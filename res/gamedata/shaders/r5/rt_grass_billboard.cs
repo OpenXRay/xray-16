@@ -10,8 +10,7 @@ RWByteAddressBuffer g_OutputIB : register(u1);
 
 cbuffer BillboardRTCB : register(b5) {
     uint maxVertsPerBillboard;
-    float normalBend;
-    uint2 pad;
+    uint3 pad;
 };
 
 uint pack_normal(float3 n)
@@ -50,13 +49,12 @@ void main(uint3 dtid : SV_DispatchThreadID)
         float3 p0 = PulledWorldPos(inst, pv0);
         float3 p1 = PulledWorldPos(inst, pv1);
         float3 p2 = PulledWorldPos(inst, pv2);
-        float3 faceN = PulledFaceNormal(p0, p1, p2);
+        uint packedN = pack_normal(PulledFaceNormal(p0, p1, p2));
         for (uint c = 0; c < 3; c++) {
             uint vi = vertBase + t + c;
             PulledVertex pv = (c == 0) ? pv0 : ((c == 1) ? pv1 : pv2);
-            float3 n = PulledBentNormal(inst, mdl, float3(pv.px, pv.py, pv.pz), faceN, normalBend);
             g_Output.Store3(vi * 24, asuint((c == 0) ? p0 : ((c == 1) ? p1 : p2)));
-            g_Output.Store(vi * 24 + 12, pack_normal(n));
+            g_Output.Store(vi * 24 + 12, packedN);
             g_Output.Store2(vi * 24 + 16, asuint(float2(pv.u, pv.v)));
             g_OutputIB.Store(vi * 4, vi);
         }

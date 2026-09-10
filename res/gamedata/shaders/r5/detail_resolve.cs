@@ -26,7 +26,6 @@ cbuffer DetailGlobals : register(b3)
     uint buildDetailsPbrIndex;
     float4 interaction_window;
     float4 interaction_window_prev;
-    float grass_normal_bend;
     uint buildDetailsBumpIndex;
 };
 
@@ -71,7 +70,6 @@ static const float GRASS_ROUGHNESS_TIP = 0.55;
 static const float GRASS_AO_BASE = 0.35;
 static const float GRASS_AO_TIP = 1.0;
 static const float GRASS_AO_POWER = 0.6;
-static const float DETAIL_TRANSMISSION_BASE = 0.25;
 
 float2 PrevMotion(float3 prevWorld, float2 uvPix)
 {
@@ -139,9 +137,7 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     float2 uvDdx = InterpolateBaryDdx2(bd, uv0, uv1, uv2);
     float2 uvDdy = InterpolateBaryDdy2(bd, uv0, uv1, uv2);
     float heightParam = dot(bd.m_lambda, h);
-    float3 local = InterpolateBary3(bd, float3(pv0.px, pv0.py, pv0.pz), float3(pv1.px, pv1.py, pv1.pz), float3(pv2.px, pv2.py, pv2.pz));
-    float3 Ng = FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2));
-    float3 N = sway ? PulledBentNormal(inst, mdl, local, Ng, grass_normal_bend) : float3(0.0, 1.0, 0.0);
+    float3 N = sway ? FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2)) : float3(0.0, 1.0, 0.0);
 
     float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float3 albedo = texel.rgb;
@@ -254,7 +250,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 rn2 = InterpolateBary3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2);
 
     float widthPercent = uv.x;
-    float3 N = normalize(lerp(rn1, rn2, widthPercent));
+    float3 N = FoliageViewerNormal(normalize(lerp(rn1, rn2, widthPercent)), v1.pos - v0.pos, v2.pos - v0.pos, eye_position - worldPos);
 
     float4 veinDetail = GetBindlessTexture(g_VeinIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float veinValue = veinDetail.a;
@@ -290,7 +286,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         motion = PrevMotion(InterpolateBary3(bd, p0.pos, p1.pos, p2.pos), uvPix);
     }
 
-    float transmission = foliage_params.x * lerp(DETAIL_TRANSMISSION_BASE, 1.0, saturate(t));
+    float transmission = foliage_params.x;
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, 0.0);
     g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
