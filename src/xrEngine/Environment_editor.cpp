@@ -25,8 +25,12 @@ ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
 ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
-ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.5f, 0.7f, 0.3f};       // Subsurface scattering tint
-ENGINE_API float ps_r3_grass_sss_intensity = 0.25f;                    // SSS strength
+ENGINE_API Fvector3 ps_r_foliage_sss_tint = {0.5f, 0.7f, 0.3f};
+ENGINE_API float ps_r_foliage_sss_sigma = 3.0f;
+ENGINE_API float ps_r_foliage_sss_blade = 0.35f;
+ENGINE_API float ps_r_foliage_sss_tuft = 0.3f;
+ENGINE_API float ps_r_foliage_sss_tree = 0.3f;
+ENGINE_API float ps_r_foliage_sss_ambient = 0.5f;
 ENGINE_API float ps_r3_grass_normal_bend = 0.5f;
 
 // Per-object-ID color tints (64 grass types max)
@@ -626,13 +630,25 @@ void CEnvironment::on_tool_frame()
             ImGui::DragFloat("Color variation", &ps_r3_grass_color_variation, 0.01f, 0.0f, 0.5f);
             ItemHelp("Per-blade random color variation (0 = uniform, 0.15 = +/-15%)");
 
-            ImGui::SeparatorText("Subsurface Scattering");
+            ImGui::SeparatorText("Foliage Subsurface Scattering");
 
-            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
-            ItemHelp("Color of light transmitted through grass blades (backlit effect)");
+            ImGui::ColorEdit3("SSS tint", reinterpret_cast<float*>(&ps_r_foliage_sss_tint));
+            ItemHelp("Multiplies the albedo of light transmitted through blades, tufts and leaves (r_foliage_sss_tint)");
 
-            ImGui::DragFloat("SSS intensity", &ps_r3_grass_sss_intensity, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Strength of subsurface scattering effect");
+            ImGui::DragFloat("Extinction (1/m)", &ps_r_foliage_sss_sigma, 0.05f, 0.0f, 20.0f);
+            ItemHelp("How fast transmitted light dies per metre of occluding foliage between the surface and the light, measured in the shadow maps (r_foliage_sss_sigma)");
+
+            ImGui::DragFloat("Blade strength", &ps_r_foliage_sss_blade, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength at the tip of procedural grass blades; bases are thicker and transmit less (r_foliage_sss_blade)");
+
+            ImGui::DragFloat("Tuft strength", &ps_r_foliage_sss_tuft, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength at the top of swaying detail tufts (r_foliage_sss_tuft)");
+
+            ImGui::DragFloat("Tree strength", &ps_r_foliage_sss_tree, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength of alpha-tested tree and bush leaves (r_foliage_sss_tree)");
+
+            ImGui::DragFloat("Ambient transmission", &ps_r_foliage_sss_ambient, 0.01f, 0.0f, 2.0f);
+            ItemHelp("Extra ambient light reaching foliage through its back side, scaled by the transmission strength (r_foliage_sss_ambient)");
 
             ImGui::SeparatorText("Detail Tufts");
 

@@ -47,8 +47,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     }
     if (g_Mode == 5u)
     {
-        float a = g_Mask.Load(int3(px, 0)).b;
-        g_Output[px] = float4(a, a * 0.5, 1.0 - a, 1.0);
+        float t = saturate(g_Mask.Load(int3(px, 0)).b * 0.25);
+        g_Output[px] = float4(t, t * 0.5, 1.0 - t, 1.0);
         return;
     }
     if (zndc > 0.0)

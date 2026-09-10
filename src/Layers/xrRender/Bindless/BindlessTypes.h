@@ -64,7 +64,6 @@ static_assert(sizeof(MaterialData) == 32, "MaterialData must be 32 bytes for GPU
 // Material flags (must match HLSL)
 enum MaterialFlags : u32 {
     MAT_FLAG_ALPHA_TEST    = (1 << 0),  // Enable alpha testing
-    MAT_FLAG_TWO_SIDED     = (1 << 1),  // Disable backface culling
     MAT_FLAG_EMISSIVE      = (1 << 2),  // Has emissive component
     MAT_FLAG_HAS_DETAIL    = (1 << 3),  // Has detail texture (detailIndex valid)
     MAT_FLAG_HAS_NORMAL    = (1 << 4),  // Has normal map (normalIndex valid)
@@ -73,6 +72,7 @@ enum MaterialFlags : u32 {
     MAT_FLAG_HAS_PBR_LAYER = (1 << 7),  // Terrain has PBR detail textures
     MAT_FLAG_ALPHA_BLEND   = (1 << 8),  // Transparent alpha blending
     MAT_FLAG_WATER         = (1 << 9),  // Water surface (Fresnel reflect/refract)
+    MAT_FLAG_FOLIAGE       = (1 << 10), // Thin two-sided vegetation, shaded with transmission
 };
 
 // ═══════════════════════════════════════════════════════

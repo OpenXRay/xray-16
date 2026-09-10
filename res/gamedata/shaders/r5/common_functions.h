@@ -255,21 +255,27 @@ float3 shade_pbr(
 	float ao,
 	float4 svPosition,
 	float sunVis,
-	bool foliage = false)
+	uint shadingClass = SHADING_CLASS_STANDARD,
+	float transmission = 0.0)
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
+	bool foliage = shadingClass == SHADING_CLASS_FOLIAGE;
 
+	float2 sun = float2(sunVis, 0.0);
 	if (sunVis < 0.0)
-		sunVis = SunVisibility(worldPos, svPosition);
+		sun = SunShadow(worldPos, svPosition);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
-	float3 sssColor = foliage ? albedo * foliage_sss.rgb * (foliage_sss.w * ao) : 0.0;
+	float3 sssColor = foliage ? albedo * foliage_sss.rgb * transmission : 0.0;
 	float3 finalColor;
 	if (foliage)
 	{
-		float3 sunLight = FoliageDirectLighting(albedo, N, L, L_sun_color) + FoliageTransmission(N, V, L) * sssColor * L_sun_color;
-		finalColor = sunLight * sunVis + albedo * ambientColor * ao;
+		float sunTransmit = sun.x + (1.0 - sun.x) * FoliageTransmittance(sun.y, foliage_sss.w);
+		float3 sunLight = FoliageDirectLighting(albedo, N, L, L_sun_color) * sun.x
+			+ FoliageTransmission(N, V, L) * sunTransmit * sssColor * L_sun_color;
+		float3 ambient = albedo * ambientColor * ao * (1.0 + foliage_sss.rgb * (transmission * foliage_params.w));
+		finalColor = sunLight + ambient;
 	}
 	else
 	{
@@ -277,7 +283,7 @@ float3 shade_pbr(
 			albedo, N, V, L,
 			L_sun_color,
 			metallic, roughness, (uint)pbr_diffuse_mode
-		) * sunVis;
+		) * sun.x;
 		float3 ambient = PBRAmbient(
 			albedo, N, V,
 			metallic, roughness, ao,
@@ -292,7 +298,7 @@ float3 shade_pbr(
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, foliage, sssColor);
+			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, shadingClass, sssColor);
 	}
 #endif
 

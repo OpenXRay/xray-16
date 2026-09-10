@@ -66,6 +66,7 @@ bool GetShaderBlendInfo(const char* shaderName, ShaderBlendInfo& out)
     out.alphaRef = props.alphaRef;
     out.writesDepth = props.writesDepth;
     out.strictB2F = props.strictB2F;
+    out.foliage = props.foliage;
     return true;
 }
 

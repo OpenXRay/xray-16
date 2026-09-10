@@ -4,7 +4,10 @@
 #ifndef PBR_BRDF_H
 #define PBR_BRDF_H
 
+#include "shared/shading_class.h"
+
 static const float PI = 3.14159265359f;
+static const float LOG2_E = 1.44269504089f;
 static const float MIN_ROUGHNESS = 0.04f;
 static const float DIELECTRIC_F0 = 0.04f;
 
@@ -165,6 +168,12 @@ float FoliageTransmission(float3 N, float3 V, float3 L)
     const float a2 = 0.36f;
     float d = (VoL * a2 - VoL) * VoL + 1.0f;
     return wrapNoL * (a2 / PI) / (d * d);
+}
+
+float FoliageTransmittance(float thickness, float sigma)
+{
+    float e = exp2(-thickness * sigma * (LOG2_E / 3.0f));
+    return 0.25f * e * (e * e + 3.0f);
 }
 
 // Simplified ambient term (placeholder for future IBL)

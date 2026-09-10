@@ -30,6 +30,7 @@ struct ShaderBlendInfo
     u32 alphaRef = 0;
     bool writesDepth = true;
     bool strictB2F = false;
+    bool foliage = false;
 };
 bool GetShaderBlendInfo(const char* shaderName, ShaderBlendInfo& out);
 

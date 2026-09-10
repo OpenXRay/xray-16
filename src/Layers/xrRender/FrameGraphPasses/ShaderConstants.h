@@ -15,8 +15,12 @@ extern ENGINE_API Fvector4 ps_dev_param_4;
 extern ECORE_API int ps_r_cluster_debug;
 extern ECORE_API int ps_r_sun_shadow_debug;
 extern ENGINE_API float psHUD_FOV;
-extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
-extern ENGINE_API float ps_r3_grass_sss_intensity;
+extern ENGINE_API Fvector3 ps_r_foliage_sss_tint;
+extern ENGINE_API float ps_r_foliage_sss_sigma;
+extern ENGINE_API float ps_r_foliage_sss_blade;
+extern ENGINE_API float ps_r_foliage_sss_tuft;
+extern ENGINE_API float ps_r_foliage_sss_tree;
+extern ENGINE_API float ps_r_foliage_sss_ambient;
 namespace xray::render {
     namespace fg {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
@@ -124,8 +128,9 @@ struct alignas(16) StaticGlobals {
     Fvector4 dev_param_4;
 
     Fvector4 foliage_sss;
+    Fvector4 foliage_params;
 };
-static_assert(sizeof(StaticGlobals) == 864, "StaticGlobals must be 864 bytes");
+static_assert(sizeof(StaticGlobals) == 880, "StaticGlobals must be 880 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -206,7 +211,8 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.dev_param_4.x = float(ps_r_cluster_debug);
     cb.dev_param_3.y = float(ps_r_sun_shadow_debug);
 
-    cb.foliage_sss.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
+    cb.foliage_sss.set(ps_r_foliage_sss_tint.x, ps_r_foliage_sss_tint.y, ps_r_foliage_sss_tint.z, ps_r_foliage_sss_sigma);
+    cb.foliage_params.set(ps_r_foliage_sss_blade, ps_r_foliage_sss_tuft, ps_r_foliage_sss_tree, ps_r_foliage_sss_ambient);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

@@ -40,7 +40,6 @@ struct MaterialData
 
 // Material flags
 #define MAT_FLAG_ALPHA_TEST    (1 << 0)
-#define MAT_FLAG_TWO_SIDED     (1 << 1)
 #define MAT_FLAG_EMISSIVE      (1 << 2)
 #define MAT_FLAG_HAS_DETAIL    (1 << 3)
 #define MAT_FLAG_HAS_NORMAL    (1 << 4)
@@ -49,6 +48,7 @@ struct MaterialData
 #define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
 #define MAT_FLAG_ALPHA_BLEND   (1 << 8)
 #define MAT_FLAG_WATER         (1 << 9)
+#define MAT_FLAG_FOLIAGE       (1 << 10)
 
 // ═══════════════════════════════════════════════════════
 //  TERRAIN MATERIAL DATA (matches C++ TerrainMaterialData)

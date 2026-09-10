@@ -23,6 +23,7 @@ RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
 RWTexture2D<float2> g_OutMotion : register(u3);
 RWTexture2D<float> g_OutVisDepth : register(u4);
+RWTexture2D<float2> g_OutMaterial : register(u5);
 
 cbuffer MaterialResolveParams : register(b5)
 {
@@ -194,6 +195,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_OutNormal[p] = float4(s.N, roughnessOut);
     g_OutBaseColor[p] = float4(s.albedo, s.metallic);
     g_OutColor[p] = float4(s.emissive, s.ao);
+    g_OutMaterial[p] = PackGBufferMaterial(s.shadingClass, s.transmission);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

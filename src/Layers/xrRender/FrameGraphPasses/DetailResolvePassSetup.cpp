@@ -25,6 +25,7 @@ struct DetailResolvePassData {
     VirtualResourceHandle color;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle material;
     VirtualResourceHandle motionVectors;
     VirtualResourceHandle visDepth;
     fg::RenderDevice* device = nullptr;
@@ -136,6 +137,7 @@ MaterialResolveOutput setupDetailResolvePass(
             data.color = passBuilder.readWrite(inputs.color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::UnorderedAccess);
+            data.material = passBuilder.readWrite(inputs.material, ResourceState::UnorderedAccess);
             data.motionVectors = passBuilder.readWrite(inputs.motionVectors, ResourceState::UnorderedAccess);
             data.visDepth = passBuilder.readWrite(inputs.visDepth, ResourceState::UnorderedAccess);
         },
@@ -162,9 +164,10 @@ MaterialResolveOutput setupDetailResolvePass(
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            auto* materialRT = fg.GetPhysicalTexture(data.material);
             auto* motionRT = fg.GetPhysicalTexture(data.motionVectors);
             auto* visDepthRT = fg.GetPhysicalTexture(data.visDepth);
-            if (!visRT || !depthRT || !colorRT || !normalRT || !baseColorRT || !motionRT || !visDepthRT)
+            if (!visRT || !depthRT || !colorRT || !normalRT || !baseColorRT || !materialRT || !motionRT || !visDepthRT)
                 return;
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
@@ -214,6 +217,7 @@ MaterialResolveOutput setupDetailResolvePass(
             bsb.Texture("g_Depth", depthRT);
             bsb.TextureUAV("g_OutNormal", normalRT);
             bsb.TextureUAV("g_OutBaseColor", baseColorRT);
+            bsb.TextureUAV("g_OutMaterial", materialRT);
             bsb.TextureUAV("g_OutColor", colorRT);
             bsb.TextureUAV("g_OutMotion", motionRT);
             bsb.TextureUAV("g_OutVisDepth", visDepthRT);
@@ -236,6 +240,7 @@ MaterialResolveOutput setupDetailResolvePass(
     out.color = passData.color;
     out.normal = passData.normal;
     out.baseColor = passData.baseColor;
+    out.material = passData.material;
     out.motionVectors = passData.motionVectors;
     out.visDepth = passData.visDepth;
     return out;
