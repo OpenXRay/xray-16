@@ -160,14 +160,14 @@ float3 FoliageDirectLighting(float3 albedo, float3 N, float3 L, float3 lightColo
     return albedo * (saturate(dot(N, L)) / PI) * lightColor;
 }
 
-float FoliageTransmission(float3 N, float3 V, float3 L)
+float FoliageTransmission(float3 N, float3 V, float3 L, float forward)
 {
     const float wrap = 0.5f;
     float wrapNoL = saturate((-dot(N, L) + wrap) / ((1.0f + wrap) * (1.0f + wrap)));
     float VoL = saturate(-dot(V, L));
     const float a2 = 0.36f;
     float d = (VoL * a2 - VoL) * VoL + 1.0f;
-    return wrapNoL * (a2 / PI) / (d * d);
+    return wrapNoL * lerp(1.0f / PI, a2 / (PI * d * d), forward);
 }
 
 float FoliageTransmittance(float thickness, float sigma)

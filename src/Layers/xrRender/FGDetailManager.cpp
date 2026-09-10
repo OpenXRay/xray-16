@@ -565,6 +565,41 @@ bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
     return true;
 }
 
+static u32 LoadOptionalDetailTexture(nvrhi::IDevice* device, const char* name, const char* debugName, nvrhi::TextureHandle& outTexture)
+{
+    resources::DDSData data;
+    if (!resources::DDSLoader::LoadFromFile(name, data) || !data.isValid || data.mipLevels.empty())
+        return 0;
+
+    nvrhi::TextureDesc desc;
+    desc.width = data.desc.width;
+    desc.height = data.desc.height;
+    desc.depth = 1;
+    desc.arraySize = 1;
+    desc.mipLevels = data.desc.mipLevels;
+    desc.format = data.desc.format;
+    desc.dimension = nvrhi::TextureDimension::Texture2D;
+    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.keepInitialState = true;
+    desc.debugName = debugName;
+
+    outTexture = device->createTexture(desc);
+    if (!outTexture || !GEnv.Backend)
+        return 0;
+
+    auto* renderDevice = GEnv.Render->GetRenderDevice();
+    for (u32 mip = 0; mip < data.mipLevels.size(); mip++)
+    {
+        const auto& ml = data.mipLevels[mip];
+        renderDevice->UploadTextureDataToNVRHI(outTexture, 0, mip, ml.data, ml.size, ml.rowPitch, 0);
+    }
+
+    const u32 index = GEnv.Backend->RegisterBindlessTexture(outTexture);
+    Msg("* [FGDetailManager] %s.dds loaded: %ux%u, %u mips, format=%d, bindless=%u",
+        name, desc.width, desc.height, desc.mipLevels, (int)desc.format, index);
+    return index;
+}
+
 bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
 {
     ZoneScoped;
@@ -621,38 +656,8 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
             texDesc.width, texDesc.height, texDesc.mipLevels, (int)texDesc.format, buildDetailsBindlessIndex);
     }
 
-    resources::DDSData pbrData;
-    if (resources::DDSLoader::LoadFromFile("build_details_pbr", pbrData) && pbrData.isValid && !pbrData.mipLevels.empty())
-    {
-        nvrhi::TextureDesc pbrDesc;
-        pbrDesc.width = pbrData.desc.width;
-        pbrDesc.height = pbrData.desc.height;
-        pbrDesc.depth = 1;
-        pbrDesc.arraySize = 1;
-        pbrDesc.mipLevels = pbrData.desc.mipLevels;
-        pbrDesc.format = pbrData.desc.format;
-        pbrDesc.dimension = nvrhi::TextureDimension::Texture2D;
-        pbrDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-        pbrDesc.keepInitialState = true;
-        pbrDesc.debugName = "BuildDetailsPBR";
-
-        buildDetailsPbrTexture = device->createTexture(pbrDesc);
-        if (buildDetailsPbrTexture)
-        {
-            for (u32 mip = 0; mip < pbrData.mipLevels.size(); mip++)
-            {
-                const auto& ml = pbrData.mipLevels[mip];
-                renderDevice->UploadTextureDataToNVRHI(buildDetailsPbrTexture, 0, mip, ml.data, ml.size, ml.rowPitch, 0);
-            }
-
-            if (GEnv.Backend)
-            {
-                buildDetailsPbrBindlessIndex = GEnv.Backend->RegisterBindlessTexture(buildDetailsPbrTexture);
-                Msg("* [FGDetailManager] build_details_pbr.dds loaded: %ux%u, %u mips, format=%d, bindless=%u",
-                    pbrDesc.width, pbrDesc.height, pbrDesc.mipLevels, (int)pbrDesc.format, buildDetailsPbrBindlessIndex);
-            }
-        }
-    }
+    buildDetailsPbrBindlessIndex = LoadOptionalDetailTexture(device, "build_details_pbr", "BuildDetailsPBR", buildDetailsPbrTexture);
+    buildDetailsBumpBindlessIndex = LoadOptionalDetailTexture(device, "build_details_bump", "BuildDetailsBump", buildDetailsBumpTexture);
 
     return true;
 }
@@ -1277,6 +1282,8 @@ void FGDetailManager::DestroyGPUBuffers()
 
     pulledVertexBuffer = nullptr;
     buildDetailsTexture = nullptr;
+    buildDetailsPbrTexture = nullptr;
+    buildDetailsBumpTexture = nullptr;
 
     perlin4dTexture = nullptr;
     perlin4dComputeShader = nullptr;
@@ -2583,6 +2590,7 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.grass_blade_height = ps_r3_grass_blade_height;
     fc.buildDetailsIndex = buildDetailsBindlessIndex;
     fc.buildDetailsPbrIndex = buildDetailsPbrBindlessIndex;
+    fc.buildDetailsBumpIndex = buildDetailsBumpBindlessIndex;
 
     const u32 cur = interactionCurrent;
     const u32 prev = cur ^ 1u;
@@ -2591,7 +2599,7 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.interaction_window.set(interactionOrigin[cur].x, interactionOrigin[cur].y, invSpan, live ? 1.0f : 0.0f);
     fc.interaction_window_prev.set(interactionOrigin[prev].x, interactionOrigin[prev].y, invSpan, (live && interactionValid[prev]) ? 1.0f : 0.0f);
     fc.grass_normal_bend = ps_r3_grass_normal_bend;
-    fc.grass_pad0 = fc.grass_pad1 = fc.grass_pad2 = 0.0f;
+    fc.grass_pad0 = fc.grass_pad1 = 0.0f;
 }
 
 void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)

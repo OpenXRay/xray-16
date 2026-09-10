@@ -25,12 +25,13 @@ ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
 ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
-ENGINE_API Fvector3 ps_r_foliage_sss_tint = {0.5f, 0.7f, 0.3f};
+ENGINE_API Fvector3 ps_r_foliage_sss_tint = {0.7f, 1.0f, 0.6f};
 ENGINE_API float ps_r_foliage_sss_sigma = 3.0f;
 ENGINE_API float ps_r_foliage_sss_blade = 0.35f;
-ENGINE_API float ps_r_foliage_sss_tuft = 0.3f;
-ENGINE_API float ps_r_foliage_sss_tree = 0.3f;
-ENGINE_API float ps_r_foliage_sss_ambient = 0.5f;
+ENGINE_API float ps_r_foliage_sss_tuft = 1.0f;
+ENGINE_API float ps_r_foliage_sss_tree = 1.0f;
+ENGINE_API float ps_r_foliage_sss_ambient = 1.0f;
+ENGINE_API float ps_r_foliage_sss_forward = 0.5f;
 ENGINE_API float ps_r3_grass_normal_bend = 0.5f;
 
 // Per-object-ID color tints (64 grass types max)
@@ -642,7 +643,7 @@ void CEnvironment::on_tool_frame()
             ItemHelp("Transmission strength at the tip of procedural grass blades; bases are thicker and transmit less (r_foliage_sss_blade)");
 
             ImGui::DragFloat("Tuft strength", &ps_r_foliage_sss_tuft, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Transmission strength at the top of swaying detail tufts (r_foliage_sss_tuft)");
+            ItemHelp("Transmission strength of swaying detail tufts (r_foliage_sss_tuft)");
 
             ImGui::DragFloat("Tree strength", &ps_r_foliage_sss_tree, 0.01f, 0.0f, 1.0f);
             ItemHelp("Transmission strength of alpha-tested tree and bush leaves (r_foliage_sss_tree)");
@@ -650,10 +651,13 @@ void CEnvironment::on_tool_frame()
             ImGui::DragFloat("Ambient transmission", &ps_r_foliage_sss_ambient, 0.01f, 0.0f, 2.0f);
             ItemHelp("Extra ambient light reaching foliage through its back side, scaled by the transmission strength (r_foliage_sss_ambient)");
 
+            ImGui::DragFloat("Forward scatter", &ps_r_foliage_sss_forward, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Share of transmitted light that peaks towards the sun seen through the leaf; the rest leaves diffusely (r_foliage_sss_forward)");
+
             ImGui::SeparatorText("Detail Tufts");
 
             ImGui::DragFloat("Tuft normal bend", &ps_r3_grass_normal_bend, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Tilts detail mesh normals from straight up (0, lit like the ground) towards a dome around each tuft (1)");
+            ItemHelp("Blends detail mesh normals from the viewer-facing card normal (0, lit like tree leaves) towards a dome around each tuft (1)");
 
             ImGui::SeparatorText("Per-Object Tint");
 

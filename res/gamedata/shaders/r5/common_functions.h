@@ -273,7 +273,7 @@ float3 shade_pbr(
 	{
 		float sunTransmit = sun.x + (1.0 - sun.x) * FoliageTransmittance(sun.y, foliage_sss.w);
 		float3 sunLight = FoliageDirectLighting(albedo, N, L, L_sun_color) * sun.x
-			+ FoliageTransmission(N, V, L) * sunTransmit * sssColor * L_sun_color;
+			+ FoliageTransmission(N, V, L, foliage_params2.x) * sunTransmit * sssColor * L_sun_color;
 		float3 ambient = albedo * ambientColor * ao * (1.0 + foliage_sss.rgb * (transmission * foliage_params.w));
 		finalColor = sunLight + ambient;
 	}
