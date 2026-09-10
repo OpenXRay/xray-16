@@ -23,7 +23,7 @@ float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy
 BumpSample SampleNormalGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
 {
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
-        return DecodeBump(float4(0.0, 0.0, 0.5, 0.5));
+        return DecodeBump(BUMP_FLAT);
     return DecodeBump(GetBindlessTexture(mat.normalIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
 }
 
@@ -47,12 +47,14 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
     s.albedo = diffuse;
     s.N = normalize(vertexNormal);
     float gloss = 0.0;
+    float variance = 0.0;
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
         BumpSample bump = SampleNormalGrad(mat, uv, uvDdx, uvDdy);
         float3x3 TBN = float3x3(normalize(tangent), normalize(bitangent), s.N);
         s.N = normalize(mul(bump.normal, TBN));
         gloss = bump.gloss;
+        variance = bump.variance;
     }
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
@@ -69,6 +71,7 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
         s.roughness = pbrSample.g;
         s.ao = pbrSample.b;
     }
+    s.roughness = RoughnessWithVariance(s.roughness, variance);
     s.emissive = (mat.flags & MAT_FLAG_EMISSIVE) ? s.albedo * g_Variants[mat.shaderVariant].emissive : 0.0;
     bool foliage = (mat.flags & MAT_FLAG_FOLIAGE) != 0;
     s.shadingClass = foliage ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD;
@@ -83,11 +86,11 @@ float4 SampleTerrainTextureGrad(uint index, float2 uv, float2 uvDdx, float2 uvDd
     return GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
 }
 
-float3 SampleTerrainNormalGrad(uint index, float2 uv, float2 uvDdx, float2 uvDdy)
+BumpSample SampleTerrainNormalGrad(uint index, float2 uv, float2 uvDdx, float2 uvDdy)
 {
     if (index == INVALID_TEXTURE_INDEX)
-        return float3(0.0, 0.0, 1.0);
-    return DecodeBump(GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy)).normal;
+        return DecodeBump(BUMP_FLAT);
+    return DecodeBump(GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
 }
 
 MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy, float3 vertexNormal, float3 tangent, float3 bitangent)
@@ -114,13 +117,16 @@ MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 u
     s.albedo = baseSample.rgb * blendedDetail * 2.0;
 
     float3 N = normalize(vertexNormal);
-    float3 normalR = SampleTerrainNormalGrad(mat.normalR_Index, detailUV, detailDdx, detailDdy);
-    float3 normalG = SampleTerrainNormalGrad(mat.normalG_Index, detailUV, detailDdx, detailDdy);
-    float3 normalB = SampleTerrainNormalGrad(mat.normalB_Index, detailUV, detailDdx, detailDdy);
-    float3 normalA = SampleTerrainNormalGrad(mat.normalA_Index, detailUV, detailDdx, detailDdy);
-    float3 blendedNormal = normalize(normalR * mask.r + normalG * mask.g + normalB * mask.b + normalA * mask.a);
+    BumpSample normalR = SampleTerrainNormalGrad(mat.normalR_Index, detailUV, detailDdx, detailDdy);
+    BumpSample normalG = SampleTerrainNormalGrad(mat.normalG_Index, detailUV, detailDdx, detailDdy);
+    BumpSample normalB = SampleTerrainNormalGrad(mat.normalB_Index, detailUV, detailDdx, detailDdy);
+    BumpSample normalA = SampleTerrainNormalGrad(mat.normalA_Index, detailUV, detailDdx, detailDdy);
+    float3 blendSum = normalR.normal * mask.r + normalG.normal * mask.g + normalB.normal * mask.b + normalA.normal * mask.a;
+    float blendLen = max(length(blendSum), 1e-4);
+    float variance = normalR.variance * mask.r + normalG.variance * mask.g + normalB.variance * mask.b + normalA.variance * mask.a
+        + (1.0 - min(blendLen, 1.0)) / blendLen;
     float3x3 TBN = float3x3(normalize(tangent), normalize(bitangent), N);
-    s.N = normalize(mul(blendedNormal, TBN));
+    s.N = normalize(mul(blendSum / blendLen, TBN));
 
     s.metallic = 0.0;
     s.roughness = 0.5;
@@ -136,6 +142,7 @@ MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 u
         s.roughness = blendedPBR.g;
         s.ao = blendedPBR.b;
     }
+    s.roughness = RoughnessWithVariance(s.roughness, variance);
     s.emissive = 0.0;
     s.shadingClass = SHADING_CLASS_STANDARD;
     s.transmission = 0.0;
