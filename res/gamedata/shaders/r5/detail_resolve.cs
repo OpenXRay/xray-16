@@ -27,6 +27,7 @@ cbuffer DetailGlobals : register(b3)
     float4 interaction_window;
     float4 interaction_window_prev;
     float grass_normal_bend;
+    uint buildDetailsBumpIndex;
 };
 
 cbuffer DetailResolveParams : register(b5)
@@ -81,6 +82,20 @@ float2 PrevMotion(float3 prevWorld, float2 uvPix)
     return float2(prevNdc.x, -prevNdc.y) * 0.5 + 0.5 - uvPix;
 }
 
+float3x3 CardTangentFrame(float3 e1, float3 e2, float2 d1, float2 d2, float3 N)
+{
+    float handedness = sign(d1.x * d2.y - d2.x * d1.y);
+    float3 T = (e1 * d2.y - e2 * d1.y) * handedness;
+    float3 B = (e2 * d1.x - e1 * d2.x) * handedness;
+    T -= N * dot(N, T);
+    float tl = length(T);
+    T = (tl > 1e-8) ? (T / tl) : 0.0;
+    B -= N * dot(N, B) + T * dot(T, B);
+    float bl = length(B);
+    B = (bl > 1e-8) ? (B / bl) : 0.0;
+    return float3x3(T, B, N);
+}
+
 void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2 pixelNdc)
 {
     uint src = (kind == DETAIL_KIND_MESH) ? g_VisibleMesh[slot] : g_VisibleDecal[slot];
@@ -125,12 +140,20 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     float2 uvDdy = InterpolateBaryDdy2(bd, uv0, uv1, uv2);
     float heightParam = dot(bd.m_lambda, h);
     float3 local = InterpolateBary3(bd, float3(pv0.px, pv0.py, pv0.pz), float3(pv1.px, pv1.py, pv1.pz), float3(pv2.px, pv2.py, pv2.pz));
-    float3 N = sway ? PulledBentNormal(inst, mdl, local, grass_normal_bend) : float3(0.0, 1.0, 0.0);
+    float3 Ng = FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2));
+    float3 N = sway ? PulledBentNormal(inst, mdl, local, Ng, grass_normal_bend) : float3(0.0, 1.0, 0.0);
 
     float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float3 albedo = texel.rgb;
+    float gloss = 0.0;
+    if (buildDetailsBumpIndex != 0u)
+    {
+        BumpSample bump = DecodeBump(GetBindlessTexture(buildDetailsBumpIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
+        N = normalize(mul(bump.normal, CardTangentFrame(w1 - w0, w2 - w0, uv1 - uv0, uv2 - uv0, N)));
+        gloss = bump.gloss;
+    }
     float metallic = 0.0;
-    float roughness = 0.85;
+    float roughness = 1.0 - gloss;
     float ao = sway ? lerp(0.5, 1.0, saturate(heightParam)) : 1.0;
     if (buildDetailsPbrIndex != 0u)
     {
@@ -161,7 +184,7 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
     }
 
-    float transmission = sway ? foliage_params.y * lerp(DETAIL_TRANSMISSION_BASE, 1.0, saturate(heightParam)) : 0.0;
+    float transmission = sway ? foliage_params.y : 0.0;
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, metallic);
     g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);

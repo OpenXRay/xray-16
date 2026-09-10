@@ -21,6 +21,7 @@ extern ENGINE_API float ps_r_foliage_sss_blade;
 extern ENGINE_API float ps_r_foliage_sss_tuft;
 extern ENGINE_API float ps_r_foliage_sss_tree;
 extern ENGINE_API float ps_r_foliage_sss_ambient;
+extern ENGINE_API float ps_r_foliage_sss_forward;
 namespace xray::render {
     namespace fg {
         extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
@@ -129,8 +130,9 @@ struct alignas(16) StaticGlobals {
 
     Fvector4 foliage_sss;
     Fvector4 foliage_params;
+    Fvector4 foliage_params2;
 };
-static_assert(sizeof(StaticGlobals) == 880, "StaticGlobals must be 880 bytes");
+static_assert(sizeof(StaticGlobals) == 896, "StaticGlobals must be 896 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -213,6 +215,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
 
     cb.foliage_sss.set(ps_r_foliage_sss_tint.x, ps_r_foliage_sss_tint.y, ps_r_foliage_sss_tint.z, ps_r_foliage_sss_sigma);
     cb.foliage_params.set(ps_r_foliage_sss_blade, ps_r_foliage_sss_tuft, ps_r_foliage_sss_tree, ps_r_foliage_sss_ambient);
+    cb.foliage_params2.set(ps_r_foliage_sss_forward, 0.f, 0.f, 0.f);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

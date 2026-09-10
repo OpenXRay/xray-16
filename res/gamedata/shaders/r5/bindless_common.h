@@ -181,24 +181,22 @@ struct BumpSample
     float gloss;
 };
 
-BumpSample SampleNormal(MaterialData mat, float2 uv)
+// X-Ray bump format: R=glossiness, G=normalZ(unused), B=normalY(DX), A=normalX
+BumpSample DecodeBump(float4 Nu)
 {
     BumpSample result;
-    result.normal = float3(0, 0, 1);
-    result.gloss = 0.0;
-
-    if (mat.normalIndex == INVALID_TEXTURE_INDEX)
-        return result;
-
-    Texture2D tex = GetBindlessTexture(mat.normalIndex);
-    float4 Nu = tex.Sample(smp_linear, uv);
-
-    // X-Ray bump format: R=glossiness, G=normalZ(unused), B=normalY(DX), A=normalX
     result.normal.x = Nu.a * 2.0 - 1.0;
     result.normal.y = Nu.b * 2.0 - 1.0;
     result.normal.z = sqrt(saturate(1.0 - result.normal.x * result.normal.x - result.normal.y * result.normal.y));
     result.gloss = Nu.r * Nu.r;
     return result;
+}
+
+BumpSample SampleNormal(MaterialData mat, float2 uv)
+{
+    if (mat.normalIndex == INVALID_TEXTURE_INDEX)
+        return DecodeBump(float4(0.0, 0.0, 0.5, 0.5));
+    return DecodeBump(GetBindlessTexture(mat.normalIndex).Sample(smp_linear, uv));
 }
 
 // ─────────────────────────────────────────────────────

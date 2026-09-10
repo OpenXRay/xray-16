@@ -42,6 +42,7 @@ extern ENGINE_API float ps_r_foliage_sss_blade;
 extern ENGINE_API float ps_r_foliage_sss_tuft;
 extern ENGINE_API float ps_r_foliage_sss_tree;
 extern ENGINE_API float ps_r_foliage_sss_ambient;
+extern ENGINE_API float ps_r_foliage_sss_forward;
 
 namespace xray::render::fg
 {
@@ -804,6 +805,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_foliage_sss_tuft", &ps_r_foliage_sss_tuft, 0.f, 1.f);
     CMD4(CCC_Float, "r_foliage_sss_tree", &ps_r_foliage_sss_tree, 0.f, 1.f);
     CMD4(CCC_Float, "r_foliage_sss_ambient", &ps_r_foliage_sss_ambient, 0.f, 2.f);
+    CMD4(CCC_Float, "r_foliage_sss_forward", &ps_r_foliage_sss_forward, 0.f, 1.f);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);

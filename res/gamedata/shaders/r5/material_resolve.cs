@@ -164,6 +164,8 @@ void main(uint3 dtid : SV_DispatchThreadID)
         float4 diffuse = SampleDiffuseGrad(mat, uv, uvDdx, uvDdy);
         s = EvalStandardMaterial(mat, diffuse.rgb, uv, uvDdx, uvDdy, n, t, b);
     }
+    if (s.shadingClass == SHADING_CLASS_FOLIAGE)
+        s.N = FoliageViewerNormal(s.N, wp1 - wp0, wp2 - wp0, eye_position - InterpolateBary3(bd, wp0, wp1, wp2));
 
     if (hud)
     {

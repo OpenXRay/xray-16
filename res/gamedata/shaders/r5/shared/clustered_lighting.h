@@ -151,7 +151,7 @@ float3 EvaluateClusteredLights(
         {
             float transmit = shadow.x + (1.0 - shadow.x) * FoliageTransmittance(shadow.y, foliage_sss.w);
             totalLight += FoliageDirectLighting(albedo, N, L, lc) * shadow.x
-                + FoliageTransmission(N, V, L) * transmit * sssColor * lc;
+                + FoliageTransmission(N, V, L, foliage_params2.x) * transmit * sssColor * lc;
         }
         else if (shadow.x > 0.001f)
         {

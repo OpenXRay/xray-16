@@ -14,4 +14,14 @@ uint GBufferShadingClass(float2 material)
     return uint(material.x * 255.0 + 0.5);
 }
 
+float3 FaceToward(float3 n, float3 dir)
+{
+    return (dot(n, dir) < 0.0) ? -n : n;
+}
+
+float3 FoliageViewerNormal(float3 N, float3 e1, float3 e2, float3 toEye)
+{
+    return FaceToward(N, FaceToward(cross(e1, e2), toEye));
+}
+
 #endif
