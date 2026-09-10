@@ -264,7 +264,42 @@ static bool GenerateNormalMapFromDiffuse(
     return true;
 }
 
-// Helper to write generated normal map as DDS (RGBA8 uncompressed for simplicity)
+static xr_vector<u8> GenerateBumpMipLevel(const u8* src, u32 srcWidth, u32 srcHeight)
+{
+    const u32 dstWidth = std::max(srcWidth / 2, 1u);
+    const u32 dstHeight = std::max(srcHeight / 2, 1u);
+    xr_vector<u8> dst(dstWidth * dstHeight * 4);
+
+    for (u32 y = 0; y < dstHeight; ++y) {
+        for (u32 x = 0; x < dstWidth; ++x) {
+            float nx = 0.f, ny = 0.f, nz = 0.f;
+            u32 gloss = 0, count = 0;
+            for (u32 sy = 0; sy < 2 && (y * 2 + sy) < srcHeight; ++sy) {
+                for (u32 sx = 0; sx < 2 && (x * 2 + sx) < srcWidth; ++sx) {
+                    const u8* t = src + ((y * 2 + sy) * srcWidth + (x * 2 + sx)) * 4;
+                    gloss += t[0];
+                    nz += t[1] / 255.f * 2.f - 1.f;
+                    ny += t[2] / 255.f * 2.f - 1.f;
+                    nx += t[3] / 255.f * 2.f - 1.f;
+                    count++;
+                }
+            }
+            const float len = std::sqrt(nx * nx + ny * ny + nz * nz);
+            if (len > 1e-6f) {
+                nx /= len; ny /= len; nz /= len;
+            } else {
+                nx = 0.f; ny = 0.f; nz = 1.f;
+            }
+            u8* o = dst.data() + (y * dstWidth + x) * 4;
+            o[0] = static_cast<u8>(gloss / count);
+            o[1] = static_cast<u8>(std::clamp((nz * 0.5f + 0.5f) * 255.f + 0.5f, 0.f, 255.f));
+            o[2] = static_cast<u8>(std::clamp((ny * 0.5f + 0.5f) * 255.f + 0.5f, 0.f, 255.f));
+            o[3] = static_cast<u8>(std::clamp((nx * 0.5f + 0.5f) * 255.f + 0.5f, 0.f, 255.f));
+        }
+    }
+    return dst;
+}
+
 static bool WriteNormalMapDDS(
     const char* root_alias,
     const xr_string& relative_path,
@@ -273,6 +308,12 @@ static bool WriteNormalMapDDS(
 {
     using namespace resources;
 
+    u32 mipCount = 1;
+    for (u32 w = width, h = height; w > 1 || h > 1; ++mipCount) {
+        w = std::max(w / 2, 1u);
+        h = std::max(h / 2, 1u);
+    }
+
     DDS_HEADER header = {};
     header.dwSize = 124;
     header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH | DDSD_MIPMAPCOUNT;
@@ -280,18 +321,17 @@ static bool WriteNormalMapDDS(
     header.dwHeight = height;
     header.dwPitchOrLinearSize = width * 4;
     header.dwDepth = 0;
-    header.dwMipMapCount = 1;
+    header.dwMipMapCount = mipCount;
 
-    // RGBA8 pixel format
     header.ddspf.dwSize = 32;
     header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
     header.ddspf.dwRGBBitCount = 32;
-    header.ddspf.dwRBitMask = 0x000000FF;  // R in byte 0
-    header.ddspf.dwGBitMask = 0x0000FF00;  // G in byte 1
-    header.ddspf.dwBBitMask = 0x00FF0000;  // B in byte 2
-    header.ddspf.dwABitMask = 0xFF000000;  // A in byte 3
+    header.ddspf.dwRBitMask = 0x000000FF;
+    header.ddspf.dwGBitMask = 0x0000FF00;
+    header.ddspf.dwBBitMask = 0x00FF0000;
+    header.ddspf.dwABitMask = 0xFF000000;
 
-    header.dwCaps = DDSCAPS_TEXTURE;
+    header.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
 
     IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
     if (!writer) {
@@ -304,8 +344,16 @@ static bool WriteNormalMapDDS(
     writer->w(&header, sizeof(header));
     writer->w(normalRGBA.data(), normalRGBA.size());
 
+    xr_vector<u8> mip = normalRGBA;
+    for (u32 level = 1, w = width, h = height; level < mipCount; ++level) {
+        mip = GenerateBumpMipLevel(mip.data(), w, h);
+        w = std::max(w / 2, 1u);
+        h = std::max(h / 2, 1u);
+        writer->w(mip.data(), mip.size());
+    }
+
     FS.w_close(writer);
-    Msg("* [PBRTextureConverter] Generated normal map: %s/%s (%ux%u)", root_alias, relative_path.c_str(), width, height);
+    Msg("* [PBRTextureConverter] Generated normal map: %s/%s (%ux%u, %u mips)", root_alias, relative_path.c_str(), width, height, mipCount);
     return true;
 }
 
