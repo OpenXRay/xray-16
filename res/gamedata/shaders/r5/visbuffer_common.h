@@ -135,4 +135,14 @@ float3 InterpolateBary3(BarycentricDeriv bd, float3 v0, float3 v1, float3 v2)
     return bd.m_lambda.x * v0 + bd.m_lambda.y * v1 + bd.m_lambda.z * v2;
 }
 
+float3 InterpolateBaryDdx3(BarycentricDeriv bd, float3 v0, float3 v1, float3 v2)
+{
+    return bd.m_ddx.x * v0 + bd.m_ddx.y * v1 + bd.m_ddx.z * v2;
+}
+
+float3 InterpolateBaryDdy3(BarycentricDeriv bd, float3 v0, float3 v1, float3 v2)
+{
+    return bd.m_ddy.x * v0 + bd.m_ddy.y * v1 + bd.m_ddy.z * v2;
+}
+
 #endif

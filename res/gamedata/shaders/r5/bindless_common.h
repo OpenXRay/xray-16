@@ -179,23 +179,27 @@ struct BumpSample
 {
     float3 normal;
     float gloss;
+    float variance;
 };
 
-// X-Ray bump format: R=glossiness, G=normalZ(unused), B=normalY(DX), A=normalX
+// X-Ray bump format: R=glossiness, G=normalZ, B=normalY(DX), A=normalX; mips keep the mean length
 BumpSample DecodeBump(float4 Nu)
 {
+    float3 n = float3(Nu.a, Nu.b, Nu.g) * 2.0 - 1.0;
+    float len = length(n);
     BumpSample result;
-    result.normal.x = Nu.a * 2.0 - 1.0;
-    result.normal.y = Nu.b * 2.0 - 1.0;
-    result.normal.z = sqrt(saturate(1.0 - result.normal.x * result.normal.x - result.normal.y * result.normal.y));
+    result.normal = (len > 1e-4) ? (n / len) : float3(0.0, 0.0, 1.0);
     result.gloss = Nu.r * Nu.r;
+    result.variance = (1.0 - min(len, 1.0)) / max(len, 1e-4);
     return result;
 }
+
+static const float4 BUMP_FLAT = float4(0.0, 1.0, 0.5, 0.5);
 
 BumpSample SampleNormal(MaterialData mat, float2 uv)
 {
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
-        return DecodeBump(float4(0.0, 0.0, 0.5, 0.5));
+        return DecodeBump(BUMP_FLAT);
     return DecodeBump(GetBindlessTexture(mat.normalIndex).Sample(smp_linear, uv));
 }
 

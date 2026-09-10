@@ -284,12 +284,8 @@ static xr_vector<u8> GenerateBumpMipLevel(const u8* src, u32 srcWidth, u32 srcHe
                     count++;
                 }
             }
-            const float len = std::sqrt(nx * nx + ny * ny + nz * nz);
-            if (len > 1e-6f) {
-                nx /= len; ny /= len; nz /= len;
-            } else {
-                nx = 0.f; ny = 0.f; nz = 1.f;
-            }
+            const float inv = 1.f / float(count);
+            nx *= inv; ny *= inv; nz *= inv;
             u8* o = dst.data() + (y * dstWidth + x) * 4;
             o[0] = static_cast<u8>(gloss / count);
             o[1] = static_cast<u8>(std::clamp((nz * 0.5f + 0.5f) * 255.f + 0.5f, 0.f, 255.f));

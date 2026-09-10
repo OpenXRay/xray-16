@@ -267,14 +267,15 @@ float3 shade_pbr(
 		sun = SunShadow(worldPos, svPosition);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
-	float3 sssColor = foliage ? albedo * foliage_sss.rgb * transmission : 0.0;
+	float3 sssColor = foliage ? albedo * foliage_sss.rgb * transmission * (1.0 - F_Schlick(saturate(dot(N, V)), DIELECTRIC_F0)) : 0.0;
 	float3 finalColor;
 	if (foliage)
 	{
 		float sunTransmit = sun.x + (1.0 - sun.x) * FoliageTransmittance(sun.y, foliage_sss.w);
-		float3 sunLight = FoliageDirectLighting(albedo, N, L, L_sun_color) * sun.x
+		float3 sunLight = PBRDirectLighting(albedo, N, V, L, L_sun_color, 0.0, roughness, 1u) * sun.x
 			+ FoliageTransmission(N, V, L, foliage_params2.x) * sunTransmit * sssColor * L_sun_color;
-		float3 ambient = albedo * ambientColor * ao * (1.0 + foliage_sss.rgb * (transmission * foliage_params.w));
+		float3 ambient = PBRAmbient(albedo, N, V, 0.0, roughness, ao, ambientColor)
+			+ albedo * ambientColor * ao * foliage_sss.rgb * (transmission * foliage_params.w);
 		finalColor = sunLight + ambient;
 	}
 	else

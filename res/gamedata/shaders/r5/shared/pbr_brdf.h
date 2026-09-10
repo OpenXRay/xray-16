@@ -155,9 +155,10 @@ float3 PBRDirectLighting(
     return (diffuse + specular) * lightColor * NdotL;
 }
 
-float3 FoliageDirectLighting(float3 albedo, float3 N, float3 L, float3 lightColor)
+float RoughnessWithVariance(float roughness, float variance)
 {
-    return albedo * (saturate(dot(N, L)) / PI) * lightColor;
+    float a2 = roughness * roughness * roughness * roughness + variance;
+    return sqrt(sqrt(saturate(a2)));
 }
 
 float FoliageTransmission(float3 N, float3 V, float3 L, float forward)
