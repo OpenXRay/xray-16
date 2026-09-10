@@ -325,6 +325,8 @@ void FrameGraphRenderer::Shutdown() {
     m_framegraph = nullptr;
 
     if (m_blackboard) {
+        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
+            passes::ShutdownReSTIRGI(*rtgi);
         if (auto* tonemap = m_blackboard->try_get<passes::TonemapPassState>())
             passes::ShutdownTonemapPass(*tonemap);
         m_blackboard.reset();
@@ -391,6 +393,8 @@ void FrameGraphRenderer::Render() {
                     framegraph::BindingSetBuilder::InvalidateReflectionCache();
                     if (m_blackboard)
                     {
+                        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
+                            passes::ShutdownReSTIRGI(*rtgi);
                         m_blackboard->clear();
                     }
 
