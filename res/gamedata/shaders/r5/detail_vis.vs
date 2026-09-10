@@ -25,7 +25,6 @@ cbuffer DetailGlobals : register(b3)
     uint buildDetailsPbrIndex;
     float4 interaction_window;
     float4 interaction_window_prev;
-    float grass_normal_bend;
     uint buildDetailsBumpIndex;
 };
 

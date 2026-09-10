@@ -48,7 +48,6 @@ extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API Fvector3 ps_r3_grass_color_tip;
 extern ENGINE_API Fvector3 ps_r3_grass_color_base;
 extern ENGINE_API float ps_r3_grass_color_variation;
-extern ENGINE_API float ps_r3_grass_normal_bend;
 extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
@@ -2598,8 +2597,7 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     const float invSpan = 1.0f / (INTERACTION_TEXTURE_SIZE * INTERACTION_TEXEL_SIZE);
     fc.interaction_window.set(interactionOrigin[cur].x, interactionOrigin[cur].y, invSpan, live ? 1.0f : 0.0f);
     fc.interaction_window_prev.set(interactionOrigin[prev].x, interactionOrigin[prev].y, invSpan, (live && interactionValid[prev]) ? 1.0f : 0.0f);
-    fc.grass_normal_bend = ps_r3_grass_normal_bend;
-    fc.grass_pad0 = fc.grass_pad1 = 0.0f;
+    fc.grass_pad0 = fc.grass_pad1 = fc.grass_pad2 = 0.0f;
 }
 
 void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)

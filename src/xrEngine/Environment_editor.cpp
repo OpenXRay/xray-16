@@ -32,7 +32,6 @@ ENGINE_API float ps_r_foliage_sss_tuft = 1.0f;
 ENGINE_API float ps_r_foliage_sss_tree = 1.0f;
 ENGINE_API float ps_r_foliage_sss_ambient = 1.0f;
 ENGINE_API float ps_r_foliage_sss_forward = 0.5f;
-ENGINE_API float ps_r3_grass_normal_bend = 0.5f;
 
 // Per-object-ID color tints (64 grass types max)
 // Default all to white (1,1,1) = no tint
@@ -640,7 +639,7 @@ void CEnvironment::on_tool_frame()
             ItemHelp("How fast transmitted light dies per metre of occluding foliage between the surface and the light, measured in the shadow maps (r_foliage_sss_sigma)");
 
             ImGui::DragFloat("Blade strength", &ps_r_foliage_sss_blade, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Transmission strength at the tip of procedural grass blades; bases are thicker and transmit less (r_foliage_sss_blade)");
+            ItemHelp("Transmission strength of procedural grass blades (r_foliage_sss_blade)");
 
             ImGui::DragFloat("Tuft strength", &ps_r_foliage_sss_tuft, 0.01f, 0.0f, 1.0f);
             ItemHelp("Transmission strength of swaying detail tufts (r_foliage_sss_tuft)");
@@ -653,11 +652,6 @@ void CEnvironment::on_tool_frame()
 
             ImGui::DragFloat("Forward scatter", &ps_r_foliage_sss_forward, 0.01f, 0.0f, 1.0f);
             ItemHelp("Share of transmitted light that peaks towards the sun seen through the leaf; the rest leaves diffusely (r_foliage_sss_forward)");
-
-            ImGui::SeparatorText("Detail Tufts");
-
-            ImGui::DragFloat("Tuft normal bend", &ps_r3_grass_normal_bend, 0.01f, 0.0f, 1.0f);
-            ItemHelp("Blends detail mesh normals from the viewer-facing card normal (0, lit like tree leaves) towards a dome around each tuft (1)");
 
             ImGui::SeparatorText("Per-Object Tint");
 

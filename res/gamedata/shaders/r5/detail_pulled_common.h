@@ -106,14 +106,4 @@ float3 PulledFaceNormal(float3 p0, float3 p1, float3 p2)
     return (len > 1e-8) ? (n / len) : float3(0.0, 1.0, 0.0);
 }
 
-float3 PulledBentNormal(PulledInstance inst, DetailModelGPU mdl, float3 local, float3 faceNormal, float bend)
-{
-    float3 radial = float3(local.x / max(mdl.geomExtentX * 0.5, 0.01), max(local.y, 0.0) / max(mdl.geomExtentY, 0.01), local.z / max(mdl.geomExtentZ * 0.5, 0.01));
-    float len = length(radial);
-    radial = (len > 1e-4) ? PulledRotate(inst, radial / len) : float3(0.0, 1.0, 0.0);
-    float3 n = lerp(faceNormal, radial, bend);
-    float nl = length(n);
-    return (nl > 1e-4) ? (n / nl) : radial;
-}
-
 #endif

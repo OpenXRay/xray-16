@@ -18,7 +18,6 @@
 extern ENGINE_API float ps_r3_grass_blade_width;
 extern ENGINE_API float ps_r3_grass_blade_height;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
-extern ENGINE_API float ps_r3_grass_normal_bend;
 
 namespace xray::render::fg {
     extern xray::render::FrameGraphRenderer RImplementation;
@@ -76,8 +75,7 @@ static_assert(sizeof(GrassRTCB) == 96, "GrassRTCB must be 96 bytes");
 
 struct BillboardRTCB {
     u32 maxVertsPerBillboard;
-    float normalBend;
-    u32 pad[2];
+    u32 pad[3];
 };
 static_assert(sizeof(BillboardRTCB) == 16, "BillboardRTCB must be 16 bytes");
 
@@ -897,8 +895,7 @@ void RTAccelStructManager::BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetail
 
         BillboardRTCB cb;
         cb.maxVertsPerBillboard = maxVPB;
-        cb.normalBend = ps_r3_grass_normal_bend;
-        cb.pad[0] = cb.pad[1] = 0;
+        cb.pad[0] = cb.pad[1] = cb.pad[2] = 0;
 
         auto* billboardRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
         framegraph::BindingSetBuilder bsb(*billboardRefl, nvDevice, "RT.Billboard");
