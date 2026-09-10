@@ -9,6 +9,8 @@ struct MaterialSurface
     float metallic;
     float ao;
     float3 emissive;
+    uint shadingClass;
+    float transmission;
 };
 
 float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
@@ -76,6 +78,9 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
         s.ao = pbrSample.b;
     }
     s.emissive = (mat.flags & MAT_FLAG_EMISSIVE) ? s.albedo * g_Variants[mat.shaderVariant].emissive : 0.0;
+    bool foliage = (mat.flags & MAT_FLAG_FOLIAGE) != 0;
+    s.shadingClass = foliage ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD;
+    s.transmission = foliage ? foliage_params.z : 0.0;
     return s;
 }
 
@@ -145,6 +150,8 @@ MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 u
         s.ao = blendedPBR.b;
     }
     s.emissive = 0.0;
+    s.shadingClass = SHADING_CLASS_STANDARD;
+    s.transmission = 0.0;
     return s;
 }
 

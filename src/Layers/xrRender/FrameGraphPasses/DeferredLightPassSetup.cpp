@@ -52,6 +52,7 @@ struct DeferredLightPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
     VirtualResourceHandle baseColor;
+    VirtualResourceHandle material;
     VirtualResourceHandle color;
     VirtualResourceHandle sunMask;
     VirtualResourceHandle localTiles;
@@ -214,7 +215,7 @@ DefaultOutputLayout setupDeferredLightPass(
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state)
 {
-    if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid())
+    if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid() || !inputs.material.is_valid())
         return inputs;
 
     EnsurePipelines(device, *state);
@@ -233,6 +234,7 @@ DefaultOutputLayout setupDeferredLightPass(
             data.depth = passBuilder.read(inputs.depth, ResourceState::ShaderResource);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
             data.baseColor = passBuilder.read(inputs.baseColor, ResourceState::ShaderResource);
+            data.material = passBuilder.read(inputs.material, ResourceState::ShaderResource);
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::UnorderedAccess);
             if (sunMask.is_valid())
                 data.sunMask = passBuilder.read(sunMask, ResourceState::ShaderResource);
@@ -250,9 +252,10 @@ DefaultOutputLayout setupDeferredLightPass(
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
             auto* normalRT = fg.GetPhysicalTexture(data.normal);
             auto* baseColorRT = fg.GetPhysicalTexture(data.baseColor);
+            auto* materialRT = fg.GetPhysicalTexture(data.material);
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (!depthRT || !normalRT || !baseColorRT || !colorRT || !cmdList)
+            if (!depthRT || !normalRT || !baseColorRT || !materialRT || !colorRT || !cmdList)
                 return;
 
             auto& state = *data.state;
@@ -325,6 +328,7 @@ DefaultOutputLayout setupDeferredLightPass(
                 bsb.Texture("g_GBufferDepth", depthRT);
                 bsb.Texture("g_GBufferNormal", normalRT);
                 bsb.Texture("g_GBufferBaseColor", baseColorRT);
+                bsb.Texture("g_GBufferMaterial", materialRT);
                 bsb.TextureUAV("g_SceneColor", colorRT);
                 bsb.BufferSRV("g_TileList", state.tileListBuffer);
                 if (cls & kTileClassLights) {

@@ -79,7 +79,7 @@ float3 EvaluateClusteredLights(
     float2 screenPos,
     float linearDepth,
     uint diffuseMode,
-    bool foliage = false,
+    uint shadingClass = SHADING_CLASS_STANDARD,
     float3 sssColor = 0.0)
 {
     uint numLights = (uint)cluster_params.w;
@@ -92,6 +92,7 @@ float3 EvaluateClusteredLights(
     uint lightOffset = clusterData.x;
     uint lightCount = clusterData.y;
 
+    bool foliage = shadingClass == SHADING_CLASS_FOLIAGE;
     float3 totalLight = 0;
     for (uint i = 0; i < lightCount; i++)
     {
@@ -137,17 +138,24 @@ float3 EvaluateClusteredLights(
             }
         }
 
+        if (atten <= 0.001f)
+            continue;
+
+        float2 shadow = float2(1.0, 0.0);
         uint shadowSlot = LocalShadowSlot(light, worldPos);
         if (shadowSlot != 0xFFFFFFFFu)
-            atten *= LocalShadowVisibility(shadowSlot, worldPos, N);
+            shadow = LocalShadow(shadowSlot, worldPos, N);
 
-        if (atten > 0.001f)
+        float3 lc = lightColor * atten;
+        if (foliage)
         {
-            float3 lc = lightColor * atten;
-            float3 litColor = foliage
-                ? FoliageDirectLighting(albedo, N, L, lc) + FoliageTransmission(N, V, L) * sssColor * lc
-                : PBRDirectLighting(albedo, N, V, L, lc, metallic, roughness, diffuseMode);
-            totalLight += litColor;
+            float transmit = shadow.x + (1.0 - shadow.x) * FoliageTransmittance(shadow.y, foliage_sss.w);
+            totalLight += FoliageDirectLighting(albedo, N, L, lc) * shadow.x
+                + FoliageTransmission(N, V, L) * transmit * sssColor * lc;
+        }
+        else if (shadow.x > 0.001f)
+        {
+            totalLight += PBRDirectLighting(albedo, N, V, L, lc * shadow.x, metallic, roughness, diffuseMode);
         }
     }
     return totalLight;

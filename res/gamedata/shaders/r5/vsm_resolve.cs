@@ -131,11 +131,12 @@ float vsmDepthD(uint slot, float2 pl)
     return g_AtlasDyn.SampleLevel(smp_nofilter, (base + pl) / kDimD, 0).r;
 }
 
-float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float dynHit, out float statLit, out bool noPage)
+float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float dynHit, out float statLit, out float thick, out bool noPage)
 {
     dynOcc = 0.0;
     dynHit = 0.0;
     statLit = 1.0;
+    thick = 0.0;
     noPage = false;
     if (g_Params2.w > 0.0 && dot(nrm, nrm) > 0.5)
     {
@@ -194,6 +195,8 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
 
     float lit = 0.0;
     float litS = 0.0;
+    float thickSum = 0.0;
+    float thickCnt = 0.0;
     for (int dy = -1; dy <= 1; ++dy)
     for (int dx = -1; dx <= 1; ++dx)
     {
@@ -203,6 +206,7 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
         float occS = vsmDepthS(slot, plG);
         bool shS = occS > zHere + bias;
         bool sh = shS;
+        float occDist = shS ? (occS - zHere) : -1.0;
         if (hasD || dbgD)
         {
             float d = vsmDepthD(slotD, pl);
@@ -210,6 +214,7 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
             {
                 sh = true;
                 dynHit += 1.0 / 9.0;
+                occDist = max(occDist, d - zHereD);
             }
             if (dbgD)
             {
@@ -222,9 +227,16 @@ float sampleVSM(float3 wp, float3 nrm, float tanT, out float dynOcc, out float d
                     dynOcc += 1.0 / 9.0;
             }
         }
+        if (sh)
+        {
+            thickSum += occDist;
+            thickCnt += 1.0;
+        }
         lit += sh ? 0.0 : 1.0;
         litS += shS ? 0.0 : 1.0;
     }
+    if (thickCnt > 0.5)
+        thick = thickSum / (thickCnt * vsm_zparams.y);
     statLit = litS * (1.0 / 9.0);
     return lit * (1.0 / 9.0);
 }
@@ -258,11 +270,12 @@ bool vsmPageAt(float2 lxy, int L, out float2 pl, out uint slotS, out uint slotD)
 }
 
 float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
-                    out float dynOcc, out float dynHit, out float statLit, out bool noPage)
+                    out float dynOcc, out float dynHit, out float statLit, out float thick, out bool noPage)
 {
     dynOcc = 0.0;
     dynHit = 0.0;
     statLit = 1.0;
+    thick = 0.0;
     noPage = false;
     bool haveN = dot(nrm, nrm) > 0.5;
 
@@ -350,6 +363,7 @@ float sampleVSMSoft(float3 wp, float3 nrm, float tanT, float rot,
     if (cntD < 0.5)
         return 1.0;
     float distB = max(sumD / cntD - zS, 0.0) / max(zScale, 1e-9);
+    thick = distB;
     float w = clamp(tanS * distB, 0.75 * texelW, rMax);
 
     float3 wpF = haveN ? wp + nrm * min(max(w, 2.0 * texelW), kMaxNormalOffset) : wp;
@@ -427,7 +441,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float zndc = g_Depth.Load(int3(px, 0));
     if (zndc <= 0.0)
     {
-        g_Mask[px] = float4(1.0, 1e6, 1.0, 0.0);
+        g_Mask[px] = float4(1.0, 1e6, 0.0, 0.0);
         return;
     }
 
@@ -468,10 +482,11 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float dynOcc;
     float dynHit;
     float statLit;
+    float thick;
     bool noPage;
     float rot = vsmIGN(float2(px), g_Params4.x);
-    float cur = softOn ? sampleVSMSoft(wp, nrm, tanT, rot, dynOcc, dynHit, statLit, noPage)
-                       : sampleVSM(wp, nrm, tanT, dynOcc, dynHit, statLit, noPage);
+    float cur = softOn ? sampleVSMSoft(wp, nrm, tanT, rot, dynOcc, dynHit, statLit, thick, noPage)
+                       : sampleVSM(wp, nrm, tanT, dynOcc, dynHit, statLit, thick, noPage);
 
     if (dynOcc > 0.0 && g_PrevCamPos.w < 1.5 && dot(nrm, nrm) > 0.5)
     {
@@ -522,6 +537,12 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (hud && g_HudParams.x > 0.0)
         outShadow = min(outShadow, sampleHud(wp, nrm, tanT));
     float sel = g_Params4.z;
-    float bOut = (sel > 1.5) ? dynOcc : ((sel > 0.5) ? status : a);
+    float bOut = thick;
+    if (sel > 1.5)
+        bOut = dynOcc;
+    else if (sel > 0.5)
+        bOut = status;
+    else if (histOK)
+        bOut = lerp(thick, max(hist.b, 0.0), a);
     g_Mask[px] = float4(outShadow, dist, bOut, dynHit);
 }

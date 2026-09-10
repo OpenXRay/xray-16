@@ -106,6 +106,7 @@ bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties
         outProps.blendMode = b->oBlend.value ? BlendMode::AlphaTest : BlendMode::Opaque;
         outProps.alphaRef = b->oBlend.value ? 200 : 0;
         outProps.writesDepth = true;
+        outProps.foliage = b->oBlend.value;
         return true;
     }
     // B_DETAIL - detail (always alpha test, oBlend controls additional blending)

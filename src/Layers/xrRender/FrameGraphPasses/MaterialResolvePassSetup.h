@@ -31,6 +31,7 @@ struct MaterialResolveOutput {
     framegraph::VirtualResourceHandle color;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle material;
     framegraph::VirtualResourceHandle motionVectors;
     framegraph::VirtualResourceHandle visDepth;
 };
@@ -45,6 +46,7 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::VirtualResourceHandle color,
     framegraph::VirtualResourceHandle normal,
     framegraph::VirtualResourceHandle baseColor,
+    framegraph::VirtualResourceHandle material,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,

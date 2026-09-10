@@ -38,6 +38,7 @@ public:
         u32 alphaRef = 0;            // Alpha reference threshold (0-255), normalized to 0.0-1.0 for GPU
         bool transparent = false;    // Requires back-to-front sorting (bStrictB2F)
         u8 priority = 1;             // Render priority (0-3) for batching
+        bool foliage = false;
 
         // Future PBR properties (stored here for unified material system)
         float metallic = 0.0f;

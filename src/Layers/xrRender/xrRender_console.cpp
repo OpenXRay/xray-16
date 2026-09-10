@@ -36,6 +36,12 @@ extern ENGINE_API float ps_r3_grass_interaction_radius_scale;
 extern ENGINE_API float ps_r3_grass_interaction_frequency;
 extern ENGINE_API float ps_r3_grass_interaction_damping;
 extern ENGINE_API int ps_r3_grass_interaction_debug;
+extern ENGINE_API Fvector3 ps_r_foliage_sss_tint;
+extern ENGINE_API float ps_r_foliage_sss_sigma;
+extern ENGINE_API float ps_r_foliage_sss_blade;
+extern ENGINE_API float ps_r_foliage_sss_tuft;
+extern ENGINE_API float ps_r_foliage_sss_tree;
+extern ENGINE_API float ps_r_foliage_sss_ambient;
 
 namespace xray::render::fg
 {
@@ -793,6 +799,11 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r3_grass_interaction_frequency", &ps_r3_grass_interaction_frequency, 0.2f, 5.f);
     CMD4(CCC_Float, "r3_grass_interaction_damping", &ps_r3_grass_interaction_damping, 0.01f, 0.98f);
     CMD4(CCC_Integer, "r3_grass_interaction_debug", &ps_r3_grass_interaction_debug, 0, 1);
+    CMD4(CCC_Float, "r_foliage_sss_sigma", &ps_r_foliage_sss_sigma, 0.f, 20.f);
+    CMD4(CCC_Float, "r_foliage_sss_blade", &ps_r_foliage_sss_blade, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_tuft", &ps_r_foliage_sss_tuft, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_tree", &ps_r_foliage_sss_tree, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_ambient", &ps_r_foliage_sss_ambient, 0.f, 2.f);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -929,6 +940,7 @@ void xrRender_initconsole()
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r2_aa_break", &ps_r2_aa_barier, tw_min, tw_max);
+    CMD4(CCC_Vector3, "r_foliage_sss_tint", &ps_r_foliage_sss_tint, tw_min, tw_max);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);

@@ -63,12 +63,14 @@ RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
 RWTexture2D<float2> g_OutMotion : register(u3);
 RWTexture2D<float> g_OutVisDepth : register(u4);
+RWTexture2D<float2> g_OutMaterial : register(u5);
 
 static const float GRASS_ROUGHNESS_BASE = 0.85;
 static const float GRASS_ROUGHNESS_TIP = 0.55;
 static const float GRASS_AO_BASE = 0.35;
 static const float GRASS_AO_TIP = 1.0;
 static const float GRASS_AO_POWER = 0.6;
+static const float DETAIL_TRANSMISSION_BASE = 0.25;
 
 float2 PrevMotion(float3 prevWorld, float2 uvPix)
 {
@@ -159,9 +161,11 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
     }
 
+    float transmission = sway ? foliage_params.y * lerp(DETAIL_TRANSMISSION_BASE, 1.0, saturate(heightParam)) : 0.0;
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, metallic);
-    g_OutColor[p] = float4(0.0, 0.0, 0.0, -max(ao, 0.004));
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    g_OutMaterial[p] = PackGBufferMaterial(sway ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD, transmission);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }
@@ -263,9 +267,11 @@ void main(uint3 dtid : SV_DispatchThreadID)
         motion = PrevMotion(InterpolateBary3(bd, p0.pos, p1.pos, p2.pos), uvPix);
     }
 
+    float transmission = foliage_params.x * lerp(DETAIL_TRANSMISSION_BASE, 1.0, saturate(t));
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, 0.0);
-    g_OutColor[p] = float4(0.0, 0.0, 0.0, -max(ao, 0.004));
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    g_OutMaterial[p] = PackGBufferMaterial(SHADING_CLASS_FOLIAGE, transmission);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

@@ -16,6 +16,7 @@
 Texture2D<float> g_GBufferDepth : register(t30);
 Texture2D<float4> g_GBufferNormal : register(t31);
 Texture2D<float4> g_GBufferBaseColor : register(t32);
+Texture2D<float2> g_GBufferMaterial : register(t37);
 StructuredBuffer<uint> g_TileList : register(t33);
 RWTexture2D<float4> g_SceneColor : register(u0);
 
@@ -36,6 +37,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
     float depth = g_GBufferDepth[p];
 
     float4 bc = g_GBufferBaseColor[p];
+    float2 m = g_GBufferMaterial[p];
     float4 c = g_SceneColor[p];
     float2 pixel = float2(p) + 0.5;
     float3 worldPos = reconstruct_world_pos(pixel, depth);
@@ -44,7 +46,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
 #else
     float sunVis = 1.0;
 #endif
-    float3 lit = c.rgb + shade_pbr(bc.rgb, normalize(n.xyz), worldPos, bc.a, abs(n.w), abs(c.a), float4(pixel, depth, 1.0), sunVis, c.a < 0.0);
+    float3 lit = c.rgb + shade_pbr(bc.rgb, normalize(n.xyz), worldPos, bc.a, abs(n.w), c.a, float4(pixel, depth, 1.0), sunVis, GBufferShadingClass(m), m.y);
 #if TILE_SUN_MIXED
     if (dev_param_3.y > 0.5)
         lit = SunShadowDebugColor(lit, worldPos);

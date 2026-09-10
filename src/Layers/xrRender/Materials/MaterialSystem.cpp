@@ -117,6 +117,7 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
         }
         if (blendInfo.strictB2F)
             info.transparent = true;
+        info.foliage = blendInfo.foliage;
         m_stats.materialsFromBlender++;
     }
 
