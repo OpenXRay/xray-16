@@ -25,6 +25,7 @@ ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};
 ENGINE_API float ps_r3_grass_color_variation = 0.15f;
 ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.5f, 0.7f, 0.3f};
 ENGINE_API float ps_r3_grass_sss_intensity = 0.25f;
+ENGINE_API float ps_r3_grass_normal_bend = 0.5f;
 
 ENGINE_API Fvector3 ps_r3_grass_object_tints[64] = {
     {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
@@ -578,6 +579,11 @@ void CEnvironment::on_tool_frame()
 
             ImGui::DragFloat("SSS intensity", &ps_r3_grass_sss_intensity, 0.01f, 0.0f, 1.0f);
             ItemHelp("Strength of subsurface scattering effect");
+
+            ImGui::SeparatorText("Detail Tufts");
+
+            ImGui::DragFloat("Tuft normal bend", &ps_r3_grass_normal_bend, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Tilts detail mesh normals from straight up (0, lit like the ground) towards a dome around each tuft (1)");
 
             ImGui::SeparatorText("Per-Object Tint");
 
