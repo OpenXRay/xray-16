@@ -142,11 +142,13 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float3 albedo = texel.rgb;
     float gloss = 0.0;
+    float variance = 0.0;
     if (buildDetailsBumpIndex != 0u)
     {
         BumpSample bump = DecodeBump(GetBindlessTexture(buildDetailsBumpIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
         N = normalize(mul(bump.normal, CardTangentFrame(w1 - w0, w2 - w0, uv1 - uv0, uv2 - uv0, N)));
         gloss = bump.gloss;
+        variance = bump.variance;
     }
     float metallic = 0.0;
     float roughness = 1.0 - gloss;
@@ -158,6 +160,7 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         roughness = pbr.g;
         ao = pbr.b;
     }
+    roughness = RoughnessWithVariance(roughness, variance);
     if (sway && g_InteractionDebug != 0u)
         albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
 
@@ -250,7 +253,12 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 rn2 = InterpolateBary3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2);
 
     float widthPercent = uv.x;
-    float3 N = FoliageViewerNormal(normalize(lerp(rn1, rn2, widthPercent)), v1.pos - v0.pos, v2.pos - v0.pos, eye_position - worldPos);
+    float3 Nu = lerp(rn1, rn2, widthPercent);
+    float invLen = 1.0 / max(length(Nu), 1e-4);
+    float3 dNdx = (lerp(InterpolateBaryDdx3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdx3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), widthPercent) + (rn2 - rn1) * uvDdx.x) * invLen;
+    float3 dNdy = (lerp(InterpolateBaryDdy3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdy3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), widthPercent) + (rn2 - rn1) * uvDdy.x) * invLen;
+    float variance = min(0.5 * (dot(dNdx, dNdx) + dot(dNdy, dNdy)), 0.18);
+    float3 N = FoliageViewerNormal(Nu * invLen, v1.pos - v0.pos, v2.pos - v0.pos, eye_position - worldPos);
 
     float4 veinDetail = GetBindlessTexture(g_VeinIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float veinValue = veinDetail.a;
@@ -262,7 +270,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     albedo *= float3(tint.r, tint.g, tint.b);
     albedo = lerp(albedo, albedo * veinDetail.rgb, veinValue * 0.15);
 
-    float roughness = saturate(lerp(GRASS_ROUGHNESS_BASE, GRASS_ROUGHNESS_TIP, t) + veinValue * 0.1);
+    float roughness = RoughnessWithVariance(saturate(lerp(GRASS_ROUGHNESS_BASE, GRASS_ROUGHNESS_TIP, t) + veinValue * 0.1), variance);
     float heightAO = lerp(GRASS_AO_BASE, GRASS_AO_TIP, pow(saturate(t), GRASS_AO_POWER));
     float edgeFactor = abs(widthPercent - 0.5) * 2.0;
     float ao = heightAO * lerp(0.95, 1.0, edgeFactor) * lerp(0.9, 1.0, veinValue);
