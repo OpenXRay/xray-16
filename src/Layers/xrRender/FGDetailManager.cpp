@@ -48,8 +48,6 @@ extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API Fvector3 ps_r3_grass_color_tip;
 extern ENGINE_API Fvector3 ps_r3_grass_color_base;
 extern ENGINE_API float ps_r3_grass_color_variation;
-extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
-extern ENGINE_API float ps_r3_grass_sss_intensity;
 extern ENGINE_API float ps_r3_grass_normal_bend;
 extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
 extern ENGINE_API float ps_r3_grass_blade_width;
@@ -2581,7 +2579,6 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.grass_blade_width = ps_r3_grass_blade_width;
     fc.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
     fc.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
-    fc.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
     fc.grass_color_variation = ps_r3_grass_color_variation;
     fc.grass_blade_height = ps_r3_grass_blade_height;
     fc.buildDetailsIndex = buildDetailsBindlessIndex;

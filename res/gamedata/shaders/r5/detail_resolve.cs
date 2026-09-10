@@ -20,7 +20,6 @@ cbuffer DetailGlobals : register(b3)
     float grass_blade_width;
     float4 grass_color_tip;
     float4 grass_color_base;
-    float4 grass_sss_color;
     float grass_color_variation;
     float grass_blade_height;
     uint buildDetailsIndex;
@@ -250,9 +249,6 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
     albedo = lerp(midColor, albedo, distFade);
 
-    float backlit = saturate(dot(N, -L_sun_dir_w) * 0.5 + 0.5);
-    float3 sss = grass_sss_color.rgb * (backlit * t * grass_sss_color.w);
-    albedo += sss * L_sun_color;
     if (g_InteractionDebug != 0u)
         albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
 
@@ -269,7 +265,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
 
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, 0.0);
-    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, -max(ao, 0.004));
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

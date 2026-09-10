@@ -72,7 +72,6 @@ public:
         float grass_blade_width;
         Fvector4 grass_color_tip;
         Fvector4 grass_color_base;
-        Fvector4 grass_sss_color;
         float grass_color_variation;
         float grass_blade_height;
         u32 buildDetailsIndex;
