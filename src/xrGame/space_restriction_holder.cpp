@@ -18,9 +18,9 @@
 CSpaceRestrictionHolder::~CSpaceRestrictionHolder() { clear(); }
 void CSpaceRestrictionHolder::clear()
 {
-#ifndef XR_COMPILER_GCC // At least GCC call destructor of members at call parent destructor
+    for (auto& [name, bridge] : m_restrictions)
+        bridge->change_implementation(nullptr);
     delete_data(m_restrictions);
-#endif
     m_default_out_restrictions = "";
     m_default_in_restrictions = "";
 }
