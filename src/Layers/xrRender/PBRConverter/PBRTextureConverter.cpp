@@ -939,6 +939,16 @@ struct Stage1Intermediate {
 
 #endif // USE_AI_PBR
 
+void ShutdownAIPipeline()
+{
+#ifdef USE_AI_PBR
+    ScopeLock lock{ &g_ai_pipeline_mutex };
+    g_ai_pipeline.reset();
+    g_ai_available = false;
+#endif
+    ONNXModelRunner::ShutdownEnvironment();
+}
+
 // ══════════════════════════════════════════════════════════
 //  HELPER: Write Single-Channel DDS (Phase 2.5.2)
 // ══════════════════════════════════════════════════════════

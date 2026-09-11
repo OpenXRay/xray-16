@@ -175,6 +175,8 @@ bool ConvertTexturesToPBR(
     ProgressCallback progress_callback = nullptr
 );
 
+void ShutdownAIPipeline();
+
 // ══════════════════════════════════════════════════════════
 //  PBR TEXTURE CONSOLIDATION
 // ══════════════════════════════════════════════════════════
