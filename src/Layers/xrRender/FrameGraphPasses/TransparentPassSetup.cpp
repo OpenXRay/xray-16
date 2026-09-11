@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TransparentPassSetup.h"
 #include "ShaderConstants.h"
+#include "VSMPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -216,6 +217,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
     TransparentPassState& state)
@@ -234,7 +236,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
 
-        [&, width, height, config, localShadow, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
+        [&, width, height, config, localShadow, sunMask, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -249,6 +251,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
             if (skinnedOrder.is_valid())
                 data.skinnedOrder = passBuilder.read(skinnedOrder, ResourceState::ShaderResource);
+            if (sunMask.is_valid())
+                data.sunMask = passBuilder.read(sunMask, ResourceState::ShaderResource);
             if (wantDistortion) {
                 ResourceDesc distDesc;
                 distDesc.type = ResourceDesc::Type::Texture2D;
@@ -319,6 +323,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
             ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
+            nvrhi::ITexture* sunMaskTex = ResolveSunMask(fg, data.sunMask, nvDevice);
 
             auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
                 framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, name);
@@ -332,6 +337,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 bsb.BufferSRV("g_LocalShadowTiles", localTiles);
                 bsb.Texture("g_LocalShadowStatic", localStatic);
                 bsb.Texture("g_LocalShadowDyn", localDyn);
+                bsb.Texture("g_SunShadowMask", sunMaskTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
                 R_ASSERT2(set, "Transparent binding set creation failed");
                 return set;

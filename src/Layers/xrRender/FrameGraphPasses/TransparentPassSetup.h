@@ -59,6 +59,7 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle localTiles;
     framegraph::VirtualResourceHandle localStatic;
     framegraph::VirtualResourceHandle localDyn;
+    framegraph::VirtualResourceHandle sunMask;
     LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
@@ -80,6 +81,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
     TransparentPassState& state
