@@ -1328,9 +1328,7 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     auto* skinVsRefl = shaderLoader->GetCachedReflection("vsm_page_pull_skinned", ".vs");
     auto* psRefl = shaderLoader->GetCachedReflection("vsm_page", ".ps");
     auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
-    auto* clearVsRefl = shaderLoader->GetCachedReflection("vsm_clear_dyn", ".vs");
-    auto* clearPsRefl = shaderLoader->GetCachedReflection("vsm_clear", ".ps");
-    if (!state.dynPageVS || !state.dynSkinPageVS || !state.dynClearVS || !dynVsRefl || !skinVsRefl || !psRefl || !atRefl || !clearVsRefl || !clearPsRefl) {
+    if (!state.dynPageVS || !state.dynSkinPageVS || !state.dynClearVS || !dynVsRefl || !skinVsRefl || !psRefl || !atRefl) {
         Msg("! [VSM] dynamic page shaders failed to load");
         state.dynPipelinesFailed = true;
         return false;
@@ -1338,8 +1336,7 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPage", *dynVsRefl, *psRefl, nvDevice);
     state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPageAT", *dynVsRefl, *atRefl, nvDevice);
     state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *psRefl, nvDevice);
-    state.dynClearLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynClear", *clearVsRefl, *clearPsRefl, nvDevice);
-    if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout || !state.dynClearLayout) {
+    if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout) {
         state.dynPipelinesFailed = true;
         return false;
     }
@@ -1379,7 +1376,7 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
         clearDesc.VS = state.dynClearVS;
         clearDesc.PS = state.clearPipeline ? state.clearPipeline->getDesc().PS : nullptr;
         clearDesc.inputLayout = nullptr;
-        clearDesc.bindingLayouts = { state.dynClearLayout };
+        clearDesc.bindingLayouts = {};
         clearDesc.primType = nvrhi::PrimitiveType::TriangleList;
         clearDesc.renderState.depthStencilState.depthTestEnable = true;
         clearDesc.renderState.depthStencilState.depthWriteEnable = true;
