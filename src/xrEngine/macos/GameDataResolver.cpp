@@ -119,7 +119,8 @@ bool HasRequiredGameData(const std::string& root)
     if (root.empty())
         return false;
 
-    return IsDirectory(JoinPath(root, "levels")) &&
+    return IsDirectory(JoinPath(root, "gamedata")) &&
+        IsDirectory(JoinPath(root, "levels")) &&
         IsDirectory(JoinPath(root, "resources")) &&
         IsDirectory(JoinPath(root, "localization"));
 }
@@ -331,7 +332,7 @@ void ShowAppleScriptAlert(const std::string& message)
 bool ChooseFolder(const GameInfo& gameInfo, std::string& selectedRoot)
 {
     const std::string prompt = "Select the " + gameInfo.displayName +
-        " directory that contains levels, resources, and localization.";
+        " directory that contains gamedata, levels, resources, and localization.";
     std::string output;
     if (!RunAppleScript("POSIX path of (choose folder with prompt " + EscapeAppleScriptString(prompt) + ")\n", output))
         return false;
@@ -435,9 +436,10 @@ bool ApplyRuntimeLayout(const std::string& prefPath, const std::string& bundleRe
     if (!HasRequiredGameData(gameRoot))
         return false;
 
-    EnsureManagedSymlink(JoinPath(bundleResourcesRoot, "fsgame.ltx"), JoinPath(prefPath, "fsgame.ltx"));
-    EnsureManagedSymlink(JoinPath(bundleResourcesRoot, "gamedata"), JoinPath(prefPath, "gamedata"));
+    const std::string rootFsLtx = JoinPath(gameRoot, "fsgame.ltx");
+    EnsureManagedSymlink(IsFile(rootFsLtx) ? rootFsLtx : JoinPath(bundleResourcesRoot, "fsgame.ltx"), JoinPath(prefPath, "fsgame.ltx"));
 
+    LinkDirectoryIfPresent(prefPath, gameRoot, "gamedata");
     LinkDirectoryIfPresent(prefPath, gameRoot, "levels");
     LinkDirectoryIfPresent(prefPath, gameRoot, "resources");
     LinkDirectoryIfPresent(prefPath, gameRoot, "localization");
@@ -477,7 +479,7 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
         if (!HasRequiredGameData(selectedRoot))
         {
             ShowAppleScriptAlert(
-                "The selected directory does not contain levels, resources, and localization. "
+                "The selected directory does not contain gamedata, levels, resources, and localization. "
                 "Please choose the root directory of a licensed game installation.");
             continue;
         }
@@ -502,7 +504,7 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
             SDL_MESSAGEBOX_WARNING,
             "OpenXRay: game files are required",
             "OpenXRay could not find required game files.\n"
-            "Choose a directory that contains levels, resources, and localization.",
+            "Choose a directory that contains gamedata, levels, resources, and localization.",
             nullptr);
     }
     else
