@@ -195,7 +195,6 @@ struct VSMState {
     nvrhi::ComputePipelineHandle touchPipeline;
     nvrhi::BindingLayoutHandle touchLayout;
     nvrhi::GraphicsPipelineHandle dynClearPipeline;
-    nvrhi::BindingLayoutHandle dynClearLayout;
     nvrhi::ShaderHandle dynClearVS;
     nvrhi::GraphicsPipelineHandle dynPagePipeline;
     nvrhi::GraphicsPipelineHandle dynPageATPipeline;
