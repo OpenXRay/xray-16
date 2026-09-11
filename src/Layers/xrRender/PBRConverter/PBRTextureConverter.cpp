@@ -945,8 +945,8 @@ void ShutdownAIPipeline()
     ScopeLock lock{ &g_ai_pipeline_mutex };
     g_ai_pipeline.reset();
     g_ai_available = false;
-#endif
     ONNXModelRunner::ShutdownEnvironment();
+#endif
 }
 
 // ══════════════════════════════════════════════════════════
