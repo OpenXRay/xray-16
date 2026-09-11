@@ -816,8 +816,8 @@ void ShutdownAIPipeline()
     ScopeLock lock{ &g_ai_pipeline_mutex };
     g_ai_pipeline.reset();
     g_ai_available = false;
-#endif
     ONNXModelRunner::ShutdownEnvironment();
+#endif
 }
 
 static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHeight, u32 channels) {
