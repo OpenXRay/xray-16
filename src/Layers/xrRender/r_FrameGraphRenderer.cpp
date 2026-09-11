@@ -1486,6 +1486,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         litOutputs,
         transparentConfig,
         localShadowOut,
+        vsmMaskHandle,
         skinnedDrawArgsBuffer,
         width, height,
         m_blackboard->get_or_add<passes::TransparentPassState>()
