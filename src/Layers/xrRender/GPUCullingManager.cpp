@@ -1049,22 +1049,7 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
                         m_skinnedHudBounds = b;
                         hudBoundsValid = true;
                     } else {
-                        Fvector c0;
-                        c0.set(m_skinnedHudBounds.x, m_skinnedHudBounds.y, m_skinnedHudBounds.z);
-                        Fvector c1;
-                        c1.set(b.x, b.y, b.z);
-                        Fvector d;
-                        d.sub(c1, c0);
-                        const float dist = d.magnitude();
-                        if (dist + b.w > m_skinnedHudBounds.w) {
-                            if (dist + m_skinnedHudBounds.w <= b.w) {
-                                m_skinnedHudBounds = b;
-                            } else {
-                                const float r = 0.5f * (dist + m_skinnedHudBounds.w + b.w);
-                                c0.mad(d, (r - m_skinnedHudBounds.w) / dist);
-                                m_skinnedHudBounds.set(c0.x, c0.y, c0.z, r);
-                            }
-                        }
+                        fg::passes::MergeBoundingSphere(m_skinnedHudBounds, b);
                     }
                 }
                 nextHistory[bucket.visuals[i]] = vertexTotal;

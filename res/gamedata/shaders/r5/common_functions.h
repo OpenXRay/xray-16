@@ -299,7 +299,7 @@ float3 shade_pbr(
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, (uint)pbr_diffuse_mode, shadingClass, sssColor);
+			svPosition.xy, linearDepth, svPosition.z >= 0.9, (uint)pbr_diffuse_mode, shadingClass, sssColor);
 	}
 #endif
 

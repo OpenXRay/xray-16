@@ -534,7 +534,7 @@ void StatsOverlay::RenderGeometrySection()
             ImGui::Indent();
             ImGui::Text("%u spots / %u points, %u atlas pages (%u%% occupied)",
                 s.localShadowSpots, s.localShadowPoints, s.localShadowPages, s.localShadowAtlas);
-            ImGui::Text("Views: %u static refresh / %u dynamic / %u overflow", s.localShadowAccepted, s.localShadowDyn, s.localShadowOverflow);
+            ImGui::Text("Views: %u static refresh / %u dynamic / %u overflow / %u hud", s.localShadowAccepted, s.localShadowDyn, s.localShadowOverflow, s.localShadowHudViews);
             ImGui::Text("%u caster batches, %u additional off-camera local casters", s.localShadowBatches, s.localShadowExtraCasters);
             ImGui::Text("Bin: %u pairs, %u drops, %u dyn drops", s.localShadowPairs, s.localShadowDrops, s.localShadowDynDrops);
             ImGui::Unindent();

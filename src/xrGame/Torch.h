@@ -5,6 +5,7 @@
 
 class CLAItem;
 class CNightVisionEffector;
+extern Fvector g_torch_camera_offset;
 
 class CTorch : public CInventoryItemObject
 {
@@ -18,7 +19,6 @@ protected:
     u16 guid_bone;
     shared_str light_trace_bone;
 
-    float m_delta_h;
     Fvector2 m_prev_hp;
     bool m_switched_on;
     ref_light light_render;

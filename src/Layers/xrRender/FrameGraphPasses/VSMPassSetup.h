@@ -53,7 +53,6 @@ constexpr u32 kVSMPrimeFrames = 8;
 constexpr u32 kVSMPrimeTraceFrames = 400;
 constexpr u32 kVSMPrimeTraceQuiet = 10;
 constexpr u32 kVSMHudMapSize = 2048;
-constexpr float kVSMHudMargin = 0.05f;
 
 struct VsmParams {
     Fmatrix view;

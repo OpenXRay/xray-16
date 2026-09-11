@@ -1779,17 +1779,18 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& 
     if (!vsRefl || !atRefl)
         return;
 
-    const Fmatrix warp = HudFovWarp();
-    const Fvector4& b = gc.GetSkinnedHudBounds();
-    const float stretch = std::max(1.0f / psHUD_FOV, 1.0f);
-    const float r = std::max(b.w, 0.05f) * stretch + kVSMHudMargin;
+    const HudShadowFit fit = BuildHudShadowFit(gc.GetSkinnedHudBounds());
+    const Fmatrix& warp = fit.warp;
+    const float r = fit.shownSphere.w;
     Fvector center;
-    center.set(b.x, b.y, b.z);
-    warp.transform_tiny(center);
+    center.set(fit.shownSphere.x, fit.shownSphere.y, fit.shownSphere.z);
+    Fvector sunDir = state.sunDir;
+    warp.transform_dir(sunDir);
+    sunDir.normalize_safe();
     Fvector eye;
-    eye.mad(center, state.sunDir, -(r + kVSMHudMargin));
-    const float depthRange = 2.0f * (r + kVSMHudMargin);
-    Fmatrix view = VSMSunView(state.sunDir, eye);
+    eye.mad(center, sunDir, -(r + kHudBoundsMargin));
+    const float depthRange = 2.0f * (r + kHudBoundsMargin);
+    Fmatrix view = VSMSunView(sunDir, eye);
     Fmatrix proj;
     proj.build_projection_ortho(2.0f * r, 2.0f * r, 0.0f, depthRange);
     state.hudViewProj.mul(proj, view);

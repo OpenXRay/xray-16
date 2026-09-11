@@ -272,6 +272,14 @@ void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
 const Fvector& SunDirVisual();
 void ResetSunDirVisual();
 Fmatrix HudFovWarp();
+constexpr float kHudBoundsMargin = 0.05f;
+void MergeBoundingSphere(Fvector4& acc, const Fvector4& b);
+struct HudShadowFit {
+    Fvector4 trueSphere;
+    Fvector4 shownSphere;
+    Fmatrix warp;
+};
+HudShadowFit BuildHudShadowFit(const Fvector4& trueSphere);
 
 inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
     StaticGlobals sg = {};
