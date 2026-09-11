@@ -15,6 +15,7 @@ light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
     flags.bShadow = false;
     flags.bVolumetric = false;
     flags.bHudMode = false;
+    flags.bCastHudToWorld = false;
     position.set(0, -1000, 0);
     direction.set(0, -1, 0);
     right.set(0, 0, 0);

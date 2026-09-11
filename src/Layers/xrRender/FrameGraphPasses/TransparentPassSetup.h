@@ -59,6 +59,7 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle localTiles;
     framegraph::VirtualResourceHandle localStatic;
     framegraph::VirtualResourceHandle localDyn;
+    framegraph::VirtualResourceHandle localHud;
     framegraph::VirtualResourceHandle sunMask;
     LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;

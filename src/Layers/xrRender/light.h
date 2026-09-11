@@ -20,6 +20,7 @@ public:
         u32 bShadow : 1;
         u32 bVolumetric : 1;
         u32 bHudMode : 1;
+        u32 bCastHudToWorld : 1;
 
     } flags;
     Fvector position;
@@ -148,6 +149,7 @@ public:
     void set_hud_mode(bool b) override { flags.bHudMode = b; }
     [[nodiscard]]
     bool get_hud_mode() override { return flags.bHudMode; }
+    void set_cast_hud_to_world(bool b) override { flags.bCastHudToWorld = b; }
 
     void spatial_move() override;
     Fvector spatial_sector_point() override;
