@@ -103,6 +103,8 @@ bool ConvertTexturesToPBR(
     ProgressCallback progress_callback = nullptr
 );
 
+void ShutdownAIPipeline();
+
 struct ConsolidationStats {
     u32 textures_found = 0;
     u32 textures_consolidated = 0;

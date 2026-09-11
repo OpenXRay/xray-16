@@ -37,6 +37,7 @@ void FGRenderBase::Destroy()
 {
     if (m_pbrConversionThread.joinable())
         m_pbrConversionThread.join();
+    pbr::ShutdownAIPipeline();
 
     xr_delete(Resources);
 

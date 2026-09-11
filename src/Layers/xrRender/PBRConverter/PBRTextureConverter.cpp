@@ -810,6 +810,16 @@ struct Stage1Intermediate {
 
 #endif
 
+void ShutdownAIPipeline()
+{
+#ifdef USE_AI_PBR
+    ScopeLock lock{ &g_ai_pipeline_mutex };
+    g_ai_pipeline.reset();
+    g_ai_available = false;
+#endif
+    ONNXModelRunner::ShutdownEnvironment();
+}
+
 static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHeight, u32 channels) {
     const u32 dstWidth = std::max(srcWidth / 2, 1u);
     const u32 dstHeight = std::max(srcHeight / 2, 1u);
