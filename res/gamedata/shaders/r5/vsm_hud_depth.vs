@@ -31,6 +31,9 @@ ByteAddressBuffer g_SkinnedIB : register(t44);
 struct VS_OUTPUT
 {
     float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#endif
     float2 texcoord : TEXCOORD0;
     nointerpolation uint materialID : TEXCOORD1;
 };
@@ -38,6 +41,9 @@ struct VS_OUTPUT
 VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 {
     VS_OUTPUT output;
+#ifdef TARGET_DXIL
+    output.clip = float4(1.0, 1.0, 1.0, 1.0);
+#endif
 
     ClusterEntry e = g_Entries[g_HudEntries[iid]];
     uint local = min(vid, e.indexCount - 1u);

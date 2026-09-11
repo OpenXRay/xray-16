@@ -4,6 +4,9 @@
 struct PS_INPUT
 {
     float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#endif
     float2 texcoord : TEXCOORD0;
     nointerpolation uint materialID : TEXCOORD1;
 };
