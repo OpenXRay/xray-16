@@ -86,7 +86,7 @@ void WeaponUsageStatistic::SaveData()
 #else
     time_t Time;
     time(&Time);
-    xr_sprintf(mFileName, "(%s)_(%s)_%s.wus", *(Level().name()), GameType, ctime(&Time));
+    xr_sprintf(mFileName, "(%s)_(%s)_%s.wus", Level().name().c_str(), GameType, ctime(&Time));
 #endif
     //---------------------------------------------------------
     FS.update_path(mFileName, "$logs$", mFileName);

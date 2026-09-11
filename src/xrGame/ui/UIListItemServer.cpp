@@ -132,7 +132,7 @@ void CUIListItemServer::CreateConsoleCommand(
     xr_string& command, LPCSTR player_name, LPCSTR player_pass, LPCSTR server_psw)
 {
     command = "start client(";
-    command += *m_srv_info.info.address;
+    command += m_srv_info.info.address.c_str();
     command += "/name=";
     command += player_name;
     command += "/pass=";

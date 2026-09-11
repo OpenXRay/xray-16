@@ -64,8 +64,18 @@ public:
 
     T& operator*() const { return *m_pObject; }
     T* operator->() const { return m_pObject; }
-    operator bool() const { return m_pObject; }
+
+    [[nodiscard]]
+    explicit operator bool() const { return m_pObject; }
+
+    [[nodiscard]]
     bool operator!() const { return m_pObject == nullptr; }
+
+    [[nodiscard]]
+    bool operator==(const FactoryPtr& other) const
+    {
+        return *m_pObject == *other.m_pObject;
+    }
 
 private:
     void CreateObject();

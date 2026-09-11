@@ -143,7 +143,7 @@ bool CUIRankingWnd::Init()
     xml.SetLocalRoot(node);
 
     auto stat_count = xml.GetNodesNum(node, "stat");
-    const u32 value_color = CUIXmlInit::GetColor(xml, "value", 0, 0xFFffffff);
+    const u32 value_color = CUIXmlInit::GetColor(xml, "value", 0, 0xFFFFFFFF);
 
     for (size_t i = 0; i < stat_count; ++i)
     {

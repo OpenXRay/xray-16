@@ -68,6 +68,7 @@ private:
     Flags8 m_flags;
     string_path m_file_name;
     Root DATA;
+    xr_vector<xr_string> m_includes;
 
     void Load(IReader* F, pcstr path, allow_include_func_t allow_include_func = nullptr);
 
@@ -237,6 +238,7 @@ public:
     bool r_line(pcstr S, int L, pcstr* N, pcstr* V) const;
     bool r_line(const shared_str& S, int L, pcstr* N, pcstr* V) const;
 
+    void w_include(pcstr include);
     void w_string(pcstr S, pcstr L, pcstr V, pcstr comment = nullptr);
     void w_u8(pcstr S, pcstr L, u8 V, pcstr comment = nullptr);
     void w_u16(pcstr S, pcstr L, u16 V, pcstr comment = nullptr);
@@ -258,6 +260,7 @@ public:
     void w_bool(pcstr S, pcstr L, bool V, pcstr comment = nullptr);
 
     void remove_line(pcstr S, pcstr L);
+    void remove_include(pcstr include);
 };
 
 #define READ_IF_EXISTS(ltx, method, section, name, default_value) \

@@ -83,9 +83,9 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     {
         IKinematics* K = smart_cast<IKinematics*>(Visual());
         R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
-        light_bone = K->LL_BoneID(*lamp->light_main_bone);
+        light_bone = K->LL_BoneID(lamp->light_main_bone.c_str());
         VERIFY(light_bone != BI_NONE);
-        ambient_bone = K->LL_BoneID(*lamp->light_ambient_bone);
+        ambient_bone = K->LL_BoneID(lamp->light_ambient_bone.c_str());
         VERIFY(ambient_bone != BI_NONE);
         CForm = xr_new<CCF_Skeleton>(this);
     }
@@ -103,7 +103,7 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     light_render->set_virtual_size(lamp->m_virtual_size);
     light_render->set_color(clr);
     light_render->set_cone(lamp->spot_cone_angle);
-    light_render->set_texture(*lamp->light_texture);
+    light_render->set_texture(lamp->light_texture.c_str());
 
     light_render->set_volumetric_quality(lamp->m_volumetric_quality);
     light_render->set_volumetric_intensity(lamp->m_volumetric_intensity);
@@ -112,7 +112,7 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     if (lamp->glow_texture.size())
     {
         glow_render = GEnv.Render->glow_create();
-        glow_render->set_texture(*lamp->glow_texture);
+        glow_render->set_texture(lamp->glow_texture.c_str());
         glow_render->set_color(clr);
         glow_render->set_radius(lamp->glow_radius);
     }
@@ -126,12 +126,12 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
         clr.mul_rgb(ambient_power);
         light_ambient->set_range(lamp->m_ambient_radius);
         light_ambient->set_color(clr);
-        light_ambient->set_texture(*lamp->m_ambient_texture);
+        light_ambient->set_texture(lamp->m_ambient_texture.c_str());
     }
 
     fHealth = lamp->m_health;
 
-    lanim = LALib.FindItem(*lamp->color_animator);
+    lanim = LALib.FindItem(lamp->color_animator.c_str());
 
     CPHSkeleton::Spawn(e);
     if (smart_cast<IKinematicsAnimated*>(Visual()))
@@ -143,7 +143,7 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
         //.intepolate_pos
     }
     if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPhysic) && !Visual())
-        Msg("! WARNING: lamp, obj name [%s],flag physics set, but has no visual", *cName());
+        Msg("! WARNING: lamp, obj name [%s],flag physics set, but has no visual", cName().c_str());
     //.	if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPhysic)&&Visual()&&!guid_physic_bone)	fHealth=0.f;
     if (Alive() && m_bState)
         TurnOn();
@@ -358,7 +358,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     m_pPhysicsShell = P_create_Shell();
 
     bone_map.clear();
-    LPCSTR fixed_bones = *lamp->fixed_bones;
+    LPCSTR fixed_bones = lamp->fixed_bones.c_str();
     if (fixed_bones)
     {
         int count = _GetItemCount(fixed_bones);

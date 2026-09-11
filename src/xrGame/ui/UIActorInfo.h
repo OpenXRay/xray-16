@@ -3,7 +3,7 @@
 #include "xrUICore/Windows/UIWindow.h"
 
 class CUIFrameWindow;
-class CUITextFrameLineWnd;
+class CUIFrameLineWnd;
 class CUIAnimatedStatic;
 class CUIStatic;
 class CUICharacterInfo;
@@ -28,9 +28,9 @@ public:
 
 protected:
     CUIFrameWindow* UIInfoFrame{};
-    CUITextFrameLineWnd* UIInfoHeader{};
+    CUIFrameLineWnd* UIInfoHeader{};
     CUIFrameWindow* UICharIconFrame{};
-    CUITextFrameLineWnd* UICharIconHeader{};
+    CUIFrameLineWnd* UICharIconHeader{};
     CUIAnimatedStatic* UIAnimatedIcon{};
 
     CUIWindow* UICharacterWindow{};

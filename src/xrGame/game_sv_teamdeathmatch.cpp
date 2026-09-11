@@ -561,12 +561,12 @@ void game_sv_TeamDeathmatch::ReadOptions(shared_str& options)
 {
     inherited::ReadOptions(options);
     //-------------------------------
-    g_sv_tdm_bAutoTeamBalance = get_option_i(*options, "abalance", (g_sv_tdm_bAutoTeamBalance ? 1 : 0)) != 0;
-    g_sv_tdm_bAutoTeamSwap = get_option_i(*options, "aswap", (g_sv_tdm_bAutoTeamSwap ? 1 : 0)) != 0;
-    g_sv_tdm_bFriendlyIndicators = get_option_i(*options, "fi", (g_sv_tdm_bFriendlyIndicators ? 1 : 0)) != 0;
-    g_sv_tdm_bFriendlyNames = get_option_i(*options, "fn", (g_sv_tdm_bFriendlyNames ? 1 : 0)) != 0;
+    g_sv_tdm_bAutoTeamBalance = get_option_i(options.c_str(), "abalance", (g_sv_tdm_bAutoTeamBalance ? 1 : 0)) != 0;
+    g_sv_tdm_bAutoTeamSwap = get_option_i(options.c_str(), "aswap", (g_sv_tdm_bAutoTeamSwap ? 1 : 0)) != 0;
+    g_sv_tdm_bFriendlyIndicators = get_option_i(options.c_str(), "fi", (g_sv_tdm_bFriendlyIndicators ? 1 : 0)) != 0;
+    g_sv_tdm_bFriendlyNames = get_option_i(options.c_str(), "fn", (g_sv_tdm_bFriendlyNames ? 1 : 0)) != 0;
 
-    float fFF = get_option_f(*options, "ffire", g_sv_tdm_fFriendlyFireModifier);
+    float fFF = get_option_f(options.c_str(), "ffire", g_sv_tdm_fFriendlyFireModifier);
     g_sv_tdm_fFriendlyFireModifier = fFF;
 }
 

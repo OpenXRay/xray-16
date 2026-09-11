@@ -28,7 +28,7 @@ void xrServer::Process_event_activate(
     {
 #ifndef MASTER_GOLD
         Msg("~ ERROR: can't activate independant object. entity[%s:%d], parent[%s:%d], section[%s]",
-            e_entity->name_replace(), id_entity, e_parent->name_replace(), id_parent, *e_entity->s_name);
+            e_entity->name_replace(), id_entity, e_parent->name_replace(), id_parent, e_entity->s_name.c_str());
 #endif // #ifndef MASTER_GOLD
         return;
     }

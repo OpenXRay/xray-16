@@ -37,5 +37,5 @@ protected:
 
     using tex_info_data = std::array<TEX_INFO[2], MAX_DEF_TEX>;
 
-    inline static tex_info_data* m_tex_info;
+    inline static tex_info_data* m_tex_info{};
 };

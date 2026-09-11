@@ -79,9 +79,25 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
-    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
-    m_caption_const = (m_caption->GetText());
+
+    CUIXmlInit::InitAutoStaticGroup(uiXml, "", 0, this);
+
+    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this, false);
+    m_caption_const = m_caption ? m_caption->GetText() : "";
+
+    // Main buttons background
+    CUIWindow* buttons_background = this;
+    if (UIHelper::CreateFrameLine(uiXml, "mbbackground_frame_line", UIMainPdaFrame, false))
+        buttons_background = UIMainPdaFrame; // SOC
+
+    // Timer background
     m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
+    if (!m_clock)
+    {
+        const auto timer = UIHelper::CreateFrameLine(uiXml, "timer_frame_line", UIMainPdaFrame, false);
+        if (timer && timer->GetTitleText())
+            m_clock = timer->GetTitleText(); // SOC
+    }
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
@@ -91,11 +107,14 @@ void CUIPdaWnd::Init()
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
-    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
-    m_btn_close->SetAccelerator(kUI_BACK, false, 2);
-    UI().Focus().UnregisterFocusable(m_btn_close);
+    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this, false);
+    if (m_btn_close)
+    {
+        m_btn_close->SetAccelerator(kUI_BACK, false, 2);
+        UI().Focus().UnregisterFocusable(m_btn_close);
+    }
 
-    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
+    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
@@ -126,7 +145,7 @@ void CUIPdaWnd::Init()
 
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
-    AttachChild(UITabControl);
+    buttons_background->AttachChild(UITabControl);
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
     UITabControl->SetAcceleratorsMode(true);
@@ -183,7 +202,7 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     case BUTTON_CLICKED:
     {
-        if (pWnd == m_btn_close)
+        if (m_btn_close && pWnd == m_btn_close)
         {
             HideDialog();
         }
@@ -235,8 +254,15 @@ void CUIPdaWnd::Update()
         m_pActiveDialog->Update();
 
     if (m_clock)
-        m_clock->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-
+    {
+        auto time = GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes);
+        if (m_clock->GetParent() != this) // SOC
+        {
+            const auto date = GetGameDateAsString(InventoryUtilities::edpDateToDay, '/', true);
+            xr_sprintf(time, "%s %s", time.c_str(), date.c_str());
+        }
+        m_clock->SetText(time.c_str());
+    }
     if (pUILogsWnd)
         Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
 }
@@ -254,21 +280,23 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
+    const std::tuple<shared_str, pcstr, CUIWindow*> availableWindowsList[] =
     {
-        { "eptMap",         pUIMapWnd },
-        { "eptTasks",       pUITaskWnd },
-        { "eptFractionWar", pUIFactionWarWnd },
-        { "eptStatistics",  pUIActorInfo },
-        { "eptRanking",     pUIRankingWnd },
-        { "eptLogs",        pUILogsWnd },
+        { "eptMap",         nullptr, pUIMapWnd },
+        { "eptTasks",       nullptr, pUITaskWnd },
+        { "eptFractionWar", nullptr, pUIFactionWarWnd },
+        { "eptStatistics",  "ui_pda_actor_info", pUIActorInfo },
+        { "eptRanking",     nullptr, pUIRankingWnd },
+        { "eptLogs",        nullptr, pUILogsWnd },
     };
 
-    for (const auto& [id, wnd] : availableWindowsList)
+    pcstr soc_infoportion{};
+    for (const auto& [id, info, wnd] : availableWindowsList)
     {
         if (section == id && wnd)
         {
             m_pActiveDialog = wnd;
+            soc_infoportion = info;
             break;
         }
     }
@@ -283,13 +311,12 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         }
     }
 
-    if (m_pActiveDialog == pUIActorInfo && pUIActorInfo)
-    {
-        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
-    }
-
     if (m_pActiveDialog)
     {
+        InventoryUtilities::SendInfoToActor(section.c_str()); // X-Ray extensions
+        if (soc_infoportion)
+            InventoryUtilities::SendInfoToActor(soc_infoportion); // SOC
+
         if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
             UIMainPdaFrame->AttachChild(m_pActiveDialog);
         UIMainPdaFrame->SetKeyboardCapture(m_pActiveDialog, true);
@@ -305,6 +332,9 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 
 void CUIPdaWnd::SetActiveCaption()
 {
+    if (!m_caption)
+        return;
+
     TABS_VECTOR* btn_vec = UITabControl->GetButtonsVector();
     TABS_VECTOR::iterator it_b = btn_vec->begin();
     TABS_VECTOR::iterator it_e = btn_vec->end();
@@ -369,7 +399,8 @@ void CUIPdaWnd::DrawHint()
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
         pUIRankingWnd->DrawHint();
 
-    m_hint_wnd->Draw();
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
 }
 
 bool CUIPdaWnd::NeedCursor() const
@@ -415,7 +446,12 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
+void CUIPdaWnd::SetCaption(pcstr text)
+{
+    if (m_caption)
+        m_caption->SetText(text);
+}
+
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();

@@ -34,7 +34,7 @@ CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 
 void CUITalkWnd::InitTalkWnd()
 {
-    inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+    inherited::SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
     UITalkDialogWnd = xr_new<CUITalkDialogWnd>();
     UITalkDialogWnd->SetAutoDelete(true);
@@ -59,8 +59,8 @@ void CUITalkWnd::InitTalkDialog()
     UITalkDialogWnd->UICharacterInfoLeft.InitCharacter(m_pOurInvOwner->object_id());
     UITalkDialogWnd->UICharacterInfoRight.InitCharacter(m_pOthersInvOwner->object_id());
 
-    //.	UITalkDialogWnd->UIDialogFrame.UITitleText.SetText		(m_pOthersInvOwner->Name());
-    //.	UITalkDialogWnd->UIOurPhrasesFrame.UITitleText.SetText	(m_pOurInvOwner->Name());
+    UITalkDialogWnd->SetOurName(m_pOurInvOwner->Name());
+    UITalkDialogWnd->SetOthersName(m_pOthersInvOwner->Name());
 
     //очистить лог сообщений
     UITalkDialogWnd->ClearAll();
@@ -235,11 +235,13 @@ void CUITalkWnd::Show(bool status)
     if (status)
     {
         InitTalkDialog();
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
     }
     else
     {
         StopSnd();
         UITalkDialogWnd->Hide();
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_hide");
 
         if (m_pActor)
         {
@@ -314,7 +316,7 @@ void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
     PlaySnd(text.c_str());
 
     bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name())); // XXX: not reliable when both persons have same names
-    UITalkDialogWnd->AddAnswer(SpeakerName, *StringTable().translate(text), i_am);
+    UITalkDialogWnd->AddAnswer(SpeakerName, StringTable().translate(text).c_str(), i_am);
 }
 
 void CUITalkWnd::SwitchToTrade()

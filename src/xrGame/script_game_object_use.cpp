@@ -56,9 +56,9 @@ CScriptGameObject* CScriptGameObject::Parent() const
 }
 
 int CScriptGameObject::clsid() const { return (object().clsid()); }
-LPCSTR CScriptGameObject::Name() const { return (*object().cName()); }
+LPCSTR CScriptGameObject::Name() const { return (object().cName().c_str()); }
 shared_str CScriptGameObject::cName() const { return (object().cName()); }
-LPCSTR CScriptGameObject::Section() const { return (*object().cNameSect()); }
+LPCSTR CScriptGameObject::Section() const { return (object().cNameSect().c_str()); }
 void CScriptGameObject::Kill(CScriptGameObject* who, bool bypass_actor_check)
 {
     CEntity* l_tpEntity = smart_cast<CEntity*>(&object());
@@ -68,13 +68,13 @@ void CScriptGameObject::Kill(CScriptGameObject* who, bool bypass_actor_check)
     if (!l_tpEntity)
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "%s cannot access class member Kill!", *object().cName());
+            LuaMessageType::Error, "%s cannot access class member Kill!", object().cName().c_str());
         return;
     }
     if (!l_tpEntity->AlreadyDie())
         l_tpEntity->KillEntity(who ? who->object().ID() : object().ID(), bypass_actor_check);
     else
-        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "attempt to kill dead object %s", *object().cName());
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "attempt to kill dead object %s", object().cName().c_str());
 }
 
 bool CScriptGameObject::Alive() const
@@ -94,7 +94,7 @@ ALife::ERelationType CScriptGameObject::GetRelationType(CScriptGameObject* who)
     if (!l_tpEntityAlive1)
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "%s cannot access class member GetRelationType!", *object().cName());
+            LuaMessageType::Error, "%s cannot access class member GetRelationType!", object().cName().c_str());
         return ALife::eRelationTypeDummy;
     }
 
@@ -102,7 +102,7 @@ ALife::ERelationType CScriptGameObject::GetRelationType(CScriptGameObject* who)
     if (!l_tpEntityAlive2)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
-            "%s cannot apply GetRelationType method for non-alive object!", *who->object().cName());
+            "%s cannot apply GetRelationType method for non-alive object!", who->object().cName().c_str());
         return ALife::eRelationTypeDummy;
     }
 
@@ -197,7 +197,7 @@ void CScriptGameObject::set_const_force(const Fvector& dir, float value, u32 tim
     if (!shell)
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "set_const_force : object %s has no physics shell!", *object().cName());
+            LuaMessageType::Error, "set_const_force : object %s has no physics shell!", object().cName().c_str());
         return;
     }
     //#ifdef DEBUG

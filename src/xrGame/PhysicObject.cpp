@@ -194,7 +194,7 @@ void CPhysicObject::RunStartupAnim(CSE_Abstract* D)
         {
             CSE_Visual* visual = smart_cast<CSE_Visual*>(D);
             R_ASSERT(visual);
-            R_ASSERT2(*visual->startup_animation, "no startup animation");
+            R_ASSERT2(visual->startup_animation.c_str(), "no startup animation");
 
             VERIFY2((!!PKinematicsAnimated->LL_MotionID(visual->startup_animation.c_str()).valid()),
                 (make_string(" animation %s not faund ", visual->startup_animation.c_str()) +
@@ -296,7 +296,7 @@ void CPhysicObject::CreateSkeleton(CSE_ALifeObjectPhysic* po)
         return;
     if (!Visual())
         return;
-    LPCSTR fixed_bones = *po->fixed_bones;
+    LPCSTR fixed_bones = po->fixed_bones.c_str();
     m_pPhysicsShell = P_build_Shell(this, !po->_flags.test(CSE_PHSkeleton::flActive), fixed_bones);
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, fixed_bones[0] != '\0');
     ApplySpawnIniToPhysicShell(

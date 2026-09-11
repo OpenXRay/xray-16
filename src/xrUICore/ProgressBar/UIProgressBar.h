@@ -5,6 +5,7 @@
 class XRUICORE_API CUIProgressBar final : public CUIWindow
 {
     friend class CUIXmlInitBase;
+    friend class CUIDoubleProgressBar;
 
 protected:
     using inherited = CUIWindow;
@@ -18,23 +19,22 @@ protected:
         om_fromcenter = 4,
         om_vfromcenter = 5,
         om_count
-    } m_orient_mode;
+    } m_orient_mode{ om_horz };
 
-    bool m_bBackgroundPresent : 1 {};
-    bool m_bUseColor          : 1 {};
-    bool m_bUseMiddleColor    : 1 {}; // Hrust: optional middle color for CS/SoC compatibility, without middle color it doesn't looks correctly
+    bool m_bUseColor          : 1 { false };
+    bool m_bUseMiddleColor    : 1 { false }; // Hrust: optional middle color for CS/SoC compatibility, without middle color it doesn't looks correctly
     bool m_bUseGradient       : 1 { true }; //Alundaio: if false then use only solid color with m_maxColor
 
-    Fvector2 m_ProgressPos; // x-current y-dest
-    float m_MinPos;
-    float m_MaxPos;
+    Fvector2 m_ProgressPos{}; // x-current y-dest
+    float m_MinPos{ 1.0f };
+    float m_MaxPos{ 1.0f + EPS };
 
-    float m_CurrentLength;
+    float m_CurrentLength{};
 
-    Fcolor m_minColor;
-    Fcolor m_middleColor;
-    Fcolor m_maxColor;
-    float m_inertion;
+    Fcolor m_minColor{};
+    Fcolor m_middleColor{};
+    Fcolor m_maxColor{};
+    float m_inertion{};
 
 protected:
     void UpdateProgressBar();
@@ -66,12 +66,13 @@ public:
     void ForceSetProgressPos(float pos);
 
     [[nodiscard]]
-    bool IsShownBackground() const { return m_bBackgroundPresent; }
-    void ShowBackground(bool status) { m_bBackgroundPresent = status; }
+    bool IsShownBackground() const { return m_UIBackgroundItem.GetVisible(); }
+    void ShowBackground(bool status) { m_UIBackgroundItem.SetVisible(status); }
 
     void UseGradient(bool status) { m_bUseGradient = status; }
 
     pcstr GetDebugType() override { return "CUIProgressBar"; }
+    void FillDebugInfo() override;
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION(CUIWindow);

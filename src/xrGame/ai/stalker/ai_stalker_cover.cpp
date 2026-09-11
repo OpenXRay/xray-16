@@ -269,7 +269,7 @@ void CAI_Stalker::on_restrictions_change()
     inherited::on_restrictions_change();
     m_best_cover_actual = false;
 #ifdef _DEBUG
-    Msg("* [%6d][%s] on_restrictions_change", Device.dwTimeGlobal, *cName());
+    Msg("* [%6d][%s] on_restrictions_change", Device.dwTimeGlobal, cName().c_str());
 #endif
 }
 

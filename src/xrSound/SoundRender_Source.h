@@ -42,7 +42,7 @@ class XRSOUND_API CSoundRender_Source final : public CSound_source
 
 private:
     void i_decompress(OggVorbis_File* ovf, char* dest, u32 size) const;
-    void i_decompress(OggVorbis_File* ovf, float* dest, u32 size) const;
+    void i_decompress(OggVorbis_File* ovf, float* dest, u32 size) const; // this overload clamps denormalized sounds
 
     bool LoadWave(pcstr name);
 

@@ -11,7 +11,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "xrEngine/xr_level_controller.h"
@@ -58,7 +57,6 @@ void game_cl_ArtefactHunt::Init()
 {
     //	pInventoryMenu	= new CUIInventoryWnd();
     //	pPdaMenu = new CUIPdaWnd();
-    //	pMapDesc = new CUIMapDesc();
 
     LoadTeamData(::detail::mp::ahunt::TEAM1_MENU);
     LoadTeamData(::detail::mp::ahunt::TEAM2_MENU);
@@ -445,11 +443,10 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
                 else
                     dTime = iCeil(float(dReinforcementTime - CurTime) / 1000);
 
-                string128 _buff;
-                m_game_ui->m_pReinforcementInidcator->SetText(xr_itoa(dTime, _buff, 10));
+                m_game_ui->SetReinforcementTimes(dTime, iReinforcementTime);
             }
             else
-                m_game_ui->m_pReinforcementInidcator->SetText("0");
+                m_game_ui->SetReinforcementTimes(0, 1);
 
             s16 lt = local_player->team;
             if (lt >= 0)

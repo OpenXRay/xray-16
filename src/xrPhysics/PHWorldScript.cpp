@@ -23,6 +23,15 @@ void CPHWorld::script_register(lua_State* luaState)
         def("physics_world", +[]
         {
             return ph_world;
+        }),
+        // X-Ray Extensions:
+        def("get_ph_time_factor", +[]
+        {
+            return phTimefactor;
+        }),
+        def("set_ph_time_factor", +[](float time_factor)
+        {
+            return phTimefactor = time_factor;
         })
     ];
 }

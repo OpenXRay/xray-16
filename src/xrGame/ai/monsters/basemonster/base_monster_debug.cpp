@@ -56,7 +56,7 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
     DBG().text(this).clear();
     DBG().text(this).add_item("---------------------------------------", x, y += delta_y, delimiter_color);
 
-    xr_sprintf(text, "-- Monster : [%s]  Current Time = [%u]", *cName(), Device.dwTimeGlobal);
+    xr_sprintf(text, "-- Monster : [%s]  Current Time = [%u]", cName().c_str(), Device.dwTimeGlobal);
     DBG().text(this).add_item(text, x, y += delta_y, color);
     DBG().text(this).add_item("-----------   PROPERTIES   ------------", x, y += delta_y, delimiter_color);
 
@@ -70,7 +70,7 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
 
     if (EnemyMan.get_enemy())
     {
-        xr_sprintf(text, "Current Enemy = [%s]", *EnemyMan.get_enemy()->cName());
+        xr_sprintf(text, "Current Enemy = [%s]", EnemyMan.get_enemy()->cName().c_str());
     }
     else
         xr_sprintf(text, "Current Enemy = [NONE]");
@@ -85,7 +85,7 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
 
     if (CorpseMan.get_corpse())
     {
-        xr_sprintf(text, "Current Corpse = [%s] Satiety = [%.2f]", *CorpseMan.get_corpse()->cName(), GetSatiety());
+        xr_sprintf(text, "Current Corpse = [%s] Satiety = [%.2f]", CorpseMan.get_corpse()->cName().c_str(), GetSatiety());
     }
     else
         xr_sprintf(text, "Current Corpse = [NONE] Satiety = [%.2f]", GetSatiety());
@@ -144,7 +144,7 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
     {
         if (HitMemory.get_last_hit_object())
         {
-            xr_sprintf(text, "Hit Info: object=[%s] time=[%u]", *(HitMemory.get_last_hit_object()->cName()),
+            xr_sprintf(text, "Hit Info: object=[%s] time=[%u]", HitMemory.get_last_hit_object()->cName().c_str(),
                 HitMemory.get_last_hit_time());
         }
         else
@@ -173,7 +173,7 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
 
     if (EnemyMan.get_enemy())
     {
-        xr_sprintf(text, "Current Enemy = [%s]", *EnemyMan.get_enemy()->cName());
+        xr_sprintf(text, "Current Enemy = [%s]", EnemyMan.get_enemy()->cName().c_str());
     }
     else
         xr_sprintf(text, "Current Enemy = [NONE]");
@@ -303,7 +303,7 @@ void CBaseMonster::debug_fsm()
     DBG().object_info(this, this).remove_item(u32(1));
     DBG().object_info(this, this).remove_item(u32(2));
 
-    DBG().object_info(this, this).add_item(*cName(), color_xrgb(255, 0, 0), 0);
+    DBG().object_info(this, this).add_item(cName().c_str(), color_xrgb(255, 0, 0), 0);
     DBG().object_info(this, this).add_item(st, color_xrgb(255, 0, 0), 1);
 
     xr_sprintf(st, "Team[%u]Squad[%u]Group[%u]", g_Team(), g_Squad(), g_Group());
@@ -392,7 +392,7 @@ void add_debug_info(debug::text_tree& root_s, const CEntity* pE)
 {
     if (pE)
     {
-        root_s.add_line(*pE->cName());
+        root_s.add_line(pE->cName().c_str());
         root_s.add_line("ID", pE->ID());
     }
     else
@@ -537,7 +537,7 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
 
     ::detail::add_debug_info(general_s, this);
     TextTree& current_visual_s = general_s.add_line("Current_Visual");
-    current_visual_s.add_line(*cNameVisual());
+    current_visual_s.add_line(cNameVisual().c_str());
 
     general_s.add_line("Health", conditions().GetHealth());
     general_s.add_line("Morale", Morale.get_morale());
@@ -615,7 +615,7 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
     //-----------------------------------------------
     TextTree& corpse_s = general_s.find_or_add("Corpse_Man");
 
-    corpse_s.add_line("Current_Corpse", CorpseMan.get_corpse() ? *CorpseMan.get_corpse()->cName() : "none");
+    corpse_s.add_line("Current_Corpse", CorpseMan.get_corpse() ? CorpseMan.get_corpse()->cName().c_str() : "none");
     corpse_s.add_line("Satiety", make_xrstr("%.2f", GetSatiety()));
 
     //-----------------------------------------------
@@ -748,7 +748,7 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
     TextTree& controller_s = root_s.find_or_add("Controllers");
     TextTree& animation_s = controller_s.find_or_add("Animations");
 
-    TextTree& current_animation_s = animation_s.add_line(*anim().cur_anim_info().name);
+    TextTree& current_animation_s = animation_s.add_line(anim().cur_anim_info().name.c_str());
 
     CBlend* p_blend = control().animation().current_blend();
     if (!p_blend)
@@ -798,7 +798,7 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
     movement_s.add_line("Path_Type", pc_path_type);
     if (movement().path_type() == MovementManager::ePathTypePatrolPath)
     {
-        movement_s.add_line("Path_Name", *movement().patrol().path_name());
+        movement_s.add_line("Path_Name", movement().patrol().path_name().c_str());
         movement_s.add_line("Completed", movement().patrol().completed());
 
         movement_s.add_line("Current_Point", movement().patrol().get_current_point_index());
@@ -872,13 +872,13 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
         movement().restrictions().base_in_restrictions().size())
     {
         ::detail::add_debug_info_restrictions(
-            restrictions_s.add_line("out"), *movement().restrictions().out_restrictions());
+            restrictions_s.add_line("out"), movement().restrictions().out_restrictions().c_str());
         ::detail::add_debug_info_restrictions(
-            restrictions_s.add_line("in"), *movement().restrictions().in_restrictions());
+            restrictions_s.add_line("in"), movement().restrictions().in_restrictions().c_str());
         ::detail::add_debug_info_restrictions(
-            restrictions_s.add_line("base_out"), *movement().restrictions().base_out_restrictions());
+            restrictions_s.add_line("base_out"), movement().restrictions().base_out_restrictions().c_str());
         ::detail::add_debug_info_restrictions(
-            restrictions_s.add_line("base_in"), *movement().restrictions().base_in_restrictions());
+            restrictions_s.add_line("base_in"), movement().restrictions().base_in_restrictions().c_str());
 
         restrictions_s.add_line(
             "Actor_Accessible?", actor ? movement().restrictions().accessible(actor->Position()) : false);

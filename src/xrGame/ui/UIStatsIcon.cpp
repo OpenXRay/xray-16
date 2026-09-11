@@ -56,6 +56,8 @@ void CUIStatsIcon::InitTexInfo()
 
 void CUIStatsIcon::FreeTexInfo()
 {
+    if (!m_tex_info)
+        return;
     // ranks
     for (int i = RANK_0; i <= RANK_4; i++)
     {

@@ -307,6 +307,14 @@ STRING_VALUE CStringTable::translate(const STRING_ID& str_id) const
     return str_id;
 }
 
+STRING_VALUE CStringTable::translate(const STRING_ID& str_id, const STRING_ID& str_id2) const
+{
+    STRING_VALUE out = str_id;
+    if (!translate(str_id, out))
+        translate(str_id2, out);
+    return out;
+}
+
 bool CStringTable::translate(const STRING_ID& str_id, STRING_VALUE& out) const
 {
     if (!pData)
@@ -320,11 +328,10 @@ bool CStringTable::translate(const STRING_ID& str_id, STRING_VALUE& out) const
     return false;
 }
 
-pcstr CStringTable::translate(const STRING_ID& str_id, pcstr default_value) const
+bool CStringTable::has_translation(const STRING_ID& str_id) const
 {
-    STRING_VALUE out;
-    if (translate(str_id, out))
-        return out.c_str();
+    if (!pData)
+        return false;
 
-    return default_value;
+    return pData->m_StringTable.find(str_id) != pData->m_StringTable.end();
 }

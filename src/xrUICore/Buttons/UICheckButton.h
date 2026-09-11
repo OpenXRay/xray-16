@@ -34,7 +34,7 @@ public:
     pcstr GetDebugType() override { return "CUICheckButton"; }
 
 private:
-    bool m_opt_backup_value;
+    bool m_opt_backup_value{};
     void InitTexture2(LPCSTR texture_name);
     CUIWindow* m_pDependControl;
 };

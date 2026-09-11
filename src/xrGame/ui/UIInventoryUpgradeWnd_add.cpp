@@ -27,7 +27,7 @@ void CUIInventoryUpgradeWnd::LoadCellsBacks(CUIXml& uiXml)
         LPCSTR type = uiXml.Read("type", 0, "");
         LPCSTR txr = uiXml.Read("back_texture", 0, NULL);
         LPCSTR txr2 = uiXml.Read("point_texture", 0, NULL);
-        u32 color = CUIXmlInit::GetColor(uiXml, "item_color", 0, 0);
+        u32 color = CUIXmlInit::GetColor(uiXml, "item_color", 0, color_rgba(0, 0, 0, 255));
         LoadCellStates(type, txr, txr2, color);
 
         uiXml.SetLocalRoot(node);

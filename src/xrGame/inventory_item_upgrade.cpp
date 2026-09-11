@@ -170,7 +170,7 @@ void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 
     for (const auto& upgrade : saved_upgrades)
     {
-        ai().alife().inventory_upgrade_manager().upgrade_install(*this, *upgrade, true);
+        ai().alife().inventory_upgrade_manager().upgrade_install(*this, upgrade.c_str(), true);
     }
 }
 

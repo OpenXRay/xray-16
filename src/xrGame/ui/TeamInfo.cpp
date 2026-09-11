@@ -67,9 +67,9 @@ LPCSTR CTeamInfo::GetTeam_name(int team)
     string32 tmp;
     R_ASSERT2(team == 1 || team == 2 || team == 3, xr_itoa(team, tmp, 10));
     if (team == 1)
-        return *GetTeam1_name();
+        return GetTeam1_name().c_str();
     else
-        return *GetTeam2_name();
+        return GetTeam2_name().c_str();
 }
 
 LPCSTR CTeamInfo::GetTeam_color_tag(int team)
@@ -108,12 +108,12 @@ LPCSTR CTeamInfo::GetTeam_color_tag(int team)
     {
         flags.set(flTeam1_col_t, true);
         team1_color_tag = str.c_str();
-        return *team1_color_tag;
+        return team1_color_tag.c_str();
     }
     else
     {
         flags.set(flTeam2_col_t, true);
         team2_color_tag = str.c_str();
-        return *team2_color_tag;
+        return team2_color_tag.c_str();
     }
 }

@@ -1076,7 +1076,7 @@ void game_sv_Deathmatch::SpawnWeaponsForActor(CSE_Abstract* pE, game_PlayerState
         Msg("--- Server: spawning item [%d] for actor [%s]", ItemID, ps->getName());
 #endif // #ifdef DEBUG
         SpawnWeapon4Actor(
-            pA->ID, *m_strWeaponsData->GetItemName(ItemID & 0x00FF), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
+            pA->ID, m_strWeaponsData->GetItemName(ItemID & 0x00FF).c_str(), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
         // Game().m_WeaponUsageStatistic->OnWeaponBought(ps, *m_strWeaponsData->GetItemName(ItemID& 0x00FF));
         R_ASSERT(ps->pItemList.size());
         ps->pItemList.erase(ps->pItemList.begin());
@@ -1729,7 +1729,7 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
             }
         };
         //---------------------------------------------------------------
-        if (IsBuyableItem(*e_what->s_name))
+        if (IsBuyableItem(e_what->s_name.c_str()))
             return TRUE;
         //---------------------------------------------------------------
     };
@@ -2169,28 +2169,28 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
 {
     inherited::ReadOptions(options);
     //-------------------------------
-    g_sv_dm_dwForceRespawn = get_option_i(*options, "frcrspwn", g_sv_dm_dwForceRespawn);
-    g_sv_dm_dwFragLimit = get_option_i(*options, "fraglimit", g_sv_dm_dwFragLimit);
-    g_sv_dm_dwTimeLimit = get_option_i(*options, "timelimit", g_sv_dm_dwTimeLimit); // in (min)
-    g_sv_dm_dwDamageBlockTime = get_option_i(*options, "dmgblock", g_sv_dm_dwDamageBlockTime); // in (sec)
+    g_sv_dm_dwForceRespawn = get_option_i(options.c_str(), "frcrspwn", g_sv_dm_dwForceRespawn);
+    g_sv_dm_dwFragLimit = get_option_i(options.c_str(), "fraglimit", g_sv_dm_dwFragLimit);
+    g_sv_dm_dwTimeLimit = get_option_i(options.c_str(), "timelimit", g_sv_dm_dwTimeLimit); // in (min)
+    g_sv_dm_dwDamageBlockTime = get_option_i(options.c_str(), "dmgblock", g_sv_dm_dwDamageBlockTime); // in (sec)
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    g_sv_dm_bDamageBlockIndicators = (get_option_i(*options, "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
+    g_sv_dm_bDamageBlockIndicators = (get_option_i(options.c_str(), "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    g_sv_dm_bAnomaliesEnabled = (get_option_i(*options, "ans", (IsAnomaliesEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
+    g_sv_dm_bAnomaliesEnabled = (get_option_i(options.c_str(), "ans", (IsAnomaliesEnabled() ? 1 : 0)) != 0);
+    g_sv_dm_dwAnomalySetLengthTime = get_option_i(options.c_str(), "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
     //-----------------------------------------------------------------------
     m_bSpectatorMode = false;
-    if (!GEnv.isDedicatedServer && (get_option_i(*options, "spectr", -1) != -1))
+    if (!GEnv.isDedicatedServer && (get_option_i(options.c_str(), "spectr", -1) != -1))
     {
         m_bSpectatorMode = true;
-        m_dwSM_SwitchDelta = get_option_i(*options, "spectr", 0) * 1000;
+        m_dwSM_SwitchDelta = get_option_i(options.c_str(), "spectr", 0) * 1000;
         if (m_dwSM_SwitchDelta < 1000)
             m_dwSM_SwitchDelta = 1000;
     };
     //-------------------------------------------------------------------------
-    g_sv_dm_dwWarmUp_MaxTime = get_option_i(*options, "warmup", g_sv_dm_dwWarmUp_MaxTime);
+    g_sv_dm_dwWarmUp_MaxTime = get_option_i(options.c_str(), "warmup", g_sv_dm_dwWarmUp_MaxTime);
 
-    g_sv_dm_bPDAHunt = (get_option_i(*options, "pdahunt", (g_sv_dm_bPDAHunt ? 1 : 0)) != 0);
+    g_sv_dm_bPDAHunt = (get_option_i(options.c_str(), "pdahunt", (g_sv_dm_bPDAHunt ? 1 : 0)) != 0);
 };
 
 [[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Create() {}

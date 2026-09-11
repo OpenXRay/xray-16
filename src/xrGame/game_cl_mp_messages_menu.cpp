@@ -22,7 +22,7 @@ void game_cl_mp::AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR tea
     for (u32 i = 0; i < 10; i++)
     {
         shared_str LineName;
-        LineName.printf("phrase_%d", i);
+        xr_sprintf(LineName, "phrase_%d", i);
         if (!pSettings->line_exist(menu_section, LineName.c_str()))
             break;
         //---------------------------------------------------------
@@ -89,7 +89,7 @@ void game_cl_mp::LoadMessagesMenu(LPCSTR menus_section)
     for (int i = 0; i < 10; i++)
     {
         shared_str LineName;
-        LineName.printf("menu_%d", i);
+        xr_sprintf(LineName, "menu_%d", i);
         if (!pSettings->line_exist(menus_section, LineName.c_str()))
             break;
         shared_str menu_section = pSettings->r_string(menus_section, LineName.c_str());

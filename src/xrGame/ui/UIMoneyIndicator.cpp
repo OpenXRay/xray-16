@@ -14,20 +14,22 @@ CUIMoneyIndicator::CUIMoneyIndicator()
     m_pBonusMoney->SetAutoDelete(true);
 }
 
-void CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
+bool CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
 {
-    CUIXmlInit::InitWindow(xml_doc, "money_wnd", 0, this);
+    if (!CUIXmlInit::InitWindow(xml_doc, "money_wnd", 0, this, false))
+        return false;
     CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_indicator", 0, &m_back);
     CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_indicator:total_money", 0, &m_money_amount);
     CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_change", 0, &m_money_change);
     CUIXmlInit::InitScrollView(xml_doc, "money_wnd:money_bonus_list", 0, m_pBonusMoney);
-    CGameFont* pF;
-    u32 color;
+    CGameFont* pF{};
+    u32 color{ u32(-1) };
     CUIXmlInit::InitFont(xml_doc, "money_wnd:money_bonus_list:font", 0, color, pF);
     m_pBonusMoney->SetTextAtrib(pF, color);
     m_money_change.SetVisible(false);
 
     m_money_change.SetColorAnimation("ui_mp_chat", LA_ONLYALPHA | LA_TEXTCOLOR);
+    return true;
 }
 
 void CUIMoneyIndicator::SetMoneyAmount(pcstr money) { m_money_amount.SetText(money); }

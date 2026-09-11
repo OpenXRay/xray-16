@@ -211,13 +211,13 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
             VERIFY(l2);
             if (l->GlobalRect().intersected(l2->GlobalRect()))
             {
-                Msg(" --error-incorrect map definition global rect of map [%s] intersects with [%s]", *l->MapName(),
-                    *l2->MapName());
+                Msg(" --error-incorrect map definition global rect of map [%s] intersects with [%s]", l->MapName().c_str(),
+                    l2->MapName().c_str());
             }
         }
         if (FALSE == l->GlobalRect().intersected(GlobalMap()->BoundRect()))
         {
-            Msg(" --error-incorrect map definition map [%s] places outside global map", *l->MapName());
+            Msg(" --error-incorrect map definition map [%s] places outside global map", l->MapName().c_str());
         }
     }
 #endif

@@ -78,7 +78,7 @@ MotionID CStalkerAnimationManager::no_object_animation(const EBodyState& body_st
     if (eMentalStateFree == movement.mental_state())
     {
         VERIFY3(eBodyStateStand == movement.body_state(), "Cannot run FREE animations, when body state is not stand!",
-            *stalker.cName());
+            stalker.cName().c_str());
 
         if (standing())
             return (animation[9].A[1]);
@@ -147,7 +147,7 @@ MotionID CStalkerAnimationManager::unknown_object_animation(u32 slot, const EBod
     if (eMentalStateFree == movement.mental_state())
     {
         VERIFY3(eBodyStateStand == movement.body_state(), "Cannot run FREE animation when body state is not stand!",
-            *object().cName());
+            object().cName().c_str());
 
         if (standing())
             return (animation[9].A[1]);

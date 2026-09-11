@@ -402,11 +402,7 @@ void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName
             if (!suitableLevels)
             {
                 Msg("--unknown game type-%s", gameType.c_str());
-                m_storage.resize(m_storage.size() + 1);
-                SGameTypeMaps& lastItem = m_storage.back();
-                lastItem.m_game_type_name = gameType;
-                lastItem.m_game_type_id = ParseStringToGameType(gameType.c_str());
-                suitableLevels = &m_storage.back();
+                suitableLevels = &m_storage.emplace_back(SGameTypeMaps{ gameType, ParseStringToGameType(gameType.c_str()) });
             }
             MPLevelDesc levelDesc;
             levelDesc.map_name = shLevelName;
@@ -430,18 +426,7 @@ void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName
 void CMapListHelper::Load()
 {
     string_path cfgFileName;
-    FS.update_path(cfgFileName, "$game_config$", "mp" DELIMITER "map_list.ltx");
-    CInifile maplistCfg(cfgFileName);
-    // read weathers set
-    CInifile::Sect weatherCfg = maplistCfg.r_section("weather");
-    m_weathers.reserve(weatherCfg.Data.size());
-    for (CInifile::Item& weatherDesc : weatherCfg.Data)
-    {
-        MPWeatherDesc gw;
-        gw.Name = weatherDesc.first;
-        gw.StartTime = weatherDesc.second;
-        m_weathers.push_back(gw);
-    }
+
     // scan for additional maps
     FS_FileSet levelCfgs;
     FS.file_list(levelCfgs, "$game_levels$", FS_ListFiles, "*level.ltx");
@@ -468,17 +453,32 @@ void CMapListHelper::Load()
         FS.unload_archive(arch);
     }
     levelsPath->_set_root(prevRoot.c_str());
-    // XXX nitrocaster: is that really fatal?
-    R_ASSERT2(m_storage.size() > 0, "unable to fill map list");
-    R_ASSERT2(m_weathers.size() > 0, "unable to fill weathers list");
-}
+    if (m_storage.empty())
+        Log("! Unable to fill MP map list (no maps discovered).");
 
-const SGameTypeMaps& CMapListHelper::GetMapListFor(const shared_str& gameType)
-{
-    if (m_storage.size() == 0)
-        Load();
-    // XXX nitrocaster: always use enum for game type representation
-    return *GetMapListInt(gameType);
+    FS.update_path(cfgFileName, "$game_config$", "mp" DELIMITER "map_list.ltx");
+    if (!FS.exist(cfgFileName))
+    {
+        Log("~ Can't open MP map list:", cfgFileName);
+        return;
+    }
+
+    CInifile maplistCfg(cfgFileName);
+    if (!maplistCfg.section_exist("weather"))
+    {
+        Log("~ MP map list has no [weather] section:", cfgFileName);
+        return;
+    }
+    // read weathers set
+    const CInifile::Sect& weatherCfg = maplistCfg.r_section("weather");
+    m_weathers.reserve(weatherCfg.Data.size());
+    for (const auto& weatherDesc : weatherCfg.Data)
+    {
+        m_weathers.emplace_back(MPWeatherDesc{ weatherDesc.first, weatherDesc.second });
+    }
+
+    if (m_weathers.empty())
+        Log("! Unable to fill MP weather list (no weather presets discovered).");
 }
 
 SGameTypeMaps* CMapListHelper::GetMapListInt(const shared_str& gameType)
@@ -493,11 +493,19 @@ SGameTypeMaps* CMapListHelper::GetMapListInt(const shared_str& gameType)
 
 const SGameTypeMaps& CMapListHelper::GetMapListFor(const EGameIDs gameId)
 {
-    if (m_storage.size() == 0)
+    if (m_storage.empty())
     {
         Load();
-        // XXX nitrocaster: is that really fatal?
-        R_ASSERT2(m_storage.size() > 0, "unable to fill map list");
+    }
+    if (m_storage.empty())
+    {
+        static SGameTypeMaps empty{};
+        if (!empty.m_game_type_name.size())
+        {
+            empty.m_game_type_name = "unknown";
+            empty.m_game_type_id = eGameIDNoGame;
+        }
+        return empty;
     }
     for (SGameTypeMaps& maps : m_storage)
     {
@@ -509,7 +517,7 @@ const SGameTypeMaps& CMapListHelper::GetMapListFor(const EGameIDs gameId)
 
 const xr_vector<MPWeatherDesc>& CMapListHelper::GetGameWeathers()
 {
-    if (m_weathers.size() == 0)
+    if (m_weathers.empty())
         Load();
     return m_weathers;
 }

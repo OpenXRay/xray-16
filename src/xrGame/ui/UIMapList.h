@@ -52,8 +52,6 @@ private:
     void OnBtnRightClick();
     void OnBtnUpClick();
     void OnBtnDownClick();
-    void AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id);
-    void ParseWeather(char** ps, char* e);
 
     CUIListBox* m_pList1;
     CUIListBox* m_pList2;
@@ -71,13 +69,7 @@ private:
     //	CUISpinText*		m_pModeSelector;
     CUIStatic* m_pMapPic;
     CUIMapInfo* m_pMapInfo;
-    // XXX nitrocaster: use MPWeatherDesc
-    struct Sw
-    {
-        shared_str weather_name;
-        shared_str weather_time;
-    };
-    xr_vector<Sw> m_mapWeather;
+
     xr_string m_command;
     xr_string m_srv_params;
 };

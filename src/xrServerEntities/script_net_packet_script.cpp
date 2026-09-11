@@ -84,7 +84,7 @@ void CScriptNetPacket::script_register(lua_State* luaState)
             {
                 shared_str temp;
                 self->r_stringZ(temp);
-                return (*temp);
+                return (temp.c_str());
             })
             .def("r_matrix", &NET_Packet::r_matrix)
             .def("r_clientID", +[](NET_Packet* self)

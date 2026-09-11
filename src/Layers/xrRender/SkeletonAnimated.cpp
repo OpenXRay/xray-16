@@ -177,7 +177,7 @@ u16 CKinematicsAnimated::LL_PartID(LPCSTR B)
     for (u16 id = 0; id < MAX_PARTS; id++)
     {
         CPartDef& P = (*m_Partition)[id];
-        if (nullptr == P.Name)
+        if (!P.Name)
             continue;
         if (0 == xr_stricmp(B, P.Name.c_str()))
             return id;
@@ -367,7 +367,7 @@ CBlend* CKinematicsAnimated::LL_PlayCycle(u16 part, MotionID motion_ID, BOOL bMi
     }
     if (part >= MAX_PARTS)
         return nullptr;
-    if (nullptr == m_Partition->part(part).Name)
+    if (!m_Partition->part(part).Name)
         return nullptr;
 
     //	shared_motions* s_mots	= &m_Motions[motion.slot];
@@ -406,13 +406,8 @@ CBlend* CKinematicsAnimated::PlayCycle(
     LPCSTR N, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel /*= 0*/)
 {
     MotionID motion_ID = ID_Cycle(N);
-    if (motion_ID.valid())
-        return PlayCycle(motion_ID, bMixIn, Callback, CallbackParam, channel);
-    else
-    {
-        xrDebug::Fatal(DEBUG_INFO, "! MODEL: can't find cycle: %s", N);
-        return nullptr;
-    }
+    R_ASSERT3_CURE(motion_ID.valid(), "! MODEL: can't find cycle:", N, { return nullptr; });
+    return PlayCycle(motion_ID, bMixIn, Callback, CallbackParam, channel);
 }
 CBlend* CKinematicsAnimated::PlayCycle(
     MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel /*= 0*/)
@@ -519,7 +514,7 @@ void CKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_ble
     // Cycles
     for (u16 part = 0; part < MAX_PARTS; part++)
     {
-        if (nullptr == m_Partition->part(part).Name)
+        if (!m_Partition->part(part).Name)
             continue;
         I = blend_cycles[part].begin();
         E = blend_cycles[part].end();

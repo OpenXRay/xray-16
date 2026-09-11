@@ -92,7 +92,7 @@ bool CPhraseDialog::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str
     //вызвать скриптовую присоединенную функцию
     //активируется после сказанной фразы
     //первый параметр - тот кто говорит фразу, второй - тот кто слушает
-    last_phrase->GetScriptHelper()->Action(pSpeakerGO1, pSpeakerGO2, *phrase_dialog->m_DialogId, phrase_id.c_str());
+    last_phrase->GetScriptHelper()->Action(pSpeakerGO1, pSpeakerGO2, phrase_dialog->m_DialogId.c_str(), phrase_id.c_str());
 
     //больше нет фраз, чтоб говорить
     phrase_dialog->m_PhraseVector.clear();
@@ -111,7 +111,7 @@ bool CPhraseDialog::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str
             THROW(next_phrase_vertex);
             shared_str next_phrase_id = next_phrase_vertex->vertex_id();
             if (next_phrase_vertex->data()->GetScriptHelper()->Precondition(
-                    pSpeakerGO2, pSpeakerGO1, *phrase_dialog->m_DialogId, phrase_id.c_str(), next_phrase_id.c_str()))
+                    pSpeakerGO2, pSpeakerGO1, phrase_dialog->m_DialogId.c_str(), phrase_id.c_str(), next_phrase_id.c_str()))
             {
                 phrase_dialog->m_PhraseVector.push_back(next_phrase_vertex->data());
 #ifdef DEBUG
@@ -127,7 +127,7 @@ bool CPhraseDialog::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str
         }
 
         R_ASSERT2(!phrase_dialog->m_PhraseVector.empty(),
-            make_string("No available phrase to say, dialog[%s]", *phrase_dialog->m_DialogId));
+            make_string("No available phrase to say, dialog[%s]", phrase_dialog->m_DialogId.c_str()));
 
         //упорядочить списко по убыванию благосклонности
         std::sort(phrase_dialog->m_PhraseVector.begin(), phrase_dialog->m_PhraseVector.end(), PhraseGoodwillPred);
@@ -184,7 +184,7 @@ LPCSTR CPhraseDialog::GetPhraseText(const shared_str& phrase_id, bool current_sp
             ph->GetText(), pSpeakerGO1, pSpeakerGO2, m_DialogId.c_str(), phrase_id.c_str());
 }
 
-LPCSTR CPhraseDialog::DialogCaption() { return data()->m_sCaption.size() ? *data()->m_sCaption : GetPhraseText("0"); }
+LPCSTR CPhraseDialog::DialogCaption() { return data()->m_sCaption.size() ? data()->m_sCaption.c_str() : GetPhraseText("0"); }
 int CPhraseDialog::Priority() { return data()->m_iPriority; }
 void CPhraseDialog::Load(shared_str dialog_id)
 {
@@ -204,7 +204,7 @@ void CPhraseDialog::load_shared(LPCSTR)
 
     // loading from XML
     XML_NODE dialog_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
-    THROW3(dialog_node, "dialog id=", *item_data.id);
+    THROW3(dialog_node, "dialog id=", item_data.id.c_str());
 
     pXML->SetLocalRoot(dialog_node);
 
@@ -232,13 +232,13 @@ void CPhraseDialog::load_shared(LPCSTR)
     }
 
     [[maybe_unused]] int phrase_num = pXML->GetNodesNum(phrase_list_node, "phrase");
-    THROW3(phrase_num, "dialog %s has no phrases at all", *item_data.id);
+    THROW3(phrase_num, "dialog %s has no phrases at all", item_data.id.c_str());
 
     pXML->SetLocalRoot(phrase_list_node);
 
 #ifdef DEBUG // debug & mixed
     LPCSTR wrong_phrase_id = pXML->CheckUniqueAttrib(phrase_list_node, "phrase", "id");
-    THROW3(wrong_phrase_id == NULL, *item_data.id, wrong_phrase_id);
+    THROW3(wrong_phrase_id == NULL, item_data.id.c_str(), wrong_phrase_id);
 #endif
 
     //ищем стартовую фразу

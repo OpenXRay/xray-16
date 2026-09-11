@@ -51,7 +51,7 @@ MotionID CStalkerAnimationManager::global_critical_hit()
 
     CWeapon* weapon = smart_cast<CWeapon*>(object().inventory().ActiveItem());
     VERIFY2(weapon, make_string("current active item: %s", object().inventory().ActiveItem() ?
-                            *object().inventory().ActiveItem()->object().cName() :
+                            object().inventory().ActiveItem()->object().cName().c_str() :
                             "no active item"));
 
     u32 animation_slot = weapon->animation_slot();

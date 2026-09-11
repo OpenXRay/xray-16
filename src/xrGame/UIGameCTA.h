@@ -10,7 +10,6 @@
 
 class UITeamPanels;
 
-class CUIMapDesc;
 class CUIMoneyIndicator;
 class CUIRankIndicator;
 class UITeamPanels;

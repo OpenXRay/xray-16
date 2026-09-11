@@ -16,7 +16,7 @@
 CSquadHierarchyHolder::~CSquadHierarchyHolder() { delete_data(m_groups); }
 CGroupHierarchyHolder& CSquadHierarchyHolder::group(u32 group_id) const
 {
-    VERIFY3(group_id < max_group_count, "Group id is invalid : ", *SeniorityHierarchy::to_string(group_id));
+    VERIFY3(group_id < max_group_count, "Group id is invalid : ", SeniorityHierarchy::to_string(group_id).c_str());
     if (!m_groups[group_id])
         m_groups[group_id] = xr_new<CGroupHierarchyHolder>(const_cast<CSquadHierarchyHolder*>(this));
     return (*m_groups[group_id]);

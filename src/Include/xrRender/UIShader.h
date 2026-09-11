@@ -11,6 +11,9 @@ public:
     virtual bool inited() = 0;
     virtual void destroy() = 0;
 
+    [[nodiscard]]
+    virtual bool operator==(const IUIShader& other) const = 0;
+
     virtual bool GetBaseTextureResolution(Fvector2& res) = 0;
     virtual xrImTextureData GetImGuiTextureId() = 0;
 };

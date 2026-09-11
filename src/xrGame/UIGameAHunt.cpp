@@ -5,6 +5,7 @@
 #include "Level.h"
 #include "game_cl_artefacthunt.h"
 #include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIMoneyIndicator.h"
@@ -27,23 +28,29 @@ void CUIGameAHunt::Init(int stage)
     { // unique
         m_pTeamPanels->Init(TEAM_PANELS_AHUNT_XML_NAME, "team_panels_wnd");
 
-        CUIXml uiXml;
+        CUIXml uiXml, uiXml2;
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_ahunt.xml");
+        uiXml2.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml"); // CS
 
-        CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
-        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        CUIXmlInit::InitWindow(uiXml, "global", 0, Window, false);
 
-        m_pReinforcementInidcator = xr_new<CUIStatic>("Reinforcement indicator");
+        m_pReinforcementInidcator = UIHelper::CreateProgressShape(uiXml, "reinforcement", nullptr, false); // CS
+        if (!m_pReinforcementInidcator)
+            m_pReinforcementInidcator = UIHelper::CreateStatic(uiXml, "reinforcement", nullptr);
         m_pReinforcementInidcator->SetAutoDelete(true);
-        CUIXmlInit::InitStatic(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
+
+        if (!CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator, false))
+            CUIXmlInit::InitStatic(uiXml2, "fraglimit", 0, m_pFragLimitIndicator, false); // CS
 
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
         CUIXmlInit::InitStatic(uiXml, "team1_score", 0, m_team1_score);
         CUIXmlInit::InitStatic(uiXml, "team2_score", 0, m_team2_score);
 
-        m_pMoneyIndicator->InitFromXML(uiXml);
-        m_pRankIndicator->InitFromXml(uiXml);
+        if (!m_pMoneyIndicator->InitFromXML(uiXml))
+            m_pMoneyIndicator->InitFromXML(uiXml2); // CS
+        if (!m_pRankIndicator->InitFromXml(uiXml))
+            m_pRankIndicator->InitFromXml(uiXml2); // CS
     }
     if (stage == 2)
     { // after
@@ -72,3 +79,14 @@ void CUIGameAHunt::SetClGame(game_cl_GameState* g)
 }
 
 void CUIGameAHunt::SetBuyMsgCaption(LPCSTR str) { m_buy_msg_caption->SetTextST(str); }
+
+void CUIGameAHunt::SetReinforcementTimes(int curTime, int maxTime)
+{
+    if (auto shape = smart_cast<CUIProgressShape*>(m_pReinforcementInidcator))
+        shape->SetPos(curTime, maxTime);
+    else
+    {
+        string128 _buff;
+        m_pReinforcementInidcator->SetText(xr_itoa(curTime, _buff, 10));
+    }
+}

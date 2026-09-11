@@ -1,0 +1,26 @@
+id: io.github.OpenXRay.xray-16
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: xr_3da
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+
+modules:
+  - name: OpenXRay
+    buildsystem: cmake
+    sources:
+      - type: git
+        url: https://github.com/OpenXRay/xray-16.git
+        branch: dev
+    config-opts:
+      - -D CMAKE_BUILD_TYPE=ReleaseMasterGold
+      - -D CMAKE_UNITY_BUILD=ON
+
+#rename-icon: openxray_cop.png
+rename-desktop-file: openxray_cop.desktop

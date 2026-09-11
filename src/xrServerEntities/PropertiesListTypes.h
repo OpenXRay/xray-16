@@ -765,7 +765,7 @@ public:
         else
             for (u32 k = 0; k < token_count; k++)
                 if ((T)token[k].id == this->GetValue())
-                    return *token[k].name;
+                    return token[k].name.c_str();
         return draw_val;
     }
 };

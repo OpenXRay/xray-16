@@ -46,6 +46,12 @@ public:
             && m_psHandle.Get() == other.m_psHandle.Get();
     }
 
+    bool operator==(const IUIShader& other) const override
+    {
+        const auto& rhs = static_cast<const fgUIShader&>(other);
+        return SamePipelineAs(rhs) && m_baseTexture == rhs.m_baseTexture;
+    }
+
     ref_shader hShader;
 
     nvrhi::ShaderHandle m_vsHandle;

@@ -47,7 +47,7 @@ IC u32 CSpaceRestrictionBridge::accessible_nearest(
     }
     bool selected_vertex_id_is_valid = level_graph.valid_vertex_id(selected);
     VERIFY2(selected_vertex_id_is_valid,
-        make_string("vertex_id[%d], object[%s], position[%f][%f][%f]", selected, *name(), VPUSH(position)));
+        make_string("vertex_id[%d], object[%s], position[%f][%f][%f]", selected, name().c_str(), VPUSH(position)));
     if (!selected_vertex_id_is_valid)
         return -1;
 

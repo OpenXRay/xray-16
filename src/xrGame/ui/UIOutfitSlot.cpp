@@ -36,9 +36,9 @@ void CUIOutfitDragDropList::SetOutfit(CUICellItem* itm)
 
         xr_string iconName;
         if (pActor)
-            iconName = *pActor->cNameVisual();
+            iconName = pActor->cNameVisual().c_str();
         else
-            iconName = *m_default_outfit;
+            iconName = m_default_outfit.c_str();
 
         xr_string::iterator it = std::find(iconName.rbegin(), iconName.rend(), '\\').base();
 

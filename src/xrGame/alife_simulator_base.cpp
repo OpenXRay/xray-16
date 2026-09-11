@@ -102,7 +102,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     abstract->m_wVersion = SPAWN_VERSION;
 
     string256 s_name_replace;
-    xr_strcpy(s_name_replace, *abstract->s_name);
+    xr_strcpy(s_name_replace, abstract->s_name.c_str());
     if (abstract->ID < 1000)
         xr_strcat(s_name_replace, "0");
     if (abstract->ID < 100)
@@ -159,7 +159,7 @@ CSE_Abstract* CALifeSimulatorBase::create(CSE_ALifeGroupAbstract* tpALifeGroupAb
     k->m_bALifeControl = true;
 
     string256 s_name_replace;
-    xr_strcpy(s_name_replace, *k->s_name);
+    xr_strcpy(s_name_replace, k->s_name.c_str());
     if (k->ID < 1000)
         xr_strcat(s_name_replace, "0");
     if (k->ID < 100)
@@ -178,8 +178,8 @@ CSE_Abstract* CALifeSimulatorBase::create(CSE_ALifeGroupAbstract* tpALifeGroupAb
 
 void CALifeSimulatorBase::create(CSE_ALifeDynamicObject*& i, CSE_ALifeDynamicObject* j, const _SPAWN_ID& tSpawnID)
 {
-    CSE_Abstract* tpSE_Abstract = F_entity_Create(*j->s_name);
-    R_ASSERT3(tpSE_Abstract, "Cannot find item with section", *j->s_name);
+    CSE_Abstract* tpSE_Abstract = F_entity_Create(j->s_name.c_str());
+    R_ASSERT3(tpSE_Abstract, "Cannot find item with section", j->s_name.c_str());
     i = smart_cast<CSE_ALifeDynamicObject*>(tpSE_Abstract);
     R_ASSERT2(i, "Non-ALife object in the 'game.spawn'");
 
@@ -264,7 +264,7 @@ void CALifeSimulatorBase::release(CSE_Abstract* abstract, bool alife_query)
 #ifdef DEBUG
     if (psAI_Flags.test(aiALife))
     {
-        Msg("[LSS] Releasing object [%s][%s][%d][%x]", abstract->name_replace(), *abstract->s_name, abstract->ID,
+        Msg("[LSS] Releasing object [%s][%s][%d][%x]", abstract->name_replace(), abstract->s_name.c_str(), abstract->ID,
             smart_cast<void*>(abstract));
     }
 #endif

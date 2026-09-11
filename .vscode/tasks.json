@@ -51,7 +51,7 @@
       "options": {
         "cwd": "${workspaceFolder}/bin"
       },
-      "command": "cmake --build . -j${CPU_COUNT}",
+      "command": "cmake --build . -j$(nproc --all)",
       "dependsOn": [
         "Configure"
       ]
@@ -101,10 +101,10 @@
       "options": [
         "Debug",
         "Release",
-        "MinSizeRel",
-        "RelWithDebInfo"
+        "Mixed",
+        "ReleaseMasterGold"
       ],
-      "default": "Debug"
+      "default": "ReleaseMasterGold"
     }
   ]
 }

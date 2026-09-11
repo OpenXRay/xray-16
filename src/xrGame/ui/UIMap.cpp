@@ -451,7 +451,7 @@ void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, co
 
     if (FALSE == fsimilar(kw, kh, EPS_L))
     {
-        Msg(" --incorrect global rect definition for map [%s]  kw=%f kh=%f", *MapName(), kw, kh);
+        Msg(" --incorrect global rect definition for map [%s]  kw=%f kh=%f", MapName().c_str(), kw, kh);
         Msg(" --try x2=%f or  y2=%f", m_GlobalRect.x1 + kh * BoundRect().width(),
             m_GlobalRect.y1 + kw * BoundRect().height());
     }

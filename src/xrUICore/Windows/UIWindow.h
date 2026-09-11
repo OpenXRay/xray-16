@@ -293,10 +293,6 @@ public:
         return { abs.x1 + size.x, abs.y1 + size.y };
     }
 
-    void SetWndRect_script(Frect rect) { SetWndRect(rect); }
-    void SetWndPos_script(Fvector2 pos) { SetWndPos(pos); }
-    void SetWndSize_script(Fvector2 size) { SetWndSize(size); }
-
     // прорисовка окна
     virtual void Draw();
     virtual void Draw(float x, float y);

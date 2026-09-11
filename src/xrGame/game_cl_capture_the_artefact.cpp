@@ -8,7 +8,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "ui/UIVote.h"
 #include "ui/TeamInfo.h"
 #include "game_base_menu_events.h"
@@ -169,7 +168,7 @@ void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
             }
             if (InWarmUp())
             {
-                m_game_ui->SetReinforcementTimes(0, 0);
+                m_game_ui->SetReinforcementTimes(0, 1);
             }
             else
             {
@@ -300,7 +299,7 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
         }
         else
         {
-            xr_sprintf(Text, "%s%s", Color_Main, *st.translate("mp_you_captured_artefact"));
+            xr_sprintf(Text, "%s%s", Color_Main, st.translate("mp_you_captured_artefact").c_str());
 
             PlayCapturedTheArtefact(ps);
 

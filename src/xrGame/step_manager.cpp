@@ -203,7 +203,7 @@ void CStepManager::update(bool b_hud_view)
             // Играть партиклы
             if (b_play && !mtl_pair->CollideParticles.empty())
             {
-                LPCSTR ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
+                LPCSTR ps_name = mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())].c_str();
 
                 //отыграть партиклы столкновения материалов
                 CParticlesObject* ps = CParticlesObject::Create(ps_name, TRUE);
@@ -273,16 +273,16 @@ void CStepManager::load_foot_bones(CInifile::Sect& data)
     {
         const CInifile::Item& item = *I;
 
-        u16 index = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(*item.second);
-        VERIFY3(index != BI_NONE, "foot bone not found", *item.second);
+        u16 index = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(item.second.c_str());
+        VERIFY3(index != BI_NONE, "foot bone not found", item.second.c_str());
 
-        if (xr_strcmp(*item.first, "front_left") == 0)
+        if (xr_strcmp(item.first.c_str(), "front_left") == 0)
             m_foot_bones[eFrontLeft] = index;
-        else if (xr_strcmp(*item.first, "front_right") == 0)
+        else if (xr_strcmp(item.first.c_str(), "front_right") == 0)
             m_foot_bones[eFrontRight] = index;
-        else if (xr_strcmp(*item.first, "back_right") == 0)
+        else if (xr_strcmp(item.first.c_str(), "back_right") == 0)
             m_foot_bones[eBackRight] = index;
-        else if (xr_strcmp(*item.first, "back_left") == 0)
+        else if (xr_strcmp(item.first.c_str(), "back_left") == 0)
             m_foot_bones[eBackLeft] = index;
     }
 }
@@ -296,9 +296,9 @@ void CStepManager::reload_foot_bones()
     }
     else
     {
-        if (!pSettings->line_exist(*m_object->cNameSect(), "foot_bones"))
+        if (!pSettings->line_exist(m_object->cNameSect().c_str(), "foot_bones"))
             R_ASSERT2(false, "section [foot_bones] not found in monster user_data");
-        load_foot_bones(pSettings->r_section(pSettings->r_string(*m_object->cNameSect(), "foot_bones")));
+        load_foot_bones(pSettings->r_section(pSettings->r_string(m_object->cNameSect().c_str(), "foot_bones")));
     }
 
     // проверка на соответсвие

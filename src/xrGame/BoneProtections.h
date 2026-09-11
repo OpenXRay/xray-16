@@ -13,9 +13,12 @@ struct SBoneProtections
         HitFraction,
 
         // Introduced in CS, externally assigned
+        // Used in outfits instead of HitFraction
         HitFractionActorCS,
 
         // Introduced in COP
+        // Used for NPCs to distinguish from hit_frac_monster,
+        // which is non-relevant to this struct
         HitFractionNPC,
 
         // Hit formula changed in COP, externally assigned

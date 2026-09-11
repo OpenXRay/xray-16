@@ -700,7 +700,7 @@ void CCustomMonster::Die(IGameObject* who)
 
 bool CCustomMonster::net_Spawn(CSE_Abstract* DC)
 {
-    memory().reload(*cNameSect());
+    memory().reload(cNameSect().c_str());
     memory().reinit();
 
     if (!movement().net_Spawn(DC) || !inherited::net_Spawn(DC) || !CScriptEntity::net_Spawn(DC))

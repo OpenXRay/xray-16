@@ -70,7 +70,7 @@ void CUIStatsPlayerInfo::Update()
     xr_vector<PI_FIELD_INFO>& field_info = *m_field_info;
 
     for (u32 i = 0; i < m_fields.size(); i++)
-        m_fields[i]->TextItemControl()->SetText(GetInfoByID(*field_info[i].name));
+        m_fields[i]->TextItemControl()->SetText(GetInfoByID(field_info[i].name.c_str()));
 
     m_pPlayerInfo = NULL;
 }
@@ -145,7 +145,7 @@ const char* CUIStatsPlayerInfo::GetInfoByID(const char* id)
     else if (0 == xr_strcmp(id, "status"))
     {
         if (m_pPlayerInfo->testFlag(GAME_PLAYER_FLAG_READY))
-            xr_strcpy(ans, *StringTable().translate("st_mp_ready"));
+            xr_strcpy(ans, StringTable().translate("st_mp_ready").c_str());
         else
             xr_strcpy(ans, "");
     }

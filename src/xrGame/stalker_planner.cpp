@@ -41,7 +41,7 @@ LPCSTR CStalkerPlanner::property2string(const _condition_type& property_id)
 LPCSTR CStalkerPlanner::object_name() const
 {
     VERIFY(m_object);
-    return (*m_object->cName());
+    return (m_object->cName().c_str());
 }
 #endif
 

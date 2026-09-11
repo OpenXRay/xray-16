@@ -1,5 +1,8 @@
 #pragma once
+
 #include "UIWindow.h"
+
+class CUIStatic;
 
 class XRUICORE_API CUIFrameWindow : public CUIWindow, public ITextureOwner
 {
@@ -20,6 +23,8 @@ public:
     virtual void SetStretchTexture(bool stretch) {}
     virtual bool GetStretchTexture() { return false; };
     virtual void Draw();
+
+    CUIStatic* GetTitleText(bool create_on_demand = false);
 
     pcstr GetDebugType() override { return "CUIFrameWindow"; }
 
@@ -43,6 +48,8 @@ protected:
     Frect m_tex_rect[fmMax];
     u32 m_texture_color;
     bool m_bTextureVisible;
+
+    CUIStatic* m_title_text{};
 
     void DrawElements();
     bool get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);

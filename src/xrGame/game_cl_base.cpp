@@ -236,7 +236,7 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
             players.emplace(newClientId, PS);
             OnNewPlayerConnected(newClientId);
         }
-        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PS->getName(), Color_Main, *StringTable().translate("mp_connected"));
+        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PS->getName(), Color_Main, StringTable().translate("mp_connected").c_str());
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
@@ -248,7 +248,7 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         string64 PlayerName;
         P.r_stringZ(PlayerName);
 
-        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, *StringTable().translate("mp_disconnected"));
+        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, StringTable().translate("mp_disconnected").c_str());
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
@@ -260,7 +260,7 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         string64 PlayerName;
         P.r_stringZ(PlayerName);
 
-        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, *StringTable().translate("mp_entered_game"));
+        xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, StringTable().translate("mp_entered_game").c_str());
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
     }

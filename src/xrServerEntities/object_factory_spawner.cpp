@@ -61,7 +61,7 @@ void CObjectFactory::init_spawn_data()
             cpcstr npc_random = pSettings->read_if_exists<pcstr>(name, "npc_random", "");
             _GetItem(npc ? npc : npc_random, 0, temp);
 
-            if (!temp.empty())
+            if (!temp.empty() && pSettings->line_exist(temp.c_str(), "class"))
             {
                 const auto npc_clsid    = pSettings->r_clsid(temp.c_str(), "class");
                 const auto npc_kind     = pSettings->read_if_exists<pcstr>(temp.c_str(), "kind", nullptr);
@@ -240,17 +240,12 @@ void CObjectFactory::on_tool_frame()
             constexpr pcstr styles[] =
             {
                 "Game",
-                "LTX"
+                "LTX",
             };
 
             ImGui::SetNextItemWidth(ImGui::CalcTextSize(" Game ").x); // shrink to minimal
-            ImGui::SliderInt("", &display_mode, 0, std::size(styles) - 1, styles[display_mode], ImGuiSliderFlags_NoInput);
-            if (ImGui::IsItemDeactivated() && !ImGui::IsItemDeactivatedAfterEdit())
-            {
-                display_mode = !display_mode;
-            }
-
-            imgui::ItemHelp("Left-click on the item in this list to spawn it.\n"
+            imgui::Selector("", display_mode, styles, std::size(styles),
+                            "Left-click on the item in this list to spawn it.\n"
                             "You can also select between displaying game names or ltx sections by using a switch.");
             ImGui::EndMenuBar();
         }

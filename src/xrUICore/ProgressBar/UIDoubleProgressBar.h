@@ -6,12 +6,12 @@ class XRUICORE_API CUIDoubleProgressBar final : public CUIWindow
 {
 public: // func
     CUIDoubleProgressBar();
-    virtual ~CUIDoubleProgressBar();
 
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
     void SetTwoPos(float cur_value, float compare_value);
 
     pcstr GetDebugType() override { return "CUIDoubleProgressBar"; }
+    void FillDebugInfo() override;
 
 protected:
     CUIProgressBar m_progress_one;

@@ -36,7 +36,7 @@ shared_str CSpaceRestrictionHolder::normalize_string(shared_str space_restrictor
     pstr* string_current = strings;
 
     pstr temp_string = (pstr)xr_alloca((n + 1) * sizeof(char));
-    LPCSTR I = *space_restrictors;
+    LPCSTR I = space_restrictors.c_str();
     pstr i = temp_string, j = i;
     for (; *I; ++I, ++i)
     {
@@ -120,9 +120,9 @@ void CSpaceRestrictionHolder::register_restrictor(
         temp1 = *temp;
 
         if (xr_strlen(*temp) && xr_strlen(space_restrictors))
-            strconcat(sizeof(m_temp_string), m_temp_string, **temp, ",", *space_restrictors);
+            strconcat(sizeof(m_temp_string), m_temp_string, (*temp).c_str(), ",", space_restrictors.c_str());
         else
-            strconcat(sizeof(m_temp_string), m_temp_string, **temp, *space_restrictors);
+            strconcat(sizeof(m_temp_string), m_temp_string, (*temp).c_str(), space_restrictors.c_str());
 
         *temp = normalize_string(m_temp_string);
 
@@ -149,9 +149,9 @@ bool try_remove_string(shared_str& search_string, const shared_str& string_to_se
     string256 temp;
     string4096 temp1;
     *temp1 = 0;
-    for (int i = 0, j = 0, n = _GetItemCount(*search_string); i < n; ++i, ++j)
+    for (int i = 0, j = 0, n = _GetItemCount(search_string.c_str()); i < n; ++i, ++j)
     {
-        if (xr_strcmp(string_to_search, _GetItem(*search_string, i, temp)))
+        if (xr_strcmp(string_to_search, _GetItem(search_string.c_str(), i, temp)))
         {
             if (j)
                 xr_strcat(temp1, ",");

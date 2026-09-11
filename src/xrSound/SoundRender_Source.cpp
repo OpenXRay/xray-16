@@ -89,7 +89,7 @@ void CSoundRender_Source::i_decompress(OggVorbis_File* ovf, float* _dest, u32 si
 
         for (long j = 0; j < samples; j++)
             for (long i = 0; i < m_data_info.channels; i++)
-                *_dest++ = pcm[i][j];
+                *_dest++ = clampr(pcm[i][j], -1.0f, 1.0f);
 
         left -= samples;
     }

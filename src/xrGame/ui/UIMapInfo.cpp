@@ -23,13 +23,13 @@ void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
 }
 
 #define ADD_TEXT(x, y, z)                                           \
-    text = *StringTable().translate(x);                                   \
+    text = StringTable().translate(x).c_str();                      \
     text += ": ";                                                   \
     text += txt_color_tag;                                          \
     if (ltx.line_exist("map_info", y))                              \
-        text += *StringTable().translate(ltx.r_string_wb("map_info", y)); \
+        text += StringTable().translate(ltx.r_string_wb("map_info", y)).c_str(); \
     else                                                            \
-        text += *StringTable().translate(z);                              \
+        text += StringTable().translate(z).c_str();                              \
     text += "%c[default]\\n";                                       \
     st = xr_new<CUIStatic>("Text");                                 \
     st->SetTextComplexMode(true);                                   \
@@ -81,7 +81,7 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         u32 txt_color;
         CGameFont* txt_font;
         CUIXmlInit::InitFont(xml_doc, "header", 0, header_color, txt_font);
-        txt_color = CUIXmlInit::GetColor(xml_doc, "txt:text", 0, 0x00);
+        txt_color = CUIXmlInit::GetColor(xml_doc, "txt:text", 0, color_rgba(0, 0, 0, 255));
         string64 txt_color_tag;
         xr_sprintf(txt_color_tag, "%s[%u,%u,%u,%u]", "%c", color_get_A(txt_color), color_get_R(txt_color),
             color_get_G(txt_color), color_get_B(txt_color));
@@ -90,27 +90,27 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 
         shared_str _modes = ltx.r_string_wb("map_info", "modes");
 
-        text = *StringTable().translate("modes");
+        text = StringTable().translate("modes").c_str();
         text += ": ";
         text += txt_color_tag;
         bool b_ = false;
         if (strstr(_modes.c_str(), "st_deathmatch"))
         {
-            text += *StringTable().translate("st_deathmatch");
+            text += StringTable().translate("st_deathmatch").c_str();
             b_ = true;
         }
         if (strstr(_modes.c_str(), "st_team_deathmatch"))
         {
             if (b_)
                 text += ", ";
-            text += *StringTable().translate("st_team_deathmatch");
+            text += StringTable().translate("st_team_deathmatch").c_str();
             b_ = true;
         }
         if (strstr(_modes.c_str(), "st_artefacthunt"))
         {
             if (b_)
                 text += ", ";
-            text += *StringTable().translate("st_artefacthunt");
+            text += StringTable().translate("st_artefacthunt").c_str();
         }
 
         text += "%c[default]\\n";
@@ -140,4 +140,4 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     }
 }
 
-const char* CUIMapInfo::GetLargeDesc() { return *m_large_desc; }
+const char* CUIMapInfo::GetLargeDesc() { return m_large_desc.c_str(); }

@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   labeler:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
     - name: on new pull request
       if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.opened == true || github.event.pull_request.reopened == true }}

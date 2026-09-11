@@ -71,8 +71,8 @@ BOOL CRestrictedObject::net_Spawn(CSE_Abstract* data)
     string4096 temp0;
     string4096 temp1;
 
-    xr_strcpy(temp0, *monster->m_out_space_restrictors);
-    xr_strcpy(temp1, *monster->m_in_space_restrictors);
+    xr_strcpy(temp0, monster->m_out_space_restrictors.c_str());
+    xr_strcpy(temp1, monster->m_in_space_restrictors.c_str());
 
     if (ai().get_alife())
     {
@@ -266,7 +266,7 @@ IC void CRestrictedObject::construct_restriction_string(pstr temp_restrictions, 
     for (; I != E; ++I)
     {
         IGameObject* object = Level().Objects.net_Find(*I);
-        if (!object || !!strstr(*current_restrictions, *object->cName()) == value)
+        if (!object || !!strstr(current_restrictions.c_str(), object->cName().c_str()) == value)
             continue;
 
         p(this, object->ID());
@@ -274,7 +274,7 @@ IC void CRestrictedObject::construct_restriction_string(pstr temp_restrictions, 
         if (count)
             xr_strcat(temp_restrictions, temp_restrictions_size, ",");
 
-        xr_strcat(temp_restrictions, temp_restrictions_size, *object->cName());
+        xr_strcat(temp_restrictions, temp_restrictions_size, object->cName().c_str());
 
         count++;
     }
@@ -355,7 +355,7 @@ void CRestrictedObject::add_restrictions(const shared_str& out_restrictions, con
 
     START_PROFILE("Restricted Object/Add Restrictions");
 
-    Level().space_restriction_manager().add_restrictions(object().ID(), *out_restrictions, *in_restrictions);
+    Level().space_restriction_manager().add_restrictions(object().ID(), out_restrictions.c_str(), in_restrictions.c_str());
 
     actual(false);
 
@@ -369,7 +369,7 @@ void CRestrictedObject::remove_restrictions(const shared_str& out_restrictions, 
 
     START_PROFILE("Restricted Object/Remove Restrictions");
 
-    Level().space_restriction_manager().remove_restrictions(object().ID(), *out_restrictions, *in_restrictions);
+    Level().space_restriction_manager().remove_restrictions(object().ID(), out_restrictions.c_str(), in_restrictions.c_str());
 
     actual(false);
 

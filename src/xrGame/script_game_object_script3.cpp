@@ -573,6 +573,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("is_on_belt", &CScriptGameObject::IsOnBelt)
         .def("item_on_belt", &CScriptGameObject::ItemOnBelt)
         .def("belt_count", &CScriptGameObject::BeltSize)
+        .def("belt_object_count", &CScriptGameObject::BeltSize)
 
         .def("get_actor_max_weight", &CScriptGameObject::GetActorMaxWeight)
         .def("set_actor_max_weight", &CScriptGameObject::SetActorMaxWeight)

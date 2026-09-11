@@ -49,7 +49,7 @@ void SLocationKey::load(IReader& stream)
     stream.r_stringZ(spot_type);
     stream.r_u8();
 
-    location = xr_new<CMapLocation>(*spot_type, object_id);
+    location = xr_new<CMapLocation>(spot_type.c_str(), object_id);
 
     location->load(stream);
 }
@@ -293,7 +293,7 @@ void CMapManager::Dump()
     auto it_e = Locations().end();
     for (; it != it_e; ++it)
     {
-        Msg("spot_type=[%s] object_id=[%d]", *((*it).spot_type), (*it).object_id);
+        Msg("spot_type=[%s] object_id=[%d]", (*it).spot_type.c_str(), (*it).object_id);
         (*it).location->Dump();
     }
 

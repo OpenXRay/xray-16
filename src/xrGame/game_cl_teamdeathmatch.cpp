@@ -10,7 +10,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "game_base_menu_events.h"
 #include "ui/TeamInfo.h"
 #include "clsid_game.h"
@@ -58,7 +57,6 @@ void game_cl_TeamDeathmatch::Init()
 {
     //	pInventoryMenu	= new CUIInventoryWnd();
     //	pPdaMenu = new CUIPdaWnd();
-    //	pMapDesc = new CUIMapDesc();
     //-----------------------------------------------------------
     LoadTeamData(GetTeamMenu(1));
     LoadTeamData(GetTeamMenu(2));
@@ -124,12 +122,12 @@ void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
 
         xr_sprintf(Text, "%s%s %s%s %s%s",
             "", // no color
-            PlayerName, Color_Main, *StringTable().translate("mp_joined"), CTeamInfo::GetTeam_color_tag(int(Team)),
+            PlayerName, Color_Main, StringTable().translate("mp_joined").c_str(), CTeamInfo::GetTeam_color_tag(int(Team)),
             CTeamInfo::GetTeam_name(int(Team)));
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
-        Msg("%s %s %s", PlayerName, *StringTable().translate("mp_joined"), CTeamInfo::GetTeam_name(int(Team)));
+        Msg("%s %s %s", PlayerName, StringTable().translate("mp_joined").c_str(), CTeamInfo::GetTeam_name(int(Team)));
     }
     break;
 
@@ -145,12 +143,12 @@ void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
             break;
 
         xr_sprintf(Text, "%s%s %s%s %s%s", CTeamInfo::GetTeam_color_tag(int(OldTeam)), pPlayer->getName(), Color_Main,
-            *StringTable().translate("mp_switched_to"), CTeamInfo::GetTeam_color_tag(int(NewTeam)),
+            StringTable().translate("mp_switched_to").c_str(), CTeamInfo::GetTeam_color_tag(int(NewTeam)),
             CTeamInfo::GetTeam_name(int(NewTeam)));
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
-        Msg("%s *s %s", pPlayer->getName(), *StringTable().translate("mp_switched_to"), CTeamInfo::GetTeam_name(int(NewTeam)));
+        Msg("%s *s %s", pPlayer->getName(), StringTable().translate("mp_switched_to").c_str(), CTeamInfo::GetTeam_name(int(NewTeam)));
     }
     break;
 
@@ -210,7 +208,6 @@ void game_cl_TeamDeathmatch::OnMapInfoAccept()
 {
     if (CanCallTeamSelectMenu())
         m_game_ui->m_pUITeamSelectWnd->ShowDialog(true);
-    //.		m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd, true);
 };
 
 void game_cl_TeamDeathmatch::OnTeamMenuBack()
@@ -218,21 +215,18 @@ void game_cl_TeamDeathmatch::OnTeamMenuBack()
     if (local_player->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
     {
         m_game_ui->ShowServerInfo();
-        //.		m_game_ui->StartStopMenu(m_game_ui->m_pMapDesc, true);
     }
 };
 
 void game_cl_TeamDeathmatch::OnTeamMenu_Cancel()
 {
     m_game_ui->m_pUITeamSelectWnd->HideDialog();
-    //.	m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd, true);
 
     if (!m_bTeamSelected && !m_bSpectatorSelected)
     {
         if (CanCallTeamSelectMenu() && !m_game_ui->m_pUITeamSelectWnd->IsShown())
         {
             m_game_ui->m_pUITeamSelectWnd->ShowDialog(true);
-            //.			m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd, true);
             return;
         }
     }
@@ -243,7 +237,6 @@ void game_cl_TeamDeathmatch::OnSkinMenuBack()
 {
     if (CanCallTeamSelectMenu())
         m_game_ui->m_pUITeamSelectWnd->ShowDialog(true);
-    //.		m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd, true);
 };
 
 void game_cl_TeamDeathmatch::OnSpectatorSelect()
@@ -349,7 +342,6 @@ void game_cl_TeamDeathmatch::SetCurrentSkinMenu()
     if (pCurSkinMenu && new_team != pCurSkinMenu->GetTeam())
         if (pCurSkinMenu->IsShown())
             pCurSkinMenu->HideDialog();
-    //.			m_game_ui->StartStopMenu(pCurSkinMenu,true);
 
     xr_delete(pCurSkinMenu);
     pCurSkinMenu = InitSkinMenu(new_team);
@@ -367,7 +359,6 @@ bool game_cl_TeamDeathmatch::CanBeReady()
         m_bMenuCalledFromReady = FALSE;
         if (CanCallTeamSelectMenu())
             m_game_ui->m_pUITeamSelectWnd->ShowDialog(true);
-        //.			m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd,true);
 
         return false;
     }
@@ -395,11 +386,9 @@ void game_cl_TeamDeathmatch::shedule_Update(u32 dt)
 
     if (!m_game_ui)
         return;
-    //---------------------------------------------------------
+
     if (m_game_ui->m_pUITeamSelectWnd && m_game_ui->m_pUITeamSelectWnd->IsShown() && !CanCallTeamSelectMenu())
         m_game_ui->m_pUITeamSelectWnd->HideDialog();
-    //.		m_game_ui->StartStopMenu(m_game_ui->m_pUITeamSelectWnd,true);
-    //---------------------------------------------------------
 
     if (m_game_ui)
         m_game_ui->SetBuyMsgCaption(NULL);
@@ -447,7 +436,7 @@ void game_cl_TeamDeathmatch::shedule_Update(u32 dt)
                 !local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
             {
                 string1024 msg;
-                xr_sprintf(msg, *StringTable().translate("mp_press_to_buy"), "B");
+                xr_sprintf(msg, StringTable().translate("mp_press_to_buy").c_str(), "B");
                 if (m_game_ui)
                     m_game_ui->SetBuyMsgCaption(msg);
                 m_bBuyEnabled = true;
@@ -756,7 +745,6 @@ void game_cl_TeamDeathmatch::OnGameMenuRespond_ChangeTeam(NET_Packet& P)
         pCurSkinMenu->SetCurSkin(local_player->skin);
         if (CanCallSkinMenu())
             pCurSkinMenu->ShowDialog(true);
-        //.			m_game_ui->StartStopMenu(pCurSkinMenu, true);
     }
 };
 

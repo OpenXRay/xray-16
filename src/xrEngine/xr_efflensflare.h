@@ -19,18 +19,20 @@ class ENGINE_API CLensFlareDescriptor
 public:
     struct SFlare
     {
-        float fOpacity;
-        float fRadius;
-        float fPosition;
+        float fOpacity{};
+        float fRadius{};
+        float fPosition{};
         shared_str texture;
         shared_str shader;
         FactoryPtr<IFlareRender> m_pRender;
-        SFlare() { fOpacity = fRadius = fPosition = 0; }
+
+        bool ed_show_params(); // ImGui editor
     };
 
     struct SSource : public SFlare
     {
         bool ignore_color;
+        bool ed_show_params(); // ImGui editor
     };
     using FlareVec = xr_vector<SFlare>;
 
@@ -61,9 +63,12 @@ public:
     shared_str section;
 
 public:
-    CLensFlareDescriptor(shared_str section, CInifile const* pIni);
+    CLensFlareDescriptor(const shared_str& section, CInifile const* pIni);
     void OnDeviceCreate();
     void OnDeviceDestroy();
+
+    void ed_show_params(); // ImGui editor
+    void save(CInifile* config) const;
 };
 
 class ENGINE_API CLensFlare
@@ -128,4 +133,5 @@ public:
 
     [[nodiscard]]
     float GetStateBlend() const { return m_StateBlend; }
+    void save(bool soc_style) const;
 };

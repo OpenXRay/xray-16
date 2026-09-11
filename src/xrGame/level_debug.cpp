@@ -258,7 +258,7 @@ struct DrawInfoPredicate
         UI().Font().pFontMedium->SetAligment(CGameFont::alLeft);
         UI().Font().pFontMedium->SetColor(s.color);
         UI().Font().pFontMedium->OutSet(x, y -= delta_height);
-        UI().Font().pFontMedium->OutNext(*(s.text));
+        UI().Font().pFontMedium->OutNext(s.text.c_str());
     }
 };
 
@@ -285,7 +285,7 @@ struct DrawTextPredicate
         UI().Font().pFontMedium->SetAligment(CGameFont::alLeft);
         UI().Font().pFontMedium->SetColor(s.color);
         UI().Font().pFontMedium->OutSet(s.x, s.y);
-        UI().Font().pFontMedium->OutNext(*(s.text));
+        UI().Font().pFontMedium->OutNext(s.text.c_str());
     }
 };
 
