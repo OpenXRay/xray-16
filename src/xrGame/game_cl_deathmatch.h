@@ -9,8 +9,6 @@ class CUISkinSelectorWnd;
 class CUIDialogWnd;
 class CUIGameDM;
 class CUIPdaWnd;
-class CUIInventoryWnd;
-class CUIMapDesc;
 class CWeaponMagazinedWGrenade;
 
 class game_cl_Deathmatch : public game_cl_mp

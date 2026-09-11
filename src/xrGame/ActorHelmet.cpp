@@ -361,7 +361,7 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
         }
         else
         {
-            NewHitPower *= GetHitTypeProtection(hit_type, element);
+            NewHitPower -= GetHitTypeProtection(hit_type, element);
         }
 
         //увеличить изношенность шлема

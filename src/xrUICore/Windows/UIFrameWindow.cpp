@@ -1,7 +1,9 @@
 #include "pch.hpp"
+
 #include "UIFrameWindow.h"
-#include "XML/UITextureMaster.h"
+
 #include "Static/UIStatic.h"
+#include "XML/UITextureMaster.h"
 
 void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts);
 
@@ -164,6 +166,18 @@ void CUIFrameWindow::Draw()
 
     inherited::Draw();
 }
+
+CUIStatic* CUIFrameWindow::GetTitleText(bool create_on_demand /*= false*/)
+{
+    if (create_on_demand && !m_title_text)
+    {
+        m_title_text = xr_new<CUIStatic>("title");
+        m_title_text->SetAutoDelete(true);
+        AttachChild(m_title_text);
+    }
+    return m_title_text;
+}
+
 
 void CUIFrameWindow::DrawElements()
 {

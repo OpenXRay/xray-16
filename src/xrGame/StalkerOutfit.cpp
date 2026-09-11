@@ -1,10 +1,6 @@
 #include "pch_script.h"
 
 #include "StalkerOutfit.h"
-#include "ActorHelmet.h"
-
-CStalkerOutfit::CStalkerOutfit() {}
-CStalkerOutfit::~CStalkerOutfit() {}
 
 void CStalkerOutfit::script_register(lua_State* luaState)
 {

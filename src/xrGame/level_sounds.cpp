@@ -207,7 +207,7 @@ void CLevelSoundManager::Load()
                 for (; it != end; ++it)
                 {
                     m_MusicTracks.push_back(SMusicTrack());
-                    m_MusicTracks.back().Load(*it->first, *it->second);
+                    m_MusicTracks.back().Load(it->first.c_str(), it->second.c_str());
                 }
             }
         }

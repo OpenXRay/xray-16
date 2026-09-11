@@ -651,8 +651,8 @@ void CUIListWnd::create_active_back()
         return;
 
     m_ActiveBackgroundFrame = xr_new<CUIFrameLineWnd>("Active background frame");
-    m_ActiveBackgroundFrame->InitFrameLineWnd("ui_listline", Fvector2().set(0.0f, 0.0f),
-                                              Fvector2().set(GetWidth(), 18.0f));
+    m_ActiveBackgroundFrame->SetWndSize({ GetWidth(), 18.0f });
+    m_ActiveBackgroundFrame->InitTexture("ui_listline");
 }
 
 void CUIListWnd::destroy_active_back()

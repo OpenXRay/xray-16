@@ -92,7 +92,7 @@ void CScriptEntity::reinit()
 void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSciptName)
 {
     if (!(((m_bScriptControl && !bScriptControl) || (!m_bScriptControl && bScriptControl)) &&
-            (bScriptControl || (xr_strlen(*m_caScriptName) && !xr_strcmp(caSciptName, m_caScriptName)))))
+            (bScriptControl || (xr_strlen(m_caScriptName.c_str()) && !xr_strcmp(caSciptName, m_caScriptName)))))
     {
         GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "Invalid sequence of taking an entity under script control");
@@ -124,7 +124,7 @@ void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSci
 }
 
 bool CScriptEntity::GetScriptControl() const { return (m_bScriptControl); }
-LPCSTR CScriptEntity::GetScriptControlName() const { return (*m_caScriptName); }
+LPCSTR CScriptEntity::GetScriptControlName() const { return (m_caScriptName.c_str()); }
 bool CScriptEntity::CheckObjectVisibility(const CGameObject* tpObject)
 {
     if (!m_monster)
@@ -145,7 +145,7 @@ bool CScriptEntity::CheckTypeVisibility(const char* section_name)
     for (; I != E; ++I)
     {
         VERIFY((*I).m_object);
-        if (!xr_strcmp(section_name, *(*I).m_object->cNameSect()))
+        if (!xr_strcmp(section_name, (*I).m_object->cNameSect().c_str()))
             return (true);
     }
     return (false);
@@ -272,7 +272,7 @@ void CScriptEntity::ProcessScripts()
 #ifdef DEBUG
         if (empty_queue)
             GEnv.ScriptEngine->script_log(
-                LuaMessageType::Info, "Object %s has an empty script queue!", *object().cName());
+                LuaMessageType::Info, "Object %s has an empty script queue!", object().cName().c_str());
 #endif
         return;
     }
@@ -345,7 +345,7 @@ bool CScriptEntity::bfAssignAnimation(CScriptEntityAction* tpEntityAction)
         return (true);
 
     IKinematicsAnimated& tVisualObject = *(smart_cast<IKinematicsAnimated*>(object().Visual()));
-    m_tpNextAnimation = tVisualObject.ID_Cycle_Safe(*GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay);
+    m_tpNextAnimation = tVisualObject.ID_Cycle_Safe(GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay.c_str());
     m_use_animation_movement_controller = GetCurrentAction()->m_tAnimationAction.m_use_animation_movement_controller;
     return (true);
 }
@@ -401,7 +401,7 @@ bool CScriptEntity::bfAssignSound(CScriptEntityAction* tpEntityAction)
         if (xr_strlen(l_tSoundAction.m_caSoundToPlay))
         {
             m_current_sound = xr_new<ref_sound>();
-            m_current_sound->create(*l_tSoundAction.m_caSoundToPlay, st_Effect, l_tSoundAction.m_sound_type);
+            m_current_sound->create(l_tSoundAction.m_caSoundToPlay.c_str(), st_Effect, l_tSoundAction.m_sound_type);
         }
         else
             l_tSoundAction.m_bCompleted = true;
@@ -420,7 +420,7 @@ bool CScriptEntity::bfAssignParticles(CScriptEntityAction* tpEntityAction)
         {
             if (!l_tParticleAction.m_bStartedToPlay)
             {
-                const Fmatrix& l_tMatrix = GetUpdatedMatrix(*l_tParticleAction.m_caBoneName,
+                const Fmatrix& l_tMatrix = GetUpdatedMatrix(l_tParticleAction.m_caBoneName.c_str(),
                     l_tParticleAction.m_tParticlePosition, l_tParticleAction.m_tParticleAngles);
                 Fvector zero_vel = {0.f, 0.f, 0.f};
                 l_tParticleAction.m_tpParticleSystem->UpdateParent(l_tMatrix, zero_vel);
@@ -513,7 +513,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction* tpEntityAction)
             string256 S;
             xr_sprintf(S,
                 "Cannot find corresponding level vertex for the specified position [%f][%f][%f] for monster %s",
-                VPUSH(l_tMovementAction.m_tDestinationPosition), *m_monster->cName());
+                VPUSH(l_tMovementAction.m_tDestinationPosition), m_monster->cName().c_str());
             THROW2(ai().level_graph().valid_vertex_id(vertex_id), S);
         }
 #endif
@@ -568,13 +568,13 @@ LPCSTR CScriptEntity::GetPatrolPathName()
     if (!GetScriptControl())
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
-            "Object %s is not under script control while you are trying to get patrol path name!", *m_object->cName());
+            "Object %s is not under script control while you are trying to get patrol path name!", m_object->cName().c_str());
         return "";
     }
 #endif
     if (m_tpActionQueue.empty())
         return ("");
-    return (*m_tpActionQueue.back()->m_tMovementAction.m_path_name);
+    return (m_tpActionQueue.back()->m_tMovementAction.m_path_name.c_str());
 }
 
 bool CScriptEntity::net_Spawn(CSE_Abstract* DC)
@@ -627,7 +627,7 @@ bool CScriptEntity::bfScriptAnimation()
 #endif
         m_tpScriptAnimation = m_tpNextAnimation;
         IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(object().Visual());
-        LPCSTR animation_id = *GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay;
+        LPCSTR animation_id = GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay.c_str();
         MotionID animation = skeleton_animated->ID_Cycle(animation_id);
         CBlend* result = 0;
         for (u16 i = 0; i < MAX_PARTS; ++i)

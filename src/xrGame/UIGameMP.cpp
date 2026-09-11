@@ -35,23 +35,6 @@ bool UIGameMP::IR_UIOnKeyboardPress(int dik)
 }
 
 bool UIGameMP::IR_UIOnKeyboardRelease(int dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
-/*
-bool UIGameMP::IsMapDescShown()
-{
-    VERIFY(m_pMapDesc);
-    return m_pMapDesc->IsShown();
-}
-void UIGameMP::ShowMapDesc()
-{
-    if (Level().IsDemoPlay())
-        return;
-
-    VERIFY(m_pMapDesc);
-    if (!m_pMapDesc->IsShown())
-    {
-        m_pMapDesc->ShowDialog(true);
-    }
-}*/
 
 bool UIGameMP::IsServerInfoShown()
 {

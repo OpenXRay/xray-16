@@ -209,32 +209,53 @@ void CUIWindow::script_register(lua_State* luaState)
 
             .def("Init", +[](CUIWindow* self, float x, float y, float width, float height)
             {
-                const Frect rect { x, y, width, height };
+                self->SetWndRect({ x, y, width, height });
+            })
+            .def("Init", +[](CUIWindow* self, Frect rect)
+            {
                 self->SetWndRect(rect);
             })
-            .def("Init", (void (CUIWindow::*)(Frect))& CUIWindow::SetWndRect_script)
 
-            .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
+            // Rect
+            .def("GetWndRect", +[](CUIWindow* self) -> Frect
+            {
+                return self->GetWndRect();
+            })
+            .def("SetWndRect", +[](CUIWindow* self, Frect rect)
+            {
+                self->SetWndRect(rect);
+            })
             .def("SetWndRect", +[](CUIWindow* self, float x, float y, float width, float height)
             {
-                const Frect rect { x, y, width, height };
-                self->SetWndRect(rect);
+                self->SetWndRect({ x, y, width, height });
             })
 
-            .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
-
-            .def("GetWndPos", +[](CUIWindow* w) -> Fvector2 { return w->GetWndPos(); })
-            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
-
+            // Position
+            .def("GetWndPos", +[](CUIWindow* self) -> Fvector2
+            {
+                return self->GetWndPos();
+            })
+            .def("SetWndPos", +[](CUIWindow* self, Fvector2 pos)
+            {
+                 self->SetWndPos(pos);
+            })
             .def("SetWndPos", +[](CUIWindow* self, float x, float y)
             {
-                const Fvector2 pos { x, y };
-                self->SetWndPos(pos);
+                self->SetWndPos({ x, y });
+            })
+
+            // Size
+            .def("GetWndSize", +[](CUIWindow* self) -> Fvector2
+            {
+                return self->GetWndSize();
+            })
+            .def("SetWndSize", +[](CUIWindow* self, Fvector2 size)
+            {
+                self->SetWndSize(size);
             })
             .def("SetWndSize", +[](CUIWindow* self, float width, float height)
             {
-                const Fvector2 size { width, height };
-                self->SetWndSize(size);
+                self->SetWndSize({ width, height });
             })
 
             .def("GetWidth", &CUIWindow::GetWidth)
@@ -251,6 +272,15 @@ void CUIWindow::script_register(lua_State* luaState)
 
             .def("SetFont", &CUIWindow::SetFont)
             .def("GetFont", &CUIWindow::GetFont)
+
+            .def("GetMouseX", +[](CUIWindow* self) // X-Ray Extensions
+            {
+                return self->cursor_pos.x;
+            })
+            .def("GetMouseY", +[](CUIWindow* self) // X-Ray Extensions
+            {
+                return self->cursor_pos.y;
+            })
 
             .def("WindowName", +[](CUIWindow* self) -> pcstr { return self->WindowName().c_str(); })
             .def("SetWindowName", &CUIWindow::SetWindowName),
@@ -354,6 +384,10 @@ void CUIFrameWindow::script_register(lua_State* luaState)
             .def("SetWidth", &CUIFrameWindow::SetWidth)
             .def("SetHeight", &CUIFrameWindow::SetHeight)
             .def("SetColor", &CUIFrameWindow::SetTextureColor)
+            .def("GetTitleStatic", +[](CUIFrameWindow* self) -> CUIStatic*
+            {
+                return self->GetTitleText(true);
+            })
             .def("Init", +[](CUIFrameWindow* self, pcstr texture, float x, float y, float width, float height)
             {
                 self->SetWndRect({ x, y, width, height });
@@ -389,11 +423,17 @@ void CUIFrameLineWnd::script_register(lua_State* luaState)
             .def("SetWidth", &CUIFrameLineWnd::SetWidth)
             .def("SetHeight", &CUIFrameLineWnd::SetHeight)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
+            .def("SetOrientation", &CUIFrameLineWnd::SetHorizontal)
+            .def("GetTitleStatic", +[](CUIFrameWindow* self) -> CUIStatic*
+            {
+                return self->GetTitleText(true);
+            })
             .def("Init", +[](CUIFrameLineWnd* self, cpcstr texture, float x, float y, float width, float height, bool horizontal)
             {
-                const Fvector2 pos { x, y };
-                const Fvector2 size { width, height };
-                self->InitFrameLineWnd(texture, pos, size, horizontal);
+                self->SetWndPos({ x, y });
+                self->SetWndSize({ width, height });
+                self->SetHorizontal(horizontal);
+                self->InitTexture(texture);
             }),
 
         class_<CUIFrameLineWndScript, CUIFrameLineWnd>("CUIFrameLineWnd")

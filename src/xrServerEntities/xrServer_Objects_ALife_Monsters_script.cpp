@@ -38,7 +38,7 @@ void CSE_ALifeTraderAbstract::script_register(lua_State* luaState)
                     selected_char.Load(ta->m_SpecificCharacter);
                     ta->m_icon_name = selected_char.IconName();
                 }
-                return *ta->m_icon_name;
+                return ta->m_icon_name.c_str();
             })
     ];
 }

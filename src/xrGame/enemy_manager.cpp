@@ -195,7 +195,7 @@ void CEnemyManager::ignore_monster_threshold(const float& ignore_monster_thresho
 void CEnemyManager::restore_ignore_monster_threshold()
 {
     m_ignore_monster_threshold =
-        READ_IF_EXISTS(pSettings, r_float, *m_object->cNameSect(), "ignore_monster_threshold", 1.f);
+        READ_IF_EXISTS(pSettings, r_float, m_object->cNameSect().c_str(), "ignore_monster_threshold", 1.f);
 }
 
 float CEnemyManager::ignore_monster_threshold() const { return (m_ignore_monster_threshold); }
@@ -206,7 +206,7 @@ void CEnemyManager::max_ignore_monster_distance(const float& max_ignore_monster_
 
 void CEnemyManager::restore_max_ignore_monster_distance()
 {
-    m_max_ignore_distance = READ_IF_EXISTS(pSettings, r_float, *m_object->cNameSect(), "max_ignore_distance", 0.f);
+    m_max_ignore_distance = READ_IF_EXISTS(pSettings, r_float, m_object->cNameSect().c_str(), "max_ignore_distance", 0.f);
 }
 
 float CEnemyManager::max_ignore_monster_distance() const { return (m_max_ignore_distance); }

@@ -7,6 +7,7 @@
 #include "UIDragDropReferenceList.h"
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
+#include "UIOutfitInfo.h"
 #include "UITradeBar.h"
 #include "UIWeightBar.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
@@ -321,9 +322,12 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
     UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
 
-    CUIItemInfo* outfitInfo = xr_new<CUIItemInfo>();
-    outfitInfo->SetAutoDelete(true);
-    m_pInventoryWnd->AttachChild(outfitInfo);
+    m_OutfitInfo = xr_new<CUIOutfitInfo>();
+    m_OutfitInfo->SetAutoDelete(true);
+    m_pInventoryWnd->AttachChild(m_OutfitInfo);
+    m_OutfitInfo->InitFromXml(uiXml);
+
+    CUIXmlInit::InitAutoStaticGroup(uiXml, "", 0, m_pInventoryWnd);
 
     std::tuple<eActorMenuListType, cpcstr, CUIWindow*, bool> inventory_lists[] =
     {
@@ -412,6 +416,8 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     descWnd->AttachChild(m_ItemInfoTradeMode);
     m_ItemInfoTradeMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), TRADE_ITEM_XML);
 
+    CUIXmlInit::InitAutoStaticGroup(uiXml, "", 0, m_pTradeWnd);
+
     m_trade_button = UIHelper::Create3tButton(uiXml, "button", 0, m_pTradeWnd);
     CUI3tButton* toTalkBtn = UIHelper::Create3tButton(uiXml, "button", 1, m_pTradeWnd);
     RegisterCallback(toTalkBtn, BUTTON_CLICKED,
@@ -454,6 +460,8 @@ void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
     m_ItemInfoSearchLootMode->SetAutoDelete(true);
     descWnd->AttachChild(m_ItemInfoSearchLootMode);
     m_ItemInfoSearchLootMode->InitItemInfo({ 0.f, 0.f }, descWnd->GetWndSize(), CARBODY_ITEM_XML);
+
+    CUIXmlInit::InitAutoStaticGroup(uiXml, "", 0, m_pSearchLootWnd);
 
     m_takeall_button = UIHelper::Create3tButton(uiXml, "take_all_btn", m_pSearchLootWnd);
 }

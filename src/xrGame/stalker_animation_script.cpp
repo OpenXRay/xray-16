@@ -51,7 +51,7 @@ void CStalkerAnimationManager::add_script_animation(
     if (!motion)
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "There is no animation %s (object %s)!", animation, *object().cName());
+            LuaMessageType::Error, "There is no animation %s (object %s)!", animation, object().cName().c_str());
         return;
     }
 
@@ -75,7 +75,7 @@ void CStalkerAnimationManager::add_script_animation(LPCSTR animation, bool hand_
     if (!motion)
     {
         GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "There is no animation %s (object %s)!", animation, *object().cName());
+            LuaMessageType::Error, "There is no animation %s (object %s)!", animation, object().cName().c_str());
         return;
     }
 

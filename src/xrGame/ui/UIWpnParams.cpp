@@ -262,12 +262,21 @@ CUIConditionParams::CUIConditionParams()
 
 bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
 {
-    if (!xml_doc.NavigateToNode("condition_params", 0))
-        return false;
-    CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
-    CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
-    m_progress.InitFromXml(xml_doc, "condition_params:progress_state");
-    return true;
+    if (xml_doc.NavigateToNode("condition_params", 0))
+    {
+        CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
+        CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
+        m_progress.InitFromXml(xml_doc, "condition_params:progress_state");
+        return true;
+    }
+    // SOC
+    if (xml_doc.NavigateToNode("condition_progress", 0))
+    {
+        CUIXmlInit::InitStatic(xml_doc, "static_condition", 0, &m_text, false);
+        m_progress.InitFromXml(xml_doc, "condition_progress");
+        return true;
+    }
+    return false;
 }
 
 void CUIConditionParams::SetInfo(CInventoryItem const* slot_item, CInventoryItem const& cur_item)

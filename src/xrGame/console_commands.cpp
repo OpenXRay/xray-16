@@ -1402,13 +1402,13 @@ public:
                 l_iErrorCode = lua_pcall(GEnv.ScriptEngine->lua(), 0, 0, 0);
                 if (l_iErrorCode)
                 {
-                    GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
+                    GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), m_script_name.c_str(), l_iErrorCode);
                     GEnv.ScriptEngine->on_error(GEnv.ScriptEngine->lua());
                     return;
                 }
             }
 
-            GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
+            GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), m_script_name.c_str(), l_iErrorCode);
         }
     } // void	Execute
 
@@ -1757,7 +1757,7 @@ public:
 
         Msg("bones for model \"%s\"", arguments);
         for (u16 i = 0, n = kinematics->LL_BoneCount(); i < n; ++i)
-            Msg("%s", *kinematics->LL_GetData(i).name);
+            Msg("%s", kinematics->LL_GetData(i).name.c_str());
 
         GEnv.Render->model_Delete(visual);
     }

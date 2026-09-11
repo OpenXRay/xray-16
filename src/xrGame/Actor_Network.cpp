@@ -873,14 +873,14 @@ void CActor::OnChangeVisual()
         SetCallbacks();
         m_anims->Create(V);
         m_vehicle_anims->Create(V);
-        CDamageManager::reload(*cNameSect(), "damage", pSettings);
+        CDamageManager::reload(cNameSect().c_str(), "damage", pSettings);
         //-------------------------------------------------------------------------------
         m_head = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head");
         m_eye_left = smart_cast<IKinematics*>(Visual())->LL_BoneID("eye_left");
         m_eye_right = smart_cast<IKinematics*>(Visual())->LL_BoneID("eye_right");
-        m_r_hand = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone0"));
-        m_l_finger1 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone1"));
-        m_r_finger2 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone2"));
+        m_r_hand = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(cNameSect().c_str(), "weapon_bone0"));
+        m_l_finger1 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(cNameSect().c_str(), "weapon_bone1"));
+        m_r_finger2 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(cNameSect().c_str(), "weapon_bone2"));
         //-------------------------------------------------------------------------------
         m_neck = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_neck");
         m_l_clavicle = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_l_clavicle");
@@ -1270,7 +1270,7 @@ void CActor::make_Interpolation()
             if (!pSyncObj)
                 return;
             pSyncObj->set_State(PredictedState); //, PredictedState.enabled);
-            VERIFY2(_valid(renderable.xform), *cName());
+            VERIFY2(_valid(renderable.xform), cName().c_str());
         }
         else
         {
@@ -1282,7 +1282,7 @@ void CActor::make_Interpolation()
             Fvector NewPos;
             NewPos.lerp(IStart.Pos, IEnd.Pos, factor);
 
-            VERIFY2(_valid(renderable.xform), *cName());
+            VERIFY2(_valid(renderable.xform), cName().c_str());
 
             //			r_model_yaw		= angle_lerp	(IStart.o_model,IEnd.o_model,		factor);
             unaffected_r_torso.yaw = angle_lerp(IStart.o_torso.yaw, IEnd.o_torso.yaw, factor);
@@ -1916,8 +1916,8 @@ void CActor::OnCriticalHitHealthLoss()
 
 #ifdef DEBUG
     IGameObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
-    Msg("%s killed by hit from %s %s", *cName(), (pLastHitter ? *(pLastHitter->cName()) : ""),
-        ((pLastHittingWeapon && pLastHittingWeapon != pLastHitter) ? *(pLastHittingWeapon->cName()) : ""));
+    Msg("%s killed by hit from %s %s", cName().c_str(), (pLastHitter ? pLastHitter->cName().c_str() : ""),
+        ((pLastHittingWeapon && pLastHittingWeapon != pLastHitter) ? pLastHittingWeapon->cName().c_str() : ""));
 #endif
     //-------------------------------------------------------------------
     if (m_iLastHitterID != u16(-1))
@@ -2023,7 +2023,7 @@ void CActor::OnCriticalWoundHealthLoss()
     if (GameID() == eGameIDSingle || !OnServer())
         return;
 #ifdef DEBUG
-    Msg("--- %s is bleed out", *cName());
+    Msg("--- %s is bleed out", cName().c_str());
 #endif // #ifdef DEBUG
     //-------------------------------
     NET_Packet P;
@@ -2044,7 +2044,7 @@ void CActor::OnCriticalRadiationHealthLoss()
     if (GameID() == eGameIDSingle || !OnServer())
         return;
     //-------------------------------
-    Msg("%s killed by radiation", *cName());
+    Msg("%s killed by radiation", cName().c_str());
     NET_Packet P;
     u_EventGen(P, GE_GAME_EVENT, ID());
     P.w_u16(GAME_EVENT_PLAYER_KILLED);

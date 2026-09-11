@@ -112,8 +112,6 @@ target_sources(xrUICore PRIVATE
     Windows/UIFrameLineWnd.h
     Windows/UIFrameWindow.cpp
     Windows/UIFrameWindow.h
-    Windows/UITextFrameLineWnd.cpp
-    Windows/UITextFrameLineWnd.h
     Windows/UIWindow.cpp
     Windows/UIWindow.h
     XML/UITextureMaster.cpp

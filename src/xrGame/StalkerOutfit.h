@@ -9,13 +9,9 @@
 
 class CStalkerOutfit : public CCustomOutfit
 {
-private:
-    typedef CCustomOutfit inherited;
-
-public:
-    CStalkerOutfit(void);
-    virtual ~CStalkerOutfit(void);
+protected:
+    using inherited = CCustomOutfit;
 
 private:
-    DECLARE_SCRIPT_REGISTER_FUNCTION();
+    DECLARE_SCRIPT_REGISTER_FUNCTION(CGameObject);
 };

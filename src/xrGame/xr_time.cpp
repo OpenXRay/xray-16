@@ -17,11 +17,11 @@ u32 get_time() { return u32(__game_time() & u32(-1)); }
 xrTime get_time_struct() { return xrTime(__game_time()); }
 LPCSTR xrTime::dateToString(int mode)
 {
-    return *InventoryUtilities::GetDateAsString(m_time, (InventoryUtilities::EDatePrecision)mode);
+    return InventoryUtilities::GetDateAsString(m_time, (InventoryUtilities::EDatePrecision)mode).c_str();
 }
 LPCSTR xrTime::timeToString(int mode)
 {
-    return *InventoryUtilities::GetTimeAsString(m_time, (InventoryUtilities::ETimePrecision)mode);
+    return InventoryUtilities::GetTimeAsString(m_time, (InventoryUtilities::ETimePrecision)mode).c_str();
 }
 
 void xrTime::add(const xrTime& other) { m_time += other.m_time; }

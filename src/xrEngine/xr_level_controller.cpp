@@ -651,6 +651,9 @@ game_action* ActionNameToPtr(pcstr name, [[maybe_unused]] bool silent /*= false*
 
 bool IsBinded(EGameActions action_id, int dik, EKeyContext context /*= EKeyContext::Undefined*/)
 {
+    if (action_id >= kNOTBINDED)
+        return false;
+
     key_binding* binding = &g_key_bindings[action_id];
     for (u8 i = 0; i < bindtypes_count; ++i)
     {
@@ -663,6 +666,9 @@ bool IsBinded(EGameActions action_id, int dik, EKeyContext context /*= EKeyConte
 
 int GetActionDik(EGameActions action_id, int idx)
 {
+    if (action_id >= kNOTBINDED)
+        return SDL_SCANCODE_UNKNOWN;
+
     key_binding* binding = &g_key_bindings[action_id];
 
     if (idx == -1)
@@ -745,7 +751,7 @@ bool IsGroupMatching(EKeyGroup g1, EKeyGroup g2)
 
 bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2)
 {
-    return c1 != c2;
+    return c1 != c2 || (c1 == EKeyContext::Undefined && c2 == EKeyContext::Undefined);
 }
 
 bool IsContextMatching(EKeyContext c1, EKeyContext c2)

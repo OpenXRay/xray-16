@@ -110,7 +110,7 @@ void CDestroyablePhysicsObject::Destroy()
     {
         m_destroy_sound.play_at_pos(this, Position());
     }
-    if (*m_destroy_particles)
+    if (m_destroy_particles.c_str())
     {
         // Fvector dir;dir.set(0,1,0);
         Fmatrix m;

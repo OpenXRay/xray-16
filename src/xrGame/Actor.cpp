@@ -416,10 +416,10 @@ void CActor::Load(LPCSTR section)
             }
         }
 
-        sndDie[0].create(strconcat(buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[1].create(strconcat(buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[2].create(strconcat(buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[3].create(strconcat(buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[0].create(strconcat(buf, cName().c_str(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[1].create(strconcat(buf, cName().c_str(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[2].create(strconcat(buf, cName().c_str(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[3].create(strconcat(buf, cName().c_str(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
 
         m_HeavyBreathSnd.create(
             pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
@@ -1500,7 +1500,7 @@ void CActor::shedule_Update(u32 DT)
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
-                    m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction != nullptr ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
+                    m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
                 }
                 else if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
                     m_pObjectWeLookingAt->cast_inventory_item()->CanTake())
@@ -1939,10 +1939,10 @@ float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
     return hit_power;
 }
 
-float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
+float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type) const
 {
     float sum = 0.0f;
-    for (auto& it : inventory().m_belt)
+    for (const auto& it : inventory().m_belt)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
@@ -2064,7 +2064,7 @@ void CActor::OnDifficultyChanged()
     conditions().LoadImmunities(tmp, pSettings);
     // hit probability
     strconcat(sizeof(tmp), tmp, "hit_probability_", diff_name);
-    m_hit_probability = pSettings->r_float(*cNameSect(), tmp);
+    m_hit_probability = pSettings->r_float(cNameSect().c_str(), tmp);
     // two hits death parameters
     strconcat(sizeof(tmp), tmp, "actor_thd_", diff_name);
     conditions().LoadTwoHitsDeathParams(tmp);
