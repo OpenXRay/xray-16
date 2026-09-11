@@ -69,6 +69,15 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         }
     }
 
+    slang::PreprocessorMacroDesc targetMacro;
+    switch (target)
+    {
+    case Target::DXIL: targetMacro = {"TARGET_DXIL", "1"}; break;
+    case Target::SPIRV: targetMacro = {"TARGET_SPIRV", "1"}; break;
+    default: targetMacro = {"TARGET_DXBC", "1"}; break;
+    }
+    slangDefines.push_back(targetMacro);
+
     slang::SessionDesc sessionDesc = {};
     sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
     slang::TargetDesc targetDesc = {};
@@ -138,6 +147,13 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 #endif
     sessionOptionCount++;
 
+    if (target != Target::SPIRV)
+    {
+        sessionOptions[sessionOptionCount].name = slang::CompilerOptionName::IgnoreCapabilities;
+        sessionOptions[sessionOptionCount].value = {slang::CompilerOptionValueKind::Int, 1, 0};
+        sessionOptionCount++;
+    }
+
     if (target == Target::SPIRV)
     {
         sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
@@ -201,7 +217,9 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         if (SLANG_FAILED(slangResult) || !entryPointComp)
         {
             result.errorMessage = "Failed to find entry point: " + xr_string(entryPoint);
-            Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
+            if (!result.warningMessage.empty())
+                result.errorMessage += "\n" + result.warningMessage;
+            Msg("! [SlangCompiler] %s: %s", sourcePath, result.errorMessage.c_str());
             return result;
         }
     }
@@ -247,7 +265,13 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     if (SLANG_FAILED(slangResult) || !codeBlob)
     {
         result.errorMessage = "Failed to retrieve compiled bytecode";
-        Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
+        if (diagnosticBlob)
+        {
+            auto* msg = static_cast<const char*>(diagnosticBlob->getBufferPointer());
+            if (msg && msg[0])
+                result.errorMessage += xr_string("\n") + msg;
+        }
+        Msg("! [SlangCompiler] %s: %s", sourcePath, result.errorMessage.c_str());
         return result;
     }
 

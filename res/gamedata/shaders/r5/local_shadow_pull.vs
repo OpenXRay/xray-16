@@ -15,7 +15,11 @@ ByteAddressBuffer g_MegaIB : register(t19);
 struct VS_OUTPUT
 {
     precise float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#else
     float clip[4] : SV_ClipDistance;
+#endif
     float2 texcoord : TEXCOORD0;
     nointerpolation uint materialID : TEXCOORD1;
 };
@@ -41,10 +45,14 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 
     LocalRoute r = LocalRouteTile(slot, worldPos);
     output.position = r.position;
+#ifdef TARGET_DXIL
+    output.clip = r.clip;
+#else
     output.clip[0] = r.clip.x;
     output.clip[1] = r.clip.y;
     output.clip[2] = r.clip.z;
     output.clip[3] = r.clip.w;
+#endif
     output.texcoord = texcoord;
     output.materialID = e.materialID;
     return output;
