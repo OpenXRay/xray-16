@@ -23,6 +23,8 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
+struct HudShadowFit;
+
 constexpr u32 kLocalShadowAtlas = 4096;
 constexpr u32 kLocalAtlasLevels = 6;
 constexpr u32 kLocalAtlasNodes = 1365;
@@ -42,6 +44,10 @@ constexpr u32 kLocalPairCapAT = 1u << 17;
 constexpr u32 kLocalPairCapDynOpaque = 1u << 16;
 constexpr u32 kLocalPairCapDynAT = 1u << 15;
 constexpr u32 kLocalPairCapSkinned = 1u << 16;
+constexpr u32 kLocalHudViewsMax = 16;
+constexpr u32 kLocalHudTileSize = 1024;
+constexpr u32 kLocalHudCasters = 1;
+constexpr u32 kLocalHudToWorld = 2;
 
 struct LocalShadowViewGPU {
     Fmatrix viewProj;
@@ -51,8 +57,11 @@ struct LocalShadowViewGPU {
     Fvector4 planes[6];
     Fvector4 shape;
     u32 meta[4];
+    Fvector4 hud;
+    Fvector4 hudZ;
+    Fmatrix hudViewProj;
 };
-static_assert(sizeof(LocalShadowViewGPU) == 240, "LocalShadowViewGPU is shader-visible");
+static_assert(sizeof(LocalShadowViewGPU) == 336, "LocalShadowViewGPU is shader-visible");
 
 struct LocalAtlasAllocator {
     u16 nodeX[kLocalAtlasNodes] = {};
@@ -138,6 +147,15 @@ struct LocalShadowState {
     nvrhi::TextureHandle dynAtlas;
     bool staticAtlasFirst = true;
     bool dynAtlasFirst = true;
+    nvrhi::TextureHandle hudAtlas;
+    LocalAtlasAllocator hudAlloc;
+    u32 hudViews = 0;
+    u32 hudSlots[kLocalHudViewsMax] = {};
+    nvrhi::GraphicsPipelineHandle hudPagePipeline;
+    nvrhi::BindingLayoutHandle hudPageLayout;
+    nvrhi::ShaderHandle hudPageVS;
+    nvrhi::ShaderHandle pageATPS;
+    bool hudPipelineFailed = false;
 
     nvrhi::ComputePipelineHandle binCountPipeline;
     nvrhi::BindingLayoutHandle binCountLayout;
@@ -181,6 +199,7 @@ struct LocalShadowOutput {
     framegraph::VirtualResourceHandle tiles;
     framegraph::VirtualResourceHandle staticAtlas;
     framegraph::VirtualResourceHandle dynAtlas;
+    framegraph::VirtualResourceHandle hudAtlas;
     LocalShadowState* state = nullptr;
     bool active = false;
 };
@@ -195,7 +214,8 @@ void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    float projScale);
+    float projScale,
+    const HudShadowFit* hudFit);
 
 LocalShadowOutput setupLocalShadowPasses(
     framegraph::FrameGraph& fg,
@@ -211,6 +231,7 @@ void ResolveLocalShadowBindings(
     nvrhi::IDevice* device,
     nvrhi::IBuffer*& tiles,
     nvrhi::ITexture*& staticAtlas,
-    nvrhi::ITexture*& dynAtlas);
+    nvrhi::ITexture*& dynAtlas,
+    nvrhi::ITexture*& hudAtlas);
 
 }

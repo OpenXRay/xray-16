@@ -270,6 +270,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
+                data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
             }
         },
 
@@ -322,7 +323,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::IBuffer* localTiles = nullptr;
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
-            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
+            nvrhi::ITexture* localHud = nullptr;
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn, localHud);
             nvrhi::ITexture* sunMaskTex = ResolveSunMask(fg, data.sunMask, nvDevice);
 
             auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
@@ -337,6 +339,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 bsb.BufferSRV("g_LocalShadowTiles", localTiles);
                 bsb.Texture("g_LocalShadowStatic", localStatic);
                 bsb.Texture("g_LocalShadowDyn", localDyn);
+                bsb.Texture("g_LocalShadowHud", localHud);
                 bsb.Texture("g_SunShadowMask", sunMaskTex);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
                 R_ASSERT2(set, "Transparent binding set creation failed");

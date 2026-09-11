@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LocalShadowPassSetup.h"
 #include "PassCommon.h"
+#include "ShaderConstants.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
@@ -293,6 +294,7 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     }
     state.pageVS = pageVsResult.handle;
     state.skinPageVS = skinVsResult.handle;
+    state.pageATPS = pageATPsResult.handle;
 
     auto& cache = GetPassResourceCache();
     state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowBinCount", *countResult.reflection, nvDevice);
@@ -939,6 +941,185 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
 }
 
+struct LocalShadowHudParams {
+    Fmatrix warp;
+    u32 slots[kLocalHudViewsMax];
+    u32 entryCount;
+    u32 viewCount;
+    u32 pad[2];
+};
+static_assert(sizeof(LocalShadowHudParams) == 144, "LocalShadowHudParams is shader-visible");
+
+struct LocalShadowHudData {
+    VirtualResourceHandle atlas;
+    VirtualResourceHandle tiles;
+    VirtualResourceHandle order;
+    LocalShadowConfig config;
+    LocalShadowState* state;
+    fg::RenderDevice* device;
+    xray::profiler::GPUProfiler* gpuProfiler;
+};
+
+bool EnsureHudAtlas(nvrhi::IDevice* nvDevice, LocalShadowState& state)
+{
+    if (state.hudAtlas)
+        return true;
+    nvrhi::TextureDesc desc;
+    desc.width = kLocalShadowAtlas;
+    desc.height = kLocalShadowAtlas;
+    desc.format = nvrhi::Format::D32;
+    desc.debugName = "LocalShadow_Hud";
+    desc.isShaderResource = true;
+    desc.isRenderTarget = true;
+    desc.isTypeless = true;
+    desc.useClearValue = true;
+    desc.clearValue = nvrhi::Color(0.0f);
+    desc.initialState = nvrhi::ResourceStates::DepthWrite;
+    desc.keepInitialState = true;
+    state.hudAtlas = nvDevice->createTexture(desc);
+    return state.hudAtlas != nullptr;
+}
+
+bool EnsureHudPipeline(fg::RenderDevice* device, LocalShadowState& state)
+{
+    if (state.hudPagePipeline)
+        return true;
+    if (state.hudPipelineFailed || !state.pageATPS)
+        return false;
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto& cache = GetPassResourceCache();
+    if (!state.hudPageVS) {
+        auto vsResult = shaderLoader->LoadVertexShader("local_shadow_pull_hud", "main");
+        if (vsResult.handle && vsResult.reflection)
+            state.hudPageVS = vsResult.handle;
+    }
+    auto* vsRefl = shaderLoader->GetCachedReflection("local_shadow_pull_hud", ".vs");
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!state.hudPageVS || !vsRefl || !atRefl) {
+        Msg("! [LocalShadow] hud pull shader failed to load");
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    state.hudPageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowHudPage", *vsRefl, *atRefl, nvDevice);
+    if (!state.hudPageLayout) {
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.depthFormat = nvrhi::Format::D32;
+    nvrhi::GraphicsPipelineDesc desc;
+    desc.VS = state.hudPageVS;
+    desc.PS = state.pageATPS;
+    desc.inputLayout = nullptr;
+    if (bindlessLayout)
+        desc.bindingLayouts = { state.hudPageLayout, bindlessLayout };
+    else
+        desc.bindingLayouts = { state.hudPageLayout };
+    desc.primType = nvrhi::PrimitiveType::TriangleList;
+    desc.renderState.depthStencilState.depthTestEnable = true;
+    desc.renderState.depthStencilState.depthWriteEnable = true;
+    desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    desc.renderState.rasterState.frontCounterClockwise = false;
+    desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    desc.renderState.rasterState.depthClipEnable = true;
+    state.hudPagePipeline = cache.GetOrCreatePipeline("LocalShadowHudPage", desc, fbInfo, nvDevice);
+    if (!state.hudPagePipeline) {
+        Msg("! [LocalShadow] hud pipeline failed");
+        state.hudPipelineFailed = true;
+        return false;
+    }
+    Msg("* [LocalShadow] hud pipeline initialized");
+    return true;
+}
+
+void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowHudData& data)
+{
+    LocalShadowState& state = *data.state;
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
+    if (!cmdList || !nvDevice || !atlas)
+        return;
+    cmdList->setTextureState(atlas, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+    cmdList->commitBarriers();
+    cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
+    if (state.hudViews == 0 || !data.config.gpuCulling)
+        return;
+    GPUCullingManager& gc = *data.config.gpuCulling;
+    const u32 count = gc.GetSkinnedHudEntryCount();
+    nvrhi::IBuffer* hudEntries = gc.GetSkinnedHudEntryBuffer();
+    nvrhi::IBuffer* entries = gc.GetSkinnedEntryBuffer();
+    nvrhi::IBuffer* preVB = gc.GetSkinnedPreVertexBuffer();
+    nvrhi::IBuffer* ib = gc.GetSkinnedPools().GetCombinedIndexBuffer();
+    if (count == 0 || !hudEntries || !entries || !preVB || !ib)
+        return;
+    if (!EnsureHudPipeline(data.device, state))
+        return;
+
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("local_shadow_pull_hud", ".vs");
+    auto* atRefl = shaderLoader->GetCachedReflection("vsm_page_at", ".ps");
+    if (!vsRefl || !atRefl)
+        return;
+
+    if (data.gpuProfiler)
+        data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Hud");
+
+    LocalShadowHudParams hp = {};
+    hp.warp = HudFovWarp();
+    std::copy_n(state.hudSlots, kLocalHudViewsMax, hp.slots);
+    hp.entryCount = count;
+    hp.viewCount = state.hudViews;
+    auto hudCB = cache.GetOrCreateVolatileCB("LocalShadow", "HudParams", sizeof(LocalShadowHudParams), data.device);
+    cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
+
+    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    cmdList->setBufferState(hudEntries, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(preVB, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(ib, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.receiverTiles, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(matBuffer.GetBuffer(), nvrhi::ResourceStates::ShaderResource);
+    cmdList->commitBarriers();
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.setDepthAttachment(atlas);
+    auto framebuffer = cache.GetOrCreateFramebuffer("LocalShadowHud", fbDesc, nvDevice);
+    if (!framebuffer)
+        return;
+
+    BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.Hud");
+    bsb.ConstantBuffer("LocalShadowHudParams", hudCB)
+       .BufferSRV("g_HudEntries", hudEntries)
+       .BufferSRV("g_Entries", entries)
+       .BufferSRV("g_LocalShadowTiles", state.receiverTiles)
+       .BufferSRV("g_SkinnedVB", preVB)
+       .BufferSRV("g_SkinnedIB", ib)
+       .BufferSRV("g_Materials", matBuffer.GetBuffer());
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.hudPageLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    auto* backend = data.device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.hudPagePipeline;
+    gs.framebuffer = framebuffer;
+    gs.bindings = { bindingSet };
+    if (bindlessTable)
+        gs.addBindingSet(bindlessTable);
+    gs.viewport.addViewport(nvrhi::Viewport(0.0f, float(kLocalShadowAtlas), 0.0f, float(kLocalShadowAtlas), 0.0f, 1.0f));
+    gs.viewport.addScissorRect(nvrhi::Rect(kLocalShadowAtlas, kLocalShadowAtlas));
+    cmdList->setGraphicsState(gs);
+    cmdList->draw(nvrhi::DrawArguments().setVertexCount(GPUCullingManager::SKINNED_ENTRY_INDICES).setInstanceCount(count * state.hudViews));
+
+    if (data.gpuProfiler)
+        data.gpuProfiler->EndPass(cmdList, "Local Shadow.Hud");
+}
 
 void SpotBasis(const light* L, Fvector& outDir, Fvector& outUp)
 {
@@ -1139,7 +1320,8 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.overflowPages.clear();
     state.activePages = state.atlasLayers = 0;
     state.receiverTiles = nullptr;
-    state.staticAtlas = state.dynAtlas = nullptr;
+    state.staticAtlas = state.dynAtlas = state.hudAtlas = nullptr;
+    state.hudViews = 0;
     std::fill_n(state.owners, kLocalTileCount, nullptr);
     std::fill_n(state.request, kLocalTileCount, LocalShadowViewGPU{});
     state.candCount = state.dirtyViews = 0;
@@ -1297,11 +1479,126 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
 }
 } // namespace
 
+static bool ViewTouchesSphere(const LocalShadowViewGPU& rec, const Fvector4& sphere, bool planes)
+{
+    Fvector c;
+    c.set(sphere.x, sphere.y, sphere.z);
+    Fvector lp;
+    lp.set(rec.lightPos.x, rec.lightPos.y, rec.lightPos.z);
+    const float reach = rec.lightPos.w + sphere.w;
+    if (lp.distance_to_sqr(c) > reach * reach)
+        return false;
+    if (!planes)
+        return true;
+    for (u32 i = 0; i < 6; ++i) {
+        const Fvector4& p = rec.planes[i];
+        if (p.x * c.x + p.y * c.y + p.z * c.z + p.w > sphere.w)
+            return false;
+    }
+    return true;
+}
+
+static bool AllocHudRect(LocalShadowState& state, u32 pageSlot, Fvector4& outRect)
+{
+    if (state.hudViews >= kLocalHudViewsMax)
+        return false;
+    const u32 node = state.hudAlloc.Alloc(LocalAtlasAllocator::LevelOf(kLocalHudTileSize));
+    if (node == ~0u)
+        return false;
+    u32 x = 0, y = 0, size = 1;
+    state.hudAlloc.Rect(node, x, y, size);
+    outRect.set(0.0f, float(x), float(y), float(size));
+    state.hudSlots[state.hudViews++] = pageSlot;
+    return true;
+}
+
+static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFit* fit)
+{
+    state.hudViews = 0;
+    state.hudAlloc.Reset();
+    for (u32 page = 0; page < state.activePages; ++page) {
+        LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
+        for (u32 slot = 0; slot < current.candCount;) {
+            LocalShadowViewGPU& rec = current.request[slot];
+            const bool point = rec.meta[2] != 0u;
+            const u32 faces = point ? 6u : 1u;
+            for (u32 f = 0; f < faces; ++f)
+                current.request[slot + f].hud.set(0.0f, 0.0f, 0.0f, 0.0f);
+            if (!fit || !ViewTouchesSphere(rec, fit->trueSphere, !point)) {
+                slot += faces;
+                continue;
+            }
+            const light* L = current.owners[slot];
+            const float flags = float(kLocalHudCasters | (L->flags.bCastHudToWorld ? kLocalHudToWorld : 0u));
+            Fvector center;
+            center.set(fit->shownSphere.x, fit->shownSphere.y, fit->shownSphere.z);
+            Fvector lightPos;
+            lightPos.set(rec.lightPos.x, rec.lightPos.y, rec.lightPos.z);
+            fit->warp.transform_tiny(lightPos);
+            Fvector toCenter;
+            toCenter.sub(center, lightPos);
+            const float dist = toCenter.magnitude();
+            const float r = fit->shownSphere.w;
+            if (dist > r + 0.01f) {
+                Fvector4 rect;
+                if (!AllocHudRect(state, page * kLocalTileCount + slot, rect)) {
+                    slot += faces;
+                    continue;
+                }
+                rect.x = flags;
+                Fvector dir;
+                dir.div(toCenter, dist);
+                Fvector up, right;
+                Fvector::generate_orthonormal_basis_normalized(dir, up, right);
+                const float halfFov = asinf(std::min(r / dist, 0.999f)) + deg2rad(1.0f);
+                const float nearZ = std::max(dist - r, 0.001f);
+                const float farZ = std::max(rec.zparams.y, dist + r);
+                Fmatrix view, proj, vp;
+                view.build_camera_dir(lightPos, dir, up);
+                proj.build_projection(2.0f * halfFov, 1.f, nearZ, farZ);
+                vp.mul(proj, view);
+                for (u32 f = 0; f < faces; ++f) {
+                    LocalShadowViewGPU& face = current.request[slot + f];
+                    face.hud = rect;
+                    face.hudZ.set(nearZ, farZ, 2.0f * tanf(halfFov) / float(kLocalHudTileSize), ps_r_local_shadow_hud_bias);
+                    face.hudViewProj = vp;
+                }
+            } else {
+                for (u32 f = 0; f < faces; ++f) {
+                    LocalShadowViewGPU& face = current.request[slot + f];
+                    Fvector4 rect;
+                    if (!AllocHudRect(state, page * kLocalTileCount + slot + f, rect))
+                        break;
+                    rect.x = flags;
+                    Fvector dir, up, right;
+                    if (point) {
+                        dir = kFaceDir[f];
+                    } else {
+                        SpotBasis(L, dir, up);
+                        fit->warp.transform_dir(dir);
+                        dir.normalize_safe();
+                    }
+                    Fvector::generate_orthonormal_basis_normalized(dir, up, right);
+                    const float tanHalf = 0.5f * face.zparams.z * face.rect.z;
+                    Fmatrix view, proj;
+                    view.build_camera_dir(lightPos, dir, up);
+                    proj.build_projection(2.0f * atanf(tanHalf), 1.f, face.zparams.x, face.zparams.y);
+                    face.hud = rect;
+                    face.hudZ.set(face.zparams.x, face.zparams.y, 2.0f * tanHalf / float(kLocalHudTileSize), ps_r_local_shadow_hud_bias);
+                    face.hudViewProj.mul(proj, view);
+                }
+            }
+            slot += faces;
+        }
+    }
+}
+
 void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
-    float projScale)
+    float projScale,
+    const HudShadowFit* hudFit)
 {
     xr_vector<ShadowCandidate> spots, points;
     for (u32 i = 0; i < lights.size(); ++i) {
@@ -1354,6 +1651,7 @@ void SelectLocalShadowLights(
     state.activePages = page;
     state.pooledSpots = u32(spots.size());
     state.pooledPoints = u32(points.size());
+    SelectLocalShadowHudViews(state, hudFit);
 }
 
 static LocalShadowOutput SetupLocalShadowPage(
@@ -1532,9 +1830,36 @@ LocalShadowOutput setupLocalShadowPasses(
             }
             cmd->setBufferState(data.state->receiverTiles, nvrhi::ResourceStates::ShaderResource);
         });
+    R_ASSERT2(EnsureHudAtlas(nvDevice, *state), "Cannot allocate the local shadow HUD atlas");
+    ResourceDesc hudDesc;
+    hudDesc.type = ResourceDesc::Type::Texture2D;
+    hudDesc.width = hudDesc.height = kLocalShadowAtlas;
+    hudDesc.format = nvrhi::Format::D32;
+    hudDesc.isDepthStencil = true;
+    hudDesc.isImported = true;
+    hudDesc.isTransient = false;
+    hudDesc.debugName = "rt_LocalShadowHud";
+    auto hudHandle = fg.ImportTexture("rt_LocalShadowHud", state->hudAtlas, hudDesc);
+    auto& hudData = fg.addCallbackPass<LocalShadowHudData>("Local Shadow HUD",
+        [&, hudHandle, orderAfter, config, state, gpuProfiler](FrameGraph& builder, PassHandle handle, LocalShadowHudData& data) {
+            data.state = state;
+            data.device = device;
+            data.config = config;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder pass(builder, handle);
+            data.atlas = pass.write(hudHandle, ResourceState::DepthStencilWrite);
+            data.tiles = pass.read(published.tiles, ResourceState::ShaderResource);
+            if (orderAfter.is_valid())
+                data.order = pass.read(orderAfter, ResourceState::ShaderResource);
+        },
+        [](const LocalShadowHudData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteHud(ctx, fg, data);
+        });
+    fg.GetRTRegistry().RegisterRT("rt_LocalShadowHud", hudData.atlas);
     out.tiles = published.tiles;
     out.staticAtlas = staticHandle;
     out.dynAtlas = dynHandle;
+    out.hudAtlas = hudData.atlas;
     out.state = state;
     out.active = true;
     return out;
@@ -1546,21 +1871,26 @@ void ResolveLocalShadowBindings(
     nvrhi::IDevice* device,
     nvrhi::IBuffer*& tiles,
     nvrhi::ITexture*& staticAtlas,
-    nvrhi::ITexture*& dynAtlas)
+    nvrhi::ITexture*& dynAtlas,
+    nvrhi::ITexture*& hudAtlas)
 {
     tiles = out.state ? out.state->receiverTiles.Get() : nullptr;
     if (!tiles)
         tiles = FallbackTiles(device);
     staticAtlas = nullptr;
     dynAtlas = nullptr;
+    hudAtlas = nullptr;
     if (out.active) {
         staticAtlas = fg.GetPhysicalTexture(out.staticAtlas);
         dynAtlas = fg.GetPhysicalTexture(out.dynAtlas);
+        hudAtlas = fg.GetPhysicalTexture(out.hudAtlas);
     }
     if (!staticAtlas)
         staticAtlas = GetPassResourceCache().GetDummyShadowMap(device);
     if (!dynAtlas)
         dynAtlas = GetPassResourceCache().GetDummyShadowMap(device);
+    if (!hudAtlas)
+        hudAtlas = GetPassResourceCache().GetDummyShadowMap2D(device);
 }
 
 }

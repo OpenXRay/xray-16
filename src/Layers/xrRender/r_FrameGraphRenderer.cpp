@@ -725,6 +725,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.localShadowPoints = localShadow.pooledPoints;
             stats.localShadowPages = localShadow.activePages;
             stats.localShadowExtraCasters = m_localShadowCasters;
+            stats.localShadowHudViews = localShadow.hudViews;
             for (u32 i = 0; i < localShadow.activePages; ++i) {
                 const auto& page = i == 0 ? localShadow : *localShadow.overflowPages[i - 1];
                 stats.localShadowAccepted += page.statAccepted;
@@ -2613,13 +2614,32 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         m_collectShadowOnly = false;
     }
 
+    if (g_pGameLevel && g_pGameLevel->pHUD)
+        g_pGameLevel->pHUD->Render_Last(0);
+
     {
         static const xr_vector<u32> noSlots;
         const xr_vector<u32>* slots = &noSlots;
         if (m_blackboard) {
             auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
             const float projScale = 0.5f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
-            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale);
+            Fvector4 hudSphere;
+            bool hudValid = false;
+            for (const auto& b : m_hudBatches) {
+                if (!b.isSkinned)
+                    continue;
+                Fvector4 s;
+                s.set(b.worldBoundsCenter.x, b.worldBoundsCenter.y, b.worldBoundsCenter.z, b.worldBoundsRadius);
+                if (hudValid)
+                    passes::MergeBoundingSphere(hudSphere, s);
+                else
+                    hudSphere = s;
+                hudValid = true;
+            }
+            passes::HudShadowFit hudFit;
+            if (hudValid)
+                hudFit = passes::BuildHudShadowFit(hudSphere);
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale, hudValid ? &hudFit : nullptr);
             slots = &localShadowState.slotOfLight;
         }
         if (!collectedLights.empty())
@@ -2644,14 +2664,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             const u32 rgb = culled ? red : bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
             fg::g_debug_draw.DrawSphere(L->position, L->range, rgb | color_rgba(0, 0, 0, culled ? 40 : 14), rgb | color_rgba(0, 0, 0, culled ? 230 : 170));
         }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  HUD RENDERING (after dynamic objects)
-    // ═══════════════════════════════════════════════════════
-
-    if (g_pGameLevel && g_pGameLevel->pHUD) {
-        g_pGameLevel->pHUD->Render_Last(0);  // context_id = 0 (not using legacy contexts)
     }
 }
 

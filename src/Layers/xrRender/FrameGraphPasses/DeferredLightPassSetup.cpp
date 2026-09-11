@@ -58,6 +58,7 @@ struct DeferredLightPassData {
     VirtualResourceHandle localTiles;
     VirtualResourceHandle localStatic;
     VirtualResourceHandle localDyn;
+    VirtualResourceHandle localHud;
     LocalShadowOutput localShadow;
     fg::RenderDevice* device = nullptr;
     DeferredLightPassState* state = nullptr;
@@ -243,6 +244,7 @@ DefaultOutputLayout setupDeferredLightPass(
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
+                data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
             }
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -271,7 +273,8 @@ DefaultOutputLayout setupDeferredLightPass(
             nvrhi::IBuffer* localTiles = nullptr;
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
-            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
+            nvrhi::ITexture* localHud = nullptr;
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn, localHud);
             nvrhi::IBindingSet* bindlessTable = nullptr;
             if (auto* backend = data.device->GetBackend())
                 bindlessTable = backend->GetBindlessDescriptorTable();
@@ -338,6 +341,7 @@ DefaultOutputLayout setupDeferredLightPass(
                     bsb.BufferSRV("g_LocalShadowTiles", localTiles);
                     bsb.Texture("g_LocalShadowStatic", localStatic);
                     bsb.Texture("g_LocalShadowDyn", localDyn);
+                    bsb.Texture("g_LocalShadowHud", localHud);
                 }
                 if (cls & kTileClassSunMixed)
                     bsb.Texture("g_SunShadowMask", sunMask);

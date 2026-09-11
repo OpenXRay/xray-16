@@ -42,6 +42,7 @@
 #include "xrNetServer/NET_Messages.h"
 
 #include "CameraLook.h"
+#include "Torch.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
 
@@ -2201,6 +2202,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_left_handed", &psHUD_Flags, HUD_LEFT_HANDED);
 
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
+    CMD4(CCC_Vector3, "hud_torch_offset", &g_torch_camera_offset, Fvector().set(-1.f, -1.f, -1.f), Fvector().set(1.f, 1.f, 1.f));
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
 
     // Demo
