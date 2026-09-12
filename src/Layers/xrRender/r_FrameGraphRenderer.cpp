@@ -2231,6 +2231,13 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
+    if (visual->getType() == MT_SKELETON_GEOMDEF_PM) {
+        const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            batch.indexCount = swi.sw[0].num_tris * 3;
+            batch.startIndex = swi.sw[0].offset;
+        }
+    }
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
     batch.renderable = renderable;
