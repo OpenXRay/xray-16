@@ -73,6 +73,7 @@ void GPUProfiler::ReleaseTimerQuery(nvrhi::TimerQueryHandle query)
 {
     if (query)
     {
+        m_device->resetTimerQuery(query);
         m_freeQueries.push_back(query);
     }
 }
@@ -124,17 +125,14 @@ void GPUProfiler::EndPass(nvrhi::ICommandList* cmdList, const char* name)
 
 void GPUProfiler::FrameStart()
 {
-    if (!m_enabled)
-        return;
+    for (const auto& pass : m_activePasses)
+        m_queryPool.erase(std::remove(m_queryPool.begin(), m_queryPool.end(), pass.query), m_queryPool.end());
 
     m_activePasses.clear();
 }
 
 void GPUProfiler::FrameEnd()
 {
-    if (!m_enabled)
-        return;
-
     m_currentFrame++;
 
     // Resolve queries from previous frames
@@ -146,8 +144,7 @@ void GPUProfiler::ResolvePendingQueries()
     if (!m_device)
         return;
 
-    m_passTimings.clear();
-    m_totalGPUTimeMs = 0.0f;
+    bool updatedTimings = false;
 
     // Process pending queries
     for (auto it = m_pendingQueries.begin(); it != m_pendingQueries.end(); )
@@ -162,6 +159,12 @@ void GPUProfiler::ResolvePendingQueries()
         // Check if query is ready
         if (m_device->pollTimerQuery(it->query))
         {
+            if (!updatedTimings)
+            {
+                m_passTimings.clear();
+                m_totalGPUTimeMs = 0.0f;
+                updatedTimings = true;
+            }
             float timeSeconds = m_device->getTimerQueryTime(it->query);
             float timeMs = timeSeconds * 1000.0f;
 
@@ -185,8 +188,7 @@ void GPUProfiler::ResolvePendingQueries()
         }
         else if (m_currentFrame - it->frameSubmitted > MAX_PENDING_FRAMES)
         {
-            // Query took too long, discard
-            ReleaseTimerQuery(it->query);
+            m_queryPool.erase(std::remove(m_queryPool.begin(), m_queryPool.end(), it->query), m_queryPool.end());
             it = m_pendingQueries.erase(it);
         }
         else

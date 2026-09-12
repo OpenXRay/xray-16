@@ -27,7 +27,6 @@ public:
     void Initialize(nvrhi::IDevice* device);
     void Shutdown();
 
-    // Enable/disable profiling (disabled = no overhead)
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsProfilingEnabled() const { return m_enabled; }
 
@@ -80,7 +79,6 @@ private:
 
     u32 m_currentFrame = 0;
 
-    // Enabled flag (when false, all timing operations are no-ops)
     bool m_enabled = false;
 };
 

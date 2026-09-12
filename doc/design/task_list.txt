@@ -201,7 +201,7 @@ remain on the merge's first-parent history.
 
 + Import native Metal backend source
   Native Metal remains disabled by default in Externals/CMakeLists.txt.
-  No Metal device, shader path, or presentation path is selected by the engine.
+  Explicit opt-in now selects the native device, shader, and presentation paths.
   Imported stubs are outstanding work, not successful implementations.
 
 Build and engine integration
@@ -215,21 +215,187 @@ Build and engine integration
   Acceptance: clean Metal opt-in build on a documented SDK/toolchain, actionable
   missing-dependency errors, and unchanged default Vulkan build.
 
-- METAL-02: Integrate native Metal device and backend selection
++ METAL-02: Integrate native Metal device and backend selection
   Prerequisites: METAL-01, METAL-06.
   Targets: IRenderBackend; backend factory/selection; new Metal backend implementation.
   Add Metal API selection, frame-graph eligibility, device/queue initialization,
   native-handle wrapping, uploads, and shutdown behind the existing interface.
   Acceptance: explicit selection creates a native Metal NVRHI device; Vulkan
   remains selectable and no Vulkan device is created for the Metal selection.
+  Implemented native MetalBackend behind IRenderBackend and guarded fg_render_mode
+  selection; Vulkan remains the default. -metal boots the ordinary game renderer,
+  including the existing main menu and Options panel, without Vulkan/MoltenVK.
+  Opt in with NVRHI_WITH_METAL3=ON and NVRHI_METAL_SHADER_CONVERTER_ROOT set to the
+  installed SDK prefix. The default-off build passes and rejects -metal clearly.
+  Launch xr_3da -metal with the usual game-data configuration. The standalone
+  data-free clear/present diagnostic is now selected with -metal-presentation.
+  A GPU readback verified dedicated uploads followed by an additional deferred copy list.
 
-- METAL-03: Implement drawable presentation and frame lifecycle
++ METAL-03: Implement drawable presentation and frame lifecycle
   Prerequisites: METAL-02, METAL-04, METAL-05.
   Targets: Metal backend; SDL window integration; CAMetalLayer presentation.
   Implement drawable acquisition, back-buffer handles, bounded frames in flight,
   vsync, resize, minimization, unavailable drawables, and orderly shutdown.
   Acceptance: clear/present survives resize, minimize/restore, and repeated startup
   without stale textures, deadlocks, premature reuse, or growing resource counts.
+  SDL Metal view and CAMetalLayer use drawable pixel dimensions, three bounded
+  in-flight slots, same-queue native presentation, completion-based reuse, and GC.
+  Frame autorelease pools cover C++ command recording and drain at end/shutdown.
+  -metal-presentation clears/presents; V toggles vsync and Escape quits.
+  The presentation path was verified with -d3ddebug and MTL_DEBUG_LAYER=1 on M5 Max:
+  1920x1080 -> 1440x896 -> 2200x1336 -> 1920x1080 pixel resizing, minimize/restore,
+  vsync off/on, repeated startup, and exit code 0 including shutdown while minimized.
+  One session closed after 4947 frames. Native allocated memory was 38961152 bytes
+  both before and after resize/restore at the same final size. Temporary upload
+  probe removed and launcher rebuilt/re-exercised.
+  Native game-menu milestone verified with Metal Shader Converter 4.0 beta 2,
+  the macOS 26 SDK, and ./cmake-build xr_3da -c releasemastergold -j 12.
+  -metal -d3ddebug -nosplash -nointro -i booted the existing menu using isolated
+  appdata and the normal game archives. Native M5 Max initialization reported
+  1920x1080 pixels with validation enabled; menu imagery, fonts, and cursor rendered.
+  Verified mouse positioning/selection and Enter activation of the Options panel,
+  stable 960x540 -> 800x450 logical window resizing, minimize/restore, and window-close
+  exit code 0. Retina window sizing, cursor bounds, and local input use matching units.
+  Warm startup recorded 41 shader-cache hits, zero misses, and zero saves.
+  No Metal/NVRHI validation errors were reported in the final menu lifecycle run.
+  This is menu bring-up, not level/gameplay parity. GameSpy initialization and
+  texture-manager shutdown leak/accounting warnings remain. Native mouse-click
+  activation was not established by synthetic input; mouse hover and keyboard
+  activation were verified. Broader task acceptance below remains outstanding.
+  User confirmed Zaton gameplay loads after adding BC6H/BC7 native formats and
+  explicit R32_FLOAT DDS mip sizing. Headless Metal validation uploaded/read back
+  all 11 mips of the real BC7 detail atlas and the 2864x2864 heightmap byte-for-byte.
+
+  rs_stats / Metal HUD freeze resolution (2026-09-12)
+  -------------------------------------------------
+  Status: user-confirmed fixed, including the final Metal HUD-enabled retest.
+  Reproduction context: native Metal on M5 Max/macOS 26, Zaton gameplay,
+  "Alex Nguyen - beginning of the game" save, then rs_stats 1.
+  This resolves the reported profiling-triggered freezes, not every Metal backend
+  acceptance item below. The final confirmation establishes that the freeze is
+  fixed; it does not independently certify every timestamp or all gameplay paths.
+
+  What actually fixed the freezes
+
+  1. Separate an operation error from device loss.
+     MetalBackend::Impl::message previously changed DeviceState to Lost for every
+     NVRHI Error. A completed timer query returning end=0 therefore permanently
+     disabled frame submission and Present, although that query's GPU work had
+     completed. The console could remain responsive while presentation stopped.
+     Error messages now remain visible without implicitly losing the device.
+     Fatal callbacks and explicit Impl::fail calls remain terminal. NVRHI reports
+     actual native GPU submission failures as Fatal and retains failed-submission
+     tracking, so a genuine GPU failure is not mistaken for successful work.
+     User result: normal-mode presentation continued, even while invalid timestamp
+     errors still occurred. This fixed the false device-loss freeze, not sampling.
+
+  2. Replace one-sided, fill-only blit timestamp markers with paired compute markers.
+     The remaining logs showed both missing end samples and ends older than their
+     new starts. With Metal HUD enabled, rs_stats still caused a genuine native
+     command-buffer OOM, not merely the incorrect device-loss transition above.
+     Each begin/end boundary now executes a real one-thread compute dispatch that
+     writes pooled marker storage. Both the start and end of each compute pass are
+     sampled: four unique sample slots per query instead of two one-sided slots.
+     Results resolve on the CPU only after the owning command buffer completes.
+     All four samples must be nonzero, non-error, and monotonically ordered; elapsed
+     time is the last timestamp minus the first, divided by the device frequency.
+     User result after this change: "awesome! freeze is fixed."
+     This is the user-confirmed change that resolved the remaining HUD-enabled
+     freeze. Compute dispatches and paired sampling changed together; their separate
+     contributions and the driver's internal failure mechanism were not isolated.
+     No HUD detection, profiler disabling, error suppression, fabricated zero time,
+     CPU timing substitute, or bypass of genuine GPU-failure handling was added.
+
+  Other retained changes from bring-up and investigation
+
+  - Gameplay loading: BC6H/BC7 native texture formats and explicit R32_FLOAT DDS mip
+    sizing enabled the user-confirmed Zaton load. Real BC7 detail-atlas and heightmap
+    uploads/readbacks were checked byte-for-byte; these were separate from profiling.
+  - Timer storage and lifetime: shared counter pages pool 256 queries, now with
+    1024 samples per page, plus GPU-only marker storage. The marker compute pipeline
+    is created once per query pool. Queries retain the native work they reference.
+    Zero, error-sentinel, and reversed timestamps are rejected, including (0,0).
+  - Profiler maintenance: drain pending queries on unsampled/disabled frames,
+    immediately release completed command-buffer references, retire expired
+    in-flight queries rather than reusing them, and preserve displayed timings
+    between samples. An unmatched detail-culling timer early return was corrected.
+  - Render encoder reuse: same-framebuffer graphics state changes keep the encoder
+    unless a barrier requires a break, avoiding per-draw attachment load/store cycles.
+  - Ordinary indirect draws: restore dirty graphics state after encoder boundaries.
+    A headless timer-boundary failure exposed missing pipeline/bindings; regression
+    readbacks cover timer begin/end and buffer-write interruptions. Its exact
+    corresponding frontend sequence was not established in gameplay.
+  - Counted indexed draws: ICBs no longer combine inheritBuffers=YES with explicit
+    per-command buffer writes. inheritBuffers=NO commands explicitly bind vertex
+    streams, vertex/fragment argument tables, direct resource/sampler heaps, draw
+    arguments, and the shader-converter indexed-draw uniform. GPU-generated count
+    clamping and pooled resource residency/lifetime remain intact.
+    This corrected a Metal API contract violation, but was not the final freeze fix.
+
+  Diagnostics retained, not required workarounds
+
+  - LDV_METAL3_TRACE=1 enables existing trace logging and encoder annotation.
+    LDV_METAL3_ENCODER_STATUS independently controls encoder execution-status
+    capture; when unset, it follows trace. Explicit 0 keeps that option disabled.
+  - Encoder labels and marker-stack tracking follow trace or status diagnostics.
+    The unconditional-labeling experiment was reverted.
+  - First command-list opening reports requested/effective status, native
+    errorOptions, and retainedReferences once per device, without per-frame logging.
+  - Failed GPU submissions report allocation/budget bytes and available encoder
+    states, labels, and signposts. The HUD failure reported about 4.65 GB allocated
+    against a 115.45 GB recommended working set; that does not establish ordinary
+    application-memory exhaustion or identify the driver's failing allocation.
+
+  What did not resolve the gameplay freezes
+
+  - Empty blit markers dropped samples; four-byte fill blits improved headless tests
+    but still produced missing/stale end samples in gameplay.
+  - GPU-side counter resolution returned zeros in earlier experiments despite valid
+    post-completion CPU results. CPU resolution was retained, but alone was not enough.
+  - Trace-only and encoder-status-only modes made earlier gameplay runs stable;
+    Metal API validation alone did not. Those observations were diagnostic effects,
+    not established root-cause fixes or required launch settings.
+  - Unconditional encoder labels did not fix the both-diagnostics-off freeze.
+  - Ordinary/count-indirect correctness fixes and large passing pressure workloads
+    did not by themselves establish or resolve the reported HUD failure.
+
+  Verification and limits
+
+  - Headless fault injection through real backend methods reproduced the timestamp
+    error's old Lost transition and verified the corrected Normal state. The error
+    remained logged and returned NaN. Injected native submission failure still
+    caused Lost and a failed idle wait; explicit failures remained terminal.
+  - Native regressions cover pooled/cross-page query reuse, nested render/compute/
+    copy intervals, completion rules, exact compute/pixel output, indirect state
+    restoration, explicit counted bindings, and GPU-generated count clipping.
+  - The new reuse regression brackets GPU event waits of 2, 8, and 3 ms, polls
+    without an idle wait, and verifies each result includes the current wait and
+    recorded write rather than a stale query generation.
+  - Earlier asynchronous probes resolved 87040 intervals without reproducing the
+    spontaneous stale end. A separate pressure run passed with 1.78 GB allocated,
+    4096 texture residency declarations per pass, a 192 MiB depth atlas, 64 raster
+    passes, and 8.4 million triangles. Neither proved gameplay was fixed.
+  - Final offscreen presentation passed 120 frames/7800 nested and reused timers
+    in each configuration: HUD0/validation0, HUD1/validation0, HUD1/validation1.
+    Total: 360 frames and 23400 valid intervals. Native regressions also passed.
+    An offscreen HUD environment setting did not prove visible HUD instrumentation;
+    the subsequent user gameplay confirmation closed that verification gap.
+  - ReleaseMasterGold linked with ./cmake-build xr_3da -c releasemastergold -j 12.
+    Temporary probes, fault-injection targets, and binaries were removed.
+    No claim is made that the driver-level HUD OOM was reproduced headlessly or that
+    compute-only versus paired-sampling-only variants were independently proven.
+
+  Implementation references
+
+  - Externals/nvrhi/src/metal3/metal3-queries.cpp: counter pool allocation,
+    encodeTimerBoundary, begin/end, completion polling, and sample validation.
+  - Externals/nvrhi/src/metal3/metal3-backend.h: TimerQueryPool and query ownership.
+  - Externals/nvrhi/src/metal3/metal3-commandlist.cpp: encoder reuse/restoration,
+    counted ICB bindings, diagnostic controls, and effective startup settings.
+  - Externals/nvrhi/src/metal3/metal3-device.cpp: terminal native submission failures.
+  - src/Layers/xrRender/Backend/MetalBackend.mm: error/device-loss classification.
+  - src/Layers/xrRender/Profiler/GPUProfiler.cpp: query retirement and maintenance.
+  - Externals/nvrhi/tests/metal3-commandlist.mm: retained native regressions.
 
 NVRHI execution and resource contracts
 --------------------------------------
@@ -253,7 +419,7 @@ NVRHI execution and resource contracts
   Acceptance: cross-list and advertised cross-queue producer/consumer workloads
   observe writes; completion is never reported before the submitted work finishes.
 
-- METAL-06: Report capabilities formats and unsupported operations accurately
++ METAL-06: Report capabilities formats and unsupported operations accurately
   Prerequisite: METAL-01.
   Targets: queryFeatureSupport; queryFormatSupport; engine Capabilities; API stubs.
   Report actual format usage, device limits, queue support, and implemented features.
@@ -261,6 +427,19 @@ NVRHI execution and resource contracts
   fabricated timing/completion values, or handles for unimplemented functionality.
   Acceptance: advertised capabilities correspond to exercised behavior; unsupported
   feature selection fails clearly before a pass can silently skip required work.
+  Native creation requires Metal 3, argument buffers tier 2, and a matching queue.
+  Format masks distinguish compressed, integer, depth/stencil, filtering, writable,
+  and read-write tier restrictions. Allocation checks format usage and device limits.
+  Deferred lists and aliased logical queues are advertised; unimplemented features
+  remain disabled. Unsupported factories report errors and return unavailable results.
+  Unsupported commands invalidate their recording; batch rejection prevents partial
+  execution, and a failed immediate recording can be discarded and re-recorded.
+  M5 Max with Metal API validation: 27 advertised texture formats allocated;
+  14 GPU write/readbacks and 7 read-write operations passed, as did a 32768-wide
+  texture allocation. Static regressions passed 20 runs; shared tests and default
+  Vulkan xr_3da build passed. Other GPU families were not exercised.
+  Native engine capability population is now implemented by METAL-02, including
+  the actual bindless table. Unsupported mesh, ray-tracing, and VRS paths stay disabled.
 
 - METAL-07: Preserve resource lifetimes across in-flight submissions
   Prerequisites: METAL-04, METAL-05.
@@ -305,6 +484,9 @@ NVRHI execution and resource contracts
   byte offset, preserving compute bindings, bounds, ordering, and zero-work cases.
   Acceptance: GPU-generated arguments drive the expected lighting/shadow workload
   without CPU readback; nonzero offsets and zero dimensions behave correctly.
+  Native indirect dispatch now encodes the bound Metal argument buffer directly,
+  tracks/retains it, and restores compute bindings after encoder interruptions.
+  Menu startup exercises the path; workload/offset/zero-dimension acceptance remains.
 
 - METAL-12: Validate indirect raster drawing and count semantics
   Prerequisites: METAL-08, METAL-10.
@@ -340,6 +522,9 @@ NVRHI execution and resource contracts
   Add debug groups/labels; ensure optional Tracy integration agrees with submission.
   Acceptance: known workloads yield available, nonfabricated durations in correct
   units, while unsupported devices report unavailable timing rather than zero success.
+  Native timestamp queries now use pooled counter-buffer pages rather than one
+  native buffer per query. The menu initializes all 64 GPUProfiler queries without
+  exhausting Metal counter buffers; timing accuracy and reuse acceptance remains.
 
 Shaders and pipeline parity
 ---------------------------
@@ -354,6 +539,12 @@ Shaders and pipeline parity
   Separate Metal caches by target, compiler/converter version, options, and defines.
   Acceptance: vertex, pixel, and compute shaders compile and bind correctly from
   cold and warm caches; shader reload changes output without stale reflection.
+  Menu VS/PS/CS shaders now compile Slang DXIL SM6.6 through the converter library.
+  Explicit root signatures and converter resource locations define table-pointer
+  and descriptor layouts; native vertex fetch supports BGRA colors and input arrays.
+  The separate Metal cache includes compiler/converter identity and serialized
+  reflection. Lowercase hash paths fix warm-cache lookup on case-insensitive APFS.
+  Cold and warm menu boots passed; shader-reload acceptance remains outstanding.
 
 - METAL-17: Achieve existing raster and compute pipeline parity
   Prerequisites: METAL-03, METAL-09, METAL-10, METAL-11, METAL-12, METAL-16.

@@ -51,8 +51,9 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     bool readyToPresent = false;
 
     void message(nvrhi::MessageSeverity severity, const char* text) override {
-        if (severity >= nvrhi::MessageSeverity::Error) {
+        if (severity == nvrhi::MessageSeverity::Fatal)
             state.store(DeviceState::Lost);
+        if (severity >= nvrhi::MessageSeverity::Error) {
             Msg("! [MetalBackend] ERROR: %s", text);
         } else if (severity == nvrhi::MessageSeverity::Warning) {
             Msg("! [MetalBackend] WARNING: %s", text);
@@ -62,6 +63,7 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     }
 
     void fail(const char* text) {
+        state.store(DeviceState::Lost);
         message(nvrhi::MessageSeverity::Error, text);
     }
 
