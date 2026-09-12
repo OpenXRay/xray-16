@@ -182,3 +182,239 @@ Swartz27: Matthew Swartz
 + Extend r__geometry_lod from 1.2f to 5.f
 * Fix problem with weapons using a grenade launcher not lerping the animations
 + Fixed skybox stretching
+
+--------------------------------
+
+Native Metal backend: NVRHI integration
+=====================================
+
+Goal: retain the existing frame-graph passes while implementing their NVRHI
+contracts through native Metal. Importing the backend is not feature parity.
+Use the legend above: + imported/completed, - planned, o externally blocked.
+Task IDs are stable; prerequisites identify implementation order.
+
+Source: https://github.com/luduvo/NVRHI
+Metal integration revision: 2bd5bf1
+The later f176f02 D3D12 change is intentionally excluded.
+Our Vulkan state-tracking, queue-lock, descriptor, SRV-swizzle, and mesh fixes
+remain on the merge's first-parent history.
+
++ Import native Metal backend source
+  Native Metal remains disabled by default in Externals/CMakeLists.txt.
+  No Metal device, shader path, or presentation path is selected by the engine.
+  Imported stubs are outstanding work, not successful implementations.
+
+Build and engine integration
+----------------------------
+
+- METAL-01: Establish reproducible optional Metal backend builds
+  Targets: Externals/CMakeLists.txt; Externals/nvrhi/CMakeLists.txt.
+  Package/discover Metal Shader Converter and its runtime headers explicitly.
+  Build Objective-C++ sources and link required Apple frameworks only when enabled.
+  Preserve Vulkan and D3D12 builds; do not silently enable Metal on Apple hosts.
+  Acceptance: clean Metal opt-in build on a documented SDK/toolchain, actionable
+  missing-dependency errors, and unchanged default Vulkan build.
+
+- METAL-02: Integrate native Metal device and backend selection
+  Prerequisites: METAL-01, METAL-06.
+  Targets: IRenderBackend; backend factory/selection; new Metal backend implementation.
+  Add Metal API selection, frame-graph eligibility, device/queue initialization,
+  native-handle wrapping, uploads, and shutdown behind the existing interface.
+  Acceptance: explicit selection creates a native Metal NVRHI device; Vulkan
+  remains selectable and no Vulkan device is created for the Metal selection.
+
+- METAL-03: Implement drawable presentation and frame lifecycle
+  Prerequisites: METAL-02, METAL-04, METAL-05.
+  Targets: Metal backend; SDL window integration; CAMetalLayer presentation.
+  Implement drawable acquisition, back-buffer handles, bounded frames in flight,
+  vsync, resize, minimization, unavailable drawables, and orderly shutdown.
+  Acceptance: clear/present survives resize, minimize/restore, and repeated startup
+  without stale textures, deadlocks, premature reuse, or growing resource counts.
+
+NVRHI execution and resource contracts
+--------------------------------------
+
+- METAL-04: Restore deferred command-list submission semantics
+  Prerequisite: METAL-01.
+  Targets: metal3-commandlist.cpp open/close; metal3-device.cpp executeCommandLists.
+  Closing must finish recording without submitting; execution submits the supplied
+  lists in the requested order and returns an execution identifier for real work.
+  Define and honor command-list reuse and CommandListParameters behavior.
+  Acceptance: recording and closing a GPU write does not execute it; submitting
+  closed lists in reversed recording order produces the requested execution order.
+
+- METAL-05: Implement completion tracking and queue dependencies
+  Prerequisite: METAL-04.
+  Targets: queueWaitForCommandList; lifetime trackers; event queries; waitForIdle.
+  Associate execution identifiers with GPU completion. Implement queue waits and
+  event signaling without synthetic completion. Preserve ordering if supported
+  logical queues share one physical Metal queue; do not advertise unsupported
+  asynchronous queue behavior.
+  Acceptance: cross-list and advertised cross-queue producer/consumer workloads
+  observe writes; completion is never reported before the submitted work finishes.
+
+- METAL-06: Report capabilities formats and unsupported operations accurately
+  Prerequisite: METAL-01.
+  Targets: queryFeatureSupport; queryFormatSupport; engine Capabilities; API stubs.
+  Report actual format usage, device limits, queue support, and implemented features.
+  Reject unsupported operations explicitly instead of returning dummy success,
+  fabricated timing/completion values, or handles for unimplemented functionality.
+  Acceptance: advertised capabilities correspond to exercised behavior; unsupported
+  feature selection fails clearly before a pass can silently skip required work.
+
+- METAL-07: Preserve resource lifetimes across in-flight submissions
+  Prerequisites: METAL-04, METAL-05.
+  Targets: resource references; upload/argument-table pools; garbage collection.
+  Retain buffers, textures, binding sets, pipelines, and transient allocations until
+  their last GPU consumer completes, including indirect and bindless references.
+  Recycle volatile constant-buffer versions only after completion.
+  Acceptance: dropping CPU handles and reusing command lists immediately after
+  submission remains correct under multiple frames in flight and Metal validation.
+
+- METAL-08: Implement resource tracking and hazard guarantees
+  Prerequisites: METAL-04, METAL-07.
+  Targets: metal3-state-tracking.cpp; command-list state and UAV-barrier methods.
+  Maintain NVRHI logical resource states and subresource/permanent-state contracts.
+  Use Metal hazard tracking, encoder boundaries, fences, or events where required;
+  do not translate Vulkan layouts mechanically into unnecessary Metal barriers.
+  Acceptance: compute-to-compute, compute-to-raster, render-to-sample, indirect,
+  and copy dependencies observe correct results with validation enabled.
+
+- METAL-09: Implement bindless layouts and descriptor-table operations
+  Prerequisites: METAL-06, METAL-07, METAL-08.
+  Targets: createBindlessLayout; create/resize/writeDescriptorTable; Metal bindings.
+  Implement descriptor types/ranges, dynamic shader indexing, bounds, and resizing
+  with keepContents. Preserve entries and retain/declare all indirectly accessed
+  resources. Define GPU-safe descriptor replacement and slot reuse.
+  Acceptance: material textures can be indexed, replaced, resized, and streamed
+  while earlier frames remain in flight, without corrupting existing entries.
+
+- METAL-10: Complete shader resource binding and view semantics
+  Prerequisites: METAL-08, METAL-09, METAL-16.
+  Targets: metal3-resource-bindings.cpp; applyGraphicsBindings; applyComputeBindings.
+  Match register spaces, stage visibility, raw/structured/typed buffers, texture
+  views, SRV component mappings, samplers, constant-buffer ranges, volatile buffers,
+  push constants, and binding changes across pipeline/encoder transitions.
+  Acceptance: shaders consume correct values after pipeline switches and resource
+  updates; bindless and ordinary bindings coexist without slot collisions.
+
+- METAL-11: Implement GPU-driven indirect compute dispatch
+  Prerequisites: METAL-08, METAL-10.
+  Targets: CommandList::dispatchIndirect; deferred-light/local-shadow/VSM passes.
+  Read dispatch dimensions from the bound GPU argument buffer at the requested
+  byte offset, preserving compute bindings, bounds, ordering, and zero-work cases.
+  Acceptance: GPU-generated arguments drive the expected lighting/shadow workload
+  without CPU readback; nonzero offsets and zero dimensions behave correctly.
+
+- METAL-12: Validate indirect raster drawing and count semantics
+  Prerequisites: METAL-08, METAL-10.
+  Targets: drawIndirect; drawIndexedIndirect; drawIndexedIndirectCount.
+  Verify the imported paths against NVRHI argument layout, count clamping,
+  baseVertex, startInstance, index types, offsets, and zero-draw behavior.
+  Retain required temporary buffers until GPU completion.
+  Acceptance: GPU-generated direct-equivalent draws produce matching pixels and
+  geometry IDs for both regular and geometry-emulation pipeline paths when used.
+
+- METAL-13: Complete texture transfer and staging readback support
+  Prerequisites: METAL-06, METAL-07, METAL-08.
+  Targets: create/map/unmapStagingTexture; staging copyTexture overloads; transfers.
+  Implement row/image pitches, slices, mip levels, CPU access, completion rules,
+  supported compressed formats, and multisample resolve constraints.
+  Acceptance: upload, copy, and read back patterned subresources with exact
+  contents and correct pitches; unsupported combinations fail explicitly.
+
+- METAL-14: Implement heap allocation and placed-resource contracts
+  Prerequisites: METAL-06, METAL-07, METAL-08.
+  Targets: createHeap; memory requirements; bindBufferMemory; bindTextureMemory.
+  Implement supported Metal heap placement, alignment, ownership, aliasing hazards,
+  and lifetime, or keep these capabilities disabled until the implementation exists.
+  Acceptance: aligned placed resources can be used and retired safely; invalid
+  placements fail without returning usable-looking resources.
+  This task is not a prerequisite for raster parity if the engine uses committed
+  resources exclusively.
+
+- METAL-15: Implement GPU timing queries and diagnostic markers
+  Prerequisites: METAL-05, METAL-07.
+  Targets: metal3-queries.cpp; timer-query methods; markers; GPUProfiler.
+  Produce real GPU timestamps with asynchronous availability and safe query reuse.
+  Add debug groups/labels; ensure optional Tracy integration agrees with submission.
+  Acceptance: known workloads yield available, nonfabricated durations in correct
+  units, while unsupported devices report unavailable timing rather than zero success.
+
+Shaders and pipeline parity
+---------------------------
+
+- METAL-16: Add Metal shader compilation reflection and cache identity
+  Prerequisite: METAL-01.
+  Targets: SlangCompiler; ShaderLoader/ShaderCache; r_FrameGraphRenderer;
+  metal3-shader.cpp and shader-resource layout integration.
+  Initially follow the imported Metal Shader Converter ABI: compile existing
+  shaders to DXIL, convert to Metal libraries, and consume matching reflection
+  and any required stage-in libraries. Do not feed DXIL/SPIR-V to Metal library APIs.
+  Separate Metal caches by target, compiler/converter version, options, and defines.
+  Acceptance: vertex, pixel, and compute shaders compile and bind correctly from
+  cold and warm caches; shader reload changes output without stale reflection.
+
+- METAL-17: Achieve existing raster and compute pipeline parity
+  Prerequisites: METAL-03, METAL-09, METAL-10, METAL-11, METAL-12, METAL-16.
+  Targets: Metal graphics/compute pipelines; existing frame-graph passes.
+  Preserve reverse-Z, winding/culling, blending, alpha testing, integer visibility
+  targets, vertex layouts, instancing, shader constants, and material resolve.
+  Audit geometry emulation only for shaders actually used by enabled passes.
+  Acceptance: a representative level renders materials, terrain, skinned geometry,
+  details, lighting, shadows, particles, transparency, and UI without Metal-specific
+  replacements of the frame-graph passes or silent disabled effects.
+
+- METAL-18: Implement native mesh pipeline creation and state binding
+  Prerequisites: METAL-06, METAL-10, METAL-16, METAL-17.
+  Targets: createMeshletPipeline overloads; setMeshletState; Metal shader metadata.
+  Create real native mesh pipelines, validate output/threadgroup limits, and bind
+  mesh/pixel resources consistently. Support taskless mesh shaders independently
+  of task/amplification shaders; report unimplemented stage combinations unsupported.
+  Acceptance: the existing cluster_vis mesh shader and both visibility pixel shaders
+  create valid pipelines without relying on geometry-shader emulation.
+
+- METAL-19: Implement direct and indirect native mesh dispatch
+  Prerequisites: METAL-08, METAL-18.
+  Targets: dispatchMesh; dispatchMeshIndirect; dispatchMeshIndirectCount.
+  Implement group dimensions, GPU argument offsets, draw counts/count buffers,
+  device limits, zero work, and resource residency. Preserve original cluster
+  triangle ordering and visibility-ID encoding.
+  Acceptance: initial/retest regular and terrain visibility paths match vertex-path
+  output; a Metal capture shows real mesh dispatch and GPU-generated arguments.
+
+Integration gates
+-----------------
+
+- METAL-20: Verify gameplay lifecycle and asynchronous rendering stability
+  Prerequisites: METAL-03, METAL-05, METAL-07, METAL-08, METAL-13, METAL-17.
+  Exercise level reload, resize, minimize/restore, shader reload, texture streaming,
+  command-list reuse, and all advertised queue modes with Metal validation.
+  Acceptance: sustained gameplay has no validation errors, stale resources, hangs,
+  or unbounded resource growth; shutdown waits for work without deadlocking.
+
+- METAL-21: Measure native Metal and mesh rendering performance
+  Prerequisites: METAL-15, METAL-19, METAL-20.
+  Compare fixed scenes against MoltenVK and native Metal's ordinary vertex path.
+  Separate shader compilation/warmup, CPU encoding/submission, GPU pass timings,
+  frame latency, and memory usage. Do not infer acceleration from API selection.
+  Acceptance: reproducible captures and measurements establish correctness and
+  identify regressions before considering any default-backend change.
+
+- METAL-22: Document validated feature support and backend opt-in
+  Prerequisites: METAL-19, METAL-20, METAL-21.
+  Document toolchain/dependency versions, feature/format limits, capability logs,
+  cache behavior, backend selection, and known unsupported operations.
+  Leave ray tracing, cooperative vectors, sparse resources, and other unused
+  optional features disabled unless separately implemented and verified.
+  Acceptance: a clean checkout can reproduce the documented build and verification
+  scenarios; engine-facing behavior matches the supported NVRHI contract.
+
+Independent validation blockers
+------------------------------
+
+o Resolve the previously reported gameplay crash before using that scenario as
+  a Metal acceptance baseline. The older-quicksave nil surge timer was diagnosed
+  separately; the reported-session crash has not been confirmed fixed.
+o Validate actual mesh execution on a supporting backend. Stock bundled MoltenVK
+  does not expose the required mesh-shader feature.
