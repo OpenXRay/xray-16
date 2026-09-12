@@ -97,8 +97,8 @@ jobs:
         # macOS images have tighter concurrency limits; keep the matrix minimal.
         # Pin the deployment target so newer runner images don't pass an unsupported
         # system version (e.g. 25.4.0) down to AppleClang/LuaJIT architecture detection.
-        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
-        - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
+        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, generator: Ninja, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
+        - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, generator: Ninja, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
 
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]
 
@@ -132,7 +132,7 @@ jobs:
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
-          brew install ccache cmake dylibbundler sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
+          brew install ccache cmake dylibbundler ninja sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
@@ -171,7 +171,7 @@ jobs:
           ccache-${{ runner.os }}-${{ matrix.platform.arch }}-
 
     - name: Run CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
+      run: cmake ${{ matrix.platform.generator && format('-G {0}', matrix.platform.generator) || '' }} -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
     - name: Run CMake Build
       id: cmake-build
@@ -191,7 +191,7 @@ jobs:
     # TODO: Merge this step with 'Make AppImage' once we switch to CMake 4.2 which directly supports AppImage generation with CPack
     # https://cmake.org/cmake/help/latest/cpack_gen/appimage.html
     - name: Make package
-      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name != 'AppImage' }}
+      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name != 'AppImage' && !startsWith(matrix.platform.name, 'macOS') }}
       id: make-package
       #continue-on-error: true
       working-directory: build
