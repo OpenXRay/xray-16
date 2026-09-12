@@ -208,7 +208,6 @@ target_sources(xrRender PRIVATE
     ModelPool.cpp
     NvTriStrip.cpp
     NvTriStripObjects.cpp
-    PBRConverter/ONNXModelRunner.cpp
     PBRConverter/PBRConversionUI.cpp
     PBRConverter/PBRTextureConverter.cpp
     PSLibrary.cpp
@@ -415,6 +414,9 @@ if(XRAY_USE_AI_PBR)
 
     message(STATUS "AI PBR converter: ON (onnxruntime: ${XRAY_ONNXRUNTIME_LIBRARY})")
 
+    target_sources(xrRender PRIVATE
+        PBRConverter/ONNXModelRunner.cpp
+    )
     target_compile_definitions(xrRender PRIVATE USE_AI_PBR)
     target_include_directories(xrRender PRIVATE "${XRAY_ONNXRUNTIME_INCLUDE_DIR}")
     target_link_libraries(xrRender PRIVATE "${XRAY_ONNXRUNTIME_LIBRARY}")
