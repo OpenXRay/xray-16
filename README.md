@@ -34,6 +34,12 @@ Legends of the Zone/Enhanced Edition is not supported and won't ever be likely. 
 
 You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray).
 
+### Experimental mesh-shader visibility
+
+`r_mesh_shaders 1` opts the frame-graph renderer into mesh-shader visibility for regular and terrain clusters, including the Hi-Z retest, on capable D3D12 or native Vulkan devices. The default is `0`; changing it does not require a restart. Unsupported devices, including the bundled macOS/MoltenVK backend, retain vertex draws. Pipeline creation failure or a scene exceeding the supported mesh dispatch capacity also retains vertex draws, with the reason logged under `[VisibilityRaster]`.
+
+This prototype emits two groups of up to 64 triangles per cluster without changing geometry, LOD selection, alpha testing, or material resolve. It is intended to look unchanged and does not yet deduplicate vertices. Confirm activation through the `mesh dispatch (two groups per cluster)` log and a GPU capture; performance improvements are not guaranteed. Skinned geometry, grass/details, shadows, and transparency keep their existing paths.
+
 ## Goals
 1. Clean up engine code, boost performance, and fix original X-Ray Engine bugs that were polluting S.T.A.L.K.E.R. series.
 2. Make it a drop-in replacement for original engine.

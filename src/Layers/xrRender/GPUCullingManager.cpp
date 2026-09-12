@@ -290,7 +290,7 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
     auto makeArgsBuffer = [&](const char* name) {
         nvrhi::BufferDesc desc;
         desc.debugName = name;
-        desc.byteSize = sizeof(u32) * 4;
+        desc.byteSize = sizeof(u32) * 8;
         desc.canHaveUAVs = true;
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
@@ -1430,7 +1430,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
     ResourceDesc argsDesc;
     argsDesc.type = ResourceDesc::Type::Buffer;
     argsDesc.debugName = "ClusterCull_Args";
-    argsDesc.bufferSize = sizeof(u32) * 4;
+    argsDesc.bufferSize = sizeof(u32) * 8;
     argsDesc.isUAV = true;
     argsDesc.isTransient = false;
     VirtualResourceHandle argsHandle = fg.ImportBuffer("cluster_args", m_clusterArgsBuffer, argsDesc);
@@ -1504,7 +1504,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupClusterRetestPass(
     ResourceDesc argsDesc;
     argsDesc.type = ResourceDesc::Type::Buffer;
     argsDesc.debugName = "ClusterCull_RetestArgs";
-    argsDesc.bufferSize = sizeof(u32) * 4;
+    argsDesc.bufferSize = sizeof(u32) * 8;
     argsDesc.isUAV = true;
     argsDesc.isTransient = false;
     VirtualResourceHandle argsHandle = fg.ImportBuffer("cluster_retest_args", m_clusterArgsBuffer2, argsDesc);
@@ -2546,7 +2546,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
 
     u32 zeroCount[kClusterCountWords] = {};
     cmdList->writeBuffer(m_clusterSet.countBuffer, zeroCount, sizeof(zeroCount));
-    u32 zeroArgs[4] = { 384, 0, 0, 0 };
+    u32 zeroArgs[8] = { 384, 0, 0, 0, 0, 0, 1, 0 };
     cmdList->writeBuffer(m_clusterArgsBuffer, zeroArgs, sizeof(zeroArgs));
     cmdList->writeBuffer(m_clusterTerrainArgsBuffer, zeroArgs, sizeof(zeroArgs));
     cmdList->writeBuffer(m_clusterArgsBuffer2, zeroArgs, sizeof(zeroArgs));
