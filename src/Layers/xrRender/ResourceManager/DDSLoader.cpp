@@ -498,6 +498,7 @@ u32 DDSLoader::CalculateMipSize(u32 width, u32 height, u32 depth, nvrhi::Format 
         case nvrhi::Format::SRGBA8_UNORM:
         case nvrhi::Format::BGRA8_UNORM:
         case nvrhi::Format::SBGRA8_UNORM:
+        case nvrhi::Format::R32_FLOAT:
             mipSize = w * h * 4;
             break;
 
