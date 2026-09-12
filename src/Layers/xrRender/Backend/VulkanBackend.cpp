@@ -114,14 +114,8 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     deviceDesc.instanceExtensions = instanceExts.data();
     deviceDesc.numInstanceExtensions = instanceExts.size();
 
-    const char* deviceExts[] = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
-        VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
-        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
-    };
-    deviceDesc.deviceExtensions = deviceExts;
-    deviceDesc.numDeviceExtensions = std::size(deviceExts);
+    deviceDesc.deviceExtensions = m_deviceExtensions.data();
+    deviceDesc.numDeviceExtensions = m_deviceExtensions.size();
 
     m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
     if (!m_nvrhiVulkanDevice) {
@@ -406,15 +400,72 @@ bool VulkanBackend::CreateLogicalDevice() {
         queueCreateInfos.push_back(computeQueueInfo);
     }
 
-    xr_vector<const char*> deviceExtensions = {
+    m_deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
         VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
 #if defined(XR_PLATFORM_APPLE)
-    deviceExtensions.push_back("VK_KHR_portability_subset");
+    m_deviceExtensions.push_back("VK_KHR_portability_subset");
 #endif
+
+    m_capabilities.meshShaders = false;
+    m_capabilities.meshShaderMaxGroups = 0;
+    u32 meshShaderMaxGroups = 0;
+    VkPhysicalDeviceMeshShaderFeaturesEXT meshFeatures = {};
+    meshFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT;
+    u32 extensionCount = 0;
+    if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS) {
+        xr_vector<VkExtensionProperties> extensions(extensionCount);
+        if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data()) == VK_SUCCESS) {
+            for (u32 i = 0; i < extensionCount; ++i) {
+                if (strcmp(extensions[i].extensionName, VK_EXT_MESH_SHADER_EXTENSION_NAME) != 0)
+                    continue;
+
+                VkPhysicalDeviceMeshShaderFeaturesEXT supportedMeshFeatures = {};
+                supportedMeshFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT;
+                VkPhysicalDeviceFeatures2 supportedFeatures = {};
+                supportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+                supportedFeatures.pNext = &supportedMeshFeatures;
+                vkGetPhysicalDeviceFeatures2(m_physicalDevice, &supportedFeatures);
+
+                VkPhysicalDeviceMeshShaderPropertiesEXT meshProperties = {};
+                meshProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT;
+                VkPhysicalDeviceProperties2 properties = {};
+                properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+                properties.pNext = &meshProperties;
+                vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
+
+                const u64 vertexGranularity = std::max(1u, meshProperties.meshOutputPerVertexGranularity);
+                const u64 primitiveGranularity = std::max(1u, meshProperties.meshOutputPerPrimitiveGranularity);
+                const u64 outputVertices = ((192 + vertexGranularity - 1) / vertexGranularity) * vertexGranularity;
+                const u64 outputPrimitives = ((64 + primitiveGranularity - 1) / primitiveGranularity) * primitiveGranularity;
+                const u64 outputBytes = outputVertices * 20 * sizeof(u32) + outputPrimitives * 4 * sizeof(u32);
+                if (supportedMeshFeatures.meshShader &&
+                    meshProperties.maxMeshWorkGroupInvocations >= 64 &&
+                    meshProperties.maxMeshWorkGroupSize[0] >= 64 &&
+                    meshProperties.maxMeshWorkGroupSize[1] >= 1 &&
+                    meshProperties.maxMeshWorkGroupSize[2] >= 1 &&
+                    meshProperties.maxMeshOutputVertices >= 192 &&
+                    meshProperties.maxMeshOutputPrimitives >= 64 &&
+                    meshProperties.maxMeshOutputComponents >= 24 &&
+                    meshProperties.maxMeshOutputMemorySize >= outputBytes &&
+                    meshProperties.maxMeshPayloadAndOutputMemorySize >= outputBytes &&
+                    meshProperties.maxMeshWorkGroupCount[0] >= 256 &&
+                    meshProperties.maxMeshWorkGroupCount[1] >= 1 &&
+                    meshProperties.maxMeshWorkGroupCount[2] >= 1) {
+                    meshShaderMaxGroups = std::min(meshProperties.maxMeshWorkGroupTotalCount,
+                        256u * std::min(meshProperties.maxMeshWorkGroupCount[1], 65535u));
+                    if (meshShaderMaxGroups != 0) {
+                        meshFeatures.meshShader = VK_TRUE;
+                        m_deviceExtensions.push_back(VK_EXT_MESH_SHADER_EXTENSION_NAME);
+                    }
+                }
+                break;
+            }
+        }
+    }
 
     VkPhysicalDeviceVulkan12Features vulkan12Features = {};
     vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
@@ -442,6 +493,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     vulkan11Features.shaderDrawParameters = VK_TRUE;
     dynamicRenderingFeatures.pNext = &vulkan11Features;
+    if (meshFeatures.meshShader)
+        vulkan11Features.pNext = &meshFeatures;
 
     VkPhysicalDeviceFeatures2 features2 = {};
     features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -461,8 +514,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     deviceCreateInfo.pNext = &features2;
     deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
     deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(deviceExtensions.size());
-    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(m_deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
 
     {
         VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
@@ -511,6 +564,9 @@ bool VulkanBackend::CreateLogicalDevice() {
         Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
         return false;
     }
+
+    m_capabilities.meshShaders = meshFeatures.meshShader == VK_TRUE;
+    m_capabilities.meshShaderMaxGroups = meshShaderMaxGroups;
 
     vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
 

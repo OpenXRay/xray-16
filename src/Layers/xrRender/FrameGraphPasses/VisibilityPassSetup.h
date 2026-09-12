@@ -30,6 +30,13 @@ struct VisibilityPassState {
     nvrhi::BindingLayoutHandle terrainLayout;
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
+    nvrhi::ShaderHandle meshShader;
+    nvrhi::BindingLayoutHandle meshLayout;
+    nvrhi::BindingLayoutHandle meshTerrainLayout;
+    nvrhi::MeshletPipelineHandle meshPipeline;
+    nvrhi::MeshletPipelineHandle meshTerrainPipeline;
+    bool meshFailed = false;
+    int meshMode = -1;
     nvrhi::ShaderHandle skinnedVS;
     nvrhi::BindingLayoutHandle skinnedLayout;
     nvrhi::GraphicsPipelineHandle skinnedPipeline;

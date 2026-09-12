@@ -438,9 +438,13 @@ void D3D12Backend::QueryCapabilities() {
     m_capabilities.shaderModel = 60;  // SM6.0 for D3D12
 
     // Check for mesh shaders
+    m_capabilities.meshShaders = false;
+    m_capabilities.meshShaderMaxGroups = 0;
     D3D12_FEATURE_DATA_D3D12_OPTIONS7 options7 = {};
     if (SUCCEEDED(m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS7, &options7, sizeof(options7)))) {
         m_capabilities.meshShaders = (options7.MeshShaderTier != D3D12_MESH_SHADER_TIER_NOT_SUPPORTED);
+        if (m_capabilities.meshShaders)
+            m_capabilities.meshShaderMaxGroups = 1u << 22;
     }
 
     // Check for ray tracing
