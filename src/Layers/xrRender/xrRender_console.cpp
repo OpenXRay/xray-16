@@ -281,6 +281,9 @@ int ps_fg_hot_reload_shaders = 0;
 const xr_token fg_render_mode_token[] = {
     {"dx12", FG_RENDER_DX12},
     {"vulkan", FG_RENDER_VULKAN},
+#if defined(XRAY_USE_METAL)
+    {"metal", FG_RENDER_METAL},
+#endif
     {nullptr, 0}
 };
 

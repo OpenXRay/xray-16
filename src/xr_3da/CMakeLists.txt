@@ -33,6 +33,10 @@ target_link_libraries(xr_3da
     xrRender
 )
 
+if(APPLE AND NVRHI_WITH_METAL3)
+    target_compile_definitions(xr_3da PRIVATE XRAY_USE_METAL)
+endif()
+
 if (WIN32)
     target_link_options(xr_3da PRIVATE "LINKER:/ERRORLIMIT:0")
 endif()

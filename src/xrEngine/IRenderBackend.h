@@ -42,12 +42,17 @@ public:
     enum class API : u8 {
         D3D11,      // Legacy, no true bindless
         D3D12,      // Primary target, bindless via descriptor heaps
-        Vulkan      // Future, bindless via descriptor indexing
+        Vulkan,
+        Metal
     };
 
     virtual API GetAPI() const = 0;
     virtual pcstr GetAPIName() const = 0;
-    bool IsFrameGraph() const { return GetAPI() == API::D3D12 || GetAPI() == API::Vulkan; }
+    bool IsFrameGraph() const
+    {
+        const auto api = GetAPI();
+        return api == API::D3D12 || api == API::Vulkan || api == API::Metal;
+    }
 
     // ═══════ Lifecycle ═══════
     virtual bool IsInitialized() const = 0;
