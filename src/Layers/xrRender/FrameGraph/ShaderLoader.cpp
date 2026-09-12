@@ -740,8 +740,6 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     ExtractedReflection cachedReflection;
     if (m_cache.TryLoad(name, ".ms", sourceHash, result.bytecode, &cachedReflection))
     {
-        fs->close();
-
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Mesh;
         desc.debugName = name;
@@ -751,6 +749,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
         );
 
         if (result.handle) {
+            fs->close();
             result.reflection = xr_new<ExtractedReflection>(cachedReflection);
             m_handleCache[cacheKey] = result.handle;
             m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(cachedReflection);
