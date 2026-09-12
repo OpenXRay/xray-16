@@ -92,6 +92,7 @@ private:
     VkQueue m_computeQueue = VK_NULL_HANDLE;
     u32 m_computeQueueFamily = UINT32_MAX;
     VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
+    xr_vector<const char*> m_deviceExtensions;
 
     VkSemaphore m_imageAvailable[BACK_BUFFER_COUNT] = {};
     VkSemaphore m_renderFinished[BACK_BUFFER_COUNT] = {};

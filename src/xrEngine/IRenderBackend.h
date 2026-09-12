@@ -105,6 +105,7 @@ public:
         // Modern features
         bool bindlessTextures = false;
         bool meshShaders = false;
+        u32 meshShaderMaxGroups = 0;
         bool rayTracing = false;
         bool variableRateShading = false;
         u32 maxBindlessResources = 0;

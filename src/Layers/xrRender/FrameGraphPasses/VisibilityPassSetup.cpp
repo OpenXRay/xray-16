@@ -6,6 +6,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/BindingLayoutBuilder.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -13,6 +14,7 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::fg::passes {
 
@@ -68,6 +70,83 @@ struct alignas(16) VisDebugParams {
     u32 pad2;
 };
 
+bool ensureMeshVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state)
+{
+    if (state.meshPipeline && state.meshTerrainPipeline)
+        return true;
+    if (state.meshFailed)
+        return false;
+
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto msResult = shaderLoader->LoadMeshShader("cluster_vis", "main");
+    auto* atRefl = shaderLoader->GetCachedReflection("cluster_vis_at", ".ps");
+    auto* fadeRefl = shaderLoader->GetCachedReflection("cluster_vis_fade", ".ps");
+    if (!msResult.handle || !msResult.reflection || !atRefl || !fadeRefl) {
+        state.meshFailed = true;
+        return false;
+    }
+
+    auto& cache = GetPassResourceCache();
+    const auto visibility = nvrhi::ShaderType::Mesh | nvrhi::ShaderType::Pixel;
+    auto layout = cache.GetOrCreateBindingLayout("VisibilityRaster_Mesh",
+        BindingLayoutBuilder::Build(*msResult.reflection, *atRefl, visibility), nvDevice);
+    auto terrainLayout = cache.GetOrCreateBindingLayout("VisibilityRaster_MeshTerrain",
+        BindingLayoutBuilder::Build(*msResult.reflection, *fadeRefl, visibility), nvDevice);
+    if (!layout || !terrainLayout) {
+        state.meshFailed = true;
+        return false;
+    }
+
+    auto* bindlessLayout = device->GetBackend()->GetBindlessLayout();
+    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* bindingLayout) {
+        nvrhi::MeshletPipelineDesc desc;
+        desc.MS = msResult.handle;
+        desc.PS = pixelShader;
+        desc.renderState = state.pipeline->getDesc().renderState;
+        desc.bindingLayouts = { bindingLayout };
+        if (bindlessLayout)
+            desc.addBindingLayout(bindlessLayout);
+        return desc;
+    };
+    const auto& fbInfo = state.pipeline->getFramebufferInfo();
+    auto pipeline = nvDevice->createMeshletPipeline(makeDesc(state.psAlphaTest, layout), fbInfo);
+    auto terrainPipeline = nvDevice->createMeshletPipeline(makeDesc(state.psFade, terrainLayout), fbInfo);
+    if (!pipeline || !terrainPipeline) {
+        state.meshFailed = true;
+        return false;
+    }
+
+    state.meshShader = msResult.handle;
+    state.meshLayout = layout;
+    state.meshTerrainLayout = terrainLayout;
+    state.meshPipeline = pipeline;
+    state.meshTerrainPipeline = terrainPipeline;
+    return true;
+}
+
+int selectMeshVisibility(fg::RenderDevice* device, const ClusterDrawConfig& config, VisibilityPassState& state)
+{
+    if (!ps_r_mesh_shaders)
+        return 0;
+    auto* backend = device->GetBackend();
+    if (!backend || !backend->GetCapabilities().meshShaders
+        || !device->GetNVRHIDevice()->queryFeatureSupport(nvrhi::Feature::Meshlets))
+        return 1;
+
+    const u64 maxGroups = backend->GetCapabilities().meshShaderMaxGroups;
+    auto fits = [maxGroups](nvrhi::IBuffer* entries, nvrhi::IBuffer* args) {
+        if (!entries || !args || args->getDesc().byteSize < 32)
+            return false;
+        const u64 groups = entries->getDesc().byteSize / sizeof(u32) * 2;
+        return ((groups + 255) / 256) * 256 <= maxGroups;
+    };
+    if ((config.IsValid() && !fits(config.visibleEntryBuffer, config.argsBuffer))
+        || (config.TerrainValid() && !fits(config.terrainVisibleEntryBuffer, config.terrainArgsBuffer)))
+        return 2;
+    return ensureMeshVisibilityResources(device, state) ? 4 : 3;
+}
+
 void renderVisibilityRaster(
     fg::RenderContext* ctx,
     fg::RenderDevice* device,
@@ -110,7 +189,20 @@ void renderVisibilityRaster(
 
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device);
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    auto* vsRefl = shaderLoader->GetCachedReflection("cluster_vis", ".vs");
+    const int meshMode = selectMeshVisibility(device, config, state);
+    const bool useMesh = meshMode == 4;
+    if (!retest && state.meshMode != meshMode) {
+        const char* modes[] = {
+            "vertex draws (r_mesh_shaders 0)",
+            "vertex draws (mesh shaders unsupported)",
+            "vertex draws (mesh dispatch capacity exceeded)",
+            "vertex draws (mesh pipeline creation failed)",
+            "mesh dispatch (two groups per cluster)"
+        };
+        Msg("* [VisibilityRaster] %s", modes[meshMode]);
+        state.meshMode = meshMode;
+    }
+    auto* vsRefl = shaderLoader->GetCachedReflection("cluster_vis", useMesh ? ".ms" : ".vs");
     auto* atRefl = shaderLoader->GetCachedReflection("cluster_vis_at", ".ps");
     auto* fadeRefl = shaderLoader->GetCachedReflection("cluster_vis_fade", ".ps");
     if (!vsRefl || !atRefl || !fadeRefl)
@@ -137,6 +229,25 @@ void renderVisibilityRaster(
         cmdList->drawIndirect(0, 1);
     };
 
+    auto drawCluster = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IMeshletPipeline* meshPipeline,
+        nvrhi::IBindingSet* bindingSet, nvrhi::IBuffer* args) {
+        if (!useMesh) {
+            draw(pipeline, bindingSet, args);
+            return;
+        }
+        nvrhi::MeshletState ms;
+        ms.pipeline = meshPipeline;
+        ms.framebuffer = framebuffer;
+        ms.bindings = { bindingSet };
+        if (bindlessTable)
+            ms.addBindingSet(bindlessTable);
+        ms.indirectParams = args;
+        ms.viewport.addViewport(viewport);
+        ms.viewport.addScissorRect(scissor);
+        cmdList->setMeshletState(ms);
+        cmdList->dispatchMeshIndirect(16, 1);
+    };
+
     if (config.IsValid()) {
         BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "VisibilityRaster.Cluster");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
@@ -148,8 +259,10 @@ void renderVisibilityRaster(
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
         bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
         bsb.BufferSRV("g_DrawFades", config.fadeBuffer);
-        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.layout, nvDevice))
-            draw(state.pipeline, bindingSet, config.argsBuffer);
+        if (useMesh)
+            bsb.BufferSRV("g_ClusterArgs", config.argsBuffer);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshLayout : state.layout, nvDevice))
+            drawCluster(state.pipeline, state.meshPipeline, bindingSet, config.argsBuffer);
     }
 
     if (config.TerrainValid()) {
@@ -162,8 +275,10 @@ void renderVisibilityRaster(
         bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
         bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
         bsb.BufferSRV("g_DrawFades", config.terrainFadeBuffer);
-        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.terrainLayout, nvDevice))
-            draw(state.terrainPipeline, bindingSet, config.terrainArgsBuffer);
+        if (useMesh)
+            bsb.BufferSRV("g_ClusterArgs", config.terrainArgsBuffer);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshTerrainLayout : state.terrainLayout, nvDevice))
+            drawCluster(state.terrainPipeline, state.meshTerrainPipeline, bindingSet, config.terrainArgsBuffer);
     }
 
     const u32 skinnedEntries = (gpuCulling && !retest) ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;

@@ -299,6 +299,7 @@ float ps_r_sun_night_lum       = 0.05f;
 float ps_r_sun_night_alt       = 0.02f;
 float ps_r_bolt_flash          = 1.0f;
 int   ps_r_vis_debug           = 0;
+int   ps_r_mesh_shaders        = 0;
 int   ps_r_vsm_debug           = 0;
 float ps_r_vsm_base            = 24.0f;
 int   ps_r_vsm_mark_half       = 1;
@@ -1038,6 +1039,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_sun_night_alt", &ps_r_sun_night_alt, -0.2f, 0.5f);
     CMD4(CCC_Float, "r_bolt_flash", &ps_r_bolt_flash, 0.0f, 4.0f);
     CMD4(CCC_Integer, "r_vis_debug", &ps_r_vis_debug, 0, 3);
+    CMD4(CCC_Integer, "r_mesh_shaders", &ps_r_mesh_shaders, 0, 1);
     CMD4(CCC_Integer, "r_vsm_debug", &ps_r_vsm_debug, 0, 5);
     CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
     CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);
