@@ -53,7 +53,7 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
             FATAL("Native Metal initialization failed - no fallback available");
             return nullptr;
         }
-        Msg("* [FGRenderHost] Native Metal presentation backend initialized successfully");
+        Msg("* [FGRenderHost] Native Metal backend initialized successfully");
 #else
         FATAL("Native Metal backend is unavailable. Build on macOS with NVRHI_WITH_METAL3=ON.");
         return nullptr;

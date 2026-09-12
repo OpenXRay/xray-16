@@ -42,6 +42,11 @@ public:
     Capabilities& GetMutableCapabilities() override;
     void UpdateCapabilities() override;
 
+    u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
+    void UnregisterBindlessTexture(u32 index) override;
+    nvrhi::IBindingLayout* GetBindlessLayout() const override;
+    nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override;
+
     void BeginDebugEvent(pcstr name) override;
     void EndDebugEvent() override;
     void SetMarker(pcstr name) override;

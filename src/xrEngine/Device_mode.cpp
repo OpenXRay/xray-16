@@ -232,8 +232,12 @@ void CRenderDevice::UpdateWindowState()
     {
         if (psDeviceMode.WindowStyle == rsWindowed)
         {
-            psDeviceMode.Width = static_cast<u32>(pxW);
-            psDeviceMode.Height = static_cast<u32>(pxH);
+            int windowWidth = 0, windowHeight = 0;
+            if (SDL_GetWindowSize(m_sdlWnd, &windowWidth, &windowHeight) && windowWidth > 0 && windowHeight > 0)
+            {
+                psDeviceMode.Width = static_cast<u32>(windowWidth);
+                psDeviceMode.Height = static_cast<u32>(windowHeight);
+            }
         }
         Reset();
         return;

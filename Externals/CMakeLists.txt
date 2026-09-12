@@ -41,7 +41,6 @@ if (APPLE)
 endif()
 
 find_package(Vulkan)
-add_subdirectory(nvrhi)
 
 # Slang shader compiler
 set(SLANG_ENABLE_CUDA OFF CACHE BOOL "Disable CUDA support")
@@ -64,6 +63,19 @@ if(MSVC)
     add_compile_options(/MP)
 endif()
 add_subdirectory(slang)
+
+if(APPLE AND NVRHI_WITH_METAL3)
+    FetchContent_GetProperties(dxc_source SOURCE_DIR XRAY_DXC_SOURCE_DIR)
+    if(XRAY_DXC_SOURCE_DIR)
+        set(NVRHI_METAL_DXC_INCLUDE_DIR "${XRAY_DXC_SOURCE_DIR}/include/dxc")
+        set(NVRHI_METAL_DXC_REFLECTION_INCLUDE_DIR "${XRAY_DXC_SOURCE_DIR}/external/DirectX-Headers/include/directx")
+        set(NVRHI_METAL_DXC_STUB_INCLUDE_DIR "${XRAY_DXC_SOURCE_DIR}/external/DirectX-Headers/include/wsl/stubs")
+    endif()
+    if(TARGET copy-dxcompiler)
+        set(NVRHI_METAL_DXC_LIBRARY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
+    endif()
+endif()
+add_subdirectory(nvrhi)
 
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})

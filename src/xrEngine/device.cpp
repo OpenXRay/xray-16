@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Render.h"
+#include "IRenderBackend.h"
 
 #include "xrCore/FS_impl.h"
 #include "xrCore/MemoryStats.h"
@@ -63,6 +64,8 @@ bool CRenderDevice::RenderBegin()
         ZoneScopedN("RenderBegin::BackendBegin");
         GEnv.Render->Begin();
     }
+    if (GEnv.Backend && GEnv.Backend->IsFrameGraph() && !GEnv.Backend->IsInFrame())
+        return false;
 
     g_bRendering = true;
     return true;
@@ -395,14 +398,21 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         break;
     }
 
-    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    case SDL_EVENT_WINDOW_RESIZED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed &&
+            event.window.data1 > 0 && event.window.data2 > 0)
         {
             psDeviceMode.Width = static_cast<u32>(event.window.data1);
             psDeviceMode.Height = static_cast<u32>(event.window.data2);
         }
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
         if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
             viewport->PlatformRequestResize = true;
         break;

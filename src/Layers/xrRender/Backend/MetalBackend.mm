@@ -33,6 +33,12 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     nvrhi::CommandListHandle uploads;
     id<MTLCommandBuffer> uploadCompletion = nil;
     Frame frames[3];
+    static constexpr u32 MaxBindlessTextures = 65536;
+    nvrhi::BindingLayoutHandle bindlessLayout;
+    nvrhi::DescriptorTableHandle bindlessTable;
+    xr_vector<u32> freeBindlessIndices;
+    xr_map<nvrhi::ITexture*, u32> bindlessTextures;
+    u32 nextBindlessIndex = 0;
     Capabilities capabilities;
     std::mutex queueMutex;
     u32 currentFrame = 0;
@@ -92,10 +98,8 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
             fail("Unable to query the Metal window pixel dimensions.");
             return false;
         }
-        if (SDL_GetWindowFlags(window) & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_HIDDEN)) {
-            pixelWidth = 0;
-            pixelHeight = 0;
-        }
+        if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
+            return false;
         width = pixelWidth > 0 ? static_cast<u32>(pixelWidth) : 0;
         height = pixelHeight > 0 ? static_cast<u32>(pixelHeight) : 0;
         if (!width || !height) {
@@ -220,6 +224,20 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             Shutdown();
             return false;
         }
+        nvrhi::BindlessLayoutDesc bindlessDesc;
+        bindlessDesc.visibility = nvrhi::ShaderType::All;
+        bindlessDesc.firstSlot = 0;
+        bindlessDesc.maxCapacity = Impl::MaxBindlessTextures;
+        bindlessDesc.registerSpaces = {nvrhi::BindingLayoutItem::Texture_SRV(1)};
+        impl.bindlessLayout = impl.device->createBindlessLayout(bindlessDesc);
+        if (impl.bindlessLayout)
+            impl.bindlessTable = impl.device->createDescriptorTable(impl.bindlessLayout);
+        if (!impl.bindlessTable) {
+            impl.fail("Unable to create the native bindless texture table.");
+            Shutdown();
+            return false;
+        }
+        impl.device->resizeDescriptorTable(impl.bindlessTable, Impl::MaxBindlessTextures, false);
         impl.initialized = true;
         UpdateCapabilities();
         ResizeSwapChain(width, height);
@@ -227,7 +245,7 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             Shutdown();
             return false;
         }
-        Msg("* [MetalBackend] Native Metal presentation initialized on %s (%ux%u pixels, validation %s)",
+        Msg("* [MetalBackend] Native Metal initialized on %s (%ux%u pixels, validation %s)",
             impl.nativeDevice.name.UTF8String, impl.width, impl.height, enableValidation ? "enabled" : "disabled");
         return true;
     }
@@ -251,6 +269,11 @@ void MetalBackend::Shutdown() {
         }
         impl.uploads = nullptr;
         impl.uploadCompletion = nil;
+        impl.bindlessTable = nullptr;
+        impl.bindlessLayout = nullptr;
+        impl.bindlessTextures.clear();
+        impl.freeBindlessIndices.clear();
+        impl.nextBindlessIndex = 0;
         impl.device = nullptr;
         impl.nativeNvrhiDevice = nullptr;
         impl.layer.device = nil;
@@ -310,6 +333,8 @@ void MetalBackend::BeginFrame() {
             impl.fail("BeginFrame requires the previous frame to be ended and presented.");
             return;
         }
+        if (SDL_GetWindowFlags(impl.window) & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_HIDDEN))
+            return;
         std::lock_guard<std::mutex> lock(impl.queueMutex);
         impl.collect();
         if (impl.state.load() == DeviceState::Lost || !impl.updateDrawableSize())
@@ -343,6 +368,8 @@ void MetalBackend::BeginFrame() {
         desc.format = nvrhi::Format::BGRA8_UNORM;
         desc.isRenderTarget = true;
         desc.isShaderResource = false;
+        desc.initialState = nvrhi::ResourceStates::Present;
+        desc.keepInitialState = true;
         desc.debugName = "Metal presentation drawable";
         frame.texture = impl.device->createHandleForNativeTexture(nvrhi::ObjectTypes::MTL3_Texture,
             nvrhi::Object((__bridge void*)texture), desc);
@@ -500,28 +527,63 @@ void MetalBackend::UpdateCapabilities() {
     caps.meshShaders = impl.device->queryFeatureSupport(nvrhi::Feature::Meshlets);
     caps.rayTracing = impl.device->queryFeatureSupport(nvrhi::Feature::RayTracingPipeline);
     caps.variableRateShading = impl.device->queryFeatureSupport(nvrhi::Feature::VariableRateShading);
-    caps.bindlessTextures = false;
-    caps.shaderModel = 0;
-    caps.geometry.dwRegisters = 0;
-    caps.geometry.dwInstructions = 0;
-    caps.geometry.dwClipPlanes = 0;
-    caps.geometry.dwVertexCache = 0;
-    caps.geometry.bVTF = false;
-    caps.raster.dwRegisters = 0;
-    caps.raster.dwInstructions = 0;
-    caps.raster.dwStages = 0;
-    caps.raster.dwMRT_count = 1;
-    caps.raster.b_MRT_mixdepth = false;
-    caps.raster_major = 0;
-    caps.raster_minor = 0;
-    caps.raster_profile = "unsupported";
-    caps.geometry_major = 0;
-    caps.geometry_minor = 0;
-    caps.geometry_profile = "unsupported";
-    caps.hasStencil = false;
-    caps.hasScissor = false;
+    caps.bindlessTextures = impl.bindlessTable != nullptr;
+    caps.maxBindlessResources = caps.bindlessTextures ? Impl::MaxBindlessTextures : 0;
+    caps.shaderModel = 66;
+    caps.raster_major = 6;
+    caps.raster_minor = 6;
+    caps.raster_profile = "ps_6_6";
+    caps.geometry_major = 6;
+    caps.geometry_minor = 6;
+    caps.geometry_profile = "vs_6_6";
     caps.useCombinedSamplers = false;
 }
+
+u32 MetalBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        std::lock_guard<std::mutex> lock(impl.queueMutex);
+        if (!impl.bindlessTable || !texture)
+            return UINT32_MAX;
+        const auto found = impl.bindlessTextures.find(texture);
+        if (found != impl.bindlessTextures.end())
+            return found->second;
+        u32 slot;
+        if (!impl.freeBindlessIndices.empty()) {
+            slot = impl.freeBindlessIndices.back();
+            impl.freeBindlessIndices.pop_back();
+        } else {
+            if (impl.nextBindlessIndex == Impl::MaxBindlessTextures)
+                return UINT32_MAX;
+            slot = impl.nextBindlessIndex++;
+        }
+        if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(slot, texture))) {
+            impl.freeBindlessIndices.push_back(slot);
+            return UINT32_MAX;
+        }
+        impl.bindlessTextures.emplace(texture, slot);
+        return slot;
+    }
+}
+
+void MetalBackend::UnregisterBindlessTexture(u32 index) {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        std::lock_guard<std::mutex> lock(impl.queueMutex);
+        for (auto it = impl.bindlessTextures.begin(); it != impl.bindlessTextures.end(); ++it) {
+            if (it->second != index)
+                continue;
+            if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(index, nullptr)))
+                return;
+            impl.bindlessTextures.erase(it);
+            impl.freeBindlessIndices.push_back(index);
+            return;
+        }
+    }
+}
+
+nvrhi::IBindingLayout* MetalBackend::GetBindlessLayout() const { return m_impl->bindlessLayout.Get(); }
+nvrhi::IDescriptorTable* MetalBackend::GetBindlessDescriptorTable() const { return m_impl->bindlessTable.Get(); }
 
 void MetalBackend::BeginDebugEvent(pcstr name) {
     if (m_impl->inFrame && name) {

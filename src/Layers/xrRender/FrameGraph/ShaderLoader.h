@@ -192,10 +192,7 @@ private:
     void AccumulateIncludeHashes(const char* source, size_t sourceLen, u32& hash, xr_set<xr_string>& visited);
 
 public:
-    void SetTarget(xray::render::SlangCompiler::Target target) {
-        m_target = target;
-        m_cache.SetBackendSubdir(target == xray::render::SlangCompiler::Target::SPIRV ? "vk" : "dx12");
-    }
+    void SetTarget(xray::render::SlangCompiler::Target target);
     xray::render::SlangCompiler::Target GetTarget() const { return m_target; }
 
 private:

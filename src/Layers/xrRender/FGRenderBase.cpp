@@ -86,6 +86,14 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
 
 void FGRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
+#if defined(XRAY_USE_METAL)
+    for (pcstr option = Core.Params; (option = strstr(option, "-metal")) != nullptr; ++option)
+    {
+        if ((option == Core.Params || option[-1] == ' ' || option[-1] == '\t')
+            && (option[6] == '\0' || option[6] == ' ' || option[6] == '\t'))
+            ps_fg_render_mode = FG_RENDER_METAL;
+    }
+#endif
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
         windowFlags |= SDL_WINDOW_VULKAN;
 #if defined(XRAY_USE_METAL)
@@ -121,12 +129,6 @@ void FGRenderBase::OnDeviceCreate(pcstr shName)
 void FGRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
     ZoneScoped;
-
-    if (ps_fg_render_mode == FG_RENDER_METAL)
-    {
-        FATAL("Native Metal game rendering is not supported. Use -metal for the presentation-only launcher.");
-        return;
-    }
 
     const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
 

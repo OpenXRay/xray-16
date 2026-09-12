@@ -184,10 +184,12 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_shaderLoader = xr_new<framegraph::ShaderLoader>(device->GetSlangCompiler());
     if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
         m_shaderLoader->SetTarget(SlangCompiler::Target::SPIRV);
+    else if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Metal)
+        m_shaderLoader->SetTarget(SlangCompiler::Target::Metal);
     else
         m_shaderLoader->SetTarget(SlangCompiler::Target::DXIL);
     Msg("* [FrameGraphRenderer] ShaderLoader initialized (target: %s)",
-        m_shaderLoader->GetTarget() == SlangCompiler::Target::SPIRV ? "SPIRV" : "DXIL");
+        SlangCompiler::GetTargetName(m_shaderLoader->GetTarget()));
 
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();

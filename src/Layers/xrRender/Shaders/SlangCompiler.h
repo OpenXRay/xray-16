@@ -25,6 +25,7 @@ public:
     {
         DXBC,      // DirectX Bytecode (Shader Model 5.0/5.1) - DX11
         DXIL,      // DirectX Intermediate Language (Shader Model 6.x) - DX12
+        Metal,
         SPIRV,     // SPIR-V (Vulkan)
         GLSL       // GLSL (OpenGL) - future support
     };

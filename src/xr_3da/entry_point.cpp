@@ -41,13 +41,18 @@ int entry_point(pcstr commandLine)
     profiler_raii raii;
     for (pcstr option = commandLine; (option = strstr(option, "-metal")) != nullptr; ++option)
     {
-        if ((option == commandLine || option[-1] == ' ' || option[-1] == '\t')
-            && (option[6] == '\0' || option[6] == ' ' || option[6] == '\t'))
+        if (option != commandLine && option[-1] != ' ' && option[-1] != '\t')
+            continue;
+        const bool presentation = strncmp(option, "-metal-presentation", 19) == 0
+            && (option[19] == '\0' || option[19] == ' ' || option[19] == '\t');
+        const bool game = option[6] == '\0' || option[6] == ' ' || option[6] == '\t';
+        if (presentation || game)
         {
 #if defined(XRAY_USE_METAL)
-            return RunMetalPresentation(commandLine);
+            if (presentation)
+                return RunMetalPresentation(commandLine);
 #else
-            std::fprintf(stderr, "Native Metal presentation requires an Apple build with NVRHI_WITH_METAL3=ON. Vulkan remains the default.\n");
+            std::fprintf(stderr, "Native Metal requires an Apple build with NVRHI_WITH_METAL3=ON. Vulkan remains the default.\n");
             return 1;
 #endif
         }
