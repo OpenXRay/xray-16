@@ -436,7 +436,8 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
                 float h_ = map->GetHeading() + h;
                 sp->SetHeading(h_);
             }
-            map->AttachChild(sp);
+            if (!sp->GetParent())
+                map->AttachChild(sp);
         }
 
         if (IsGameTypeSingle())
@@ -445,7 +446,8 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
             if (s)
             {
                 s->SetWndPos(sp->GetWndPos());
-                map->AttachChild(s);
+                if (!s->GetParent())
+                    map->AttachChild(s);
             }
         }
 

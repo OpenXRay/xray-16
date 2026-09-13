@@ -11,6 +11,45 @@
 #include <getopt.h>
 #endif
 
+#if defined(XR_PLATFORM_APPLE)
+#include <SDL.h>
+
+namespace
+{
+bool EnvironmentFlagEnabled(pcstr name)
+{
+    pcstr value = SDL_getenv(name);
+    return value && value[0] && xr_strcmp(value, "0") != 0 && xr_strcmp(value, "false") != 0 &&
+        xr_strcmp(value, "off") != 0;
+}
+
+std::string GetBundledDefaultCommandLine()
+{
+    char* basePath = SDL_GetBasePath();
+    if (!basePath)
+        return {};
+
+    std::string commandLinePath = basePath;
+    SDL_free(basePath);
+    commandLinePath += "../Resources/openxray/default_command_line.txt";
+
+    FILE* file = fopen(commandLinePath.c_str(), "r");
+    if (!file)
+        return {};
+
+    char commandLine[1024]{};
+    const bool hasCommandLine = fgets(commandLine, sizeof(commandLine), file) != nullptr;
+    fclose(file);
+
+    if (!hasCommandLine)
+        return {};
+
+    commandLine[strcspn(commandLine, "\r\n")] = '\0';
+    return commandLine;
+}
+} // namespace
+#endif
+
 // Always request high performance GPU
 extern "C"
 {
@@ -84,29 +123,28 @@ int main(int argc, char *argv[])
 
     try
     {
-        char* commandLine = nullptr;
-        int i;
-        if(argc > 1)
+#if defined(XR_PLATFORM_APPLE)
+        std::string commandLine = GetBundledDefaultCommandLine();
+        if (EnvironmentFlagEnabled("OPENXRAY_SKIP_INTRO") && commandLine.find("-nointro") == std::string::npos)
         {
-            size_t sum = 1;
-            for(i = 1; i < argc; ++i)
-                sum += strlen(argv[i]) + 1;
-
-            commandLine = (char*)xr_malloc(sum);
-            ZeroMemory(commandLine, sum);
-
-            for(i = 1; i < argc; ++i)
-            {
-                strcat(commandLine, argv[i]);
-                strcat(commandLine, " ");
-            }
-
-            result = entry_point(commandLine);
-
-            xr_free(commandLine);
+            if (!commandLine.empty())
+                commandLine += ' ';
+            commandLine += "-nointro";
         }
-        else
-            result = entry_point("");
+#else
+        std::string commandLine;
+#endif
+
+        if (!commandLine.empty())
+            commandLine += ' ';
+
+        for (int i = 1; i < argc; ++i)
+        {
+            commandLine += argv[i];
+            commandLine += ' ';
+        }
+
+        result = entry_point(commandLine.c_str());
     }
     catch (const std::overflow_error& e)
     {

@@ -1,6 +1,7 @@
 #pragma once
 #include "UIDialogWnd.h"
 #include "encyclopedia_article_defs.h"
+#include "UIPdaAux.h"
 
 class CInventoryOwner;
 class CUIFrameLineWnd;
@@ -18,6 +19,11 @@ class CUIActorInfoWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
+class CUIEventsWnd;
+class CUIDiaryWnd;
+class CUIPdaContactsWnd;
+class CUIStalkersRankingWnd;
+class CUIEncyclopediaWnd;
 class UIHint;
 
 class CUIPdaWnd final : public CUIDialogWnd
@@ -49,6 +55,12 @@ public:
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
+
+    CUIEventsWnd* pUISocTasks;
+    CUIDiaryWnd* pUISocDiary;
+    CUIPdaContactsWnd* pUISocContacts;
+    CUIStalkersRankingWnd* pUISocRanking;
+    CUIEncyclopediaWnd* pUISocEncyclopedia;
 
     virtual void Reset();
 
@@ -90,6 +102,7 @@ public:
     bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
+    void PdaContentsChanged(pda_section::part type);
 
     pcstr GetDebugType() override { return "CUIPdaWnd"; }
 };

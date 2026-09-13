@@ -148,6 +148,22 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, pcstr path, int index, CUIStati
     InitTexture(xml_doc, path, index, pWnd);
     InitTextureOffset(xml_doc, path, index, pWnd);
 
+    if (ShadowOfChernobylMode && strstr(xml_doc.m_xml_file_name, "ui_mm_load_dlg.xml") &&
+        xr_strcmp(path, "back_video") == 0)
+    {
+        // The original full-screen load-dialog video is not clipped correctly
+        // by the modern widescreen UI path and covers the load form.
+        pWnd->Show(false);
+    }
+
+    if (ShadowOfChernobylMode && strstr(xml_doc.m_xml_file_name, "ui_mm_load_dlg.xml") &&
+        xr_strcmp(path, "form:picture") == 0)
+    {
+        // The SoC XML uses clipper="1" to keep a large fallback image inside
+        // the save preview. The current UI renderer does not support that rule.
+        pWnd->SetStretchTexture(true);
+    }
+
     cpcstr mirroring = xml_doc.ReadAttrib(path, index, "mirror", "");
     if (0 == xr_strcmp(mirroring, "h"))
         pWnd->GetStaticItem()->SetMirrorMode(EUIMirroring::Horisontal);
@@ -811,7 +827,8 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, pcstr path,
         newButton->m_btn_id = xml_doc.ReadAttrib("button", i, "id");
         if (!newButton->m_btn_id.size())
         {
-            R_ASSERT4(defaultIdsAllowed, "Tab control tab doesn't have 'id' assigned.", xml_doc.m_xml_file_name, path);
+            R_ASSERT4(ShadowOfChernobylMode || defaultIdsAllowed,
+                "Tab control tab doesn't have 'id' assigned.", xml_doc.m_xml_file_name, path);
             Msg("~ [%s] doesn't have `id` tag in file [%s]", xml_doc.m_xml_file_name, path);
             string32 temp;
             xr_sprintf(temp, "%d", i);

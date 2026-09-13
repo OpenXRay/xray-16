@@ -5703,6 +5703,15 @@
     <ClInclude Include="ui\UIPdaWnd.h">
       <Filter>UI\Common\PDA</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIPdaAux.h">
+      <Filter>UI\Common\PDA</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIPdaContactsWnd.h">
+      <Filter>UI\Common\PDA</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIPdaListItem.h">
+      <Filter>UI\Common\PDA</Filter>
+    </ClInclude>
     <ClInclude Include="ui\map_hint.h">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClInclude>
@@ -5727,6 +5736,9 @@
     <ClInclude Include="ui\UIRankingWnd.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIStalkersRankingWnd.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClInclude>
     <ClInclude Include="ui\UIMapLegend.h">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
@@ -5736,10 +5748,34 @@
     <ClInclude Include="ui\UITaskWnd.h">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UITaskDescrWnd.h">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UITaskItem.h">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClInclude>
     <ClInclude Include="ui\UILogsWnd.h">
       <Filter>UI\Common\PDA\logs</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIDiaryWnd.h">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaWnd.h">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEventsWnd.h">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UITreeViewItem.h">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClInclude>
     <ClInclude Include="ui\UINewsItemWnd.h">
+      <Filter>UI\Common\PDA\logs\News</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UINewsWnd.h">
       <Filter>UI\Common\PDA\logs\News</Filter>
     </ClInclude>
     <ClInclude Include="ui\ui_af_params.h">
@@ -8866,6 +8902,15 @@
     <ClCompile Include="ui\UIPdaWnd.cpp">
       <Filter>UI\Common\PDA</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UIPdaAux.cpp">
+      <Filter>UI\Common\PDA</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaContactsWnd.cpp">
+      <Filter>UI\Common\PDA</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaListItem.cpp">
+      <Filter>UI\Common\PDA</Filter>
+    </ClCompile>
     <ClCompile Include="ui\map_hint.cpp">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>
@@ -8893,6 +8938,9 @@
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UIStalkersRankingWnd.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
     <ClCompile Include="ui\UIMapLegend.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>
@@ -8902,10 +8950,34 @@
     <ClCompile Include="ui\UITaskWnd.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UITaskDescrWnd.cpp">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UITaskItem.cpp">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClCompile>
     <ClCompile Include="ui\UILogsWnd.cpp">
       <Filter>UI\Common\PDA\logs</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UIDiaryWnd2.cpp">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEventsWnd.cpp">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UITreeViewItem.cpp">
+      <Filter>UI\Common\PDA\logs</Filter>
+    </ClCompile>
     <ClCompile Include="ui\UINewsItemWnd.cpp">
+      <Filter>UI\Common\PDA\logs\News</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UINewsWnd.cpp">
       <Filter>UI\Common\PDA\logs\News</Filter>
     </ClCompile>
     <ClCompile Include="ui\ui_af_params.cpp">

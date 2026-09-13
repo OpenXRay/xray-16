@@ -25,6 +25,7 @@ public:
     virtual void InitButton(Fvector2 pos, Fvector2 size);
     bool InitTexture(pcstr texture, bool fatal = true) override;
     virtual bool InitTexture(pcstr tex_enabled, pcstr tex_disabled, pcstr tex_touched, pcstr tex_highlighted, bool fatal = true);
+    void SetBackgroundStretchTexture(bool value) { m_stretchBackgroundTexture = value; }
 
     //.			void 	SetTextColor				(u32 color);
     virtual void SetTextureOffset(float x, float y);
@@ -56,6 +57,7 @@ public:
     CUI_IB_FrameLineWnd* m_back_frameline;
 
 private:
+    bool m_stretchBackgroundTexture{ true };
     void PlaySoundH();
     void PlaySoundT();
 

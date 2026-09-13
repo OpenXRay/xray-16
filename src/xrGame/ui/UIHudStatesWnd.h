@@ -19,38 +19,38 @@ private:
     typedef CUIWindow inherited;
     //-	typedef ALife::EInfluenceType	EIndicatorType;
 
-    CUIStatic* m_back;
-    CUIStatic* m_back_v;
-    CUIStatic* m_back_over_arrow;
-    CUIStatic* m_static_health;
-    CUIStatic* m_static_armor;
-    CUIStatic* m_static_weapon;
+    CUIStatic* m_back{};
+    CUIStatic* m_back_v{};
+    CUIStatic* m_back_over_arrow{};
+    CUIStatic* m_static_health{};
+    CUIStatic* m_static_armor{};
+    CUIStatic* m_static_weapon{};
 
     xr_map<ALife::EInfluenceType, CUIStatic*> m_resist_back;
     xr_map<ALife::EInfluenceType, CUIStatic*> m_indik;
 
-    CUIStatic* m_ui_weapon_cur_ammo;
-    CUIStatic* m_ui_weapon_fmj_ammo;
-    CUIStatic* m_ui_weapon_ap_ammo;
-    CUIStatic* m_ui_weapon_third_ammo; //Alundaio
-    CUIStatic* m_fire_mode;
-    CUIStatic* m_ui_grenade;
+    CUIStatic* m_ui_weapon_cur_ammo{};
+    CUIStatic* m_ui_weapon_fmj_ammo{};
+    CUIStatic* m_ui_weapon_ap_ammo{};
+    CUIStatic* m_ui_weapon_third_ammo{}; //Alundaio
+    CUIStatic* m_fire_mode{};
+    CUIStatic* m_ui_grenade{};
     II_BriefInfo m_item_info;
 
-    CUIStatic* m_ui_weapon_sign_ammo;
-    CUIStatic* m_ui_weapon_icon;
+    CUIStatic* m_ui_weapon_sign_ammo{};
+    CUIStatic* m_ui_weapon_icon{};
     Frect m_ui_weapon_icon_rect;
 
-    CUIProgressBar* m_ui_health_bar;
-    CUIProgressBar* m_ui_armor_bar;
-    CUIProgressBar* m_ui_stamina_bar;
+    CUIProgressBar* m_ui_health_bar{};
+    CUIProgressBar* m_ui_armor_bar{};
+    CUIProgressBar* m_ui_stamina_bar{};
 
-    CUIProgressShape* m_progress_self;
-    CUIStatic* m_radia_damage;
+    CUIProgressShape* m_progress_self{};
+    CUIStatic* m_radia_damage{};
     UI_Arrow* m_arrow{};
     UI_Arrow* m_arrow_shadow{};
 
-    CUIStatic* m_bleeding;
+    CUIStatic* m_bleeding{};
     /*
         CUIStatic*			m_bleeding_lev1;
         CUIStatic*			m_bleeding_lev2;

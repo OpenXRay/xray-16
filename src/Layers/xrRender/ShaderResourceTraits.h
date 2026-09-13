@@ -159,7 +159,9 @@ static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
     CHK_GL(glUseProgramStages(pp, GL_FRAGMENT_SHADER_BIT, ps));
     CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT,   vs));
     CHK_GL(glUseProgramStages(pp, GL_GEOMETRY_SHADER_BIT, gs));
+#ifndef XR_PLATFORM_APPLE
     CHK_GL(glValidateProgramPipeline(pp));
+#endif
     return pp;
 }
 #endif

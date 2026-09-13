@@ -131,8 +131,11 @@ void CGameTask::Load(const TASK_ID& id)
                 0 != xr_stricmp(objective.m_icon_texture_name.c_str(), "ui\\ui_icons_task"))
             {
                 objective.m_icon_rect = CUITextureMaster::GetTextureRect(objective.m_icon_texture_name.c_str());
-                objective.m_icon_rect.rb.sub(objective.m_icon_rect.rb, objective.m_icon_rect.lt);
-                objective.m_icon_texture_name = CUITextureMaster::GetTextureFileName(objective.m_icon_texture_name.c_str());
+                if (!ShadowOfChernobylMode)
+                {
+                    objective.m_icon_rect.rb.sub(objective.m_icon_rect.rb, objective.m_icon_rect.lt);
+                    objective.m_icon_texture_name = CUITextureMaster::GetTextureFileName(objective.m_icon_texture_name.c_str());
+                }
             }
             else if (objective.m_icon_texture_name.size())
             {
@@ -365,6 +368,13 @@ void CGameTask::OnArrived()
 
     FillEncyclopedia();
     CreateMapLocation(false);
+    for (SGameTaskObjective& objective : m_Objectives)
+    {
+        // SoC creates hidden objective locations only after the prior
+        // objective is complete. UpdateActiveTask performs that step.
+        if (!ShadowOfChernobylMode || objective.m_def_location_enabled)
+            objective.CreateMapLocation(false);
+    }
 }
 
 void CGameTask::FillEncyclopedia() const
@@ -399,32 +409,53 @@ void SGameTaskObjective::CreateMapLocation(bool on_load)
         return;
     }
 
+    string512 ownerIdBuffer;
+    if (m_idx == ROOT_TASK_OBJECTIVE)
+        xr_strcpy(ownerIdBuffer, m_parent->m_ID.c_str());
+    else
+        xr_sprintf(ownerIdBuffer, "%s/%u", m_parent->m_ID.c_str(), m_idx);
+    const shared_str ownerId = ownerIdBuffer;
+
+    bool created = false;
     if (on_load)
     {
         xr_vector<CMapLocation*> res;
         Level().MapManager().GetMapLocations(m_map_location, m_map_object_id, res);
-        xr_vector<CMapLocation*>::iterator it = res.begin();
-        xr_vector<CMapLocation*>::iterator it_e = res.end();
-        for (; it != it_e; ++it)
+        for (CMapLocation* ml : res)
         {
-            CMapLocation* ml = *it;
-            if (ml->m_owner_task_id == m_parent->m_ID)
+            if (ml->m_owner_task_id == ownerId)
             {
                 m_linked_map_location = ml;
                 break;
             }
         }
+
+        // Older saves used only the task ID. Let the first matching objective
+        // claim that location. Other objectives then get separate locations.
+        if (!m_linked_map_location)
+        {
+            for (CMapLocation* ml : res)
+            {
+                if (ml->m_owner_task_id == m_parent->m_ID)
+                {
+                    m_linked_map_location = ml;
+                    m_linked_map_location->m_owner_task_id = ownerId;
+                    break;
+                }
+            }
+        }
         //.		m_linked_map_location =	Level().MapManager().GetMapLocation(m_map_location, m_map_object_id);
     }
-    else
+    if (!m_linked_map_location)
     {
         m_linked_map_location = Level().MapManager().AddMapLocation(m_map_location, m_map_object_id);
-        m_linked_map_location->m_owner_task_id = m_parent->m_ID;
+        m_linked_map_location->m_owner_task_id = ownerId;
+        created = true;
     }
 
     VERIFY(m_linked_map_location);
 
-    if (!on_load)
+    if (!on_load || created)
     {
         if (m_map_hint.size())
         {
@@ -432,6 +463,13 @@ void SGameTaskObjective::CreateMapLocation(bool on_load)
         }
         m_linked_map_location->DisablePointer();
         m_linked_map_location->SetSerializable(true);
+        if (ShadowOfChernobylMode)
+        {
+            if (m_def_location_enabled)
+                m_linked_map_location->EnableSpot();
+            else
+                m_linked_map_location->DisableSpot();
+        }
     }
 
     if (m_linked_map_location->complex_spot())
@@ -621,10 +659,26 @@ void CGameTask::save(IWriter& stream)
 void CGameTask::load(IReader& stream)
 {
     load_data(m_ID, stream);
+
+    // Saved tasks are default-constructed, so load their current XML data
+    // after the task ID becomes available. This repairs missing legacy icon
+    // data in old SoC saves while saved state and progress still load below.
+    if (ShadowOfChernobylMode)
+        Load(m_ID);
+
+    const shared_str configuredRootIcon = m_icon_texture_name;
+    const Frect configuredRootIconRect = m_icon_rect;
+
     load_data(m_priority, stream);
     SGameTaskObjective::load(stream);
 
-    u32 count;
+    if (ShadowOfChernobylMode && configuredRootIcon.size())
+    {
+        m_icon_texture_name = configuredRootIcon;
+        m_icon_rect = configuredRootIconRect;
+    }
+
+    u32 count{};
     load_data(count, stream);
     m_Objectives.resize(count);
 
@@ -636,6 +690,20 @@ void CGameTask::load(IReader& stream)
 
     CommitScriptHelperContents();
     CreateMapLocation(true);
+    for (u32 i = 0; i < m_Objectives.size(); ++i)
+    {
+        SGameTaskObjective& objective = m_Objectives[i];
+        const bool hiddenLocationAvailable =
+            ShadowOfChernobylMode && !objective.m_def_location_enabled && i > 0 &&
+            m_Objectives[i - 1].GetTaskState() == eTaskStateCompleted;
+
+        if (!ShadowOfChernobylMode || objective.m_def_location_enabled || hiddenLocationAvailable)
+        {
+            objective.CreateMapLocation(true);
+            if (hiddenLocationAvailable && objective.LinkedMapLocation())
+                objective.LinkedMapLocation()->EnableSpot();
+        }
+    }
 }
 
 void SGameTaskObjective::SetIconName_script(pcstr tex)

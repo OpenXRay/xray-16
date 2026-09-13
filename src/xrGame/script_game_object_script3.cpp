@@ -165,12 +165,11 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
 
         .def("give_game_news", +[](CScriptGameObject* self,
-            pcstr news, pcstr texture_name, Frect /*tex_rect*/, int delay, int show_time)
+            pcstr news, pcstr texture_name, Frect texture_rect, int delay, int show_time)
         {
             // SOC give_game_news style
-            // tex_rect is ignored, we could add support for it back, if really needed.
-            // It also should be safe to pass nullptr to caption param
-            self->GiveGameNews(nullptr, news, texture_name, delay, show_time);
+            // It is safe to pass nullptr to the caption parameter.
+            self->GiveGameNews(nullptr, news, texture_name, texture_rect, delay, show_time);
             return true;
         })
         .def("give_game_news",

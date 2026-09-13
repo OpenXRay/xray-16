@@ -2131,6 +2131,30 @@ target_sources(xrGame PRIVATE
     ui/UIAchievements.h
     ui/UIActorInfo.cpp
     ui/UIActorInfo.h
+    ui/UIDiaryWnd2.cpp
+    ui/UIDiaryWnd.h
+    ui/UIEncyclopediaArticleWnd.cpp
+    ui/UIEncyclopediaArticleWnd.h
+    ui/UIEncyclopediaWnd.cpp
+    ui/UIEncyclopediaWnd.h
+    ui/UIEventsWnd.cpp
+    ui/UIEventsWnd.h
+    ui/UINewsWnd.cpp
+    ui/UINewsWnd.h
+    ui/UIPdaAux.cpp
+    ui/UIPdaAux.h
+    ui/UIPdaContactsWnd.cpp
+    ui/UIPdaContactsWnd.h
+    ui/UIPdaListItem.cpp
+    ui/UIPdaListItem.h
+    ui/UIStalkersRankingWnd.cpp
+    ui/UIStalkersRankingWnd.h
+    ui/UITaskDescrWnd.cpp
+    ui/UITaskDescrWnd.h
+    ui/UITaskItem.cpp
+    ui/UITaskItem.h
+    ui/UITreeViewItem.cpp
+    ui/UITreeViewItem.h
     ui/UIActorMenu_action.cpp
     ui/UIActorMenu.cpp
     ui/UIActorMenuDeadBodySearch.cpp
@@ -2520,6 +2544,22 @@ endif()
 set_target_properties(xrGame PROPERTIES
     PREFIX ""
     UNITY_BUILD_BATCH_SIZE 50
+)
+
+set_source_files_properties(
+    ui/UIDiaryWnd2.cpp
+    ui/UIEncyclopediaArticleWnd.cpp
+    ui/UIEncyclopediaWnd.cpp
+    ui/UIEventsWnd.cpp
+    ui/UINewsWnd.cpp
+    ui/UIPdaAux.cpp
+    ui/UIPdaContactsWnd.cpp
+    ui/UIPdaListItem.cpp
+    ui/UIStalkersRankingWnd.cpp
+    ui/UITaskDescrWnd.cpp
+    ui/UITaskItem.cpp
+    ui/UITreeViewItem.cpp
+    PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
 )
 
 target_precompile_headers(xrGame

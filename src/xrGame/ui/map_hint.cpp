@@ -89,7 +89,9 @@ void CUIMapLocationHint::SetInfoMSpot(CMapSpot* spot)
     CMapLocation* ml = spot->MapLocation();
 
     CGameTask* gt = Level().GameTaskManager().HasGameTask(ml, true);
-    if (gt)
+    // SoC has only the simple map-hint layout. The detailed task layout is
+    // a CoP control set and its fields do not exist in hint_item.xml.
+    if (gt && !ShadowOfChernobylMode)
         SetInfoTask(gt);
     else
         SetInfoStr(ml->GetHint());
@@ -97,6 +99,18 @@ void CUIMapLocationHint::SetInfoMSpot(CMapSpot* spot)
 
 void CUIMapLocationHint::SetInfoTask(CGameTask* task)
 {
+    if (!task)
+        return;
+
+    // Keep this path safe for UI layouts which do not define detailed task
+    // controls. This also protects custom game-data layouts.
+    if (!m_info["t_icon"] || !m_info["t_caption"] || !m_info["t_time"] ||
+        !m_info["t_time_rem"] || !m_info["t_hint_text"])
+    {
+        SetInfoStr(task->m_Title.c_str());
+        return;
+    }
+
     SetInfoMode(2);
     CUIStatic* S = m_info["t_icon"];
 

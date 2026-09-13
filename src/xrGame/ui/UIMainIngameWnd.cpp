@@ -76,7 +76,13 @@ void CUIMainIngameWnd::Init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
-    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
+    if (!CUIXmlInit::InitWindow(uiXml, "main", 0, this, false))
+    {
+        if (ShadowOfChernobylMode)
+            SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
+        else
+            CUIXmlInit::InitWindow(uiXml, "main", 0, this);
+    }
 
     Enable(false);
 
@@ -220,7 +226,7 @@ void CUIMainIngameWnd::Init()
         AttachChild(UIMotionIcon);
     }
 
-    UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
+    UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this, false);
 
     if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
     {
@@ -266,17 +272,20 @@ void CUIMainIngameWnd::Draw()
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
     // show IO icon
-    bool IOActive = (FS.dwOpenCounter > 0);
-    if (IOActive)
-        UIStaticDiskIO_start_time = Device.fTimeGlobal;
-
-    if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
-        UIStaticDiskIO->Show(false);
-    else
+    if (UIStaticDiskIO)
     {
-        u32 alpha = clampr(iFloor(255.f * (1.f - (Device.fTimeGlobal - UIStaticDiskIO_start_time) / 1.f)), 0, 255);
-        UIStaticDiskIO->Show(true);
-        UIStaticDiskIO->SetTextureColor(color_rgba(255, 255, 255, alpha));
+        bool IOActive = (FS.dwOpenCounter > 0);
+        if (IOActive)
+            UIStaticDiskIO_start_time = Device.fTimeGlobal;
+
+        if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
+            UIStaticDiskIO->Show(false);
+        else
+        {
+            u32 alpha = clampr(iFloor(255.f * (1.f - (Device.fTimeGlobal - UIStaticDiskIO_start_time) / 1.f)), 0, 255);
+            UIStaticDiskIO->Show(true);
+            UIStaticDiskIO->SetTextureColor(color_rgba(255, 255, 255, alpha));
+        }
     }
     FS.dwOpenCounter = 0;
 

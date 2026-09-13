@@ -17,7 +17,7 @@ public:
         flMax
     };
 
-    CUIFrameLineWnd(pcstr window_name);
+    CUIFrameLineWnd(pcstr window_name = "CUIFrameLineWnd");
 
     bool InitTexture(pcstr texture, bool fatal = true) override;
     bool InitTextureEx(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true) override;
