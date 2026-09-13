@@ -16,6 +16,7 @@ class object_shift
 
 public:
     object_shift() = default;
+    void reset();
     void set_taget(float taget, float time);
     float shift() const;
     void freeze(bool v) { b_freeze = v; }
