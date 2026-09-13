@@ -276,6 +276,13 @@ void CSoundRender_Emitter::dispatch_prefill()
     prefill_task.store(task, std::memory_order_release);
 }
 
+void CSoundRender_Emitter::discard_prefilled_blocks()
+{
+    wait_prefill();
+    current_block = 0;
+    filled_blocks = 0;
+}
+
 void CSoundRender_Emitter::wait_prefill() const
 {
     if (const auto task = prefill_task.load(std::memory_order_acquire))
