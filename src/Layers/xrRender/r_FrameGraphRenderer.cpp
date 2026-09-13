@@ -266,6 +266,8 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
+    if (auto* backend = m_device->GetBackend())
+        backend->WaitForIdle();
 
     m_HWOCC.occq_destroy();
     m_PSLibrary.OnDestroy();
