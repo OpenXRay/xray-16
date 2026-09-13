@@ -21,7 +21,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(xrExternals)freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;INGAME_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -230,6 +230,9 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
       <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>

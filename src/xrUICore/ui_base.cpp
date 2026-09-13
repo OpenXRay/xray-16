@@ -7,7 +7,6 @@
 
 CUICursor& GetUICursor() { return GEnv.UI->GetUICursor(); }
 UICore& UI() { return *GEnv.UI; }
-extern ENGINE_API Fvector2 g_current_font_scale;
 
 void S2DVert::rotate_pt(const Fvector2& pivot, const float cosA, const float sinA, const float kx)
 {
@@ -220,7 +219,6 @@ UICore::UICore()
     OnUIReset();
 
     m_current_scale = &m_scale_;
-    g_current_font_scale.set(1.0f, 1.0f);
     m_currentPointType = IUIRender::pttTL;
 }
 
@@ -300,16 +298,12 @@ void UICore::pp_start()
         float(Device.dwHeight)));
 
     m_current_scale = &m_pp_scale_;
-
-    g_current_font_scale.set(float(Device.dwWidth) / float(Device.dwWidth),
-        float(Device.dwHeight) / float(Device.dwHeight));
 }
 
 void UICore::pp_stop()
 {
     m_bPostprocess = false;
     m_current_scale = &m_scale_;
-    g_current_font_scale.set(1.0f, 1.0f);
 }
 
 void UICore::RenderFont()

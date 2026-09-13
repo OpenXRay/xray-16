@@ -8,6 +8,10 @@
 #include "FS_impl.h"
 #include <SDL.h>
 
+#if defined(XR_PLATFORM_WINDOWS)
+#include "xrCore/Text/Utf8Utils.hpp"
+#endif
+
 XRCORE_API str_container* g_pStringContainer = nullptr;
 
 #if 1
@@ -220,7 +224,11 @@ void str_container::verify() const
 void str_container::dump() const
 {
     impl->cs.Enter();
+#if defined(XR_PLATFORM_WINDOWS)
+    FILE* F = _wfopen(L"d:\\$str_dump$.txt", L"w");
+#else
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
+#endif
     impl->dump(F);
     fclose(F);
     impl->cs.Leave();
@@ -402,7 +410,11 @@ void str_container::dump()
     impl->cs.Enter();
     str_container_impl::cdb::iterator it = impl->container.begin();
     str_container_impl::cdb::iterator end = impl->container.end();
+#if defined(XR_PLATFORM_WINDOWS)
+    FILE* F = _wfopen(L"d:\\$str_dump$.txt", L"w");
+#else
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
+#endif
     for (; it != end; it++)
         fprintf(
             F, "ref[%4d]-len[%3d]-crc[%8X] : %s\n", (*it)->dwReference, (*it)->dwLength, (*it)->dwCRC, (*it)->value);

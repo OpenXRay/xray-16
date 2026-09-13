@@ -14,7 +14,17 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(XR_PLATFORM_POSIX)
+#if defined(XR_PLATFORM_WINDOWS)
+struct xr_finddata_t
+{
+    unsigned attrib;
+    __time64_t time_create;
+    __time64_t time_access;
+    __time64_t time_write;
+    _fsize_t size;
+    char name[1024];
+};
+#elif defined(XR_PLATFORM_POSIX)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
@@ -48,6 +58,8 @@ struct _finddata32_t
     _fsize_t size;
     char name[FILENAME_MAX];
 };
+
+typedef _finddata_t xr_finddata_t;
 #endif
 
 class CStreamReader;
@@ -150,7 +162,7 @@ private:
     using files_set = xr_set<file, file_pred>;
     using files_it = files_set::iterator;
 
-    using FFVec = xr_vector<_finddata_t>;
+    using FFVec = xr_vector<xr_finddata_t>;
     FFVec rec_files;
 
     int m_iLockRescan;
@@ -165,7 +177,7 @@ private:
     const file* RegisterExternal(pcstr name);
     const file* Register(pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
     void ProcessArchive(pcstr path);
-    void ProcessOne(pcstr path, const _finddata_t& entry);
+    void ProcessOne(pcstr path, const xr_finddata_t& entry);
     bool Recurse(pcstr path);
 
     files_it file_find_it(pcstr n);

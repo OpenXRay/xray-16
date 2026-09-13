@@ -51,7 +51,7 @@ float CUIPdaKillMessage::InitText(CUIStatic& refStatic, float x, ColoredName& in
         return 0.0f;
 
     CGameFont* pFont = refStatic.GetFont();
-    float _eps = pFont->SizeOf_(' ');
+    float _eps = pFont->SizeOf_(" ");
     UI().ClientToScreenScaledWidth(_eps); // add one letter
 
     float height = pFont->CurrentHeight_();

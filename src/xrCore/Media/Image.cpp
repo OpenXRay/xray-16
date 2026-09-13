@@ -2,6 +2,9 @@
 #include "Image.hpp"
 
 #include <cstdio>
+#if defined(XR_PLATFORM_WINDOWS)
+#include "xrCore/Text/Utf8Utils.hpp"
+#endif
 
 using namespace XRay::Media;
 
@@ -18,7 +21,12 @@ Image::~Image()
 
 void Image::SaveTGA(const char* name, ImageDataFormat format, bool align)
 {
+#if defined(XR_PLATFORM_WINDOWS)
+    const std::wstring wname = XRay::Utf8::ToWide(name);
+    FILE* file = _wfopen(wname.c_str(), L"wb");
+#else
     FILE* file = std::fopen(name, "wb");
+#endif
     auto writerFunc = [&](void* data, size_t dataSize) { std::fwrite(data, dataSize, 1, file); };
     SaveTGA(writerFunc, format, align);
     std::fclose(file);

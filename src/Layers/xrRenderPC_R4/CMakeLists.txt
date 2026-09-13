@@ -32,6 +32,7 @@ target_link_libraries(xrRenderPC_R4
     xrScriptEngine
     xrAPI
     xrMiscMath
+    freetype
 )
 
 target_compile_definitions(xrRenderPC_R4

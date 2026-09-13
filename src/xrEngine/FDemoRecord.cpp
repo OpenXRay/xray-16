@@ -60,46 +60,11 @@ Fbox get_level_screenshot_bound()
     return res;
 }
 
-pcstr GetFontTexName(pcstr section)
-{
-    static const char* tex_names[] = { "texture800", "texture", "texture1600" };
-    int def_idx = 1; // default 1024x768
-    int idx = def_idx;
-
-#if 0
-    u32 w = Device.dwWidth;
-
-    if (w <= 800)
-        idx = 0;
-    else if (w <= 1280)
-        idx = 1;
-    else
-        idx = 2;
-#else
-    u32 h = Device.dwHeight;
-
-    if (h <= 600)
-        idx = 0;
-    else if (h <= 1024)
-        idx = 1;
-    else
-        idx = 2;
-#endif
-
-    while (idx >= 0)
-    {
-        if (pSettings->line_exist(section, tex_names[idx]))
-            return pSettings->r_string(section, tex_names[idx]);
-        --idx;
-    }
-    return pSettings->r_string(section, tex_names[def_idx]);
-}
-
 CDemoRecord::CDemoRecord(const char* name, float life_time)
     : CEffectorCam(cefDemo, life_time /*,false*/),
       m_speed(speed_1),
       m_angle_speed(speed_1),
-      m_Font(pSettings->r_string(DEMO_RECORD_HELP_FONT, "shader"), GetFontTexName(DEMO_RECORD_HELP_FONT))
+      m_Font(DEMO_RECORD_HELP_FONT)
 {
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 

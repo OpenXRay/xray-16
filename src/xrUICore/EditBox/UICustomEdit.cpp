@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "UICustomEdit.h"
 #include "Lines/UILines.h"
+#include "xrCore/Text/Utf8Utils.hpp"
 #include "xrEngine/line_edit_control.h"
 #include "xrEngine/xr_input.h"
 
@@ -96,7 +97,7 @@ void CUICustomEdit::SetPasswordMode(bool mode) { TextItemControl()->SetPasswordM
 
 void CUICustomEdit::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    //кто-то другой захватил клавиатуру
+    // someone else captured the keyboard
     if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && m_bInputFocus)
     {
         CaptureFocus(false);
@@ -173,53 +174,91 @@ void CUICustomEdit::Draw()
 
     if (ec().need_update() || m_force_update)
     {
-        float ui_width = GetWidth();
+        const float ui_width = GetWidth();
 
-        LPCSTR cursor_str = ec().str_before_cursor();
-        u32 cursor_str_size = xr_strlen(cursor_str);
+        pcstr cursor_str = ec().str_before_cursor();
 
-        LPCSTR istr = cursor_str;
+        // Scroll left: skip whole codepoints until the tail fits in the edit box.
+        pcstr istr = cursor_str;
         float str_length = font->SizeOf_(istr);
         UI().ClientToScreenScaledWidth(str_length);
-
-        u32 ix = 0;
-        while ((str_length > ui_width) && (ix < cursor_str_size))
+        while (str_length > ui_width && *istr)
         {
-            istr = cursor_str + ix;
+            istr = XRay::Utf8::Next(istr);
             str_length = font->SizeOf_(istr);
             UI().ClientToScreenScaledWidth(str_length);
-            ++ix;
         }
-        istr = cursor_str + ix;
-        LPCSTR astr = ec().str_edit() + ix;
-        u32 str_size = xr_strlen(ec().str_edit());
 
-        u32 jx = 1;
-        strncpy_s(m_out_str, sizeof(m_out_str), astr, jx);
+        // The visible part of the full edit string starts at the same codepoint position
+        // as the scrolled prefix (istr). Use codepoint distance to avoid landing on a
+        // continuation byte if the edit buffer and the prefix buffer ever differ.
+        const size_t skipped_codepoints = XRay::Utf8::DistanceCodepoints(cursor_str, istr);
+        pcstr astr = XRay::Utf8::Advance(ec().str_edit(), skipped_codepoints);
 
-        str_length = font->SizeOf_(m_out_str);
-        UI().ClientToScreenScaledWidth(str_length);
+        // Guard against a misaligned start if the edit buffer ever ends with an incomplete codepoint.
+        while (*astr && XRay::Utf8::IsContinuationByte(static_cast<u8>(*astr)))
+            ++astr;
 
-        while ((str_length < ui_width) && (jx < str_size - ix))
+        // Grow the visible substring by whole codepoints until it no longer fits.
+        const size_t max_out_bytes = sizeof(m_out_str) - 1;
+        size_t visible_bytes = 0;
+        for (pcstr p = astr; *p; p = XRay::Utf8::Next(p))
         {
-            strncpy_s(m_out_str, sizeof(m_out_str), astr, jx);
+            size_t candidate_bytes = XRay::Utf8::Next(p) - astr;
+            if (candidate_bytes > max_out_bytes)
+            {
+                candidate_bytes = max_out_bytes;
+                strncpy_s(m_out_str, sizeof(m_out_str), astr, candidate_bytes);
+                m_out_str[candidate_bytes] = '\0';
+
+                str_length = font->SizeOf_(m_out_str);
+                UI().ClientToScreenScaledWidth(str_length);
+
+                if (visible_bytes == 0 || str_length < ui_width)
+                    visible_bytes = candidate_bytes;
+                break;
+            }
+
+            strncpy_s(m_out_str, sizeof(m_out_str), astr, candidate_bytes);
+            m_out_str[candidate_bytes] = '\0';
+
             str_length = font->SizeOf_(m_out_str);
             UI().ClientToScreenScaledWidth(str_length);
-            ++jx;
+
+            if (str_length < ui_width)
+            {
+                visible_bytes = candidate_bytes;
+            }
+            else if (visible_bytes == 0)
+            {
+                visible_bytes = candidate_bytes;
+                break;
+            }
+            else
+            {
+                break;
+            }
         }
-        strncpy_s(m_out_str, sizeof(m_out_str), astr, jx);
+        strncpy_s(m_out_str, sizeof(m_out_str), astr, visible_bytes);
+        m_out_str[visible_bytes] = '\0';
+
+        // Defensive: the visible substring must not end in the middle of a codepoint.
+        // Use IsValid() rather than a trailing-continuation check: a completed
+        // multi-byte codepoint (e.g. Cyrillic 'т' = D1 82) legitimately ends in a
+        // continuation byte and must NOT be trimmed here.
+        while (visible_bytes > 0 && !XRay::Utf8::IsValid(m_out_str))
+        {
+            --visible_bytes;
+            m_out_str[visible_bytes] = '\0';
+        }
 
         TextItemControl()->SetText(m_out_str);
 
         if (TextItemControl()->IsPasswordMode())
         {
-            string256 passText;
-            shared_str str(istr);
-            int sz = (int)str.size();
-            for (int i = 0; i < sz; i++)
-                passText[i] = '*';
-            passText[sz] = 0;
-            m_dx_cur = font->SizeOf_(passText); // cursor_str
+            const size_t sz = XRay::Utf8::LengthCodepoints(istr);
+            xr_string passText(sz, '*');
+            m_dx_cur = font->SizeOf_(passText.c_str()); // cursor_str
         }
         else
             m_dx_cur = font->SizeOf_(istr); // cursor_str

@@ -5,9 +5,7 @@
 #include "IInputReceiver.h"
 #include "GameFont.h"
 #include "XR_IOConsole.h"
-#include "xrCore/Text/StringConversion.hpp"
-
-#include <locale>
+#include "xrCore/Text/Utf8Utils.hpp"
 
 CInput* pInput = nullptr;
 
@@ -299,28 +297,51 @@ void CInput::KeyUpdate()
         case SDL_KEYDOWN:
             if (event.key.repeat)
                 continue;
-            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            {
+                ZoneScopedN("CInput::KeyUpdate/IR_OnKeyboardPress");
+                ZoneTextF("#%d/%d scancode %d", i, count, (int)event.key.keysym.scancode);
+                cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            }
             break;
 
         case SDL_KEYUP:
+        {
+            ZoneScopedN("CInput::KeyUpdate/IR_OnKeyboardRelease");
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
-            break;
+        }
+        break;
 
         case SDL_TEXTINPUT:
             if (cnt != textInputCounter)
                 continue; // if input target changed, skip this frame
-            cbStack.back()->IR_OnTextInput(event.text.text);
+            {
+                ZoneScopedN("CInput::KeyUpdate/IR_OnTextInput");
+                const xr_string utf8Text = XRay::Utf8::FixTextInputEncoding(event.text.text);
+                cbStack.back()->IR_OnTextInput(utf8Text.c_str());
+            }
             break;
 
         case SDL_KEYMAPCHANGED:
+        {
+            ZoneScopedN("CInput::KeyUpdate/KeyMapChanged_Process");
             seqKeyMapChanged.Process();
-            break;
+        }
+        break;
         }
     }
 
-    for (u32 i = 0; i < COUNT_KB_BUTTONS; ++i)
-        if (keyboardState[i])
+    {
+        ZoneScopedN("CInput::KeyUpdate/IR_OnKeyboardHold_scan");
+        u32 held_keys = 0;
+        for (u32 i = 0; i < COUNT_KB_BUTTONS; ++i)
+        {
+            if (!keyboardState[i])
+                continue;
+            ++held_keys;
             cbStack.back()->IR_OnKeyboardHold(i);
+        }
+        ZoneTextF("held_keys %u / scancodes", held_keys);
+    }
 }
 
 bool ControllerState::attitude_changed() const
@@ -519,14 +540,13 @@ void CInput::ControllerUpdate()
 
 bool KbdKeyToButtonName(const int dik, xr_string& result)
 {
-    static std::locale locale("");
-
     if (dik >= 0)
     {
         cpcstr name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
         if (name && name[0])
         {
-            result = StringFromUTF8(name, locale);
+            // SDL returns key names in UTF-8; keep them as-is for the UTF-8 UI.
+            result = name;
             return true;
         }
     }

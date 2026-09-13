@@ -394,6 +394,8 @@ target_sources_grouped(
     FILES
     Text/StringConversion.cpp
     Text/StringConversion.hpp
+    Text/Utf8Utils.cpp
+    Text/Utf8Utils.hpp
 )
 
 target_sources_grouped(

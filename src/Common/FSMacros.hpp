@@ -11,6 +11,7 @@
 #define _game_meshes_ "$game_meshes$"
 #define _game_shaders_ "$game_shaders$"
 #define _game_config_ "$game_config$"
+#define _game_fonts_ "$game_fonts$"
 
 // editor path definition
 #define _server_root_ "$server_root$"

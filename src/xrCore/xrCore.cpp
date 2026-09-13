@@ -6,6 +6,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <mmsystem.h>
 #include <objbase.h>
+#include "xrCore/Text/Utf8Utils.hpp"
 #pragma comment(lib, "winmm.lib")
 #elif defined(XR_PLATFORM_POSIX)
 #include <sys/types.h>
@@ -222,12 +223,15 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         {
             string_path c_name;
             sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
-            SetCurrentDirectory(c_name);
+            SetCurrentDirectoryW(XRay::Utf8::ToWide(c_name).c_str());
         }
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
-        GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
+        wchar_t tempWorkingPath[sizeof(WorkingPath)]{};
+        GetCurrentDirectoryW(sizeof(tempWorkingPath) / sizeof(wchar_t), tempWorkingPath);
+        const xr_string utf8WorkingPath = XRay::Utf8::FromWide(tempWorkingPath);
+        xr_strcpy(WorkingPath, sizeof(WorkingPath), utf8WorkingPath.c_str());
 #elif defined(XR_PLATFORM_POSIX)
         getcwd(WorkingPath, sizeof(WorkingPath));
 #else

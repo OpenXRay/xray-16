@@ -313,6 +313,16 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
 bool CScriptEngine::load_buffer(
 lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameSpaceName)
 {
+    // Strip UTF-8 BOM if present
+    if (tSize >= 3 &&
+        static_cast<u8>(caBuffer[0]) == 0xEF &&
+        static_cast<u8>(caBuffer[1]) == 0xBB &&
+        static_cast<u8>(caBuffer[2]) == 0xBF)
+    {
+        caBuffer += 3;
+        tSize -= 3;
+    }
+
     int l_iErrorCode;
     if (caNameSpaceName && xr_strcmp(GlobalNamespace, caNameSpaceName))
     {

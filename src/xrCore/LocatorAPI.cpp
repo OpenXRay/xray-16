@@ -9,6 +9,7 @@
 #include <direct.h>
 #include <sys/stat.h>
 #include <sys/utime.h>
+#include "xrCore/Text/Utf8Utils.hpp"
 #elif defined(XR_PLATFORM_POSIX)
 #include <SDL.h>
 #include <glob.h>
@@ -469,19 +470,27 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
 void CLocatorAPI::archive::open()
 {
-    struct stat file_info;
 #if defined(XR_PLATFORM_WINDOWS)
     // Open the file
     if (hSrcFile && hSrcMap)
         return;
 
-    hSrcFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+    hSrcFile = CreateFileW(XRay::Utf8::ToWide(path.c_str()).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
-    stat(path.c_str(), &file_info);
-    modif = file_info.st_mtime;
+
+    FILETIME ftCreate{}, ftAccess{}, ftWrite{};
+    GetFileTime(hSrcFile, &ftCreate, &ftAccess, &ftWrite);
+    const ULARGE_INTEGER writeTime{ { ftWrite.dwLowDateTime, ftWrite.dwHighDateTime } };
+    // Convert Windows FILETIME (100-ns intervals since 1601) to Unix seconds
+    modif = static_cast<u32>((writeTime.QuadPart - 116444736000000000ULL) / 10000000ULL);
+
+    LARGE_INTEGER fileSize{};
+    R_ASSERT(GetFileSizeEx(hSrcFile, &fileSize));
+    size = static_cast<size_t>(fileSize.QuadPart);
 #elif defined(XR_PLATFORM_POSIX)
+    struct stat file_info;
     // Open the file
     if (hSrcFile)
         return;
@@ -497,10 +506,10 @@ void CLocatorAPI::archive::open()
     modif = file_info.st_mtim.tv_sec;
 #   endif
     xr_free(conv_path);
+    size = file_info.st_size;
 #else
 #   error Select or add implementation for your platform
 #endif
-    size = file_info.st_size;
     R_ASSERT(size > 0);
 }
 
@@ -601,7 +610,7 @@ bool ignore_name(const char* _name)
     return false;
 }
 
-void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
+void CLocatorAPI::ProcessOne(pcstr path, const xr_finddata_t& entry)
 {
     ZoneScoped;
 
@@ -653,7 +662,8 @@ void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 bool ignore_path(pcstr _path)
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    HANDLE h = CreateFile(_path, 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
+    const std::wstring wpath = XRay::Utf8::ToWide(_path);
+    HANDLE h = CreateFileW(wpath.c_str(), 0, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_NO_BUFFERING, nullptr);
 
     if (h != INVALID_HANDLE_VALUE)
     {
@@ -691,13 +701,16 @@ bool CLocatorAPI::Recurse(pcstr path)
         return true;
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, "*");
-    _finddata_t findData;
+    xr_finddata_t findData;
     convert_path_separators(scanPath);
 #ifdef XR_PLATFORM_WINDOWS
-    intptr_t handle = _findfirst(scanPath, &findData);
+    const std::wstring wscanPath = XRay::Utf8::ToWide(scanPath);
+    _wfinddata64i32_t wfindData{};
+    intptr_t handle = _wfindfirst(wscanPath.c_str(), &wfindData);
     if (handle == -1)
         return false;
 #elif defined(XR_PLATFORM_POSIX)
+
     glob_t globbuf;
 
     globbuf.gl_offs = 256;
@@ -717,7 +730,15 @@ bool CLocatorAPI::Recurse(pcstr path)
     while (done != -1)
     {
 #if defined(XR_PLATFORM_WINDOWS)
-        // do nothing
+        findData.attrib = wfindData.attrib;
+        findData.size = static_cast<_fsize_t>(wfindData.size);
+        findData.time_create = wfindData.time_create;
+        findData.time_access = wfindData.time_access;
+        findData.time_write = wfindData.time_write;
+        {
+            const xr_string utf8Name = XRay::Utf8::FromWide(wfindData.name);
+            xr_strcpy(findData.name, sizeof findData.name, utf8Name.c_str());
+        }
 #elif defined(XR_PLATFORM_POSIX)
         xr_strcpy(findData.name, globbuf.gl_pathv[handle - done]);
         struct stat fi;
@@ -764,7 +785,7 @@ bool CLocatorAPI::Recurse(pcstr path)
         if (!ignore)
             rec_files.push_back(findData);
 #ifdef XR_PLATFORM_WINDOWS
-        done = _findnext(handle, &findData);
+        done = _wfindnext(handle, &wfindData);
 #elif defined(XR_PLATFORM_POSIX)
         done--;
 #else
@@ -781,7 +802,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
-        std::sort(rec_files.begin() + oldSize, rec_files.end(), [](const _finddata_t& x, const _finddata_t& y)
+        std::sort(rec_files.begin() + oldSize, rec_files.end(), [](const xr_finddata_t& x, const xr_finddata_t& y)
         {
             return xr_strcmp(x.name, y.name) < 0;
         });
@@ -1668,13 +1689,13 @@ void CLocatorAPI::w_close(IWriter*& S)
         if (bReg)
         {
 #if defined(XR_PLATFORM_WINDOWS)
-            struct _stat st;
-            _stat(fname, &st);
-            Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+            struct _stat st{};
+            if (_wstat(XRay::Utf8::ToWide(fname).c_str(), &st) == 0)
+                Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #elif defined(XR_PLATFORM_POSIX)
-            struct stat st;
-            ::stat(fname, &st);
-            Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+            struct stat st{};
+            if (::stat(fname, &st) == 0)
+                Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -1740,7 +1761,11 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
         const char* end_symbol = r_it->name + xr_strlen(r_it->name) - 1;
         if (*end_symbol == _DELIMITER)
         {
-            _rmdir(r_it->name);
+#if defined(XR_PLATFORM_WINDOWS)
+            _wrmdir(XRay::Utf8::ToWide(r_it->name).c_str());
+#else
+            rmdir(r_it->name);
+#endif
             m_files.erase(*r_it);
         }
     }
@@ -1759,7 +1784,13 @@ void CLocatorAPI::file_delete(pcstr path, pcstr nm)
     if (I != m_files.end())
     {
         // remove file
+#if defined(XR_PLATFORM_WINDOWS)
+        _wunlink(XRay::Utf8::ToWide(I->name).c_str());
+#elif defined(XR_PLATFORM_POSIX)
         xr_unlink(I->name);
+#else
+#   error Select or add implementation for your platform
+#endif
         auto str = pstr(I->name);
         xr_free(str);
         m_files.erase(I);
@@ -1794,7 +1825,13 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         {
             if (!overwrite)
                 return;
+#if defined(XR_PLATFORM_WINDOWS)
+            _wunlink(XRay::Utf8::ToWide(D->name).c_str());
+#elif defined(XR_PLATFORM_POSIX)
             xr_unlink(D->name);
+#else
+#   error Select or add implementation for your platform
+#endif
             auto str = pstr(D->name);
             xr_free(str);
             m_files.erase(D);
@@ -1813,7 +1850,13 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         VerifyPath(dest);
         pstr conv_dest = xr_strdup(dest);
         convert_path_separators(conv_dest);
+#if defined(XR_PLATFORM_WINDOWS)
+        _wrename(XRay::Utf8::ToWide(src).c_str(), XRay::Utf8::ToWide(conv_dest).c_str());
+#elif defined(XR_PLATFORM_POSIX)
         rename(src, conv_dest);
+#else
+#   error Select or add implementation for your platform
+#endif
         xr_free(conv_dest);
     }
 }
@@ -1990,7 +2033,12 @@ bool CLocatorAPI::can_write_to_folder(pcstr path)
         string_path temp;
         pcstr fn = "$!#%TEMP%#!$.$$$";
         strconcat(sizeof temp, temp, path, path[xr_strlen(path) - 1] != _DELIMITER ? DELIMITER : "", fn);
+#if defined(XR_PLATFORM_WINDOWS)
+        const std::wstring wtemp = XRay::Utf8::ToWide(temp);
+        FILE* hf = _wfopen(wtemp.c_str(), L"wb");
+#else
         FILE* hf = fopen(temp, "wb");
+#endif
         if (hf == nullptr)
             return false;
         fclose(hf);
@@ -2009,7 +2057,12 @@ bool CLocatorAPI::can_write_to_alias(pcstr path)
 
 bool CLocatorAPI::can_modify_file(pcstr fname)
 {
+#if defined(XR_PLATFORM_WINDOWS)
+    const std::wstring wfname = XRay::Utf8::ToWide(fname);
+    FILE* hf = _wfopen(wfname.c_str(), L"r+b");
+#else
     FILE* hf = fopen(fname, "r+b");
+#endif
     if (hf)
     {
         fclose(hf);
