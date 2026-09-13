@@ -78,12 +78,13 @@ void CRenderDevice::InitializeImGui()
     {
         if (data->WantVisible)
         {
+            const ImVec2 scale = Device.GetImGuiInputScale();
             const SDL_Rect r
             {
-                .x = (int)(data->InputPos.x - viewport->Pos.x),
-                .y = (int)(data->InputPos.y - viewport->Pos.y + data->InputLineHeight),
+                .x = (int)((data->InputPos.x - viewport->Pos.x) / scale.x),
+                .y = (int)((data->InputPos.y - viewport->Pos.y + data->InputLineHeight) / scale.y),
                 .w = 1,
-                .h = (int)data->InputLineHeight,
+                .h = (int)(data->InputLineHeight / scale.y),
             };
             SDL_SetTextInputArea(Device.m_sdlWnd, &r, 0);
         }

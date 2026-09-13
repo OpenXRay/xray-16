@@ -267,6 +267,9 @@ public:
     [[nodiscard]]
     auto GetImGuiContext() const { return m_imgui_context; }
 
+    [[nodiscard]]
+    auto GetImGuiInputScale() const { return m_imgui_input_scale; }
+
 public:
     struct ImGuiViewportData
     {
@@ -297,6 +300,7 @@ private:
     xray::editor::ide m_editor;
 
     ImGuiContext* m_imgui_context{};
+    ImVec2 m_imgui_input_scale{ 1.0f, 1.0f };
 public:
     IImGuiRender* m_imgui_render{};
 
