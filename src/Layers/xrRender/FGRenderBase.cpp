@@ -87,7 +87,7 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
 void FGRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
-        windowFlags |= SDL_WINDOW_VULKAN;
+        windowFlags |= SDL_WINDOW_VULKAN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
 }
 
 void FGRenderBase::SetupStates()
