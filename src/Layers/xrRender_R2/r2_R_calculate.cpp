@@ -114,8 +114,12 @@ void CRender::Calculate()
     g_pGamePersistent->SpatialSpace.q_sphere(spatial_lights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
     for (auto spatial : spatial_lights)
     {
-        const auto& entity_pos = spatial->spatial_sector_point();
-        spatial->spatial_updatesector(dsgraph_main.detect_sector(entity_pos));
+        if (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+        {
+            const auto& entity_pos = spatial->spatial_sector_point();
+            spatial->spatial_updatesector(dsgraph_main.detect_sector(entity_pos));
+        }
+
         const auto sector_id = spatial->GetSpatialData().sector_id;
         if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             continue; // disassociated from S/P structure
