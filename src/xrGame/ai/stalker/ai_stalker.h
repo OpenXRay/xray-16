@@ -347,7 +347,7 @@ protected:
     bool non_conflicted(const CInventoryItem* item, const CWeapon* new_weapon) const;
     bool enough_ammo(const CWeapon* new_weapon) const;
     bool conflicted(
-        const CInventoryItem* item, const CWeapon* new_weapon, bool new_wepon_enough_ammo, int new_weapon_rank) const;
+        const CInventoryItem* item, const CWeapon* new_weapon, bool new_weapon_enough_ammo, int new_weapon_rank) const;
     void update_conflicted(CInventoryItem* item, const CWeapon* new_weapon);
     void remove_personal_only_ammo(const CInventoryItem* item);
     void on_after_take(const CGameObject* object);
