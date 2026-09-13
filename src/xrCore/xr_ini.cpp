@@ -658,8 +658,8 @@ void CInifile::save_as(IWriter& writer, bool bcheck) const
         writer.w_string(temp);
         if (bcheck)
         {
-            xr_sprintf(temp, sizeof temp, "; %d %d %d", (*r_it)->Name._get()->dwCRC, (*r_it)->Name._get()->dwReference,
-                (*r_it)->Name._get()->dwLength);
+            xr_sprintf(temp, sizeof temp, "; %d %d %d", (*r_it)->Name.get_crc(), (*r_it)->Name.get_crc(),
+                (*r_it)->Name.get_crc());
             writer.w_string(temp);
         }
 

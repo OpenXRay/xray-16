@@ -12,6 +12,8 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
+#include "xrCore/xrstring_manager.h"
+
 xr_vector<xr_token> VidQualityToken;
 
 extern xr_vector<xr_token> vid_monitor_token;

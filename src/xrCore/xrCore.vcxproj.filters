@@ -339,6 +339,9 @@
     <ClCompile Include="Debug\StackTrace.cpp">
       <Filter>Debug core\StackTrace</Filter>
     </ClCompile>
+    <ClCompile Include="xrstring_manager.cpp">
+      <Filter>shared memory/string library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -718,6 +721,12 @@
     </ClInclude>
     <ClInclude Include="Debug\StackTrace.h">
       <Filter>Debug core\StackTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="xrstring_manager.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
+    <ClInclude Include="xrstring_impl.h">
+      <Filter>shared memory/string library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

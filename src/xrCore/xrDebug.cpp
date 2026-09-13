@@ -10,6 +10,7 @@
 #include <SDL.h>
 
 #include <csignal>
+#include "xrstring_manager.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
 #   include <dbghelp.h>

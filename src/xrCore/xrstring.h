@@ -1,160 +1,71 @@
 #pragma once
 
 #include <cstdio>
-
 #include "xr_types.h"
 #include "xrMemory.h"
-
 #include <cstring>
 
-#pragma pack(push, 4)
-#pragma warning(push)
-#pragma warning(disable : 4200)
-struct XRCORE_API str_value
+struct str_value;
+
+class XRCORE_API shared_str
 {
-    u32 dwReference;
-    u32 dwLength;
-    u32 dwCRC;
-    str_value* next;
-    char value[];
-};
-
-struct XRCORE_API str_value_cmp
-{
-    // less
-    IC bool operator()(const str_value* A, const str_value* B) const { return A->dwCRC < B->dwCRC; };
-};
-
-#pragma warning(pop)
-
-struct str_container_impl;
-class IWriter;
-//////////////////////////////////////////////////////////////////////////
-class XRCORE_API str_container
-{
-public:
-    str_container();
-    ~str_container();
-
-    str_value* dock(pcstr value) const;
-    void clean() const;
-    void dump() const;
-    void dump(IWriter* W) const;
-    void verify() const;
-
-    [[nodiscard]]
-    std::pair<size_t, size_t> stat_economy() const;
-
-private:
-    str_container_impl* impl;
-};
-XRCORE_API extern str_container* g_pStringContainer;
-
-//////////////////////////////////////////////////////////////////////////
-class shared_str
-{
-    str_value* p_{};
+    u32 index_{};
 
 protected:
-    // ref-counting
-    void _dec() noexcept
-    {
-        if (nullptr == p_)
-            return;
-        p_->dwReference--;
-        if (0 == p_->dwReference)
-            p_ = nullptr;
-    }
+    void _dec() noexcept;
 
 public:
-    void _set(pcstr rhs)
-    {
-        str_value* v = g_pStringContainer->dock(rhs);
-        if (nullptr != v)
-            v->dwReference++;
-        _dec();
-        p_ = v;
-    }
-    void _set(shared_str const& rhs) noexcept
-    {
-        str_value* v = rhs.p_;
-        if (nullptr != v)
-            v->dwReference++;
-        _dec();
-        p_ = v;
-    }
-    void _set(std::nullptr_t) noexcept
-    {
-        _dec();
-        p_ = nullptr;
-    }
+    void _set(pcstr rhs);
+    void _set(shared_str const& rhs) noexcept;
+    void _set(std::nullptr_t) noexcept;
 
     [[nodiscard]]
-    const str_value* _get() const { return p_; }
+    const str_value* _get() const;
+
+    friend bool operator==(shared_str const& a, shared_str const& b);
+    friend bool operator!=(shared_str const& a, shared_str const& b);
+    friend bool operator<(shared_str const& a, shared_str const& b);
+    friend bool operator>(shared_str const& a, shared_str const& b);
 
 public:
     // construction
     shared_str() = default;
-    shared_str(pcstr rhs)
+    shared_str(pcstr rhs);
+    shared_str(shared_str const& rhs) noexcept;
+    shared_str(shared_str&& rhs) noexcept : index_(rhs.index_)
     {
-        p_ = nullptr;
-        _set(rhs);
+        rhs.index_ = 0;
     }
-    shared_str(shared_str const& rhs) noexcept
-    {
-        p_ = nullptr;
-        _set(rhs);
-    }
-    shared_str(shared_str&& rhs) noexcept
-        : p_(rhs.p_)
-    {
-        rhs.p_ = nullptr;
-    }
-    ~shared_str() { _dec(); }
+    ~shared_str();
     // assignment & accessors
-    shared_str& operator=(pcstr rhs)
-    {
-        _set(rhs);
-        return *this;
-    }
-    shared_str& operator=(shared_str const& rhs) noexcept
-    {
-        _set(rhs);
-        return *this;
-    }
+    shared_str& operator=(pcstr rhs);
+    shared_str& operator=(shared_str const& rhs) noexcept;
     shared_str& operator=(shared_str&& rhs) noexcept
     {
-        p_ = rhs.p_;
-        rhs.p_ = nullptr;
+        index_ = rhs.index_;
+        rhs.index_ = 0;
         return *this;
     }
-    shared_str& operator=(std::nullptr_t) noexcept
+    shared_str& operator=(std::nullptr_t) noexcept;
+
+    [[nodiscard]]
+    bool operator!() const
     {
-        _set(nullptr);
-        return *this;
+        return index_ == 0;
     }
-
     [[nodiscard]]
-    bool operator!() const { return p_ == nullptr; }
-    [[nodiscard]]
-    explicit operator bool() const { return p_ != nullptr; }
-    [[nodiscard]]
-    char operator[](size_t id) { return p_->value[id]; }
-    [[nodiscard]]
-    char operator[](size_t id) const { return p_->value[id]; }
-
-    [[nodiscard]]
-    pcstr c_str() const { return p_ ? p_->value : nullptr; }
-
-    // misc func
-    [[nodiscard]]
-    size_t size() const
+    explicit operator bool() const
     {
-        if (nullptr == p_)
-            return 0;
-
-        return p_->dwLength;
+        return index_ != 0;
     }
+    [[nodiscard]]
+    char operator[](size_t id);
+    [[nodiscard]]
+    char operator[](size_t id) const;
+    [[nodiscard]]
+    pcstr c_str() const;
+    [[nodiscard]]
+    size_t size() const;
 
     [[nodiscard]]
     bool empty() const
@@ -164,13 +75,16 @@ public:
 
     void swap(shared_str& rhs) noexcept
     {
-        str_value* tmp = p_;
-        p_ = rhs.p_;
-        rhs.p_ = tmp;
+        u32 tmp = index_;
+        index_ = rhs.index_;
+        rhs.index_ = tmp;
     }
 
     [[nodiscard]]
-    bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
+    bool equal(const shared_str& rhs) const;
+
+    [[nodiscard]]
+    u32 get_crc() const;
 };
 
 inline int __cdecl xr_sprintf(shared_str& destination, pcstr format_string, ...)
@@ -191,7 +105,7 @@ struct std::hash<shared_str>
 {
     [[nodiscard]] size_t operator()(const shared_str& str) const noexcept
     {
-        return str ? str._get()->dwCRC : std::hash<pcstr>{}(nullptr);
+        return str ? str.get_crc() : std::hash<pcstr>{}(nullptr);
     }
 };
 
@@ -209,10 +123,26 @@ bool operator!=(std::nullptr_t, const shared_str&) = delete;
 // ptr != const res_ptr
 // res_ptr < res_ptr
 // res_ptr > res_ptr
-IC bool operator==(shared_str const& a, shared_str const& b) { return a._get() == b._get(); }
-IC bool operator!=(shared_str const& a, shared_str const& b) { return a._get() != b._get(); }
-IC bool operator<(shared_str const& a, shared_str const& b) { return a._get() < b._get(); }
-IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > b._get(); }
+IC bool operator==(shared_str const& a, shared_str const& b)
+{
+    return a.index_ == b.index_;
+}
+
+IC bool operator!=(shared_str const& a, shared_str const& b)
+{
+    return a.index_ != b.index_;
+}
+
+IC bool operator<(shared_str const& a, shared_str const& b)
+{
+    return a.index_ < b.index_;
+}
+
+IC bool operator>(shared_str const& a, shared_str const& b)
+{
+    return a.index_ > b.index_;
+}
+
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) noexcept { lhs.swap(rhs); }
 IC size_t xr_strlen(const shared_str& a) noexcept { return a.size(); }
@@ -253,6 +183,3 @@ IC void xr_strlwr(shared_str& src)
         xr_free(lp);
     }
 }
-
-#pragma pack(pop)
-////
