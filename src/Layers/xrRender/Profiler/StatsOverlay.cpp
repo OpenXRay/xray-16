@@ -373,6 +373,8 @@ void StatsOverlay::RenderGPUSection()
 
         const auto& passTimings = m_gpuProfiler->GetPassTimings();
         float totalGPU = m_gpuProfiler->GetTotalGPUTimeMs();
+        if (const u64 sampleId = m_gpuProfiler->GetCompletedSampleId())
+            ImGui::TextDisabled("Completed GPU sample: %llu", static_cast<unsigned long long>(sampleId));
 
         if (passTimings.empty())
         {

@@ -6,16 +6,6 @@
 namespace xray::profiler
 {
 
-// Ring buffer entry for pending GPU queries
-struct PendingQuery
-{
-    shared_str name;
-    nvrhi::TimerQueryHandle query;
-    u32 frameSubmitted = 0;
-    bool resolved = false;
-    bool isAsync = false;
-};
-
 // GPU Profiler - manages NVRHI timer queries for FrameGraph passes
 class GPUProfiler
 {
@@ -27,8 +17,7 @@ public:
     void Initialize(nvrhi::IDevice* device);
     void Shutdown();
 
-    // Enable/disable profiling (disabled = no overhead)
-    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    void SetEnabled(bool enabled);
     bool IsProfilingEnabled() const { return m_enabled; }
 
     // Begin/End timing for a named pass
@@ -45,6 +34,7 @@ public:
     // Access results
     const xr_vector<GPUPassTiming>& GetPassTimings() const { return m_passTimings; }
     float GetTotalGPUTimeMs() const { return m_totalGPUTimeMs; }
+    u64 GetCompletedSampleId() const { return m_completedSampleId; }
 
     // Check if initialized
     bool IsInitialized() const { return m_device != nullptr; }
@@ -52,6 +42,7 @@ public:
 private:
     nvrhi::TimerQueryHandle AcquireTimerQuery();
     void ReleaseTimerQuery(nvrhi::TimerQueryHandle query);
+    void SealRecordingFrame();
 
 private:
     nvrhi::IDevice* m_device = nullptr;
@@ -61,26 +52,34 @@ private:
     xr_vector<nvrhi::TimerQueryHandle> m_freeQueries;
     static constexpr u32 INITIAL_POOL_SIZE = 64;
 
-    // Active passes this frame
+    struct PendingQuery
+    {
+        GPUPassTiming timing;
+        nvrhi::TimerQueryHandle query;
+    };
+
+    struct PendingFrame
+    {
+        xr_vector<PendingQuery> queries;
+        u64 sampleId = 0;
+        bool sealed = false;
+        bool valid = true;
+    };
+
     struct ActivePass
     {
-        shared_str name;
-        nvrhi::TimerQueryHandle query;
-        bool isAsync = false;
+        nvrhi::ICommandList* cmdList = nullptr;
+        size_t queryIndex = 0;
     };
     xr_vector<ActivePass> m_activePasses;
+    xr_vector<PendingFrame> m_pendingFrames;
+    static constexpr size_t NO_RECORDING_FRAME = static_cast<size_t>(-1);
+    size_t m_recordingFrame = NO_RECORDING_FRAME;
 
-    // Pending queries from previous frames
-    xr_vector<PendingQuery> m_pendingQueries;
-    static constexpr u32 MAX_PENDING_FRAMES = 4;
-
-    // Resolved timings for current frame display
     xr_vector<GPUPassTiming> m_passTimings;
     float m_totalGPUTimeMs = 0.0f;
-
-    u32 m_currentFrame = 0;
-
-    // Enabled flag (when false, all timing operations are no-ops)
+    u64 m_currentFrame = 0;
+    u64 m_completedSampleId = 0;
     bool m_enabled = false;
 };
 
