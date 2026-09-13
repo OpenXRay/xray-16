@@ -327,6 +327,7 @@ void MetalBackend::WaitForIdle() {
 }
 
 void MetalBackend::BeginFrame() {
+    ZoneScopedN("Metal::BeginFrame");
     @autoreleasepool {
         Impl& impl = *m_impl;
         if (!impl.initialized || impl.state.load() == DeviceState::Lost)
@@ -337,20 +338,36 @@ void MetalBackend::BeginFrame() {
         }
         if (SDL_GetWindowFlags(impl.window) & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_HIDDEN))
             return;
-        std::lock_guard<std::mutex> lock(impl.queueMutex);
-        impl.collect();
+        std::unique_lock<std::mutex> lock(impl.queueMutex, std::defer_lock);
+        {
+            ZoneScopedN("Metal::QueueLock");
+            lock.lock();
+        }
+        {
+            ZoneScopedN("Metal::Collect");
+            impl.collect();
+        }
         if (impl.state.load() == DeviceState::Lost || !impl.updateDrawableSize())
             return;
         Impl::Frame& frame = impl.frames[impl.currentFrame];
-        if (!impl.checkCompletion(frame.completion, true))
-            return;
-        frame.completion = nil;
-        frame.texture = nullptr;
-        frame.drawable = nil;
-        impl.device->runGarbageCollection();
+        {
+            ZoneScopedN("Metal::FrameSlotWait");
+            if (!impl.checkCompletion(frame.completion, true))
+                return;
+        }
+        {
+            ZoneScopedN("Metal::GC");
+            frame.completion = nil;
+            frame.texture = nullptr;
+            frame.drawable = nil;
+            impl.device->runGarbageCollection();
+        }
         if (impl.state.load() == DeviceState::Lost)
             return;
-        frame.drawable = [impl.layer nextDrawable];
+        {
+            ZoneScopedN("Metal::NextDrawable");
+            frame.drawable = [impl.layer nextDrawable];
+        }
         if (!frame.drawable) {
             DeviceState expected = DeviceState::Normal;
             impl.state.compare_exchange_strong(expected, DeviceState::NeedReset);
@@ -380,7 +397,10 @@ void MetalBackend::BeginFrame() {
             frame.drawable = nil;
             return;
         }
-        frame.commands->open();
+        {
+            ZoneScopedN("Metal::CommandListOpen");
+            frame.commands->open();
+        }
         if (impl.state.load() == DeviceState::Lost) {
             frame.texture = nullptr;
             frame.drawable = nil;
