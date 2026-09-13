@@ -400,7 +400,6 @@ target_include_directories(xrPhysics
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${CMAKE_SOURCE_DIR}/Externals/ode/include"
 )
 
@@ -408,13 +407,12 @@ target_link_libraries(xrPhysics
     PUBLIC
     xrODE
     PRIVATE
+    xrAPI
     xrCore
+    xrCDB
     xrEngine
     xrMaterialSystem
-    xrMiscMath
     xrScriptEngine
-    xrAPI
-    xrCDB
     xrSound
 )
 
@@ -422,6 +420,11 @@ target_compile_definitions(xrPhysics
     PRIVATE
     XRPHYSICS_EXPORTS
     PURE_DYNAMIC_CAST
+)
+
+target_compile_options(xrPhysics
+    PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4756> # overflow in constant arithmetic
 )
 
 set_target_properties(xrPhysics PROPERTIES
@@ -432,9 +435,3 @@ target_precompile_headers(xrPhysics
     PRIVATE
     StdAfx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrPhysics LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

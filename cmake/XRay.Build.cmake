@@ -1,6 +1,10 @@
 include_guard()
 
 set(CMAKE_CXX_STANDARD 17)
+if (WIN32)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Output all libraries and executables to one folder
@@ -8,7 +12,14 @@ set(XRAY_COMPILE_OUTPUT_FOLDER "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_PROCESSOR
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${XRAY_COMPILE_OUTPUT_FOLDER}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${XRAY_COMPILE_OUTPUT_FOLDER}")
 set(CMAKE_PDB_OUTPUT_DIRECTORY "${XRAY_COMPILE_OUTPUT_FOLDER}")
-set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY "${XRAY_COMPILE_OUTPUT_FOLDER}")
+
+include(GNUInstallDirs)
+
+# Provide access to shared externals headers (e.g. submodule_check.hpp)
+include_directories(
+    "${CMAKE_SOURCE_DIR}/Externals"
+    "${CMAKE_SOURCE_DIR}/Externals/luabind"
+)
 
 add_compile_definitions(
     # _DEBUG, DEBUG, MIXED, NDEBUG defines
@@ -40,6 +51,34 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|LCC|Clang")
 else()
     message(FATAL_ERROR "Unsupported or unknown compiler.")
 endif()
+
+# https://stackoverflow.com/questions/61909735/cmakes-vs-package-references-not-adding-a-reference-to-vs2017-project
+# https://stackoverflow.com/questions/2973263/add-visual-c-property-sheets-using-cmake
+set(XRAY_MSBUILD_PROPS "${CMAKE_CURRENT_LIST_DIR}/XRay.MSBuild.props")
+
+if (WIN32)
+    include_directories("${XRAY_SDK_INCLUDE_DIR}")
+    include_directories("${XRAY_SDK_INCLUDE_DIR}/SDL2")
+endif()
+
+if (WIN32)
+    find_package(BugTrap REQUIRED)
+    find_package(OpenSSL REQUIRED)
+else()
+    find_package(SDL2 2.0.18 REQUIRED)
+    find_package(mimalloc NAMES mimalloc2 mimalloc2.0 mimalloc)
+endif()
+
+find_package(LZO REQUIRED)
+find_package(OpenAL REQUIRED)
+find_package(Ogg REQUIRED)
+find_package(Vorbis REQUIRED)
+find_package(Theora REQUIRED)
+
+find_package(JPEG)
+
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT OpenXRay)
+include(InstallRequiredSystemLibraries)
 
 # https://gitlab.kitware.com/cmake/cmake/-/issues/25650
 if (CMAKE_VERSION VERSION_EQUAL "3.28.2" AND CMAKE_UNITY_BUILD)

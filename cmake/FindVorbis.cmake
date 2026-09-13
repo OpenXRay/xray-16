@@ -57,7 +57,7 @@ set(_VORBIS_SEARCH_NORMAL
   )
 list(APPEND _VORBIS_SEARCHES _VORBIS_SEARCH_NORMAL)
 
-set(VORBIS_NAMES vorbis libvorbis)
+set(VORBIS_NAMES libvorbis_static vorbis libvorbis)
 set(VORBIS_NAMES_DEBUG vorbisd vorbis_d vorbisD vorbis_D)
 set(VORBISENC_NAMES vorbisenc libvorbisenc)
 set(VORBISENC_NAMES_DEBUG vorbisencd vorbisenc_d vorbisencD vorbisenc_D)

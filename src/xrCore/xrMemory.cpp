@@ -21,7 +21,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #   ifdef _DEBUG
 #       define USE_PURE_ALLOC
-#   else
+#   elif !defined(USE_MIMALLOC)
 #       define USE_MIMALLOC
 #   endif
 #endif

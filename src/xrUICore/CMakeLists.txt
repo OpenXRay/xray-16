@@ -131,11 +131,9 @@ target_include_directories(xrUICore
 target_link_libraries(xrUICore
     PRIVATE
     xrAPI
-    xrScriptEngine
-    xrEngine
-    xrMiscMath
-    xrImGui
     xrCore
+    xrEngine
+    xrScriptEngine
     xrSound
 )
 
@@ -153,9 +151,3 @@ target_precompile_headers(xrUICore
     PRIVATE
     pch.hpp
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrUICore LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

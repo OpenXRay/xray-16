@@ -42,7 +42,7 @@ set(_OGG_SEARCH_NORMAL
   )
 list(APPEND _OGG_SEARCHES _OGG_SEARCH_NORMAL)
 
-set(OGG_NAMES ogg libogg)
+set(OGG_NAMES libogg_static ogg libogg)
 set(OGG_NAMES_DEBUG oggd ogg_D oggD ogg_D)
 
 foreach(search ${_OGG_SEARCHES})

@@ -40,15 +40,13 @@ target_include_directories(xrCDB
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/Externals"
-    "${CMAKE_SOURCE_DIR}/Externals/imgui"
 )
 
 target_link_libraries(xrCDB
     PRIVATE
-    xrCore
-    xrMiscMath
-    xrOPCODE
     xrAPI
+    xrCore
+    xrOPCODE
 )
 
 target_compile_definitions(xrCDB
@@ -64,9 +62,3 @@ target_precompile_headers(xrCDB
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrCDB LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

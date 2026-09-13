@@ -16,9 +16,6 @@ target_include_directories(xrMaterialSystem
 )
 
 target_link_libraries(xrMaterialSystem
-    PUBLIC
-    xrMiscMath
-
     PRIVATE
     xrAPI
     xrCore
@@ -37,9 +34,3 @@ target_precompile_headers(xrMaterialSystem
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrMaterialSystem LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

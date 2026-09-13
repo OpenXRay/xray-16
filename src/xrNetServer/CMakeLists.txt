@@ -1,13 +1,12 @@
 add_library(xrNetServer)
 
-target_sources(xrNetServer PRIVATE
+target_sources(xrNetServer
+    PRIVATE
     guids.cpp
     ip_filter.cpp
     ip_filter.h
     NET_AuthCheck.cpp
     NET_AuthCheck.h
-    #NET_Client.cpp
-    #NET_Client.h
     NET_Common.cpp
     NET_Common.h
     NET_Compressor.cpp
@@ -16,16 +15,26 @@ target_sources(xrNetServer PRIVATE
     NET_Log.h
     NET_Messages.h
     NET_PlayersMonitor.h
-    #NET_Server.cpp
-    #NET_Server.h
     NET_Shared.h
     stdafx.cpp
     stdafx.h
-    empty/NET_Client.cpp
-    empty/NET_Client.h
-    empty/NET_Server.cpp
-    empty/NET_Server.h
 )
+
+if (WIN32)
+    target_sources(xrNetServer PRIVATE
+        NET_Client.cpp
+        NET_Client.h
+        NET_Server.cpp
+        NET_Server.h
+    )
+else()
+    target_sources(xrNetServer PRIVATE
+        empty/NET_Client.cpp
+        empty/NET_Client.h
+        empty/NET_Server.cpp
+        empty/NET_Server.h
+    )
+endif()
 
 target_include_directories(xrNetServer
     PRIVATE
@@ -36,6 +45,8 @@ target_include_directories(xrNetServer
 target_link_libraries(xrNetServer
     PRIVATE
     xrCore
+    $<$<PLATFORM_ID:Windows>:Ws2_32>
+    $<$<PLATFORM_ID:Windows>:dxguid>
 )
 
 target_compile_definitions(xrNetServer
@@ -51,9 +62,3 @@ target_precompile_headers(xrNetServer
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrNetServer LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

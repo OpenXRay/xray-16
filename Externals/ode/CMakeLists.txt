@@ -78,6 +78,7 @@ target_sources(xrODE PRIVATE
     include/ode/timer.h
     contrib/msvc7/ode_default/de_padf_integration.cpp
     contrib/msvc7/ode_default/de_padf_integration.h
+    config/msvcdefs.def
 )
 
 target_include_directories(xrODE
@@ -95,9 +96,3 @@ set_target_properties(xrODE PROPERTIES
     PREFIX ""
     UNITY_BUILD OFF
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrODE LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

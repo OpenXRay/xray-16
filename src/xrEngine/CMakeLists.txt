@@ -331,8 +331,6 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "Render\\Execution & 3D\\Shaders\\Textures"
     FILES
-    #tntQAVI.cpp
-    #tntQAVI.h
     xrImage_Resampler.cpp
     xrImage_Resampler.h
     xrTheora_Stream.cpp
@@ -341,14 +339,24 @@ target_sources_grouped(
     xrTheora_Surface.h
 )
 
-#target_sources_grouped(
-#    TARGET xrEngine
-#    NAME "Render\\Execution & 3D\\TextConsole"
-#    FILES
-#    Text_Console.cpp
-#    Text_Console.h
-#    Text_Console_WndProc.cpp
-#)
+target_sources_grouped(
+    TARGET xrEngine
+    NAME "Render\\Execution & 3D\\Shaders\\Textures"
+    CONDITION $<PLATFORM_ID:Windows>
+    FILES
+    tntQAVI.cpp
+    tntQAVI.h
+)
+
+target_sources_grouped(
+    TARGET xrEngine
+    NAME "Render\\Execution & 3D\\TextConsole"
+    CONDITION $<PLATFORM_ID:Windows>
+    FILES
+    Text_Console.cpp
+    Text_Console.h
+    Text_Console_WndProc.cpp
+)
 
 target_sources_grouped(
     TARGET xrEngine
@@ -408,30 +416,31 @@ target_sources(xrEngine
 )
 
 target_include_directories(xrEngine
+    PUBLIC
+    "${CMAKE_SOURCE_DIR}/src"
+
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc"
 )
 
 target_link_libraries(xrEngine
     PUBLIC
-    xrMiscMath
+    xrImGui
 
     PRIVATE
     xrAPI
+    xrCore
     xrCDB
     xrMaterialSystem
-    xrCore
-    xrSound
-    xrScriptEngine
     xrNetServer
-    xrImGui
+    xrScriptEngine
+    xrSound
+    $<$<PLATFORM_ID:Windows>:DiscordGameSDK>
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
-    SDL2::SDL2
+    $<$<PLATFORM_ID:Windows>:Vfw32>
 )
 
 target_compile_definitions(xrEngine
@@ -448,9 +457,3 @@ target_precompile_headers(xrEngine
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrEngine LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

@@ -50,7 +50,6 @@ target_include_directories(xrGameSpy
 target_link_libraries(xrGameSpy
     PRIVATE
     xrCore
-    xrMiscMath
     GameSpy-oxr
 )
 
@@ -68,9 +67,3 @@ target_precompile_headers(xrGameSpy
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrGameSpy LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

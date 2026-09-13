@@ -4,7 +4,7 @@ function(target_sources_grouped)
     cmake_parse_arguments(
         PARSED_ARGS
         ""
-        "TARGET;NAME;SCOPE"
+        "TARGET;NAME;SCOPE;CONDITION"
         "FILES"
         ${ARGN}
     )
@@ -21,7 +21,20 @@ function(target_sources_grouped)
         set(PARSED_ARGS_SCOPE PRIVATE)
     endif()
 
-    target_sources(${PARSED_ARGS_TARGET} ${PARSED_ARGS_SCOPE} ${PARSED_ARGS_FILES})
+    if(NOT PARSED_ARGS_CONDITION)
+        set(PARSED_ARGS_CONDITION 1)
+    endif()
+
+    target_sources(${PARSED_ARGS_TARGET} ${PARSED_ARGS_SCOPE} $<${PARSED_ARGS_CONDITION}:${PARSED_ARGS_FILES}>)
+
+    string(GENEX_STRIP "${PARSED_ARGS_FILES}" PARSED_ARGS_FILES_NO_GENEX)
+    if(NOT PARSED_ARGS_FILES STREQUAL PARSED_ARGS_FILES_NO_GENEX)
+        message(AUTHOR_WARNING
+            "VS project filters won't be applied for file names with generator expression, "
+            "because source_group function doesn't support them.\n"
+            "Use CONDITION parameter of this function."
+        )
+    endif()
 
     source_group(${PARSED_ARGS_NAME} FILES ${PARSED_ARGS_FILES})
 endfunction()

@@ -57,7 +57,7 @@ set(_THEORA_SEARCH_NORMAL
   )
 list(APPEND _THEORA_SEARCHES _THEORA_SEARCH_NORMAL)
 
-set(THEORA_NAMES theora libtheora)
+set(THEORA_NAMES libtheora_static theora libtheora)
 set(THEORA_NAMES_DEBUG theorad theora_d theoraD theora_D)
 set(THEORADEC_NAMES theoradec libtheoradec)
 set(THEORADEC_NAMES_DEBUG theoradecd theoradec_d theoradecD theoradec_D)

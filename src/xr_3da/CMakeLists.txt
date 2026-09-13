@@ -26,17 +26,37 @@ target_include_directories(xr_3da
 
 target_link_libraries(xr_3da
     PRIVATE
-    xrCore
     xrAPI
+    xrCore
     xrEngine
     xrRender_GL
     xrGame
 )
 
+if (WIN32)
+    target_link_libraries(xr_3da
+        PRIVATE
+        xrRender_R4
+    )
+
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x64")
+    else()
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x86")
+    endif()
+
+    add_custom_command(TARGET xr_3da POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${_xr_runtime_dir}"
+            "$<TARGET_FILE_DIR:xr_3da>"
+        COMMENT "Copying Windows runtime dependencies"
+        VERBATIM
+    )
+endif()
+
 set_target_properties(xr_3da PROPERTIES
     PREFIX ""
-)
-
-install(TARGETS xr_3da RUNTIME
-    DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    WIN32_EXECUTABLE ON
+    VS_USER_PROPS ${XRAY_MSBUILD_PROPS}
+    VS_PACKAGE_REFERENCES "sdl2.nuget_2.32.4;sdl2.nuget.redist_2.32.4;directxmath_2024.10.15.1;directxtex_desktop_2019_2024.10.29.1"
 )

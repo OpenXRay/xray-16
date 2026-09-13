@@ -292,10 +292,9 @@ target_include_directories(xrAICore
 
 target_link_libraries(xrAICore
     PRIVATE
+    xrAPI
     xrCore
     xrEngine
-    xrMiscMath
-    xrAPI
     xrScriptEngine
 )
 
@@ -312,9 +311,3 @@ target_precompile_headers(xrAICore
     PRIVATE
     pch.hpp
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrAICore LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

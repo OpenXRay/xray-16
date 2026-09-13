@@ -37,7 +37,6 @@ target_include_directories(xrParticles
 target_link_libraries(xrParticles
     PRIVATE
     xrCore
-    xrMiscMath
     xrEngine
 )
 
@@ -54,9 +53,3 @@ target_precompile_headers(xrParticles
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrParticles LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()
