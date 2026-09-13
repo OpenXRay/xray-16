@@ -209,7 +209,7 @@ public:
 
     //захватить/освободить мышь окном
     //сообщение посылается дочерним окном родительскому
-    void SetCapture(CUIWindow* pChildWindow, bool capture_status);
+    virtual void SetCapture(CUIWindow* pChildWindow, bool capture_status);
 
     [[nodiscard]]
     CUIWindow* GetMouseCapturer() const { return m_pMouseCapturer; }
