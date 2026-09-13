@@ -168,7 +168,17 @@ void ide::UpdateMouseData()
     {
         if (io.WantSetMousePos)
         {
-            pInput->iSetMousePos({ (int)io.MousePos.x, (int)io.MousePos.y }, io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
+            const ImVec2 scale = Device.GetImGuiInputScale();
+            const float x = io.MousePos.x / scale.x;
+            const float y = io.MousePos.y / scale.y;
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+                SDL_WarpMouseGlobal(x, y);
+            else
+                SDL_WarpMouseInWindow(Device.m_sdlWnd, x, y);
+        }
+        else
+        {
+            IR_OnMouseMove(0, 0);
         }
     }
 
@@ -311,11 +321,14 @@ void ide::IR_OnMouseMove(int /*x*/, int /*y*/)
 {
     // x and y are relative to previous mouse position
     // ImGui accepts absolute coordinates (that are relative to window or monitor)
-    Ivector2 p;
-    pInput->iGetAsyncMousePos(p, ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
-
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMousePosEvent(static_cast<float>(p.x), static_cast<float>(p.y));
+    float x = 0.0f, y = 0.0f;
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        SDL_GetGlobalMouseState(&x, &y);
+    else
+        SDL_GetMouseState(&x, &y);
+    const ImVec2 scale = Device.GetImGuiInputScale();
+    io.AddMousePosEvent(x * scale.x, y * scale.y);
 }
 
 void ide::IR_OnKeyboardPress(int key)
