@@ -69,7 +69,6 @@ private:
     //	CUISpinText*		m_pModeSelector;
     CUIStatic* m_pMapPic;
     CUIMapInfo* m_pMapInfo;
-
     xr_string m_command;
     xr_string m_srv_params;
 };

@@ -176,7 +176,27 @@ void CALifeGraphRegistry::add(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_
     if (!object->m_bOnline && object->used_ai_locations() /**&& object->interactive()**/)
     {
         VERIFY(ai().game_graph().valid_vertex_id(game_vertex_id));
-        m_objects[game_vertex_id].objects().add(object->ID, object);
+        OBJECT_REGISTRY& target = m_objects[game_vertex_id].objects();
+        const auto& target_map = target.objects();
+        const auto existing_at_target = target_map.find(object->ID);
+        const bool already_registered_here =
+            (existing_at_target != target_map.end() && existing_at_target->second == object);
+
+        if (!already_registered_here)
+        {
+            const GameGraph::_GRAPH_ID vertex_count = (GameGraph::_GRAPH_ID)m_objects.size();
+            for (GameGraph::_GRAPH_ID i = 0; i < vertex_count; ++i)
+            {
+                if (!ai().game_graph().valid_vertex_id(i))
+                    continue;
+                OBJECT_REGISTRY& reg = m_objects[i].objects();
+                const auto& om = reg.objects();
+                if (om.find(object->ID) == om.end())
+                    continue;
+                reg.remove(object->ID, true);
+            }
+            target.add(object->ID, object);
+        }
         object->m_tGraphID = game_vertex_id;
     }
     else if (!m_level && update)
@@ -191,6 +211,7 @@ void CALifeGraphRegistry::add(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_
 
 void CALifeGraphRegistry::remove(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_ID game_vertex_id, bool update)
 {
+    bool removed_from_graph = false;
     if (object->used_ai_locations() /**&& object->interactive()**/)
     {
 #ifdef DEBUG
@@ -200,8 +221,51 @@ void CALifeGraphRegistry::remove(CSE_ALifeDynamicObject* object, GameGraph::_GRA
                 game_vertex_id);
         }
 #endif
-        m_objects[game_vertex_id].objects().remove(object->ID);
+        if (ai().game_graph().valid_vertex_id(game_vertex_id))
+        {
+            OBJECT_REGISTRY& primary = m_objects[game_vertex_id].objects();
+            const auto& primary_map = primary.objects();
+            if (primary_map.find(object->ID) != primary_map.end())
+            {
+                primary.remove(object->ID);
+                removed_from_graph = true;
+            }
+        }
+        if (!removed_from_graph)
+        {
+            const GameGraph::_GRAPH_ID vertex_count = (GameGraph::_GRAPH_ID)m_objects.size();
+            for (GameGraph::_GRAPH_ID i = 0; i < vertex_count; ++i)
+            {
+                if (!ai().game_graph().valid_vertex_id(i))
+                    continue;
+                if (i == game_vertex_id)
+                    continue;
+                OBJECT_REGISTRY& reg = m_objects[i].objects();
+                const auto& om = reg.objects();
+                if (om.find(object->ID) == om.end())
+                    continue;
+                reg.remove(object->ID);
+                removed_from_graph = true;
+#ifndef MASTER_GOLD
+                Msg("! [ALife] graph registry: object [%s][%d] was at vertex %u, not at m_tGraphID %u — removed from "
+                    "actual vertex",
+                    object->name_replace(), object->ID, i, game_vertex_id);
+#endif
+                break;
+            }
+        }
+#ifndef MASTER_GOLD
+        if (!removed_from_graph)
+            Msg("! [ALife] graph registry: remove [%s][%d] — not in any vertex map (expected %u), continuing",
+                object->name_replace(), object->ID, game_vertex_id);
+#endif
     }
     if (update && m_level)
-        level().remove(object, ai().game_graph().vertex(game_vertex_id)->level_id() != level().level_id());
+    {
+        bool level_no_assert =
+            ai().game_graph().vertex(game_vertex_id)->level_id() != level().level_id();
+        if (object->used_ai_locations() && !removed_from_graph)
+            level_no_assert = true;
+        level().remove(object, level_no_assert);
+    }
 }
