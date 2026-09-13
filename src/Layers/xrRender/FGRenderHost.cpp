@@ -15,8 +15,8 @@ IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, b
 
 IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, bool enableValidation)
 {
-    int w, h;
-    SDL_GetWindowSize(hWnd, &w, &h);
+    int w = 0, h = 0;
+    SDL_GetWindowSizeInPixels(hWnd, &w, &h);
     dwWidth = static_cast<u32>(w);
     dwHeight = static_cast<u32>(h);
 
@@ -65,8 +65,8 @@ void FGRenderHost::ResizeBackend(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight)
     if (!GEnv.Backend)
         return;
 
-    int w, h;
-    SDL_GetWindowSize(hWnd, &w, &h);
+    int w = 0, h = 0;
+    SDL_GetWindowSizeInPixels(hWnd, &w, &h);
     GEnv.Backend->ResizeSwapChain(static_cast<u32>(w), static_cast<u32>(h));
     std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
 }

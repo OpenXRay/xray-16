@@ -224,7 +224,9 @@ void CRenderDevice::UpdateWindowState()
 
     int pxW = 0, pxH = 0;
     SDL_GetWindowSizeInPixels(m_sdlWnd, &pxW, &pxH);
-    m_windowVisible = (pxW > 0 && pxH > 0);
+    int windowWidth = 0, windowHeight = 0;
+    SDL_GetWindowSize(m_sdlWnd, &windowWidth, &windowHeight);
+    m_windowVisible = (pxW > 0 && pxH > 0 && windowWidth > 0 && windowHeight > 0);
     if (!m_windowVisible)
         return;
 
@@ -232,16 +234,23 @@ void CRenderDevice::UpdateWindowState()
     {
         if (psDeviceMode.WindowStyle == rsWindowed)
         {
-            psDeviceMode.Width = static_cast<u32>(pxW);
-            psDeviceMode.Height = static_cast<u32>(pxH);
+            psDeviceMode.Width = static_cast<u32>(windowWidth);
+            psDeviceMode.Height = static_cast<u32>(windowHeight);
         }
         Reset();
-        return;
     }
 
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = { static_cast<float>(dwWidth), static_cast<float>(dwHeight) };
-    io.DisplayFramebufferScale = ImVec2{ 1.0f, 1.0f };
+    const ImVec2 pixelScale{
+        static_cast<float>(dwWidth) / windowWidth,
+        static_cast<float>(dwHeight) / windowHeight
+    };
+    const bool viewports = (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0;
+    io.DisplaySize = viewports
+        ? ImVec2{ static_cast<float>(windowWidth), static_cast<float>(windowHeight) }
+        : ImVec2{ static_cast<float>(dwWidth), static_cast<float>(dwHeight) };
+    io.DisplayFramebufferScale = viewports ? pixelScale : ImVec2{ 1.0f, 1.0f };
+    m_imgui_input_scale = viewports ? ImVec2{ 1.0f, 1.0f } : pixelScale;
 }
 
 SDL_Window* CRenderDevice::GetApplicationWindow()
