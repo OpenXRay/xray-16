@@ -277,9 +277,7 @@ void FrameGraph::Execute() {
     // ═══════════════════════════════════════════════════════
     //  PHASE A: Record async compute passes
     // ═══════════════════════════════════════════════════════
-    u64 computeInstanceID = 0;
     if (hasAsyncCompute) {
-        m_asyncComputeBackend->ComputeWaitForPreviousGraphics();
         m_computeCommandList->open();
         m_context->SetOverrideCommandList(m_computeCommandList);
 
@@ -291,7 +289,7 @@ void FrameGraph::Execute() {
 
         m_context->SetOverrideCommandList(nullptr);
         m_computeCommandList->close();
-        computeInstanceID = m_asyncComputeBackend->ExecuteComputeCommandList(m_computeCommandList);
+        m_asyncComputeBackend->QueueComputeCommandList(m_computeCommandList);
     }
 
     bool syncInserted = false;
@@ -303,7 +301,7 @@ void FrameGraph::Execute() {
         if (hasAsyncCompute && pass->isAsync)
             continue;
 
-        if (!syncInserted && computeInstanceID != 0) {
+        if (!syncInserted && hasAsyncCompute) {
             bool dependsOnAsync = false;
             for (const PassNode* dep : pass->dependsOn) {
                 if (dep->isAsync) {
@@ -312,7 +310,7 @@ void FrameGraph::Execute() {
                 }
             }
             if (dependsOnAsync) {
-                m_asyncComputeBackend->QueueWaitForCompute(computeInstanceID);
+                m_asyncComputeBackend->QueueWaitForCompute();
                 syncInserted = true;
             }
         }

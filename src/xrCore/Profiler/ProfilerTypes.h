@@ -5,6 +5,8 @@
 #include "xrCommon/xr_map.h"
 #include "xrCore/xrstring.h"
 
+#include <atomic>
+
 namespace xray::profiler
 {
 
@@ -16,7 +18,7 @@ struct ZoneInfo
     const char* name;
     const char* file;
     u32 line;
-    mutable u32 id = INVALID_ZONE_ID;  // Assigned on first use
+    mutable std::atomic<u32> id{INVALID_ZONE_ID};
 };
 
 // Per-frame timing data for a single zone

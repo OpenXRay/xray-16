@@ -25,7 +25,7 @@ public:
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
 
     // Frame lifecycle
-    void FrameStart();
+    void FrameStart(bool sampleFrame);
     void FrameEnd();
 
     // Resolve pending queries (call after GPU work completes)

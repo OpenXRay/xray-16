@@ -110,7 +110,7 @@ void FGFontRender::InitResources()
     uploadCL->open();
     uploadCL->writeBuffer(m_indexBuffer, quadIndices.data(), ibDesc.byteSize);
     uploadCL->close();
-    m_device->executeCommandList(uploadCL);
+    GEnv.Backend->ExecuteCommandList(uploadCL);
 
     u32 frameCount = GEnv.Backend ? GEnv.Backend->GetBackBufferCount() : 2u;
     if (frameCount < 2)

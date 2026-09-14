@@ -39,9 +39,8 @@ public:
 
     bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
     nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
-    u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) override;
-    void QueueWaitForCompute(u64 instanceID) override;
-    void ComputeWaitForPreviousGraphics() override;
+    void QueueComputeCommandList(nvrhi::ICommandList* commandList) override;
+    void QueueWaitForCompute() override;
 
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
@@ -129,4 +128,6 @@ private:
     // GC is launched at EndFrame and waited on at BeginFrame
     TaskHandle m_gcTask;
     u64 m_lastGraphicsInstanceID = 0;
+    u64 m_frameComputeInstanceID = 0;
+    bool m_frameWaitForCompute = false;
 };

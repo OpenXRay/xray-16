@@ -4,7 +4,7 @@
 namespace xray::profiler
 {
 
-static bool g_enabled = true;
+static std::atomic<bool> g_enabled{true};
 
 void Initialize()
 {

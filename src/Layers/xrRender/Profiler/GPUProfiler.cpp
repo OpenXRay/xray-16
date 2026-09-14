@@ -162,11 +162,11 @@ void GPUProfiler::SealRecordingFrame()
     m_recordingFrame = NO_RECORDING_FRAME;
 }
 
-void GPUProfiler::FrameStart()
+void GPUProfiler::FrameStart(bool sampleFrame)
 {
     SealRecordingFrame();
     ++m_currentFrame;
-    if (!m_enabled || !m_device)
+    if (!m_enabled || !m_device || !sampleFrame)
         return;
 
     size_t frameIndex = 0;

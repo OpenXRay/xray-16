@@ -556,7 +556,7 @@ bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
     }
 
     cmdList->close();
-    device->executeCommandList(cmdList);
+    GEnv.Backend->ExecuteCommandList(cmdList);
 
     Msg("  ✓ Heightmap texture loaded: %ux%u R32_FLOAT, %u mips",
         texDesc.width, texDesc.height, texDesc.mipLevels);
