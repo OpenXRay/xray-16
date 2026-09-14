@@ -22,8 +22,6 @@ private:
     typedef xr_vector<Upgrade*> Upgrades_vec;
 
 public:
-    Root();
-    virtual ~Root();
     void construct(const shared_str& root_id, Manager& manager_r);
     IC LPCSTR scheme() const;
 
@@ -31,13 +29,13 @@ public:
     virtual bool is_root();
 
 #ifdef DEBUG
-    virtual void log_hierarchy(LPCSTR nest);
-    void test_all_upgrades(CInventoryItem& item);
+    void log_hierarchy(pcstr nest) const override;
+    void test_all_upgrades(CInventoryItem& item) const;
 #endif // DEBUG
 
-    virtual bool contain_upgrade(const shared_str& upgrade_id);
-    bool verify_scheme_index(const Ivector2& scheme_index);
-    Upgrade* get_upgrade_by_index(Ivector2 const& index);
+    bool contain_upgrade(const shared_str& upgrade_id) const override;
+    bool verify_scheme_index(const Ivector2& scheme_index) const;
+    Upgrade* get_upgrade_by_index(Ivector2 const& index) const;
 
     void highlight_hierarchy(shared_str const& upgrade_id);
     void reset_highlight();

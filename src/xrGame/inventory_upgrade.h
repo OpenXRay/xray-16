@@ -107,7 +107,7 @@ public:
 
     virtual UpgradeStateResult can_install(CInventoryItem& item, bool loading);
     virtual UpgradeStateResult can_add(CInventoryItem& item);
-    bool check_scheme_index(const Ivector2& scheme_index);
+    bool check_scheme_index(const Ivector2& scheme_index) const;
     void set_highlight(bool value);
     void run_effects(bool loading);
 

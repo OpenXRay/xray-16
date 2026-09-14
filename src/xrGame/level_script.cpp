@@ -940,9 +940,21 @@ void CLevel::script_register(lua_State* luaState)
             .def(self + xrTime())
             .def(self - xrTime())
 
-            .def("diffSec", &xrTime::diffSec_script)
-            .def("add", &xrTime::add_script)
-            .def("sub", &xrTime::sub_script)
+            .def("diffSec", +[](const xrTime* self, const xrTime* other) -> float
+            {
+                R_ASSERT1_CURE(other, { return 0; });
+                return self->diffSec(*other);
+            })
+            .def("add", +[](xrTime* self, const xrTime* other)
+            {
+                R_ASSERT1_CURE(other, { return; });
+                self->add(*other);
+            })
+            .def("sub", +[](xrTime* self, const xrTime* other)
+            {
+                R_ASSERT1_CURE(other, { return; });
+                self->sub(*other);
+            })
 
             .def("setHMS", &xrTime::setHMS)
             .def("setHMSms", &xrTime::setHMSms)

@@ -19,6 +19,7 @@ enum ECallbackType : u32
 
     eInventoryPda,
     eInventoryInfo,
+    eInventoryInfoRemoved,
     eArticleInfo,
     eTaskStateChange,
     eMapLocationAdded,

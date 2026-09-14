@@ -946,7 +946,7 @@ float CIKLimb::ObjShiftDown(float current_shift, const SCalculateData& cd) const
     Fvector g;
     g.sub(m_foot.ref_bone_to_foot(m, cd.state.goal.get()).c, hip);
     float l = m_limb.Length();
-    return -g.y - _sqrt(l * l - g.x * g.x - g.z * g.z);
+    return -g.y - _sqrt(std::clamp(l * l - g.x * g.x - g.z * g.z, 0.f, l * l));
 }
 
 float CIKLimb::get_time_to_step_begin(const CBlend& B) const

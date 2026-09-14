@@ -18,8 +18,8 @@ namespace upgrade
 class Group : private Noncopyable
 {
 public:
-    Group();
-    virtual ~Group();
+    virtual ~Group() = default;
+
     void construct(const shared_str& group_id, UpgradeBase& parent_upgrade, Manager& manager_r);
     void add_parent_upgrade(UpgradeBase& parent_upgrade);
 
@@ -27,7 +27,7 @@ public:
     IC LPCSTR id_str() const;
 
 #ifdef DEBUG
-    void log_hierarchy(LPCSTR nesting);
+    void log_hierarchy(pcstr nesting) const;
 #endif // DEBUG
 
     void fill_root(Root* root);

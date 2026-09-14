@@ -706,7 +706,15 @@ void CSE_ALifeSpaceRestrictor::STATE_Read(NET_Packet& tNetPacket, u16 size)
     inherited1::STATE_Read(tNetPacket, size);
     cform_read(tNetPacket);
     if (m_wVersion > 74)
+    {
         m_space_restrictor_type = tNetPacket.r_u8();
+        if (m_space_restrictor_type > RestrictionSpace::eRestrictorTypeOut)
+        {
+            Msg("! Space restrictor[%s][%s] located at game vertex[%u] and level vertex[%u] has wrong type[%u] during STATE_Read. "
+                "This will result in NODEFAULT crash. Check what you are submitting in the net packet.",
+                name(), name_replace(), m_tGraphID, m_tNodeID, m_space_restrictor_type);
+        }
+    }
 }
 
 void CSE_ALifeSpaceRestrictor::STATE_Write(NET_Packet& tNetPacket)
