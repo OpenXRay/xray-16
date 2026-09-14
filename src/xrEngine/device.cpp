@@ -151,23 +151,14 @@ void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
 void CRenderDevice::CalcFrameStats()
 {
     stats.RenderTotal.FrameEnd();
-    do
+    if (stats.RenderTotal.result > EPS_S)
     {
-        // calc FPS & TPS
-        if (fTimeDeltaReal <= EPS_S)
-            break;
-        const float fps = 1.f / fTimeDeltaReal;
-        // if (Engine.External.tune_enabled) vtune.update (fps);
         constexpr float fOne = 0.3f;
         constexpr float fInv = 1.0f - fOne;
-        stats.fFPS = fInv * stats.fFPS + fOne * fps;
-        if (stats.RenderTotal.result > EPS_S)
-        {
-            const u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
-            stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
-            stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
-        }
-    } while (false);
+        const u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
+        stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
+        stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
+    }
     stats.RenderTotal.FrameStart();
 }
 
@@ -270,6 +261,35 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
+void CRenderDevice::PaceFrame()
+{
+    const auto windowFlags = m_sdlWnd ? SDL_GetWindowFlags(m_sdlWnd) : 0;
+    const bool hidden = !GEnv.isDedicatedServer && (windowFlags & (SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED));
+
+    if (!b_is_Ready || hidden || !g_loading_events.empty())
+    {
+        m_framePacer.Reset();
+        fTimeDeltaReal = 0.f;
+        return;
+    }
+
+    int fpsCap = ps_fps_limit;
+    if (GEnv.isDedicatedServer)
+        fpsCap = g_svDedicateServerUpdateReate;
+    else if (Paused() || !g_pGameLevel ||
+        (g_pGamePersistent && (g_pGamePersistent->IsMainMenuActive() || !g_pGamePersistent->IsLoaded())))
+        fpsCap = ps_fps_limit_in_menu;
+
+    u64 nowNs = SDL_GetTicksNS();
+    const u64 delayNs = m_framePacer.GetDelayNs(nowNs, static_cast<u32>(fpsCap));
+    if (delayNs > 0)
+    {
+        SDL_DelayPrecise(delayNs);
+        nowNs = SDL_GetTicksNS();
+    }
+    fTimeDeltaReal = static_cast<float>(m_framePacer.StartFrame(nowNs)) * 1e-9f;
+}
+
 void CRenderDevice::ProcessFrame()
 {
     // Update profiler enabled state based on rs_stats
@@ -290,6 +310,8 @@ void CRenderDevice::ProcessFrame()
 
         if (!m_windowVisible)
         {
+            m_framePacer.Reset();
+            fTimeDeltaReal = 0.f;
             Sleep(16);
             xray::profiler::FrameEnd();
             return;
@@ -302,8 +324,6 @@ void CRenderDevice::ProcessFrame()
         }
 
         xray::memstats::FrameBegin();
-
-        const u64 frameStartNs = SDL_GetTicksNS();
 
         FrameMove();
 
@@ -321,21 +341,6 @@ void CRenderDevice::ProcessFrame()
         DoRender();
 
         TaskScheduler->Wait(processSeqParallel);
-
-        int fpsCap = ps_fps_limit;
-        if (GEnv.isDedicatedServer)
-            fpsCap = g_svDedicateServerUpdateReate;
-        else if (Paused() || g_pGameLevel == nullptr)
-            fpsCap = ps_fps_limit_in_menu;
-
-        if (fpsCap > 0)
-        {
-            const u64 targetFrameNs = 1'000'000'000ull / static_cast<u64>(fpsCap);
-            const u64 deadlineNs = frameStartNs + targetFrameNs;
-            const u64 nowNs = SDL_GetTicksNS();
-            if (nowNs < deadlineNs)
-                SDL_DelayPrecise(deadlineNs - nowNs);
-        }
 
         if (!b_is_Active)
             SDL_DelayNS(1'000'000ull);
@@ -430,6 +435,7 @@ void CRenderDevice::Run()
     ZoneScoped;
 
     g_bLoaded = false;
+    m_framePacer.Reset();
     Log("Starting engine...");
 
     // Startup timers and calculate timer delta
@@ -467,10 +473,16 @@ void CRenderDevice::FrameMove()
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
 
-    fTimeDeltaReal = Timer.GetElapsed_sec();
-    if (!_valid(fTimeDeltaReal))
-        fTimeDeltaReal = EPS_S + EPS_S;
-    Timer.Start(); // previous frame
+    float simulationDelta = Timer.GetElapsed_sec();
+    if (!_valid(simulationDelta))
+        simulationDelta = EPS_S + EPS_S;
+    Timer.Start();
+
+    if (fTimeDeltaReal > 0.f)
+    {
+        m_averageFrameTime = 0.7f * m_averageFrameTime + 0.3f * fTimeDeltaReal;
+        stats.fFPS = 1.f / m_averageFrameTime;
+    }
 
     if (psDeviceFlags.test(rsConstantFPS))
     {
@@ -491,7 +503,7 @@ void CRenderDevice::FrameMove()
             fTimeDelta = 0.0f;
         else
         {
-            fTimeDelta = 0.1f * fTimeDelta + 0.9f * fTimeDeltaReal; // smooth random system activity - worst case ~7% error
+            fTimeDelta = 0.1f * fTimeDelta + 0.9f * simulationDelta;
             clamp(fTimeDelta, EPS_S + EPS_S, .1f); // limit to 10fps minimum
         }
         fTimeGlobal = TimerGlobal.GetElapsed_sec();
@@ -499,7 +511,7 @@ void CRenderDevice::FrameMove()
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
-    ImGui::GetIO().DeltaTime = fTimeDeltaReal;
+    ImGui::GetIO().DeltaTime = fTimeDeltaReal > 0.f ? fTimeDeltaReal : 1.f / 60.f;
 
     m_imgui_render->Frame();
     ImGui::NewFrame();

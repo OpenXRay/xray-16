@@ -307,6 +307,7 @@ target_sources_grouped(
     FILES
     device.cpp
     device.h
+    FramePacer.h
     Device_create.cpp
     Device_destroy.cpp
     Device_imgui.cpp

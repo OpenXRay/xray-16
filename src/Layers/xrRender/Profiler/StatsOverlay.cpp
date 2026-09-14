@@ -119,11 +119,10 @@ void StatsOverlay::Render()
 
     // Frame time header
     CPUProfiler& cpuProfiler = GetCPUProfiler();
-    float cpuFrameTime = cpuProfiler.GetFrameTimeMs();
-    float gpuFrameTime = m_gpuProfiler ? m_gpuProfiler->GetTotalGPUTimeMs() : 0.0f;
-    float fps = cpuFrameTime > 0.0f ? 1000.0f / cpuFrameTime : 0.0f;
+    const float frameTime = Device.fTimeDeltaReal * 1000.f;
+    const float fps = Device.GetStats().fFPS;
 
-    ImGui::Text("Frame: %s (%.1f FPS)", FormatTime(cpuFrameTime), fps);
+    ImGui::Text("Frame: %s (%.1f FPS)", FormatTime(frameTime), fps);
     if (!ideActive)
     {
         ImGui::TextDisabled("(Press editor key to interact)");
