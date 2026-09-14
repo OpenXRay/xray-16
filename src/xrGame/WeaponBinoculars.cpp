@@ -44,9 +44,8 @@ void CWeaponBinoculars::OnZoomIn()
         m_sounds.StopSound("sndZoomOut");
         bool b_hud_mode = (Level().CurrentEntity() == H_Parent());
         m_sounds.PlaySound("sndZoomIn", H_Parent()->Position(), H_Parent(), b_hud_mode);
-        if (m_bVision && !m_binoc_vision)
+        if (m_bVision && !m_binoc_vision && psHUD_Flags.test(HUD_BINOCULAR_VISION))
         {
-            //.VERIFY			(!m_binoc_vision);
             m_binoc_vision = xr_new<CBinocularsVision>(cNameSect());
         }
     }
@@ -95,7 +94,7 @@ bool CWeaponBinoculars::render_item_ui_query()
 
 void CWeaponBinoculars::render_item_ui()
 {
-    if (psHUD_Flags.test(HUD_BINOCULAR_VISION))
+    if (psHUD_Flags.test(HUD_BINOCULAR_VISION) && m_binoc_vision)
         m_binoc_vision->Draw();
     inherited::render_item_ui();
 }
