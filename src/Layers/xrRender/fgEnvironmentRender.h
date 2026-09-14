@@ -55,14 +55,11 @@ private:
 
     ref_texture tsky0, tsky1;
     ref_texture t_envmap_0, t_envmap_1;
-    ref_texture tonemap;
 
     u32 tsky0_tstage{};
     u32 tsky1_tstage{};
     u32 tclouds0_tstage{};
     u32 tclouds1_tstage{};
-    u32 tonemap_tstage_2sky{ u32(-1) };
-    u32 tonemap_tstage_clouds{ u32(-1) };
 
     nvrhi::IDevice* m_device = nullptr;
     nvrhi::BufferHandle m_skyVertexBuffer;

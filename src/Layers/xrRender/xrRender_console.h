@@ -107,15 +107,6 @@ extern ECORE_API Flags32 ps_r2_ls_flags_ext;
 extern ECORE_API float ps_r2_df_parallax_h; // r2-only
 extern ECORE_API float ps_r2_df_parallax_range; // r2-only
 extern ECORE_API float ps_r2_gmaterial; // r2-only
-extern ECORE_API float ps_r2_tonemap_middlegray; // r2-only
-extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
-extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
-extern ECORE_API float ps_r2_tonemap_amount; // r2-only
-extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear
-extern ECORE_API float ps_r2_ls_bloom_threshold; // r2-only
-extern ECORE_API float ps_r2_ls_bloom_speed; // r2-only
 extern ECORE_API float ps_r2_ls_dsm_kernel; // r2-only
 extern ECORE_API float ps_r2_ls_psm_kernel; // r2-only
 extern ECORE_API float ps_r2_ls_ssm_kernel; // r2-only
@@ -177,10 +168,8 @@ enum
     R2FLAG_SUN_FOCUS = (1 << 1),
     R2FLAG_SUN_TSM = (1 << 2),
     R2FLAG_SUN_DETAILS = (1 << 3),
-    R2FLAG_TONEMAP = (1 << 4),
     R2FLAG_AA = (1 << 5),
     R2FLAG_GI = (1 << 6),
-    R2FLAG_FASTBLOOM = (1 << 7),
     R2FLAG_GLOBALMATERIAL = (1 << 8),
     R2FLAG_ZFILL = (1 << 9),
     R2FLAG_R1LIGHTS = (1 << 10),

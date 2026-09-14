@@ -52,10 +52,9 @@
 #include "FrameGraphPasses/DecalPassSetup.h"          // Screen-space box decals
 #include "Decals/DecalManager.h"                      // Decal manager
 #include "Decals/OverlayManager.h"                    // Per-NPC overlay textures
-#include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/FontPassSetup.h"
-#include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
+#include "FrameGraphPasses/PresentPassSetup.h"
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
 #include "ClusteredLightManager.h"
@@ -334,8 +333,6 @@ void FrameGraphRenderer::Shutdown() {
     if (m_blackboard) {
         if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
             passes::ShutdownReSTIRGI(*rtgi);
-        if (auto* tonemap = m_blackboard->try_get<passes::TonemapPassState>())
-            passes::ShutdownTonemapPass(*tonemap);
         m_blackboard.reset();
     }
 
@@ -527,7 +524,6 @@ void FrameGraphRenderer::Render() {
     // TODO: Get statistics from FrameGraph itself
     m_stats.gbufferMs = 0.0f;
     m_stats.lightingMs = 0.0f;
-    m_stats.tonemapMs = 0.0f;
     m_stats.numDrawCalls = 0;
     m_stats.numTriangles = 0;
 }
@@ -598,15 +594,14 @@ void FrameGraphRenderer::RenderMenu() {
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
     sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
 
-    auto ldrOutput = passes::setupTonemapPass(
+    auto ldrOutput = passes::setupPresentPass(
         *m_framegraph,
         m_device,
-        sceneWithUI,  // HDR input (RGBA16_FLOAT)
-        framegraph::VirtualResourceHandle(),  // No exposure for menu
-        backbufferHandle,  // Output directly to imported backbuffer
+        sceneWithUI,
+        backbufferHandle,
         width,
         height,
-        m_blackboard->get_or_add<passes::TonemapPassState>()
+        m_blackboard->get_or_add<passes::PresentPassState>()
     );
 
     fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
@@ -1788,23 +1783,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
-    // ═══════════════════════════════════════════════════════
-    passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
-    auto exposureOutput = passes::setupExposurePass(
-        *m_framegraph,
-        m_device,
-        sceneColor,
-        exposureConfig,
-        Device.fTimeDelta,
-        width,
-        height,
-        m_blackboard->get_or_add<passes::ExposurePassState>()
-    );
-
-    m_exposureTexture = exposureOutput.exposureTexture;
-
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
         sceneColor,
@@ -1824,17 +1802,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
 
-    // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
-    auto ldrOutput = passes::setupTonemapPass(
+    auto ldrOutput = passes::setupPresentPass(
         *m_framegraph,
         m_device,
         sceneWithUI,
-        exposureOutput.exposureTexture,
         backbufferHandle,
         width,
         height,
-        m_blackboard->get_or_add<passes::TonemapPassState>(),
-        &m_blackboard->get_or_add<passes::ExposurePassState>()
+        m_blackboard->get_or_add<passes::PresentPassState>()
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1845,7 +1820,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
     m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Material", materialBuffer);
-    m_framegraph->GetRTRegistry().RegisterRT("rt_Exposure", exposureOutput.exposureTexture);
     if (motionOutput.motionVectors.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);
     if (ps_r_rt_gi)
@@ -2006,7 +1980,6 @@ void FrameGraphRenderer::PrintStats() const {
         1000.0f / m_stats.totalFrameMs);
     Msg("  G-Buffer: %.2f ms", m_stats.gbufferMs);
     Msg("  Lighting: %.2f ms", m_stats.lightingMs);
-    Msg("  Tonemap: %.2f ms", m_stats.tonemapMs);
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");

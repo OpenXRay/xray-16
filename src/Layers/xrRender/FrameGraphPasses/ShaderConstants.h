@@ -231,17 +231,12 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
 struct SunLightData {
     Fvector color;      // Sun color (RGB)
     Fvector direction;  // Sun direction (world space, pointing toward light)
-    float intensity;    // HDR intensity multiplier (1.0 = SDR, 2.0+ = HDR)
 };
 
 inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
     const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
 
-    cb.L_sun_color.set(
-        sun.color.x * sun.intensity,
-        sun.color.y * sun.intensity,
-        sun.color.z * sun.intensity
-    );
+    cb.L_sun_color.set(sun.color);
 
     cb.L_sun_dir_w.set(
         sun.direction.x,
@@ -268,7 +263,7 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
     }
 }
 
-void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
+void GetSunLightData(SunLightData& outSun);
 const Fvector& SunDirVisual();
 void ResetSunDirVisual();
 Fmatrix HudFovWarp();
@@ -281,11 +276,11 @@ struct HudShadowFit {
 };
 HudShadowFit BuildHudShadowFit(const Fvector4& trueSphere);
 
-inline StaticGlobals BuildStaticGlobals(float hdrIntensity = 2.0f) {
+inline StaticGlobals BuildStaticGlobals() {
     StaticGlobals sg = {};
     FillGlobalConstants(sg);
     SunLightData sunData;
-    GetSunLightData(sunData, hdrIntensity);
+    GetSunLightData(sunData);
     FillSunConstants(sg, sunData);
     return sg;
 }

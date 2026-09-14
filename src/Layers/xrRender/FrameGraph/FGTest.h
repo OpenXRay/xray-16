@@ -17,9 +17,6 @@ namespace xray::render::framegraph {
 // Simple triangle test - single pass clear + render
 void TestSimpleTriangle(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
 
-// Two-pass test - HDR render → Tonemap
-void TestTwoPassRender(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
-
 // Resource aliasing test - Multiple transient resources with non-overlapping lifetimes
 void TestResourceAliasing(fg::RenderDevice* renderDevice, fg::RenderContext* context, nvrhi::ITexture* backbuffer);
 

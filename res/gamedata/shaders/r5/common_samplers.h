@@ -74,9 +74,7 @@ Texture2D	s_diffuse;	// rgb.a = diffuse.gloss
 Texture2D	s_accumulator;      	// rgb.a = diffuse.specular
 #endif
 //uniform sampler2D       s_generic;              //
-Texture2D	s_bloom;	//
 Texture2D	s_image;	// used in various post-processing
-Texture2D	s_tonemap;	// actually MidleGray / exp(Lw + eps)
 
 
 #endif	//	#ifndef	common_samplers_h_included
