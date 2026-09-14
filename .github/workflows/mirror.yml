@@ -7,7 +7,7 @@ jobs:
     if: github.repository == 'OpenXRay/xray-16'
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
