@@ -60,26 +60,4 @@ struct HiZCB {
     u32 pad1;
 };
 
-struct HistogramCB {
-    float minLogLum;
-    float logLumRange;
-    u32 width;
-    u32 height;
-};
-
-struct AdaptCB {
-    float minLogLum;
-    float logLumRange;
-    float lowPercentile;
-    float highPercentile;
-    float adaptSpeedUp;
-    float adaptSpeedDown;
-    float deltaTime;
-    float exposureCompensation;
-    float minExposure;
-    float maxExposure;
-    float calibrationConstant;
-    float padding;
-};
-
 } // namespace xray::render::fg::passes

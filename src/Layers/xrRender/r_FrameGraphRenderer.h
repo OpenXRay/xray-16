@@ -218,7 +218,6 @@ public:
         float totalFrameMs = 0.0f;
         float gbufferMs = 0.0f;
         float lightingMs = 0.0f;
-        float tonemapMs = 0.0f;
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
     };
@@ -433,9 +432,6 @@ private:
     framegraph::VirtualResourceHandle m_rt_MenuDistort;   // Distortion mask
     framegraph::VirtualResourceHandle m_rt_FinalComposite; // Final composited output (scene + UI)
 
-    // Exposure texture (1x1 R32_FLOAT) for sky and tonemap passes
-    framegraph::VirtualResourceHandle m_exposureTexture;
-
     // Hi-Z pyramid (R32_FLOAT with mip chain) for GPU occlusion culling
     // Generated from depth prepass, used by GPU culling and froxel volumetrics
     framegraph::VirtualResourceHandle m_hizPyramid;
@@ -469,7 +465,6 @@ private:
     //xr_unique_ptr<passes::HUDPass> m_hudPass;
     //xr_unique_ptr<passes::ParticlePass> m_particlePass;
     //xr_unique_ptr<passes::LightingPass> m_lightingPass;
-    //xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 
     // UI rendering passes (5-step pipeline - works for menu AND in-game)
     //xr_unique_ptr<passes::UIPass> m_uiPass;                   // Step 1: Render UI sprites/widgets

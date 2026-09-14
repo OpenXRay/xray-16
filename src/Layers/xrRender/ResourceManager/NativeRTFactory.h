@@ -49,12 +49,6 @@ public:
     //  POST-PROCESS RENDER TARGETS
     // ═══════════════════════════════════════════════════
 
-    // HDR accumulation buffer - RGBA16F or RGB11B10F
-    TextureHandle CreateHDRTarget(u32 width, u32 height, const char* name = "rt_HDR");
-
-    // Bloom chain (multiple mips) - RGBA16F
-    TextureHandle CreateBloomTarget(u32 width, u32 height, u32 mipLevels, const char* name = "rt_Bloom");
-
     // LDR output - RGBA8_UNORM
     TextureHandle CreateLDRTarget(u32 width, u32 height, const char* name = "rt_LDR");
 

@@ -1,0 +1,12 @@
+Texture2D<float4> t_scene : register(t0);
+
+#include "common_samplers.h"
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_TARGET {
+    return t_scene.Sample(smp_linear, input.texcoord);
+}
