@@ -87,7 +87,7 @@ void DecalManager::CreateCubeMesh(nvrhi::IDevice* device)
     cmdList->writeBuffer(m_cubeVB, s_cubeVerts, sizeof(s_cubeVerts));
     cmdList->writeBuffer(m_cubeIB, s_cubeIndices, sizeof(s_cubeIndices));
     cmdList->close();
-    device->executeCommandList(cmdList);
+    GEnv.Backend->ExecuteCommandList(cmdList);
 }
 
 Fmatrix DecalManager::BuildOBBMatrix(const Fvector& pos, const Fvector& normal, float size, float angle)

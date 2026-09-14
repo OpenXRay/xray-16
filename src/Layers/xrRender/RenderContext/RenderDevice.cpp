@@ -12,7 +12,7 @@ static std::mutex s_textureUploadMutex;
 class ScopedUpload {
 public:
     ScopedUpload(IRenderBackend* backend, nvrhi::IDevice* device)
-        : m_backend(backend), m_device(device), m_ownsCommandList(false)
+        : m_ownsCommandList(false)
     {
         if (backend && backend->IsInFrame()) {
             m_cmdList = backend->GetCommandList();
@@ -27,14 +27,14 @@ public:
             m_cmdList = s_textureUploadCmdList.Get();
             m_ownsCommandList = true;
         }
-        m_cmdList->beginMarker("Texture Upload");
+        m_cmdList->beginMarker("Resource Upload");
     }
 
     ~ScopedUpload() {
         m_cmdList->endMarker();
         if (m_ownsCommandList && s_textureUploadCmdList) {
             s_textureUploadCmdList->close();
-            m_device->executeCommandList(s_textureUploadCmdList);
+            GEnv.Backend->ExecuteCommandList(s_textureUploadCmdList);
         }
     }
 
@@ -42,8 +42,6 @@ public:
     operator nvrhi::ICommandList*() const { return m_cmdList; }
 
 private:
-    IRenderBackend* m_backend;
-    nvrhi::IDevice* m_device;
     nvrhi::ICommandList* m_cmdList = nullptr;
     std::unique_lock<std::mutex> m_lock;
     bool m_ownsCommandList;
@@ -385,11 +383,8 @@ BufferHandle RenderDevice::CreateBuffer(
     }
 
     if (initialData) {
-        nvrhi::ICommandList* cmdList = m_backend->GetCommandList();
-        cmdList->open();
-        cmdList->writeBuffer(nvrhiBuffer, initialData, desc.byteSize);
-        cmdList->close();
-        m_backend->ExecuteCommandList(cmdList);
+        ScopedUpload upload(m_backend.get(), GetNativeDevice());
+        upload.Get()->writeBuffer(nvrhiBuffer, initialData, desc.byteSize);
     }
 
     BufferHandle handle = AllocateBufferHandle();
@@ -435,11 +430,8 @@ void RenderDevice::UpdateBuffer(
     BufferInfo& info = m_buffers[handle.index];
     VERIFY(offset + size <= info.desc.byteSize);
 
-    nvrhi::ICommandList* cmdList = m_backend->GetCommandList();
-    cmdList->open();
-    cmdList->writeBuffer(info.nvrhiHandle, data, size, offset);
-    cmdList->close();
-    m_backend->ExecuteCommandList(cmdList);
+    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    upload.Get()->writeBuffer(info.nvrhiHandle, data, size, offset);
 }
 
 nvrhi::IBuffer* RenderDevice::GetNativeBuffer(BufferHandle handle) {
@@ -633,7 +625,7 @@ void RenderDevice::DestroyContext(RenderContext* context) {
 
 void RenderDevice::ExecuteContext(RenderContext* context) {
     VERIFY(context);
-    m_backend->ExecuteCommandList(context->GetCommandList());
+    GEnv.Backend->ExecuteCommandList(context->GetCommandList());
 }
 
 nvrhi::IDevice* RenderDevice::GetNativeDevice() const {

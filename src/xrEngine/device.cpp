@@ -295,14 +295,11 @@ void CRenderDevice::PaceFrame()
 
 void CRenderDevice::ProcessFrame()
 {
-    static u32 profilerFrameCounter = 0;
-    profilerFrameCounter++;
-    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
-    const bool shouldProfile = psDeviceFlags.test(rsStatistic) && ((profilerFrameCounter % throttleInterval) == 0);
-    xray::profiler::SetEnabled(shouldProfile);
+    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
 
     xray::profiler::FrameStart();
 
+    do
     {
         ZoneScoped;
 
@@ -313,14 +310,12 @@ void CRenderDevice::ProcessFrame()
             m_framePacer.Reset();
             fTimeDeltaReal = 0.f;
             Sleep(16);
-            xray::profiler::FrameEnd();
-            return;
+            break;
         }
 
         if (!BeforeFrame())
         {
-            xray::profiler::FrameEnd();
-            return;
+            break;
         }
 
         xray::memstats::FrameBegin();
@@ -347,7 +342,7 @@ void CRenderDevice::ProcessFrame()
 
         const bool recordAlloc = (g_pGameLevel != nullptr) && (dwPrecacheFrame == 0);
         xray::memstats::FrameEnd(recordAlloc);
-    }
+    } while (false);
 
     xray::profiler::FrameEnd();
 }
@@ -405,8 +400,12 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         const auto window = SDL_GetWindowFromID(event.window.windowID);
         if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
         {
-            psDeviceMode.Width = static_cast<u32>(event.window.data1);
-            psDeviceMode.Height = static_cast<u32>(event.window.data2);
+            int windowWidth = 0, windowHeight = 0;
+            if (SDL_GetWindowSize(window, &windowWidth, &windowHeight) && windowWidth > 0 && windowHeight > 0)
+            {
+                psDeviceMode.Width = static_cast<u32>(windowWidth);
+                psDeviceMode.Height = static_cast<u32>(windowHeight);
+            }
         }
         if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
             viewport->PlatformRequestResize = true;

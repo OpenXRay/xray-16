@@ -14,11 +14,11 @@ static bool FormatSubmitThreadLine(char* buf, size_t size)
     if (!GEnv.Backend || !GEnv.Backend->GetSubmitThreadTimings(t))
         return false;
     xr_sprintf(buf, size,
-        "SubmitThread (us): latency %llu | qlock %llu | semWait %llu | encode %llu | plock %llu | present %llu | fence %llu | gc %llu",
+        "SubmitThread (us): latency %llu | qlock %llu | semWait %llu | encode %llu | plock %llu | present %llu | gc %llu",
         (unsigned long long)t.jobLatencyUs, (unsigned long long)t.queueLockUs,
         (unsigned long long)t.semWaitUs, (unsigned long long)t.encodeUs,
         (unsigned long long)t.presentLockUs, (unsigned long long)t.presentUs,
-        (unsigned long long)t.fenceUs, (unsigned long long)t.gcUs);
+        (unsigned long long)t.gcUs);
     return true;
 }
 

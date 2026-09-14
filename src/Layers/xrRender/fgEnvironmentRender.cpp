@@ -220,7 +220,7 @@ void FGEnvironmentRender::InitSkyResources()
         for (u32 face = 0; face < 6; ++face)
             uploadCmd->writeTexture(m_skyPlaceholderCube, face, 0, &skyBlue, sizeof(skyBlue));
         uploadCmd->close();
-        m_device->executeCommandList(uploadCmd);
+        GEnv.Backend->ExecuteCommandList(uploadCmd);
     }
 
     auto* shaderLoader = RImplementation.GetShaderLoader();
@@ -418,7 +418,7 @@ void FGEnvironmentRender::InitSunResources()
         u16 indices[] = {0, 1, 2, 2, 1, 3};
         uploadCmd->writeBuffer(m_sunIndexBuffer, indices, sizeof(indices));
         uploadCmd->close();
-        m_device->executeCommandList(uploadCmd);
+        GEnv.Backend->ExecuteCommandList(uploadCmd);
     }
 
     auto* shaderLoader = RImplementation.GetShaderLoader();

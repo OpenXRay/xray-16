@@ -21,7 +21,7 @@ public:
     void BeginPass(nvrhi::ICommandList* cmdList, const char* name, bool isAsync = false);
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
 
-    void FrameStart();
+    void FrameStart(bool sampleFrame);
     void FrameEnd();
 
     void ResolvePendingQueries();

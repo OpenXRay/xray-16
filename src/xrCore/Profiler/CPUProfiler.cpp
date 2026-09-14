@@ -6,33 +6,28 @@
 namespace xray::profiler
 {
 
-void ThreadZoneStack::Push(u32 zoneId)
+bool ThreadZoneStack::Push(u32 zoneId, u64 epoch, u32 previousMemoryZone)
 {
-    if (m_depth < MAX_DEPTH)
-    {
-        m_stack[m_depth++] = zoneId;
-    }
+    if (m_depth == MAX_DEPTH)
+        return false;
+    const u32 parentId = CurrentParent(epoch);
+    m_stack[m_depth++] = {zoneId, parentId, previousMemoryZone, epoch};
+    return true;
 }
 
-u32 ThreadZoneStack::Pop()
+ThreadZoneStack::Entry ThreadZoneStack::Pop()
 {
-    if (m_depth > 0)
-    {
+    if (m_depth != 0)
         return m_stack[--m_depth];
-    }
-    return INVALID_ZONE_ID;
+    return {INVALID_ZONE_ID, INVALID_ZONE_ID, INVALID_ZONE_ID, 0};
 }
 
-u32 ThreadZoneStack::CurrentParent() const
+u32 ThreadZoneStack::CurrentParent(u64 epoch) const
 {
-    if (m_depth > 0)
-    {
-        return m_stack[m_depth - 1];
-    }
+    if (m_depth != 0 && m_stack[m_depth - 1].epoch == epoch)
+        return m_stack[m_depth - 1].zoneId;
     return INVALID_ZONE_ID;
 }
-
-static CPUProfiler* g_cpuProfiler = nullptr;
 
 CPUProfiler::CPUProfiler()
 {
@@ -46,47 +41,60 @@ CPUProfiler::~CPUProfiler() = default;
 
 CPUProfiler& CPUProfiler::Instance()
 {
-    if (!g_cpuProfiler)
-    {
-        g_cpuProfiler = new CPUProfiler();
-    }
-    return *g_cpuProfiler;
+    static CPUProfiler* const profiler = new CPUProfiler();
+    return *profiler;
+}
+
+void CPUProfiler::SetEnabled(bool enabled)
+{
+    ScopeLock lock(&m_zoneLock);
+    if (m_enabled.load(std::memory_order_relaxed) == enabled)
+        return;
+    m_captureEpoch.store(0, std::memory_order_release);
+    m_framesUntilSample.store(0, std::memory_order_relaxed);
+    m_enabled.store(enabled, std::memory_order_release);
+}
+
+void CPUProfiler::SetThrottleInterval(u32 interval)
+{
+    interval = interval != 0 ? interval : 1;
+    ScopeLock lock(&m_zoneLock);
+    if (m_throttleInterval.load(std::memory_order_relaxed) == interval)
+        return;
+    m_throttleInterval.store(interval, std::memory_order_relaxed);
+    m_framesUntilSample.store(0, std::memory_order_relaxed);
 }
 
 u32 CPUProfiler::RegisterZone(const ZoneInfo* info)
 {
-    if (info->id != INVALID_ZONE_ID)
-    {
-        return info->id;
-    }
+    if (!info || !IsSamplingFrame())
+        return INVALID_ZONE_ID;
+    u32 id = info->id.load(std::memory_order_acquire);
+    if (id != INVALID_ZONE_ID)
+        return id;
 
-    ScopeLock lock(&m_registryLock);
+    ScopeLock lock(&m_zoneLock);
+    if (!IsSamplingFrame())
+        return INVALID_ZONE_ID;
+    id = info->id.load(std::memory_order_relaxed);
+    if (id != INVALID_ZONE_ID)
+        return id;
 
-    if (info->id != INVALID_ZONE_ID)
-    {
-        return info->id;
-    }
-
-    u32 id = m_nextZoneId.fetch_add(1);
-
-    if (id >= m_zones.size())
-    {
-        m_zones.resize(id + 1);
-    }
-
+    id = static_cast<u32>(m_zones.size());
+    m_zones.resize(id + 1);
     m_zones[id].info = info;
-    info->id = id;
-
+    info->id.store(id, std::memory_order_release);
     return id;
 }
 
 const ZoneInfo* CPUProfiler::RegisterDynamicZone(pcstr name)
 {
-    if (!m_enabled || !name)
+    if (!name || !IsSamplingFrame())
         return nullptr;
 
-    ScopeLock lock(&m_registryLock);
-
+    ScopeLock lock(&m_zoneLock);
+    if (!IsSamplingFrame())
+        return nullptr;
     shared_str key(name);
     auto it = m_dynamicZones.find(key);
     if (it != m_dynamicZones.end())
@@ -106,82 +114,63 @@ ThreadZoneStack& CPUProfiler::GetThreadStack()
     return stack;
 }
 
-void CPUProfiler::BeginZone(u32 zoneId)
+u64 CPUProfiler::BeginZone(u32 zoneId)
 {
-    if (!m_enabled || zoneId == INVALID_ZONE_ID)
-        return;
-
-    ThreadZoneStack& stack = GetThreadStack();
-
-    u32 parentId = stack.CurrentParent();
+    const u64 epoch = m_captureEpoch.load(std::memory_order_acquire);
+    if (epoch == 0 || zoneId == INVALID_ZONE_ID)
+        return 0;
 
     ScopeLock lock(&m_zoneLock);
+    if (m_captureEpoch.load(std::memory_order_relaxed) != epoch || zoneId >= m_zones.size())
+        return 0;
+    if (!GetThreadStack().Push(zoneId, epoch, memstats::CurrentZone()))
+        return 0;
+    memstats::ZoneEntered(zoneId);
+    return epoch;
+}
 
-    if (zoneId >= m_zones.size())
+void CPUProfiler::EndZone(u32 zoneId, u64 epoch, float elapsedMs,
+    u64 allocCalls, u64 allocBytes, u64 freeCalls, u64 freeBytes)
+{
+    if (epoch == 0 || zoneId == INVALID_ZONE_ID)
+        return;
+
+    const auto entry = GetThreadStack().Pop();
+    memstats::ZoneExited(zoneId, entry.previousMemoryZone);
+    if (m_captureEpoch.load(std::memory_order_acquire) != epoch)
+        return;
+
+    ScopeLock lock(&m_zoneLock);
+    if (m_captureEpoch.load(std::memory_order_relaxed) != epoch || zoneId >= m_zones.size())
         return;
 
     ZoneData& zone = m_zones[zoneId];
-
     if (zone.timing.callCount == 0)
-    {
-        zone.parentId = parentId;
-
-        if (parentId != INVALID_ZONE_ID && parentId < m_zones.size())
-        {
-            auto& parentChildren = m_zones[parentId].childIds;
-            bool found = false;
-            for (u32 childId : parentChildren)
-            {
-                if (childId == zoneId)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                parentChildren.push_back(zoneId);
-            }
-        }
-    }
-
-    stack.Push(zoneId);
-    zone.timing.callCount++;
-
-    memstats::ZoneEntered(zoneId);
-}
-
-void CPUProfiler::EndZone(u32 zoneId, float elapsedMs,
-    u64 allocCalls, u64 allocBytes, u64 freeCalls, u64 freeBytes)
-{
-    if (!m_enabled || zoneId == INVALID_ZONE_ID)
-        return;
-
-    ThreadZoneStack& stack = GetThreadStack();
-    stack.Pop();
-    memstats::ZoneExited(zoneId, stack.CurrentParent());
-
-    ScopeLock lock(&m_zoneLock);
-
-    if (zoneId >= m_zones.size())
-        return;
-
-    ZoneTiming& timing = m_zones[zoneId].timing;
-    if (timing.callCount == 0)
-        timing.callCount = 1;
-    timing.totalTimeMs += elapsedMs;
-    timing.allocCalls += allocCalls;
-    timing.allocBytes += allocBytes;
-    timing.freeCalls += freeCalls;
-    timing.freeBytes += freeBytes;
+        zone.parentId = entry.parentId;
+    ++zone.timing.callCount;
+    zone.timing.totalTimeMs += elapsedMs;
+    zone.timing.allocCalls += allocCalls;
+    zone.timing.allocBytes += allocBytes;
+    zone.timing.freeCalls += freeCalls;
+    zone.timing.freeBytes += freeBytes;
 }
 
 void CPUProfiler::FrameStart()
 {
-    if (!m_enabled)
+    m_captureEpoch.store(0, std::memory_order_release);
+    if (!m_enabled.load(std::memory_order_acquire))
         return;
+    u32 remaining = m_framesUntilSample.load(std::memory_order_relaxed);
+    while (remaining != 0)
+    {
+        if (m_framesUntilSample.compare_exchange_weak(remaining, remaining - 1, std::memory_order_relaxed))
+            return;
+    }
 
     ScopeLock lock(&m_zoneLock);
+    if (!m_enabled.load(std::memory_order_relaxed))
+        return;
+    m_framesUntilSample.store(m_throttleInterval.load(std::memory_order_relaxed) - 1, std::memory_order_relaxed);
 
     for (auto& zone : m_zones)
     {
@@ -190,31 +179,30 @@ void CPUProfiler::FrameStart()
         zone.childIds.clear();
     }
     m_rootZones.clear();
-
     m_frameTimer.Start();
+    if (++m_nextEpoch == 0)
+        ++m_nextEpoch;
+    m_captureEpoch.store(m_nextEpoch, std::memory_order_release);
 }
 
 void CPUProfiler::FrameEnd()
 {
-    if (!m_enabled)
+    if (!IsSamplingFrame())
+        return;
+    ScopeLock lock(&m_zoneLock);
+    if (m_captureEpoch.exchange(0, std::memory_order_acq_rel) == 0)
         return;
 
     m_frameTimeMs = m_frameTimer.GetElapsed_sec() * 1000.0f;
-
-    ScopeLock lock(&m_zoneLock);
-
     BuildHierarchy(m_zones, m_rootZones);
     ComputeSelfTimes(m_zones);
-
     CopyToDisplayBuffer();
 }
 
 void CPUProfiler::CopyToDisplayBuffer()
 {
     m_displayFrameTimeMs = m_frameTimeMs;
-
     m_displayZones.resize(m_zones.size());
-
     for (u32 i = 0; i < m_zones.size(); ++i)
     {
         m_displayZones[i].info = m_zones[i].info;
@@ -222,21 +210,38 @@ void CPUProfiler::CopyToDisplayBuffer()
         m_displayZones[i].parentId = m_zones[i].parentId;
         m_displayZones[i].childIds = m_zones[i].childIds;
     }
-
     m_displayRootZones = m_rootZones;
 }
 
-void CPUProfiler::BuildHierarchy(const xr_vector<ZoneData>& zones, xr_vector<u32>& rootZones)
+void CPUProfiler::BuildHierarchy(xr_vector<ZoneData>& zones, xr_vector<u32>& rootZones)
 {
     rootZones.clear();
-
     for (u32 i = 0; i < zones.size(); ++i)
     {
-        const ZoneData& zone = zones[i];
-        if (zone.timing.callCount > 0 && zone.parentId == INVALID_ZONE_ID)
+        auto& zone = zones[i];
+        if (zone.timing.callCount == 0)
+            continue;
+        u32 parentId = zone.parentId;
+        for (u32 depth = 0; parentId != INVALID_ZONE_ID; ++depth)
         {
-            rootZones.push_back(i);
+            if (parentId >= zones.size() || zones[parentId].timing.callCount == 0 ||
+                parentId == i || depth == zones.size())
+            {
+                zone.parentId = INVALID_ZONE_ID;
+                break;
+            }
+            parentId = zones[parentId].parentId;
         }
+    }
+    for (u32 i = 0; i < zones.size(); ++i)
+    {
+        const auto& zone = zones[i];
+        if (zone.timing.callCount == 0)
+            continue;
+        if (zone.parentId == INVALID_ZONE_ID)
+            rootZones.push_back(i);
+        else
+            zones[zone.parentId].childIds.push_back(i);
     }
 }
 
@@ -262,7 +267,6 @@ void CPUProfiler::ComputeSelfTimes(xr_vector<ZoneData>& zones)
         zone.timing.selfTimeMs = zone.timing.totalTimeMs - childTime;
         if (zone.timing.selfTimeMs < 0.0f)
             zone.timing.selfTimeMs = 0.0f;
-
         zone.timing.selfAllocCalls =
             zone.timing.allocCalls > childAllocCalls ? zone.timing.allocCalls - childAllocCalls : 0;
         zone.timing.selfAllocBytes =
@@ -271,19 +275,18 @@ void CPUProfiler::ComputeSelfTimes(xr_vector<ZoneData>& zones)
 }
 
 CPUZoneScope::CPUZoneScope(const ZoneInfo* info)
-    : m_zoneId(INVALID_ZONE_ID)
 {
     if (!info)
         return;
-
     CPUProfiler& profiler = CPUProfiler::Instance();
-    if (!profiler.IsEnabled())
+    if (!profiler.IsSamplingFrame())
+        return;
+    m_zoneId = profiler.RegisterZone(info);
+    m_epoch = profiler.BeginZone(m_zoneId);
+    if (m_epoch == 0)
         return;
 
-    m_zoneId = profiler.RegisterZone(info);
     m_startTime = CTimerBase::Clock::now();
-    profiler.BeginZone(m_zoneId);
-
     m_allocCalls0 = memstats::AllocCallsThread();
     m_allocBytes0 = memstats::AllocBytesThread();
     m_freeCalls0 = memstats::FreeCallsThread();
@@ -292,13 +295,18 @@ CPUZoneScope::CPUZoneScope(const ZoneInfo* info)
 
 CPUZoneScope::~CPUZoneScope()
 {
-    if (m_zoneId == INVALID_ZONE_ID)
+    if (m_epoch == 0)
         return;
+    CPUProfiler& profiler = CPUProfiler::Instance();
+    if (profiler.m_captureEpoch.load(std::memory_order_acquire) != m_epoch)
+    {
+        profiler.EndZone(m_zoneId, m_epoch, 0.0f, 0, 0, 0, 0);
+        return;
+    }
 
-    auto endTime = CTimerBase::Clock::now();
-    float elapsedMs = std::chrono::duration<float, std::milli>(endTime - m_startTime).count();
-
-    CPUProfiler::Instance().EndZone(m_zoneId, elapsedMs,
+    const auto endTime = CTimerBase::Clock::now();
+    const float elapsedMs = std::chrono::duration<float, std::milli>(endTime - m_startTime).count();
+    profiler.EndZone(m_zoneId, m_epoch, elapsedMs,
         memstats::AllocCallsThread() - m_allocCalls0,
         memstats::AllocBytesThread() - m_allocBytes0,
         memstats::FreeCallsThread() - m_freeCalls0,

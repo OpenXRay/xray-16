@@ -80,7 +80,7 @@ bool SmokeTrailManager::Initialize(fg::RenderDevice* device)
         cmdList->clearBufferUInt(m_stateBuffer, 0);
         cmdList->clearBufferUInt(m_drawArgsBuffer, 0);
         cmdList->close();
-        nvDevice->executeCommandList(cmdList);
+        GEnv.Backend->ExecuteCommandList(cmdList);
     }
 
     m_initialized = true;
