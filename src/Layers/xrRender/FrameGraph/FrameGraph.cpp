@@ -400,6 +400,10 @@ void FrameGraph::ResetForNextFrame() {
         }
     }
 
+    m_compileInDegree.clear();
+    m_compilePassWorklist.clear();
+    m_compileTransientResources.clear();
+
     // Clear graph structure:
     for (auto& pass : m_passes)
         m_passPool.push_back(std::move(pass));
@@ -455,6 +459,10 @@ void FrameGraph::Reset() {
         resource.nvrhiTexture = nullptr;
         resource.nvrhiBuffer = nullptr;
     }
+
+    m_compileInDegree.clear();
+    m_compilePassWorklist.clear();
+    m_compileTransientResources.clear();
 
     // Clear state
     m_resources.clear();
@@ -748,11 +756,14 @@ void FrameGraph::TopologicalSort() {
     m_sortedPasses.clear();
     m_sortedPasses.reserve(numPasses);
 
-    xr_vector<u32> inDegree(numPasses);
+    auto& inDegree = m_compileInDegree;
+    inDegree.resize(numPasses);
     for (u32 i = 0; i < numPasses; ++i)
         inDegree[i] = static_cast<u32>(m_passes[i].dependsOn.size());
 
-    xr_vector<PassNode*> queue;
+    auto& queue = m_compilePassWorklist;
+    queue.clear();
+    queue.reserve(numPasses);
     for (u32 i = 0; i < numPasses; ++i) {
         if (inDegree[i] == 0)
             queue.push_back(&m_passes[i]);
@@ -797,18 +808,19 @@ void FrameGraph::CullUnusedPasses() {
     // These are passes that write to:
     // 1. Imported resources (like backbuffer)
     // 2. Persistent resources (non-transient)
-    xr_vector<PassNode*> terminalPasses;
+    auto& queue = m_compilePassWorklist;
+    queue.clear();
 
     for (auto& pass : m_passes) {
         if (pass.hasSideEffects) {
-            terminalPasses.push_back(&pass);
+            queue.push_back(&pass);
             continue;
         }
         for (const auto& access : pass.resourceAccesses) {
             if (access.IsWrite()) {
                 const ResourceNode* resource = GetResourceNode(access.resource);
                 if (resource && (resource->desc.isImported || resource->isPersistent)) {
-                    terminalPasses.push_back(&pass);
+                    queue.push_back(&pass);
                     break;
                 }
             }
@@ -816,7 +828,7 @@ void FrameGraph::CullUnusedPasses() {
     }
 
     // If no terminal passes found, keep all passes (conservative)
-    if (terminalPasses.empty()) {
+    if (queue.empty()) {
         for (auto& pass : m_passes) {
             pass.culled = false;
         }
@@ -825,8 +837,6 @@ void FrameGraph::CullUnusedPasses() {
 
     // Mark terminal passes and all their dependencies as used
     // (Work backwards from terminal passes)
-    xr_vector<PassNode*> queue = terminalPasses;
-
     while (!queue.empty()) {
         PassNode* current = queue.back();
         queue.pop_back();
@@ -1149,7 +1159,8 @@ void FrameGraph::InsertResourceBarriers() {
 
 void FrameGraph::OptimizeMemoryAliasing() {
     // Collect all transient resources (candidates for aliasing)
-    xr_vector<ResourceNode*> transientResources;
+    auto& transientResources = m_compileTransientResources;
+    transientResources.clear();
     for (auto& resource : m_resources) {
         if (resource.canAlias && resource.firstUsedPass != INVALID_INDEX && !resource.desc.isImported) {
             transientResources.push_back(&resource);

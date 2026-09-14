@@ -26,6 +26,7 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 namespace fg
 {
@@ -192,7 +193,6 @@ GPUCullingManager::GPUCullingManager()
     m_staticInstanceData.reserve(MAX_CULLING_OBJECTS);
 
     m_dynamicObjectFlags.reserve(MAX_CULLING_OBJECTS);
-    m_dynamicDrawArgsData.reserve(MAX_CULLING_OBJECTS);
     m_dynamicMaterialIDData.reserve(MAX_CULLING_OBJECTS);
     m_dynamicInstanceData.reserve(MAX_CULLING_OBJECTS);
 
@@ -469,10 +469,10 @@ void GPUCullingManager::Shutdown()
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
     m_dynamicObjectFlags.clear();
-    m_dynamicDrawArgsData.clear();
     m_dynamicMaterialIDData.clear();
     m_dynamicBatchKeys.clear();
     m_dynamicIdentity.clear();
+    m_dynamicClusterPlans.clear();
     m_totalVertexCount = 0;
     m_totalIndexCount = 0;
     m_maxMegaVertices = 0;
@@ -613,8 +613,6 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
     m_dynamicObjectFlags.clear();
     m_dynamicObjectFlags.reserve(totalBatches);
-    m_dynamicDrawArgsData.clear();
-    m_dynamicDrawArgsData.reserve(totalBatches);
     m_dynamicMaterialIDData.clear();
     m_dynamicMaterialIDData.reserve(totalBatches);
     m_dynamicInstanceData.clear();
@@ -657,6 +655,20 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         return key;
     };
 
+    auto appendInstance = [](const GeometryBatch& batch, u32 flags, u32 materialID,
+                             xr_vector<u32>& materialIDData,
+                             xr_vector<GPUInstanceData>& instanceData) {
+        materialIDData.push_back(materialID);
+
+        GPUInstanceData inst;
+        inst.world = batch.worldMatrix;
+        inst.materialID = materialID;
+        inst.flags = flags;
+        inst.pad0 = 0.0f;
+        inst.pad1 = 0.0f;
+        instanceData.push_back(inst);
+    };
+
     auto appendBatch = [&](const GeometryBatch& batch, u32 flags, u32 materialID,
                            xr_vector<IndirectDrawArgs>& drawArgsData,
                            xr_vector<u32>& materialIDData,
@@ -668,16 +680,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         args.baseVertexLocation = batch.megaBufferAlloc.valid ? static_cast<s32>(batch.megaBufferAlloc.vertexOffset) : 0;
         args.startInstanceLocation = static_cast<u32>(drawArgsData.size());
         drawArgsData.push_back(args);
-
-        materialIDData.push_back(materialID);
-
-        GPUInstanceData inst;
-        inst.world = batch.worldMatrix;
-        inst.materialID = materialID;
-        inst.flags = flags;
-        inst.pad0 = 0.0f;
-        inst.pad1 = 0.0f;
-        instanceData.push_back(inst);
+        appendInstance(batch, flags, materialID, materialIDData, instanceData);
     };
 
     {
@@ -718,8 +721,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         } else {
             const u32 flags = batchFlags(batch);
             m_dynamicObjectFlags.push_back(flags);
-            appendBatch(batch, flags, batch.bindlessMaterialID,
-                m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData);
+            appendInstance(batch, flags, batch.bindlessMaterialID,
+                m_dynamicMaterialIDData, m_dynamicInstanceData);
             m_dynamicBatchKeys.push_back(batchKey(batch));
             m_dynamicIdentity.push_back(std::make_pair(static_cast<const void*>(batch.visual), static_cast<const void*>(batch.renderable)));
         }
@@ -740,7 +743,6 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     const u32 dynamicCount = std::min(static_cast<u32>(m_dynamicInstanceData.size()), dynamicCapacity);
     if (m_dynamicInstanceData.size() > dynamicCount) {
         m_dynamicObjectFlags.resize(dynamicCount);
-        m_dynamicDrawArgsData.resize(dynamicCount);
         m_dynamicMaterialIDData.resize(dynamicCount);
         m_dynamicInstanceData.resize(dynamicCount);
         m_dynamicBatchKeys.resize(dynamicCount);
@@ -2163,12 +2165,10 @@ u32 GPUCullingManager::GetTerrainResidualCount() const
     return m_terrainObjectCount;
 }
 
-static void EmitClusterEntry(const ClusterDAG& dag, u32 megaBase, const ClusterMetaProto& p, const ClusterUnitRecord& rec,
-    u32 batchIndex, const Fmatrix& world, u32 materialID, u32 extraFlags, xr_vector<GPUClusterEntry>& out)
+static void FillClusterEntry(const ClusterMeshKey* memberKeys, u32 megaBase, const ClusterMetaProto& p,
+    const ClusterUnitRecord& rec, u32 batchIndex, const Fmatrix& world, float scale, u32 materialID,
+    u32 extraFlags, bool castsShadow, GPUClusterEntry& e)
 {
-    const float scale = std::max(world.i.magnitude(), std::max(world.j.magnitude(), world.k.magnitude()));
-
-    GPUClusterEntry e;
     Fvector c;
 
     world.transform_tiny(c, Fvector().set(p.sphere[0], p.sphere[1], p.sphere[2]));
@@ -2193,15 +2193,13 @@ static void EmitClusterEntry(const ClusterDAG& dag, u32 megaBase, const ClusterM
     e.ibFirst = megaBase + rec.firstIndex + p.ibFirst;
     e.firstVertex = rec.isComponent
         ? 0
-        : dag.MemberKeys()[rec.firstMember + p.member].vertexOffset;
+        : memberKeys[rec.firstMember + p.member].vertexOffset;
     e.batchIndex = batchIndex;
     e.materialID = materialID;
     e.flags = ((p.flags & CLUSTER_PROTO_FLAG_AT) ? GPU_CLUSTER_ENTRY_AT : 0) |
               ((p.flags & CLUSTER_PROTO_FLAG_TERRAIN) ? GPU_CLUSTER_ENTRY_TERRAIN : 0) |
               extraFlags;
-    // Terrain material IDs index a separate table. Regular entries retain their
-    // material's shadow eligibility independently of camera rendering eligibility.
-    if (!(e.flags & GPU_CLUSTER_ENTRY_TERRAIN) && !MaterialCastsShadow(materialID))
+    if (!(e.flags & GPU_CLUSTER_ENTRY_TERRAIN) && !castsShadow)
         e.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
 
     u32 errClass = 3;
@@ -2209,13 +2207,12 @@ static void EmitClusterEntry(const ClusterDAG& dag, u32 megaBase, const ClusterM
     else if (e.parentError < 10.0f) errClass = 1;
     else if (e.parentError < 1e30f) errClass = 2;
     e.flags |= (std::min(p.depth, 15u) << 8) | (errClass << 12);
-
-    out.push_back(e);
 }
 
 void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
 {
     m_dynamicEntryData.clear();
+    m_dynamicClusterPlans.clear();
     m_clusterSet.dynamicEntryCount = 0;
     const u32 dynamicCount = m_dynamicObjectCount;
     const bool historyValid = m_dynamicHistoryFrame + 1u == Device.dwFrame;
@@ -2223,6 +2220,8 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
     auto& nextHistory = m_dynamicHistory[m_dynamicHistoryIndex ^ 1u];
     nextHistory.clear();
     m_dynamicPrevWorldData.resize(dynamicCount);
+    m_dynamicClusterPlans.reserve(dynamicCount);
+    u32 entryCount = 0;
     u32 clustered = 0;
 
     const bool clusterReady = m_clusterSet.uploaded && m_clusterSet.entryBuffer;
@@ -2252,17 +2251,54 @@ void GPUCullingManager::BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList)
         const ClusterUnitRecord* rec = m_clusterDAG.FindRecord(key, member);
         if (!rec)
             continue;
-        if (m_dynamicEntryData.size() + rec->protoCount > kDynamicClusterEntryCapacity)
+        if (static_cast<size_t>(entryCount) + rec->protoCount > kDynamicClusterEntryCapacity)
             continue;
+        const u32 firstEntry = entryCount;
+        bool hasRegularEntry = false;
         for (u32 p = 0; p < rec->protoCount; ++p) {
             const ClusterMetaProto& proto = protos[rec->firstProto + p];
             if (rec->isComponent && proto.member != member)
                 continue;
-            EmitClusterEntry(m_clusterDAG, megaBase, proto, *rec, i, world,
-                m_dynamicMaterialIDData[i], GPU_CLUSTER_ENTRY_DYNAMIC |
-                    ((m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY) ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u), m_dynamicEntryData);
+            ++entryCount;
+            hasRegularEntry |= !(proto.flags & CLUSTER_PROTO_FLAG_TERRAIN);
+        }
+        if (entryCount != firstEntry) {
+            DynamicClusterPlan plan;
+            plan.record = rec;
+            plan.world = &world;
+            plan.member = member;
+            plan.batchIndex = i;
+            plan.firstEntry = firstEntry;
+            plan.materialID = m_dynamicMaterialIDData[i];
+            plan.extraFlags = GPU_CLUSTER_ENTRY_DYNAMIC |
+                ((m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY) ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
+            plan.scale = std::max(world.i.magnitude(), std::max(world.j.magnitude(), world.k.magnitude()));
+            plan.castsShadow = !hasRegularEntry || MaterialCastsShadow(plan.materialID);
+            m_dynamicClusterPlans.push_back(plan);
         }
         ++clustered;
+    }
+    m_dynamicEntryData.resize(entryCount);
+    if (!m_dynamicClusterPlans.empty()) {
+        const DynamicClusterPlan* plans = m_dynamicClusterPlans.data();
+        const ClusterMetaProto* prototypes = protos.data();
+        const ClusterMeshKey* memberKeys = m_clusterDAG.MemberKeys().data();
+        GPUClusterEntry* entries = m_dynamicEntryData.data();
+        xr_parallel_for(TaskRange<u32>(0, static_cast<u32>(m_dynamicClusterPlans.size())),
+            [&](const TaskRange<u32>& range) {
+                for (u32 i = range.begin(); i != range.end(); ++i) {
+                    const DynamicClusterPlan& plan = plans[i];
+                    const ClusterUnitRecord& rec = *plan.record;
+                    u32 entry = plan.firstEntry;
+                    for (u32 p = 0; p < rec.protoCount; ++p) {
+                        const ClusterMetaProto& proto = prototypes[rec.firstProto + p];
+                        if (rec.isComponent && proto.member != plan.member)
+                            continue;
+                        FillClusterEntry(memberKeys, megaBase, proto, rec, plan.batchIndex, *plan.world,
+                            plan.scale, plan.materialID, plan.extraFlags, plan.castsShadow, entries[entry++]);
+                    }
+                }
+            });
     }
     m_clusterSet.dynamicResidualCount = dynamicCount - clustered;
     m_dynamicHistoryIndex ^= 1u;
@@ -2302,7 +2338,13 @@ void GPUCullingManager::BuildClusterEntries()
 
     auto emitEntry = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec,
                          u32 batchIndex, const Fmatrix& world, u32 materialID, u32 extraFlags = 0u) {
-        EmitClusterEntry(m_clusterDAG, megaBase, p, rec, batchIndex, world, materialID, extraFlags, m_clusterEntryData);
+        const float scale = std::max(world.i.magnitude(), std::max(world.j.magnitude(), world.k.magnitude()));
+        const bool terrain = (p.flags & CLUSTER_PROTO_FLAG_TERRAIN) || (extraFlags & GPU_CLUSTER_ENTRY_TERRAIN);
+        const bool castsShadow = terrain || MaterialCastsShadow(materialID);
+        GPUClusterEntry entry;
+        FillClusterEntry(m_clusterDAG.MemberKeys().data(), megaBase, p, rec, batchIndex, world, scale,
+            materialID, extraFlags, castsShadow, entry);
+        m_clusterEntryData.push_back(entry);
     };
 
     auto emitStatic = [&](const ClusterMetaProto& p, const ClusterUnitRecord& rec, u32 batchIndex, u32 extraFlags) {

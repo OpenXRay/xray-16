@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Render.h"
+#include "IRenderBackend.h"
 
 #include "xrCore/FS_impl.h"
 #include "xrCore/MemoryStats.h"
@@ -62,6 +63,8 @@ bool CRenderDevice::RenderBegin()
     {
         ZoneScopedN("RenderBegin::BackendBegin");
         GEnv.Render->Begin();
+        if (GEnv.Backend && GEnv.Backend->IsFrameGraph() && !GEnv.Backend->IsInFrame())
+            return false;
     }
 
     g_bRendering = true;
