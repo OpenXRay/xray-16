@@ -14,7 +14,6 @@
       ..\..\intermediate\editors\xrCoreB\xrMemory_pso_Copy.obj 
       ..\..\intermediate\editors\xrCoreB\xrMemory_pso_Fill.obj 
       ..\..\intermediate\editors\xrCoreB\_compressed_normal.obj 
-      ..\..\intermediate\editors\xrCoreB\xrMemory_align.obj 
       ..\..\intermediate\editors\xrCoreB\LzHuf.obj 
       ..\..\intermediate\editors\xrCoreB\log.obj 
       ..\..\intermediate\editors\xrCoreB\FS.obj 
@@ -113,7 +112,6 @@
       <FILE FILENAME="xrMemory_pso_Copy.cpp" FORMNAME="" UNITNAME="xrMemory_pso_Copy.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrMemory_pso_Fill.cpp" FORMNAME="" UNITNAME="xrMemory_pso_Fill.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="_compressed_normal.cpp" FORMNAME="" UNITNAME="_compressed_normal.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="xrMemory_align.cpp" FORMNAME="" UNITNAME="xrMemory_align" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrCore.rc" FORMNAME="" UNITNAME="xrCore.rc" CONTAINERID="RCCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="LzHuf.cpp" FORMNAME="" UNITNAME="LzHuf.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="log.cpp" FORMNAME="" UNITNAME="log.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
@@ -178,7 +176,6 @@
       <FILE FILENAME="xrCPU_Pipe.h" FORMNAME="" UNITNAME="xrCPU_Pipe.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrDebug_macros.h" FORMNAME="" UNITNAME="xrDebug_macros.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrMemory.h" FORMNAME="" UNITNAME="xrMemory.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="xrMemory_align.h" FORMNAME="" UNITNAME="xrMemory_align.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrMemory_POOL.h" FORMNAME="" UNITNAME="xrMemory_POOL.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrMemory_pso.h" FORMNAME="" UNITNAME="xrMemory_pso.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="xrMemory_subst_borland.h" FORMNAME="" UNITNAME="xrMemory_subst_borland.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>

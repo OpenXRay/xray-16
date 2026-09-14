@@ -356,8 +356,6 @@ target_sources_grouped(
     MemoryStats.h
     xrMemory.cpp
     xrMemory.h
-    #Memory/xrMemory_align.cpp
-    #Memory/xrMemory_align.h
 )
 
 target_sources_grouped(
