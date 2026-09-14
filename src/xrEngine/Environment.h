@@ -141,10 +141,10 @@ public:
 class ENGINE_API CEnvDescriptor
 {
 public:
-    bool dont_save; // oh
+    bool dont_save{}; // oh
 
-    float exec_time;
-    float exec_time_loaded;
+    float exec_time{};
+    float exec_time_loaded{};
 
     shared_str sky_texture_name;
     shared_str sky_texture_env_name;
@@ -152,35 +152,35 @@ public:
 
     FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
-    Fvector4 clouds_color;
-    float clouds_rotation;
-    Fvector3 sky_color;
-    float sky_rotation;
+    Fvector4 clouds_color{ 1.0f, 1.0f, 1.0f, 1.0f };
+    float clouds_rotation{};
+    Fvector3 sky_color{ 1.0f, 1.0f, 1.0f };
+    float sky_rotation{};
 
-    float far_plane;
+    float far_plane{ 400.0f };
 
-    Fvector3 fog_color;
-    float fog_density;
-    float fog_distance;
+    Fvector3 fog_color{ 1.0f, 1.0f, 1.0f };
+    float fog_density{};
+    float fog_distance{ 400.0f };
 
-    float rain_density;
-    Fvector3 rain_color;
+    float rain_density{};
+    Fvector3 rain_color{};
 
-    float bolt_period;
-    float bolt_duration;
+    float bolt_period{};
+    float bolt_duration{};
 
-    float wind_velocity;
-    float wind_direction;
+    float wind_velocity{};
+    float wind_direction{};
 
-    Fvector3 ambient;
-    Fvector4 hemi_color; // w = R2 correction
-    Fvector3 sun_color;
-    Fvector3 sun_dir;
-    float sun_azimuth; // for dynamic sun dir
-    bool use_dynamic_sun_dir;
+    Fvector3 ambient{};
+    Fvector4 hemi_color{ 1.0f, 1.0f, 1.0f, 1.0f }; // w = R2 correction
+    Fvector3 sun_color{ 1.0f, 1.0f, 1.0f };
+    Fvector3 sun_dir{ 0.0f, -1.0f, 0.0f };
+    float sun_azimuth{}; // for dynamic sun dir
+    bool use_dynamic_sun_dir{ true };
 
-    float m_fSunShaftsIntensity;
-    float m_fWaterIntensity;
+    float m_fSunShaftsIntensity{};
+    float m_fWaterIntensity{ 1.0f };
 
     // SkyLoader: trees wave
     float m_fTreeAmplitude { 0.005f };
@@ -188,12 +188,12 @@ public:
     float m_fTreeRotation  { 10.0f };
     Fvector3 m_fTreeWave   { 0.1f, 0.01f, 0.11f };
 
-    CLensFlareDescriptor* lens_flare;
-    SThunderboltCollection* thunderbolt;
+    CLensFlareDescriptor* lens_flare{};
+    SThunderboltCollection* thunderbolt{};
 
-    CEnvAmbient* env_ambient;
+    CEnvAmbient* env_ambient{};
 
-    CEnvDescriptor(shared_str const& identifier);
+    CEnvDescriptor(const shared_str& identifier) : m_identifier(identifier) {}
 
     void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
     void save(CInifile& config, pcstr section = nullptr) const;
@@ -217,11 +217,11 @@ public:
 class ENGINE_API CEnvDescriptorMixer : public CEnvDescriptor
 {
 public:
-    float weight;
-    float modif_power;
-    float fog_near;
-    float fog_far;
-    Fvector4 env_color;
+    float weight{};
+    float modif_power{};
+    float fog_near{};
+    float fog_far{};
+    Fvector4 env_color{};
 
     bool soc_style;
 
