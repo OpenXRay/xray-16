@@ -276,6 +276,7 @@ u32 ps_fg_render_mode = FG_RENDER_VULKAN;
 #endif
 
 int ps_fg_hot_reload_shaders = 0;
+int ps_fg_retina = 1;
 const xr_token fg_render_mode_token[] = {
     {"dx12", FG_RENDER_DX12},
     {"vulkan", FG_RENDER_VULKAN},
@@ -1090,6 +1091,7 @@ void xrRender_initconsole()
 
     CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
     CMD4(CCC_Integer, "fg_hot_reload_shaders", &ps_fg_hot_reload_shaders, 0, 1);
+    CMD4(CCC_Integer, "fg_retina", &ps_fg_retina, 0, 1);
 
 #ifdef DEBUG
     using namespace xray::render::resources::test;
