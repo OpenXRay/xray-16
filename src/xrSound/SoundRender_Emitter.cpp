@@ -6,6 +6,7 @@
 #include "SoundRender_Source.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 
 extern u32 psSoundModel;
 extern float psSoundVEffects;
@@ -253,10 +254,14 @@ void CSoundRender_Emitter::fill_all_blocks()
 void CSoundRender_Emitter::dispatch_prefill()
 {
     wait_prefill();
+    ScopeLock scope(&prefill_lock);
+    if (!prefill_task.IsFinished())
+        return;
+
     if (filled_blocks >= sdef_target_count_prefill)
         return;
 
-    const auto task = &TaskScheduler->AddTask([this]
+    prefill_task = TaskScheduler->AddTask([this]
     {
         size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count_prefill;
 
@@ -269,17 +274,18 @@ void CSoundRender_Emitter::dispatch_prefill()
             next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count_prefill;
             filled_blocks++;
         }
-
-        prefill_task.store(nullptr, std::memory_order_release);
     });
-
-    prefill_task.store(task, std::memory_order_release);
 }
 
 void CSoundRender_Emitter::wait_prefill() const
 {
-    if (const auto task = prefill_task.load(std::memory_order_acquire))
-        TaskScheduler->Wait(*task);
+    TaskHandle task;
+    {
+        ScopeLock scope(&prefill_lock);
+        task = prefill_task;
+    }
+    if (task)
+        TaskScheduler->Wait(task);
 }
 
 u32 CSoundRender_Emitter::get_bytes_total() const

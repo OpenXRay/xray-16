@@ -1,5 +1,6 @@
 #pragma once
 
+#include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
 #include <vulkan/vulkan.h>
@@ -125,7 +126,7 @@ private:
     u32 m_currentFrameIndex = 0;
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
-    Task* m_gcTask = nullptr;
+    TaskHandle m_gcTask;
     std::atomic<u64> m_lastGraphicsInstanceID{ 0 };
 
     struct SubmitJob {

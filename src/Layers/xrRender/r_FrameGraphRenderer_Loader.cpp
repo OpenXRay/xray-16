@@ -3,6 +3,7 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/Threading/TaskManager.hpp"
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
@@ -257,6 +258,10 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
 void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
+    if (m_processHOMTask) {
+        TaskScheduler->Wait(m_processHOMTask);
+        m_processHOMTask.Reset();
+    }
 
     if (!g_pGameLevel)
         return;

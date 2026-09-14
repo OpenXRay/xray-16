@@ -274,7 +274,7 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-Task& CHOM::DispatchMTRender()
+TaskHandle CHOM::DispatchMTRender()
 {
     return TaskManager::AddTask([this]
     {

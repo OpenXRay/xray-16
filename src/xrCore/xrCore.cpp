@@ -332,6 +332,7 @@ void xrCore::_destroy()
     if (0 == init_counter)
     {
         ZoneScoped;
+        TaskScheduler->Shutdown();
         FS._destroy();
         EFS._destroy();
         xr_FS = nullptr;

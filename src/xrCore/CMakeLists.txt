@@ -528,3 +528,16 @@ if (BUILD_SHARED_LIBS)
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()
+
+option(XRAY_BUILD_TASK_TESTS "Build offline scheduler regression executable" OFF)
+
+if (XRAY_BUILD_TASK_TESTS)
+    add_executable(xrCoreTaskTests Threading/TaskTests.cpp)
+    target_include_directories(xrCoreTaskTests
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_SOURCE_DIR}/src"
+        "${CMAKE_SOURCE_DIR}/Externals"
+    )
+    target_link_libraries(xrCoreTaskTests PRIVATE xrCore)
+endif()
