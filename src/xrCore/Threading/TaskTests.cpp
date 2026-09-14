@@ -6,10 +6,12 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -331,6 +333,148 @@ void ShutdownDrainAndRestart()
     }
 }
 
+void AlignedTaskStorage()
+{
+    struct alignas(128) Storage
+    {
+        std::byte bytes[128];
+    };
+
+    std::array<std::unique_ptr<Storage>, 32> small;
+    for (size_t i = 0; i < small.size(); ++i)
+    {
+        small[i] = std::make_unique<Storage>();
+        Require(reinterpret_cast<uintptr_t>(small[i].get()) % alignof(Storage) == 0,
+            "over-aligned scalar new returned misaligned storage", i);
+        small[i]->bytes[0] = std::byte(i);
+    }
+    auto large = std::make_unique<Storage[]>(4096);
+    Require(reinterpret_cast<uintptr_t>(large.get()) % alignof(Storage) == 0,
+        "over-aligned array new returned misaligned storage");
+    large[4095].bytes[127] = std::byte{ 73 };
+    for (size_t i = 0; i < small.size(); ++i)
+        Require(small[i]->bytes[0] == std::byte(i), "aligned allocations overlap", i);
+
+    auto* data = static_cast<unsigned char*>(Memory.mem_alloc(31, 128));
+    Require(data && reinterpret_cast<uintptr_t>(data) % 128 == 0, "aligned memory allocation failed");
+    for (size_t i = 0; i < 31; ++i)
+        data[i] = static_cast<unsigned char>(i + 1);
+    data = static_cast<unsigned char*>(Memory.mem_realloc(data, 257, 256));
+    Require(data && reinterpret_cast<uintptr_t>(data) % 256 == 0, "aligned growth lost alignment");
+    for (size_t i = 0; i < 31; ++i)
+        Require(data[i] == i + 1, "aligned growth lost existing data", i);
+    data = static_cast<unsigned char*>(Memory.mem_realloc(data, 17, 512));
+    Require(data && reinterpret_cast<uintptr_t>(data) % 512 == 0, "aligned shrink lost alignment");
+    for (size_t i = 0; i < 17; ++i)
+        Require(data[i] == i + 1, "aligned shrink lost existing data", i);
+    Memory.mem_free(data, 512);
+}
+
+void ExternalWorkerShutdown()
+{
+    auto owner = xr_make_unique<TaskManager>();
+    TaskManager* scheduler = owner.get();
+    Signal registered;
+    Signal started;
+    Signal released;
+    std::atomic_bool unregistering{};
+    std::thread external([&, scheduler]
+    {
+        scheduler->RegisterThisThreadAsWorker();
+        registered.Set();
+        Require(started.Wait(), "owned workers did not start");
+        while (scheduler->GetWorkersCount() > 2)
+            std::this_thread::yield();
+        auto completion = TaskManager::AddTask([&released] { released.Set(); });
+        Require(released.Wait(), "shutdown did not help work needed by an external worker");
+        scheduler->Wait(completion);
+        unregistering.store(true, std::memory_order_release);
+        scheduler->UnregisterThisThreadAsWorker();
+    });
+    Require(registered.Wait(), "external worker did not register");
+    scheduler->SpawnThreads();
+    started.Set();
+    scheduler->Shutdown();
+    Require(unregistering.load(std::memory_order_acquire), "shutdown returned before external worker release");
+    Require(scheduler->GetWorkersCount() == 0, "shutdown left a worker registered");
+    owner.reset();
+    external.join();
+}
+
+void SynchronousMoveOnlyCallable()
+{
+    SchedulerSession scheduler(true);
+    std::array<int, 32> outputs{};
+    const auto function = [value = std::make_unique<int>(7)](int& output) { output += *value; };
+    xr_parallel_for_each(outputs, function);
+    xr_parallel_for_each(outputs, true, function);
+    auto parent = TaskManager::AddTask([&](Task& task)
+    {
+        xr_parallel_for_each(task, outputs, function);
+        xr_parallel_for_each(task, outputs, true, function);
+    });
+    TaskScheduler->Wait(parent);
+    for (int output : outputs)
+        Require(output == 28, "synchronous foreach lost its const move-only callable");
+    int stillOwned = 0;
+    function(stillOwned);
+    Require(stillOwned == 7, "synchronous foreach consumed its caller's callable");
+
+    xr_parallel_for_each(outputs, [value = std::make_unique<int>(1)](int& output) { output += *value; });
+    xr_parallel_for_each(outputs, true, [value = std::make_unique<int>(2)](int& output) { output += *value; });
+    auto temporaryParent = TaskManager::AddTask([&outputs](Task& task)
+    {
+        xr_parallel_for_each(task, outputs, [value = std::make_unique<int>(3)](int& output) { output += *value; });
+        xr_parallel_for_each(task, outputs, true, [value = std::make_unique<int>(4)](int& output) { output += *value; });
+    });
+    TaskScheduler->Wait(temporaryParent);
+    bool rejected = false;
+    try
+    {
+        xr_parallel_for_each(outputs, false, function);
+    }
+    catch (const std::invalid_argument&)
+    {
+        rejected = true;
+    }
+    Require(rejected, "asynchronous foreach accepted a noncopyable lvalue");
+    TaskScheduler->Shutdown();
+    for (int output : outputs)
+        Require(output == 38, "foreach lost a temporary callable or scheduled an invalid asynchronous request");
+}
+
+void AsynchronousMoveOnlyCallable()
+{
+    SchedulerSession scheduler(true);
+    std::array<int, 32> outputs{};
+    Lifetime lifetime;
+    auto function = [owner = std::make_unique<Probe>(lifetime)](int& output) mutable
+    {
+        Require(bool(owner), "asynchronous callable lost ownership before invocation");
+        output = 53;
+    };
+    auto task = xr_parallel_for_each(outputs, false, std::move(function));
+    TaskScheduler->Wait(task);
+    for (int output : outputs)
+        Require(output == 53, "asynchronous move-only callable lost a range");
+    Require(lifetime.destroyed.load() == 1, "asynchronous callable outlived completed descendants");
+
+    Lifetime parentedLifetime;
+    auto parent = TaskManager::AddTask([&](Task& parentTask)
+    {
+        xr_parallel_for_each(parentTask, outputs, false,
+            [owner = std::make_unique<Probe>(parentedLifetime)](int& output) mutable
+            {
+                Require(bool(owner), "parented asynchronous callable lost ownership before invocation");
+                output = 79;
+            });
+    });
+    TaskScheduler->Wait(parent);
+    for (int output : outputs)
+        Require(output == 79, "parent completed before its asynchronous range");
+    Require(parentedLifetime.destroyed.load() == 1, "parented callable outlived completed descendants");
+}
+
 void Run(const char* name, void (*test)())
 {
     currentScenario.store(name);
@@ -345,6 +489,7 @@ int main()
 {
     Memory._initialize();
     _initialize_cpu_thread();
+    Run("over-aligned task storage and resizing", AlignedTaskStorage);
     Run("single-worker nested helping and visibility", NestedHelping);
     Run("reset releases ownership without joining or cancelling", ResetDoesNotJoinOrCancel);
     Run("retained results and copied/moved ownership", RetainedResultsAndOwnership);
@@ -353,6 +498,12 @@ int main()
     Run("asynchronous range owns its temporary callable", AsyncCallableLifetime);
     Run("shutdown finishes nested work before owner teardown", ShutdownNestedHelping);
     Run("shutdown drains and restart preserves retained completion", ShutdownDrainAndRestart);
+    if (std::thread::hardware_concurrency() > 2)
+        Run("shutdown waits for external worker release", ExternalWorkerShutdown);
+    else
+        std::puts("SKIP [external worker shutdown requires three worker slots]");
+    Run("synchronous foreach borrows move-only callables", SynchronousMoveOnlyCallable);
+    Run("asynchronous foreach owns move-only callables", AsynchronousMoveOnlyCallable);
     Memory._destroy();
     std::puts("All scheduler regressions passed.");
     return EXIT_SUCCESS;

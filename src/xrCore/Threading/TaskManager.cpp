@@ -199,10 +199,28 @@ void TaskManager::Shutdown()
                 workEpoch.load(std::memory_order_acquire) != epoch;
         });
     }
-    shouldStop.store(true, std::memory_order_release);
+    {
+        std::unique_lock lock(workersLock);
+        shouldStop.store(true, std::memory_order_release);
+    }
     NotifyWork(true);
     for (auto& thread : workerThreads)
         thread.join();
+    const auto drained = [this]
+    {
+        return GetWorkersCount() == 1 && outstandingTasks.load(std::memory_order_acquire) == 0;
+    };
+    while (!drained())
+    {
+        const auto epoch = workEpoch.load(std::memory_order_acquire);
+        if (ExecuteOneTask())
+            continue;
+        std::unique_lock lock(workMutex);
+        workChanged.wait(lock, [this, &drained, epoch]
+        {
+            return drained() || workEpoch.load(std::memory_order_acquire) != epoch;
+        });
+    }
     UnregisterThisThreadAsWorker();
 }
 
@@ -223,6 +241,7 @@ void TaskManager::RegisterThisThreadAsWorker()
     R_ASSERT(!s_tl_worker.manager);
     {
         std::unique_lock lock(workersLock);
+        R_ASSERT(!shouldStop.load(std::memory_order_acquire));
         R_ASSERT(workers.size() < threadCapacity);
         s_tl_worker.id = workers.size();
         s_tl_worker.manager = this;
@@ -247,8 +266,8 @@ void TaskManager::UnregisterThisThreadAsWorker()
         s_tl_worker.id = size_t(-1);
         s_tl_worker.manager = nullptr;
         workerCount.store(workers.size(), std::memory_order_release);
+        NotifyWork(true);
     }
-    NotifyWork(true);
 }
 
 void TaskManager::TaskWorkerStart()
@@ -266,6 +285,8 @@ void TaskManager::TaskWorkerStart()
                 workEpoch.load(std::memory_order_acquire) != epoch;
         });
     }
+    while (Task* task = s_tl_worker.pop())
+        ExecuteTask(*task);
     UnregisterThisThreadAsWorker();
 }
 
