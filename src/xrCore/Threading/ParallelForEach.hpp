@@ -25,7 +25,7 @@ public:
     template <typename Iterator, typename Function>
     static decltype(auto) Run(Iterator begin, Iterator end, bool wait, const Function& function)
     {
-        return xr_parallel_for(TaskRange(begin, end), wait, [&](TaskRange<Iterator>& range)
+        return xr_parallel_for(TaskRange(begin, end), wait, [function](TaskRange<Iterator>& range)
         {
             for (auto& it : range)
             {
@@ -37,7 +37,7 @@ public:
     template <typename Iterator, typename Function>
     static decltype(auto) Run(Task& parent, Iterator begin, Iterator end, bool wait, const Function& function)
     {
-        return xr_parallel_for(parent, TaskRange(begin, end), wait, [&](TaskRange<Iterator>& range)
+        return xr_parallel_for(parent, TaskRange(begin, end), wait, [function](TaskRange<Iterator>& range)
         {
             for (auto& it : range)
             {

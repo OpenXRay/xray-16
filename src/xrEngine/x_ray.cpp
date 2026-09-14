@@ -236,17 +236,6 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         ShowSplash(topmost);
     }
 
-    const auto& inputTask = TaskManager::AddTask([]
-    {
-        const bool captureInput = !strstr(Core.Params, "-i");
-        pInput = xr_new<CInput>(captureInput);
-    });
-
-    const auto& createSoundDevicesList = TaskManager::AddTask([]
-    {
-        Engine.Sound.CreateDevicesList();
-    });
-
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
@@ -260,6 +249,17 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
 #endif
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
+
+    const auto inputTask = TaskManager::AddTask([]
+    {
+        const bool captureInput = !strstr(Core.Params, "-i");
+        pInput = xr_new<CInput>(captureInput);
+    });
+
+    const auto createSoundDevicesList = TaskManager::AddTask([]
+    {
+        Engine.Sound.CreateDevicesList();
+    });
 
     InitSettings();
     // Adjust player & computer name for Asian
@@ -296,7 +296,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         Console->Execute(loadArgs + 1);
 
     // Initialize APP
-    const auto& createLightAnim = TaskScheduler->AddTask([]
+    const auto createLightAnim = TaskScheduler->AddTask([]
     {
         LALib.OnCreate();
     });

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "xrCore/_std_extensions.h"
+#include "xrCore/Threading/Lock.hpp"
+#include "xrCore/Threading/Task.hpp"
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Scene.h"
 
 struct OggVorbis_File;
-
-class Task;
 
 class CSoundRender_Emitter final : public CSound_emitter
 {
@@ -82,7 +82,8 @@ private:
     OggVorbis_File* ovf{};
 
     xr_vector<u8> temp_buf[sdef_target_count_prefill];
-    std::atomic<Task*> prefill_task{};
+    mutable Lock prefill_lock;
+    TaskHandle prefill_task;
 
     size_t current_block{};
     int filled_blocks{};

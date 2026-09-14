@@ -545,8 +545,8 @@ void D3D12Backend::BeginFrame() {
 
     if (m_gcTask) {
         ZoneScopedN("D3D12::WaitForGC");
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
 
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -574,15 +574,15 @@ void D3D12Backend::EndFrame() {
     }
 
     nvrhi::IDevice* device = m_nvrhiDevice;
-    m_gcTask = &TaskScheduler->AddTask([device] {
+    m_gcTask = TaskScheduler->AddTask([device] {
         device->runGarbageCollection();
     });
 }
 
 void D3D12Backend::WaitForIdle() {
     if (m_gcTask) {
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
 
     m_nvrhiDevice->waitForIdle();
