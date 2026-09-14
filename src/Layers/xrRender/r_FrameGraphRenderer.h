@@ -208,7 +208,6 @@ public:
         float totalFrameMs = 0.0f;
         float gbufferMs = 0.0f;
         float lightingMs = 0.0f;
-        float tonemapMs = 0.0f;
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
     };
@@ -406,8 +405,6 @@ private:
     framegraph::VirtualResourceHandle m_rt_MenuMain;
     framegraph::VirtualResourceHandle m_rt_MenuDistort;
     framegraph::VirtualResourceHandle m_rt_FinalComposite;
-
-    framegraph::VirtualResourceHandle m_exposureTexture;
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 

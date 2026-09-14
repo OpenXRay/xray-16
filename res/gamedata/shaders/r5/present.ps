@@ -1,5 +1,4 @@
-Texture2D t_hdr : register(t0);
-Texture2D<float> t_exposure : register(t1);
+Texture2D<float4> t_scene : register(t0);
 
 #include "common_samplers.h"
 
@@ -9,7 +8,5 @@ struct PS_INPUT {
 };
 
 float4 main(PS_INPUT input) : SV_TARGET {
-    float4 color = t_hdr.Sample(smp_linear, input.texcoord);
-
-    return color;
+    return t_scene.Sample(smp_linear, input.texcoord);
 }

@@ -26,10 +26,6 @@ public:
 
     TextureHandle CreateGBufferRT(u32 width, u32 height, nvrhi::Format format, const char* name);
 
-    TextureHandle CreateHDRTarget(u32 width, u32 height, const char* name = "rt_HDR");
-
-    TextureHandle CreateBloomTarget(u32 width, u32 height, u32 mipLevels, const char* name = "rt_Bloom");
-
     TextureHandle CreateLDRTarget(u32 width, u32 height, const char* name = "rt_LDR");
 
     TextureHandle CreateHistoryBuffer(u32 width, u32 height, nvrhi::Format format, const char* name = "rt_History");

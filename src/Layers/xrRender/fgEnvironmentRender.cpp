@@ -76,7 +76,6 @@ FGEnvironmentRender::FGEnvironmentRender()
     tsky1.create(r2_T_sky1);
     t_envmap_0.create(r2_T_envs0);
     t_envmap_1.create(r2_T_envs1);
-    tonemap.create(r2_RT_luminance_cur);
 }
 
 void FGEnvironmentRender::Copy(IEnvironmentRender& _in)
@@ -95,10 +94,8 @@ void FGEnvironmentRender::Clear()
     sky_r_textures.clear();
     sky_r_textures.push_back(zero);
     sky_r_textures.push_back(zero);
-    sky_r_textures.push_back(zero);
 
     clouds_r_textures.clear();
-    clouds_r_textures.push_back(zero);
     clouds_r_textures.push_back(zero);
     clouds_r_textures.push_back(zero);
 }
@@ -111,14 +108,10 @@ void FGEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     sky_r_textures.clear();
     sky_r_textures.emplace_back(tsky0_tstage, pA->sky_texture);
     sky_r_textures.emplace_back(tsky1_tstage, pB->sky_texture);
-    if (tonemap_tstage_2sky != u32(-1))
-        sky_r_textures.emplace_back(tonemap_tstage_2sky, tonemap);
 
     clouds_r_textures.clear();
     clouds_r_textures.emplace_back(tclouds0_tstage, pA->clouds_texture);
     clouds_r_textures.emplace_back(tclouds1_tstage, pB->clouds_texture);
-    if (tonemap_tstage_clouds != u32(-1))
-        clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap);
 
     tsky0->surface_set(nvrhi::TextureHandle(sky_r_textures[0].second->surface_get_native()));
     tsky1->surface_set(nvrhi::TextureHandle(sky_r_textures[1].second->surface_get_native()));
@@ -143,14 +136,11 @@ void FGEnvironmentRender::OnDeviceDestroy()
     tsky1->surface_set(nvrhi::TextureHandle());
     t_envmap_0->surface_set(nvrhi::TextureHandle());
     t_envmap_1->surface_set(nvrhi::TextureHandle());
-    tonemap->surface_set(nvrhi::TextureHandle());
 
     tsky0_tstage = 0;
     tsky1_tstage = 0;
     tclouds0_tstage = 0;
     tclouds1_tstage = 0;
-    tonemap_tstage_2sky = u32(-1);
-    tonemap_tstage_clouds = u32(-1);
 
     m_skyVertexBuffer = nullptr;
     m_skyIndexBuffer = nullptr;

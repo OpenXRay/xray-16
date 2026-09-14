@@ -79,27 +79,6 @@ TextureHandle NativeRTFactory::CreateGBufferRT(u32 width, u32 height, nvrhi::For
     );
 }
 
-TextureHandle NativeRTFactory::CreateHDRTarget(u32 width, u32 height, const char* name) {
-    Msg("  [NativeRTFactory] Creating HDR Target: %s (%ux%u)", name, width, height);
-
-    return CreateGBufferRT(width, height, nvrhi::Format::RGBA16_FLOAT, name);
-}
-
-TextureHandle NativeRTFactory::CreateBloomTarget(u32 width, u32 height, u32 mipLevels, const char* name) {
-    Msg("  [NativeRTFactory] Creating Bloom Target: %s (%ux%u, %u mips)", name, width, height, mipLevels);
-
-    return CreateRenderTargetInternal(
-        width, height,
-        1,
-        1,
-        mipLevels,
-        nvrhi::Format::RGBA16_FLOAT,
-        false,
-        false,
-        name
-    );
-}
-
 TextureHandle NativeRTFactory::CreateLDRTarget(u32 width, u32 height, const char* name) {
     Msg("  [NativeRTFactory] Creating LDR Target: %s (%ux%u)", name, width, height);
 

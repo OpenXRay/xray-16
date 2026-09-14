@@ -80,12 +80,11 @@ HudShadowFit BuildHudShadowFit(const Fvector4& trueSphere)
     return fit;
 }
 
-void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
+void GetSunLightData(SunLightData& outSun) {
     auto* sun = static_cast<light*>(Lights.sun._get());
     if (sun) {
         outSun.color.set(sun->color.r, sun->color.g, sun->color.b);
         outSun.direction = sun->direction;
-        outSun.intensity = 1.f;
     }
 }
 
