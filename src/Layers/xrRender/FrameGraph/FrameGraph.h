@@ -230,6 +230,10 @@ private:
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
 
+    xr_vector<u32> m_compileInDegree;
+    xr_vector<PassNode*> m_compilePassWorklist;
+    xr_vector<ResourceNode*> m_compileTransientResources;
+
     // Compilation results
     xr_vector<PassNode*> m_sortedPasses;  // Execution order
     bool m_compiled = false;

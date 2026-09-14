@@ -678,6 +678,7 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_backBufferHeight = extent.height;
     m_currentImageIndex = 0;
     m_swapchainVSync = wantVSync;
+    m_swapchainNeedsReset.store(false, std::memory_order_release);
 
     Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
         extent.width, extent.height, imageCount, m_swapchainFormat);
@@ -685,8 +686,7 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
 }
 
 void VulkanBackend::DestroySwapChain() {
-    for (auto& bb : m_backBuffers)
-        bb = nullptr;
+    m_backBuffers.clear();
     m_swapchainImages.clear();
 
     if (m_swapchain) {
@@ -700,7 +700,8 @@ void VulkanBackend::CreateBackBufferTextures() {
         ? nvrhi::Format::RGBA8_UNORM
         : nvrhi::Format::BGRA8_UNORM;
 
-    for (u32 i = 0; i < m_swapchainImages.size() && i < BACK_BUFFER_COUNT; i++) {
+    m_backBuffers.resize(m_swapchainImages.size());
+    for (u32 i = 0; i < m_swapchainImages.size(); i++) {
         nvrhi::TextureDesc desc;
         desc.width = m_backBufferWidth;
         desc.height = m_backBufferHeight;
@@ -728,9 +729,11 @@ void VulkanBackend::CreateSyncObjects() {
 
     for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
         vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
-        vkCreateSemaphore(m_device, &semInfo, nullptr, &m_renderFinished[i]);
         vkCreateFence(m_device, &fenceInfo, nullptr, &m_inFlightFence[i]);
     }
+    m_renderFinished.resize(m_swapchainImages.size(), VK_NULL_HANDLE);
+    for (auto& semaphore : m_renderFinished)
+        vkCreateSemaphore(m_device, &semInfo, nullptr, &semaphore);
 }
 
 void VulkanBackend::DestroySyncObjects() {
@@ -741,15 +744,18 @@ void VulkanBackend::DestroySyncObjects() {
             vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
             m_imageAvailable[i] = VK_NULL_HANDLE;
         }
-        if (m_renderFinished[i]) {
-            vkDestroySemaphore(m_device, m_renderFinished[i], nullptr);
-            m_renderFinished[i] = VK_NULL_HANDLE;
-        }
         if (m_inFlightFence[i]) {
             vkDestroyFence(m_device, m_inFlightFence[i], nullptr);
             m_inFlightFence[i] = VK_NULL_HANDLE;
         }
     }
+    for (VkSemaphore semaphore : m_renderFinished) {
+        if (semaphore)
+            vkDestroySemaphore(m_device, semaphore, nullptr);
+    }
+    m_renderFinished.clear();
+    m_inFrame = false;
+    m_presentPending = false;
 }
 
 void VulkanBackend::CreateBindlessResources() {
@@ -865,8 +871,9 @@ nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
 void VulkanBackend::Present(bool vsync) {
     m_requestedVSync = vsync;
 
-    if (m_asyncSubmit)
+    if (m_asyncSubmit || !m_presentPending)
         return;
+    m_presentPending = false;
 
     ZoneScopedN("VulkanBackend::Present");
 
@@ -875,15 +882,18 @@ void VulkanBackend::Present(bool vsync) {
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = &m_renderFinished[m_currentFrameIndex];
+    presentInfo.pWaitSemaphores = &m_renderFinished[m_currentImageIndex];
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = &m_swapchain;
     presentInfo.pImageIndices = &m_currentImageIndex;
 
     VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        m_swapchainNeedsReset.store(true, std::memory_order_release);
         Msg("* [VulkanBackend] Swapchain out of date, resize needed");
     }
+    R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
+        "Vulkan presentation failed");
 
     VkSubmitInfo fenceSubmit = {};
     fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -894,10 +904,12 @@ void VulkanBackend::Present(bool vsync) {
 
 void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
     WaitForIdle();
+    DestroySyncObjects();
 
     DestroySwapChain();
     R_ASSERT2(CreateSwapChain(width, height), "Vulkan swapchain recreation failed");
     CreateBackBufferTextures();
+    CreateSyncObjects();
 }
 
 void VulkanBackend::BeginFrame() {
@@ -916,7 +928,6 @@ void VulkanBackend::BeginFrame() {
     }
 
     vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
     VkResult result;
     {
@@ -927,10 +938,14 @@ void VulkanBackend::BeginFrame() {
             &m_currentImageIndex);
     }
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        Msg("* [VulkanBackend] Swapchain out of date during acquire");
-        return;
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        m_swapchainNeedsReset.store(true, std::memory_order_release);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            Msg("* [VulkanBackend] Swapchain out of date during acquire");
+            return;
+        }
     }
+    R_ASSERT2(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Vulkan image acquisition failed");
 
     if (!m_asyncSubmit) {
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
@@ -949,7 +964,11 @@ void VulkanBackend::BeginFrame() {
 void VulkanBackend::EndFrame() {
     ZoneScopedN("VK::EndFrame");
 
+    if (!m_inFrame)
+        return;
+
     m_inFrame = false;
+    vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
     if (m_asyncSubmit) {
         {
@@ -960,7 +979,7 @@ void VulkanBackend::EndFrame() {
         SubmitJob job;
         job.cl = m_commandLists[m_recordSlot];
         job.imageAvailable = m_imageAvailable[m_currentFrameIndex];
-        job.renderFinished = m_renderFinished[m_currentFrameIndex];
+        job.renderFinished = m_renderFinished[m_currentImageIndex];
         job.fence = m_inFlightFence[m_currentFrameIndex];
         job.imageIndex = m_currentImageIndex;
         job.slot = m_recordSlot;
@@ -986,7 +1005,7 @@ void VulkanBackend::EndFrame() {
         std::lock_guard<std::mutex> qk(m_queueMutex);
         vkDevice->queueSignalSemaphore(
             nvrhi::CommandQueue::Graphics,
-            m_renderFinished[m_currentFrameIndex], 0);
+            m_renderFinished[m_currentImageIndex], 0);
 
         {
             ZoneScopedN("VK::CommandListClose");
@@ -998,6 +1017,7 @@ void VulkanBackend::EndFrame() {
             m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandLists[m_recordSlot]);
         }
     }
+    m_presentPending = true;
 
     nvrhi::IDevice* device = m_nvrhiDevice;
     m_gcTask = TaskScheduler->AddTask([device] {
@@ -1072,8 +1092,11 @@ void VulkanBackend::SubmitThreadMain() {
 
             VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
             if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+                m_swapchainNeedsReset.store(true, std::memory_order_release);
                 Msg("* [VulkanBackend] Swapchain out of date, resize needed");
             }
+            R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
+                "Vulkan presentation failed");
             const auto tPresented = Clock::now();
             m_stPresentUs.store(usBetween(tPresentLocked, tPresented), std::memory_order_relaxed);
 
@@ -1185,7 +1208,7 @@ nvrhi::ICommandList* VulkanBackend::CreateCommandList() {
 DeviceState VulkanBackend::GetDeviceState() const {
     if (!m_initialized || !m_device)
         return DeviceState::Lost;
-    if (m_requestedVSync != m_swapchainVSync)
+    if (m_swapchainNeedsReset.load(std::memory_order_acquire) || m_requestedVSync != m_swapchainVSync)
         return DeviceState::NeedReset;
     return DeviceState::Normal;
 }
