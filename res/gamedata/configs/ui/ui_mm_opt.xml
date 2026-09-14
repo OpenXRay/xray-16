@@ -339,7 +339,7 @@
         </cap_vsync>
         <check_vsync x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="rs_v_sync" group="mm_opt_video_adv" depend="vid"/>
+            <options_item entry="rs_v_sync" group="mm_opt_video_adv"/>
         </check_vsync>
 
         <cap_always_active x="20" y="3" width="135" height="24">
