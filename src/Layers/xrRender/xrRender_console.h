@@ -169,6 +169,7 @@ extern ECORE_API int ps_r4_skeleton_wallmark_mode; // 0=decal stamps, 1=procedur
 enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1 };
 extern ECORE_API u32 ps_fg_render_mode;
 extern ECORE_API int ps_fg_hot_reload_shaders;
+extern ECORE_API int ps_fg_retina;
 
 enum
 {
