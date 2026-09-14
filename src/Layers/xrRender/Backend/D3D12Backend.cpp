@@ -594,6 +594,8 @@ void D3D12Backend::BeginFrame() {
     }
 
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
+    m_frameComputeInstanceID = 0;
+    m_frameWaitForCompute = false;
 
     {
         ZoneScopedN("D3D12::CommandListOpen");
@@ -614,6 +616,9 @@ void D3D12Backend::EndFrame() {
 
     // NVRHI handles fence signaling internally
     {
+        if (m_frameWaitForCompute && m_frameComputeInstanceID)
+            m_nvrhiDevice->queueWaitForCommandList(
+                nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, m_frameComputeInstanceID);
         ZoneScopedN("D3D12::ExecuteCommandList");
         m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
     }
@@ -653,23 +658,19 @@ void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     }
 }
 
-u64 D3D12Backend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
+void D3D12Backend::QueueComputeCommandList(nvrhi::ICommandList* commandList) {
     if (!m_nvrhiDevice || !commandList || !m_computeQueue)
-        return 0;
-    return m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+        return;
+    if (m_lastGraphicsInstanceID)
+        m_nvrhiDevice->queueWaitForCommandList(
+            nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
+    m_frameComputeInstanceID = m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
 }
 
-void D3D12Backend::QueueWaitForCompute(u64 instanceID) {
-    if (!m_nvrhiDevice || !m_computeQueue || instanceID == 0)
-        return;
-    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, instanceID);
+void D3D12Backend::QueueWaitForCompute() {
+    m_frameWaitForCompute = true;
 }
 
-void D3D12Backend::ComputeWaitForPreviousGraphics() {
-    if (!m_nvrhiDevice || !m_computeQueue || m_lastGraphicsInstanceID == 0)
-        return;
-    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
-}
 
 void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
     if (!m_nvrhiDevice)

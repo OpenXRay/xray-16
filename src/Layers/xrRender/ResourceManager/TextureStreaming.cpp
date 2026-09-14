@@ -336,7 +336,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
     if (needsExecute) {
         s_streamingCmdList->close();
-        m_device->GetNativeDevice()->executeCommandList(s_streamingCmdList);
+        GEnv.Backend->ExecuteCommandList(s_streamingCmdList);
     }
 
     // Update metadata

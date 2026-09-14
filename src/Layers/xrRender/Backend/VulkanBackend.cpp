@@ -3,6 +3,8 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
+#include <utility>
+
 #if defined(__APPLE__)
 #include <pthread/qos.h>
 #endif
@@ -167,10 +169,13 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         nvrhi::CommandListParameters computeParams;
         computeParams.enableImmediateExecution = false;
         computeParams.setQueueType(nvrhi::CommandQueue::Compute);
-        m_computeCommandList = m_nvrhiDevice->createCommandList(computeParams);
-        if (m_computeCommandList) {
+        for (auto& commandList : m_computeCommandLists)
+            commandList = m_nvrhiDevice->createCommandList(computeParams);
+        if (m_computeCommandLists[0] && m_computeCommandLists[1]) {
             Msg("* [VulkanBackend] Async compute enabled");
         } else {
+            for (auto& commandList : m_computeCommandLists)
+                commandList = nullptr;
             Msg("! [VulkanBackend] Failed to create compute command list (async compute disabled)");
         }
     }
@@ -208,7 +213,9 @@ void VulkanBackend::Shutdown() {
         bb = nullptr;
     m_commandLists[0] = nullptr;
     m_commandLists[1] = nullptr;
-    m_computeCommandList = nullptr;
+    m_frameComputeCommandList = nullptr;
+    for (auto& commandList : m_computeCommandLists)
+        commandList = nullptr;
     m_uploadCommandList = nullptr;
 
     m_nvrhiDevice = nullptr;
@@ -673,6 +680,7 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, nullptr);
     m_swapchainImages.resize(imageCount);
     vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, m_swapchainImages.data());
+    m_maxAcquiredImageCount = imageCount - surfaceCaps.minImageCount + 1;
 
     m_backBufferWidth = extent.width;
     m_backBufferHeight = extent.height;
@@ -723,17 +731,18 @@ void VulkanBackend::CreateSyncObjects() {
     VkSemaphoreCreateInfo semInfo = {};
     semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    VkFenceCreateInfo fenceInfo = {};
-    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
     for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
         vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
-        vkCreateFence(m_device, &fenceInfo, nullptr, &m_inFlightFence[i]);
+        m_frameSubmissionIDs[i] = 0;
+        m_frameSubmissionPending[i] = false;
     }
     m_renderFinished.resize(m_swapchainImages.size(), VK_NULL_HANDLE);
     for (auto& semaphore : m_renderFinished)
         vkCreateSemaphore(m_device, &semInfo, nullptr, &semaphore);
+    m_acquiredImageCount = 0;
+    m_frameComputeInstanceID = 0;
+    m_frameComputeCommandList = nullptr;
+    m_frameWaitForCompute = false;
 }
 
 void VulkanBackend::DestroySyncObjects() {
@@ -744,16 +753,18 @@ void VulkanBackend::DestroySyncObjects() {
             vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
             m_imageAvailable[i] = VK_NULL_HANDLE;
         }
-        if (m_inFlightFence[i]) {
-            vkDestroyFence(m_device, m_inFlightFence[i], nullptr);
-            m_inFlightFence[i] = VK_NULL_HANDLE;
-        }
+        m_frameSubmissionIDs[i] = 0;
+        m_frameSubmissionPending[i] = false;
     }
     for (VkSemaphore semaphore : m_renderFinished) {
         if (semaphore)
             vkDestroySemaphore(m_device, semaphore, nullptr);
     }
     m_renderFinished.clear();
+    m_acquiredImageCount = 0;
+    m_frameComputeInstanceID = 0;
+    m_frameComputeCommandList = nullptr;
+    m_frameWaitForCompute = false;
     m_inFrame = false;
     m_presentPending = false;
 }
@@ -895,10 +906,6 @@ void VulkanBackend::Present(bool vsync) {
     R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
         "Vulkan presentation failed");
 
-    VkSubmitInfo fenceSubmit = {};
-    fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, m_inFlightFence[m_currentFrameIndex]);
-
     m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
 }
 
@@ -921,21 +928,52 @@ void VulkanBackend::BeginFrame() {
         m_gcTask.Reset();
     }
 
+    uint64_t frameSubmissionID;
     if (m_asyncSubmit) {
-        ZoneScopedN("VK::WaitSubmitSlot");
-        std::unique_lock<std::mutex> lk(m_submitMutex);
-        m_submitDoneCv.wait(lk, [&] { return !m_slotInFlight[m_recordSlot]; });
+        {
+            ZoneScopedN("VK::WaitSubmitSlot");
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [&] {
+                return !m_slotInFlight[m_recordSlot] && !m_frameSubmissionPending[m_currentFrameIndex];
+            });
+            frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
+        }
+        {
+            ZoneScopedN("VK::WaitPresentCapacity");
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [&] { return m_acquiredImageCount < m_maxAcquiredImageCount; });
+        }
+    } else {
+        frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
     }
 
-    vkWaitForFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex], VK_TRUE, UINT64_MAX);
+    if (frameSubmissionID) {
+        ZoneScopedN("VK::WaitFrameGPU");
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        const VkSemaphore semaphore = vkDevice->getQueueSemaphore(nvrhi::CommandQueue::Graphics);
+        VkSemaphoreWaitInfo waitInfo = {};
+        waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
+        waitInfo.semaphoreCount = 1;
+        waitInfo.pSemaphores = &semaphore;
+        waitInfo.pValues = &frameSubmissionID;
+        const VkResult result = vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
+        R_ASSERT2(result == VK_SUCCESS, "Vulkan frame completion wait failed");
+    }
 
     VkResult result;
     {
-        std::lock_guard<std::mutex> sc(m_swapchainMutex);
-        result = vkAcquireNextImageKHR(
-            m_device, m_swapchain, UINT64_MAX,
-            m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
-            &m_currentImageIndex);
+        std::unique_lock<std::mutex> sc(m_swapchainMutex, std::defer_lock);
+        {
+            ZoneScopedN("VK::WaitAcquireLock");
+            sc.lock();
+        }
+        {
+            ZoneScopedN("VK::AcquireImage");
+            result = vkAcquireNextImageKHR(
+                m_device, m_swapchain, UINT64_MAX,
+                m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
+                &m_currentImageIndex);
+        }
     }
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
@@ -947,13 +985,13 @@ void VulkanBackend::BeginFrame() {
     }
     R_ASSERT2(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Vulkan image acquisition failed");
 
-    if (!m_asyncSubmit) {
-        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
-        vkDevice->queueWaitForSemaphore(
-            nvrhi::CommandQueue::Graphics,
-            m_imageAvailable[m_currentFrameIndex], 0);
+    if (m_asyncSubmit) {
+        std::lock_guard<std::mutex> lk(m_submitMutex);
+        ++m_acquiredImageCount;
     }
-
+    m_frameComputeInstanceID = 0;
+    m_frameComputeCommandList = nullptr;
+    m_frameWaitForCompute = false;
     {
         ZoneScopedN("VK::CommandListOpen");
         m_commandLists[m_recordSlot]->open();
@@ -968,7 +1006,6 @@ void VulkanBackend::EndFrame() {
         return;
 
     m_inFrame = false;
-    vkResetFences(m_device, 1, &m_inFlightFence[m_currentFrameIndex]);
 
     if (m_asyncSubmit) {
         {
@@ -980,7 +1017,9 @@ void VulkanBackend::EndFrame() {
         job.cl = m_commandLists[m_recordSlot];
         job.imageAvailable = m_imageAvailable[m_currentFrameIndex];
         job.renderFinished = m_renderFinished[m_currentImageIndex];
-        job.fence = m_inFlightFence[m_currentFrameIndex];
+        job.computeCl = std::move(m_frameComputeCommandList);
+        job.waitForCompute = m_frameWaitForCompute;
+        job.frameIndex = m_currentFrameIndex;
         job.imageIndex = m_currentImageIndex;
         job.slot = m_recordSlot;
 
@@ -989,9 +1028,10 @@ void VulkanBackend::EndFrame() {
             std::unique_lock<std::mutex> lk(m_submitMutex);
             m_submitDoneCv.wait(lk, [&] { return !m_jobQueued; });
             job.enqueueTime = std::chrono::steady_clock::now();
-            m_pendingJob = job;
+            m_pendingJob = std::move(job);
             m_jobQueued = true;
             m_slotInFlight[m_recordSlot] = true;
+            m_frameSubmissionPending[m_currentFrameIndex] = true;
         }
         m_submitCv.notify_one();
 
@@ -1003,6 +1043,12 @@ void VulkanBackend::EndFrame() {
     auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
     {
         std::lock_guard<std::mutex> qk(m_queueMutex);
+        vkDevice->queueWaitForSemaphore(
+            nvrhi::CommandQueue::Graphics,
+            m_imageAvailable[m_currentFrameIndex], 0);
+        if (m_frameWaitForCompute && m_frameComputeInstanceID)
+            m_nvrhiDevice->queueWaitForCommandList(
+                nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, m_frameComputeInstanceID);
         vkDevice->queueSignalSemaphore(
             nvrhi::CommandQueue::Graphics,
             m_renderFinished[m_currentImageIndex], 0);
@@ -1014,7 +1060,9 @@ void VulkanBackend::EndFrame() {
 
         {
             ZoneScopedN("VK::ExecuteCommandList");
-            m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandLists[m_recordSlot]);
+            const u64 instanceID = m_nvrhiDevice->executeCommandList(m_commandLists[m_recordSlot]);
+            m_frameSubmissionIDs[m_currentFrameIndex] = instanceID;
+            m_lastGraphicsInstanceID = instanceID;
         }
     }
     m_presentPending = true;
@@ -1042,7 +1090,7 @@ void VulkanBackend::SubmitThreadMain() {
             m_submitCv.wait(lk, [&] { return m_jobQueued || !m_submitRun; });
             if (!m_submitRun && !m_jobQueued)
                 return;
-            job = m_pendingJob;
+            job = std::move(m_pendingJob);
             m_jobQueued = false;
             m_submitActive = true;
         }
@@ -1052,6 +1100,7 @@ void VulkanBackend::SubmitThreadMain() {
         m_stJobLatencyUs.store(usBetween(job.enqueueTime, tDequeue), std::memory_order_relaxed);
 
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        u64 graphicsInstanceID;
         {
             std::lock_guard<std::mutex> qk(m_queueMutex);
             const auto tLocked = Clock::now();
@@ -1059,18 +1108,34 @@ void VulkanBackend::SubmitThreadMain() {
 
             vkDevice->queueWaitForSemaphore(nvrhi::CommandQueue::Graphics, job.imageAvailable, 0);
             vkDevice->queueSignalSemaphore(nvrhi::CommandQueue::Graphics, job.renderFinished, 0);
+            const u64 previousGraphicsID = m_lastGraphicsInstanceID.load();
+            if (job.computeCl && previousGraphicsID)
+                m_nvrhiDevice->queueWaitForCommandList(
+                    nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, previousGraphicsID);
             const auto tSem = Clock::now();
             m_stSemWaitUs.store(usBetween(tLocked, tSem), std::memory_order_relaxed);
 
+            u64 computeInstanceID = 0;
+            if (job.computeCl) {
+                ZoneScopedN("VK::ExecuteComputeCommandList");
+                computeInstanceID = m_nvrhiDevice->executeCommandList(job.computeCl, nvrhi::CommandQueue::Compute);
+            }
+            if (job.waitForCompute && computeInstanceID)
+                m_nvrhiDevice->queueWaitForCommandList(
+                    nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, computeInstanceID);
+
             {
                 ZoneScopedN("VK::ExecuteCommandList");
-                m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(job.cl);
+                graphicsInstanceID = m_nvrhiDevice->executeCommandList(job.cl);
+                m_lastGraphicsInstanceID = graphicsInstanceID;
             }
             m_stEncodeUs.store(usBetween(tSem, Clock::now()), std::memory_order_relaxed);
         }
 
         {
             std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_frameSubmissionIDs[job.frameIndex] = graphicsInstanceID;
+            m_frameSubmissionPending[job.frameIndex] = false;
             m_slotInFlight[job.slot] = false;
         }
         m_submitDoneCv.notify_all();
@@ -1097,14 +1162,15 @@ void VulkanBackend::SubmitThreadMain() {
             }
             R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
                 "Vulkan presentation failed");
-            const auto tPresented = Clock::now();
-            m_stPresentUs.store(usBetween(tPresentLocked, tPresented), std::memory_order_relaxed);
-
-            VkSubmitInfo fenceSubmit = {};
-            fenceSubmit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            vkQueueSubmit(m_graphicsQueue, 1, &fenceSubmit, job.fence);
-            m_stFenceUs.store(usBetween(tPresented, Clock::now()), std::memory_order_relaxed);
+            m_stPresentUs.store(usBetween(tPresentLocked, Clock::now()), std::memory_order_relaxed);
         }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            R_ASSERT2(m_acquiredImageCount > 0, "Vulkan presentation has no acquired image");
+            --m_acquiredImageCount;
+        }
+        m_submitDoneCv.notify_all();
 
         {
             ZoneScopedN("SubmitThread::GC");
@@ -1130,7 +1196,6 @@ bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
     out.encodeUs = m_stEncodeUs.load(std::memory_order_relaxed);
     out.presentLockUs = m_stPresentLockUs.load(std::memory_order_relaxed);
     out.presentUs = m_stPresentUs.load(std::memory_order_relaxed);
-    out.fenceUs = m_stFenceUs.load(std::memory_order_relaxed);
     out.gcUs = m_stGcUs.load(std::memory_order_relaxed);
     return true;
 }
@@ -1157,33 +1222,36 @@ void VulkanBackend::WaitForIdle() {
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList) {
         std::lock_guard<std::mutex> qk(m_queueMutex);
-        m_nvrhiDevice->executeCommandList(commandList);
+        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(commandList);
     }
 }
 
-u64 VulkanBackend::ExecuteComputeCommandList(nvrhi::ICommandList* commandList) {
+void VulkanBackend::QueueComputeCommandList(nvrhi::ICommandList* commandList) {
     if (!m_nvrhiDevice || !commandList || !m_computeQueue)
-        return 0;
-    return m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+        return;
+    R_ASSERT2(!m_frameComputeCommandList, "Only one compute command list may be queued per frame");
+    m_frameComputeCommandList = commandList;
+    if (m_asyncSubmit)
+        return;
+    const u64 instanceID = m_lastGraphicsInstanceID.load();
+    if (instanceID)
+        m_nvrhiDevice->queueWaitForCommandList(
+            nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, instanceID);
+    ZoneScopedN("VK::ExecuteComputeCommandList");
+    m_frameComputeInstanceID = m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
 }
 
-void VulkanBackend::QueueWaitForCompute(u64 instanceID) {
-    if (!m_nvrhiDevice || !m_computeQueue || instanceID == 0)
-        return;
-    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, instanceID);
+void VulkanBackend::QueueWaitForCompute() {
+    m_frameWaitForCompute = true;
 }
 
-void VulkanBackend::ComputeWaitForPreviousGraphics() {
-    if (!m_nvrhiDevice || !m_computeQueue || m_lastGraphicsInstanceID == 0)
-        return;
-    m_nvrhiDevice->queueWaitForCommandList(nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
-}
 
 void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
     if (!m_nvrhiDevice) return;
+    std::lock_guard<std::mutex> qk(m_queueMutex);
     for (u32 i = 0; i < count; i++) {
         if (commandLists[i])
-            m_nvrhiDevice->executeCommandList(commandLists[i]);
+            m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(commandLists[i]);
     }
 }
 
@@ -1193,11 +1261,12 @@ void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, s
     if (m_inFrame) {
         m_commandLists[m_recordSlot]->writeBuffer(buffer, data, size);
     } else {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
         m_nvrhiDevice->runGarbageCollection();
         m_uploadCommandList->open();
         m_uploadCommandList->writeBuffer(buffer, data, size);
         m_uploadCommandList->close();
-        m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_uploadCommandList);
     }
 }
 

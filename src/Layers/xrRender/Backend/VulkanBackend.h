@@ -32,11 +32,10 @@ public:
     nvrhi::ICommandList* GetCommandList() const override { return m_commandLists[m_recordSlot].Get(); }
     nvrhi::ICommandList* CreateCommandList() override;
 
-    bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
-    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
-    u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) override;
-    void QueueWaitForCompute(u64 instanceID) override;
-    void ComputeWaitForPreviousGraphics() override;
+    bool HasAsyncCompute() const override { return m_computeCommandLists[0] != nullptr; }
+    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandLists[m_recordSlot].Get(); }
+    void QueueComputeCommandList(nvrhi::ICommandList* commandList) override;
+    void QueueWaitForCompute() override;
 
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
@@ -97,13 +96,13 @@ private:
 
     VkSemaphore m_imageAvailable[BACK_BUFFER_COUNT] = {};
     xr_vector<VkSemaphore> m_renderFinished;
-    VkFence m_inFlightFence[BACK_BUFFER_COUNT] = {};
+    u64 m_frameSubmissionIDs[BACK_BUFFER_COUNT] = {};
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::DeviceHandle m_nvrhiVulkanDevice;
     nvrhi::CommandListHandle m_commandLists[2];
     u32 m_recordSlot = 0;
-    nvrhi::CommandListHandle m_computeCommandList;
+    nvrhi::CommandListHandle m_computeCommandLists[2];
     nvrhi::CommandListHandle m_uploadCommandList;
     xr_vector<VkImage> m_swapchainImages;
     xr_vector<nvrhi::TextureHandle> m_backBuffers;
@@ -126,16 +125,23 @@ private:
     u32 m_backBufferHeight = 0;
     u32 m_currentImageIndex = 0;
     u32 m_currentFrameIndex = 0;
+    u32 m_acquiredImageCount = 0;
+    u32 m_maxAcquiredImageCount = 1;
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
     TaskHandle m_gcTask;
     std::atomic<u64> m_lastGraphicsInstanceID{ 0 };
+    u64 m_frameComputeInstanceID = 0;
+    nvrhi::CommandListHandle m_frameComputeCommandList;
+    bool m_frameWaitForCompute = false;
 
     struct SubmitJob {
         nvrhi::ICommandList* cl = nullptr;
         VkSemaphore imageAvailable = VK_NULL_HANDLE;
         VkSemaphore renderFinished = VK_NULL_HANDLE;
-        VkFence fence = VK_NULL_HANDLE;
+        nvrhi::CommandListHandle computeCl;
+        bool waitForCompute = false;
+        u32 frameIndex = 0;
         u32 imageIndex = 0;
         u32 slot = 0;
         std::chrono::steady_clock::time_point enqueueTime;
@@ -151,6 +157,7 @@ private:
     bool m_submitActive = false;
     bool m_submitRun = false;
     bool m_slotInFlight[2] = {};
+    bool m_frameSubmissionPending[BACK_BUFFER_COUNT] = {};
     std::mutex m_queueMutex;
     std::mutex m_swapchainMutex;
 
@@ -160,7 +167,6 @@ private:
     std::atomic<u64> m_stEncodeUs{0};
     std::atomic<u64> m_stPresentLockUs{0};
     std::atomic<u64> m_stPresentUs{0};
-    std::atomic<u64> m_stFenceUs{0};
     std::atomic<u64> m_stGcUs{0};
 
     void SubmitThreadMain();

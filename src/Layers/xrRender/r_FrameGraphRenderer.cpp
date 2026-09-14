@@ -359,7 +359,7 @@ void FrameGraphRenderer::Render() {
     if (m_gpuProfiler)
     {
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
-        m_gpuProfiler->FrameStart();
+        m_gpuProfiler->FrameStart(xray::profiler::GetCPUProfiler().IsSamplingFrame());
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
@@ -542,7 +542,7 @@ void FrameGraphRenderer::RenderMenu() {
     if (m_gpuProfiler)
     {
         m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
-        m_gpuProfiler->FrameStart();
+        m_gpuProfiler->FrameStart(xray::profiler::GetCPUProfiler().IsSamplingFrame());
     }
     
     if (m_device && m_device->GetFGResourceManager()) {

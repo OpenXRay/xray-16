@@ -89,7 +89,7 @@ public:
     PassData& addCallbackPass(const char* name, Setup&& setupFunc, Execute&& executeFunc)
     {
         const xray::profiler::ZoneInfo* setupZone = nullptr;
-        if (xray::profiler::CPUProfiler::Instance().IsEnabled())
+        if (xray::profiler::CPUProfiler::Instance().IsSamplingFrame())
         {
             char setupZoneName[128];
             std::snprintf(setupZoneName, sizeof(setupZoneName), "%s [setup]", name);

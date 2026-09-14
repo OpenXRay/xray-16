@@ -67,9 +67,8 @@ public:
     // ═══════ Async Compute ═══════
     virtual bool HasAsyncCompute() const { return false; }
     virtual nvrhi::ICommandList* GetComputeCommandList() const { return nullptr; }
-    virtual u64 ExecuteComputeCommandList(nvrhi::ICommandList* commandList) { return 0; }
-    virtual void QueueWaitForCompute(u64 instanceID) {}
-    virtual void ComputeWaitForPreviousGraphics() {}
+    virtual void QueueComputeCommandList(nvrhi::ICommandList* commandList) {}
+    virtual void QueueWaitForCompute() {}
 
     // ═══════ Command Execution ═══════
     virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}
@@ -95,7 +94,6 @@ public:
         u64 encodeUs;
         u64 presentLockUs;
         u64 presentUs;
-        u64 fenceUs;
         u64 gcUs;
     };
     virtual bool GetSubmitThreadTimings(SubmitThreadTimings& out) const { return false; }
