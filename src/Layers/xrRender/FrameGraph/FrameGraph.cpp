@@ -337,6 +337,10 @@ void FrameGraph::ResetForNextFrame() {
         }
     }
 
+    m_compileInDegree.clear();
+    m_compilePassWorklist.clear();
+    m_compileTransientResources.clear();
+
     for (auto& pass : m_passes)
         m_passPool.push_back(std::move(pass));
     m_passes.clear();
@@ -383,6 +387,10 @@ void FrameGraph::Reset() {
         resource.nvrhiTexture = nullptr;
         resource.nvrhiBuffer = nullptr;
     }
+
+    m_compileInDegree.clear();
+    m_compilePassWorklist.clear();
+    m_compileTransientResources.clear();
 
     m_resources.clear();
     m_passes.clear();
@@ -646,11 +654,14 @@ void FrameGraph::TopologicalSort() {
     m_sortedPasses.clear();
     m_sortedPasses.reserve(numPasses);
 
-    xr_vector<u32> inDegree(numPasses);
+    auto& inDegree = m_compileInDegree;
+    inDegree.resize(numPasses);
     for (u32 i = 0; i < numPasses; ++i)
         inDegree[i] = static_cast<u32>(m_passes[i].dependsOn.size());
 
-    xr_vector<PassNode*> queue;
+    auto& queue = m_compilePassWorklist;
+    queue.clear();
+    queue.reserve(numPasses);
     for (u32 i = 0; i < numPasses; ++i) {
         if (inDegree[i] == 0)
             queue.push_back(&m_passes[i]);
@@ -690,32 +701,31 @@ void FrameGraph::CullUnusedPasses() {
         pass.culled = true;
     }
 
-    xr_vector<PassNode*> terminalPasses;
+    auto& queue = m_compilePassWorklist;
+    queue.clear();
 
     for (auto& pass : m_passes) {
         if (pass.hasSideEffects) {
-            terminalPasses.push_back(&pass);
+            queue.push_back(&pass);
             continue;
         }
         for (const auto& access : pass.resourceAccesses) {
             if (access.IsWrite()) {
                 const ResourceNode* resource = GetResourceNode(access.resource);
                 if (resource && (resource->desc.isImported || resource->isPersistent)) {
-                    terminalPasses.push_back(&pass);
+                    queue.push_back(&pass);
                     break;
                 }
             }
         }
     }
 
-    if (terminalPasses.empty()) {
+    if (queue.empty()) {
         for (auto& pass : m_passes) {
             pass.culled = false;
         }
         return;
     }
-
-    xr_vector<PassNode*> queue = terminalPasses;
 
     while (!queue.empty()) {
         PassNode* current = queue.back();
@@ -1002,7 +1012,8 @@ void FrameGraph::InsertResourceBarriers() {
 }
 
 void FrameGraph::OptimizeMemoryAliasing() {
-    xr_vector<ResourceNode*> transientResources;
+    auto& transientResources = m_compileTransientResources;
+    transientResources.clear();
     for (auto& resource : m_resources) {
         if (resource.canAlias && resource.firstUsedPass != INVALID_INDEX && !resource.desc.isImported) {
             transientResources.push_back(&resource);

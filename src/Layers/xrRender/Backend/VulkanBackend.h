@@ -45,7 +45,7 @@ public:
 
     nvrhi::ITexture* GetBackBuffer() override;
     u32 GetCurrentBackBufferIndex() const override { return m_currentImageIndex; }
-    u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
+    u32 GetBackBufferCount() const override { return static_cast<u32>(m_backBuffers.size()); }
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
     void ResizeSwapChain(u32 width, u32 height) override;
@@ -96,7 +96,7 @@ private:
     xr_vector<const char*> m_deviceExtensions;
 
     VkSemaphore m_imageAvailable[BACK_BUFFER_COUNT] = {};
-    VkSemaphore m_renderFinished[BACK_BUFFER_COUNT] = {};
+    xr_vector<VkSemaphore> m_renderFinished;
     VkFence m_inFlightFence[BACK_BUFFER_COUNT] = {};
 
     nvrhi::DeviceHandle m_nvrhiDevice;
@@ -106,7 +106,7 @@ private:
     nvrhi::CommandListHandle m_computeCommandList;
     nvrhi::CommandListHandle m_uploadCommandList;
     xr_vector<VkImage> m_swapchainImages;
-    nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
+    xr_vector<nvrhi::TextureHandle> m_backBuffers;
 
     nvrhi::BindingLayoutHandle m_bindlessLayout;
     nvrhi::DescriptorTableHandle m_bindlessDescriptorTable;
@@ -116,8 +116,10 @@ private:
 
     bool m_initialized = false;
     bool m_inFrame = false;
+    bool m_presentPending = false;
     bool m_requestedVSync = false;
     bool m_swapchainVSync = false;
+    std::atomic<bool> m_swapchainNeedsReset{ false };
     bool m_validationEnabled = false;
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;

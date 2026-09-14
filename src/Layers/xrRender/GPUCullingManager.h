@@ -409,6 +409,18 @@ private:
     xr_vector<GPUClusterEntry> m_clusterEntryData;
     xr_vector<ClusterMeshKey> m_staticBatchKeys;
     xr_vector<GPUClusterEntry> m_dynamicEntryData;
+    struct DynamicClusterPlan {
+        const ClusterUnitRecord* record;
+        const Fmatrix* world;
+        u32 member;
+        u32 batchIndex;
+        u32 firstEntry;
+        u32 materialID;
+        u32 extraFlags;
+        float scale;
+        bool castsShadow;
+    };
+    xr_vector<DynamicClusterPlan> m_dynamicClusterPlans;
     xr_vector<ClusterMeshKey> m_dynamicBatchKeys;
     xr_vector<std::pair<const void*, const void*>> m_dynamicIdentity;
     xr_vector<Fmatrix> m_dynamicPrevWorldData;
@@ -474,7 +486,6 @@ private:
     xr_vector<u32> m_staticBatchVertexCounts;
 
     xr_vector<u32> m_dynamicObjectFlags;
-    xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;
     xr_vector<u32> m_dynamicMaterialIDData;
     xr_vector<GPUInstanceData> m_dynamicInstanceData;
 
