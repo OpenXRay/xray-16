@@ -589,8 +589,8 @@ void D3D12Backend::BeginFrame() {
     // with CPU game logic. Wait here before any NVRHI operations.
     if (m_gcTask) {
         ZoneScopedN("D3D12::WaitForGC");
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
 
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -628,7 +628,7 @@ void D3D12Backend::EndFrame() {
     // NOTE: No ZoneScopedN here! The profiler resets zones at frame boundary,
     // and this task spans across frames, which corrupts the zone hierarchy.
     nvrhi::IDevice* device = m_nvrhiDevice;
-    m_gcTask = &TaskScheduler->AddTask([device] {
+    m_gcTask = TaskScheduler->AddTask([device] {
         device->runGarbageCollection();
     });
 }
@@ -636,8 +636,8 @@ void D3D12Backend::EndFrame() {
 void D3D12Backend::WaitForIdle() {
     // Wait for any pending async GC first
     if (m_gcTask) {
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
 
     // Use NVRHI's built-in wait which handles its internal fences

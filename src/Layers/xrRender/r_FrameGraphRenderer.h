@@ -1,6 +1,7 @@
 // xrRender/r_FrameGraphRenderer.h
 #pragma once
 
+#include "xrCore/Threading/Task.hpp"
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/FGRenderBase.h"
 #include "Layers/xrRender/Shader.h"
@@ -353,7 +354,7 @@ public:
 
     IRender_Sector::sector_id_t m_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
     u32 m_uLastLTRACK{ 0 };
-    Task* m_pProcessHOMTask{ nullptr };
+    TaskHandle m_processHOMTask;
     bool m_bFirstFrameAfterReset{ false };
     xr_vector<Fbox3> m_main_coarse_structure;
     fg::CHOM m_HOM;

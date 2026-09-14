@@ -329,7 +329,7 @@ void CRenderDevice::ProcessFrame()
 
         OnCameraUpdated();
 
-        const auto& processSeqParallel = TaskScheduler->AddTask([this]
+        const auto processSeqParallel = TaskScheduler->AddTask([this]
         {
             ZoneScopedN("ProcessParallelSequence");
             for (u32 pit = 0; pit < seqParallel.size(); pit++)

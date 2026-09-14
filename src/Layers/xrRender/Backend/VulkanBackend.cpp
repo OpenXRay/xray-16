@@ -905,8 +905,8 @@ void VulkanBackend::BeginFrame() {
 
     if (m_gcTask) {
         ZoneScopedN("VK::WaitForGC");
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
 
     if (m_asyncSubmit) {
@@ -1000,7 +1000,7 @@ void VulkanBackend::EndFrame() {
     }
 
     nvrhi::IDevice* device = m_nvrhiDevice;
-    m_gcTask = &TaskScheduler->AddTask([device] {
+    m_gcTask = TaskScheduler->AddTask([device] {
         device->runGarbageCollection();
     });
 }
@@ -1122,8 +1122,8 @@ void VulkanBackend::FlushSubmits() {
 void VulkanBackend::WaitForIdle() {
     FlushSubmits();
     if (m_gcTask) {
-        TaskScheduler->Wait(*m_gcTask);
-        m_gcTask = nullptr;
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
     }
     if (m_nvrhiDevice)
         m_nvrhiDevice->waitForIdle();

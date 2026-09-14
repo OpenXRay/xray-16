@@ -267,6 +267,10 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
 }
 
 void FrameGraphRenderer::Shutdown() {
+    if (m_processHOMTask) {
+        TaskScheduler->Wait(m_processHOMTask);
+        m_processHOMTask.Reset();
+    }
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
@@ -2499,10 +2503,10 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         submittedDynamic++;
     }
 
-    if (m_pProcessHOMTask) {
+    if (m_processHOMTask) {
         ZoneScopedN("CollectVisibleGeometry::WaitHOM");
-        TaskScheduler->Wait(*m_pProcessHOMTask);
-        m_pProcessHOMTask = nullptr;
+        TaskScheduler->Wait(m_processHOMTask);
+        m_processHOMTask.Reset();
     }
     xr_vector<const light*>& culledLights = m_culledLights;
     culledLights.clear();
@@ -3043,7 +3047,9 @@ void FrameGraphRenderer::OnCameraUpdated()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
-    m_pProcessHOMTask = &m_HOM.DispatchMTRender();
+    if (m_processHOMTask)
+        TaskScheduler->Wait(m_processHOMTask);
+    m_processHOMTask = m_HOM.DispatchMTRender();
 }
 
 namespace

@@ -5,7 +5,6 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "player_hud_tune.h"
 
-class Task;
 class CMainMenu;
 class CUICursor;
 class CParticlesObject;

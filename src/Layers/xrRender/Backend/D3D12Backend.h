@@ -3,11 +3,11 @@
 // This is the PRIMARY TARGET backend for GPU-driven rendering
 #pragma once
 
+#include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
 // Forward declarations
-class Task;
 struct ID3D12Device;
 struct ID3D12CommandQueue;
 struct IDXGISwapChain3;
@@ -127,6 +127,6 @@ private:
 
     // Async GC - runs garbage collection on background thread between frames
     // GC is launched at EndFrame and waited on at BeginFrame
-    Task* m_gcTask = nullptr;
+    TaskHandle m_gcTask;
     u64 m_lastGraphicsInstanceID = 0;
 };
