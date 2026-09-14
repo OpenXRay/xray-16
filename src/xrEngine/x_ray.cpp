@@ -384,6 +384,10 @@ int CApplication::Run()
 
     while (!quitRequested())
     {
+        Device.PaceFrame();
+        if (quitRequested())
+            break;
+
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;

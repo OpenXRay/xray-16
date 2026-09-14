@@ -7,6 +7,7 @@
 // ZFar  - always 1.0f
 
 #include "pure.h"
+#include "FramePacer.h"
 
 #include "xrCore/FTimer.h"
 #include "Stats.h"
@@ -41,6 +42,8 @@ private:
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
     CTimer TimerMM;
+    FramePacer m_framePacer;
+    float m_averageFrameTime{ 1.f / 30.f };
 
     void SetupStates();
 
@@ -162,6 +165,7 @@ public:
 
 public:
     // Scene control
+    void PaceFrame();
     void ProcessFrame();
 
     void PreCache(u32 amount, bool wait_user_input);

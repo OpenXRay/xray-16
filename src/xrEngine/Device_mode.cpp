@@ -226,7 +226,9 @@ void CRenderDevice::UpdateWindowState()
     SDL_GetWindowSizeInPixels(m_sdlWnd, &pxW, &pxH);
     int windowWidth = 0, windowHeight = 0;
     SDL_GetWindowSize(m_sdlWnd, &windowWidth, &windowHeight);
-    m_windowVisible = (pxW > 0 && pxH > 0 && windowWidth > 0 && windowHeight > 0);
+    const auto windowFlags = SDL_GetWindowFlags(m_sdlWnd);
+    m_windowVisible = (GEnv.isDedicatedServer || !(windowFlags & (SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED))) &&
+        pxW > 0 && pxH > 0 && windowWidth > 0 && windowHeight > 0;
     if (!m_windowVisible)
         return;
 

@@ -12,6 +12,7 @@
 #include "xrCDB/ISpatial.h"
 
 #include "pure.h"
+#include "FramePacer.h"
 #ifndef _EDITOR
 #include "Environment.h"
 #include "EngineAPI.h"
@@ -96,6 +97,7 @@ private:
     int load_stage{};
     int max_load_stage{};
     CTimer phase_timer;
+    mutable FramePacer m_loadingFramePacer;
 
     bool loaded{};
 
