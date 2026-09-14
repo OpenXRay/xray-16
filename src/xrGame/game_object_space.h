@@ -19,6 +19,7 @@ enum ECallbackType : u32
 
     eInventoryPda,
     eInventoryInfo,
+    eInventoryInfoRemoved,
     eArticleInfo,
     eTaskStateChange,
     eMapLocationAdded,
@@ -81,8 +82,6 @@ enum ECallbackType : u32
     eControllerAttitudeChange,
 
     // X-Ray Extensions:
-    eInventoryInfoRemoved,
-
     eKeyPress   = 123,
     eKeyRelease = 124,
     eKeyHold    = 125,
