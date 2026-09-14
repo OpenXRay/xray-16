@@ -89,6 +89,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore,
         VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateCommandPool);
 
+    m_requestedVSync = psDeviceFlags.test(rsVSync);
     if (!CreateSwapChain(width, height)) { Shutdown(); return false; }
 
     Msg("* [VulkanBackend] About to create NVRHI device...");
@@ -618,7 +619,7 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
     vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
 
-    const bool wantVSync = psDeviceFlags.test(rsVSync);
+    const bool wantVSync = m_requestedVSync;
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
     if (!wantVSync)
     {
@@ -675,6 +676,7 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_backBufferWidth = extent.width;
     m_backBufferHeight = extent.height;
     m_currentImageIndex = 0;
+    m_swapchainVSync = wantVSync;
 
     Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
         extent.width, extent.height, imageCount, m_swapchainFormat);
@@ -860,6 +862,8 @@ nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
 }
 
 void VulkanBackend::Present(bool vsync) {
+    m_requestedVSync = vsync;
+
     if (m_asyncSubmit)
         return;
 
@@ -890,11 +894,8 @@ void VulkanBackend::Present(bool vsync) {
 void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
     WaitForIdle();
 
-    for (auto& bb : m_backBuffers)
-        bb = nullptr;
-
     DestroySwapChain();
-    CreateSwapChain(width, height);
+    R_ASSERT2(CreateSwapChain(width, height), "Vulkan swapchain recreation failed");
     CreateBackBufferTextures();
 }
 
@@ -962,10 +963,12 @@ void VulkanBackend::EndFrame() {
         job.fence = m_inFlightFence[m_currentFrameIndex];
         job.imageIndex = m_currentImageIndex;
         job.slot = m_recordSlot;
-        job.enqueueTime = std::chrono::steady_clock::now();
 
         {
-            std::lock_guard<std::mutex> lk(m_submitMutex);
+            ZoneScopedN("VK::WaitSubmitQueue");
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [&] { return !m_jobQueued; });
+            job.enqueueTime = std::chrono::steady_clock::now();
             m_pendingJob = job;
             m_jobQueued = true;
             m_slotInFlight[m_recordSlot] = true;
@@ -1020,7 +1023,9 @@ void VulkanBackend::SubmitThreadMain() {
                 return;
             job = m_pendingJob;
             m_jobQueued = false;
+            m_submitActive = true;
         }
+        m_submitDoneCv.notify_all();
 
         const auto tDequeue = Clock::now();
         m_stJobLatencyUs.store(usBetween(job.enqueueTime, tDequeue), std::memory_order_relaxed);
@@ -1083,6 +1088,12 @@ void VulkanBackend::SubmitThreadMain() {
             m_nvrhiDevice->runGarbageCollection();
             m_stGcUs.store(usBetween(tGc, Clock::now()), std::memory_order_relaxed);
         }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_submitActive = false;
+        }
+        m_submitDoneCv.notify_all();
     }
 }
 
@@ -1104,7 +1115,7 @@ void VulkanBackend::FlushSubmits() {
     if (!m_asyncSubmit)
         return;
     std::unique_lock<std::mutex> lk(m_submitMutex);
-    m_submitDoneCv.wait(lk, [&] { return !m_jobQueued && !m_slotInFlight[0] && !m_slotInFlight[1]; });
+    m_submitDoneCv.wait(lk, [&] { return !m_jobQueued && !m_submitActive; });
 }
 
 void VulkanBackend::WaitForIdle() {
@@ -1173,6 +1184,8 @@ nvrhi::ICommandList* VulkanBackend::CreateCommandList() {
 DeviceState VulkanBackend::GetDeviceState() const {
     if (!m_initialized || !m_device)
         return DeviceState::Lost;
+    if (m_requestedVSync != m_swapchainVSync)
+        return DeviceState::NeedReset;
     return DeviceState::Normal;
 }
 

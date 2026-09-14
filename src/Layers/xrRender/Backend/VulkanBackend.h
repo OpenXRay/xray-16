@@ -115,6 +115,8 @@ private:
 
     bool m_initialized = false;
     bool m_inFrame = false;
+    bool m_requestedVSync = false;
+    bool m_swapchainVSync = false;
     bool m_validationEnabled = false;
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
@@ -143,6 +145,7 @@ private:
     std::condition_variable m_submitDoneCv;
     SubmitJob m_pendingJob;
     bool m_jobQueued = false;
+    bool m_submitActive = false;
     bool m_submitRun = false;
     bool m_slotInFlight[2] = {};
     std::mutex m_queueMutex;
