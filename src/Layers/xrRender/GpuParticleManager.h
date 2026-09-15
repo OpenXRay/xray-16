@@ -49,6 +49,9 @@ public:
     void SetActionParam(const PS::CPEDef&,u32 actionIndex,float value);
     float GetTimeLimit(const PS::CPEDef&) const;
     void SetTimeLimit(const PS::CPEDef&,float value);
+    struct CollisionParams { float friction,resilience,cutoff; };
+    CollisionParams GetCollisionParams(const PS::CPEDef&) const;
+    void SetCollisionParams(const PS::CPEDef&,CollisionParams);
     void SetupSimulationPasses(framegraph::FrameGraph&,nvrhi::IDevice*);
     GpuParticleDrawResources GetDrawResources() const;
     GpuParticleStats GetStats() const;

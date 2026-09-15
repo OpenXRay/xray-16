@@ -428,9 +428,11 @@ void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds,uint lane)
                     particle.position = position;
                     particle.velocity = velocity;
                 }
+                if (hitType != 0) particle.flags = (particle.flags & ~6u) | (hitType << 1u);
                 if (g_Papi.pad != 0) {
-                    if (hitType == 1) particle.color = GpuPapiPackColor(float4(0,1,0,1));
-                    else if (hitType == 2) particle.color = GpuPapiPackColor(float4(1,1,0,1));
+                    uint stored = (particle.flags >> 1u) & 3u;
+                    if (stored == 1) particle.color = GpuPapiPackColor(float4(0,1,0,1));
+                    else if (stored == 2) particle.color = GpuPapiPackColor(float4(1,1,0,1));
                     else particle.color = GpuPapiPackColor(float4(1,0,0,1));
                 }
                 g_Particles[index] = particle;

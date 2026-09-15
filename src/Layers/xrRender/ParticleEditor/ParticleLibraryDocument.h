@@ -66,7 +66,8 @@ private:
 
     void Parse();
     void ParseEntry(size_t offset, size_t size, Kind kind);
-    void AddCollisionChunk(size_t entry);
+    void AddChunk(size_t entry, uint32_t id, const std::vector<uint8_t>& payload, uint32_t flag);
+    void EnsureChunks(size_t entry, uint32_t flags);
     void Patch(const FlagWord& word, uint32_t oldFlags, uint32_t flags);
 
     std::vector<uint8_t> m_bytes;

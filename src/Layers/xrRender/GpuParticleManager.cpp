@@ -598,6 +598,28 @@ void GpuParticleManager::SetTimeLimit(const PS::CPEDef& definition,float value) 
         return;
     }
 }
+GpuParticleManager::CollisionParams GpuParticleManager::GetCollisionParams(const PS::CPEDef& definition) const {
+    std::lock_guard lock(m_impl->mutex);
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i)
+        if (m_impl->definitions[i] == &definition) {
+            const auto& p = m_impl->programs[i];
+            return {p.collisionFriction,p.collisionResilience,p.collisionCutoff};
+        }
+    return {1.f,0.f,0.f};
+}
+void GpuParticleManager::SetCollisionParams(const PS::CPEDef& definition,CollisionParams params) {
+    std::lock_guard lock(m_impl->mutex);
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i) {
+        if (m_impl->definitions[i] != &definition) continue;
+        auto& p = m_impl->programs[i];
+        if (p.collisionFriction == params.friction && p.collisionResilience == params.resilience && p.collisionCutoff == params.cutoff) return;
+        p.collisionFriction = params.friction;
+        p.collisionResilience = params.resilience;
+        p.collisionCutoff = params.cutoff;
+        m_impl->definitionsDirty = true;
+        return;
+    }
+}
 void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvrhi::IDevice* device) {
     ZoneScopedN("GpuPapi.Prepare");
     std::lock_guard lock(m_impl->mutex);

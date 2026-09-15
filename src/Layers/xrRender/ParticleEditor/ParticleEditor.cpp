@@ -350,6 +350,14 @@ void ParticleEditor::DrawSelection()
                 }
                 ImGui::PopID();
             }
+            if (entry.flags & PS::CPEDef::dfCollision) {
+                auto collision = manager.GetCollisionParams(*liveDef);
+                bool changed = ImGui::SliderFloat("Collision friction (1-f)", &collision.friction, 0.f, 1.f, "%.2f");
+                changed |= ImGui::SliderFloat("Collision resilience", &collision.resilience, 0.f, 1.f, "%.2f");
+                changed |= ImGui::SliderFloat("Collision cutoff (sqr)", &collision.cutoff, 0.f, 10.f, "%.2f");
+                if (changed)
+                    manager.SetCollisionParams(*liveDef, collision);
+            }
         }
     }
     if (ImGui::CollapsingHeader("Definition flags", ImGuiTreeNodeFlags_DefaultOpen))
