@@ -66,9 +66,12 @@ public:
 
     // ═══════ Async Compute ═══════
     virtual bool HasAsyncCompute() const { return false; }
-    virtual nvrhi::ICommandList* GetComputeCommandList() const { return nullptr; }
-    virtual void QueueComputeCommandList(nvrhi::ICommandList* commandList) {}
-    virtual void QueueWaitForCompute() {}
+    virtual nvrhi::ICommandList* AcquireComputeCommandList() { return nullptr; }
+    virtual u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) { return 0; }
+    virtual void AddGraphicsWait(u32 token) {}
+    virtual u32 SplitGraphics() { return 0; }
+    virtual u32 LastGraphicsToken() const { return 0; }
+    virtual u32 LastComputeToken() const { return 0; }
 
     // ═══════ Command Execution ═══════
     virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}

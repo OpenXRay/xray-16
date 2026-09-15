@@ -164,9 +164,7 @@ void FrameGraph::SetPassAsyncCompute(PassHandle pass) {
     PassNode* passNode = GetPassNode(pass);
     VERIFY(passNode != nullptr);
 
-    passNode->isAsync = true;
-    passNode->isCompute = true;
-    passNode->isGraphics = false;
+    passNode->queue = PassQueue::Compute;
 }
 
 void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
@@ -235,6 +233,11 @@ void FrameGraph::Compile() {
         BuildLifetimeLists();
     }
 
+    {
+        ZoneScopedN("Compile::AssignSegments");
+        AssignSegments();
+    }
+
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
     m_stats.numResources = static_cast<u32>(m_resources.size());
@@ -251,7 +254,7 @@ void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
         xray::profiler::CPUProfiler::Instance().RegisterDynamicZone(pass->name.c_str()));
 
     if (m_gpuProfiler)
-        m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
+        m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->queue == PassQueue::Compute);
 
     m_currentPass = pass;
     (*pass->executeCallback)(*m_context, *this);
@@ -263,82 +266,101 @@ void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
     cmdList->endMarker();
 }
 
+void FrameGraph::BeginSegment() {
+    if (!m_segmentBeginCallback)
+        return;
+    m_currentPass = nullptr;
+    (*m_segmentBeginCallback)(*m_context, *this);
+}
+
+bool FrameGraph::IsAsyncComputeActive() const {
+    return m_backend != nullptr && m_backend->HasAsyncCompute() && m_backend->IsInFrame();
+}
+
 void FrameGraph::Execute() {
     ZoneScoped;
 
     R_ASSERT2(m_compiled, "Must compile before execute");
     R_ASSERT2(m_context != nullptr, "RenderContext required for execution");
     R_ASSERT2(m_renderDevice != nullptr, "RenderDevice required for execution");
+    R_ASSERT(m_context->GetCommandList() != nullptr);
 
-    nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
-    R_ASSERT(graphicsCmdList != nullptr);
+    const bool async = IsAsyncComputeActive();
+    const u32 prevGraphicsToken = async ? m_backend->LastGraphicsToken() : 0;
+    const u32 prevComputeToken = async ? m_backend->LastComputeToken() : 0;
 
-    bool hasAsyncCompute = m_computeCommandList != nullptr && m_asyncComputeBackend != nullptr;
-    R_ASSERT2(!hasAsyncCompute || m_computeCommandList != graphicsCmdList,
-        "async compute must record into a separate command list");
-
-    // Count async passes to check if we have any work for the compute queue
-    u32 asyncPassCount = 0;
-    if (hasAsyncCompute) {
-        for (PassNode* pass : m_sortedPasses) {
-            if (!pass->culled && pass->executeCallback && pass->isAsync)
-                asyncPassCount++;
+    u32 finalGraphicsSegment = INVALID_INDEX;
+    for (u32 i = static_cast<u32>(m_sortedPasses.size()); i > 0; --i) {
+        const PassNode* pass = m_sortedPasses[i - 1];
+        if (m_segments[pass->segment].queue == PassQueue::Graphics) {
+            finalGraphicsSegment = pass->segment;
+            break;
         }
-        if (asyncPassCount == 0)
-            hasAsyncCompute = false;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  PHASE A: Record async compute passes
-    // ═══════════════════════════════════════════════════════
-    if (hasAsyncCompute) {
-        m_computeCommandList->open();
-        m_context->SetOverrideCommandList(m_computeCommandList);
+    bool firstGraphicsSegment = true;
+    bool firstComputeSegment = true;
+    nvrhi::ICommandList* computeCmdList = nullptr;
+    u32 waitTokens[MAX_SEGMENT_WAITS + 1];
 
-        for (PassNode* pass : m_sortedPasses) {
-            if (pass->culled || !pass->executeCallback || !pass->isAsync)
-                continue;
+    for (u32 i = 0; i < m_sortedPasses.size(); ++i) {
+        PassNode* pass = m_sortedPasses[i];
+        Segment& segment = m_segments[pass->segment];
+
+        if (segment.queue == PassQueue::Compute) {
+            if (segment.firstPass == i) {
+                computeCmdList = m_backend->AcquireComputeCommandList();
+                computeCmdList->open();
+                m_context->SetCommandList(computeCmdList);
+                BeginSegment();
+            }
+
             R_ASSERT(pass->devirtualize.empty() && pass->destroy.empty());
-            ExecutePass(pass, m_computeCommandList);
+            if (pass->executeCallback)
+                ExecutePass(pass, computeCmdList);
+
+            if (segment.lastPass == i) {
+                computeCmdList->close();
+                u32 numWaits = 0;
+                for (u32 w = 0; w < segment.numWaits; ++w)
+                    waitTokens[numWaits++] = m_segments[segment.waits[w]].token;
+                if (firstComputeSegment && prevGraphicsToken)
+                    waitTokens[numWaits++] = prevGraphicsToken;
+                firstComputeSegment = false;
+                segment.token = m_backend->SubmitCompute(computeCmdList, waitTokens, numWaits);
+                computeCmdList = nullptr;
+                m_context->SetCommandList(m_backend->GetCommandList());
+            }
+            continue;
         }
 
-        m_context->SetOverrideCommandList(nullptr);
-        m_computeCommandList->close();
-        m_asyncComputeBackend->QueueComputeCommandList(m_computeCommandList);
-    }
-
-    bool syncInserted = false;
-
-    for (PassNode* pass : m_sortedPasses) {
-        if (pass->culled)
-            continue;
-
-        if (hasAsyncCompute && pass->isAsync)
-            continue;
-
-        if (!syncInserted && hasAsyncCompute) {
-            bool dependsOnAsync = false;
-            for (const auto& dep : pass->dependsOn) {
-                if (dep.pass->isAsync) {
-                    dependsOnAsync = true;
-                    break;
-                }
+        if (segment.firstPass == i) {
+            if (async) {
+                for (u32 w = 0; w < segment.numWaits; ++w)
+                    m_backend->AddGraphicsWait(m_segments[segment.waits[w]].token);
+                if (firstGraphicsSegment && prevComputeToken)
+                    m_backend->AddGraphicsWait(prevComputeToken);
             }
-            if (dependsOnAsync) {
-                m_asyncComputeBackend->QueueWaitForCompute();
-                syncInserted = true;
-            }
+            firstGraphicsSegment = false;
+            BeginSegment();
         }
 
         for (ResourceNode* resource : pass->devirtualize)
             Devirtualize(*resource);
 
         if (pass->executeCallback)
-            ExecutePass(pass, graphicsCmdList);
+            ExecutePass(pass, m_context->GetCommandList());
 
         for (ResourceNode* resource : pass->destroy)
             Destroy(*resource);
+
+        if (async && segment.lastPass == i && (pass->segment != finalGraphicsSegment || pass->forkAfter)) {
+            segment.token = m_backend->SplitGraphics();
+            m_context->SetCommandList(m_backend->GetCommandList());
+        }
     }
+
+    nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
 
     if (m_presentTarget.is_valid()) {
         ResourceNode* target = GetResourceNode(m_presentTarget);
@@ -431,6 +453,8 @@ void FrameGraph::ResetForNextFrame() {
     m_passes.clear();
     m_resources.clear();
     m_sortedPasses.clear();
+    m_segments.clear();
+    m_segmentBeginCallback = nullptr;
     m_compiled = false;
     m_presentTarget = VirtualResourceHandle();
     m_currentPass = nullptr;
@@ -466,6 +490,8 @@ void FrameGraph::Reset() {
     m_passes.clear();
     m_passPool.clear();
     m_sortedPasses.clear();
+    m_segments.clear();
+    m_segmentBeginCallback = nullptr;
     m_rtRegistry.Clear();  // Clear RT registry
     m_compiled = false;
     m_presentTarget = VirtualResourceHandle();
@@ -560,10 +586,14 @@ void FrameGraph::PrintExecutionOrder() const {
     for (u32 i = 0; i < m_sortedPasses.size(); i++) {
         const PassNode* pass = m_sortedPasses[i];
 
-        Msg("[%2u] %-30s (%u deps)",
+        const Segment* segment = pass->segment != INVALID_INDEX ? &m_segments[pass->segment] : nullptr;
+        Msg("[%2u] %-30s (%u deps) [%s segment %u, %u waits]",
             i,
             pass->name.c_str(),
-            static_cast<u32>(pass->dependsOn.size()));
+            static_cast<u32>(pass->dependsOn.size()),
+            segment && segment->queue == PassQueue::Compute ? "compute" : "graphics",
+            pass->segment,
+            segment ? segment->numWaits : 0u);
 
         // Show resource accesses
         if (!pass->resourceAccesses.empty()) {
@@ -749,7 +779,7 @@ void FrameGraph::BuildDependencyGraph() {
 
 void FrameGraph::ValidateAsyncPasses() {
     for (const auto& pass : m_passes) {
-        if (!pass.isAsync)
+        if (pass.queue != PassQueue::Compute)
             continue;
 
         for (const auto& access : pass.resourceAccesses) {
@@ -758,14 +788,93 @@ void FrameGraph::ValidateAsyncPasses() {
                 "async framegraph pass touches a resource that is not imported",
                 pass.name.c_str(),
                 resource ? resource->desc.debugName.c_str() : "<invalid handle>");
+            R_ASSERT4(access.state != ResourceState::RenderTarget
+                    && access.state != ResourceState::DepthStencilWrite
+                    && access.state != ResourceState::DepthStencilRead
+                    && access.state != ResourceState::DepthStencilReadShaderResource
+                    && access.state != ResourceState::Present,
+                "async framegraph pass requests a graphics-only resource state",
+                pass.name.c_str(),
+                resource->desc.debugName.c_str());
+        }
+    }
+}
+
+void FrameGraph::AssignSegments() {
+    m_segments.clear();
+
+    const bool async = IsAsyncComputeActive();
+    auto queueOf = [async](const PassNode* pass) {
+        return async ? pass->queue : PassQueue::Graphics;
+    };
+
+    for (PassNode* pass : m_sortedPasses) {
+        pass->segment = INVALID_INDEX;
+        pass->forkAfter = false;
+    }
+
+    if (async) {
+        for (PassNode* pass : m_sortedPasses) {
+            for (const auto& dep : pass->dependsOn) {
+                if (!dep.pass->culled && queueOf(dep.pass) != queueOf(pass))
+                    dep.pass->forkAfter = true;
+            }
+        }
+    }
+
+    u32 open[2] = { INVALID_INDEX, INVALID_INDEX };
+
+    for (u32 i = 0; i < m_sortedPasses.size(); ++i) {
+        PassNode* pass = m_sortedPasses[i];
+        const PassQueue queue = queueOf(pass);
+        const u32 q = static_cast<u32>(queue);
+
+        u32 waits[MAX_SEGMENT_WAITS];
+        u32 numWaits = 0;
+        for (const auto& dep : pass->dependsOn) {
+            if (dep.pass->culled || queueOf(dep.pass) == queue)
+                continue;
+            const u32 producer = dep.pass->segment;
+            R_ASSERT(producer != INVALID_INDEX);
+            bool known = false;
+            for (u32 w = 0; w < numWaits; ++w)
+                known |= waits[w] == producer;
+            if (known)
+                continue;
+            R_ASSERT2(numWaits < MAX_SEGMENT_WAITS, "framegraph pass has too many cross-queue producers");
+            waits[numWaits++] = producer;
         }
 
-        for (const auto& dep : pass.dependsOn) {
-            R_ASSERT4(dep.pass->isAsync,
-                "async framegraph pass depends on a graphics pass",
-                pass.name.c_str(),
-                dep.pass->name.c_str());
+        if (queue == PassQueue::Graphics)
+            open[static_cast<u32>(PassQueue::Compute)] = INVALID_INDEX;
+
+        if (open[q] != INVALID_INDEX) {
+            const Segment& current = m_segments[open[q]];
+            for (u32 w = 0; w < numWaits && open[q] != INVALID_INDEX; ++w) {
+                bool known = false;
+                for (u32 s = 0; s < current.numWaits; ++s)
+                    known |= current.waits[s] == waits[w];
+                if (!known)
+                    open[q] = INVALID_INDEX;
+            }
         }
+
+        if (open[q] == INVALID_INDEX) {
+            open[q] = static_cast<u32>(m_segments.size());
+            Segment& created = m_segments.emplace_back();
+            created.queue = queue;
+            created.firstPass = i;
+            created.numWaits = numWaits;
+            for (u32 w = 0; w < numWaits; ++w)
+                created.waits[w] = waits[w];
+        }
+
+        Segment& segment = m_segments[open[q]];
+        segment.lastPass = i;
+        pass->segment = open[q];
+
+        if (pass->forkAfter)
+            open[q] = INVALID_INDEX;
     }
 }
 
@@ -973,7 +1082,7 @@ void FrameGraph::BuildLifetimeLists() {
         PassNode& first = m_passes[resource.firstUsedPass];
         PassNode& last = m_passes[resource.lastUsedPass];
         R_ASSERT(!first.culled && !last.culled);
-        R_ASSERT(!first.isAsync && !last.isAsync);
+        R_ASSERT(first.queue != PassQueue::Compute && last.queue != PassQueue::Compute);
         first.devirtualize.push_back(&resource);
         last.destroy.push_back(&resource);
     }

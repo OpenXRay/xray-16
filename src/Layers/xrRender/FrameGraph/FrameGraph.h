@@ -81,6 +81,15 @@ public:
     // Mark pass as async compute (runs on compute queue)
     void SetPassAsyncCompute(PassHandle pass);
 
+    void SetSegmentBeginCallbackPtr(IPassCallback* callback) { m_segmentBeginCallback = callback; }
+
+    template <typename F>
+    void SetSegmentBeginCallback(F&& callback)
+    {
+        SetSegmentBeginCallbackPtr(
+            m_frameArena.Make<PassCallback<std::decay_t<F>>>(std::forward<F>(callback)));
+    }
+
     // Mark pass as having side effects (writes to external resources, prevents culling)
     void SetPassHasSideEffects(PassHandle pass);
 
@@ -124,10 +133,7 @@ public:
 
     const FrameArena::Stats& GetFrameArenaStats() const { return m_frameArena.GetStats(); }
 
-    void SetAsyncCompute(nvrhi::ICommandList* computeCmdList, IRenderBackend* backend) {
-        m_computeCommandList = computeCmdList;
-        m_asyncComputeBackend = backend;
-    }
+    void SetAsyncComputeBackend(IRenderBackend* backend) { m_backend = backend; }
 
     void Compile();
 
@@ -216,8 +222,8 @@ private:
     nvrhi::IDevice* m_device;
     fg::RenderContext* m_context = nullptr;
     xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
-    nvrhi::ICommandList* m_computeCommandList = nullptr;
-    IRenderBackend* m_asyncComputeBackend = nullptr;
+    IRenderBackend* m_backend = nullptr;
+    IPassCallback* m_segmentBeginCallback = nullptr;
     resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 
@@ -240,6 +246,19 @@ private:
 
     // Compilation results
     xr_vector<PassNode*> m_sortedPasses;  // Execution order
+
+    static constexpr u32 MAX_SEGMENT_WAITS = 8;
+
+    struct Segment {
+        PassQueue queue = PassQueue::Graphics;
+        u32 firstPass = INVALID_INDEX;
+        u32 lastPass = INVALID_INDEX;
+        u32 waits[MAX_SEGMENT_WAITS] = {};
+        u32 numWaits = 0;
+        u32 token = 0;
+    };
+
+    xr_vector<Segment> m_segments;
     bool m_compiled = false;
     VirtualResourceHandle m_presentTarget;
     u32 m_generation = 1;
@@ -258,6 +277,7 @@ private:
     void ResolveUsage();
     void ComputeResourceLifetimes();
     void BuildLifetimeLists();
+    void AssignSegments();
     void Devirtualize(ResourceNode& resource);
     void Destroy(ResourceNode& resource);
     void InsertResourceBarriers();
@@ -267,6 +287,8 @@ private:
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);
+    void BeginSegment();
+    bool IsAsyncComputeActive() const;
 
     ResourceNode* GetResourceNode(VirtualResourceHandle handle);
     const ResourceNode* GetResourceNode(VirtualResourceHandle handle) const;

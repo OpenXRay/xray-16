@@ -594,8 +594,7 @@ void D3D12Backend::BeginFrame() {
     }
 
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
-    m_frameComputeInstanceID = 0;
-    m_frameWaitForCompute = false;
+    m_graphicsWaits.Clear();
 
     {
         ZoneScopedN("D3D12::CommandListOpen");
@@ -610,17 +609,8 @@ void D3D12Backend::EndFrame() {
     m_inFrame = false;
 
     {
-        ZoneScopedN("D3D12::CommandListClose");
-        m_commandList->close();
-    }
-
-    // NVRHI handles fence signaling internally
-    {
-        if (m_frameWaitForCompute && m_frameComputeInstanceID)
-            m_nvrhiDevice->queueWaitForCommandList(
-                nvrhi::CommandQueue::Graphics, nvrhi::CommandQueue::Compute, m_frameComputeInstanceID);
         ZoneScopedN("D3D12::ExecuteCommandList");
-        m_lastGraphicsInstanceID = m_nvrhiDevice->executeCommandList(m_commandList);
+        SubmitGraphics();
     }
 
     // ═══════════════════════════════════════════════════════
@@ -658,17 +648,44 @@ void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     }
 }
 
-void D3D12Backend::QueueComputeCommandList(nvrhi::ICommandList* commandList) {
-    if (!m_nvrhiDevice || !commandList || !m_computeQueue)
-        return;
-    if (m_lastGraphicsInstanceID)
-        m_nvrhiDevice->queueWaitForCommandList(
-            nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, m_lastGraphicsInstanceID);
-    m_frameComputeInstanceID = m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+u64 D3D12Backend::SubmitGraphics() {
+    {
+        ZoneScopedN("D3D12::CommandListClose");
+        m_commandList->close();
+    }
+    const u32 token = m_tokens.Issue(nvrhi::CommandQueue::Graphics);
+    for (u32 i = 0; i < m_graphicsWaits.count; ++i)
+        m_tokens.WaitFor(m_nvrhiDevice, nvrhi::CommandQueue::Graphics, m_graphicsWaits.tokens[i]);
+    m_graphicsWaits.Clear();
+    const u64 instanceID = m_nvrhiDevice->executeCommandList(m_commandList);
+    m_tokens.Resolve(token, nvrhi::CommandQueue::Graphics, instanceID);
+    return instanceID;
 }
 
-void D3D12Backend::QueueWaitForCompute() {
-    m_frameWaitForCompute = true;
+u32 D3D12Backend::SplitGraphics() {
+    R_ASSERT2(m_inFrame, "SplitGraphics requires an open frame");
+    SubmitGraphics();
+    const u32 token = m_tokens.last[u32(nvrhi::CommandQueue::Graphics)];
+    {
+        ZoneScopedN("D3D12::CommandListOpen");
+        m_commandList->open();
+    }
+    return token;
+}
+
+nvrhi::ICommandList* D3D12Backend::AcquireComputeCommandList() {
+    R_ASSERT2(m_inFrame && m_computeCommandList, "compute command lists are only available inside a frame with async compute");
+    return m_computeCommandList;
+}
+
+u32 D3D12Backend::SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) {
+    R_ASSERT2(m_inFrame && commandList && m_computeQueue, "SubmitCompute requires an in-frame compute command list");
+    const u32 token = m_tokens.Issue(nvrhi::CommandQueue::Compute);
+    for (u32 i = 0; i < numWaitTokens; ++i)
+        m_tokens.WaitFor(m_nvrhiDevice, nvrhi::CommandQueue::Compute, waitTokens[i]);
+    const u64 instanceID = m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+    m_tokens.Resolve(token, nvrhi::CommandQueue::Compute, instanceID);
+    return token;
 }
 
 

@@ -123,6 +123,11 @@ struct PassDependency {
 //  PASS NODE (INTERNAL STATE)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+enum class PassQueue : u8 {
+    Graphics,
+    Compute,
+};
+
 struct PassNode {
     PassHandle handle;
     shared_str name;
@@ -152,10 +157,9 @@ struct PassNode {
     float lastExecutionTimeMs = 0.0f;
 
     // Flags
-    bool isAsync = false;                // Can run on async compute queue
-    bool isGraphics = true;              // Uses graphics pipeline
-    bool isCompute = false;              // Uses compute pipeline
-    bool isCopy = false;                 // Copy/blit operation
+    PassQueue queue = PassQueue::Graphics;
+    bool forkAfter = false;
+    u32 segment = INVALID_INDEX;
     bool hasSideEffects = false;         // Writes to external resources (prevents culling)
 
     PassNode() = default;
@@ -179,10 +183,9 @@ struct PassNode {
         timestampQueryStart = INVALID_INDEX;
         timestampQueryEnd = INVALID_INDEX;
         lastExecutionTimeMs = 0.0f;
-        isAsync = false;
-        isGraphics = true;
-        isCompute = false;
-        isCopy = false;
+        queue = PassQueue::Graphics;
+        forkAfter = false;
+        segment = INVALID_INDEX;
         hasSideEffects = false;
     }
 

@@ -18,7 +18,6 @@ target_sources(xrRender PRIVATE
     FrameGraph/FGResource.h
     FrameGraph/FGResource.cpp
     FrameGraph/FGPass.h
-    FrameGraph/FGPass.cpp
     FrameGraph/FrameGraph.h
     FrameGraph/FrameGraph.cpp
     FrameGraph/FGTest.h
@@ -174,6 +173,7 @@ target_sources(xrRender PRIVATE
     fgRenderFactory_ImGui.cpp
     GlobalRenderDevice.cpp
 
+    Backend/SubmitTokenRing.h
     Backend/VulkanBackend.h
     Backend/VulkanBackend.cpp
 
