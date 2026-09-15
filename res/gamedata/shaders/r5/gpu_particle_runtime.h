@@ -397,6 +397,15 @@ void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds,uint lane)
             AllMemoryBarrierWithGroupSync();
         }
         uint remaining = collision ? emitter.count : 0;
+        bool localCollision = collision && (emitter.flags & GPU_PAPI_LOCAL) != 0;
+        float3 invX = 0, invY = 0, invZ = 0;
+        if (localCollision) {
+            float3 bx = emitter.basisX.xyz, by = emitter.basisY.xyz, bz = emitter.basisZ.xyz;
+            float det = dot(bx, cross(by, bz));
+            invX = cross(by, bz) / det;
+            invY = cross(bz, bx) / det;
+            invZ = cross(bx, by) / det;
+        }
         while (remaining > 0) {
             uint batch = min(remaining,64u);
             if (lane < batch) {
@@ -404,7 +413,21 @@ void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds,uint lane)
                 GpuPapiParticle particle = g_Particles[index];
                 if (animated) GpuAnimateParticle(particle,program);
                 bool dead = false;
-                uint hitType = GpuParticleCollision(particle.position,particle.positionB,particle.velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
+                float3 position = particle.position, positionB = particle.positionB, velocity = particle.velocity;
+                if (localCollision) {
+                    position = emitter.origin.xyz + emitter.basisX.xyz * position.x + emitter.basisY.xyz * position.y + emitter.basisZ.xyz * position.z;
+                    positionB = emitter.origin.xyz + emitter.basisX.xyz * positionB.x + emitter.basisY.xyz * positionB.y + emitter.basisZ.xyz * positionB.z;
+                    velocity = emitter.basisX.xyz * velocity.x + emitter.basisY.xyz * velocity.y + emitter.basisZ.xyz * velocity.z;
+                }
+                uint hitType = GpuParticleCollision(position,positionB,velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
+                if (localCollision) {
+                    float3 rel = position - emitter.origin.xyz;
+                    particle.position = float3(dot(rel, invX), dot(rel, invY), dot(rel, invZ));
+                    particle.velocity = float3(dot(velocity, invX), dot(velocity, invY), dot(velocity, invZ));
+                } else {
+                    particle.position = position;
+                    particle.velocity = velocity;
+                }
                 if (g_Papi.pad != 0) {
                     if (hitType == 1) particle.color = GpuPapiPackColor(float4(0,1,0,1));
                     else if (hitType == 2) particle.color = GpuPapiPackColor(float4(1,1,0,1));

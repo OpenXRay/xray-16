@@ -100,7 +100,7 @@ struct ParticleLibraryPreview::Impl {
         transform.c = position;
         Fvector velocity;
         velocity.set(0.f, 0.f, 0.f);
-        visual->UpdateParent(transform, velocity, TRUE);
+        visual->UpdateParent(transform, velocity, FALSE);
         positionDirty = false;
     }
 };
