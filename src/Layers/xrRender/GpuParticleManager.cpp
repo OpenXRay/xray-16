@@ -576,6 +576,13 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
     stats.pendingRoots = u32(pendingRoots);
     stats.commands = u32(commandCount);
     stats.commandBytes = commandCount * sizeof(GpuPapiCommand) + pendingRoots * sizeof(std::array<u32,2>);
+    stats.programs = u32(m_impl->programs.size());
+    stats.particleCapacity = m_impl->draw.particleCapacity;
+    stats.emitterCapacity = m_impl->emitterCapacity;
+    stats.collisionRoots = 0;
+    stats.dynamicCollisionRoots = 0;
+    stats.hudRoots = 0;
+    stats.childRoots = 0;
     for (u32 i = 0; i < m_impl->roots.size(); ++i) {
         const auto& root = m_impl->roots[i];
         if (root.live) {
@@ -583,6 +590,11 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
             frame->drawBucketMask |= m_impl->ProgramDrawBuckets(root.program);
             for (u32 program : root.childPrograms)
                 frame->drawBucketMask |= m_impl->ProgramDrawBuckets(program);
+            u32 flags = m_impl->programs[root.program].flags;
+            stats.collisionRoots += (flags >> 16) & 1u;
+            stats.dynamicCollisionRoots += (flags >> 19) & 1u;
+            stats.hudRoots += root.hud ? 1u : 0u;
+            stats.childRoots += root.childPrograms.empty() ? 0u : 1u;
         }
         if (root.commands.empty()) continue;
         ranges.push_back({u32(batch.size()),u32(root.commands.size())});
@@ -594,6 +606,8 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
             if (command.type == 6) { frame->collisionFlags |= root.collisionFlags; break; }
     }
     m_impl->draw.drawBucketMask = frame->drawBucketMask;
+    stats.drawBuckets = 0;
+    for (u32 mask = frame->drawBucketMask; mask; mask &= mask - 1) ++stats.drawBuckets;
     m_impl->Buffer(m_impl->commands,batch.size(),sizeof(GpuPapiCommand),"GpuPapiCommands",false);
     m_impl->Buffer(m_impl->rootCommands,ranges.size(),sizeof(ranges[0]),"GpuPapiRootCommands",false);
     m_impl->Buffer(m_impl->visibleRoots,visible.size(),sizeof(u32),"GpuPapiVisibleRoots",false);
