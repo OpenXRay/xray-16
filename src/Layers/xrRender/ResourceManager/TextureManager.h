@@ -49,6 +49,7 @@ struct TextureDesc {
     u32 depth = 1;
     u32 arraySize = 1;
     u32 mipLevels = 1;
+    u32 sampleCount = 1;
 
     nvrhi::Format format = nvrhi::Format::RGBA8_UNORM;
 

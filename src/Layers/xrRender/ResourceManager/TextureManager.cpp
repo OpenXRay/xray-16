@@ -107,6 +107,7 @@ u64 TextureDesc::CalculateMemorySize(u32 startMip, u32 mipCount) const {
     }
 
     totalSize *= arraySize;
+    totalSize *= std::max(1u, sampleCount);
 
     return totalSize;
 }
@@ -252,6 +253,7 @@ TextureHandle TextureManager::CreateTexture(
     nvrhiDesc.arraySize = desc.arraySize;
     nvrhiDesc.mipLevels = desc.mipLevels;
     nvrhiDesc.format = desc.format;
+    nvrhiDesc.sampleCount = std::max(1u, desc.sampleCount);
     nvrhiDesc.debugName = desc.debugName.c_str();
     nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
     nvrhiDesc.keepInitialState = true;
@@ -261,10 +263,14 @@ TextureHandle TextureManager::CreateTexture(
             nvrhiDesc.dimension = nvrhi::TextureDimension::Texture1D;
             break;
         case TextureDesc::Texture2D:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+            nvrhiDesc.dimension = nvrhiDesc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMS
+                : nvrhi::TextureDimension::Texture2D;
             break;
         case TextureDesc::Texture2DArray:
-            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+            nvrhiDesc.dimension = nvrhiDesc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMSArray
+                : nvrhi::TextureDimension::Texture2DArray;
             break;
         case TextureDesc::Texture3D:
             nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
