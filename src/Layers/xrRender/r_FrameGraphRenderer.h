@@ -208,9 +208,6 @@ public:
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
 
-    // Render ImGui onto final output (called after FrameGraph execution)
-    void RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer);
-
     // Access RenderContext
     fg::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
 
@@ -394,9 +391,6 @@ private:
     // FrameGraph
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
-    // Final output texture (for copying to backbuffer)
-    framegraph::VirtualResourceHandle m_finalOutput;
-
     // ═══════════════════════════════════════════════════
     //  NATIVE NVRHI RENDER TARGETS (Phase 1 Migration)
     // ═══════════════════════════════════════════════════
@@ -416,22 +410,6 @@ private:
     fg::TextureHandle m_native_MenuMain;      // Main UI RT (replaces rt_Generic_0 in menu)
     fg::TextureHandle m_native_MenuDistort;   // Distortion mask RT (replaces rt_Generic_1 in menu)
     fg::TextureHandle m_native_FinalComposite; // Final composited output (scene + UI)
-
-    // FrameGraph virtual handles (imported from native RTs)
-    framegraph::VirtualResourceHandle m_rt_Position;
-    framegraph::VirtualResourceHandle m_rt_Normal;
-    framegraph::VirtualResourceHandle m_rt_Albedo;
-    framegraph::VirtualResourceHandle m_rt_Depth;
-    framegraph::VirtualResourceHandle m_rt_Accumulator;
-    framegraph::VirtualResourceHandle m_rt_Generic_0;
-    framegraph::VirtualResourceHandle m_rt_Generic_1;
-    framegraph::VirtualResourceHandle m_rt_Generic_2;
-    framegraph::VirtualResourceHandle m_backbuffer;
-
-    // Menu-specific virtual handles
-    framegraph::VirtualResourceHandle m_rt_MenuMain;      // Main UI rendering
-    framegraph::VirtualResourceHandle m_rt_MenuDistort;   // Distortion mask
-    framegraph::VirtualResourceHandle m_rt_FinalComposite; // Final composited output (scene + UI)
 
     // Hi-Z pyramid (R32_FLOAT with mip chain) for GPU occlusion culling
     // Generated from depth prepass, used by GPU culling and froxel volumetrics

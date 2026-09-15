@@ -610,16 +610,13 @@ void FrameGraphRenderer::RenderMenu() {
     );
 
     fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
-    auto finalOutput = passes::setupImGuiPass(
+    passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,  // LDR input (RGBA8_UNORM)
         imguiRenderer,
         width,
         height
     );
-
-    m_finalOutput = finalOutput;
-
     m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
@@ -1962,16 +1959,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
-    auto finalOutput = passes::setupImGuiPass(
+    passes::setupImGuiPass(
         *m_framegraph,
         ldrOutput,
         imguiRenderer,
         width,
         height
     );
-
-    // Store final output for presentation (now points to backbuffer)
-    m_finalOutput = finalOutput;
 
     m_prevFrameWidth = width;
     m_prevFrameHeight = height;
@@ -2771,43 +2765,6 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
             ProcessVisualGeometry(leafVisual, xform, root);
         }
     });
-}
-
-void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer) {
-    if (!drawData || drawData->TotalVtxCount == 0)
-        return;
-
-    if (!imguiRenderer) {
-        static bool warned = false;
-        if (!warned) {
-            Msg("! [FrameGraphRenderer] ImGui renderer not provided");
-            warned = true;
-        }
-        return;
-    }
-
-    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-    if (!finalTexture) {
-        Msg("! [FrameGraphRenderer] Failed to get final output texture for ImGui");
-        return;
-    }
-    
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
-
-    nvrhi::FramebufferHandle framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, m_device->GetNVRHIDevice());
-    if (!framebuffer) {
-        Msg("! [FrameGraphRenderer] Failed to create framebuffer for ImGui");
-        return;
-    }
-
-    nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
-    if (!cmdList) {
-        Msg("! [FrameGraphRenderer] No command list available for ImGui");
-        return;
-    }
-
-    imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
 }
 
 void FrameGraphRenderer::UpdateSmokeTrail(

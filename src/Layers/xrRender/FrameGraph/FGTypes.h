@@ -21,10 +21,13 @@ namespace xray::render::framegraph {
     // Virtual resource handle (lightweight, just an index)
     struct VirtualResourceHandle {
         u32 index = INVALID_INDEX;
+        u32 generation = 0;
 
         bool is_valid() const { return index != INVALID_INDEX; }
-        bool operator==(const VirtualResourceHandle& other) const { return index == other.index; }
-        bool operator!=(const VirtualResourceHandle& other) const { return index != other.index; }
+        bool operator==(const VirtualResourceHandle& other) const {
+            return index == other.index && generation == other.generation;
+        }
+        bool operator!=(const VirtualResourceHandle& other) const { return !(*this == other); }
     };
 
     // Pass handle (lightweight, just an index)

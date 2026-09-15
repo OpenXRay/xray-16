@@ -2150,6 +2150,15 @@ VSMOutput setupVSMPasses(
     xray::profiler::GPUProfiler* gpuProfiler)
 {
     VSMOutput out;
+    if (state) {
+        state->fgNeeded = framegraph::VirtualResourceHandle();
+        state->fgDirtyList = framegraph::VirtualResourceHandle();
+        state->fgAtlas = framegraph::VirtualResourceHandle();
+        state->fgDynAtlas = framegraph::VirtualResourceHandle();
+        state->fgDynTable = framegraph::VirtualResourceHandle();
+        state->fgDynArgs = framegraph::VirtualResourceHandle();
+        state->fgHudMap = framegraph::VirtualResourceHandle();
+    }
     if (!state || !device || !depth.is_valid() || width == 0 || height == 0)
         return out;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();

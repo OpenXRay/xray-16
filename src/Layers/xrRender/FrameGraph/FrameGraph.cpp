@@ -48,6 +48,7 @@ VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const Resource
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
 
     return node.handle;
 }
@@ -58,6 +59,7 @@ VirtualResourceHandle FrameGraph::CreateBuffer(const char* name, const ResourceD
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
 
     return node.handle;
 }
@@ -72,6 +74,7 @@ VirtualResourceHandle FrameGraph::ImportTexture(
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
     node.nvrhiTexture = physicalTexture;
     node.isAllocated = true;
     node.isPersistent = true;
@@ -90,6 +93,7 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
     node.nvrhiBuffer = physicalBuffer;
     node.isAllocated = true;
     node.isPersistent = true;
@@ -123,6 +127,7 @@ PassHandle FrameGraph::AddPass(const char* name) {
 void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
     PassNode* passNode = GetPassNode(pass);
     VERIFY(passNode != nullptr);
+    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
 
     passNode->Read(resource, state);
 }
@@ -130,6 +135,7 @@ void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, Resou
 void FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
     PassNode* passNode = GetPassNode(pass);
     VERIFY(passNode != nullptr);
+    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
 
     passNode->Write(resource, state);
 }
@@ -137,6 +143,7 @@ void FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, Reso
 void FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
     PassNode* passNode = GetPassNode(pass);
     VERIFY(passNode != nullptr);
+    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
 
     passNode->ReadWrite(resource, state);
 }
@@ -241,7 +248,9 @@ void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
     if (m_gpuProfiler)
         m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->isAsync);
 
+    m_currentPass = pass;
     (*pass->executeCallback)(*m_context, *this);
+    m_currentPass = nullptr;
 
     if (m_gpuProfiler)
         m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
@@ -348,6 +357,15 @@ nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) co
         return nullptr;
     }
 
+#ifdef DEBUG
+    if (m_currentPass) {
+        VERIFY4(PassDeclaresResource(*m_currentPass, handle),
+            "framegraph pass fetched a texture it never declared",
+            m_currentPass->name.c_str(),
+            node->desc.debugName.c_str());
+    }
+#endif
+
     return tex;
 }
 
@@ -355,6 +373,16 @@ nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) cons
     const ResourceNode* node = GetResourceNode(handle);
     VERIFY(node != nullptr);
     VERIFY(node->isAllocated && "Resource not allocated - call Compile first");
+
+#ifdef DEBUG
+    if (m_currentPass) {
+        VERIFY4(PassDeclaresResource(*m_currentPass, handle),
+            "framegraph pass fetched a buffer it never declared",
+            m_currentPass->name.c_str(),
+            node->desc.debugName.c_str());
+    }
+#endif
+
     return node->nvrhiBuffer;
 }
 
@@ -406,6 +434,9 @@ void FrameGraph::ResetForNextFrame() {
     m_sortedPasses.clear();
     m_compiled = false;
     m_presentTarget = VirtualResourceHandle();
+    m_currentPass = nullptr;
+    if (++m_generation == 0)
+        m_generation = 1;
 
     // Clear render target registry
     m_rtRegistry.Clear();
@@ -466,6 +497,9 @@ void FrameGraph::Reset() {
     m_rtRegistry.Clear();  // Clear RT registry
     m_compiled = false;
     m_presentTarget = VirtualResourceHandle();
+    m_currentPass = nullptr;
+    if (++m_generation == 0)
+        m_generation = 1;
     m_frameArena.Reset();
 
     // Reset statistics (don't use memset - contains non-trivial types!)
@@ -643,6 +677,7 @@ ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) {
     if (!handle.is_valid() || handle.index >= m_resources.size()) {
         return nullptr;
     }
+    VERIFY2(handle.generation == m_generation, "stale framegraph resource handle");
     return &m_resources[handle.index];
 }
 
@@ -650,7 +685,16 @@ const ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) co
     if (!handle.is_valid() || handle.index >= m_resources.size()) {
         return nullptr;
     }
+    VERIFY2(handle.generation == m_generation, "stale framegraph resource handle");
     return &m_resources[handle.index];
+}
+
+bool FrameGraph::PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const {
+    for (const auto& access : pass.resourceAccesses) {
+        if (access.resource.index == handle.index)
+            return true;
+    }
+    return false;
 }
 
 PassNode* FrameGraph::GetPassNode(PassHandle handle) {
