@@ -62,7 +62,6 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
     node.nvrhiTexture = physicalTexture;
     node.isAllocated = true;
-    node.canAlias = false;
     node.isPersistent = true;
     node.desc.isImported = true;
 
@@ -81,7 +80,6 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
     node.nvrhiBuffer = physicalBuffer;
     node.isAllocated = true;
-    node.canAlias = false;
     node.isPersistent = true;
     node.desc.isImported = true;
 
@@ -331,7 +329,7 @@ void FrameGraph::ResetForNextFrame() {
 
     if (m_resourcePool) {
         for (auto& resource : m_resources) {
-            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
+            if (resource.desc.isImported)
                 continue;
 
             if (resource.resourceTexture.IsValid())
@@ -344,7 +342,6 @@ void FrameGraph::ResetForNextFrame() {
 
     m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
-    m_compileTransientResources.clear();
 
     for (auto& pass : m_passes)
         m_passPool.push_back(std::move(pass));
@@ -367,7 +364,7 @@ void FrameGraph::Reset() {
         resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
 
         for (auto& resource : m_resources) {
-            if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
+            if (resource.desc.isImported)
                 continue;
 
             if (resource.resourceTexture.IsValid()) {
@@ -387,7 +384,7 @@ void FrameGraph::Reset() {
     }
 
     for (auto& resource : m_resources) {
-        if (resource.desc.isImported || resource.aliasedWith != INVALID_INDEX)
+        if (resource.desc.isImported)
             continue;
 
         resource.nvrhiTexture = nullptr;
@@ -396,7 +393,6 @@ void FrameGraph::Reset() {
 
     m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
-    m_compileTransientResources.clear();
 
     m_resources.clear();
     m_passes.clear();
@@ -413,9 +409,6 @@ void FrameGraph::Reset() {
     m_stats.numCulledResources = 0;
     m_stats.compileTimeMs = 0.0f;
     m_stats.totalMemoryAllocated = 0;
-    m_stats.peakMemoryUsage = 0;
-    m_stats.numAliasedResources = 0;
-    m_stats.memoryReduced = 0;
     m_stats.executeTimeMs = 0.0f;
     m_stats.totalGPUTimeMs = 0.0f;
     m_stats.passTimings.clear();
@@ -443,15 +436,6 @@ void FrameGraph::PrintStatistics() const {
     if (m_stats.totalMemoryAllocated > 0) {
         Msg("Memory:");
         Msg("  Total allocated: %.2f MB", m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
-        Msg("  Peak usage: %.2f MB", m_stats.peakMemoryUsage / (1024.0f * 1024.0f));
-
-        if (m_stats.numAliasedResources > 0) {
-            float savingsPercent = 100.0f * m_stats.memoryReduced / (float)m_stats.totalMemoryAllocated;
-            Msg("  Saved via aliasing: %.2f MB (%.1f%%)",
-                m_stats.memoryReduced / (1024.0f * 1024.0f),
-                savingsPercent);
-            Msg("  Aliased resources: %u", m_stats.numAliasedResources);
-        }
     }
 
     Msg("Timing:");
@@ -792,8 +776,6 @@ void FrameGraph::AllocateResources() {
             continue;
         }
 
-        if (resource.aliasedWith != INVALID_INDEX)
-            continue;
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
             if (m_resourcePool) {
                 resources::BufferDesc rmBufferDesc;
@@ -942,18 +924,6 @@ void FrameGraph::AllocateResources() {
         }
     }
 
-    for (auto& resource : m_resources) {
-        if (resource.aliasedWith == INVALID_INDEX)
-            continue;
-
-        ResourceNode& target = m_resources[resource.aliasedWith];
-        resource.nvrhiTexture = target.nvrhiTexture;
-        resource.nvrhiBuffer = target.nvrhiBuffer;
-        resource.resourceTexture = target.resourceTexture;
-        resource.resourceBuffer = target.resourceBuffer;
-        resource.isAllocated = target.isAllocated;
-    }
-
     m_stats.totalMemoryAllocated = totalMemoryAllocated;
 }
 
@@ -994,76 +964,6 @@ void FrameGraph::InsertResourceBarriers() {
             }
         }
     }
-}
-
-void FrameGraph::OptimizeMemoryAliasing() {
-    auto& transientResources = m_compileTransientResources;
-    transientResources.clear();
-    for (auto& resource : m_resources) {
-        if (resource.canAlias && resource.firstUsedPass != INVALID_INDEX && !resource.desc.isImported) {
-            transientResources.push_back(&resource);
-        }
-    }
-
-    if (transientResources.empty()) {
-        return;
-    }
-
-    std::sort(transientResources.begin(), transientResources.end(),
-        [](const ResourceNode* a, const ResourceNode* b) {
-            return a->memorySize > b->memorySize;
-        });
-
-    u32 aliasedCount = 0;
-    u64 memoryReduced = 0;
-
-    for (size_t i = 0; i < transientResources.size(); i++) {
-        ResourceNode* current = transientResources[i];
-
-        if (current->aliasedWith != INVALID_INDEX) {
-            continue;
-        }
-
-        for (size_t j = 0; j < i; j++) {
-            ResourceNode* candidate = transientResources[j];
-
-            if (!current->OverlapsWith(*candidate)) {
-                bool compatible = true;
-
-                if (current->desc.type != candidate->desc.type) {
-                    compatible = false;
-                }
-
-                if (current->desc.type != ResourceDesc::Type::Buffer &&
-                    current->desc.format != candidate->desc.format) {
-                    compatible = false;
-                }
-
-                if (current->desc.type != ResourceDesc::Type::Buffer &&
-                    (current->desc.width != candidate->desc.width ||
-                     current->desc.height != candidate->desc.height ||
-                     current->desc.mipLevels != candidate->desc.mipLevels ||
-                     current->desc.arraySize != candidate->desc.arraySize)) {
-                    compatible = false;
-                }
-
-                if (candidate->memorySize < current->memorySize) {
-                    compatible = false;
-                }
-
-                if (compatible) {
-                    current->aliasedWith = candidate->handle.index;
-                    aliasedCount++;
-                    memoryReduced += current->memorySize;
-                    break;
-                }
-            }
-        }
-    }
-
-    m_stats.numAliasedResources = aliasedCount;
-    m_stats.memoryReduced = memoryReduced;
-    m_stats.peakMemoryUsage = m_stats.totalMemoryAllocated - memoryReduced;
 }
 
 nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {

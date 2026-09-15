@@ -138,9 +138,6 @@ public:
         float compileTimeMs = 0.0f;
 
         u64 totalMemoryAllocated = 0;
-        u64 peakMemoryUsage = 0;
-        u32 numAliasedResources = 0;
-        u64 memoryReduced = 0;
 
         float executeTimeMs = 0.0f;
         float totalGPUTimeMs = 0.0f;
@@ -175,7 +172,6 @@ private:
 
     xr_vector<ReaderLink> m_compileReaderLinks;
     xr_vector<PassNode*> m_compilePassWorklist;
-    xr_vector<ResourceNode*> m_compileTransientResources;
 
     xr_vector<PassNode*> m_sortedPasses;
     bool m_compiled = false;
@@ -189,7 +185,6 @@ private:
     void ComputeResourceLifetimes();
     void AllocateResources();
     void InsertResourceBarriers();
-    void OptimizeMemoryAliasing();
 
     void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);
 

@@ -89,10 +89,6 @@ struct ResourceNode {
     nvrhi::TextureHandle nvrhiTexture;
     nvrhi::BufferHandle nvrhiBuffer;
 
-    bool canAlias = true;
-    u32 aliasedWith = INVALID_INDEX;
-    u64 memoryOffset = 0;
-
     ResourceState currentState = ResourceState::Undefined;
 
     u64 memorySize = 0;
@@ -105,25 +101,8 @@ struct ResourceNode {
     explicit ResourceNode(const ResourceDesc& _desc)
         : desc(_desc)
         , memorySize(_desc.ComputeMemorySize())
-        , canAlias(_desc.isTransient && !_desc.isImported)
         , isPersistent(!_desc.isTransient)
     {}
-
-    bool OverlapsWith(const ResourceNode& other) const {
-        if (firstUsedPass == INVALID_INDEX || other.firstUsedPass == INVALID_INDEX) {
-            return false;
-        }
-
-        return !(lastUsedPass < other.firstUsedPass ||
-                 other.lastUsedPass < firstUsedPass);
-    }
-
-    u32 GetLifetimeSpan() const {
-        if (firstUsedPass == INVALID_INDEX || lastUsedPass == INVALID_INDEX) {
-            return 0;
-        }
-        return lastUsedPass - firstUsedPass + 1;
-    }
 };
 
 }
