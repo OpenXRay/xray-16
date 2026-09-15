@@ -830,7 +830,9 @@ void R_dsgraph_structure::build_subspace()
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
             ISpatial* spatial = lstRenderables[o_it];
-            if (o.is_main_pass)
+            // Re-detect the sector only when it was invalidated by a move (spatial_move). Static objects keep
+            // their cached sector and skip the 2 ray_query casts entirely - this is the bulk of per-frame rays.
+            if (o.is_main_pass && (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR))
             {
                 const auto& entity_pos = spatial->spatial_sector_point();
                 const auto sector_id = detect_sector(entity_pos);
