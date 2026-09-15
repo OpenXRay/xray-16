@@ -221,6 +221,11 @@ void FrameGraphRenderer::level_Unload()
         m_processHOMTask.Reset();
     }
 
+    m_cachedStaticBatches.clear();
+    m_staticBatchesCached = false;
+    if (m_geometryCollector)
+        m_geometryCollector->BeginFrame();
+
     if (!g_pGameLevel)
         return;
     if (!b_loaded)
