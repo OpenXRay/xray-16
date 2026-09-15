@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <initializer_list>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -473,28 +474,22 @@ const std::string& ParticleLibraryDocument::Path() const { return m_path; }
 bool ParticleLibraryDocument::Dirty() const { return m_changedWords != 0 || m_structureChanged; }
 const std::vector<uint8_t>& ParticleLibraryDocument::Bytes() const { return m_bytes; }
 
-void ParticleLibraryDocument::AddCollisionChunk(size_t entry)
+void ParticleLibraryDocument::AddChunk(size_t entry, uint32_t id, const std::vector<uint8_t>& payload, uint32_t flag)
 {
-    constexpr float defaults[] = {1.f, 0.f, 0.f};
-    constexpr size_t chunkSize = 8 + sizeof(defaults);
+    const size_t chunkSize = 8 + payload.size();
     if (m_bytes.size() > static_cast<size_t>(std::numeric_limits<int32_t>::max()) - chunkSize)
-        throw std::runtime_error("Adding collision parameters would exceed the engine reader's supported size");
+        throw std::runtime_error("Adding chunk would exceed the engine reader's supported size");
 
     Binding& target = m_bindings[entry];
     const size_t offset = target.entryOffset + target.entrySize;
     const uint32_t effectsSize = Reader(m_bytes, m_effectsSizeOffset, 4).U32();
     m_bytes.insert(m_bytes.begin() + offset, chunkSize, 0);
-    WriteU32(m_bytes, offset, 33);
-    WriteU32(m_bytes, offset + 4, sizeof(defaults));
-    for (size_t i = 0; i != std::size(defaults); ++i)
-    {
-        uint32_t bits;
-        std::memcpy(&bits, &defaults[i], sizeof(bits));
-        WriteU32(m_bytes, offset + 8 + i * sizeof(bits), bits);
-    }
+    WriteU32(m_bytes, offset, id);
+    WriteU32(m_bytes, offset + 4, static_cast<uint32_t>(payload.size()));
+    std::memcpy(m_bytes.data() + offset + 8, payload.data(), payload.size());
     target.entrySize += chunkSize;
     WriteU32(m_bytes, target.entryOffset - 4, static_cast<uint32_t>(target.entrySize));
-    WriteU32(m_bytes, m_effectsSizeOffset, effectsSize + chunkSize);
+    WriteU32(m_bytes, m_effectsSizeOffset, effectsSize + static_cast<uint32_t>(chunkSize));
     for (auto& binding : m_bindings)
     {
         if (binding.entryOffset >= offset)
@@ -505,8 +500,51 @@ void ParticleLibraryDocument::AddCollisionChunk(size_t entry)
             if (word.offset >= offset)
                 word.offset += chunkSize;
     }
-    target.availableFlags |= Collision;
+    target.availableFlags |= flag;
     m_structureChanged = true;
+}
+
+void ParticleLibraryDocument::EnsureChunks(size_t entry, uint32_t flags)
+{
+    const Binding& binding = m_bindings[entry];
+    auto floats = [](std::initializer_list<float> values)
+    {
+        std::vector<uint8_t> bytes;
+        bytes.reserve(values.size() * sizeof(float));
+        for (float value : values)
+        {
+            uint32_t bits;
+            std::memcpy(&bits, &value, sizeof(bits));
+            for (unsigned i = 0; i != 4; ++i)
+                bytes.push_back(static_cast<uint8_t>(bits >> (i * 8)));
+        }
+        return bytes;
+    };
+    if ((flags & Sprite) && !(binding.availableFlags & Sprite))
+    {
+        std::vector<uint8_t> bytes;
+        const char* shader = "particles\\alpha_add";
+        const char* texture = "pfx\\pfx_sparks";
+        bytes.insert(bytes.end(), shader, shader + std::strlen(shader) + 1);
+        bytes.insert(bytes.end(), texture, texture + std::strlen(texture) + 1);
+        AddChunk(entry, 7, bytes, Sprite);
+    }
+    if ((flags & Framed) && !(binding.availableFlags & Framed))
+    {
+        auto bytes = floats({32.f / 256.f, 64.f / 128.f, 0.f, 0.f});
+        for (uint32_t value : {8u, 16u})
+            for (unsigned i = 0; i != 4; ++i)
+                bytes.push_back(static_cast<uint8_t>(value >> (i * 8)));
+        auto speed = floats({24.f});
+        bytes.insert(bytes.end(), speed.begin(), speed.end());
+        AddChunk(entry, 6, bytes, Framed);
+    }
+    if ((flags & TimeLimit) && !(binding.availableFlags & TimeLimit))
+        AddChunk(entry, 8, floats({1.f}), TimeLimit);
+    if ((flags & Collision) && !(binding.availableFlags & Collision))
+        AddChunk(entry, 33, floats({0.9f, 0.5f, 0.f}), Collision);
+    if ((flags & VelocityScale) && !(binding.availableFlags & VelocityScale))
+        AddChunk(entry, 34, floats({1.f, 1.f, 1.f}), VelocityScale);
 }
 
 void ParticleLibraryDocument::Patch(const FlagWord& word, uint32_t oldFlags, uint32_t flags)
@@ -530,11 +568,7 @@ bool ParticleLibraryDocument::SetFlags(size_t entry, uint32_t flags, std::string
         Entry& value = m_entries[entry];
         const Binding& binding = m_bindings[entry];
         if (value.kind == Kind::Effect)
-        {
-            CheckFlags(flags, binding.availableFlags | Collision);
-            if ((flags & Collision) && !(binding.availableFlags & Collision))
-                AddCollisionChunk(entry);
-        }
+            EnsureChunks(entry, flags);
         Patch(binding.flags, value.flags, flags);
         value.flags = flags;
         return true;
