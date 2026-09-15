@@ -132,7 +132,7 @@ void FGResourcePool::FreeBuffer(resources::BufferHandle handle) {
 
 resources::TextureHandle FGResourcePool::FindCompatibleTexture(const resources::TextureDesc& desc) {
     for (auto& pooled : m_texturePool) {
-        if (!pooled.inUse && AreTexturesCompatible(pooled.desc, desc)) {
+        if (!pooled.inUse && pooled.lastUsedFrame < m_currentFrame && AreTexturesCompatible(pooled.desc, desc)) {
             pooled.inUse = true;
             pooled.lastUsedFrame = m_currentFrame;
 
