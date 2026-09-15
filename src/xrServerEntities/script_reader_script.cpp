@@ -24,7 +24,18 @@ void CScriptReader::script_register(lua_State* luaState)
             .def("r_float", &IReader::r_float)
             .def("r_u64", &IReader::r_u64)
             .def("r_s64", &IReader::r_s64)
-            .def("r_u32", &IReader::r_u32)
+            .def("r_u32", +[](IReader* self) -> lua_Number
+            {
+                const u32 value = self->r_u32();
+
+                // SoC scripts use -1 as a u32 sentinel. In the original 32-bit
+                // engine, Lua received 0xffffffff as -1. Keep that behavior in
+                // SoC mode so original saves do not contain invalid object IDs.
+                if (ShadowOfChernobylMode)
+                    return static_cast<s32>(value);
+
+                return value;
+            })
             .def("r_s32", &IReader::r_s32)
             .def("r_u16", &IReader::r_u16)
             .def("r_s16", &IReader::r_s16)

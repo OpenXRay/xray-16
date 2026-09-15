@@ -199,11 +199,15 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     //Проверка на попадание мыши в окно,
     //происходит в обратном порядке, чем рисование окон
     //(последние в списке имеют высший приоритет)
-    WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
-
-    for (; it != m_ChildWndList.rend(); ++it)
+    // A mouse handler can attach or detach windows while it handles this event.
+    // Use a snapshot so those changes do not invalidate this iteration.
+    const WINDOW_LIST children = m_ChildWndList;
+    for (auto it = children.rbegin(); it != children.rend(); ++it)
     {
         CUIWindow* w = (*it);
+        if (!IsChild(w))
+            continue;
+
         const Frect& wndRect = w->GetWndRect();
         if (wndRect.in(cursor_pos))
         {
@@ -391,11 +395,13 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 //обработка сообщений
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    //оповестить дочерние окна
-    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    // A child can attach or detach windows while it handles a message.
+    // Use a snapshot so those changes do not invalidate this iteration.
+    const WINDOW_LIST children = m_ChildWndList;
+    for (CUIWindow* child : children)
     {
-        if ((*it)->IsEnabled())
-            (*it)->SendMessage(pWnd, msg, pData);
+        if (IsChild(child) && child->IsEnabled())
+            child->SendMessage(pWnd, msg, pData);
     }
 }
 

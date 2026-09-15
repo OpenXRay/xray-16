@@ -12,7 +12,9 @@ function main_menu:__init() super()
 	self.mbox_mode = 0
     self:InitControls()
     self:InitCallBacks()
-    xr_s.on_main_menu_on()     						 --' Distemper 03.2008 --
+	if xr_s and xr_s.on_main_menu_on then
+		xr_s.on_main_menu_on()
+	end
 end
 
 function main_menu:__finalize()
@@ -24,7 +26,14 @@ function main_menu:InitControls()
     local xml						= CScriptXmlInit()
     xml:ParseFile					("ui_mm_main.xml")
 
+    local is_soc = IsShadowOfChernobylMode and IsShadowOfChernobylMode()
+    if is_soc then
+        xml:InitStatic				("back_movie", self)
+    end
     xml:InitStatic					("background", self)
+    if is_soc then
+        xml:InitStatic				("fire_movie", self)
+    end
     self.shniaga					= xml:InitMMShniaga("shniaga_wnd",self);
 
 	self.message_box				= CUIMessageBoxEx()
@@ -168,7 +177,9 @@ end
 function main_menu:OnButton_return_game()
 	local console = get_console()
 	console:execute("main_menu off")
-	xr_s.on_main_menu_off()      						--' Distemper 03.2008 --
+	if xr_s and xr_s.on_main_menu_off then
+		xr_s.on_main_menu_off()
+	end
 end
 
 function main_menu:OnButton_new_novice_game()
@@ -235,7 +246,12 @@ function main_menu:OnButton_options_clicked()
 		self.opt_dlg.owner = self
 	end
 
-	self.opt_dlg:SetCurrentValues()
+	if self.opt_dlg.SetCurrentValues ~= nil then
+		self.opt_dlg:SetCurrentValues()
+	else
+		-- Shadow of Chernobyl names this operation UpdateControls.
+		self.opt_dlg:UpdateControls()
+	end
 	self.opt_dlg:ShowDialog(true)
 	self:HideDialog()
 	self:Show(false)
@@ -261,7 +277,8 @@ function main_menu:OnButton_multiplayer_clicked()
 	-- assert(self.gs_profile)
 
 	if not(self.mp_dlg) then
-        self.mp_dlg = ui_mp_main.mp_main(self.gs_profile:online())
+		local online = self.gs_profile and self.gs_profile:online() or false
+	        self.mp_dlg = ui_mp_main.mp_main(online)
         self.mp_dlg.owner = self
 		self.mp_dlg:OnRadio_NetChanged()
 		if (self.mp_dlg.online) then

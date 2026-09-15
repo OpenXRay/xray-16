@@ -20,6 +20,7 @@
 #include "xrServer.h"
 #include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "UIHelper.h"
+#include "xrEngine/StringTable/StringTable.h"
 
 using namespace InventoryUtilities;
 
@@ -138,7 +139,16 @@ void CUICharacterInfo::InitCharacter(u16 id)
     }
     if (m_icons[eRank])
     {
-        m_icons[eRank]->TextItemControl()->SetTextST(GetRankAsText(chInfo.Rank().value()));
+        const pcstr rankStringId = GetRankAsText(chInfo.Rank().value());
+        if (ShadowOfChernobylMode)
+        {
+            xr_string rankText = CStringTable().translate(rankStringId).c_str();
+            if (!rankText.empty() && rankText[0] >= 'A' && rankText[0] <= 'Z')
+                rankText[0] += 'a' - 'A';
+            m_icons[eRank]->SetText(rankText.c_str());
+        }
+        else
+            m_icons[eRank]->TextItemControl()->SetTextST(rankStringId);
     }
     if (m_icons[eCommunity])
     {

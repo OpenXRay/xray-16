@@ -21,6 +21,7 @@ private:
     CUIStatic m_Counter_text{ "Counter text" };
     CUIStatic* m_clock_wnd{};
     CUIStatic* m_pointerDistanceText{};
+    bool m_hasCounter{};
 
     u8 m_current_map_idx{ u8(-1) };
 

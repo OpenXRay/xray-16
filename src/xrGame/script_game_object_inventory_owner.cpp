@@ -111,7 +111,8 @@ void CScriptGameObject::AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR
     _AddIconedTalkMessage(caption, text, texture_name, templ_name);
 }
 
-void _give_news(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type);
+void _give_news(
+    LPCSTR caption, LPCSTR news, LPCSTR texture_name, const Frect* texture_rect, int delay, int show_time, int type);
 
 void CScriptGameObject::GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time)
 {
@@ -119,12 +120,21 @@ void CScriptGameObject::GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture
 }
 
 void CScriptGameObject::GiveGameNews(
-    LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type)
+    LPCSTR caption, LPCSTR news, LPCSTR texture_name, const Frect& texture_rect, int delay, int show_time)
 {
-    _give_news(caption, news, texture_name, delay, show_time, type);
+    Frect absolute_texture_rect = texture_rect;
+    absolute_texture_rect.rb.add(absolute_texture_rect.lt);
+    _give_news(caption, news, texture_name, &absolute_texture_rect, delay, show_time, GAME_NEWS_DATA::eNews);
 }
 
-void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int show_time, int type)
+void CScriptGameObject::GiveGameNews(
+    LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time, int type)
+{
+    _give_news(caption, news, texture_name, nullptr, delay, show_time, type);
+}
+
+void _give_news(
+    LPCSTR caption, LPCSTR text, LPCSTR texture_name, const Frect* texture_rect, int delay, int show_time, int type)
 {
     GAME_NEWS_DATA news_data;
     news_data.m_type = (GAME_NEWS_DATA::eNewsType)type;
@@ -136,6 +146,11 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
     VERIFY(xr_strlen(texture_name) > 0);
 
     news_data.texture_name = texture_name;
+    if (texture_rect)
+    {
+        news_data.texture_rect = *texture_rect;
+        news_data.has_texture_rect = true;
+    }
 
     if (delay == 0)
         Actor()->AddGameNews(std::move(news_data));
