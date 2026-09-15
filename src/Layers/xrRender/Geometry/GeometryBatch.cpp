@@ -21,38 +21,32 @@ void GeometryCollector::BeginFrame() {
 }
 
 void GeometryCollector::EndFrame() {
-    m_stats.numBatches = static_cast<u32>(m_batches.size());
+    m_stats.numBatches = static_cast<u32>(m_batches.size() + m_staticBatches.size());
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
     VERIFY(batch.indexCount > 0);
+    VERIFY(!(batch.isStatic && batch.isSkinned));
 
-    m_batches.push_back(batch);
+    if (batch.isStatic)
+        m_staticBatches.push_back(batch);
+    else
+        m_batches.push_back(batch);
 }
 
-void GeometryCollector::Sort() {
+void GeometryCollector::EndStaticBuild() {
+    m_staticTransparentIndices.clear();
 
-    std::sort(m_batches.begin(), m_batches.end(),
-        [](const GeometryBatch& a, const GeometryBatch& b) {
-            bool aB2F = a.IsStrictB2F();
-            bool bB2F = b.IsStrictB2F();
-            bool aAref = a.IsAlphaTested();
-            bool bAref = b.IsAlphaTested();
+    for (u32 i = 0; i < m_staticBatches.size(); ++i) {
+        const GeometryBatch& batch = m_staticBatches[i];
+        if (!batch.isSkinned && !batch.isTerrain && batch.IsStrictB2F())
+            m_staticTransparentIndices.push_back(i);
+    }
+}
 
-            if (aB2F != bB2F) {
-                return !aB2F;
-            }
-
-            if (aB2F && bB2F) {
-                return a.ssa < b.ssa;
-            }
-
-            if (aAref != bAref) {
-                return !aAref;
-            }
-
-            return a.ssa > b.ssa;
-        });
+void GeometryCollector::ClearStatic() {
+    m_staticBatches.clear();
+    m_staticTransparentIndices.clear();
 }
 
 }

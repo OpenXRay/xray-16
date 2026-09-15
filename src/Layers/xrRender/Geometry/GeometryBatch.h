@@ -37,6 +37,9 @@ struct GeometryBatch {
 
     bool isShadowOnly = false;
 
+    bool isTransparent = false;
+    bool isAlphaTested = false;
+
     u16 skinningRenderMode = 0;
 
     u32 skinnedPoolFormat = UINT32_MAX;
@@ -50,27 +53,11 @@ struct GeometryBatch {
 
     fg::MeshAllocation megaBufferAlloc;
 
-    bool IsAlphaTested() const {
-        if (!visual || !visual->shaderName.size())
-            return false;
+    bool IsAlphaTested() const { return isAlphaTested; }
 
-        return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName)
-            .alphaTest;
-    }
+    bool IsStrictB2F() const { return isTransparent; }
 
-    bool IsStrictB2F() const {
-        if (!visual || !visual->shaderName.size())
-            return false;
-
-        return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName)
-            .transparent;
-    }
-
-    bool IsOpaque() const {
-        return !IsAlphaTested() && !IsStrictB2F();
-    }
+    bool IsOpaque() const { return !isAlphaTested && !isTransparent; }
 };
 
 class GeometryCollector {
@@ -84,10 +71,14 @@ public:
     void Submit(const GeometryBatch& batch);
 
     const xr_vector<GeometryBatch>& GetBatches() const { return m_batches; }
+    const xr_vector<GeometryBatch>& GetStaticBatches() const { return m_staticBatches; }
+    const xr_vector<u32>& GetStaticTransparentIndices() const { return m_staticTransparentIndices; }
 
-    xr_vector<GeometryBatch>& GetBatchesMutable() { return m_batches; }
+    bool HasStaticBatches() const { return !m_staticBatches.empty(); }
+    bool HasBatches() const { return !m_batches.empty() || !m_staticBatches.empty(); }
 
-    void Sort();
+    void EndStaticBuild();
+    void ClearStatic();
 
     struct Stats {
         u32 numBatches = 0;
@@ -99,8 +90,9 @@ public:
 
 private:
     xr_vector<GeometryBatch> m_batches;
+    xr_vector<GeometryBatch> m_staticBatches;
+    xr_vector<u32> m_staticTransparentIndices;
     Stats m_stats;
-
 };
 
 extern GeometryCollector* g_geometryCollector;

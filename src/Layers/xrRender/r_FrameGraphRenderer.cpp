@@ -295,8 +295,6 @@ void FrameGraphRenderer::Shutdown() {
     m_uiRender = nullptr;
     m_uiMaterialCache = nullptr;
     m_uiVCBPool = nullptr;
-    m_cachedStaticBatches.clear();
-    m_staticBatchesCached = false;
     if (m_gpuCullingManager) {
         m_gpuCullingManager->InvalidateStaticCullingData();
         m_gpuCullingManager = nullptr;
@@ -609,35 +607,40 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
         if (m_geometryCollector)
         {
-            const auto& batches = m_geometryCollector->GetBatches();
-            stats.totalBatches = static_cast<u32>(batches.size());
-
-            for (const auto& batch : batches)
+            auto accumulate = [&stats](const xr_vector<GeometryBatch>& batches)
             {
-                u32 triangles = batch.indexCount / 3;
-                stats.totalTriangles += triangles;
+                stats.totalBatches += static_cast<u32>(batches.size());
 
-                if (batch.isSkinned)
+                for (const auto& batch : batches)
                 {
-                    stats.skinnedBatches++;
-                    stats.skinnedTriangles += triangles;
+                    u32 triangles = batch.indexCount / 3;
+                    stats.totalTriangles += triangles;
+
+                    if (batch.isSkinned)
+                    {
+                        stats.skinnedBatches++;
+                        stats.skinnedTriangles += triangles;
+                    }
+                    else if (batch.isTerrain)
+                    {
+                        stats.terrainBatches++;
+                        stats.terrainTriangles += triangles;
+                    }
+                    else if (batch.isStatic)
+                    {
+                        stats.staticBatches++;
+                        stats.staticTriangles += triangles;
+                    }
+                    else
+                    {
+                        stats.dynamicBatches++;
+                        stats.dynamicTriangles += triangles;
+                    }
                 }
-                else if (batch.isTerrain)
-                {
-                    stats.terrainBatches++;
-                    stats.terrainTriangles += triangles;
-                }
-                else if (batch.isStatic)
-                {
-                    stats.staticBatches++;
-                    stats.staticTriangles += triangles;
-                }
-                else
-                {
-                    stats.dynamicBatches++;
-                    stats.dynamicTriangles += triangles;
-                }
-            }
+            };
+
+            accumulate(m_geometryCollector->GetStaticBatches());
+            accumulate(m_geometryCollector->GetBatches());
         }
 
         stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
@@ -1910,6 +1913,8 @@ void FrameGraphRenderer::PrintStats() const {
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
     if (!visual)
         return false;
+
+    ZoneScopedN("ProcessVisualGeometry");
     
     IRender_Mesh* meshVisual = nullptr;
     switch (visual->getType()) {
@@ -2005,6 +2010,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.vertexCount = meshVisual->vCount;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
+    if (visual->shaderName.size()) {
+        const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName);
+        batch.isTransparent = materialInfo.transparent;
+        batch.isAlphaTested = materialInfo.alphaTest;
+    }
     batch.renderable = renderable;
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isShadowOnly = m_collectShadowOnly;
@@ -2116,6 +2126,11 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     }
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
+    if (visual->shaderName.size()) {
+        const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName);
+        batch.isTransparent = materialInfo.transparent;
+        batch.isAlphaTested = materialInfo.alphaTest;
+    }
     batch.renderable = renderable;
 
     u32 visualType = visual->getType();
@@ -2316,9 +2331,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         return;
 
     const auto& sectors = scene_info::GetSceneSectors();
-    u32 submittedStatic = 0;
 
-    if (!m_staticBatchesCached && !sectors.empty()) {
+    if (!m_geometryCollector->HasStaticBatches() && !sectors.empty()) {
         Msg("* [GeomCache] Building static geometry cache from %zu sectors...", sectors.size());
 
         xr_vector<dxRender_Visual*> staticVisuals;
@@ -2333,8 +2347,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         for (dxRender_Visual* v : staticVisuals) {
             uniqueVisuals.insert(v);
         }
-
-        u32 batchCountBefore = static_cast<u32>(m_geometryCollector->GetBatches().size());
 
         for (dxRender_Visual* visual : uniqueVisuals) {
             Fmatrix xform = Fidentity;
@@ -2351,23 +2363,13 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                     break;
             }
 
-            if (ProcessVisualGeometry(visual, xform, nullptr, true)) {
-                submittedStatic++;
-            }
+            ProcessVisualGeometry(visual, xform, nullptr, true);
         }
 
-        const auto& allBatches = m_geometryCollector->GetBatches();
-        m_cachedStaticBatches.assign(allBatches.begin() + batchCountBefore, allBatches.end());
-        m_staticBatchesCached = true;
+        m_geometryCollector->EndStaticBuild();
 
         Msg("* [GeomCache] Cached %zu static batches from %zu unique visuals (total sectors: %zu)",
-            m_cachedStaticBatches.size(), uniqueVisuals.size(), sectors.size());
-    }
-    else if (m_staticBatchesCached) {
-        for (const auto& batch : m_cachedStaticBatches) {
-            m_geometryCollector->Submit(batch);
-            submittedStatic++;
-        }
+            m_geometryCollector->GetStaticBatches().size(), uniqueVisuals.size(), sectors.size());
     }
 
     u32 submittedDynamic = 0;
@@ -2377,20 +2379,23 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     xr_vector<const light*>& collectedLights = m_collectedLights;
     collectedLights.clear();
 
-    for (ISpatial* spatial : m_lstRenderables)
     {
-        if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
-            continue;
-        spatial->GetSpatialData().collect_stamp = collectStamp;
+        ZoneScopedN("CollectVisibleGeometry::Renderables");
+        for (ISpatial* spatial : m_lstRenderables)
+        {
+            if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+                continue;
+            spatial->GetSpatialData().collect_stamp = collectStamp;
 
-        IRenderable* renderable = spatial->dcast_Renderable();
-        if (!renderable) {
-            notRenderable++;
-            continue;
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable) {
+                notRenderable++;
+                continue;
+            }
+
+            renderable->renderable_Render(0, renderable);
+            submittedDynamic++;
         }
-
-        renderable->renderable_Render(0, renderable);
-        submittedDynamic++;
     }
 
     if (m_processHOMTask) {

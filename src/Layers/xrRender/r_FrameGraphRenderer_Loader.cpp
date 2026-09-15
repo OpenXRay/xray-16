@@ -58,6 +58,8 @@ void FrameGraphRenderer::level_Load(IReader* fs)
                 gpuCulling->BeginLevelLoad(2000000, 6000000);
             }
         }
+        if (m_geometryCollector)
+            m_geometryCollector->ClearStatic();
         if (m_blackboard) {
             passes::InvalidateVSMCache(m_blackboard->get_or_add<passes::VSMState>());
             passes::ResetLocalShadowPool(m_blackboard->get_or_add<passes::LocalShadowState>());
@@ -221,10 +223,10 @@ void FrameGraphRenderer::level_Unload()
         m_processHOMTask.Reset();
     }
 
-    m_cachedStaticBatches.clear();
-    m_staticBatchesCached = false;
-    if (m_geometryCollector)
+    if (m_geometryCollector) {
+        m_geometryCollector->ClearStatic();
         m_geometryCollector->BeginFrame();
+    }
 
     if (!g_pGameLevel)
         return;

@@ -440,9 +440,6 @@ private:
     xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;
     xr_vector<fg::passes::ParticleBatch> m_hudParticleBatches;
 
-    xr_vector<GeometryBatch> m_cachedStaticBatches;
-    bool m_staticBatchesCached = false;
-
     xr_unique_ptr<fg::RenderContext> m_renderContext;
 
     Stats m_stats;
