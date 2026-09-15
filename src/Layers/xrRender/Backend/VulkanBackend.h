@@ -161,13 +161,13 @@ private:
     std::mutex m_queueMutex;
     std::mutex m_swapchainMutex;
 
-    std::atomic<u64> m_stJobLatencyUs{0};
-    std::atomic<u64> m_stQueueLockUs{0};
-    std::atomic<u64> m_stSemWaitUs{0};
-    std::atomic<u64> m_stEncodeUs{0};
-    std::atomic<u64> m_stPresentLockUs{0};
-    std::atomic<u64> m_stPresentUs{0};
-    std::atomic<u64> m_stGcUs{0};
+    mutable std::atomic<u64> m_stJobLatencyUs{0};
+    mutable std::atomic<u64> m_stQueueLockUs{0};
+    mutable std::atomic<u64> m_stSemWaitUs{0};
+    mutable std::atomic<u64> m_stEncodeUs{0};
+    mutable std::atomic<u64> m_stPresentLockUs{0};
+    mutable std::atomic<u64> m_stPresentUs{0};
+    mutable std::atomic<u64> m_stGcUs{0};
 
     void SubmitThreadMain();
     void FlushSubmits();
