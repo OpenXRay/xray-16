@@ -2209,13 +2209,15 @@ VSMOutput setupVSMPasses(
             state->primeTraceQuiet = 0;
         }
         state->behindLoadScreen = behind;
+        const bool bolt = g_pGamePersistent && g_pGamePersistent->Environment().IsThunderboltActive();
+        const bool held = bolt && state->nightFrozen;
         const bool night = state->sunDown && !state->atlasFirst && state->maskReady;
-        if (night != state->nightFrozen) {
+        if (night != state->nightFrozen && !held) {
             state->nightFrozen = night;
             if (ps_r_vsm_debug >= 1)
                 Msg("[VSM] night-freeze: %s", night ? "FROZEN (sun down, VSM update skipped)" : "active (sun up)");
         }
-        if (behind || night) {
+        if (behind || night || held) {
             if (behind && state->maskReady) {
                 ResourceDesc heldDesc;
                 heldDesc.type = ResourceDesc::Type::Texture2D;
