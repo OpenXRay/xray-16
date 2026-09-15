@@ -102,6 +102,9 @@ target_link_libraries(xrScriptEngine
 )
 
 target_compile_definitions(xrScriptEngine
+    PUBLIC
+    XRAY_USE_LUAJIT=$<BOOL:${XRAY_USE_LUAJIT}>
+
     PRIVATE
     XRSCRIPTENGINE_EXPORTS
 )
