@@ -176,6 +176,8 @@ private:
     xr_vector<PassNode*> m_sortedPasses;
     bool m_compiled = false;
     VirtualResourceHandle m_presentTarget;
+    u32 m_generation = 1;
+    const PassNode* m_currentPass = nullptr;
 
     Statistics m_stats;
 
@@ -191,6 +193,8 @@ private:
 
     ResourceNode* GetResourceNode(VirtualResourceHandle handle);
     const ResourceNode* GetResourceNode(VirtualResourceHandle handle) const;
+
+    bool PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const;
 
     PassNode* GetPassNode(PassHandle handle);
     const PassNode* GetPassNode(PassHandle handle) const;

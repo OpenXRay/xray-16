@@ -201,8 +201,6 @@ public:
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
 
-    void RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRHI* imguiRenderer);
-
     fg::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
 
     struct Stats {
@@ -378,8 +376,6 @@ private:
 
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
-    framegraph::VirtualResourceHandle m_finalOutput;
-
     fg::TextureHandle m_native_Position;
     fg::TextureHandle m_native_Normal;
     fg::TextureHandle m_native_Albedo;
@@ -392,20 +388,6 @@ private:
     fg::TextureHandle m_native_MenuMain;
     fg::TextureHandle m_native_MenuDistort;
     fg::TextureHandle m_native_FinalComposite;
-
-    framegraph::VirtualResourceHandle m_rt_Position;
-    framegraph::VirtualResourceHandle m_rt_Normal;
-    framegraph::VirtualResourceHandle m_rt_Albedo;
-    framegraph::VirtualResourceHandle m_rt_Depth;
-    framegraph::VirtualResourceHandle m_rt_Accumulator;
-    framegraph::VirtualResourceHandle m_rt_Generic_0;
-    framegraph::VirtualResourceHandle m_rt_Generic_1;
-    framegraph::VirtualResourceHandle m_rt_Generic_2;
-    framegraph::VirtualResourceHandle m_backbuffer;
-
-    framegraph::VirtualResourceHandle m_rt_MenuMain;
-    framegraph::VirtualResourceHandle m_rt_MenuDistort;
-    framegraph::VirtualResourceHandle m_rt_FinalComposite;
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 
