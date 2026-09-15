@@ -23,6 +23,8 @@ public:
 
     void Reset();
 
+    void Tick();
+
     struct Statistics {
         u32 texturesAllocated = 0;
         u32 texturesAliased = 0;
@@ -53,6 +55,8 @@ private:
 
     bool m_aliasingEnabled = true;
     u32 m_currentFrame = 0;
+
+    static constexpr u32 kEvictAfterFrames = 4;
 
     mutable Statistics m_stats;
 };

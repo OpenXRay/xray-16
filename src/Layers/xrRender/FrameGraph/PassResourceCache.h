@@ -87,6 +87,7 @@ public:
 
     void Clear();
     void ClearFramebufferDependent();
+    void InvalidateTexture(const nvrhi::ITexture* texture);
 
     struct Stats {
         u32 samplerHits = 0;
