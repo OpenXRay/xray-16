@@ -5,6 +5,7 @@
 #include "Layers/xrRender/Blender_CLSID.h"
 #include "Layers/xrRender/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/blenders/Blender_Particle.h"
+#include "Layers/xrRender/blenders/Blender_Screen_SET.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r__scene.h"
@@ -80,10 +81,13 @@ bool GetParticleBlendIndex(const char* shaderName, u32& outIndex)
     fg::IBlender* B = res->_FindBlender(shaderName);
     if (!B)
         return false;
-    if (B->getDescription().CLS != fg::B_PARTICLE)
+    const CLASS_ID type = B->getDescription().CLS;
+    if (type == fg::B_PARTICLE)
+        outIndex = static_cast<fg::CBlender_Particle*>(B)->oBlend.IDselected;
+    else if (type == fg::B_SCREEN_SET)
+        outIndex = static_cast<fg::CBlender_Screen_SET*>(B)->oBlend.IDselected;
+    else
         return false;
-    auto* bp = static_cast<fg::CBlender_Particle*>(B);
-    outIndex = bp->oBlend.IDselected;
     return true;
 }
 

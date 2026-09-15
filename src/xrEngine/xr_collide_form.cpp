@@ -201,6 +201,15 @@ void CCF_Skeleton::BuildTopLevel()
     VERIFY(_valid(bv_sphere));
 }
 
+void CCF_Skeleton::RefreshCollisionGeometry()
+{
+    if (dwFrameTL != Device.dwFrame)
+        BuildTopLevel();
+    IKinematics* K = PKinematics(owner->Visual());
+    if (dwFrame != Device.dwFrame || K->LL_GetBonesVisible() != vis_mask)
+        BuildState();
+}
+
 bool CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
     ZoneScoped;

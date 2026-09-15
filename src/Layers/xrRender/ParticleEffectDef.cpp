@@ -103,6 +103,7 @@ void CPEDef::pTimeLimit(float time_limit)
     m_fTimeLimit		= time_limit;
 }
 */
+#ifdef _EDITOR
 void CPEDef::ExecuteAnimate(Particle* particles, u32 p_cnt, float dt)
 {
     float speedFac = m_Frame.m_fSpeed * dt;
@@ -138,26 +139,8 @@ void CPEDef::ExecuteCollision(
             if (dist >= EPS)
             {
                 dir.div(dist);
-#ifdef _EDITOR
                 if (Tools->RayPick(m.posB, dir, dist, &pt, &n))
                 {
-#else
-                collide::rq_result RQ;
-                collide::rq_target RT = m_Flags.is(dfCollisionDyn) ? collide::rqtBoth : collide::rqtStatic;
-                if (g_pGameLevel->ObjectSpace.RayPick(m.posB, dir, dist, RT, RQ, nullptr))
-                {
-                    pt.mad(m.posB, dir, RQ.range);
-                    if (RQ.O)
-                    {
-                        n.set(0.f, 1.f, 0.f);
-                    }
-                    else
-                    {
-                        CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + RQ.element;
-                        Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
-                        n.mknormal(verts[T->verts[0]], verts[T->verts[1]], verts[T->verts[2]]);
-                    }
-#endif
                     pick_cnt++;
                     if (cb && (pick_cnt == 1))
                         if (!cb(owner, m, pt, n))
@@ -195,6 +178,7 @@ void CPEDef::ExecuteCollision(
         } while (pick_needed && (pick_cnt < 2));
     }
 }
+#endif
 
 //------------------------------------------------------------------------------
 // I/O part

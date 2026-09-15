@@ -2,33 +2,16 @@
 #pragma hdrstop
 #include "ParticleEffect.h"
 
-#include "xrCore/Threading/ParallelFor.hpp"
-
-#ifndef _EDITOR
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
-#include <xmmintrin.h>
-#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-#include "sse2neon/sse2neon.h"
-#elif defined(XR_ARCHITECTURE_RISCV)
-#include "sse2rvv/sse2rvv.h"
-#else
-#error Add your platform here
-#endif
-#endif
-
-extern ENGINE_API float psHUD_FOV;
 
 namespace xray::render::fg
 {
 using namespace PAPI;
 using namespace PS;
 
+#ifdef _EDITOR
 const u32 PS::uDT_STEP = 33;
 const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
 
-#ifdef XR_COMPILER_MSVC
-#pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
-#endif
 
 void PS::OnEffectParticleBirth(void* owner, u32, PAPI::Particle& m, u32)
 {
@@ -216,6 +199,156 @@ void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadPar
 }
 
 u32 CParticleEffect::ParticlesCount() { return ParticleManager()->GetParticlesCount(m_HandleEffect); }
+
+void CParticleEffect::SetHudMode(BOOL b)
+{
+    m_RT_Flags.set(flRT_HUDmode, b);
+}
+#else
+CParticleEffect::CParticleEffect()
+{
+    m_RT_Flags.zero();
+    m_Def = nullptr;
+    m_InitialPosition.set(0, 0, 0);
+    m_XFORM.identity();
+    vis.box.set(m_InitialPosition, m_InitialPosition);
+    vis.box.grow(EPS_L);
+    vis.box.getsphere(vis.sphere.P, vis.sphere.R);
+}
+
+CParticleEffect::~CParticleEffect()
+{
+    if (m_GpuHandle)
+        GetGpuParticleManager().DestroyEmitter(m_GpuHandle);
+    OnDeviceDestroy();
+}
+
+void CParticleEffect::Play()
+{
+    if (!m_GpuHandle)
+        return;
+    GetGpuParticleManager().Play(m_GpuHandle);
+    m_RT_Flags.set(flRT_DefferedStop, FALSE);
+    m_RT_Flags.set(flRT_Playing, TRUE);
+}
+
+void CParticleEffect::Stop(BOOL bDefferedStop)
+{
+    if (m_GpuHandle)
+        GetGpuParticleManager().Stop(m_GpuHandle, bDefferedStop != FALSE);
+    if (bDefferedStop)
+        m_RT_Flags.set(flRT_DefferedStop, TRUE);
+    else
+    {
+        m_RT_Flags.set(flRT_Playing | flRT_DefferedStop, FALSE);
+        m_ParticleCount = 0;
+    }
+}
+
+void CParticleEffect::RefreshShader()
+{
+    OnDeviceDestroy();
+    OnDeviceCreate();
+}
+
+void CParticleEffect::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
+{
+    m_RT_Flags.set(flRT_XFORM, bXFORM);
+    m_XFORM.set(m);
+    if (bXFORM)
+        m_InitialPosition.set(0.f, 0.f, 0.f);
+    else
+        m_InitialPosition = m.c;
+    m_ParentVelocity = velocity;
+    if (m_GpuHandle)
+        GetGpuParticleManager().UpdateParent(m_GpuHandle, m, velocity, bXFORM != FALSE);
+    vis.box.modify(m_InitialPosition);
+    vis.box.getsphere(vis.sphere.P, vis.sphere.R);
+}
+
+void CParticleEffect::RefreshSnapshot()
+{
+    if (!m_GpuHandle || !m_RT_Flags.is(flRT_Playing))
+        return;
+    GpuParticleSnapshot snapshot;
+    if (!GetGpuParticleManager().GetSnapshot(m_GpuHandle, snapshot) ||
+        static_cast<s32>(snapshot.serial - m_SnapshotSerial) < 0)
+        return;
+    m_SnapshotSerial = snapshot.serial;
+    m_ParticleCount = snapshot.count;
+    m_RT_Flags.set(flRT_Playing, snapshot.playing);
+    if (!snapshot.playing)
+        m_RT_Flags.set(flRT_DefferedStop, FALSE);
+    if (snapshot.bounds.is_valid())
+    {
+        if (m_RT_Flags.is(flRT_XFORM))
+        {
+            Fmatrix inverse;
+            inverse.invert(m_XFORM);
+            vis.box.xform(snapshot.bounds, inverse);
+        }
+        else
+            vis.box.set(snapshot.bounds);
+    }
+    else if (!snapshot.playing)
+    {
+        vis.box.set(m_InitialPosition, m_InitialPosition);
+        vis.box.grow(EPS_L);
+    }
+    vis.box.modify(m_InitialPosition);
+    vis.box.getsphere(vis.sphere.P, vis.sphere.R);
+}
+
+void CParticleEffect::OnFrame(u32 frame_dt)
+{
+    ZoneScoped;
+    if (!m_GpuHandle)
+        return;
+    RefreshSnapshot();
+    if (m_RT_Flags.is(flRT_Playing))
+        GetGpuParticleManager().Tick(m_GpuHandle, frame_dt);
+}
+
+BOOL CParticleEffect::Compile(CPEDef* def)
+{
+    if (m_GpuHandle)
+        GetGpuParticleManager().DestroyEmitter(m_GpuHandle);
+    OnDeviceDestroy();
+    m_GpuHandle = 0;
+    m_SnapshotSerial = 0;
+    m_ParticleCount = 0;
+    m_RT_Flags.set(flRT_Playing | flRT_DefferedStop, FALSE);
+    m_Def = def;
+    if (!m_Def)
+        return TRUE;
+    m_GpuHandle = GetGpuParticleManager().CreateEmitter(*m_Def);
+    R_ASSERT3(m_GpuHandle, "Unable to create GPU particle emitter", m_Def->Name());
+    GetGpuParticleManager().UpdateParent(
+        m_GpuHandle, m_XFORM, m_ParentVelocity, m_RT_Flags.is(flRT_XFORM));
+    GetGpuParticleManager().SetHudMode(m_GpuHandle, m_RT_Flags.is(flRT_HUDmode));
+    RefreshShader();
+    return TRUE;
+}
+
+void CParticleEffect::SetHudMode(BOOL b)
+{
+    m_RT_Flags.set(flRT_HUDmode, b);
+    if (m_GpuHandle)
+        GetGpuParticleManager().SetHudMode(m_GpuHandle, b != FALSE);
+}
+
+void CParticleEffect::ConfigureChildren(const char* birth, const char* play, const char* death, u32 groupFlags)
+{
+    R_ASSERT(m_GpuHandle);
+    GetGpuParticleManager().ConfigureChildren(m_GpuHandle, birth, play, death, groupFlags);
+}
+
+u32 CParticleEffect::ParticlesCount()
+{
+    RefreshSnapshot();
+    return m_ParticleCount;
+}
+#endif
 //------------------------------------------------------------------------------
 // Render
 //------------------------------------------------------------------------------
@@ -244,6 +377,7 @@ void CParticleEffect::OnDeviceDestroy()
     }
 }
 
+#ifdef _EDITOR
 IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -315,301 +449,6 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, co
     pv++;
 }
 
-#ifndef _EDITOR
-//----------------------------------------------------
-Lock m_sprite_section;
-
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
-IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
-    const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
-{
-    ZoneScoped;
-
-    m_sprite_section.Enter();
-
-    __m128 Vr, Vt, T_, R_, _pos, _zz, _sa, _ca, a, b, c, d;
-
-    _sa = _mm_set1_ps(sina);
-    _ca = _mm_set1_ps(cosa);
-
-    T_ = _mm_load_ss((float*)&T.x);
-    T_ = _mm_loadh_pi(T_, (__m64*)&T.y);
-
-    R_ = _mm_load_ss((float*)&R.x);
-    R_ = _mm_loadh_pi(R_, (__m64*)&R.y);
-
-    _pos = _mm_load_ss((float*)&pos.x);
-    _pos = _mm_loadh_pi(_pos, (__m64*)&pos.y);
-
-    _zz = _mm_setzero_ps();
-
-    Vr = _mm_mul_ps(_mm_set1_ps(r1), _mm_add_ps(_mm_mul_ps(T_, _sa), _mm_mul_ps(R_, _ca)));
-    Vt = _mm_mul_ps(_mm_set1_ps(r2), _mm_sub_ps(_mm_mul_ps(T_, _ca), _mm_mul_ps(R_, _sa)));
-
-    a = _mm_sub_ps(Vt, Vr);
-    b = _mm_add_ps(Vt, Vr);
-    c = _mm_sub_ps(_zz, a);
-    d = _mm_sub_ps(_zz, b);
-
-    a = _mm_add_ps(a, _pos);
-    d = _mm_add_ps(d, _pos);
-    b = _mm_add_ps(b, _pos);
-    c = _mm_add_ps(c, _pos);
-
-    _mm_store_ss((float*)&pv->p.x, d);
-    _mm_storeh_pi((__m64*)&pv->p.y, d);
-    pv->color = clr;
-    pv->t.set(lt.x, rb.y);
-    pv++;
-
-    _mm_store_ss((float*)&pv->p.x, a);
-    _mm_storeh_pi((__m64*)&pv->p.y, a);
-    pv->color = clr;
-    pv->t.set(lt.x, lt.y);
-    pv++;
-
-    _mm_store_ss((float*)&pv->p.x, c);
-    _mm_storeh_pi((__m64*)&pv->p.y, c);
-    pv->color = clr;
-    pv->t.set(rb.x, rb.y);
-    pv++;
-
-    _mm_store_ss((float*)&pv->p.x, b);
-    _mm_storeh_pi((__m64*)&pv->p.y, b);
-    pv->color = clr;
-    pv->t.set(rb.x, lt.y);
-    pv++;
-    m_sprite_section.Leave();
-}
-
-IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
-    float r1, float r2, u32 clr, float sina, float cosa)
-{
-    ZoneScoped;
-
-    const Fvector& T = dir;
-    Fvector R;
-
-    // R.crossproduct(T,Device.vCameraDirection).normalize_safe();
-
-    __m128 _t, _t1, _t2, _r, _r1, _r2;
-
-    // crossproduct
-
-    _t = _mm_load_ss((float*)&T.x);
-    _t = _mm_loadh_pi(_t, (__m64*)&T.y);
-
-    _r = _mm_load_ss((float*)&Device.vCameraDirection.x);
-    _r = _mm_loadh_pi(_r, (__m64*)&Device.vCameraDirection.y);
-
-    _t1 = _mm_shuffle_ps(_t, _t, _MM_SHUFFLE(0, 3, 1, 2));
-    _t2 = _mm_shuffle_ps(_t, _t, _MM_SHUFFLE(2, 0, 1, 3));
-
-    _r1 = _mm_shuffle_ps(_r, _r, _MM_SHUFFLE(2, 0, 1, 3));
-    _r2 = _mm_shuffle_ps(_r, _r, _MM_SHUFFLE(0, 3, 1, 2));
-
-    _t1 = _mm_mul_ps(_t1, _r1);
-    _t2 = _mm_mul_ps(_t2, _r2);
-
-    _t1 = _mm_sub_ps(_t1, _t2); // z | y | 0 | x
-
-    // normalize_safe
-
-    _t2 = _mm_mul_ps(_t1, _t1); // zz | yy | 00 | xx
-    _r1 = _mm_movehl_ps(_t2, _t2); // zz | yy | zz | yy
-    _t2 = _mm_add_ss(_t2, _r1); // zz | yy | 00 | xx + yy
-    _r1 = _mm_shuffle_ps(_r1, _r1, _MM_SHUFFLE(1, 1, 1, 1)); // zz | zz | zz | zz
-    _t2 = _mm_add_ss(_t2, _r1); // zz | yy | 00 | xx + yy + zz
-
-    _r1 = _mm_set_ss(std::numeric_limits<float>::min());
-
-    if (_mm_comigt_ss(_t2, _r1))
-    {
-        _t2 = _mm_rsqrt_ss(_t2);
-        _t2 = _mm_shuffle_ps(_t2, _t2, _MM_SHUFFLE(0, 0, 0, 0));
-        _t1 = _mm_mul_ps(_t1, _t2);
-    }
-
-    _mm_store_ss((float*)&R.x, _t1);
-    _mm_storeh_pi((__m64*)&R.y, _t1);
-
-    FillSprite(pv, T, R, pos, lt, rb, r1, r2, clr, sina, cosa);
-}
-#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-ICF void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
-    const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
-{
-    FillSprite_fpu(pv, T, R, pos, lt, rb, r1, r2, clr, sina, cosa);
-}
-ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const Fvector2& lt, const Fvector2& rb,
-    float r1, float r2, u32 clr, float sina, float cosa)
-{
-    FillSprite_fpu(pv, pos, dir, lt, rb, r1, r2, clr, sina, cosa);
-}
-#else
-#error Specify your platform explicitly
-#endif // defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
-ICF void magnitude_sse(Fvector& vec, float& res) // XXX: move this to Fvector class
-{
-    __m128 tv, tu;
-
-    tv = _mm_load_ss((float*)&vec.x); // tv = 0 | 0 | 0 | x
-    tv = _mm_loadh_pi(tv, (__m64*)&vec.y); // tv = z | y | 0 | x
-    tv = _mm_mul_ps(tv, tv); // tv = zz | yy | 0 | xx
-    tu = _mm_movehl_ps(tv, tv); // tu = zz | yy | zz | yy
-    tv = _mm_add_ss(tv, tu); // tv = zz | yy | 0 | xx + yy
-    tu = _mm_shuffle_ps(tu, tu, _MM_SHUFFLE(1, 1, 1, 1)); // tu = zz | zz | zz | zz
-    tv = _mm_add_ss(tv, tu); // tv = zz | yy | 0 | xx + yy + zz
-    tv = _mm_sqrt_ss(tv); // tv = zz | yy | 0 | sqrt( xx + yy + zz )
-    _mm_store_ss((float*)&res, tv);
-}
-#elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-ICF void magnitude_sse(Fvector& vec, float& res)
-{
-    res = vec.magnitude();
-}
-#else
-#error Specify your platform explicitly
-#endif
-
-void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles)
-{
-    float sina = 0.0f, cosa = 0.0f;
-    // Xottab_DUTY: changed angle to be float instead of DWORD
-    // But it must be 0xFFFFFFFF or otherwise some particles won't play
-    float angle = float(0xFFFFFFFF); // XXX: check if we can replace with flt_max
-
-    const auto renderParticles = [&, this](const TaskRange<u32>& range)
-    {
-        for (u32 i = range.begin(); i != range.end(); ++i)
-        {
-            PAPI::Particle& m = particles[i];
-            Fvector2 lt, rb;
-            lt.set(0.f, 0.f);
-            rb.set(1.f, 1.f);
-
-            _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
-
-            if (angle != m.rot.x)
-            {
-                angle = m.rot.x;
-                sina = sinf(angle);
-                cosa = cosf(angle);
-            }
-
-            _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
-
-            if (m_Def->m_Flags.is(CPEDef::dfFramed))
-                m_Def->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), lt, rb);
-
-            float r_x = m.size.x * 0.5f;
-            float r_y = m.size.y * 0.5f;
-            float speed = 0.f;
-            bool speed_calculated = false;
-
-            if (m_Def->m_Flags.is(CPEDef::dfVelocityScale))
-            {
-                magnitude_sse(m.vel, speed);
-                speed_calculated = true;
-                r_x += speed * m_Def->m_VelocityScale.x;
-                r_y += speed * m_Def->m_VelocityScale.y;
-            }
-
-            if (m_Def->m_Flags.is(CPEDef::dfAlignToPath))
-            {
-                if (!speed_calculated)
-                    magnitude_sse(m.vel, speed);
-
-                if ((speed < EPS_S) && m_Def->m_Flags.is(CPEDef::dfWorldAlign))
-                {
-                    Fmatrix M;
-                    M.setXYZ(m_Def->m_APDefaultRotation);
-                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
-                    {
-                        Fvector p;
-                        m_XFORM.transform_tiny(p, m.pos);
-                        M.mulA_43(m_XFORM);
-                        FillSprite(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                    else
-                    {
-                        FillSprite(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                }
-                else if ((speed >= EPS_S) && m_Def->m_Flags.is(CPEDef::dfFaceAlign))
-                {
-                    Fmatrix M;
-                    M.identity();
-                    M.k.div(m.vel, speed);
-                    M.j.set(0, 1, 0);
-                    if (_abs(M.j.dotproduct(M.k)) > .99f)
-                        M.j.set(0, 0, 1);
-                    M.i.crossproduct(M.j, M.k);
-                    M.i.normalize();
-                    M.j.crossproduct(M.k, M.i);
-                    M.j.normalize();
-                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
-                    {
-                        Fvector p;
-                        m_XFORM.transform_tiny(p, m.pos);
-                        M.mulA_43(m_XFORM);
-                        FillSprite(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                    else
-                    {
-                        FillSprite(pv, M.j, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                }
-                else
-                {
-                    Fvector dir;
-                    if (speed >= EPS_S)
-                        dir.div(m.vel, speed);
-                    else
-                        dir.setHP(-m_Def->m_APDefaultRotation.y, -m_Def->m_APDefaultRotation.x);
-                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
-                    {
-                        Fvector p, d;
-                        m_XFORM.transform_tiny(p, m.pos);
-                        m_XFORM.transform_dir(d, dir);
-                        FillSprite(pv, p, d, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                    else
-                    {
-                        FillSprite(pv, m.pos, dir, lt, rb, r_x, r_y, m.color, sina, cosa);
-                    }
-                }
-            }
-            else
-            {
-                if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
-                {
-                    Fvector p;
-                    m_XFORM.transform_tiny(p, m.pos);
-                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
-                }
-                else
-                {
-                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
-                }
-            }
-        }
-    };
-    // XXX: it turned out that singlethreaded code works way faster
-    // But on processors with small caches it may work slower, profiling needed
-    //if (count > (TaskScheduler->GetWorkersCount() * 64))
-    //    xr_parallel_for(TaskRange<u32>(0, count), renderParticles);
-    //else
-    {
-        renderParticles(TaskRange<u32>(0, count));
-    }
-}
-
-#else // _EDITOR
-
-//----------------------------------------------------
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float angle)
 {

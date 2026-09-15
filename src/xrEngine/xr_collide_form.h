@@ -162,6 +162,7 @@ public:
     virtual bool _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     bool _ElementCenter(u16 elem_id, Fvector& e_center);
     const ElementVec& _GetElements() { return elements; }
+    void RefreshCollisionGeometry();
 #ifdef DEBUG
     void _dbg_refresh()
     {

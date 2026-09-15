@@ -25,6 +25,11 @@ void CSkeletonX::AfterLoad(CKinematics* parent, u16 child_idx)
 }
 void CSkeletonX::_Copy(CSkeletonX* B)
 {
+    collisionIndices.clear();
+    collisionVertices.clear();
+    collisionPose.clear();
+    collisionTriangles.clear();
+    collisionPoseFrame = u32(-1);
     Parent = nullptr;
     ChildIDX = B->ChildIDX;
     Vertices1W = B->Vertices1W;
@@ -44,6 +49,11 @@ void CSkeletonX::_Copy(CSkeletonX* B)
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 {
+    collisionIndices.clear();
+    collisionVertices.clear();
+    collisionPose.clear();
+    collisionTriangles.clear();
+    collisionPoseFrame = u32(-1);
     s_bones_array_const = "sbones_array";
     xr_vector<u16> bids;
 

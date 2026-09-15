@@ -1829,8 +1829,10 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 if (!batch.visual) continue;
 
                 GPUParticleData particle;
-                particle.position = batch.visual->vis.sphere.P;
-                particle.radius = batch.visual->vis.sphere.R;
+                batch.worldMatrix.transform_tiny(particle.position, batch.visual->vis.sphere.P);
+                const float scale = std::max({batch.worldMatrix.i.magnitude(),
+                    batch.worldMatrix.j.magnitude(), batch.worldMatrix.k.magnitude()});
+                particle.radius = batch.visual->vis.sphere.R * scale;
                 particle.batchIndex = i;
                 particle.flags = 0;
                 particle.pad0 = 0.0f;

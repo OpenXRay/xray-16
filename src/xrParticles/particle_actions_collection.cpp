@@ -1613,9 +1613,6 @@ void PAVortex::Transform(const Fmatrix& m)
 // Turbulence
 #include "noise.h"
 
-static int noise_start = 1;
-extern void noise3Init();
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -1653,11 +1650,7 @@ ICF void _mm_store_fvector(Fvector& v, const __m128 R1)
 
 void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
-    if (noise_start)
-    {
-        noise_start = 0;
-        noise3Init();
-    }
+    noise3Init();
 
     age += dt;
 
