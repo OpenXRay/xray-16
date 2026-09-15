@@ -109,11 +109,6 @@ struct ResourceNode {
     nvrhi::TextureHandle nvrhiTexture;
     nvrhi::BufferHandle nvrhiBuffer;
 
-    // Memory aliasing
-    bool canAlias = true;               // Can share memory with others
-    u32 aliasedWith = INVALID_INDEX;    // Index of resource we alias with
-    u64 memoryOffset = 0;               // Offset in aliased memory
-
     // State tracking
     ResourceState currentState = ResourceState::Undefined;
 
@@ -129,28 +124,8 @@ struct ResourceNode {
     explicit ResourceNode(const ResourceDesc& _desc)
         : desc(_desc)
         , memorySize(_desc.ComputeMemorySize())
-        , canAlias(_desc.isTransient && !_desc.isImported)
         , isPersistent(!_desc.isTransient)
     {}
-
-    // Check if resource lifetime overlaps with another
-    bool OverlapsWith(const ResourceNode& other) const {
-        if (firstUsedPass == INVALID_INDEX || other.firstUsedPass == INVALID_INDEX) {
-            return false;
-        }
-
-        // Check for overlap: [first1, last1] ) [first2, last2] != 
-        return !(lastUsedPass < other.firstUsedPass ||
-                 other.lastUsedPass < firstUsedPass);
-    }
-
-    // Get lifetime span
-    u32 GetLifetimeSpan() const {
-        if (firstUsedPass == INVALID_INDEX || lastUsedPass == INVALID_INDEX) {
-            return 0;
-        }
-        return lastUsedPass - firstUsedPass + 1;
-    }
 };
 
 } // namespace xray::render::framegraph

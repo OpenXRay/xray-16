@@ -195,9 +195,6 @@ public:
 
         // Memory stats
         u64 totalMemoryAllocated = 0;
-        u64 peakMemoryUsage = 0;
-        u32 numAliasedResources = 0;
-        u64 memoryReduced = 0;  // Saved by aliasing
 
         // Execute stats
         float executeTimeMs = 0.0f;
@@ -239,7 +236,6 @@ private:
 
     xr_vector<ReaderLink> m_compileReaderLinks;
     xr_vector<PassNode*> m_compilePassWorklist;
-    xr_vector<ResourceNode*> m_compileTransientResources;
 
     // Compilation results
     xr_vector<PassNode*> m_sortedPasses;  // Execution order
@@ -259,7 +255,6 @@ private:
     void ComputeResourceLifetimes();
     void AllocateResources();
     void InsertResourceBarriers();
-    void OptimizeMemoryAliasing();
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     //  HELPER METHODS
