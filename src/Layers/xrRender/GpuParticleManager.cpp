@@ -696,6 +696,7 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
     m_impl->Buffer(m_impl->visibleRoots,visible.size(),sizeof(u32),"GpuPapiVisibleRoots",false);
     auto pass = graph.AddPass("GpuPapiSimulation");
     graph.SetPassHasSideEffects(pass);
+    graph.SetPassAsyncCompute(pass);
     auto import = [&](const char* name,nvrhi::IBuffer* buffer) {
         framegraph::ResourceDesc desc;
         desc.type = framegraph::ResourceDesc::Type::Buffer;

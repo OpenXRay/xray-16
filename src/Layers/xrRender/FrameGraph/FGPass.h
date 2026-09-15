@@ -99,6 +99,11 @@ struct PassDependency {
     EdgeKind kind = EdgeKind::ReadAfterWrite;
 };
 
+enum class PassQueue : u8 {
+    Graphics,
+    Compute,
+};
+
 struct PassNode {
     PassHandle handle;
     shared_str name;
@@ -121,10 +126,9 @@ struct PassNode {
     u32 timestampQueryEnd = INVALID_INDEX;
     float lastExecutionTimeMs = 0.0f;
 
-    bool isAsync = false;
-    bool isGraphics = true;
-    bool isCompute = false;
-    bool isCopy = false;
+    PassQueue queue = PassQueue::Graphics;
+    bool forkAfter = false;
+    u32 segment = INVALID_INDEX;
     bool hasSideEffects = false;
 
     PassNode() = default;
@@ -148,10 +152,9 @@ struct PassNode {
         timestampQueryStart = INVALID_INDEX;
         timestampQueryEnd = INVALID_INDEX;
         lastExecutionTimeMs = 0.0f;
-        isAsync = false;
-        isGraphics = true;
-        isCompute = false;
-        isCopy = false;
+        queue = PassQueue::Graphics;
+        forkAfter = false;
+        segment = INVALID_INDEX;
         hasSideEffects = false;
     }
 

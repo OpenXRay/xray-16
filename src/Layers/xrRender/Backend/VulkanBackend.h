@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SubmitTokenRing.h"
 #include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
@@ -8,6 +9,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <deque>
 #include <mutex>
 #include <thread>
 
@@ -29,13 +31,16 @@ public:
     DeviceState GetDeviceState() const override;
 
     nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
-    nvrhi::ICommandList* GetCommandList() const override { return m_commandLists[m_recordSlot].Get(); }
+    nvrhi::ICommandList* GetCommandList() const override { return m_currentGraphics; }
     nvrhi::ICommandList* CreateCommandList() override;
 
-    bool HasAsyncCompute() const override { return m_computeCommandLists[0] != nullptr; }
-    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandLists[m_recordSlot].Get(); }
-    void QueueComputeCommandList(nvrhi::ICommandList* commandList) override;
-    void QueueWaitForCompute() override;
+    bool HasAsyncCompute() const override { return m_asyncComputeEnabled; }
+    nvrhi::ICommandList* AcquireComputeCommandList() override;
+    u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override;
+    void AddGraphicsWait(u32 token) override { m_graphicsWaits.Add(token); }
+    u32 SplitGraphics() override;
+    u32 LastGraphicsToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
+    u32 LastComputeToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Compute)]; }
 
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
@@ -100,9 +105,15 @@ private:
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::DeviceHandle m_nvrhiVulkanDevice;
-    nvrhi::CommandListHandle m_commandLists[2];
+
+    struct CommandListPool {
+        xr_vector<nvrhi::CommandListHandle> lists;
+        u32 used = 0;
+    };
+    CommandListPool m_graphicsPools[2];
+    CommandListPool m_computePools[2];
     u32 m_recordSlot = 0;
-    nvrhi::CommandListHandle m_computeCommandLists[2];
+    nvrhi::ICommandList* m_currentGraphics = nullptr;
     nvrhi::CommandListHandle m_uploadCommandList;
     xr_vector<VkImage> m_swapchainImages;
     xr_vector<nvrhi::TextureHandle> m_backBuffers;
@@ -130,17 +141,19 @@ private:
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
     TaskHandle m_gcTask;
-    std::atomic<u64> m_lastGraphicsInstanceID{ 0 };
-    u64 m_frameComputeInstanceID = 0;
-    nvrhi::CommandListHandle m_frameComputeCommandList;
-    bool m_frameWaitForCompute = false;
+    bool m_asyncComputeEnabled = false;
+    bool m_frameGraphicsSubmitted = false;
+    SubmitTokenRing m_tokens;
+    SubmitWaitList m_graphicsWaits;
 
     struct SubmitJob {
         nvrhi::ICommandList* cl = nullptr;
+        nvrhi::CommandQueue queue = nvrhi::CommandQueue::Graphics;
+        u32 token = 0;
+        SubmitWaitList waits;
         VkSemaphore imageAvailable = VK_NULL_HANDLE;
         VkSemaphore renderFinished = VK_NULL_HANDLE;
-        nvrhi::CommandListHandle computeCl;
-        bool waitForCompute = false;
+        bool present = false;
         u32 frameIndex = 0;
         u32 imageIndex = 0;
         u32 slot = 0;
@@ -152,8 +165,7 @@ private:
     std::mutex m_submitMutex;
     std::condition_variable m_submitCv;
     std::condition_variable m_submitDoneCv;
-    SubmitJob m_pendingJob;
-    bool m_jobQueued = false;
+    std::deque<SubmitJob> m_jobs;
     bool m_submitActive = false;
     bool m_submitRun = false;
     bool m_slotInFlight[2] = {};
@@ -174,6 +186,9 @@ private:
     mutable std::atomic<u64> m_stAcquireUs{0};
     void StoreMaxUs(std::atomic<u64>& slot, u64 value) const;
 
+    nvrhi::ICommandList* AcquireFromPool(CommandListPool& pool, nvrhi::CommandQueue queue);
+    u64 SubmitLocked(const SubmitJob& job);
+    void EnqueueJob(SubmitJob&& job);
     void SubmitThreadMain();
     void FlushSubmits();
 };

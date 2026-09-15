@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SubmitTokenRing.h"
 #include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
@@ -32,9 +33,12 @@ public:
     nvrhi::ICommandList* CreateCommandList() override;
 
     bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
-    nvrhi::ICommandList* GetComputeCommandList() const override { return m_computeCommandList.Get(); }
-    void QueueComputeCommandList(nvrhi::ICommandList* commandList) override;
-    void QueueWaitForCompute() override;
+    nvrhi::ICommandList* AcquireComputeCommandList() override;
+    u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override;
+    void AddGraphicsWait(u32 token) override { m_graphicsWaits.Add(token); }
+    u32 SplitGraphics() override;
+    u32 LastGraphicsToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
+    u32 LastComputeToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Compute)]; }
 
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
@@ -111,7 +115,8 @@ private:
     u32 m_currentBackBufferIndex = 0;
 
     TaskHandle m_gcTask;
-    u64 m_lastGraphicsInstanceID = 0;
-    u64 m_frameComputeInstanceID = 0;
-    bool m_frameWaitForCompute = false;
+    SubmitTokenRing m_tokens;
+    SubmitWaitList m_graphicsWaits;
+
+    u64 SubmitGraphics();
 };

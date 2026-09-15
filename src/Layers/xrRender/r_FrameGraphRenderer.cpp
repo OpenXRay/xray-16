@@ -108,6 +108,8 @@ namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
 
 namespace xray::render
 {
+static constexpr u32 FRAME_GLOBALS_CB_VERSIONS = 64;
+
 fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
 {
     fg::CDetail* D = xr_new<fg::CDetail>();
@@ -440,10 +442,10 @@ void FrameGraphRenderer::Render() {
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     
-    if (ps_fg_render_mode == FG_RENDER_VULKAN && GEnv.Backend->HasAsyncCompute())
-        m_framegraph->SetAsyncCompute(GEnv.Backend->GetComputeCommandList(), GEnv.Backend);
+    if (ps_fg_render_mode == FG_RENDER_VULKAN)
+        m_framegraph->SetAsyncComputeBackend(GEnv.Backend);
     else
-        m_framegraph->SetAsyncCompute(nullptr, nullptr);
+        m_framegraph->SetAsyncComputeBackend(nullptr);
 
     {
         ZoneScopedN("FG::Compile");
@@ -451,8 +453,7 @@ void FrameGraphRenderer::Render() {
     }
 
     auto& cache = framegraph::GetPassResourceCache();
-    auto* cmdList = m_renderContext->GetCommandList();
-    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device);
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device, FRAME_GLOBALS_CB_VERSIONS);
     auto staticGlobalsData = passes::BuildStaticGlobals();
 
     {
@@ -472,13 +473,17 @@ void FrameGraphRenderer::Render() {
         staticGlobalsData.cluster_scales.set(ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
     }
 
-    cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
-
     auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
-        sizeof(passes::DynamicTransforms), m_device);
+        sizeof(passes::DynamicTransforms), m_device, FRAME_GLOBALS_CB_VERSIONS);
     passes::DynamicTransforms dynamicTransformsData = {};
     passes::FillDynamicTransforms(dynamicTransformsData);
-    cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
+
+    m_framegraph->SetSegmentBeginCallback(
+        [staticGlobalsCB, staticGlobalsData, dynamicTransformsCB, dynamicTransformsData](fg::RenderContext& ctx, const framegraph::FrameGraph&) {
+            nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+            cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
+            cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
+        });
 
     {
         ZoneScopedN("FG::Execute");
@@ -603,7 +608,7 @@ void FrameGraphRenderer::RenderMenu() {
     m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
-    m_framegraph->SetAsyncCompute(nullptr, nullptr);
+    m_framegraph->SetAsyncComputeBackend(nullptr);
     m_framegraph->Compile();
     m_framegraph->Execute();
 
@@ -995,7 +1000,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             QueryParticleBlendMode(definition->m_ShaderName.c_str()), static_cast<u32>(variant));
         gpuParticleState.registeredPrograms = program + 1;
     }
-    gpuParticles.SetupSimulationPasses(*m_framegraph, nvDevice);
 
     u32 writeIdx = m_pingPongIndex;
     u32 readIdx = 1 - m_pingPongIndex;
@@ -1139,6 +1143,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             cullActive = clusterArgsHandle.is_valid();
         }
     }
+    gpuParticles.SetupSimulationPasses(*m_framegraph, nvDevice);
     passes::ClusterDrawConfig clusterConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
         if (m_gpuCullingManager->GetClusterEntryCount() > 0) {
