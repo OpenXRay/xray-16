@@ -7,6 +7,7 @@
 
 void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
 {
+    ZoneScoped;
     R_ASSERT1_CURE(E, { return; });
 
     // Search lowest-priority target
@@ -32,6 +33,7 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
 
 bool CSoundRender_Core::i_allow_play(const CSoundRender_Emitter* E)
 {
+    ZoneScoped;
     // Search available target
     const float Ptest = E->priority();
     return std::any_of(s_targets.begin(), s_targets.end(), [Ptest](const CSoundRender_Target* target)

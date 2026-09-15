@@ -303,6 +303,7 @@ IC void volume_lerp(float& c, float t, float s, float dt)
 
 bool CSoundRender_Emitter::update_culling(float dt)
 {
+    ZoneScoped;
     if (b2D)
     {
         occluder_volume = 1.f;
@@ -365,6 +366,7 @@ float CSoundRender_Emitter::priority() const
 
 void CSoundRender_Emitter::update_environment(float dt)
 {
+    ZoneScoped;
     if (bMoved)
         e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
     e_current.lerp(e_current, e_target, dt);

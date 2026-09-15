@@ -253,6 +253,7 @@ void CSoundRender_Emitter::fill_all_blocks()
 
 void CSoundRender_Emitter::dispatch_prefill()
 {
+    ZoneScoped;
     wait_prefill();
     ScopeLock scope(&prefill_lock);
     if (!prefill_task.IsFinished())
@@ -279,6 +280,7 @@ void CSoundRender_Emitter::dispatch_prefill()
 
 void CSoundRender_Emitter::wait_prefill() const
 {
+    ZoneScoped;
     TaskHandle task;
     {
         ScopeLock scope(&prefill_lock);
