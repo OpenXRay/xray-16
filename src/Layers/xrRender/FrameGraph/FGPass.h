@@ -108,6 +108,8 @@ struct PassNode {
     xr_vector<ResourceBarrier> barriersBeforePass;
 
     xr_vector<PassDependency> dependsOn;
+    xr_vector<ResourceNode*> devirtualize;
+    xr_vector<ResourceNode*> destroy;
 
     IPassCallback* executeCallback = nullptr;
 
@@ -137,6 +139,8 @@ struct PassNode {
         resourceAccesses.clear();
         barriersBeforePass.clear();
         dependsOn.clear();
+        devirtualize.clear();
+        destroy.clear();
         executeCallback = nullptr;
         culled = false;
         executionOrder = INVALID_INDEX;

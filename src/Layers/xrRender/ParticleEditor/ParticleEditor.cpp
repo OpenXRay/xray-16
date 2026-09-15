@@ -2,6 +2,7 @@
 #include "ParticleEditor.h"
 #include "Layers/xrRender/ParticleEffectDef.h"
 #include "Layers/xrRender/ParticleGroup.h"
+#include "Layers/xrRender/GpuParticleManager.h"
 
 #include <algorithm>
 #include <cctype>
@@ -326,6 +327,31 @@ void ParticleEditor::DrawSelection()
     ImGui::Text("Time limit: %.3f s", entry.timeLimit);
     if (effect && !(entry.flags & PS::CPEDef::dfTimeLimit))
         ImGui::TextDisabled("Time limit flag is disabled.");
+    if (effect && ImGui::CollapsingHeader("Particle timing (live GPU)")) {
+        auto& manager = GetGpuParticleManager();
+        const PS::CPEDef* liveDef = nullptr;
+        for (const auto* candidate : manager.GetDefinitions())
+            if (candidate && 0 == xr_strcmp(candidate->Name(), entry.name.c_str())) { liveDef = candidate; break; }
+        if (!liveDef) {
+            ImGui::TextDisabled("Effect not spawned in the world yet.");
+        } else {
+            float timeLimit = manager.GetTimeLimit(*liveDef);
+            if (ImGui::SliderFloat("Time limit##live", &timeLimit, 0.f, 30.f, "%.2f s"))
+                manager.SetTimeLimit(*liveDef, timeLimit);
+            auto params = manager.GetActionParams(*liveDef);
+            for (u32 i = 0; i < params.size(); ++i) {
+                ImGui::PushID(int(i));
+                if (params[i].type == 10) {
+                    if (ImGui::SliderFloat("KillOld age", &params[i].value, 0.01f, 60.f, "%.2f s"))
+                        manager.SetActionParam(*liveDef, i, params[i].value);
+                } else if (params[i].type == 21) {
+                    if (ImGui::SliderFloat("Source rate", &params[i].value, 0.f, 1000.f, "%.1f /s"))
+                        manager.SetActionParam(*liveDef, i, params[i].value);
+                }
+                ImGui::PopID();
+            }
+        }
+    }
     if (ImGui::CollapsingHeader("Definition flags", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::PushID("definition");

@@ -187,7 +187,9 @@ private:
     void CullUnusedPasses();
     void ResolveUsage();
     void ComputeResourceLifetimes();
-    void AllocateResources();
+    void BuildLifetimeLists();
+    void Devirtualize(ResourceNode& resource);
+    void Destroy(ResourceNode& resource);
     void InsertResourceBarriers();
 
     void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);

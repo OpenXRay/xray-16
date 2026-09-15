@@ -31,8 +31,8 @@ FrameGraph::~FrameGraph() {
 };
 
 VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const ResourceDesc& desc) {
-    VERIFY(!m_compiled && "Cannot create resources after compile");
-    VERIFY(desc.type != ResourceDesc::Type::Buffer && "Use CreateBuffer for buffers");
+    R_ASSERT2(!m_compiled, "Cannot create resources after compile");
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer, "Use CreateBuffer for buffers");
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
@@ -42,8 +42,8 @@ VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const Resource
 }
 
 VirtualResourceHandle FrameGraph::CreateBuffer(const char* name, const ResourceDesc& desc) {
-    VERIFY(!m_compiled && "Cannot create resources after compile");
-    VERIFY(desc.type == ResourceDesc::Type::Buffer && "Use CreateTexture for textures");
+    R_ASSERT2(!m_compiled, "Cannot create resources after compile");
+    R_ASSERT2(desc.type == ResourceDesc::Type::Buffer, "Use CreateTexture for textures");
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
@@ -57,8 +57,9 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     nvrhi::ITexture* physicalTexture,
     const ResourceDesc& desc
 ) {
-    VERIFY(!m_compiled && "Cannot import resources after compile");
-    VERIFY(physicalTexture != nullptr);
+    R_ASSERT2(!m_compiled, "Cannot import resources after compile");
+    R_ASSERT(physicalTexture != nullptr);
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer, "Use ImportBuffer for buffers");
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
@@ -76,8 +77,9 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     nvrhi::IBuffer* physicalBuffer,
     const ResourceDesc& desc
 ) {
-    VERIFY(!m_compiled && "Cannot import resources after compile");
-    VERIFY(physicalBuffer != nullptr);
+    R_ASSERT2(!m_compiled, "Cannot import resources after compile");
+    R_ASSERT(physicalBuffer != nullptr);
+    R_ASSERT2(desc.type == ResourceDesc::Type::Buffer, "Use ImportTexture for textures");
 
     ResourceNode& node = m_resources.emplace_back(desc);
     node.handle.index = static_cast<u32>(m_resources.size() - 1);
@@ -91,7 +93,7 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
 }
 
 PassHandle FrameGraph::AddPass(const char* name) {
-    VERIFY(!m_compiled && "Cannot add passes after compile");
+    R_ASSERT2(!m_compiled, "Cannot add passes after compile");
 
     PassHandle handle;
     handle.index = static_cast<u32>(m_passes.size());
@@ -109,25 +111,28 @@ PassHandle FrameGraph::AddPass(const char* name) {
 }
 
 void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
     PassNode* passNode = GetPassNode(pass);
-    VERIFY(passNode != nullptr);
-    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
+    R_ASSERT(passNode != nullptr);
+    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
 
     passNode->Read(resource, state);
 }
 
 void FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
     PassNode* passNode = GetPassNode(pass);
-    VERIFY(passNode != nullptr);
-    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
+    R_ASSERT(passNode != nullptr);
+    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
 
     passNode->Write(resource, state);
 }
 
 void FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
     PassNode* passNode = GetPassNode(pass);
-    VERIFY(passNode != nullptr);
-    VERIFY2(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource");
+    R_ASSERT(passNode != nullptr);
+    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
 
     passNode->ReadWrite(resource, state);
 }
@@ -156,11 +161,11 @@ void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
 }
 
 void FrameGraph::SetPresentTarget(VirtualResourceHandle handle) {
-    VERIFY(!m_compiled && "Cannot set present target after compile");
+    R_ASSERT2(!m_compiled, "Cannot set present target after compile");
 
     const ResourceNode* node = GetResourceNode(handle);
-    VERIFY(node != nullptr);
-    VERIFY(node->desc.isImported && node->nvrhiTexture);
+    R_ASSERT(node != nullptr);
+    R_ASSERT(node->desc.isImported && node->nvrhiTexture);
 
     m_presentTarget = handle;
 }
@@ -168,7 +173,7 @@ void FrameGraph::SetPresentTarget(VirtualResourceHandle handle) {
 void FrameGraph::Compile() {
     ZoneScoped;
 
-    VERIFY(!m_compiled && "Already compiled");
+    R_ASSERT2(!m_compiled, "Already compiled");
 
     {
         ZoneScopedN("Compile::BuildDependencyGraph");
@@ -203,8 +208,8 @@ void FrameGraph::Compile() {
     }
 
     {
-        ZoneScopedN("Compile::AllocateResources");
-        AllocateResources();
+        ZoneScopedN("Compile::BuildLifetimeLists");
+        BuildLifetimeLists();
     }
 
     m_compiled = true;
@@ -234,15 +239,15 @@ void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
 void FrameGraph::Execute() {
     ZoneScoped;
 
-    VERIFY(m_compiled && "Must compile before execute");
-    VERIFY(m_context != nullptr && "RenderContext required for execution");
-    VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
+    R_ASSERT2(m_compiled, "Must compile before execute");
+    R_ASSERT2(m_context != nullptr, "RenderContext required for execution");
+    R_ASSERT2(m_renderDevice != nullptr, "RenderDevice required for execution");
 
     nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
-    VERIFY(graphicsCmdList != nullptr);
+    R_ASSERT(graphicsCmdList != nullptr);
 
     bool hasAsyncCompute = m_computeCommandList != nullptr && m_asyncComputeBackend != nullptr;
-    VERIFY2(!hasAsyncCompute || m_computeCommandList != graphicsCmdList,
+    R_ASSERT2(!hasAsyncCompute || m_computeCommandList != graphicsCmdList,
         "async compute must record into a separate command list");
 
     u32 asyncPassCount = 0;
@@ -262,6 +267,7 @@ void FrameGraph::Execute() {
         for (PassNode* pass : m_sortedPasses) {
             if (pass->culled || !pass->executeCallback || !pass->isAsync)
                 continue;
+            R_ASSERT(pass->devirtualize.empty() && pass->destroy.empty());
             ExecutePass(pass, m_computeCommandList);
         }
 
@@ -273,7 +279,7 @@ void FrameGraph::Execute() {
     bool syncInserted = false;
 
     for (PassNode* pass : m_sortedPasses) {
-        if (pass->culled || !pass->executeCallback)
+        if (pass->culled)
             continue;
 
         if (hasAsyncCompute && pass->isAsync)
@@ -293,12 +299,19 @@ void FrameGraph::Execute() {
             }
         }
 
-        ExecutePass(pass, graphicsCmdList);
+        for (ResourceNode* resource : pass->devirtualize)
+            Devirtualize(*resource);
+
+        if (pass->executeCallback)
+            ExecutePass(pass, graphicsCmdList);
+
+        for (ResourceNode* resource : pass->destroy)
+            Destroy(*resource);
     }
 
     if (m_presentTarget.is_valid()) {
         ResourceNode* target = GetResourceNode(m_presentTarget);
-        VERIFY(target != nullptr && target->nvrhiTexture);
+        R_ASSERT(target != nullptr && target->nvrhiTexture);
 
         graphicsCmdList->setTextureState(
             target->nvrhiTexture.Get(),
@@ -312,15 +325,11 @@ void FrameGraph::Execute() {
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
     const ResourceNode* node = GetResourceNode(handle);
-    if (!node || !node->isAllocated) {
+    if (!node)
         return nullptr;
-    }
 
-    nvrhi::ITexture* tex = node->nvrhiTexture.Get();
-
-    if (!tex) {
-        return nullptr;
-    }
+    R_ASSERT3(node->isAllocated && node->nvrhiTexture,
+        "framegraph texture accessed outside its lifetime", node->desc.debugName.c_str());
 
 #ifdef DEBUG
     if (m_currentPass) {
@@ -331,13 +340,16 @@ nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) co
     }
 #endif
 
-    return tex;
+    return node->nvrhiTexture;
 }
 
 nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) const {
     const ResourceNode* node = GetResourceNode(handle);
-    VERIFY(node != nullptr);
-    VERIFY(node->isAllocated && "Resource not allocated - call Compile first");
+    if (!node)
+        return nullptr;
+
+    R_ASSERT3(node->isAllocated && node->nvrhiBuffer,
+        "framegraph buffer accessed outside its lifetime", node->desc.debugName.c_str());
 
 #ifdef DEBUG
     if (m_currentPass) {
@@ -353,27 +365,19 @@ nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) cons
 
 const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) const {
     const ResourceNode* node = GetResourceNode(handle);
-    VERIFY(node != nullptr);
+    R_ASSERT(node != nullptr);
     return node->desc;
 }
 
 void FrameGraph::ResetForNextFrame() {
     ZoneScopedN("FG::ResetForNextFrame");
 
-    if (m_resourcePool) {
-        for (auto& resource : m_resources) {
-            if (resource.desc.isImported)
-                continue;
-
-            if (resource.resourceTexture.IsValid())
-                m_resourcePool->FreeTexture(resource.resourceTexture);
-
-            if (resource.resourceBuffer.IsValid())
-                m_resourcePool->FreeBuffer(resource.resourceBuffer);
-        }
-
-        m_resourcePool->Tick();
+    for (auto& resource : m_resources) {
+        if (!resource.desc.isImported)
+            Destroy(resource);
     }
+    if (m_resourcePool)
+        m_resourcePool->Tick();
 
     m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
@@ -397,37 +401,12 @@ void FrameGraph::ResetForNextFrame() {
 }
 
 void FrameGraph::Reset() {
-    if (m_resourceManager) {
-        resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
-        resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
-
-        for (auto& resource : m_resources) {
-            if (resource.desc.isImported)
-                continue;
-
-            if (resource.resourceTexture.IsValid()) {
-                texManager->Release(resource.resourceTexture);
-                resource.resourceTexture = resources::TextureHandle();
-            }
-
-            if (resource.resourceBuffer.IsValid()) {
-                bufManager->Release(resource.resourceBuffer);
-                resource.resourceBuffer = resources::BufferHandle();
-            }
-        }
-    }
-
-    if (m_resourcePool) {
-        m_resourcePool->Reset();
-    }
-
     for (auto& resource : m_resources) {
-        if (resource.desc.isImported)
-            continue;
-
-        resource.nvrhiTexture = nullptr;
-        resource.nvrhiBuffer = nullptr;
+        if (!resource.desc.isImported)
+            Destroy(resource);
     }
+    if (m_resourcePool)
+        m_resourcePool->Reset();
 
     m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
@@ -594,18 +573,18 @@ bool FrameGraph::ValidateGraph() const {
 }
 
 ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) {
-    if (!handle.is_valid() || handle.index >= m_resources.size()) {
+    if (!handle.is_valid())
         return nullptr;
-    }
-    VERIFY2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.index < m_resources.size(), "framegraph resource handle is out of bounds");
     return &m_resources[handle.index];
 }
 
 const ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) const {
-    if (!handle.is_valid() || handle.index >= m_resources.size()) {
+    if (!handle.is_valid())
         return nullptr;
-    }
-    VERIFY2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.index < m_resources.size(), "framegraph resource handle is out of bounds");
     return &m_resources[handle.index];
 }
 
@@ -692,27 +671,25 @@ void FrameGraph::BuildDependencyGraph() {
 }
 
 void FrameGraph::ValidateAsyncPasses() {
-#ifdef DEBUG
     for (const auto& pass : m_passes) {
         if (!pass.isAsync)
             continue;
 
         for (const auto& access : pass.resourceAccesses) {
             const ResourceNode* resource = GetResourceNode(access.resource);
-            VERIFY4(resource != nullptr && resource->desc.isImported,
+            R_ASSERT4(resource != nullptr && resource->desc.isImported,
                 "async framegraph pass touches a resource that is not imported",
                 pass.name.c_str(),
                 resource ? resource->desc.debugName.c_str() : "<invalid handle>");
         }
 
         for (const auto& dep : pass.dependsOn) {
-            VERIFY4(dep.pass->isAsync,
+            R_ASSERT4(dep.pass->isAsync,
                 "async framegraph pass depends on a graphics pass",
                 pass.name.c_str(),
                 dep.pass->name.c_str());
         }
     }
-#endif
 }
 
 void FrameGraph::CullUnusedPasses() {
@@ -781,31 +758,38 @@ void FrameGraph::ResolveUsage() {
 
         for (const auto& access : pass->resourceAccesses) {
             ResourceNode* resource = GetResourceNode(access.resource);
-            if (!resource) continue;
+            R_ASSERT(resource != nullptr);
 
             const bool isBuffer = resource->desc.type == ResourceDesc::Type::Buffer;
 
             if (resource->desc.isImported) {
+                const auto* textureDesc = resource->nvrhiTexture ? &resource->nvrhiTexture->getDesc() : nullptr;
+                const auto* bufferDesc = resource->nvrhiBuffer ? &resource->nvrhiBuffer->getDesc() : nullptr;
                 bool satisfied = true;
                 switch (access.state) {
                     case ResourceState::UnorderedAccess:
-                        if (resource->nvrhiBuffer)
-                            satisfied = resource->nvrhiBuffer->getDesc().canHaveUAVs;
-                        else if (resource->nvrhiTexture)
-                            satisfied = resource->nvrhiTexture->getDesc().isUAV;
+                        satisfied = isBuffer
+                            ? bufferDesc && bufferDesc->canHaveUAVs
+                            : textureDesc && textureDesc->isUAV;
                         break;
                     case ResourceState::RenderTarget:
-                        if (resource->nvrhiTexture)
-                            satisfied = resource->nvrhiTexture->getDesc().isRenderTarget;
+                        satisfied = !isBuffer && textureDesc && textureDesc->isRenderTarget
+                            && !nvrhi::getFormatInfo(textureDesc->format).hasDepth
+                            && !nvrhi::getFormatInfo(textureDesc->format).hasStencil;
+                        break;
+                    case ResourceState::DepthStencilWrite:
+                    case ResourceState::DepthStencilRead:
+                        satisfied = !isBuffer && textureDesc && textureDesc->isRenderTarget
+                            && (nvrhi::getFormatInfo(textureDesc->format).hasDepth
+                                || nvrhi::getFormatInfo(textureDesc->format).hasStencil);
                         break;
                     case ResourceState::IndirectArgument:
-                        if (resource->nvrhiBuffer)
-                            satisfied = resource->nvrhiBuffer->getDesc().isDrawIndirectArgs;
+                        satisfied = isBuffer && bufferDesc && bufferDesc->isDrawIndirectArgs;
                         break;
                     default:
                         break;
                 }
-                VERIFY4(satisfied,
+                R_ASSERT4(satisfied,
                     "framegraph pass requests a state the imported resource was not created for",
                     pass->name.c_str(),
                     resource->desc.debugName.c_str());
@@ -877,47 +861,63 @@ void FrameGraph::ComputeResourceLifetimes() {
     m_stats.numCulledResources = unusedCount;
 }
 
-void FrameGraph::AllocateResources() {
-    u64 totalMemoryAllocated = 0;
+void FrameGraph::BuildLifetimeLists() {
+    for (auto& pass : m_passes) {
+        pass.devirtualize.clear();
+        pass.destroy.clear();
+    }
 
     for (auto& resource : m_resources) {
-        if (resource.firstUsedPass == INVALID_INDEX)
+        if (resource.desc.isImported || resource.firstUsedPass == INVALID_INDEX)
             continue;
 
-        if (resource.desc.isImported) {
-            resource.isAllocated = true;
-            continue;
+        R_ASSERT(resource.firstUsedPass < m_passes.size());
+        R_ASSERT(resource.lastUsedPass < m_passes.size());
+        PassNode& first = m_passes[resource.firstUsedPass];
+        PassNode& last = m_passes[resource.lastUsedPass];
+        R_ASSERT(!first.culled && !last.culled);
+        R_ASSERT(!first.isAsync && !last.isAsync);
+        first.devirtualize.push_back(&resource);
+        last.destroy.push_back(&resource);
+    }
+}
+
+void FrameGraph::Destroy(ResourceNode& resource) {
+    R_ASSERT(!resource.desc.isImported);
+    if (resource.resourceTexture.IsValid()) {
+        m_resourcePool->FreeTexture(resource.resourceTexture);
+        resource.resourceTexture = {};
+    }
+    if (resource.resourceBuffer.IsValid()) {
+        m_resourcePool->FreeBuffer(resource.resourceBuffer);
+        resource.resourceBuffer = {};
+    }
+    resource.nvrhiTexture = nullptr;
+    resource.nvrhiBuffer = nullptr;
+    resource.isAllocated = false;
+}
+
+void FrameGraph::Devirtualize(ResourceNode& resource) {
+    R_ASSERT(!resource.desc.isImported && !resource.isAllocated);
+
+    if (resource.desc.type == ResourceDesc::Type::Buffer) {
+        if (m_resourcePool) {
+            resources::BufferDesc rmBufferDesc;
+            rmBufferDesc.type = resources::BufferType::Structured;
+            rmBufferDesc.usage = resources::BufferUsage::Static;
+            rmBufferDesc.size = resource.desc.bufferSize;
+            rmBufferDesc.stride = resource.desc.structStride;
+            rmBufferDesc.gpuWrite = resource.desc.allowUAV;
+            rmBufferDesc.indirectArgs = resource.desc.isIndirectArgs;
+            rmBufferDesc.cpuAccess = false;
+            rmBufferDesc.debugName = resource.desc.debugName;
+
+            resource.resourceBuffer = m_resourcePool->AllocateBuffer(rmBufferDesc);
+            if (resource.resourceBuffer.IsValid())
+                resource.nvrhiBuffer = m_resourceManager->GetBufferManager()->GetNVRHIBuffer(resource.resourceBuffer);
         }
 
-        if (resource.desc.type == ResourceDesc::Type::Buffer) {
-            if (m_resourcePool) {
-                resources::BufferDesc rmBufferDesc;
-                rmBufferDesc.type = resources::BufferType::Structured;
-                rmBufferDesc.usage = resources::BufferUsage::Static;
-                rmBufferDesc.size = resource.desc.bufferSize;
-                rmBufferDesc.stride = resource.desc.structStride;
-                rmBufferDesc.gpuWrite = resource.desc.allowUAV;
-                rmBufferDesc.indirectArgs = resource.desc.isIndirectArgs;
-                rmBufferDesc.cpuAccess = false;
-                rmBufferDesc.debugName = resource.desc.debugName;
-
-                resources::BufferHandle rmHandle = m_resourcePool->AllocateBuffer(rmBufferDesc);
-
-                if (rmHandle.IsValid()) {
-                    resource.resourceBuffer = rmHandle;
-
-                    resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
-                    resource.nvrhiBuffer = bufManager->GetNVRHIBuffer(rmHandle);
-                    resource.isAllocated = (resource.nvrhiBuffer != nullptr);
-                    totalMemoryAllocated += resource.memorySize;
-
-                    continue;
-                } else {
-                    Msg("! [FrameGraph] Failed to allocate buffer '%s' via ResourceManager, falling back to NVRHI",
-                        resource.desc.debugName.c_str());
-                }
-            }
-
+        if (!resource.resourceBuffer.IsValid()) {
             nvrhi::BufferDesc nvrhiDesc;
             nvrhiDesc.byteSize = resource.desc.bufferSize;
             nvrhiDesc.structStride = resource.desc.structStride;
@@ -926,120 +926,99 @@ void FrameGraph::AllocateResources() {
             nvrhiDesc.keepInitialState = true;
             nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
             nvrhiDesc.isDrawIndirectArgs = resource.desc.isIndirectArgs;
-
             resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
+        }
+    } else {
+        if (m_resourcePool) {
+            resources::TextureDesc rmTexDesc;
+            rmTexDesc.width = resource.desc.width;
+            rmTexDesc.height = resource.desc.height;
+            rmTexDesc.depth = resource.desc.depth;
+            rmTexDesc.arraySize = resource.desc.arraySize;
+            rmTexDesc.mipLevels = resource.desc.mipLevels;
+            rmTexDesc.sampleCount = resource.desc.sampleCount;
+            rmTexDesc.format = resource.desc.format;
+            rmTexDesc.debugName = resource.desc.debugName;
 
-            if (resource.nvrhiBuffer) {
-                resource.isAllocated = true;
-                totalMemoryAllocated += resource.memorySize;
-            } else {
-                Msg("! [FrameGraph] Failed to create NVRHI buffer '%s'",
-                    resource.desc.debugName.c_str());
-            }
-        } else {
-            if (m_resourcePool) {
-                resources::TextureDesc rmTexDesc;
-                rmTexDesc.width = resource.desc.width;
-                rmTexDesc.height = resource.desc.height;
-                rmTexDesc.depth = resource.desc.depth;
-                rmTexDesc.arraySize = resource.desc.arraySize;
-                rmTexDesc.mipLevels = resource.desc.mipLevels;
-                rmTexDesc.sampleCount = resource.desc.sampleCount;
-                rmTexDesc.format = resource.desc.format;
-                rmTexDesc.debugName = resource.desc.debugName;
-
-                switch (resource.desc.type) {
-                    case ResourceDesc::Type::Texture2D:
-                        rmTexDesc.type = resources::TextureDesc::Texture2D;
-                        break;
-                    case ResourceDesc::Type::Texture3D:
-                        rmTexDesc.type = resources::TextureDesc::Texture3D;
-                        break;
-                    case ResourceDesc::Type::TextureCube:
-                        rmTexDesc.type = resources::TextureDesc::TextureCube;
-                        break;
-                    case ResourceDesc::Type::Texture2DArray:
-                        rmTexDesc.type = resources::TextureDesc::Texture2DArray;
-                        break;
-                    default:
-                        rmTexDesc.type = resources::TextureDesc::Texture2D;
-                        break;
-                }
-
-                rmTexDesc.isRenderTarget = resource.desc.isRenderTarget;
-                rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
-                rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-
-                resources::TextureHandle rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
-
-                if (rmHandle.IsValid()) {
-                    resource.resourceTexture = rmHandle;
-
-                    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
-                    resource.nvrhiTexture = texManager->GetNVRHITexture(rmHandle);
-                    resource.isAllocated = (resource.nvrhiTexture != nullptr);
-                    totalMemoryAllocated += resource.memorySize;
-                    continue;
-                }
+            switch (resource.desc.type) {
+                case ResourceDesc::Type::Texture2D:
+                    rmTexDesc.type = resources::TextureDesc::Texture2D;
+                    break;
+                case ResourceDesc::Type::Texture3D:
+                    rmTexDesc.type = resources::TextureDesc::Texture3D;
+                    break;
+                case ResourceDesc::Type::TextureCube:
+                    rmTexDesc.type = resources::TextureDesc::TextureCube;
+                    break;
+                case ResourceDesc::Type::Texture2DArray:
+                    rmTexDesc.type = resources::TextureDesc::Texture2DArray;
+                    break;
+                default:
+                    NODEFAULT;
             }
 
+            rmTexDesc.isRenderTarget = resource.desc.isRenderTarget;
+            rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
+            rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+            resource.resourceTexture = m_resourcePool->AllocateTexture(rmTexDesc);
+            if (resource.resourceTexture.IsValid())
+                resource.nvrhiTexture = m_resourceManager->GetTextureManager()->GetNVRHITexture(resource.resourceTexture);
+        }
+
+        if (!resource.resourceTexture.IsValid()) {
             nvrhi::TextureDesc nvrhiDesc;
-                nvrhiDesc.width = resource.desc.width;
-                nvrhiDesc.height = resource.desc.height;
-                nvrhiDesc.depth = resource.desc.depth;
-                nvrhiDesc.arraySize = resource.desc.arraySize;
-                nvrhiDesc.mipLevels = resource.desc.mipLevels;
-                nvrhiDesc.sampleCount = resource.desc.sampleCount;
-                nvrhiDesc.format = resource.desc.format;
-                nvrhiDesc.debugName = resource.desc.debugName.c_str();
-                nvrhiDesc.keepInitialState = true;
+            nvrhiDesc.width = resource.desc.width;
+            nvrhiDesc.height = resource.desc.height;
+            nvrhiDesc.depth = resource.desc.depth;
+            nvrhiDesc.arraySize = resource.desc.arraySize;
+            nvrhiDesc.mipLevels = resource.desc.mipLevels;
+            nvrhiDesc.sampleCount = resource.desc.sampleCount;
+            nvrhiDesc.format = resource.desc.format;
+            nvrhiDesc.debugName = resource.desc.debugName.c_str();
+            nvrhiDesc.keepInitialState = true;
 
-                switch (resource.desc.type) {
-                    case ResourceDesc::Type::Texture2D:
-                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                        break;
-                    case ResourceDesc::Type::Texture3D:
-                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
-                        break;
-                    case ResourceDesc::Type::TextureCube:
-                        nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
-                        break;
-                    case ResourceDesc::Type::Texture2DArray:
-                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
-                        break;
-                    default:
-                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                        break;
-                }
-
-                nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
-                nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-                nvrhiDesc.isShaderResource = true;
-
-                if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
-                    nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-                    nvrhiDesc.useClearValue = true;
-                    nvrhiDesc.clearValue = nvrhi::Color(0.0f);
-                } else if (resource.desc.isDepthStencil) {
-                    nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-                    nvrhiDesc.isRenderTarget = true;
-                    nvrhiDesc.isTypeless = true;
-                    nvrhiDesc.useClearValue = true;
-                    nvrhiDesc.clearValue = nvrhi::Color(0.0f);
-                } else {
-                    nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-                }
-
-            resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);
-
-            if (resource.nvrhiTexture) {
-                resource.isAllocated = true;
-                totalMemoryAllocated += resource.memorySize;
+            switch (resource.desc.type) {
+                case ResourceDesc::Type::Texture2D:
+                    nvrhiDesc.dimension = resource.desc.sampleCount > 1
+                        ? nvrhi::TextureDimension::Texture2DMS : nvrhi::TextureDimension::Texture2D;
+                    break;
+                case ResourceDesc::Type::Texture3D:
+                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+                    break;
+                case ResourceDesc::Type::TextureCube:
+                    nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+                    break;
+                case ResourceDesc::Type::Texture2DArray:
+                    nvrhiDesc.dimension = resource.desc.sampleCount > 1
+                        ? nvrhi::TextureDimension::Texture2DMSArray : nvrhi::TextureDimension::Texture2DArray;
+                    break;
+                default:
+                    NODEFAULT;
             }
+
+            nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
+            nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+            nvrhiDesc.isShaderResource = true;
+            if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+                nvrhiDesc.useClearValue = true;
+                nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+            } else if (resource.desc.isDepthStencil) {
+                nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
+                nvrhiDesc.isRenderTarget = true;
+                nvrhiDesc.isTypeless = true;
+                nvrhiDesc.useClearValue = true;
+                nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+            } else {
+                nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            }
+            resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);
         }
     }
 
-    m_stats.totalMemoryAllocated = totalMemoryAllocated;
+    resource.isAllocated = resource.nvrhiTexture || resource.nvrhiBuffer;
+    R_ASSERT3(resource.isAllocated, "Failed to allocate framegraph resource", resource.desc.debugName.c_str());
+    m_stats.totalMemoryAllocated += resource.memorySize;
 }
 
 void FrameGraph::InsertResourceBarriers() {

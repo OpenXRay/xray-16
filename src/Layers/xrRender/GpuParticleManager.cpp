@@ -543,6 +543,58 @@ void GpuParticleManager::SetProgramMaterial(u32 program,u32 material,u32 blend,u
     value.shaderVariant = variant;
     m_impl->definitionsDirty = true;
 }
+xr_vector<GpuParticleManager::ActionParam> GpuParticleManager::GetActionParams(const PS::CPEDef& definition) const {
+    std::lock_guard lock(m_impl->mutex);
+    xr_vector<ActionParam> result;
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i) {
+        if (m_impl->definitions[i] != &definition) continue;
+        const auto& program = m_impl->programs[i];
+        for (u32 j = 0; j < program.actionCount; ++j) {
+            const auto& action = m_impl->actions[program.actionFirst + j];
+            if (action.type == 10)
+                result.push_back({action.type, action.p0.x});
+            else if (action.type == 21)
+                result.push_back({action.type, action.p0.y});
+        }
+        break;
+    }
+    return result;
+}
+void GpuParticleManager::SetActionParam(const PS::CPEDef& definition,u32 actionIndex,float value) {
+    std::lock_guard lock(m_impl->mutex);
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i) {
+        if (m_impl->definitions[i] != &definition) continue;
+        const auto& program = m_impl->programs[i];
+        u32 match = 0;
+        for (u32 j = 0; j < program.actionCount; ++j) {
+            auto& action = m_impl->actions[program.actionFirst + j];
+            if (action.type != 10 && action.type != 21) continue;
+            if (match++ != actionIndex) continue;
+            float& target = action.type == 10 ? action.p0.x : action.p0.y;
+            if (target == value) return;
+            target = value;
+            m_impl->definitionsDirty = true;
+            return;
+        }
+        break;
+    }
+}
+float GpuParticleManager::GetTimeLimit(const PS::CPEDef& definition) const {
+    std::lock_guard lock(m_impl->mutex);
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i)
+        if (m_impl->definitions[i] == &definition) return m_impl->programs[i].timeLimit;
+    return 0.f;
+}
+void GpuParticleManager::SetTimeLimit(const PS::CPEDef& definition,float value) {
+    std::lock_guard lock(m_impl->mutex);
+    for (u32 i = 0; i < m_impl->definitions.size(); ++i) {
+        if (m_impl->definitions[i] != &definition) continue;
+        if (m_impl->programs[i].timeLimit == value) return;
+        m_impl->programs[i].timeLimit = value;
+        m_impl->definitionsDirty = true;
+        return;
+    }
+}
 void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvrhi::IDevice* device) {
     ZoneScopedN("GpuPapi.Prepare");
     std::lock_guard lock(m_impl->mutex);
@@ -583,6 +635,12 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
     stats.dynamicCollisionRoots = 0;
     stats.hudRoots = 0;
     stats.childRoots = 0;
+    auto collisionCounts = m_impl->collision.GetCounts();
+    stats.bvhNodes = collisionCounts.bvhNodes;
+    stats.staticTriangles = collisionCounts.staticTriangles;
+    stats.dynamicObjects = collisionCounts.dynamicObjects;
+    stats.dynamicShapes = collisionCounts.dynamicShapes;
+    stats.dynamicTriangles = collisionCounts.dynamicTriangles;
     for (u32 i = 0; i < m_impl->roots.size(); ++i) {
         const auto& root = m_impl->roots[i];
         if (root.live) {
