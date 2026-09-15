@@ -299,7 +299,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
-            auto framebuffer = cache.GetOrCreateFramebuffer("TransparentPass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
@@ -424,7 +424,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::FramebufferDesc distortFbDesc;
             distortFbDesc.addColorAttachment(distortRT);
             distortFbDesc.setDepthAttachment(depthRT);
-            auto distortFB = cache.GetOrCreateFramebuffer("TransparentPass_Distort", distortFbDesc, nvDevice);
+            auto distortFB = cache.GetOrCreateFramebuffer(distortFbDesc, nvDevice);
             if (!distortFB)
                 return;
             cmdList->clearTextureFloat(distortRT, nvrhi::AllSubresources, nvrhi::Color(0.f, 0.f, 0.f, 0.f));
@@ -509,7 +509,7 @@ framegraph::DefaultOutputLayout setupStaticWallmarkPass(
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
-            auto framebuffer = cache.GetOrCreateFramebuffer("StaticWallmarkPass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 

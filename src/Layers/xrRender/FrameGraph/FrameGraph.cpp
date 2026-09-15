@@ -704,8 +704,10 @@ void FrameGraph::BuildDependencyGraph() {
         pass.dependents.clear();
     }
 
-    xr_map<u32, PassNode*> lastWriter;
-    xr_map<u32, xr_vector<PassNode*>> readersSinceWrite;
+    for (auto& resource : m_resources) {
+        resource.lastWriter = nullptr;
+        resource.readersSinceWrite.clear();
+    }
 
     auto addEdge = [](PassNode& pass, PassNode* producer) {
         if (producer == &pass)
@@ -720,31 +722,32 @@ void FrameGraph::BuildDependencyGraph() {
         for (const auto& access : pass.resourceAccesses) {
             if (!access.IsRead()) continue;
 
-            auto it = lastWriter.find(access.resource.index);
-            if (it != lastWriter.end())
-                addEdge(pass, it->second);
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
+            if (resource->lastWriter)
+                addEdge(pass, resource->lastWriter);
         }
 
         for (const auto& access : pass.resourceAccesses) {
             if (!access.IsWrite()) continue;
 
-            auto it = lastWriter.find(access.resource.index);
-            if (it != lastWriter.end())
-                addEdge(pass, it->second);
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
+            if (resource->lastWriter)
+                addEdge(pass, resource->lastWriter);
 
-            auto rit = readersSinceWrite.find(access.resource.index);
-            if (rit != readersSinceWrite.end()) {
-                for (PassNode* reader : rit->second)
-                    addEdge(pass, reader);
-                rit->second.clear();
-            }
+            for (PassNode* reader : resource->readersSinceWrite)
+                addEdge(pass, reader);
+            resource->readersSinceWrite.clear();
         }
 
         for (const auto& access : pass.resourceAccesses) {
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
             if (access.IsRead())
-                readersSinceWrite[access.resource.index].push_back(&pass);
+                resource->readersSinceWrite.push_back(&pass);
             if (access.IsWrite())
-                lastWriter[access.resource.index] = &pass;
+                resource->lastWriter = &pass;
         }
     }
 }

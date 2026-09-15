@@ -303,35 +303,62 @@ nvrhi::ComputePipelineHandle PassResourceCache::GetOrCreateComputePipeline(
 //  FRAMEBUFFER CACHE
 // ═══════════════════════════════════════════════════════════════════════════════
 
+static u64 HashFramebufferAttachment(u64 hash, const nvrhi::FramebufferAttachment& attachment)
+{
+    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(attachment.texture));
+    hash = PassResourceCache::HashCombine(hash, attachment.subresources.baseMipLevel);
+    hash = PassResourceCache::HashCombine(hash, attachment.subresources.numMipLevels);
+    hash = PassResourceCache::HashCombine(hash, attachment.subresources.baseArraySlice);
+    hash = PassResourceCache::HashCombine(hash, attachment.subresources.numArraySlices);
+    hash = PassResourceCache::HashCombine(hash, u64(attachment.format));
+    return PassResourceCache::HashCombine(hash, u64(attachment.isReadOnly));
+}
+
+static bool FramebufferAttachmentsEqual(
+    const nvrhi::FramebufferAttachment& a, const nvrhi::FramebufferAttachment& b)
+{
+    return a.texture == b.texture &&
+        a.subresources.baseMipLevel == b.subresources.baseMipLevel &&
+        a.subresources.numMipLevels == b.subresources.numMipLevels &&
+        a.subresources.baseArraySlice == b.subresources.baseArraySlice &&
+        a.subresources.numArraySlices == b.subresources.numArraySlices &&
+        a.format == b.format && a.isReadOnly == b.isReadOnly;
+}
+
+static bool FramebufferDescsEqual(const nvrhi::FramebufferDesc& a, const nvrhi::FramebufferDesc& b)
+{
+    if (a.colorAttachments.size() != b.colorAttachments.size() ||
+        !FramebufferAttachmentsEqual(a.depthAttachment, b.depthAttachment) ||
+        !FramebufferAttachmentsEqual(a.shadingRateAttachment, b.shadingRateAttachment))
+        return false;
+    for (size_t i = 0; i < a.colorAttachments.size(); ++i)
+        if (!FramebufferAttachmentsEqual(a.colorAttachments[i], b.colorAttachments[i]))
+            return false;
+    return true;
+}
+
 nvrhi::FramebufferHandle PassResourceCache::GetOrCreateFramebuffer(
-    const char* passName,
     const nvrhi::FramebufferDesc& desc,
     nvrhi::IDevice* device)
 {
-    // Key combines pass name with all render target pointers
-    // This ensures we reuse framebuffers when the same RTs are bound
-    u64 key = HashString(passName);
+    u64 key = desc.colorAttachments.size();
+    for (const auto& attachment : desc.colorAttachments)
+        key = HashFramebufferAttachment(key, attachment);
+    key = HashFramebufferAttachment(key, desc.depthAttachment);
+    key = HashFramebufferAttachment(key, desc.shadingRateAttachment);
 
-    for (const auto& attachment : desc.colorAttachments) {
-        if (attachment.texture) {
-            key = HashCombine(key, HashPointer(attachment.texture));
+    const auto range = m_framebuffers.equal_range(key);
+    for (auto it = range.first; it != range.second; ++it) {
+        if (FramebufferDescsEqual(desc, it->second->getDesc())) {
+            m_stats.framebufferHits++;
+            return it->second;
         }
     }
-    if (desc.depthAttachment.texture) {
-        key = HashCombine(key, HashPointer(desc.depthAttachment.texture));
-    }
 
-    auto it = m_framebuffers.find(key);
-    if (it != m_framebuffers.end()) {
-        m_stats.framebufferHits++;
-        return it->second;
-    }
-
-    // Create new framebuffer
     m_stats.framebufferMisses++;
     nvrhi::FramebufferHandle fb = device->createFramebuffer(desc);
     if (fb) {
-        m_framebuffers[key] = fb;
+        m_framebuffers.emplace(key, fb);
     }
     return fb;
 }

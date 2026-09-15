@@ -104,7 +104,7 @@ framegraph::VirtualResourceHandle setupPresentPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputTexture);
-            auto framebuffer = cache.GetOrCreateFramebuffer("Present", fbDesc, device);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, device);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

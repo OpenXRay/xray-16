@@ -2793,7 +2793,7 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, fg::ImGuiRendererNVRH
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
 
-    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    nvrhi::FramebufferHandle framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, m_device->GetNVRHIDevice());
     if (!framebuffer) {
         Msg("! [FrameGraphRenderer] Failed to create framebuffer for ImGui");
         return;

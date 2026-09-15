@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SkyPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgEnvironmentRender.h"
@@ -36,7 +37,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             CEnvironment* environment = g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr;
             if (!environment) return;

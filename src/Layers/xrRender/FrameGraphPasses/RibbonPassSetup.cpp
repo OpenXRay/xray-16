@@ -265,7 +265,7 @@ RibbonPassOutput setupRibbonPass(
             fbDesc.addColorAttachment(colorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = GetPassResourceCache();
-            auto framebuffer = cache.GetOrCreateFramebuffer("RibbonPass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 

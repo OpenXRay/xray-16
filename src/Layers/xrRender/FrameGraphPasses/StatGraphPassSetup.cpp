@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "StatGraphPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgStatGraphRender.h"
@@ -38,7 +39,7 @@ framegraph::VirtualResourceHandle setupStatGraphPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             data.renderer->Draw(cmdList, framebuffer, data.width, data.height);
         });

@@ -1874,7 +1874,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorTexture);
             fbDesc.setDepthAttachment(depthTexture);
-            nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
+            nvrhi::FramebufferHandle framebuffer = framegraph::GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, nvDevice);
 
             nvrhi::GraphicsState gfxState;
             gfxState.pipeline = mgr->m_debugGraphicsPipeline;

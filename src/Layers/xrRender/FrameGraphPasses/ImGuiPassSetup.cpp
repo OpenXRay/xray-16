@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "ImGuiPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/ImGuiRendererNVRHI.h"
@@ -67,7 +68,7 @@ framegraph::VirtualResourceHandle setupImGuiPass(
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
 
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             // Render ImGui using the explicit framebuffer/cmdList method
             data.renderer->Render(drawData, framebuffer, cmdList);

@@ -668,7 +668,7 @@ ParticlePassOutput setupParticlePass(
                 fbDesc.addColorAttachment(baseColorRT);
             fbDesc.setDepthAttachment(depthRT);
             auto& cache = framegraph::GetPassResourceCache();
-            auto framebuffer = cache.GetOrCreateFramebuffer("ParticlePass", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
             if (!framebuffer)
                 return;
 
@@ -979,7 +979,7 @@ ParticlePassOutput setupParticlePass(
             nvrhi::FramebufferDesc distortFbDesc;
             distortFbDesc.addColorAttachment(distortRT);
             distortFbDesc.setDepthAttachment(depthRT);
-            auto distortFB = cache.GetOrCreateFramebuffer("ParticlePass_distort", distortFbDesc, nvDevice);
+            auto distortFB = cache.GetOrCreateFramebuffer(distortFbDesc, nvDevice);
             if (!distortFB)
                 return;
 

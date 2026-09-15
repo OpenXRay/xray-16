@@ -7,6 +7,8 @@
 
 namespace xray::render::framegraph {
 
+struct PassNode;
+
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  RESOURCE DESCRIPTION (LOGICAL)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -90,6 +92,9 @@ private:
 struct ResourceNode {
     ResourceDesc desc;
     VirtualResourceHandle handle;
+
+    PassNode* lastWriter = nullptr;
+    xr_vector<PassNode*> readersSinceWrite;
 
     // Lifetime tracking
     u32 firstUsedPass = INVALID_INDEX;  // First pass that accesses this

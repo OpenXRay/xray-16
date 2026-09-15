@@ -95,10 +95,7 @@ public:
     // ═══════════════════════════════════════════════════════
     //  FRAMEBUFFER CACHE
     // ═══════════════════════════════════════════════════════
-    // Framebuffers keyed by render target pointer combination
-    // This allows reuse when same RTs are used in different frames
     nvrhi::FramebufferHandle GetOrCreateFramebuffer(
-        const char* passName,
         const nvrhi::FramebufferDesc& desc,
         nvrhi::IDevice* device);
 
@@ -184,7 +181,7 @@ private:
     xr_map<u64, nvrhi::BindingLayoutHandle> m_bindingLayouts;
     xr_map<u64, nvrhi::GraphicsPipelineHandle> m_graphicsPipelines;
     xr_map<u64, nvrhi::ComputePipelineHandle> m_computePipelines;
-    xr_map<u64, nvrhi::FramebufferHandle> m_framebuffers;
+    xr_multimap<u64, nvrhi::FramebufferHandle> m_framebuffers;
     xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
     xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
     xr_map<u64, fg::BufferHandle> m_volatileCBs;

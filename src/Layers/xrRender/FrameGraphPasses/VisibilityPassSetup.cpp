@@ -183,7 +183,7 @@ void renderVisibilityRaster(
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.addColorAttachment(visRT);
     fbDesc.setDepthAttachment(depthRT);
-    auto framebuffer = cache.GetOrCreateFramebuffer("VisibilityRaster", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return;
 
