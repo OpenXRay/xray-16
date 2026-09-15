@@ -145,12 +145,28 @@ u32 BuildCollisionTree(xr_vector<CollisionNode>& nodes, xr_vector<CollisionTrian
 
 struct CollisionBuffer
 {
+    struct Range
+    {
+        size_t first;
+        size_t end;
+    };
+
     nvrhi::BufferHandle buffer;
-    xr_vector<u8> uploaded;
+    xr_vector<Range> dirty;
+
+    void Mark(size_t first, size_t end)
+    {
+        if (first == end)
+            return;
+        if (!dirty.empty() && dirty.back().end >= first)
+            dirty.back().end = std::max(dirty.back().end, end);
+        else
+            dirty.push_back({first, end});
+    }
 
     template <typename T>
     void Upload(nvrhi::IDevice* device, nvrhi::ICommandList* commandList, const char* name,
-        const xr_vector<T>& values)
+        const xr_vector<T>& values, u64& bindingVersion, bool full = false)
     {
         const T empty{};
         const T* data = values.empty() ? &empty : values.data();
@@ -158,22 +174,47 @@ struct CollisionBuffer
         if (!buffer || buffer->getDesc().byteSize < bytes)
         {
             nvrhi::BufferDesc description;
-            description.byteSize = bytes;
+            description.byteSize = std::max<u64>(bytes, buffer ? buffer->getDesc().byteSize * 2 : bytes);
             description.structStride = sizeof(T);
             description.debugName = name;
             description.initialState = nvrhi::ResourceStates::ShaderResource;
             description.keepInitialState = true;
             buffer = device->createBuffer(description);
             R_ASSERT2(buffer, "GPU particle collision buffer allocation failed");
-            uploaded.clear();
+            ++bindingVersion;
+            full = true;
         }
-        if (uploaded.size() != bytes || memcmp(uploaded.data(), data, bytes) != 0)
-        {
+        if (full)
             commandList->writeBuffer(buffer, data, bytes);
-            const auto* begin = reinterpret_cast<const u8*>(data);
-            uploaded.assign(begin, begin + bytes);
-        }
+        else
+            for (const auto& range : dirty)
+            {
+                const size_t end = std::min(range.end, values.size());
+                if (range.first < end)
+                    commandList->writeBuffer(buffer, data + range.first,
+                        (end - range.first) * sizeof(T), range.first * sizeof(T));
+            }
+        dirty.clear();
     }
+};
+
+template <typename T>
+void StoreCollisionValue(xr_vector<T>& values, CollisionBuffer& buffer, size_t index, const T& value)
+{
+    if (index == values.size())
+        values.push_back(value);
+    else if (memcmp(&values[index], &value, sizeof(T)) == 0)
+        return;
+    else
+        values[index] = value;
+    buffer.Mark(index, index + 1);
+}
+
+struct CollisionTriangleRange
+{
+    u64 revision;
+    u32 first;
+    u32 count;
 };
 }
 
@@ -191,7 +232,8 @@ struct GpuParticleCollision::State
     xr_vector<CollisionTriangle> dynamicTriangles;
     xr_vector<CollisionShape> shapes;
     xr_vector<CollisionObject> objects;
-    xr_vector<Fvector> boneTriangles;
+    xr_vector<CollisionTriangleRange> triangleRanges;
+    xr_vector<CollisionNode> blocks;
     xr_vector<CollisionCounts> counts{1};
     CollisionBuffer nodeBuffer;
     CollisionBuffer staticBuffer;
@@ -199,6 +241,8 @@ struct GpuParticleCollision::State
     CollisionBuffer shapeBuffer;
     CollisionBuffer objectBuffer;
     CollisionBuffer countBuffer;
+    CollisionBuffer blockBuffer;
+    u64 bindingVersion{};
 
     bool UpdateStatic()
     {
@@ -236,11 +280,15 @@ struct GpuParticleCollision::State
 
     void UpdateDynamic()
     {
-        objects.clear();
-        shapes.clear();
-        dynamicTriangles.clear();
+        u32 objectCount = 0;
+        u32 shapeCount = 0;
+        u32 triangleCount = 0;
+        u32 rangeCount = 0;
         if (!g_pGameLevel || !g_pGameLevel->bReady || !g_pGamePersistent)
+        {
+            ClearDynamic();
             return;
+        }
         auto& list = g_pGameLevel->Objects;
         for (u32 index = 0; index != list.o_count(); ++index)
         {
@@ -256,15 +304,18 @@ struct GpuParticleCollision::State
             R_ASSERT2(skeleton, "GPU particle collision encountered an unknown object collision form");
             skeleton->RefreshCollisionGeometry();
             CollisionObject gpuObject{};
-            gpuObject.first = static_cast<u32>(shapes.size());
+            gpuObject.first = shapeCount;
             gpuObject.mesh = dynamic_cast<CCF_DynamicMesh*>(form) != nullptr;
             gpuObject.spatialSphere = Vector4(spatial.sphere.P, spatial.sphere.R);
             Fvector center;
             object->XFORM().transform_tiny(center, form->getSphere().P);
             gpuObject.sphere = Vector4(center, form->getSphere().R);
-            Fmatrix inverse;
-            inverse.invert(object->XFORM());
-            MatrixRows(inverse, gpuObject.row0, gpuObject.row1, gpuObject.row2);
+            if (gpuObject.mesh)
+            {
+                Fmatrix inverse;
+                inverse.invert(object->XFORM());
+                MatrixRows(inverse, gpuObject.row0, gpuObject.row1, gpuObject.row2);
+            }
             auto* kinematics = gpuObject.mesh ? dynamic_cast<CKinematics*>(object->Visual()) : nullptr;
             R_ASSERT(!gpuObject.mesh || kinematics);
             for (const auto& element : skeleton->_GetElements())
@@ -291,28 +342,84 @@ struct GpuParticleCollision::State
                 default:
                     NODEFAULT;
                 }
-                shape.triangleFirst = static_cast<u32>(dynamicTriangles.size());
+                shape.triangleFirst = triangleCount;
                 if (kinematics)
                 {
-                    boneTriangles.clear();
                     for (auto* child : kinematics->children)
                     {
                         auto* mesh = dynamic_cast<CSkeletonX*>(child);
                         R_ASSERT(mesh);
-                        mesh->ExportCollisionTriangles(element.elem_id, boneTriangles);
+                        const auto& cached = mesh->ExportCollisionTriangles(element.elem_id);
+                        R_ASSERT(cached.vertices.size() % 3 == 0);
+                        const u32 count = static_cast<u32>(cached.vertices.size() / 3);
+                        const CollisionTriangleRange range{cached.revision, triangleCount, count};
+                        const bool changed = rangeCount == triangleRanges.size()
+                            || triangleRanges[rangeCount].revision != range.revision
+                            || triangleRanges[rangeCount].first != range.first
+                            || triangleRanges[rangeCount].count != range.count;
+                        if (rangeCount == triangleRanges.size())
+                            triangleRanges.push_back(range);
+                        else
+                            triangleRanges[rangeCount] = range;
+                        ++rangeCount;
+                        if (changed)
+                        {
+                            if (dynamicTriangles.size() < size_t(triangleCount) + count)
+                                dynamicTriangles.resize(size_t(triangleCount) + count);
+                            for (u32 triangle = 0; triangle != count; ++triangle)
+                            {
+                                const auto* vertices = cached.vertices.data() + size_t(triangle) * 3;
+                                dynamicTriangles[triangleCount + triangle] = {Vector4(vertices[0]),
+                                    Vector4(vertices[1]), Vector4(vertices[2])};
+                            }
+                            dynamicBuffer.Mark(triangleCount, size_t(triangleCount) + count);
+                        }
+                        triangleCount += count;
                     }
-                    R_ASSERT(boneTriangles.size() % 3 == 0);
-                    shape.triangleCount = static_cast<u32>(boneTriangles.size() / 3);
-                    for (size_t triangle = 0; triangle != boneTriangles.size(); triangle += 3)
-                        dynamicTriangles.push_back({Vector4(boneTriangles[triangle]),
-                            Vector4(boneTriangles[triangle + 1]), Vector4(boneTriangles[triangle + 2])});
+                    shape.triangleCount = triangleCount - shape.triangleFirst;
                 }
-                shapes.push_back(shape);
+                StoreCollisionValue(shapes, shapeBuffer, shapeCount++, shape);
             }
-            gpuObject.count = static_cast<u32>(shapes.size()) - gpuObject.first;
+            gpuObject.count = shapeCount - gpuObject.first;
             if (gpuObject.count)
-                objects.push_back(gpuObject);
+                StoreCollisionValue(objects, objectBuffer, objectCount++, gpuObject);
         }
+        objects.resize(objectCount);
+        shapes.resize(shapeCount);
+        dynamicTriangles.resize(triangleCount);
+        triangleRanges.resize(rangeCount);
+        u32 blockCount = 0;
+        for (u32 first = 0; first < objectCount; first += 16)
+        {
+            CollisionNode block{};
+            block.first = first;
+            block.count = std::min(16u, objectCount - first);
+            block.minimum.set(flt_max, flt_max, flt_max);
+            block.maximum.set(-flt_max, -flt_max, -flt_max);
+            for (u32 offset = 0; offset != block.count; ++offset)
+            {
+                const auto& sphere = objects[first + offset].spatialSphere;
+                const float margin = (std::max({std::abs(sphere.x), std::abs(sphere.y),
+                    std::abs(sphere.z), std::abs(sphere.w)}) + 1.f)
+                    * (8.f * std::numeric_limits<float>::epsilon());
+                const float radius = std::abs(sphere.w) + margin;
+                IncludePoint(block.minimum, block.maximum,
+                    {sphere.x - radius, sphere.y - radius, sphere.z - radius, 0.f});
+                IncludePoint(block.minimum, block.maximum,
+                    {sphere.x + radius, sphere.y + radius, sphere.z + radius, 0.f});
+            }
+            StoreCollisionValue(blocks, blockBuffer, blockCount++, block);
+        }
+        blocks.resize(blockCount);
+    }
+
+    void ClearDynamic()
+    {
+        objects.clear();
+        shapes.clear();
+        dynamicTriangles.clear();
+        triangleRanges.clear();
+        blocks.clear();
     }
 };
 
@@ -332,25 +439,26 @@ void GpuParticleCollision::Update(nvrhi::IDevice* device, nvrhi::ICommandList* c
     if (collision && (definitionFlags & PS::CPEDef::dfCollisionDyn) != 0)
         state->UpdateDynamic();
     else
-    {
-        state->objects.clear();
-        state->shapes.clear();
-        state->dynamicTriangles.clear();
-    }
-    auto& counts = state->counts[0];
+        state->ClearDynamic();
+    CollisionCounts counts{};
     counts.nodes = static_cast<u32>(state->nodes.size());
     counts.objects = static_cast<u32>(state->objects.size());
     counts.staticTriangles = static_cast<u32>(state->staticTriangles.size());
     counts.dynamicTriangles = static_cast<u32>(state->dynamicTriangles.size());
+    StoreCollisionValue(state->counts, state->countBuffer, 0, counts);
     if (staticChanged || !state->nodeBuffer.buffer)
     {
-        state->nodeBuffer.Upload(device, commandList, "GpuParticleCollisionNodes", state->nodes);
-        state->staticBuffer.Upload(device, commandList, "GpuParticleCollisionStaticTriangles", state->staticTriangles);
+        state->nodeBuffer.Upload(device, commandList, "GpuParticleCollisionNodes", state->nodes,
+            state->bindingVersion, true);
+        state->staticBuffer.Upload(device, commandList, "GpuParticleCollisionStaticTriangles", state->staticTriangles,
+            state->bindingVersion, true);
     }
-    state->dynamicBuffer.Upload(device, commandList, "GpuParticleCollisionDynamicTriangles", state->dynamicTriangles);
-    state->shapeBuffer.Upload(device, commandList, "GpuParticleCollisionShapes", state->shapes);
-    state->objectBuffer.Upload(device, commandList, "GpuParticleCollisionObjects", state->objects);
-    state->countBuffer.Upload(device, commandList, "GpuParticleCollisionCounts", state->counts);
+    state->dynamicBuffer.Upload(device, commandList, "GpuParticleCollisionDynamicTriangles", state->dynamicTriangles,
+        state->bindingVersion);
+    state->shapeBuffer.Upload(device, commandList, "GpuParticleCollisionShapes", state->shapes, state->bindingVersion);
+    state->objectBuffer.Upload(device, commandList, "GpuParticleCollisionObjects", state->objects, state->bindingVersion);
+    state->blockBuffer.Upload(device, commandList, "GpuParticleCollisionBlocks", state->blocks, state->bindingVersion);
+    state->countBuffer.Upload(device, commandList, "GpuParticleCollisionCounts", state->counts, state->bindingVersion);
 }
 
 void GpuParticleCollision::Bind(framegraph::BindingSetBuilder& builder) const
@@ -361,11 +469,19 @@ void GpuParticleCollision::Bind(framegraph::BindingSetBuilder& builder) const
         .BufferSRV("g_GpuCollisionStaticTriangles", state->staticBuffer.buffer)
         .BufferSRV("g_GpuCollisionDynamicTriangles", state->dynamicBuffer.buffer)
         .BufferSRV("g_GpuCollisionShapes", state->shapeBuffer.buffer)
-        .BufferSRV("g_GpuCollisionObjects", state->objectBuffer.buffer);
+        .BufferSRV("g_GpuCollisionObjects", state->objectBuffer.buffer)
+        .BufferSRV("g_GpuCollisionBlocks", state->blockBuffer.buffer);
+}
+
+u64 GpuParticleCollision::GetBindingVersion() const
+{
+    return state->bindingVersion;
 }
 
 void GpuParticleCollision::Reset()
 {
+    const u64 bindingVersion = state->bindingVersion + 1;
     state = std::make_unique<State>();
+    state->bindingVersion = bindingVersion;
 }
 }

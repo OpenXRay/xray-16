@@ -38,6 +38,13 @@ public:
         RM_SKINNING_4B_HQ
     };
 
+    struct CollisionTriangles
+    {
+        xr_vector<Fvector> vertices;
+        u64 revision{};
+        u64 poseRevision{};
+    };
+
 protected:
     enum
     {
@@ -69,7 +76,10 @@ protected:
     xr_vector<u16> collisionIndices;
     xr_vector<u8> collisionVertices;
     xr_vector<Fmatrix> collisionPose;
-    xr_map<u16, xr_vector<Fvector>> collisionTriangles;
+    xr_map<u16, CollisionTriangles> collisionTriangles;
+    xr_vector<Fvector> collisionSkinnedVertices;
+    xr_vector<u8> collisionSkinnedValid;
+    u64 collisionPoseRevision{};
     u32 collisionPoseFrame{u32(-1)};
 
     void _Copy(CSkeletonX* V);
@@ -125,7 +135,7 @@ public:
     const ref_smem<vertBoned2W>& GetVertices2W() const { return Vertices2W; }
     const ref_smem<vertBoned3W>& GetVertices3W() const { return Vertices3W; }
     const ref_smem<vertBoned4W>& GetVertices4W() const { return Vertices4W; }
-    void ExportCollisionTriangles(u16 bone, xr_vector<Fvector>& triangles);
+    const CollisionTriangles& ExportCollisionTriangles(u16 bone);
 };
 
 void get_pos_bones(const vertBoned1W& v, Fvector& p, CKinematics* Parent);

@@ -20,6 +20,7 @@ public:
     void Update(nvrhi::IDevice* device, nvrhi::ICommandList* commandList, u32 definitionFlags);
     void Bind(framegraph::BindingSetBuilder& builder) const;
     void Reset();
+    u64 GetBindingVersion() const;
 
 private:
     struct State;

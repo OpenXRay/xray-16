@@ -2,7 +2,9 @@
 #include "common.h"
 #include "bindless_common.h"
 
+#ifndef GPU_PARTICLE_SET
 Texture2D<float> g_SceneDepth : register(t1);
+#endif
 
 #define DEPTH_EPSILON 0.1
 
@@ -32,6 +34,7 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
     float4 result = diffuseSample * input.color;
 
+#ifndef GPU_PARTICLE_SET
     float sceneDepth = g_SceneDepth.Load(int3((int2)input.hpos.xy, 0));
     bool hud = input.drawBucket >= 6u;
     if (input.drawBucket % 6u != 0u && sceneDepth > 0.0 && (!hud || sceneDepth >= 0.9)) {
@@ -46,6 +49,7 @@ PS_OUTPUT main(PS_INPUT input)
         result.a *= soft;
         result.rgb *= soft;
     }
+#endif
     clip(result.a - (0.01 / 255.0));
 
     output.color = result;

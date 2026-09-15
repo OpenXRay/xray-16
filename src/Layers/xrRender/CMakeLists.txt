@@ -219,6 +219,9 @@ target_sources(xrRender PRIVATE
     ParticleEffect.cpp
     ParticleEffectDef.cpp
     ParticleGroup.cpp
+    ParticleEditor/ParticleLibraryDocument.cpp
+    ParticleEditor/ParticleLibraryPreview.cpp
+    ParticleEditor/ParticleEditor.cpp
     Profiler/GPUProfiler.cpp
     Profiler/StatsOverlay.cpp
     ResourceManager/AsyncIO.cpp

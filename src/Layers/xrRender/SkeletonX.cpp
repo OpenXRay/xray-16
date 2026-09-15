@@ -28,7 +28,10 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     collisionIndices.clear();
     collisionVertices.clear();
     collisionPose.clear();
-    collisionTriangles.clear();
+    for (auto& entry : collisionTriangles)
+        entry.second.revision = 0;
+    collisionSkinnedVertices.clear();
+    collisionSkinnedValid.clear();
     collisionPoseFrame = u32(-1);
     Parent = nullptr;
     ChildIDX = B->ChildIDX;
@@ -52,7 +55,10 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     collisionIndices.clear();
     collisionVertices.clear();
     collisionPose.clear();
-    collisionTriangles.clear();
+    for (auto& entry : collisionTriangles)
+        entry.second.revision = 0;
+    collisionSkinnedVertices.clear();
+    collisionSkinnedValid.clear();
     collisionPoseFrame = u32(-1);
     s_bones_array_const = "sbones_array";
     xr_vector<u16> bids;

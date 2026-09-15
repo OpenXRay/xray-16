@@ -30,6 +30,7 @@ public:
 
 public:
     bool Load(LPCSTR nm);
+    bool Load(IReader& reader);
     bool Save(LPCSTR nm);
 
     bool Load2();

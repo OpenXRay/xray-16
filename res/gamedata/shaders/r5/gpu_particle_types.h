@@ -24,7 +24,7 @@ struct GpuPapiDomain {
     float4 p1,p2,u,v,radii;
 };
 struct GpuPapiAction {
-    uint type,flags,pad0,pad1;
+    uint type,flags,pad0,stateIndex;
     GpuPapiDomain domains[5];
     float4 p0,p1,p2,p3;
 };
@@ -41,7 +41,7 @@ struct GpuPapiProgram {
     float2 frameSize; float frameSpeed; uint frameCount;
     float3 alignRotation; uint frameDimX;
     float3 velocityScale; uint maxParticles;
-    uint actionFirst,actionCount,pad0,pad1;
+    uint actionFirst,actionCount,stateCount,pad1;
     float collisionFriction,collisionResilience,collisionCutoff,timeLimit;
 };
 struct GpuPapiEmitter {

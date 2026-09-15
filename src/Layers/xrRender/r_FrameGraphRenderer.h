@@ -27,6 +27,7 @@ struct ImDrawData;
 namespace xray::render::fg
 {
 class IRender_DetailModel;
+class ParticleEditor;
 
 struct ShaderMacro
 {
@@ -446,6 +447,7 @@ private:
 
     xr_unique_ptr<xray::profiler::GPUProfiler> m_gpuProfiler;
     xr_unique_ptr<xray::profiler::StatsOverlay> m_statsOverlay;
+    xr_unique_ptr<fg::ParticleEditor> m_particleEditor;
 
     xr_vector<ISpatial*> m_lstRenderables;
     xr_vector<ISpatial*> m_lstShadowCasters;

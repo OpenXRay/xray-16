@@ -96,6 +96,7 @@ public:
     void SetRenderContext(fg::RenderContext* context) { m_context = context; }
 
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+    xray::profiler::GPUProfiler* GetGPUProfiler() const { return m_gpuProfiler; }
 
     const FrameArena::Stats& GetFrameArenaStats() const { return m_frameArena.GetStats(); }
 

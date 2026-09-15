@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "ModelPool.h"
+#include "r_FrameGraphRenderer.h"
 
 #include "xrMaterialSystem/GameMtlLib.h"
 
@@ -451,7 +452,7 @@ dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)
 dxRender_Visual* CModelPool::CreatePG(PS::CPGDef* source)
 {
     PS::CParticleGroup* V = (PS::CParticleGroup*)Instance_Create(MT_PARTICLE_GROUP);
-    V->Compile(source);
+    V->Compile(source, RImplementation.m_PSLibrary);
     return V;
 }
 

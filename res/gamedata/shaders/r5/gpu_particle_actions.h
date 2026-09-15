@@ -101,8 +101,9 @@ float3 GpuPapiAvoid(GpuPapiDomain domain, float3 position, float3 velocity, floa
 }
 
 float3 GpuPapiBounce(GpuPapiDomain domain, float3 position, float3 velocity, float4 parameters,
-    float dt, inout uint rng)
+    float dt)
 {
+    uint rng = 1u;
     float3 normal = domain.p2.xyz;
     bool inside = false;
     if (domain.type == 5u)
@@ -130,11 +131,104 @@ float3 GpuPapiBounce(GpuPapiDomain domain, float3 position, float3 velocity, flo
 
 bool GpuPapiSerialAction(uint type)
 {
-    return type == 1u || type == 6u || type == 7u || type == 9u || type == 10u || type == 11u ||
+    return type == 7u || type == 9u || type == 10u || type == 11u ||
         type == 15u || type == 16u || type == 17u || type == 19u || type == 20u || type == 21u;
 }
 
-void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, uint actionIndex,
+bool GpuPapiLocalAction(uint type)
+{
+    return type == 3u || type == 4u || type == 8u || type == 12u ||
+        type == 22u || type == 23u || type == 24u || type == 25u || type == 26u ||
+        type == 27u || type == 28u;
+}
+
+void GpuPapiExecuteLocalParticle(uint type, float4 p0, float4 p1, float dt, float killOldTime,
+    inout GpuPapiParticle particle)
+{
+    switch (type)
+    {
+    case 3u:
+        if (p0.x != 0.0)
+            particle.positionB = particle.position;
+        break;
+    case 4u:
+    {
+        float squared = dot(particle.velocity, particle.velocity);
+        if (squared >= p0.w && squared <= p1.x)
+            particle.velocity *= 1.0 - (1.0 - p0.xyz) * dt;
+        break;
+    }
+    case 8u:
+        particle.velocity += p0.xyz * dt;
+        break;
+    case 12u:
+        particle.age += dt;
+        particle.positionB = particle.position;
+        particle.position += particle.velocity * dt;
+        break;
+    case 22u:
+    {
+        float squared = dot(particle.velocity, particle.velocity);
+        if (squared < p0.x * p0.x && squared != 0.0)
+            particle.velocity *= p0.x / sqrt(squared);
+        else if (squared > p0.y * p0.y)
+            particle.velocity *= p0.y / sqrt(squared);
+        break;
+    }
+    case 23u:
+        if (particle.age >= p1.y * killOldTime && particle.age <= p1.z * killOldTime)
+        {
+            float4 color = GpuPapiUnpackColor(particle.color);
+            particle.color = GpuPapiPackColor(color + (p0 - color) * (p1.x * dt));
+        }
+        break;
+    case 24u:
+        particle.size += (p0.xyz - particle.size) * (p1.xyz * dt);
+        break;
+    case 25u:
+    case 26u:
+        particle.rotation.x += (abs(p0.x) - abs(particle.rotation.x)) *
+            (particle.rotation.x >= 0.0 ? p0.w * dt : -p0.w * dt);
+        break;
+    case 27u:
+    case 28u:
+        particle.velocity += (p0.xyz - particle.velocity) * (p0.w * dt);
+        break;
+    }
+}
+
+groupshared uint g_GroupLocalType[16];
+groupshared float4 g_GroupLocalP0[16];
+groupshared float4 g_GroupLocalP1[16];
+
+void GpuPapiExecuteLocalSegment(GpuPapiEmitter emitter, uint actionFirst, uint actionCount,
+    float dt, float killOldTime, uint lane)
+{
+    if (lane < actionCount)
+    {
+        uint actionDataIndex = actionFirst + lane;
+        uint type = g_Actions[actionDataIndex].type;
+        float4 p0 = g_Actions[actionDataIndex].p0;
+        if (type == 27u || type == 28u)
+            p0.xyz = GpuPapiDirection(emitter, g_Actions[actionDataIndex].flags, p0.xyz);
+        g_GroupLocalType[lane] = type;
+        g_GroupLocalP0[lane] = p0;
+        g_GroupLocalP1[lane] = g_Actions[actionDataIndex].p1;
+    }
+    GroupMemoryBarrierWithGroupSync();
+    for (uint ordinal = lane; ordinal < emitter.count; ordinal += 64u)
+    {
+        uint index = GpuParticleIndex(emitter, ordinal);
+        GpuPapiParticle particle = g_Particles[index];
+        for (uint action = 0; action < actionCount; ++action)
+            GpuPapiExecuteLocalParticle(g_GroupLocalType[action], g_GroupLocalP0[action],
+                g_GroupLocalP1[action], dt, killOldTime, particle);
+        g_Particles[index] = particle;
+    }
+    AllMemoryBarrierWithGroupSync();
+}
+
+void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex,
     float dt, inout float killOldTime, uint ordinalFirst, uint ordinalStride)
 {
     uint type = g_Actions[actionDataIndex].type;
@@ -143,7 +237,7 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
     uint flags = g_Actions[actionDataIndex].flags;
     float4 p0 = g_Actions[actionDataIndex].p0;
     float4 p1 = g_Actions[actionDataIndex].p1;
-    uint stateIndex = emitter.actionStateFirst + actionIndex;
+    uint stateIndex = emitter.actionStateFirst + g_Actions[actionDataIndex].stateIndex;
     float4 state = 0.0;
     if (type == 5u || type == 18u || type == 30u)
         state = g_GroupActionState;
@@ -210,7 +304,7 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
     {
         state.x += dt;
         octaves = g_Actions[actionDataIndex].pad0;
-        floorCoordinates = (g_Actions[actionDataIndex].pad1 & 1u) != 0u;
+        floorCoordinates = g_Actions[actionDataIndex].p2.y != 0.0;
     }
     float3 center = 0.0;
     if (type == 5u || type == 9u || type == 13u || type == 14u || type == 29u || type == 31u)
@@ -222,9 +316,6 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
         axis = GpuPapiDirection(emitter, flags, p1.xyz);
         maximumRadius = g_Actions[actionDataIndex].p2.x;
     }
-    float3 targetVelocity = 0.0;
-    if (type == 27u || type == 28u)
-        targetVelocity = GpuPapiDirection(emitter, flags, p0.xyz);
     for (uint ordinal = ordinalFirst; ordinal < emitter.count; ordinal += ordinalStride)
     {
         uint index = GpuParticleIndex(emitter, ordinal);
@@ -235,19 +326,8 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
             particle.velocity = GpuPapiAvoid(domain, particle.position, particle.velocity, p0, dt);
             break;
         case 1u:
-            particle.velocity = GpuPapiBounce(domain, particle.position, particle.velocity, p0, dt, emitter.rng);
+            particle.velocity = GpuPapiBounce(domain, particle.position, particle.velocity, p0, dt);
             break;
-        case 3u:
-            if (p0.x != 0.0)
-                particle.positionB = particle.position;
-            break;
-        case 4u:
-        {
-            float squared = dot(particle.velocity, particle.velocity);
-            if (squared >= p0.w && squared <= p1.x)
-                particle.velocity *= 1.0 - (1.0 - p0.xyz) * dt;
-            break;
-        }
         case 5u:
         {
             float3 direction = particle.position - center;
@@ -288,9 +368,6 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
                 }
             }
             break;
-        case 8u:
-            particle.velocity += p0.xyz * dt;
-            break;
         case 9u:
         case 31u:
         {
@@ -307,11 +384,6 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
             }
             break;
         }
-        case 12u:
-            particle.age += dt;
-            particle.positionB = particle.position;
-            particle.position += particle.velocity * dt;
-            break;
         case 13u:
         case 14u:
         {
@@ -353,34 +425,6 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
                 particle.velocity += a + b;
             }
             break;
-        case 22u:
-        {
-            float squared = dot(particle.velocity, particle.velocity);
-            if (squared < p0.x * p0.x && squared != 0.0)
-                particle.velocity *= p0.x / sqrt(squared);
-            else if (squared > p0.y * p0.y)
-                particle.velocity *= p0.y / sqrt(squared);
-            break;
-        }
-        case 23u:
-            if (particle.age >= p1.y * killOldTime && particle.age <= p1.z * killOldTime)
-            {
-                float4 color = GpuPapiUnpackColor(particle.color);
-                particle.color = GpuPapiPackColor(color + (p0 - color) * (p1.x * dt));
-            }
-            break;
-        case 24u:
-            particle.size += (p0.xyz - particle.size) * (p1.xyz * dt);
-            break;
-        case 25u:
-        case 26u:
-            particle.rotation.x += (abs(p0.x) - abs(particle.rotation.x)) *
-                (particle.rotation.x >= 0.0 ? p0.w * dt : -p0.w * dt);
-            break;
-        case 27u:
-        case 28u:
-            particle.velocity += (targetVelocity - particle.velocity) * (p0.w * dt);
-            break;
         case 29u:
         {
             float3 offset = particle.position - center;
@@ -415,7 +459,10 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
             break;
         }
         }
-        g_Particles[index] = particle;
+        if (type == 6u)
+            g_Particles[index].velocity = particle.velocity;
+        else
+            g_Particles[index] = particle;
     }
     if (type == 5u)
         state.x += dt;

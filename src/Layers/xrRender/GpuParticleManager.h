@@ -6,6 +6,7 @@
 #include <memory>
 namespace xray::render::framegraph { class FrameGraph; }
 namespace xray::render::fg {
+class CPSLibrary;
 namespace PS { class CPEDef; }
 using GpuParticleHandle = u64;
 struct GpuParticleSnapshot {
@@ -17,7 +18,12 @@ struct GpuParticleSnapshot {
 struct GpuParticleDrawResources {
     nvrhi::BufferHandle particles,emitters,programs,indices,drawArgs,bucketOffsets;
     u32 particleCapacity = 0;
+    u32 drawBucketMask = 0;
     framegraph::VirtualResourceHandle particleResource,emitterResource,programResource,indexResource,argsResource,bucketResource;
+};
+struct GpuParticleStats {
+    u32 liveRoots = 0,pendingRoots = 0,commands = 0,replayedCommands = 0,bindingSets = 0;
+    u64 commandBytes = 0,readbackBytes = 0;
 };
 class GpuParticleManager {
 public:
@@ -31,11 +37,13 @@ public:
     void SetHudMode(GpuParticleHandle,bool);
     void Tick(GpuParticleHandle,u32 milliseconds);
     bool GetSnapshot(GpuParticleHandle,GpuParticleSnapshot&) const;
-    void ConfigureChildren(GpuParticleHandle,const char* birth,const char* play,const char* death,u32 groupFlags);
+    void ConfigureChildren(GpuParticleHandle,const char* birth,const char* play,const char* death,u32 groupFlags,CPSLibrary& library);
+    void ReleaseDefinition(const PS::CPEDef&);
     const xr_vector<const PS::CPEDef*>& GetDefinitions() const;
     void SetProgramMaterial(u32 program,u32 material,u32 blend,u32 variant);
     void SetupSimulationPasses(framegraph::FrameGraph&,nvrhi::IDevice*);
     GpuParticleDrawResources GetDrawResources() const;
+    GpuParticleStats GetStats() const;
     void LevelUnload();
     void Reset();
 private:

@@ -28,6 +28,7 @@ struct GpuParticlePassState {
     nvrhi::FramebufferInfo framebuffer;
     nvrhi::Format distortionFormat = nvrhi::Format::UNKNOWN;
     const framegraph::ExtractedReflection* vertexReflection = nullptr;
+    const framegraph::ExtractedReflection* setReflection = nullptr;
     const framegraph::ExtractedReflection* pixelReflection = nullptr;
     const framegraph::ExtractedReflection* distortReflection = nullptr;
 };
