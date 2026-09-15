@@ -18,9 +18,11 @@ namespace PS
 {
 class CParticleEffect;
 
+#ifdef _EDITOR
 typedef BOOL (*CollisionCallback)(
     CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
+#endif
 
 class PFunction;
 struct SFrame
@@ -92,8 +94,10 @@ public:
     BOOL SaveActionList(IWriter& F);
     BOOL LoadActionList(IReader& F);
     // execute
+#ifdef _EDITOR
     void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt);
     void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner, CollisionCallback cb) const;
+#endif
 
     CPEDef();
     ~CPEDef();

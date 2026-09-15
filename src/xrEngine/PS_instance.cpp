@@ -6,6 +6,8 @@
 
 #include "PS_instance.h"
 #include "IGame_Persistent.h"
+#include "Include/xrRender/ParticleCustom.h"
+#include "Include/xrRender/RenderVisual.h"
 
 CPS_Instance::CPS_Instance(bool destroy_on_game_load)
     : SpatialBase(g_pGamePersistent->SpatialSpace), m_destroy_on_game_load(destroy_on_game_load)
@@ -47,8 +49,18 @@ void CPS_Instance::shedule_Update(u32 dt)
     // remove???
     if (m_bDead)
         return;
-    if (m_bAutoRemove && m_iLifeTime <= 0)
+    if (m_bAutoRemove && !PSI_alive())
         PSI_destroy();
+}
+
+bool CPS_Instance::PSI_alive()
+{
+    if (m_bDead)
+        return false;
+    if (m_iLifeTime > 0)
+        return true;
+    auto* particles = renderable.visual ? renderable.visual->dcast_ParticleCustom() : nullptr;
+    return particles && particles->IsPlaying();
 }
 //----------------------------------------------------
 void CPS_Instance::PSI_destroy()

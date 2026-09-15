@@ -15,6 +15,7 @@
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
 #include "ParticleEffectDef.h"
+#include "GpuParticleManager.h"
 #include "Shader.h"
 #include "r__scene.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -45,6 +46,7 @@
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
+#include "FrameGraphPasses/GpuParticlePassSetup.h"
 #include "FrameGraphPasses/DistortionApplyPassSetup.h"
 #include "FrameGraphPasses/DecalPassSetup.h"
 #include "Decals/DecalManager.h"
@@ -157,6 +159,13 @@ extern ENGINE_API int ps_r_path_tracer_bounces;
 namespace xray::render {
 
 using namespace fg;
+static u8 QueryParticleBlendMode(LPCSTR shaderName)
+{
+    u32 id = 0;
+    if (!shader_info::GetParticleBlendIndex(shaderName, id))
+        return passes::PARTICLE_BLEND_BLEND;
+    return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
+}
 
 namespace fg {
     extern xray::render::FrameGraphRenderer RImplementation;
@@ -272,6 +281,7 @@ void FrameGraphRenderer::Shutdown() {
     if (auto* backend = m_device->GetBackend())
         backend->WaitForIdle();
 
+    GetGpuParticleManager().Reset();
     m_HWOCC.occq_destroy();
     m_PSLibrary.OnDestroy();
 
@@ -669,15 +679,6 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
         if (m_blackboard)
         {
-            const auto& particleCull = m_blackboard->get_or_add<passes::ParticlePassState>().cullStats;
-            if (particleCull.active)
-            {
-                stats.particleCullSubmitted = particleCull.submittedBatches;
-                stats.particleCullVisible = particleCull.visibleBatches;
-                stats.particleQuadsSubmitted = particleCull.submittedQuads;
-                stats.particleQuadsVisible = particleCull.visibleQuads;
-            }
-
             const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
             stats.vsmActive = vsm.active;
             stats.vsmSunMoving = vsm.sunMoving;
@@ -966,6 +967,28 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    auto& gpuParticles = GetGpuParticleManager();
+    auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
+    if (gpuParticleState.materialCache != m_materialCache.get()) {
+        gpuParticleState.materialCache = m_materialCache.get();
+        gpuParticleState.registeredPrograms = 0;
+    }
+    const auto& particleDefinitions = gpuParticles.GetDefinitions();
+    for (u32 program = gpuParticleState.registeredPrograms; program < particleDefinitions.size(); ++program) {
+        const auto* definition = particleDefinitions[program];
+        sh_list textures;
+        Resources->_ParseList(textures, definition->m_TextureName.c_str());
+        const u32 material = m_materialCache && definition->m_TextureName.size() && !textures.empty()
+            ? m_materialCache->PreRegisterParticleMaterial(textures[0]) : 0;
+        if (material == UINT32_MAX)
+            break;
+        const auto variant = strstr(definition->m_ShaderName.c_str(), "distort")
+            ? passes::ParticleShaderVariant::Distort : passes::ParticleShaderVariant::Standard;
+        gpuParticles.SetProgramMaterial(program, material,
+            QueryParticleBlendMode(definition->m_ShaderName.c_str()), static_cast<u32>(variant));
+        gpuParticleState.registeredPrograms = program + 1;
+    }
+    gpuParticles.SetupSimulationPasses(*m_framegraph, nvDevice);
 
     u32 writeIdx = m_pingPongIndex;
     u32 readIdx = 1 - m_pingPongIndex;
@@ -1510,31 +1533,26 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
     }
 
-    auto particleOutputs = passes::setupParticlePass(
-        *m_framegraph,
-        m_device,
-        transparentOutputs,
-        &m_worldParticleBatches,
-        &m_hudParticleBatches,
-        m_materialCache.get(),
-        width,
-        height,
-        hizOutput.pyramid,
-        hizOutput.width,
-        hizOutput.height,
-        hizOutput.mipLevels,
-        &Device.mFullTransform,
-        framegraph::VirtualResourceHandle(),
-        &m_blackboard->get_or_add<passes::ParticlePassState>()
-    );
+    passes::GpuParticlePassOutputs particleOutputs{
+        transparentOutputs.albedo, transparentOutputs.distortion};
+    if (psDeviceFlags.test(rsDrawParticles)) {
+        particleOutputs = passes::setupGpuParticlePass(
+            *m_framegraph, m_device, gpuParticles.GetDrawResources(), m_materialCache.get(),
+            transparentOutputs.albedo, transparentOutputs.depth, transparentOutputs.normal,
+            transparentOutputs.baseColor, transparentOutputs.distortion, width, height,
+            gpuParticleState);
+    }
+    auto particleLayout = transparentOutputs;
+    particleLayout.albedo = particleOutputs.color;
+    particleLayout.distortion = particleOutputs.distortion;
 
-    auto smokeOutputs = particleOutputs.layout;
+    auto smokeOutputs = particleLayout;
     if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
     {
         smokeOutputs = passes::setupSmokeTrailPass(
             *m_framegraph,
             m_device,
-            particleOutputs.layout,
+            particleLayout,
             m_smokeTrailManager.get(),
             width,
             height,
@@ -1545,10 +1563,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto sceneColor = smokeOutputs.albedo;
 
-    if (particleOutputs.distortionRT.is_valid()) {
+    if (particleOutputs.distortion.is_valid()) {
         sceneColor = passes::setupDistortionApplyPass(
-            *m_framegraph, m_device, sceneColor, particleOutputs.distortionRT,
-            particleOutputs.layout.depth, width, height,
+            *m_framegraph, m_device, sceneColor, particleOutputs.distortion,
+            particleLayout.depth, width, height,
             m_blackboard->get_or_add<passes::DistortionApplyPassState>());
     }
 
@@ -2165,13 +2183,6 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     return true;
 }
 
-static u8 QueryParticleBlendMode(LPCSTR shaderName)
-{
-    u32 id = 0;
-    if (!shader_info::GetParticleBlendIndex(shaderName, id))
-        return passes::PARTICLE_BLEND_BLEND;
-    return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
-}
 
 void FrameGraphRenderer::ProcessSingleParticleEffect(
     fg::PS::CParticleEffect* pEffect,
@@ -2182,33 +2193,17 @@ void FrameGraphRenderer::ProcessSingleParticleEffect(
     if (!pEffect)
         return;
 
-    bool isHUDParticle = isHUD || pEffect->GetHudMode();
-
-    PAPI::Particle* particles = nullptr;
-    u32 particleCount = 0;
-    PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
-    if (particleCount == 0)
-        return;
-
-    auto* pDef = pEffect->GetDefinition();
-    if (!pDef)
-        return;
-
+    const bool hud = isHUD || pEffect->GetHudMode();
+    GetGpuParticleManager().SetHudMode(pEffect->GetGpuHandle(), hud);
     passes::ParticleBatch batch;
     batch.visual = pEffect;
-    batch.worldMatrix = worldTransform;
-    batch.renderable = renderable;
-    batch.isHUDMode = isHUDParticle;
-    batch.particleCount = particleCount;
-    batch.blendMode = QueryParticleBlendMode(pDef->m_ShaderName.c_str());
-
-    if (strstr(pDef->m_ShaderName.c_str(), "distort"))
-        batch.shaderVariant = passes::ParticleShaderVariant::Distort;
-
-    if (m_materialCache && pDef->m_TextureName.size())
-        batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(pDef->m_TextureName);
-
-    if (isHUDParticle)
+    if (pEffect->m_RT_Flags.is(fg::PS::CParticleEffect::flRT_XFORM))
+        batch.worldMatrix = pEffect->m_XFORM;
+    else
+        batch.worldMatrix.identity();
+    batch.isHUDMode = hud;
+    batch.particleCount = pEffect->ParticlesCount();
+    if (hud)
         m_hudParticleBatches.push_back(batch);
     else
         m_worldParticleBatches.push_back(batch);
@@ -2237,18 +2232,6 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
             if (item._effect) {
                 auto* childEffect = static_cast<fg::PS::CParticleEffect*>(item._effect);
                 ProcessSingleParticleEffect(childEffect, worldTransform, renderable, isHUD);
-            }
-            for (auto* child : item._children_related) {
-                if (child && child->getType() == MT_PARTICLE_EFFECT)
-                    ProcessSingleParticleEffect(
-                        static_cast<fg::PS::CParticleEffect*>(child),
-                        worldTransform, renderable, isHUD);
-            }
-            for (auto* child : item._children_free) {
-                if (child && child->getType() == MT_PARTICLE_EFFECT)
-                    ProcessSingleParticleEffect(
-                        static_cast<fg::PS::CParticleEffect*>(child),
-                        worldTransform, renderable, isHUD);
             }
         }
         return true;
@@ -2302,10 +2285,6 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
             for (auto& item : pG->items) {
                 if (item._effect)
                     ForEachLeafVisual(item._effect, fn);
-                for (auto* v : item._children_related)
-                    ForEachLeafVisual(v, fn);
-                for (auto* v : item._children_free)
-                    ForEachLeafVisual(v, fn);
             }
             break;
         }

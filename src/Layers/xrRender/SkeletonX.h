@@ -66,6 +66,12 @@ protected:
         u32 RMS_bonecount; // skinning, maximal bone ID
     };
 
+    xr_vector<u16> collisionIndices;
+    xr_vector<u8> collisionVertices;
+    xr_vector<Fmatrix> collisionPose;
+    xr_map<u16, xr_vector<Fvector>> collisionTriangles;
+    u32 collisionPoseFrame{u32(-1)};
+
     void _Copy(CSkeletonX* V);
     void _Load(const char* N, IReader* data, u32& dwVertCount);
 
@@ -119,6 +125,7 @@ public:
     const ref_smem<vertBoned2W>& GetVertices2W() const { return Vertices2W; }
     const ref_smem<vertBoned3W>& GetVertices3W() const { return Vertices3W; }
     const ref_smem<vertBoned4W>& GetVertices4W() const { return Vertices4W; }
+    void ExportCollisionTriangles(u16 bone, xr_vector<Fvector>& triangles);
 };
 
 void get_pos_bones(const vertBoned1W& v, Fvector& p, CKinematics* Parent);

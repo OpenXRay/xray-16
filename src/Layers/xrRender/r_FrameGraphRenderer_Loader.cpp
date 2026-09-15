@@ -14,6 +14,7 @@
 
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/GpuParticleManager.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
@@ -232,6 +233,7 @@ void FrameGraphRenderer::level_Unload()
         return;
     if (!b_loaded)
         return;
+    GetGpuParticleManager().LevelUnload();
 
     m_HOM.Unload();
 

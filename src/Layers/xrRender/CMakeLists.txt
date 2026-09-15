@@ -95,7 +95,8 @@ target_sources(xrRender PRIVATE
     fgEnvironmentRender.h
     fgEnvironmentRender.cpp
     FrameGraphPasses/ParticlePassSetup.h
-    FrameGraphPasses/ParticlePassSetup.cpp
+    FrameGraphPasses/GpuParticlePassSetup.h
+    FrameGraphPasses/GpuParticlePassSetup.cpp
     FrameGraphPasses/RibbonPassSetup.h
     FrameGraphPasses/RibbonPassSetup.cpp
     FrameGraphPasses/TrailPassSetup.h
@@ -209,6 +210,12 @@ target_sources(xrRender PRIVATE
     PBRConverter/PBRConversionUI.cpp
     PBRConverter/PBRTextureConverter.cpp
     PSLibrary.cpp
+    GpuParticleManager.h
+    GpuParticleManager.cpp
+    GpuParticleTranslate.h
+    GpuParticleTranslate.cpp
+    GpuParticleCollision.h
+    GpuParticleCollision.cpp
     ParticleEffect.cpp
     ParticleEffectDef.cpp
     ParticleGroup.cpp

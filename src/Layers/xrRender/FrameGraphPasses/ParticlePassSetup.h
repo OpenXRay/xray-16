@@ -1,30 +1,6 @@
 #pragma once
 
-#include "Layers/xrRender/FrameGraph/FGTypes.h"
-#include "Layers/xrRender/FrameGraph/FGResource.h"
-#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FBasicVisual.h"
-#include "PassVertexFormats.h"
-
-namespace xray::render::fg {
-    class dxRender_Visual;
-    namespace PS {
-        class CParticleEffect;
-        class CParticleGroup;
-        class CPEDef;
-    }
-}
-
-namespace xray::render {
-    class MaterialCache;
-    namespace fg {
-        class RenderDevice;
-    }
-}
-
-namespace xray::render::framegraph {
-    class FrameGraph;
-}
 
 namespace xray::render::fg::passes {
 
@@ -48,104 +24,8 @@ enum ParticleBlendMode : u8 {
 struct ParticleBatch {
     fg::dxRender_Visual* visual = nullptr;
     Fmatrix worldMatrix;
-    IRenderable* renderable = nullptr;
     bool isHUDMode = false;
     u32 particleCount = 0;
-    u32 vertexOffset = 0;
-    u32 bindlessMaterialID = 0;
-    u8 blendMode = PARTICLE_BLEND_BLEND;
-    ParticleShaderVariant shaderVariant = ParticleShaderVariant::Standard;
 };
-
-struct ParticleCullStats {
-    u32 submittedBatches = 0;
-    u32 visibleBatches = 0;
-    u32 submittedQuads = 0;
-    u32 visibleQuads = 0;
-    bool active = false;
-};
-
-struct ParticlePassState {
-    nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
-    nvrhi::GraphicsPipelineHandle distortPipeline;
-    nvrhi::BindingLayoutHandle layout;
-    nvrhi::BindingLayoutHandle distortLayout;
-    nvrhi::InputLayoutHandle inputLayout;
-    nvrhi::ShaderHandle vs;
-    nvrhi::ShaderHandle ps;
-    nvrhi::ShaderHandle distortPS;
-    nvrhi::SamplerHandle sampler;
-    bool initialized = false;
-    bool distortInitialized = false;
-    nvrhi::BufferHandle particleVB;
-    u32 particleVBSize = 0;
-    nvrhi::BufferHandle quadIB;
-    u32 maxQuads = 0;
-    nvrhi::ComputePipelineHandle cullPipeline;
-    nvrhi::BindingLayoutHandle cullLayout;
-    nvrhi::BufferHandle cullObjectBuffer;
-    nvrhi::BufferHandle cullArgsBuffer;
-    static constexpr u32 CULL_STATS_SLOTS = 6;
-    nvrhi::BufferHandle cullStatsBuffer;
-    nvrhi::BufferHandle cullStatsReadback[CULL_STATS_SLOTS];
-    u32 cullStatsSubmitted[CULL_STATS_SLOTS][2] = {};
-    u32 cullStatsWriteSlot = 0;
-    u32 cullStatsScheduled = 0;
-    ParticleCullStats cullStats;
-    xr_vector<ParticleVertex> scratchVertices;
-    xr_vector<ParticleBatch> scratchFiltered;
-    xr_vector<u32> scratchCounts;
-};
-
-struct ParticlePassData {
-    framegraph::VirtualResourceHandle inputColor;
-    framegraph::VirtualResourceHandle depth;
-    framegraph::VirtualResourceHandle outputColor;
-    framegraph::VirtualResourceHandle outputNormal;
-    framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle hiZPyramid;
-    framegraph::VirtualResourceHandle distortionRT;
-    framegraph::VirtualResourceHandle prevDepth;
-    fg::RenderDevice* device;
-    const xr_vector<ParticleBatch>* worldParticleBatches;
-    const xr_vector<ParticleBatch>* hudParticleBatches;
-    MaterialCache* materialCache;
-    framegraph::DefaultOutputLayout outputs;
-    u32 width;
-    u32 height;
-    u32 hiZWidth;
-    u32 hiZHeight;
-    u32 hiZMipLevels;
-    Fmatrix prevViewProj;
-    bool hasPrevViewProj;
-    ParticlePassState* passState;
-    bool hasDistortion;
-    bool reuseDistortion = false;
-};
-
-struct ParticlePassOutput {
-    framegraph::DefaultOutputLayout layout;
-    framegraph::VirtualResourceHandle distortionRT;
-};
-
-void InitializeParticleResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, ParticlePassState& state);
-
-ParticlePassOutput setupParticlePass(
-    framegraph::FrameGraph& fg,
-    fg::RenderDevice* device,
-    const framegraph::DefaultOutputLayout& forwardInputs,
-    const xr_vector<ParticleBatch>* worldParticleBatches,
-    const xr_vector<ParticleBatch>* hudParticleBatches,
-    MaterialCache* materialCache,
-    u32 width,
-    u32 height,
-    framegraph::VirtualResourceHandle hiZPyramid = {},
-    u32 hiZWidth = 0,
-    u32 hiZHeight = 0,
-    u32 hiZMipLevels = 0,
-    const Fmatrix* prevViewProj = nullptr,
-    framegraph::VirtualResourceHandle prevDepth = {},
-    ParticlePassState* state = nullptr
-);
 
 }

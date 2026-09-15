@@ -14,6 +14,7 @@ struct PS_INPUT
     float3 worldPos : TEXCOORD2;
     float3 normal   : TEXCOORD3;
     nointerpolation uint materialID : TEXCOORD4;
+    nointerpolation uint drawBucket : TEXCOORD5;
 };
 
 struct PS_OUTPUT
@@ -31,10 +32,9 @@ PS_OUTPUT main(PS_INPUT input)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
     float4 result = diffuseSample * input.color;
 
-    clip(result.a - (0.01 / 255.0));
-
     float sceneDepth = g_SceneDepth.Load(int3((int2)input.hpos.xy, 0));
-    if (sceneDepth > 0.0) {
+    bool hud = input.drawBucket >= 6u;
+    if (input.drawBucket % 6u != 0u && sceneDepth > 0.0 && (!hud || sceneDepth >= 0.9)) {
         float3 sceneWP = reconstruct_world_pos(input.hpos.xy, sceneDepth);
         float3 viewDir = camera_direction.xyz;
         float sceneViewZ = dot(sceneWP - eye_position, viewDir);
@@ -46,6 +46,7 @@ PS_OUTPUT main(PS_INPUT input)
         result.a *= soft;
         result.rgb *= soft;
     }
+    clip(result.a - (0.01 / 255.0));
 
     output.color = result;
     output.normal = float4(normalize(input.normal), 1);

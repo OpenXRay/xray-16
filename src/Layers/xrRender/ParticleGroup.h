@@ -83,13 +83,16 @@ public:
     using VisualVec = xr_vector<dxRender_Visual*>;
     struct SItem
     {
-        dxRender_Visual* _effect;
+        dxRender_Visual* _effect{};
+#ifdef _EDITOR
         VisualVec _children_related;
         VisualVec _children_free;
+#endif
 
         void Set(dxRender_Visual* e);
         void Clear();
 
+#ifdef _EDITOR
         u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
         {
             visuals.reserve(_children_related.size() + _children_free.size() + 1);
@@ -99,16 +102,23 @@ public:
             visuals.insert(visuals.end(), _children_free.begin(), _children_free.end());
             return visuals.size();
         }
+#endif
 
         void OnDeviceCreate();
         void OnDeviceDestroy();
 
+#ifdef _EDITOR
         void StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m);
         void StopRelatedChild(u32 idx);
         void StartFreeChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m);
+#endif
 
         void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM);
+#ifdef _EDITOR
         void OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying);
+#else
+        void OnFrame(u32 u_dt, Fbox& box, bool& bPlaying);
+#endif
 
         u32 ParticlesCount();
         bool IsPlaying() const;
