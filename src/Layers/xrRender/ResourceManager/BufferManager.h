@@ -32,6 +32,7 @@ struct BufferDesc {
 
     bool cpuAccess = false;
     bool gpuWrite = false;
+    bool indirectArgs = false;
 
     shared_str debugName;
 

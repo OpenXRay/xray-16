@@ -34,6 +34,7 @@ struct ResourceDesc {
     bool isDepthStencil = false;
     bool isUAV = false;
     bool allowUAV = false;
+    bool isIndirectArgs = false;
 
     bool isTransient = true;
     bool isImported = false;
