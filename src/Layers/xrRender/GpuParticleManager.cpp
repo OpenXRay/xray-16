@@ -10,6 +10,7 @@
 #include "FrameGraph/BindingLayoutBuilder.h"
 #include "FrameGraphPasses/PassCommon.h"
 #include "Profiler/GPUProfiler.h"
+#include "xrRender_console.h"
 #include "xrParticles/noise.h"
 #include <atomic>
 #include <algorithm>
@@ -361,7 +362,9 @@ struct GpuParticleManager::Impl {
             params.phase = 1;
             Dispatch(commandList,initialize,params,1);
             params.phase = 0;
+            params.pad = ps_r_gpu_particle_debug_collision ? 1u : 0u;
             Dispatch(commandList,simulate,params,u32(ranges.size()));
+            params.pad = 0;
             for (const auto& range : ranges) {
                 const auto& command = batch[range[0] + range[1] - 1];
                 auto& root = roots[command.emitter / 2];

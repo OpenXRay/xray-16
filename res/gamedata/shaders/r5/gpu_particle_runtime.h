@@ -404,7 +404,12 @@ void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds,uint lane)
                 GpuPapiParticle particle = g_Particles[index];
                 if (animated) GpuAnimateParticle(particle,program);
                 bool dead = false;
-                GpuParticleCollision(particle.position,particle.positionB,particle.velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
+                uint hitType = GpuParticleCollision(particle.position,particle.positionB,particle.velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
+                if (g_Papi.pad != 0) {
+                    if (hitType == 1) particle.color = GpuPapiPackColor(float4(0,1,0,1));
+                    else if (hitType == 2) particle.color = GpuPapiPackColor(float4(1,1,0,1));
+                    else particle.color = GpuPapiPackColor(float4(1,0,0,1));
+                }
                 g_Particles[index] = particle;
                 g_GroupDead[lane] = dead ? 1u : 0u;
             }

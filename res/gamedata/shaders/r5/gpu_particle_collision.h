@@ -202,10 +202,11 @@ bool GpuCollisionShape(float3 origin, float3 direction, GpuPapiCollisionShape sh
 }
 
 bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynamicCollision, bool hitOnly,
-    out float3 normal)
+    out float3 normal, out uint hitSource)
 {
     bool hit = false;
     normal = float3(0.0, 1.0, 0.0);
+    hitSource = 0;
     uint nodeIndex = 0;
     uint staticTriangle = 0xffffffff;
     uint4 counts = g_GpuCollisionCounts[0];
@@ -225,9 +226,13 @@ bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynam
             if (GpuCollisionTriangle(origin, direction, triangle, limit, true, distance))
             {
                 if (hitOnly)
+                {
+                    hitSource = 1;
                     return true;
+                }
                 limit = distance;
                 staticTriangle = node.first + offset;
+                hitSource = 1;
                 hit = true;
             }
         }
@@ -286,9 +291,13 @@ bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynam
                 continue;
         }
         if (hitOnly)
+        {
+            hitSource = 2;
             return true;
+        }
         limit = nearestDistance;
         staticTriangle = 0xffffffff;
+        hitSource = 2;
         hit = true;
     }
     if (staticTriangle != 0xffffffff)
@@ -299,9 +308,10 @@ bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynam
     return hit;
 }
 
-void GpuParticleCollision(inout float3 position, float3 previousPosition, inout float3 velocity,
+uint GpuParticleCollision(inout float3 position, float3 previousPosition, inout float3 velocity,
     float dt, uint definitionFlags, float friction, float resilience, float cutoff, inout bool dead)
 {
+    uint result = 0;
     for (uint iteration = 0; iteration != 2; ++iteration)
     {
         float3 segment = position - previousPosition;
@@ -309,16 +319,18 @@ void GpuParticleCollision(inout float3 position, float3 previousPosition, inout 
         if (distance < 0.00001)
         {
             position = previousPosition;
-            return;
+            return result;
         }
         float3 normal;
+        uint hitSource;
         if (!GpuParticleRayPick(previousPosition, segment / distance, distance,
-            (definitionFlags & (1u << 19)) != 0, (definitionFlags & (1u << 17)) != 0, normal))
-            return;
+            (definitionFlags & (1u << 19)) != 0, (definitionFlags & (1u << 17)) != 0, normal, hitSource))
+            return result;
+        result = hitSource;
         if ((definitionFlags & (1u << 17)) != 0)
         {
             dead = true;
-            return;
+            return result;
         }
         float3 normalVelocity = normal * dot(velocity, normal);
         float3 tangentVelocity = velocity - normalVelocity;
@@ -326,6 +338,7 @@ void GpuParticleCollision(inout float3 position, float3 previousPosition, inout 
             - normalVelocity * resilience;
         position = previousPosition + velocity * dt;
     }
+    return result;
 }
 
 #endif
