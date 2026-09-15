@@ -59,6 +59,9 @@ struct DeferredLightPassData {
     VirtualResourceHandle localStatic;
     VirtualResourceHandle localDyn;
     VirtualResourceHandle localHud;
+    VirtualResourceHandle clusterLightData;
+    VirtualResourceHandle clusterGrid;
+    VirtualResourceHandle clusterLightIndexList;
     LocalShadowOutput localShadow;
     fg::RenderDevice* device = nullptr;
     DeferredLightPassState* state = nullptr;
@@ -213,6 +216,7 @@ DefaultOutputLayout setupDeferredLightPass(
     u32 height,
     VirtualResourceHandle sunMask,
     const LocalShadowOutput& localShadow,
+    const ClusterLightOutput& clusterLights,
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state)
 {
@@ -225,7 +229,7 @@ DefaultOutputLayout setupDeferredLightPass(
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunMask, localShadow, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
+        [&, width, height, sunMask, localShadow, clusterLights, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.state = state;
@@ -245,6 +249,11 @@ DefaultOutputLayout setupDeferredLightPass(
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
                 data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
+            }
+            if (clusterLights.active) {
+                data.clusterLightData = passBuilder.read(clusterLights.lightData, ResourceState::ShaderResource);
+                data.clusterGrid = passBuilder.read(clusterLights.clusterGrid, ResourceState::ShaderResource);
+                data.clusterLightIndexList = passBuilder.read(clusterLights.lightIndexList, ResourceState::ShaderResource);
             }
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {

@@ -31,7 +31,14 @@ struct ClusterLightPassState {
     bool cullInitialized = false;
 };
 
-void setupClusterLightPass(
+struct ClusterLightOutput {
+    framegraph::VirtualResourceHandle lightData;
+    framegraph::VirtualResourceHandle clusterGrid;
+    framegraph::VirtualResourceHandle lightIndexList;
+    bool active = false;
+};
+
+ClusterLightOutput setupClusterLightPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     ClusteredLightManager* lightManager,

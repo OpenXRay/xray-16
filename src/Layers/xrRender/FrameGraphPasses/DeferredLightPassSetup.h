@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "LocalShadowPassSetup.h"
+#include "ClusterLightPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::profiler {
@@ -59,6 +60,7 @@ framegraph::DefaultOutputLayout setupDeferredLightPass(
     u32 height,
     framegraph::VirtualResourceHandle sunMask,
     const LocalShadowOutput& localShadow,
+    const ClusterLightOutput& clusterLights,
     xray::profiler::GPUProfiler* gpuProfiler,
     DeferredLightPassState* state);
 

@@ -106,7 +106,7 @@ static void InitCullPipeline(nvrhi::IDevice* nvDevice, ClusterLightPassState& st
     Msg("* [ClusterLight] Hi-Z cull pipeline initialized");
 }
 
-void setupClusterLightPass(
+ClusterLightOutput setupClusterLightPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     ClusteredLightManager* lightManager,
@@ -122,15 +122,40 @@ void setupClusterLightPass(
 {
     bool useHiZ = hasPrevViewProj && hizPyramid.is_valid() && hizWidth > 0 && hizHeight > 0;
 
-    fg.addCallbackPass<ClusterLightPassData>(
+    auto importBuffer = [&](const char* name, nvrhi::IBuffer* buffer) {
+        ResourceDesc desc;
+        desc.type = ResourceDesc::Type::Buffer;
+        desc.bufferSize = buffer->getDesc().byteSize;
+        desc.structStride = buffer->getDesc().structStride;
+        desc.isUAV = buffer->getDesc().canHaveUAVs;
+        desc.allowUAV = desc.isUAV;
+        desc.isImported = true;
+        desc.isTransient = false;
+        desc.debugName = name;
+        return fg.ImportBuffer(name, buffer, desc);
+    };
+    ClusterLightOutput output;
+    VirtualResourceHandle lightData = importBuffer("cluster_light_data", lightManager->GetLightDataBuffer());
+    VirtualResourceHandle clusterGrid = importBuffer("cluster_light_grid", lightManager->GetClusterGridBuffer());
+    VirtualResourceHandle lightIndexList = importBuffer("cluster_light_index_list", lightManager->GetLightIndexListBuffer());
+
+    struct ClusterLightDeclaredData : ClusterLightPassData {
+        VirtualResourceHandle lightData, clusterGrid, lightIndexList;
+    };
+
+    auto& passData = fg.addCallbackPass<ClusterLightDeclaredData>(
         "ClusterLightAssign",
-        [&, screenWidth, screenHeight, state, hizPyramid, hizWidth, hizHeight, hizMipLevels, prevViewProj, useHiZ](
-            FrameGraph& builder, PassHandle passHandle, ClusterLightPassData& data) {
+        [&, screenWidth, screenHeight, state, hizPyramid, hizWidth, hizHeight, hizMipLevels, prevViewProj, useHiZ, lightData, clusterGrid, lightIndexList](
+            FrameGraph& builder, PassHandle passHandle, ClusterLightDeclaredData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             passBuilder.sideEffects();
 
             if (useHiZ && hizPyramid.is_valid())
                 passBuilder.read(hizPyramid);
+            data.lightData = passBuilder.write(lightData, ResourceState::CopyDest);
+            data.clusterGrid = passBuilder.write(clusterGrid, ResourceState::UnorderedAccess);
+            data.lightIndexList = passBuilder.write(lightIndexList, ResourceState::UnorderedAccess);
 
             data.device = device;
             data.lightManager = lightManager;
@@ -261,6 +286,12 @@ void setupClusterLightPass(
             cmdList->dispatch(tilesX, tilesY, CLUSTER_NUM_SLICES);
         }
     );
+
+    output.lightData = passData.lightData;
+    output.clusterGrid = passData.clusterGrid;
+    output.lightIndexList = passData.lightIndexList;
+    output.active = true;
+    return output;
 }
 
 }
