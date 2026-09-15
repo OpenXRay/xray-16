@@ -84,6 +84,8 @@ public:
     // Mark pass as having side effects (writes to external resources, prevents culling)
     void SetPassHasSideEffects(PassHandle pass);
 
+    void SetPresentTarget(VirtualResourceHandle handle);
+
     // Template method for lambda-based passes (Frostbite pattern)
     template <typename PassData, typename Setup, typename Execute>
     PassData& addCallbackPass(const char* name, Setup&& setupFunc, Execute&& executeFunc)
@@ -230,13 +232,19 @@ private:
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
 
-    xr_vector<u32> m_compileInDegree;
+    struct ReaderLink {
+        PassNode* pass;
+        u32 next;
+    };
+
+    xr_vector<ReaderLink> m_compileReaderLinks;
     xr_vector<PassNode*> m_compilePassWorklist;
     xr_vector<ResourceNode*> m_compileTransientResources;
 
     // Compilation results
     xr_vector<PassNode*> m_sortedPasses;  // Execution order
     bool m_compiled = false;
+    VirtualResourceHandle m_presentTarget;
 
     // Statistics
     Statistics m_stats;
@@ -246,7 +254,7 @@ private:
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     void BuildDependencyGraph();
-    void TopologicalSort();
+    void ValidateAsyncPasses();
     void CullUnusedPasses();
     void ComputeResourceLifetimes();
     void AllocateResources();
@@ -264,9 +272,6 @@ private:
 
     PassNode* GetPassNode(PassHandle handle);
     const PassNode* GetPassNode(PassHandle handle) const;
-
-    PassNode* FindProducer(VirtualResourceHandle resource);
-    bool HasCyclicDependency() const;
 
     // Convert FrameGraph state to NVRHI state
     static nvrhi::ResourceStates ConvertToNVRHIState(ResourceState state);

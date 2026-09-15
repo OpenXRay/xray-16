@@ -28,6 +28,7 @@ FrameGraph::FrameGraph(fg::RenderDevice* renderDevice)
     m_resources.reserve(256);
     m_passes.reserve(128);
     m_sortedPasses.reserve(128);
+    m_compileReaderLinks.reserve(512);
 }
 
 FrameGraph::~FrameGraph() {
@@ -45,12 +46,8 @@ VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const Resource
     VERIFY(!m_compiled && "Cannot create resources after compile");
     VERIFY(desc.type != ResourceDesc::Type::Buffer && "Use CreateBuffer for buffers");
 
-    // Create resource node
-    ResourceNode node(desc);
-    node.handle.index = static_cast<u32>(m_resources.size());
-
-    // Add to registry
-    m_resources.push_back(node);
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
 
     return node.handle;
 }
@@ -59,12 +56,8 @@ VirtualResourceHandle FrameGraph::CreateBuffer(const char* name, const ResourceD
     VERIFY(!m_compiled && "Cannot create resources after compile");
     VERIFY(desc.type == ResourceDesc::Type::Buffer && "Use CreateTexture for textures");
 
-    // Create resource node
-    ResourceNode node(desc);
-    node.handle.index = static_cast<u32>(m_resources.size());
-
-    // Add to registry
-    m_resources.push_back(node);
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
 
     return node.handle;
 }
@@ -77,18 +70,13 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     VERIFY(!m_compiled && "Cannot import resources after compile");
     VERIFY(physicalTexture != nullptr);
 
-    // Create imported resource node
-    ResourceNode node(desc);
-    node.handle.index = static_cast<u32>(m_resources.size());
-    // Store the imported NVRHI texture
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
     node.nvrhiTexture = physicalTexture;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
-    node.desc.isImported = true;  // CRITICAL: Mark as imported so we don't reallocate/clear it
-
-    // Add to registry
-    m_resources.push_back(node);
+    node.desc.isImported = true;
 
     return node.handle;
 }
@@ -101,18 +89,13 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     VERIFY(!m_compiled && "Cannot import resources after compile");
     VERIFY(physicalBuffer != nullptr);
 
-    // Create imported resource node
-    ResourceNode node(desc);
-    node.handle.index = static_cast<u32>(m_resources.size());
-    // Store the imported NVRHI buffer
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
     node.nvrhiBuffer = physicalBuffer;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
-    node.desc.isImported = true;  // CRITICAL: Mark as imported so we don't reallocate/clear it
-
-    // Add to registry
-    m_resources.push_back(node);
+    node.desc.isImported = true;
 
     return node.handle;
 }
@@ -183,6 +166,16 @@ void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
     passNode->hasSideEffects = true;
 }
 
+void FrameGraph::SetPresentTarget(VirtualResourceHandle handle) {
+    VERIFY(!m_compiled && "Cannot set present target after compile");
+
+    const ResourceNode* node = GetResourceNode(handle);
+    VERIFY(node != nullptr);
+    VERIFY(node->desc.isImported && node->nvrhiTexture);
+
+    m_presentTarget = handle;
+}
+
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  COMPILE PHASE (STUB FOR NOW)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -198,10 +191,17 @@ void FrameGraph::Compile() {
         BuildDependencyGraph();
     }
 
-    // Phase 2: Sort passes into execution order
+    ValidateAsyncPasses();
+
+    // Phase 2: Establish execution order (declaration order)
     {
-        ZoneScopedN("Compile::TopologicalSort");
-        TopologicalSort();
+        ZoneScopedN("Compile::OrderPasses");
+        m_sortedPasses.clear();
+        m_sortedPasses.reserve(m_passes.size());
+        for (auto& pass : m_passes) {
+            pass.executionOrder = pass.handle.index;
+            m_sortedPasses.push_back(&pass);
+        }
     }
 
     // Phase 3: Remove unused passes
@@ -213,11 +213,6 @@ void FrameGraph::Compile() {
     {
         ZoneScopedN("Compile::ComputeResourceLifetimes");
         ComputeResourceLifetimes();
-    }
-
-    {
-        ZoneScopedN("Compile::OptimizeMemoryAliasing");
-        OptimizeMemoryAliasing();
     }
 
     {
@@ -262,6 +257,8 @@ void FrameGraph::Execute() {
     VERIFY(graphicsCmdList != nullptr);
 
     bool hasAsyncCompute = m_computeCommandList != nullptr && m_asyncComputeBackend != nullptr;
+    VERIFY2(!hasAsyncCompute || m_computeCommandList != graphicsCmdList,
+        "async compute must record into a separate command list");
 
     // Count async passes to check if we have any work for the compute queue
     u32 asyncPassCount = 0;
@@ -303,8 +300,8 @@ void FrameGraph::Execute() {
 
         if (!syncInserted && hasAsyncCompute) {
             bool dependsOnAsync = false;
-            for (const PassNode* dep : pass->dependsOn) {
-                if (dep->isAsync) {
+            for (const auto& dep : pass->dependsOn) {
+                if (dep.pass->isAsync) {
                     dependsOnAsync = true;
                     break;
                 }
@@ -318,20 +315,17 @@ void FrameGraph::Execute() {
         ExecutePass(pass, graphicsCmdList);
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  TRANSITION IMPORTED BACKBUFFER TO PRESENT STATE
-    // ═══════════════════════════════════════════════════════
-    for (auto& resource : m_resources) {
-        if (resource.desc.isImported && resource.nvrhiTexture) {
-            if (resource.desc.isRenderTarget) {
-                graphicsCmdList->setTextureState(
-                    resource.nvrhiTexture.Get(),
-                    nvrhi::AllSubresources,
-                    nvrhi::ResourceStates::Present
-                );
-            }
-        }
+    if (m_presentTarget.is_valid()) {
+        ResourceNode* target = GetResourceNode(m_presentTarget);
+        VERIFY(target != nullptr && target->nvrhiTexture);
+
+        graphicsCmdList->setTextureState(
+            target->nvrhiTexture.Get(),
+            nvrhi::AllSubresources,
+            nvrhi::ResourceStates::Present
+        );
     }
+
     graphicsCmdList->commitBarriers();
 }
 
@@ -398,7 +392,7 @@ void FrameGraph::ResetForNextFrame() {
         }
     }
 
-    m_compileInDegree.clear();
+    m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
     m_compileTransientResources.clear();
 
@@ -409,6 +403,7 @@ void FrameGraph::ResetForNextFrame() {
     m_resources.clear();
     m_sortedPasses.clear();
     m_compiled = false;
+    m_presentTarget = VirtualResourceHandle();
 
     // Clear render target registry
     m_rtRegistry.Clear();
@@ -458,7 +453,7 @@ void FrameGraph::Reset() {
         resource.nvrhiBuffer = nullptr;
     }
 
-    m_compileInDegree.clear();
+    m_compileReaderLinks.clear();
     m_compilePassWorklist.clear();
     m_compileTransientResources.clear();
 
@@ -469,6 +464,7 @@ void FrameGraph::Reset() {
     m_sortedPasses.clear();
     m_rtRegistry.Clear();  // Clear RT registry
     m_compiled = false;
+    m_presentTarget = VirtualResourceHandle();
     m_frameArena.Reset();
 
     // Reset statistics (don't use memset - contains non-trivial types!)
@@ -569,10 +565,9 @@ void FrameGraph::PrintExecutionOrder() const {
     for (u32 i = 0; i < m_sortedPasses.size(); i++) {
         const PassNode* pass = m_sortedPasses[i];
 
-        Msg("[%2u] %-30s (depth %u, %u deps)",
+        Msg("[%2u] %-30s (%u deps)",
             i,
             pass->name.c_str(),
-            pass->depth,
             static_cast<u32>(pass->dependsOn.size()));
 
         // Show resource accesses
@@ -627,8 +622,7 @@ bool FrameGraph::ValidateGraph() const {
         }
     }
 
-    // Check 3: No cyclic dependencies (should be caught by topological sort)
-    // Already handled by TopologicalSort
+    // Check 3: Execution order is declaration order, so cycles are impossible
 
     // Check 4: Imported resources have valid handles
     for (const auto& resource : m_resources) {
@@ -684,16 +678,6 @@ const PassNode* FrameGraph::GetPassNode(PassHandle handle) const {
     return &m_passes[handle.index];
 }
 
-PassNode* FrameGraph::FindProducer(VirtualResourceHandle resource) {
-    // TODO: Implement producer finding
-    return nullptr;
-}
-
-bool FrameGraph::HasCyclicDependency() const {
-    // TODO: Implement cycle detection
-    return false;
-}
-
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  COMPILATION PHASES (STUBS - TO BE IMPLEMENTED)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -701,21 +685,25 @@ bool FrameGraph::HasCyclicDependency() const {
 void FrameGraph::BuildDependencyGraph() {
     for (auto& pass : m_passes) {
         pass.dependsOn.clear();
-        pass.dependents.clear();
     }
 
     for (auto& resource : m_resources) {
         resource.lastWriter = nullptr;
-        resource.readersSinceWrite.clear();
+        resource.readersHead = INVALID_INDEX;
     }
 
-    auto addEdge = [](PassNode& pass, PassNode* producer) {
+    auto& readerLinks = m_compileReaderLinks;
+    readerLinks.clear();
+
+    auto addEdge = [](PassNode& pass, PassNode* producer, EdgeKind kind) {
         if (producer == &pass)
             return;
-        if (!pass.DependsOn(producer)) {
-            pass.dependsOn.push_back(producer);
-            producer->dependents.push_back(&pass);
+        if (PassDependency* existing = pass.FindDependency(producer)) {
+            if (kind == EdgeKind::ReadAfterWrite)
+                existing->kind = EdgeKind::ReadAfterWrite;
+            return;
         }
+        pass.dependsOn.push_back(PassDependency{producer, kind});
     };
 
     for (auto& pass : m_passes) {
@@ -725,7 +713,7 @@ void FrameGraph::BuildDependencyGraph() {
             ResourceNode* resource = GetResourceNode(access.resource);
             VERIFY(resource != nullptr);
             if (resource->lastWriter)
-                addEdge(pass, resource->lastWriter);
+                addEdge(pass, resource->lastWriter, EdgeKind::ReadAfterWrite);
         }
 
         for (const auto& access : pass.resourceAccesses) {
@@ -734,69 +722,48 @@ void FrameGraph::BuildDependencyGraph() {
             ResourceNode* resource = GetResourceNode(access.resource);
             VERIFY(resource != nullptr);
             if (resource->lastWriter)
-                addEdge(pass, resource->lastWriter);
+                addEdge(pass, resource->lastWriter, EdgeKind::WriteAfterWrite);
 
-            for (PassNode* reader : resource->readersSinceWrite)
-                addEdge(pass, reader);
-            resource->readersSinceWrite.clear();
+            for (u32 link = resource->readersHead; link != INVALID_INDEX; link = readerLinks[link].next)
+                addEdge(pass, readerLinks[link].pass, EdgeKind::WriteAfterRead);
+            resource->readersHead = INVALID_INDEX;
         }
 
         for (const auto& access : pass.resourceAccesses) {
             ResourceNode* resource = GetResourceNode(access.resource);
             VERIFY(resource != nullptr);
-            if (access.IsRead())
-                resource->readersSinceWrite.push_back(&pass);
+            if (access.IsRead()) {
+                readerLinks.push_back(ReaderLink{&pass, resource->readersHead});
+                resource->readersHead = static_cast<u32>(readerLinks.size() - 1);
+            }
             if (access.IsWrite())
                 resource->lastWriter = &pass;
         }
     }
 }
 
-void FrameGraph::TopologicalSort() {
-    const u32 numPasses = static_cast<u32>(m_passes.size());
-    m_sortedPasses.clear();
-    m_sortedPasses.reserve(numPasses);
+void FrameGraph::ValidateAsyncPasses() {
+#ifdef DEBUG
+    for (const auto& pass : m_passes) {
+        if (!pass.isAsync)
+            continue;
 
-    auto& inDegree = m_compileInDegree;
-    inDegree.resize(numPasses);
-    for (u32 i = 0; i < numPasses; ++i)
-        inDegree[i] = static_cast<u32>(m_passes[i].dependsOn.size());
-
-    auto& queue = m_compilePassWorklist;
-    queue.clear();
-    queue.reserve(numPasses);
-    for (u32 i = 0; i < numPasses; ++i) {
-        if (inDegree[i] == 0)
-            queue.push_back(&m_passes[i]);
-    }
-
-    u32 executionOrder = 0;
-    size_t queueHead = 0;
-    while (queueHead < queue.size()) {
-        PassNode* current = queue[queueHead++];
-
-        current->executionOrder = executionOrder++;
-        m_sortedPasses.push_back(current);
-
-        for (PassNode* dependent : current->dependents) {
-            u32 idx = dependent->handle.index;
-            if (--inDegree[idx] == 0)
-                queue.push_back(dependent);
-        }
-    }
-
-    if (m_sortedPasses.size() != m_passes.size()) {
-        Msg("! [FrameGraph] Cycle detected in dependency graph!");
-        Msg("! [FrameGraph] Processed %zu/%zu passes",
-            m_sortedPasses.size(), m_passes.size());
-
-        for (auto& pass : m_passes) {
-            if (pass.executionOrder == INVALID_INDEX)
-                Msg("! [FrameGraph]   Pass in cycle: %s", pass.name.c_str());
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY4(resource != nullptr && resource->desc.isImported,
+                "async framegraph pass touches a resource that is not imported",
+                pass.name.c_str(),
+                resource ? resource->desc.debugName.c_str() : "<invalid handle>");
         }
 
-        VERIFY2(false, "FrameGraph has cyclic dependencies");
+        for (const auto& dep : pass.dependsOn) {
+            VERIFY4(dep.pass->isAsync,
+                "async framegraph pass depends on a graphics pass",
+                pass.name.c_str(),
+                dep.pass->name.c_str());
+        }
     }
+#endif
 }
 
 void FrameGraph::CullUnusedPasses() {
@@ -846,10 +813,10 @@ void FrameGraph::CullUnusedPasses() {
         if (current->culled) {
             current->culled = false;
 
-            // Add all dependencies to queue
-            for (PassNode* dependency : current->dependsOn) {
-                if (dependency->culled) {
-                    queue.push_back(dependency);
+            // Only data-flow edges keep a producer alive
+            for (const auto& dependency : current->dependsOn) {
+                if (dependency.kind == EdgeKind::ReadAfterWrite && dependency.pass->culled) {
+                    queue.push_back(dependency.pass);
                 }
             }
         }

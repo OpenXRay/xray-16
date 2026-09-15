@@ -94,7 +94,7 @@ struct ResourceNode {
     VirtualResourceHandle handle;
 
     PassNode* lastWriter = nullptr;
-    xr_vector<PassNode*> readersSinceWrite;
+    u32 readersHead = INVALID_INDEX;
 
     // Lifetime tracking
     u32 firstUsedPass = INVALID_INDEX;  // First pass that accesses this
