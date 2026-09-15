@@ -380,12 +380,18 @@ bool VulkanBackend::CreateLogicalDevice() {
         return false;
     }
 
-    // If no dedicated compute family, try using a second queue from graphics family
     bool useGraphicsFamilyForCompute = false;
     if (m_computeQueueFamily == UINT32_MAX) {
         if (queueFamilies[m_graphicsQueueFamily].queueCount >= 2) {
             m_computeQueueFamily = m_graphicsQueueFamily;
             useGraphicsFamilyForCompute = true;
+        } else {
+            for (u32 i = 0; i < queueFamilyCount; i++) {
+                if (i != m_graphicsQueueFamily && (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT)) {
+                    m_computeQueueFamily = i;
+                    break;
+                }
+            }
         }
     }
 
@@ -581,9 +587,11 @@ bool VulkanBackend::CreateLogicalDevice() {
     if (m_computeQueueFamily != UINT32_MAX) {
         u32 computeQueueIndex = useGraphicsFamilyForCompute ? 1 : 0;
         vkGetDeviceQueue(m_device, m_computeQueueFamily, computeQueueIndex, &m_computeQueue);
-        Msg("* [VulkanBackend] Compute queue: family %u, index %u%s",
-            m_computeQueueFamily, computeQueueIndex,
-            useGraphicsFamilyForCompute ? " (shared family)" : " (dedicated)");
+        const char* kind = useGraphicsFamilyForCompute ? "shared family"
+            : (queueFamilies[m_computeQueueFamily].queueFlags & VK_QUEUE_GRAPHICS_BIT) ? "general-purpose family"
+            : "dedicated";
+        Msg("* [VulkanBackend] Compute queue: family %u, index %u (%s)",
+            m_computeQueueFamily, computeQueueIndex, kind);
     } else {
         Msg("* [VulkanBackend] No compute queue available (async compute disabled)");
     }
