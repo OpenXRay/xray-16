@@ -412,6 +412,8 @@ if (APPLE)
         TARGET xrEngine
         NAME "Platform\\macOS"
         FILES
+        macos/GameDataLayout.cpp
+        macos/GameDataLayout.h
         macos/GameDataResolver.cpp
         macos/GameDataResolver.h
     )

@@ -2,16 +2,18 @@
 #pragma hdrstop
 
 #if defined(XR_PLATFORM_APPLE)
-#include "GameDataResolver.h"
+#    include "GameDataResolver.h"
+#    include "GameDataLayout.h"
 
-#include <SDL.h>
-#include <cstdio>
-#include <cstdlib>
-#include <limits.h>
-#include <string>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <vector>
+#    include <SDL.h>
+#    include <cerrno>
+#    include <cstdio>
+#    include <cstdlib>
+#    include <limits.h>
+#    include <string>
+#    include <sys/stat.h>
+#    include <unistd.h>
+#    include <vector>
 
 namespace
 {
@@ -102,18 +104,6 @@ bool IsFile(const std::string& path)
     return stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode);
 }
 
-bool IsSymlink(const std::string& path)
-{
-    struct stat st;
-    return lstat(path.c_str(), &st) == 0 && S_ISLNK(st.st_mode);
-}
-
-bool PathExistsNoFollow(const std::string& path)
-{
-    struct stat st;
-    return lstat(path.c_str(), &st) == 0;
-}
-
 bool HasRequiredGameData(const std::string& root)
 {
     if (root.empty())
@@ -122,13 +112,6 @@ bool HasRequiredGameData(const std::string& root)
     return IsDirectory(JoinPath(root, "levels")) &&
         IsDirectory(JoinPath(root, "resources")) &&
         IsDirectory(JoinPath(root, "localization"));
-}
-
-bool HasRuntimeLayout(const std::string& root)
-{
-    return HasRequiredGameData(root) &&
-        IsFile(JoinPath(root, "fsgame.ltx")) &&
-        IsDirectory(JoinPath(root, "gamedata"));
 }
 
 GameInfo GetGameInfo(pcstr commandLine)
@@ -161,9 +144,9 @@ GameInfo GetGameInfo(pcstr commandLine)
     };
 }
 
-std::string GetPrefPath(const GameInfo& gameInfo)
+std::string GetPrefPath(pcstr appName)
 {
-    char* prefPath = SDL_GetPrefPath(CompanyName, gameInfo.appSupportName.c_str());
+    char* prefPath = SDL_GetPrefPath(CompanyName, appName);
     if (!prefPath)
         return {};
 
@@ -383,70 +366,23 @@ bool ChooseRootFromDialog(const GameInfo& gameInfo, const std::vector<std::strin
     return true;
 }
 
-bool MoveExistingAside(const std::string& path)
+bool UseGameDataLayout(const xray::macos::GameDataLayoutPaths& paths)
 {
-    if (!PathExistsNoFollow(path))
-        return true;
-
-    for (u32 i = 0; i < 100; ++i)
+    std::string error;
+    if (!xray::macos::PrepareGameDataLayout(paths, error))
     {
-        std::string backupPath = path + ".openxray-backup";
-        if (i != 0)
-            backupPath += std::to_string(i);
-
-        if (PathExistsNoFollow(backupPath))
-            continue;
-
-        return rename(path.c_str(), backupPath.c_str()) == 0;
+        Msg("! macOS game data setup: %s", error.c_str());
+        return false;
     }
 
-    return false;
-}
-
-bool EnsureManagedSymlink(const std::string& source, const std::string& linkPath)
-{
-    if (source.empty() || linkPath.empty())
+    // xrCore uses fsgame.ltx in the working directory before its legacy SDL preference path.
+    if (chdir(paths.runtimeRoot.c_str()) != 0)
+    {
+        Msg("! Cannot enter macOS game data layout: %s", strerror(errno));
         return false;
+    }
 
-    if (RemoveTrailingSlash(source) == RemoveTrailingSlash(linkPath))
-        return true;
-
-    if (IsSymlink(linkPath))
-        xr_unlink(linkPath.c_str());
-    else if (!MoveExistingAside(linkPath))
-        return false;
-
-    return symlink(source.c_str(), linkPath.c_str()) == 0;
-}
-
-void LinkDirectoryIfPresent(const std::string& prefPath, const std::string& gameRoot, pcstr dirName)
-{
-    const std::string source = JoinPath(gameRoot, dirName);
-    if (!IsDirectory(source))
-        return;
-
-    const std::string linkPath = JoinPath(prefPath, dirName);
-    if (RemoveTrailingSlash(source) == RemoveTrailingSlash(linkPath))
-        return;
-
-    EnsureManagedSymlink(source, linkPath);
-}
-
-bool ApplyRuntimeLayout(const std::string& prefPath, const std::string& bundleResourcesRoot, const std::string& gameRoot)
-{
-    if (!HasRequiredGameData(gameRoot))
-        return false;
-
-    EnsureManagedSymlink(JoinPath(bundleResourcesRoot, "fsgame.ltx"), JoinPath(prefPath, "fsgame.ltx"));
-    EnsureManagedSymlink(JoinPath(bundleResourcesRoot, "gamedata"), JoinPath(prefPath, "gamedata"));
-
-    LinkDirectoryIfPresent(prefPath, gameRoot, "levels");
-    LinkDirectoryIfPresent(prefPath, gameRoot, "resources");
-    LinkDirectoryIfPresent(prefPath, gameRoot, "localization");
-    LinkDirectoryIfPresent(prefPath, gameRoot, "mp");
-    LinkDirectoryIfPresent(prefPath, gameRoot, "patches");
-
-    return HasRuntimeLayout(prefPath);
+    return true;
 }
 } // namespace
 
@@ -460,18 +396,32 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
         return;
 
     const GameInfo gameInfo = GetGameInfo(commandLine);
-    const std::string prefPath = GetPrefPath(gameInfo);
-    if (prefPath.empty())
+    const std::string legacyPrefPath = GetPrefPath(gameInfo.appSupportName.c_str());
+    const std::string openxrayPrefPath = GetPrefPath("OpenXRay");
+    if (legacyPrefPath.empty() || openxrayPrefPath.empty())
         return;
+
+    // Keep the runtime view separate even when the selected installation is in the legacy SDL directory.
+    const std::string profilePath = JoinPath(openxrayPrefPath, gameInfo.appSupportName.c_str());
+    const std::string runtimeRoot = JoinPath(profilePath, "runtime");
+    const std::string legacyAppData = JoinPath(legacyPrefPath, "_appdata_");
+    const std::string profileAppData = JoinPath(profilePath, "_appdata_");
+    const std::string appDataRoot = IsDirectory(profileAppData) || !IsDirectory(legacyAppData) ? profileAppData : legacyAppData;
 
     const bool forceSelection = HasCommandLineOption(commandLine, "-select_gamedata") ||
         HasCommandLineOption(commandLine, "-reset_gamedata_path");
 
-    const std::string savedRoot = GetSavedRoot(prefPath);
-    if (!forceSelection && HasRequiredGameData(savedRoot) && ApplyRuntimeLayout(prefPath, bundleResourcesRoot, savedRoot))
+    std::string savedRoot = GetSavedRoot(profilePath);
+    if (savedRoot.empty())
+        savedRoot = GetSavedRoot(legacyPrefPath);
+    savedRoot = NormalizeExistingPath(savedRoot);
+    if (!forceSelection && HasRequiredGameData(savedRoot) && UseGameDataLayout({ savedRoot, bundleResourcesRoot, runtimeRoot, appDataRoot }))
+    {
+        SaveRoot(profilePath, savedRoot);
         return;
+    }
 
-    const std::vector<std::string> candidates = DiscoverCandidates(gameInfo, prefPath);
+    const std::vector<std::string> candidates = DiscoverCandidates(gameInfo, legacyPrefPath);
     std::string selectedRoot;
 
     while (ChooseRootFromDialog(gameInfo, candidates, selectedRoot))
@@ -484,9 +434,10 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
             continue;
         }
 
-        if (ApplyRuntimeLayout(prefPath, bundleResourcesRoot, selectedRoot))
+        selectedRoot = NormalizeExistingPath(selectedRoot);
+        if (UseGameDataLayout({ selectedRoot, bundleResourcesRoot, runtimeRoot, appDataRoot }))
         {
-            SaveRoot(prefPath, NormalizeExistingPath(selectedRoot));
+            SaveRoot(profilePath, selectedRoot);
             return;
         }
 
@@ -495,27 +446,7 @@ void ResolveMacOSGameDataPath(pcstr commandLine)
             "Check file permissions and try again.");
     }
 
-    if (HasRuntimeLayout(prefPath))
-        return;
-
-    if (!HasRequiredGameData(prefPath))
-    {
-        SDL_ShowSimpleMessageBox(
-            SDL_MESSAGEBOX_WARNING,
-            "OpenXRay: game files are required",
-            "OpenXRay could not find required game files.\n"
-            "Choose a directory that contains levels, resources, and localization.",
-            nullptr);
-    }
-    else
-    {
-        SDL_ShowSimpleMessageBox(
-            SDL_MESSAGEBOX_WARNING,
-            "OpenXRay: setup is incomplete",
-            "OpenXRay could not prepare bundled engine resources in Application Support.",
-            nullptr);
-    }
-
+    // Only a successfully prepared layout may reach xrCore; cancelling must not use a partial layout.
     std::exit(EXIT_SUCCESS);
 }
 #endif

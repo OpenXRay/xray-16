@@ -179,6 +179,10 @@ jobs:
     - name: Run CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
+    - name: Test macOS game data layout
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
+      run: bash misc/macos/test_game_data_layout.sh
+
     - name: Run CMake Build
       id: cmake-build
       run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
