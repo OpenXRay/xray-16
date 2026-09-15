@@ -188,7 +188,7 @@ jobs:
       run: ccache -s || true
 
     - name: Make macOS app bundle
-      if: ${{ startsWith(matrix.platform.name, 'macOS') && matrix.configuration == 'Release' && steps.cmake-build.outcome == 'success' }}
+      if: ${{ startsWith(matrix.platform.name, 'macOS') && steps.cmake-build.outcome == 'success' }}
       id: make-macos-app-bundle
       run: |
           bash misc/macos/make_app_bundle.sh "${{ matrix.platform.arch }}" "${{ matrix.configuration }}"
