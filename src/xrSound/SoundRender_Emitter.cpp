@@ -73,6 +73,7 @@ void CSoundRender_Emitter::Event_ReleaseOwner()
 
 void CSoundRender_Emitter::Event_Propagade()
 {
+    ZoneScoped;
     fTimeToPropagade += ::Random.randF(s_f_def_event_pulse - 0.030f, s_f_def_event_pulse + 0.030f);
     if (!owner_data)
         return;
@@ -115,6 +116,7 @@ u32 CSoundRender_Emitter::play_time()
 
 void CSoundRender_Emitter::set_cursor(u32 p)
 {
+    ZoneScoped;
     m_stream_cursor = p;
 
     if (owner_data._get() && owner_data->fn_attached[0].size())
@@ -245,6 +247,7 @@ std::pair<u8*, size_t> CSoundRender_Emitter::obtain_block()
 
 void CSoundRender_Emitter::fill_all_blocks()
 {
+    ZoneScoped;
     current_block = 0;
     for (size_t i = 0; i < sdef_target_count_prefill; ++i)
         fill_block(temp_buf[i].data(), temp_buf[i].size());

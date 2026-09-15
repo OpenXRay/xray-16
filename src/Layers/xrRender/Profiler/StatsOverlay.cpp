@@ -231,7 +231,7 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
 
     if (hasChildren)
     {
-        bool open = ImGui::TreeNode(label);
+        bool open = ImGui::TreeNode("zone", "%s", label);
         if (ImGui::BeginPopupContextItem("zone_ctx"))
         {
             if (memstats::BacktraceCaptureSupported() && ImGui::MenuItem("Capture alloc backtraces"))

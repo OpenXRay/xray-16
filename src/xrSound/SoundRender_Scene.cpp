@@ -366,6 +366,7 @@ void CSoundRender_Scene::set_user_env(CSound_environment* E)
 
 CSound_environment* CSoundRender_Scene::get_environment(const Fvector& P)
 {
+    ZoneScoped;
     static CSoundRender_Environment identity;
 
     if (bUserEnvironment)
