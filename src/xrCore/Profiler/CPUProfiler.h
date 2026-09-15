@@ -16,14 +16,14 @@ public:
     struct Entry
     {
         u32 zoneId;
-        u32 parentId;
+        u32 nodeId;
         u32 previousMemoryZone;
         u64 epoch;
     };
 
-    bool Push(u32 zoneId, u64 epoch, u32 previousMemoryZone);
+    bool Push(u32 zoneId, u32 nodeId, u64 epoch, u32 previousMemoryZone);
     Entry Pop();
-    u32 CurrentParent(u64 epoch) const;
+    u32 CurrentNode(u64 epoch) const;
     bool Empty() const { return m_depth == 0; }
 
 private:
@@ -64,13 +64,14 @@ public:
 private:
     friend class CPUZoneScope;
 
+    u32 FindOrCreateNode(u32 parentNode, u32 zoneId);
     void ComputeSelfTimes(xr_vector<ZoneData>& zones);
-    void BuildHierarchy(xr_vector<ZoneData>& zones, xr_vector<u32>& rootZones);
     void CopyToDisplayBuffer();
     ThreadZoneStack& GetThreadStack();
 
-    xr_vector<ZoneData> m_zones;
-    xr_vector<u32> m_rootZones;
+    xr_vector<const ZoneInfo*> m_infos;
+    xr_vector<ZoneData> m_nodes;
+    xr_vector<u32> m_rootNodes;
     xr_map<shared_str, ZoneInfo*> m_dynamicZones;
     Lock m_zoneLock;
 

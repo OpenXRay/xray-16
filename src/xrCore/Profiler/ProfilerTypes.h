@@ -52,6 +52,7 @@ struct ZoneTiming
 struct ZoneData
 {
     const ZoneInfo* info = nullptr;
+    u32 zoneId = INVALID_ZONE_ID;
     ZoneTiming timing;
 
     u32 parentId = INVALID_ZONE_ID;
