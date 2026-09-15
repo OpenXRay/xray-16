@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "LocalShadowPassSetup.h"
+#include "ClusterLightPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -61,6 +62,9 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle localDyn;
     framegraph::VirtualResourceHandle localHud;
     framegraph::VirtualResourceHandle sunMask;
+    framegraph::VirtualResourceHandle clusterLightData;
+    framegraph::VirtualResourceHandle clusterGrid;
+    framegraph::VirtualResourceHandle clusterLightIndexList;
     LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
@@ -82,6 +86,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    const ClusterLightOutput& clusterLights,
     framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,

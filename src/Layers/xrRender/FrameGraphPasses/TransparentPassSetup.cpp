@@ -217,6 +217,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const framegraph::DefaultOutputLayout& inputs,
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
+    const ClusterLightOutput& clusterLights,
     framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
@@ -236,7 +237,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
 
-        [&, width, height, config, localShadow, sunMask, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
+        [&, width, height, config, localShadow, clusterLights, sunMask, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -271,6 +272,11 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
                 data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
+            }
+            if (clusterLights.active) {
+                data.clusterLightData = passBuilder.read(clusterLights.lightData, ResourceState::ShaderResource);
+                data.clusterGrid = passBuilder.read(clusterLights.clusterGrid, ResourceState::ShaderResource);
+                data.clusterLightIndexList = passBuilder.read(clusterLights.lightIndexList, ResourceState::ShaderResource);
             }
         },
 

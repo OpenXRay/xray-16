@@ -108,7 +108,7 @@ namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
 
 namespace xray::render
 {
-static constexpr u32 FRAME_GLOBALS_CB_VERSIONS = 64;
+static constexpr u32 FRAME_GLOBALS_CB_VERSIONS = 128;
 
 fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
 {
@@ -1319,8 +1319,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
 
     auto& clmSetup = fg::ClusteredLightManager::Instance();
+    passes::ClusterLightOutput clusterLightOut;
     if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
-        passes::setupClusterLightPass(
+        clusterLightOut = passes::setupClusterLightPass(
             *m_framegraph,
             m_device,
             &clmSetup,
@@ -1515,6 +1516,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height,
         vsmMaskHandle,
         localShadowOut,
+        clusterLightOut,
         m_gpuProfiler.get(),
         &m_blackboard->get_or_add<passes::DeferredLightPassState>()
     );
@@ -1525,6 +1527,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         litOutputs,
         transparentConfig,
         localShadowOut,
+        clusterLightOut,
         vsmMaskHandle,
         skinnedDrawArgsBuffer,
         width, height,

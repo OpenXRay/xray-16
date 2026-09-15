@@ -1885,6 +1885,7 @@ static LocalShadowOutput SetupLocalShadowPage(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             data.tiles = passBuilder.write(tilesHandle, ResourceState::UnorderedAccess);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::ShaderResource);
