@@ -308,7 +308,7 @@ TextureHandle TextureManager::CreateTexture(
 
         meta.memoryUsed = desc.CalculateMemorySize();
         m_stats.texturesResident++;
-        m_stats.totalMemoryUsed += meta.memoryUsed;
+        m_memoryUsed += meta.memoryUsed;
 
     } else {
         Msg("! [TextureManager] Failed to create NVRHI texture '%s'", desc.debugName.c_str());
