@@ -1273,7 +1273,7 @@ void ExecuteAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMAtlasDa
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
-    auto framebuffer = cache.GetOrCreateFramebuffer("VSMAtlas", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return;
 
@@ -1620,7 +1620,7 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
-    auto framebuffer = cache.GetOrCreateFramebuffer("VSMAtlasDyn", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return;
     const auto& rtDesc = atlas->getDesc();
@@ -1816,7 +1816,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& 
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(hudMap);
-    auto framebuffer = cache.GetOrCreateFramebuffer("VSMHud", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return;
 

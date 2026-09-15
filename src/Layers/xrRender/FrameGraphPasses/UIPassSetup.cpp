@@ -123,7 +123,7 @@ framegraph::VirtualResourceHandle setupUIPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(sceneRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             if (!g_pGamePersistent) {
                 Msg("* [UIPass] No GamePersistent");
@@ -193,7 +193,7 @@ framegraph::VirtualResourceHandle setupCursorPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(uiRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             if (!g_pGamePersistent) {
                 Msg("* [CursorPass] No GamePersistent");

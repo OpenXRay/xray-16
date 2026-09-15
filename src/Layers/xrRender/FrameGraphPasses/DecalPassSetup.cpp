@@ -132,7 +132,7 @@ DefaultOutputLayout setupDecalPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(baseColorTex);
-            auto framebuffer = cache.GetOrCreateFramebuffer("Decal", fbDesc, nvDevice);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
 
             if (!data.passState->initialized)
                 return;

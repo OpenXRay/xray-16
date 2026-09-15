@@ -3,6 +3,7 @@
 #include "ThunderboltPassSetup.h"
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
@@ -37,7 +38,7 @@ framegraph::VirtualResourceHandle setupThunderboltPass(framegraph::FrameGraph& f
             fbDesc.addColorAttachment(outputRT);
             if (depth)
                 fbDesc.setDepthAttachment(depth);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             data.renderer->Draw(cmdList, framebuffer);
         });

@@ -660,7 +660,7 @@ struct LocalDrawContext {
 };
 
 bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalShadowState& state,
-                    nvrhi::ITexture* atlas, fg::RenderDevice* device, const char* fbName, u32 clearIndex,
+                    nvrhi::ITexture* atlas, fg::RenderDevice* device, u32 clearIndex,
                     LocalDrawContext& out)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -701,7 +701,7 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas, nvrhi::TextureSubresourceSet(0, 1, state.atlasLayer, 1));
-    auto framebuffer = cache.GetOrCreateFramebuffer(fbName, fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return false;
 
@@ -763,7 +763,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Static");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowStatic", 0, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, 0, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Static");
         return;
@@ -854,7 +854,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Dyn");
 
     LocalDrawContext dc;
-    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, "LocalShadowDyn", 1, dc)) {
+    if (!BeginAtlasPass(ctx, cfg, state, atlas, data.device, 1, dc)) {
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
         return;
@@ -1085,7 +1085,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
 
     nvrhi::FramebufferDesc fbDesc;
     fbDesc.setDepthAttachment(atlas);
-    auto framebuffer = cache.GetOrCreateFramebuffer("LocalShadowHud", fbDesc, nvDevice);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
     if (!framebuffer)
         return;
 

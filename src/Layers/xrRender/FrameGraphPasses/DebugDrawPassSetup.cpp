@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DebugDrawPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FGDebugDraw.h"
@@ -39,7 +40,7 @@ framegraph::VirtualResourceHandle setupDebugDrawPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             Fmatrix vp;
             vp.mul(Device.mProject, Device.mView);

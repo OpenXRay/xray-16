@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FontPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgFontRender.h"
@@ -40,7 +41,7 @@ framegraph::VirtualResourceHandle setupFontPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(uiRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             for (auto fontPtrPtr : fontMgr->m_all_fonts)
             {

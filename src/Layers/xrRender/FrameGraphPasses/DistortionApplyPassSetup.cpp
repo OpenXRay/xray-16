@@ -134,7 +134,7 @@ VirtualResourceHandle setupDistortionApplyPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputTex);
-            auto framebuffer = cache.GetOrCreateFramebuffer("DistortionApply", fbDesc, device);
+            auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, device);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

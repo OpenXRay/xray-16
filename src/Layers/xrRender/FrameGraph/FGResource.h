@@ -6,6 +6,8 @@
 
 namespace xray::render::framegraph {
 
+struct PassNode;
+
 struct ResourceDesc {
     enum class Type : u8 {
         Texture2D,
@@ -73,6 +75,9 @@ private:
 struct ResourceNode {
     ResourceDesc desc;
     VirtualResourceHandle handle;
+
+    PassNode* lastWriter = nullptr;
+    xr_vector<PassNode*> readersSinceWrite;
 
     u32 firstUsedPass = INVALID_INDEX;
     u32 lastUsedPass = INVALID_INDEX;

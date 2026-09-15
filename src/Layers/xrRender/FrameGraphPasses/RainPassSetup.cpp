@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RainPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/fgRainRender.h"
@@ -33,7 +34,7 @@ framegraph::VirtualResourceHandle setupRainPass(
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(outputRT);
             if (depth) fbDesc.setDepthAttachment(depth);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             data.renderer->Draw(cmdList, framebuffer);
         });
