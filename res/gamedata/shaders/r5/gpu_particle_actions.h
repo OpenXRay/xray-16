@@ -128,8 +128,14 @@ float3 GpuPapiBounce(GpuPapiDomain domain, float3 position, float3 velocity, flo
         normalVelocity * parameters.y;
 }
 
+bool GpuPapiSerialAction(uint type)
+{
+    return type == 1u || type == 6u || type == 7u || type == 9u || type == 10u || type == 11u ||
+        type == 15u || type == 16u || type == 17u || type == 19u || type == 20u || type == 21u;
+}
+
 void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, uint actionIndex,
-    float dt, inout float killOldTime)
+    float dt, inout float killOldTime, uint ordinalFirst, uint ordinalStride)
 {
     uint type = g_Actions[actionDataIndex].type;
     if (type == 21u && ((emitter.flags & GPU_PAPI_PLAYING) == 0u || (emitter.flags & GPU_PAPI_STOPPING) != 0u))
@@ -140,7 +146,7 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
     uint stateIndex = emitter.actionStateFirst + actionIndex;
     float4 state = 0.0;
     if (type == 5u || type == 18u || type == 30u)
-        state = g_ActionState[stateIndex];
+        state = g_GroupActionState;
     GpuPapiDomain domain = (GpuPapiDomain)0;
     if (type == 0u || type == 1u || type == 19u || type == 21u)
         domain = GpuPapiTransformDomain(g_Actions[actionDataIndex].domains[0], emitter, flags, false);
@@ -219,7 +225,7 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
     float3 targetVelocity = 0.0;
     if (type == 27u || type == 28u)
         targetVelocity = GpuPapiDirection(emitter, flags, p0.xyz);
-    for (uint ordinal = 0u; ordinal < emitter.count; ++ordinal)
+    for (uint ordinal = ordinalFirst; ordinal < emitter.count; ordinal += ordinalStride)
     {
         uint index = GpuParticleIndex(emitter, ordinal);
         GpuPapiParticle particle = g_Particles[index];
@@ -415,7 +421,7 @@ void GpuPapiExecuteAction(inout GpuPapiEmitter emitter, uint actionDataIndex, ui
         state.x += dt;
     if (type == 18u)
         state.x -= dt;
-    if (type == 5u || type == 18u || type == 30u)
+    if (ordinalFirst == 0u && (type == 5u || type == 18u || type == 30u))
         g_ActionState[stateIndex] = state;
 }
 

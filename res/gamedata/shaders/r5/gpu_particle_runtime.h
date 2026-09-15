@@ -29,6 +29,19 @@ struct GpuPapiReservation {
     uint childFirst;
 };
 static GpuPapiReservation g_Reservation;
+groupshared GpuPapiEmitter g_GroupEmitter;
+groupshared float4 g_GroupActionState;
+groupshared float g_GroupKillOldTime;
+groupshared uint g_GroupControl;
+groupshared uint g_GroupDead[64];
+groupshared float3 g_GroupBoundsMin[64];
+groupshared float3 g_GroupBoundsMax[64];
+void GpuSyncEmitter(inout GpuPapiEmitter emitter,uint lane) {
+    if (lane == 0) g_GroupEmitter = emitter;
+    AllMemoryBarrierWithGroupSync();
+    emitter = g_GroupEmitter;
+    GroupMemoryBarrierWithGroupSync();
+}
 bool GpuCheckedAdd(inout uint total,uint count) {
     if (count > 0x40000000u - total) { GpuAllocationError(16u); return false; }
     total += count;
@@ -304,69 +317,111 @@ void GpuRemoveParticle(inout GpuPapiEmitter emitter,uint ordinal) {
 }
 #include "gpu_particle_actions.h"
 #include "gpu_particle_collision.h"
-void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds) {
+void GpuAdvanceEmitter(inout GpuPapiEmitter emitter,uint milliseconds,uint lane) {
     if ((emitter.flags & GPU_PAPI_PLAYING) == 0 || emitter.active != 1) return;
     uint steps = GpuTickSteps(emitter,milliseconds);
-    emitter.memDT = (emitter.memDT + milliseconds % 33u) % 33u;
+    if (lane == 0) emitter.memDT = (emitter.memDT + milliseconds % 33u) % 33u;
+    GpuSyncEmitter(emitter,lane);
     GpuPapiProgram program = g_Programs[emitter.program];
     for (uint step = 0; step < steps; ++step) {
-        if ((program.flags & 16384u) != 0 && (emitter.flags & GPU_PAPI_STOPPING) == 0) {
-            emitter.remainingLimit -= 0.033;
-            if (emitter.remainingLimit < 0) {
-                emitter.remainingLimit = program.timeLimit;
-                emitter.flags |= GPU_PAPI_STOPPING;
-                break;
+        if (lane == 0) {
+            g_GroupControl = 0;
+            if ((program.flags & 16384u) != 0 && (emitter.flags & GPU_PAPI_STOPPING) == 0) {
+                emitter.remainingLimit -= 0.033;
+                if (emitter.remainingLimit < 0) {
+                    emitter.remainingLimit = program.timeLimit;
+                    emitter.flags |= GPU_PAPI_STOPPING;
+                    g_GroupControl = 1;
+                }
             }
         }
+        GpuSyncEmitter(emitter,lane);
+        uint control = g_GroupControl;
+        GroupMemoryBarrierWithGroupSync();
+        if (control != 0) break;
         float killOldTime = 1.0;
-        for (uint actionIndex = 0; actionIndex < program.actionCount; ++actionIndex)
-            GpuPapiExecuteAction(emitter,program.actionFirst + actionIndex,actionIndex,0.033,killOldTime);
-        for (uint remaining = (program.flags & 3072u) == 3072u || (program.flags & 65536u) != 0 ? emitter.count : 0; remaining > 0; --remaining) {
-            uint index = GpuParticleIndex(emitter,remaining - 1);
-            GpuPapiParticle particle = g_Particles[index];
-            if ((program.flags & 3072u) == 3072u) {
-                float frame = float(particle.frame) / 255.0 + ((particle.flags & 1u) != 0 ? -1.0 : 1.0) * program.frameSpeed * 0.033;
-                if (frame > float(program.frameCount)) frame -= float(program.frameCount);
-                if (frame < 0) frame += float(program.frameCount);
-                particle.frame = uint(int(floor(frame * 255.0))) & 65535u;
+        for (uint actionIndex = 0; actionIndex < program.actionCount; ++actionIndex) {
+            uint actionDataIndex = program.actionFirst + actionIndex;
+            uint type = g_Actions[actionDataIndex].type;
+            if (lane == 0 && (type == 5u || type == 18u || type == 30u))
+                g_GroupActionState = g_ActionState[emitter.actionStateFirst + actionIndex];
+            AllMemoryBarrierWithGroupSync();
+            if (GpuPapiSerialAction(type)) {
+                if (lane == 0)
+                    GpuPapiExecuteAction(emitter,actionDataIndex,actionIndex,0.033,killOldTime,0,1);
             }
-            bool dead = false;
-            if ((program.flags & 65536u) != 0)
-                GpuParticleCollision(particle.position,particle.positionB,particle.velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
-            g_Particles[index] = particle;
-            if (dead) GpuRemoveParticle(emitter,remaining - 1);
+            else
+                GpuPapiExecuteAction(emitter,actionDataIndex,actionIndex,0.033,killOldTime,lane,64);
+            if (lane == 0) g_GroupKillOldTime = killOldTime;
+            GpuSyncEmitter(emitter,lane);
+            killOldTime = g_GroupKillOldTime;
+        }
+        uint remaining = (program.flags & 3072u) == 3072u || (program.flags & 65536u) != 0 ? emitter.count : 0;
+        while (remaining > 0) {
+            uint batch = min(remaining,64u);
+            if (lane < batch) {
+                uint index = GpuParticleIndex(emitter,remaining - 1u - lane);
+                GpuPapiParticle particle = g_Particles[index];
+                if ((program.flags & 3072u) == 3072u) {
+                    float frame = float(particle.frame) / 255.0 + ((particle.flags & 1u) != 0 ? -1.0 : 1.0) * program.frameSpeed * 0.033;
+                    if (frame > float(program.frameCount)) frame -= float(program.frameCount);
+                    if (frame < 0) frame += float(program.frameCount);
+                    particle.frame = uint(int(floor(frame * 255.0))) & 65535u;
+                }
+                bool dead = false;
+                if ((program.flags & 65536u) != 0)
+                    GpuParticleCollision(particle.position,particle.positionB,particle.velocity,0.033,program.flags,program.collisionFriction,program.collisionResilience,program.collisionCutoff,dead);
+                g_Particles[index] = particle;
+                g_GroupDead[lane] = dead ? 1u : 0u;
+            }
+            AllMemoryBarrierWithGroupSync();
+            if (lane == 0)
+                for (uint offset = 0; offset < batch; ++offset)
+                    if (g_GroupDead[offset] != 0) GpuRemoveParticle(emitter,remaining - 1u - offset);
+            GpuSyncEmitter(emitter,lane);
+            remaining -= batch;
         }
         if ((emitter.flags & GPU_PAPI_STOPPING) != 0 && emitter.count == 0) {
-            emitter.flags &= ~(GPU_PAPI_PLAYING | GPU_PAPI_STOPPING);
+            if (lane == 0) emitter.flags &= ~(GPU_PAPI_PLAYING | GPU_PAPI_STOPPING);
+            GpuSyncEmitter(emitter,lane);
             break;
         }
     }
 }
-void GpuAdvanceRoot(inout GpuPapiEmitter root,uint milliseconds) {
-    GpuAdvanceEmitter(root,milliseconds);
+void GpuAdvanceRoot(inout GpuPapiEmitter root,uint milliseconds,uint lane) {
+    GpuAdvanceEmitter(root,milliseconds,lane);
     for (uint phase = 0; phase < 2; ++phase) {
         uint index = root.pad0;
         uint previous = GPU_PAPI_INVALID;
         while (index != GPU_PAPI_INVALID) {
-            GpuPapiEmitter child = g_Emitters[index];
+            GpuPapiEmitter child = (GpuPapiEmitter)0;
+            if (lane == 0) child = g_Emitters[index];
+            GpuSyncEmitter(child,lane);
             uint next = child.pad0;
             bool attached = (child.flags & GPU_PAPI_ATTACHED) != 0;
             if (attached == (phase == 0)) {
-                if (attached && (root.flags & GPU_PAPI_PLAYING) != 0 && child.parentParticle != GPU_PAPI_INVALID)
+                if (lane == 0 && attached && (root.flags & GPU_PAPI_PLAYING) != 0 && child.parentParticle != GPU_PAPI_INVALID)
                     GpuChildTransform(child,root,g_Particles[child.parentParticle],false);
-                GpuAdvanceEmitter(child,milliseconds);
-                if ((child.flags & GPU_PAPI_PLAYING) == 0) {
-                    if (attached && (child.flags & GPU_PAPI_REWIND) != 0) GpuPlayEmitter(child);
-                    else if (!attached) {
-                        GpuReleaseEmitter(child);
-                        if (previous == GPU_PAPI_INVALID) root.pad0 = next;
-                        else g_Emitters[previous].pad0 = next;
-                        GpuPublishRetired(index,child);
-                        index = next;
-                        continue;
+                GpuSyncEmitter(child,lane);
+                GpuAdvanceEmitter(child,milliseconds,lane);
+                bool retire = (child.flags & GPU_PAPI_PLAYING) == 0 && !attached;
+                if (lane == 0) {
+                    if ((child.flags & GPU_PAPI_PLAYING) == 0) {
+                        if (attached && (child.flags & GPU_PAPI_REWIND) != 0) GpuPlayEmitter(child);
+                        else if (retire) {
+                            GpuReleaseEmitter(child);
+                            if (previous == GPU_PAPI_INVALID) root.pad0 = next;
+                            else g_Emitters[previous].pad0 = next;
+                            GpuPublishRetired(index,child);
+                        }
                     }
+                    if (!retire) g_Emitters[index] = child;
                 }
-                g_Emitters[index] = child;
+                GpuSyncEmitter(root,lane);
+                if (retire) {
+                    index = next;
+                    continue;
+                }
             }
             previous = index;
             index = next;
@@ -388,21 +443,36 @@ void GpuStopRoot(inout GpuPapiEmitter root,bool deferred) {
     }
     if (!deferred) root.pad0 = GPU_PAPI_INVALID;
 }
-void GpuBounds(GpuPapiEmitter emitter,inout GpuPapiStatus status,bool updateBounds) {
+void GpuBounds(GpuPapiEmitter emitter,inout GpuPapiStatus status,bool updateBounds,uint lane) {
     status.playing |= (emitter.flags & GPU_PAPI_PLAYING) != 0 ? 1u : 0u;
     status.count += emitter.count;
     if (!updateBounds) return;
     bool local = (emitter.flags & GPU_PAPI_LOCAL) != 0;
     float radiusScale = local ? max(length(emitter.basisX.xyz),max(length(emitter.basisY.xyz),length(emitter.basisZ.xyz))) : 1.0;
-    for (uint i = 0; i < emitter.count; ++i) {
+    float3 boundsMin = float3(3.402823466e+38,3.402823466e+38,3.402823466e+38);
+    float3 boundsMax = -boundsMin;
+    for (uint i = lane; i < emitter.count; i += 64u) {
         GpuPapiParticle particle = g_Particles[GpuParticleIndex(emitter,i)];
         float3 position = particle.position;
         float radius = max(abs(particle.size.x),max(abs(particle.size.y),abs(particle.size.z))) * radiusScale;
         if (local) {
             position = emitter.origin.xyz + emitter.basisX.xyz * position.x + emitter.basisY.xyz * position.y + emitter.basisZ.xyz * position.z;
         }
-        status.boundsMin = min(status.boundsMin,position - radius);
-        status.boundsMax = max(status.boundsMax,position + radius);
+        boundsMin = min(boundsMin,position - radius);
+        boundsMax = max(boundsMax,position + radius);
     }
+    g_GroupBoundsMin[lane] = boundsMin;
+    g_GroupBoundsMax[lane] = boundsMax;
+    GroupMemoryBarrierWithGroupSync();
+    for (uint stride = 32u; stride > 0; stride >>= 1u) {
+        if (lane < stride) {
+            g_GroupBoundsMin[lane] = min(g_GroupBoundsMin[lane],g_GroupBoundsMin[lane + stride]);
+            g_GroupBoundsMax[lane] = max(g_GroupBoundsMax[lane],g_GroupBoundsMax[lane + stride]);
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+    status.boundsMin = min(status.boundsMin,g_GroupBoundsMin[0]);
+    status.boundsMax = max(status.boundsMax,g_GroupBoundsMax[0]);
+    GroupMemoryBarrierWithGroupSync();
 }
 #endif
