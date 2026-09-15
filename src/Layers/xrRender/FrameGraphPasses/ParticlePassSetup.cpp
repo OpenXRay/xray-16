@@ -213,8 +213,11 @@ static u32 GenerateParticleVertices(
         if (particleCount == 0 || !particles)
             continue;
 
-        u32 baseVertex = (u32)vertices.size();
-        vertices.resize(baseVertex + particleCount * 4);
+        const size_t baseVertex = vertices.size();
+        const size_t needed = baseVertex + size_t(particleCount) * 4;
+        if (needed > vertices.capacity())
+            vertices.reserve(std::max(needed, vertices.capacity() * 2));
+        vertices.resize(needed);
         ParticleVertex* pv = &vertices[baseVertex];
 
         bool alignToPath = pDef->m_Flags.is(CPEDef::dfAlignToPath);
@@ -704,10 +707,31 @@ ParticlePassOutput setupParticlePass(
                 PARTICLE_BLEND_ALPHA_ADD,
             };
 
-            auto renderBatchGroup = [&](const xr_vector<ParticleBatch>& allBatches, u8 blendMode,
-                                        float depthMin, float depthMax)
+            auto& ps = *data.passState;
+            auto& stagedVertices = ps.scratchVertices;
+            stagedVertices.clear();
+
+            struct StagedDraw {
+                u8 mode;
+                bool indirect;
+                u32 vertexOffset;
+                u32 totalParticles;
+                u32 firstSlot;
+                u32 slotCount;
+                float depthMin;
+                float depthMax;
+            };
+
+            xr_vector<StagedDraw> stagedDraws;
+            xr_vector<ParticleCullSlot> cullSlots;
+            xr_vector<ParticleDrawArgs> cullArgs;
+            u32 submittedQuads = 0;
+
+            auto stageBatchGroup = [&](const xr_vector<ParticleBatch>& allBatches, u8 blendMode,
+                                       float depthMin, float depthMax)
             {
-                xr_vector<ParticleBatch> filtered;
+                auto& filtered = ps.scratchFiltered;
+                filtered.clear();
                 for (const auto& b : allBatches) {
                     if (b.blendMode == blendMode && b.shaderVariant == ParticleShaderVariant::Standard)
                         filtered.push_back(b);
@@ -715,65 +739,25 @@ ParticlePassOutput setupParticlePass(
                 if (filtered.empty())
                     return;
 
-                xr_vector<ParticleVertex> vertices;
-                u32 totalParticles = GenerateParticleVertices(filtered, vertices);
-                if (totalParticles == 0)
+                const u32 vertexOffset = (u32)stagedVertices.size();
+                const u32 totalParticles = GenerateParticleVertices(filtered, stagedVertices);
+                if (totalParticles == 0) {
+                    stagedVertices.resize(vertexOffset);
                     return;
+                }
 
-                EnsureParticleVertexBuffer(nvDevice, (u32)(vertices.size() * sizeof(ParticleVertex)), *data.passState);
-                EnsureQuadIndexBuffer(nvDevice, totalParticles, *data.passState);
-                if (!data.passState->particleVB || !data.passState->quadIB)
-                    return;
-
-                cmdList->writeBuffer(data.passState->particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
-
-                auto pipeline = data.passState->pipelines[blendMode];
-                if (!pipeline)
-                    pipeline = data.passState->pipelines[PARTICLE_BLEND_BLEND];
-                if (!pipeline)
-                    return;
-
-                nvrhi::Viewport viewport(
-                    0.0f, static_cast<float>(rtDesc.width),
-                    0.0f, static_cast<float>(rtDesc.height),
-                    depthMin, depthMax
-                );
-
-                nvrhi::GraphicsState gfxState;
-                gfxState.pipeline = pipeline;
-                gfxState.framebuffer = framebuffer;
-                gfxState.bindings = { bindingSet };
-                if (bindlessTable)
-                    gfxState.addBindingSet(bindlessTable);
-                gfxState.vertexBuffers = { {data.passState->particleVB, 0, 0} };
-                gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
-                gfxState.viewport.addViewport(viewport);
-                gfxState.viewport.addScissorRect(scissor);
-
-                cmdList->setGraphicsState(gfxState);
-                cmdList->drawIndexed(
-                    nvrhi::DrawArguments()
-                        .setVertexCount(totalParticles * 6)
-                        .setStartIndexLocation(0)
-                        .setStartVertexLocation(0)
-                );
+                StagedDraw draw = {};
+                draw.mode = blendMode;
+                draw.indirect = false;
+                draw.vertexOffset = vertexOffset;
+                draw.totalParticles = totalParticles;
+                draw.depthMin = depthMin;
+                draw.depthMax = depthMax;
+                stagedDraws.push_back(draw);
             };
 
-            struct WorldGroupDraw {
-                u8 mode;
-                xr_vector<ParticleVertex> vertices;
-                u32 totalParticles;
-                u32 firstSlot;
-                u32 slotCount;
-            };
-
-            xr_vector<WorldGroupDraw> worldGroups;
-            xr_vector<ParticleCullSlot> cullSlots;
-            xr_vector<ParticleDrawArgs> cullArgs;
-            u32 submittedQuads = 0;
-
-            bool cullReady = data.passState->cullPipeline && data.passState->cullObjectBuffer &&
-                             data.passState->cullArgsBuffer && data.passState->cullStatsBuffer &&
+            bool cullReady = ps.cullPipeline && ps.cullObjectBuffer &&
+                             ps.cullArgsBuffer && ps.cullStatsBuffer &&
                              data.hasPrevViewProj &&
                              data.hiZPyramid.is_valid() && data.hiZMipLevels > 0;
             nvrhi::ITexture* hizTexture = cullReady ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
@@ -782,7 +766,8 @@ ParticlePassOutput setupParticlePass(
 
             if (totalWorld > 0 && cullReady) {
                 for (u8 mode : s_renderOrder) {
-                    xr_vector<ParticleBatch> filtered;
+                    auto& filtered = ps.scratchFiltered;
+                    filtered.clear();
                     for (const auto& b : *data.worldParticleBatches) {
                         if (b.blendMode == mode && b.shaderVariant == ParticleShaderVariant::Standard)
                             filtered.push_back(b);
@@ -790,14 +775,16 @@ ParticlePassOutput setupParticlePass(
                     if (filtered.empty())
                         continue;
 
-                    WorldGroupDraw group;
-                    group.mode = mode;
-                    xr_vector<u32> counts;
-                    group.totalParticles = GenerateParticleVertices(filtered, group.vertices, &counts);
-                    if (group.totalParticles == 0)
+                    const u32 vertexOffset = (u32)stagedVertices.size();
+                    auto& counts = ps.scratchCounts;
+                    counts.clear();
+                    const u32 totalParticles = GenerateParticleVertices(filtered, stagedVertices, &counts);
+                    if (totalParticles == 0) {
+                        stagedVertices.resize(vertexOffset);
                         continue;
+                    }
 
-                    group.firstSlot = (u32)cullSlots.size();
+                    const u32 firstSlot = (u32)cullSlots.size();
                     u32 firstParticle = 0;
                     for (size_t i = 0; i < filtered.size(); ++i) {
                         u32 count = counts[i];
@@ -823,11 +810,24 @@ ParticlePassOutput setupParticlePass(
 
                         firstParticle += count;
                     }
-                    group.slotCount = (u32)cullSlots.size() - group.firstSlot;
-                    if (group.slotCount == 0)
+
+                    const u32 slotCount = (u32)cullSlots.size() - firstSlot;
+                    if (slotCount == 0) {
+                        stagedVertices.resize(vertexOffset);
                         continue;
-                    submittedQuads += group.totalParticles;
-                    worldGroups.push_back(std::move(group));
+                    }
+                    submittedQuads += totalParticles;
+
+                    StagedDraw draw = {};
+                    draw.mode = mode;
+                    draw.indirect = true;
+                    draw.vertexOffset = vertexOffset;
+                    draw.totalParticles = totalParticles;
+                    draw.firstSlot = firstSlot;
+                    draw.slotCount = slotCount;
+                    draw.depthMin = 0.0f;
+                    draw.depthMax = 1.0f;
+                    stagedDraws.push_back(draw);
                 }
 
                 if (cullSlots.empty() || cullSlots.size() > PARTICLE_CULL_MAX_SLOTS)
@@ -882,7 +882,6 @@ ParticlePassOutput setupParticlePass(
                     cmdList->setComputeState(cullState);
                     cmdList->dispatch(((u32)cullSlots.size() + 63) / 64, 1, 1);
 
-                    auto& ps = *data.passState;
                     if (ps.cullStatsScheduled >= ParticlePassState::CULL_STATS_SLOTS) {
                         nvrhi::IBuffer* oldest = ps.cullStatsReadback[ps.cullStatsWriteSlot];
                         void* mapped = oldest ? nvDevice->mapBuffer(oldest, nvrhi::CpuAccessMode::Read) : nullptr;
@@ -922,51 +921,73 @@ ParticlePassOutput setupParticlePass(
                 }
             }
 
-            if (totalWorld > 0 && cullReady) {
-                for (auto& group : worldGroups) {
-                    EnsureParticleVertexBuffer(nvDevice, (u32)(group.vertices.size() * sizeof(ParticleVertex)), *data.passState);
-                    EnsureQuadIndexBuffer(nvDevice, group.totalParticles, *data.passState);
-                    if (!data.passState->particleVB || !data.passState->quadIB)
-                        continue;
-
-                    cmdList->writeBuffer(data.passState->particleVB, group.vertices.data(),
-                                         group.vertices.size() * sizeof(ParticleVertex));
-
-                    auto pipeline = data.passState->pipelines[group.mode];
-                    if (!pipeline)
-                        pipeline = data.passState->pipelines[PARTICLE_BLEND_BLEND];
-                    if (!pipeline)
-                        continue;
-
-                    nvrhi::Viewport viewport(
-                        0.0f, static_cast<float>(rtDesc.width),
-                        0.0f, static_cast<float>(rtDesc.height),
-                        0.0f, 1.0f
-                    );
-
-                    nvrhi::GraphicsState gfxState;
-                    gfxState.pipeline = pipeline;
-                    gfxState.framebuffer = framebuffer;
-                    gfxState.bindings = { bindingSet };
-                    if (bindlessTable)
-                        gfxState.addBindingSet(bindlessTable);
-                    gfxState.vertexBuffers = { {data.passState->particleVB, 0, 0} };
-                    gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
-                    gfxState.indirectParams = data.passState->cullArgsBuffer;
-                    gfxState.viewport.addViewport(viewport);
-                    gfxState.viewport.addScissorRect(scissor);
-
-                    cmdList->setGraphicsState(gfxState);
-                    cmdList->drawIndexedIndirect(group.firstSlot * sizeof(ParticleDrawArgs), group.slotCount);
-                }
-            } else if (totalWorld > 0) {
+            if (totalWorld > 0 && !cullReady) {
+                stagedVertices.clear();
+                stagedDraws.clear();
                 for (u8 mode : s_renderOrder)
-                    renderBatchGroup(*data.worldParticleBatches, mode, 0.0f, 1.0f);
+                    stageBatchGroup(*data.worldParticleBatches, mode, 0.0f, 1.0f);
             }
 
             if (totalHUD > 0) {
                 for (u8 mode : s_renderOrder)
-                    renderBatchGroup(*data.hudParticleBatches, mode, 0.9f, 1.0f);
+                    stageBatchGroup(*data.hudParticleBatches, mode, 0.9f, 1.0f);
+            }
+
+            if (!stagedDraws.empty()) {
+                u32 maxGroupParticles = 0;
+                for (const auto& draw : stagedDraws)
+                    maxGroupParticles = std::max(maxGroupParticles, draw.totalParticles);
+
+                EnsureParticleVertexBuffer(nvDevice, (u32)(stagedVertices.size() * sizeof(ParticleVertex)), ps);
+                EnsureQuadIndexBuffer(nvDevice, maxGroupParticles, ps);
+
+                if (ps.particleVB && ps.quadIB) {
+                    cmdList->writeBuffer(ps.particleVB, stagedVertices.data(),
+                                         stagedVertices.size() * sizeof(ParticleVertex));
+
+                    for (const auto& draw : stagedDraws) {
+                        auto pipeline = ps.pipelines[draw.mode];
+                        if (!pipeline)
+                            pipeline = ps.pipelines[PARTICLE_BLEND_BLEND];
+                        if (!pipeline)
+                            continue;
+
+                        nvrhi::Viewport viewport(
+                            0.0f, static_cast<float>(rtDesc.width),
+                            0.0f, static_cast<float>(rtDesc.height),
+                            draw.depthMin, draw.depthMax
+                        );
+
+                        nvrhi::GraphicsState gfxState;
+                        gfxState.pipeline = pipeline;
+                        gfxState.framebuffer = framebuffer;
+                        gfxState.bindings = { bindingSet };
+                        if (bindlessTable)
+                            gfxState.addBindingSet(bindlessTable);
+                        gfxState.vertexBuffers = {
+                            {ps.particleVB, 0, u64(draw.vertexOffset) * sizeof(ParticleVertex)}
+                        };
+                        gfxState.indexBuffer = { ps.quadIB, nvrhi::Format::R16_UINT, 0 };
+                        if (draw.indirect)
+                            gfxState.indirectParams = ps.cullArgsBuffer;
+                        gfxState.viewport.addViewport(viewport);
+                        gfxState.viewport.addScissorRect(scissor);
+
+                        cmdList->setGraphicsState(gfxState);
+
+                        if (draw.indirect) {
+                            cmdList->drawIndexedIndirect(draw.firstSlot * sizeof(ParticleDrawArgs),
+                                                         draw.slotCount);
+                        } else {
+                            cmdList->drawIndexed(
+                                nvrhi::DrawArguments()
+                                    .setVertexCount(draw.totalParticles * 6)
+                                    .setStartIndexLocation(0)
+                                    .setStartVertexLocation(0)
+                            );
+                        }
+                    }
+                }
             }
 
             if (!data.hasDistortion || !data.distortionRT.is_valid())
@@ -998,58 +1019,84 @@ ParticlePassOutput setupParticlePass(
             auto distortBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(
                 distortBindDesc, data.passState->distortLayout, nvDevice);
 
-            auto renderDistortGroup = [&](const xr_vector<ParticleBatch>& allBatches,
-                                          float depthMin, float depthMax)
+            stagedVertices.clear();
+            stagedDraws.clear();
+
+            auto stageDistortGroup = [&](const xr_vector<ParticleBatch>& allBatches,
+                                         float depthMin, float depthMax)
             {
-                xr_vector<ParticleBatch> filtered;
+                auto& filtered = ps.scratchFiltered;
+                filtered.clear();
                 for (const auto& b : allBatches)
                     if (b.shaderVariant == ParticleShaderVariant::Distort)
                         filtered.push_back(b);
                 if (filtered.empty())
                     return;
 
-                xr_vector<ParticleVertex> vertices;
-                u32 totalParticles = GenerateParticleVertices(filtered, vertices);
-                if (totalParticles == 0)
+                const u32 vertexOffset = (u32)stagedVertices.size();
+                const u32 totalParticles = GenerateParticleVertices(filtered, stagedVertices);
+                if (totalParticles == 0) {
+                    stagedVertices.resize(vertexOffset);
                     return;
+                }
 
-                EnsureParticleVertexBuffer(nvDevice, (u32)(vertices.size() * sizeof(ParticleVertex)), *data.passState);
-                EnsureQuadIndexBuffer(nvDevice, totalParticles, *data.passState);
-                if (!data.passState->particleVB || !data.passState->quadIB)
-                    return;
+                StagedDraw draw = {};
+                draw.indirect = false;
+                draw.vertexOffset = vertexOffset;
+                draw.totalParticles = totalParticles;
+                draw.depthMin = depthMin;
+                draw.depthMax = depthMax;
+                stagedDraws.push_back(draw);
+            };
 
-                cmdList->writeBuffer(data.passState->particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
+            if (totalWorld > 0)
+                stageDistortGroup(*data.worldParticleBatches, 0.0f, 1.0f);
+            if (totalHUD > 0)
+                stageDistortGroup(*data.hudParticleBatches, 0.9f, 1.0f);
 
+            if (stagedDraws.empty())
+                return;
+
+            u32 maxDistortParticles = 0;
+            for (const auto& draw : stagedDraws)
+                maxDistortParticles = std::max(maxDistortParticles, draw.totalParticles);
+
+            EnsureParticleVertexBuffer(nvDevice, (u32)(stagedVertices.size() * sizeof(ParticleVertex)), ps);
+            EnsureQuadIndexBuffer(nvDevice, maxDistortParticles, ps);
+            if (!ps.particleVB || !ps.quadIB)
+                return;
+
+            cmdList->writeBuffer(ps.particleVB, stagedVertices.data(),
+                                 stagedVertices.size() * sizeof(ParticleVertex));
+
+            for (const auto& draw : stagedDraws) {
                 nvrhi::Viewport viewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
-                    depthMin, depthMax
+                    draw.depthMin, draw.depthMax
                 );
 
                 nvrhi::GraphicsState gfxState;
-                gfxState.pipeline = data.passState->distortPipeline;
+                gfxState.pipeline = ps.distortPipeline;
                 gfxState.framebuffer = distortFB;
                 gfxState.bindings = { distortBindingSet };
                 if (bindlessTable)
                     gfxState.addBindingSet(bindlessTable);
-                gfxState.vertexBuffers = { {data.passState->particleVB, 0, 0} };
-                gfxState.indexBuffer = { data.passState->quadIB, nvrhi::Format::R16_UINT, 0 };
+                gfxState.vertexBuffers = {
+                    {ps.particleVB, 0, u64(draw.vertexOffset) * sizeof(ParticleVertex)}
+                };
+                gfxState.indexBuffer = { ps.quadIB, nvrhi::Format::R16_UINT, 0 };
                 gfxState.viewport.addViewport(viewport);
                 gfxState.viewport.addScissorRect(scissor);
 
                 cmdList->setGraphicsState(gfxState);
                 cmdList->drawIndexed(
                     nvrhi::DrawArguments()
-                        .setVertexCount(totalParticles * 6)
+                        .setVertexCount(draw.totalParticles * 6)
                         .setStartIndexLocation(0)
                         .setStartVertexLocation(0)
                 );
-            };
-
-            if (totalWorld > 0)
-                renderDistortGroup(*data.worldParticleBatches, 0.0f, 1.0f);
-            if (totalHUD > 0)
-                renderDistortGroup(*data.hudParticleBatches, 0.9f, 1.0f);
+            }
         }
     );
 
