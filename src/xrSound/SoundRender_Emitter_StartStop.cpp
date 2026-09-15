@@ -46,6 +46,7 @@ void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay
 
 void CSoundRender_Emitter::i_stop()
 {
+    ZoneScoped;
     bRewind = FALSE;
     if (target)
         stop_target();
@@ -109,6 +110,7 @@ void CSoundRender_Emitter::cancel()
 
 void CSoundRender_Emitter::stop_target()
 {
+    ZoneScoped;
     wait_prefill();
     R_ASSERT1_CURE(target, { return; });
     target->stop();
