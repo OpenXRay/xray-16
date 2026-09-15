@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FGResourcePool.h"
+#include "PassResourceCache.h"
 
 // FrameGraph Resource Pool Implementation
 // Week 4: FrameGraph Integration with ResourceManager
@@ -179,9 +180,27 @@ void FGResourcePool::Reset() {
     m_stats.texturesActive = 0;
     m_stats.memoryAllocated = 0;
     m_stats.memorySaved = 0;
+}
 
-    m_currentFrame++;
+void FGResourcePool::Tick() {
+    ++m_currentFrame;
 
+    for (auto it = m_texturePool.begin(); it != m_texturePool.end(); ++it) {
+        if (it->inUse)
+            continue;
+        if (m_currentFrame - it->lastUsedFrame < kEvictAfterFrames)
+            continue;
+
+        resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+        GetPassResourceCache().InvalidateTexture(texManager->GetNVRHITexture(it->handle));
+        texManager->Release(it->handle);
+
+        if (m_stats.texturesActive > 0)
+            m_stats.texturesActive--;
+
+        m_texturePool.erase(it);
+        return;
+    }
 }
 
 // ═══════════════════════════════════════════════════

@@ -525,6 +525,43 @@ void PassResourceCache::ClearFramebufferDependent() {
     m_bindingSets.clear();
 }
 
+static bool FramebufferReferences(const nvrhi::FramebufferDesc& desc, const nvrhi::ITexture* texture) {
+    for (const auto& attachment : desc.colorAttachments)
+        if (attachment.texture == texture)
+            return true;
+    return desc.depthAttachment.texture == texture ||
+        desc.shadingRateAttachment.texture == texture;
+}
+
+void PassResourceCache::InvalidateTexture(const nvrhi::ITexture* texture) {
+    if (!texture)
+        return;
+
+    for (auto it = m_framebuffers.begin(); it != m_framebuffers.end();) {
+        if (it->second && FramebufferReferences(it->second->getDesc(), texture))
+            it = m_framebuffers.erase(it);
+        else
+            ++it;
+    }
+
+    for (auto it = m_bindingSets.begin(); it != m_bindingSets.end();) {
+        const nvrhi::BindingSetDesc* desc = it->second ? it->second->getDesc() : nullptr;
+        bool references = false;
+        if (desc) {
+            for (const auto& binding : desc->bindings) {
+                if (binding.resourceHandle == static_cast<const nvrhi::IResource*>(texture)) {
+                    references = true;
+                    break;
+                }
+            }
+        }
+        if (references)
+            it = m_bindingSets.erase(it);
+        else
+            ++it;
+    }
+}
+
 void PassResourceCache::ResetStats() {
     m_stats = Stats{};
 }

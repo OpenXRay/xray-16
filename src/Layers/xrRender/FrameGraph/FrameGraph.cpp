@@ -421,6 +421,8 @@ void FrameGraph::ResetForNextFrame() {
             if (resource.resourceBuffer.IsValid())
                 m_resourcePool->FreeBuffer(resource.resourceBuffer);
         }
+
+        m_resourcePool->Tick();
     }
 
     m_compileReaderLinks.clear();

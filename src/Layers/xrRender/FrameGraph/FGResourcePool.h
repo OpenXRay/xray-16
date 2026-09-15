@@ -48,6 +48,8 @@ public:
     // Reset pool (free all transient resources)
     void Reset();
 
+    void Tick();
+
     // ═══════════════════════════════════════════════════
     //  STATISTICS
     // ═══════════════════════════════════════════════════
@@ -92,6 +94,8 @@ private:
 
     bool m_aliasingEnabled = true;
     u32 m_currentFrame = 0;
+
+    static constexpr u32 kEvictAfterFrames = 4;
 
     // Statistics
     mutable Statistics m_stats;
