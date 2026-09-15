@@ -97,6 +97,7 @@ struct LocalShadowState {
     u32 atlasLayer = 0;
     nvrhi::BufferHandle receiverTiles;
     const light* owners[kLocalTileCount] = {};
+    u16 nodeOfSlot[kLocalTileCount] = {};
     LocalAtlasAllocator atlas;
     LocalShadowViewGPU request[kLocalTileCount] = {};
     u32 candList[kLocalTileCount][4] = {};

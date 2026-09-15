@@ -1323,6 +1323,8 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.staticAtlas = state.dynAtlas = state.hudAtlas = nullptr;
     state.hudViews = 0;
     std::fill_n(state.owners, kLocalTileCount, nullptr);
+    std::fill_n(state.nodeOfSlot, kLocalTileCount, u16(0));
+    state.atlas.Reset();
     std::fill_n(state.request, kLocalTileCount, LocalShadowViewGPU{});
     state.candCount = state.dirtyViews = 0;
     state.stateReset = state.staticAtlasFirst = state.dynAtlasFirst = true;
@@ -1341,6 +1343,8 @@ void WarmLocalShadowPool(fg::RenderDevice* device, LocalShadowState& state)
     R_ASSERT2(EnsureAtlasLayers(nvDevice, state, 1), "Cannot allocate the local shadow atlas");
     R_ASSERT2(EnsureResources(nvDevice, state), "Cannot allocate a complete local shadow page");
     R_ASSERT2(EnsurePipelines(device, state), "Cannot render complete local light shadows without their pipelines");
+    R_ASSERT2(EnsureHudAtlas(nvDevice, state), "Cannot allocate the local shadow HUD atlas");
+    EnsureHudPipeline(device, state);
 }
 
 void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
@@ -1374,23 +1378,158 @@ struct ShadowCandidate {
     float desiredSize;
 };
 
-void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates)
+struct SlotPlan {
+    u32 base = ~0u;
+    u32 nodes[6] = {};
+    bool newOwner = true;
+};
+
+u32 FacesOf(const light* L)
 {
-    ++state.frame;
-    state.candCount = 0;
-    state.dirtyViews = 0;
-    state.statCasterBatches = 0;
-    state.pooledSpots = state.pooledPoints = 0;
-    xr_vector<u32> sizes, nodes;
-    for (const auto& candidate : candidates) {
-        const bool point = candidate.source->flags.type == IRender_Light::POINT;
-        const u32 lo = point ? kLocalPointFaceMin : kLocalSpotTileMin;
-        const u32 hi = point ? kLocalPointFaceMax : kLocalSpotTileMax;
-        u32 size = lo;
-        while (size < hi && float(size) < candidate.desiredSize)
-            size <<= 1;
-        sizes.push_back(size);
+    return L->flags.type == IRender_Light::POINT ? 6u : 1u;
+}
+
+u32 TileSize(const ShadowCandidate& candidate, u32 current)
+{
+    const bool point = candidate.source->flags.type == IRender_Light::POINT;
+    const u32 lo = point ? kLocalPointFaceMin : kLocalSpotTileMin;
+    const u32 hi = point ? kLocalPointFaceMax : kLocalSpotTileMax;
+    u32 size = lo;
+    while (size < hi && float(size) < candidate.desiredSize)
+        size <<= 1;
+    if (current && size > current && candidate.desiredSize < float(current) * 1.25f)
+        return current;
+    if (current && size < current && candidate.desiredSize > float(current) * 0.4f)
+        return current;
+    return size;
+}
+
+u32 FindResident(const LocalShadowState& state, const light* L, u32 faces)
+{
+    for (u32 slot = 0; slot + faces <= kLocalTileCount; ++slot) {
+        if (state.owners[slot] != L || state.request[slot].meta[3] != 0u)
+            continue;
+        bool whole = state.request[slot].meta[2] == u32(faces == 6u);
+        for (u32 f = 1; whole && f < faces; ++f)
+            whole = state.owners[slot + f] == L;
+        return whole ? slot : ~0u;
     }
+    return ~0u;
+}
+
+u32 FindFreeSlots(const LocalShadowState& state, u32 faces)
+{
+    for (u32 slot = 0; slot + faces <= kLocalTileCount; ++slot) {
+        bool free = true;
+        for (u32 f = 0; free && f < faces; ++f)
+            free = state.owners[slot + f] == nullptr;
+        if (free)
+            return slot;
+    }
+    return ~0u;
+}
+
+bool AllocNodes(LocalAtlasAllocator& atlas, u32 level, u32 faces, u32* nodes)
+{
+    for (u32 f = 0; f < faces; ++f) {
+        nodes[f] = atlas.Alloc(level);
+        if (nodes[f] == ~0u) {
+            for (u32 k = 0; k < f; ++k)
+                atlas.Free(nodes[k]);
+            return false;
+        }
+    }
+    return true;
+}
+
+void EvictSlots(LocalShadowState& state, u32 base, u32 faces)
+{
+    for (u32 f = 0; f < faces; ++f) {
+        state.atlas.Free(state.nodeOfSlot[base + f]);
+        state.owners[base + f] = nullptr;
+    }
+}
+
+void EvictStaleResidents(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates)
+{
+    for (u32 slot = 0; slot < kLocalTileCount;) {
+        const light* L = state.owners[slot];
+        if (!L) {
+            ++slot;
+            continue;
+        }
+        const u32 faces = state.request[slot].meta[2] ? 6u : 1u;
+        bool keep = false;
+        for (const auto& candidate : candidates) {
+            if (candidate.source == L && FacesOf(candidate.source) == faces) {
+                keep = true;
+                break;
+            }
+        }
+        if (!keep)
+            EvictSlots(state, slot, faces);
+        slot += faces;
+    }
+}
+
+bool PlanIncremental(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates, xr_vector<SlotPlan>& plans)
+{
+    EvictStaleResidents(state, candidates);
+
+    plans.assign(candidates.size(), SlotPlan{});
+    for (u32 i = 0; i < candidates.size(); ++i) {
+        const ShadowCandidate& candidate = candidates[i];
+        const u32 faces = FacesOf(candidate.source);
+        const u32 base = FindResident(state, candidate.source, faces);
+        if (base == ~0u)
+            continue;
+        SlotPlan& plan = plans[i];
+        plan.base = base;
+        plan.newOwner = false;
+        const u32 currentLevel = state.atlas.nodeLevel[state.nodeOfSlot[base]];
+        const u32 level = LocalAtlasAllocator::LevelOf(TileSize(candidate, LocalAtlasAllocator::SizeOf(currentLevel)));
+        if (level != currentLevel && AllocNodes(state.atlas, level, faces, plan.nodes)) {
+            for (u32 f = 0; f < faces; ++f) {
+                state.atlas.Free(state.nodeOfSlot[base + f]);
+                state.nodeOfSlot[base + f] = u16(plan.nodes[f]);
+            }
+        } else {
+            for (u32 f = 0; f < faces; ++f)
+                plan.nodes[f] = state.nodeOfSlot[base + f];
+        }
+    }
+
+    for (u32 i = 0; i < candidates.size(); ++i) {
+        SlotPlan& plan = plans[i];
+        if (plan.base != ~0u)
+            continue;
+        const ShadowCandidate& candidate = candidates[i];
+        const bool point = candidate.source->flags.type == IRender_Light::POINT;
+        const u32 faces = point ? 6u : 1u;
+        const u32 base = FindFreeSlots(state, faces);
+        if (base == ~0u)
+            return false;
+        const u32 minLevel = LocalAtlasAllocator::LevelOf(point ? kLocalPointFaceMin : kLocalSpotTileMin);
+        u32 level = LocalAtlasAllocator::LevelOf(TileSize(candidate, 0));
+        while (!AllocNodes(state.atlas, level, faces, plan.nodes)) {
+            if (level >= minLevel)
+                return false;
+            ++level;
+        }
+        plan.base = base;
+        for (u32 f = 0; f < faces; ++f) {
+            state.owners[base + f] = candidate.source;
+            state.nodeOfSlot[base + f] = u16(plan.nodes[f]);
+        }
+    }
+    return true;
+}
+
+void PlanRepack(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates, xr_vector<SlotPlan>& plans)
+{
+    xr_vector<u32> sizes, nodes;
+    for (const auto& candidate : candidates)
+        sizes.push_back(TileSize(candidate, 0));
     // Pack complete lights. A full page fits at minimum sizes, so resolution can
     // decrease under pressure without rejecting a light or any of its six faces.
     for (;;) {
@@ -1398,7 +1537,7 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
         nodes.clear();
         bool fit = true;
         for (u32 i = 0; i < candidates.size() && fit; ++i) {
-            const u32 faces = candidates[i].source->flags.type == IRender_Light::POINT ? 6u : 1u;
+            const u32 faces = FacesOf(candidates[i].source);
             for (u32 f = 0; f < faces; ++f) {
                 const u32 node = state.atlas.Alloc(LocalAtlasAllocator::LevelOf(sizes[i]));
                 if (node == ~0u) {
@@ -1421,20 +1560,53 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
         R_ASSERT2(reduced, "A local shadow page must fit all of its minimum-size views");
     }
 
+    const light* previousOwners[kLocalTileCount];
+    std::copy_n(state.owners, kLocalTileCount, previousOwners);
+    std::fill_n(state.owners, kLocalTileCount, nullptr);
+
+    plans.assign(candidates.size(), SlotPlan{});
+    u32 base = 0, node = 0;
+    for (u32 i = 0; i < candidates.size(); ++i) {
+        const light* L = candidates[i].source;
+        const u32 faces = FacesOf(L);
+        SlotPlan& plan = plans[i];
+        plan.base = base;
+        plan.newOwner = previousOwners[base] != L || state.request[base].meta[2] != u32(faces == 6u);
+        for (u32 f = 0; f < faces; ++f) {
+            plan.nodes[f] = nodes[node++];
+            state.owners[base + f] = L;
+            state.nodeOfSlot[base + f] = u16(plan.nodes[f]);
+        }
+        base += faces;
+    }
+}
+
+void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandidate>& candidates)
+{
+    ++state.frame;
+    state.candCount = 0;
+    state.dirtyViews = 0;
+    state.statCasterBatches = 0;
+    state.pooledSpots = state.pooledPoints = 0;
+
+    xr_vector<SlotPlan> plans;
+    if (!PlanIncremental(state, candidates, plans))
+        PlanRepack(state, candidates, plans);
+
     state.slotOfLight.clear();
-    for (const auto& candidate : candidates) {
-        const light* L = candidate.source;
+    for (u32 i = 0; i < candidates.size(); ++i) {
+        const light* L = candidates[i].source;
+        const SlotPlan& plan = plans[i];
         const bool point = L->flags.type == IRender_Light::POINT;
-        const u32 base = state.candCount;
+        const u32 base = plan.base;
         const u32 faces = point ? 6u : 1u;
-        const bool newOwner = state.owners[base] != L || state.request[base].meta[2] != u32(point);
-        const u32 serial = newOwner ? ++state.nextSerial : state.request[base].meta[1];
+        const u32 serial = plan.newOwner ? ++state.nextSerial : state.request[base].meta[1];
         state.slotOfLight.push_back(base + 1u);
         const float farZ = std::max(L->range + EPS_S, 0.002f);
         const float nearZ = clampr(L->virtual_size, 0.001f, farZ * 0.5f);
         const float fov = point ? PI_DIV_2 + deg2rad(11.5f) : L->cone + deg2rad(3.5f);
         for (u32 f = 0; f < faces; ++f) {
-            const u32 slot = state.candCount++;
+            const u32 slot = base + f;
             Fvector dir, up;
             if (point) {
                 dir = kFaceDir[f];
@@ -1447,13 +1619,13 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
             proj.build_projection(fov, 1.f, nearZ, farZ);
             vp.mul(proj, view);
             LocalShadowViewGPU rec = {};
-            FillRecord(rec, vp, state.atlas, nodes[slot], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
+            FillRecord(rec, vp, state.atlas, plan.nodes[f], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
             rec.shape.y = float(state.atlasLayer);
             const auto& previous = state.request[slot];
             // Exact transform/rectangle comparison includes virtual size and roll.
             // The baseline is a requested revision that is rendered this frame;
             // sub-threshold movement can no longer accumulate against an old map.
-            const bool changed = newOwner || state.owners[slot] != L
+            const bool changed = plan.newOwner || state.owners[slot] != L
                 || memcmp(&rec, &previous, offsetof(LocalShadowViewGPU, meta)) != 0;
             u32 stamp = previous.meta[0] + u32(changed);
             if (stamp == 0u)
@@ -1465,10 +1637,11 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
             state.dirtyViews += u32(changed);
             state.request[slot] = rec;
             state.owners[slot] = L;
-            state.candList[slot][0] = slot;
-            state.candList[slot][1] = stamp;
-            state.candList[slot][2] = serial;
-            state.candList[slot][3] = slot | (3u << 30); // Visible; refresh dynamic depth every frame.
+            const u32 cand = state.candCount++;
+            state.candList[cand][0] = slot;
+            state.candList[cand][1] = stamp;
+            state.candList[cand][2] = serial;
+            state.candList[cand][3] = slot | (3u << 30); // Visible; refresh dynamic depth every frame.
         }
         if (point)
             ++state.pooledPoints;
@@ -1476,6 +1649,22 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
             ++state.pooledSpots;
     }
     state.statAtlasPercent = u32(u64(state.atlas.UsedTexels()) * 100u / (u64(kLocalShadowAtlas) * kLocalShadowAtlas));
+}
+
+void ReleasePage(LocalShadowState& state)
+{
+    for (u32 slot = 0; slot < kLocalTileCount;) {
+        const light* L = state.owners[slot];
+        if (!L) {
+            ++slot;
+            continue;
+        }
+        const u32 faces = state.request[slot].meta[2] ? 6u : 1u;
+        EvictSlots(state, slot, faces);
+        slot += faces;
+    }
+    state.candCount = 0;
+    state.slotOfLight.clear();
 }
 } // namespace
 
@@ -1518,16 +1707,17 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFi
     state.hudAlloc.Reset();
     for (u32 page = 0; page < state.activePages; ++page) {
         LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
-        for (u32 slot = 0; slot < current.candCount;) {
+        for (u32 cand = 0; cand < current.candCount; ++cand) {
+            const u32 slot = current.candList[cand][0];
             LocalShadowViewGPU& rec = current.request[slot];
+            if (rec.meta[3] != 0u)
+                continue;
             const bool point = rec.meta[2] != 0u;
             const u32 faces = point ? 6u : 1u;
             for (u32 f = 0; f < faces; ++f)
                 current.request[slot + f].hud.set(0.0f, 0.0f, 0.0f, 0.0f);
-            if (!fit || !ViewTouchesSphere(rec, fit->trueSphere, !point)) {
-                slot += faces;
+            if (!fit || !ViewTouchesSphere(rec, fit->trueSphere, !point))
                 continue;
-            }
             const light* L = current.owners[slot];
             const float flags = float(kLocalHudCasters | (L->flags.bCastHudToWorld ? kLocalHudToWorld : 0u));
             Fvector center;
@@ -1541,10 +1731,8 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFi
             const float r = fit->shownSphere.w;
             if (dist > r + 0.01f) {
                 Fvector4 rect;
-                if (!AllocHudRect(state, page * kLocalTileCount + slot, rect)) {
-                    slot += faces;
+                if (!AllocHudRect(state, page * kLocalTileCount + slot, rect))
                     continue;
-                }
                 rect.x = flags;
                 Fvector dir;
                 dir.div(toCenter, dist);
@@ -1588,7 +1776,6 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFi
                     face.hudViewProj.mul(proj, view);
                 }
             }
-            slot += faces;
         }
     }
 }
@@ -1647,6 +1834,8 @@ void SelectLocalShadowLights(
             slots[batch[i].lightIndex] = page * kLocalTileCount + current.slotOfLight[i];
         ++page;
     }
+    for (u32 p = page; p <= state.overflowPages.size(); ++p)
+        ReleasePage(p == 0 ? state : *state.overflowPages[p - 1]);
     state.slotOfLight = std::move(slots);
     state.activePages = page;
     state.pooledSpots = u32(spots.size());
