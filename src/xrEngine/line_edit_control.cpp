@@ -10,7 +10,7 @@
 
 #include "xrCore/os_clipboard.h"
 #include "xrCore/buffer_vector.h"
-#include "xrCore/Text/StringConversion.hpp"
+#include "xrCore/Text/Utf8Utils.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
 
@@ -18,13 +18,11 @@
 
 #include <SDL.h>
 
-#include <locale>
-
 ENGINE_API float g_console_sensitive = 0.15f;
 
 namespace text_editor
 {
-static bool terminate_char(char c, bool check_space = false)
+static bool terminate_char(u32 c, bool check_space = false)
 {
     switch (c)
     {
@@ -263,12 +261,14 @@ void line_edit_control::remove_callback(int dik)
         xr_delete(m_actions[dik]);
 }
 
-void line_edit_control::insert_character(char c)
+void line_edit_control::insert_utf8_codepoint(pcstr cp, size_t len)
 {
-    VERIFY(m_inserted_pos < (m_buffer_size - 1 /*trailing zero*/));
-    m_inserted[m_inserted_pos    ] = c;
-    m_inserted[m_inserted_pos + 1] = 0;
-    m_inserted_pos++;
+    if (m_inserted_pos + len >= (m_buffer_size - 1 /*trailing zero*/))
+        return;
+    for (size_t i = 0; i < len; ++i)
+        m_inserted[m_inserted_pos + i] = cp[i];
+    m_inserted[m_inserted_pos + len] = 0;
+    m_inserted_pos += len;
 }
 
 void line_edit_control::clear_inserted() { m_inserted[0] = m_inserted[1] = 0; m_inserted_pos = 0; }
@@ -280,17 +280,37 @@ void line_edit_control::set_edit(pcstr str)
     strncpy_s(m_edit_str, m_buffer_size, str, str_size);
     m_edit_str[str_size] = 0;
 
+    // Some UI defaults / scripts still pass CP1251 strings. Normalize to UTF-8 internally.
+    if (!XRay::Utf8::IsValid(m_edit_str))
+    {
+        const xr_string utf8 = XRay::Utf8::FromCP1251(m_edit_str);
+        str_size = std::min(utf8.size(), m_buffer_size - 1);
+        strncpy_s(m_edit_str, m_buffer_size, utf8.c_str(), str_size);
+        m_edit_str[str_size] = 0;
+    }
+
+    // Make sure the stored string does not end in the middle of a UTF-8 codepoint.
+    while (str_size > 0 && !XRay::Utf8::IsValid(m_edit_str))
+    {
+        --str_size;
+        m_edit_str[str_size] = 0;
+    }
+
     m_cur_pos = str_size;
     m_select_start = m_cur_pos;
     m_accel = 1.0f;
     update_bufs();
 }
 
-bool line_edit_control::char_is_allowed(char c)
+bool line_edit_control::char_is_allowed(u32 codepoint)
 {
+    // Reject control characters (below U+0020).
+    if (codepoint < 0x20)
+        return false;
+
     if (m_current_mode == im_number_only)
     {
-        switch (c)
+        switch (codepoint)
         {
         case '7': case '8': case '9':
         case '4': case '5': case '6':
@@ -301,7 +321,7 @@ bool line_edit_control::char_is_allowed(char c)
             return false;
         }
     }
-    switch (c)
+    switch (codepoint)
     {
     case '\'': case '\"': // ' and "
     case '\\': case '/':  // \ and /
@@ -371,13 +391,29 @@ void line_edit_control::on_text_input(const char *text)
     clear_inserted();
     compute_positions();
 
-    static std::locale locale("");
-    const auto str = StringFromUTF8(text, locale);
-
-    for (char c : str)
+    // Pasted text may still be in CP1251; convert it once if needed.
+    xr_string inputText;
+    pcstr p = text;
+    if (text && text[0] && !XRay::Utf8::IsValid(text))
     {
-        if (char_is_allowed(c))
-            insert_character(c);
+        inputText = XRay::Utf8::FromCP1251(text);
+        p = inputText.c_str();
+    }
+
+    while (*p != 0)
+    {
+        size_t len = 0;
+        const u32 codepoint = XRay::Utf8::Decode(p, len);
+        // Skip replacement character from stray invalid bytes rather than inserting raw bytes.
+        if (codepoint == XRay::Utf8::REPLACEMENT_CHARACTER && len == 1 &&
+            XRay::Utf8::SequenceLength(static_cast<u8>(*p)) != 1)
+        {
+            ++p;
+            continue;
+        }
+        if (char_is_allowed(codepoint))
+            insert_utf8_codepoint(p, len);
+        p += len;
     }
     add_inserted_text();
 
@@ -478,7 +514,13 @@ void line_edit_control::update_bufs()
     m_buf3[0] = 0;
 
     const size_t edit_size = xr_strlen(m_edit_str);
-    const u8 ds = (m_cursor_view && m_insert_mode && m_p2 < edit_size) ? 1 : 0;
+    size_t ds = 0;
+    if (m_cursor_view && m_insert_mode && m_p2 < edit_size)
+    {
+        size_t len = 0;
+        XRay::Utf8::Decode(m_edit_str + m_p2, len);
+        ds = len;
+    }
     strncpy_s(m_buf0, m_buffer_size, m_edit_str, m_cur_pos);
     strncpy_s(m_buf1, m_buffer_size, m_edit_str, m_p1);
     strncpy_s(m_buf2, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1 + ds);
@@ -516,10 +558,19 @@ void line_edit_control::add_inserted_text()
     {
         m_inserted[m_buffer_size - 1 - m_p1] = 0;
         new_size = xr_strlen(m_inserted);
+        // trim back to the leading byte so we do not split a UTF-8 codepoint
+        while (new_size > 0 && XRay::Utf8::IsContinuationByte(static_cast<u8>(m_inserted[new_size - 1])))
+            m_inserted[--new_size] = 0;
     }
     strncpy_s(buf + m_p1, m_buffer_size - m_p1, m_inserted, _min(new_size, m_buffer_size - m_p1)); // part 2
 
-    const u8 ds = (m_insert_mode && m_p2 < old_edit_size) ? 1 : 0;
+    size_t ds = 0;
+    if (m_insert_mode && m_p2 < old_edit_size)
+    {
+        size_t len = 0;
+        XRay::Utf8::Decode(m_edit_str + m_p2, len);
+        ds = len;
+    }
     strncpy_s(buf + m_p1 + new_size, m_buffer_size - (m_p1 + new_size), m_edit_str + m_p2 + ds,
         _min(old_edit_size - m_p2 - ds, m_buffer_size - m_p1 - new_size)); // part 3
     buf[m_buffer_size] = 0;
@@ -553,7 +604,7 @@ void line_edit_control::copy_to_clipboard()
 void line_edit_control::paste_from_clipboard()
 {
     os_clipboard::paste_from_clipboard(m_inserted, m_buffer_size - 1);
-    m_inserted_pos += xr_strlen(m_inserted);
+    m_inserted_pos = xr_strlen(m_inserted);
 }
 void line_edit_control::cut_to_clipboard()
 {
@@ -587,14 +638,23 @@ void line_edit_control::delete_selected(bool back)
     {
         if (back)
         {
-            u8 dp = ((m_p1 == m_p2) && m_p1 > 0) ? 1 : 0;
+            size_t dp = 0;
+            if ((m_p1 == m_p2) && m_p1 > 0)
+                dp = m_edit_str + m_p1 - XRay::Utf8::Prev(m_edit_str, m_edit_str + m_p1);
+
             strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1 - dp, m_p2 - m_p1 + dp);
             strncpy_s(m_edit_str + m_p1 - dp, m_buffer_size - (m_p1 - dp), m_edit_str + m_p2, edit_len - m_p2);
             m_cur_pos = m_p1 - dp;
         }
         else
         {
-            u8 dn = ((m_p1 == m_p2) && m_p2 < edit_len) ? 1 : 0;
+            size_t dn = 0;
+            if ((m_p1 == m_p2) && m_p2 < edit_len)
+            {
+                size_t len = 0;
+                XRay::Utf8::Decode(m_edit_str + m_p2, len);
+                dn = len;
+            }
             strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1 + dn);
             strncpy_s(m_edit_str + m_p1, m_buffer_size - m_p1, m_edit_str + m_p2 + dn, edit_len - m_p2 - dn);
             m_cur_pos = m_p1;
@@ -632,43 +692,79 @@ void line_edit_control::move_pos_end() { m_cur_pos = xr_strlen(m_edit_str); }
 void line_edit_control::move_pos_left()
 {
     if (m_cur_pos > 0)
-        --m_cur_pos;
+        m_cur_pos = XRay::Utf8::Prev(m_edit_str, m_edit_str + m_cur_pos) - m_edit_str;
 }
-void line_edit_control::move_pos_right() { ++m_cur_pos; }
+void line_edit_control::move_pos_right()
+{
+    m_cur_pos = XRay::Utf8::Next(m_edit_str + m_cur_pos) - m_edit_str;
+}
 void line_edit_control::move_pos_left_word()
 {
-    size_t i = m_cur_pos > 0 ? m_cur_pos - 1 : 0;
+    pcstr const edit_str = m_edit_str;
+    pcstr p = edit_str + m_cur_pos;
 
-    while (i > 0 && m_edit_str[i] == ' ')
-        --i;
-
-    if (i > 0 && !terminate_char(m_edit_str[i]))
+    // skip whitespace to the left, landing on the first non-space character
+    while (p > edit_str)
     {
-        while (i > 0 && !terminate_char(m_edit_str[i], true))
-            --i;
-
-        if (i > 0)
-            ++i;
+        pcstr prev = XRay::Utf8::Prev(edit_str, p);
+        size_t len = 0;
+        const u32 cp = XRay::Utf8::Decode(prev, len);
+        if (cp != ' ')
+        {
+            p = prev;
+            break;
+        }
+        p = prev;
     }
 
-    m_cur_pos = i;
+    // skip non-terminating characters to the left
+    if (p > edit_str)
+    {
+        size_t len = 0;
+        if (!terminate_char(XRay::Utf8::Decode(p, len)))
+        {
+            while (p > edit_str)
+            {
+                pcstr prev = XRay::Utf8::Prev(edit_str, p);
+                size_t prev_len = 0;
+                const u32 cp = XRay::Utf8::Decode(prev, prev_len);
+                if (terminate_char(cp, true))
+                    break;
+                p = prev;
+            }
+        }
+    }
+
+    m_cur_pos = p - edit_str;
 }
 
 void line_edit_control::move_pos_right_word()
 {
-    const size_t edit_len = xr_strlen(m_edit_str);
-    size_t i = m_cur_pos + 1;
+    pcstr const edit_str = m_edit_str;
+    pcstr p = XRay::Utf8::Next(edit_str + m_cur_pos);
+    pcstr const end = edit_str + xr_strlen(edit_str);
 
-    while (i < edit_len && !terminate_char(m_edit_str[i], true))
-        ++i;
+    // skip non-terminating characters to the right
+    while (p < end)
+    {
+        size_t len = 0;
+        const u32 cp = XRay::Utf8::Decode(p, len);
+        if (terminate_char(cp, true))
+            break;
+        p += len;
+    }
 
-    //while (i < edit_len && terminate_char(m_edit_str[i]))
-    //    ++i;
+    // skip whitespace to the right
+    while (p < end)
+    {
+        size_t len = 0;
+        const u32 cp = XRay::Utf8::Decode(p, len);
+        if (cp != ' ')
+            break;
+        p += len;
+    }
 
-    while (i < edit_len && m_edit_str[i] == ' ')
-        ++i;
-
-    m_cur_pos = i;
+    m_cur_pos = p - edit_str;
 }
 
 void line_edit_control::compute_positions()
@@ -686,7 +782,14 @@ void line_edit_control::compute_positions()
         m_p2 = m_select_start;
 }
 
-void line_edit_control::clamp_cur_pos() { clamp<size_t>(m_cur_pos, 0, xr_strlen(m_edit_str)); }
+void line_edit_control::clamp_cur_pos()
+{
+    clamp<size_t>(m_cur_pos, 0, xr_strlen(m_edit_str));
+
+    // If m_cur_pos points to a continuation byte, move it back to the leading byte.
+    while (m_cur_pos > 0 && XRay::Utf8::IsContinuationByte(static_cast<u8>(m_edit_str[m_cur_pos])))
+        --m_cur_pos;
+}
 void line_edit_control::SwitchKL()
 {
     cpcstr hint = SDL_GetHint(SDL_HINT_GRAB_KEYBOARD);

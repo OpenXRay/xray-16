@@ -523,7 +523,6 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         CHK_DX(_hr);
 
         //string64 cname;
-        //CHK_DX(WideCharToMultiByte( CP_ACP, 0, Pinfo->pwszName, -1, cname, sizeof(cname) , nullptr, nullptr ) );
 
         SClientConnectData cl_data;
         //xr_strcpy(cl_data.name, cname);

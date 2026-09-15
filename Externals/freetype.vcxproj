@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\src\xray_project_configurations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}</ProjectGuid>
+    <RootNamespace>freetype</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\src\xray_project_configuration.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\src\xray.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <AdditionalIncludeDirectories>$(xrExternals)freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="freetype\src\autofit\autofit.c" />
+    <ClCompile Include="freetype\src\base\ftbase.c" />
+    <ClCompile Include="freetype\src\base\ftbbox.c" />
+    <ClCompile Include="freetype\src\base\ftbdf.c" />
+    <ClCompile Include="freetype\src\base\ftbitmap.c" />
+    <ClCompile Include="freetype\src\base\ftcid.c" />
+    <ClCompile Include="freetype\src\base\ftfstype.c" />
+    <ClCompile Include="freetype\src\base\ftgasp.c" />
+    <ClCompile Include="freetype\src\base\ftglyph.c" />
+    <ClCompile Include="freetype\src\base\ftgxval.c" />
+    <ClCompile Include="freetype\src\base\ftinit.c" />
+    <ClCompile Include="freetype\src\base\ftmm.c" />
+    <ClCompile Include="freetype\src\base\ftotval.c" />
+    <ClCompile Include="freetype\src\base\ftpatent.c" />
+    <ClCompile Include="freetype\src\base\ftpfr.c" />
+    <ClCompile Include="freetype\src\base\ftstroke.c" />
+    <ClCompile Include="freetype\src\base\ftsynth.c" />
+    <ClCompile Include="freetype\src\base\fttype1.c" />
+    <ClCompile Include="freetype\src\base\ftwinfnt.c" />
+    <ClCompile Include="freetype\src\bdf\bdf.c" />
+    <ClCompile Include="freetype\src\cache\ftcache.c" />
+    <ClCompile Include="freetype\src\cff\cff.c" />
+    <ClCompile Include="freetype\src\cid\type1cid.c" />
+    <ClCompile Include="freetype\src\gzip\ftgzip.c" />
+    <ClCompile Include="freetype\src\hvf\hvf.c" />
+    <ClCompile Include="freetype\src\lzw\ftlzw.c" />
+    <ClCompile Include="freetype\src\pcf\pcf.c" />
+    <ClCompile Include="freetype\src\pfr\pfr.c" />
+    <ClCompile Include="freetype\src\psaux\psaux.c" />
+    <ClCompile Include="freetype\src\pshinter\pshinter.c" />
+    <ClCompile Include="freetype\src\psnames\psmodule.c" />
+    <ClCompile Include="freetype\src\raster\raster.c" />
+    <ClCompile Include="freetype\src\sfnt\sfnt.c" />
+    <ClCompile Include="freetype\src\smooth\smooth.c" />
+    <ClCompile Include="freetype\src\sdf\sdf.c" />
+    <ClCompile Include="freetype\src\svg\svg.c" />
+    <ClCompile Include="freetype\src\truetype\truetype.c" />
+    <ClCompile Include="freetype\src\type1\type1.c" />
+    <ClCompile Include="freetype\src\type42\type42.c" />
+    <ClCompile Include="freetype\src\winfonts\winfnt.c" />
+    <ClCompile Include="freetype\builds\windows\ftdebug.c" />
+    <ClCompile Include="freetype\builds\windows\ftsystem.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

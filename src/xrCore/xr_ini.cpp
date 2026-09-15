@@ -259,7 +259,10 @@ XRCORE_API bool _parse(pstr dest, pcstr src)
     {
         while (*src)
         {
-            if (isspace((u8)*src))
+            // Only ASCII whitespace is stripped outside quoted strings.
+            // Using iswspace() on UTF-8 bytes would treat some continuation bytes
+            // (e.g. 0xA0 NBSP) as whitespace and corrupt multi-byte codepoints.
+            if (*src == ' ' || *src == '\t' || *src == '\r' || *src == '\n')
             {
                 if (bInsideSTR)
                 {
@@ -267,7 +270,7 @@ XRCORE_API bool _parse(pstr dest, pcstr src)
                     continue;
                 }
 
-                while (*src && isspace(*src))
+                while (*src && (*src == ' ' || *src == '\t' || *src == '\r' || *src == '\n'))
                     ++src;
 
                 continue;
@@ -409,10 +412,24 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
     string4096 str2;
 
     bool bInsideSTR = false;
+    bool bFirstLine = true;
 
     while (!F->eof())
     {
         F->r_string(str, sizeof str);
+
+        // Strip UTF-8 BOM at the beginning of the file
+        if (bFirstLine &&
+            static_cast<u8>(str[0]) == 0xEF &&
+            static_cast<u8>(str[1]) == 0xBB &&
+            static_cast<u8>(str[2]) == 0xBF)
+        {
+            const size_t len = xr_strlen(str);
+            if (len >= 3)
+                memmove(str, str + 3, len - 2); // includes null terminator
+        }
+        bFirstLine = false;
+
         _Trim(str);
         pstr comm = strchr(str, ';');
         pstr comm_1 = strchr(str, '/');

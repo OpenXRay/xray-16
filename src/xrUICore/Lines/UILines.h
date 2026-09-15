@@ -49,6 +49,13 @@ public:
     float GetVisibleHeight();
     float GetIndentByAlign() const;
 
+    // UTF-8 text cursor helpers used by CUICustomEdit
+    bool BuildVisualLineRanges(xr_vector<std::pair<size_t, size_t>>& out_ranges);
+    bool ComputeCursorPlacement(size_t cursor_pos, float& out_x_in_line, size_t& out_visual_line_idx);
+    bool CursorPosFromLocalPoint(float local_x, float local_y, size_t& out_pos, float scroll_offset_y,
+        const float* vindent_override = nullptr);
+    bool MoveCursorByVisualLine(size_t& io_cursor, int delta);
+
     Fvector2 m_TextOffset{};
     Fvector2 m_wndSize{};
     Fvector2 m_wndPos{};
