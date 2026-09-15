@@ -92,6 +92,9 @@ struct ParticlePassState {
     u32 cullStatsWriteSlot = 0;
     u32 cullStatsScheduled = 0;
     ParticleCullStats cullStats;
+    xr_vector<ParticleVertex> scratchVertices;
+    xr_vector<ParticleBatch> scratchFiltered;
+    xr_vector<u32> scratchCounts;
 };
 
 struct ParticlePassData {
