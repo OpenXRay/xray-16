@@ -57,7 +57,7 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
                 desc.clearValue.color[2],
                 desc.clearValue.color[3]
             );
-            m_commandList->clearTextureFloat(
+            GetCommandList()->clearTextureFloat(
                 desc.renderTargets[i],
                 nvrhi::AllSubresources,
                 clearColor
@@ -67,7 +67,7 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
 
     if (desc.clearDepth || desc.clearStencil) {
         if (desc.depthStencil) {
-            m_commandList->clearDepthStencilTexture(
+            GetCommandList()->clearDepthStencilTexture(
                 desc.depthStencil,
                 nvrhi::AllSubresources,
                 desc.clearDepth,
@@ -275,7 +275,7 @@ void RenderContext::WriteBuffer(nvrhi::IBuffer* buffer, const void* data, size_t
     VERIFY(dataSize > 0);
     VERIFY(m_commandList != nullptr);
 
-    m_commandList->writeBuffer(buffer, data, dataSize, offset);
+    GetCommandList()->writeBuffer(buffer, data, dataSize, offset);
 }
 
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
@@ -413,13 +413,13 @@ void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
 
     m_stats.numDrawCalls++;
 
-    m_commandList->setGraphicsState(m_currentState);
+    GetCommandList()->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = vertexCount;
     args.startVertexLocation = startVertex;
 
-    m_commandList->draw(args);
+    GetCommandList()->draw(args);
 }
 
 void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) {
@@ -427,14 +427,14 @@ void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) 
 
     m_stats.numDrawIndexedCalls++;
 
-    m_commandList->setGraphicsState(m_currentState);
+    GetCommandList()->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = indexCount;
     args.startIndexLocation = startIndex;
     args.startVertexLocation = baseVertex;
 
-    m_commandList->drawIndexed(args);
+    GetCommandList()->drawIndexed(args);
 }
 
 void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
@@ -443,7 +443,7 @@ void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
 
     m_stats.numDrawInstancedCalls++;
 
-    m_commandList->setGraphicsState(m_currentState);
+    GetCommandList()->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = vertexCount;
@@ -451,7 +451,7 @@ void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
     args.startVertexLocation = startVertex;
     args.startInstanceLocation = startInstance;
 
-    m_commandList->draw(args);
+    GetCommandList()->draw(args);
 }
 
 void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
@@ -461,7 +461,7 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
 
     m_stats.numDrawIndexedInstancedCalls++;
 
-    m_commandList->setGraphicsState(m_currentState);
+    GetCommandList()->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = indexCount;
@@ -470,7 +470,7 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
     args.startVertexLocation = baseVertex;
     args.startInstanceLocation = startInstance;
 
-    m_commandList->drawIndexed(args);
+    GetCommandList()->drawIndexed(args);
 }
 
 void RenderContext::DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffset) {
@@ -481,9 +481,9 @@ void RenderContext::DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffs
 
     m_currentState.indirectParams = argsBuffer;
 
-    m_commandList->setGraphicsState(m_currentState);
+    GetCommandList()->setGraphicsState(m_currentState);
 
-    m_commandList->drawIndexedIndirect(argsOffset, 1);
+    GetCommandList()->drawIndexedIndirect(argsOffset, 1);
 
     m_currentState.indirectParams = nullptr;
 }
@@ -492,13 +492,13 @@ void RenderContext::ClearRenderTarget(nvrhi::ITexture* rt, const float color[4])
     VERIFY(rt != nullptr);
 
     nvrhi::Color clearColor(color[0], color[1], color[2], color[3]);
-    m_commandList->clearTextureFloat(rt, nvrhi::AllSubresources, clearColor);
+    GetCommandList()->clearTextureFloat(rt, nvrhi::AllSubresources, clearColor);
 }
 
 void RenderContext::ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil) {
     VERIFY(ds != nullptr);
 
-    m_commandList->clearDepthStencilTexture(
+    GetCommandList()->clearDepthStencilTexture(
         ds,
         nvrhi::AllSubresources,
         true,
@@ -536,8 +536,8 @@ void RenderContext::Dispatch(u32 groupsX, u32 groupsY, u32 groupsZ) {
     VERIFY2(!m_inRenderPass, "Cannot dispatch compute in render pass!");
     VERIFY(m_currentComputeState.pipeline != nullptr);
 
-    m_commandList->setComputeState(m_currentComputeState);
-    m_commandList->dispatch(groupsX, groupsY, groupsZ);
+    GetCommandList()->setComputeState(m_currentComputeState);
+    GetCommandList()->dispatch(groupsX, groupsY, groupsZ);
 
     m_stats.numDispatchCalls++;
 }
@@ -549,7 +549,7 @@ void RenderContext::ClearBufferUint(nvrhi::IBuffer* buffer, u32 value) {
     if (value == 0) {
         const auto& desc = buffer->getDesc();
         xr_vector<u32> zeros(desc.byteSize / sizeof(u32), 0);
-        m_commandList->writeBuffer(buffer, zeros.data(), desc.byteSize, 0);
+        GetCommandList()->writeBuffer(buffer, zeros.data(), desc.byteSize, 0);
     } else {
         Msg("! [RenderContext::ClearBufferUint] Non-zero clear not yet implemented");
     }
@@ -560,7 +560,7 @@ void RenderContext::CopyTexture(nvrhi::ITexture* dest, nvrhi::ITexture* src) {
     VERIFY(src != nullptr);
     VERIFY2(!m_inRenderPass, "Cannot copy textures inside render pass!");
 
-    m_commandList->copyTexture(
+    GetCommandList()->copyTexture(
         dest,
         nvrhi::TextureSlice(),
         src,
