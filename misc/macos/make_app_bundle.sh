@@ -81,13 +81,23 @@ find "${BIN_DIR}" -maxdepth 1 -type f -name '*.dylib' -exec cp {} "${LIBS_DIR}/"
 cp "${ROOT_DIR}/res/fsgame.ltx" "${OXR_RES_DIR}/fsgame.ltx"
 cp -R "${ROOT_DIR}/res/gamedata" "${OXR_RES_DIR}/gamedata"
 
-# Bundle non-system dynamic libraries (Homebrew deps etc.).
+# Bundle non-system dynamic libraries and abort if a dependency cannot be found.
 dylibbundler \
     -of -cd -b \
     -x "${MACOS_DIR}/xr_3da" \
     -d "${LIBS_DIR}" \
     -s "${BIN_DIR}" \
-    -s "${LIBS_DIR}"
+    -s "${LIBS_DIR}" <<<'quit'
+
+# SDL2-compat loads SDL3 dynamically, which is outside this SDL2 bundle's dependencies.
+for sdl2_lib in "${LIBS_DIR}"/libSDL2*.dylib; do
+    [[ -f "${sdl2_lib}" ]] || continue
+    if LC_ALL=C grep -a -q 'SDL2COMPAT_' "${sdl2_lib}"; then
+        echo "Cannot package SDL2-compat. Build native SDL2 with misc/macos/build_sdl2.sh"
+        echo "and reconfigure OpenXRay with the resulting SDL2_DIR before rebuilding."
+        exit 1
+    fi
+done
 
 reset_rpaths() {
     local binary="$1"
