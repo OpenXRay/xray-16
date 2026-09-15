@@ -3,6 +3,11 @@
 #if defined(_WIN32)
 #   define XR_PLATFORM_WINDOWS
 #   define _XRAY_PLATFORM_MARKER "Windows"
+#elif defined(__ANDROID__)
+#   define XR_PLATFORM_ANDROID
+#   define XR_PLATFORM_LINUX
+#   define XR_PLATFORM_POSIX
+#   define _XRAY_PLATFORM_MARKER "Android"
 #elif defined(__linux__)
 #   define XR_PLATFORM_LINUX
 #   define XR_PLATFORM_POSIX
