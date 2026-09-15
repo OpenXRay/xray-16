@@ -4,6 +4,7 @@
 #include "xrCore/MemoryStats.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IRenderBackend.h"
+#include "Layers/xrRender/GpuParticleManager.h"
 #include <imgui.h>
 #include <algorithm>
 #include <cstring>
@@ -557,6 +558,16 @@ void StatsOverlay::RenderGeometrySection()
 
             ImGui::Unindent();
         }
+
+        const auto particles = xray::render::fg::GetGpuParticleManager().GetStats();
+        ImGui::Text("GPU Particles:");
+        ImGui::Indent();
+        ImGui::Text("Roots: %u live / %u pending", particles.liveRoots, particles.pendingRoots);
+        ImGui::Text("Commands: %u / %u replayed", particles.commands, particles.replayedCommands);
+        ImGui::Text("Command upload: %.2f KiB / status copy: %.2f KiB",
+            double(particles.commandBytes) / 1024.0, double(particles.readbackBytes) / 1024.0);
+        ImGui::Text("Compute bindings created: %u", particles.bindingSets);
+        ImGui::Unindent();
 
         // ═══════════════════════════════════════════════════
         //  MEGA-BUFFER STATS

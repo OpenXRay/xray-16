@@ -16,6 +16,7 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/GpuParticleManager.h"
+#include "Layers/xrRender/ParticleEditor/ParticleEditor.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
@@ -261,6 +262,8 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
 void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
+    if (m_particleEditor)
+        m_particleEditor->OnLevelUnload();
     if (m_processHOMTask) {
         TaskScheduler->Wait(m_processHOMTask);
         m_processHOMTask.Reset();

@@ -52,6 +52,11 @@ static constexpr GpuParticleBlendDesc gpuParticleBlends[PARTICLE_BLEND_COUNT] = 
     { nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, "GpuParticle.AlphaAdd" }
 };
 
+static constexpr u32 gpuParticleSetMask = (1u << 0) | (1u << 6);
+static constexpr u32 gpuParticleColorMask = (1u << 12) - 1;
+static constexpr u32 gpuParticleSoftMask = gpuParticleColorMask & ~gpuParticleSetMask;
+static constexpr u32 gpuParticleDistortionMask = (1u << 12) | (1u << 13);
+
 static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticlePassData& data)
 {
     auto& state = *data.state;
@@ -68,15 +73,18 @@ static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticleP
     auto* loader = GEnv.Render->GetShaderLoader();
     VERIFY(device && loader);
     auto vertex = loader->LoadVertexShader("gpu_particle");
+    auto set = loader->LoadPixelShader("bindless_particle_set");
     auto pixel = loader->LoadPixelShader("bindless_particle");
     auto distort = loader->LoadPixelShader("bindless_particle_distort");
-    VERIFY2(vertex.handle && pixel.handle && distort.handle, "GPU particle shaders are required");
-    VERIFY(vertex.reflection && pixel.reflection && distort.reflection);
+    VERIFY2(vertex.handle && set.handle && pixel.handle && distort.handle, "GPU particle shaders are required");
+    VERIFY(vertex.reflection && set.reflection && pixel.reflection && distort.reflection);
     state.vertexReflection = loader->GetCachedReflection("gpu_particle", ".vs");
+    state.setReflection = loader->GetCachedReflection("bindless_particle_set", ".ps");
     state.pixelReflection = loader->GetCachedReflection("bindless_particle", ".ps");
     state.distortReflection = loader->GetCachedReflection("bindless_particle_distort", ".ps");
-    VERIFY(state.vertexReflection && state.pixelReflection && state.distortReflection);
+    VERIFY(state.vertexReflection && state.setReflection && state.pixelReflection && state.distortReflection);
     auto& cache = GetPassResourceCache();
+    auto setLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Set", *vertex.reflection, *set.reflection, device);
     auto layout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle", *vertex.reflection, *pixel.reflection, device);
     auto distortLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Distort", *vertex.reflection, *distort.reflection, device);
     auto* backend = data.device->GetBackend();
@@ -91,6 +99,8 @@ static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticleP
     pipeline.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
     for (u32 mode = 0; mode < PARTICLE_BLEND_COUNT; ++mode) {
         const auto& blend = gpuParticleBlends[mode];
+        pipeline.PS = mode == PARTICLE_BLEND_SET ? set.handle : pixel.handle;
+        pipeline.bindingLayouts = { mode == PARTICLE_BLEND_SET ? setLayout : layout, backend->GetBindlessLayout() };
         auto& target = pipeline.renderState.blendState.targets[0];
         target.blendEnable = mode != PARTICLE_BLEND_SET;
         target.srcBlend = blend.source;
@@ -136,7 +146,7 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     params.hudWarp = HudFovWarp();
     params.cameraTop.set(Device.vCameraTop.x, Device.vCameraTop.y, Device.vCameraTop.z, 0.0f);
     params.cameraRight.set(Device.vCameraRight.x, Device.vCameraRight.y, Device.vCameraRight.z, 0.0f);
-    auto bind = [&](const ExtractedReflection& pixel, nvrhi::IBindingLayout* layout, bool distortion) {
+    auto bind = [&](const ExtractedReflection& pixel, nvrhi::IBindingLayout* layout, bool softParticles) {
         BindingSetBuilder bindings(*passState.vertexReflection, pixel, device, "GpuParticle");
         bindings.ConstantBuffer("static_globals", staticGlobals)
             .ConstantBuffer("GpuParticleDrawParams", drawConstants)
@@ -146,25 +156,44 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
             .BufferSRV("g_ParticleIndices", graph.GetPhysicalBuffer(data.resources.indexResource))
             .BufferSRV("g_BucketOffsets", graph.GetPhysicalBuffer(data.resources.bucketResource))
             .BufferSRV("g_Materials", materials.GetBuffer());
-        if (!distortion)
+        if (softParticles)
             bindings.Texture("g_SceneDepth", graph.GetPhysicalTexture(data.sceneDepth));
         return cache.GetOrCreateBindingSet(bindings.Build(), layout, device);
     };
-    auto bindingSet = bind(*passState.pixelReflection, passState.pipelines[0]->getDesc().bindingLayouts[0], false);
-    auto distortBindingSet = bind(*passState.distortReflection, passState.distortPipeline->getDesc().bindingLayouts[0], true);
-    VERIFY(bindingSet && distortBindingSet);
-    nvrhi::FramebufferDesc framebufferDesc;
-    framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.color));
-    framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.normal));
-    framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.baseColor));
-    framebufferDesc.setDepthAttachment(graph.GetPhysicalTexture(data.depth));
-    auto framebuffer = cache.GetOrCreateFramebuffer(framebufferDesc, device);
-    nvrhi::FramebufferDesc distortDesc;
+    const u32 mask = data.resources.drawBucketMask;
+    nvrhi::BindingSetHandle setBindingSet, bindingSet, distortBindingSet;
+    if (mask & gpuParticleSetMask) {
+        setBindingSet = bind(*passState.setReflection, passState.pipelines[PARTICLE_BLEND_SET]->getDesc().bindingLayouts[0], false);
+        VERIFY(setBindingSet);
+    }
+    if (mask & gpuParticleSoftMask) {
+        bindingSet = bind(*passState.pixelReflection, passState.pipelines[PARTICLE_BLEND_BLEND]->getDesc().bindingLayouts[0], true);
+        VERIFY(bindingSet);
+    }
+    if (mask & gpuParticleDistortionMask) {
+        distortBindingSet = bind(*passState.distortReflection, passState.distortPipeline->getDesc().bindingLayouts[0], false);
+        VERIFY(distortBindingSet);
+    }
+    const auto depthAttachment = nvrhi::FramebufferAttachment()
+        .setTexture(graph.GetPhysicalTexture(data.depth)).setReadOnly((mask & gpuParticleSetMask) == 0);
+    nvrhi::FramebufferHandle framebuffer, distortFramebuffer;
+    if (mask & gpuParticleColorMask) {
+        nvrhi::FramebufferDesc framebufferDesc;
+        framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.color));
+        framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.normal));
+        framebufferDesc.addColorAttachment(graph.GetPhysicalTexture(data.baseColor));
+        framebufferDesc.setDepthAttachment(depthAttachment);
+        framebuffer = cache.GetOrCreateFramebuffer(framebufferDesc, device);
+        VERIFY(framebuffer);
+    }
     auto* distortion = graph.GetPhysicalTexture(data.distortion);
-    distortDesc.addColorAttachment(distortion);
-    distortDesc.setDepthAttachment(graph.GetPhysicalTexture(data.depth));
-    auto distortFramebuffer = cache.GetOrCreateFramebuffer(distortDesc, device);
-    VERIFY(framebuffer && distortFramebuffer);
+    if (mask & gpuParticleDistortionMask) {
+        nvrhi::FramebufferDesc distortDesc;
+        distortDesc.addColorAttachment(distortion);
+        distortDesc.setDepthAttachment(depthAttachment);
+        distortFramebuffer = cache.GetOrCreateFramebuffer(distortDesc, device);
+        VERIFY(distortFramebuffer);
+    }
     if (data.clearDistortion)
         commandList->clearTextureFloat(distortion, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 0.0f));
     auto* bindlessTable = data.device->GetBackend()->GetBindlessDescriptorTable();
@@ -175,12 +204,15 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     state.viewport.viewports = { nvrhi::Viewport(0.0f, float(data.width), 0.0f, float(data.height), 0.0f, 1.0f) };
     static constexpr u32 buckets[] = { 0, 3, 4, 1, 2, 5, 6, 9, 10, 7, 8, 11, 12, 13 };
     for (u32 bucket : buckets) {
+        if ((mask & (1u << bucket)) == 0)
+            continue;
         params.drawBucket = bucket;
         commandList->writeBuffer(drawConstants, &params, sizeof(params));
         bool isDistortion = bucket >= 12;
         state.pipeline = isDistortion ? passState.distortPipeline : passState.pipelines[bucket % PARTICLE_BLEND_COUNT];
         state.framebuffer = isDistortion ? distortFramebuffer : framebuffer;
-        state.bindings = { isDistortion ? distortBindingSet : bindingSet, bindlessTable };
+        state.bindings = { isDistortion ? distortBindingSet :
+            (bucket % PARTICLE_BLEND_COUNT == PARTICLE_BLEND_SET ? setBindingSet : bindingSet), bindlessTable };
         commandList->setGraphicsState(state);
         commandList->drawIndirect(bucket * sizeof(nvrhi::DrawIndirectArguments), 1);
     }
@@ -200,26 +232,34 @@ GpuParticlePassOutputs setupGpuParticlePass(
     u32 height,
     GpuParticlePassState& state)
 {
-    if (resources.particleCapacity == 0)
+    if (resources.particleCapacity == 0 || resources.drawBucketMask == 0)
         return { color, distortion };
     VERIFY(device && color.is_valid() && depth.is_valid() && normal.is_valid() && baseColor.is_valid());
     VERIFY(resources.particleResource.is_valid() && resources.emitterResource.is_valid() && resources.programResource.is_valid());
     VERIFY(resources.indexResource.is_valid() && resources.argsResource.is_valid() && resources.bucketResource.is_valid());
-    ResourceDesc depthDesc = graph.GetResourceDesc(depth);
-    depthDesc.debugName = "GpuParticle.SceneDepth";
-    depthDesc.isImported = false;
-    depthDesc.isTransient = true;
-    auto sceneDepth = graph.CreateTexture("GpuParticle.SceneDepth", depthDesc);
-    struct DepthCopyData { VirtualResourceHandle source, destination; };
-    graph.addCallbackPass<DepthCopyData>("GpuParticle.DepthCopy",
-        [&](FrameGraph& builder, PassHandle handle, DepthCopyData& data) {
-            RenderPassBuilder pass(builder, handle);
-            data.source = pass.read(depth, ResourceState::CopySource);
-            data.destination = pass.write(sceneDepth, ResourceState::CopyDest);
-        },
-        [](const DepthCopyData& data, const FrameGraph& graph, fg::RenderContext* context) {
-            context->CopyTexture(graph.GetPhysicalTexture(data.destination), graph.GetPhysicalTexture(data.source));
-        });
+    const bool writesDepth = (resources.drawBucketMask & gpuParticleSetMask) != 0;
+    const bool softParticles = (resources.drawBucketMask & gpuParticleSoftMask) != 0;
+    VirtualResourceHandle sceneDepth;
+    if (softParticles) {
+        sceneDepth = depth;
+        if (writesDepth) {
+            ResourceDesc depthDesc = graph.GetResourceDesc(depth);
+            depthDesc.debugName = "GpuParticle.SceneDepth";
+            depthDesc.isImported = false;
+            depthDesc.isTransient = true;
+            sceneDepth = graph.CreateTexture("GpuParticle.SceneDepth", depthDesc);
+            struct DepthCopyData { VirtualResourceHandle source, destination; };
+            graph.addCallbackPass<DepthCopyData>("GpuParticle.DepthCopy",
+                [&](FrameGraph& builder, PassHandle handle, DepthCopyData& data) {
+                    RenderPassBuilder pass(builder, handle);
+                    data.source = pass.read(depth, ResourceState::CopySource);
+                    data.destination = pass.write(sceneDepth, ResourceState::CopyDest);
+                },
+                [](const DepthCopyData& data, const FrameGraph& graph, fg::RenderContext* context) {
+                    context->CopyTexture(graph.GetPhysicalTexture(data.destination), graph.GetPhysicalTexture(data.source));
+                });
+        }
+    }
     auto& passData = graph.addCallbackPass<GpuParticlePassData>("GpuParticles",
         [&](FrameGraph& builder, PassHandle handle, GpuParticlePassData& data) {
             RenderPassBuilder pass(builder, handle);
@@ -235,11 +275,22 @@ GpuParticlePassOutputs setupGpuParticlePass(
             pass.read(resources.indexResource);
             pass.read(resources.bucketResource);
             pass.read(resources.argsResource, ResourceState::IndirectArgument);
-            data.color = pass.readWrite(color, ResourceState::RenderTarget);
-            data.normal = pass.readWrite(normal, ResourceState::RenderTarget);
-            data.baseColor = pass.readWrite(baseColor, ResourceState::RenderTarget);
-            data.depth = pass.readWrite(depth, ResourceState::DepthStencilWrite);
-            data.sceneDepth = pass.read(sceneDepth);
+            data.color = color;
+            data.normal = normal;
+            data.baseColor = baseColor;
+            if (resources.drawBucketMask & gpuParticleColorMask) {
+                pass.readWrite(color, ResourceState::RenderTarget);
+                pass.readWrite(normal, ResourceState::RenderTarget);
+                pass.readWrite(baseColor, ResourceState::RenderTarget);
+            }
+            if (writesDepth)
+                data.depth = pass.readWrite(depth, ResourceState::DepthStencilWrite);
+            else
+                data.depth = pass.read(depth, softParticles ?
+                    ResourceState::DepthStencilReadShaderResource : ResourceState::DepthStencilRead);
+            data.sceneDepth = sceneDepth;
+            if (softParticles && writesDepth)
+                pass.read(sceneDepth);
             data.clearDistortion = !distortion.is_valid();
             if (distortion.is_valid())
                 data.distortion = pass.readWrite(distortion, ResourceState::RenderTarget);

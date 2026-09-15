@@ -4,6 +4,7 @@
 
 namespace xray::render::fg
 {
+class CPSLibrary;
 namespace PS
 {
 class CParticleEffect;
@@ -147,7 +148,7 @@ public:
 
     virtual void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM);
 
-    BOOL Compile(CPGDef* def);
+    BOOL Compile(CPGDef* def, CPSLibrary& library);
 
     const CPGDef* GetDefinition() { return m_Def; }
     virtual void Play();

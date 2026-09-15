@@ -17,6 +17,7 @@
 #include "ParticleEffect.h"
 #include "ParticleEffectDef.h"
 #include "GpuParticleManager.h"
+#include "ParticleEditor/ParticleEditor.h"
 #include "Shader.h"
 #include "r__scene.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -248,6 +249,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_blackboard = xr_make_unique<framegraph::Blackboard>();
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    m_particleEditor = xr_make_unique<fg::ParticleEditor>();
     
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
     m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
@@ -286,6 +288,7 @@ void FrameGraphRenderer::Shutdown() {
     if (auto* backend = m_device->GetBackend())
         backend->WaitForIdle();
 
+    m_particleEditor = nullptr;
     GetGpuParticleManager().Reset();
     m_HWOCC.occq_destroy();
     m_PSLibrary.OnDestroy();
@@ -1014,6 +1017,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const auto& particleDefinitions = gpuParticles.GetDefinitions();
     for (u32 program = gpuParticleState.registeredPrograms; program < particleDefinitions.size(); ++program) {
         const auto* definition = particleDefinitions[program];
+        if (!definition) {
+            gpuParticleState.registeredPrograms = program + 1;
+            continue;
+        }
         sh_list textures;
         Resources->_ParseList(textures, definition->m_TextureName.c_str());
         const u32 material = m_materialCache && definition->m_TextureName.size() && !textures.empty()
@@ -2980,6 +2987,8 @@ void FrameGraphRenderer::OnFrame()
 {
     ZoneScoped;
     g_pModelPool->DeleteQueue();
+    if (m_particleEditor)
+        m_particleEditor->Update(Device.dwTimeDelta);
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 }

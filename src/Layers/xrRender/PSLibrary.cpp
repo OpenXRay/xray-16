@@ -204,9 +204,18 @@ bool CPSLibrary::Load(const char* nm)
         return false;
     }
 
-    ZoneScoped;
+    IReader* reader = FS.r_open(nm);
+    if (!reader)
+        return false;
+    const bool result = Load(*reader);
+    FS.r_close(reader);
+    return result;
+}
 
-    IReader* F = FS.r_open(nm);
+bool CPSLibrary::Load(IReader& reader)
+{
+    ZoneScoped;
+    IReader* F = &reader;
     bool bRes = true;
     R_ASSERT(F->find_chunk(PS_CHUNK_VERSION));
     u16 ver = F->r_u16();
@@ -261,8 +270,6 @@ bool CPSLibrary::Load(const char* nm)
         OBJ->close();
     }
 
-    // final
-    FS.r_close(F);
 
     std::sort(m_PEDs.begin(), m_PEDs.end(), ped_sort_pred);
     std::sort(m_PGDs.begin(), m_PGDs.end(), pgd_sort_pred);

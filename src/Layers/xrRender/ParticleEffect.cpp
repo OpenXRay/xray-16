@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "ParticleEffect.h"
+#include "PSLibrary.h"
 
 
 namespace xray::render::fg
@@ -337,10 +338,10 @@ void CParticleEffect::SetHudMode(BOOL b)
         GetGpuParticleManager().SetHudMode(m_GpuHandle, b != FALSE);
 }
 
-void CParticleEffect::ConfigureChildren(const char* birth, const char* play, const char* death, u32 groupFlags)
+void CParticleEffect::ConfigureChildren(const char* birth, const char* play, const char* death, u32 groupFlags, CPSLibrary& library)
 {
     R_ASSERT(m_GpuHandle);
-    GetGpuParticleManager().ConfigureChildren(m_GpuHandle, birth, play, death, groupFlags);
+    GetGpuParticleManager().ConfigureChildren(m_GpuHandle, birth, play, death, groupFlags, library);
 }
 
 u32 CParticleEffect::ParticlesCount()

@@ -605,48 +605,70 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
 
 template <typename T>
 static void ExportCollisionFaces(const T* vertices, CKinematics* parent, const u16* indices,
-    const CBoneData::FacesVec& faces, xr_vector<Fvector>& triangles)
+    const CBoneData::FacesVec& faces, xr_vector<Fvector>& triangles,
+    xr_vector<Fvector>& skinnedVertices, xr_vector<u8>& skinnedValid)
 {
     for (u16 face : faces)
         for (u32 corner = 0; corner != 3; ++corner)
         {
-            Fvector position;
-            get_pos_bones(vertices[indices[u32(face) * 3 + corner]], position, parent);
-            triangles.push_back(position);
+            const u16 index = indices[u32(face) * 3 + corner];
+            if (skinnedVertices.size() <= index)
+            {
+                skinnedVertices.resize(size_t(index) + 1);
+                skinnedValid.resize(size_t(index) + 1, 0);
+            }
+            if (!skinnedValid[index])
+            {
+                get_pos_bones(vertices[index], skinnedVertices[index], parent);
+                skinnedValid[index] = 1;
+            }
+            triangles.push_back(skinnedVertices[index]);
         }
 }
 
-void CSkeletonX::ExportCollisionTriangles(u16 bone, xr_vector<Fvector>& outputTriangles)
+const CSkeletonX::CollisionTriangles& CSkeletonX::ExportCollisionTriangles(u16 bone)
 {
     auto* visual = dynamic_cast<Fvisual*>(this);
     R_ASSERT(visual && Parent && ChildIDX != u16(-1));
     const auto& faces = Parent->LL_GetData(bone).child_faces[ChildIDX];
     if (faces.empty())
-        return;
+    {
+        static const CollisionTriangles empty;
+        return empty;
+    }
     if (collisionPoseFrame != Device.dwFrame)
     {
         collisionPoseFrame = Device.dwFrame;
-        bool changed = collisionPose.size() != Parent->LL_BoneCount();
-        collisionPose.resize(Parent->LL_BoneCount());
-        for (u16 id = 0; id != Parent->LL_BoneCount(); ++id)
+        const bool singleBone = RenderMode == RM_SINGLE || RenderMode == RM_SINGLE_HQ;
+        const bool fullPose = !singleBone && BonesUsed.size() == 0;
+        const u32 poseCount = singleBone ? 1u : fullPose ? Parent->LL_BoneCount() : BonesUsed.size();
+        bool changed = collisionPose.size() != poseCount;
+        collisionPose.resize(poseCount);
+        for (u32 index = 0; index != poseCount; ++index)
         {
+            const u16 id = singleBone ? u16(RMS_boneid) : fullPose ? u16(index) : BonesUsed[index];
             const Fmatrix& pose = Parent->LL_GetBoneInstance(id).mRenderTransform;
-            if (changed || memcmp(&collisionPose[id], &pose, sizeof(pose)) != 0)
+            if (changed || memcmp(&collisionPose[index], &pose, sizeof(pose)) != 0)
             {
-                collisionPose[id] = pose;
+                collisionPose[index] = pose;
                 changed = true;
             }
         }
         if (changed)
-            collisionTriangles.clear();
+        {
+            ++collisionPoseRevision;
+            std::fill(collisionSkinnedValid.begin(), collisionSkinnedValid.end(), 0);
+        }
     }
-    const auto cached = collisionTriangles.find(bone);
-    if (cached != collisionTriangles.end())
-    {
-        outputTriangles.insert(outputTriangles.end(), cached->second.begin(), cached->second.end());
-        return;
-    }
-    auto& triangles = collisionTriangles[bone];
+    auto& cached = collisionTriangles[bone];
+    if (cached.revision && cached.poseRevision == collisionPoseRevision
+        && cached.vertices.size() == faces.size() * 3)
+        return cached;
+    static u64 nextRevision = 0;
+    cached.revision = ++nextRevision;
+    cached.poseRevision = collisionPoseRevision;
+    auto& triangles = cached.vertices;
+    triangles.clear();
     triangles.reserve(faces.size() * 3);
     if (collisionIndices.empty())
     {
@@ -662,15 +684,19 @@ void CSkeletonX::ExportCollisionTriangles(u16 bone, xr_vector<Fvector>& outputTr
         if (auto* progressive = dynamic_cast<CSkeletonX_PM*>(this))
             base += progressive->GetSWI().sw[0].offset;
         if (*Vertices1W)
-            ExportCollisionFaces(*Vertices1W, Parent, indices + base, faces, triangles);
+            ExportCollisionFaces(*Vertices1W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
         else if (*Vertices2W)
-            ExportCollisionFaces(*Vertices2W, Parent, indices + base, faces, triangles);
+            ExportCollisionFaces(*Vertices2W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
         else if (*Vertices3W)
-            ExportCollisionFaces(*Vertices3W, Parent, indices + base, faces, triangles);
+            ExportCollisionFaces(*Vertices3W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
         else
         {
             R_ASSERT(*Vertices4W);
-            ExportCollisionFaces(*Vertices4W, Parent, indices + base, faces, triangles);
+            ExportCollisionFaces(*Vertices4W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
         }
     }
     else
@@ -688,35 +714,43 @@ void CSkeletonX::ExportCollisionTriangles(u16 bone, xr_vector<Fvector>& outputTr
         {
         case RM_SINGLE:
         case RM_SKINNING_1B:
-            ExportCollisionFaces(static_cast<const vertHW_1W<s16>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_1W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_2B:
-            ExportCollisionFaces(static_cast<const vertHW_2W<s16>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_2W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_3B:
-            ExportCollisionFaces(static_cast<const vertHW_3W<s16>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_3W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_4B:
-            ExportCollisionFaces(static_cast<const vertHW_4W<s16>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_4W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SINGLE_HQ:
         case RM_SKINNING_1B_HQ:
-            ExportCollisionFaces(static_cast<const vertHW_1W<float>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_1W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_2B_HQ:
-            ExportCollisionFaces(static_cast<const vertHW_2W<float>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_2W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_3B_HQ:
-            ExportCollisionFaces(static_cast<const vertHW_3W<float>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_3W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         case RM_SKINNING_4B_HQ:
-            ExportCollisionFaces(static_cast<const vertHW_4W<float>*>(vertices), Parent, indices, faces, triangles);
+            ExportCollisionFaces(static_cast<const vertHW_4W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
             break;
         default:
             NODEFAULT;
         }
     }
-    outputTriangles.insert(outputTriangles.end(), triangles.begin(), triangles.end());
+    return cached;
 }
 
 BOOL CSkeletonX_ST::PickBone(

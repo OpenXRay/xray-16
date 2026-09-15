@@ -55,6 +55,7 @@ namespace xray::render::framegraph {
         CopyDest,            // Copy destination
         Present,             // Presentable
         Common,              // Generic read state
+        DepthStencilReadShaderResource,
     };
 
     // Convert to string for debugging
@@ -64,6 +65,7 @@ namespace xray::render::framegraph {
         case ResourceState::RenderTarget: return "RenderTarget";
         case ResourceState::DepthStencilWrite: return "DepthStencilWrite";
         case ResourceState::DepthStencilRead: return "DepthStencilRead";
+        case ResourceState::DepthStencilReadShaderResource: return "DepthStencilReadShaderResource";
         case ResourceState::ShaderResource: return "ShaderResource";
         case ResourceState::UnorderedAccess: return "UnorderedAccess";
         case ResourceState::IndirectArgument: return "IndirectArgument";

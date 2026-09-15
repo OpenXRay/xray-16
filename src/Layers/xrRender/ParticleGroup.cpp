@@ -596,7 +596,7 @@ void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOO
         item.UpdateParent(m, velocity, bXFORM);
 }
 
-BOOL CParticleGroup::Compile(CPGDef* def)
+BOOL CParticleGroup::Compile(CPGDef* def, CPSLibrary& library)
 {
     m_Def = def;
 
@@ -611,7 +611,7 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); ++e_it)
         {
-            PS::CPEDef* SE3 = RImplementation.m_PSLibrary.FindPED((*e_it)->m_EffectName.c_str());
+            PS::CPEDef* SE3 = library.FindPED((*e_it)->m_EffectName.c_str());
             R_ASSERT3(SE3, "Particle effect doesn't exist", (*e_it)->m_EffectName.c_str());
             CParticleEffect* eff = (CParticleEffect*)g_pModelPool->CreatePE(SE3);
 #ifdef _EDITOR
@@ -619,7 +619,7 @@ BOOL CParticleGroup::Compile(CPGDef* def)
 #else
             const auto& effect = **e_it;
             eff->ConfigureChildren(effect.m_OnBirthChildName.c_str(), effect.m_OnPlayChildName.c_str(),
-                effect.m_OnDeadChildName.c_str(), effect.m_Flags.get());
+                effect.m_OnDeadChildName.c_str(), effect.m_Flags.get(), library);
 #endif
             items[e_it - def->m_Effects.begin()].Set(eff);
         }

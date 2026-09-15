@@ -922,6 +922,7 @@ void FrameGraph::ResolveUsage() {
                     break;
                 case ResourceState::DepthStencilWrite:
                 case ResourceState::DepthStencilRead:
+                case ResourceState::DepthStencilReadShaderResource:
                     resource->desc.isDepthStencil = true;
                     break;
                 case ResourceState::IndirectArgument:
@@ -1224,6 +1225,8 @@ nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {
             return nvrhi::ResourceStates::DepthWrite;
         case ResourceState::DepthStencilRead:
             return nvrhi::ResourceStates::DepthRead;
+        case ResourceState::DepthStencilReadShaderResource:
+            return nvrhi::ResourceStates::DepthRead | nvrhi::ResourceStates::ShaderResource;
         case ResourceState::ShaderResource:
             return nvrhi::ResourceStates::ShaderResource;
         case ResourceState::UnorderedAccess:

@@ -6,10 +6,10 @@ uint GpuPrepareCommand(inout GpuPapiEmitter emitter,GpuPapiCommand command,uint 
     if (command.type == 0) {
         if (emitter.active != 0 || command.p0 >= g_Papi.programCount) { GpuAllocationError(8u); return 2; }
         GpuPapiProgram program = g_Programs[command.p0];
-        if (!GpuReserveResources(program.maxParticles,program.actionCount,0)) return 2;
+        if (!GpuReserveResources(program.maxParticles,program.stateCount,0)) return 2;
         GpuInitializeEmitter(emitter,command.p0,index,command.generation,index,g_Reservation.particleFirst,g_Reservation.stateFirst);
         g_Reservation.particleUsed = program.maxParticles;
-        g_Reservation.stateUsed = program.actionCount;
+        g_Reservation.stateUsed = program.stateCount;
         GpuReleaseReservation();
     }
     if (emitter.generation != command.generation || emitter.active != 1) return 0;
@@ -102,6 +102,7 @@ void main(uint3 groupID : SV_GroupID,uint lane : SV_GroupIndex) {
             GpuBounds(childEmitter,status,boundsDirty,lane);
             child = childEmitter.pad0;
         }
+        if (boundsDirty) GpuReduceBounds(status,lane);
         if (status.count == 0) {
             status.boundsMin = emitter.origin.xyz - 0.001;
             status.boundsMax = emitter.origin.xyz + 0.001;

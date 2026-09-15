@@ -52,6 +52,7 @@ StructuredBuffer<GpuPapiCollisionTriangle> g_GpuCollisionStaticTriangles;
 StructuredBuffer<GpuPapiCollisionTriangle> g_GpuCollisionDynamicTriangles;
 StructuredBuffer<GpuPapiCollisionShape> g_GpuCollisionShapes;
 StructuredBuffer<GpuPapiCollisionObject> g_GpuCollisionObjects;
+StructuredBuffer<GpuPapiCollisionNode> g_GpuCollisionBlocks;
 
 float3 GpuCollisionTransform(float3 point, float w, float4 row0, float4 row1, float4 row2)
 {
@@ -200,12 +201,13 @@ bool GpuCollisionShape(float3 origin, float3 direction, GpuPapiCollisionShape sh
     return GpuCollisionCylinder(origin, direction, shape.data0, shape.data1, limit, distance);
 }
 
-bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynamicCollision,
+bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynamicCollision, bool hitOnly,
     out float3 normal)
 {
     bool hit = false;
     normal = float3(0.0, 1.0, 0.0);
     uint nodeIndex = 0;
+    uint staticTriangle = 0xffffffff;
     uint4 counts = g_GpuCollisionCounts[0];
     while (nodeIndex < counts.x)
     {
@@ -222,17 +224,30 @@ bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynam
             float distance;
             if (GpuCollisionTriangle(origin, direction, triangle, limit, true, distance))
             {
+                if (hitOnly)
+                    return true;
                 limit = distance;
-                normal = normalize(cross(triangle.b.xyz - triangle.a.xyz, triangle.c.xyz - triangle.a.xyz));
+                staticTriangle = node.first + offset;
                 hit = true;
             }
         }
         ++nodeIndex;
     }
-    if (!dynamicCollision)
-        return hit;
-    for (uint objectIndex = 0; objectIndex < counts.y; ++objectIndex)
+    for (uint objectIndex = 0; dynamicCollision && objectIndex < counts.y; ++objectIndex)
     {
+        if ((objectIndex & 15u) == 0)
+        {
+            GpuPapiCollisionNode block = g_GpuCollisionBlocks[objectIndex >> 4];
+            float3 relativeBounds = max(abs(origin - block.minimum), abs(origin - block.maximum));
+            float padding = max(relativeBounds.x, max(relativeBounds.y, relativeBounds.z)) * 0.002;
+            float blockEntry;
+            if (!GpuCollisionBounds(origin, direction, block.minimum - padding, block.maximum + padding,
+                max(limit, 0.0), blockEntry))
+            {
+                objectIndex = block.first + block.count - 1;
+                continue;
+            }
+        }
         GpuPapiCollisionObject object = g_GpuCollisionObjects[objectIndex];
         float distance;
         if (!GpuCollisionSphere(origin, direction, object.spatialSphere, limit, false, distance)
@@ -270,9 +285,16 @@ bool GpuParticleRayPick(float3 origin, float3 direction, float limit, bool dynam
             if (!meshHit)
                 continue;
         }
+        if (hitOnly)
+            return true;
         limit = nearestDistance;
-        normal = float3(0.0, 1.0, 0.0);
+        staticTriangle = 0xffffffff;
         hit = true;
+    }
+    if (staticTriangle != 0xffffffff)
+    {
+        GpuPapiCollisionTriangle triangle = g_GpuCollisionStaticTriangles[staticTriangle];
+        normal = normalize(cross(triangle.b.xyz - triangle.a.xyz, triangle.c.xyz - triangle.a.xyz));
     }
     return hit;
 }
@@ -291,7 +313,7 @@ void GpuParticleCollision(inout float3 position, float3 previousPosition, inout 
         }
         float3 normal;
         if (!GpuParticleRayPick(previousPosition, segment / distance, distance,
-            (definitionFlags & (1u << 19)) != 0, normal))
+            (definitionFlags & (1u << 19)) != 0, (definitionFlags & (1u << 17)) != 0, normal))
             return;
         if ((definitionFlags & (1u << 17)) != 0)
         {

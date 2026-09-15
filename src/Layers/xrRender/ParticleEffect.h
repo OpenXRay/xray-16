@@ -9,6 +9,7 @@
 
 namespace xray::render::fg
 {
+class CPSLibrary;
 namespace PS
 {
 class ECORE_API CParticleEffect : public dxParticleCustom
@@ -78,7 +79,7 @@ public:
     void Render(float LOD, bool useFastGeo);
 #else
     GpuParticleHandle GetGpuHandle() const { return m_GpuHandle; }
-    void ConfigureChildren(const char* birth, const char* play, const char* death, u32 groupFlags);
+    void ConfigureChildren(const char* birth, const char* play, const char* death, u32 groupFlags, CPSLibrary& library);
 #endif
     virtual u32 ParticlesCount();
 };

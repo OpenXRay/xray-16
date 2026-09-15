@@ -120,6 +120,7 @@ public:
 
     // Set GPUProfiler for per-pass timing (optional, can be nullptr)
     void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+    xray::profiler::GPUProfiler* GetGPUProfiler() const { return m_gpuProfiler; }
 
     const FrameArena::Stats& GetFrameArenaStats() const { return m_frameArena.GetStats(); }
 

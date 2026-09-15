@@ -346,7 +346,7 @@ bool Encode(const ParticleAction& base, GpuPapiAction& result)
         result.p1 = Vector(a.offset);
         result.pad0 = static_cast<u32>(a.octaves);
 #if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-        result.pad1 = 1;
+        result.p2.y = 1.f;
 #endif
         if (a.octaves < 0 || a.frequency == 0.f)
             return false;
@@ -393,6 +393,7 @@ bool TranslateGpuParticleDefinition(const PS::CPEDef& definition, GpuPapiProgram
     manager->LoadActions(handle, reader);
     auto* list = manager->GetActionListPtr(handle);
     actions.reserve(list->size());
+    u32 stateCount = 0;
     for (const PAPI::ParticleAction* action : *list)
     {
         GpuPapiAction encoded{};
@@ -402,6 +403,8 @@ bool TranslateGpuParticleDefinition(const PS::CPEDef& definition, GpuPapiProgram
             actions.clear();
             return Fail(error, definition, index, "invalid action parameters or domain data");
         }
+        encoded.stateIndex = action->type == PAExplosionID || action->type == PARestoreID ||
+            action->type == PATurbulenceID ? stateCount++ : GPU_PAPI_INVALID;
         actions.push_back(encoded);
     }
     program.flags = definition.m_Flags.get();
@@ -414,7 +417,7 @@ bool TranslateGpuParticleDefinition(const PS::CPEDef& definition, GpuPapiProgram
     program.maxParticles = static_cast<u32>(definition.m_MaxParticles);
     program.actionFirst = 0;
     program.actionCount = static_cast<u32>(actions.size());
-    program.pad0 = 0;
+    program.stateCount = stateCount;
     program.pad1 = 0;
     program.collisionFriction = definition.m_fCollideOneMinusFriction;
     program.collisionResilience = definition.m_fCollideResilience;
