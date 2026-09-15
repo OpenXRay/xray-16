@@ -283,7 +283,7 @@ struct GpuParticleManager::Impl {
             params.phase = 1;
             Dispatch(commandList,initialize,params,1);
             params.phase = 0;
-            Dispatch(commandList,simulate,params,(u32(ranges.size()) + 31) / 32);
+            Dispatch(commandList,simulate,params,u32(ranges.size()));
         }
         params.rootCapacity = u32(visible.size());
         Fvector4 planes[6]{};
