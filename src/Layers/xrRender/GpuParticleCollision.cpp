@@ -478,6 +478,12 @@ u64 GpuParticleCollision::GetBindingVersion() const
     return state->bindingVersion;
 }
 
+GpuParticleCollision::Counts GpuParticleCollision::GetCounts() const
+{
+    return {u32(state->nodes.size()),u32(state->staticTriangles.size()),
+        u32(state->objects.size()),u32(state->shapes.size()),u32(state->dynamicTriangles.size())};
+}
+
 void GpuParticleCollision::Reset()
 {
     const u64 bindingVersion = state->bindingVersion + 1;

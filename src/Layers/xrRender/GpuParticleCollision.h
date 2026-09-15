@@ -21,6 +21,8 @@ public:
     void Bind(framegraph::BindingSetBuilder& builder) const;
     void Reset();
     u64 GetBindingVersion() const;
+    struct Counts { u32 bvhNodes,staticTriangles,dynamicObjects,dynamicShapes,dynamicTriangles; };
+    Counts GetCounts() const;
 
 private:
     struct State;

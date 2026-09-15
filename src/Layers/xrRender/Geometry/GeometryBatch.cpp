@@ -31,7 +31,7 @@ void GeometryCollector::EndFrame() {
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
     VERIFY(batch.indexCount > 0);
-    VERIFY(!(batch.isStatic && batch.isSkinned));
+    R_ASSERT2(!(batch.isStatic && batch.isSkinned), "Static skinned geometry is not supported");
 
     if (batch.isStatic)
         m_staticBatches.push_back(batch);
@@ -47,11 +47,13 @@ void GeometryCollector::EndStaticBuild() {
         if (!batch.isSkinned && !batch.isTerrain && batch.IsStrictB2F())
             m_staticTransparentIndices.push_back(i);
     }
+    m_staticBuildComplete = true;
 }
 
 void GeometryCollector::ClearStatic() {
     m_staticBatches.clear();
     m_staticTransparentIndices.clear();
+    m_staticBuildComplete = false;
 }
 
 } // namespace xray::render

@@ -2421,7 +2421,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     const auto& sectors = scene_info::GetSceneSectors();
 
-    if (!m_geometryCollector->HasStaticBatches() && !sectors.empty()) {
+    if (!m_geometryCollector->IsStaticBuildComplete() && !sectors.empty()) {
         Msg("* [GeomCache] Building static geometry cache from %zu sectors...", sectors.size());
 
         xr_vector<dxRender_Visual*> staticVisuals;

@@ -565,6 +565,10 @@ void StatsOverlay::RenderGeometrySection()
         ImGui::Text("Roots: %u live / %u pending  (%u programs)", particles.liveRoots, particles.pendingRoots, particles.programs);
         ImGui::Text("  collision: %u / dyn collision: %u / hud: %u / children: %u",
             particles.collisionRoots, particles.dynamicCollisionRoots, particles.hudRoots, particles.childRoots);
+        if (particles.collisionRoots || particles.bvhNodes)
+            ImGui::Text("  BVH: %u nodes / %u tris  dyn: %u obj / %u shapes / %u tris",
+                particles.bvhNodes, particles.staticTriangles, particles.dynamicObjects,
+                particles.dynamicShapes, particles.dynamicTriangles);
         ImGui::Text("Pool: %u particles / %u emitters / %u draw buckets",
             particles.particleCapacity, particles.emitterCapacity, particles.drawBuckets);
         ImGui::Text("Commands: %u / %u replayed", particles.commands, particles.replayedCommands);

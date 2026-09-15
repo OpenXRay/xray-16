@@ -25,6 +25,7 @@ struct GpuParticleStats {
     u32 liveRoots = 0,pendingRoots = 0,commands = 0,replayedCommands = 0,bindingSets = 0;
     u32 collisionRoots = 0,dynamicCollisionRoots = 0,hudRoots = 0,childRoots = 0;
     u32 programs = 0,drawBuckets = 0,particleCapacity = 0,emitterCapacity = 0;
+    u32 bvhNodes = 0,staticTriangles = 0,dynamicObjects = 0,dynamicShapes = 0,dynamicTriangles = 0;
     u64 commandBytes = 0,readbackBytes = 0;
 };
 class GpuParticleManager {
@@ -43,6 +44,11 @@ public:
     void ReleaseDefinition(const PS::CPEDef&);
     const xr_vector<const PS::CPEDef*>& GetDefinitions() const;
     void SetProgramMaterial(u32 program,u32 material,u32 blend,u32 variant);
+    struct ActionParam { u32 type; float value; };
+    xr_vector<ActionParam> GetActionParams(const PS::CPEDef&) const;
+    void SetActionParam(const PS::CPEDef&,u32 actionIndex,float value);
+    float GetTimeLimit(const PS::CPEDef&) const;
+    void SetTimeLimit(const PS::CPEDef&,float value);
     void SetupSimulationPasses(framegraph::FrameGraph&,nvrhi::IDevice*);
     GpuParticleDrawResources GetDrawResources() const;
     GpuParticleStats GetStats() const;

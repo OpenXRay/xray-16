@@ -111,7 +111,7 @@ public:
     const xr_vector<GeometryBatch>& GetStaticBatches() const { return m_staticBatches; }
     const xr_vector<u32>& GetStaticTransparentIndices() const { return m_staticTransparentIndices; }
 
-    bool HasStaticBatches() const { return !m_staticBatches.empty(); }
+    bool IsStaticBuildComplete() const { return m_staticBuildComplete; }
     bool HasBatches() const { return !m_batches.empty() || !m_staticBatches.empty(); }
 
     void EndStaticBuild();
@@ -130,6 +130,7 @@ private:
     xr_vector<GeometryBatch> m_batches;
     xr_vector<GeometryBatch> m_staticBatches;
     xr_vector<u32> m_staticTransparentIndices;
+    bool m_staticBuildComplete = false;
     Stats m_stats;
 };
 

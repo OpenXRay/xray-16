@@ -86,6 +86,21 @@ The `dev` branch is the default and base branch for the project. It is used for 
 
 The code base is based on X-Ray 1.6.02 that is used in S.T.A.L.K.E.R.: Call of Pripyat and it was greatly refactored.
 
+#### Framegraph resource verification
+
+Framegraph transients are allocated at their first live pass and returned to the pool after their last use. Imported resources remain externally owned. Resource generations, allocation lifetimes, imported attachment capabilities and async-pass isolation are checked in release builds; per-pass declaration checks additionally run in debug builds.
+
+Build the configuration you intend to launch explicitly:
+
+```sh
+./cmake-build -c releasemastergold xr_3da
+python3 misc/tests/run_framegraph_resources.py --build-dir cmake_builds/releasemastergold
+```
+
+The regression runner uses a real Vulkan device with `VK_EXT_headless_surface`, NVRHI validation and temporary test executables. It verifies texture-budget accounting, pool eviction, empty static-build completion, GPU readback across reused and overlapping transient lifetimes, culled passes, callback-free lifetime boundaries, reset accounting and invalid-access rejection. It does not require installed game assets. For a Release build, use `-c release` and `--build-dir cmake_builds/release`.
+
+Without `-c`, `cmake-build` selects the most recently modified build directory. A launch symlink pointing at another configuration will still run that other executable.
+
 ### Funding
 [![Sponsors](https://img.shields.io/github/sponsors/openxray?color=brightgreen&label=Sponsors)](https://github.com/sponsors/OpenXRay) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg?label=Financial%20contributors)](https://opencollective.com/openxray)
 
