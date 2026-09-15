@@ -295,10 +295,6 @@ void CRenderDevice::PaceFrame()
 
 void CRenderDevice::ProcessFrame()
 {
-    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
-
-    xray::profiler::FrameStart();
-
     do
     {
         ZoneScoped;
@@ -343,8 +339,6 @@ void CRenderDevice::ProcessFrame()
         const bool recordAlloc = (g_pGameLevel != nullptr) && (dwPrecacheFrame == 0);
         xray::memstats::FrameEnd(recordAlloc);
     } while (false);
-
-    xray::profiler::FrameEnd();
 }
 
 void CRenderDevice::ProcessEvent(const SDL_Event& event)

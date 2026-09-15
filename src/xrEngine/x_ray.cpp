@@ -382,19 +382,37 @@ int CApplication::Run()
         return SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_EVENT_QUIT, SDL_EVENT_QUIT) > 0;
     };
 
-    while (!quitRequested())
+    for (;;)
     {
-        Device.PaceFrame();
-        if (quitRequested())
-            break;
+        xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+        xray::profiler::FrameStart();
 
+        {
+            ZoneScopedN("PaceFrame");
+            Device.PaceFrame();
+        }
+
+        bool quit;
+        {
+            ZoneScopedN("PumpEvents");
+            quit = quitRequested();
+        }
+        if (quit)
+        {
+            xray::profiler::FrameEnd();
+            break;
+        }
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;
 
         SDL_Event events[MAX_WINDOW_EVENTS];
-        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_EVENT_WINDOW_FIRST, SDL_EVENT_WINDOW_LAST);
+        int count;
+        {
+            ZoneScopedN("WindowEvents");
+            count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+                SDL_GETEVENT, SDL_EVENT_WINDOW_FIRST, SDL_EVENT_WINDOW_LAST);
+        }
 
         for (int i = 0; i < count; ++i)
         {
@@ -445,7 +463,9 @@ int CApplication::Run()
 
         UpdateDiscordStatus();
         FrameMarkEnd(FRAME_MARK_APPLICATION_RUN);
-    } // while (!SDL_QuitRequested())
+
+        xray::profiler::FrameEnd();
+    }
 
     Device.Shutdown();
 
