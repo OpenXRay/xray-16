@@ -99,7 +99,8 @@ void MakeFilter(string1024& dest, pcstr info, pcstr ext)
     }
     xr_strcpy(dest, res.c_str());
 
-    for (size_t i = 0; i < res.size(); ++i)
+    const auto bound = res.size() > sizeof(dest) ? sizeof(dest) : res.size();
+    for (size_t i = 0; i < bound; ++i)
     {
         if (res[i] == '|')
             dest[i] = '\0';
@@ -158,7 +159,7 @@ bool EFS_Utils::GetOpenNameInternal(
     string512 path;
     xr_strcpy(path, (offset && offset[0]) ? offset : P.m_Path);
     ofn.lpstrInitialDir = path;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR |
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
         (bMulti ? OFN_ALLOWMULTISELECT | OFN_EXPLORER : 0);
 
     ofn.FlagsEx = OFN_EX_NOPLACESBAR;

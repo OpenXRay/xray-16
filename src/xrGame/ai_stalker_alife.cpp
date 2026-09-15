@@ -317,7 +317,7 @@ bool CAI_Stalker::enough_ammo(const CWeapon* new_weapon) const
 }
 
 bool CAI_Stalker::conflicted(
-    const CInventoryItem* item, const CWeapon* new_weapon, bool new_wepon_enough_ammo, int new_weapon_rank) const
+    const CInventoryItem* item, const CWeapon* new_weapon, bool new_weapon_enough_ammo, int new_weapon_rank) const
 {
     if (non_conflicted(item, new_weapon))
         return (false);
@@ -326,10 +326,10 @@ bool CAI_Stalker::conflicted(
     VERIFY(weapon);
 
     bool current_weapon_enough_ammo = enough_ammo(weapon);
-    if (current_weapon_enough_ammo && !new_wepon_enough_ammo)
+    if (current_weapon_enough_ammo && !new_weapon_enough_ammo)
         return (true);
 
-    if (!current_weapon_enough_ammo && new_wepon_enough_ammo)
+    if (!current_weapon_enough_ammo && new_weapon_enough_ammo)
         return (false);
 
     if (!fsimilar(weapon->GetCondition(), new_weapon->GetCondition(), .05f))
