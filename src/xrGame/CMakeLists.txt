@@ -247,8 +247,8 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    #AnselManager.cpp
-    #AnselManager.h
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.h>
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -2483,21 +2483,33 @@ target_include_directories(xrGame
 
 target_link_libraries(xrGame
     PRIVATE
-    xrCore
-    xrEngine
-    xrMaterialSystem
-    xrMiscMath
-    xrImGui
     xrAPI
-    xrAICore
-    xrUICore
-    xrSound
-    xrScriptEngine
-    xrGameSpy
+    xrCore
     xrCDB
-    xrPhysics
+    xrEngine
+    xrAICore
+    xrGameSpy
+    GameSpy-oxr
+    xrMaterialSystem
     xrNetServer
+    xrPhysics
+    xrScriptEngine
+    xrSound
+    xrUICore
 )
+
+if (MSVC)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x64/AnselSDK64.lib")
+    else()
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x86/AnselSDK32.lib")
+    endif()
+
+    target_link_libraries(xrGame
+        PRIVATE
+        ${_xr_ansel_lib}
+    )
+endif()
 
 target_compile_definitions(xrGame
     PUBLIC
@@ -2508,14 +2520,22 @@ target_compile_definitions(xrGame
     XRGAME_EXPORTS
 )
 
-# E2K hack: MCST lcc compiler does not support object files greater than 4Gb due to a bug in EDG frontend
-if (CMAKE_CXX_COMPILER_ID MATCHES "LCC")
-    target_compile_options(xrGame
-        PRIVATE
-        -g0
-    )
-    message("Debug information generation is disabled for xrGame, because MCST lcc compiler does not support object files greater than 4 GB (EDG frontend bug).")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "LCC")
+    message("Debug information generation will be disabled for xrGame, because "
+            "MCST lcc compiler does not support object files greater than 4 GB due to EDG frontend bug.")
 endif()
+
+target_compile_options(xrGame
+    PRIVATE
+    # E2K hack: MCST lcc compiler does not support object files greater than 4Gb due to a bug in EDG frontend
+    $<$<CXX_COMPILER_ID:LCC>:-g0>
+
+    # Especially when Unity build is enabled, xrGame exceeds .obj file format limits
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+
+    # Disable specific warnings
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4250> # 'class1' : inherits 'class2::member' via dominance
+)
 
 set_target_properties(xrGame PROPERTIES
     PREFIX ""
@@ -2527,9 +2547,3 @@ target_precompile_headers(xrGame
     $<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>
     $<$<COMPILE_LANGUAGE:CXX>:pch_script.h>
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrGame LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

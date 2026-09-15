@@ -13,6 +13,8 @@ target_sources(xrImGui PRIVATE
     "${IMGUI_DIR}/imgui_internal.h"
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.h"
+    "$<$<STREQUAL:$<PLATFORM_ID>,Windows>:${IMGUI_DIR}/backends/imgui_impl_dx11.cpp>"
+    "$<$<STREQUAL:$<PLATFORM_ID>,Windows>:${IMGUI_DIR}/backends/imgui_impl_dx11.h>"
     "${IMGUI_DIR}/imstb_rectpack.h"
     "${IMGUI_DIR}/imstb_textedit.h"
     "${IMGUI_DIR}/imstb_truetype.h"
