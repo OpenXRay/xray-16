@@ -93,8 +93,7 @@ dylibbundler \
 for sdl2_lib in "${LIBS_DIR}"/libSDL2*.dylib; do
     [[ -f "${sdl2_lib}" ]] || continue
     if LC_ALL=C grep -a -q 'SDL2COMPAT_' "${sdl2_lib}"; then
-        echo "Cannot package SDL2-compat. Build native SDL2 with misc/macos/build_sdl2.sh"
-        echo "and reconfigure OpenXRay with the resulting SDL2_DIR before rebuilding."
+        echo "Cannot package SDL2-compat. Reconfigure and rebuild OpenXRay to select native SDL2."
         exit 1
     fi
 done

@@ -138,7 +138,7 @@ jobs:
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
-          brew install ccache cmake ninja dylibbundler lzo libogg libvorbis theora openal-soft jpeg-turbo
+          brew install ccache cmake dylibbundler lzo libogg libvorbis theora openal-soft jpeg-turbo
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
@@ -176,18 +176,16 @@ jobs:
           ccache-${{ runner.os }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-
           ccache-${{ runner.os }}-${{ matrix.platform.arch }}-
 
-    - name: Build native SDL2 for macOS
-      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
-      run: |
-        bash misc/macos/build_sdl2.sh "${{ matrix.platform.arch }}" "$RUNNER_TEMP/openxray-sdl2"
-        echo "SDL2_DIR=$RUNNER_TEMP/openxray-sdl2/lib/cmake/SDL2" >> "$GITHUB_ENV"
-
     - name: Run CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
     - name: Test macOS game data layout
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: bash misc/macos/test_game_data_layout.sh
+
+    - name: Test macOS SDL2 selection
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
+      run: bash misc/macos/test_sdl2_selection.sh
 
     - name: Run CMake Build
       id: cmake-build
