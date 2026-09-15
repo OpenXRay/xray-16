@@ -374,8 +374,8 @@ CApplication::~CApplication()
 
 int CApplication::Run()
 {
-    HideSplash();
     Device.Run();
+    HideSplash();
 
     auto quitRequested = []() {
         SDL_PumpEvents();
