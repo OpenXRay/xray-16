@@ -77,7 +77,7 @@ struct ResourceNode {
     VirtualResourceHandle handle;
 
     PassNode* lastWriter = nullptr;
-    xr_vector<PassNode*> readersSinceWrite;
+    u32 readersHead = INVALID_INDEX;
 
     u32 firstUsedPass = INVALID_INDEX;
     u32 lastUsedPass = INVALID_INDEX;

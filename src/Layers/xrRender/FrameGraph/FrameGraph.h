@@ -67,6 +67,8 @@ public:
 
     void SetPassHasSideEffects(PassHandle pass);
 
+    void SetPresentTarget(VirtualResourceHandle handle);
+
     template <typename PassData, typename Setup, typename Execute>
     PassData& addCallbackPass(const char* name, Setup&& setupFunc, Execute&& executeFunc)
     {
@@ -166,17 +168,23 @@ private:
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
 
-    xr_vector<u32> m_compileInDegree;
+    struct ReaderLink {
+        PassNode* pass;
+        u32 next;
+    };
+
+    xr_vector<ReaderLink> m_compileReaderLinks;
     xr_vector<PassNode*> m_compilePassWorklist;
     xr_vector<ResourceNode*> m_compileTransientResources;
 
     xr_vector<PassNode*> m_sortedPasses;
     bool m_compiled = false;
+    VirtualResourceHandle m_presentTarget;
 
     Statistics m_stats;
 
     void BuildDependencyGraph();
-    void TopologicalSort();
+    void ValidateAsyncPasses();
     void CullUnusedPasses();
     void ComputeResourceLifetimes();
     void AllocateResources();
@@ -190,9 +198,6 @@ private:
 
     PassNode* GetPassNode(PassHandle handle);
     const PassNode* GetPassNode(PassHandle handle) const;
-
-    PassNode* FindProducer(VirtualResourceHandle resource);
-    bool HasCyclicDependency() const;
 
     static nvrhi::ResourceStates ConvertToNVRHIState(ResourceState state);
 };

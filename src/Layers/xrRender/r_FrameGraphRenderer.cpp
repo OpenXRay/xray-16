@@ -541,6 +541,7 @@ void FrameGraphRenderer::RenderMenu() {
         backbufferDesc.debugName = "Backbuffer";
 
         backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+        m_framegraph->SetPresentTarget(backbufferHandle);
     }
 
     framegraph::ResourceDesc bgDesc;
@@ -950,6 +951,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         backbufferDesc.debugName = "Backbuffer";
 
         backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+        m_framegraph->SetPresentTarget(backbufferHandle);
     }
 
     framegraph::ResourceDesc depthDesc;

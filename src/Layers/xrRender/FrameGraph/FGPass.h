@@ -88,6 +88,17 @@ struct ResourceBarrier {
     {}
 };
 
+enum class EdgeKind : u8 {
+    ReadAfterWrite,
+    WriteAfterRead,
+    WriteAfterWrite,
+};
+
+struct PassDependency {
+    PassNode* pass = nullptr;
+    EdgeKind kind = EdgeKind::ReadAfterWrite;
+};
+
 struct PassNode {
     PassHandle handle;
     shared_str name;
@@ -96,8 +107,7 @@ struct PassNode {
 
     xr_vector<ResourceBarrier> barriersBeforePass;
 
-    xr_vector<PassNode*> dependsOn;
-    xr_vector<PassNode*> dependents;
+    xr_vector<PassDependency> dependsOn;
 
     IPassCallback* executeCallback = nullptr;
 
@@ -127,7 +137,6 @@ struct PassNode {
         resourceAccesses.clear();
         barriersBeforePass.clear();
         dependsOn.clear();
-        dependents.clear();
         executeCallback = nullptr;
         culled = false;
         executionOrder = INVALID_INDEX;
@@ -211,10 +220,17 @@ struct PassNode {
     }
 
     bool DependsOn(const PassNode* other) const {
-        for (const auto* dep : dependsOn) {
-            if (dep == other) return true;
+        for (const auto& dep : dependsOn) {
+            if (dep.pass == other) return true;
         }
         return false;
+    }
+
+    PassDependency* FindDependency(const PassNode* other) {
+        for (auto& dep : dependsOn) {
+            if (dep.pass == other) return &dep;
+        }
+        return nullptr;
     }
 };
 
