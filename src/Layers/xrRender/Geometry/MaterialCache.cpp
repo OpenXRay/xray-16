@@ -1589,6 +1589,9 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 
     m_pendingMaterials.clear();
 
+    if (!ctx)
+        return;
+
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
     }
