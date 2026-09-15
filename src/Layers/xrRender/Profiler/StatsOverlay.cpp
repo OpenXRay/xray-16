@@ -562,11 +562,14 @@ void StatsOverlay::RenderGeometrySection()
         const auto particles = xray::render::fg::GetGpuParticleManager().GetStats();
         ImGui::Text("GPU Particles:");
         ImGui::Indent();
-        ImGui::Text("Roots: %u live / %u pending", particles.liveRoots, particles.pendingRoots);
+        ImGui::Text("Roots: %u live / %u pending  (%u programs)", particles.liveRoots, particles.pendingRoots, particles.programs);
+        ImGui::Text("  collision: %u / dyn collision: %u / hud: %u / children: %u",
+            particles.collisionRoots, particles.dynamicCollisionRoots, particles.hudRoots, particles.childRoots);
+        ImGui::Text("Pool: %u particles / %u emitters / %u draw buckets",
+            particles.particleCapacity, particles.emitterCapacity, particles.drawBuckets);
         ImGui::Text("Commands: %u / %u replayed", particles.commands, particles.replayedCommands);
-        ImGui::Text("Command upload: %.2f KiB / status copy: %.2f KiB",
-            double(particles.commandBytes) / 1024.0, double(particles.readbackBytes) / 1024.0);
-        ImGui::Text("Compute bindings created: %u", particles.bindingSets);
+        ImGui::Text("Upload: %.2f KiB / readback: %.2f KiB / bindings: %u",
+            double(particles.commandBytes) / 1024.0, double(particles.readbackBytes) / 1024.0, particles.bindingSets);
         ImGui::Unindent();
 
         // ═══════════════════════════════════════════════════

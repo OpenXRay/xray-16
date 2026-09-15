@@ -23,6 +23,8 @@ struct GpuParticleDrawResources {
 };
 struct GpuParticleStats {
     u32 liveRoots = 0,pendingRoots = 0,commands = 0,replayedCommands = 0,bindingSets = 0;
+    u32 collisionRoots = 0,dynamicCollisionRoots = 0,hudRoots = 0,childRoots = 0;
+    u32 programs = 0,drawBuckets = 0,particleCapacity = 0,emitterCapacity = 0;
     u64 commandBytes = 0,readbackBytes = 0;
 };
 class GpuParticleManager {
