@@ -95,6 +95,10 @@ public:
         u64 presentLockUs;
         u64 presentUs;
         u64 gcUs;
+        u64 slotWaitUs;
+        u64 capacityWaitUs;
+        u64 gpuWaitUs;
+        u64 acquireUs;
     };
     virtual bool GetSubmitThreadTimings(SubmitThreadTimings& out) const { return false; }
 

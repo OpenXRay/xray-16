@@ -936,20 +936,29 @@ void VulkanBackend::BeginFrame() {
         m_gcTask.Reset();
     }
 
+    using Clock = std::chrono::steady_clock;
+    auto usSince = [](Clock::time_point a) -> u64 {
+        return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - a).count());
+    };
+
     uint64_t frameSubmissionID;
     if (m_asyncSubmit) {
         {
             ZoneScopedN("VK::WaitSubmitSlot");
+            const auto t0 = Clock::now();
             std::unique_lock<std::mutex> lk(m_submitMutex);
             m_submitDoneCv.wait(lk, [&] {
                 return !m_slotInFlight[m_recordSlot] && !m_frameSubmissionPending[m_currentFrameIndex];
             });
             frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
+            StoreMaxUs(m_stSlotWaitUs, usSince(t0));
         }
         {
             ZoneScopedN("VK::WaitPresentCapacity");
+            const auto t0 = Clock::now();
             std::unique_lock<std::mutex> lk(m_submitMutex);
             m_submitDoneCv.wait(lk, [&] { return m_acquiredImageCount < m_maxAcquiredImageCount; });
+            StoreMaxUs(m_stCapacityWaitUs, usSince(t0));
         }
     } else {
         frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
@@ -957,6 +966,7 @@ void VulkanBackend::BeginFrame() {
 
     if (frameSubmissionID) {
         ZoneScopedN("VK::WaitFrameGPU");
+        const auto t0 = Clock::now();
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
         const VkSemaphore semaphore = vkDevice->getQueueSemaphore(nvrhi::CommandQueue::Graphics);
         VkSemaphoreWaitInfo waitInfo = {};
@@ -966,6 +976,7 @@ void VulkanBackend::BeginFrame() {
         waitInfo.pValues = &frameSubmissionID;
         const VkResult result = vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
         R_ASSERT2(result == VK_SUCCESS, "Vulkan frame completion wait failed");
+        StoreMaxUs(m_stGpuWaitUs, usSince(t0));
     }
 
     VkResult result;
@@ -977,10 +988,12 @@ void VulkanBackend::BeginFrame() {
         }
         {
             ZoneScopedN("VK::AcquireImage");
+            const auto t0 = Clock::now();
             result = vkAcquireNextImageKHR(
                 m_device, m_swapchain, UINT64_MAX,
                 m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
                 &m_currentImageIndex);
+            StoreMaxUs(m_stAcquireUs, usSince(t0));
         }
     }
 
@@ -1090,10 +1103,7 @@ void VulkanBackend::SubmitThreadMain() {
     auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
         return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
     };
-    auto storeMax = [](std::atomic<u64>& slot, u64 value) {
-        u64 current = slot.load(std::memory_order_relaxed);
-        while (current < value && !slot.compare_exchange_weak(current, value, std::memory_order_relaxed)) {}
-    };
+    auto storeMax = [this](std::atomic<u64>& slot, u64 value) { StoreMaxUs(slot, value); };
 
     for (;;) {
         SubmitJob job;
@@ -1199,9 +1209,12 @@ void VulkanBackend::SubmitThreadMain() {
     }
 }
 
+void VulkanBackend::StoreMaxUs(std::atomic<u64>& slot, u64 value) const {
+    u64 current = slot.load(std::memory_order_relaxed);
+    while (current < value && !slot.compare_exchange_weak(current, value, std::memory_order_relaxed)) {}
+}
+
 bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
-    if (!m_asyncSubmit)
-        return false;
     out.jobLatencyUs = m_stJobLatencyUs.exchange(0, std::memory_order_relaxed);
     out.queueLockUs = m_stQueueLockUs.exchange(0, std::memory_order_relaxed);
     out.semWaitUs = m_stSemWaitUs.exchange(0, std::memory_order_relaxed);
@@ -1209,6 +1222,10 @@ bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
     out.presentLockUs = m_stPresentLockUs.exchange(0, std::memory_order_relaxed);
     out.presentUs = m_stPresentUs.exchange(0, std::memory_order_relaxed);
     out.gcUs = m_stGcUs.exchange(0, std::memory_order_relaxed);
+    out.slotWaitUs = m_stSlotWaitUs.exchange(0, std::memory_order_relaxed);
+    out.capacityWaitUs = m_stCapacityWaitUs.exchange(0, std::memory_order_relaxed);
+    out.gpuWaitUs = m_stGpuWaitUs.exchange(0, std::memory_order_relaxed);
+    out.acquireUs = m_stAcquireUs.exchange(0, std::memory_order_relaxed);
     return true;
 }
 

@@ -168,6 +168,11 @@ private:
     mutable std::atomic<u64> m_stPresentLockUs{0};
     mutable std::atomic<u64> m_stPresentUs{0};
     mutable std::atomic<u64> m_stGcUs{0};
+    mutable std::atomic<u64> m_stSlotWaitUs{0};
+    mutable std::atomic<u64> m_stCapacityWaitUs{0};
+    mutable std::atomic<u64> m_stGpuWaitUs{0};
+    mutable std::atomic<u64> m_stAcquireUs{0};
+    void StoreMaxUs(std::atomic<u64>& slot, u64 value) const;
 
     void SubmitThreadMain();
     void FlushSubmits();

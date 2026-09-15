@@ -15,7 +15,9 @@ static bool FormatSubmitThreadLine(char* buf, size_t size)
     if (!GEnv.Backend || !GEnv.Backend->GetSubmitThreadTimings(t))
         return false;
     xr_sprintf(buf, size,
-        "SubmitThread max (us): latency %llu | qlock %llu | semWait %llu | encode %llu | plock %llu | present %llu | gc %llu",
+        "FrameSync max (us): slot %llu | cap %llu | gpu %llu | acquire %llu || Submit: latency %llu | qlock %llu | semWait %llu | encode %llu | plock %llu | present %llu | gc %llu",
+        (unsigned long long)t.slotWaitUs, (unsigned long long)t.capacityWaitUs,
+        (unsigned long long)t.gpuWaitUs, (unsigned long long)t.acquireUs,
         (unsigned long long)t.jobLatencyUs, (unsigned long long)t.queueLockUs,
         (unsigned long long)t.semWaitUs, (unsigned long long)t.encodeUs,
         (unsigned long long)t.presentLockUs, (unsigned long long)t.presentUs,
