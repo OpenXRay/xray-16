@@ -696,11 +696,18 @@ void CExplosive::ExplodeWaveProcessObject(collide::rq_results& storage, CPhysics
         Fvector l_dir;
         l_dir.sub(l_goPos, m_vExplodePos);
 
-        float rmag = _sqrt(m_fUpThrowFactor * m_fUpThrowFactor + 1.f + 2.f * m_fUpThrowFactor * l_dir.y);
+        if (_valid(l_dir) && l_dir.square_magnitude() > EPS)
+            l_dir.normalize();
+        else
+            l_dir.set(0.f, 1.f, 0.f);
+
         l_dir.y += m_fUpThrowFactor;
-        // rmag -модуль l_dir после l_dir.y += m_fUpThrowFactor,
-        // модуль=_sqrt(l_dir^2+y^2+2.*(l_dir,y)),y=(0,m_fUpThrowFactor,0) (до этого модуль l_dir =1)
-        l_dir.mul(1.f / rmag); //перенормировка
+
+        if (_valid(l_dir) && l_dir.square_magnitude() > EPS)
+            l_dir.normalize();
+        else
+            l_dir.set(0.f, 1.f, 0.f);
+
         NET_Packet P;
         SHit HS;
         HS.GenHeader(GE_HIT, l_pGO->ID()); //		cast_game_object()->u_EventGen		(P,GE_HIT,l_pGO->ID());
