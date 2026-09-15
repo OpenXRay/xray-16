@@ -51,6 +51,9 @@ struct GeometryBatch {
 
     bool isShadowOnly = false;
 
+    bool isTransparent = false;
+    bool isAlphaTested = false;
+
     // Skinning render mode from CSkeletonX::RenderMode
     // Used to select correct shader (1B, 2B, 3B, 4B variants)
     u16 skinningRenderMode = 0;
@@ -81,30 +84,11 @@ struct GeometryBatch {
     // ═══════════════════════════════════════════════════
     // Uses MaterialSystem for material flags
 
-    // Check if batch is alpha-tested (uses clip/discard in shader)
-    bool IsAlphaTested() const {
-        if (!visual || !visual->shaderName.size())
-            return false;
+    bool IsAlphaTested() const { return isAlphaTested; }
 
-        return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName)
-            .alphaTest;
-    }
+    bool IsStrictB2F() const { return isTransparent; }
 
-    // Check if batch requires back-to-front sorting (transparent/alpha-blended)
-    bool IsStrictB2F() const {
-        if (!visual || !visual->shaderName.size())
-            return false;
-
-        return MaterialSystem::Instance()
-            .GetMaterialInfo(visual->shaderName)
-            .transparent;
-    }
-
-    // Check if batch is opaque (no alpha-test and no strict B2F)
-    bool IsOpaque() const {
-        return !IsAlphaTested() && !IsStrictB2F();
-    }
+    bool IsOpaque() const { return !isAlphaTested && !isTransparent; }
 };
 
 // ══════════════════════════════════════════════════════════
@@ -123,14 +107,15 @@ public:
     // Submit geometry for rendering
     void Submit(const GeometryBatch& batch);
 
-    // Get batches for rendering (const)
     const xr_vector<GeometryBatch>& GetBatches() const { return m_batches; }
+    const xr_vector<GeometryBatch>& GetStaticBatches() const { return m_staticBatches; }
+    const xr_vector<u32>& GetStaticTransparentIndices() const { return m_staticTransparentIndices; }
 
-    // Get batches for routing (non-const, for Week 16 dynamic routing)
-    xr_vector<GeometryBatch>& GetBatchesMutable() { return m_batches; }
+    bool HasStaticBatches() const { return !m_staticBatches.empty(); }
+    bool HasBatches() const { return !m_batches.empty() || !m_staticBatches.empty(); }
 
-    // Sort batches for optimal rendering
-    void Sort();
+    void EndStaticBuild();
+    void ClearStatic();
 
     // Statistics
     struct Stats {
@@ -143,9 +128,9 @@ public:
 
 private:
     xr_vector<GeometryBatch> m_batches;
+    xr_vector<GeometryBatch> m_staticBatches;
+    xr_vector<u32> m_staticTransparentIndices;
     Stats m_stats;
-
-    // Sorting key
 };
 
 // Global geometry collector instance (to be initialized by renderer)

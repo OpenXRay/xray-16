@@ -26,56 +26,32 @@ void GeometryCollector::BeginFrame() {
 
 void GeometryCollector::EndFrame() {
     // Update statistics
-    m_stats.numBatches = static_cast<u32>(m_batches.size());
+    m_stats.numBatches = static_cast<u32>(m_batches.size() + m_staticBatches.size());
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
     VERIFY(batch.indexCount > 0);
+    VERIFY(!(batch.isStatic && batch.isSkinned));
 
-    m_batches.push_back(batch);
+    if (batch.isStatic)
+        m_staticBatches.push_back(batch);
+    else
+        m_batches.push_back(batch);
 }
 
-void GeometryCollector::Sort() {
-    // ═══════════════════════════════════════════════════════
-    //  RENDER ORDER SORTING (using SSA + shader flags)
-    // ═══════════════════════════════════════════════════════
-    // Proper render order for forward rendering:
-    //   1. Opaque (iPriority == 0) - SSA descending (front-to-back for early-Z)
-    //   2. Alpha-tested (iPriority == 1) - SSA descending (after opaque fills depth)
-    //   3. Transparent (bStrictB2F) - SSA ascending (back-to-front for blending)
-    //
-    // SSA = R / distSQ (larger = closer/bigger = more visually important)
-    // SSA descending = front-to-back, SSA ascending = back-to-front
+void GeometryCollector::EndStaticBuild() {
+    m_staticTransparentIndices.clear();
 
-    std::sort(m_batches.begin(), m_batches.end(),
-        [](const GeometryBatch& a, const GeometryBatch& b) {
-            // Get sorting properties using member functions
-            bool aB2F = a.IsStrictB2F();
-            bool bB2F = b.IsStrictB2F();
-            bool aAref = a.IsAlphaTested();
-            bool bAref = b.IsAlphaTested();
+    for (u32 i = 0; i < m_staticBatches.size(); ++i) {
+        const GeometryBatch& batch = m_staticBatches[i];
+        if (!batch.isSkinned && !batch.isTerrain && batch.IsStrictB2F())
+            m_staticTransparentIndices.push_back(i);
+    }
+}
 
-            // 1. Transparent (bStrictB2F) batches render LAST
-            if (aB2F != bB2F) {
-                return !aB2F;  // Non-B2F comes before B2F
-            }
-
-            // 2. For transparent batches: sort by SSA ascending (back-to-front)
-            if (aB2F && bB2F) {
-                return a.ssa < b.ssa;  // Ascending SSA = back-to-front
-            }
-
-            // 3. Alpha-tested renders AFTER opaque
-            //    This ensures opaque geometry fills depth buffer first,
-            //    so clip() in alpha-tested shaders shows correct background.
-            if (aAref != bAref) {
-                return !aAref;  // Non-aref (opaque) comes before aref
-            }
-
-            // 4. Within same category: sort by SSA descending (front-to-back)
-            //    This matches vanilla's cmp_ssa: return lhs.ssa > rhs.ssa
-            return a.ssa > b.ssa;  // Descending SSA = front-to-back
-        });
+void GeometryCollector::ClearStatic() {
+    m_staticBatches.clear();
+    m_staticTransparentIndices.clear();
 }
 
 } // namespace xray::render

@@ -583,7 +583,8 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         return;
 
     const auto& batches = geometry->GetBatches();
-    const u32 totalBatches = static_cast<u32>(batches.size());
+    const auto& staticBatches = geometry->GetStaticBatches();
+    const u32 totalBatches = static_cast<u32>(batches.size() + staticBatches.size());
 
     if (totalBatches == 0) {
         m_staticObjectCount = 0;
@@ -685,9 +686,46 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
 
     {
     ZoneScopedN("Upload::Rebuild");
-    for (u32 i = 0; i < totalBatches; i++) {
-        const auto& batch = batches[i];
+    const bool rebuildStatics = !m_staticDataCached || !m_terrainDataCached;
+    if (rebuildStatics) {
+        for (const auto& batch : staticBatches) {
+            if (batch.isSkinned)
+                continue;
 
+            if (batch.isTerrain) {
+                if (m_terrainDataCached)
+                    continue;
+                appendBatch(batch, 0u, batch.terrainMaterialID,
+                    m_terrainDrawArgsData, m_terrainMaterialIDData, m_terrainInstanceData);
+                m_terrainBatchKeys.push_back(batchKey(batch));
+                continue;
+            }
+
+            if (batch.IsStrictB2F())
+                continue;
+
+            if (m_staticDataCached)
+                continue;
+
+            const u32 flags = batchFlags(batch);
+            m_staticObjectFlags.push_back(flags);
+            appendBatch(batch, flags, batch.bindlessMaterialID,
+                m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
+            m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
+            m_staticBatchKeys.push_back(batchKey(batch));
+        }
+    }
+
+    for (u32 index : geometry->GetStaticTransparentIndices()) {
+        const auto& batch = staticBatches[index];
+        if (!batch.megaBufferAlloc.valid)
+            ++m_transparentResidualCount;
+        appendBatch(batch, batchFlags(batch), batch.bindlessMaterialID,
+            m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
+        m_transparentKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
+    }
+
+    for (const auto& batch : batches) {
         if (batch.isSkinned)
             continue;
 
@@ -709,23 +747,12 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
             continue;
         }
 
-        if (batch.isStatic) {
-            if (m_staticDataCached)
-                continue;
-            const u32 flags = batchFlags(batch);
-            m_staticObjectFlags.push_back(flags);
-            appendBatch(batch, flags, batch.bindlessMaterialID,
-                m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
-            m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
-            m_staticBatchKeys.push_back(batchKey(batch));
-        } else {
-            const u32 flags = batchFlags(batch);
-            m_dynamicObjectFlags.push_back(flags);
-            appendInstance(batch, flags, batch.bindlessMaterialID,
-                m_dynamicMaterialIDData, m_dynamicInstanceData);
-            m_dynamicBatchKeys.push_back(batchKey(batch));
-            m_dynamicIdentity.push_back(std::make_pair(static_cast<const void*>(batch.visual), static_cast<const void*>(batch.renderable)));
-        }
+        const u32 flags = batchFlags(batch);
+        m_dynamicObjectFlags.push_back(flags);
+        appendInstance(batch, flags, batch.bindlessMaterialID,
+            m_dynamicMaterialIDData, m_dynamicInstanceData);
+        m_dynamicBatchKeys.push_back(batchKey(batch));
+        m_dynamicIdentity.push_back(std::make_pair(static_cast<const void*>(batch.visual), static_cast<const void*>(batch.renderable)));
     }
     }
 
@@ -1415,7 +1442,7 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupCullingPass(
 {
     using namespace framegraph;
 
-    if (!m_computeEnabled || !geometry || geometry->GetBatches().empty() || !m_clusterArgsBuffer)
+    if (!m_computeEnabled || !geometry || !geometry->HasBatches() || !m_clusterArgsBuffer)
         return VirtualResourceHandle();
 
     struct GPUCullPassData {

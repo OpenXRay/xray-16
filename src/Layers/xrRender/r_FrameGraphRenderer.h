@@ -494,14 +494,6 @@ private:
     xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;  // World-space particles
     xr_vector<fg::passes::ParticleBatch> m_hudParticleBatches;    // HUD particles (need FOV adjustment)
 
-    // ═══════════════════════════════════════════════════════
-    //  STATIC GEOMETRY CACHE (collected once, reused every frame)
-    // ═══════════════════════════════════════════════════════
-    // Static geometry from sector hierarchies doesn't change - cache it!
-    // Only dynamic objects (from spatial DB) need per-frame collection
-    xr_vector<GeometryBatch> m_cachedStaticBatches;
-    bool m_staticBatchesCached = false;
-
     // RenderContext for execution
     xr_unique_ptr<fg::RenderContext> m_renderContext;
 
