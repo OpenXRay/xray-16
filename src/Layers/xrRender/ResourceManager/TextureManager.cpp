@@ -359,7 +359,7 @@ TextureHandle TextureManager::CreateTexture(
         // Calculate memory
         meta.memoryUsed = desc.CalculateMemorySize();
         m_stats.texturesResident++;
-        m_stats.totalMemoryUsed += meta.memoryUsed;
+        m_memoryUsed += meta.memoryUsed;
 
         // Msg("~ [TextureManager] Created runtime texture '%s': %ux%ux%u, %.2f MB",
         //     desc.debugName.c_str(),

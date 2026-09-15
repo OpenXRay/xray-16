@@ -72,6 +72,7 @@ struct GpuParticleManager::Impl {
     xr_vector<GpuPapiAction> actions;
     xr_vector<Migration> migrations;
     xr_vector<std::unique_ptr<FrameData>> frames;
+    xr_vector<u32> uploadedVisibleRoots;
     GpuParticleStats stats;
     GpuParticleDrawResources draw;
     nvrhi::BufferHandle actionBuffer,actionState,particleAllocation,stateAllocation,commands,rootCommands,visibleRoots,status,errors,noise,constants,visibilityConstants,cursors;
@@ -158,6 +159,7 @@ struct GpuParticleManager::Impl {
         R_ASSERT2(replacement,"GPU PAPI buffer allocation failed");
         if (preserve && initialized) migrations.push_back({replacement,buffer,true});
         buffer = replacement;
+        if (buffer.GetAddressOf() == visibleRoots.GetAddressOf()) uploadedVisibleRoots.clear();
         initialize.binding = nullptr;
         simulate.binding = nullptr;
         compact.binding = nullptr;
@@ -309,6 +311,16 @@ struct GpuParticleManager::Impl {
                 commandList->clearBufferUInt(status,0);
                 initialized = true;
             }
+            const bool uploadVisible = uploadedVisibleRoots != visible;
+            if (definitionsDirty) {
+                if (!programs.empty()) commandList->setBufferState(draw.programs,nvrhi::ResourceStates::CopyDest);
+                if (!actions.empty()) commandList->setBufferState(actionBuffer,nvrhi::ResourceStates::CopyDest);
+            }
+            if (!noiseUploaded) commandList->setBufferState(noise,nvrhi::ResourceStates::CopyDest);
+            if (!batch.empty()) commandList->setBufferState(commands,nvrhi::ResourceStates::CopyDest);
+            if (!ranges.empty()) commandList->setBufferState(rootCommands,nvrhi::ResourceStates::CopyDest);
+            if (uploadVisible && !visible.empty()) commandList->setBufferState(visibleRoots,nvrhi::ResourceStates::CopyDest);
+            commandList->commitBarriers();
             if (definitionsDirty) {
                 if (!programs.empty()) commandList->writeBuffer(draw.programs,programs.data(),programs.size() * sizeof(GpuPapiProgram));
                 if (!actions.empty()) commandList->writeBuffer(actionBuffer,actions.data(),actions.size() * sizeof(GpuPapiAction));
@@ -328,7 +340,10 @@ struct GpuParticleManager::Impl {
             }
             if (!batch.empty()) commandList->writeBuffer(commands,batch.data(),batch.size() * sizeof(GpuPapiCommand));
             if (!ranges.empty()) commandList->writeBuffer(rootCommands,ranges.data(),ranges.size() * sizeof(ranges[0]));
-            if (!visible.empty()) commandList->writeBuffer(visibleRoots,visible.data(),visible.size() * sizeof(u32));
+            if (uploadVisible) {
+                if (!visible.empty()) commandList->writeBuffer(visibleRoots,visible.data(),visible.size() * sizeof(u32));
+                uploadedVisibleRoots = visible;
+            }
         }
         {
             ZoneScopedN("GpuPapiSimulation.Collision");
