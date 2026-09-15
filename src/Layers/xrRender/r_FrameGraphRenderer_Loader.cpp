@@ -16,11 +16,13 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/GpuParticleManager.h"
+#include "Layers/xrRender/ParticleEffectDef.h"
 #include "Layers/xrRender/ParticleEditor/ParticleEditor.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/LocalShadowPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/DistortionApplyPassSetup.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -227,11 +229,40 @@ void FrameGraphRenderer::level_Load(IReader* fs)
     if (!GEnv.isDedicatedServer && m_blackboard)
         passes::WarmLocalShadowPool(GetRenderDevice(), m_blackboard->get_or_add<passes::LocalShadowState>());
 
+    if (!GEnv.isDedicatedServer)
+        WarmParticles();
+
     // End
     g_pGamePersistent->LoadEnd();
 
     // signal loaded
     b_loaded = TRUE;
+}
+
+void FrameGraphRenderer::WarmParticles()
+{
+    ZoneScoped;
+    g_pGamePersistent->LoadTitle("st_loading_textures");
+    if (m_materialCache)
+    {
+        sh_list textures;
+        for (auto it = m_PSLibrary.FirstPED(); it != m_PSLibrary.LastPED(); ++it)
+        {
+            const PS::CPEDef& def = **it;
+            if (!def.m_Flags.is(PS::CPEDef::dfSprite) || !def.m_TextureName.size())
+                continue;
+            Resources->_ParseList(textures, def.m_TextureName.c_str());
+            if (!textures.empty())
+                m_materialCache->PreRegisterParticleMaterial(textures[0]);
+        }
+        m_materialCache->FinalizePendingMaterials(nullptr);
+    }
+    if (nvrhi::IDevice* device = m_device ? m_device->GetNVRHIDevice() : nullptr)
+    {
+        GetGpuParticleManager().WarmCollision(device);
+        if (m_blackboard)
+            passes::InitializeDistortionApplyPass(device, m_blackboard->get_or_add<passes::DistortionApplyPassState>());
+    }
 }
 
 // ═══════════════════════════════════════════════════

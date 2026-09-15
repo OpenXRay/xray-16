@@ -56,6 +56,7 @@ public:
     GpuParticleDrawResources GetDrawResources() const;
     GpuParticleStats GetStats() const;
     void LevelUnload();
+    void WarmCollision(nvrhi::IDevice* device);
     void Reset();
 private:
     struct Impl;

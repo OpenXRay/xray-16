@@ -151,6 +151,7 @@ private:
     void LoadVisuals(IReader* fs);
     void CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange>& ranges);
     void LoadLights(IReader* fs);
+    void WarmParticles();
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
     void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);

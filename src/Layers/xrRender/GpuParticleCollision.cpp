@@ -10,6 +10,7 @@
 #include "xrEngine/xr_collide_form.h"
 #include "xrEngine/cf_dynamic_mesh.h"
 #include "xrCore/Animation/Bone.hpp"
+#include "xrEngine/IRenderBackend.h"
 #include <algorithm>
 #include <limits>
 
@@ -165,25 +166,31 @@ struct CollisionBuffer
     }
 
     template <typename T>
+    bool Reserve(nvrhi::IDevice* device, const char* name, size_t count, u64& bindingVersion)
+    {
+        const size_t bytes = std::max(size_t(1), count) * sizeof(T);
+        if (buffer && buffer->getDesc().byteSize >= bytes)
+            return false;
+        nvrhi::BufferDesc description;
+        description.byteSize = std::max<u64>(bytes, buffer ? buffer->getDesc().byteSize * 2 : bytes);
+        description.structStride = sizeof(T);
+        description.debugName = name;
+        description.initialState = nvrhi::ResourceStates::ShaderResource;
+        description.keepInitialState = true;
+        buffer = device->createBuffer(description);
+        R_ASSERT2(buffer, "GPU particle collision buffer allocation failed");
+        ++bindingVersion;
+        return true;
+    }
+
+    template <typename T>
     void Upload(nvrhi::IDevice* device, nvrhi::ICommandList* commandList, const char* name,
         const xr_vector<T>& values, u64& bindingVersion, bool full = false)
     {
         const T empty{};
         const T* data = values.empty() ? &empty : values.data();
         const size_t bytes = std::max(size_t(1), values.size()) * sizeof(T);
-        if (!buffer || buffer->getDesc().byteSize < bytes)
-        {
-            nvrhi::BufferDesc description;
-            description.byteSize = std::max<u64>(bytes, buffer ? buffer->getDesc().byteSize * 2 : bytes);
-            description.structStride = sizeof(T);
-            description.debugName = name;
-            description.initialState = nvrhi::ResourceStates::ShaderResource;
-            description.keepInitialState = true;
-            buffer = device->createBuffer(description);
-            R_ASSERT2(buffer, "GPU particle collision buffer allocation failed");
-            ++bindingVersion;
-            full = true;
-        }
+        full |= Reserve<T>(device, name, values.size(), bindingVersion);
         if (full)
             commandList->writeBuffer(buffer, data, bytes);
         else
@@ -194,6 +201,17 @@ struct CollisionBuffer
                     commandList->writeBuffer(buffer, data + range.first,
                         (end - range.first) * sizeof(T), range.first * sizeof(T));
             }
+        dirty.clear();
+    }
+
+    template <typename T>
+    void UploadOutOfFrame(nvrhi::IDevice* device, const char* name, const xr_vector<T>& values, u64& bindingVersion)
+    {
+        const T empty{};
+        const T* data = values.empty() ? &empty : values.data();
+        const size_t bytes = std::max(size_t(1), values.size()) * sizeof(T);
+        Reserve<T>(device, name, values.size(), bindingVersion);
+        GEnv.Backend->UploadBufferData(buffer, data, bytes);
         dirty.clear();
     }
 };
@@ -247,7 +265,7 @@ struct GpuParticleCollision::State
     bool UpdateStatic()
     {
         auto* currentLevel = g_pGameLevel;
-        auto* currentModel = currentLevel && currentLevel->bReady ? currentLevel->ObjectSpace.GetStaticModel() : nullptr;
+        auto* currentModel = currentLevel ? currentLevel->ObjectSpace.GetStaticModel() : nullptr;
         const CDB::TRI* triangles = currentModel ? currentModel->get_tris() : nullptr;
         const Fvector* vertices = currentModel ? currentModel->get_verts() : nullptr;
         const u32 triangleCount = currentModel ? currentModel->get_tris_count() : 0;
@@ -459,6 +477,19 @@ void GpuParticleCollision::Update(nvrhi::IDevice* device, nvrhi::ICommandList* c
     state->objectBuffer.Upload(device, commandList, "GpuParticleCollisionObjects", state->objects, state->bindingVersion);
     state->blockBuffer.Upload(device, commandList, "GpuParticleCollisionBlocks", state->blocks, state->bindingVersion);
     state->countBuffer.Upload(device, commandList, "GpuParticleCollisionCounts", state->counts, state->bindingVersion);
+}
+
+void GpuParticleCollision::Warm(nvrhi::IDevice* device)
+{
+    R_ASSERT(device);
+    if (state->device && state->device != device)
+        Reset();
+    state->device = device;
+    if (!state->UpdateStatic() && state->nodeBuffer.buffer)
+        return;
+    state->nodeBuffer.UploadOutOfFrame(device, "GpuParticleCollisionNodes", state->nodes, state->bindingVersion);
+    state->staticBuffer.UploadOutOfFrame(device, "GpuParticleCollisionStaticTriangles", state->staticTriangles,
+        state->bindingVersion);
 }
 
 void GpuParticleCollision::Bind(framegraph::BindingSetBuilder& builder) const

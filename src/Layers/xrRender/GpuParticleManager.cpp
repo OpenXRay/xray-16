@@ -747,5 +747,10 @@ void GpuParticleManager::LevelUnload() {
     }
     m_impl->collision.Reset();
 }
+void GpuParticleManager::WarmCollision(nvrhi::IDevice* device) {
+    std::lock_guard lock(m_impl->mutex);
+    R_ASSERT2(!m_impl->device || m_impl->device == device,"GPU PAPI device changed without renderer teardown");
+    m_impl->collision.Warm(device);
+}
 void GpuParticleManager::Reset() { m_impl = std::make_shared<Impl>(); }
 }

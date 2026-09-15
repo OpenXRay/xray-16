@@ -18,6 +18,7 @@ public:
     GpuParticleCollision(const GpuParticleCollision&) = delete;
     GpuParticleCollision& operator=(const GpuParticleCollision&) = delete;
     void Update(nvrhi::IDevice* device, nvrhi::ICommandList* commandList, u32 definitionFlags);
+    void Warm(nvrhi::IDevice* device);
     void Bind(framegraph::BindingSetBuilder& builder) const;
     void Reset();
     u64 GetBindingVersion() const;
