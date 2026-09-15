@@ -12,6 +12,10 @@ project(OpenXRay
     LANGUAGES CXX C
 )
 
+# Keep a stable engine root when OpenXRay is embedded with add_subdirectory().
+# CMAKE_SOURCE_DIR belongs to the outer application in that configuration.
+set(XRAY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
 option(BUILD_SHARED_LIBS "Build shared libraries"     ${BUILD_SHARED_LIBS_DEFAULT_VALUE})
 
 option(XRAY_USE_LUAJIT   "Use LuaJIT"                 ON)

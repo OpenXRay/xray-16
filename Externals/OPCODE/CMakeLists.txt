@@ -69,7 +69,7 @@ target_sources(xrOPCODE PRIVATE
 
 target_include_directories(xrOPCODE
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src"
 )
 
 target_link_libraries(xrOPCODE

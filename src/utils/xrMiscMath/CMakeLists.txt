@@ -12,7 +12,7 @@ target_sources(xrMiscMath PRIVATE
 
 target_include_directories(xrMiscMath
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src"
 )
 
 set_target_properties(xrMiscMath PROPERTIES

@@ -1,6 +1,6 @@
 add_library(xrImGui STATIC)
 
-set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/Externals/imgui")
+set(IMGUI_DIR "${XRAY_SOURCE_DIR}/Externals/imgui")
 
 target_sources(xrImGui PRIVATE
     "${IMGUI_DIR}/imconfig.h"

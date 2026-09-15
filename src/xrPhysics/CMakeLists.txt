@@ -395,13 +395,13 @@ target_sources_grouped(
 
 target_include_directories(xrPhysics
     PUBLIC
-    "${CMAKE_SOURCE_DIR}/Externals"
+    "${XRAY_SOURCE_DIR}/Externals"
 
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/Externals/imgui"
-    "${CMAKE_SOURCE_DIR}/Externals/ode/include"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/Externals/imgui"
+    "${XRAY_SOURCE_DIR}/Externals/ode/include"
 )
 
 target_link_libraries(xrPhysics
