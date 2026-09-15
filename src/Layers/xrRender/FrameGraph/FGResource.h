@@ -56,7 +56,7 @@ struct ResourceDesc {
         } else {
             // Texture memory estimation
             u64 pixelSize = GetFormatBytesPerPixel(format);
-            u64 pixels = width * height * depth * arraySize;
+            u64 pixels = u64(width) * u64(height) * u64(depth) * u64(arraySize);
 
             // Account for mip chain (~33% more)
             if (mipLevels > 1) {

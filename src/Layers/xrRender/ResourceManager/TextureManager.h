@@ -65,6 +65,7 @@ struct TextureDesc {
     u32 depth = 1;           // For 3D textures
     u32 arraySize = 1;       // For texture arrays/cubemaps
     u32 mipLevels = 1;
+    u32 sampleCount = 1;
 
     nvrhi::Format format = nvrhi::Format::RGBA8_UNORM;
 

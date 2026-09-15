@@ -995,6 +995,7 @@ void FrameGraph::AllocateResources() {
                 rmTexDesc.depth = resource.desc.depth;
                 rmTexDesc.arraySize = resource.desc.arraySize;
                 rmTexDesc.mipLevels = resource.desc.mipLevels;
+                rmTexDesc.sampleCount = resource.desc.sampleCount;
                 rmTexDesc.format = resource.desc.format;
                 rmTexDesc.debugName = resource.desc.debugName;
 
