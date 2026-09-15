@@ -192,6 +192,10 @@ BufferHandle BufferManager::CreateBuffer(
         nvrhiDesc.canHaveUAVs = true;
     }
 
+    if (desc.indirectArgs) {
+        nvrhiDesc.isDrawIndirectArgs = true;
+    }
+
     meta.nvrhiBuffer = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
 
     if (!meta.nvrhiBuffer) {

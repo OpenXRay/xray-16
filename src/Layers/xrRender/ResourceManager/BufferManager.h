@@ -44,6 +44,7 @@ struct BufferDesc {
     // Access flags
     bool cpuAccess = false;    // Can map from CPU?
     bool gpuWrite = false;     // UAV?
+    bool indirectArgs = false;
 
     shared_str debugName;
 

@@ -42,6 +42,7 @@ struct ResourceDesc {
     bool isDepthStencil = false;
     bool isUAV = false;
     bool allowUAV = false;   // Can be bound as UAV
+    bool isIndirectArgs = false;
 
     // Memory management hints
     bool isTransient = true; // Can be aliased/destroyed

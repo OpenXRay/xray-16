@@ -252,6 +252,7 @@ private:
     void BuildDependencyGraph();
     void ValidateAsyncPasses();
     void CullUnusedPasses();
+    void ResolveUsage();
     void ComputeResourceLifetimes();
     void AllocateResources();
     void InsertResourceBarriers();

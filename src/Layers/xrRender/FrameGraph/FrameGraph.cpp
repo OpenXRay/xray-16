@@ -209,6 +209,11 @@ void FrameGraph::Compile() {
     }
 
     {
+        ZoneScopedN("Compile::ResolveUsage");
+        ResolveUsage();
+    }
+
+    {
         ZoneScopedN("Compile::ComputeResourceLifetimes");
         ComputeResourceLifetimes();
     }
@@ -822,6 +827,67 @@ void FrameGraph::CullUnusedPasses() {
     m_stats.numCulledPasses = culledCount;
 }
 
+void FrameGraph::ResolveUsage() {
+    for (const PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+
+        for (const auto& access : pass->resourceAccesses) {
+            ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) continue;
+
+            const bool isBuffer = resource->desc.type == ResourceDesc::Type::Buffer;
+
+            if (resource->desc.isImported) {
+                bool satisfied = true;
+                switch (access.state) {
+                    case ResourceState::UnorderedAccess:
+                        if (resource->nvrhiBuffer)
+                            satisfied = resource->nvrhiBuffer->getDesc().canHaveUAVs;
+                        else if (resource->nvrhiTexture)
+                            satisfied = resource->nvrhiTexture->getDesc().isUAV;
+                        break;
+                    case ResourceState::RenderTarget:
+                        if (resource->nvrhiTexture)
+                            satisfied = resource->nvrhiTexture->getDesc().isRenderTarget;
+                        break;
+                    case ResourceState::IndirectArgument:
+                        if (resource->nvrhiBuffer)
+                            satisfied = resource->nvrhiBuffer->getDesc().isDrawIndirectArgs;
+                        break;
+                    default:
+                        break;
+                }
+                VERIFY4(satisfied,
+                    "framegraph pass requests a state the imported resource was not created for",
+                    pass->name.c_str(),
+                    resource->desc.debugName.c_str());
+                continue;
+            }
+
+            switch (access.state) {
+                case ResourceState::UnorderedAccess:
+                    if (isBuffer)
+                        resource->desc.allowUAV = true;
+                    else
+                        resource->desc.isUAV = true;
+                    break;
+                case ResourceState::RenderTarget:
+                    resource->desc.isRenderTarget = true;
+                    break;
+                case ResourceState::DepthStencilWrite:
+                case ResourceState::DepthStencilRead:
+                    resource->desc.isDepthStencil = true;
+                    break;
+                case ResourceState::IndirectArgument:
+                    resource->desc.isIndirectArgs = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 void FrameGraph::ComputeResourceLifetimes() {
     // Reset lifetimes for all resources
     for (auto& resource : m_resources) {
@@ -892,6 +958,7 @@ void FrameGraph::AllocateResources() {
                 rmBufferDesc.size = resource.desc.bufferSize;
                 rmBufferDesc.stride = resource.desc.structStride;
                 rmBufferDesc.gpuWrite = resource.desc.allowUAV;
+                rmBufferDesc.indirectArgs = resource.desc.isIndirectArgs;
                 rmBufferDesc.cpuAccess = false;
                 rmBufferDesc.debugName = resource.desc.debugName;
 
@@ -924,6 +991,7 @@ void FrameGraph::AllocateResources() {
             nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
             nvrhiDesc.keepInitialState = true;  // D3D12 requires state tracking
             nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
+            nvrhiDesc.isDrawIndirectArgs = resource.desc.isIndirectArgs;
 
             resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
 
