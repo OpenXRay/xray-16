@@ -208,7 +208,7 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
         return;
 
     const ZoneData& zone = zones[zoneId];
-    if (!zone.info || zone.timing.callCount == 0)
+    if (!zone.info)
         return;
 
     ImGui::PushID(static_cast<int>(zoneId));
@@ -218,7 +218,7 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     float selfTime = zone.timing.selfTimeMs;
     u32 callCount = zone.timing.callCount;
 
-    u32 color = GetTimeColor(totalTime, parentTime);
+    u32 color = callCount == 0 ? IM_COL32(110, 110, 110, 255) : GetTimeColor(totalTime, parentTime);
     ImGui::PushStyleColor(ImGuiCol_Text, color);
 
     char label[256];
@@ -238,6 +238,8 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
                 memstats::ArmBacktraceCapture(zone.zoneId, zone.info->name);
             if (ImGui::MenuItem("Copy tree to clipboard"))
                 CopyZoneTreeToClipboard();
+            if (ImGui::MenuItem("Reset tree"))
+                GetCPUProfiler().ResetTree();
             ImGui::EndPopup();
         }
         ImGui::SameLine();
@@ -273,6 +275,8 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
                 memstats::ArmBacktraceCapture(zone.zoneId, zone.info->name);
             if (ImGui::MenuItem("Copy tree to clipboard"))
                 CopyZoneTreeToClipboard();
+            if (ImGui::MenuItem("Reset tree"))
+                GetCPUProfiler().ResetTree();
             ImGui::EndPopup();
         }
         ImGui::SameLine();
