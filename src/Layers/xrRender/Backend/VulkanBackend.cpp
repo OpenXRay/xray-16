@@ -1090,6 +1090,10 @@ void VulkanBackend::SubmitThreadMain() {
     auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
         return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
     };
+    auto storeMax = [](std::atomic<u64>& slot, u64 value) {
+        u64 current = slot.load(std::memory_order_relaxed);
+        while (current < value && !slot.compare_exchange_weak(current, value, std::memory_order_relaxed)) {}
+    };
 
     for (;;) {
         SubmitJob job;
@@ -1105,14 +1109,14 @@ void VulkanBackend::SubmitThreadMain() {
         m_submitDoneCv.notify_all();
 
         const auto tDequeue = Clock::now();
-        m_stJobLatencyUs.store(usBetween(job.enqueueTime, tDequeue), std::memory_order_relaxed);
+        storeMax(m_stJobLatencyUs, usBetween(job.enqueueTime, tDequeue));
 
         auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
         u64 graphicsInstanceID;
         {
             std::lock_guard<std::mutex> qk(m_queueMutex);
             const auto tLocked = Clock::now();
-            m_stQueueLockUs.store(usBetween(tDequeue, tLocked), std::memory_order_relaxed);
+            storeMax(m_stQueueLockUs, usBetween(tDequeue, tLocked));
 
             vkDevice->queueWaitForSemaphore(nvrhi::CommandQueue::Graphics, job.imageAvailable, 0);
             vkDevice->queueSignalSemaphore(nvrhi::CommandQueue::Graphics, job.renderFinished, 0);
@@ -1121,7 +1125,7 @@ void VulkanBackend::SubmitThreadMain() {
                 m_nvrhiDevice->queueWaitForCommandList(
                     nvrhi::CommandQueue::Compute, nvrhi::CommandQueue::Graphics, previousGraphicsID);
             const auto tSem = Clock::now();
-            m_stSemWaitUs.store(usBetween(tLocked, tSem), std::memory_order_relaxed);
+            storeMax(m_stSemWaitUs, usBetween(tLocked, tSem));
 
             u64 computeInstanceID = 0;
             if (job.computeCl) {
@@ -1137,7 +1141,7 @@ void VulkanBackend::SubmitThreadMain() {
                 graphicsInstanceID = m_nvrhiDevice->executeCommandList(job.cl);
                 m_lastGraphicsInstanceID = graphicsInstanceID;
             }
-            m_stEncodeUs.store(usBetween(tSem, Clock::now()), std::memory_order_relaxed);
+            storeMax(m_stEncodeUs, usBetween(tSem, Clock::now()));
         }
 
         {
@@ -1153,7 +1157,7 @@ void VulkanBackend::SubmitThreadMain() {
             const auto tPre = Clock::now();
             std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
             const auto tPresentLocked = Clock::now();
-            m_stPresentLockUs.store(usBetween(tPre, tPresentLocked), std::memory_order_relaxed);
+            storeMax(m_stPresentLockUs, usBetween(tPre, tPresentLocked));
 
             VkPresentInfoKHR presentInfo = {};
             presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -1170,7 +1174,7 @@ void VulkanBackend::SubmitThreadMain() {
             }
             R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
                 "Vulkan presentation failed");
-            m_stPresentUs.store(usBetween(tPresentLocked, Clock::now()), std::memory_order_relaxed);
+            storeMax(m_stPresentUs, usBetween(tPresentLocked, Clock::now()));
         }
 
         {
@@ -1184,7 +1188,7 @@ void VulkanBackend::SubmitThreadMain() {
             ZoneScopedN("SubmitThread::GC");
             const auto tGc = Clock::now();
             m_nvrhiDevice->runGarbageCollection();
-            m_stGcUs.store(usBetween(tGc, Clock::now()), std::memory_order_relaxed);
+            storeMax(m_stGcUs, usBetween(tGc, Clock::now()));
         }
 
         {
@@ -1198,13 +1202,13 @@ void VulkanBackend::SubmitThreadMain() {
 bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
     if (!m_asyncSubmit)
         return false;
-    out.jobLatencyUs = m_stJobLatencyUs.load(std::memory_order_relaxed);
-    out.queueLockUs = m_stQueueLockUs.load(std::memory_order_relaxed);
-    out.semWaitUs = m_stSemWaitUs.load(std::memory_order_relaxed);
-    out.encodeUs = m_stEncodeUs.load(std::memory_order_relaxed);
-    out.presentLockUs = m_stPresentLockUs.load(std::memory_order_relaxed);
-    out.presentUs = m_stPresentUs.load(std::memory_order_relaxed);
-    out.gcUs = m_stGcUs.load(std::memory_order_relaxed);
+    out.jobLatencyUs = m_stJobLatencyUs.exchange(0, std::memory_order_relaxed);
+    out.queueLockUs = m_stQueueLockUs.exchange(0, std::memory_order_relaxed);
+    out.semWaitUs = m_stSemWaitUs.exchange(0, std::memory_order_relaxed);
+    out.encodeUs = m_stEncodeUs.exchange(0, std::memory_order_relaxed);
+    out.presentLockUs = m_stPresentLockUs.exchange(0, std::memory_order_relaxed);
+    out.presentUs = m_stPresentUs.exchange(0, std::memory_order_relaxed);
+    out.gcUs = m_stGcUs.exchange(0, std::memory_order_relaxed);
     return true;
 }
 
