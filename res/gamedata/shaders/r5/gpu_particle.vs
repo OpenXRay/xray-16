@@ -13,6 +13,7 @@ cbuffer GpuParticleDrawParams : register(b5)
     float4x4 g_HudWarp;
     float4 g_CameraTop;
     float4 g_CameraRight;
+    uint g_DrawBucket;
 };
 
 struct VS_OUTPUT
@@ -33,7 +34,7 @@ float3 GpuParticleTransformDirection(GpuPapiEmitter emitter, float3 direction)
 
 VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 {
-    uint drawBucket = vertexID / 6u;
+    uint drawBucket = g_DrawBucket;
     GpuPapiParticle particle = g_Particles[g_ParticleIndices[g_BucketOffsets[drawBucket] + instanceID]];
     GpuPapiEmitter emitter = g_Emitters[particle.emitter];
     GpuPapiProgram program = g_Programs[particle.program];

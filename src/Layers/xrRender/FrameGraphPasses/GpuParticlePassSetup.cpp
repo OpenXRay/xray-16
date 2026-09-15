@@ -22,8 +22,10 @@ struct GpuParticleDrawParams {
     Fmatrix hudWarp;
     Fvector4 cameraTop;
     Fvector4 cameraRight;
+    u32 drawBucket;
+    u32 padding[3];
 };
-static_assert(sizeof(GpuParticleDrawParams) == 96);
+static_assert(sizeof(GpuParticleDrawParams) == 112);
 static_assert(sizeof(nvrhi::DrawIndirectArguments) == 16);
 
 struct GpuParticlePassData {
@@ -44,7 +46,7 @@ struct GpuParticleBlendDesc {
 static constexpr GpuParticleBlendDesc gpuParticleBlends[PARTICLE_BLEND_COUNT] = {
     { nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, "GpuParticle.Set" },
     { nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::InvSrcAlpha, "GpuParticle.Blend" },
-    { nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, "GpuParticle.Add" },
+    { nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, "GpuParticle.Add" },
     { nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::Zero, nvrhi::BlendFactor::One, nvrhi::BlendFactor::Zero, "GpuParticle.Mul" },
     { nvrhi::BlendFactor::DstColor, nvrhi::BlendFactor::SrcColor, nvrhi::BlendFactor::One, nvrhi::BlendFactor::SrcAlpha, "GpuParticle.Mul2x" },
     { nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, nvrhi::BlendFactor::One, "GpuParticle.AlphaAdd" }
@@ -129,12 +131,11 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
         data.materialCache->FinalizePendingMaterials(context);
     materials.Upload(context);
     auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-    auto* drawConstants = cache.GetOrCreateVolatileCB("GpuParticle", "DrawParams", sizeof(GpuParticleDrawParams), data.device);
+    auto* drawConstants = cache.GetOrCreateVolatileCB("GpuParticle", "DrawParams", sizeof(GpuParticleDrawParams), data.device, 128);
     GpuParticleDrawParams params = {};
     params.hudWarp = HudFovWarp();
     params.cameraTop.set(Device.vCameraTop.x, Device.vCameraTop.y, Device.vCameraTop.z, 0.0f);
     params.cameraRight.set(Device.vCameraRight.x, Device.vCameraRight.y, Device.vCameraRight.z, 0.0f);
-    commandList->writeBuffer(drawConstants, &params, sizeof(params));
     auto bind = [&](const ExtractedReflection& pixel, nvrhi::IBindingLayout* layout, bool distortion) {
         BindingSetBuilder bindings(*passState.vertexReflection, pixel, device, "GpuParticle");
         bindings.ConstantBuffer("static_globals", staticGlobals)
@@ -174,6 +175,8 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     state.viewport.viewports = { nvrhi::Viewport(0.0f, float(data.width), 0.0f, float(data.height), 0.0f, 1.0f) };
     static constexpr u32 buckets[] = { 0, 3, 4, 1, 2, 5, 6, 9, 10, 7, 8, 11, 12, 13 };
     for (u32 bucket : buckets) {
+        params.drawBucket = bucket;
+        commandList->writeBuffer(drawConstants, &params, sizeof(params));
         bool isDistortion = bucket >= 12;
         state.pipeline = isDistortion ? passState.distortPipeline : passState.pipelines[bucket % PARTICLE_BLEND_COUNT];
         state.framebuffer = isDistortion ? distortFramebuffer : framebuffer;

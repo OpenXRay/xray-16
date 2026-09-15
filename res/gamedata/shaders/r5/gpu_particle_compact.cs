@@ -46,7 +46,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID) {
             uint count = g_DrawArgs[bucket].y;
             g_BucketOffsets[bucket] = offset;
             g_BucketCursors[bucket] = 0;
-            g_DrawArgs[bucket] = uint4(6,count,bucket * 6u,0);
+            g_DrawArgs[bucket] = uint4(6,count,0,0);
             offset += count;
         }
         return;
