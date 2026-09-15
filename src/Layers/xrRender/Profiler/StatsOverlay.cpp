@@ -254,7 +254,7 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
         if (ImGui::BeginPopupContextItem("zone_ctx"))
         {
             if (memstats::BacktraceCaptureSupported() && ImGui::MenuItem("Capture alloc backtraces"))
-                memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+                memstats::ArmBacktraceCapture(zone.zoneId, zone.info->name);
             if (ImGui::MenuItem("Copy tree to clipboard"))
                 CopyZoneTreeToClipboard();
             ImGui::EndPopup();
@@ -291,7 +291,7 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
         if (ImGui::BeginPopupContextItem("zone_ctx"))
         {
             if (memstats::BacktraceCaptureSupported() && ImGui::MenuItem("Capture alloc backtraces"))
-                memstats::ArmBacktraceCapture(zoneId, zone.info->name);
+                memstats::ArmBacktraceCapture(zone.zoneId, zone.info->name);
             if (ImGui::MenuItem("Copy tree to clipboard"))
                 CopyZoneTreeToClipboard();
             ImGui::EndPopup();
@@ -1148,7 +1148,7 @@ void StatsOverlay::RenderAllocationsSection()
             });
             if (s_armMatchCount == 1)
             {
-                memstats::ArmBacktraceCapture(s_armMatches[0], zones[s_armMatches[0]].info->name);
+                memstats::ArmBacktraceCapture(zones[s_armMatches[0]].zoneId, zones[s_armMatches[0]].info->name);
                 s_armMatchCount = 0;
             }
             else if (s_armMatchCount > 1)
@@ -1175,7 +1175,7 @@ void StatsOverlay::RenderAllocationsSection()
                     (u32)zones[id].timing.allocCalls, m);
                 if (ImGui::MenuItem(label))
                 {
-                    memstats::ArmBacktraceCapture(id, zones[id].info->name);
+                    memstats::ArmBacktraceCapture(zones[id].zoneId, zones[id].info->name);
                     s_armMatchCount = 0;
                 }
             }

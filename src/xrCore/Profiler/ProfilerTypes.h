@@ -52,10 +52,11 @@ struct ZoneTiming
     }
 };
 
-// Complete zone data combining static info and timing
+// Per-frame call-path node: one entry per (parent node, zone) pair
 struct ZoneData
 {
     const ZoneInfo* info = nullptr;
+    u32 zoneId = INVALID_ZONE_ID;
     ZoneTiming timing;
 
     // For tree structure
