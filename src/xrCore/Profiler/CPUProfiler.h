@@ -54,6 +54,7 @@ public:
 
     void FrameStart();
     void FrameEnd();
+    void ResetTree();
 
     const xr_vector<ZoneData>& GetZones() const { return m_displayZones; }
     const xr_vector<u32>& GetRootZones() const { return m_displayRootZones; }
@@ -85,6 +86,7 @@ private:
     std::atomic<u32> m_throttleInterval{30};
     std::atomic<u64> m_captureEpoch{0};
     u64 m_nextEpoch = 0;
+    std::atomic<bool> m_resetPending{false};
     std::atomic<u32> m_framesUntilSample{0};
 };
 

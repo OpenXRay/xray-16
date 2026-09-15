@@ -187,8 +187,13 @@ void CPUProfiler::FrameStart()
         return;
     m_framesUntilSample.store(m_throttleInterval.load(std::memory_order_relaxed) - 1, std::memory_order_relaxed);
 
-    m_nodes.clear();
-    m_rootNodes.clear();
+    if (m_resetPending.exchange(false, std::memory_order_acq_rel))
+    {
+        m_nodes.clear();
+        m_rootNodes.clear();
+    }
+    for (auto& node : m_nodes)
+        node.timing.Reset();
     m_frameTimer.Start();
     if (++m_nextEpoch == 0)
         ++m_nextEpoch;
@@ -213,6 +218,14 @@ void CPUProfiler::CopyToDisplayBuffer()
     m_displayFrameTimeMs = m_frameTimeMs;
     m_displayZones = m_nodes;
     m_displayRootZones = m_rootNodes;
+}
+
+void CPUProfiler::ResetTree()
+{
+    ScopeLock lock(&m_zoneLock);
+    m_resetPending.store(true, std::memory_order_release);
+    m_displayZones.clear();
+    m_displayRootZones.clear();
 }
 
 void CPUProfiler::ComputeSelfTimes(xr_vector<ZoneData>& zones)
