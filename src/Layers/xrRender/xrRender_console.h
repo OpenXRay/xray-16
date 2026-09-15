@@ -51,6 +51,7 @@ extern ECORE_API float ps_r__Tree_SBC; // scale bias correct
 extern ECORE_API float ps_r__WallmarkTTL;
 extern ECORE_API float ps_r__WallmarkSHIFT;
 extern ECORE_API float ps_r__WallmarkSHIFT_V;
+extern ECORE_API int ps_r_gpu_particle_debug_collision;
 
 extern ECORE_API float ps_r__GLOD_ssa_start;
 extern ECORE_API float ps_r__GLOD_ssa_end;

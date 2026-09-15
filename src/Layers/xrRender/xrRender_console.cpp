@@ -159,6 +159,7 @@ float ps_r__WallmarkTTL = 50.f;
 float ps_r__WallmarkSHIFT = 0.0001f;
 float ps_r__WallmarkSHIFT_V = 0.0001f;
 int ps_r4_skeleton_wallmark_mode = 0;
+int ps_r_gpu_particle_debug_collision = 0;
 
 float ps_r__GLOD_ssa_start = 256.f;
 float ps_r__GLOD_ssa_end = 64.f;
@@ -770,6 +771,7 @@ void xrRender_initconsole()
 #endif // DEBUG
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
     CMD4(CCC_Integer, "r4_skeleton_wallmark_mode", &ps_r4_skeleton_wallmark_mode, 0, 1);
+    CMD4(CCC_Integer, "r_gpu_particle_debug_collision", &ps_r_gpu_particle_debug_collision, 0, 1);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
 
