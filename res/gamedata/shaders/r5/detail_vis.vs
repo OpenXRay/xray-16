@@ -34,6 +34,8 @@ cbuffer DetailVisParams : register(b5)
     uint g_Kind;
     uint g_Segments;
     float g_AlphaRef;
+    uint g_PreparedCapacity;
+    uint3 g_VisPad;
 };
 
 Texture3D g_Perlin4D : register(t12);
@@ -42,6 +44,7 @@ StructuredBuffer<uint> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
 StructuredBuffer<PulledVertex> pulled_vertices : register(t36);
 StructuredBuffer<DetailInstance> all_instances : register(t37);
+StructuredBuffer<PreparedBlade> prepared_blades : register(t38);
 
 struct VS_OUTPUT
 {
@@ -81,9 +84,20 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     }
 
     uint localVert = vid;
-    BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
-    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
-    BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    BladeInstance b;
+    BladeBend w;
+    if (iid < g_PreparedCapacity)
+    {
+        PreparedBlade p = prepared_blades[iid];
+        b = BladeFromPrepared(p, raw);
+        w = BendFromPrepared(p, g_wind_direction.xy);
+    }
+    else
+    {
+        b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
+        float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
+        w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    }
     BladeVertex v = EvalBladeVertex(b, w, localVert, g_Segments, wave.w, grass_blade_width, g_Perlin4D, smp_linear);
     o.position = mul(m_VP, float4(v.pos, 1.0));
     o.uv = v.uv;

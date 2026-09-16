@@ -1,10 +1,35 @@
 #include "common_samplers.h"
 #include "cull_utils.h"
+#include "detail_blade_common.h"
 
 struct InstanceData
 {
     float3 pos;
     uint packed;
+};
+
+cbuffer DetailGlobals : register(b3)
+{
+    float4 consts;
+    float4 wave;
+    float4 dir2D;
+    float4 dir2D_2;
+    float4x4 g_detail_VP;
+    float4 detail_params;
+    float4 g_wind_direction;
+    float grass_wind_displacement;
+    float grass_interaction_displacement;
+    float grass_interaction_max_angle;
+    float grass_blade_width;
+    float4 grass_color_tip;
+    float4 grass_color_base;
+    float grass_color_variation;
+    float grass_blade_height;
+    uint buildDetailsIndex;
+    uint buildDetailsPbrIndex;
+    float4 interaction_window;
+    float4 interaction_window_prev;
+    uint buildDetailsBumpIndex;
 };
 
 static const float PACK_MAX_SCALE = 4.0;
@@ -56,7 +81,7 @@ cbuffer DetailCullParams : register(b5)
     uint g_visible_decal_capacity;
     uint g_grass_mode;
     uint g_visible_billboard_capacity;
-    uint g_cull_pad2;
+    uint g_prepared_capacity;
 };
 
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
@@ -64,6 +89,8 @@ StructuredBuffer<uint> g_visible_slot_ids : register(t1);
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
 Texture2D<float> g_hiz_pyramid : register(t3);
 StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
+Texture3D g_Perlin4D : register(t12);
+Texture2D g_Interaction : register(t13);
 
 
 RWStructuredBuffer<uint> g_visible_lod0 : register(u0);
@@ -76,12 +103,26 @@ RWStructuredBuffer<uint> g_visible_decals : register(u6);
 RWByteAddressBuffer g_indirect_args_decal : register(u7);
 RWStructuredBuffer<uint> g_visible_billboard : register(u8);
 RWByteAddressBuffer g_indirect_args_billboard : register(u9);
+RWStructuredBuffer<PreparedBlade> g_prepared_lod0 : register(u10);
+RWStructuredBuffer<PreparedBlade> g_prepared_lod1 : register(u11);
+RWStructuredBuffer<PreparedBlade> g_prepared_lod2 : register(u12);
 
 static const uint DO_NO_WAVING = 0x0001;
 
-void AppendBladeLOD(float3 pos, uint inst_idx)
+PreparedBlade PrepareBlade(InstanceData inst)
 {
-    float3 to_camera = pos - g_camera_pos;
+    DetailInstance raw;
+    raw.pos = inst.pos;
+    raw.packed = inst.packed;
+    BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
+    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
+    BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    return PackPreparedBlade(b, w);
+}
+
+void AppendBladeLOD(InstanceData inst, uint inst_idx)
+{
+    float3 to_camera = inst.pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
 
     uint idx;
@@ -90,18 +131,24 @@ void AppendBladeLOD(float3 pos, uint inst_idx)
         g_indirect_args_lod0.InterlockedAdd(4, 1, idx);
         if (idx < g_visible_blade_capacity)
             g_visible_lod0[idx] = inst_idx;
+        if (idx < g_prepared_capacity)
+            g_prepared_lod0[idx] = PrepareBlade(inst);
     }
     else if (dist_sqr < g_lod_distance_mid_sqr)
     {
         g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
         if (idx < g_visible_blade_capacity)
             g_visible_lod1[idx] = inst_idx;
+        if (idx < g_prepared_capacity)
+            g_prepared_lod1[idx] = PrepareBlade(inst);
     }
     else
     {
         g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
         if (idx < g_visible_blade_capacity)
             g_visible_lod2[idx] = inst_idx;
+        if (idx < g_prepared_capacity)
+            g_prepared_lod2[idx] = PrepareBlade(inst);
     }
 }
 
@@ -158,6 +205,6 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         else if (g_grass_mode == 0)
             AppendBillboard(inst_idx);
         else
-            AppendBladeLOD(inst.pos, inst_idx);
+            AppendBladeLOD(inst, inst_idx);
     }
 }

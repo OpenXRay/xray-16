@@ -125,6 +125,56 @@ BladeBend EvalBladeBend(BladeInstance b, float time, float2 windAngleSpeed, floa
     return o;
 }
 
+struct PreparedBlade
+{
+    float3 pos;
+    float bladeHeight;
+    float scale;
+    float rotation;
+    float2 bendDir;
+    float bendAngle;
+};
+
+PreparedBlade PackPreparedBlade(BladeInstance b, BladeBend w)
+{
+    PreparedBlade p;
+    p.pos = b.pos;
+    p.bladeHeight = b.bladeHeight;
+    p.scale = b.scale;
+    p.rotation = b.rotation;
+    p.bendDir = w.bendDir.xz;
+    p.bendAngle = w.bendAngle;
+    return p;
+}
+
+BladeInstance BladeFromPrepared(PreparedBlade p, DetailInstance raw)
+{
+    BladeInstance b;
+    b.pos = p.pos;
+    b.objectId = raw.packed & 0x3Fu;
+    b.rotation = p.rotation;
+    b.scale = p.scale;
+    b.bladeHeight = p.bladeHeight;
+    float sr = sin(b.rotation);
+    float cr = cos(b.rotation);
+    b.facing = normalize(float3(sr, 0.0, cr));
+    b.right = float3(cr, 0.0, -sr);
+    int2 bc = int2(floor(b.pos.xz));
+    uint bh = asuint(bc.x * 73856093 + bc.y * 19349663);
+    bh ^= bh >> 16;
+    b.bladeHash = float(bh & 0xFFFFu) / 65535.0;
+    return b;
+}
+
+BladeBend BendFromPrepared(PreparedBlade p, float2 windAngleSpeed)
+{
+    BladeBend w;
+    w.windSpeed = max(windAngleSpeed.y, 0.1);
+    w.bendDir = float3(p.bendDir.x, 0.0, p.bendDir.y);
+    w.bendAngle = p.bendAngle;
+    return w;
+}
+
 struct BladeVertex
 {
     float3 pos;
