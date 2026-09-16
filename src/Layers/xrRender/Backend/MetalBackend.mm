@@ -2,6 +2,7 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 #include "MetalBackend.h"
+#include "SubmitTokenRing.h"
 #undef BOOL
 
 #include <nvrhi/metal3.h>
@@ -15,8 +16,18 @@ extern "C" void* objc_autoreleasePoolPush(void);
 extern "C" void objc_autoreleasePoolPop(void* pool);
 
 struct MetalBackend::Impl final : nvrhi::IMessageCallback {
+    struct Pool {
+        xr_vector<nvrhi::CommandListHandle> lists;
+        u32 used = 0;
+    };
+    struct Submitted {
+        id<MTLCommandBuffer> commands = nil;
+        nvrhi::CommandQueue queue = nvrhi::CommandQueue::Graphics;
+    };
     struct Frame {
-        nvrhi::CommandListHandle commands;
+        Pool graphics;
+        Pool compute;
+        xr_vector<Submitted> submitted;
         nvrhi::TextureHandle texture;
         id<CAMetalDrawable> drawable = nil;
         id<MTLCommandBuffer> completion = nil;
@@ -28,11 +39,17 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     CAMetalLayer* layer = nil;
     id<MTLDevice> nativeDevice = nil;
     id<MTLCommandQueue> queue = nil;
+    id<MTLCommandQueue> computeQueue = nil;
     nvrhi::DeviceHandle nativeNvrhiDevice;
     nvrhi::DeviceHandle device;
     nvrhi::CommandListHandle uploads;
     id<MTLCommandBuffer> uploadCompletion = nil;
     Frame frames[3];
+    nvrhi::ICommandList* currentGraphics = nullptr;
+    SubmitTokenRing tokens;
+    SubmitWaitList graphicsWaits;
+    bool asyncCompute = false;
+    QueueTimings queueTimings = {};
     static constexpr u32 MaxBindlessTextures = 65536;
     nvrhi::BindingLayoutHandle bindlessLayout;
     nvrhi::DescriptorTableHandle bindlessTable;
@@ -50,6 +67,66 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     bool inFrame = false;
     bool readyToPresent = false;
 
+    nvrhi::ICommandList* acquire(Pool& pool, nvrhi::CommandQueue queueType) {
+        if (pool.used < pool.lists.size())
+            return pool.lists[pool.used++].Get();
+        nvrhi::CommandListParameters params;
+        params.enableImmediateExecution = false;
+        params.queueType = queueType;
+        nvrhi::CommandListHandle commands = device->createCommandList(params);
+        if (!commands) {
+            fail("Unable to create a Metal command list.");
+            return nullptr;
+        }
+        pool.lists.push_back(commands);
+        ++pool.used;
+        return commands.Get();
+    }
+
+    u32 submit(nvrhi::ICommandList* commands, nvrhi::CommandQueue queueType, const SubmitWaitList& waits) {
+        const u32 token = tokens.Issue(queueType);
+        for (u32 i = 0; i < waits.count; ++i)
+            tokens.WaitFor(device, queueType, waits.tokens[i]);
+        id<MTLCommandBuffer> native = nativeCommands(commands);
+        const u64 instance = device->executeCommandList(commands, queueType);
+        if (!instance) {
+            fail("NVRHI rejected a Metal command list submission.");
+            return token;
+        }
+        tokens.Resolve(token, queueType, instance);
+        if (native)
+            frames[currentFrame].submitted.push_back({native, queueType});
+        return token;
+    }
+
+    void collectQueueTimings(Frame& frame) {
+        QueueTimings t = {};
+        double first = 0.0, last = 0.0;
+        for (const Submitted& s : frame.submitted) {
+            const double start = s.commands.GPUStartTime, end = s.commands.GPUEndTime;
+            if (end <= start)
+                continue;
+            first = first == 0.0 ? start : std::min(first, start);
+            last = std::max(last, end);
+            const u64 us = u64((end - start) * 1e6);
+            if (s.queue == nvrhi::CommandQueue::Compute) {
+                t.computeUs += us;
+                for (const Submitted& g : frame.submitted) {
+                    if (g.queue != nvrhi::CommandQueue::Graphics)
+                        continue;
+                    const double lo = std::max(start, double(g.commands.GPUStartTime));
+                    const double hi = std::min(end, double(g.commands.GPUEndTime));
+                    if (hi > lo)
+                        t.overlapUs += u64((hi - lo) * 1e6);
+                }
+            } else {
+                t.graphicsUs += us;
+            }
+        }
+        if (last > first)
+            t.spanUs = u64((last - first) * 1e6);
+        queueTimings = t;
+    }
     void message(nvrhi::MessageSeverity severity, const char* text) override {
         if (severity == nvrhi::MessageSeverity::Fatal)
             state.store(DeviceState::Lost);
@@ -173,6 +250,16 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             return false;
         }
         impl.queue.label = @"OpenXRay Metal graphics and presentation";
+        impl.asyncCompute = !strstr(Core.Params, "-no_async_compute");
+        if (impl.asyncCompute) {
+            impl.computeQueue = [impl.nativeDevice newCommandQueue];
+            if (!impl.computeQueue) {
+                Msg("! [MetalBackend] Unable to create the compute queue, async compute disabled");
+                impl.asyncCompute = false;
+            } else {
+                impl.computeQueue.label = @"OpenXRay Metal async compute";
+            }
+        }
         impl.view = SDL_Metal_CreateView(window);
         if (!impl.view) {
             Msg("! [MetalBackend] SDL_Metal_CreateView: %s", SDL_GetError());
@@ -197,6 +284,7 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         nvrhi::metal3::DeviceDesc desc;
         desc.pDevice = impl.nativeDevice;
         desc.commonQueue = impl.queue;
+        desc.computeQueue = impl.computeQueue;
         desc.errorCB = &impl;
         impl.nativeNvrhiDevice = nvrhi::metal3::createDevice(desc);
         if (!impl.nativeNvrhiDevice) {
@@ -213,12 +301,13 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         nvrhi::CommandListParameters params;
         params.enableImmediateExecution = false;
         for (Impl::Frame& frame : impl.frames) {
-            frame.commands = impl.device->createCommandList(params);
-            if (!frame.commands) {
-                impl.fail("Unable to create a Metal frame command list.");
+            if (!impl.acquire(frame.graphics, nvrhi::CommandQueue::Graphics)
+                || (impl.asyncCompute && !impl.acquire(frame.compute, nvrhi::CommandQueue::Compute))) {
                 Shutdown();
                 return false;
             }
+            frame.graphics.used = 0;
+            frame.compute.used = 0;
         }
         impl.uploads = impl.device->createCommandList(params);
         if (!impl.uploads) {
@@ -247,8 +336,9 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             Shutdown();
             return false;
         }
-        Msg("* [MetalBackend] Native Metal initialized on %s (%ux%u pixels, validation %s)",
-            impl.nativeDevice.name.UTF8String, impl.width, impl.height, enableValidation ? "enabled" : "disabled");
+        Msg("* [MetalBackend] Native Metal initialized on %s (%ux%u pixels, validation %s, async compute %s)",
+            impl.nativeDevice.name.UTF8String, impl.width, impl.height, enableValidation ? "enabled" : "disabled",
+            impl.asyncCompute ? "on" : "off");
         return true;
     }
 }
@@ -259,16 +349,20 @@ void MetalBackend::Shutdown() {
         if (impl.inFrame) {
             while (impl.debugDepth)
                 EndDebugEvent();
-            impl.frames[impl.currentFrame].commands->close();
+            impl.currentGraphics->close();
             impl.inFrame = false;
         }
         WaitForIdle();
         for (Impl::Frame& frame : impl.frames) {
-            frame.commands = nullptr;
+            frame.graphics = {};
+            frame.compute = {};
+            frame.submitted.clear();
             frame.texture = nullptr;
             frame.drawable = nil;
             frame.completion = nil;
         }
+        impl.currentGraphics = nullptr;
+        impl.graphicsWaits.Clear();
         impl.uploads = nullptr;
         impl.uploadCompletion = nil;
         impl.bindlessTable = nullptr;
@@ -285,6 +379,7 @@ void MetalBackend::Shutdown() {
             impl.view = nullptr;
         }
         impl.queue = nil;
+        impl.computeQueue = nil;
         impl.nativeDevice = nil;
         impl.window = nullptr;
         impl.currentFrame = 0;
@@ -302,7 +397,7 @@ bool MetalBackend::IsInitialized() const { return m_impl->initialized; }
 bool MetalBackend::IsInFrame() const { return m_impl->inFrame; }
 nvrhi::IDevice* MetalBackend::GetDevice() const { return m_impl->device.Get(); }
 nvrhi::ICommandList* MetalBackend::GetCommandList() const {
-    return m_impl->initialized ? m_impl->frames[m_impl->currentFrame].commands.Get() : nullptr;
+    return m_impl->initialized ? m_impl->currentGraphics : nullptr;
 }
 
 DeviceState MetalBackend::GetDeviceState() const {
@@ -354,9 +449,16 @@ void MetalBackend::BeginFrame() {
             ZoneScopedN("Metal::FrameSlotWait");
             if (!impl.checkCompletion(frame.completion, true))
                 return;
+            for (const Impl::Submitted& submitted : frame.submitted)
+                if (!impl.checkCompletion(submitted.commands, true))
+                    return;
         }
         {
             ZoneScopedN("Metal::GC");
+            impl.collectQueueTimings(frame);
+            frame.submitted.clear();
+            frame.graphics.used = 0;
+            frame.compute.used = 0;
             frame.completion = nil;
             frame.texture = nullptr;
             frame.drawable = nil;
@@ -399,7 +501,11 @@ void MetalBackend::BeginFrame() {
         }
         {
             ZoneScopedN("Metal::CommandListOpen");
-            frame.commands->open();
+            impl.currentGraphics = impl.acquire(frame.graphics, nvrhi::CommandQueue::Graphics);
+            if (!impl.currentGraphics)
+                return;
+            impl.graphicsWaits.Clear();
+            impl.currentGraphics->open();
         }
         if (impl.state.load() == DeviceState::Lost) {
             frame.texture = nullptr;
@@ -418,14 +524,13 @@ void MetalBackend::EndFrame() {
             return;
         while (impl.debugDepth)
             EndDebugEvent();
-        Impl::Frame& frame = impl.frames[impl.currentFrame];
-        frame.commands->close();
+        impl.currentGraphics->close();
         impl.inFrame = false;
         if (impl.state.load() != DeviceState::Lost) {
             std::lock_guard<std::mutex> lock(impl.queueMutex);
-            if (!impl.device->executeCommandList(frame.commands))
-                impl.fail("NVRHI rejected the Metal frame submission.");
-            else
+            impl.submit(impl.currentGraphics, nvrhi::CommandQueue::Graphics, impl.graphicsWaits);
+            impl.graphicsWaits.Clear();
+            if (impl.state.load() != DeviceState::Lost)
                 impl.readyToPresent = true;
         }
     }
@@ -501,13 +606,61 @@ void MetalBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
     }
 }
 
+bool MetalBackend::HasAsyncCompute() const { return m_impl->asyncCompute && m_impl->computeQueue != nil; }
+u32 MetalBackend::LastGraphicsToken() const { return m_impl->tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
+u32 MetalBackend::LastComputeToken() const { return m_impl->tokens.last[u32(nvrhi::CommandQueue::Compute)]; }
+void MetalBackend::AddGraphicsWait(u32 token) { m_impl->graphicsWaits.Add(token); }
+
+nvrhi::ICommandList* MetalBackend::AcquireComputeCommandList() {
+    Impl& impl = *m_impl;
+    R_ASSERT2(impl.inFrame && HasAsyncCompute(), "compute command lists are only available inside a frame with async compute");
+    return impl.acquire(impl.frames[impl.currentFrame].compute, nvrhi::CommandQueue::Compute);
+}
+
+u32 MetalBackend::SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        R_ASSERT2(impl.inFrame && HasAsyncCompute() && commandList, "SubmitCompute requires an in-frame compute command list");
+        SubmitWaitList waits;
+        for (u32 i = 0; i < numWaitTokens; ++i)
+            waits.Add(waitTokens[i]);
+        std::lock_guard<std::mutex> lock(impl.queueMutex);
+        return impl.submit(commandList, nvrhi::CommandQueue::Compute, waits);
+    }
+}
+
+u32 MetalBackend::SplitGraphics() {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        R_ASSERT2(impl.inFrame, "SplitGraphics requires an open frame");
+        impl.currentGraphics->close();
+        u32 token;
+        {
+            std::lock_guard<std::mutex> lock(impl.queueMutex);
+            token = impl.submit(impl.currentGraphics, nvrhi::CommandQueue::Graphics, impl.graphicsWaits);
+            impl.graphicsWaits.Clear();
+        }
+        impl.currentGraphics = impl.acquire(impl.frames[impl.currentFrame].graphics, nvrhi::CommandQueue::Graphics);
+        if (impl.currentGraphics)
+            impl.currentGraphics->open();
+        return token;
+    }
+}
+
+bool MetalBackend::GetQueueTimings(QueueTimings& out) const {
+    if (!HasAsyncCompute())
+        return false;
+    out = m_impl->queueTimings;
+    return true;
+}
+
 void MetalBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
     @autoreleasepool {
         Impl& impl = *m_impl;
         if (!impl.initialized || impl.state.load() == DeviceState::Lost || !buffer || !data || !size)
             return;
         if (impl.inFrame) {
-            impl.frames[impl.currentFrame].commands->writeBuffer(buffer, data, size);
+            impl.currentGraphics->writeBuffer(buffer, data, size);
             return;
         }
         std::lock_guard<std::mutex> lock(impl.queueMutex);

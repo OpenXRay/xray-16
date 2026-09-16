@@ -28,6 +28,15 @@ public:
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
     void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
 
+    bool HasAsyncCompute() const override;
+    nvrhi::ICommandList* AcquireComputeCommandList() override;
+    u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override;
+    void AddGraphicsWait(u32 token) override;
+    u32 SplitGraphics() override;
+    u32 LastGraphicsToken() const override;
+    u32 LastComputeToken() const override;
+    bool GetQueueTimings(QueueTimings& out) const override;
+
     nvrhi::ITexture* GetBackBuffer() override;
     u32 GetCurrentBackBufferIndex() const override;
     u32 GetBackBufferCount() const override { return 3; }

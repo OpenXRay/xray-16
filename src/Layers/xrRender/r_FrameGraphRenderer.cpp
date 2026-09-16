@@ -446,10 +446,7 @@ void FrameGraphRenderer::Render() {
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     
-    if (ps_fg_render_mode == FG_RENDER_VULKAN)
-        m_framegraph->SetAsyncComputeBackend(GEnv.Backend);
-    else
-        m_framegraph->SetAsyncComputeBackend(nullptr);
+    m_framegraph->SetAsyncComputeBackend(GEnv.Backend && GEnv.Backend->HasAsyncCompute() ? GEnv.Backend : nullptr);
 
     {
         ZoneScopedN("FG::Compile");
