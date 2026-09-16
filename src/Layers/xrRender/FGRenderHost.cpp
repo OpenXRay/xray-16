@@ -5,6 +5,9 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #endif
+#if defined(XRAY_USE_METAL)
+#include "Layers/xrRender/Backend/MetalBackend.h"
+#endif
 #include "xrRender_console.h"
 
 #include <SDL3/SDL.h>
@@ -32,7 +35,22 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
         }
         Msg("* [FGRenderHost] Vulkan backend initialized successfully");
     }
-    else
+    else if (ps_fg_render_mode == FG_RENDER_METAL)
+    {
+#if defined(XRAY_USE_METAL)
+        backend = CreateMetalBackend(hWnd, dwWidth, dwHeight, enableValidation);
+        if (!backend)
+        {
+            FATAL("Native Metal initialization failed - no fallback available");
+            return nullptr;
+        }
+        Msg("* [FGRenderHost] Native Metal backend initialized successfully");
+#else
+        FATAL("Native Metal backend is unavailable. Build on macOS with NVRHI_WITH_METAL3=ON.");
+        return nullptr;
+#endif
+    }
+    else if (ps_fg_render_mode == FG_RENDER_DX12)
     {
 #if defined(XR_PLATFORM_WINDOWS)
         auto* dx12Backend = xr_new<D3D12Backend>();
@@ -49,6 +67,11 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
         FATAL("D3D12 backend not available on this platform");
         return nullptr;
 #endif
+    }
+    else
+    {
+        FATAL("Unknown frame-graph backend selection");
+        return nullptr;
     }
 
     Msg("*   Bindless textures: %s (max %u)",

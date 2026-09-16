@@ -86,12 +86,29 @@ void FGRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& f
 
 void FGRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
+#if defined(XRAY_USE_METAL)
+    for (pcstr option = Core.Params; (option = strstr(option, "-metal")) != nullptr; ++option)
+    {
+        if ((option == Core.Params || option[-1] == ' ' || option[-1] == '\t')
+            && (option[6] == '\0' || option[6] == ' ' || option[6] == '\t'))
+            ps_fg_render_mode = FG_RENDER_METAL;
+    }
+#endif
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
     {
         windowFlags |= SDL_WINDOW_VULKAN;
         if (ps_fg_retina)
             windowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
     }
+#if defined(XRAY_USE_METAL)
+    else if (ps_fg_render_mode == FG_RENDER_METAL)
+    {
+        windowFlags &= ~SDL_WINDOW_VULKAN;
+        windowFlags |= SDL_WINDOW_METAL;
+        if (ps_fg_retina)
+            windowFlags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+    }
+#endif
 }
 
 void FGRenderBase::SetupStates()

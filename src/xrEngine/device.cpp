@@ -389,10 +389,11 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         break;
     }
 
-    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    case SDL_EVENT_WINDOW_RESIZED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed &&
+            event.window.data1 > 0 && event.window.data2 > 0)
         {
             int windowWidth = 0, windowHeight = 0;
             if (SDL_GetWindowSize(window, &windowWidth, &windowHeight) && windowWidth > 0 && windowHeight > 0)
@@ -401,6 +402,12 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
                 psDeviceMode.Height = static_cast<u32>(windowHeight);
             }
         }
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
         if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
             viewport->PlatformRequestResize = true;
         break;

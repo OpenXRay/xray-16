@@ -30,7 +30,7 @@ void ShaderCache::GetCachePath(
         xr_sprintf(shaderDir, "shaders_cache_fg%s%s%s%s%s",
             DELIMITER, m_backendSubdir.c_str(), DELIMITER, shaderName, extension);
 
-    xr_sprintf(outPath, "%s%s%08X",
+    xr_sprintf(outPath, "%s%s%08x",
         shaderDir, DELIMITER, sourceHash);
 }
 
@@ -89,18 +89,15 @@ bool ShaderCache::TryLoad(
     outBytecode.resize(bytecodeSize);
     reader->r(outBytecode.data(), bytecodeSize);
 
-    if (outReflection && reader->elapsed() < reader->length())
+    if (outReflection)
     {
-        u8 hasReflection = reader->r_u8();
-        if (hasReflection)
+        if (reader->elapsed() >= reader->length() || reader->r_u8() == 0 ||
+            !DeserializeReflection(reader, *outReflection))
         {
-            if (!DeserializeReflection(reader, *outReflection))
-            {
-                Msg("! [ShaderCache] Failed to deserialize reflection for %s%s", shaderName, extension);
-                FS.r_close(reader);
-                m_stats.misses++;
-                return false;
-            }
+            Msg("! [ShaderCache] Missing or invalid reflection for %s%s", shaderName, extension);
+            FS.r_close(reader);
+            m_stats.misses++;
+            return false;
         }
     }
 

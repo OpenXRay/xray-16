@@ -156,7 +156,7 @@ extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 extern ECORE_API int ps_r4_debug_gpu_culling;
 extern ECORE_API int ps_r4_skeleton_wallmark_mode;
 
-enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1 };
+enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1, FG_RENDER_METAL = 2 };
 extern ECORE_API u32 ps_fg_render_mode;
 extern ECORE_API int ps_fg_hot_reload_shaders;
 extern ECORE_API int ps_fg_retina;

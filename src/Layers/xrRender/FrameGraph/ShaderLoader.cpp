@@ -3,6 +3,9 @@
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/xrRender_console.h"
+#ifdef XRAY_USE_METAL
+#include "MetalShaderToolchain.h"
+#endif
 
 namespace xray::render::framegraph {
 using namespace fg;
@@ -102,11 +105,44 @@ IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
     return R;
 }
 
+void ShaderLoader::SetTarget(xray::render::SlangCompiler::Target target)
+{
+    if (m_target != target)
+    {
+        ClearAllCaches();
+        m_watchedFiles.clear();
+    }
+    m_target = target;
+    switch (target)
+    {
+    case xray::render::SlangCompiler::Target::Metal: m_cache.SetBackendSubdir("metal"); break;
+    case xray::render::SlangCompiler::Target::SPIRV: m_cache.SetBackendSubdir("vk"); break;
+    case xray::render::SlangCompiler::Target::DXBC: m_cache.SetBackendSubdir("dx11"); break;
+    case xray::render::SlangCompiler::Target::GLSL: m_cache.SetBackendSubdir("gl"); break;
+    default: m_cache.SetBackendSubdir("dx12"); break;
+    }
+}
+
 u32 ShaderLoader::ComputeSourceHash(const char* source, size_t sourceLen, const char* macros)
 {
     u32 hash = macros
         ? ShaderCache::ComputeHash(source, sourceLen, macros)
         : ShaderCache::ComputeHash(source, sourceLen);
+    if (m_target == xray::render::SlangCompiler::Target::Metal)
+    {
+        xr_string identity = "metal-dxil-sm66-column-major-linear-vertex-fetch-v1;";
+        identity += spGetBuildTagString();
+#ifdef XR_METAL_SHADER_TOOLCHAIN_ID
+        identity += XR_METAL_SHADER_TOOLCHAIN_ID;
+#endif
+#ifdef DEBUG
+        identity += ";debug-maximal";
+#else
+        identity += ";debug-none";
+#endif
+        hash ^= ShaderCache::ComputeHash(identity.c_str(), identity.size()) +
+            0x9E3779B9u + (hash << 6) + (hash >> 2);
+    }
 
     xr_set<xr_string> visited;
     AccumulateIncludeHashes(source, sourceLen, hash, visited);
@@ -208,7 +244,7 @@ bool ShaderLoader::CompileShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     if (m_cache.TryLoad(shaderName, extension, sourceHash, outBytecode))
@@ -251,6 +287,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     ShaderResult result;
 
     xr_string cacheKey = xr_string(name) + ".vs";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         result.handle = handleIt->second;
@@ -268,7 +306,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     ExtractedReflection deserializedReflection;
@@ -279,6 +317,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Vertex;
         desc.debugName = name;
+        desc.entryName = entryPoint;
 
         result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
@@ -332,6 +371,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     nvrhi::ShaderDesc desc;
     desc.shaderType = nvrhi::ShaderType::Vertex;
     desc.debugName = name;
+    desc.entryName = entryPoint;
 
     result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
@@ -370,6 +410,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     ShaderResult result;
 
     xr_string cacheKey = xr_string(name) + ".ps";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         result.handle = handleIt->second;
@@ -387,7 +429,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     ExtractedReflection deserializedReflection;
@@ -398,6 +440,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Pixel;
         desc.debugName = name;
+        desc.entryName = entryPoint;
 
         result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
@@ -451,6 +494,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     nvrhi::ShaderDesc desc;
     desc.shaderType = nvrhi::ShaderType::Pixel;
     desc.debugName = name;
+    desc.entryName = entryPoint;
 
     result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
@@ -508,7 +552,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     xr_string diskCacheName = name;
@@ -523,6 +567,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Compute;
         desc.debugName = name;
+        desc.entryName = entryPoint;
 
         result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
@@ -576,6 +621,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
     nvrhi::ShaderDesc desc;
     desc.shaderType = nvrhi::ShaderType::Compute;
     desc.debugName = name;
+    desc.entryName = entryPoint;
 
     result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
@@ -616,6 +662,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     ShaderResult result;
 
     xr_string cacheKey = xr_string(name) + ".as";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         result.handle = handleIt->second;
@@ -633,7 +681,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     ExtractedReflection cachedReflection;
@@ -644,6 +692,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Amplification;
         desc.debugName = name;
+        desc.entryName = entryPoint;
 
         result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc, result.bytecode.data(), result.bytecode.size()
@@ -684,6 +733,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
     nvrhi::ShaderDesc desc;
     desc.shaderType = nvrhi::ShaderType::Amplification;
     desc.debugName = name;
+    desc.entryName = entryPoint;
 
     result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc, compileResult.bytecode.data(), compileResult.bytecode.size()
@@ -717,6 +767,8 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     ShaderResult result;
 
     xr_string cacheKey = xr_string(name) + ".ms";
+    if (entryPoint && xr_strcmp(entryPoint, "main") != 0)
+        cacheKey += xr_string(":") + entryPoint;
     auto handleIt = m_handleCache.find(cacheKey);
     if (handleIt != m_handleCache.end()) {
         result.handle = handleIt->second;
@@ -734,7 +786,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
 
     u32 sourceHash = ComputeSourceHash(
         (const char*)fs->pointer(),
-        fs->length()
+        fs->length(), entryPoint
     );
 
     ExtractedReflection cachedReflection;
@@ -743,6 +795,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Mesh;
         desc.debugName = name;
+        desc.entryName = entryPoint;
 
         result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc, result.bytecode.data(), result.bytecode.size()
@@ -784,6 +837,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
     nvrhi::ShaderDesc desc;
     desc.shaderType = nvrhi::ShaderType::Mesh;
     desc.debugName = name;
+    desc.entryName = entryPoint;
 
     result.handle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc, compileResult.bytecode.data(), compileResult.bytecode.size()
@@ -833,7 +887,7 @@ bool ShaderLoader::CompileShaderWithDefines(
     sourceCode.assign((const char*)shaderFile->pointer(), shaderFile->length());
     shaderFile->close();
 
-    xr_string definesStr;
+    xr_string definesStr = xr_string(entryPoint) + ";";
     for (const auto& define : defines)
     {
         definesStr.append(define.name);
@@ -858,7 +912,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         &cachedReflection
     );
 
-    if (cacheHit && !cachedReflection.IsEmpty())
+    if (cacheHit)
     {
         xr_string cacheKeyStr = xr_string(shaderName) + extension;
 
@@ -909,6 +963,9 @@ bool ShaderLoader::CompileShaderWithDefines(
     );
 
     xr_string cacheKeyStr = xr_string(shaderName) + extension;
+    auto oldReflection = m_reflectionCache.find(cacheKeyStr);
+    if (oldReflection != m_reflectionCache.end())
+        xr_delete(oldReflection->second);
     auto* reflection = xr_new<ExtractedReflection>();
     *reflection = std::move(extractedReflection);
     m_reflectionCache[cacheKeyStr] = reflection;
@@ -1018,6 +1075,7 @@ bool ShaderLoader::ValidateChangedFiles()
         nvrhi::ShaderDesc desc;
         desc.shaderType = shaderType;
         desc.debugName = info.shaderName.c_str();
+        desc.entryName = info.entryPoint.c_str();
 
         nvrhi::ShaderHandle testHandle = GEnv.Render->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,

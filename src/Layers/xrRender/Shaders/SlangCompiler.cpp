@@ -72,11 +72,14 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     slang::PreprocessorMacroDesc targetMacro;
     switch (target)
     {
+    case Target::Metal:
     case Target::DXIL: targetMacro = {"TARGET_DXIL", "1"}; break;
     case Target::SPIRV: targetMacro = {"TARGET_SPIRV", "1"}; break;
     default: targetMacro = {"TARGET_DXBC", "1"}; break;
     }
     slangDefines.push_back(targetMacro);
+    if (target == Target::Metal)
+        slangDefines.push_back({"TARGET_METAL", "1"});
 
     slang::SessionDesc sessionDesc = {};
     sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
@@ -89,6 +92,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     case Target::DXBC:
         profile = "sm_5_0";
         break;
+    case Target::Metal:
     case Target::DXIL:
         profile = "sm_6_6";
         break;
@@ -327,6 +331,7 @@ SlangCompileTarget SlangCompiler::GetSlangTarget(Target target) const
     {
     case Target::DXBC:
         return SLANG_DXBC;
+    case Target::Metal:
     case Target::DXIL:
         return SLANG_DXIL;
     case Target::SPIRV:
@@ -371,6 +376,7 @@ const char* SlangCompiler::GetTargetName(Target target)
     {
     case Target::DXBC:  return "DXBC (DX11)";
     case Target::DXIL:  return "DXIL (DX12)";
+    case Target::Metal: return "DXIL (Metal Shader Converter)";
     case Target::SPIRV: return "SPIR-V (Vulkan)";
     case Target::GLSL:  return "GLSL (OpenGL)";
     default:            return "Unknown";

@@ -611,8 +611,11 @@ bool CInput::iGetAsyncMousePos(Ivector2& p, bool global /*= false*/) const
         return true;
     }
     SDL_GetMouseState(&fx, &fy);
-    p.x = static_cast<int>(fx);
-    p.y = static_cast<int>(fy);
+    const float pixelDensity = SDL_GetWindowPixelDensity(Device.m_sdlWnd);
+    p.x = static_cast<int>(fx * pixelDensity);
+    p.y = static_cast<int>(fy * pixelDensity);
+    if (pixelDensity <= 0.0f)
+        return false;
     return !global;
 }
 
@@ -624,7 +627,10 @@ bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
         return true;
     }
 
-    SDL_WarpMouseInWindow(Device.m_sdlWnd, static_cast<float>(p.x), static_cast<float>(p.y));
+    const float pixelDensity = SDL_GetWindowPixelDensity(Device.m_sdlWnd);
+    if (pixelDensity <= 0.0f)
+        return false;
+    SDL_WarpMouseInWindow(Device.m_sdlWnd, static_cast<float>(p.x) / pixelDensity, static_cast<float>(p.y) / pixelDensity);
     return !global;
 }
 

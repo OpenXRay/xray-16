@@ -17,6 +17,7 @@ public:
     {
         DXBC,
         DXIL,
+        Metal,
         SPIRV,
         GLSL
     };
