@@ -61,11 +61,24 @@ struct VsmParams {
 };
 static_assert(sizeof(VsmParams) == 176, "VsmParams layout is shader-visible");
 
+struct VsmResidParams {
+    s32 pageBase[12];
+    u32 frame;
+    u32 refreshBudget;
+    u32 wrongBudget;
+    u32 forceDirty;
+    u32 interval[8];
+    Fvector4 pivot;
+    Fvector4 sun;
+    Fvector4 levelOrigin[kVSMLevels];
+};
+
 struct VSMState {
     static constexpr u32 kReadbackSlots = 6;
 
     bool active = false;
     VsmParams params;
+    VsmResidParams residParams = {};
     Fmatrix sunView;
     s32 pageBase[kVSMLevels][2] = {};
     s32 tileBias[kVSMLevels][2] = {};
@@ -133,6 +146,8 @@ struct VSMState {
     u32 dynMaxPages = 0;
     framegraph::VirtualResourceHandle fgNeeded;
     framegraph::VirtualResourceHandle fgDirtyList;
+    framegraph::VirtualResourceHandle fgDrawClear;
+    framegraph::VirtualResourceHandle fgPageArgs[kVSMStreamCount];
     framegraph::VirtualResourceHandle fgAtlas;
     framegraph::VirtualResourceHandle fgDynAtlas;
     framegraph::VirtualResourceHandle fgDynTable;
@@ -251,7 +266,6 @@ struct VSMDynConfig {
 };
 
 struct VSMOutput {
-    framegraph::VirtualResourceHandle atlas;
     framegraph::VirtualResourceHandle mask;
     framegraph::VirtualResourceHandle debugView;
     bool active = false;
@@ -270,17 +284,20 @@ VSMOutput setupVSMPasses(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle orderAfter,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
     const VSMDrawConfig& config,
+    const VSMDynConfig& dynConfig,
     u32 width,
     u32 height,
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler);
 
-void setupVSMDynamicPasses(
+void setupVSMAtlasPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
-    const VSMDynConfig& config,
+    const VSMDrawConfig& config,
+    const VSMDynConfig& dynConfig,
     VSMState* state,
     xray::profiler::GPUProfiler* gpuProfiler);
 

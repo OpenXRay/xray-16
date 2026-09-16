@@ -1385,6 +1385,40 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
+    passes::VSMDrawConfig vsmCfg;
+    passes::VSMDynConfig vsmDyn;
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        vsmState.active = false;
+        if (visActive && hizOutput.pyramid.is_valid()) {
+            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
+            vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
+            vsmCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
+            vsmCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
+            vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+            vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+            vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            vsmCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+            vsmCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
+            vsmCfg.materialCache = m_materialCache.get();
+            vsmDyn.gpuCulling = m_gpuCullingManager.get();
+            vsmDyn.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+            vsmDyn.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+            vsmDyn.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+            vsmDyn.megaIndexBuffer = clusterConfig.megaIndexBuffer;
+            const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
+            if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
+                coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
+                passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
+                auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
+                    vsmCfg, vsmDyn, width, height, &vsmState, m_gpuProfiler.get());
+                vsmMaskHandle = vsmOut.mask;
+                vsmPassesActive = vsmOut.active;
+            }
+        }
+    }
+
     framegraph::VirtualResourceHandle visMotionHandle;
     framegraph::VirtualResourceHandle visDepthHandle;
     if (visActive) {
@@ -1495,44 +1529,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    {
-        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        vsmState.active = false;
-        if (visActive && hizOutput.pyramid.is_valid()) {
-            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
-            passes::VSMDrawConfig vsmCfg;
-            vsmCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-            vsmCfg.entryCount = m_gpuCullingManager->GetClusterEntryCount();
-            vsmCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
-            vsmCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
-            vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
-            vsmCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-            vsmCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-            vsmCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
-            vsmCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
-            vsmCfg.materialCache = m_materialCache.get();
-            const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
-            if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
-                coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
-                passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
-                auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, vsmCfg,
-                    width, height, &vsmState, m_gpuProfiler.get());
-                vsmMaskHandle = vsmOut.mask;
-                vsmPassesActive = vsmOut.active;
-            }
-        }
-    }
-
-
     if (vsmPassesActive) {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        passes::VSMDynConfig vsmDyn;
-        vsmDyn.gpuCulling = m_gpuCullingManager.get();
-        vsmDyn.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-        vsmDyn.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
-        vsmDyn.megaVertexBuffer = clusterConfig.megaVertexBuffer;
-        vsmDyn.megaIndexBuffer = clusterConfig.megaIndexBuffer;
-        passes::setupVSMDynamicPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmDyn, &vsmState, m_gpuProfiler.get());
+        passes::setupVSMAtlasPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmCfg, vsmDyn, &vsmState, m_gpuProfiler.get());
         framegraph::VirtualResourceHandle vsmDebugView;
         vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
         if (vsmDebugView.is_valid())
