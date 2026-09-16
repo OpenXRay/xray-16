@@ -1,13 +1,15 @@
 #define SM_6_0
 #include "common.h"
+#include "visbuffer_common.h"
 
 struct PS_INPUT
 {
     float4 position : SV_Position;
-    nointerpolation uint visID : TEXCOORD0;
+    nointerpolation uint entry : TEXCOORD0;
+    uint primID : SV_PrimitiveID;
 };
 
 uint main(PS_INPUT input) : SV_Target0
 {
-    return input.visID;
+    return PackVisID(input.entry, input.primID);
 }

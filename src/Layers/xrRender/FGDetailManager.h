@@ -205,6 +205,8 @@ public:
 
     nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
+    nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
+    bool bladeIndicesUploaded = false;
     nvrhi::BufferHandle visibleDecalInstancesBuffer;
     nvrhi::BufferHandle decalDrawArgsBuffer;
     nvrhi::BufferHandle visibleBillboardInstancesBuffer;

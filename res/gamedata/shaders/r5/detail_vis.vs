@@ -46,17 +46,16 @@ StructuredBuffer<DetailInstance> all_instances : register(t37);
 struct VS_OUTPUT
 {
     float4 position : SV_Position;
-    nointerpolation uint visID : TEXCOORD0;
+    nointerpolation uint entry : TEXCOORD0;
     float2 uv : TEXCOORD1;
 };
 
 VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 {
-    uint tri = vid / 3u;
     DetailInstance raw = all_instances[visible_indices[iid]];
 
     VS_OUTPUT o;
-    o.visID = PackVisID(g_EntryBase + (g_Kind << 22) + iid, tri);
+    o.entry = g_EntryBase + (g_Kind << 22) + iid;
 
     if (g_Kind >= DETAIL_KIND_MESH)
     {
@@ -81,8 +80,7 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
         return o;
     }
 
-    uint corner = vid - tri * 3u;
-    uint localVert = BladeTriangleVertex(tri, corner, g_Segments);
+    uint localVert = vid;
     BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
     float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
     BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
