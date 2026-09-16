@@ -25,6 +25,18 @@ static bool FormatSubmitThreadLine(char* buf, size_t size)
     return true;
 }
 
+static bool FormatQueueTimingsLine(char* buf, size_t size)
+{
+    IRenderBackend::QueueTimings t;
+    if (!GEnv.Backend || !GEnv.Backend->GetQueueTimings(t))
+        return false;
+    xr_sprintf(buf, size,
+        "GPU queues (us): graphics %llu | compute %llu | overlap %llu | span %llu",
+        (unsigned long long)t.graphicsUs, (unsigned long long)t.computeUs,
+        (unsigned long long)t.overlapUs, (unsigned long long)t.spanUs);
+    return true;
+}
+
 namespace xray::profiler
 {
 
@@ -200,6 +212,8 @@ void StatsOverlay::RenderCPUSection()
             ImGui::Text("Total: %s", FormatTime(frameTime));
             char submitLine[320];
             if (FormatSubmitThreadLine(submitLine, sizeof(submitLine)))
+                ImGui::TextDisabled("%s", submitLine);
+            if (FormatQueueTimingsLine(submitLine, sizeof(submitLine)))
                 ImGui::TextDisabled("%s", submitLine);
             ImGui::Indent();
 
@@ -1036,6 +1050,11 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         xr_sprintf(line, sizeof(line), "\nGPU total %.3f ms | async %.3f ms | graphics %.3f ms | sample %llu\n",
             totalGPU, asyncTotal, graphicsTotal, (unsigned long long)m_gpuProfiler->GetCompletedSampleId());
         text += line;
+        if (FormatQueueTimingsLine(line, sizeof(line)))
+        {
+            text += line;
+            text += "\n";
+        }
         for (int asyncOnly = 1; asyncOnly >= 0; --asyncOnly)
         {
             text += asyncOnly ? "[async]\n" : "[graphics]\n";

@@ -110,6 +110,14 @@ public:
     };
     virtual bool GetSubmitThreadTimings(SubmitThreadTimings& out) const { return false; }
 
+    struct QueueTimings {
+        u64 graphicsUs;
+        u64 computeUs;
+        u64 overlapUs;
+        u64 spanUs;
+    };
+    virtual bool GetQueueTimings(QueueTimings& out) const { return false; }
+
     // ═══════ Capabilities ═══════
     struct Capabilities {
         // Modern features
