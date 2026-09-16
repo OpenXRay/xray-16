@@ -998,6 +998,81 @@ void StatsOverlay::CopyZoneTreeToClipboard()
     ImGui::SetClipboardText(text.c_str());
 }
 
+void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
+{
+    const u32 now = Device.dwTimeGlobal;
+    if (m_lastDumpTime != 0 && now - m_lastDumpTime < intervalSeconds * 1000u)
+        return;
+    m_lastDumpTime = now;
+
+    xr_string text;
+    text.reserve(32768);
+    char line[512];
+
+    xr_sprintf(line, sizeof(line), "backend: %s | %ux%u | frame %.2f ms (%.1f FPS) | time %u ms\n",
+        GEnv.Backend ? GEnv.Backend->GetAPIName() : "none", Device.dwWidth, Device.dwHeight,
+        Device.fTimeDeltaReal * 1000.f, Device.GetStats().fFPS, now);
+    text += line;
+
+    const RenderStats& rs = m_renderStats;
+    xr_sprintf(line, sizeof(line), "clusters: %u/%u visible (terrain %u/%u) | tris %u+%u | occl cand %u rec %u | residual S%u T%u D%u X%u | vsm %s\n",
+        rs.clusterVisible, rs.clusterStaticEntries, rs.clusterTerrainVisible, rs.clusterTerrainEntries,
+        rs.clusterTrianglesDrawn, rs.clusterTerrainTrianglesDrawn, rs.clusterOcclusionCandidates, rs.clusterOcclusionRecovered,
+        rs.residualStatic, rs.residualTerrain, rs.residualDynamic, rs.residualTransparent,
+        rs.vsmActive ? (rs.vsmSunMoving ? "moving" : "active") : "off");
+    text += line;
+
+    if (m_gpuProfiler && m_gpuProfiler->IsInitialized())
+    {
+        const auto& passes = m_gpuProfiler->GetPassTimings();
+        const float totalGPU = m_gpuProfiler->GetTotalGPUTimeMs();
+        float asyncTotal = 0.0f, graphicsTotal = 0.0f;
+        for (const auto& pass : passes)
+        {
+            if (strchr(pass.name.c_str(), '.'))
+                continue;
+            (pass.isAsync ? asyncTotal : graphicsTotal) += pass.timeMs;
+        }
+        xr_sprintf(line, sizeof(line), "\nGPU total %.3f ms | async %.3f ms | graphics %.3f ms | sample %llu\n",
+            totalGPU, asyncTotal, graphicsTotal, (unsigned long long)m_gpuProfiler->GetCompletedSampleId());
+        text += line;
+        for (int asyncOnly = 1; asyncOnly >= 0; --asyncOnly)
+        {
+            text += asyncOnly ? "[async]\n" : "[graphics]\n";
+            for (const auto& pass : passes)
+            {
+                if (pass.isAsync != (asyncOnly != 0) || pass.pending)
+                    continue;
+                const bool sub = strchr(pass.name.c_str(), '.') != nullptr;
+                xr_sprintf(line, sizeof(line), "%s%-40s %9.3f ms %5.1f%%\n", sub ? "    " : "  ",
+                    pass.name.c_str(), pass.timeMs, totalGPU > 0.0f ? pass.timeMs / totalGPU * 100.0f : 0.0f);
+                text += line;
+            }
+        }
+    }
+
+    CPUProfiler& profiler = GetCPUProfiler();
+    xr_sprintf(line, sizeof(line), "\nCPU total %.3f ms\n", profiler.GetFrameTimeMs());
+    text += line;
+    const auto& zones = profiler.GetZones();
+    for (u32 rootId : profiler.GetRootZones())
+        AppendZoneText(text, rootId, zones, 1);
+    char submitLine[320];
+    if (FormatSubmitThreadLine(submitLine, sizeof(submitLine)))
+    {
+        text += submitLine;
+        text += "\n";
+    }
+
+    string_path path;
+    FS.update_path(path, "$logs$", "gpu_profile.txt");
+    if (IWriter* writer = FS.w_open(path))
+    {
+        writer->w(text.data(), static_cast<u32>(text.size()));
+        FS.w_close(writer);
+    }
+}
+
 void StatsOverlay::RenderAllocationsSection()
 {
     ImGui::SetNextItemOpen(m_allocExpanded, ImGuiCond_Once);

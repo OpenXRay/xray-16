@@ -160,6 +160,7 @@ namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDe
 extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_path_tracer;
+extern ENGINE_API int ps_profile_dump;
 extern ENGINE_API int ps_r_path_tracer_bounces;
 
 namespace xray::render {
@@ -648,7 +649,7 @@ void FrameGraphRenderer::RenderMenu() {
 
 void FrameGraphRenderer::RenderStatsOverlay()
 {
-    if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
+    if (m_statsOverlay && (psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0))
     {
         xray::profiler::RenderStats stats;
         stats.Reset();
@@ -858,8 +859,13 @@ void FrameGraphRenderer::RenderStatsOverlay()
             m_statsOverlay->SetWallmarkData(std::move(wmData));
         }
 
-        m_statsOverlay->SetVisible(true);
-        m_statsOverlay->Render();
+        if (ps_profile_dump > 0)
+            m_statsOverlay->WriteProfileDump(static_cast<u32>(ps_profile_dump));
+        if (psDeviceFlags.test(rsStatistic))
+        {
+            m_statsOverlay->SetVisible(true);
+            m_statsOverlay->Render();
+        }
     }
 }
 

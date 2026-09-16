@@ -187,6 +187,7 @@ public:
     struct WallmarkTexGroup { nvrhi::ITexture* diffuseTex = nullptr; xr_string texName; xr_vector<WallmarkSplat> splats; };
     struct WallmarkObjectData { void* objKey = nullptr; xr_vector<WallmarkTexGroup> groups; };
     void SetWallmarkData(xr_vector<WallmarkObjectData> data) { m_wallmarkData = std::move(data); }
+    void WriteProfileDump(u32 intervalSeconds);
 
 private:
     void RenderCPUSection();
@@ -207,6 +208,7 @@ private:
 
 private:
     GPUProfiler* m_gpuProfiler = nullptr;
+    u32 m_lastDumpTime = 0;
     RenderStats m_renderStats;
     bool m_visible = false;
 

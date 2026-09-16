@@ -699,6 +699,7 @@ ENGINE_API shared_str current_player_hud_sect{};
 
 extern int ps_fps_limit;
 extern int ps_fps_limit_in_menu;
+extern int ps_profile_dump;
 
 void CCC_Register()
 {
@@ -746,6 +747,9 @@ void CCC_Register()
 
     CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 0, 1000);
     CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 0, 1000);
+    CMD4(CCC_Integer, "rs_profile_dump", &ps_profile_dump, 0, 60);
+    if (strstr(Core.Params, "-profile_dump"))
+        ps_profile_dump = 2;
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
