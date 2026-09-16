@@ -99,7 +99,7 @@ void MakeFilter(string1024& dest, pcstr info, pcstr ext)
     }
     xr_strcpy(dest, res.c_str());
 
-    const auto bound = res.size() > sizeof(dest) ? sizeof(dest) : res.size();
+    const auto bound = std::min(res.size(), sizeof(dest));
     for (size_t i = 0; i < bound; ++i)
     {
         if (res[i] == '|')
