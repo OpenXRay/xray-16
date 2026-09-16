@@ -54,6 +54,7 @@ ENGINE_API bool ShadowOfChernobylMode = false;
 ENGINE_API string512 g_sLaunchOnExit_params{};
 ENGINE_API string512 g_sLaunchOnExit_app{};
 ENGINE_API string_path g_sLaunchWorkingFolder{};
+extern ENGINE_API int ps_profile_dump;
 
 namespace
 {
@@ -384,7 +385,7 @@ int CApplication::Run()
 
     for (;;)
     {
-        xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+        xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0);
         xray::profiler::FrameStart();
 
         {
