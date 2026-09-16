@@ -183,13 +183,11 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         uint object_id = inst.packed & 0x3F;
 
         DetailModelGPU mdl = g_detail_models[object_id];
-        float geom_half_height = mdl.geomExtentY * 0.5;
-        float bounds_radius = scale * max(geom_half_height, max(mdl.geomExtentX, mdl.geomExtentZ) * 0.5);
-        bounds_radius = max(bounds_radius, scale * 0.25);
-        float3 bounds_center = inst.pos + float3(0, scale * geom_half_height, 0);
+        float full_height = scale * mdl.geomExtentY;
+        float bounds_radius = max(full_height, scale * max(mdl.geomExtentX, mdl.geomExtentZ) * 0.5);
+        bounds_radius = max(bounds_radius, scale * 0.5);
+        float3 bounds_center = inst.pos + float3(0, full_height * 0.5, 0);
 
-        if (!DistanceTestSphere(bounds_center, bounds_radius, g_camera_pos, g_fade_distance_sqr))
-            continue;
 
         if (!FrustumTestSphere(bounds_center, bounds_radius, g_frustum_planes))
             continue;
