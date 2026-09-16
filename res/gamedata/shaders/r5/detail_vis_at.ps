@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "visbuffer_common.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -37,13 +38,14 @@ cbuffer DetailVisParams : register(b5)
 struct PS_INPUT
 {
     float4 position : SV_Position;
-    nointerpolation uint visID : TEXCOORD0;
+    nointerpolation uint entry : TEXCOORD0;
     float2 uv : TEXCOORD1;
+    uint primID : SV_PrimitiveID;
 };
 
 uint main(PS_INPUT input) : SV_Target0
 {
     float4 texel = GetBindlessTexture(buildDetailsIndex).Sample(smp_linear, input.uv);
     clip(texel.a - g_AlphaRef);
-    return input.visID;
+    return PackVisID(input.entry, input.primID);
 }

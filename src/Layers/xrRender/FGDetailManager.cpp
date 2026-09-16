@@ -60,6 +60,29 @@ extern float ps_current_detail_density;
 
 static int magic4x4[4][4] = {{0, 14, 3, 13}, {11, 5, 8, 6}, {12, 2, 15, 1}, {7, 9, 4, 10}};
 
+static u32 BuildBladeIndices(u32 lod, u16* indices)
+{
+    const u32 segments = FGDetailManager::LOD_SEGMENTS[lod];
+    const u32 quads = (segments - 1u) * 2u;
+    for (u32 tri = 0; tri < FGDetailManager::LOD_TRIANGLES[lod]; ++tri) {
+        for (u32 corner = 0; corner < 3; ++corner) {
+            u32 v;
+            if (tri < quads) {
+                const u32 b = (tri >> 1) * 2u;
+                if ((tri & 1u) == 0u)
+                    v = corner == 0u ? b : (corner == 1u ? b + 2u : b + 1u);
+                else
+                    v = corner == 0u ? b + 1u : (corner == 1u ? b + 2u : b + 3u);
+            } else {
+                const u32 b = (segments - 1u) * 2u;
+                v = corner == 0u ? b : (corner == 1u ? segments * 2u : b + 1u);
+            }
+            indices[tri * 3 + corner] = u16(v);
+        }
+    }
+    return FGDetailManager::LOD_TRIANGLES[lod] * 3 * sizeof(u16);
+}
+
 static void bwdithermap(int levels, int magic[16][16])
 {
     float N = 255.0f / (levels - 1);
@@ -870,6 +893,21 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
                 return false;
             }
         }
+        {
+            nvrhi::BufferDesc desc;
+            desc.byteSize = LOD_TRIANGLES[lod] * 3 * sizeof(u16);
+            desc.debugName = ("DetailBladeIndicesLOD" + std::to_string(lod)).c_str();
+            desc.isIndexBuffer = true;
+            desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            desc.keepInitialState = true;
+            bladeIndexBuffer[lod] = device->createBuffer(desc);
+            if (!bladeIndexBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create blade index buffer LOD%u", lod);
+                return false;
+            }
+            bladeIndicesUploaded = false;
+        }
 
         {
             nvrhi::BufferDesc desc;
@@ -1246,6 +1284,7 @@ void FGDetailManager::DestroyGPUBuffers()
     {
         visibleInstancesBuffer[lod] = nullptr;
         drawArgsBuffer[lod] = nullptr;
+        bladeIndexBuffer[lod] = nullptr;
     }
 
     slotAABBBuffer = nullptr;
@@ -2123,6 +2162,15 @@ void FGDetailManager::DispatchCulling(
     {
         IndirectDrawArgs args = { LOD_TRIANGLES[lod] * 3u, 0, 0, 0, 0 };
         cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
+    }
+    if (!bladeIndicesUploaded)
+    {
+        for (u32 lod = 0; lod < LOD_COUNT; lod++)
+        {
+            u16 indices[LOD_TRIANGLES[0] * 3];
+            cmdList->writeBuffer(bladeIndexBuffer[lod], indices, BuildBladeIndices(lod, indices));
+        }
+        bladeIndicesUploaded = true;
     }
     {
         IndirectDrawArgs decalArgs = { maxPulledIndexCount, 0, 0, 0, 0 };
