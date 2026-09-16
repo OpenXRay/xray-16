@@ -1332,6 +1332,9 @@ void FGDetailManager::DestroyGPUBuffers()
 
     computePipeline = nullptr;
     computeBindingLayout = nullptr;
+    swArgsPipeline = nullptr;
+    swArgsBindingLayout = nullptr;
+    swDispatchArgsBuffer = nullptr;
     cullComputeShader = nullptr;
 
 
@@ -1386,8 +1389,10 @@ void FGDetailManager::InvalidateShadersAndPipelines()
     cullComputeShader = nullptr;
     computeBindingLayout = nullptr;
     computePipeline = nullptr;
-
-
+    swArgsComputeShader = nullptr;
+    swArgsBindingLayout = nullptr;
+    swArgsPipeline = nullptr;
+    swDispatchArgsBuffer = nullptr;
 
     perlin4dComputeShader = nullptr;
     perlin4dBindingLayout = nullptr;
@@ -1810,6 +1815,12 @@ bool FGDetailManager::LoadCullComputeShader(framegraph::ShaderLoader* shaderLoad
         Msg("! [FGDetailManager] Failed to load detail_cull.cs");
         return false;
     }
+    swArgsComputeShader = shaderLoader->LoadComputeShader("detail_sw_args", "main").handle;
+    if (!swArgsComputeShader)
+    {
+        Msg("! [FGDetailManager] Failed to load detail_sw_args.cs");
+        return false;
+    }
     return true;
 }
 
@@ -1993,6 +2004,33 @@ bool FGDetailManager::CreateComputePipeline(fg::RenderDevice* renderDevice)
         {
             Msg("! [FGDetailManager] Failed to create instance cull pipeline");
             return false;
+        }
+    }
+
+    {
+        auto* refl = shaderLoader->GetCachedReflection("detail_sw_args", ".cs");
+        if (!refl)
+            return false;
+        swArgsBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailSwArgs", *refl, device);
+        if (!swArgsBindingLayout)
+            return false;
+        nvrhi::ComputePipelineDesc pipelineDesc;
+        pipelineDesc.CS = swArgsComputeShader;
+        pipelineDesc.bindingLayouts = { swArgsBindingLayout };
+        swArgsPipeline = device->createComputePipeline(pipelineDesc);
+        if (!swArgsPipeline)
+            return false;
+        if (!swDispatchArgsBuffer)
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = "DetailSwDispatchArgs";
+            desc.byteSize = sizeof(u32) * 8;
+            desc.canHaveUAVs = true;
+            desc.canHaveRawViews = true;
+            desc.isDrawIndirectArgs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            swDispatchArgsBuffer = device->createBuffer(desc);
         }
     }
 
@@ -2277,6 +2315,29 @@ void FGDetailManager::DispatchCulling(
     }
 
     if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.InstanceCull");
+
+    if (swArgsPipeline && swDispatchArgsBuffer)
+    {
+        auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_sw_args", ".cs");
+        cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+        framegraph::BindingSetBuilder bsb(*refl, device, "Detail.SwArgs");
+        bsb.BufferSRV("g_ArgsLod1", drawArgsBuffer[1])
+           .BufferSRV("g_ArgsLod2", drawArgsBuffer[2])
+           .BufferUAV("g_SwArgs", swDispatchArgsBuffer);
+        if (auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), swArgsBindingLayout, device))
+        {
+            nvrhi::ComputeState state;
+            state.pipeline = swArgsPipeline;
+            state.bindings = { bindingSet };
+            cmdList->setComputeState(state);
+            cmdList->dispatch(1, 1, 1);
+        }
+        cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::IndirectArgument);
+        cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::IndirectArgument);
+    }
 }
 
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)

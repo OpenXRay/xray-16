@@ -243,6 +243,7 @@ extern ECORE_API int   ps_r_mesh_shaders;
 extern ECORE_API int   ps_r_vis_sw;
 extern ECORE_API float ps_r_vis_sw_px;
 extern ECORE_API float ps_r_vis_sw_near;
+extern ECORE_API int   ps_r_vis_sw_grass;
 extern ECORE_API int   ps_r_vsm_debug;
 extern ECORE_API float ps_r_vsm_base;
 extern ECORE_API int   ps_r_vsm_mark_half;

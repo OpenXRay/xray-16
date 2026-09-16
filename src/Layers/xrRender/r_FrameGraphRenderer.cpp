@@ -1258,6 +1258,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const bool grassIds = detailArgsHandle.is_valid()
         && grassEntryBase + fg::FGDetailManager::VIS_KIND_COUNT * (1u << 22) <= passes::kVisIdEntryLimit;
 
+    bool swGrass = false;
+    if (swVisHandle.is_valid() && grassIds && ps_r_vis_sw_grass && psDeviceFlags.is(rsDrawDetails)) {
+        auto grassVis = passes::setupSwGrassPass(*m_framegraph, m_device, detailArgsHandle, swVisHandle, m_detailManager.get(),
+            grassEntryBase, width, height, &m_blackboard->get_or_add<passes::VisibilityPassState>());
+        if (grassVis.is_valid()) {
+            swVisHandle = grassVis;
+            swGrass = true;
+        }
+    }
+
     framegraph::VirtualResourceHandle visIdBuffer;
     if (cullActive && clusterConfig.UseMegaBuffers() && clusterConfig.IsValid()
         && m_gpuCullingManager->GetClusterEntryCapacity() < passes::kVisIdEntryLimit) {
@@ -1286,7 +1296,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 grassIds ? m_detailManager.get() : nullptr,
                 grassIds ? detailArgsHandle : framegraph::VirtualResourceHandle(),
                 grassEntryBase,
-                &visState
+                &visState,
+                false,
+                swGrass
             );
             depthBuffer = visOut.depth;
             visIdBuffer = visOut.visId;

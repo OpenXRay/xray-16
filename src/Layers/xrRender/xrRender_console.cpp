@@ -299,6 +299,7 @@ int   ps_r_mesh_shaders        = 0;
 int   ps_r_vis_sw              = 1;
 float ps_r_vis_sw_px           = 64.0f;
 float ps_r_vis_sw_near         = 0.5f;
+int   ps_r_vis_sw_grass        = 1;
 int   ps_r_vsm_debug           = 0;
 float ps_r_vsm_base            = 24.0f;
 int   ps_r_vsm_mark_half       = 1;
@@ -1032,6 +1033,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_vis_sw", &ps_r_vis_sw, 0, 1);
     CMD4(CCC_Float, "r_vis_sw_px", &ps_r_vis_sw_px, 0.0f, 1024.0f);
     CMD4(CCC_Float, "r_vis_sw_near", &ps_r_vis_sw_near, 0.0f, 10.0f);
+    CMD4(CCC_Integer, "r_vis_sw_grass", &ps_r_vis_sw_grass, 0, 1);
     CMD4(CCC_Integer, "r_vsm_debug", &ps_r_vsm_debug, 0, 5);
     CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
     CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);

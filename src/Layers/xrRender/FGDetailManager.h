@@ -233,6 +233,10 @@ public:
     nvrhi::ShaderHandle cullComputeShader;
     nvrhi::BindingLayoutHandle computeBindingLayout;
     nvrhi::ComputePipelineHandle computePipeline;
+    nvrhi::ShaderHandle swArgsComputeShader;
+    nvrhi::BindingLayoutHandle swArgsBindingLayout;
+    nvrhi::ComputePipelineHandle swArgsPipeline;
+    nvrhi::BufferHandle swDispatchArgsBuffer;
 
     u32 visibleBufferCapacity = 0;
 
