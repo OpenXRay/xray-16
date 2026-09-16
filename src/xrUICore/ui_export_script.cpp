@@ -7,6 +7,19 @@
 #include "Cursor/UICursor.h"
 #include "XML/UITextureMaster.h"
 
+namespace
+{
+TEX_INFO* GetTextureInfoForScript(pcstr name, pcstr defaultName = nullptr)
+{
+    // SoC reads the returned object in a second Lua call. Keep it alive after
+    // this binding returns instead of passing a short-lived value object.
+    static TEX_INFO info;
+    info = {};
+    CUITextureMaster::FindItem(name, defaultName, info);
+    return &info;
+}
+}
+
 #include "Windows/UIWindow.h"
 #include "Windows/UIFrameWindow.h"
 #include "Windows/UIFrameLineWnd.h"
@@ -56,6 +69,7 @@ void UIStyleManager::script_register(lua_State* luaState)
         def("GetDefaultUIPathWithDelimiter", +[] { return UI_PATH_DEFAULT_WITH_DELIMITER; }),
         def("GetUIPath",                     +[] { return UI_PATH; }),
         def("GetUIPathWithDelimiter",        +[] { return UI_PATH_WITH_DELIMITER; }),
+        def("IsShadowOfChernobylMode",        +[] { return ShadowOfChernobylMode; }),
 
         class_<UIStyleManager>("UIStyleManager")
             .def("GetAllStyles", &UIStyleManager::GetToken, return_stl_iterator())
@@ -128,15 +142,10 @@ void CUITextureMaster::script_register(lua_State* luaState)
             return CUITextureMaster::GetTextureRect(iconName);
         }),
 
-            def("GetTextureInfo", +[](pcstr name)
-        {
-            return CUITextureMaster::FindItem(name);
-        }),
+            def("GetTextureInfo", +[](pcstr name) { return GetTextureInfoForScript(name); }),
 
-            def("GetTextureInfo", +[](pcstr name, pcstr defaultName)
-        {
-            return CUITextureMaster::FindItem(name, defaultName);
-        }),
+            def("GetTextureInfo",
+                +[](pcstr name, pcstr defaultName) { return GetTextureInfoForScript(name, defaultName); }),
 
             def("GetTextureInfo", +[](pcstr name, TEX_INFO& outValue)
         {

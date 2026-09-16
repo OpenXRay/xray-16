@@ -14,6 +14,16 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+namespace
+{
+void ClearGLErrors()
+{
+    while (glGetError() != GL_NO_ERROR)
+    {
+    }
+}
+} // namespace
+
 void resptrcode_texture::create(LPCSTR _name)
 {
     _set(RImplementation.Resources->_CreateTexture(_name));
@@ -196,6 +206,8 @@ void CTexture::Load()
             u32 _w = pTheora->Width(false);
             u32 _h = pTheora->Height(false);
 
+            ClearGLErrors();
+
             glGenBuffers(1, &pBuffer);
             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pBuffer);
             CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, flags.MemoryUsage, nullptr, GL_STREAM_DRAW));
@@ -203,7 +215,9 @@ void CTexture::Load()
 
             glGenTextures(1, &pTexture);
             glBindTexture(GL_TEXTURE_2D, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
+            CHK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
+            CHK_GL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+            CHK_GL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _w, _h, 0, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
 
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;

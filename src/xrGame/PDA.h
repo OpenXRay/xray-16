@@ -44,6 +44,7 @@ public:
     bool IsOn() { return !m_bTurnedOff; }
     bool IsOff() { return m_bTurnedOff; }
     void ActivePDAContacts(xr_vector<CPda*>& res);
+    void ActivePDAContactOwners(xr_vector<CInventoryOwner*>& res);
     CPda* GetPdaFromOwner(IGameObject* owner);
     u32 ActiveContactsNum() { return m_active_contacts.size(); }
     void PlayScriptFunction();

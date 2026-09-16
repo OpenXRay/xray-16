@@ -273,6 +273,9 @@ void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR textu
 
 void CUITalkDialogWnd::AddIconedAnswer(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
 {
+    // SoC scripts pass x, y, width, and height instead of two absolute points.
+    texture_rect.rb.add(texture_rect.lt);
+
     CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
     itm->Init(text, texture_name, texture_rect);
     UIAnswersList->AddWindow(itm, true);
@@ -284,6 +287,8 @@ void CUITalkDialogWnd::AddIconedAnswer(pcstr text, pcstr texture_name, Frect tex
 
     news_data.m_type = GAME_NEWS_DATA::eTalk;
     news_data.texture_name = texture_name;
+    news_data.texture_rect = texture_rect;
+    news_data.has_texture_rect = true;
     news_data.receive_time = Level().GetGameTime();
 
     Actor()->game_news_registry->registry().objects().emplace_back(std::move(news_data));

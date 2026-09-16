@@ -5,8 +5,28 @@ if (APPLE)
         if ($ENV{MACOSX_DEPLOYMENT_TARGET})
             set(CMAKE_OSX_DEPLOYMENT_TARGET $ENV{MACOSX_DEPLOYMENT_TARGET})
         else()
-            message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to your system's version: ${CMAKE_SYSTEM_VERSION}")
-            set(CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_SYSTEM_VERSION})
+            execute_process(
+                COMMAND sw_vers -productVersion
+                OUTPUT_VARIABLE XRAY_MACOS_PRODUCT_VERSION
+                RESULT_VARIABLE XRAY_SW_VERS_RESULT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
+            )
+
+            if (XRAY_SW_VERS_RESULT STREQUAL "0" AND XRAY_MACOS_PRODUCT_VERSION MATCHES "^([0-9]+)")
+                set(CMAKE_OSX_DEPLOYMENT_TARGET "${CMAKE_MATCH_1}.0")
+                message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to macOS ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+            elseif (CMAKE_SYSTEM_VERSION MATCHES "^([0-9]+)")
+                set(XRAY_DARWIN_VERSION_MAJOR "${CMAKE_MATCH_1}")
+                if (XRAY_DARWIN_VERSION_MAJOR GREATER_EQUAL 20)
+                    math(EXPR XRAY_MACOS_VERSION_MAJOR "${XRAY_DARWIN_VERSION_MAJOR} - 9")
+                    set(CMAKE_OSX_DEPLOYMENT_TARGET "${XRAY_MACOS_VERSION_MAJOR}.0")
+                    message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to macOS ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+                else()
+                    message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to 10.15")
+                    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+                endif()
+            endif()
         endif()
     endif()
     message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET: ${CMAKE_OSX_DEPLOYMENT_TARGET}")

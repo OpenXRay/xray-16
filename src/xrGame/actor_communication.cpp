@@ -65,26 +65,23 @@ void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
         n = (article.data()->name).c_str();
         callback(GameObject::eArticleInfo)(lua_game_object(), g, n, _atype);
 
-        /* XXX: Shadow of Chernobyl encyclopedia, return this code
         if (CurrentGameUI())
         {
             CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-            pda_section::part p = pda_section::encyclopedia;
-            switch (article.data()->articleType)
+            if (pGameSP)
             {
-            case ARTICLE_DATA::eEncyclopediaArticle: p = pda_section::encyclopedia;
-                break;
-            case ARTICLE_DATA::eJournalArticle: p = pda_section::journal;
-                break;
-            case ARTICLE_DATA::eInfoArticle: p = pda_section::info;
-                break;
-            case ARTICLE_DATA::eTaskArticle: p = pda_section::quests;
-                break;
-            default: NODEFAULT;
-            };
-            pGameSP->PdaMenu->PdaContentsChanged(p);
+                pda_section::part p = pda_section::encyclopedia;
+                switch (article.data()->articleType)
+                {
+                case ARTICLE_DATA::eEncyclopediaArticle: p = pda_section::encyclopedia; break;
+                case ARTICLE_DATA::eJournalArticle: p = pda_section::journal; break;
+                case ARTICLE_DATA::eInfoArticle: p = pda_section::info; break;
+                case ARTICLE_DATA::eTaskArticle: p = pda_section::quests; break;
+                default: NODEFAULT;
+                }
+                pGameSP->GetPdaMenu().PdaContentsChanged(p);
+            }
         }
-        */
 
         if (CurrentGameUI())
         {
@@ -124,6 +121,9 @@ void CActor::AddGameNews(GAME_NEWS_DATA&& news_data)
 
     GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
     news_vector.emplace_back(std::move(news_data));
+
+    if (CurrentGameUI())
+        CurrentGameUI()->GetPdaMenu().PdaContentsChanged(pda_section::news);
 }
 
 void CActor::ClearGameNews()

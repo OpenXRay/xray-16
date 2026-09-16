@@ -93,16 +93,19 @@ void CUIZoneMap::Init(bool motionIconAttached)
 
     if (IsGameTypeSingle())
     {
-        CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter);
-        m_background.AttachChild(&m_Counter);
-        CUIXmlInit::InitStatic(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
-        m_Counter.AttachChild(&m_Counter_text);
-
-        if (motionIconAttached)
+        m_hasCounter = CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter, false);
+        if (m_hasCounter)
         {
-            temp = m_Counter.GetWndPos();
-            temp.mul(m_background.GetWndSize());
-            m_Counter.SetWndPos(temp);
+            m_background.AttachChild(&m_Counter);
+            CUIXmlInit::InitStatic(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
+            m_Counter.AttachChild(&m_Counter_text);
+
+            if (motionIconAttached)
+            {
+                temp = m_Counter.GetWndPos();
+                temp.mul(m_background.GetWndSize());
+                m_Counter.SetWndPos(temp);
+            }
         }
     }
 }
@@ -122,7 +125,7 @@ void CUIZoneMap::Update()
     if (!pActor)
         return;
 
-    if (!(Device.dwFrame % 20) && IsGameTypeSingle())
+    if (!(Device.dwFrame % 20) && IsGameTypeSingle() && m_hasCounter)
     {
         string16 text_str;
         xr_strcpy(text_str, sizeof(text_str), "");
@@ -231,4 +234,8 @@ void CUIZoneMap::OnSectorChanged(IRender_Sector::sector_id_t sector)
     m_activeMap->InitTextureEx(sub_texture, m_activeMap->m_shader_name.c_str());
 }
 
-void CUIZoneMap::Counter_ResetClrAnimation() { m_Counter_text.ResetColorAnimation(); }
+void CUIZoneMap::Counter_ResetClrAnimation()
+{
+    if (m_hasCounter)
+        m_Counter_text.ResetColorAnimation();
+}

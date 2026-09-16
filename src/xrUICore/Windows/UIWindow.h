@@ -13,12 +13,16 @@
 class XRUICORE_API CUIWindow : public CUIDebuggable
 {
 public:
-    CUIWindow(pcstr window_name);
+    CUIWindow(pcstr window_name = "CUIWindow");
     ~CUIWindow() override;
 
     virtual void SetWndPos(const Fvector2& pos)
     {
         m_wndPos.set(pos.x, pos.y);
+    }
+    void SetWndPos(float x, float y)
+    {
+        SetWndPos(Fvector2().set(x, y));
     }
     [[nodiscard]]
     const Fvector2& GetWndPos() const

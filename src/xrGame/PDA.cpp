@@ -165,6 +165,7 @@ CInventoryOwner* CPda::GetOriginalOwner()
 void CPda::ActivePDAContacts(xr_vector<CPda*>& res)
 {
     res.clear();
+
     xr_vector<IGameObject*>::iterator it = m_active_contacts.begin();
     xr_vector<IGameObject*>::iterator it_e = m_active_contacts.end();
 
@@ -173,6 +174,33 @@ void CPda::ActivePDAContacts(xr_vector<CPda*>& res)
         CPda* p = GetPdaFromOwner(*it);
         if (p)
             res.push_back(p);
+    }
+}
+
+void CPda::ActivePDAContactOwners(xr_vector<CInventoryOwner*>& res)
+{
+    res.clear();
+
+    if (!H_Parent())
+        return;
+
+    Position().set(H_Parent()->Position());
+    const float radiusSqr = _sqr(m_fRadius);
+    const u32 objectCount = Level().Objects.o_count();
+
+    for (u32 i = 0; i < objectCount; ++i)
+    {
+        IGameObject* object = Level().Objects.o_get_by_iterator(i);
+        if (!object || object == H_Parent())
+            continue;
+
+        CEntityAlive* entity = smart_cast<CEntityAlive*>(object);
+        CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(object);
+        if (!entity || !inventoryOwner || !entity->g_Alive() || entity->cast_base_monster())
+            continue;
+
+        if (Position().distance_to_sqr(entity->Position()) <= radiusSqr)
+            res.push_back(inventoryOwner);
     }
 }
 
