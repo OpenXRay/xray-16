@@ -238,7 +238,10 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
     state.readbackWrite = 0;
     state.readbackScheduled = 0;
     state.stateReset = true;
-    R_ASSERT(state.staticAtlas && state.dynAtlas);
+    if (!state.staticAtlas || !state.dynAtlas) {
+        if (!EnsureAtlasLayers(nvDevice, state, 1))
+            return false;
+    }
 
     bool ok = state.requestBuffer && state.candListBuffer && state.stateBuffer && state.tileCount
         && state.schedule && state.dirtyList && state.refreshDynBuffer && state.pairBase && state.emitArgs

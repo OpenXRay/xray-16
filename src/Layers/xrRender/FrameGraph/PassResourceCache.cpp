@@ -519,6 +519,10 @@ void PassResourceCache::Clear() {
     Msg("* [PassResourceCache] Cleared all caches");
 }
 
+void PassResourceCache::ClearBindingSets() {
+    m_bindingSets.clear();
+}
+
 void PassResourceCache::ClearFramebufferDependent() {
     m_framebuffers.clear();
     m_graphicsPipelines.clear();

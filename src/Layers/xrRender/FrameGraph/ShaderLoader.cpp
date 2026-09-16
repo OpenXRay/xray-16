@@ -1232,6 +1232,97 @@ bool ShaderLoader::ValidateChangedFiles()
     return true;
 }
 
+bool ShaderLoader::ReloadChangedShaders()
+{
+    if (!GEnv.Render || !GEnv.Render->GetRenderDevice())
+        return false;
+
+    nvrhi::IDevice* nvDevice = GEnv.Render->GetRenderDevice()->GetNVRHIDevice();
+    u32 reloaded = 0;
+
+    for (auto& [cacheKey, watchInfo] : m_watchedFiles)
+    {
+        std::error_code ec;
+        const auto currentTime = std::filesystem::last_write_time(watchInfo.absolutePath, ec);
+        if (ec || currentTime == watchInfo.lastWriteTime)
+            continue;
+
+        IReader* shaderFile = OpenShaderFile(watchInfo.shaderName.c_str(), watchInfo.extension.c_str());
+        if (!shaderFile)
+            continue;
+
+        xr_string sourceCode;
+        sourceCode.assign((const char*)shaderFile->pointer(), shaderFile->length());
+        shaderFile->close();
+
+        string_path fullPath;
+        strconcat(sizeof(fullPath), fullPath,
+            GEnv.Render->getShaderPath(),
+            watchInfo.shaderName.c_str(),
+            watchInfo.extension.c_str());
+
+        auto compileResult = m_slangCompiler->CompileFromSource(
+            sourceCode.c_str(),
+            watchInfo.entryPoint.c_str(),
+            watchInfo.stage,
+            m_target,
+            fullPath);
+
+        if (!compileResult.IsValid())
+        {
+            Msg("! [ShaderLoader] Hot-reload compile failed: %s%s",
+                watchInfo.shaderName.c_str(), watchInfo.extension.c_str());
+            continue;
+        }
+
+        nvrhi::ShaderType shaderType;
+        if (!TryGetNvrhiShaderType(watchInfo.stage, shaderType))
+            continue;
+
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = shaderType;
+        desc.debugName = watchInfo.shaderName.c_str();
+        desc.entryName = watchInfo.entryPoint.c_str();
+
+        nvrhi::ShaderHandle newHandle = nvDevice->createShader(
+            desc, compileResult.bytecode.data(), compileResult.bytecode.size());
+        if (!newHandle)
+            continue;
+
+        auto extractedReflection = ShaderReflector::ExtractReflection(
+            compileResult.reflection,
+            compileResult.linkedProgram,
+            compileResult.vkShifts);
+
+        m_handleCache[cacheKey] = newHandle;
+
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end())
+        {
+            if (reflIt->second)
+                xr_delete(reflIt->second);
+            reflIt->second = xr_new<ExtractedReflection>(extractedReflection);
+        }
+        else
+            m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
+        u32 sourceHash = ComputeSourceHash(sourceCode.c_str(), sourceCode.size(), watchInfo.entryPoint.c_str());
+        m_cache.Save(watchInfo.shaderName.c_str(), watchInfo.extension.c_str(),
+            sourceHash, compileResult.bytecode, &extractedReflection);
+
+        watchInfo.lastWriteTime = currentTime;
+        ++reloaded;
+
+        Msg("* [ShaderLoader] Hot-reloaded: %s%s (entry: %s)",
+            watchInfo.shaderName.c_str(), watchInfo.extension.c_str(), watchInfo.entryPoint.c_str());
+    }
+
+    if (reloaded > 0)
+        Msg("* [ShaderLoader] Reloaded %u shader(s)", reloaded);
+
+    return reloaded > 0;
+}
+
 void ShaderLoader::ClearAllCaches()
 {
     m_handleCache.clear();

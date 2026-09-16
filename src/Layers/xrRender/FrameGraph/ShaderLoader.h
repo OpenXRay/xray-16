@@ -164,6 +164,7 @@ public:
     // Development hot-reload support
     bool CheckForChangedFiles();
     bool ValidateChangedFiles();
+    bool ReloadChangedShaders();
     void ClearAllCaches();
 
 private:
