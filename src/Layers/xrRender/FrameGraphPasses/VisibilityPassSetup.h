@@ -53,6 +53,10 @@ struct VisibilityPassState {
     nvrhi::ShaderHandle swShader;
     nvrhi::BindingLayoutHandle swLayout;
     nvrhi::ComputePipelineHandle swPipeline;
+    nvrhi::ShaderHandle swGrassShader;
+    nvrhi::BindingLayoutHandle swGrassLayout;
+    nvrhi::ComputePipelineHandle swGrassPipeline;
+    bool swGrassFailed = false;
     nvrhi::ShaderHandle swResolvePS;
     nvrhi::BindingLayoutHandle swResolveLayout;
     nvrhi::GraphicsPipelineHandle swResolvePipeline;
@@ -82,6 +86,17 @@ framegraph::VirtualResourceHandle setupSwRasterPass(
     VisibilityPassState* state,
     framegraph::VirtualResourceHandle prevVis);
 
+framegraph::VirtualResourceHandle setupSwGrassPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle detailArgs,
+    framegraph::VirtualResourceHandle prevVis,
+    FGDetailManager* detailManager,
+    u32 grassEntryBase,
+    u32 width,
+    u32 height,
+    VisibilityPassState* state);
+
 VisibilityPassOutput setupVisibilityPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -97,7 +112,8 @@ VisibilityPassOutput setupVisibilityPass(
     framegraph::VirtualResourceHandle detailArgs,
     u32 grassEntryBase,
     VisibilityPassState* state,
-    bool retest = false);
+    bool retest = false,
+    bool swGrass = false);
 
 framegraph::VirtualResourceHandle setupVisDebugViewPass(
     framegraph::FrameGraph& fg,
