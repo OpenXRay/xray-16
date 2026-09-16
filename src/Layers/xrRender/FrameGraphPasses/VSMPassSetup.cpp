@@ -2272,7 +2272,6 @@ VSMOutput setupVSMPasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::ShaderResource);
@@ -2289,7 +2288,6 @@ VSMOutput setupVSMPasses(
             data.device = device;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
             data.candList = passBuilder.write(candHandle, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.write(clearHandle, ResourceState::UnorderedAccess);
@@ -2306,7 +2304,6 @@ VSMOutput setupVSMPasses(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.candList = passBuilder.readWrite(residData.candList, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.readWrite(residData.drawClear, ResourceState::UnorderedAccess);
             data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
@@ -2340,7 +2337,6 @@ VSMOutput setupVSMPasses(
             data.config = dynConfig;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
             data.dynTable = passBuilder.write(dynTableHandle, ResourceState::UnorderedAccess);
         },
@@ -2356,7 +2352,6 @@ VSMOutput setupVSMPasses(
             data.config = dynConfig;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.dynTable = passBuilder.read(allocData.dynTable, ResourceState::ShaderResource);
             if (skinnedDrawArgs.is_valid())
                 data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
@@ -2515,7 +2510,6 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             data.atlas = passBuilder.read(state->fgAtlas, ResourceState::ShaderResource);
             if (state->dynActive) {
