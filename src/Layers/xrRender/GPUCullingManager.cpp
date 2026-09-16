@@ -304,6 +304,8 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
     m_clusterTerrainArgsBuffer = makeArgsBuffer("ClusterCull_TerrainArgs");
     m_clusterArgsBuffer2 = makeArgsBuffer("ClusterCull_RetestArgs");
     m_clusterTerrainArgsBuffer2 = makeArgsBuffer("ClusterCull_RetestTerrainArgs");
+    m_clusterSwArgsBuffer = makeArgsBuffer("ClusterCull_SwArgs");
+    m_clusterSwArgsBuffer2 = makeArgsBuffer("ClusterCull_RetestSwArgs");
 
     CreateSkinnedBuffers(device);
 }
@@ -441,6 +443,8 @@ void GPUCullingManager::Shutdown()
     m_clusterTerrainArgsBuffer = nullptr;
     m_clusterArgsBuffer2 = nullptr;
     m_clusterTerrainArgsBuffer2 = nullptr;
+    m_clusterSwArgsBuffer = nullptr;
+    m_clusterSwArgsBuffer2 = nullptr;
     m_clusterEntryData.clear();
     m_neutralFadeBuffer = nullptr;
     m_neutralFadeZeroed = false;
@@ -2558,6 +2562,8 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     m_clusterSet.fadeBuffer2 = makeStreamBuffer("ClusterCull_RetestFades", m_clusterSet.staticEntryCount + kDynamicClusterEntryCapacity);
     m_clusterSet.terrainVisibleEntryBuffer2 = makeStreamBuffer("ClusterCull_RetestTerrainVisibleEntries", m_clusterSet.terrainEntryCount);
     m_clusterSet.terrainFadeBuffer2 = makeStreamBuffer("ClusterCull_RetestTerrainFades", m_clusterSet.terrainEntryCount);
+    m_clusterSet.swEntryBuffer = makeStreamBuffer("ClusterCull_SwEntries", n + kDynamicClusterEntryCapacity);
+    m_clusterSet.swEntryBuffer2 = makeStreamBuffer("ClusterCull_RetestSwEntries", n + kDynamicClusterEntryCapacity);
 
     if (!m_clusterSet.entryBuffer || !m_clusterSet.countBuffer ||
         !m_clusterSet.visibleEntryBuffer || !m_clusterSet.fadeBuffer ||
@@ -2622,6 +2628,9 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
     cmdList->writeBuffer(m_clusterTerrainArgsBuffer, zeroArgs, sizeof(zeroArgs));
     cmdList->writeBuffer(m_clusterArgsBuffer2, zeroArgs, sizeof(zeroArgs));
     cmdList->writeBuffer(m_clusterTerrainArgsBuffer2, zeroArgs, sizeof(zeroArgs));
+    u32 zeroSwArgs[4] = {};
+    cmdList->writeBuffer(m_clusterSwArgsBuffer, zeroSwArgs, sizeof(zeroSwArgs));
+    cmdList->writeBuffer(m_clusterSwArgsBuffer2, zeroSwArgs, sizeof(zeroSwArgs));
 
     m_clusterSet.uploaded = true;
     m_clusterEntryData.clear();
@@ -2662,7 +2671,9 @@ struct ClusterCullParamsCB {
     u32 hizHeight;
     u32 hizMipLevels;
     float ssaCull;
-    u32 pad[2];
+    float swCull;
+    float swNearZ;
+    u32 pad;
 };
 
 bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
@@ -2736,27 +2747,31 @@ bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
     return m_clusterCullParamsCB.IsValid();
 }
 
-void GPUCullingManager::DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase,
-    nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs)
+void GPUCullingManager::DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase, u32 swCountOffset,
+    nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs, nvrhi::IBuffer* swArgs)
 {
     struct ClusterArgsParamsCB {
         u32 countBase;
-        u32 pad[3];
+        u32 swCountOffset;
+        u32 pad[2];
     };
     ClusterArgsParamsCB cb = {};
     cb.countBase = countBase;
+    cb.swCountOffset = swCountOffset;
     cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterArgsParamsCB), &cb, sizeof(cb));
 
     cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(args, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(terrainArgs, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(swArgs, nvrhi::ResourceStates::UnorderedAccess);
 
     auto* argsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_draw_args", ".cs");
     framegraph::BindingSetBuilder argsBsb(*argsRefl, nvDevice, "GPUCull.ClusterArgs");
     argsBsb.ConstantBuffer("ClusterArgsParams", m_device->GetNativeBuffer(m_clusterArgsParamsCB))
            .BufferSRV("g_Count", m_clusterSet.countBuffer)
            .BufferUAV("g_Args", args)
-           .BufferUAV("g_TerrainArgs", terrainArgs);
+           .BufferUAV("g_TerrainArgs", terrainArgs)
+           .BufferUAV("g_SwArgs", swArgs);
 
     nvrhi::BindingSetHandle argsBindingSet = nvDevice->createBindingSet(argsBsb.Build(), m_clusterArgsLayout);
     if (!argsBindingSet)
@@ -2770,6 +2785,7 @@ void GPUCullingManager::DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi:
 
     cmdList->setBufferState(args, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(terrainArgs, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(swArgs, nvrhi::ResourceStates::IndirectArgument);
 }
 
 void GPUCullingManager::FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj, u32 entryCount,
@@ -2792,6 +2808,8 @@ void GPUCullingManager::FillClusterCullParams(ClusterCullParamsCB& cb, const Fma
     cb.hizHeight = useHiZ ? hizHeight : 1u;
     cb.hizMipLevels = useHiZ ? hizMipLevels : 1u;
     cb.ssaCull = 0.0f;
+    cb.swCull = m_clusterSwCull;
+    cb.swNearZ = m_clusterSwNearZ;
 }
 
 void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
@@ -2821,6 +2839,7 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.swEntryBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
     auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull", ".cs");
     framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterCull");
@@ -2832,7 +2851,8 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
        .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer)
        .BufferUAV("g_OutTerrainEntryIndices", m_clusterSet.terrainVisibleEntryBuffer)
        .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer)
-       .BufferUAV("g_OutCandidates", m_clusterSet.candidateBuffer);
+       .BufferUAV("g_OutCandidates", m_clusterSet.candidateBuffer)
+       .BufferUAV("g_OutSwEntries", m_clusterSet.swEntryBuffer);
 
     nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterCullLayout);
     if (!bindingSet)
@@ -2849,8 +2869,9 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.swEntryBuffer, nvrhi::ResourceStates::ShaderResource);
 
-    DispatchClusterArgs(cmdList, nvDevice, 0, m_clusterArgsBuffer, m_clusterTerrainArgsBuffer);
+    DispatchClusterArgs(cmdList, nvDevice, 0, 40, m_clusterArgsBuffer, m_clusterTerrainArgsBuffer, m_clusterSwArgsBuffer);
 }
 
 void GPUCullingManager::DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
@@ -2873,6 +2894,7 @@ void GPUCullingManager::DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrh
     cmdList->setBufferState(m_clusterSet.fadeBuffer2, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer2, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(m_clusterSet.terrainFadeBuffer2, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(m_clusterSet.swEntryBuffer2, nvrhi::ResourceStates::UnorderedAccess);
 
     auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_cull_retest", ".cs");
     framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.ClusterRetest");
@@ -2884,7 +2906,8 @@ void GPUCullingManager::DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrh
        .BufferUAV("g_OutEntryIndices", m_clusterSet.visibleEntryBuffer2)
        .BufferUAV("g_OutFades", m_clusterSet.fadeBuffer2)
        .BufferUAV("g_OutTerrainEntryIndices", m_clusterSet.terrainVisibleEntryBuffer2)
-       .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer2);
+       .BufferUAV("g_OutTerrainFades", m_clusterSet.terrainFadeBuffer2)
+       .BufferUAV("g_OutSwEntries", m_clusterSet.swEntryBuffer2);
 
     nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bsb.Build(), m_clusterRetestLayout);
     if (!bindingSet)
@@ -2900,8 +2923,9 @@ void GPUCullingManager::DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrh
     cmdList->setBufferState(m_clusterSet.fadeBuffer2, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer2, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(m_clusterSet.terrainFadeBuffer2, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.swEntryBuffer2, nvrhi::ResourceStates::ShaderResource);
 
-    DispatchClusterArgs(cmdList, nvDevice, 20, m_clusterArgsBuffer2, m_clusterTerrainArgsBuffer2);
+    DispatchClusterArgs(cmdList, nvDevice, 20, 44, m_clusterArgsBuffer2, m_clusterTerrainArgsBuffer2, m_clusterSwArgsBuffer2);
 }
 
 // ═══════════════════════════════════════════════════════

@@ -1201,6 +1201,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
 
         if (m_gpuCullingManager->IsEnabled()) {
+            const bool swRaster = ps_r_vis_sw && nvDevice->queryFeatureSupport(nvrhi::Feature::BufferInt64Atomics)
+                && !m_blackboard->get_or_add<passes::VisibilityPassState>().swFailed;
+            const float pxScale = Device.mProject._22 * float(height) * 0.5f;
+            m_gpuCullingManager->SetClusterSwCull(swRaster ? ps_r_vis_sw_px * 0.5f / pxScale : 0.0f, ps_r_vis_sw_near);
             clusterArgsHandle = m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get(),
                 prevHiZHandle, m_prevViewProj, hizWidth, hizHeight, hizMipLevels);
             cullActive = clusterArgsHandle.is_valid();
@@ -1223,6 +1227,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             clusterConfig.terrainArgsBuffer = m_gpuCullingManager->GetClusterTerrainArgsBuffer();
             clusterConfig.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
             clusterConfig.terrainEntryCount = m_gpuCullingManager->GetClusterTerrainEntryCount();
+            clusterConfig.swEntryBuffer = m_gpuCullingManager->GetClusterSwEntryBuffer();
+            clusterConfig.swArgsBuffer = m_gpuCullingManager->GetClusterSwArgsBuffer();
         }
 
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
@@ -1230,6 +1236,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             clusterConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
         }
     }
+
+    framegraph::VirtualResourceHandle swVisHandle;
+    if (cullActive && ps_r_vis_sw && nvDevice->queryFeatureSupport(nvrhi::Feature::BufferInt64Atomics))
+        swVisHandle = passes::setupSwRasterPass(*m_framegraph, m_device, clusterArgsHandle, clusterConfig, width, height,
+            &m_blackboard->get_or_add<passes::VisibilityPassState>(), framegraph::VirtualResourceHandle());
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
         skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
@@ -1268,6 +1279,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 m_framegraph->CreateTexture("rt_VisID", visDesc),
                 clusterArgsHandle,
                 skinnedDrawArgsBuffer,
+                swVisHandle,
                 clusterConfig,
                 m_materialCache.get(),
                 m_gpuCullingManager.get(),
@@ -1324,6 +1336,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             retestConfig.terrainVisibleEntryBuffer = m_gpuCullingManager->GetClusterRetestTerrainVisibleEntryBuffer();
             retestConfig.terrainFadeBuffer = m_gpuCullingManager->GetClusterRetestTerrainFadeBuffer();
             retestConfig.terrainArgsBuffer = m_gpuCullingManager->GetClusterRetestTerrainArgsBuffer();
+            retestConfig.swEntryBuffer = m_gpuCullingManager->GetClusterRetestSwEntryBuffer();
+            retestConfig.swArgsBuffer = m_gpuCullingManager->GetClusterRetestSwArgsBuffer();
+            framegraph::VirtualResourceHandle swRetestHandle;
+            if (swVisHandle.is_valid())
+                swRetestHandle = passes::setupSwRasterPass(*m_framegraph, m_device, retestArgsHandle, retestConfig, width, height,
+                    &m_blackboard->get_or_add<passes::VisibilityPassState>(), swVisHandle);
             auto retestOut = passes::setupVisibilityPass(
                 *m_framegraph,
                 m_device,
@@ -1331,6 +1349,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 visIdBuffer,
                 retestArgsHandle,
                 framegraph::VirtualResourceHandle(),
+                swRetestHandle,
                 retestConfig,
                 m_materialCache.get(),
                 m_gpuCullingManager.get(),

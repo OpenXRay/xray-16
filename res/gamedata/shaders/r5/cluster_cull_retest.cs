@@ -32,7 +32,9 @@ cbuffer ClusterCullParams : register(b5)
     uint g_HiZHeight;
     uint g_HiZMipLevels;
     float g_SsaCull;
-    uint2 g_ClusterPad;
+    float g_SwCull;
+    float g_SwNearZ;
+    uint g_ClusterPad;
 };
 
 StructuredBuffer<ClusterEntry> g_Entries : register(t0);
@@ -44,6 +46,7 @@ RWStructuredBuffer<uint> g_OutEntryIndices : register(u1);
 RWStructuredBuffer<uint> g_OutFades : register(u2);
 RWStructuredBuffer<uint> g_OutTerrainEntryIndices : register(u3);
 RWStructuredBuffer<uint> g_OutTerrainFades : register(u4);
+RWStructuredBuffer<uint> g_OutSwEntries : register(u5);
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)
@@ -58,6 +61,18 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (!HiZTestSphere(e.sphere.xyz, e.sphere.w, g_CameraPos.xyz, g_HiZViewProj,
                        g_HiZPyramid, smp_nofilter, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
+
+    if ((e.flags & 1u) == 0u && g_SwCull > 0.0)
+    {
+        float d = dot(g_ViewDir.xyz, e.sphere.xyz - g_CameraPos.xyz) - e.sphere.w;
+        if (d > g_SwNearZ && e.sphere.w <= g_SwCull * d)
+        {
+            uint swSlot;
+            g_OutCount.InterlockedAdd(44, 1u, swSlot);
+            g_OutSwEntries[swSlot] = idx;
+            return;
+        }
+    }
 
     uint fade = (((e.flags >> 8) & 0x3Fu) << 12) | ((idx & 0x3FFFu) << 18);
 

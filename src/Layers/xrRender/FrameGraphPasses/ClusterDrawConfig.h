@@ -24,6 +24,13 @@ struct ClusterDrawConfig {
     nvrhi::IBuffer* megaVertexBuffer = nullptr;
     nvrhi::IBuffer* megaIndexBuffer = nullptr;
 
+    nvrhi::IBuffer* swEntryBuffer = nullptr;
+    nvrhi::IBuffer* swArgsBuffer = nullptr;
+
+    bool SwValid() const {
+        return entryBuffer && swEntryBuffer && swArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
+    }
+
     bool IsValid() const {
         return entryBuffer && visibleEntryBuffer && fadeBuffer && argsBuffer && instanceBuffer && entryCount > 0;
     }

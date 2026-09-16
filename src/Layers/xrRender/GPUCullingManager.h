@@ -430,6 +430,11 @@ public:
     nvrhi::IBuffer* GetClusterRetestTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer2.Get(); }
     nvrhi::IBuffer* GetClusterRetestTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer2.Get(); }
     nvrhi::IBuffer* GetClusterRetestTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterSwEntryBuffer() const { return m_clusterSet.swEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterSwArgsBuffer() const { return m_clusterSwArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterRetestSwEntryBuffer() const { return m_clusterSet.swEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestSwArgsBuffer() const { return m_clusterSwArgsBuffer2.Get(); }
+    void SetClusterSwCull(float swCull, float swNearZ) { m_clusterSwCull = swCull; m_clusterSwNearZ = swNearZ; }
     u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
     u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
     u32 GetClusterTerrainEntryCount() const { return m_clusterSet.terrainEntryCount; }
@@ -471,6 +476,8 @@ private:
         nvrhi::BufferHandle fadeBuffer2;
         nvrhi::BufferHandle terrainVisibleEntryBuffer2;
         nvrhi::BufferHandle terrainFadeBuffer2;
+        nvrhi::BufferHandle swEntryBuffer;
+        nvrhi::BufferHandle swEntryBuffer2;
         nvrhi::BufferHandle bvhNodeBuffer;
         nvrhi::BufferHandle bvhIndexBuffer;
         u32 bvhNodeCount = 0;
@@ -494,7 +501,11 @@ private:
     nvrhi::BufferHandle m_clusterTerrainArgsBuffer;
     nvrhi::BufferHandle m_clusterArgsBuffer2;
     nvrhi::BufferHandle m_clusterTerrainArgsBuffer2;
-    static constexpr u32 kClusterCountWords = 10;
+    nvrhi::BufferHandle m_clusterSwArgsBuffer;
+    nvrhi::BufferHandle m_clusterSwArgsBuffer2;
+    float m_clusterSwCull = 0.0f;
+    float m_clusterSwNearZ = 0.0f;
+    static constexpr u32 kClusterCountWords = 12;
     nvrhi::BufferHandle m_neutralFadeBuffer;
     bool m_neutralFadeZeroed = false;
     xr_vector<GPUClusterEntry> m_clusterEntryData;
@@ -536,8 +547,8 @@ private:
         nvrhi::ITexture* prevHiZ, const Fmatrix& prevViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
     void DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         nvrhi::ITexture* hiz, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
-    void DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase,
-        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs);
+    void DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase, u32 swCountOffset,
+        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs, nvrhi::IBuffer* swArgs);
     void FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj, u32 entryCount,
         bool useHiZ, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
 
