@@ -147,6 +147,8 @@ MotionVectorOutput setupMotionVectorPass(
             cmdList->writeBuffer(data.state->cb, &cb, sizeof(cb));
 
             auto* mvRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("motion_vector_fill", ".cs");
+            if (!mvRefl)
+                return;
             BindingSetBuilder bsb(*mvRefl, nvDevice, "MotionVector");
             bsb.ConstantBuffer("MotionVectorParams", data.state->cb)
                .Texture("t_Depth", depthTex)

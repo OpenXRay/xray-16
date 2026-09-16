@@ -44,6 +44,7 @@ public:
 
     void DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
     void DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
+    void InvalidateShadersAndPipelines();
 
 private:
     void InitSkyResources();
