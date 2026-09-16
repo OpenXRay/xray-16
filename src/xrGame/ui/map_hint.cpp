@@ -173,20 +173,31 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     }
     else if (task->GetTaskType() == eTaskTypeAdditional)
     {
-        m_info["t_icon"]->Show(false);
-        float w = m_info["t_hint_text"]->GetWidth();
+        // Иконка побочного задания
+        m_info["t_icon"]->Show(true);
 
-        Fvector2 pos = m_info["t_caption"]->GetWndPos();
+        // Ширина рамки под описание задания (выравнивается по строке времени t_time)
+        float w = m_info["t_time"]->GetWidth();
+
+        // Расположение иконки побочного задания слева
+        Fvector2 pos = m_info["t_icon"]->GetWndPos();
         pos.x = m_posx_icon;
+        m_info["t_icon"]->SetWndPos(pos);
+
+        // Заголовок справа от иконки
+        pos = m_info["t_caption"]->GetWndPos();
+        pos.x = m_posx_caption;
         m_info["t_caption"]->SetWndPos(pos);
         m_info["t_caption"]->SetWidth(w);
 
+        // Время
         pos = m_info["t_time"]->GetWndPos();
-        pos.x = m_posx_icon;
+        pos.x = m_posx_caption;
         m_info["t_time"]->SetWndPos(pos);
 
+        // Сколько осталось времени
         pos = m_info["t_time_rem"]->GetWndPos();
-        pos.x = m_posx_icon;
+        pos.x = m_posx_caption;
         m_info["t_time_rem"]->SetWndPos(pos);
     }
 
