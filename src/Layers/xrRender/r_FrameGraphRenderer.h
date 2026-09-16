@@ -399,6 +399,7 @@ private:
     u32 m_hizHistoryWidth = 0;
     u32 m_hizHistoryHeight = 0;
     bool m_hasPrevHiZ = false;
+    nvrhi::TextureHandle m_sceneDepth;
 
     Fmatrix m_prevViewProj;
     Fmatrix m_prevView;
