@@ -54,6 +54,7 @@ VirtualResourceHandle setupDetailCullPass(
         [&, prevHiZ, argsHandle, fallbackHiZ, hiZWidth, hiZHeight, hiZMipLevels, prevViewProj, gpuProfiler, detailState](
             FrameGraph& builder, PassHandle passHandle, DetailCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
 
             data.device = device;
             data.detailManager = detailManager;
