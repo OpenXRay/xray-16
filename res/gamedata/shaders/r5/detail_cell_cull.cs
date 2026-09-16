@@ -60,9 +60,6 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     if (slot.instance_count == 0)
         return;
 
-    // Distance culling for slot AABB
-    if (!DistanceTestAABB(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
-        return;
 
     // Frustum culling for slot AABB
     if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))

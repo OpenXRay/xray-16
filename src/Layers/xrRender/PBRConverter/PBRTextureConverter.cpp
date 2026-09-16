@@ -1041,12 +1041,20 @@ static bool WriteRGBADDS(
     writer->w(&magic, sizeof(magic));
     writer->w(&header, sizeof(header));
 
-    // Write mip 0 - data is already RGBA with preserved alpha!
     const u32 pixelCount = width * height;
     writer->w(rgbaData, pixelCount * 4);
 
-    // Generate and write mipmaps
     if (generateMipmaps) {
+        bool hasAlpha = false;
+        u64 covRef = 0;
+        constexpr u32 ALPHA_REF = 128;
+        for (u32 i = 0; i < pixelCount; i++) {
+            if (rgbaData[i * 4 + 3] < 255) hasAlpha = true;
+            if (rgbaData[i * 4 + 3] >= ALPHA_REF) covRef++;
+        }
+        const double targetCov = pixelCount > 0 ? double(covRef) / double(pixelCount) : 1.0;
+        const bool doCoverage = hasAlpha && covRef > 0 && covRef < u64(pixelCount);
+
         xr_vector<u8> currentMip(rgbaData, rgbaData + pixelCount * 4);
         u32 mipWidth = width;
         u32 mipHeight = height;
@@ -1055,6 +1063,27 @@ static bool WriteRGBADDS(
             currentMip = GenerateMipLevel(currentMip.data(), mipWidth, mipHeight, 4);
             mipWidth = std::max(mipWidth / 2, 1u);
             mipHeight = std::max(mipHeight / 2, 1u);
+
+            if (doCoverage) {
+                u8* px = currentMip.data();
+                u64 texels = u64(mipWidth) * mipHeight;
+                u64 hist[256] = {};
+                for (u64 i = 0; i < texels; i++) hist[px[i * 4 + 3]]++;
+                u64 atLeast[257]; atLeast[256] = 0;
+                for (int t = 255; t >= 0; t--) atLeast[t] = atLeast[t + 1] + hist[t];
+                float lo = 1.0f, hi = 8.0f;
+                for (int it = 0; it < 24; it++) {
+                    float mid = 0.5f * (lo + hi);
+                    u32 thresh = std::min<u32>(256, u32(ceilf(float(ALPHA_REF) / mid)));
+                    double cov = double(atLeast[thresh]) / double(texels);
+                    if (cov < targetCov) lo = mid; else hi = mid;
+                }
+                float scale = 0.5f * (lo + hi);
+                if (scale > 1.001f) {
+                    for (u64 i = 0; i < texels; i++)
+                        px[i * 4 + 3] = u8(std::min<u32>(u32(float(px[i * 4 + 3]) * scale + 0.5f), 255u));
+                }
+            }
 
             writer->w(currentMip.data(), currentMip.size());
         }
