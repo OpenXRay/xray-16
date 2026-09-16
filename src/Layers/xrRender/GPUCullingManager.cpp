@@ -918,6 +918,8 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_staticDataCached = false;
     m_terrainDataCached = false;
     m_staticUploaded = false;
+    m_clusterSet = {};
+    m_clusterEntryData.clear();
 
     Msg("* [GPUCulling] Shaders and pipelines invalidated for hot-reload");
 }

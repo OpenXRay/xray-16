@@ -224,6 +224,7 @@ private:
         std::filesystem::file_time_type lastWriteTime;
     };
     xr_map<xr_string, WatchedFile> m_watchedFiles;
+    bool m_hotReloadPrimed = false;
 };
 
 } // namespace xray::render::framegraph

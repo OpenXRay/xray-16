@@ -252,6 +252,8 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(emitCB, &emitParams, sizeof(emitParams));
 
             auto* emitReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_emit", ".cs");
+            if (!emitReflection)
+                return;
             BindingSetBuilder bsb(*emitReflection, nvDevice, "SmokeTrail.Emit");
             bsb.ConstantBuffer("SmokeEmitCB", emitCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
@@ -301,6 +303,8 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(simCB, &simParams, sizeof(simParams));
 
             auto* simReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_simulate", ".cs");
+            if (!simReflection)
+                return;
             BindingSetBuilder bsb(*simReflection, nvDevice, "SmokeTrail.Sim");
             bsb.ConstantBuffer("SmokeSimCB", simCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
@@ -349,6 +353,8 @@ DefaultOutputLayout setupSmokeTrailPass(
             cmdList->writeBuffer(compactCB, &compactParams, sizeof(compactParams));
 
             auto* compactReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("smoke_trail_compact", ".cs");
+            if (!compactReflection)
+                return;
             BindingSetBuilder bsb(*compactReflection, nvDevice, "SmokeTrail.Compact");
             bsb.ConstantBuffer("SmokeCompactCB", compactCB)
                .BufferUAV("g_CompactBuffer", mgr->GetCompactBuffer())
@@ -470,6 +476,8 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* vsReflection = shaderLoader->GetCachedReflection("smoke_trail", ".vs");
             auto* psReflection = shaderLoader->GetCachedReflection("smoke_trail", ".ps");
+            if (!vsReflection || !psReflection)
+                return;
             BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "SmokeTrail.Draw");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                .ConstantBuffer("TrailParams", trailParamsCB)

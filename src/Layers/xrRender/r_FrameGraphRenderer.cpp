@@ -445,6 +445,12 @@ void FrameGraphRenderer::Render() {
                     if (imguiReload)
                         imguiReload->InvalidateShadersAndPipeline();
 
+                    if (g_pGamePersistent) {
+                        auto* fgEnv = dynamic_cast<fg::FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
+                        if (fgEnv)
+                            fgEnv->InvalidateShadersAndPipelines();
+                    }
+
                     Msg("* Shader hot-reload complete");
                 }
             }

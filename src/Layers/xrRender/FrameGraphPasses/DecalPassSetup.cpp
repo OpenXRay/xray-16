@@ -141,6 +141,8 @@ DefaultOutputLayout setupDecalPass(
 
             auto* vsReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".vs");
             auto* psReflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("decal_box", ".ps");
+            if (!vsReflection || !psReflection)
+                return;
 
             auto* materialBuffer = MaterialBuffer::Instance().GetBuffer();
 

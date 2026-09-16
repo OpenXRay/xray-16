@@ -336,6 +336,8 @@ RibbonPassOutput setupRibbonPass(
                 auto* shaderLoader = GEnv.Render->GetShaderLoader();
                 auto* vsReflection = shaderLoader->GetCachedReflection("ribbon", ".vs");
                 auto* psReflection = shaderLoader->GetCachedReflection("ribbon", ".ps");
+                if (!vsReflection || !psReflection)
+                    return;
                 BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Ribbon");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                    .ConstantBuffer("RibbonParams", ribbonParamsCB)

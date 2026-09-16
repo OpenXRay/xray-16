@@ -1523,6 +1523,8 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     cmdList->writeBuffer(renderDevice->GetNativeBuffer(perlin4dCB), &params, sizeof(params));
 
     auto* perlin4dRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("perlin4d_gen", ".cs");
+    if (!perlin4dRefl)
+        return;
     framegraph::BindingSetBuilder bsb(*perlin4dRefl, device, "Detail.Perlin4D");
     bsb.ConstantBuffer("Perlin4DGenParams", renderDevice->GetNativeBuffer(perlin4dCB))
        .TextureUAV("g_output", perlin4dTexture);
@@ -2241,6 +2243,8 @@ void FGDetailManager::DispatchCulling(
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.SlotCull");
     {
         auto* slotCullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cell_cull", ".cs");
+        if (!slotCullRefl)
+            return;
         framegraph::BindingSetBuilder bsb(*slotCullRefl, device, "Detail.SlotCull");
         bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
@@ -2269,6 +2273,8 @@ void FGDetailManager::DispatchCulling(
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.InstanceCull");
     {
         auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
+        if (!cullRefl)
+            return;
         framegraph::BindingSetBuilder bsb(*cullRefl, device, "Detail.Cull");
         auto detailGlobalsCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(DetailFrameConstants), renderDevice);
         DetailFrameConstants frameConstants;
@@ -2319,24 +2325,27 @@ void FGDetailManager::DispatchCulling(
     if (swArgsPipeline && swDispatchArgsBuffer)
     {
         auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_sw_args", ".cs");
-        cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
-        framegraph::BindingSetBuilder bsb(*refl, device, "Detail.SwArgs");
-        bsb.BufferSRV("g_ArgsLod1", drawArgsBuffer[1])
-           .BufferSRV("g_ArgsLod2", drawArgsBuffer[2])
-           .BufferUAV("g_SwArgs", swDispatchArgsBuffer);
-        if (auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), swArgsBindingLayout, device))
+        if (refl)
         {
-            nvrhi::ComputeState state;
-            state.pipeline = swArgsPipeline;
-            state.bindings = { bindingSet };
-            cmdList->setComputeState(state);
-            cmdList->dispatch(1, 1, 1);
+            cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+            framegraph::BindingSetBuilder bsb(*refl, device, "Detail.SwArgs");
+            bsb.BufferSRV("g_ArgsLod1", drawArgsBuffer[1])
+               .BufferSRV("g_ArgsLod2", drawArgsBuffer[2])
+               .BufferUAV("g_SwArgs", swDispatchArgsBuffer);
+            if (auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), swArgsBindingLayout, device))
+            {
+                nvrhi::ComputeState state;
+                state.pipeline = swArgsPipeline;
+                state.bindings = { bindingSet };
+                cmdList->setComputeState(state);
+                cmdList->dispatch(1, 1, 1);
+            }
+            cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+            cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::IndirectArgument);
+            cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::IndirectArgument);
         }
-        cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-        cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::IndirectArgument);
-        cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::IndirectArgument);
     }
 }
 
@@ -2506,6 +2515,8 @@ nvrhi::BindingSetHandle FGDetailManager::CreateInstanceGenBindingSet(nvrhi::IDev
 {
     auto* renderDevice = GEnv.Render->GetRenderDevice();
     auto* instGenRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_instance_gen", ".cs");
+    if (!instGenRefl)
+        return {};
     framegraph::BindingSetBuilder bsb(*instGenRefl, device, "Detail.InstanceGen");
     bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
        .ConstantBuffer("InstanceGenParams", renderDevice->GetNativeBuffer(cachedInstanceGenParamsCB))
@@ -2591,6 +2602,8 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
         if (gpuProfiler) gpuProfiler->BeginPass(cmdList, passName);
 
         auto* prefixRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_prefix_sum", ".cs:main_scan_blocks");
+        if (!prefixRefl)
+            return;
         framegraph::BindingSetBuilder bsb(*prefixRefl, device, "Detail.PrefixSum");
         bsb.ConstantBuffer("InstanceGenParams", renderDevice->GetNativeBuffer(cachedInstanceGenParamsCB))
            .BufferUAV("g_per_slot_counts", perSlotCountsBuffer)

@@ -601,4 +601,21 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     cmdList->setGraphicsState(state);
     cmdList->drawIndexed(nvrhi::DrawArguments{6, 1, 0, 0, 0});
 }
+
+void FGEnvironmentRender::InvalidateShadersAndPipelines()
+{
+    m_skyVS = nullptr;
+    m_skyPS = nullptr;
+    m_skyInputLayout = nullptr;
+    m_skyBindingLayout = nullptr;
+    m_skyPipeline = nullptr;
+    m_skyInitialized = false;
+
+    m_sunVS = nullptr;
+    m_sunPS = nullptr;
+    m_sunInputLayout = nullptr;
+    m_sunBindingLayout = nullptr;
+    m_sunPipeline = nullptr;
+    m_sunInitialized = false;
+}
 } // namespace xray::render::fg

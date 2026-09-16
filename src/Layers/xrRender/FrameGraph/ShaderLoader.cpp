@@ -120,6 +120,7 @@ void ShaderLoader::SetTarget(xray::render::SlangCompiler::Target target)
     {
         ClearAllCaches();
         m_watchedFiles.clear();
+        m_hotReloadPrimed = false;
     }
     m_target = target;
     switch (target)
@@ -223,6 +224,10 @@ void ShaderLoader::WatchShaderFile(
 
     string_path fullPath;
     FS.update_path(fullPath, "$game_shaders$", filename);
+#ifndef WINDOWS
+    for (char* p = fullPath; *p; ++p)
+        if (*p == '\\') *p = '/';
+#endif
 
     std::error_code ec;
     const auto writeTime = std::filesystem::last_write_time(fullPath, ec);
@@ -1090,12 +1095,36 @@ bool ShaderLoader::CheckForChangedFiles()
     if (!ps_fg_hot_reload_shaders)
         return false;
 
-    // Hot-reload can be enabled at runtime after shaders were already cached.
-    // Prime watcher entries by forcing one cache rebuild pass.
-    if (m_watchedFiles.empty() && !m_handleCache.empty())
+    if (m_watchedFiles.empty() && !m_handleCache.empty() && !m_hotReloadPrimed)
     {
-        Msg("* [ShaderLoader] Priming hot-reload file watch list");
-        ClearAllCaches();
+        m_hotReloadPrimed = true;
+        for (const auto& [cacheKey, handle] : m_handleCache)
+        {
+            auto dotPos = cacheKey.find('.');
+            if (dotPos == xr_string::npos)
+                continue;
+            auto colonPos = cacheKey.find(':', dotPos);
+            xr_string name = cacheKey.substr(0, dotPos);
+            xr_string ext = (colonPos != xr_string::npos)
+                ? cacheKey.substr(dotPos, colonPos - dotPos)
+                : cacheKey.substr(dotPos);
+            xr_string entry = (colonPos != xr_string::npos)
+                ? cacheKey.substr(colonPos + 1)
+                : "main";
+
+            using Stage = xray::render::SlangCompiler::Stage;
+            Stage stage = Stage::Vertex;
+            if (ext == ".ps") stage = Stage::Pixel;
+            else if (ext == ".cs") stage = Stage::Compute;
+            else if (ext == ".gs") stage = Stage::Geometry;
+            else if (ext == ".hs") stage = Stage::Hull;
+            else if (ext == ".ds") stage = Stage::Domain;
+            else if (ext == ".as") stage = Stage::Amplification;
+            else if (ext == ".ms") stage = Stage::Mesh;
+
+            WatchShaderFile(cacheKey, name.c_str(), ext.c_str(), entry.c_str(), stage);
+        }
+        Msg("* [ShaderLoader] Primed hot-reload file watch list: %u entries", u32(m_watchedFiles.size()));
         return false;
     }
 

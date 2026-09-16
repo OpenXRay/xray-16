@@ -224,6 +224,8 @@ HiZPyramidOutput setupHiZBuildPass(
                 outputSubres.numArraySlices = 1;
 
                 auto* hizRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("hiz_build", ".cs");
+                if (!hizRefl)
+                    continue;
                 framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice, "HiZBuild");
                 if (mip == 0)
                     bsb.Texture("g_input_depth", depthTexture);
