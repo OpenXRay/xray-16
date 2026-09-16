@@ -331,9 +331,16 @@ void renderVisibilityRaster(
     u32 grassEntryBase,
     VisibilityPassState& state,
     bool retest,
-    bool swMerge)
+    bool swMerge,
+    xray::profiler::GPUProfiler* gpuProfiler)
 {
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    auto scope = [&](const char* rasterLabel, const char* retestLabel, auto&& body) {
+        const char* label = retest ? retestLabel : rasterLabel;
+        if (gpuProfiler) gpuProfiler->BeginPass(cmdList, label);
+        body();
+        if (gpuProfiler) gpuProfiler->EndPass(cmdList, label);
+    };
     if (!retest) {
         cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
         cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
@@ -389,7 +396,7 @@ void renderVisibilityRaster(
     nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
     if (swMerge)
-        drawSwResolve(ctx, device, framebuffer, viewport, scissor, state);
+        scope("Visibility Raster.SwResolve", "Visibility Retest.SwResolve", [&] { drawSwResolve(ctx, device, framebuffer, viewport, scissor, state); });
     auto draw = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingSet* bindingSet, nvrhi::IBuffer* args) {
         nvrhi::GraphicsState gs;
         gs.pipeline = pipeline;
@@ -423,7 +430,7 @@ void renderVisibilityRaster(
         cmdList->dispatchMeshIndirect(16, 1);
     };
 
-    if (config.IsValid()) {
+    if (config.IsValid()) scope("Visibility Raster.Clusters", "Visibility Retest.Clusters", [&] {
         BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "VisibilityRaster.Cluster");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
@@ -438,9 +445,9 @@ void renderVisibilityRaster(
             bsb.BufferSRV("g_ClusterArgs", config.argsBuffer);
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshLayout : state.layout, nvDevice))
             drawCluster(state.pipeline, state.meshPipeline, bindingSet, config.argsBuffer);
-    }
+    });
 
-    if (config.TerrainValid()) {
+    if (config.TerrainValid()) scope("Visibility Raster.Terrain", "Visibility Retest.Terrain", [&] {
         BindingSetBuilder bsb(*vsRefl, *fadeRefl, nvDevice, "VisibilityRaster.ClusterTerrain");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.BufferSRV("g_InstanceData", config.terrainInstanceBuffer);
@@ -454,10 +461,10 @@ void renderVisibilityRaster(
             bsb.BufferSRV("g_ClusterArgs", config.terrainArgsBuffer);
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshTerrainLayout : state.terrainLayout, nvDevice))
             drawCluster(state.terrainPipeline, state.meshTerrainPipeline, bindingSet, config.terrainArgsBuffer);
-    }
+    });
 
     const u32 skinnedEntries = (gpuCulling && !retest) ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
-    if (skinnedEntries > 0 && state.skinnedPipeline) {
+    if (skinnedEntries > 0 && state.skinnedPipeline) scope("Visibility Raster.Skinned", "Visibility Retest.Skinned", [&] {
         auto* skinnedVsRefl = shaderLoader->GetCachedReflection("cluster_vis_skinned", ".vs");
         nvrhi::IBuffer* preVB = gpuCulling->GetSkinnedPreVertexBuffer();
         nvrhi::IBuffer* skinnedIB = gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer();
@@ -489,11 +496,11 @@ void renderVisibilityRaster(
                 cmdList->draw(nvrhi::DrawArguments().setVertexCount(GPUCullingManager::SKINNED_ENTRY_INDICES).setInstanceCount(skinnedEntries));
             }
         }
-    }
+    });
 
     if (!retest && detailManager && state.bladePipeline && detailManager->generatedInstancesBuffer && detailManager->perlin4dTexture
         && detailManager->detailModelsBuffer && detailManager->pulledVertexBuffer
-        && detailManager->interactionTexture[0] && detailManager->interactionTexture[1]) {
+        && detailManager->interactionTexture[0] && detailManager->interactionTexture[1]) scope("Visibility Raster.Grass", "Visibility Retest.Grass", [&] {
         auto* bladeVsRefl = shaderLoader->GetCachedReflection("detail_vis", ".vs");
         auto* bladePsRefl = shaderLoader->GetCachedReflection("detail_vis", ".ps");
         auto* pulledPsRefl = shaderLoader->GetCachedReflection("detail_vis_at", ".ps");
@@ -547,7 +554,7 @@ void renderVisibilityRaster(
                              detailManager->visibleDecalInstancesBuffer, detailManager->decalDrawArgsBuffer);
             }
         }
-    }
+    });
 }
 
 }
@@ -764,7 +771,7 @@ VisibilityPassOutput setupVisibilityPass(
             renderVisibilityRaster(ctx, data.device, depthRT, visRT, data.config, data.materialCache,
                 data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr,
                 data.detailArgs.is_valid() ? data.detailManager : nullptr, data.grassEntryBase, *data.state, data.retest,
-                data.swVis.is_valid());
+                data.swVis.is_valid(), fg.GetGPUProfiler());
         });
 
     VisibilityPassOutput out;
