@@ -41,18 +41,6 @@ struct VsmMarkParams {
     u32 pad[2];
 };
 
-struct VsmResidParams {
-    s32 pageBase[12];
-    u32 frame;
-    u32 refreshBudget;
-    u32 wrongBudget;
-    u32 forceDirty;
-    u32 interval[8];
-    Fvector4 pivot;
-    Fvector4 sun;
-    Fvector4 levelOrigin[kVSMLevels];
-};
-
 struct VsmBinParams {
     u32 includeAT;
     u32 capOpaque;
@@ -248,9 +236,18 @@ nvrhi::BufferHandle MakeUAVBuffer(nvrhi::IDevice* nvDevice, const char* name, u6
     return nvDevice->createBuffer(desc);
 }
 
-nvrhi::IBuffer* VsmParamsCB(fg::RenderDevice* device)
+nvrhi::IBuffer* VsmParamsCB(nvrhi::ICommandList* cmdList, fg::RenderDevice* device, const VSMState& state)
 {
-    return GetPassResourceCache().GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), device, 64);
+    auto cb = GetPassResourceCache().GetOrCreateVolatileCB("VSM", "VsmParams", sizeof(VsmParams), device, 64);
+    cmdList->writeBuffer(cb, &state.params, sizeof(VsmParams));
+    return cb;
+}
+
+nvrhi::IBuffer* ResidParamsCB(nvrhi::ICommandList* cmdList, fg::RenderDevice* device, const VSMState& state)
+{
+    auto cb = GetPassResourceCache().GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), device);
+    cmdList->writeBuffer(cb, &state.residParams, sizeof(VsmResidParams));
+    return cb;
 }
 
 bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
@@ -795,8 +792,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     if (!markRefl)
         return;
 
-    auto vsmCB = VsmParamsCB(data.device);
-    cmdList->writeBuffer(vsmCB, &state.params, sizeof(VsmParams));
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
 
     const u32 markStep = ps_r_vsm_mark_half ? 2u : 1u;
     VsmMarkParams mp = {};
@@ -886,7 +882,8 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     if (!refl)
         return;
 
-    VsmResidParams rp = {};
+    VsmResidParams& rp = state.residParams;
+    rp = {};
     float demand = 0.0f;
     for (u32 L = 0; L + 1 < kVSMLevels; ++L)
         demand += float(state.levelPages[L]) / float(std::max(state.refreshInterval[L], 1u));
@@ -924,8 +921,7 @@ void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
     rp.sun.set(state.sunDir.x, state.sunDir.y, state.sunDir.z, 0.0f);
     for (u32 L = 0; L < kVSMLevels; ++L)
         rp.levelOrigin[L].set(state.params.level[L].x, state.params.level[L].y, state.params.level[L].z / float(kVSMPagesAxis), 0.0f);
-    auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
-    cmdList->writeBuffer(residCB, &rp, sizeof(rp));
+    auto residCB = ResidParamsCB(cmdList, data.device, state);
 
     cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::UnorderedAccess);
@@ -982,7 +978,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     const bool haveEntries = data.config.entryBuffer && data.config.entryCount > 0
         && data.config.bvhNodeBuffer && data.config.bvhIndexBuffer && data.config.bvhNodeCount > 0;
     {
-        auto vsmCB = VsmParamsCB(data.device);
+        auto vsmCB = VsmParamsCB(cmdList, data.device, state);
 
         VsmBinParams bp = {};
         bp.includeAT = ps_r_vsm_at ? 1u : 0u;
@@ -1015,7 +1011,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.candList, nvrhi::ResourceStates::UnorderedAccess);
-        auto residCB = cache.GetOrCreateVolatileCB("VSM", "ResidParams", sizeof(VsmResidParams), data.device);
+        auto residCB = ResidParamsCB(cmdList, data.device, state);
         BindingSetBuilder pbs(*prepRefl, nvDevice, "VSM.BinPrep");
         pbs.ConstantBuffer("VsmResidParams", residCB)
            .BufferUAV("g_Counters", state.drawClear)
@@ -1185,7 +1181,7 @@ void DrawPages(fg::RenderContext* ctx, const VSMAtlasData& data, nvrhi::IFramebu
         return;
 
     auto& matBuffer = bindless::MaterialBuffer::Instance();
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
@@ -1415,7 +1411,7 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
 
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     GPUCullingManager& gpuCulling = *data.config.gpuCulling;
     auto touch = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, const char* label) {
         if (!entries || entryCount == 0)
@@ -1483,7 +1479,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
     for (u32 i = 0; i < kVSMDynStreamCount; ++i)
         cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::UnorderedAccess);
 
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     GPUCullingManager& gpuCulling = *data.config.gpuCulling;
     const VSMDynConfig& cfg = data.config;
     auto dispatchSource = [&](nvrhi::IBuffer* entries, u32 entryBase, u32 entryCount, u32 statsBase,
@@ -1589,7 +1585,7 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     if (!dynVsRefl || !skinVsRefl || !psRefl || !atRefl)
         return;
 
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
     auto& matBuffer = bindless::MaterialBuffer::Instance();
@@ -1870,7 +1866,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     if (!refl)
         return;
 
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
 
     nvrhi::ITexture* hudTex = data.hudMap.is_valid() ? fg.GetPhysicalTexture(data.hudMap) : nullptr;
     const bool hudOn = hudTex && state.hudRendered && ps_r_vsm_hud;
@@ -1947,7 +1943,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
     if (!refl)
         return;
 
-    auto vsmCB = VsmParamsCB(data.device);
+    auto vsmCB = VsmParamsCB(cmdList, data.device, state);
 
     VsmDebugParams dp = {};
     dp.invViewProj = Device.mInvFullTransform;
@@ -2143,7 +2139,9 @@ VSMOutput setupVSMPasses(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle orderAfter,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
     const VSMDrawConfig& config,
+    const VSMDynConfig& dynConfig,
     u32 width,
     u32 height,
     VSMState* state,
@@ -2153,11 +2151,17 @@ VSMOutput setupVSMPasses(
     if (state) {
         state->fgNeeded = framegraph::VirtualResourceHandle();
         state->fgDirtyList = framegraph::VirtualResourceHandle();
+        state->fgDrawClear = framegraph::VirtualResourceHandle();
+        for (u32 i = 0; i < kVSMStreamCount; ++i)
+            state->fgPageArgs[i] = framegraph::VirtualResourceHandle();
         state->fgAtlas = framegraph::VirtualResourceHandle();
         state->fgDynAtlas = framegraph::VirtualResourceHandle();
         state->fgDynTable = framegraph::VirtualResourceHandle();
         state->fgDynArgs = framegraph::VirtualResourceHandle();
         state->fgHudMap = framegraph::VirtualResourceHandle();
+        state->dynActive = false;
+        state->dynRendered = false;
+        state->hudRendered = false;
     }
     if (!state || !device || !depth.is_valid() || width == 0 || height == 0)
         return out;
@@ -2259,17 +2263,6 @@ VSMOutput setupVSMPasses(
             argsHandles[i] = fg.ImportBuffer(kArgsNames[i], state->pageArgs[i], bufferDesc(kArgsNames[i], sizeof(u32) * 4, 0));
     }
 
-    ResourceDesc atlasDesc;
-    atlasDesc.type = ResourceDesc::Type::Texture2D;
-    atlasDesc.width = kVSMAtlasW * kVSMPageSize;
-    atlasDesc.height = kVSMAtlasH * kVSMPageSize;
-    atlasDesc.format = nvrhi::Format::D16;
-    atlasDesc.isDepthStencil = true;
-    atlasDesc.isImported = true;
-    atlasDesc.isTransient = false;
-    atlasDesc.debugName = "rt_VSMAtlas";
-    VirtualResourceHandle atlasHandle = fg.ImportTexture("rt_VSMAtlas", state->atlas, atlasDesc);
-
     auto& markData = fg.addCallbackPass<VSMMarkData>(
         "VSM Mark",
         [&, depth, orderAfter, neededHandle, width, height, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMMarkData& data) {
@@ -2295,6 +2288,7 @@ VSMOutput setupVSMPasses(
             data.device = device;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
             data.candList = passBuilder.write(candHandle, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.write(clearHandle, ResourceState::UnorderedAccess);
@@ -2311,6 +2305,7 @@ VSMOutput setupVSMPasses(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             data.candList = passBuilder.readWrite(residData.candList, ResourceState::UnorderedAccess);
             data.drawClear = passBuilder.readWrite(residData.drawClear, ResourceState::UnorderedAccess);
             data.dirtyList = passBuilder.write(dirtyHandle, ResourceState::UnorderedAccess);
@@ -2321,6 +2316,84 @@ VSMOutput setupVSMPasses(
             ExecuteBin(ctx, data);
         });
 
+    out.active = true;
+    state->fgNeeded = markData.needed;
+    state->fgDirtyList = binData.dirtyList;
+    state->fgDrawClear = binData.drawClear;
+    for (u32 i = 0; i < kVSMStreamCount; ++i)
+        state->fgPageArgs[i] = binData.pageArgs[i];
+
+    const bool dyn = dynConfig.gpuCulling && state->dynAtlas && state->dynPageTable && state->dynClearArgs
+        && (dynConfig.gpuCulling->GetDynamicClusterEntryCount() > 0 || dynConfig.gpuCulling->GetSkinnedEntryCount() > 0);
+    if (!dyn)
+        return out;
+
+    VirtualResourceHandle dynTableHandle = fg.ImportBuffer("vsm_dyn_page_table", state->dynPageTable, bufferDesc("vsm_dyn_page_table", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
+    VirtualResourceHandle dynArgsHandle = fg.ImportBuffer("vsm_dyn_args", state->dynArgs[0], bufferDesc("vsm_dyn_args", sizeof(u32) * 4, 0));
+
+    auto& allocData = fg.addCallbackPass<VSMDynAllocData>(
+        "VSM Dyn Alloc",
+        [&, dynTableHandle, dynConfig, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAllocData& data) {
+            data.state = state;
+            data.device = device;
+            data.config = dynConfig;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
+            data.needed = passBuilder.read(markData.needed, ResourceState::ShaderResource);
+            data.dynTable = passBuilder.write(dynTableHandle, ResourceState::UnorderedAccess);
+        },
+        [](const VSMDynAllocData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteDynAlloc(ctx, data);
+        });
+
+    auto& dynBinData = fg.addCallbackPass<VSMDynBinData>(
+        "VSM Dyn Bin",
+        [&, skinnedDrawArgs, dynArgsHandle, dynConfig, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynBinData& data) {
+            data.state = state;
+            data.device = device;
+            data.config = dynConfig;
+            data.gpuProfiler = gpuProfiler;
+            RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
+            data.dynTable = passBuilder.read(allocData.dynTable, ResourceState::ShaderResource);
+            if (skinnedDrawArgs.is_valid())
+                data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
+            data.dynArgs = passBuilder.write(dynArgsHandle, ResourceState::UnorderedAccess);
+        },
+        [](const VSMDynBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            ExecuteDynBin(ctx, data);
+        });
+
+    state->fgDynTable = allocData.dynTable;
+    state->fgDynArgs = dynBinData.dynArgs;
+    state->dynActive = true;
+    return out;
+}
+
+void setupVSMAtlasPasses(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle skinnedDrawArgs,
+    const VSMDrawConfig& config,
+    const VSMDynConfig& dynConfig,
+    VSMState* state,
+    xray::profiler::GPUProfiler* gpuProfiler)
+{
+    if (!state || !device || !state->active || !state->fgDirtyList.is_valid())
+        return;
+
+    ResourceDesc atlasDesc;
+    atlasDesc.type = ResourceDesc::Type::Texture2D;
+    atlasDesc.width = kVSMAtlasW * kVSMPageSize;
+    atlasDesc.height = kVSMAtlasH * kVSMPageSize;
+    atlasDesc.format = nvrhi::Format::D16;
+    atlasDesc.isDepthStencil = true;
+    atlasDesc.isImported = true;
+    atlasDesc.isTransient = false;
+    atlasDesc.debugName = "rt_VSMAtlas";
+    VirtualResourceHandle atlasHandle = fg.ImportTexture("rt_VSMAtlas", state->atlas, atlasDesc);
+
     auto& atlasData = fg.addCallbackPass<VSMAtlasData>(
         "VSM Static Atlas",
         [&, atlasHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMAtlasData& data) {
@@ -2330,60 +2403,20 @@ VSMOutput setupVSMPasses(
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.atlas = passBuilder.write(atlasHandle, ResourceState::DepthStencilWrite);
-            data.dirtyList = passBuilder.read(binData.dirtyList, ResourceState::ShaderResource);
-            data.drawClear = passBuilder.read(binData.drawClear, ResourceState::IndirectArgument);
+            data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
+            data.drawClear = passBuilder.read(state->fgDrawClear, ResourceState::IndirectArgument);
             for (u32 i = 0; i < kVSMStreamCount; ++i)
-                data.pageArgs[i] = passBuilder.read(binData.pageArgs[i], ResourceState::IndirectArgument);
+                data.pageArgs[i] = passBuilder.read(state->fgPageArgs[i], ResourceState::IndirectArgument);
         },
         [](const VSMAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteAtlas(ctx, fg, data);
         });
 
     fg.GetRTRegistry().RegisterRT("rt_VSMAtlas", atlasData.atlas);
-    out.atlas = atlasData.atlas;
-    out.active = true;
-    state->fgNeeded = markData.needed;
-    state->fgDirtyList = binData.dirtyList;
     state->fgAtlas = atlasData.atlas;
-    state->fgDynAtlas = VirtualResourceHandle{};
-    state->fgDynTable = VirtualResourceHandle{};
-    state->fgDynArgs = VirtualResourceHandle{};
-    state->fgHudMap = VirtualResourceHandle{};
-    state->dynActive = false;
-    state->dynRendered = false;
-    state->hudRendered = false;
-    return out;
-}
 
-void setupVSMDynamicPasses(
-    framegraph::FrameGraph& fg,
-    fg::RenderDevice* device,
-    framegraph::VirtualResourceHandle skinnedDrawArgs,
-    const VSMDynConfig& config,
-    VSMState* state,
-    xray::profiler::GPUProfiler* gpuProfiler)
-{
-    if (!state || !device || !state->active || !config.gpuCulling)
+    if (!state->dynActive)
         return;
-    if (!state->dynAtlas || !state->dynPageTable || !state->dynClearArgs)
-        return;
-    if (config.gpuCulling->GetDynamicClusterEntryCount() == 0 && config.gpuCulling->GetSkinnedEntryCount() == 0)
-        return;
-
-    auto bufferDesc = [](const char* name, u64 bytes, u32 stride) {
-        ResourceDesc d;
-        d.type = ResourceDesc::Type::Buffer;
-        d.bufferSize = bytes;
-        d.structStride = stride;
-        d.isUAV = true;
-        d.allowUAV = true;
-        d.isImported = true;
-        d.isTransient = false;
-        d.debugName = name;
-        return d;
-    };
-    VirtualResourceHandle dynTableHandle = fg.ImportBuffer("vsm_dyn_page_table", state->dynPageTable, bufferDesc("vsm_dyn_page_table", u64(kVSMPageCount) * sizeof(u32), sizeof(u32)));
-    VirtualResourceHandle dynArgsHandle = fg.ImportBuffer("vsm_dyn_args", state->dynArgs[0], bufferDesc("vsm_dyn_args", sizeof(u32) * 4, 0));
 
     ResourceDesc dynAtlasDesc;
     dynAtlasDesc.type = ResourceDesc::Type::Texture2D;
@@ -2396,58 +2429,23 @@ void setupVSMDynamicPasses(
     dynAtlasDesc.debugName = "rt_VSMAtlasDyn";
     VirtualResourceHandle dynAtlasHandle = fg.ImportTexture("rt_VSMAtlasDyn", state->dynAtlas, dynAtlasDesc);
 
-    auto& allocData = fg.addCallbackPass<VSMDynAllocData>(
-        "VSM Dyn Alloc",
-        [&, dynTableHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAllocData& data) {
-            data.state = state;
-            data.device = device;
-            data.config = config;
-            data.gpuProfiler = gpuProfiler;
-            RenderPassBuilder passBuilder(builder, passHandle);
-            data.needed = passBuilder.read(state->fgNeeded, ResourceState::ShaderResource);
-            data.dynTable = passBuilder.write(dynTableHandle, ResourceState::UnorderedAccess);
-        },
-        [](const VSMDynAllocData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            ExecuteDynAlloc(ctx, data);
-        });
-
-    auto& binData = fg.addCallbackPass<VSMDynBinData>(
-        "VSM Dyn Bin",
-        [&, skinnedDrawArgs, dynArgsHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynBinData& data) {
-            data.state = state;
-            data.device = device;
-            data.config = config;
-            data.gpuProfiler = gpuProfiler;
-            RenderPassBuilder passBuilder(builder, passHandle);
-            data.dynTable = passBuilder.read(allocData.dynTable, ResourceState::ShaderResource);
-            if (skinnedDrawArgs.is_valid())
-                data.order = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
-            data.dynArgs = passBuilder.write(dynArgsHandle, ResourceState::UnorderedAccess);
-        },
-        [](const VSMDynBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            ExecuteDynBin(ctx, data);
-        });
-
-    auto& atlasData = fg.addCallbackPass<VSMDynAtlasData>(
+    auto& dynAtlasData = fg.addCallbackPass<VSMDynAtlasData>(
         "VSM Dyn Atlas",
-        [&, dynAtlasHandle, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAtlasData& data) {
+        [&, dynAtlasHandle, dynConfig, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMDynAtlasData& data) {
             data.state = state;
             data.device = device;
-            data.config = config;
+            data.config = dynConfig;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.dynAtlas = passBuilder.write(dynAtlasHandle, ResourceState::DepthStencilWrite);
-            data.dynArgs = passBuilder.read(binData.dynArgs, ResourceState::IndirectArgument);
+            data.dynArgs = passBuilder.read(state->fgDynArgs, ResourceState::IndirectArgument);
         },
         [](const VSMDynAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteDynAtlas(ctx, fg, data);
         });
 
-    fg.GetRTRegistry().RegisterRT("rt_VSMAtlasDyn", atlasData.dynAtlas);
-    state->fgDynAtlas = atlasData.dynAtlas;
-    state->fgDynTable = allocData.dynTable;
-    state->fgDynArgs = binData.dynArgs;
-    state->dynActive = true;
+    fg.GetRTRegistry().RegisterRT("rt_VSMAtlasDyn", dynAtlasData.dynAtlas);
+    state->fgDynAtlas = dynAtlasData.dynAtlas;
 
     ResourceDesc hudDesc;
     hudDesc.type = ResourceDesc::Type::Texture2D;
@@ -2462,10 +2460,10 @@ void setupVSMDynamicPasses(
 
     auto& hudData = fg.addCallbackPass<VSMHudData>(
         "VSM HUD Map",
-        [&, hudHandle, skinnedDrawArgs, config, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMHudData& data) {
+        [&, hudHandle, skinnedDrawArgs, dynConfig, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, VSMHudData& data) {
             data.state = state;
             data.device = device;
-            data.config = config;
+            data.config = dynConfig;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             data.hudMap = passBuilder.write(hudHandle, ResourceState::DepthStencilWrite);
