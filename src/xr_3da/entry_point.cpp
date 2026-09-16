@@ -3,6 +3,10 @@
 #include "xrEngine/x_ray.h"
 #include "xrGame/xrGame.h"
 #include "Include/xrRender/xrRender.h"
+#include <cstdio>
+#if defined(XRAY_USE_METAL)
+#include "Layers/xrRender/Backend/MetalPresentation.h"
+#endif
 
 #if !defined(XR_PLATFORM_WINDOWS)
 #include <unistd.h>
@@ -35,6 +39,24 @@ struct profiler_raii
 int entry_point(pcstr commandLine)
 {
     profiler_raii raii;
+    for (pcstr option = commandLine; (option = strstr(option, "-metal")) != nullptr; ++option)
+    {
+        if (option != commandLine && option[-1] != ' ' && option[-1] != '\t')
+            continue;
+        const bool presentation = strncmp(option, "-metal-presentation", 19) == 0
+            && (option[19] == '\0' || option[19] == ' ' || option[19] == '\t');
+        const bool game = option[6] == '\0' || option[6] == ' ' || option[6] == '\t';
+        if (presentation || game)
+        {
+#if defined(XRAY_USE_METAL)
+            if (presentation)
+                return RunMetalPresentation(commandLine);
+#else
+            std::fprintf(stderr, "Native Metal requires an Apple build with NVRHI_WITH_METAL3=ON. Vulkan remains the default.\n");
+            return 1;
+#endif
+        }
+    }
     auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
     CApplication app{ commandLine, game, s_render_modules };

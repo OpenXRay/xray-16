@@ -342,6 +342,51 @@ if(WIN32)
     )
 endif()
 
+if(APPLE AND NVRHI_WITH_METAL3)
+    target_sources(xrRender PRIVATE
+        Backend/MetalBackend.h
+        Backend/MetalBackend.mm
+        Backend/MetalPresentation.h
+        Backend/MetalPresentation.cpp
+    )
+    set_source_files_properties(Backend/MetalBackend.mm PROPERTIES
+        COMPILE_OPTIONS "-fobjc-arc"
+        SKIP_PRECOMPILE_HEADERS ON
+        SKIP_UNITY_BUILD_INCLUSION ON
+    )
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_METAL)
+    if(NOT TARGET copy-dxcompiler OR NOT TARGET copy-dxil)
+        message(FATAL_ERROR "Native Metal shaders require Slang's DXC runtime targets.")
+    endif()
+    set(XRAY_METAL_DXC_LIBRARY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
+    set(XRAY_METAL_TOOLCHAIN_HEADER "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/MetalShaderToolchain.h")
+    add_custom_command(
+        OUTPUT "${XRAY_METAL_TOOLCHAIN_HEADER}"
+        COMMAND "${CMAKE_COMMAND}"
+            "-DMETAL_CONVERTER=${NVRHI_METAL_IRCONVERTER_LIBRARY}"
+            "-DDXC_LIBRARY=${XRAY_METAL_DXC_LIBRARY}"
+            "-DOUTPUT=${XRAY_METAL_TOOLCHAIN_HEADER}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/Shaders/MetalShaderToolchain.cmake"
+        DEPENDS copy-dxcompiler "${XRAY_METAL_DXC_LIBRARY}"
+            "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
+            Shaders/MetalShaderToolchain.cmake
+        VERBATIM
+    )
+    target_sources(xrRender PRIVATE "${XRAY_METAL_TOOLCHAIN_HEADER}")
+    target_include_directories(xrRender PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>")
+    find_library(XRAY_METAL_FRAMEWORK Metal REQUIRED)
+    find_library(XRAY_FOUNDATION_FRAMEWORK Foundation REQUIRED)
+    find_library(XRAY_QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
+    target_link_libraries(xrRender PRIVATE
+        ${XRAY_METAL_FRAMEWORK}
+        ${XRAY_FOUNDATION_FRAMEWORK}
+        ${XRAY_QUARTZCORE_FRAMEWORK}
+    )
+    if(NOT NVRHI_BUILD_SHARED)
+        target_link_libraries(xrRender PRIVATE nvrhi_metal3)
+    endif()
+endif()
+
 target_include_directories(xrRender
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -376,14 +421,20 @@ target_link_libraries(xrRender
     xrScriptEngine
     xrAPI
     xrMiscMath
-    nvrhi_vk
     nvrhi
     ${XRAY_VULKAN_LIBS}
     slang
 )
 
+if(NOT NVRHI_BUILD_SHARED)
+    target_link_libraries(xrRender PRIVATE nvrhi_vk)
+    if(WIN32)
+        target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12)
+    endif()
+endif()
+
 if(WIN32)
-    target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12 d3dcompiler)
+    target_link_libraries(xrRender PRIVATE d3dcompiler)
 endif()
 
 target_compile_definitions(xrRender

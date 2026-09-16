@@ -2160,11 +2160,11 @@ void FGDetailManager::DispatchCulling(
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
 
+    if (!generatedInstancesBuffer)
+        return;
+
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.InstanceCull");
     {
-        if (!generatedInstancesBuffer)
-            return;
-
         auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
         framegraph::BindingSetBuilder bsb(*cullRefl, device, "Detail.Cull");
         bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
