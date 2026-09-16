@@ -358,6 +358,7 @@ void FrameGraphRenderer::Shutdown() {
     m_hizHistory[0] = nullptr;
     m_hizHistory[1] = nullptr;
     m_hasPrevHiZ = false;
+    m_sceneDepth = nullptr;
     m_inspectorPreview = nullptr;
     old_QuadIB = nullptr;
 }
@@ -1000,6 +1001,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z (No Depth Prepass)
     // ═══════════════════════════════════════════════════════
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!m_sceneDepth || m_sceneDepth->getDesc().width != width || m_sceneDepth->getDesc().height != height) {
+        nvrhi::TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = nvrhi::Format::D32;
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.isTypeless = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(0.0f);
+        desc.initialState = nvrhi::ResourceStates::DepthWrite;
+        desc.keepInitialState = true;
+        desc.debugName = "rt_Depth";
+        m_sceneDepth = nvDevice->createTexture(desc);
+    }
     framegraph::ResourceDesc depthDesc;
     depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     depthDesc.debugName = "rt_Depth";
@@ -1007,11 +1024,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     depthDesc.height = height;
     depthDesc.format = nvrhi::Format::D32;
     depthDesc.isDepthStencil = true;
-    depthDesc.isTransient = true;
+    depthDesc.isImported = true;
+    depthDesc.isTransient = false;
 
-    framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
+    framegraph::VirtualResourceHandle depthBuffer = m_framegraph->ImportTexture("rt_Depth", m_sceneDepth, depthDesc);
 
-    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
     auto& gpuParticles = GetGpuParticleManager();
     auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
     if (gpuParticleState.materialCache != m_materialCache.get()) {
@@ -1419,6 +1436,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
+    passes::LocalShadowConfig localCfg;
+    if (m_blackboard && m_gpuCullingManager) {
+        localCfg.gpuCulling = m_gpuCullingManager.get();
+        localCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
+        localCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
+        localCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
+        localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+        localCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        localCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+        localCfg.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        localCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
+        localCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
+        localCfg.materialCache = m_materialCache.get();
+        passes::setupLocalShadowBinPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+            &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
+    }
+
     framegraph::VirtualResourceHandle visMotionHandle;
     framegraph::VirtualResourceHandle visDepthHandle;
     if (visActive) {
@@ -1540,23 +1574,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
 
     passes::LocalShadowOutput localShadowOut;
-    if (m_blackboard && m_gpuCullingManager) {
-        auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
-        passes::LocalShadowConfig localCfg;
-        localCfg.gpuCulling = m_gpuCullingManager.get();
-        localCfg.entryBuffer = m_gpuCullingManager->GetClusterEntryBuffer();
-        localCfg.bvhNodeBuffer = m_gpuCullingManager->GetShadowBvhNodeBuffer();
-        localCfg.bvhIndexBuffer = m_gpuCullingManager->GetShadowBvhIndexBuffer();
-        localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
-        localCfg.staticInstanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
-        localCfg.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
-        localCfg.dynamicInstanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
-        localCfg.megaVertexBuffer = clusterConfig.megaVertexBuffer;
-        localCfg.megaIndexBuffer = clusterConfig.megaIndexBuffer;
-        localCfg.materialCache = m_materialCache.get();
+    if (m_blackboard && m_gpuCullingManager)
         localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
-            &localShadowState, m_gpuProfiler.get());
-    }
+            &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
 
     auto litOutputs = passes::setupDeferredLightPass(
         *m_framegraph,

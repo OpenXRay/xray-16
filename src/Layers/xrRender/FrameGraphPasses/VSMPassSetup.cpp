@@ -2272,6 +2272,7 @@ VSMOutput setupVSMPasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::ShaderResource);
@@ -2514,6 +2515,7 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             data.atlas = passBuilder.read(state->fgAtlas, ResourceState::ShaderResource);
             if (state->dynActive) {

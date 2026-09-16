@@ -180,6 +180,11 @@ struct LocalShadowState {
     nvrhi::ShaderHandle skinPageVS;
     bool pipelinesFailed = false;
     bool resourcesFailed = false;
+    framegraph::VirtualResourceHandle fgTiles;
+    framegraph::VirtualResourceHandle fgArgs;
+    framegraph::VirtualResourceHandle fgClearArgs;
+    framegraph::VirtualResourceHandle fgDirtyList;
+    framegraph::VirtualResourceHandle fgRefreshDyn;
 };
 
 struct LocalShadowConfig {
@@ -217,6 +222,14 @@ void SelectLocalShadowLights(
     const Fvector& camPos,
     float projScale,
     const HudShadowFit* hudFit);
+
+void setupLocalShadowBinPasses(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle orderAfter,
+    const LocalShadowConfig& config,
+    LocalShadowState* state,
+    xray::profiler::GPUProfiler* gpuProfiler);
 
 LocalShadowOutput setupLocalShadowPasses(
     framegraph::FrameGraph& fg,
