@@ -32,7 +32,9 @@ cbuffer ClusterCullParams : register(b5)
     uint g_HiZHeight;
     uint g_HiZMipLevels;
     float g_SsaCull;
-    uint2 g_ClusterPad;
+    float g_SwCull;
+    float g_SwNearZ;
+    uint g_ClusterPad;
 };
 
 StructuredBuffer<ClusterEntry> g_Entries : register(t0);
@@ -44,6 +46,7 @@ RWStructuredBuffer<uint> g_OutFades : register(u2);
 RWStructuredBuffer<uint> g_OutTerrainEntryIndices : register(u3);
 RWStructuredBuffer<uint> g_OutTerrainFades : register(u4);
 RWStructuredBuffer<uint> g_OutCandidates : register(u5);
+RWStructuredBuffer<uint> g_OutSwEntries : register(u6);
 
 float ProjErr(float4 s, float e)
 {
@@ -113,6 +116,18 @@ void main(uint3 dtID : SV_DispatchThreadID)
             uint cslot;
             g_OutCount.InterlockedAdd(16, 1u, cslot);
             g_OutCandidates[cslot] = idx;
+            return;
+        }
+    }
+
+    if (fA == 63u && fB == 0u && (e.flags & 1u) == 0u && g_SwCull > 0.0)
+    {
+        float d = dot(g_ViewDir.xyz, e.sphere.xyz - g_CameraPos.xyz) - e.sphere.w;
+        if (d > g_SwNearZ && e.sphere.w <= g_SwCull * d)
+        {
+            uint swSlot;
+            g_OutCount.InterlockedAdd(40, 1u, swSlot);
+            g_OutSwEntries[swSlot] = idx;
             return;
         }
     }

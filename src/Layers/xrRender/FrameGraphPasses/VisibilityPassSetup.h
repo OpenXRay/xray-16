@@ -50,6 +50,16 @@ struct VisibilityPassState {
     nvrhi::ShaderHandle debugShader;
     nvrhi::BindingLayoutHandle debugLayout;
     nvrhi::ComputePipelineHandle debugPipeline;
+    nvrhi::ShaderHandle swShader;
+    nvrhi::BindingLayoutHandle swLayout;
+    nvrhi::ComputePipelineHandle swPipeline;
+    nvrhi::ShaderHandle swResolvePS;
+    nvrhi::BindingLayoutHandle swResolveLayout;
+    nvrhi::GraphicsPipelineHandle swResolvePipeline;
+    nvrhi::BufferHandle swVisBuffer;
+    u32 swWidth = 0;
+    u32 swHeight = 0;
+    bool swFailed = false;
     bool initialized = false;
     bool failed = false;
     bool debugFailed = false;
@@ -62,6 +72,16 @@ struct VisibilityPassOutput {
 
 bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state);
 
+framegraph::VirtualResourceHandle setupSwRasterPass(
+    framegraph::FrameGraph& fg,
+    fg::RenderDevice* device,
+    framegraph::VirtualResourceHandle drawArgsBuffer,
+    const ClusterDrawConfig& config,
+    u32 width,
+    u32 height,
+    VisibilityPassState* state,
+    framegraph::VirtualResourceHandle prevVis);
+
 VisibilityPassOutput setupVisibilityPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -69,6 +89,7 @@ VisibilityPassOutput setupVisibilityPass(
     framegraph::VirtualResourceHandle visIdTarget,
     framegraph::VirtualResourceHandle drawArgsBuffer,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
+    framegraph::VirtualResourceHandle swVis,
     const ClusterDrawConfig& config,
     MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
