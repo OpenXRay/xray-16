@@ -908,6 +908,22 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             }
             bladeIndicesUploaded = false;
         }
+        {
+            preparedBladeCapacity = std::min(visibleBufferCapacity, PREPARED_BLADE_CAPACITY);
+            nvrhi::BufferDesc desc;
+            desc.byteSize = u64(preparedBladeCapacity) * 36;
+            desc.structStride = 36;
+            desc.debugName = ("DetailPreparedLOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
+            preparedBladeBuffer[lod] = device->createBuffer(desc);
+            if (!preparedBladeBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create prepared blade buffer LOD%u", lod);
+                return false;
+            }
+        }
 
         {
             nvrhi::BufferDesc desc;
@@ -1285,6 +1301,7 @@ void FGDetailManager::DestroyGPUBuffers()
         visibleInstancesBuffer[lod] = nullptr;
         drawArgsBuffer[lod] = nullptr;
         bladeIndexBuffer[lod] = nullptr;
+        preparedBladeBuffer[lod] = nullptr;
     }
 
     slotAABBBuffer = nullptr;
@@ -2150,7 +2167,7 @@ void FGDetailManager::DispatchCulling(
     params.visibleDecalCapacity = decalCapacity;
     params.grassMode = ps_r__detail_gpu ? 1u : 0u;
     params.visibleBillboardCapacity = visibleBufferCapacity;
-    params.cullPad2 = 0;
+    params.preparedCapacity = preparedBladeCapacity;
 
     cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedCullParamsCB), &params, sizeof(params));
 
@@ -2208,19 +2225,30 @@ void FGDetailManager::DispatchCulling(
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
 
-    if (!generatedInstancesBuffer)
+    if (!generatedInstancesBuffer || !perlin4dTexture || !interactionTexture[interactionCurrent])
         return;
 
     if (gpuProfiler) gpuProfiler->BeginPass(cmdList, "DetailCull.InstanceCull");
     {
         auto* cullRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_cull", ".cs");
         framegraph::BindingSetBuilder bsb(*cullRefl, device, "Detail.Cull");
+        auto detailGlobalsCB = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(DetailFrameConstants), renderDevice);
+        DetailFrameConstants frameConstants;
+        FillFrameConstants(frameConstants);
+        cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
+        for (u32 lod = 0; lod < LOD_COUNT; lod++)
+            cmdList->setBufferState(preparedBladeBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->setTextureState(perlin4dTexture, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setTextureState(interactionTexture[interactionCurrent], nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
         bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
+           .ConstantBuffer("DetailGlobals", detailGlobalsCB)
            .BufferSRV("g_all_instances", generatedInstancesBuffer)
            .BufferSRV("g_visible_slot_ids", visibleSlotIDsBuffer)
            .BufferSRV("g_slot_aabbs", slotAABBBuffer)
            .Texture("g_hiz_pyramid", hiZPyramid)
            .BufferSRV("g_detail_models", detailModelsBuffer)
+           .Texture("g_Perlin4D", perlin4dTexture)
+           .Texture("g_Interaction", interactionTexture[interactionCurrent])
            .BufferUAV("g_visible_lod0", visibleInstancesBuffer[0])
            .BufferUAV("g_indirect_args_lod0", drawArgsBuffer[0])
            .BufferUAV("g_visible_lod1", visibleInstancesBuffer[1])
@@ -2230,7 +2258,10 @@ void FGDetailManager::DispatchCulling(
            .BufferUAV("g_visible_decals", visibleDecalInstancesBuffer)
            .BufferUAV("g_indirect_args_decal", decalDrawArgsBuffer)
            .BufferUAV("g_visible_billboard", visibleBillboardInstancesBuffer)
-           .BufferUAV("g_indirect_args_billboard", billboardDrawArgsBuffer);
+           .BufferUAV("g_indirect_args_billboard", billboardDrawArgsBuffer)
+           .BufferUAV("g_prepared_lod0", preparedBladeBuffer[0])
+           .BufferUAV("g_prepared_lod1", preparedBladeBuffer[1])
+           .BufferUAV("g_prepared_lod2", preparedBladeBuffer[2]);
 
         nvrhi::BindingSetHandle instanceCullBindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), computeBindingLayout, device);
 
@@ -2241,6 +2272,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->setComputeState(state);
 
         cmdList->dispatchIndirect(0);
+        for (u32 lod = 0; lod < LOD_COUNT; lod++)
+            cmdList->setBufferState(preparedBladeBuffer[lod], nvrhi::ResourceStates::ShaderResource);
     }
 
     if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.InstanceCull");

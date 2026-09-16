@@ -49,7 +49,8 @@ struct alignas(16) DetailResolveParams {
     u32 veinIndex;
     u32 segments[4];
     u32 interactionDebug;
-    u32 pad[3];
+    u32 preparedCapacity;
+    u32 pad[2];
 };
 
 }
@@ -194,7 +195,8 @@ MaterialResolveOutput setupDetailResolvePass(
                 params.segments[lod] = FGDetailManager::LOD_SEGMENTS[lod];
             params.segments[3] = 0;
             params.interactionDebug = ps_r3_grass_interaction_debug ? 1u : 0u;
-            params.pad[0] = params.pad[1] = params.pad[2] = 0;
+            params.preparedCapacity = dm->preparedBladeCapacity;
+            params.pad[0] = params.pad[1] = 0;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
             BindingSetBuilder bsb(*refl, nvDevice, "DetailResolve");
@@ -204,6 +206,9 @@ MaterialResolveOutput setupDetailResolvePass(
             bsb.BufferSRV("g_VisibleLod0", dm->visibleInstancesBuffer[0]);
             bsb.BufferSRV("g_VisibleLod1", dm->visibleInstancesBuffer[1]);
             bsb.BufferSRV("g_VisibleLod2", dm->visibleInstancesBuffer[2]);
+            bsb.BufferSRV("g_PreparedLod0", dm->preparedBladeBuffer[0]);
+            bsb.BufferSRV("g_PreparedLod1", dm->preparedBladeBuffer[1]);
+            bsb.BufferSRV("g_PreparedLod2", dm->preparedBladeBuffer[2]);
             bsb.BufferSRV("g_VisibleMesh", dm->visibleBillboardInstancesBuffer);
             bsb.BufferSRV("g_VisibleDecal", dm->visibleDecalInstancesBuffer);
             bsb.BufferSRV("detail_models", dm->detailModelsBuffer);

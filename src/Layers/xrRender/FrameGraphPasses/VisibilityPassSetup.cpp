@@ -69,6 +69,8 @@ struct alignas(16) DetailVisParams {
     u32 kind;
     u32 segments;
     float alphaRef;
+    u32 preparedCapacity;
+    u32 pad[3];
 };
 
 struct VisDebugViewData {
@@ -517,12 +519,13 @@ void renderVisibilityRaster(
             auto visParamsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailVisParams", sizeof(DetailVisParams), device, 64);
 
             auto drawKind = [&](const auto& psRefl, nvrhi::IBindingLayout* layout, nvrhi::IGraphicsPipeline* pipeline, const char* name,
-                                u32 kind, u32 segments, float alphaRef, nvrhi::IBuffer* list, nvrhi::IBuffer* args, nvrhi::IBuffer* indices) {
+                                u32 kind, u32 segments, float alphaRef, nvrhi::IBuffer* list, nvrhi::IBuffer* args, nvrhi::IBuffer* indices, nvrhi::IBuffer* prepared) {
                 DetailVisParams params = {};
                 params.entryBase = grassEntryBase;
                 params.kind = kind;
                 params.segments = segments;
                 params.alphaRef = alphaRef;
+                params.preparedCapacity = prepared ? detailManager->preparedBladeCapacity : 0u;
                 cmdList->writeBuffer(visParamsCB, &params, sizeof(params));
 
                 BindingSetBuilder bsb(*bladeVsRefl, psRefl, nvDevice, name);
@@ -533,6 +536,7 @@ void renderVisibilityRaster(
                 bsb.BufferSRV("detail_models", detailManager->detailModelsBuffer);
                 bsb.BufferSRV("pulled_vertices", detailManager->pulledVertexBuffer);
                 bsb.BufferSRV("all_instances", detailManager->generatedInstancesBuffer);
+                bsb.BufferSRV("prepared_blades", prepared ? prepared : detailManager->preparedBladeBuffer[0].Get());
                 bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
                 bsb.Texture("g_Interaction", detailManager->interactionTexture[detailManager->interactionCurrent]);
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
@@ -541,22 +545,23 @@ void renderVisibilityRaster(
             };
 
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod) {
-                if (!detailManager->visibleInstancesBuffer[lod] || !detailManager->drawArgsBuffer[lod] || !detailManager->bladeIndexBuffer[lod])
+                if (!detailManager->visibleInstancesBuffer[lod] || !detailManager->drawArgsBuffer[lod] || !detailManager->bladeIndexBuffer[lod] || !detailManager->preparedBladeBuffer[lod])
                     continue;
                 drawKind(*bladePsRefl, state.bladeLayout, state.bladePipeline, "VisibilityRaster.Blades",
                          lod, FGDetailManager::LOD_SEGMENTS[lod], 0.0f,
-                         detailManager->visibleInstancesBuffer[lod], detailManager->drawArgsBuffer[lod], detailManager->bladeIndexBuffer[lod].Get());
+                         detailManager->visibleInstancesBuffer[lod], detailManager->drawArgsBuffer[lod], detailManager->bladeIndexBuffer[lod].Get(),
+                         detailManager->preparedBladeBuffer[lod].Get());
             }
 
             if (pulledPsRefl && state.pulledPipeline && detailManager->maxPulledIndexCount > 0) {
                 if (detailManager->visibleBillboardInstancesBuffer && detailManager->billboardDrawArgsBuffer)
                     drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Meshes",
                              FGDetailManager::VIS_KIND_MESH, 0, 96.0f / 255.0f,
-                             detailManager->visibleBillboardInstancesBuffer, detailManager->billboardDrawArgsBuffer, nullptr);
+                             detailManager->visibleBillboardInstancesBuffer, detailManager->billboardDrawArgsBuffer, nullptr, nullptr);
                 if (detailManager->visibleDecalInstancesBuffer && detailManager->decalDrawArgsBuffer)
                     drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Patches",
                              FGDetailManager::VIS_KIND_DECAL, 0, 0.5f,
-                             detailManager->visibleDecalInstancesBuffer, detailManager->decalDrawArgsBuffer, nullptr);
+                             detailManager->visibleDecalInstancesBuffer, detailManager->decalDrawArgsBuffer, nullptr, nullptr);
             }
         }
     });

@@ -102,7 +102,7 @@ public:
         u32 visibleDecalCapacity;
         u32 grassMode;
         u32 visibleBillboardCapacity;
-        u32 cullPad2;
+        u32 preparedCapacity;
     };
 
     struct GrassObjectTint { float r, g, b, pad; };
@@ -207,6 +207,9 @@ public:
     nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
     nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
     bool bladeIndicesUploaded = false;
+    static constexpr u32 PREPARED_BLADE_CAPACITY = 1u << 17;
+    nvrhi::BufferHandle preparedBladeBuffer[LOD_COUNT];
+    u32 preparedBladeCapacity = 0;
     nvrhi::BufferHandle visibleDecalInstancesBuffer;
     nvrhi::BufferHandle decalDrawArgsBuffer;
     nvrhi::BufferHandle visibleBillboardInstancesBuffer;

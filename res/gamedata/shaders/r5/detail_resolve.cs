@@ -39,7 +39,7 @@ cbuffer DetailResolveParams : register(b5)
     uint g_VeinIndex;
     uint4 g_Segments;
     uint g_InteractionDebug;
-    uint g_ResolvePad0;
+    uint g_PreparedCapacity;
     uint g_ResolvePad1;
     uint g_ResolvePad2;
 };
@@ -58,6 +58,9 @@ StructuredBuffer<uint> g_VisibleMesh : register(t38);
 StructuredBuffer<uint> g_VisibleDecal : register(t39);
 StructuredBuffer<DetailModelGPU> detail_models : register(t40);
 StructuredBuffer<PulledVertex> pulled_vertices : register(t41);
+StructuredBuffer<PreparedBlade> g_PreparedLod0 : register(t42);
+StructuredBuffer<PreparedBlade> g_PreparedLod1 : register(t43);
+StructuredBuffer<PreparedBlade> g_PreparedLod2 : register(t44);
 RWTexture2D<float4> g_OutNormal : register(u0);
 RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
@@ -228,9 +231,20 @@ void main(uint3 dtid : SV_DispatchThreadID)
     uint segments = (lod == 0u) ? g_Segments.x : ((lod == 1u) ? g_Segments.y : g_Segments.z);
 
     DetailInstance raw = all_instances[src];
-    BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
-    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
-    BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    BladeInstance b;
+    BladeBend w;
+    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, raw.pos.xz, interaction_window);
+    if (slot < g_PreparedCapacity)
+    {
+        PreparedBlade p = (lod == 0u) ? g_PreparedLod0[slot] : ((lod == 1u) ? g_PreparedLod1[slot] : g_PreparedLod2[slot]);
+        b = BladeFromPrepared(p, raw);
+        w = BendFromPrepared(p, g_wind_direction.xy);
+    }
+    else
+    {
+        b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
+        w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    }
 
     uint lv0 = BladeTriangleVertex(tri, 0u, segments);
     uint lv1 = BladeTriangleVertex(tri, 1u, segments);
