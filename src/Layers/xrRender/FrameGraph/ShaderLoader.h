@@ -101,6 +101,7 @@ public:
 
     bool CheckForChangedFiles();
     bool ValidateChangedFiles();
+    bool ReloadChangedShaders();
     void ClearAllCaches();
 
 private:

@@ -86,6 +86,7 @@ public:
         nvrhi::IDevice* device);
 
     void Clear();
+    void ClearBindingSets();
     void ClearFramebufferDependent();
     void InvalidateTexture(const nvrhi::ITexture* texture);
 

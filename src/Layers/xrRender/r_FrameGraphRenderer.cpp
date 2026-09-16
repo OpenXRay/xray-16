@@ -408,9 +408,10 @@ void FrameGraphRenderer::Render() {
 
                     m_device->GetNVRHIDevice()->waitForIdle();
 
-                    GEnv.Render->GetShaderLoader()->ClearAllCaches();
+                    GEnv.Render->GetShaderLoader()->ReloadChangedShaders();
                     framegraph::GetPassResourceCache().Clear();
                     framegraph::BindingSetBuilder::InvalidateReflectionCache();
+
                     if (m_blackboard)
                     {
                         if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
