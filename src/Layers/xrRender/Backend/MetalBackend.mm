@@ -309,6 +309,7 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             frame.graphics.used = 0;
             frame.compute.used = 0;
         }
+        impl.currentGraphics = impl.frames[0].graphics.lists[0].Get();
         impl.uploads = impl.device->createCommandList(params);
         if (!impl.uploads) {
             impl.fail("Unable to create the Metal upload command list.");
