@@ -82,16 +82,11 @@ void SpatialBase::spatial_register()
 
 void SpatialBase::spatial_unregister()
 {
-    if (spatial.node_ptr)
+    if (spatial.node_ptr && spatial.space && spatial.space->m_alive)
     {
-        // remove
         spatial.space->remove(this);
         spatial.node_ptr = NULL;
         spatial.sector_id = IRender_Sector::INVALID_SECTOR_ID;
-    }
-    else
-    {
-        // already unregistered
     }
 }
 
@@ -158,10 +153,12 @@ ISpatial_DB::ISpatial_DB(pcstr name)
 
 {
     xr_strcpy(Name, name);
+    m_alive = true;
 }
 
 ISpatial_DB::~ISpatial_DB()
 {
+    m_alive = false;
     if (m_root)
     {
         _node_destroy(m_root);

@@ -231,6 +231,7 @@ private:
 public:
     string64 Name;
     ISpatial_NODE* m_root{};
+    bool m_alive = false;
     Fvector m_center{};
     float m_bounds{};
     xr_vector<ISpatial*>* q_result{};
