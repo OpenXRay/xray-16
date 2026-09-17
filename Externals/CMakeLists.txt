@@ -62,6 +62,11 @@ if(MSVC)
     add_compile_options(/MP)
 endif()
 add_subdirectory(slang)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang-rich-diagnostics.cpp
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang
+    PROPERTIES COMPILE_OPTIONS
+        "$<$<NOT:$<AND:$<CONFIG:Debug,Mixed>,$<CXX_COMPILER_ID:MSVC>>>:$<IF:$<CXX_COMPILER_ID:MSVC>,/O1;/Os,$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>>>"
+)
 
 if(APPLE AND NVRHI_WITH_METAL3)
     FetchContent_GetProperties(dxc_source SOURCE_DIR XRAY_DXC_SOURCE_DIR)
