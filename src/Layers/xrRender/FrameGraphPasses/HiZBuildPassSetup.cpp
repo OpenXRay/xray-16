@@ -261,7 +261,7 @@ HiZPyramidOutput setupHiZBuildPass(
 
             // Final state: transition entire pyramid to ShaderResource for culling pass
             cmdList->setTextureState(hizTexture, nvrhi::AllSubresources,
-                nvrhi::ResourceStates::ShaderResource);
+                nvrhi::ResourceStates::NonPixelShaderResource);
         }
     );
 

@@ -154,7 +154,7 @@ struct GpuParticleManager::Impl {
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = indirect;
         desc.keepInitialState = true;
-        desc.initialState = uav ? nvrhi::ResourceStates::UnorderedAccess : nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = uav ? nvrhi::ResourceStates::UnorderedAccess : nvrhi::ResourceStates::NonPixelShaderResource;
         desc.debugName = name;
         auto replacement = device->createBuffer(desc);
         R_ASSERT2(replacement,"GPU PAPI buffer allocation failed");

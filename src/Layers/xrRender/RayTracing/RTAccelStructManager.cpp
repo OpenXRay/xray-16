@@ -517,7 +517,7 @@ void RTAccelStructManager::CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, G
     desc.debugName = "RTBatchInfoBuffer";
     desc.byteSize = batchInfos.size() * sizeof(RTBatchInfo);
     desc.structStride = sizeof(RTBatchInfo);
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     desc.keepInitialState = true;
 
     m_batchInfoBuffer = nvDevice->createBuffer(desc);

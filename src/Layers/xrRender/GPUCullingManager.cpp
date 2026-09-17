@@ -238,7 +238,7 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
         desc.debugName = name;
         desc.byteSize = u64(count) * sizeof(GPUInstanceData);
         desc.structStride = sizeof(GPUInstanceData);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         nvrhi::BufferHandle buffer = nvDevice->createBuffer(desc);
         R_ASSERT2(buffer, name);
@@ -269,7 +269,7 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
         fadeDesc.debugName = "ClusterCull_NeutralFade";
         fadeDesc.byteSize = sizeof(u32);
         fadeDesc.structStride = sizeof(u32);
-        fadeDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        fadeDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         fadeDesc.keepInitialState = true;
         m_neutralFadeBuffer = nvDevice->createBuffer(fadeDesc);
         m_neutralFadeZeroed = false;
@@ -282,7 +282,7 @@ void GPUCullingManager::CreateBuffers(fg::RenderDevice* device)
         desc.height = 1;
         desc.format = nvrhi::Format::R32_FLOAT;
         desc.isShaderResource = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         m_dummyHiZ = nvDevice->createTexture(desc);
     }
@@ -338,7 +338,7 @@ void GPUCullingManager::CreateSkinnedBuffers(fg::RenderDevice* device)
         desc.debugName = "GPUCull_SkinnedEntries";
         desc.byteSize = u64(SKINNED_ENTRY_CAPACITY) * sizeof(GPUClusterEntry);
         desc.structStride = sizeof(GPUClusterEntry);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         m_skinnedEntryBuffer = nvDevice->createBuffer(desc);
         m_skinnedEntryCapacity = m_skinnedEntryBuffer ? SKINNED_ENTRY_CAPACITY : 0;
@@ -846,7 +846,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         cmdList->writeBuffer(m_terrainInstanceBuffer,
             m_terrainInstanceData.data(),
             m_terrainObjectCount * sizeof(GPUInstanceData));
-        cmdList->setBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
         m_terrainDataCached = true;
         Msg("* [GPUCulling] Terrain data cached: %u objects", m_terrainObjectCount);
@@ -866,7 +866,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
         cmdList->writeBuffer(m_transparentInstanceBuffer,
             m_transparentInstanceData.data(),
             m_transparentObjectCount * sizeof(GPUInstanceData));
-        cmdList->setBufferState(m_transparentInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(m_transparentInstanceBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
     }
 }
 
@@ -2071,7 +2071,7 @@ void GPUCullingManager::CreateMegaBuffers()
         desc.debugName = "MegaVertexBuffer";
         desc.byteSize = m_totalVertexCount * sizeof(bindless::UnifiedVertex);
         desc.isVertexBuffer = true;  // Required for D3D11 vertex buffer binding
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         desc.canHaveRawViews = true;
         desc.isAccelStructBuildInput = nvDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct);
@@ -2091,7 +2091,7 @@ void GPUCullingManager::CreateMegaBuffers()
         nvrhi::BufferDesc desc;
         desc.debugName = "MegaIndexBuffer";
         desc.byteSize = m_totalIndexCount * sizeof(u32);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         desc.isIndexBuffer = true;
         desc.canHaveRawViews = true;
@@ -2112,7 +2112,7 @@ void GPUCullingManager::CreateMegaBuffers()
         desc.debugName = "GPUCull_DynamicPrevWorld";
         desc.byteSize = m_maxObjects * sizeof(Fmatrix);
         desc.structStride = sizeof(Fmatrix);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         m_dynamicPrevWorldBuffer = nvDevice->createBuffer(desc);
         R_ASSERT2(m_dynamicPrevWorldBuffer, "Failed to create dynamic previous-world buffer");
@@ -2530,7 +2530,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
         desc.debugName = "ClusterCull_Entries";
         desc.byteSize = u64(n + kDynamicClusterEntryCapacity) * sizeof(GPUClusterEntry);
         desc.structStride = sizeof(GPUClusterEntry);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         m_clusterSet.entryBuffer = nvDevice->createBuffer(desc);
     }
@@ -2588,7 +2588,7 @@ void GPUCullingManager::UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi
         desc.debugName = "ClusterCull_ShadowBvhNodes";
         desc.byteSize = u64(m_clusterSet.bvhNodeCount) * sizeof(ClusterBvhNode);
         desc.structStride = sizeof(ClusterBvhNode);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         m_clusterSet.bvhNodeBuffer = nvDevice->createBuffer(desc);
         desc.debugName = "ClusterCull_ShadowBvhIndices";
@@ -2762,7 +2762,7 @@ void GPUCullingManager::DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi:
     cb.swCountOffset = swCountOffset;
     cmdList->writeBuffer(m_device->GetNativeBuffer(m_clusterArgsParamsCB), &cb, sizeof(cb));
 
-    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.countBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(args, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(terrainArgs, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(swArgs, nvrhi::ResourceStates::UnorderedAccess);
@@ -2866,12 +2866,12 @@ void GPUCullingManager::DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi:
     cmdList->setComputeState(state);
     cmdList->dispatch((entryCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE, 1, 1);
 
-    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(m_clusterSet.swEntryBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(m_clusterSet.visibleEntryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(m_clusterSet.fadeBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(m_clusterSet.terrainVisibleEntryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(m_clusterSet.terrainFadeBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(m_clusterSet.candidateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(m_clusterSet.swEntryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
     DispatchClusterArgs(cmdList, nvDevice, 0, 40, m_clusterArgsBuffer, m_clusterTerrainArgsBuffer, m_clusterSwArgsBuffer);
 }

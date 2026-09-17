@@ -1142,7 +1142,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         desc.format = nvrhi::Format::R32_FLOAT;
         desc.isShaderResource = true;
         desc.isUAV = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         for (int i = 0; i < 2; i++) {
             desc.debugName = (i == 0) ? "HiZ_A" : "HiZ_B";

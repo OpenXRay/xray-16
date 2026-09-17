@@ -282,7 +282,7 @@ void renderSwRaster(fg::RenderContext* ctx, const SwRasterPassData& data)
     const ClusterDrawConfig& config = data.config;
     cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(config.swArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(config.swEntryBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(config.swEntryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
     BindingSetBuilder bsb(*refl, nvDevice, "VisibilityRaster.Sw");
     bsb.ConstantBuffer("static_globals", staticGlobalsCB);
@@ -305,7 +305,7 @@ void renderSwRaster(fg::RenderContext* ctx, const SwRasterPassData& data)
     cs.indirectParams = config.swArgsBuffer;
     cmdList->setComputeState(cs);
     cmdList->dispatchIndirect(0);
-    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 }
 
 bool ensureSwGrassResources(fg::RenderDevice* device, VisibilityPassState& state)

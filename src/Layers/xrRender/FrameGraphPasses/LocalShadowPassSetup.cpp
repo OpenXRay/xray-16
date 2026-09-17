@@ -201,7 +201,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
         desc.debugName = name;
         desc.byteSize = bytes;
         desc.structStride = stride;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         return nvDevice->createBuffer(desc);
     };
@@ -395,7 +395,7 @@ void BuildLocalShadowArgs(fg::RenderContext* ctx, fg::RenderDevice* device, Loca
     ap.caps[6] = mode;
     auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "ArgsParams", sizeof(ap), device, 1024);
     cmdList->writeBuffer(cb, &ap, sizeof(ap));
-    cmdList->setBufferState(state.stats, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.stats, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.args, nvrhi::ResourceStates::UnorderedAccess);
     BindingSetBuilder bsb(*reflection, nvDevice, "LocalShadow.Args");
     bsb.ConstantBuffer("LocalShadowArgsParams", cb).BufferSRV("g_Stats", state.stats).BufferUAV("g_Args", state.args);
@@ -523,8 +523,8 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     cmdList->writeBuffer(state.requestBuffer, state.request, sizeof(state.request));
     cmdList->writeBuffer(state.candListBuffer, state.candList, sizeof(state.candList));
     cmdList->clearBufferUInt(state.stats, 0);
-    cmdList->setBufferState(state.requestBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.candListBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.requestBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.candListBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.stats, nvrhi::ResourceStates::UnorderedAccess);
     for (u32 i = 0; i < kLocalStreamCount; ++i)
         cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::UnorderedAccess);
@@ -545,11 +545,11 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
 
     bool counted = false;
     if (haveEntries && state.candCount > 0) {
-        cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
         cmdList->setBufferState(state.tileCount, nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setBufferState(cfg.entryBuffer, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(cfg.bvhNodeBuffer, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(cfg.bvhIndexBuffer, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(cfg.entryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(cfg.bvhNodeBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(cfg.bvhIndexBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
         BindingSetBuilder cbs(*countRefl, nvDevice, "LocalShadow.BinCount");
         cbs.ConstantBuffer("LocalShadowBinParams", binCB)
            .BufferSRV("g_Entries", cfg.entryBuffer)
@@ -574,7 +574,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
         cmdList->clearBufferUInt(state.tileCount, 0);
     }
 
-    cmdList->setBufferState(state.tileCount, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.tileCount, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
@@ -609,9 +609,9 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     }
 
     if (haveEntries) {
-        cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::NonPixelShaderResource);
         cmdList->setBufferState(state.emitArgs, nvrhi::ResourceStates::IndirectArgument);
         BindingSetBuilder ebs(*emitRefl, nvDevice, "LocalShadow.BinEmit");
         ebs.ConstantBuffer("LocalShadowBinParams", binCB)
@@ -637,19 +637,19 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
         }
     }
 
-    cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.stats, nvrhi::ResourceStates::UnorderedAccess);
 
     BuildLocalShadowArgs(ctx, data.device, state, 0u);
 
     for (u32 i = 0; i < kLocalStreamCount; ++i)
-        cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.args, nvrhi::ResourceStates::IndirectArgument);
     cmdList->setBufferState(state.clearArgs, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.refreshDynBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
 
     if (data.gpuProfiler)
