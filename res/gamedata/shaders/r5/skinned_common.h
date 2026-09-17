@@ -123,7 +123,7 @@ float4 sample_decal_stamp(PaintSplat splat, float2 meshUV)
 
     float2 stampUV = (meshUV - uvMin) / max(2.0 * splat.uvRadius, 1e-5);
     MaterialData wallmarkMat = g_Materials[splat.wallmarkMaterialID];
-    return SampleDiffuse(wallmarkMat, stampUV);
+    return SampleDiffuseLevel(wallmarkMat, stampUV);
 }
 
 float4 sample_procedural_blood(PaintSplat splat, float2 meshUV)
