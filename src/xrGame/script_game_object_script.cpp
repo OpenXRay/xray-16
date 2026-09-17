@@ -71,6 +71,7 @@ void CScriptGameObject::script_register(lua_State* luaState)
                 value("patrol_path_in_point", int(GameObject::ePatrolPathInPoint)),
                 value("inventory_pda", int(GameObject::eInventoryPda)),
                 value("inventory_info", int(GameObject::eInventoryInfo)),
+                value("inventory_info_removed", int(GameObject::eInventoryInfoRemoved)),
                 value("article_info", int(GameObject::eArticleInfo)),
                 value("task_state", int(GameObject::eTaskStateChange)),
                 value("map_location_added", int(GameObject::eMapLocationAdded)),

@@ -249,48 +249,6 @@ void CEnvAmbient::load(
 //-----------------------------------------------------------------------------
 // Environment descriptor
 //-----------------------------------------------------------------------------
-CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(identifier)
-{
-    dont_save = false;
-
-    exec_time = 0.0f;
-    exec_time_loaded = 0.0f;
-
-    clouds_color.set(1, 1, 1, 1);
-    sky_color.set(1, 1, 1);
-    sky_rotation = 0.0f;
-
-    far_plane = 400.0f;
-    ;
-
-    fog_color.set(1, 1, 1);
-    fog_density = 0.0f;
-    fog_distance = 400.0f;
-
-    rain_density = 0.0f;
-    rain_color.set(0, 0, 0);
-
-    bolt_period = 0.0f;
-    bolt_duration = 0.0f;
-
-    wind_velocity = 0.0f;
-    wind_direction = 0.0f;
-
-    ambient.set(0, 0, 0);
-    hemi_color.set(1, 1, 1, 1);
-    sun_color.set(1, 1, 1);
-    sun_dir.set(0, -1, 0);
-    use_dynamic_sun_dir = true;
-
-    m_fSunShaftsIntensity = 0;
-    m_fWaterIntensity = 1;
-
-    lens_flare = nullptr;
-    thunderbolt = nullptr;
-
-    env_ambient = nullptr;
-}
-
 #define C_CHECK(C)                                                           \
     if (C.x < 0 || C.x > 2 || C.y < 0 || C.y > 2 || C.z < 0 || C.z > 2)      \
     {                                                                        \

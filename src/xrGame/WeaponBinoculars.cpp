@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "WeaponBinoculars.h"
 
+#include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_level_controller.h"
 
 #include "Level.h"
@@ -23,7 +24,9 @@ void CWeaponBinoculars::Load(LPCSTR section)
     // Sounds
     m_sounds.LoadSound(section, "snd_zoomin", "sndZoomIn", false, SOUND_TYPE_ITEM_USING);
     m_sounds.LoadSound(section, "snd_zoomout", "sndZoomOut", false, SOUND_TYPE_ITEM_USING);
-    m_bVision = !!pSettings->r_bool(section, "vision_present");
+    m_bVision = pSettings->r_bool(section, "vision_present");
+    if (fis_zero(pSettings->read_if_exists<float>(section, "vis_frame_speed", 0.0f)))
+        m_bVision = false;
 }
 
 bool CWeaponBinoculars::Action(u16 cmd, u32 flags)
@@ -43,9 +46,8 @@ void CWeaponBinoculars::OnZoomIn()
         m_sounds.StopSound("sndZoomOut");
         bool b_hud_mode = (Level().CurrentEntity() == H_Parent());
         m_sounds.PlaySound("sndZoomIn", H_Parent()->Position(), H_Parent(), b_hud_mode);
-        if (m_bVision && !m_binoc_vision)
+        if (m_bVision && !m_binoc_vision && psHUD_Flags.test(HUD_BINOCULAR_VISION))
         {
-            //.VERIFY			(!m_binoc_vision);
             m_binoc_vision = xr_new<CBinocularsVision>(cNameSect());
         }
     }
@@ -82,7 +84,7 @@ void CWeaponBinoculars::UpdateCL()
 {
     inherited::UpdateCL();
     // manage visible entities here...
-    if (H_Parent() && IsZoomed() && !IsRotatingToZoom() && m_binoc_vision)
+    if (H_Parent() && IsZoomed() && !IsRotatingToZoom() && m_binoc_vision && psHUD_Flags.test(HUD_BINOCULAR_VISION))
         m_binoc_vision->Update();
 }
 
@@ -94,7 +96,8 @@ bool CWeaponBinoculars::render_item_ui_query()
 
 void CWeaponBinoculars::render_item_ui()
 {
-    m_binoc_vision->Draw();
+    if (psHUD_Flags.test(HUD_BINOCULAR_VISION) && m_binoc_vision)
+        m_binoc_vision->Draw();
     inherited::render_item_ui();
 }
 

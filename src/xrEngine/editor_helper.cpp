@@ -18,13 +18,13 @@ bool CascadingCollapsingHeader(cpcstr label, ImGuiTreeNodeFlags flags)
     else
         seed = window->GetID("CascadingCollapsingHeader");
 
-    ImGuiID id = ImHashStr(label, 0, seed);
+    ImGuiID storage_id = ImHashStr(label, 0, seed);
 #ifndef IMGUI_DISABLE_DEBUG_TOOLS
     ImGuiContext& g = *window->Ctx;
-    if (g.DebugHookIdInfoId == id)
-        ImGui::DebugHookIdInfo(id, ImGuiDataType_String, label, nullptr);
+    if (g.DebugHookIdInfoId == storage_id)
+        ImGui::DebugHookIdInfo(storage_id, ImGuiDataType_String, label, nullptr);
 #endif
-    ImGui::SetNextItemStorageID(id);
+    ImGui::SetNextItemStorageID(storage_id);
 
     return ImGui::CollapsingHeader(label, flags);
 }

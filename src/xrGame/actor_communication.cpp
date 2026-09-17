@@ -163,7 +163,14 @@ bool CActor::OnReceiveInfo(shared_str info_id) const
 
 void CActor::OnDisableInfo(shared_str info_id) const
 {
+    const bool wasPresent = HasInfo(info_id);
+
     CInventoryOwner::OnDisableInfo(info_id);
+
+    if (wasPresent)
+    {
+        callback(GameObject::eInventoryInfoRemoved)(lua_game_object(), info_id.c_str());
+    }
 
     if (!CurrentGameUI())
         return;

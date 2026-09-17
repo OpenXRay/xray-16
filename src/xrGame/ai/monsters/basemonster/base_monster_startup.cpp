@@ -313,6 +313,8 @@ void CBaseMonster::reinit()
 
 bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
 {
+    CInventoryOwner::SetMonsterCommunity();
+
     if (!inherited::net_Spawn(DC))
         return (FALSE);
 
@@ -321,8 +323,6 @@ bool CBaseMonster::net_Spawn(CSE_Abstract* DC)
         "There is no AI-Map, level graph, cross table, or graph is not compiled into the game graph!");
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
     settings_overrides();
-
-    CInventoryOwner::SetMonsterCommunity();
 
     if (GetScriptControl())
     {
