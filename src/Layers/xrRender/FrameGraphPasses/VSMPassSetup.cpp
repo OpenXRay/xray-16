@@ -865,7 +865,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     const u32 mw = (data.width + markStep - 1) / markStep;
     const u32 mh = (data.height + markStep - 1) / markStep;
     cmdList->dispatch((mw + 7) / 8, (mh + 7) / 8, 1);
-    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::NonPixelShaderResource);
 }
 
 void ExecuteResid(fg::RenderContext* ctx, const VSMResidData& data)
@@ -1030,10 +1030,10 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
         cmdList->setBufferState(state.binArgs, nvrhi::ResourceStates::IndirectArgument);
 
         if (haveEntries) {
-            cmdList->setBufferState(state.candList, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.candList, nvrhi::ResourceStates::NonPixelShaderResource);
             cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::UnorderedAccess);
-            cmdList->setBufferState(data.config.bvhNodeBuffer, nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(data.config.bvhIndexBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(data.config.bvhNodeBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+            cmdList->setBufferState(data.config.bvhIndexBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
             BindingSetBuilder cbs(*countRefl, nvDevice, "VSM.BinCount");
             cbs.ConstantBuffer("VsmParams", vsmCB)
                .ConstantBuffer("VsmBinParams", binCB)
@@ -1056,8 +1056,8 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
             cmdList->clearBufferUInt(state.pageCount, 0);
         }
 
-        cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setBufferState(state.candList, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.pageCount, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(state.candList, nvrhi::ResourceStates::NonPixelShaderResource);
         cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::UnorderedAccess);
         cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::UnorderedAccess);
@@ -1096,9 +1096,9 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
 
         if (haveEntries) {
             cmdList->setBufferState(state.emitArgs, nvrhi::ResourceStates::IndirectArgument);
-            cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::NonPixelShaderResource);
+            cmdList->setBufferState(state.pairBase, nvrhi::ResourceStates::NonPixelShaderResource);
+            cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::NonPixelShaderResource);
             BindingSetBuilder bsb(*binRefl, nvDevice, "VSM.Bin");
             bsb.ConstantBuffer("VsmParams", vsmCB)
                .ConstantBuffer("VsmBinParams", binCB)
@@ -1132,7 +1132,7 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     cmdList->writeBuffer(argsCB, &ap, sizeof(ap));
     for (u32 i = 0; i < kVSMStreamCount; ++i)
         cmdList->setBufferState(state.pageArgs[i], nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.binStats, nvrhi::ResourceStates::NonPixelShaderResource);
 
     BindingSetBuilder abs(*argsRefl, nvDevice, "VSM.Args");
     abs.ConstantBuffer("VsmArgsParams", argsCB)
@@ -1150,15 +1150,15 @@ void ExecuteBin(fg::RenderContext* ctx, const VSMBinData& data)
     }
 
     cmdList->setBufferState(state.drawClear, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dirtyList, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.pageTable, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.pageList, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.slotDirty, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.slotPivot, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.slotSun, nvrhi::ResourceStates::NonPixelShaderResource);
     for (u32 i = 0; i < kVSMStreamCount; ++i) {
         cmdList->setBufferState(state.pageArgs[i], nvrhi::ResourceStates::IndirectArgument);
-        cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.pairs[i], nvrhi::ResourceStates::NonPixelShaderResource);
     }
 }
 
@@ -1409,7 +1409,7 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.needed, nvrhi::ResourceStates::NonPixelShaderResource);
 
     auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     GPUCullingManager& gpuCulling = *data.config.gpuCulling;
@@ -1422,7 +1422,7 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
         tp.includeAT = ps_r_vsm_at ? 1u : 0u;
         auto touchCB = cache.GetOrCreateVolatileCB("VSM", "DynTouchParams", sizeof(VsmDynBinParams), data.device, 64);
         cmdList->writeBuffer(touchCB, &tp, sizeof(tp));
-        cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(entries, nvrhi::ResourceStates::NonPixelShaderResource);
         BindingSetBuilder tbs(*touchRefl, nvDevice, label);
         tbs.ConstantBuffer("VsmParams", vsmCB)
            .ConstantBuffer("VsmDynBinParams", touchCB)
@@ -1455,8 +1455,8 @@ void ExecuteDynAlloc(fg::RenderContext* ctx, const VSMDynAllocData& data)
     cmdList->setComputeState(cs);
     cmdList->dispatch((kVSMPageCount + 63) / 64, 1, 1);
 
-    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.dynPageList, nvrhi::ResourceStates::NonPixelShaderResource);
 }
 
 void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
@@ -1475,7 +1475,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
         return;
 
     cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::NonPixelShaderResource);
     for (u32 i = 0; i < kVSMDynStreamCount; ++i)
         cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::UnorderedAccess);
 
@@ -1495,7 +1495,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
         bp.statsBase = statsBase;
         auto binCB = cache.GetOrCreateVolatileCB("VSM", "DynBinParams", sizeof(VsmDynBinParams), data.device, 64);
         cmdList->writeBuffer(binCB, &bp, sizeof(bp));
-        cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(entries, nvrhi::ResourceStates::NonPixelShaderResource);
 
         BindingSetBuilder bsb(*binRefl, nvDevice, label);
         bsb.ConstantBuffer("VsmParams", vsmCB)
@@ -1528,8 +1528,8 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
     for (u32 i = 0; i < kVSMDynStreamCount; ++i)
         cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::UnorderedAccess);
     cmdList->setBufferState(state.dynClearArgs, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(state.dynAllocInfo, nvrhi::ResourceStates::NonPixelShaderResource);
 
     BindingSetBuilder abs(*argsRefl, nvDevice, "VSM.DynArgs");
     abs.ConstantBuffer("VsmDynArgsParams", argsCB)
@@ -1550,7 +1550,7 @@ void ExecuteDynBin(fg::RenderContext* ctx, const VSMDynBinData& data)
 
     for (u32 i = 0; i < kVSMDynStreamCount; ++i) {
         cmdList->setBufferState(state.dynArgs[i], nvrhi::ResourceStates::IndirectArgument);
-        cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(state.dynPairs[i], nvrhi::ResourceStates::NonPixelShaderResource);
     }
     cmdList->setBufferState(state.dynClearArgs, nvrhi::ResourceStates::IndirectArgument);
 }
@@ -1893,7 +1893,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     auto resolveCB = cache.GetOrCreateVolatileCB("VSM", "ResolveParams", sizeof(VsmResolveParams), data.device);
     cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
 
-    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::NonPixelShaderResource);
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resolve");
     bsb.ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmResolveParams", resolveCB)

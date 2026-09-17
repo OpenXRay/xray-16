@@ -175,7 +175,7 @@ struct CollisionBuffer
         description.byteSize = std::max<u64>(bytes, buffer ? buffer->getDesc().byteSize * 2 : bytes);
         description.structStride = sizeof(T);
         description.debugName = name;
-        description.initialState = nvrhi::ResourceStates::ShaderResource;
+        description.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         description.keepInitialState = true;
         buffer = device->createBuffer(description);
         R_ASSERT2(buffer, "GPU particle collision buffer allocation failed");

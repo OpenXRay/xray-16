@@ -33,7 +33,7 @@ void ClusteredLightManager::Initialize(fg::RenderDevice* device)
         desc.byteSize = INITIAL_LIGHT_CAPACITY * sizeof(GPULightData);
         desc.structStride = sizeof(GPULightData);
         desc.debugName = "ClusteredLights_LightData";
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         desc.canHaveTypedViews = false;
         desc.canHaveUAVs = false;

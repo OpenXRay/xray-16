@@ -21,7 +21,7 @@ bool GPUStructuredBuffer<T>::Initialize(fg::RenderDevice* device, const char* de
     desc.debugName = debugName;
     desc.byteSize = maxElements * sizeof(T);
     desc.structStride = sizeof(T);
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     desc.keepInitialState = true;
 
     m_buffer = device->GetNVRHIDevice()->createBuffer(desc);

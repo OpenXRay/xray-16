@@ -228,7 +228,7 @@ HiZPyramidOutput setupHiZBuildPass(
             }
 
             cmdList->setTextureState(hizTexture, nvrhi::AllSubresources,
-                nvrhi::ResourceStates::ShaderResource);
+                nvrhi::ResourceStates::NonPixelShaderResource);
         }
     );
 
