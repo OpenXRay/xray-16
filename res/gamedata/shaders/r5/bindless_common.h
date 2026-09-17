@@ -134,10 +134,8 @@ StructuredBuffer<VariantData> g_Variants : register(t23);
 #include "common_samplers.h"
 #endif
 
-// ═══════════════════════════════════════════════════════
-//  VARIANT TEXTURE SAMPLING
-// ═══════════════════════════════════════════════════════
 
+#ifndef BINDLESS_NO_IMPLICIT_GRAD
 float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
 {
     uint texIdx = g_VariantTextures[materialID].tex[slot];
@@ -147,22 +145,14 @@ float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
     return tex.Sample(smp_linear, uv);
 }
 
-// ═══════════════════════════════════════════════════════
-//  TEXTURE SAMPLING
-// ═══════════════════════════════════════════════════════
-
-// ─────────────────────────────────────────────────────
-//  DIFFUSE SAMPLING
-// ─────────────────────────────────────────────────────
-
 float4 SampleDiffuse(MaterialData mat, float2 uv)
 {
     if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
-        return float4(1, 0, 1, 1);  // Magenta for missing
-
+        return float4(1, 0, 1, 1);
     Texture2D tex = GetBindlessTexture(mat.diffuseIndex);
     return tex.Sample(smp_linear, uv);
 }
+#endif
 
 float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
 {
@@ -171,10 +161,6 @@ float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
     return GetBindlessTexture(mat.diffuseIndex).SampleLevel(smp_linear, uv, 0);
 }
 
-// ─────────────────────────────────────────────────────
-//  NORMAL SAMPLING
-// ─────────────────────────────────────────────────────
-
 struct BumpSample
 {
     float3 normal;
@@ -182,7 +168,6 @@ struct BumpSample
     float variance;
 };
 
-// X-Ray bump format: R=glossiness, G=normalZ, B=normalY(DX), A=normalX; mips keep the mean length
 BumpSample DecodeBump(float4 Nu)
 {
     float3 n = float3(Nu.a, Nu.b, Nu.g) * 2.0 - 1.0;
@@ -196,6 +181,7 @@ BumpSample DecodeBump(float4 Nu)
 
 static const float4 BUMP_FLAT = float4(0.0, 1.0, 0.5, 0.5);
 
+#ifndef BINDLESS_NO_IMPLICIT_GRAD
 BumpSample SampleNormal(MaterialData mat, float2 uv)
 {
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
@@ -203,30 +189,21 @@ BumpSample SampleNormal(MaterialData mat, float2 uv)
     return DecodeBump(GetBindlessTexture(mat.normalIndex).Sample(smp_linear, uv));
 }
 
-// ─────────────────────────────────────────────────────
-//  DETAIL SAMPLING
-// ─────────────────────────────────────────────────────
-
 float4 SampleDetail(MaterialData mat, float2 uv)
 {
     if (mat.detailIndex == INVALID_TEXTURE_INDEX)
-        return float4(0.5, 0.5, 0.5, 0.5);  // Neutral detail
-
+        return float4(0.5, 0.5, 0.5, 0.5);
     Texture2D tex = GetBindlessTexture(mat.detailIndex);
     return tex.Sample(smp_linear, uv * mat.detailScale);
 }
 
-// ─────────────────────────────────────────────────────
-//  PBR SAMPLING
-// ─────────────────────────────────────────────────────
-
 float3 SamplePBR(MaterialData mat, float2 uv)
 {
     if (mat.pbrIndex == INVALID_TEXTURE_INDEX)
-        return float3(0.0, 0.5, 1.0);  // Default: non-metallic, medium rough, full AO
-
+        return float3(0.0, 0.5, 1.0);
     Texture2D tex = GetBindlessTexture(mat.pbrIndex);
     return tex.Sample(smp_linear, uv).rgb;
 }
+#endif
 
 #endif // BINDLESS_COMMON_H
