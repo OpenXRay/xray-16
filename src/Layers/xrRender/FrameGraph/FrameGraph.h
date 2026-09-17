@@ -202,6 +202,7 @@ private:
     Statistics m_stats;
 
     void BuildDependencyGraph();
+    void KeepDepthReadersOnGraphicsQueue();
     void ValidateAsyncPasses();
     void CullUnusedPasses();
     void ResolveUsage();
