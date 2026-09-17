@@ -524,6 +524,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
     features2.features.multiViewport = VK_TRUE;
     features2.features.shaderClipDistance = VK_TRUE;
+    features2.features.textureCompressionBC = VK_TRUE;
 
     VkDeviceCreateInfo deviceCreateInfo = {};
     deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -561,6 +562,7 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMPF(shaderStorageImageWriteWithoutFormat);
         CLAMPF(multiViewport);
         CLAMPF(shaderClipDistance);
+        CLAMPF(textureCompressionBC);
 #undef CLAMPF
         if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");

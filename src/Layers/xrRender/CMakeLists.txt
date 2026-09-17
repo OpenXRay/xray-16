@@ -293,6 +293,8 @@ target_sources(xrRender PRIVATE
     ../../../Externals/meshoptimizer/src/vertexcodec.cpp
     ../../../Externals/meshoptimizer/src/vertexfilter.cpp
     ../../../Externals/meshoptimizer/src/vfetchoptimizer.cpp
+    ../../../Externals/bc7enc_rdo/bc7enc.cpp
+    ../../../Externals/bc7enc_rdo/bc7decomp.cpp
 
     ./Blender.cpp
     ./Blender_Recorder.cpp
@@ -386,6 +388,13 @@ if(APPLE AND NVRHI_WITH_METAL3)
         target_link_libraries(xrRender PRIVATE nvrhi_metal3)
     endif()
 endif()
+set_source_files_properties(
+    ../../../Externals/bc7enc_rdo/bc7enc.cpp
+    ../../../Externals/bc7enc_rdo/bc7decomp.cpp
+    PROPERTIES
+    SKIP_PRECOMPILE_HEADERS ON
+    SKIP_UNITY_BUILD_INCLUSION ON
+)
 
 target_include_directories(xrRender
     PRIVATE

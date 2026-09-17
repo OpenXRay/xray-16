@@ -57,3 +57,6 @@
 	path = Externals/MoltenVK
 	url = https://github.com/KhronosGroup/MoltenVK.git
 	branch = main
+[submodule "Externals/bc7enc_rdo"]
+	path = Externals/bc7enc_rdo
+	url = https://github.com/richgel999/bc7enc_rdo.git

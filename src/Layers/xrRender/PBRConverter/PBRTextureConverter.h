@@ -177,6 +177,8 @@ bool ConvertTexturesToPBR(
 
 void ShutdownAIPipeline();
 
+u32 RecompressPBROutputs(const TextureInventory& inventory, const PBRConversionParams& params);
+
 // ══════════════════════════════════════════════════════════
 //  PBR TEXTURE CONSOLIDATION
 // ══════════════════════════════════════════════════════════

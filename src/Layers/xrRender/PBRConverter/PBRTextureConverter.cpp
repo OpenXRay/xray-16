@@ -9,6 +9,8 @@
 #include "xrCore/Threading/ParallelFor.hpp"
 #include "Layers/xrRender/ResourceManager/DDSLoader.h"
 #include "Layers/xrRender/ETextureParams.h"  // For .thm file support
+#include "../../../Externals/bc7enc_rdo/bc7enc.h"
+#include "../../../Externals/bc7enc_rdo/bc7decomp.h"
 #include <atomic>
 #include <algorithm>
 #include <cmath>
@@ -158,8 +160,27 @@ static xr_vector<u8> DecompressDDS(const resources::DDSData& ddsData, u32& outWi
         return result;
     }
 
+    if (ddsData.desc.format == nvrhi::Format::BC7_UNORM) {
+        const u32 blocksX = (outWidth + 3) / 4;
+        const u32 blocksY = (outHeight + 3) / 4;
+        for (u32 by = 0; by < blocksY; ++by) {
+            for (u32 bx = 0; bx < blocksX; ++bx) {
+                bc7decomp::color_rgba block[16];
+                bc7decomp::unpack_bc7(mip0.data + (by * blocksX + bx) * 16, block);
+                for (u32 py = 0; py < 4 && (by * 4 + py) < outHeight; ++py) {
+                    for (u32 px = 0; px < 4 && (bx * 4 + px) < outWidth; ++px) {
+                        const bc7decomp::color_rgba& c = block[py * 4 + px];
+                        u8* dst = result.data() + ((by * 4 + py) * outWidth + (bx * 4 + px)) * 4;
+                        dst[0] = c.r; dst[1] = c.g; dst[2] = c.b; dst[3] = c.a;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     if (!isDXT1 && !isDXT5) {
-        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5/RGBA8/R8 supported)", static_cast<int>(ddsData.desc.format));
+        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5/BC7/RGBA8/R8 supported)", static_cast<int>(ddsData.desc.format));
         return result;
     }
 
@@ -296,38 +317,192 @@ static xr_vector<u8> GenerateBumpMipLevel(const u8* src, u32 srcWidth, u32 srcHe
     return dst;
 }
 
-static bool WriteNormalMapDDS(
-    const char* root_alias,
-    const xr_string& relative_path,
-    const xr_vector<u8>& normalRGBA,
-    u32 width, u32 height)
-{
-    using namespace resources;
+// ══════════════════════════════════════════════════════════
+//  HELPER: Write Single-Channel DDS (Phase 2.5.2)
+// ══════════════════════════════════════════════════════════
+// Writes R8 format DDS file (single channel, 8-bit)
 
-    u32 mipCount = 1;
-    for (u32 w = width, h = height; w > 1 || h > 1; ++mipCount) {
+static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHeight, u32 channels) {
+    // Box filter downsample by 2x2
+    const u32 dstWidth = std::max(srcWidth / 2, 1u);
+    const u32 dstHeight = std::max(srcHeight / 2, 1u);
+    xr_vector<u8> dstData(dstWidth * dstHeight * channels);
+
+    for (u32 y = 0; y < dstHeight; ++y) {
+        for (u32 x = 0; x < dstWidth; ++x) {
+            // Sample 2x2 pixels from source
+            for (u32 c = 0; c < channels; ++c) {
+                u32 sum = 0;
+                u32 count = 0;
+
+                for (u32 sy = 0; sy < 2 && (y * 2 + sy) < srcHeight; ++sy) {
+                    for (u32 sx = 0; sx < 2 && (x * 2 + sx) < srcWidth; ++sx) {
+                        sum += srcData[((y * 2 + sy) * srcWidth + (x * 2 + sx)) * channels + c];
+                        count++;
+                    }
+                }
+
+                dstData[(y * dstWidth + x) * channels + c] = static_cast<u8>(sum / count);
+            }
+        }
+    }
+
+    return dstData;
+}
+
+enum class MipFilter { Box, Bump };
+
+struct MipChain {
+    u32 width = 0;
+    u32 height = 0;
+    xr_vector<xr_vector<u8>> levels;
+};
+
+static MipChain BuildMipChain(const u8* rgba, u32 width, u32 height, bool generateMipmaps, MipFilter filter)
+{
+    MipChain chain;
+    chain.width = width;
+    chain.height = height;
+    chain.levels.emplace_back(rgba, rgba + size_t(width) * height * 4);
+    if (!generateMipmaps)
+        return chain;
+    for (u32 w = width, h = height; w > 1 || h > 1;) {
+        const xr_vector<u8>& src = chain.levels.back();
+        chain.levels.push_back(filter == MipFilter::Bump ? GenerateBumpMipLevel(src.data(), w, h) : GenerateMipLevel(src.data(), w, h, 4));
         w = std::max(w / 2, 1u);
         h = std::max(h / 2, 1u);
     }
+    return chain;
+}
+
+static bool PreserveAlphaCoverage(MipChain& chain, u32 alphaRef = 200)
+{
+    const u32 ALPHA_REF = alphaRef;
+    if (chain.levels.size() < 2)
+        return false;
+    const xr_vector<u8>& mip0 = chain.levels[0];
+    const size_t texels0 = mip0.size() / 4;
+    size_t cov0 = 0;
+    for (size_t i = 0; i < texels0; i++)
+        if (mip0[i * 4 + 3] >= ALPHA_REF)
+            cov0++;
+    if (cov0 == 0 || cov0 == texels0)
+        return false;
+    const double target = double(cov0) / double(texels0);
+
+    bool rescaled = false;
+    for (size_t m = 1; m < chain.levels.size(); m++) {
+        u8* px = chain.levels[m].data();
+        const size_t texels = chain.levels[m].size() / 4;
+        size_t hist[256] = {};
+        for (size_t i = 0; i < texels; i++)
+            hist[px[i * 4 + 3]]++;
+        size_t atLeast[257];
+        atLeast[256] = 0;
+        for (int t = 255; t >= 0; t--)
+            atLeast[t] = atLeast[t + 1] + hist[t];
+
+        float lo = 1.0f, hi = 8.0f;
+        for (int it = 0; it < 24; it++) {
+            const float mid = 0.5f * (lo + hi);
+            const u32 thresh = std::min<u32>(256, u32(ceilf(float(ALPHA_REF) / mid)));
+            const double cov = double(atLeast[thresh]) / double(texels);
+            if (cov < target)
+                lo = mid;
+            else
+                hi = mid;
+        }
+        const float scale = 0.5f * (lo + hi);
+        if (scale <= 1.001f)
+            continue;
+        for (size_t i = 0; i < texels; i++)
+            px[i * 4 + 3] = u8(std::min<u32>(u32(float(px[i * 4 + 3]) * scale + 0.5f), 255u));
+        rescaled = true;
+    }
+    return rescaled;
+}
+
+static xr_vector<u8> EncodeBC7(const u8* rgba, u32 width, u32 height, bool perceptual)
+{
+    static std::once_flag s_init;
+    std::call_once(s_init, [] { bc7enc_compress_block_init(); });
+
+    bc7enc_compress_block_params params;
+    bc7enc_compress_block_params_init(&params);
+    if (perceptual)
+        bc7enc_compress_block_params_init_perceptual_weights(&params);
+    else
+        bc7enc_compress_block_params_init_linear_weights(&params);
+    params.m_max_partitions = 16;
+
+    const u32 blocksX = (width + 3) / 4;
+    const u32 blocksY = (height + 3) / 4;
+    xr_vector<u8> out(size_t(blocksX) * blocksY * 16);
+
+    auto encodeRows = [&](u32 rowBegin, u32 rowEnd) {
+        u8 pixels[64];
+        for (u32 by = rowBegin; by < rowEnd; ++by) {
+            for (u32 bx = 0; bx < blocksX; ++bx) {
+                for (u32 py = 0; py < 4; ++py) {
+                    const u32 y = std::min(by * 4 + py, height - 1);
+                    for (u32 px = 0; px < 4; ++px) {
+                        const u32 x = std::min(bx * 4 + px, width - 1);
+                        std::memcpy(pixels + (py * 4 + px) * 4, rgba + (size_t(y) * width + x) * 4, 4);
+                    }
+                }
+                bc7enc_compress_block(out.data() + (size_t(by) * blocksX + bx) * 16, pixels, &params);
+            }
+        }
+    };
+
+    const u32 threads = std::min<u32>(std::max(1u, std::thread::hardware_concurrency()), blocksY);
+    if (threads <= 1) {
+        encodeRows(0, blocksY);
+        return out;
+    }
+    xr_vector<std::thread> workers;
+    workers.reserve(threads);
+    for (u32 t = 0; t < threads; ++t)
+        workers.emplace_back(encodeRows, blocksY * t / threads, blocksY * (t + 1) / threads);
+    for (auto& w : workers)
+        w.join();
+    return out;
+}
+
+static bool WriteMipChainDDS(const char* root_alias, const xr_string& relative_path, const MipChain& chain, bool compress, bool perceptual)
+{
+    using namespace resources;
+    const u32 mipCount = static_cast<u32>(chain.levels.size());
 
     DDS_HEADER header = {};
     header.dwSize = 124;
-    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH | DDSD_MIPMAPCOUNT;
-    header.dwWidth = width;
-    header.dwHeight = height;
-    header.dwPitchOrLinearSize = width * 4;
-    header.dwDepth = 0;
+    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | (compress ? DDSD_LINEARSIZE : DDSD_PITCH);
+    if (mipCount > 1)
+        header.dwFlags |= DDSD_MIPMAPCOUNT;
+    header.dwHeight = chain.height;
+    header.dwWidth = chain.width;
+    header.dwPitchOrLinearSize = compress ? ((chain.width + 3) / 4) * ((chain.height + 3) / 4) * 16 : chain.width * 4;
     header.dwMipMapCount = mipCount;
-
     header.ddspf.dwSize = 32;
-    header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-    header.ddspf.dwRGBBitCount = 32;
-    header.ddspf.dwRBitMask = 0x000000FF;
-    header.ddspf.dwGBitMask = 0x0000FF00;
-    header.ddspf.dwBBitMask = 0x00FF0000;
-    header.ddspf.dwABitMask = 0xFF000000;
+    if (compress) {
+        header.ddspf.dwFlags = DDPF_FOURCC;
+        header.ddspf.dwFourCC = FOURCC_DX10;
+    } else {
+        header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+        header.ddspf.dwRGBBitCount = 32;
+        header.ddspf.dwRBitMask = 0x000000FF;
+        header.ddspf.dwGBitMask = 0x0000FF00;
+        header.ddspf.dwBBitMask = 0x00FF0000;
+        header.ddspf.dwABitMask = 0xFF000000;
+    }
+    header.dwCaps = DDSCAPS_TEXTURE;
+    if (mipCount > 1)
+        header.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
 
-    header.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
+    DDS_HEADER_DX10 dx10 = {};
+    dx10.dxgiFormat = DDSDxgiFormat_BC7_UNORM;
+    dx10.resourceDimension = D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+    dx10.arraySize = 1;
 
     IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
     if (!writer) {
@@ -338,18 +513,35 @@ static bool WriteNormalMapDDS(
     const u32 magic = DDS_MAGIC;
     writer->w(&magic, sizeof(magic));
     writer->w(&header, sizeof(header));
-    writer->w(normalRGBA.data(), normalRGBA.size());
+    if (compress)
+        writer->w(&dx10, sizeof(dx10));
 
-    xr_vector<u8> mip = normalRGBA;
-    for (u32 level = 1, w = width, h = height; level < mipCount; ++level) {
-        mip = GenerateBumpMipLevel(mip.data(), w, h);
+    for (u32 level = 0, w = chain.width, h = chain.height; level < mipCount; ++level) {
+        if (compress) {
+            const xr_vector<u8> blocks = EncodeBC7(chain.levels[level].data(), w, h, perceptual);
+            writer->w(blocks.data(), blocks.size());
+        } else {
+            writer->w(chain.levels[level].data(), chain.levels[level].size());
+        }
         w = std::max(w / 2, 1u);
         h = std::max(h / 2, 1u);
-        writer->w(mip.data(), mip.size());
     }
 
     FS.w_close(writer);
-    Msg("* [PBRTextureConverter] Generated normal map: %s/%s (%ux%u, %u mips)", root_alias, relative_path.c_str(), width, height, mipCount);
+    return true;
+}
+
+static bool WriteNormalMapDDS(
+    const char* root_alias,
+    const xr_string& relative_path,
+    const xr_vector<u8>& normalRGBA,
+    u32 width, u32 height,
+    bool compress)
+{
+    const MipChain chain = BuildMipChain(normalRGBA.data(), width, height, true, MipFilter::Bump);
+    if (!WriteMipChainDDS(root_alias, relative_path, chain, compress, false))
+        return false;
+    Msg("* [PBRTextureConverter] Generated normal map: %s/%s (%ux%u, %u mips)", root_alias, relative_path.c_str(), width, height, static_cast<u32>(chain.levels.size()));
     return true;
 }
 
@@ -950,149 +1142,25 @@ void ShutdownAIPipeline()
 #endif
 }
 
-// ══════════════════════════════════════════════════════════
-//  HELPER: Write Single-Channel DDS (Phase 2.5.2)
-// ══════════════════════════════════════════════════════════
-// Writes R8 format DDS file (single channel, 8-bit)
-
-static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHeight, u32 channels) {
-    // Box filter downsample by 2x2
-    const u32 dstWidth = std::max(srcWidth / 2, 1u);
-    const u32 dstHeight = std::max(srcHeight / 2, 1u);
-    xr_vector<u8> dstData(dstWidth * dstHeight * channels);
-
-    for (u32 y = 0; y < dstHeight; ++y) {
-        for (u32 x = 0; x < dstWidth; ++x) {
-            // Sample 2x2 pixels from source
-            for (u32 c = 0; c < channels; ++c) {
-                u32 sum = 0;
-                u32 count = 0;
-
-                for (u32 sy = 0; sy < 2 && (y * 2 + sy) < srcHeight; ++sy) {
-                    for (u32 sx = 0; sx < 2 && (x * 2 + sx) < srcWidth; ++sx) {
-                        sum += srcData[((y * 2 + sy) * srcWidth + (x * 2 + sx)) * channels + c];
-                        count++;
-                    }
-                }
-
-                dstData[(y * dstWidth + x) * channels + c] = static_cast<u8>(sum / count);
-            }
-        }
-    }
-
-    return dstData;
+static bool IsTreeTexture(const xr_string& relative_path)
+{
+    return relative_path.size() > 6 && _strnicmp(relative_path.c_str(), "trees", 5) == 0 &&
+        (relative_path[5] == '\\' || relative_path[5] == '/');
 }
 
-static bool WriteRGBADDS(
+static bool WriteAlbedoDDS(
     const char* root_alias,
     const xr_string& relative_path,
     const u8* rgbaData,
     u32 width,
     u32 height,
     bool generateMipmaps,
+    bool compress,
     u32 alphaRef = 200)
 {
-    // Build DDS header for RGBA8 (32-bit with alpha, like texconv outputs)
-    using namespace resources;
-
-    // Calculate mipmap count
-    u32 mipCount = 1;
-    if (generateMipmaps) {
-        u32 w = width, h = height;
-        while (w > 1 || h > 1) {
-            w = std::max(w / 2, 1u);
-            h = std::max(h / 2, 1u);
-            mipCount++;
-        }
-    }
-
-    DDS_HEADER header = {};
-    header.dwSize = 124;
-    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH;
-    if (generateMipmaps) {
-        header.dwFlags |= DDSD_MIPMAPCOUNT;
-    }
-    header.dwHeight = height;
-    header.dwWidth = width;
-    header.dwPitchOrLinearSize = width * 4;  // 4 bytes per pixel (RGBA)
-    header.dwDepth = 0;
-    header.dwMipMapCount = mipCount;
-
-    // Pixel format: RGBA8 (32-bit with alpha)
-    header.ddspf.dwSize = 32;
-    header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-    header.ddspf.dwRGBBitCount = 32;
-    header.ddspf.dwRBitMask = 0x000000FF;  // Red (low byte)
-    header.ddspf.dwGBitMask = 0x0000FF00;  // Green
-    header.ddspf.dwBBitMask = 0x00FF0000;  // Blue
-    header.ddspf.dwABitMask = 0xFF000000;  // Alpha (high byte)
-
-    header.dwCaps = DDSCAPS_TEXTURE;
-    if (generateMipmaps) {
-        header.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
-    }
-
-    // Write file
-    IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
-    if (!writer) {
-        Msg("! [PBRTextureConverter] Failed to open file for writing: %s/%s", root_alias, relative_path.c_str());
-        return false;
-    }
-
-    const u32 magic = DDS_MAGIC;
-    writer->w(&magic, sizeof(magic));
-    writer->w(&header, sizeof(header));
-
-    const u32 pixelCount = width * height;
-    writer->w(rgbaData, pixelCount * 4);
-
-    if (generateMipmaps) {
-        bool hasAlpha = false;
-        u64 covRef = 0;
-        const u32 ALPHA_REF = alphaRef;
-        for (u32 i = 0; i < pixelCount; i++) {
-            if (rgbaData[i * 4 + 3] < 255) hasAlpha = true;
-            if (rgbaData[i * 4 + 3] >= ALPHA_REF) covRef++;
-        }
-        const double targetCov = pixelCount > 0 ? double(covRef) / double(pixelCount) : 1.0;
-        const bool doCoverage = hasAlpha && covRef > 0 && covRef < u64(pixelCount);
-
-        xr_vector<u8> currentMip(rgbaData, rgbaData + pixelCount * 4);
-        u32 mipWidth = width;
-        u32 mipHeight = height;
-
-        for (u32 mipLevel = 1; mipLevel < mipCount; ++mipLevel) {
-            currentMip = GenerateMipLevel(currentMip.data(), mipWidth, mipHeight, 4);
-            mipWidth = std::max(mipWidth / 2, 1u);
-            mipHeight = std::max(mipHeight / 2, 1u);
-
-            if (doCoverage) {
-                u8* px = currentMip.data();
-                u64 texels = u64(mipWidth) * mipHeight;
-                u64 hist[256] = {};
-                for (u64 i = 0; i < texels; i++) hist[px[i * 4 + 3]]++;
-                u64 atLeast[257]; atLeast[256] = 0;
-                for (int t = 255; t >= 0; t--) atLeast[t] = atLeast[t + 1] + hist[t];
-                float lo = 1.0f, hi = 8.0f;
-                for (int it = 0; it < 24; it++) {
-                    float mid = 0.5f * (lo + hi);
-                    u32 thresh = std::min<u32>(256, u32(ceilf(float(ALPHA_REF) / mid)));
-                    double cov = double(atLeast[thresh]) / double(texels);
-                    if (cov < targetCov) lo = mid; else hi = mid;
-                }
-                float scale = 0.5f * (lo + hi);
-                if (scale > 1.001f) {
-                    for (u64 i = 0; i < texels; i++)
-                        px[i * 4 + 3] = u8(std::min<u32>(u32(float(px[i * 4 + 3]) * scale + 0.5f), 255u));
-                }
-            }
-
-            writer->w(currentMip.data(), currentMip.size());
-        }
-    }
-
-    FS.w_close(writer);
-    return true;
+    MipChain chain = BuildMipChain(rgbaData, width, height, generateMipmaps, MipFilter::Box);
+    PreserveAlphaCoverage(chain, alphaRef);
+    return WriteMipChainDDS(root_alias, relative_path, chain, compress, true);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1113,202 +1181,21 @@ static bool WritePackedPBRDDS(
     const u8* parallaxData,  // Can be nullptr
     u32 width,
     u32 height,
-    bool generateMipmaps)
+    bool generateMipmaps,
+    bool compress)
 {
-    // Pack into RGBA8
     const u32 pixelCount = width * height;
     xr_vector<u8> packedData(pixelCount * 4);
 
     for (u32 i = 0; i < pixelCount; ++i) {
-        packedData[i * 4 + 0] = metallicData ? metallicData[i] : 0;      // R = Metallic
-        packedData[i * 4 + 1] = roughnessData ? roughnessData[i] : 128;  // G = Roughness (default 0.5)
-        packedData[i * 4 + 2] = aoData ? aoData[i] : 255;                // B = AO (default 1.0)
-        packedData[i * 4 + 3] = parallaxData ? parallaxData[i] : 128;    // A = Parallax (default 0.5)
+        packedData[i * 4 + 0] = metallicData ? metallicData[i] : 0;
+        packedData[i * 4 + 1] = roughnessData ? roughnessData[i] : 128;
+        packedData[i * 4 + 2] = aoData ? aoData[i] : 255;
+        packedData[i * 4 + 3] = parallaxData ? parallaxData[i] : 128;
     }
 
-    return WriteRGBADDS(root_alias, relative_path, packedData.data(), width, height, generateMipmaps);
-}
-
-static bool WriteSingleChannelDDS(
-    const char* root_alias,
-    const xr_string& relative_path,
-    const u8* pixelData,
-    u32 width,
-    u32 height,
-    bool generateMipmaps)
-{
-    // Build DDS header
-    using namespace resources;
-
-    // Calculate mipmap count
-    u32 mipCount = 1;
-    if (generateMipmaps) {
-        u32 w = width, h = height;
-        while (w > 1 || h > 1) {
-            w = std::max(w / 2, 1u);
-            h = std::max(h / 2, 1u);
-            mipCount++;
-        }
-    }
-
-    DDS_HEADER header = {};
-    header.dwSize = 124;
-    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-    if (generateMipmaps) {
-        header.dwFlags |= DDSD_MIPMAPCOUNT;
-    }
-    header.dwHeight = height;
-    header.dwWidth = width;
-    header.dwPitchOrLinearSize = width;  // 1 byte per pixel
-    header.dwDepth = 0;
-    header.dwMipMapCount = mipCount;
-
-    // Pixel format: R8 (single channel, 8-bit)
-    header.ddspf.dwSize = 32;
-    header.ddspf.dwFlags = DDPF_LUMINANCE;
-    header.ddspf.dwRGBBitCount = 8;
-    header.ddspf.dwRBitMask = 0xFF;
-    header.ddspf.dwGBitMask = 0;
-    header.ddspf.dwBBitMask = 0;
-    header.ddspf.dwABitMask = 0;
-
-    header.dwCaps = DDSCAPS_TEXTURE;
-    if (generateMipmaps) {
-        header.dwCaps |= DDSCAPS_MIPMAP | DDSCAPS_COMPLEX;
-    }
-
-    // Write file using two-parameter VFS pattern
-    IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
-    if (!writer) {
-        Msg("! [PBRTextureConverter] Failed to open file for writing: %s/%s", root_alias, relative_path.c_str());
-        return false;
-    }
-
-    // Write magic number
-    const u32 magic = DDS_MAGIC;
-    writer->w(&magic, sizeof(magic));
-
-    // Write header
-    writer->w(&header, sizeof(header));
-
-    // Write mip 0
-    const u32 dataSize = width * height;
-    writer->w(pixelData, dataSize);
-
-    // Generate and write mipmaps
-    if (generateMipmaps) {
-        xr_vector<u8> currentMip(pixelData, pixelData + dataSize);
-        u32 mipWidth = width;
-        u32 mipHeight = height;
-
-        for (u32 mipLevel = 1; mipLevel < mipCount; ++mipLevel) {
-            currentMip = GenerateMipLevel(currentMip.data(), mipWidth, mipHeight, 1);
-            mipWidth = std::max(mipWidth / 2, 1u);
-            mipHeight = std::max(mipHeight / 2, 1u);
-
-            writer->w(currentMip.data(), currentMip.size());
-        }
-    }
-
-    FS.w_close(writer);
-    return true;
-}
-
-// ══════════════════════════════════════════════════════════
-//  SANITY TEST: Write decompressed DDS to verify decompressor
-// ══════════════════════════════════════════════════════════
-static bool WriteUncompressedDDS(
-    const char* root_alias,
-    const xr_string& relative_path,
-    const u8* rgbaData,
-    u32 width,
-    u32 height)
-{
-    using namespace resources;
-
-    DDS_HEADER header = {};
-    header.dwSize = 124;
-    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-    header.dwWidth = width;
-    header.dwHeight = height;
-    header.dwPitchOrLinearSize = width * 4; // RGBA8
-    header.dwDepth = 0;
-    header.dwMipMapCount = 1;
-
-    // RGBA8 pixel format (uncompressed)
-    header.ddspf.dwSize = 32;
-    header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-    header.ddspf.dwRGBBitCount = 32;
-    header.ddspf.dwRBitMask = 0x000000FF;
-    header.ddspf.dwGBitMask = 0x0000FF00;
-    header.ddspf.dwBBitMask = 0x00FF0000;
-    header.ddspf.dwABitMask = 0xFF000000;
-
-    header.dwCaps = DDSCAPS_TEXTURE;
-
-    // Write file
-    IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
-    if (!writer) {
-        Msg("! [PBRTextureConverter] Failed to open file for writing: %s/%s", root_alias, relative_path.c_str());
-        return false;
-    }
-
-    const u32 magic = DDS_MAGIC;
-    writer->w(&magic, sizeof(magic));
-    writer->w(&header, sizeof(header));
-    writer->w(rgbaData, width * height * 4); // RGBA8
-
-    FS.w_close(writer);
-    Msg("* [PBRTextureConverter] Wrote uncompressed DDS: %s/%s (%ux%u)", root_alias, relative_path.c_str(), width, height);
-    return true;
-}
-
-static void SanityTestDecompressor(const LegacyTextureAsset& asset)
-{
-    Msg("~ [PBRTextureConverter] SANITY TEST: Decompressing %s...", asset.diffuse.relative_path.c_str());
-
-    // Load DDS
-    auto StripDDSExtension = [](const xr_string& path) -> xr_string {
-        if (path.size() >= 4 && path.substr(path.size() - 4) == ".dds") {
-            return path.substr(0, path.size() - 4);
-        }
-        return path;
-    };
-
-    resources::DDSData diffuseData;
-    xr_string diffuse_vfs_path = StripDDSExtension(asset.diffuse.relative_path);
-    if (!resources::DDSLoader::LoadFromFile(diffuse_vfs_path.c_str(), diffuseData)) {
-        Msg("! [PBRTextureConverter] SANITY TEST: Failed to load diffuse");
-        return;
-    }
-
-    // Decompress
-    u32 width, height;
-    xr_vector<u8> rgba = DecompressDDS(diffuseData, width, height);
-
-    if (rgba.empty()) {
-        Msg("! [PBRTextureConverter] SANITY TEST: Decompression failed");
-        return;
-    }
-
-    Msg("* [PBRTextureConverter] SANITY TEST: Decompressed to %ux%u RGBA8 (%u bytes)", width, height, rgba.size());
-
-    // Write to res/gamedata/test_decompress.dds
-    WriteUncompressedDDS("$game_data$", "test_decompress_diffuse.dds", rgba.data(), width, height);
-
-    // Also test normal map if available
-    if (asset.has_normal) {
-        resources::DDSData normalData;
-        xr_string normal_vfs_path = StripDDSExtension(asset.normal.relative_path);
-        if (resources::DDSLoader::LoadFromFile(normal_vfs_path.c_str(), normalData)) {
-            xr_vector<u8> normalRGBA = DecompressDDS(normalData, width, height);
-            if (!normalRGBA.empty()) {
-                WriteUncompressedDDS("$game_data$", "test_decompress_normal.dds", normalRGBA.data(), width, height);
-            }
-        }
-    }
-
-    Msg("* [PBRTextureConverter] SANITY TEST: Complete - check gamedata/test_decompress_*.dds");
+    const MipChain chain = BuildMipChain(packedData.data(), width, height, generateMipmaps, MipFilter::Box);
+    return WriteMipChainDDS(root_alias, relative_path, chain, compress, false);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1606,7 +1493,7 @@ bool ConvertTexturesToPBR(
                     xr_vector<u8> generatedNormalRGBA;
                     if (GenerateNormalMapFromDiffuse(diffuseRGBA, diffuseWidth, diffuseHeight, generatedNormalRGBA, 4.0f)) {
                         xr_string bump_path = asset.base_name + "_bump.dds";
-                        if (WriteNormalMapDDS(params.output_root.c_str(), bump_path, generatedNormalRGBA, diffuseWidth, diffuseHeight)) {
+                        if (WriteNormalMapDDS(params.output_root.c_str(), bump_path, generatedNormalRGBA, diffuseWidth, diffuseHeight, params.compress_output)) {
                             asset.has_normal = true;
                             asset.normal.root_alias = params.output_root;
                             asset.normal.relative_path = bump_path;
@@ -1656,10 +1543,10 @@ bool ConvertTexturesToPBR(
             auto t_write_start = std::chrono::high_resolution_clock::now();
 
             if (!output.converted.albedoData.empty()) {
-                if (!WriteRGBADDS(output.output_root.c_str(), output.albedo_path,
+                if (!WriteAlbedoDDS(output.output_root.c_str(), output.albedo_path,
                                   output.converted.albedoData.data(),
                                   output.converted.width, output.converted.height, output.generate_mipmaps,
-                                  output.alphaRef)) {
+                                  params.compress_output, output.alphaRef)) {
                     Msg("! [PBRTextureConverter] Failed to write albedo: %s", output.albedo_path.c_str());
                     failed_count++;
                     ui_progress.OnFailed();
@@ -1672,7 +1559,7 @@ bool ConvertTexturesToPBR(
                                    output.converted.roughnessData.data(),
                                    output.converted.aoData.empty() ? nullptr : output.converted.aoData.data(),
                                    output.converted.parallaxData.empty() ? nullptr : output.converted.parallaxData.data(),
-                                   output.converted.width, output.converted.height, output.generate_mipmaps)) {
+                                   output.converted.width, output.converted.height, output.generate_mipmaps, params.compress_output)) {
                 Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", output.pbr_path.c_str());
                 failed_count++;
                 ui_progress.OnFailed();
@@ -2052,7 +1939,7 @@ bool ConsolidatePBRTextures(
                                roughnessData.data(),
                                aoData.data(),
                                parallaxData.empty() ? nullptr : parallaxData.data(),
-                               width, height, true)) {
+                               width, height, true, true)) {
             Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", pbr_path.c_str());
             out_stats.textures_failed++;
             ui_progress.OnFailed();
@@ -2087,6 +1974,70 @@ bool ConsolidatePBRTextures(
         out_stats.textures_consolidated, out_stats.textures_failed, out_stats.files_deleted);
 
     return out_stats.textures_failed == 0;
+}
+
+static bool RecompressLooseRGBA8(const char* root_alias, const xr_string& relative_path, MipFilter filter, bool perceptual, bool preserveCoverage, u32 alphaRef = 200)
+{
+    string_path full_path;
+    FS.update_path(full_path, root_alias, relative_path.c_str());
+    const auto* desc = FS.GetFileDesc(full_path);
+    if (!desc || desc->vfs != std::numeric_limits<size_t>::max())
+        return false;
+
+    resources::DDSData dds;
+    if (!resources::DDSLoader::LoadFromFile(full_path, dds) || !dds.isValid || dds.mipLevels.empty())
+        return false;
+    if (dds.desc.format != nvrhi::Format::RGBA8_UNORM)
+        return false;
+
+    const auto& mip0 = dds.mipLevels[0];
+    MipChain chain = BuildMipChain(mip0.data, mip0.width, mip0.height, dds.mipLevels.size() > 1, filter);
+    if (preserveCoverage)
+        PreserveAlphaCoverage(chain, alphaRef);
+    const xr_string temp_path = relative_path + ".bc7";
+    if (!WriteMipChainDDS(root_alias, temp_path, chain, true, perceptual))
+        return false;
+    string_path temp_full;
+    FS.update_path(temp_full, root_alias, temp_path.c_str());
+    FS.file_rename(temp_full, full_path, true);
+    return true;
+}
+
+u32 RecompressPBROutputs(const TextureInventory& inventory, const PBRConversionParams& params)
+{
+    auto& ui_progress = ConversionProgress::Get();
+    ui_progress.BeginPhase("Compressing textures", static_cast<u32>(inventory.assets.size()));
+    const auto start = std::chrono::high_resolution_clock::now();
+
+    u32 recompressed = 0;
+    const auto alphaRefCache = LoadAlphaRefCache();
+    for (const auto& asset : inventory.assets) {
+        const xr_string albedo_path = asset.base_name + ".dds";
+        const xr_string pbr_path = asset.base_name + "_pbr.dds";
+        const xr_string bump_path = asset.base_name + "_bump.dds";
+        xr_string lookupKey = asset.base_name;
+        std::replace(lookupKey.begin(), lookupKey.end(), '\\', '/');
+        auto cacheIt = alphaRefCache.find(lookupKey);
+        u32 aref = (cacheIt != alphaRefCache.end()) ? cacheIt->second : 200;
+        u32 files = 0;
+        if (RecompressLooseRGBA8(params.output_root.c_str(), albedo_path, MipFilter::Box, true, true, aref))
+            ++files;
+        if (RecompressLooseRGBA8(params.output_root.c_str(), pbr_path, MipFilter::Box, false, false))
+            ++files;
+        if (RecompressLooseRGBA8(params.output_root.c_str(), bump_path, MipFilter::Bump, false, false))
+            ++files;
+        if (files) {
+            recompressed += files;
+            Msg("* [PBRTextureConverter] Compressed %u file(s) to BC7: %s", files, asset.base_name.c_str());
+            ui_progress.OnConverted();
+        } else {
+            ui_progress.OnSkipped();
+        }
+    }
+
+    const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count();
+    Msg("[PBRTextureConverter] BC7 recompression: %u files in %lld ms", recompressed, ms);
+    return recompressed;
 }
 
 bool ConvertSingleTextureToPBR(
