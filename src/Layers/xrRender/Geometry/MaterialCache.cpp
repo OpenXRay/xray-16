@@ -226,7 +226,57 @@ void MaterialCache::CreateDefaultPBRTextures()
 }
 
 MaterialCache::~MaterialCache() {
+    FlushAlphaRefCache();
     Clear();
+}
+
+void MaterialCache::FlushAlphaRefCache()
+{
+    if (m_alphaRefByTexture.empty())
+        return;
+
+    string_path cachePath;
+    FS.update_path(cachePath, "$app_data_root$", "pbr_cache" DELIMITER "alpha_ref.cache");
+
+    xr_map<shared_str, u32> merged;
+
+    if (FS.exist(cachePath)) {
+        IReader* reader = FS.r_open(cachePath);
+        if (reader) {
+            u32 count = reader->r_u32();
+            for (u32 i = 0; i < count && !reader->eof(); i++) {
+                shared_str name;
+                reader->r_stringZ(name);
+                u32 aref = reader->r_u32();
+                merged[name] = aref;
+            }
+            FS.r_close(reader);
+        }
+    }
+
+    for (const auto& [tex, aref] : m_alphaRefByTexture) {
+        auto it = merged.find(tex);
+        if (it == merged.end())
+            merged[tex] = aref;
+        else
+            it->second = std::max(it->second, aref);
+    }
+
+    IWriter* writer = FS.w_open(cachePath);
+    if (!writer) {
+        Msg("! [MaterialCache] Failed to write alpha ref cache: %s", cachePath);
+        return;
+    }
+
+    writer->w_u32(static_cast<u32>(merged.size()));
+    for (const auto& [tex, aref] : merged) {
+        writer->w_stringZ(tex);
+        writer->w_u32(aref);
+    }
+    FS.w_close(writer);
+
+    Msg("* [MaterialCache] Flushed alpha ref cache: %u entries -> %s",
+        static_cast<u32>(merged.size()), cachePath);
 }
 
 
@@ -1358,6 +1408,11 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         if (matInfo.alphaTest) {
             matData.flags |= MAT_FLAG_ALPHA_TEST;
             matData.alphaRef = matInfo.alphaRef / 255.0f;
+            auto it = m_alphaRefByTexture.find(visual->textureName);
+            if (it == m_alphaRefByTexture.end())
+                m_alphaRefByTexture[visual->textureName] = matInfo.alphaRef;
+            else
+                it->second = std::max(it->second, matInfo.alphaRef);
         }
         if (matInfo.transparent) {
             matData.flags |= MAT_FLAG_ALPHA_BLEND;

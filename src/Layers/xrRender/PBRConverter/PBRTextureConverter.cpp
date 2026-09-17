@@ -935,6 +935,7 @@ struct Stage1Intermediate {
     xr_string pbr_path;
     xr_string pbr_name;
     xr_string albedo_path;
+    u32 alphaRef = 200;
 };
 
 #endif // USE_AI_PBR
@@ -988,7 +989,8 @@ static bool WriteRGBADDS(
     const u8* rgbaData,
     u32 width,
     u32 height,
-    bool generateMipmaps)
+    bool generateMipmaps,
+    u32 alphaRef = 200)
 {
     // Build DDS header for RGBA8 (32-bit with alpha, like texconv outputs)
     using namespace resources;
@@ -1047,7 +1049,7 @@ static bool WriteRGBADDS(
     if (generateMipmaps) {
         bool hasAlpha = false;
         u64 covRef = 0;
-        constexpr u32 ALPHA_REF = 128;
+        const u32 ALPHA_REF = alphaRef;
         for (u32 i = 0; i < pixelCount; i++) {
             if (rgbaData[i * 4 + 3] < 255) hasAlpha = true;
             if (rgbaData[i * 4 + 3] >= ALPHA_REF) covRef++;
@@ -1434,6 +1436,7 @@ struct PreparedTexture {
     xr_string albedo_path;
     resources::DDSData diffuseData;
     resources::DDSData normalData;
+    u32 alphaRef;
 };
 
 struct ConvertedOutput {
@@ -1444,7 +1447,37 @@ struct ConvertedOutput {
     ConvertedPBRTextures converted;
     bool generate_mipmaps;
     xr_string output_root;
+    u32 alphaRef;
 };
+
+static xr_map<xr_string, u32> LoadAlphaRefCache()
+{
+    xr_map<xr_string, u32> cache;
+
+    string_path cachePath;
+    FS.update_path(cachePath, "$app_data_root$", "pbr_cache" DELIMITER "alpha_ref.cache");
+
+    if (!FS.exist(cachePath))
+        return cache;
+
+    IReader* reader = FS.r_open(cachePath);
+    if (!reader)
+        return cache;
+
+    u32 count = reader->r_u32();
+    for (u32 i = 0; i < count && !reader->eof(); i++) {
+        shared_str name;
+        reader->r_stringZ(name);
+        u32 aref = reader->r_u32();
+        xr_string key = name.c_str();
+        std::replace(key.begin(), key.end(), '\\', '/');
+        cache[key] = aref;
+    }
+    FS.r_close(reader);
+
+    Msg("* [PBRTextureConverter] Loaded alpha ref cache: %u entries", static_cast<u32>(cache.size()));
+    return cache;
+}
 
 bool ConvertTexturesToPBR(
     const TextureInventory& inventory,
@@ -1469,6 +1502,8 @@ bool ConvertTexturesToPBR(
     std::atomic<u32> ai_conversions{0};
 #endif
 
+
+    const auto alphaRefCache = LoadAlphaRefCache();
     const auto start_time = std::chrono::high_resolution_clock::now();
 
     xr_vector<LegacyTextureAsset> sorted_assets(inventory.assets.begin(), inventory.assets.end());
@@ -1606,6 +1641,10 @@ bool ConvertTexturesToPBR(
             prepared.albedo_path = asset.base_name + ".dds";
             prepared.diffuseData = std::move(diffuseData);
             prepared.normalData = std::move(normalData);
+            xr_string lookupKey = asset.base_name;
+            std::replace(lookupKey.begin(), lookupKey.end(), '\\', '/');
+            auto cacheIt = alphaRefCache.find(lookupKey);
+            prepared.alphaRef = (cacheIt != alphaRefCache.end()) ? cacheIt->second : 200;
             prepared_queue.push(std::move(prepared));
         }
         prepared_queue.signal_done();
@@ -1619,7 +1658,8 @@ bool ConvertTexturesToPBR(
             if (!output.converted.albedoData.empty()) {
                 if (!WriteRGBADDS(output.output_root.c_str(), output.albedo_path,
                                   output.converted.albedoData.data(),
-                                  output.converted.width, output.converted.height, output.generate_mipmaps)) {
+                                  output.converted.width, output.converted.height, output.generate_mipmaps,
+                                  output.alphaRef)) {
                     Msg("! [PBRTextureConverter] Failed to write albedo: %s", output.albedo_path.c_str());
                     failed_count++;
                     ui_progress.OnFailed();
@@ -1683,6 +1723,7 @@ bool ConvertTexturesToPBR(
             output.converted = std::move(converted);
             output.generate_mipmaps = params.generate_mipmaps;
             output.output_root = params.output_root;
+            output.alphaRef = inter.alphaRef;
             write_queue.push(std::move(output));
         };
 
@@ -1753,6 +1794,7 @@ bool ConvertTexturesToPBR(
                 dummy.pbr_path = std::move(prepared.pbr_path);
                 dummy.pbr_name = std::move(prepared.pbr_name);
                 dummy.albedo_path = std::move(prepared.albedo_path);
+                dummy.alphaRef = prepared.alphaRef;
                 EmitResult(dummy, std::move(converted), infer_ms);
             } else {
                 PBRPipeline::Stage1Result stage1 = g_ai_pipeline->ProcessStage1(
@@ -1780,6 +1822,7 @@ bool ConvertTexturesToPBR(
                 inter.pbr_path = std::move(prepared.pbr_path);
                 inter.pbr_name = std::move(prepared.pbr_name);
                 inter.albedo_path = std::move(prepared.albedo_path);
+                inter.alphaRef = prepared.alphaRef;
                 large_batch.push_back(std::move(inter));
             }
         }

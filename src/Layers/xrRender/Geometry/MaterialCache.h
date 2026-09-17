@@ -285,6 +285,9 @@ private:
 
     float GetDetailScale(const shared_str& textureName);
 
+    xr_map<shared_str, u32> m_alphaRefByTexture;
+    void FlushAlphaRefCache();
+
     MaterialPSO* CreateUIPSO(
         IUIShader* uiShader,
         ShaderElement* elem,
