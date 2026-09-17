@@ -54,6 +54,14 @@ endif()
 
 if (WIN32)
     target_link_options(xr_3da PRIVATE "LINKER:/ERRORLIMIT:0")
+    add_custom_command(TARGET xr_3da POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${XRAY_SDK_DIR}/binaries/x64/AnselSDK64.dll"
+            "${XRAY_SDK_DIR}/binaries/x64/BugTrap.dll"
+            "${XRAY_SDK_DIR}/binaries/x64/discord_game_sdk.dll"
+            "$<TARGET_FILE_DIR:xr_3da>"
+        VERBATIM
+    )
 endif()
 
 set_target_properties(xr_3da PROPERTIES
