@@ -370,7 +370,7 @@ void renderSwGrass(fg::RenderContext* ctx, const SwGrassPassData& data)
         params.height = data.height;
         cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
-        cmdList->setBufferState(dm->drawArgsBuffer[lod], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(dm->drawArgsBuffer[lod], nvrhi::ResourceStates::NonPixelShaderResource);
         BindingSetBuilder bsb(*refl, nvDevice, "VisibilityRaster.SwGrass");
         bsb.ConstantBuffer("static_globals", staticGlobalsCB);
         bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
@@ -393,7 +393,7 @@ void renderSwGrass(fg::RenderContext* ctx, const SwGrassPassData& data)
         cmdList->dispatchIndirect((lod - 1) * 16);
         cmdList->setBufferState(dm->drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
-    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 }
 
 void drawSwResolve(fg::RenderContext* ctx, fg::RenderDevice* device, nvrhi::IFramebuffer* framebuffer,
