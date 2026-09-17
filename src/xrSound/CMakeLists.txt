@@ -74,7 +74,11 @@ target_sources_grouped(
     stdafx.h
 )
 
-set_source_files_properties(guids.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(guids.cpp
+    PROPERTIES
+    SKIP_PRECOMPILE_HEADERS ON
+    SKIP_UNITY_BUILD_INCLUSION ON
+)
 
 target_sources_grouped(
     TARGET xrSound
@@ -126,9 +130,8 @@ target_include_directories(xrSound
 
 target_link_libraries(xrSound
     PRIVATE
-    xrCore
-    xrMiscMath
     xrAPI
+    xrCore
     xrCDB
     xrMaterialSystem
     OpenAL::OpenAL
@@ -150,9 +153,3 @@ target_precompile_headers(xrSound
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrSound LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

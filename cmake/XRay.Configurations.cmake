@@ -11,7 +11,8 @@ set(XRAY_DEFAULT_BUILD_TYPE ReleaseMasterGold)
 
 get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if (is_multi_config)
-    if (NOT CMAKE_DEFAULT_BUILD_TYPE)
+    # XXX: https://gitlab.kitware.com/cmake/cmake/-/issues/20820
+    if (NOT CMAKE_DEFAULT_BUILD_TYPE AND CMAKE_GENERATOR STREQUAL "Ninja Multi-Config")
         set(CMAKE_DEFAULT_BUILD_TYPE ${XRAY_DEFAULT_BUILD_TYPE})
     endif()
     if (CMAKE_BUILD_TYPE)

@@ -43,6 +43,7 @@ find_path(LZO_INCLUDE_DIR lzo/lzo1x.h
 find_library(LZO_LIBRARY
   NAMES
     lzo2
+    lzo
   HINTS
     ${_lzo_SEARCH_DIRS}
   PATH_SUFFIXES
@@ -59,11 +60,13 @@ if(LZO_FOUND)
   set(LZO_LIBRARIES ${LZO_LIBRARY})
   set(LZO_INCLUDE_DIRS ${LZO_INCLUDE_DIR})
 
-  add_library(LZO::LZO UNKNOWN IMPORTED)
-  set_target_properties(LZO::LZO PROPERTIES
-    IMPORTED_LOCATION "${LZO_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${LZO_INCLUDE_DIR}"
-  )
+  if(NOT TARGET LZO::LZO)
+    add_library(LZO::LZO UNKNOWN IMPORTED)
+    set_target_properties(LZO::LZO PROPERTIES
+      IMPORTED_LOCATION "${LZO_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${LZO_INCLUDE_DIR}"
+    )
+  endif()
 endif()
 
 mark_as_advanced(

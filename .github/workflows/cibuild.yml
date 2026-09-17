@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  windows:
-    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
+  msbuild:
+    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (MSBuild, MSVC)
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
@@ -90,8 +90,8 @@ jobs:
         # cc is always set for the correct naming of the job.
         # Both cc and cxx should be set if we want to change the compiler.
         # You may also want to set XRAY_LINKER when changing the compiler.
-        #- { name: Windows,   os: windows-latest,   arch: x64,     cc: cl, }
-        #- { name: Windows,   os: windows-latest,   arch: x86,     cc: cl, }
+        - { name: Windows,   os: windows-latest,   arch: x64,     cc: cl, }
+        - { name: Windows,   os: windows-latest,   arch: x86,     cc: cl, }
         - { name: Ubuntu,    os: ubuntu-latest,    arch: amd64,   cc: gcc, }
         - { name: Ubuntu,    os: ubuntu-latest,    arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
         - { name: Ubuntu,    os: ubuntu-24.04-arm, arch: arm64,   cc: gcc }

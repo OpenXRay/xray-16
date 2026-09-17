@@ -11,7 +11,25 @@ set(CPACK_SOURCE_IGNORE_FILES "/.gitattributes")
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
 set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
 
-if (UNIX)
+# DEB
+set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+
+# RPM
+set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
+# -- set(CPACK_RPM_PACKAGE_AUTOREQPROV ON)
+set(CPACK_RPM_PACKAGE_AUTOREQ ON)
+set(CPACK_RPM_PACKAGE_AUTOPROV YES)
+set(CPACK_RPM_PACKAGE_RELEASE_DIST ON)
+
+if (CPACK_GENERATOR)
+    # do nothing, it's ok
+elseif (WIN32)
+    set(CPACK_GENERATOR 7Z)
+elseif (UNIX)
     # Try to find specific OS files to determine type of linux distribution
     find_file(FEDORA_FOUND fedora-release PATHS /etc)
     find_file(REDHAT_FOUND redhat-release inittab.RH PATHS /etc)
@@ -38,25 +56,27 @@ if (UNIX)
     # --- SELECT PROPER CPACK GENERATOR ---
     if (DEBIAN_FOUND)
         set(CPACK_GENERATOR DEB)
-
-        set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-
-        set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
-    endif()
-
-    if (FEDORA_FOUND OR REDHAT_FOUND OR CENTOS_FOUND)
+    elseif (FEDORA_FOUND OR REDHAT_FOUND OR CENTOS_FOUND)
         set(CPACK_GENERATOR RPM)
-
-        set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
-
-        set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
-        # -- set(CPACK_RPM_PACKAGE_AUTOREQPROV ON)
-        set(CPACK_RPM_PACKAGE_AUTOREQ ON)
-        set(CPACK_RPM_PACKAGE_AUTOPROV YES)
-        set(CPACK_RPM_PACKAGE_RELEASE_DIST ON)
     endif()
 
+    unset(FEDORA_FOUND)
+    unset(REDHAT_FOUND)
+    unset(CENTOS_FOUND)
+    unset(DEBIAN_FOUND)
+endif()
+
+if (CPACK_GENERATOR)
     include(CPack)
+
+    cpack_add_component(OpenXRay
+        DISPLAY_NAME "OpenXRay"
+        DESCRIPTION "The main OpenXRay package that includes binary files to run the game."
+        REQUIRED
+    )
+
+    cpack_add_component(Debug
+        DISPLAY_NAME "Debug"
+        DESCRIPTION "Debug symbols for engine developers needs."
+    )
 endif()
