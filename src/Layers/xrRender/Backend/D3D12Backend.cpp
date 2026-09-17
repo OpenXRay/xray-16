@@ -112,10 +112,8 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
-    // Wrap with validation layer for detailed error messages
-    if (strstr(Core.Params, "-no_nvrhi_validation")) {
+    if (!enableValidation) {
         m_nvrhiDevice = baseDevice;
-        Msg("* [D3D12Backend] NVRHI validation layer disabled (-no_nvrhi_validation)");
     } else {
         m_nvrhiDevice = nvrhi::validation::createValidationLayer(baseDevice);
         if (!m_nvrhiDevice) {
