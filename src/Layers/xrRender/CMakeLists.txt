@@ -435,6 +435,12 @@ target_link_libraries(xrRender
     slang
 )
 
+foreach(slang_runtime_module slang-glslang slang-glsl-module)
+    if(TARGET ${slang_runtime_module})
+        add_dependencies(xrRender ${slang_runtime_module})
+    endif()
+endforeach()
+
 if(NOT NVRHI_BUILD_SHARED)
     target_link_libraries(xrRender PRIVATE nvrhi_vk)
     if(WIN32)
