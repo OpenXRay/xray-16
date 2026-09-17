@@ -9,9 +9,6 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include "Layers/xrRender/Backend/D3D12Backend.h"
-#endif
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "xrEngine/Environment.h"
@@ -119,12 +116,7 @@ static void InitializeResources(fg::RenderDevice* device)
 
     s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer", *csResult.reflection, nvDevice);
 
-#if defined(XR_PLATFORM_WINDOWS)
-    auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
-    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-#else
-    nvrhi::IBindingLayout* bindlessLayout = nullptr;
-#endif
+    nvrhi::IBindingLayout* bindlessLayout = GEnv.Backend ? GEnv.Backend->GetBindlessLayout() : nullptr;
 
     nvrhi::ComputePipelineDesc pipeDesc;
     pipeDesc.CS = s_pathtrace_shader;
@@ -343,14 +335,8 @@ PathTracerOutput setupPathTracerPass(
             state.pipeline = s_pipeline;
             state.bindings = { bindingSet };
 
-#if defined(XR_PLATFORM_WINDOWS)
-            auto* backend = dynamic_cast<D3D12Backend*>(GEnv.Backend);
-            if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                if (bindlessTable)
-                    state.addBindingSet(bindlessTable);
-            }
-#endif
+            if (auto* bindlessTable = GEnv.Backend ? GEnv.Backend->GetBindlessDescriptorTable() : nullptr)
+                state.addBindingSet(bindlessTable);
 
             cmdList->setComputeState(state);
             cmdList->dispatch(
