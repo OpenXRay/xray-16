@@ -354,5 +354,11 @@ void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
     {
         Msg("! [PBR] Consolidation had failures: %d failed", consolidationStats.textures_failed);
     }
+
+    if (params.compress_output)
+    {
+        Msg("~ [PBR] Compressing uncompressed PBR outputs to BC7...");
+        RecompressPBROutputs(inventory, params);
+    }
 }
 }
