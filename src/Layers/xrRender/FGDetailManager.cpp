@@ -558,7 +558,7 @@ bool FGDetailManager::LoadHeightmapTexture(nvrhi::IDevice* device)
     texDesc.dimension = nvrhi::TextureDimension::Texture2D;
     texDesc.isRenderTarget = false;
     texDesc.isUAV = false;
-    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     texDesc.keepInitialState = true;
     texDesc.debugName = "DetailHeightmap";
 
@@ -601,7 +601,7 @@ static u32 LoadOptionalDetailTexture(nvrhi::IDevice* device, const char* name, c
     desc.mipLevels = data.desc.mipLevels;
     desc.format = data.desc.format;
     desc.dimension = nvrhi::TextureDimension::Texture2D;
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
+    desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     desc.keepInitialState = true;
     desc.debugName = debugName;
 
@@ -653,7 +653,7 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
     texDesc.mipLevels = ddsData.desc.mipLevels;
     texDesc.format = ddsData.desc.format;
     texDesc.dimension = nvrhi::TextureDimension::Texture2D;
-    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     texDesc.keepInitialState = true;
     texDesc.debugName = "BuildDetails";
 
@@ -775,7 +775,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isConstantBuffer = false;
         desc.isDrawIndirectArgs = false;
         desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
 
         slotDataBuffer = device->createBuffer(desc);
@@ -843,7 +843,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isConstantBuffer = false;
         desc.isDrawIndirectArgs = false;
         desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
 
         detailModelsBuffer = device->createBuffer(desc);
@@ -860,7 +860,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         pvDesc.structStride = sizeof(DecalPulledVertex);
         pvDesc.debugName = "DetailPulledVerts";
         pvDesc.canHaveUAVs = false;
-        pvDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        pvDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         pvDesc.keepInitialState = true;
         pulledVertexBuffer = device->createBuffer(pvDesc);
 
@@ -898,7 +898,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
             desc.byteSize = LOD_TRIANGLES[lod] * 3 * sizeof(u16);
             desc.debugName = ("DetailBladeIndicesLOD" + std::to_string(lod)).c_str();
             desc.isIndexBuffer = true;
-            desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
             desc.keepInitialState = true;
             bladeIndexBuffer[lod] = device->createBuffer(desc);
             if (!bladeIndexBuffer[lod])
@@ -1032,7 +1032,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         desc.isConstantBuffer = false;
         desc.isDrawIndirectArgs = false;
         desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
 
         slotAABBBuffer = device->createBuffer(desc);
@@ -1277,7 +1277,7 @@ bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
         desc.byteSize = sizeof(GrassObjectTint) * 64;
         desc.structStride = sizeof(GrassObjectTint);
         desc.debugName = "GrassObjectTints";
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         cachedGrassTintsBuffer = device->createBuffer(desc);
     }
@@ -1423,7 +1423,7 @@ bool FGDetailManager::CreatePerlin4DTexture(nvrhi::IDevice* device)
     desc.dimension        = nvrhi::TextureDimension::Texture3D;
     desc.format           = nvrhi::Format::RGBA16_FLOAT;
     desc.isUAV            = true;
-    desc.initialState     = nvrhi::ResourceStates::ShaderResource;
+    desc.initialState     = nvrhi::ResourceStates::NonPixelShaderResource;
     desc.keepInitialState = true;
     desc.debugName        = "Perlin4DVolume";
 
@@ -1551,7 +1551,7 @@ bool FGDetailManager::CreateInteractionResources(nvrhi::IDevice* device)
         desc.height = INTERACTION_TEXTURE_SIZE;
         desc.format = nvrhi::Format::RGBA16_FLOAT;
         desc.isUAV = true;
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
         desc.keepInitialState = true;
         desc.debugName = i == 0 ? "DetailInteraction0" : "DetailInteraction1";
         interactionTexture[i] = device->createTexture(desc);
@@ -1569,7 +1569,7 @@ bool FGDetailManager::CreateInteractionResources(nvrhi::IDevice* device)
     bufDesc.byteSize = sizeof(InteractionEntity) * INTERACTION_MAX_ENTITIES;
     bufDesc.structStride = sizeof(InteractionEntity);
     bufDesc.debugName = "DetailInteractionEntities";
-    bufDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    bufDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     bufDesc.keepInitialState = true;
     interactionEntityBuffer = device->createBuffer(bufDesc);
     if (!interactionEntityBuffer)
@@ -2265,7 +2265,7 @@ void FGDetailManager::DispatchCulling(
     if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.SlotCull");
 
     cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
-    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
     if (!generatedInstancesBuffer || !perlin4dTexture || !interactionTexture[interactionCurrent])
         return;
@@ -2282,8 +2282,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
         for (u32 lod = 0; lod < LOD_COUNT; lod++)
             cmdList->setBufferState(preparedBladeBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setTextureState(perlin4dTexture, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-        cmdList->setTextureState(interactionTexture[interactionCurrent], nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+        cmdList->setTextureState(perlin4dTexture, nvrhi::AllSubresources, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setTextureState(interactionTexture[interactionCurrent], nvrhi::AllSubresources, nvrhi::ResourceStates::NonPixelShaderResource);
         bsb.ConstantBuffer("DetailCullParams", renderDevice->GetNativeBuffer(cachedCullParamsCB))
            .ConstantBuffer("DetailGlobals", detailGlobalsCB)
            .BufferSRV("g_all_instances", generatedInstancesBuffer)
@@ -2317,7 +2317,7 @@ void FGDetailManager::DispatchCulling(
 
         cmdList->dispatchIndirect(0);
         for (u32 lod = 0; lod < LOD_COUNT; lod++)
-            cmdList->setBufferState(preparedBladeBuffer[lod], nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(preparedBladeBuffer[lod], nvrhi::ResourceStates::NonPixelShaderResource);
     }
 
     if (gpuProfiler) gpuProfiler->EndPass(cmdList, "DetailCull.InstanceCull");
@@ -2327,8 +2327,8 @@ void FGDetailManager::DispatchCulling(
         auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_sw_args", ".cs");
         if (refl)
         {
-            cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::ShaderResource);
-            cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::ShaderResource);
+            cmdList->setBufferState(drawArgsBuffer[1], nvrhi::ResourceStates::NonPixelShaderResource);
+            cmdList->setBufferState(drawArgsBuffer[2], nvrhi::ResourceStates::NonPixelShaderResource);
             cmdList->setBufferState(swDispatchArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
             framegraph::BindingSetBuilder bsb(*refl, device, "Detail.SwArgs");
             bsb.BufferSRV("g_ArgsLod1", drawArgsBuffer[1])
@@ -2631,12 +2631,12 @@ void FGDetailManager::RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi
 
     dispatchPrefixSum(prefixSumTopPipeline, 1, "DetailCull.RegenScanTop");
 
-    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
 
     dispatchInstanceGen(1, "DetailCull.RegenScatter");
 
-    cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(generatedInstancesBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(slotAABBBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(perSlotPrefixBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
     if (instanceCountReadbackBuffer)
