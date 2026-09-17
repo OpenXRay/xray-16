@@ -1,4 +1,5 @@
 #define SM_6_0
+#define BINDLESS_NO_IMPLICIT_GRAD
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_mdi_common.h"

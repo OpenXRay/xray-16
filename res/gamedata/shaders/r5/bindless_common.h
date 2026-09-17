@@ -97,6 +97,8 @@ StructuredBuffer<VariantData> g_Variants : register(t23);
 #include "common_samplers.h"
 #endif
 
+
+#ifndef BINDLESS_NO_IMPLICIT_GRAD
 float4 SampleVariantTexture(uint materialID, uint slot, float2 uv)
 {
     uint texIdx = g_VariantTextures[materialID].tex[slot];
@@ -110,10 +112,10 @@ float4 SampleDiffuse(MaterialData mat, float2 uv)
 {
     if (mat.diffuseIndex == INVALID_TEXTURE_INDEX)
         return float4(1, 0, 1, 1);
-
     Texture2D tex = GetBindlessTexture(mat.diffuseIndex);
     return tex.Sample(smp_linear, uv);
 }
+#endif
 
 float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
 {
@@ -142,6 +144,7 @@ BumpSample DecodeBump(float4 Nu)
 
 static const float4 BUMP_FLAT = float4(0.0, 1.0, 0.5, 0.5);
 
+#ifndef BINDLESS_NO_IMPLICIT_GRAD
 BumpSample SampleNormal(MaterialData mat, float2 uv)
 {
     if (mat.normalIndex == INVALID_TEXTURE_INDEX)
@@ -153,7 +156,6 @@ float4 SampleDetail(MaterialData mat, float2 uv)
 {
     if (mat.detailIndex == INVALID_TEXTURE_INDEX)
         return float4(0.5, 0.5, 0.5, 0.5);
-
     Texture2D tex = GetBindlessTexture(mat.detailIndex);
     return tex.Sample(smp_linear, uv * mat.detailScale);
 }
@@ -162,9 +164,9 @@ float3 SamplePBR(MaterialData mat, float2 uv)
 {
     if (mat.pbrIndex == INVALID_TEXTURE_INDEX)
         return float3(0.0, 0.5, 1.0);
-
     Texture2D tex = GetBindlessTexture(mat.pbrIndex);
     return tex.Sample(smp_linear, uv).rgb;
 }
+#endif
 
 #endif
