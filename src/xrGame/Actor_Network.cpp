@@ -618,7 +618,11 @@ bool CActor::net_Spawn(CSE_Abstract* DC)
     else
         cam_Set(eacFirstEye);
 
-    cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0); // E->o_Angle.z);
+    bool cameraRestoredFromPacket = abs(cam_Active()->yaw) > 0.f || abs(cam_Active()->pitch) > 0.f || abs(cam_Active()->roll) > 0.f;
+    if (!cameraRestoredFromPacket)
+    {
+        cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0);
+    }
 
     // *** movement state - respawn
     // mstate_wishful			= 0;
@@ -1410,6 +1414,14 @@ void CActor::save(NET_Packet& output_packet)
     output_packet.w_stringZ(g_quick_use_slots[1]);
     output_packet.w_stringZ(g_quick_use_slots[2]);
     output_packet.w_stringZ(g_quick_use_slots[3]);
+
+    CCameraBase* camera = cam_Active();
+    if (camera)
+    {
+        output_packet.w_float(camera->yaw);
+        output_packet.w_float(camera->pitch);
+        output_packet.w_float(camera->roll);
+    }
 }
 
 void CActor::load(IReader& input_packet)
@@ -1437,6 +1449,15 @@ void CActor::load(IReader& input_packet)
     input_packet.r_stringZ(g_quick_use_slots[1], sizeof(g_quick_use_slots[1]));
     input_packet.r_stringZ(g_quick_use_slots[2], sizeof(g_quick_use_slots[2]));
     input_packet.r_stringZ(g_quick_use_slots[3], sizeof(g_quick_use_slots[3]));
+
+    CCameraBase* camera = cam_Active();
+    if (camera)
+    {
+        const float yaw = input_packet.r_float();
+        const float pitch = input_packet.r_float();
+        const float roll = input_packet.r_float();
+        camera->Set(yaw, pitch, roll);
+    }
 }
 
 #ifdef DEBUG
