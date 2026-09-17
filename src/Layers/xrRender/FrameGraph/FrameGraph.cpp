@@ -199,6 +199,7 @@ void FrameGraph::Compile() {
         BuildDependencyGraph();
     }
 
+    KeepDepthReadersOnGraphicsQueue();
     ValidateAsyncPasses();
 
     // Phase 2: Establish execution order (declaration order)
@@ -773,6 +774,25 @@ void FrameGraph::BuildDependencyGraph() {
             }
             if (access.IsWrite())
                 resource->lastWriter = &pass;
+        }
+    }
+}
+
+void FrameGraph::KeepDepthReadersOnGraphicsQueue() {
+    if (m_renderDevice->GetNVRHIDevice()->getGraphicsAPI() != nvrhi::GraphicsAPI::D3D12)
+        return;
+
+    for (auto& pass : m_passes) {
+        if (pass.queue != PassQueue::Compute)
+            continue;
+
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            if (resource && resource->desc.type != ResourceDesc::Type::Buffer
+                && (resource->desc.isDepthStencil || nvrhi::getFormatInfo(resource->desc.format).hasDepth)) {
+                pass.queue = PassQueue::Graphics;
+                break;
+            }
         }
     }
 }

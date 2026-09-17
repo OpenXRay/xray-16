@@ -272,6 +272,7 @@ private:
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     void BuildDependencyGraph();
+    void KeepDepthReadersOnGraphicsQueue();
     void ValidateAsyncPasses();
     void CullUnusedPasses();
     void ResolveUsage();
