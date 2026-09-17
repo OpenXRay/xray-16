@@ -433,7 +433,8 @@ static xr_vector<u8> EncodeBC7(const u8* rgba, u32 width, u32 height, bool perce
         bc7enc_compress_block_params_init_perceptual_weights(&params);
     else
         bc7enc_compress_block_params_init_linear_weights(&params);
-    params.m_max_partitions = 16;
+    params.m_max_partitions = BC7ENC_MAX_PARTITIONS;
+    params.m_uber_level = 2;
 
     const u32 blocksX = (width + 3) / 4;
     const u32 blocksY = (height + 3) / 4;
