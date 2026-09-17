@@ -147,13 +147,13 @@ float3 GenerateCameraRay(uint2 pixel, inout uint rng, out float3 origin)
 {
     float2 jitter = float2(rand_float(rng), rand_float(rng));
     float2 uv = (float2(pixel) + jitter) / float2(g_ScreenWidth, g_ScreenHeight);
-    float4 clip = float4(uv * 2.0 - 1.0, 0.0, 1.0);
+    float4 clip = float4(uv * 2.0 - 1.0, 1.0, 1.0);
     clip.y = -clip.y;
 
     float4 nearWorld = mul(g_InvViewProj, clip);
     nearWorld.xyz /= nearWorld.w;
 
-    float4 farClip = float4(clip.xy, 1.0, 1.0);
+    float4 farClip = float4(clip.xy, 0.0, 1.0);
     float4 farWorld = mul(g_InvViewProj, farClip);
     farWorld.xyz /= farWorld.w;
 
