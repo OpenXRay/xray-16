@@ -219,6 +219,16 @@ public:
     }
 
     virtual float get_animation_length(MotionID motion_ID);
+    void EnumerateCycleNames(xr_vector<shared_str>& outNames) const override
+    {
+        for (const auto& slot : m_Motions)
+        {
+            auto* cmap = slot.motions.cycle();
+            if (!cmap) continue;
+            for (const auto& pair : *cmap)
+                outNames.push_back(pair.first);
+        }
+    }
 };
 
 // IC CKinematicsAnimated* PKinematicsAnimated(IRender_Visual* V) { return V?V->dcast_PKinematicsAnimated():0; }

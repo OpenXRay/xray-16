@@ -117,6 +117,8 @@ public:
     virtual IKinematics* dcast_PKinematics() = 0;
 
     virtual float get_animation_length(MotionID motion_ID) = 0;
+
+    virtual void EnumerateCycleNames(xr_vector<shared_str>& outNames) const {}
     //#ifdef DEBUG
     //virtual const BlendSVec& blend_cycle(const u32& bone_part_id) const = 0;
     //#endif

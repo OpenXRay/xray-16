@@ -118,7 +118,7 @@ public:
     CBlend* PlayCycle(MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) override;
     CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) override;
 
-    void EnumerateCycleNames(xr_vector<shared_str>& outNames) const;
+    void EnumerateCycleNames(xr_vector<shared_str>& outNames) const override;
 
     MotionID ID_FX(LPCSTR N) override;
     MotionID ID_FX_Safe(LPCSTR N) override;
