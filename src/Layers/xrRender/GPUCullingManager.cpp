@@ -1381,8 +1381,6 @@ u32 GPUCullingManager::GetOrUploadOzzSkeleton(nvrhi::ICommandList* cmdList, xray
     if (m_currentBoneOffset + boneCount > MAX_TOTAL_BONES)
         return 0;
 
-    parent->CalculateBonesFG(TRUE);
-
     const u32 boneOffset = m_currentBoneOffset;
     mesh->SetUploadedFrame(m_boneUploadFrameId);
     mesh->SetUploadedBoneOffset(boneOffset);
