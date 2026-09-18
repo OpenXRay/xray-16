@@ -828,7 +828,23 @@ void OzzKinematicsAnimated::LL_SetChannelFactor(u16 channel, float factor)
 
 void OzzKinematicsAnimated::UpdateTracks()
 {
-    LL_UpdateTracks(Device.fTimeDelta, true, false);
+    if (updateTracksLastTime == Device.dwTimeGlobal)
+        return;
+
+    u32 elapsed = Device.dwTimeGlobal - updateTracksLastTime;
+    if (elapsed > 66)
+        elapsed = 66;
+    const float dt = float(elapsed) / 1000.f;
+
+    if (updateTracksCallback)
+    {
+        if ((*updateTracksCallback)(dt, *this))
+            updateTracksLastTime = Device.dwTimeGlobal;
+        return;
+    }
+
+    updateTracksLastTime = Device.dwTimeGlobal;
+    LL_UpdateTracks(dt, false, false);
 }
 
 void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_blends)
@@ -860,9 +876,6 @@ void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_b
             ++index;
         }
     }
-
-    if (updateTracksCallback)
-        (*updateTracksCallback)(dt, *this);
 }
 
 MotionID OzzKinematicsAnimated::ID_Cycle(LPCSTR N)

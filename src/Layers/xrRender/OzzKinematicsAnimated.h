@@ -163,6 +163,7 @@ private:
 
     IBlendDestroyCallback* blendDestroyCallback = nullptr;
     IUpdateTracksCallback* updateTracksCallback = nullptr;
+    u32 updateTracksLastTime = 0;
 
     xray::render::fg::animation::channal_rule channelRules[MAX_CHANNELS]{};
     float channelFactors[MAX_CHANNELS]{};
