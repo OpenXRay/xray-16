@@ -652,16 +652,16 @@ void OzzKinematicsAnimated::OnCalculateBones()
 
 void OzzKinematicsAnimated::CalculateBones(BOOL bForceExact)
 {
-        auto& bufs = m_animBufs;
-    if (!bufs.locals.empty())
-        core.SetPoseLocals(ozz::make_span(bufs.locals));
+    if (m_isPlaying && activeAnimation)
+        AdvanceAnimation(0.f);
 
     core.CalculateTransforms(!!bForceExact);
 }
 
-void OzzKinematicsAnimated::CalculateBonesFG(BOOL)
+void OzzKinematicsAnimated::CalculateBonesFG(BOOL bForceExact)
 {
-    core.InvalidateCache();
+    UpdateTracks();
+    core.CalculateTransforms(!!bForceExact);
 }
 
 #ifdef DEBUG
@@ -1123,37 +1123,24 @@ void OzzKinematicsAnimated::UpdateTracks()
 
 void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_blends)
 {
-        auto& state = m_animState;
+    auto& state = m_animState;
     auto& ctl   = m_animCtl;
-    auto& bufs  = m_animBufs;
 
     if (activeAnimation)
     {
         ctl.animation      = activeAnimation.get();
         ctl.playback_speed = playbackSpeed;
-
-        if (animationLoaded && !activeBlends.empty())
-            m_isPlaying = true;
-        else
-            m_isPlaying = false;
-
-        if (loopPlayback)
-            m_isLooping = true;
-        else
-            m_isLooping = false;
+        m_isPlaying = animationLoaded && !activeBlends.empty();
+        m_isLooping = loopPlayback;
     }
 
-    
-
-    if (!bufs.locals.empty())
+    if (m_isPlaying && activeAnimation)
     {
-        ozz::span<const ozz::math::SoaTransform> ecs_locals(bufs.locals.data(), bufs.locals.size());
-        R_ASSERT2(SetPoseLocals(ecs_locals), "OzzKinematicsAnimated: failed to apply ECS pose");
-        animationApplied = true;
-        playbackTime = state.current_time;
+        AdvanceAnimation(dt);
+        state.current_time = playbackTime;
+        state.time_ratio   = activeAnimation->duration() > 0.f ? playbackTime / activeAnimation->duration() : 0.f;
     }
 
-    // Update blend system for compatibility (callbacks, state tracking)
     if (!activeBlends.empty())
     {
         size_t index = 0;
@@ -1165,7 +1152,6 @@ void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_b
             if (b_force || blend.dwFrame != Device.dwFrame)
             {
                 blend.dwFrame = Device.dwFrame;
-
                 blend.timeCurrent = state.current_time;
 
                 const bool finished = blend.update(dt, blend.Callback);
