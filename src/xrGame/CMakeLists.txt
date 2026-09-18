@@ -940,6 +940,8 @@ target_sources(xrGame PRIVATE
     player_hud.h
     player_hud_tune.cpp
     player_hud_tune.h
+    ozz_anim_debugger.cpp
+    ozz_anim_debugger.h
     player_name_modifyer.cpp
     player_name_modifyer.h
     pose_extrapolation.cpp

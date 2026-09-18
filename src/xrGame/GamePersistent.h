@@ -4,6 +4,7 @@
 
 #include "xrEngine/IGame_Persistent.h"
 #include "player_hud_tune.h"
+#include "ozz_anim_debugger.h"
 
 class CMainMenu;
 class CUICursor;
@@ -33,6 +34,7 @@ private:
     bool m_bPickableDOF{};
 
     AnselManager* ansel{};
+    COzzAnimDebugger m_ozzAnimDebugger;
 
     CUISequencer* m_intro{};
     EVENT eQuickLoad;
