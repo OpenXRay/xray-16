@@ -107,7 +107,7 @@ void SpatialBase::spatial_move()
         //*** adopted from xray-monolith
         const float threshold = ps_r__sector_update_distance;
 
-        if (last_sector_point.distance_to_sqr(spatial_sector_point()) > threshold * threshold)
+        if (last_sector_point.distance_to_sqr(spatial_sector_point()) >= threshold * threshold)
         {
             spatial.type |= STYPEFLAG_INVALIDSECTOR;
         }
