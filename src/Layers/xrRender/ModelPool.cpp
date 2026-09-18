@@ -519,8 +519,7 @@ void CModelPool::dump()
     int free_cnt = 0;
     for (REGISTRY_IT it = Registry.begin(); it != Registry.end(); ++it)
     {
-        CKinematics* K = PCKinematics((dxRender_Visual*)it->first);
-        VERIFY(K);
+        CKinematics* K = PCKinematics(it->first);
         if (K)
         {
             u32 cur = K->mem_usage(true);

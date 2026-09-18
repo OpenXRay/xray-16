@@ -2898,6 +2898,14 @@ void FrameGraphRenderer::add_SkeletonWallmark(
 {
     if (!xf || !obj || size <= EPS_L)
         return;
+
+    dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(obj->dcast_RenderVisual());
+    if (!visual)
+        return;
+    if (visual->Type != MT_SKELETON_ANIM && visual->Type != MT_SKELETON_RIGID)
+        return;
+    CKinematics* K = static_cast<CKinematics*>(visual);
+
     float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
     if (distSq > _sqr(50.f))
         return;
@@ -2919,7 +2927,7 @@ void FrameGraphRenderer::add_SkeletonWallmark(
     }
     float decalSize = size * 2.0f;
     fg::decals::MeshPickResult entryPick;
-    if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, start, dir, 100.f, entryPick))
+    if (fg::decals::PickMeshDirect(K, *xf, start, dir, 100.f, entryPick))
     {
         auto* overlayMgr = GetOverlayManager();
         float worldRadius = decalSize * 0.5f;
@@ -2929,7 +2937,7 @@ void FrameGraphRenderer::add_SkeletonWallmark(
         auto queueSplat = [&](const fg::decals::MeshPickResult& pick)
         {
             const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
-            overlayMgr->AddSplat((CKinematics*)obj, pick.triVerts,
+            overlayMgr->AddSplat(K, pick.triVerts,
                                   pick.baryU, pick.baryV,
                                   worldRadius, bloodColor, 0.8f,
                                   pick.uv, uvRadius, matID,
@@ -2950,7 +2958,7 @@ void FrameGraphRenderer::add_SkeletonWallmark(
             exitStart.mad(start, shotDir, entryAdvance);
 
             fg::decals::MeshPickResult exitPick;
-            if (fg::decals::PickMeshDirect((CKinematics*)obj, *xf, exitStart, shotDir, remaining, exitPick))
+            if (fg::decals::PickMeshDirect(K, *xf, exitStart, shotDir, remaining, exitPick))
             {
                 const float minSeparation = _max(0.02f, worldRadius * 0.25f);
                 if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)

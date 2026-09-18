@@ -9,6 +9,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/OzzMesh.h"
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -572,15 +573,21 @@ void RTAccelStructManager::InitSkinningPipeline()
         Msg("* [RT] Skinning compute pipeline created");
 }
 
-static CKinematics* GetSkeletonParent(const GeometryBatch& batch)
+static u32 ResolveBoneOffset(const GeometryBatch& batch, GPUCullingManager* gpuCulling, nvrhi::ICommandList* cmdList)
 {
-    if (!batch.visual) return nullptr;
-    u32 visualType = batch.visual->getType();
-    if (visualType == MT_SKELETON_GEOMDEF_ST)
-        return static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
-    if (visualType == MT_SKELETON_GEOMDEF_PM)
-        return static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
-    return nullptr;
+    if (!batch.visual)
+        return 0;
+    switch (batch.visual->getType())
+    {
+    case MT_SKELETON_GEOMDEF_ST:
+        return gpuCulling->GetOrUploadSkeleton(cmdList, static_cast<CSkeletonX_ST*>(batch.visual)->GetParent());
+    case MT_SKELETON_GEOMDEF_PM:
+        return gpuCulling->GetOrUploadSkeleton(cmdList, static_cast<CSkeletonX_PM*>(batch.visual)->GetParent());
+    case MT_OZZ_MESH:
+        return gpuCulling->GetOrUploadOzzSkeleton(cmdList, static_cast<xray::render::fg::OzzMesh*>(batch.visual));
+    default:
+        return 0;
+    }
 }
 
 void RTAccelStructManager::BuildSkinnedBLAS(
@@ -614,8 +621,7 @@ void RTAccelStructManager::BuildSkinnedBLAS(
 
     auto processBatch = [&](const GeometryBatch& batch) {
         auto* mesh = static_cast<IRender_Mesh*>(static_cast<Fvisual*>(batch.visual));
-        CKinematics* parent = GetSkeletonParent(batch);
-        u32 boneOffset = parent ? gpuCulling->GetOrUploadSkeleton(cmdList, parent) : 0;
+        u32 boneOffset = ResolveBoneOffset(batch, gpuCulling, cmdList);
 
         u16* srcIndices = static_cast<u16*>(mesh->p_rm_Indices->Map(0, mesh->dwPrimitives * 3 * sizeof(u16), true));
         for (u32 i = batch.startIndex; i < batch.startIndex + batch.indexCount; i++)

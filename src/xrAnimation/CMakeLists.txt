@@ -6,8 +6,6 @@ target_sources_grouped(
     FILES
     stdafx.h
     stdafx.cpp
-    xrAnimation.h
-    xrAnimation.cpp
 )
 
 target_sources_grouped(
