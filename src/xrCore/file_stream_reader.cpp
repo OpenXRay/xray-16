@@ -1,14 +1,16 @@
 #include "stdafx.h"
 #include "file_stream_reader.h"
 
-#if defined(XR_PLATFORM_POSIX)
+#if defined(XR_PLATFORM_WINDOWS)
+#include "xrCore/Text/Utf8Utils.hpp"
+#elif defined(XR_PLATFORM_POSIX)
 #include <fcntl.h>
 #endif
 
 void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+    m_file_handle = CreateFileW(XRay::Utf8::ToWide(file_name).c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 
     VERIFY(m_file_handle != INVALID_HANDLE_VALUE);
     LARGE_INTEGER size;

@@ -35,6 +35,55 @@ void CRenderDevice::InitializeImGui()
 
     io.ConfigNavMoveSetMousePos = true;
 
+    // Load a font with Cyrillic glyph support for the console.
+    // The default ImGui font (ProggyClean) only covers U+0020-U+00FF,
+    // so Cyrillic characters (U+0400-U+04FF) render as '?'.
+    {
+        // Try several candidate locations; the first one that exists wins.
+        string_path fontPath;
+        bool found = false;
+        const char* candidates[] =
+        {
+            "fonts" DELIMITER "DroidSans.ttf",
+            "fonts" DELIMITER "rus" DELIMITER "arial.ttf",
+            "fonts" DELIMITER "eng" DELIMITER "arial.ttf",
+        };
+        for (const char* cand : candidates)
+        {
+            FS.update_path(fontPath, "$game_data$", cand);
+            if (FS.exist(fontPath))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            // Build glyph ranges manually (GetGlyphRangesCyrillic is obsolete since 1.92)
+            ImFontGlyphRangesBuilder builder;
+            ImWchar ranges[] =
+            {
+                0x0020, 0x00FF, // Basic Latin + Latin Supplement
+                0x0400, 0x04FF, // Cyrillic
+                0x0500, 0x052F, // Cyrillic Supplement
+                0,
+            };
+            builder.AddRanges(ranges);
+            ImVector<ImWchar> glyphRanges;
+            builder.BuildRanges(&glyphRanges);
+            io.Fonts->AddFontFromFileTTF(fontPath, 16.0f, nullptr, glyphRanges.Data);
+        }
+        else
+        {
+            // No Cyrillic-capable TTF found: ImGui will fall back to its built-in
+            // font, which cannot render Cyrillic (shown as '?'). Warn so the missing
+            // asset is easy to diagnose instead of being a silent rendering bug.
+            Msg("! ImGui: no Cyrillic TTF font found in $game_data$\\fonts\\; "
+                "console/UI overlay text in Russian will render as '?'");
+        }
+    }
+
     string_path fName;
     FS.update_path(fName, "$app_data_root$", io.IniFilename);
     convert_path_separators(fName);

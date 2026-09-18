@@ -10,6 +10,7 @@
 #elif defined(XR_PLATFORM_POSIX)
 #include <sys/mman.h>
 #endif
+#include "xrCore/Text/Utf8Utils.hpp"
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -80,14 +81,19 @@ void VerifyPath(pcstr path)
         CopyMemory(tmp, path, i);
         tmp[i] = 0;
         convert_path_separators(tmp);
-        _mkdir(tmp);
+#if defined(XR_PLATFORM_WINDOWS)
+        _wmkdir(XRay::Utf8::ToWide(tmp).c_str());
+#else
+        mkdir(tmp, 0777);
+#endif
     }
 }
 
 static int open_internal(pcstr fn, int& handle)
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
+    const std::wstring wfn = XRay::Utf8::ToWide(fn);
+    return (_wsopen_s(&handle, wfn.c_str(), _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
 #elif defined(XR_PLATFORM_POSIX)
     pstr conv_fn = xr_strdup(fn);
     convert_path_separators(conv_fn);
@@ -142,7 +148,12 @@ void FileCompress(pcstr fn, pcstr sign, void* data, size_t size)
     MARK M;
     mk_mark(M, sign);
 
+#if defined(XR_PLATFORM_WINDOWS)
+    const std::wstring wfn = XRay::Utf8::ToWide(fn);
+    int H = _wopen(wfn.c_str(), O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+#else
     int H = _open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+#endif
     R_ASSERT2(H > 0, fn);
     std::ignore = _write(H, &M, 8);
     _writeLZ(H, data, size);
@@ -154,7 +165,12 @@ void* FileDecompress(pcstr fn, pcstr sign, size_t* size)
     MARK M, F;
     mk_mark(M, sign);
 
+#if defined(XR_PLATFORM_WINDOWS)
+    const std::wstring wfn = XRay::Utf8::ToWide(fn);
+    int H = _wopen(wfn.c_str(), O_BINARY | O_RDONLY);
+#else
     int H = _open(fn, O_BINARY | O_RDONLY);
+#endif
     R_ASSERT2(H > 0, fn);
     std::ignore = _read(H, &F, 8);
     if (strncmp(M, F, 8) != 0)
@@ -489,6 +505,90 @@ CFileReader::CFileReader(pcstr name)
 };
 CFileReader::~CFileReader() { xr_free(data); };
 //---------------------------------------------------
+// virtual stream (memory-mapped), optional open without fatal assert
+#if defined(XR_PLATFORM_WINDOWS)
+CVirtualFileReader::CVirtualFileReader(void* hf, void* hm, char* mapped, size_t sz, pcstr dbgName)
+    : IReader(mapped, sz), hSrcFile(hf), hSrcMap(hm)
+{
+#ifdef FS_DEBUG
+    register_file_mapping(data, Size, dbgName);
+#endif
+}
+#elif defined(XR_PLATFORM_POSIX)
+CVirtualFileReader::CVirtualFileReader(int fd, char* mapped, size_t sz, pcstr dbgName)
+    : IReader(mapped, sz)
+{
+    hSrcFile = fd;
+#ifdef FS_DEBUG
+    register_file_mapping(data, Size, dbgName);
+#endif
+}
+#endif
+
+CVirtualFileReader* CVirtualFileReader::TryOpen(pcstr cFileName)
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    const std::wstring wFileName = XRay::Utf8::ToWide(cFileName);
+    void* const hFile =
+        (void*)CreateFileW(wFileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+    if (hFile == (void*)INVALID_HANDLE_VALUE)
+    {
+        Msg("! CVirtualFileReader::TryOpen: CreateFile failed [%s] err=%s", cFileName,
+            xrDebug::ErrorToString(static_cast<long>(GetLastError())));
+        return nullptr;
+    }
+    LARGE_INTEGER size{};
+    if (!GetFileSizeEx((HANDLE)hFile, &size) || size.QuadPart == 0)
+    {
+        Msg("! CVirtualFileReader::TryOpen: bad size [%s]", cFileName);
+        CloseHandle((HANDLE)hFile);
+        return nullptr;
+    }
+    void* const hMap = (void*)CreateFileMapping((HANDLE)hFile, 0, PAGE_READONLY, 0, 0, 0);
+    if (hMap == (void*)INVALID_HANDLE_VALUE)
+    {
+        CloseHandle((HANDLE)hFile);
+        return nullptr;
+    }
+    char* mapped = (char*)MapViewOfFile((HANDLE)hMap, FILE_MAP_READ, 0, 0, 0);
+    if (!mapped)
+    {
+        CloseHandle((HANDLE)hMap);
+        CloseHandle((HANDLE)hFile);
+        return nullptr;
+    }
+    // Private ctor: cannot use xr_new<T>(...) from header (access from non-friend template).
+    void* const mem = Memory.mem_alloc(sizeof(CVirtualFileReader));
+    return new (mem) CVirtualFileReader(hFile, hMap, mapped, static_cast<size_t>(size.QuadPart), cFileName);
+#elif defined(XR_PLATFORM_POSIX)
+    pstr conv_path = xr_strdup(cFileName);
+    if (!conv_path)
+        return nullptr;
+    convert_path_separators(conv_path);
+    const int fd = ::open(conv_path, O_RDONLY);
+    xr_free(conv_path);
+    if (fd == -1)
+        return nullptr;
+    struct stat file_info{};
+    if (::fstat(fd, &file_info) != 0 || file_info.st_size <= 0)
+    {
+        ::close(fd);
+        return nullptr;
+    }
+    const size_t sz = static_cast<size_t>(file_info.st_size);
+    char* data = (char*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, fd, 0);
+    if (!data || data == MAP_FAILED)
+    {
+        ::close(fd);
+        return nullptr;
+    }
+    void* const mem = Memory.mem_alloc(sizeof(CVirtualFileReader));
+    return new (mem) CVirtualFileReader(fd, data, sz, cFileName);
+#else
+#   error Select or add implementation for your platform
+#endif
+}
+//---------------------------------------------------
 // compressed stream
 CCompressedReader::CCompressedReader(const char* name, const char* sign)
 {
@@ -500,7 +600,8 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     // Open the file
-    hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+    const std::wstring wFileName = XRay::Utf8::ToWide(cFileName);
+    hSrcFile = CreateFileW(wFileName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     LARGE_INTEGER size;
@@ -555,7 +656,8 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     // Open the file
-    hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+    const std::wstring wFileName = XRay::Utf8::ToWide(cFileName);
+    hSrcFile = CreateFileW(wFileName.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     LARGE_INTEGER size;

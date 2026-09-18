@@ -412,6 +412,7 @@ target_link_libraries(xrRender_GL
     xrParticles
     xrScriptEngine
     xrImGui
+    freetype
 )
 
 target_compile_definitions(xrRender_GL

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "XMLDocument.hpp"
+#include "xrCore/Text/Utf8Utils.hpp"
 
 pcstr UI_PATH = UI_PATH_DEFAULT;
 pcstr UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
@@ -88,6 +89,16 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml, bool 
             file = FS.r_open(path, buff);
         }
     };
+
+    // Strip UTF-8 BOM if present at the beginning of this file.
+    // Each included file is appended to the document buffer, so its BOM must be
+    // removed before parsing to avoid embedded zero-width characters.
+    if (F->tell() == 0 && F->length() >= 3)
+    {
+        const u8* data = static_cast<const u8*>(F->pointer());
+        if (data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
+            F->seek(3);
+    }
 
     while (!F->eof())
     {
@@ -183,6 +194,34 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
 bool XMLDocument::Set(pcstr text, bool fatal)
 {
     R_ASSERT(text != nullptr);
+
+    // Strip UTF-8 BOM if present
+    text = XRay::Utf8::StripBom(text);
+
+    // Auto-detect legacy CP1251 XML files and transcode them to UTF-8.
+    // This keeps compatibility with old mod content while the engine works internally in UTF-8.
+    xr_string convertedText;
+    if (!XRay::Utf8::IsValid(text))
+    {
+        Msg("! XML file '%s' is not valid UTF-8, converting from Windows-1251 to UTF-8", m_xml_file_name);
+        convertedText = XRay::Utf8::FromCP1251(text);
+
+        // Update the XML declaration encoding if it claims windows-1251
+        const char windows1251[] = "encoding=\"windows-1251\"";
+        size_t pos = convertedText.find(windows1251);
+        if (pos != xr_string::npos)
+            convertedText.replace(pos, std::size(windows1251) - 1, "encoding=\"utf-8\"");
+        else
+        {
+            const char windows1251sq[] = "encoding='windows-1251'";
+            pos = convertedText.find(windows1251sq);
+            if (pos != xr_string::npos)
+                convertedText.replace(pos, std::size(windows1251sq) - 1, "encoding='utf-8'");
+        }
+
+        text = convertedText.c_str();
+    }
+
     m_Doc.Parse(&m_Doc, text);
 
     if (m_Doc.Error())

@@ -27,12 +27,10 @@
 #endif
 
 #ifdef XR_PLATFORM_WINDOWS
-#include <locale>
-
 #include "DiscordGameSDK/discord.h"
 #define USE_DISCORD_INTEGRATION
 
-#include "xrCore/Text/StringConversion.hpp"
+#include "xrCore/Text/Utf8Utils.hpp"
 #endif
 
 // global variables
@@ -526,12 +524,10 @@ void CApplication::InitializeDiscord()
 
     if (core)
     {
-        const std::locale locale("");
-
         discord::Activity activity{};
         activity.SetType(discord::ActivityType::Playing);
         activity.SetApplicationId(DISCORD_APP_ID);
-        activity.SetState(StringToUTF8(Core.ApplicationTitle, locale).c_str());
+        activity.SetState(XRay::Utf8::FromACP(Core.ApplicationTitle).c_str());
         activity.GetAssets().SetLargeImage("logo");
         core->ActivityManager().UpdateActivity(activity, nullptr);
 
