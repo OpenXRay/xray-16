@@ -176,7 +176,7 @@ private:
     bool FinalizeSkeletonInitialization(pcstr debug_source);
     bool BuildBoneMetadata();
     void ResetRuntimeState();
-    void ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transform) const;
+    bool ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transform) const;
     void UpdateBoundingBox();
 
 protected:
@@ -190,7 +190,8 @@ protected:
     xr_vector<Fobb> boneBoxes;
 
     xr_vector<ozz::math::Float4x4> modelTransforms;
-    xr_vector<Fmatrix> cachedTransformsPreCallbacks;
+    xr_vector<Fmatrix> subtreeDelta;
+    xr_vector<u8> subtreeDirty;
 
     IKinematics::accel boneMapByName;
     IKinematics::accel boneMapByPtr;

@@ -233,8 +233,8 @@ bool OzzKinematicsCore::FinalizeSkeletonInitialization(pcstr debug_source)
     modelTransforms.shrink_to_fit();
     modelTransforms.resize(static_cast<size_t>(joint_count));
 
-    cachedTransformsPreCallbacks.clear();
-    cachedTransformsPreCallbacks.resize(static_cast<size_t>(joint_count));
+    subtreeDelta.resize(static_cast<size_t>(joint_count));
+    subtreeDirty.assign(static_cast<size_t>(joint_count), 0);
 
     boneMapByName.clear();
     boneMapByPtr.clear();
@@ -480,7 +480,8 @@ void OzzKinematicsCore::ResetRuntimeState()
     boneStorage.clear();
     boneMapByName.clear();
     boneMapByPtr.clear();
-    cachedTransformsPreCallbacks.clear();
+    subtreeDelta.clear();
+    subtreeDirty.clear();
     boneOffsets.clear();
     sampledLocals.clear();
     modelTransforms.clear();
@@ -505,8 +506,9 @@ bool OzzKinematicsCore::IsBoneVisible(u16 bone_id) const
     return boneVisibility ? boneVisibility->get(bone_id) : true;
 }
 
-void OzzKinematicsCore::ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transform) const
+bool OzzKinematicsCore::ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transform) const
 {
+    bool applied = false;
     for (const auto& offset : boneOffsets)
     {
         if (offset.m_bone_id != bone_id)
@@ -515,7 +517,9 @@ void OzzKinematicsCore::ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& tran
         const Fvector original_position = transform.c;
         transform.mulB_43(offset.m_transform);
         transform.c.add(original_position, offset.m_transform.c);
+        applied = true;
     }
+    return applied;
 }
 
 u16 OzzKinematicsCore::GetBoneCount() const
@@ -528,24 +532,28 @@ void OzzKinematicsCore::SetRootBone(u16 bone_id)
     rootBone = bone_id;
 }
 
-void OzzKinematicsCore::SetBoneVisible(u16 bone_id, bool visible, bool /*recursive*/)
+void OzzKinematicsCore::SetBoneVisible(u16 bone_id, bool visible, bool recursive)
 {
+    if (bone_id >= boneInstances.size())
+        return;
+
     if (boneVisibility)
         boneVisibility->set(bone_id, visible);
 
-    if (bone_id < boneInstances.size())
+    if (visible)
     {
-        if (visible)
-        {
-            InvalidateCache();
-        }
-        else
-        {
-            boneInstances[bone_id].mTransform.scale(0.f, 0.f, 0.f);
-            boneInstances[bone_id].mRenderTransform.scale(0.f, 0.f, 0.f);
-            if (bone_id < cachedTransformsPreCallbacks.size())
-                cachedTransformsPreCallbacks[bone_id].scale(0.f, 0.f, 0.f);
-        }
+        InvalidateCache();
+    }
+    else
+    {
+        boneInstances[bone_id].mTransform.scale(0.f, 0.f, 0.f);
+        boneInstances[bone_id].mRenderTransform.scale(0.f, 0.f, 0.f);
+    }
+
+    if (recursive && bone_id < bones.size() && bones[bone_id])
+    {
+        for (const CBoneData* child : bones[bone_id]->children)
+            SetBoneVisible(child->GetSelfID(), visible, recursive);
     }
 }
 
@@ -567,8 +575,6 @@ void OzzKinematicsCore::SetVisibilityMask(u64 mask)
         {
             boneInstances[idx].mTransform.scale(0.f, 0.f, 0.f);
             boneInstances[idx].mRenderTransform.scale(0.f, 0.f, 0.f);
-            if (idx < cachedTransformsPreCallbacks.size())
-                cachedTransformsPreCallbacks[idx].scale(0.f, 0.f, 0.f);
         }
     }
     InvalidateCache();
@@ -621,40 +627,62 @@ void OzzKinematicsCore::CalculateTransforms(bool)
     if (!job.Run())
         return;
 
+    const ozz::span<const int16_t> parents = skeleton.joint_parents();
+
     Fbox box;
     box.invalidate();
 
     for (size_t i = 0; i < jointCount; ++i)
     {
         CBoneInstance& inst = boneInstances[i];
-        Fmatrix transform = ConvertOzzMatrixToXRay(modelTransforms[i]);
-        ApplyAdditionalBoneTransforms(static_cast<u16>(i), transform);
+        const Fmatrix anim = ConvertOzzMatrixToXRay(modelTransforms[i]);
+        const int16_t parent = parents[i];
+        const bool inherited = parent >= 0 && subtreeDirty[parent] != 0;
 
+        bool modified = false;
         if (!IsBoneVisible(static_cast<u16>(i)))
         {
             inst.mTransform.scale(0.f, 0.f, 0.f);
             inst.mRenderTransform.scale(0.f, 0.f, 0.f);
-            cachedTransformsPreCallbacks[i].scale(0.f, 0.f, 0.f);
-            continue;
+            modified = true;
+        }
+        else
+        {
+            if (inst.callback_overwrite())
+            {
+                if (inst.callback())
+                    inst.callback()(&inst);
+                modified = true;
+            }
+            else
+            {
+                if (inherited)
+                    inst.mTransform.mul_43(subtreeDelta[parent], anim);
+                else
+                    inst.mTransform = anim;
+                modified = ApplyAdditionalBoneTransforms(static_cast<u16>(i), inst.mTransform);
+                if (inst.callback())
+                {
+                    inst.callback()(&inst);
+                    modified = true;
+                }
+            }
+
+            inst.mRenderTransform.mul_43(inst.mTransform, bones[i]->m2b_transform);
+            box.modify(inst.mTransform.c);
         }
 
-        cachedTransformsPreCallbacks[i] = transform;
-
-        bool hasCb = inst.callback() != nullptr;
-        if (!inst.callback_overwrite() || !hasCb)
-            inst.mTransform = transform;
-
-        if (hasCb)
-            inst.callback()(&inst);
-        else if (inst.callback_overwrite())
-            inst.mTransform = transform;
-
-        if (i < bones.size() && bones[i])
-            inst.mRenderTransform.mul_43(inst.mTransform, bones[i]->m2b_transform);
-        else
-            inst.mRenderTransform = inst.mTransform;
-
-        box.modify(inst.mTransform.c);
+        subtreeDirty[i] = (modified || inherited) ? 1 : 0;
+        if (modified)
+        {
+            Fmatrix inverse;
+            inverse.invert(anim);
+            subtreeDelta[i].mul_43(inst.mTransform, inverse);
+        }
+        else if (inherited)
+        {
+            subtreeDelta[i] = subtreeDelta[parent];
+        }
     }
 
     cachedBox = box;
