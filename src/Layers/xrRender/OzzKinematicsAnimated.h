@@ -75,7 +75,7 @@ public:
 
     void OnCalculateBones() override;
     void CalculateBones(BOOL bForceExact = FALSE) override;
-    void CalculateBonesFG(BOOL bForceExact = FALSE) override;
+    void CalculateBonesFG(BOOL bForceExact = FALSE);
 #ifdef DEBUG
     std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID ID) override;
     void LL_DumpBlends_dbg() override;
@@ -118,7 +118,7 @@ public:
     CBlend* PlayCycle(MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) override;
     CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) override;
 
-    void EnumerateCycleNames(xr_vector<shared_str>& outNames) const override;
+    void EnumerateCycleNames(xr_vector<shared_str>& outNames) const;
 
     MotionID ID_FX(LPCSTR N) override;
     MotionID ID_FX_Safe(LPCSTR N) override;
@@ -136,21 +136,21 @@ public:
 
     IRenderVisual* dcast_RenderVisual() override
     {
-        return this;
+        return static_cast<xray::render::fg::dxRender_Visual*>(this);
     }
 
     IKinematics* dcast_PKinematics() override
     {
-        return this;
+        return static_cast<IKinematics*>(this);
     }
 
     IKinematicsAnimated* dcast_PKinematicsAnimated() override
     {
-        return this;
+        return static_cast<IKinematicsAnimated*>(this);
     }
 
     OzzMotionsContainer* GetMotionsContainer() const;
-    const ozz::animation::Animation* ResolveMotionAnimation(MotionID id) const override;
+    const ozz::animation::Animation* ResolveMotionAnimation(MotionID id) const;
 
 private:
     struct SMotionsSlot

@@ -51,8 +51,10 @@ bool OzzKinematics::LoadMeshFromBuffer(const std::vector<std::uint8_t>& meshData
 
         auto* meshVisual = xr_new<xray::render::fg::OzzMesh>();
         meshVisual->LoadFromOzzMesh(this, mesh);
+#ifdef DEBUG
         if (dbg_name.c_str())
             meshVisual->dbg_name = dbg_name;
+#endif
         children.push_back(meshVisual);
         merged_box.merge(meshVisual->vis.box);
         any_loaded = true;

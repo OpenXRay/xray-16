@@ -163,6 +163,7 @@ void OzzKinematicsAnimated::OnSkeletonLoaded()
     EnsureMotionLibraryLoaded();
     PopulateEntityBindPose();
 
+#ifdef DEBUG
     if (core.IsInitialized() && dbg_name.c_str())
     {
         defaultPartition.load(this, dbg_name.c_str());
@@ -175,14 +176,13 @@ void OzzKinematicsAnimated::OnSkeletonLoaded()
                 defaultPartition[0].bones[i] = i;
         }
     }
+#endif
 }
 
 void OzzKinematicsAnimated::PopulateEntityBindPose()
 {
     if (!core.IsInitialized())
         return;
-
-    core.BindBoneVisibility(&core.ownedBoneVisibility);
 
     auto& bufs = m_animBufs;
     const int num_joints     = core.Skeleton().num_joints();
