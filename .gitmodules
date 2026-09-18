@@ -60,3 +60,7 @@
 [submodule "Externals/bc7enc_rdo"]
 	path = Externals/bc7enc_rdo
 	url = https://github.com/richgel999/bc7enc_rdo.git
+[submodule "Externals/ozz-animation"]
+	path = Externals/ozz-animation
+	url = https://github.com/yohjimane/ozz-animation.git
+	branch = yohji/feat/ozz-animation
