@@ -13,6 +13,8 @@
 #include "xrEngine/PS_instance.h"
 #endif
 
+XRCDB_API float ps_r__sector_update_distance = 1.f;
+
 Fvector c_spatial_offset[8] = {
     {-1, -1, -1}, {1, -1, -1}, {-1, 1, -1}, {1, 1, -1}, {-1, -1, 1}, {1, -1, 1}, {-1, 1, 1}, {1, 1, 1}};
 
@@ -103,7 +105,9 @@ void SpatialBase::spatial_move()
         //*** invalidate the cached sector only on a meaningful move, so stationary/jittering
         //*** objects don't force a per-frame sector raycast (see r__dsgraph_build sector detection)
         //*** adopted from xray-monolith
-        if (last_sector_point.distance_to_sqr(spatial_sector_point()) > 1.f)
+        const float threshold = ps_r__sector_update_distance;
+
+        if (last_sector_point.distance_to_sqr(spatial_sector_point()) > threshold * threshold)
         {
             spatial.type |= STYPEFLAG_INVALIDSECTOR;
         }
