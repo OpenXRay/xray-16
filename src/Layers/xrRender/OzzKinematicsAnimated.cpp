@@ -163,20 +163,14 @@ void OzzKinematicsAnimated::OnSkeletonLoaded()
     EnsureMotionLibraryLoaded();
     PopulateEntityBindPose();
 
-#ifdef DEBUG
-    if (core.IsInitialized() && dbg_name.c_str())
+    if (core.IsInitialized())
     {
-        defaultPartition.load(this, dbg_name.c_str());
-        if (defaultPartition.count() == 0)
-        {
-            defaultPartition[0].Name = "default";
-            const u16 bone_count = core.GetBoneCount();
-            defaultPartition[0].bones.resize(bone_count);
-            for (u16 i = 0; i < bone_count; ++i)
-                defaultPartition[0].bones[i] = i;
-        }
+        defaultPartition[0].Name = "default";
+        const u16 bone_count = core.GetBoneCount();
+        defaultPartition[0].bones.resize(bone_count);
+        for (u16 i = 0; i < bone_count; ++i)
+            defaultPartition[0].bones[i] = i;
     }
-#endif
 }
 
 void OzzKinematicsAnimated::PopulateEntityBindPose()
