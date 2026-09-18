@@ -6,6 +6,9 @@
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"
 
+#include "ozz/base/containers/vector.h"
+#include "ozz/base/maths/simd_math.h"
+
 
 namespace XRay::Animation
 {
@@ -90,8 +93,8 @@ public:
 
     void CalculateBones(BOOL bForceExact = FALSE) override;
     void CalculateBones_Invalidate() override;
-    void CalculateBonesFG(BOOL bForceExact = FALSE) override;
-    void CalculateBones_InvalidateFG() override;
+    void CalculateBonesFG(BOOL bForceExact = FALSE);
+    void CalculateBones_InvalidateFG();
     void Callback(UpdateCallback C, void* Param) override;
 
     void SetUpdateCallback(UpdateCallback pCallback) override;
@@ -102,12 +105,12 @@ public:
 
     IRenderVisual* dcast_RenderVisual() override
     {
-        return this;
+        return static_cast<xray::render::fg::dxRender_Visual*>(this);
     }
 
     IKinematics* dcast_PKinematics() override
     {
-        return this;
+        return static_cast<IKinematics*>(this);
     }
 
     IKinematicsAnimated* dcast_PKinematicsAnimated() override
