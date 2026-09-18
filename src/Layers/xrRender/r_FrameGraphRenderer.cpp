@@ -14,6 +14,7 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "OzzSharedMotions.hpp"
 #include "ParticleEffectDef.h"
 #include "GpuParticleManager.h"
 #include "ParticleEditor/ParticleEditor.h"
@@ -189,6 +190,9 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
+    if (!XRay::Animation::g_pOzzMotionsContainer)
+        XRay::Animation::g_pOzzMotionsContainer = xr_new<XRay::Animation::OzzMotionsContainer>();
+
     m_shaderLoader = xr_new<framegraph::ShaderLoader>(device->GetSlangCompiler());
     if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
         m_shaderLoader->SetTarget(SlangCompiler::Target::SPIRV);
@@ -291,6 +295,7 @@ void FrameGraphRenderer::Shutdown() {
     m_particleEditor = nullptr;
     GetGpuParticleManager().Reset();
     m_HWOCC.occq_destroy();
+    xr_delete(XRay::Animation::g_pOzzMotionsContainer);
     m_PSLibrary.OnDestroy();
 
     if (m_shaderLoader) {
@@ -2119,7 +2124,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.isStatic = isStatic;
     if (batch.isSkinned) {
         if (visualType == MT_OZZ_MESH) {
-            batch.skinningRenderMode = 1;
+            batch.skinningRenderMode = 10;
         } else if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
         } else {
@@ -2242,7 +2247,7 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
     if (batch.isSkinned) {
         if (visualType == MT_OZZ_MESH) {
-            batch.skinningRenderMode = 1;
+            batch.skinningRenderMode = 10;
         } else if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
         } else {
