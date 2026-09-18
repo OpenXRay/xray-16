@@ -5,35 +5,23 @@
 
 #include "Layers/xrRender/AnimationKeyCalculate.h"
 #include "OzzConversion.h"
-#include "OzzMotionArchive.h"
 
 #include "framework/mesh.h"
 
 #include "xrCore/Animation/Motion.hpp"
-#include "xrCore/FS.h"
-#include "xrCore/FS_impl.h"
 #include "xrCore/_std_extensions.h"
 #include "xrEngine/device.h"
 
 #include "ozz/animation/runtime/skeleton_utils.h"
 #include "ozz/animation/runtime/local_to_model_job.h"
-#include "ozz/base/io/archive.h"
-#include "ozz/base/io/stream.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <filesystem>
 #include <limits>
 #include <string>
 
-namespace fs = std::filesystem;
 namespace Render = xray::render::fg;
-
-namespace xray::render::fg
-{
-    class AnimationComputeManager;
-}
 
 namespace XRay
 {
@@ -47,17 +35,6 @@ constexpr Render::animation::channal_rule kDefaultChannelRules[MAX_CHANNELS] = {
     { Render::animation::lerp,  Render::animation::add },
     { Render::animation::lerp,  Render::animation::add },
 };
-
-bool EndsWithIgnoreCase(const xr_string& value, pcstr suffix)
-{
-    if (!suffix)
-        return false;
-    const size_t suffix_length = xr_strlen(suffix);
-    if (value.size() < suffix_length)
-        return false;
-    return xr_stricmp(value.c_str() + value.size() - suffix_length, suffix) == 0;
-}
-
 }
 
 OzzKinematicsAnimated::OzzKinematicsAnimated()
@@ -84,13 +61,11 @@ OzzKinematicsAnimated::~OzzKinematicsAnimated()
     ClearActiveBlends(true);
 }
 
-
 void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* pFrom)
 {
     xray::render::fg::FHierrarhyVisual::Copy(pFrom);
 
-    auto* src = dynamic_cast<OzzKinematicsAnimated*>(pFrom);
-    R_ASSERT2(src, "OzzKinematicsAnimated::Copy: source is not OzzKinematicsAnimated");
+    auto* src = static_cast<OzzKinematicsAnimated*>(pFrom);
 
     m_BundleSkeleton     = src->m_BundleSkeleton;
     m_BundleMesh         = src->m_BundleMesh;
@@ -127,112 +102,34 @@ void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* pFrom)
     }
 }
 
-void OzzKinematicsAnimated::Copy(OzzKinematicsAnimated* from)
-{
-    if (!from || !from->core.IsInitialized())
-        return;
-
-    m_Motions = from->m_Motions;
-
-    motionReferences = from->motionReferences;
-    embeddedAnimationData = from->embeddedAnimationData;
-
-    defaultPartition = from->defaultPartition;
-
-    if (core.IsInitialized())
-    {
-        for (auto& slot : m_Motions)
-        {
-            BuildBoneMotionCache(slot);
-        }
-    }
-
-    InitializeChannelState();
-    ResetPlaybackState();
-    InitializeSamplingState();
-    IBlend_Startup();
-
-    blendDestroyCallback = nullptr;
-    updateTracksCallback = nullptr;
-}
-
 void OzzKinematicsAnimated::OnSkeletonLoaded()
 {
     EnsureMotionLibraryLoaded();
-    PopulateEntityBindPose();
 
-    if (core.IsInitialized())
+    if (IsInitialized())
     {
         defaultPartition[0].Name = "default";
-        const u16 bone_count = core.GetBoneCount();
+        const u16 bone_count = LL_BoneCount();
         defaultPartition[0].bones.resize(bone_count);
         for (u16 i = 0; i < bone_count; ++i)
             defaultPartition[0].bones[i] = i;
     }
 }
 
-void OzzKinematicsAnimated::PopulateEntityBindPose()
-{
-    if (!core.IsInitialized())
-        return;
-
-    auto& bufs = m_animBufs;
-    const int num_joints     = core.Skeleton().num_joints();
-    const int num_soa_joints = core.Skeleton().num_soa_joints();
-
-    bufs.locals.resize(static_cast<std::size_t>(num_soa_joints));
-    bufs.models.resize(static_cast<std::size_t>(num_joints));
-    bufs.context.Resize(num_joints);
-
-    for (int i = 0; i < num_soa_joints; ++i)
-        bufs.locals[i] = core.Skeleton().joint_rest_poses()[i];
-
-    m_animCtl.skeleton = &core.Skeleton();
-
-    ozz::animation::LocalToModelJob ltm_job;
-    ltm_job.skeleton = &core.Skeleton();
-    ltm_job.input    = ozz::make_span(bufs.locals);
-    ltm_job.output   = ozz::make_span(bufs.models);
-    R_ASSERT2(ltm_job.Run(), "ozz LocalToModelJob (bind-pose) failed");
-}
-
-bool OzzKinematicsAnimated::InitializeFromOzz(pcstr skeletonPath, const xr_vector<xr_string>& motionRefs)
-{
-    if (!skeletonPath || !skeletonPath[0])
-        return false;
-
-    motionReferences = motionRefs;
-
-    if (!core.InitializeFromOzz(skeletonPath))
-    {
-        motionReferences.clear();
-        return false;
-    }
-
-    InitializeSamplingState();
-    ResetPlaybackState();
-
-    InitializeChannelState();
-    EnsureMotionLibraryLoaded();
-
-    return true;
-}
-
 bool OzzKinematicsAnimated::InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData, const xr_vector<xr_string>& motionRefs)
 {
     motionReferences = motionRefs;
 
-    if (!core.InitializeFromOzzBuffer(skeletonData))
+    if (!OzzKinematics::InitializeFromOzzBuffer(skeletonData))
     {
         motionReferences.clear();
         return false;
     }
 
-    InitializeSamplingState();
+    ResetSamplingBuffers();
     ResetPlaybackState();
 
     InitializeChannelState();
-    EnsureMotionLibraryLoaded();
 
     return true;
 }
@@ -240,18 +137,6 @@ bool OzzKinematicsAnimated::InitializeFromOzzBuffer(ozz::span<const std::byte> s
 void OzzKinematicsAnimated::SetEmbeddedAnimationData(const std::vector<std::uint8_t>& data)
 {
     embeddedAnimationData = data;
-}
-
-void OzzKinematicsAnimated::ResetAnimationState()
-{
-    InitializeChannelState();
-    motionReferences.clear();
-    m_Motions.clear();
-    blendDestroyCallback = nullptr;
-    updateTracksCallback = nullptr;
-    animationApplied = false;
-    embeddedAnimationData.clear();
-    ResetPlaybackState();
 }
 
 void OzzKinematicsAnimated::InitializeChannelState()
@@ -290,12 +175,12 @@ CBlend* OzzKinematicsAnimated::IBlend_Create()
 
 void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
 {
-    if (!g_pOzzMotionsContainer || !core.IsInitialized())
+    if (!g_pOzzMotionsContainer || !IsInitialized())
         return;
 
     m_Motions.clear();
 
-    SkeletonFingerprint skelFP = SkeletonFingerprint::Compute(core.Skeleton());
+    SkeletonFingerprint skelFP = SkeletonFingerprint::Compute(Skeleton());
 
     if (!embeddedAnimationData.empty())
     {
@@ -312,7 +197,7 @@ void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
         request.blocking = true;
         request.embeddedData = embeddedAnimationData;
 
-        if (!slot.motions.Create(request, core.Skeleton()))
+        if (!slot.motions.Create(request, Skeleton()))
             m_Motions.pop_back();
         else
             BuildBoneMotionCache(slot);
@@ -334,7 +219,7 @@ void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
         request.skelFingerprint = skelFP;
         request.blocking = true;
 
-        if (!slot.motions.Create(request, core.Skeleton()))
+        if (!slot.motions.Create(request, Skeleton()))
         {
             m_Motions.pop_back();
             continue;
@@ -346,13 +231,13 @@ void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
 
 void OzzKinematicsAnimated::BuildBoneMotionCache(SMotionsSlot& slot)
 {
-    if (!core.IsInitialized())
+    if (!IsInitialized())
         return;
 
-    const u32 bone_count = core.Skeleton().num_joints();
+    const u32 bone_count = Skeleton().num_joints();
     slot.bone_motions.resize(bone_count);
 
-    auto joint_names = core.Skeleton().joint_names();
+    auto joint_names = Skeleton().joint_names();
     for (u32 bone_idx = 0; bone_idx < bone_count; ++bone_idx)
     {
         const char* bone_name = joint_names[bone_idx];
@@ -398,15 +283,9 @@ void OzzKinematicsAnimated::RemoveActiveBlend(size_t index, bool notifyDestroy)
 
 void OzzKinematicsAnimated::ClearActiveBlends(bool notifyDestroy)
 {
-    static thread_local int s_depth = 0;
-    ++s_depth;
-    if (s_depth > 8)
-        Msg("! [ClearActiveBlends] depth=%d (recursion?)", s_depth);
-
     if (activeBlends.empty())
     {
         ResetPlaybackState();
-        --s_depth;
         return;
     }
 
@@ -426,7 +305,6 @@ void OzzKinematicsAnimated::ClearActiveBlends(bool notifyDestroy)
 
     activeBlends.clear();
     ResetPlaybackState();
-    --s_depth;
 }
 
 void OzzKinematicsAnimated::ResetPlaybackState()
@@ -440,45 +318,11 @@ void OzzKinematicsAnimated::ResetPlaybackState()
     loopPlayback = true;
     samplingContext.Resize(0);
     ResetSamplingBuffers();
-
-        auto& state = m_animState;
-    auto& ctl   = m_animCtl;
-
-    state.current_time = 0.0f;
-    state.time_ratio   = 0.0f;
-    ctl.animation      = nullptr;
-    ctl.playback_speed = 1.0f;
-
-    m_isPlaying = false;
-    m_isLooping = true;
-}
-
-bool OzzKinematicsAnimated::LoadAnimationFromFile(const std::filesystem::path& path)
-{
-    if (!LoadAnimationClipFromFile(path))
-        return false;
-
-    controllerMotion.invalidate();
-    animationApplied = false;
-    CalculateBones_Invalidate();
-    return true;
-}
-
-void OzzKinematicsAnimated::StopAnimation()
-{
-    ClearActiveBlends(true);
-    ClearPose();
-    CalculateBones_Invalidate();
-
-        auto& state = m_animState;
-    state.current_time = 0.0f;
-    state.time_ratio   = 0.0f;
-    m_isPlaying = false;
 }
 
 bool OzzKinematicsAnimated::AdvanceAnimation(float dt)
 {
-    if (!core.IsInitialized())
+    if (!IsInitialized())
         return false;
 
     if (!animationLoaded || !activeAnimation)
@@ -515,7 +359,7 @@ bool OzzKinematicsAnimated::AdvanceAnimation(float dt)
 
     const float ratio = duration > 0.f ? playbackTime / duration : 0.f;
 
-    if (sampledLocals.size() != static_cast<size_t>(core.Skeleton().num_soa_joints()))
+    if (sampledLocals.size() != static_cast<size_t>(Skeleton().num_soa_joints()))
         ResetSamplingBuffers();
 
     ozz::animation::SamplingJob job;
@@ -527,67 +371,38 @@ bool OzzKinematicsAnimated::AdvanceAnimation(float dt)
     if (!job.Run())
         return false;
 
-    if (!SetPoseLocals(ozz::span<const ozz::math::SoaTransform>(sampledLocals.data(), sampledLocals.size())))
-        return false;
+    poseValid = true;
+    CalculateBones_Invalidate();
 
     animationApplied = true;
     return true;
 }
 
-bool OzzKinematicsAnimated::HasLoadedAnimation() const
-{
-    return animationLoaded && activeAnimation;
-}
-
-void OzzKinematicsAnimated::SetLooping(bool loop)
-{
-    loopPlayback = loop;
-}
-
-void OzzKinematicsAnimated::SetPlaybackSpeed(float speed)
-{
-    playbackSpeed = speed;
-}
-
-float OzzKinematicsAnimated::AnimationDuration() const
-{
-    return (animationLoaded && activeAnimation) ? activeAnimation->duration() : 0.f;
-}
-
-#ifdef DEBUG
-ozz::span<const ozz::math::SoaTransform> OzzKinematicsAnimated::DebugSampledLocals() const
-{
-    if (sampledLocals.empty())
-        return {};
-    return ozz::span<const ozz::math::SoaTransform>(sampledLocals.data(), sampledLocals.size());
-}
-#endif
-
-void OzzKinematicsAnimated::InitializeSamplingState()
-{
-    ResetSamplingBuffers();
-}
-
 void OzzKinematicsAnimated::ResetSamplingBuffers()
 {
-    if (!core.IsInitialized())
+    if (!IsInitialized())
     {
         sampledLocals.clear();
+        poseValid = false;
         return;
     }
 
-    const int soa_count = core.Skeleton().num_soa_joints();
-    sampledLocals.resize(static_cast<size_t>(soa_count));
+    const size_t soa_count = static_cast<size_t>(Skeleton().num_soa_joints());
+    if (sampledLocals.size() == soa_count)
+        return;
+
+    sampledLocals.resize(soa_count);
     for (ozz::math::SoaTransform& transform : sampledLocals)
         transform = ozz::math::SoaTransform::identity();
+    poseValid = false;
 }
 
 bool OzzKinematicsAnimated::LoadAnimationClip(const std::shared_ptr<ozz::animation::Animation>& animation)
 {
-    if (!core.IsInitialized() || !animation)
+    if (!IsInitialized() || !animation)
         return false;
 
-    if (animation->num_tracks() != core.Skeleton().num_joints())
+    if (animation->num_tracks() != Skeleton().num_joints())
         return false;
 
     activeAnimation = animation;
@@ -598,52 +413,8 @@ bool OzzKinematicsAnimated::LoadAnimationClip(const std::shared_ptr<ozz::animati
     return true;
 }
 
-bool OzzKinematicsAnimated::LoadAnimationClipFromFile(const std::filesystem::path& path)
-{
-    if (!core.IsInitialized())
-        return false;
-
-    ozz::io::File file(path.string().c_str(), "rb");
-    if (!file.opened())
-        return false;
-
-    ozz::io::IArchive archive(&file);
-    std::shared_ptr<ozz::animation::Animation> animation = std::make_shared<ozz::animation::Animation>();
-    if (archive.TestTag<ozz::animation::Animation>())
-    {
-        archive >> *animation;
-    }
-    else
-    {
-        file.Seek(0, ozz::io::Stream::kSet);
-        ozz::io::IArchive aggregate(&file);
-
-        uint32_t animation_count = 0;
-        aggregate >> animation_count;
-        if (animation_count == 0)
-            return false;
-
-        aggregate >> *animation;
-        SkipOzzAnimationMetadata(aggregate);
-
-        for (uint32_t idx = 1; idx < animation_count; ++idx)
-        {
-            ozz::animation::Animation discarded;
-            aggregate >> discarded;
-            SkipOzzAnimationMetadata(aggregate);
-        }
-    }
-
-    return LoadAnimationClip(animation);
-}
-
-void OzzKinematicsAnimated::OnCalculateBones()
-{
-    UpdateTracks();
-}
-
 #ifdef DEBUG
-std::pair<LPCSTR, LPCSTR> OzzKinematicsAnimated::LL_MotionDefName_dbg(MotionID )
+std::pair<LPCSTR, LPCSTR> OzzKinematicsAnimated::LL_MotionDefName_dbg(MotionID)
 {
     static xr_string empty;
     return { empty.c_str(), empty.c_str() };
@@ -654,24 +425,24 @@ void OzzKinematicsAnimated::LL_DumpBlends_dbg()
 }
 #endif
 
-u32 OzzKinematicsAnimated::LL_PartBlendsCount(u32 )
+u32 OzzKinematicsAnimated::LL_PartBlendsCount(u32)
 {
     return 0;
 }
 
-CBlend* OzzKinematicsAnimated::LL_PartBlend(u32 , u32 )
+CBlend* OzzKinematicsAnimated::LL_PartBlend(u32, u32)
 {
     return nullptr;
 }
 
-void OzzKinematicsAnimated::LL_IterateBlends(IterateBlendsCallback& ) {}
+void OzzKinematicsAnimated::LL_IterateBlends(IterateBlendsCallback&) {}
 
 u16 OzzKinematicsAnimated::LL_MotionsSlotCount()
 {
     return 0;
 }
 
-const shared_motions& OzzKinematicsAnimated::LL_MotionsSlot(u16 )
+const shared_motions& OzzKinematicsAnimated::LL_MotionsSlot(u16)
 {
     static shared_motions dummy;
     return dummy;
@@ -701,7 +472,7 @@ CMotion* OzzKinematicsAnimated::LL_GetRootMotion(MotionID id)
     if (!id.valid())
         return nullptr;
 
-    const u16 root_bone = core.GetRootBone();
+    const u16 root_bone = LL_GetBoneRoot();
     const u16 resolved_root = (root_bone != BI_NONE) ? root_bone : u16(0);
     return LL_GetMotion(id, resolved_root);
 }
@@ -711,10 +482,10 @@ CMotion* OzzKinematicsAnimated::LL_GetMotion(MotionID id, u16 bone_id)
     if (!id.valid() || id.slot >= m_Motions.size())
         return nullptr;
 
-    if (!core.IsInitialized() || bone_id == BI_NONE)
+    if (!IsInitialized() || bone_id == BI_NONE)
         return nullptr;
 
-    const u32 joint_count = static_cast<u32>(core.Skeleton().num_joints());
+    const u32 joint_count = static_cast<u32>(Skeleton().num_joints());
     if (bone_id >= joint_count)
         return nullptr;
 
@@ -731,7 +502,7 @@ CMotion* OzzKinematicsAnimated::LL_GetMotion(MotionID id, u16 bone_id)
 
 void OzzKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 channel_mask, SKeyTable& keys)
 {
-    if (!core.IsInitialized() || !bd)
+    if (!IsInitialized() || !bd)
         return;
 
     const u16 self_id = bd->GetSelfID();
@@ -904,7 +675,7 @@ MotionID OzzKinematicsAnimated::LL_MotionID(LPCSTR B)
     return MotionID();
 }
 
-u16 OzzKinematicsAnimated::LL_PartID(LPCSTR )
+u16 OzzKinematicsAnimated::LL_PartID(LPCSTR)
 {
     return BI_NONE;
 }
@@ -928,16 +699,6 @@ void OzzKinematicsAnimated::EnumerateCycleNames(xr_vector<shared_str>& outNames)
 CBlend* OzzKinematicsAnimated::LL_PlayCycle(u16 partition, MotionID motion, BOOL bMixing, float blendAccrue, float blendFalloff, float Speed, BOOL noloop,
     PlayCallback Callback, LPVOID CallbackParam, u8 channel)
 {
-    static thread_local int s_play_depth = 0;
-    struct DepthGuard { int& d; DepthGuard(int& v) : d(v) { ++d; } ~DepthGuard() { --d; } } _g(s_play_depth);
-    if (s_play_depth > 8)
-        Msg("! [LL_PlayCycle] depth=%d (recursion via callback?)", s_play_depth);
-    if (s_play_depth > 200)
-    {
-        Msg("! [LL_PlayCycle] runaway recursion at depth=%d, aborting", s_play_depth);
-        return nullptr;
-    }
-
     if (!motion.valid() || motion.slot >= m_Motions.size())
         return nullptr;
 
@@ -995,24 +756,6 @@ CBlend* OzzKinematicsAnimated::LL_PlayCycle(u16 partition, MotionID motion, BOOL
     if (fis_zero(playback_speed_value))
         playback_speed_value = !fis_zero(def_speed) ? def_speed : 1.f;
 
-        auto& state = m_animState;
-    auto& ctl   = m_animCtl;
-
-    const bool sameMotion = (ctl.animation == activeAnimation.get());
-    if (!sameMotion)
-    {
-        state.current_time = 0.0f;
-        state.time_ratio   = 0.0f;
-    }
-    ctl.animation      = activeAnimation.get();
-    ctl.playback_speed = playback_speed_value;
-
-    m_isPlaying = true;
-    if (loopPlayback)
-        m_isLooping = true;
-    else
-        m_isLooping = false;
-
     CBlend& blend = *entry.blend;
     blend.set_accrue_state();
     blend.blendAmount = mixing ? EPS_S : 1.f;
@@ -1021,7 +764,7 @@ CBlend* OzzKinematicsAnimated::LL_PlayCycle(u16 partition, MotionID motion, BOOL
     blend.blendPower = 1.f;
 
     blend.speed = playback_speed_value;
-    SetPlaybackSpeed(playback_speed_value);
+    playbackSpeed = playback_speed_value;
 
     blend.motionID = resolvedMotion;
     blend.timeCurrent = 0.f;
@@ -1075,9 +818,6 @@ void OzzKinematicsAnimated::LL_CloseCycle(u16 partition, u8 mask_channel)
         }
         ++index;
     }
-
-    if (activeBlends.empty())
-        m_isPlaying = false;
 }
 
 void OzzKinematicsAnimated::LL_SetChannelFactor(u16 channel, float factor)
@@ -1093,23 +833,8 @@ void OzzKinematicsAnimated::UpdateTracks()
 
 void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_blends)
 {
-    auto& state = m_animState;
-    auto& ctl   = m_animCtl;
-
-    if (activeAnimation)
-    {
-        ctl.animation      = activeAnimation.get();
-        ctl.playback_speed = playbackSpeed;
-        m_isPlaying = animationLoaded && !activeBlends.empty();
-        m_isLooping = loopPlayback;
-    }
-
-    if (m_isPlaying && activeAnimation)
-    {
+    if (activeAnimation && animationLoaded && !activeBlends.empty())
         AdvanceAnimation(dt);
-        state.current_time = playbackTime;
-        state.time_ratio   = activeAnimation->duration() > 0.f ? playbackTime / activeAnimation->duration() : 0.f;
-    }
 
     if (!activeBlends.empty())
     {
@@ -1122,7 +847,7 @@ void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_b
             if (b_force || blend.dwFrame != Device.dwFrame)
             {
                 blend.dwFrame = Device.dwFrame;
-                blend.timeCurrent = state.current_time;
+                blend.timeCurrent = playbackTime;
 
                 const bool finished = blend.update(dt, blend.Callback);
                 if (finished && !leave_blends)
@@ -1197,27 +922,27 @@ CBlend* OzzKinematicsAnimated::PlayCycle(u16 partition, MotionID M, BOOL bMixIn,
     return LL_PlayCycle(partition, M, bMixIn, Callback, CallbackParam, channel);
 }
 
-MotionID OzzKinematicsAnimated::ID_FX(LPCSTR )
+MotionID OzzKinematicsAnimated::ID_FX(LPCSTR)
 {
     return MotionID();
 }
 
-MotionID OzzKinematicsAnimated::ID_FX_Safe(LPCSTR )
+MotionID OzzKinematicsAnimated::ID_FX_Safe(LPCSTR)
 {
     return MotionID();
 }
 
-CBlend* OzzKinematicsAnimated::PlayFX(LPCSTR , float )
+CBlend* OzzKinematicsAnimated::PlayFX(LPCSTR, float)
 {
     return nullptr;
 }
 
-CBlend* OzzKinematicsAnimated::PlayFX(MotionID , float )
+CBlend* OzzKinematicsAnimated::PlayFX(MotionID, float)
 {
     return nullptr;
 }
 
-CBlend* OzzKinematicsAnimated::PlayFX_Safe(cpcstr , float )
+CBlend* OzzKinematicsAnimated::PlayFX_Safe(cpcstr, float)
 {
     return nullptr;
 }
@@ -1227,9 +952,9 @@ const CPartition& OzzKinematicsAnimated::partitions() const
     return defaultPartition;
 }
 
-float OzzKinematicsAnimated::get_animation_length(MotionID )
+float OzzKinematicsAnimated::get_animation_length(MotionID)
 {
-    return AnimationDuration();
+    return (animationLoaded && activeAnimation) ? activeAnimation->duration() : 0.f;
 }
 
 void OzzKinematicsAnimated::LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset)
@@ -1241,105 +966,5 @@ void OzzKinematicsAnimated::LL_ClearAdditionalTransform(u16 bone_id)
 {
     OzzKinematics::LL_ClearAdditionalTransform(bone_id);
 }
-
-u16 OzzKinematicsAnimated::GetAvailableMotionCount() const
-{
-    if (!g_pOzzMotionsContainer)
-        return 0;
-
-    u32 total_count = 0;
-    for (const auto& slot : m_Motions)
-    {
-        if (const OzzMotionsValue* value = g_pOzzMotionsContainer->Resolve(slot.motions.GetHandle()))
-        {
-            total_count += value->GetMotionCount();
-        }
-    }
-
-    return static_cast<u16>(std::min(total_count, static_cast<u32>(std::numeric_limits<u16>::max())));
-}
-
-bool OzzKinematicsAnimated::GetMotionName(u16 index, xr_string& out_name) const
-{
-    if (!g_pOzzMotionsContainer)
-        return false;
-
-    u16 current_offset = 0;
-    for (const auto& slot : m_Motions)
-    {
-        const OzzMotionsValue* value = g_pOzzMotionsContainer->Resolve(slot.motions.GetHandle());
-        if (!value)
-            continue;
-
-        const u16 slot_count = value->GetMotionCount();
-        if (index < current_offset + slot_count)
-        {
-            const u16 local_index = index - current_offset;
-            if (const auto* record = value->FindMotion(local_index))
-            {
-                out_name = record->name;
-                return true;
-            }
-            return false;
-        }
-
-        current_offset += slot_count;
-    }
-
-    return false;
-}
-
-bool OzzKinematicsAnimated::GetMotionInfo(u16 index, xr_string& out_name, float& out_duration) const
-{
-    if (!g_pOzzMotionsContainer)
-        return false;
-
-    u16 current_offset = 0;
-    for (const auto& slot : m_Motions)
-    {
-        const OzzMotionsValue* value = g_pOzzMotionsContainer->Resolve(slot.motions.GetHandle());
-        if (!value)
-            continue;
-
-        const u16 slot_count = value->GetMotionCount();
-        if (index < current_offset + slot_count)
-        {
-            const u16 local_index = index - current_offset;
-            if (const auto* record = value->FindMotion(local_index))
-            {
-                out_name = record->name;
-                out_duration = record->animation ? record->animation->duration() : 0.f;
-                return true;
-            }
-            return false;
-        }
-
-        current_offset += slot_count;
-    }
-
-    return false;
-}
-
-OzzMotionsContainer* OzzKinematicsAnimated::GetMotionsContainer() const
-{
-    return g_pOzzMotionsContainer;
-}
-
-const ozz::animation::Animation* OzzKinematicsAnimated::ResolveMotionAnimation(MotionID id) const
-{
-    if (!id.valid() || id.slot >= m_Motions.size() || !g_pOzzMotionsContainer)
-        return nullptr;
-
-    OzzMotionsValue* value = g_pOzzMotionsContainer->Resolve(m_Motions[id.slot].motions.GetHandle());
-    if (!value)
-        return nullptr;
-
-    OzzMotionsValue::MotionRecord* record = value->FindMotion(id.idx);
-    if (!record || !record->animation)
-        return nullptr;
-
-    return record->animation.get();
-}
-
 }
 }

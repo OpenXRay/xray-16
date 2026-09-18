@@ -340,8 +340,6 @@ target_sources(xrRender PRIVATE
     OzzKinematics.cpp
     OzzKinematicsAnimated.h
     OzzKinematicsAnimated.cpp
-    OzzKinematicsCore.h
-    OzzKinematicsCore.cpp
     OzzMesh.h
     OzzMesh.cpp
     OzzMotionArchive.h
