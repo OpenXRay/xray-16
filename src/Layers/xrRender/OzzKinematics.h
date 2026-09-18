@@ -125,6 +125,10 @@ public:
     shared_str getDebugName() override;
 #endif
 
+public:
+    u32 fg_bone_upload_frame{0};
+    u32 fg_bone_upload_offset{0};
+
 protected:
     OzzKinematicsCore core;
 
