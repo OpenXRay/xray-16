@@ -2105,6 +2105,9 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_SKELETON_GEOMDEF_PM:  // Skinned mesh (progressive)
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
+        case MT_OZZ_MESH:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
         case MT_PARTICLE_EFFECT: // particles & particle groups
         case MT_PARTICLE_GROUP:
             if (m_collectShadowOnly)
@@ -2151,7 +2154,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     //
 
     u32 visualType = visual->getType();
-    bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM || visualType == MT_OZZ_MESH);
 
     if (isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_PM) {
@@ -2205,11 +2208,13 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         batch.isAlphaTested = materialInfo.alphaTest;
     }
     batch.renderable = renderable;
-    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM || visualType == MT_OZZ_MESH);
     batch.isShadowOnly = m_collectShadowOnly;
     batch.isStatic = isStatic;
     if (batch.isSkinned) {
-        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+        if (visualType == MT_OZZ_MESH) {
+            batch.skinningRenderMode = 1;
+        } else if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
         } else {
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
@@ -2282,6 +2287,9 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
         case MT_SKELETON_GEOMDEF_PM:
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
+        case MT_OZZ_MESH:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
             return ProcessParticleGeometry(visual, worldTransform, renderable, true);
@@ -2326,11 +2334,13 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.renderable = renderable;
 
     u32 visualType = visual->getType();
-    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM || visualType == MT_OZZ_MESH);
     batch.vertexCount = meshVisual->vCount;
 
     if (batch.isSkinned) {
-        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+        if (visualType == MT_OZZ_MESH) {
+            batch.skinningRenderMode = 1;
+        } else if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
         } else {
             batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
@@ -2447,6 +2457,18 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
             //if (pV->m_lod) {
                 //fn(pV->m_lod);
             //}
+            break;
+        }
+        case MT_OZZ_STATIC:
+        case MT_OZZ_ANIMATED: {
+            auto* pV = static_cast<FHierrarhyVisual*>(pVisual);
+            for (auto& child : pV->children) {
+                ForEachLeafVisual(child, fn);
+            }
+            break;
+        }
+        case MT_OZZ_MESH: {
+            fn(pVisual);
             break;
         }
         case MT_SKELETON_GEOMDEF_PM:
