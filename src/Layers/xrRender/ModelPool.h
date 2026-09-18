@@ -56,6 +56,7 @@ public:
     dxRender_Visual* Instance_Load(LPCSTR N, IReader* data, BOOL allow_register);
     void Instance_Register(LPCSTR N, dxRender_Visual* V);
     dxRender_Visual* Instance_Find(LPCSTR N);
+    dxRender_Visual* Instance_LoadOzzx(LPCSTR N, LPCSTR full_path);
 
     dxRender_Visual* CreatePE(PS::CPEDef* source);
     dxRender_Visual* CreatePG(PS::CPGDef* source);

@@ -17,6 +17,10 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "OzzKinematicsAnimated.h"
+#include "OzzMesh.h"
+#include "xrAnimation/OzzBundle.h"
+#include <filesystem>
 #else
 #include "FMesh.h"
 #include "FVisual.h"
@@ -53,6 +57,11 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     case MT_SKELETON_GEOMDEF_ST: V = xr_new<CSkeletonX_ST>(); break;
     case MT_PARTICLE_EFFECT: V = xr_new<PS::CParticleEffect>(); break;
     case MT_PARTICLE_GROUP: V = xr_new<PS::CParticleGroup>(); break;
+#ifndef _EDITOR
+    case MT_OZZ_STATIC: V = xr_new<XRay::Animation::OzzKinematics>(); break;
+    case MT_OZZ_ANIMATED: V = xr_new<XRay::Animation::OzzKinematicsAnimated>(); break;
+    case MT_OZZ_MESH: V = xr_new<OzzMesh>(); break;
+#endif
 #ifndef _EDITOR
     case MT_LOD: V = xr_new<FLOD>(); break;
     case MT_TREE_ST: V = xr_new<FTreeVisual_ST>(); break;
@@ -116,6 +125,39 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
     if (bLogging)
         Msg("- Uncached model loading: %s", fn);
 #endif // DEBUG
+
+#ifndef _EDITOR
+    {
+        string_path ozzx_stem;
+        xr_strcpy(ozzx_stem, sizeof(ozzx_stem), name);
+        for (char* p = ozzx_stem; *p; ++p)
+            if (*p == '\\') *p = '/';
+        if (char* ext = strext(ozzx_stem))
+            *ext = 0;
+
+        string_path ozzx_name;
+        strconcat(sizeof(ozzx_name), ozzx_name, ozzx_stem, ".ozzx");
+
+        string_path ozzx_fn;
+        bool ozzx_found = false;
+        if (FS.exist(ozzx_fn, "$level$", ozzx_name, FSType::Any))
+            ozzx_found = true;
+        else if (FS.exist(ozzx_fn, "$game_meshes$", ozzx_name, FSType::Any))
+            ozzx_found = true;
+
+        if (ozzx_found)
+        {
+            dxRender_Visual* V = Instance_LoadOzzx(N, ozzx_fn);
+            if (V)
+            {
+                if (allow_register)
+                    Instance_Register(N, V);
+                return V;
+            }
+        }
+    }
+#endif
+
 
     IReader* data = FS.r_open(fn);
     ogf_header H;
@@ -643,5 +685,81 @@ void CModelPool::RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransf
     }
 }
 void CModelPool::OnDeviceDestroy() { Destroy(); }
+#endif
+
+#ifndef _EDITOR
+dxRender_Visual* CModelPool::Instance_LoadOzzx(LPCSTR N, LPCSTR full_path)
+{
+    XRay::Animation::OzzxBundle bundle;
+    if (!XRay::Animation::ReadOzzxBundle(std::filesystem::path(full_path), bundle))
+    {
+        Msg("! [ModelPool] Failed to read .ozzx bundle '%s'", full_path);
+        return nullptr;
+    }
+
+    if (bundle.skeleton.empty())
+    {
+        Msg("! [ModelPool] .ozzx bundle '%s' has no skeleton payload", full_path);
+        return nullptr;
+    }
+
+    const u32 type = (bundle.model_type == MT_OZZ_STATIC) ? MT_OZZ_STATIC : MT_OZZ_ANIMATED;
+    dxRender_Visual* V = Instance_Create(type);
+#ifdef DEBUG
+    V->dbg_name = N;
+#endif
+    auto* kin = static_cast<XRay::Animation::OzzKinematics*>(V);
+    auto* kin_anim = (type == MT_OZZ_ANIMATED) ? static_cast<XRay::Animation::OzzKinematicsAnimated*>(V) : nullptr;
+
+    kin->CacheBundlePayloads(
+        bundle.skeleton,
+        bundle.mesh,
+        bundle.motion_refs,
+        bundle.bone_metadata,
+        bundle.user_data,
+        bundle.embedded_animation_data);
+
+    const auto skeleton_span = ozz::span<const std::byte>(
+        reinterpret_cast<const std::byte*>(bundle.skeleton.data()),
+        bundle.skeleton.size());
+
+    bool init_ok;
+    if (kin_anim)
+        init_ok = kin_anim->InitializeFromOzzBuffer(skeleton_span, bundle.motion_refs);
+    else
+        init_ok = kin->InitializeFromOzzBuffer(skeleton_span);
+
+    if (!init_ok)
+    {
+        Msg("! [ModelPool] Failed to initialize OzzKinematics from '%s'", full_path);
+        xr_delete(V);
+        return nullptr;
+    }
+
+    if (!bundle.bone_metadata.empty())
+        kin->ApplyExtendedBoneMetadata(bundle.bone_metadata);
+
+    if (!bundle.user_data.empty())
+        kin->LoadUserDataFromBuffer(bundle.user_data);
+
+    if (kin_anim && !bundle.embedded_animation_data.empty())
+        kin_anim->SetEmbeddedAnimationData(bundle.embedded_animation_data);
+
+    if (kin_anim)
+        kin_anim->OnSkeletonLoaded();
+
+    if (!bundle.mesh.empty())
+    {
+        if (!kin->LoadMeshFromBuffer(bundle.mesh))
+            Msg("! [ModelPool] Failed to load ozz mesh from '%s'", full_path);
+    }
+
+    Msg("* [ModelPool] Loaded .ozzx '%s' (bones=%u, type=%s, motion_refs=%zu)",
+        full_path, kin->LL_BoneCount(),
+        kin_anim ? "animated" : "static",
+        bundle.motion_refs.size());
+
+    return V;
+}
 #endif
 } // namespace xray::render::fg
