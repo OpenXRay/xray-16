@@ -1456,6 +1456,31 @@ void DrawAnimationPanel(ViewerState& state, VulkanRenderer& renderer) {
                             }
                         }
                     }
+
+                    if (state.weapon.loaded && i < state.animation_metadata.size())
+                    {
+                        const auto& hand_name = state.animation_metadata[i].name;
+                        int wpn_match = -1;
+                        for (size_t wi = 0; wi < state.weapon.animation_metadata.size(); ++wi)
+                        {
+                            if (state.weapon.animation_metadata[wi].name == hand_name)
+                            {
+                                wpn_match = static_cast<int>(wi);
+                                break;
+                            }
+                        }
+                        if (wpn_match >= 0 && wpn_match < static_cast<int>(state.weapon.animations.size()))
+                        {
+                            state.weapon.current_animation_index = wpn_match;
+                            state.weapon.controller.animation = &state.weapon.animations[wpn_match];
+                            state.weapon.controller.playback_speed = speed;
+                            state.weapon.anim_state.current_time = 0.f;
+                            state.weapon.anim_state.time_ratio = 0.f;
+                            state.weapon.anim_state.is_playing = true;
+                            state.weapon.anim_state.is_looping = true;
+                            Msg("[DEBUG] Paired weapon animation: '%s' (index=%d)", hand_name.c_str(), wpn_match);
+                        }
+                    }
                 }
                 if (selected) {
                     ImGui::SetItemDefaultFocus();
@@ -3268,7 +3293,24 @@ int main(int argc, const char** argv) {
             RenderECSInstances(state, renderer);
 
             if (state.weapon.loaded) {
-                state.weapon.anim_state.current_time += dt * state.weapon.controller.playback_speed;
+                if (state.weapon.anim_state.is_playing && !state.instance_entities.empty() && state.ecs_animation_registry)
+                {
+                    auto* hand_state = state.ecs_animation_registry->GetComponent<AnimationECS::AnimationState>(
+                        state.instance_entities[0]);
+                    if (hand_state && hand_state->is_playing && state.weapon.controller.animation)
+                    {
+                        state.weapon.anim_state.current_time = hand_state->current_time;
+                        state.weapon.anim_state.time_ratio = hand_state->time_ratio;
+                    }
+                    else
+                    {
+                        state.weapon.anim_state.current_time += dt * state.weapon.controller.playback_speed;
+                    }
+                }
+                else
+                {
+                    state.weapon.anim_state.current_time += dt * state.weapon.controller.playback_speed;
+                }
                 UpdateWeaponPose(state);
 
                 if (renderer.HasWeaponMesh() && state.weapon.buffers.IsInitialized()) {
