@@ -2,9 +2,6 @@
 
 #include "OzzKinematicsCore.h"
 
-#include "xrECS/Components.hpp"
-#include "xrAnimation/Components.hpp"
-#include "xrECS/App.hpp"
 #include "OzzConversion.h"
 #include "xrCore/FS.h"
 #include "xrCore/FS_impl.h"

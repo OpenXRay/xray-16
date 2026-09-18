@@ -6,7 +6,6 @@
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"
 
-#include <entt/entt.hpp>
 
 namespace XRay::Animation
 {
@@ -100,7 +99,6 @@ public:
     UpdateCallback GetUpdateCallback() override;
     void* GetUpdateCallbackParam() override;
 
-    virtual entt::entity GetSkeletonEntity() const { return m_skeleton_entity; }
 
     IRenderVisual* dcast_RenderVisual() override
     {
@@ -140,7 +138,10 @@ protected:
     std::vector<std::uint8_t> m_BundleUserData;
     std::vector<std::uint8_t> m_BundleEmbeddedAnim;
 
-    entt::entity m_skeleton_entity{ entt::null };
+    ozz::vector<ozz::math::SoaTransform> m_locals;
+    ozz::vector<ozz::math::Float4x4> m_models;
+    ozz::animation::SamplingJob::Context m_samplingContext;
+
 
     virtual void OnSkeletonLoaded();
 
