@@ -231,9 +231,4 @@ public:
     }
 };
 
-// IC CKinematicsAnimated* PKinematicsAnimated(IRender_Visual* V) { return V?V->dcast_PKinematicsAnimated():0; }
-IC CKinematicsAnimated* PKinematicsAnimated(IRenderVisual* V)
-{
-    return V ? (CKinematicsAnimated*)V->dcast_PKinematicsAnimated() : 0;
-}
 } // namespace xray::render::fg

@@ -332,5 +332,12 @@ private:
     bool m_is_original_lod;
 };
 
-IC CKinematics* PCKinematics(dxRender_Visual* V) { return V ? (CKinematics*)V->dcast_PKinematics() : 0; }
+IC CKinematics* PCKinematics(dxRender_Visual* V)
+{
+    if (!V)
+        return nullptr;
+    if (V->Type != MT_SKELETON_ANIM && V->Type != MT_SKELETON_RIGID)
+        return nullptr;
+    return static_cast<CKinematics*>(V);
+}
 } // namespace xray::render::fg
