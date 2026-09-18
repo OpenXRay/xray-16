@@ -14,9 +14,6 @@
 #include "ozz/base/maths/soa_transform.h"
 #include "ozz/base/span.h"
 
-
-
-#include <filesystem>
 #include <memory>
 
 class CMotion;
@@ -24,45 +21,22 @@ class CMotionDef;
 
 namespace XRay::Animation
 {
-/**
- * Animated kinematics implementation using Ozz runtime.
- * This class extends OzzKinematics with IKinematicsAnimated functionality.
- */
 class OzzKinematicsAnimated : public OzzKinematics,
                               public IKinematicsAnimated
 {
 public:
     OzzKinematicsAnimated();
     ~OzzKinematicsAnimated() override;
-    virtual void OnSkeletonLoaded() override;
-    void PopulateEntityBindPose();
+
+    void OnSkeletonLoaded() override;
 
     void Copy(xray::render::fg::dxRender_Visual* pFrom) override;
-    void Copy(OzzKinematicsAnimated* from);
 
-
-    bool InitializeFromOzz(pcstr skeletonPath, const xr_vector<xr_string>& motionRefs = xr_vector<xr_string>());
     bool InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData, const xr_vector<xr_string>& motionRefs = xr_vector<xr_string>());
 
     void SetEmbeddedAnimationData(const std::vector<std::uint8_t>& data);
 
-
-    bool LoadAnimationFromFile(const std::filesystem::path& path);
-    void StopAnimation();
     bool AdvanceAnimation(float dt);
-
-    bool HasActiveAnimation() const
-    {
-        return animationApplied;
-    }
-
-    bool HasLoadedAnimation() const;
-    void SetLooping(bool loop);
-    void SetPlaybackSpeed(float speed);
-    float AnimationDuration() const;
-#ifdef DEBUG
-    ozz::span<const ozz::math::SoaTransform> DebugSampledLocals() const;
-#endif
 
     struct ActiveBlendEntry
     {
@@ -73,7 +47,6 @@ public:
         u16 recordIndex = u16(-1);
     };
 
-    void OnCalculateBones() override;
 #ifdef DEBUG
     std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID ID) override;
     void LL_DumpBlends_dbg() override;
@@ -127,11 +100,6 @@ public:
     const CPartition& partitions() const override;
     float get_animation_length(MotionID motion_ID) override;
 
-    // Animation enumeration helpers for utilities
-    u16 GetAvailableMotionCount() const;
-    bool GetMotionName(u16 index, xr_string& out_name) const;
-    bool GetMotionInfo(u16 index, xr_string& out_name, float& out_duration) const;
-
     IRenderVisual* dcast_RenderVisual() override
     {
         return static_cast<xray::render::fg::dxRender_Visual*>(this);
@@ -147,8 +115,11 @@ public:
         return static_cast<IKinematicsAnimated*>(this);
     }
 
-    OzzMotionsContainer* GetMotionsContainer() const;
-    const ozz::animation::Animation* ResolveMotionAnimation(MotionID id) const;
+protected:
+    void OnCalculateBones() override
+    {
+        UpdateTracks();
+    }
 
 private:
     struct SMotionsSlot
@@ -159,7 +130,6 @@ private:
 
     using MotionsSlotVec = xr_vector<SMotionsSlot>;
 
-    void ResetAnimationState();
     void InitializeChannelState();
     void EnsureMotionLibraryLoaded();
     void BuildBoneMotionCache(SMotionsSlot& slot);
@@ -171,15 +141,12 @@ private:
     void RemoveActiveBlend(size_t index, bool notifyDestroy);
     void ClearActiveBlends(bool notifyDestroy);
     void ResetPlaybackState();
-    void InitializeSamplingState();
     void ResetSamplingBuffers();
     bool LoadAnimationClip(const std::shared_ptr<ozz::animation::Animation>& animation);
-    bool LoadAnimationClipFromFile(const std::filesystem::path& path);
 
 private:
     std::shared_ptr<ozz::animation::Animation> activeAnimation;
     ozz::animation::SamplingJob::Context samplingContext;
-    xr_vector<ozz::math::SoaTransform> sampledLocals;
     bool animationLoaded = false;
     bool loopPlayback = true;
     float playbackSpeed = 1.f;
@@ -201,32 +168,5 @@ private:
     float channelFactors[MAX_CHANNELS]{};
 
     CPartition defaultPartition{};
-
-    struct AnimCtl
-    {
-        const ozz::animation::Skeleton*  skeleton  = nullptr;
-        const ozz::animation::Animation* animation = nullptr;
-        float playback_speed = 1.0f;
-    };
-
-    struct AnimState
-    {
-        float current_time = 0.0f;
-        float time_ratio   = 0.0f;
-    };
-
-    struct AnimBufs
-    {
-        ozz::animation::SamplingJob::Context           context;
-        ozz::vector<ozz::math::SoaTransform>           locals;
-        ozz::vector<ozz::math::Float4x4>               models;
-    };
-
-    AnimCtl   m_animCtl;
-    AnimState m_animState;
-    AnimBufs  m_animBufs;
-    bool m_isPlaying = false;
-    bool m_isLooping = false;
-
 };
 } // namespace XRay::Animation
