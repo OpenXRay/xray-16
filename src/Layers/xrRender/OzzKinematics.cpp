@@ -371,20 +371,12 @@ void OzzKinematics::LL_ClearAdditionalTransform(u16 bone_id)
     core.ClearBoneTransform(bone_id);
 }
 
-void OzzKinematics::CalculateBones(BOOL)
+void OzzKinematics::CalculateBones(BOOL bForceExact)
 {
+    core.CalculateTransforms(!!bForceExact);
 }
 
 void OzzKinematics::CalculateBones_Invalidate()
-{
-}
-
-void OzzKinematics::CalculateBonesFG(BOOL bForceExact)
-{
-    core.CalculateTransforms(bForceExact);
-}
-
-void OzzKinematics::CalculateBones_InvalidateFG()
 {
     core.InvalidateCache();
 }

@@ -93,8 +93,6 @@ public:
 
     void CalculateBones(BOOL bForceExact = FALSE) override;
     void CalculateBones_Invalidate() override;
-    void CalculateBonesFG(BOOL bForceExact = FALSE);
-    void CalculateBones_InvalidateFG();
     void Callback(UpdateCallback C, void* Param) override;
 
     void SetUpdateCallback(UpdateCallback pCallback) override;

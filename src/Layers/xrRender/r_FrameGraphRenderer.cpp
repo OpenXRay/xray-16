@@ -15,6 +15,7 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "OzzKinematics.h"
 #include "OzzSharedMotions.hpp"
 #include "ParticleEffectDef.h"
 #include "GpuParticleManager.h"
@@ -2466,7 +2467,9 @@ static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
         }
         case MT_OZZ_STATIC:
         case MT_OZZ_ANIMATED: {
-            auto* pV = static_cast<FHierrarhyVisual*>(pVisual);
+            auto* pV = static_cast<XRay::Animation::OzzKinematics*>(pVisual);
+            pV->CalculateBones(TRUE);
+
             for (auto& child : pV->children) {
                 ForEachLeafVisual(child, fn);
             }

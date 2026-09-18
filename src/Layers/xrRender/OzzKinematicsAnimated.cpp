@@ -644,20 +644,6 @@ void OzzKinematicsAnimated::OnCalculateBones()
     UpdateTracks();
 }
 
-void OzzKinematicsAnimated::CalculateBones(BOOL bForceExact)
-{
-    if (m_isPlaying && activeAnimation)
-        AdvanceAnimation(0.f);
-
-    core.CalculateTransforms(!!bForceExact);
-}
-
-void OzzKinematicsAnimated::CalculateBonesFG(BOOL bForceExact)
-{
-    UpdateTracks();
-    core.CalculateTransforms(!!bForceExact);
-}
-
 #ifdef DEBUG
 std::pair<LPCSTR, LPCSTR> OzzKinematicsAnimated::LL_MotionDefName_dbg(MotionID /*ID*/)
 {

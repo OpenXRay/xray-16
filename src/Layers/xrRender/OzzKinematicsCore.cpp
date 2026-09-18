@@ -613,6 +613,8 @@ void OzzKinematicsCore::CalculateTransforms(bool)
     const u32 currentTime = Device.dwTimeGlobal;
     if (currentTime == lastUpdateTime)
         return;
+
+    OnCalculateBones();
     lastUpdateTime = currentTime;
 
     const size_t jointCount = static_cast<size_t>(skeleton.num_joints());
@@ -689,8 +691,6 @@ void OzzKinematicsCore::CalculateTransforms(bool)
 
     if (updateCallback && ownerKinematics)
         updateCallback(ownerKinematics);
-
-    OnCalculateBones();
 }
 
 void OzzKinematicsCore::InvalidateCache()
