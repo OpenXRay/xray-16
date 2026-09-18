@@ -429,6 +429,7 @@ target_link_libraries(xrRender
     xrParticles
     xrScriptEngine
     xrAPI
+    xrAnimation
     xrMiscMath
     nvrhi
     ${XRAY_VULKAN_LIBS}
