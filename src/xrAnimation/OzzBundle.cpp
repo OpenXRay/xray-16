@@ -356,11 +356,15 @@ static bool WriteUserDataBlock(std::ofstream& stream, const std::vector<std::uin
 
 bool ReadOzzxBundle(const std::filesystem::path& path, OzzxBundle& out_bundle)
 {
-    std::ifstream stream(path, std::ios::binary);
+    string_path norm;
+    xr_strcpy(norm, sizeof(norm), path.string().c_str());
+    convert_path_separators(norm);
+
+    std::ifstream stream(norm, std::ios::binary);
     if (!stream)
     {
         const std::error_code ec(errno, std::generic_category());
-        std::cerr << "[OzzBundle] open bundle failed (errno " << ec.value() << ": " << ec.message() << ") — " << path << std::endl;
+        std::cerr << "[OzzBundle] open bundle failed (errno " << ec.value() << ": " << ec.message() << ") — " << norm << std::endl;
         return false;
     }
 

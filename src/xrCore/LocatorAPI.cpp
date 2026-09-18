@@ -1099,13 +1099,13 @@ const CLocatorAPI::file* CLocatorAPI::GetFileDesc(pcstr path)
 
 FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
 {
-    if ((fsType | FSType::Virtual) == FSType::Virtual)
+    if ((fsType & FSType::Virtual) != FSType{})
     {
         auto it = file_find_it(fn);
         if (it != m_files.end())
             return FileStatus(true, false);
     }
-    if ((fsType | FSType::External) == FSType::External)
+    if ((fsType & FSType::External) != FSType{})
     {
         string_path conv_fn;
         xr_strcpy(conv_fn, fn);

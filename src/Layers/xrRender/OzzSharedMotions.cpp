@@ -280,8 +280,11 @@ bool OzzMotionsValue::Load(pcstr file_path, const ozz::animation::Skeleton& skel
     if (status.External)
     {
         Msg("[OzzMotionsContainer] Loading external file: %s", resolved);
+        string_path norm_resolved;
+        xr_strcpy(norm_resolved, sizeof(norm_resolved), resolved);
+        convert_path_separators(norm_resolved);
         std::error_code ec;
-        fs::path absolute = fs::weakly_canonical(fs::path(resolved), ec);
+        fs::path absolute = fs::weakly_canonical(fs::path(norm_resolved), ec);
         if (ec || !fs::exists(absolute, ec))
         {
             Msg("[OzzMotionsContainer] ERROR: Failed to resolve path: %s", resolved);
