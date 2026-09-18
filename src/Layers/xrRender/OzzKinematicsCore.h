@@ -8,7 +8,18 @@
 
 #include "ExtendedBoneMetadata.h"
 
-namespace xray::ecs { struct CBoneVisibility; }
+struct OzzBoneVisibility
+{
+    u64 mask = u64(-1);
+    bool get(u16 bone_id) const { return bone_id >= 64 || (mask & (u64(1) << bone_id)) != 0; }
+    void set(u16 bone_id, bool visible)
+    {
+        if (bone_id >= 64) return;
+        if (visible) mask |= (u64(1) << bone_id);
+        else mask &= ~(u64(1) << bone_id);
+    }
+    void setAll(u64 m) { mask = m; }
+};
 
 #include "ozz/animation/runtime/sampling_job.h"
 #include "ozz/animation/runtime/skeleton.h"
@@ -77,7 +88,7 @@ public:
 
     u64 GetVisibilityMask() const;
     void SetVisibilityMask(u64 mask);
-    void BindBoneVisibility(xray::ecs::CBoneVisibility* vis) { boneVisibility = vis; }
+    void BindBoneVisibility(OzzBoneVisibility* vis) { boneVisibility = vis; }
 
     CInifile* GetUserData()
     {
@@ -187,7 +198,8 @@ protected:
     xr_vector<KinematicsABT::additional_bone_transform> boneOffsets;
 
     u16 rootBone;
-    xray::ecs::CBoneVisibility* boneVisibility = nullptr;
+    OzzBoneVisibility ownedBoneVisibility;
+    OzzBoneVisibility* boneVisibility = &ownedBoneVisibility;
     u32 lastUpdateTime;
     s32 visibilityCounter;
     Fbox cachedBox;

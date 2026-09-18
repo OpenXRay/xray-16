@@ -2,11 +2,6 @@
 #include "OzzKinematics.h"
 #include "OzzConversion.h"
 #include "OzzMesh.h"
-#include "Layers/xrRender/ECS/Components.h"
-#include "xrAnimation/Components.hpp"
-#include "xrECS/App.hpp"
-#include "xrECS/Components.hpp"
-#include "xrECS/Hierarchy.hpp"
 #include "xrEngine/device.h"
 
 #include "framework/mesh.h"
@@ -25,13 +20,7 @@ OzzKinematics::OzzKinematics() : stubBoneData(u16(-1))
     core.SetOwner(this);
 }
 
-OzzKinematics::~OzzKinematics()
-{
-    auto& reg = xray::ecs::Reg();
-    if (m_skeleton_entity != entt::null && reg.valid(m_skeleton_entity))
-        reg.destroy(m_skeleton_entity);
-    m_skeleton_entity = entt::null;
-}
+OzzKinematics::~OzzKinematics() = default;
 
 void OzzKinematics::Load(const char*, IReader*, u32)
 {
@@ -101,29 +90,20 @@ void OzzKinematics::OnSkeletonLoaded()
     if (!core.IsInitialized())
         return;
 
-    auto& reg = xray::ecs::Reg();
-
-    if (m_skeleton_entity == entt::null)
-        m_skeleton_entity = reg.create();
-
-    auto& vis = reg.get_or_emplace<xray::ecs::CBoneVisibility>(m_skeleton_entity);
-    core.BindBoneVisibility(&vis);
-
-    auto& bufs = reg.get_or_emplace<xray::ecs::AnimationBuffers>(m_skeleton_entity);
     const int num_joints     = core.Skeleton().num_joints();
     const int num_soa_joints = core.Skeleton().num_soa_joints();
 
-    bufs.locals.resize(static_cast<std::size_t>(num_soa_joints));
-    bufs.models.resize(static_cast<std::size_t>(num_joints));
-    bufs.context.Resize(num_joints);
+    m_locals.resize(static_cast<std::size_t>(num_soa_joints));
+    m_models.resize(static_cast<std::size_t>(num_joints));
+    m_samplingContext.Resize(num_joints);
 
     for (int i = 0; i < num_soa_joints; ++i)
-        bufs.locals[i] = core.Skeleton().joint_rest_poses()[i];
+        m_locals[i] = core.Skeleton().joint_rest_poses()[i];
 
     ozz::animation::LocalToModelJob ltm_job;
     ltm_job.skeleton = &core.Skeleton();
-    ltm_job.input    = ozz::make_span(bufs.locals);
-    ltm_job.output   = ozz::make_span(bufs.models);
+    ltm_job.input    = ozz::make_span(m_locals);
+    ltm_job.output   = ozz::make_span(m_models);
     R_ASSERT2(ltm_job.Run(), "ozz LocalToModelJob (bind-pose) failed");
 }
 
@@ -159,24 +139,10 @@ void OzzKinematics::Copy(xray::render::fg::dxRender_Visual* pFrom)
 
     OnSkeletonLoaded();
 
-    auto& reg = xray::ecs::Reg();
     for (auto* child : children)
     {
         if (auto* mesh_child = dynamic_cast<xray::render::fg::OzzMesh*>(child))
-        {
             mesh_child->SetParent(this);
-            const entt::entity mesh_entity = mesh_child->GetEntity();
-            if (mesh_entity != entt::null && reg.valid(mesh_entity))
-            {
-                if (auto* skinning = reg.try_get<xray::ecs::COzzMeshSkinning>(mesh_entity))
-                {
-                    skinning->skeleton_owner = m_skeleton_entity;
-                    skinning->palette_staging.clear();
-                }
-                if (m_skeleton_entity != entt::null)
-                    xray::ecs::SetParent(mesh_entity, m_skeleton_entity);
-            }
-        }
     }
 }
 

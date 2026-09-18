@@ -7,11 +7,7 @@
 #include "SkeletonX.h"
 #include "FSkinnedTypes.h"
 #include "Layers/xrRender/BufferUtils.h"
-#include "Layers/xrRender/ECS/Components.h"
 #include "OzzKinematicsAnimated.h"
-
-#include "xrECS/App.hpp"
-#include "xrECS/Hierarchy.hpp"
 
 #include "ozz/base/maths/simd_math.h"
 
@@ -26,30 +22,9 @@ OzzMesh::OzzMesh()
 {
     Type = MT_OZZ_MESH;
     shader = nullptr;
-
-    auto& reg = xray::ecs::Reg();
-    owner_entity = reg.create();
-    reg.emplace<xray::ecs::CSkinnedMesh>(owner_entity, xray::ecs::CSkinnedMesh{ this });
-    reg.emplace<xray::ecs::CSkeletonBones>(owner_entity);
-    reg.emplace<xray::ecs::COzzMeshSkinning>(owner_entity);
-    reg.emplace<xray::ecs::CSyncToRender>(owner_entity);
 }
 
-OzzMesh::~OzzMesh()
-{
-    DestroyEcsEntity();
-}
-
-void OzzMesh::DestroyEcsEntity()
-{
-    if (owner_entity == entt::null)
-        return;
-
-    auto& reg = xray::ecs::Reg();
-    if (reg.valid(owner_entity))
-        reg.destroy(owner_entity);
-    owner_entity = entt::null;
-}
+OzzMesh::~OzzMesh() = default;
 
 void OzzMesh::Copy(dxRender_Visual* pFrom)
 {
@@ -60,51 +35,26 @@ void OzzMesh::Copy(dxRender_Visual* pFrom)
 
     m_Parent = src->m_Parent;
 
-    auto& reg = xray::ecs::Reg();
-    R_ASSERT2(owner_entity != entt::null && reg.valid(owner_entity),
-        "OzzMesh::Copy: target has no ecs entity");
-    R_ASSERT2(src->owner_entity != entt::null && reg.valid(src->owner_entity),
-        "OzzMesh::Copy: source has no ecs entity");
+    m_jointRemaps       = src->m_jointRemaps;
+    m_inverseBindPoses  = src->m_inverseBindPoses;
+    m_paletteStaging.clear();
 
-    const auto& src_skinning = reg.get<xray::ecs::COzzMeshSkinning>(src->owner_entity);
-    auto& dst_skinning = reg.get<xray::ecs::COzzMeshSkinning>(owner_entity);
-    dst_skinning.skeleton_owner       = src_skinning.skeleton_owner;
-    dst_skinning.joint_remaps         = src_skinning.joint_remaps;
-    dst_skinning.inverse_bind_poses   = src_skinning.inverse_bind_poses;
-    dst_skinning.palette_staging.clear();
-
-    auto& dst_bones = reg.get<xray::ecs::CSkeletonBones>(owner_entity);
-    dst_bones.bone_count                = static_cast<u32>(dst_skinning.joint_remaps.size());
-    dst_bones.frame_uploaded_bone_offset = 0;
-    dst_bones.frame_uploaded            = 0;
-
-    if (src_skinning.skeleton_owner != entt::null)
-        xray::ecs::SetParent(owner_entity, src_skinning.skeleton_owner);
+    m_boneCount              = static_cast<u32>(m_jointRemaps.size());
+    m_uploadedBoneOffset     = 0;
+    m_uploadedFrame          = 0;
 }
 
 void OzzMesh::LoadFromOzzMesh(XRay::Animation::OzzKinematics* parent, const ozz::sample::Mesh& mesh)
 {
     m_Parent = parent;
 
-    auto& reg = xray::ecs::Reg();
-    R_ASSERT2(owner_entity != entt::null && reg.valid(owner_entity),
-        "OzzMesh::LoadFromOzzMesh: missing ecs entity");
+    m_jointRemaps.assign(mesh.joint_remaps.begin(), mesh.joint_remaps.end());
+    m_inverseBindPoses.assign(mesh.inverse_bind_poses.begin(), mesh.inverse_bind_poses.end());
+    m_paletteStaging.clear();
 
-    const entt::entity skeleton_owner = parent ? parent->GetSkeletonEntity() : entt::null;
-
-    auto& skinning = reg.get<xray::ecs::COzzMeshSkinning>(owner_entity);
-    skinning.skeleton_owner = skeleton_owner;
-    skinning.joint_remaps.assign(mesh.joint_remaps.begin(), mesh.joint_remaps.end());
-    skinning.inverse_bind_poses.assign(mesh.inverse_bind_poses.begin(), mesh.inverse_bind_poses.end());
-    skinning.palette_staging.clear();
-
-    auto& bones = reg.get<xray::ecs::CSkeletonBones>(owner_entity);
-    bones.bone_count                = static_cast<u32>(skinning.joint_remaps.size());
-    bones.frame_uploaded_bone_offset = 0;
-    bones.frame_uploaded            = 0;
-
-    if (skeleton_owner != entt::null)
-        xray::ecs::SetParent(owner_entity, skeleton_owner);
+    m_boneCount              = static_cast<u32>(m_jointRemaps.size());
+    m_uploadedBoneOffset     = 0;
+    m_uploadedFrame          = 0;
 
     if (!mesh.xray_metadata.shader_name.empty())
         shaderName = mesh.xray_metadata.shader_name.c_str();

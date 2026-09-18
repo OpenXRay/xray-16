@@ -1,16 +1,7 @@
 #include "stdafx.h"
 
-#include "Components.hpp"
-#include "IK.hpp"
-
-#include "xrECS/App.hpp"
-#include "xrECS/Components.hpp"
-#include "xrECS/Hierarchy.hpp"
-#include "xrECS/World.hpp"
-
 #include "OzzKinematicsAnimated.h"
 #include "OzzMesh.h"
-#include "Layers/xrRender/ECS/Components.h"
 
 #include "Layers/xrRender/AnimationKeyCalculate.h"
 #include "OzzConversion.h"
@@ -70,18 +61,8 @@ bool EndsWithIgnoreCase(const xr_string& value, pcstr suffix)
 
 } // namespace
 
-OzzKinematicsAnimated::OzzKinematicsAnimated(entt::entity owner)
+OzzKinematicsAnimated::OzzKinematicsAnimated()
 {
-    auto& reg = xray::ecs::Reg();
-    m_ecs_entity = reg.create();
-    m_owns_ecs_entity = true;
-
-    reg.emplace<xray::ecs::AnimationController>(m_ecs_entity);
-    reg.emplace<xray::ecs::AnimationState>(m_ecs_entity);
-    reg.emplace<xray::ecs::AnimationBuffers>(m_ecs_entity);
-    if (owner != entt::null)
-        reg.emplace<xray::ecs::COwnerEntity>(m_ecs_entity, xray::ecs::COwnerEntity{owner});
-
     InitializeChannelState();
     ResetPlaybackState();
     IBlend_Startup();
@@ -102,51 +83,8 @@ OzzKinematicsAnimated::~OzzKinematicsAnimated()
     }
 
     ClearActiveBlends(true);
-
-    auto& reg = xray::ecs::Reg();
-    if (m_ecs_entity != entt::null && reg.valid(m_ecs_entity))
-        reg.destroy(m_ecs_entity);
-
-    m_ecs_entity = entt::null;
-    m_owns_ecs_entity = false;
 }
 
-void OzzKinematicsAnimated::RebindToOwnerEntity(entt::entity new_owner)
-{
-    auto& reg = xray::ecs::Reg();
-    if (reg.valid(m_ecs_entity) && new_owner != entt::null)
-        reg.emplace_or_replace<xray::ecs::COwnerEntity>(m_ecs_entity, xray::ecs::COwnerEntity{new_owner});
-
-    ClearActiveBlends(true);
-
-    if (reg.valid(m_ecs_entity))
-    {
-        reg.remove<xray::ecs::Playing>(m_ecs_entity);
-        reg.remove<xray::ecs::Looping>(m_ecs_entity);
-        reg.remove<xray::ecs::BlendState>(m_ecs_entity);
-
-        if (auto* state = reg.try_get<xray::ecs::AnimationState>(m_ecs_entity))
-        {
-            state->current_time = 0.f;
-            state->time_ratio   = 0.f;
-        }
-        if (auto* ctl = reg.try_get<xray::ecs::AnimationController>(m_ecs_entity))
-        {
-            ctl->animation      = nullptr;
-            ctl->playback_speed = 1.f;
-        }
-    }
-
-    activeAnimation.reset();
-    animationLoaded = false;
-    animationApplied = false;
-    playbackTime = 0.f;
-    playbackSpeed = 1.f;
-    loopPlayback = true;
-
-    if (core.IsInitialized())
-        PopulateEntityBindPose();
-}
 
 void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* pFrom)
 {
@@ -183,23 +121,10 @@ void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* pFrom)
 
     OnSkeletonLoaded();
 
-    auto& reg = xray::ecs::Reg();
     for (auto* child : children)
     {
         if (auto* mesh_child = dynamic_cast<xray::render::fg::OzzMesh*>(child))
-        {
             mesh_child->SetParent(this);
-            const entt::entity mesh_entity = mesh_child->GetEntity();
-            if (mesh_entity != entt::null && reg.valid(mesh_entity))
-            {
-                if (auto* skinning = reg.try_get<xray::ecs::COzzMeshSkinning>(mesh_entity))
-                {
-                    skinning->skeleton_owner = m_ecs_entity;
-                    skinning->palette_staging.clear();
-                }
-                xray::ecs::SetParent(mesh_entity, m_ecs_entity);
-            }
-        }
     }
 }
 
@@ -257,13 +182,9 @@ void OzzKinematicsAnimated::PopulateEntityBindPose()
     if (!core.IsInitialized())
         return;
 
-    auto& world = xray::ecs::App::Get().GetWorld();
-    auto& reg   = world.reg();
+    core.BindBoneVisibility(&core.ownedBoneVisibility);
 
-    auto& vis = reg.get_or_emplace<xray::ecs::CBoneVisibility>(m_ecs_entity);
-    core.BindBoneVisibility(&vis);
-
-    auto& bufs = reg.get<xray::ecs::AnimationBuffers>(m_ecs_entity);
+    auto& bufs = m_animBufs;
     const int num_joints     = core.Skeleton().num_joints();
     const int num_soa_joints = core.Skeleton().num_soa_joints();
 
@@ -274,19 +195,13 @@ void OzzKinematicsAnimated::PopulateEntityBindPose()
     for (int i = 0; i < num_soa_joints; ++i)
         bufs.locals[i] = core.Skeleton().joint_rest_poses()[i];
 
-    auto& ctl = reg.get<xray::ecs::AnimationController>(m_ecs_entity);
-    ctl.skeleton = &core.Skeleton();
+    m_animCtl.skeleton = &core.Skeleton();
 
     ozz::animation::LocalToModelJob ltm_job;
     ltm_job.skeleton = &core.Skeleton();
     ltm_job.input    = ozz::make_span(bufs.locals);
     ltm_job.output   = ozz::make_span(bufs.models);
     R_ASSERT2(ltm_job.Run(), "ozz LocalToModelJob (bind-pose) failed");
-
-    xray::animation::InitializeIK(world,
-                                  m_ecs_entity,
-                                  core.Skeleton().joint_names(),
-                                  ozz::make_span(bufs.models));
 }
 
 bool OzzKinematicsAnimated::InitializeFromOzz(pcstr skeletonPath, const xr_vector<xr_string>& motionRefs)
@@ -534,17 +449,16 @@ void OzzKinematicsAnimated::ResetPlaybackState()
     samplingContext.Resize(0);
     ResetSamplingBuffers();
 
-    auto& reg = xray::ecs::Reg();
-    auto& state = reg.get<xray::ecs::AnimationState>(m_ecs_entity);
-    auto& ctl   = reg.get<xray::ecs::AnimationController>(m_ecs_entity);
+        auto& state = m_animState;
+    auto& ctl   = m_animCtl;
 
     state.current_time = 0.0f;
     state.time_ratio   = 0.0f;
     ctl.animation      = nullptr;
     ctl.playback_speed = 1.0f;
 
-    reg.remove<xray::ecs::Playing>(m_ecs_entity);
-    reg.emplace_or_replace<xray::ecs::Looping>(m_ecs_entity);
+    m_isPlaying = false;
+    m_isLooping = true;
 }
 
 bool OzzKinematicsAnimated::LoadAnimationFromFile(const std::filesystem::path& path)
@@ -564,11 +478,10 @@ void OzzKinematicsAnimated::StopAnimation()
     ClearPose();
     CalculateBones_Invalidate();
 
-    auto& reg = xray::ecs::Reg();
-    auto& state = reg.get<xray::ecs::AnimationState>(m_ecs_entity);
+        auto& state = m_animState;
     state.current_time = 0.0f;
     state.time_ratio   = 0.0f;
-    reg.remove<xray::ecs::Playing>(m_ecs_entity);
+    m_isPlaying = false;
 }
 
 bool OzzKinematicsAnimated::AdvanceAnimation(float dt)
@@ -739,8 +652,7 @@ void OzzKinematicsAnimated::OnCalculateBones()
 
 void OzzKinematicsAnimated::CalculateBones(BOOL bForceExact)
 {
-    auto& reg = xray::ecs::Reg();
-    auto& bufs = reg.get<xray::ecs::AnimationBuffers>(m_ecs_entity);
+        auto& bufs = m_animBufs;
     if (!bufs.locals.empty())
         core.SetPoseLocals(ozz::make_span(bufs.locals));
 
@@ -1113,9 +1025,8 @@ CBlend* OzzKinematicsAnimated::LL_PlayCycle(u16 partition, MotionID motion, BOOL
     if (fis_zero(playback_speed_value))
         playback_speed_value = !fis_zero(def_speed) ? def_speed : 1.f;
 
-    auto& reg = xray::ecs::Reg();
-    auto& state = reg.get<xray::ecs::AnimationState>(m_ecs_entity);
-    auto& ctl   = reg.get<xray::ecs::AnimationController>(m_ecs_entity);
+        auto& state = m_animState;
+    auto& ctl   = m_animCtl;
 
     const bool sameMotion = (ctl.animation == activeAnimation.get());
     if (!sameMotion)
@@ -1126,11 +1037,11 @@ CBlend* OzzKinematicsAnimated::LL_PlayCycle(u16 partition, MotionID motion, BOOL
     ctl.animation      = activeAnimation.get();
     ctl.playback_speed = playback_speed_value;
 
-    reg.emplace_or_replace<xray::ecs::Playing>(m_ecs_entity);
+    m_isPlaying = true;
     if (loopPlayback)
-        reg.emplace_or_replace<xray::ecs::Looping>(m_ecs_entity);
+        m_isLooping = true;
     else
-        reg.remove<xray::ecs::Looping>(m_ecs_entity);
+        m_isLooping = false;
 
     CBlend& blend = *entry.blend;
     blend.set_accrue_state();
@@ -1196,7 +1107,7 @@ void OzzKinematicsAnimated::LL_CloseCycle(u16 partition, u8 mask_channel)
     }
 
     if (activeBlends.empty())
-        xray::ecs::Reg().remove<xray::ecs::Playing>(m_ecs_entity);
+        m_isPlaying = false;
 }
 
 void OzzKinematicsAnimated::LL_SetChannelFactor(u16 channel, float factor)
@@ -1212,10 +1123,9 @@ void OzzKinematicsAnimated::UpdateTracks()
 
 void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_blends)
 {
-    auto& reg = xray::ecs::Reg();
-    auto& state = reg.get<xray::ecs::AnimationState>(m_ecs_entity);
-    auto& ctl   = reg.get<xray::ecs::AnimationController>(m_ecs_entity);
-    auto& bufs  = reg.get<xray::ecs::AnimationBuffers>(m_ecs_entity);
+        auto& state = m_animState;
+    auto& ctl   = m_animCtl;
+    auto& bufs  = m_animBufs;
 
     if (activeAnimation)
     {
@@ -1223,17 +1133,17 @@ void OzzKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_b
         ctl.playback_speed = playbackSpeed;
 
         if (animationLoaded && !activeBlends.empty())
-            reg.emplace_or_replace<xray::ecs::Playing>(m_ecs_entity);
+            m_isPlaying = true;
         else
-            reg.remove<xray::ecs::Playing>(m_ecs_entity);
+            m_isPlaying = false;
 
         if (loopPlayback)
-            reg.emplace_or_replace<xray::ecs::Looping>(m_ecs_entity);
+            m_isLooping = true;
         else
-            reg.remove<xray::ecs::Looping>(m_ecs_entity);
+            m_isLooping = false;
     }
 
-    reg.remove<xray::ecs::BlendState>(m_ecs_entity);
+    
 
     if (!bufs.locals.empty())
     {

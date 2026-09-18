@@ -14,10 +14,7 @@
 #include "ozz/base/maths/soa_transform.h"
 #include "ozz/base/span.h"
 
-#include "Components.hpp"
-#include "IK.hpp"
 
-#include <entt/entt.hpp>
 
 #include <filesystem>
 #include <memory>
@@ -35,7 +32,7 @@ class OzzKinematicsAnimated : public OzzKinematics,
                               public IKinematicsAnimated
 {
 public:
-    explicit OzzKinematicsAnimated(entt::entity owner);
+    OzzKinematicsAnimated();
     ~OzzKinematicsAnimated() override;
     virtual void OnSkeletonLoaded() override;
     void PopulateEntityBindPose();
@@ -43,15 +40,12 @@ public:
     void Copy(xray::render::fg::dxRender_Visual* pFrom) override;
     void Copy(OzzKinematicsAnimated* from);
 
-    entt::entity GetSkeletonEntity() const override { return m_ecs_entity; }
-    entt::entity GetEcsEntity() const override { return m_ecs_entity; }
 
     bool InitializeFromOzz(pcstr skeletonPath, const xr_vector<xr_string>& motionRefs = xr_vector<xr_string>());
     bool InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData, const xr_vector<xr_string>& motionRefs = xr_vector<xr_string>());
 
     void SetEmbeddedAnimationData(const std::vector<std::uint8_t>& data);
 
-    void RebindToOwnerEntity(entt::entity new_owner);
 
     bool LoadAnimationFromFile(const std::filesystem::path& path);
     void StopAnimation();
@@ -210,7 +204,31 @@ private:
 
     CPartition defaultPartition{};
 
-    entt::entity m_ecs_entity{ entt::null };
-    bool         m_owns_ecs_entity = false;
+    struct AnimCtl
+    {
+        const ozz::animation::Skeleton*  skeleton  = nullptr;
+        const ozz::animation::Animation* animation = nullptr;
+        float playback_speed = 1.0f;
+    };
+
+    struct AnimState
+    {
+        float current_time = 0.0f;
+        float time_ratio   = 0.0f;
+    };
+
+    struct AnimBufs
+    {
+        ozz::animation::SamplingJob::Context           context;
+        ozz::vector<ozz::math::SoaTransform>           locals;
+        ozz::vector<ozz::math::Float4x4>               models;
+    };
+
+    AnimCtl   m_animCtl;
+    AnimState m_animState;
+    AnimBufs  m_animBufs;
+    bool m_isPlaying = false;
+    bool m_isLooping = false;
+
 };
 } // namespace XRay::Animation
