@@ -9,6 +9,8 @@ namespace Animation
 struct StartupConversionStats
 {
     std::size_t baked = 0;
+    std::size_t cache_hits = 0;
+    std::size_t write_failed = 0;
     std::size_t skipped = 0;
     std::size_t failed = 0;
     double total_time_seconds = 0.0;
