@@ -24,9 +24,22 @@ struct OzzMotionLibrary
     u32 refs{ 0u };
 };
 
-const ozz::vector<ozz::math::SoaTransform>& FirstFrame(OzzMotionLibrary& library, u16 idx);
+inline const ozz::vector<ozz::math::SoaTransform>& FirstFrame(const OzzMotionLibrary& library, u16 idx)
+{
+    return library.firstFrame[idx];
+}
 
-bool PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror);
+enum class PrebakeResult
+{
+    CacheHit,
+    Baked,
+    WriteFailed,
+    Failed
+};
+
+bool MotionCachePresent(const shared_str& omf_key, u32 fingerprint);
+
+PrebakeResult PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror);
 
 class OzzMotionLibraryContainer
 {
