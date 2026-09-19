@@ -6,7 +6,7 @@
 #include "xrCore/LocatorAPI.h"
 #include "xrCore/xr_ini.h"
 
-#include <map>
+#include <set>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -36,27 +36,52 @@ xr_string Root(pcstr alias)
     return path;
 }
 
-xr_string WithExtension(xr_string path, pcstr extension)
+xr_string LibraryPath(xr_string path)
 {
-    const size_t length = xr_strlen(extension);
-    if (path.size() < length || path.compare(path.size() - length, length, extension) != 0)
-        path += extension;
+    if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".omf") == 0)
+        path.replace(path.size() - 4, 4, ".ozz");
+    else if (path.size() < 4 || path.compare(path.size() - 4, 4, ".ozz") != 0)
+        path += ".ozz";
     return path;
+}
+
+xr_string SourcePath(xr_string library)
+{
+    library.replace(library.size() - 4, 4, ".omf");
+    return library;
+}
+
+xr_string ResolveInNamespace(const xr_string& relative, const xr_string& root)
+{
+    const auto library = root + relative;
+    if (LibraryExists(library))
+        return library;
+    const auto source = SourcePath(library);
+    return FS.exist(source.c_str()) ? source : xr_string{};
 }
 
 xr_string Resolve(const xr_string& relative, const xr_string& level, const xr_string& meshes)
 {
     if (!level.empty())
     {
-        const auto candidate = level + relative;
-        if (FS.exist(candidate.c_str()))
+        const auto candidate = ResolveInNamespace(relative, level);
+        if (!candidate.empty())
             return candidate;
     }
-    const auto candidate = meshes + relative;
-    if (FS.exist(candidate.c_str()))
+    const auto candidate = ResolveInNamespace(relative, meshes);
+    if (!candidate.empty())
         return candidate;
-    throw std::runtime_error("missing motion source " + std::string(relative.c_str()) +
+    throw std::runtime_error("missing motion library " + std::string(relative.c_str()) +
         " in level namespace " + std::string(level.c_str()));
+}
+
+void CollectReferences(const xr_string& name, const xr_string& root, std::set<xr_string>& selected)
+{
+    FS_FileSet files;
+    FS.file_list(files, root.c_str(), FS_ListFiles, name.c_str());
+    FS.file_list(files, root.c_str(), FS_ListFiles, SourcePath(name).c_str());
+    for (const auto& file : files)
+        selected.insert(LibraryPath(CanonicalPath(file.name.c_str())));
 }
 
 xr_vector<xr_string> ResolveReferences(const xr_vector<shared_str>& references,
@@ -68,27 +93,19 @@ xr_vector<xr_string> ResolveReferences(const xr_vector<shared_str>& references,
         auto name = CanonicalPath(reference.c_str());
         if (name.empty())
             throw std::runtime_error("empty OGF motion reference");
-        name = WithExtension(std::move(name), ".omf");
+        name = LibraryPath(std::move(name));
         if (name.find_first_of("*?") == xr_string::npos)
             sources.push_back(Resolve(name, level, meshes));
         else
         {
-            std::map<xr_string, xr_string> selected;
-            FS_FileSet meshFiles;
-            FS.file_list(meshFiles, meshes.c_str(), FS_ListFiles, name.c_str());
-            for (const auto& file : meshFiles)
-                selected.emplace(CanonicalPath(file.name.c_str()), meshes + file.name.c_str());
+            std::set<xr_string> selected;
+            CollectReferences(name, meshes, selected);
             if (!level.empty())
-            {
-                FS_FileSet levelFiles;
-                FS.file_list(levelFiles, level.c_str(), FS_ListFiles, name.c_str());
-                for (const auto& file : levelFiles)
-                    selected[CanonicalPath(file.name.c_str())] = level + file.name.c_str();
-            }
+                CollectReferences(name, level, selected);
             if (selected.empty())
-                throw std::runtime_error("motion wildcard matched no sources: " + std::string(name.c_str()));
-            for (const auto& item : selected)
-                sources.push_back(item.second);
+                throw std::runtime_error("motion wildcard matched no libraries: " + std::string(name.c_str()));
+            for (const auto& library : selected)
+                sources.push_back(Resolve(library, level, meshes));
         }
     }
     if (sources.empty() || sources.size() > MAX_ANIM_SLOT)
@@ -168,29 +185,22 @@ void InspectVisual(const Chunk& visual, const xr_string& source, const xr_string
             xr_vector<shared_str> references;
             bool embedded = false;
             ReadOgfSkeleton(&ogf, bones, references, embedded);
-            std::shared_ptr<const OzzSkeletonMirror> mirror;
-            const auto skeleton = PrepareSkeleton(bones, mirror);
+            const auto skeleton = PrepareSkeleton(bones);
             for (const auto& level : levels)
             {
                 PreparedModel model;
                 model.skeleton = skeleton;
                 if (embedded)
                 {
-                    model.libraries.push_back(PrepareLibrary(source.c_str(), visual.data, visual.size,
-                        skeleton, *mirror, model.partition));
+                    model.libraries.push_back(PrepareLibrary(source.c_str(), visual.data, visual.size));
                 }
                 else
                 {
                     const auto sources = ResolveReferences(references, level, meshes);
                     for (const auto& motion : sources)
-                    {
-                        CPartition partition;
-                        model.libraries.push_back(PrepareLibrary(motion.c_str(), nullptr, 0,
-                            skeleton, *mirror, partition));
-                        if (model.libraries.size() == 1)
-                            model.partition = std::move(partition);
-                    }
+                        model.libraries.push_back(PrepareLibrary(motion.c_str(), nullptr, 0));
                 }
+                model.partition = LibraryPartition(model.libraries.front(), *skeleton);
                 ApplyPartitions(relative, level, meshes, bones, model.partition);
                 RegisterModel(source, level, std::move(model));
             }

@@ -129,22 +129,22 @@ public:
     u32 LL_CycleCount()
     {
         u32 cnt = 0;
-        for (const auto& library : m_animations->libraries)
-            cnt += library->metadata.cycles.size();
+        for (const auto& binding : m_animations->bindings)
+            cnt += binding.metadata->cycles.size();
         return cnt;
     }
     u32 LL_FXCount()
     {
         u32 cnt = 0;
-        for (const auto& library : m_animations->libraries)
-            cnt += library->metadata.effects.size();
+        for (const auto& binding : m_animations->bindings)
+            cnt += binding.metadata->effects.size();
         return cnt;
     }
     const accel_map* LL_Motions(u32 slot) { return &LL_MotionsSlot(u16(slot)).motions; }
     MotionID ID_Motion(LPCSTR N, u16 slot);
 #endif
     u16 LL_MotionsSlotCount() override { return u16(m_animations->libraries.size()); }
-    const MotionLibraryMetadata& LL_MotionsSlot(u16 idx) override { return m_animations->libraries[idx]->metadata; }
+    const MotionLibraryMetadata& LL_MotionsSlot(u16 idx) override { return *m_animations->bindings[idx].metadata; }
     const CMotionDef* LL_GetMotionDef(MotionID id) override { return &LL_MotionsSlot(id.slot).clips[id.idx].definition; }
     float LL_MotionDuration(MotionID id) override { return LL_MotionsSlot(id.slot).clips[id.idx].duration; }
     virtual IBlendDestroyCallback* GetBlendDestroyCallback();
@@ -220,8 +220,8 @@ public:
     virtual float get_animation_length(MotionID motion_ID);
     void EnumerateCycleNames(xr_vector<shared_str>& outNames) const override
     {
-        for (const auto& library : m_animations->libraries)
-            for (const auto& pair : library->metadata.cycles)
+        for (const auto& binding : m_animations->bindings)
+            for (const auto& pair : binding.metadata->cycles)
                 outNames.push_back(pair.first);
     }
 };

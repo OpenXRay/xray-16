@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "LegacyOmfConverter.h"
 #include "LegacyChunkIO.h"
-#include "OzzSkeletonMirror.h"
 
 #include <ozz/animation/offline/animation_builder.h>
 #include <ozz/animation/offline/raw_animation.h>
+#include <ozz/animation/runtime/skeleton.h>
 #include <ozz/base/maths/quaternion.h>
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <set>
-#include <unordered_map>
+#include <unordered_set>
 
 namespace XRay::Animation
 {
@@ -151,7 +151,7 @@ void ReadTrack(BinaryReader& reader, u32 frames, RawAnimation::JointTrack& track
     track.scales.push_back({0.f, ozz::math::Float3::one()});
 }
 
-xr_vector<u16> ReadMetadata(const Chunk& chunk, const OzzSkeletonMirror& skeleton, MotionLibraryMetadata& metadata)
+void ReadMetadata(const Chunk& chunk, xr_vector<shared_str>& boneNames, MotionLibraryMetadata& metadata)
 {
     BinaryReader reader{chunk.data, chunk.size};
     const u16 version = reader.read<u16>();
@@ -160,34 +160,32 @@ xr_vector<u16> ReadMetadata(const Chunk& chunk, const OzzSkeletonMirror& skeleto
     const u16 partCount = reader.read<u16>();
     if (partCount > MAX_PARTS)
         throw std::runtime_error("too many OMF partitions");
-    const size_t bones = skeleton.boneToJoint.size();
-    xr_vector<u16> remap(bones, BI_NONE);
-    xr_vector<bool> assigned(bones, false);
-    std::unordered_map<std::string, u16> boneNames;
-    const auto names = skeleton.skeleton.joint_names();
-    for (u16 bone = 0; bone < bones; ++bone)
-        boneNames.emplace(ToLowerCopy(names[skeleton.boneToJoint[bone]]), bone);
+    std::unordered_set<std::string> assignedNames;
     for (u16 part = 0; part < partCount; ++part)
     {
         auto& target = metadata.partition[part];
         target.Name = ToLowerCopy(reader.read_stringz()).c_str();
         const u16 count = reader.read<u16>();
-        if (count > bones)
+        if (count > ozz::animation::Skeleton::kMaxJoints)
             throw std::runtime_error("invalid OMF partition size");
         for (u16 index = 0; index < count; ++index)
         {
             const auto name = ToLowerCopy(reader.read_stringz());
             const u32 sourceBone = reader.read<u32>();
-            const auto found = boneNames.find(name);
-            if (sourceBone >= bones || remap[sourceBone] != BI_NONE || found == boneNames.end() || assigned[found->second])
+            if (sourceBone >= ozz::animation::Skeleton::kMaxJoints || name.empty() ||
+                !assignedNames.emplace(name).second)
                 throw std::runtime_error("invalid or duplicate OMF bone mapping: " + name);
-            target.bones.push_back(found->second);
-            remap[sourceBone] = found->second;
-            assigned[found->second] = true;
+            if (sourceBone >= boneNames.size())
+                boneNames.resize(size_t(sourceBone) + 1);
+            if (boneNames[sourceBone])
+                throw std::runtime_error("duplicate OMF bone track");
+            target.bones.push_back(sourceBone);
+            boneNames[sourceBone] = name.c_str();
         }
     }
-    if (std::find(remap.begin(), remap.end(), BI_NONE) != remap.end())
-        throw std::runtime_error("OMF partitions do not cover the skeleton");
+    const size_t bones = boneNames.size();
+    if (!bones || std::any_of(boneNames.begin(), boneNames.end(), [](const shared_str& name) { return !name; }))
+        throw std::runtime_error("OMF partitions do not cover contiguous bone tracks");
     const u16 count = reader.read<u16>();
     if (!count || count >= 0x3fff)
         throw std::runtime_error("invalid OMF motion count");
@@ -209,7 +207,6 @@ xr_vector<u16> ReadMetadata(const Chunk& chunk, const OzzSkeletonMirror& skeleto
             {
                 if (definition.bone_or_part >= bones)
                     throw std::runtime_error("OMF effect references invalid bone");
-                definition.bone_or_part = remap[definition.bone_or_part];
             }
         }
         else if (definition.bone_or_part != BI_NONE && definition.bone_or_part >= partCount)
@@ -251,16 +248,15 @@ xr_vector<u16> ReadMetadata(const Chunk& chunk, const OzzSkeletonMirror& skeleto
     }
     if (reader.offset != reader.size)
         throw std::runtime_error("unexpected OMF metadata trailing bytes");
-    return remap;
 }
 }
 
-ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr source, const OzzSkeletonMirror& skeleton)
+ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr source)
 {
     try
     {
-        if (!data || !size || !skeleton.skeleton.num_joints())
-            throw std::runtime_error("empty OMF or skeleton");
+        if (!data || !size)
+            throw std::runtime_error("empty OMF");
         ChunkStorage storage;
         const auto chunks = ParseChunks(data, size, storage);
         const auto params = chunks.find(OGF_S_SMPARAMS);
@@ -269,7 +265,7 @@ ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr s
             throw std::runtime_error("missing OMF metadata or motions");
         ConvertedOmfLibrary output;
         output.metadata.source = source;
-        const auto remap = ReadMetadata(params->second, skeleton, output.metadata);
+        ReadMetadata(params->second, output.boneNames, output.metadata);
         const auto clips = ParseChunks(motions->second.data, motions->second.size, storage);
         const auto countChunk = clips.find(0);
         if (countChunk == clips.end())
@@ -294,9 +290,9 @@ ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr s
             RawAnimation raw;
             raw.name = name.c_str();
             raw.duration = float(frames) * SAMPLE_SPF;
-            raw.tracks.resize(remap.size());
-            for (u16 bone : remap)
-                ReadTrack(reader, frames, raw.tracks[skeleton.boneToJoint[bone]]);
+            raw.tracks.resize(output.boneNames.size());
+            for (auto& track : raw.tracks)
+                ReadTrack(reader, frames, track);
             if (reader.offset != reader.size || !raw.Validate())
                 throw std::runtime_error("invalid OMF clip: " + name);
             std::set<float> times{0.f, raw.duration};
