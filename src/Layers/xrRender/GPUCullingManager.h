@@ -13,7 +13,6 @@
 namespace xray::render::fg::passes {
     struct ParticleBatch;
 }
-namespace xray::render::fg { class OzzMesh; }
 
 namespace xray::render {
     class GeometryCollector;
@@ -402,7 +401,6 @@ public:
     // Returns offset (in bone count) into global buffer
     u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
 
-    u32 GetOrUploadOzzSkeleton(nvrhi::ICommandList* cmdList, xray::render::fg::OzzMesh* mesh);
     // Get the global bone buffer for shader binding
     nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
 

@@ -16,8 +16,6 @@
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics bone access
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonX.h"
-#include "Layers/xrRender/OzzMesh.h"
-#include "Layers/xrRender/OzzKinematics.h"
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "Layers/xrRender/Bindless/UnifiedVertex.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
@@ -995,21 +993,15 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         bucket.args.push_back(args);
 
         CKinematics* skeleton = nullptr;
-        xray::render::fg::OzzMesh* ozzMesh = nullptr;
         u32 visualType = batch.visual ? batch.visual->getType() : 0;
         if (visualType == MT_SKELETON_GEOMDEF_ST)
             skeleton = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
         else if (visualType == MT_SKELETON_GEOMDEF_PM)
             skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
-        else if (visualType == MT_OZZ_MESH)
-            ozzMesh = static_cast<xray::render::fg::OzzMesh*>(batch.visual);
 
         SkinnedDrawRecord rec;
         rec.world = batch.worldMatrix;
-        if (ozzMesh)
-            rec.boneOffset = GetOrUploadOzzSkeleton(cmdList, ozzMesh);
-        else
-            rec.boneOffset = GetOrUploadSkeleton(cmdList, skeleton);
+        rec.boneOffset = GetOrUploadSkeleton(cmdList, skeleton);
         rec.splatOffset = 0;
         rec.splatCount = 0;
         if (overlayMgr && skeleton) {
@@ -1404,54 +1396,6 @@ void GPUCullingManager::UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinem
     u64 byteSize = static_cast<u64>(boneCount) * BONE_STRIDE;
 
     cmdList->writeBuffer(m_globalBoneBuffer, m_boneStagingBuffer.data() + boneOffset, byteSize, byteOffset);
-}
-
-u32 GPUCullingManager::GetOrUploadOzzSkeleton(nvrhi::ICommandList* cmdList, xray::render::fg::OzzMesh* mesh)
-{
-    if (!m_boneBufferInitialized || !mesh || !cmdList)
-        return 0;
-
-    if (mesh->GetUploadedFrame() == m_boneUploadFrameId)
-        return mesh->GetUploadedBoneOffset();
-
-    auto* parent = mesh->GetParent();
-    if (!parent || !parent->IsInitialized())
-        return 0;
-
-    const auto& remaps = mesh->GetJointRemaps();
-    const auto& invBinds = mesh->GetInverseBindPoses();
-    const u32 boneCount = static_cast<u32>(remaps.size());
-    if (boneCount == 0 || invBinds.size() != remaps.size())
-        return 0;
-
-    if (m_currentBoneOffset + boneCount > MAX_TOTAL_BONES)
-        return 0;
-
-    const u32 boneOffset = m_currentBoneOffset;
-    mesh->SetUploadedFrame(m_boneUploadFrameId);
-    mesh->SetUploadedBoneOffset(boneOffset);
-
-    xr_vector<Fmatrix> palette;
-    parent->BuildSkinningPalette(palette, true);
-
-    for (u32 i = 0; i < boneCount; ++i)
-    {
-        const u16 skelIdx = remaps[i];
-        if (skelIdx < palette.size())
-            m_boneStagingBuffer[boneOffset + i] = palette[skelIdx];
-        else
-            m_boneStagingBuffer[boneOffset + i].identity();
-    }
-
-    if (!m_boneBatching)
-    {
-        u64 byteOff = static_cast<u64>(boneOffset) * BONE_STRIDE;
-        u64 byteSize = static_cast<u64>(boneCount) * BONE_STRIDE;
-        cmdList->writeBuffer(m_globalBoneBuffer, m_boneStagingBuffer.data() + boneOffset, byteSize, byteOff);
-    }
-
-    m_currentBoneOffset += boneCount;
-    return boneOffset;
 }
 
 void GPUCullingManager::FlushBoneBatch(nvrhi::ICommandList* cmdList)

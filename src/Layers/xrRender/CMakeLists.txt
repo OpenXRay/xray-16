@@ -336,17 +336,8 @@ target_sources(xrRender PRIVATE
     ./blenders/uber_deffer.cpp
 
     ModelNaming.h
-    OzzKinematics.h
-    OzzKinematics.cpp
     OzzKinematicsAnimated.h
     OzzKinematicsAnimated.cpp
-    OzzModelData.h
-    OzzModelData.cpp
-    OzzMesh.h
-    OzzMesh.cpp
-    OzzMotionArchive.h
-    OzzSharedMotions.hpp
-    OzzSharedMotions.cpp
 
 )
 
