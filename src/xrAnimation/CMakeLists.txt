@@ -50,4 +50,8 @@ set_target_properties(xrAnimation PROPERTIES PREFIX "")
 
 target_precompile_headers(xrAnimation PRIVATE stdafx.h)
 
-add_subdirectory(tools)
+option(XRAY_BUILD_OZZ_TOOLS "Build the offline ozz asset conversion tools" OFF)
+
+if(XRAY_BUILD_OZZ_TOOLS)
+    add_subdirectory(tools)
+endif()

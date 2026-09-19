@@ -7,7 +7,7 @@ endif()
 add_library(sse2neon INTERFACE)
 target_include_directories(sse2neon INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(ozz_build_tools         ON  CACHE BOOL "ozz: enable offline pipeline (animation/skeleton builders)")
+set(ozz_build_tools         OFF CACHE BOOL "ozz: skip offline command line tools (dump2ozz)")
 set(ozz_build_fbx           OFF CACHE BOOL "ozz: skip FBX pipeline (no FBX SDK dependency)")
 set(ozz_build_gltf          OFF CACHE BOOL "ozz: skip glTF importer")
 set(ozz_build_data          OFF CACHE BOOL "ozz: skip data regeneration")
