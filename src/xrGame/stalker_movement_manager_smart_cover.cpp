@@ -170,7 +170,7 @@ void stalker_movement_manager_smart_cover::modify_animation(CBlend* blend)
     if (!blend)
         return;
 
-    CMotionDef* motion_def = smart_cast<IKinematicsAnimated*>(object().Visual())->LL_GetMotionDef(blend->motionID);
+    const CMotionDef* motion_def = smart_cast<IKinematicsAnimated*>(object().Visual())->LL_GetMotionDef(blend->motionID);
     VERIFY(motion_def);
     blend->speed = motion_def->Speed() * g_smart_cover_animation_speed_factor;
 }

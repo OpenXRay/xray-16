@@ -502,7 +502,9 @@ void FrameGraphRenderer::LoadVisuals(IReader* fs)
         chunk->r_chunk_safe(OGF_HEADER, &H, sizeof(H));
 
         dxRender_Visual* visual = g_pModelPool->Instance_Create(H.type);
-        visual->Load(nullptr, chunk, 0);
+        string64 name;
+        xr_sprintf(name, "@level_visual:%u", index);
+        visual->Load(name, chunk, 0);
         BufferPool.Visuals.push_back(visual);
 
         chunk->close();

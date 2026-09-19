@@ -308,11 +308,6 @@ void CActor::g_SetSprintAnimation(u32 mstate_rl, MotionID& head, MotionID& torso
         legs = (jump && sprint.legs_jump_rs.valid()) ? sprint.legs_jump_rs : sprint.legs_rs;
 }
 
-CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
-{
-    IKinematicsAnimated* VA = smart_cast<IKinematicsAnimated*>(V);
-    return (VA && motion_ID.valid()) ? VA->LL_GetRootMotion(motion_ID) : 0;
-}
 
 #ifdef DEBUG
 BOOL g_ShowAnimationInfo = FALSE;
@@ -689,7 +684,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
 
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(Visual());
 
-    CMotionDef* motion0 = skeleton_animated->LL_GetMotionDef(m_current_torso);
+    const CMotionDef* motion0 = skeleton_animated->LL_GetMotionDef(m_current_torso);
     VERIFY(motion0);
     if (!(motion0->flags & esmSyncPart))
         return;
@@ -697,7 +692,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
     if (!m_current_legs_blend)
         return;
 
-    CMotionDef* motion1 = skeleton_animated->LL_GetMotionDef(m_current_legs);
+    const CMotionDef* motion1 = skeleton_animated->LL_GetMotionDef(m_current_legs);
     VERIFY(motion1);
     if (!(motion1->flags & esmSyncPart))
         return;

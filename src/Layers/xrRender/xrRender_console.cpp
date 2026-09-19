@@ -4,7 +4,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "xrCore/xr_token.h"
-#include "xrCore/Animation/SkeletonMotions.hpp"
+#include "xrAnimation/OzzMotionLibrary.h"
 
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
@@ -576,7 +576,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        g_pMotionsContainer->dump();
+        XRay::Animation::DumpOzzAnimationStats();
     }
 };
 

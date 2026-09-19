@@ -10,8 +10,6 @@
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/Bindless/VariantTextureBuffer.h"
 #include "Layers/xrRender/Bindless/VariantBuffer.h"
-#include "Layers/xrRender/ModelPool.h"
-#include "xrAnimation/StartupConversionInventory.h"
 
 #include "xrEngine/IRenderBackend.h"
 #include "xrEngine/GameFont.h"
@@ -364,15 +362,4 @@ void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
     }
 }
 
-void FGRenderBase::ConvertLegacyAssetsToOzz()
-{
-    if (g_legacy_animation)
-        return;
-
-    XRay::Animation::StartupConversionStats stats;
-    XRay::Animation::PrebakeLegacyMotionLibraries(stats);
-
-    Msg("~ [Ozz] motion cache: baked=%zu, cached=%zu, unwritable=%zu, skipped=%zu, failed=%zu in %.2fs", stats.baked,
-        stats.cache_hits, stats.write_failed, stats.skipped, stats.failed, stats.total_time_seconds);
-}
 }

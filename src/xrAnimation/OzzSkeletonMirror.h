@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "xrCore/xrCore.h"
+#include "xrAnimation.h"
 #include "xrCore/Animation/Bone.hpp"
 #include <ozz/animation/runtime/skeleton.h>
 #include <ozz/base/span.h>
@@ -26,6 +27,6 @@ struct OzzSkeletonMirror
     u32 fingerprint{ 0u };
 };
 
-std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const OzzBoneDesc> bones);
+XRANIMATION_API std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const OzzBoneDesc> bones);
 }
 }

@@ -207,7 +207,7 @@ int IGame_Persistent::Level_ID(pcstr name, pcstr ver, bool bSet)
 
     for (CLocatorAPI::archive& A : FS.m_archives)
     {
-        if (!A.hSrcFile)
+        if (!A.is_open())
         {
             cpcstr ln = A.header->r_string("header", "level_name");
             cpcstr lv = A.header->r_string("header", "level_ver");

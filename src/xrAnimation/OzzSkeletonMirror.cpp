@@ -10,6 +10,7 @@
 #include <ozz/base/maths/quaternion.h>
 #include <ozz/base/maths/transform.h>
 #include <ozz/base/maths/vec_float.h>
+#include <stdexcept>
 
 namespace XRay
 {
@@ -49,8 +50,8 @@ void FillJoint(ozz::animation::offline::RawSkeleton::Joint& joint, u16 bone,
 std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const OzzBoneDesc> bones)
 {
     const size_t boneCount = bones.size();
-    if (boneCount == 0)
-        return nullptr;
+    if (boneCount == 0 || boneCount > ozz::animation::Skeleton::kMaxJoints)
+        throw std::runtime_error("invalid skeleton bone count");
 
     JointChildren children(boneCount);
     xr_vector<u16> roots;
@@ -59,14 +60,27 @@ std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const 
     for (size_t i = 0; i < boneCount; ++i)
     {
         const u16 parent = bones[i].parent;
-        if (parent == BI_NONE || size_t(parent) >= boneCount || size_t(parent) == i)
+        if (parent == BI_NONE)
             roots.push_back(u16(i));
+        else if (size_t(parent) >= boneCount || size_t(parent) == i)
+            throw std::runtime_error("invalid skeleton parent");
         else
             children[parent].push_back(u16(i));
     }
 
     if (roots.empty())
-        return nullptr;
+        throw std::runtime_error("skeleton has no root");
+    for (size_t i = 0; i < boneCount; ++i)
+    {
+        u16 parent = bones[i].parent;
+        size_t depth = 0;
+        while (parent != BI_NONE)
+        {
+            if (++depth >= boneCount)
+                throw std::runtime_error("skeleton hierarchy cycle");
+            parent = bones[parent].parent;
+        }
+    }
 
     ozz::animation::offline::RawSkeleton raw;
     raw.roots.resize(roots.size());
@@ -74,12 +88,12 @@ std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const 
         FillJoint(raw.roots[i], roots[i], bones, children);
 
     if (!raw.Validate())
-        return nullptr;
+        throw std::runtime_error("invalid Ozz raw skeleton");
 
     const ozz::animation::offline::SkeletonBuilder builder;
     ozz::unique_ptr<ozz::animation::Skeleton> built = builder(raw);
     if (!built)
-        return nullptr;
+        throw std::runtime_error("Ozz skeleton build failed");
 
     auto mirror = std::make_shared<OzzSkeletonMirror>();
     mirror->skeleton = std::move(*built);
@@ -94,14 +108,15 @@ std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const 
     xr_unordered_map<shared_str, u16> byName;
     byName.reserve(boneCount);
     for (size_t i = 0; i < boneCount; ++i)
-        byName.emplace(bones[i].name, u16(i));
+        if (!byName.emplace(bones[i].name, u16(i)).second)
+            throw std::runtime_error("duplicate skeleton bone name");
 
     for (int j = 0; j < jointCount; ++j)
     {
         const shared_str key(jointNames[j]);
         const auto it = byName.find(key);
         if (it == byName.end())
-            continue;
+            throw std::runtime_error("Ozz skeleton bone mapping failed");
         mirror->jointToBone[size_t(j)] = it->second;
         mirror->boneToJoint[it->second] = u16(j);
     }
@@ -114,6 +129,9 @@ std::shared_ptr<const OzzSkeletonMirror> BuildOzzSkeletonMirror(ozz::span<const 
     }
     if (jointCount > 0)
         crc = crc32(jointParents.data(), u32(sizeof(int16_t) * size_t(jointCount)), crc);
+    crc = crc32(mirror->boneToJoint.data(), u32(boneCount * sizeof(u16)), crc);
+    for (const auto& bone : bones)
+        crc = crc32(&bone.bind_local, sizeof(bone.bind_local), crc);
 
     mirror->fingerprint = crc;
 

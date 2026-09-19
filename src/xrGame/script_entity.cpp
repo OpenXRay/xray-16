@@ -643,7 +643,7 @@ bool CScriptEntity::bfScriptAnimation()
             if (!blend)
                 continue;
             result = blend;
-            [[maybe_unused]] CMotionDef* MD = skeleton_animated->LL_GetMotionDef(animation);
+            [[maybe_unused]] const CMotionDef* MD = skeleton_animated->LL_GetMotionDef(animation);
             VERIFY(MD);
             if (m_use_animation_movement_controller)
                 m_object->create_anim_mov_ctrl(blend, 0, true);

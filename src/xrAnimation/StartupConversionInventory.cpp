@@ -1,369 +1,277 @@
 #include "stdafx.h"
-
 #include "StartupConversionInventory.h"
-
 #include "LegacyOgfSkeleton.h"
-#include "OzzMotionLibrary.h"
-#include "OzzSkeletonMirror.h"
-
-#include "xrCore/FMesh.hpp"
-#include "xrCore/FS.h"
+#include "LegacyChunkIO.h"
+#include "Common/LevelStructure.hpp"
 #include "xrCore/LocatorAPI.h"
-#include "xrCore/log.h"
-#include "xrCore/Threading/ParallelFor.hpp"
+#include "xrCore/xr_ini.h"
 
-#include <algorithm>
-#include <atomic>
-#include <cctype>
-#include <chrono>
+#include <map>
 #include <memory>
-#include <unordered_set>
-#include <utility>
+#include <stdexcept>
+#include <unordered_map>
 
-namespace XRay
-{
-namespace Animation
+namespace XRay::Animation::Startup
 {
 namespace
 {
-using MirrorPtr = std::shared_ptr<const OzzSkeletonMirror>;
-
-constexpr u32 kInventoryVersion = 1u;
-
-struct VisualEntry
+struct ReaderCloser
 {
-    pcstr alias{ nullptr };
-    xr_string relative;
-    u32 size{ 0u };
-    u32 modif{ 0u };
+    void operator()(IReader* reader) const { FS.r_close(reader); }
 };
+using Reader = std::unique_ptr<IReader, ReaderCloser>;
 
-struct VisualResult
+Reader Open(const xr_string& source)
 {
-    MirrorPtr mirror;
-    xr_vector<shared_str> keys;
-    u32 fingerprint{ 0u };
-    bool cached{ false };
-    bool failed{ false };
-};
-
-struct PrebakeJob
-{
-    shared_str key;
-    MirrorPtr mirror;
-};
-
-xr_string CanonicalizeRelativePath(pcstr value)
-{
-    xr_string result(value ? value : "");
-    std::transform(result.begin(), result.end(), result.begin(),
-        [](unsigned char ch) { return char(std::tolower(ch)); });
-    std::replace(result.begin(), result.end(), '/', '\\');
-    while (!result.empty() && result.front() == '\\')
-        result.erase(result.begin());
-    return result;
+    Reader reader(FS.r_open(source.c_str()));
+    if (!reader)
+        throw std::runtime_error("cannot open animation source " + std::string(source.c_str()));
+    return reader;
 }
 
-bool OpenByKey(pcstr key, IReader*& reader)
+xr_string Root(pcstr alias)
 {
-    string_path fn;
-    if (!FS.exist(fn, "$level$", key) && !FS.exist(fn, "$game_meshes$", key))
-        return false;
-
-    reader = FS.r_open(fn);
-    return reader != nullptr;
-}
-
-xr_vector<VisualEntry> ScanVisuals()
-{
-    static pcstr const roots[] = { "$level$", "$game_meshes$" };
-
-    xr_vector<VisualEntry> visuals;
-    std::unordered_set<xr_string> seen;
-
-    for (pcstr root : roots)
-    {
-        FS_FileSet files;
-        FS.file_list(files, root, FS_ListFiles, "*.ogf");
-
-        for (const auto& file : files)
-        {
-            xr_string relative = CanonicalizeRelativePath(file.name.c_str());
-            if (relative.empty())
-                continue;
-            if (!seen.insert(relative).second)
-                continue;
-
-            VisualEntry entry;
-            entry.alias = root;
-            entry.relative = std::move(relative);
-            entry.size = file.size;
-            entry.modif = u32(file.time_write);
-            visuals.emplace_back(std::move(entry));
-        }
-    }
-
-    return visuals;
-}
-
-struct InventoryCache
-{
-    struct Record
-    {
-        u32 size{ 0u };
-        u32 modif{ 0u };
-        u32 fingerprint{ 0u };
-        xr_vector<xr_string> keys;
-    };
-
-    std::unordered_map<xr_string, Record> records;
-    bool dirty{ false };
-};
-
-string_path& InventoryCachePath()
-{
-    static string_path path;
-    if (path[0] == 0)
-        FS.update_path(path, "$app_data_root$", "ozz_inventory.cache");
+    string_path path;
+    FS.update_path(path, alias, "");
     return path;
 }
 
-void LoadInventoryCache(InventoryCache& cache)
+xr_string WithExtension(xr_string path, pcstr extension)
 {
-    IReader* reader = FS.r_open(InventoryCachePath());
-    if (!reader)
-        return;
+    const size_t length = xr_strlen(extension);
+    if (path.size() < length || path.compare(path.size() - length, length, extension) != 0)
+        path += extension;
+    return path;
+}
 
-    if (reader->length() >= int(sizeof(u32)) && reader->r_u32() == kInventoryVersion)
+xr_string Resolve(const xr_string& relative, const xr_string& level, const xr_string& meshes)
+{
+    if (!level.empty())
     {
-        while (reader->elapsed() > int(sizeof(u32) * 4))
+        const auto candidate = level + relative;
+        if (FS.exist(candidate.c_str()))
+            return candidate;
+    }
+    const auto candidate = meshes + relative;
+    if (FS.exist(candidate.c_str()))
+        return candidate;
+    throw std::runtime_error("missing motion source " + std::string(relative.c_str()) +
+        " in level namespace " + std::string(level.c_str()));
+}
+
+xr_vector<xr_string> ResolveReferences(const xr_vector<shared_str>& references,
+    const xr_string& level, const xr_string& meshes)
+{
+    xr_vector<xr_string> sources;
+    for (const auto& reference : references)
+    {
+        auto name = CanonicalPath(reference.c_str());
+        if (name.empty())
+            throw std::runtime_error("empty OGF motion reference");
+        name = WithExtension(std::move(name), ".omf");
+        if (name.find_first_of("*?") == xr_string::npos)
+            sources.push_back(Resolve(name, level, meshes));
+        else
         {
-            string_path relative;
-            reader->r_stringZ(relative, sizeof(relative));
-
-            InventoryCache::Record record;
-            record.size = reader->r_u32();
-            record.modif = reader->r_u32();
-            record.fingerprint = reader->r_u32();
-
-            const u32 count = reader->r_u32();
-            record.keys.reserve(count);
-            for (u32 i = 0; i < count; ++i)
+            std::map<xr_string, xr_string> selected;
+            FS_FileSet meshFiles;
+            FS.file_list(meshFiles, meshes.c_str(), FS_ListFiles, name.c_str());
+            for (const auto& file : meshFiles)
+                selected.emplace(CanonicalPath(file.name.c_str()), meshes + file.name.c_str());
+            if (!level.empty())
             {
-                string_path key;
-                reader->r_stringZ(key, sizeof(key));
-                record.keys.emplace_back(key);
+                FS_FileSet levelFiles;
+                FS.file_list(levelFiles, level.c_str(), FS_ListFiles, name.c_str());
+                for (const auto& file : levelFiles)
+                    selected[CanonicalPath(file.name.c_str())] = level + file.name.c_str();
             }
-            cache.records.emplace(xr_string(relative), std::move(record));
+            if (selected.empty())
+                throw std::runtime_error("motion wildcard matched no sources: " + std::string(name.c_str()));
+            for (const auto& item : selected)
+                sources.push_back(item.second);
         }
     }
-
-    FS.r_close(reader);
+    if (sources.empty() || sources.size() > MAX_ANIM_SLOT)
+        throw std::runtime_error("invalid resolved animation slot count");
+    return sources;
 }
 
-void SaveInventoryCache(const InventoryCache& cache)
+void ApplyPartitions(const xr_string& relativeModel, const xr_string& level, const xr_string& meshes,
+    const xr_vector<OzzBoneDesc>& bones, CPartition& partition)
 {
-    if (!cache.dirty)
+    if (relativeModel.compare(0, 13, "@level_visual") == 0 || relativeModel.find(':') != xr_string::npos)
         return;
-
-    IWriter* writer = FS.w_open(InventoryCachePath());
-    if (!writer)
-        return;
-
-    writer->w_u32(kInventoryVersion);
-    for (const auto& item : cache.records)
-    {
-        writer->w_stringZ(item.first.c_str());
-        writer->w_u32(item.second.size);
-        writer->w_u32(item.second.modif);
-        writer->w_u32(item.second.fingerprint);
-        writer->w_u32(u32(item.second.keys.size()));
-        for (const xr_string& key : item.second.keys)
-            writer->w_stringZ(key.c_str());
-    }
-    FS.w_close(writer);
-}
-
-void InspectVisual(const VisualEntry& entry, const InventoryCache& cache, VisualResult& result)
-{
-    const auto known = cache.records.find(entry.relative);
-    if (known != cache.records.end() && known->second.size == entry.size && known->second.modif == entry.modif)
-    {
-        bool complete = true;
-        for (const xr_string& key : known->second.keys)
-            complete = complete && MotionCachePresent(shared_str(key.c_str()), known->second.fingerprint);
-
-        if (complete)
-        {
-            result.fingerprint = known->second.fingerprint;
-            result.cached = true;
-            for (const xr_string& key : known->second.keys)
-                result.keys.emplace_back(key.c_str());
-            return;
-        }
-    }
-
-    IReader* ogf = FS.r_open(entry.alias, entry.relative.c_str());
-    if (!ogf)
-    {
-        result.failed = true;
-        Msg("! [ozz] can't open visual [%s]", entry.relative.c_str());
-        return;
-    }
-
-    ogf_header header{};
-    const bool has_header = ogf->r_chunk_safe(OGF_HEADER, &header, sizeof(header)) != 0;
-    if (!has_header || header.type != MT_SKELETON_ANIM)
-    {
-        FS.r_close(ogf);
-        return;
-    }
-
-    xr_vector<OzzBoneDesc> bones;
-    xr_vector<shared_str> refs;
-    bool embedded = false;
-    const bool parsed = ReadOgfSkeleton(ogf, bones, refs, embedded);
-    FS.r_close(ogf);
-
-    if (!parsed || bones.empty())
-    {
-        result.failed = true;
-        Msg("! [ozz] can't read skeleton of [%s]", entry.relative.c_str());
-        return;
-    }
-
-    result.mirror = BuildOzzSkeletonMirror(ozz::span<const OzzBoneDesc>(bones.data(), bones.size()));
-    if (!result.mirror)
-    {
-        result.failed = true;
-        Msg("! [ozz] can't build skeleton mirror for [%s]", entry.relative.c_str());
-        return;
-    }
-    result.fingerprint = result.mirror->fingerprint;
-    if (embedded)
-        result.keys.emplace_back(entry.relative.c_str());
+    xr_string relative = relativeModel;
+    const auto extension = relative.rfind('.');
+    if (extension != xr_string::npos)
+        relative.resize(extension);
+    relative += ".ltx";
+    xr_string source;
+    if (!level.empty() && FS.exist((level + relative).c_str()))
+        source = level + relative;
+    else if (FS.exist((meshes + relative).c_str()))
+        source = meshes + relative;
     else
-        result.keys = std::move(refs);
-}
-}
-
-void PrebakeLegacyMotionLibraries(StartupConversionStats& out_stats)
-{
-    using namespace std::chrono;
-    const auto start_time = high_resolution_clock::now();
-
-    out_stats = {};
-
-    const xr_vector<VisualEntry> visuals = ScanVisuals();
-    if (visuals.empty())
         return;
-
-    InventoryCache inventory;
-    LoadInventoryCache(inventory);
-
-    xr_vector<VisualResult> results(visuals.size());
-    xr_parallel_for(TaskRange<size_t>(0, visuals.size()), [&](const TaskRange<size_t>& range)
+    const auto reader = Open(source);
+    const auto slash = source.find_last_of("\\/");
+    const xr_string directory = slash == xr_string::npos ? xr_string{} : source.substr(0, slash + 1);
+    CInifile ini(reader.get(), directory.c_str());
+    std::unordered_map<xr_string, u16> indices;
+    for (u16 bone = 0; bone < bones.size(); ++bone)
+        indices.emplace(CanonicalPath(bones[bone].name.c_str()), bone);
+    for (u16 index = 0; index < MAX_PARTS; ++index)
     {
-        for (size_t idx = range.begin(); idx != range.end(); ++idx)
-            InspectVisual(visuals[idx], inventory, results[idx]);
-    });
-
-    for (size_t idx = 0; idx < visuals.size(); ++idx)
-    {
-        const VisualResult& result = results[idx];
-        if (result.cached || result.failed || !result.mirror)
+        string32 name;
+        xr_sprintf(name, "part_%u", unsigned(index));
+        if (!ini.section_exist(name))
             continue;
-
-        InventoryCache::Record record;
-        record.size = visuals[idx].size;
-        record.modif = visuals[idx].modif;
-        record.fingerprint = result.fingerprint;
-        record.keys.reserve(result.keys.size());
-        for (const shared_str& key : result.keys)
-            record.keys.emplace_back(key.c_str());
-
-        inventory.records[visuals[idx].relative] = std::move(record);
-        inventory.dirty = true;
-    }
-
-    xr_vector<PrebakeJob> jobs;
-    std::unordered_set<xr_string> queued;
-
-    for (const VisualResult& result : results)
-    {
-        if (result.failed)
-            ++out_stats.failed;
-        if (!result.mirror && !result.cached)
-            continue;
-
-        for (const shared_str& key : result.keys)
+        const auto& section = ini.r_section(name);
+        auto& part = partition[index];
+        if (!section.Data.empty())
+            part.bones.clear();
+        for (const auto& item : section.Data)
         {
-            string64 suffix;
-            xr_sprintf(suffix, sizeof(suffix), "#%08x", result.fingerprint);
-
-            xr_string unique(key.c_str() ? key.c_str() : "");
-            unique += suffix;
-
-            if (!queued.insert(std::move(unique)).second)
+            if (item.first == "partition_name")
+                part.Name = item.second;
+            else
             {
-                ++out_stats.skipped;
-                continue;
+                const auto found = indices.find(CanonicalPath(item.first.c_str()));
+                if (found == indices.end())
+                    throw std::runtime_error(std::string(source.c_str()) + ": unknown partition bone " + item.first.c_str());
+                part.bones.push_back(found->second);
             }
-
-            if (result.cached)
-            {
-                ++out_stats.cache_hits;
-                continue;
-            }
-
-            jobs.emplace_back(PrebakeJob{ key, result.mirror });
         }
     }
-
-    std::atomic<size_t> baked{ 0 };
-    std::atomic<size_t> cache_hits{ 0 };
-    std::atomic<size_t> write_failed{ 0 };
-    std::atomic<size_t> failed{ 0 };
-
-    xr_parallel_for(TaskRange<size_t>(0, jobs.size()), [&](const TaskRange<size_t>& range)
-    {
-        for (size_t idx = range.begin(); idx != range.end(); ++idx)
-        {
-            const PrebakeJob& job = jobs[idx];
-
-            IReader* reader = nullptr;
-            if (!OpenByKey(job.key.c_str(), reader))
-            {
-                ++failed;
-                Msg("! [ozz] can't open motion source [%s]", job.key.c_str());
-                continue;
-            }
-
-            const PrebakeResult result = PrebakeMotionLibrary(job.key, reader, *job.mirror);
-            FS.r_close(reader);
-
-            switch (result)
-            {
-            case PrebakeResult::CacheHit: ++cache_hits; break;
-            case PrebakeResult::Baked: ++baked; break;
-            case PrebakeResult::WriteFailed:
-                ++write_failed;
-                Msg("! [ozz] can't store motion library cache [%s]", job.key.c_str());
-                break;
-            case PrebakeResult::Failed:
-                ++failed;
-                Msg("! [ozz] can't prebake motion library [%s]", job.key.c_str());
-                break;
-            }
-        }
-    });
-
-    out_stats.baked = baked.load();
-    out_stats.cache_hits += cache_hits.load();
-    out_stats.write_failed = write_failed.load();
-    SaveInventoryCache(inventory);
-    out_stats.failed += failed.load();
-    out_stats.total_time_seconds = duration_cast<duration<double>>(high_resolution_clock::now() - start_time).count();
 }
+
+void InspectVisual(const Chunk& visual, const xr_string& source, const xr_string& relative,
+    const xr_vector<xr_string>& levels, const xr_string& meshes, unsigned depth = 0)
+{
+    try
+    {
+        if (depth > 256)
+            throw std::runtime_error("OGF child hierarchy too deep");
+        ChunkStorage storage;
+        const auto chunks = ParseChunks(visual.data, visual.size, storage);
+        const auto header = chunks.find(OGF_HEADER);
+        if (header == chunks.end())
+            throw std::runtime_error("missing OGF header");
+        BinaryReader headerReader{header->second.data, header->second.size};
+        const auto information = headerReader.read<ogf_header>();
+        if (information.format_version != xrOGF_FormatVersion)
+            throw std::runtime_error("unsupported OGF version");
+        if (information.type == MT_SKELETON_ANIM)
+        {
+            IReader ogf(const_cast<std::byte*>(visual.data), visual.size);
+            xr_vector<OzzBoneDesc> bones;
+            xr_vector<shared_str> references;
+            bool embedded = false;
+            ReadOgfSkeleton(&ogf, bones, references, embedded);
+            std::shared_ptr<const OzzSkeletonMirror> mirror;
+            const auto skeleton = PrepareSkeleton(bones, mirror);
+            for (const auto& level : levels)
+            {
+                PreparedModel model;
+                model.skeleton = skeleton;
+                if (embedded)
+                {
+                    model.libraries.push_back(PrepareLibrary(source.c_str(), visual.data, visual.size,
+                        skeleton, *mirror, model.partition));
+                }
+                else
+                {
+                    const auto sources = ResolveReferences(references, level, meshes);
+                    for (const auto& motion : sources)
+                    {
+                        CPartition partition;
+                        model.libraries.push_back(PrepareLibrary(motion.c_str(), nullptr, 0,
+                            skeleton, *mirror, partition));
+                        if (model.libraries.size() == 1)
+                            model.partition = std::move(partition);
+                    }
+                }
+                ApplyPartitions(relative, level, meshes, bones, model.partition);
+                RegisterModel(source, level, std::move(model));
+            }
+        }
+        const auto children = chunks.find(OGF_CHILDREN);
+        if (children != chunks.end())
+        {
+            const auto entries = ParseChunks(children->second.data, children->second.size, storage);
+            for (u32 index = 0; index < entries.size(); ++index)
+            {
+                const auto child = entries.find(index);
+                if (child == entries.end())
+                    throw std::runtime_error("non-contiguous OGF children");
+                string32 suffix;
+                xr_sprintf(suffix, ":%u", index + 1);
+                InspectVisual(child->second, source + suffix, relative + suffix, levels, meshes, depth + 1);
+            }
+        }
+    }
+    catch (const std::exception& error)
+    {
+        throw std::runtime_error(std::string(source.c_str()) + ": " + error.what());
+    }
+}
+
+void InspectFile(const xr_string& source, const xr_string& relative,
+    const xr_vector<xr_string>& levels, const xr_string& meshes)
+{
+    const auto reader = Open(source);
+    InspectVisual({static_cast<const std::byte*>(reader->pointer()), size_t(reader->length())},
+        source, relative, levels, meshes);
+}
+}
+
+void BuildInventory()
+{
+    for (auto& archive : FS.m_archives)
+        if (!archive.is_open())
+            FS.LoadArchive(archive);
+    const auto meshes = Root("$game_meshes$");
+    const auto gameLevels = Root("$game_levels$");
+    FS_FileSet directories;
+    FS.file_list(directories, "$game_levels$", FS_ListFolders | FS_RootOnly);
+    xr_vector<xr_string> levelRoots;
+    xr_vector<xr_string> meshContexts{xr_string{}};
+    for (const auto& directory : directories)
+    {
+        const auto root = gameLevels + directory.name.c_str();
+        levelRoots.push_back(root);
+        meshContexts.push_back(root);
+    }
+    FS_FileSet meshFiles;
+    FS.file_list(meshFiles, "$game_meshes$", FS_ListFiles, "*.ogf");
+    for (const auto& file : meshFiles)
+        InspectFile(meshes + file.name.c_str(), file.name.c_str(), meshContexts, meshes);
+    for (const auto& level : levelRoots)
+    {
+        const xr_vector<xr_string> context{level};
+        FS_FileSet models;
+        FS.file_list(models, level.c_str(), FS_ListFiles, "*.ogf");
+        for (const auto& file : models)
+            InspectFile(level + file.name.c_str(), file.name.c_str(), context, meshes);
+        const auto levelFile = level + "level";
+        if (!FS.exist(levelFile.c_str()))
+            continue;
+        const auto reader = Open(levelFile);
+        ChunkStorage storage;
+        const auto chunks = ParseChunks(static_cast<const std::byte*>(reader->pointer()), reader->length(), storage);
+        const auto visuals = chunks.find(fsL_VISUALS);
+        if (visuals == chunks.end())
+            throw std::runtime_error(std::string(levelFile.c_str()) + ": missing level visuals");
+        const auto entries = ParseChunks(visuals->second.data, visuals->second.size, storage);
+        for (u32 index = 0; index < entries.size(); ++index)
+        {
+            const auto found = entries.find(index);
+            if (found == entries.end())
+                throw std::runtime_error(std::string(levelFile.c_str()) + ": non-contiguous level visuals");
+            string64 name;
+            xr_sprintf(name, "@level_visual:%u", index);
+            InspectVisual(found->second, level + name, name, context, meshes);
+        }
+    }
 }
 }

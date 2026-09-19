@@ -126,6 +126,8 @@ public:
     virtual void BuildBoneMatrix(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
     virtual void OnCalculateBones() {}
+    virtual bool PrepareBones() { return false; }
+    virtual void FinishBones() {}
 
     virtual void CalculateBonesAdditionalTransforms(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0)); //--#SM+#--

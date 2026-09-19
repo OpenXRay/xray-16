@@ -15,15 +15,14 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 {
     ZoneScoped;
 
-    // early out.
-    // check if the info is still relevant
-    // skip all the computations - assume nothing changes in a small period of time :)
-    if (Device.dwTimeGlobal == UCalc_Time)
-        return; // early out for "fast" update
     UCalc_mtlock lock;
+    if (!bForceExact && Device.dwTimeGlobal != UCalc_Time &&
+        Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval))
+        return;
+    if (!bForceExact && Device.dwTimeGlobal == UCalc_Time && !PrepareBones())
+        return;
     OnCalculateBones();
-    if (!bForceExact && (Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
-        return; // early out for "slow" update
+    PrepareBones();
     if (Update_Visibility)
         Visibility_Update();
 
@@ -47,6 +46,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
             ? &Fidentity : &bone_instances[bd->GetParentID()].mTransform;
         CLBone(bd, bi, parent, u8(-1));
     }
+    FinishBones();
 #ifdef DEBUG
     check_kinematics(this, dbg_name.c_str());
     RImplementation.BasicStats.Animation.End();

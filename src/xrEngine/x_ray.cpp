@@ -13,6 +13,7 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrNetServer/NET_AuthCheck.h"
+#include "xrAnimation/OzzMotionLibrary.h"
 
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
@@ -274,6 +275,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
     Device.FillVideoModes();
     TaskScheduler->Wait(inputTask);
     InitConsole();
+    XRay::Animation::PrepareOzzAnimationInventory();
 
     Engine.Initialize(game, modules);
 
@@ -344,6 +346,7 @@ CApplication::~CApplication()
 
     Device.Destroy();
     Engine.Destroy();
+    XRay::Animation::ShutdownOzzAnimations();
 
 #ifdef USE_DISCORD_INTEGRATION
     discord::Core::Destroy(&m_discord_core);

@@ -1,26 +1,21 @@
 #pragma once
 
-#include "xrCommon/xr_string.h"
-#include "xrCommon/xr_vector.h"
-
+#include "xrAnimation.h"
+#include "xrCore/Animation/SkeletonMotions.hpp"
 #include <cstddef>
-
 #include <ozz/animation/runtime/animation.h>
-#include <ozz/animation/runtime/skeleton.h>
 #include <ozz/base/memory/unique_ptr.h>
 
-namespace XRay
+namespace XRay::Animation
 {
-namespace Animation
+struct OzzSkeletonMirror;
+
+struct ConvertedOmfLibrary
 {
-struct ConvertedOmfAnimation
-{
-    xr_string name;
-    u32 frame_count = 0;
-    ozz::unique_ptr<ozz::animation::Animation> animation;
+    MotionLibraryMetadata metadata;
+    xr_vector<ozz::unique_ptr<ozz::animation::Animation>> animations;
 };
 
-bool ConvertLegacyOmf(const std::byte* data, size_t size, const xr_vector<xr_string>& skeleton_bone_names,
-    const ozz::animation::Skeleton& skeleton, xr_vector<ConvertedOmfAnimation>& out_animations);
-}
+XRANIMATION_API ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size,
+    pcstr source, const OzzSkeletonMirror& skeleton);
 }

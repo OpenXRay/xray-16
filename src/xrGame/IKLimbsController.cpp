@@ -339,7 +339,7 @@ void CIKLimbsController::PlayLegs(CBlend* b)
     anim_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).first;
     anim_set_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).second;
 
-    CMotionDef& MD = *skeleton_animated->LL_GetMotionDef(b->motionID);
+    const CMotionDef& MD = *skeleton_animated->LL_GetMotionDef(b->motionID);
     if (MD.marks.empty() && (MD.flags & esmUseFootSteps))
         Msg("! No foot stseps for animation: animation name: %s, animation set: %s ", anim_name, anim_set_name);
 #endif

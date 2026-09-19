@@ -483,7 +483,7 @@ void CLocatorAPI::archive::open()
     modif = file_info.st_mtime;
 #elif defined(XR_PLATFORM_POSIX)
     // Open the file
-    if (hSrcFile)
+    if (is_open())
         return;
 
     pstr conv_path = xr_strdup(path.c_str());

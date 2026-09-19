@@ -103,13 +103,21 @@ public:
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
 #elif defined(XR_PLATFORM_POSIX)
-        int hSrcFile = 0;
+        int hSrcFile = -1;
 #else
 #   error Select or add implementation for your platform
 #endif
         CInifile* header = nullptr;
 
         archive() = default;
+        bool is_open() const
+        {
+#if defined(XR_PLATFORM_POSIX)
+            return hSrcFile >= 0;
+#else
+            return hSrcFile != nullptr;
+#endif
+        }
         void open();
         void close();
     };
