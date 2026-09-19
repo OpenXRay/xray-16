@@ -21,6 +21,11 @@ foreach(_ozz_tgt ozz_base ozz_animation ozz_animation_offline ozz_animation_tool
         target_compile_options(${_ozz_tgt} PRIVATE -Wno-error=delayed-template-parsing-in-cxx20)
     endif()
 endforeach()
+if (PROJECT_PLATFORM_ARM OR PROJECT_PLATFORM_ARM64)
+    target_compile_definitions(ozz_base PUBLIC "OZZ_SIMD_SSE4_1=")
+    target_include_directories(ozz_base PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/ozz-sse2neon")
+    target_link_libraries(ozz_base PUBLIC sse2neon)
+endif()
 
 set(SDL_SHARED              OFF CACHE BOOL "Build SDL3 as static library")
 set(SDL_STATIC              ON  CACHE BOOL "Build SDL3 as static library")
