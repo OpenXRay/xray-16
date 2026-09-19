@@ -73,7 +73,7 @@ public:
 #ifdef _EDITOR
 public:
 #else
-private:
+protected:
 #endif
     u32 Update_LastTime{};
 

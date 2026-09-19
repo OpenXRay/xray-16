@@ -35,6 +35,8 @@ extern bool ENGINE_API g_bRendering;
 
 namespace xray::render::fg
 {
+bool g_legacy_animation = false;
+
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
     dxRender_Visual* V = nullptr;
@@ -49,7 +51,10 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     case MT_PROGRESSIVE: // dynamic-resolution visual
         V = xr_new<FProgressive>();
         break;
-    case MT_SKELETON_ANIM: V = xr_new<XRay::Animation::OzzKinematicsAnimated>(); break;
+    case MT_SKELETON_ANIM:
+        V = g_legacy_animation ? static_cast<dxRender_Visual*>(xr_new<CKinematicsAnimated>())
+                               : static_cast<dxRender_Visual*>(xr_new<XRay::Animation::OzzKinematicsAnimated>());
+        break;
     case MT_SKELETON_RIGID: V = xr_new<CKinematics>(); break;
     case MT_SKELETON_GEOMDEF_PM: V = xr_new<CSkeletonX_PM>(); break;
     case MT_SKELETON_GEOMDEF_ST: V = xr_new<CSkeletonX_ST>(); break;
@@ -213,6 +218,7 @@ void CModelPool::Destroy()
 
     // cleanup motions container
     g_pMotionsContainer->clean(false);
+    XRay::Animation::g_pOzzMotionLibraries->clean(false);
 }
 
 CModelPool::CModelPool()
@@ -220,13 +226,17 @@ CModelPool::CModelPool()
     bLogging = TRUE;
     bForceDiscard = FALSE;
     bAllowChildrenDuplicate = TRUE;
+    g_legacy_animation = !!strstr(Core.Params, "-legacy_anim");
+    g_skeleton_motions_load_keys = g_legacy_animation;
     g_pMotionsContainer = xr_new<motions_container>();
+    XRay::Animation::g_pOzzMotionLibraries = xr_new<XRay::Animation::OzzMotionLibraryContainer>();
 }
 
 CModelPool::~CModelPool()
 {
     Destroy();
     xr_delete(g_pMotionsContainer);
+    xr_delete(XRay::Animation::g_pOzzMotionLibraries);
 }
 
 dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)

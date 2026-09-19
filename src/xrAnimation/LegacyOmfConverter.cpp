@@ -362,14 +362,12 @@ ozz::animation::offline::RawAnimation BuildRawAnimation(const LegacyOmfMotion& m
             const Fquaternion& xr_quat = source_track.rotations[frame];
             const Fvector& xr_translation = source_track.translations[frame];
 
-            Fmatrix local;
-            local.mk_xform(xr_quat, xr_translation);
-
-            const auto ozz_matrix = ConvertXRayMatrixToOzz(local);
             track.translations[frame].time = time;
-            track.translations[frame].value = XRay::Animation::ExtractTranslation(ozz_matrix);
+            track.translations[frame].value =
+                ozz::math::Float3(xr_translation.x, xr_translation.y, xr_translation.z);
             track.rotations[frame].time = time;
-            track.rotations[frame].value = XRay::Animation::ExtractQuaternion(ozz_matrix);
+            track.rotations[frame].value =
+                ozz::math::Normalize(ozz::math::Quaternion(xr_quat.x, xr_quat.y, xr_quat.z, xr_quat.w));
         }
     }
 

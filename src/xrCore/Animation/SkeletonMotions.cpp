@@ -9,6 +9,7 @@
 #include "Include/xrRender/Kinematics.h"
 
 motions_container* g_pMotionsContainer = nullptr;
+bool g_skeleton_motions_load_keys = true;
 
 u16 CPartition::part_id(const shared_str& name) const
 {
@@ -205,15 +206,19 @@ BOOL motions_value::load(pcstr N, IReader* data, vecBones* bones)
 
             if (M.test_flag(flRKeyAbsent))
             {
-                CKeyQR* r = (CKeyQR*)MS->pointer();
-                const u32 crc_q = crc32(r, sizeof(CKeyQR));
-                M._keysR.create(crc_q, 1, r);
+                if (g_skeleton_motions_load_keys)
+                {
+                    CKeyQR* r = (CKeyQR*)MS->pointer();
+                    const u32 crc_q = crc32(r, sizeof(CKeyQR));
+                    M._keysR.create(crc_q, 1, r);
+                }
                 MS->advance(1 * sizeof(CKeyQR));
             }
             else
             {
                 const u32 crc_q = MS->r_u32();
-                M._keysR.create(crc_q, dwLen, (CKeyQR*)MS->pointer());
+                if (g_skeleton_motions_load_keys)
+                    M._keysR.create(crc_q, dwLen, (CKeyQR*)MS->pointer());
                 MS->advance(dwLen * sizeof(CKeyQR));
             }
             if (M.test_flag(flTKeyPresent))
@@ -221,12 +226,14 @@ BOOL motions_value::load(pcstr N, IReader* data, vecBones* bones)
                 const u32 crc_t = MS->r_u32();
                 if (M.test_flag(flTKey16IsBit))
                 {
-                    M._keysT16.create(crc_t, dwLen, (CKeyQT16*)MS->pointer());
+                    if (g_skeleton_motions_load_keys)
+                        M._keysT16.create(crc_t, dwLen, (CKeyQT16*)MS->pointer());
                     MS->advance(dwLen * sizeof(CKeyQT16));
                 }
                 else
                 {
-                    M._keysT8.create(crc_t, dwLen, (CKeyQT8*)MS->pointer());
+                    if (g_skeleton_motions_load_keys)
+                        M._keysT8.create(crc_t, dwLen, (CKeyQT8*)MS->pointer());
                     MS->advance(dwLen * sizeof(CKeyQT8));
                 };
 
