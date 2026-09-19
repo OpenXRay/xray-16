@@ -245,6 +245,8 @@ public:
 
 extern XRCORE_API motions_container* g_pMotionsContainer;
 
+extern XRCORE_API bool g_skeleton_motions_load_keys;
+
 class XRCORE_API shared_motions
 {
     motions_value* p_;
