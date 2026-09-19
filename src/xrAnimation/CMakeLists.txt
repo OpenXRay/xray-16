@@ -16,6 +16,8 @@ target_sources_grouped(
     OzzBundle.h
     OzzBundle.cpp
     OzzConversion.h
+    OzzSkeletonMirror.h
+    OzzSkeletonMirror.cpp
 )
 
 target_sources_grouped(

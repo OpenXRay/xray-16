@@ -9,7 +9,6 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/OzzMesh.h"
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -583,8 +582,6 @@ static u32 ResolveBoneOffset(const GeometryBatch& batch, GPUCullingManager* gpuC
         return gpuCulling->GetOrUploadSkeleton(cmdList, static_cast<CSkeletonX_ST*>(batch.visual)->GetParent());
     case MT_SKELETON_GEOMDEF_PM:
         return gpuCulling->GetOrUploadSkeleton(cmdList, static_cast<CSkeletonX_PM*>(batch.visual)->GetParent());
-    case MT_OZZ_MESH:
-        return gpuCulling->GetOrUploadOzzSkeleton(cmdList, static_cast<xray::render::fg::OzzMesh*>(batch.visual));
     default:
         return 0;
     }

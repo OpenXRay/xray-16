@@ -12,7 +12,6 @@
 namespace xray::render::fg::passes {
     struct ParticleBatch;
 }
-namespace xray::render::fg { class OzzMesh; }
 
 namespace xray::render {
     class GeometryCollector;
@@ -317,7 +316,6 @@ public:
 
     u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
 
-    u32 GetOrUploadOzzSkeleton(nvrhi::ICommandList* cmdList, xray::render::fg::OzzMesh* mesh);
     nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
 
     void ProcessStatsReadback();
