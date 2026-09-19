@@ -63,80 +63,42 @@ OzzKinematicsAnimated::~OzzKinematicsAnimated()
 
 void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* pFrom)
 {
-    xray::render::fg::FHierrarhyVisual::Copy(pFrom);
+    OzzKinematics::Copy(pFrom);
 
     auto* src = static_cast<OzzKinematicsAnimated*>(pFrom);
 
-    m_BundleSkeleton     = src->m_BundleSkeleton;
-    m_BundleMesh         = src->m_BundleMesh;
-    m_BundleMotionRefs   = src->m_BundleMotionRefs;
-    m_BundleBoneMeta     = src->m_BundleBoneMeta;
-    m_BundleUserData     = src->m_BundleUserData;
-    m_BundleEmbeddedAnim = src->m_BundleEmbeddedAnim;
+    m_Motions = src->m_Motions;
 
-    if (m_BundleSkeleton.empty())
-        return;
-
-    const auto skeleton_span = ozz::span<const std::byte>(
-        reinterpret_cast<const std::byte*>(m_BundleSkeleton.data()),
-        m_BundleSkeleton.size());
-
-    R_ASSERT2(InitializeFromOzzBuffer(skeleton_span, m_BundleMotionRefs),
-        "OzzKinematicsAnimated::Copy: re-init from cached skeleton failed");
-
-    if (!m_BundleBoneMeta.empty())
-        ApplyExtendedBoneMetadata(m_BundleBoneMeta);
-
-    if (!m_BundleUserData.empty())
-        LoadUserDataFromBuffer(m_BundleUserData);
-
-    if (!m_BundleEmbeddedAnim.empty())
-        SetEmbeddedAnimationData(m_BundleEmbeddedAnim);
-
-    OnSkeletonLoaded();
-
-    for (auto* child : children)
-    {
-        if (auto* mesh_child = dynamic_cast<xray::render::fg::OzzMesh*>(child))
-            mesh_child->SetParent(this);
-    }
+    IBlend_Startup();
+    InitializeChannelState();
+    ResetPlaybackState();
 }
 
-void OzzKinematicsAnimated::OnSkeletonLoaded()
+void OzzKinematicsAnimated::Spawn()
 {
-    EnsureMotionLibraryLoaded();
+    OzzKinematics::Spawn();
 
-    if (IsInitialized())
-    {
-        defaultPartition[0].Name = "default";
-        const u16 bone_count = LL_BoneCount();
-        defaultPartition[0].bones.resize(bone_count);
-        for (u16 i = 0; i < bone_count; ++i)
-            defaultPartition[0].bones[i] = i;
-    }
+    IBlend_Startup();
+    ResetPlaybackState();
+
+    updateTracksCallback = nullptr;
+    updateTracksLastTime = 0;
+
+    InitializeChannelState();
 }
 
-bool OzzKinematicsAnimated::InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData, const xr_vector<xr_string>& motionRefs)
+bool OzzKinematicsAnimated::LoadBundle(const OzzxBundle& bundle)
 {
-    motionReferences = motionRefs;
-
-    if (!OzzKinematics::InitializeFromOzzBuffer(skeletonData))
-    {
-        motionReferences.clear();
+    if (!OzzKinematics::LoadBundle(bundle))
         return false;
-    }
 
     ResetSamplingBuffers();
     ResetPlaybackState();
-
     InitializeChannelState();
 
-    return true;
-}
+    EnsureMotionLibraryLoaded();
 
-void OzzKinematicsAnimated::SetEmbeddedAnimationData(const std::vector<std::uint8_t>& data)
-{
-    embeddedAnimationData = data;
+    return true;
 }
 
 void OzzKinematicsAnimated::InitializeChannelState()
@@ -182,10 +144,11 @@ void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
 
     SkeletonFingerprint skelFP = SkeletonFingerprint::Compute(Skeleton());
 
-    if (!embeddedAnimationData.empty())
+    const std::vector<std::uint8_t>& embeddedAnimation = model->embeddedAnimation;
+
+    if (!embeddedAnimation.empty())
     {
-        const u32 dataHash = crc32(embeddedAnimationData.data(),
-                                   static_cast<u32>(embeddedAnimationData.size()));
+        const u32 dataHash = crc32(embeddedAnimation.data(), static_cast<u32>(embeddedAnimation.size()));
         xr_string embeddedKey = xr_string("<embedded_") + xr_string(std::to_string(dataHash).c_str()) + xr_string(">");
 
         m_Motions.push_back(SMotionsSlot());
@@ -195,17 +158,15 @@ void OzzKinematicsAnimated::EnsureMotionLibraryLoaded()
         request.key = shared_str(embeddedKey.c_str());
         request.skelFingerprint = skelFP;
         request.blocking = true;
-        request.embeddedData = embeddedAnimationData;
+        request.embeddedData = embeddedAnimation;
 
         if (!slot.motions.Create(request, Skeleton()))
             m_Motions.pop_back();
         else
             BuildBoneMotionCache(slot);
-
-        embeddedAnimationData.clear();
     }
 
-    for (const auto& reference : motionReferences)
+    for (const auto& reference : model->motionRefs)
     {
         m_Motions.push_back(SMotionsSlot());
         SMotionsSlot& slot = m_Motions.back();
@@ -962,7 +923,8 @@ CBlend* OzzKinematicsAnimated::PlayFX_Safe(cpcstr, float)
 
 const CPartition& OzzKinematicsAnimated::partitions() const
 {
-    return defaultPartition;
+    static const CPartition empty;
+    return model ? model->defaultPartition : empty;
 }
 
 float OzzKinematicsAnimated::get_animation_length(MotionID)

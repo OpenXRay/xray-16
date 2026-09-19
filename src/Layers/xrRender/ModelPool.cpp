@@ -708,44 +708,13 @@ dxRender_Visual* CModelPool::Instance_LoadOzzx(LPCSTR N, LPCSTR full_path)
     V->dbg_name = N;
 #endif
     auto* kin = static_cast<XRay::Animation::OzzKinematics*>(V);
-    auto* kin_anim = (type == MT_OZZ_ANIMATED) ? static_cast<XRay::Animation::OzzKinematicsAnimated*>(V) : nullptr;
 
-    kin->CacheBundlePayloads(
-        bundle.skeleton,
-        bundle.mesh,
-        bundle.motion_refs,
-        bundle.bone_metadata,
-        bundle.user_data,
-        bundle.embedded_animation_data);
-
-    const auto skeleton_span = ozz::span<const std::byte>(
-        reinterpret_cast<const std::byte*>(bundle.skeleton.data()),
-        bundle.skeleton.size());
-
-    bool init_ok;
-    if (kin_anim)
-        init_ok = kin_anim->InitializeFromOzzBuffer(skeleton_span, bundle.motion_refs);
-    else
-        init_ok = kin->InitializeFromOzzBuffer(skeleton_span);
-
-    if (!init_ok)
+    if (!kin->LoadBundle(bundle))
     {
         Msg("! [ModelPool] Failed to initialize OzzKinematics from '%s'", full_path);
         xr_delete(V);
         return nullptr;
     }
-
-    if (!bundle.bone_metadata.empty())
-        kin->ApplyExtendedBoneMetadata(bundle.bone_metadata);
-
-    if (!bundle.user_data.empty())
-        kin->LoadUserDataFromBuffer(bundle.user_data);
-
-    if (kin_anim && !bundle.embedded_animation_data.empty())
-        kin_anim->SetEmbeddedAnimationData(bundle.embedded_animation_data);
-
-    if (kin_anim)
-        kin_anim->OnSkeletonLoaded();
 
     if (!bundle.mesh.empty())
     {
@@ -755,7 +724,7 @@ dxRender_Visual* CModelPool::Instance_LoadOzzx(LPCSTR N, LPCSTR full_path)
 
     Msg("* [ModelPool] Loaded .ozzx '%s' (bones=%u, type=%s, motion_refs=%zu)",
         full_path, kin->LL_BoneCount(),
-        kin_anim ? "animated" : "static",
+        (type == MT_OZZ_ANIMATED) ? "animated" : "static",
         bundle.motion_refs.size());
 
     return V;
