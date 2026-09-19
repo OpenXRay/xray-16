@@ -1,21 +1,22 @@
 #pragma once
 
-#include <cstddef>
+#include "OzzMotionLibrary.h"
+#include "OzzSkeletonMirror.h"
 
-namespace XRay
+namespace XRay::Animation::Startup
 {
-namespace Animation
+struct PreparedModel
 {
-struct StartupConversionStats
-{
-    std::size_t baked = 0;
-    std::size_t cache_hits = 0;
-    std::size_t write_failed = 0;
-    std::size_t skipped = 0;
-    std::size_t failed = 0;
-    double total_time_seconds = 0.0;
+    xr_string skeleton;
+    xr_vector<xr_string> libraries;
+    CPartition partition;
 };
 
-void PrebakeLegacyMotionLibraries(StartupConversionStats& out_stats);
-}
+xr_string CanonicalPath(pcstr path);
+xr_string ContentKey(const void* data, size_t size);
+xr_string PrepareSkeleton(const xr_vector<OzzBoneDesc>& bones, std::shared_ptr<const OzzSkeletonMirror>& mirror);
+xr_string PrepareLibrary(pcstr source, const void* data, size_t size,
+    const xr_string& skeletonKey, const OzzSkeletonMirror& mirror, CPartition& partition);
+void RegisterModel(const xr_string& source, const xr_string& levelRoot, PreparedModel model);
+void BuildInventory();
 }

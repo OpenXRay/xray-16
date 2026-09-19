@@ -11,7 +11,7 @@ namespace XRay
 {
 namespace Animation
 {
-bool ReadOgfSkeleton(
+void ReadOgfSkeleton(
     IReader* ogf, xr_vector<OzzBoneDesc>& bones, xr_vector<shared_str>& motion_refs, bool& has_embedded_motions);
 }
 }

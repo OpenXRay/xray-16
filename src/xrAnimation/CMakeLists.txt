@@ -1,4 +1,4 @@
-add_library(xrAnimation STATIC)
+add_library(xrAnimation)
 
 target_sources_grouped(
     TARGET xrAnimation
@@ -6,6 +6,7 @@ target_sources_grouped(
     FILES
     stdafx.h
     stdafx.cpp
+    xrAnimation.h
 )
 
 target_sources_grouped(
@@ -16,6 +17,8 @@ target_sources_grouped(
     OzzMotionLibrary.cpp
     OzzSkeletonMirror.h
     OzzSkeletonMirror.cpp
+    OzzPose.h
+    OzzPose.cpp
 )
 
 target_sources_grouped(
@@ -42,16 +45,16 @@ target_link_libraries(xrAnimation
     xrCore
     xrAPI
     ozz_animation
-    ozz_animation_offline
     ozz_base
+    PRIVATE
+    ozz_animation_offline
 )
 
 set_target_properties(xrAnimation PROPERTIES PREFIX "")
+target_compile_definitions(xrAnimation PRIVATE XRANIMATION_EXPORTS)
 
 target_precompile_headers(xrAnimation PRIVATE stdafx.h)
 
-option(XRAY_BUILD_OZZ_TOOLS "Build the offline ozz asset conversion tools" OFF)
-
-if(XRAY_BUILD_OZZ_TOOLS)
-    add_subdirectory(tools)
+if(BUILD_SHARED_LIBS)
+    install(TARGETS xrAnimation LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 endif()

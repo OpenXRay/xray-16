@@ -10,7 +10,7 @@ CBlend* PlayMotionByParts(
     IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam)
 {
     CBlend* ret = 0;
-    CMotionDef* md = sa->LL_GetMotionDef(motion_ID);
+    const CMotionDef* md = sa->LL_GetMotionDef(motion_ID);
 
     if (md->bone_or_part != BI_NONE)
         return sa->LL_PlayCycle(md->bone_or_part, motion_ID, bMixIn, Callback, CallbackParam);

@@ -335,9 +335,6 @@ target_sources(xrRender PRIVATE
     ./blenders/blender_deffer_model.cpp
     ./blenders/uber_deffer.cpp
 
-    OzzKinematicsAnimated.h
-    OzzKinematicsAnimated.cpp
-
 )
 
 if(WIN32)

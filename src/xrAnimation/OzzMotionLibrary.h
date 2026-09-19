@@ -1,59 +1,33 @@
 #pragma once
 
-#include "xrCore/xrCore.h"
-
+#include "xrAnimation.h"
+#include "xrCore/Animation/SkeletonMotions.hpp"
+#include <memory>
 #include <ozz/animation/runtime/animation.h>
 #include <ozz/base/containers/vector.h>
 #include <ozz/base/maths/soa_transform.h>
 #include <ozz/base/memory/unique_ptr.h>
 
-class IReader;
-
-namespace XRay
-{
-namespace Animation
+namespace XRay::Animation
 {
 struct OzzSkeletonMirror;
 
 struct OzzMotionLibrary
 {
-    shared_str key;
-    u32 fingerprint{ 0u };
+    MotionLibraryMetadata metadata;
     xr_vector<ozz::unique_ptr<ozz::animation::Animation>> animations;
     xr_vector<ozz::vector<ozz::math::SoaTransform>> firstFrame;
-    u32 refs{ 0u };
 };
 
-inline const ozz::vector<ozz::math::SoaTransform>& FirstFrame(const OzzMotionLibrary& library, u16 idx)
+struct OzzModelAnimations
 {
-    return library.firstFrame[idx];
-}
-
-enum class PrebakeResult
-{
-    CacheHit,
-    Baked,
-    WriteFailed,
-    Failed
+    std::shared_ptr<const OzzSkeletonMirror> skeleton;
+    xr_vector<std::shared_ptr<const OzzMotionLibrary>> libraries;
+    CPartition partition;
 };
 
-bool MotionCachePresent(const shared_str& omf_key, u32 fingerprint);
-
-PrebakeResult PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror);
-
-class OzzMotionLibraryContainer
-{
-    using LibraryMap = xr_map<shared_str, OzzMotionLibrary*>;
-    LibraryMap container;
-
-public:
-    ~OzzMotionLibraryContainer();
-
-    OzzMotionLibrary* dock(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror);
-    void undock(OzzMotionLibrary* library);
-    void clean(bool force);
-};
-
-extern OzzMotionLibraryContainer* g_pOzzMotionLibraries;
-}
+XRANIMATION_API std::shared_ptr<const OzzModelAnimations> LoadOzzModelAnimations(pcstr modelName);
+XRANIMATION_API void PrepareOzzAnimationInventory();
+XRANIMATION_API void ShutdownOzzAnimations();
+XRANIMATION_API void DumpOzzAnimationStats();
 }

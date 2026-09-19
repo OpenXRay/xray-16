@@ -61,7 +61,7 @@ void ik_anim_state::update(IKinematicsAnimated* K, const CBlend* b, u16 i)
         current_blend = 0;
         return;
     }
-    CMotionDef& m_def_new = *K->LL_GetMotionDef(b->motionID);
+    const CMotionDef& m_def_new = *K->LL_GetMotionDef(b->motionID);
 
     if (m_def_new.marks.size() <= i)
         return;
@@ -69,7 +69,7 @@ void ik_anim_state::update(IKinematicsAnimated* K, const CBlend* b, u16 i)
     if (b_is_blending(current_blend, b))
     {
         is_blending = true;
-        CMotionDef& m_def_cur = *K->LL_GetMotionDef(current_blend->motionID);
+        const CMotionDef& m_def_cur = *K->LL_GetMotionDef(current_blend->motionID);
         bool is_cur_step = (m_def_cur.marks.size() > i) && blend_in(*current_blend, m_def_cur.marks[i]);
         is_idle = !!(m_def_new.flags & esmIdle) && !!(m_def_cur.flags & esmIdle);
         bool any_idle = (m_def_cur.flags & esmIdle) || (m_def_new.flags & esmIdle);
@@ -95,10 +95,10 @@ void ik_anim_state::update(IKinematicsAnimated* K, const CBlend* b, u16 i)
 bool ik_anim_state::time_step_begin(IKinematicsAnimated* K, const CBlend& B, u16 limb_id, float& time)
 {
     time = 0;
-    CMotionDef& m_def_cur = *K->LL_GetMotionDef(B.motionID);
+    const CMotionDef& m_def_cur = *K->LL_GetMotionDef(B.motionID);
     if (m_def_cur.marks.size() <= limb_id || !!(m_def_cur.flags & esmIdle))
         return false;
-    motion_marks& marks = m_def_cur.marks[limb_id];
+    const motion_marks& marks = m_def_cur.marks[limb_id];
     if (marks.is_empty())
         return false;
     // if( blend_in( *current_blend, marks ) )

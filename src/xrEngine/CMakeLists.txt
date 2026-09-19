@@ -451,6 +451,7 @@ target_link_libraries(xrEngine
     PRIVATE
     xrAPI
     xrCDB
+    xrAnimation
     xrMaterialSystem
     xrCore
     xrSound

@@ -350,7 +350,6 @@ public:
     virtual void SetPostProcessParams(const SPPInfo& ppi) = 0;
 
     virtual void ConvertLegacyAssetsToPBR() = 0;
-    virtual void ConvertLegacyAssetsToOzz() = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

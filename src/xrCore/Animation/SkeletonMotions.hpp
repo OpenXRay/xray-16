@@ -7,10 +7,7 @@
 #include "xrCore/_quaternion.h"
 #include "xrCore/_vector3d.h"
 
-// fwd. decl.
-class CKinematicsAnimated;
 class CBlend;
-class IKinematics;
 
 // callback
 typedef void (*PlayCallback)(CBlend* P);
@@ -23,11 +20,6 @@ enum
     flTKey16IsBit = (1 << 2),
 };
 #pragma pack(push, 2)
-struct CKey
-{
-    Fquaternion Q; // rotation
-    Fvector T; // translation
-};
 struct CKeyQR
 {
     s16 x, y, z, w; // rotation
@@ -40,69 +32,8 @@ struct CKeyQT16
 {
     s16 x1, y1, z1;
 };
-/*
-struct CKeyQT
-{
-// s8 x,y,z;
-s16 x1,y1,z1;
-};
-*/
 #pragma pack(pop)
 
-//*** Motion Data *********************************************************************************
-class XRCORE_API CMotion
-{
-    struct
-    {
-        u32 _flags : 8;
-        u32 _count : 24;
-    };
-
-public:
-    ref_smem<CKeyQR> _keysR;
-    ref_smem<CKeyQT8> _keysT8;
-    ref_smem<CKeyQT16> _keysT16;
-    Fvector _initT;
-    Fvector _sizeT;
-
-public:
-    void set_flags(u8 val)
-    {
-        _flags = val;
-    }
-
-    void set_flag(u8 mask, u8 val)
-    {
-        if (val)
-            _flags |= mask;
-        else
-            _flags &= ~mask;
-    }
-
-    [[nodiscard]] BOOL test_flag(u8 mask) const { return BOOL(_flags & mask); }
-
-    void set_count(u32 cnt)
-    {
-        VERIFY(cnt);
-        _count = cnt;
-    }
-
-    ICF u32 get_count() const { return (u32(_count) & 0x00FFFFFF); }
-
-    [[nodiscard]] float GetLength() const { return float(_count) * SAMPLE_SPF; }
-
-    [[nodiscard]] u32 mem_usage()
-    {
-        u32 sz = sizeof(*this);
-        if (_keysR.size())
-            sz += _keysR.size() * sizeof(CKeyQR) / _keysR.ref_count();
-        if (_keysT8.size())
-            sz += _keysT8.size() * sizeof(CKeyQT8) / _keysT8.ref_count();
-        if (_keysT16.size())
-            sz += _keysT16.size() * sizeof(CKeyQT16) / _keysT16.ref_count();
-        return sz;
-    }
-};
 
 class XRCORE_API motion_marks
 {
@@ -122,7 +53,9 @@ private:
 public:
     shared_str name;
     void Load(IReader*);
-    void Save(IWriter*);
+    void Save(IWriter*) const;
+    const xr_vector<interval>& Intervals() const { return intervals; }
+    void SetIntervals(xr_vector<interval> values) { intervals = std::move(values); }
     [[nodiscard]] bool is_empty() const { return intervals.empty(); }
     [[nodiscard]] const interval* pick_mark(float const& t) const;
     [[nodiscard]] bool is_mark_between(float const& t0, float const& t1) const;
@@ -150,24 +83,19 @@ public:
         return u16(t);
     }
 
-    void Load(IReader* MP, u32 fl, u16 vers);
     [[nodiscard]] u32 mem_usage() const { return sizeof(*this); }
     ICF float Accrue() const { return fQuantizerRangeExt * Dequantize(accrue); }
     ICF float Falloff() const { return fQuantizerRangeExt * Dequantize(falloff); }
     ICF float Speed() const { return Dequantize(speed); }
     ICF float Power() const { return Dequantize(power); }
-    bool StopAtEnd();
+    bool StopAtEnd() const;
 };
 struct accel_str_pred
 {
     IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
 };
 typedef xr_map<shared_str, u16, accel_str_pred> accel_map;
-using MotionDefVec = xr_vector<CMotionDef>;
 
-using MotionVec = xr_vector<CMotion>;
-using BoneMotionsVec = xr_vector<MotionVec*>;
-using BoneMotionMap = xr_map<shared_str, MotionVec>;
 
 // partition
 class XRCORE_API CPartDef
@@ -189,7 +117,6 @@ public:
     IC const CPartDef& part(u16 id) const { return P[id]; }
     [[nodiscard]] u16 part_id(const shared_str& name) const;
     [[nodiscard]] u32 mem_usage() const { return P[0].mem_usage() * MAX_PARTS; }
-    void load(IKinematics* V, pcstr model_name);
 
     [[nodiscard]] u8 count() const
     {
@@ -201,139 +128,21 @@ public:
     };
 };
 
-// shared motions
-struct XRCORE_API motions_value
+struct MotionMetadata
 {
-    accel_map m_motion_map; // motion associations
-    accel_map m_cycle; // motion data itself (shared)
-    accel_map m_fx; // motion data itself (shared)
-    CPartition m_partition; // partition
-    u32 m_dwReference;
-    BoneMotionMap m_motions;
-    MotionDefVec m_mdefs;
-
-    shared_str m_id;
-
-    BOOL load(pcstr N, IReader* data, vecBones* bones);
-    MotionVec* bone_motions(const shared_str& bone_name);
-
-    u32 mem_usage()
-    {
-        u32 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
-        for (auto it = m_mdefs.begin(); it != m_mdefs.end(); ++it)
-            sz += it->mem_usage();
-        for (auto bm_it = m_motions.begin(); bm_it != m_motions.end(); ++bm_it)
-            for (auto m_it = bm_it->second.begin(); m_it != bm_it->second.end(); ++m_it)
-                sz += m_it->mem_usage();
-        return sz;
-    }
+    shared_str name;
+    CMotionDef definition;
+    float duration = 0.f;
 };
 
-class XRCORE_API motions_container
+struct MotionLibraryMetadata
 {
-    using SharedMotionsMap = xr_map<shared_str, motions_value*>;
-    SharedMotionsMap container;
-
-public:
-    motions_container();
-    ~motions_container();
-    bool has(shared_str key);
-    motions_value* dock(shared_str key, IReader* data, vecBones* bones);
-    void dump();
-    void clean(bool force_destroy);
-};
-
-extern XRCORE_API motions_container* g_pMotionsContainer;
-
-extern XRCORE_API bool g_skeleton_motions_load_keys;
-
-class XRCORE_API shared_motions
-{
-    motions_value* p_;
-
-protected:
-    // ref-counting
-    void destroy()
-    {
-        if (0 == p_)
-            return;
-        p_->m_dwReference--;
-        if (0 == p_->m_dwReference)
-            p_ = 0;
-    }
-
-public:
-    bool create(shared_str key, IReader* data, vecBones* bones); //{ motions_value* v =
-    // g_pMotionsContainer->dock(key,data,bones); if (0!=v)
-    // v->m_dwReference++; destroy(); p_ = v; }
-    bool create(
-        shared_motions const& rhs); // { motions_value* v = rhs.p_; if (0!=v) v->m_dwReference++; destroy(); p_ = v; }
-public:
-    // construction
-    shared_motions() { p_ = 0; }
-    shared_motions(shared_motions const& rhs)
-    {
-        p_ = 0;
-        create(rhs);
-    }
-    ~shared_motions() { destroy(); }
-
-    // assignment & accessors
-    shared_motions& operator=(shared_motions const& rhs)
-    {
-        create(rhs);
-        return *this;
-    }
-    bool operator==(shared_motions const& rhs) const { return (p_ == rhs.p_); }
-
-    // misc func
-    [[nodiscard]] MotionVec* bone_motions(shared_str bone_name) const
-    {
-        VERIFY(p_);
-        return p_->bone_motions(bone_name);
-    }
-
-    [[nodiscard]] accel_map* motion_map() const
-    {
-        VERIFY(p_);
-        return &p_->m_motion_map;
-    }
-
-    [[nodiscard]] accel_map* cycle() const
-    {
-        VERIFY(p_);
-        return &p_->m_cycle;
-    }
-
-    [[nodiscard]] accel_map* fx() const
-    {
-        VERIFY(p_);
-        return &p_->m_fx;
-    }
-
-    [[nodiscard]] CPartition* partition() const
-    {
-        VERIFY(p_);
-        return &p_->m_partition;
-    }
-
-    [[nodiscard]] MotionDefVec* motion_defs() const
-    {
-        VERIFY(p_);
-        return &p_->m_mdefs;
-    }
-
-    [[nodiscard]] CMotionDef* motion_def(u16 idx) const
-    {
-        VERIFY(p_);
-        return &p_->m_mdefs[idx];
-    }
-
-    [[nodiscard]] const shared_str& id() const
-    {
-        VERIFY(p_);
-        return p_->m_id;
-    }
+    shared_str source;
+    accel_map motions;
+    accel_map cycles;
+    accel_map effects;
+    CPartition partition;
+    xr_vector<MotionMetadata> clips;
 };
 //---------------------------------------------------------------------------
 #endif

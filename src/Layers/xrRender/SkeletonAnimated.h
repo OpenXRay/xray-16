@@ -5,6 +5,7 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
 #include "Include/xrRender/KinematicsAnimated.h"
+#include "xrAnimation/OzzPose.h"
 
 namespace xray::render::fg
 {
@@ -58,8 +59,8 @@ private:
 public:
     // Calculation
 private:
-    void LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 channel_mask, SKeyTable& keys);
-    void LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* parent, const SKeyTable& keys);
+    bool PrepareBones() override;
+    void FinishBones() override { m_poseDirty = false; }
     virtual void BuildBoneMatrix(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
 
@@ -68,6 +69,10 @@ public:
     virtual void LL_ClearAdditionalTransform(u16 bone_id = BI_NONE); //--#SM+#--
 
     virtual void OnCalculateBones();
+    void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) override;
+    void Bone_Calculate(CBoneData* bd, Fmatrix* parent) override;
+    void LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
+        const BonePoseQuery& query) override;
 
 public:
 #ifdef _EDITOR
@@ -79,15 +84,11 @@ protected:
 
     CBlendInstance* blend_instances{};
 
-    struct SMotionsSlot
-    {
-        shared_motions motions;
-        BoneMotionsVec bone_motions;
-    };
-    using MotionsSlotVec = xr_vector<SMotionsSlot>;
-    MotionsSlotVec m_Motions;
-
-    CPartition* m_Partition{};
+    std::shared_ptr<const XRay::Animation::OzzModelAnimations> m_animations;
+    XRay::Animation::OzzPose m_pose;
+    bool m_poseDirty = true;
+    bool m_poseTraversal = false;
+    const CPartition* m_Partition{};
 
     IBlendDestroyCallback* m_blend_destroy_callback{};
     IUpdateTracksCallback* m_update_tracks_callback{};
@@ -111,7 +112,6 @@ private:
         float blendFalloff, float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam);
     void IFXBlendSetup(
         CBlend& B, MotionID motion_ID, float blendAccrue, float blendFalloff, float Power, float Speed, u16 bone);
-    //.	bool						LoadMotions				(LPCSTR N, IReader *data);
 public:
 #if (defined DEBUG || defined _EDITOR)
     std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID ID);
@@ -129,25 +129,24 @@ public:
     u32 LL_CycleCount()
     {
         u32 cnt = 0;
-        for (u32 k = 0; k < m_Motions.size(); k++)
-            cnt += m_Motions[k].motions.cycle()->size();
+        for (const auto& library : m_animations->libraries)
+            cnt += library->metadata.cycles.size();
         return cnt;
     }
     u32 LL_FXCount()
     {
         u32 cnt = 0;
-        for (u32 k = 0; k < m_Motions.size(); k++)
-            cnt += m_Motions[k].motions.fx()->size();
+        for (const auto& library : m_animations->libraries)
+            cnt += library->metadata.effects.size();
         return cnt;
     }
-    accel_map* LL_Motions(u32 slot) { return m_Motions[slot].motions.motion_map(); }
+    const accel_map* LL_Motions(u32 slot) { return &LL_MotionsSlot(u16(slot)).motions; }
     MotionID ID_Motion(LPCSTR N, u16 slot);
 #endif
-    u16 LL_MotionsSlotCount() { return (u16)m_Motions.size(); }
-    const shared_motions& LL_MotionsSlot(u16 idx) { return m_Motions[idx].motions; }
-    CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
-    CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
-    CMotion* LL_GetMotion(MotionID id, u16 bone_id) { return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
+    u16 LL_MotionsSlotCount() override { return u16(m_animations->libraries.size()); }
+    const MotionLibraryMetadata& LL_MotionsSlot(u16 idx) override { return m_animations->libraries[idx]->metadata; }
+    const CMotionDef* LL_GetMotionDef(MotionID id) override { return &LL_MotionsSlot(id.slot).clips[id.idx].definition; }
+    float LL_MotionDuration(MotionID id) override { return LL_MotionsSlot(id.slot).clips[id.idx].duration; }
     virtual IBlendDestroyCallback* GetBlendDestroyCallback();
     virtual void SetBlendDestroyCallback(IBlendDestroyCallback* cb);
     // Low level interface
@@ -221,13 +220,9 @@ public:
     virtual float get_animation_length(MotionID motion_ID);
     void EnumerateCycleNames(xr_vector<shared_str>& outNames) const override
     {
-        for (const auto& slot : m_Motions)
-        {
-            auto* cmap = slot.motions.cycle();
-            if (!cmap) continue;
-            for (const auto& pair : *cmap)
+        for (const auto& library : m_animations->libraries)
+            for (const auto& pair : library->metadata.cycles)
                 outNames.push_back(pair.first);
-        }
     }
 };
 

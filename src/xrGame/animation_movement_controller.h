@@ -45,7 +45,7 @@ public:
 
 private:
     void GetInitalPositionBlenSpeed();
-    void animation_root_position(Fmatrix& pos);
+    void animation_root_position(Fmatrix& pos, const float* time = nullptr);
     void InitalPositionBlending(const Fmatrix& to);
     void SetPosesBlending();
 

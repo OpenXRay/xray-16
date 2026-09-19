@@ -1,372 +1,326 @@
 #include "stdafx.h"
-
 #include "LegacyOmfConverter.h"
-
 #include "LegacyChunkIO.h"
-
-#include "xrCore/FMesh.hpp"
-#include "xrCore/_quaternion.h"
-#include "xrCore/_vector3d.h"
-#include "xrCore/Animation/SkeletonMotionDefs.hpp"
-#include "xrCore/Animation/SkeletonMotions.hpp"
-#include "xrCore/Threading/ParallelFor.hpp"
+#include "OzzSkeletonMirror.h"
 
 #include <ozz/animation/offline/animation_builder.h>
 #include <ozz/animation/offline/raw_animation.h>
 #include <ozz/base/maths/quaternion.h>
-#include <ozz/base/maths/vec_float.h>
-
 #include <algorithm>
-#include <cstddef>
-#include <cstdint>
+#include <cmath>
 #include <limits>
-#include <stdexcept>
-#include <string>
+#include <set>
 #include <unordered_map>
-#include <utility>
-#include <vector>
 
-namespace XRay
-{
-namespace Animation
+namespace XRay::Animation
 {
 namespace
 {
-struct BoneTrack
-{
-    xr_vector<Fquaternion> rotations;
-    xr_vector<Fvector> translations;
-};
+using RawAnimation = ozz::animation::offline::RawAnimation;
 
-struct OmfMotion
+float ReadFinite(BinaryReader& reader)
 {
-    xr_string name;
-    u32 frame_count = 0;
-    xr_vector<BoneTrack> bone_tracks;
-};
+    const float value = reader.read<float>();
+    if (!std::isfinite(value))
+        throw std::runtime_error("non-finite animation value");
+    return value;
+}
 
-struct OmfData
+Fvector ReadTranslation(BinaryReader& reader)
 {
-    xr_vector<u16> bone_remap;
-    u16 motion_count = 0;
-    xr_vector<OmfMotion> motions;
-};
+    Fvector value;
+    value.x = reader.read<float>();
+    value.y = reader.read<float>();
+    value.z = reader.read<float>();
+    return value;
+}
 
-void ParseSmparams(const Chunk& chunk, const xr_vector<xr_string>& skeleton_bone_names, OmfData& output)
+Fquaternion ReadRotation(BinaryReader& reader)
 {
-    BinaryReader reader{ chunk.data, chunk.size };
+    Fquaternion value;
+    value.x = float(reader.read<s16>()) * KEY_QuantI;
+    value.y = float(reader.read<s16>()) * KEY_QuantI;
+    value.z = float(reader.read<s16>()) * KEY_QuantI;
+    value.w = float(reader.read<s16>()) * KEY_QuantI;
+    const float norm = value.x * value.x + value.y * value.y + value.z * value.z + value.w * value.w;
+    if (!(norm > 0.f))
+        throw std::runtime_error("zero animation quaternion");
+    value.normalize();
+    return value;
+}
 
+ozz::math::Quaternion ToOzz(const Fquaternion& value)
+{
+    return ozz::math::Quaternion(value.x, value.y, value.z, value.w);
+}
+
+unsigned RotationSegments(const Fquaternion& a, const Fquaternion& b)
+{
+    const double dot = std::min(1.0, std::abs(double(a.x) * b.x + double(a.y) * b.y +
+        double(a.z) * b.z + double(a.w) * b.w));
+    const double angle = std::acos(dot);
+    unsigned segments = 1;
+    while (segments < 16)
+    {
+        const double theta = angle / segments;
+        if (theta < 1.e-4)
+            break;
+        const double sine = std::sin(theta);
+        const double cosine = std::cos(theta);
+        const double t = (1.0 - std::sqrt(std::max(0.0,
+            1.0 - 2.0 * (1.0 - sine / theta) / (1.0 - cosine)))) * 0.5;
+        const double error = 2.0 * std::abs(std::atan2(t * sine, 1.0 - t + t * cosine) - t * theta);
+        if (error <= 0.0002)
+            break;
+        segments *= 2;
+    }
+    return segments;
+}
+
+void ReadTrack(BinaryReader& reader, u32 frames, RawAnimation::JointTrack& track)
+{
+    const u8 flags = reader.read<u8>();
+    if (flags & ~(flTKeyPresent | flRKeyAbsent | flTKey16IsBit))
+        throw std::runtime_error("unsupported animation track flags");
+    const u32 rotationCount = flags & flRKeyAbsent ? 1 : frames;
+    if (!(flags & flRKeyAbsent))
+        reader.read<u32>();
+    if (rotationCount > (reader.size - reader.offset) / sizeof(CKeyQR))
+        throw std::runtime_error("truncated rotation track");
+    xr_vector<Fquaternion> rotations(rotationCount);
+    for (auto& value : rotations)
+        value = ReadRotation(reader);
+    const auto& first = rotations.front();
+    const bool constant = std::all_of(rotations.begin(), rotations.end(), [&](const Fquaternion& value)
+    {
+        return (value.x == first.x && value.y == first.y && value.z == first.z && value.w == first.w) ||
+            (value.x == -first.x && value.y == -first.y && value.z == -first.z && value.w == -first.w);
+    });
+    track.rotations.push_back({0.f, ToOzz(first)});
+    if (!constant)
+    {
+        for (u32 frame = 0; frame < frames; ++frame)
+        {
+            const auto& a = rotations[frame];
+            const auto& b = rotations[(frame + 1) % frames];
+            const unsigned segments = RotationSegments(a, b);
+            for (unsigned part = 1; part <= segments; ++part)
+            {
+                const float fraction = float(part) / float(segments);
+                Fquaternion value;
+                value.slerp(a, b, fraction);
+                value.normalize();
+                track.rotations.push_back({(float(frame) + fraction) * SAMPLE_SPF, ToOzz(value)});
+            }
+        }
+    }
+
+    if (flags & flTKeyPresent)
+    {
+        reader.read<u32>();
+        const size_t keySize = flags & flTKey16IsBit ? sizeof(CKeyQT16) : sizeof(CKeyQT8);
+        if (frames > (reader.size - reader.offset) / keySize)
+            throw std::runtime_error("truncated translation track");
+        const auto* keys = reader.data + reader.offset;
+        reader.skip(size_t(frames) * keySize);
+        const Fvector scale = ReadTranslation(reader);
+        const Fvector offset = ReadTranslation(reader);
+        BinaryReader packed{keys, size_t(frames) * keySize};
+        track.translations.reserve(size_t(frames) + 1);
+        for (u32 frame = 0; frame < frames; ++frame)
+        {
+            const float x = flags & flTKey16IsBit ? float(packed.read<s16>()) : float(packed.read<s8>());
+            const float y = flags & flTKey16IsBit ? float(packed.read<s16>()) : float(packed.read<s8>());
+            const float z = flags & flTKey16IsBit ? float(packed.read<s16>()) : float(packed.read<s8>());
+            const ozz::math::Float3 value(x * scale.x + offset.x, y * scale.y + offset.y, z * scale.z + offset.z);
+            track.translations.push_back({float(frame) * SAMPLE_SPF, value});
+        }
+        const auto initial = track.translations.front().value;
+        const bool fixed = std::all_of(track.translations.begin(), track.translations.end(), [&](const auto& key)
+        { return key.value.x == initial.x && key.value.y == initial.y && key.value.z == initial.z; });
+        if (fixed)
+            track.translations.resize(1);
+        else
+            track.translations.push_back({float(frames) * SAMPLE_SPF, initial});
+    }
+    else
+    {
+        const Fvector value = ReadTranslation(reader);
+        track.translations.push_back({0.f, ozz::math::Float3(value.x, value.y, value.z)});
+    }
+    track.scales.push_back({0.f, ozz::math::Float3::one()});
+}
+
+xr_vector<u16> ReadMetadata(const Chunk& chunk, const OzzSkeletonMirror& skeleton, MotionLibraryMetadata& metadata)
+{
+    BinaryReader reader{chunk.data, chunk.size};
     const u16 version = reader.read<u16>();
     if (version > xrOGF_SMParamsVersion)
-        throw std::runtime_error("unsupported OMF params version");
-
-    const u16 part_count = reader.read<u16>();
-
-    output.bone_remap.assign(skeleton_bone_names.size(), std::numeric_limits<u16>::max());
-
-    std::unordered_map<std::string, u16> skeleton_index_by_name;
-    skeleton_index_by_name.reserve(skeleton_bone_names.size());
-    for (u16 idx = 0; idx < skeleton_bone_names.size(); ++idx)
-        skeleton_index_by_name.emplace(ToLowerCopy(std::string(skeleton_bone_names[idx].c_str())), idx);
-
-    u32 bones_mapped = 0;
-
-    for (u16 part = 0; part < part_count; ++part)
+        throw std::runtime_error("unsupported OMF metadata version");
+    const u16 partCount = reader.read<u16>();
+    if (partCount > MAX_PARTS)
+        throw std::runtime_error("too many OMF partitions");
+    const size_t bones = skeleton.boneToJoint.size();
+    xr_vector<u16> remap(bones, BI_NONE);
+    xr_vector<bool> assigned(bones, false);
+    std::unordered_map<std::string, u16> boneNames;
+    const auto names = skeleton.skeleton.joint_names();
+    for (u16 bone = 0; bone < bones; ++bone)
+        boneNames.emplace(ToLowerCopy(names[skeleton.boneToJoint[bone]]), bone);
+    for (u16 part = 0; part < partCount; ++part)
     {
-        reader.read_stringz();
-        const u16 bone_count = reader.read<u16>();
-        for (u16 bone_idx = 0; bone_idx < bone_count; ++bone_idx)
+        auto& target = metadata.partition[part];
+        target.Name = ToLowerCopy(reader.read_stringz()).c_str();
+        const u16 count = reader.read<u16>();
+        if (count > bones)
+            throw std::runtime_error("invalid OMF partition size");
+        for (u16 index = 0; index < count; ++index)
         {
-            const std::string bone_name_raw = reader.read_stringz();
-            const u32 remap_index = reader.read<u32>();
-            if (remap_index >= output.bone_remap.size())
-                throw std::runtime_error("bone remap index out of range in OMF params");
-            const auto it = skeleton_index_by_name.find(ToLowerCopy(bone_name_raw));
-            if (it == skeleton_index_by_name.end())
-                throw std::runtime_error("bone " + bone_name_raw + " referenced in OMF params not found in skeleton");
-            output.bone_remap[remap_index] = it->second;
-            ++bones_mapped;
+            const auto name = ToLowerCopy(reader.read_stringz());
+            const u32 sourceBone = reader.read<u32>();
+            const auto found = boneNames.find(name);
+            if (sourceBone >= bones || remap[sourceBone] != BI_NONE || found == boneNames.end() || assigned[found->second])
+                throw std::runtime_error("invalid or duplicate OMF bone mapping: " + name);
+            target.bones.push_back(found->second);
+            remap[sourceBone] = found->second;
+            assigned[found->second] = true;
         }
     }
-
-    if (bones_mapped != skeleton_bone_names.size())
-        throw std::runtime_error("OMF bone remap does not cover all skeleton bones");
-
-    output.motion_count = reader.read<u16>();
-}
-
-void ParseMotions(const Chunk& chunk, ChunkStorage& storage, OmfData& output)
-{
-    const auto subchunks = ParseSubchunks(chunk, storage);
-
-    std::unordered_map<std::uint32_t, const Chunk*> by_id;
-    by_id.reserve(subchunks.size());
-    for (const auto& item : subchunks)
-        if (!by_id.emplace(item.first, &item.second).second)
-            throw std::runtime_error("duplicate sub-chunk id in OMF motion chunk");
-
-    const auto count_it = by_id.find(0);
-    if (count_it == by_id.end())
-        throw std::runtime_error("OMF motion chunk missing count sub-chunk");
-
-    BinaryReader count_reader{ count_it->second->data, count_it->second->size };
-    const u32 motion_count = count_reader.read<u32>();
-    if (motion_count != output.motion_count)
-        throw std::runtime_error("motion metadata count mismatch");
-
-    if (subchunks.size() - 1 != motion_count)
-        throw std::runtime_error("OMF motion chunk count mismatch");
-
-    output.motions.clear();
-    output.motions.resize(motion_count);
-
-    for (u32 motion_idx = 0; motion_idx < motion_count; ++motion_idx)
+    if (std::find(remap.begin(), remap.end(), BI_NONE) != remap.end())
+        throw std::runtime_error("OMF partitions do not cover the skeleton");
+    const u16 count = reader.read<u16>();
+    if (!count || count >= 0x3fff)
+        throw std::runtime_error("invalid OMF motion count");
+    metadata.clips.resize(count);
+    for (u16 index = 0; index < count; ++index)
     {
-        const auto item_it = by_id.find(motion_idx + 1);
-        if (item_it == by_id.end())
-            throw std::runtime_error("OMF motion chunk missing motion sub-chunk");
-
-        const Chunk& item = *item_it->second;
-        BinaryReader reader{ item.data, item.size };
-
-        OmfMotion& motion = output.motions[motion_idx];
-        motion.name = reader.read_stringz().c_str();
-        motion.frame_count = reader.read<u32>();
-        if (motion.frame_count == 0)
-            throw std::runtime_error("motion has zero frames: " + std::string(motion.name.c_str()));
-
-        motion.bone_tracks.resize(output.bone_remap.size());
-
-        for (size_t track_idx = 0; track_idx < output.bone_remap.size(); ++track_idx)
+        auto& clip = metadata.clips[index];
+        clip.name = ToLowerCopy(reader.read_stringz()).c_str();
+        auto& definition = clip.definition;
+        const u32 flags = reader.read<u32>();
+        definition.flags = u16(flags);
+        definition.bone_or_part = reader.read<u16>();
+        definition.motion = reader.read<u16>();
+        if (definition.motion >= count)
+            throw std::runtime_error("OMF definition references invalid motion");
+        if (flags & esmFX)
         {
-            BoneTrack& track = motion.bone_tracks[track_idx];
-            track.rotations.resize(motion.frame_count);
-            track.translations.resize(motion.frame_count);
-
-            const std::uint8_t flags = reader.read_uint8();
-            const bool rotation_present = (flags & flRKeyAbsent) == 0;
-            const bool translation_present = (flags & flTKeyPresent) != 0;
-            const bool high_quality_translation = (flags & flTKey16IsBit) != 0;
-
-            const auto read_quaternion = [&reader]()
+            if (definition.bone_or_part != BI_NONE)
             {
-                Fquaternion q;
-                q.x = static_cast<float>(reader.read<std::int16_t>()) * KEY_QuantI;
-                q.y = static_cast<float>(reader.read<std::int16_t>()) * KEY_QuantI;
-                q.z = static_cast<float>(reader.read<std::int16_t>()) * KEY_QuantI;
-                q.w = static_cast<float>(reader.read<std::int16_t>()) * KEY_QuantI;
-                q.normalize();
-                return q;
-            };
-
-            if (rotation_present)
-            {
-                reader.read<u32>();
-                for (u32 frame = 0; frame < motion.frame_count; ++frame)
-                    track.rotations[frame] = read_quaternion();
-            }
-            else
-            {
-                std::fill(track.rotations.begin(), track.rotations.end(), read_quaternion());
-            }
-
-            if (translation_present)
-            {
-                reader.read<u32>();
-
-                xr_vector<Fvector>& translations = track.translations;
-                if (high_quality_translation)
-                {
-                    for (u32 frame = 0; frame < motion.frame_count; ++frame)
-                    {
-                        Fvector& t = translations[frame];
-                        t.x = static_cast<float>(reader.read<std::int16_t>());
-                        t.y = static_cast<float>(reader.read<std::int16_t>());
-                        t.z = static_cast<float>(reader.read<std::int16_t>());
-                    }
-                }
-                else
-                {
-                    for (u32 frame = 0; frame < motion.frame_count; ++frame)
-                    {
-                        Fvector& t = translations[frame];
-                        t.x = static_cast<float>(reader.read_int8());
-                        t.y = static_cast<float>(reader.read_int8());
-                        t.z = static_cast<float>(reader.read_int8());
-                    }
-                }
-
-                const Fvector size = reader.read_fvector3();
-                const Fvector init = reader.read_fvector3();
-                for (u32 frame = 0; frame < motion.frame_count; ++frame)
-                {
-                    Fvector& t = translations[frame];
-                    t.x = t.x * size.x + init.x;
-                    t.y = t.y * size.y + init.y;
-                    t.z = t.z * size.z + init.z;
-                }
-            }
-            else
-            {
-                const Fvector init = reader.read_fvector3();
-                std::fill(track.translations.begin(), track.translations.end(), init);
+                if (definition.bone_or_part >= bones)
+                    throw std::runtime_error("OMF effect references invalid bone");
+                definition.bone_or_part = remap[definition.bone_or_part];
             }
         }
-
-        if (reader.offset != reader.size)
-            throw std::runtime_error("unexpected extra data in motion chunk");
+        else if (definition.bone_or_part != BI_NONE && definition.bone_or_part >= partCount)
+            throw std::runtime_error("OMF cycle references invalid partition");
+        definition.speed = definition.Quantize(std::clamp(ReadFinite(reader), 0.f, 100.f));
+        definition.power = definition.Quantize(std::clamp(ReadFinite(reader), 0.f, 100.f));
+        definition.accrue = definition.Quantize(std::clamp(ReadFinite(reader), 0.f, 100.f));
+        definition.falloff = definition.Quantize(std::clamp(ReadFinite(reader), 0.f, 100.f));
+        if (!(flags & esmFX) && definition.falloff >= definition.accrue)
+            definition.falloff = u16(definition.accrue - 1);
+        if (version >= 4)
+        {
+            const u32 marks = reader.read<u32>();
+            if (marks > (reader.size - reader.offset) / 5)
+                throw std::runtime_error("invalid OMF marks count");
+            definition.marks.resize(marks);
+            for (auto& mark : definition.marks)
+            {
+                mark.name = ReadStringCRLF(reader).c_str();
+                const u32 intervals = reader.read<u32>();
+                if (intervals > (reader.size - reader.offset) / (2 * sizeof(float)))
+                    throw std::runtime_error("truncated OMF marks");
+                xr_vector<motion_marks::interval> values;
+                values.reserve(intervals);
+                for (u32 item = 0; item < intervals; ++item)
+                {
+                    const float begin = ReadFinite(reader);
+                    const float end = ReadFinite(reader);
+                    if (end < begin)
+                        throw std::runtime_error("reversed OMF mark interval");
+                    values.emplace_back(begin, end);
+                }
+                mark.SetIntervals(std::move(values));
+            }
+        }
+        if (!metadata.motions.emplace(clip.name, index).second)
+            throw std::runtime_error("duplicate OMF motion name");
+        (flags & esmFX ? metadata.effects : metadata.cycles).emplace(clip.name, index);
     }
-
-    std::unordered_map<std::string, u32> seen;
-    for (u32 motion_idx = 0; motion_idx < motion_count; ++motion_idx)
-        if (!seen.emplace(ToLowerCopy(std::string(output.motions[motion_idx].name.c_str())), motion_idx).second)
-            throw std::runtime_error("duplicate motion name in OMF: " + std::string(output.motions[motion_idx].name.c_str()));
+    if (reader.offset != reader.size)
+        throw std::runtime_error("unexpected OMF metadata trailing bytes");
+    return remap;
+}
 }
 
-OmfData ParseOmfBuffer(const std::byte* data, size_t size, const xr_vector<xr_string>& skeleton_bone_names)
+ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr source, const OzzSkeletonMirror& skeleton)
 {
-    ChunkStorage storage;
-    const auto chunks = ParseChunks(data, size, storage);
-
-    const auto params_it = chunks.find(OGF_S_SMPARAMS);
-    if (params_it == chunks.end())
-        throw std::runtime_error("OMF file missing smparams chunk");
-
-    const auto motions_it = chunks.find(OGF_S_MOTIONS);
-    if (motions_it == chunks.end())
-        throw std::runtime_error("OMF file missing motions chunk");
-
-    OmfData output;
-    ParseSmparams(params_it->second, skeleton_bone_names, output);
-    ParseMotions(motions_it->second, storage, output);
-    return output;
-}
-
-bool IsConstant(const xr_vector<Fquaternion>& values)
-{
-    for (size_t i = 1; i < values.size(); ++i)
-        if (values[i].x != values[0].x || values[i].y != values[0].y || values[i].z != values[0].z ||
-            values[i].w != values[0].w)
-            return false;
-    return true;
-}
-
-bool IsConstant(const xr_vector<Fvector>& values)
-{
-    for (size_t i = 1; i < values.size(); ++i)
-        if (values[i].x != values[0].x || values[i].y != values[0].y || values[i].z != values[0].z)
-            return false;
-    return true;
-}
-
-ozz::animation::offline::RawAnimation BuildRawAnimation(const OmfMotion& motion, const OmfData& omf)
-{
-    const size_t joint_count = omf.bone_remap.size();
-    if (joint_count == 0)
-        throw std::runtime_error("OMF bone remap is empty");
-
-    const u32 frames = motion.frame_count;
-
-    ozz::animation::offline::RawAnimation raw_animation;
-    raw_animation.name = motion.name.c_str();
-    raw_animation.duration = frames * SAMPLE_SPF;
-    raw_animation.tracks.resize(joint_count);
-
-    for (size_t remap_index = 0; remap_index < joint_count; ++remap_index)
+    try
     {
-        const u16 joint_index = omf.bone_remap[remap_index];
-        if (joint_index >= joint_count)
-            throw std::runtime_error("bone remap references invalid joint index");
-
-        const BoneTrack& source_track = motion.bone_tracks[remap_index];
-        auto& track = raw_animation.tracks[joint_index];
-
-        track.scales.resize(1);
-        track.scales[0].time = 0.f;
-        track.scales[0].value = ozz::math::Float3(1.f, 1.f, 1.f);
-
-        const bool constant_rotation = IsConstant(source_track.rotations);
-        const bool constant_translation = IsConstant(source_track.translations);
-
-        const auto to_quaternion = [](const Fquaternion& q)
-        { return ozz::math::Normalize(ozz::math::Quaternion(q.x, q.y, q.z, q.w)); };
-
-        if (constant_rotation)
+        if (!data || !size || !skeleton.skeleton.num_joints())
+            throw std::runtime_error("empty OMF or skeleton");
+        ChunkStorage storage;
+        const auto chunks = ParseChunks(data, size, storage);
+        const auto params = chunks.find(OGF_S_SMPARAMS);
+        const auto motions = chunks.find(OGF_S_MOTIONS);
+        if (params == chunks.end() || motions == chunks.end())
+            throw std::runtime_error("missing OMF metadata or motions");
+        ConvertedOmfLibrary output;
+        output.metadata.source = source;
+        const auto remap = ReadMetadata(params->second, skeleton, output.metadata);
+        const auto clips = ParseChunks(motions->second.data, motions->second.size, storage);
+        const auto countChunk = clips.find(0);
+        if (countChunk == clips.end())
+            throw std::runtime_error("missing OMF motion count");
+        BinaryReader countReader{countChunk->second.data, countChunk->second.size};
+        const u32 count = countReader.read<u32>();
+        if (count != output.metadata.clips.size() || clips.size() != size_t(count) + 1)
+            throw std::runtime_error("OMF metadata/clip count mismatch");
+        output.animations.reserve(count);
+        for (u32 index = 0; index < count; ++index)
         {
-            track.rotations.resize(1);
-            track.rotations[0].time = 0.f;
-            track.rotations[0].value = to_quaternion(source_track.rotations[0]);
-        }
-        else
-        {
-            track.rotations.resize(frames + 1);
-            for (u32 frame = 0; frame <= frames; ++frame)
+            const auto found = clips.find(index + 1);
+            if (found == clips.end())
+                throw std::runtime_error("missing OMF clip");
+            BinaryReader reader{found->second.data, found->second.size};
+            const auto name = ToLowerCopy(reader.read_stringz());
+            if (name != output.metadata.clips[index].name.c_str())
+                throw std::runtime_error("OMF metadata/clip name mismatch: " + name);
+            const u32 frames = reader.read<u32>();
+            if (!frames || frames > 0x00ffffff)
+                throw std::runtime_error("unsupported OMF frame count: " + name);
+            RawAnimation raw;
+            raw.name = name.c_str();
+            raw.duration = float(frames) * SAMPLE_SPF;
+            raw.tracks.resize(remap.size());
+            for (u16 bone : remap)
+                ReadTrack(reader, frames, raw.tracks[skeleton.boneToJoint[bone]]);
+            if (reader.offset != reader.size || !raw.Validate())
+                throw std::runtime_error("invalid OMF clip: " + name);
+            std::set<float> times{0.f, raw.duration};
+            for (const auto& track : raw.tracks)
             {
-                track.rotations[frame].time = float(frame) * SAMPLE_SPF;
-                track.rotations[frame].value = to_quaternion(source_track.rotations[frame % frames]);
+                for (const auto& key : track.rotations)
+                    times.insert(key.time);
+                for (const auto& key : track.translations)
+                    times.insert(key.time);
+                if (times.size() >= 65535)
+                    throw std::runtime_error("Ozz timepoint limit exceeded: " + name);
             }
+            const ozz::animation::offline::AnimationBuilder builder;
+            auto animation = builder(raw);
+            if (!animation)
+                throw std::runtime_error("Ozz animation build failed: " + name);
+            output.metadata.clips[index].duration = raw.duration;
+            output.animations.push_back(std::move(animation));
         }
-
-        if (constant_translation)
-        {
-            const Fvector& t = source_track.translations[0];
-            track.translations.resize(1);
-            track.translations[0].time = 0.f;
-            track.translations[0].value = ozz::math::Float3(t.x, t.y, t.z);
-        }
-        else
-        {
-            track.translations.resize(frames + 1);
-            for (u32 frame = 0; frame <= frames; ++frame)
-            {
-                const Fvector& t = source_track.translations[frame % frames];
-                track.translations[frame].time = float(frame) * SAMPLE_SPF;
-                track.translations[frame].value = ozz::math::Float3(t.x, t.y, t.z);
-            }
-        }
+        return output;
     }
-
-    return raw_animation;
-}
-
-ConvertedOmfAnimation BuildConvertedAnimation(const OmfMotion& motion, const OmfData& omf)
-{
-    const ozz::animation::offline::AnimationBuilder builder;
-    auto animation = builder(BuildRawAnimation(motion, omf));
-    if (!animation)
-        throw std::runtime_error("ozz animation build failed for motion: " + std::string(motion.name.c_str()));
-
-    ConvertedOmfAnimation converted;
-    converted.name = motion.name;
-    converted.frame_count = motion.frame_count;
-    converted.animation = std::move(animation);
-    return converted;
-}
-}
-
-bool ConvertLegacyOmf(const std::byte* data, size_t size, const xr_vector<xr_string>& skeleton_bone_names,
-    const ozz::animation::Skeleton& skeleton, xr_vector<ConvertedOmfAnimation>& out_animations)
-{
-    out_animations.clear();
-
-    if (!data || size == 0)
-        return false;
-
-    if (size_t(skeleton.num_joints()) != skeleton_bone_names.size())
-        return false;
-
-    const OmfData omf = ParseOmfBuffer(data, size, skeleton_bone_names);
-
-    const size_t motion_count = omf.motions.size();
-    out_animations.resize(motion_count);
-
-    xr_parallel_for(TaskRange<size_t>(0, motion_count), [&](const TaskRange<size_t>& range)
+    catch (const std::exception& error)
     {
-        for (size_t idx = range.begin(); idx != range.end(); ++idx)
-            out_animations[idx] = BuildConvertedAnimation(omf.motions[idx], omf);
-    });
-
-    return true;
-}
+        throw std::runtime_error(std::string(source) + ": " + error.what());
+    }
 }
 }

@@ -132,7 +132,7 @@ protected:
     EPState GetState(EMotionAnim a);
     void CheckReplacedAnim();
 
-    CMotionDef* get_motion_def(SAnimItem* it, u32 index) const;
+    const CMotionDef* get_motion_def(SAnimItem* it, u32 index) const;
 
 public:
     float GetAnimSpeed(EMotionAnim anim);

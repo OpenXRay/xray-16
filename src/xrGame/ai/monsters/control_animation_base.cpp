@@ -370,7 +370,7 @@ float CControlAnimationBase::GetAnimSpeed(EMotionAnim anim)
     SAnimItem* anim_it = m_anim_storage[anim];
     VERIFY(anim_it);
 
-    CMotionDef* def = get_motion_def(anim_it, 0);
+    const CMotionDef* def = get_motion_def(anim_it, 0);
 
     return (def->Dequantize(def->speed));
 }
@@ -558,7 +558,7 @@ void CControlAnimationBase::UpdateAnimCount()
 
 void CControlAnimationBase::SetCurAnim(EMotionAnim a) { cur_anim_info().set_motion(a); }
 
-CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index) const
+const CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index) const
 {
     string128 s1, s2;
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
