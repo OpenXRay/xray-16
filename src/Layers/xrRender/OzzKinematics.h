@@ -1,20 +1,17 @@
 #pragma once
 
-#include <cstddef>
+#include <memory>
 #include <vector>
 
 #include "Include/xrRender/Kinematics.h"
 #include "Layers/xrRender/FHierrarhyVisual.h"
-#include "xrAnimation/ExtendedBoneMetadata.h"
-#include "xrCommon/xr_smart_pointers.h"
-#include "xrCommon/xr_string.h"
+#include "OzzModelData.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCore/_fbox.h"
 
 #include "ozz/animation/runtime/skeleton.h"
 #include "ozz/base/maths/simd_math.h"
 #include "ozz/base/maths/soa_transform.h"
-#include "ozz/base/span.h"
 
 struct OzzBoneVisibility
 {
@@ -29,11 +26,6 @@ struct OzzBoneVisibility
     void setAll(u64 m) { mask = m; }
 };
 
-namespace ozz::io
-{
-class Stream;
-}
-
 namespace XRay::Animation
 {
 class OzzKinematics : public xray::render::fg::FHierrarhyVisual, public IKinematics
@@ -42,37 +34,26 @@ public:
     OzzKinematics();
     ~OzzKinematics() override;
 
-    bool InitializeFromOzz(pcstr skeletonPath);
-    bool InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData);
-    bool ApplyExtendedBoneMetadata(const ExtendedBoneMetadataCollection& metadata);
-    bool LoadUserDataFromBuffer(const std::vector<std::uint8_t>& buffer);
+    virtual bool LoadBundle(const OzzxBundle& bundle);
     bool LoadMeshFromBuffer(const std::vector<std::uint8_t>& meshData);
 
-    void CacheBundlePayloads(
-        std::vector<std::uint8_t> skeleton_payload,
-        std::vector<std::uint8_t> mesh,
-        xr_vector<xr_string> motion_refs,
-        ExtendedBoneMetadataCollection bone_metadata,
-        std::vector<std::uint8_t> user_data,
-        std::vector<std::uint8_t> embedded_anim);
-
     void Copy(xray::render::fg::dxRender_Visual* pFrom) override;
-
-    virtual void OnSkeletonLoaded() {}
+    void Spawn() override;
+    void Depart() override;
 
     bool HasBones() const
     {
-        return initialized && !boneInstances.empty();
+        return model && !boneInstances.empty();
     }
 
     bool IsInitialized() const
     {
-        return initialized;
+        return model != nullptr;
     }
 
     const ozz::animation::Skeleton& Skeleton() const
     {
-        return skeleton;
+        return model->skeleton;
     }
 
     void ClearPose();
@@ -89,12 +70,12 @@ public:
 
     CInifile* LL_UserData() override
     {
-        return userData;
+        return model ? model->userData.get() : nullptr;
     }
 
     accel* LL_Bones() override
     {
-        return &boneMapByName;
+        return model ? const_cast<accel*>(&model->boneMapByName) : nullptr;
     }
 
     CBoneInstance& LL_GetBoneInstance(u16 bone_id) override;
@@ -193,31 +174,19 @@ protected:
     virtual void OnCalculateBones() {}
 
     bool IsBoneVisible(u16 bone_id) const;
-    void ResetRuntimeState();
 
 protected:
-    std::vector<std::uint8_t> m_BundleSkeleton;
-    std::vector<std::uint8_t> m_BundleMesh;
-    xr_vector<xr_string>      m_BundleMotionRefs;
-    ExtendedBoneMetadataCollection m_BundleBoneMeta;
-    std::vector<std::uint8_t> m_BundleUserData;
-    std::vector<std::uint8_t> m_BundleEmbeddedAnim;
+    std::shared_ptr<const OzzModelData> model;
 
-    ozz::animation::Skeleton skeleton;
     xr_vector<ozz::math::SoaTransform> sampledLocals;
     bool poseValid;
 
     xr_vector<CBoneInstance> boneInstances;
-    xr_vector<CBoneData*> bones;
-    xr_vector<xr_unique_ptr<CBoneData>> boneStorage;
     xr_vector<Fobb> boneBoxes;
 
     xr_vector<ozz::math::Float4x4> modelTransforms;
     xr_vector<Fmatrix> subtreeDelta;
     xr_vector<u8> subtreeDirty;
-
-    accel boneMapByName;
-    accel boneMapByPtr;
 
     xr_vector<KinematicsABT::additional_bone_transform> boneOffsets;
 
@@ -225,18 +194,13 @@ protected:
     OzzBoneVisibility boneVisibility;
     u32 lastUpdateTime;
     Fbox cachedBox;
-    bool initialized;
-
-    CInifile* userData;
-    xr_unique_ptr<CInifile> userDataOwner;
 
     UpdateCallback updateCallback;
     void* updateCallbackParam;
 
 private:
-    bool LoadSkeletonFromStream(ozz::io::Stream* stream, pcstr debug_source);
-    bool FinalizeSkeletonInitialization(pcstr debug_source);
-    bool BuildBoneMetadata();
+    void IBoneInstances_Create();
+    u64 FullVisibilityMask() const;
     bool ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transform) const;
 };
-} // namespace XRay::Animation
+}

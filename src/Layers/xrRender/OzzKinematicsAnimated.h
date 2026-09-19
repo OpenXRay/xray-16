@@ -5,14 +5,12 @@
 #include "Layers/xrRender/Animation.h"
 #include "OzzKinematics.h"
 #include "OzzSharedMotions.hpp"
-#include "xrAnimation/ExtendedBoneMetadata.h"
 #include "xrCore/FMesh.hpp"
 #include "xrCommon/xr_unordered_map.h"
 
 #include "ozz/animation/runtime/animation.h"
 #include "ozz/animation/runtime/sampling_job.h"
 #include "ozz/base/maths/soa_transform.h"
-#include "ozz/base/span.h"
 
 #include <memory>
 
@@ -28,13 +26,10 @@ public:
     OzzKinematicsAnimated();
     ~OzzKinematicsAnimated() override;
 
-    void OnSkeletonLoaded() override;
+    bool LoadBundle(const OzzxBundle& bundle) override;
 
     void Copy(xray::render::fg::dxRender_Visual* pFrom) override;
-
-    bool InitializeFromOzzBuffer(ozz::span<const std::byte> skeletonData, const xr_vector<xr_string>& motionRefs = xr_vector<xr_string>());
-
-    void SetEmbeddedAnimationData(const std::vector<std::uint8_t>& data);
+    void Spawn() override;
 
     bool AdvanceAnimation(float dt);
 
@@ -153,8 +148,6 @@ private:
     float playbackTime = 0.f;
 
     MotionsSlotVec m_Motions;
-    xr_vector<xr_string> motionReferences;
-    std::vector<std::uint8_t> embeddedAnimationData;
 
     svector<CBlend, MAX_BLENDED_POOL> blend_pool;
     xr_vector<ActiveBlendEntry> activeBlends;
@@ -167,7 +160,5 @@ private:
 
     xray::render::fg::animation::channal_rule channelRules[MAX_CHANNELS]{};
     float channelFactors[MAX_CHANNELS]{};
-
-    CPartition defaultPartition{};
 };
 } // namespace XRay::Animation
