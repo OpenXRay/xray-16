@@ -1,6 +1,8 @@
 #pragma once
 
 #include "xrCore/_vector3d.h"
+#include "xrCore/FS.h"
+#include "xrCore/lzhuf.h"
 
 #include <algorithm>
 #include <cctype>
@@ -119,7 +121,28 @@ inline std::vector<std::byte> LoadFileBytes(const std::filesystem::path& path)
     return data;
 }
 
-inline std::unordered_map<std::uint32_t, Chunk> ParseChunks(const std::byte* data, std::size_t size)
+struct ChunkStorage
+{
+    std::vector<std::vector<std::byte>> blocks;
+
+    Chunk adopt(std::uint32_t id, const std::byte* data, std::size_t size)
+    {
+        if ((id & CFS_CompressMark) == 0)
+            return Chunk{ data, size };
+
+        std::uint8_t* dest = nullptr;
+        std::size_t dest_size = 0;
+        if (!_decompressLZ(&dest, &dest_size, const_cast<std::byte*>(data), size))
+            throw std::runtime_error("failed to decompress chunk");
+
+        blocks.emplace_back(reinterpret_cast<const std::byte*>(dest), reinterpret_cast<const std::byte*>(dest) + dest_size);
+        xr_free(dest);
+        return Chunk{ blocks.back().data(), blocks.back().size() };
+    }
+};
+
+inline std::unordered_map<std::uint32_t, Chunk> ParseChunks(
+    const std::byte* data, std::size_t size, ChunkStorage& storage)
 {
     std::unordered_map<std::uint32_t, Chunk> chunks;
     std::size_t offset = 0;
@@ -133,13 +156,13 @@ inline std::unordered_map<std::uint32_t, Chunk> ParseChunks(const std::byte* dat
         offset += sizeof(std::uint32_t);
         if (offset + chunk_size > size)
             throw std::runtime_error("chunk extends past end of file");
-        chunks.emplace(id, Chunk{ data + offset, chunk_size });
+        chunks.emplace(id & ~CFS_CompressMark, storage.adopt(id, data + offset, chunk_size));
         offset += chunk_size;
     }
     return chunks;
 }
 
-inline std::vector<std::pair<std::uint32_t, Chunk>> ParseSubchunks(const Chunk& chunk)
+inline std::vector<std::pair<std::uint32_t, Chunk>> ParseSubchunks(const Chunk& chunk, ChunkStorage& storage)
 {
     std::vector<std::pair<std::uint32_t, Chunk>> subchunks;
     std::size_t offset = 0;
@@ -153,9 +176,27 @@ inline std::vector<std::pair<std::uint32_t, Chunk>> ParseSubchunks(const Chunk& 
         offset += sizeof(std::uint32_t);
         if (offset + sub_size > chunk.size)
             throw std::runtime_error("sub-chunk extends past parent chunk");
-        subchunks.emplace_back(id, Chunk{ chunk.data + offset, sub_size });
+        subchunks.emplace_back(id & ~CFS_CompressMark, storage.adopt(id, chunk.data + offset, sub_size));
         offset += sub_size;
     }
+    return subchunks;
+}
+
+inline std::unordered_map<std::uint32_t, Chunk> ParseChunks(const std::byte* data, std::size_t size)
+{
+    ChunkStorage storage;
+    auto chunks = ParseChunks(data, size, storage);
+    if (!storage.blocks.empty())
+        throw std::runtime_error("compressed chunk requires chunk storage");
+    return chunks;
+}
+
+inline std::vector<std::pair<std::uint32_t, Chunk>> ParseSubchunks(const Chunk& chunk)
+{
+    ChunkStorage storage;
+    auto subchunks = ParseSubchunks(chunk, storage);
+    if (!storage.blocks.empty())
+        throw std::runtime_error("compressed sub-chunk requires chunk storage");
     return subchunks;
 }
 

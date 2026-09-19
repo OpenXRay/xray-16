@@ -95,17 +95,21 @@ void ParseSmparams(const Chunk& chunk, const xr_vector<xr_string>& skeleton_bone
     output.motion_count = reader.read<u16>();
 }
 
-void ParseMotions(const Chunk& chunk, OmfData& output)
+void ParseMotions(const Chunk& chunk, ChunkStorage& storage, OmfData& output)
 {
-    const auto subchunks = ParseSubchunks(chunk);
-    if (subchunks.empty())
-        throw std::runtime_error("OMF motion chunk missing motion count");
+    const auto subchunks = ParseSubchunks(chunk, storage);
 
-    const auto& count_chunk = subchunks.front();
-    if (count_chunk.first != 0)
+    std::unordered_map<std::uint32_t, const Chunk*> by_id;
+    by_id.reserve(subchunks.size());
+    for (const auto& item : subchunks)
+        if (!by_id.emplace(item.first, &item.second).second)
+            throw std::runtime_error("duplicate sub-chunk id in OMF motion chunk");
+
+    const auto count_it = by_id.find(0);
+    if (count_it == by_id.end())
         throw std::runtime_error("OMF motion chunk missing count sub-chunk");
 
-    BinaryReader count_reader{ count_chunk.second.data, count_chunk.second.size };
+    BinaryReader count_reader{ count_it->second->data, count_it->second->size };
     const u32 motion_count = count_reader.read<u32>();
     if (motion_count != output.motion_count)
         throw std::runtime_error("motion metadata count mismatch");
@@ -118,7 +122,11 @@ void ParseMotions(const Chunk& chunk, OmfData& output)
 
     for (u32 motion_idx = 0; motion_idx < motion_count; ++motion_idx)
     {
-        const Chunk& item = subchunks[motion_idx + 1].second;
+        const auto item_it = by_id.find(motion_idx + 1);
+        if (item_it == by_id.end())
+            throw std::runtime_error("OMF motion chunk missing motion sub-chunk");
+
+        const Chunk& item = *item_it->second;
         BinaryReader reader{ item.data, item.size };
 
         OmfMotion& motion = output.motions[motion_idx];
@@ -208,11 +216,17 @@ void ParseMotions(const Chunk& chunk, OmfData& output)
         if (reader.offset != reader.size)
             throw std::runtime_error("unexpected extra data in motion chunk");
     }
+
+    std::unordered_map<std::string, u32> seen;
+    for (u32 motion_idx = 0; motion_idx < motion_count; ++motion_idx)
+        if (!seen.emplace(ToLowerCopy(std::string(output.motions[motion_idx].name.c_str())), motion_idx).second)
+            throw std::runtime_error("duplicate motion name in OMF: " + std::string(output.motions[motion_idx].name.c_str()));
 }
 
 OmfData ParseOmfBuffer(const std::byte* data, size_t size, const xr_vector<xr_string>& skeleton_bone_names)
 {
-    const auto chunks = ParseChunks(data, size);
+    ChunkStorage storage;
+    const auto chunks = ParseChunks(data, size, storage);
 
     const auto params_it = chunks.find(OGF_S_SMPARAMS);
     if (params_it == chunks.end())
@@ -224,8 +238,25 @@ OmfData ParseOmfBuffer(const std::byte* data, size_t size, const xr_vector<xr_st
 
     OmfData output;
     ParseSmparams(params_it->second, skeleton_bone_names, output);
-    ParseMotions(motions_it->second, output);
+    ParseMotions(motions_it->second, storage, output);
     return output;
+}
+
+bool IsConstant(const xr_vector<Fquaternion>& values)
+{
+    for (size_t i = 1; i < values.size(); ++i)
+        if (values[i].x != values[0].x || values[i].y != values[0].y || values[i].z != values[0].z ||
+            values[i].w != values[0].w)
+            return false;
+    return true;
+}
+
+bool IsConstant(const xr_vector<Fvector>& values)
+{
+    for (size_t i = 1; i < values.size(); ++i)
+        if (values[i].x != values[0].x || values[i].y != values[0].y || values[i].z != values[0].z)
+            return false;
+    return true;
 }
 
 ozz::animation::offline::RawAnimation BuildRawAnimation(const OmfMotion& motion, const OmfData& omf)
@@ -234,9 +265,11 @@ ozz::animation::offline::RawAnimation BuildRawAnimation(const OmfMotion& motion,
     if (joint_count == 0)
         throw std::runtime_error("OMF bone remap is empty");
 
+    const u32 frames = motion.frame_count;
+
     ozz::animation::offline::RawAnimation raw_animation;
     raw_animation.name = motion.name.c_str();
-    raw_animation.duration = motion.frame_count > 1 ? (motion.frame_count - 1) * SAMPLE_SPF : SAMPLE_SPF;
+    raw_animation.duration = frames * SAMPLE_SPF;
     raw_animation.tracks.resize(joint_count);
 
     for (size_t remap_index = 0; remap_index < joint_count; ++remap_index)
@@ -248,24 +281,48 @@ ozz::animation::offline::RawAnimation BuildRawAnimation(const OmfMotion& motion,
         const BoneTrack& source_track = motion.bone_tracks[remap_index];
         auto& track = raw_animation.tracks[joint_index];
 
-        track.translations.resize(motion.frame_count);
-        track.rotations.resize(motion.frame_count);
         track.scales.resize(1);
         track.scales[0].time = 0.f;
         track.scales[0].value = ozz::math::Float3(1.f, 1.f, 1.f);
 
-        for (u32 frame = 0; frame < motion.frame_count; ++frame)
+        const bool constant_rotation = IsConstant(source_track.rotations);
+        const bool constant_translation = IsConstant(source_track.translations);
+
+        const auto to_quaternion = [](const Fquaternion& q)
+        { return ozz::math::Normalize(ozz::math::Quaternion(q.x, q.y, q.z, q.w)); };
+
+        if (constant_rotation)
         {
-            const float time = static_cast<float>(frame) * SAMPLE_SPF;
+            track.rotations.resize(1);
+            track.rotations[0].time = 0.f;
+            track.rotations[0].value = to_quaternion(source_track.rotations[0]);
+        }
+        else
+        {
+            track.rotations.resize(frames + 1);
+            for (u32 frame = 0; frame <= frames; ++frame)
+            {
+                track.rotations[frame].time = float(frame) * SAMPLE_SPF;
+                track.rotations[frame].value = to_quaternion(source_track.rotations[frame % frames]);
+            }
+        }
 
-            const Fquaternion& xr_quat = source_track.rotations[frame];
-            const Fvector& xr_translation = source_track.translations[frame];
-
-            track.translations[frame].time = time;
-            track.translations[frame].value = ozz::math::Float3(xr_translation.x, xr_translation.y, xr_translation.z);
-            track.rotations[frame].time = time;
-            track.rotations[frame].value =
-                ozz::math::Normalize(ozz::math::Quaternion(xr_quat.x, xr_quat.y, xr_quat.z, xr_quat.w));
+        if (constant_translation)
+        {
+            const Fvector& t = source_track.translations[0];
+            track.translations.resize(1);
+            track.translations[0].time = 0.f;
+            track.translations[0].value = ozz::math::Float3(t.x, t.y, t.z);
+        }
+        else
+        {
+            track.translations.resize(frames + 1);
+            for (u32 frame = 0; frame <= frames; ++frame)
+            {
+                const Fvector& t = source_track.translations[frame % frames];
+                track.translations[frame].time = float(frame) * SAMPLE_SPF;
+                track.translations[frame].value = ozz::math::Float3(t.x, t.y, t.z);
+            }
         }
     }
 
