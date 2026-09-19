@@ -25,6 +25,33 @@ SoaTransform EmptyPose()
     return pose;
 }
 
+template <size_t sourceLane>
+void CopyPoseLane(SoaTransform& target, int lane, const SoaTransform& source)
+{
+    const auto copy = [lane](SimdFloat4 target, SimdFloat4 source)
+    {
+        return SetI(target, Swizzle<sourceLane, sourceLane, sourceLane, sourceLane>(source), lane);
+    };
+    target.translation = {copy(target.translation.x, source.translation.x),
+        copy(target.translation.y, source.translation.y), copy(target.translation.z, source.translation.z)};
+    target.rotation = {copy(target.rotation.x, source.rotation.x), copy(target.rotation.y, source.rotation.y),
+        copy(target.rotation.z, source.rotation.z), copy(target.rotation.w, source.rotation.w)};
+    target.scale = {copy(target.scale.x, source.scale.x), copy(target.scale.y, source.scale.y),
+        copy(target.scale.z, source.scale.z)};
+}
+
+void GatherPoseLane(SoaTransform& target, int lane, const ozz::vector<SoaTransform>& source, u16 track)
+{
+    const auto& pose = source[track / 4];
+    switch (track % 4)
+    {
+    case 0: CopyPoseLane<0>(target, lane, pose); break;
+    case 1: CopyPoseLane<1>(target, lane, pose); break;
+    case 2: CopyPoseLane<2>(target, lane, pose); break;
+    case 3: CopyPoseLane<3>(target, lane, pose); break;
+    }
+}
+
 SoaTransform SelectPose(SimdInt4 mask, const SoaTransform& a, const SoaTransform& b)
 {
     SoaTransform result;
@@ -119,6 +146,7 @@ struct OzzPose::State
     xr_vector<Packet> packets;
     ozz::vector<SoaTransform> locals;
     ozz::vector<SoaTransform> queryLocals;
+    ozz::vector<SoaTransform> samplingLocals;
     ozz::vector<Float4x4> models;
     float factors[channelCount] = {1.f, 1.f, 1.f, 1.f};
     u64 revision = 1;
@@ -141,6 +169,7 @@ struct OzzPose::State
             }
         }
         const auto& library = *assets->libraries[blend.motion.slot];
+        const auto& binding = assets->bindings[blend.motion.slot];
         const auto* animation = library.animations[blend.motion.idx].get();
         if (blend.sampledMotion != blend.motion)
             blend.context.Invalidate();
@@ -150,8 +179,18 @@ struct OzzPose::State
         job.animation = animation;
         job.context = &blend.context;
         job.ratio = animation->duration() > 0.f ? wrapped / animation->duration() : 0.f;
-        job.output = ozz::make_span(blend.locals);
+        job.output = ozz::make_span(binding.jointToTrack.empty() ? blend.locals : samplingLocals);
         R_ASSERT2(job.Run(), "Ozz motion sampling failed");
+        if (!binding.jointToTrack.empty())
+        {
+            for (size_t packet = 0; packet < blend.locals.size(); ++packet)
+            {
+                auto& pose = blend.locals[packet];
+                pose = SoaTransform::identity();
+                for (size_t lane = 0; lane < 4 && packet * 4 + lane < binding.jointToTrack.size(); ++lane)
+                    GatherPoseLane(pose, int(lane), samplingLocals, binding.jointToTrack[packet * 4 + lane]);
+            }
+        }
         blend.sampledMotion = blend.motion;
         blend.sampledTime = time;
         blend.source = slot;
@@ -213,7 +252,13 @@ struct OzzPose::State
                     auto value = Sample(slot, overridden && controls->time ? *controls->time : blend.time)[packet];
                     if (channel >= 2)
                     {
-                        const auto& first = assets->libraries[blend.motion.slot]->firstFrame[blend.motion.idx][packet];
+                        const auto& binding = assets->bindings[blend.motion.slot];
+                        const auto& frames = assets->libraries[blend.motion.slot]->firstFrame[blend.motion.idx];
+                        auto first = SoaTransform::identity();
+                        if (binding.jointToTrack.empty())
+                            first = frames[packet];
+                        else
+                            GatherPoseLane(first, lane, frames, binding.jointToTrack[packet * 4 + lane]);
                         value.rotation = value.rotation * Conjugate(first.rotation);
                         value.translation = value.translation - first.translation;
                     }
@@ -293,6 +338,12 @@ void OzzPose::Reset(std::shared_ptr<const OzzModelAnimations> assets, u16 blendC
     state->locals.resize(skeleton.num_soa_joints(), SoaTransform::identity());
     state->queryLocals.resize(skeleton.num_soa_joints(), SoaTransform::identity());
     state->models.resize(skeleton.num_joints());
+    for (const auto& binding : state->assets->bindings)
+        if (!binding.jointToTrack.empty())
+        {
+            state->samplingLocals.resize(skeleton.num_soa_joints());
+            break;
+        }
 }
 
 void OzzPose::ReserveBlend(u16 slot)

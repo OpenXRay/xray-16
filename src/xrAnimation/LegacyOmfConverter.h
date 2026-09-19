@@ -8,14 +8,12 @@
 
 namespace XRay::Animation
 {
-struct OzzSkeletonMirror;
-
 struct ConvertedOmfLibrary
 {
+    xr_vector<shared_str> boneNames;
     MotionLibraryMetadata metadata;
     xr_vector<ozz::unique_ptr<ozz::animation::Animation>> animations;
 };
 
-XRANIMATION_API ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size,
-    pcstr source, const OzzSkeletonMirror& skeleton);
+XRANIMATION_API ConvertedOmfLibrary ConvertLegacyOmf(const std::byte* data, size_t size, pcstr source);
 }

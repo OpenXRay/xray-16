@@ -14,15 +14,23 @@ struct OzzSkeletonMirror;
 
 struct OzzMotionLibrary
 {
+    xr_vector<shared_str> boneNames;
     MotionLibraryMetadata metadata;
     xr_vector<ozz::unique_ptr<ozz::animation::Animation>> animations;
     xr_vector<ozz::vector<ozz::math::SoaTransform>> firstFrame;
+};
+
+struct OzzMotionBinding
+{
+    xr_vector<u16> jointToTrack;
+    std::shared_ptr<const MotionLibraryMetadata> metadata;
 };
 
 struct OzzModelAnimations
 {
     std::shared_ptr<const OzzSkeletonMirror> skeleton;
     xr_vector<std::shared_ptr<const OzzMotionLibrary>> libraries;
+    xr_vector<OzzMotionBinding> bindings;
     CPartition partition;
 };
 

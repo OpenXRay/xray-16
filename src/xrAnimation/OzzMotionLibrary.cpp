@@ -11,11 +11,15 @@
 #include <ozz/base/io/stream.h>
 #include <ozz/base/span.h>
 #include <array>
+#include <cctype>
+#include <cstring>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <map>
 #include <mutex>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -23,9 +27,9 @@ namespace XRay::Animation
 {
 namespace
 {
-constexpr u32 CacheVersion = 5;
-constexpr u32 CacheMagic = 0x435a5a4f;
-constexpr size_t MaxCacheBytes = 512u * 1024u * 1024u;
+constexpr u32 LibraryVersion = 1;
+constexpr u32 LibraryMagic = 0x4c5a5a4f;
+constexpr size_t MaxLibraryBytes = 512u * 1024u * 1024u;
 using Bytes = xr_vector<std::byte>;
 using Digest = std::array<u8, 32>;
 
@@ -258,104 +262,98 @@ MotionLibraryMetadata ReadMetadata(BinaryReader& reader, size_t joints)
     return metadata;
 }
 
-std::filesystem::path CachePath(const xr_string& key)
+std::filesystem::path NativePath(pcstr path)
 {
-    if (key.size() != 64 || key.find_first_not_of("0123456789abcdef") != xr_string::npos)
-        throw std::runtime_error("invalid prepared asset key");
-    string_path root;
-    FS.update_path(root, "$app_data_root$", "ozz_cache");
-    std::string native(root);
+    std::string native(path);
     std::replace(native.begin(), native.end(), '\\', char(std::filesystem::path::preferred_separator));
-    return std::filesystem::path(native) / (std::string(key.c_str()) + ".ozzcache");
+    return native;
 }
 
-Bytes ReadCache(const xr_string& key, u32 type)
+xr_string OutputPath(pcstr source)
 {
-    const auto path = CachePath(key);
-    std::ifstream stream(path, std::ios::binary | std::ios::ate);
-    if (!stream)
-        throw std::runtime_error("cannot open prepared cache " + path.string());
-    const std::streamoff size = stream.tellg();
-    constexpr size_t headerBytes = 4 * sizeof(u32) + sizeof(Digest);
-    if (size < std::streamoff(headerBytes) || size > std::streamoff(MaxCacheBytes))
-        throw std::runtime_error("invalid prepared cache size " + path.string());
-    stream.seekg(0);
-    u32 header[4];
-    Digest checksum;
-    stream.read(reinterpret_cast<char*>(header), sizeof(header));
-    stream.read(reinterpret_cast<char*>(checksum.data()), checksum.size());
-    if (!stream || header[0] != CacheMagic || header[1] != CacheVersion || header[2] != type ||
-        header[3] != size_t(size) - headerBytes || !header[3])
-        throw std::runtime_error("invalid prepared cache header " + path.string());
-    Bytes bytes(header[3]);
-    stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
-    if (!stream || checksum != HashBytes(bytes.data(), bytes.size()))
-        throw std::runtime_error("corrupt prepared cache " + path.string());
-    return bytes;
+    xr_string path(source);
+    const auto canonical = Startup::CanonicalPath(source);
+    if (canonical.size() >= 4 && canonical.compare(canonical.size() - 4, 4, ".omf") == 0)
+        path.replace(path.size() - 4, 4, ".ozz");
+    else if (canonical.size() < 4 || canonical.compare(canonical.size() - 4, 4, ".ozz") != 0)
+        path += ".ozz";
+    for (size_t index = 0; index < path.size(); ++index)
+        if (path[index] == ':' && !(index == 1 && std::isalpha(static_cast<unsigned char>(path[0]))))
+            path[index] = '.';
+    return path;
 }
 
-void WriteCache(const xr_string& key, u32 type, const Bytes& bytes)
+struct SourceStamp
 {
-    if (bytes.empty() || bytes.size() > MaxCacheBytes - 4 * sizeof(u32) - sizeof(Digest))
-        throw std::runtime_error("prepared asset exceeds cache size limit");
-    const auto path = CachePath(key);
-    std::filesystem::create_directories(path.parent_path());
-    auto temporary = path;
-    temporary += ".tmp";
-    std::ofstream stream(temporary, std::ios::binary | std::ios::trunc);
-    const u32 header[] = {CacheMagic, CacheVersion, type, u32(bytes.size())};
-    const auto checksum = HashBytes(bytes.data(), bytes.size());
-    stream.write(reinterpret_cast<const char*>(header), sizeof(header));
-    stream.write(reinterpret_cast<const char*>(checksum.data()), checksum.size());
-    stream.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
-    stream.flush();
-    if (!stream)
-        throw std::runtime_error("cannot write prepared cache " + path.string());
-    stream.close();
-    std::error_code error;
-    std::filesystem::rename(temporary, path, error);
-    if (error)
+    u32 size = 0;
+    u32 modified = 0;
+    u32 crc = 0;
+    u64 nativeTime = 0;
+
+    bool operator==(const SourceStamp& other) const
     {
-        std::filesystem::remove(path, error);
-        error.clear();
-        std::filesystem::rename(temporary, path, error);
+        return size == other.size && modified == other.modified && crc == other.crc && nativeTime == other.nativeTime;
     }
-    if (error)
-        throw std::runtime_error("cannot publish prepared cache " + path.string() + ": " + error.message());
+};
+
+bool ReadSourceStamp(pcstr source, SourceStamp& stamp)
+{
+    bool found = false;
+    if (const auto* file = FS.GetFileDesc(source))
+    {
+        stamp.size = file->size_real;
+        stamp.modified = file->modif;
+        stamp.crc = file->crc;
+        found = true;
+    }
+    const auto path = NativePath(source);
+    std::error_code error;
+    if (std::filesystem::is_regular_file(path, error))
+    {
+        const auto size = std::filesystem::file_size(path);
+        if (size > MaxLibraryBytes)
+            throw std::runtime_error("motion source exceeds size limit");
+        stamp.size = u32(size);
+        stamp.nativeTime = u64(std::filesystem::last_write_time(path).time_since_epoch().count());
+        found = true;
+    }
+    return found;
+}
+
+Bytes ReadLibraryBytes(pcstr source)
+{
+    const auto canonical = Startup::CanonicalPath(source);
+    if (canonical.size() < 4 || canonical.compare(canonical.size() - 4, 4, ".ozz") != 0)
+        throw std::runtime_error("runtime motion input must be an .ozz library");
+    const auto path = NativePath(source);
+    std::error_code error;
+    if (std::filesystem::is_regular_file(path, error))
+    {
+        std::ifstream stream(path, std::ios::binary | std::ios::ate);
+        const auto size = stream.tellg();
+        if (!stream || size <= 0 || size > std::streamoff(MaxLibraryBytes))
+            throw std::runtime_error("invalid Ozz library size " + path.string());
+        Bytes bytes(static_cast<size_t>(size));
+        stream.seekg(0);
+        stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
+        if (!stream)
+            throw std::runtime_error("cannot read Ozz library " + path.string());
+        return bytes;
+    }
+    const auto close = [](IReader* reader) { FS.r_close(reader); };
+    std::unique_ptr<IReader, decltype(close)> reader(FS.r_open(source), close);
+    if (!reader || !reader->length() || size_t(reader->length()) > MaxLibraryBytes)
+        throw std::runtime_error("cannot read Ozz library " + path.string());
+    const auto* begin = static_cast<const std::byte*>(reader->pointer());
+    return Bytes(begin, begin + reader->length());
 }
 
 void ValidateArchiveHeader(BinaryReader& reader, pcstr tag, u32 version)
 {
     if (reader.read<u8>() != u8(ozz::GetNativeEndianness()) || reader.read_stringz() != tag || reader.read<u32>() != version)
-        throw std::runtime_error("unsupported Ozz cache archive");
+        throw std::runtime_error("unsupported Ozz animation archive");
 }
 
-void ValidateSkeletonArchive(BinaryReader reader, size_t joints)
-{
-    ValidateArchiveHeader(reader, "ozz-skeleton", 2);
-    if (reader.read<u32>() != joints)
-        throw std::runtime_error("prepared skeleton joint count mismatch");
-    const u32 namesBytes = reader.read<u32>();
-    reader.require(namesBytes);
-    BinaryReader names{reader.data + reader.offset, namesBytes};
-    for (size_t joint = 0; joint < joints; ++joint)
-        if (names.read_stringz().empty())
-            throw std::runtime_error("empty prepared joint name");
-    if (names.offset != names.size)
-        throw std::runtime_error("prepared skeleton name count mismatch");
-    reader.skip(namesBytes);
-    for (size_t joint = 0; joint < joints; ++joint)
-    {
-        const s16 parent = reader.read<s16>();
-        if (parent < -1 || parent >= int(joint))
-            throw std::runtime_error("invalid prepared joint parent");
-    }
-    const size_t floats = ((joints + 3) / 4) * 40;
-    for (size_t value = 0; value < floats; ++value)
-        ReadFloat(reader);
-    if (reader.offset != reader.size)
-        throw std::runtime_error("unexpected prepared skeleton bytes");
-}
 
 void ValidateAnimationArchive(BinaryReader reader, size_t joints, const MotionMetadata& clip)
 {
@@ -440,7 +438,7 @@ void ValidateAnimationArchive(BinaryReader reader, size_t joints, const MotionMe
         throw std::runtime_error("unexpected prepared animation bytes");
 }
 
-template <class T> void WriteArchive(Writer& writer, const T& object)
+void WriteArchive(Writer& writer, const ozz::animation::Animation& object)
 {
     ozz::io::MemoryStream stream;
     { ozz::io::OArchive archive(&stream); archive << object; }
@@ -453,15 +451,12 @@ template <class T> void WriteArchive(Writer& writer, const T& object)
         throw std::runtime_error("Ozz archive serialization failed");
 }
 
-template <class T> void ReadArchive(BinaryReader& reader, T& object, size_t joints, const MotionMetadata* clip = nullptr)
+void ReadArchive(BinaryReader& reader, ozz::animation::Animation& object, size_t joints, const MotionMetadata& clip)
 {
     const u32 size = reader.read<u32>();
     reader.require(size);
     BinaryReader body{reader.data + reader.offset, size};
-    if (clip)
-        ValidateAnimationArchive(body, joints, *clip);
-    else
-        ValidateSkeletonArchive(body, joints);
+    ValidateAnimationArchive(body, joints, clip);
     ozz::io::MemoryStream stream;
     if (stream.Write(body.data, body.size) != body.size || stream.Seek(0, ozz::io::Stream::kSet) != 0)
         throw std::runtime_error("Ozz archive input failed");
@@ -472,49 +467,56 @@ template <class T> void ReadArchive(BinaryReader& reader, T& object, size_t join
     reader.skip(size);
 }
 
-std::shared_ptr<const OzzSkeletonMirror> LoadSkeleton(const xr_string& key)
+struct LibraryFile
 {
-    const auto bytes = ReadCache(key, 1);
-    BinaryReader reader{bytes.data(), bytes.size()};
-    auto mirror = std::make_shared<OzzSkeletonMirror>();
-    mirror->fingerprint = reader.read<u32>();
-    const u32 count = reader.read<u32>();
-    if (!count || count > ozz::animation::Skeleton::kMaxJoints)
-        throw std::runtime_error("invalid prepared skeleton size");
-    mirror->boneToJoint.resize(count);
-    mirror->jointToBone.assign(count, BI_NONE);
-    for (u16 bone = 0; bone < count; ++bone)
-    {
-        const u16 joint = reader.read<u16>();
-        if (joint >= count || mirror->jointToBone[joint] != BI_NONE)
-            throw std::runtime_error("invalid prepared skeleton mapping");
-        mirror->boneToJoint[bone] = joint;
-        mirror->jointToBone[joint] = bone;
-    }
-    ReadArchive(reader, mirror->skeleton, count);
-    if (reader.offset != reader.size)
-        throw std::runtime_error("unexpected prepared skeleton payload");
-    return mirror;
-}
+    std::shared_ptr<const OzzMotionLibrary> library;
+    Digest checksum{};
+};
 
-std::shared_ptr<const OzzMotionLibrary> LoadLibrary(const xr_string& key, const xr_string& skeletonKey,
-    const OzzSkeletonMirror& skeleton)
+LibraryFile LoadLibrary(pcstr path, const SourceStamp* expected = nullptr)
 {
-    const auto bytes = ReadCache(key, 2);
+    const auto bytes = ReadLibraryBytes(path);
     BinaryReader reader{bytes.data(), bytes.size()};
-    if (ReadString(reader) != skeletonKey.c_str())
-        throw std::runtime_error("prepared library skeleton mismatch");
+    if (reader.read<u32>() != LibraryMagic || reader.read<u32>() != LibraryVersion)
+        throw std::runtime_error("unsupported Ozz library format");
+    SourceStamp source;
+    source.size = reader.read<u32>();
+    source.modified = reader.read<u32>();
+    source.crc = reader.read<u32>();
+    source.nativeTime = reader.read<u64>();
+    if (expected && !(source == *expected))
+        throw std::runtime_error("stale Ozz library");
+    const auto size = reader.read<u32>();
+    LibraryFile result;
+    for (auto& byte : result.checksum)
+        byte = reader.read<u8>();
+    if (!size || size != reader.size - reader.offset ||
+        result.checksum != HashBytes(reader.data + reader.offset, size))
+        throw std::runtime_error("corrupt Ozz library payload");
+    const u32 tracks = reader.read<u32>();
+    if (!tracks || tracks > ozz::animation::Skeleton::kMaxJoints)
+        throw std::runtime_error("invalid Ozz library track count");
     auto library = std::make_shared<OzzMotionLibrary>();
-    library->metadata = ReadMetadata(reader, skeleton.boneToJoint.size());
+    library->boneNames.reserve(tracks);
+    std::unordered_set<std::string> names;
+    for (u32 track = 0; track < tracks; ++track)
+    {
+        const auto name = ReadString(reader);
+        if (name.empty() || !names.emplace(name).second)
+            throw std::runtime_error("invalid Ozz library bone name");
+        library->boneNames.emplace_back(name.c_str());
+    }
+    library->metadata = ReadMetadata(reader, tracks);
+    library->metadata.source = path;
     library->animations.reserve(library->metadata.clips.size());
     library->firstFrame.resize(library->metadata.clips.size());
-    ozz::animation::SamplingJob::Context context(skeleton.skeleton.num_joints());
+    ozz::animation::SamplingJob::Context context(tracks);
     for (size_t index = 0; index < library->metadata.clips.size(); ++index)
     {
         auto animation = ozz::make_unique<ozz::animation::Animation>();
-        ReadArchive(reader, *animation, skeleton.boneToJoint.size(), &library->metadata.clips[index]);
+        ReadArchive(reader, *animation, tracks, library->metadata.clips[index]);
         auto& frame = library->firstFrame[index];
-        frame.resize(skeleton.skeleton.num_soa_joints());
+        frame.resize((tracks + 3) / 4);
         context.Invalidate();
         ozz::animation::SamplingJob job;
         job.animation = animation.get();
@@ -522,22 +524,128 @@ std::shared_ptr<const OzzMotionLibrary> LoadLibrary(const xr_string& key, const 
         job.ratio = 0.f;
         job.output = ozz::make_span(frame);
         if (!job.Run())
-            throw std::runtime_error("cannot sample prepared first frame");
+            throw std::runtime_error("cannot sample Ozz library first frame");
         library->animations.push_back(std::move(animation));
     }
     if (reader.offset != reader.size)
-        throw std::runtime_error("unexpected prepared library payload");
-    return library;
+        throw std::runtime_error("unexpected Ozz library payload");
+    result.library = std::move(library);
+    return result;
+}
+
+void WriteLibrary(pcstr destination, const SourceStamp& source, const ConvertedOmfLibrary& library)
+{
+    Writer writer;
+    writer.put(u32(library.boneNames.size()));
+    for (const auto& name : library.boneNames)
+        writer.string(name.c_str());
+    WriteMetadata(writer, library.metadata);
+    for (const auto& animation : library.animations)
+        WriteArchive(writer, *animation);
+    if (writer.bytes.empty() || writer.bytes.size() > MaxLibraryBytes - 64)
+        throw std::runtime_error("Ozz library exceeds size limit");
+    Writer header;
+    header.put(LibraryMagic);
+    header.put(LibraryVersion);
+    header.put(source.size);
+    header.put(source.modified);
+    header.put(source.crc);
+    header.put(source.nativeTime);
+    header.put(u32(writer.bytes.size()));
+    const auto checksum = HashBytes(writer.bytes.data(), writer.bytes.size());
+    header.append(checksum.data(), checksum.size());
+    const auto path = NativePath(destination);
+    std::filesystem::create_directories(path.parent_path());
+    auto temporary = path;
+    temporary += ".tmp";
+    std::ofstream stream(temporary, std::ios::binary | std::ios::trunc);
+    stream.write(reinterpret_cast<const char*>(header.bytes.data()), header.bytes.size());
+    stream.write(reinterpret_cast<const char*>(writer.bytes.data()), writer.bytes.size());
+    stream.flush();
+    if (!stream)
+        throw std::runtime_error("cannot write Ozz library " + path.string());
+    stream.close();
+    std::error_code error;
+    std::filesystem::rename(temporary, path, error);
+    if (error)
+    {
+        std::filesystem::remove(path, error);
+        error.clear();
+        std::filesystem::rename(temporary, path, error);
+    }
+    if (error)
+        throw std::runtime_error("cannot publish Ozz library " + path.string() + ": " + error.message());
+}
+
+xr_vector<u16> TrackBones(const xr_vector<shared_str>& names, const OzzSkeletonMirror& skeleton)
+{
+    if (names.size() != skeleton.boneToJoint.size())
+        throw std::runtime_error("Ozz library and model bone counts differ");
+    std::unordered_map<std::string_view, u16> bones;
+    for (u16 bone = 0; bone < skeleton.boneToJoint.size(); ++bone)
+        bones.emplace(skeleton.skeleton.joint_names()[skeleton.boneToJoint[bone]], bone);
+    xr_vector<u16> mapping;
+    mapping.reserve(names.size());
+    for (const auto& name : names)
+    {
+        const auto found = bones.find(name.c_str());
+        if (found == bones.end())
+            throw std::runtime_error("Ozz library bone absent from model: " + std::string(name.c_str()));
+        mapping.push_back(found->second);
+    }
+    return mapping;
+}
+
+void BindPartition(CPartition& partition, const xr_vector<u16>& bones)
+{
+    for (u16 part = 0; part < MAX_PARTS; ++part)
+        for (auto& bone : partition[part].bones)
+            bone = bones[bone];
+}
+
+OzzMotionBinding BindLibrary(const std::shared_ptr<const OzzMotionLibrary>& library, const OzzSkeletonMirror& skeleton)
+{
+    const auto bones = TrackBones(library->boneNames, skeleton);
+    OzzMotionBinding binding;
+    bool sameBones = true;
+    for (u16 track = 0; track < bones.size(); ++track)
+    {
+        sameBones = sameBones && bones[track] == track;
+        const auto joint = skeleton.boneToJoint[bones[track]];
+        if (joint != track && binding.jointToTrack.empty())
+        {
+            binding.jointToTrack.resize(bones.size());
+            for (u16 index = 0; index < bones.size(); ++index)
+                binding.jointToTrack[index] = index;
+        }
+        if (!binding.jointToTrack.empty())
+            binding.jointToTrack[joint] = track;
+    }
+    if (sameBones)
+        binding.metadata = std::shared_ptr<const MotionLibraryMetadata>(library, &library->metadata);
+    else
+    {
+        auto metadata = std::make_shared<MotionLibraryMetadata>(library->metadata);
+        BindPartition(metadata->partition, bones);
+        for (auto& clip : metadata->clips)
+            if ((clip.definition.flags & esmFX) && clip.definition.bone_or_part != BI_NONE)
+                clip.definition.bone_or_part = bones[clip.definition.bone_or_part];
+        binding.metadata = std::move(metadata);
+    }
+    return binding;
 }
 
 struct ModelEntry
 {
-    xr_string key;
+    Startup::PreparedModel prepared;
     std::weak_ptr<const OzzModelAnimations> resident;
 };
 struct LibraryEntry
 {
+    xr_string path;
+    xr_vector<shared_str> boneNames;
     CPartition partition;
+    Digest checksum;
     std::weak_ptr<const OzzMotionLibrary> resident;
 };
 struct Catalog
@@ -545,10 +653,8 @@ struct Catalog
     bool ready = false;
     bool preparing = false;
     std::unordered_map<xr_string, ModelEntry> models;
-    std::unordered_map<xr_string, std::weak_ptr<const OzzSkeletonMirror>> skeletons;
+    std::map<Digest, std::weak_ptr<const OzzSkeletonMirror>> skeletons;
     std::unordered_map<xr_string, LibraryEntry> libraries;
-    std::unordered_set<xr_string> validatedModels;
-    std::unordered_map<xr_string, xr_string> sources;
 };
 Catalog catalog;
 std::mutex catalogMutex;
@@ -558,41 +664,30 @@ xr_string ModelIdentity(const xr_string& source, const xr_string& level)
     return source + "|" + level;
 }
 
-std::shared_ptr<const OzzModelAnimations> LoadModel(const xr_string& key)
+std::shared_ptr<const OzzModelAnimations> LoadModel(const Startup::PreparedModel& prepared)
 {
-    const auto bytes = ReadCache(key, 3);
-    BinaryReader reader{bytes.data(), bytes.size()};
-    const xr_string skeletonKey(ReadString(reader).c_str());
-    auto knownSkeleton = catalog.skeletons.find(skeletonKey);
-    if (knownSkeleton == catalog.skeletons.end())
-        throw std::runtime_error("unprepared skeleton dependency");
     auto model = std::make_shared<OzzModelAnimations>();
-    model->skeleton = knownSkeleton->second.lock();
-    if (!model->skeleton)
+    model->skeleton = prepared.skeleton;
+    model->partition = prepared.partition;
+    model->libraries.reserve(prepared.libraries.size());
+    model->bindings.reserve(prepared.libraries.size());
+    for (const auto& path : prepared.libraries)
     {
-        model->skeleton = LoadSkeleton(skeletonKey);
-        knownSkeleton->second = model->skeleton;
-    }
-    model->partition = ReadPartition(reader, model->skeleton->boneToJoint.size());
-    const u32 count = reader.read<u32>();
-    if (!count || count > MAX_ANIM_SLOT)
-        throw std::runtime_error("invalid prepared model slot count");
-    for (u32 index = 0; index < count; ++index)
-    {
-        const xr_string libraryKey(ReadString(reader).c_str());
-        auto knownLibrary = catalog.libraries.find(libraryKey);
-        if (knownLibrary == catalog.libraries.end())
-            throw std::runtime_error("unprepared library dependency");
-        auto library = knownLibrary->second.resident.lock();
+        auto known = catalog.libraries.find(Startup::CanonicalPath(path.c_str()));
+        if (known == catalog.libraries.end())
+            throw std::runtime_error("unprepared Ozz library dependency");
+        auto library = known->second.resident.lock();
         if (!library)
         {
-            library = LoadLibrary(libraryKey, skeletonKey, *model->skeleton);
-            knownLibrary->second.resident = library;
+            const auto file = LoadLibrary(path.c_str());
+            if (file.checksum != known->second.checksum)
+                throw std::runtime_error("Ozz library changed after startup: " + std::string(path.c_str()));
+            library = file.library;
+            known->second.resident = library;
         }
+        model->bindings.push_back(BindLibrary(library, *model->skeleton));
         model->libraries.push_back(std::move(library));
     }
-    if (reader.offset != reader.size)
-        throw std::runtime_error("unexpected prepared model payload");
     return model;
 }
 }
@@ -608,28 +703,18 @@ xr_string CanonicalPath(pcstr path)
     return value.c_str();
 }
 
-xr_string ContentKey(const void* data, size_t size)
+
+bool LibraryExists(const xr_string& path)
 {
-    if ((!data && size) || size > std::numeric_limits<u32>::max())
-        throw std::runtime_error("invalid animation digest input");
-    const auto digest = HashBytes(data, size);
-    xr_string value;
-    value.reserve(digest.size() * 2);
-    constexpr char digits[] = "0123456789abcdef";
-    for (u8 byte : digest)
-    {
-        value.push_back(digits[byte >> 4]);
-        value.push_back(digits[byte & 15]);
-    }
-    return value;
+    std::error_code error;
+    return std::filesystem::is_regular_file(NativePath(path.c_str()), error) || FS.exist(path.c_str());
 }
 
-xr_string PrepareSkeleton(const xr_vector<OzzBoneDesc>& bones, std::shared_ptr<const OzzSkeletonMirror>& mirror)
+std::shared_ptr<const OzzSkeletonMirror> PrepareSkeleton(const xr_vector<OzzBoneDesc>& bones)
 {
     if (!catalog.preparing)
         throw std::runtime_error("skeleton importer outside startup");
     Writer identity;
-    identity.put(CacheVersion);
     identity.put(u32(bones.size()));
     for (const auto& bone : bones)
     {
@@ -637,104 +722,98 @@ xr_string PrepareSkeleton(const xr_vector<OzzBoneDesc>& bones, std::shared_ptr<c
         identity.put(bone.parent);
         identity.append(&bone.bind_local, sizeof(bone.bind_local));
     }
-    const auto key = ContentKey(identity.bytes.data(), identity.bytes.size());
-    try { mirror = LoadSkeleton(key); }
-    catch (const std::exception&)
+    const auto key = HashBytes(identity.bytes.data(), identity.bytes.size());
+    auto& known = catalog.skeletons[key];
+    auto mirror = known.lock();
+    if (!mirror)
     {
         mirror = BuildOzzSkeletonMirror(ozz::make_span(bones));
-        Writer writer;
-        writer.put(mirror->fingerprint);
-        writer.put(u32(mirror->boneToJoint.size()));
-        for (u16 joint : mirror->boneToJoint)
-            writer.put(joint);
-        WriteArchive(writer, mirror->skeleton);
-        WriteCache(key, 1, writer.bytes);
-        mirror = LoadSkeleton(key);
+        known = mirror;
     }
-    catalog.skeletons.emplace(key, mirror);
-    return key;
+    return mirror;
 }
 
-xr_string PrepareLibrary(pcstr source, const void* data, size_t size,
-    const xr_string& skeletonKey, const OzzSkeletonMirror& mirror, CPartition& partition)
+xr_string PrepareLibrary(pcstr source, const void* data, size_t size)
 try
 {
     if (!catalog.preparing)
         throw std::runtime_error("motion importer outside startup");
-    const xr_string sourceIdentity = CanonicalPath(source) + "|" + skeletonKey;
-    const auto prepared = catalog.sources.find(sourceIdentity);
-    if (prepared != catalog.sources.end())
+    const auto path = OutputPath(source);
+    const auto key = CanonicalPath(path.c_str());
+    const auto prepared = catalog.libraries.find(key);
+    if (prepared != catalog.libraries.end())
+        return prepared->second.path;
+    SourceStamp stamp;
+    xr_string original(source);
+    bool hasSource;
+    if (data)
     {
-        partition = catalog.libraries.at(prepared->second).partition;
-        return prepared->second;
+        if (!size || size > MaxLibraryBytes)
+            throw std::runtime_error("invalid embedded motion source size");
+        stamp.size = u32(size);
+        const auto digest = HashBytes(data, size);
+        std::memcpy(&stamp.crc, digest.data(), sizeof(stamp.crc));
+        std::memcpy(&stamp.nativeTime, digest.data() + sizeof(stamp.crc), sizeof(stamp.nativeTime));
+        hasSource = true;
     }
-    const auto close = [](IReader* reader) { FS.r_close(reader); };
-    std::unique_ptr<IReader, decltype(close)> reader(nullptr, close);
-    if (!data)
+    else
     {
-        reader.reset(FS.r_open(source));
-        if (!reader)
-            throw std::runtime_error("cannot open motion source");
-        data = reader->pointer();
-        size = reader->length();
+        original = path;
+        original.replace(original.size() - 4, 4, ".omf");
+        hasSource = ReadSourceStamp(original.c_str(), stamp);
     }
-    const xr_string identity = sourceIdentity + "|" + ContentKey(data, size);
-    const auto key = ContentKey(identity.data(), identity.size());
-    const auto known = catalog.libraries.find(key);
-    if (known != catalog.libraries.end())
-    {
-        partition = known->second.partition;
-        catalog.sources.emplace(sourceIdentity, key);
-        return key;
-    }
-    std::shared_ptr<const OzzMotionLibrary> library;
-    try { library = LoadLibrary(key, skeletonKey, mirror); }
+    LibraryFile file;
+    try { file = LoadLibrary(path.c_str(), hasSource ? &stamp : nullptr); }
     catch (const std::exception&)
     {
-        Msg("* [ozz] Converting motions: %s", source);
-        auto converted = ConvertLegacyOmf(static_cast<const std::byte*>(data), size, source, mirror);
-        Writer writer;
-        writer.string(skeletonKey.c_str());
-        WriteMetadata(writer, converted.metadata);
-        for (const auto& animation : converted.animations)
-            WriteArchive(writer, *animation);
-        WriteCache(key, 2, writer.bytes);
-        converted.animations.clear();
-        library = LoadLibrary(key, skeletonKey, mirror);
+        if (!hasSource)
+            throw;
+        const auto close = [](IReader* reader) { FS.r_close(reader); };
+        std::unique_ptr<IReader, decltype(close)> reader(nullptr, close);
+        if (!data)
+        {
+            reader.reset(FS.r_open(original.c_str()));
+            if (!reader)
+                throw std::runtime_error("cannot open startup motion source");
+            data = reader->pointer();
+            size = reader->length();
+        }
+        Msg("* [ozz] Converting motions: %s -> %s", source, path.c_str());
+        {
+            const auto converted = ConvertLegacyOmf(static_cast<const std::byte*>(data), size, path.c_str());
+            WriteLibrary(path.c_str(), stamp, converted);
+        }
+        file = LoadLibrary(path.c_str(), &stamp);
     }
-    partition = library->metadata.partition;
-    catalog.libraries.emplace(key, LibraryEntry{partition, {}});
-    catalog.sources.emplace(sourceIdentity, key);
-    return key;
+    catalog.libraries.emplace(key,
+        LibraryEntry{path, file.library->boneNames, file.library->metadata.partition, file.checksum, file.library});
+    return path;
 }
 catch (const std::exception& error)
 {
     throw std::runtime_error(std::string(source) + ": " + error.what());
 }
 
+CPartition LibraryPartition(const xr_string& path, const OzzSkeletonMirror& skeleton)
+{
+    if (!catalog.preparing)
+        throw std::runtime_error("partition preparation outside startup");
+    const auto& library = catalog.libraries.at(CanonicalPath(path.c_str()));
+    auto partition = library.partition;
+    BindPartition(partition, TrackBones(library.boneNames, skeleton));
+    return partition;
+}
+
 void RegisterModel(const xr_string& source, const xr_string& levelRoot, PreparedModel model)
 {
     if (!catalog.preparing)
         throw std::runtime_error("model preparation outside startup");
-    Writer writer;
-    writer.string(model.skeleton.c_str());
-    WritePartition(writer, model.partition);
-    writer.put(u32(model.libraries.size()));
-    for (const auto& key : model.libraries)
-        writer.string(key.c_str());
-    const auto key = ContentKey(writer.bytes.data(), writer.bytes.size());
-    if (catalog.validatedModels.insert(key).second)
-    {
-        try
-        {
-            if (ReadCache(key, 3) != writer.bytes)
-                throw std::runtime_error("model cache identity mismatch");
-        }
-        catch (const std::exception&) { WriteCache(key, 3, writer.bytes); }
-        LoadModel(key);
-    }
+    if (!model.skeleton || model.libraries.empty() || model.libraries.size() > MAX_ANIM_SLOT)
+        throw std::runtime_error("invalid prepared model");
+    for (const auto& path : model.libraries)
+        TrackBones(catalog.libraries.at(CanonicalPath(path.c_str())).boneNames, *model.skeleton);
     if (!catalog.models.emplace(ModelIdentity(CanonicalPath(source.c_str()), CanonicalPath(levelRoot.c_str())),
-        ModelEntry{key, {}}).second)
+        ModelEntry{std::move(model), {}}).second)
         throw std::runtime_error("duplicate prepared model identity: " + std::string(source.c_str()));
 }
 }
@@ -752,10 +831,6 @@ void PrepareOzzAnimationInventory()
         Startup::BuildInventory();
         for (auto& entry : catalog.libraries)
             entry.second.partition = CPartition{};
-        catalog.validatedModels.clear();
-        catalog.validatedModels.rehash(0);
-        catalog.sources.clear();
-        catalog.sources.rehash(0);
         catalog.preparing = false;
         catalog.ready = true;
         Msg("* [ozz] Prepared %zu model contexts, %zu skeletons, %zu motion libraries",
@@ -808,7 +883,7 @@ std::shared_ptr<const OzzModelAnimations> LoadOzzModelAnimations(pcstr modelName
             auto model = found->second.resident.lock();
             if (!model)
             {
-                model = LoadModel(found->second.key);
+                model = LoadModel(found->second.prepared);
                 found->second.resident = model;
             }
             return model;
