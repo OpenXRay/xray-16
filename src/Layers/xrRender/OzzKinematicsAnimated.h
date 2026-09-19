@@ -1,5 +1,6 @@
 #pragma once
 
+#include <thread>
 #include <memory>
 
 #include "SkeletonAnimated.h"
@@ -33,13 +34,21 @@ private:
         float time{ -1.f };
         MotionID motion;
         ozz::animation::SamplingJob::Context ctx;
-        ozz::vector<ozz::math::SoaTransform> locals;
+        xr_vector<CKey> keys;
     };
+
+    void ValidateLibrary(const char* N, const shared_str& key, size_t slot);
 
     const BlendSample& EnsureSampled(CBlend& B);
 
-    xr_vector<OzzMotionLibrary*> libraries;
     xr_vector<BlendSample> samples;
+    ozz::vector<ozz::math::SoaTransform> locals;
+    svector<u16, MAX_BLENDED_POOL> live;
+#ifdef DEBUG
+    std::thread::id sampleOwner;
+#endif
+    u32 sampleFrame{ u32(-1) };
+    xr_vector<OzzMotionLibrary*> libraries;
 };
 }
 }

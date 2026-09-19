@@ -65,7 +65,10 @@ void OzzKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
 
     libraries.assign(m_Motions.size(), nullptr);
     if (!mirror)
+    {
+        xrDebug::Fatal(DEBUG_INFO, "[ozz] can't build skeleton mirror for model '%s'", N);
         return;
+    }
 
     string_path embedded;
     strconcat(sizeof(embedded), embedded, N, ".ogf");
@@ -76,24 +79,48 @@ void OzzKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         if (0 == xr_strcmp(key.c_str(), embedded))
         {
             libraries[k] = g_pOzzMotionLibraries->dock(key, data, *mirror);
-            continue;
+        }
+        else
+        {
+            string_path fn;
+            if (!FS.exist(fn, "$level$", key.c_str()) && !FS.exist(fn, "$game_meshes$", key.c_str()))
+                xrDebug::Fatal(DEBUG_INFO, "[ozz] can't find motion file '%s' for model '%s'", key.c_str(), N);
+
+            IReader* MS = FS.r_open(fn);
+            if (!MS)
+                xrDebug::Fatal(DEBUG_INFO, "[ozz] can't open motion file '%s' for model '%s'", fn, N);
+
+            libraries[k] = g_pOzzMotionLibraries->dock(key, MS, *mirror);
+            FS.r_close(MS);
         }
 
-        string_path fn;
-        if (!FS.exist(fn, "$level$", key.c_str()) && !FS.exist(fn, "$game_meshes$", key.c_str()))
-        {
-            Msg("! [ozz] can't find motion file [%s] for model [%s]", key.c_str(), N);
-            continue;
-        }
+        if (!libraries[k])
+            xrDebug::Fatal(DEBUG_INFO, "[ozz] can't bake motion library '%s' for model '%s'", key.c_str(), N);
 
-        IReader* MS = FS.r_open(fn);
-        if (!MS)
-        {
-            Msg("! [ozz] can't open motion file [%s] for model [%s]", fn, N);
-            continue;
-        }
-        libraries[k] = g_pOzzMotionLibraries->dock(key, MS, *mirror);
-        FS.r_close(MS);
+        ValidateLibrary(N, key, k);
+    }
+}
+
+void OzzKinematicsAnimated::ValidateLibrary(const char* N, const shared_str& key, size_t slot)
+{
+    const OzzMotionLibrary& library = *libraries[slot];
+    const MotionVec* motions = m_Motions[slot].motions.bone_motions(LL_GetData(u16(0)).name);
+    const size_t expected = motions ? motions->size() : 0;
+
+    if (expected != library.animations.size())
+        xrDebug::Fatal(DEBUG_INFO, "[ozz] motion count mismatch in '%s' for model '%s': %u legacy, %u baked",
+            key.c_str(), N, u32(expected), u32(library.animations.size()));
+
+    const int joints = mirror->skeleton.num_joints();
+    for (size_t i = 0; i < library.animations.size(); ++i)
+    {
+        const ozz::animation::Animation* animation = library.animations[i].get();
+        if (!animation)
+            xrDebug::Fatal(
+                DEBUG_INFO, "[ozz] missing baked motion %u in '%s' for model '%s'", u32(i), key.c_str(), N);
+        if (animation->num_tracks() != joints)
+            xrDebug::Fatal(DEBUG_INFO, "[ozz] motion %u in '%s' has %d tracks, model '%s' has %d joints", u32(i),
+                key.c_str(), animation->num_tracks(), N, joints);
     }
 }
 
@@ -111,21 +138,48 @@ void OzzKinematicsAnimated::Copy(xray::render::fg::dxRender_Visual* P)
 
 const OzzKinematicsAnimated::BlendSample& OzzKinematicsAnimated::EnsureSampled(CBlend& B)
 {
-    BlendSample& S = samples[size_t(&B - blend_pool.begin())];
+#ifdef DEBUG
+    const std::thread::id caller = std::this_thread::get_id();
+    if (sampleOwner == std::thread::id())
+        sampleOwner = caller;
+    VERIFY2(sampleOwner == caller, "[ozz] sampling contexts touched from two threads");
+#endif
+
+    if (sampleFrame != Device.dwFrame)
+    {
+        live.clear();
+        sampleFrame = Device.dwFrame;
+    }
+
+    const size_t slot = size_t(&B - blend_pool.begin());
+    BlendSample& S = samples[slot];
 
     if (S.frame == Device.dwFrame && S.time == B.timeCurrent && S.motion == B.motionID)
         return S;
 
-    const ozz::animation::Animation* animation = libraries[B.motionID.slot]->animations[B.motionID.idx].get();
+    for (u16 other : live)
+    {
+        const BlendSample& O = samples[other];
+        if (O.motion == B.motionID && O.time == B.timeCurrent)
+            return O;
+    }
 
+    const ozz::animation::Animation* animation = libraries[B.motionID.slot]->animations[B.motionID.idx].get();
+    const int joints = mirror->skeleton.num_joints();
+
+    if (S.ctx.max_tracks() < joints)
+        S.ctx.Resize(joints);
     if (S.motion != B.motionID)
     {
         S.ctx.Invalidate();
-        S.ctx.Resize(mirror->skeleton.num_joints());
         S.motion = B.motionID;
     }
-    if (S.locals.size() != size_t(mirror->skeleton.num_soa_joints()))
-        S.locals.resize(size_t(mirror->skeleton.num_soa_joints()));
+
+    const size_t soa = size_t(mirror->skeleton.num_soa_joints());
+    if (locals.size() != soa)
+        locals.resize(soa);
+    if (S.keys.size() != size_t(joints))
+        S.keys.resize(size_t(joints));
 
     const float duration = animation->duration();
     float ratio = duration > 0.f ? B.timeCurrent / duration : 0.f;
@@ -135,19 +189,22 @@ const OzzKinematicsAnimated::BlendSample& OzzKinematicsAnimated::EnsureSampled(C
     job.animation = animation;
     job.context = &S.ctx;
     job.ratio = ratio;
-    job.output = ozz::make_span(S.locals);
-    job.Run();
+    job.output = ozz::make_span(locals);
+    R_ASSERT2(job.Run(), "[ozz] motion sampling failed");
+
+    for (u16 j = 0; j < u16(joints); ++j)
+        ExtractKey(locals, j, S.keys[j]);
 
     S.frame = Device.dwFrame;
     S.time = B.timeCurrent;
+    live.push_back(u16(slot));
     return S;
 }
 
 void OzzKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 channel_mask, SKeyTable& keys)
 {
     const u16 SelfID = bd->GetSelfID();
-    if (!mirror)
-        return;
+    VERIFY(mirror);
 
     const u16 joint = mirror->boneToJoint[SelfID];
     if (BI_NONE == joint)
@@ -162,15 +219,13 @@ void OzzKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 c
         if (!(channel_mask & (1 << B->channel)))
             continue;
 
-        OzzMotionLibrary* library = B->motionID.slot < libraries.size() ? libraries[B->motionID.slot] : nullptr;
-        if (!library || B->motionID.idx >= library->animations.size() || !library->animations[B->motionID.idx])
-            continue;
+        OzzMotionLibrary* library = libraries[B->motionID.slot];
+        VERIFY(library && B->motionID.idx < library->animations.size() && library->animations[B->motionID.idx]);
 
         const u8 channel = B->channel;
         int& b_count = keys.chanel_blend_conts[channel];
         keys.blends[channel][b_count] = B;
-
-        ExtractKey(EnsureSampled(*B).locals, joint, keys.keys[channel][b_count]);
+        keys.keys[channel][b_count] = EnsureSampled(*B).keys[joint];
 
         if (channels.rule(channel).extern_ == xray::render::fg::animation::add)
             ExtractKey(FirstFrame(*library, B->motionID.idx), joint, BK[channel][b_count]);
