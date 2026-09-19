@@ -102,6 +102,8 @@ bool OzzModelData::Load(const OzzxBundle& bundle)
     if (!BuildBoneMetadata())
         return false;
 
+    BuildBindTransforms();
+
     ApplyExtendedBoneMetadata(bundle.bone_metadata);
     LoadUserData(bundle.user_data);
 
@@ -232,6 +234,20 @@ bool OzzModelData::BuildBoneMetadata()
         bones[defaultRoot]->CalculateM2B(Fidentity);
 
     return true;
+}
+
+void OzzModelData::BuildBindTransforms()
+{
+    const ozz::span<const int16_t> parents = skeleton.joint_parents();
+    const size_t count = bones.size();
+
+    bindModel.resize(count);
+    for (size_t idx = 0; idx < count; ++idx)
+    {
+        const int16_t parent_index = (idx < parents.size()) ? parents[idx] : static_cast<int16_t>(-1);
+        const Fmatrix& parent_matrix = (parent_index >= 0 && static_cast<size_t>(parent_index) < idx) ? bindModel[parent_index] : Fidentity;
+        bindModel[idx].mul_43(parent_matrix, bones[idx]->bind_transform);
+    }
 }
 
 void OzzModelData::ApplyExtendedBoneMetadata(const ExtendedBoneMetadataCollection& metadata)
