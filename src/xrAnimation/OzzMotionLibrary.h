@@ -26,6 +26,8 @@ struct OzzMotionLibrary
 
 const ozz::vector<ozz::math::SoaTransform>& FirstFrame(OzzMotionLibrary& library, u16 idx);
 
+bool PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror);
+
 class OzzMotionLibraryContainer
 {
     using LibraryMap = xr_map<shared_str, OzzMotionLibrary*>;

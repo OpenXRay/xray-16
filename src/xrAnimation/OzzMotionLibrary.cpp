@@ -14,9 +14,13 @@
 #include <ozz/base/maths/simd_math.h>
 #include <ozz/base/span.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <exception>
-#include <optional>
+#include <filesystem>
+#include <fstream>
+#include <string>
+#include <system_error>
 #include <utility>
 
 namespace XRay
@@ -29,6 +33,16 @@ using AnimationVec = xr_vector<ozz::unique_ptr<ozz::animation::Animation>>;
 
 constexpr u32 kCacheMagic = u32('O') | (u32('Z') << 8) | (u32('Z') << 16) | (u32('M') << 24);
 constexpr u32 kCacheVersion = 1u;
+constexpr size_t kCacheHeaderFields = 6;
+constexpr size_t kCacheHeaderSize = kCacheHeaderFields * sizeof(u32);
+
+struct CacheTarget
+{
+    std::filesystem::path path;
+    u32 fingerprint{ 0u };
+    u32 omf_size{ 0u };
+    u32 omf_modif{ 0u };
+};
 
 shared_str MakeLibraryKey(const shared_str& omf_key, u32 fingerprint)
 {
@@ -40,118 +54,155 @@ shared_str MakeLibraryKey(const shared_str& omf_key, u32 fingerprint)
     return shared_str(composed.c_str());
 }
 
-bool ResolveOmfPath(const shared_str& omf_key, string_path& fn)
+std::filesystem::path NativePath(pcstr path)
 {
-    if (FS.exist(fn, "$level$", omf_key.c_str()))
-        return true;
-    if (FS.exist(fn, "$game_meshes$", omf_key.c_str()))
-        return true;
-    return false;
+    std::string value(path ? path : "");
+    const char preferred = char(std::filesystem::path::preferred_separator);
+    if (preferred != '\\')
+        std::replace(value.begin(), value.end(), '\\', preferred);
+    return std::filesystem::path(value);
 }
 
-void MakeCachePath(pcstr omf_fn, u32 fingerprint, string_path& out)
+bool ResolveCacheTarget(const shared_str& omf_key, u32 fingerprint, CacheTarget& target)
 {
-    xr_strcpy(out, sizeof(string_path), omf_fn);
-    if (pstr ext = strext(out))
+    string_path omf_fn;
+    if (!FS.exist(omf_fn, "$level$", omf_key.c_str()) && !FS.exist(omf_fn, "$game_meshes$", omf_key.c_str()))
+        return false;
+
+    const auto* desc = FS.GetFileDesc(omf_fn);
+    if (!desc)
+        return false;
+
+    string_path cache_fn;
+    xr_strcpy(cache_fn, sizeof(cache_fn), omf_fn);
+    if (pstr ext = strext(cache_fn))
         *ext = 0;
 
     string64 suffix;
     xr_sprintf(suffix, sizeof(suffix), ".%08x.ozz", fingerprint);
-    xr_strcat(out, sizeof(string_path), suffix);
+    xr_strcat(cache_fn, sizeof(cache_fn), suffix);
+
+    target.path = NativePath(cache_fn);
+    target.fingerprint = fingerprint;
+    target.omf_size = desc->size_real;
+    target.omf_modif = desc->modif;
+    return true;
 }
 
-bool LoadCache(pcstr path, u32 fingerprint, u32 omf_size, u32 omf_modif, AnimationVec& out)
+bool ReadCacheHeader(std::ifstream& stream, const CacheTarget& target, u32& count)
 {
-    if (!FS.exist(path, FSType::Any))
+    u32 header[kCacheHeaderFields];
+    stream.read(reinterpret_cast<char*>(header), std::streamsize(sizeof(header)));
+    if (stream.gcount() != std::streamsize(sizeof(header)))
         return false;
 
-    IReader* R = FS.r_open(path);
-    if (!R)
+    if (header[0] != kCacheMagic || header[1] != kCacheVersion || header[2] != target.fingerprint ||
+        header[3] != target.omf_size || header[4] != target.omf_modif)
         return false;
 
-    bool ok = false;
-    if (R->length() >= 6 * sizeof(u32))
+    count = header[5];
+    return true;
+}
+
+bool CacheUpToDate(const CacheTarget& target)
+{
+    std::ifstream stream(target.path, std::ios::binary);
+    if (!stream)
+        return false;
+
+    u32 count = 0;
+    return ReadCacheHeader(stream, target, count);
+}
+
+bool LoadCache(const CacheTarget& target, AnimationVec& out)
+{
+    std::ifstream stream(target.path, std::ios::binary | std::ios::ate);
+    if (!stream)
+        return false;
+
+    const std::streamoff total = stream.tellg();
+    if (total < std::streamoff(kCacheHeaderSize))
+        return false;
+
+    stream.seekg(0, std::ios::beg);
+
+    u32 count = 0;
+    if (!ReadCacheHeader(stream, target, count))
+        return false;
+
+    const size_t bytes = size_t(total) - kCacheHeaderSize;
+    xr_vector<u8> blob(bytes);
+    if (bytes != 0)
     {
-        const u32 magic = R->r_u32();
-        const u32 version = R->r_u32();
-        const u32 fp = R->r_u32();
-        const u32 size_real = R->r_u32();
-        const u32 modif = R->r_u32();
-        const u32 count = R->r_u32();
-
-        if (magic == kCacheMagic && version == kCacheVersion && fp == fingerprint && size_real == omf_size &&
-            modif == omf_modif)
-        {
-            const size_t bytes = R->length() - R->tell();
-            ozz::io::MemoryStream stream;
-            if (bytes == 0 || stream.Write(R->pointer(), bytes) == bytes)
-            {
-                stream.Seek(0, ozz::io::Stream::kSet);
-                ozz::io::IArchive archive(&stream);
-
-                out.clear();
-                out.reserve(count);
-                ok = true;
-                for (u32 i = 0; i < count; ++i)
-                {
-                    if (!archive.TestTag<ozz::animation::Animation>())
-                    {
-                        ok = false;
-                        break;
-                    }
-                    out.emplace_back(ozz::make_unique<ozz::animation::Animation>());
-                    archive >> *out.back();
-                }
-                if (!ok)
-                    out.clear();
-            }
-        }
+        stream.read(reinterpret_cast<char*>(blob.data()), std::streamsize(bytes));
+        if (stream.gcount() != std::streamsize(bytes))
+            return false;
     }
 
-    FS.r_close(R);
-    return ok;
+    ozz::io::MemoryStream memory;
+    if (bytes != 0 && memory.Write(blob.data(), bytes) != bytes)
+        return false;
+
+    memory.Seek(0, ozz::io::Stream::kSet);
+    ozz::io::IArchive archive(&memory);
+
+    out.clear();
+    out.reserve(count);
+    for (u32 i = 0; i < count; ++i)
+    {
+        if (!archive.TestTag<ozz::animation::Animation>())
+        {
+            out.clear();
+            return false;
+        }
+        out.emplace_back(ozz::make_unique<ozz::animation::Animation>());
+        archive >> *out.back();
+    }
+    return true;
 }
 
-void SaveCache(pcstr path, u32 fingerprint, u32 omf_size, u32 omf_modif, const AnimationVec& animations)
+void SaveCache(const CacheTarget& target, const AnimationVec& animations)
 {
-    ozz::io::MemoryStream stream;
+    ozz::io::MemoryStream memory;
     {
-        ozz::io::OArchive archive(&stream);
+        ozz::io::OArchive archive(&memory);
         for (const auto& animation : animations)
             archive << *animation;
     }
 
-    const size_t bytes = stream.Size();
+    const size_t bytes = size_t(memory.Size());
     xr_vector<u8> blob(bytes);
-    stream.Seek(0, ozz::io::Stream::kSet);
-    if (bytes != 0 && stream.Read(blob.data(), bytes) != bytes)
+    memory.Seek(0, ozz::io::Stream::kSet);
+    if (bytes != 0 && memory.Read(blob.data(), bytes) != bytes)
         return;
 
-    string_path tmp;
-    xr_strcpy(tmp, sizeof(tmp), path);
-    xr_strcat(tmp, sizeof(tmp), ".tmp");
+    std::filesystem::path tmp = target.path;
+    tmp += ".tmp";
 
-    IWriter* W = FS.w_open(tmp);
-    if (!W)
-        return;
-
-    if (!W->valid())
     {
-        FS.w_close(W);
-        return;
+        std::ofstream stream(tmp, std::ios::binary | std::ios::trunc);
+        if (!stream)
+            return;
+
+        const u32 header[kCacheHeaderFields] = { kCacheMagic, kCacheVersion, target.fingerprint, target.omf_size,
+            target.omf_modif, u32(animations.size()) };
+        stream.write(reinterpret_cast<const char*>(header), std::streamsize(sizeof(header)));
+        if (bytes != 0)
+            stream.write(reinterpret_cast<const char*>(blob.data()), std::streamsize(bytes));
+
+        if (!stream)
+        {
+            stream.close();
+            std::error_code ec;
+            std::filesystem::remove(tmp, ec);
+            return;
+        }
     }
 
-    W->w_u32(kCacheMagic);
-    W->w_u32(kCacheVersion);
-    W->w_u32(fingerprint);
-    W->w_u32(omf_size);
-    W->w_u32(omf_modif);
-    W->w_u32(u32(animations.size()));
-    if (bytes != 0)
-        W->w(blob.data(), bytes);
-    FS.w_close(W);
-
-    FS.file_rename(tmp, path, true);
+    std::error_code ec;
+    std::filesystem::rename(tmp, target.path, ec);
+    if (ec)
+        std::filesystem::remove(tmp, ec);
 }
 
 bool BakeLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror, AnimationVec& out)
@@ -168,8 +219,8 @@ bool BakeLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirro
     xr_vector<ConvertedOmfAnimation> converted;
     try
     {
-        if (!ConvertLegacyOmf(static_cast<const std::byte*>(omf->begin()), omf->length(), names, mirror.skeleton,
-                converted, std::nullopt, false))
+        if (!ConvertLegacyOmf(
+                static_cast<const std::byte*>(omf->begin()), omf->length(), names, mirror.skeleton, converted))
             return false;
     }
     catch (const std::exception& error)
@@ -194,6 +245,23 @@ bool BakeLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirro
 }
 
 OzzMotionLibraryContainer* g_pOzzMotionLibraries = nullptr;
+
+bool PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror)
+{
+    CacheTarget target;
+    if (!ResolveCacheTarget(omf_key, mirror.fingerprint, target))
+        return false;
+
+    if (CacheUpToDate(target))
+        return true;
+
+    AnimationVec animations;
+    if (!BakeLibrary(omf_key, omf, mirror, animations))
+        return false;
+
+    SaveCache(target, animations);
+    return true;
+}
 
 const ozz::vector<ozz::math::SoaTransform>& FirstFrame(OzzMotionLibrary& library, u16 idx)
 {
@@ -228,34 +296,17 @@ OzzMotionLibrary* OzzMotionLibraryContainer::dock(
         return it->second;
     }
 
-    string_path omf_fn;
-    const bool resolved = ResolveOmfPath(omf_key, omf_fn);
-
-    u32 omf_size = omf ? u32(omf->length()) : 0u;
-    u32 omf_modif = 0u;
-    if (resolved)
-    {
-        if (const auto* desc = FS.GetFileDesc(omf_fn))
-        {
-            omf_size = desc->size_real;
-            omf_modif = desc->modif;
-        }
-    }
-
-    string_path cache_fn;
-    if (resolved)
-        MakeCachePath(omf_fn, mirror.fingerprint, cache_fn);
-
     AnimationVec animations;
-    if (!resolved || !LoadCache(cache_fn, mirror.fingerprint, omf_size, omf_modif, animations))
+    bool ready = false;
+
+    CacheTarget target;
+    if (ResolveCacheTarget(omf_key, mirror.fingerprint, target) && PrebakeMotionLibrary(omf_key, omf, mirror))
+        ready = LoadCache(target, animations);
+
+    if (!ready && !BakeLibrary(omf_key, omf, mirror, animations))
     {
-        if (!BakeLibrary(omf_key, omf, mirror, animations))
-        {
-            Msg("! [ozz] can't bake motion library [%s]", omf_key.c_str());
-            return nullptr;
-        }
-        if (resolved)
-            SaveCache(cache_fn, mirror.fingerprint, omf_size, omf_modif, animations);
+        Msg("! [ozz] can't bake motion library [%s]", omf_key.c_str());
+        return nullptr;
     }
 
     OzzMotionLibrary* library = xr_new<OzzMotionLibrary>();

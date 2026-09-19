@@ -10,12 +10,8 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrAnimation
-    NAME "Bundle"
+    NAME "Runtime"
     FILES
-    ExtendedBoneMetadata.h
-    OzzBundle.h
-    OzzBundle.cpp
-    OzzConversion.h
     OzzMotionLibrary.h
     OzzMotionLibrary.cpp
     OzzSkeletonMirror.h
@@ -24,31 +20,21 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrAnimation
-    NAME "Converters"
+    NAME "Legacy"
     FILES
     LegacyChunkIO.h
-    LegacyMotionSerialization.h
-    LegacyOgfConverter.h
-    LegacyOgfConverter.cpp
+    LegacyOgfSkeleton.h
+    LegacyOgfSkeleton.cpp
     LegacyOmfConverter.h
     LegacyOmfConverter.cpp
     StartupConversionInventory.h
     StartupConversionInventory.cpp
 )
 
-target_sources(xrAnimation PRIVATE
-    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples/framework/mesh.cc"
-)
-set_source_files_properties(
-    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples/framework/mesh.cc"
-    PROPERTIES SKIP_PRECOMPILE_HEADERS ON
-)
-
 target_include_directories(xrAnimation
     PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/.."
-    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples"
 )
 
 target_link_libraries(xrAnimation

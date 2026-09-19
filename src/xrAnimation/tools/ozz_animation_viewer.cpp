@@ -7,10 +7,10 @@
 
 #include "../../../Externals/imgui/imgui.h"
 #include "../../../Externals/imgui/imgui_internal.h"
-#include "../../../Externals/ozz-animation/samples/framework/mesh.h"
+#include "framework/mesh.h"
 
-#include "../ExtendedBoneMetadata.h"
-#include "../OzzBundle.h"
+#include "ExtendedBoneMetadata.h"
+#include "OzzBundle.h"
 
 #include "ozz/animation/runtime/animation.h"
 #include "ozz/animation/runtime/local_to_model_job.h"

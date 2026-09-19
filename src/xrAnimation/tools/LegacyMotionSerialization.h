@@ -1,13 +1,13 @@
 #pragma once
 
-#include "LegacyOmfConverter.h"
+#include "LegacyOmfConverterFull.h"
 
 #include <ozz/base/io/archive.h>
 
 #include <cstdint>
 #include <string>
 
-namespace XRay::Animation {
+namespace XRay::Animation::Tools {
 
 inline void SerializeString(ozz::io::OArchive& archive, const std::string& value)
 {

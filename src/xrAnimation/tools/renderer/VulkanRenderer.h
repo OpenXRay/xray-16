@@ -7,7 +7,7 @@
 #include "InstancedMeshRenderer.h"
 #include "DebugRenderer.h"
 
-#include "../../ExtendedBoneMetadata.h"
+#include "../ExtendedBoneMetadata.h"
 #include "../ozz_animation_viewer/IDebugDrawContext.h"
 
 #include <ozz/animation/runtime/animation.h>
