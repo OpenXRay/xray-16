@@ -11,6 +11,8 @@ namespace PS
 struct SEmitter;
 };
 
+extern bool g_legacy_animation;
+
 // defs
 class ECORE_API CModelPool
 {
