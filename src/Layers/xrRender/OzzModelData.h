@@ -27,6 +27,7 @@ struct OzzModelData
 
     xr_vector<xr_unique_ptr<CBoneData>> boneStorage;
     xr_vector<CBoneData*> bones;
+    xr_vector<Fmatrix> bindModel;
 
     accel boneMapByName;
     accel boneMapByPtr;
@@ -51,6 +52,7 @@ struct OzzModelData
 private:
     bool LoadSkeleton(const std::vector<std::uint8_t>& payload);
     bool BuildBoneMetadata();
+    void BuildBindTransforms();
     void ApplyExtendedBoneMetadata(const ExtendedBoneMetadataCollection& metadata);
     void LoadUserData(const std::vector<std::uint8_t>& buffer);
     void BuildDefaultPartition();

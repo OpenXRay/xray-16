@@ -182,18 +182,19 @@ protected:
     bool poseValid;
 
     xr_vector<CBoneInstance> boneInstances;
-    xr_vector<Fobb> boneBoxes;
 
     xr_vector<ozz::math::Float4x4> modelTransforms;
     xr_vector<Fmatrix> subtreeDelta;
     xr_vector<u8> subtreeDirty;
+    xr_vector<Fmatrix> boneCalcScratch;
+    xr_vector<u16> boneChainScratch;
 
     xr_vector<KinematicsABT::additional_bone_transform> boneOffsets;
 
     u16 rootBone;
     OzzBoneVisibility boneVisibility;
     u32 lastUpdateTime;
-    Fbox cachedBox;
+    s32 UCalc_Visibox;
 
     UpdateCallback updateCallback;
     void* updateCallbackParam;

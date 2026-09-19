@@ -20,12 +20,17 @@
 #include <algorithm>
 #include <memory>
 
+namespace xray::render::fg
+{
+extern int psSkeletonUpdate;
+}
+
 namespace XRay::Animation
 {
 OzzKinematics::OzzKinematics()
-    : poseValid(false), rootBone(BI_NONE), lastUpdateTime(0), updateCallback(nullptr), updateCallbackParam(nullptr)
+    : poseValid(false), rootBone(BI_NONE), lastUpdateTime(0), UCalc_Visibox(xray::render::fg::psSkeletonUpdate), updateCallback(nullptr),
+      updateCallbackParam(nullptr)
 {
-    cachedBox.invalidate();
 }
 
 OzzKinematics::~OzzKinematics()
@@ -71,10 +76,6 @@ void OzzKinematics::IBoneInstances_Create()
     for (CBoneInstance& instance : boneInstances)
         instance.construct();
 
-    boneBoxes.resize(count);
-    for (Fobb& box : boneBoxes)
-        box.invalidate();
-
     modelTransforms.resize(count);
     subtreeDelta.resize(count);
     subtreeDirty.assign(count, 0);
@@ -89,7 +90,7 @@ void OzzKinematics::IBoneInstances_Create()
     rootBone = model ? model->defaultRoot : BI_NONE;
     boneOffsets.clear();
     lastUpdateTime = 0;
-    cachedBox.invalidate();
+    UCalc_Visibox = xray::render::fg::psSkeletonUpdate;
 }
 
 bool OzzKinematics::LoadMeshFromBuffer(const std::vector<std::uint8_t>& meshData)
@@ -258,19 +259,133 @@ bool OzzKinematics::ApplyAdditionalBoneTransforms(u16 bone_id, Fmatrix& transfor
 
 void OzzKinematics::Bone_Calculate(CBoneData* bd, Fmatrix* parent)
 {
-    CalculateBones(TRUE);
+    if (!bd || !model || boneInstances.empty())
+        return;
+
+    const u16 self_id = bd->GetSelfID();
+    const size_t count = std::min(boneInstances.size(), modelTransforms.size());
+    if (self_id >= count)
+        return;
+
+    const ozz::span<const int16_t> parents = model->skeleton.joint_parents();
+
+    size_t end = static_cast<size_t>(self_id) + 1;
+    while (end < count && parents[end] >= static_cast<int16_t>(self_id))
+        ++end;
+
+    const size_t range = end - static_cast<size_t>(self_id);
+    boneCalcScratch.resize(range);
+    for (size_t k = 0; k < range; ++k)
+        boneCalcScratch[k] = ConvertOzzMatrixToXRay(modelTransforms[static_cast<size_t>(self_id) + k]);
+
+    for (size_t j = self_id; j < end; ++j)
+    {
+        CBoneInstance& bi = boneInstances[j];
+        if (!IsBoneVisible(static_cast<u16>(j)))
+            continue;
+
+        const int16_t parent_index = parents[j];
+        const Fmatrix& parent_matrix = (j == static_cast<size_t>(self_id))
+            ? (parent ? *parent : Fidentity)
+            : boneInstances[parent_index].mTransform;
+
+        const Fmatrix& anim = boneCalcScratch[j - static_cast<size_t>(self_id)];
+
+        Fmatrix local;
+        if (parent_index >= 0)
+        {
+            const Fmatrix parent_anim = (static_cast<size_t>(parent_index) >= static_cast<size_t>(self_id))
+                ? boneCalcScratch[static_cast<size_t>(parent_index) - static_cast<size_t>(self_id)]
+                : ConvertOzzMatrixToXRay(modelTransforms[parent_index]);
+            Fmatrix parent_inverse;
+            parent_inverse.invert(parent_anim);
+            local.mul_43(parent_inverse, anim);
+        }
+        else
+        {
+            local = anim;
+        }
+
+        if (bi.callback_overwrite())
+        {
+            if (bi.callback())
+                bi.callback()(&bi);
+        }
+        else
+        {
+            bi.mTransform.mul_43(parent_matrix, local);
+            ApplyAdditionalBoneTransforms(static_cast<u16>(j), bi.mTransform);
+            if (bi.callback())
+                bi.callback()(&bi);
+        }
+
+        bi.mRenderTransform.mul_43(bi.mTransform, model->bones[j]->m2b_transform);
+
+        Fmatrix anim_inverse;
+        anim_inverse.invert(anim);
+        subtreeDirty[j] = 1;
+        subtreeDelta[j].mul_43(bi.mTransform, anim_inverse);
+    }
 }
 
 void OzzKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks)
 {
-    if (!model || id >= LL_BoneCount())
+    const size_t count = std::min(boneInstances.size(), modelTransforms.size());
+    if (!model || id >= count)
     {
         pos.identity();
         return;
     }
 
-    CalculateBones(TRUE);
-    pos = boneInstances[id].mTransform;
+    const ozz::span<const int16_t> parents = model->skeleton.joint_parents();
+
+    boneChainScratch.clear();
+    for (int16_t node = static_cast<int16_t>(id);;)
+    {
+        boneChainScratch.push_back(static_cast<u16>(node));
+        if (static_cast<u16>(node) == rootBone || parents[node] < 0)
+            break;
+        node = parents[node];
+    }
+
+    Fmatrix parentTemp = Fidentity;
+    for (size_t k = boneChainScratch.size(); k > 0; --k)
+    {
+        const u16 b = boneChainScratch[k - 1];
+        CBoneInstance bi = boneInstances[b];
+
+        if (!ignore_callbacks && bi.callback_overwrite())
+        {
+            if (bi.callback())
+                bi.callback()(&bi);
+        }
+        else
+        {
+            const Fmatrix anim = ConvertOzzMatrixToXRay(modelTransforms[b]);
+            const int16_t parent_index = parents[b];
+
+            Fmatrix local;
+            if (parent_index >= 0)
+            {
+                Fmatrix parent_inverse;
+                parent_inverse.invert(ConvertOzzMatrixToXRay(modelTransforms[parent_index]));
+                local.mul_43(parent_inverse, anim);
+            }
+            else
+            {
+                local = anim;
+            }
+
+            bi.mTransform.mul_43(parentTemp, local);
+            ApplyAdditionalBoneTransforms(b, bi.mTransform);
+            if (!ignore_callbacks && bi.callback())
+                bi.callback()(&bi);
+        }
+
+        parentTemp = bi.mTransform;
+    }
+
+    pos = parentTemp;
 }
 
 bool OzzKinematics::PickBone(const Fmatrix& parent_xform, pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id)
@@ -383,53 +498,25 @@ Fmatrix& OzzKinematics::LL_GetTransform_R(u16 bone_id)
 
 Fobb& OzzKinematics::LL_GetBox(u16 bone_id)
 {
-    static Fobb stub;
-    if (bone_id < boneBoxes.size())
-        return boneBoxes[bone_id];
-    return stub;
+    R_ASSERT2(model && bone_id < model->bones.size() && model->bones[bone_id], "OzzKinematics::LL_GetBox: bone id out of range");
+    return model->bones[bone_id]->obb;
 }
 
 const Fbox& OzzKinematics::GetBox() const
 {
-    auto* self = const_cast<OzzKinematics*>(this);
-
-    if (!model || boneInstances.empty())
-    {
-        self->cachedBox.invalidate();
-        return cachedBox;
-    }
-
-    Fbox computed;
-    computed.invalidate();
-
-    for (size_t idx = 0; idx < boneInstances.size(); ++idx)
-    {
-        if (!IsBoneVisible(static_cast<u16>(idx)))
-            continue;
-
-        const Fmatrix& transform = boneInstances[idx].mTransform;
-        computed.modify(transform.c);
-    }
-
-    if (!computed.is_valid())
-        computed.set_zero();
-
-    self->cachedBox = computed;
-    return cachedBox;
+    return vis.box;
 }
 
 void OzzKinematics::LL_GetBindTransform(xr_vector<Fmatrix>& matrices)
 {
-    matrices.clear();
+    const u16 count = LL_BoneCount();
+    matrices.resize(count);
     if (!model)
         return;
 
-    matrices.reserve(model->bones.size());
-    for (CBoneData* bone : model->bones)
-    {
-        if (bone)
-            matrices.push_back(bone->bind_transform);
-    }
+    const size_t available = std::min(static_cast<size_t>(count), model->bindModel.size());
+    for (size_t idx = 0; idx < available; ++idx)
+        matrices[idx] = model->bindModel[idx];
 }
 
 int OzzKinematics::LL_GetBoneGroups(xr_vector<xr_vector<u16>>& groups)
@@ -514,7 +601,7 @@ void OzzKinematics::LL_ClearAdditionalTransform(u16 bone_id)
     CalculateBones_Invalidate();
 }
 
-void OzzKinematics::CalculateBones(BOOL)
+void OzzKinematics::CalculateBones(BOOL bForceExact)
 {
     if (!model || boneInstances.empty())
         return;
@@ -523,12 +610,15 @@ void OzzKinematics::CalculateBones(BOOL)
     if (skeleton.num_joints() == 0)
         return;
 
-    const u32 currentTime = Device.dwTimeGlobal;
-    if (currentTime == lastUpdateTime)
+    if (Device.dwTimeGlobal == lastUpdateTime)
         return;
 
     OnCalculateBones();
-    lastUpdateTime = currentTime;
+
+    if (!bForceExact && (Device.dwTimeGlobal < (lastUpdateTime + UCalc_Interval)))
+        return;
+
+    lastUpdateTime = Device.dwTimeGlobal;
 
     const size_t jointCount = static_cast<size_t>(skeleton.num_joints());
 
@@ -543,9 +633,6 @@ void OzzKinematics::CalculateBones(BOOL)
         return;
 
     const ozz::span<const int16_t> parents = skeleton.joint_parents();
-
-    Fbox box;
-    box.invalidate();
 
     for (size_t i = 0; i < jointCount; ++i)
     {
@@ -584,7 +671,6 @@ void OzzKinematics::CalculateBones(BOOL)
             }
 
             inst.mRenderTransform.mul_43(inst.mTransform, model->bones[i]->m2b_transform);
-            box.modify(inst.mTransform.c);
         }
 
         subtreeDirty[i] = (modified || inherited) ? 1 : 0;
@@ -600,7 +686,59 @@ void OzzKinematics::CalculateBones(BOOL)
         }
     }
 
-    cachedBox = box;
+    UCalc_Visibox++;
+    if (UCalc_Visibox >= xray::render::fg::psSkeletonUpdate)
+    {
+        UCalc_Visibox = -(::Random.randI(xray::render::fg::psSkeletonUpdate - 1));
+
+        Fbox Box;
+        Box.invalidate();
+        for (size_t b = 0; b < jointCount; ++b)
+        {
+            if (!IsBoneVisible(static_cast<u16>(b)))
+                continue;
+
+            Fobb& obb = model->bones[b]->obb;
+            Fmatrix& Mbone = boneInstances[b].mTransform;
+            Fmatrix Mbox;
+            obb.xform_get(Mbox);
+            Fmatrix X;
+            X.mul_43(Mbone, Mbox);
+            Fvector& S = obb.m_halfsize;
+
+            Fvector P, A;
+            A.set(-S.x, -S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, -S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, -S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, -S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+        }
+        if (jointCount)
+        {
+            vis.box.vMin = (Box.vMin);
+            vis.box.vMax = (Box.vMax);
+            vis.box.getsphere(vis.sphere.P, vis.sphere.R);
+        }
+    }
 
     if (updateCallback)
         updateCallback(this);
@@ -609,7 +747,7 @@ void OzzKinematics::CalculateBones(BOOL)
 void OzzKinematics::CalculateBones_Invalidate()
 {
     lastUpdateTime = 0;
-    cachedBox.invalidate();
+    UCalc_Visibox = xray::render::fg::psSkeletonUpdate;
 }
 
 #ifdef DEBUG
