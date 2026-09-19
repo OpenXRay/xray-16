@@ -32,9 +32,10 @@ namespace
 using AnimationVec = xr_vector<ozz::unique_ptr<ozz::animation::Animation>>;
 
 constexpr u32 kCacheMagic = u32('O') | (u32('Z') << 8) | (u32('Z') << 16) | (u32('M') << 24);
-constexpr u32 kCacheVersion = 1u;
+constexpr u32 kCacheVersion = 2u;
 constexpr size_t kCacheHeaderFields = 6;
 constexpr size_t kCacheHeaderSize = kCacheHeaderFields * sizeof(u32);
+constexpr u32 kMaxMotions = 0x3FFFu;
 
 struct CacheTarget
 {
@@ -101,21 +102,28 @@ bool ReadCacheHeader(std::ifstream& stream, const CacheTarget& target, u32& coun
         return false;
 
     count = header[5];
+    return count <= kMaxMotions;
+}
+
+bool ValidateAnimations(const AnimationVec& animations, const OzzSkeletonMirror& mirror)
+{
+    const int joints = mirror.skeleton.num_joints();
+    for (const auto& animation : animations)
+    {
+        if (!animation)
+            return false;
+        if (animation->num_tracks() != joints)
+            return false;
+        if (!(animation->duration() > 0.f))
+            return false;
+    }
     return true;
 }
 
-bool CacheUpToDate(const CacheTarget& target)
+bool LoadCache(const CacheTarget& target, const OzzSkeletonMirror& mirror, AnimationVec& out)
 {
-    std::ifstream stream(target.path, std::ios::binary);
-    if (!stream)
-        return false;
+    out.clear();
 
-    u32 count = 0;
-    return ReadCacheHeader(stream, target, count);
-}
-
-bool LoadCache(const CacheTarget& target, AnimationVec& out)
-{
     std::ifstream stream(target.path, std::ios::binary | std::ios::ate);
     if (!stream)
         return false;
@@ -131,6 +139,9 @@ bool LoadCache(const CacheTarget& target, AnimationVec& out)
         return false;
 
     const size_t bytes = size_t(total) - kCacheHeaderSize;
+    if (count != 0 && bytes == 0)
+        return false;
+
     xr_vector<u8> blob(bytes);
     if (bytes != 0)
     {
@@ -146,7 +157,6 @@ bool LoadCache(const CacheTarget& target, AnimationVec& out)
     memory.Seek(0, ozz::io::Stream::kSet);
     ozz::io::IArchive archive(&memory);
 
-    out.clear();
     out.reserve(count);
     for (u32 i = 0; i < count; ++i)
     {
@@ -158,10 +168,16 @@ bool LoadCache(const CacheTarget& target, AnimationVec& out)
         out.emplace_back(ozz::make_unique<ozz::animation::Animation>());
         archive >> *out.back();
     }
+
+    if (!ValidateAnimations(out, mirror))
+    {
+        out.clear();
+        return false;
+    }
     return true;
 }
 
-void SaveCache(const CacheTarget& target, const AnimationVec& animations)
+bool SaveCache(const CacheTarget& target, const AnimationVec& animations)
 {
     ozz::io::MemoryStream memory;
     {
@@ -174,7 +190,10 @@ void SaveCache(const CacheTarget& target, const AnimationVec& animations)
     xr_vector<u8> blob(bytes);
     memory.Seek(0, ozz::io::Stream::kSet);
     if (bytes != 0 && memory.Read(blob.data(), bytes) != bytes)
-        return;
+        return false;
+
+    std::error_code ec;
+    std::filesystem::create_directories(target.path.parent_path(), ec);
 
     std::filesystem::path tmp = target.path;
     tmp += ".tmp";
@@ -182,7 +201,7 @@ void SaveCache(const CacheTarget& target, const AnimationVec& animations)
     {
         std::ofstream stream(tmp, std::ios::binary | std::ios::trunc);
         if (!stream)
-            return;
+            return false;
 
         const u32 header[kCacheHeaderFields] = { kCacheMagic, kCacheVersion, target.fingerprint, target.omf_size,
             target.omf_modif, u32(animations.size()) };
@@ -190,19 +209,23 @@ void SaveCache(const CacheTarget& target, const AnimationVec& animations)
         if (bytes != 0)
             stream.write(reinterpret_cast<const char*>(blob.data()), std::streamsize(bytes));
 
+        stream.flush();
         if (!stream)
         {
             stream.close();
-            std::error_code ec;
             std::filesystem::remove(tmp, ec);
-            return;
+            return false;
         }
     }
 
-    std::error_code ec;
     std::filesystem::rename(tmp, target.path, ec);
     if (ec)
-        std::filesystem::remove(tmp, ec);
+    {
+        std::error_code remove_ec;
+        std::filesystem::remove(tmp, remove_ec);
+        return false;
+    }
+    return true;
 }
 
 bool BakeLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror, AnimationVec& out)
@@ -242,33 +265,62 @@ bool BakeLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirro
     }
     return true;
 }
+
+PrebakeResult AcquireAnimations(
+    const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror, AnimationVec& out)
+{
+    CacheTarget target;
+    const bool has_target = ResolveCacheTarget(omf_key, mirror.fingerprint, target);
+
+    if (has_target && LoadCache(target, mirror, out))
+        return PrebakeResult::CacheHit;
+
+    if (!BakeLibrary(omf_key, omf, mirror, out))
+        return PrebakeResult::Failed;
+
+    if (!ValidateAnimations(out, mirror))
+    {
+        Msg("! [ozz] baked motion library [%s] does not match its skeleton", omf_key.c_str());
+        out.clear();
+        return PrebakeResult::Failed;
+    }
+
+    if (!has_target)
+        return PrebakeResult::WriteFailed;
+
+    return SaveCache(target, out) ? PrebakeResult::Baked : PrebakeResult::WriteFailed;
+}
 }
 
 OzzMotionLibraryContainer* g_pOzzMotionLibraries = nullptr;
 
-bool PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror)
+PrebakeResult PrebakeMotionLibrary(const shared_str& omf_key, IReader* omf, const OzzSkeletonMirror& mirror)
 {
-    CacheTarget target;
-    if (!ResolveCacheTarget(omf_key, mirror.fingerprint, target))
-        return false;
-
-    if (CacheUpToDate(target))
-        return true;
-
     AnimationVec animations;
-    if (!BakeLibrary(omf_key, omf, mirror, animations))
-        return false;
-
-    SaveCache(target, animations);
-    return true;
+    return AcquireAnimations(omf_key, omf, mirror, animations);
 }
 
-const ozz::vector<ozz::math::SoaTransform>& FirstFrame(OzzMotionLibrary& library, u16 idx)
+bool MotionCachePresent(const shared_str& omf_key, u32 fingerprint)
 {
-    ozz::vector<ozz::math::SoaTransform>& frame = library.firstFrame[idx];
-    if (frame.empty())
+    CacheTarget target;
+    if (!ResolveCacheTarget(omf_key, fingerprint, target))
+        return false;
+
+    std::ifstream stream(target.path, std::ios::binary);
+    if (!stream)
+        return false;
+
+    u32 count = 0;
+    return ReadCacheHeader(stream, target, count);
+}
+
+bool PrecomputeFirstFrames(OzzMotionLibrary& library)
+{
+    library.firstFrame.resize(library.animations.size());
+    for (size_t idx = 0; idx < library.animations.size(); ++idx)
     {
         const ozz::animation::Animation* animation = library.animations[idx].get();
+        ozz::vector<ozz::math::SoaTransform>& frame = library.firstFrame[idx];
         frame.resize(size_t(animation->num_soa_tracks()));
 
         ozz::animation::SamplingJob::Context context(animation->num_tracks());
@@ -277,9 +329,10 @@ const ozz::vector<ozz::math::SoaTransform>& FirstFrame(OzzMotionLibrary& library
         job.context = &context;
         job.ratio = 0.f;
         job.output = ozz::make_span(frame);
-        job.Run();
+        if (!job.Run())
+            return false;
     }
-    return frame;
+    return true;
 }
 
 OzzMotionLibraryContainer::~OzzMotionLibraryContainer() { clean(true); }
@@ -297,13 +350,7 @@ OzzMotionLibrary* OzzMotionLibraryContainer::dock(
     }
 
     AnimationVec animations;
-    bool ready = false;
-
-    CacheTarget target;
-    if (ResolveCacheTarget(omf_key, mirror.fingerprint, target) && PrebakeMotionLibrary(omf_key, omf, mirror))
-        ready = LoadCache(target, animations);
-
-    if (!ready && !BakeLibrary(omf_key, omf, mirror, animations))
+    if (PrebakeResult::Failed == AcquireAnimations(omf_key, omf, mirror, animations))
     {
         Msg("! [ozz] can't bake motion library [%s]", omf_key.c_str());
         return nullptr;
@@ -313,8 +360,14 @@ OzzMotionLibrary* OzzMotionLibraryContainer::dock(
     library->key = key;
     library->fingerprint = mirror.fingerprint;
     library->animations = std::move(animations);
-    library->firstFrame.resize(library->animations.size());
     library->refs = 1;
+
+    if (!PrecomputeFirstFrames(*library))
+    {
+        Msg("! [ozz] can't sample first frames of motion library [%s]", omf_key.c_str());
+        xr_delete(library);
+        return nullptr;
+    }
 
     container.insert(std::make_pair(key, library));
     return library;
