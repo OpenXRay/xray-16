@@ -1,3 +1,44 @@
+add_library(xrAnimationTools STATIC
+    ExtendedBoneMetadata.h
+    LegacyMotionSerialization.h
+    LegacyOgfConverter.h
+    LegacyOgfConverter.cpp
+    LegacyOmfConverterFull.h
+    LegacyOmfConverterFull.cpp
+    OzzBundle.h
+    OzzBundle.cpp
+    OzzConversion.h
+    stdafx.h
+    stdafx.cpp
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples/framework/mesh.cc"
+)
+
+set_source_files_properties(
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples/framework/mesh.cc"
+    PROPERTIES SKIP_PRECOMPILE_HEADERS ON
+)
+
+target_include_directories(xrAnimationTools
+    PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/include"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples"
+)
+
+target_link_libraries(xrAnimationTools
+    PUBLIC
+    xrAnimation
+    xrCore
+    ozz_animation
+    ozz_animation_offline
+    ozz_geometry
+    ozz_base
+)
+
+set_target_properties(xrAnimationTools PROPERTIES PREFIX "")
+
+target_precompile_headers(xrAnimationTools PRIVATE stdafx.h)
+
 set(_xrAnimation_tool_targets "")
 
 set(_converter_src ${CMAKE_CURRENT_SOURCE_DIR}/xray_to_ozz_converter.cpp)
@@ -10,6 +51,7 @@ if(EXISTS ${_converter_src})
 
     target_link_libraries(xray_to_ozz_converter
         PRIVATE
+        xrAnimationTools
         xrAnimation
         xrCore
         ozz_animation_offline
@@ -117,6 +159,7 @@ if(XRAY_BUILD_OZZ_VIEWER)
         target_link_libraries(ozz_animation_viewer
             PRIVATE
             SDL3::SDL3-static
+            xrAnimationTools
             xrAnimation
             xrCore
             ozz_animation

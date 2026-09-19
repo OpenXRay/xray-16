@@ -5,7 +5,7 @@
 #include "ExtendedBoneMetadata.h"
 #include "LegacyChunkIO.h"
 #include "LegacyMotionSerialization.h"
-#include "LegacyOmfConverter.h"
+#include "LegacyOmfConverterFull.h"
 #include "OzzConversion.h"
 
 #include "xrCore/xrCore.h"
@@ -13,6 +13,8 @@
 #include "xrCore/Animation/SkeletonMotionDefs.hpp"
 #include "xrCore/FMesh.hpp"
 
+#include <ozz/animation/offline/animation_builder.h>
+#include <ozz/animation/offline/raw_animation.h>
 #include <ozz/animation/offline/raw_skeleton.h>
 #include <ozz/animation/offline/skeleton_builder.h>
 #include <ozz/base/io/archive.h>
@@ -21,7 +23,7 @@
 #include <ozz/base/maths/quaternion.h>
 #include <ozz/base/maths/soa_transform.h>
 
-#include "../../Externals/ozz-animation/samples/framework/mesh.h"
+#include "framework/mesh.h"
 
 #include <algorithm>
 #include <array>
@@ -48,8 +50,13 @@ namespace XRay
 {
 namespace Animation
 {
+using namespace XRay::Animation::Tools;
+
 namespace
 {
+constexpr std::uint8_t kOzzModelTypeStatic = 13u;
+constexpr std::uint8_t kOzzModelTypeAnimated = 14u;
+
 using Matrix4 = std::array<std::array<float, 4>, 4>;
 
 constexpr Matrix4 kXrayToOzz = {
@@ -2376,17 +2383,17 @@ void ConvertLegacyVisualToOzzBundleImpl(const LegacyVisualInput& input,
     // Map legacy MT types to ozz MT types
     if (original_ogf_type == MT_SKELETON_ANIM)
     {
-        out_result.model_type = MT_OZZ_ANIMATED;
+        out_result.model_type = kOzzModelTypeAnimated;
     }
     else if (original_ogf_type == MT_SKELETON_RIGID)
     {
-        out_result.model_type = MT_OZZ_STATIC;
+        out_result.model_type = kOzzModelTypeStatic;
     }
     else
     {
         // Fallback: check if we have animations
         const bool has_animations = !out_result.motion_refs.empty() || !out_result.embedded_animation_binary.empty();
-        out_result.model_type = has_animations ? MT_OZZ_ANIMATED : MT_OZZ_STATIC;
+        out_result.model_type = has_animations ? kOzzModelTypeAnimated : kOzzModelTypeStatic;
     }
 
 }

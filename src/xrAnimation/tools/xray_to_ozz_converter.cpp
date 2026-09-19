@@ -25,8 +25,8 @@
 #include <ozz/base/maths/soa_transform.h>
 #include <ozz/base/maths/vec_float.h>
 
-#include "../Externals/ozz-animation/samples/framework/mesh.h"
-#include "../OzzConversion.h"
+#include "framework/mesh.h"
+#include "OzzConversion.h"
 
 #include <algorithm>
 #include <array>
@@ -58,9 +58,9 @@
 
 #include "xrCore/Animation/SkeletonMotionDefs.hpp"
 
-#include "../LegacyOgfConverter.h"
-#include "../LegacyOmfConverter.h"
-#include "../OzzBundle.h"
+#include "LegacyOgfConverter.h"
+#include "LegacyOmfConverterFull.h"
+#include "OzzBundle.h"
 
 #ifdef main
 #    undef main
@@ -406,12 +406,12 @@ void convert_animation(const AnimationConfig& config)
     if (!skeleton_conversion.skeleton)
         throw std::runtime_error("legacy skeleton conversion produced null skeleton");
 
-    xr_vector<XRay::Animation::ConvertedOmfAnimation> converted;
+    xr_vector<XRay::Animation::Tools::ConvertedOmfAnimation> converted;
     std::optional<xr_string> motion_filter;
     if (config.motion_name)
         motion_filter = xr_string(config.motion_name->c_str());
 
-    if (!XRay::Animation::ConvertLegacyOmf(config.input_omf,
+    if (!XRay::Animation::Tools::ConvertLegacyOmf(config.input_omf,
                                            skeleton_conversion.bone_names,
                                            *skeleton_conversion.skeleton,
                                            converted,
@@ -467,7 +467,7 @@ void convert_animation(const AnimationConfig& config)
         }
 
         SerializeMotionMetadata(archive, metadata);
-        XRay::Animation::SerializeBoneMotions(archive, entry);
+        XRay::Animation::Tools::SerializeBoneMotions(archive, entry);
         metadata_to_write.push_back(std::move(metadata));
     }
 

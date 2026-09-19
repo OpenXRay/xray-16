@@ -365,42 +365,10 @@ void FGRenderBase::ConvertLegacyAssetsToPBRImpl()
 
 void FGRenderBase::ConvertLegacyAssetsToOzz()
 {
-    Msg("~ [Ozz] Scanning for legacy OGF/OMF assets...");
-
-    XRay::Animation::LegacyAssetInventory inventory =
-        XRay::Animation::BuildDefaultLegacyAssetInventory();
-
-    Msg("~ [Ozz] Inventory: %zu visuals, %zu motions",
-        inventory.visuals.size(), inventory.motions.size());
-
-    if (inventory.visuals.empty() && inventory.motions.empty())
-        return;
-
-    XRay::Animation::StartupConversionParams params;
-
-    if (XRay::Animation::VerifyConvertedOutputs(inventory, params))
-    {
-        Msg("~ [Ozz] All assets already converted, skipping.");
-        return;
-    }
-
-    Msg("~ [Ozz] Starting conversion (outputs missing)...");
-
     XRay::Animation::StartupConversionStats stats;
-    const bool success = XRay::Animation::ConvertInventoryToOzz(
-        inventory, params, stats, nullptr);
+    XRay::Animation::PrebakeLegacyMotionLibraries(stats);
 
-    if (success)
-    {
-        Msg("~ [Ozz] Conversion complete in %.1fs: bundles=%zu (skipped=%zu), motions=%zu (skipped=%zu), failures=%zu",
-            stats.total_time_seconds,
-            stats.bundles_written, stats.bundles_skipped,
-            stats.motions_written, stats.motions_skipped,
-            stats.failures);
-    }
-    else
-    {
-        Msg("! [Ozz] Conversion failed (failures=%zu)", stats.failures);
-    }
+    Msg("~ [Ozz] motion cache: baked=%zu, skipped=%zu, failed=%zu in %.2fs", stats.baked, stats.skipped, stats.failed,
+        stats.total_time_seconds);
 }
 }
