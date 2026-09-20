@@ -1286,7 +1286,44 @@ void StatsOverlay::RenderAllocationsSection()
             char header[128];
             xr_sprintf(header, sizeof(header), "Backtraces: %s (%s allocs, %d sites)###bt",
                 bt.zoneName ? bt.zoneName : "?", FormatNumber((u32)bt.totalCalls), bt.siteCount);
-            if (ImGui::TreeNode(header))
+            const bool open = ImGui::TreeNode(header);
+            if (ImGui::BeginPopupContextItem("backtraces_ctx"))
+            {
+                if (ImGui::MenuItem("Copy all to clipboard"))
+                {
+                    u64 totalBytes = 0;
+                    for (int i = 0; i < bt.siteCount; ++i)
+                        totalBytes += bt.sites[i].bytes;
+
+                    xr_string text;
+                    text.reserve(16384);
+                    text += "Backtraces: ";
+                    text += bt.zoneName ? bt.zoneName : "?";
+                    char line[128];
+                    xr_sprintf(line, sizeof(line), "\nTotal: %llu allocs, %llu bytes, %d sites\n",
+                        static_cast<unsigned long long>(bt.totalCalls),
+                        static_cast<unsigned long long>(totalBytes), bt.siteCount);
+                    text += line;
+                    for (int i = 0; i < bt.siteCount; ++i)
+                    {
+                        const auto& site = bt.sites[i];
+                        xr_sprintf(line, sizeof(line), "\nSite %d: %llu allocs, %llu bytes\n",
+                            i + 1, static_cast<unsigned long long>(site.count),
+                            static_cast<unsigned long long>(site.bytes));
+                        text += line;
+                        for (int f = 0; f < site.depth; ++f)
+                        {
+                            xr_sprintf(line, sizeof(line), "  %d: ", f);
+                            text += line;
+                            text += site.frames[f];
+                            text += "\n";
+                        }
+                    }
+                    ImGui::SetClipboardText(text.c_str());
+                }
+                ImGui::EndPopup();
+            }
+            if (open)
             {
                 for (int i = 0; i < bt.siteCount; ++i)
                 {
