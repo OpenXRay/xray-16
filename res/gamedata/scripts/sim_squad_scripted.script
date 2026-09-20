@@ -1,0 +1,1044 @@
+--'******************************************************
+--'*	Боевой отряд группировки. (Скриптовая версия)
+--'*	Наследован от обычного боевого отряда.
+--'*	Отличия:
+--'*		- Детерминированные состав отряда
+--'*		- Возможность жестко указать активное действие
+--'******************************************************
+local squad_behaviour_ini 	= ini_file("misc\\squad_behaviours.ltx")
+local locations_ini			= ini_file("misc\\smart_terrain_masks.ltx")
+--function printf()
+--end
+
+class "sim_squad_scripted" (cse_alife_online_offline_group)
+
+--***********************************************************************************************
+--*										INITIALIZATION											*
+--***********************************************************************************************
+
+function sim_squad_scripted:__init(section) super (section)
+	--' смарт, в котором сейчас находится отряд.
+	self.smart_id 			= nil
+	self.board 				= sim_board.get_sim_board()
+	self.current_spot_id 	= nil --' ID объекта на который сейчас установлен мапспот.
+
+	--' Текущее действие
+	self.current_action 	= nil
+
+	self.current_target_id	= nil
+
+	self.assigned_target_id	= nil
+
+	--' Саундменеджер отряда
+	self.sound_manager 		= sound_manager.get_sound_manager("squad_"..self:section_name() )
+
+	self.settings_id 		= self:section_name()
+
+	self:init_squad()
+
+	self:set_squad_behaviour()
+end
+--' Инициализация
+function sim_squad_scripted:init_squad()
+	self.player_id 			= utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "faction", self, true, "")
+	self.action_condlist	= xr_logic.parse_condlist(self, "assign_action", "target_smart", utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "target_smart", self, false, "", ""))
+	self.death_condlist		= xr_logic.parse_condlist(self, "death_condlist", "on_death", utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "on_death", self, false, "", ""))
+	self.invulnerability	= xr_logic.parse_condlist(self, "invulnerability", "invulnerability", utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "invulnerability", self, false, "", ""))
+	self.relationship		= self.relationship or utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "relationship", self, false, "", nil)
+	self.sympathy			= utils.cfg_get_number(sim_board.squad_ltx, self.settings_id, "sympathy", self, false, nil)
+	self.show_spot			= xr_logic.parse_condlist(self, "show_spot", "show_spot", utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "show_spot", self, false, "", "false"))
+
+	self.always_walk 		= utils.cfg_get_bool(sim_board.squad_ltx, self.settings_id, "always_walk", self, false)
+	self.always_arrived		= utils.cfg_get_bool(sim_board.squad_ltx, self.settings_id, "always_arrived", self, false)
+	self:set_location_types_section("stalker_terrain")
+	self:set_squad_sympathy()
+end
+
+-- Инициализация отряда на загрузке
+function sim_squad_scripted:init_squad_on_load()
+	-- Прописываем сквад в нужные смарты
+	printf("Init squad %s on load", self.id)
+	self:set_squad_sympathy()
+	self.board:assign_squad_to_smart(self, self.smart_id)
+
+	if self.smart_id ~= nil then
+		self.board:enter_smart(self, self.smart_id, true)
+	end
+	self.need_to_reset_location_masks = true
+end
+
+-- Вычитываем настройки поведения сквада.
+function sim_squad_scripted:set_squad_behaviour()
+	self.behaviour		= {}
+	local behaviour_section = utils.cfg_get_string(sim_board.squad_ltx, self.settings_id, "behaviour", self, false, "", self.player_id)
+	if not squad_behaviour_ini:section_exist(behaviour_section) then
+		abort("There is no section ["..behaviour_section.."] in 'misc\\squad_behaviours.ltx'")
+	end
+	local n = squad_behaviour_ini:line_count(behaviour_section)
+	for j=0,n-1 do
+		local result, prop_name, prop_condlist = squad_behaviour_ini:r_line(behaviour_section,j,"","")
+		self.behaviour[prop_name] = prop_condlist
+	end
+end
+
+--***********************************************************************************************
+--*										SCRIPT_TARGET_SELECTION									*
+--***********************************************************************************************
+
+--' Возвращает скриптовую цель.
+function sim_squad_scripted:get_script_target()
+	local new_target = xr_logic.pick_section_from_condlist(db.actor, self, self.action_condlist)
+
+	if new_target == nil then
+--		printf("[%s] get_script_target nil_condlist", self.id)
+		return nil
+	end
+
+	if new_target ~= self.last_target then
+		self.last_target = new_target
+		--' Парсим новые задачи для отряда
+		self.parsed_targets = utils.parse_names(new_target)
+
+		if self.need_free_update ~= true then
+			self.next_target = 1
+		else
+			self.need_free_update = false
+		end
+	end
+	if self.parsed_targets[self.next_target] == nil then
+		self.next_target = 1
+	end
+
+
+	local nt = self:pick_next_target()
+	if nt == "nil" then
+		return nil
+	elseif nt == "loop" then
+		self.next_target = 1
+		nt = self:pick_next_target()
+	end
+	local point = self.board.smarts_by_names[nt]
+	if point == nil then
+		abort("Incorrect next point [%s] for squad [%s]", tostring(nt),  tostring(self.id))
+	end
+	return point.id
+end
+
+
+--' Выбор следующей цели
+function sim_squad_scripted:pick_next_target()
+	--printf("Picking next target for [%s] = %s by %s", self:section_name(), tostring(self.parsed_targets[self.next_target]), self.next_target)
+	return self.parsed_targets[self.next_target]
+end
+
+
+--' Проверка пришел ли отряд в очередной поинт
+function sim_squad_scripted:check_squad_come_to_point()
+	--printf("[%s] check squad point", self.id)
+	if self.parsed_targets == nil then
+		return true
+	end
+	--' Если мы уже дошли до точки.
+	local next_target = self.next_target or 0
+	if self.assigned_target_id ~= nil and self.smart_id == self.assigned_target_id then
+		if self.parsed_targets[next_target+1] ~= nil then
+			self.next_target = next_target+1
+			return true
+		end
+	end
+	return false
+end
+
+--' Проверка пришел ли отряд в очередной поинт
+function sim_squad_scripted:update_current_action()
+	local is_finished =	self.current_action:update(false)
+	if not is_finished then
+		return false
+	end
+	return true
+end
+
+function sim_squad_scripted:update()
+	cse_alife_online_offline_group.update (self)
+	self:refresh()
+
+	-- Апдейт доступности для симуляции.
+	simulation_objects.get_sim_obj_registry():update_avaliability(self)
+
+	self:check_invulnerability()
+
+	local script_target = self:get_script_target()
+
+	--printf("[%s] SCRIPTED UPDATE. Target[%s]", self.id, tostring(script_target))
+	if script_target == nil then
+		self:generic_update()
+		if self.need_to_reset_location_masks then
+			self:set_location_types()
+			self.need_to_reset_location_masks = false
+		end
+		return
+	end
+
+	self.sound_manager:update()
+
+	local need_to_find_new_action = false
+	if self.assigned_target_id ~= nil and self.assigned_target_id == script_target then
+		if self.current_action ~= nil then
+			if self.current_action.name == "stay_point" then
+				--' Если экшн stay_point. Проверяем пришли ли до экшна.
+				if self:check_squad_come_to_point() then
+					--' Пришли в точку, перевыбрали цель
+					need_to_find_new_action = true
+					--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+				else
+					--' Не пришли в точку, апдейтимся дальше
+					need_to_find_new_action = self:update_current_action()
+					--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+				end
+			else
+				--' Если экшн attack_point. Проверяем пришли ли после экшна.
+				if self:update_current_action() then
+					self:check_squad_come_to_point()
+					need_to_find_new_action = true
+					--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+				end
+			end
+		else
+			--' Проверяем пришли ли
+			self:check_squad_come_to_point()
+			need_to_find_new_action = true
+			--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+		end
+	else
+		if self.current_action == nil then
+			need_to_find_new_action = true
+			--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+		else
+			if self.current_action.major == true then
+				if self:update_current_action() then
+					self:check_squad_come_to_point()
+					need_to_find_new_action = true
+					--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+				end
+			else
+				need_to_find_new_action = true
+				--printf("[%s] SCRIPTED need_to_find_new_action %s", self.id, tostring(need_to_find_new_action))
+			end
+		end
+	end
+
+	if need_to_find_new_action == true then
+		self.assigned_target_id = script_target
+
+		if self.current_action ~= nil then
+			self.current_action:finalize()
+			self.current_action = nil
+		end
+		--' Если у нас нет текущей цели - просим выдать нам задание.
+		self:get_next_action(false)
+	end
+	if self.need_to_reset_location_masks then
+		self:set_location_types()
+		self.need_to_reset_location_masks = false
+	end
+end
+
+
+
+--***********************************************************************************************
+--*										SIMULATION_TARGET_SELECTION								*
+--***********************************************************************************************
+
+function sim_squad_scripted:clear_assigned_target()
+	self.assigned_target_id = nil
+end
+
+function sim_squad_scripted:assigned_target_avaliable()
+	local target_obj = self.assigned_target_id and alife():object(self.assigned_target_id)
+	if target_obj == nil then
+		return false
+	end
+	-- В данном случае нужно проверять попьюлейшн минус один, т.к. я уже состою в смарте.
+	return target_obj:target_precondition(self, true)
+end
+
+local function can_help_actor(squad)
+	if empty(xr_combat_ignore.fighting_with_actor_npcs) then
+		return false
+	end
+	if game_graph():vertex(squad.m_game_vertex_id):level_id() ~= game_graph():vertex(alife():actor().m_game_vertex_id):level_id() then
+		return false
+	end
+	if has_alife_info("sim_duty_help_harder") and squad:get_squad_community() == "duty" then
+		return true
+	elseif has_alife_info("sim_freedom_help_harder") and squad:get_squad_community() == "freedom" then
+		return true
+	elseif has_alife_info("sim_stalker_help_harder") and squad:get_squad_community() == "stalker" then
+		return true
+	end
+	return false
+end
+
+local function get_help_target_id(squad)
+	if not can_help_actor(squad) then
+		return nil
+	end
+	for k,v in pairs (xr_combat_ignore.fighting_with_actor_npcs) do
+		local enemy_squad_id = alife():object(k).group_id
+		if enemy_squad_id ~= nil then
+			local target_squad = alife():object(enemy_squad_id)
+			if target_squad and squad.position:distance_to_sqr(target_squad.position) < 150^2 and
+				game_relations.is_factions_enemies(squad:get_squad_community(), target_squad:get_squad_community()) then
+				return enemy_squad_id
+			end
+		end
+	end
+	return nil
+end
+
+
+--' Апдейт отряда для выбора симуляционных целей.
+function sim_squad_scripted:generic_update()
+	--printf("Squad[%s] UPDATE", self.id)
+	--' Если у нас есть незавершенное действие - ждем пока оно завершится.
+	self.sound_manager:update()
+	self:refresh()
+
+	local help_target_id = get_help_target_id(self)
+
+	if help_target_id then
+		self.assigned_target_id = help_target_id
+		self.current_action = nil
+		self:get_next_action(false)
+		return
+	end
+	if self.assigned_target_id and alife():object(self.assigned_target_id) and alife():object(self.assigned_target_id):clsid() ~= clsid.online_offline_group_s then
+		local squad_target = self.board:get_squad_target(self)
+		if squad_target:clsid() == clsid.online_offline_group_s then
+			self.assigned_target_id = squad_target.id
+			self.current_action = nil
+			self:get_next_action(true)
+			return
+		end
+	end
+
+	if self.current_action ~= nil and self:assigned_target_avaliable() then
+		--printf("[%s] CURRENT ACTION [%s]", self.id, self.current_action.name)
+		local is_finished =	self.current_action:update(true)
+
+		if is_finished then
+			self.current_action:finalize()
+			if self.current_action.name == "stay_point" or self.assigned_target_id == nil then
+				self.assigned_target_id = self.board:get_squad_target(self).id
+			end
+			self.current_action = nil
+		else
+			return
+		end
+	else
+		self.current_action = nil
+		self.current_target_id = nil
+		self.assigned_target_id = self.board:get_squad_target(self).id
+	end
+	self:get_next_action(true)
+end
+--' Получение следующего экшна на выполнение
+function sim_squad_scripted:get_next_action(under_simulation)
+	local squad_target = alife():object(self.assigned_target_id)
+	--printf("assigned_target = [%s]", tostring(self.assigned_target_id))
+	if self.current_target_id == nil then
+		if squad_target == nil or squad_target:am_i_reached(self) then
+			if squad_target ~= nil then
+				squad_target:on_reach_target(self)
+				squad_target:on_after_reach(self)
+			end
+			self.current_action = sim_squad_actions.stay_on_target(self)
+			self.current_target_id = self.assigned_target_id
+			self.current_action:make(under_simulation)
+			return
+		end
+	end
+
+	if (self.assigned_target_id == self.current_target_id) or self.assigned_target_id == nil then
+		self.current_action = sim_squad_actions.stay_on_target(self)
+		self.current_target_id = self.assigned_target_id
+		self.current_action:make(under_simulation)
+	else
+		self.current_action = sim_squad_actions.reach_target(self)
+		self.current_action:make(under_simulation)
+	end
+end
+
+--***********************************************************************************************
+--*										MEMBERS_CONTROL											*
+--***********************************************************************************************
+--' Удаление персонажей отряда
+function sim_squad_scripted:remove_squad()
+	local squad_npcs = {}
+	for k in self:squad_members() do
+		squad_npcs[k.id] = true
+	end
+--
+	for j,v in pairs(squad_npcs) do
+		local obj = alife():object(j)
+		if obj ~= nil then
+			self:unregister_member(j)
+			alife():release(obj, true)
+		end
+	end
+	self:hide()
+--	alife():release(self, true)
+end
+--' Удаление конкретного персонажа отряда
+function sim_squad_scripted:remove_npc(npc_id)
+	local npc = alife():object(npc_id)
+	self:on_npc_death(npc)
+	--printf("releasing object ["..npc:name().."]")
+	alife():release(npc, true)
+end
+--' Убийство НПС
+function sim_squad_scripted:on_npc_death(npc)
+	printf("Squad %s. Killed member %s", tostring(self.id), npc.id)
+
+	self.sound_manager:unregister_npc(npc.id)
+	self:unregister_member(npc.id)
+
+	if self:npc_count() == 0 then
+		printf("REMOVING DEAD SQUAD %s", tostring(self.id))
+		if self.current_action ~= nil then
+			self.current_action:finalize()
+			self.current_action = nil
+		end
+
+		if self.death_condlist ~= nil then
+			xr_logic.pick_section_from_condlist(db.actor, self, self.death_condlist)
+		end
+		self.board:remove_squad(self)
+		return
+	end
+	self:refresh()
+end
+function sim_squad_scripted:assign_squad_member_to_smart(member_id, smart, old_smart_id)
+	local obj = alife():object(member_id)
+	if obj ~= nil then
+		--printf("    npc [%s] smart [%s]", obj:name(), tostring(obj.m_smart_terrain_id))
+		if obj.m_smart_terrain_id == self.smart_id then
+			return
+		end
+
+		if obj.m_smart_terrain_id ~= 65535 and old_smart_id ~= nil and (obj.m_smart_terrain_id == old_smart_id) and self.board.smarts[old_smart_id] ~= nil then
+			self.board.smarts[old_smart_id].smrt:unregister_npc(obj)
+		end
+
+		if smart ~= nil then
+			smart:register_npc(obj)
+		end
+	end
+end
+--' Назначение смарта
+function sim_squad_scripted:assign_smart(smart)
+	local old_smart = self.smart_id
+	self.smart_id = smart and smart.id
+	--printf("  squad %s assign smart. old[%s] new[%s]", self.id, tostring(old_smart), tostring(self.smart_id))
+	--callstack()
+	for k in self:squad_members() do
+		self:assign_squad_member_to_smart(k.id, smart, old_smart)
+	end
+end
+
+function sim_squad_scripted:check_invulnerability()
+	if self.squad_online ~= true then
+		return
+	end
+	local invulnerability = xr_logic.pick_section_from_condlist(db.actor, self, self.invulnerability) == "true"
+
+	for k in self:squad_members() do
+		local npc_st = db.storage[k.id]
+		if npc_st ~= nil then
+			local npc = npc_st.object
+			if npc:invulnerable() ~= invulnerabilty and utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil) == nil  then
+--				printf("RESET INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
+				npc:invulnerable(invulnerability)
+			end
+		end
+	end
+end
+
+function sim_squad_scripted:set_location_types_section (section)
+--	printf("set_location_types_section[%s] for [%s]", tostring(section), tostring(self:name()))
+	if locations_ini:section_exist(section) then
+		local result, id, value	= locations_ini:r_line(section,0,"","")
+		self:add_location_type(id)
+	end
+end
+function sim_squad_scripted:set_location_types(new_smart_name)
+	local default_location = "stalker_terrain"
+	printf("set_location_types for squad [%s]", self:name())
+	self:clear_location_types()
+	--[[for k,v in pairs(simulation_objects.get_sim_obj_registry().objects) do
+		if alife():object(k):clsid() == clsid.smart_terrain then
+			self:set_location_types_section(alife():object(k):name())
+		end
+	end]]--
+
+	if alife():object(self.assigned_target_id):clsid() == clsid.smart_terrain then
+		self:set_location_types_section(default_location)
+		local old_smart_name = self.smart_id and alife():object(self.smart_id) and alife():object(self.smart_id):name()
+		--printf("old_smart_name = [%s]!", tostring(old_smart_name))
+		if old_smart_name then
+			self:set_location_types_section(old_smart_name)
+		end
+		--printf("new_smart_name = [%s]!", tostring(new_smart_name))
+		if new_smart_name then
+			self:set_location_types_section(new_smart_name)
+		end
+	else
+		--printf("target is squad or actor setting [squad_terrain]!")
+		self:set_location_types_section("squad_terrain")
+		for k,v in pairs(simulation_objects.get_sim_obj_registry().objects) do
+			if alife():object(k):clsid() == clsid.smart_terrain then
+				local props_base = alife():object(k).props and alife():object(k).props["base"]
+				if props_base and tonumber(props_base) == 0 then
+					self:set_location_types_section(alife():object(k):name())
+				end
+			end
+		end
+	end
+end
+
+function sim_squad_scripted:add_squad_member(spawn_section, spawn_position, lv_id, gv_id, sect_number)
+	local spawn_sections_ltx = system_ini()
+	local custom_data = utils.cfg_get_string(spawn_sections_ltx, spawn_section, "custom_data", self, false, "", "default_custom_data.ltx")
+	if custom_data ~= "default_custom_data.ltx" then
+		printf("INCORRECT npc_spawn_section USED [%s]. You cannot use npc with custom_data in squads", spawn_section)
+	end
+
+	local position = spawn_position
+
+	local obj =  alife():create(spawn_section,
+								position,
+								lv_id,
+								gv_id)
+
+	self:register_member(obj.id)
+	self.sound_manager:register_npc(obj.id)
+
+	if simulation_objects.is_on_the_same_level(obj, alife():actor()) and position:distance_to_sqr(alife():actor().position) <= alife():switch_distance()^2 then
+		db.spawned_vertex_by_id[obj.id] = lv_id
+	end
+
+	return obj.id
+end
+
+--' Создание чуваков в отряд
+function sim_squad_scripted:create_npc(spawn_smart)
+	local ini = system_ini()
+	local spawn_sections = utils.parse_names(utils.cfg_get_string(ini, self.settings_id, "npc", self, false, "", ""))
+
+	local spawn_point = utils.cfg_get_string(ini, self.settings_id, "spawn_point", self, false, "","self") or
+						utils.cfg_get_string(spawn_smart.ini, smart_terrain.SMART_TERRAIN_SECT, "spawn_point", self, false,"","self")
+	spawn_point = xr_logic.parse_condlist(self, "spawn_point", "spawn_point", spawn_point)
+	spawn_point = xr_logic.pick_section_from_condlist(db.actor, self, spawn_point)
+
+	--print_table(debug.getinfo(1))
+	printf("SPAWN SMART %s", spawn_smart:name())
+	--' Высчитываем базовую позицию спауна
+	local base_spawn_position = spawn_smart.position
+	local base_lvi = spawn_smart.m_level_vertex_id
+	local base_gvi = spawn_smart.m_game_vertex_id
+	if spawn_point ~= nil then
+		if spawn_point == "self" then
+			base_spawn_position = spawn_smart.position
+			base_lvi = spawn_smart.m_level_vertex_id
+			base_gvi = spawn_smart.m_game_vertex_id
+		else
+			base_spawn_position = patrol(spawn_point):point(0)
+			base_lvi = patrol(spawn_point):level_vertex_id(0)
+			base_gvi = patrol(spawn_point):game_vertex_id(0)
+		end
+	elseif spawn_smart.spawn_point ~= nil then
+		base_spawn_position = patrol(spawn_smart.spawn_point):point(0)
+		base_lvi = patrol(spawn_smart.spawn_point):level_vertex_id(0)
+		base_gvi = patrol(spawn_smart.spawn_point):game_vertex_id(0)
+	end
+	if #spawn_sections ~= 0 then
+		for k,v in pairs(spawn_sections) do
+			self:add_squad_member(v, base_spawn_position, base_lvi, base_gvi,k)
+		end
+	end
+
+	-- подспаун рэндомных чуваков...
+	local random_spawn = utils.cfg_get_string(ini, self.settings_id, "npc_random", self, false, "",nil)
+	if random_spawn ~= nil then
+		random_spawn 				= 	utils.parse_names(random_spawn)
+		local count_min, count_max 	= utils.r_2nums( ini,  self.settings_id, "npc_in_squad", 1, 2 )
+		if count_min > count_max then
+			abort("min_count can't be greater then max_count [%s]!!!!!", self.settings_id)
+		end
+		local random_count	 		= math.random(count_min, count_max)
+		for i = 1,random_count do
+			local random_id = math.random(1, #random_spawn)
+			self:add_squad_member(random_spawn[random_id], base_spawn_position, base_lvi, base_gvi,random_id)
+		end
+	elseif #spawn_sections == 0 then
+		abort("You are trying to spawn an empty squad [%s]!!!", self.settings_id)
+	end
+
+
+	self.smart_id = spawn_smart.id
+	self:refresh()
+end
+
+function sim_squad_scripted:set_squad_sympathy(sympathy)
+	local symp = sympathy or self.sympathy
+	if(symp~=nil) then
+		for k in self:squad_members() do
+			local npc = db.storage[k.id] and db.storage[k.id].object
+			if(npc) then
+				game_relations.set_npc_sympathy(npc, symp)
+			else
+				if(db.goodwill.sympathy==nil) then
+					db.goodwill.sympathy = {}
+				end
+				db.goodwill.sympathy[k.id] = symp
+			end
+		end
+	end
+end
+local function set_relation(npc1, npc2, new_relation)
+	local goodwill = 0
+	if(new_relation=="enemy") then
+		goodwill = -1000
+	elseif(new_relation=="friend") then
+		goodwill = 1000
+	end
+	if npc1 and npc2 then
+		npc1:force_set_goodwill(goodwill, npc2.id)
+	else
+		abort("Npc not set in goodwill function!!!")
+	end
+end
+function sim_squad_scripted:set_squad_relation(relation)
+	local rel = relation or self.relationship
+	if(rel~=nil) then
+		for k in self:squad_members() do
+			local npc = db.storage[k.id] and db.storage[k.id].object
+			if(npc) then
+				game_relations.set_npcs_relation(npc, db.actor, rel)
+			else
+				set_relation(alife():object(k.id), alife():actor(),rel)
+			end
+		end
+	end
+end
+
+
+local function reset_animation(npc)
+	local state_mgr = db.storage[npc:id()].state_mgr
+	if state_mgr == nil then
+		return
+	end
+	local planner = npc:motivation_action_manager()
+
+	state_mgr.animation:set_state(nil, true)
+	state_mgr.animation:set_control()
+	state_mgr.animstate:set_state(nil, true)
+	state_mgr.animstate:set_control()
+
+	state_mgr:set_state("idle", nil, nil, nil, {fast_set = true})
+
+--	planner:update()
+--	planner:update()
+--	planner:update()
+
+	state_mgr:update()
+	state_mgr:update()
+	state_mgr:update()
+	state_mgr:update()
+	state_mgr:update()
+	state_mgr:update()
+	state_mgr:update()
+
+	npc:set_body_state(move.standing)
+	npc:set_mental_state(anim.free)
+
+end
+
+function sim_squad_scripted:set_squad_position(position)
+	if self.online == false then
+		self:force_change_position(position)
+	end
+
+	for k in self:squad_members() do
+		local cl_object = level.object_by_id(k.id)
+		db.offline_objects[k.id].level_vertex_id = level.vertex_id(position)
+		if cl_object then
+			reset_animation(cl_object)
+			printf("teleporting npc [%s]", k.id)
+			cl_object:set_npc_position(position)
+			printf("end of teleporting npc [%s]", k.id)
+		else
+			k.object.position = position
+		end
+	end
+end
+
+function sim_squad_scripted:has_detector()
+	for k in self:squad_members() do
+		if alife():object(k.id) and  alife():object(k.id):has_detector() then
+			return true
+		end
+	end
+	return false
+end
+
+function sim_squad_scripted:get_squad_community()
+	local squad_community = squad_community_by_behaviour[self.player_id]
+	if squad_community == nil then
+		abort("squad community is 'nil' for player_id [%s]", self.player_id)
+	end
+	return squad_community
+end
+
+--***********************************************************************************************
+--*										SAVE\LOAD												*
+--***********************************************************************************************
+
+function sim_squad_scripted:STATE_Write(packet)
+	cse_alife_online_offline_group.STATE_Write (self, packet)
+	set_save_marker(packet, "save", false, "sim_squad_scripted")
+
+
+	packet:w_stringZ(tostring(self.current_target_id))
+	packet:w_stringZ(tostring(self.respawn_point_id))
+	packet:w_stringZ(tostring(self.respawn_point_prop_section))
+	packet:w_stringZ(tostring(self.smart_id))
+
+	set_save_marker(packet, "save", true, "sim_squad_scripted")
+end
+function sim_squad_scripted:STATE_Read(packet, size)
+	cse_alife_online_offline_group.STATE_Read (self, packet, size)
+	set_save_marker(packet, "load", false, "sim_squad_scripted")
+
+	self.current_target_id = packet:r_stringZ()
+	if self.current_target_id == "nil" then
+		self.current_target_id = nil
+	else
+		self.current_target_id = tonumber(self.current_target_id)
+	end
+	self.respawn_point_id = packet:r_stringZ()
+	if self.respawn_point_id == "nil" then
+		self.respawn_point_id = nil
+	else
+		self.respawn_point_id = tonumber(self.respawn_point_id)
+	end
+	self.respawn_point_prop_section = packet:r_stringZ()
+	if self.respawn_point_prop_section == "nil" then
+		self.respawn_point_prop_section = nil
+	end
+	self.smart_id = packet:r_stringZ()
+	if self.smart_id == "nil" then
+		self.smart_id = nil
+	else
+		self.smart_id = tonumber(self.smart_id)
+	end
+
+	self:init_squad_on_load()
+	set_save_marker(packet, "load", true, "sim_squad_scripted")
+end
+--***********************************************************************************************
+--*										SERVER_OBJECT											*
+--***********************************************************************************************
+
+function sim_squad_scripted:on_register()
+	cse_alife_online_offline_group.on_register( self )
+	self.board.squads[self.id] = self
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+	simulation_objects.get_sim_obj_registry():register(self)
+end
+function sim_squad_scripted:on_unregister()
+	--' Отрегистрация в таскменеджере
+	unregister_story_object_by_id(self.id)
+		--' Удалить отряд
+	self.board.squads[self.id] = nil
+	self.board:assign_squad_to_smart(self, nil)
+	cse_alife_online_offline_group.on_unregister( self )
+	simulation_objects.get_sim_obj_registry():unregister(self)
+	if self.respawn_point_id ~= nil then
+		local smart = alife():object(self.respawn_point_id)
+		-- затычка для дестроя левела(смарты дестроятся раньше сквадов)
+		if smart == nil then
+			return
+		end
+		smart.already_spawned[self.respawn_point_prop_section].num = smart.already_spawned[self.respawn_point_prop_section].num - 1
+	end
+end
+function sim_squad_scripted:can_switch_offline()
+	return cse_alife_online_offline_group.can_switch_offline(self)
+end
+function sim_squad_scripted:can_switch_online()
+	return cse_alife_online_offline_group.can_switch_online(self)
+end
+
+--***********************************************************************************************
+--*										MAP LOCATION											*
+--***********************************************************************************************
+
+--[[
+monster_predatory_day
+monster_predatory_night
+monster_vegetarian
+monster_zombied_day
+monster_zombied_night
+monster_special
+]]--
+
+is_squad_monster =
+{
+	["monster_predatory_day"] 	= true,
+	["monster_predatory_night"] = true,
+	["monster_vegetarian"] 		= true,
+	["monster_zombied_day"] 	= true,
+	["monster_zombied_night"] 	= true,
+	["monster_special"] 		= true,
+	["monster"]					= true
+}
+
+function sim_squad_scripted:refresh()
+	if(self:commander_id()==nil) then
+		self:hide()
+		return
+	end
+	self:show()
+end
+
+
+function sim_squad_scripted:hide()
+	if(self.current_spot_id==nil) or (self.spot_section==nil) then
+		return
+	end
+	level.map_remove_object_spot(self.current_spot_id, self.spot_section)
+	self.current_spot_id = nil
+	self.spot_section = nil
+end
+
+--' Показать отряд на карте
+function sim_squad_scripted:show()
+	if self.show_disabled then
+		self:hide()
+		return
+	end
+
+    if(level.map_has_object_spot(self:commander_id(), "ui_pda2_trader_location")~=0) or
+	(level.map_has_object_spot(self:commander_id(), "ui_pda2_mechanic_location")~=0) or
+	(level.map_has_object_spot(self:commander_id(), "ui_pda2_scout_location")~=0) or
+	(level.map_has_object_spot(self:commander_id(), "ui_pda2_quest_npc_location")~=0) or
+	(level.map_has_object_spot(self:commander_id(), "ui_pda2_medic_location")~=0) then
+		self.show_disabled = true
+		return
+	end
+
+	if self.current_spot_id ~= self:commander_id() then
+		self:hide()
+		self.current_spot_id = self:commander_id()
+		self:show()
+		return
+	end
+	local spot = ""
+
+	if not(is_squad_monster[self.player_id]) then
+		local relation = game_relations.get_squad_relation_to_actor_by_id(self.id)
+		if(relation=="friends") then
+			spot = "alife_presentation_squad_friend"
+		elseif(relation=="neutral") then
+			spot = "alife_presentation_squad_neutral"
+		end
+	end
+	if(spot~="") then
+		if spot == self.spot_section then
+			level.map_change_spot_hint(self.current_spot_id, self.spot_section, self:get_squad_props())
+			return
+		end
+		if self.spot_section == nil then
+			level.map_add_object_spot(self.current_spot_id, spot, self:get_squad_props())
+		else
+			level.map_remove_object_spot(self.current_spot_id, self.spot_section)
+			level.map_add_object_spot(self.current_spot_id, spot, self:get_squad_props())
+		end
+		self.spot_section = spot
+	elseif(self.spot_section~=nil) then
+		level.map_remove_object_spot(self.current_spot_id, self.spot_section)
+		self.spot_section = nil
+	end
+end
+
+function sim_squad_scripted:get_squad_props()
+	if dev_debug then
+		local t = "["..tostring(self:name()).."]\\n"..
+					"current_target = ["..tostring(self.current_target_id and alife():object(self.current_target_id) and alife():object(self.current_target_id):name()).."]\\n"..
+					"assigned_target = ["..tostring(self.assigned_target_id and alife():object(self.assigned_target_id) and alife():object(self.assigned_target_id):name()).."]\\n"
+		if self.current_action and self.current_action.name == "stay_point" then
+			t = t.."stay_on_point = ["..tostring(self.current_action.idle_time - game.get_game_time():diffSec(self.current_action.start_time)).."]"
+		end
+		return t
+	else
+		return ""
+	end
+end
+
+
+
+
+--***********************************************************************************************
+--*										SIMULATION_TARGET_SQUAD									*
+--***********************************************************************************************
+-- Получить позицию, левел вертекс, гейм вертекс обьекта.
+function sim_squad_scripted:get_location()
+	return self.position, self.m_level_vertex_id, self.m_game_vertex_id
+end
+
+function sim_squad_scripted:get_current_task()
+	if self.assigned_target_id ~= nil and alife():object(self.assigned_target_id) ~= nil then
+		local smart_terrain = alife():object(self.assigned_target_id)
+		if smart_terrain.arriving_npc ~= nil and smart_terrain.arriving_npc[self:commander_id()] == nil
+			and smart_terrain.npc_info and smart_terrain.npc_info[self:commander_id()]
+			and smart_terrain.npc_info[self:commander_id()].job_id and smart_terrain.job_data[smart_terrain.npc_info[self:commander_id()].job_id] then
+			return smart_terrain.job_data[smart_terrain.npc_info[self:commander_id()].job_id].alife_task
+		end
+		return alife():object(self.assigned_target_id):get_alife_task()
+	end
+	return self:get_alife_task()
+end
+-- Достигнут ли я отрядом выбравшим меня как цель.
+function sim_squad_scripted:am_i_reached(squad)
+	return self:npc_count() == 0
+end
+-- Вызывается 1 раз после достижения меня отрядом выбравшим меня как цель.
+function sim_squad_scripted:on_after_reach(squad)
+
+end
+-- Вызывается 1 раз в момент выбора меня как цели.
+function sim_squad_scripted:on_reach_target(squad)
+	squad:set_location_types()
+ 	for k in squad:squad_members() do
+		if db.offline_objects[k.id] ~= nil then
+			db.offline_objects[k.id] = {}
+		end
+	end
+	self.board:assign_squad_to_smart(squad, nil)
+end
+-- Возвращает CALifeSmartTerrainTask на меня, вызывается из smart_terrain:task()
+function sim_squad_scripted:get_alife_task()
+	--printf("Returning alife task for object [%s] game_vertex [%s] level_vertex [%s] position %s", self.id, self.m_game_vertex_id, self.m_level_vertex_id, vec_to_str(self.position))
+	return CALifeSmartTerrainTask(self.m_game_vertex_id, self.m_level_vertex_id)
+end
+
+local smarts_by_no_assault_zones = {
+									["zat_a2_sr_no_assault"] 	= "zat_stalker_base_smart",
+									["jup_a6_sr_no_assault"] 	= "jup_a6",
+									["jup_b41_sr_no_assault"] 	= "jup_b41"
+}
+
+function sim_squad_scripted:sim_available()
+	for k,v in pairs (smarts_by_no_assault_zones) do
+		local zone = db.zone_by_name[k]
+		if zone and zone:inside(self.position) then
+			local smart = sim_board.get_sim_board():get_smart_by_name(v)
+			if smart and smart.base_on_actor_control ~= nil and smart.base_on_actor_control.status ~= smart_terrain_control.ALARM then
+				return false
+			end
+		end
+	end
+
+	if self.smart_id == nil then
+		return true
+	end
+	-- Удалять из регистра сим обьектов если мы идем на базу.
+	local props_base = alife():object(self.smart_id).props and alife():object(self.smart_id).props["base"]
+	if props_base and tonumber(props_base) > 0 then
+		return false
+	end
+
+
+	local smart = alife():object(self.smart_id)
+	if smart.base_on_actor_control ~= nil and smart.base_on_actor_control.status ~= smart_terrain_control.NORMAL then
+		if db.zone_by_name[smart.base_on_actor_control.noweap_zone] == nil or not db.zone_by_name[smart.base_on_actor_control.noweap_zone]:inside(self.position) then
+			return false
+		end
+	end
+	return true
+end
+
+-- Мой прекондишн.
+function sim_squad_scripted:target_precondition(squad)
+	local squad_params = sim_board.simulation_activities[squad.player_id]
+	if squad_params == nil or squad_params.squad == nil then
+		return false
+	end
+
+	local self_params = squad_params.squad[self.player_id]
+	if self_params == nil or self_params.prec(squad, self) == false then
+		return false
+	end
+	return true
+
+--[[
+	if squad.player_id == "dolg" and
+		(is_squad_monster[self.player_id] or self.player_id == "freedom") and
+		in_time_interval(8,22) then
+		return true
+	end
+
+
+	if squad.player_id == "bandit" and self.player_id == "stalker" then
+		return true
+	end
+	if squad.player_id == "freedom" and self.player_id == "dolg" and in_time_interval(8,22) then
+		return true
+	end
+
+	-- Травоядные днем атакуют проходящих мимо сталкеров.(плоть, кабан)
+	if squad.player_id == "monster_vegetarian" and in_time_interval(8,22) and not is_squad_monster[self.player_id] then
+		return true
+	end
+
+	-- Хищники днем атакуют сталкеров и травоядных(собаки, псевдособаки, пси собаки)
+	if squad.player_id == "monster_predatory_day" and
+		in_time_interval(8,22) and
+		(self.player_id == "monster_vegetarian" or not is_squad_monster[self.player_id]) then
+		return true
+	end
+	-- Хищники ночью атакуют сталкеров и травоядных(тушканы,кровосос, химера)
+	if squad.player_id == "monster_predatory_night" and
+		in_time_interval( 22 , 8) and
+		(self.player_id == "monster_vegetarian" or not is_squad_monster[self.player_id]) then
+		return true
+	end
+	-- Зомбиобразные днем атакуют проходящих мимо сталкеров.
+	if squad.player_id == "monster_zombied_day" and
+		in_time_interval(8,22) and
+		(not is_squad_monster[self.player_id]) then
+		return true
+	end
+	-- Зомбиобразные днем атакуют проходящих мимо сталкеров.
+	if squad.player_id == "monster_zombied_night" and
+		in_time_interval(22,8) and
+		(not is_squad_monster[self.player_id]) then
+		return true
+	end
+	-- Особенные днем атакуют проходящих мимо сталкеров.
+	if squad.player_id == "monster_special" and
+		in_time_interval(8,22) and
+		(not is_squad_monster[self.player_id]) then
+		return true
+	end
+
+	return false
+	]]
+end
+
+-- Посчитать мой приоритет для отряда.
+function sim_squad_scripted:evaluate_prior(squad)
+	return simulation_objects.evaluate_prior(self, squad)
+end
