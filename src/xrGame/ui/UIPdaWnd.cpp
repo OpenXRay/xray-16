@@ -29,6 +29,11 @@
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
 #include "UIScriptWnd.h"
+#include "UIDiaryWnd.h"
+#include "UIEncyclopediaWnd.h"
+#include "UIEventsWnd.h"
+#include "UIPdaContactsWnd.h"
+#include "UIStalkersRankingWnd.h"
 
 #define PDA_XML "pda.xml"
 
@@ -45,6 +50,11 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUIActorInfo = nullptr;
     pUIRankingWnd = nullptr;
     pUILogsWnd = nullptr;
+    pUISocTasks = nullptr;
+    pUISocDiary = nullptr;
+    pUISocContacts = nullptr;
+    pUISocRanking = nullptr;
+    pUISocEncyclopedia = nullptr;
     m_hint_wnd = nullptr;
     Init();
 }
@@ -63,6 +73,11 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
+    delete_data(pUISocTasks);
+    delete_data(pUISocDiary);
+    delete_data(pUISocContacts);
+    delete_data(pUISocRanking);
+    delete_data(pUISocEncyclopedia);
     delete_data(m_hint_wnd);
     if (UINoice)
         delete_data(UINoice);
@@ -122,13 +137,33 @@ void CUIPdaWnd::Init()
         if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
             xr_delete(pUIMapWnd);
 
-        pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
-        if (!pUITaskWnd->Init())
-            xr_delete(pUITaskWnd);
+        if (ShadowOfChernobylMode)
+        {
+            pUISocTasks = xr_new<CUIEventsWnd>();
+            pUISocTasks->Init();
 
-        pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
-        if (!pUIFactionWarWnd->Init())
-            xr_delete(pUIFactionWarWnd);
+            pUISocDiary = xr_new<CUIDiaryWnd>();
+            pUISocDiary->Init();
+
+            pUISocContacts = xr_new<CUIPdaContactsWnd>();
+            pUISocContacts->Init();
+
+            pUISocRanking = xr_new<CUIStalkersRankingWnd>();
+            pUISocRanking->Init();
+
+            pUISocEncyclopedia = xr_new<CUIEncyclopediaWnd>();
+            pUISocEncyclopedia->Init();
+        }
+        else
+        {
+            pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
+            if (!pUITaskWnd->Init())
+                xr_delete(pUITaskWnd);
+
+            pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
+            if (!pUIFactionWarWnd->Init())
+                xr_delete(pUIFactionWarWnd);
+        }
 
         pUIActorInfo = xr_new<CUIActorInfoWnd>();
         if (!pUIActorInfo->Init())
@@ -227,7 +262,7 @@ void CUIPdaWnd::Show(bool status)
             SetActiveSubdialog(m_sActiveSection);
         else
         {
-            cpcstr subdialog = pUIMapWnd && !pUITaskWnd ? "eptMap" : "eptTasks";
+            cpcstr subdialog = pUIMapWnd && !pUITaskWnd && !pUISocTasks ? "eptMap" : "eptTasks";
             SetActiveSubdialog(subdialog);
             UITabControl->SetActiveTab(subdialog);
         }
@@ -283,7 +318,11 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     const std::tuple<shared_str, pcstr, CUIWindow*> availableWindowsList[] =
     {
         { "eptMap",         nullptr, pUIMapWnd },
-        { "eptTasks",       nullptr, pUITaskWnd },
+        { "eptTasks",       nullptr, pUISocTasks ? static_cast<CUIWindow*>(pUISocTasks) : pUITaskWnd },
+        { "eptDiary",       "ui_pda_events", pUISocDiary },
+        { "eptContacts",    "ui_pda_contacts", pUISocContacts },
+        { "eptStalkersRanking", "ui_pda_ranking", pUISocRanking },
+        { "eptEncyclopedia", "ui_pda_encyclopedia", pUISocEncyclopedia },
         { "eptFractionWar", nullptr, pUIFactionWarWnd },
         { "eptStatistics",  "ui_pda_actor_info", pUIActorInfo },
         { "eptRanking",     nullptr, pUIRankingWnd },
@@ -420,6 +459,40 @@ void CUIPdaWnd::UpdatePda()
     {
         pUITaskWnd->ReloadTaskInfo();
     }
+    else if (m_pActiveDialog == pUISocTasks && pUISocTasks)
+    {
+        pUISocTasks->Reload();
+    }
+}
+
+void CUIPdaWnd::PdaContentsChanged(pda_section::part type)
+{
+    bool showNotification = true;
+
+    if (type == pda_section::encyclopedia && pUISocEncyclopedia)
+        pUISocEncyclopedia->ReloadArticles();
+    else if (type == pda_section::news && pUISocDiary)
+    {
+        pUISocDiary->AddNews();
+        pUISocDiary->MarkNewsAsRead(pUISocDiary->IsShown());
+    }
+    else if (type == pda_section::quests && pUISocTasks)
+        pUISocTasks->Reload();
+    else if (type == pda_section::contacts && pUISocContacts)
+    {
+        pUISocContacts->Reload();
+        showNotification = false;
+    }
+    else if ((type == pda_section::journal || type == pda_section::info) && pUISocDiary)
+        pUISocDiary->ReloadJournal();
+    else
+        showNotification = false;
+
+    if (showNotification)
+    {
+        g_pda_info_state |= type;
+        CurrentGameUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, true);
+    }
 }
 
 void CUIPdaWnd::UpdateRankingWnd()
@@ -444,6 +517,16 @@ void CUIPdaWnd::Reset()
         pUIRankingWnd->ResetAll();
     if (pUILogsWnd)
         pUILogsWnd->ResetAll();
+    if (pUISocTasks)
+        pUISocTasks->Reset();
+    if (pUISocDiary)
+        pUISocDiary->Reset();
+    if (pUISocContacts)
+        pUISocContacts->Reset();
+    if (pUISocRanking)
+        pUISocRanking->Reset();
+    if (pUISocEncyclopedia)
+        pUISocEncyclopedia->Reset();
 }
 
 void CUIPdaWnd::SetCaption(pcstr text)
@@ -472,6 +555,53 @@ void RearrangeTabButtons(CUITabControl* pTab)
     pos.x = pTab->GetWndPos().x - pos.x;
     pos.y = pTab->GetWndPos().y;
     pTab->SetWndPos(pos);
+}
+
+void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& signPlaces)
+{
+    const auto& buttons = *pTab->GetButtonsVector();
+    signPlaces.clear();
+    signPlaces.resize(buttons.size());
+
+    if (buttons.empty())
+        return;
+
+    Fvector2 pos = buttons.front()->GetWndPos();
+    constexpr Fvector2 signSize{12.0f, 11.0f};
+
+    for (u32 index = 0; index < buttons.size(); ++index)
+    {
+        CUITabButton* button = buttons[index];
+
+        if (index != 0)
+        {
+            auto* separator = xr_new<CUIStatic>();
+            separator->SetAutoDelete(true);
+            pTab->AttachChild(separator);
+            separator->SetFont(button->GetFont());
+            separator->SetTextColor(color_rgba(90, 90, 90, 255));
+            separator->SetText("//");
+            separator->SetWndSize(button->GetWndSize());
+            separator->AdjustWidthToText();
+            separator->SetWndPos(pos);
+            pos.x += separator->GetWidth();
+        }
+
+        signPlaces[index] = pos;
+        signPlaces[index].y += iFloor((button->GetHeight() - signSize.y) / 2.0f);
+        signPlaces[index].y = static_cast<float>(iFloor(signPlaces[index].y));
+        pos.x += signSize.x;
+
+        button->SetWndPos(pos);
+        button->AdjustWidthToText();
+        pos.x += button->GetWidth() + 3.0f;
+    }
+}
+
+void draw_sign(CUIStatic* sign, Fvector2& pos)
+{
+    sign->SetWndPos(pos);
+    sign->Draw();
 }
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)

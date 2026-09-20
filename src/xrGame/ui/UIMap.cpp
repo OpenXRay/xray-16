@@ -21,6 +21,13 @@ CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
+    if (ShadowOfChernobylMode && pGameIni->section_exist(name.c_str()) &&
+        pGameIni->line_exist(name.c_str(), "bound_rect"))
+    {
+        Init_internal(name, *pGameIni, name, sh_name);
+        return;
+    }
+
     const CInifile* levelIni{};
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
@@ -73,8 +80,33 @@ void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, c
     if (pLtx.line_exist(m_name, "texture"))
         m_texture = pLtx.r_string(m_name, "texture"); // Override if needed
 
+    if (ShadowOfChernobylMode)
+    {
+        constexpr pcstr oldMapPrefix = "ui\\ui_map_";
+        constexpr pcstr newMapPrefix = "map\\map_";
+        const xr_string textureName = m_texture.c_str();
+
+        if (textureName.rfind(oldMapPrefix, 0) == 0)
+        {
+            const xr_string fallbackName = newMapPrefix + textureName.substr(xr_strlen(oldMapPrefix));
+            const xr_string fallbackFile = fallbackName + ".dds";
+            if (FS.exist("$game_textures$", fallbackFile.c_str()))
+            {
+                Msg("~ Using SoC map texture fallback [%s] for [%s]", fallbackName.c_str(), textureName.c_str());
+                m_texture = fallbackName.c_str();
+            }
+        }
+    }
+
     Fvector4 tmp = pLtx.read_if_exists<Fvector4>(sect_name, "bound_rect", {-10000.0f, -10000.0f, 10000.0f, 10000.0f});
     pLtx.read_if_exists(tmp, m_name, "bound_rect"); // Override if needed
+
+    if (ShadowOfChernobylMode && pLtx.line_exist(sect_name, "x1") && pLtx.line_exist(sect_name, "x2") &&
+        pLtx.line_exist(sect_name, "z1") && pLtx.line_exist(sect_name, "z2"))
+    {
+        tmp.set(pLtx.r_float(sect_name, "x1"), pLtx.r_float(sect_name, "z1"),
+            pLtx.r_float(sect_name, "x2"), pLtx.r_float(sect_name, "z2"));
+    }
 
     m_shader_name = sh_name;
 

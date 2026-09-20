@@ -6,6 +6,31 @@
 xr_vector<xr_token> vid_monitor_token;
 xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
+namespace
+{
+void FitWindowedResolutionToDisplay(u32& width, u32& height, const u32 monitor, SDL_Window* window)
+{
+    SDL_Rect usable;
+    if (SDL_GetDisplayUsableBounds(static_cast<int>(monitor), &usable) != 0 || usable.w <= 0 || usable.h <= 0)
+        return;
+
+    int top = 0;
+    int left = 0;
+    int bottom = 0;
+    int right = 0;
+    SDL_GetWindowBordersSize(window, &top, &left, &bottom, &right);
+
+    const u32 maxWidth = static_cast<u32>(std::max(256, usable.w - left - right));
+    const u32 maxHeight = static_cast<u32>(std::max(192, usable.h - top - bottom));
+    if (width <= maxWidth && height <= maxHeight)
+        return;
+
+    const float scale = std::min(float(maxWidth) / float(width), float(maxHeight) / float(height));
+    width = std::max<u32>(256, iFloor(float(width) * scale));
+    height = std::max<u32>(192, iFloor(float(height) * scale));
+}
+} // namespace
+
 void FillResolutionsForMonitor(const int monitorID)
 {
     const int modeCount = SDL_GetNumDisplayModes(monitorID);
@@ -111,6 +136,17 @@ void CRenderDevice::UpdateWindowProps()
     ZoneScoped;
 
     const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
+
+    // SDL window sizes describe the client area. Apply native borders first
+    // so SelectResolution can also reserve space for the macOS title bar.
+    if (psDeviceMode.WindowStyle == rsWindowed)
+    {
+        SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
+        SDL_SetWindowBordered(m_sdlWnd, SDL_TRUE);
+        SDL_SetWindowResizable(m_sdlWnd, SDL_TRUE);
+        SDL_PumpEvents();
+    }
+
     SelectResolution(windowed);
 
     // Changing monitor, unset fullscreen for the previous monitor
@@ -161,8 +197,11 @@ void CRenderDevice::UpdateWindowProps()
 
     ImGuiIO& io = ImGui::GetIO();
 
-    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
-    io.DisplayFramebufferScale = ImVec2{ float(dwWidth / m_rcWindowClient.w), float(dwHeight / m_rcWindowClient.h) };
+    io.DisplaySize = { static_cast<float>(m_rcWindowClient.w), static_cast<float>(m_rcWindowClient.h) };
+    io.DisplayFramebufferScale = ImVec2{
+        m_rcWindowClient.w ? float(dwWidth) / float(m_rcWindowClient.w) : 1.0f,
+        m_rcWindowClient.h ? float(dwHeight) / float(m_rcWindowClient.h) : 1.0f
+    };
 }
 
 void CRenderDevice::UpdateWindowRects()
@@ -198,6 +237,10 @@ void CRenderDevice::SelectResolution(const bool windowed)
         psDeviceMode.Width = current.w;
         psDeviceMode.Height = current.h;
         psDeviceMode.RefreshRate = current.refresh_rate;
+    }
+    else if (windowed && psDeviceMode.WindowStyle == rsWindowed)
+    {
+        FitWindowedResolutionToDisplay(psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.Monitor, m_sdlWnd);
     }
     else if (!windowed) // check if safe for fullscreen
     {
