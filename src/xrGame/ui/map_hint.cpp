@@ -100,7 +100,7 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     SetInfoMode(2);
     CUIStatic* S = m_info["t_icon"];
 
-    S->InitTexture(task->m_icon_texture_name.c_str());
+    const bool enableIcon = S->InitTexture(task->m_icon_texture_name.c_str());
     S->SetStretchTexture(true);
 
     S = m_info["t_caption"];
@@ -145,7 +145,7 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     pos.y = S->GetWndPos().y + S->GetWndSize().y + 10;
     m_info["t_hint_text"]->SetWndPos(pos);
 
-    if (task->GetTaskType() == eTaskTypeStoryline)
+    if (enableIcon)
     {
         m_info["t_icon"]->Show(true);
         float w = m_info["t_time"]->GetWidth();
@@ -171,7 +171,7 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
         pos.y = _max(pos.y, m_info["t_icon"]->GetWndPos().y + m_info["t_icon"]->GetWndSize().y + 7);
         m_info["t_hint_text"]->SetWndPos(pos);
     }
-    else if (task->GetTaskType() == eTaskTypeAdditional)
+    else
     {
         m_info["t_icon"]->Show(false);
         float w = m_info["t_hint_text"]->GetWidth();

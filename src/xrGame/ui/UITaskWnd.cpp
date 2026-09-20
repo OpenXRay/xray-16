@@ -453,7 +453,8 @@ void CUITaskItem::InitTask(CGameTask* task)
     {
         if (task)
         {
-            S->InitTexture(task->m_icon_texture_name.c_str());
+            if (S->InitTexture(task->m_icon_texture_name.c_str()))
+                S->TextureOn();
             S->SetStretchTexture(true);
             m_info["t_icon_over"]->Show(true);
         }
