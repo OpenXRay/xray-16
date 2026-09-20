@@ -124,7 +124,6 @@ void OverlayManager::UploadSplats(nvrhi::ICommandList* cmdList)
         return;
 
     m_gpuSplats.clear();
-    m_rangeCache.clear();
 
     for (auto& [obj, data] : m_objects) {
         SplatRange range;
