@@ -28,6 +28,10 @@ public:
                       const ExtractedReflection& psReflection,
                       nvrhi::IDevice* device,
                       const char* debugLabel = nullptr);
+    ~BindingSetBuilder();
+
+    BindingSetBuilder(const BindingSetBuilder&) = delete;
+    BindingSetBuilder& operator=(const BindingSetBuilder&) = delete;
 
     static void InvalidateReflectionCache();
 
@@ -54,12 +58,15 @@ public:
     BindingSetBuilder& BufferUAVSlot(u32 slot, nvrhi::IBuffer* buffer);
     BindingSetBuilder& ConstantBufferSlot(u32 slot, nvrhi::IBuffer* buffer);
 
-    nvrhi::BindingSetDesc Build();
+    const nvrhi::BindingSetDesc& Build() &;
 
 private:
     const ReflectedLists* m_lists;
 
     nvrhi::BindingSetDesc m_desc;
+    bool m_samplersAdded = false;
+
+    void AcquireBindingStorage();
 
     int FindSRVSlot(const char* name) const;
     int FindUAVSlot(const char* name) const;

@@ -303,7 +303,7 @@ RibbonPassOutput setupRibbonPass(
                    .ConstantBuffer("RibbonParams", ribbonParamsCB)
                    .BufferSRV("g_Materials", matBuffer.GetBuffer())
                    .BufferSRV("g_ControlPoints", st.controlPointBuffer);
-                auto bindDesc = bsb.Build();
+                const auto& bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
 
                 nvrhi::GraphicsState gfxState;

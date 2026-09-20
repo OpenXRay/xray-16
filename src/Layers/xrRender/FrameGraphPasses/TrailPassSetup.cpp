@@ -345,7 +345,7 @@ TrailPassOutput setupTrailPass(
                    .BufferSRV("g_Materials", matBuffer.GetBuffer())
                    .BufferSRV("g_ControlPoints", st.controlPointBuffer)
                    .BufferSRV("g_TrailState", st.dummyStateBuffer);
-                auto bindDesc = bsb.Build();
+                const auto& bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);
 
                 nvrhi::GraphicsState gfxState;
