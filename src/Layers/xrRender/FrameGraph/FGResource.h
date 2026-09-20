@@ -15,6 +15,7 @@ struct ResourceDesc {
         TextureCube,
         Texture2DArray,
         Buffer,
+        AccelerationStructure,
     };
 
     Type type = Type::Texture2D;
@@ -30,6 +31,9 @@ struct ResourceDesc {
     u64 bufferSize = 0;
     u32 structStride = 0;
 
+    u64 accelerationStructureSize = 0;
+    bool isTopLevelAccelerationStructure = false;
+
     bool isRenderTarget = false;
     bool isDepthStencil = false;
     bool isUAV = false;
@@ -42,6 +46,8 @@ struct ResourceDesc {
     shared_str debugName;
 
     u64 ComputeMemorySize() const {
+        if (type == Type::AccelerationStructure)
+            return accelerationStructureSize;
         if (type == Type::Buffer) {
             return bufferSize;
         } else {
@@ -89,6 +95,7 @@ struct ResourceNode {
 
     nvrhi::TextureHandle nvrhiTexture;
     nvrhi::BufferHandle nvrhiBuffer;
+    nvrhi::rt::AccelStructHandle nvrhiAccelStruct;
 
     ResourceState currentState = ResourceState::Undefined;
 

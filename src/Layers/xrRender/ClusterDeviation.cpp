@@ -11,7 +11,6 @@ namespace xray::render::fg
 namespace
 {
 
-constexpr u32 kMaxAttrs = 8;
 constexpr u32 kMaxSubdiv = 8;
 constexpr int kMaxCellsPerAxis = 64;
 constexpr float kCandidateTol = 1e-3f;
@@ -36,7 +35,7 @@ float Axis(const V3& v, int a) { return a == 0 ? v.x : (a == 1 ? v.y : v.z); }
 
 struct Tri {
     V3 v[3];
-    float attr[3][kMaxAttrs];
+    float attr[3][kClusterAttrWeighted];
 };
 
 struct TriSet {
@@ -276,7 +275,7 @@ float Deviate(const TriSet& query, const TriSet& target, const Grid& grid, float
             for (u32 j = 0; i + j <= n; ++j) {
                 const float u = float(i) * inv, v = float(j) * inv, w = 1.0f - u - v;
                 const V3 p = Add(Mul(t.v[0], w), Add(Mul(t.v[1], u), Mul(t.v[2], v)));
-                float attr[kMaxAttrs];
+                float attr[kClusterAttrWeighted];
                 for (u32 k = 0; k < attrCount; ++k)
                     attr[k] = t.attr[0][k] * w + t.attr[1][k] * u + t.attr[2][k] * v;
                 worst = std::max(worst, QuerySample(grid, target, p, attr, attrCount, scratch));
@@ -288,24 +287,33 @@ float Deviate(const TriSet& query, const TriSet& target, const Grid& grid, float
 
 }
 
-float ClusterMeshDeviation(
+bool ClusterMeshDeviation(
     const float* positions, size_t positionStride,
     const float* attributes, size_t attributeStride,
     const float* attributeWeights, u32 attributeCount,
     const u32* source, size_t sourceCount,
-    const u32* result, size_t resultCount)
+    const u32* result, size_t resultCount,
+    float& outDeviation)
 {
+    outDeviation = 0.0f;
+
+    if (!positions || !attributes || !attributeWeights || !source || !result)
+        return false;
+    if (attributeCount != kClusterAttrWeighted)
+        return false;
+    if (positionStride < 3 || attributeStride < kClusterAttrStride)
+        return false;
+
     static thread_local TriSet s_a;
     static thread_local TriSet s_b;
     static thread_local Grid s_ga;
     static thread_local Grid s_gb;
     static thread_local QueryScratch s_scratch;
 
-    const u32 attrCount = std::min(attributeCount, kMaxAttrs);
-    BuildSet(s_a, positions, positionStride, attributes, attributeStride, attributeWeights, attrCount, source, sourceCount);
-    BuildSet(s_b, positions, positionStride, attributes, attributeStride, attributeWeights, attrCount, result, resultCount);
+    BuildSet(s_a, positions, positionStride, attributes, attributeStride, attributeWeights, attributeCount, source, sourceCount);
+    BuildSet(s_b, positions, positionStride, attributes, attributeStride, attributeWeights, attributeCount, result, resultCount);
     if (s_a.tris.empty() || s_b.tris.empty())
-        return 0.0f;
+        return s_a.tris.empty() && s_b.tris.empty();
 
     BuildGrid(s_ga, s_a);
     BuildGrid(s_gb, s_b);
@@ -314,9 +322,10 @@ float ClusterMeshDeviation(
     const float extent = std::max(size.x, std::max(size.y, size.z));
     const float step = std::max(kMinSampleStep, extent / kSampleDivisor);
 
-    const float ab = Deviate(s_a, s_b, s_gb, step, attrCount, s_scratch);
-    const float ba = Deviate(s_b, s_a, s_ga, step, attrCount, s_scratch);
-    return std::max(ab, ba);
+    const float ab = Deviate(s_a, s_b, s_gb, step, attributeCount, s_scratch);
+    const float ba = Deviate(s_b, s_a, s_ga, step, attributeCount, s_scratch);
+    outDeviation = std::max(ab, ba);
+    return true;
 }
 
 }

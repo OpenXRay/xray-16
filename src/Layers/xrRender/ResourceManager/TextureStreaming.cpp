@@ -11,27 +11,31 @@ static std::mutex s_streamingCmdListMutex;
 StreamingManager::StreamingManager(xray::render::fg::RenderDevice* device, TextureManager* texManager)
     : m_device(device)
     , m_texManager(texManager)
-    , m_asyncIO(nullptr)
 {
     VERIFY(m_texManager);
-
-    m_asyncIO = xr_new<AsyncIOManager>();
-
 }
 
 StreamingManager::~StreamingManager() {
-    for (auto& request : m_activeRequests) {
-        if (request.ioHandle) {
-            u32 requestID = (u32)(uintptr_t)request.ioHandle;
-            m_asyncIO->CancelRequest(requestID);
-        }
-    }
+    if (m_asyncIO && m_ioEpoch)
+        m_asyncIO->DrainEpoch(m_ioEpoch);
 
     PrintStatistics();
 
-    xr_delete(m_asyncIO);
-
     s_streamingCmdList = nullptr;
+}
+
+AsyncIOManager* StreamingManager::IOService() {
+    if (m_asyncIO)
+        return m_asyncIO;
+    if (!m_device)
+        return nullptr;
+    FGResourceManager* owner = m_device->GetFGResourceManager();
+    if (!owner)
+        return nullptr;
+    m_asyncIO = owner->GetIOService();
+    if (m_asyncIO && !m_ioEpoch)
+        m_ioEpoch = m_asyncIO->AcquireEpoch();
+    return m_asyncIO;
 }
 
 void StreamingManager::RequestMips(
@@ -76,18 +80,32 @@ void StreamingManager::RequestMips(
 
 void StreamingManager::CancelRequest(TextureHandle handle) {
     auto it = m_handleToRequest.find(handle);
-    if (it == m_handleToRequest.end()) {
+    if (it == m_handleToRequest.end())
         return;
+
+    for (auto pending = m_pendingRequests.begin(); pending != m_pendingRequests.end();) {
+        if (pending->handle == handle) {
+            pending = m_pendingRequests.erase(pending);
+            if (m_stats.requestsPending)
+                m_stats.requestsPending--;
+            continue;
+        }
+        ++pending;
     }
 
-    u32 index = it->second;
-
-    if (index < m_pendingRequests.size()) {
-        m_pendingRequests.erase(m_pendingRequests.begin() + index);
-        m_handleToRequest.erase(it);
-        m_stats.requestsPending--;
+    for (auto active = m_activeRequests.begin(); active != m_activeRequests.end();) {
+        if (active->handle == handle) {
+            if (active->ioRequest && m_asyncIO)
+                m_asyncIO->CancelRequest(active->ioRequest);
+            active = m_activeRequests.erase(active);
+            if (m_stats.requestsInProgress)
+                m_stats.requestsInProgress--;
+            continue;
+        }
+        ++active;
     }
 
+    m_handleToRequest.erase(it);
 }
 
 bool StreamingManager::HasPendingRequest(TextureHandle handle) const {
@@ -97,10 +115,7 @@ bool StreamingManager::HasPendingRequest(TextureHandle handle) const {
 void StreamingManager::Update(float deltaTime) {
     m_stats.bytesStreamedThisFrame = 0;
 
-    m_asyncIO->ProcessCompletedRequests();
-
     ProcessActiveRequests();
-
     ProcessPendingRequests();
 }
 
@@ -130,21 +145,9 @@ void StreamingManager::ProcessActiveRequests() {
                 break;
 
             case StreamingRequest::InProgress:
-                if (request.ioHandle) {
-                    u32 requestID = (u32)(uintptr_t)request.ioHandle;
-
-                    if (m_asyncIO->IsRequestComplete(requestID)) {
-                        if (!request.stagingBuffer.empty()) {
-                            request.status = StreamingRequest::Uploading;
-                        } else {
-                            FailRequest(request, "Async I/O failed or returned empty buffer");
-                            it = m_activeRequests.erase(it);
-                            continue;
-                        }
-                    }
-                } else {
+                if (!request.ioRequest) {
                     if (!LoadMipsFromDisk(request)) {
-                        FailRequest(request, "Failed to start async load");
+                        FailRequest(request, "failed to start the async load");
                         it = m_activeRequests.erase(it);
                         continue;
                     }
@@ -153,16 +156,19 @@ void StreamingManager::ProcessActiveRequests() {
                 break;
 
             case StreamingRequest::Uploading:
-                if (UploadMipsToGPU(request)) {
-                    CompleteRequest(request);
-                    it = m_activeRequests.erase(it);
-                    continue;
-                } else {
-                    FailRequest(request, "Failed to upload to GPU");
-                    it = m_activeRequests.erase(it);
-                    continue;
+            {
+                const UploadResult result = UploadMipsToGPU(request);
+                if (result == UploadResult::Deferred) {
+                    ++it;
+                    break;
                 }
-                break;
+                if (result == UploadResult::Uploaded)
+                    CompleteRequest(request);
+                else
+                    FailRequest(request, "failed to upload the streamed mips");
+                it = m_activeRequests.erase(it);
+                continue;
+            }
 
             case StreamingRequest::Complete:
             case StreamingRequest::Failed:
@@ -180,54 +186,52 @@ void StreamingManager::StartRequest(StreamingRequest& request) {
 
 bool StreamingManager::LoadMipsFromDisk(StreamingRequest& request) {
     const TextureMetadata* meta = m_texManager->GetMetadata(request.handle);
-    if (!meta) {
+    if (!meta)
         return false;
-    }
 
-    if (!request.ioHandle) {
-
-        IReader* reader = FS.r_open(meta->filePath.c_str());
-        if (!reader) {
-            return false;
-        }
-
-        u64 size = reader->length();
-        FS.r_close(reader);
-
-        u32 requestID = m_asyncIO->ReadAsync(
-            meta->filePath.c_str(),
-            0,
-            size,
-            [this, handle = request.handle](AsyncIORequest& ioRequest) {
-                this->OnAsyncLoadComplete(handle, ioRequest);
-            },
-            (void*)(uintptr_t)request.handle.index
-        );
-
-        request.ioHandle = (void*)(uintptr_t)requestID;
+    if (request.ioRequest)
         return true;
-    }
 
-    return true;
+    AsyncIOManager* io = IOService();
+    if (!io)
+        return false;
+
+    IReader* reader = FS.r_open(meta->filePath.c_str());
+    if (!reader)
+        return false;
+    const u64 size = u64(reader->length());
+    FS.r_close(reader);
+    if (size == 0)
+        return false;
+
+    request.ioRequest = io->ReadAsync(
+        meta->filePath.c_str(),
+        0,
+        size,
+        m_ioEpoch,
+        [this, handle = request.handle](AsyncIORequest& ioRequest) {
+            this->OnAsyncLoadComplete(handle, ioRequest);
+        },
+        (void*)(uintptr_t)request.handle.index);
+
+    return request.ioRequest != 0;
 }
 
-bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
+StreamingManager::UploadResult StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
     TextureMetadata* meta = const_cast<TextureMetadata*>(
         m_texManager->GetMetadata(request.handle)
     );
 
-    if (!meta || !meta->nvrhiTexture) {
-        return false;
-    }
+    if (!meta || !meta->nvrhiTexture)
+        return UploadResult::Failed;
 
-    if (m_stats.bytesStreamedThisFrame + request.stagingBuffer.size() > m_bandwidthLimit) {
-        return false;
-    }
+    if (m_stats.bytesStreamedThisFrame != 0
+        && m_stats.bytesStreamedThisFrame + request.stagingBuffer.size() > m_bandwidthLimit)
+        return UploadResult::Deferred;
 
     DDSData ddsData;
-    if (!DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData)) {
-        return false;
-    }
+    if (!DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData))
+        return UploadResult::Failed;
 
     u32 startMip = request.currentMips;
     u32 endMip = request.targetMips;
@@ -269,7 +273,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
     m_stats.bytesStreamedThisFrame += request.stagingBuffer.size();
     m_stats.bytesStreamedTotal += request.stagingBuffer.size();
 
-    return true;
+    return UploadResult::Uploaded;
 }
 
 void StreamingManager::CompleteRequest(StreamingRequest& request) {

@@ -31,6 +31,10 @@ struct GeometryBatch {
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr;
 
+    u64 visualLifetimeID = 0;
+    u64 renderableLifetimeID = 0;
+    u32 geometrySubset = 0;
+
     bool isStatic = false;
 
     bool isSkinned = false;

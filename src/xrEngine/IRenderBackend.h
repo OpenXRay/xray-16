@@ -64,6 +64,21 @@ public:
     virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}
     virtual void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {}
 
+    enum class SubmissionLeaseState : u8 {
+        Unknown,
+        Open,
+        Pending,
+        Complete,
+        Failed
+    };
+
+    virtual bool SupportsSubmissionLeases() const { return false; }
+    virtual u64 OpenSubmissionLease() { return 0; }
+    virtual void CloseSubmissionLease(u64 lease) {}
+    virtual SubmissionLeaseState PollSubmissionLease(u64 lease) { return SubmissionLeaseState::Unknown; }
+    virtual void ReleaseSubmissionLease(u64 lease) {}
+    virtual u32 GetPendingSubmissionCount() const { return 0; }
+
     virtual nvrhi::ITexture* GetBackBuffer() = 0;
     virtual u32 GetCurrentBackBufferIndex() const { return 0; }
     virtual u32 GetBackBufferCount() const { return 1; }
@@ -150,6 +165,8 @@ public:
 
     virtual u32 RegisterBindlessTexture(nvrhi::ITexture* texture) { return UINT32_MAX; }
     virtual void UnregisterBindlessTexture(u32 index) {}
+    virtual bool RetainBindlessTextures(const u32* indices, u32 count);
+    virtual void ReleaseBindlessTextures(const u32* indices, u32 count);
     virtual nvrhi::IBindingLayout* GetBindlessLayout() const { return nullptr; }
     virtual nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const { return nullptr; }
 

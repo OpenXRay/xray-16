@@ -225,9 +225,32 @@ void MaterialCache::CreateDefaultPBRTextures()
     Msg("* [MaterialCache] Created default PBR texture");
 }
 
-MaterialCache::~MaterialCache() {
+MaterialCache::~MaterialCache()
+{
     FlushAlphaRefCache();
     Clear();
+    if (m_textureBackend)
+        m_textureBackend->ReleaseBindlessTextures(
+            m_bindlessTextureIndices.data(), u32(m_bindlessTextureIndices.size()));
+}
+
+u32 MaterialCache::RegisterMaterialTexture(nvrhi::ITexture* texture)
+{
+    if (!texture)
+        return fg::bindless::INVALID_TEXTURE_INDEX;
+    const auto found = m_bindlessTextures.find(texture);
+    if (found != m_bindlessTextures.end())
+        return found->second;
+    R_ASSERT(GEnv.Backend);
+    R_ASSERT(!m_textureBackend || m_textureBackend == GEnv.Backend);
+    m_textureBackend = GEnv.Backend;
+    const u32 index = m_textureBackend->RegisterBindlessTexture(texture);
+    if (index != fg::bindless::INVALID_TEXTURE_INDEX)
+    {
+        m_bindlessTextures.emplace(texture, index);
+        m_bindlessTextureIndices.push_back(index);
+    }
+    return index;
 }
 
 void MaterialCache::FlushAlphaRefCache()
@@ -1161,7 +1184,7 @@ u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
 }
 
 
-void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
+void MaterialCache::FinalizePendingTerrainMaterials()
 {
     using namespace fg::bindless;
 
@@ -1218,7 +1241,7 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
                 return INVALID_TEXTURE_INDEX;
             }
 
-            u32 idx = backend->RegisterBindlessTexture(nvrhiTex);
+            u32 idx = RegisterMaterialTexture(nvrhiTex);
             if (idx == INVALID_TEXTURE_INDEX) {
                 missingTextures.push_back(xr_string(slotName) + ": " + texName + " (register failed)");
             }
@@ -1360,7 +1383,6 @@ void MaterialCache::FinalizePendingTerrainMaterials(fg::RenderContext* ctx)
     s_finalizeCallCount++;
 
     if (processedCount > 0) {
-        terrainBuffer.Upload(ctx);
         Msg("* [MaterialCache] Finalized %u terrain materials (call #%u, total registered: %u)",
             processedCount, s_finalizeCallCount, terrainBuffer.GetMaterialCount());
     }
@@ -1491,7 +1513,7 @@ u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
 }
 
 
-void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
+void MaterialCache::FinalizePendingMaterials()
 {
     using namespace fg::bindless;
 
@@ -1513,7 +1535,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
         return;
     }
 
-    u32 processedCount = 0;
 
     for (const auto& pending : m_pendingMaterials) {
         dxRender_Visual* visual = pending.visual;
@@ -1544,7 +1565,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
-                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    u32 descriptorIndex = RegisterMaterialTexture(nvrhiTex);
                     if (descriptorIndex != INVALID_TEXTURE_INDEX) {
                         matData.diffuseIndex = descriptorIndex;
                         updated = true;
@@ -1560,7 +1581,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
-                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    u32 descriptorIndex = RegisterMaterialTexture(nvrhiTex);
                     if (descriptorIndex != INVALID_TEXTURE_INDEX) {
                         matData.normalIndex = descriptorIndex;
                         matData.flags |= MAT_FLAG_HAS_NORMAL;
@@ -1577,7 +1598,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
                 if (handle.IsValid()) {
                     nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                     if (nvrhiTex) {
-                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        u32 descriptorIndex = RegisterMaterialTexture(nvrhiTex);
                         if (descriptorIndex != INVALID_TEXTURE_INDEX) {
                             matData.detailIndex = descriptorIndex;
                             matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
@@ -1596,7 +1617,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
                 if (handle.IsValid()) {
                     nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                     if (nvrhiTex) {
-                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        u32 descriptorIndex = RegisterMaterialTexture(nvrhiTex);
                         if (descriptorIndex != INVALID_TEXTURE_INDEX) {
                             matData.pbrIndex = descriptorIndex;
                             matData.flags |= MAT_FLAG_HAS_PBR;
@@ -1609,7 +1630,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
 
         if (updated) {
             materialBuffer.UpdateMaterial(materialID, matData);
-            processedCount++;
         }
 
         if (matData.shaderVariant > 0) {
@@ -1630,7 +1650,7 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
                     if (handle.IsValid()) {
                         nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                         if (nvrhiTex) {
-                            u32 idx = backend->RegisterBindlessTexture(nvrhiTex);
+                            u32 idx = RegisterMaterialTexture(nvrhiTex);
                             if (idx != INVALID_TEXTURE_INDEX)
                                 vtData.tex[slotIdx] = idx;
                         }
@@ -1643,17 +1663,6 @@ void MaterialCache::FinalizePendingMaterials(fg::RenderContext* ctx)
     }
 
     m_pendingMaterials.clear();
-
-    if (!ctx)
-        return;
-
-    if (processedCount > 0) {
-        materialBuffer.Upload(ctx);
-    }
-
-    auto& vtb = bindless::VariantTextureBuffer::Instance();
-    if (vtb.IsInitialized())
-        vtb.Upload(ctx);
 }
 
 nvrhi::ITexture* MaterialCache::GetNVRHITextureByName(const char* textureName)

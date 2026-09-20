@@ -12,6 +12,7 @@ public:
     Fmatrix xform;
     IRenderVisual* visual;
     IRender_ObjectSpecific* pROS;
+    u64 lifetimeSerial;
     bool pROS_Allowed;
     bool invisible; // object should be invisible on the scene graph
     bool hud; // At the current moment, object is being rendered on HUD

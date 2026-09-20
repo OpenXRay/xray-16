@@ -6,7 +6,6 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    class MaterialCache;
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
@@ -49,7 +48,6 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::VirtualResourceHandle material,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
-    MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
     const Fmatrix& prevView,

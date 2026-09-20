@@ -29,30 +29,8 @@ static_assert(offsetof(UnifiedVertex, texcoord1) == 32, "texcoord1 at offset 32"
 static_assert(offsetof(UnifiedVertex, color) == 40, "color at offset 40");
 static_assert(offsetof(UnifiedVertex, flags) == 44, "flags at offset 44");
 
-enum class SourceVertexFormat : u8 {
-    Unknown = 0,
-    R1_Lmap,
-    R1_Vert,
-    MU_Model,
-    R1_Lmap_Unpacked,
-    R1_Vert_Unpacked,
-    MU_Model_Unpacked,
-    X_Vert,
-};
-
-inline SourceVertexFormat DetectVertexFormat(u32 stride, bool hasLightmap, bool hasColor) {
-    switch (stride) {
-        case 12: return SourceVertexFormat::X_Vert;
-        case 28:
-            return hasColor ? SourceVertexFormat::R1_Vert_Unpacked : SourceVertexFormat::MU_Model_Unpacked;
-        case 32:
-            if (hasLightmap) return SourceVertexFormat::R1_Lmap;
-            if (hasColor) return SourceVertexFormat::R1_Vert;
-            return SourceVertexFormat::MU_Model;
-        default:
-            return SourceVertexFormat::Unknown;
-    }
-}
+constexpr u32 UNIFIED_VERTEX_FLAG_FLOAT_BASIS = 1u << 0;
+constexpr u32 UNIFIED_VERTEX_FLAG_MASK = UNIFIED_VERTEX_FLAG_FLOAT_BASIS;
 
 constexpr u32 UNIFIED_VERTEX_STRIDE = 48;
 

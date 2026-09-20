@@ -43,6 +43,9 @@ public:
         const ResourceDesc& desc
     );
 
+    VirtualResourceHandle ImportAccelerationStructure(
+        const char* name, nvrhi::rt::IAccelStruct* physicalAccelerationStructure);
+
     PassHandle AddPass(const char* name);
 
     void PassRead(PassHandle pass, VirtualResourceHandle resource,
@@ -121,6 +124,7 @@ public:
 
     nvrhi::ITexture* GetPhysicalTexture(VirtualResourceHandle handle) const;
     nvrhi::IBuffer* GetPhysicalBuffer(VirtualResourceHandle handle) const;
+    nvrhi::rt::IAccelStruct* GetPhysicalAccelerationStructure(VirtualResourceHandle handle) const;
 
     const ResourceDesc& GetResourceDesc(VirtualResourceHandle handle) const;
 
@@ -168,6 +172,7 @@ private:
     RenderTargetRegistry m_rtRegistry;
 
     xr_vector<ResourceNode> m_resources;
+    xr_map<const void*, u32> m_importedLookup;
     xr_vector<PassNode> m_passes;
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
@@ -223,6 +228,7 @@ private:
     bool PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const;
 
     PassNode* GetPassNode(PassHandle handle);
+    VirtualResourceHandle CanonicalizeImport(const void* physical, const ResourceDesc& desc);
     const PassNode* GetPassNode(PassHandle handle) const;
 
     static nvrhi::ResourceStates ConvertToNVRHIState(ResourceState state);

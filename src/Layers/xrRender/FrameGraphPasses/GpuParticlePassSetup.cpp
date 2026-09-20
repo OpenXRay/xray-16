@@ -11,8 +11,6 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
-#include "Layers/xrRender/Bindless/MaterialBuffer.h"
-#include "Layers/xrRender/Geometry/MaterialCache.h"
 
 namespace xray::render::fg::passes {
 
@@ -30,7 +28,7 @@ static_assert(sizeof(nvrhi::DrawIndirectArguments) == 16);
 
 struct GpuParticlePassData {
     fg::RenderDevice* device;
-    MaterialCache* materialCache;
+    VirtualResourceHandle materials;
     GpuParticleDrawResources resources;
     VirtualResourceHandle color, depth, normal, baseColor, distortion, sceneDepth;
     GpuParticlePassState* state;
@@ -136,10 +134,6 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     auto* commandList = context->GetCommandList();
     const auto& passState = *data.state;
     auto& cache = GetPassResourceCache();
-    auto& materials = bindless::MaterialBuffer::Instance();
-    if (data.materialCache)
-        data.materialCache->FinalizePendingMaterials(context);
-    materials.Upload(context);
     auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     auto* drawConstants = cache.GetOrCreateVolatileCB("GpuParticle", "DrawParams", sizeof(GpuParticleDrawParams), data.device, 128);
     GpuParticleDrawParams params = {};
@@ -155,7 +149,7 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
             .BufferSRV("g_Programs", graph.GetPhysicalBuffer(data.resources.programResource))
             .BufferSRV("g_ParticleIndices", graph.GetPhysicalBuffer(data.resources.indexResource))
             .BufferSRV("g_BucketOffsets", graph.GetPhysicalBuffer(data.resources.bucketResource))
-            .BufferSRV("g_Materials", materials.GetBuffer());
+            .BufferSRV("g_Materials", graph.GetPhysicalBuffer(data.materials));
         if (softParticles)
             bindings.Texture("g_SceneDepth", graph.GetPhysicalTexture(data.sceneDepth));
         return cache.GetOrCreateBindingSet(bindings.Build(), layout, device);
@@ -222,7 +216,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
     FrameGraph& graph,
     fg::RenderDevice* device,
     const GpuParticleDrawResources& resources,
-    MaterialCache* materialCache,
+    VirtualResourceHandle materials,
     VirtualResourceHandle color,
     VirtualResourceHandle depth,
     VirtualResourceHandle normal,
@@ -264,7 +258,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
         [&](FrameGraph& builder, PassHandle handle, GpuParticlePassData& data) {
             RenderPassBuilder pass(builder, handle);
             data.device = device;
-            data.materialCache = materialCache;
+            data.materials = pass.read(materials, ResourceState::ShaderResource);
             data.state = &state;
             data.width = width;
             data.height = height;

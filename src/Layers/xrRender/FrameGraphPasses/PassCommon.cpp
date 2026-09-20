@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "PassCommon.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/device.h"
@@ -8,36 +10,55 @@
 
 namespace xray::render::fg::passes {
 
-nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDevice* device)
+
+void RecordGeometryShadowDraw(nvrhi::ICommandList* cmd, nvrhi::IDevice* device,
+    nvrhi::IBuffer* dirtyList, nvrhi::IBuffer* drawArgs, nvrhi::IBuffer* geometryDirty, u32 capacity,
+    ShadowPublication publication, nvrhi::IBuffer* cacheState, nvrhi::IBuffer* pageList,
+    nvrhi::ComputePipelineHandle& pipeline)
 {
+    const bool vsm = publication == ShadowPublication::VSM;
+    const char* entry = vsm ? "publishVSM" : "publishLocal";
+    R_ASSERT(cacheState && (!vsm || pageList));
+    auto* loader = GEnv.Render->GetShaderLoader();
     auto& cache = framegraph::GetPassResourceCache();
-    if (cache.HasStaticBuffer(passName, "DrawIndexBuffer")) {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = 65536 * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.isVertexBuffer = true;
-        desc.debugName = "DrawIndexBuffer";
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
-        return cache.GetOrCreateStaticBuffer(passName, "DrawIndexBuffer", desc, device);
+    if (!pipeline)
+    {
+        auto shader = loader->LoadComputeShader("geometry_shadow_accept", entry);
+        R_ASSERT(shader.handle && shader.reflection);
+        auto layout = cache.GetOrCreateBindingLayoutFromReflection(entry, *shader.reflection, device);
+        R_ASSERT(layout);
+        nvrhi::ComputePipelineDesc desc;
+        desc.CS = shader.handle;
+        desc.bindingLayouts = { layout };
+        pipeline = cache.GetOrCreateComputePipeline(entry, desc, device);
+        R_ASSERT(pipeline);
     }
-
-    nvrhi::BufferDesc desc;
-    desc.byteSize = 65536 * sizeof(u32);
-    desc.structStride = sizeof(u32);
-    desc.isVertexBuffer = true;
-    desc.debugName = "DrawIndexBuffer";
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
-    auto buffer = cache.GetOrCreateStaticBuffer(passName, "DrawIndexBuffer", desc, device);
-
-    if (buffer && GEnv.Backend) {
-        xr_vector<u32> drawIndices(65536);
-        for (u32 i = 0; i < 65536; i++)
-            drawIndices[i] = i;
-        GEnv.Backend->UploadBufferData(buffer, drawIndices.data(), 65536 * sizeof(u32));
-    }
-    return buffer;
+    auto* reflection = loader->GetCachedReflection("geometry_shadow_accept",
+        vsm ? ".cs:publishVSM" : ".cs:publishLocal");
+    R_ASSERT(reflection);
+    auto layout = pipeline->getDesc().bindingLayouts[0];
+    framegraph::BindingSetBuilder builder(*reflection, device, entry);
+    builder.BufferSRV("g_DirtyList", dirtyList)
+        .BufferSRV("g_DrawArgs", drawArgs)
+        .BufferUAV("g_GeometryDirty", geometryDirty);
+    if (vsm)
+        builder.BufferSRV("g_PageList", pageList).BufferUAV("g_PageTable", cacheState);
+    else
+        builder.BufferUAV("g_TileState", cacheState);
+    auto bindings = cache.GetOrCreateBindingSet(builder.Build(), layout, device);
+    R_ASSERT(bindings);
+    cmd->setBufferState(dirtyList, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmd->setBufferState(drawArgs, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmd->setBufferState(geometryDirty, nvrhi::ResourceStates::UnorderedAccess);
+    cmd->setBufferState(cacheState, nvrhi::ResourceStates::UnorderedAccess);
+    if (vsm)
+        cmd->setBufferState(pageList, nvrhi::ResourceStates::NonPixelShaderResource);
+    cmd->commitBarriers();
+    nvrhi::ComputeState state;
+    state.pipeline = pipeline;
+    state.bindings = { bindings };
+    cmd->setComputeState(state);
+    cmd->dispatch((capacity + 63u) / 64u, 1, 1);
 }
 
 LightingConstants FillLightingConstants()

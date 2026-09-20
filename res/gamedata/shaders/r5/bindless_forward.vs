@@ -1,3 +1,4 @@
+
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
@@ -12,6 +13,7 @@ struct VS_INPUT
     float2 texcoord1 : TEXCOORD1;
     float4 color     : COLOR0;
     uint drawIndex   : DRAWINDEX;
+    float3 exactNormal : EXACTNORMAL;
 };
 
 struct VS_OUTPUT
@@ -49,7 +51,8 @@ VS_OUTPUT main(VS_INPUT input)
     float4x4 worldMatrix = instanceData.world;
     uint materialID = instanceData.materialID;
 
-    float3 normalUnpacked = UnpackNormal(input.normal);
+    float3 normalUnpacked = (instanceData.flags & 4u) != 0u
+        ? UnpackNormal(input.normal) : input.exactNormal;
     float3 tangentUnpacked = UnpackNormal(input.tangent);
     float3 binormalUnpacked = UnpackNormal(input.binormal);
 

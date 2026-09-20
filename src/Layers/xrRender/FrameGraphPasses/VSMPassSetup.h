@@ -2,10 +2,10 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    class MaterialCache;
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
@@ -73,6 +73,44 @@ struct VsmResidParams {
     Fvector4 levelOrigin[kVSMLevels];
 };
 
+class VSMCacheResources
+{
+public:
+    framegraph::VirtualResourceHandle pageTable;
+    framegraph::VirtualResourceHandle pageList;
+    framegraph::VirtualResourceHandle physTile;
+    framegraph::VirtualResourceHandle slotDirty;
+    framegraph::VirtualResourceHandle slotFrame;
+    framegraph::VirtualResourceHandle slotPivot;
+    framegraph::VirtualResourceHandle slotSun;
+};
+
+class VSMReadbackSlot
+{
+public:
+    VSMReadbackSlot();
+    ~VSMReadbackSlot();
+    VSMReadbackSlot(const VSMReadbackSlot&) = delete;
+    VSMReadbackSlot& operator=(const VSMReadbackSlot&) = delete;
+
+    nvrhi::BufferHandle buffer;
+    VsmParams demand = {};
+    u64 lease = 0;
+    u64 sequence = 0;
+    u32 cacheEpoch = 0;
+    bool captured = false;
+    bool cacheCaptured = false;
+};
+
+class VSMCachedTile
+{
+public:
+    Fvector4 pivot = {};
+    Fvector4 sun = {};
+    u32 page[2] = {};
+    bool published = false;
+};
+
 struct VSMState {
     static constexpr u32 kReadbackSlots = 6;
 
@@ -115,6 +153,7 @@ struct VSMState {
     nvrhi::BufferHandle pageList;
     nvrhi::BufferHandle physTile;
     nvrhi::BufferHandle slotDirty;
+    nvrhi::BufferHandle geometryDirty;
     nvrhi::BufferHandle dirtyList;
     nvrhi::BufferHandle drawClear;
     nvrhi::BufferHandle slotFrame;
@@ -146,6 +185,8 @@ struct VSMState {
     u32 dynMaxPages = 0;
     framegraph::VirtualResourceHandle fgNeeded;
     framegraph::VirtualResourceHandle fgDirtyList;
+    framegraph::VirtualResourceHandle fgGeometryDirty;
+    VSMCacheResources fgCache;
     framegraph::VirtualResourceHandle fgDrawClear;
     framegraph::VirtualResourceHandle fgPageArgs[kVSMStreamCount];
     framegraph::VirtualResourceHandle fgAtlas;
@@ -169,9 +210,16 @@ struct VSMState {
     nvrhi::BufferHandle pairs[kVSMStreamCount];
     u32 pairCapacity[kVSMStreamCount] = {};
     nvrhi::BufferHandle pageArgs[kVSMStreamCount];
-    nvrhi::BufferHandle readback[kReadbackSlots];
+    bool binRecorded = false;
+    nvrhi::ComputePipelineHandle publicationPipeline;
+    VSMReadbackSlot readback[kReadbackSlots];
     u32 readbackWrite = 0;
-    u32 readbackScheduled = 0;
+    u32 readbackRecording = 0;
+    u64 readbackSequence = 0;
+    u64 readbackLatest = 0;
+    u32 cachedDemandEpoch = UINT32_MAX;
+    bool cachedDemandEnabled = false;
+    xr_vector<VSMCachedTile> cachedTiles;
 
     u32 markPages = 0;
     u32 levelPages[kVSMLevels] = {};
@@ -244,25 +292,18 @@ struct VSMState {
 };
 
 struct VSMDrawConfig {
-    nvrhi::IBuffer* entryBuffer = nullptr;
-    u32 entryCount = 0;
-    nvrhi::IBuffer* bvhNodeBuffer = nullptr;
-    nvrhi::IBuffer* bvhIndexBuffer = nullptr;
+    GeometryFrameResources geometryResources;
+    GeometryFrameBuffers geometry;
+    u32 refCount = 0;
     u32 bvhNodeCount = 0;
     u32 minimumPairCapacity[kVSMStreamCount] = {};
-    nvrhi::IBuffer* staticInstanceBuffer = nullptr;
-    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
-    nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::IBuffer* megaIndexBuffer = nullptr;
-    MaterialCache* materialCache = nullptr;
+    bool residencyStreaming = false;
 };
 
 struct VSMDynConfig {
     GPUCullingManager* gpuCulling = nullptr;
-    nvrhi::IBuffer* entryBuffer = nullptr;
-    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
-    nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::IBuffer* megaIndexBuffer = nullptr;
+    GeometryFrameResources geometryResources;
+    GeometryFrameBuffers geometry;
 };
 
 struct VSMOutput {

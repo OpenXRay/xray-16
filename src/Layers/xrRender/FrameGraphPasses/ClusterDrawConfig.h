@@ -1,47 +1,65 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include <nvrhi/nvrhi.h>
+
+namespace xray::render::framegraph {
+    class FrameGraph;
+}
 
 namespace xray::render::fg::passes {
 
-struct ClusterDrawConfig {
-    nvrhi::IBuffer* entryBuffer = nullptr;
+class ClusterDrawBuffers
+{
+public:
+    nvrhi::IBuffer* clusterRefs = nullptr;
+    nvrhi::IBuffer* clusterMeta = nullptr;
+    nvrhi::IBuffer* instances = nullptr;
+    nvrhi::IBuffer* clusterPages = nullptr;
+    nvrhi::IBuffer* clusterPayload = nullptr;
+    nvrhi::IBuffer* clusterVertices = nullptr;
     nvrhi::IBuffer* visibleEntryBuffer = nullptr;
     nvrhi::IBuffer* fadeBuffer = nullptr;
     nvrhi::IBuffer* argsBuffer = nullptr;
-    nvrhi::IBuffer* instanceBuffer = nullptr;
-    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
-    nvrhi::IBuffer* dynamicPrevWorldBuffer = nullptr;
-    u32 entryCount = 0;
-
     nvrhi::IBuffer* terrainVisibleEntryBuffer = nullptr;
     nvrhi::IBuffer* terrainFadeBuffer = nullptr;
     nvrhi::IBuffer* terrainArgsBuffer = nullptr;
-    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
-    u32 terrainEntryCount = 0;
-
-    nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::IBuffer* megaIndexBuffer = nullptr;
-
     nvrhi::IBuffer* swEntryBuffer = nullptr;
     nvrhi::IBuffer* swArgsBuffer = nullptr;
+};
 
-    bool SwValid() const {
-        return entryBuffer && swEntryBuffer && swArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
-    }
+enum class ClusterDrawUse
+{
+    Geometry,
+    Raster,
+    Software
+};
 
-    bool IsValid() const {
-        return entryBuffer && visibleEntryBuffer && fadeBuffer && argsBuffer && instanceBuffer && entryCount > 0;
-    }
+class ClusterDrawConfig
+{
+public:
+    GeometryFrameResources geometry;
+    framegraph::VirtualResourceHandle visibleEntries;
+    framegraph::VirtualResourceHandle fades;
+    framegraph::VirtualResourceHandle args;
+    framegraph::VirtualResourceHandle terrainVisibleEntries;
+    framegraph::VirtualResourceHandle terrainFades;
+    framegraph::VirtualResourceHandle terrainArgs;
+    framegraph::VirtualResourceHandle swEntries;
+    framegraph::VirtualResourceHandle swArgs;
 
-    bool TerrainValid() const {
-        return entryBuffer && terrainVisibleEntryBuffer && terrainFadeBuffer && terrainArgsBuffer && terrainInstanceBuffer && terrainEntryCount > 0;
-    }
+    u32 refCount = 0;
+    u32 staticRefCount = 0;
+    u32 terrainRefCount = 0;
 
-    bool UseMegaBuffers() const {
-        return megaVertexBuffer && megaIndexBuffer;
-    }
+    bool HasGeometry() const;
+    bool IsValid() const;
+    bool TerrainValid() const;
+    bool SwValid() const;
+    bool UseCompactGeometry() const;
+
+    ClusterDrawBuffers Resolve(const framegraph::FrameGraph& graph, ClusterDrawUse use) const;
 };
 
 }

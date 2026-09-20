@@ -1,33 +1,42 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
+#include <memory>
 
-namespace xray::render {
-    struct GeometryBatch;
+class IRenderBackend;
+
+namespace xray::render
+{
+struct GeometryBatch;
+namespace framegraph
+{
+class FrameGraph;
+class RenderPassBuilder;
+}
 }
 
-namespace xray::render::fg {
-    class FGDetailManager;
-}
-
-namespace xray::render::fg {
-class RenderDevice;
-class RenderContext;
-}
-
-namespace xray::render::fg {
+namespace xray::render::fg
+{
+class FGDetailManager;
 class GPUCullingManager;
+class RenderDevice;
 
-struct RTBatchInfo {
+class RTBatchInfo
+{
+public:
     u32 materialID;
     u32 startIndex;
     s32 baseVertex;
     u32 indexCount;
 };
-static_assert(sizeof(RTBatchInfo) == 16, "RTBatchInfo must be 16 bytes");
+static_assert(sizeof(RTBatchInfo) == 16);
 
-struct RTBatchCounts {
+class RTBatchCounts
+{
+public:
     u32 identityStatic = 0;
     u32 terrain = 0;
     u32 transparent = 0;
@@ -36,137 +45,265 @@ struct RTBatchCounts {
     u32 grass = 0;
 };
 
-class RTAccelStructManager {
+class RTFrameResources
+{
 public:
-    void Initialize(fg::RenderDevice* device);
-    void Shutdown();
+    framegraph::VirtualResourceHandle tlas;
+    framegraph::VirtualResourceHandle batchInfo;
+    framegraph::VirtualResourceHandle vertices;
+    framegraph::VirtualResourceHandle indices;
+    framegraph::VirtualResourceHandle materials;
+    framegraph::VirtualResourceHandle terrainMaterials;
+    framegraph::VirtualResourceHandle skinnedVertices;
+    framegraph::VirtualResourceHandle skinnedIndices;
+    framegraph::VirtualResourceHandle grassVertices;
+    framegraph::VirtualResourceHandle grassIndices;
+    nvrhi::DescriptorTableHandle textures;
+};
 
-    void BuildIfNeeded(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
+class RTFrameBuffers
+{
+public:
+    nvrhi::rt::IAccelStruct* tlas = nullptr;
+    nvrhi::IBuffer* batchInfo = nullptr;
+    nvrhi::IBuffer* vertices = nullptr;
+    nvrhi::IBuffer* indices = nullptr;
+    nvrhi::IBuffer* materials = nullptr;
+    nvrhi::IBuffer* terrainMaterials = nullptr;
+    nvrhi::IBuffer* skinnedVertices = nullptr;
+    nvrhi::IBuffer* skinnedIndices = nullptr;
+    nvrhi::IBuffer* grassVertices = nullptr;
+    nvrhi::IBuffer* grassIndices = nullptr;
+    nvrhi::IDescriptorTable* textures = nullptr;
+};
 
-    void BuildSkinnedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling,
-                          const xr_vector<GeometryBatch>& worldBatches,
-                          const xr_vector<GeometryBatch>& hudBatches);
-    void BuildGrassBLAS(nvrhi::ICommandList* cmdList, FGDetailManager* detailMgr);
-    void RebuildDynamic(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
-    void InvalidateSkinned();
-    void InvalidateGrass();
-    static void InvalidateShaderPipelines();
+class RTMemoryStats
+{
+public:
+    u64 sourceBytes = 0;
+    u64 generationBytes = 0;
+    u64 accelerationBytes = 0;
+    u32 pendingLeases = 0;
+    u32 generations = 0;
+    bool accelerationBytesKnown = true;
+};
 
-    bool IsReady() const { return m_isReady; }
-    bool IsSupported() const { return m_rtSupported; }
+class RTSkinningCB
+{
+public:
+    Fmatrix worldMatrix;
+    Fmatrix normalMatrix;
+    u32 vertexCount;
+    u32 vertexStride;
+    u32 formatID;
+    u32 boneOffset;
+    u32 outputOffset;
+    u32 inputBaseVertex;
+    u32 pad[2];
+};
+static_assert(sizeof(RTSkinningCB) == 160);
 
-    nvrhi::rt::IAccelStruct* GetTLAS() const { return m_tlas.Get(); }
-    nvrhi::IBuffer* GetBatchInfoBuffer() const { return m_batchInfoBuffer.Get(); }
-    nvrhi::IBuffer* GetMegaVB() const { return m_megaVB; }
-    nvrhi::IBuffer* GetMegaIB() const { return m_megaIB; }
-    nvrhi::IBuffer* GetMaterialBuffer() const { return m_materialBuffer; }
-    nvrhi::IBuffer* GetTerrainMaterialBuffer() const { return m_terrainMaterialBuffer; }
-    nvrhi::IBuffer* GetSkinnedOutputVB() const { return m_skinnedOutputVB.Get(); }
-    nvrhi::IBuffer* GetSkinnedIB() const { return m_skinnedIB.Get(); }
-    nvrhi::IBuffer* GetGrassOutputVB() const { return m_grassOutputVB.Get(); }
-    nvrhi::IBuffer* GetGrassIB() const { return m_grassIB.Get(); }
-    u32 GetBatchCount() const { return m_batchCount; }
-    const RTBatchCounts& GetBatchCounts() const { return m_batchCounts; }
-    u32 GetDetailAtlasIndex() const { return m_detailAtlasIndex; }
+class GrassRTCB
+{
+public:
+    Fvector4 detail_params;
+    Fvector4 wind_direction;
+    Fvector4 wave;
+    float grass_wind_displacement;
+    float grass_blade_height;
+    float grass_blade_width;
+    u32 segments;
+    u32 vertsPerBlade;
+    u32 bladeCount;
+    u32 outputVertexOffset;
+    u32 indicesPerBlade;
+    u32 outputIndexOffset;
+    u32 pad[3];
+};
+static_assert(sizeof(GrassRTCB) == 96);
 
-    void SetMaterialBuffer(nvrhi::IBuffer* buf) { m_materialBuffer = buf; }
-    void SetTerrainMaterialBuffer(nvrhi::IBuffer* buf) { m_terrainMaterialBuffer = buf; }
+class BillboardRTCB
+{
+public:
+    u32 maxVertsPerBillboard;
+    u32 pad[3];
+};
+static_assert(sizeof(BillboardRTCB) == 16);
+
+class RTGeometryBuild
+{
+public:
+    nvrhi::rt::AccelStructDesc desc;
+    nvrhi::rt::AccelStructHandle handle;
+};
+
+class RTTextureBindings
+{
+public:
+    RTTextureBindings();
+    ~RTTextureBindings();
+    RTTextureBindings(const RTTextureBindings&) = delete;
+    RTTextureBindings& operator=(const RTTextureBindings&) = delete;
+    void Capture(xr_vector<u32>& indices);
+    nvrhi::IDescriptorTable* GetTable() const;
 
 private:
-    struct GeometryKey {
-        u32 startIndex;
-        s32 baseVertex;
-        u32 indexCount;
-        bool operator<(const GeometryKey& o) const {
-            if (startIndex != o.startIndex) return startIndex < o.startIndex;
-            if (baseVertex != o.baseVertex) return baseVertex < o.baseVertex;
-            return indexCount < o.indexCount;
-        }
-    };
+    IRenderBackend* m_backend = nullptr;
+    nvrhi::DescriptorTableHandle m_table;
+    xr_vector<u32> m_indices;
+};
 
-    struct InstanceInfo {
-        Fmatrix world;
-        u32 materialID;
-    };
+class RTStaticGeometry
+{
+public:
+    nvrhi::BufferHandle vertices;
+    nvrhi::BufferHandle indices;
+    xr_vector<RTGeometryBuild> builds;
+    xr_vector<nvrhi::rt::InstanceDesc> instances;
+    xr_vector<RTBatchInfo> batches;
+    RTBatchCounts counts;
+    RTTextureBindings textures;
+    bool emptySource = false;
+    bool recorded = false;
+};
 
-    struct UniqueGeometry {
-        GeometryKey key;
-        u32 vertexCount;
-        nvrhi::rt::AccelStructHandle blas;
-        xr_vector<InstanceInfo> instances;
-    };
+class RTSkinJob
+{
+public:
+    nvrhi::BufferHandle source;
+    RTSkinningCB constants;
+    u32 indexOffset;
+    u32 indexCount;
+    u32 materialID;
+};
 
-    struct SkinnedBatchRT {
-        u32 vertexOffset;
-        u32 vertexCount;
-        u32 indexOffset;
-        u32 indexCount;
-        u32 materialID;
-        nvrhi::IBuffer* srcVB;
-        u32 srcStride;
-        u32 srcBaseVertex;
-        u32 formatID;
-        u32 boneOffset;
-        Fmatrix worldMatrix;
-        nvrhi::IBuffer* srcIB;
-        u32 srcStartIndex;
-    };
+class RTGrassJob
+{
+public:
+    nvrhi::BufferHandle visible;
+    GrassRTCB constants;
+};
 
-    void BuildStaticBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
-    void BuildInstancedBLAS(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
-    void BuildTLAS(nvrhi::ICommandList* cmdList);
-    void CreateBatchInfoBuffer(nvrhi::ICommandList* cmdList, GPUCullingManager* gpuCulling);
+class RTSceneGeneration
+{
+public:
+    std::shared_ptr<RTStaticGeometry> geometry;
+    RTTextureBindings textures;
+    nvrhi::rt::AccelStructHandle tlas;
+    RTGeometryBuild skinBuild;
+    RTGeometryBuild grassBuild;
+    nvrhi::BufferHandle batchInfo;
+    nvrhi::BufferHandle materials;
+    nvrhi::BufferHandle terrainMaterials;
+    nvrhi::BufferHandle sourceMaterials;
+    nvrhi::BufferHandle sourceTerrainMaterials;
+    nvrhi::BufferHandle bones;
+    nvrhi::BufferHandle skinnedVertices;
+    nvrhi::BufferHandle skinnedIndices;
+    nvrhi::BufferHandle grassVertices;
+    nvrhi::BufferHandle grassIndices;
+    nvrhi::BufferHandle grassInstances;
+    nvrhi::BufferHandle grassSlots;
+    nvrhi::BufferHandle grassModels;
+    nvrhi::BufferHandle grassPulledVertices;
+    nvrhi::BufferHandle grassDrawArgs;
+    nvrhi::TextureHandle grassWind;
+    xr_vector<RTSkinJob> skinJobs;
+    xr_vector<RTGrassJob> grassJobs;
+    xr_vector<u32> skinIndexData;
+    xr_vector<RTBatchInfo> batches;
+    xr_vector<nvrhi::rt::InstanceDesc> instances;
+    RTBatchCounts counts;
+    BillboardRTCB billboardConstants = {};
+    u32 billboardCapacity = 0;
+    u32 grassVertexCount = 0;
+    u32 grassIndexCount = 0;
+    u32 detailAtlasIndex = 0;
+    u32 leases = 0;
+    bool billboard = false;
+    bool recorded = false;
+};
+
+class RTLeaseRecord
+{
+public:
+    std::shared_ptr<RTSceneGeneration> scene;
+    u64 lease = 0;
+};
+
+class RTBuildPassData
+{
+public:
+    class RTAccelStructManager* manager = nullptr;
+    std::shared_ptr<RTSceneGeneration> scene;
+    RTFrameResources resources;
+    framegraph::VirtualResourceHandle sourceMaterials;
+    framegraph::VirtualResourceHandle sourceTerrainMaterials;
+    framegraph::VirtualResourceHandle bones;
+    xr_vector<framegraph::VirtualResourceHandle> skinSources;
+    xr_vector<framegraph::VirtualResourceHandle> buffers;
+    xr_vector<framegraph::VirtualResourceHandle> structures;
+    framegraph::VirtualResourceHandle wind;
+};
+
+class RTAccelStructManager
+{
+public:
+    void Initialize(RenderDevice* device);
+    void Shutdown();
+    void SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpuCulling,
+        FGDetailManager* detailMgr, const xr_vector<GeometryBatch>& worldBatches,
+        const xr_vector<GeometryBatch>& hudBatches, bool rebuildDynamic);
+    RTFrameResources UseScene(framegraph::FrameGraph& graph,
+        framegraph::RenderPassBuilder& builder) const;
+    static RTFrameBuffers ResolveScene(const framegraph::FrameGraph& graph,
+        const RTFrameResources& resources);
+    static void InvalidateShaderPipelines();
+    bool IsReady() const;
+    bool IsSupported() const;
+    const RTBatchCounts& GetBatchCounts() const;
+    u32 GetDetailAtlasIndex() const;
+    RTMemoryStats GetMemoryStats(const GPUCullingManager* gpu) const;
+    void RetireScenes();
+
+private:
+    void AppendMaterialTextures(u32 materialID, bool terrain);
+    void PrepareStatic(GPUCullingManager* gpuCulling);
+    void PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpuCulling,
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
+    void PrepareGrass(RTSceneGeneration& scene, FGDetailManager* detailMgr);
+    void PrepareScene(GPUCullingManager* gpuCulling, FGDetailManager* detailMgr,
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
+    void RecordInputs(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
+        nvrhi::ICommandList* commandList);
+    void RecordBLAS(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
+        nvrhi::ICommandList* commandList);
+    void RecordTLAS(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
+        nvrhi::ICommandList* commandList);
+    RTFrameResources ImportScene(framegraph::FrameGraph& graph,
+        const RTSceneGeneration& scene) const;
     void InitSkinningPipeline();
     void InitGrassPipeline();
     void InitBillboardPipeline();
-    u32 GetSkinningFormatID(u16 renderMode, u32 stride);
+    static u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
-    fg::RenderDevice* m_device = nullptr;
+    RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
-    bool m_isReady = false;
-    u32 m_batchCount = 0;
-    RTBatchCounts m_batchCounts = {};
-
-    nvrhi::rt::AccelStructHandle m_staticBlas;
-    xr_vector<UniqueGeometry> m_uniqueGeometries;
-    nvrhi::rt::AccelStructHandle m_tlas;
-    nvrhi::BufferHandle m_batchInfoBuffer;
-
-    nvrhi::IBuffer* m_megaVB = nullptr;
-    nvrhi::IBuffer* m_megaIB = nullptr;
-    nvrhi::IBuffer* m_materialBuffer = nullptr;
-    nvrhi::IBuffer* m_terrainMaterialBuffer = nullptr;
-
-    nvrhi::BufferHandle m_skinnedOutputVB;
-    nvrhi::BufferHandle m_skinnedIB;
-    nvrhi::rt::AccelStructHandle m_skinnedBlas;
-    xr_vector<SkinnedBatchRT> m_skinnedBatchData;
-    bool m_skinnedReady = false;
-
-    nvrhi::BufferHandle m_grassOutputVB;
-    nvrhi::BufferHandle m_grassIB;
-    nvrhi::rt::AccelStructHandle m_grassBlas;
-    u32 m_grassTotalVerts = 0;
-    u32 m_grassTotalIndices = 0;
-    bool m_grassReady = false;
-    bool m_grassBillboardMode = false;
-    u32 m_detailAtlasIndex = 0;
+    std::shared_ptr<RTStaticGeometry> m_staticGeometry;
+    std::shared_ptr<RTSceneGeneration> m_scene;
+    xr_vector<std::shared_ptr<RTSceneGeneration>> m_generations;
+    xr_vector<RTLeaseRecord> m_leases;
+    xr_vector<u32> m_textureScratch;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
-    static fg::BufferHandle s_skinCB;
-    static bool s_skinInitialized;
-
+    static BufferHandle s_skinCB;
     static nvrhi::ComputePipelineHandle s_grassPipeline;
     static nvrhi::BindingLayoutHandle s_grassLayout;
-    static fg::BufferHandle s_grassCB;
+    static BufferHandle s_grassCB;
     static nvrhi::SamplerHandle s_grassSampler;
-    static bool s_grassInitialized;
-
     static nvrhi::ComputePipelineHandle s_billboardPipeline;
     static nvrhi::BindingLayoutHandle s_billboardLayout;
-    static fg::BufferHandle s_billboardCB;
-    static bool s_billboardInitialized;
+    static BufferHandle s_billboardCB;
 };
-
 }

@@ -1,15 +1,15 @@
 #define SM_6_0
 #include "common.h"
-#include "visbuffer_common.h"
+#define CLUSTER_GEO_T_REFS t14
+#define CLUSTER_GEO_T_META t16
+#define CLUSTER_GEO_T_INSTANCES t20
+#include "cluster_geo_bindings.h"
+#include "cluster_geo_payload.h"
 #include "sw_raster_common.h"
+#include "sw_dispatch_common.h"
 
-StructuredBuffer<InstanceData> g_InstanceData : register(t14);
 StructuredBuffer<uint> g_SwEntries : register(t15);
-StructuredBuffer<ClusterEntry> g_Entries : register(t16);
-ByteAddressBuffer g_MegaVB : register(t18);
-ByteAddressBuffer g_MegaIB : register(t19);
-StructuredBuffer<InstanceData> g_DynamicInstanceData : register(t20);
-StructuredBuffer<InstanceData> g_TerrainInstanceData : register(t21);
+ByteAddressBuffer g_SwDispatchArgs : register(t22);
 
 cbuffer SwRasterParams : register(b5)
 {
@@ -18,32 +18,39 @@ cbuffer SwRasterParams : register(b5)
     uint2 g_SwPad;
 };
 
-[numthreads(128, 1, 1)]
-void main(uint3 groupID : SV_GroupID, uint tri : SV_GroupIndex)
+groupshared float3 gs_Projected[CLUSTER_SW_LANES];
+groupshared uint gs_Valid[CLUSTER_SW_LANES];
+
+[numthreads(CLUSTER_SW_LANES, 1, 1)]
+void main(uint3 groupID : SV_GroupID, uint lane : SV_GroupIndex)
 {
-    uint entryIdx = g_SwEntries[groupID.x];
-    ClusterEntry e = g_Entries[entryIdx];
-    if (tri * 3u + 2u >= e.indexCount)
+    uint slot = SwDispatchLinearGroup(groupID);
+    if (slot >= g_SwDispatchArgs.Load(16u))
         return;
 
-    float4x4 world;
-    if ((e.flags & CLUSTER_ENTRY_FLAG_DYNAMIC) != 0u)
-        world = g_DynamicInstanceData[e.batchIndex].world;
-    else if ((e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u)
-        world = g_TerrainInstanceData[e.batchIndex].world;
-    else
-        world = g_InstanceData[e.batchIndex].world;
-    float4x4 wvp = mul(m_VP, world);
+    uint refIdx = g_SwEntries[slot];
+    ClusterRefView view = LoadClusterRefView(refIdx);
+    ClusterEntry e = view.entry;
+    ClusterGeoView geo = ClusterGeoResolve(e);
 
-    float3 v[3];
-    uint3 idx = g_MegaIB.Load3((e.ibFirst + tri * 3u) * 4u);
-    [unroll]
-    for (uint c = 0; c < 3; ++c)
-    {
-        uint3 w0 = g_MegaVB.Load3((e.firstVertex + idx[c]) * 48u);
-        if (!SwProjectVertex(wvp, float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z)), g_Width, g_Height, v[c]))
-            return;
-    }
+    float4x4 wvp = mul(m_VP, view.world);
 
-    SwRasterizeTriangle(v[0], v[1], v[2], g_Width, g_Height, PackVisID(entryIdx, tri));
+    float3 projected = float3(0.0, 0.0, 0.0);
+    uint valid = 0u;
+    if (lane < geo.vertexCount)
+        valid = SwProjectVertex(wvp, ClusterLoadPosition(geo, lane), g_Width, g_Height, projected) ? 1u : 0u;
+    gs_Projected[lane] = projected;
+    gs_Valid[lane] = valid;
+
+    GroupMemoryBarrierWithGroupSync();
+
+    if (lane >= geo.triangleCount)
+        return;
+
+    uint3 corners = ClusterPayloadTriangle(geo, lane);
+    if (gs_Valid[corners.x] == 0u || gs_Valid[corners.y] == 0u || gs_Valid[corners.z] == 0u)
+        return;
+
+    SwRasterizeTriangle(gs_Projected[corners.x], gs_Projected[corners.y], gs_Projected[corners.z],
+        g_Width, g_Height, PackVisID(refIdx, lane));
 }

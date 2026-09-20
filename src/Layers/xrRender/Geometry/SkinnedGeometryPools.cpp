@@ -92,24 +92,32 @@ bool SkinnedGeometryPools::Register(VertexStagingBuffer* vsb, IndexStagingBuffer
     return true;
 }
 
-void SkinnedGeometryPools::FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::ICommandList* cmdList)
+void SkinnedGeometryPools::PrepareUploads(nvrhi::IDevice* nvDevice)
 {
-    if (m_combinedDirty) {
+    if (!nvDevice)
+        return;
+
+    if (m_combinedDirty)
+    {
         m_combinedDirty = false;
         u32 total = 0;
-        for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
+        for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f)
+        {
             m_formatIndexBase[f] = total;
             total += m_pools[f].indexCount;
         }
-        if (total > 0) {
-            xr_vector<u32> combined(total);
-            for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
+        if (total > 0)
+        {
+            m_combinedIndexData.resize(total);
+            for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f)
+            {
                 const u16* src = reinterpret_cast<const u16*>(m_pools[f].indexData.data());
-                u32* dst = combined.data() + m_formatIndexBase[f];
+                u32* dst = m_combinedIndexData.data() + m_formatIndexBase[f];
                 for (u32 i = 0; i < m_pools[f].indexCount; ++i)
                     dst[i] = src[i];
             }
-            if (!m_combinedIndexBuffer || m_combinedIndexBuffer->getDesc().byteSize < u64(total) * sizeof(u32)) {
+            if (!m_combinedIndexBuffer || m_combinedIndexBuffer->getDesc().byteSize < u64(total) * sizeof(u32))
+            {
                 u64 capacity = 128 * 1024;
                 while (capacity < u64(total) * sizeof(u32))
                     capacity *= 2;
@@ -121,62 +129,91 @@ void SkinnedGeometryPools::FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::IComman
                 desc.initialState = nvrhi::ResourceStates::ShaderResource;
                 desc.keepInitialState = true;
                 m_combinedIndexBuffer = nvDevice->createBuffer(desc);
+                if (!m_combinedIndexBuffer)
+                    FATAL("[SkinnedPools] combined index buffer allocation failed");
             }
-            if (m_combinedIndexBuffer)
-                cmdList->writeBuffer(m_combinedIndexBuffer, combined.data(), u64(total) * sizeof(u32));
             m_combinedIndexCount = total;
+            m_combinedUploadPending = true;
         }
     }
-    for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f) {
+
+    for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f)
+    {
         Pool& pool = m_pools[f];
 
-        if (!pool.vertexData.empty()) {
-            if (!pool.vertexBuffer || pool.vertexBuffer->getDesc().byteSize < pool.vertexData.size()) {
-                size_t capacity = 256 * 1024;
-                while (capacity < pool.vertexData.size())
-                    capacity *= 2;
+        if (!pool.vertexData.empty()
+            && (!pool.vertexBuffer || pool.vertexBuffer->getDesc().byteSize < pool.vertexData.size()))
+        {
+            size_t capacity = 256 * 1024;
+            while (capacity < pool.vertexData.size())
+                capacity *= 2;
 
-                nvrhi::BufferDesc desc;
-                desc.debugName = "SkinnedPool_VB";
-                desc.byteSize = capacity;
-                desc.isVertexBuffer = true;
-                desc.canHaveRawViews = true;
-                desc.initialState = nvrhi::ResourceStates::VertexBuffer;
-                desc.keepInitialState = true;
-                pool.vertexBuffer = nvDevice->createBuffer(desc);
-                pool.vertexBytesUploaded = 0;
-            }
-            if (pool.vertexBuffer && pool.vertexBytesUploaded < pool.vertexData.size()) {
-                cmdList->writeBuffer(pool.vertexBuffer,
-                    pool.vertexData.data() + pool.vertexBytesUploaded,
-                    pool.vertexData.size() - pool.vertexBytesUploaded,
-                    pool.vertexBytesUploaded);
-                pool.vertexBytesUploaded = pool.vertexData.size();
-            }
+            nvrhi::BufferDesc desc;
+            desc.debugName = "SkinnedPool_VB";
+            desc.byteSize = capacity;
+            desc.isVertexBuffer = true;
+            desc.canHaveRawViews = true;
+            desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            desc.keepInitialState = true;
+            pool.vertexBuffer = nvDevice->createBuffer(desc);
+            if (!pool.vertexBuffer)
+                FATAL_F("[SkinnedPools] format %u vertex buffer allocation failed", f);
+            pool.vertexBytesUploaded = 0;
         }
 
-        if (!pool.indexData.empty()) {
-            if (!pool.indexBuffer || pool.indexBuffer->getDesc().byteSize < pool.indexData.size()) {
-                size_t capacity = 128 * 1024;
-                while (capacity < pool.indexData.size())
-                    capacity *= 2;
+        if (!pool.indexData.empty()
+            && (!pool.indexBuffer || pool.indexBuffer->getDesc().byteSize < pool.indexData.size()))
+        {
+            size_t capacity = 128 * 1024;
+            while (capacity < pool.indexData.size())
+                capacity *= 2;
 
-                nvrhi::BufferDesc desc;
-                desc.debugName = "SkinnedPool_IB";
-                desc.byteSize = capacity;
-                desc.isIndexBuffer = true;
-                desc.initialState = nvrhi::ResourceStates::IndexBuffer;
-                desc.keepInitialState = true;
-                pool.indexBuffer = nvDevice->createBuffer(desc);
-                pool.indexBytesUploaded = 0;
-            }
-            if (pool.indexBuffer && pool.indexBytesUploaded < pool.indexData.size()) {
-                cmdList->writeBuffer(pool.indexBuffer,
-                    pool.indexData.data() + pool.indexBytesUploaded,
-                    pool.indexData.size() - pool.indexBytesUploaded,
-                    pool.indexBytesUploaded);
-                pool.indexBytesUploaded = pool.indexData.size();
-            }
+            nvrhi::BufferDesc desc;
+            desc.debugName = "SkinnedPool_IB";
+            desc.byteSize = capacity;
+            desc.isIndexBuffer = true;
+            desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            desc.keepInitialState = true;
+            pool.indexBuffer = nvDevice->createBuffer(desc);
+            if (!pool.indexBuffer)
+                FATAL_F("[SkinnedPools] format %u index buffer allocation failed", f);
+            pool.indexBytesUploaded = 0;
+        }
+    }
+}
+
+void SkinnedGeometryPools::FlushUploads(nvrhi::ICommandList* cmdList)
+{
+    if (!cmdList)
+        return;
+
+    if (m_combinedUploadPending && m_combinedIndexBuffer)
+    {
+        cmdList->writeBuffer(m_combinedIndexBuffer, m_combinedIndexData.data(),
+            u64(m_combinedIndexCount) * sizeof(u32));
+        m_combinedUploadPending = false;
+    }
+
+    for (u32 f = FIRST_FORMAT; f < FORMAT_COUNT; ++f)
+    {
+        Pool& pool = m_pools[f];
+
+        if (pool.vertexBuffer && pool.vertexBytesUploaded < pool.vertexData.size())
+        {
+            cmdList->writeBuffer(pool.vertexBuffer,
+                pool.vertexData.data() + pool.vertexBytesUploaded,
+                pool.vertexData.size() - pool.vertexBytesUploaded,
+                pool.vertexBytesUploaded);
+            pool.vertexBytesUploaded = pool.vertexData.size();
+        }
+
+        if (pool.indexBuffer && pool.indexBytesUploaded < pool.indexData.size())
+        {
+            cmdList->writeBuffer(pool.indexBuffer,
+                pool.indexData.data() + pool.indexBytesUploaded,
+                pool.indexData.size() - pool.indexBytesUploaded,
+                pool.indexBytesUploaded);
+            pool.indexBytesUploaded = pool.indexData.size();
         }
     }
 }

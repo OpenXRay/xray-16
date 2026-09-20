@@ -1,4 +1,5 @@
 #include "common.h"
+#include "visbuffer_common.h"
 
 cbuffer MotionVectorParams : register(b5) {
     float4x4 g_InvViewProj;
@@ -38,7 +39,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
     }
 
-    if (g_HasVis != 0u && t_VisID.Load(int3(pixel, 0)) != 0u && asuint(t_VisDepth.Load(int3(pixel, 0))) == asuint(depth))
+    if (g_HasVis != 0u && VisIDValid(t_VisID.Load(int3(pixel, 0))) && asuint(t_VisDepth.Load(int3(pixel, 0))) == asuint(depth))
         return;
 
     float3 worldPos = ReconstructWorldPos(pixel, depth);

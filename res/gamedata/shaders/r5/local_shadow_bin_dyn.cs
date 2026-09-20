@@ -1,7 +1,13 @@
 #define SM_5_0
 #include "common.h"
 #include "local_shadow_common.h"
-#include "visbuffer_common.h"
+#define CLUSTER_GEO_T_REFS t17
+#define CLUSTER_GEO_T_META t18
+#define CLUSTER_GEO_T_INSTANCES t19
+#define CLUSTER_GEO_RESIDENCY
+#define CLUSTER_GEO_T_GROUPS t26
+#define CLUSTER_GEO_T_GROUP_STATE t27
+#include "cluster_geo_bindings.h"
 #include "cluster_bvh_types.h"
 #include "local_shadow_bvh_types.h"
 
@@ -15,9 +21,18 @@ cbuffer LocalShadowDynBinParams : register(b5)
     uint g_CapAT;
     uint g_IncludeAT;
     uint g_StaticOverflow;
+    uint g_UseSkinned;
+    uint3 g_DynBinPad;
 };
 
-StructuredBuffer<ClusterEntry> g_Entries : register(t14);
+StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t14);
+
+ClusterEntry LoadSourceEntry(uint idx)
+{
+    if (g_UseSkinned != 0u)
+        return g_SkinnedEntries[idx];
+    return LoadClusterEntry(idx);
+}
 StructuredBuffer<LocalShadowView> g_Tiles : register(t15);
 StructuredBuffer<uint> g_Refresh : register(t16);
 RWStructuredBuffer<uint> g_Stats : register(u0);
@@ -67,7 +82,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     uint entryIdx = g_EntryBase + (valid ? idx : 0u);
     ClusterEntry e = (ClusterEntry)0;
     if (valid)
-        e = g_Entries[entryIdx];
+        e = LoadSourceEntry(entryIdx);
     if ((e.flags & (CLUSTER_ENTRY_FLAG_HUD | CLUSTER_ENTRY_FLAG_NO_SHADOW)) != 0u)
         valid = false;
     bool at = (e.flags & CLUSTER_ENTRY_FLAG_AT) != 0u;
@@ -85,7 +100,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
             hit = false;
         if (hit)
         {
-            LocalViewQuery q = localQueryFromView(v, slot, g_IncludeAT, 1.0);
+            LocalViewQuery q = localQueryFromView(v, slot, g_IncludeAT, 1.0, g_UseSkinned == 0u ? 1u : 0u);
             bool skinned = (e.flags & CLUSTER_ENTRY_FLAG_SKINNED) != 0u;
             if (skinned ? localBoxOutside(e.sphere.xyz, e.extent, q) : !localEntryTouchesView(e, q))
                 hit = false;

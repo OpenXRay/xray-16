@@ -26,7 +26,17 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     VS_OUTPUT output;
 
     ClusterEntry e = g_SkinnedEntries[iid];
-    uint local = min(vid, e.indexCount - 1u);
+    if (vid >= e.indexCount)
+    {
+        output.position = float4(2.0, 2.0, 2.0, 1.0);
+        output.texcoord = float2(0.0, 0.0);
+        output.materialID = 0u;
+        output.drawID = 0u;
+        output.visID = VIS_ID_BACKGROUND;
+        return output;
+    }
+
+    uint local = vid;
     uint index = g_SkinnedIB.Load((e.ibFirst + local) * 4u);
     uint vertexByte = (e.firstVertex + index) * 48u;
 

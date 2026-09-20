@@ -42,7 +42,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
     framegraph::FrameGraph& graph,
     fg::RenderDevice* device,
     const GpuParticleDrawResources& resources,
-    MaterialCache* materialCache,
+    framegraph::VirtualResourceHandle materials,
     framegraph::VirtualResourceHandle color,
     framegraph::VirtualResourceHandle depth,
     framegraph::VirtualResourceHandle normal,

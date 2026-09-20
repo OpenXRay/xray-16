@@ -25,7 +25,7 @@ struct StreamingRequest {
     };
     Status status = Pending;
 
-    void* ioHandle = nullptr;
+    u64 ioRequest = 0;
     xr_vector<u8> stagingBuffer;
 
     bool operator<(const StreamingRequest& other) const {
@@ -70,9 +70,18 @@ public:
     void PrintStatistics() const;
 
 private:
+    enum class UploadResult : u8 {
+        Uploaded,
+        Deferred,
+        Failed
+    };
+
+    AsyncIOManager* IOService();
+
     xray::render::fg::RenderDevice* m_device;
     TextureManager* m_texManager;
-    AsyncIOManager* m_asyncIO;
+    AsyncIOManager* m_asyncIO = nullptr;
+    u32 m_ioEpoch = 0;
 
     xr_vector<StreamingRequest> m_pendingRequests;
     xr_vector<StreamingRequest> m_activeRequests;
@@ -89,7 +98,7 @@ private:
     void FailRequest(StreamingRequest& request, const char* reason);
 
     bool LoadMipsFromDisk(StreamingRequest& request);
-    bool UploadMipsToGPU(StreamingRequest& request);
+    UploadResult UploadMipsToGPU(StreamingRequest& request);
 
     void OnAsyncLoadComplete(TextureHandle handle, AsyncIORequest& ioRequest);
 

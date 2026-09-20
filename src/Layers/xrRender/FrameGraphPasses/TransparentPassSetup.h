@@ -21,32 +21,29 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
-struct TransparentPassConfig {
-    nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::IBuffer* megaIndexBuffer = nullptr;
-    nvrhi::IBuffer* instanceBuffer = nullptr;
-    nvrhi::IBuffer* drawArgsBuffer = nullptr;
+class TransparentPassConfig
+{
+public:
+    GeometryFrameResources geometry;
     u32 objectCount = 0;
     const xr_vector<TransparentDrawRange>* ranges = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
     bool skinned = false;
 
-    bool HasRigid() const {
-        return objectCount > 0 && ranges && drawArgsBuffer && instanceBuffer && megaVertexBuffer && megaIndexBuffer;
-    }
-    bool IsValid() const {
-        return HasRigid() || (skinned && gpuCulling);
-    }
+    bool HasRigid() const;
+    bool IsValid() const;
 };
 
 struct TransparentPassState {
-    xr_map<u32, nvrhi::GraphicsPipelineHandle> pipelines;
+    xr_map<u64, nvrhi::GraphicsPipelineHandle> pipelines;
     nvrhi::GraphicsPipelineHandle distortPipeline;
+    nvrhi::GraphicsPipelineHandle skinnedDistortPipeline;
     xr_map<u32, nvrhi::GraphicsPipelineHandle> wallmarkPipelines;
     nvrhi::BindingLayoutHandle layout;
     nvrhi::BindingLayoutHandle distortLayout;
     nvrhi::BindingLayoutHandle wallmarkLayout;
     nvrhi::InputLayoutHandle inputLayout;
+    nvrhi::InputLayoutHandle skinnedInputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
     nvrhi::ShaderHandle distortPS;

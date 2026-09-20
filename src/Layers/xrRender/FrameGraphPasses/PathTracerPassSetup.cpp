@@ -156,7 +156,7 @@ static void EnsureAccumulationBuffer(nvrhi::IDevice* nvDevice, u32 width, u32 he
 
 struct PathTracerData {
     fg::RenderDevice* device;
-    RTAccelStructManager* accelMgr;
+    RTFrameResources scene;
     VirtualResourceHandle outputTex;
     PathTracerCB cbData;
     u32 width, height;
@@ -278,7 +278,7 @@ PathTracerOutput setupPathTracerPass(
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.device = device;
-            data.accelMgr = accelMgr;
+            data.scene = accelMgr->UseScene(builder, passBuilder);
             data.width = width;
             data.height = height;
             data.cbData = cbData;
@@ -299,10 +299,11 @@ PathTracerOutput setupPathTracerPass(
 
             cmdList->writeBuffer(s_cb, &data.cbData, sizeof(PathTracerCB));
 
-            nvrhi::IBuffer* skinnedVB = data.accelMgr->GetSkinnedOutputVB();
-            nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
-            nvrhi::IBuffer* grassVB = data.accelMgr->GetGrassOutputVB();
-            nvrhi::IBuffer* grassIB = data.accelMgr->GetGrassIB();
+            const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
+            nvrhi::IBuffer* skinnedVB = scene.skinnedVertices;
+            nvrhi::IBuffer* skinnedIB = scene.skinnedIndices;
+            nvrhi::IBuffer* grassVB = scene.grassVertices;
+            nvrhi::IBuffer* grassIB = scene.grassIndices;
             if (!skinnedVB) skinnedVB = s_ptPlaceholderBuffer.Get();
             if (!skinnedIB) skinnedIB = s_ptPlaceholderBuffer.Get();
             if (!grassVB) grassVB = s_ptPlaceholderBuffer.Get();
@@ -314,29 +315,28 @@ PathTracerOutput setupPathTracerPass(
 
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "PathTracer");
             bsb.ConstantBuffer("PathTracerParams", s_cb);
-            bsb.AccelStruct("g_SceneTLAS", data.accelMgr->GetTLAS());
-            bsb.BufferSRV("g_BatchInfo", data.accelMgr->GetBatchInfoBuffer());
-            bsb.BufferSRV("g_MegaVB", data.accelMgr->GetMegaVB());
-            bsb.BufferSRV("g_MegaIB", data.accelMgr->GetMegaIB());
+            bsb.AccelStruct("g_SceneTLAS", scene.tlas);
+            bsb.BufferSRV("g_BatchInfo", scene.batchInfo);
+            bsb.BufferSRV("g_MegaVB", scene.vertices);
+            bsb.BufferSRV("g_MegaIB", scene.indices);
             bsb.Texture("g_Sky0", data.sky0);
             bsb.Texture("g_Sky1", data.sky1);
             bsb.BufferSRV("g_SkinnedVB", skinnedVB);
-            bsb.BufferSRV("g_Materials", data.accelMgr->GetMaterialBuffer());
-            bsb.BufferSRV("g_TerrainMaterials", data.accelMgr->GetTerrainMaterialBuffer());
+            bsb.BufferSRV("g_Materials", scene.materials);
+            bsb.BufferSRV("g_TerrainMaterials", scene.terrainMaterials);
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);
             bsb.TextureUAV("g_Accumulation", s_accumBuffer);
             bsb.TextureUAV("g_Output", outTex);
-            auto& cache = GetPassResourceCache();
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), s_layout, nvDevice);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_layout);
 
             nvrhi::ComputeState state;
             state.pipeline = s_pipeline;
             state.bindings = { bindingSet };
 
-            if (auto* bindlessTable = GEnv.Backend ? GEnv.Backend->GetBindlessDescriptorTable() : nullptr)
-                state.addBindingSet(bindlessTable);
+            if (scene.textures)
+                state.addBindingSet(scene.textures);
 
             cmdList->setComputeState(state);
             cmdList->dispatch(

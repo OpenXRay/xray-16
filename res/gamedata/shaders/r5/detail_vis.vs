@@ -55,10 +55,17 @@ struct VS_OUTPUT
 
 VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 {
-    DetailInstance raw = all_instances[visible_indices[iid]];
-
     VS_OUTPUT o;
-    o.entry = g_EntryBase + (g_Kind << 22) + iid;
+    if (!DetailSlotRepresentable(iid))
+    {
+        o.position = float4(2.0, 2.0, 2.0, 1.0);
+        o.entry = 0u;
+        o.uv = float2(0.0, 0.0);
+        return o;
+    }
+
+    DetailInstance raw = all_instances[visible_indices[iid]];
+    o.entry = PackDetailEntry(g_EntryBase, g_Kind, iid);
 
     if (g_Kind >= DETAIL_KIND_MESH)
     {
@@ -66,7 +73,7 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
         DetailModelGPU mdl = detail_models[inst.objectId];
         if (vid >= mdl.pulledIndexCount)
         {
-            o.position = asfloat(0x7FC00000);
+            o.position = float4(2.0, 2.0, 2.0, 1.0);
             o.uv = float2(0.0, 0.0);
             return o;
         }

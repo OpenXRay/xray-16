@@ -225,6 +225,7 @@ TrailPassOutput setupTrailPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
+    VirtualResourceHandle materials,
     u32 width,
     u32 height,
     TrailPassState* state)
@@ -249,6 +250,7 @@ TrailPassOutput setupTrailPass(
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
+            data.materials = passBuilder.read(materials, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = forwardInputs.normal;
@@ -282,9 +284,6 @@ TrailPassOutput setupTrailPass(
 
             if (data.passState->pointCount < 2)
                 return;
-
-            auto& matBuffer = MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
 
             auto& st = *data.passState;
 
@@ -342,7 +341,7 @@ TrailPassOutput setupTrailPass(
                 BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Trail");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                    .ConstantBuffer("TrailParams", trailParamsCB)
-                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
+                   .BufferSRV("g_Materials", fg.GetPhysicalBuffer(data.materials))
                    .BufferSRV("g_ControlPoints", st.controlPointBuffer)
                    .BufferSRV("g_TrailState", st.dummyStateBuffer);
                 const auto& bindDesc = bsb.Build();

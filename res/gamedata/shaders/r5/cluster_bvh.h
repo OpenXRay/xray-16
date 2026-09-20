@@ -80,6 +80,8 @@ void bvhTraverse(uint t, uint nodeCount, BvhQuery q)
                     {
                         if (pos + k < uint(VSM_BVH_LEAF_CAP))
                             gs_bvhLeaf[pos + k] = g_BvhIndex[nd.first + k];
+                        else
+                            BvhVisit(true, g_BvhIndex[nd.first + k], q);
                     }
                 }
                 else

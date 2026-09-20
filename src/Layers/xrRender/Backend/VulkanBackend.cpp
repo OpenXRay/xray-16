@@ -139,6 +139,8 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         Msg("* [VulkanBackend] NVRHI validation layer enabled");
     }
 
+    m_completion.Initialize(m_nvrhiDevice);
+
     for (auto& pool : m_graphicsPools) {
         if (!AcquireFromPool(pool, nvrhi::CommandQueue::Graphics)) {
             Msg("! [VulkanBackend] Failed to create command list");
@@ -208,8 +210,15 @@ void VulkanBackend::Shutdown() {
         m_submitThread.join();
     }
 
+    m_completion.Shutdown();
+
     m_bindlessDescriptorTable = nullptr;
     m_bindlessLayout = nullptr;
+    m_bindlessTextureMap.clear();
+    m_bindlessTextureResources.clear();
+    m_bindlessTextureReferences.clear();
+    m_freeBindlessIndices.clear();
+    m_nextBindlessIndex = 0;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     for (auto& pool : m_graphicsPools)
@@ -837,12 +846,18 @@ void VulkanBackend::QueryCapabilities() {
 }
 
 u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
     if (!m_bindlessDescriptorTable || !texture)
         return UINT32_MAX;
 
     auto it = m_bindlessTextureMap.find(texture);
     if (it != m_bindlessTextureMap.end())
+    {
+        u32& references = m_bindlessTextureReferences[it->second];
+        R_ASSERT(references != 0 && references != UINT32_MAX);
+        ++references;
         return it->second;
+    }
 
     u32 slot;
     if (!m_freeBindlessIndices.empty()) {
@@ -854,6 +869,8 @@ u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
             return UINT32_MAX;
         }
         slot = m_nextBindlessIndex++;
+        m_bindlessTextureResources.resize(m_nextBindlessIndex);
+        m_bindlessTextureReferences.resize(m_nextBindlessIndex);
     }
 
     nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
@@ -865,19 +882,45 @@ u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     }
 
     m_bindlessTextureMap[texture] = slot;
+    m_bindlessTextureResources[slot] = texture;
+    m_bindlessTextureReferences[slot] = 1;
     return slot;
 }
 
-void VulkanBackend::UnregisterBindlessTexture(u32 index) {
-    if (index >= MAX_BINDLESS_TEXTURES)
-        return;
-    for (auto it = m_bindlessTextureMap.begin(); it != m_bindlessTextureMap.end(); ++it) {
-        if (it->second == index) {
-            m_bindlessTextureMap.erase(it);
-            break;
-        }
+void VulkanBackend::UnregisterBindlessTexture(u32 index)
+{
+    ReleaseBindlessTextures(&index, 1);
+}
+
+bool VulkanBackend::RetainBindlessTextures(const u32* indices, u32 count)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    for (u32 i = 0; i < count; ++i)
+    {
+        if (indices[i] >= m_bindlessTextureReferences.size() || m_bindlessTextureReferences[indices[i]] == 0)
+            return false;
+        R_ASSERT(m_bindlessTextureReferences[indices[i]] <= UINT32_MAX - count);
     }
-    m_freeBindlessIndices.push_back(index);
+    for (u32 i = 0; i < count; ++i)
+        ++m_bindlessTextureReferences[indices[i]];
+    return true;
+}
+
+void VulkanBackend::ReleaseBindlessTextures(const u32* indices, u32 count)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    for (u32 i = 0; i < count; ++i)
+    {
+        const u32 index = indices[i];
+        R_ASSERT(index < m_bindlessTextureReferences.size() && m_bindlessTextureReferences[index] != 0);
+        if (--m_bindlessTextureReferences[index] != 0)
+            continue;
+        R_ASSERT2(m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, nvrhi::BindingSetItem::None(index)),
+            "[VulkanBackend] bindless texture retirement failed");
+        m_bindlessTextureMap.erase(m_bindlessTextureResources[index].Get());
+        m_bindlessTextureResources[index] = nullptr;
+        m_freeBindlessIndices.push_back(index);
+    }
 }
 
 nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
@@ -926,6 +969,8 @@ void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
 
 void VulkanBackend::BeginFrame() {
     ZoneScopedN("VK::BeginFrame");
+    m_completion.DiscardOpenLeases();
+    R_ASSERT2(!m_inFrame, "Vulkan frame recording was abandoned without EndFrame");
 
     if (m_gcTask) {
         ZoneScopedN("VK::WaitForGC");
@@ -1024,7 +1069,10 @@ void VulkanBackend::EndFrame() {
     ZoneScopedN("VK::EndFrame");
 
     if (!m_inFrame)
+    {
+        m_completion.DiscardOpenLeases();
         return;
+    }
 
     m_inFrame = false;
 
@@ -1037,6 +1085,7 @@ void VulkanBackend::EndFrame() {
     job.cl = m_currentGraphics;
     job.queue = nvrhi::CommandQueue::Graphics;
     job.token = m_tokens.Issue(nvrhi::CommandQueue::Graphics);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
     job.waits = m_graphicsWaits;
     job.imageAvailable = m_frameGraphicsSubmitted ? VK_NULL_HANDLE : m_imageAvailable[m_currentFrameIndex];
     job.renderFinished = m_renderFinished[m_currentImageIndex];
@@ -1056,6 +1105,7 @@ void VulkanBackend::EndFrame() {
             m_frameSubmissionPending[m_currentFrameIndex] = true;
         }
         m_submitCv.notify_one();
+        m_completion.CloseOpenLeases();
 
         m_recordSlot ^= 1;
         m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
@@ -1067,6 +1117,7 @@ void VulkanBackend::EndFrame() {
         ZoneScopedN("VK::ExecuteCommandList");
         m_frameSubmissionIDs[m_currentFrameIndex] = SubmitLocked(job);
     }
+    m_completion.CloseOpenLeases();
     m_presentPending = true;
 
     nvrhi::IDevice* device = m_nvrhiDevice;
@@ -1216,7 +1267,13 @@ void VulkanBackend::WaitForIdle() {
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList) {
         std::lock_guard<std::mutex> qk(m_queueMutex);
-        m_nvrhiDevice->executeCommandList(commandList);
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(commandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("Vulkan rejected a command list submission");
+        }
+        m_completion.ArmTicket(ticket);
     }
 }
 
@@ -1242,7 +1299,13 @@ u64 VulkanBackend::SubmitLocked(const SubmitJob& job) {
     if (job.renderFinished)
         vkDevice->queueSignalSemaphore(job.queue, job.renderFinished, 0);
     const u64 instanceID = m_nvrhiDevice->executeCommandList(job.cl, job.queue);
+    if (!instanceID)
+    {
+        m_completion.CancelTicket(job.completion);
+        FATAL("Vulkan rejected a queued command list submission");
+    }
     m_tokens.Resolve(job.token, job.queue, instanceID);
+    m_completion.ArmTicket(job.completion);
     return instanceID;
 }
 
@@ -1268,6 +1331,7 @@ u32 VulkanBackend::SubmitCompute(nvrhi::ICommandList* commandList, const u32* wa
     job.cl = commandList;
     job.queue = nvrhi::CommandQueue::Compute;
     job.token = m_tokens.Issue(nvrhi::CommandQueue::Compute);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Compute);
     for (u32 i = 0; i < numWaitTokens; ++i)
         job.waits.Add(waitTokens[i]);
 
@@ -1292,6 +1356,7 @@ u32 VulkanBackend::SplitGraphics() {
     job.cl = m_currentGraphics;
     job.queue = nvrhi::CommandQueue::Graphics;
     job.token = m_tokens.Issue(nvrhi::CommandQueue::Graphics);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
     job.waits = m_graphicsWaits;
     job.imageAvailable = m_frameGraphicsSubmitted ? VK_NULL_HANDLE : m_imageAvailable[m_currentFrameIndex];
     m_graphicsWaits.Clear();
@@ -1318,8 +1383,15 @@ void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists
     if (!m_nvrhiDevice) return;
     std::lock_guard<std::mutex> qk(m_queueMutex);
     for (u32 i = 0; i < count; i++) {
-        if (commandLists[i])
-            m_nvrhiDevice->executeCommandList(commandLists[i]);
+        if (commandLists[i]) {
+            const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+            if (!m_nvrhiDevice->executeCommandList(commandLists[i]))
+            {
+                m_completion.CancelTicket(ticket);
+                FATAL("Vulkan rejected an ordered command list submission");
+            }
+            m_completion.ArmTicket(ticket);
+        }
     }
 }
 
@@ -1334,7 +1406,13 @@ void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, s
         m_uploadCommandList->open();
         m_uploadCommandList->writeBuffer(buffer, data, size);
         m_uploadCommandList->close();
-        m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(m_uploadCommandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("Vulkan rejected a buffer upload submission");
+        }
+        m_completion.ArmTicket(ticket);
     }
 }
 

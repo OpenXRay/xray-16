@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+#include <atomic>
 #include "Layers/xrRender/BufferUtils.h"
 
 #include <nvrhi/nvrhi.h>
@@ -359,12 +361,23 @@ VertexStagingBuffer::~VertexStagingBuffer()
     Destroy();
 }
 
+static std::atomic<u64> g_stagingSourceTokens{1};
+static std::atomic<u64> g_stagingHostBytes{0};
+
+u64 GetStagingHostMemoryUsage()
+{
+    return g_stagingHostBytes.load(std::memory_order_relaxed);
+}
+
 void VertexStagingBuffer::Create(size_t size, bool allowReadBack )
 {
+    source_token = g_stagingSourceTokens.fetch_add(1, std::memory_order_relaxed);
     m_Size = size;
     m_AllowReadBack = allowReadBack;
 
     m_HostBuffer = xr_alloc<u8>(size);
+    if (m_HostBuffer)
+        g_stagingHostBytes.fetch_add(size, std::memory_order_relaxed);
     AddRef();
 }
 
@@ -417,7 +430,15 @@ void VertexStagingBuffer::Destroy()
 void VertexStagingBuffer::DiscardHostBuffer()
 {
     if (m_HostBuffer)
+    {
+        g_stagingHostBytes.fetch_sub(m_Size, std::memory_order_relaxed);
         xr_free(m_HostBuffer);
+    }
+}
+
+void VertexStagingBuffer::DiscardDeviceBuffer()
+{
+    m_DeviceBuffer = nullptr;
 }
 
 size_t VertexStagingBuffer::GetSystemMemoryUsage() const
@@ -441,10 +462,13 @@ IndexStagingBuffer::~IndexStagingBuffer()
 
 void IndexStagingBuffer::Create(size_t size, bool allowReadBack , bool )
 {
+    source_token = g_stagingSourceTokens.fetch_add(1, std::memory_order_relaxed);
     m_Size = size;
     m_AllowReadBack = allowReadBack;
 
     m_HostBuffer = xr_alloc<u8>(size);
+    if (m_HostBuffer)
+        g_stagingHostBytes.fetch_add(size, std::memory_order_relaxed);
     AddRef();
 }
 
@@ -497,7 +521,15 @@ void IndexStagingBuffer::Destroy()
 void IndexStagingBuffer::DiscardHostBuffer()
 {
     if (m_HostBuffer)
+    {
+        g_stagingHostBytes.fetch_sub(m_Size, std::memory_order_relaxed);
         xr_free(m_HostBuffer);
+    }
+}
+
+void IndexStagingBuffer::DiscardDeviceBuffer()
+{
+    m_DeviceBuffer = nullptr;
 }
 
 size_t IndexStagingBuffer::GetSystemMemoryUsage() const

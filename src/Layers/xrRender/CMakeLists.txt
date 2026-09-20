@@ -58,6 +58,7 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ShaderConstants.h
     FrameGraphPasses/ShaderConstants.cpp
     FrameGraphPasses/ClusterDrawConfig.h
+    FrameGraphPasses/ClusterDrawConfig.cpp
     FrameGraphPasses/VisibilityPassSetup.h
     FrameGraphPasses/VisibilityPassSetup.cpp
     FrameGraphPasses/MaterialResolvePassSetup.h
@@ -174,6 +175,10 @@ target_sources(xrRender PRIVATE
     GlobalRenderDevice.cpp
 
     Backend/SubmitTokenRing.h
+    Backend/BackendCompletion.h
+    Backend/BackendCompletion.cpp
+    GeometryResidency.h
+    GeometryResidency.cpp
     Backend/VulkanBackend.h
     Backend/VulkanBackend.cpp
 
@@ -191,6 +196,8 @@ target_sources(xrRender PRIVATE
     FHierrarhyVisual.cpp
     FLOD.cpp
     FProgressive.cpp
+    ClusterBasis.h
+    ClusterBasis.cpp
     ClusterDAG.cpp
     ClusterDeviation.cpp
     ClusterShadowBVH.cpp
