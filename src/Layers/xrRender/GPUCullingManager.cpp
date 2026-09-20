@@ -1337,6 +1337,8 @@ u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinema
 
 void GPUCullingManager::UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset)
 {
+    ZoneScopedN("Animation::PalettePublication");
+
     u32 boneCount = skeleton->LL_BoneCount();
 
     for (u32 i = 0; i < boneCount; i++) {
@@ -1359,6 +1361,8 @@ void GPUCullingManager::FlushBoneBatch(nvrhi::ICommandList* cmdList)
     m_boneBatching = false;
     if (!cmdList || m_currentBoneOffset <= m_boneBatchStart)
         return;
+
+    ZoneScopedN("Animation::PalettePublication");
 
     const u64 byteOffset = static_cast<u64>(m_boneBatchStart) * BONE_STRIDE;
     const u64 byteSize = static_cast<u64>(m_currentBoneOffset - m_boneBatchStart) * BONE_STRIDE;

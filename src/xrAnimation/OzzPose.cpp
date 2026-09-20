@@ -2,8 +2,9 @@
 #include "OzzPose.h"
 #include "OzzSkeletonMirror.h"
 
-#include <ozz/animation/runtime/local_to_model_job.h>
+#include "xrCore/Profiler/Profiler.h"
 #include <ozz/animation/runtime/sampling_job.h>
+#include <ozz/base/maths/soa_float4x4.h>
 #include <ozz/base/maths/soa_transform.h>
 #include <algorithm>
 #include <cmath>
@@ -112,6 +113,12 @@ void ExportMatrix(const Float4x4& matrix, Fmatrix& result)
     StorePtrU(matrix.cols[2], &result._31);
     StorePtrU(matrix.cols[3], &result._41);
 }
+
+void ComputeLocalMatrices(const SoaTransform& pose, Float4x4 (&result)[4])
+{
+    const auto matrices = SoaFloat4x4::FromAffine(pose.translation, pose.rotation, pose.scale);
+    Transpose16x16(&matrices.cols[0].x, result->cols);
+}
 }
 
 struct OzzPose::State
@@ -122,11 +129,29 @@ struct OzzPose::State
         float time = 0.f;
         float weight = 0.f;
         u8 channel = 0;
+    };
+    struct Sample
+    {
         u16 source = noBlend;
         MotionID sampledMotion;
         float sampledTime = std::numeric_limits<float>::quiet_NaN();
         ozz::animation::SamplingJob::Context context;
         ozz::vector<SoaTransform> locals;
+    };
+    struct SamplingBank
+    {
+        xr_vector<std::unique_ptr<Sample>> samples;
+        ozz::vector<SoaTransform> remapScratch;
+
+        void ReserveBlend(u16 slot, const ozz::animation::Skeleton& skeleton)
+        {
+            auto& sample = samples[slot];
+            if (sample)
+                return;
+            sample = std::make_unique<Sample>();
+            sample->context.Resize(skeleton.num_joints());
+            sample->locals.resize(skeleton.num_soa_joints());
+        }
     };
     struct Bone
     {
@@ -137,6 +162,7 @@ struct OzzPose::State
     {
         u64 revision = 0;
         u8 channels = 0;
+        Fmatrix matrices[4];
     };
 
     std::shared_ptr<const OzzModelAnimations> assets;
@@ -144,61 +170,65 @@ struct OzzPose::State
     u16 blendCount = 0;
     xr_vector<Bone> bones;
     xr_vector<Packet> packets;
-    ozz::vector<SoaTransform> locals;
-    ozz::vector<SoaTransform> queryLocals;
-    ozz::vector<SoaTransform> samplingLocals;
-    ozz::vector<Float4x4> models;
+    SamplingBank normal;
+    SamplingBank query;
     float factors[channelCount] = {1.f, 1.f, 1.f, 1.f};
     u64 revision = 1;
 
-    const ozz::vector<SoaTransform>& Sample(u16 slot, float time)
+    const ozz::vector<SoaTransform>& SampleBlend(SamplingBank& bank, u16 slot, float time) const
     {
-        Blend& blend = blends[slot];
-        if (blend.source != noBlend)
+        const Blend& blend = blends[slot];
+        auto& sample = *bank.samples[slot];
+        if (sample.source != noBlend)
         {
-            const auto& source = blends[blend.source];
+            const auto& source = *bank.samples[sample.source];
             if (source.sampledMotion == blend.motion && source.sampledTime == time)
                 return source.locals;
         }
         for (u16 i = 0; i < blendCount; ++i)
         {
-            if (blends[i].sampledMotion == blend.motion && blends[i].sampledTime == time)
+            const auto& source = bank.samples[i];
+            if (source && source->sampledMotion == blend.motion && source->sampledTime == time)
             {
-                blend.source = i;
-                return blends[i].locals;
+                sample.source = i;
+                return source->locals;
             }
         }
         const auto& library = *assets->libraries[blend.motion.slot];
         const auto& binding = assets->bindings[blend.motion.slot];
         const auto* animation = library.animations[blend.motion.idx].get();
-        if (blend.sampledMotion != blend.motion)
-            blend.context.Invalidate();
+        if (sample.sampledMotion != blend.motion)
+            sample.context.Invalidate();
         const float duration = library.metadata.clips[blend.motion.idx].duration;
         const float wrapped = duration > 0.f ? std::fmod(std::max(time, 0.f), duration) : 0.f;
         ozz::animation::SamplingJob job;
         job.animation = animation;
-        job.context = &blend.context;
+        job.context = &sample.context;
         job.ratio = animation->duration() > 0.f ? wrapped / animation->duration() : 0.f;
-        job.output = ozz::make_span(binding.jointToTrack.empty() ? blend.locals : samplingLocals);
-        R_ASSERT2(job.Run(), "Ozz motion sampling failed");
+        job.output = ozz::make_span(binding.jointToTrack.empty() ? sample.locals : bank.remapScratch);
+        {
+            ZoneScopedN("Animation::Sampling");
+            R_ASSERT2(job.Run(), "Ozz motion sampling failed");
+        }
         if (!binding.jointToTrack.empty())
         {
-            for (size_t packet = 0; packet < blend.locals.size(); ++packet)
+            ZoneScopedN("Animation::Remapping");
+            for (size_t packet = 0; packet < sample.locals.size(); ++packet)
             {
-                auto& pose = blend.locals[packet];
+                auto& pose = sample.locals[packet];
                 pose = SoaTransform::identity();
                 for (size_t lane = 0; lane < 4 && packet * 4 + lane < binding.jointToTrack.size(); ++lane)
-                    GatherPoseLane(pose, int(lane), samplingLocals, binding.jointToTrack[packet * 4 + lane]);
+                    GatherPoseLane(pose, int(lane), bank.remapScratch, binding.jointToTrack[packet * 4 + lane]);
             }
         }
-        blend.sampledMotion = blend.motion;
-        blend.sampledTime = time;
-        blend.source = slot;
-        return blend.locals;
+        sample.sampledMotion = blend.motion;
+        sample.sampledTime = time;
+        sample.source = slot;
+        return sample.locals;
     }
 
-    SoaTransform Compose(size_t packet, u8 channels, u16 queryBone = noBlend,
-        const OzzPoseOverride* controls = nullptr)
+    SoaTransform Compose(SamplingBank& bank, size_t packet, u8 channels, u16 queryBone = noBlend,
+        const OzzPoseOverride* controls = nullptr) const
     {
         const auto zero = simd_float4::zero();
         const auto one = simd_float4::one();
@@ -249,7 +279,7 @@ struct OzzPose::State
                     const auto& blend = blends[slot];
                     const u16 boneId = assets->skeleton->jointToBone[packet * 4 + lane];
                     const bool overridden = controls && boneId == queryBone && controls->blend == slot;
-                    auto value = Sample(slot, overridden && controls->time ? *controls->time : blend.time)[packet];
+                    auto value = SampleBlend(bank, slot, overridden && controls->time ? *controls->time : blend.time)[packet];
                     if (channel >= 2)
                     {
                         const auto& binding = assets->bindings[blend.motion.slot];
@@ -303,24 +333,6 @@ struct OzzPose::State
         result.rotation = Conjugate(result.rotation);
         return result;
     }
-
-    void Model(Fmatrix& result, u16 bone, const Fmatrix& parent, ozz::span<const SoaTransform> input)
-    {
-        const u16 joint = assets->skeleton->boneToJoint[bone];
-        const auto parentMatrix = ImportMatrix(parent);
-        const auto parentJoint = assets->skeleton->skeleton.joint_parents()[joint];
-        if (parentJoint != ozz::animation::Skeleton::kNoParent)
-            models[parentJoint] = parentMatrix;
-        ozz::animation::LocalToModelJob job;
-        job.skeleton = &assets->skeleton->skeleton;
-        job.input = input;
-        job.output = ozz::make_span(models);
-        job.from = joint;
-        job.to = joint;
-        job.root = &parentMatrix;
-        R_ASSERT2(job.Run(), "Ozz hierarchy evaluation failed");
-        ExportMatrix(models[joint], result);
-    }
 };
 
 OzzPose::OzzPose() = default;
@@ -335,13 +347,13 @@ void OzzPose::Reset(std::shared_ptr<const OzzModelAnimations> assets, u16 blendC
     state->blends = std::make_unique<State::Blend[]>(blendCapacity);
     state->bones.resize(skeleton.num_joints());
     state->packets.resize(skeleton.num_soa_joints());
-    state->locals.resize(skeleton.num_soa_joints(), SoaTransform::identity());
-    state->queryLocals.resize(skeleton.num_soa_joints(), SoaTransform::identity());
-    state->models.resize(skeleton.num_joints());
+    state->normal.samples.resize(blendCapacity);
+    state->query.samples.resize(blendCapacity);
     for (const auto& binding : state->assets->bindings)
         if (!binding.jointToTrack.empty())
         {
-            state->samplingLocals.resize(skeleton.num_soa_joints());
+            state->normal.remapScratch.resize(skeleton.num_soa_joints());
+            state->query.remapScratch.resize(skeleton.num_soa_joints());
             break;
         }
 }
@@ -349,12 +361,9 @@ void OzzPose::Reset(std::shared_ptr<const OzzModelAnimations> assets, u16 blendC
 void OzzPose::ReserveBlend(u16 slot)
 {
     R_ASSERT(slot < state->blendCount);
-    auto& blend = state->blends[slot];
-    if (blend.context.max_tracks())
-        return;
     const auto& skeleton = state->assets->skeleton->skeleton;
-    blend.context.Resize(skeleton.num_joints());
-    blend.locals.resize(skeleton.num_soa_joints());
+    state->normal.ReserveBlend(slot, skeleton);
+    state->query.ReserveBlend(slot, skeleton);
 }
 
 bool OzzPose::SetBlend(u16 slot, MotionID motion, float time, float weight, u8 channel)
@@ -392,23 +401,29 @@ bool OzzPose::SetChannelFactor(u16 channel, float factor)
     return true;
 }
 
-void OzzPose::BuildBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 channels)
+const Fmatrix& OzzPose::EvaluateLocalBone(u16 bone, u8 channels)
 {
-    const size_t packet = state->assets->skeleton->boneToJoint[bone] / 4;
-    auto& stamp = state->packets[packet];
-    if (stamp.revision != state->revision || stamp.channels != channels)
+    const u16 joint = state->assets->skeleton->boneToJoint[bone];
+    auto& packet = state->packets[joint / 4];
+    if (packet.revision != state->revision || packet.channels != channels)
     {
-        state->locals[packet] = state->Compose(packet, channels);
-        stamp = {state->revision, channels};
+        ZoneScopedN("Animation::LocalPose");
+        Float4x4 matrices[4];
+        ComputeLocalMatrices(state->Compose(state->normal, joint / 4, channels), matrices);
+        for (size_t lane = 0; lane < 4; ++lane)
+            ExportMatrix(matrices[lane], packet.matrices[lane]);
+        packet.revision = state->revision;
+        packet.channels = channels;
     }
-    state->Model(result, bone, parent, ozz::make_span(state->locals));
+    return packet.matrices[joint % 4];
 }
 
 void OzzPose::QueryBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 channels,
     const OzzPoseOverride& controls)
 {
-    const size_t packet = state->assets->skeleton->boneToJoint[bone] / 4;
-    state->queryLocals[packet] = state->Compose(packet, channels, bone, &controls);
-    state->Model(result, bone, parent, ozz::make_span(state->queryLocals));
+    const u16 joint = state->assets->skeleton->boneToJoint[bone];
+    Float4x4 matrices[4];
+    ComputeLocalMatrices(state->Compose(state->query, joint / 4, channels, bone, &controls), matrices);
+    ExportMatrix(ImportMatrix(parent) * matrices[joint % 4], result);
 }
 }

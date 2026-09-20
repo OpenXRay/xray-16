@@ -29,7 +29,7 @@ public:
     bool SetBlend(u16 slot, MotionID motion, float time, float weight, u8 channel);
     bool SetBoneBlends(u16 bone, ozz::span<const u16> slots);
     bool SetChannelFactor(u16 channel, float factor);
-    void BuildBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 channels);
+    const Fmatrix& EvaluateLocalBone(u16 bone, u8 channels);
     void QueryBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 channels,
         const OzzPoseOverride& controls);
 
