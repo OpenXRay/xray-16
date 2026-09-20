@@ -489,3 +489,15 @@ bool CUIPdaWnd::OnControllerAction(int axis, const ControllerAxisState& state, E
 
     return false;
 }
+
+bool CUIPdaWnd::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    bool open = CUIDialogWnd::FillDebugTree(debugState);
+    open |= m_hint_wnd->FillDebugTree(debugState);
+    return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
+}

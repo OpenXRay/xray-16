@@ -92,4 +92,6 @@ public:
     void UpdateRankingWnd();
 
     pcstr GetDebugType() override { return "CUIPdaWnd"; }
+
+    bool FillDebugTree(const CUIDebugState& debugState) override;
 };

@@ -82,6 +82,8 @@ public:
 
     bool IsUsingCursorRightNow() const override;
 
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+
 private:
     void TaskSetTargetMap(CGameTask* task) const;
     void TaskShowMapSpot(CGameTask* task, bool show) const;
