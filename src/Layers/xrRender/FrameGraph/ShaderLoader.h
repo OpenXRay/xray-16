@@ -5,6 +5,7 @@
 #include "ShaderCache.h"
 #include "xrCommon/xr_set.h"
 #include <filesystem>
+#include <string_view>
 
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
 
@@ -14,6 +15,28 @@ namespace slang {
 }
 
 namespace xray::render::framegraph {
+
+class ShaderKeyView
+{
+public:
+    ShaderKeyView(const char* name, const char* extension);
+
+    int Compare(const xr_string& other) const;
+
+private:
+    std::string_view m_name;
+    std::string_view m_extension;
+};
+
+class ShaderKeyLess
+{
+public:
+    using is_transparent = void;
+
+    bool operator()(const xr_string& lhs, const xr_string& rhs) const;
+    bool operator()(const xr_string& lhs, const ShaderKeyView& rhs) const;
+    bool operator()(const ShaderKeyView& lhs, const xr_string& rhs) const;
+};
 
 class ShaderLoader {
 public:
@@ -135,7 +158,7 @@ private:
     xray::render::SlangCompiler::Target m_target = xray::render::SlangCompiler::Target::DXIL;
     ShaderCache m_cache;
 
-    xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
+    xr_map<xr_string, ExtractedReflection*, ShaderKeyLess> m_reflectionCache;
 
     xr_map<xr_string, nvrhi::ShaderHandle> m_handleCache;
 

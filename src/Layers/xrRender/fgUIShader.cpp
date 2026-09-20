@@ -147,7 +147,7 @@ bool fgUIShader::GetBaseTextureResolution(Fvector2& res)
     bool ok = (nvrhiTexture != nullptr);
     if (ok)
     {
-        nvrhi::TextureDesc desc = nvrhiTexture->getDesc();
+        const auto& desc = nvrhiTexture->getDesc();
         res = { float(desc.width), float(desc.height) };
     }
     texManager->Release(handle);
