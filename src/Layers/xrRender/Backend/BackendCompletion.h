@@ -27,6 +27,7 @@ public:
     void CloseLease(u64 lease);
     void ReleaseLease(u64 lease);
     IRenderBackend::SubmissionLeaseState PollLease(u64 lease);
+    IRenderBackend::SubmissionLeaseState PeekLease(u64 lease) const;
 
     u32 PendingTicketCount() const;
     u32 OpenLeaseCount() const;
@@ -75,8 +76,10 @@ private:
 
     u32 AcquireSlotLocked(u32 queueIndex);
     void AdvanceLocked(u32 queueIndex);
+    void AdvanceAllLocked();
     void MarkFailureLocked(u32 queueIndex, u64 seq);
     Ticket* FindTicketLocked(u32 queueIndex, u64 seq);
+    IRenderBackend::SubmissionLeaseState EvaluateLeaseLocked(const Lease& lease) const;
 
     mutable std::mutex m_mutex;
     nvrhi::IDevice* m_device = nullptr;

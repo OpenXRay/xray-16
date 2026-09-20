@@ -210,7 +210,10 @@ void VulkanBackend::Shutdown() {
         m_submitThread.join();
     }
 
-    m_completion.Shutdown();
+    {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        m_completion.Shutdown();
+    }
 
     m_bindlessDescriptorTable = nullptr;
     m_bindlessLayout = nullptr;
@@ -229,7 +232,9 @@ void VulkanBackend::Shutdown() {
     m_uploadCommandList = nullptr;
 
     m_nvrhiDevice = nullptr;
-    if (m_nvrhiVulkanDevice) {
+    if (m_nvrhiVulkanDevice)
+    {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
         m_nvrhiVulkanDevice->waitForIdle();
         m_nvrhiVulkanDevice->runGarbageCollection();
     }
@@ -1131,9 +1136,9 @@ void VulkanBackend::EndFrame() {
     m_completion.CloseOpenLeases();
     m_presentPending = true;
 
-    nvrhi::IDevice* device = m_nvrhiDevice;
-    m_gcTask = TaskScheduler->AddTask([device] {
-        device->runGarbageCollection();
+    m_gcTask = TaskScheduler->AddTask([this]
+    {
+        RunGarbageCollection();
     });
 }
 
@@ -1224,7 +1229,7 @@ void VulkanBackend::SubmitThreadMain() {
         {
             ZoneScopedN("SubmitThread::GC");
             const auto tGc = Clock::now();
-            m_nvrhiDevice->runGarbageCollection();
+            RunGarbageCollection();
             storeMax(m_stGcUs, usBetween(tGc, Clock::now()));
         }
 
@@ -1269,10 +1274,31 @@ void VulkanBackend::WaitForIdle() {
         TaskScheduler->Wait(m_gcTask);
         m_gcTask.Reset();
     }
+    std::lock_guard<std::mutex> qk(m_queueMutex);
     if (m_nvrhiDevice)
         m_nvrhiDevice->waitForIdle();
     if (m_device)
         vkDeviceWaitIdle(m_device);
+}
+
+void VulkanBackend::RunGarbageCollection()
+{
+    if (!m_nvrhiDevice)
+        return;
+    std::lock_guard<std::mutex> qk(m_queueMutex);
+    m_nvrhiDevice->runGarbageCollection();
+}
+
+IRenderBackend::SubmissionLeaseState VulkanBackend::PollSubmissionLease(u64 lease)
+{
+    const SubmissionLeaseState observed = m_completion.PeekLease(lease);
+    if (observed != SubmissionLeaseState::Pending)
+        return observed;
+
+    std::unique_lock<std::mutex> qk(m_queueMutex, std::try_to_lock);
+    if (!qk.owns_lock())
+        return observed;
+    return m_completion.PollLease(lease);
 }
 
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {

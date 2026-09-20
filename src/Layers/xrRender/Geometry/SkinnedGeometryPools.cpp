@@ -232,6 +232,23 @@ nvrhi::IBuffer* SkinnedGeometryPools::GetIndexBuffer(u32 formatID) const
     return m_pools[formatID].indexBuffer.Get();
 }
 
+u32 SkinnedGeometryPools::GetVertexCount(u32 formatID) const
+{
+    if (formatID >= FORMAT_COUNT)
+        return 0;
+    return m_pools[formatID].vertexCount;
+}
+
+const u16* SkinnedGeometryPools::GetIndexRange(u32 formatID, u32 firstIndex, u32 count) const
+{
+    if (formatID >= FORMAT_COUNT || count == 0)
+        return nullptr;
+    const Pool& pool = m_pools[formatID];
+    if (u64(firstIndex) + u64(count) > u64(pool.indexCount))
+        return nullptr;
+    return reinterpret_cast<const u16*>(pool.indexData.data()) + firstIndex;
+}
+
 void SkinnedGeometryPools::Reset()
 {
     for (auto& pool : m_pools)

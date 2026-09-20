@@ -19,7 +19,11 @@ struct MS_VERTEX
 
 struct MS_PRIMITIVE
 {
+#ifdef TARGET_SPIRV
+    uint visID : SV_PrimitiveID;
+#else
     uint visID : TEXCOORD3;
+#endif
 };
 
 [shader("mesh")]

@@ -1443,8 +1443,6 @@ bool DrawPages(fg::RenderContext* ctx, const FrameGraph& graph, const VSMAtlasDa
         bsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
         bsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
         bsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
-        bsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
-        bsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
         bsb.BufferSRV("g_Pairs", state.pairs[stream]);
         bsb.BufferSRV("g_PageList", graph.GetPhysicalBuffer(data.cache.pageList));
         bsb.BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload);
@@ -1934,8 +1932,6 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
            .BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs)
            .BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta)
            .BufferSRV("g_GeoInstances", cfg.geometry.instances)
-           .BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups)
-           .BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency)
            .BufferSRV("g_Pairs", state.dynPairs[0])
            .BufferSRV("g_PageList", state.dynPageList)
            .BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload)
@@ -1949,8 +1945,6 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
              .BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs)
              .BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta)
              .BufferSRV("g_GeoInstances", cfg.geometry.instances)
-             .BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups)
-             .BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency)
              .BufferSRV("g_Pairs", state.dynPairs[1])
              .BufferSRV("g_PageList", state.dynPageList)
              .BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload)

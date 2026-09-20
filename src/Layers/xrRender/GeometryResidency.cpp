@@ -20,6 +20,15 @@ u64 AlignBytes(u64 bytes)
     return u64(BlocksFor(bytes)) * GEOMETRY_PAGE_BLOCK_BYTES;
 }
 
+constexpr u64 GEOMETRY_ARENA_MAX_BYTES =
+    (u64(UINT32_MAX) / GEOMETRY_PAGE_BLOCK_BYTES) * GEOMETRY_PAGE_BLOCK_BYTES;
+constexpr u64 GEOMETRY_ARENA_HEADROOM_MAX = 16ull * 1024ull * 1024ull;
+constexpr u32 GEOMETRY_ARENA_COPY_GAP_BLOCKS = 16u;
+constexpr u32 GEOMETRY_ARENA_COPY_RANGE_LIMIT = 64u;
+constexpr u32 GEOMETRY_PAGE_READ_ATTEMPTS = 4u;
+constexpr u32 GEOMETRY_PAGE_RETRY_FRAMES = 8u;
+constexpr u32 GEOMETRY_EVICTION_LIMIT = 64u;
+
 } // namespace
 
 void GeometryResidencyManager::Arena::Reset(u64 arenaBytes)
@@ -27,6 +36,8 @@ void GeometryResidencyManager::Arena::Reset(u64 arenaBytes)
     bytes = AlignBytes(arenaBytes);
     blockCount = BlocksFor(bytes);
     usedBlocks = 0;
+    pinnedBlocks = 0;
+    reservedBlocks = 0;
     cursor = 0;
     freeMask.assign((blockCount + 63u) / 64u, 0ull);
     for (u32 b = 0; b < blockCount; ++b)
@@ -44,9 +55,13 @@ void GeometryResidencyManager::Arena::Grow(u64 arenaBytes)
         freeMask[block >> 6] |= 1ull << (block & 63u);
 }
 
-bool GeometryResidencyManager::Arena::Allocate(u32 blocks, u32& outBlock)
+bool GeometryResidencyManager::Arena::Allocate(u32 blocks, bool pinnedRequest, u32& outBlock)
 {
-    if (blocks == 0 || blocks > blockCount || usedBlocks + blocks > blockCount)
+    if (blocks == 0 || blocks > blockCount)
+        return false;
+
+    const u32 ceiling = pinnedRequest ? blockCount : blockCount - reservedBlocks;
+    if (usedBlocks + blocks > ceiling)
         return false;
 
     u32 block = cursor < blockCount ? cursor : 0u;
@@ -66,6 +81,11 @@ bool GeometryResidencyManager::Arena::Allocate(u32 blocks, u32& outBlock)
                     freeMask[index >> 6] &= ~(1ull << (index & 63u));
                 }
                 usedBlocks += blocks;
+                if (pinnedRequest)
+                {
+                    pinnedBlocks += blocks;
+                    reservedBlocks -= std::min(reservedBlocks, blocks);
+                }
                 cursor = first + blocks;
                 outBlock = first;
                 return true;
@@ -78,7 +98,7 @@ bool GeometryResidencyManager::Arena::Allocate(u32 blocks, u32& outBlock)
     return false;
 }
 
-void GeometryResidencyManager::Arena::Release(u32 block, u32 blocks)
+void GeometryResidencyManager::Arena::Release(u32 block, u32 blocks, bool pinnedRelease)
 {
     if (block == GEOMETRY_PAGE_SLOT_INVALID || blocks == 0)
         return;
@@ -89,6 +109,80 @@ void GeometryResidencyManager::Arena::Release(u32 block, u32 blocks)
         freeMask[index >> 6] |= (1ull << (index & 63u));
     }
     usedBlocks = usedBlocks > blocks ? usedBlocks - blocks : 0u;
+    if (!pinnedRelease)
+        return;
+    const u32 released = std::min(pinnedBlocks, blocks);
+    pinnedBlocks -= released;
+    reservedBlocks += released;
+}
+
+bool GeometryResidencyManager::Arena::CanAllocate(u32 blocks, bool pinnedRequest) const
+{
+    if (blocks == 0 || blocks > blockCount)
+        return false;
+
+    const u32 ceiling = pinnedRequest ? blockCount : blockCount - reservedBlocks;
+    if (usedBlocks + blocks > ceiling)
+        return false;
+
+    u32 run = 0;
+    for (u32 block = 0; block < blockCount; ++block)
+    {
+        if ((freeMask[block >> 6] & (1ull << (block & 63u))) == 0ull)
+        {
+            run = 0;
+            continue;
+        }
+        if (++run == blocks)
+            return true;
+    }
+    return false;
+}
+
+void GeometryResidencyManager::Arena::CollectLiveRanges(xr_vector<ArenaCopyRange>& out) const
+{
+    out.clear();
+    u32 runStart = GEOMETRY_PAGE_SLOT_INVALID;
+    u32 runEnd = 0;
+    const u32 words = u32(freeMask.size());
+    for (u32 word = 0; word < words; ++word)
+    {
+        u64 occupied = ~freeMask[word];
+        const u32 base = word << 6;
+        if (blockCount - base < 64u)
+            occupied &= (1ull << (blockCount - base)) - 1ull;
+        for (u32 bit = 0; bit < 64u && (occupied >> bit) != 0ull; ++bit)
+        {
+            if (((occupied >> bit) & 1ull) == 0ull)
+                continue;
+            const u32 index = base + bit;
+            if (runStart != GEOMETRY_PAGE_SLOT_INVALID
+                && index <= runEnd + GEOMETRY_ARENA_COPY_GAP_BLOCKS)
+            {
+                runEnd = index;
+                continue;
+            }
+            if (runStart != GEOMETRY_PAGE_SLOT_INVALID)
+            {
+                out.push_back(ArenaCopyRange{ u64(runStart) * GEOMETRY_PAGE_BLOCK_BYTES,
+                    u64(runEnd + 1u - runStart) * GEOMETRY_PAGE_BLOCK_BYTES });
+            }
+            runStart = index;
+            runEnd = index;
+        }
+    }
+    if (runStart != GEOMETRY_PAGE_SLOT_INVALID)
+    {
+        out.push_back(ArenaCopyRange{ u64(runStart) * GEOMETRY_PAGE_BLOCK_BYTES,
+            u64(runEnd + 1u - runStart) * GEOMETRY_PAGE_BLOCK_BYTES });
+    }
+    if (out.size() > GEOMETRY_ARENA_COPY_RANGE_LIMIT)
+    {
+        const u64 first = out.front().offset;
+        const u64 last = out.back().offset + out.back().bytes;
+        out.clear();
+        out.push_back(ArenaCopyRange{ first, last - first });
+    }
 }
 
 GeometryResidencyManager::GeometryResidencyManager() = default;
@@ -119,6 +213,8 @@ void GeometryResidencyManager::ReleaseBuffers()
     m_shadowCutBuffers = nullptr;
     m_vertexCopySource = nullptr;
     m_payloadCopySource = nullptr;
+    m_vertexCopyRanges.clear();
+    m_payloadCopyRanges.clear();
     m_vertexArena.buffer = nullptr;
     m_payloadArena.buffer = nullptr;
     m_vertexArena.Reset(0);
@@ -321,6 +417,11 @@ bool GeometryResidencyManager::BeginLevel(ClusterDAG* dag, const char* storePath
     m_pendingActivation.clear();
     m_cutChangedGroups.clear();
     m_views.clear();
+    m_groupUnreachable.clear();
+    m_unreachableDirty = true;
+    m_readFailureLogged = false;
+    m_pressureVertexBytes = 0;
+    m_pressurePayloadBytes = 0;
     m_frameIndex = 0;
     m_mappingGeneration = 1;
     m_cutRevision = 1;
@@ -408,6 +509,11 @@ void GeometryResidencyManager::EndLevel()
     m_views.clear();
     m_shadowPending.clear();
     m_shadowActive.clear();
+    m_groupUnreachable.clear();
+    m_unreachableDirty = false;
+    m_readFailureLogged = false;
+    m_pressureVertexBytes = 0;
+    m_pressurePayloadBytes = 0;
     m_dag = nullptr;
     m_active = false;
     m_tablesInitialized = false;
@@ -478,8 +584,8 @@ void GeometryResidencyManager::RegisterRuntimePages()
             vertexBytes += AlignBytes(pages[page].vertexBytes);
             payloadBytes += AlignBytes(u64(pages[page].payloadBytes) + CLUSTER_PAYLOAD_TAIL_PAD);
         }
-        GrowArena(m_vertexArena, m_vertexArena.bytes + vertexBytes, m_vertexCopySource);
-        GrowArena(m_payloadArena, m_payloadArena.bytes + payloadBytes, m_payloadCopySource);
+        ReserveRuntimeArena(m_vertexArena, vertexBytes, false, m_vertexCopySource, m_vertexCopyRanges);
+        ReserveRuntimeArena(m_payloadArena, payloadBytes, false, m_payloadCopySource, m_payloadCopyRanges);
         m_stats.pinnedVertexBytes += vertexBytes;
         m_stats.pinnedPayloadBytes += payloadBytes;
         m_stats.vertexArenaBytes = m_vertexArena.bytes;
@@ -500,7 +606,25 @@ void GeometryResidencyManager::RegisterRuntimePages()
             m_gpuPages[p] = pages[p];
             m_gpuPages[p].vertexBase = UINT32_MAX;
             m_gpuPages[p].payloadBase = UINT32_MAX;
-            R_ASSERT2(AllocatePage(p), "Pinned runtime geometry does not fit its arena reservation");
+            if (!AllocatePage(p))
+            {
+                const u32 vertexRun = BlocksFor(pages[p].vertexBytes);
+                const u32 payloadRun = BlocksFor(u64(pages[p].payloadBytes) + CLUSTER_PAYLOAD_TAIL_PAD);
+                if (!m_vertexArena.CanAllocate(vertexRun, true))
+                {
+                    ReserveRuntimeArena(m_vertexArena, u64(vertexRun) * GEOMETRY_PAGE_BLOCK_BYTES, true,
+                        m_vertexCopySource, m_vertexCopyRanges);
+                }
+                if (!m_payloadArena.CanAllocate(payloadRun, true))
+                {
+                    ReserveRuntimeArena(m_payloadArena, u64(payloadRun) * GEOMETRY_PAGE_BLOCK_BYTES, true,
+                        m_payloadCopySource, m_payloadCopyRanges);
+                }
+                m_stats.vertexArenaBytes = m_vertexArena.bytes;
+                m_stats.payloadArenaBytes = m_payloadArena.bytes;
+                if (!AllocatePage(p))
+                    FATAL_F("[GeoResidency] pinned runtime page %u does not fit the grown arena", p);
+            }
             u32 vertexSize = 0;
             u32 payloadSize = 0;
             const u8* vertices = CookVertexBytes(p, vertexSize);
@@ -588,10 +712,11 @@ bool GeometryResidencyManager::AllocatePage(u32 page)
 
     u32 vertexBlock = GEOMETRY_PAGE_SLOT_INVALID;
     u32 payloadBlock = GEOMETRY_PAGE_SLOT_INVALID;
-    if (!m_vertexArena.Allocate(vertexBlocks, vertexBlock))
+    if (!m_vertexArena.Allocate(vertexBlocks, slot.pinned, vertexBlock))
         return false;
-    if (!m_payloadArena.Allocate(payloadBlocks, payloadBlock)) {
-        m_vertexArena.Release(vertexBlock, vertexBlocks);
+    if (!m_payloadArena.Allocate(payloadBlocks, slot.pinned, payloadBlock))
+    {
+        m_vertexArena.Release(vertexBlock, vertexBlocks, slot.pinned);
         return false;
     }
 
@@ -602,10 +727,31 @@ bool GeometryResidencyManager::AllocatePage(u32 page)
     return true;
 }
 
+void GeometryResidencyManager::RecordAllocationPressure(u32 page)
+{
+    const GPUClusterPage& source = m_dag->Pages()[page];
+    const bool pinned = m_pageSlots[page].pinned;
+    const auto record = [pinned](const Arena& arena, u64 bytes, u64& pressure)
+    {
+        const u64 required = AlignBytes(bytes);
+        if (arena.CanAllocate(BlocksFor(required), pinned))
+            return;
+        const u64 capacity = pinned ? arena.bytes : arena.FineBudgetBytes();
+        const u64 used = pinned ? arena.UsedBytes() : arena.FineUsedBytes();
+        const u64 available = capacity - std::min(capacity, used);
+        const u64 missing = required > available ? required - available : required;
+        pressure = std::max(pressure, missing);
+    };
+    record(m_vertexArena, source.vertexBytes, m_pressureVertexBytes);
+    record(m_payloadArena, u64(source.payloadBytes) + CLUSTER_PAYLOAD_TAIL_PAD, m_pressurePayloadBytes);
+}
+
 void GeometryResidencyManager::IssuePageRead(u32 page)
 {
     PageSlot& slot = m_pageSlots[page];
     if (slot.state != PageState::Absent || !m_io || page >= m_storePageCount)
+        return;
+    if (slot.readAttempts != 0 && m_frameIndex < slot.retryFrame)
         return;
 
     const GPUClusterPage& source = m_dag->Pages()[page];
@@ -617,19 +763,53 @@ void GeometryResidencyManager::IssuePageRead(u32 page)
     slot.payloadRead = m_io->ReadAsync(m_storePath.c_str(), m_storePayloadOrigin + source.payloadBase,
         source.payloadBytes, m_ioEpoch, nullptr, nullptr, m_storeIdentity);
 
-    if (!slot.vertexRead || !slot.payloadRead) {
+    if (!slot.vertexRead || !slot.payloadRead)
+    {
         if (slot.vertexRead)
             m_io->CancelRequest(slot.vertexRead);
         if (slot.payloadRead)
             m_io->CancelRequest(slot.payloadRead);
         slot.vertexRead = 0;
         slot.payloadRead = 0;
-        m_stats.readsFailed++;
+        RecordPageReadFailure(page, "the request could not be queued");
         return;
     }
 
     slot.state = PageState::Reading;
     m_stats.readsIssued++;
+}
+
+void GeometryResidencyManager::RecordPageReadFailure(u32 page, const char* reason)
+{
+    PageSlot& slot = m_pageSlots[page];
+    slot.vertexRead = 0;
+    slot.payloadRead = 0;
+    slot.vertexStaging.clear();
+    slot.vertexStaging.shrink_to_fit();
+    slot.payloadStaging.clear();
+    slot.payloadStaging.shrink_to_fit();
+    slot.state = PageState::Absent;
+    m_stats.readsFailed++;
+
+    if (slot.readAttempts < GEOMETRY_PAGE_READ_ATTEMPTS)
+        ++slot.readAttempts;
+    if (slot.readAttempts < GEOMETRY_PAGE_READ_ATTEMPTS)
+    {
+        const u32 backoff = GEOMETRY_PAGE_RETRY_FRAMES << (slot.readAttempts - 1u);
+        slot.retryFrame = m_frameIndex + backoff;
+        return;
+    }
+
+    slot.state = PageState::Failed;
+    slot.retryFrame = 0;
+    m_stats.failedPages++;
+    m_unreachableDirty = true;
+    if (!m_readFailureLogged)
+    {
+        m_readFailureLogged = true;
+        Msg("! [GeoResidency] page %u abandoned after %u failed reads from '%s' (%s); the coarse residency stays in place",
+            page, GEOMETRY_PAGE_READ_ATTEMPTS, m_storePath.c_str(), reason);
+    }
 }
 
 void GeometryResidencyManager::MarkGroupWordDirty(u32 word)
@@ -765,6 +945,7 @@ void GeometryResidencyManager::UnpublishPage(u32 page)
 void GeometryResidencyManager::RetirePage(u32 page)
 {
     PageSlot& slot = m_pageSlots[page];
+    const bool abandoned = slot.state == PageState::Failed;
     UnpublishPage(page);
 
     if (slot.vertexBlock != GEOMETRY_PAGE_SLOT_INVALID) {
@@ -774,6 +955,7 @@ void GeometryResidencyManager::RetirePage(u32 page)
         retiring.vertexBlocks = slot.vertexBlocks;
         retiring.payloadBlock = slot.payloadBlock;
         retiring.payloadBlocks = slot.payloadBlocks;
+        retiring.pinned = slot.pinned;
         m_retiring.push_back(retiring);
     }
 
@@ -781,7 +963,7 @@ void GeometryResidencyManager::RetirePage(u32 page)
     slot.vertexBlocks = 0;
     slot.payloadBlock = GEOMETRY_PAGE_SLOT_INVALID;
     slot.payloadBlocks = 0;
-    slot.state = PageState::Absent;
+    slot.state = abandoned ? PageState::Failed : PageState::Absent;
     slot.cpuSourced = false;
     slot.vertexStaging.clear();
     slot.vertexStaging.shrink_to_fit();
@@ -845,6 +1027,81 @@ void GeometryResidencyManager::EvictGroup(u32 group)
             RetirePage(page);
     }
     m_stats.evictions++;
+}
+
+void GeometryResidencyManager::AbandonGroup(u32 group)
+{
+    GroupSlot& slot = m_groupSlots[group];
+    if (!slot.requested || slot.resident)
+        return;
+
+    slot.requested = false;
+    const xr_vector<u32>& memberPages = m_dag->GroupMemberPageList();
+    for (u32 i = 0; i < slot.memberPageCount; ++i)
+    {
+        const u32 page = memberPages[slot.firstMemberPage + i];
+        PageSlot& pageSlot = m_pageSlots[page];
+        R_ASSERT(pageSlot.refs != 0);
+        if (--pageSlot.refs == 0 && !pageSlot.pinned)
+            RetirePage(page);
+    }
+}
+
+void GeometryResidencyManager::RefreshUnreachableGroups()
+{
+    if (m_groupUnreachable.size() != size_t(m_groupCount))
+        m_unreachableDirty = true;
+    if (!m_unreachableDirty)
+        return;
+
+    m_unreachableDirty = false;
+    m_groupUnreachable.assign(m_groupCount, u8(0));
+
+    const xr_vector<u32>& memberPages = m_dag->GroupMemberPageList();
+    const xr_vector<u32>& dependencies = m_dag->GroupDependencies();
+    for (u32 group = 0; group < m_groupCount; ++group)
+    {
+        const GroupSlot& slot = m_groupSlots[group];
+        for (u32 i = 0; i < slot.memberPageCount; ++i)
+        {
+            const u32 page = memberPages[slot.firstMemberPage + i];
+            if (page < u32(m_pageSlots.size()) && m_pageSlots[page].state == PageState::Failed)
+            {
+                m_groupUnreachable[group] = 1;
+                break;
+            }
+        }
+    }
+
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        for (u32 group = 0; group < m_groupCount; ++group)
+        {
+            if (m_groupUnreachable[group])
+                continue;
+            const GroupSlot& slot = m_groupSlots[group];
+            for (u32 i = 0; i < slot.dependencyCount; ++i)
+            {
+                const u32 dependency = dependencies[slot.firstDependency + i];
+                if (dependency >= m_groupCount || !m_groupUnreachable[dependency])
+                    continue;
+                m_groupUnreachable[group] = 1;
+                changed = true;
+                break;
+            }
+        }
+    }
+
+    m_stats.unreachableGroups = 0;
+    for (u32 group = 0; group < m_groupCount; ++group)
+    {
+        if (!m_groupUnreachable[group])
+            continue;
+        m_stats.unreachableGroups++;
+        AbandonGroup(group);
+    }
 }
 
 void GeometryResidencyManager::DeactivateIncompleteGroups()
@@ -990,8 +1247,8 @@ void GeometryResidencyManager::CompleteFrames(IRenderBackend* backend)
             ++it;
             continue;
         }
-        m_vertexArena.Release(it->vertexBlock, it->vertexBlocks);
-        m_payloadArena.Release(it->payloadBlock, it->payloadBlocks);
+        m_vertexArena.Release(it->vertexBlock, it->vertexBlocks, it->pinned);
+        m_payloadArena.Release(it->payloadBlock, it->payloadBlocks, it->pinned);
         it = m_retiring.erase(it);
     }
 
@@ -1015,6 +1272,12 @@ void GeometryResidencyManager::BeginFrame(IRenderBackend* backend)
     m_stats.uploadKiB = 0;
     m_stats.allocationDeferrals = 0;
     m_stats.budgetDeferrals = 0;
+    m_stats.dependencyStalls = 0;
+    m_stats.readThrottles = 0;
+    m_stats.uploadThrottles = 0;
+    m_stats.reservationFailures = 0;
+    m_pressureVertexBytes = 0;
+    m_pressurePayloadBytes = 0;
 }
 
 void GeometryResidencyManager::ClearDemand()
@@ -1157,12 +1420,20 @@ void GeometryResidencyManager::ResolveDemand()
             slot.payloadRead = 0;
 
             const GPUClusterPage& source = m_dag->Pages()[p];
-            if (!vertexOk || !payloadOk
-                || vertex.contentTag != m_storeIdentity || payload.contentTag != m_storeIdentity
-                || vertex.buffer.size() != source.vertexBytes
-                || payload.buffer.size() != source.payloadBytes) {
-                slot.state = PageState::Absent;
-                m_stats.readsFailed++;
+            if (!vertexOk || !payloadOk)
+            {
+                RecordPageReadFailure(p, "the store read did not complete");
+                continue;
+            }
+            if (vertex.contentTag != m_storeIdentity || payload.contentTag != m_storeIdentity)
+            {
+                RecordPageReadFailure(p, "the completed request carried a foreign store tag");
+                continue;
+            }
+            if (vertex.buffer.size() != source.vertexBytes
+                || payload.buffer.size() != source.payloadBytes)
+            {
+                RecordPageReadFailure(p, "the store returned a short page");
                 continue;
             }
 
@@ -1170,10 +1441,14 @@ void GeometryResidencyManager::ResolveDemand()
             slot.payloadStaging = std::move(payload.buffer);
             slot.payloadStaging.resize(size_t(source.payloadBytes) + CLUSTER_PAYLOAD_TAIL_PAD, 0);
             slot.cpuSourced = false;
+            slot.readAttempts = 0;
+            slot.retryFrame = 0;
             slot.state = PageState::Staged;
             m_uploadQueue.push_back(p);
         }
     }
+
+    RefreshUnreachableGroups();
 
     const auto& dependencies = m_dag->GroupDependencies();
     m_demandClosure.clear();
@@ -1223,15 +1498,22 @@ void GeometryResidencyManager::ResolveDemand()
     m_stats.activatingGroups = 0;
     for (u32 g = 0; g < m_groupCount; ++g) {
         GroupSlot& slot = m_groupSlots[g];
-        if (slot.resident || !slot.desired)
+        if (slot.resident || !slot.desired || m_groupUnreachable[g])
             continue;
 
         bool dependenciesReady = true;
         for (u32 i = 0; i < slot.dependencyCount; ++i)
             dependenciesReady &= m_groupSlots[dependencies[slot.firstDependency + i]].resident;
-        if (!dependenciesReady || !ReserveGroupPages(g))
+        if (!dependenciesReady)
         {
+            ++m_stats.dependencyStalls;
             ++m_stats.budgetDeferrals;
+            continue;
+        }
+        if (!ReserveGroupPages(g))
+        {
+            ++m_stats.reservationFailures;
+            ++m_stats.allocationDeferrals;
             continue;
         }
         if (!slot.requested)
@@ -1248,7 +1530,9 @@ void GeometryResidencyManager::ResolveDemand()
                 continue;
             if (m_pageSlots[page].state != PageState::Absent)
                 continue;
-            if (inFlight >= maxReads) {
+            if (inFlight >= maxReads)
+            {
+                m_stats.readThrottles++;
                 m_stats.budgetDeferrals++;
                 break;
             }
@@ -1286,6 +1570,7 @@ void GeometryResidencyManager::ResolveDemand()
     m_stats.retiringArenaBytes = bytes(m_vertexCopySource) + bytes(m_payloadCopySource);
     for (const auto& frame : m_frames)
         m_stats.retiringArenaBytes += bytes(frame.vertexCopySource) + bytes(frame.payloadCopySource);
+    m_stats.reservedHeadroomBytes = m_vertexArena.ReservedBytes() + m_payloadArena.ReservedBytes();
     m_stats.mappingGeneration = m_mappingGeneration;
     m_stats.cutRevision = m_cutRevision;
 }
@@ -1309,29 +1594,6 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
         m_tablesInitialized = true;
     }
 
-    const u64 vertexHighWater = (m_vertexArena.bytes * 15ull) / 16ull;
-    const u64 payloadHighWater = (m_payloadArena.bytes * 15ull) / 16ull;
-    if (m_fineGroupCount != 0) {
-        for (u32 pass = 0; pass < 64u
-            && (m_vertexArena.UsedBytes() > vertexHighWater || m_payloadArena.UsedBytes() > payloadHighWater
-                || m_stats.budgetDeferrals != 0); ++pass) {
-            u32 victim = UINT32_MAX;
-            u32 oldest = UINT32_MAX;
-            for (u32 g = 0; g < m_groupCount; ++g) {
-                const GroupSlot& slot = m_groupSlots[g];
-                if (!slot.resident || slot.pinned || slot.desired || slot.dependentResidents != 0)
-                    continue;
-                if (slot.lastDesiredFrame <= oldest) {
-                    oldest = slot.lastDesiredFrame;
-                    victim = g;
-                }
-            }
-            if (victim == UINT32_MAX)
-                break;
-            EvictGroup(victim);
-        }
-    }
-
     const u64 uploadBudget = u64(std::max(256, ps_r_geo_page_upload)) * 1024ull;
     u64 uploaded = 0;
 
@@ -1339,12 +1601,27 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
     frame.id = m_snapshotId;
     frame.vertexCopySource = std::move(m_vertexCopySource);
     frame.payloadCopySource = std::move(m_payloadCopySource);
-    if (frame.vertexCopySource)
-        cmdList->copyBuffer(m_vertexArena.buffer, 0, frame.vertexCopySource, 0,
-            frame.vertexCopySource->getDesc().byteSize);
-    if (frame.payloadCopySource)
-        cmdList->copyBuffer(m_payloadArena.buffer, 0, frame.payloadCopySource, 0,
-            frame.payloadCopySource->getDesc().byteSize);
+    const auto migrate = [&](nvrhi::IBuffer* source, nvrhi::IBuffer* destination,
+        xr_vector<ArenaCopyRange>& ranges)
+    {
+        if (!source)
+        {
+            ranges.clear();
+            return;
+        }
+        const u64 limit = std::min(source->getDesc().byteSize, destination->getDesc().byteSize);
+        for (const ArenaCopyRange& range : ranges)
+        {
+            if (range.offset >= limit)
+                continue;
+            const u64 bytes = std::min(range.bytes, limit - range.offset);
+            if (bytes != 0)
+                cmdList->copyBuffer(destination, range.offset, source, range.offset, bytes);
+        }
+        ranges.clear();
+    };
+    migrate(frame.vertexCopySource, m_vertexArena.buffer, m_vertexCopyRanges);
+    migrate(frame.payloadCopySource, m_payloadArena.buffer, m_payloadCopyRanges);
     frame.lease = m_frameLease;
 
     m_uploadDeferred.clear();
@@ -1372,15 +1649,19 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
         }
 
         const u64 bytes = u64(vertexSize) + payloadSize;
-        if (!slot.pinned && uploaded != 0 && uploaded + bytes > uploadBudget) {
+        if (!slot.pinned && uploaded != 0 && uploaded + bytes > uploadBudget)
+        {
             m_uploadDeferred.push_back(page);
+            m_stats.uploadThrottles++;
             m_stats.budgetDeferrals++;
             continue;
         }
 
-        if (!AllocatePage(page)) {
+        if (!AllocatePage(page))
+        {
             m_uploadDeferred.push_back(page);
             m_stats.allocationDeferrals++;
+            RecordAllocationPressure(page);
             continue;
         }
 
@@ -1399,6 +1680,7 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
         m_stats.uploadKiB += u32(bytes / 1024ull);
     }
     m_uploadQueue = m_uploadDeferred;
+    EvictUnderPressure();
 
     bool activated = true;
     while (activated && !m_pendingActivation.empty())
@@ -1470,11 +1752,12 @@ bool GeometryResidencyManager::ReserveGroupPages(u32 group)
             m_reservedPages.push_back(page);
             continue;
         }
+        RecordAllocationPressure(page);
         for (u32 reserved : m_reservedPages)
         {
             auto& allocated = m_pageSlots[reserved];
-            m_vertexArena.Release(allocated.vertexBlock, allocated.vertexBlocks);
-            m_payloadArena.Release(allocated.payloadBlock, allocated.payloadBlocks);
+            m_vertexArena.Release(allocated.vertexBlock, allocated.vertexBlocks, allocated.pinned);
+            m_payloadArena.Release(allocated.payloadBlock, allocated.payloadBlocks, allocated.pinned);
             allocated.vertexBlock = allocated.payloadBlock = GEOMETRY_PAGE_SLOT_INVALID;
             allocated.vertexBlocks = allocated.payloadBlocks = 0;
         }
@@ -1483,17 +1766,94 @@ bool GeometryResidencyManager::ReserveGroupPages(u32 group)
     return true;
 }
 
-void GeometryResidencyManager::GrowArena(Arena& arena, u64 bytes, nvrhi::BufferHandle& source)
+void GeometryResidencyManager::EvictUnderPressure()
 {
-    bytes = AlignBytes(bytes);
-    R_ASSERT2(bytes <= UINT32_MAX, "Pinned geometry exceeds the shader address range");
+    if (m_fineGroupCount == 0)
+        return;
+
+    const u64 vertexHighWater = (m_vertexArena.FineBudgetBytes() * 15ull) / 16ull;
+    const u64 payloadHighWater = (m_payloadArena.FineBudgetBytes() * 15ull) / 16ull;
+
+    size_t scanned = 0;
+    u64 retiringVertexBytes = 0;
+    u64 retiringPayloadBytes = 0;
+    const auto absorbRetiring = [&]()
+    {
+        for (; scanned < m_retiring.size(); ++scanned)
+        {
+            const RetiringPage& retiring = m_retiring[scanned];
+            if (retiring.pinned)
+                continue;
+            retiringVertexBytes += u64(retiring.vertexBlocks) * GEOMETRY_PAGE_BLOCK_BYTES;
+            retiringPayloadBytes += u64(retiring.payloadBlocks) * GEOMETRY_PAGE_BLOCK_BYTES;
+        }
+    };
+    absorbRetiring();
+
+    for (u32 pass = 0; pass < GEOMETRY_EVICTION_LIMIT; ++pass)
+    {
+        const u64 vertexCommitted = m_vertexArena.FineUsedBytes()
+            - std::min(m_vertexArena.FineUsedBytes(), retiringVertexBytes);
+        const u64 payloadCommitted = m_payloadArena.FineUsedBytes()
+            - std::min(m_payloadArena.FineUsedBytes(), retiringPayloadBytes);
+        const bool overHighWater = vertexCommitted > vertexHighWater || payloadCommitted > payloadHighWater;
+        const bool starved = retiringVertexBytes < m_pressureVertexBytes
+            || retiringPayloadBytes < m_pressurePayloadBytes;
+        if (!overHighWater && !starved)
+            break;
+
+        u32 victim = UINT32_MAX;
+        u32 oldest = UINT32_MAX;
+        for (u32 g = 0; g < m_groupCount; ++g)
+        {
+            const GroupSlot& slot = m_groupSlots[g];
+            if (!slot.resident || slot.pinned || slot.desired || slot.dependentResidents != 0)
+                continue;
+            if (slot.lastDesiredFrame <= oldest)
+            {
+                oldest = slot.lastDesiredFrame;
+                victim = g;
+            }
+        }
+        if (victim == UINT32_MAX)
+            break;
+        EvictGroup(victim);
+        absorbRetiring();
+    }
+}
+
+void GeometryResidencyManager::ReserveRuntimeArena(Arena& arena, u64 bytes, bool force,
+    nvrhi::BufferHandle& source, xr_vector<ArenaCopyRange>& ranges)
+{
+    const u64 required = AlignBytes(bytes);
+    if (required == 0)
+        return;
+
+    const u64 credited = force ? 0ull : arena.ReservedBytes();
+    if (required <= credited)
+        return;
+
+    const u64 deficit = required - credited;
+    const u64 minimum = arena.bytes + deficit;
+    if (minimum > GEOMETRY_ARENA_MAX_BYTES)
+        FATAL_F("[GeoResidency] pinned runtime geometry needs %llu arena bytes beyond the shader address range",
+            (unsigned long long)minimum);
+
+    const u64 headroom = std::min(std::max(deficit, arena.bytes / 8ull), GEOMETRY_ARENA_HEADROOM_MAX);
+    const u64 target = AlignBytes(std::min(minimum + headroom, GEOMETRY_ARENA_MAX_BYTES));
+    const u32 added = BlocksFor(target) - arena.blockCount;
+
     if (!source)
+    {
         source = arena.buffer;
+        arena.CollectLiveRanges(ranges);
+    }
     auto desc = arena.buffer->getDesc();
-    desc.byteSize = bytes;
+    desc.byteSize = target;
     arena.buffer = m_device->GetNVRHIDevice()->createBuffer(desc);
     R_ASSERT(arena.buffer);
-    arena.Grow(bytes);
+    arena.Grow(target);
+    arena.reservedBlocks += added;
 }
 
 nvrhi::IBuffer* GeometryResidencyManager::GetArenaCopySource(bool vertices) const
@@ -1608,6 +1968,22 @@ const GeometryResidencyStats& GeometryResidencyManager::Stats() const
 u64 GeometryResidencyManager::Arena::UsedBytes() const
 {
     return u64(usedBlocks) * GEOMETRY_PAGE_BLOCK_BYTES;
+}
+
+u64 GeometryResidencyManager::Arena::ReservedBytes() const
+{
+    return u64(reservedBlocks) * GEOMETRY_PAGE_BLOCK_BYTES;
+}
+
+u64 GeometryResidencyManager::Arena::FineUsedBytes() const
+{
+    return u64(usedBlocks - std::min(usedBlocks, pinnedBlocks)) * GEOMETRY_PAGE_BLOCK_BYTES;
+}
+
+u64 GeometryResidencyManager::Arena::FineBudgetBytes() const
+{
+    const u32 committed = std::min(blockCount, pinnedBlocks + reservedBlocks);
+    return u64(blockCount - committed) * GEOMETRY_PAGE_BLOCK_BYTES;
 }
 
 } // namespace xray::render::fg

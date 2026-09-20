@@ -37,6 +37,8 @@ public:
     nvrhi::IBuffer* GetIndexBuffer(u32 formatID) const;
     nvrhi::IBuffer* GetCombinedIndexBuffer() const { return m_combinedIndexBuffer.Get(); }
     u32 GetFormatIndexBase(u32 formatID) const { return formatID < FORMAT_COUNT ? m_formatIndexBase[formatID] : 0; }
+    u32 GetVertexCount(u32 formatID) const;
+    const u16* GetIndexRange(u32 formatID, u32 firstIndex, u32 count) const;
 
     void Reset();
 

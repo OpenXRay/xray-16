@@ -842,8 +842,6 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         BindingSetBuilder bsb(*vsRefl, ps, nvDevice, label);
         bsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
         bsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
-        bsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
-        bsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
         bsb.BufferSRV("g_Pairs", state.pairs[stream]);
         bsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
         bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
@@ -987,8 +985,6 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
             BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
             bsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
             bsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
-            bsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
-            bsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
             bsb.BufferSRV("g_Pairs", state.pairs[3]);
             bsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
             bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
@@ -1000,8 +996,6 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
             BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
             atBsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
             atBsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
-            atBsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
-            atBsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
             atBsb.BufferSRV("g_Pairs", state.pairs[4]);
             atBsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
             atBsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);

@@ -171,8 +171,8 @@ public:
 class RTSkinJob
 {
 public:
-    nvrhi::BufferHandle source;
     RTSkinningCB constants;
+    u32 sourceSlot;
     u32 indexOffset;
     u32 indexCount;
     u32 materialID;
@@ -199,6 +199,7 @@ public:
     nvrhi::BufferHandle sourceMaterials;
     nvrhi::BufferHandle sourceTerrainMaterials;
     nvrhi::BufferHandle bones;
+    xr_vector<nvrhi::BufferHandle> skinSources;
     nvrhi::BufferHandle skinnedVertices;
     nvrhi::BufferHandle skinnedIndices;
     nvrhi::BufferHandle grassVertices;
@@ -287,7 +288,7 @@ private:
     void InitSkinningPipeline();
     void InitGrassPipeline(const FGDetailManager::InstanceGeneration& source);
     void InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source);
-    static u32 GetSkinningFormatID(u16 renderMode, u32 stride);
+    static u32 GetSkinningFormatID(u32 poolFormat);
 
     RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
