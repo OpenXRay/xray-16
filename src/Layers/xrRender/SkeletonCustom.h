@@ -120,7 +120,6 @@ public:
     void Bone_Calculate(CBoneData* bd, Fmatrix* parent) override;
     void CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
 
-    void BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 channel_mask, bool ignore_callbacks);
     void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) override;
 
     virtual void BuildBoneMatrix(
@@ -151,6 +150,7 @@ protected:
     vecBones* bones; // all bones (shared)
     u16 iRoot; // Root bone index
     xr_vector<u16> m_bones_topo; // BFS-sorted bone IDs (parent always before child)
+    bool m_subtreeTraversal = false;
 
     // Fast search
     accel* bone_map_N; // bones associations (shared) - sorted by name
@@ -171,6 +171,11 @@ protected:
     void Visibility_Invalidate() { Update_Visibility = TRUE; }
     void Visibility_Update();
     void BuildTopologicalOrder();
+    void CalculateHierarchy();
+    void CalculateSubtree(CBoneData* bd, Fmatrix* parent);
+    void BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 channel_mask, bool ignore_callbacks);
+    void RefreshBounds();
+    void RunFinalCallbacks();
 
     void LL_Validate();
 

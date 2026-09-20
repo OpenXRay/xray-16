@@ -556,7 +556,7 @@ void CKinematicsAnimated::UpdateTracks()
     if (Update_LastTime == Device.dwTimeGlobal)
         return;
 
-    ZoneScoped;
+    ZoneScopedN("Animation::TrackAdvance");
 
     u32 DT = Device.dwTimeGlobal - Update_LastTime;
     if (DT > 66)
@@ -681,6 +681,8 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
 
 bool CKinematicsAnimated::PrepareBones()
 {
+    ZoneScopedN("Animation::PoseInputs");
+
     bool changed = m_poseDirty;
     for (u16 i = 0; i < blend_pool.size(); ++i)
     {
@@ -709,6 +711,9 @@ bool CKinematicsAnimated::PrepareBones()
 void CKinematicsAnimated::LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
     const BonePoseQuery& query)
 {
+    UCalc_mtlock lock;
+    ZoneScopedN("Animation::PoseQuery");
+
     PrepareBones();
     XRay::Animation::OzzPoseOverride controls;
     if (query.blend)
@@ -728,22 +733,6 @@ void CKinematicsAnimated::LL_EvaluateBonePose(Fmatrix& result, u16 bone, const F
     m_pose.QueryBone(result, bone, parent, query.channels, controls);
 }
 
-void CKinematicsAnimated::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks)
-{
-    PrepareBones();
-    inherited::Bone_GetAnimPos(pos, id, channel_mask, ignore_callbacks);
-}
-
-void CKinematicsAnimated::Bone_Calculate(CBoneData* bd, Fmatrix* parent)
-{
-    const bool nested = m_poseTraversal;
-    if (!nested)
-        PrepareBones();
-    m_poseTraversal = true;
-    inherited::Bone_Calculate(bd, parent);
-    m_poseTraversal = nested;
-}
-
 // Добавить скриптовое смещение для кости --#SM+#--
 void CKinematicsAnimated::LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset)
 {
@@ -756,7 +745,7 @@ void CKinematicsAnimated::LL_ClearAdditionalTransform(u16 bone_id) { inherited::
 void CKinematicsAnimated::BuildBoneMatrix(
     const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask)
 {
-    m_pose.BuildBone(bi.mTransform, bd->GetSelfID(), *parent, channel_mask);
+    bi.mTransform.mul_43(*parent, m_pose.EvaluateLocalBone(bd->GetSelfID(), channel_mask));
     CalculateBonesAdditionalTransforms(bd, bi, parent, channel_mask);
 }
 

@@ -69,8 +69,6 @@ public:
     virtual void LL_ClearAdditionalTransform(u16 bone_id = BI_NONE); //--#SM+#--
 
     virtual void OnCalculateBones();
-    void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) override;
-    void Bone_Calculate(CBoneData* bd, Fmatrix* parent) override;
     void LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
         const BonePoseQuery& query) override;
 
@@ -87,7 +85,6 @@ protected:
     std::shared_ptr<const XRay::Animation::OzzModelAnimations> m_animations;
     XRay::Animation::OzzPose m_pose;
     bool m_poseDirty = true;
-    bool m_poseTraversal = false;
     const CPartition* m_Partition{};
 
     IBlendDestroyCallback* m_blend_destroy_callback{};
