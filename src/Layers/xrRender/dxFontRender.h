@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Include/xrRender/FontRender.h"
-
 #include "xrEngine/GameFont.h"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -14,12 +13,15 @@ public:
 
     void Initialize(cpcstr cShader, cpcstr cTexture) override;
     void OnRender(CGameFont& owner) override;
-
-private:
-    inline void ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j);
+    void CreateFontAtlas(u32 width, u32 height, const char* name, void* bitmap) override;
 
 private:
     ref_shader pShader;
     ref_geom pGeom;
+    ref_texture pTexture;
+
+    u32 m_atlasWidth = 0;
+    u32 m_atlasHeight = 0;
+    u32 m_oglTextureID = 0;
 };
 } // namespace xray::render::RENDER_NAMESPACE

@@ -2,6 +2,10 @@
 #pragma hdrstop // huh?
 #include "Threading/Lock.hpp"
 
+#if defined(XR_PLATFORM_WINDOWS)
+#include "xrCore/Text/Utf8Utils.hpp"
+#endif
+
 using namespace std;
 
 XRCORE_API smem_container* g_pSharedMemoryContainer = nullptr;
@@ -82,7 +86,11 @@ void smem_container::clean()
 void smem_container::dump()
 {
     ScopeLock scope(&lock);
+#if defined(XR_PLATFORM_WINDOWS)
+    FILE* F = _wfopen(L"x:\\$smem_dump$.txt", L"w");
+#else
     FILE* F = fopen("x:\\$smem_dump$.txt", "w");
+#endif
     for (auto& v : container)
         fprintf(F, "%4u : crc[%6x], %u bytes\n", v->dwReference, v->dwCRC, v->dwLength);
     fclose(F);

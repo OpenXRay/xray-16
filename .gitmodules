@@ -28,3 +28,6 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/freetype"]
+	path = Externals/freetype
+	url = https://github.com/ChugunovRoman/freetype.git

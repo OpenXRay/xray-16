@@ -98,6 +98,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\StringConversion.cpp" />
+    <ClCompile Include="Text\Utf8Utils.cpp" />
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ScopeLock.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
@@ -203,6 +204,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="string_concatenations.h" />
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="Text\StringConversion.hpp" />
+    <ClInclude Include="Text\Utf8Utils.hpp" />
     <ClInclude Include="Threading\Event.hpp" />
     <ClInclude Include="Threading\ParallelFor.hpp" />
     <ClInclude Include="Threading\ParallelForEach.hpp" />

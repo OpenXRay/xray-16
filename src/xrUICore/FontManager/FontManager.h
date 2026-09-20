@@ -26,7 +26,6 @@ struct XRUICORE_API CFontManager : public CUIResetNotifier
 
     void InitializeFonts();
     void InitializeFont(CGameFont*& F, LPCSTR section, u32 flags = 0);
-    LPCSTR GetFontTexName(LPCSTR section);
 
     void OnUIReset() override;
 };
