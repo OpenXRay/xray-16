@@ -5,6 +5,8 @@
 #include "DetailModel.h"
 #include <nvrhi/nvrhi.h>
 #include "RenderContext/ResourceHandle.h"
+#include "xrEngine/IRenderBackend.h"
+#include <memory>
 
 namespace xray::profiler { class GPUProfiler; }
 
@@ -53,7 +55,8 @@ public:
         u32 instance_count;
         int slot_x;
         int slot_z;
-        Fvector4 padding2;
+        u32 instance_chunk;
+        u32 padding2[3];
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes");
 
@@ -91,19 +94,20 @@ public:
         Fvector3 cameraPos;
         float fadeDistanceSqr;
         Fvector4 frustumPlanes[6];
-        u32 visibleBladeCapacity;
+        u32 visibleBladeCapacity[3];
         u32 totalSlotCount;
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
+        float detailDensity;
         float lodDistanceCloseSqr;
         float lodDistanceMidSqr;
-        float detailDensity;
         u32 visibleDecalCapacity;
         u32 grassMode;
         u32 visibleBillboardCapacity;
-        u32 preparedCapacity;
+        u32 preparedCapacity[3];
     };
+    static_assert(sizeof(DetailCullParams) == 304);
 
     struct GrassObjectTint { float r, g, b, pad; };
 
@@ -166,13 +170,15 @@ public:
         float heightmapWorldMinZ;
         float heightmapTexelSize;
         float detailHeightMultiplier;
-        u32 genMode;
-        u32 prefixSumBlockSize;
-        u32 prefixSumTotalBlocks;
+        u32 slotOffset;
+        u32 slotCount;
         u32 instanceCapacity;
         u32 detailModelCount;
-        u32 pad0, pad1, pad2;
+        float detailDensity;
+        u32 grassMode;
+        u32 padding[2];
     };
+    static_assert(sizeof(InstanceGenParams) == 48);
 
     xr_vector<CDetail*> detail_models;
     xr_vector<DetailObject*> objects;
@@ -191,30 +197,22 @@ public:
     nvrhi::BufferHandle slotDataBuffer;
     xr_vector<GPUSlotData> slotDataCPU;
 
-    nvrhi::BufferHandle generatedInstancesBuffer;
     nvrhi::BufferHandle detailModelsBuffer;
-    u32 generatedInstancesCapacity = 0;
 
     nvrhi::ShaderHandle instanceGenComputeShader;
     nvrhi::BindingLayoutHandle instanceGenBindingLayout;
     nvrhi::ComputePipelineHandle instanceGenPipeline;
+    nvrhi::ShaderHandle instanceCountComputeShader;
+    nvrhi::BindingLayoutHandle instanceCountBindingLayout;
+    nvrhi::ComputePipelineHandle instanceCountPipeline;
 
     nvrhi::BufferHandle pulledVertexBuffer;
     u32 maxPulledIndexCount = 0;
     xr_vector<DetailModelGPU> cachedModelGPUData;
 
-    nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
-    nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
     nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
     bool bladeIndicesUploaded = false;
     static constexpr u32 PREPARED_BLADE_CAPACITY = 1u << 17;
-    nvrhi::BufferHandle preparedBladeBuffer[LOD_COUNT];
-    u32 preparedBladeCapacity = 0;
-    nvrhi::BufferHandle visibleDecalInstancesBuffer;
-    nvrhi::BufferHandle decalDrawArgsBuffer;
-    nvrhi::BufferHandle visibleBillboardInstancesBuffer;
-    nvrhi::BufferHandle billboardDrawArgsBuffer;
-    nvrhi::BufferHandle slotAABBBuffer;
 
     nvrhi::TextureHandle buildDetailsTexture;
     u32 buildDetailsBindlessIndex = 0;
@@ -223,8 +221,6 @@ public:
     nvrhi::TextureHandle buildDetailsBumpTexture;
     u32 buildDetailsBumpBindlessIndex = 0;
 
-    nvrhi::BufferHandle visibleSlotIDsBuffer;
-    nvrhi::BufferHandle visibleSlotCounterBuffer;
 
     nvrhi::ShaderHandle slotCullComputeShader;
     nvrhi::BindingLayoutHandle slotCullBindingLayout;
@@ -233,12 +229,12 @@ public:
     nvrhi::ShaderHandle cullComputeShader;
     nvrhi::BindingLayoutHandle computeBindingLayout;
     nvrhi::ComputePipelineHandle computePipeline;
-    nvrhi::ShaderHandle swArgsComputeShader;
-    nvrhi::BindingLayoutHandle swArgsBindingLayout;
-    nvrhi::ComputePipelineHandle swArgsPipeline;
-    nvrhi::BufferHandle swDispatchArgsBuffer;
-
-    u32 visibleBufferCapacity = 0;
+    nvrhi::ShaderHandle slotArgsComputeShader;
+    nvrhi::BindingLayoutHandle slotArgsBindingLayout;
+    nvrhi::ComputePipelineHandle slotArgsPipeline;
+    nvrhi::ShaderHandle visibilityArgsComputeShader;
+    nvrhi::BindingLayoutHandle visibilityArgsBindingLayout;
+    nvrhi::ComputePipelineHandle visibilityArgsPipeline;
 
     nvrhi::TextureHandle perlin4dTexture;  // 3D volume (RGBA16F, 32³)
     static constexpr u32 PERLIN4D_TEXTURE_SIZE = 32;
@@ -277,16 +273,117 @@ public:
         u32 visibleLOD2Count = 0;
         u32 visibleDecalCount = 0;
         u32 visibleBillboardCount = 0;
+        u32 packetCount = 0;
+        u32 overflowFlags = 0;
 
         u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count + visibleBillboardCount; }
     };
 
+    class InstanceChunk
+    {
+    public:
+        nvrhi::BufferHandle buffer;
+        Fbox bounds;
+        Fvector2 sourceMin;
+        Fvector2 sourceMax;
+        u32 firstSlot = 0;
+        u32 slotCount = 0;
+        u32 instanceCount = 0;
+        u32 wavingCount = 0;
+        u32 staticCount = 0;
+    };
+
+    class InstanceGeneration
+    {
+    public:
+        xr_vector<InstanceChunk> chunks;
+        nvrhi::BindingLayoutHandle bindingLayout;
+        nvrhi::DescriptorTableHandle descriptorTable;
+        nvrhi::BufferHandle slots;
+        nvrhi::BufferHandle models;
+        nvrhi::BufferHandle pulledVertices;
+        InstanceGenParams params = {};
+        u32 maxPulledIndexCount = 0;
+        u64 id = 0;
+        u64 instanceCount = 0;
+        u64 bytes = 0;
+    };
+
+    class VisibilityFrame
+    {
+    public:
+        std::shared_ptr<const InstanceGeneration> source;
+        xr_vector<u32> visibleChunks;
+        DetailCullParams cullParams = {};
+        nvrhi::BufferHandle visible[VIS_KIND_COUNT];
+        nvrhi::BufferHandle drawArgs[VIS_KIND_COUNT];
+        nvrhi::BufferHandle prepared[LOD_COUNT];
+        nvrhi::BufferHandle visibleSlots;
+        nvrhi::BufferHandle visibleSlotCount;
+        nvrhi::BufferHandle slotDispatch;
+        nvrhi::BufferHandle swDispatch;
+        nvrhi::BufferHandle packets;
+        nvrhi::BufferHandle workStatus;
+        nvrhi::BufferHandle readback;
+        DetailCullingStats stats;
+        u32 visibleCapacity[VIS_KIND_COUNT] = {};
+        u32 preparedCapacity[LOD_COUNT] = {};
+        u32 entryBase = 0;
+        u64 id = 0;
+        u64 lease = 0;
+        u64 bytes = 0;
+        bool statsRecorded = false;
+        bool statsReady = false;
+    };
+
+    class GenerationWork
+    {
+    public:
+        enum class Stage : u8
+        {
+            CountReady,
+            CountPending,
+            EmitReady,
+            EmitPending
+        };
+
+        std::shared_ptr<InstanceGeneration> source;
+        xr_vector<SlotAABB> slots;
+        xr_vector<u32> slotOrder;
+        nvrhi::BufferHandle counts;
+        nvrhi::BufferHandle countReadback;
+        nvrhi::BufferHandle localCounters;
+        nvrhi::BufferHandle emitSlots;
+        nvrhi::BufferHandle status;
+        nvrhi::BufferHandle statusReadback;
+        InstanceGenParams params = {};
+        Stage stage = Stage::CountReady;
+        u32 nextChunk = 0;
+        u32 submittedChunks = 0;
+        u64 lease = 0;
+        u64 bytes = 0;
+    };
+
+    class InstanceMemoryStats
+    {
+    public:
+        IRenderBackend::MemoryBudget device;
+        u64 residentInstances = 0;
+        u64 residentBytes = 0;
+        u64 activeBytes = 0;
+        u64 frameBytes = 0;
+        u64 pendingBytes = 0;
+        u32 residentChunks = 0;
+        u32 generations = 0;
+        u32 frames = 0;
+    };
+
+    std::shared_ptr<const InstanceGeneration> generatedInstances;
+    std::shared_ptr<VisibilityFrame> visibilityFrame;
+    std::shared_ptr<GenerationWork> generationWork;
     DetailCullingStats cullingStats;
-    static constexpr u32 STATS_READBACK_SLOTS = 6;
-    nvrhi::BufferHandle statsReadbackBuffers[STATS_READBACK_SLOTS];
-    u32 statsWriteSlot = 0;
-    u32 statsScheduled = 0;
-    u32 statsFrameCounter = 0;
+    InstanceMemoryStats instanceMemoryStats;
+    u64 totalGeneratedInstances = 0;
 
     nvrhi::SamplerHandle cachedSmp_LinearWrap;
     nvrhi::SamplerHandle cachedSmp_PointClamp;
@@ -311,26 +408,6 @@ public:
 
     nvrhi::TextureHandle heightmapTexture;
 
-    float m_lastDensity = -1.0f;
-    u32 m_lastGrassMode = ~0u;
-    bool m_instancesNeedRegeneration = true;
-
-    nvrhi::BufferHandle instanceCounterBuffer;
-    nvrhi::BufferHandle instanceCountReadbackBuffer;
-    u32 totalGeneratedInstances = 0;
-    bool instanceCountReadbackPending = false;
-    nvrhi::BufferHandle perSlotCountsBuffer;
-
-    nvrhi::BufferHandle perSlotPrefixBuffer;
-    nvrhi::BufferHandle blockTotalsBuffer;
-    nvrhi::BufferHandle perSlotLocalCountersBuffer;
-
-    static constexpr u32 PREFIX_SUM_BLOCK_SIZE = 256;
-    nvrhi::ShaderHandle prefixSumScanShader;
-    nvrhi::ShaderHandle prefixSumTopShader;
-    nvrhi::BindingLayoutHandle prefixSumBindingLayout;
-    nvrhi::ComputePipelineHandle prefixSumScanPipeline;
-    nvrhi::ComputePipelineHandle prefixSumTopPipeline;
 
     FGDetailManager();
     ~FGDetailManager();
@@ -348,13 +425,13 @@ public:
     bool LoadInstanceGenShader(class framegraph::ShaderLoader* shaderLoader);
     bool CreateComputePipeline(fg::RenderDevice* device);
     bool CreateInstanceGenPipeline(fg::RenderDevice* device);
-    bool LoadPrefixSumShaders(class framegraph::ShaderLoader* shaderLoader);
-    bool CreatePrefixSumPipeline(fg::RenderDevice* device);
 
     void DispatchCulling(
         nvrhi::ICommandList* cmdList,
         nvrhi::IDevice* device,
         nvrhi::ITexture* hiZPyramid,
+        VisibilityFrame& frame,
+        const std::shared_ptr<GenerationWork>& generation,
         const Fmatrix& prevViewProj,
         float fadeDistance,
         u32 hiZWidth,
@@ -377,16 +454,16 @@ public:
 
     void FillFrameConstants(DetailFrameConstants& out);
     void UploadGrassTints(nvrhi::ICommandList* cmdList);
-    void ClearDrawArgs(nvrhi::ICommandList* cmdList);
+    void ClearDrawArgs(nvrhi::ICommandList* cmdList, VisibilityFrame& frame);
     void ComputeSlotAABBs();
 
-    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame);
     void ProcessStatsReadback(nvrhi::IDevice* device);
     const DetailCullingStats& GetCullingStats() const { return cullingStats; }
 
-    void RegenerateAllInstances(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device,
-        xray::profiler::GPUProfiler* gpuProfiler = nullptr);
-    void ResizeVisibleBuffersIfNeeded(nvrhi::IDevice* device);
+    void PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool enabled);
+    std::shared_ptr<const VisibilityFrame> GetCompletedVisibilityFrame() const;
+    void RecordGeneration(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, GenerationWork& work);
 
 private:
     IReader* dtFS = nullptr;
@@ -394,7 +471,23 @@ private:
 
     xr_vector<DecalPulledVertex> pulledVertexData;
 
-    nvrhi::BindingSetHandle CreateInstanceGenBindingSet(nvrhi::IDevice* device) const;
+    void AllocateGeneration(nvrhi::IDevice* device, GenerationWork& work);
+    void AllocateVisibilityFrame(nvrhi::IDevice* device, VisibilityFrame& frame);
+    void RequireInstanceMemory(u64 bytes, const char* purpose);
+    void UpdateInstanceMemoryStats();
+    void DestroyInstanceStorage();
+    void RecordVisibilityWork(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame, bool slots);
+    nvrhi::BufferHandle CreateInstanceBuffer(nvrhi::IDevice* device, u64 bytes, u32 stride,
+        const char* name, bool readback = false, bool indirect = false);
+    bool IsChunkVisible(const InstanceChunk& chunk, const DetailCullParams& params) const;
+    xr_vector<std::shared_ptr<VisibilityFrame>> m_visibilityFrames;
+    xr_vector<std::weak_ptr<const InstanceGeneration>> m_instanceGenerations;
+    std::shared_ptr<VisibilityFrame> m_completedVisibilityFrame;
+    nvrhi::BindingLayoutHandle m_cullSourceLayout;
+    u64 m_instanceGenerationId = 0;
+    u64 m_visibilityFrameId = 0;
+    bool m_instancesNeedRegeneration = true;
+    bool m_detailsEnabled = false;
     void BuildDetailModelGPUData();
 };
 

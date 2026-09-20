@@ -832,3 +832,30 @@ DeviceState D3D12Backend::GetDeviceState() const {
 
     return DeviceState::Normal;
 }
+
+IRenderBackend::MemoryBudget D3D12Backend::GetMemoryBudget() const
+{
+    MemoryBudget result;
+    result.bufferRangeBytes = 4ull << D3D12_REQ_BUFFER_RESOURCE_TEXEL_COUNT_2_TO_EXP;
+    if (!m_adapter)
+        return result;
+    IDXGIAdapter3* adapter = nullptr;
+    if (SUCCEEDED(m_adapter->QueryInterface(IID_PPV_ARGS(&adapter))))
+    {
+        DXGI_QUERY_VIDEO_MEMORY_INFO info = {};
+        if (SUCCEEDED(adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+        {
+            result.budgetBytes = info.Budget;
+            result.usageBytes = info.CurrentUsage;
+            result.usageKnown = true;
+        }
+        adapter->Release();
+    }
+    if (!result.budgetBytes)
+    {
+        DXGI_ADAPTER_DESC1 desc = {};
+        if (SUCCEEDED(m_adapter->GetDesc1(&desc)))
+            result.budgetBytes = desc.DedicatedVideoMemory ? desc.DedicatedVideoMemory : desc.SharedSystemMemory;
+    }
+    return result;
+}

@@ -866,9 +866,41 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.detailVisibleLOD1 = cullStats.visibleLOD1Count;
             stats.detailVisibleLOD2 = cullStats.visibleLOD2Count;
             stats.detailVisibleDecals = cullStats.visibleDecalCount;
+            stats.detailVisibleMeshes = cullStats.visibleBillboardCount;
+            stats.detailPackets = cullStats.packetCount;
+            stats.detailOverflow = cullStats.overflowFlags;
             stats.detailGeneratedInstances = m_detailManager->totalGeneratedInstances;
-            stats.detailVisibleCapacity = m_detailManager->visibleBufferCapacity;
-            stats.detailDecalCapacity = std::max(m_detailManager->visibleBufferCapacity / 4, 10000u);
+            const auto& memory = m_detailManager->instanceMemoryStats;
+            stats.detailSourceBytes = memory.residentBytes;
+            stats.detailActiveSourceBytes = memory.activeBytes;
+            stats.detailFrameBytes = memory.frameBytes;
+            stats.detailPendingBytes = memory.pendingBytes;
+            stats.detailBudgetBytes = memory.device.budgetBytes;
+            stats.detailUsageBytes = memory.device.usageBytes;
+            stats.detailUsageKnown = memory.device.usageKnown;
+            stats.detailResidentChunks = memory.residentChunks;
+            stats.detailGenerations = memory.generations;
+            stats.detailFrames = memory.frames;
+            if (const auto& source = m_detailManager->generatedInstances)
+            {
+                stats.detailSourceId = source->id;
+                stats.detailSourceChunks = u32(source->chunks.size());
+            }
+            if (const auto frame = m_detailManager->GetCompletedVisibilityFrame())
+            {
+                stats.detailVisibilityFrame = frame->id;
+                stats.detailVisibilitySource = frame->source ? frame->source->id : 0;
+                stats.detailVisibilityInstances = frame->source ? frame->source->instanceCount : 0;
+                stats.detailPacketCapacity = passes::kVisIdEntryLimit - frame->entryBase;
+                for (u32 kind = 0; kind < FGDetailManager::VIS_KIND_COUNT; ++kind)
+                    stats.detailVisibleCapacity[kind] = frame->visibleCapacity[kind];
+            }
+            if (const auto& work = m_detailManager->generationWork)
+            {
+                stats.detailGenerationStage = u32(work->stage) + 1;
+                stats.detailGenerationChunks = work->nextChunk;
+                stats.detailGenerationChunkCount = work->source ? u32(work->source->chunks.size()) : 0;
+            }
         }
 
         if (m_framegraph) {
@@ -1259,15 +1291,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager) {
         m_gpuCullingManager->Initialize(m_device);
 
-        if (m_detailManager && !m_detailManager->computePipeline) {
+        if (m_detailManager && (!m_detailManager->instanceGenPipeline || !m_detailManager->slotCullPipeline)) {
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             m_detailManager->LoadCullComputeShader(shaderLoader);
             m_detailManager->LoadInstanceGenShader(shaderLoader);
-            m_detailManager->LoadPrefixSumShaders(shaderLoader);
 
             m_detailManager->CreateComputePipeline(m_device);
             m_detailManager->CreateInstanceGenPipeline(m_device);
-            m_detailManager->CreatePrefixSumPipeline(m_device);
 
             if (!m_detailManager->perlin4dTexture) {
                 m_detailManager->CreatePerlin4DTexture(m_device->GetNVRHIDevice());
@@ -1333,30 +1363,28 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_overlayManager.get(), geometryResources);
     clusterConfig.geometry = geometryResources;
 
-    framegraph::VirtualResourceHandle detailArgsHandle;
-    if (m_detailManager && m_gpuCullingManager)
-        detailArgsHandle = passes::setupDetailCullPass(
-            *m_framegraph, m_device, m_detailManager.get(),
-            prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
-            hizWidth, hizHeight, hizMipLevels, m_prevViewProj,
-            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
     const u32 clusterEntryCapacity = m_gpuCullingManager ? m_gpuCullingManager->GetClusterRefCapacity() : 0u;
     const bool clusterIdsFit = m_gpuCullingManager
         && passes::VisIdRangeFits(clusterEntryCapacity, m_gpuCullingManager->GetSkinnedEntryCapacity());
     const u32 grassEntryBase = clusterIdsFit ? clusterEntryCapacity + m_gpuCullingManager->GetSkinnedEntryCapacity() : 0u;
-    const bool grassIds = detailArgsHandle.is_valid() && clusterIdsFit
-        && passes::VisIdRangeFits(grassEntryBase, fg::FGDetailManager::VIS_KIND_COUNT * passes::kVisIdDetailKindSpan);
-    if (detailArgsHandle.is_valid() && !grassIds)
-        FATAL_F("[FrameGraph] detail visibility range %u+%u exceeds the %u entry identifier limit",
-            grassEntryBase, fg::FGDetailManager::VIS_KIND_COUNT * passes::kVisIdDetailKindSpan, passes::kVisIdEntryLimit);
-    if (grassIds && m_detailManager && m_detailManager->visibleBufferCapacity > passes::kVisIdDetailKindSpan)
-        FATAL_F("[FrameGraph] detail visibility capacity %u exceeds the %u representable slots per kind",
-            m_detailManager->visibleBufferCapacity, passes::kVisIdDetailKindSpan);
+    passes::DetailPassResources detailResources;
+    if (m_detailManager && m_gpuCullingManager)
+    {
+        const bool enabled = psDeviceFlags.is(rsDrawDetails);
+        R_ASSERT2(!enabled || clusterIdsFit, "[FrameGraph] rigid and skinned entries exhaust the visibility identifier range");
+        m_detailManager->PrepareFrame(m_device->GetNVRHIDevice(), grassEntryBase, enabled);
+        detailResources = passes::setupDetailCullPass(
+            *m_framegraph, m_device, m_detailManager.get(),
+            prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
+            hizWidth, hizHeight, hizMipLevels, m_prevViewProj,
+            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
+    }
+    const bool grassIds = detailResources.HasSource();
 
     bool swGrass = false;
     if (swVisHandle.is_valid() && grassIds && ps_r_vis_sw_grass && psDeviceFlags.is(rsDrawDetails)) {
-        auto grassVis = passes::setupSwGrassPass(*m_framegraph, m_device, detailArgsHandle, swVisHandle, m_detailManager.get(),
-            grassEntryBase, width, height, &m_blackboard->get_or_add<passes::VisibilityPassState>());
+        auto grassVis = passes::setupSwGrassPass(*m_framegraph, m_device, detailResources, swVisHandle, m_detailManager.get(),
+            width, height, &m_blackboard->get_or_add<passes::VisibilityPassState>());
         if (grassVis.is_valid()) {
             swVisHandle = grassVis;
             swGrass = true;
@@ -1388,8 +1416,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 clusterConfig,
                 m_gpuCullingManager.get(),
                 grassIds ? m_detailManager.get() : nullptr,
-                grassIds ? detailArgsHandle : framegraph::VirtualResourceHandle(),
-                grassEntryBase,
+                detailResources,
                 &visState,
                 false,
                 swGrass
@@ -1467,8 +1494,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 retestConfig,
                 m_gpuCullingManager.get(),
                 nullptr,
-                framegraph::VirtualResourceHandle(),
-                0u,
+                passes::DetailPassResources(),
                 &m_blackboard->get_or_add<passes::VisibilityPassState>(),
                 true
             );
@@ -1597,7 +1623,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             height,
             &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
         );
-        if (grassIds && passes::EnsureDetailResolveResources(m_device, m_blackboard->get_or_add<passes::DetailResolvePassState>())) {
+        if (grassIds && passes::EnsureDetailResolveResources(m_device, m_blackboard->get_or_add<passes::DetailResolvePassState>(), detailResources)) {
             resolved = passes::setupDetailResolvePass(
                 *m_framegraph,
                 m_device,
@@ -1605,7 +1631,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 depthBuffer,
                 resolved,
                 m_detailManager.get(),
-                grassEntryBase,
+                detailResources,
                 m_prevView,
                 m_prevProject,
                 m_hasPrevFrameData,

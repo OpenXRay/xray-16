@@ -443,6 +443,11 @@ bool VulkanBackend::CreateLogicalDevice() {
     if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS) {
         xr_vector<VkExtensionProperties> extensions(extensionCount);
         if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data()) == VK_SUCCESS) {
+            for (const auto& extension : extensions)
+            {
+                if (strcmp(extension.extensionName, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0)
+                    m_deviceExtensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
+            }
             for (u32 i = 0; i < extensionCount; ++i) {
                 if (strcmp(extensions[i].extensionName, VK_EXT_MESH_SHADER_EXTENSION_NAME) != 0)
                     continue;
@@ -496,6 +501,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan12Features.drawIndirectCount = VK_TRUE;
     vulkan12Features.descriptorIndexing = VK_TRUE;
     vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    vulkan12Features.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
     vulkan12Features.runtimeDescriptorArray = VK_TRUE;
     vulkan12Features.descriptorBindingPartiallyBound = VK_TRUE;
     vulkan12Features.descriptorBindingVariableDescriptorCount = VK_TRUE;
@@ -549,6 +555,11 @@ bool VulkanBackend::CreateLogicalDevice() {
         sup2.pNext = &sup12;
         sup12.pNext = &sup11;
         vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
+        if (!sup12.shaderStorageBufferArrayNonUniformIndexing)
+        {
+            Msg("! [VulkanBackend] Non-uniform storage-buffer indexing is required for chunked instance geometry");
+            return false;
+        }
 
 #define CLAMP12(F) do { if (vulkan12Features.F && !sup12.F) { Msg("! [VulkanBackend] vk12 feature unsupported: " #F); vulkan12Features.F = VK_FALSE; } } while(0)
         CLAMP12(drawIndirectCount);
@@ -1426,6 +1437,36 @@ DeviceState VulkanBackend::GetDeviceState() const {
     if (m_swapchainNeedsReset.load(std::memory_order_acquire) || m_requestedVSync != m_swapchainVSync)
         return DeviceState::NeedReset;
     return DeviceState::Normal;
+}
+
+IRenderBackend::MemoryBudget VulkanBackend::GetMemoryBudget() const
+{
+    MemoryBudget result;
+    if (!m_physicalDevice)
+        return result;
+    VkPhysicalDeviceProperties properties = {};
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
+    result.bufferRangeBytes = properties.limits.maxStorageBufferRange;
+    const bool hasBudget = std::any_of(m_deviceExtensions.begin(), m_deviceExtensions.end(), [](const char* name)
+    {
+        return strcmp(name, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0;
+    });
+    VkPhysicalDeviceMemoryBudgetPropertiesEXT budget = {};
+    budget.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
+    VkPhysicalDeviceMemoryProperties2 memory = {};
+    memory.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+    memory.pNext = hasBudget ? &budget : nullptr;
+    vkGetPhysicalDeviceMemoryProperties2(m_physicalDevice, &memory);
+    for (u32 i = 0; i < memory.memoryProperties.memoryHeapCount; ++i)
+    {
+        if ((memory.memoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == 0)
+            continue;
+        result.budgetBytes += hasBudget ? budget.heapBudget[i] : memory.memoryProperties.memoryHeaps[i].size;
+        if (hasBudget)
+            result.usageBytes += budget.heapUsage[i];
+    }
+    result.usageKnown = hasBudget;
+    return result;
 }
 
 void VulkanBackend::BeginDebugEvent(pcstr name) {}

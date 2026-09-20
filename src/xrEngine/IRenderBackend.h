@@ -60,6 +60,17 @@ public:
     virtual void WaitForIdle() = 0;
     virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
 
+    class MemoryBudget
+    {
+    public:
+        u64 budgetBytes = 0;
+        u64 usageBytes = 0;
+        u64 bufferRangeBytes = 0;
+        bool usageKnown = false;
+    };
+
+    virtual MemoryBudget GetMemoryBudget() const;
+
     // ═══════ NVRHI Access ═══════
     // All modern rendering goes through NVRHI
     virtual nvrhi::IDevice* GetDevice() const = 0;

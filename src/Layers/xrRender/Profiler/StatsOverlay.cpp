@@ -725,13 +725,13 @@ void StatsOverlay::RenderGeometrySection()
             u32 totalVisible = s.detailVisibleLOD0 + s.detailVisibleLOD1 + s.detailVisibleLOD2;
             if (totalVisible > 0)
             {
-                if (s.detailGeneratedInstances > 0)
+                if (s.detailVisibilityInstances > 0)
                 {
-                    float cullRate = 100.0f * (1.0f - float(totalVisible) / float(s.detailGeneratedInstances));
+                    float cullRate = 100.0f * (1.0f - float(totalVisible) / float(s.detailVisibilityInstances));
                     char visStr[32];
                     xr_strcpy(visStr, FormatNumber(totalVisible));
-                    ImGui::Text("Blades: %s/%s visible (%.0f%% culled)",
-                        visStr, FormatNumber(s.detailGeneratedInstances), cullRate);
+                    ImGui::Text("Blades: %s/%llu visible (%.0f%% culled)",
+                        visStr, static_cast<unsigned long long>(s.detailVisibilityInstances), cullRate);
                 }
                 else
                 {
@@ -755,15 +755,32 @@ void StatsOverlay::RenderGeometrySection()
 
             if (s.detailVisibleDecals > 0)
                 ImGui::Text("Decals: %s visible", FormatNumber(s.detailVisibleDecals));
+            if (s.detailVisibleMeshes > 0)
+                ImGui::Text("Meshes: %s visible", FormatNumber(s.detailVisibleMeshes));
 
-            if (s.detailVisibleCapacity > 0)
-            {
-                float totalMB = (s.detailVisibleCapacity * 4.0f * 3 + s.detailDecalCapacity * 4.0f) / (1024.0f * 1024.0f);
-                char capStr[32];
-                xr_strcpy(capStr, FormatNumber(s.detailVisibleCapacity));
-                ImGui::TextDisabled("Buffers: %s/LOD + %s decal (%.1f MB)",
-                    capStr, FormatNumber(s.detailDecalCapacity), totalMB);
-            }
+            ImGui::Text("Source %llu: %llu instances / %u chunks",
+                static_cast<unsigned long long>(s.detailSourceId),
+                static_cast<unsigned long long>(s.detailGeneratedInstances), s.detailSourceChunks);
+            ImGui::TextDisabled("Source storage: %s active / %s resident, %u chunks / %u generations",
+                FormatBytes(s.detailActiveSourceBytes, 0), FormatBytes(s.detailSourceBytes, 1),
+                s.detailResidentChunks, s.detailGenerations);
+            ImGui::Text("Visibility frame %llu / source %llu: %u/%u packets, overflow 0x%X",
+                static_cast<unsigned long long>(s.detailVisibilityFrame),
+                static_cast<unsigned long long>(s.detailVisibilitySource),
+                s.detailPackets, s.detailPacketCapacity, s.detailOverflow);
+            ImGui::TextDisabled("Work capacities: %u / %u / %u LOD, %u mesh, %u decal",
+                s.detailVisibleCapacity[0], s.detailVisibleCapacity[1], s.detailVisibleCapacity[2],
+                s.detailVisibleCapacity[3], s.detailVisibleCapacity[4]);
+            ImGui::TextDisabled("Visibility storage: %s / %u frames, generation scratch %s",
+                FormatBytes(s.detailFrameBytes, 0), s.detailFrames, FormatBytes(s.detailPendingBytes, 1));
+            const char* stages[] = { "idle", "count ready", "count pending", "emit ready", "emit pending" };
+            ImGui::TextDisabled("Generation: %s, %u/%u chunks complete",
+                stages[s.detailGenerationStage], s.detailGenerationChunks, s.detailGenerationChunkCount);
+            if (s.detailUsageKnown)
+                ImGui::TextDisabled("GPU memory: %s used / %s budget, 5%% admission headroom",
+                    FormatBytes(s.detailUsageBytes, 0), FormatBytes(s.detailBudgetBytes, 1));
+            else
+                ImGui::TextDisabled("GPU memory: usage unavailable / %s budget", FormatBytes(s.detailBudgetBytes));
 
             ImGui::Unindent();
         }

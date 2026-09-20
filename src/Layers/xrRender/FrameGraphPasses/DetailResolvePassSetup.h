@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "MaterialResolvePassSetup.h"
+#include "DetailCullPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::fg {
@@ -19,12 +20,14 @@ namespace xray::render::fg::passes {
 struct DetailResolvePassState {
     nvrhi::ComputePipelineHandle pipeline;
     nvrhi::BindingLayoutHandle layout;
+    nvrhi::BindingLayoutHandle sourceLayout;
     nvrhi::ShaderHandle shader;
     bool initialized = false;
     bool failed = false;
 };
 
-bool EnsureDetailResolveResources(fg::RenderDevice* device, DetailResolvePassState& state);
+bool EnsureDetailResolveResources(fg::RenderDevice* device, DetailResolvePassState& state,
+    const DetailPassResources& details);
 
 MaterialResolveOutput setupDetailResolvePass(
     framegraph::FrameGraph& fg,
@@ -33,7 +36,7 @@ MaterialResolveOutput setupDetailResolvePass(
     framegraph::VirtualResourceHandle depth,
     const MaterialResolveOutput& inputs,
     fg::FGDetailManager* detailManager,
-    u32 grassEntryBase,
+    const DetailPassResources& details,
     const Fmatrix& prevView,
     const Fmatrix& prevProj,
     bool motionValid,

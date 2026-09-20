@@ -167,11 +167,31 @@ struct RenderStats
     u32 detailVisibleLOD1 = 0;   // Instances in LOD1 (mid, 4 segments)
     u32 detailVisibleLOD2 = 0;   // Instances in LOD2 (far, 2 segments)
     u32 detailVisibleDecals = 0; // Visible decal instances
+    u32 detailVisibleMeshes = 0;
 
-    // Detail buffer sizing
-    u32 detailGeneratedInstances = 0;  // Total generated instances (from readback)
-    u32 detailVisibleCapacity = 0;     // Current visible buffer capacity per LOD
-    u32 detailDecalCapacity = 0;       // Current decal buffer capacity
+    u64 detailGeneratedInstances = 0;
+    u64 detailVisibilityInstances = 0;
+    u32 detailVisibleCapacity[5] = {};
+    u32 detailPackets = 0;
+    u32 detailPacketCapacity = 0;
+    u32 detailOverflow = 0;
+    u64 detailSourceId = 0;
+    u64 detailVisibilityFrame = 0;
+    u64 detailVisibilitySource = 0;
+    u64 detailSourceBytes = 0;
+    u64 detailActiveSourceBytes = 0;
+    u64 detailFrameBytes = 0;
+    u64 detailPendingBytes = 0;
+    u64 detailBudgetBytes = 0;
+    u64 detailUsageBytes = 0;
+    u32 detailSourceChunks = 0;
+    u32 detailResidentChunks = 0;
+    u32 detailGenerations = 0;
+    u32 detailFrames = 0;
+    u32 detailGenerationStage = 0;
+    u32 detailGenerationChunks = 0;
+    u32 detailGenerationChunkCount = 0;
+    bool detailUsageKnown = false;
 
     u32 fgArenaUsed = 0;
     u32 fgArenaPeak = 0;
@@ -222,8 +242,14 @@ struct RenderStats
         detailInstances = detailSlots = 0;
         detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
         detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
-        detailVisibleDecals = 0;
-        detailGeneratedInstances = detailVisibleCapacity = detailDecalCapacity = 0;
+        detailVisibleDecals = detailVisibleMeshes = detailPackets = detailPacketCapacity = detailOverflow = 0;
+        detailGeneratedInstances = detailVisibilityInstances = detailSourceId = detailVisibilityFrame = detailVisibilitySource = 0;
+        detailSourceBytes = detailActiveSourceBytes = detailFrameBytes = detailPendingBytes = detailBudgetBytes = detailUsageBytes = 0;
+        detailSourceChunks = detailResidentChunks = detailGenerations = detailFrames = 0;
+        detailGenerationStage = detailGenerationChunks = detailGenerationChunkCount = 0;
+        detailUsageKnown = false;
+        for (auto& capacity : detailVisibleCapacity)
+            capacity = 0;
         fgArenaUsed = fgArenaPeak = fgArenaCapacity = fgArenaFallbacks = 0;
     }
 };

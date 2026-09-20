@@ -1,8 +1,8 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
-#include "visbuffer_common.h"
-#include "detail_blade_common.h"
+#include "detail_visibility_common.h"
+#include "detail_source_common.h"
 #include "detail_pulled_common.h"
 
 cbuffer DetailGlobals : register(b3)
@@ -39,9 +39,7 @@ cbuffer DetailResolveParams : register(b5)
     uint g_VeinIndex;
     uint4 g_Segments;
     uint g_InteractionDebug;
-    uint g_PreparedCapacity;
-    uint g_ResolvePad1;
-    uint g_ResolvePad2;
+    uint3 g_PreparedCapacity;
 };
 
 Texture3D g_Perlin4D : register(t12);
@@ -49,13 +47,12 @@ Texture2D g_Interaction : register(t13);
 Texture2D g_InteractionPrev : register(t14);
 Texture2D<uint> g_VisID : register(t30);
 Texture2D<float> g_Depth : register(t31);
-StructuredBuffer<uint> g_VisibleLod0 : register(t33);
-StructuredBuffer<uint> g_VisibleLod1 : register(t34);
-StructuredBuffer<uint> g_VisibleLod2 : register(t35);
+StructuredBuffer<uint2> g_VisibleLod0 : register(t33);
+StructuredBuffer<uint2> g_VisibleLod1 : register(t34);
+StructuredBuffer<uint2> g_VisibleLod2 : register(t35);
 StructuredBuffer<GrassObjectTint> grass_object_tints : register(t36);
-StructuredBuffer<DetailInstance> all_instances : register(t37);
-StructuredBuffer<uint> g_VisibleMesh : register(t38);
-StructuredBuffer<uint> g_VisibleDecal : register(t39);
+StructuredBuffer<uint2> g_VisibleMesh : register(t38);
+StructuredBuffer<uint2> g_VisibleDecal : register(t39);
 StructuredBuffer<DetailModelGPU> detail_models : register(t40);
 StructuredBuffer<PulledVertex> pulled_vertices : register(t41);
 StructuredBuffer<PreparedBlade> g_PreparedLod0 : register(t42);
@@ -99,10 +96,12 @@ float3x3 CardTangentFrame(float3 e1, float3 e2, float2 d1, float2 d2, float3 N)
 
 void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2 pixelNdc)
 {
-    uint src = (kind == DETAIL_KIND_MESH) ? g_VisibleMesh[slot] : g_VisibleDecal[slot];
-    DetailInstance raw = all_instances[src];
+    uint2 src = (kind == DETAIL_KIND_MESH) ? g_VisibleMesh[slot] : g_VisibleDecal[slot];
+    DetailInstance raw = LoadDetailInstance(src);
     PulledInstance inst = DecodePulled(raw);
     DetailModelGPU mdl = detail_models[inst.objectId];
+    if (tri >= mdl.pulledIndexCount / 3u)
+        return;
     uint base = mdl.pulledVertexBase + tri * 3u;
     PulledVertex pv0 = pulled_vertices[base];
     PulledVertex pv1 = pulled_vertices[base + 1u];
@@ -211,10 +210,8 @@ void main(uint3 dtid : SV_DispatchThreadID)
     if (entryIdx < g_EntryBase)
         return;
     uint rel = entryIdx - g_EntryBase;
-    uint kind = UnpackDetailKind(rel);
-    uint slot = UnpackDetailSlot(rel);
-    uint tri = UnpackVisTri(id);
-    if (kind > DETAIL_KIND_DECAL)
+    uint kind, slot, tri;
+    if (!DecodeDetailVisibility(rel, UnpackVisTri(id), kind, slot, tri))
         return;
 
     float2 uvPix = (float2(p) + 0.5) * screen_res.zw;
@@ -227,14 +224,14 @@ void main(uint3 dtid : SV_DispatchThreadID)
     }
 
     uint lod = kind;
-    uint src = (lod == 0u) ? g_VisibleLod0[slot] : ((lod == 1u) ? g_VisibleLod1[slot] : g_VisibleLod2[slot]);
+    uint2 src = (lod == 0u) ? g_VisibleLod0[slot] : ((lod == 1u) ? g_VisibleLod1[slot] : g_VisibleLod2[slot]);
     uint segments = (lod == 0u) ? g_Segments.x : ((lod == 1u) ? g_Segments.y : g_Segments.z);
 
-    DetailInstance raw = all_instances[src];
+    DetailInstance raw = LoadDetailInstance(src);
     BladeInstance b;
     BladeBend w;
     float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, raw.pos.xz, interaction_window);
-    if (slot < g_PreparedCapacity)
+    if (slot < g_PreparedCapacity[lod])
     {
         PreparedBlade p = (lod == 0u) ? g_PreparedLod0[slot] : ((lod == 1u) ? g_PreparedLod1[slot] : g_PreparedLod2[slot]);
         b = BladeFromPrepared(p, raw);

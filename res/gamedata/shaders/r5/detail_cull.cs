@@ -1,12 +1,9 @@
-#include "common_samplers.h"
+SamplerState smp_nofilter : register(s0);
+SamplerState smp_rtlinear : register(s1);
+SamplerState smp_linear : register(s2);
 #include "cull_utils.h"
-#include "detail_blade_common.h"
-
-struct InstanceData
-{
-    float3 pos;
-    uint packed;
-};
+#include "detail_source_common.h"
+#include "detail_cull_params.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -34,18 +31,6 @@ cbuffer DetailGlobals : register(b3)
 
 static const float PACK_MAX_SCALE = 4.0;
 
-struct SlotAABB
-{
-    float3 aabb_min;
-    float padding0;
-    float3 aabb_max;
-    float padding1;
-    uint instance_base;
-    uint instance_count;
-    int slot_x;
-    int slot_z;
-    float4 padding2;
-};
 
 struct DetailModelGPU
 {
@@ -63,64 +48,50 @@ struct DetailModelGPU
     float geomExtentY;
 };
 
-cbuffer DetailCullParams : register(b5)
-{
-    float4x4 g_view_proj;
-    float4x4 g_prev_view_proj;
-    float3 g_camera_pos;
-    float g_fade_distance_sqr;
-    float4 g_frustum_planes[6];
-    uint g_visible_blade_capacity;
-    uint g_total_slot_count;
-    uint g_hiz_width;
-    uint g_hiz_height;
-    uint g_hiz_mip_levels;
-    float g_lod_distance_close_sqr;
-    float g_lod_distance_mid_sqr;
-    float g_detail_density;
-    uint g_visible_decal_capacity;
-    uint g_grass_mode;
-    uint g_visible_billboard_capacity;
-    uint g_prepared_capacity;
-};
-
-StructuredBuffer<InstanceData> g_all_instances : register(t0);
 StructuredBuffer<uint> g_visible_slot_ids : register(t1);
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
 Texture2D<float> g_hiz_pyramid : register(t3);
 StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
+ByteAddressBuffer g_visible_slot_count : register(t5);
 Texture3D g_Perlin4D : register(t12);
 Texture2D g_Interaction : register(t13);
 
 
-RWStructuredBuffer<uint> g_visible_lod0 : register(u0);
+RWStructuredBuffer<uint2> g_visible_lod0 : register(u0);
 RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
-RWStructuredBuffer<uint> g_visible_lod1 : register(u2);
+RWStructuredBuffer<uint2> g_visible_lod1 : register(u2);
 RWByteAddressBuffer g_indirect_args_lod1 : register(u3);
-RWStructuredBuffer<uint> g_visible_lod2 : register(u4);
+RWStructuredBuffer<uint2> g_visible_lod2 : register(u4);
 RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
-RWStructuredBuffer<uint> g_visible_decals : register(u6);
+RWStructuredBuffer<uint2> g_visible_decals : register(u6);
 RWByteAddressBuffer g_indirect_args_decal : register(u7);
-RWStructuredBuffer<uint> g_visible_billboard : register(u8);
+RWStructuredBuffer<uint2> g_visible_billboard : register(u8);
 RWByteAddressBuffer g_indirect_args_billboard : register(u9);
 RWStructuredBuffer<PreparedBlade> g_prepared_lod0 : register(u10);
 RWStructuredBuffer<PreparedBlade> g_prepared_lod1 : register(u11);
 RWStructuredBuffer<PreparedBlade> g_prepared_lod2 : register(u12);
+RWByteAddressBuffer g_work_status : register(u13);
 
 static const uint DO_NO_WAVING = 0x0001;
 
-PreparedBlade PrepareBlade(InstanceData inst)
+PreparedBlade PrepareBlade(DetailInstance inst)
 {
-    DetailInstance raw;
-    raw.pos = inst.pos;
-    raw.packed = inst.packed;
-    BladeInstance b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
+    BladeInstance b = DecodeBlade(inst, g_Perlin4D, smp_linear, grass_blade_height);
     float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, b.pos.xz, interaction_window);
     BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
     return PackPreparedBlade(b, w);
 }
 
-void AppendBladeLOD(InstanceData inst, uint inst_idx)
+bool ReserveVisibleSlot(RWByteAddressBuffer args, uint capacity, out uint index)
+{
+    args.InterlockedAdd(4, 1u, index);
+    if (index < capacity)
+        return true;
+    g_work_status.InterlockedOr(28, 1u);
+    return false;
+}
+
+void AppendBladeLOD(DetailInstance inst, uint2 address)
 {
     float3 to_camera = inst.pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
@@ -128,56 +99,57 @@ void AppendBladeLOD(InstanceData inst, uint inst_idx)
     uint idx;
     if (dist_sqr < g_lod_distance_close_sqr)
     {
-        g_indirect_args_lod0.InterlockedAdd(4, 1, idx);
-        if (idx < g_visible_blade_capacity)
-            g_visible_lod0[idx] = inst_idx;
-        if (idx < g_prepared_capacity)
+        if (!ReserveVisibleSlot(g_indirect_args_lod0, g_visible_blade_capacity.x, idx))
+            return;
+        g_visible_lod0[idx] = address;
+        if (idx < g_prepared_capacity.x)
             g_prepared_lod0[idx] = PrepareBlade(inst);
     }
     else if (dist_sqr < g_lod_distance_mid_sqr)
     {
-        g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
-        if (idx < g_visible_blade_capacity)
-            g_visible_lod1[idx] = inst_idx;
-        if (idx < g_prepared_capacity)
+        if (!ReserveVisibleSlot(g_indirect_args_lod1, g_visible_blade_capacity.y, idx))
+            return;
+        g_visible_lod1[idx] = address;
+        if (idx < g_prepared_capacity.y)
             g_prepared_lod1[idx] = PrepareBlade(inst);
     }
     else
     {
-        g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
-        if (idx < g_visible_blade_capacity)
-            g_visible_lod2[idx] = inst_idx;
-        if (idx < g_prepared_capacity)
+        if (!ReserveVisibleSlot(g_indirect_args_lod2, g_visible_blade_capacity.z, idx))
+            return;
+        g_visible_lod2[idx] = address;
+        if (idx < g_prepared_capacity.z)
             g_prepared_lod2[idx] = PrepareBlade(inst);
     }
 }
 
-void AppendBillboard(uint inst_idx)
+void AppendBillboard(uint2 address)
 {
     uint idx;
-    g_indirect_args_billboard.InterlockedAdd(4, 1, idx);
-    if (idx < g_visible_billboard_capacity)
-        g_visible_billboard[idx] = inst_idx;
+    if (ReserveVisibleSlot(g_indirect_args_billboard, g_visible_billboard_capacity, idx))
+        g_visible_billboard[idx] = address;
 }
 
-void AppendDecal(uint inst_idx)
+void AppendDecal(uint2 address)
 {
     uint idx;
-    g_indirect_args_decal.InterlockedAdd(4, 1, idx);
-    if (idx < g_visible_decal_capacity)
-        g_visible_decals[idx] = inst_idx;
+    if (ReserveVisibleSlot(g_indirect_args_decal, g_visible_decal_capacity, idx))
+        g_visible_decals[idx] = address;
 }
 
 [numthreads(64, 1, 1)]
 void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 {
-    uint slot_id = g_visible_slot_ids[group_id.x];
+    uint visibleSlot = group_id.y * 65535u + group_id.x;
+    if (visibleSlot >= g_visible_slot_count.Load(0))
+        return;
+    uint slot_id = g_visible_slot_ids[visibleSlot];
     SlotAABB slot = g_slot_aabbs[slot_id];
 
     for (uint i = thread_id.x; i < slot.instance_count; i += 64)
     {
-        uint inst_idx = slot.instance_base + i;
-        InstanceData inst = g_all_instances[inst_idx];
+        uint2 address = uint2(slot.instance_chunk, slot.instance_base + i);
+        DetailInstance inst = LoadDetailInstance(address);
 
         float scale = float((inst.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
         uint object_id = inst.packed & 0x3F;
@@ -199,10 +171,10 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         uint flags = asuint(mdl.flags);
         bool is_static = (flags & DO_NO_WAVING) != 0;
         if (is_static)
-            AppendDecal(inst_idx);
+            AppendDecal(address);
         else if (g_grass_mode == 0)
-            AppendBillboard(inst_idx);
+            AppendBillboard(address);
         else
-            AppendBladeLOD(inst, inst_idx);
+            AppendBladeLOD(inst, address);
     }
 }

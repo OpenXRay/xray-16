@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "ClusterDrawConfig.h"
+#include "DetailCullPassSetup.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -20,8 +21,6 @@ namespace xray::render::framegraph {
 namespace xray::render::fg::passes {
 
 constexpr u32 kVisIdEntryLimit = (1u << 25) - 1u;
-constexpr u32 kVisIdDetailSlotBits = 22u;
-constexpr u32 kVisIdDetailKindSpan = 1u << kVisIdDetailSlotBits;
 
 constexpr bool VisIdRangeFits(u32 base, u32 count)
 {
@@ -51,6 +50,7 @@ struct VisibilityPassState {
     nvrhi::ShaderHandle bladeVS;
     nvrhi::ShaderHandle bladePS;
     nvrhi::BindingLayoutHandle bladeLayout;
+    nvrhi::BindingLayoutHandle detailSourceLayout;
     nvrhi::GraphicsPipelineHandle bladePipeline;
     nvrhi::ShaderHandle pulledPS;
     nvrhi::BindingLayoutHandle pulledLayout;
@@ -63,6 +63,7 @@ struct VisibilityPassState {
     nvrhi::ComputePipelineHandle swPipeline;
     nvrhi::ShaderHandle swGrassShader;
     nvrhi::BindingLayoutHandle swGrassLayout;
+    nvrhi::BindingLayoutHandle swGrassSourceLayout;
     nvrhi::ComputePipelineHandle swGrassPipeline;
     bool swGrassFailed = false;
     nvrhi::ShaderHandle swResolvePS;
@@ -98,10 +99,9 @@ framegraph::VirtualResourceHandle setupSwRasterPass(
 framegraph::VirtualResourceHandle setupSwGrassPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
-    framegraph::VirtualResourceHandle detailArgs,
+    const DetailPassResources& details,
     framegraph::VirtualResourceHandle prevVis,
     FGDetailManager* detailManager,
-    u32 grassEntryBase,
     u32 width,
     u32 height,
     VisibilityPassState* state);
@@ -116,8 +116,7 @@ VisibilityPassOutput setupVisibilityPass(
     const ClusterDrawConfig& config,
     GPUCullingManager* gpuCulling,
     FGDetailManager* detailManager,
-    framegraph::VirtualResourceHandle detailArgs,
-    u32 grassEntryBase,
+    const DetailPassResources& details,
     VisibilityPassState* state,
     bool retest = false,
     bool swGrass = false);

@@ -3,6 +3,7 @@
 #include "xrCore/xrCore.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
+#include "Layers/xrRender/FGDetailManager.h"
 #include <nvrhi/nvrhi.h>
 #include <memory>
 
@@ -106,7 +107,6 @@ static_assert(sizeof(RTSkinningCB) == 160);
 class GrassRTCB
 {
 public:
-    Fvector4 detail_params;
     Fvector4 wind_direction;
     Fvector4 wave;
     float grass_wind_displacement;
@@ -120,13 +120,14 @@ public:
     u32 outputIndexOffset;
     u32 pad[3];
 };
-static_assert(sizeof(GrassRTCB) == 96);
+static_assert(sizeof(GrassRTCB) == 80);
 
 class BillboardRTCB
 {
 public:
     u32 maxVertsPerBillboard;
-    u32 pad[3];
+    u32 billboardCount;
+    u32 pad[2];
 };
 static_assert(sizeof(BillboardRTCB) == 16);
 
@@ -202,11 +203,9 @@ public:
     nvrhi::BufferHandle skinnedIndices;
     nvrhi::BufferHandle grassVertices;
     nvrhi::BufferHandle grassIndices;
-    nvrhi::BufferHandle grassInstances;
-    nvrhi::BufferHandle grassSlots;
-    nvrhi::BufferHandle grassModels;
-    nvrhi::BufferHandle grassPulledVertices;
-    nvrhi::BufferHandle grassDrawArgs;
+    std::shared_ptr<const FGDetailManager::VisibilityFrame> grassFrame;
+    nvrhi::ComputePipelineHandle grassPipeline;
+    nvrhi::BindingLayoutHandle grassLayout;
     nvrhi::TextureHandle grassWind;
     xr_vector<RTSkinJob> skinJobs;
     xr_vector<RTGrassJob> grassJobs;
@@ -215,7 +214,6 @@ public:
     xr_vector<nvrhi::rt::InstanceDesc> instances;
     RTBatchCounts counts;
     BillboardRTCB billboardConstants = {};
-    u32 billboardCapacity = 0;
     u32 grassVertexCount = 0;
     u32 grassIndexCount = 0;
     u32 detailAtlasIndex = 0;
@@ -241,6 +239,10 @@ public:
     framegraph::VirtualResourceHandle sourceTerrainMaterials;
     framegraph::VirtualResourceHandle bones;
     xr_vector<framegraph::VirtualResourceHandle> skinSources;
+    xr_vector<framegraph::VirtualResourceHandle> grassSources;
+    xr_vector<framegraph::VirtualResourceHandle> grassVisible;
+    framegraph::VirtualResourceHandle grassModels;
+    framegraph::VirtualResourceHandle grassPulledVertices;
     xr_vector<framegraph::VirtualResourceHandle> buffers;
     xr_vector<framegraph::VirtualResourceHandle> structures;
     framegraph::VirtualResourceHandle wind;
@@ -283,8 +285,8 @@ private:
     RTFrameResources ImportScene(framegraph::FrameGraph& graph,
         const RTSceneGeneration& scene) const;
     void InitSkinningPipeline();
-    void InitGrassPipeline();
-    void InitBillboardPipeline();
+    void InitGrassPipeline(const FGDetailManager::InstanceGeneration& source);
+    void InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source);
     static u32 GetSkinningFormatID(u16 renderMode, u32 stride);
 
     RenderDevice* m_device = nullptr;
@@ -300,10 +302,11 @@ private:
     static BufferHandle s_skinCB;
     static nvrhi::ComputePipelineHandle s_grassPipeline;
     static nvrhi::BindingLayoutHandle s_grassLayout;
+    static nvrhi::BindingLayoutHandle s_grassSourceLayout;
     static BufferHandle s_grassCB;
-    static nvrhi::SamplerHandle s_grassSampler;
     static nvrhi::ComputePipelineHandle s_billboardPipeline;
     static nvrhi::BindingLayoutHandle s_billboardLayout;
+    static nvrhi::BindingLayoutHandle s_billboardSourceLayout;
     static BufferHandle s_billboardCB;
 };
 }

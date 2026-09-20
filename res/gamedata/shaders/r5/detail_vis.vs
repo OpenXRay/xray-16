@@ -1,8 +1,9 @@
 #define SM_6_0
 #include "common.h"
-#include "visbuffer_common.h"
+#include "detail_visibility_common.h"
 #include "detail_blade_common.h"
 #include "detail_pulled_common.h"
+#include "detail_source_common.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -40,10 +41,9 @@ cbuffer DetailVisParams : register(b5)
 
 Texture3D g_Perlin4D : register(t12);
 Texture2D g_Interaction : register(t13);
-StructuredBuffer<uint> visible_indices : register(t33);
+StructuredBuffer<uint2> visible_indices : register(t33);
 StructuredBuffer<DetailModelGPU> detail_models : register(t35);
 StructuredBuffer<PulledVertex> pulled_vertices : register(t36);
-StructuredBuffer<DetailInstance> all_instances : register(t37);
 StructuredBuffer<PreparedBlade> prepared_blades : register(t38);
 
 struct VS_OUTPUT
@@ -51,21 +51,20 @@ struct VS_OUTPUT
     float4 position : SV_Position;
     nointerpolation uint entry : TEXCOORD0;
     float2 uv : TEXCOORD1;
+    nointerpolation uint primitiveBase : TEXCOORD2;
 };
 
 VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 {
-    VS_OUTPUT o;
-    if (!DetailSlotRepresentable(iid))
+    VS_OUTPUT o = (VS_OUTPUT)0;
+    if (iid >= g_DetailPackets[g_Kind].instanceCount)
     {
         o.position = float4(2.0, 2.0, 2.0, 1.0);
-        o.entry = 0u;
-        o.uv = float2(0.0, 0.0);
         return o;
     }
 
-    DetailInstance raw = all_instances[visible_indices[iid]];
-    o.entry = PackDetailEntry(g_EntryBase, g_Kind, iid);
+    DetailInstance raw = LoadDetailInstance(visible_indices[iid]);
+    o.entry = DetailVisibilityEntry(g_EntryBase, g_Kind, iid, o.primitiveBase);
 
     if (g_Kind >= DETAIL_KIND_MESH)
     {

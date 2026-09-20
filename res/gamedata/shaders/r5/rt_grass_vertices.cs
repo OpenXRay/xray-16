@@ -1,31 +1,14 @@
-struct InstanceData {
-    float3 pos;
-    uint packed;
-};
+#include "detail_source_common.h"
+#include "sw_dispatch_common.h"
 
-struct GPUSlotData {
-    float world_min_x;
-    float world_min_z;
-    float y_base;
-    float y_height;
-    uint packed_ids;
-    uint packed_palette_01;
-    uint packed_palette_23;
-    float pad;
-};
-
-StructuredBuffer<InstanceData> g_AllInstances : register(t0);
-StructuredBuffer<GPUSlotData> g_SlotData : register(t1);
-StructuredBuffer<uint> g_VisibleIndices : register(t2);
-#include "common_samplers.h"
-#include "detail_blade_common.h"
+StructuredBuffer<uint2> g_VisibleIndices : register(t2);
+SamplerState smp_linear : register(s2);
 
 Texture3D g_WindTexture : register(t3);
 RWByteAddressBuffer g_Output : register(u0);
 RWByteAddressBuffer g_OutputIB : register(u1);
 
 cbuffer GrassRTCB : register(b5) {
-    float4 detail_params;
     float4 g_wind_direction;
     float4 wave;
     float grass_wind_displacement;
@@ -54,20 +37,18 @@ uint pack_normal(float3 n)
 }
 
 [numthreads(256, 1, 1)]
-void main(uint3 dtid : SV_DispatchThreadID)
+void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 {
-    uint global_vert = dtid.x;
+    uint global_vert = SwDispatchLinearGroup(group_id) * 256u + thread_id.x;
     uint blade_idx = global_vert / vertsPerBlade;
     uint local_vert = global_vert % vertsPerBlade;
 
     if (blade_idx >= bladeCount)
         return;
 
-    uint src_idx = g_VisibleIndices[blade_idx];
-    InstanceData raw = g_AllInstances[src_idx];
+    DetailInstance raw = LoadDetailInstance(g_VisibleIndices[blade_idx]);
 
     float3 base_pos = raw.pos;
-    uint object_id = raw.packed & 0x3F;
     float rotation = float(BladeHash(raw.pos) & 0xFFFFu) / 65535.0 * TWO_PI;
     float scale = float((raw.packed >> 18) & 0x3FF) / 1023.0 * PACK_MAX_SCALE;
 

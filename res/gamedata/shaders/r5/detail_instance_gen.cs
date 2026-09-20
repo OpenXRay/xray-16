@@ -1,4 +1,5 @@
 #define DETAIL_SLOT_SIZE 2.0
+#include "detail_slot_common.h"
 
 struct GPUSlotData
 {
@@ -21,39 +22,6 @@ struct InstanceData
 static const float PACK_MAX_SCALE = 4.0;
 static const float TWO_PI = 6.28318530718;
 
-struct SlotAABB
-{
-    float3 aabb_min;
-    float padding0;
-    float3 aabb_max;
-    float padding1;
-    uint instance_base;
-    uint instance_count;
-    int slot_x;
-    int slot_z;
-    float4 padding2;
-};
-
-cbuffer DetailCullParams : register(b5)
-{
-    float4x4 g_view_proj;
-    float4x4 g_prev_view_proj;
-    float3 g_camera_pos;
-    float g_fade_distance_sqr;
-    float4 g_frustum_planes[6];
-    uint g_visible_blade_capacity;
-    uint g_total_slot_count;
-    uint g_hiz_width;
-    uint g_hiz_height;
-    uint g_hiz_mip_levels;
-    float g_lod_distance_close_sqr;
-    float g_lod_distance_mid_sqr;
-    float g_detail_density;
-    uint g_visible_decal_capacity;
-    uint g_grass_mode;
-    uint g_visible_billboard_capacity;
-    uint g_cull_pad2;
-};
 
 struct DetailModelGPU
 {
@@ -77,26 +45,30 @@ cbuffer InstanceGenParams : register(b6)
     float g_heightmap_world_min_z;
     float g_heightmap_texel_size;
     float g_detail_height_multiplier;
-    uint g_gen_mode;
-    uint g_prefix_sum_block_size;
-    uint g_prefix_sum_total_blocks;
+    uint g_slot_offset;
+    uint g_slot_count;
     uint g_instance_capacity;
     uint g_detail_model_count;
-    uint g_pad0, g_pad1, g_pad2;
+    float g_detail_density;
+    uint g_grass_mode;
+    uint2 g_gen_padding;
 };
 
 StructuredBuffer<GPUSlotData> g_slot_data : register(t1);
 Texture2D<float> g_heightmap : register(t2);
 StructuredBuffer<DetailModelGPU> g_detail_models : register(t3);
-StructuredBuffer<uint> g_prefix_offsets : register(t4);
+#ifdef DETAIL_COUNT_ONLY
+RWStructuredBuffer<uint4> g_per_slot_counts : register(u2);
+#else
+StructuredBuffer<SlotAABB> g_slot_aabbs : register(t4);
+StructuredBuffer<uint> g_emit_slot_ids : register(t5);
 
 RWStructuredBuffer<InstanceData> g_instances : register(u0);
-RWByteAddressBuffer g_instance_counter : register(u1);
-RWStructuredBuffer<uint> g_per_slot_counts : register(u2);
+RWByteAddressBuffer g_emit_status : register(u1);
 RWStructuredBuffer<uint> g_local_counters : register(u3);
-RWStructuredBuffer<SlotAABB> g_slot_aabbs : register(u4);
+#endif
 
-#include "common_samplers.h"
+SamplerState smp_nofilter : register(s0);
 
 uint pcg_hash(uint input)
 {
@@ -170,10 +142,14 @@ bool InterpolateAndDither(float alpha255[4], uint x, uint y, uint shift_x, uint 
 [numthreads(64, 1, 1)]
 void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 {
-    uint slot_idx = group_id.y * 65535 + group_id.x;
-
-    if (slot_idx >= g_total_slot_count)
+    uint dispatch_slot = group_id.y * 65535u + group_id.x;
+    if (dispatch_slot >= g_slot_count)
         return;
+#ifdef DETAIL_COUNT_ONLY
+    uint slot_idx = dispatch_slot;
+#else
+    uint slot_idx = g_emit_slot_ids[g_slot_offset + dispatch_slot];
+#endif
 
     GPUSlotData slot = g_slot_data[slot_idx];
 
@@ -213,6 +189,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
     alpha255[3][3] = 255.0 * float((slot.packed_palette_23 >> 28) & 0xFu) / 15.0;
 
     uint slot_instance_count = 0;
+    uint slot_waving_count = 0;
 
     for (uint i = thread_id.x; i < total_grid_points; i += 64)
     {
@@ -280,15 +257,13 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 
         world_pos.y = terrain_y;
 
-        if (g_gen_mode == 0)
-        {
+        DetailModelGPU mdl = g_detail_models[object_id];
+        uint flags = asuint(mdl.flags);
+        const uint DO_NO_WAVING = 0x0001;
+#ifdef DETAIL_COUNT_ONLY
             slot_instance_count++;
-        }
-        else
-        {
-            DetailModelGPU mdl = g_detail_models[object_id];
-            uint flags = asuint(mdl.flags);
-            const uint DO_NO_WAVING = 0x0001;
+            slot_waving_count += uint((flags & DO_NO_WAVING) == 0u);
+#else
             bool pulled = (flags & DO_NO_WAVING) != 0 || g_grass_mode == 0u;
 
             float scale = (pulled ? pcg_randF(r_scale, mdl.minScale * 0.5, mdl.maxScale * 0.9) : mdl.maxScale) * g_detail_height_multiplier;
@@ -315,37 +290,31 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
                         | ((pack_rotation & 0x3FF) << 8)
                         | ((pack_scale & 0x3FF) << 18);
 
-            uint base_offset = g_prefix_offsets[slot_idx];
-            if (base_offset >= g_instance_capacity)
-                continue;
+            SlotAABB range = g_slot_aabbs[slot_idx];
+            uint base_offset = range.instance_base;
 
             uint local_idx;
             InterlockedAdd(g_local_counters[slot_idx], 1, local_idx);
-            uint write_idx = base_offset + local_idx;
 
-            if (write_idx >= g_instance_capacity)
+            if (base_offset > g_instance_capacity || local_idx >= range.instance_count ||
+                local_idx >= g_instance_capacity - base_offset)
+            {
+                g_emit_status.InterlockedOr(0, 1u);
                 continue;
+            }
 
-            g_instances[write_idx] = inst;
+            g_instances[base_offset + local_idx] = inst;
             slot_instance_count++;
-        }
+#endif
     }
 
-    if (g_gen_mode == 0)
-    {
-        if (slot_instance_count > 0)
-            InterlockedAdd(g_per_slot_counts[slot_idx], slot_instance_count);
-    }
-    else
-    {
-        if (slot_instance_count > 0)
-            g_instance_counter.InterlockedAdd(0, slot_instance_count);
-
-        GroupMemoryBarrierWithGroupSync();
-        if (thread_id.x == 0)
-        {
-            g_slot_aabbs[slot_idx].instance_base = g_prefix_offsets[slot_idx];
-            g_slot_aabbs[slot_idx].instance_count = g_local_counters[slot_idx];
-        }
-    }
+#ifdef DETAIL_COUNT_ONLY
+        InterlockedAdd(g_per_slot_counts[slot_idx].x, slot_instance_count);
+        InterlockedAdd(g_per_slot_counts[slot_idx].y, slot_waving_count);
+        InterlockedAdd(g_per_slot_counts[slot_idx].z, slot_instance_count - slot_waving_count);
+#else
+        DeviceMemoryBarrierWithGroupSync();
+        if (thread_id.x == 0 && g_local_counters[slot_idx] != g_slot_aabbs[slot_idx].instance_count)
+            g_emit_status.InterlockedOr(0, 2u);
+#endif
 }

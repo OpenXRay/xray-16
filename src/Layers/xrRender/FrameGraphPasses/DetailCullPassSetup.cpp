@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "DetailCullPassSetup.h"
-#include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -11,9 +10,11 @@ namespace xray::render::fg::passes
 {
 using namespace framegraph;
 
-struct DetailCullPassData {
+struct DetailCullPassData
+{
     VirtualResourceHandle hiZPyramid;
-    VirtualResourceHandle args;
+    std::shared_ptr<FGDetailManager::VisibilityFrame> frame;
+    std::shared_ptr<FGDetailManager::GenerationWork> generation;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
     nvrhi::ITexture* fallbackHiZ;
@@ -25,7 +26,35 @@ struct DetailCullPassData {
     DetailPassState* detailState;
 };
 
-VirtualResourceHandle setupDetailCullPass(
+bool DetailPassResources::HasSource() const
+{
+    return frame && frame->source && !frame->source->chunks.empty();
+}
+
+void DetailPassResources::Read(RenderPassBuilder& builder, bool drawIndirect, bool swIndirect) const
+{
+    if (!HasSource())
+        return;
+    for (auto handle : sourceChunks)
+        builder.read(handle, ResourceState::ShaderResource);
+    for (auto handle : visible)
+        builder.read(handle, ResourceState::ShaderResource);
+    for (auto handle : prepared)
+        builder.read(handle, ResourceState::ShaderResource);
+    for (auto handle : { models, pulled, packets, perlin, interaction[0], interaction[1], tints })
+        if (handle.is_valid())
+            builder.read(handle, ResourceState::ShaderResource);
+    if (drawIndirect || swIndirect)
+        for (auto handle : drawArgs)
+            builder.read(handle, drawIndirect ? ResourceState::IndirectArgument : ResourceState::ShaderResource);
+    if (drawIndirect)
+        for (auto handle : indices)
+            builder.read(handle, ResourceState::IndexBuffer);
+    if (swIndirect)
+        builder.read(swDispatch, ResourceState::IndirectArgument);
+}
+
+DetailPassResources setupDetailCullPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     fg::FGDetailManager* detailManager,
@@ -38,26 +67,80 @@ VirtualResourceHandle setupDetailCullPass(
     xray::profiler::GPUProfiler* gpuProfiler,
     DetailPassState* detailState)
 {
-    if (!detailManager || !detailManager->drawArgsBuffer[0])
-        return VirtualResourceHandle();
+    DetailPassResources result;
+    if (!detailManager || !detailManager->visibilityFrame)
+        return result;
+    result.frame = detailManager->visibilityFrame;
+    const auto& frame = *result.frame;
+    const auto importBuffer = [&](nvrhi::IBuffer* buffer)
+    {
+        if (!buffer)
+            return VirtualResourceHandle();
+        const auto& native = buffer->getDesc();
+        ResourceDesc desc;
+        desc.type = ResourceDesc::Type::Buffer;
+        desc.bufferSize = native.byteSize;
+        desc.structStride = native.structStride;
+        desc.isUAV = native.canHaveUAVs;
+        desc.isIndirectArgs = native.isDrawIndirectArgs;
+        desc.isTransient = false;
+        desc.debugName = native.debugName.c_str();
+        return fg.ImportBuffer(native.debugName.c_str(), buffer, desc);
+    };
+    const auto importTexture = [&](nvrhi::ITexture* texture)
+    {
+        if (!texture)
+            return VirtualResourceHandle();
+        const auto& native = texture->getDesc();
+        ResourceDesc desc;
+        desc.type = native.dimension == nvrhi::TextureDimension::Texture3D ? ResourceDesc::Type::Texture3D : ResourceDesc::Type::Texture2D;
+        desc.width = native.width;
+        desc.height = native.height;
+        desc.depth = native.depth;
+        desc.mipLevels = native.mipLevels;
+        desc.arraySize = native.arraySize;
+        desc.format = native.format;
+        desc.isUAV = native.isUAV;
+        desc.isTransient = false;
+        desc.debugName = native.debugName.c_str();
+        return fg.ImportTexture(native.debugName.c_str(), texture, desc);
+    };
+    for (u32 kind = 0; kind < FGDetailManager::VIS_KIND_COUNT; ++kind)
+    {
+        result.visible[kind] = importBuffer(frame.visible[kind]);
+        result.drawArgs[kind] = importBuffer(frame.drawArgs[kind]);
+    }
+    for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
+    {
+        result.prepared[lod] = importBuffer(frame.prepared[lod]);
+        result.indices[lod] = importBuffer(detailManager->bladeIndexBuffer[lod]);
+    }
+    if (result.HasSource())
+    {
+        result.sourceChunks.reserve(frame.visibleChunks.size());
+        for (u32 chunk : frame.visibleChunks)
+            result.sourceChunks.push_back(importBuffer(frame.source->chunks[chunk].buffer));
+        result.models = importBuffer(frame.source->models);
+        result.pulled = importBuffer(frame.source->pulledVertices);
+    }
+    result.packets = importBuffer(frame.packets);
+    result.swDispatch = importBuffer(frame.swDispatch);
+    result.tints = importBuffer(detailManager->cachedGrassTintsBuffer);
+    result.perlin = importTexture(detailManager->perlin4dTexture);
+    for (u32 i = 0; i < 2; ++i)
+        result.interaction[i] = importTexture(detailManager->interactionTexture[i]);
 
-    ResourceDesc argsDesc;
-    argsDesc.type = ResourceDesc::Type::Buffer;
-    argsDesc.debugName = "DetailDrawArgsLOD0";
-    argsDesc.bufferSize = sizeof(u32) * 5;
-    argsDesc.isUAV = true;
-    argsDesc.isTransient = false;
-    VirtualResourceHandle argsHandle = fg.ImportBuffer("detail_args", detailManager->drawArgsBuffer[0], argsDesc);
-
-    auto& passData = fg.addCallbackPass<DetailCullPassData>(
+    fg.addCallbackPass<DetailCullPassData>(
         "DetailCull",
-        [&, prevHiZ, argsHandle, fallbackHiZ, hiZWidth, hiZHeight, hiZMipLevels, prevViewProj, gpuProfiler, detailState](
-            FrameGraph& builder, PassHandle passHandle, DetailCullPassData& data) {
+        [&](FrameGraph& builder, PassHandle passHandle, DetailCullPassData& data)
+        {
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.asyncCompute();
-
+            passBuilder.sideEffects();
             data.device = device;
             data.detailManager = detailManager;
+            data.frame = result.frame;
+            data.generation = detailManager->generationWork;
             data.fallbackHiZ = fallbackHiZ;
             data.hiZWidth = hiZWidth;
             data.hiZHeight = hiZHeight;
@@ -65,52 +148,105 @@ VirtualResourceHandle setupDetailCullPass(
             data.prevViewProj = prevViewProj;
             data.gpuProfiler = gpuProfiler;
             data.detailState = detailState;
-
             if (prevHiZ.is_valid())
                 data.hiZPyramid = passBuilder.read(prevHiZ, ResourceState::ShaderResource);
-            data.args = passBuilder.write(argsHandle, ResourceState::UnorderedAccess);
+            for (auto handle : result.visible)
+                passBuilder.write(handle, ResourceState::UnorderedAccess);
+            for (auto handle : result.drawArgs)
+                passBuilder.write(handle, ResourceState::UnorderedAccess);
+            for (auto handle : result.prepared)
+                passBuilder.write(handle, ResourceState::UnorderedAccess);
+            for (auto handle : { result.packets, result.swDispatch, importBuffer(frame.visibleSlots),
+                importBuffer(frame.visibleSlotCount), importBuffer(frame.slotDispatch), importBuffer(frame.workStatus) })
+                passBuilder.write(handle, ResourceState::UnorderedAccess);
+            passBuilder.write(importBuffer(frame.readback), ResourceState::CopyDest);
+            for (auto handle : result.sourceChunks)
+                passBuilder.read(handle, ResourceState::ShaderResource);
+            if (result.HasSource())
+            {
+                passBuilder.read(importBuffer(frame.source->slots), ResourceState::ShaderResource);
+                passBuilder.read(result.models, ResourceState::ShaderResource);
+                passBuilder.read(result.pulled, ResourceState::ShaderResource);
+            }
+            if (!detailManager->bladeIndicesUploaded)
+                for (auto handle : result.indices)
+                    passBuilder.write(handle, ResourceState::CopyDest);
+            const bool upload = detailState && !detailState->detailDataUploaded;
+            for (auto buffer : { detailManager->slotDataBuffer, detailManager->detailModelsBuffer, detailManager->pulledVertexBuffer })
+            {
+                const auto handle = importBuffer(buffer);
+                if (upload)
+                    passBuilder.write(handle, ResourceState::CopyDest);
+                else
+                    passBuilder.read(handle, ResourceState::ShaderResource);
+            }
+            if (result.tints.is_valid())
+                passBuilder.write(result.tints, ResourceState::CopyDest);
+            if (result.perlin.is_valid())
+                passBuilder.readWrite(result.perlin, ResourceState::UnorderedAccess);
+            for (auto handle : result.interaction)
+                if (handle.is_valid())
+                    passBuilder.readWrite(handle, ResourceState::UnorderedAccess);
+            if (data.generation)
+            {
+                const auto& work = *data.generation;
+                if (work.stage == FGDetailManager::GenerationWork::Stage::CountReady || work.stage == FGDetailManager::GenerationWork::Stage::EmitReady)
+                    passBuilder.read(importTexture(detailManager->heightmapTexture), ResourceState::ShaderResource);
+                if (work.stage == FGDetailManager::GenerationWork::Stage::CountReady)
+                {
+                    passBuilder.write(importBuffer(work.counts), ResourceState::UnorderedAccess);
+                    passBuilder.write(importBuffer(work.countReadback), ResourceState::CopyDest);
+                }
+                else if (work.stage == FGDetailManager::GenerationWork::Stage::EmitReady)
+                {
+                    for (auto buffer : { work.source->slots, work.emitSlots })
+                    {
+                        const auto handle = importBuffer(buffer);
+                        if (work.nextChunk == 0)
+                            passBuilder.write(handle, ResourceState::CopyDest);
+                        else
+                            passBuilder.read(handle, ResourceState::ShaderResource);
+                    }
+                    passBuilder.readWrite(importBuffer(work.localCounters), ResourceState::UnorderedAccess);
+                    passBuilder.readWrite(importBuffer(work.status), ResourceState::UnorderedAccess);
+                    passBuilder.write(importBuffer(work.statusReadback), ResourceState::CopyDest);
+                    const u32 end = std::min(u32(work.source->chunks.size()), work.nextChunk + fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS);
+                    for (u32 i = work.nextChunk; i < end; ++i)
+                        passBuilder.write(importBuffer(work.source->chunks[i].buffer), ResourceState::UnorderedAccess);
+                }
+            }
         },
         [](const DetailCullPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             ZoneScoped;
             ZoneName("DetailCullPass", 14);
-
             auto* dm = data.detailManager;
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            if (!dm || !cmdList)
-                return;
-            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-
-            const bool enabled = psDeviceFlags.is(rsDrawDetails) && dm->instanceGenPipeline && dm->slotDataBuffer;
-            if (!enabled)
-            {
-                dm->ClearDrawArgs(cmdList);
-                return;
-            }
-
+            auto* cmdList = ctx->GetCommandList();
+            R_ASSERT2(cmdList && data.frame, "[DetailManager] detail culling command list or frame unavailable");
+            auto* nvDevice = data.device->GetNVRHIDevice();
             if (data.detailState && !data.detailState->detailDataUploaded)
             {
                 dm->UploadBufferData(cmdList);
                 data.detailState->detailDataUploaded = true;
             }
-
             dm->UploadGrassTints(cmdList);
-
             if (dm->perlin4dPipeline)
             {
-                if (data.gpuProfiler) data.gpuProfiler->BeginPass(cmdList, "DetailCull.Perlin");
+                if (data.gpuProfiler)
+                    data.gpuProfiler->BeginPass(cmdList, "DetailCull.Perlin");
                 dm->DispatchPerlin4DCompute(cmdList, nvDevice, Device.fTimeGlobal);
-                if (data.gpuProfiler) data.gpuProfiler->EndPass(cmdList, "DetailCull.Perlin");
+                if (data.gpuProfiler)
+                    data.gpuProfiler->EndPass(cmdList, "DetailCull.Perlin");
             }
-
             if (dm->interactionPipeline)
             {
-                if (data.gpuProfiler) data.gpuProfiler->BeginPass(cmdList, "DetailCull.Interaction");
+                if (data.gpuProfiler)
+                    data.gpuProfiler->BeginPass(cmdList, "DetailCull.Interaction");
                 dm->DispatchInteraction(cmdList, nvDevice);
-                if (data.gpuProfiler) data.gpuProfiler->EndPass(cmdList, "DetailCull.Interaction");
+                if (data.gpuProfiler)
+                    data.gpuProfiler->EndPass(cmdList, "DetailCull.Interaction");
             }
-
-            nvrhi::ITexture* hiZTexture = data.hiZPyramid.is_valid() ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
+            auto* hiZTexture = data.hiZPyramid.is_valid() ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
             u32 hiZWidth = data.hiZWidth;
             u32 hiZHeight = data.hiZHeight;
             u32 hiZMipLevels = data.hiZMipLevels;
@@ -121,25 +257,12 @@ VirtualResourceHandle setupDetailCullPass(
                 hiZHeight = 1;
                 hiZMipLevels = 0;
             }
-
             const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
-            dm->DispatchCulling(
-                cmdList,
-                nvDevice,
-                hiZTexture,
-                data.prevViewProj,
-                fadeDistance,
-                hiZWidth,
-                hiZHeight,
-                hiZMipLevels,
-                data.gpuProfiler
-            );
-
-            dm->ScheduleStatsReadback(cmdList, nvDevice);
-        }
-    );
-
-    return passData.args;
+            dm->DispatchCulling(cmdList, nvDevice, hiZTexture, *data.frame, data.generation,
+                data.prevViewProj, fadeDistance, hiZWidth, hiZHeight, hiZMipLevels, data.gpuProfiler);
+            dm->ScheduleStatsReadback(cmdList, nvDevice, *data.frame);
+        });
+    return result;
 }
 
-} // namespace xray::render::fg::passes
+}

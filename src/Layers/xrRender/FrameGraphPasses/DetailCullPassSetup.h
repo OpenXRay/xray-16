@@ -2,35 +2,49 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
-#include <nvrhi/nvrhi.h>
+#include "Layers/xrRender/FGDetailManager.h"
 
-struct Fmatrix;
-
-namespace xray::render::fg {
-    class FGDetailManager;
+namespace xray::profiler
+{
+class GPUProfiler;
 }
 
-namespace xray::render {
-    namespace fg {
-        class RenderDevice;
-    }
+namespace xray::render::framegraph
+{
+class FrameGraph;
+class RenderPassBuilder;
 }
 
-namespace xray::profiler {
-    class GPUProfiler;
-}
+namespace xray::render::fg::passes
+{
 
-namespace xray::render::framegraph {
-    class FrameGraph;
-}
-
-namespace xray::render::fg::passes {
-
-struct DetailPassState {
+struct DetailPassState
+{
     bool detailDataUploaded = false;
 };
 
-framegraph::VirtualResourceHandle setupDetailCullPass(
+class DetailPassResources
+{
+public:
+    std::shared_ptr<FGDetailManager::VisibilityFrame> frame;
+    xr_vector<framegraph::VirtualResourceHandle> sourceChunks;
+    framegraph::VirtualResourceHandle visible[FGDetailManager::VIS_KIND_COUNT];
+    framegraph::VirtualResourceHandle drawArgs[FGDetailManager::VIS_KIND_COUNT];
+    framegraph::VirtualResourceHandle prepared[FGDetailManager::LOD_COUNT];
+    framegraph::VirtualResourceHandle indices[FGDetailManager::LOD_COUNT];
+    framegraph::VirtualResourceHandle models;
+    framegraph::VirtualResourceHandle pulled;
+    framegraph::VirtualResourceHandle packets;
+    framegraph::VirtualResourceHandle swDispatch;
+    framegraph::VirtualResourceHandle perlin;
+    framegraph::VirtualResourceHandle interaction[2];
+    framegraph::VirtualResourceHandle tints;
+
+    bool HasSource() const;
+    void Read(framegraph::RenderPassBuilder& builder, bool drawIndirect, bool swIndirect) const;
+};
+
+DetailPassResources setupDetailCullPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     fg::FGDetailManager* detailManager,
@@ -41,7 +55,6 @@ framegraph::VirtualResourceHandle setupDetailCullPass(
     u32 hiZMipLevels,
     const Fmatrix& prevViewProj,
     xray::profiler::GPUProfiler* gpuProfiler,
-    DetailPassState* detailState
-);
+    DetailPassState* detailState);
 
-} // namespace xray::render::fg::passes
+}
