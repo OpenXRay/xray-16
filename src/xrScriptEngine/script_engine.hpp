@@ -56,6 +56,31 @@ enum class LuaMessageType : u32
 extern XRSCRIPTENGINE_API Flags32 g_LuaDebug;
 extern XRSCRIPTENGINE_API int g_LuaDumpDepth;
 
+namespace xray::script_engine
+{
+template <lua_CFunction Function>
+inline void push_persistent_cfunction(lua_State* L)
+{
+    static char cacheKey;
+
+    lua_pushlightuserdata(L, &cacheKey);
+    lua_rawget(L, LUA_REGISTRYINDEX);
+
+    if (lua_isfunction(L, -1))
+        return;
+
+    lua_pop(L, 1);
+
+    lua_pushcfunction(L, Function);
+    lua_pushvalue(L, LUA_GLOBALSINDEX);
+    lua_setfenv(L, -2);
+
+    lua_pushlightuserdata(L, &cacheKey);
+    lua_pushvalue(L, -2);
+    lua_rawset(L, LUA_REGISTRYINDEX);
+}
+}
+
 class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
