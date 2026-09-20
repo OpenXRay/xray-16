@@ -205,15 +205,15 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
 
     uint id = g_VisID[p];
-    if (id == 0u)
+    if (!VisIDValid(id))
         return;
-    uint entryIdx = id >> VIS_ID_TRI_BITS;
+    uint entryIdx = UnpackVisEntry(id);
     if (entryIdx < g_EntryBase)
         return;
     uint rel = entryIdx - g_EntryBase;
-    uint kind = rel >> 22;
-    uint slot = rel & 0x3FFFFFu;
-    uint tri = id & VIS_ID_TRI_MASK;
+    uint kind = UnpackDetailKind(rel);
+    uint slot = UnpackDetailSlot(rel);
+    uint tri = UnpackVisTri(id);
     if (kind > DETAIL_KIND_DECAL)
         return;
 

@@ -5,11 +5,16 @@
 
 #include "xrCDB/ISpatial.h"
 
+#include <atomic>
+
+static std::atomic<u64> g_renderableLifetimeCounter{1};
+
 RenderableBase::RenderableBase()
 {
     renderable.xform.identity();
     renderable.visual = NULL;
     renderable.pROS = NULL;
+    renderable.lifetimeSerial = g_renderableLifetimeCounter.fetch_add(1, std::memory_order_relaxed);
     renderable.pROS_Allowed = true;
     renderable.invisible = false;
     renderable.hud = false;

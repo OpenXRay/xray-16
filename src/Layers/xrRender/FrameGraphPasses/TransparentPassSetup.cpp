@@ -20,6 +20,17 @@
 
 namespace xray::render::fg::passes {
 
+bool TransparentPassConfig::HasRigid() const
+{
+    return objectCount > 0 && ranges && geometry.forwardArgs.is_valid() && geometry.forwardInstances.is_valid()
+        && geometry.megaVertices.is_valid() && geometry.megaIndices.is_valid();
+}
+
+bool TransparentPassConfig::IsValid() const
+{
+    return HasRigid() || (skinned && gpuCulling);
+}
+
 static nvrhi::BlendFactor ToBlendFactor(u32 factor)
 {
     switch (static_cast<VariantBlendFactor>(factor)) {
@@ -59,13 +70,16 @@ static nvrhi::GraphicsPipelineDesc MakeBasePipelineDesc(fg::RenderDevice* device
     return desc;
 }
 
-static nvrhi::IGraphicsPipeline* GetColorPipeline(fg::RenderDevice* device, TransparentPassState& state, u32 key)
+static nvrhi::IGraphicsPipeline* GetColorPipeline(fg::RenderDevice* device, TransparentPassState& state, u32 key, bool skinned)
 {
-    auto it = state.pipelines.find(key);
+    const u64 pipelineKey = u64(key) | (u64(skinned) << 32);
+    auto it = state.pipelines.find(pipelineKey);
     if (it != state.pipelines.end())
         return it->second.Get();
 
     nvrhi::GraphicsPipelineDesc desc = MakeBasePipelineDesc(device, state, state.ps, state.layout);
+    if (skinned)
+        desc.inputLayout = state.skinnedInputLayout;
     desc.renderState.depthStencilState.depthWriteEnable = (key & TRANSPARENT_KEY_DEPTH_WRITE) != 0;
     auto& rt0 = desc.renderState.blendState.targets[0];
     rt0.blendEnable = true;
@@ -81,10 +95,10 @@ static nvrhi::IGraphicsPipeline* GetColorPipeline(fg::RenderDevice* device, Tran
     }
 
     string64 name;
-    xr_sprintf(name, "TransparentPass_%08x", key);
+    xr_sprintf(name, "TransparentPass_%08x_%u", key, u32(skinned));
     auto& cache = framegraph::GetPassResourceCache();
     nvrhi::GraphicsPipelineHandle pipeline = cache.GetOrCreatePipeline(name, desc, state.fbInfo, device->GetNVRHIDevice());
-    state.pipelines[key] = pipeline;
+    state.pipelines[pipelineKey] = pipeline;
     return pipeline.Get();
 }
 
@@ -162,11 +176,22 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
 
     u32 attrCount = 0;
     auto* attrs = GetUnifiedVertexAttributes(attrCount);
-    state.inputLayout = nvDevice->createInputLayout(attrs, attrCount, state.vs);
+    nvrhi::VertexAttributeDesc attributes[8];
+    R_ASSERT(attrCount + 1u == std::size(attributes));
+    std::copy_n(attrs, attrCount, attributes);
+    attributes[attrCount] = nvrhi::VertexAttributeDesc()
+        .setName("EXACTNORMAL").setFormat(nvrhi::Format::RGB32_FLOAT)
+        .setBufferIndex(0).setOffset(0).setElementStride(sizeof(bindless::UnifiedVertex));
+    state.skinnedInputLayout = nvDevice->createInputLayout(attributes, u32(std::size(attributes)), state.vs);
+    for (auto& attribute : attributes)
+    {
+        if (attribute.bufferIndex == 0)
+            attribute.elementStride = sizeof(ForwardVertex);
+    }
+    attributes[attrCount].offset = offsetof(ForwardVertex, normal);
+    state.inputLayout = nvDevice->createInputLayout(attributes, u32(std::size(attributes)), state.vs);
+    R_ASSERT(state.inputLayout && state.skinnedInputLayout);
 
-    auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
-    if (!drawIndexBuffer)
-        return;
 
     nvrhi::FramebufferInfoEx distortFbInfo;
     distortFbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
@@ -182,11 +207,14 @@ void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::Frame
     drt0.destBlendAlpha = nvrhi::BlendFactor::One;
     drt0.blendOpAlpha = nvrhi::BlendOp::Add;
     state.distortPipeline = cache.GetOrCreatePipeline("TransparentPass_Distort", distortDesc, distortFbInfo, nvDevice);
-    if (!state.distortPipeline)
+    distortDesc.inputLayout = state.skinnedInputLayout;
+    state.skinnedDistortPipeline = cache.GetOrCreatePipeline("TransparentPass_SkinnedDistort", distortDesc, distortFbInfo, nvDevice);
+    if (!state.distortPipeline || !state.skinnedDistortPipeline)
         return;
 
     const u32 defaultKey = u32(VariantBlendFactor::SrcAlpha) | (u32(VariantBlendFactor::InvSrcAlpha) << TRANSPARENT_KEY_DST_SHIFT);
-    if (!GetColorPipeline(device, state, defaultKey))
+    if (!GetColorPipeline(device, state, defaultKey, false)
+        || !GetColorPipeline(device, state, defaultKey, true))
         return;
 
     const u32 wallmarkKey = u32(VariantBlendFactor::DstColor) | (u32(VariantBlendFactor::SrcColor) << TRANSPARENT_KEY_DST_SHIFT) | TRANSPARENT_KEY_WMARK;
@@ -245,6 +273,26 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             data.passState = &state;
 
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.read(config.geometry.forwardDrawIndices, ResourceState::VertexBuffer);
+            if (config.HasRigid())
+            {
+                passBuilder.read(config.geometry.megaVertices, ResourceState::VertexBuffer);
+                passBuilder.read(config.geometry.megaIndices, ResourceState::IndexBuffer);
+                passBuilder.read(config.geometry.forwardArgs, ResourceState::IndirectArgument);
+                passBuilder.read(config.geometry.forwardInstances, ResourceState::ShaderResource);
+            }
+            if (config.skinned)
+            {
+                passBuilder.read(config.geometry.deformedVertices, ResourceState::VertexBuffer);
+                passBuilder.read(config.geometry.skinnedIndices, ResourceState::IndexBuffer);
+                passBuilder.read(config.geometry.skinnedForwardArgs, ResourceState::IndirectArgument);
+                passBuilder.read(config.geometry.skinnedForwardInstances, ResourceState::ShaderResource);
+            }
+            for (const auto handle : { config.geometry.materials, config.geometry.variants, config.geometry.variantTextures })
+            {
+                if (handle.is_valid())
+                    passBuilder.read(handle, ResourceState::ShaderResource);
+            }
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.normal = passBuilder.readWrite(inputs.normal, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
@@ -313,9 +361,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 return;
 
             using namespace fg::bindless;
-            auto& matBuffer = MaterialBuffer::Instance();
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
+            auto* drawIndexBuffer = fg.GetPhysicalBuffer(data.config.geometry.forwardDrawIndices);
 
             const auto& cfg = data.config;
 
@@ -336,8 +383,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
                 framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, name);
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-                bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
+                bsb.BufferSRV("g_Materials", fg.GetPhysicalBuffer(cfg.geometry.materials));
+                bsb.BufferSRV("g_Variants", fg.GetPhysicalBuffer(cfg.geometry.variants));
                 bsb.BufferSRV("g_InstanceData", instanceBuffer);
                 bsb.BufferSRV("g_LightData", ClusteredLightManager::Instance().GetLightDataBuffer());
                 bsb.BufferSRV("g_ClusterGrid", ClusteredLightManager::Instance().GetClusterGridBuffer());
@@ -354,9 +401,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             auto makeDistortBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
                 framegraph::BindingSetBuilder bsb(*vsReflection, *distortReflection, nvDevice, name);
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-                bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-                bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
-                bsb.BufferSRV("g_VariantTextures", VariantTextureBuffer::Instance().GetBuffer());
+                bsb.BufferSRV("g_Materials", fg.GetPhysicalBuffer(cfg.geometry.materials));
+                bsb.BufferSRV("g_Variants", fg.GetPhysicalBuffer(cfg.geometry.variants));
+                bsb.BufferSRV("g_VariantTextures", fg.GetPhysicalBuffer(cfg.geometry.variantTextures));
                 bsb.BufferSRV("g_InstanceData", instanceBuffer);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->distortLayout, nvDevice);
                 R_ASSERT2(set, "Transparent distortion binding set creation failed");
@@ -376,17 +423,24 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 nvrhi::IBuffer* drawArgs;
                 const xr_vector<TransparentDrawRange>* ranges;
                 const char* name;
+                bool skinned;
             };
             DrawSource sources[2] = {};
             u32 sourceCount = 0;
             if (cfg.HasRigid())
-                sources[sourceCount++] = { cfg.megaVertexBuffer, cfg.megaIndexBuffer, cfg.instanceBuffer, cfg.drawArgsBuffer, cfg.ranges, "Transparent" };
+                sources[sourceCount++] = { fg.GetPhysicalBuffer(cfg.geometry.megaVertices),
+                    fg.GetPhysicalBuffer(cfg.geometry.megaIndices), fg.GetPhysicalBuffer(cfg.geometry.forwardInstances),
+                    fg.GetPhysicalBuffer(cfg.geometry.forwardArgs), cfg.ranges, "Transparent", false };
             if (cfg.skinned && cfg.gpuCulling && cfg.gpuCulling->GetSkinnedForwardCount() > 0) {
                 GPUCullingManager& gc = *cfg.gpuCulling;
-                nvrhi::IBuffer* preVB = gc.GetSkinnedPreVertexBuffer();
-                nvrhi::IBuffer* skinnedIB = gc.GetSkinnedPools().GetCombinedIndexBuffer();
-                if (preVB && skinnedIB && gc.GetSkinnedForwardArgsBuffer() && gc.GetSkinnedForwardInstanceBuffer())
-                    sources[sourceCount++] = { preVB, skinnedIB, gc.GetSkinnedForwardInstanceBuffer(), gc.GetSkinnedForwardArgsBuffer(), &gc.GetSkinnedForwardRanges(), "Transparent.Skinned" };
+                nvrhi::IBuffer* preVB = fg.GetPhysicalBuffer(cfg.geometry.deformedVertices);
+                nvrhi::IBuffer* skinnedIB = fg.GetPhysicalBuffer(cfg.geometry.skinnedIndices);
+                nvrhi::IBuffer* args = fg.GetPhysicalBuffer(cfg.geometry.skinnedForwardArgs);
+                nvrhi::IBuffer* instances = fg.GetPhysicalBuffer(cfg.geometry.skinnedForwardInstances);
+                if (!preVB || !skinnedIB || !args || !instances)
+                    FATAL("[FrameGraph] prepared skinned forward geometry is unavailable");
+                sources[sourceCount++] = { preVB, skinnedIB, instances, args,
+                    &gc.GetSkinnedForwardRanges(), "Transparent.Skinned", true };
             }
 
             auto drawRanges = [&](const DrawSource& src, nvrhi::IFramebuffer* fb, nvrhi::IBindingSet* bindings, bool distortPass) {
@@ -396,8 +450,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                     if (distortPass ? (range.key & TRANSPARENT_KEY_DISTORT) == 0 : (range.key & TRANSPARENT_KEY_NO_COLOR) != 0)
                         continue;
                     nvrhi::IGraphicsPipeline* pipeline = distortPass
-                        ? data.passState->distortPipeline.Get()
-                        : GetColorPipeline(data.device, *data.passState, range.key);
+                        ? (src.skinned ? data.passState->skinnedDistortPipeline.Get() : data.passState->distortPipeline.Get())
+                        : GetColorPipeline(data.device, *data.passState, range.key, src.skinned);
                     if (!pipeline)
                         continue;
                     nvrhi::GraphicsState gs;
@@ -493,6 +547,13 @@ framegraph::DefaultOutputLayout setupStaticWallmarkPass(
             data.passState = &state;
 
             RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.read(config.geometry.megaVertices, ResourceState::VertexBuffer);
+            passBuilder.read(config.geometry.megaIndices, ResourceState::IndexBuffer);
+            passBuilder.read(config.geometry.forwardArgs, ResourceState::IndirectArgument);
+            passBuilder.read(config.geometry.forwardInstances, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.forwardDrawIndices, ResourceState::VertexBuffer);
+            passBuilder.read(config.geometry.materials, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.variants, ResourceState::ShaderResource);
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
         },
@@ -527,14 +588,14 @@ framegraph::DefaultOutputLayout setupStaticWallmarkPass(
 
             using namespace fg::bindless;
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            auto drawIndexBuffer = GetOrCreateDrawIndexBuffer("TransparentPass", nvDevice);
+            auto* drawIndexBuffer = fg.GetPhysicalBuffer(data.config.geometry.forwardDrawIndices);
             const auto& cfg = data.config;
 
             framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "StaticWallmark");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
-            bsb.BufferSRV("g_Materials", MaterialBuffer::Instance().GetBuffer());
-            bsb.BufferSRV("g_Variants", VariantBuffer::Instance().GetBuffer());
-            bsb.BufferSRV("g_InstanceData", cfg.instanceBuffer);
+            bsb.BufferSRV("g_Materials", fg.GetPhysicalBuffer(cfg.geometry.materials));
+            bsb.BufferSRV("g_Variants", fg.GetPhysicalBuffer(cfg.geometry.variants));
+            bsb.BufferSRV("g_InstanceData", fg.GetPhysicalBuffer(cfg.geometry.forwardInstances));
             nvrhi::IBindingSet* bindings = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->wallmarkLayout, nvDevice);
             R_ASSERT2(bindings, "Static wallmark binding set creation failed");
 
@@ -557,11 +618,11 @@ framegraph::DefaultOutputLayout setupStaticWallmarkPass(
                 if (bindlessTable)
                     gs.addBindingSet(bindlessTable);
                 gs.vertexBuffers = {
-                    {cfg.megaVertexBuffer, 0, 0},
+                    {fg.GetPhysicalBuffer(cfg.geometry.megaVertices), 0, 0},
                     {drawIndexBuffer, 1, 0}
                 };
-                gs.indexBuffer = { cfg.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-                gs.indirectParams = cfg.drawArgsBuffer;
+                gs.indexBuffer = { fg.GetPhysicalBuffer(cfg.geometry.megaIndices), nvrhi::Format::R32_UINT, 0 };
+                gs.indirectParams = fg.GetPhysicalBuffer(cfg.geometry.forwardArgs);
                 gs.viewport.addViewport(viewport);
                 gs.viewport.addScissorRect(scissor);
                 cmdList->setGraphicsState(gs);

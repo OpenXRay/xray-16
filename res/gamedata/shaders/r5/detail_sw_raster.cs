@@ -3,6 +3,7 @@
 #include "visbuffer_common.h"
 #include "detail_blade_common.h"
 #include "sw_raster_common.h"
+#include "sw_dispatch_common.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -49,10 +50,10 @@ ByteAddressBuffer g_DrawArgs : register(t39);
 #define BLADE_MAX_VERTS 10
 
 [numthreads(64, 1, 1)]
-void main(uint3 dtID : SV_DispatchThreadID)
+void main(uint3 groupID : SV_GroupID, uint3 groupThreadID : SV_GroupThreadID)
 {
-    uint slot = dtID.x;
-    if (slot >= g_DrawArgs.Load(4))
+    uint slot = SwDispatchLinearGroup(groupID) * 64u + groupThreadID.x;
+    if (slot >= g_DrawArgs.Load(4) || !DetailSlotRepresentable(slot))
         return;
 
     DetailInstance raw = all_instances[visible_indices[slot]];
@@ -80,7 +81,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
             return;
     }
 
-    uint entry = g_EntryBase + (g_Lod << 22) + slot;
+    uint entry = PackDetailEntry(g_EntryBase, g_Lod, slot);
     uint triCount = (g_Segments - 1u) * 2u + 1u;
     for (uint tri = 0; tri < triCount; ++tri)
     {

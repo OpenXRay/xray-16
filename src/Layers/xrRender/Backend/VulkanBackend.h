@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SubmitTokenRing.h"
+#include "BackendCompletion.h"
 #include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
@@ -45,6 +46,13 @@ public:
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
+    bool SupportsSubmissionLeases() const override { return true; }
+    u64 OpenSubmissionLease() override { return m_completion.OpenLease(); }
+    void CloseSubmissionLease(u64 lease) override { m_completion.CloseLease(lease); }
+    SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_completion.PollLease(lease); }
+    void ReleaseSubmissionLease(u64 lease) override { m_completion.ReleaseLease(lease); }
+    u32 GetPendingSubmissionCount() const override { return m_completion.PendingTicketCount(); }
+
     void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
 
     nvrhi::ITexture* GetBackBuffer() override;
@@ -64,6 +72,8 @@ public:
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
+    bool RetainBindlessTextures(const u32* indices, u32 count) override;
+    void ReleaseBindlessTextures(const u32* indices, u32 count) override;
     nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindlessLayout.Get(); }
     nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindlessDescriptorTable.Get(); }
 
@@ -123,6 +133,9 @@ private:
     xr_vector<u32> m_freeBindlessIndices;
     xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
     u32 m_nextBindlessIndex = 0;
+    xr_vector<nvrhi::TextureHandle> m_bindlessTextureResources;
+    xr_vector<u32> m_bindlessTextureReferences;
+    std::mutex m_bindlessMutex;
 
     bool m_initialized = false;
     bool m_inFrame = false;
@@ -150,6 +163,7 @@ private:
         nvrhi::ICommandList* cl = nullptr;
         nvrhi::CommandQueue queue = nvrhi::CommandQueue::Graphics;
         u32 token = 0;
+        u64 completion = 0;
         SubmitWaitList waits;
         VkSemaphore imageAvailable = VK_NULL_HANDLE;
         VkSemaphore renderFinished = VK_NULL_HANDLE;
@@ -171,6 +185,7 @@ private:
     bool m_slotInFlight[2] = {};
     bool m_frameSubmissionPending[BACK_BUFFER_COUNT] = {};
     std::mutex m_queueMutex;
+    xray::render::backend::SubmissionTracker m_completion;
     std::mutex m_swapchainMutex;
 
     mutable std::atomic<u64> m_stJobLatencyUs{0};

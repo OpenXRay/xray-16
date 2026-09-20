@@ -1,7 +1,13 @@
 #define SM_5_0
 #include "common.h"
 #include "local_shadow_common.h"
-#include "visbuffer_common.h"
+#define CLUSTER_GEO_T_REFS t14
+#define CLUSTER_GEO_T_META t22
+#define CLUSTER_GEO_T_INSTANCES t23
+#define CLUSTER_GEO_RESIDENCY
+#define CLUSTER_GEO_T_GROUPS t26
+#define CLUSTER_GEO_T_GROUP_STATE t27
+#include "cluster_geo_bindings.h"
 #include "cluster_bvh_types.h"
 #include "local_shadow_bvh_types.h"
 
@@ -16,12 +22,11 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_CapAT;
     uint g_Budget;
     uint g_Frame;
-    uint g_BinPad0;
-    uint g_BinPad1;
+    uint g_BinRefCount;
+    uint g_ResidencyStreaming;
     uint g_BinPad2;
 };
 
-StructuredBuffer<ClusterEntry> g_Entries : register(t14);
 StructuredBuffer<LocalShadowView> g_TileState : register(t17);
 StructuredBuffer<uint4> g_PairBase : register(t20);
 StructuredBuffer<uint> g_DirtyList : register(t21);
@@ -58,7 +63,7 @@ void BvhVisit(bool active, uint entryIdx, LocalViewQuery q)
         return;
     uint v;
     InterlockedAdd(gs_visited, 1u, v);
-    ClusterEntry e = g_Entries[entryIdx];
+    ClusterEntry e = LoadClusterEntry(entryIdx);
     bool at = (e.flags & CLUSTER_ENTRY_FLAG_AT) != 0u;
     bool terrain = (e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u;
     if (at && q.includeAT == 0u)
@@ -89,7 +94,7 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
     GroupMemoryBarrierWithGroupSync();
 
     uint slot = g_DirtyList[gID.x];
-    LocalViewQuery q = localQueryFromView(g_TileState[slot], slot, g_IncludeAT, g_ErrK);
+    LocalViewQuery q = localQueryFromView(g_TileState[slot], slot, g_IncludeAT, g_ErrK, g_ResidencyStreaming);
     bvhTraverse(t, g_NodeCount, q);
 
     GroupMemoryBarrierWithGroupSync();

@@ -287,6 +287,11 @@ int   ps_r_cluster_cache = 1;
 int   ps_r_cluster_debug = 0;
 float ps_r_cluster_lod   = 4.0f;
 float ps_r_cluster_fade  = 0.25f;
+int   ps_r_geo_paging      = 1;
+int   ps_r_geo_page_budget = 96;
+int   ps_r_geo_page_reads  = 48;
+int   ps_r_geo_page_upload = 6144;
+int   ps_r_geo_page_stats  = 0;
 float ps_r_ssa_px        = 2.0f;
 
 int   ps_r_sun_shadow_debug    = 0;
@@ -1021,6 +1026,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_cluster_debug", &ps_r_cluster_debug, 0, 4);
     CMD4(CCC_Float, "r_cluster_lod", &ps_r_cluster_lod, 0.05f, 64.0f);
     CMD4(CCC_Float, "r_cluster_fade", &ps_r_cluster_fade, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_geo_paging", &ps_r_geo_paging, 0, 1);
+    CMD4(CCC_Integer, "r_geo_page_budget", &ps_r_geo_page_budget, 8, 4096);
+    CMD4(CCC_Integer, "r_geo_page_reads", &ps_r_geo_page_reads, 1, 512);
+    CMD4(CCC_Integer, "r_geo_page_upload", &ps_r_geo_page_upload, 256, 131072);
+    CMD4(CCC_Integer, "r_geo_page_stats", &ps_r_geo_page_stats, 0, 1);
     CMD4(CCC_Float, "r_ssa_px", &ps_r_ssa_px, 0.25f, 16.0f);
 
     CMD4(CCC_Integer, "r_sun_shadow_debug", &ps_r_sun_shadow_debug, 0, 2);

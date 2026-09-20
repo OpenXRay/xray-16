@@ -13,7 +13,7 @@ Texture2D<float> g_LocalShadowHud : register(t38);
 uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
 {
     LocalShadowView base = g_LocalShadowTiles[baseSlot];
-    if (base.zparams.w < 0.5)
+    if (base.zparams.w != 1.0)
         return 0xFFFFFFFFu;
     if (!pointLight)
         return baseSlot;
@@ -67,7 +67,7 @@ float2 LocalShadowHudLayer(LocalShadowView t, float3 wp, float3 N)
 float2 LocalShadow(uint slot, float3 wp, float3 N, bool hudReceiver)
 {
     LocalShadowView t = g_LocalShadowTiles[slot];
-    if (t.zparams.w < 0.5)
+    if (t.zparams.w != 1.0)
         return float2(1.0, 0.0);
     uint hudFlags = uint(t.hud.x + 0.5);
     bool hudLayer = hudReceiver ? (hudFlags & LOCAL_SHADOW_HUD_CASTERS) != 0u : (hudFlags & LOCAL_SHADOW_HUD_TO_WORLD) != 0u;

@@ -52,36 +52,20 @@ static_assert(offsetof(UnifiedVertex, color) == 40, "color at offset 40");
 static_assert(offsetof(UnifiedVertex, flags) == 44, "flags at offset 44");
 
 // ═══════════════════════════════════════════════════════════════════
-//  VERTEX FORMAT IDENTIFIERS
+//  SOURCE CLASS FLAGS (UnifiedVertex::flags)
 // ═══════════════════════════════════════════════════════════════════
+//
+// The packed normal/tangent/binormal words always hold D3DCOLOR data so that
+// the retained legacy vertex buffer, its input layout and the ray tracing hit
+// decoders keep their current interpretation without a tag check.
+//
+// UNIFIED_VERTEX_FLAG_FLOAT_BASIS marks vertices whose source declaration
+// authored a full float3 normal and no tangent/binormal. For those the packed
+// words are a derived approximation; the exact float normal travels in the
+// parallel source-normal array and is what the compact cluster payload stores.
 
-enum class SourceVertexFormat : u8 {
-    Unknown = 0,
-    R1_Lmap,          // r1v_lmap - lightmapped (32 bytes)
-    R1_Vert,          // r1v_vert - vertex-lit (32 bytes)
-    MU_Model,         // mu_model_vert - trees/models (32 bytes)
-    R1_Lmap_Unpacked, // r1v_lmap_unpacked (32 bytes)
-    R1_Vert_Unpacked, // r1v_vert_unpacked (28 bytes)
-    MU_Model_Unpacked,// mu_model_vert_unpacked (28 bytes)
-    X_Vert,           // x_vert - position only (12 bytes)
-};
-
-// Get format from vertex stride (heuristic)
-inline SourceVertexFormat DetectVertexFormat(u32 stride, bool hasLightmap, bool hasColor) {
-    switch (stride) {
-        case 12: return SourceVertexFormat::X_Vert;
-        case 28:
-            // Could be r1_vert_unpacked or mu_model_unpacked
-            return hasColor ? SourceVertexFormat::R1_Vert_Unpacked : SourceVertexFormat::MU_Model_Unpacked;
-        case 32:
-            // Could be r1_lmap, r1_vert, mu_model, or r1_lmap_unpacked
-            if (hasLightmap) return SourceVertexFormat::R1_Lmap;
-            if (hasColor) return SourceVertexFormat::R1_Vert;
-            return SourceVertexFormat::MU_Model;
-        default:
-            return SourceVertexFormat::Unknown;
-    }
-}
+constexpr u32 UNIFIED_VERTEX_FLAG_FLOAT_BASIS = 1u << 0;
+constexpr u32 UNIFIED_VERTEX_FLAG_MASK = UNIFIED_VERTEX_FLAG_FLOAT_BASIS;
 
 // ═══════════════════════════════════════════════════════════════════
 //  SHADER INPUT LAYOUT (matches UnifiedVertex)

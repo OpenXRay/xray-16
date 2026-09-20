@@ -214,6 +214,7 @@ RibbonPassOutput setupRibbonPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     const DefaultOutputLayout& forwardInputs,
+    VirtualResourceHandle materials,
     u32 width,
     u32 height,
     RibbonPassState* state)
@@ -238,6 +239,7 @@ RibbonPassOutput setupRibbonPass(
             data.inputColor = passBuilder.read(forwardInputs.albedo);
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
+            data.materials = passBuilder.read(materials, ResourceState::ShaderResource);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.normal = forwardInputs.normal;
@@ -257,9 +259,6 @@ RibbonPassOutput setupRibbonPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (!nvDevice || !cmdList)
                 return;
-
-            auto& matBuffer = MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
@@ -341,7 +340,7 @@ RibbonPassOutput setupRibbonPass(
                 BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, "Ribbon");
                 bsb.ConstantBuffer("static_globals", staticGlobalsCB)
                    .ConstantBuffer("RibbonParams", ribbonParamsCB)
-                   .BufferSRV("g_Materials", matBuffer.GetBuffer())
+                   .BufferSRV("g_Materials", fg.GetPhysicalBuffer(data.materials))
                    .BufferSRV("g_ControlPoints", st.controlPointBuffer);
                 const auto& bindDesc = bsb.Build();
                 auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st.layout, nvDevice);

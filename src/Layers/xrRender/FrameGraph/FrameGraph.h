@@ -55,6 +55,9 @@ public:
         const ResourceDesc& desc
     );
 
+    VirtualResourceHandle ImportAccelerationStructure(
+        const char* name, nvrhi::rt::IAccelStruct* physicalAccelerationStructure);
+
     // Create passes
     PassHandle AddPass(const char* name);
 
@@ -160,6 +163,7 @@ public:
     // Get physical resource from virtual handle (for use in callbacks)
     nvrhi::ITexture* GetPhysicalTexture(VirtualResourceHandle handle) const;
     nvrhi::IBuffer* GetPhysicalBuffer(VirtualResourceHandle handle) const;
+    nvrhi::rt::IAccelStruct* GetPhysicalAccelerationStructure(VirtualResourceHandle handle) const;
 
     // Get resource description
     const ResourceDesc& GetResourceDesc(VirtualResourceHandle handle) const;
@@ -232,6 +236,7 @@ private:
 
     // Graph data
     xr_vector<ResourceNode> m_resources;
+    xr_map<const void*, u32> m_importedLookup;
     xr_vector<PassNode> m_passes;
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
@@ -297,6 +302,7 @@ private:
     bool PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const;
 
     PassNode* GetPassNode(PassHandle handle);
+    VirtualResourceHandle CanonicalizeImport(const void* physical, const ResourceDesc& desc);
     const PassNode* GetPassNode(PassHandle handle) const;
 
     // Convert FrameGraph state to NVRHI state

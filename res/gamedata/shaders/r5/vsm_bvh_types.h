@@ -10,7 +10,7 @@ struct VsmPageQuery
     float errB;
     uint slot;
     uint includeAT;
-    uint pad;
+    uint residency;
 };
 
 float2 vsmLightHalfExtent(float3 h)
@@ -30,7 +30,9 @@ bool vsmBoxTouchesPage(float3 center, float3 half3, VsmPageQuery q)
 
 bool bvhNodeTest(ClusterBvhNode nd, VsmPageQuery q)
 {
-    if (nd.minSelfError > q.errB || nd.maxParentError <= q.errB)
+    if (nd.maxParentError <= q.errB)
+        return false;
+    if (q.residency == 0u && nd.minSelfError > q.errB)
         return false;
     float3 c = (nd.bmin + nd.bmax) * 0.5;
     float3 h = (nd.bmax - nd.bmin) * 0.5;

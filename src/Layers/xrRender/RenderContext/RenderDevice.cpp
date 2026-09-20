@@ -116,8 +116,42 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
         // SM6.6 Bindless support
         u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override { return m_ref->RegisterBindlessTexture(texture); }
         void UnregisterBindlessTexture(u32 index) override { m_ref->UnregisterBindlessTexture(index); }
+        bool RetainBindlessTextures(const u32* indices, u32 count) override
+        {
+            return m_ref->RetainBindlessTextures(indices, count);
+        }
+        void ReleaseBindlessTextures(const u32* indices, u32 count) override
+        {
+            m_ref->ReleaseBindlessTextures(indices, count);
+        }
         nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_ref->GetBindlessLayout(); }
         nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_ref->GetBindlessDescriptorTable(); }
+        nvrhi::ICommandList* CreateCommandList() override { return m_ref->CreateCommandList(); }
+        bool HasAsyncCompute() const override { return m_ref->HasAsyncCompute(); }
+        nvrhi::ICommandList* AcquireComputeCommandList() override { return m_ref->AcquireComputeCommandList(); }
+        u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override
+        {
+            return m_ref->SubmitCompute(commandList, waitTokens, numWaitTokens);
+        }
+        void AddGraphicsWait(u32 token) override { m_ref->AddGraphicsWait(token); }
+        u32 SplitGraphics() override { return m_ref->SplitGraphics(); }
+        u32 LastGraphicsToken() const override { return m_ref->LastGraphicsToken(); }
+        u32 LastComputeToken() const override { return m_ref->LastComputeToken(); }
+        void ExecuteCommandList(nvrhi::ICommandList* commandList) override { m_ref->ExecuteCommandList(commandList); }
+        void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override
+        {
+            m_ref->ExecuteCommandLists(commandLists, count);
+        }
+        void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override
+        {
+            m_ref->UploadBufferData(buffer, data, size);
+        }
+        bool SupportsSubmissionLeases() const override { return m_ref->SupportsSubmissionLeases(); }
+        u64 OpenSubmissionLease() override { return m_ref->OpenSubmissionLease(); }
+        void CloseSubmissionLease(u64 lease) override { m_ref->CloseSubmissionLease(lease); }
+        SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_ref->PollSubmissionLease(lease); }
+        void ReleaseSubmissionLease(u64 lease) override { m_ref->ReleaseSubmissionLease(lease); }
+        u32 GetPendingSubmissionCount() const override { return m_ref->GetPendingSubmissionCount(); }
     };
 
     m_backend.reset(xr_new<BackendRef>(backend));

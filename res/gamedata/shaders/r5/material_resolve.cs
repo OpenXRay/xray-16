@@ -4,21 +4,18 @@
 #include "bindless_common.h"
 #include "skinned_mdi_common.h"
 #include "material_eval.h"
-#include "visbuffer_common.h"
+#define CLUSTER_GEO_T_REFS t40
+#define CLUSTER_GEO_T_META t16
+#define CLUSTER_GEO_T_INSTANCES t46
+#include "cluster_geo_bindings.h"
+#include "cluster_geo_payload.h"
 
-StructuredBuffer<ClusterEntry> g_Entries : register(t16);
-ByteAddressBuffer g_MegaVB : register(t18);
-ByteAddressBuffer g_MegaIB : register(t19);
 Texture2D<uint> g_VisID : register(t30);
 Texture2D<float> g_Depth : register(t31);
-StructuredBuffer<InstanceData> g_InstanceData : register(t40);
-StructuredBuffer<InstanceData> g_TerrainInstanceData : register(t41);
 StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t42);
 ByteAddressBuffer g_SkinnedVB : register(t43);
 ByteAddressBuffer g_SkinnedIB : register(t44);
 ByteAddressBuffer g_SkinnedPrevVB : register(t45);
-StructuredBuffer<InstanceData> g_DynamicInstanceData : register(t46);
-StructuredBuffer<float4x4> g_DynamicPrevWorld : register(t47);
 RWTexture2D<float4> g_OutNormal : register(u0);
 RWTexture2D<float4> g_OutBaseColor : register(u1);
 RWTexture2D<float4> g_OutColor : register(u2);
@@ -65,17 +62,19 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
 
     uint id = g_VisID[p];
-    if (id == 0u)
+    if (!VisIDValid(id))
         return;
 
-    uint entryIdx = id >> VIS_ID_TRI_BITS;
+    uint entryIdx = UnpackVisEntry(id);
     if (entryIdx >= g_EntryLimit)
         return;
-    uint tri = id & VIS_ID_TRI_MASK;
+    uint tri = UnpackVisTri(id);
     bool skinned = entryIdx >= g_SkinnedEntryBase;
-    ClusterEntry e = skinned ? g_SkinnedEntries[entryIdx - g_SkinnedEntryBase] : g_Entries[entryIdx];
+    ClusterRefView view = (ClusterRefView)0;
+    if (!skinned)
+        view = LoadClusterRefView(entryIdx);
+    ClusterEntry e = skinned ? g_SkinnedEntries[entryIdx - g_SkinnedEntryBase] : view.entry;
     SkinnedDrawRecord rec = g_SkinnedRecords[skinned ? e.batchIndex : 0u];
-    uint ib = e.ibFirst + tri * 3u;
 
     bool terrain = (e.flags & CLUSTER_ENTRY_FLAG_TERRAIN) != 0u;
     bool hud = (e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u;
@@ -88,6 +87,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 pp0, pp1, pp2;
     if (skinned)
     {
+        uint ib = e.ibFirst + tri * 3u;
         uint i0 = g_SkinnedIB.Load(ib * 4u);
         uint i1 = g_SkinnedIB.Load((ib + 1u) * 4u);
         uint i2 = g_SkinnedIB.Load((ib + 2u) * 4u);
@@ -112,19 +112,23 @@ void main(uint3 dtid : SV_DispatchThreadID)
     }
     else
     {
-        uint i0 = g_MegaIB.Load(ib * 4u);
-        uint i1 = g_MegaIB.Load((ib + 1u) * 4u);
-        uint i2 = g_MegaIB.Load((ib + 2u) * 4u);
-        v0 = LoadMegaVertex(g_MegaVB, e.firstVertex + i0);
-        v1 = LoadMegaVertex(g_MegaVB, e.firstVertex + i1);
-        v2 = LoadMegaVertex(g_MegaVB, e.firstVertex + i2);
-        world = terrain ? g_TerrainInstanceData[e.batchIndex].world : (dynamic ? g_DynamicInstanceData[e.batchIndex].world : g_InstanceData[e.batchIndex].world);
+        ClusterGeoView geo = ClusterGeoResolve(e);
+        if (tri >= geo.triangleCount)
+            return;
+        uint3 corners = ClusterPayloadTriangle(geo, tri);
+        ClusterVertex c0 = ClusterLoadVertex(geo, corners.x);
+        ClusterVertex c1 = ClusterLoadVertex(geo, corners.y);
+        ClusterVertex c2 = ClusterLoadVertex(geo, corners.z);
+        v0.position = c0.position; v0.normal = c0.normal; v0.tangent = c0.tangent; v0.binormal = c0.binormal; v0.uv = c0.uv;
+        v1.position = c1.position; v1.normal = c1.normal; v1.tangent = c1.tangent; v1.binormal = c1.binormal; v1.uv = c1.uv;
+        v2.position = c2.position; v2.normal = c2.normal; v2.tangent = c2.tangent; v2.binormal = c2.binormal; v2.uv = c2.uv;
+        world = view.world;
         wp0 = mul(world, float4(v0.position, 1.0)).xyz;
         wp1 = mul(world, float4(v1.position, 1.0)).xyz;
         wp2 = mul(world, float4(v2.position, 1.0)).xyz;
-        if (dynamic)
+        if (dynamic && view.historyValid != 0u)
         {
-            float4x4 prevWorld = g_DynamicPrevWorld[e.batchIndex];
+            float4x4 prevWorld = view.prevWorld;
             pp0 = mul(prevWorld, float4(v0.position, 1.0)).xyz;
             pp1 = mul(prevWorld, float4(v1.position, 1.0)).xyz;
             pp2 = mul(prevWorld, float4(v2.position, 1.0)).xyz;

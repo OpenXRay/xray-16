@@ -2,10 +2,10 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    class MaterialCache;
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
@@ -105,8 +105,12 @@ struct LocalShadowState {
     u32 dirtyViews = 0;
     u32 nextSerial = 0;
     bool stateReset = true;
+    u32 geometryRevision = 0;
+    bool staticComplete = false;
+    bool dynComplete = false;
+    nvrhi::ComputePipelineHandle publicationPipeline;
     u32 pairCapacity[kLocalStreamCount] = {};
-    nvrhi::IBuffer* lastEntryBuffer = nullptr;
+    nvrhi::IBuffer* lastRefBuffer = nullptr;
     nvrhi::IBuffer* lastBvhNodeBuffer = nullptr;
     xr_vector<u32> slotOfLight;
     u32 pooledSpots = 0;
@@ -137,6 +141,7 @@ struct LocalShadowState {
     nvrhi::BufferHandle tileCount;
     nvrhi::BufferHandle schedule;
     nvrhi::BufferHandle dirtyList;
+    nvrhi::BufferHandle geometryDirty;
     nvrhi::BufferHandle refreshDynBuffer;
     nvrhi::BufferHandle pairBase;
     nvrhi::BufferHandle emitArgs;
@@ -184,21 +189,15 @@ struct LocalShadowState {
     framegraph::VirtualResourceHandle fgArgs;
     framegraph::VirtualResourceHandle fgClearArgs;
     framegraph::VirtualResourceHandle fgDirtyList;
+    framegraph::VirtualResourceHandle fgGeometryDirty;
     framegraph::VirtualResourceHandle fgRefreshDyn;
 };
 
 struct LocalShadowConfig {
     GPUCullingManager* gpuCulling = nullptr;
-    nvrhi::IBuffer* entryBuffer = nullptr;
-    nvrhi::IBuffer* bvhNodeBuffer = nullptr;
-    nvrhi::IBuffer* bvhIndexBuffer = nullptr;
+    GeometryFrameResources geometryResources;
+    GeometryFrameBuffers geometry;
     u32 bvhNodeCount = 0;
-    nvrhi::IBuffer* staticInstanceBuffer = nullptr;
-    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
-    nvrhi::IBuffer* dynamicInstanceBuffer = nullptr;
-    nvrhi::IBuffer* megaVertexBuffer = nullptr;
-    nvrhi::IBuffer* megaIndexBuffer = nullptr;
-    MaterialCache* materialCache = nullptr;
 };
 
 struct LocalShadowOutput {

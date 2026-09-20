@@ -28,6 +28,13 @@ public:
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
     void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
 
+    bool SupportsSubmissionLeases() const override { return true; }
+    u64 OpenSubmissionLease() override;
+    void CloseSubmissionLease(u64 lease) override;
+    SubmissionLeaseState PollSubmissionLease(u64 lease) override;
+    void ReleaseSubmissionLease(u64 lease) override;
+    u32 GetPendingSubmissionCount() const override;
+
     bool HasAsyncCompute() const override;
     nvrhi::ICommandList* AcquireComputeCommandList() override;
     u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override;
@@ -53,6 +60,8 @@ public:
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
+    bool RetainBindlessTextures(const u32* indices, u32 count) override;
+    void ReleaseBindlessTextures(const u32* indices, u32 count) override;
     nvrhi::IBindingLayout* GetBindlessLayout() const override;
     nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override;
 

@@ -5,6 +5,8 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
+class IRenderBackend;
+
 namespace xray::render::fg {
     struct Shader;
     struct ShaderElement;
@@ -254,6 +256,10 @@ private:
     Stats m_stats;
 
     xr_map<xr_string, resources::TextureHandle> m_textureHandleCache;
+    IRenderBackend* m_textureBackend = nullptr;
+    xr_unordered_map<nvrhi::ITexture*, u32> m_bindlessTextures;
+    xr_vector<u32> m_bindlessTextureIndices;
+    u32 RegisterMaterialTexture(nvrhi::ITexture* texture);
 
     xr_map<xr_string, float> m_detailScaleCache;
 
@@ -319,9 +325,9 @@ public:
 
     u32 PreRegisterTerrainMaterial(dxRender_Visual* visual);
 
-    void FinalizePendingTerrainMaterials(fg::RenderContext* ctx);
+    void FinalizePendingTerrainMaterials();
 
-    void FinalizePendingMaterials(fg::RenderContext* ctx);
+    void FinalizePendingMaterials();
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 

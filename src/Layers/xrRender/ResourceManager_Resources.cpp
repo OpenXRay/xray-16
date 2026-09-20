@@ -220,6 +220,25 @@ SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferH
     return Geom;
 }
 
+SGeometry* CResourceManager::CreateLogicalGeom(const VertexElement* decl)
+{
+    R_ASSERT(decl);
+    SDeclaration* declaration = _CreateDecl(decl);
+    const u32 stride = GetDeclVertexSize(decl, 0);
+    R_ASSERT(stride != 0);
+    for (SGeometry* geometry : v_geoms)
+    {
+        if (geometry->dcl == declaration && !geometry->vb && !geometry->ib
+            && geometry->vb_stride == stride)
+            return geometry;
+    }
+    SGeometry* geometry = v_geoms.emplace_back(xr_new<SGeometry>());
+    geometry->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    geometry->dcl = declaration;
+    geometry->vb_stride = stride;
+    return geometry;
+}
+
 SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     thread_local xr_vector<VertexElement> decl;
@@ -236,6 +255,19 @@ void CResourceManager::DeleteGeom(const SGeometry* Geom)
     if (reclaim(v_geoms, Geom))
         return;
     Msg("! ERROR: Failed to find compiled geometry-declaration");
+}
+
+void CResourceManager::DiscardGeometryBuffer(nvrhi::IBuffer* buffer)
+{
+    if (!buffer)
+        return;
+    for (SGeometry* geometry : v_geoms)
+    {
+        if (geometry->vb.Get() == buffer)
+            geometry->vb = nullptr;
+        if (geometry->ib.Get() == buffer)
+            geometry->ib = nullptr;
+    }
 }
 
 void CResourceManager::DBG_VerifyGeoms()

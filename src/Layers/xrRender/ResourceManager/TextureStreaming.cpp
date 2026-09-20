@@ -16,33 +16,31 @@ static std::mutex s_streamingCmdListMutex;
 StreamingManager::StreamingManager(xray::render::fg::RenderDevice* device, TextureManager* texManager)
     : m_device(device)
     , m_texManager(texManager)
-    , m_asyncIO(nullptr)
 {
     VERIFY(m_texManager);
-
-    // Create async I/O manager
-    m_asyncIO = xr_new<AsyncIOManager>();
-
-    // Msg("! [StreamingManager] Created (max concurrent: %u, bandwidth: %llu MB/frame)",
-    //     m_maxConcurrentStreams,
-    //     m_bandwidthLimit / (1024 * 1024));
 }
 
 StreamingManager::~StreamingManager() {
-    // Cancel all pending requests
-    for (auto& request : m_activeRequests) {
-        if (request.ioHandle) {
-            u32 requestID = (u32)(uintptr_t)request.ioHandle;
-            m_asyncIO->CancelRequest(requestID);
-        }
-    }
+    if (m_asyncIO && m_ioEpoch)
+        m_asyncIO->DrainEpoch(m_ioEpoch);
 
     PrintStatistics();
 
-    // Destroy async I/O manager
-    xr_delete(m_asyncIO);
-
     s_streamingCmdList = nullptr;
+}
+
+AsyncIOManager* StreamingManager::IOService() {
+    if (m_asyncIO)
+        return m_asyncIO;
+    if (!m_device)
+        return nullptr;
+    FGResourceManager* owner = m_device->GetFGResourceManager();
+    if (!owner)
+        return nullptr;
+    m_asyncIO = owner->GetIOService();
+    if (m_asyncIO && !m_ioEpoch)
+        m_ioEpoch = m_asyncIO->AcquireEpoch();
+    return m_asyncIO;
 }
 
 // ═══════════════════════════════════════════════════
@@ -104,20 +102,32 @@ void StreamingManager::RequestMips(
 
 void StreamingManager::CancelRequest(TextureHandle handle) {
     auto it = m_handleToRequest.find(handle);
-    if (it == m_handleToRequest.end()) {
+    if (it == m_handleToRequest.end())
         return;
+
+    for (auto pending = m_pendingRequests.begin(); pending != m_pendingRequests.end();) {
+        if (pending->handle == handle) {
+            pending = m_pendingRequests.erase(pending);
+            if (m_stats.requestsPending)
+                m_stats.requestsPending--;
+            continue;
+        }
+        ++pending;
     }
 
-    u32 index = it->second;
-
-    // Remove from pending
-    if (index < m_pendingRequests.size()) {
-        m_pendingRequests.erase(m_pendingRequests.begin() + index);
-        m_handleToRequest.erase(it);
-        m_stats.requestsPending--;
+    for (auto active = m_activeRequests.begin(); active != m_activeRequests.end();) {
+        if (active->handle == handle) {
+            if (active->ioRequest && m_asyncIO)
+                m_asyncIO->CancelRequest(active->ioRequest);
+            active = m_activeRequests.erase(active);
+            if (m_stats.requestsInProgress)
+                m_stats.requestsInProgress--;
+            continue;
+        }
+        ++active;
     }
 
-    // TODO: Cancel active request if in progress
+    m_handleToRequest.erase(it);
 }
 
 bool StreamingManager::HasPendingRequest(TextureHandle handle) const {
@@ -131,13 +141,7 @@ bool StreamingManager::HasPendingRequest(TextureHandle handle) const {
 void StreamingManager::Update(float deltaTime) {
     m_stats.bytesStreamedThisFrame = 0;
 
-    // Process completed async I/O requests first
-    m_asyncIO->ProcessCompletedRequests();
-
-    // Process active requests (check for completion)
     ProcessActiveRequests();
-
-    // Start new requests if we have bandwidth
     ProcessPendingRequests();
 }
 
@@ -166,30 +170,14 @@ void StreamingManager::ProcessActiveRequests() {
 
         switch (request.status) {
             case StreamingRequest::Pending:
-                // Shouldn't happen
                 StartRequest(request);
                 ++it;
                 break;
 
             case StreamingRequest::InProgress:
-                // Check if async I/O is complete
-                if (request.ioHandle) {
-                    u32 requestID = (u32)(uintptr_t)request.ioHandle;
-
-                    if (m_asyncIO->IsRequestComplete(requestID)) {
-                        // I/O completed - data should be in stagingBuffer now
-                        if (!request.stagingBuffer.empty()) {
-                            request.status = StreamingRequest::Uploading;
-                        } else {
-                            FailRequest(request, "Async I/O failed or returned empty buffer");
-                            it = m_activeRequests.erase(it);
-                            continue;
-                        }
-                    }
-                } else {
-                    // No async handle yet - try to start async load
+                if (!request.ioRequest) {
                     if (!LoadMipsFromDisk(request)) {
-                        FailRequest(request, "Failed to start async load");
+                        FailRequest(request, "failed to start the async load");
                         it = m_activeRequests.erase(it);
                         continue;
                     }
@@ -198,21 +186,22 @@ void StreamingManager::ProcessActiveRequests() {
                 break;
 
             case StreamingRequest::Uploading:
-                // Upload to GPU
-                if (UploadMipsToGPU(request)) {
-                    CompleteRequest(request);
-                    it = m_activeRequests.erase(it);
-                    continue;
-                } else {
-                    FailRequest(request, "Failed to upload to GPU");
-                    it = m_activeRequests.erase(it);
-                    continue;
+            {
+                const UploadResult result = UploadMipsToGPU(request);
+                if (result == UploadResult::Deferred) {
+                    ++it;
+                    break;
                 }
-                break;
+                if (result == UploadResult::Uploaded)
+                    CompleteRequest(request);
+                else
+                    FailRequest(request, "failed to upload the streamed mips");
+                it = m_activeRequests.erase(it);
+                continue;
+            }
 
             case StreamingRequest::Complete:
             case StreamingRequest::Failed:
-                // Remove from active
                 it = m_activeRequests.erase(it);
                 continue;
         }
@@ -234,71 +223,53 @@ void StreamingManager::StartRequest(StreamingRequest& request) {
 
 bool StreamingManager::LoadMipsFromDisk(StreamingRequest& request) {
     const TextureMetadata* meta = m_texManager->GetMetadata(request.handle);
-    if (!meta) {
+    if (!meta)
         return false;
-    }
 
-    // ═══════════════════════════════════════════════════
-    //  ASYNC I/O VERSION
-    // ═══════════════════════════════════════════════════
+    if (request.ioRequest)
+        return true;
 
-    if (!request.ioHandle) {
-        // First call - kick off async read
+    AsyncIOManager* io = IOService();
+    if (!io)
+        return false;
 
-        // Msg("! [StreamingManager] Starting async load: %s", meta->filePath.c_str());
+    IReader* reader = FS.r_open(meta->filePath.c_str());
+    if (!reader)
+        return false;
+    const u64 size = u64(reader->length());
+    FS.r_close(reader);
+    if (size == 0)
+        return false;
 
-        // Calculate file size
-        // For now, just read entire file (later can optimize to read only specific mips)
-        IReader* reader = FS.r_open(meta->filePath.c_str());
-        if (!reader) {
-            return false;
-        }
+    request.ioRequest = io->ReadAsync(
+        meta->filePath.c_str(),
+        0,
+        size,
+        m_ioEpoch,
+        [this, handle = request.handle](AsyncIORequest& ioRequest) {
+            this->OnAsyncLoadComplete(handle, ioRequest);
+        },
+        (void*)(uintptr_t)request.handle.index);
 
-        u64 size = reader->length();
-        FS.r_close(reader);
-
-        // Submit async read
-        u32 requestID = m_asyncIO->ReadAsync(
-            meta->filePath.c_str(),
-            0,  // offset (read entire file for now)
-            size,
-            [this, handle = request.handle](AsyncIORequest& ioRequest) {
-                // Callback when complete
-                this->OnAsyncLoadComplete(handle, ioRequest);
-            },
-            (void*)(uintptr_t)request.handle.index
-        );
-
-        request.ioHandle = (void*)(uintptr_t)requestID;
-        return true;  // Async load started
-    }
-
-    // Already started - waiting for completion
-    return true;
+    return request.ioRequest != 0;
 }
 
-bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
+StreamingManager::UploadResult StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
     TextureMetadata* meta = const_cast<TextureMetadata*>(
         m_texManager->GetMetadata(request.handle)
     );
 
-    if (!meta || !meta->nvrhiTexture) {
-        return false;
-    }
+    if (!meta || !meta->nvrhiTexture)
+        return UploadResult::Failed;
 
-    // Msg("! [StreamingManager] Uploading mips to GPU...");
-
-    // Check bandwidth limit
-    if (m_stats.bytesStreamedThisFrame + request.stagingBuffer.size() > m_bandwidthLimit) {
-        // Defer to next frame
-        return false;
-    }
+    if (m_stats.bytesStreamedThisFrame != 0
+        && m_stats.bytesStreamedThisFrame + request.stagingBuffer.size() > m_bandwidthLimit)
+        return UploadResult::Deferred;
 
     // Load DDS again to get proper mip layout info
     DDSData ddsData;
-    if (!DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData)) {
-        return false;
-    }
+    if (!DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData))
+        return UploadResult::Failed;
 
     // Upload texture mips
     u32 startMip = request.currentMips;
@@ -347,7 +318,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
     // Msg("! [StreamingManager] ✅ Upload complete");
 
-    return true;
+    return UploadResult::Uploaded;
 }
 
 void StreamingManager::CompleteRequest(StreamingRequest& request) {

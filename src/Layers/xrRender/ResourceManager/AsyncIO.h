@@ -5,106 +5,84 @@
 #include <condition_variable>
 #include <functional>
 
-// Async I/O Manager
-// Week 3 - Day 5: Task 5.1
-
 namespace xray::render::resources {
 
-// ═══════════════════════════════════════════════════
-//  ASYNC I/O REQUEST
-// ═══════════════════════════════════════════════════
-
 enum class IOStatus : u8 {
-    Pending,        // Waiting in queue
-    InProgress,     // Reading from disk
-    Complete,       // Successfully read
-    Failed          // Error occurred
+    Unknown,
+    Pending,
+    Deferred,
+    InProgress,
+    Complete,
+    Failed,
+    Canceled
 };
 
 struct AsyncIORequest {
-    // Request data
     shared_str filePath;
-    u64 offset = 0;           // File offset to start reading
-    u64 size = 0;             // Bytes to read
+    u64 offset = 0;
+    u64 size = 0;
 
-    // Output buffer
-    xr_vector<u8> buffer;     // Filled when complete
+    xr_vector<u8> buffer;
 
-    // Status
     IOStatus status = IOStatus::Pending;
     float requestTime = 0.0f;
 
-    // Callback (called when complete)
     using Callback = std::function<void(AsyncIORequest&)>;
     Callback callback;
 
-    // User data (optional)
     void* userData = nullptr;
+    u64 contentTag = 0;
 
-    // Error info
     shared_str errorMessage;
 
-    // Request ID (for tracking)
-    u32 requestID = 0;
+    u64 requestID = 0;
+    u32 epoch = 0;
 };
-
-// ═══════════════════════════════════════════════════
-//  ASYNC I/O MANAGER
-// ═══════════════════════════════════════════════════
 
 class AsyncIOManager {
 public:
     AsyncIOManager();
     ~AsyncIOManager();
 
-    // ═══════════════════════════════════════════════════
-    //  REQUEST SUBMISSION
-    // ═══════════════════════════════════════════════════
+    u32 AcquireEpoch();
+    void CancelEpoch(u32 epoch);
+    void DrainEpoch(u32 epoch);
+    void DrainAll();
 
-    // Submit async read request
-    u32 ReadAsync(
+    u64 ReadAsync(
         const char* filePath,
         u64 offset,
         u64 size,
+        u32 epoch,
         AsyncIORequest::Callback callback,
-        void* userData = nullptr
+        void* userData = nullptr,
+        u64 contentTag = 0
     );
 
-    // Cancel pending request
-    void CancelRequest(u32 requestID);
+    void CancelRequest(u64 requestID);
 
-    // ═══════════════════════════════════════════════════
-    //  STATUS CHECKING
-    // ═══════════════════════════════════════════════════
+    IOStatus GetRequestStatus(u64 requestID) const;
+    bool IsRequestSettled(u64 requestID) const;
+    bool TryTakeResult(u64 requestID, AsyncIORequest& out);
 
-    IOStatus GetRequestStatus(u32 requestID) const;
-    bool IsRequestComplete(u32 requestID) const;
+    void Pump();
 
-    // ═══════════════════════════════════════════════════
-    //  UPDATE (Call from Main Thread)
-    // ═══════════════════════════════════════════════════
-
-    // Process completed requests (invoke callbacks)
-    void ProcessCompletedRequests();
-
-    // ═══════════════════════════════════════════════════
-    //  CONFIGURATION
-    // ═══════════════════════════════════════════════════
-
-    void SetMaxConcurrentRequests(u32 count) { m_maxConcurrent = count; }
-    u32 GetMaxConcurrentRequests() const { return m_maxConcurrent; }
-
-    // ═══════════════════════════════════════════════════
-    //  STATISTICS
-    // ═══════════════════════════════════════════════════
+    void SetMaxConcurrentRequests(u32 count);
+    u32 GetMaxConcurrentRequests() const;
+    void SetBandwidthLimit(u64 bytesPerWindow);
+    u64 GetBandwidthLimit() const;
 
     struct Statistics {
         u32 requestsPending = 0;
         u32 requestsInProgress = 0;
+        u32 requestsRetained = 0;
         u32 requestsCompleted = 0;
         u32 requestsFailed = 0;
+        u32 requestsCanceled = 0;
+        u32 requestsDeferred = 0;
 
         u64 bytesRead = 0;
+        u64 bytesDispatchedThisWindow = 0;
         float avgReadTime = 0.0f;
     };
 
@@ -112,53 +90,50 @@ public:
     void PrintStatistics() const;
 
 private:
-    // ═══════════════════════════════════════════════════
-    //  THREADING
-    // ═══════════════════════════════════════════════════
-
-    struct WorkerThread {
-        std::thread thread;
-        bool shouldExit = false;
+    class Entry
+    {
+    public:
+        AsyncIORequest request;
+        bool canceled = false;
+        bool settled = false;
+        bool retained = false;
+        bool dispatched = false;
     };
 
-    xr_vector<WorkerThread> m_workers;
-
-    // Worker thread function
     void WorkerThreadFunc(u32 workerID);
+    bool PickRequestLocked(u64& outID);
+    bool HasDispatchableLocked() const;
+    Entry* FindLocked(u64 requestID);
+    const Entry* FindLocked(u64 requestID) const;
+    void RemovePendingLocked(u64 requestID);
+    void SettleLocked(Entry& entry, IOStatus status, const char* error);
+    void DropLocked(u64 requestID, Entry& entry);
 
-    // ═══════════════════════════════════════════════════
-    //  REQUEST QUEUES (Thread-Safe)
-    // ═══════════════════════════════════════════════════
-
-    // Pending requests (not yet started)
-    mutable std::mutex m_pendingMutex;
-    xr_vector<AsyncIORequest> m_pendingRequests;
-    xr_map<u32, u32> m_idToIndex;  // RequestID → index in pending
-
-    // Active requests (being processed)
-    mutable std::mutex m_activeMutex;
-    xr_vector<AsyncIORequest> m_activeRequests;
-
-    // Completed requests (ready for callback)
-    mutable std::mutex m_completedMutex;
-    xr_vector<AsyncIORequest> m_completedRequests;
-
-    // ═══════════════════════════════════════════════════
-    //  CONFIGURATION
-    // ═══════════════════════════════════════════════════
-
-    u32 m_maxConcurrent = 4;      // Max parallel I/O operations
-    u32 m_nextRequestID = 1;
-
-    // ═══════════════════════════════════════════════════
-    //  SYNCHRONIZATION
-    // ═══════════════════════════════════════════════════
-
+    mutable std::mutex m_mutex;
     std::condition_variable m_workAvailable;
-    std::mutex m_workMutex;
+    std::condition_variable m_idle;
 
-    // Statistics
-    mutable Statistics m_stats;
+    xr_unordered_map<u64, Entry> m_requests;
+    xr_vector<u64> m_pending;
+    xr_vector<u64> m_finished;
+
+    xr_vector<std::thread> m_workers;
+    bool m_shouldExit = false;
+
+    u32 m_maxConcurrent = 4;
+    u32 m_activeCount = 0;
+    u32 m_retainedCount = 0;
+    u64 m_nextRequestID = 1;
+    u32 m_nextEpoch = 1;
+
+    u64 m_bandwidthLimit = 16ull * 1024ull * 1024ull;
+    u64 m_windowBytes = 0;
+
+    Statistics m_stats;
+    double m_readTimeTotal = 0.0;
+    u64 m_readTimeSamples = 0;
+
+    xr_vector<AsyncIORequest> m_dispatchScratch;
 };
 
 } // namespace xray::render::resources

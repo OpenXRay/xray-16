@@ -6,7 +6,6 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
-    class MaterialCache;
     namespace fg {
         class RenderDevice;
         class GPUCullingManager;
@@ -20,7 +19,14 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
-constexpr u32 kVisIdEntryLimit = 1u << 25;
+constexpr u32 kVisIdEntryLimit = (1u << 25) - 1u;
+constexpr u32 kVisIdDetailSlotBits = 22u;
+constexpr u32 kVisIdDetailKindSpan = 1u << kVisIdDetailSlotBits;
+
+constexpr bool VisIdRangeFits(u32 base, u32 count)
+{
+    return base <= kVisIdEntryLimit && count <= kVisIdEntryLimit - base;
+}
 
 struct VisibilityPassState {
     nvrhi::ShaderHandle vs;
@@ -31,6 +37,8 @@ struct VisibilityPassState {
     nvrhi::GraphicsPipelineHandle pipeline;
     nvrhi::GraphicsPipelineHandle terrainPipeline;
     nvrhi::ShaderHandle meshShader;
+    nvrhi::ShaderHandle meshPsAlphaTest;
+    nvrhi::ShaderHandle meshPsFade;
     nvrhi::BindingLayoutHandle meshLayout;
     nvrhi::BindingLayoutHandle meshTerrainLayout;
     nvrhi::MeshletPipelineHandle meshPipeline;
@@ -76,10 +84,11 @@ struct VisibilityPassOutput {
 
 bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state);
 
+bool EnsureSwRasterResources(fg::RenderDevice* device, VisibilityPassState& state, u32 width, u32 height);
+
 framegraph::VirtualResourceHandle setupSwRasterPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
-    framegraph::VirtualResourceHandle drawArgsBuffer,
     const ClusterDrawConfig& config,
     u32 width,
     u32 height,
@@ -102,11 +111,9 @@ VisibilityPassOutput setupVisibilityPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depthTarget,
     framegraph::VirtualResourceHandle visIdTarget,
-    framegraph::VirtualResourceHandle drawArgsBuffer,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
     framegraph::VirtualResourceHandle swVis,
     const ClusterDrawConfig& config,
-    MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     FGDetailManager* detailManager,
     framegraph::VirtualResourceHandle detailArgs,

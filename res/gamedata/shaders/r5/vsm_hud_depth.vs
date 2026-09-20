@@ -46,7 +46,18 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
 #endif
 
     ClusterEntry e = g_Entries[g_HudEntries[iid]];
-    uint local = min(vid, e.indexCount - 1u);
+    if (vid >= e.indexCount)
+    {
+#ifdef TARGET_DXIL
+        output.clip = float4(-1.0, -1.0, -1.0, -1.0);
+#endif
+        output.position = float4(2.0, 2.0, 2.0, 1.0);
+        output.texcoord = float2(0.0, 0.0);
+        output.materialID = 0u;
+        return output;
+    }
+
+    uint local = vid;
     uint index = g_SkinnedIB.Load((e.ibFirst + local) * 4u);
     uint vertexByte = (e.firstVertex + index) * 48u;
     uint4 w0 = g_SkinnedVB.Load4(vertexByte);

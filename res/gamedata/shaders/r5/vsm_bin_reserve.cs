@@ -34,6 +34,7 @@ RWStructuredBuffer<float4> g_SlotSun : register(u7);
 RWStructuredBuffer<uint> g_SlotDirty : register(u8);
 RWStructuredBuffer<uint> g_Stats : register(u9);
 RWByteAddressBuffer g_EmitArgs : register(u10);
+RWStructuredBuffer<uint2> g_GeometryDirty : register(u11);
 
 groupshared uint gs_scan[3][RESERVE_THREADS];
 groupshared uint gs_carry[3];
@@ -88,7 +89,7 @@ void publishPage(uint index, uint4 cand, uint3 base)
     int2 wpage = int2(within % VSM_PAGES_AXIS, within / VSM_PAGES_AXIS);
     int2 absPage = pageBaseOf(level) + wpage;
 
-    g_PageTable[vp] = slot;
+    g_PageTable[vp] = VSM_UNMAPPED;
     g_PhysTile[slot] = uint2(uint(absPage.x), uint(absPage.y));
 
     uint phase = 0u;
@@ -104,6 +105,8 @@ void publishPage(uint index, uint4 cand, uint3 base)
     g_SlotPivot[slot] = float4(g_Pivot.xyz, org.x);
     g_SlotSun[slot] = float4(g_Sun.xyz, org.y);
     g_SlotDirty[slot] = kind;
+    uint2 geometry = g_GeometryDirty[slot];
+    g_GeometryDirty[slot] = uint2(geometry.x, 2u);
 }
 
 [numthreads(RESERVE_THREADS, 1, 1)]

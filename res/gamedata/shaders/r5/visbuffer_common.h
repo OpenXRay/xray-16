@@ -16,6 +16,10 @@ struct ClusterEntry
     float parentError;
     float3 extent;
     float extentPad;
+    uint page;
+    uint payloadOffset;
+    uint vertexCount;
+    uint geoPad;
 };
 
 struct InstanceData
@@ -37,10 +41,48 @@ struct InstanceData
 
 #define VIS_ID_TRI_BITS 7u
 #define VIS_ID_TRI_MASK 127u
+#define VIS_ID_BACKGROUND 0u
+#define VIS_ID_DETAIL_SLOT_BITS 22u
+#define VIS_ID_DETAIL_SLOT_MASK 4194303u
 
 uint PackVisID(uint entryIdx, uint tri)
 {
-    return (entryIdx << VIS_ID_TRI_BITS) | (tri & VIS_ID_TRI_MASK);
+    return ((entryIdx + 1u) << VIS_ID_TRI_BITS) | (tri & VIS_ID_TRI_MASK);
+}
+
+bool VisIDValid(uint id)
+{
+    return id >= (1u << VIS_ID_TRI_BITS);
+}
+
+uint UnpackVisEntry(uint id)
+{
+    return (id >> VIS_ID_TRI_BITS) - 1u;
+}
+
+uint UnpackVisTri(uint id)
+{
+    return id & VIS_ID_TRI_MASK;
+}
+
+uint PackDetailEntry(uint entryBase, uint kind, uint slot)
+{
+    return entryBase + (kind << VIS_ID_DETAIL_SLOT_BITS) + slot;
+}
+
+bool DetailSlotRepresentable(uint slot)
+{
+    return slot <= VIS_ID_DETAIL_SLOT_MASK;
+}
+
+uint UnpackDetailKind(uint rel)
+{
+    return rel >> VIS_ID_DETAIL_SLOT_BITS;
+}
+
+uint UnpackDetailSlot(uint rel)
+{
+    return rel & VIS_ID_DETAIL_SLOT_MASK;
 }
 
 struct MegaVertex

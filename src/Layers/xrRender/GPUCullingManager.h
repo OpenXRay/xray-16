@@ -5,10 +5,11 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
-#include "Layers/xrRender/Bindless/UnifiedVertex.h"
+#include "Layers/xrRender/Bindless/VertexConverter.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/ClusterShadowBVH.h"
+#include "Layers/xrRender/GeometryResidency.h"
 
 namespace xray::render::fg::passes {
     struct ParticleBatch;
@@ -53,6 +54,7 @@ static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes f
 enum GPUObjectFlags : u32 {
     GPU_OBJECT_NO_RESOLVE = 0x1,
     GPU_OBJECT_SHADOW_ONLY = 0x2,
+    GPU_OBJECT_SKINNED_FORWARD = 0x4,
 };
 
 struct TransparentDrawRange {
@@ -70,7 +72,9 @@ enum TransparentKeyBits : u32 {
     TRANSPARENT_KEY_WMARK = 1u << 20,
 };
 
-// Cluster LOD entry (matches HLSL ClusterEntry in cluster_cull.cs)
+// Typed skinned/HUD cluster entry (matches HLSL ClusterEntry). ibFirst and
+// firstVertex address the typed skinned streams; page, payloadOffset and
+// vertexCount address the compact cluster payload arenas.
 struct GPUClusterEntry {
     Fvector4 sphere;
     Fvector4 lodSelf;
@@ -84,8 +88,12 @@ struct GPUClusterEntry {
     float selfError;
     float parentError;
     Fvector4 extent;
+    u32 page;
+    u32 payloadOffset;
+    u32 vertexCount;
+    u32 geoPad;
 };
-static_assert(sizeof(GPUClusterEntry) == 96, "GPUClusterEntry must be 96 bytes");
+static_assert(sizeof(GPUClusterEntry) == 112, "GPUClusterEntry must be 112 bytes");
 
 enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_AT      = 0x1,
@@ -96,6 +104,36 @@ enum GPUClusterEntryFlags : u32 {
     GPU_CLUSTER_ENTRY_HUD = 0x20,
     GPU_CLUSTER_ENTRY_DYNAMIC = 0x40,
     GPU_CLUSTER_ENTRY_NO_SHADOW = 0x80,
+};
+
+class GPUGeoInstance
+{
+public:
+    Fmatrix world;
+    Fmatrix prevWorld;
+    u32 assetMember;
+    u32 materialID;
+    u32 flags;
+    float scaleBound;
+    u32 firstRef;
+    u32 refCount;
+    u32 firstPage;
+    u32 historyValid;
+    float prevScaleBound;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
+};
+static_assert(sizeof(GPUGeoInstance) == 176, "GPUGeoInstance is shader-visible");
+
+class GeometryInstanceKey
+{
+public:
+    u64 renderable = 0;
+    u64 visual = 0;
+    u32 subset = 0;
+
+    bool operator<(const GeometryInstanceKey& o) const;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -150,6 +188,17 @@ struct MeshAllocation {
     MeshAllocation() : vertexOffset(0), indexOffset(0), vertexCount(0), indexCount(0), valid(false) {}
 };
 
+class ForwardVertex
+{
+public:
+    bindless::UnifiedVertex vertex;
+    Fvector3 normal;
+};
+
+static_assert(sizeof(ForwardVertex) == 60);
+
+constexpr u32 GEOMETRY_SOURCE_FORWARD = 1u << 31;
+
 struct GPUInstanceData {
     Fmatrix world;          // World transform (64 bytes)
     u32 materialID;         // Bindless material ID
@@ -167,13 +216,141 @@ static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes f
 //
 // USAGE:
 // 1. Call Initialize() once at startup
-// 2. Call UploadSceneObjects() each frame with geometry batches
+// 2. Call PrepareSceneGeometry() each frame, then the geometry prepare pass uploads
 // 3. Call SetupCullingPass() to add culling pass to FrameGraph
 // 4. Forward pass reads visible indices from culling output
 //
 // PERFORMANCE:
 // - GPU culling: ~0.3-0.5ms for 100K objects
 // - 10-100x faster than CPU culling for large scenes
+
+class GeometrySourceKey
+{
+public:
+    u64 vertexSource = 0;
+    u64 indexSource = 0;
+    u32 vertexBase = 0;
+    u32 vertexCount = 0;
+    u32 indexBase = 0;
+    u32 indexCount = 0;
+    u32 flags = 0;
+    u32 vertexStride = 0;
+    u32 vertexFormat = 0;
+
+    bool operator<(const GeometrySourceKey& o) const;
+};
+
+class GeometryFrameResources
+{
+public:
+    framegraph::VirtualResourceHandle clusterMeta;
+    framegraph::VirtualResourceHandle assetMembers;
+    framegraph::VirtualResourceHandle assetNodes;
+    framegraph::VirtualResourceHandle clusterRefs;
+    framegraph::VirtualResourceHandle instances;
+    framegraph::VirtualResourceHandle counts;
+    framegraph::VirtualResourceHandle clusterPages;
+    framegraph::VirtualResourceHandle clusterPayload;
+    framegraph::VirtualResourceHandle clusterVertices;
+    framegraph::VirtualResourceHandle clusterGroups;
+    framegraph::VirtualResourceHandle rtVertices;
+    framegraph::VirtualResourceHandle rtIndices;
+    framegraph::VirtualResourceHandle boneMatrices;
+    framegraph::VirtualResourceHandle groupResidency;
+    framegraph::VirtualResourceHandle shadowCuts;
+    framegraph::VirtualResourceHandle arenaCopySourceVertices;
+    framegraph::VirtualResourceHandle arenaCopySourcePayload;
+    framegraph::VirtualResourceHandle megaVertices;
+    framegraph::VirtualResourceHandle megaIndices;
+    framegraph::VirtualResourceHandle megaCopySourceVertices;
+    framegraph::VirtualResourceHandle megaCopySourceIndices;
+    framegraph::VirtualResourceHandle forwardArgs;
+    framegraph::VirtualResourceHandle forwardInstances;
+    framegraph::VirtualResourceHandle forwardDrawIndices;
+    framegraph::VirtualResourceHandle shadowBvhNodes;
+    framegraph::VirtualResourceHandle shadowBvhIndices;
+    framegraph::VirtualResourceHandle visibleEntries;
+    framegraph::VirtualResourceHandle fades;
+    framegraph::VirtualResourceHandle terrainVisibleEntries;
+    framegraph::VirtualResourceHandle terrainFades;
+    framegraph::VirtualResourceHandle swEntries;
+    framegraph::VirtualResourceHandle candidates;
+    framegraph::VirtualResourceHandle retestVisibleEntries;
+    framegraph::VirtualResourceHandle retestFades;
+    framegraph::VirtualResourceHandle retestTerrainVisibleEntries;
+    framegraph::VirtualResourceHandle retestTerrainFades;
+    framegraph::VirtualResourceHandle retestSwEntries;
+    framegraph::VirtualResourceHandle drawArgs;
+    framegraph::VirtualResourceHandle terrainArgs;
+    framegraph::VirtualResourceHandle swArgs;
+    framegraph::VirtualResourceHandle retestDrawArgs;
+    framegraph::VirtualResourceHandle retestTerrainArgs;
+    framegraph::VirtualResourceHandle retestSwArgs;
+    framegraph::VirtualResourceHandle retestDispatchArgs;
+    framegraph::VirtualResourceHandle queueArgs;
+    framegraph::VirtualResourceHandle nodeQueueA;
+    framegraph::VirtualResourceHandle nodeQueueB;
+    framegraph::VirtualResourceHandle deferredNodes;
+    framegraph::VirtualResourceHandle deferredInstances;
+    framegraph::VirtualResourceHandle leafQueue;
+    framegraph::VirtualResourceHandle skinnedEntries;
+    framegraph::VirtualResourceHandle deformedVertices;
+    framegraph::VirtualResourceHandle previousDeformedVertices;
+    framegraph::VirtualResourceHandle skinnedHudEntries;
+    framegraph::VirtualResourceHandle neutralFades;
+    framegraph::VirtualResourceHandle paintSplats;
+    framegraph::VirtualResourceHandle skinnedRecords;
+    framegraph::VirtualResourceHandle skinnedIndices;
+    framegraph::VirtualResourceHandle skinnedForwardArgs;
+    framegraph::VirtualResourceHandle skinnedForwardInstances;
+    framegraph::VirtualResourceHandle materials;
+    framegraph::VirtualResourceHandle terrainMaterials;
+    framegraph::VirtualResourceHandle variants;
+    framegraph::VirtualResourceHandle variantTextures;
+    bool valid = false;
+};
+
+class GeometryFrameBuffers
+{
+public:
+    nvrhi::IBuffer* clusterMeta = nullptr;
+    nvrhi::IBuffer* clusterRefs = nullptr;
+    nvrhi::IBuffer* instances = nullptr;
+    nvrhi::IBuffer* clusterPages = nullptr;
+    nvrhi::IBuffer* clusterPayload = nullptr;
+    nvrhi::IBuffer* clusterVertices = nullptr;
+    nvrhi::IBuffer* clusterGroups = nullptr;
+    nvrhi::IBuffer* groupResidency = nullptr;
+    nvrhi::IBuffer* shadowBvhNodes = nullptr;
+    nvrhi::IBuffer* shadowBvhIndices = nullptr;
+    nvrhi::IBuffer* skinnedEntries = nullptr;
+    nvrhi::IBuffer* deformedVertices = nullptr;
+    nvrhi::IBuffer* skinnedIndices = nullptr;
+    nvrhi::IBuffer* skinnedHudEntries = nullptr;
+    nvrhi::IBuffer* neutralFades = nullptr;
+    nvrhi::IBuffer* materials = nullptr;
+};
+
+class GeometryMemoryStats
+{
+public:
+    u64 sharedMetadataBytes = 0;
+    u64 instanceTableBytes = 0;
+    u64 payloadBytes = 0;
+    u64 vertexBytes = 0;
+    u64 retainedSourceBytes = 0;
+    u64 forwardDrawBytes = 0;
+    u64 retiringSourceBytes = 0;
+    u64 sourceStagingBytes = 0;
+    u64 hostSourceBytes = 0;
+    u32 forwardUploadLeases = 0;
+    u64 residencyArenaBytes = 0;
+    u64 residencyUsedBytes = 0;
+    u64 residencyPinnedBytes = 0;
+    u64 residencyStagingBytes = 0;
+};
+
+GeometryFrameBuffers ResolveGeometryResources(const framegraph::FrameGraph& fg, const GeometryFrameResources& res);
 
 class GPUCullingManager {
 public:
@@ -186,23 +363,29 @@ public:
     // Shutdown and release resources
     void Shutdown();
 
-    // Upload scene objects to GPU (call once per frame before culling)
-    // Extracts bounding sphere data from geometry batches
-    void UploadSceneObjects(fg::RenderContext* ctx, const GeometryCollector* geometry);
+    void PrepareSceneGeometry(const GeometryCollector* geometry);
+    void UploadSceneObjects(fg::RenderContext* ctx);
 
     void InvalidateStaticCullingData();
     void InvalidateShadersAndPipelines();
 
-    // Uploads the scene sets, builds the RT accel structs and culls the cluster entries;
-    // returns the imported cluster args buffer as the ordering token for the raster.
-    framegraph::VirtualResourceHandle SetupCullingPass(
+    GeometryFrameResources ImportGeometryResources(framegraph::FrameGraph& fg);
+
+    framegraph::VirtualResourceHandle SetupGeometryPreparePass(
+        framegraph::FrameGraph& fg,
+        const GeometryCollector* geometry,
+        GeometryFrameResources& resources
+    );
+
+    void SetupCullingPass(
         framegraph::FrameGraph& fg,
         const GeometryCollector* geometry,
         framegraph::VirtualResourceHandle prevHiZ,
         const Fmatrix& prevViewProj,
         u32 hizWidth,
         u32 hizHeight,
-        u32 hizMipLevels
+        u32 hizMipLevels,
+        GeometryFrameResources& resources
     );
 
     // Re-tests the entries phase one held back against this frame's Hi-Z and
@@ -212,7 +395,8 @@ public:
         framegraph::VirtualResourceHandle hizPyramid,
         u32 hizWidth,
         u32 hizHeight,
-        u32 hizMipLevels
+        u32 hizMipLevels,
+        GeometryFrameResources& resources
     );
 
     u32 GetStaticObjectCount() const { return m_staticObjectCount; }
@@ -221,37 +405,39 @@ public:
     // Check if culling is enabled and ready
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
-    // ───────────────────────────────────────────────────────
-    //  MEGA-BUFFER SYSTEM (GPU-Driven Rendering)
-    // ───────────────────────────────────────────────────────
-    // Unified vertex/index buffers for all geometry
-    // Enables true MultiDrawIndirect with single VB/IB binding
 
     // Begin level load - prepare to receive mesh data
     // estimatedVertices/Indices help pre-allocate, but will grow if needed
     void BeginLevelLoad(u32 estimatedVertices = 1000000, u32 estimatedIndices = 3000000);
 
-    // Register a mesh's geometry into mega-buffers
-    // Converts from X-Ray format to UnifiedVertex and stores in mega-buffer
-    // Returns allocation info with offsets for draw args
-    MeshAllocation RegisterMesh(
-        const void* vertices,
-        u32 vertexCount,
-        u32 vertexStride,
-        bindless::SourceVertexFormat format,
-        const u16* indices,
-        u32 indexCount
-    );
-
     // End level load - upload all data to GPU
     void EndLevelLoad();
+    void UnloadLevel();
+    void RetainForwardGeometry(const MeshAllocation& allocation);
 
     bool AreMegaBuffersReady() const { return m_megaBuffersReady; }
     bool IsMegaDataUploaded() const { return m_megaDataUploaded; }
 
-    // Get mega-buffers for rendering
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
+    nvrhi::IBuffer* GetRTVertexBuffer() const { return m_rtVertexBuffer.Get(); }
+    nvrhi::IBuffer* GetRTIndexBuffer() const { return m_rtIndexBuffer.Get(); }
+    u32 GetRTVertexCount() const { return m_rtVertexCount; }
+    u32 GetRTIndexCount() const { return m_rtIndexCount; }
+    static constexpr u32 RT_VERTEX_STRIDE = 32u;
+    u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterPageBuffer() const { return m_residency.GetPageTableBuffer(); }
+    nvrhi::IBuffer* GetClusterPayloadBuffer() const { return m_residency.GetPayloadArenaBuffer(); }
+    nvrhi::IBuffer* GetClusterVertexBuffer() const { return m_residency.GetVertexArenaBuffer(); }
+    nvrhi::IBuffer* GetClusterGroupBuffer() const { return m_residency.GetClusterGroupBuffer(); }
+    nvrhi::IBuffer* GetGroupResidencyBuffer() const { return m_residency.GetGroupBitsBuffer(); }
+    GeometryResidencyManager& GetResidency() { return m_residency; }
+    const GeometryResidencyManager& GetResidency() const { return m_residency; }
+    void BeginGeometryResidencyFrame();
+    void EndGeometryResidencyFrame();
+    void AddShadowGeometryDemand(const GeometryDemandView& view);
+    u32 GetGeometryCutRevision() const { return m_residency.CutRevision(); }
+    GeometryMemoryStats GetGeometryMemoryStats() const;
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }
     u32 GetTotalIndexCount() const { return m_totalIndexCount; }
 
@@ -288,23 +474,21 @@ public:
 
     bool IsDebugEnabled() const;
 
-    nvrhi::IBuffer* GetStaticInstanceBuffer() const { return m_staticInstanceBuffer.Get(); }
-    nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicInstanceBuffer.Get(); }
     u32 GetStaticResidualCount() const;
     u32 GetTerrainResidualCount() const;
 
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
-    nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
 
     u32 GetTransparentObjectCount() const { return m_transparentObjectCount; }
     u32 GetTransparentResidualCount() const { return m_transparentResidualCount; }
-    nvrhi::IBuffer* GetTransparentInstanceBuffer() const { return m_transparentInstanceBuffer.Get(); }
-    nvrhi::IBuffer* GetTransparentDrawArgsBuffer() const { return m_transparentDrawArgsBuffer.Get(); }
     const xr_vector<TransparentDrawRange>& GetTransparentRanges() const { return m_transparentRanges; }
     u32 GetSkinnedForwardCount() const { return m_skinnedForwardCount; }
     nvrhi::IBuffer* GetSkinnedForwardArgsBuffer() const { return m_skinnedForwardArgsBuffer.Get(); }
     nvrhi::IBuffer* GetSkinnedForwardInstanceBuffer() const { return m_skinnedForwardInstanceBuffer.Get(); }
     const xr_vector<TransparentDrawRange>& GetSkinnedForwardRanges() const { return m_skinnedForwardRanges; }
+    u32 GetSkinnedEntryCapacity() const { return m_skinnedEntryCapacity; }
+    u32 GetSkinnedHudEntryCapacity() const { return m_skinnedHudEntryCapacity; }
+    nvrhi::IBuffer* GetSkinnedChunkBuffer() const { return m_skinnedChunkBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
     //  CULLING STATS READBACK (for profiling overlay)
@@ -317,6 +501,12 @@ public:
         u32 clusterTerrainTrianglesDrawn = 0;
         u32 clusterCandidates = 0;
         u32 clusterRetestVisible = 0;
+        u32 clusterInstanceVisits = 0;
+        u32 clusterNodeVisits = 0;
+        u32 clusterLeafVisits = 0;
+        u32 clusterDeferredInstances = 0;
+        u32 clusterDeferredNodes = 0;
+        u32 clusterOverflow = 0;
     };
     const CullingStats& GetCullingStats() const { return m_cullingStats; }
 
@@ -330,16 +520,17 @@ public:
     // draw-args, record and material-ID arrays; each draw's startInstanceLocation
     // is its global slot so DRAWINDEX indexes the records directly.
 
-    void UploadSkinnedObjects(fg::RenderContext* ctx, const GeometryCollector* geometry,
+    void PrepareSkinnedGeometry(const GeometryCollector* geometry,
         const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr);
+
+    void UploadSkinnedObjects(fg::RenderContext* ctx, decals::OverlayManager* overlayMgr);
 
     // Returns the imported draw-args buffer handle (invalid if disabled) so the
     // consumers can declare a read dependency on the upload.
     framegraph::VirtualResourceHandle SetupSkinnedUploadPass(
         framegraph::FrameGraph& fg,
-        const GeometryCollector* geometry,
-        const xr_vector<GeometryBatch>* hudBatches,
-        decals::OverlayManager* overlayMgr
+        decals::OverlayManager* overlayMgr,
+        GeometryFrameResources& resources
     );
 
     u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
@@ -394,6 +585,7 @@ public:
     static constexpr u32 SKINNED_ENTRY_INDICES = 384;
     static constexpr u32 SKINNED_ENTRY_CAPACITY = 32768;
     static constexpr u32 SKINNED_HUD_ENTRY_CAPACITY = 4096;
+    static constexpr u32 kSkinnedEntryLimit = (1u << 25) - 1u;
 
     // ───────────────────────────────────────────────────────
     //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
@@ -414,13 +606,15 @@ public:
     // Process readback results from previous frame (call at frame start)
     void ProcessStatsReadback();
 
-    static constexpr u32 kDynamicClusterEntryCapacity = 16384;
-    u32 GetClusterCullEntryCount() const { return m_clusterSet.entryCount + m_clusterSet.dynamicEntryCount; }
-    u32 GetDynamicClusterEntryCount() const { return m_clusterSet.dynamicEntryCount; }
+    u32 GetClusterCullRefCount() const { return m_clusterSet.refCount + m_clusterSet.dynamicRefCount; }
+    u32 GetDynamicClusterRefCount() const { return m_clusterSet.dynamicRefCount; }
     u32 GetDynamicResidualCount() const { return m_clusterSet.dynamicResidualCount; }
-    u32 GetClusterEntryCapacity() const { return m_clusterSet.entryCount + kDynamicClusterEntryCapacity; }
-    nvrhi::IBuffer* GetDynamicPrevWorldBuffer() const { return m_dynamicPrevWorldBuffer.Get(); }
-    nvrhi::IBuffer* GetClusterEntryBuffer() const { return m_clusterSet.entryBuffer.Get(); }
+    u32 GetClusterRefCapacity() const { return m_clusterSet.refCapacity; }
+    nvrhi::IBuffer* GetClusterRefBuffer() const { return m_clusterSet.refBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterMetaBuffer() const { return m_clusterSet.metaBuffer.Get(); }
+    nvrhi::IBuffer* GetGeoInstanceBuffer() const { return m_clusterSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetAssetMemberBuffer() const { return m_clusterSet.memberBuffer.Get(); }
+    nvrhi::IBuffer* GetAssetNodeBuffer() const { return m_clusterSet.assetNodeBuffer.Get(); }
     nvrhi::IBuffer* GetShadowBvhNodeBuffer() const { return m_clusterSet.bvhNodeBuffer.Get(); }
     nvrhi::IBuffer* GetShadowBvhIndexBuffer() const { return m_clusterSet.bvhIndexBuffer.Get(); }
     u32 GetShadowBvhNodeCount() const { return m_clusterSet.bvhNodeCount; }
@@ -442,9 +636,10 @@ public:
     nvrhi::IBuffer* GetClusterRetestSwEntryBuffer() const { return m_clusterSet.swEntryBuffer2.Get(); }
     nvrhi::IBuffer* GetClusterRetestSwArgsBuffer() const { return m_clusterSwArgsBuffer2.Get(); }
     void SetClusterSwCull(float swCull, float swNearZ) { m_clusterSwCull = swCull; m_clusterSwNearZ = swNearZ; }
-    u32 GetClusterEntryCount() const { return m_clusterSet.entryCount; }
-    u32 GetClusterStaticEntryCount() const { return m_clusterSet.staticEntryCount; }
-    u32 GetClusterTerrainEntryCount() const { return m_clusterSet.terrainEntryCount; }
+    u32 GetClusterRefCount() const { return m_clusterSet.refCount; }
+    u32 GetClusterStaticRefCount() const { return m_clusterSet.staticRefCount; }
+    u32 GetClusterTerrainRefCount() const { return m_clusterSet.terrainRefCount; }
+    u32 GetGeoInstanceCount() const { return m_clusterSet.instanceCount + m_clusterSet.dynamicInstanceCount; }
     nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
     nvrhi::ITexture* GetDummyHiZ() const { return m_dummyHiZ.Get(); }
 
@@ -457,8 +652,6 @@ private:
     // Extract frustum planes from view-projection matrix
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
-    nvrhi::BufferHandle m_staticInstanceBuffer;
-    nvrhi::BufferHandle m_dynamicInstanceBuffer;
     nvrhi::BufferHandle m_transparentInstanceBuffer;
     nvrhi::BufferHandle m_transparentDrawArgsBuffer;
     u32 m_staticObjectCount = 0;
@@ -472,7 +665,11 @@ private:
     //  CLUSTER LOD CULLING SET
     // ───────────────────────────────────────────────────────
     struct ClusterCullBuffers {
-        nvrhi::BufferHandle entryBuffer;
+        nvrhi::BufferHandle metaBuffer;
+        nvrhi::BufferHandle memberBuffer;
+        nvrhi::BufferHandle assetNodeBuffer;
+        nvrhi::BufferHandle refBuffer;
+        nvrhi::BufferHandle instanceBuffer;
         nvrhi::BufferHandle countBuffer;
         nvrhi::BufferHandle visibleEntryBuffer;
         nvrhi::BufferHandle fadeBuffer;
@@ -485,6 +682,12 @@ private:
         nvrhi::BufferHandle terrainFadeBuffer2;
         nvrhi::BufferHandle swEntryBuffer;
         nvrhi::BufferHandle swEntryBuffer2;
+        nvrhi::BufferHandle nodeQueue[2];
+        nvrhi::BufferHandle deferredNodeBuffer;
+        nvrhi::BufferHandle deferredInstanceBuffer;
+        nvrhi::BufferHandle nodeSinkBuffer;
+        nvrhi::BufferHandle u32SinkBuffer;
+        nvrhi::BufferHandle leafQueueBuffer;
         nvrhi::BufferHandle bvhNodeBuffer;
         nvrhi::BufferHandle bvhIndexBuffer;
         u32 bvhNodeCount = 0;
@@ -494,69 +697,94 @@ private:
         u32 shadowCapacityAxis = 0;
         u32 shadowCapacity[3] = {};
         bool shadowCapacityValid = false;
-        u32 entryCount = 0;
-        u32 dynamicEntryCount = 0;
+        u32 refCount = 0;
+        u32 staticRefCount = 0;
+        u32 terrainRefCount = 0;
+        u32 dynamicRefCount = 0;
+        u32 instanceCount = 0;
+        u32 dynamicInstanceCount = 0;
+        u32 refCapacity = 0;
+        u32 instanceCapacity = 0;
+        u32 nodeRefCapacity = 0;
+        u32 staticNodeRefs = 0;
+        u32 dynamicNodeRefs = 0;
+        u32 traversalDepth = 0;
         u32 dynamicResidualCount = 0;
-        u32 staticEntryCount = 0;
-        u32 terrainEntryCount = 0;
         u32 residualStaticCount = 0;
         u32 residualTerrainCount = 0;
         bool uploaded = false;
     };
     ClusterCullBuffers m_clusterSet;
+    ClusterBvh m_shadowBvh;
     nvrhi::BufferHandle m_clusterArgsBuffer;
     nvrhi::BufferHandle m_clusterTerrainArgsBuffer;
     nvrhi::BufferHandle m_clusterArgsBuffer2;
     nvrhi::BufferHandle m_clusterTerrainArgsBuffer2;
     nvrhi::BufferHandle m_clusterSwArgsBuffer;
     nvrhi::BufferHandle m_clusterSwArgsBuffer2;
+    nvrhi::BufferHandle m_clusterRetestDispatchArgs;
+    nvrhi::BufferHandle m_clusterQueueArgsBuffer;
     float m_clusterSwCull = 0.0f;
     float m_clusterSwNearZ = 0.0f;
-    static constexpr u32 kClusterCountWords = 12;
+    static constexpr u32 kClusterCountWords = 20;
+    static constexpr u32 kClusterQueueArgsSlots = 4;
+    static constexpr u32 kClusterTraversalGroup = 64;
+    static constexpr u32 kMaxClusterTraversalDepth = 64;
     nvrhi::BufferHandle m_neutralFadeBuffer;
     bool m_neutralFadeZeroed = false;
-    xr_vector<GPUClusterEntry> m_clusterEntryData;
+    xr_vector<GPUGeoInstance> m_geoInstanceData;
+    xr_vector<u32> m_clusterRefData;
     xr_vector<ClusterMeshKey> m_staticBatchKeys;
-    xr_vector<GPUClusterEntry> m_dynamicEntryData;
-    struct DynamicClusterPlan {
-        const ClusterUnitRecord* record;
-        const Fmatrix* world;
-        u32 member;
-        u32 batchIndex;
-        u32 firstEntry;
-        u32 materialID;
-        u32 extraFlags;
-        float scale;
-        bool castsShadow;
-    };
-    xr_vector<DynamicClusterPlan> m_dynamicClusterPlans;
+    xr_vector<GPUGeoInstance> m_dynamicGeoInstanceData;
+    xr_vector<u32> m_dynamicRefData;
     xr_vector<ClusterMeshKey> m_dynamicBatchKeys;
-    xr_vector<std::pair<const void*, const void*>> m_dynamicIdentity;
-    xr_vector<Fmatrix> m_dynamicPrevWorldData;
-    nvrhi::BufferHandle m_dynamicPrevWorldBuffer;
-    xr_map<std::pair<const void*, const void*>, Fmatrix> m_dynamicHistory[2];
+    xr_vector<GeometryInstanceKey> m_dynamicIdentity;
+    class DynamicHistoryEntry
+    {
+    public:
+        Fmatrix world;
+        u32 assetMember;
+    };
+    xr_map<GeometryInstanceKey, DynamicHistoryEntry> m_dynamicHistory[2];
     u32 m_dynamicHistoryIndex = 0;
     u32 m_dynamicHistoryFrame = 0;
-    void BuildDynamicClusterEntries(nvrhi::ICommandList* cmdList);
-    nvrhi::ComputePipelineHandle m_clusterCullPipeline;
-    nvrhi::BindingLayoutHandle m_clusterCullLayout;
+    u32 m_geometryHistoryFrame = 0;
+    bool m_staticHistoryValid = false;
+    void BuildDynamicGeometryInstances();
+    nvrhi::ComputePipelineHandle m_clusterInstancePipeline;
+    nvrhi::BindingLayoutHandle m_clusterInstanceLayout;
+    nvrhi::ComputePipelineHandle m_clusterNodePipeline;
+    nvrhi::BindingLayoutHandle m_clusterNodeLayout;
+    nvrhi::ComputePipelineHandle m_clusterLeafPipeline;
+    nvrhi::BindingLayoutHandle m_clusterLeafLayout;
+    nvrhi::ComputePipelineHandle m_clusterQueueArgsPipeline;
+    nvrhi::BindingLayoutHandle m_clusterQueueArgsLayout;
     nvrhi::ComputePipelineHandle m_clusterArgsPipeline;
     nvrhi::BindingLayoutHandle m_clusterArgsLayout;
-    nvrhi::ComputePipelineHandle m_clusterRetestPipeline;
-    nvrhi::BindingLayoutHandle m_clusterRetestLayout;
     fg::BufferHandle m_clusterCullParamsCB;
     fg::BufferHandle m_clusterArgsParamsCB;
+    fg::BufferHandle m_clusterQueueParamsCB;
 
-    void BuildClusterEntries();
-    void UploadClusterEntries(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice);
+    void BuildStaticGeometryInstances();
+    bool EnsureGeometryTableBuffers(nvrhi::IDevice* nvDevice);
+    void UploadGeometryTables(nvrhi::ICommandList* cmdList);
+    bool EnsureClusterStreamBuffers(nvrhi::IDevice* nvDevice);
     bool EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice);
     void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         nvrhi::ITexture* prevHiZ, const Fmatrix& prevViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
     void DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
         nvrhi::ITexture* hiz, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
     void DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase, u32 swCountOffset,
-        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs, nvrhi::IBuffer* swArgs);
-    void FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj, u32 entryCount,
+        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs, nvrhi::IBuffer* swArgs, nvrhi::IBuffer* retestDispatchArgs);
+    void DispatchQueueArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        u32 srcCountOffset, u32 resetCountOffset, u32 slot, u32 groupSize);
+    void DispatchClusterTraversal(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, const Fmatrix& hizViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels,
+        bool late);
+    void AccumulateGeometryDemand();
+    void DispatchClusterLeaves(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, nvrhi::IBuffer* queue, u32 argsSlot, bool late, bool allowDefer);
+    void FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj,
         bool useHiZ, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
 
     nvrhi::TextureHandle m_dummyHiZ;
@@ -565,7 +793,6 @@ private:
 
     u32 m_terrainObjectCount = 0;
     u32 m_maxTerrainObjects = 0;
-    nvrhi::BufferHandle m_terrainInstanceBuffer;
 
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
@@ -610,11 +837,16 @@ private:
 
     // Transparent-specific CPU data
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
+    xr_vector<IndirectDrawArgs> m_transparentNativeArgs;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;
     xr_vector<u32> m_transparentKeys;
     xr_vector<TransparentDrawRange> m_transparentRanges;
     TransparentDrawScratch m_transparentDrawScratch;
+    nvrhi::BufferHandle m_forwardDrawIndexBuffer;
+    u32 m_forwardDrawIndexCapacity = 0;
+    xr_vector<u32> m_forwardDrawIndices;
+    void EnsureForwardBuffers(nvrhi::IDevice* device);
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH UPLOAD
@@ -632,7 +864,7 @@ private:
     u32 m_skinnedEntryCapacity = 0;
     u32 m_skinnedEntryCount = 0;
     u32 m_skinnedVisibleEntryCount = 0;
-    static constexpr u32 SKINNED_FORWARD_CAPACITY = 2048;
+    u32 m_skinnedForwardCapacity = 0;
     xr_vector<IndirectDrawArgs> m_skinnedForwardArgsData;
     xr_vector<GPUInstanceData> m_skinnedForwardInstanceData;
     xr_vector<u32> m_skinnedForwardKeys;
@@ -644,7 +876,18 @@ private:
     void EnsureSkinnedForwardBuffers(nvrhi::IDevice* nvDevice);
     xr_vector<u32> m_skinnedHudEntryData;
     nvrhi::BufferHandle m_skinnedHudEntryBuffer;
+    u32 m_skinnedHudEntryCapacity = 0;
     u32 m_skinnedHudEntryCount = 0;
+    bool m_skinnedPreVBRecreated = false;
+    bool m_skinnedPrepared = false;
+    u32 m_skinnedPreparedVertexCount = 0;
+    class SkinnedUploadPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle entries;
+        GPUCullingManager* manager;
+        decals::OverlayManager* overlayMgr;
+    };
     Fvector4 m_skinnedHudBounds = {};
     u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
     u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
@@ -653,15 +896,23 @@ private:
     nvrhi::BufferHandle m_skinnedPreVB[2];
     u32 m_skinnedPreVBCapacity = 0;
     u32 m_skinnedPreVBIndex = 0;
-    struct SkinnedHistoryEntry {
-        const void* visual;
+    class SkinnedHistoryEntry
+    {
+    public:
+        u64 visual;
+        u64 renderable;
         u32 firstVertex;
         u32 slot;
+
+        bool SameIdentity(const SkinnedHistoryEntry& o) const;
+        bool operator<(const SkinnedHistoryEntry& o) const;
     };
     xr_vector<SkinnedHistoryEntry> m_skinnedHistory[2];
     u32 m_skinnedHistoryIndex = 0;
     u32 m_skinnedHistoryFrame = 0;
     bool EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 vertexTotal);
+    void EnsureSkinnedChunkBuffer(nvrhi::IDevice* nvDevice, u32 chunkTotal);
+    void EnsureSkinnedEntryBuffers(nvrhi::IDevice* nvDevice, u32 entryTotal, u32 hudEntryTotal);
     nvrhi::ComputePipelineHandle m_preskinPipeline;
     nvrhi::BindingLayoutHandle m_preskinLayout;
     struct PreskinBindingSet {
@@ -685,12 +936,11 @@ private:
     xr_vector<Fmatrix> m_boneStagingBuffer;
     u32 m_currentBoneOffset = 0;
     bool m_boneBufferInitialized = false;
-    bool m_boneBatching = false;
     u32 m_boneBatchStart = 0;
 
     void CreateSkinnedBuffers(fg::RenderDevice* device);
     void EnsureSkinnedCapacity(u32 count);
-    void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
+    u32 PrepareSkeletonPalette(CKinematics* skeleton);
     void FlushBoneBatch(nvrhi::ICommandList* cmdList);
 
     // ───────────────────────────────────────────────────────
@@ -702,12 +952,51 @@ private:
     // CPU-side staging data (during level load)
     xr_vector<bindless::UnifiedVertex> m_megaVertices;
     xr_vector<u32> m_megaIndices;
+    xr_vector<ForwardVertex> m_forwardVertices;
+    xr_vector<u32> m_forwardIndices;
+    xr_map<ClusterMeshKey, MeshAllocation> m_forwardAllocations;
+    u32 m_forwardVertexBase = 0;
+    u32 m_forwardIndexBase = 0;
+    void AppendForwardGeometry(const MeshAllocation& allocation, const ClusterSourceView& source);
+    class ForwardUpload
+    {
+    public:
+        u64 lease = 0;
+        nvrhi::BufferHandle vertices;
+        nvrhi::BufferHandle indices;
+        nvrhi::BufferHandle drawIndices;
+        nvrhi::BufferHandle copyVertices;
+        nvrhi::BufferHandle copyIndices;
+        xr_vector<ForwardVertex> vertexStaging;
+        xr_vector<u32> indexStaging;
+        xr_vector<u32> drawIndexStaging;
+    };
+    xr_vector<ForwardUpload> m_forwardUploads;
+    void RetireForwardUploads(bool discard);
+    // Exact float normals for sources that author a normal without a tangent
+    // frame, kept in lockstep with m_megaVertices while cooking needs them.
+    xr_vector<Fvector3> m_megaSourceNormals;
+    bool m_megaSourceNormalsActive = false;
 
     // Tracking
     u32 m_totalVertexCount = 0;
     u32 m_totalIndexCount = 0;
     u32 m_maxMegaVertices = 0;
     u32 m_maxMegaIndices = 0;
+    u32 m_megaVertexCapacity = 0;
+    u32 m_megaIndexCapacity = 0;
+    xr_vector<bindless::UnifiedVertex> m_runtimeVertices;
+    xr_vector<Fvector3> m_runtimeSourceNormals;
+    xr_vector<u32> m_runtimeIndices;
+    nvrhi::BufferHandle m_megaCopySourceVB;
+    nvrhi::BufferHandle m_megaCopySourceIB;
+    u32 m_megaCopyVertexCount = 0;
+    u32 m_megaCopyIndexCount = 0;
+    bool m_geometryTablesDirty = false;
+    xr_map<GeometrySourceKey, MeshAllocation> m_runtimeSourceLookup;
+    bool EnsureMegaCapacity(u32 vertexTotal, u32 indexTotal);
+    void EnsureSourceNormalStorage(u32 vertexTotal);
+    Fvector3* ActivateSourceNormals(u32 firstVertex, u32 vertexCount);
     bool m_megaBuffersReady = false;
     bool m_megaDataUploaded = false;
     bool m_levelLoadInProgress = false;
@@ -724,7 +1013,7 @@ private:
     struct VBPoolInfo {
         u32 megaBufferVertexOffset;  // Start offset in mega-VB
         u32 vertexCount;              // Total vertices in pool
-        bindless::SourceVertexFormat format;
+        bindless::SourceVertexLayout layout;
     };
 
     struct IBPoolInfo {
@@ -768,26 +1057,72 @@ public:
         bool alternative = false
     );
 
-    // Get mesh allocation from VB/IB pool + offsets
-    // Called from FVisual::Load() to get mega-buffer offsets
+    MeshAllocation RegisterRuntimeGeometry(
+        const GeometrySourceKey& source,
+        const void* vertices,
+        u32 vertexStride,
+        const VertexElement* decl,
+        const u16* indices
+    );
+
+    const MeshAllocation* FindRuntimeGeometry(const GeometrySourceKey& source) const;
+
     MeshAllocation GetMeshAllocation(
         u32 vbID, u32 vBase, u32 vCount,
         u32 ibID, u32 iBase, u32 iCount,
         bool alternative = false
     ) const;
 
-    // Bake the cluster LOD DAG over CPU-resident mega arrays and append
-    // cluster index data to the mega-IB. Must run between the last
-    // RegisterVBPool/RegisterIBPool call and EndLevelLoad.
     void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges,
         const char* cachePath, u64 geomStamp);
     ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
+private:
+    class GeometryPreparePassData
+    {
+    public:
+        framegraph::VirtualResourceHandle instances;
+        framegraph::VirtualResourceHandle clusterRefs;
+        framegraph::VirtualResourceHandle megaVertices;
+        framegraph::VirtualResourceHandle megaIndices;
+        GPUCullingManager* manager;
+    };
 
-    // Detect vertex format from vertex declaration
-    static bindless::SourceVertexFormat DetectFormatFromDecl(
-        const VertexElement* decl,
-        u32 stride
-    );
+    class GPUCullPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle prevHiZ;
+        GPUCullingManager* manager;
+        Fmatrix prevViewProj;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    class ClusterRetestPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle hiz;
+        framegraph::VirtualResourceHandle args;
+        GPUCullingManager* manager;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    GeometryResidencyManager m_residency;
+    nvrhi::BufferHandle m_rtVertexBuffer;
+    nvrhi::BufferHandle m_rtIndexBuffer;
+    xr_vector<u8> m_rtVertexStaging;
+    xr_vector<u32> m_rtIndexStaging;
+    u32 m_rtVertexCount = 0;
+    u32 m_rtIndexCount = 0;
+    bool m_rtSourceUploaded = false;
+    u64 m_rtSourceLease = 0;
+    void RetireRTSourceUpload(bool discard);
+    void CaptureRTSource();
+    void UploadRTSource(nvrhi::ICommandList* cmdList);
+    string_path m_pageStorePath = {};
 };
+
 
 } // namespace xray::render::fg

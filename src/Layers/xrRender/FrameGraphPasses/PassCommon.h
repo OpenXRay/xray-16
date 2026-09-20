@@ -53,10 +53,20 @@ inline void QueryBindingLayoutFromPipeline(
         outLayout = desc.bindingLayouts[0];
 }
 
-nvrhi::BufferHandle GetOrCreateDrawIndexBuffer(const char* passName, nvrhi::IDevice* device);
 
 LightingConstants FillLightingConstants();
 
 u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
+
+enum class ShadowPublication
+{
+    VSM,
+    Local
+};
+
+void RecordGeometryShadowDraw(nvrhi::ICommandList* cmd, nvrhi::IDevice* device,
+    nvrhi::IBuffer* dirtyList, nvrhi::IBuffer* drawArgs, nvrhi::IBuffer* geometryDirty, u32 capacity,
+    ShadowPublication publication, nvrhi::IBuffer* cacheState, nvrhi::IBuffer* pageList,
+    nvrhi::ComputePipelineHandle& pipeline);
 
 } // namespace xray::render::fg::passes

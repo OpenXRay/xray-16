@@ -6,13 +6,9 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
-#include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
-#include "Layers/xrRender/Bindless/MaterialBuffer.h"
-#include "Layers/xrRender/Bindless/VariantBuffer.h"
-#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 
 namespace xray::render::fg::passes {
@@ -32,7 +28,6 @@ struct MaterialResolvePassData {
     VirtualResourceHandle visDepth;
     VirtualResourceHandle skinnedDrawArgs;
     fg::RenderDevice* device = nullptr;
-    MaterialCache* materialCache = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
     nvrhi::IBuffer* splatBuffer = nullptr;
     MaterialResolvePassState* state = nullptr;
@@ -115,7 +110,6 @@ MaterialResolveOutput setupMaterialResolvePass(
     VirtualResourceHandle material,
     VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
-    MaterialCache* materialCache,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
     const Fmatrix& prevView,
@@ -144,10 +138,9 @@ MaterialResolveOutput setupMaterialResolvePass(
 
     auto& passData = fg.addCallbackPass<MaterialResolvePassData>(
         "Material Resolve",
-        [&, visId, depth, color, normal, baseColor, material, skinnedDrawArgs, config, materialCache, gpuCulling, splatBuffer, prevView, prevProj, motionValid, entryLimit, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
+        [&, visId, depth, color, normal, baseColor, material, skinnedDrawArgs, config, gpuCulling, splatBuffer, prevView, prevProj, motionValid, entryLimit, width, height, state, motionHandle, visDepthHandle](FrameGraph& builder, PassHandle passHandle, MaterialResolvePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
-            data.materialCache = materialCache;
             data.gpuCulling = gpuCulling;
             data.splatBuffer = splatBuffer;
             data.state = state;
@@ -160,8 +153,24 @@ MaterialResolveOutput setupMaterialResolvePass(
             data.height = height;
             data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
+            if (config.geometry.valid) {
+                passBuilder.read(config.geometry.clusterRefs, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterMeta, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.instances, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterPayload, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterVertices, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterPages, ResourceState::ShaderResource);
+            }
             if (skinnedDrawArgs.is_valid())
                 data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
+            for (const auto handle : { config.geometry.skinnedEntries, config.geometry.deformedVertices,
+                config.geometry.previousDeformedVertices, config.geometry.skinnedIndices,
+                config.geometry.skinnedRecords, config.geometry.boneMatrices, config.geometry.paintSplats,
+                config.geometry.materials, config.geometry.terrainMaterials, config.geometry.variants })
+            {
+                if (handle.is_valid())
+                    passBuilder.read(handle, ResourceState::ShaderResource);
+            }
             data.color = passBuilder.readWrite(color, ResourceState::UnorderedAccess);
             data.normal = passBuilder.readWrite(normal, ResourceState::UnorderedAccess);
             data.baseColor = passBuilder.readWrite(baseColor, ResourceState::UnorderedAccess);
@@ -190,18 +199,12 @@ MaterialResolveOutput setupMaterialResolvePass(
             cmdList->clearTextureFloat(materialRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
             const auto& config = data.config;
-            if (!config.IsValid() || !config.UseMegaBuffers())
+            if (!config.geometry.valid || !config.UseCompactGeometry())
                 return;
 
-            if (data.materialCache) {
-                data.materialCache->FinalizePendingMaterials(ctx);
-                data.materialCache->FinalizePendingTerrainMaterials(ctx);
-            }
-            auto& matBuffer = bindless::MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
-            auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
-            terrainMatBuffer.Upload(ctx);
-            if (!matBuffer.GetBuffer() || !terrainMatBuffer.GetBuffer())
+            auto* matBuffer = fg.GetPhysicalBuffer(config.geometry.materials);
+            auto* terrainMatBuffer = fg.GetPhysicalBuffer(config.geometry.terrainMaterials);
+            if (!matBuffer || !terrainMatBuffer)
                 return;
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
@@ -211,18 +214,22 @@ MaterialResolveOutput setupMaterialResolvePass(
                 return;
 
             auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            nvrhi::IBuffer* terrainInstances = config.terrainInstanceBuffer ? config.terrainInstanceBuffer : config.instanceBuffer;
+            const ClusterDrawBuffers buffers = config.Resolve(fg, ClusterDrawUse::Geometry);
+            if (!buffers.clusterRefs || !buffers.clusterMeta || !buffers.instances
+                || !buffers.clusterPayload || !buffers.clusterVertices || !buffers.clusterPages)
+                return;
 
             GPUCullingManager* gpuCulling = data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr;
+            const auto& geometry = config.geometry;
             const bool skinned = gpuCulling && gpuCulling->GetSkinnedEntryCount() > 0
-                && gpuCulling->GetSkinnedEntryBuffer() && gpuCulling->GetSkinnedPreVertexBuffer()
-                && gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() && gpuCulling->GetSkinnedRecordsBuffer()
-                && gpuCulling->GetGlobalBoneBuffer();
+                && geometry.skinnedEntries.is_valid() && geometry.deformedVertices.is_valid()
+                && geometry.skinnedIndices.is_valid() && geometry.skinnedRecords.is_valid()
+                && geometry.boneMatrices.is_valid();
             auto paramsCB = cache.GetOrCreateVolatileCB("MaterialResolve", "MaterialResolveParams", sizeof(MaterialResolveParams), data.device, 16);
             MaterialResolveParams params = {};
             params.prevView = data.prevView;
             params.prevProj = data.prevProj;
-            params.skinnedEntryBase = skinned ? gpuCulling->GetClusterEntryCapacity() : 0xFFFFFFFFu;
+            params.skinnedEntryBase = skinned ? gpuCulling->GetClusterRefCapacity() : 0xFFFFFFFFu;
             params.motionValid = data.motionValid ? 1u : 0u;
             params.entryLimit = data.entryLimit;
             cmdList->writeBuffer(paramsCB, &params, sizeof(params));
@@ -230,23 +237,23 @@ MaterialResolveOutput setupMaterialResolvePass(
             BindingSetBuilder bsb(*refl, nvDevice, "MaterialResolve");
             bsb.ConstantBuffer("static_globals", staticGlobalsCB);
             bsb.ConstantBuffer("MaterialResolveParams", paramsCB);
-            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            bsb.BufferSRV("g_Variants", bindless::VariantBuffer::Instance().GetBuffer());
-            bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer.GetBuffer());
-            bsb.BufferSRV("g_InstanceData", config.instanceBuffer);
-            bsb.BufferSRV("g_TerrainInstanceData", terrainInstances);
-            bsb.BufferSRV("g_DynamicInstanceData", config.dynamicInstanceBuffer ? config.dynamicInstanceBuffer : config.instanceBuffer);
-            bsb.BufferSRV("g_DynamicPrevWorld", config.dynamicPrevWorldBuffer ? config.dynamicPrevWorldBuffer : config.megaVertexBuffer);
-            bsb.BufferSRV("g_Entries", config.entryBuffer);
-            bsb.BufferSRV("g_MegaVB", config.megaVertexBuffer);
-            bsb.BufferSRV("g_MegaIB", config.megaIndexBuffer);
-            bsb.BufferSRV("g_SkinnedEntries", skinned ? gpuCulling->GetSkinnedEntryBuffer() : config.entryBuffer);
-            bsb.BufferSRV("g_SkinnedVB", skinned ? gpuCulling->GetSkinnedPreVertexBuffer() : config.megaVertexBuffer);
-            bsb.BufferSRV("g_SkinnedIB", skinned ? gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer() : config.megaIndexBuffer);
-            bsb.BufferSRV("g_SkinnedPrevVB", skinned ? gpuCulling->GetSkinnedPrevVertexBuffer() : config.megaVertexBuffer);
-            bsb.BufferSRV("g_SkinnedRecords", skinned ? gpuCulling->GetSkinnedRecordsBuffer() : config.entryBuffer);
-            bsb.BufferSRV("g_BoneMatrices", skinned ? gpuCulling->GetGlobalBoneBuffer() : config.megaVertexBuffer);
-            bsb.BufferSRV("g_PaintSplats", skinned && data.splatBuffer ? data.splatBuffer : config.megaVertexBuffer);
+            bsb.BufferSRV("g_Materials", matBuffer);
+            bsb.BufferSRV("g_Variants", fg.GetPhysicalBuffer(geometry.variants));
+            bsb.BufferSRV("g_TerrainMaterials", terrainMatBuffer);
+            bsb.BufferSRV("g_ClusterRefs", buffers.clusterRefs);
+            bsb.BufferSRV("g_ClusterMeta", buffers.clusterMeta);
+            bsb.BufferSRV("g_GeoInstances", buffers.instances);
+            bsb.BufferSRV("g_ClusterPayload", buffers.clusterPayload);
+            bsb.BufferSRV("g_ClusterVertices", buffers.clusterVertices);
+            bsb.BufferSRV("g_ClusterPages", buffers.clusterPages);
+            bsb.BufferSRV("g_SkinnedEntries", skinned ? fg.GetPhysicalBuffer(geometry.skinnedEntries) : buffers.clusterMeta);
+            bsb.BufferSRV("g_SkinnedVB", skinned ? fg.GetPhysicalBuffer(geometry.deformedVertices) : buffers.clusterVertices);
+            bsb.BufferSRV("g_SkinnedIB", skinned ? fg.GetPhysicalBuffer(geometry.skinnedIndices) : buffers.clusterPayload);
+            bsb.BufferSRV("g_SkinnedPrevVB", skinned ? fg.GetPhysicalBuffer(geometry.previousDeformedVertices) : buffers.clusterVertices);
+            bsb.BufferSRV("g_SkinnedRecords", skinned ? fg.GetPhysicalBuffer(geometry.skinnedRecords) : buffers.clusterMeta);
+            bsb.BufferSRV("g_BoneMatrices", skinned ? fg.GetPhysicalBuffer(geometry.boneMatrices) : buffers.clusterVertices);
+            bsb.BufferSRV("g_PaintSplats", skinned && geometry.paintSplats.is_valid()
+                ? fg.GetPhysicalBuffer(geometry.paintSplats) : buffers.clusterVertices);
             bsb.Texture("g_VisID", visRT);
             bsb.Texture("g_Depth", depthRT);
             bsb.TextureUAV("g_OutNormal", normalRT);

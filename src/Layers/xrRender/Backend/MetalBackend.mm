@@ -3,6 +3,7 @@
 #include "xrCore/xrCore.h"
 #include "MetalBackend.h"
 #include "SubmitTokenRing.h"
+#include "BackendCompletion.h"
 #undef BOOL
 
 #include <nvrhi/metal3.h>
@@ -23,6 +24,7 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     struct Submitted {
         id<MTLCommandBuffer> commands = nil;
         nvrhi::CommandQueue queue = nvrhi::CommandQueue::Graphics;
+        u64 ticket = 0;
     };
     struct Frame {
         Pool graphics;
@@ -56,8 +58,12 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     xr_vector<u32> freeBindlessIndices;
     xr_map<nvrhi::ITexture*, u32> bindlessTextures;
     u32 nextBindlessIndex = 0;
+    xr_vector<nvrhi::TextureHandle> bindlessResources;
+    xr_vector<u32> bindlessReferences;
+    std::mutex bindlessMutex;
     Capabilities capabilities;
     std::mutex queueMutex;
+    xray::render::backend::SubmissionTracker completion;
     u32 currentFrame = 0;
     u32 width = 0;
     u32 height = 0;
@@ -88,14 +94,17 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
         for (u32 i = 0; i < waits.count; ++i)
             tokens.WaitFor(device, queueType, waits.tokens[i]);
         id<MTLCommandBuffer> native = nativeCommands(commands);
+        const u64 ticket = completion.RegisterTicket(queueType);
         const u64 instance = device->executeCommandList(commands, queueType);
         if (!instance) {
+            completion.CancelTicket(ticket);
             fail("NVRHI rejected a Metal command list submission.");
             return token;
         }
         tokens.Resolve(token, queueType, instance);
+        completion.ArmTicket(ticket);
         if (native)
-            frames[currentFrame].submitted.push_back({native, queueType});
+            frames[currentFrame].submitted.push_back({native, queueType, ticket});
         return token;
     }
 
@@ -150,6 +159,14 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
         if (wait)
             [commands waitUntilCompleted];
         if (commands.status == MTLCommandBufferStatusError) {
+            for (const auto& frame : frames)
+            {
+                for (const auto& submitted : frame.submitted)
+                {
+                    if (submitted.commands == commands)
+                        completion.CancelTicket(submitted.ticket);
+                }
+            }
             const char* error = commands.error.localizedDescription.UTF8String;
             fail(error ? error : "Native Metal command buffer failed without an error description.");
             return false;
@@ -298,6 +315,7 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             Shutdown();
             return false;
         }
+        impl.completion.Initialize(impl.device);
         nvrhi::CommandListParameters params;
         params.enableImmediateExecution = false;
         for (Impl::Frame& frame : impl.frames) {
@@ -354,6 +372,7 @@ void MetalBackend::Shutdown() {
             impl.inFrame = false;
         }
         WaitForIdle();
+        impl.completion.Shutdown();
         for (Impl::Frame& frame : impl.frames) {
             frame.graphics = {};
             frame.compute = {};
@@ -371,6 +390,8 @@ void MetalBackend::Shutdown() {
         impl.bindlessTextures.clear();
         impl.freeBindlessIndices.clear();
         impl.nextBindlessIndex = 0;
+        impl.bindlessResources.clear();
+        impl.bindlessReferences.clear();
         impl.device = nullptr;
         impl.nativeNvrhiDevice = nullptr;
         impl.layer.device = nil;
@@ -426,6 +447,7 @@ void MetalBackend::BeginFrame() {
     ZoneScopedN("Metal::BeginFrame");
     @autoreleasepool {
         Impl& impl = *m_impl;
+        impl.completion.DiscardOpenLeases();
         if (!impl.initialized || impl.state.load() == DeviceState::Lost)
             return;
         if (impl.inFrame || impl.readyToPresent) {
@@ -522,7 +544,10 @@ void MetalBackend::EndFrame() {
     @autoreleasepool {
         Impl& impl = *m_impl;
         if (!impl.inFrame)
+        {
+            impl.completion.DiscardOpenLeases();
             return;
+        }
         while (impl.debugDepth)
             EndDebugEvent();
         impl.currentGraphics->close();
@@ -534,6 +559,10 @@ void MetalBackend::EndFrame() {
             if (impl.state.load() != DeviceState::Lost)
                 impl.readyToPresent = true;
         }
+        if (impl.state.load() == DeviceState::Lost)
+            impl.completion.DiscardOpenLeases();
+        else
+            impl.completion.CloseOpenLeases();
     }
     m_impl->drainFramePool();
 }
@@ -602,10 +631,44 @@ void MetalBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
         if (!impl.initialized || impl.state.load() == DeviceState::Lost || !count)
             return;
         std::lock_guard<std::mutex> lock(impl.queueMutex);
-        if (!impl.device->executeCommandLists(commandLists, count))
+        const u64 ticket = impl.completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        auto& submitted = impl.frames[impl.currentFrame].submitted;
+        const size_t first = submitted.size();
+        for (u32 i = 0; i < count; ++i)
+        {
+            if (auto native = impl.nativeCommands(commandLists[i]))
+                submitted.push_back({native, nvrhi::CommandQueue::Graphics, ticket});
+        }
+        if (!impl.device->executeCommandLists(commandLists, count)) {
+            impl.completion.CancelTicket(ticket);
+            submitted.resize(first);
             impl.fail("NVRHI rejected the ordered Metal command list batch.");
+            return;
+        }
+        impl.completion.ArmTicket(ticket);
     }
 }
+
+u64 MetalBackend::OpenSubmissionLease() { return m_impl->completion.OpenLease(); }
+void MetalBackend::CloseSubmissionLease(u64 lease) { m_impl->completion.CloseLease(lease); }
+
+IRenderBackend::SubmissionLeaseState MetalBackend::PollSubmissionLease(u64 lease)
+{
+    Impl& impl = *m_impl;
+    const auto state = impl.completion.PollLease(lease);
+    if (state != SubmissionLeaseState::Complete)
+        return state;
+    std::lock_guard<std::mutex> lock(impl.queueMutex);
+    for (const auto& frame : impl.frames)
+    {
+        for (const auto& submitted : frame.submitted)
+            impl.checkCompletion(submitted.commands, false);
+    }
+    return impl.completion.PollLease(lease);
+}
+
+void MetalBackend::ReleaseSubmissionLease(u64 lease) { m_impl->completion.ReleaseLease(lease); }
+u32 MetalBackend::GetPendingSubmissionCount() const { return m_impl->completion.PendingTicketCount(); }
 
 bool MetalBackend::HasAsyncCompute() const { return m_impl->asyncCompute && m_impl->computeQueue != nil; }
 u32 MetalBackend::LastGraphicsToken() const { return m_impl->tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
@@ -683,10 +746,13 @@ void MetalBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, si
             impl.fail("The Metal upload command list has no native command buffer.");
             return;
         }
+        const u64 ticket = impl.completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
         if (!impl.device->executeCommandList(impl.uploads)) {
+            impl.completion.CancelTicket(ticket);
             impl.fail("NVRHI rejected the Metal buffer upload.");
             return;
         }
+        impl.completion.ArmTicket(ticket);
         impl.uploadCompletion = commands;
     }
 }
@@ -716,45 +782,85 @@ void MetalBackend::UpdateCapabilities() {
     caps.useCombinedSamplers = false;
 }
 
-u32 MetalBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
-    @autoreleasepool {
+u32 MetalBackend::RegisterBindlessTexture(nvrhi::ITexture* texture)
+{
+    @autoreleasepool
+    {
         Impl& impl = *m_impl;
-        std::lock_guard<std::mutex> lock(impl.queueMutex);
+        std::lock_guard<std::mutex> lock(impl.bindlessMutex);
         if (!impl.bindlessTable || !texture)
             return UINT32_MAX;
         const auto found = impl.bindlessTextures.find(texture);
         if (found != impl.bindlessTextures.end())
+        {
+            u32& references = impl.bindlessReferences[found->second];
+            R_ASSERT(references != 0 && references != UINT32_MAX);
+            ++references;
             return found->second;
+        }
         u32 slot;
-        if (!impl.freeBindlessIndices.empty()) {
+        if (!impl.freeBindlessIndices.empty())
+        {
             slot = impl.freeBindlessIndices.back();
             impl.freeBindlessIndices.pop_back();
-        } else {
+        }
+        else
+        {
             if (impl.nextBindlessIndex == Impl::MaxBindlessTextures)
                 return UINT32_MAX;
             slot = impl.nextBindlessIndex++;
+            impl.bindlessResources.resize(impl.nextBindlessIndex);
+            impl.bindlessReferences.resize(impl.nextBindlessIndex);
         }
-        if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(slot, texture))) {
+        if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(slot, texture)))
+        {
             impl.freeBindlessIndices.push_back(slot);
             return UINT32_MAX;
         }
+        impl.bindlessResources[slot] = texture;
+        impl.bindlessReferences[slot] = 1;
         impl.bindlessTextures.emplace(texture, slot);
         return slot;
     }
 }
 
-void MetalBackend::UnregisterBindlessTexture(u32 index) {
-    @autoreleasepool {
+void MetalBackend::UnregisterBindlessTexture(u32 index)
+{
+    ReleaseBindlessTextures(&index, 1);
+}
+
+bool MetalBackend::RetainBindlessTextures(const u32* indices, u32 count)
+{
+    Impl& impl = *m_impl;
+    std::lock_guard<std::mutex> lock(impl.bindlessMutex);
+    for (u32 i = 0; i < count; ++i)
+    {
+        if (indices[i] >= impl.bindlessReferences.size() || impl.bindlessReferences[indices[i]] == 0)
+            return false;
+        R_ASSERT(impl.bindlessReferences[indices[i]] <= UINT32_MAX - count);
+    }
+    for (u32 i = 0; i < count; ++i)
+        ++impl.bindlessReferences[indices[i]];
+    return true;
+}
+
+void MetalBackend::ReleaseBindlessTextures(const u32* indices, u32 count)
+{
+    @autoreleasepool
+    {
         Impl& impl = *m_impl;
-        std::lock_guard<std::mutex> lock(impl.queueMutex);
-        for (auto it = impl.bindlessTextures.begin(); it != impl.bindlessTextures.end(); ++it) {
-            if (it->second != index)
+        std::lock_guard<std::mutex> lock(impl.bindlessMutex);
+        for (u32 i = 0; i < count; ++i)
+        {
+            const u32 index = indices[i];
+            R_ASSERT(index < impl.bindlessReferences.size() && impl.bindlessReferences[index] != 0);
+            if (--impl.bindlessReferences[index] != 0)
                 continue;
-            if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(index, nullptr)))
-                return;
-            impl.bindlessTextures.erase(it);
+            R_ASSERT2(impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::None(index)),
+                "[MetalBackend] bindless texture retirement failed");
+            impl.bindlessTextures.erase(impl.bindlessResources[index].Get());
+            impl.bindlessResources[index] = nullptr;
             impl.freeBindlessIndices.push_back(index);
-            return;
         }
     }
 }

@@ -85,10 +85,14 @@ public:
     u32 bindless_material_id{UINT32_MAX};
     u32 bindless_material_epoch{0};
 
+    u64 lifetimeID{0};
+
+    static u64 AllocateLifetimeID();
+
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Release(); // Shared memory release
     virtual void Copy(dxRender_Visual* from);
-    virtual void Spawn(){};
+    virtual void Spawn();
     virtual void Depart(){};
 
     //	virtual	CKinematics*		dcast_PKinematics			()				{ return 0;	}

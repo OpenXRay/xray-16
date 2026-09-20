@@ -6,6 +6,7 @@ u32 GetFVFVertexSize(u32 FVF);
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
 bool CreateDeclFromFVF(u32 fvfCode, xr_vector<VertexElement>& decl);
+u64 GetStagingHostMemoryUsage();
 
 inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 {
@@ -52,6 +53,7 @@ public:
     void Unmap(bool doFlush = false);
     VertexBufferHandle GetBufferHandle() const;
     void DiscardHostBuffer();
+    void DiscardDeviceBuffer();
 
     void AddRef()
     {
@@ -78,7 +80,7 @@ public:
     }
     bool operator==(const VertexStagingBuffer& other) const
     {
-        return other.m_DeviceBuffer == m_DeviceBuffer;
+        return other.source_token == source_token;
     }
 
     // Conversion to bool for validity checks
@@ -86,6 +88,8 @@ public:
 
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
+
+    u64 source_token{0};
 
     u32 skinned_pool_format{UINT32_MAX};
     u32 skinned_pool_generation{};
@@ -105,6 +109,8 @@ private:
 class IndexStagingBuffer
 {
 public:
+    u64 source_token{0};
+
     ~IndexStagingBuffer();
 
     void Create(size_t size, bool allowReadBack = false, bool managed = true);
@@ -113,6 +119,7 @@ public:
     void Unmap(bool doFlush = false);
     IndexBufferHandle GetBufferHandle() const;
     void DiscardHostBuffer();
+    void DiscardDeviceBuffer();
 
     void AddRef()
     {
@@ -139,7 +146,7 @@ public:
     }
     bool operator==(const IndexStagingBuffer& other) const
     {
-        return other.m_DeviceBuffer == m_DeviceBuffer;
+        return other.source_token == source_token;
     }
 
     // Conversion to bool for validity checks

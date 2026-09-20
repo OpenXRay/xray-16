@@ -11,7 +11,8 @@ struct LocalViewQuery
     float  errK;
     uint   slot;
     uint   includeAT;
-    uint3  pad;
+    uint   residency;
+    uint2  pad;
 };
 
 float localBoxNear(float3 c, float3 h, float3 p) { return length(max(abs(p - c) - h, 0.0)); }
@@ -40,7 +41,9 @@ bool bvhNodeTest(ClusterBvhNode nd, LocalViewQuery q)
     // One threshold for the entire hierarchy gives a complete cut. Per-entry
     // AABB distances let both a near parent and its far child reject themselves.
     float errB = q.nearZ * q.texelPerMetre * q.errK;
-    return nd.minSelfError <= errB && nd.maxParentError > errB;
+    if (nd.maxParentError <= errB)
+        return false;
+    return q.residency != 0u || nd.minSelfError <= errB;
 }
 
 bool localEntryTouchesView(ClusterEntry e, LocalViewQuery q)
@@ -55,7 +58,7 @@ bool localEntryTouchesView(ClusterEntry e, LocalViewQuery q)
     return e.selfError <= errB && e.parentError > errB;
 }
 
-LocalViewQuery localQueryFromView(LocalShadowView v, uint slot, uint includeAT, float errK)
+LocalViewQuery localQueryFromView(LocalShadowView v, uint slot, uint includeAT, float errK, uint residency)
 {
     LocalViewQuery q;
     q.planes = v.planes;
@@ -66,6 +69,7 @@ LocalViewQuery localQueryFromView(LocalShadowView v, uint slot, uint includeAT, 
     q.errK = errK;
     q.slot = slot;
     q.includeAT = includeAT;
+    q.residency = residency;
     q.pad = 0u;
     return q;
 }

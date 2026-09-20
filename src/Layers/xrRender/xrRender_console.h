@@ -231,6 +231,11 @@ extern ECORE_API int   ps_r_cluster_cache;
 extern ECORE_API int   ps_r_cluster_debug;
 extern ECORE_API float ps_r_cluster_lod;
 extern ECORE_API float ps_r_cluster_fade;
+extern ECORE_API int   ps_r_geo_paging;
+extern ECORE_API int   ps_r_geo_page_budget;
+extern ECORE_API int   ps_r_geo_page_reads;
+extern ECORE_API int   ps_r_geo_page_upload;
+extern ECORE_API int   ps_r_geo_page_stats;
 extern ECORE_API float ps_r_ssa_px;
 
 extern ECORE_API int   ps_r_sun_shadow_debug;

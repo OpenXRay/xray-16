@@ -56,6 +56,12 @@ namespace xray::render::framegraph {
         Present,             // Presentable
         Common,              // Generic read state
         DepthStencilReadShaderResource,
+        AccelStructRead,
+        AccelStructWrite,
+        AccelStructBuildInput,
+        AccelStructBuildBlas,
+        VertexBuffer,
+        IndexBuffer,
     };
 
     // Convert to string for debugging
@@ -73,6 +79,12 @@ namespace xray::render::framegraph {
         case ResourceState::CopyDest: return "CopyDest";
         case ResourceState::Present: return "Present";
         case ResourceState::Common: return "Common";
+        case ResourceState::AccelStructRead: return "AccelStructRead";
+        case ResourceState::AccelStructWrite: return "AccelStructWrite";
+        case ResourceState::AccelStructBuildInput: return "AccelStructBuildInput";
+        case ResourceState::AccelStructBuildBlas: return "AccelStructBuildBlas";
+        case ResourceState::VertexBuffer: return "VertexBuffer";
+        case ResourceState::IndexBuffer: return "IndexBuffer";
         default: return "Unknown";
         }
     }

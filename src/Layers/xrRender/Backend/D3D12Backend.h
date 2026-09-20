@@ -4,6 +4,7 @@
 #pragma once
 
 #include "SubmitTokenRing.h"
+#include "BackendCompletion.h"
 #include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
@@ -46,6 +47,13 @@ public:
     u32 LastGraphicsToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
     u32 LastComputeToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Compute)]; }
 
+    bool SupportsSubmissionLeases() const override { return true; }
+    u64 OpenSubmissionLease() override { return m_completion.OpenLease(); }
+    void CloseSubmissionLease(u64 lease) override { m_completion.CloseLease(lease); }
+    SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_completion.PollLease(lease); }
+    void ReleaseSubmissionLease(u64 lease) override { m_completion.ReleaseLease(lease); }
+    u32 GetPendingSubmissionCount() const override { return m_completion.PendingTicketCount(); }
+
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
@@ -70,6 +78,8 @@ public:
     // ═══════ Bindless Resources (D3D12 feature) ═══════
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
+    bool RetainBindlessTextures(const u32* indices, u32 count) override;
+    void ReleaseBindlessTextures(const u32* indices, u32 count) override;
     nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindlessLayout.Get(); }
     nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindlessDescriptorTable.Get(); }
 
@@ -118,6 +128,9 @@ private:
     xr_vector<u32> m_freeBindlessIndices;
     xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
     u32 m_nextBindlessIndex = 0;
+    xr_vector<nvrhi::TextureHandle> m_bindlessTextureResources;
+    xr_vector<u32> m_bindlessTextureReferences;
+    std::mutex m_bindlessMutex;
 
     // State
     bool m_initialized = false;
@@ -133,6 +146,7 @@ private:
     TaskHandle m_gcTask;
     SubmitTokenRing m_tokens;
     SubmitWaitList m_graphicsWaits;
+    xray::render::backend::SubmissionTracker m_completion;
 
     u64 SubmitGraphics();
 };

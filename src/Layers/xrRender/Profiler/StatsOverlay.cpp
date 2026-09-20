@@ -564,7 +564,67 @@ void StatsOverlay::RenderGeometrySection()
             if (s.clusterTerrainEntries > 0)
                 ImGui::Text("Terrain: %u/%u drawn, %s tris", s.clusterTerrainVisible, s.clusterTerrainEntries, FormatNumber(s.clusterTerrainTrianglesDrawn));
             ImGui::Text("Occlusion: %u held by last frame's Hi-Z, %u recovered by the retest", s.clusterOcclusionCandidates, s.clusterOcclusionRecovered);
+            ImGui::Text("Hierarchy: %u instances, %u nodes, %u leaf refs visited", s.clusterInstanceVisits, s.clusterNodeVisits, s.clusterLeafVisits);
+            ImGui::Text("Deferred: %u instances, %u nodes; overflow %u", s.clusterDeferredInstances, s.clusterDeferredNodes, s.clusterOverflow);
             ImGui::Text("Undrawn residue: %u static / %u terrain / %u dynamic / %u transparent", s.residualStatic, s.residualTerrain, s.residualDynamic, s.residualTransparent);
+            ImGui::Unindent();
+        }
+
+        if (s.geometryResidencyArenaBytes || s.geometryRTSourceBytes || s.geometryForwardDrawBytes)
+        {
+            ImGui::Text("Geometry memory and paging:");
+            ImGui::Indent();
+            ImGui::Text("Geometry tables: %.2f MiB shared, %.2f MiB instances/references/BVH",
+                s.geometrySharedBytes / 1048576.0, s.geometryInstanceBytes / 1048576.0);
+            ImGui::Text("Compact allocation: %.2f MiB payload, %.2f MiB vertices, %u pages",
+                s.geometryPayloadBytes / 1048576.0, s.geometryVertexBytes / 1048576.0, s.geometryPages);
+            ImGui::Text("Retained forward: %.2f MiB geometry, %.2f MiB draw data",
+                s.geometryRetainedBytes / 1048576.0, s.geometryForwardDrawBytes / 1048576.0);
+            ImGui::Text("Exact RT: %.2f MiB source, %.2f MiB generation buffers (%u generations, %u leases)",
+                s.geometryRTSourceBytes / 1048576.0, s.geometryRTGenerationBytes / 1048576.0,
+                s.geometryRTGenerations, s.geometryRTLeases);
+            if (s.geometryRTAccelerationKnown)
+                ImGui::Text("RT acceleration structures: %.2f MiB", s.geometryRTAccelerationBytes / 1048576.0);
+            else
+                ImGui::Text("RT acceleration structures: %.2f MiB reported; native total unavailable",
+                    s.geometryRTAccelerationBytes / 1048576.0);
+            ImGui::Text("Retiring: %.2f MiB forward, %.2f MiB arenas; forward upload leases %u",
+                s.geometryRetiringSourceBytes / 1048576.0, s.geometryRetiringArenaBytes / 1048576.0,
+                s.geometryForwardUploadLeases);
+            ImGui::Text("CPU source storage: %.2f MiB cook/upload staging, %.2f MiB retained source hosts",
+                s.geometrySourceStagingBytes / 1048576.0, s.geometryHostSourceBytes / 1048576.0);
+            ImGui::Text("Cached sun views: %.2f MiB readback, %.2f MiB CPU snapshots",
+                s.geometryShadowSnapshotBytes / 1048576.0, s.geometryShadowHostBytes / 1048576.0);
+            ImGui::Text("Residency [%s]: %.2f / %.2f MiB arena, %.2f MiB pinned, %.2f MiB staging",
+                s.geometryStreaming ? "demand paged" : "fully resident",
+                s.geometryResidencyUsedBytes / 1048576.0, s.geometryResidencyArenaBytes / 1048576.0,
+                s.geometryResidencyPinnedBytes / 1048576.0, s.geometryResidencyStagingBytes / 1048576.0);
+            ImGui::Text("Level-load policy: paging %s, fine budget %u MiB%s",
+                s.geometryPagingRequested ? "on" : "off", s.geometryPageBudgetMiB,
+                s.geometryPolicyPending ? " (changed controls require a level reload)" : "");
+            if (s.geometryPagingDetails)
+            {
+                ImGui::Text("Groups: %u resident (%u pinned), %u desired, %u activating, %u blocked, %u evicted",
+                    s.geometryResidentGroups, s.geometryPinnedGroups, s.geometryDesiredGroups,
+                    s.geometryActivatingGroups, s.geometryBlockedGroups, s.geometryEvictions);
+                ImGui::Text("Pages: %u resident (%u pinned), %u reading, %u uploading, %u retiring",
+                    s.geometryResidentPages, s.geometryPinnedPages, s.geometryReadingPages,
+                    s.geometryUploadingPages, s.geometryRetiringPages);
+                ImGui::Text("Streaming: %u uploads (%u KiB), %u reads, %u read failures, %u discarded uploads",
+                    s.geometryUploadsRecorded, s.geometryUploadKiB, s.geometryReadsIssued,
+                    s.geometryReadsFailed, s.geometryUploadsDiscarded);
+                ImGui::Text("Pressure: %u allocation deferrals, %u budget deferrals; snapshots %u live, %u failed, cut revision %u",
+                    s.geometryAllocationDeferrals, s.geometryBudgetDeferrals,
+                    s.geometryLiveSnapshots, s.geometryFailedSnapshots, s.geometryCutRevision);
+            }
+            else
+                ImGui::TextDisabled("r_geo_page_stats 1: detailed residency counters");
+            ImGui::Text("Vertex slots: %llu page / %llu unique / %llu cluster",
+                static_cast<unsigned long long>(s.geometryPageVertexSlots),
+                static_cast<unsigned long long>(s.geometryUniqueVertices),
+                static_cast<unsigned long long>(s.geometryClusterVertexReferences));
+            ImGui::Text("Cluster maxima: %u vertices, %u triangles; %u recluster splits",
+                s.geometryMaxClusterVertices, s.geometryMaxClusterTriangles, s.geometryReclusterSplits);
             ImGui::Unindent();
         }
 
@@ -633,16 +693,12 @@ void StatsOverlay::RenderGeometrySection()
         // ═══════════════════════════════════════════════════
         if (s.megaBufferVertices > 0)
         {
-            ImGui::Text("Mega-Buffer:");
+            ImGui::Text("Logical source layout:");
             ImGui::Indent();
 
             ImGui::Text("Vertices: %s", FormatNumber(s.megaBufferVertices));
             ImGui::Text("Indices:  %s", FormatNumber(s.megaBufferIndices));
 
-            // Estimate memory usage (UnifiedVertex = 48 bytes, index = 4 bytes)
-            float vertMB = (s.megaBufferVertices * 48) / (1024.0f * 1024.0f);
-            float idxMB = (s.megaBufferIndices * 4) / (1024.0f * 1024.0f);
-            ImGui::TextDisabled("~%.1f MB verts, ~%.1f MB idx", vertMB, idxMB);
 
             ImGui::Unindent();
         }
@@ -1066,6 +1122,53 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         rs.clusterTrianglesDrawn, rs.clusterTerrainTrianglesDrawn, rs.clusterOcclusionCandidates, rs.clusterOcclusionRecovered,
         rs.residualStatic, rs.residualTerrain, rs.residualDynamic, rs.residualTransparent,
         rs.vsmActive ? (rs.vsmSunMoving ? "moving" : "active") : "off");
+    text += line;
+
+    xr_sprintf(line, sizeof(line), "hierarchy: %u instances, %u nodes, %u leaf refs | deferred %u inst %u nodes | overflow %u\n",
+        rs.clusterInstanceVisits, rs.clusterNodeVisits, rs.clusterLeafVisits,
+        rs.clusterDeferredInstances, rs.clusterDeferredNodes, rs.clusterOverflow);
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry allocation MiB: shared %.2f | instance/ref/BVH %.2f | payload %.2f | vertices %.2f | retained forward %.2f | pages %u\n",
+        rs.geometrySharedBytes / 1048576.0, rs.geometryInstanceBytes / 1048576.0,
+        rs.geometryPayloadBytes / 1048576.0, rs.geometryVertexBytes / 1048576.0,
+        rs.geometryRetainedBytes / 1048576.0, rs.geometryPages);
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry ownership MiB: forward draws %.2f | retiring forward %.2f | retiring arenas %.2f | source staging %.2f | source hosts %.2f | forward leases %u | shadow snapshots %.2f readback %.2f host\n",
+        rs.geometryForwardDrawBytes / 1048576.0, rs.geometryRetiringSourceBytes / 1048576.0,
+        rs.geometryRetiringArenaBytes / 1048576.0, rs.geometrySourceStagingBytes / 1048576.0,
+        rs.geometryHostSourceBytes / 1048576.0, rs.geometryForwardUploadLeases,
+        rs.geometryShadowSnapshotBytes / 1048576.0, rs.geometryShadowHostBytes / 1048576.0);
+    text += line;
+    xr_sprintf(line, sizeof(line), "exact RT MiB: source %.2f | generations %.2f | AS %.2f (%s) | generations %u | leases %u\n",
+        rs.geometryRTSourceBytes / 1048576.0, rs.geometryRTGenerationBytes / 1048576.0,
+        rs.geometryRTAccelerationBytes / 1048576.0, rs.geometryRTAccelerationKnown ? "known" : "partial/unknown",
+        rs.geometryRTGenerations, rs.geometryRTLeases);
+    text += line;
+    xr_sprintf(line, sizeof(line), "paging level policy: requested %u | fine budget %u MiB | reload pending %u\n",
+        u32(rs.geometryPagingRequested), rs.geometryPageBudgetMiB, u32(rs.geometryPolicyPending));
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry vertices: page %llu | unique %llu | cluster %llu | maxima %u vertices %u triangles | recluster %u\n",
+        static_cast<unsigned long long>(rs.geometryPageVertexSlots),
+        static_cast<unsigned long long>(rs.geometryUniqueVertices),
+        static_cast<unsigned long long>(rs.geometryClusterVertexReferences),
+        rs.geometryMaxClusterVertices, rs.geometryMaxClusterTriangles, rs.geometryReclusterSplits);
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry residency [%s]: arena %.2f/%.2f MiB | pinned %.2f MiB | staging %.2f MiB | cut revision %u\n",
+        rs.geometryStreaming ? "demand paged" : "fully resident",
+        rs.geometryResidencyUsedBytes / 1048576.0, rs.geometryResidencyArenaBytes / 1048576.0,
+        rs.geometryResidencyPinnedBytes / 1048576.0, rs.geometryResidencyStagingBytes / 1048576.0,
+        rs.geometryCutRevision);
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry groups: %u resident (%u pinned) | %u desired | %u activating | %u blocked | %u evicted\n",
+        rs.geometryResidentGroups, rs.geometryPinnedGroups, rs.geometryDesiredGroups,
+        rs.geometryActivatingGroups, rs.geometryBlockedGroups, rs.geometryEvictions);
+    text += line;
+    xr_sprintf(line, sizeof(line), "geometry pages: %u resident (%u pinned) | %u reading | %u uploading | %u retiring | uploads %u (%u KiB) | reads %u (%u failed) | discarded %u | deferrals %u alloc %u budget | snapshots %u live %u failed\n",
+        rs.geometryResidentPages, rs.geometryPinnedPages, rs.geometryReadingPages,
+        rs.geometryUploadingPages, rs.geometryRetiringPages, rs.geometryUploadsRecorded,
+        rs.geometryUploadKiB, rs.geometryReadsIssued, rs.geometryReadsFailed,
+        rs.geometryUploadsDiscarded, rs.geometryAllocationDeferrals, rs.geometryBudgetDeferrals,
+        rs.geometryLiveSnapshots, rs.geometryFailedSnapshots);
     text += line;
 
     if (m_gpuProfiler && m_gpuProfiler->IsInitialized())

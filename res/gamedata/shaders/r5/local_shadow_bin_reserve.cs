@@ -14,8 +14,8 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_CapAT;
     uint g_Budget;
     uint g_Frame;
-    uint g_BinPad0;
-    uint g_BinPad1;
+    uint g_BinRefCount;
+    uint g_ResidencyStreaming;
     uint g_BinPad2;
 };
 
@@ -31,9 +31,8 @@ RWStructuredBuffer<uint4> g_PairBase : register(u4);
 RWByteAddressBuffer g_EmitArgs : register(u5);
 RWByteAddressBuffer g_ClearArgs : register(u6);
 RWStructuredBuffer<uint> g_Stats : register(u7);
+RWStructuredBuffer<uint2> g_GeometryDirty : register(u8);
 
-// Every requested view is published only for a same-frame complete draw. Views
-// that exceed the compact pair buffers use bounded caster batches in Static.
 [numthreads(1, 1, 1)]
 void main()
 {
@@ -45,14 +44,17 @@ void main()
         uint slot = cand.x;
         LocalShadowView req = g_Request[slot];
         LocalShadowView old = g_TileState[slot];
-        bool current = old.zparams.w > 0.5 && old.meta.x == cand.y && old.meta.y == cand.z;
-        req.zparams.w = 1.0;
+        bool current = old.zparams.w == 1.0 && old.meta.x == cand.y && old.meta.y == cand.z
+            && g_GeometryDirty[slot].y == 0u;
+        req.zparams.w = current ? 1.0 : 2.0;
         req.shape.x = 0.0;
         if (!current)
         {
+            uint2 geometry = g_GeometryDirty[slot];
+            g_GeometryDirty[slot] = uint2(geometry.x, 1u);
             uint3 count = g_TileCount[i].xyz;
             bool fallback = any(count > uint3(g_CapOpaque, g_CapTerrain, g_CapAT) - sum)
-                || (g_NodeCount == 0u && g_BinPad0 != 0u);
+                || (g_NodeCount == 0u && g_BinRefCount != 0u);
             // The work budget limits compact scratch usage; overflow still draws.
             fallback = fallback || (dirty > 0u && dot(float3(sum + count), 1.0) > float(g_Budget));
             req.shape.x = fallback ? 1.0 : 0.0;

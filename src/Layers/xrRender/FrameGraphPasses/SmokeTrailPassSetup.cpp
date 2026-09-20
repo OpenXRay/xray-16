@@ -410,9 +410,6 @@ DefaultOutputLayout setupSmokeTrailPass(
             if (!nvDevice || !cmdList)
                 return;
 
-            auto& matBuffer = MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
-
             // Framebuffer
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);

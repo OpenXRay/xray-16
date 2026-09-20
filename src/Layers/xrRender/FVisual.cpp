@@ -103,7 +103,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->useAlternativeGeom = true;
 
             // geom
-            m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
+            if (m_fast->p_rm_Vertices->IsValid() && m_fast->p_rm_Indices->IsValid())
+                m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
+            else
+                m_fast->rm_geom.create_logical(fmt);
         }
     }
 
@@ -135,7 +138,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY(nullptr == p_rm_Vertices);
             vStride = GetFVFVertexSize(fvf);
             p_rm_Vertices = xr_new<VertexStagingBuffer>();
-            p_rm_Vertices->Create(vCount * vStride);
+            p_rm_Vertices->Create(size_t(vCount) * vStride, true);
             u8* bytes = static_cast<u8*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
             p_rm_Vertices->Unmap(true); // upload vertex data
@@ -177,6 +180,18 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
     if (dwFlags & VLOAD_NOVERTICES)
         return;
+    else if (!p_rm_Vertices->IsValid() || !p_rm_Indices->IsValid())
+    {
+        R_ASSERT(p_rm_Vertices->source_token && p_rm_Indices->source_token);
+        if (fvf)
+        {
+            xr_vector<VertexElement> declaration;
+            R_ASSERT(CreateDeclFromFVF(fvf, declaration));
+            rm_geom.create_logical(declaration.data());
+        }
+        else
+            rm_geom.create_logical(vFormat);
+    }
     else if (fvf)
         rm_geom.create(fvf, *p_rm_Vertices, *p_rm_Indices);
     else

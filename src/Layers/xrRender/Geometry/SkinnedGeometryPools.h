@@ -30,7 +30,8 @@ public:
     bool Register(VertexStagingBuffer* vsb, IndexStagingBuffer* isb,
         u32 vCount, u32 vStride, u32 iCount, u32 formatID);
 
-    void FlushUploads(nvrhi::IDevice* nvDevice, nvrhi::ICommandList* cmdList);
+    void PrepareUploads(nvrhi::IDevice* nvDevice);
+    void FlushUploads(nvrhi::ICommandList* cmdList);
 
     nvrhi::IBuffer* GetVertexBuffer(u32 formatID) const;
     nvrhi::IBuffer* GetIndexBuffer(u32 formatID) const;
@@ -44,9 +45,11 @@ public:
 private:
     u32 m_generation = 1;
     nvrhi::BufferHandle m_combinedIndexBuffer;
+    xr_vector<u32> m_combinedIndexData;
     u32 m_combinedIndexCount = 0;
     u32 m_formatIndexBase[FORMAT_COUNT] = {};
     bool m_combinedDirty = false;
+    bool m_combinedUploadPending = false;
 
     struct Pool
     {

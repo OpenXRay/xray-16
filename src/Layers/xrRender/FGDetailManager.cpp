@@ -15,6 +15,7 @@
 #include "xrCore/Profiler/Profiler.h"
 #include "Profiler/GPUProfiler.h"
 #include "FrameGraphPasses/ShaderConstants.h"
+#include "FrameGraphPasses/VisibilityPassSetup.h"
 #include "FrameGraph/PassResourceCache.h"
 #include "FrameGraph/BindingSetBuilder.h"
 #include "ResourceManager/DDSLoader.h"
@@ -2114,6 +2115,10 @@ void FGDetailManager::DispatchCulling(
         m_lastGrassMode = grassMode;
     }
 
+    if (std::max(visibleBufferCapacity, generatedInstancesCapacity) > passes::kVisIdDetailKindSpan)
+        FATAL_F("[DetailManager] detail capacity %u exceeds the %u representable visibility slots per kind",
+            std::max(visibleBufferCapacity, generatedInstancesCapacity), passes::kVisIdDetailKindSpan);
+
     ResizeVisibleBuffersIfNeeded(device);
 
     if (m_instancesNeedRegeneration)
@@ -2123,6 +2128,9 @@ void FGDetailManager::DispatchCulling(
         u32 grid_per_slot = (d_size + 1) * (d_size + 1);
         u32 neededGenCapacity = std::min(u32(float(slot_count) * float(grid_per_slot) * 0.08f), MAX_INSTANCES);
         neededGenCapacity = std::max(neededGenCapacity, 1000000u);
+        if (neededGenCapacity > passes::kVisIdDetailKindSpan)
+            FATAL_F("[DetailManager] requested detail capacity %u exceeds the %u representable visibility slots per kind",
+                neededGenCapacity, passes::kVisIdDetailKindSpan);
 
         if (neededGenCapacity > generatedInstancesCapacity)
         {

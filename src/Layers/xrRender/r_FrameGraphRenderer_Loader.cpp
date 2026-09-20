@@ -39,6 +39,11 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/FSkinned.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render
 {
@@ -158,13 +163,29 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             CollectClusterBakeRanges(ranges);
 
             u64 geomStamp = 0;
-            if (CStreamReader* geom = FS.rs_open("$level$", "level.geom")) {
-                const u64 geomSize = geom->length();
+            {
                 static u8 s_stampBuf[65536];
-                const u32 n = u32(std::min<u64>(geomSize, sizeof(s_stampBuf)));
-                geom->r(s_stampBuf, n);
-                geomStamp = geomSize ^ (u64(crc32(s_stampBuf, n)) << 8);
-                FS.r_close(geom);
+                auto hashSource = [&](const char* name) {
+                    CStreamReader* geom = FS.rs_open("$level$", name);
+                    if (!geom)
+                        return;
+                    const u64 total = geom->length();
+                    u32 crc = 0;
+                    u64 read = 0;
+                    while (read < total) {
+                        const u32 chunkSize = u32(std::min<u64>(total - read, sizeof(s_stampBuf)));
+                        geom->r(s_stampBuf, chunkSize);
+                        crc = crc32(s_stampBuf, chunkSize, crc);
+                        read += chunkSize;
+                    }
+                    FS.r_close(geom);
+                    geomStamp = geomStamp * 1099511628211ull;
+                    geomStamp ^= total;
+                    geomStamp = geomStamp * 1099511628211ull;
+                    geomStamp ^= u64(crc);
+                };
+                hashSource("level.geom");
+                hashSource("level.geomx");
             }
 
             string_path cachePath = "";
@@ -181,6 +202,52 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         }
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
+            if (GEnv.Backend)
+                GEnv.Backend->WaitForIdle();
+            xr_set<const VertexStagingBuffer*> retainedVertices;
+            xr_set<const IndexStagingBuffer*> retainedIndices;
+            for (auto* visual : BufferPool.Visuals)
+            {
+                IRender_Mesh* mesh = nullptr;
+                bool skinned = false;
+                switch (visual->getType())
+                {
+                case MT_NORMAL: mesh = static_cast<Fvisual*>(visual); break;
+                case MT_PROGRESSIVE: mesh = static_cast<FProgressive*>(visual); break;
+                case MT_TREE_ST:
+                case MT_TREE_PM: mesh = static_cast<FTreeVisual*>(visual); break;
+                case MT_SKELETON_GEOMDEF_ST:
+                    mesh = static_cast<CSkeletonX_ST*>(visual);
+                    skinned = true;
+                    break;
+                case MT_SKELETON_GEOMDEF_PM:
+                    mesh = static_cast<CSkeletonX_PM*>(visual);
+                    skinned = true;
+                    break;
+                default: break;
+                }
+                if (mesh && (skinned || !gpuCulling->GetMeshAllocation(mesh->vbPoolID,
+                    mesh->vBase, mesh->vCount, mesh->ibPoolID, mesh->iBase, mesh->iCount,
+                    mesh->useAlternativeGeom).valid))
+                {
+                    retainedVertices.insert(mesh->p_rm_Vertices);
+                    retainedIndices.insert(mesh->p_rm_Indices);
+                }
+            }
+            auto discard = [&](auto& buffers, const auto& retained)
+            {
+                for (auto& buffer : buffers)
+                {
+                    Resources->DiscardGeometryBuffer(buffer.GetBufferHandle());
+                    buffer.DiscardDeviceBuffer();
+                    if (retained.find(&buffer) == retained.end())
+                        buffer.DiscardHostBuffer();
+                }
+            };
+            discard(BufferPool.nVB, retainedVertices);
+            discard(BufferPool.xVB, retainedVertices);
+            discard(BufferPool.nIB, retainedIndices);
+            discard(BufferPool.xIB, retainedIndices);
         }
 
         // Details
@@ -255,7 +322,7 @@ void FrameGraphRenderer::WarmParticles()
             if (!textures.empty())
                 m_materialCache->PreRegisterParticleMaterial(textures[0]);
         }
-        m_materialCache->FinalizePendingMaterials(nullptr);
+        m_materialCache->FinalizePendingMaterials();
     }
     if (nvrhi::IDevice* device = m_device ? m_device->GetNVRHIDevice() : nullptr)
     {
@@ -309,6 +376,20 @@ void FrameGraphRenderer::level_Unload()
         return;
     if (!b_loaded)
         return;
+    if (GEnv.Backend)
+        GEnv.Backend->WaitForIdle();
+    if (m_framegraph)
+        m_framegraph->Reset();
+    framegraph::GetPassResourceCache().ClearBindingSets();
+    if (m_gpuCullingManager)
+        m_gpuCullingManager->UnloadLevel();
+    if (m_rtAccelMgr)
+    {
+        m_rtAccelMgr->Shutdown();
+        m_rtAccelMgr->Initialize(m_device);
+    }
+    m_hudBatches.clear();
+    m_ptSampleIndex = 0;
     GetGpuParticleManager().LevelUnload();
 
     // HOM
@@ -588,18 +669,21 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
 
         const bool isTerrain = m_materialCache && m_materialCache->IsTerrainMaterial(visual);
 
-        shader_info::ShaderBlendInfo blendInfo;
-        if (!isTerrain && shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo)) {
-            if (blendInfo.mode != shader_info::ShaderBlendMode::Opaque &&
-                blendInfo.mode != shader_info::ShaderBlendMode::AlphaTest)
-                continue;
-        }
 
         MeshAllocation alloc = gpuCulling->GetMeshAllocation(
             mesh->vbPoolID, mesh->vBase, mesh->vCount,
             mesh->ibPoolID, iBase, iCount, mesh->useAlternativeGeom);
         if (!alloc.valid)
             continue;
+        const bool forward = !isTerrain && visual->shaderName.size()
+            && MaterialSystem::Instance().GetMaterialInfo(visual->shaderName).transparent;
+        if (forward)
+        {
+            gpuCulling->RetainForwardGeometry(alloc);
+            continue;
+        }
+        shader_info::ShaderBlendInfo blendInfo;
+        shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo);
 
         fg::ClusterBakeRange range;
         range.key.vertexOffset = alloc.vertexOffset;

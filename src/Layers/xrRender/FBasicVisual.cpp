@@ -10,6 +10,8 @@
 #include "xrEngine/xr_object.h"  // For GEnv
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 
+#include <atomic>
+
 namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
@@ -23,15 +25,27 @@ IRender_Mesh::~IRender_Mesh()
     _RELEASE(p_rm_Indices);
 }
 
+u64 dxRender_Visual::AllocateLifetimeID()
+{
+    static std::atomic<u64> s_counter{1};
+    return s_counter.fetch_add(1, std::memory_order_relaxed);
+}
+
 dxRender_Visual::dxRender_Visual()
 {
     Type = 0;
     shader = nullptr;
+    lifetimeID = AllocateLifetimeID();
     vis.clear();
 }
 
 dxRender_Visual::~dxRender_Visual() {}
 void dxRender_Visual::Release() {}
+
+void dxRender_Visual::Spawn()
+{
+    lifetimeID = AllocateLifetimeID();
+}
 // CStatTimer						tscreate;
 
 void dxRender_Visual::Load(const char* N, IReader* data, u32)

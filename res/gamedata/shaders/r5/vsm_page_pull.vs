@@ -3,37 +3,14 @@
 #include "vsm_common.h"
 #include "vsm_params.h"
 
-struct ClusterEntry
-{
-    float4 sphere;
-    float4 lodSelf;
-    float4 lodParent;
-    uint indexCount;
-    uint ibFirst;
-    uint firstVertex;
-    uint batchIndex;
-    uint materialID;
-    uint flags;
-    float selfError;
-    float parentError;
-    float3 extent;
-    float extentPad;
-};
+#define CLUSTER_GEO_T_REFS t14
+#define CLUSTER_GEO_T_META t16
+#define CLUSTER_GEO_T_INSTANCES t20
+#include "cluster_geo_bindings.h"
+#include "cluster_geo_payload.h"
 
-struct InstanceData
-{
-    float4x4 world;
-    uint materialID;
-    uint flags;
-    float pad0, pad1;
-};
-
-StructuredBuffer<InstanceData> g_InstanceData : register(t14);
 StructuredBuffer<uint2> g_Pairs : register(t15);
-StructuredBuffer<ClusterEntry> g_Entries : register(t16);
 StructuredBuffer<uint4> g_PageList : register(t17);
-ByteAddressBuffer g_MegaVB : register(t18);
-ByteAddressBuffer g_MegaIB : register(t19);
 
 #include "vsm_page_route.h"
 
@@ -54,18 +31,36 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     VS_OUTPUT output;
 
     uint2 pair = g_Pairs[iid];
-    ClusterEntry e = g_Entries[pair.x];
+    ClusterRefView view = LoadClusterRefView(pair.x);
+    ClusterEntry e = view.entry;
     uint slot = pair.y;
 
-    uint local = min(vid, e.indexCount - 1u);
-    uint index = g_MegaIB.Load((e.ibFirst + local) * 4u);
-    uint vertexByte = (e.firstVertex + index) * 48u;
-    uint4 w0 = g_MegaVB.Load4(vertexByte);
-    uint4 w1 = g_MegaVB.Load4(vertexByte + 16u);
-    float3 position = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
-    float2 texcoord = float2(asfloat(w1.z), asfloat(w1.w));
+    if (vid >= e.indexCount)
+    {
+        output.position = float4(2.0, 2.0, 2.0, 1.0);
+#ifdef TARGET_DXIL
+        output.clip = float4(-1.0, -1.0, -1.0, -1.0);
+#else
+        output.clip[0] = -1.0;
+        output.clip[1] = -1.0;
+        output.clip[2] = -1.0;
+        output.clip[3] = -1.0;
+#endif
+        output.texcoord = float2(0.0, 0.0);
+        output.materialID = 0u;
+        return output;
+    }
 
-    float4x4 worldMatrix = g_InstanceData[e.batchIndex].world;
+    ClusterGeoView geo = ClusterGeoResolve(e);
+    uint triangle = vid / 3u;
+    uint corner = vid - triangle * 3u;
+    uint3 corners = ClusterPayloadTriangle(geo, triangle);
+    uint local = (corner == 0u) ? corners.x : ((corner == 1u) ? corners.y : corners.z);
+    uint slotIndex = ClusterPayloadSlot(geo, local);
+    float3 position = ClusterLoadPositionSlot(geo, slotIndex);
+    float2 texcoord = ClusterLoadUVSlot(geo, slotIndex);
+
+    float4x4 worldMatrix = view.world;
     float3 worldPos = mul(worldMatrix, float4(position, 1.0)).xyz;
 
     VsmRoute r = VsmRoutePage(slot, worldPos);

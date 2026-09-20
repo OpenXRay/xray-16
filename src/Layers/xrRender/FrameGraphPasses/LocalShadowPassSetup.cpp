@@ -23,6 +23,30 @@ using namespace framegraph;
 
 namespace {
 
+void DeclareGeometryReads(framegraph::RenderPassBuilder& passBuilder, const GeometryFrameResources& res)
+{
+    for (const auto handle : { res.skinnedEntries, res.deformedVertices, res.skinnedIndices,
+        res.skinnedHudEntries, res.neutralFades, res.materials })
+    {
+        if (handle.is_valid())
+            passBuilder.read(handle, framegraph::ResourceState::ShaderResource);
+    }
+    if (!res.valid)
+        return;
+    for (const auto handle : { res.clusterRefs, res.clusterMeta, res.instances,
+        res.clusterPayload, res.clusterVertices, res.clusterPages, res.clusterGroups,
+        res.groupResidency, res.shadowBvhNodes, res.shadowBvhIndices })
+    {
+        if (handle.is_valid())
+            passBuilder.read(handle, framegraph::ResourceState::ShaderResource);
+    }
+}
+
+}
+
+
+namespace {
+
 const Fvector kFaceDir[6] = { { 1.f, 0.f, 0.f }, { -1.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, -1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f, -1.f } };
 const Fvector kFaceUp[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
 
@@ -53,9 +77,11 @@ struct LocalShadowDynBinParams {
     u32 capTerrain;
     u32 capAT;
     u32 includeAT;
-    u32 pad;
+    u32 staticOverflow;
+    u32 useSkinned;
+    u32 pad[3];
 };
-static_assert(sizeof(LocalShadowDynBinParams) == 32, "LocalShadowDynBinParams is shader-visible");
+static_assert(sizeof(LocalShadowDynBinParams) == 48, "LocalShadowDynBinParams is shader-visible");
 
 struct LocalShadowArgsParams {
     u32 caps[8];
@@ -69,6 +95,7 @@ struct LocalShadowBinData {
     VirtualResourceHandle dirtyList;
     VirtualResourceHandle refreshDyn;
     VirtualResourceHandle order;
+    VirtualResourceHandle geometryDirty;
     LocalShadowState* state;
     fg::RenderDevice* device;
     LocalShadowConfig config;
@@ -81,6 +108,7 @@ struct LocalShadowStaticData {
     VirtualResourceHandle args;
     VirtualResourceHandle clearArgs;
     VirtualResourceHandle dirtyList;
+    VirtualResourceHandle geometryDirty;
     LocalShadowState* state;
     fg::RenderDevice* device;
     LocalShadowConfig config;
@@ -214,6 +242,8 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
     state.tileCount = MakeUAVBuffer(nvDevice, "LocalShadow_TileCount", u64(kLocalTileCount) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.schedule = MakeUAVBuffer(nvDevice, "LocalShadow_Schedule", u64(kLocalTileCount) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.dirtyList = MakeUAVBuffer(nvDevice, "LocalShadow_DirtyList", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), false);
+    state.geometryDirty = MakeUAVBuffer(nvDevice, "LocalShadow_GeometryDirty",
+        u64(kLocalTileCount) * sizeof(u32) * 2, sizeof(u32) * 2, false);
     state.refreshDynBuffer = MakeUAVBuffer(nvDevice, "LocalShadow_RefreshDyn", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), false);
     state.pairBase = MakeUAVBuffer(nvDevice, "LocalShadow_PairBase", u64(kLocalTileCount) * sizeof(u32) * 4, sizeof(u32) * 4, false);
     state.emitArgs = MakeArgsBuffer(nvDevice, "LocalShadow_EmitArgs", 1);
@@ -245,7 +275,7 @@ bool EnsureResources(nvrhi::IDevice* nvDevice, LocalShadowState& state)
 
     bool ok = state.requestBuffer && state.candListBuffer && state.stateBuffer && state.tileCount
         && state.schedule && state.dirtyList && state.refreshDynBuffer && state.pairBase && state.emitArgs
-        && state.stats && state.args && state.clearArgs && state.staticAtlas && state.dynAtlas;
+        && state.stats && state.args && state.clearArgs && state.staticAtlas && state.dynAtlas && state.geometryDirty;
     for (u32 i = 0; i < kLocalStreamCount; ++i)
         ok = ok && state.pairs[i];
     if (!ok) {
@@ -410,7 +440,7 @@ void BuildLocalShadowArgs(fg::RenderContext* ctx, fg::RenderDevice* device, Loca
 }
 
 void BinCasterBatch(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShadowState& state,
-                    nvrhi::IBuffer* entries, u32 entryBase, u32 count, u32 mode)
+                    const GeometryFrameBuffers& geometry, nvrhi::IBuffer* entries, u32 entryBase, u32 count, u32 mode)
 {
     auto* cmd = ctx->GetCommandList();
     auto* nvDevice = device->GetNVRHIDevice();
@@ -428,7 +458,8 @@ void BinCasterBatch(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShado
     dp.capTerrain = statics ? state.pairCapacity[terrain] : 0u;
     dp.capAT = skinned ? 0u : state.pairCapacity[at];
     dp.includeAT = 1u;
-    dp.pad = statics ? 1u : 0u;
+    dp.staticOverflow = statics ? 1u : 0u;
+    dp.useSkinned = skinned ? 1u : 0u;
     // count * refreshCount <= every writable stream capacity. No pair truncation.
     const u32 zeros[3] = {};
     cmd->setBufferState(state.stats, nvrhi::ResourceStates::CopyDest);
@@ -445,7 +476,12 @@ void BinCasterBatch(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShado
         cmd->setBufferState(state.pairs[stream], nvrhi::ResourceStates::UnorderedAccess);
     BindingSetBuilder bsb(*reflection, nvDevice, "LocalShadow.CasterBatch");
     bsb.ConstantBuffer("LocalShadowDynBinParams", cb)
-       .BufferSRV("g_Entries", entries)
+       .BufferSRV("g_SkinnedEntries", skinned ? entries : geometry.clusterMeta)
+       .BufferSRV("g_ClusterRefs", geometry.clusterRefs)
+       .BufferSRV("g_ClusterMeta", geometry.clusterMeta)
+       .BufferSRV("g_GeoInstances", geometry.instances)
+       .BufferSRV("g_ClusterGroups", geometry.clusterGroups)
+       .BufferSRV("g_ClusterGroupState", geometry.groupResidency)
        .BufferSRV("g_Tiles", state.stateBuffer)
        .BufferSRV("g_Refresh", statics ? state.dirtyList : state.refreshDynBuffer)
        .BufferUAV("g_Stats", state.stats)
@@ -499,22 +535,26 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     if (data.gpuProfiler)
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Bin");
 
-    const LocalShadowConfig& cfg = data.config;
+    LocalShadowConfig cfg = data.config;
+    cfg.geometry = ResolveGeometryResources(fg, cfg.geometryResources);
     GPUCullingManager* gpuCulling = cfg.gpuCulling;
-    const bool haveEntries = gpuCulling && cfg.entryBuffer && gpuCulling->GetClusterEntryCount() > 0
-        && cfg.bvhNodeBuffer && cfg.bvhIndexBuffer && cfg.bvhNodeCount > 0;
-    if (haveEntries && (cfg.entryBuffer != state.lastEntryBuffer || cfg.bvhNodeBuffer != state.lastBvhNodeBuffer))
+    const bool haveEntries = gpuCulling && cfg.geometry.clusterRefs && gpuCulling->GetClusterRefCount() > 0
+        && cfg.geometry.shadowBvhNodes && cfg.geometry.shadowBvhIndices && cfg.bvhNodeCount > 0;
+    if (haveEntries && (cfg.geometry.clusterRefs != state.lastRefBuffer || cfg.geometry.shadowBvhNodes != state.lastBvhNodeBuffer))
         state.stateReset = true;
-    state.lastEntryBuffer = cfg.entryBuffer;
-    state.lastBvhNodeBuffer = cfg.bvhNodeBuffer;
+    state.lastRefBuffer = cfg.geometry.clusterRefs;
+    state.lastBvhNodeBuffer = cfg.geometry.shadowBvhNodes;
 
     if (state.stateReset) {
         state.dirtyViews = state.candCount;
         cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::CopyDest);
         cmdList->setBufferState(state.schedule, nvrhi::ResourceStates::CopyDest);
+        cmdList->setBufferState(fg.GetPhysicalBuffer(data.geometryDirty), nvrhi::ResourceStates::CopyDest);
         cmdList->clearBufferUInt(state.stateBuffer, 0);
         cmdList->clearBufferUInt(state.schedule, 0);
+        cmdList->clearBufferUInt(fg.GetPhysicalBuffer(data.geometryDirty), 0);
         state.stateReset = false;
+        state.staticComplete = false;
     }
 
     cmdList->setBufferState(state.requestBuffer, nvrhi::ResourceStates::CopyDest);
@@ -539,25 +579,33 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
     bp.capAT = state.pairCapacity[2];
     bp.budget = u32(std::max(1, ps_r_local_shadow_pairs_budget));
     bp.frame = state.frame;
-    bp.pad[0] = gpuCulling ? gpuCulling->GetClusterEntryCount() : 0u;
+    bp.pad[0] = gpuCulling ? gpuCulling->GetClusterRefCount() : 0u;
+    bp.pad[1] = gpuCulling && gpuCulling->GetResidency().IsStreaming() ? 1u : 0u;
     auto binCB = cache.GetOrCreateVolatileCB("LocalShadow", "BinParams", sizeof(LocalShadowBinParams), data.device, 64);
     cmdList->writeBuffer(binCB, &bp, sizeof(bp));
+    cmdList->setBufferState(fg.GetPhysicalBuffer(data.geometryDirty), nvrhi::ResourceStates::UnorderedAccess);
 
     bool counted = false;
     if (haveEntries && state.candCount > 0) {
         cmdList->setBufferState(state.stateBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
         cmdList->setBufferState(state.tileCount, nvrhi::ResourceStates::UnorderedAccess);
-        cmdList->setBufferState(cfg.entryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
-        cmdList->setBufferState(cfg.bvhNodeBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
-        cmdList->setBufferState(cfg.bvhIndexBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(cfg.geometry.clusterRefs, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(cfg.geometry.shadowBvhNodes, nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->setBufferState(cfg.geometry.shadowBvhIndices, nvrhi::ResourceStates::NonPixelShaderResource);
         BindingSetBuilder cbs(*countRefl, nvDevice, "LocalShadow.BinCount");
         cbs.ConstantBuffer("LocalShadowBinParams", binCB)
-           .BufferSRV("g_Entries", cfg.entryBuffer)
+           .BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs)
+           .BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta)
+           .BufferSRV("g_GeoInstances", cfg.geometry.instances)
+           .BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups)
+           .BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency)
            .BufferSRV("g_Request", state.requestBuffer)
            .BufferSRV("g_CandList", state.candListBuffer)
            .BufferSRV("g_TileState", state.stateBuffer)
-           .BufferSRV("g_BvhNodes", cfg.bvhNodeBuffer)
-           .BufferSRV("g_BvhIndex", cfg.bvhIndexBuffer)
+           .BufferSRV("g_BvhNodes", cfg.geometry.shadowBvhNodes)
+           .BufferSRV("g_BvhIndex", cfg.geometry.shadowBvhIndices)
+           .BufferSRV("g_GeometryCuts", fg.GetPhysicalBuffer(cfg.geometryResources.shadowCuts))
+           .BufferUAV("g_GeometryDirty", fg.GetPhysicalBuffer(data.geometryDirty))
            .BufferUAV("g_TileCount", state.tileCount);
         if (auto countSet = cache.GetOrCreateBindingSet(cbs.Build(), state.binCountLayout, nvDevice)) {
             nvrhi::ComputeState cs;
@@ -596,6 +644,7 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
            .BufferUAV("g_PairBase", state.pairBase)
            .BufferUAV("g_EmitArgs", state.emitArgs)
            .BufferUAV("g_ClearArgs", state.clearArgs)
+           .BufferUAV("g_GeometryDirty", fg.GetPhysicalBuffer(data.geometryDirty))
            .BufferUAV("g_Stats", state.stats);
         auto reserveSet = cache.GetOrCreateBindingSet(rbs.Build(), state.binReserveLayout, nvDevice);
         R_ASSERT(reserveSet);
@@ -615,12 +664,16 @@ void ExecuteBin(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowB
         cmdList->setBufferState(state.emitArgs, nvrhi::ResourceStates::IndirectArgument);
         BindingSetBuilder ebs(*emitRefl, nvDevice, "LocalShadow.BinEmit");
         ebs.ConstantBuffer("LocalShadowBinParams", binCB)
-           .BufferSRV("g_Entries", cfg.entryBuffer)
+           .BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs)
+           .BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta)
+           .BufferSRV("g_GeoInstances", cfg.geometry.instances)
+           .BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups)
+           .BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency)
            .BufferSRV("g_TileState", state.stateBuffer)
            .BufferSRV("g_DirtyList", state.dirtyList)
            .BufferSRV("g_PairBase", state.pairBase)
-           .BufferSRV("g_BvhNodes", cfg.bvhNodeBuffer)
-           .BufferSRV("g_BvhIndex", cfg.bvhIndexBuffer)
+           .BufferSRV("g_BvhNodes", cfg.geometry.shadowBvhNodes)
+           .BufferSRV("g_BvhIndex", cfg.geometry.shadowBvhIndices)
            .BufferUAV("g_Stats", state.stats)
            .BufferUAV("g_PairsOpaque", state.pairs[0])
            .BufferUAV("g_PairsTerrain", state.pairs[1])
@@ -678,7 +731,7 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     if (!clearVsRefl || !clearPsRefl)
         return false;
 
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    
     auto srv = [&](nvrhi::IBuffer* b) {
         if (b)
             cmdList->setBufferState(b, nvrhi::ResourceStates::ShaderResource);
@@ -686,17 +739,18 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     srv(state.stateBuffer);
     srv(state.dirtyList);
     srv(state.refreshDynBuffer);
-    srv(cfg.entryBuffer);
-    srv(cfg.staticInstanceBuffer);
-    srv(cfg.terrainInstanceBuffer);
-    srv(cfg.dynamicInstanceBuffer);
-    srv(cfg.megaVertexBuffer);
-    srv(cfg.megaIndexBuffer);
-    srv(matBuffer.GetBuffer());
+    srv(cfg.geometry.clusterRefs);
+    srv(cfg.geometry.instances);
+    srv(cfg.geometry.instances);
+    srv(cfg.geometry.instances);
+    srv(cfg.geometry.clusterPayload);
+    srv(cfg.geometry.clusterVertices);
+    srv(cfg.geometry.clusterPages);
+    srv(cfg.geometry.materials);
     if (cfg.gpuCulling) {
-        srv(cfg.gpuCulling->GetSkinnedEntryBuffer());
-        srv(cfg.gpuCulling->GetSkinnedPreVertexBuffer());
-        srv(cfg.gpuCulling->GetSkinnedPools().GetCombinedIndexBuffer());
+        srv(cfg.geometry.skinnedEntries);
+        srv(cfg.geometry.deformedVertices);
+        srv(cfg.geometry.skinnedIndices);
     }
     for (u32 i = 0; i < kLocalStreamCount; ++i)
         srv(state.pairs[i]);
@@ -733,12 +787,16 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
         cmdList->setGraphicsState(gs);
         cmdList->drawIndirect(clearIndex * kLocalArgsStride, 1);
     }
+    else
+        return false;
     return true;
 }
 
 void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowStaticData& data)
 {
     LocalShadowState& state = *data.state;
+    const bool pending = !state.staticComplete;
+    state.staticComplete = false;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
@@ -750,12 +808,9 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         state.staticAtlasFirst = false;
     }
 
-    const LocalShadowConfig& cfg = data.config;
-    const bool haveCasters = cfg.entryBuffer && cfg.megaVertexBuffer && cfg.megaIndexBuffer;
-
-    if (cfg.materialCache)
-        cfg.materialCache->FinalizePendingMaterials(ctx);
-    bindless::MaterialBuffer::Instance().Upload(ctx);
+    LocalShadowConfig cfg = data.config;
+    cfg.geometry = ResolveGeometryResources(fg, cfg.geometryResources);
+    const bool haveCasters = cfg.geometry.clusterRefs && cfg.geometry.clusterPayload && cfg.geometry.clusterVertices && cfg.geometry.clusterPages;
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -775,23 +830,34 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         return;
     }
 
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    
+    bool complete = true;
     auto drawStream = [&](u32 stream, nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingLayout* layout,
                           const ExtractedReflection& ps, nvrhi::IBuffer* instanceBuffer, bool withBindless, const char* label) {
-        if (!pipeline || !layout || !instanceBuffer)
+        if (!pipeline || !layout || !instanceBuffer || (withBindless && !dc.bindlessTable))
+        {
+            complete = false;
             return;
+        }
         BindingSetBuilder bsb(*vsRefl, ps, nvDevice, label);
-        bsb.BufferSRV("g_InstanceData", instanceBuffer);
+        bsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
+        bsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
+        bsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
+        bsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
         bsb.BufferSRV("g_Pairs", state.pairs[stream]);
-        bsb.BufferSRV("g_Entries", cfg.entryBuffer);
+        bsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
         bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-        bsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
-        bsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
+        bsb.BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload);
+        bsb.BufferSRV("g_ClusterVertices", cfg.geometry.clusterVertices);
+        bsb.BufferSRV("g_ClusterPages", cfg.geometry.clusterPages);
         if (withBindless)
-            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
+            bsb.BufferSRV("g_Materials", cfg.geometry.materials);
         auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
         if (!bindingSet)
+        {
+            complete = false;
             return;
+        }
         nvrhi::GraphicsState gs;
         gs.pipeline = pipeline;
         gs.framebuffer = dc.framebuffer;
@@ -806,24 +872,34 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
     };
 
     if (haveCasters) {
-        drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.staticInstanceBuffer, false, "LocalShadow.PageOpaque");
-        drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.terrainInstanceBuffer, false, "LocalShadow.PageTerrain");
-        drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.staticInstanceBuffer, true, "LocalShadow.PageAT");
+        drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.geometry.instances, false, "LocalShadow.PageOpaque");
+        drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.geometry.instances, false, "LocalShadow.PageTerrain");
+        drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.geometry.instances, true, "LocalShadow.PageAT");
 
-        if (cfg.gpuCulling && state.dirtyViews > 0) {
-            const u32 count = cfg.gpuCulling->GetClusterEntryCount();
+        if (cfg.gpuCulling && state.candCount > 0 && (pending || state.dirtyViews > 0
+            || state.geometryRevision != cfg.gpuCulling->GetResidency().CutRevision())) {
+            const u32 count = cfg.gpuCulling->GetClusterRefCount();
             const u32 capacity = std::min({ state.pairCapacity[0], state.pairCapacity[1], state.pairCapacity[2] });
-            const u64 upperBound = u64(count) * state.dirtyViews;
+            const u64 upperBound = u64(count) * state.candCount;
             if (upperBound > capacity || upperBound > u32(std::max(1, ps_r_local_shadow_pairs_budget)) || !cfg.bvhNodeCount) {
-                const u32 batchSize = std::max(1u, capacity / state.dirtyViews);
+                const u32 batchSize = std::max(1u, capacity / state.candCount);
                 for (u32 base = 0; base < count; base += batchSize) {
-                    BinCasterBatch(ctx, data.device, state, cfg.entryBuffer, base, std::min(batchSize, count - base), 1u);
-                    drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.staticInstanceBuffer, false, "LocalShadow.PageOpaque");
-                    drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.terrainInstanceBuffer, false, "LocalShadow.PageTerrain");
-                    drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.staticInstanceBuffer, true, "LocalShadow.PageAT");
+                    BinCasterBatch(ctx, data.device, state, cfg.geometry, cfg.geometry.clusterRefs, base, std::min(batchSize, count - base), 1u);
+                    drawStream(0, state.pagePipeline, state.pageLayout, *psRefl, cfg.geometry.instances, false, "LocalShadow.PageOpaque");
+                    drawStream(1, state.pagePipeline, state.pageLayout, *psRefl, cfg.geometry.instances, false, "LocalShadow.PageTerrain");
+                    drawStream(2, state.pageATPipeline, state.pageATLayout, *atRefl, cfg.geometry.instances, true, "LocalShadow.PageAT");
                 }
             }
         }
+    }
+    if (complete)
+    {
+        RecordGeometryShadowDraw(cmdList, nvDevice, fg.GetPhysicalBuffer(data.dirtyList),
+            fg.GetPhysicalBuffer(data.clearArgs), fg.GetPhysicalBuffer(data.geometryDirty), kLocalTileCount,
+            ShadowPublication::Local, fg.GetPhysicalBuffer(data.tiles), nullptr, state.publicationPipeline);
+        if (cfg.gpuCulling)
+            state.geometryRevision = cfg.gpuCulling->GetResidency().CutRevision();
+        state.staticComplete = true;
     }
 
     if (data.gpuProfiler)
@@ -833,6 +909,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
 void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowDynData& data)
 {
     LocalShadowState& state = *data.state;
+    state.dynComplete = false;
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
@@ -844,8 +921,10 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         state.dynAtlasFirst = false;
     }
 
-    const LocalShadowConfig& cfg = data.config;
-    const bool haveCasters = cfg.gpuCulling && cfg.megaVertexBuffer && cfg.megaIndexBuffer;
+    LocalShadowConfig cfg = data.config;
+    cfg.geometry = ResolveGeometryResources(fg, cfg.geometryResources);
+    const bool haveCasters = cfg.gpuCulling && (cfg.gpuCulling->GetDynamicClusterRefCount() > 0
+        || cfg.gpuCulling->GetSkinnedEntryCount() > 0);
 
     auto& cache = GetPassResourceCache();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -867,15 +946,22 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
     }
 
     if (!haveCasters) {
+        state.dynComplete = true;
         if (data.gpuProfiler)
             data.gpuProfiler->EndPass(cmdList, "Local Shadow.Dyn");
         return;
     }
 
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    
     GPUCullingManager& gpuCulling = *cfg.gpuCulling;
+    bool complete = true;
 
     auto draw = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingSet* bindingSet, u32 stream, bool withBindless) {
+        if (!pipeline || !bindingSet || (withBindless && !dc.bindlessTable))
+        {
+            complete = false;
+            return;
+        }
         nvrhi::GraphicsState gs;
         gs.pipeline = pipeline;
         gs.framebuffer = dc.framebuffer;
@@ -889,55 +975,66 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         cmdList->drawIndirect(stream * kLocalArgsStride, 1);
     };
 
-    if (gpuCulling.GetDynamicClusterEntryCount() > 0 && cfg.entryBuffer && cfg.dynamicInstanceBuffer) {
-        const u32 count = gpuCulling.GetDynamicClusterEntryCount();
+    if (gpuCulling.GetDynamicClusterRefCount() > 0)
+    {
+        R_ASSERT(cfg.geometry.clusterRefs && cfg.geometry.instances && cfg.geometry.clusterPayload
+            && cfg.geometry.clusterVertices && cfg.geometry.clusterPages);
+        const u32 count = gpuCulling.GetDynamicClusterRefCount();
         const u32 batchSize = std::max(1u, std::min(state.pairCapacity[3], state.pairCapacity[4]) / std::max(1u, state.candCount));
         for (u32 base = 0; base < count; base += batchSize) {
-            BinCasterBatch(ctx, data.device, state, cfg.entryBuffer, gpuCulling.GetClusterEntryCount() + base,
+            BinCasterBatch(ctx, data.device, state, cfg.geometry, cfg.geometry.clusterRefs, gpuCulling.GetClusterRefCount() + base,
                 std::min(batchSize, count - base), 2u);
             BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "LocalShadow.DynOpaque");
-            bsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+            bsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
+            bsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
+            bsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
+            bsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
             bsb.BufferSRV("g_Pairs", state.pairs[3]);
-            bsb.BufferSRV("g_Entries", cfg.entryBuffer);
+            bsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
             bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-            bsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
-            bsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
-            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.pageLayout, nvDevice))
-                draw(state.pagePipeline, bindingSet, 3, false);
+            bsb.BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload);
+            bsb.BufferSRV("g_ClusterVertices", cfg.geometry.clusterVertices);
+            bsb.BufferSRV("g_ClusterPages", cfg.geometry.clusterPages);
+            draw(state.pagePipeline, cache.GetOrCreateBindingSet(bsb.Build(), state.pageLayout, nvDevice), 3, false);
 
             BindingSetBuilder atBsb(*vsRefl, *atRefl, nvDevice, "LocalShadow.DynAT");
-            atBsb.BufferSRV("g_InstanceData", cfg.dynamicInstanceBuffer);
+            atBsb.BufferSRV("g_ClusterMeta", cfg.geometry.clusterMeta);
+            atBsb.BufferSRV("g_GeoInstances", cfg.geometry.instances);
+            atBsb.BufferSRV("g_ClusterGroups", cfg.geometry.clusterGroups);
+            atBsb.BufferSRV("g_ClusterGroupState", cfg.geometry.groupResidency);
             atBsb.BufferSRV("g_Pairs", state.pairs[4]);
-            atBsb.BufferSRV("g_Entries", cfg.entryBuffer);
+            atBsb.BufferSRV("g_ClusterRefs", cfg.geometry.clusterRefs);
             atBsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
-            atBsb.BufferSRV("g_MegaVB", cfg.megaVertexBuffer);
-            atBsb.BufferSRV("g_MegaIB", cfg.megaIndexBuffer);
-            atBsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            if (auto bindingSet = cache.GetOrCreateBindingSet(atBsb.Build(), state.pageATLayout, nvDevice))
-                draw(state.pageATPipeline, bindingSet, 4, true);
+            atBsb.BufferSRV("g_ClusterPayload", cfg.geometry.clusterPayload);
+            atBsb.BufferSRV("g_ClusterVertices", cfg.geometry.clusterVertices);
+            atBsb.BufferSRV("g_ClusterPages", cfg.geometry.clusterPages);
+            atBsb.BufferSRV("g_Materials", cfg.geometry.materials);
+            draw(state.pageATPipeline, cache.GetOrCreateBindingSet(atBsb.Build(), state.pageATLayout, nvDevice), 4, true);
         }
     }
 
-    nvrhi::IBuffer* skinnedEntries = gpuCulling.GetSkinnedEntryBuffer();
-    nvrhi::IBuffer* preVB = gpuCulling.GetSkinnedPreVertexBuffer();
-    nvrhi::IBuffer* skinnedIB = gpuCulling.GetSkinnedPools().GetCombinedIndexBuffer();
-    if (gpuCulling.GetSkinnedEntryCount() > 0 && skinnedEntries && preVB && skinnedIB) {
+    nvrhi::IBuffer* skinnedEntries = cfg.geometry.skinnedEntries;
+    nvrhi::IBuffer* preVB = cfg.geometry.deformedVertices;
+    nvrhi::IBuffer* skinnedIB = cfg.geometry.skinnedIndices;
+    if (gpuCulling.GetSkinnedEntryCount() > 0)
+    {
+        R_ASSERT(skinnedEntries && preVB && skinnedIB);
         const u32 count = gpuCulling.GetSkinnedEntryCount();
         const u32 batchSize = std::max(1u, state.pairCapacity[5] / std::max(1u, state.candCount));
         for (u32 base = 0; base < count; base += batchSize) {
-            BinCasterBatch(ctx, data.device, state, skinnedEntries, base, std::min(batchSize, count - base), 3u);
+            BinCasterBatch(ctx, data.device, state, cfg.geometry, skinnedEntries, base, std::min(batchSize, count - base), 3u);
             BindingSetBuilder bsb(*skinVsRefl, *atRefl, nvDevice, "LocalShadow.DynSkin");
             bsb.BufferSRV("g_Pairs", state.pairs[5]);
             bsb.BufferSRV("g_Entries", skinnedEntries);
             bsb.BufferSRV("g_LocalShadowTiles", state.stateBuffer);
             bsb.BufferSRV("g_SkinnedVB", preVB);
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
-            bsb.BufferSRV("g_Materials", matBuffer.GetBuffer());
-            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice))
-                draw(state.skinPagePipeline, bindingSet, 5, true);
+            bsb.BufferSRV("g_Materials", cfg.geometry.materials);
+            draw(state.skinPagePipeline, cache.GetOrCreateBindingSet(bsb.Build(), state.skinPageLayout, nvDevice), 5, true);
         }
     }
 
+    state.dynComplete = complete;
     ScheduleLocalShadowStats(state, cmdList);
 
     if (data.gpuProfiler)
@@ -1051,12 +1148,14 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
     cmdList->clearDepthStencilTexture(atlas, nvrhi::AllSubresources, true, 0.0f, false, 0);
     if (state.hudViews == 0 || !data.config.gpuCulling)
         return;
+    LocalShadowConfig cfg = data.config;
+    cfg.geometry = ResolveGeometryResources(fg, cfg.geometryResources);
     GPUCullingManager& gc = *data.config.gpuCulling;
     const u32 count = gc.GetSkinnedHudEntryCount();
-    nvrhi::IBuffer* hudEntries = gc.GetSkinnedHudEntryBuffer();
-    nvrhi::IBuffer* entries = gc.GetSkinnedEntryBuffer();
-    nvrhi::IBuffer* preVB = gc.GetSkinnedPreVertexBuffer();
-    nvrhi::IBuffer* ib = gc.GetSkinnedPools().GetCombinedIndexBuffer();
+    nvrhi::IBuffer* hudEntries = cfg.geometry.skinnedHudEntries;
+    nvrhi::IBuffer* entries = cfg.geometry.skinnedEntries;
+    nvrhi::IBuffer* preVB = cfg.geometry.deformedVertices;
+    nvrhi::IBuffer* ib = cfg.geometry.skinnedIndices;
     if (count == 0 || !hudEntries || !entries || !preVB || !ib)
         return;
     if (!EnsureHudPipeline(data.device, state))
@@ -1080,13 +1179,13 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
     auto hudCB = cache.GetOrCreateVolatileCB("LocalShadow", "HudParams", sizeof(LocalShadowHudParams), data.device);
     cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
 
-    auto& matBuffer = bindless::MaterialBuffer::Instance();
+    
     cmdList->setBufferState(hudEntries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(preVB, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(ib, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(state.receiverTiles, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(matBuffer.GetBuffer(), nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(cfg.geometry.materials, nvrhi::ResourceStates::ShaderResource);
     cmdList->commitBarriers();
 
     nvrhi::FramebufferDesc fbDesc;
@@ -1102,7 +1201,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
        .BufferSRV("g_LocalShadowTiles", state.receiverTiles)
        .BufferSRV("g_SkinnedVB", preVB)
        .BufferSRV("g_SkinnedIB", ib)
-       .BufferSRV("g_Materials", matBuffer.GetBuffer());
+       .BufferSRV("g_Materials", cfg.geometry.materials);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.hudPageLayout, nvDevice);
     if (!bindingSet)
         return;
@@ -1855,6 +1954,7 @@ static void SetupLocalShadowPageBin(
     state->fgArgs = VirtualResourceHandle();
     state->fgClearArgs = VirtualResourceHandle();
     state->fgDirtyList = VirtualResourceHandle();
+    state->fgGeometryDirty = VirtualResourceHandle();
     state->fgRefreshDyn = VirtualResourceHandle();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
@@ -1886,6 +1986,8 @@ static void SetupLocalShadowPageBin(
         bufferDesc("local_shadow_dirty_list", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), true));
     VirtualResourceHandle refreshDynHandle = fg.ImportBuffer("local_shadow_refresh_dyn", state->refreshDynBuffer,
         bufferDesc("local_shadow_refresh_dyn", u64(kLocalTileCount) * sizeof(u32), sizeof(u32), true));
+    const auto geometryDirtyHandle = fg.ImportBuffer("local_shadow_geometry_dirty", state->geometryDirty,
+        bufferDesc("local_shadow_geometry_dirty", u64(kLocalTileCount) * sizeof(u32) * 2, sizeof(u32) * 2, true));
 
     auto& binData = fg.addCallbackPass<LocalShadowBinData>(
         "Local Shadow Bin",
@@ -1896,6 +1998,10 @@ static void SetupLocalShadowPageBin(
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
             passBuilder.asyncCompute();
+            DeclareGeometryReads(passBuilder, config.geometryResources);
+            if (config.geometryResources.shadowCuts.is_valid())
+                passBuilder.read(config.geometryResources.shadowCuts, ResourceState::ShaderResource);
+            data.geometryDirty = passBuilder.readWrite(geometryDirtyHandle, ResourceState::UnorderedAccess);
             data.tiles = passBuilder.write(tilesHandle, ResourceState::UnorderedAccess);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::ShaderResource);
@@ -1911,6 +2017,7 @@ static void SetupLocalShadowPageBin(
     state->fgArgs = binData.args;
     state->fgClearArgs = binData.clearArgs;
     state->fgDirtyList = binData.dirtyList;
+    state->fgGeometryDirty = binData.geometryDirty;
     state->fgRefreshDyn = binData.refreshDyn;
 }
 
@@ -1932,15 +2039,19 @@ static LocalShadowOutput SetupLocalShadowPage(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            DeclareGeometryReads(passBuilder, config.geometryResources);
             data.atlas = passBuilder.write(staticHandle, ResourceState::DepthStencilWrite);
-            data.tiles = passBuilder.read(state->fgTiles, ResourceState::ShaderResource);
+            data.tiles = passBuilder.readWrite(state->fgTiles, ResourceState::UnorderedAccess);
             data.args = passBuilder.write(state->fgArgs, ResourceState::IndirectArgument);
             data.clearArgs = passBuilder.read(state->fgClearArgs, ResourceState::IndirectArgument);
             data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
+            data.geometryDirty = passBuilder.readWrite(state->fgGeometryDirty, ResourceState::UnorderedAccess);
         },
         [](const LocalShadowStaticData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteStatic(ctx, fg, data);
         });
+    state->fgGeometryDirty = staticData.geometryDirty;
+    state->fgTiles = staticData.tiles;
 
     auto& dynData = fg.addCallbackPass<LocalShadowDynData>(
         "Local Shadow Dyn",
@@ -1950,6 +2061,7 @@ static LocalShadowOutput SetupLocalShadowPage(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
+            DeclareGeometryReads(passBuilder, config.geometryResources);
             data.atlas = passBuilder.write(dynHandle, ResourceState::DepthStencilWrite);
             data.tiles = passBuilder.read(state->fgTiles, ResourceState::ShaderResource);
             data.args = passBuilder.write(staticData.args, ResourceState::IndirectArgument);
@@ -2025,27 +2137,39 @@ LocalShadowOutput setupLocalShadowPasses(
     desc.isTransient = false;
     desc.debugName = "local_shadow_receivers";
     auto receivers = fg.ImportBuffer("local_shadow_receivers", state->receiverTiles, desc);
-    struct PublishData { VirtualResourceHandle tiles; LocalShadowState* state; };
+    class PublishData
+    {
+    public:
+        VirtualResourceHandle tiles;
+        xr_vector<VirtualResourceHandle> sourceTiles;
+        LocalShadowState* state;
+    };
     auto& published = fg.addCallbackPass<PublishData>("Local Shadow Publish",
         [=](FrameGraph& builder, PassHandle handle, PublishData& data) {
             RenderPassBuilder pass(builder, handle);
             pass.read(staticHandle, ResourceState::ShaderResource);
             pass.read(dynHandle, ResourceState::ShaderResource);
             for (auto tiles : pageTiles)
-                pass.read(tiles, ResourceState::CopySource);
+                data.sourceTiles.push_back(pass.read(tiles, ResourceState::CopySource));
             data.tiles = pass.write(receivers, ResourceState::CopyDest);
             data.state = state;
         },
-        [](const PublishData& data, const FrameGraph&, fg::RenderContext* ctx) {
+        [](const PublishData& data, const FrameGraph& graph, fg::RenderContext* ctx) {
             auto* cmd = ctx->GetCommandList();
             const u64 bytes = u64(kLocalTileCount) * sizeof(LocalShadowViewGPU);
-            cmd->setBufferState(data.state->receiverTiles, nvrhi::ResourceStates::CopyDest);
-            for (u32 i = 0; i < data.state->activePages; ++i) {
+            auto* receivers = graph.GetPhysicalBuffer(data.tiles);
+            cmd->setBufferState(receivers, nvrhi::ResourceStates::CopyDest);
+            cmd->clearBufferUInt(receivers, 0);
+            for (u32 i = 0; i < data.state->activePages; ++i)
+            {
                 auto& page = i == 0 ? *data.state : *data.state->overflowPages[i - 1];
-                cmd->setBufferState(page.stateBuffer, nvrhi::ResourceStates::CopySource);
-                cmd->copyBuffer(data.state->receiverTiles, u64(i) * bytes, page.stateBuffer, 0, bytes);
+                if (!page.staticComplete || !page.dynComplete)
+                    continue;
+                auto* source = graph.GetPhysicalBuffer(data.sourceTiles[i]);
+                cmd->setBufferState(source, nvrhi::ResourceStates::CopySource);
+                cmd->copyBuffer(receivers, u64(i) * bytes, source, 0, bytes);
             }
-            cmd->setBufferState(data.state->receiverTiles, nvrhi::ResourceStates::ShaderResource);
+            cmd->setBufferState(receivers, nvrhi::ResourceStates::ShaderResource);
         });
     R_ASSERT2(EnsureHudAtlas(nvDevice, *state), "Cannot allocate the local shadow HUD atlas");
     ResourceDesc hudDesc;
@@ -2064,6 +2188,7 @@ LocalShadowOutput setupLocalShadowPasses(
             data.config = config;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder pass(builder, handle);
+            DeclareGeometryReads(pass, config.geometryResources);
             data.atlas = pass.write(hudHandle, ResourceState::DepthStencilWrite);
             data.tiles = pass.read(published.tiles, ResourceState::ShaderResource);
             if (orderAfter.is_valid())

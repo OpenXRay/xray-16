@@ -25,9 +25,9 @@ float2 GetHitUV(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
     uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
 
-    float2 uv0 = asfloat(megaVB.Load2(i0 * 48 + 24));
-    float2 uv1 = asfloat(megaVB.Load2(i1 * 48 + 24));
-    float2 uv2 = asfloat(megaVB.Load2(i2 * 48 + 24));
+    float2 uv0 = asfloat(megaVB.Load2(i0 * 32 + 24));
+    float2 uv1 = asfloat(megaVB.Load2(i1 * 32 + 24));
+    float2 uv2 = asfloat(megaVB.Load2(i2 * 32 + 24));
 
     float w0 = 1.0 - barycentrics.x - barycentrics.y;
     return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
@@ -49,9 +49,9 @@ float3 GetHitNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
     uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
 
-    float3 n0 = DecodePackedNormal(megaVB.Load(i0 * 48 + 12));
-    float3 n1 = DecodePackedNormal(megaVB.Load(i1 * 48 + 12));
-    float3 n2 = DecodePackedNormal(megaVB.Load(i2 * 48 + 12));
+    float3 n0 = asfloat(megaVB.Load3(i0 * 32 + 12));
+    float3 n1 = asfloat(megaVB.Load3(i1 * 32 + 12));
+    float3 n2 = asfloat(megaVB.Load3(i2 * 32 + 12));
 
     float w0 = 1.0 - barycentrics.x - barycentrics.y;
     return normalize(n0 * w0 + n1 * barycentrics.x + n2 * barycentrics.y);
@@ -65,9 +65,9 @@ float3 GetHitGeometricNormal(ByteAddressBuffer megaVB, ByteAddressBuffer megaIB,
     uint i1 = megaIB.Load(triBase * 4 + 4) + info.baseVertex;
     uint i2 = megaIB.Load(triBase * 4 + 8) + info.baseVertex;
 
-    float3 p0 = asfloat(megaVB.Load3(i0 * 48));
-    float3 p1 = asfloat(megaVB.Load3(i1 * 48));
-    float3 p2 = asfloat(megaVB.Load3(i2 * 48));
+    float3 p0 = asfloat(megaVB.Load3(i0 * 32));
+    float3 p1 = asfloat(megaVB.Load3(i1 * 32));
+    float3 p2 = asfloat(megaVB.Load3(i2 * 32));
 
     return normalize(cross(p1 - p0, p2 - p0));
 }

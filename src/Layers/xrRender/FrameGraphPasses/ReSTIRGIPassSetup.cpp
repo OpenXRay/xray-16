@@ -211,7 +211,7 @@ static void EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState
 
 struct InitialPassData {
     fg::RenderDevice* device;
-    RTAccelStructManager* accelMgr;
+    RTFrameResources scene;
     ReSTIRGIPassState* state;
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
@@ -390,7 +390,7 @@ ReSTIRGIOutput setupReSTIRGIPass(
             pb.write(fgResB, ResourceState::UnorderedAccess);
             pb.sideEffects();
             data.device = device;
-            data.accelMgr = accelMgr;
+            data.scene = accelMgr->UseScene(builder, pb);
             data.state = &state;
             data.cbData = initialCB;
             data.width = width;
@@ -413,12 +413,13 @@ ReSTIRGIOutput setupReSTIRGIPass(
             nvrhi::ITexture* directLit = data.state->directLighting.Get();
             nvrhi::ITexture* resA = data.state->reservoirA[data.writeIdx].Get();
             nvrhi::ITexture* resB = data.state->reservoirB[data.writeIdx].Get();
-            auto* tlas = data.accelMgr->GetTLAS();
-            auto* batchInfo = data.accelMgr->GetBatchInfoBuffer();
-            auto* megaVB = data.accelMgr->GetMegaVB();
-            auto* megaIB = data.accelMgr->GetMegaIB();
-            auto* matBuf = data.accelMgr->GetMaterialBuffer();
-            auto* terrainBuf = data.accelMgr->GetTerrainMaterialBuffer();
+            const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
+            auto* tlas = scene.tlas;
+            auto* batchInfo = scene.batchInfo;
+            auto* megaVB = scene.vertices;
+            auto* megaIB = scene.indices;
+            auto* matBuf = scene.materials;
+            auto* terrainBuf = scene.terrainMaterials;
 
             if (!sky0 || !sky1 || !directLit || !resA || !resB ||
                 !tlas || !batchInfo || !megaVB || !megaIB || !matBuf || !terrainBuf) {
@@ -430,23 +431,12 @@ ReSTIRGIOutput setupReSTIRGIPass(
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            ReSTIRGICB cb = data.cbData;
-            const auto& bc = data.accelMgr->GetBatchCounts();
-            cb.identityStaticCount = bc.identityStatic;
-            cb.terrainBatchCount = bc.terrain;
-            cb.skinnedBatchStart = bc.skinned > 0
-                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal
-                : 0;
-            cb.grassBatchStart = bc.grass > 0
-                ? bc.identityStatic + bc.terrain + bc.transparent + bc.instancedTotal + bc.skinned
-                : 0;
-            cb.detailAtlasIndex = data.accelMgr->GetDetailAtlasIndex();
-            cmdList->writeBuffer(data.state->cb, &cb, sizeof(ReSTIRGICB));
+            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(ReSTIRGICB));
 
-            nvrhi::IBuffer* skinnedVB = data.accelMgr->GetSkinnedOutputVB();
-            nvrhi::IBuffer* skinnedIB = data.accelMgr->GetSkinnedIB();
-            nvrhi::IBuffer* grassVB = data.accelMgr->GetGrassOutputVB();
-            nvrhi::IBuffer* grassIB = data.accelMgr->GetGrassIB();
+            nvrhi::IBuffer* skinnedVB = scene.skinnedVertices;
+            nvrhi::IBuffer* skinnedIB = scene.skinnedIndices;
+            nvrhi::IBuffer* grassVB = scene.grassVertices;
+            nvrhi::IBuffer* grassIB = scene.grassIndices;
             if (!skinnedVB) skinnedVB = s_rtgiPlaceholderBuffer.Get();
             if (!skinnedIB) skinnedIB = s_rtgiPlaceholderBuffer.Get();
             if (!grassVB) grassVB = s_rtgiPlaceholderBuffer.Get();
@@ -476,16 +466,15 @@ ReSTIRGIOutput setupReSTIRGIPass(
             bsb.TextureUAV("u_DirectLighting", directLit);
             bsb.TextureUAV("u_ReservoirA", resA);
             bsb.TextureUAV("u_ReservoirB", resB);
-            auto& cache = GetPassResourceCache();
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->initialLayout, nvDevice);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->initialLayout);
             if (!bindingSet) return;
 
             nvrhi::ComputeState cs;
             cs.pipeline = data.state->initialPipeline;
             cs.bindings = { bindingSet };
 
-            if (auto* bindlessTable = GEnv.Backend ? GEnv.Backend->GetBindlessDescriptorTable() : nullptr)
-                cs.addBindingSet(bindlessTable);
+            if (scene.textures)
+                cs.addBindingSet(scene.textures);
 
             cmdList->setComputeState(cs);
             cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);

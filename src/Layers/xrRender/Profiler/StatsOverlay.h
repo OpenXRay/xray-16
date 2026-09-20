@@ -29,9 +29,8 @@ struct RenderStats
     u32 skinnedTriangles = 0;    // Skinned mesh triangles
     u32 terrainTriangles = 0;    // Terrain triangles
 
-    // Mega-buffer stats
-    u32 megaBufferVertices = 0;  // Total vertices in mega-buffer
-    u32 megaBufferIndices = 0;   // Total indices in mega-buffer
+    u32 megaBufferVertices = 0;
+    u32 megaBufferIndices = 0;
 
     // Skinned culling stats (from GPU Hi-Z culling)
 
@@ -55,6 +54,68 @@ struct RenderStats
     u32 clusterTrianglesDrawn = 0;
     u32 clusterTerrainTrianglesDrawn = 0;
     u32 clusterTerrainVisible = 0;  // Terrain entries drawn last frame
+    u32 clusterInstanceVisits = 0;
+    u32 clusterNodeVisits = 0;
+    u32 clusterLeafVisits = 0;
+    u32 clusterDeferredInstances = 0;
+    u32 clusterDeferredNodes = 0;
+    u32 clusterOverflow = 0;
+    u64 geometrySharedBytes = 0;
+    u64 geometryInstanceBytes = 0;
+    u64 geometryPayloadBytes = 0;
+    u64 geometryVertexBytes = 0;
+    u64 geometryRetainedBytes = 0;
+    u64 geometryForwardDrawBytes = 0;
+    u64 geometryRetiringSourceBytes = 0;
+    u64 geometrySourceStagingBytes = 0;
+    u64 geometryHostSourceBytes = 0;
+    u64 geometryRetiringArenaBytes = 0;
+    u64 geometryShadowSnapshotBytes = 0;
+    u64 geometryShadowHostBytes = 0;
+    u64 geometryRTSourceBytes = 0;
+    u64 geometryRTGenerationBytes = 0;
+    u64 geometryRTAccelerationBytes = 0;
+    u32 geometryForwardUploadLeases = 0;
+    u32 geometryRTGenerations = 0;
+    u32 geometryRTLeases = 0;
+    u32 geometryPageBudgetMiB = 0;
+    bool geometryPagingRequested = false;
+    bool geometryPolicyPending = false;
+    bool geometryPagingDetails = false;
+    bool geometryRTAccelerationKnown = true;
+    u64 geometryResidencyArenaBytes = 0;
+    u64 geometryResidencyUsedBytes = 0;
+    u64 geometryResidencyPinnedBytes = 0;
+    u64 geometryResidencyStagingBytes = 0;
+    u32 geometryResidentGroups = 0;
+    u32 geometryPinnedGroups = 0;
+    u32 geometryDesiredGroups = 0;
+    u32 geometryActivatingGroups = 0;
+    u32 geometryBlockedGroups = 0;
+    u32 geometryResidentPages = 0;
+    u32 geometryPinnedPages = 0;
+    u32 geometryReadingPages = 0;
+    u32 geometryUploadingPages = 0;
+    u32 geometryRetiringPages = 0;
+    u32 geometryUploadsRecorded = 0;
+    u32 geometryUploadKiB = 0;
+    u32 geometryReadsIssued = 0;
+    u32 geometryReadsFailed = 0;
+    u32 geometryUploadsDiscarded = 0;
+    u32 geometryAllocationDeferrals = 0;
+    u32 geometryBudgetDeferrals = 0;
+    u32 geometryEvictions = 0;
+    u32 geometryLiveSnapshots = 0;
+    u32 geometryFailedSnapshots = 0;
+    u32 geometryCutRevision = 0;
+    bool geometryStreaming = false;
+    u64 geometryPageVertexSlots = 0;
+    u64 geometryUniqueVertices = 0;
+    u64 geometryClusterVertexReferences = 0;
+    u32 geometryPages = 0;
+    u32 geometryReclusterSplits = 0;
+    u32 geometryMaxClusterVertices = 0;
+    u32 geometryMaxClusterTriangles = 0;
 
     bool vsmActive = false;
     bool vsmSunMoving = false;
@@ -127,6 +188,27 @@ struct RenderStats
         clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
         residualStatic = residualTerrain = residualDynamic = residualTransparent = 0;
         clusterOcclusionCandidates = clusterOcclusionRecovered = 0;
+        clusterInstanceVisits = clusterNodeVisits = clusterLeafVisits = 0;
+        clusterDeferredInstances = clusterDeferredNodes = clusterOverflow = 0;
+        geometrySharedBytes = geometryInstanceBytes = geometryPayloadBytes = geometryVertexBytes = geometryRetainedBytes = 0;
+        geometryForwardDrawBytes = geometryRetiringSourceBytes = geometrySourceStagingBytes = geometryHostSourceBytes = 0;
+        geometryRetiringArenaBytes = geometryShadowSnapshotBytes = geometryShadowHostBytes = 0;
+        geometryRTSourceBytes = geometryRTGenerationBytes = geometryRTAccelerationBytes = 0;
+        geometryForwardUploadLeases = geometryRTGenerations = geometryRTLeases = geometryPageBudgetMiB = 0;
+        geometryPagingRequested = geometryPolicyPending = geometryPagingDetails = false;
+        geometryRTAccelerationKnown = true;
+        geometryPageVertexSlots = geometryUniqueVertices = geometryClusterVertexReferences = 0;
+        geometryPages = geometryReclusterSplits = geometryMaxClusterVertices = geometryMaxClusterTriangles = 0;
+        geometryResidencyArenaBytes = geometryResidencyUsedBytes = 0;
+        geometryResidencyPinnedBytes = geometryResidencyStagingBytes = 0;
+        geometryResidentGroups = geometryPinnedGroups = geometryDesiredGroups = 0;
+        geometryActivatingGroups = geometryBlockedGroups = 0;
+        geometryResidentPages = geometryPinnedPages = geometryReadingPages = 0;
+        geometryUploadingPages = geometryRetiringPages = geometryUploadsRecorded = geometryUploadKiB = 0;
+        geometryReadsIssued = geometryReadsFailed = geometryUploadsDiscarded = 0;
+        geometryAllocationDeferrals = geometryBudgetDeferrals = geometryEvictions = 0;
+        geometryLiveSnapshots = geometryFailedSnapshots = geometryCutRevision = 0;
+        geometryStreaming = false;
         vsmActive = vsmSunMoving = false;
         vsmPages = vsmDirtyPages = vsmWrongPages = 0;
         vsmBinDraws = vsmBinInstances = vsmBinMaxVisited = vsmBinLodCulled = vsmBinDrops = 0;

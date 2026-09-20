@@ -36,11 +36,6 @@ struct clodConfig
 	float simplify_ratio;
 	float simplify_threshold;
 
-	// to compute the error of simplified clusters, we use the formula that combines previous accumulated error as follows:
-	// max(previous_error * simplify_error_merge_previous, current_error) + current_error * simplify_error_merge_additive
-	float simplify_error_merge_previous;
-	float simplify_error_merge_additive;
-
 	// amplify the error of clusters that go through sloppy simplification to account for appearance degradation
 	float simplify_error_factor_sloppy;
 
@@ -237,6 +232,15 @@ static clodBounds boundsMerge(const std::vector<Cluster>& clusters, const std::v
 		result.error = std::max(result.error, clusters[group[j]].bounds.error);
 
 	return result;
+}
+
+static float errorAccumulate(float inherited, float step)
+{
+	if (!(inherited < FLT_MAX) || !(step < FLT_MAX))
+		return FLT_MAX;
+
+	float total = inherited + step;
+	return total < FLT_MAX ? total : FLT_MAX;
 }
 
 static std::vector<Cluster> clusterize(const clodConfig& config, const clodMesh& mesh, const unsigned int* indices, size_t index_count)
@@ -546,7 +550,6 @@ clodConfig clodDefaultConfig(size_t max_triangles)
 
 	config.simplify_ratio = 0.5f;
 	config.simplify_threshold = 0.85f;
-	config.simplify_error_merge_previous = 1.0f;
 	config.simplify_error_factor_sloppy = 2.0f;
 	config.simplify_permissive = true;
 	config.simplify_fallback_permissive = false; // note: by default we run in permissive mode, but it's also possible to disable that and use it only as a fallback
@@ -646,8 +649,7 @@ size_t clodBuild(clodConfig config, clodMesh mesh, void* output_context, clodOut
 				continue; // simplification is stuck; abandon the merge
 			}
 
-			// enforce error monotonicity (with an optional hierarchical factor to separate transitions more)
-			bounds.error = std::max(bounds.error * config.simplify_error_merge_previous, error) + error * config.simplify_error_merge_additive;
+			bounds.error = errorAccumulate(bounds.error, error);
 
 			// output the new group with all clusters; the resulting id will be recorded in new clusters as clodCluster::refined
 			int refined = outputGroup(config, mesh, clusters, groups[i], bounds, depth, output_context, output_callback);

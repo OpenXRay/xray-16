@@ -124,6 +124,7 @@ struct RibbonPassData {
     framegraph::VirtualResourceHandle inputColor;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle materials;
     fg::RenderDevice* device;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
@@ -147,6 +148,7 @@ RibbonPassOutput setupRibbonPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,
+    framegraph::VirtualResourceHandle materials,
     u32 width,
     u32 height,
     RibbonPassState* state = nullptr

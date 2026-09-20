@@ -44,6 +44,10 @@ struct GeometryBatch {
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr; // For skinned meshes
 
+    u64 visualLifetimeID = 0;
+    u64 renderableLifetimeID = 0;
+    u32 geometrySubset = 0;
+
     // Static vs dynamic classification (used for GPU culling uploads)
     bool isStatic = false;
 

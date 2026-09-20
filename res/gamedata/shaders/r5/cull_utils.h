@@ -128,31 +128,49 @@ HiZTestResult HiZTestSphereEx(
     result.hiZDepth = 0.0;
 
     float4 clipC = mul(pyramidViewProj, float4(center, 1.0));
-    if (clipC.w <= 0.001)
+
+    float rx = radius * length(pyramidViewProj[0].xyz);
+    float ry = radius * length(pyramidViewProj[1].xyz);
+    float rz = radius * length(pyramidViewProj[2].xyz);
+    float rw = radius * length(pyramidViewProj[3].xyz);
+
+    float wMin = clipC.w - rw;
+    float wMax = clipC.w + rw;
+    if (wMin <= 0.001)
         return result;
 
-    float2 ndc = clipC.xy / clipC.w;
-    float2 uv = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5);
-    if (any(uv < 0.0) || any(uv > 1.0))
+    float xMin = clipC.x - rx;
+    float xMax = clipC.x + rx;
+    float yMin = clipC.y - ry;
+    float yMax = clipC.y + ry;
+    float zMin = clipC.z - rz;
+    float zMax = clipC.z + rz;
+
+    float2 ndcX = float2(min(min(xMin / wMin, xMin / wMax), min(xMax / wMin, xMax / wMax)),
+                         max(max(xMin / wMin, xMin / wMax), max(xMax / wMin, xMax / wMax)));
+    float2 ndcY = float2(min(min(yMin / wMin, yMin / wMax), min(yMax / wMin, yMax / wMax)),
+                         max(max(yMin / wMin, yMin / wMax), max(yMax / wMin, yMax / wMax)));
+
+    if (ndcX.x < -1.0 || ndcX.y > 1.0 || ndcY.x < -1.0 || ndcY.y > 1.0)
         return result;
 
-    float3 viewForward = normalize(pyramidViewProj[3].xyz);
-    float4 clipN = mul(pyramidViewProj, float4(center - viewForward * radius, 1.0));
-    if (clipN.w <= 0.001)
-        return result;
-    result.frontDepth = clipN.z / clipN.w;
+    result.frontDepth = max(max(zMax / wMin, zMax / wMax), max(zMin / wMin, zMin / wMax));
 
-    float focal = length(pyramidViewProj[1].xyz);
-    float screenTexels = radius * focal * float(hiZHeight) / clipC.w;
-    uint mi = (uint)ceil(log2(max(1.0, screenTexels)));
-    if (mi > hiZMipLevels - 1)
+    float2 uvMin = float2(ndcX.x * 0.5 + 0.5, 0.5 - ndcY.y * 0.5);
+    float2 uvMax = float2(ndcX.y * 0.5 + 0.5, 0.5 - ndcY.x * 0.5);
+
+    float2 pMin = uvMin * float2(hiZWidth, hiZHeight) - 1.0;
+    float2 pMax = uvMax * float2(hiZWidth, hiZHeight) + 1.0;
+    pMin = max(pMin, float2(0.0, 0.0));
+    pMax = min(pMax, float2(float(hiZWidth) - 1.0, float(hiZHeight) - 1.0));
+    float spanTexels = max(pMax.x - pMin.x, pMax.y - pMin.y) + 1.0;
+    uint mi = (uint)ceil(log2(max(1.0, spanTexels)));
+    if (mi > hiZMipLevels - 1u)
         return result;
 
-    float2 pc0 = uv * float2(hiZWidth, hiZHeight);
-    float halfT = 0.5 * screenTexels;
     int2 tmax = int2(max(1u, hiZWidth >> mi), max(1u, hiZHeight >> mi)) - 1;
-    int2 t0 = clamp(int2(floor(pc0 - halfT)) >> (int)mi, int2(0, 0), tmax);
-    int2 t1 = clamp(int2(floor(pc0 + halfT)) >> (int)mi, int2(0, 0), tmax);
+    int2 t0 = clamp(int2(floor(pMin)) >> (int)mi, int2(0, 0), tmax);
+    int2 t1 = clamp(int2(floor(pMax)) >> (int)mi, int2(0, 0), tmax);
 
     float d0 = hiZPyramid.Load(int3(t0.x, t0.y, mi));
     float d1 = hiZPyramid.Load(int3(t1.x, t0.y, mi));

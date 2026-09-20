@@ -226,8 +226,10 @@ public:
 
     SGeometry* CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
     SGeometry* CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
+    SGeometry* CreateLogicalGeom(const VertexElement* decl);
 
     void DeleteGeom(const SGeometry* VS);
+    void DiscardGeometryBuffer(nvrhi::IBuffer* buffer);
     void DeferredLoad(BOOL E) { bDeferredLoad = E; }
     void DeferredUpload();
     void DeferredUnload();

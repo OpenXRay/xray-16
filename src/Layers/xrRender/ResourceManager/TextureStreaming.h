@@ -33,9 +33,8 @@ struct StreamingRequest {
     };
     Status status = Pending;
 
-    // For async I/O (Week 3)
-    void* ioHandle = nullptr;  // Platform-specific async I/O handle
-    xr_vector<u8> stagingBuffer;  // CPU memory for loaded data
+    u64 ioRequest = 0;
+    xr_vector<u8> stagingBuffer;
 
     // Comparison for priority queue
     bool operator<(const StreamingRequest& other) const {
@@ -106,9 +105,18 @@ public:
     void PrintStatistics() const;
 
 private:
+    enum class UploadResult : u8 {
+        Uploaded,
+        Deferred,
+        Failed
+    };
+
+    AsyncIOManager* IOService();
+
     xray::render::fg::RenderDevice* m_device;
     TextureManager* m_texManager;
-    AsyncIOManager* m_asyncIO;  // Async I/O manager
+    AsyncIOManager* m_asyncIO = nullptr;
+    u32 m_ioEpoch = 0;
 
     // ═══════════════════════════════════════════════════
     //  REQUEST QUEUE (Priority-based)
@@ -139,7 +147,7 @@ private:
 
     // Mip loading
     bool LoadMipsFromDisk(StreamingRequest& request);
-    bool UploadMipsToGPU(StreamingRequest& request);
+    UploadResult UploadMipsToGPU(StreamingRequest& request);
 
     // Async I/O callback
     void OnAsyncLoadComplete(TextureHandle handle, AsyncIORequest& ioRequest);

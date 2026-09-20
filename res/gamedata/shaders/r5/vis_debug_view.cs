@@ -36,13 +36,13 @@ void main(uint3 dtid : SV_DispatchThreadID)
     }
 
     uint id = g_VisID[dtid.xy];
-    if (id == 0u)
+    if (!VisIDValid(id))
     {
         g_VisDebug[dtid.xy] = float4(0.0, 0.0, 0.0, 1.0);
         return;
     }
-    uint entry = id >> VIS_ID_TRI_BITS;
-    uint tri = id & VIS_ID_TRI_MASK;
+    uint entry = UnpackVisEntry(id);
+    uint tri = UnpackVisTri(id);
     float3 color = (visDebugMode == 2u) ? HashColor(entry * 131u + tri) : HashColor(entry) * (0.6 + 0.4 * float(tri & 1u));
     g_VisDebug[dtid.xy] = float4(color, 1.0);
 }

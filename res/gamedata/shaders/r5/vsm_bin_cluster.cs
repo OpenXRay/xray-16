@@ -2,7 +2,13 @@
 #include "common.h"
 #include "vsm_common.h"
 #include "vsm_params.h"
-#include "visbuffer_common.h"
+#define CLUSTER_GEO_T_REFS t0
+#define CLUSTER_GEO_T_META t3
+#define CLUSTER_GEO_T_INSTANCES t4
+#define CLUSTER_GEO_RESIDENCY
+#define CLUSTER_GEO_T_GROUPS t26
+#define CLUSTER_GEO_T_GROUP_STATE t27
+#include "cluster_geo_bindings.h"
 #include "vsm_bvh_types.h"
 
 cbuffer VsmBinParams : register(b5)
@@ -13,10 +19,10 @@ cbuffer VsmBinParams : register(b5)
     uint g_PairCapAT;
     uint g_NodeCount;
     float g_ErrK;
-    uint2 g_BinPad;
+    uint g_ResidencyStreaming;
+    uint g_BinPad;
 };
 
-StructuredBuffer<ClusterEntry> g_Entries : register(t0);
 StructuredBuffer<uint> g_DirtyList : register(t1);
 StructuredBuffer<uint4> g_PageList : register(t2);
 StructuredBuffer<uint4> g_PairBase : register(t16);
@@ -54,7 +60,7 @@ void BvhVisit(bool active, uint entryIdx, VsmPageQuery q)
         return;
     uint v;
     InterlockedAdd(gs_visited, 1u, v);
-    ClusterEntry e = g_Entries[entryIdx];
+    ClusterEntry e = LoadClusterEntry(entryIdx);
     bool at = (e.flags & 1u) != 0u;
     bool terrain = (e.flags & 4u) != 0u;
     if (at && q.includeAT == 0u)
@@ -97,7 +103,7 @@ void main(uint3 gID : SV_GroupID, uint3 gtID : SV_GroupThreadID)
     q.errB = vsm_level[L].z / float(VSM_VIRTUAL_RES) * g_ErrK;
     q.slot = slot;
     q.includeAT = g_IncludeAT;
-    q.pad = 0u;
+    q.residency = g_ResidencyStreaming;
 
     bvhTraverse(t, g_NodeCount, q);
 

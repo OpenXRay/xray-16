@@ -125,6 +125,8 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         Msg("* [D3D12Backend] NVRHI validation layer enabled");
     }
 
+    m_completion.Initialize(m_nvrhiDevice);
+
     // Create per-frame command list (for rendering)
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false; // D3D12 uses deferred execution
@@ -181,9 +183,16 @@ void D3D12Backend::Shutdown() {
 
     WaitForIdle();
 
+    m_completion.Shutdown();
+
     // Release NVRHI resources
     m_bindlessDescriptorTable = nullptr;
     m_bindlessLayout = nullptr;
+    m_bindlessTextureMap.clear();
+    m_bindlessTextureResources.clear();
+    m_bindlessTextureReferences.clear();
+    m_freeBindlessIndices.clear();
+    m_nextBindlessIndex = 0;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     m_commandList = nullptr;
@@ -485,12 +494,18 @@ void D3D12Backend::QueryCapabilities() {
 }
 
 u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
     if (!m_bindlessDescriptorTable || !texture)
         return UINT32_MAX;
 
     auto it = m_bindlessTextureMap.find(texture);
     if (it != m_bindlessTextureMap.end())
+    {
+        u32& references = m_bindlessTextureReferences[it->second];
+        R_ASSERT(references != 0 && references != UINT32_MAX);
+        ++references;
         return it->second;
+    }
 
     u32 slot;
     if (!m_freeBindlessIndices.empty()) {
@@ -502,6 +517,8 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
             return UINT32_MAX;
         }
         slot = m_nextBindlessIndex++;
+        m_bindlessTextureResources.resize(m_nextBindlessIndex);
+        m_bindlessTextureReferences.resize(m_nextBindlessIndex);
     }
 
     nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
@@ -513,19 +530,45 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     }
 
     m_bindlessTextureMap[texture] = slot;
+    m_bindlessTextureResources[slot] = texture;
+    m_bindlessTextureReferences[slot] = 1;
     return slot;
 }
 
-void D3D12Backend::UnregisterBindlessTexture(u32 index) {
-    if (index >= MAX_BINDLESS_TEXTURES)
-        return;
-    for (auto it = m_bindlessTextureMap.begin(); it != m_bindlessTextureMap.end(); ++it) {
-        if (it->second == index) {
-            m_bindlessTextureMap.erase(it);
-            break;
-        }
+void D3D12Backend::UnregisterBindlessTexture(u32 index)
+{
+    ReleaseBindlessTextures(&index, 1);
+}
+
+bool D3D12Backend::RetainBindlessTextures(const u32* indices, u32 count)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    for (u32 i = 0; i < count; ++i)
+    {
+        if (indices[i] >= m_bindlessTextureReferences.size() || m_bindlessTextureReferences[indices[i]] == 0)
+            return false;
+        R_ASSERT(m_bindlessTextureReferences[indices[i]] <= UINT32_MAX - count);
     }
-    m_freeBindlessIndices.push_back(index);
+    for (u32 i = 0; i < count; ++i)
+        ++m_bindlessTextureReferences[indices[i]];
+    return true;
+}
+
+void D3D12Backend::ReleaseBindlessTextures(const u32* indices, u32 count)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    for (u32 i = 0; i < count; ++i)
+    {
+        const u32 index = indices[i];
+        R_ASSERT(index < m_bindlessTextureReferences.size() && m_bindlessTextureReferences[index] != 0);
+        if (--m_bindlessTextureReferences[index] != 0)
+            continue;
+        R_ASSERT2(m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, nvrhi::BindingSetItem::None(index)),
+            "[D3D12Backend] bindless texture retirement failed");
+        m_bindlessTextureMap.erase(m_bindlessTextureResources[index].Get());
+        m_bindlessTextureResources[index] = nullptr;
+        m_freeBindlessIndices.push_back(index);
+    }
 }
 
 nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
@@ -579,6 +622,8 @@ void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
 
 void D3D12Backend::BeginFrame() {
     ZoneScopedN("D3D12::BeginFrame");
+    m_completion.DiscardOpenLeases();
+    R_ASSERT2(!m_inFrame, "D3D12 frame recording was abandoned without EndFrame");
 
     // ═══════════════════════════════════════════════════════
     //  ASYNC GC: Wait for previous frame's garbage collection
@@ -603,6 +648,11 @@ void D3D12Backend::BeginFrame() {
 
 void D3D12Backend::EndFrame() {
     ZoneScopedN("D3D12::EndFrame");
+    if (!m_inFrame)
+    {
+        m_completion.DiscardOpenLeases();
+        return;
+    }
 
     m_inFrame = false;
 
@@ -610,6 +660,8 @@ void D3D12Backend::EndFrame() {
         ZoneScopedN("D3D12::ExecuteCommandList");
         SubmitGraphics();
     }
+    m_completion.CloseOpenLeases();
+
 
     // ═══════════════════════════════════════════════════════
     //  ASYNC GC: Launch garbage collection on background thread
@@ -642,7 +694,13 @@ void D3D12Backend::WaitForIdle() {
 
 void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
     if (m_nvrhiDevice && commandList) {
-        m_nvrhiDevice->executeCommandList(commandList);
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(commandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("D3D12 rejected a command list submission");
+        }
+        m_completion.ArmTicket(ticket);
     }
 }
 
@@ -655,8 +713,15 @@ u64 D3D12Backend::SubmitGraphics() {
     for (u32 i = 0; i < m_graphicsWaits.count; ++i)
         m_tokens.WaitFor(m_nvrhiDevice, nvrhi::CommandQueue::Graphics, m_graphicsWaits.tokens[i]);
     m_graphicsWaits.Clear();
+    const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
     const u64 instanceID = m_nvrhiDevice->executeCommandList(m_commandList);
+    if (!instanceID)
+    {
+        m_completion.CancelTicket(ticket);
+        FATAL("D3D12 rejected a graphics command list submission");
+    }
     m_tokens.Resolve(token, nvrhi::CommandQueue::Graphics, instanceID);
+    m_completion.ArmTicket(ticket);
     return instanceID;
 }
 
@@ -681,8 +746,15 @@ u32 D3D12Backend::SubmitCompute(nvrhi::ICommandList* commandList, const u32* wai
     const u32 token = m_tokens.Issue(nvrhi::CommandQueue::Compute);
     for (u32 i = 0; i < numWaitTokens; ++i)
         m_tokens.WaitFor(m_nvrhiDevice, nvrhi::CommandQueue::Compute, waitTokens[i]);
+    const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Compute);
     const u64 instanceID = m_nvrhiDevice->executeCommandList(commandList, nvrhi::CommandQueue::Compute);
+    if (!instanceID)
+    {
+        m_completion.CancelTicket(ticket);
+        FATAL("D3D12 rejected a compute command list submission");
+    }
     m_tokens.Resolve(token, nvrhi::CommandQueue::Compute, instanceID);
+    m_completion.ArmTicket(ticket);
     return token;
 }
 
@@ -693,7 +765,13 @@ void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
 
     for (u32 i = 0; i < count; ++i) {
         if (commandLists[i]) {
-            m_nvrhiDevice->executeCommandList(commandLists[i]);
+            const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+            if (!m_nvrhiDevice->executeCommandList(commandLists[i]))
+            {
+                m_completion.CancelTicket(ticket);
+                FATAL("D3D12 rejected an ordered command list submission");
+            }
+            m_completion.ArmTicket(ticket);
         }
     }
 }
@@ -712,7 +790,13 @@ void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, si
         m_uploadCommandList->open();
         m_uploadCommandList->writeBuffer(buffer, data, size);
         m_uploadCommandList->close();
-        m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(m_uploadCommandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("D3D12 rejected a buffer upload submission");
+        }
+        m_completion.ArmTicket(ticket);
     }
 }
 

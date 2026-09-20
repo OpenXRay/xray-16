@@ -3,15 +3,54 @@
 #include "vsm_common.h"
 
 #include "vsm_resid_params.h"
+#define GEOMETRY_CUTS_REGISTER t1
+#include "geometry_cut_common.h"
 
 StructuredBuffer<uint> g_Needed : register(t0);
+StructuredBuffer<float4> g_SlotPivot : register(t2);
+StructuredBuffer<float4> g_SlotSun : register(t3);
 RWStructuredBuffer<uint> g_PageTable : register(u0);
 RWStructuredBuffer<uint4> g_PageList : register(u1);
-RWStructuredBuffer<uint2> g_PhysTile : register(u2);
+StructuredBuffer<uint2> g_PhysTile : register(t4);
 RWStructuredBuffer<uint> g_SlotDirty : register(u3);
 RWStructuredBuffer<uint4> g_CandList : register(u4);
 RWByteAddressBuffer g_Counters : register(u5);
-RWStructuredBuffer<uint> g_SlotFrame : register(u6);
+StructuredBuffer<uint> g_SlotFrame : register(t5);
+RWStructuredBuffer<uint2> g_GeometryDirty : register(u7);
+
+void updateGeometryDirty(uint slot, uint level)
+{
+    uint2 state = g_GeometryDirty[slot];
+    uint2 header = g_GeometryCuts.Load2(0u);
+    if (state.x >= header.y)
+        return;
+    if (state.y == 0u && any(g_SlotSun[slot].xyz != 0.0))
+    {
+        float4 pivot = g_SlotPivot[slot];
+        float4 sun = g_SlotSun[slot];
+        float3 up = abs(sun.y) > 0.99 ? float3(0.0, 0.0, 1.0) : float3(0.0, 1.0, 0.0);
+        up = normalize(up - sun.xyz * dot(up, sun.xyz));
+        float3 right = cross(up, sun.xyz);
+        float2 origin = float2(pivot.w, sun.w);
+        float width = g_LevelOrigin[level].z;
+        for (uint i = geometryFirstCutAfter(state.x, header.x); i < header.x; ++i)
+        {
+            float3 center, extent;
+            geometryCutBounds(i, center, extent);
+            float3 delta = center - pivot.xyz;
+            float3 local = float3(dot(right, delta), dot(up, delta), dot(sun.xyz, delta));
+            float3 radius = float3(dot(abs(right), extent), dot(abs(up), extent), dot(abs(sun.xyz), extent));
+            if (all(local.xy + radius.xy >= origin) && all(local.xy - radius.xy <= origin + width)
+                && local.z + radius.z >= g_Pivot.w && local.z - radius.z <= g_Sun.w)
+            {
+                state.y = 1u;
+                break;
+            }
+        }
+    }
+    state.x = header.y;
+    g_GeometryDirty[slot] = state;
+}
 
 int2 pageBaseOf(int L)
 {
@@ -47,6 +86,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     int2 wpage = int2(within % VSM_PAGES_AXIS, within / VSM_PAGES_AXIS);
     int2 absPage = pageBaseOf(level) + wpage;
     int slot = vsmToroidalSlot(level, absPage);
+    updateGeometryDirty(uint(slot), uint(level));
     g_SlotDirty[slot] = 0u;
     if (!needed)
     {
@@ -56,8 +96,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     g_PageList[slot] = uint4(uint(level), uint(wpage.x), uint(wpage.y), 0u);
 
     uint2 tile = uint2(uint(absPage.x), uint(absPage.y));
-    bool force = g_ForceDirty != 0u;
-    bool wrong = any(g_PhysTile[slot] != tile);
+    bool force = g_ForceDirty != 0u || g_GeometryDirty[slot].y != 0u;
+    bool wrong = any(g_PhysTile[slot] != tile) || !any(g_SlotSun[slot].xyz != 0.0);
     uint kind = 0u;
 
     if (wrong)
@@ -81,7 +121,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
         }
     }
 
-    g_PageTable[vp] = (kind == 1u) ? VSM_UNMAPPED : uint(slot);
+    g_PageTable[vp] = (kind == 1u || g_GeometryDirty[slot].y == 2u) ? VSM_UNMAPPED : uint(slot);
     if (kind == 0u)
         return;
 

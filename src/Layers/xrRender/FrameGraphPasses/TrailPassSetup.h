@@ -142,6 +142,7 @@ struct TrailPassData {
     framegraph::VirtualResourceHandle inputColor;
     framegraph::VirtualResourceHandle outputColor;
     framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle materials;
     fg::RenderDevice* device;
     framegraph::DefaultOutputLayout outputs;
     u32 width;
@@ -165,6 +166,7 @@ TrailPassOutput setupTrailPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     const framegraph::DefaultOutputLayout& forwardInputs,
+    framegraph::VirtualResourceHandle materials,
     u32 width,
     u32 height,
     TrailPassState* state = nullptr

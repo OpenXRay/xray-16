@@ -1,26 +1,8 @@
-// bindless_forward.vs
-// SM6 Bindless forward vertex shader
-//
-// SUPPORTS TWO VERTEX FORMATS:
-// 1. Legacy X-Ray compressed format (32 bytes) - current rendering path
-// 2. UnifiedVertex format (48 bytes) - GPU-driven mega-buffer path
-//
-// For now, we use the UnifiedVertex format which has pre-unpacked UVs.
-// When rendering from legacy D3D11 buffers, the input layout handles conversion.
 
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
 
-// UnifiedVertex format (48 bytes):
-//   Position:  float3    at offset  0 (12 bytes)
-//   Normal:    D3DCOLOR  at offset 12 (4 bytes) - packed [-1,1] -> [0,1], A=hemi
-//   Tangent:   D3DCOLOR  at offset 16 (4 bytes) - packed
-//   Binormal:  D3DCOLOR  at offset 20 (4 bytes) - packed
-//   TexCoord0: float2    at offset 24 (8 bytes) - pre-unpacked base UV
-//   TexCoord1: float2    at offset 32 (8 bytes) - lightmap UV
-//   Color:     D3DCOLOR  at offset 40 (4 bytes) - vertex color
-//   Flags:     uint      at offset 44 (4 bytes) - reserved
 struct VS_INPUT
 {
     float4 position  : POSITION;     // float3 position
@@ -31,6 +13,7 @@ struct VS_INPUT
     float2 texcoord1 : TEXCOORD1;    // float2: lightmap UV
     float4 color     : COLOR0;       // D3DCOLOR: vertex color (BGRA8_UNORM)
     uint drawIndex   : DRAWINDEX;    // Per-instance draw index from StartInstanceLocation
+    float3 exactNormal : EXACTNORMAL;
 };
 
 struct VS_OUTPUT
@@ -78,8 +61,8 @@ VS_OUTPUT main(VS_INPUT input)
     float4x4 worldMatrix = instanceData.world;
     uint materialID = instanceData.materialID;
 
-    // Unpack compressed normal/tangent/binormal
-    float3 normalUnpacked = UnpackNormal(input.normal);
+    float3 normalUnpacked = (instanceData.flags & 4u) != 0u
+        ? UnpackNormal(input.normal) : input.exactNormal;
     float3 tangentUnpacked = UnpackNormal(input.tangent);
     float3 binormalUnpacked = UnpackNormal(input.binormal);
 

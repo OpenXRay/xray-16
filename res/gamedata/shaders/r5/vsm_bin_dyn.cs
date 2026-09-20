@@ -3,22 +3,13 @@
 #include "vsm_common.h"
 #include "vsm_params.h"
 
-struct ClusterEntry
-{
-    float4 sphere;
-    float4 lodSelf;
-    float4 lodParent;
-    uint indexCount;
-    uint ibFirst;
-    uint firstVertex;
-    uint batchIndex;
-    uint materialID;
-    uint flags;
-    float selfError;
-    float parentError;
-    float3 extent;
-    float extentPad;
-};
+#define CLUSTER_GEO_T_REFS t2
+#define CLUSTER_GEO_T_META t3
+#define CLUSTER_GEO_T_INSTANCES t4
+#define CLUSTER_GEO_RESIDENCY
+#define CLUSTER_GEO_T_GROUPS t26
+#define CLUSTER_GEO_T_GROUP_STATE t27
+#include "cluster_geo_bindings.h"
 
 cbuffer VsmDynBinParams : register(b5)
 {
@@ -28,11 +19,19 @@ cbuffer VsmDynBinParams : register(b5)
     uint g_CapOpaque;
     uint g_CapAT;
     uint g_StatsBase;
-    uint2 g_DynBinPad;
+    uint g_UseSkinned;
+    uint g_DynBinPad;
 };
 
-StructuredBuffer<ClusterEntry> g_Entries : register(t0);
+StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t0);
 StructuredBuffer<uint> g_DynPageTable : register(t1);
+
+ClusterEntry LoadSourceEntry(uint idx)
+{
+    if (g_UseSkinned != 0u)
+        return g_SkinnedEntries[idx];
+    return LoadClusterEntry(idx);
+}
 RWStructuredBuffer<uint> g_Stats : register(u0);
 RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
 RWStructuredBuffer<uint2> g_PairsAT : register(u2);
@@ -45,8 +44,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
         return;
 
     uint entryIdx = g_EntryBase + idx;
-    ClusterEntry e = g_Entries[entryIdx];
-    if ((e.flags & (32u | 128u)) != 0u) // HUD or material without a shadow pass
+    ClusterEntry e = LoadSourceEntry(entryIdx);
+    if ((e.flags & (CLUSTER_ENTRY_FLAG_HUD | CLUSTER_ENTRY_FLAG_NO_SHADOW)) != 0u)
         return;
     bool at = (e.flags & 1u) != 0u;
     if (at && g_IncludeAT == 0u)
