@@ -14,11 +14,28 @@ struct PS_INPUT
     float2 texcoord : TEXCOORD0;
     nointerpolation uint materialID : TEXCOORD1;
     nointerpolation uint drawID : TEXCOORD2;
-#ifdef CLUSTER_VIS_MESH
-    perprimitive
-#endif
+#if !defined(CLUSTER_VIS_MESH) || !defined(TARGET_SPIRV)
     nointerpolation uint visID : TEXCOORD3;
+#endif
 };
+
+#if defined(CLUSTER_VIS_MESH) && defined(TARGET_SPIRV)
+uint ClusterVisID(PS_INPUT input)
+{
+    return asuint(spirv_asm
+    {
+        OpCapability MeshShadingEXT;
+        OpExtension "SPV_EXT_mesh_shader";
+        OpDecorate builtin(PrimitiveId:int) Flat;
+        result:$$int = OpLoad builtin(PrimitiveId:int);
+    });
+}
+#else
+uint ClusterVisID(PS_INPUT input)
+{
+    return input.visID;
+}
+#endif
 
 uint main(PS_INPUT input) : SV_Target0
 {
@@ -33,7 +50,7 @@ uint main(PS_INPUT input) : SV_Target0
     }
 #endif
 
-    return input.visID;
+    return ClusterVisID(input);
 }
 
 #endif

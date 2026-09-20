@@ -50,7 +50,7 @@ public:
     bool SupportsSubmissionLeases() const override { return true; }
     u64 OpenSubmissionLease() override { return m_completion.OpenLease(); }
     void CloseSubmissionLease(u64 lease) override { m_completion.CloseLease(lease); }
-    SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_completion.PollLease(lease); }
+    SubmissionLeaseState PollSubmissionLease(u64 lease) override;
     void ReleaseSubmissionLease(u64 lease) override { m_completion.ReleaseLease(lease); }
     u32 GetPendingSubmissionCount() const override { return m_completion.PendingTicketCount(); }
 
@@ -204,6 +204,7 @@ private:
 
     nvrhi::ICommandList* AcquireFromPool(CommandListPool& pool, nvrhi::CommandQueue queue);
     u64 SubmitLocked(const SubmitJob& job);
+    void RunGarbageCollection();
     void EnqueueJob(SubmitJob&& job);
     void SubmitThreadMain();
     void FlushSubmits();

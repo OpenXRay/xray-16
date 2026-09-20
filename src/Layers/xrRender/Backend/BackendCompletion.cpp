@@ -63,14 +63,12 @@ u64 SubmissionTracker::RegisterTicket(nvrhi::CommandQueue queue)
     if (!m_device)
         return 0;
 
-    AdvanceLocked(queueIndex);
-    const u32 slot = AcquireSlotLocked(queueIndex);
     QueueState& state = m_queues[queueIndex];
     if (state.issuedSeq == ((1ull << kTicketQueueShift) - 1ull))
         FATAL("[Backend] submission completion sequence exhausted");
     Ticket ticket;
     ticket.seq = ++state.issuedSeq;
-    ticket.slot = slot;
+    ticket.slot = UINT32_MAX;
     ticket.state = TicketState::Pending;
     state.tickets.push_back(ticket);
     return MakeTicket(queueIndex, ticket.seq);
@@ -126,10 +124,13 @@ void SubmissionTracker::ArmTicket(u64 ticket)
     if (!m_device)
         FATAL("[Backend] submission completed after tracker shutdown");
 
+    AdvanceAllLocked();
+
     Ticket* entry = FindTicketLocked(queueIndex, seq);
-    if (!entry || entry->state != TicketState::Pending || entry->slot == UINT32_MAX)
+    if (!entry || entry->state != TicketState::Pending)
         FATAL("[Backend] submitted command list has no pending completion ticket");
 
+    entry->slot = AcquireSlotLocked(queueIndex);
     QuerySlot& slot = m_slots[queueIndex][entry->slot];
     m_device->resetEventQuery(slot.query);
     m_device->setEventQuery(slot.query, nvrhi::CommandQueue(queueIndex));
@@ -154,12 +155,7 @@ void SubmissionTracker::CancelTicket(u64 ticket)
         return;
 
     if (entry->state == TicketState::Pending)
-    {
-        QuerySlot& slot = m_slots[queueIndex][entry->slot];
-        slot.busy = false;
-        entry->slot = UINT32_MAX;
         entry->state = TicketState::Canceled;
-    }
     AdvanceLocked(queueIndex);
 }
 
@@ -202,6 +198,12 @@ void SubmissionTracker::AdvanceLocked(u32 queueIndex)
         state.tickets.erase(state.tickets.begin(), state.tickets.begin() + state.head);
         state.head = 0;
     }
+}
+
+void SubmissionTracker::AdvanceAllLocked()
+{
+    for (u32 q = 0; q < QUEUE_COUNT; ++q)
+        AdvanceLocked(q);
 }
 
 void SubmissionTracker::MarkFailureLocked(u32 queueIndex, u64 seq)
@@ -274,6 +276,20 @@ void SubmissionTracker::ReleaseLease(u64 lease)
     m_leases.erase(lease);
 }
 
+IRenderBackend::SubmissionLeaseState SubmissionTracker::EvaluateLeaseLocked(const Lease& lease) const
+{
+    if (!lease.closed)
+        return IRenderBackend::SubmissionLeaseState::Open;
+
+    for (u32 q = 0; q < QUEUE_COUNT; ++q)
+    {
+        if (m_queues[q].completedSeq < lease.requiredSeq[q])
+            return IRenderBackend::SubmissionLeaseState::Pending;
+    }
+    return lease.failed ? IRenderBackend::SubmissionLeaseState::Failed
+                        : IRenderBackend::SubmissionLeaseState::Complete;
+}
+
 IRenderBackend::SubmissionLeaseState SubmissionTracker::PollLease(u64 lease)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -283,14 +299,17 @@ IRenderBackend::SubmissionLeaseState SubmissionTracker::PollLease(u64 lease)
     if (!it->second.closed)
         return IRenderBackend::SubmissionLeaseState::Open;
 
-    for (u32 q = 0; q < QUEUE_COUNT; ++q)
-    {
-        AdvanceLocked(q);
-        if (m_queues[q].completedSeq < it->second.requiredSeq[q])
-            return IRenderBackend::SubmissionLeaseState::Pending;
-    }
-    return it->second.failed ? IRenderBackend::SubmissionLeaseState::Failed
-                            : IRenderBackend::SubmissionLeaseState::Complete;
+    AdvanceAllLocked();
+    return EvaluateLeaseLocked(it->second);
+}
+
+IRenderBackend::SubmissionLeaseState SubmissionTracker::PeekLease(u64 lease) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const auto it = m_leases.find(lease);
+    if (it == m_leases.end())
+        return IRenderBackend::SubmissionLeaseState::Unknown;
+    return EvaluateLeaseLocked(it->second);
 }
 
 u32 SubmissionTracker::PendingTicketCount() const

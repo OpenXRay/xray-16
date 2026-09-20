@@ -60,6 +60,12 @@ public:
     u32 uploadsDiscarded = 0;
     u32 allocationDeferrals = 0;
     u32 budgetDeferrals = 0;
+    u32 dependencyStalls = 0;
+    u32 readThrottles = 0;
+    u32 uploadThrottles = 0;
+    u32 reservationFailures = 0;
+    u32 failedPages = 0;
+    u32 unreachableGroups = 0;
     u32 evictions = 0;
 
     u64 vertexArenaBytes = 0;
@@ -70,6 +76,7 @@ public:
     u64 pinnedPayloadBytes = 0;
     u64 stagingBytes = 0;
     u64 retiringArenaBytes = 0;
+    u64 reservedHeadroomBytes = 0;
     u32 pageBudgetMiB = 0;
     bool pagingRequested = false;
 
@@ -140,7 +147,15 @@ private:
         Reading,
         Staged,
         Uploading,
-        Resident
+        Resident,
+        Failed
+    };
+
+    class ArenaCopyRange
+    {
+    public:
+        u64 offset = 0;
+        u64 bytes = 0;
     };
 
     class Arena
@@ -150,14 +165,21 @@ private:
         u64 bytes = 0;
         u32 blockCount = 0;
         u32 usedBlocks = 0;
+        u32 pinnedBlocks = 0;
+        u32 reservedBlocks = 0;
         u32 cursor = 0;
         xr_vector<u64> freeMask;
 
         void Grow(u64 arenaBytes);
         void Reset(u64 arenaBytes);
-        bool Allocate(u32 blocks, u32& outBlock);
-        void Release(u32 block, u32 blocks);
+        bool Allocate(u32 blocks, bool pinnedRequest, u32& outBlock);
+        bool CanAllocate(u32 blocks, bool pinnedRequest) const;
+        void Release(u32 block, u32 blocks, bool pinnedRelease);
+        void CollectLiveRanges(xr_vector<ArenaCopyRange>& out) const;
         u64 UsedBytes() const;
+        u64 ReservedBytes() const;
+        u64 FineUsedBytes() const;
+        u64 FineBudgetBytes() const;
     };
 
     class PageSlot
@@ -170,6 +192,8 @@ private:
         u64 vertexRead = 0;
         u64 payloadRead = 0;
         u32 refs = 0;
+        u32 readAttempts = 0;
+        u32 retryFrame = 0;
         u64 publishedSnapshot = 0;
         PageState state = PageState::Absent;
         bool pinned = false;
@@ -219,12 +243,14 @@ private:
         u32 vertexBlocks = 0;
         u32 payloadBlock = GEOMETRY_PAGE_SLOT_INVALID;
         u32 payloadBlocks = 0;
+        bool pinned = false;
     };
 
     bool CreateBuffers(u64 vertexBytes, u64 payloadBytes);
     void ReleaseBuffers();
     void BuildMemberGroups();
     bool AllocatePage(u32 page);
+    void RecordAllocationPressure(u32 page);
     void IssuePageRead(u32 page);
     void StageFromCook(u32 page);
     bool TryActivateGroup(u32 group);
@@ -246,7 +272,12 @@ private:
     const u8* CookPayloadBytes(u32 page, u32& outSize) const;
     void UploadShadowCuts(nvrhi::ICommandList* cmdList);
     bool ReserveGroupPages(u32 group);
-    void GrowArena(Arena& arena, u64 bytes, nvrhi::BufferHandle& source);
+    void ReserveRuntimeArena(Arena& arena, u64 bytes, bool force, nvrhi::BufferHandle& source,
+        xr_vector<ArenaCopyRange>& ranges);
+    void RecordPageReadFailure(u32 page, const char* reason);
+    void RefreshUnreachableGroups();
+    void AbandonGroup(u32 group);
+    void EvictUnderPressure();
 
     RenderDevice* m_device = nullptr;
     resources::AsyncIOManager* m_io = nullptr;
@@ -274,6 +305,8 @@ private:
     u32 m_cutStagingRevision = 0;
     nvrhi::BufferHandle m_vertexCopySource;
     nvrhi::BufferHandle m_payloadCopySource;
+    xr_vector<ArenaCopyRange> m_vertexCopyRanges;
+    xr_vector<ArenaCopyRange> m_payloadCopyRanges;
     xr_vector<u32> m_reservedPages;
     xr_vector<u32> m_demandClosure;
 
@@ -296,6 +329,7 @@ private:
     xr_vector<RetiringPage> m_retiring;
     xr_vector<u32> m_uploadQueue;
     xr_vector<u32> m_uploadDeferred;
+    xr_vector<u8> m_groupUnreachable;
 
     u32 m_groupCount = 0;
     u32 m_fineGroupCount = 0;
@@ -305,6 +339,10 @@ private:
     u64 m_snapshotId = 0;
     u64 m_settledSnapshot = 0;
     u64 m_frameLease = 0;
+    u64 m_pressureVertexBytes = 0;
+    u64 m_pressurePayloadBytes = 0;
+    bool m_unreachableDirty = false;
+    bool m_readFailureLogged = false;
 
     GeometryResidencyStats m_stats;
 };

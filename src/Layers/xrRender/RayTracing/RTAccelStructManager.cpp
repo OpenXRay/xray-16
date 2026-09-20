@@ -6,6 +6,7 @@
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -273,6 +274,7 @@ void RTAccelStructManager::RetireScenes()
         {
             it->scene->skinIndexData.clear();
             it->scene->skinJobs.clear();
+            it->scene->skinSources.clear();
             it->scene->grassJobs.clear();
             it->scene->bones = nullptr;
             it->scene->sourceMaterials = nullptr;
@@ -403,15 +405,15 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
     m_staticGeometry = std::move(geometry);
 }
 
-u32 RTAccelStructManager::GetSkinningFormatID(u16 mode, u32 stride)
+u32 RTAccelStructManager::GetSkinningFormatID(u32 poolFormat)
 {
-    switch (mode)
+    switch (poolFormat)
     {
-    case 1: case 3: return 0;
-    case 2: case 4: return 1;
-    case 5: case 6: return 2;
-    case 7: case 8: return 3;
-    case 9: case 10: return 4;
+    case VF_SKINNED_NONHQ: return 0;
+    case VF_SKINNED_HQ1W: return 1;
+    case VF_SKINNED_HQ2W: return 2;
+    case VF_SKINNED_HQ3W: return 3;
+    case VF_SKINNED_HQ4W: return 4;
     default: FATAL("[RT] unrecognized authored skinning vertex format");
     }
     return 0;
@@ -446,47 +448,99 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     if (world.empty() && hud.empty())
         return;
     InitSkinningPipeline();
+    const auto& pools = gpu->GetSkinnedPools();
     u64 vertexCount = 0;
+    auto slotOf = [&](nvrhi::IBuffer* source)
+    {
+        for (u32 slot = 0; slot < scene.skinSources.size(); ++slot)
+        {
+            if (scene.skinSources[slot] == source)
+                return slot;
+        }
+        scene.skinSources.push_back(source);
+        return u32(scene.skinSources.size() - 1);
+    };
     auto append = [&](const GeometryBatch& batch)
     {
         R_ASSERT(batch.visual && batch.indexCount && batch.isSkinned);
-        auto* mesh = static_cast<IRender_Mesh*>(static_cast<Fvisual*>(batch.visual));
         CKinematics* skeleton = nullptr;
         if (batch.visual->getType() == MT_SKELETON_GEOMDEF_ST)
             skeleton = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
         else if (batch.visual->getType() == MT_SKELETON_GEOMDEF_PM)
             skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
-        R_ASSERT(skeleton && mesh->p_rm_Vertices && mesh->p_rm_Indices);
-        auto* indexBuffer = mesh->p_rm_Indices->GetBufferHandle().Get();
-        const u64 indexBytes = indexBuffer->getDesc().byteSize;
-        R_ASSERT(indexBytes <= UINT32_MAX && (u64(batch.startIndex) + batch.indexCount) * sizeof(u16) <= indexBytes);
-        R_ASSERT(vertexCount + mesh->vCount <= UINT32_MAX && scene.skinIndexData.size() + u64(batch.indexCount) <= UINT32_MAX);
-        auto* indices = static_cast<const u16*>(mesh->p_rm_Indices->Map(0, u32(indexBytes), true));
-        R_ASSERT(indices);
+        R_ASSERT(skeleton);
+        auto* mesh = static_cast<IRender_Mesh*>(static_cast<Fvisual*>(batch.visual));
+        const u32 format = batch.skinnedPoolFormat;
+        const bool pooled = format >= SkinnedGeometryPools::FIRST_FORMAT
+            && format < SkinnedGeometryPools::FORMAT_COUNT;
+        const u32 vertices = batch.vertexCount;
+        R_ASSERT(vertices && vertexCount + vertices <= UINT32_MAX
+            && scene.skinIndexData.size() + u64(batch.indexCount) <= UINT32_MAX);
+        nvrhi::IBuffer* source = nullptr;
+        const u16* indices = nullptr;
+        IndexStagingBuffer* mapped = nullptr;
+        u32 stride = 0;
+        u32 baseVertex = 0;
+        u32 formatID = 0;
+        if (pooled)
+        {
+            source = pools.GetVertexBuffer(format);
+            if (!source)
+                FATAL_F("[RT] skinned vertex pool %u has no storage; pooled skinning never ran", format);
+            stride = SkinnedFormatStride(format);
+            baseVertex = u32(batch.skinnedPoolBaseVertex);
+            formatID = GetSkinningFormatID(format);
+            R_ASSERT(batch.skinnedPoolBaseVertex >= 0
+                && u64(baseVertex) + vertices <= pools.GetVertexCount(format));
+            indices = pools.GetIndexRange(format, batch.skinnedPoolFirstIndex, batch.indexCount);
+            if (!indices)
+                FATAL_F("[RT] pooled skinned index range %u+%u escapes format %u",
+                    batch.skinnedPoolFirstIndex, batch.indexCount, format);
+        }
+        else
+        {
+            R_ASSERT(mesh->p_rm_Vertices && mesh->p_rm_Indices);
+            source = mesh->p_rm_Vertices->GetBufferHandle().Get();
+            if (!source)
+                FATAL("[RT] a skinned visual has neither pooled geometry nor a resident vertex buffer");
+            stride = mesh->vStride;
+            baseVertex = mesh->vBase;
+            formatID = GetSkinningFormatID(SkinnedFormatFromRenderMode(batch.skinningRenderMode, stride));
+            if ((u64(batch.startIndex) + batch.indexCount) * sizeof(u16)
+                > mesh->p_rm_Indices->GetSystemMemoryUsage())
+                FATAL_F("[RT] skinned index range %u+%u escapes its retained staging allocation",
+                    batch.startIndex, batch.indexCount);
+            mapped = mesh->p_rm_Indices;
+            const auto* host = static_cast<const u16*>(mapped->Map(0, 0, true));
+            R_ASSERT(host);
+            indices = host + batch.startIndex;
+        }
+        R_ASSERT(stride && (u64(baseVertex) + vertices) * stride <= source->getDesc().byteSize);
         RTSkinJob job;
-        job.source = mesh->p_rm_Vertices->GetBufferHandle();
         job.constants = {};
         job.constants.worldMatrix = batch.worldMatrix;
         Fmatrix inverse;
         inverse.invert(batch.worldMatrix);
         job.constants.normalMatrix.transpose(inverse);
-        job.constants.vertexCount = mesh->vCount;
-        job.constants.vertexStride = mesh->vStride;
-        job.constants.formatID = GetSkinningFormatID(batch.skinningRenderMode, mesh->vStride);
+        job.constants.vertexCount = vertices;
+        job.constants.vertexStride = stride;
+        job.constants.formatID = formatID;
         job.constants.boneOffset = gpu->GetPreparedSkeletonOffset(skeleton);
         job.constants.outputOffset = u32(vertexCount);
-        job.constants.inputBaseVertex = mesh->vBase;
+        job.constants.inputBaseVertex = baseVertex;
+        job.sourceSlot = slotOf(source);
         job.indexOffset = u32(scene.skinIndexData.size());
         job.indexCount = batch.indexCount;
         job.materialID = batch.bindlessMaterialID;
         for (u32 i = 0; i < batch.indexCount; ++i)
         {
-            const u32 index = indices[batch.startIndex + i];
-            R_ASSERT(index < mesh->vCount);
+            const u32 index = indices[i];
+            R_ASSERT(index < vertices);
             scene.skinIndexData.push_back(index);
         }
-        mesh->p_rm_Indices->Unmap();
-        vertexCount += mesh->vCount;
+        if (mapped)
+            mapped->Unmap();
+        vertexCount += vertices;
         scene.skinJobs.push_back(std::move(job));
     };
     for (const auto& batch : world)
@@ -678,6 +732,7 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     scene.skinBuild = {};
     scene.grassBuild = {};
     scene.skinJobs.clear();
+    scene.skinSources.clear();
     scene.grassJobs.clear();
     scene.skinIndexData.clear();
     scene.batches = m_staticGeometry->batches;
@@ -798,9 +853,14 @@ void RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
                 pb.write(resources.skinnedIndices, ResourceState::CopyDest);
                 data.bones = pb.read(ImportRTBuffer(builder, "skinned_bone_matrices", scene->bones),
                     ResourceState::ShaderResource);
-                for (const auto& job : scene->skinJobs)
-                    data.skinSources.push_back(pb.read(ImportRTBuffer(builder, "RT_SkinSource", job.source),
+                data.skinSources.clear();
+                for (const auto& source : scene->skinSources)
+                {
+                    const auto& name = source->getDesc().debugName;
+                    data.skinSources.push_back(pb.read(ImportRTBuffer(builder,
+                        name.empty() ? "RT_SkinSource" : name.c_str(), source),
                         ResourceState::ShaderResource));
+                }
             }
             if (scene->counts.grass)
             {
@@ -932,11 +992,11 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
         const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
         R_ASSERT(reflection);
         auto* bones = buffer(data.bones);
-        for (u32 i = 0; i < scene.skinJobs.size(); ++i)
+        for (const auto& job : scene.skinJobs)
         {
-            const auto& job = scene.skinJobs[i];
             framegraph::BindingSetBuilder bindings(*reflection, device, "RT.SkinVertices");
-            bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[i])).BufferSRV("g_BoneMatrices", bones)
+            bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[job.sourceSlot]))
+                .BufferSRV("g_BoneMatrices", bones)
                 .BufferUAV("g_Output", output).ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
             auto bindingSet = device->createBindingSet(bindings.Build(), s_skinLayout);
             R_ASSERT(bindingSet);
