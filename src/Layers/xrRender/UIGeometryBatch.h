@@ -41,7 +41,6 @@ class UIGeometryBatch
 {
 public:
     UIGeometryBatch() = default;
-    ~UIGeometryBatch() = default;
 
     xr_vector<UIVertex> vertices;
     xr_vector<u16> indices;

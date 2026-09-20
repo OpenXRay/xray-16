@@ -1348,12 +1348,61 @@ void ShaderLoader::ClearAllCaches()
 //  GET CACHED REFLECTION DATA
 // ══════════════════════════════════════════════════════════
 
+ShaderKeyView::ShaderKeyView(const char* name, const char* extension)
+    : m_name(name ? name : "")
+    , m_extension(extension ? extension : "")
+{
+}
+
+int ShaderKeyView::Compare(const xr_string& other) const
+{
+    std::string_view rhs(other.data(), other.size());
+
+    const size_t headLength = m_name.size() < rhs.size() ? m_name.size() : rhs.size();
+    if (headLength != 0)
+    {
+        const int head = std::char_traits<char>::compare(m_name.data(), rhs.data(), headLength);
+        if (head != 0)
+            return head;
+    }
+    if (rhs.size() < m_name.size())
+        return 1;
+
+    rhs.remove_prefix(m_name.size());
+
+    const size_t tailLength = m_extension.size() < rhs.size() ? m_extension.size() : rhs.size();
+    if (tailLength != 0)
+    {
+        const int tail = std::char_traits<char>::compare(m_extension.data(), rhs.data(), tailLength);
+        if (tail != 0)
+            return tail;
+    }
+    if (m_extension.size() == rhs.size())
+        return 0;
+
+    return m_extension.size() < rhs.size() ? -1 : 1;
+}
+
+bool ShaderKeyLess::operator()(const xr_string& lhs, const xr_string& rhs) const
+{
+    return lhs.compare(rhs) < 0;
+}
+
+bool ShaderKeyLess::operator()(const xr_string& lhs, const ShaderKeyView& rhs) const
+{
+    return rhs.Compare(lhs) > 0;
+}
+
+bool ShaderKeyLess::operator()(const ShaderKeyView& lhs, const xr_string& rhs) const
+{
+    return lhs.Compare(rhs) < 0;
+}
+
 ExtractedReflection* ShaderLoader::GetCachedReflection(
     const char* shaderName,
     const char* extension)
 {
-    xr_string key = xr_string(shaderName) + extension;
-    auto it = m_reflectionCache.find(key);
+    const auto it = m_reflectionCache.find(ShaderKeyView(shaderName, extension));
 
     if (it != m_reflectionCache.end())
     {

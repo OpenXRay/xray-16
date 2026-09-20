@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nvrhi/nvrhi.h>
+#include <span>
 #include "Include/xrRender/UIRender.h"
 #include "Layers/xrRender/UIGeometryBatch.h"
 
@@ -40,10 +41,7 @@ public:
     void Initialize(RenderDevice* device, render::MaterialCache* matCache);
     void Shutdown();
 
-    const xr_vector<ui::UIGeometryBatch>& GetBatches() const
-    {
-        return m_batches;
-    }
+    std::span<const ui::UIGeometryBatch> GetBatches() const;
 
     void Clear();
 
@@ -80,6 +78,7 @@ private:
     xr_vector<ui::UIVertex> m_currentVertices;
 
     xr_vector<ui::UIGeometryBatch> m_batches;
+    size_t m_batchCount = 0;
     xr_vector<ui::UIVertex> m_vertexScratch;
     xr_vector<u16> m_indexScratch;
 

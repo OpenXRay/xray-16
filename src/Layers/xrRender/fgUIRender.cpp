@@ -119,9 +119,16 @@ void FGUIRender::CacheSetCullMode(CullMode mode)
     m_cullMode = static_cast<int>(mode);
 }
 
+std::span<const UIGeometryBatch> FGUIRender::GetBatches() const
+{
+    return { m_batches.data(), m_batchCount };
+}
+
 void FGUIRender::Clear()
 {
-    m_batches.clear();
+    for (size_t i = 0; i < m_batchCount; ++i)
+        m_batches[i].Clear();
+    m_batchCount = 0;
     m_currentVertices.clear();
     m_primitiveType = ptNone;
     m_pointType = pttNone;
@@ -145,18 +152,20 @@ UIPrimitiveType FGUIRender::ConvertPrimitiveType(ePrimitiveType primType)
 
 UIGeometryBatch* FGUIRender::GetOrCreateBatch(UIPrimitiveType primType, size_t incomingVertexCount)
 {
-    if (!m_batches.empty())
+    if (m_batchCount != 0)
     {
-        UIGeometryBatch& lastBatch = m_batches.back();
+        UIGeometryBatch& lastBatch = m_batches[m_batchCount - 1];
         if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor, m_hasScissor ? &m_scissorRect : nullptr, m_cullMode, primType, incomingVertexCount))
         {
             return &lastBatch;
         }
     }
 
-    m_batches.emplace_back();
-    UIGeometryBatch& newBatch = m_batches.back();
+    if (m_batchCount == m_batches.size())
+        m_batches.emplace_back();
+    UIGeometryBatch& newBatch = m_batches[m_batchCount++];
     newBatch.uiShader = m_currentUIShader;
+    newBatch.shaderElement = 0;
     newBatch.alphaRef = m_currentAlphaRef;
     newBatch.hasScissor = m_hasScissor;
     if (m_hasScissor)
@@ -182,6 +191,9 @@ void FGUIRender::Initialize(RenderDevice* device, render::MaterialCache* matCach
 
 void FGUIRender::Shutdown()
 {
+    Clear();
+    m_batches.clear();
+    m_currentUIShader = nullptr;
     m_frames.clear();
     m_matCache = nullptr;
     m_device = nullptr;
@@ -322,13 +334,14 @@ void FGUIRender::RenderBatchWithShader(nvrhi::ICommandList* cmdList, const UIGeo
 
 void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, u32 screenWidth, u32 screenHeight)
 {
-    if (!m_initialized || m_batches.empty())
+    if (!m_initialized || m_batchCount == 0)
         return;
 
     m_vertexScratch.clear();
     m_indexScratch.clear();
-    for (const auto& batch : m_batches)
+    for (size_t i = 0; i < m_batchCount; ++i)
     {
+        const auto& batch = m_batches[i];
         if (batch.IsEmpty() || !batch.uiShader)
             continue;
         m_vertexScratch.insert(m_vertexScratch.end(), batch.vertices.begin(), batch.vertices.end());
@@ -371,8 +384,9 @@ void FGUIRender::Draw(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebu
     u32 indexOffset = baseIndex;
 
     UIPrimitiveType lastTopology = UIPrimitiveType::TriList;
-    for (const auto& batch : m_batches)
+    for (size_t i = 0; i < m_batchCount; ++i)
     {
+        const auto& batch = m_batches[i];
         if (batch.IsEmpty() || !batch.uiShader)
             continue;
 

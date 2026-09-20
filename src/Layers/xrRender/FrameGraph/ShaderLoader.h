@@ -6,6 +6,7 @@
 #include "ShaderCache.h"
 #include "xrCommon/xr_set.h"
 #include <filesystem>
+#include <string_view>
 
 // Need full include (not just forward decl) since we use SlangCompiler::Stage
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
@@ -30,6 +31,28 @@ namespace xray::render::framegraph {
 //  - Ready for multi-API (SPIRV for Vulkan in future)
 //
 // ══════════════════════════════════════════════════════════
+
+class ShaderKeyView
+{
+public:
+    ShaderKeyView(const char* name, const char* extension);
+
+    int Compare(const xr_string& other) const;
+
+private:
+    std::string_view m_name;
+    std::string_view m_extension;
+};
+
+class ShaderKeyLess
+{
+public:
+    using is_transparent = void;
+
+    bool operator()(const xr_string& lhs, const xr_string& rhs) const;
+    bool operator()(const xr_string& lhs, const ShaderKeyView& rhs) const;
+    bool operator()(const ShaderKeyView& lhs, const xr_string& rhs) const;
+};
 
 class ShaderLoader {
 public:
@@ -210,7 +233,7 @@ private:
     ShaderCache m_cache;
 
     // Cache for extracted reflection data (keyed by shader name + extension)
-    xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
+    xr_map<xr_string, ExtractedReflection*, ShaderKeyLess> m_reflectionCache;
 
     // In-memory cache for compiled shader handles (keyed by shader name + extension)
     // Prevents re-creating NVRHI handles every frame when passes call LoadVertexShader/LoadPixelShader
