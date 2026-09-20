@@ -1,3 +1,5 @@
+local debug_build = debug_build
+
 --[[------------------------------------------------------------------------------------------------
 Space restrictor binder
 Чугай Александр
@@ -78,22 +80,25 @@ end
 
 -- вызывается из обновления актёра!(БРЕХНЯ!!!!!!!)
 function restrictor_binder:update(delta)
+	local object = self.object
 	if not self.initialized and db.actor then
 		self.initialized = true
-		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
+		xr_logic.initialize_obj(object, self.st, self.loaded, db.actor, modules.stype_restrictor)
 	end
 
-	self.object:info_clear()
-	local active_section = db.storage[self.object:id()] and db.storage[self.object:id()].active_section
-	if active_section then
-		self.object:info_add("section: " .. active_section)
+	if debug_build then
+		object:info_clear()
+		local active_section = db.storage[object:id()] and db.storage[object:id()].active_section
+		if active_section then
+			object:info_add("section: " .. active_section)
+		end
+		object:info_add("name: [" .. object:name() .. "] id [" .. object:id() .. "]")
 	end
-	self.object:info_add("name: [" .. self.object:name() .. "] id [" .. self.object:id() .. "]")
 
 	if self.st.active_section ~= nil then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+		xr_logic.issue_event(object, self.st[self.st.active_scheme], "update", delta)
 	end
-	xr_sound.update(self.object:id())
+	xr_sound.update(object:id())
 end
 
 function restrictor_binder:net_save_relevant()

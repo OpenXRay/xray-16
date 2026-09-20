@@ -1,3 +1,5 @@
+local debug_build = debug_build
+
 --[[------------------------------------------------------------------------------------------------------------------
 автор: Диденко Руслан (Stohe)
 
@@ -353,12 +355,12 @@ end
 
 function motivator_binder:update(delta)
 	object_binder.update(self, delta)
+	local object = self.object
 
-	if xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] and self.object:best_enemy() == nil then
-		xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
+	if xr_combat_ignore.fighting_with_actor_npcs[object:id()] and object:best_enemy() == nil then
+		xr_combat_ignore.fighting_with_actor_npcs[object:id()] = nil
 	end
 
-	local object = self.object
 	local object_alive = object:alive()
 	local actor = db.actor
 
@@ -379,10 +381,10 @@ function motivator_binder:update(delta)
 
 	-- Открываем двери
 	if object_alive then
-		local opened_doors = ph_door.try_to_open_door(self.object)
+		local opened_doors = ph_door.try_to_open_door(object)
 		utils.copy_table(self.opened_doors, opened_doors)
 		-- Закрываем двери
-		local closed_doors = ph_door.try_to_close_door(self.object, self.opened_doors)
+		local closed_doors = ph_door.try_to_close_door(object, self.opened_doors)
 		for id,v in pairs(closed_doors) do
 			self.opened_doors[id] = nil
 		end
@@ -412,45 +414,49 @@ function motivator_binder:update(delta)
 		xr_meet.process_npc_usability(object)
 		
 		-- Апдейт безсмертия
-		stalker_generic.update_invulnerability(self.object)
+		stalker_generic.update_invulnerability(object)
 	end
 
 
 
 
 	-- Апдейт отряда
-	local squad = get_object_squad(self.object)
+	local squad = get_object_squad(object)
 	if squad ~= nil then
-		if squad:commander_id() == self.object:id() then
+		if squad:commander_id() == object:id() then
 			squad:update()
 		end
 	end
 
-	object:info_clear()
+	if debug_build then
+		object:info_clear()
+	end
 	if object_alive then
-		local active_section = db.storage[object:id()].active_section
-		if active_section then
-			object:info_add("section: " .. active_section)
+		if debug_build then
+			local active_section = db.storage[object:id()].active_section
+			if active_section then
+				object:info_add("section: " .. active_section)
+			end
+			local best_enemy = object:best_enemy()
+			if best_enemy then
+				object:info_add("enemy: " .. best_enemy:name())
+			end
+			local best_danger = object:best_danger()
+			if best_danger then
+				object:info_add("danger: " .. xr_danger.get_danger_name(best_danger))
+			end
+			object:info_add(object:name().." ["..object:team().."]["..object:squad().."]["..object:group().."]")
 		end
-		local best_enemy = object:best_enemy()
-		if best_enemy then
-			object:info_add("enemy: " .. best_enemy:name())
-		end
-		local best_danger = object:best_danger()
-		if best_danger then
-			object:info_add("danger: " .. xr_danger.get_danger_name(best_danger))
-		end
-		object:info_add(object:name().." ["..object:team().."]["..object:squad().."]["..object:group().."]")
 
 		if alife():object(object:id()) == nil then
 			return
 		end
 
-		if squad ~= nil then
+		if debug_build and squad ~= nil then
 			object:info_add("squad_id: " .. squad:section_name())
 			if squad.current_action ~= nil then
 				local target = squad.assigned_target_id and alife():object(squad.assigned_target_id) and alife():object(squad.assigned_target_id):name()
-				self.object:info_add("current_action: " .. squad.current_action.name .."["..tostring(target).."]")
+				object:info_add("current_action: " .. squad.current_action.name .."["..tostring(target).."]")
 			end
 		end
 	else

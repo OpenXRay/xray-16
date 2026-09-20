@@ -1,3 +1,5 @@
+local debug_build = debug_build
+
 -----------------------------------------------------------------------------------
 -- Monster binding
 -----------------------------------------------------------------------------------
@@ -39,13 +41,14 @@ end
 
 function generic_object_binder:update(delta)
 	object_binder.update(self, delta)
+	local object = self.object
 
-	if xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] and self.object:best_enemy() == nil then
-		xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
+	if xr_combat_ignore.fighting_with_actor_npcs[object:id()] and object:best_enemy() == nil then
+		xr_combat_ignore.fighting_with_actor_npcs[object:id()] = nil
 	end
 
-	local squad = get_object_squad(self.object)
-	local object_alive = self.object:alive()
+	local squad = get_object_squad(object)
+	local object_alive = object:alive()
 	--' printf("_bp: generic_object_binder: UPDATE [name='%s' time=%d]",
 	--'	self.object:name(), time_global())
 
@@ -54,48 +57,50 @@ function generic_object_binder:update(delta)
 	end
 
 
-	self.object:set_tip_text("")
-	local st = db.storage[self.object:id()]
+	object:set_tip_text("")
+	local st = db.storage[object:id()]
 	if st ~= nil and st.active_scheme ~= nil then
-		xr_logic.try_switch_to_another_section(self.object, st[st.active_scheme], db.actor)
+		xr_logic.try_switch_to_another_section(object, st[st.active_scheme], db.actor)
 	end
 	-- Апдейт отряда
 	if squad ~= nil then
-		if squad:commander_id() == self.object:id() then
+		if squad:commander_id() == object:id() then
 			squad:update()
 		end
 	end
 
 
-	self.object:info_clear()
+	if debug_build then
+		object:info_clear()
 
-	local active_section = db.storage[self.object:id()] and db.storage[self.object:id()].active_section
-	if active_section then
-		self.object:info_add("section: " .. active_section)
+		local active_section = db.storage[object:id()] and db.storage[object:id()].active_section
+		if active_section then
+			object:info_add("section: " .. active_section)
+		end
+		local best_enemy = object:best_enemy()
+		if best_enemy then
+			object:info_add("enemy: " .. best_enemy:name())
+		end
+		object:info_add(object:name().." ["..object:team().."]["..object:squad().."]["..object:group().."]")
 	end
-	local best_enemy = self.object:best_enemy()
-	if best_enemy then
-		self.object:info_add("enemy: " .. best_enemy:name())
-	end
-	self.object:info_add(self.object:name().." ["..self.object:team().."]["..self.object:squad().."]["..self.object:group().."]")
 
-	if alife():object(self.object:id()) == nil then
+	if alife():object(object:id()) == nil then
 		return
 	end
 
-	if squad ~= nil then
-		self.object:info_add("squad_id: " .. squad:section_name())
+	if debug_build and squad ~= nil then
+		object:info_add("squad_id: " .. squad:section_name())
 		if squad.current_action ~= nil then
 			local target = squad.assigned_target_id and alife():object(squad.assigned_target_id) and alife():object(squad.assigned_target_id):name()
-			self.object:info_add("current_action: " .. squad.current_action.name .."["..tostring(target).."]")
+			object:info_add("current_action: " .. squad.current_action.name .."["..tostring(target).."]")
 		end
 	end
 
 
 -- Если есть враг , то идем в комбат !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	if self.object:get_enemy() then
-		if xr_logic.mob_captured(self.object) then
-			xr_logic.mob_release(self.object)
+	if object:get_enemy() then
+		if xr_logic.mob_captured(object) then
+			xr_logic.mob_release(object)
 		end
 		return
 	end
@@ -109,18 +114,18 @@ function generic_object_binder:update(delta)
 
 		local target_pos, target_lv_id, target_gv_id = squad_target:get_location()
 	--	if not xr_logic.mob_captured(self.object) then
-			xr_logic.mob_capture(self.object, true)
+			xr_logic.mob_capture(object, true)
 	--	end
-		if squad:commander_id() == self.object:id() then
-			action(self.object, move(move.walk_with_leader, target_pos),
+		if squad:commander_id() == object:id() then
+			action(object, move(move.walk_with_leader, target_pos),
 				cond(cond.move_end))
 		else
 			local commander_pos = alife():object(squad:commander_id()).position
-			if commander_pos:distance_to(self.object:position()) > 10 then
-				action(self.object, move(move.run_with_leader, target_pos),
+			if commander_pos:distance_to(object:position()) > 10 then
+				action(object, move(move.run_with_leader, target_pos),
 				cond(cond.move_end))
 			else
-				action(self.object, move(move.walk_with_leader, target_pos),
+				action(object, move(move.walk_with_leader, target_pos),
 				cond(cond.move_end))
 			end
 		end
@@ -128,7 +133,7 @@ function generic_object_binder:update(delta)
 	end
 
 	if self.st.active_section ~= nil then
-		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+		xr_logic.issue_event(object, self.st[self.st.active_scheme], "update", delta)
 	end
 end
 
