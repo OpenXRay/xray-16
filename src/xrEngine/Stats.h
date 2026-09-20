@@ -6,7 +6,7 @@
 #include "xrCore/_flags.h"
 #include "xrCore/xrstring.h"
 #include "xrCommon/xr_vector.h"
-#include "xrEngine/StatGraph.h"
+#include <array>
 
 class ENGINE_API CGameFont;
 
@@ -16,8 +16,22 @@ class ENGINE_API CStats : public pureRender
 {
 private:
     CGameFont* statsFont;
-    CGameFont* fpsFont;
-    xr_unique_ptr<CStatGraph> fpsGraph;
+    struct FPSSample
+    {
+        double time = 0.0;
+        float fps = 0.f;
+    };
+    static constexpr u32 fpsHistorySize = 64;
+    std::array<FPSSample, fpsHistorySize> fpsHistory{};
+    u32 fpsHistoryWrite = 0;
+    u32 fpsHistoryCount = 0;
+    u64 fpsFrameCount = 0;
+    double fpsElapsed = 0.0;
+    double fpsSampleTime = 0.0;
+    u32 fpsSampleFrames = 0;
+    float fpsAverage = 0.f;
+    float fpsMinimum = 0.f;
+    float fpsMaximum = 0.f;
     xr_vector<shared_str> errors;
 
 public:
@@ -25,11 +39,13 @@ public:
     ~CStats();
 
     void Show(void);
+    void RenderFPSOverlay();
     virtual void OnRender();
     void OnDeviceCreate(void);
     void OnDeviceDestroy(void);
 
 private:
+    void ResetFPSOverlay();
     void FilteredLog(const char* s);
 };
 

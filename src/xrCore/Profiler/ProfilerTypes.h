@@ -54,6 +54,8 @@ struct ZoneData
     const ZoneInfo* info = nullptr;
     u32 zoneId = INVALID_ZONE_ID;
     ZoneTiming timing;
+    double allocAverageCalls = 0.0;
+    u32 allocSampleCount = 0;
 
     u32 parentId = INVALID_ZONE_ID;
     xr_vector<u32> childIds;

@@ -107,9 +107,20 @@ namespace
 
     std::atomic<bool> g_btArmed{ false };
     std::atomic<u32> g_btGen{ 0 };
-    u32 g_btTargetZone = noZone;
-    const char* g_btZoneName = nullptr;
+    std::atomic<u32> g_btTargetZone{ noZone };
+    std::atomic<const char*> g_btZoneName{ nullptr };
     BacktraceReport g_btReport;
+    std::atomic<bool> g_spikeEnabled{ false };
+    std::atomic<bool> g_spikePaused{ false };
+    std::atomic<u64> g_spikeSample{ 0 };
+    thread_local AllocationSpikeWatch* tl_spikeWatch = nullptr;
+    std::atomic<bool> g_btAutomatic{ false };
+    std::atomic<u32> g_btNodeId{ noZone };
+    std::atomic<u64> g_btSample{ 0 };
+    std::atomic<u64> g_btCapturedCalls{ 0 };
+    AllocationSpikeCounter* g_btSpikeCounter = nullptr;
+    u64 g_btBaselineCalls = 0;
+    u64 g_btThresholdCalls = 0;
 
 #if XR_MEMSTATS_BACKTRACE
     constexpr int btMaxFrames = 32;
@@ -134,8 +145,11 @@ namespace
         ~BtGuard() { g_btLock.clear(std::memory_order_release); }
     };
 
-    void CaptureBacktrace(size_t size)
+    void CaptureBacktrace(size_t size, u32 generation)
     {
+        if (g_btAutomatic.load(std::memory_order_relaxed) &&
+            g_btCapturedCalls.load(std::memory_order_relaxed) >= spikeBacktraceMaxCalls)
+            return;
         tl_btReentry = true;
 
         void* frames[btMaxFrames];
@@ -150,6 +164,15 @@ namespace
 
         {
             BtGuard guard;
+            if (!g_btArmed.load(std::memory_order_relaxed) ||
+                g_btGen.load(std::memory_order_relaxed) != generation ||
+                (g_btAutomatic.load(std::memory_order_relaxed) &&
+                    g_btCapturedCalls.load(std::memory_order_relaxed) >= spikeBacktraceMaxCalls))
+            {
+                tl_btReentry = false;
+                return;
+            }
+            g_btCapturedCalls.fetch_add(1, std::memory_order_relaxed);
             int slot = -1;
             for (int i = 0; i < g_btCaptureCount; ++i)
             {
@@ -177,6 +200,77 @@ namespace
         }
 
         tl_btReentry = false;
+    }
+
+    u32 CountWatchedAllocation(AllocationSpikeWatch& watch)
+    {
+        const u64 tag = watch.sample << 32;
+        u64 value = watch.counter->value.load(std::memory_order_relaxed);
+        while ((value & 0xffffffff00000000ull) == tag && static_cast<u32>(value) != 0xffffffffu)
+        {
+            if (watch.counter->value.compare_exchange_weak(value, value + 1, std::memory_order_relaxed))
+                return static_cast<u32>(value + 1);
+        }
+        return 0;
+    }
+
+    void ObserveAllocationSpike(size_t size)
+    {
+        const u64 sample = g_spikeSample.load(std::memory_order_acquire);
+        if (sample == 0)
+            return;
+        if (g_btArmed.load(std::memory_order_acquire))
+        {
+            if (!g_btAutomatic.load(std::memory_order_relaxed) ||
+                g_btSample.load(std::memory_order_relaxed) != sample)
+                return;
+            const u32 generation = g_btGen.load(std::memory_order_acquire);
+            const u32 nodeId = g_btNodeId.load(std::memory_order_relaxed);
+            for (auto* watch = tl_spikeWatch; watch; watch = watch->parent)
+            {
+                if (watch->sample == sample && watch->nodeId == nodeId)
+                {
+                    if (CountWatchedAllocation(*watch) != 0)
+                        CaptureBacktrace(size, generation);
+                    return;
+                }
+            }
+            return;
+        }
+        if (!g_spikeEnabled.load(std::memory_order_relaxed) || g_spikePaused.load(std::memory_order_relaxed))
+            return;
+        for (auto* watch = tl_spikeWatch; watch; watch = watch->parent)
+        {
+            if (watch->sample != sample)
+                continue;
+            const u32 calls = CountWatchedAllocation(*watch);
+            if (calls == 0 || calls <= watch->thresholdCalls)
+                continue;
+            u32 generation;
+            {
+                BtGuard guard;
+                if (g_btArmed.load(std::memory_order_relaxed) ||
+                    g_spikePaused.load(std::memory_order_relaxed) ||
+                    !g_spikeEnabled.load(std::memory_order_relaxed) ||
+                    g_spikeSample.load(std::memory_order_relaxed) != sample)
+                    return;
+                g_btCaptureCount = 0;
+                g_btCapturedCalls.store(0, std::memory_order_relaxed);
+                g_btTargetZone.store(watch->zoneId, std::memory_order_relaxed);
+                g_btZoneName.store(watch->zoneName, std::memory_order_relaxed);
+                g_btNodeId.store(watch->nodeId, std::memory_order_relaxed);
+                g_btSample.store(sample, std::memory_order_relaxed);
+                g_btSpikeCounter = watch->counter;
+                g_btBaselineCalls = watch->baselineCalls;
+                g_btThresholdCalls = watch->thresholdCalls;
+                g_btAutomatic.store(true, std::memory_order_relaxed);
+                generation = g_btGen.fetch_add(1, std::memory_order_release) + 1;
+                g_spikePaused.store(true, std::memory_order_relaxed);
+                g_btArmed.store(true, std::memory_order_release);
+            }
+            CaptureBacktrace(size, generation);
+            return;
+        }
     }
 
     void SymbolicateFrame(void* addr, char* out, size_t outLen)
@@ -220,7 +314,8 @@ namespace
 
         {
             BtGuard guard;
-            if (g_btCaptureCount == 0)
+            if (!g_btArmed.load(std::memory_order_relaxed) ||
+                (g_btCaptureCount == 0 && !g_btAutomatic.load(std::memory_order_relaxed)))
                 return;
 
             for (int i = 0; i < g_btCaptureCount; ++i)
@@ -236,9 +331,18 @@ namespace
             for (int i = 0; i < n; ++i)
                 sites[i] = g_btCapture[i];
 
-            g_btReport.zoneId = g_btTargetZone;
-            g_btReport.zoneName = g_btZoneName;
-            g_btArmed.store(false, std::memory_order_relaxed);
+            g_btReport.zoneId = g_btTargetZone.load(std::memory_order_relaxed);
+            g_btReport.zoneName = g_btZoneName.load(std::memory_order_relaxed);
+            g_btReport.automatic = g_btAutomatic.load(std::memory_order_relaxed);
+            g_btReport.sample = g_btSample.load(std::memory_order_relaxed);
+            g_btReport.baselineCalls = g_btBaselineCalls;
+            g_btReport.thresholdCalls = g_btThresholdCalls;
+            g_btReport.observedCalls = g_btSpikeCounter ?
+                static_cast<u32>(g_btSpikeCounter->value.load(std::memory_order_relaxed)) : 0;
+            g_btReport.capturedCalls = g_btCapturedCalls.load(std::memory_order_relaxed);
+            g_btReport.captureLimitReached = g_btReport.automatic && g_btReport.capturedCalls >= spikeBacktraceMaxCalls;
+            g_btArmed.store(false, std::memory_order_release);
+            g_btGen.fetch_add(1, std::memory_order_release);
             g_btCaptureCount = 0;
         }
 
@@ -294,12 +398,17 @@ XRCORE_API void CountAlloc(size_t size)
     }
 
 #if XR_MEMSTATS_BACKTRACE
-    if (g_btArmed.load(std::memory_order_relaxed) && !tl_btReentry)
+    if (!tl_btReentry)
     {
-        const bool inTargetSubtree = tl_targetDepth > 0
-            && tl_targetGen == g_btGen.load(std::memory_order_relaxed);
-        if (inTargetSubtree || (g_btTargetZone == noZone && tl_currentZone == noZone))
-            CaptureBacktrace(size);
+        if (tl_spikeWatch)
+            ObserveAllocationSpike(size);
+        if (g_btArmed.load(std::memory_order_acquire) && !g_btAutomatic.load(std::memory_order_relaxed))
+        {
+            const u32 generation = g_btGen.load(std::memory_order_acquire);
+            const bool inTargetSubtree = tl_targetDepth > 0 && tl_targetGen == generation;
+            if (inTargetSubtree || (g_btTargetZone.load(std::memory_order_relaxed) == noZone && tl_currentZone == noZone))
+                CaptureBacktrace(size, generation);
+        }
     }
 #endif
 
@@ -463,7 +572,8 @@ XRCORE_API void FrameEnd(bool record)
             g_report.named[t][i] = g_named[t][i];
     }
 
-    FinalizeBacktrace();
+    if (!g_btAutomatic.load(std::memory_order_acquire))
+        FinalizeBacktrace();
 }
 
 XRCORE_API const FrameReport& Report() { return g_report; }
@@ -471,25 +581,25 @@ XRCORE_API const FrameReport& Report() { return g_report; }
 XRCORE_API void ZoneEntered(u32 zoneId)
 {
     tl_currentZone = zoneId;
-    if (!g_btArmed.load(std::memory_order_relaxed))
+    if (!g_btArmed.load(std::memory_order_acquire))
         return;
-    const u32 gen = g_btGen.load(std::memory_order_relaxed);
+    const u32 gen = g_btGen.load(std::memory_order_acquire);
     if (tl_targetGen != gen)
     {
         tl_targetGen = gen;
         tl_targetDepth = 0;
     }
-    if (zoneId == g_btTargetZone)
+    if (zoneId == g_btTargetZone.load(std::memory_order_relaxed))
         ++tl_targetDepth;
 }
 
 XRCORE_API void ZoneExited(u32 zoneId, u32 currentZoneId)
 {
     tl_currentZone = currentZoneId;
-    if (!g_btArmed.load(std::memory_order_relaxed))
+    if (!g_btArmed.load(std::memory_order_acquire))
         return;
-    if (tl_targetGen == g_btGen.load(std::memory_order_relaxed)
-        && zoneId == g_btTargetZone && tl_targetDepth > 0)
+    if (tl_targetGen == g_btGen.load(std::memory_order_acquire)
+        && zoneId == g_btTargetZone.load(std::memory_order_relaxed) && tl_targetDepth > 0)
         --tl_targetDepth;
 }
 
@@ -502,11 +612,18 @@ XRCORE_API void ArmBacktraceCapture(u32 zoneId, const char* zoneName)
 #if XR_MEMSTATS_BACKTRACE
     BtGuard guard;
     g_btCaptureCount = 0;
-    g_btTargetZone = zoneId;
-    g_btZoneName = zoneName;
+    g_btTargetZone.store(zoneId, std::memory_order_relaxed);
+    g_btZoneName.store(zoneName, std::memory_order_relaxed);
+    g_btAutomatic.store(false, std::memory_order_relaxed);
+    g_btNodeId.store(noZone, std::memory_order_relaxed);
+    g_btSample.store(0, std::memory_order_relaxed);
+    g_btCapturedCalls.store(0, std::memory_order_relaxed);
+    g_btSpikeCounter = nullptr;
+    g_btBaselineCalls = 0;
+    g_btThresholdCalls = 0;
     g_btReport.ready = false;
-    g_btGen.fetch_add(1, std::memory_order_relaxed);
-    g_btArmed.store(true, std::memory_order_relaxed);
+    g_btGen.fetch_add(1, std::memory_order_release);
+    g_btArmed.store(true, std::memory_order_release);
 #else
     (void)zoneId;
     (void)zoneName;
@@ -519,18 +636,69 @@ XRCORE_API void DisarmBacktraceCapture()
 #if XR_MEMSTATS_BACKTRACE
     BtGuard guard;
     g_btCaptureCount = 0;
-    g_btGen.fetch_add(1, std::memory_order_relaxed);
+    g_btGen.fetch_add(1, std::memory_order_release);
 #endif
-    g_btArmed.store(false, std::memory_order_relaxed);
+    g_btArmed.store(false, std::memory_order_release);
 }
 
-XRCORE_API bool BacktraceCaptureArmed() { return g_btArmed.load(std::memory_order_relaxed); }
+XRCORE_API bool BacktraceCaptureArmed() { return g_btArmed.load(std::memory_order_acquire); }
 
 XRCORE_API const char* ArmedZoneName()
 {
-    return g_btArmed.load(std::memory_order_relaxed) ? g_btZoneName : nullptr;
+    return g_btArmed.load(std::memory_order_acquire) ? g_btZoneName.load(std::memory_order_relaxed) : nullptr;
 }
 
 XRCORE_API const BacktraceReport& GetBacktraceReport() { return g_btReport; }
+
+XRCORE_API void SetAllocationSpikeCaptureEnabled(bool enabled)
+{
+    g_spikeEnabled.store(enabled && BacktraceCaptureSupported(), std::memory_order_relaxed);
+}
+
+XRCORE_API bool AllocationSpikeCaptureEnabled()
+{
+    return g_spikeEnabled.load(std::memory_order_relaxed);
+}
+
+XRCORE_API bool AllocationSpikeCapturePaused()
+{
+    return g_spikePaused.load(std::memory_order_relaxed);
+}
+
+XRCORE_API void ResumeAllocationSpikeCapture()
+{
+#if XR_MEMSTATS_BACKTRACE
+    BtGuard guard;
+    if (!g_btArmed.load(std::memory_order_relaxed))
+        g_spikePaused.store(false, std::memory_order_relaxed);
+#endif
+}
+
+XRCORE_API void BeginAllocationSpikeWatch(AllocationSpikeWatch& watch)
+{
+    watch.parent = tl_spikeWatch;
+    tl_spikeWatch = &watch;
+}
+
+XRCORE_API void EndAllocationSpikeWatch(AllocationSpikeWatch& watch)
+{
+    if (watch.counter)
+    {
+        tl_spikeWatch = watch.parent;
+        watch.counter = nullptr;
+    }
+}
+
+XRCORE_API void SetAllocationSpikeSample(u64 sample)
+{
+    g_spikeSample.store(sample, std::memory_order_release);
+}
+
+XRCORE_API void FinishAllocationSpikeSample(u64 sample)
+{
+    g_spikeSample.store(0, std::memory_order_release);
+    if (g_btAutomatic.load(std::memory_order_acquire) && g_btSample.load(std::memory_order_relaxed) == sample)
+        FinalizeBacktrace();
+}
 
 }

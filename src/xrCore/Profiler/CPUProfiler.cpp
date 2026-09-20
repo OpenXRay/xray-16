@@ -2,6 +2,7 @@
 #include "CPUProfiler.h"
 
 #include "../MemoryStats.h"
+#include <algorithm>
 
 namespace xray::profiler
 {
@@ -10,15 +11,18 @@ bool ThreadZoneStack::Push(u32 zoneId, u32 nodeId, u64 epoch, u32 previousMemory
 {
     if (m_depth == MAX_DEPTH)
         return false;
-    m_stack[m_depth++] = {zoneId, nodeId, previousMemoryZone, epoch};
+    m_stack[m_depth++] = {zoneId, nodeId, previousMemoryZone, epoch, {}};
     return true;
 }
 
 ThreadZoneStack::Entry ThreadZoneStack::Pop()
 {
     if (m_depth != 0)
+    {
+        memstats::EndAllocationSpikeWatch(m_stack[m_depth - 1].allocationWatch);
         return m_stack[--m_depth];
-    return {INVALID_ZONE_ID, INVALID_ZONE_ID, INVALID_ZONE_ID, 0};
+    }
+    return {INVALID_ZONE_ID, INVALID_ZONE_ID, INVALID_ZONE_ID, 0, {}};
 }
 
 u32 ThreadZoneStack::CurrentNode(u64 epoch) const
@@ -50,7 +54,8 @@ void CPUProfiler::SetEnabled(bool enabled)
     ScopeLock lock(&m_zoneLock);
     if (m_enabled.load(std::memory_order_relaxed) == enabled)
         return;
-    m_captureEpoch.store(0, std::memory_order_release);
+    const u64 epoch = m_captureEpoch.exchange(0, std::memory_order_acq_rel);
+    memstats::FinishAllocationSpikeSample(epoch);
     m_framesUntilSample.store(0, std::memory_order_relaxed);
     m_enabled.store(enabled, std::memory_order_release);
 }
@@ -123,6 +128,9 @@ u32 CPUProfiler::FindOrCreateNode(u32 parentNode, u32 zoneId)
     const u32 nodeId = static_cast<u32>(m_nodes.size());
     ZoneData& node = m_nodes.emplace_back();
     node.info = m_infos[zoneId];
+    if (nodeId == m_allocationSpikeCounters.size())
+        m_allocationSpikeCounters.emplace_back();
+    m_allocationSpikeCounters[nodeId].value.store(m_nextEpoch << 32, std::memory_order_relaxed);
     node.zoneId = zoneId;
     node.parentId = parentNode;
     (parentNode == INVALID_ZONE_ID ? m_rootNodes : m_nodes[parentNode].childIds).push_back(nodeId);
@@ -142,6 +150,21 @@ u64 CPUProfiler::BeginZone(u32 zoneId)
     const u32 nodeId = FindOrCreateNode(stack.CurrentNode(epoch), zoneId);
     if (!stack.Push(zoneId, nodeId, epoch, memstats::CurrentZone()))
         return 0;
+    const auto& node = m_nodes[nodeId];
+    if (node.allocSampleCount >= memstats::spikeWarmupSamples &&
+        memstats::AllocationSpikeCaptureEnabled() &&
+        (!memstats::AllocationSpikeCapturePaused() || memstats::BacktraceCaptureArmed()))
+    {
+        auto& watch = stack.CurrentAllocationWatch();
+        watch.counter = &m_allocationSpikeCounters[nodeId];
+        watch.zoneId = zoneId;
+        watch.nodeId = nodeId;
+        watch.sample = epoch;
+        watch.zoneName = node.info->name;
+        watch.baselineCalls = static_cast<u64>(node.allocAverageCalls);
+        watch.thresholdCalls = std::max(watch.baselineCalls * 2, watch.baselineCalls + 256);
+        memstats::BeginAllocationSpikeWatch(watch);
+    }
     memstats::ZoneEntered(zoneId);
     return epoch;
 }
@@ -172,7 +195,8 @@ void CPUProfiler::EndZone(u32 zoneId, u64 epoch, float elapsedMs,
 
 void CPUProfiler::FrameStart()
 {
-    m_captureEpoch.store(0, std::memory_order_release);
+    const u64 previousEpoch = m_captureEpoch.exchange(0, std::memory_order_acq_rel);
+    memstats::FinishAllocationSpikeSample(previousEpoch);
     if (!m_enabled.load(std::memory_order_acquire))
         return;
     u32 remaining = m_framesUntilSample.load(std::memory_order_relaxed);
@@ -192,12 +216,16 @@ void CPUProfiler::FrameStart()
         m_nodes.clear();
         m_rootNodes.clear();
     }
-    for (auto& node : m_nodes)
-        node.timing.Reset();
-    m_frameTimer.Start();
     if (++m_nextEpoch == 0)
         ++m_nextEpoch;
+    for (u32 i = 0; i < m_nodes.size(); ++i)
+    {
+        m_nodes[i].timing.Reset();
+        m_allocationSpikeCounters[i].value.store(m_nextEpoch << 32, std::memory_order_relaxed);
+    }
+    m_frameTimer.Start();
     m_captureEpoch.store(m_nextEpoch, std::memory_order_release);
+    memstats::SetAllocationSpikeSample(m_nextEpoch);
 }
 
 void CPUProfiler::FrameEnd()
@@ -205,11 +233,22 @@ void CPUProfiler::FrameEnd()
     if (!IsSamplingFrame())
         return;
     ScopeLock lock(&m_zoneLock);
-    if (m_captureEpoch.exchange(0, std::memory_order_acq_rel) == 0)
+    const u64 epoch = m_captureEpoch.exchange(0, std::memory_order_acq_rel);
+    if (epoch == 0)
         return;
 
     m_frameTimeMs = m_frameTimer.GetElapsed_sec() * 1000.0f;
     ComputeSelfTimes(m_nodes);
+    memstats::FinishAllocationSpikeSample(epoch);
+    for (auto& node : m_nodes)
+    {
+        if (node.timing.callCount == 0)
+            continue;
+        if (node.allocSampleCount < memstats::spikeWarmupSamples)
+            ++node.allocSampleCount;
+        node.allocAverageCalls +=
+            (static_cast<double>(node.timing.allocCalls) - node.allocAverageCalls) / node.allocSampleCount;
+    }
     CopyToDisplayBuffer();
 }
 

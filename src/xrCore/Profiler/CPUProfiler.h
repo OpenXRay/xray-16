@@ -3,6 +3,8 @@
 #include "ProfilerTypes.h"
 #include "../FTimer.h"
 #include "../Threading/Lock.hpp"
+#include "../MemoryStats.h"
+#include "xrCommon/xr_deque.h"
 
 #include <atomic>
 #include <chrono>
@@ -19,12 +21,14 @@ public:
         u32 nodeId;
         u32 previousMemoryZone;
         u64 epoch;
+        memstats::AllocationSpikeWatch allocationWatch;
     };
 
     bool Push(u32 zoneId, u32 nodeId, u64 epoch, u32 previousMemoryZone);
     Entry Pop();
     u32 CurrentNode(u64 epoch) const;
     bool Empty() const { return m_depth == 0; }
+    memstats::AllocationSpikeWatch& CurrentAllocationWatch() { return m_stack[m_depth - 1].allocationWatch; }
 
 private:
     static constexpr u32 MAX_DEPTH = 128;
@@ -72,6 +76,7 @@ private:
 
     xr_vector<const ZoneInfo*> m_infos;
     xr_vector<ZoneData> m_nodes;
+    xr_deque<memstats::AllocationSpikeCounter> m_allocationSpikeCounters;
     xr_vector<u32> m_rootNodes;
     xr_map<shared_str, ZoneInfo*> m_dynamicZones;
     Lock m_zoneLock;
