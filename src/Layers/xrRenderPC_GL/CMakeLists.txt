@@ -397,21 +397,22 @@ target_include_directories(xrRender_GL
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
     "${CMAKE_SOURCE_DIR}/Externals"
     "${CMAKE_SOURCE_DIR}/Externals/gli"
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
+    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK/ags_lib/inc"
 )
 
 target_link_libraries(xrRender_GL
     PRIVATE
     xrAPI
-    xrCDB
     xrCore
+    xrCDB
     xrEngine
     xrMaterialSystem
     xrParticles
     xrScriptEngine
-    xrImGui
 )
 
 target_compile_definitions(xrRender_GL
@@ -430,9 +431,3 @@ target_precompile_headers(xrRender_GL
     PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:stdafx.h>
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrRender_GL LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()

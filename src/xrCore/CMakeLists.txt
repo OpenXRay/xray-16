@@ -137,16 +137,17 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+target_sources_grouped(
+    TARGET xrCore
+    NAME "Debug core\\DxErr"
+    CONDITION $<PLATFORM_ID:Windows>
+    FILES
+    Debug/dxerr.cpp
+    Debug/dxerr.h
+    Debug/DXGetErrorDescription.inl
+    Debug/DXGetErrorString.inl
+    Debug/DXTrace.inl
+)
 
 target_sources_grouped(
     TARGET xrCore
@@ -454,25 +455,35 @@ target_include_directories(xrCore
 
 target_link_libraries(xrCore
     PUBLIC
-    pthread
+    xrMiscMath
+    $<$<NOT:$<PLATFORM_ID:Windows>>:pthread>
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     SDL2::SDL2
 
     PRIVATE
-    xrMiscMath
+    xrAPI
+    LZO::LZO
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
-    LZO::LZO
+    $<$<PLATFORM_ID:Windows>:BugTrap>
+    $<$<PLATFORM_ID:Windows>:FaultRep>
+    $<$<PLATFORM_ID:Windows>:Winmm>
+    $<$<PLATFORM_ID:Windows>:OpenSSL::Crypto>
 )
 
-if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD" AND NOT WIN32 AND NOT HAIKU)
-    target_link_libraries(xrCore
-        PRIVATE
-        dl
-    )
+if (NOT WIN32)
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD" AND NOT HAIKU)
+        target_link_libraries(xrCore
+            PRIVATE
+            dl
+        )
+    endif()
 endif()
 
 target_compile_definitions(xrCore
+    PUBLIC
+    $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
+
     PRIVATE
     XRCORE_EXPORTS
     CMAKE_INSTALL_FULL_LIBDIR=\"${CMAKE_INSTALL_FULL_LIBDIR}\"
@@ -485,6 +496,7 @@ target_compile_definitions(xrCore
     GIT_INFO_CURRENT_COMMIT=\"${XRAY_GIT_SHA}\"
     GIT_INFO_CURRENT_BRANCH=\"${XRAY_GIT_BRANCH}\"
     OPENSSL_NO_DEPRECATED
+    $<$<PLATFORM_ID:Windows>:USE_OPENSSL>
 )
 
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
@@ -495,15 +507,11 @@ endif()
 
 set_target_properties(xrCore PROPERTIES
     PREFIX ""
+    VS_USER_PROPS ${XRAY_MSBUILD_PROPS}
+    VS_PACKAGE_REFERENCES "sdl2.nuget_2.32.4;sdl2.nuget.redist_2.32.4"
 )
 
 target_precompile_headers(xrCore
     PRIVATE
     stdafx.h
 )
-
-if (BUILD_SHARED_LIBS)
-    install(TARGETS xrCore LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
-endif()
