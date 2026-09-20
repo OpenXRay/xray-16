@@ -1,0 +1,121 @@
+--[[------------------------------------------------------------------------------------------------
+Space restrictor binder
+Чугай Александр
+
+Примечания:
+	- обновлений у рестрикторов нету, поэтому для тех, кому надо, актёр вызывает искусственно на своём обновлении
+--------------------------------------------------------------------------------------------------]]
+function bind( obj )
+	obj:bind_object( restrictor_binder( obj ) )
+end
+
+----------------------------------------------------------------------------------------------------
+class "restrictor_binder" ( object_binder )
+
+function restrictor_binder:__init(obj, char_ini) super(obj)
+	self.initialized = false
+	self.loaded = false
+end
+
+function restrictor_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function restrictor_binder:reinit()
+	object_binder.reinit(self)
+
+	db.storage[self.object:id()] = { }
+
+	self.st = db.storage[self.object:id()]
+end
+
+function restrictor_binder:net_spawn(data)
+	if not object_binder.net_spawn( self,data ) then
+		return false
+	end
+
+	db.add_zone(self.object)
+	db.add_obj(self.object)
+
+	local obj_id = self.object:id()
+	if(xr_sound.looped_sound[obj_id]) then
+		for k,v in pairs(xr_sound.looped_sound[obj_id]) do
+			xr_sound.play_sound_looped(obj_id, k)
+		end
+	end
+
+	--' Если это рестиктор информационной территории - зарегистрить его.
+	local ini = self.object:spawn_ini()
+	if not ini then
+		return true
+	end
+
+	if ini:section_exist("information_sector") then
+		sr_danger.register_new_sector(self.object)
+	end
+
+		if ini:section_exist("apply_on_combat") then
+		combat_restrictor.register_combat_restrictor(self.object)
+	end
+
+	return true
+end
+
+function restrictor_binder:net_destroy()
+		xr_sound.stop_sounds_by_id(self.object:id())
+	local st = db.storage[self.object:id()]
+	if st.active_scheme then
+		xr_logic.issue_event(self.object, st[st.active_scheme], "net_destroy")
+	end
+
+	db.del_zone( self.object )
+	db.del_obj(self.object)
+
+	db.storage[self.object:id()] = nil
+
+	object_binder.net_destroy(self)
+end
+
+-- вызывается из обновления актёра!(БРЕХНЯ!!!!!!!)
+function restrictor_binder:update(delta)
+	if not self.initialized and db.actor then
+		self.initialized = true
+		xr_logic.initialize_obj(self.object, self.st, self.loaded, db.actor, modules.stype_restrictor)
+	end
+
+	self.object:info_clear()
+	local active_section = db.storage[self.object:id()] and db.storage[self.object:id()].active_section
+	if active_section then
+		self.object:info_add("section: " .. active_section)
+	end
+	self.object:info_add("name: [" .. self.object:name() .. "] id [" .. self.object:id() .. "]")
+
+	if self.st.active_section ~= nil then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "update", delta)
+	end
+	xr_sound.update(self.object:id())
+end
+
+function restrictor_binder:net_save_relevant()
+	return true
+end
+
+function restrictor_binder:save(packet)
+	set_save_marker(packet, "save", false, "restrictor_binder")
+	object_binder.save(self, packet)
+
+	xr_logic.save_obj(self.object, packet)
+	set_save_marker(packet, "save", true, "restrictor_binder")
+end
+
+function restrictor_binder:load(reader)
+	set_save_marker(reader, "load", false, "restrictor_binder")
+	self.loaded = true
+
+	printf( "restrictor_binder:load" )
+
+	object_binder.load(self, reader)
+
+	xr_logic.load_obj(self.object, reader)
+	set_save_marker(reader, "load", true, "restrictor_binder")
+end
