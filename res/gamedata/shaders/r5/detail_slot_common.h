@@ -12,7 +12,9 @@ struct SlotAABB
     int slot_x;
     int slot_z;
     uint instance_chunk;
-    uint3 padding2;
+    uint padding2;
+    uint padding3;
+    uint padding4;
 };
 
 #endif

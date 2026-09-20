@@ -91,8 +91,9 @@ uint pcg_randI(inout PCGState rng, uint max_val) { return pcg_rand(rng) % max_va
 
 float pcg_randF(inout PCGState rng, float min_val, float max_val)
 {
-    float t = float(pcg_rand(rng)) / 4294967296.0;
-    return min_val + t * (max_val - min_val);
+    precise float t = float(pcg_rand(rng)) / 4294967296.0;
+    precise float value = min_val + t * (max_val - min_val);
+    return value;
 }
 
 float pcg_randFs(inout PCGState rng, float range) { return pcg_randF(rng, -range, range); }
@@ -104,25 +105,27 @@ int bwdithermap(uint col, uint row)
     uint i = col % 4, j = row % 4;
     uint k = col / 4, l = row / 4;
     const float magicfact = (255.0 - 1.0) / 16.0;
-    return int(0.5 + g_magic4x4[i][j] * magicfact + (g_magic4x4[k][l] / 16.0) * magicfact);
+    precise float value = 0.5 + g_magic4x4[i][j] * magicfact + (g_magic4x4[k][l] / 16.0) * magicfact;
+    return int(value);
 }
 
 float Interpolate(float base[4], uint x, uint y, uint size)
 {
-    float f = float(size);
-    float fx = float(x) / f;
-    float ifx = 1.0 - fx;
-    float fy = float(y) / f;
-    float ify = 1.0 - fy;
+    precise float f = float(size);
+    precise float fx = float(x) / f;
+    precise float ifx = 1.0 - fx;
+    precise float fy = float(y) / f;
+    precise float ify = 1.0 - fy;
 
-    float c01 = base[0] * ifx + base[1] * fx;
-    float c23 = base[2] * ifx + base[3] * fx;
-    float c02 = base[0] * ify + base[2] * fy;
-    float c13 = base[1] * ify + base[3] * fy;
+    precise float c01 = base[0] * ifx + base[1] * fx;
+    precise float c23 = base[2] * ifx + base[3] * fx;
+    precise float c02 = base[0] * ify + base[2] * fy;
+    precise float c13 = base[1] * ify + base[3] * fy;
 
-    float cx = ify * c01 + fy * c23;
-    float cy = ifx * c02 + fx * c13;
-    return (cx + cy) / 2.0;
+    precise float cx = ify * c01 + fy * c23;
+    precise float cy = ifx * c02 + fx * c13;
+    precise float value = (cx + cy) / 2.0;
+    return value;
 }
 
 bool InterpolateAndDither(float alpha255[4], uint x, uint y, uint shift_x, uint shift_z, uint size)
@@ -130,7 +133,8 @@ bool InterpolateAndDither(float alpha255[4], uint x, uint y, uint shift_x, uint 
     uint cx = clamp(x, 0u, size - 1u);
     uint cy = clamp(y, 0u, size - 1u);
 
-    int c = int(Interpolate(alpha255, cx, cy, size) + 0.5);
+    precise float value = Interpolate(alpha255, cx, cy, size) + 0.5;
+    int c = int(value);
     c = clamp(c, 0, 255);
 
     uint row = (y + shift_z) % 16u;
@@ -153,7 +157,8 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 
     GPUSlotData slot = g_slot_data[slot_idx];
 
-    uint d_size = uint(ceil(DETAIL_SLOT_SIZE / g_detail_density));
+    precise float grid_size = ceil(DETAIL_SLOT_SIZE / g_detail_density);
+    uint d_size = uint(grid_size);
     uint total_grid_points = (d_size + 1) * (d_size + 1);
 
     int sx = int(slot.world_min_x / DETAIL_SLOT_SIZE);
@@ -166,7 +171,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
     uint id3 = (slot.packed_ids >> 24) & 0xFFu;
     const uint ID_Empty = 0x3F;
 
-    float alpha255[4][4];
+    precise float alpha255[4][4];
 
     alpha255[0][0] = 255.0 * float((slot.packed_palette_01 >> 0) & 0xFu) / 15.0;
     alpha255[0][1] = 255.0 * float((slot.packed_palette_01 >> 4) & 0xFu) / 15.0;
@@ -237,18 +242,18 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         if (object_id >= g_detail_model_count)
             continue;
 
-        float jitter = g_detail_density / 1.7;
-        float rx = (float(x) / float(d_size)) * DETAIL_SLOT_SIZE + slot.world_min_x;
-        float rz = (float(z) / float(d_size)) * DETAIL_SLOT_SIZE + slot.world_min_z;
+        precise float jitter = g_detail_density / 1.7;
+        precise float rx = (float(x) / float(d_size)) * DETAIL_SLOT_SIZE + slot.world_min_x;
+        precise float rz = (float(z) / float(d_size)) * DETAIL_SLOT_SIZE + slot.world_min_z;
 
-        float3 world_pos;
+        precise float3 world_pos;
         world_pos.x = rx + pcg_randFs(r_jitter, jitter);
         world_pos.z = rz + pcg_randFs(r_jitter, jitter);
 
-        float2 hm_pixel = (float2(world_pos.x, world_pos.z) - float2(g_heightmap_world_min_x, g_heightmap_world_min_z)) / g_heightmap_texel_size;
+        precise float2 hm_pixel = (float2(world_pos.x, world_pos.z) - float2(g_heightmap_world_min_x, g_heightmap_world_min_z)) / g_heightmap_texel_size;
         uint hm_width, hm_height;
         g_heightmap.GetDimensions(hm_width, hm_height);
-        float2 hm_uv = hm_pixel / float2(hm_width, hm_height);
+        precise float2 hm_uv = hm_pixel / float2(hm_width, hm_height);
         float terrain_y = g_heightmap.SampleLevel(smp_nofilter, hm_uv, 0).r;
 
         const float HEIGHTMAP_NO_TERRAIN = -1e10;
