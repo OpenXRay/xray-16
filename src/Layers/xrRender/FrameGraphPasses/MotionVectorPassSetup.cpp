@@ -155,7 +155,7 @@ MotionVectorOutput setupMotionVectorPass(
                .Texture("t_VisID", hasVis ? visTex : data.state->dummyVisId.Get())
                .Texture("t_VisDepth", hasVis ? visDepthTex : depthTex)
                .TextureUAV("u_MotionVectors", mvTex);
-            auto bindDesc = bsb.Build();
+            const auto& bindDesc = bsb.Build();
             auto& cache = GetPassResourceCache();
             auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, data.state->layout, nvDevice);
 

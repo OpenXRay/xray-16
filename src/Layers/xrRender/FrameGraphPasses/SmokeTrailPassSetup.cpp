@@ -258,7 +258,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             bsb.ConstantBuffer("SmokeEmitCB", emitCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer())
                .BufferUAV("g_StateBuffer", mgr->GetStateBuffer());
-            auto bindDesc = bsb.Build();
+            const auto& bindDesc = bsb.Build();
             auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->emitLayout, nvDevice);
 
             nvrhi::ComputeState cs;
@@ -308,7 +308,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             BindingSetBuilder bsb(*simReflection, nvDevice, "SmokeTrail.Sim");
             bsb.ConstantBuffer("SmokeSimCB", simCB)
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
-            auto bindDesc = bsb.Build();
+            const auto& bindDesc = bsb.Build();
             auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->simLayout, nvDevice);
 
             nvrhi::ComputeState cs;
@@ -361,7 +361,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                .BufferUAV("g_StateBuffer", mgr->GetStateBuffer())
                .BufferUAV("g_DrawArgs", mgr->GetDrawArgsBuffer())
                .BufferUAV("g_SimBuffer", mgr->GetSimBuffer());
-            auto bindDesc = bsb.Build();
+            const auto& bindDesc = bsb.Build();
             auto bindSet = cache.GetOrCreateBindingSet(bindDesc, st->compactLayout, nvDevice);
 
             nvrhi::ComputeState cs;
@@ -484,7 +484,7 @@ DefaultOutputLayout setupSmokeTrailPass(
                .BufferSRV("g_ControlPoints", mgr->GetCompactBuffer())
                .BufferSRV("g_TrailState", mgr->GetStateBuffer())
                .Texture("g_Perlin4D", data.perlin4dVolume);
-            auto bindDesc = bsb.Build();
+            const auto& bindDesc = bsb.Build();
             auto bindingSet = cache.GetOrCreateBindingSet(bindDesc, st->drawLayout, nvDevice);
 
             // Graphics state with indirect params

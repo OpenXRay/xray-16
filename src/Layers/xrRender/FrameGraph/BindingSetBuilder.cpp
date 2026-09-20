@@ -28,6 +28,7 @@ namespace {
 
 using ReflectionKey = std::pair<const void*, const void*>;
 xr_map<ReflectionKey, BindingSetBuilder::ReflectedLists> s_reflectedListsCache;
+thread_local xr_vector<std::vector<nvrhi::BindingSetItem>> s_bindingStorage;
 
 void Collect(BindingSetBuilder::ReflectedLists& lists,
     xr_vector<BindingSetBuilder::ReflectedResource>& samplers,
@@ -101,8 +102,7 @@ BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrh
     const char*)
     : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device))
 {
-    m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
-        + m_lists->cbs.size() + m_lists->samplerItems.size());
+    AcquireBindingStorage();
 }
 
 BindingSetBuilder::BindingSetBuilder(
@@ -112,6 +112,21 @@ BindingSetBuilder::BindingSetBuilder(
     const char*)
     : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device))
 {
+    AcquireBindingStorage();
+}
+
+BindingSetBuilder::~BindingSetBuilder()
+{
+    m_desc.bindings.clear();
+    s_bindingStorage.push_back(std::move(m_desc.bindings));
+}
+
+void BindingSetBuilder::AcquireBindingStorage()
+{
+    if (!s_bindingStorage.empty()) {
+        m_desc.bindings.swap(s_bindingStorage.back());
+        s_bindingStorage.pop_back();
+    }
     m_desc.bindings.reserve(m_lists->srvs.size() + m_lists->uavs.size()
         + m_lists->cbs.size() + m_lists->samplerItems.size());
 }
@@ -276,9 +291,12 @@ static int GetBindingSetRegisterClass(nvrhi::ResourceType type)
     }
 }
 
-nvrhi::BindingSetDesc BindingSetBuilder::Build()
+const nvrhi::BindingSetDesc& BindingSetBuilder::Build() &
 {
-    AddSamplers();
+    if (!m_samplersAdded) {
+        AddSamplers();
+        m_samplersAdded = true;
+    }
 
     std::sort(m_desc.bindings.begin(), m_desc.bindings.end(),
         [](const nvrhi::BindingSetItem& a, const nvrhi::BindingSetItem& b) {
@@ -288,7 +306,7 @@ nvrhi::BindingSetDesc BindingSetBuilder::Build()
             return a.slot < b.slot;
         });
 
-    return std::move(m_desc);
+    return m_desc;
 }
 
 }

@@ -1528,7 +1528,7 @@ void FGDetailManager::DispatchPerlin4DCompute(nvrhi::ICommandList* cmdList, nvrh
     framegraph::BindingSetBuilder bsb(*perlin4dRefl, device, "Detail.Perlin4D");
     bsb.ConstantBuffer("Perlin4DGenParams", renderDevice->GetNativeBuffer(perlin4dCB))
        .TextureUAV("g_output", perlin4dTexture);
-    auto bindSet = device->createBindingSet(bsb.Build(), perlin4dBindingLayout);
+    auto bindSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), perlin4dBindingLayout, device);
 
     nvrhi::ComputeState cs;
     cs.pipeline = perlin4dPipeline;

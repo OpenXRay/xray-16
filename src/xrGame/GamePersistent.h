@@ -110,7 +110,7 @@ public:
     virtual void OnSectorChanged(IRender_Sector::sector_id_t sector);
     virtual void OnAssetsChanged();
 
-    CHudTuner GetHudTuner() { return m_hudTuner; }
+    const CHudTuner& GetHudTuner() const { return m_hudTuner; }
 };
 
 IC CGamePersistent& GamePersistent() { return *((CGamePersistent*)g_pGamePersistent); }
