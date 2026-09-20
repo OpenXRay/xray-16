@@ -87,47 +87,62 @@ static u32 TransparentKeyForMaterial(u32 materialID)
 }
 
 static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vector<u32>* materialIDs,
-    xr_vector<GPUInstanceData>& instances, xr_vector<u32>& keys, u32 maxCount, xr_vector<TransparentDrawRange>& ranges)
+    xr_vector<GPUInstanceData>& instances, xr_vector<u32>& keys, u32 maxCount, xr_vector<TransparentDrawRange>& ranges,
+    GPUCullingManager::TransparentDrawScratch& scratch, const xr_vector<float>* sortValues = nullptr)
 {
     ranges.clear();
-    u32 n = static_cast<u32>(args.size());
-    if (n > maxCount) {
+    const u32 count = static_cast<u32>(args.size());
+    const u32 n = std::min(count, maxCount);
+    if (count > maxCount) {
         static bool s_warned = false;
         if (!s_warned) {
-            Msg("! [GPUCulling] %u transparent draws exceed the %u capacity, dropping the rest", n, maxCount);
+            Msg("! [GPUCulling] %u transparent draws exceed the %u capacity, dropping the rest", count, maxCount);
             s_warned = true;
         }
-        n = maxCount;
-        args.resize(n);
-        instances.resize(n);
-        keys.resize(n);
-        if (materialIDs)
-            materialIDs->resize(n);
     }
-    if (n == 0)
+    if (n == 0) {
+        args.clear();
+        instances.clear();
+        keys.clear();
+        if (materialIDs)
+            materialIDs->clear();
         return;
-    xr_vector<u32> order(n);
-    for (u32 i = 0; i < n; ++i)
+    }
+    auto& order = scratch.order;
+    order.resize(sortValues ? count : n);
+    for (u32 i = 0; i < order.size(); ++i)
         order[i] = i;
-    std::stable_sort(order.begin(), order.end(), [&](u32 a, u32 b) { return keys[a] < keys[b]; });
-    xr_vector<IndirectDrawArgs> sortedArgs(n);
-    xr_vector<GPUInstanceData> sortedInstances(n);
-    xr_vector<u32> sortedKeys(n);
-    xr_vector<u32> sortedMaterials(materialIDs ? n : 0);
+    auto depthLess = [&](u32 a, u32 b) {
+        if ((*sortValues)[a] != (*sortValues)[b])
+            return (*sortValues)[a] < (*sortValues)[b];
+        return a < b;
+    };
+    if (sortValues && n < count)
+        std::partial_sort(order.begin(), order.begin() + n, order.end(), depthLess);
+    order.resize(n);
+    std::sort(order.begin(), order.end(), [&](u32 a, u32 b) {
+        if (keys[a] != keys[b])
+            return keys[a] < keys[b];
+        return sortValues ? depthLess(a, b) : a < b;
+    });
+    scratch.args.clear();
+    scratch.instances.clear();
+    scratch.keys.clear();
+    scratch.materialIDs.clear();
     for (u32 i = 0; i < n; ++i) {
         const u32 src = order[i];
-        sortedArgs[i] = args[src];
-        sortedArgs[i].startInstanceLocation = i;
-        sortedInstances[i] = instances[src];
-        sortedKeys[i] = keys[src];
+        scratch.args.push_back(args[src]);
+        scratch.args.back().startInstanceLocation = i;
+        scratch.instances.push_back(instances[src]);
+        scratch.keys.push_back(keys[src]);
         if (materialIDs)
-            sortedMaterials[i] = (*materialIDs)[src];
+            scratch.materialIDs.push_back((*materialIDs)[src]);
     }
-    args.swap(sortedArgs);
-    instances.swap(sortedInstances);
-    keys.swap(sortedKeys);
+    args.swap(scratch.args);
+    instances.swap(scratch.instances);
+    keys.swap(scratch.keys);
     if (materialIDs)
-        materialIDs->swap(sortedMaterials);
+        materialIDs->swap(scratch.materialIDs);
     for (u32 i = 0; i < n;) {
         u32 j = i;
         while (j < n && keys[j] == keys[i])
@@ -401,7 +416,8 @@ void GPUCullingManager::EnsureSkinnedCapacity(u32 count)
 
     m_maxSkinnedObjects = capacity;
     m_skinnedRecordsData.reserve(capacity);
-    m_skinnedMaterialIDData.reserve(capacity);
+    for (auto& history : m_skinnedHistory)
+        history.reserve(capacity);
 }
 
 void GPUCullingManager::Shutdown()
@@ -425,6 +441,10 @@ void GPUCullingManager::Shutdown()
     m_skinnedPreVBCapacity = 0;
     m_preskinPipeline = nullptr;
     m_preskinLayout = nullptr;
+    m_preskinFailed = false;
+    for (auto& format : m_preskinBindingSets)
+        for (auto& binding : format)
+            binding = {};
     m_maxSkinnedObjects = 0;
 
     m_staticInstanceBuffer = nullptr;
@@ -853,7 +873,7 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx, const Geometr
     }
 
     PartitionTransparentDraws(m_transparentDrawArgsData, &m_transparentMaterialIDData, m_transparentInstanceData,
-        m_transparentKeys, m_maxTransparentObjects, m_transparentRanges);
+        m_transparentKeys, m_maxTransparentObjects, m_transparentRanges, m_transparentDrawScratch);
     m_transparentObjectCount = std::min(static_cast<u32>(m_transparentInstanceData.size()), m_maxTransparentObjects);
 
     if (m_transparentObjectCount > 0 && m_transparentInstanceBuffer && m_transparentDrawArgsBuffer) {
@@ -910,6 +930,12 @@ void GPUCullingManager::InvalidateShadersAndPipelines()
     m_debugGraphicsPipeline = nullptr;
     m_debugGraphicsLayout = nullptr;
     m_debugInputLayout = nullptr;
+    m_preskinPipeline = nullptr;
+    m_preskinLayout = nullptr;
+    m_preskinFailed = false;
+    for (auto& format : m_preskinBindingSets)
+        for (auto& binding : format)
+            binding = {};
 
     m_initialized = false;
     m_computeEnabled = false;
@@ -935,17 +961,9 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
 {
     ZoneScopedN("GPUCull::UploadSkinnedObjects");
 
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
-        SkinnedBucket& bucket = m_skinnedBuckets[f];
-        bucket.args.clear();
-        bucket.records.clear();
-        bucket.materialIDs.clear();
-        bucket.kinds.clear();
-        bucket.srcVertexBases.clear();
-        bucket.vertexCounts.clear();
-        bucket.visuals.clear();
-        bucket.ssa.clear();
-    }
+    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
+        for (auto& batches : m_skinnedBuckets[f].kinds)
+            batches.clear();
     m_skinnedForwardArgsData.clear();
     m_skinnedForwardInstanceData.clear();
     m_skinnedForwardKeys.clear();
@@ -969,6 +987,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
 
     u32 residual = 0;
     u32 hudPooled = 0;
+    u32 pooledTotal = 0;
+    u32 vertexDemand = 0;
     auto addBatch = [&](const GeometryBatch& batch, u8 kind) {
         const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
         const bool pooled = batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
@@ -981,16 +1001,8 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         if (forward)
             kind = 3u;
         hudPooled += kind == 2u ? 1u : 0u;
-
-        SkinnedBucket& bucket = m_skinnedBuckets[batch.skinnedPoolFormat];
-
-        IndirectDrawArgs args;
-        args.indexCountPerInstance = batch.indexCount;
-        args.instanceCount = 1;
-        args.startIndexLocation = batch.skinnedPoolFirstIndex;
-        args.baseVertexLocation = batch.skinnedPoolBaseVertex;
-        args.startInstanceLocation = 0;
-        bucket.args.push_back(args);
+        ++pooledTotal;
+        vertexDemand += batch.vertexCount;
 
         CKinematics* skeleton = nullptr;
         u32 visualType = batch.visual ? batch.visual->getType() : 0;
@@ -999,25 +1011,13 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         else if (visualType == MT_SKELETON_GEOMDEF_PM)
             skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
 
-        SkinnedDrawRecord rec;
-        rec.world = batch.worldMatrix;
-        rec.boneOffset = GetOrUploadSkeleton(cmdList, skeleton);
-        rec.splatOffset = 0;
-        rec.splatCount = 0;
+        SkinnedBucket::Batch prepared{ &batch, GetOrUploadSkeleton(cmdList, skeleton), 0, 0 };
         if (overlayMgr && skeleton) {
             auto sr = overlayMgr->GetSplatRange(skeleton);
-            rec.splatOffset = sr.offset;
-            rec.splatCount = sr.count;
+            prepared.splatOffset = sr.offset;
+            prepared.splatCount = sr.count;
         }
-        rec.prevFirstVertex = 0xFFFFFFFFu;
-        rec.bounds.set(batch.worldBoundsCenter.x, batch.worldBoundsCenter.y, batch.worldBoundsCenter.z, batch.worldBoundsRadius);
-        bucket.records.push_back(rec);
-        bucket.materialIDs.push_back(batch.bindlessMaterialID);
-        bucket.kinds.push_back(kind);
-        bucket.srcVertexBases.push_back(u32(batch.skinnedPoolBaseVertex));
-        bucket.vertexCounts.push_back(batch.vertexCount);
-        bucket.visuals.push_back(batch.visual);
-        bucket.ssa.push_back(batch.ssa);
+        m_skinnedBuckets[batch.skinnedPoolFormat].kinds[kind].push_back(prepared);
     };
     for (const auto& batch : geometry->GetBatches()) {
         if (batch.isSkinned)
@@ -1031,10 +1031,6 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     }
 
     FlushBoneBatch(cmdList);
-
-    u32 pooledTotal = 0;
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
-        pooledTotal += static_cast<u32>(m_skinnedBuckets[f].records.size());
     m_skinnedObjectCount = pooledTotal - hudPooled + residual;
 
     if (pooledTotal == 0)
@@ -1042,10 +1038,6 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
 
     EnsureSkinnedCapacity(pooledTotal);
 
-    u32 vertexDemand = 0;
-    for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
-        for (u32 count : m_skinnedBuckets[f].vertexCounts)
-            vertexDemand += count;
     const bool preVBRecreated = EnsurePreskinBuffers(m_device->GetNVRHIDevice(), vertexDemand);
     const bool historyValid = !preVBRecreated && m_skinnedHistoryFrame + 1u == Device.dwFrame;
     const auto& prevHistory = m_skinnedHistory[m_skinnedHistoryIndex];
@@ -1053,7 +1045,6 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     nextHistory.clear();
 
     m_skinnedRecordsData.clear();
-    m_skinnedMaterialIDData.clear();
     m_skinnedChunkData.clear();
     m_skinnedEntryData.clear();
     m_skinnedShadowEntryData.clear();
@@ -1061,76 +1052,80 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     bool hudBoundsValid = false;
     u32 vertexTotal = 0;
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f) {
-        SkinnedBucket& bucket = m_skinnedBuckets[f];
+        const u32 formatIndexBase = m_skinnedPools.GetFormatIndexBase(f);
         m_skinnedChunkBase[f] = static_cast<u32>(m_skinnedChunkData.size());
         for (u32 kind : kSkinnedKindOrder) {
-            for (u32 i = 0; i < static_cast<u32>(bucket.records.size()); ++i) {
-                if (bucket.kinds[i] != kind)
-                    continue;
+            for (const auto& prepared : m_skinnedBuckets[f].kinds[kind]) {
+                const GeometryBatch& batch = *prepared.source;
                 const u32 slot = static_cast<u32>(m_skinnedRecordsData.size());
-                const u32 vertexCount = bucket.vertexCounts[i];
-                const IndirectDrawArgs& args = bucket.args[i];
-                m_skinnedRecordsData.push_back(bucket.records[i]);
-                u32 prevBase = 0xFFFFFFFFu;
+                const u32 vertexCount = batch.vertexCount;
+                SkinnedDrawRecord rec;
+                rec.world = batch.worldMatrix;
+                rec.boneOffset = prepared.boneOffset;
+                rec.splatOffset = prepared.splatOffset;
+                rec.splatCount = prepared.splatCount;
+                rec.prevFirstVertex = 0xFFFFFFFFu;
+                rec.bounds.set(batch.worldBoundsCenter.x, batch.worldBoundsCenter.y, batch.worldBoundsCenter.z, batch.worldBoundsRadius);
                 if (historyValid) {
-                    auto it = prevHistory.find(bucket.visuals[i]);
-                    if (it != prevHistory.end())
-                        prevBase = it->second;
+                    auto it = std::lower_bound(prevHistory.begin(), prevHistory.end(), batch.visual,
+                        [](const SkinnedHistoryEntry& entry, const void* visual) {
+                            return std::less<const void*>{}(entry.visual, visual);
+                        });
+                    if (it != prevHistory.end() && it->visual == batch.visual)
+                        rec.prevFirstVertex = it->firstVertex;
                 }
-                m_skinnedRecordsData.back().prevFirstVertex = prevBase;
+                m_skinnedRecordsData.push_back(rec);
                 if (kind == 2u) {
-                    const Fvector4& b = bucket.records[i].bounds;
                     if (!hudBoundsValid) {
-                        m_skinnedHudBounds = b;
+                        m_skinnedHudBounds = rec.bounds;
                         hudBoundsValid = true;
                     } else {
-                        fg::passes::MergeBoundingSphere(m_skinnedHudBounds, b);
+                        fg::passes::MergeBoundingSphere(m_skinnedHudBounds, rec.bounds);
                     }
                 }
-                nextHistory[bucket.visuals[i]] = vertexTotal;
-                m_skinnedMaterialIDData.push_back(bucket.materialIDs[i]);
+                nextHistory.push_back({ batch.visual, vertexTotal, slot });
                 for (u32 v0 = 0; v0 < vertexCount; v0 += SKINNED_CHUNK_VERTICES) {
                     SkinnedChunk chunk;
                     chunk.slot = slot;
-                    chunk.srcVertex = bucket.srcVertexBases[i] + v0;
+                    chunk.srcVertex = u32(batch.skinnedPoolBaseVertex) + v0;
                     chunk.dstVertex = vertexTotal + v0;
                     chunk.count = std::min(SKINNED_CHUNK_VERTICES, vertexCount - v0);
                     m_skinnedChunkData.push_back(chunk);
                 }
+                const u32 ibBase = formatIndexBase + batch.skinnedPoolFirstIndex;
                 if (kind == 3u) {
                     IndirectDrawArgs forwardArgs;
-                    forwardArgs.indexCountPerInstance = args.indexCountPerInstance;
+                    forwardArgs.indexCountPerInstance = batch.indexCount;
                     forwardArgs.instanceCount = 1;
-                    forwardArgs.startIndexLocation = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
+                    forwardArgs.startIndexLocation = ibBase;
                     forwardArgs.baseVertexLocation = static_cast<s32>(vertexTotal);
                     forwardArgs.startInstanceLocation = static_cast<u32>(m_skinnedForwardArgsData.size());
                     m_skinnedForwardArgsData.push_back(forwardArgs);
                     GPUInstanceData inst;
                     inst.world.identity();
-                    inst.materialID = bucket.materialIDs[i];
+                    inst.materialID = batch.bindlessMaterialID;
                     inst.flags = 0;
                     inst.pad0 = 0.0f;
                     inst.pad1 = 0.0f;
                     m_skinnedForwardInstanceData.push_back(inst);
-                    m_skinnedForwardKeys.push_back(TransparentKeyForMaterial(bucket.materialIDs[i]));
-                    m_skinnedForwardSort.push_back(bucket.ssa[i]);
+                    m_skinnedForwardKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
+                    m_skinnedForwardSort.push_back(batch.ssa);
                 } else {
-                    const u32 ibBase = m_skinnedPools.GetFormatIndexBase(f) + args.startIndexLocation;
-                    for (u32 i0 = 0; i0 < args.indexCountPerInstance; i0 += SKINNED_ENTRY_INDICES) {
-                        GPUClusterEntry e = {};
-                        e.sphere.set(bucket.records[i].bounds.x, bucket.records[i].bounds.y, bucket.records[i].bounds.z, bucket.records[i].bounds.w);
-                        e.extent.set(bucket.records[i].bounds.w, bucket.records[i].bounds.w, bucket.records[i].bounds.w, 0.0f);
-                        e.indexCount = std::min(SKINNED_ENTRY_INDICES, args.indexCountPerInstance - i0);
-                        e.ibFirst = ibBase + i0;
-                        e.firstVertex = vertexTotal;
-                        e.batchIndex = slot;
-                        e.materialID = bucket.materialIDs[i];
-                        e.flags = GPU_CLUSTER_ENTRY_SKINNED | (kind == 2u ? GPU_CLUSTER_ENTRY_HUD : 0u) | (kind == 1u ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
-                        if (!MaterialCastsShadow(e.materialID))
-                            e.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
+                    GPUClusterEntry entry = {};
+                    entry.sphere = rec.bounds;
+                    entry.extent.set(rec.bounds.w, rec.bounds.w, rec.bounds.w, 0.0f);
+                    entry.firstVertex = vertexTotal;
+                    entry.batchIndex = slot;
+                    entry.materialID = batch.bindlessMaterialID;
+                    entry.flags = GPU_CLUSTER_ENTRY_SKINNED | (kind == 2u ? GPU_CLUSTER_ENTRY_HUD : 0u) | (kind == 1u ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
+                    if (!MaterialCastsShadow(entry.materialID))
+                        entry.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
+                    for (u32 i0 = 0; i0 < batch.indexCount; i0 += SKINNED_ENTRY_INDICES) {
+                        entry.indexCount = std::min(SKINNED_ENTRY_INDICES, batch.indexCount - i0);
+                        entry.ibFirst = ibBase + i0;
                         if (kind == 2u)
                             m_skinnedHudEntryData.push_back(static_cast<u32>(m_skinnedEntryData.size()));
-                        (kind == 1u ? m_skinnedShadowEntryData : m_skinnedEntryData).push_back(e);
+                        (kind == 1u ? m_skinnedShadowEntryData : m_skinnedEntryData).push_back(entry);
                     }
                 }
                 vertexTotal += vertexCount;
@@ -1139,25 +1134,11 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
         m_skinnedChunkCount[f] = static_cast<u32>(m_skinnedChunkData.size()) - m_skinnedChunkBase[f];
     }
 
+    {
+    ZoneScopedN("Upload::SkinnedWrite");
     if (!m_skinnedForwardArgsData.empty()) {
-        const u32 n = static_cast<u32>(m_skinnedForwardArgsData.size());
-        xr_vector<u32> order(n);
-        for (u32 i = 0; i < n; ++i)
-            order[i] = i;
-        std::stable_sort(order.begin(), order.end(), [&](u32 a, u32 b) { return m_skinnedForwardSort[a] < m_skinnedForwardSort[b]; });
-        xr_vector<IndirectDrawArgs> sortedArgs(n);
-        xr_vector<GPUInstanceData> sortedInstances(n);
-        xr_vector<u32> sortedKeys(n);
-        for (u32 i = 0; i < n; ++i) {
-            sortedArgs[i] = m_skinnedForwardArgsData[order[i]];
-            sortedInstances[i] = m_skinnedForwardInstanceData[order[i]];
-            sortedKeys[i] = m_skinnedForwardKeys[order[i]];
-        }
-        m_skinnedForwardArgsData.swap(sortedArgs);
-        m_skinnedForwardInstanceData.swap(sortedInstances);
-        m_skinnedForwardKeys.swap(sortedKeys);
         PartitionTransparentDraws(m_skinnedForwardArgsData, nullptr, m_skinnedForwardInstanceData,
-            m_skinnedForwardKeys, SKINNED_FORWARD_CAPACITY, m_skinnedForwardRanges);
+            m_skinnedForwardKeys, SKINNED_FORWARD_CAPACITY, m_skinnedForwardRanges, m_transparentDrawScratch, &m_skinnedForwardSort);
         m_skinnedForwardCount = static_cast<u32>(m_skinnedForwardArgsData.size());
         EnsureSkinnedForwardBuffers(m_device->GetNVRHIDevice());
         if (m_skinnedForwardCount > 0 && m_skinnedForwardArgsBuffer && m_skinnedForwardInstanceBuffer) {
@@ -1188,8 +1169,16 @@ void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, const Geome
     m_skinnedHudEntryCount = std::min(static_cast<u32>(m_skinnedHudEntryData.size()), SKINNED_HUD_ENTRY_CAPACITY);
     if (m_skinnedHudEntryCount > 0)
         cmdList->writeBuffer(m_skinnedHudEntryBuffer, m_skinnedHudEntryData.data(), u64(m_skinnedHudEntryCount) * sizeof(u32));
+    }
 
     if (DispatchPreskin(cmdList, overlayMgr, vertexTotal)) {
+        std::sort(nextHistory.begin(), nextHistory.end(), [](const SkinnedHistoryEntry& a, const SkinnedHistoryEntry& b) {
+            if (a.visual != b.visual)
+                return std::less<const void*>{}(a.visual, b.visual);
+            return a.slot > b.slot;
+        });
+        nextHistory.erase(std::unique(nextHistory.begin(), nextHistory.end(),
+            [](const SkinnedHistoryEntry& a, const SkinnedHistoryEntry& b) { return a.visual == b.visual; }), nextHistory.end());
         m_skinnedHistoryIndex ^= 1u;
         m_skinnedHistoryFrame = Device.dwFrame;
     } else {
@@ -1254,6 +1243,8 @@ bool GPUCullingManager::EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 verte
 
 bool GPUCullingManager::DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal)
 {
+    ZoneScopedN("GPUCull::DispatchPreskin");
+
     if (vertexTotal == 0 || m_skinnedChunkData.empty())
         return false;
 
@@ -1309,22 +1300,30 @@ bool GPUCullingManager::DispatchPreskin(nvrhi::ICommandList* cmdList, decals::Ov
         params.pad = 0;
         cmdList->writeBuffer(paramsCB, &params, sizeof(params));
 
-        framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.SkinnedPreskin");
-        bsb.ConstantBuffer("static_globals", staticGlobalsCB)
-           .ConstantBuffer("PreskinParams", paramsCB)
-           .BufferSRV("g_SrcVB", srcVB)
-           .BufferSRV("g_Chunks", m_skinnedChunkBuffer)
-           .BufferSRV("g_SkinnedRecords", m_skinnedRecordsBuffer)
-           .BufferSRV("g_BoneMatrices", m_globalBoneBuffer)
-           .BufferSRV("g_PaintSplats", splatBuffer)
-           .BufferUAV("g_DstVB", dstVB);
-        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), m_preskinLayout, nvDevice);
-        if (!bindingSet)
+        nvrhi::IBuffer* resources[] = {
+            staticGlobalsCB, paramsCB, srcVB, m_skinnedChunkBuffer,
+            m_skinnedRecordsBuffer, m_globalBoneBuffer, splatBuffer, dstVB
+        };
+        auto& binding = m_preskinBindingSets[f][m_skinnedPreVBIndex];
+        if (!binding.handle || !std::equal(std::begin(resources), std::end(resources), std::begin(binding.resources))) {
+            framegraph::BindingSetBuilder bsb(*refl, nvDevice, "GPUCull.SkinnedPreskin");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB)
+               .ConstantBuffer("PreskinParams", paramsCB)
+               .BufferSRV("g_SrcVB", srcVB)
+               .BufferSRV("g_Chunks", m_skinnedChunkBuffer)
+               .BufferSRV("g_SkinnedRecords", m_skinnedRecordsBuffer)
+               .BufferSRV("g_BoneMatrices", m_globalBoneBuffer)
+               .BufferSRV("g_PaintSplats", splatBuffer)
+               .BufferUAV("g_DstVB", dstVB);
+            binding.handle = cache.GetOrCreateBindingSet(bsb.Build(), m_preskinLayout, nvDevice);
+            std::copy(std::begin(resources), std::end(resources), std::begin(binding.resources));
+        }
+        if (!binding.handle)
             continue;
 
         nvrhi::ComputeState cs;
         cs.pipeline = m_preskinPipeline;
-        cs.bindings = { bindingSet };
+        cs.bindings = { binding.handle };
         cmdList->setComputeState(cs);
         cmdList->dispatch(m_skinnedChunkCount[f], 1, 1);
     }

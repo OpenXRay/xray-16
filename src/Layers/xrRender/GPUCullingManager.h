@@ -358,14 +358,21 @@ public:
     static_assert(sizeof(SkinnedDrawRecord) == 96, "SkinnedDrawRecord must be 96 bytes");
 
     struct SkinnedBucket {
+        struct Batch {
+            const GeometryBatch* source;
+            u32 boneOffset;
+            u32 splatOffset;
+            u32 splatCount;
+        };
+        xr_vector<Batch> kinds[4];
+    };
+
+    struct TransparentDrawScratch {
+        xr_vector<u32> order;
         xr_vector<IndirectDrawArgs> args;
-        xr_vector<SkinnedDrawRecord> records;
+        xr_vector<GPUInstanceData> instances;
+        xr_vector<u32> keys;
         xr_vector<u32> materialIDs;
-        xr_vector<u8> kinds;
-        xr_vector<u32> srcVertexBases;
-        xr_vector<u32> vertexCounts;
-        xr_vector<const void*> visuals;
-        xr_vector<float> ssa;
     };
 
     struct SkinnedChunk {
@@ -607,6 +614,7 @@ private:
     xr_vector<GPUInstanceData> m_transparentInstanceData;
     xr_vector<u32> m_transparentKeys;
     xr_vector<TransparentDrawRange> m_transparentRanges;
+    TransparentDrawScratch m_transparentDrawScratch;
 
     // ───────────────────────────────────────────────────────
     //  SKINNED MESH UPLOAD
@@ -617,7 +625,6 @@ private:
     bool m_skinnedEnabled = false;
 
     xr_vector<SkinnedDrawRecord> m_skinnedRecordsData;
-    xr_vector<u32> m_skinnedMaterialIDData;
     xr_vector<SkinnedChunk> m_skinnedChunkData;
     xr_vector<GPUClusterEntry> m_skinnedEntryData;
     xr_vector<GPUClusterEntry> m_skinnedShadowEntryData;
@@ -646,12 +653,22 @@ private:
     nvrhi::BufferHandle m_skinnedPreVB[2];
     u32 m_skinnedPreVBCapacity = 0;
     u32 m_skinnedPreVBIndex = 0;
-    xr_map<const void*, u32> m_skinnedHistory[2];
+    struct SkinnedHistoryEntry {
+        const void* visual;
+        u32 firstVertex;
+        u32 slot;
+    };
+    xr_vector<SkinnedHistoryEntry> m_skinnedHistory[2];
     u32 m_skinnedHistoryIndex = 0;
     u32 m_skinnedHistoryFrame = 0;
     bool EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 vertexTotal);
     nvrhi::ComputePipelineHandle m_preskinPipeline;
     nvrhi::BindingLayoutHandle m_preskinLayout;
+    struct PreskinBindingSet {
+        nvrhi::IBuffer* resources[8] = {};
+        nvrhi::BindingSetHandle handle;
+    };
+    PreskinBindingSet m_preskinBindingSets[SkinnedGeometryPools::FORMAT_COUNT][2];
     bool m_preskinFailed = false;
     bool EnsurePreskinPipeline(nvrhi::IDevice* nvDevice);
     bool DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal);
