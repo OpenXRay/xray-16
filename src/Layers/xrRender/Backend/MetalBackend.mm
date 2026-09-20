@@ -430,6 +430,23 @@ DeviceState MetalBackend::GetDeviceState() const {
     }
 }
 
+IRenderBackend::MemoryBudget MetalBackend::GetMemoryBudget() const
+{
+    MemoryBudget result;
+    @autoreleasepool
+    {
+        id<MTLDevice> device = m_impl->nativeDevice;
+        if (device)
+        {
+            result.budgetBytes = device.recommendedMaxWorkingSetSize;
+            result.usageBytes = device.currentAllocatedSize;
+            result.bufferRangeBytes = device.maxBufferLength;
+            result.usageKnown = true;
+        }
+    }
+    return result;
+}
+
 void MetalBackend::WaitForIdle() {
     @autoreleasepool {
         Impl& impl = *m_impl;

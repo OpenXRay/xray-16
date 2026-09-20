@@ -6,10 +6,11 @@ struct PS_INPUT
 {
     float4 position : SV_Position;
     nointerpolation uint entry : TEXCOORD0;
+    nointerpolation uint primitiveBase : TEXCOORD2;
     uint primID : SV_PrimitiveID;
 };
 
 uint main(PS_INPUT input) : SV_Target0
 {
-    return PackVisID(input.entry, input.primID);
+    return PackVisID(input.entry, input.primitiveBase + input.primID);
 }

@@ -1,7 +1,7 @@
 #define SM_6_0
 #include "common.h"
-#include "visbuffer_common.h"
-#include "detail_blade_common.h"
+#include "detail_visibility_common.h"
+#include "detail_source_common.h"
 #include "sw_raster_common.h"
 #include "sw_dispatch_common.h"
 
@@ -42,8 +42,7 @@ cbuffer DetailSwParams : register(b5)
 
 Texture3D g_Perlin4D : register(t12);
 Texture2D g_Interaction : register(t13);
-StructuredBuffer<uint> visible_indices : register(t33);
-StructuredBuffer<DetailInstance> all_instances : register(t37);
+StructuredBuffer<uint2> visible_indices : register(t33);
 StructuredBuffer<PreparedBlade> prepared_blades : register(t38);
 ByteAddressBuffer g_DrawArgs : register(t39);
 
@@ -53,10 +52,10 @@ ByteAddressBuffer g_DrawArgs : register(t39);
 void main(uint3 groupID : SV_GroupID, uint3 groupThreadID : SV_GroupThreadID)
 {
     uint slot = SwDispatchLinearGroup(groupID) * 64u + groupThreadID.x;
-    if (slot >= g_DrawArgs.Load(4) || !DetailSlotRepresentable(slot))
+    if (slot >= g_DrawArgs.Load(4))
         return;
 
-    DetailInstance raw = all_instances[visible_indices[slot]];
+    DetailInstance raw = LoadDetailInstance(visible_indices[slot]);
     BladeInstance b;
     BladeBend w;
     if (slot < g_PreparedCapacity)
@@ -81,7 +80,8 @@ void main(uint3 groupID : SV_GroupID, uint3 groupThreadID : SV_GroupThreadID)
             return;
     }
 
-    uint entry = PackDetailEntry(g_EntryBase, g_Lod, slot);
+    uint primitiveBase;
+    uint entry = DetailVisibilityEntry(g_EntryBase, g_Lod, slot, primitiveBase);
     uint triCount = (g_Segments - 1u) * 2u + 1u;
     for (uint tri = 0; tri < triCount; ++tri)
     {
@@ -94,6 +94,6 @@ void main(uint3 groupID : SV_GroupID, uint3 groupThreadID : SV_GroupThreadID)
             v1 = v2;
             v2 = t;
         }
-        SwRasterizeTriangle(v0, v1, v2, g_Width, g_Height, PackVisID(entry, tri));
+        SwRasterizeTriangle(v0, v1, v2, g_Width, g_Height, PackVisID(entry, primitiveBase + tri));
     }
 }

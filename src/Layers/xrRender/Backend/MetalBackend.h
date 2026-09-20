@@ -20,6 +20,7 @@ public:
     bool IsInitialized() const override;
     void WaitForIdle() override;
     DeviceState GetDeviceState() const override;
+    MemoryBudget GetMemoryBudget() const override;
 
     nvrhi::IDevice* GetDevice() const override;
     nvrhi::ICommandList* GetCommandList() const override;

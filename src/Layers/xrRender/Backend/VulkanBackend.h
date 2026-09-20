@@ -30,6 +30,7 @@ public:
     bool IsInitialized() const override { return m_initialized; }
     void WaitForIdle() override;
     DeviceState GetDeviceState() const override;
+    MemoryBudget GetMemoryBudget() const override;
 
     nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
     nvrhi::ICommandList* GetCommandList() const override { return m_currentGraphics; }

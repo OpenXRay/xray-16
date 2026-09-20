@@ -142,6 +142,7 @@ target_sources(xrRender PRIVATE
 
     FGDetailManager.h
     FGDetailManager.cpp
+    FGDetailStorage.cpp
 
     FGDebugDraw.h
     FGDebugDraw.cpp
