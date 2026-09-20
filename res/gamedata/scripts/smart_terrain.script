@@ -78,19 +78,6 @@ end
 
 -- Расстояние до работы
 local function arrived_to_smart(obj, smart)
-	local obj_gv, obj_pos
-
-	local storage = db.storage[obj.id]
-
-	if storage == nil then
-		obj_gv, obj_pos = game_graph():vertex(obj.m_game_vertex_id), obj.position
-	else
-		local obj = db.storage[obj.id].object
-		obj_gv, obj_pos = game_graph():vertex(obj:game_vertex_id()), obj:position()
-	end
-
-	local smart_gv = game_graph():vertex(smart.m_game_vertex_id)
-
 	if obj.group_id then
 		local squad = smart.board.squads[obj.group_id]
 		if squad ~= nil and squad.current_action then
@@ -106,6 +93,20 @@ local function arrived_to_smart(obj, smart)
 			end
 		end
 	end
+
+	local graph = game_graph()
+	local obj_gv, obj_pos
+
+	local storage = db.storage[obj.id]
+
+	if storage == nil then
+		obj_gv, obj_pos = graph:vertex(obj.m_game_vertex_id), obj.position
+	else
+		local obj = storage.object
+		obj_gv, obj_pos = graph:vertex(obj:game_vertex_id()), obj:position()
+	end
+
+	local smart_gv = graph:vertex(smart.m_game_vertex_id)
 
 	if obj_gv:level_id() == smart_gv:level_id() then
 		return obj_pos:distance_to_sqr(smart.position) <= 10000 --Ближе 100 метров
@@ -1008,9 +1009,12 @@ function se_smart_terrain:update()
 
 	local current_time = time_global()
 
-	if simulation_objects.is_on_the_same_level(self, alife():actor()) then
-		local dist_to_actor = self.position:distance_to(alife():actor().position)
-		local old_dist_to_actor = (nearest_to_actor_smart.id == nil and nearest_to_actor_smart.dist) or alife():object(nearest_to_actor_smart.id).position:distance_to(alife():actor().position)
+	local sim = alife()
+	local actor = sim:actor()
+	if simulation_objects.is_on_the_same_level(self, actor) then
+		local actor_pos = actor.position
+		local dist_to_actor = self.position:distance_to(actor_pos)
+		local old_dist_to_actor = (nearest_to_actor_smart.id == nil and nearest_to_actor_smart.dist) or sim:object(nearest_to_actor_smart.id).position:distance_to(actor_pos)
 		if dist_to_actor < old_dist_to_actor then
 			nearest_to_actor_smart.id = self.id
 			nearest_to_actor_smart.dist = dist_to_actor
@@ -1128,11 +1132,11 @@ end
 
 -- Достигнут ли я отрядом выбравшим меня как цель.
 function se_smart_terrain:am_i_reached(squad)
-	local squad_pos, squad_lv_id, squad_gv_id = squad:get_location()
-	local target_pos, target_lv_id, target_gv_id = self:get_location()
-	if game_graph():vertex(squad_gv_id):level_id() ~= game_graph():vertex(target_gv_id):level_id() then
+	if not simulation_objects.is_on_the_same_level(squad, self) then
 		return false
 	end
+	local squad_pos = squad.position
+	local target_pos = self.position
 	if IsMonster(alife():object(squad:commander_id())) and squad:get_script_target() == nil then
 		return squad_pos:distance_to_sqr(target_pos) <= 25
 	end

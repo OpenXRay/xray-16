@@ -90,12 +90,13 @@ end
 
 --' Возвращает расстояние между двумя точками графа с учетом разности уровней
 function graph_distance(vid1, vid2)
-	local p1 = game_graph():vertex(vid1):game_point()
-	local p2 = game_graph():vertex(vid2):game_point()
+	local graph = game_graph()
+	local p1 = graph:vertex(vid1):game_point()
+	local p2 = graph:vertex(vid2):game_point()
 
 	--printf("GRAPH DISTANCE [%s][%s][%s] : [%s][%s][%s]", p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
 
-	return game_graph():vertex(vid1):game_point():distance_to(game_graph():vertex(vid2):game_point())
+	return p1:distance_to(p2)
 end
 
 --' Сравнивает два вектора

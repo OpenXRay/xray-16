@@ -826,9 +826,10 @@ function get_object_squad(object)
 	else
 		obj_id = object.id
 	end
-	local se_obj = alife():object(obj_id)
+	local sim = alife()
+	local se_obj = sim:object(obj_id)
 	if se_obj and se_obj.group_id ~= 65535 then
-		return alife():object(se_obj.group_id)
+		return sim:object(se_obj.group_id)
 	end
 	return nil
 end

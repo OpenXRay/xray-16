@@ -266,7 +266,7 @@ local function can_help_actor(squad)
 	if empty(xr_combat_ignore.fighting_with_actor_npcs) then
 		return false
 	end
-	if game_graph():vertex(squad.m_game_vertex_id):level_id() ~= game_graph():vertex(alife():actor().m_game_vertex_id):level_id() then
+	if not simulation_objects.is_on_the_same_level(squad, alife():actor()) then
 		return false
 	end
 	if has_alife_info("sim_duty_help_harder") and squad:get_squad_community() == "duty" then
@@ -283,13 +283,18 @@ local function get_help_target_id(squad)
 	if not can_help_actor(squad) then
 		return nil
 	end
+	local sim = alife()
+	local squad_pos
 	for k,v in pairs (xr_combat_ignore.fighting_with_actor_npcs) do
-		local enemy_squad_id = alife():object(k).group_id
+		local enemy_squad_id = sim:object(k).group_id
 		if enemy_squad_id ~= nil then
-			local target_squad = alife():object(enemy_squad_id)
-			if target_squad and squad.position:distance_to_sqr(target_squad.position) < 150^2 and
-				game_relations.is_factions_enemies(squad:get_squad_community(), target_squad:get_squad_community()) then
-				return enemy_squad_id
+			local target_squad = sim:object(enemy_squad_id)
+			if target_squad then
+				squad_pos = squad_pos or squad.position
+				if squad_pos:distance_to_sqr(target_squad.position) < 150^2 and
+					game_relations.is_factions_enemies(squad:get_squad_community(), target_squad:get_squad_community()) then
+					return enemy_squad_id
+				end
 			end
 		end
 	end
@@ -312,7 +317,8 @@ function sim_squad_scripted:generic_update()
 		self:get_next_action(false)
 		return
 	end
-	if self.assigned_target_id and alife():object(self.assigned_target_id) and alife():object(self.assigned_target_id):clsid() ~= clsid.online_offline_group_s then
+	local assigned_target = self.assigned_target_id and alife():object(self.assigned_target_id)
+	if assigned_target and assigned_target:clsid() ~= clsid.online_offline_group_s then
 		local squad_target = self.board:get_squad_target(self)
 		if squad_target:clsid() == clsid.online_offline_group_s then
 			self.assigned_target_id = squad_target.id
