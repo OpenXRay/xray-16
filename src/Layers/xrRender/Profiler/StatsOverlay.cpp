@@ -203,6 +203,38 @@ void StatsOverlay::RenderCPUSection()
     {
         m_cpuExpanded = true;
 
+        if (memstats::BacktraceCaptureSupported())
+        {
+            bool autoCapture = memstats::AllocationSpikeCaptureEnabled();
+            if (ImGui::Checkbox("Auto-capture allocation spikes", &autoCapture))
+                memstats::SetAllocationSpikeCaptureEnabled(autoCapture);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Learns each call path over 8 sampled measurements, then tracks a moving average.\n"
+                    "Triggers above both 2x the average and 256 extra allocations.\n"
+                    "Captures the remaining allocations in that same measurement, including child zones.\n"
+                    "At most 4096 stacks per spike; pauses after capture to preserve the report.");
+            if (autoCapture)
+            {
+                if (memstats::AllocationSpikeCapturePaused())
+                {
+                    if (memstats::BacktraceCaptureArmed())
+                        ImGui::TextDisabled("Capture in progress...");
+                    else
+                    {
+                        ImGui::TextColored(ImVec4(1.f, 0.7f, 0.3f, 1.f), "Auto-capture paused; see Allocations / Backtraces");
+                        ImGui::SameLine();
+                        if (ImGui::SmallButton("Resume##allocspikes"))
+                            memstats::ResumeAllocationSpikeCapture();
+                    }
+                }
+                else if (memstats::BacktraceCaptureArmed())
+                    ImGui::TextDisabled("Automatic detection waits for the manual capture");
+                else
+                    ImGui::TextDisabled("Watching sampled measurements (every %u frames; 8-sample warmup)",
+                        profiler.GetThrottleInterval());
+            }
+        }
+
         if (rootZones.empty())
         {
             ImGui::TextDisabled("No CPU zones recorded");
@@ -1283,6 +1315,18 @@ void StatsOverlay::RenderAllocationsSection()
         const auto& bt = memstats::GetBacktraceReport();
         if (bt.ready)
         {
+            if (bt.automatic)
+            {
+                ImGui::TextColored(ImVec4(1.f, 0.7f, 0.3f, 1.f),
+                    "Allocation spike: %llu baseline -> %llu observed (trigger > %llu)",
+                    static_cast<unsigned long long>(bt.baselineCalls),
+                    static_cast<unsigned long long>(bt.observedCalls),
+                    static_cast<unsigned long long>(bt.thresholdCalls));
+                ImGui::TextDisabled("Sample %llu: %llu post-threshold stacks captured%s",
+                    static_cast<unsigned long long>(bt.sample),
+                    static_cast<unsigned long long>(bt.capturedCalls),
+                    bt.captureLimitReached ? " (capture limit reached)" : "");
+            }
             char header[128];
             xr_sprintf(header, sizeof(header), "Backtraces: %s (%s allocs, %d sites)###bt",
                 bt.zoneName ? bt.zoneName : "?", FormatNumber((u32)bt.totalCalls), bt.siteCount);
@@ -1299,11 +1343,25 @@ void StatsOverlay::RenderAllocationsSection()
                     text.reserve(16384);
                     text += "Backtraces: ";
                     text += bt.zoneName ? bt.zoneName : "?";
-                    char line[128];
+                    char line[256];
                     xr_sprintf(line, sizeof(line), "\nTotal: %llu allocs, %llu bytes, %d sites\n",
                         static_cast<unsigned long long>(bt.totalCalls),
                         static_cast<unsigned long long>(totalBytes), bt.siteCount);
                     text += line;
+                    if (bt.automatic)
+                    {
+                        xr_sprintf(line, sizeof(line),
+                            "Automatic allocation spike (tail capture)\nSample: %llu\nBaseline: %llu allocs\n"
+                            "Trigger: >%llu allocs\nObserved: %llu allocs\nCaptured: %llu stacks\n",
+                            static_cast<unsigned long long>(bt.sample),
+                            static_cast<unsigned long long>(bt.baselineCalls),
+                            static_cast<unsigned long long>(bt.thresholdCalls),
+                            static_cast<unsigned long long>(bt.observedCalls),
+                            static_cast<unsigned long long>(bt.capturedCalls));
+                        text += line;
+                        if (bt.captureLimitReached)
+                            text += "Trace capture limit reached.\n";
+                    }
                     for (int i = 0; i < bt.siteCount; ++i)
                     {
                         const auto& site = bt.sites[i];

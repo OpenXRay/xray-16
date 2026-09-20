@@ -538,6 +538,9 @@ void CRenderDevice::FrameMove()
     if (GEnv.Render)
         GEnv.Render->RenderPBRConversionUI();
 
+    if (Statistic)
+        Statistic->RenderFPSOverlay();
+
     ImGui::EndFrame();
 }
 

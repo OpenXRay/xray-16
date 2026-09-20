@@ -3,6 +3,7 @@
 #include "xr_types.h"
 
 #include <cstddef>
+#include <atomic>
 
 namespace xray::memstats
 {
@@ -75,6 +76,8 @@ constexpr u32 noZone = 0xffffffffu;
 constexpr int btReportMaxSites = 64;
 constexpr int btReportFramesPerSite = 16;
 constexpr int btSymLen = 160;
+constexpr u32 spikeWarmupSamples = 8;
+constexpr u32 spikeBacktraceMaxCalls = 4096;
 
 struct BacktraceSite
 {
@@ -91,6 +94,13 @@ struct BacktraceReport
     const char* zoneName = nullptr;
     int siteCount = 0;
     u64 totalCalls = 0;
+    bool automatic = false;
+    bool captureLimitReached = false;
+    u64 sample = 0;
+    u64 baselineCalls = 0;
+    u64 thresholdCalls = 0;
+    u64 observedCalls = 0;
+    u64 capturedCalls = 0;
     BacktraceSite sites[btReportMaxSites] = {};
 };
 
@@ -100,6 +110,32 @@ XRCORE_API void DisarmBacktraceCapture();
 XRCORE_API bool BacktraceCaptureArmed();
 XRCORE_API const char* ArmedZoneName();
 XRCORE_API const BacktraceReport& GetBacktraceReport();
+
+struct AllocationSpikeCounter
+{
+    std::atomic<u64> value{0};
+};
+
+struct AllocationSpikeWatch
+{
+    AllocationSpikeWatch* parent = nullptr;
+    AllocationSpikeCounter* counter = nullptr;
+    u32 zoneId = noZone;
+    u32 nodeId = noZone;
+    u64 sample = 0;
+    const char* zoneName = nullptr;
+    u64 baselineCalls = 0;
+    u64 thresholdCalls = 0;
+};
+
+XRCORE_API void SetAllocationSpikeCaptureEnabled(bool enabled);
+XRCORE_API bool AllocationSpikeCaptureEnabled();
+XRCORE_API bool AllocationSpikeCapturePaused();
+XRCORE_API void ResumeAllocationSpikeCapture();
+XRCORE_API void BeginAllocationSpikeWatch(AllocationSpikeWatch& watch);
+XRCORE_API void EndAllocationSpikeWatch(AllocationSpikeWatch& watch);
+XRCORE_API void SetAllocationSpikeSample(u64 sample);
+XRCORE_API void FinishAllocationSpikeSample(u64 sample);
 
 XRCORE_API void ZoneEntered(u32 zoneId);
 XRCORE_API void ZoneExited(u32 zoneId, u32 currentZoneId);
