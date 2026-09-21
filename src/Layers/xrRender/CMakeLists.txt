@@ -156,6 +156,7 @@ target_sources(xrRender PRIVATE
     Geometry/SkinnedGeometryPools.h
     Geometry/SkinnedGeometryPools.cpp
     Geometry/MaterialCache.cpp
+    Geometry/MaterialCache_Developer.cpp
 
     UIGeometryBatch.h
     fgUIRender.h
@@ -166,6 +167,8 @@ target_sources(xrRender PRIVATE
 
     r_FrameGraphRenderer.h
     r_FrameGraphRenderer.cpp
+    r_FrameGraphRenderer_Developer.cpp
+    DeveloperSceneRenderer.h
     r_FrameGraphRenderer_Loader.cpp
     r_FrameGraphRenderer_Shaders.cpp
     r_FrameGraphRenderer_Blenders.cpp

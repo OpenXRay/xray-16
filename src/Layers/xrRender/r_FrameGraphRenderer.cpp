@@ -3480,6 +3480,7 @@ void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
         m_materialCache->Clear();
     if (m_uiMaterialCache)
         m_uiMaterialCache->Clear();
+    ReRegisterDeveloperMaterials();
 }
 
 void FrameGraphRenderer::OnBackBufferResized(u32, u32)

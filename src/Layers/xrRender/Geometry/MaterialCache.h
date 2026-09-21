@@ -2,8 +2,10 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
+#include "xrCore/_vector3d.h"
 
 class IRenderBackend;
 
@@ -287,6 +289,28 @@ private:
 
     resources::TextureHandle m_defaultPBR;
 
+    class DeveloperMaterial
+    {
+    public:
+        u32 materialID = UINT32_MAX;
+        fg::TextureHandle diffuse;
+        fg::TextureHandle pbr;
+        u32 diffuseIndex = UINT32_MAX;
+        u32 pbrIndex = UINT32_MAX;
+        shared_str shaderName;
+        shared_str textureName;
+    };
+    xr_map<xr_string, DeveloperMaterial> m_developerMaterials;
+    xr_vector<u32> m_developerBindlessIndices;
+    void ReleaseDeveloperMaterial(const DeveloperMaterial& material, bool releaseBackend);
+
+    static constexpr u32 DEVELOPER_TEXTURE_SIZE = 4;
+
+    static u8 QuantizeDeveloperChannel(float value);
+    static void BuildDeveloperTextureDesc(fg::RenderDevice::TextureDesc& desc, nvrhi::Format format, pcstr debugName);
+    static void FillDeveloperColorPixels(u8* pixels, const Fvector& color);
+    static void FillDeveloperPbrPixels(u8* pixels, float metallic, float roughness);
+
     void CreateDefaultPBRTextures();
 
     float GetDetailScale(const shared_str& textureName);
@@ -319,6 +343,13 @@ public:
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
     u32 PreRegisterParticleMaterial(const shared_str& textureName);
+
+    u32 RegisterDeveloperMaterial(const char* key, const char* shaderName, const char* textureName,
+        const Fvector& color, float metallic, float roughness);
+
+    void ReleaseDeveloperMaterials();
+
+    u32 GetVisualMaterialEpoch() const;
 
 
     bool IsTerrainMaterial(dxRender_Visual* visual);

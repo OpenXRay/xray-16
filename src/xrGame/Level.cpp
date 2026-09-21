@@ -1074,6 +1074,11 @@ bool CLevel::IsClient()
     return true;
 }
 
+bool CLevel::IsDeveloperLevel() const
+{
+    return false;
+}
+
 void CLevel::OnAlifeSimulatorUnLoaded()
 {
     MapManager().ResetStorage();

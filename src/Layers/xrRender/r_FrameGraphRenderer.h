@@ -138,6 +138,8 @@ public:
 
     void level_Load(IReader* fs) override;
     void level_Unload() override;
+    bool level_LoadDeveloper(const xray::render::DeveloperScene& scene) override;
+    void DumpDeveloperSceneDiagnostics() override;
     HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
 
     fg::IBlender* blender_create(CLASS_ID cls);
@@ -158,6 +160,35 @@ private:
     void LoadSWIs(CStreamReader* fs);
     void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
     u32 GetVertexStride(u32 vertexFormatID);
+
+    class DeveloperMaterialRecord
+    {
+    public:
+        xr_string key;
+        xr_string shaderName;
+        xr_string textureName;
+        Fvector color = { 1.0f, 1.0f, 1.0f };
+        float metallic = 0.0f;
+        float roughness = 0.5f;
+    };
+
+    bool PrepareDeveloperMaterials(const xray::render::DeveloperScene& scene);
+    bool BuildDeveloperGeometry(const xray::render::DeveloperScene& scene, u32 formatID,
+        xr_vector<dxRender_Visual*>& visuals, Fbox& bounds);
+    bool VerifyDeveloperAllocations(const xr_vector<dxRender_Visual*>& visuals, u32& validCount, u32& invalidCount);
+    bool BakeDeveloperClusterDAG(const xray::render::DeveloperScene& scene, u64& sceneStamp, xr_string& cachePath);
+    void DiscardDeveloperStaging(const xr_vector<dxRender_Visual*>& visuals);
+    void SetupDeveloperSun();
+    bool CommitDeveloperSector(const xr_vector<dxRender_Visual*>& visuals);
+    void ReRegisterDeveloperMaterials();
+    void CleanupDeveloperLoad();
+
+    xr_vector<DeveloperMaterialRecord> m_developerMaterials;
+    u32 m_developerMaterialEpoch = 0;
+    u32 m_developerMeshCount = 0;
+    u32 m_developerVertexCount = 0;
+    u32 m_developerIndexCount = 0;
+    bool m_developerSceneLoaded = false;
 public:
 
     pcstr getShaderPath() override { return "r5\\"; }

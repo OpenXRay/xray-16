@@ -456,6 +456,7 @@ void FrameGraphRenderer::level_Unload()
 
     //*** Shaders
     m_CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
+    CleanupDeveloperLoad();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

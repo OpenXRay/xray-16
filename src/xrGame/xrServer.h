@@ -167,6 +167,7 @@ private:
 
 protected:
     game_sv_GameState* game;
+    bool m_developerSession{ false };
 
     void Server_Client_Check(IClient* CL);
     void PerformCheckClientsForMaxPing();
@@ -269,6 +270,7 @@ public:
     virtual void Disconnect();
     virtual void Update();
     void SLS_Default();
+    void SetDeveloperSession(bool value);
     void SLS_Clear();
     void SLS_Save(IWriter& fs);
     void SLS_Load(IReader& fs);

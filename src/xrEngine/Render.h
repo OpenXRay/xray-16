@@ -30,6 +30,7 @@ namespace xray::render::framegraph { class ShaderLoader; }
 namespace xray::render
 {
     class MaterialCache;
+    class DeveloperScene;
     namespace fg { class RenderDevice; class ImGuiRendererNVRHI; class FGUIRender; }
 }
 
@@ -278,6 +279,9 @@ public:
 
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
+
+    virtual bool level_LoadDeveloper(const xray::render::DeveloperScene& scene) = 0;
+    virtual void DumpDeveloperSceneDiagnostics() = 0;
 
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
     virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,

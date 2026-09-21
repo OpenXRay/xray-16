@@ -178,6 +178,9 @@ target_sources_grouped(
     FILES
     IGame_Level.cpp
     IGame_Level.h
+    DeveloperMode.cpp
+    DeveloperMode.h
+    DeveloperScene.h
     IGame_Level_check_textures.cpp
 )
 

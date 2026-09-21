@@ -76,6 +76,9 @@ public:
                 CDB::remapping_materials_callback remapping_materials_callback);
 
     void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
+                CDB::build_callback build_callback);
+
+    void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
                 CDB::build_callback build_callback,
                 CDB::serialize_callback serialize_callback,
                 CDB::deserialize_callback deserialize_callback,

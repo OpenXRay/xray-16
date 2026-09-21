@@ -403,6 +403,7 @@ public:
     IC CBulletManager& BulletManager() { return *m_pBulletManager; }
     bool IsServer();
     bool IsClient();
+    virtual bool IsDeveloperLevel() const;
     CSE_Abstract* spawn_item(
         LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item = false);
 

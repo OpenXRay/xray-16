@@ -976,6 +976,11 @@ shared_str xrServer::level_version(const shared_str& server_options) const
     return (game_sv_GameState::parse_level_version(server_options));
 }
 
+void xrServer::SetDeveloperSession(bool value)
+{
+    m_developerSession = value;
+}
+
 void xrServer::create_direct_client()
 {
     SClientConnectData cl_data;

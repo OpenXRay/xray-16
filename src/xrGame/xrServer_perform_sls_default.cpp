@@ -8,6 +8,8 @@
 
 #ifdef USE_DESIGNER_KEY
 #include "xrServer_Objects_ALife_Monsters.h"
+#include "xrServer_Space.h"
+#include "DeveloperRoom.h"
 #endif
 
 void xrServer::SLS_Default()
@@ -24,7 +26,7 @@ void xrServer::SLS_Default()
 #endif
 
     string_path fn_spawn;
-    if (FS.exist(fn_spawn, "$level$", "level.spawn"))
+    if (!m_developerSession && FS.exist(fn_spawn, "$level$", "level.spawn"))
     {
         IReader* SP = FS.r_open(fn_spawn);
         NET_Packet P;
@@ -57,16 +59,30 @@ void xrServer::SLS_Default()
     }
 
 #ifdef USE_DESIGNER_KEY
-    if (!_designer)
+    if (!_designer && !m_developerSession)
         return;
 
     if (_actor)
         return;
 
-    _actor = smart_cast<CSE_ALifeCreatureActor*>(entity_Create("actor"));
-    _actor->o_Position = Fvector().set(0.f, 0.f, 0.f);
-    _actor->set_name_replace("designer");
+    CSE_Abstract* abstract = entity_Create("actor");
+    _actor = smart_cast<CSE_ALifeCreatureActor*>(abstract);
+    R_ASSERT2(_actor, "Cannot create actor server entity from 'actor' section");
+
+    if (m_developerSession)
+    {
+        _actor->o_Position = CDeveloperRoom::ActorPosition();
+        _actor->o_Angle.set(0.f, 0.f, 0.f);
+        _actor->set_name_replace("dev_actor");
+    }
+    else
+    {
+        _actor->o_Position = Fvector().set(0.f, 0.f, 0.f);
+        _actor->set_name_replace("designer");
+    }
+
     _actor->s_flags.flags |= M_SPAWN_OBJECT_ASPLAYER;
+
     NET_Packet packet;
     packet.w_begin(M_SPAWN);
     _actor->Spawn_Write(packet, TRUE);
@@ -76,6 +92,22 @@ void xrServer::SLS_Default()
     R_ASSERT(id == M_SPAWN);
     ClientID clientID;
     clientID.set(0);
-    Process_spawn(packet, clientID);
+    CSE_Abstract* spawned = Process_spawn(packet, clientID);
+
+    if (m_developerSession)
+    {
+        const Fvector& position = _actor->o_Position;
+        if (spawned)
+        {
+            Msg("[dev_level] event=actor_spawn result=ok id=%u pos=%.2f,%.2f,%.2f", u32(spawned->ID), position.x,
+                position.y, position.z);
+        }
+        else
+        {
+            Msg("! [dev_level] event=actor_spawn result=failed reason=spawn_rejected pos=%.2f,%.2f,%.2f", position.x,
+                position.y, position.z);
+        }
+        F_entity_Destroy(abstract);
+    }
 #endif
 }
