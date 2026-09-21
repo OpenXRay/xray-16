@@ -91,10 +91,13 @@ static u32 TransparentKeyForMaterial(u32 materialID)
 
 static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vector<u32>* materialIDs,
     xr_vector<GPUInstanceData>& instances, xr_vector<u32>& keys, xr_vector<TransparentDrawRange>& ranges,
-    GPUCullingManager::TransparentDrawScratch& scratch, const xr_vector<float>* sortValues = nullptr)
+    GPUCullingManager::TransparentDrawScratch& scratch, const xr_vector<float>* sortValues = nullptr,
+    xr_vector<GeometryInstanceKey>* identities = nullptr)
 {
     ranges.clear();
     R_ASSERT2(args.size() <= UINT32_MAX, "Forward submission count exceeds the addressable range");
+    if (identities)
+        R_ASSERT2(identities->size() == args.size(), "Forward identities are out of sync with draw args");
     const u32 n = static_cast<u32>(args.size());
     if (n == 0) {
         args.clear();
@@ -102,6 +105,8 @@ static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vect
         keys.clear();
         if (materialIDs)
             materialIDs->clear();
+        if (identities)
+            identities->clear();
         return;
     }
     auto& order = scratch.order;
@@ -122,6 +127,7 @@ static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vect
     scratch.instances.clear();
     scratch.keys.clear();
     scratch.materialIDs.clear();
+    scratch.identities.clear();
     for (u32 i = 0; i < n; ++i) {
         const u32 src = order[i];
         scratch.args.push_back(args[src]);
@@ -130,12 +136,16 @@ static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vect
         scratch.keys.push_back(keys[src]);
         if (materialIDs)
             scratch.materialIDs.push_back((*materialIDs)[src]);
+        if (identities)
+            scratch.identities.push_back((*identities)[src]);
     }
     args.swap(scratch.args);
     instances.swap(scratch.instances);
     keys.swap(scratch.keys);
     if (materialIDs)
         materialIDs->swap(scratch.materialIDs);
+    if (identities)
+        identities->swap(scratch.identities);
     for (u32 i = 0; i < n;) {
         u32 j = i;
         while (j < n && keys[j] == keys[i])
@@ -183,6 +193,7 @@ GPUCullingManager::GPUCullingManager()
     m_staticDrawArgsData.reserve(MAX_CULLING_OBJECTS);
     m_staticMaterialIDData.reserve(MAX_CULLING_OBJECTS);
     m_staticInstanceData.reserve(MAX_CULLING_OBJECTS);
+    m_staticInstanceIdentities.reserve(MAX_CULLING_OBJECTS);
 
     m_dynamicObjectFlags.reserve(MAX_CULLING_OBJECTS);
     m_dynamicMaterialIDData.reserve(MAX_CULLING_OBJECTS);
@@ -591,6 +602,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         m_staticMaterialIDData.reserve(totalBatches);
         m_staticInstanceData.clear();
         m_staticInstanceData.reserve(totalBatches);
+        m_staticInstanceIdentities.clear();
+        m_staticInstanceIdentities.reserve(totalBatches);
         m_staticBatchVertexCounts.clear();
         m_staticBatchVertexCounts.reserve(totalBatches);
         m_staticBatchKeys.clear();
@@ -615,6 +628,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         m_terrainMaterialIDData.reserve(totalBatches / 4);
         m_terrainInstanceData.clear();
         m_terrainInstanceData.reserve(totalBatches / 4);
+        m_terrainInstanceIdentities.clear();
+        m_terrainInstanceIdentities.reserve(totalBatches / 4);
         m_terrainBatchKeys.clear();
         m_terrainBatchKeys.reserve(totalBatches / 4);
     }
@@ -622,6 +637,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
     m_transparentDrawArgsData.clear();
     m_transparentMaterialIDData.clear();
     m_transparentInstanceData.clear();
+    m_transparentInstanceIdentities.clear();
     m_transparentKeys.clear();
     m_transparentRanges.clear();
     m_transparentResidualCount = 0;
@@ -682,6 +698,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
                     continue;
                 appendBatch(batch, 0u, batch.terrainMaterialID,
                     m_terrainDrawArgsData, m_terrainMaterialIDData, m_terrainInstanceData);
+                m_terrainInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
+                    batch.visualLifetimeID, batch.geometrySubset });
                 m_terrainBatchKeys.push_back(batchKey(batch));
                 continue;
             }
@@ -696,6 +714,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
             m_staticObjectFlags.push_back(flags);
             appendBatch(batch, flags, batch.bindlessMaterialID,
                 m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
+            m_staticInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
+                batch.visualLifetimeID, batch.geometrySubset });
             m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
             m_staticBatchKeys.push_back(batchKey(batch));
         }
@@ -707,6 +727,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
             ++m_transparentResidualCount;
         appendBatch(batch, batchFlags(batch), batch.bindlessMaterialID,
             m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
+        m_transparentInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
+            batch.visualLifetimeID, batch.geometrySubset });
         m_transparentKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
     }
 
@@ -719,6 +741,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
                 continue;
             appendBatch(batch, 0u, batch.terrainMaterialID,
                 m_terrainDrawArgsData, m_terrainMaterialIDData, m_terrainInstanceData);
+            m_terrainInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
+                batch.visualLifetimeID, batch.geometrySubset });
             m_terrainBatchKeys.push_back(batchKey(batch));
             continue;
         }
@@ -728,6 +752,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
                 ++m_transparentResidualCount;
             appendBatch(batch, batchFlags(batch), batch.bindlessMaterialID,
                 m_transparentDrawArgsData, m_transparentMaterialIDData, m_transparentInstanceData);
+            m_transparentInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
+                batch.visualLifetimeID, batch.geometrySubset });
             m_transparentKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
             continue;
         }
@@ -759,7 +785,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
 
     PartitionTransparentDraws(m_transparentDrawArgsData, &m_transparentMaterialIDData,
         m_transparentInstanceData, m_transparentKeys,
-        m_transparentRanges, m_transparentDrawScratch);
+        m_transparentRanges, m_transparentDrawScratch, nullptr, &m_transparentInstanceIdentities);
     m_transparentObjectCount = u32(m_transparentDrawArgsData.size());
     m_transparentNativeArgs = m_transparentDrawArgsData;
     for (auto& args : m_transparentNativeArgs)
@@ -903,6 +929,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticDrawArgsData.clear();
     m_staticMaterialIDData.clear();
     m_staticInstanceData.clear();
+    m_staticInstanceIdentities.clear();
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
 
@@ -910,6 +937,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_terrainDrawArgsData.clear();
     m_terrainMaterialIDData.clear();
     m_terrainInstanceData.clear();
+    m_terrainInstanceIdentities.clear();
     m_terrainBatchKeys.clear();
     m_terrainObjectCount = 0;
 
@@ -2482,6 +2510,7 @@ void GPUCullingManager::UnloadLevel()
     m_staticMaterialIDData.clear();
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
+    m_staticInstanceIdentities.clear();
     m_dynamicObjectFlags.clear();
     m_dynamicMaterialIDData.clear();
     m_dynamicBatchKeys.clear();
@@ -2498,12 +2527,14 @@ void GPUCullingManager::UnloadLevel()
     m_terrainDrawArgsData.clear();
     m_terrainMaterialIDData.clear();
     m_terrainInstanceData.clear();
+    m_terrainInstanceIdentities.clear();
     m_terrainBatchKeys.clear();
     m_terrainObjectCount = 0;
 
     m_transparentDrawArgsData.clear();
     m_transparentMaterialIDData.clear();
     m_transparentInstanceData.clear();
+    m_transparentInstanceIdentities.clear();
     m_skinnedPools.Reset();
     for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
         m_skinnedBuckets[f] = SkinnedBucket{};

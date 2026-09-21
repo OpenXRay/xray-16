@@ -63,10 +63,14 @@ public:
     u32 detailAtlasIndex;
     u32 diffuseMode;
     u32 lightCount;
-    u32 pad;
+    u32 reuseReservoirs;
+    u32 emissiveCount;
+    u32 maxNullEvents;
+    float environmentRotation;
+    float sunAngularRadius;
 };
 
-static_assert(sizeof(ReSTIRGICB) == 224);
+static_assert(sizeof(ReSTIRGICB) == 240);
 
 class TemporalCB
 {
@@ -110,6 +114,7 @@ public:
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle material;
     framegraph::VirtualResourceHandle lightData;
+    framegraph::VirtualResourceHandle environmentDistribution;
     framegraph::VirtualResourceHandle directLighting;
     framegraph::VirtualResourceHandle indirectLighting;
     framegraph::VirtualResourceHandle reservoirA;

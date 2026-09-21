@@ -22,6 +22,7 @@ void ClusteredLightManager::Initialize(fg::RenderDevice* device)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     m_device = nvDevice;
     m_lightsCPU.reserve(INITIAL_LIGHT_CAPACITY);
+    m_lightIDs.reserve(INITIAL_LIGHT_CAPACITY);
     m_lightCapacity = INITIAL_LIGHT_CAPACITY;
     m_identityIndices.resize(m_lightCapacity);
 
@@ -118,6 +119,7 @@ void ClusteredLightManager::Shutdown()
         snapshot.clear();
     m_culledLights.clear();
     m_lightsCPU.clear();
+    m_lightIDs.clear();
     m_spotTextureCache.clear();
     m_device = nullptr;
 }
@@ -148,6 +150,7 @@ void ClusteredLightManager::EnsureLightCapacity(u32 count)
 void ClusteredLightManager::BeginFrame(bool rayTracingLighting)
 {
     m_lightsCPU.clear();
+    m_lightIDs.clear();
     m_rayTracingLighting = rayTracingLighting;
     m_numLights = 0;
     m_numPoint = 0;
@@ -245,6 +248,7 @@ void ClusteredLightManager::CollectLight(const light* L)
     EnsureLightCapacity(m_numLights + 1u);
 
     m_lightsCPU.push_back(BuildGPULightData(L, 0));
+    m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }
 
@@ -265,12 +269,16 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     }
 
     m_lightsCPU.resize(count);
+    m_lightIDs.resize(count);
     m_numLights = count;
     m_lightsThisFrame = lights;
 
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
+        {
             m_lightsCPU[i] = BuildGPULightData(lights[i], i < shadowSlots.size() ? shadowSlots[i] : 0u);
+            m_lightIDs[i] = lights[i]->GetLightID();
+        }
     });
 
     if (psDeviceFlags.test(rsStatistic))
@@ -293,12 +301,14 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
     EnsureLightCapacity(m_numLights + 1u);
 
     m_lightsCPU.push_back(BuildGPULightData(L, 0));
+    m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }
 
 void ClusteredLightManager::BuildLightBuffer(const light_Package& package)
 {
     m_lightsCPU.clear();
+    m_lightIDs.clear();
     m_numLights = 0;
 
     for (const light* L : package.v_point)
@@ -340,13 +350,26 @@ void ClusteredLightManager::UploadAllVisible(nvrhi::ICommandList* cmdList)
     m_culledLights.clear();
 }
 
+u64 ClusteredLightManager::GetLightID(u32 index) const
+{
+    return index < m_lightIDs.size() ? m_lightIDs[index] : INVALID_LIGHT_ID;
+}
+
+u32 ClusteredLightManager::FindLightIndex(u64 id) const
+{
+    for (u32 i = 0; i < m_lightIDs.size(); ++i)
+        if (m_lightIDs[i] == id)
+            return i;
+    return INVALID_LIGHT_INDEX;
+}
+
 u64 ClusteredLightManager::GetTransportSignature() const
 {
     xr_set<nvrhi::ITexture*> textures;
     u64 signature = 0;
-    for (const auto& light : m_lightsCPU)
+    for (size_t index = 0; index < m_lightsCPU.size(); ++index)
     {
-        auto transport = light;
+        auto transport = m_lightsCPU[index];
         transport.spotParamsAndType.w = 0.0f;
         u64 lightSignature = 14695981039346656037ull;
         const auto append = [&](const void* data, size_t size)
@@ -358,6 +381,8 @@ u64 ClusteredLightManager::GetTransportSignature() const
                 lightSignature *= 1099511628211ull;
             }
         };
+        const u64 lightID = index < m_lightIDs.size() ? m_lightIDs[index] : INVALID_LIGHT_ID;
+        append(&lightID, sizeof(lightID));
         append(&transport, sizeof(transport));
         u32 textureIndex = 0;
         std::memcpy(&textureIndex, &transport.spotParamsAndType.z, sizeof(textureIndex));

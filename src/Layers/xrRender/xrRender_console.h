@@ -45,6 +45,9 @@ extern ECORE_API float ps_r__Detail_l_ambient;
 extern ECORE_API float ps_r__Detail_l_aniso;
 extern ECORE_API float ps_r__Detail_density;
 extern ECORE_API float ps_r__Detail_height;
+extern int ps_r__detail_gpu;
+extern float ps_current_detail_height;
+extern float ps_current_detail_density;
 
 extern ECORE_API float ps_r__Tree_SBC; // scale bias correct
 

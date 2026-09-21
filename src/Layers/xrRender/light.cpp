@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <atomic>
 #include "light.h"
 #include "xrRender_console.h"
 
@@ -8,6 +9,7 @@ static constexpr float RSQRTDIV2 = 0.70710678118654752440084436210485f;
 
 light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
 {
+    m_lightID = AllocateLightID();
     spatial.type = STYPE_LIGHTSOURCE;
     flags.type = POINT;
     flags.bStatic = false;
@@ -50,6 +52,12 @@ light::~light()
         xr_delete(f);
 #endif
     set_active(false);
+}
+
+u64 light::AllocateLightID()
+{
+    static std::atomic<u64> next{ 1 };
+    return next.fetch_add(1, std::memory_order_relaxed);
 }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)

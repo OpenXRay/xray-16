@@ -71,6 +71,13 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
             status == IRenderBackend::SubmissionLeaseState::Failed ||
             status == IRenderBackend::SubmissionLeaseState::Unknown)
         {
+            if (frame->pathTracer.capturedSnapshot && frame->pathTracer.snapshot)
+            {
+                if (status == IRenderBackend::SubmissionLeaseState::Complete)
+                    frame->pathTracer.snapshot->submitted = true;
+                else if (pathTracer.snapshot == frame->pathTracer.snapshot)
+                    passes::DiscardPathTracerSnapshot(pathTracer);
+            }
             backend->ReleaseSubmissionLease(frame->lease);
             it = m_frames.erase(it);
         }
@@ -135,8 +142,16 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     frame.hizRecorded = hiz && hizRecorded;
     frame.reservoirIndex = rtgi.currTemporalIdx;
     frame.rtgiRecorded = lighting.effective == LightingMode::RTGI && lighting.recorded && lighting.reuseReservoirs;
-    if (lighting.effective == LightingMode::ReferencePT && lighting.recorded)
+    const bool ptRecorded = lighting.effective == LightingMode::ReferencePT && lighting.recorded;
+    if (ptRecorded || pathTracer.pending.capturedSnapshot)
+    {
         frame.pathTracer = pathTracer.pending;
+        if (!ptRecorded)
+        {
+            frame.pathTracer.valid = false;
+            frame.pathTracer.samples = 0;
+        }
+    }
     frame.textures.push_back(hiz);
     frame.textures.push_back(pathTracer.accumulation);
     frame.textures.push_back(rtgi.directLighting);

@@ -43,6 +43,8 @@ static constexpr u32 CLUSTER_TILE_SIZE = 64;
 static constexpr u32 CLUSTER_NUM_SLICES = 24;
 static constexpr u32 INITIAL_LIGHT_CAPACITY = 1024;
 static constexpr u32 MAX_LIGHT_INDICES = 1024 * 1024;
+static constexpr u64 INVALID_LIGHT_ID = 0;
+static constexpr u32 INVALID_LIGHT_INDEX = UINT32_MAX;
 
 class ClusteredLightManager {
 public:
@@ -72,6 +74,12 @@ public:
     u32 GetTilesY() const { return m_tilesY; }
     u64 GetTransportSignature() const;
 
+    u64 GetLightID(u32 index) const;
+    u32 FindLightIndex(u64 id) const;
+    const xr_vector<u64>& GetLightIDs() const { return m_lightIDs; }
+    const xr_vector<GPULightData>& GetLightDataCPU() const { return m_lightsCPU; }
+    const xr_map<shared_str, u32>& GetSpotTextureIndices() const { return m_spotTextureCache; }
+
     ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const;
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
@@ -91,6 +99,7 @@ private:
     nvrhi::DeviceHandle m_device;
 
     xr_vector<GPULightData> m_lightsCPU;
+    xr_vector<u64> m_lightIDs;
     xr_vector<u32> m_identityIndices;
     u32 m_lightCapacity = 0;
     bool m_rayTracingLighting = false;

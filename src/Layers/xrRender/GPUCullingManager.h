@@ -407,6 +407,11 @@ public:
     const xr_vector<IndirectDrawArgs>& GetTransparentDrawArgsData() const { return m_transparentDrawArgsData; }
     const xr_vector<u32>& GetTransparentMaterialIDData() const { return m_transparentMaterialIDData; }
     const xr_vector<GPUInstanceData>& GetStaticInstanceData() const { return m_staticInstanceData; }
+    const xr_vector<GPUInstanceData>& GetTerrainInstanceData() const { return m_terrainInstanceData; }
+    const xr_vector<GPUInstanceData>& GetTransparentInstanceData() const { return m_transparentInstanceData; }
+    const xr_vector<GeometryInstanceKey>& GetStaticInstanceIdentities() const { return m_staticInstanceIdentities; }
+    const xr_vector<GeometryInstanceKey>& GetTerrainInstanceIdentities() const { return m_terrainInstanceIdentities; }
+    const xr_vector<GeometryInstanceKey>& GetTransparentInstanceIdentities() const { return m_transparentInstanceIdentities; }
 
     void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
     RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
@@ -501,6 +506,7 @@ public:
         xr_vector<GPUInstanceData> instances;
         xr_vector<u32> keys;
         xr_vector<u32> materialIDs;
+        xr_vector<GeometryInstanceKey> identities;
     };
 
     struct SkinnedChunk {
@@ -742,6 +748,7 @@ private:
     xr_vector<u32> m_staticMaterialIDData;
     xr_vector<GPUInstanceData> m_staticInstanceData;
     xr_vector<u32> m_staticBatchVertexCounts;
+    xr_vector<GeometryInstanceKey> m_staticInstanceIdentities;
 
     xr_vector<u32> m_dynamicObjectFlags;
     xr_vector<u32> m_dynamicMaterialIDData;
@@ -751,12 +758,14 @@ private:
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
     xr_vector<ClusterMeshKey> m_terrainBatchKeys;
+    xr_vector<GeometryInstanceKey> m_terrainInstanceIdentities;
     bool m_terrainDataCached = false;
 
     xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
     xr_vector<IndirectDrawArgs> m_transparentNativeArgs;
     xr_vector<u32> m_transparentMaterialIDData;
     xr_vector<GPUInstanceData> m_transparentInstanceData;
+    xr_vector<GeometryInstanceKey> m_transparentInstanceIdentities;
     xr_vector<u32> m_transparentKeys;
     xr_vector<TransparentDrawRange> m_transparentRanges;
     TransparentDrawScratch m_transparentDrawScratch;
