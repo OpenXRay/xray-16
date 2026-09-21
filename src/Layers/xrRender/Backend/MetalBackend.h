@@ -33,6 +33,7 @@ public:
     u64 OpenSubmissionLease() override;
     void CloseSubmissionLease(u64 lease) override;
     SubmissionLeaseState PollSubmissionLease(u64 lease) override;
+    bool IsSubmissionLeaseSubmitted(u64 lease) const override;
     void ReleaseSubmissionLease(u64 lease) override;
     u32 GetPendingSubmissionCount() const override;
 
@@ -61,6 +62,7 @@ public:
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
+    nvrhi::ITexture* GetBindlessTexture(u32 index) override;
     bool RetainBindlessTextures(const u32* indices, u32 count) override;
     void ReleaseBindlessTextures(const u32* indices, u32 count) override;
     nvrhi::IBindingLayout* GetBindlessLayout() const override;

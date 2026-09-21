@@ -684,6 +684,11 @@ IRenderBackend::SubmissionLeaseState MetalBackend::PollSubmissionLease(u64 lease
     return impl.completion.PollLease(lease);
 }
 
+bool MetalBackend::IsSubmissionLeaseSubmitted(u64 lease) const
+{
+    return m_impl->completion.IsLeaseSubmitted(lease);
+}
+
 void MetalBackend::ReleaseSubmissionLease(u64 lease) { m_impl->completion.ReleaseLease(lease); }
 u32 MetalBackend::GetPendingSubmissionCount() const { return m_impl->completion.PendingTicketCount(); }
 
@@ -844,6 +849,13 @@ u32 MetalBackend::RegisterBindlessTexture(nvrhi::ITexture* texture)
 void MetalBackend::UnregisterBindlessTexture(u32 index)
 {
     ReleaseBindlessTextures(&index, 1);
+}
+
+nvrhi::ITexture* MetalBackend::GetBindlessTexture(u32 index)
+{
+    Impl& impl = *m_impl;
+    std::lock_guard<std::mutex> lock(impl.bindlessMutex);
+    return index < impl.bindlessResources.size() ? impl.bindlessResources[index].Get() : nullptr;
 }
 
 bool MetalBackend::RetainBindlessTextures(const u32* indices, u32 count)

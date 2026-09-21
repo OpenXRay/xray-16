@@ -199,7 +199,15 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         lighting.Fail(LightingFallback::InputsUnavailable);
         return { sceneColorIn };
     }
-    const bool useHistory = lighting.reuseReservoirs && state.historyValid && hasPrevFrameData;
+    auto validHistoryGuide = [&](VirtualResourceHandle handle)
+    {
+        if (!handle.is_valid())
+            return false;
+        const auto& desc = fg.GetResourceDesc(handle);
+        return desc.width == width && desc.height == height && desc.sampleCount == 1;
+    };
+    const bool useHistory = lighting.reuseReservoirs && state.historyValid && hasPrevFrameData &&
+        validHistoryGuide(prevDepth) && validHistoryGuide(prevNormals) && validHistoryGuide(motionVectors);
     state.historyValid = false;
     state.initialRecorded = false;
 
@@ -482,7 +490,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.state->initialRecorded = true;
         });
 
-    if (useHistory && motionVectors.is_valid())
+    if (useHistory)
     {
         const auto previousA = fg.ImportTexture("rtgi_ResA_R", state.reservoirA[readIdx], resDesc);
         const auto previousB = fg.ImportTexture("rtgi_ResB_R", state.reservoirB[readIdx], resDesc);
@@ -504,11 +512,9 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 RenderPassBuilder pb(builder, passHandle);
                 data.depth = pb.read(depth, ResourceState::ShaderResource);
                 data.normal = pb.read(normal, ResourceState::ShaderResource);
-                if (prevNormals.is_valid())
-                    data.prevNormals = pb.read(prevNormals, ResourceState::ShaderResource);
+                data.prevNormals = pb.read(prevNormals, ResourceState::ShaderResource);
                 data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-                if (prevDepth.is_valid())
-                    data.prevDepth = pb.read(prevDepth, ResourceState::ShaderResource);
+                data.prevDepth = pb.read(prevDepth, ResourceState::ShaderResource);
                 data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
                 data.previousA = pb.read(previousA, ResourceState::ShaderResource);
                 data.previousB = pb.read(previousB, ResourceState::ShaderResource);
@@ -528,9 +534,9 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                     return;
                 auto* depthTex = fg.GetPhysicalTexture(data.depth);
                 auto* normalTex = fg.GetPhysicalTexture(data.normal);
-                auto* prevNormalsTex = data.prevNormals.is_valid() ? fg.GetPhysicalTexture(data.prevNormals) : normalTex;
+                auto* prevNormalsTex = fg.GetPhysicalTexture(data.prevNormals);
                 auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-                auto* prevDepthTex = data.prevDepth.is_valid() ? fg.GetPhysicalTexture(data.prevDepth) : depthTex;
+                auto* prevDepthTex = fg.GetPhysicalTexture(data.prevDepth);
                 auto* mvTex = fg.GetPhysicalTexture(data.motionVectors);
                 auto* previousA = fg.GetPhysicalTexture(data.previousA);
                 auto* previousB = fg.GetPhysicalTexture(data.previousB);
@@ -538,7 +544,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 auto* reservoirB = fg.GetPhysicalTexture(data.reservoirB);
                 if (!depthTex || !normalTex || !prevNormalsTex || !prevDepthTex || !baseColorTex || !mvTex || !previousA || !previousB || !reservoirA || !reservoirB)
                 {
-                    data.lighting->Fail(LightingFallback::InputsUnavailable);
                     return;
                 }
 
@@ -551,7 +556,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_temporal", ".cs");
                 if (!csReflection)
                 {
-                    data.lighting->Fail(LightingFallback::ShaderUnavailable);
                     return;
                 }
 
@@ -571,7 +575,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->temporalLayout, nvDevice);
                 if (!bindingSet)
                 {
-                    data.lighting->Fail(LightingFallback::BindingUnavailable);
                     return;
                 }
 
@@ -581,6 +584,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
                 cmdList->setComputeState(cs);
                 cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+                data.lighting->historyUsed = true;
             });
     }
 
@@ -675,8 +679,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
             cmdList->setComputeState(cs);
             cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
-            data.state->currTemporalIdx = 1 - data.reservoirIdx;
-            data.state->historyValid = data.lighting->reuseReservoirs;
             data.lighting->recorded = true;
         });
 

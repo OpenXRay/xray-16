@@ -908,6 +908,12 @@ void VulkanBackend::UnregisterBindlessTexture(u32 index)
     ReleaseBindlessTextures(&index, 1);
 }
 
+nvrhi::ITexture* VulkanBackend::GetBindlessTexture(u32 index)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    return index < m_bindlessTextureResources.size() ? m_bindlessTextureResources[index].Get() : nullptr;
+}
+
 bool VulkanBackend::RetainBindlessTextures(const u32* indices, u32 count)
 {
     std::lock_guard<std::mutex> lock(m_bindlessMutex);
@@ -1299,6 +1305,11 @@ IRenderBackend::SubmissionLeaseState VulkanBackend::PollSubmissionLease(u64 leas
     if (!qk.owns_lock())
         return observed;
     return m_completion.PollLease(lease);
+}
+
+bool VulkanBackend::IsSubmissionLeaseSubmitted(u64 lease) const
+{
+    return m_completion.IsLeaseSubmitted(lease);
 }
 
 void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {

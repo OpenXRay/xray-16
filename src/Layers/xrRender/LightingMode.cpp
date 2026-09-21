@@ -11,6 +11,9 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
     conflictingRequests = requestRTGI && requestPT;
     recorded = false;
     recordedSamples = 0;
+    previousSurfacesValid = false;
+    historyUsed = false;
+    sceneRevision = 0;
 }
 
 void LightingFrameState::Fail(LightingFallback reason)
@@ -19,6 +22,7 @@ void LightingFrameState::Fail(LightingFallback reason)
     fallback = reason;
     recorded = false;
     recordedSamples = 0;
+    historyUsed = false;
 }
 
 const char* LightingModeName(LightingMode mode)

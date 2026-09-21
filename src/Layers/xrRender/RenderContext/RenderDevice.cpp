@@ -60,6 +60,11 @@ nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
     return m_backend ? m_backend->GetDevice() : nullptr;
 }
 
+IRenderBackend* RenderDevice::GetBackend() const
+{
+    return m_backend;
+}
+
 nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
     return m_backend ? m_backend->GetCommandList() : nullptr;
 }
@@ -72,67 +77,7 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
     VERIFY(backend);
     VERIFY(backend->IsInitialized());
 
-    class BackendRef : public IRenderBackend {
-    public:
-        IRenderBackend* m_ref;
-        BackendRef(IRenderBackend* ref) : m_ref(ref) {}
-        API GetAPI() const override { return m_ref->GetAPI(); }
-        pcstr GetAPIName() const override { return m_ref->GetAPIName(); }
-        bool IsInitialized() const override { return m_ref->IsInitialized(); }
-        void Shutdown() override {}
-        void WaitForIdle() override { m_ref->WaitForIdle(); }
-        DeviceState GetDeviceState() const override { return m_ref->GetDeviceState(); }
-        nvrhi::IDevice* GetDevice() const override { return m_ref->GetDevice(); }
-        nvrhi::ICommandList* GetCommandList() const override { return m_ref->GetCommandList(); }
-        nvrhi::ITexture* GetBackBuffer() override { return m_ref->GetBackBuffer(); }
-        void Present(bool vsync) override { m_ref->Present(vsync); }
-        std::pair<u32, u32> GetBackBufferSize() const override { return m_ref->GetBackBufferSize(); }
-        bool IsInFrame() const override { return m_ref->IsInFrame(); }
-        void BeginFrame() override { m_ref->BeginFrame(); }
-        void EndFrame() override { m_ref->EndFrame(); }
-        const Capabilities& GetCapabilities() const override { return m_ref->GetCapabilities(); }
-        Capabilities& GetMutableCapabilities() override { return m_ref->GetMutableCapabilities(); }
-        u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override { return m_ref->RegisterBindlessTexture(texture); }
-        void UnregisterBindlessTexture(u32 index) override { m_ref->UnregisterBindlessTexture(index); }
-        bool RetainBindlessTextures(const u32* indices, u32 count) override
-        {
-            return m_ref->RetainBindlessTextures(indices, count);
-        }
-        void ReleaseBindlessTextures(const u32* indices, u32 count) override
-        {
-            m_ref->ReleaseBindlessTextures(indices, count);
-        }
-        nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_ref->GetBindlessLayout(); }
-        nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_ref->GetBindlessDescriptorTable(); }
-        nvrhi::ICommandList* CreateCommandList() override { return m_ref->CreateCommandList(); }
-        bool HasAsyncCompute() const override { return m_ref->HasAsyncCompute(); }
-        nvrhi::ICommandList* AcquireComputeCommandList() override { return m_ref->AcquireComputeCommandList(); }
-        u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override
-        {
-            return m_ref->SubmitCompute(commandList, waitTokens, numWaitTokens);
-        }
-        void AddGraphicsWait(u32 token) override { m_ref->AddGraphicsWait(token); }
-        u32 SplitGraphics() override { return m_ref->SplitGraphics(); }
-        u32 LastGraphicsToken() const override { return m_ref->LastGraphicsToken(); }
-        u32 LastComputeToken() const override { return m_ref->LastComputeToken(); }
-        void ExecuteCommandList(nvrhi::ICommandList* commandList) override { m_ref->ExecuteCommandList(commandList); }
-        void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override
-        {
-            m_ref->ExecuteCommandLists(commandLists, count);
-        }
-        void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override
-        {
-            m_ref->UploadBufferData(buffer, data, size);
-        }
-        bool SupportsSubmissionLeases() const override { return m_ref->SupportsSubmissionLeases(); }
-        u64 OpenSubmissionLease() override { return m_ref->OpenSubmissionLease(); }
-        void CloseSubmissionLease(u64 lease) override { m_ref->CloseSubmissionLease(lease); }
-        SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_ref->PollSubmissionLease(lease); }
-        void ReleaseSubmissionLease(u64 lease) override { m_ref->ReleaseSubmissionLease(lease); }
-        u32 GetPendingSubmissionCount() const override { return m_ref->GetPendingSubmissionCount(); }
-    };
-
-    m_backend.reset(xr_new<BackendRef>(backend));
+    m_backend = backend;
     Msg("* [RenderDevice] Backend initialized: %s (from existing backend)", backend->GetAPIName());
 
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
@@ -213,7 +158,7 @@ TextureHandle RenderDevice::CreateTexture(
         size_t rowPitch = nvrhiDesc.width * formatInfo.bytesPerBlock;
         size_t depthPitch = rowPitch * nvrhiDesc.height;
 
-        ScopedUpload upload(m_backend.get(), GetNativeDevice());
+        ScopedUpload upload(m_backend, GetNativeDevice());
         upload.Get()->writeTexture(nvrhiTexture, 0, 0, initialData, rowPitch, depthPitch);
     }
 
@@ -336,7 +281,7 @@ void RenderDevice::UploadTextureData(
 
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
-    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    ScopedUpload upload(m_backend, GetNativeDevice());
 
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
@@ -377,7 +322,7 @@ void RenderDevice::UploadTextureDataToNVRHI(
 
     size_t depthPitch = (size_t)rowPitch * rowCount;
 
-    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    ScopedUpload upload(m_backend, GetNativeDevice());
     upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
 }
 
@@ -397,7 +342,7 @@ void RenderDevice::UploadTextureDataToNVRHI(
 
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
-    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    ScopedUpload upload(m_backend, GetNativeDevice());
     upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
 }
 
@@ -417,7 +362,7 @@ BufferHandle RenderDevice::CreateBuffer(
     }
 
     if (initialData) {
-        ScopedUpload upload(m_backend.get(), GetNativeDevice());
+        ScopedUpload upload(m_backend, GetNativeDevice());
         upload.Get()->writeBuffer(nvrhiBuffer, initialData, desc.byteSize);
     }
 
@@ -464,7 +409,7 @@ void RenderDevice::UpdateBuffer(
     BufferInfo& info = m_buffers[handle.index];
     VERIFY(offset + size <= info.desc.byteSize);
 
-    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    ScopedUpload upload(m_backend, GetNativeDevice());
     upload.Get()->writeBuffer(info.nvrhiHandle, data, size, offset);
 }
 

@@ -15,7 +15,6 @@ class PathTracerConfig
 {
 public:
     u32 maxBounces = 8;
-    u32 sampleIndex = 0;
     u32 diffuseMode = 0;
 };
 
@@ -48,11 +47,34 @@ public:
 
 static_assert(sizeof(PathTracerCB) == 160);
 
+class PathTracerHistory
+{
+public:
+    PathTracerCB parameters = {};
+    nvrhi::TextureHandle sky0;
+    nvrhi::TextureHandle sky1;
+    u64 sceneRevision = 0;
+    u64 textureRevision = 0;
+    u32 samples = 0;
+    bool valid = false;
+};
+
+class PathTracerPassState
+{
+public:
+    nvrhi::TextureHandle accumulation;
+    u32 width = 0;
+    u32 height = 0;
+    PathTracerHistory history;
+    PathTracerHistory pending;
+};
+
 class PathTracerData
 {
 public:
     RenderDevice* device = nullptr;
     LightingFrameState* lighting = nullptr;
+    PathTracerPassState* state = nullptr;
     RTFrameResources scene;
     framegraph::VirtualResourceHandle outputTex;
     framegraph::VirtualResourceHandle accumulation;
@@ -63,10 +85,10 @@ public:
     nvrhi::TextureHandle sky1;
 };
 
-LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height);
+LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height, PathTracerPassState& state);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle sceneColorIn, LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj,
-    const Fvector& cameraPos, u32 width, u32 height);
+    const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
 
 void ShutdownPathTracer();
 }

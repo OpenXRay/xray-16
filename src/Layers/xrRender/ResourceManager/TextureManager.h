@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ResourceHandle.h"
+#include "xrCommon/xr_set.h"
 #include <nvrhi/nvrhi.h>
 #include <mutex>
 
@@ -86,6 +87,7 @@ struct TextureMetadata {
     u32 refCount = 0;
 
     nvrhi::TextureHandle nvrhiTexture;
+    u64 contentRevision = 0;
 
     xr_unique_ptr<DDSData> videoTextureData;
     bool videoActiveThisFrame = false;
@@ -141,6 +143,9 @@ public:
     nvrhi::ITexture* GetNVRHITexture(TextureHandle handle);
 
     const TextureMetadata* GetMetadata(TextureHandle handle) const;
+    void NotifyContentChanged(TextureMetadata& metadata);
+    u64 GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
+        nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
 
     bool IsResident(TextureHandle handle) const;
 
@@ -191,6 +196,7 @@ private:
 
     xr_vector<TextureMetadata> m_textures;
     xr_vector<u32> m_freeSlots;
+    u64 m_contentRevision = 0;
 
     xr_map<shared_str, TextureHandle> m_pathToHandle;
 

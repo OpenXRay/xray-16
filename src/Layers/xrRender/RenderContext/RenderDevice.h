@@ -30,7 +30,7 @@ public:
 
     nvrhi::IDevice* GetNVRHIDevice() const;
 
-    IRenderBackend* GetBackend() const { return m_backend.get(); }
+    IRenderBackend* GetBackend() const;
 
     nvrhi::ICommandList* GetImmediateCommandList() const;
 
@@ -251,7 +251,7 @@ public:
     void ResetStatistics();
 
 private:
-    xr_unique_ptr<IRenderBackend> m_backend;
+    IRenderBackend* m_backend = nullptr;
 
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
 

@@ -343,20 +343,16 @@ void FrameGraphRenderer::Shutdown() {
     fg::ClusteredLightManager::Instance().Shutdown();
 
     passes::ShutdownPathTracer();
+    m_mainView.Shutdown();
 
     m_framegraph = nullptr;
 
     if (m_blackboard) {
-        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
-            passes::ShutdownReSTIRGI(*rtgi);
         m_blackboard.reset();
     }
 
-    m_normals[0] = nullptr;
-    m_normals[1] = nullptr;
     m_hizHistory[0] = nullptr;
     m_hizHistory[1] = nullptr;
-    m_hasPrevHiZ = false;
     m_sceneDepth = nullptr;
     m_inspectorPreview = nullptr;
     old_QuadIB = nullptr;
@@ -413,13 +409,11 @@ void FrameGraphRenderer::Render() {
                     framegraph::GetPassResourceCache().Clear();
                     framegraph::BindingSetBuilder::InvalidateReflectionCache();
                     passes::ShutdownPathTracer();
-                    m_ptSampleIndex = 0;
-                    m_ptWasEnabled = false;
+                    m_mainView.InvalidateHistory();
+                    passes::ShutdownReSTIRGI(m_mainView.rtgi);
 
                     if (m_blackboard)
                     {
-                        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
-                            passes::ShutdownReSTIRGI(*rtgi);
                         m_blackboard->clear();
                     }
 
@@ -448,6 +442,9 @@ void FrameGraphRenderer::Render() {
         }
     }
 
+    m_mainView.BeginFrame(GEnv.Backend, Device.dwFrame, Device.dwWidth, Device.dwHeight,
+        Device.mView, Device.mProject, Device.mFullTransform, Device.vCameraPosition,
+        Device.vCameraDirection, Device.fTimeGlobal);
     {
         ZoneScopedN("FG::SetupPasses");
         SetupFrameGraphPasses();
@@ -497,37 +494,21 @@ void FrameGraphRenderer::Render() {
             cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
         });
 
+    m_mainView.BeginRecording();
     {
         ZoneScopedN("FG::Execute");
         m_framegraph->Execute();
     }
 
-    if (m_lightingState.effective == fg::LightingMode::ReferencePT && m_lightingState.recorded)
-        m_ptSampleIndex = m_lightingState.recordedSamples;
-    else
-    {
-        m_ptSampleIndex = 0;
-        m_ptWasEnabled = false;
-    }
-    if (m_lightingState.effective != fg::LightingMode::RTGI || !m_lightingState.recorded)
-    {
-        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
-            rtgi->historyValid = false;
-    }
+    const auto* hizState = m_blackboard->try_get<passes::HiZBuildPassState>();
+    m_mainView.FinishRecording(m_lightingState, m_hizHistory[m_mainView.writeIndex],
+        m_hizPyramid.is_valid() && hizState && hizState->recorded);
 
     if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
     {
         m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
     }
 
-    m_hasPrevFrameData = true;
-    m_prevViewProj = Device.mFullTransform;
-    m_prevView = Device.mView;
-    m_prevProject = Device.mProject;
-    m_prevCameraPos = Device.vCameraPosition;
-    m_prevDetailTime = Device.fTimeGlobal;
-    m_hasPrevHiZ = m_hizPyramid.is_valid();
-    m_pingPongIndex = 1 - m_pingPongIndex;
 
     if (m_gpuProfiler)
     {
@@ -551,13 +532,7 @@ void FrameGraphRenderer::RenderMenu() {
     m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
     if (m_lightingState.requested != fg::LightingMode::Raster)
         m_lightingState.Fail(fg::LightingFallback::NoScene);
-    m_ptSampleIndex = 0;
-    m_ptWasEnabled = false;
-    if (m_blackboard)
-    {
-        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
-            rtgi->historyValid = false;
-    }
+    m_mainView.InvalidateHistory();
 
     if (!m_enabled) return;
 
@@ -659,7 +634,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
         xray::profiler::RenderStats stats;
         stats.Reset();
         stats.lighting = m_lightingState;
-        stats.pathTracerSamples = m_ptSampleIndex;
+        stats.pathTracerSamples = m_mainView.pathTracer.history.samples;
 
         if (m_geometryCollector)
         {
@@ -1098,18 +1073,15 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
     const auto previousMode = m_lightingState.effective;
     m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
     m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
+    m_lightingState.previousSurfacesValid = m_mainView.hasPrevFrameData;
     if (previousMode != m_lightingState.effective)
     {
-        if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
-            rtgi->historyValid = false;
+        m_mainView.rtgi.historyValid = false;
+        m_mainView.pathTracer.history.valid = false;
+        m_mainView.pathTracer.history.samples = 0;
     }
     if (m_rtAccelMgr)
         m_rtAccelMgr->RetireScenes();
-    if (m_lightingState.effective != fg::LightingMode::ReferencePT)
-    {
-        m_ptSampleIndex = 0;
-        m_ptWasEnabled = false;
-    }
     if (m_lightingState.effective == fg::LightingMode::Raster)
         return;
     if (!m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
@@ -1119,54 +1091,34 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
     }
 
     const auto readiness = m_lightingState.effective == fg::LightingMode::ReferencePT ?
-        passes::EnsurePathTracerResources(m_device, width, height) :
-        passes::EnsureReSTIRGIResources(m_device, m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), width, height, m_lightingState.reuseReservoirs);
+        passes::EnsurePathTracerResources(m_device, width, height, m_mainView.pathTracer) :
+        passes::EnsureReSTIRGIResources(m_device, m_mainView.rtgi, width, height, m_lightingState.reuseReservoirs);
     if (readiness != fg::LightingFallback::None)
     {
         m_lightingState.Fail(readiness);
         return;
     }
 
-    if (m_lightingState.effective == fg::LightingMode::ReferencePT)
-    {
-        const bool justEnabled = !m_ptWasEnabled;
-        const bool posChanged = !Device.vCameraPosition.similar(m_ptPrevCameraPos, 0.01f);
-        const bool dirChanged = !Device.vCameraDirection.similar(m_ptPrevCameraDir, 0.001f);
-        const bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
-        const bool diffuseModeChanged = m_ptPrevDiffuseMode != ps_fg_pbr_diffuse_mode;
-        const bool sizeChanged = m_prevFrameWidth != width || m_prevFrameHeight != height;
-        if (justEnabled || posChanged || dirChanged || bouncesChanged || diffuseModeChanged || sizeChanged)
-            m_ptSampleIndex = 0;
-        m_ptWasEnabled = true;
-        m_ptPrevCameraPos = Device.vCameraPosition;
-        m_ptPrevCameraDir = Device.vCameraDirection;
-        m_ptPrevBounces = ps_r_path_tracer_bounces;
-        m_ptPrevDiffuseMode = ps_fg_pbr_diffuse_mode;
-    }
-
-    const bool rebuild = !m_rtAccelMgr->IsReady() || m_lightingState.effective == fg::LightingMode::RTGI || m_ptSampleIndex == 0;
     xr_vector<GeometryBatch> worldSkinned;
     xr_vector<GeometryBatch> hudSkinned;
-    if (rebuild)
+    for (const auto& batch : m_geometryCollector->GetBatches())
     {
-        for (const auto& batch : m_geometryCollector->GetBatches())
+        if (batch.isSkinned && batch.visual && batch.indexCount)
+            worldSkinned.push_back(batch);
+    }
+    const Fmatrix hudFov = passes::HudFovWarp();
+    for (const auto& batch : m_hudBatches)
+    {
+        if (batch.isSkinned && batch.visual && batch.indexCount)
         {
-            if (batch.isSkinned && batch.visual && batch.indexCount)
-                worldSkinned.push_back(batch);
-        }
-        const Fmatrix hudFov = passes::HudFovWarp();
-        for (const auto& batch : m_hudBatches)
-        {
-            if (batch.isSkinned && batch.visual && batch.indexCount)
-            {
-                auto adjusted = batch;
-                adjusted.worldMatrix.mul(hudFov, batch.worldMatrix);
-                hudSkinned.push_back(std::move(adjusted));
-            }
+            auto adjusted = batch;
+            adjusted.worldMatrix.mul(hudFov, batch.worldMatrix);
+            hudSkinned.push_back(std::move(adjusted));
         }
     }
-    if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned, rebuild))
+    if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned))
         m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
+    m_lightingState.sceneRevision = m_rtAccelMgr->GetSceneRevision();
 }
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {
@@ -1192,6 +1144,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    const u32 writeIdx = m_mainView.writeIndex;
+    const u32 readIdx = 1 - writeIdx;
     if (!m_sceneDepth || m_sceneDepth->getDesc().width != width || m_sceneDepth->getDesc().height != height) {
         nvrhi::TextureDesc desc;
         desc.width = width;
@@ -1250,24 +1204,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache->FinalizePendingTerrainMaterials();
     }
 
-    u32 writeIdx = m_pingPongIndex;
-    u32 readIdx = 1 - m_pingPongIndex;
-
-    if (!m_normals[0] || m_prevFrameWidth != width || m_prevFrameHeight != height) {
-        nvrhi::TextureDesc desc;
-        desc.width = width;
-        desc.height = height;
-        desc.format = nvrhi::Format::RGBA16_FLOAT;
-        desc.isShaderResource = true;
-        desc.isRenderTarget = true;
-        desc.isUAV = true;
-        desc.initialState = nvrhi::ResourceStates::RenderTarget;
-        desc.keepInitialState = true;
-        for (int i = 0; i < 2; i++) {
-            desc.debugName = (i == 0) ? "Normals_A" : "Normals_B";
-            m_normals[i] = nvDevice->createTexture(desc);
-        }
-    }
 
     framegraph::ResourceDesc normalImportDesc;
     normalImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -1275,10 +1211,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     normalImportDesc.height = height;
     normalImportDesc.format = nvrhi::Format::RGBA16_FLOAT;
     normalImportDesc.isRenderTarget = true;
-    normalImportDesc.isImported = true;
-    normalImportDesc.isTransient = false;
+    normalImportDesc.isUAV = true;
+    normalImportDesc.isTransient = true;
     normalImportDesc.debugName = "rt_Normal";
-    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->ImportTexture("rt_Normal", m_normals[writeIdx], normalImportDesc);
+    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalImportDesc);
 
     framegraph::ResourceDesc baseColorDesc;
     baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -1296,20 +1232,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     materialDesc.format = nvrhi::Format::RG8_UNORM;
     framegraph::VirtualResourceHandle materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
 
-    framegraph::VirtualResourceHandle prevNormalsHandle;
-    if (m_hasPrevFrameData && m_normals[readIdx]) {
-        framegraph::ResourceDesc prevNormalsDesc;
-        prevNormalsDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        prevNormalsDesc.debugName = "rt_PrevNormals";
-        prevNormalsDesc.width = width;
-        prevNormalsDesc.height = height;
-        prevNormalsDesc.format = nvrhi::Format::RGBA16_FLOAT;
-        prevNormalsDesc.isRenderTarget = true;
-        prevNormalsDesc.isImported = true;
-        prevNormalsDesc.isTransient = false;
-        prevNormalsHandle = m_framegraph->ImportTexture("rt_PrevNormals", m_normals[readIdx], prevNormalsDesc);
-        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
-    }
+    const auto prevNormalsHandle = m_mainView.ImportPreviousNormals(*m_framegraph);
+    const auto prevDepthHandle = m_mainView.ImportPreviousDepth(*m_framegraph);
 
     const u32 hizWidth = std::max(1u, width / 2);
     const u32 hizHeight = std::max(1u, height / 2);
@@ -1330,7 +1254,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
         m_hizHistoryWidth = hizWidth;
         m_hizHistoryHeight = hizHeight;
-        m_hasPrevHiZ = false;
+        m_mainView.hasPrevHiZ = false;
     }
     auto hizImportDesc = [&](const char* name) {
         framegraph::ResourceDesc desc;
@@ -1346,7 +1270,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         return desc;
     };
     framegraph::VirtualResourceHandle prevHiZHandle;
-    if (m_hasPrevHiZ && m_hizHistory[readIdx])
+    if (m_mainView.hasPrevHiZ && m_hizHistory[readIdx])
         prevHiZHandle = m_framegraph->ImportTexture("rt_PrevHiZ", m_hizHistory[readIdx], hizImportDesc("rt_PrevHiZ"));
 
     framegraph::VirtualResourceHandle clusterArgsHandle;
@@ -1398,7 +1322,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             geometryResources = m_gpuCullingManager->ImportGeometryResources(*m_framegraph);
             m_gpuCullingManager->SetupGeometryPreparePass(*m_framegraph, m_geometryCollector.get(), geometryResources);
             m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get(),
-                prevHiZHandle, m_prevViewProj, hizWidth, hizHeight, hizMipLevels, geometryResources);
+                prevHiZHandle, m_mainView.prevViewProj, hizWidth, hizHeight, hizMipLevels, geometryResources);
             clusterArgsHandle = geometryResources.drawArgs;
             cullActive = geometryResources.valid && clusterArgsHandle.is_valid();
         }
@@ -1443,7 +1367,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         detailResources = passes::setupDetailCullPass(
             *m_framegraph, m_device, m_detailManager.get(),
             prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
-            hizWidth, hizHeight, hizMipLevels, m_prevViewProj,
+            hizWidth, hizHeight, hizMipLevels, m_mainView.prevViewProj,
             m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
     }
     const bool grassIds = detailResources.HasSource();
@@ -1677,9 +1601,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             clusterConfig,
             m_gpuCullingManager.get(),
             m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
-            m_prevView,
-            m_prevProject,
-            m_hasPrevFrameData,
+            m_mainView.prevView,
+            m_mainView.prevProject,
+            m_mainView.hasPrevFrameData,
             grassIds ? grassEntryBase : 0xFFFFFFFFu,
             width,
             height,
@@ -1694,10 +1618,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 resolved,
                 m_detailManager.get(),
                 detailResources,
-                m_prevView,
-                m_prevProject,
-                m_hasPrevFrameData,
-                m_prevDetailTime,
+                m_mainView.prevView,
+                m_mainView.prevProject,
+                m_mainView.hasPrevFrameData,
+                m_mainView.prevDetailTime,
                 width,
                 height,
                 &m_blackboard->get_or_add<passes::DetailResolvePassState>()
@@ -1768,24 +1692,25 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
 
     passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
-        visMotionHandle, Device.mInvFullTransform, m_prevViewProj, m_hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
+        visMotionHandle, Device.mInvFullTransform, m_mainView.prevViewProj, m_mainView.hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
+
+    m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs, clusterLightOut, localShadowOut,
-            prevNormalsHandle, framegraph::VirtualResourceHandle(), motionOutput.motionVectors, Device.mInvFullTransform, m_prevViewProj, Device.vCameraPosition,
-            ps_r_rt_gi_intensity, width, height, m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), m_hasPrevFrameData, m_lightingState);
+            prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj, Device.vCameraPosition,
+            ps_r_rt_gi_intensity, width, height, m_mainView.rtgi, m_mainView.hasPrevFrameData, m_lightingState);
         opaqueOutputs.albedo = rtgiOutput.sceneColor;
     }
     else if (m_lightingState.effective == fg::LightingMode::ReferencePT)
     {
         passes::PathTracerConfig ptConfig;
         ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
-        ptConfig.sampleIndex = m_ptSampleIndex;
         ptConfig.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
         const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, m_lightingState, ptConfig,
-            Device.mInvFullTransform, Device.vCameraPosition, width, height);
+            Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
     }
 
@@ -1939,6 +1864,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_Material", materialBuffer);
     if (motionOutput.motionVectors.is_valid())
         m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);
+    if (prevDepthHandle.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevDepth", prevDepthHandle);
+    if (prevNormalsHandle.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
     if (m_lightingState.effective == fg::LightingMode::RTGI)
         m_framegraph->GetRTRegistry().RegisterRT("rt_RTGI_SceneColor", sceneColor);
 
@@ -2081,8 +2010,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    m_prevFrameWidth = width;
-    m_prevFrameHeight = height;
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -3376,6 +3303,7 @@ void FrameGraphRenderer::destroy()
 void FrameGraphRenderer::reset_begin()
 {
     ZoneScoped;
+    m_mainView.InvalidateHistory();
     if (Resources)
         Resources->reset_begin();
 
@@ -3397,6 +3325,7 @@ void FrameGraphRenderer::reset_end()
 void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
 {
     ZoneScoped;
+    m_mainView.InvalidateHistory();
     framegraph::GetPassResourceCache().ClearFramebufferDependent();
     if (m_materialCache)
         m_materialCache->Clear();

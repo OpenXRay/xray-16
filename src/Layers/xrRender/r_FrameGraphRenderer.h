@@ -22,6 +22,7 @@
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 #include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/RenderView.h"
 
 struct ImDrawData;
 
@@ -394,22 +395,12 @@ private:
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 
-    nvrhi::TextureHandle m_normals[2];
-    u32 m_pingPongIndex = 0;
     nvrhi::TextureHandle m_hizHistory[2];
     u32 m_hizHistoryWidth = 0;
     u32 m_hizHistoryHeight = 0;
-    bool m_hasPrevHiZ = false;
     nvrhi::TextureHandle m_sceneDepth;
+    fg::RenderView m_mainView;
 
-    Fmatrix m_prevViewProj;
-    Fmatrix m_prevView;
-    Fmatrix m_prevProject;
-    float m_prevDetailTime = 0.0f;
-    Fvector m_prevCameraPos;
-    bool m_hasPrevFrameData = false;
-    u32 m_prevFrameWidth = 0;
-    u32 m_prevFrameHeight = 0;
 
     nvrhi::TextureHandle m_inspectorPreview;
 
@@ -430,12 +421,6 @@ private:
 
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     fg::LightingFrameState m_lightingState;
-    u32 m_ptSampleIndex = 0;
-    Fvector m_ptPrevCameraPos = {0, 0, 0};
-    Fvector m_ptPrevCameraDir = {0, 0, 0};
-    int m_ptPrevBounces = 0;
-    int m_ptPrevDiffuseMode = 0;
-    bool m_ptWasEnabled = false;
 
     xr_unique_ptr<fg::FGUIRender> m_uiRender;
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;

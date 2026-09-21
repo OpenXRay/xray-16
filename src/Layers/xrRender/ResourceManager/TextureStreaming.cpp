@@ -269,6 +269,7 @@ StreamingManager::UploadResult StreamingManager::UploadMipsToGPU(StreamingReques
     }
 
     meta->residentMips = request.targetMips;
+    m_texManager->NotifyContentChanged(*meta);
 
     m_stats.bytesStreamedThisFrame += request.stagingBuffer.size();
     m_stats.bytesStreamedTotal += request.stagingBuffer.size();
