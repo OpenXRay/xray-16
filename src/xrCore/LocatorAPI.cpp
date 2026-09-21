@@ -178,7 +178,6 @@ CLocatorAPI::CLocatorAPI() :
 #   error Select or add implementation for your platform
 #endif
     m_iLockRescan = 0;
-    dwOpenCounter = 0;
 }
 
 CLocatorAPI::~CLocatorAPI()
@@ -1622,7 +1621,6 @@ bool CLocatorAPI::check_for_file(pcstr path, pcstr _fname, string_path& fname, c
     }
     else
         desc = &*I;
-    ++dwOpenCounter;
     return true;
 }
 

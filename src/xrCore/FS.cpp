@@ -367,17 +367,6 @@ void IReader::r(void* p, size_t cnt)
     VERIFY(Pos + cnt <= Size);
     CopyMemory(p, pointer(), cnt);
     advance(cnt);
-#ifdef DEBUG
-    bool bShow = false;
-    if (dynamic_cast<CFileReader*>(this))
-        bShow = true;
-    if (dynamic_cast<CVirtualFileReader*>(this))
-        bShow = true;
-    if (bShow)
-    {
-        FS.dwOpenCounter++;
-    }
-#endif
 };
 
 IC bool is_term(char a) { return (a == 13) || (a == 10); };

@@ -220,8 +220,6 @@ void CUIMainIngameWnd::Init()
         AttachChild(UIMotionIcon);
     }
 
-    UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
-
     if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
     {
         UIArtefactPanel = xr_new<CUIArtefactPanel>();
@@ -258,27 +256,11 @@ void CUIMainIngameWnd::Init()
     HUD_SOUND_ITEM::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
 
-float UIStaticDiskIO_start_time = 0.0f;
 void CUIMainIngameWnd::Draw()
 {
     ZoneScoped;
 
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-
-    // show IO icon
-    bool IOActive = (FS.dwOpenCounter > 0);
-    if (IOActive)
-        UIStaticDiskIO_start_time = Device.fTimeGlobal;
-
-    if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
-        UIStaticDiskIO->Show(false);
-    else
-    {
-        u32 alpha = clampr(iFloor(255.f * (1.f - (Device.fTimeGlobal - UIStaticDiskIO_start_time) / 1.f)), 0, 255);
-        UIStaticDiskIO->Show(true);
-        UIStaticDiskIO->SetTextureColor(color_rgba(255, 255, 255, alpha));
-    }
-    FS.dwOpenCounter = 0;
 
     if (!IsGameTypeSingle())
     {

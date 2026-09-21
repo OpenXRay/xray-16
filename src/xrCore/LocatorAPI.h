@@ -186,7 +186,6 @@ public:
     };
     Flags32 m_Flags;
     u32 dwAllocGranularity;
-    u32 dwOpenCounter;
 
 private:
     void check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);

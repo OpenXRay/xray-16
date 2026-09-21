@@ -28,7 +28,6 @@ public:
     pcstr GetDebugType() override { return "CUIMainIngameWnd"; }
 
 protected:
-    CUIStatic* UIStaticDiskIO{};
     CUIStatic* UIStaticQuickHelp{};
     CUIMotionIcon* UIMotionIcon{};
     CUIZoneMap* UIZoneMap{};
