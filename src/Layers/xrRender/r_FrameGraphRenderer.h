@@ -21,6 +21,7 @@
 #include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
+#include "Layers/xrRender/LightingMode.h"
 
 struct ImDrawData;
 
@@ -428,6 +429,7 @@ private:
     xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
 
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
+    fg::LightingFrameState m_lightingState;
     u32 m_ptSampleIndex = 0;
     Fvector m_ptPrevCameraPos = {0, 0, 0};
     Fvector m_ptPrevCameraDir = {0, 0, 0};
@@ -482,6 +484,7 @@ private:
     void SetupFrame();
 
     void SetupFrameGraphPasses();
+    void PrepareLightingMode(u32 width, u32 height);
 
     void CollectVisibleGeometry();
 

@@ -180,6 +180,10 @@ static nvrhi::rt::InstanceDesc RTInstance(nvrhi::rt::IAccelStruct* blas,
     return result;
 }
 
+bool RTAccelStructManager::s_skinAttempted = false;
+bool RTAccelStructManager::s_grassAttempted = false;
+bool RTAccelStructManager::s_billboardAttempted = false;
+
 void RTAccelStructManager::Initialize(RenderDevice* device)
 {
     m_device = device;
@@ -220,11 +224,28 @@ void RTAccelStructManager::InvalidateShaderPipelines()
     s_billboardLayout = nullptr;
     s_billboardSourceLayout = nullptr;
     s_billboardCB = {};
+    s_skinAttempted = false;
+    s_grassAttempted = false;
+    s_billboardAttempted = false;
 }
 
 bool RTAccelStructManager::IsReady() const
 {
-    return m_scene && m_scene->tlas;
+    if (!m_scene ||
+        !m_scene->tlas ||
+        !m_scene->geometry ||
+        !m_scene->geometry->vertices ||
+        !m_scene->geometry->indices ||
+        !m_scene->batchInfo ||
+        !m_scene->materials ||
+        !m_scene->terrainMaterials ||
+        !m_scene->textures.GetTable())
+        return false;
+    if (m_scene->counts.skinned && (!m_scene->skinnedVertices || !m_scene->skinnedIndices || !m_scene->skinBuild.handle))
+        return false;
+    if (m_scene->counts.grass && (!m_scene->grassVertices || !m_scene->grassIndices || !m_scene->grassBuild.handle))
+        return false;
+    return true;
 }
 
 bool RTAccelStructManager::IsSupported() const
@@ -419,13 +440,15 @@ u32 RTAccelStructManager::GetSkinningFormatID(u32 poolFormat)
     return 0;
 }
 
-void RTAccelStructManager::InitSkinningPipeline()
+bool RTAccelStructManager::InitSkinningPipeline()
 {
-    if (s_skinPipeline)
-        return;
+    if (s_skinAttempted)
+        return s_skinPipeline != nullptr;
+    s_skinAttempted = true;
     auto* device = m_device->GetNVRHIDevice();
     auto shader = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_skin_vertices");
-    R_ASSERT2(shader.handle && shader.reflection, "[RT] skinning shader unavailable");
+    if (!shader.handle || !shader.reflection)
+        return false;
     auto& cache = framegraph::GetPassResourceCache();
     RenderDevice::BufferDesc desc;
     desc.debugName = "RTSkinningCB";
@@ -435,11 +458,13 @@ void RTAccelStructManager::InitSkinningPipeline()
     desc.maxVersions = RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     s_skinCB = m_device->CreateBuffer(desc);
     s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *shader.reflection, device);
+    if (!s_skinLayout || !s_skinCB.IsValid() || !m_device->GetNativeBuffer(s_skinCB))
+        return false;
     nvrhi::ComputePipelineDesc pipeline;
     pipeline.CS = shader.handle;
     pipeline.bindingLayouts = { s_skinLayout };
     s_skinPipeline = device->createComputePipeline(pipeline);
-    R_ASSERT2(s_skinPipeline, "[RT] skinning pipeline unavailable");
+    return s_skinPipeline != nullptr;
 }
 
 void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpu,
@@ -447,7 +472,6 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
 {
     if (world.empty() && hud.empty())
         return;
-    InitSkinningPipeline();
     const auto& pools = gpu->GetSkinnedPools();
     u64 vertexCount = 0;
     auto slotOf = [&](nvrhi::IBuffer* source)
@@ -568,13 +592,17 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     scene.counts.skinned = u32(scene.skinJobs.size());
 }
 
-void RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGeneration& source)
+bool RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGeneration& source)
 {
-    if (s_grassPipeline && s_grassSourceLayout == source.bindingLayout)
-        return;
+    if (s_grassAttempted && s_grassSourceLayout == source.bindingLayout)
+        return s_grassPipeline != nullptr;
+    s_grassAttempted = true;
+    s_grassSourceLayout = source.bindingLayout;
+    s_grassPipeline = nullptr;
     auto* device = m_device->GetNVRHIDevice();
     auto shader = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_grass_vertices");
-    R_ASSERT2(shader.handle && shader.reflection, "[RT] grass shader unavailable");
+    if (!shader.handle || !shader.reflection)
+        return false;
     auto& cache = framegraph::GetPassResourceCache();
     if (!s_grassCB.IsValid())
     {
@@ -587,21 +615,26 @@ void RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGene
         s_grassCB = m_device->CreateBuffer(desc);
     }
     s_grassLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGrass", *shader.reflection, device);
+    if (!s_grassLayout || !s_grassCB.IsValid() || !m_device->GetNativeBuffer(s_grassCB))
+        return false;
     nvrhi::ComputePipelineDesc pipeline;
     pipeline.CS = shader.handle;
     pipeline.bindingLayouts = { s_grassLayout, m_device->GetBackend()->GetBindlessLayout(), source.bindingLayout };
     s_grassPipeline = device->createComputePipeline(pipeline);
-    R_ASSERT2(s_grassPipeline, "[RT] grass pipeline unavailable");
-    s_grassSourceLayout = source.bindingLayout;
+    return s_grassPipeline != nullptr;
 }
 
-void RTAccelStructManager::InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source)
+bool RTAccelStructManager::InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source)
 {
-    if (s_billboardPipeline && s_billboardSourceLayout == source.bindingLayout)
-        return;
+    if (s_billboardAttempted && s_billboardSourceLayout == source.bindingLayout)
+        return s_billboardPipeline != nullptr;
+    s_billboardAttempted = true;
+    s_billboardSourceLayout = source.bindingLayout;
+    s_billboardPipeline = nullptr;
     auto* device = m_device->GetNVRHIDevice();
     auto shader = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_grass_billboard");
-    R_ASSERT2(shader.handle && shader.reflection, "[RT] billboard shader unavailable");
+    if (!shader.handle || !shader.reflection)
+        return false;
     auto& cache = framegraph::GetPassResourceCache();
     if (!s_billboardCB.IsValid())
     {
@@ -614,12 +647,46 @@ void RTAccelStructManager::InitBillboardPipeline(const FGDetailManager::Instance
         s_billboardCB = m_device->CreateBuffer(desc);
     }
     s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection("RTBillboard", *shader.reflection, device);
+    if (!s_billboardLayout || !s_billboardCB.IsValid() || !m_device->GetNativeBuffer(s_billboardCB))
+        return false;
     nvrhi::ComputePipelineDesc pipeline;
     pipeline.CS = shader.handle;
     pipeline.bindingLayouts = { s_billboardLayout, m_device->GetBackend()->GetBindlessLayout(), source.bindingLayout };
     s_billboardPipeline = device->createComputePipeline(pipeline);
-    R_ASSERT2(s_billboardPipeline, "[RT] billboard pipeline unavailable");
-    s_billboardSourceLayout = source.bindingLayout;
+    return s_billboardPipeline != nullptr;
+}
+
+bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool needsSkin)
+{
+    if (!GEnv.Render || !GEnv.Render->GetShaderLoader())
+        return false;
+    auto* backend = m_device->GetBackend();
+    if (!backend || !backend->GetBindlessLayout() || !backend->GetBindlessDescriptorTable())
+        return false;
+    if (needsSkin && !InitSkinningPipeline())
+        return false;
+    const auto frame = detail ? detail->GetCompletedVisibilityFrame() : nullptr;
+    if (!frame || !frame->source || frame->source->chunks.empty())
+        return true;
+    const auto& source = *frame->source;
+    const auto& stats = frame->stats;
+    if (!source.params.grassMode)
+    {
+        if (!source.maxPulledIndexCount || !stats.visibleBillboardCount)
+            return true;
+        return source.bindingLayout && source.descriptorTable && frame->visible[FGDetailManager::VIS_KIND_MESH] && InitBillboardPipeline(source);
+    }
+    if (!stats.visibleLOD0Count && !stats.visibleLOD1Count && !stats.visibleLOD2Count)
+        return true;
+    if (!source.bindingLayout || !source.descriptorTable || !detail->perlin4dTexture)
+        return false;
+    const u32 counts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
+    for (u32 i = 0; i < 3; ++i)
+    {
+        if (counts[i] && !frame->visible[i])
+            return false;
+    }
+    return InitGrassPipeline(source);
 }
 
 void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManager* detail)
@@ -642,7 +709,6 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         const u32 maximum = source.maxPulledIndexCount / 3 * 3;
         if (!maximum || !stats.visibleBillboardCount)
             return;
-        InitBillboardPipeline(source);
         scene.grassPipeline = s_billboardPipeline;
         scene.grassLayout = s_billboardLayout;
         scene.billboardConstants.maxVertsPerBillboard = maximum;
@@ -657,7 +723,6 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         const u32 counts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
         if (!counts[0] && !counts[1] && !counts[2])
             return;
-        InitGrassPipeline(source);
         scene.grassPipeline = s_grassPipeline;
         scene.grassLayout = s_grassLayout;
         scene.grassWind = detail->perlin4dTexture;
@@ -808,28 +873,30 @@ RTFrameResources RTAccelStructManager::ImportScene(framegraph::FrameGraph& graph
     return resources;
 }
 
-void RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpu,
-    FGDetailManager* detail, const xr_vector<GeometryBatch>& world,
+bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpu, FGDetailManager* detail, const xr_vector<GeometryBatch>& world,
     const xr_vector<GeometryBatch>& hud, bool rebuildDynamic)
 {
-    if (!m_rtSupported || !gpu)
-        return;
-    R_ASSERT2(GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases(),
-        "[RT] immutable scene generations require submission leases");
+    if (!m_rtSupported || !gpu || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
+        return false;
     RetireScenes();
     PrepareStatic(gpu);
     if (!m_staticGeometry)
-        return;
+        return false;
     if (!m_scene || rebuildDynamic || m_scene->geometry != m_staticGeometry)
+    {
+        if (!EnsureBuildResources(detail, !world.empty() || !hud.empty()))
+            return false;
         PrepareScene(gpu, detail, world, hud);
-    if (!m_scene)
-        return;
+    }
+    if (!IsReady())
+        return false;
     const u64 lease = GEnv.Backend->OpenSubmissionLease();
-    R_ASSERT(lease != 0);
+    if (!lease)
+        return false;
     ++m_scene->leases;
     m_leases.push_back({ m_scene, lease });
     if (m_scene->recorded)
-        return;
+        return true;
     using namespace framegraph;
     const auto scene = m_scene;
     const auto resources = ImportScene(graph, *scene);
@@ -967,6 +1034,7 @@ void RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
         {
             data.manager->RecordTLAS(data, fg, ctx->GetCommandList());
         });
+    return true;
 }
 
 void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,

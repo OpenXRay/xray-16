@@ -157,6 +157,9 @@ target_sources(xrRender PRIVATE
     fgUIRender.h
     fgUIRender.cpp
 
+    LightingMode.h
+    LightingMode.cpp
+
     r_FrameGraphRenderer.h
     r_FrameGraphRenderer.cpp
     r_FrameGraphRenderer_Loader.cpp
