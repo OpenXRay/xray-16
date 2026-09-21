@@ -16,6 +16,7 @@ class PathTracerConfig
 public:
     u32 maxBounces = 8;
     u32 sampleIndex = 0;
+    u32 diffuseMode = 0;
 };
 
 class PathTracerOutput
@@ -41,7 +42,8 @@ public:
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[2];
+    u32 diffuseMode;
+    u32 pad;
 };
 
 static_assert(sizeof(PathTracerCB) == 160);

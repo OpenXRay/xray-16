@@ -161,6 +161,13 @@ float4 SampleDiffuseLevel(MaterialData mat, float2 uv)
     return GetBindlessTexture(mat.diffuseIndex).SampleLevel(smp_linear, uv, 0);
 }
 
+float3 SamplePBRLevel(MaterialData mat, float2 uv)
+{
+    if (mat.pbrIndex == INVALID_TEXTURE_INDEX)
+        return float3(0.0, 0.5, 1.0);
+    return GetBindlessTexture(mat.pbrIndex).SampleLevel(smp_linear, uv, 0).rgb;
+}
+
 struct BumpSample
 {
     float3 normal;

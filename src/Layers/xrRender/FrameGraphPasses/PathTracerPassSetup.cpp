@@ -240,8 +240,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         cbData.grassBatchStart = 0;
 
     cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
-    cbData.pad[0] = 0;
-    cbData.pad[1] = 0;
+    cbData.diffuseMode = config.diffuseMode;
+    cbData.pad = 0;
 
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",

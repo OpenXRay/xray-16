@@ -37,6 +37,7 @@ public:
     u32 recordedSamples = 0;
     bool conflictingRequests = false;
     bool recorded = false;
+    bool reuseReservoirs = true;
 };
 
 const char* LightingModeName(LightingMode mode);

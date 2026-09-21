@@ -48,28 +48,6 @@ constexpr u32 kTileClassLights = 2;
 constexpr u32 kTileArgsStride = sizeof(u32) * 3;
 constexpr u32 kTileArgsBytes = kTileArgsStride * kLightTileClasses;
 
-struct DeferredLightPassData {
-    VirtualResourceHandle depth;
-    VirtualResourceHandle normal;
-    VirtualResourceHandle baseColor;
-    VirtualResourceHandle material;
-    VirtualResourceHandle color;
-    VirtualResourceHandle sunMask;
-    VirtualResourceHandle localTiles;
-    VirtualResourceHandle localStatic;
-    VirtualResourceHandle localDyn;
-    VirtualResourceHandle localHud;
-    VirtualResourceHandle clusterLightData;
-    VirtualResourceHandle clusterGrid;
-    VirtualResourceHandle clusterLightIndexList;
-    LocalShadowOutput localShadow;
-    fg::RenderDevice* device = nullptr;
-    DeferredLightPassState* state = nullptr;
-    xray::profiler::GPUProfiler* gpuProfiler = nullptr;
-    u32 width = 0;
-    u32 height = 0;
-};
-
 bool LoadComputePass(fg::RenderDevice* device, const char* shaderName, const char* cacheName,
     nvrhi::ShaderHandle& outShader, nvrhi::BindingLayoutHandle& outLayout, nvrhi::ComputePipelineHandle& outPipeline)
 {
@@ -208,17 +186,9 @@ void ProcessDeferredLightStats(DeferredLightPassState& state, nvrhi::IDevice* de
     device->unmapBuffer(oldest);
 }
 
-DefaultOutputLayout setupDeferredLightPass(
-    FrameGraph& fg,
-    fg::RenderDevice* device,
-    const DefaultOutputLayout& inputs,
-    u32 width,
-    u32 height,
-    VirtualResourceHandle sunMask,
-    const LocalShadowOutput& localShadow,
-    const ClusterLightOutput& clusterLights,
-    xray::profiler::GPUProfiler* gpuProfiler,
-    DeferredLightPassState* state)
+DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* device, const DefaultOutputLayout& inputs, u32 width, u32 height,
+    VirtualResourceHandle sunMask, const LocalShadowOutput& localShadow, const ClusterLightOutput& clusterLights, xray::profiler::GPUProfiler* gpuProfiler,
+    DeferredLightPassState* state, LightingFrameState* lighting)
 {
     if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid() || !inputs.material.is_valid())
         return inputs;
@@ -229,10 +199,13 @@ DefaultOutputLayout setupDeferredLightPass(
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunMask, localShadow, clusterLights, state, gpuProfiler](FrameGraph& builder, PassHandle passHandle, DeferredLightPassData& data) {
+        [&, width, height, sunMask, localShadow, clusterLights, state, gpuProfiler, lighting](FrameGraph& builder, PassHandle passHandle,
+            DeferredLightPassData& data)
+        {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
             data.state = state;
+            data.lighting = lighting;
             data.gpuProfiler = gpuProfiler;
             data.width = width;
             data.height = height;
@@ -244,19 +217,25 @@ DefaultOutputLayout setupDeferredLightPass(
             if (sunMask.is_valid())
                 data.sunMask = passBuilder.read(sunMask, ResourceState::ShaderResource);
             data.localShadow = localShadow;
-            if (localShadow.active) {
+            if (localShadow.active)
+            {
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
                 data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
             }
-            if (clusterLights.active) {
+            if (clusterLights.active)
+            {
                 data.clusterLightData = passBuilder.read(clusterLights.lightData, ResourceState::ShaderResource);
                 data.clusterGrid = passBuilder.read(clusterLights.clusterGrid, ResourceState::ShaderResource);
                 data.clusterLightIndexList = passBuilder.read(clusterLights.lightIndexList, ResourceState::ShaderResource);
             }
         },
-        [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+        [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        {
+            if (data.lighting && data.lighting->recorded && data.lighting->effective != LightingMode::Raster)
+                return;
+
             ZoneScoped;
             ZoneName("DeferredLightPass", 17);
 
@@ -327,7 +306,8 @@ DefaultOutputLayout setupDeferredLightPass(
                     data.gpuProfiler->EndPass(cmdList, "Deferred Light.Classify");
             }
 
-            for (u32 cls = 0; cls < kLightTileClasses; ++cls) {
+            for (u32 cls = 0; cls < kLightTileClasses; ++cls)
+            {
                 auto* refl = shaderLoader->GetCachedReflection(kTileShaderNames[cls], ".cs");
                 if (!refl)
                     continue;
@@ -343,7 +323,8 @@ DefaultOutputLayout setupDeferredLightPass(
                 bsb.Texture("g_GBufferMaterial", materialRT);
                 bsb.TextureUAV("g_SceneColor", colorRT);
                 bsb.BufferSRV("g_TileList", state.tileListBuffer);
-                if (cls & kTileClassLights) {
+                if (cls & kTileClassLights)
+                {
                     bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());
                     bsb.BufferSRV("g_ClusterGrid", clm.GetClusterGridBuffer());
                     bsb.BufferSRV("g_LightIndexList", clm.GetLightIndexListBuffer());
@@ -382,5 +363,4 @@ DefaultOutputLayout setupDeferredLightPass(
     outputs.depth = passData.depth;
     return outputs;
 }
-
 }

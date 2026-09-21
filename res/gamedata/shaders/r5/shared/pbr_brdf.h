@@ -18,10 +18,10 @@ float D_GGX(float NdotH, float roughness)
     float a2 = a * a;
     float NdotH2 = NdotH * NdotH;
 
-    float denom = NdotH2 * (a2 - 1.0f) + 1.0f;
+    float denom = max(1.0f - NdotH2, 0.0f) + NdotH2 * a2;
     denom = PI * denom * denom;
 
-    return a2 / max(denom, 0.0001f);
+    return a2 / max(denom, 1e-12f);
 }
 
 // Schlick-GGX Geometry Function (single direction)

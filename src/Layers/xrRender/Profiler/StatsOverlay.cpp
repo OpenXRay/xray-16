@@ -150,6 +150,8 @@ void StatsOverlay::Render()
         ImGui::Text("Fallback: %s", render::fg::LightingFallbackName(lighting.fallback));
     if (lighting.requested != render::fg::LightingMode::Raster)
         ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
+    if (lighting.requested == render::fg::LightingMode::RTGI)
+        ImGui::Text("RTGI ReSTIR reuse: %s", lighting.reuseReservoirs ? "enabled" : "disabled");
     if (lighting.requested == render::fg::LightingMode::ReferencePT)
         ImGui::Text("PT recorded samples: %u", m_renderStats.pathTracerSamples);
 
@@ -1148,6 +1150,8 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         render::fg::LightingModeName(rs.lighting.requested), render::fg::LightingModeName(rs.lighting.effective),
         render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
         rs.pathTracerSamples);
+    text += line;
+    xr_sprintf(line, sizeof(line), "RTGI ReSTIR reuse: %s\n", rs.lighting.reuseReservoirs ? "enabled" : "disabled");
     text += line;
     xr_sprintf(line, sizeof(line), "clusters: %u/%u visible (terrain %u/%u) | tris %u+%u | occl cand %u rec %u | residual S%u T%u D%u X%u | vsm %s\n",
         rs.clusterVisible, rs.clusterStaticEntries, rs.clusterTerrainVisible, rs.clusterTerrainEntries,

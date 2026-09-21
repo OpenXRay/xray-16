@@ -485,6 +485,7 @@ private:
     Fvector m_ptPrevCameraPos = {0, 0, 0};
     Fvector m_ptPrevCameraDir = {0, 0, 0};
     int m_ptPrevBounces = 0;
+    int m_ptPrevDiffuseMode = 0;
     bool m_ptWasEnabled = false;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)

@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/LightingMode.h"
 #include "LocalShadowPassSetup.h"
 #include "ClusterLightPassSetup.h"
 #include <nvrhi/nvrhi.h>
@@ -28,6 +29,7 @@ public:
     u32 objectCount = 0;
     const xr_vector<TransparentDrawRange>* ranges = nullptr;
     GPUCullingManager* gpuCulling = nullptr;
+    const LightingFrameState* lighting = nullptr;
     bool skinned = false;
 
     bool HasRigid() const;

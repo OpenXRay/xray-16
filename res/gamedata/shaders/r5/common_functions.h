@@ -230,13 +230,15 @@ float3 shade_pbr(
 	float4 svPosition,
 	float sunVis,
 	uint shadingClass = SHADING_CLASS_STANDARD,
-	float transmission = 0.0)
+	float transmission = 0.0,
+	bool includeAmbient = true,
+	float sunThickness = 0.0)
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
 	bool foliage = shadingClass == SHADING_CLASS_FOLIAGE;
 
-	float2 sun = float2(sunVis, 0.0);
+	float2 sun = float2(sunVis, sunThickness);
 	if (sunVis < 0.0)
 		sun = SunShadow(worldPos, svPosition);
 
@@ -250,7 +252,7 @@ float3 shade_pbr(
 			+ FoliageTransmission(N, V, L, foliage_params2.x) * sunTransmit * sssColor * L_sun_color;
 		float3 ambient = PBRAmbient(albedo, N, V, 0.0, roughness, ao, ambientColor)
 			+ albedo * ambientColor * ao * foliage_sss.rgb * (transmission * foliage_params.w);
-		finalColor = sunLight + ambient;
+		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
 	}
 	else
 	{
@@ -264,7 +266,7 @@ float3 shade_pbr(
 			metallic, roughness, ao,
 			ambientColor
 		);
-		finalColor = sunLight + ambient;
+		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
 	}
 
 #ifdef CLUSTERED_LIGHTING_FORWARD

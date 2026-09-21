@@ -158,6 +158,7 @@ void FrameGraphRenderer::CreateQuadIB()
 namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); void ShutdownImGuiRenderer(); }
 
 extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_rt_gi_restir;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_profile_dump;
@@ -573,6 +574,7 @@ void FrameGraphRenderer::Render() {
 void FrameGraphRenderer::RenderMenu() {
     ZoneScopedN("FrameGraphRenderer::RenderMenu");
     m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
+    m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
     if (m_lightingState.requested != fg::LightingMode::Raster)
         m_lightingState.Fail(fg::LightingFallback::NoScene);
     m_ptSampleIndex = 0;
@@ -1127,6 +1129,7 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
     m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
+    m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
     if (previousMode != m_lightingState.effective)
     {
         if (auto* rtgi = m_blackboard->try_get<passes::ReSTIRGIPassState>())
@@ -1149,7 +1152,7 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 
     const auto readiness = m_lightingState.effective == fg::LightingMode::ReferencePT ?
         passes::EnsurePathTracerResources(m_device, width, height) :
-        passes::EnsureReSTIRGIResources(m_device, m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), width, height);
+        passes::EnsureReSTIRGIResources(m_device, m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), width, height, m_lightingState.reuseReservoirs);
     if (readiness != fg::LightingFallback::None)
     {
         m_lightingState.Fail(readiness);
@@ -1162,13 +1165,15 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
         const bool posChanged = !Device.vCameraPosition.similar(m_ptPrevCameraPos, 0.01f);
         const bool dirChanged = !Device.vCameraDirection.similar(m_ptPrevCameraDir, 0.001f);
         const bool bouncesChanged = m_ptPrevBounces != ps_r_path_tracer_bounces;
+        const bool diffuseModeChanged = m_ptPrevDiffuseMode != ps_fg_pbr_diffuse_mode;
         const bool sizeChanged = m_prevFrameWidth != width || m_prevFrameHeight != height;
-        if (justEnabled || posChanged || dirChanged || bouncesChanged || sizeChanged)
+        if (justEnabled || posChanged || dirChanged || bouncesChanged || diffuseModeChanged || sizeChanged)
             m_ptSampleIndex = 0;
         m_ptWasEnabled = true;
         m_ptPrevCameraPos = Device.vCameraPosition;
         m_ptPrevCameraDir = Device.vCameraDirection;
         m_ptPrevBounces = ps_r_path_tracer_bounces;
+        m_ptPrevDiffuseMode = ps_fg_pbr_diffuse_mode;
     }
 
     const bool rebuild = !m_rtAccelMgr->IsReady() || m_lightingState.effective == fg::LightingMode::RTGI || m_ptSampleIndex == 0;
@@ -1759,26 +1764,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     gbufferOutputs.material = materialBuffer;
     gbufferOutputs.depth = depthBuffer;
 
-    // ═══════════════════════════════════════════════════════
-    //  GPU CULLING DEBUG VISUALIZATION (Optional overlay)
-    // ═══════════════════════════════════════════════════════
-    if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
-        m_gpuCullingManager->SetupDebugVisualizationPass(
-            *m_framegraph,
-            m_hizPyramid,
-            gbufferOutputs.albedo,
-            depthBuffer,
-            hizOutput.width,
-            hizOutput.height,
-            hizOutput.mipLevels,
-            Device.mFullTransform,
-            &m_worldParticleBatches
-        );
-    }
-
     passes::TransparentPassConfig transparentConfig;
     transparentConfig.geometry = geometryResources;
-    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0) {
+    transparentConfig.lighting = &m_lightingState;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0)
+    {
         transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
         transparentConfig.ranges = &m_gpuCullingManager->GetTransparentRanges();
     }
@@ -1823,18 +1813,35 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
             &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
 
-    auto litOutputs = passes::setupDeferredLightPass(
-        *m_framegraph,
-        m_device,
-        detailOutputs,
-        width,
-        height,
-        vsmMaskHandle,
-        localShadowOut,
-        clusterLightOut,
-        m_gpuProfiler.get(),
-        &m_blackboard->get_or_add<passes::DeferredLightPassState>()
-    );
+    passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
+        visMotionHandle, Device.mInvFullTransform, m_prevViewProj, m_hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
+
+    auto opaqueOutputs = detailOutputs;
+    if (m_lightingState.effective == fg::LightingMode::RTGI)
+    {
+        const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs, clusterLightOut, localShadowOut,
+            prevNormalsHandle, framegraph::VirtualResourceHandle(), motionOutput.motionVectors, Device.mInvFullTransform, m_prevViewProj, Device.vCameraPosition,
+            ps_r_rt_gi_intensity, width, height, m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), m_hasPrevFrameData, m_lightingState);
+        opaqueOutputs.albedo = rtgiOutput.sceneColor;
+    }
+    else if (m_lightingState.effective == fg::LightingMode::ReferencePT)
+    {
+        passes::PathTracerConfig ptConfig;
+        ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
+        ptConfig.sampleIndex = m_ptSampleIndex;
+        ptConfig.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
+        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, m_lightingState, ptConfig,
+            Device.mInvFullTransform, Device.vCameraPosition, width, height);
+        opaqueOutputs.albedo = ptOutput.composited;
+    }
+
+    auto litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
+        m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
+    if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
+    {
+        m_gpuCullingManager->SetupDebugVisualizationPass(*m_framegraph, m_hizPyramid, litOutputs.albedo, depthBuffer, hizOutput.width, hizOutput.height,
+            hizOutput.mipLevels, Device.mFullTransform, &m_worldParticleBatches);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  TRANSPARENT PASS (alpha-blended geometry)
@@ -1852,17 +1859,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    // ═══════════════════════════════════════════════════════
-    //  MOTION VECTOR PASS (Depth-based reprojection)
-    // ═══════════════════════════════════════════════════════
-    passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(
-        *m_framegraph, m_device,
-        transparentOutputs.depth,
-        visIdBuffer, visDepthHandle, visMotionHandle,
-        Device.mInvFullTransform, m_prevViewProj, m_hasPrevFrameData,
-        width, height,
-        m_blackboard->get_or_add<passes::MotionVectorPassState>()
-    );
     if (ps_r_vis_debug && visIdBuffer.is_valid()) {
         auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, motionOutput.motionVectors, width, height, u32(ps_r_vis_debug), &m_blackboard->get_or_add<passes::VisibilityPassState>());
         if (visDebug.is_valid())
@@ -1910,35 +1906,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             *m_framegraph, m_device, sceneColor, particleOutputs.distortion,
             particleLayout.depth, width, height,
             m_blackboard->get_or_add<passes::DistortionApplyPassState>());
-    }
-
-
-    // ═══════════════════════════════════════════════════════
-    //  ReSTIR GI (RT Shadows + Indirect Lighting)
-    // ═══════════════════════════════════════════════════════
-
-    if (m_lightingState.effective == fg::LightingMode::RTGI)
-    {
-        auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), transparentOutputs.depth, transparentOutputs.normal,
-            transparentOutputs.baseColor, prevNormalsHandle, framegraph::VirtualResourceHandle(), motionOutput.motionVectors, sceneColor,
-            Device.mInvFullTransform, m_prevViewProj, Device.vCameraPosition, ps_r_rt_gi_intensity, width, height,
-            m_blackboard->get_or_add<passes::ReSTIRGIPassState>(), m_hasPrevFrameData, m_lightingState);
-        sceneColor = rtgiOutput.sceneColor;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  PATH TRACER (Reference / Ground-Truth Mode)
-    // ═══════════════════════════════════════════════════════
-    if (m_lightingState.effective == fg::LightingMode::ReferencePT)
-    {
-        passes::PathTracerConfig ptConfig;
-        ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
-        ptConfig.sampleIndex = m_ptSampleIndex;
-
-        auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), sceneColor, m_lightingState, ptConfig,
-            Device.mInvFullTransform, Device.vCameraPosition, width, height);
-
-        sceneColor = ptOutput.composited;
     }
 
     if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Rain)

@@ -3,6 +3,9 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
+#include "ClusterLightPassSetup.h"
+#include "LocalShadowPassSetup.h"
 
 namespace xray::render::framegraph
 {
@@ -25,10 +28,12 @@ public:
     nvrhi::TextureHandle reservoirA[2];
     nvrhi::TextureHandle reservoirB[2];
     nvrhi::TextureHandle directLighting;
+    nvrhi::TextureHandle indirectLighting;
     u32 currTemporalIdx = 0;
     u32 texWidth = 0;
     u32 texHeight = 0;
     LightingFallback readiness = LightingFallback::ResourcesUnavailable;
+    LightingFallback temporalReadiness = LightingFallback::ResourcesUnavailable;
     bool initialized = false;
     bool historyValid = false;
     bool initialRecorded = false;
@@ -101,7 +106,11 @@ public:
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle material;
+    ClusterLightOutput clusterLights;
+    LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle directLighting;
+    framegraph::VirtualResourceHandle indirectLighting;
     framegraph::VirtualResourceHandle reservoirA;
     framegraph::VirtualResourceHandle reservoirB;
     ReSTIRGICB cbData;
@@ -143,6 +152,7 @@ public:
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle sceneColor;
     framegraph::VirtualResourceHandle directLighting;
+    framegraph::VirtualResourceHandle indirectLighting;
     framegraph::VirtualResourceHandle reservoirA;
     framegraph::VirtualResourceHandle reservoirB;
     CompositeCB cbData;
@@ -151,12 +161,11 @@ public:
     u32 reservoirIdx = 0;
 };
 
-LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height);
-ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr, framegraph::VirtualResourceHandle depth,
-    framegraph::VirtualResourceHandle normal, framegraph::VirtualResourceHandle baseColor, framegraph::VirtualResourceHandle prevNormals,
-    framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, framegraph::VirtualResourceHandle sceneColorIn,
-    const Fmatrix& invViewProj, const Fmatrix& prevViewProj, const Fvector& cameraPos, float giIntensity, u32 width, u32 height, ReSTIRGIPassState& state,
-    bool hasPrevFrameData, LightingFrameState& lighting);
+LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseReservoirs);
+ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr, const framegraph::DefaultOutputLayout& inputs,
+    const ClusterLightOutput& clusterLights, const LocalShadowOutput& localShadow, framegraph::VirtualResourceHandle prevNormals,
+    framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
+    const Fvector& cameraPos, float giIntensity, u32 width, u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting);
 
 void ShutdownReSTIRGI(ReSTIRGIPassState& state);
 }

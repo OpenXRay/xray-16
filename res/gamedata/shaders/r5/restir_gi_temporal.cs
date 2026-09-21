@@ -33,11 +33,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0 || depth >= 0.9) {
+    if (depth <= 0.0) {
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
         return;
     }
+    if (depth >= 0.9)
+        return;
 
     GIReservoir currRes = UnpackReservoir(
         u_ReservoirA[pixel],

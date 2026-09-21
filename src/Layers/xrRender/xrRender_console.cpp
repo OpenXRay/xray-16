@@ -1018,6 +1018,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
+    CMD4(CCC_Integer, "r_rt_gi_restir", &ps_r_rt_gi_restir, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
 
     CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);

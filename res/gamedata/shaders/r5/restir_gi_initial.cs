@@ -1,4 +1,7 @@
+#define CLUSTERED_LIGHTING_FORWARD
+#define LOCAL_SHADOW_RECEIVER
 #include "bindless_common.h"
+#include "common.h"
 #include "rt_common.h"
 #include "shared/pbr_brdf.h"
 #include "restir_gi_common.h"
@@ -23,7 +26,7 @@ cbuffer ReSTIRGIParams : register(b5) {
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
 StructuredBuffer<RTBatchInfo> g_BatchInfo : register(t2);
 ByteAddressBuffer g_MegaVB : register(t3);
-ByteAddressBuffer g_MegaIB : register(t4);
+ByteAddressBuffer g_MegaIB : register(t18);
 TextureCube<float4> g_Sky0 : register(t5);
 TextureCube<float4> g_Sky1 : register(t6);
 ByteAddressBuffer g_SkinnedVB : register(t7);
@@ -33,10 +36,12 @@ ByteAddressBuffer g_GrassIB : register(t13);
 Texture2D<float> t_Depth : register(t14);
 Texture2D<float4> t_Normal : register(t15);
 Texture2D<float4> t_BaseColor : register(t16);
+Texture2D<float2> t_Material : register(t17);
 
 RWTexture2D<float4> u_DirectLighting : register(u0);
 RWTexture2D<float4> u_ReservoirA : register(u1);
 RWTexture2D<float4> u_ReservoirB : register(u2);
+RWTexture2D<float4> u_IndirectLighting : register(u3);
 
 static const uint MAX_SHADOW_SKIPS = 8;
 
@@ -287,18 +292,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0 || depth >= 0.9) {
+    float4 normalData = t_Normal.Load(int3(pixel, 0));
+    if (depth <= 0.0 || dot(normalData.xyz, normalData.xyz) < 0.25) {
         u_DirectLighting[pixel] = 0;
+        u_IndirectLighting[pixel] = 0;
         u_ReservoirA[pixel] = 0;
         u_ReservoirB[pixel] = 0;
         return;
     }
 
-    float2 giUV = (float2(pixel) + 0.5) / g_ScreenSize;
-    float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
-    float4 giWorld = mul(g_InvViewProj, giClip);
-    float3 worldPos = giWorld.xyz / giWorld.w;
-    float4 normalData = t_Normal.Load(int3(pixel, 0));
+    float3 worldPos = reconstruct_world_pos(float2(pixel) + 0.5, depth);
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
 
     float3 N = normalize(normalData.xyz);
@@ -306,19 +309,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 albedo = baseColorData.rgb;
     float metallic = baseColorData.a;
     float3 V = normalize(g_CameraPos.xyz - worldPos);
-    float3 sunDir = normalize(-g_SunDir_Intensity.xyz);
-    float sunIntensity = g_SunDir_Intensity.w;
-    float3 sunColor = g_SunColor_SkyWeight.xyz * sunIntensity;
+    float3 sunDir = normalize(-L_sun_dir_w);
+    float3 sunColor = L_sun_color;
 
     float3 biasedPos = worldPos + N * 0.01;
 
     // === DIRECT LIGHTING (shadow ray to sun) ===
     float shadow = TraceShadow(biasedPos, sunDir);
-    float3 direct = 0;
-    if (shadow > 0.001) {
-        float NdotL = max(0.0, dot(N, sunDir));
-        direct = albedo * NdotL * sunColor * shadow;
-    }
+    float2 material = t_Material.Load(int3(pixel, 0));
+    float3 direct = shade_pbr(albedo, N, worldPos, metallic, roughness, 1.0,
+        float4(float2(pixel) + 0.5, depth, 1.0), shadow, GBufferShadingClass(material), material.y, false, 10000.0);
 
     // === INDIRECT LIGHTING (1 cosine bounce + NEE) ===
     uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
@@ -331,11 +331,15 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     GIReservoir reservoir = EmptyReservoir();
 
+    float3 environmentIndirect = 0;
     if (!hit.valid) {
-        direct += albedo * SampleSky(bounceDir);
+        float3 F0 = CalculateF0(albedo, metallic);
+        float3 kD = (1.0 - F_Schlick(max(dot(N, bounceDir), 0.0), F0)) * (1.0 - metallic);
+        environmentIndirect = kD * albedo * SampleSky(bounceDir);
     }
 
     u_DirectLighting[pixel] = float4(direct, 1.0);
+    u_IndirectLighting[pixel] = float4(environmentIndirect, 1.0);
 
     if (hit.valid) {
         float3 hitBiased = hit.position + hit.geoNormal * 0.005;

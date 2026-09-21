@@ -343,6 +343,16 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             if (!nvDevice || !cmdList)
                 return;
 
+            if (data.config.lighting && data.config.lighting->effective == LightingMode::ReferencePT && data.config.lighting->recorded)
+            {
+                if (data.distortion.is_valid())
+                {
+                    if (auto* distortion = fg.GetPhysicalTexture(data.distortion))
+                        cmdList->clearTextureFloat(distortion, nvrhi::AllSubresources, nvrhi::Color(0.f));
+                }
+                return;
+            }
+
             auto* baseColorRT = data.baseColor.is_valid() ? fg.GetPhysicalTexture(data.baseColor) : nullptr;
 
             nvrhi::FramebufferDesc fbDesc;
