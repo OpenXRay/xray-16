@@ -1,43 +1,70 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
-#include "Layers/xrRender/FrameGraph/FGResource.h"
-#include <nvrhi/nvrhi.h>
+#include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 
-namespace xray::render::fg {
-class RenderDevice;
-}
-
-namespace xray::render::framegraph {
+namespace xray::render::framegraph
+{
 class FrameGraph;
 }
 
-namespace xray::render::fg {
-class RTAccelStructManager;
-}
-
-namespace xray::render::fg::passes {
-
-struct PathTracerConfig {
+namespace xray::render::fg::passes
+{
+class PathTracerConfig
+{
+public:
     u32 maxBounces = 8;
     u32 sampleIndex = 0;
 };
 
-struct PathTracerOutput {
+class PathTracerOutput
+{
+public:
     framegraph::VirtualResourceHandle composited;
 };
 
-PathTracerOutput setupPathTracerPass(
-    framegraph::FrameGraph& fg,
-    fg::RenderDevice* device,
-    RTAccelStructManager* accelMgr,
-    const PathTracerConfig& config,
-    const Fmatrix& invViewProj,
-    const Fvector& cameraPos,
-    u32 width,
-    u32 height
-);
+class PathTracerCB
+{
+public:
+    Fmatrix invViewProj;
+    Fvector4 cameraPos_pad;
+    Fvector4 sunDir_intensity;
+    Fvector4 sunColor_skyWeight;
+    float screenWidth;
+    float screenHeight;
+    u32 sampleIndex;
+    u32 maxBounces;
+    u32 identityStaticCount;
+    u32 terrainBatchCount;
+    u32 transparentBatchCount;
+    u32 skinnedBatchStart;
+    u32 grassBatchStart;
+    u32 detailAtlasIndex;
+    u32 pad[2];
+};
+
+static_assert(sizeof(PathTracerCB) == 160);
+
+class PathTracerData
+{
+public:
+    RenderDevice* device = nullptr;
+    LightingFrameState* lighting = nullptr;
+    RTFrameResources scene;
+    framegraph::VirtualResourceHandle outputTex;
+    framegraph::VirtualResourceHandle accumulation;
+    PathTracerCB cbData;
+    u32 width = 0;
+    u32 height = 0;
+    nvrhi::TextureHandle sky0;
+    nvrhi::TextureHandle sky1;
+};
+
+LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height);
+PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
+    framegraph::VirtualResourceHandle sceneColorIn, LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj,
+    const Fvector& cameraPos, u32 width, u32 height);
 
 void ShutdownPathTracer();
-
 }

@@ -940,6 +940,7 @@ private:
 
     void CreateSkinnedBuffers(fg::RenderDevice* device);
     void EnsureSkinnedCapacity(u32 count);
+    static CKinematics* GetBatchSkeleton(const GeometryBatch& batch);
     u32 PrepareSkeletonPalette(CKinematics* skeleton);
     void FlushBoneBatch(nvrhi::ICommandList* cmdList);
 

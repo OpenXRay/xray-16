@@ -16,7 +16,6 @@ Texture2D<float4> t_ReservoirA : register(t1);
 Texture2D<float4> t_ReservoirB : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_BaseColor : register(t5);
-Texture2D<float4> t_SceneColorIn : register(t6);
 Texture2D<float4> t_Normal : register(t8);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
@@ -30,7 +29,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float depth = t_Depth.Load(int3(pixel, 0));
     if (depth <= 0.0 || depth >= 0.9) {
-        u_SceneColor[pixel] = t_SceneColorIn.Load(int3(pixel, 0));
         return;
     }
 

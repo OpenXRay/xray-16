@@ -254,7 +254,7 @@ class RTAccelStructManager
 public:
     void Initialize(RenderDevice* device);
     void Shutdown();
-    void SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpuCulling,
+    bool SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpuCulling,
         FGDetailManager* detailMgr, const xr_vector<GeometryBatch>& worldBatches,
         const xr_vector<GeometryBatch>& hudBatches, bool rebuildDynamic);
     RTFrameResources UseScene(framegraph::FrameGraph& graph,
@@ -285,9 +285,10 @@ private:
         nvrhi::ICommandList* commandList);
     RTFrameResources ImportScene(framegraph::FrameGraph& graph,
         const RTSceneGeneration& scene) const;
-    void InitSkinningPipeline();
-    void InitGrassPipeline(const FGDetailManager::InstanceGeneration& source);
-    void InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source);
+    bool EnsureBuildResources(FGDetailManager* detailMgr, bool needsSkin);
+    bool InitSkinningPipeline();
+    bool InitGrassPipeline(const FGDetailManager::InstanceGeneration& source);
+    bool InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source);
     static u32 GetSkinningFormatID(u32 poolFormat);
 
     RenderDevice* m_device = nullptr;
@@ -301,13 +302,16 @@ private:
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;
     static BufferHandle s_skinCB;
+    static bool s_skinAttempted;
     static nvrhi::ComputePipelineHandle s_grassPipeline;
     static nvrhi::BindingLayoutHandle s_grassLayout;
     static nvrhi::BindingLayoutHandle s_grassSourceLayout;
     static BufferHandle s_grassCB;
+    static bool s_grassAttempted;
     static nvrhi::ComputePipelineHandle s_billboardPipeline;
     static nvrhi::BindingLayoutHandle s_billboardLayout;
     static nvrhi::BindingLayoutHandle s_billboardSourceLayout;
     static BufferHandle s_billboardCB;
+    static bool s_billboardAttempted;
 };
 }

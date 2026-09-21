@@ -2,6 +2,7 @@
 
 #include "xrCore/Profiler/ProfilerTypes.h"
 #include "GPUProfiler.h"
+#include "Layers/xrRender/LightingMode.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::profiler
@@ -197,9 +198,13 @@ struct RenderStats
     u32 fgArenaPeak = 0;
     u32 fgArenaCapacity = 0;
     u32 fgArenaFallbacks = 0;
+    render::fg::LightingFrameState lighting;
+    u32 pathTracerSamples = 0;
 
     void Reset()
     {
+        lighting = {};
+        pathTracerSamples = 0;
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
         totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
         megaBufferVertices = megaBufferIndices = 0;

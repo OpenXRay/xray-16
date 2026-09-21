@@ -1072,6 +1072,16 @@ void GPUCullingManager::EnsureSkinnedEntryBuffers(nvrhi::IDevice* nvDevice, u32 
     }
 }
 
+CKinematics* GPUCullingManager::GetBatchSkeleton(const GeometryBatch& batch)
+{
+    const u32 visualType = batch.visual ? batch.visual->getType() : 0;
+    if (visualType == MT_SKELETON_GEOMDEF_ST)
+        return static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    if (visualType == MT_SKELETON_GEOMDEF_PM)
+        return static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+    return nullptr;
+}
+
 void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry,
     const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr)
 {
@@ -1103,6 +1113,7 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
     {
         if (!batch.isSkinned)
             return;
+        PrepareSkeletonPalette(GetBatchSkeleton(batch));
         if (kind != 2u)
             ++m_skinnedObjectCount;
         const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
@@ -1134,6 +1145,9 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
             account(batch, 2u);
     }
 
+    if (m_currentBoneOffset > 0)
+        m_skinnedPools.PrepareUploads(m_device->GetNVRHIDevice());
+
     if (pooledTotal == 0)
         return;
     if (vertexDemand > (1ull << 32) / sizeof(bindless::UnifiedVertex)
@@ -1146,7 +1160,6 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
         FATAL("[GPUCulling] skinned deformation requires the preskin pipeline; no conventional skinned path exists");
 
     EnsureSkinnedCapacity(u32(pooledTotal));
-    m_skinnedPools.PrepareUploads(nvDevice);
     m_skinnedPreVBRecreated = EnsurePreskinBuffers(nvDevice, u32(vertexDemand)) || m_skinnedPreVBRecreated;
     EnsureSkinnedChunkBuffer(nvDevice, u32(chunkDemand));
     EnsureSkinnedEntryBuffers(nvDevice, u32(entryDemand), u32(hudEntryDemand));
@@ -1162,14 +1175,9 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
         if (forward)
             kind = 3u;
 
-        CKinematics* skeleton = nullptr;
-        u32 visualType = batch.visual ? batch.visual->getType() : 0;
-        if (visualType == MT_SKELETON_GEOMDEF_ST)
-            skeleton = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
-        else if (visualType == MT_SKELETON_GEOMDEF_PM)
-            skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+        CKinematics* skeleton = GetBatchSkeleton(batch);
 
-        SkinnedBucket::Batch prepared{ &batch, PrepareSkeletonPalette(skeleton), 0, 0 };
+        SkinnedBucket::Batch prepared{ &batch, GetPreparedSkeletonOffset(skeleton), 0, 0 };
         if (overlayMgr && skeleton) {
             auto sr = overlayMgr->GetSplatRange(skeleton);
             prepared.splatOffset = sr.offset;
@@ -1303,14 +1311,14 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
 void GPUCullingManager::UploadSkinnedObjects(fg::RenderContext* ctx, decals::OverlayManager* overlayMgr)
 {
     ZoneScopedN("GPUCull::UploadSkinnedObjects");
+    auto cmdList = ctx->GetCommandList();
+    m_skinnedPools.FlushUploads(cmdList);
+    FlushBoneBatch(cmdList);
     if (!m_skinnedPrepared)
         return;
 
-    auto cmdList = ctx->GetCommandList();
     if (overlayMgr)
         overlayMgr->UploadSplats(cmdList);
-    m_skinnedPools.FlushUploads(cmdList);
-    FlushBoneBatch(cmdList);
 
     if (m_skinnedForwardCount > 0)
     {
@@ -1950,9 +1958,8 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
 {
     using namespace framegraph;
 
-    if (!IsSkinnedEnabled() || !m_skinnedPrepared)
+    if (!IsSkinnedEnabled() || (!m_skinnedPrepared && m_currentBoneOffset == 0))
         return VirtualResourceHandle{};
-
 
     auto importStructured = [&](const char* name, nvrhi::IBuffer* buffer, bool uav)
     {
@@ -2002,16 +2009,32 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
     resources.skinnedForwardArgs = forwardArgs;
     resources.skinnedForwardInstances = forwardInstances;
 
-    if (!resources.skinnedEntries.is_valid())
+    if (m_skinnedPrepared && !resources.skinnedEntries.is_valid())
         return VirtualResourceHandle{};
 
     auto& passData = fg.addCallbackPass<SkinnedUploadPassData>(
         "Skinned Upload",
-        [&, overlayMgr, previousVertices, hudEntries, chunks, bones, sourceIndices, splats, forwardArgs, forwardInstances](
-            FrameGraph& builder, PassHandle passHandle, SkinnedUploadPassData& data) {
+        [&, overlayMgr, previousVertices, hudEntries, chunks, bones, sourceIndices, splats, forwardArgs, forwardInstances](FrameGraph& builder,
+            PassHandle passHandle, SkinnedUploadPassData& data)
+        {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.manager = this;
             data.overlayMgr = overlayMgr;
+            if (bones.is_valid())
+                passBuilder.readWrite(bones, ResourceState::ShaderResource);
+            for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
+            {
+                if (sourceVertices[f].is_valid())
+                    passBuilder.readWrite(sourceVertices[f], ResourceState::ShaderResource);
+                if (sourceFormatIndices[f].is_valid())
+                    passBuilder.readWrite(sourceFormatIndices[f], ResourceState::ShaderResource);
+            }
+            if (sourceIndices.is_valid())
+                passBuilder.readWrite(sourceIndices, ResourceState::ShaderResource);
+
+            if (!m_skinnedPrepared)
+                return;
+
             data.entries = passBuilder.write(resources.skinnedEntries, ResourceState::CopyDest);
             if (resources.skinnedRecords.is_valid())
                 passBuilder.readWrite(resources.skinnedRecords, ResourceState::ShaderResource);
@@ -2023,28 +2046,17 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
                 passBuilder.write(hudEntries, ResourceState::CopyDest);
             if (chunks.is_valid())
                 passBuilder.readWrite(chunks, ResourceState::ShaderResource);
-            if (bones.is_valid())
-                passBuilder.readWrite(bones, ResourceState::ShaderResource);
             if (splats.is_valid())
                 passBuilder.readWrite(splats, ResourceState::ShaderResource);
             if (forwardArgs.is_valid())
                 passBuilder.write(forwardArgs, ResourceState::CopyDest);
             if (forwardInstances.is_valid())
                 passBuilder.write(forwardInstances, ResourceState::CopyDest);
-            for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
-            {
-                if (sourceVertices[f].is_valid())
-                    passBuilder.readWrite(sourceVertices[f], ResourceState::ShaderResource);
-                if (sourceFormatIndices[f].is_valid())
-                    passBuilder.readWrite(sourceFormatIndices[f], ResourceState::ShaderResource);
-            }
-            if (sourceIndices.is_valid())
-                passBuilder.readWrite(sourceIndices, ResourceState::ShaderResource);
         },
-        [](const SkinnedUploadPassData& data, const FrameGraph&, fg::RenderContext* ctx) {
+        [](const SkinnedUploadPassData& data, const FrameGraph&, fg::RenderContext* ctx)
+        {
             data.manager->UploadSkinnedObjects(ctx, data.overlayMgr);
-        }
-    );
+        });
 
     return passData.entries;
 }

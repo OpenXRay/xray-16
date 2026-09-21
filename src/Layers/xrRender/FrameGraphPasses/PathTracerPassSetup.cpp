@@ -18,11 +18,11 @@
 
 namespace fg
 {
-    extern xray::render::FrameGraphRenderer RImplementation;
+extern xray::render::FrameGraphRenderer RImplementation;
 }
 
-namespace xray::render::fg::passes {
-
+namespace xray::render::fg::passes
+{
 using namespace framegraph;
 
 static nvrhi::ShaderHandle s_pathtrace_shader;
@@ -31,53 +31,17 @@ static nvrhi::ComputePipelineHandle s_pipeline;
 static nvrhi::BindingLayoutHandle s_layout;
 static nvrhi::SamplerHandle s_sampler;
 static nvrhi::TextureHandle s_accumBuffer;
-static nvrhi::TextureHandle s_ptPlaceholderCube;
 static nvrhi::BufferHandle s_ptPlaceholderBuffer;
 static u32 s_accumWidth = 0;
 static u32 s_accumHeight = 0;
 static bool s_initialized = false;
-static bool s_enabled = false;
-
-struct PathTracerCB {
-    Fmatrix invViewProj;
-    Fvector4 cameraPos_pad;
-    Fvector4 sunDir_intensity;
-    Fvector4 sunColor_skyWeight;
-    float screenWidth;
-    float screenHeight;
-    u32 sampleIndex;
-    u32 maxBounces;
-    u32 identityStaticCount;
-    u32 terrainBatchCount;
-    u32 transparentBatchCount;
-    u32 skinnedBatchStart;
-    u32 grassBatchStart;
-    u32 detailAtlasIndex;
-    u32 pad[2];
-};
-static_assert(sizeof(PathTracerCB) == 160, "PathTracerCB must be 160 bytes");
-
-static void CreatePlaceholderCubemap(nvrhi::IDevice* nvDevice)
-{
-    if (s_ptPlaceholderCube) return;
-
-    nvrhi::TextureDesc desc;
-    desc.debugName = "PT_PlaceholderCube";
-    desc.width = 1;
-    desc.height = 1;
-    desc.dimension = nvrhi::TextureDimension::TextureCube;
-    desc.arraySize = 6;
-    desc.format = nvrhi::Format::RGBA8_UNORM;
-    desc.isRenderTarget = false;
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
-
-    s_ptPlaceholderCube = nvDevice->createTexture(desc);
-}
+static LightingFallback s_readiness = LightingFallback::ResourcesUnavailable;
+static bool s_accumulationValid = false;
 
 static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
 {
-    if (s_ptPlaceholderBuffer) return;
+    if (s_ptPlaceholderBuffer)
+        return;
 
     nvrhi::BufferDesc desc;
     desc.debugName = "PT_PlaceholderBuffer";
@@ -89,50 +53,45 @@ static void CreatePlaceholderBuffer(nvrhi::IDevice* nvDevice)
     s_ptPlaceholderBuffer = nvDevice->createBuffer(desc);
 }
 
-static void InitializeResources(fg::RenderDevice* device)
+static LightingFallback InitializeResources(RenderDevice* device)
 {
-    if (s_initialized) return;
+    if (s_initialized)
+        return s_readiness;
 
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-    auto& cache = GetPassResourceCache();
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+    auto* backend = device->GetBackend();
+    if (!shaderLoader || !backend || !backend->GetBindlessLayout() || !backend->GetBindlessDescriptorTable())
+        return s_readiness;
 
-    auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("rt_pathtrace");
-    if (!csResult.handle) {
-        Msg("! [PathTracer] Failed to load rt_pathtrace shader");
-        s_initialized = true;
-        return;
-    }
+    s_initialized = true;
+    auto csResult = shaderLoader->LoadComputeShader("rt_pathtrace");
+    if (!csResult.handle || !csResult.reflection)
+        return s_readiness = LightingFallback::ShaderUnavailable;
     s_pathtrace_shader = csResult.handle;
 
+    auto& cache = GetPassResourceCache();
     s_cb = cache.GetOrCreateVolatileCB("PathTracer", "PathTracerCB", sizeof(PathTracerCB), device);
-
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllFilters(true);
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     s_sampler = cache.GetOrCreateSampler("PathTracer", samplerDesc, nvDevice);
-
-    CreatePlaceholderCubemap(nvDevice);
     CreatePlaceholderBuffer(nvDevice);
+    if (!s_cb || !s_sampler || !s_ptPlaceholderBuffer)
+    {
+        s_initialized = false;
+        return s_readiness;
+    }
 
     s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer", *csResult.reflection, nvDevice);
-
-    nvrhi::IBindingLayout* bindlessLayout = GEnv.Backend ? GEnv.Backend->GetBindlessLayout() : nullptr;
-
+    if (!s_layout)
+        return s_readiness = LightingFallback::PipelineUnavailable;
     nvrhi::ComputePipelineDesc pipeDesc;
     pipeDesc.CS = s_pathtrace_shader;
-    if (bindlessLayout)
-        pipeDesc.bindingLayouts = { s_layout, bindlessLayout };
-    else
-        pipeDesc.bindingLayouts = { s_layout };
+    pipeDesc.bindingLayouts = { s_layout, backend->GetBindlessLayout() };
     s_pipeline = nvDevice->createComputePipeline(pipeDesc);
-
-    s_enabled = s_pipeline != nullptr;
-    s_initialized = true;
-
-    if (s_enabled)
-        Msg("* [PathTracer] Pipeline created successfully");
-    else
-        Msg("! [PathTracer] Pipeline creation failed");
+    s_readiness = s_pipeline ? LightingFallback::None : LightingFallback::PipelineUnavailable;
+    return s_readiness;
 }
 
 static void EnsureAccumulationBuffer(nvrhi::IDevice* nvDevice, u32 width, u32 height)
@@ -150,94 +109,110 @@ static void EnsureAccumulationBuffer(nvrhi::IDevice* nvDevice, u32 width, u32 he
     desc.keepInitialState = true;
 
     s_accumBuffer = nvDevice->createTexture(desc);
+    s_accumulationValid = false;
     s_accumWidth = width;
     s_accumHeight = height;
 }
 
-struct PathTracerData {
-    fg::RenderDevice* device;
-    RTFrameResources scene;
-    VirtualResourceHandle outputTex;
-    PathTracerCB cbData;
-    u32 width, height;
-    nvrhi::ITexture* sky0;
-    nvrhi::ITexture* sky1;
-};
-
-PathTracerOutput setupPathTracerPass(
-    FrameGraph& fg,
-    fg::RenderDevice* device,
-    RTAccelStructManager* accelMgr,
-    const PathTracerConfig& config,
-    const Fmatrix& invViewProj,
-    const Fvector& cameraPos,
-    u32 width,
-    u32 height)
+LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height)
 {
-    InitializeResources(device);
+    if (!device || !device->GetNVRHIDevice() || !width || !height)
+        return LightingFallback::ResourcesUnavailable;
+    const auto readiness = InitializeResources(device);
+    if (readiness != LightingFallback::None)
+        return readiness;
+    EnsureAccumulationBuffer(device->GetNVRHIDevice(), width, height);
+    return s_accumBuffer ? LightingFallback::None : LightingFallback::ResourcesUnavailable;
+}
 
-    ResourceDesc outDesc;
-    outDesc.type = ResourceDesc::Type::Texture2D;
-    outDesc.debugName = "pt_SceneColor";
-    outDesc.width = width;
-    outDesc.height = height;
-    outDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    outDesc.isUAV = true;
-    outDesc.isRenderTarget = true;
-    outDesc.isTransient = true;
-
-    VirtualResourceHandle outHandle = fg.CreateTexture("pt_SceneColor", outDesc);
-
-    if (!s_enabled || !accelMgr || !accelMgr->IsReady()) {
-        auto& passData = fg.addCallbackPass<PathTracerData>(
-            "Path Tracer (disabled)",
-            [&](FrameGraph& builder, PassHandle passHandle, PathTracerData& data) {
-                RenderPassBuilder passBuilder(builder, passHandle);
-                data.outputTex = passBuilder.write(outHandle, ResourceState::UnorderedAccess);
-            },
-            [](const PathTracerData&, const FrameGraph&, fg::RenderContext*) {}
-        );
-        return { passData.outputTex };
+PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, VirtualResourceHandle sceneColorIn,
+    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height)
+{
+    const auto readiness = EnsurePathTracerResources(device, width, height);
+    if (readiness != LightingFallback::None)
+    {
+        lighting.Fail(readiness);
+        return { sceneColorIn };
+    }
+    if (!accelMgr || !accelMgr->IsReady())
+    {
+        lighting.Fail(LightingFallback::SceneUnavailable);
+        return { sceneColorIn };
+    }
+    if (!sceneColorIn.is_valid() || !g_pGamePersistent)
+    {
+        lighting.Fail(LightingFallback::InputsUnavailable);
+        return { sceneColorIn };
+    }
+    const auto& outputDesc = fg.GetResourceDesc(sceneColorIn);
+    if ((!outputDesc.isUAV && !outputDesc.allowUAV) ||
+        outputDesc.format != nvrhi::Format::RGBA16_FLOAT ||
+        outputDesc.width != width ||
+        outputDesc.height != height ||
+        outputDesc.sampleCount != 1)
+    {
+        lighting.Fail(LightingFallback::InputsUnavailable);
+        return { sceneColorIn };
     }
 
-    EnsureAccumulationBuffer(device->GetNVRHIDevice(), width, height);
+    ResourceDesc accumulationDesc;
+    accumulationDesc.width = width;
+    accumulationDesc.height = height;
+    accumulationDesc.format = nvrhi::Format::RGBA32_FLOAT;
+    accumulationDesc.isUAV = true;
+    accumulationDesc.isImported = true;
+    accumulationDesc.isTransient = false;
+    const auto accumulation = fg.ImportTexture("pt_Accumulation", s_accumBuffer, accumulationDesc);
 
     CEnvironment& env = g_pGamePersistent->Environment();
     auto* resourceManager = device->GetFGResourceManager();
     resources::TextureManager* texManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
 
-    nvrhi::ITexture* sky0Tex = s_ptPlaceholderCube.Get();
-    nvrhi::ITexture* sky1Tex = s_ptPlaceholderCube.Get();
+    nvrhi::ITexture* sky0Tex = nullptr;
+    nvrhi::ITexture* sky1Tex = nullptr;
     float skyWeight = env.CurrentEnv.weight;
 
-    if (texManager && env.Current[0] && env.Current[1]) {
+    if (texManager && env.Current[0] && env.Current[1])
+    {
         const shared_str& name0 = env.Current[0]->sky_texture_name;
         const shared_str& name1 = env.Current[1]->sky_texture_name;
-        if (name0.size()) {
+        if (name0.size())
+        {
             auto h = texManager->LoadTexture(name0.c_str());
             nvrhi::ITexture* t = texManager->GetNVRHITexture(h);
-            if (t) sky0Tex = t;
+            if (t)
+                sky0Tex = t;
         }
-        if (name1.size()) {
+        if (name1.size())
+        {
             auto h = texManager->LoadTexture(name1.c_str());
             nvrhi::ITexture* t = texManager->GetNVRHITexture(h);
-            if (t) sky1Tex = t;
+            if (t)
+                sky1Tex = t;
         }
+    }
+    if (!sky0Tex ||
+        !sky1Tex ||
+        sky0Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube ||
+        sky1Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube)
+    {
+        lighting.Fail(LightingFallback::EnvironmentUnavailable);
+        return { sceneColorIn };
     }
 
     Fvector sunDir = { 0, -1, 0 };
     Fvector sunColor = { 1, 1, 1 };
     float sunIntensity = 1.0f;
-        sunDir = env.CurrentEnv.sun_dir;
-        Fvector3 sc;
-        sc.x = env.CurrentEnv.sun_color.x;
-        sc.y = env.CurrentEnv.sun_color.y;
-        sc.z = env.CurrentEnv.sun_color.z;
-        sunIntensity = std::max({ sc.x, sc.y, sc.z });
-        if (sunIntensity > 0.001f)
-            sunColor.set(sc.x / sunIntensity, sc.y / sunIntensity, sc.z / sunIntensity);
-        else
-            sunColor.set(0, 0, 0);
+    sunDir = env.CurrentEnv.sun_dir;
+    Fvector3 sc;
+    sc.x = env.CurrentEnv.sun_color.x;
+    sc.y = env.CurrentEnv.sun_color.y;
+    sc.z = env.CurrentEnv.sun_color.z;
+    sunIntensity = std::max({ sc.x, sc.y, sc.z });
+    if (sunIntensity > 0.001f)
+        sunColor.set(sc.x / sunIntensity, sc.y / sunIntensity, sc.z / sunIntensity);
+    else
+        sunColor.set(0, 0, 0);
 
     PathTracerCB cbData;
     cbData.invViewProj = invViewProj;
@@ -246,7 +221,7 @@ PathTracerOutput setupPathTracerPass(
     cbData.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
     cbData.screenWidth = static_cast<float>(width);
     cbData.screenHeight = static_cast<float>(height);
-    cbData.sampleIndex = config.sampleIndex;
+    cbData.sampleIndex = s_accumulationValid ? config.sampleIndex : 0;
     cbData.maxBounces = config.maxBounces;
 
     const auto& batchCounts = accelMgr->GetBatchCounts();
@@ -255,15 +230,12 @@ PathTracerOutput setupPathTracerPass(
     cbData.transparentBatchCount = batchCounts.transparent;
 
     if (batchCounts.skinned > 0)
-        cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain +
-                                   batchCounts.transparent + batchCounts.instancedTotal;
+        cbData.skinnedBatchStart = batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal;
     else
         cbData.skinnedBatchStart = 0;
 
     if (batchCounts.grass > 0)
-        cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain +
-                                 batchCounts.transparent + batchCounts.instancedTotal +
-                                 batchCounts.skinned;
+        cbData.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned;
     else
         cbData.grassBatchStart = 0;
 
@@ -274,10 +246,12 @@ PathTracerOutput setupPathTracerPass(
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
 
-        [&, width, height, cbData, sky0Tex, sky1Tex](FrameGraph& builder, PassHandle passHandle, PathTracerData& data) {
+        [&, width, height, cbData, sky0Tex, sky1Tex](FrameGraph& builder, PassHandle passHandle, PathTracerData& data)
+        {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.device = device;
+            data.lighting = &lighting;
             data.scene = accelMgr->UseScene(builder, passBuilder);
             data.width = width;
             data.height = height;
@@ -285,33 +259,60 @@ PathTracerOutput setupPathTracerPass(
             data.sky0 = sky0Tex;
             data.sky1 = sky1Tex;
 
-            data.outputTex = passBuilder.write(outHandle, ResourceState::UnorderedAccess);
+            data.accumulation = passBuilder.readWrite(accumulation, ResourceState::UnorderedAccess);
+            data.outputTex = passBuilder.readWrite(sceneColorIn, ResourceState::UnorderedAccess);
         },
 
-        [](const PathTracerData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
-            if (!s_enabled) return;
+        [](const PathTracerData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        {
+            if (s_readiness != LightingFallback::None)
+            {
+                data.lighting->Fail(s_readiness);
+                return;
+            }
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
             nvrhi::ITexture* outTex = fg.GetPhysicalTexture(data.outputTex);
-            if (!outTex || !s_accumBuffer) return;
+            auto* accumulationTex = fg.GetPhysicalTexture(data.accumulation);
+            if (!outTex || !accumulationTex)
+            {
+                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                s_accumulationValid = false;
+                return;
+            }
 
             cmdList->writeBuffer(s_cb, &data.cbData, sizeof(PathTracerCB));
 
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
+            if (!scene.tlas || !scene.batchInfo || !scene.vertices || !scene.indices || !scene.materials || !scene.terrainMaterials || !scene.textures)
+            {
+                data.lighting->Fail(LightingFallback::SceneUnavailable);
+                s_accumulationValid = false;
+                return;
+            }
             nvrhi::IBuffer* skinnedVB = scene.skinnedVertices;
             nvrhi::IBuffer* skinnedIB = scene.skinnedIndices;
             nvrhi::IBuffer* grassVB = scene.grassVertices;
             nvrhi::IBuffer* grassIB = scene.grassIndices;
-            if (!skinnedVB) skinnedVB = s_ptPlaceholderBuffer.Get();
-            if (!skinnedIB) skinnedIB = s_ptPlaceholderBuffer.Get();
-            if (!grassVB) grassVB = s_ptPlaceholderBuffer.Get();
-            if (!grassIB) grassIB = s_ptPlaceholderBuffer.Get();
+            if (!skinnedVB)
+                skinnedVB = s_ptPlaceholderBuffer.Get();
+            if (!skinnedIB)
+                skinnedIB = s_ptPlaceholderBuffer.Get();
+            if (!grassVB)
+                grassVB = s_ptPlaceholderBuffer.Get();
+            if (!grassIB)
+                grassIB = s_ptPlaceholderBuffer.Get();
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
             auto* csReflection = shaderLoader->GetCachedReflection("rt_pathtrace", ".cs");
-            if (!csReflection) return;
+            if (!csReflection)
+            {
+                data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                s_accumulationValid = false;
+                return;
+            }
 
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "PathTracer");
             bsb.ConstantBuffer("PathTracerParams", s_cb);
@@ -327,9 +328,15 @@ PathTracerOutput setupPathTracerPass(
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);
-            bsb.TextureUAV("g_Accumulation", s_accumBuffer);
+            bsb.TextureUAV("g_Accumulation", accumulationTex);
             bsb.TextureUAV("g_Output", outTex);
             auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_layout);
+            if (!bindingSet)
+            {
+                data.lighting->Fail(LightingFallback::BindingUnavailable);
+                s_accumulationValid = false;
+                return;
+            }
 
             nvrhi::ComputeState state;
             state.pipeline = s_pipeline;
@@ -339,13 +346,11 @@ PathTracerOutput setupPathTracerPass(
                 state.addBindingSet(scene.textures);
 
             cmdList->setComputeState(state);
-            cmdList->dispatch(
-                (data.width + 7) / 8,
-                (data.height + 7) / 8,
-                1
-            );
-        }
-    );
+            cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+            s_accumulationValid = true;
+            data.lighting->recorded = true;
+            data.lighting->recordedSamples = data.cbData.sampleIndex + 1;
+        });
 
     return { passData.outputTex };
 }
@@ -358,12 +363,11 @@ void ShutdownPathTracer()
     s_layout = nullptr;
     s_sampler = nullptr;
     s_accumBuffer = nullptr;
-    s_ptPlaceholderCube = nullptr;
     s_ptPlaceholderBuffer = nullptr;
     s_accumWidth = 0;
     s_accumHeight = 0;
     s_initialized = false;
-    s_enabled = false;
+    s_readiness = LightingFallback::ResourcesUnavailable;
+    s_accumulationValid = false;
 }
-
 }

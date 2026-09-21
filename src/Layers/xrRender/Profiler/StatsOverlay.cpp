@@ -142,6 +142,16 @@ void StatsOverlay::Render()
     {
         ImGui::TextDisabled("(Press editor key to interact)");
     }
+    const auto& lighting = m_renderStats.lighting;
+    ImGui::Text("Lighting: %s -> %s", render::fg::LightingModeName(lighting.requested), render::fg::LightingModeName(lighting.effective));
+    if (lighting.conflictingRequests)
+        ImGui::TextDisabled("Both RT switches enabled: PT takes precedence");
+    if (lighting.fallback != render::fg::LightingFallback::None)
+        ImGui::Text("Fallback: %s", render::fg::LightingFallbackName(lighting.fallback));
+    if (lighting.requested != render::fg::LightingMode::Raster)
+        ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
+    if (lighting.requested == render::fg::LightingMode::ReferencePT)
+        ImGui::Text("PT recorded samples: %u", m_renderStats.pathTracerSamples);
 
     // Settings section (collapsible)
     if (ImGui::CollapsingHeader("Settings"))
@@ -1134,6 +1144,11 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
     text += line;
 
     const RenderStats& rs = m_renderStats;
+    xr_sprintf(line, sizeof(line), "lighting: requested=%s | effective=%s | reason=%s | conflict=%s | recorded=%s | PT recorded samples=%u\n",
+        render::fg::LightingModeName(rs.lighting.requested), render::fg::LightingModeName(rs.lighting.effective),
+        render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
+        rs.pathTracerSamples);
+    text += line;
     xr_sprintf(line, sizeof(line), "clusters: %u/%u visible (terrain %u/%u) | tris %u+%u | occl cand %u rec %u | residual S%u T%u D%u X%u | vsm %s\n",
         rs.clusterVisible, rs.clusterStaticEntries, rs.clusterTerrainVisible, rs.clusterTerrainEntries,
         rs.clusterTrianglesDrawn, rs.clusterTerrainTrianglesDrawn, rs.clusterOcclusionCandidates, rs.clusterOcclusionRecovered,

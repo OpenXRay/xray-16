@@ -22,6 +22,7 @@
 #include "Layers/xrRender/ClusterDAG.h"
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
+#include "Layers/xrRender/LightingMode.h"
 
 struct ImDrawData;
 
@@ -479,6 +480,7 @@ private:
 
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
+    fg::LightingFrameState m_lightingState;
     u32 m_ptSampleIndex = 0;
     Fvector m_ptPrevCameraPos = {0, 0, 0};
     Fvector m_ptPrevCameraDir = {0, 0, 0};
@@ -544,6 +546,7 @@ private:
 
     // FrameGraph passes (called per-frame in Render)
     void SetupFrameGraphPasses();
+    void PrepareLightingMode(u32 width, u32 height);
 
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();
