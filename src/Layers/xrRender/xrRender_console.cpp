@@ -1025,6 +1025,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Integer, "r_rt_gi_restir", &ps_r_rt_gi_restir, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_rt_gi_bounces", &ps_r_rt_gi_bounces, 1, 16);
+    CMD4(CCC_Integer, "r_rt_gi_samples", &ps_r_rt_gi_samples, 1, 8);
+    CMD4(CCC_Float, "r_rt_gi_ray_distance", &ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
+    CMD4(CCC_Float, "r_rt_scene_radius", &ps_r_rt_scene_radius, 1.0f, 10000.0f);
+    CMD4(CCC_Float, "r_rt_grass_radius", &ps_r_rt_grass_radius, 0.0f, 256.0f);
 
     CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);
     CMD4(CCC_Integer, "r_cluster_merge", &ps_r_cluster_merge, 0, 1);

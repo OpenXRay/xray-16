@@ -616,6 +616,12 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         m_staticObjectCount = 0;
         m_dynamicObjectCount = 0;
         m_transparentResidualCount = 0;
+        m_rtRayOnlyDynamicCount = 0;
+        m_dynamicObjectFlags.clear();
+        m_dynamicMaterialIDData.clear();
+        m_dynamicInstanceData.clear();
+        m_dynamicBatchKeys.clear();
+        m_dynamicInstanceIdentities.clear();
         m_clusterSet.dynamicRefCount = 0;
         m_clusterSet.dynamicInstanceCount = 0;
         m_clusterSet.dynamicResidualCount = 0;
@@ -647,8 +653,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
     m_dynamicInstanceData.reserve(totalBatches);
     m_dynamicBatchKeys.clear();
     m_dynamicBatchKeys.reserve(totalBatches);
-    m_dynamicIdentity.clear();
-    m_dynamicIdentity.reserve(totalBatches);
+    m_dynamicInstanceIdentities.clear();
+    m_dynamicInstanceIdentities.reserve(totalBatches);
 
     if (!m_terrainDataCached) {
         m_terrainDrawArgsData.clear();
@@ -670,6 +676,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
     m_transparentKeys.clear();
     m_transparentRanges.clear();
     m_transparentResidualCount = 0;
+    m_rtRayOnlyDynamicCount = 0;
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
         return MaterialObjectFlags(batch.bindlessMaterialID) | (batch.isShadowOnly ? GPU_OBJECT_SHADOW_ONLY : 0u);
@@ -789,6 +796,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
 
         const u32 flags = batchFlags(batch);
         m_dynamicObjectFlags.push_back(flags);
+        if (flags & GPU_OBJECT_SHADOW_ONLY)
+            ++m_rtRayOnlyDynamicCount;
         appendInstance(batch, flags, batch.bindlessMaterialID,
             m_dynamicMaterialIDData, m_dynamicInstanceData);
         m_dynamicBatchKeys.push_back(batchKey(batch));
@@ -796,7 +805,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         identity.renderable = batch.renderableLifetimeID;
         identity.visual = batch.visualLifetimeID;
         identity.subset = batch.geometrySubset;
-        m_dynamicIdentity.push_back(identity);
+        m_dynamicInstanceIdentities.push_back(identity);
     }
     }
 
@@ -1636,6 +1645,7 @@ GeometryFrameResources GPUCullingManager::ImportGeometryResources(framegraph::Fr
 {
     using namespace framegraph;
     EnsureForwardBuffers(m_device->GetNVRHIDevice());
+    PrepareRTSourceGeneration();
 
     GeometryFrameResources out;
     ClusterCullBuffers& set = m_clusterSet;
@@ -1680,6 +1690,8 @@ GeometryFrameResources GPUCullingManager::ImportGeometryResources(framegraph::Fr
 
     out.rtVertices = importStructured("rt_source_vertices", m_rtVertexBuffer, false);
     out.rtIndices = importStructured("rt_source_indices", m_rtIndexBuffer, false);
+    out.rtCopySourceVertices = importStructured("rt_source_previous_vertices", m_rtCopySourceVertexBuffer.Get(), false);
+    out.rtCopySourceIndices = importStructured("rt_source_previous_indices", m_rtCopySourceIndexBuffer.Get(), false);
     out.boneMatrices = importStructured("skinned_bone_matrices", m_globalBoneBuffer, false);
     out.megaVertices = importStructured("mega_vertices", m_megaVertexBuffer, false);
     out.megaIndices = importStructured("mega_indices", m_megaIndexBuffer, false);
@@ -1774,6 +1786,10 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupGeometryPreparePass(
                 passBuilder.read(resources.megaCopySourceVertices, ResourceState::CopySource);
             if (resources.megaCopySourceIndices.is_valid())
                 passBuilder.read(resources.megaCopySourceIndices, ResourceState::CopySource);
+            if (resources.rtCopySourceVertices.is_valid())
+                passBuilder.read(resources.rtCopySourceVertices, ResourceState::CopySource);
+            if (resources.rtCopySourceIndices.is_valid())
+                passBuilder.read(resources.rtCopySourceIndices, ResourceState::CopySource);
             if (resources.clusterMeta.is_valid())
                 passBuilder.write(resources.clusterMeta, ResourceState::CopyDest);
             if (resources.assetMembers.is_valid())
@@ -2469,9 +2485,26 @@ void GPUCullingManager::BeginLevelLoad(u32 estimatedVertices, u32 estimatedIndic
     m_runtimeSourceLookup.clear();
     m_rtVertexBuffer = nullptr;
     m_rtIndexBuffer = nullptr;
+    m_rtCopySourceVertexBuffer = nullptr;
+    m_rtCopySourceIndexBuffer = nullptr;
     m_rtVertexStaging.clear();
+    m_rtVertexStaging.shrink_to_fit();
     m_rtIndexStaging.clear();
+    m_rtIndexStaging.shrink_to_fit();
+    m_rtSubmittedVertexStaging.clear();
+    m_rtSubmittedVertexStaging.shrink_to_fit();
+    m_rtSubmittedIndexStaging.clear();
+    m_rtSubmittedIndexStaging.shrink_to_fit();
+    m_rtVertexCount = 0;
+    m_rtIndexCount = 0;
+    m_rtVertexUploaded = 0;
+    m_rtIndexUploaded = 0;
+    m_rtVertexCapacity = 0;
+    m_rtIndexCapacity = 0;
+    m_rtRuntimeVertexCount = 0;
+    m_rtRayOnlyDynamicCount = 0;
     m_rtSourceUploaded = false;
+    m_rtSourceFailed = false;
     m_megaSourceNormalsActive = false;
 
     // Clear VB/IB pool tracking
@@ -2553,13 +2586,26 @@ void GPUCullingManager::UnloadLevel()
     m_transparentNativeArgs.clear();
     m_rtVertexBuffer = nullptr;
     m_rtIndexBuffer = nullptr;
+    m_rtCopySourceVertexBuffer = nullptr;
+    m_rtCopySourceIndexBuffer = nullptr;
     m_rtVertexStaging.clear();
     m_rtVertexStaging.shrink_to_fit();
     m_rtIndexStaging.clear();
     m_rtIndexStaging.shrink_to_fit();
+    m_rtSubmittedVertexStaging.clear();
+    m_rtSubmittedVertexStaging.shrink_to_fit();
+    m_rtSubmittedIndexStaging.clear();
+    m_rtSubmittedIndexStaging.shrink_to_fit();
     m_rtVertexCount = 0;
     m_rtIndexCount = 0;
+    m_rtVertexUploaded = 0;
+    m_rtIndexUploaded = 0;
+    m_rtVertexCapacity = 0;
+    m_rtIndexCapacity = 0;
+    m_rtRuntimeVertexCount = 0;
+    m_rtRayOnlyDynamicCount = 0;
     m_rtSourceUploaded = false;
+    m_rtSourceFailed = false;
     m_geometryTablesDirty = false;
     m_runtimeSourceLookup.clear();
     m_megaVertices.clear();
@@ -2575,7 +2621,7 @@ void GPUCullingManager::UnloadLevel()
     m_dynamicObjectFlags.clear();
     m_dynamicMaterialIDData.clear();
     m_dynamicBatchKeys.clear();
-    m_dynamicIdentity.clear();
+    m_dynamicInstanceIdentities.clear();
     m_dynamicHistory[0].clear();
     m_dynamicHistory[1].clear();
     m_totalVertexCount = 0;
@@ -2780,6 +2826,45 @@ void GPUCullingManager::RetireForwardUploads(bool discard)
     }
 }
 
+namespace
+{
+void PackRTSourceVertices(const bindless::UnifiedVertex* vertices, const Fvector3* floatNormals,
+    u32 vertexCount, u8* destination)
+{
+    for (u32 v = 0; v < vertexCount; ++v)
+    {
+        const bindless::UnifiedVertex& src = vertices[v];
+        u8* dst = destination + size_t(v) * GPUCullingManager::RT_VERTEX_STRIDE;
+        memcpy(dst, &src.position, sizeof(Fvector3));
+
+        Fvector3 normal;
+        if (floatNormals && (src.flags & bindless::UNIFIED_VERTEX_FLAG_FLOAT_BASIS) != 0)
+            normal = floatNormals[v];
+        else
+            normal = bindless::VertexConverter::UnpackNormal(src.normal);
+        memcpy(dst + 12, &normal, sizeof(Fvector3));
+        memcpy(dst + 24, &src.texcoord0, sizeof(float) * 2);
+        memcpy(dst + 32, &src.tangent, sizeof(u32));
+        memcpy(dst + 36, &src.binormal, sizeof(u32));
+    }
+}
+
+nvrhi::BufferHandle CreateRTSourceBuffer(nvrhi::IDevice* device, const char* name,
+    u64 bytes, u32 stride, bool indexBuffer)
+{
+    nvrhi::BufferDesc desc;
+    desc.debugName = name;
+    desc.byteSize = std::max<u64>(bytes, 4ull);
+    desc.structStride = stride;
+    desc.canHaveRawViews = true;
+    desc.isIndexBuffer = indexBuffer;
+    desc.isAccelStructBuildInput = true;
+    desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
+    desc.keepInitialState = true;
+    return device->createBuffer(desc);
+}
+}
+
 void GPUCullingManager::RetireRTSourceUpload(bool discard)
 {
     if (!m_rtSourceLease)
@@ -2793,33 +2878,192 @@ void GPUCullingManager::RetireRTSourceUpload(bool discard)
     R_ASSERT(state != State::Unknown);
     if (!discard && (state == State::Open || state == State::Pending))
         return;
-    if (!discard && state == State::Failed)
-        m_rtSourceUploaded = false;
-    else
+    if (discard)
     {
         m_rtVertexStaging.clear();
         m_rtVertexStaging.shrink_to_fit();
         m_rtIndexStaging.clear();
         m_rtIndexStaging.shrink_to_fit();
+        m_rtSubmittedVertexStaging.clear();
+        m_rtSubmittedVertexStaging.shrink_to_fit();
+        m_rtSubmittedIndexStaging.clear();
+        m_rtSubmittedIndexStaging.shrink_to_fit();
+        m_rtCopySourceVertexBuffer = nullptr;
+        m_rtCopySourceIndexBuffer = nullptr;
+    }
+    else if (state == State::Failed)
+    {
+        const u32 submittedVertices = u32(m_rtSubmittedVertexStaging.size() / RT_VERTEX_STRIDE);
+        const u32 submittedIndices = u32(m_rtSubmittedIndexStaging.size());
+        R_ASSERT(submittedVertices <= m_rtVertexUploaded && submittedIndices <= m_rtIndexUploaded);
+        m_rtVertexStaging.insert(m_rtVertexStaging.begin(),
+            m_rtSubmittedVertexStaging.begin(), m_rtSubmittedVertexStaging.end());
+        m_rtIndexStaging.insert(m_rtIndexStaging.begin(),
+            m_rtSubmittedIndexStaging.begin(), m_rtSubmittedIndexStaging.end());
+        m_rtSubmittedVertexStaging.clear();
+        m_rtSubmittedVertexStaging.shrink_to_fit();
+        m_rtSubmittedIndexStaging.clear();
+        m_rtSubmittedIndexStaging.shrink_to_fit();
+        m_rtVertexUploaded -= submittedVertices;
+        m_rtIndexUploaded -= submittedIndices;
+        m_rtSourceUploaded = false;
+    }
+    else
+    {
+        m_rtSubmittedVertexStaging.clear();
+        m_rtSubmittedVertexStaging.shrink_to_fit();
+        m_rtSubmittedIndexStaging.clear();
+        m_rtSubmittedIndexStaging.shrink_to_fit();
+        m_rtCopySourceVertexBuffer = nullptr;
+        m_rtCopySourceIndexBuffer = nullptr;
     }
     backend->ReleaseSubmissionLease(m_rtSourceLease);
     m_rtSourceLease = 0;
 }
 
+bool GPUCullingManager::IsRTSourceReady() const
+{
+    return m_rtVertexBuffer && m_rtIndexBuffer && m_rtSourceUploaded && !m_rtSourceFailed;
+}
+
+u32 GPUCullingManager::GetRTRuntimeVertexCount() const
+{
+    return m_rtRuntimeVertexCount;
+}
+
+u32 GPUCullingManager::GetRTRayOnlyDynamicCount() const
+{
+    return m_rtRayOnlyDynamicCount;
+}
+
+const xr_vector<GPUInstanceData>& GPUCullingManager::GetDynamicInstanceData() const
+{
+    return m_dynamicInstanceData;
+}
+
+const xr_vector<GeometryInstanceKey>& GPUCullingManager::GetDynamicInstanceIdentities() const
+{
+    return m_dynamicInstanceIdentities;
+}
+
+const xr_vector<ClusterMeshKey>& GPUCullingManager::GetDynamicMeshKeys() const
+{
+    return m_dynamicBatchKeys;
+}
+
+void GPUCullingManager::PrepareRTSourceGeneration()
+{
+    if (!m_device || !m_rtVertexBuffer || !m_rtIndexBuffer)
+        return;
+    if (m_rtVertexCount <= m_rtVertexCapacity && m_rtIndexCount <= m_rtIndexCapacity)
+        return;
+    if (m_rtSourceLease)
+        return;
+    if (EnsureRTSourceCapacity(m_rtVertexCount, m_rtIndexCount))
+        m_rtSourceFailed = false;
+    else
+        m_rtSourceFailed = true;
+}
+
+bool GPUCullingManager::EnsureRTSourceCapacity(u32 vertexCount, u32 indexCount)
+{
+    if (!m_device || !m_rtVertexBuffer || !m_rtIndexBuffer)
+        return false;
+    if (vertexCount <= m_rtVertexCapacity && indexCount <= m_rtIndexCapacity)
+        return true;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    const u32 vertexCapacity = std::max(vertexCount, m_rtVertexCapacity + m_rtVertexCapacity / 2u);
+    const u32 indexCapacity = std::max(indexCount, m_rtIndexCapacity + m_rtIndexCapacity / 2u);
+
+    nvrhi::BufferHandle vertexBuffer = CreateRTSourceBuffer(nvDevice, "RTSource_Vertices",
+        u64(vertexCapacity) * RT_VERTEX_STRIDE, RT_VERTEX_STRIDE, false);
+    nvrhi::BufferHandle indexBuffer = CreateRTSourceBuffer(nvDevice, "RTSource_Indices",
+        u64(indexCapacity) * sizeof(u32), 0u, true);
+    if (!vertexBuffer || !indexBuffer)
+    {
+        Msg("! [GPUCulling] ray tracing source growth to %u vertices / %u indices failed",
+            vertexCapacity, indexCapacity);
+        return false;
+    }
+
+    if (!m_rtCopySourceVertexBuffer)
+        m_rtCopySourceVertexBuffer = m_rtVertexBuffer;
+    if (!m_rtCopySourceIndexBuffer)
+        m_rtCopySourceIndexBuffer = m_rtIndexBuffer;
+    m_rtVertexBuffer = vertexBuffer;
+    m_rtIndexBuffer = indexBuffer;
+    m_rtVertexCapacity = vertexCapacity;
+    m_rtIndexCapacity = indexCapacity;
+    m_rtSourceUploaded = false;
+    Msg("* [GPUCulling] ray tracing source grown to %u vertices / %u indices", vertexCapacity, indexCapacity);
+    return true;
+}
+
 void GPUCullingManager::UploadRTSource(nvrhi::ICommandList* cmdList)
 {
-    if (m_rtSourceUploaded || !cmdList || !m_rtVertexBuffer || !m_rtIndexBuffer)
+    if (!cmdList || !m_rtVertexBuffer || !m_rtIndexBuffer)
         return;
-    if (m_rtVertexStaging.empty() || m_rtIndexStaging.empty())
+    if (m_rtSourceLease)
         return;
+    if (m_rtVertexCount > m_rtVertexCapacity || m_rtIndexCount > m_rtIndexCapacity)
+        return;
+    if (m_rtVertexUploaded == m_rtVertexCount && m_rtIndexUploaded == m_rtIndexCount)
+        return;
+
+    R_ASSERT(m_rtVertexUploaded + u32(m_rtVertexStaging.size() / RT_VERTEX_STRIDE) == m_rtVertexCount
+        && m_rtIndexUploaded + u32(m_rtIndexStaging.size()) == m_rtIndexCount);
 
     R_ASSERT(GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases() && !m_rtSourceLease);
     m_rtSourceLease = GEnv.Backend->OpenSubmissionLease();
     R_ASSERT(m_rtSourceLease);
-    cmdList->writeBuffer(m_rtVertexBuffer, m_rtVertexStaging.data(), m_rtVertexStaging.size());
-    cmdList->writeBuffer(m_rtIndexBuffer, m_rtIndexStaging.data(),
-        u64(m_rtIndexCount) * sizeof(u32));
+    if (m_rtCopySourceVertexBuffer && m_rtVertexUploaded > 0)
+        cmdList->copyBuffer(m_rtVertexBuffer, 0, m_rtCopySourceVertexBuffer, 0,
+            u64(m_rtVertexUploaded) * RT_VERTEX_STRIDE);
+    if (m_rtCopySourceIndexBuffer && m_rtIndexUploaded > 0)
+        cmdList->copyBuffer(m_rtIndexBuffer, 0, m_rtCopySourceIndexBuffer, 0,
+            u64(m_rtIndexUploaded) * sizeof(u32));
+    if (!m_rtVertexStaging.empty())
+        cmdList->writeBuffer(m_rtVertexBuffer, m_rtVertexStaging.data(), m_rtVertexStaging.size(),
+            u64(m_rtVertexUploaded) * RT_VERTEX_STRIDE);
+    if (!m_rtIndexStaging.empty())
+        cmdList->writeBuffer(m_rtIndexBuffer, m_rtIndexStaging.data(), m_rtIndexStaging.size() * sizeof(u32),
+            u64(m_rtIndexUploaded) * sizeof(u32));
+    m_rtVertexUploaded = m_rtVertexCount;
+    m_rtIndexUploaded = m_rtIndexCount;
+    m_rtSubmittedVertexStaging.swap(m_rtVertexStaging);
+    m_rtSubmittedIndexStaging.swap(m_rtIndexStaging);
     m_rtSourceUploaded = true;
+}
+
+void GPUCullingManager::AppendRuntimeRTSource(const bindless::UnifiedVertex* vertices,
+    const Fvector3* floatNormals, u32 vertexCount, const u32* indices, u32 indexCount)
+{
+    if (!m_rtVertexBuffer || !vertices || !indices || !vertexCount || !indexCount)
+        return;
+
+    R_ASSERT(m_rtVertexUploaded + u32(m_rtVertexStaging.size() / RT_VERTEX_STRIDE) == m_rtVertexCount
+        && m_rtIndexUploaded + u32(m_rtIndexStaging.size()) == m_rtIndexCount);
+    R_ASSERT(u64(m_rtVertexCount) + vertexCount <= UINT32_MAX
+        && u64(m_rtIndexCount) + indexCount <= UINT32_MAX);
+
+    const size_t vertexMark = m_rtVertexStaging.size();
+    m_rtVertexStaging.resize(vertexMark + size_t(vertexCount) * RT_VERTEX_STRIDE);
+    PackRTSourceVertices(vertices, floatNormals, vertexCount, m_rtVertexStaging.data() + vertexMark);
+
+    const size_t indexMark = m_rtIndexStaging.size();
+    m_rtIndexStaging.resize(indexMark + indexCount);
+    for (u32 i = 0; i < indexCount; ++i)
+    {
+        const u32 index = indices[i];
+        R_ASSERT(index < vertexCount);
+        m_rtIndexStaging[indexMark + i] = index;
+    }
+
+    m_rtVertexCount += vertexCount;
+    m_rtIndexCount += indexCount;
+    m_rtRuntimeVertexCount += vertexCount;
+    m_rtSourceUploaded = false;
 }
 
 void GPUCullingManager::CaptureRTSource()
@@ -2832,49 +3076,43 @@ void GPUCullingManager::CaptureRTSource()
         || !nvDevice->queryFeatureSupport(nvrhi::Feature::RayQuery))
         return;
 
+    if (u32(m_megaVertices.size()) != m_totalVertexCount || u32(m_megaIndices.size()) != m_totalIndexCount)
+    {
+        m_rtSourceFailed = true;
+        Msg("! [GPUCulling] ray tracing source cannot represent %u registered vertices and %u indices resolved at "
+            "level load; ray tracing stays unavailable", m_totalVertexCount, m_totalIndexCount);
+        return;
+    }
+
     m_rtVertexCount = u32(m_megaVertices.size());
     m_rtIndexCount = u32(m_megaIndices.size());
     m_rtVertexStaging.assign(size_t(m_rtVertexCount) * RT_VERTEX_STRIDE, 0);
+    PackRTSourceVertices(m_megaVertices.data(),
+        (m_megaSourceNormalsActive && m_megaSourceNormals.size() >= m_megaVertices.size())
+            ? m_megaSourceNormals.data() : nullptr,
+        m_rtVertexCount, m_rtVertexStaging.data());
 
-    const bool haveFloatNormals = m_megaSourceNormalsActive
-        && m_megaSourceNormals.size() >= m_megaVertices.size();
-
-    for (u32 v = 0; v < m_rtVertexCount; ++v) {
-        const bindless::UnifiedVertex& src = m_megaVertices[v];
-        u8* dst = m_rtVertexStaging.data() + size_t(v) * RT_VERTEX_STRIDE;
-        memcpy(dst, &src.position, sizeof(Fvector3));
-
-        Fvector3 normal;
-        if (haveFloatNormals && (src.flags & bindless::UNIFIED_VERTEX_FLAG_FLOAT_BASIS) != 0)
-            normal = m_megaSourceNormals[v];
-        else
-            normal = bindless::VertexConverter::UnpackNormal(src.normal);
-        memcpy(dst + 12, &normal, sizeof(Fvector3));
-        memcpy(dst + 24, &src.texcoord0, sizeof(float) * 2);
-        memcpy(dst + 32, &src.tangent, sizeof(u32));
-        memcpy(dst + 36, &src.binormal, sizeof(u32));
-    }
-
-    auto makeBuildInput = [&](const char* name, u64 bytes, u32 stride, bool indexBuffer) {
-        nvrhi::BufferDesc desc;
-        desc.debugName = name;
-        desc.byteSize = std::max<u64>(bytes, 4ull);
-        desc.structStride = stride;
-        desc.canHaveRawViews = true;
-        desc.isIndexBuffer = indexBuffer;
-        desc.isAccelStructBuildInput = true;
-        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
-        desc.keepInitialState = true;
-        return nvDevice->createBuffer(desc);
-    };
-
-    m_rtVertexBuffer = makeBuildInput("RTSource_Vertices",
+    m_rtVertexBuffer = CreateRTSourceBuffer(nvDevice, "RTSource_Vertices",
         u64(m_rtVertexCount) * RT_VERTEX_STRIDE, RT_VERTEX_STRIDE, false);
-    m_rtIndexBuffer = makeBuildInput("RTSource_Indices",
+    m_rtIndexBuffer = CreateRTSourceBuffer(nvDevice, "RTSource_Indices",
         u64(m_rtIndexCount) * sizeof(u32), 0u, true);
     if (!m_rtVertexBuffer || !m_rtIndexBuffer)
-        FATAL("[GPUCulling] exact ray tracing source buffers could not be created");
+    {
+        m_rtVertexBuffer = nullptr;
+        m_rtIndexBuffer = nullptr;
+        m_rtVertexCount = 0;
+        m_rtIndexCount = 0;
+        m_rtVertexStaging.clear();
+        m_rtVertexStaging.shrink_to_fit();
+        m_rtSourceFailed = true;
+        Msg("! [GPUCulling] exact ray tracing source buffers could not be created; ray tracing stays unavailable");
+        return;
+    }
 
+    m_rtVertexCapacity = m_rtVertexCount;
+    m_rtIndexCapacity = m_rtIndexCount;
+    m_rtVertexUploaded = 0;
+    m_rtIndexUploaded = 0;
     m_rtSourceUploaded = false;
     m_rtIndexStaging.swap(m_megaIndices);
     Msg("* [GPUCulling] exact ray tracing source captured: %u vertices (%.2f MB, 40 B position+normal+uv0+packed tangent/binormal), %u indices (%.2f MB)",
@@ -3180,6 +3418,8 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
                     continue;
                 extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY;
             }
+            if (m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY)
+                extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY;
 
             u32 assetMember = 0;
             if (!m_clusterDAG.FindAssetMember(key, assetMember))
@@ -3191,7 +3431,7 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
                 continue;
 
             const Fmatrix& world = m_dynamicInstanceData[i].world;
-            const GeometryInstanceKey& identity = m_dynamicIdentity[i];
+            const GeometryInstanceKey& identity = m_dynamicInstanceIdentities[i];
 
             Fmatrix prevWorld = world;
             u32 historyValid = 0;
@@ -3527,17 +3767,20 @@ GeometryMemoryStats GPUCullingManager::GetGeometryMemoryStats() const
         + bytes(m_clusterSet.bvhNodeBuffer) + bytes(m_clusterSet.bvhIndexBuffer);
     stats.payloadBytes = bytes(m_residency.GetPayloadArenaBuffer());
     stats.vertexBytes = bytes(m_residency.GetVertexArenaBuffer());
-    stats.retainedSourceBytes = bytes(m_megaVertexBuffer) + bytes(m_megaIndexBuffer);
+    stats.retainedSourceBytes = bytes(m_megaVertexBuffer) + bytes(m_megaIndexBuffer)
+        + bytes(m_rtVertexBuffer) + bytes(m_rtIndexBuffer);
     stats.forwardDrawBytes = bytes(m_transparentDrawArgsBuffer) + bytes(m_transparentInstanceBuffer)
         + bytes(m_skinnedForwardArgsBuffer) + bytes(m_skinnedForwardInstanceBuffer) + bytes(m_forwardDrawIndexBuffer);
-    stats.retiringSourceBytes = bytes(m_megaCopySourceVB) + bytes(m_megaCopySourceIB);
+    stats.retiringSourceBytes = bytes(m_megaCopySourceVB) + bytes(m_megaCopySourceIB)
+        + bytes(m_rtCopySourceVertexBuffer) + bytes(m_rtCopySourceIndexBuffer);
     stats.sourceStagingBytes = m_megaVertices.capacity() * sizeof(bindless::UnifiedVertex)
         + m_megaIndices.capacity() * sizeof(u32) + m_megaSourceNormals.capacity() * sizeof(Fvector3)
         + m_runtimeVertices.capacity() * sizeof(bindless::UnifiedVertex)
         + m_runtimeIndices.capacity() * sizeof(u32) + m_runtimeSourceNormals.capacity() * sizeof(Fvector3)
         + m_forwardVertices.capacity() * sizeof(ForwardVertex) + m_forwardIndices.capacity() * sizeof(u32)
         + m_forwardDrawIndices.capacity() * sizeof(u32) + m_rtVertexStaging.capacity()
-        + m_rtIndexStaging.capacity() * sizeof(u32) + m_clusterDAG.PageVertexData().capacity()
+        + m_rtIndexStaging.capacity() * sizeof(u32) + m_rtSubmittedVertexStaging.capacity()
+        + m_rtSubmittedIndexStaging.capacity() * sizeof(u32) + m_clusterDAG.PageVertexData().capacity()
         + m_clusterDAG.PagePayloadData().capacity() + m_clusterDAG.RuntimePageVertexData().capacity()
         + m_clusterDAG.RuntimePagePayloadData().capacity();
     stats.hostSourceBytes = GetStagingHostMemoryUsage();
@@ -4370,6 +4613,14 @@ MeshAllocation GPUCullingManager::RegisterRuntimeGeometry(
             FATAL_F("[GPUCulling] runtime geometry index %u exceeds the %u source vertices", index, source.vertexCount);
         }
         m_runtimeIndices[indexMark + i] = index;
+    }
+
+    if (m_rtVertexBuffer)
+    {
+        R_ASSERT(m_rtVertexCount == m_totalVertexCount && m_rtIndexCount == m_totalIndexCount);
+        AppendRuntimeRTSource(m_runtimeVertices.data() + vertexMark,
+            m_runtimeSourceNormals.empty() ? nullptr : m_runtimeSourceNormals.data(),
+            source.vertexCount, m_runtimeIndices.data() + indexMark, source.indexCount);
     }
 
     ClusterMeshKey key;

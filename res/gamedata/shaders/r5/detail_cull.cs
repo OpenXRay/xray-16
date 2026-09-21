@@ -196,12 +196,22 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         float3 bounds_center = inst.pos + float3(0, full_height * 0.5, 0);
 
 
-        if (!FrustumTestSphere(bounds_center, bounds_radius, g_frustum_planes))
-            continue;
+        if (g_ray_mode != 0u)
+        {
+            float3 to_camera = bounds_center - g_camera_pos;
+            float reach = g_ray_radius + bounds_radius;
+            if (dot(to_camera, to_camera) > reach * reach)
+                continue;
+        }
+        else
+        {
+            if (!FrustumTestSphere(bounds_center, bounds_radius, g_frustum_planes))
+                continue;
 
-        if (g_hiz_mip_levels != 0 && !HiZTestSphere(bounds_center, bounds_radius, g_camera_pos, g_prev_view_proj,
-                            g_hiz_pyramid, smp_nofilter, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
-            continue;
+            if (g_hiz_mip_levels != 0 && !HiZTestSphere(bounds_center, bounds_radius, g_camera_pos, g_prev_view_proj,
+                                g_hiz_pyramid, smp_nofilter, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
+                continue;
+        }
 
         uint flags = asuint(mdl.flags);
         bool is_static = (flags & DO_NO_WAVING) != 0;

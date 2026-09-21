@@ -45,6 +45,43 @@ static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
     }
 }
 
+static float ComputeRTGICameraConeSpread(const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height)
+{
+    if (!width || !height)
+        return 0.0f;
+
+    auto direction = [&](float ndcX, float ndcY, Fvector& out)
+    {
+        const float x = ndcX * invViewProj._11 + ndcY * invViewProj._21 + invViewProj._31 + invViewProj._41;
+        const float y = ndcX * invViewProj._12 + ndcY * invViewProj._22 + invViewProj._32 + invViewProj._42;
+        const float z = ndcX * invViewProj._13 + ndcY * invViewProj._23 + invViewProj._33 + invViewProj._43;
+        const float w = ndcX * invViewProj._14 + ndcY * invViewProj._24 + invViewProj._34 + invViewProj._44;
+        if (!std::isfinite(w) || fabsf(w) < 1e-6f)
+            return false;
+        Fvector point;
+        point.set(x / w, y / w, z / w);
+        out.sub(point, cameraPos);
+        const float length = out.magnitude();
+        if (!std::isfinite(length) || length < 1e-6f)
+            return false;
+        out.div(length);
+        return true;
+    };
+
+    Fvector base;
+    Fvector stepX;
+    Fvector stepY;
+    if (!direction(0.0f, 0.0f, base) ||
+        !direction(2.0f / float(width), 0.0f, stepX) ||
+        !direction(0.0f, 2.0f / float(height), stepY))
+        return 0.0f;
+
+    const float angleX = acosf(std::min(1.0f, std::max(-1.0f, base.dotproduct(stepX))));
+    const float angleY = acosf(std::min(1.0f, std::max(-1.0f, base.dotproduct(stepY))));
+    const float spread = std::max(angleX, angleY);
+    return std::isfinite(spread) ? spread : 0.0f;
+}
+
 static void InitializeResources(RenderDevice* device, ReSTIRGIPassState& state)
 {
     if (state.initialized)
@@ -52,19 +89,31 @@ static void InitializeResources(RenderDevice* device, ReSTIRGIPassState& state)
 
     auto* nvDevice = device->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
-    auto* backend = device->GetBackend();
-    if (!shaderLoader || !backend || !backend->GetBindlessLayout() || !backend->GetBindlessDescriptorTable())
+    if (!shaderLoader)
+    {
+        state.readiness = LightingFallback::ShaderUnavailable;
         return;
+    }
+    auto* backend = device->GetBackend();
+    if (!backend)
+    {
+        state.readiness = LightingFallback::Unsupported;
+        return;
+    }
+    if (!backend->GetBindlessLayout() || !backend->GetBindlessDescriptorTable())
+    {
+        state.readiness = LightingFallback::BindingUnavailable;
+        return;
+    }
 
     auto& cache = GetPassResourceCache();
     CreatePlaceholders(nvDevice);
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.setAllFilters(true);
-    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-    state.sampler = cache.GetOrCreateSampler("RTGI", samplerDesc, nvDevice);
-    state.cb = cache.GetOrCreateVolatileCB("RTGI", "RTGI_CB", u32(std::max({ sizeof(ReSTIRGICB), sizeof(TemporalCB), sizeof(CompositeCB) })), device);
-    if (!state.sampler || !state.cb || !s_rtgiPlaceholderBuffer)
+    state.cb = cache.GetOrCreateVolatileCB("RTGI", "RTGI_CB", u32(std::max(sizeof(RTGIRawCB), sizeof(RTGICompositeParams))), device);
+    if (!state.cb || !s_rtgiPlaceholderBuffer)
+    {
+        state.readiness = LightingFallback::ResourcesUnavailable;
         return;
+    }
 
     state.initialized = true;
     const auto createPipeline =
@@ -84,84 +133,61 @@ static void InitializeResources(RenderDevice* device, ReSTIRGIPassState& state)
         pipeline = nvDevice->createComputePipeline(desc);
         return pipeline ? LightingFallback::None : LightingFallback::PipelineUnavailable;
     };
-    state.readiness = createPipeline("restir_gi_initial", "RTGI_Initial", true, state.initialLayout, state.initialPipeline);
+    state.readiness = createPipeline("rtgi_trace", "RTGI_Trace", true, state.traceLayout, state.tracePipeline);
     if (state.readiness != LightingFallback::None)
         return;
-    state.readiness = createPipeline("restir_gi_composite", "RTGI_Composite", false, state.compositeLayout, state.compositePipeline);
-    if (state.readiness != LightingFallback::None)
-        return;
-    state.temporalReadiness = createPipeline("restir_gi_temporal", "RTGI_Temporal", false, state.temporalLayout, state.temporalPipeline);
+    state.readiness = createPipeline("rtgi_composite", "RTGI_Composite", false, state.compositeLayout, state.compositePipeline);
 }
 
-static void EnsurePersistentTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& state, u32 width, u32 height)
+static void EnsureRawTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& state, u32 width, u32 height)
 {
-    if (state.reservoirA[0] &&
-        state.reservoirA[1] &&
-        state.reservoirB[0] &&
-        state.reservoirB[1] &&
-        state.directLighting &&
-        state.indirectLighting &&
+    if (state.rawDiffuse &&
+        state.rawSpecular &&
+        state.emission &&
+        state.normalRoughness &&
+        state.albedoMetallic &&
+        state.pathData &&
+        state.surfaceData &&
+        state.motion &&
         state.texWidth == width &&
         state.texHeight == height)
         return;
-    state.historyValid = false;
-    state.currTemporalIdx = 0;
 
-    for (int i = 0; i < 2; i++)
-    {
-        {
-            nvrhi::TextureDesc desc;
-            desc.debugName = i == 0 ? "RTGI_ReservoirA_0" : "RTGI_ReservoirA_1";
-            desc.width = width;
-            desc.height = height;
-            desc.format = nvrhi::Format::RGBA32_FLOAT;
-            desc.isUAV = true;
-            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = true;
-            state.reservoirA[i] = nvDevice->createTexture(desc);
-        }
-        {
-            nvrhi::TextureDesc desc;
-            desc.debugName = i == 0 ? "RTGI_ReservoirB_0" : "RTGI_ReservoirB_1";
-            desc.width = width;
-            desc.height = height;
-            desc.format = nvrhi::Format::RGBA32_FLOAT;
-            desc.isUAV = true;
-            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-            desc.keepInitialState = true;
-            state.reservoirB[i] = nvDevice->createTexture(desc);
-        }
-    }
-
+    const auto create = [nvDevice, width, height](const char* name, nvrhi::Format format)
     {
         nvrhi::TextureDesc desc;
-        desc.debugName = "RTGI_DirectLighting";
+        desc.debugName = name;
         desc.width = width;
         desc.height = height;
-        desc.format = nvrhi::Format::RGBA16_FLOAT;
+        desc.format = format;
         desc.isUAV = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = true;
-        state.directLighting = nvDevice->createTexture(desc);
-        desc.debugName = "RTGI_IndirectLighting";
-        state.indirectLighting = nvDevice->createTexture(desc);
-    }
+        return nvDevice->createTexture(desc);
+    };
 
+    state.rawDiffuse = create("RTGI_RawDiffuse", nvrhi::Format::RGBA32_FLOAT);
+    state.rawSpecular = create("RTGI_RawSpecular", nvrhi::Format::RGBA32_FLOAT);
+    state.emission = create("RTGI_Emission", nvrhi::Format::RGBA16_FLOAT);
+    state.normalRoughness = create("RTGI_NormalRoughness", nvrhi::Format::RGBA16_FLOAT);
+    state.albedoMetallic = create("RTGI_AlbedoMetallic", nvrhi::Format::RGBA16_FLOAT);
+    state.pathData = create("RTGI_PathData", nvrhi::Format::RGBA32_FLOAT);
+    state.surfaceData = create("RTGI_SurfaceData", nvrhi::Format::RGBA32_FLOAT);
+    state.motion = create("RTGI_Motion", nvrhi::Format::RG16_FLOAT);
     state.texWidth = width;
     state.texHeight = height;
 }
 
-LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseReservoirs)
+LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested)
 {
     if (!device || !device->GetNVRHIDevice() || !width || !height)
         return LightingFallback::ResourcesUnavailable;
     InitializeResources(device, state);
     if (state.readiness != LightingFallback::None)
         return state.readiness;
-    if (reuseReservoirs && state.temporalReadiness != LightingFallback::None)
-        return state.temporalReadiness;
-    EnsurePersistentTextures(device->GetNVRHIDevice(), state, width, height);
-    if (!state.directLighting || !state.indirectLighting || !state.reservoirA[0] || !state.reservoirA[1] || !state.reservoirB[0] || !state.reservoirB[1])
+    EnsureRawTextures(device->GetNVRHIDevice(), state, width, height);
+    if (!state.rawDiffuse || !state.rawSpecular || !state.emission || !state.normalRoughness ||
+        !state.albedoMetallic || !state.pathData || !state.surfaceData || !state.motion)
         return LightingFallback::ResourcesUnavailable;
     return LightingFallback::None;
 }
@@ -175,47 +201,46 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     const auto normal = inputs.normal;
     const auto baseColor = inputs.baseColor;
     const auto material = inputs.material;
-    const auto sceneColorIn = inputs.albedo;
-    const auto readiness = EnsureReSTIRGIResources(device, state, width, height, lighting.reuseReservoirs);
+    const auto sourceColorIn = inputs.albedo;
+
+    lighting.reuseRequested = lighting.reuseRequested || lighting.reuseReservoirs;
+    lighting.reuseAvailable = false;
+    lighting.reuseReservoirs = false;
+
+    const auto readiness = EnsureReSTIRGIResources(device, state, width, height, lighting.reuseRequested);
     if (readiness != LightingFallback::None)
     {
         lighting.Fail(readiness);
-        return { sceneColorIn };
+        return { sourceColorIn };
     }
     if (!accelMgr || !accelMgr->IsReady())
     {
         lighting.Fail(LightingFallback::SceneUnavailable);
-        return { sceneColorIn };
+        return { sourceColorIn };
     }
-    if (!sceneColorIn.is_valid() || !depth.is_valid() || !normal.is_valid() || !baseColor.is_valid() || !material.is_valid() || !g_pGamePersistent)
-    {
-        lighting.Fail(LightingFallback::InputsUnavailable);
-        return { sceneColorIn };
-    }
-    const auto& outputDesc = fg.GetResourceDesc(sceneColorIn);
-    if ((!outputDesc.isUAV && !outputDesc.allowUAV) ||
-        outputDesc.format != nvrhi::Format::RGBA16_FLOAT ||
-        outputDesc.width != width ||
-        outputDesc.height != height ||
-        outputDesc.sampleCount != 1)
-    {
-        lighting.Fail(LightingFallback::InputsUnavailable);
-        return { sceneColorIn };
-    }
-    auto validHistoryGuide = [&](VirtualResourceHandle handle)
+
+    const auto validInput = [&](VirtualResourceHandle handle)
     {
         if (!handle.is_valid())
             return false;
         const auto& desc = fg.GetResourceDesc(handle);
-        return desc.width == width && desc.height == height && desc.sampleCount == 1;
+        return desc.type == ResourceDesc::Type::Texture2D && desc.width == width && desc.height == height && desc.sampleCount == 1;
     };
-    const bool useHistory = lighting.reuseReservoirs && state.historyValid && hasPrevFrameData &&
-        validHistoryGuide(prevDepth) && validHistoryGuide(prevNormals) && validHistoryGuide(motionVectors);
+    if (!validInput(sourceColorIn) || !validInput(depth) || !validInput(normal) || !validInput(baseColor) ||
+        !validInput(material) || !validInput(motionVectors) || !g_pGamePersistent)
+    {
+        lighting.Fail(LightingFallback::InputsUnavailable);
+        return { sourceColorIn };
+    }
+    const auto& sourceDesc = fg.GetResourceDesc(sourceColorIn);
+    if ((!sourceDesc.isUAV && !sourceDesc.allowUAV) || sourceDesc.format != nvrhi::Format::RGBA16_FLOAT)
+    {
+        lighting.Fail(LightingFallback::InputsUnavailable);
+        return { sourceColorIn };
+    }
+
     state.historyValid = false;
     state.initialRecorded = false;
-
-    u32 writeIdx = state.currTemporalIdx;
-    u32 readIdx = 1 - writeIdx;
 
     CEnvironment& env = g_pGamePersistent->Environment();
     auto* resourceManager = device->GetFGResourceManager();
@@ -248,7 +273,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         sky1Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube)
     {
         lighting.Fail(LightingFallback::EnvironmentUnavailable);
-        return { sceneColorIn };
+        return { sourceColorIn };
     }
 
     auto& lightManager = ClusteredLightManager::Instance();
@@ -256,7 +281,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         (lightManager.GetLightCount() > 0 && (!clusterLights.active || !clusterLights.lightData.is_valid())))
     {
         lighting.Fail(LightingFallback::ResourcesUnavailable);
-        return { sceneColorIn };
+        return { sourceColorIn };
     }
     auto lightData = clusterLights.lightData;
     if (!lightData.is_valid())
@@ -275,7 +300,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     if (!environmentSampling.distribution.is_valid())
     {
         lighting.Fail(LightingFallback::ResourcesUnavailable);
-        return { sceneColorIn };
+        return { sourceColorIn };
     }
 
     SunLightData sun = {};
@@ -290,105 +315,143 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         sunColor.set(0, 0, 0);
 
     const auto& batchCounts = accelMgr->GetBatchCounts();
+    const u32 bounces = static_cast<u32>(std::clamp(ps_r_rt_gi_bounces, 1, 16));
+    const u32 samples = static_cast<u32>(std::clamp(ps_r_rt_gi_samples, 1, 8));
+    const float rayDistance = std::clamp(ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
 
-    ReSTIRGICB initialCB = {};
-    initialCB.invViewProj = invViewProj;
-    initialCB.prevViewProj = prevViewProj;
-    initialCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
-    initialCB.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
-    initialCB.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
-    initialCB.screenWidth = (float)width;
-    initialCB.screenHeight = (float)height;
-    initialCB.giIntensity = giIntensity;
-    initialCB.frameIndex = Device.dwFrame;
-    initialCB.identityStaticCount = batchCounts.identityStatic;
-    initialCB.terrainBatchCount = batchCounts.terrain;
-    initialCB.skinnedBatchStart =
+    RTGIRawCB rawCB = {};
+    rawCB.invViewProj = invViewProj;
+    rawCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
+    rawCB.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
+    rawCB.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
+    rawCB.screenWidth = (float)width;
+    rawCB.screenHeight = (float)height;
+    rawCB.giIntensity = giIntensity;
+    rawCB.frameIndex = Device.dwFrame;
+    rawCB.identityStaticCount = batchCounts.identityStatic;
+    rawCB.terrainBatchCount = batchCounts.terrain;
+    rawCB.skinnedBatchStart =
         batchCounts.skinned > 0 ? batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal : UINT32_MAX;
-    initialCB.grassBatchStart = batchCounts.grass > 0 ?
+    rawCB.grassBatchStart = batchCounts.grass > 0 ?
         batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned :
         UINT32_MAX;
-    initialCB.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
-    initialCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
-    initialCB.lightCount = lightManager.GetLightCount();
-    initialCB.reuseReservoirs = lighting.reuseReservoirs ? 1u : 0u;
-    initialCB.emissiveCount = accelMgr->GetScene()->emissiveCount;
-    initialCB.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
-    initialCB.environmentRotation = env.CurrentEnv.sky_rotation;
-    initialCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
+    rawCB.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
+    rawCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
+    rawCB.lightCount = lightManager.GetLightCount();
+    rawCB.emissiveCount = accelMgr->GetScene()->emissiveCount;
+    rawCB.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
+    rawCB.maxBounces = bounces;
+    rawCB.samplesPerPixel = samples;
+    rawCB.rayDistance = rayDistance;
+    rawCB.environmentRotation = env.CurrentEnv.sky_rotation;
+    rawCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
+    rawCB.cameraConeSpread = ComputeRTGICameraConeSpread(invViewProj, cameraPos, width, height);
+    rawCB.pad = 0;
 
-    ResourceDesc persistDesc;
-    persistDesc.type = ResourceDesc::Type::Texture2D;
-    persistDesc.width = width;
-    persistDesc.height = height;
-    persistDesc.isImported = true;
-    persistDesc.isTransient = false;
-    persistDesc.isUAV = true;
+    ResourceDesc rawDesc;
+    rawDesc.type = ResourceDesc::Type::Texture2D;
+    rawDesc.width = width;
+    rawDesc.height = height;
+    rawDesc.isImported = true;
+    rawDesc.isTransient = false;
+    rawDesc.isUAV = true;
 
-    auto dlDesc = persistDesc;
-    dlDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    VirtualResourceHandle fgDirectLighting = fg.ImportTexture("rtgi_DirectLighting", state.directLighting.Get(), dlDesc);
-    VirtualResourceHandle fgIndirectLighting = fg.ImportTexture("rtgi_IndirectLighting", state.indirectLighting.Get(), dlDesc);
+    const auto importRaw = [&](const char* name, nvrhi::ITexture* texture, nvrhi::Format format)
+    {
+        ResourceDesc desc = rawDesc;
+        desc.format = format;
+        return fg.ImportTexture(name, texture, desc);
+    };
 
-    auto resDesc = persistDesc;
-    resDesc.format = nvrhi::Format::RGBA32_FLOAT;
-    VirtualResourceHandle fgResA = fg.ImportTexture("rtgi_ResA_W", state.reservoirA[writeIdx].Get(), resDesc);
-    VirtualResourceHandle fgResB = fg.ImportTexture("rtgi_ResB_W", state.reservoirB[writeIdx].Get(), resDesc);
+    const auto fgRawDiffuse = importRaw("rtgi_RawDiffuse", state.rawDiffuse.Get(), nvrhi::Format::RGBA32_FLOAT);
+    const auto fgRawSpecular = importRaw("rtgi_RawSpecular", state.rawSpecular.Get(), nvrhi::Format::RGBA32_FLOAT);
+    const auto fgEmission = importRaw("rtgi_Emission", state.emission.Get(), nvrhi::Format::RGBA16_FLOAT);
+    const auto fgNormalRoughness = importRaw("rtgi_NormalRoughness", state.normalRoughness.Get(), nvrhi::Format::RGBA16_FLOAT);
+    const auto fgAlbedoMetallic = importRaw("rtgi_AlbedoMetallic", state.albedoMetallic.Get(), nvrhi::Format::RGBA16_FLOAT);
+    const auto fgPathData = importRaw("rtgi_PathData", state.pathData.Get(), nvrhi::Format::RGBA32_FLOAT);
+    const auto fgSurfaceData = importRaw("rtgi_SurfaceData", state.surfaceData.Get(), nvrhi::Format::RGBA32_FLOAT);
+    const auto fgOutMotion = importRaw("rtgi_Motion", state.motion.Get(), nvrhi::Format::RG16_FLOAT);
 
-    fg.GetRTRegistry().RegisterRT("rt_DirectLighting", fgDirectLighting);
-    fg.GetRTRegistry().RegisterRT("rt_IndirectLighting", fgIndirectLighting);
-    fg.GetRTRegistry().RegisterRT("rt_GI_ReservoirA", fgResA);
-    fg.GetRTRegistry().RegisterRT("rt_GI_ReservoirB", fgResB);
+    if (!fgRawDiffuse.is_valid() || !fgRawSpecular.is_valid() || !fgEmission.is_valid() ||
+        !fgNormalRoughness.is_valid() || !fgAlbedoMetallic.is_valid() || !fgPathData.is_valid() ||
+        !fgSurfaceData.is_valid() || !fgOutMotion.is_valid())
+    {
+        lighting.Fail(LightingFallback::ResourcesUnavailable);
+        return { sourceColorIn };
+    }
 
-    // ============================================
-    //  PASS 1: Initial Sample (RT shadow + bounce)
-    // ============================================
-    fg.addCallbackPass<InitialPassData>(
-        "RTGI Initial",
-        [&, sky0Tex, sky1Tex, initialCB, fgDirectLighting, fgIndirectLighting, fgResA, fgResB, lightData](FrameGraph& builder,
-            PassHandle passHandle, InitialPassData& data)
+    fg.GetRTRegistry().RegisterRT("rt_GI_RawDiffuse", fgRawDiffuse);
+    fg.GetRTRegistry().RegisterRT("rt_GI_RawSpecular", fgRawSpecular);
+    fg.GetRTRegistry().RegisterRT("rt_GI_Emission", fgEmission);
+    fg.GetRTRegistry().RegisterRT("rt_GI_NormalRoughness", fgNormalRoughness);
+    fg.GetRTRegistry().RegisterRT("rt_GI_AlbedoMetallic", fgAlbedoMetallic);
+    fg.GetRTRegistry().RegisterRT("rt_GI_PathData", fgPathData);
+    fg.GetRTRegistry().RegisterRT("rt_GI_SurfaceData", fgSurfaceData);
+    fg.GetRTRegistry().RegisterRT("rt_GI_Motion", fgOutMotion);
+
+    fg.addCallbackPass<RTGITracePassData>(
+        "RTGI Raw Transport",
+        [&](FrameGraph& builder, PassHandle passHandle, RTGITracePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
             data.depth = pb.read(depth, ResourceState::ShaderResource);
             data.normal = pb.read(normal, ResourceState::ShaderResource);
             data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
             data.material = pb.read(material, ResourceState::ShaderResource);
+            data.sourceColor = pb.read(sourceColorIn, ResourceState::ShaderResource);
+            data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
             data.lightData = pb.read(lightData, ResourceState::ShaderResource);
             data.environmentDistribution = pb.read(environmentSampling.distribution, ResourceState::ShaderResource);
-            data.directLighting = pb.write(fgDirectLighting, ResourceState::UnorderedAccess);
-            data.indirectLighting = pb.write(fgIndirectLighting, ResourceState::UnorderedAccess);
-            data.reservoirA = pb.write(fgResA, ResourceState::UnorderedAccess);
-            data.reservoirB = pb.write(fgResB, ResourceState::UnorderedAccess);
+            data.rawDiffuse = pb.write(fgRawDiffuse, ResourceState::UnorderedAccess);
+            data.rawSpecular = pb.write(fgRawSpecular, ResourceState::UnorderedAccess);
+            data.emission = pb.write(fgEmission, ResourceState::UnorderedAccess);
+            data.normalRoughness = pb.write(fgNormalRoughness, ResourceState::UnorderedAccess);
+            data.albedoMetallic = pb.write(fgAlbedoMetallic, ResourceState::UnorderedAccess);
+            data.pathData = pb.write(fgPathData, ResourceState::UnorderedAccess);
+            data.surfaceData = pb.write(fgSurfaceData, ResourceState::UnorderedAccess);
+            data.outMotion = pb.write(fgOutMotion, ResourceState::UnorderedAccess);
             pb.sideEffects();
             data.device = device;
             data.scene = accelMgr->UseScene(builder, pb);
             data.state = &state;
             data.lighting = &lighting;
-            data.cbData = initialCB;
+            data.cbData = rawCB;
             data.width = width;
             data.height = height;
             data.sky0 = sky0Tex;
             data.sky1 = sky1Tex;
         },
-        [](const InitialPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        [](const RTGITracePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
+            if (data.lighting->effective != LightingMode::RTGI)
+                return;
+
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
             auto* materialTex = fg.GetPhysicalTexture(data.material);
-            if (!depthTex || !normalTex || !baseColorTex || !materialTex)
+            auto* sourceColorTex = fg.GetPhysicalTexture(data.sourceColor);
+            auto* motionTex = fg.GetPhysicalTexture(data.motionVectors);
+            auto* rawDiffuse = fg.GetPhysicalTexture(data.rawDiffuse);
+            auto* rawSpecular = fg.GetPhysicalTexture(data.rawSpecular);
+            auto* emission = fg.GetPhysicalTexture(data.emission);
+            auto* normalRoughness = fg.GetPhysicalTexture(data.normalRoughness);
+            auto* albedoMetallic = fg.GetPhysicalTexture(data.albedoMetallic);
+            auto* pathData = fg.GetPhysicalTexture(data.pathData);
+            auto* surfaceData = fg.GetPhysicalTexture(data.surfaceData);
+            auto* outMotion = fg.GetPhysicalTexture(data.outMotion);
+            if (!depthTex || !normalTex || !baseColorTex || !materialTex || !sourceColorTex || !motionTex ||
+                !rawDiffuse || !rawSpecular || !emission || !normalRoughness || !albedoMetallic ||
+                !pathData || !surfaceData || !outMotion)
             {
-                Msg("! [RTGI Initial] Null FG texture: depth=%d normal=%d baseColor=%d", !!depthTex, !!normalTex, !!baseColorTex);
+                Msg("! [RTGI Trace] Null FG texture: depth=%d normal=%d base=%d material=%d source=%d motion=%d raw=%d",
+                    !!depthTex, !!normalTex, !!baseColorTex, !!materialTex, !!sourceColorTex, !!motionTex, !!rawDiffuse);
                 data.lighting->Fail(LightingFallback::InputsUnavailable);
                 return;
             }
 
             nvrhi::ITexture* sky0 = data.sky0;
             nvrhi::ITexture* sky1 = data.sky1;
-            nvrhi::ITexture* directLit = fg.GetPhysicalTexture(data.directLighting);
-            nvrhi::ITexture* indirectLit = fg.GetPhysicalTexture(data.indirectLighting);
-            nvrhi::ITexture* resA = fg.GetPhysicalTexture(data.reservoirA);
-            nvrhi::ITexture* resB = fg.GetPhysicalTexture(data.reservoirB);
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
             auto* tlas = scene.tlas;
             auto* batchInfo = scene.batchInfo;
@@ -398,20 +461,31 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             auto* terrainBuf = scene.terrainMaterials;
 
             auto* environmentDistribution = fg.GetPhysicalBuffer(data.environmentDistribution);
-            if (!sky0 || !sky1 || !directLit || !indirectLit || !resA || !resB || !tlas || !batchInfo || !megaVB ||
-                !megaIB || !matBuf || !terrainBuf || !scene.variants || !scene.textures ||
-                !scene.emissiveTriangles || !scene.batchTransforms || !scene.emissiveBatchOffsets || !environmentDistribution)
+            if (!sky0 || !sky1 || !tlas || !batchInfo || !megaVB || !megaIB || !matBuf || !terrainBuf ||
+                !scene.variants || !scene.textures || !scene.emissiveTriangles || !scene.batchTransforms ||
+                !scene.emissiveBatchOffsets || !environmentDistribution)
             {
-                Msg("! [RTGI Initial] Null binding: sky0=%d sky1=%d directLit=%d resA=%d resB=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
-                    !!sky0, !!sky1, !!directLit, !!resA, !!resB, !!tlas, !!batchInfo, !!megaVB, !!megaIB, !!matBuf, !!terrainBuf);
+                Msg("! [RTGI Trace] Null binding: sky0=%d sky1=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
+                    !!sky0, !!sky1, !!tlas, !!batchInfo, !!megaVB, !!megaIB, !!matBuf, !!terrainBuf);
                 data.lighting->Fail(LightingFallback::SceneUnavailable);
                 return;
             }
 
-            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            auto* lightData = fg.GetPhysicalBuffer(data.lightData);
+            auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            if (!lightData || !staticGlobals)
+            {
+                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                return;
+            }
 
-            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(ReSTIRGICB));
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            auto* csReflection = shaderLoader->GetCachedReflection("rtgi_trace", ".cs");
+            if (!csReflection)
+            {
+                data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                return;
+            }
 
             nvrhi::IBuffer* skinnedVB = scene.skinnedVertices;
             nvrhi::IBuffer* skinnedIB = scene.skinnedIndices;
@@ -426,24 +500,12 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             if (!grassIB)
                 grassIB = s_rtgiPlaceholderBuffer.Get();
 
-            auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_initial", ".cs");
-            if (!csReflection)
-            {
-                data.lighting->Fail(LightingFallback::ShaderUnavailable);
-                return;
-            }
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(RTGIRawCB));
 
-            auto* lightData = fg.GetPhysicalBuffer(data.lightData);
-            auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            if (!lightData || !staticGlobals)
-            {
-                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
-                return;
-            }
-
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Initial");
-            bsb.ConstantBuffer("ReSTIRGIParams", data.state->cb);
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "RTGI.Trace");
+            bsb.ConstantBuffer("RTGIRawParams", data.state->cb);
             bsb.ConstantBuffer("static_globals", staticGlobals);
             bsb.BufferSRV("g_LightData", lightData);
             bsb.AccelStruct("g_SceneTLAS", tlas);
@@ -467,11 +529,17 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             bsb.Texture("t_Normal", normalTex);
             bsb.Texture("t_BaseColor", baseColorTex);
             bsb.Texture("t_Material", materialTex);
-            bsb.TextureUAV("u_DirectLighting", directLit);
-            bsb.TextureUAV("u_IndirectLighting", indirectLit);
-            bsb.TextureUAV("u_ReservoirA", resA);
-            bsb.TextureUAV("u_ReservoirB", resB);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->initialLayout);
+            bsb.Texture("t_SourceColor", sourceColorTex);
+            bsb.Texture("t_MotionVectors", motionTex);
+            bsb.TextureUAV("u_RawDiffuse", rawDiffuse);
+            bsb.TextureUAV("u_RawSpecular", rawSpecular);
+            bsb.TextureUAV("u_Emission", emission);
+            bsb.TextureUAV("u_NormalRoughness", normalRoughness);
+            bsb.TextureUAV("u_AlbedoMetallic", albedoMetallic);
+            bsb.TextureUAV("u_PathData", pathData);
+            bsb.TextureUAV("u_SurfaceData", surfaceData);
+            bsb.TextureUAV("u_Motion", outMotion);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->traceLayout);
             if (!bindingSet)
             {
                 data.lighting->Fail(LightingFallback::BindingUnavailable);
@@ -479,9 +547,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             }
 
             nvrhi::ComputeState cs;
-            cs.pipeline = data.state->initialPipeline;
+            cs.pipeline = data.state->tracePipeline;
             cs.bindings = { bindingSet };
-
             if (scene.textures)
                 cs.addBindingSet(scene.textures);
 
@@ -490,210 +557,68 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.state->initialRecorded = true;
         });
 
-    // ============================================
-    //  PASS 2: Temporal Resampling
-    // ============================================
-    if (useHistory)
-    {
-        const auto previousA = fg.ImportTexture("rtgi_ResA_R", state.reservoirA[readIdx], resDesc);
-        const auto previousB = fg.ImportTexture("rtgi_ResB_R", state.reservoirB[readIdx], resDesc);
-        TemporalCB temporalCB;
-        temporalCB.invViewProj = invViewProj;
-        temporalCB.prevInvViewProj.invert_44(prevViewProj);
-        temporalCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
-        temporalCB.screenWidth = (float)width;
-        temporalCB.screenHeight = (float)height;
-        temporalCB.invScreenWidth = 1.0f / width;
-        temporalCB.invScreenHeight = 1.0f / height;
-        temporalCB.frameIndex = Device.dwFrame;
-        temporalCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
-        temporalCB.pad[0] = temporalCB.pad[1] = 0;
+    RTGICompositeParams compositeCB = {};
+    compositeCB.width = width;
+    compositeCB.height = height;
+    compositeCB.pad0 = 0;
+    compositeCB.pad1 = 0;
 
-        fg.addCallbackPass<TemporalPassData>(
-            "ReSTIR GI Temporal",
-            [&, temporalCB, fgResA, fgResB](FrameGraph& builder, PassHandle passHandle, TemporalPassData& data)
-            {
-                RenderPassBuilder pb(builder, passHandle);
-                data.depth = pb.read(depth, ResourceState::ShaderResource);
-                data.normal = pb.read(normal, ResourceState::ShaderResource);
-                data.prevNormals = pb.read(prevNormals, ResourceState::ShaderResource);
-                data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-                data.material = pb.read(material, ResourceState::ShaderResource);
-                data.prevDepth = pb.read(prevDepth, ResourceState::ShaderResource);
-                data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
-                data.previousA = pb.read(previousA, ResourceState::ShaderResource);
-                data.previousB = pb.read(previousB, ResourceState::ShaderResource);
-                data.reservoirA = pb.readWrite(fgResA, ResourceState::UnorderedAccess);
-                data.reservoirB = pb.readWrite(fgResB, ResourceState::UnorderedAccess);
-                pb.sideEffects();
-                data.device = device;
-                data.state = &state;
-                data.lighting = &lighting;
-                data.cbData = temporalCB;
-                data.width = width;
-                data.height = height;
-            },
-            [](const TemporalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
-            {
-                if (!data.state->initialRecorded || data.lighting->effective != LightingMode::RTGI)
-                    return;
-                auto* depthTex = fg.GetPhysicalTexture(data.depth);
-                auto* normalTex = fg.GetPhysicalTexture(data.normal);
-                auto* prevNormalsTex = fg.GetPhysicalTexture(data.prevNormals);
-                auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-                auto* materialTex = fg.GetPhysicalTexture(data.material);
-                auto* prevDepthTex = fg.GetPhysicalTexture(data.prevDepth);
-                auto* mvTex = fg.GetPhysicalTexture(data.motionVectors);
-                auto* previousA = fg.GetPhysicalTexture(data.previousA);
-                auto* previousB = fg.GetPhysicalTexture(data.previousB);
-                auto* reservoirA = fg.GetPhysicalTexture(data.reservoirA);
-                auto* reservoirB = fg.GetPhysicalTexture(data.reservoirB);
-                if (!depthTex || !normalTex || !prevNormalsTex || !prevDepthTex || !baseColorTex || !materialTex ||
-                    !mvTex || !previousA || !previousB || !reservoirA || !reservoirB)
-                {
-                    return;
-                }
-
-                nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-                nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-
-                cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(TemporalCB));
-
-                auto* shaderLoader = GEnv.Render->GetShaderLoader();
-                auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_temporal", ".cs");
-                if (!csReflection)
-                {
-                    return;
-                }
-
-                auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-                if (!staticGlobals)
-                    return;
-
-                framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Temporal");
-                bsb.ConstantBuffer("ReSTIRTemporalParams", data.state->cb);
-                bsb.ConstantBuffer("static_globals", staticGlobals);
-                bsb.Texture("t_PrevReservoirA", previousA);
-                bsb.Texture("t_PrevReservoirB", previousB);
-                bsb.Texture("t_MotionVectors", mvTex);
-                bsb.Texture("t_Depth", depthTex);
-                bsb.Texture("t_Normal", normalTex);
-                bsb.Texture("t_PrevNormal", prevNormalsTex);
-                bsb.Texture("t_BaseColor", baseColorTex);
-                bsb.Texture("t_Material", materialTex);
-                bsb.Texture("t_PrevDepth", prevDepthTex);
-                bsb.TextureUAV("u_ReservoirA", reservoirA);
-                bsb.TextureUAV("u_ReservoirB", reservoirB);
-                auto& cache = GetPassResourceCache();
-                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->temporalLayout, nvDevice);
-                if (!bindingSet)
-                {
-                    return;
-                }
-
-                nvrhi::ComputeState cs;
-                cs.pipeline = data.state->temporalPipeline;
-                cs.bindings = { bindingSet };
-
-                cmdList->setComputeState(cs);
-                cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
-                data.lighting->historyUsed = true;
-            });
-    }
-
-    // ============================================
-    //  PASS 3: Composite (direct + indirect → scene)
-    // ============================================
-    CompositeCB compositeCB;
-    compositeCB.invViewProj = invViewProj;
-    compositeCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
-    compositeCB.screenWidth = (float)width;
-    compositeCB.screenHeight = (float)height;
-    compositeCB.giIntensity = giIntensity;
-    compositeCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
-
-    auto& compositeData = fg.addCallbackPass<CompositePassData>(
+    auto& compositeData = fg.addCallbackPass<RTGICompositePassData>(
         "RTGI Opaque Lighting",
-        [&, compositeCB, writeIdx, fgDirectLighting, fgIndirectLighting, fgResA, fgResB](FrameGraph& builder, PassHandle passHandle, CompositePassData& data)
+        [&](FrameGraph& builder, PassHandle passHandle, RTGICompositePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
-            data.depth = pb.read(depth, ResourceState::ShaderResource);
-            data.normal = pb.read(normal, ResourceState::ShaderResource);
-            data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
-            data.material = pb.read(material, ResourceState::ShaderResource);
-            data.directLighting = pb.read(fgDirectLighting, ResourceState::ShaderResource);
-            data.indirectLighting = pb.readWrite(fgIndirectLighting, ResourceState::UnorderedAccess);
-            data.reservoirA = pb.read(fgResA, ResourceState::ShaderResource);
-            data.reservoirB = pb.read(fgResB, ResourceState::ShaderResource);
-            data.sceneColor = pb.readWrite(sceneColorIn, ResourceState::UnorderedAccess);
+            data.rawDiffuse = pb.read(fgRawDiffuse, ResourceState::ShaderResource);
+            data.rawSpecular = pb.read(fgRawSpecular, ResourceState::ShaderResource);
+            data.emission = pb.read(fgEmission, ResourceState::ShaderResource);
+            data.sceneColor = pb.readWrite(sourceColorIn, ResourceState::UnorderedAccess);
+            pb.sideEffects();
             data.device = device;
             data.state = &state;
             data.lighting = &lighting;
             data.cbData = compositeCB;
+            data.bounces = bounces;
+            data.samples = samples;
+            data.rayDistance = rayDistance;
             data.width = width;
             data.height = height;
-            data.reservoirIdx = writeIdx;
         },
-        [](const CompositePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        [](const RTGICompositePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             if (!data.state->initialRecorded || data.lighting->effective != LightingMode::RTGI)
                 return;
-            auto* depthTex = fg.GetPhysicalTexture(data.depth);
-            auto* normalTex = fg.GetPhysicalTexture(data.normal);
-            auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-            auto* materialTex = fg.GetPhysicalTexture(data.material);
-            auto* outTex = fg.GetPhysicalTexture(data.sceneColor);
-            if (!depthTex || !normalTex || !baseColorTex || !materialTex || !outTex)
-            {
-                data.lighting->Fail(LightingFallback::InputsUnavailable);
-                return;
-            }
 
-            nvrhi::ITexture* directLit = fg.GetPhysicalTexture(data.directLighting);
-            nvrhi::ITexture* indirectLit = fg.GetPhysicalTexture(data.indirectLighting);
-            nvrhi::ITexture* resA = fg.GetPhysicalTexture(data.reservoirA);
-            nvrhi::ITexture* resB = fg.GetPhysicalTexture(data.reservoirB);
-            if (!directLit || !indirectLit || !resA || !resB)
+            auto* rawDiffuse = fg.GetPhysicalTexture(data.rawDiffuse);
+            auto* rawSpecular = fg.GetPhysicalTexture(data.rawSpecular);
+            auto* emission = fg.GetPhysicalTexture(data.emission);
+            auto* outTex = fg.GetPhysicalTexture(data.sceneColor);
+            if (!rawDiffuse || !rawSpecular || !emission || !outTex)
             {
-                Msg("! [RTGI Composite] Null persistent texture: directLit=%d resA=%d resB=%d idx=%d", !!directLit, !!resA, !!resB, data.reservoirIdx);
+                Msg("! [RTGI Composite] Null FG texture: raw=%d spec=%d emission=%d out=%d",
+                    !!rawDiffuse, !!rawSpecular, !!emission, !!outTex);
                 data.lighting->Fail(LightingFallback::ResourcesUnavailable);
                 return;
             }
 
-            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-
-            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(CompositeCB));
-
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            auto* csReflection = shaderLoader->GetCachedReflection("restir_gi_composite", ".cs");
+            auto* csReflection = shaderLoader->GetCachedReflection("rtgi_composite", ".cs");
             if (!csReflection)
             {
                 data.lighting->Fail(LightingFallback::ShaderUnavailable);
                 return;
             }
 
-            auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
-            if (!staticGlobals)
-            {
-                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
-                return;
-            }
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(RTGICompositeParams));
 
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "ReSTIRGI.Spatial");
-            bsb.ConstantBuffer("CompositeParams", data.state->cb);
-            bsb.ConstantBuffer("static_globals", staticGlobals);
-            bsb.Texture("t_DirectLighting", directLit);
-            bsb.TextureUAV("u_IndirectLighting", indirectLit);
-            bsb.Texture("t_ReservoirA", resA);
-            bsb.Texture("t_ReservoirB", resB);
-            bsb.Texture("t_Depth", depthTex);
-            bsb.Texture("t_Normal", normalTex);
-            bsb.Texture("t_BaseColor", baseColorTex);
-            bsb.Texture("t_Material", materialTex);
+            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "RTGI.Composite");
+            bsb.ConstantBuffer("RTGICompositeParams", data.state->cb);
+            bsb.Texture("t_RawDiffuse", rawDiffuse);
+            bsb.Texture("t_RawSpecular", rawSpecular);
+            bsb.Texture("t_Emission", emission);
             bsb.TextureUAV("u_SceneColor", outTex);
-            auto& cache = GetPassResourceCache();
-            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
+            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->compositeLayout);
             if (!bindingSet)
             {
                 data.lighting->Fail(LightingFallback::BindingUnavailable);
@@ -707,35 +632,46 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             cmdList->setComputeState(cs);
             cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
             data.lighting->recorded = true;
+            data.lighting->rawSignalsRecorded = true;
+            data.lighting->historyUsed = false;
+            data.lighting->rtgiBounces = data.bounces;
+            data.lighting->rtgiSamples = data.samples;
+            data.lighting->rtgiRayDistance = data.rayDistance;
         });
 
-    return { compositeData.sceneColor };
+    ReSTIRGIOutput output;
+    output.sceneColor = compositeData.sceneColor;
+    output.rawDiffuse = fgRawDiffuse;
+    output.rawSpecular = fgRawSpecular;
+    output.emission = fgEmission;
+    output.normalRoughness = fgNormalRoughness;
+    output.albedoMetallic = fgAlbedoMetallic;
+    output.pathData = fgPathData;
+    output.surfaceData = fgSurfaceData;
+    output.motionVectors = fgOutMotion;
+    return output;
 }
 
 void ShutdownReSTIRGI(ReSTIRGIPassState& state)
 {
-    state.initialPipeline = nullptr;
-    state.initialLayout = nullptr;
-    state.temporalPipeline = nullptr;
-    state.temporalLayout = nullptr;
+    state.tracePipeline = nullptr;
+    state.traceLayout = nullptr;
     state.compositePipeline = nullptr;
     state.compositeLayout = nullptr;
     state.cb = nullptr;
-    state.sampler = nullptr;
-    for (int i = 0; i < 2; i++)
-    {
-        state.reservoirA[i] = nullptr;
-        state.reservoirB[i] = nullptr;
-    }
-    state.directLighting = nullptr;
-    state.indirectLighting = nullptr;
+    state.rawDiffuse = nullptr;
+    state.rawSpecular = nullptr;
+    state.emission = nullptr;
+    state.normalRoughness = nullptr;
+    state.albedoMetallic = nullptr;
+    state.pathData = nullptr;
+    state.surfaceData = nullptr;
+    state.motion = nullptr;
     s_rtgiPlaceholderBuffer = nullptr;
     state.initialized = false;
     state.readiness = LightingFallback::ResourcesUnavailable;
-    state.temporalReadiness = LightingFallback::ResourcesUnavailable;
     state.historyValid = false;
     state.initialRecorded = false;
-    state.currTemporalIdx = 0;
     state.texWidth = 0;
     state.texHeight = 0;
 }

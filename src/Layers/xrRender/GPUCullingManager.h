@@ -255,6 +255,8 @@ public:
     framegraph::VirtualResourceHandle clusterGroups;
     framegraph::VirtualResourceHandle rtVertices;
     framegraph::VirtualResourceHandle rtIndices;
+    framegraph::VirtualResourceHandle rtCopySourceVertices;
+    framegraph::VirtualResourceHandle rtCopySourceIndices;
     framegraph::VirtualResourceHandle boneMatrices;
     framegraph::VirtualResourceHandle groupResidency;
     framegraph::VirtualResourceHandle shadowCuts;
@@ -423,6 +425,8 @@ public:
     nvrhi::IBuffer* GetRTIndexBuffer() const { return m_rtIndexBuffer.Get(); }
     u32 GetRTVertexCount() const { return m_rtVertexCount; }
     u32 GetRTIndexCount() const { return m_rtIndexCount; }
+    bool IsRTSourceReady() const;
+    u32 GetRTRuntimeVertexCount() const;
     static constexpr u32 RT_VERTEX_STRIDE = 40u;
     u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
     const Fmatrix* GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const;
@@ -455,6 +459,10 @@ public:
     const xr_vector<GeometryInstanceKey>& GetStaticInstanceIdentities() const { return m_staticInstanceIdentities; }
     const xr_vector<GeometryInstanceKey>& GetTerrainInstanceIdentities() const { return m_terrainInstanceIdentities; }
     const xr_vector<GeometryInstanceKey>& GetTransparentInstanceIdentities() const { return m_transparentInstanceIdentities; }
+    const xr_vector<GPUInstanceData>& GetDynamicInstanceData() const;
+    const xr_vector<GeometryInstanceKey>& GetDynamicInstanceIdentities() const;
+    const xr_vector<ClusterMeshKey>& GetDynamicMeshKeys() const;
+    u32 GetRTRayOnlyDynamicCount() const;
 
     void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
     RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
@@ -745,7 +753,7 @@ private:
     xr_vector<GPUGeoInstance> m_dynamicGeoInstanceData;
     xr_vector<u32> m_dynamicRefData;
     xr_vector<ClusterMeshKey> m_dynamicBatchKeys;
-    xr_vector<GeometryInstanceKey> m_dynamicIdentity;
+    xr_vector<GeometryInstanceKey> m_dynamicInstanceIdentities;
     class DynamicHistoryEntry
     {
     public:
@@ -1123,15 +1131,30 @@ private:
     GeometryResidencyManager m_residency;
     nvrhi::BufferHandle m_rtVertexBuffer;
     nvrhi::BufferHandle m_rtIndexBuffer;
+    nvrhi::BufferHandle m_rtCopySourceVertexBuffer;
+    nvrhi::BufferHandle m_rtCopySourceIndexBuffer;
     xr_vector<u8> m_rtVertexStaging;
     xr_vector<u32> m_rtIndexStaging;
+    xr_vector<u8> m_rtSubmittedVertexStaging;
+    xr_vector<u32> m_rtSubmittedIndexStaging;
     u32 m_rtVertexCount = 0;
     u32 m_rtIndexCount = 0;
+    u32 m_rtVertexUploaded = 0;
+    u32 m_rtIndexUploaded = 0;
+    u32 m_rtVertexCapacity = 0;
+    u32 m_rtIndexCapacity = 0;
+    u32 m_rtRuntimeVertexCount = 0;
+    u32 m_rtRayOnlyDynamicCount = 0;
     bool m_rtSourceUploaded = false;
+    bool m_rtSourceFailed = false;
     u64 m_rtSourceLease = 0;
     void RetireRTSourceUpload(bool discard);
     void CaptureRTSource();
+    void PrepareRTSourceGeneration();
     void UploadRTSource(nvrhi::ICommandList* cmdList);
+    bool EnsureRTSourceCapacity(u32 vertexCount, u32 indexCount);
+    void AppendRuntimeRTSource(const bindless::UnifiedVertex* vertices, const Fvector3* floatNormals,
+        u32 vertexCount, const u32* indices, u32 indexCount);
     string_path m_pageStorePath = {};
 };
 

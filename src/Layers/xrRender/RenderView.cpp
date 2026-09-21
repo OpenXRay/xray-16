@@ -104,9 +104,6 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
             hasPrevHiZ = previous->hizRecorded;
             if (previous->surfacesRecorded || previous->hizRecorded)
                 writeIndex = 1 - previous->guideIndex;
-            if (previous->rtgiRecorded)
-                rtgi.currTemporalIdx = 1 - previous->reservoirIndex;
-            rtgi.historyValid = previous->rtgiRecorded && hasPrevFrameData;
             pathTracer.history = previous->pathTracer;
         }
     }
@@ -140,8 +137,6 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     }
     auto& frame = *m_recording;
     frame.hizRecorded = hiz && hizRecorded;
-    frame.reservoirIndex = rtgi.currTemporalIdx;
-    frame.rtgiRecorded = lighting.effective == LightingMode::RTGI && lighting.recorded && lighting.reuseReservoirs;
     const bool ptRecorded = lighting.effective == LightingMode::ReferencePT && lighting.recorded;
     if (ptRecorded || pathTracer.pending.capturedSnapshot)
     {
@@ -154,14 +149,18 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     }
     frame.textures.push_back(hiz);
     frame.textures.push_back(pathTracer.accumulation);
-    frame.textures.push_back(rtgi.directLighting);
-    frame.textures.push_back(rtgi.indirectLighting);
+    frame.textures.push_back(rtgi.rawDiffuse);
+    frame.textures.push_back(rtgi.rawSpecular);
+    frame.textures.push_back(rtgi.emission);
+    frame.textures.push_back(rtgi.normalRoughness);
+    frame.textures.push_back(rtgi.albedoMetallic);
+    frame.textures.push_back(rtgi.pathData);
+    frame.textures.push_back(rtgi.surfaceData);
+    frame.textures.push_back(rtgi.motion);
     for (u32 i = 0; i < 2; ++i)
     {
         frame.textures.push_back(m_depth[i]);
         frame.textures.push_back(m_normals[i]);
-        frame.textures.push_back(rtgi.reservoirA[i]);
-        frame.textures.push_back(rtgi.reservoirB[i]);
     }
     m_frames.push_back(std::move(m_recording));
 }

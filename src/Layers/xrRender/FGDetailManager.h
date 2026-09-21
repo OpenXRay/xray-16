@@ -106,8 +106,18 @@ public:
         u32 grassMode;
         u32 visibleBillboardCapacity;
         u32 preparedCapacity[3];
+        u32 rayMode;
+        float rayRadius;
+        float rayCellRadius;
+        u32 rayPadding;
     };
-    static_assert(sizeof(DetailCullParams) == 304);
+    static_assert(sizeof(DetailCullParams) == 320);
+    static constexpr u32 RAY_MODE_RASTER = 0;
+    static constexpr u32 RAY_MODE_COVERAGE = 1;
+    static constexpr float RAY_MEMBERSHIP_MAX_SCALE = 4.0f;
+    static constexpr float RAY_COVERAGE_GUARD_MAX = 4.0f;
+    static constexpr float RAY_COVERAGE_GUARD_FRACTION = 0.25f;
+    static constexpr float RAY_COVERAGE_TOLERANCE = 0.05f;
 
     struct GrassObjectTint { float r, g, b, pad; };
 
@@ -392,6 +402,7 @@ public:
 
     std::shared_ptr<const InstanceGeneration> generatedInstances;
     std::shared_ptr<VisibilityFrame> visibilityFrame;
+    std::shared_ptr<VisibilityFrame> rayVisibilityFrame;
     std::shared_ptr<GenerationWork> generationWork;
     DetailCullingStats cullingStats;
     InstanceMemoryStats instanceMemoryStats;
@@ -475,6 +486,10 @@ public:
 
     void PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool enabled);
     std::shared_ptr<const VisibilityFrame> GetCompletedVisibilityFrame() const;
+    void SetRayTracingCoverage(bool enabled, float radius);
+    std::shared_ptr<const VisibilityFrame> GetCompletedRayVisibilityFrame() const;
+    bool IsRayTracingCoverageEnabled() const;
+    bool IsRayTracingCoveragePending() const;
     void RecordGeneration(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, GenerationWork& work);
 
 private:
@@ -484,8 +499,10 @@ private:
     xr_vector<DecalPulledVertex> pulledVertexData;
 
     void AllocateGeneration(nvrhi::IDevice* device, GenerationWork& work);
-    void AllocateVisibilityFrame(nvrhi::IDevice* device, VisibilityFrame& frame);
+    bool AllocateVisibilityFrame(nvrhi::IDevice* device, VisibilityFrame& frame, bool ray);
+    void FinalizeVisibilityFrame(nvrhi::IDevice* device, const std::shared_ptr<VisibilityFrame>& frame, bool ray);
     void RequireInstanceMemory(u64 bytes, const char* purpose);
+    u64 AvailableInstanceMemory();
     void UpdateInstanceMemoryStats();
     void DestroyInstanceStorage();
     void RecordVisibilityWork(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame, bool slots);
@@ -496,12 +513,20 @@ private:
     nvrhi::BufferHandle CreateInstanceBuffer(nvrhi::IDevice* device, u64 bytes, u32 stride,
         const char* name, bool readback = false, bool indirect = false);
     bool IsChunkVisible(const InstanceChunk& chunk, const DetailCullParams& params) const;
+    bool IsChunkRayRelevant(const InstanceChunk& chunk, const Fvector3& cameraPos, float cellRadius) const;
+    bool RayVisibilityFrameCovers(const VisibilityFrame& frame) const;
     xr_vector<std::shared_ptr<VisibilityFrame>> m_visibilityFrames;
+    xr_vector<std::shared_ptr<VisibilityFrame>> m_rayVisibilityFrames;
     xr_vector<std::weak_ptr<const InstanceGeneration>> m_instanceGenerations;
     std::shared_ptr<VisibilityFrame> m_completedVisibilityFrame;
+    std::shared_ptr<VisibilityFrame> m_completedRayVisibilityFrame;
     nvrhi::BindingLayoutHandle m_cullSourceLayout;
     u64 m_instanceGenerationId = 0;
     u64 m_visibilityFrameId = 0;
+    u64 m_rayVisibilityFrameId = 0;
+    float m_rayCoverageRadius = 0.0f;
+    float m_rayModelReach = 0.0f;
+    bool m_rayCoverageRequested = false;
     bool m_instancesNeedRegeneration = true;
     bool m_detailsEnabled = false;
     void BuildDetailModelGPUData();

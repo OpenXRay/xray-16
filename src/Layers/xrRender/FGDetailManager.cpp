@@ -226,6 +226,7 @@ void FGDetailManager::Unload()
 
     slot_aabbs.clear();
     slotDataCPU.clear();
+    slot_count = 0;
 
     if (dtFS)
     {
@@ -1548,11 +1549,14 @@ void FGDetailManager::DispatchCulling(
     R_ASSERT2(m_cullSourceLayout == frame.source->bindingLayout, "[DetailManager] culling source layout mismatch");
     auto* renderDevice = GEnv.Render->GetRenderDevice();
     auto& params = frame.cullParams;
-    params.prevViewProj = prevViewProj;
     params.fadeDistanceSqr = fadeDistance * fadeDistance;
-    params.hizWidth = hiZWidth;
-    params.hizHeight = hiZHeight;
-    params.hizMipLevels = hiZMipLevels;
+    if (!params.rayMode)
+    {
+        params.prevViewProj = prevViewProj;
+        params.hizWidth = hiZWidth;
+        params.hizHeight = hiZHeight;
+        params.hizMipLevels = hiZMipLevels;
+    }
     cmdList->writeBuffer(renderDevice->GetNativeBuffer(cachedCullParamsCB), &params, sizeof(params));
     for (u32 kind = 0; kind < VIS_KIND_COUNT; ++kind)
     {
@@ -1733,6 +1737,11 @@ void FGDetailManager::BuildDetailModelGPUData()
             d.pulledIndexCount = 0;
         }
     }
+
+    m_rayModelReach = 0.0f;
+    for (const auto& model : cachedModelGPUData)
+        m_rayModelReach = std::max(m_rayModelReach, RAY_MEMBERSHIP_MAX_SCALE *
+            std::max({ model.geomExtentY, std::max(model.geomExtentX, model.geomExtentZ) * 0.5f, 0.5f }));
 
     if (pulledVerts.empty())
         pulledVerts.push_back(DecalPulledVertex{});

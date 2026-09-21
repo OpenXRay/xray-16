@@ -132,7 +132,7 @@ static framegraph::VirtualResourceHandle ImportRTBuffer(framegraph::FrameGraph& 
     return graph.ImportBuffer(name, buffer, desc);
 }
 
-static void EnsureRTBuffer(nvrhi::IDevice* device, nvrhi::BufferHandle& buffer,
+static bool EnsureRTBuffer(nvrhi::IDevice* device, nvrhi::BufferHandle& buffer,
     const nvrhi::BufferDesc& desc)
 {
     R_ASSERT(desc.byteSize != 0);
@@ -140,8 +140,10 @@ static void EnsureRTBuffer(nvrhi::IDevice* device, nvrhi::BufferHandle& buffer,
         buffer->getDesc().structStride != desc.structStride)
     {
         buffer = device->createBuffer(desc);
-        R_ASSERT2(buffer, "[RT] buffer allocation failed");
+        if (!buffer)
+            return false;
     }
+    return true;
 }
 
 static nvrhi::BufferDesc RTVertexBufferDesc(const char* name, u64 size)
@@ -187,14 +189,18 @@ static nvrhi::rt::GeometryDesc RTTriangles(nvrhi::IBuffer* vertices,
     return desc;
 }
 
+static constexpr u32 RT_MASK_WORLD = 0x01;
+static constexpr u32 RT_MASK_HUD = 0x02;
+
 static nvrhi::rt::InstanceDesc RTInstance(nvrhi::rt::IAccelStruct* blas,
-    u32 firstBatch, const RTBatchTransform& transform, bool opaque)
+    u32 firstBatch, const RTBatchTransform& transform, bool opaque, u32 mask)
 {
     R_ASSERT(firstBatch < (1u << 24));
+    R_ASSERT(mask);
     nvrhi::rt::AffineTransform affine;
     memcpy(&affine, &transform.rows, sizeof(affine));
     nvrhi::rt::InstanceDesc result;
-    result.setTransform(affine).setInstanceID(firstBatch).setInstanceMask(0x01)
+    result.setTransform(affine).setInstanceID(firstBatch).setInstanceMask(mask)
         .setFlags(opaque ? nvrhi::rt::InstanceFlags::ForceOpaque :
             nvrhi::rt::InstanceFlags::TriangleCullDisable).setBLAS(blas);
     return result;
@@ -307,7 +313,11 @@ void RTAccelStructManager::Shutdown()
     m_leases.clear();
     m_scene.reset();
     m_staticGeometry.reset();
+    m_dynamicGeometry.reset();
+    m_dynamicSourceVertices = nullptr;
+    m_dynamicSourceIndices = nullptr;
     m_generations.clear();
+    m_skinTopologies.clear();
     m_textureScratch.clear();
     m_textureScratch.shrink_to_fit();
     InvalidateShaderPipelines();
@@ -335,6 +345,8 @@ void RTAccelStructManager::InvalidateShaderPipelines()
 
 bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
 {
+    if (scene.failed)
+        return false;
     if (!scene.tlas ||
         !scene.geometry ||
         !scene.geometry->vertices ||
@@ -348,9 +360,14 @@ bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
         !scene.emissiveBatchOffsetBuffer ||
         !scene.textures.GetTable())
         return false;
-    if (scene.counts.skinned && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinBuild.handle))
+    if (!scene.skinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology ||
+        !scene.skinBuild.handle))
         return false;
-    if (scene.counts.grass && (!scene.grassVertices || !scene.grassIndices || !scene.grassBuild.handle))
+    if (!scene.hudSkinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology ||
+        !scene.hudSkinBuild.handle))
+        return false;
+    if (scene.counts.grass && (!scene.grassVertices || !scene.grassIndices || !scene.grassBuild.handle ||
+        !scene.grassPipeline || !scene.grassLayout))
         return false;
     return true;
 }
@@ -396,24 +413,66 @@ void RTAccelStructManager::RetireScenes()
         {
             it->scene->recorded = false;
             it->scene->failed = true;
+            RTSkinTopology* failedTopology = it->scene->skinTopology.get();
+            if (failedTopology)
+            {
+                failedTopology->uploadPending = false;
+                failedTopology->staging.clear();
+                failedTopology->staging.shrink_to_fit();
+                for (auto cached = m_skinTopologies.begin(); cached != m_skinTopologies.end(); ++cached)
+                {
+                    if (cached->second.get() == failedTopology)
+                    {
+                        m_skinTopologies.erase(cached);
+                        break;
+                    }
+                }
+                for (auto& generation : m_generations)
+                {
+                    if (generation->skinTopology.get() == failedTopology)
+                    {
+                        generation->failed = true;
+                        generation->recorded = false;
+                    }
+                }
+            }
+            if (it->scene->dynamicGeometry)
+            {
+                auto failedDynamic = it->scene->dynamicGeometry;
+                failedDynamic->recorded = false;
+                if (m_dynamicGeometry == failedDynamic)
+                    m_dynamicGeometry.reset();
+                for (auto& generation : m_generations)
+                {
+                    if (generation->dynamicGeometry == failedDynamic)
+                    {
+                        generation->failed = true;
+                        generation->recorded = false;
+                    }
+                }
+            }
             if (it->scene->geometry == m_staticGeometry)
             {
                 m_scene.reset();
                 m_staticGeometry.reset();
+                m_dynamicGeometry.reset();
             }
             else if (it->scene == m_scene)
                 m_scene.reset();
         }
-        if (it->scene->leases == 0 && it->scene->recorded && it->scene->retention == 0)
+        if (it->scene != m_scene && it->scene->leases == 0 && it->scene->recorded && it->scene->retention == 0)
         {
-            it->scene->skinIndexData.clear();
+            it->scene->skinTopology.reset();
+            it->scene->skinnedIndices = nullptr;
             it->scene->skinJobs.clear();
+            it->scene->hudSkinJobs.clear();
             it->scene->skinSources.clear();
             it->scene->grassJobs.clear();
             it->scene->emissiveTriangles.clear();
             it->scene->emissiveBatchOffsets.clear();
             it->scene->batchTransforms.clear();
             it->scene->batchIdentities.clear();
+            it->scene->dynamicGeometry.reset();
             it->scene->bones = nullptr;
             it->scene->sourceMaterials = nullptr;
             it->scene->sourceTerrainMaterials = nullptr;
@@ -500,6 +559,11 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
     appendScenes(gpu->GetStaticInstanceData(), gpu->GetStaticInstanceIdentities());
     appendScenes(gpu->GetTerrainInstanceData(), gpu->GetTerrainInstanceIdentities());
     appendScenes(gpu->GetTransparentInstanceData(), gpu->GetTransparentInstanceIdentities());
+    appendScenes(gpu->GetDynamicInstanceData(), gpu->GetDynamicInstanceIdentities());
+    const auto& dynamicKeys = gpu->GetDynamicMeshKeys();
+    const size_t dynamicKeyCount = dynamicKeys.size();
+    HashSceneData(signature, &dynamicKeyCount, sizeof(dynamicKeyCount));
+    HashSceneData(signature, dynamicKeys.data(), dynamicKeyCount * sizeof(ClusterMeshKey));
     auto appendBatches = [&](const xr_vector<GeometryBatch>& batches)
     {
         append(batches.size());
@@ -531,7 +595,7 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
     };
     appendBatches(world);
     appendBatches(hud);
-    const auto frame = detail ? detail->GetCompletedVisibilityFrame() : nullptr;
+    const auto frame = detail ? detail->GetCompletedRayVisibilityFrame() : nullptr;
     if (frame && frame->source)
     {
         append(frame->source->id);
@@ -592,13 +656,23 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
         desc.isAccelStructBuildInput = true;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
-        EnsureRTBuffer(m_device->GetNVRHIDevice(), geometry->vertices, desc);
+        if (!EnsureRTBuffer(m_device->GetNVRHIDevice(), geometry->vertices, desc))
+        {
+            geometry->failed = true;
+            m_staticGeometry = std::move(geometry);
+            return;
+        }
         desc.debugName = "RT_EmptySourceIndices";
         desc.byteSize = sizeof(u32);
         desc.structStride = 0;
         desc.canHaveRawViews = true;
         desc.isIndexBuffer = true;
-        EnsureRTBuffer(m_device->GetNVRHIDevice(), geometry->indices, desc);
+        if (!EnsureRTBuffer(m_device->GetNVRHIDevice(), geometry->indices, desc))
+        {
+            geometry->failed = true;
+            m_staticGeometry = std::move(geometry);
+            return;
+        }
     }
     const auto& staticArgs = gpu->GetStaticDrawArgsData();
     const auto& staticInstances = gpu->GetStaticInstanceData();
@@ -669,8 +743,12 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
         if (geometry->batches.size() == firstBatch)
             return;
         shared.handle = device->createAccelStruct(shared.desc);
-        R_ASSERT2(shared.handle, "[RT] shared BLAS allocation failed");
-        geometry->instances.push_back(RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), true));
+        if (!shared.handle)
+        {
+            geometry->failed = true;
+            return;
+        }
+        geometry->instances.push_back(RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), true, RT_MASK_WORLD));
         geometry->instanceBatches.push_back(-1);
         geometry->builds.push_back(std::move(shared));
     };
@@ -697,7 +775,11 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
                 build.desc.addBottomLevelGeometry(RTTriangles(geometry->vertices, geometry->indices,
                     GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, true));
                 build.handle = device->createAccelStruct(build.desc);
-                R_ASSERT2(build.handle, "[RT] instanced BLAS allocation failed");
+                if (!build.handle)
+                {
+                    geometry->failed = true;
+                    return;
+                }
                 buildIndex = u32(geometry->builds.size());
                 geometry->builds.push_back(std::move(build));
                 unique.emplace(key, buildIndex);
@@ -706,7 +788,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
                 buildIndex = found->second;
             const u32 batchIndex = u32(geometry->batches.size());
             geometry->instances.push_back(RTInstance(geometry->builds[buildIndex].handle,
-                batchIndex, RTBatchTransformOf(Fidentity), true));
+                batchIndex, RTBatchTransformOf(Fidentity), true, RT_MASK_WORLD));
             geometry->instanceBatches.push_back(s32(batchIndex));
             geometry->batches.push_back({ materials[i], startIndex, baseVertex, indexCount });
             geometry->batchSources.push_back({ arrayIndex, i });
@@ -727,6 +809,11 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
     const u32 instancedFirst = u32(geometry->batches.size());
     appendInstanceBatches(RT_SOURCE_STATIC, staticArgs, staticMaterials, staticInstances, &staticCounts);
     geometry->counts.instancedTotal = u32(geometry->batches.size()) - instancedFirst;
+    if (geometry->failed)
+    {
+        m_staticGeometry = std::move(geometry);
+        return;
+    }
     R_ASSERT(geometry->batchSources.size() == geometry->batches.size());
     R_ASSERT(geometry->instanceBatches.size() == geometry->instances.size());
     m_textureScratch.clear();
@@ -737,6 +824,101 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
     geometry->textures.Capture(m_textureScratch);
     m_staticGeometry = std::move(geometry);
     m_staticSignature = signature;
+}
+
+bool RTDynamicRange::operator<(const RTDynamicRange& other) const
+{
+    if (vertexOffset != other.vertexOffset)
+        return vertexOffset < other.vertexOffset;
+    if (indexOffset != other.indexOffset)
+        return indexOffset < other.indexOffset;
+    if (vertexCount != other.vertexCount)
+        return vertexCount < other.vertexCount;
+    return indexCount < other.indexCount;
+}
+
+bool RTAccelStructManager::EnsureDynamicGeometry(GPUCullingManager* gpu)
+{
+    auto* vertices = gpu->GetRTVertexBuffer();
+    auto* indices = gpu->GetRTIndexBuffer();
+    R_ASSERT(vertices && indices);
+    if (!m_dynamicGeometry || m_dynamicSourceVertices != vertices || m_dynamicSourceIndices != indices)
+    {
+        m_dynamicGeometry = std::make_shared<RTDynamicGeometry>();
+        m_dynamicSourceVertices = vertices;
+        m_dynamicSourceIndices = indices;
+    }
+    if (m_dynamicGeometry->failed)
+        return false;
+    auto* device = m_device->GetNVRHIDevice();
+    const auto& keys = gpu->GetDynamicMeshKeys();
+    for (const auto& key : keys)
+    {
+        if (!key.vertexCount || !key.indexCount)
+            continue;
+        R_ASSERT(key.indexCount % 3 == 0);
+        R_ASSERT(key.vertexOffset <= 0x7FFFFFFFu);
+        R_ASSERT(u64(key.vertexOffset) + key.vertexCount <= gpu->GetRTVertexCount());
+        R_ASSERT(u64(key.indexOffset) + key.indexCount <= gpu->GetRTIndexCount());
+        RTDynamicRange range = {};
+        range.vertexOffset = key.vertexOffset;
+        range.indexOffset = key.indexOffset;
+        range.vertexCount = key.vertexCount;
+        range.indexCount = key.indexCount;
+        if (m_dynamicGeometry->recordBuilds.find(range) != m_dynamicGeometry->recordBuilds.end())
+            continue;
+        RTGeometryBuild build;
+        build.desc.debugName = "RT_DynamicBLAS";
+        build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+        build.desc.addBottomLevelGeometry(RTTriangles(vertices, indices, GPUCullingManager::RT_VERTEX_STRIDE,
+            range.vertexOffset, range.vertexCount, range.indexOffset, range.indexCount, true));
+        build.handle = device->createAccelStruct(build.desc);
+        if (!build.handle)
+        {
+            m_dynamicGeometry->failed = true;
+            return false;
+        }
+        m_dynamicGeometry->recordBuilds.emplace(range, u32(m_dynamicGeometry->builds.size()));
+        m_dynamicGeometry->builds.push_back(std::move(build));
+        m_dynamicGeometry->recorded = false;
+    }
+    return true;
+}
+
+void RTAccelStructManager::PrepareDynamic(RTSceneGeneration& scene, GPUCullingManager* gpu)
+{
+    if (!m_dynamicGeometry)
+        return;
+    const auto& instances = gpu->GetDynamicInstanceData();
+    const auto& identities = gpu->GetDynamicInstanceIdentities();
+    const auto& keys = gpu->GetDynamicMeshKeys();
+    R_ASSERT(instances.size() == identities.size());
+    R_ASSERT(instances.size() == keys.size());
+    const u32 firstBatch = u32(scene.batches.size());
+    for (u32 i = 0; i < keys.size(); ++i)
+    {
+        RTDynamicRange range = {};
+        range.vertexOffset = keys[i].vertexOffset;
+        range.indexOffset = keys[i].indexOffset;
+        range.vertexCount = keys[i].vertexCount;
+        range.indexCount = keys[i].indexCount;
+        auto found = m_dynamicGeometry->recordBuilds.find(range);
+        if (found == m_dynamicGeometry->recordBuilds.end())
+            continue;
+        const u32 batchIndex = u32(scene.batches.size());
+        const RTBatchTransform transform = RTBatchTransformOf(instances[i].world);
+        const u64 identity = RTInstanceIdentity(identities[i]);
+        scene.instances.push_back(RTInstance(m_dynamicGeometry->builds[found->second].handle,
+            batchIndex, transform, true, RT_MASK_WORLD));
+        scene.batches.push_back({ instances[i].materialID, range.indexOffset, s32(range.vertexOffset), range.indexCount });
+        scene.batchTransforms.push_back(transform);
+        scene.batchIdentities.push_back(identity);
+        AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, batchIndex,
+            instances[i].materialID, range.indexCount, identity);
+    }
+    const u32 count = u32(scene.batches.size()) - firstBatch;
+    scene.counts.instancedTotal += count;
+    scene.counts.dynamic = count;
 }
 
 u32 RTAccelStructManager::GetSkinningFormatID(u32 poolFormat)
@@ -787,6 +969,10 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         return;
     const auto& pools = gpu->GetSkinnedPools();
     u64 vertexCount = 0;
+    u64 indexCount = 0;
+    u64 topologyKey = RT_IDENTITY_SEED;
+    xr_vector<RTSkinSourcePlan> plans;
+    plans.reserve(world.size() + hud.size());
     auto slotOf = [&](nvrhi::IBuffer* source)
     {
         for (u32 slot = 0; slot < scene.skinSources.size(); ++slot)
@@ -797,7 +983,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         scene.skinSources.push_back(source);
         return u32(scene.skinSources.size() - 1);
     };
-    auto append = [&](const GeometryBatch& batch)
+    auto append = [&](const GeometryBatch& batch, xr_vector<RTSkinJob>& jobs)
     {
         R_ASSERT(batch.visual && batch.indexCount && batch.isSkinned);
         CKinematics* skeleton = nullptr;
@@ -812,9 +998,8 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
             && format < SkinnedGeometryPools::FORMAT_COUNT;
         const u32 vertices = batch.vertexCount;
         R_ASSERT(vertices && vertexCount + vertices <= UINT32_MAX
-            && scene.skinIndexData.size() + u64(batch.indexCount) <= UINT32_MAX);
+            && indexCount + u64(batch.indexCount) <= UINT32_MAX);
         nvrhi::IBuffer* source = nullptr;
-        const u16* indices = nullptr;
         IndexStagingBuffer* mapped = nullptr;
         u32 stride = 0;
         u32 baseVertex = 0;
@@ -829,8 +1014,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
             formatID = GetSkinningFormatID(format);
             R_ASSERT(batch.skinnedPoolBaseVertex >= 0
                 && u64(baseVertex) + vertices <= pools.GetVertexCount(format));
-            indices = pools.GetIndexRange(format, batch.skinnedPoolFirstIndex, batch.indexCount);
-            if (!indices)
+            if (!pools.GetIndexRange(format, batch.skinnedPoolFirstIndex, batch.indexCount))
                 FATAL_F("[RT] pooled skinned index range %u+%u escapes format %u",
                     batch.skinnedPoolFirstIndex, batch.indexCount, format);
         }
@@ -848,9 +1032,6 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
                 FATAL_F("[RT] skinned index range %u+%u escapes its retained staging allocation",
                     batch.startIndex, batch.indexCount);
             mapped = mesh->p_rm_Indices;
-            const auto* host = static_cast<const u16*>(mapped->Map(0, 0, true));
-            R_ASSERT(host);
-            indices = host + batch.startIndex;
         }
         R_ASSERT(stride && (u64(baseVertex) + vertices) * stride <= source->getDesc().byteSize);
         RTSkinJob job;
@@ -866,51 +1047,146 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         job.constants.outputOffset = u32(vertexCount);
         job.constants.inputBaseVertex = baseVertex;
         job.sourceSlot = slotOf(source);
-        job.indexOffset = u32(scene.skinIndexData.size());
+        job.indexOffset = u32(indexCount);
         job.indexCount = batch.indexCount;
         job.materialID = batch.bindlessMaterialID;
         job.geometryID = RTInstanceIdentity(batch.renderableLifetimeID, batch.visualLifetimeID,
             batch.geometrySubset);
-        for (u32 i = 0; i < batch.indexCount; ++i)
-        {
-            const u32 index = indices[i];
-            R_ASSERT(index < vertices);
-            scene.skinIndexData.push_back(index);
-        }
-        if (mapped)
-            mapped->Unmap();
+        RTSkinSourcePlan plan;
+        plan.source = source;
+        plan.staging = mapped;
+        plan.format = format;
+        plan.firstIndex = pooled ? batch.skinnedPoolFirstIndex : batch.startIndex;
+        plan.indexCount = batch.indexCount;
+        plan.indexOffset = u32(indexCount);
+        plan.vertexCount = vertices;
+        plan.baseVertex = baseVertex;
+        plan.pooled = pooled;
+        topologyKey = RTIdentity(topologyKey, batch.renderableLifetimeID);
+        topologyKey = RTIdentity(topologyKey, batch.visualLifetimeID);
+        topologyKey = RTIdentity(topologyKey, u64(batch.geometrySubset));
+        topologyKey = RTIdentity(topologyKey, u64(pooled ? format : 0xFFFFFFFFu));
+        topologyKey = RTIdentity(topologyKey, u64(plan.firstIndex));
+        topologyKey = RTIdentity(topologyKey, u64(batch.indexCount));
+        topologyKey = RTIdentity(topologyKey, u64(vertices));
+        topologyKey = RTIdentity(topologyKey, u64(baseVertex));
+        topologyKey = RTIdentity(topologyKey, u64(reinterpret_cast<size_t>(source)));
+        topologyKey = RTIdentity(topologyKey, u64(reinterpret_cast<size_t>(mapped)));
+        plans.push_back(plan);
+        indexCount += batch.indexCount;
         vertexCount += vertices;
-        scene.skinJobs.push_back(std::move(job));
+        jobs.push_back(std::move(job));
     };
     for (const auto& batch : world)
-        append(batch);
+        append(batch, scene.skinJobs);
     for (const auto& batch : hud)
-        append(batch);
-    auto* device = m_device->GetNVRHIDevice();
-    EnsureRTBuffer(device, scene.skinnedVertices, RTVertexBufferDesc("RT_SkinVertices", vertexCount * SKIN_VERTEX_STRIDE));
-    EnsureRTBuffer(device, scene.skinnedIndices, RTVertexBufferDesc("RT_SkinIndices", scene.skinIndexData.size() * sizeof(u32)));
-    scene.bones = gpu->GetGlobalBoneBuffer();
-    R_ASSERT(scene.bones);
-    scene.skinBuild.desc.debugName = "RT_SkinBLAS";
-    scene.skinBuild.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
-    const u32 firstBatch = u32(scene.batches.size());
-    const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
-    for (const auto& job : scene.skinJobs)
+        append(batch, scene.hudSkinJobs);
+    topologyKey = RTIdentity(topologyKey, indexCount);
+    topologyKey = RTIdentity(topologyKey, u64(plans.size()));
+    std::shared_ptr<RTSkinTopology> topology;
+    auto cached = m_skinTopologies.find(topologyKey);
+    if (cached != m_skinTopologies.end() && cached->second->indexCount == u32(indexCount))
+        topology = cached->second;
+    for (auto it = m_skinTopologies.begin(); it != m_skinTopologies.end();)
     {
-        scene.skinBuild.desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices,
-            scene.skinnedIndices, SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
-            job.indexOffset, job.indexCount, true));
-        const u32 batchIndex = u32(scene.batches.size());
-        scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
-        scene.batchTransforms.push_back(identityTransform);
-        scene.batchIdentities.push_back(job.geometryID);
-        AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, batchIndex,
-            job.materialID, job.indexCount, job.geometryID);
+        if (it->second.use_count() == 1)
+            it = m_skinTopologies.erase(it);
+        else
+            ++it;
     }
-    scene.skinBuild.handle = device->createAccelStruct(scene.skinBuild.desc);
-    R_ASSERT2(scene.skinBuild.handle, "[RT] skin BLAS allocation failed");
-    scene.instances.push_back(RTInstance(scene.skinBuild.handle, firstBatch, identityTransform, true));
-    scene.counts.skinned = u32(scene.skinJobs.size());
+    auto* device = m_device->GetNVRHIDevice();
+    if (!topology)
+    {
+        topology = std::make_shared<RTSkinTopology>();
+        topology->indexCount = u32(indexCount);
+        topology->staging.resize(size_t(indexCount));
+        for (const auto& plan : plans)
+        {
+            const u16* indices = nullptr;
+            if (plan.pooled)
+            {
+                indices = pools.GetIndexRange(plan.format, plan.firstIndex, plan.indexCount);
+                if (!indices)
+                    FATAL_F("[RT] pooled skinned index range %u+%u escapes format %u",
+                        plan.firstIndex, plan.indexCount, plan.format);
+            }
+            else
+            {
+                R_ASSERT(plan.staging);
+                const auto* host = static_cast<const u16*>(plan.staging->Map(0, 0, true));
+                R_ASSERT(host);
+                indices = host + plan.firstIndex;
+            }
+            for (u32 i = 0; i < plan.indexCount; ++i)
+            {
+                const u32 index = indices[i];
+                R_ASSERT(index < plan.vertexCount);
+                topology->staging[size_t(plan.indexOffset) + i] = index;
+            }
+            if (plan.staging)
+                plan.staging->Unmap();
+        }
+        if (!EnsureRTBuffer(device, topology->indices,
+            RTVertexBufferDesc("RT_SkinIndices", indexCount * sizeof(u32))))
+        {
+            scene.failed = true;
+            return;
+        }
+        topology->uploadPending = true;
+        m_skinTopologies[topologyKey] = topology;
+    }
+    scene.skinTopology = topology;
+    scene.skinnedIndices = topology->indices;
+    if (!EnsureRTBuffer(device, scene.skinnedVertices,
+        RTVertexBufferDesc("RT_SkinVertices", vertexCount * SKIN_VERTEX_STRIDE)))
+    {
+        scene.failed = true;
+        return;
+    }
+    scene.bones = gpu->GetGlobalBoneBuffer();
+    if (!scene.bones)
+    {
+        scene.failed = true;
+        return;
+    }
+    const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
+    auto buildSkin = [&](xr_vector<RTSkinJob>& jobs, RTGeometryBuild& build, const char* name, u32 mask)
+    {
+        if (jobs.empty())
+            return;
+        build.desc.debugName = name;
+        build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+        const u32 firstBatch = u32(scene.batches.size());
+        for (const auto& job : jobs)
+        {
+            build.desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices, topology->indices,
+                SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
+                job.indexOffset, job.indexCount, true));
+            const u32 batchIndex = u32(scene.batches.size());
+            scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
+            scene.batchTransforms.push_back(identityTransform);
+            scene.batchIdentities.push_back(job.geometryID);
+            if (mask == RT_MASK_WORLD)
+                AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, batchIndex,
+                    job.materialID, job.indexCount, job.geometryID);
+            else
+                scene.emissiveBatchOffsets.push_back(UINT32_MAX);
+        }
+        build.handle = device->createAccelStruct(build.desc);
+        if (!build.handle)
+        {
+            scene.failed = true;
+            return;
+        }
+        scene.instances.push_back(RTInstance(build.handle, firstBatch, identityTransform, true, mask));
+    };
+    buildSkin(scene.skinJobs, scene.skinBuild, "RT_SkinBLAS", RT_MASK_WORLD);
+    if (scene.failed)
+        return;
+    buildSkin(scene.hudSkinJobs, scene.hudSkinBuild, "RT_HudSkinBLAS", RT_MASK_HUD);
+    if (scene.failed)
+        return;
+    scene.counts.skinned = u32(scene.skinJobs.size() + scene.hudSkinJobs.size());
 }
 
 bool RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGeneration& source)
@@ -986,7 +1262,9 @@ bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool ne
         return false;
     if (needsSkin && !InitSkinningPipeline())
         return false;
-    const auto frame = detail ? detail->GetCompletedVisibilityFrame() : nullptr;
+    const auto frame = detail ? detail->GetCompletedRayVisibilityFrame() : nullptr;
+    if (detail && detail->IsRayTracingCoverageEnabled() && (!frame || !frame->source || !frame->statsReady))
+        return false;
     if (!frame || !frame->source || frame->source->chunks.empty())
         return true;
     const auto& source = *frame->source;
@@ -1017,7 +1295,12 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     scene.grassLayout = nullptr;
     if (!detail)
         return;
-    auto frame = detail->GetCompletedVisibilityFrame();
+    auto frame = detail->GetCompletedRayVisibilityFrame();
+    if (detail->IsRayTracingCoverageEnabled() && (!frame || !frame->source || !frame->statsReady))
+    {
+        scene.failed = true;
+        return;
+    }
     if (!frame || !frame->source || frame->source->chunks.empty())
         return;
     const auto& source = *frame->source;
@@ -1032,6 +1315,11 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
             return;
         scene.grassPipeline = s_billboardPipeline;
         scene.grassLayout = s_billboardLayout;
+        if (!scene.grassPipeline || !scene.grassLayout)
+        {
+            scene.failed = true;
+            return;
+        }
         scene.billboardConstants.maxVertsPerBillboard = maximum;
         scene.billboardConstants.billboardCount = stats.visibleBillboardCount;
         vertices = u64(maximum) * stats.visibleBillboardCount;
@@ -1046,6 +1334,11 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
             return;
         scene.grassPipeline = s_grassPipeline;
         scene.grassLayout = s_grassLayout;
+        if (!scene.grassPipeline || !scene.grassLayout)
+        {
+            scene.failed = true;
+            return;
+        }
         scene.grassWind = detail->perlin4dTexture;
         GrassRTCB constants = {};
         const float angle = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.wind_direction : 0.0f;
@@ -1082,18 +1375,26 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     scene.grassVertexCount = u32(vertices);
     scene.grassIndexCount = u32(indices);
     auto* device = m_device->GetNVRHIDevice();
-    EnsureRTBuffer(device, scene.grassVertices, RTVertexBufferDesc("RT_GrassVertices", vertices * 24));
-    EnsureRTBuffer(device, scene.grassIndices, RTVertexBufferDesc("RT_GrassIndices", indices * sizeof(u32)));
+    if (!EnsureRTBuffer(device, scene.grassVertices, RTVertexBufferDesc("RT_GrassVertices", vertices * 24)) ||
+        !EnsureRTBuffer(device, scene.grassIndices, RTVertexBufferDesc("RT_GrassIndices", indices * sizeof(u32))))
+    {
+        scene.failed = true;
+        return;
+    }
     scene.grassBuild.desc.debugName = "RT_GrassBLAS";
     scene.grassBuild.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
     scene.grassBuild.desc.addBottomLevelGeometry(RTTriangles(scene.grassVertices, scene.grassIndices,
         24, 0, scene.grassVertexCount, 0, scene.grassIndexCount, !scene.billboard));
     scene.grassBuild.handle = device->createAccelStruct(scene.grassBuild.desc);
-    R_ASSERT2(scene.grassBuild.handle, "[RT] grass BLAS allocation failed");
+    if (!scene.grassBuild.handle)
+    {
+        scene.failed = true;
+        return;
+    }
     const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
     const u32 grassBatch = u32(scene.batches.size());
     scene.instances.push_back(RTInstance(scene.grassBuild.handle, grassBatch,
-        identityTransform, !scene.billboard));
+        identityTransform, !scene.billboard, RT_MASK_WORLD));
     scene.batches.push_back({ 0, 0, 0, scene.grassIndexCount });
     scene.batchTransforms.push_back(identityTransform);
     scene.batchIdentities.push_back(0);
@@ -1121,12 +1422,16 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     }
     auto& scene = *next;
     scene.geometry = m_staticGeometry;
+    scene.dynamicGeometry.reset();
     scene.skinBuild = {};
+    scene.hudSkinBuild = {};
     scene.grassBuild = {};
     scene.skinJobs.clear();
+    scene.hudSkinJobs.clear();
     scene.skinSources.clear();
     scene.grassJobs.clear();
-    scene.skinIndexData.clear();
+    scene.skinTopology.reset();
+    scene.skinnedIndices = nullptr;
     scene.batches = m_staticGeometry->batches;
     scene.instances = m_staticGeometry->instances;
     scene.counts = m_staticGeometry->counts;
@@ -1177,9 +1482,20 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
         AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, i, batch.materialID,
             batch.indexCount, scene.batchIdentities[i]);
     }
+    if (gpu->GetRTVertexBuffer() && gpu->GetRTIndexBuffer())
+    {
+        if (!EnsureDynamicGeometry(gpu))
+        {
+            scene.failed = true;
+            m_scene.reset();
+            return;
+        }
+        scene.dynamicGeometry = m_dynamicGeometry;
+        PrepareDynamic(scene, gpu);
+    }
     PrepareSkin(scene, gpu, world, hud);
     PrepareGrass(scene, detail);
-    if (scene.instances.empty())
+    if (scene.failed || scene.instances.empty())
     {
         m_scene.reset();
         return;
@@ -1191,39 +1507,60 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     tlas.topLevelMaxInstances = u32(scene.instances.size());
     tlas.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
     scene.tlas = device->createAccelStruct(tlas);
-    R_ASSERT2(scene.tlas, "[RT] TLAS allocation failed");
+    if (!scene.tlas)
+    {
+        scene.failed = true;
+        m_scene.reset();
+        return;
+    }
     nvrhi::BufferDesc batches;
     batches.debugName = "RT_BatchInfo";
     batches.byteSize = scene.batches.size() * sizeof(RTBatchInfo);
     batches.structStride = sizeof(RTBatchInfo);
     batches.initialState = nvrhi::ResourceStates::ShaderResource;
     batches.keepInitialState = true;
-    EnsureRTBuffer(device, scene.batchInfo, batches);
     R_ASSERT(scene.batchTransforms.size() == scene.batches.size());
     R_ASSERT(scene.batchIdentities.size() == scene.batches.size());
     R_ASSERT(scene.emissiveBatchOffsets.size() == scene.batches.size());
     scene.emissiveCount = u32(scene.emissiveTriangles.size());
-    EnsureRTBuffer(device, scene.emissiveTriangleBuffer, RTTableBufferDesc("RT_EmissiveTriangles",
-        sizeof(RTEmissiveTriangle), scene.emissiveTriangles.size()));
-    EnsureRTBuffer(device, scene.batchTransformBuffer, RTTableBufferDesc("RT_BatchTransforms",
-        sizeof(RTBatchTransform), scene.batchTransforms.size()));
-    EnsureRTBuffer(device, scene.emissiveBatchOffsetBuffer, RTTableBufferDesc("RT_EmissiveBatchOffsets",
-        sizeof(u32), scene.emissiveBatchOffsets.size()));
+    if (!EnsureRTBuffer(device, scene.batchInfo, batches) ||
+        !EnsureRTBuffer(device, scene.emissiveTriangleBuffer, RTTableBufferDesc("RT_EmissiveTriangles",
+            sizeof(RTEmissiveTriangle), scene.emissiveTriangles.size())) ||
+        !EnsureRTBuffer(device, scene.batchTransformBuffer, RTTableBufferDesc("RT_BatchTransforms",
+            sizeof(RTBatchTransform), scene.batchTransforms.size())) ||
+        !EnsureRTBuffer(device, scene.emissiveBatchOffsetBuffer, RTTableBufferDesc("RT_EmissiveBatchOffsets",
+            sizeof(u32), scene.emissiveBatchOffsets.size())))
+    {
+        scene.failed = true;
+        m_scene.reset();
+        return;
+    }
     scene.sourceMaterials = bindless::MaterialBuffer::Instance().GetBuffer();
     scene.sourceTerrainMaterials = bindless::TerrainMaterialBuffer::Instance().GetBuffer();
     scene.sourceVariants = bindless::VariantBuffer::Instance().GetBuffer();
-    R_ASSERT(scene.sourceMaterials && scene.sourceTerrainMaterials && scene.sourceVariants);
+    if (!scene.sourceMaterials || !scene.sourceTerrainMaterials || !scene.sourceVariants)
+    {
+        scene.failed = true;
+        m_scene.reset();
+        return;
+    }
     auto materialDesc = scene.sourceMaterials->getDesc();
     materialDesc.debugName = "RT_MaterialSnapshot";
-    EnsureRTBuffer(device, scene.materials, materialDesc);
+    bool snapshotReady = EnsureRTBuffer(device, scene.materials, materialDesc);
     materialDesc = scene.sourceTerrainMaterials->getDesc();
     materialDesc.debugName = "RT_TerrainMaterialSnapshot";
-    EnsureRTBuffer(device, scene.terrainMaterials, materialDesc);
+    snapshotReady &= EnsureRTBuffer(device, scene.terrainMaterials, materialDesc);
     auto variantDesc = scene.sourceVariants->getDesc();
     variantDesc.debugName = "RT_VariantSnapshot";
-    EnsureRTBuffer(device, scene.variants, variantDesc);
+    snapshotReady &= EnsureRTBuffer(device, scene.variants, variantDesc);
+    if (!snapshotReady)
+    {
+        scene.failed = true;
+        m_scene.reset();
+        return;
+    }
     m_textureScratch.clear();
-    const u32 skinEnd = u32(scene.geometry->batches.size()) + scene.counts.skinned;
+    const u32 skinEnd = u32(scene.geometry->batches.size()) + scene.counts.dynamic + scene.counts.skinned;
     const u32 terrainEnd = scene.counts.identityStatic + scene.counts.terrain;
     for (u32 i = 0; i < skinEnd; ++i)
         AppendMaterialTextures(scene.batches[i].materialID, i >= scene.counts.identityStatic && i < terrainEnd);
@@ -1269,8 +1606,10 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
     if (!m_rtSupported || !gpu || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
         return false;
     RetireScenes();
+    if ((gpu->GetRTVertexBuffer() || gpu->GetRTIndexBuffer()) && !gpu->IsRTSourceReady())
+        return false;
     PrepareStatic(gpu);
-    if (!m_staticGeometry)
+    if (!m_staticGeometry || m_staticGeometry->failed)
         return false;
     const u64 signature = ComputeSceneSignature(gpu, detail, world, hud);
     if (!m_scene || signature != m_sceneSignature || m_scene->geometry != m_staticGeometry || !m_scene->recorded)
@@ -1389,11 +1728,23 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
                     data.structures.push_back(pb.write(builder.ImportAccelerationStructure(
                         build.desc.debugName.c_str(), build.handle), ResourceState::AccelStructWrite));
             };
+            bool sourceDeclared = false;
             if (!scene->geometry->recorded)
             {
                 input(resources.vertices);
                 input(resources.indices);
+                sourceDeclared = true;
                 for (const auto& build : scene->geometry->builds)
+                    output(build);
+            }
+            if (scene->dynamicGeometry && !scene->dynamicGeometry->recorded)
+            {
+                if (!sourceDeclared)
+                {
+                    input(resources.vertices);
+                    input(resources.indices);
+                }
+                for (const auto& build : scene->dynamicGeometry->builds)
                     output(build);
             }
             if (scene->counts.skinned)
@@ -1401,6 +1752,7 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
                 input(resources.skinnedVertices);
                 input(resources.skinnedIndices);
                 output(scene->skinBuild);
+                output(scene->hudSkinBuild);
             }
             if (scene->counts.grass)
             {
@@ -1429,7 +1781,13 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             };
             for (const auto& build : scene->geometry->builds)
                 input(build);
+            if (scene->dynamicGeometry)
+            {
+                for (const auto& build : scene->dynamicGeometry->builds)
+                    input(build);
+            }
             input(scene->skinBuild);
+            input(scene->hudSkinBuild);
             input(scene->grassBuild);
         },
         [](const RTBuildPassData& data, const FrameGraph& fg, RenderContext* ctx)
@@ -1480,25 +1838,36 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     if (scene.counts.skinned)
     {
         auto* output = buffer(data.resources.skinnedVertices);
-        commandList->writeBuffer(buffer(data.resources.skinnedIndices), scene.skinIndexData.data(),
-            scene.skinIndexData.size() * sizeof(u32));
+        R_ASSERT(scene.skinTopology);
+        if (scene.skinTopology->uploadPending)
+        {
+            commandList->writeBuffer(buffer(data.resources.skinnedIndices),
+                scene.skinTopology->staging.data(), scene.skinTopology->staging.size() * sizeof(u32));
+            scene.skinTopology->staging.clear();
+            scene.skinTopology->staging.shrink_to_fit();
+            scene.skinTopology->uploadPending = false;
+        }
         const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
         R_ASSERT(reflection);
         auto* bones = buffer(data.bones);
-        for (const auto& job : scene.skinJobs)
+        for (u32 list = 0; list < 2; ++list)
         {
-            framegraph::BindingSetBuilder bindings(*reflection, device, "RT.SkinVertices");
-            bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[job.sourceSlot]))
-                .BufferSRV("g_BoneMatrices", bones)
-                .BufferUAV("g_Output", output).ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
-            auto bindingSet = device->createBindingSet(bindings.Build(), s_skinLayout);
-            R_ASSERT(bindingSet);
-            commandList->writeBuffer(m_device->GetNativeBuffer(s_skinCB), &job.constants, sizeof(job.constants));
-            nvrhi::ComputeState state;
-            state.pipeline = s_skinPipeline;
-            state.bindings = { bindingSet };
-            commandList->setComputeState(state);
-            commandList->dispatch((job.constants.vertexCount + 255) / 256, 1, 1);
+            const xr_vector<RTSkinJob>& jobs = list == 0 ? scene.skinJobs : scene.hudSkinJobs;
+            for (const auto& job : jobs)
+            {
+                framegraph::BindingSetBuilder bindings(*reflection, device, "RT.SkinVertices");
+                bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[job.sourceSlot]))
+                    .BufferSRV("g_BoneMatrices", bones)
+                    .BufferUAV("g_Output", output).ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
+                auto bindingSet = device->createBindingSet(bindings.Build(), s_skinLayout);
+                R_ASSERT(bindingSet);
+                commandList->writeBuffer(m_device->GetNativeBuffer(s_skinCB), &job.constants, sizeof(job.constants));
+                nvrhi::ComputeState state;
+                state.pipeline = s_skinPipeline;
+                state.bindings = { bindingSet };
+                commandList->setComputeState(state);
+                commandList->dispatch((job.constants.vertexCount + 255) / 256, 1, 1);
+            }
         }
     }
     if (!scene.counts.grass)
@@ -1568,16 +1937,26 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
         auto* destination = graph.GetPhysicalAccelerationStructure(data.structures[index++]);
         nvrhi::utils::BuildBottomLevelAccelStruct(commandList, destination, item.desc);
     };
-    if (!data.scene->geometry->recorded)
+    const auto& scene = *data.scene;
+    if (!scene.geometry->recorded)
     {
-        for (const auto& item : data.scene->geometry->builds)
+        for (const auto& item : scene.geometry->builds)
             build(item);
-        data.scene->geometry->recorded = true;
+        scene.geometry->recorded = true;
     }
-    if (data.scene->counts.skinned)
-        build(data.scene->skinBuild);
-    if (data.scene->counts.grass)
-        build(data.scene->grassBuild);
+    if (scene.dynamicGeometry && !scene.dynamicGeometry->recorded)
+    {
+        for (const auto& item : scene.dynamicGeometry->builds)
+            build(item);
+        scene.dynamicGeometry->recorded = true;
+    }
+    if (scene.counts.skinned)
+    {
+        build(scene.skinBuild);
+        build(scene.hudSkinBuild);
+    }
+    if (scene.counts.grass)
+        build(scene.grassBuild);
     R_ASSERT(index == data.structures.size());
 }
 
@@ -1699,17 +2078,21 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
         result.accelerationBytes += bytes;
         result.accelerationBytesKnown &= bytes != 0;
     };
+    xr_set<RTSkinTopology*> countedTopologies;
     for (u32 i = 0; i < m_generations.size(); ++i)
     {
         const auto& scene = *m_generations[i];
         result.generationBytes += bufferBytes(scene.batchInfo) + bufferBytes(scene.materials) +
             bufferBytes(scene.terrainMaterials) + bufferBytes(scene.variants) +
             bufferBytes(scene.skinnedVertices) +
-            bufferBytes(scene.skinnedIndices) + bufferBytes(scene.grassVertices) + bufferBytes(scene.grassIndices) +
+            bufferBytes(scene.grassVertices) + bufferBytes(scene.grassIndices) +
             bufferBytes(scene.emissiveTriangleBuffer) + bufferBytes(scene.batchTransformBuffer) +
             bufferBytes(scene.emissiveBatchOffsetBuffer);
+        if (scene.skinTopology && countedTopologies.insert(scene.skinTopology.get()).second)
+            result.generationBytes += bufferBytes(scene.skinTopology->indices);
         acceleration(scene.tlas);
         acceleration(scene.skinBuild.handle);
+        acceleration(scene.hudSkinBuild.handle);
         acceleration(scene.grassBuild.handle);
         bool first = scene.geometry != nullptr;
         for (u32 j = 0; j < i; ++j)
@@ -1723,6 +2106,19 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
             for (const auto& build : scene.geometry->builds)
                 acceleration(build.handle);
         }
+        bool firstDynamic = scene.dynamicGeometry != nullptr;
+        for (u32 j = 0; j < i; ++j)
+            firstDynamic &= m_generations[j]->dynamicGeometry != scene.dynamicGeometry;
+        if (firstDynamic)
+        {
+            for (const auto& build : scene.dynamicGeometry->builds)
+                acceleration(build.handle);
+        }
+    }
+    for (const auto& topology : m_skinTopologies)
+    {
+        if (countedTopologies.insert(topology.second.get()).second)
+            result.generationBytes += bufferBytes(topology.second->indices);
     }
     return result;
 }

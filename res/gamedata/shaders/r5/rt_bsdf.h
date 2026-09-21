@@ -11,6 +11,20 @@ float Luminance(float3 color)
     return dot(color, float3(0.2126, 0.7152, 0.0722));
 }
 
+MaterialSurface GBufferMaterialSurface(float4 normalData, float4 baseColorData, float2 materialData)
+{
+    MaterialSurface surface;
+    surface.albedo = baseColorData.rgb;
+    surface.N = normalize(normalData.xyz);
+    surface.roughness = abs(normalData.w);
+    surface.metallic = baseColorData.a;
+    surface.ao = 1.0;
+    surface.emissive = 0.0;
+    surface.shadingClass = GBufferShadingClass(materialData);
+    surface.transmission = materialData.y;
+    return surface;
+}
+
 void RTTangentFrame(float3 N, out float3 T, out float3 B)
 {
     float3 up = abs(N.y) < 0.999 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);

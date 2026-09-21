@@ -167,7 +167,32 @@ void StatsOverlay::Render()
         ImGui::Text("RT scene revision: %llu", static_cast<unsigned long long>(lighting.sceneRevision));
     }
     if (lighting.requested == render::fg::LightingMode::RTGI)
-        ImGui::Text("RTGI ReSTIR reuse: %s", lighting.reuseReservoirs ? "enabled" : "disabled");
+    {
+        ImGui::Text("RTGI implementation: %s", render::fg::RTGIImplementationName());
+        ImGui::Text("RTGI budgets: samples %u | bounces %u | ray distance %.0f m (%s)",
+            lighting.rtgiSamples, lighting.rtgiBounces, lighting.rtgiRayDistance,
+            lighting.rawSignalsRecorded ? "recorded" : "configured, not recorded");
+        ImGui::Text("RTGI reuse: requested %s | available %s | reservoirs %s",
+            lighting.reuseRequested ? "yes" : "no", lighting.reuseAvailable ? "yes" : "no",
+            lighting.reuseReservoirs ? "active" : "inactive");
+        if (lighting.reuseRequested && !lighting.reuseAvailable)
+            ImGui::TextDisabled("Reuse requested but unavailable: no reservoir reuse runs");
+        ImGui::Text("RTGI raw guides: %s", lighting.rawSignalsRecorded ? "recorded" : "not recorded");
+        const char* grassCoverage = !lighting.rayGrassEnabled ? "disabled"
+            : (lighting.rayGrassPending ? "pending/unavailable" : "covered");
+        ImGui::Text("RTGI ray scope: scene radius %.0f m (offscreen dynamic admission envelope) | grass radius %.0f m%s | grass coverage %s | frustum/HiZ-independent",
+            lighting.raySceneRadius, lighting.rayGrassRadius,
+            lighting.rayGrassRadius > 0.0f ? "" : " (radius 0)", grassCoverage);
+        ImGui::TextDisabled("Scene radius adds offscreen dynamic admission only; resident static coverage is retained and camera/shadow-admitted dynamics may extend farther");
+        ImGui::TextDisabled("RTGI rays: world only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | not reconstructed | not cached | not clamped");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("RTGI traces raw multibounce transport from raster primaries with world-only rays; HUD geometry stays visible in color but is excluded from world occlusion and reflection.\n"
+                "The scene radius only adds an offscreen dynamic admission envelope: resident static coverage is retained (static geometry is not clipped to that radius) and camera- or shadow-admitted dynamics may extend beyond it.\n"
+                "The primary geometric normal is the resolved primary shading normal, used as an approximation because no independent geometric normal exists.\n"
+                "Grass coverage is the actual ray membership, not the requested radius: disabled when details or RT support are unavailable or the radius is 0; pending/unavailable without a completed frame covering the current requested sphere and resident source; covered only with usable completed membership.\n"
+                "No legacy temporal estimator, no reference accumulation, no reservoir reuse, no reconstruction cache and no radiance clamp.\n"
+                "Admission and grass coverage are bounded radii independent of frustum and HiZ culling, so coverage is not the full world and cost is not uniform.");
+    }
     if (lighting.requested == render::fg::LightingMode::ReferencePT)
     {
         const RenderStats& rs = m_renderStats;
@@ -933,6 +958,17 @@ void StatsOverlay::RenderInspectorSection()
         ImGui::RadioButton("B", &m_channelMode, 3); ImGui::SameLine();
         ImGui::RadioButton("A", &m_channelMode, 4); ImGui::SameLine();
         ImGui::RadioButton("Depth", &m_channelMode, 5);
+        ImGui::TextDisabled("Depth reads raw device depth; RTGI raw/guide channel meanings on hover");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("RTGI raw signals and guides, defined for every in-bounds pixel:\n"
+                "RawDiffuse: RGB = direct diffuse + giIntensity x indirect diffuse, A = 1 on a valid surface. No albedo demodulation, no clamp, no tone map.\n"
+                "RawSpecular: RGB = direct specular + giIntensity x indirect specular, A = 1 on a valid surface.\n"
+                "Emission: RGB = primary source emission/sky copied before the composite writes scene color.\n"
+                "NormalRoughness / AlbedoMetallic: immutable primary copies (shading normal.xyz and |roughness|; albedo.rgb and metallic). The primary geometric normal fed to the integrator is this resolved shading normal, an approximation because no independent geometric normal exists.\n"
+                "PathData: R = mean first diffuse-lobe segment distance, G = mean first specular-lobe segment distance (miss = ray distance, 0 when the lobe is absent), B = valid-path fraction - not temporal confidence, A = mean traced scattering depth.\n"
+                "SurfaceData: R = linear camera distance to the primary, G = actual device depth including HUD encoding, B = bit flags (bit0 valid opaque primary, bit1 finite/usable motion): 0 background or invalid, 1 opaque without usable motion, 3 opaque with motion, A = 1 HUD / 0 world.\n"
+                "Motion: previousUV - currentUV from the raster primaries; xy stays zero when unusable or non-finite and SurfaceData.B reports it, so true static zero motion remains distinguishable from missing motion.\n"
+                "Normal/roughness, albedo/metallic and motion are immutable primary copies; no reconstruction pass consumes the guides in this build.");
 
         if (m_selectedRTMipCount > 1)
         {
@@ -1214,8 +1250,24 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
         rs.pathTracerSamples);
     text += line;
-    xr_sprintf(line, sizeof(line), "RTGI ReSTIR reuse: %s\n", rs.lighting.reuseReservoirs ? "enabled" : "disabled");
-    text += line;
+    if (rs.lighting.requested == render::fg::LightingMode::RTGI)
+    {
+        xr_sprintf(line, sizeof(line), "RTGI: implementation=%s | budgets samples=%u bounces=%u ray distance=%.0f m (%s) | reuse requested=%s available=%s reservoirs=%s | raw guides=%s\n",
+            render::fg::RTGIImplementationName(), rs.lighting.rtgiSamples, rs.lighting.rtgiBounces, rs.lighting.rtgiRayDistance,
+            rs.lighting.rawSignalsRecorded ? "recorded" : "configured, not recorded",
+            rs.lighting.reuseRequested ? "yes" : "no", rs.lighting.reuseAvailable ? "yes" : "no",
+            rs.lighting.reuseReservoirs ? "active" : "inactive",
+            rs.lighting.rawSignalsRecorded ? "recorded" : "not recorded");
+        text += line;
+        const char* grassCoverage = !rs.lighting.rayGrassEnabled ? "disabled"
+            : (rs.lighting.rayGrassPending ? "pending/unavailable" : "covered");
+        xr_sprintf(line, sizeof(line), "RTGI scope: scene radius=%.0f m adds an offscreen dynamic admission envelope (resident static coverage retained; camera/shadow-admitted dynamics may extend farther) | grass radius=%.0f m%s | grass coverage=%s (actual membership, not the requested radius) | frustum/HiZ-independent, bounded, not full-world\n",
+            rs.lighting.raySceneRadius, rs.lighting.rayGrassRadius,
+            rs.lighting.rayGrassRadius > 0.0f ? "" : " (radius 0)", grassCoverage);
+        text += line;
+        xr_sprintf(line, sizeof(line), "RTGI rays: world-only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | raw multibounce, unreconstructed, uncached, unclamped\n");
+        text += line;
+    }
     xr_sprintf(line, sizeof(line), "history: surfaces=%s | used=%s | RT scene revision=%llu | PT recorded samples=%u\n",
         rs.lighting.previousSurfacesValid ? "valid" : "rejected", rs.lighting.historyUsed ? "yes" : "no",
         static_cast<unsigned long long>(rs.lighting.sceneRevision), rs.lighting.recordedSamples);

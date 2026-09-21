@@ -24,11 +24,9 @@ public:
     u32 width = 0;
     u32 height = 0;
     u32 guideIndex = 0;
-    u32 reservoirIndex = 0;
     u64 lease = 0;
     bool surfacesRecorded = false;
     bool hizRecorded = false;
-    bool rtgiRecorded = false;
     passes::PathTracerHistory pathTracer;
     xr_vector<nvrhi::TextureHandle> textures;
 };

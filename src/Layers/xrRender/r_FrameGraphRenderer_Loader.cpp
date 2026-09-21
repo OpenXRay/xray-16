@@ -390,6 +390,8 @@ void FrameGraphRenderer::level_Unload()
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr->Initialize(m_device);
     }
+    if (m_detailManager)
+        m_detailManager->Unload();
     m_hudBatches.clear();
     GetGpuParticleManager().LevelUnload();
 

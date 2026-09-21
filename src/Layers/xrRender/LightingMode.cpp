@@ -11,8 +11,19 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
     conflictingRequests = requestRTGI && requestPT;
     recorded = false;
     recordedSamples = 0;
+    reuseRequested = false;
+    reuseAvailable = false;
+    reuseReservoirs = false;
     previousSurfacesValid = false;
     historyUsed = false;
+    rtgiBounces = 0;
+    rtgiSamples = 0;
+    rtgiRayDistance = 0.0f;
+    raySceneRadius = 0.0f;
+    rayGrassRadius = 0.0f;
+    rayGrassEnabled = false;
+    rayGrassPending = false;
+    rawSignalsRecorded = false;
     sceneRevision = 0;
 }
 
@@ -22,7 +33,9 @@ void LightingFrameState::Fail(LightingFallback reason)
     fallback = reason;
     recorded = false;
     recordedSamples = 0;
+    reuseReservoirs = false;
     historyUsed = false;
+    rawSignalsRecorded = false;
 }
 
 const char* LightingModeName(LightingMode mode)
@@ -34,6 +47,11 @@ const char* LightingModeName(LightingMode mode)
     case LightingMode::ReferencePT: return "Reference Path Tracer";
     }
     return "Unknown";
+}
+
+const char* RTGIImplementationName()
+{
+    return "raw multibounce v1";
 }
 
 const char* LightingFallbackName(LightingFallback reason)

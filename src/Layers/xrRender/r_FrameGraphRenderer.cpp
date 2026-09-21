@@ -160,6 +160,11 @@ namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDe
 extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API int ps_r_rt_gi_restir;
 extern ENGINE_API float ps_r_rt_gi_intensity;
+extern ENGINE_API int ps_r_rt_gi_bounces;
+extern ENGINE_API int ps_r_rt_gi_samples;
+extern ENGINE_API float ps_r_rt_gi_ray_distance;
+extern ENGINE_API float ps_r_rt_scene_radius;
+extern ENGINE_API float ps_r_rt_grass_radius;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_profile_dump;
 extern ENGINE_API int ps_r_path_tracer_bounces;
@@ -172,6 +177,19 @@ extern ENGINE_API float ps_r_rt_sun_radius;
 namespace xray::render {
 
 using namespace fg;
+
+static void ApplyRTLightingSettings(fg::LightingFrameState& lighting)
+{
+    lighting.reuseRequested = ps_r_rt_gi_restir != 0;
+    lighting.reuseAvailable = false;
+    lighting.reuseReservoirs = false;
+    lighting.rtgiBounces = static_cast<u32>(std::clamp(ps_r_rt_gi_bounces, 1, 16));
+    lighting.rtgiSamples = static_cast<u32>(std::clamp(ps_r_rt_gi_samples, 1, 8));
+    lighting.rtgiRayDistance = std::clamp(ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
+    lighting.raySceneRadius = std::clamp(ps_r_rt_scene_radius, 1.0f, 10000.0f);
+    lighting.rayGrassRadius = std::clamp(ps_r_rt_grass_radius, 0.0f, 256.0f);
+}
+
 static u8 QueryParticleBlendMode(LPCSTR shaderName)
 {
     u32 id = 0;
@@ -562,7 +580,7 @@ void FrameGraphRenderer::Render() {
 void FrameGraphRenderer::RenderMenu() {
     ZoneScopedN("FrameGraphRenderer::RenderMenu");
     m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
-    m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
+    ApplyRTLightingSettings(m_lightingState);
     if (m_lightingState.requested != fg::LightingMode::Raster)
         m_lightingState.Fail(fg::LightingFallback::NoScene);
     m_mainView.InvalidateHistory();
@@ -1047,6 +1065,8 @@ void FrameGraphRenderer::SetupFrame() {
     m_shadowCasterRegion.valid = false;
     m_lightsFrustum = m_lightsTouching = m_lightsInvalidSector = 0;
     m_lightsLodCulled = m_lightsHomCulled = m_localShadowCasters = 0;
+    m_rtRayAdmitted = 0;
+    m_rtRayAdmittedSkinned = 0;
 
     if (collectScene)
     {
@@ -1132,11 +1152,23 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     return m_framegraph->CreateTexture(name, desc);
 }
 
+u32 FrameGraphRenderer::GetRTRayAdmittedCount() const
+{
+    return m_rtRayAdmitted;
+}
+
+u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
+{
+    return m_rtRayAdmittedSkinned;
+}
+
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
     m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
-    m_lightingState.reuseReservoirs = ps_r_rt_gi_restir != 0;
+    ApplyRTLightingSettings(m_lightingState);
+    m_lightingState.rayGrassEnabled = m_detailManager && m_detailManager->IsRayTracingCoverageEnabled();
+    m_lightingState.rayGrassPending = m_detailManager && m_detailManager->IsRayTracingCoveragePending();
     m_lightingState.previousSurfacesValid = m_mainView.hasPrevFrameData;
     if (previousMode != m_lightingState.effective)
     {
@@ -1158,7 +1190,7 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 
     const auto readiness = m_lightingState.effective == fg::LightingMode::ReferencePT ?
         passes::EnsurePathTracerResources(m_device, width, height, m_mainView.pathTracer) :
-        passes::EnsureReSTIRGIResources(m_device, m_mainView.rtgi, width, height, m_lightingState.reuseReservoirs);
+        passes::EnsureReSTIRGIResources(m_device, m_mainView.rtgi, width, height, m_lightingState.reuseRequested);
     if (readiness != fg::LightingFallback::None)
     {
         m_lightingState.Fail(readiness);
@@ -1436,6 +1468,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     {
         const bool enabled = psDeviceFlags.is(rsDrawDetails);
         R_ASSERT2(!enabled || clusterIdsFit, "[FrameGraph] rigid and skinned entries exhaust the visibility identifier range");
+        const bool rayCoverageRequested = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+            m_rtAccelMgr && m_rtAccelMgr->IsSupported() &&
+            GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
+        m_detailManager->SetRayTracingCoverage(rayCoverageRequested, ps_r_rt_grass_radius);
         m_detailManager->PrepareFrame(m_device->GetNVRHIDevice(), grassEntryBase, enabled);
         detailResources = passes::setupDetailCullPass(
             *m_framegraph, m_device, m_detailManager.get(),
@@ -2773,6 +2809,41 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             for (ISpatial* spatial : localCasters)
                 if (submitCaster(spatial))
                     ++m_localShadowCasters;
+        }
+        m_collectShadowOnly = false;
+    }
+
+    if (rayTracingLighting && ps_r_rt_scene_radius > 0.0f)
+    {
+        ZoneScopedN("CollectVisibleGeometry::RayAdmission");
+        const float radius = ps_r_rt_scene_radius;
+        Fvector extent;
+        extent.set(radius, radius, radius);
+        xr_vector<ISpatial*>& candidates = m_rtCandidates;
+        g_pGamePersistent->SpatialSpace.q_box(candidates, 0, STYPE_RENDERABLE, Device.vCameraPosition, extent);
+        m_collectShadowOnly = true;
+        for (ISpatial* spatial : candidates)
+        {
+            SpatialData& sd = spatial->GetSpatialData();
+            if (sd.type & STYPE_LIGHTSOURCE)
+                continue;
+            if (sd.collect_stamp == collectStamp)
+                continue;
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable || renderable->renderable_HUD())
+                continue;
+            const float reach = radius + sd.sphere.R;
+            if (Device.vCameraPosition.distance_to_sqr(sd.sphere.P) > reach * reach)
+                continue;
+            sd.collect_stamp = collectStamp;
+            const size_t before = m_geometryCollector->GetBatches().size();
+            renderable->renderable_Render(0, nullptr);
+            const auto& batches = m_geometryCollector->GetBatches();
+            if (batches.size() > before)
+                ++m_rtRayAdmitted;
+            for (size_t i = before; i < batches.size(); ++i)
+                if (batches[i].isSkinned)
+                    ++m_rtRayAdmittedSkinned;
         }
         m_collectShadowOnly = false;
     }
