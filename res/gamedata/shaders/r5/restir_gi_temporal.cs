@@ -1,6 +1,3 @@
-#include "common.h"
-#include "rt_common.h"
-#include "shared/pbr_brdf.h"
 #include "restir_gi_common.h"
 
 cbuffer ReSTIRTemporalParams : register(b5) {
@@ -10,7 +7,9 @@ cbuffer ReSTIRTemporalParams : register(b5) {
     float2 g_ScreenSize;
     float2 g_InvScreenSize;
     uint g_FrameIndex;
-    uint3 g_Pad;
+    uint g_DiffuseMode;
+    uint g_Pad0;
+    uint g_Pad1;
 };
 
 Texture2D<float4> t_PrevReservoirA : register(t0);
@@ -21,6 +20,7 @@ Texture2D<float4> t_PrevNormal : register(t5);
 Texture2D<float4> t_BaseColor : register(t6);
 Texture2D<float> t_PrevDepth : register(t8);
 Texture2D<float4> t_Normal : register(t9);
+Texture2D<float2> t_Material : register(t17);
 
 RWTexture2D<float4> u_ReservoirA : register(u0);
 RWTexture2D<float4> u_ReservoirB : register(u1);
@@ -53,20 +53,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     if (!all(isfinite(worldPos)) || !all(isfinite(normalData.xyz)) || dot(normalData.xyz, normalData.xyz) < 0.25)
         return;
-    float3 N = normalize(normalData.xyz);
-    float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
-    float3 albedo = baseColorData.rgb;
-    float metallic = baseColorData.a;
 
-    float3 target_curr = 0;
-    if (IsReservoirValid(currRes)) {
-        float3 wi = normalize(currRes.samplePos - worldPos);
-        float cosTheta = max(dot(N, wi), 0);
-        float3 F0 = CalculateF0(albedo, metallic);
-        float3 kD = (1.0 - F_Schlick(cosTheta, F0)) * (1.0 - metallic);
-        target_curr = currRes.Lo * kD * albedo / PI * cosTheta;
-    }
-    float targetLum_curr = Luminance(target_curr);
+    MaterialSurface primary = GBufferMaterialSurface(normalData, t_BaseColor.Load(int3(pixel, 0)), t_Material.Load(int3(pixel, 0)));
+    float3 V = RTSafeNormalize(g_CameraPos.xyz - worldPos, primary.N);
+
+    float targetLum_curr = 0.0;
+    if (IsReservoirValid(currRes))
+        targetLum_curr = Luminance(GITargetRadiance(primary, V, worldPos, currRes.samplePos, currRes.Lo, g_DiffuseMode));
 
     GIReservoir output = EmptyReservoir();
     uint rng = pcg_hash(pixel.x + pixel.y * 7919u + g_FrameIndex * 48611u);
@@ -97,7 +90,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             float4 prevWorld = mul(g_PrevInvViewProj, prevClip);
             float3 prevWorldPos = prevWorld.xyz / prevWorld.w;
             float posDist = length(worldPos - prevWorldPos);
-            valid = posDist < 0.1 * viewDist && dot(N, prevN) > 0.906;
+            valid = posDist < 0.1 * viewDist && dot(primary.N, prevN) > 0.906;
         }
 
         if (valid) {
@@ -107,12 +100,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             );
 
             if (IsReservoirValid(prevRes)) {
-                float3 wi_prev = normalize(prevRes.samplePos - worldPos);
-                float cosTheta_prev = max(dot(N, wi_prev), 0);
-                float3 F0 = CalculateF0(albedo, metallic);
-                float3 kD = (1.0 - F_Schlick(cosTheta_prev, F0)) * (1.0 - metallic);
-                float3 target_prev = prevRes.Lo * kD * albedo / PI * cosTheta_prev;
-                float targetLum_prev = Luminance(target_prev);
+                float targetLum_prev = Luminance(GITargetRadiance(primary, V, worldPos, prevRes.samplePos, prevRes.Lo, g_DiffuseMode));
 
                 if (targetLum_prev > 0) {
                     uint clampedM = min(prevRes.M, RESTIR_M_MAX);
@@ -126,16 +114,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     }
 
     float outTargetLum = targetLum_curr;
-    if (output.samplePos.x != currRes.samplePos.x || output.samplePos.y != currRes.samplePos.y) {
-        float3 wi_out = normalize(output.samplePos - worldPos);
-        float cosTheta_out = max(dot(N, wi_out), 0);
-        float3 F0 = CalculateF0(albedo, metallic);
-        float3 kD = (1.0 - F_Schlick(cosTheta_out, F0)) * (1.0 - metallic);
-        float3 target_out = output.Lo * kD * albedo / PI * cosTheta_out;
-        outTargetLum = Luminance(target_out);
-    }
+    if (output.samplePos.x != currRes.samplePos.x || output.samplePos.y != currRes.samplePos.y)
+        outTargetLum = Luminance(GITargetRadiance(primary, V, worldPos, output.samplePos, output.Lo, g_DiffuseMode));
 
-    output.W = (outTargetLum > 0 && output.M > 0) ? output.w_sum / (outTargetLum * output.M) : 0;
+    ReservoirFinalize(output, outTargetLum);
     output.age = min(output.age + 1, 255);
 
     float4 outA, outB;

@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -252,6 +253,7 @@ bool RTAccelStructManager::IsReady() const
         !m_scene->batchInfo ||
         !m_scene->materials ||
         !m_scene->terrainMaterials ||
+        !m_scene->variants ||
         !m_scene->textures.GetTable())
         return false;
     if (m_scene->counts.skinned && (!m_scene->skinnedVertices || !m_scene->skinnedIndices || !m_scene->skinBuild.handle))
@@ -313,6 +315,7 @@ void RTAccelStructManager::RetireScenes()
             it->scene->bones = nullptr;
             it->scene->sourceMaterials = nullptr;
             it->scene->sourceTerrainMaterials = nullptr;
+            it->scene->sourceVariants = nullptr;
             it->scene->grassFrame.reset();
             it->scene->grassPipeline = nullptr;
             it->scene->grassLayout = nullptr;
@@ -370,6 +373,7 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
     };
     append(bindless::MaterialBuffer::Instance().GetRevision());
     append(bindless::TerrainMaterialBuffer::Instance().GetRevision());
+    append(bindless::VariantBuffer::Instance().GetRevision());
     auto appendBatches = [&](const xr_vector<GeometryBatch>& batches)
     {
         append(batches.size());
@@ -405,15 +409,11 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
     if (frame && frame->source)
     {
         append(frame->source->id);
-        append(frame->cullParams);
-        HashSceneData(signature, frame->visibleChunks.data(), frame->visibleChunks.size() * sizeof(u32));
+        append(frame->statsReady ? frame->contentSignature : frame->id);
         append(frame->stats.visibleBillboardCount);
         append(frame->stats.visibleLOD0Count);
         append(frame->stats.visibleLOD1Count);
         append(frame->stats.visibleLOD2Count);
-        if (frame->stats.visibleBillboardCount || frame->stats.visibleLOD0Count ||
-            frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count)
-            append(frame->id);
         append(detail->buildDetailsBindlessIndex);
         if (frame->source->params.grassMode &&
             (frame->stats.visibleLOD0Count || frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count))
@@ -421,9 +421,9 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
             append(ps_r3_grass_blade_height);
             append(ps_r3_grass_blade_width);
             append(ps_r3_grass_wind_displacement);
+            append(Device.fTimeGlobal);
             if (ps_r3_grass_wind_displacement != 0.0f)
             {
-                append(Device.fTimeGlobal);
                 append(detail->windSpeed);
                 if (g_pGamePersistent)
                     append(g_pGamePersistent->Environment().CurrentEnv.wind_direction);
@@ -462,6 +462,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
         desc.debugName = "RT_EmptySourceVertices";
         desc.byteSize = GPUCullingManager::RT_VERTEX_STRIDE;
         desc.structStride = GPUCullingManager::RT_VERTEX_STRIDE;
+        desc.canHaveRawViews = true;
         desc.isAccelStructBuildInput = true;
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
@@ -708,7 +709,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     for (const auto& batch : hud)
         append(batch);
     auto* device = m_device->GetNVRHIDevice();
-    EnsureRTBuffer(device, scene.skinnedVertices, RTVertexBufferDesc("RT_SkinVertices", vertexCount * 24));
+    EnsureRTBuffer(device, scene.skinnedVertices, RTVertexBufferDesc("RT_SkinVertices", vertexCount * SKIN_VERTEX_STRIDE));
     EnsureRTBuffer(device, scene.skinnedIndices, RTVertexBufferDesc("RT_SkinIndices", scene.skinIndexData.size() * sizeof(u32)));
     scene.bones = gpu->GetGlobalBoneBuffer();
     R_ASSERT(scene.bones);
@@ -718,7 +719,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     for (const auto& job : scene.skinJobs)
     {
         scene.skinBuild.desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices,
-            scene.skinnedIndices, 24, job.constants.outputOffset, job.constants.vertexCount,
+            scene.skinnedIndices, SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
             job.indexOffset, job.indexCount, true));
         scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
     }
@@ -967,13 +968,17 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     EnsureRTBuffer(device, scene.batchInfo, batches);
     scene.sourceMaterials = bindless::MaterialBuffer::Instance().GetBuffer();
     scene.sourceTerrainMaterials = bindless::TerrainMaterialBuffer::Instance().GetBuffer();
-    R_ASSERT(scene.sourceMaterials && scene.sourceTerrainMaterials);
+    scene.sourceVariants = bindless::VariantBuffer::Instance().GetBuffer();
+    R_ASSERT(scene.sourceMaterials && scene.sourceTerrainMaterials && scene.sourceVariants);
     auto materialDesc = scene.sourceMaterials->getDesc();
     materialDesc.debugName = "RT_MaterialSnapshot";
     EnsureRTBuffer(device, scene.materials, materialDesc);
     materialDesc = scene.sourceTerrainMaterials->getDesc();
     materialDesc.debugName = "RT_TerrainMaterialSnapshot";
     EnsureRTBuffer(device, scene.terrainMaterials, materialDesc);
+    auto variantDesc = scene.sourceVariants->getDesc();
+    variantDesc.debugName = "RT_VariantSnapshot";
+    EnsureRTBuffer(device, scene.variants, variantDesc);
     m_textureScratch.clear();
     const u32 skinEnd = u32(scene.geometry->batches.size()) + scene.counts.skinned;
     const u32 terrainEnd = scene.counts.identityStatic + scene.counts.terrain;
@@ -995,6 +1000,7 @@ RTFrameResources RTAccelStructManager::ImportScene(framegraph::FrameGraph& graph
     resources.indices = ImportRTBuffer(graph, "rt_source_indices", scene.geometry->indices);
     resources.materials = ImportRTBuffer(graph, "RT_MaterialSnapshot", scene.materials);
     resources.terrainMaterials = ImportRTBuffer(graph, "RT_TerrainMaterialSnapshot", scene.terrainMaterials);
+    resources.variants = ImportRTBuffer(graph, "RT_VariantSnapshot", scene.variants);
     resources.textures = scene.textures.GetTable();
     R_ASSERT(resources.textures == scene.geometry->textures.GetTable());
     if (scene.counts.skinned)
@@ -1053,10 +1059,13 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             pb.write(resources.batchInfo, ResourceState::CopyDest);
             pb.write(resources.materials, ResourceState::CopyDest);
             pb.write(resources.terrainMaterials, ResourceState::CopyDest);
+            pb.write(resources.variants, ResourceState::CopyDest);
             data.sourceMaterials = pb.read(ImportRTBuffer(builder, "bindless_materials",
                 scene->sourceMaterials), ResourceState::CopySource);
             data.sourceTerrainMaterials = pb.read(ImportRTBuffer(builder, "terrain_materials",
                 scene->sourceTerrainMaterials), ResourceState::CopySource);
+            data.sourceVariants = pb.read(ImportRTBuffer(builder, "bindless_variants",
+                scene->sourceVariants), ResourceState::CopySource);
             if (scene->counts.skinned)
             {
                 pb.write(resources.skinnedVertices, ResourceState::UnorderedAccess);
@@ -1194,6 +1203,8 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     commandList->copyBuffer(buffer(data.resources.materials), 0, source, 0, source->getDesc().byteSize);
     source = buffer(data.sourceTerrainMaterials);
     commandList->copyBuffer(buffer(data.resources.terrainMaterials), 0, source, 0, source->getDesc().byteSize);
+    source = buffer(data.sourceVariants);
+    commandList->copyBuffer(buffer(data.resources.variants), 0, source, 0, source->getDesc().byteSize);
     auto* device = m_device->GetNVRHIDevice();
     if (scene.counts.skinned)
     {
@@ -1325,6 +1336,7 @@ RTFrameResources RTAccelStructManager::UseScene(framegraph::FrameGraph& graph,
     input(resources.indices);
     input(resources.materials);
     input(resources.terrainMaterials);
+    input(resources.variants);
     input(resources.skinnedVertices);
     input(resources.skinnedIndices);
     input(resources.grassVertices);
@@ -1346,6 +1358,7 @@ RTFrameBuffers RTAccelStructManager::ResolveScene(const framegraph::FrameGraph& 
     result.indices = buffer(resources.indices);
     result.materials = buffer(resources.materials);
     result.terrainMaterials = buffer(resources.terrainMaterials);
+    result.variants = buffer(resources.variants);
     result.skinnedVertices = buffer(resources.skinnedVertices);
     result.skinnedIndices = buffer(resources.skinnedIndices);
     result.grassVertices = buffer(resources.grassVertices);
@@ -1378,7 +1391,8 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
     {
         const auto& scene = *m_generations[i];
         result.generationBytes += bufferBytes(scene.batchInfo) + bufferBytes(scene.materials) +
-            bufferBytes(scene.terrainMaterials) + bufferBytes(scene.skinnedVertices) +
+            bufferBytes(scene.terrainMaterials) + bufferBytes(scene.variants) +
+            bufferBytes(scene.skinnedVertices) +
             bufferBytes(scene.skinnedIndices) + bufferBytes(scene.grassVertices) + bufferBytes(scene.grassIndices);
         acceleration(scene.tlas);
         acceleration(scene.skinBuild.handle);

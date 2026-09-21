@@ -50,7 +50,7 @@ public:
 
     void Initialize(fg::RenderDevice* device);
     void Shutdown();
-    void BeginFrame();
+    void BeginFrame(bool rayTracingLighting = false);
     void CollectLight(const light* L);
     void CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots);
     void BuildLightBuffer(const light_Package& package);
@@ -70,6 +70,7 @@ public:
     u32 GetOmniCount() const { return m_numOmni; }
     u32 GetTilesX() const { return m_tilesX; }
     u32 GetTilesY() const { return m_tilesY; }
+    u64 GetTransportSignature() const;
 
     ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const;
 
@@ -92,6 +93,7 @@ private:
     xr_vector<GPULightData> m_lightsCPU;
     xr_vector<u32> m_identityIndices;
     u32 m_lightCapacity = 0;
+    bool m_rayTracingLighting = false;
     xr_map<shared_str, u32> m_spotTextureCache;
     u32 m_numLights = 0;
     u32 m_numPoint = 0;

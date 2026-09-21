@@ -145,9 +145,10 @@ void ClusteredLightManager::EnsureLightCapacity(u32 count)
     m_lightCapacity = capacity;
 }
 
-void ClusteredLightManager::BeginFrame()
+void ClusteredLightManager::BeginFrame(bool rayTracingLighting)
 {
     m_lightsCPU.clear();
+    m_rayTracingLighting = rayTracingLighting;
     m_numLights = 0;
     m_numPoint = 0;
     m_numSpot = 0;
@@ -163,7 +164,7 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
 
     gpu.positionAndInvRangeSq.set(L->position.x, L->position.y, L->position.z, invRangeSq);
     gpu.colorAndRange.set(L->color.r, L->color.g, L->color.b, range);
-    const float lod = L->get_LOD();
+    const float lod = m_rayTracingLighting ? 1.0f : L->get_LOD();
     gpu.colorAndRange.x *= lod;
     gpu.colorAndRange.y *= lod;
     gpu.colorAndRange.z *= lod;
@@ -337,6 +338,45 @@ void ClusteredLightManager::UploadAllVisible(nvrhi::ICommandList* cmdList)
     cmdList->writeBuffer(m_visibleLightCountBuffer, &m_numLights, sizeof(u32));
     m_visibleLightCountCPU = m_numLights;
     m_culledLights.clear();
+}
+
+u64 ClusteredLightManager::GetTransportSignature() const
+{
+    xr_set<nvrhi::ITexture*> textures;
+    u64 signature = 0;
+    for (const auto& light : m_lightsCPU)
+    {
+        auto transport = light;
+        transport.spotParamsAndType.w = 0.0f;
+        u64 lightSignature = 14695981039346656037ull;
+        const auto append = [&](const void* data, size_t size)
+        {
+            const auto* bytes = static_cast<const u8*>(data);
+            for (size_t i = 0; i < size; ++i)
+            {
+                lightSignature ^= bytes[i];
+                lightSignature *= 1099511628211ull;
+            }
+        };
+        append(&transport, sizeof(transport));
+        u32 textureIndex = 0;
+        std::memcpy(&textureIndex, &transport.spotParamsAndType.z, sizeof(textureIndex));
+        if (textureIndex && GEnv.Backend)
+        {
+            auto* texture = GEnv.Backend->GetBindlessTexture(textureIndex);
+            append(&texture, sizeof(texture));
+            if (texture)
+                textures.insert(texture);
+        }
+        signature += lightSignature;
+    }
+    auto* device = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
+    auto* resources = device ? device->GetFGResourceManager() : nullptr;
+    auto* textureManager = resources ? resources->GetTextureManager() : nullptr;
+    const u64 textureRevision = textureManager ? textureManager->GetContentRevision(textures, nullptr, nullptr) : 0;
+    signature ^= u64(m_numLights) * 1099511628211ull;
+    signature ^= textureRevision + 0x9e3779b97f4a7c15ull + (signature << 6) + (signature >> 2);
+    return signature;
 }
 
 ClusterCB ClusteredLightManager::BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const

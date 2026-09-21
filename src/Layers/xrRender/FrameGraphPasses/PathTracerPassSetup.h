@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "ClusterLightPassSetup.h"
 
 namespace xray::render::framegraph
 {
@@ -42,7 +43,7 @@ public:
     u32 grassBatchStart;
     u32 detailAtlasIndex;
     u32 diffuseMode;
-    u32 pad;
+    u32 lightCount;
 };
 
 static_assert(sizeof(PathTracerCB) == 160);
@@ -55,6 +56,10 @@ public:
     nvrhi::TextureHandle sky1;
     u64 sceneRevision = 0;
     u64 textureRevision = 0;
+    u64 lightingSignature = 0;
+    Fvector4 foliageSSS = {};
+    Fvector4 foliageParams = {};
+    Fvector4 foliageParams2 = {};
     u32 samples = 0;
     bool valid = false;
 };
@@ -78,6 +83,7 @@ public:
     RTFrameResources scene;
     framegraph::VirtualResourceHandle outputTex;
     framegraph::VirtualResourceHandle accumulation;
+    framegraph::VirtualResourceHandle lightData;
     PathTracerCB cbData;
     u32 width = 0;
     u32 height = 0;
@@ -87,7 +93,8 @@ public:
 
 LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height, PathTracerPassState& state);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
-    framegraph::VirtualResourceHandle sceneColorIn, LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj,
+    framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights,
+    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj,
     const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
 
 void ShutdownPathTracer();

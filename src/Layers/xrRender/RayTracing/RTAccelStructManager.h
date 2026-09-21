@@ -56,6 +56,7 @@ public:
     framegraph::VirtualResourceHandle indices;
     framegraph::VirtualResourceHandle materials;
     framegraph::VirtualResourceHandle terrainMaterials;
+    framegraph::VirtualResourceHandle variants;
     framegraph::VirtualResourceHandle skinnedVertices;
     framegraph::VirtualResourceHandle skinnedIndices;
     framegraph::VirtualResourceHandle grassVertices;
@@ -72,6 +73,7 @@ public:
     nvrhi::IBuffer* indices = nullptr;
     nvrhi::IBuffer* materials = nullptr;
     nvrhi::IBuffer* terrainMaterials = nullptr;
+    nvrhi::IBuffer* variants = nullptr;
     nvrhi::IBuffer* skinnedVertices = nullptr;
     nvrhi::IBuffer* skinnedIndices = nullptr;
     nvrhi::IBuffer* grassVertices = nullptr;
@@ -201,6 +203,8 @@ public:
     nvrhi::BufferHandle terrainMaterials;
     nvrhi::BufferHandle sourceMaterials;
     nvrhi::BufferHandle sourceTerrainMaterials;
+    nvrhi::BufferHandle sourceVariants;
+    nvrhi::BufferHandle variants;
     nvrhi::BufferHandle bones;
     xr_vector<nvrhi::BufferHandle> skinSources;
     nvrhi::BufferHandle skinnedVertices;
@@ -241,6 +245,7 @@ public:
     RTFrameResources resources;
     framegraph::VirtualResourceHandle sourceMaterials;
     framegraph::VirtualResourceHandle sourceTerrainMaterials;
+    framegraph::VirtualResourceHandle sourceVariants;
     framegraph::VirtualResourceHandle bones;
     xr_vector<framegraph::VirtualResourceHandle> skinSources;
     xr_vector<framegraph::VirtualResourceHandle> grassSources;
@@ -255,6 +260,8 @@ public:
 class RTAccelStructManager
 {
 public:
+    static constexpr u32 SKIN_VERTEX_STRIDE = 32u;
+
     void Initialize(RenderDevice* device);
     void Shutdown();
     bool SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpuCulling,

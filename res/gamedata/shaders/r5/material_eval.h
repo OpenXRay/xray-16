@@ -1,17 +1,7 @@
 #ifndef MATERIAL_EVAL_H
 #define MATERIAL_EVAL_H
 
-struct MaterialSurface
-{
-    float3 albedo;
-    float3 N;
-    float roughness;
-    float metallic;
-    float ao;
-    float3 emissive;
-    uint shadingClass;
-    float transmission;
-};
+#include "shared/material_surface.h"
 
 float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
 {

@@ -15,6 +15,35 @@ extern ENGINE_API float ps_r3_grass_lod_mid;
 namespace xray::render::fg
 {
 
+u64 FGDetailManager::CombineContentHash(u64 hash, u64 value)
+{
+    hash ^= value + 0x9E3779B97F4A7C15ull + (hash << 6) + (hash >> 2);
+    return hash;
+}
+
+u64 FGDetailManager::FinalizeContentHash(u64 hash)
+{
+    hash ^= hash >> 30;
+    hash *= 0xBF58476D1CE4E5B9ull;
+    hash ^= hash >> 27;
+    hash *= 0x94D049BB133111EBull;
+    hash ^= hash >> 31;
+    return hash;
+}
+
+u64 FGDetailManager::ComposeContentSignature(u64 sourceId, const DetailCullingStats& stats,
+    const DetailMembershipFingerprint& fingerprint)
+{
+    u64 hash = CombineContentHash(0x9E3779B97F4A7C15ull, sourceId);
+    hash = CombineContentHash(hash, stats.visibleLOD0Count);
+    hash = CombineContentHash(hash, stats.visibleLOD1Count);
+    hash = CombineContentHash(hash, stats.visibleLOD2Count);
+    hash = CombineContentHash(hash, stats.visibleBillboardCount);
+    hash = CombineContentHash(hash, fingerprint.membership0);
+    hash = CombineContentHash(hash, fingerprint.membership1);
+    return FinalizeContentHash(hash);
+}
+
 void FGDetailManager::UpdateInstanceMemoryStats()
 {
     instanceMemoryStats = {};
@@ -291,8 +320,8 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
     additional += additionalBytes(frame.slotDispatch, 12);
     additional += additionalBytes(frame.swDispatch, 32);
     additional += additionalBytes(frame.packets, VIS_KIND_COUNT * 16);
-    additional += additionalBytes(frame.workStatus, 32);
-    additional += additionalBytes(frame.readback, 32);
+    additional += additionalBytes(frame.workStatus, VISIBILITY_STATUS_BYTES);
+    additional += additionalBytes(frame.readback, VISIBILITY_STATUS_BYTES);
     RequireInstanceMemory(additional, "detail visibility frame");
     const auto ensure = [&](nvrhi::BufferHandle& buffer, u64 bytes, u32 stride, const char* name,
         bool readback = false, bool indirect = false)
@@ -324,9 +353,9 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
     ensure(frame.slotDispatch, 12, 0, "DetailSlotDispatch", false, true);
     ensure(frame.swDispatch, 32, 0, "DetailSwDispatch", false, true);
     ensure(frame.packets, VIS_KIND_COUNT * 16, 16, "DetailVisibilityPackets");
-    ensure(frame.workStatus, 32, 0, "DetailVisibilityStatus");
-    ensure(frame.readback, 32, 0, "DetailVisibilityReadback", true);
-    frame.bytes += frame.visibleSlots->getDesc().byteSize + 4 + 12 + 32 + VIS_KIND_COUNT * 16 + 32 + 32;
+    ensure(frame.workStatus, VISIBILITY_STATUS_BYTES, 0, "DetailVisibilityStatus");
+    ensure(frame.readback, VISIBILITY_STATUS_BYTES, 0, "DetailVisibilityReadback", true);
+    frame.bytes += frame.visibleSlots->getDesc().byteSize + 4 + 12 + 32 + VIS_KIND_COUNT * 16 + VISIBILITY_STATUS_BYTES + VISIBILITY_STATUS_BYTES;
     params.totalSlotCount = slot_count;
     params.visibleBillboardCapacity = frame.visibleCapacity[VIS_KIND_MESH];
     params.visibleDecalCapacity = frame.visibleCapacity[VIS_KIND_DECAL];
@@ -354,6 +383,8 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
         R_ASSERT2(mapped, "[DetailManager] completed visibility readback could not be mapped");
         static_assert(sizeof(DetailCullingStats) == 32);
         std::memcpy(&frame->stats, mapped, sizeof(DetailCullingStats));
+        DetailMembershipFingerprint fingerprint;
+        std::memcpy(&fingerprint, static_cast<const u8*>(mapped) + sizeof(DetailCullingStats), sizeof(fingerprint));
         device->unmapBuffer(frame->readback);
         if (frame->stats.overflowFlags)
             FATAL_F("[DetailManager] visible work overflow: flags=%u packets=%u availableEntries=%u counts=%u/%u/%u/%u/%u capacities=%u/%u/%u/%u/%u. No aliased IDs or partial density were drawn.",
@@ -362,6 +393,7 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
                 frame->stats.visibleBillboardCount, frame->stats.visibleDecalCount,
                 frame->visibleCapacity[0], frame->visibleCapacity[1], frame->visibleCapacity[2],
                 frame->visibleCapacity[3], frame->visibleCapacity[4]);
+        frame->contentSignature = ComposeContentSignature(frame->source ? frame->source->id : 0, frame->stats, fingerprint);
         frame->statsReady = true;
         if (!m_completedVisibilityFrame || frame->id > m_completedVisibilityFrame->id)
         {
@@ -484,6 +516,7 @@ void FGDetailManager::PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool e
     visibilityFrame->statsRecorded = false;
     visibilityFrame->statsReady = false;
     visibilityFrame->stats = {};
+    visibilityFrame->contentSignature = 0;
     AllocateVisibilityFrame(device, *visibilityFrame);
     if (generatedInstances && !generatedInstances->chunks.empty())
         R_ASSERT2(CreateComputePipeline(GEnv.Render->GetRenderDevice()), "[DetailManager] source-compatible culling pipeline unavailable");
@@ -563,7 +596,7 @@ void FGDetailManager::RecordGeneration(nvrhi::ICommandList* cmdList, nvrhi::IDev
 void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame)
 {
     R_ASSERT(device && frame.lease);
-    cmdList->copyBuffer(frame.readback, 0, frame.workStatus, 0, sizeof(DetailCullingStats));
+    cmdList->copyBuffer(frame.readback, 0, frame.workStatus, 0, VISIBILITY_STATUS_BYTES);
     frame.statsRecorded = true;
 }
 
