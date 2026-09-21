@@ -46,6 +46,8 @@
 #endif // _EDITOR
 
 #include "xrEngine/xr_level_controller.h"
+#include "xrEngine/DeveloperMode.h"
+#include "DeveloperLevel.h"
 
 CGamePersistent::CGamePersistent()
 {
@@ -86,6 +88,11 @@ CGamePersistent::~CGamePersistent()
 
 IGame_Level* CGamePersistent::CreateLevel()
 {
+    if (m_devLevel)
+    {
+        m_devLevel = false;
+        return xr_new<CDeveloperLevel>();
+    }
     return xr_new<CLevel>();
 }
 
@@ -97,6 +104,16 @@ void CGamePersistent::DestroyLevel(IGame_Level*& lvl)
 void CGamePersistent::PreStart(LPCSTR op)
 {
     inherited::PreStart(op);
+
+    m_devLevel = false;
+
+    if (op)
+    {
+        IGame_Persistent::params parsed;
+        parsed.parse_cmd_line(op);
+        m_devLevel = (0 == xr_strcmp(parsed.m_game_or_spawn, "dev_material_room") &&
+            0 == xr_strcmp(parsed.m_game_type, "single") && 0 == xr_strcmp(parsed.m_alife, "developer"));
+    }
 }
 
 extern void clean_game_globals();
@@ -126,7 +143,7 @@ void CGamePersistent::OnAppStart()
 
     inherited::OnAppStart();
 
-    if (GEnv.Render)
+    if (GEnv.Render && !DeveloperMode::Requested())
         GEnv.Render->ConvertLegacyAssetsToPBR();
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -177,6 +194,13 @@ void CGamePersistent::Disconnect()
 
 void CGamePersistent::OnGameStart()
 {
+    if (g_pGameLevel && Level().IsDeveloperLevel())
+    {
+        Msg("[dev_level] event=start stage=prefetch skipped");
+        UpdateGameType();
+        return;
+    }
+
     inherited::OnGameStart();
     UpdateGameType();
 }
@@ -389,12 +413,18 @@ bool allow_intro()
     if ((0 != strstr(Core.Params, "-nointro")))
         return false;
 
+    if (DeveloperMode::Requested())
+        return false;
+
     return true;
 }
 
 bool allow_game_intro()
 {
-    return !strstr(Core.Params, "-nogameintro");
+    if (strstr(Core.Params, "-nogameintro"))
+        return false;
+
+    return !(g_pGameLevel && Level().IsDeveloperLevel());
 }
 
 void CGamePersistent::start_logo_intro()
@@ -433,6 +463,11 @@ void CGamePersistent::game_loaded()
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
+        if (g_pGameLevel && Level().IsDeveloperLevel())
+        {
+            load_screen_renderer.Stop();
+            return;
+        }
         if (g_pGameLevel && g_pGameLevel->bReady && g_keypress_on_start &&
             load_screen_renderer.NeedsUserInput() && m_game_params.m_e_game_type == eGameIDSingle)
         {

@@ -32,6 +32,7 @@ private:
     bool ambient_effect_wind_on{};
 
     bool m_bPickableDOF{};
+    bool m_devLevel{ false };
 
     AnselManager* ansel{};
     COzzAnimDebugger m_ozzAnimDebugger;

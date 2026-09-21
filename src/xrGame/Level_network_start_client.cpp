@@ -94,6 +94,18 @@ bool CLevel::net_start_client3()
             download_url = get_net_DescriptionData().download_url;
             rescan_mp_archives(); // because if we are using psNET_direct_connect, we not download map...
         }
+        if (IsDeveloperLevel())
+        {
+            map_data.m_name = name();
+            map_data.m_map_version = Server->level_version(Server->GetConnectOptions());
+            map_data.m_map_download_url = nullptr;
+            map_data.m_map_loaded = true;
+
+            deny_m_spawn = FALSE;
+            R_ASSERT2(Load(0), "Loading developer level failed.");
+            map_data.m_level_geom_crc32 = 0;
+            return true;
+        }
         // Determine internal level-ID
         const int level_id = g_pGamePersistent->Level_ID(level_name, level_ver, true);
         if (level_id == -1)

@@ -406,6 +406,7 @@ void FrameGraphRenderer::level_Unload()
     BufferPool.fastGeomLoaded = false;
 
     m_CompiledLevelShaders.clear();
+    CleanupDeveloperLoad();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

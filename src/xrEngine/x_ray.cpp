@@ -16,6 +16,7 @@
 #include "xrAnimation/OzzMotionLibrary.h"
 
 #include "IGame_Persistent.h"
+#include "DeveloperMode.h"
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
 
@@ -252,6 +253,15 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
+    if (DeveloperMode::Requested())
+    {
+        R_ASSERT2(game && !GEnv.isDedicatedServer,
+            "-dev_level requires the game module and an interactive client");
+        R_ASSERT2(!DeveloperMode::HasOption("-start") && !DeveloperMode::HasOption("-load"),
+            "-dev_level cannot be combined with -start or -load");
+        Msg("[dev_level] event=boot schema=1 scene=dev_material_room mode=single_non_alife diagnostics=engine_log");
+    }
+
     const auto inputTask = TaskManager::AddTask([]
     {
         const bool captureInput = !strstr(Core.Params, "-i");
@@ -317,6 +327,9 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         g_pGamePersistent->OnAppStart();
     else
         Console->Show();
+
+    if (DeveloperMode::Requested())
+        Console->Execute("start server(dev_material_room/single/developer/new) client(localhost)");
 
     FrameMarkEnd(FRAME_MARK_APPLICATION_STARTUP);
 }

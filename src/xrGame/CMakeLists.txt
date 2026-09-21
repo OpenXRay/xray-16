@@ -411,6 +411,10 @@ target_sources(xrGame PRIVATE
     DemoPlay_Control.h
     DestroyablePhysicsObject.cpp
     DestroyablePhysicsObject.h
+    DeveloperLevel.cpp
+    DeveloperLevel.h
+    DeveloperRoom.cpp
+    DeveloperRoom.h
     detail_path_builder.h
     detail_path_manager.cpp
     detail_path_manager.h

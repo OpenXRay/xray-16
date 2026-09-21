@@ -121,20 +121,27 @@ bool CLevel::net_start1()
 
         if (xr_strcmp(p.m_alife, "alife"))
         {
-            shared_str l_ver = game_sv_GameState::parse_level_version(m_caServerOptions);
-
             map_data.m_name = game_sv_GameState::parse_level_name(m_caServerOptions);
 
-            if (!GEnv.isDedicatedServer)
-                g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
-
-            const int id = g_pGamePersistent->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
-
-            if (id < 0)
+            if (IsDeveloperLevel())
             {
-                Log("Can't find level: ", map_data.m_name.c_str());
-                net_start_result_total = FALSE;
-                return true;
+                Msg("[dev_level] event=start stage=session type=%s map=%s", p.m_game_type, map_data.m_name.c_str());
+            }
+            else
+            {
+                shared_str l_ver = game_sv_GameState::parse_level_version(m_caServerOptions);
+
+                if (!GEnv.isDedicatedServer)
+                    g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
+
+                const int id = g_pGamePersistent->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
+
+                if (id < 0)
+                {
+                    Log("Can't find level: ", map_data.m_name.c_str());
+                    net_start_result_total = FALSE;
+                    return true;
+                }
             }
         }
     }
@@ -154,9 +161,10 @@ bool CLevel::net_start2()
             Msg("! Failed to start server.");
             return true;
         }
+        Server->SetDeveloperSession(IsDeveloperLevel());
         Server->SLS_Default();
         map_data.m_name = Server->level_name(m_caServerOptions);
-        if (!GEnv.isDedicatedServer)
+        if (!GEnv.isDedicatedServer && !IsDeveloperLevel())
             g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
     }
     return true;

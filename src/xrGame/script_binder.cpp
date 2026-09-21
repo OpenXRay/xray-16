@@ -58,6 +58,8 @@ void CScriptBinder::reinit()
 void CScriptBinder::reload(LPCSTR section)
 {
 #ifndef DBG_DISABLE_SCRIPTS
+    if (g_pGameLevel && Level().IsDeveloperLevel())
+        return;
     VERIFY(!m_object);
     if (!pSettings->line_exist(section, "script_binding"))
         return;
