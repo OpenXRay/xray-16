@@ -279,6 +279,17 @@ public:
         u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count + visibleBillboardCount; }
     };
 
+    class DetailMembershipFingerprint
+    {
+    public:
+        u32 membership0 = 0;
+        u32 membership1 = 0;
+    };
+    static_assert(sizeof(DetailMembershipFingerprint) == 8, "DetailMembershipFingerprint must be 8 bytes");
+
+    static constexpr u32 VISIBILITY_STATUS_BYTES = sizeof(DetailCullingStats) + sizeof(DetailMembershipFingerprint);
+    static_assert(VISIBILITY_STATUS_BYTES == 40, "detail visibility status must stay 32-byte stats plus two fingerprint words");
+
     class InstanceChunk
     {
     public:
@@ -326,6 +337,7 @@ public:
         nvrhi::BufferHandle workStatus;
         nvrhi::BufferHandle readback;
         DetailCullingStats stats;
+        u64 contentSignature = 0;
         u32 visibleCapacity[VIS_KIND_COUNT] = {};
         u32 preparedCapacity[LOD_COUNT] = {};
         u32 entryBase = 0;
@@ -477,6 +489,10 @@ private:
     void UpdateInstanceMemoryStats();
     void DestroyInstanceStorage();
     void RecordVisibilityWork(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame, bool slots);
+    static u64 CombineContentHash(u64 hash, u64 value);
+    static u64 FinalizeContentHash(u64 hash);
+    static u64 ComposeContentSignature(u64 sourceId, const DetailCullingStats& stats,
+        const DetailMembershipFingerprint& fingerprint);
     nvrhi::BufferHandle CreateInstanceBuffer(nvrhi::IDevice* device, u64 bytes, u32 stride,
         const char* name, bool readback = false, bool indirect = false);
     bool IsChunkVisible(const InstanceChunk& chunk, const DetailCullParams& params) const;

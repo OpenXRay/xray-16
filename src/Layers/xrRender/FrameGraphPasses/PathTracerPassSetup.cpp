@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "PathTracerPassSetup.h"
+#include "ShaderConstants.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -122,7 +124,8 @@ LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 
 }
 
 PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, VirtualResourceHandle sceneColorIn,
-    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
+    const ClusterLightOutput& clusterLights, LightingFrameState& lighting, const PathTracerConfig& config,
+    const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
     PathTracerPassState& state)
 {
     state.pending.valid = false;
@@ -198,15 +201,32 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         return { sceneColorIn };
     }
 
-    Fvector sunDir = { 0, -1, 0 };
-    Fvector sunColor = { 1, 1, 1 };
-    float sunIntensity = 1.0f;
-    sunDir = env.CurrentEnv.sun_dir;
-    Fvector3 sc;
-    sc.x = env.CurrentEnv.sun_color.x;
-    sc.y = env.CurrentEnv.sun_color.y;
-    sc.z = env.CurrentEnv.sun_color.z;
-    sunIntensity = std::max({ sc.x, sc.y, sc.z });
+    auto& lightManager = ClusteredLightManager::Instance();
+    if (!lightManager.GetLightDataBuffer() ||
+        (lightManager.GetLightCount() > 0 && (!clusterLights.active || !clusterLights.lightData.is_valid())))
+    {
+        lighting.Fail(LightingFallback::ResourcesUnavailable);
+        return { sceneColorIn };
+    }
+    auto lightData = clusterLights.lightData;
+    if (!lightData.is_valid())
+    {
+        auto* buffer = lightManager.GetLightDataBuffer();
+        ResourceDesc desc;
+        desc.type = ResourceDesc::Type::Buffer;
+        desc.bufferSize = buffer->getDesc().byteSize;
+        desc.structStride = buffer->getDesc().structStride;
+        desc.isImported = true;
+        desc.isTransient = false;
+        lightData = fg.ImportBuffer("cluster_light_data", buffer, desc);
+    }
+
+    SunLightData sun = {};
+    GetSunLightData(sun);
+    const Fvector sunDir = sun.direction;
+    const Fvector sc = sun.color;
+    const float sunIntensity = std::max({ sc.x, sc.y, sc.z });
+    Fvector sunColor;
     if (sunIntensity > 0.001f)
         sunColor.set(sc.x / sunIntensity, sc.y / sunIntensity, sc.z / sunIntensity);
     else
@@ -239,16 +259,26 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
 
     cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     cbData.diffuseMode = config.diffuseMode;
-    cbData.pad = 0;
+    cbData.lightCount = lightManager.GetLightCount();
 
     state.pending.parameters = cbData;
     state.pending.sky0 = sky0Tex;
     state.pending.sky1 = sky1Tex;
     state.pending.sceneRevision = accelMgr->GetSceneRevision();
     state.pending.textureRevision = accelMgr->GetTextureRevision(sky0Tex, sky1Tex);
+    state.pending.lightingSignature = lightManager.GetTransportSignature();
+    state.pending.foliageSSS.set(ps_r_foliage_sss_tint.x, ps_r_foliage_sss_tint.y,
+        ps_r_foliage_sss_tint.z, ps_r_foliage_sss_sigma);
+    state.pending.foliageParams.set(ps_r_foliage_sss_blade, ps_r_foliage_sss_tuft,
+        ps_r_foliage_sss_tree, ps_r_foliage_sss_ambient);
+    state.pending.foliageParams2.set(ps_r_foliage_sss_forward, 0.0f, 0.0f, 0.0f);
     const auto& history = state.history;
     if (history.valid && history.sceneRevision == state.pending.sceneRevision &&
         history.textureRevision == state.pending.textureRevision &&
+        history.lightingSignature == state.pending.lightingSignature &&
+        memcmp(&history.foliageSSS, &state.pending.foliageSSS, sizeof(Fvector4)) == 0 &&
+        memcmp(&history.foliageParams, &state.pending.foliageParams, sizeof(Fvector4)) == 0 &&
+        memcmp(&history.foliageParams2, &state.pending.foliageParams2, sizeof(Fvector4)) == 0 &&
         history.sky0 == sky0Tex && history.sky1 == sky1Tex &&
         memcmp(&history.parameters, &cbData, sizeof(cbData)) == 0)
         cbData.sampleIndex = history.samples;
@@ -265,6 +295,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.lighting = &lighting;
             data.state = &state;
             data.scene = accelMgr->UseScene(builder, passBuilder);
+            data.lightData = passBuilder.read(lightData, ResourceState::ShaderResource);
             data.width = width;
             data.height = height;
             data.cbData = cbData;
@@ -297,7 +328,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             cmdList->writeBuffer(s_cb, &data.cbData, sizeof(PathTracerCB));
 
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
-            if (!scene.tlas || !scene.batchInfo || !scene.vertices || !scene.indices || !scene.materials || !scene.terrainMaterials || !scene.textures)
+            if (!scene.tlas || !scene.batchInfo || !scene.vertices || !scene.indices || !scene.materials ||
+                !scene.terrainMaterials || !scene.variants || !scene.textures)
             {
                 data.lighting->Fail(LightingFallback::SceneUnavailable);
                 return;
@@ -323,8 +355,18 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
                 return;
             }
 
+            auto* lightData = fg.GetPhysicalBuffer(data.lightData);
+            auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+            if (!lightData || !staticGlobals)
+            {
+                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                return;
+            }
+
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "PathTracer");
             bsb.ConstantBuffer("PathTracerParams", s_cb);
+            bsb.ConstantBuffer("static_globals", staticGlobals);
+            bsb.BufferSRV("g_LightData", lightData);
             bsb.AccelStruct("g_SceneTLAS", scene.tlas);
             bsb.BufferSRV("g_BatchInfo", scene.batchInfo);
             bsb.BufferSRV("g_MegaVB", scene.vertices);
@@ -334,6 +376,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             bsb.BufferSRV("g_SkinnedVB", skinnedVB);
             bsb.BufferSRV("g_Materials", scene.materials);
             bsb.BufferSRV("g_TerrainMaterials", scene.terrainMaterials);
+            bsb.BufferSRV("g_Variants", scene.variants);
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);

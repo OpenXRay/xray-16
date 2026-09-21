@@ -34,8 +34,47 @@ float SpotLightAttenuation(float3 toLight, float3 spotDir, float scale, float of
 }
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
-// These are bound in the forward pass
+#define CLUSTERED_LIGHTING_PUNCTUAL
+#endif
+
+#ifdef CLUSTERED_LIGHTING_PUNCTUAL
 StructuredBuffer<GPULightData> g_LightData : register(t20);
+
+float PunctualLightAttenuation(GPULightData light, float3 worldPos, out float3 L, out float dist)
+{
+    float3 toLight = light.positionAndInvRangeSq.xyz - worldPos;
+    float distSq = dot(toLight, toLight);
+    dist = sqrt(distSq);
+    L = distSq > 1e-12f ? toLight * rsqrt(distSq) : float3(0.0f, 1.0f, 0.0f);
+
+    float atten = PointLightAttenuation(distSq, light.positionAndInvRangeSq.w);
+    if (light.spotParamsAndType.y > 0.5f)
+    {
+        uint texIdx = asuint(light.spotParamsAndType.z);
+        if (texIdx != 0u)
+        {
+            float4 projPos = mul(light.spotVP, float4(worldPos, 1.0));
+            if (projPos.w > 0.0f)
+            {
+                float2 projUV = projPos.xy / projPos.w * 0.5f + 0.5f;
+                projUV.y = 1.0f - projUV.y;
+                atten *= GetBindlessTexture(texIdx).SampleLevel(smp_rtlinear, projUV, 0).r;
+            }
+            else
+            {
+                atten = 0.0f;
+            }
+        }
+        else
+        {
+            atten *= SpotLightAttenuation(toLight, light.directionAndSpotScale.xyz, light.directionAndSpotScale.w, light.spotParamsAndType.x);
+        }
+    }
+    return atten;
+}
+#endif
+
+#ifdef CLUSTERED_LIGHTING_FORWARD
 StructuredBuffer<uint2> g_ClusterGrid : register(t21);
 StructuredBuffer<uint> g_LightIndexList : register(t22);
 #endif
@@ -101,43 +140,11 @@ float3 EvaluateClusteredLights(
         if (lightOffset != 0xFFFFFFFFu)
             lightIdx = g_LightIndexList[lightOffset + i];
         GPULightData light = g_LightData[lightIdx];
-        float3 lightPos = light.positionAndInvRangeSq.xyz;
-        float invRangeSq = light.positionAndInvRangeSq.w;
         float3 lightColor = light.colorAndRange.xyz;
-        float lightType = light.spotParamsAndType.y;
 
-        float3 toLight = lightPos - worldPos;
-        float distSq = dot(toLight, toLight);
-        float3 L = normalize(toLight);
-        float atten = PointLightAttenuation(distSq, invRangeSq);
-
-        if (lightType > 0.5f)
-        {
-            uint texIdx = asuint(light.spotParamsAndType.z);
-            if (texIdx != 0)
-            {
-                float4 projPos = mul(light.spotVP, float4(worldPos, 1.0));
-                if (projPos.w > 0)
-                {
-                    float2 projUV = projPos.xy / projPos.w * 0.5 + 0.5;
-                    projUV.y = 1.0 - projUV.y;
-                    Texture2D spotTex = GetBindlessTexture(texIdx);
-                    float4 texSample = spotTex.SampleLevel(smp_rtlinear, projUV, 0);
-                    atten *= texSample.r;
-                }
-                else
-                {
-                    atten = 0;
-                }
-            }
-            else
-            {
-                float3 spotDir = light.directionAndSpotScale.xyz;
-                float spotScale = light.directionAndSpotScale.w;
-                float spotOffset = light.spotParamsAndType.x;
-                atten *= SpotLightAttenuation(toLight, spotDir, spotScale, spotOffset);
-            }
-        }
+        float3 L;
+        float dist;
+        float atten = PunctualLightAttenuation(light, worldPos, L, dist);
 
         if (atten <= 0.001f)
             continue;

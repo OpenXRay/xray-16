@@ -1058,7 +1058,9 @@ void FrameGraphRenderer::SetupFrame() {
         m_worldParticleBatches.clear();
         m_hudParticleBatches.clear();
 
-        fg::ClusteredLightManager::Instance().BeginFrame();
+        const bool rayTracingLighting = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+            m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
+        fg::ClusteredLightManager::Instance().BeginFrame(rayTracingLighting);
     }
 
     if (collectScene) {
@@ -1744,7 +1746,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto opaqueOutputs = detailOutputs;
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
-        const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs, clusterLightOut, localShadowOut,
+        const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs, clusterLightOut,
             prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj, Device.vCameraPosition,
             ps_r_rt_gi_intensity, width, height, m_mainView.rtgi, m_mainView.hasPrevFrameData, m_lightingState);
         opaqueOutputs.albedo = rtgiOutput.sceneColor;
@@ -1754,7 +1756,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         passes::PathTracerConfig ptConfig;
         ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
         ptConfig.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
-        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, m_lightingState, ptConfig,
+        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, m_lightingState, ptConfig,
             Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
     }
@@ -2632,6 +2634,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     xr_vector<const light*>& culledLights = m_culledLights;
     culledLights.clear();
     const bool debugLights = ps_r_local_shadow_debug != 0;
+    const bool rayTracingLighting = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+        m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
     auto cullLight = [&](const light* L) {
         if (debugLights)
             culledLights.push_back(L);
@@ -2653,7 +2657,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
         if (o.noshadows)
             L->flags.bShadow = false;
-        if (!touchesCamera) {
+        if (!touchesCamera && !rayTracingLighting) {
             if (L->get_LOD() <= EPS_L) {
                 ++m_lightsLodCulled;
                 cullLight(L);
@@ -2664,7 +2668,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                 cullLight(L);
                 return;
             }
-        } else {
+        } else if (touchesCamera) {
             ++m_lightsTouching;
         }
         L->spatial.collect_stamp = collectStamp;
@@ -2683,6 +2687,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             ++m_lightsFrustum;
             collectLight(spatial, false);
         }
+    }
+
+    if (rayTracingLighting)
+    {
+        auto& space = g_pGamePersistent->SpatialSpace;
+        Fvector extent;
+        extent.set(space.m_bounds * 2.0f, space.m_bounds * 2.0f, space.m_bounds * 2.0f);
+        space.q_box(touchingLights, 0, STYPE_LIGHTSOURCE, space.m_center, extent);
+        for (ISpatial* spatial : touchingLights)
+            collectLight(spatial, false);
     }
 
     // Collect the union once. A caster needed by a local light must never be

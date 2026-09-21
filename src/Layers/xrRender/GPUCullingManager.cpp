@@ -2820,6 +2820,8 @@ void GPUCullingManager::CaptureRTSource()
             normal = bindless::VertexConverter::UnpackNormal(src.normal);
         memcpy(dst + 12, &normal, sizeof(Fvector3));
         memcpy(dst + 24, &src.texcoord0, sizeof(float) * 2);
+        memcpy(dst + 32, &src.tangent, sizeof(u32));
+        memcpy(dst + 36, &src.binormal, sizeof(u32));
     }
 
     auto makeBuildInput = [&](const char* name, u64 bytes, u32 stride, bool indexBuffer) {
@@ -2827,7 +2829,7 @@ void GPUCullingManager::CaptureRTSource()
         desc.debugName = name;
         desc.byteSize = std::max<u64>(bytes, 4ull);
         desc.structStride = stride;
-        desc.canHaveRawViews = stride == 0;
+        desc.canHaveRawViews = true;
         desc.isIndexBuffer = indexBuffer;
         desc.isAccelStructBuildInput = true;
         desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
@@ -2844,7 +2846,7 @@ void GPUCullingManager::CaptureRTSource()
 
     m_rtSourceUploaded = false;
     m_rtIndexStaging.swap(m_megaIndices);
-    Msg("* [GPUCulling] exact ray tracing source captured: %u vertices (%.2f MB, 32 B position+normal+uv0), %u indices (%.2f MB)",
+    Msg("* [GPUCulling] exact ray tracing source captured: %u vertices (%.2f MB, 40 B position+normal+uv0+packed tangent/binormal), %u indices (%.2f MB)",
         m_rtVertexCount, (u64(m_rtVertexCount) * RT_VERTEX_STRIDE) / (1024.0f * 1024.0f),
         m_rtIndexCount, (u64(m_rtIndexCount) * sizeof(u32)) / (1024.0f * 1024.0f));
 }

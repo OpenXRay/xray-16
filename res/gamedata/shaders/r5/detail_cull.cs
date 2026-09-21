@@ -73,6 +73,7 @@ RWStructuredBuffer<PreparedBlade> g_prepared_lod2 : register(u12);
 RWByteAddressBuffer g_work_status : register(u13);
 
 static const uint DO_NO_WAVING = 0x0001;
+static const uint MEMBERSHIP_KIND_BILLBOARD = 3u;
 
 PreparedBlade PrepareBlade(DetailInstance inst)
 {
@@ -91,7 +92,34 @@ bool ReserveVisibleSlot(RWByteAddressBuffer args, uint capacity, out uint index)
     return false;
 }
 
-void AppendBladeLOD(DetailInstance inst, uint2 address)
+uint MembershipFingerprint0(uint kind, uint2 address)
+{
+    uint h = kind ^ (address.x * 0x9E3779B9u) ^ (address.y * 0x85EBCA6Bu) ^ 0x7FEB352Du;
+    h = (h ^ (h >> 16u)) * 0x7FEB352Du;
+    h = (h ^ (h >> 15u)) * 0x846CA68Bu;
+    return h ^ (h >> 16u);
+}
+
+uint MembershipFingerprint1(uint kind, uint2 address)
+{
+    uint h = 0x85EBCA6Bu + kind * 0x9E3779B9u;
+    h += address.x * 0x165667B1u;
+    h = (h << 15u) | (h >> 17u);
+    h += address.y * 0xC2B2AE3Du;
+    h = (h << 13u) | (h >> 19u);
+    h ^= h >> 15u;
+    h *= 0x2545F491u;
+    h ^= h >> 13u;
+    return h;
+}
+
+void AppendMembership(inout uint2 membership, uint kind, uint2 address)
+{
+    membership.x += MembershipFingerprint0(kind, address);
+    membership.y += MembershipFingerprint1(kind, address);
+}
+
+void AppendBladeLOD(DetailInstance inst, uint2 address, inout uint2 membership)
 {
     float3 to_camera = inst.pos - g_camera_pos;
     float dist_sqr = dot(to_camera, to_camera);
@@ -102,6 +130,7 @@ void AppendBladeLOD(DetailInstance inst, uint2 address)
         if (!ReserveVisibleSlot(g_indirect_args_lod0, g_visible_blade_capacity.x, idx))
             return;
         g_visible_lod0[idx] = address;
+        AppendMembership(membership, 0u, address);
         if (idx < g_prepared_capacity.x)
             g_prepared_lod0[idx] = PrepareBlade(inst);
     }
@@ -110,6 +139,7 @@ void AppendBladeLOD(DetailInstance inst, uint2 address)
         if (!ReserveVisibleSlot(g_indirect_args_lod1, g_visible_blade_capacity.y, idx))
             return;
         g_visible_lod1[idx] = address;
+        AppendMembership(membership, 1u, address);
         if (idx < g_prepared_capacity.y)
             g_prepared_lod1[idx] = PrepareBlade(inst);
     }
@@ -118,16 +148,20 @@ void AppendBladeLOD(DetailInstance inst, uint2 address)
         if (!ReserveVisibleSlot(g_indirect_args_lod2, g_visible_blade_capacity.z, idx))
             return;
         g_visible_lod2[idx] = address;
+        AppendMembership(membership, 2u, address);
         if (idx < g_prepared_capacity.z)
             g_prepared_lod2[idx] = PrepareBlade(inst);
     }
 }
 
-void AppendBillboard(uint2 address)
+void AppendBillboard(uint2 address, inout uint2 membership)
 {
     uint idx;
     if (ReserveVisibleSlot(g_indirect_args_billboard, g_visible_billboard_capacity, idx))
+    {
         g_visible_billboard[idx] = address;
+        AppendMembership(membership, MEMBERSHIP_KIND_BILLBOARD, address);
+    }
 }
 
 void AppendDecal(uint2 address)
@@ -145,6 +179,7 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         return;
     uint slot_id = g_visible_slot_ids[visibleSlot];
     SlotAABB slot = g_slot_aabbs[slot_id];
+    uint2 membership = uint2(0u, 0u);
 
     for (uint i = thread_id.x; i < slot.instance_count; i += 64)
     {
@@ -173,8 +208,14 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         if (is_static)
             AppendDecal(address);
         else if (g_grass_mode == 0)
-            AppendBillboard(address);
+            AppendBillboard(address, membership);
         else
-            AppendBladeLOD(inst, address);
+            AppendBladeLOD(inst, address, membership);
+    }
+
+    if (membership.x != 0u || membership.y != 0u)
+    {
+        g_work_status.InterlockedAdd(32, membership.x);
+        g_work_status.InterlockedAdd(36, membership.y);
     }
 }

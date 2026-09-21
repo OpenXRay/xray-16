@@ -5,7 +5,6 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "ClusterLightPassSetup.h"
-#include "LocalShadowPassSetup.h"
 
 namespace xray::render::framegraph
 {
@@ -62,7 +61,9 @@ public:
     u32 skinnedBatchStart;
     u32 grassBatchStart;
     u32 detailAtlasIndex;
-    u32 pad[3];
+    u32 diffuseMode;
+    u32 lightCount;
+    u32 pad;
 };
 
 static_assert(sizeof(ReSTIRGICB) == 224);
@@ -78,7 +79,8 @@ public:
     float invScreenWidth;
     float invScreenHeight;
     u32 frameIndex;
-    u32 pad[3];
+    u32 diffuseMode;
+    u32 pad[2];
 };
 
 static_assert(sizeof(TemporalCB) == 176);
@@ -91,7 +93,7 @@ public:
     float screenWidth;
     float screenHeight;
     float giIntensity;
-    u32 pad;
+    u32 diffuseMode;
 };
 
 static_assert(sizeof(CompositeCB) == 96);
@@ -107,8 +109,7 @@ public:
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle material;
-    ClusterLightOutput clusterLights;
-    LocalShadowOutput localShadow;
+    framegraph::VirtualResourceHandle lightData;
     framegraph::VirtualResourceHandle directLighting;
     framegraph::VirtualResourceHandle indirectLighting;
     framegraph::VirtualResourceHandle reservoirA;
@@ -130,6 +131,7 @@ public:
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle prevNormals;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle material;
     framegraph::VirtualResourceHandle prevDepth;
     framegraph::VirtualResourceHandle motionVectors;
     framegraph::VirtualResourceHandle reservoirA;
@@ -150,6 +152,7 @@ public:
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle material;
     framegraph::VirtualResourceHandle sceneColor;
     framegraph::VirtualResourceHandle directLighting;
     framegraph::VirtualResourceHandle indirectLighting;
@@ -163,7 +166,7 @@ public:
 
 LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseReservoirs);
 ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr, const framegraph::DefaultOutputLayout& inputs,
-    const ClusterLightOutput& clusterLights, const LocalShadowOutput& localShadow, framegraph::VirtualResourceHandle prevNormals,
+    const ClusterLightOutput& clusterLights, framegraph::VirtualResourceHandle prevNormals,
     framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
     const Fvector& cameraPos, float giIntensity, u32 width, u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting);
 

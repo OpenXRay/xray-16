@@ -1,6 +1,3 @@
-#include "common.h"
-#include "rt_common.h"
-#include "shared/pbr_brdf.h"
 #include "restir_gi_common.h"
 
 cbuffer CompositeParams : register(b5) {
@@ -8,7 +5,7 @@ cbuffer CompositeParams : register(b5) {
     float4 g_CameraPos;
     float2 g_ScreenSize;
     float g_GIIntensity;
-    uint g_Pad;
+    uint g_DiffuseMode;
 };
 
 Texture2D<float4> t_DirectLighting : register(t0);
@@ -17,6 +14,7 @@ Texture2D<float4> t_ReservoirB : register(t2);
 Texture2D<float> t_Depth : register(t3);
 Texture2D<float4> t_BaseColor : register(t5);
 Texture2D<float4> t_Normal : register(t8);
+Texture2D<float2> t_Material : register(t17);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
 RWTexture2D<float4> u_IndirectLighting : register(u1);
@@ -49,20 +47,11 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             giClip.z = (depth - 0.9) * 10.0;
         float4 giWorld = mul(g_InvViewProj, giClip);
         float3 worldPos = giWorld.xyz / giWorld.w;
-        float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
 
-        float3 N = normalize(normalData.xyz);
-        float roughness = abs(normalData.w);
-        float3 albedo = baseColorData.rgb;
-        float metallic = baseColorData.a;
+        MaterialSurface primary = GBufferMaterialSurface(normalData, t_BaseColor.Load(int3(pixel, 0)), t_Material.Load(int3(pixel, 0)));
+        float3 V = RTSafeNormalize(g_CameraPos.xyz - worldPos, primary.N);
 
-        float3 wi = normalize(r.samplePos - worldPos);
-        float cosTheta = max(dot(N, wi), 0);
-        float3 F0 = CalculateF0(albedo, metallic);
-        float3 kD = (1.0 - F_Schlick(cosTheta, F0)) * (1.0 - metallic);
-        float3 brdfCos = kD * albedo / PI * cosTheta;
-
-        indirect = r.Lo * brdfCos * r.W;
+        indirect = GITargetRadiance(primary, V, worldPos, r.samplePos, r.Lo, g_DiffuseMode) * r.W;
         indirect = min(indirect, RESTIR_MAX_RADIANCE);
     }
 

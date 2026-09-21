@@ -120,6 +120,8 @@ struct VariantData
 #define VARIANT_FLAG_BACK_TO_FRONT (1 << 3)
 #define VARIANT_FLAG_EMISSIVE      (1 << 4)
 #define VARIANT_FLAG_NO_SHADOW     (1 << 5)
+#define VARIANT_FLAG_ADDITIVE_EMISSION (1 << 6)
+#define VARIANT_FLAG_EMISSION_ALPHA   (1 << 7)
 
 // ═══════════════════════════════════════════════════════
 //  BINDLESS BUFFERS

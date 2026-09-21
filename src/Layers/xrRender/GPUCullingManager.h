@@ -423,7 +423,7 @@ public:
     nvrhi::IBuffer* GetRTIndexBuffer() const { return m_rtIndexBuffer.Get(); }
     u32 GetRTVertexCount() const { return m_rtVertexCount; }
     u32 GetRTIndexCount() const { return m_rtIndexCount; }
-    static constexpr u32 RT_VERTEX_STRIDE = 32u;
+    static constexpr u32 RT_VERTEX_STRIDE = 40u;
     u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
     const Fmatrix* GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const;
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }

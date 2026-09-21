@@ -1,11 +1,8 @@
 #ifndef RESTIR_GI_COMMON_H
 #define RESTIR_GI_COMMON_H
 
-#ifndef RT_COMMON_H
-#error "rt_common.h must be included before restir_gi_common.h"
-#endif
+#include "rt_bsdf.h"
 
-static const uint RESTIR_INVALID_ID = 0xFFFFFFFF;
 static const float RESTIR_MAX_RADIANCE = 100.0;
 static const uint RESTIR_M_MAX = 20;
 
@@ -38,11 +35,6 @@ bool IsReservoirValid(GIReservoir r)
     return r.M > 0 && any(r.Lo > 0);
 }
 
-float Luminance(float3 c)
-{
-    return dot(c, float3(0.2126, 0.7152, 0.0722));
-}
-
 bool ReservoirUpdate(inout GIReservoir r, float weight, float3 pos, float3 normal, float3 lo, inout uint rng)
 {
     if (isnan(weight) || isinf(weight))
@@ -59,6 +51,11 @@ bool ReservoirUpdate(inout GIReservoir r, float weight, float3 pos, float3 norma
         return true;
     }
     return false;
+}
+
+void ReservoirFinalize(inout GIReservoir r, float targetLuminance)
+{
+    r.W = (targetLuminance > 0.0 && r.M > 0) ? r.w_sum / (targetLuminance * r.M) : 0.0;
 }
 
 float2 OctEncode(float3 n)
@@ -102,8 +99,6 @@ void UnpackNormalMAge(uint packed, out float3 normal, out uint M, out uint age)
     age = packed & 0xFF;
 }
 
-// ReservoirA (RGBA32_FLOAT): samplePos.xyz, W
-// ReservoirB (RGBA32_FLOAT): Lo.rgb, packed(normal_oct16 | M_u8 | age_u8)
 void PackReservoir(GIReservoir r, out float4 A, out float4 B)
 {
     A = float4(r.samplePos, r.W);
@@ -121,35 +116,27 @@ GIReservoir UnpackReservoir(float4 A, float4 B)
     return r;
 }
 
-// Jacobian of reconnection shift: reusing sample from pixel q at pixel r
-// x1_new = primary surface at destination pixel (r)
-// x1_old = primary surface at source pixel (q)
-// x2 = secondary surface (sample point, fixed)
-// x2_normal = normal at secondary surface
-float JacobianReconnectionShift(float3 x2_normal, float3 x1_new, float3 x1_old, float3 x2)
+MaterialSurface GBufferMaterialSurface(float4 normalData, float4 baseColorData, float2 materialData)
 {
-    float3 v_new = x1_new - x2;
-    float t_new2 = dot(v_new, v_new);
-    v_new = t_new2 > 0 ? v_new * rsqrt(t_new2) : 0;
-
-    float3 v_old = x1_old - x2;
-    float t_old2 = dot(v_old, v_old);
-    v_old = t_old2 > 0 ? v_old * rsqrt(t_old2) : 0;
-
-    float cos_new = abs(dot(v_new, x2_normal));
-    float cos_old = abs(dot(v_old, x2_normal));
-
-    return (cos_new * t_old2) / max(cos_old * t_new2, 1e-6);
+    MaterialSurface surface;
+    surface.albedo = baseColorData.rgb;
+    surface.N = normalize(normalData.xyz);
+    surface.roughness = abs(normalData.w);
+    surface.metallic = baseColorData.a;
+    surface.ao = 1.0;
+    surface.emissive = 0.0;
+    surface.shadingClass = GBufferShadingClass(materialData);
+    surface.transmission = materialData.y;
+    return surface;
 }
 
-bool ValidateTemporalNeighbor(float currLinearDepth, float3 currNormal, float prevLinearDepth, float3 prevNormal)
+float3 GITargetRadiance(MaterialSurface primary, float3 V, float3 worldPos, float3 samplePos, float3 Lo, uint diffuseMode)
 {
-    float depthDiff = abs(currLinearDepth - prevLinearDepth) / max(currLinearDepth, 1e-4);
-    if (depthDiff > 0.1)
-        return false;
-    if (dot(currNormal, prevNormal) < 0.906)
-        return false;
-    return true;
+    float3 toSample = samplePos - worldPos;
+    float distSq = dot(toSample, toSample);
+    if (distSq <= 1e-12 || !all(isfinite(toSample)) || !all(isfinite(Lo)))
+        return 0.0;
+    return RTEvaluateBSDF(primary, V, toSample * rsqrt(distSq), Lo, diffuseMode);
 }
 
 #endif
