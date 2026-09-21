@@ -361,6 +361,7 @@ void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
     m_mainView.InvalidateHistory();
+    passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_particleEditor)
         m_particleEditor->OnLevelUnload();
     if (m_processHOMTask) {

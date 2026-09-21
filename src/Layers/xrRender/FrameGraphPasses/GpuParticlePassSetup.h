@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/LightingMode.h"
 #include "ParticlePassSetup.h"
 #include <nvrhi/nvrhi.h>
 
@@ -50,6 +51,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
     framegraph::VirtualResourceHandle distortion,
     u32 width,
     u32 height,
-    GpuParticlePassState& state);
+    GpuParticlePassState& state,
+    const LightingFrameState* lighting = nullptr);
 
 }

@@ -3,7 +3,8 @@
 #include "rt_shading.h"
 #include "restir_gi_common.h"
 
-cbuffer ReSTIRGIParams : register(b5) {
+cbuffer ReSTIRGIParams : register(b5)
+{
     float4x4 g_InvViewProj;
     float4x4 g_PrevViewProj;
     float4 g_CameraPos;
@@ -19,7 +20,11 @@ cbuffer ReSTIRGIParams : register(b5) {
     uint g_DetailAtlasIndex;
     uint g_DiffuseMode;
     uint g_RTLightCount;
-    uint g_Pad;
+    uint g_ReuseReservoirs;
+    uint g_EmissiveCount;
+    uint g_MaxNullEvents;
+    float g_EnvironmentRotation;
+    float g_SunAngularRadius;
 };
 
 Texture2D<float> t_Depth : register(t14);
@@ -46,65 +51,130 @@ float3 ReconstructWorldPos(float2 pixel, float depth)
 void main(uint3 dispatchID : SV_DispatchThreadID)
 {
     uint2 pixel = dispatchID.xy;
-    if (pixel.x >= (uint)g_ScreenSize.x || pixel.y >= (uint)g_ScreenSize.y)
+    if (pixel.x >= uint(g_ScreenSize.x) || pixel.y >= uint(g_ScreenSize.y))
         return;
-
     float depth = t_Depth.Load(int3(pixel, 0));
     float4 normalData = t_Normal.Load(int3(pixel, 0));
-    if (depth <= 0.0 || dot(normalData.xyz, normalData.xyz) < 0.25) {
-        u_DirectLighting[pixel] = 0;
-        u_IndirectLighting[pixel] = 0;
-        u_ReservoirA[pixel] = 0;
-        u_ReservoirB[pixel] = 0;
+    if (depth <= 0.0 || dot(normalData.xyz, normalData.xyz) < 0.25)
+    {
+        u_DirectLighting[pixel] = 0.0;
+        u_IndirectLighting[pixel] = 0.0;
+        u_ReservoirA[pixel] = 0.0;
+        u_ReservoirB[pixel] = 0.0;
         return;
     }
-
     RTSceneParams scene = RTBuildSceneParams(g_IdentityStaticCount, g_TerrainBatchCount,
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
-        g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight);
-
+        g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
+        g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+    uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
     float3 worldPos = ReconstructWorldPos(float2(pixel), depth);
     MaterialSurface primary = GBufferMaterialSurface(normalData, t_BaseColor.Load(int3(pixel, 0)), t_Material.Load(int3(pixel, 0)));
     float3 V = RTSafeNormalize(g_CameraPos.xyz - worldPos, primary.N);
-
-    u_DirectLighting[pixel] = float4(RTDirectLighting(scene, primary, worldPos, primary.N, V), 1.0);
-
-    uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
-
-    GIReservoir reservoir = EmptyReservoir();
+    float coneWidth = max(length(ReconstructWorldPos(float2(pixel) + float2(1.0, 0.0), depth) - worldPos),
+        length(ReconstructWorldPos(float2(pixel) + float2(0.0, 1.0), depth) - worldPos));
+    float coneSpread = coneWidth / max(length(g_CameraPos.xyz - worldPos), 0.001);
+    coneSpread = max(coneSpread, max(primary.roughness * primary.roughness, 1.0 - primary.metallic));
+    RTDirectTerms direct = RTDirectLightingTerms(scene, primary, worldPos, primary.N, V,
+        coneWidth, coneSpread, true, rng);
+    float3 directRadiance = direct.diffuse + direct.specular;
     float3 unresampledIndirect = 0.0;
-
+    GIReservoir reservoir = EmptyReservoir();
     RTBSDFSample bounce = RTSampleBSDF(primary, V, scene.diffuseMode, rng);
     if (bounce.valid)
     {
-        float bounceSide = dot(bounce.direction, primary.N) >= 0.0 ? 1.0 : -1.0;
-        float3 bounceOrigin = worldPos + primary.N * (RT_RAY_ORIGIN_OFFSET * bounceSide);
-        RTSceneTrace trace = RTTraceRay(scene, bounceOrigin, bounce.direction, RT_RAY_DISTANCE, false, rng);
-        unresampledIndirect = bounce.weight * trace.emissive;
-        if (!trace.hit)
+        float side = dot(bounce.direction, primary.N) >= 0.0 ? 1.0 : -1.0;
+        float3 origin = worldPos + primary.N * (RT_RAY_ORIGIN_OFFSET * side);
+        float3 direction = bounce.direction;
+        float3 pathWeight = bounce.weight;
+        float3 previousPosition = worldPos;
+        float previousPdf = bounce.pdf;
+        bool previousDelta = bounce.delta;
+        bool reusable = true;
+        bool indirectSource = false;
+        uint nullEvents = 0u;
+        for (uint event = 0u; event < scene.maxNullEvents; ++event)
         {
-            unresampledIndirect += bounce.weight * SampleRTSky(scene, bounce.direction) * trace.transmittance;
-        }
-        else
-        {
-            float3 hitPos = bounceOrigin + bounce.direction * trace.t;
-            RTHitGeometry geometry = RTFetchHitGeometry(scene, trace, bounce.direction);
-            RTHitSurface hit = RTResolveHitSurface(scene, trace, geometry);
-
-            float3 secondaryV = RTSafeNormalize(worldPos - hitPos, -bounce.direction);
-            float3 Lo = hit.surface.emissive + RTDirectLighting(scene, hit.surface, hitPos, geometry.geoNormal, secondaryV);
-            Lo = min(Lo, RESTIR_MAX_RADIANCE) * trace.transmittance;
-
-            float3 target = GITargetRadiance(primary, V, worldPos, hitPos, Lo, scene.diffuseMode);
-            float targetLuminance = Luminance(target);
-            if (targetLuminance > 0.0)
+            RTSceneTrace trace = RTTraceRay(scene, origin, direction, RT_RAY_DISTANCE, false, rng,
+                coneWidth, coneSpread, previousPosition, previousPdf, previousDelta);
+            float3 sourceRadiance = pathWeight * trace.emissive;
+            if (indirectSource)
+                unresampledIndirect += sourceRadiance;
+            else
+                directRadiance += sourceRadiance;
+            pathWeight *= trace.transmittance;
+            nullEvents += trace.nullEvents;
+            if (trace.exhausted || nullEvents >= scene.maxNullEvents)
+                break;
+            if (!trace.hit)
             {
-                ReservoirUpdate(reservoir, targetLuminance / bounce.pdf, hitPos, hit.surface.N, Lo, rng);
-                ReservoirFinalize(reservoir, targetLuminance);
+                sourceRadiance = pathWeight * RTMissRadiance(scene, direction, previousPdf, previousDelta);
+                if (indirectSource)
+                    unresampledIndirect += sourceRadiance;
+                else
+                    directRadiance += sourceRadiance;
+                break;
             }
+            float3 hitPosition = origin + direction * trace.t;
+            RTHitGeometry geometry = RTFetchHitGeometry(scene, trace, direction);
+            RTHitSurface hit = RTResolveHitSurface(scene, trace, geometry);
+            coneWidth += coneSpread * trace.t;
+            float emissionWeight = RTEmissionWeight(scene, trace.batchIdx, trace.info, trace.primitiveIndex,
+                previousPosition, hitPosition, previousPdf, previousDelta);
+            sourceRadiance = pathWeight * hit.surface.emissive * emissionWeight;
+            if (indirectSource)
+                unresampledIndirect += sourceRadiance;
+            else
+                directRadiance += sourceRadiance;
+            if ((hit.flags & MAT_FLAG_WATER) != 0u)
+            {
+                reusable = false;
+                bool passthrough;
+                RTBSDFSample water = RTSampleSurface(hit, geometry, -direction, scene.diffuseMode, rng, passthrough);
+                if (!water.valid)
+                    break;
+                pathWeight *= water.weight;
+                if (!passthrough)
+                {
+                    previousPosition = hitPosition;
+                    previousPdf = water.pdf;
+                    previousDelta = water.delta;
+                    indirectSource = true;
+                }
+                else if (++nullEvents >= scene.maxNullEvents)
+                    break;
+                float waterSide = dot(water.direction, geometry.geoNormal) >= 0.0 ? 1.0 : -1.0;
+                origin = hitPosition + geometry.geoNormal * (RT_RAY_ORIGIN_OFFSET * waterSide);
+                direction = water.direction;
+                continue;
+            }
+            coneSpread = max(coneSpread, max(hit.surface.roughness * hit.surface.roughness, 1.0 - hit.surface.metallic));
+            RTDirectTerms secondary = RTDirectLightingTerms(scene, hit.surface, hitPosition,
+                geometry.geoNormal, -direction, coneWidth, coneSpread, false, rng);
+            float3 Lo = secondary.diffuse + secondary.specular;
+            if (g_ReuseReservoirs == 0u || !reusable)
+            {
+                unresampledIndirect += pathWeight * Lo;
+            }
+            else
+            {
+                Lo = min(Lo, RESTIR_MAX_RADIANCE);
+                float3 target = GITargetRadiance(primary, V, worldPos, hitPosition, Lo, scene.diffuseMode);
+                float targetLuminance = Luminance(target);
+                if (targetLuminance > 0.0)
+                {
+                    ReservoirUpdate(reservoir, targetLuminance / bounce.pdf, hitPosition, hit.surface.N, Lo, rng);
+                    ReservoirFinalize(reservoir, targetLuminance);
+                }
+            }
+            break;
         }
     }
-
+    if (!all(isfinite(directRadiance)))
+        directRadiance = 0.0;
+    if (!all(isfinite(unresampledIndirect)))
+        unresampledIndirect = 0.0;
+    u_DirectLighting[pixel] = float4(directRadiance, 1.0);
     u_IndirectLighting[pixel] = float4(unresampledIndirect, 1.0);
     float4 reservoirA, reservoirB;
     PackReservoir(reservoir, reservoirA, reservoirB);

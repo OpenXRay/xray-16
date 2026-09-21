@@ -180,6 +180,50 @@ void RTNormalizedBasis(float3 N, float3 tangent, float3 bitangent, out float3 T,
     B = bLenSq > 1e-10 ? bitangent * rsqrt(bLenSq) : cross(N, T);
 }
 
+static const float RT_FOOTPRINT_MIN_COS = 1e-3;
+static const float RT_FOOTPRINT_MAX_RADIUS = 1024.0;
+
+void RTUVFootprintFromRayCone(float3 uvTangent, float3 uvBitangent, float3 geoNormal, float3 rayDirection,
+    float rayDistance, float coneWidth, float coneSpread, out float2 uvDx, out float2 uvDy)
+{
+    uvDx = 0.0;
+    uvDy = 0.0;
+
+    float radius = coneWidth + coneSpread * max(rayDistance, 0.0);
+    if (!(radius > 0.0) || !isfinite(radius))
+        return;
+    radius = min(radius, RT_FOOTPRINT_MAX_RADIUS);
+
+    float aa = dot(uvTangent, uvTangent);
+    float ab = dot(uvTangent, uvBitangent);
+    float bb = dot(uvBitangent, uvBitangent);
+    float det = aa * bb - ab * ab;
+    if (!(det > 1e-12 * aa * bb) || !isfinite(det))
+        return;
+
+    float3 n = RTSafeNormalize(geoNormal, float3(0.0, 1.0, 0.0));
+    float3 rd = RTSafeNormalize(rayDirection, -n);
+    float3 up = abs(n.y) < 0.999 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+    float3 majorDir = rd - n * dot(rd, n);
+    majorDir = dot(majorDir, majorDir) > 1e-12 ? normalize(majorDir) : RTSafeNormalize(cross(up, n), float3(1.0, 0.0, 0.0));
+    float3 minorDir = cross(n, majorDir);
+
+    float stretch = 1.0 / max(abs(dot(rd, n)), RT_FOOTPRINT_MIN_COS);
+    float invDet = 1.0 / det;
+    float majorT = dot(uvTangent, majorDir) * (radius * stretch);
+    float majorB = dot(uvBitangent, majorDir) * (radius * stretch);
+    uvDx = float2(bb * majorT - ab * majorB, aa * majorB - ab * majorT) * invDet;
+    float minorT = dot(uvTangent, minorDir) * radius;
+    float minorB = dot(uvBitangent, minorDir) * radius;
+    uvDy = float2(bb * minorT - ab * minorB, aa * minorB - ab * minorT) * invDet;
+
+    if (!all(isfinite(uvDx)) || !all(isfinite(uvDy)))
+    {
+        uvDx = 0.0;
+        uvDy = 0.0;
+    }
+}
+
 uint pcg_hash(uint input)
 {
     uint state = input * 747796405u + 2891336453u;

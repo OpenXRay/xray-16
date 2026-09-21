@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "ReSTIRGIPassSetup.h"
 #include "ShaderConstants.h"
+#include "RTEnvironmentSamplingPassSetup.h"
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
@@ -268,6 +271,13 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         lightData = fg.ImportBuffer("cluster_light_data", buffer, desc);
     }
 
+    const auto environmentSampling = setupRTEnvironmentSamplingPass(fg, device, sky0Tex, sky1Tex, skyWeight);
+    if (!environmentSampling.distribution.is_valid())
+    {
+        lighting.Fail(LightingFallback::ResourcesUnavailable);
+        return { sceneColorIn };
+    }
+
     SunLightData sun = {};
     GetSunLightData(sun);
     const Fvector sunDir = sun.direction;
@@ -281,7 +291,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
     const auto& batchCounts = accelMgr->GetBatchCounts();
 
-    ReSTIRGICB initialCB;
+    ReSTIRGICB initialCB = {};
     initialCB.invViewProj = invViewProj;
     initialCB.prevViewProj = prevViewProj;
     initialCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
@@ -294,14 +304,18 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     initialCB.identityStaticCount = batchCounts.identityStatic;
     initialCB.terrainBatchCount = batchCounts.terrain;
     initialCB.skinnedBatchStart =
-        batchCounts.skinned > 0 ? batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal : 0;
+        batchCounts.skinned > 0 ? batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal : UINT32_MAX;
     initialCB.grassBatchStart = batchCounts.grass > 0 ?
         batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned :
-        0;
+        UINT32_MAX;
     initialCB.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
     initialCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
     initialCB.lightCount = lightManager.GetLightCount();
-    initialCB.pad = 0;
+    initialCB.reuseReservoirs = lighting.reuseReservoirs ? 1u : 0u;
+    initialCB.emissiveCount = accelMgr->GetScene()->emissiveCount;
+    initialCB.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
+    initialCB.environmentRotation = env.CurrentEnv.sky_rotation;
+    initialCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
 
     ResourceDesc persistDesc;
     persistDesc.type = ResourceDesc::Type::Texture2D;
@@ -340,6 +354,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.baseColor = pb.read(baseColor, ResourceState::ShaderResource);
             data.material = pb.read(material, ResourceState::ShaderResource);
             data.lightData = pb.read(lightData, ResourceState::ShaderResource);
+            data.environmentDistribution = pb.read(environmentSampling.distribution, ResourceState::ShaderResource);
             data.directLighting = pb.write(fgDirectLighting, ResourceState::UnorderedAccess);
             data.indirectLighting = pb.write(fgIndirectLighting, ResourceState::UnorderedAccess);
             data.reservoirA = pb.write(fgResA, ResourceState::UnorderedAccess);
@@ -382,8 +397,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             auto* matBuf = scene.materials;
             auto* terrainBuf = scene.terrainMaterials;
 
+            auto* environmentDistribution = fg.GetPhysicalBuffer(data.environmentDistribution);
             if (!sky0 || !sky1 || !directLit || !indirectLit || !resA || !resB || !tlas || !batchInfo || !megaVB ||
-                !megaIB || !matBuf || !terrainBuf || !scene.variants || !scene.textures)
+                !megaIB || !matBuf || !terrainBuf || !scene.variants || !scene.textures ||
+                !scene.emissiveTriangles || !scene.batchTransforms || !scene.emissiveBatchOffsets || !environmentDistribution)
             {
                 Msg("! [RTGI Initial] Null binding: sky0=%d sky1=%d directLit=%d resA=%d resB=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
                     !!sky0, !!sky1, !!directLit, !!resA, !!resB, !!tlas, !!batchInfo, !!megaVB, !!megaIB, !!matBuf, !!terrainBuf);
@@ -442,6 +459,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
             bsb.BufferSRV("g_GrassVB", grassVB);
             bsb.BufferSRV("g_GrassIB", grassIB);
+            bsb.BufferSRV("g_EmissiveTriangles", scene.emissiveTriangles);
+            bsb.BufferSRV("g_RTBatchTransforms", scene.batchTransforms);
+            bsb.BufferSRV("g_EmissiveBatchOffsets", scene.emissiveBatchOffsets);
+            bsb.BufferSRV("g_EnvironmentCDF", environmentDistribution);
             bsb.Texture("t_Depth", depthTex);
             bsb.Texture("t_Normal", normalTex);
             bsb.Texture("t_BaseColor", baseColorTex);

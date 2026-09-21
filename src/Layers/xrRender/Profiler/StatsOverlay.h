@@ -13,6 +13,8 @@ namespace xray::profiler
 // ═══════════════════════════════════════════════════════
 // Collected per-frame from geometry collector and GPU culling
 
+const char* PathTracerDiagnosticName(u32 mode);
+
 struct RenderStats
 {
     // Geometry counts
@@ -200,11 +202,39 @@ struct RenderStats
     u32 fgArenaFallbacks = 0;
     render::fg::LightingFrameState lighting;
     u32 pathTracerSamples = 0;
+    u32 pathTracerBounces = 0;
+    u32 pathTracerDiffuseMode = 0;
+    u32 pathTracerDiagnosticMode = 0;
+    u32 pathTracerMaxNullEvents = 0;
+    u32 pathTracerMaxSamples = 0;
+    float pathTracerSunAngularRadius = 0.0f;
+    bool pathTracerFreezeRequested = false;
+    bool pathTracerFrozen = false;
+    bool pathTracerCapturePending = false;
+    bool pathTracerSnapshotValid = false;
+    bool pathTracerSnapshotFallback = false;
+    bool pathTracerCdfActive = false;
+    u32 pathTracerLightCount = 0;
+    u32 pathTracerEmissiveCount = 0;
+    u32 pathTracerCapturedTextures = 0;
+    u64 pathTracerCapturedTextureBytes = 0;
+    u64 pathTracerRetainedSceneBytes = 0;
+    u64 pathTracerFrozenSceneRevision = 0;
+    u64 pathTracerFrozenTextureRevision = 0;
+    u64 pathTracerLightingSignature = 0;
 
     void Reset()
     {
         lighting = {};
         pathTracerSamples = 0;
+        pathTracerBounces = pathTracerDiffuseMode = pathTracerDiagnosticMode = 0;
+        pathTracerMaxNullEvents = pathTracerMaxSamples = 0;
+        pathTracerSunAngularRadius = 0.0f;
+        pathTracerFreezeRequested = pathTracerFrozen = pathTracerCapturePending = false;
+        pathTracerSnapshotValid = pathTracerSnapshotFallback = pathTracerCdfActive = false;
+        pathTracerLightCount = pathTracerEmissiveCount = pathTracerCapturedTextures = 0;
+        pathTracerCapturedTextureBytes = pathTracerRetainedSceneBytes = 0;
+        pathTracerFrozenSceneRevision = pathTracerFrozenTextureRevision = pathTracerLightingSignature = 0;
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
         totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
         megaBufferVertices = megaBufferIndices = 0;

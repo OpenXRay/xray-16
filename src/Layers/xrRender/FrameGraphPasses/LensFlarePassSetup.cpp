@@ -11,21 +11,24 @@
 namespace xray::render::fg::passes
 {
 framegraph::VirtualResourceHandle setupLensFlarePass(framegraph::FrameGraph& fg, framegraph::VirtualResourceHandle inputTarget,
-    framegraph::VirtualResourceHandle depthTarget, FGLensFlareRender* renderer)
+    framegraph::VirtualResourceHandle depthTarget, FGLensFlareRender* renderer, const LightingFrameState* lighting)
 {
     using namespace framegraph;
 
     auto& passData = fg.addCallbackPass<LensFlarePassData>(
         "LensFlare",
-        [inputTarget, depthTarget, renderer](FrameGraph& builder, PassHandle passHandle, LensFlarePassData& data)
+        [inputTarget, depthTarget, renderer, lighting](FrameGraph& builder, PassHandle passHandle, LensFlarePassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
+            data.lighting = lighting;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
             data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const LensFlarePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
+            if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
+                return;
             if (!data.renderer || !data.renderer->HasWork())
                 return;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();

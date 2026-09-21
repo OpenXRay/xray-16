@@ -5,6 +5,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/LightingMode.h"
 #include "SmokeTrailManager.h"
 #include "TrailPassSetup.h"  // TrailParamsCB, shared structs
 
@@ -54,6 +55,7 @@ framegraph::DefaultOutputLayout setupSmokeTrailPass(
     u32                                  width,
     u32                                  height,
     SmokeTrailPassState&                 state,
+    const LightingFrameState*            lighting = nullptr,
     nvrhi::ITexture*                     perlin4dVolume = nullptr);
 
 } // namespace xray::render::fg::passes

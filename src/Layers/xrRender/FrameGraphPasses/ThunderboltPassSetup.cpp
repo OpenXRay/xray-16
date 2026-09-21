@@ -11,21 +11,24 @@
 namespace xray::render::fg::passes
 {
 framegraph::VirtualResourceHandle setupThunderboltPass(framegraph::FrameGraph& fg, framegraph::VirtualResourceHandle inputTarget,
-    framegraph::VirtualResourceHandle depthTarget, FGThunderboltRender* renderer)
+    framegraph::VirtualResourceHandle depthTarget, FGThunderboltRender* renderer, const LightingFrameState* lighting)
 {
     using namespace framegraph;
 
     auto& passData = fg.addCallbackPass<ThunderboltPassData>(
         "Thunderbolt",
-        [inputTarget, depthTarget, renderer](FrameGraph& builder, PassHandle passHandle, ThunderboltPassData& data)
+        [inputTarget, depthTarget, renderer, lighting](FrameGraph& builder, PassHandle passHandle, ThunderboltPassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
+            data.lighting = lighting;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
             data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const ThunderboltPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
+            if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
+                return;
             if (!data.renderer || !data.renderer->HasWork())
                 return;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();

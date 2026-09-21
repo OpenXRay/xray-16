@@ -22,6 +22,9 @@ struct DistortionApplyData {
     VirtualResourceHandle distortionInput;
     VirtualResourceHandle depthInput;
     VirtualResourceHandle output;
+    VirtualResourceHandle copySource;
+    VirtualResourceHandle copyDest;
+    const LightingFrameState* lighting = nullptr;
     u32 width;
     u32 height;
     DistortionApplyPassState* passState;
@@ -72,7 +75,8 @@ VirtualResourceHandle setupDistortionApplyPass(
     VirtualResourceHandle depth,
     u32 width,
     u32 height,
-    DistortionApplyPassState& passState)
+    DistortionApplyPassState& passState,
+    const LightingFrameState* lighting)
 {
     if (device && device->GetNVRHIDevice())
         InitializeDistortionApplyPass(device->GetNVRHIDevice(), passState);
@@ -91,19 +95,32 @@ VirtualResourceHandle setupDistortionApplyPass(
     auto& passData = fg.addCallbackPass<DistortionApplyData>(
         "DistortionApply",
 
-        [sceneColor, distortionRT, depth, outputHandle, width, height, &passState](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
+        [sceneColor, distortionRT, depth, outputHandle, width, height, &passState, lighting](FrameGraph& builder, PassHandle passHandle, DistortionApplyData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.width = width;
             data.height = height;
             data.passState = &passState;
+            data.lighting = lighting;
             data.sceneInput = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.distortionInput = passBuilder.read(distortionRT, ResourceState::ShaderResource);
             data.depthInput = passBuilder.read(depth, ResourceState::ShaderResource);
             data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
+            data.copySource = passBuilder.read(sceneColor, ResourceState::CopySource);
+            data.copyDest = passBuilder.write(outputHandle, ResourceState::CopyDest);
         },
 
         [](const DistortionApplyData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+            if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
+            {
+                auto* copySource = fg.GetPhysicalTexture(data.copySource);
+                auto* copyDest = fg.GetPhysicalTexture(data.copyDest);
+                if (cmdList && copySource && copyDest)
+                    ctx->CopyTexture(copyDest, copySource);
+                return;
+            }
+
             auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
             auto* distortTex = fg.GetPhysicalTexture(data.distortionInput);
             auto* depthTex = fg.GetPhysicalTexture(data.depthInput);

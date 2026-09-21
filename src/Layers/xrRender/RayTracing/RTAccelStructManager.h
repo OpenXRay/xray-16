@@ -47,6 +47,31 @@ public:
     u32 grass = 0;
 };
 
+class RTEmissiveTriangle
+{
+public:
+    u32 batchIndex;
+    u32 primitiveIndex;
+    u32 idLow;
+    u32 idHigh;
+};
+static_assert(sizeof(RTEmissiveTriangle) == 16);
+
+class RTBatchTransform
+{
+public:
+    float rows[3][4];
+};
+static_assert(sizeof(RTBatchTransform) == 48);
+
+class RTBatchSource
+{
+public:
+    u32 array;
+    u32 index;
+};
+static_assert(sizeof(RTBatchSource) == 8);
+
 class RTFrameResources
 {
 public:
@@ -61,6 +86,10 @@ public:
     framegraph::VirtualResourceHandle skinnedIndices;
     framegraph::VirtualResourceHandle grassVertices;
     framegraph::VirtualResourceHandle grassIndices;
+    framegraph::VirtualResourceHandle emissiveTriangles;
+    framegraph::VirtualResourceHandle batchTransforms;
+    framegraph::VirtualResourceHandle emissiveBatchOffsets;
+    u32 emissiveCount = 0;
     nvrhi::DescriptorTableHandle textures;
 };
 
@@ -78,6 +107,10 @@ public:
     nvrhi::IBuffer* skinnedIndices = nullptr;
     nvrhi::IBuffer* grassVertices = nullptr;
     nvrhi::IBuffer* grassIndices = nullptr;
+    nvrhi::IBuffer* emissiveTriangles = nullptr;
+    nvrhi::IBuffer* batchTransforms = nullptr;
+    nvrhi::IBuffer* emissiveBatchOffsets = nullptr;
+    u32 emissiveCount = 0;
     nvrhi::IDescriptorTable* textures = nullptr;
 };
 
@@ -151,6 +184,7 @@ public:
     void Capture(xr_vector<u32>& indices);
     nvrhi::IDescriptorTable* GetTable() const;
     const xr_set<nvrhi::ITexture*>& GetTextures() const;
+    const xr_vector<u32>& GetIndices() const { return m_indices; }
 
 private:
     IRenderBackend* m_backend = nullptr;
@@ -166,7 +200,9 @@ public:
     nvrhi::BufferHandle indices;
     xr_vector<RTGeometryBuild> builds;
     xr_vector<nvrhi::rt::InstanceDesc> instances;
+    xr_vector<s32> instanceBatches;
     xr_vector<RTBatchInfo> batches;
+    xr_vector<RTBatchSource> batchSources;
     RTBatchCounts counts;
     RTTextureBindings textures;
     bool emptySource = false;
@@ -181,6 +217,7 @@ public:
     u32 indexOffset;
     u32 indexCount;
     u32 materialID;
+    u64 geometryID;
 };
 
 class RTGrassJob
@@ -219,15 +256,25 @@ public:
     xr_vector<RTGrassJob> grassJobs;
     xr_vector<u32> skinIndexData;
     xr_vector<RTBatchInfo> batches;
+    xr_vector<RTBatchTransform> batchTransforms;
+    xr_vector<u64> batchIdentities;
+    xr_vector<RTEmissiveTriangle> emissiveTriangles;
+    xr_vector<u32> emissiveBatchOffsets;
     xr_vector<nvrhi::rt::InstanceDesc> instances;
     RTBatchCounts counts;
+    nvrhi::BufferHandle emissiveTriangleBuffer;
+    nvrhi::BufferHandle batchTransformBuffer;
+    nvrhi::BufferHandle emissiveBatchOffsetBuffer;
     BillboardRTCB billboardConstants = {};
+    u32 emissiveCount = 0;
     u32 grassVertexCount = 0;
     u32 grassIndexCount = 0;
     u32 detailAtlasIndex = 0;
     u32 leases = 0;
+    u32 retention = 0;
     bool billboard = false;
     bool recorded = false;
+    bool failed = false;
 };
 
 class RTLeaseRecord
@@ -269,6 +316,12 @@ public:
         const xr_vector<GeometryBatch>& hudBatches);
     RTFrameResources UseScene(framegraph::FrameGraph& graph,
         framegraph::RenderPassBuilder& builder) const;
+    RTFrameResources UseScene(framegraph::FrameGraph& graph, framegraph::RenderPassBuilder& builder,
+        const std::shared_ptr<RTSceneGeneration>& scene) const;
+    std::shared_ptr<RTSceneGeneration> GetScene() const;
+    void RetainScene(const std::shared_ptr<RTSceneGeneration>& scene);
+    void ReleaseScene(const std::shared_ptr<RTSceneGeneration>& scene);
+    bool IsSceneValid(const RTSceneGeneration& scene) const;
     static RTFrameBuffers ResolveScene(const framegraph::FrameGraph& graph,
         const RTFrameResources& resources);
     static void InvalidateShaderPipelines();
@@ -283,6 +336,7 @@ public:
 
 private:
     static void HashSceneData(u64& signature, const void* data, size_t size);
+    bool IsSceneReady(const RTSceneGeneration& scene) const;
     u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling) const;
     u64 ComputeSceneSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches) const;

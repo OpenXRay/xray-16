@@ -1017,6 +1017,11 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
+    CMD4(CCC_Integer, "r_path_tracer_debug", &ps_r_path_tracer_debug, 0, 13);
+    CMD4(CCC_Integer, "r_path_tracer_freeze", &ps_r_path_tracer_freeze, 0, 1);
+    CMD4(CCC_Integer, "r_path_tracer_samples", &ps_r_path_tracer_samples, 0, 16777216);
+    CMD4(CCC_Integer, "r_rt_max_null_events", &ps_r_rt_max_null_events, 1, 4096);
+    CMD4(CCC_Float, "r_rt_sun_radius", &ps_r_rt_sun_radius, 0.0f, 5.0f);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Integer, "r_rt_gi_restir", &ps_r_rt_gi_restir, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);

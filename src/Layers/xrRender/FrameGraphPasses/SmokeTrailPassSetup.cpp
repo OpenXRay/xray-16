@@ -195,6 +195,7 @@ struct SmokeDrawPassData
     fg::RenderDevice*    device     = nullptr;
     SmokeTrailManager*   manager    = nullptr;
     SmokeTrailPassState* smokeState = nullptr;
+    const LightingFrameState* lighting = nullptr;
     DefaultOutputLayout  outputs;
     u32 width  = 0;
     u32 height = 0;
@@ -214,6 +215,7 @@ DefaultOutputLayout setupSmokeTrailPass(
     u32                              width,
     u32                              height,
     SmokeTrailPassState&             state,
+    const LightingFrameState*        lighting,
     nvrhi::ITexture*                 perlin4dVolume)
 {
     InitSmokeComputePipelines(device, state);
@@ -384,6 +386,7 @@ DefaultOutputLayout setupSmokeTrailPass(
             data.device            = device;
             data.manager           = manager;
             data.smokeState        = &state;
+            data.lighting          = lighting;
             data.width             = width;
             data.height            = height;
             data.outputs           = inputs;
@@ -398,6 +401,9 @@ DefaultOutputLayout setupSmokeTrailPass(
             auto* mgr   = data.manager;
             auto* st    = data.smokeState;
             if (!mgr || !mgr->IsReady() || !st || !st->initialized)
+                return;
+
+            if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);

@@ -40,6 +40,16 @@ static bool FormatQueueTimingsLine(char* buf, size_t size)
 namespace xray::profiler
 {
 
+const char* PathTracerDiagnosticName(u32 mode)
+{
+    static constexpr pcstr kNames[] = {
+        "beauty", "albedo", "normal", "roughness", "metallic",
+        "direct diffuse", "direct specular", "indirect diffuse", "indirect specular",
+        "visible emission", "path length", "invalid samples", "raw radiance", "transport coverage",
+    };
+    return mode < sizeof(kNames) / sizeof(kNames[0]) ? kNames[mode] : "unknown";
+}
+
 StatsOverlay::StatsOverlay()
 {
     // Get the ImGui context from Device - required for proper input handling
@@ -160,8 +170,52 @@ void StatsOverlay::Render()
         ImGui::Text("RTGI ReSTIR reuse: %s", lighting.reuseReservoirs ? "enabled" : "disabled");
     if (lighting.requested == render::fg::LightingMode::ReferencePT)
     {
-        ImGui::Text("PT submitted samples: %u", m_renderStats.pathTracerSamples);
+        const RenderStats& rs = m_renderStats;
+        ImGui::Text("PT submitted samples: %u", rs.pathTracerSamples);
         ImGui::Text("PT recorded samples: %u", lighting.recordedSamples);
+        ImGui::Text("PT reference: %s (diagnostic %u of 13)", PathTracerDiagnosticName(rs.pathTracerDiagnosticMode), rs.pathTracerDiagnosticMode);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Path length: R = traced scattering depth / 16, G = requested budget / 16.\n"
+                "Invalid samples: magenta marks rejected samples.\n"
+                "Transport coverage: standard green, foliage yellow, alpha blend cyan,\n"
+                "thin-water fallback magenta, miss blue.");
+        ImGui::Text("PT integrator: bounces %u | diffuse %u | null events %u | sample cap %u%s",
+            rs.pathTracerBounces, rs.pathTracerDiffuseMode, rs.pathTracerMaxNullEvents, rs.pathTracerMaxSamples,
+            rs.pathTracerMaxSamples ? "" : " (uncapped)");
+        ImGui::Text("PT sun radius: %.2f deg%s", rad2deg(rs.pathTracerSunAngularRadius),
+            rs.pathTracerSunAngularRadius > 0.0f ? "" : " (delta sun)");
+        ImGui::Text("PT scene: %s", rs.pathTracerFreezeRequested ?
+            (rs.pathTracerSnapshotValid ? "frozen snapshot" : (rs.pathTracerCapturePending ? "frozen capture awaiting completion" : "live fallback (no snapshot)")) :
+            "live scene (freeze off)");
+        ImGui::Text("PT snapshot: requested %s | pending %s | valid %s | fallback %s | frozen %s | cdf %s",
+            rs.pathTracerFreezeRequested ? "yes" : "no", rs.pathTracerCapturePending ? "yes" : "no",
+            rs.pathTracerSnapshotValid ? "yes" : "no", rs.pathTracerSnapshotFallback ? "yes" : "no",
+            rs.pathTracerFrozen ? "yes" : "no", rs.pathTracerCdfActive ? "active" : "inactive");
+        ImGui::Text("PT scene contents: %u lights | %u emitters (%s)",
+            rs.pathTracerLightCount, rs.pathTracerEmissiveCount, rs.pathTracerFrozen ? "frozen snapshot" : "live scene");
+        if (rs.pathTracerFrozen)
+        {
+            ImGui::Text("PT frozen revision: scene %llu | textures %llu | lighting %016llx",
+                static_cast<unsigned long long>(rs.pathTracerFrozenSceneRevision),
+                static_cast<unsigned long long>(rs.pathTracerFrozenTextureRevision),
+                static_cast<unsigned long long>(rs.pathTracerLightingSignature));
+            ImGui::Text("PT frozen clone: %u textures (%s) | retained scene %s",
+                rs.pathTracerCapturedTextures, FormatBytes(rs.pathTracerCapturedTextureBytes, 0),
+                FormatBytes(rs.pathTracerRetainedSceneBytes, 1));
+        }
+        else
+            ImGui::TextDisabled("PT frozen snapshot: none (live scene)");
+        ImGui::TextDisabled("Reference: finite depth, RR from depth 3 | not reconstructed | not cached | not clamped");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Finite-depth reference with Russian roulette from depth 3, GGX min roughness 0.04 and ray-cone filtering.\n"
+                "Ray reach is finite (10000 m) and every path has a per-ray null-event budget (candidates bounded at 64x the budget).\n"
+                "No reservoir reconstruction, no radiance cache and no radiance clamp, so this is not an exact physical solution.");
+        ImGui::TextDisabled("Supported: admitted/resident RT geometry + bounded grass");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Supported: admitted and resident RT geometry with bounded grass coverage.\n"
+                "Deferred: solid dielectric refraction, volumetric absorption and particle/volume transport.\n"
+                "Live raster particles, smoke, weather sprites, distortion and lens flares are excluded from reference output.\n"
+                "Not a complete full-world geometry ground truth.");
     }
 
     // Settings section (collapsible)
@@ -1166,6 +1220,38 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         rs.lighting.previousSurfacesValid ? "valid" : "rejected", rs.lighting.historyUsed ? "yes" : "no",
         static_cast<unsigned long long>(rs.lighting.sceneRevision), rs.lighting.recordedSamples);
     text += line;
+    if (rs.lighting.requested == render::fg::LightingMode::ReferencePT)
+    {
+        xr_sprintf(line, sizeof(line), "PT reference: diagnostic=%u %s | bounces=%u | diffuse=%u | null events=%u | sample cap=%u%s | sun radius=%.2f deg%s\n",
+            rs.pathTracerDiagnosticMode, PathTracerDiagnosticName(rs.pathTracerDiagnosticMode), rs.pathTracerBounces,
+            rs.pathTracerDiffuseMode, rs.pathTracerMaxNullEvents, rs.pathTracerMaxSamples,
+            rs.pathTracerMaxSamples ? "" : " (uncapped)", rad2deg(rs.pathTracerSunAngularRadius),
+            rs.pathTracerSunAngularRadius > 0.0f ? "" : " (delta sun)");
+        text += line;
+        xr_sprintf(line, sizeof(line), "PT scene: %s | snapshot requested=%s pending=%s valid=%s fallback=%s frozen=%s | cdf=%s\n",
+            rs.pathTracerFreezeRequested ?
+                (rs.pathTracerSnapshotValid ? "frozen snapshot" : (rs.pathTracerCapturePending ? "frozen capture awaiting completion" : "live fallback (no snapshot)")) :
+                "live scene (freeze off)",
+            rs.pathTracerFreezeRequested ? "yes" : "no", rs.pathTracerCapturePending ? "yes" : "no",
+            rs.pathTracerSnapshotValid ? "yes" : "no", rs.pathTracerSnapshotFallback ? "yes" : "no",
+            rs.pathTracerFrozen ? "yes" : "no", rs.pathTracerCdfActive ? "active" : "inactive");
+        text += line;
+        xr_sprintf(line, sizeof(line), "PT scene contents: %u lights | %u emitters (%s)\n",
+            rs.pathTracerLightCount, rs.pathTracerEmissiveCount, rs.pathTracerFrozen ? "frozen snapshot" : "live scene");
+        text += line;
+        if (rs.pathTracerFrozen)
+            xr_sprintf(line, sizeof(line), "PT frozen revision: scene %llu | textures %llu | lighting %016llx | cloned textures %u (%s) | retained scene %s\n",
+                static_cast<unsigned long long>(rs.pathTracerFrozenSceneRevision),
+                static_cast<unsigned long long>(rs.pathTracerFrozenTextureRevision),
+                static_cast<unsigned long long>(rs.pathTracerLightingSignature),
+                rs.pathTracerCapturedTextures, FormatBytes(rs.pathTracerCapturedTextureBytes, 0),
+                FormatBytes(rs.pathTracerRetainedSceneBytes, 1));
+        else
+            xr_sprintf(line, sizeof(line), "PT frozen revision: none (live scene)\n");
+        text += line;
+        xr_sprintf(line, sizeof(line), "PT scope: finite depth (RR from depth 3, ray reach 10000 m), per-ray null-event budget with 64x candidate bound, unreconstructed, uncached, unclamped | supported: admitted/resident RT geometry + bounded grass | deferred: dielectric refraction, volumetric absorption, particle/volume transport | live raster effect overlays excluded\n");
+        text += line;
+    }
     xr_sprintf(line, sizeof(line), "clusters: %u/%u visible (terrain %u/%u) | tris %u+%u | occl cand %u rec %u | residual S%u T%u D%u X%u | vsm %s\n",
         rs.clusterVisible, rs.clusterStaticEntries, rs.clusterTerrainVisible, rs.clusterTerrainEntries,
         rs.clusterTrianglesDrawn, rs.clusterTerrainTrianglesDrawn, rs.clusterOcclusionCandidates, rs.clusterOcclusionRecovered,

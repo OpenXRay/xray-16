@@ -163,6 +163,8 @@ BufferHandle BufferManager::CreateBuffer(
     nvrhiDesc.byteSize = desc.size;
     nvrhiDesc.structStride = desc.stride;
     nvrhiDesc.debugName = desc.debugName.c_str();
+    nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+    nvrhiDesc.keepInitialState = true;
 
     switch (desc.type) {
         case BufferType::Vertex:

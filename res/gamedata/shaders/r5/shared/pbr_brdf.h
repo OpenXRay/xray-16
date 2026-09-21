@@ -41,6 +41,14 @@ float G_Smith(float NdotV, float NdotL, float roughness)
     return ggx1 * ggx2;
 }
 
+float G1_SmithGGX(float NdotX, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+
+    return 2.0f * NdotX / max(NdotX + sqrt(a2 + (1.0f - a2) * NdotX * NdotX), 1e-6f);
+}
+
 // Fresnel-Schlick approximation
 float3 F_Schlick(float cosTheta, float3 F0)
 {
@@ -118,7 +126,13 @@ float3 MultiscatterCompensation(float3 F0, float NdotV, float NdotL, float rough
 
 // Full PBR direct lighting calculation
 // diffuseMode: 0=Disney/Burley, 1=Lambertian, 2=Oren-Nayar
-float3 PBRDirectLighting(
+struct PBRDirectTerms
+{
+    float3 diffuse;
+    float3 specular;
+};
+
+PBRDirectTerms PBRDirectLightingTerms(
     float3 albedo,
     float3 N,
     float3 V,
@@ -152,7 +166,24 @@ float3 PBRDirectLighting(
     float3 kD = (1.0f - F_in) * (1.0f - F_out) * (1.0f - metallic);
     float3 diffuse = kD * albedo * fd;
 
-    return (diffuse + specular) * lightColor * NdotL;
+    PBRDirectTerms terms;
+    terms.diffuse = diffuse * lightColor * NdotL;
+    terms.specular = specular * lightColor * NdotL;
+    return terms;
+}
+
+float3 PBRDirectLighting(
+    float3 albedo,
+    float3 N,
+    float3 V,
+    float3 L,
+    float3 lightColor,
+    float metallic,
+    float roughness,
+    uint diffuseMode)
+{
+    PBRDirectTerms terms = PBRDirectLightingTerms(albedo, N, V, L, lightColor, metallic, roughness, diffuseMode);
+    return terms.diffuse + terms.specular;
 }
 
 float RoughnessWithVariance(float roughness, float variance)

@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/LightingMode.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::framegraph {
@@ -30,7 +31,8 @@ framegraph::VirtualResourceHandle setupDistortionApplyPass(
     framegraph::VirtualResourceHandle depth,
     u32 width,
     u32 height,
-    DistortionApplyPassState& state
+    DistortionApplyPassState& state,
+    const LightingFrameState* lighting = nullptr
 );
 
 } // namespace xray::render::fg::passes

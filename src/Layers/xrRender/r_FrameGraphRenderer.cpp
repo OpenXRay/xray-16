@@ -71,6 +71,7 @@
 #include "FrameGraphPasses/ThunderboltPassSetup.h"
 #include "FrameGraphPasses/LensFlarePassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
+#include "FrameGraphPasses/RTEnvironmentSamplingPassSetup.h"
 #include "Layers/xrRender/fgRainRender.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
 #include "Layers/xrRender/fgLensFlareRender.h"
@@ -162,6 +163,11 @@ extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_profile_dump;
 extern ENGINE_API int ps_r_path_tracer_bounces;
+extern ENGINE_API int ps_r_path_tracer_debug;
+extern ENGINE_API int ps_r_path_tracer_freeze;
+extern ENGINE_API int ps_r_path_tracer_samples;
+extern ENGINE_API int ps_r_rt_max_null_events;
+extern ENGINE_API float ps_r_rt_sun_radius;
 
 namespace xray::render {
 
@@ -347,6 +353,7 @@ void FrameGraphRenderer::Shutdown() {
     fg::ClusteredLightManager::Instance().Shutdown();
 
     passes::ShutdownPathTracer();
+    passes::ShutdownRTEnvironmentSampling();
     m_mainView.Shutdown();
 
     m_framegraph = nullptr;
@@ -421,6 +428,7 @@ void FrameGraphRenderer::Render() {
                     framegraph::GetPassResourceCache().Clear();
                     framegraph::BindingSetBuilder::InvalidateReflectionCache();
                     passes::ShutdownPathTracer();
+                    passes::ShutdownRTEnvironmentSampling();
                     m_mainView.InvalidateHistory();
                     passes::ShutdownReSTIRGI(m_mainView.rtgi);
 
@@ -660,6 +668,29 @@ void FrameGraphRenderer::RenderStatsOverlay()
         stats.Reset();
         stats.lighting = m_lightingState;
         stats.pathTracerSamples = m_mainView.pathTracer.history.samples;
+        const auto& ptPending = m_mainView.pathTracer.pending;
+        const auto& ptRecorded = ptPending.valid ? ptPending.parameters : m_mainView.pathTracer.history.parameters;
+        const auto& ptSnapshot = m_mainView.pathTracer.snapshotStats;
+        stats.pathTracerBounces = ptRecorded.maxBounces;
+        stats.pathTracerDiffuseMode = ptRecorded.diffuseMode;
+        stats.pathTracerDiagnosticMode = ptRecorded.diagnosticMode;
+        stats.pathTracerMaxNullEvents = ptRecorded.maxNullEvents;
+        stats.pathTracerMaxSamples = ptRecorded.maxSamples;
+        stats.pathTracerSunAngularRadius = ptRecorded.sunAngularRadius;
+        stats.pathTracerFreezeRequested = ptSnapshot.freezeRequested;
+        stats.pathTracerFrozen = ptSnapshot.frozen;
+        stats.pathTracerCapturePending = ptSnapshot.capturePending;
+        stats.pathTracerSnapshotValid = ptSnapshot.valid;
+        stats.pathTracerSnapshotFallback = ptSnapshot.fallback;
+        stats.pathTracerCdfActive = ptSnapshot.cdfActive;
+        stats.pathTracerLightCount = ptSnapshot.frozen ? ptSnapshot.lightCount : ptRecorded.lightCount;
+        stats.pathTracerEmissiveCount = ptSnapshot.frozen ? ptSnapshot.emissiveCount : ptRecorded.emissiveCount;
+        stats.pathTracerCapturedTextures = ptSnapshot.capturedTextures;
+        stats.pathTracerCapturedTextureBytes = ptSnapshot.capturedTextureBytes;
+        stats.pathTracerRetainedSceneBytes = ptSnapshot.retainedSceneBytes;
+        stats.pathTracerFrozenSceneRevision = ptSnapshot.sceneRevision;
+        stats.pathTracerFrozenTextureRevision = ptSnapshot.textureRevision;
+        stats.pathTracerLightingSignature = ptSnapshot.lightingSignature;
 
         if (m_geometryCollector)
         {
@@ -1113,6 +1144,8 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
         m_mainView.pathTracer.history.valid = false;
         m_mainView.pathTracer.history.samples = 0;
     }
+    if (ps_r_path_tracer == 0 || ps_r_path_tracer_freeze == 0)
+        passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_rtAccelMgr)
         m_rtAccelMgr->RetireScenes();
     if (m_lightingState.effective == fg::LightingMode::Raster)
@@ -1756,6 +1789,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         passes::PathTracerConfig ptConfig;
         ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
         ptConfig.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
+        ptConfig.diagnosticMode = static_cast<u32>(ps_r_path_tracer_debug);
+        ptConfig.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
+        ptConfig.maxSamples = static_cast<u32>(ps_r_path_tracer_samples);
+        ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
+        ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
         const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, m_lightingState, ptConfig,
             Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
@@ -1801,7 +1839,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             *m_framegraph, m_device, gpuParticles.GetDrawResources(), geometryResources.materials,
             transparentOutputs.albedo, transparentOutputs.depth, transparentOutputs.normal,
             transparentOutputs.baseColor, transparentOutputs.distortion, width, height,
-            gpuParticleState);
+            gpuParticleState, &m_lightingState);
     }
     auto particleLayout = transparentOutputs;
     particleLayout.albedo = particleOutputs.color;
@@ -1821,6 +1859,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             width,
             height,
             m_blackboard->get_or_add<passes::SmokeTrailPassState>(),
+            &m_lightingState,
             m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
         );
     }
@@ -1831,7 +1870,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         sceneColor = passes::setupDistortionApplyPass(
             *m_framegraph, m_device, sceneColor, particleOutputs.distortion,
             particleLayout.depth, width, height,
-            m_blackboard->get_or_add<passes::DistortionApplyPassState>());
+            m_blackboard->get_or_add<passes::DistortionApplyPassState>(), &m_lightingState);
     }
 
     if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Rain)
@@ -1846,7 +1885,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     *m_framegraph,
                     sceneColor,
                     transparentOutputs.depth,
-                    fgRain);
+                    fgRain,
+                    &m_lightingState);
             }
         }
     }
@@ -1863,7 +1903,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     *m_framegraph,
                     sceneColor,
                     transparentOutputs.depth,
-                    fgTB);
+                    fgTB,
+                    &m_lightingState);
             }
         }
     }
@@ -1880,7 +1921,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                     *m_framegraph,
                     sceneColor,
                     transparentOutputs.depth,
-                    fgLF);
+                    fgLF,
+                    &m_lightingState);
             }
         }
     }

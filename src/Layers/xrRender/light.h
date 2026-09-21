@@ -157,6 +157,7 @@ public:
     IRender_Light* dcast_Light() override { return this; }
     vis_data& get_homdata();
     float get_LOD() const;
+    u64 GetLightID() const { return m_lightID; }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     void gi_generate();
@@ -167,5 +168,10 @@ public:
 
     light();
     ~light() override;
+
+private:
+    static u64 AllocateLightID();
+
+    u64 m_lightID;
 };
 } // namespace xray::render::fg

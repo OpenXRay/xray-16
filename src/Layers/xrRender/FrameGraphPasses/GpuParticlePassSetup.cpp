@@ -32,6 +32,7 @@ struct GpuParticlePassData {
     GpuParticleDrawResources resources;
     VirtualResourceHandle color, depth, normal, baseColor, distortion, sceneDepth;
     GpuParticlePassState* state;
+    const LightingFrameState* lighting = nullptr;
     u32 width, height;
     bool clearDistortion;
 };
@@ -133,6 +134,17 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     auto* device = data.device->GetNVRHIDevice();
     auto* commandList = context->GetCommandList();
     const auto& passState = *data.state;
+
+    if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
+    {
+        if (data.clearDistortion)
+        {
+            if (auto* distortion = graph.GetPhysicalTexture(data.distortion))
+                commandList->clearTextureFloat(distortion, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 0.0f));
+        }
+        return;
+    }
+
     auto& cache = GetPassResourceCache();
     auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     auto* drawConstants = cache.GetOrCreateVolatileCB("GpuParticle", "DrawParams", sizeof(GpuParticleDrawParams), data.device, 128);
@@ -224,7 +236,8 @@ GpuParticlePassOutputs setupGpuParticlePass(
     VirtualResourceHandle distortion,
     u32 width,
     u32 height,
-    GpuParticlePassState& state)
+    GpuParticlePassState& state,
+    const LightingFrameState* lighting)
 {
     if (resources.particleCapacity == 0 || resources.drawBucketMask == 0)
         return { color, distortion };
@@ -260,6 +273,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
             data.device = device;
             data.materials = pass.read(materials, ResourceState::ShaderResource);
             data.state = &state;
+            data.lighting = lighting;
             data.width = width;
             data.height = height;
             data.resources = resources;

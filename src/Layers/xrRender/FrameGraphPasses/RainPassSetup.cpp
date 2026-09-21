@@ -12,19 +12,23 @@ framegraph::VirtualResourceHandle setupRainPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle inputTarget,
     framegraph::VirtualResourceHandle depthTarget,
-    FGRainRender* renderer)
+    FGRainRender* renderer,
+    const LightingFrameState* lighting)
 {
     using namespace framegraph;
 
     auto& passData = fg.addCallbackPass<RainPassData>(
         "Rain",
-        [inputTarget, depthTarget, renderer](FrameGraph& builder, PassHandle passHandle, RainPassData& data) {
+        [inputTarget, depthTarget, renderer, lighting](FrameGraph& builder, PassHandle passHandle, RainPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.renderer = renderer;
+            data.lighting = lighting;
             data.depth = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
             data.output = passBuilder.readWrite(inputTarget, ResourceState::RenderTarget);
         },
         [](const RainPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            if (data.lighting && data.lighting->effective == LightingMode::ReferencePT && data.lighting->recorded)
+                return;
             if (!data.renderer || !data.renderer->HasWork()) return;
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             auto* outputRT = fg.GetPhysicalTexture(data.output);

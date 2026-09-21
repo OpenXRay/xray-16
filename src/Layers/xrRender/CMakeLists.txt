@@ -133,6 +133,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/PassCommon.cpp
     FrameGraphPasses/PathTracerPassSetup.h
     FrameGraphPasses/PathTracerPassSetup.cpp
+    FrameGraphPasses/RTEnvironmentSamplingPassSetup.h
+    FrameGraphPasses/RTEnvironmentSamplingPassSetup.cpp
     FrameGraphPasses/MotionVectorPassSetup.h
     FrameGraphPasses/MotionVectorPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h
