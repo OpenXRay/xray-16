@@ -42,7 +42,7 @@ public:
     nvrhi::IDevice* GetNVRHIDevice() const;
 
     // Get the render backend (new abstraction)
-    IRenderBackend* GetBackend() const { return m_backend.get(); }
+    IRenderBackend* GetBackend() const;
 
     // Get the immediate command list for direct rendering (e.g., ImGui)
     nvrhi::ICommandList* GetImmediateCommandList() const;
@@ -333,7 +333,7 @@ public:
 
 private:
     // Render backend (D3D11/D3D12 wrapper)
-    xr_unique_ptr<IRenderBackend> m_backend;
+    IRenderBackend* m_backend = nullptr;
 
     // Pipeline state cache
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;

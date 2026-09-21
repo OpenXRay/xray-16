@@ -312,6 +312,31 @@ IRenderBackend::SubmissionLeaseState SubmissionTracker::PeekLease(u64 lease) con
     return EvaluateLeaseLocked(it->second);
 }
 
+bool SubmissionTracker::IsLeaseSubmitted(u64 lease) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const auto it = m_leases.find(lease);
+    if (it == m_leases.end() || !it->second.closed || it->second.failed)
+        return false;
+
+    bool hasWork = false;
+    for (u32 q = 0; q < QUEUE_COUNT; ++q)
+    {
+        const auto& state = m_queues[q];
+        const u64 first = it->second.openSeq[q];
+        const u64 last = it->second.requiredSeq[q];
+        hasWork |= last > first;
+        for (u32 i = state.head; i < state.tickets.size(); ++i)
+        {
+            const auto& ticket = state.tickets[i];
+            if (ticket.seq > first && ticket.seq <= last &&
+                ticket.state != TicketState::Armed && ticket.state != TicketState::Complete)
+                return false;
+        }
+    }
+    return hasWork;
+}
+
 u32 SubmissionTracker::PendingTicketCount() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);

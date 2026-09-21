@@ -17,11 +17,13 @@ public:
     const TerrainMaterialData* GetMaterial(u32 materialID) const { return Get(materialID); }
 
     u32 GetMaterialCount() const { return m_materialCount; }
+    u64 GetRevision() const;
 
 private:
     TerrainMaterialBuffer() = default;
 
     u32 m_materialCount = 0;
+    u64 m_revision = 0;
 };
 
 } // namespace xray::render::fg::bindless

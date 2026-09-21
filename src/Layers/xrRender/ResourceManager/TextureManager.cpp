@@ -442,6 +442,26 @@ const TextureMetadata* TextureManager::GetMetadata(TextureHandle handle) const {
     return &m_textures[handle.index];
 }
 
+void TextureManager::NotifyContentChanged(TextureMetadata& metadata)
+{
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    metadata.contentRevision = ++m_contentRevision;
+}
+
+u64 TextureManager::GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
+    nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const
+{
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    u64 revision = 0;
+    for (const auto& metadata : m_textures)
+    {
+        auto* texture = metadata.nvrhiTexture.Get();
+        if (metadata.isAlive && texture && (texture == sky0 || texture == sky1 || textures.find(texture) != textures.end()))
+            revision = std::max(revision, metadata.contentRevision);
+    }
+    return revision;
+}
+
 TextureHandle TextureManager::FindTexture(const char* path) const {
     auto it = m_pathToHandle.find(shared_str(path));
     if (it != m_pathToHandle.end()) {
@@ -1080,6 +1100,7 @@ void TextureManager::UpdateVideoTextures() {
             videoState->frameBuffer.data(),
             dataSize
         );
+        NotifyContentChanged(meta);
 
         // Clear the update flag
         videoState->needsUpdate = false;
@@ -1161,6 +1182,7 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
                     frameData.rowPitch,
                     frameData.slicePitch
                 );
+                NotifyContentChanged(meta);
 
                 seqState->currentFrame = nextFrame;
                 seqState->needsUpdate = false;  // Mark as uploaded

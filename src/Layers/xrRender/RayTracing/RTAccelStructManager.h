@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#include "xrCommon/xr_set.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include "Layers/xrRender/FGDetailManager.h"
@@ -147,11 +148,13 @@ public:
     RTTextureBindings& operator=(const RTTextureBindings&) = delete;
     void Capture(xr_vector<u32>& indices);
     nvrhi::IDescriptorTable* GetTable() const;
+    const xr_set<nvrhi::ITexture*>& GetTextures() const;
 
 private:
     IRenderBackend* m_backend = nullptr;
     nvrhi::DescriptorTableHandle m_table;
     xr_vector<u32> m_indices;
+    xr_set<nvrhi::ITexture*> m_textures;
 };
 
 class RTStaticGeometry
@@ -256,7 +259,7 @@ public:
     void Shutdown();
     bool SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpuCulling,
         FGDetailManager* detailMgr, const xr_vector<GeometryBatch>& worldBatches,
-        const xr_vector<GeometryBatch>& hudBatches, bool rebuildDynamic);
+        const xr_vector<GeometryBatch>& hudBatches);
     RTFrameResources UseScene(framegraph::FrameGraph& graph,
         framegraph::RenderPassBuilder& builder) const;
     static RTFrameBuffers ResolveScene(const framegraph::FrameGraph& graph,
@@ -267,9 +270,15 @@ public:
     const RTBatchCounts& GetBatchCounts() const;
     u32 GetDetailAtlasIndex() const;
     RTMemoryStats GetMemoryStats(const GPUCullingManager* gpu) const;
+    u64 GetSceneRevision() const;
+    u64 GetTextureRevision(nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
     void RetireScenes();
 
 private:
+    static void HashSceneData(u64& signature, const void* data, size_t size);
+    u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling) const;
+    u64 ComputeSceneSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches) const;
     void AppendMaterialTextures(u32 materialID, bool terrain);
     void PrepareStatic(GPUCullingManager* gpuCulling);
     void PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpuCulling,
@@ -298,6 +307,9 @@ private:
     xr_vector<std::shared_ptr<RTSceneGeneration>> m_generations;
     xr_vector<RTLeaseRecord> m_leases;
     xr_vector<u32> m_textureScratch;
+    u64 m_staticSignature = 0;
+    u64 m_sceneSignature = 0;
+    u64 m_sceneRevision = 0;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;

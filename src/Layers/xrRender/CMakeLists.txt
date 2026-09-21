@@ -3,6 +3,8 @@ add_library(xrRender STATIC)
 target_sources(xrRender PRIVATE
     stdafx.h
     stdafx.cpp
+    RenderView.h
+    RenderView.cpp
 
     RenderContext/ResourceHandle.h
     RenderContext/RCShader.h
@@ -515,3 +517,5 @@ target_precompile_headers(xrRender
     PRIVATE
     stdafx.h
 )
+
+set_source_files_properties(RenderView.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON)

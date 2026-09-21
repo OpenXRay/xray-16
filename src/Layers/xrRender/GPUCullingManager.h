@@ -425,6 +425,7 @@ public:
     u32 GetRTIndexCount() const { return m_rtIndexCount; }
     static constexpr u32 RT_VERTEX_STRIDE = 32u;
     u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
+    const Fmatrix* GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const;
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
     nvrhi::IBuffer* GetClusterPageBuffer() const { return m_residency.GetPageTableBuffer(); }
     nvrhi::IBuffer* GetClusterPayloadBuffer() const { return m_residency.GetPayloadArenaBuffer(); }

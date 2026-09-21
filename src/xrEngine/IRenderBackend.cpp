@@ -17,3 +17,13 @@ bool IRenderBackend::RetainBindlessTextures(const u32*, u32)
 void IRenderBackend::ReleaseBindlessTextures(const u32*, u32)
 {
 }
+
+bool IRenderBackend::IsSubmissionLeaseSubmitted(u64) const
+{
+    return false;
+}
+
+nvrhi::ITexture* IRenderBackend::GetBindlessTexture(u32)
+{
+    return nullptr;
+}

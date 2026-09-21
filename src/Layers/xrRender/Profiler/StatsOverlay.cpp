@@ -150,10 +150,19 @@ void StatsOverlay::Render()
         ImGui::Text("Fallback: %s", render::fg::LightingFallbackName(lighting.fallback));
     if (lighting.requested != render::fg::LightingMode::Raster)
         ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
+    ImGui::Text("Surface history: %s", lighting.previousSurfacesValid ? "valid" : "rejected");
+    if (lighting.requested != render::fg::LightingMode::Raster)
+    {
+        ImGui::Text("RT history used: %s", lighting.historyUsed ? "yes" : "no");
+        ImGui::Text("RT scene revision: %llu", static_cast<unsigned long long>(lighting.sceneRevision));
+    }
     if (lighting.requested == render::fg::LightingMode::RTGI)
         ImGui::Text("RTGI ReSTIR reuse: %s", lighting.reuseReservoirs ? "enabled" : "disabled");
     if (lighting.requested == render::fg::LightingMode::ReferencePT)
-        ImGui::Text("PT recorded samples: %u", m_renderStats.pathTracerSamples);
+    {
+        ImGui::Text("PT submitted samples: %u", m_renderStats.pathTracerSamples);
+        ImGui::Text("PT recorded samples: %u", lighting.recordedSamples);
+    }
 
     // Settings section (collapsible)
     if (ImGui::CollapsingHeader("Settings"))
@@ -1146,12 +1155,16 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
     text += line;
 
     const RenderStats& rs = m_renderStats;
-    xr_sprintf(line, sizeof(line), "lighting: requested=%s | effective=%s | reason=%s | conflict=%s | recorded=%s | PT recorded samples=%u\n",
+    xr_sprintf(line, sizeof(line), "lighting: requested=%s | effective=%s | reason=%s | conflict=%s | recorded=%s | PT submitted samples=%u\n",
         render::fg::LightingModeName(rs.lighting.requested), render::fg::LightingModeName(rs.lighting.effective),
         render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
         rs.pathTracerSamples);
     text += line;
     xr_sprintf(line, sizeof(line), "RTGI ReSTIR reuse: %s\n", rs.lighting.reuseReservoirs ? "enabled" : "disabled");
+    text += line;
+    xr_sprintf(line, sizeof(line), "history: surfaces=%s | used=%s | RT scene revision=%llu | PT recorded samples=%u\n",
+        rs.lighting.previousSurfacesValid ? "valid" : "rejected", rs.lighting.historyUsed ? "yes" : "no",
+        static_cast<unsigned long long>(rs.lighting.sceneRevision), rs.lighting.recordedSamples);
     text += line;
     xr_sprintf(line, sizeof(line), "clusters: %u/%u visible (terrain %u/%u) | tris %u+%u | occl cand %u rec %u | residual S%u T%u D%u X%u | vsm %s\n",
         rs.clusterVisible, rs.clusterStaticEntries, rs.clusterTerrainVisible, rs.clusterTerrainEntries,

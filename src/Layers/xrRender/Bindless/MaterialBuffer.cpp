@@ -31,6 +31,7 @@ void MaterialBuffer::Shutdown()
 {
     GPUStructuredBuffer::Shutdown();
     m_materialCount = 0;
+    ++m_revision;
 }
 
 u32 MaterialBuffer::RegisterMaterial(const MaterialData& material)
@@ -40,6 +41,7 @@ u32 MaterialBuffer::RegisterMaterial(const MaterialData& material)
 
     u32 id = m_materialCount++;
     Set(id, material);
+    ++m_revision;
     m_uploadCount = m_materialCount;
     return id;
 }
@@ -48,7 +50,16 @@ void MaterialBuffer::UpdateMaterial(u32 materialID, const MaterialData& material
 {
     if (!IsInitialized() || materialID >= m_materialCount)
         return;
+    const auto* previous = Get(materialID);
+    if (previous && memcmp(previous, &material, sizeof(material)) == 0)
+        return;
     Set(materialID, material);
+    ++m_revision;
+}
+
+u64 MaterialBuffer::GetRevision() const
+{
+    return m_revision;
 }
 
 DrawMaterialIDBuffer::~DrawMaterialIDBuffer()

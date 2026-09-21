@@ -2856,6 +2856,14 @@ u32 GPUCullingManager::GetPreparedSkeletonOffset(CKinematics* skeleton) const
     return skeleton->fg_bone_upload_offset;
 }
 
+const Fmatrix* GPUCullingManager::GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const
+{
+    const u32 offset = GetPreparedSkeletonOffset(skeleton);
+    count = skeleton->LL_BoneCount();
+    R_ASSERT(u64(offset) + count <= m_currentBoneOffset);
+    return m_boneStagingBuffer.data() + offset;
+}
+
 void GPUCullingManager::BeginGeometryResidencyFrame()
 {
     RetireRTSourceUpload(false);

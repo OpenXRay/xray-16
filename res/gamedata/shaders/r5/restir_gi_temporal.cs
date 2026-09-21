@@ -51,6 +51,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float4 giWorld = mul(g_InvViewProj, giClip);
     float3 worldPos = giWorld.xyz / giWorld.w;
     float4 normalData = t_Normal.Load(int3(pixel, 0));
+    if (!all(isfinite(worldPos)) || !all(isfinite(normalData.xyz)) || dot(normalData.xyz, normalData.xyz) < 0.25)
+        return;
     float3 N = normalize(normalData.xyz);
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
     float3 albedo = baseColorData.rgb;
@@ -84,11 +86,12 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (all(prevUV >= 0) && all(prevUV < 1.0)) {
         int2 prevPixel = int2(prevUV * g_ScreenSize);
         float prevDepth = t_PrevDepth.Load(int3(prevPixel, 0));
-        float3 prevN = normalize(t_PrevNormal.Load(int3(prevPixel, 0)).xyz);
+        float3 prevNormal = t_PrevNormal.Load(int3(prevPixel, 0)).xyz;
 
         float viewDist = length(worldPos - g_CameraPos.xyz);
         bool valid = false;
-        if (prevDepth > 0.0 && prevDepth < 0.9) {
+        if (prevDepth > 0.0 && prevDepth < 0.9 && all(isfinite(prevNormal)) && dot(prevNormal, prevNormal) >= 0.25) {
+            float3 prevN = normalize(prevNormal);
             float2 prevNdcUV = (float2(prevPixel) + 0.5) * g_InvScreenSize;
             float4 prevClip = float4(prevNdcUV.x * 2.0 - 1.0, 1.0 - prevNdcUV.y * 2.0, prevDepth, 1.0);
             float4 prevWorld = mul(g_PrevInvViewProj, prevClip);

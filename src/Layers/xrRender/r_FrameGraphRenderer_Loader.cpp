@@ -360,6 +360,7 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
 void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
+    m_mainView.InvalidateHistory();
     if (m_particleEditor)
         m_particleEditor->OnLevelUnload();
     if (m_processHOMTask) {
@@ -389,7 +390,6 @@ void FrameGraphRenderer::level_Unload()
         m_rtAccelMgr->Initialize(m_device);
     }
     m_hudBatches.clear();
-    m_ptSampleIndex = 0;
     GetGpuParticleManager().LevelUnload();
 
     // HOM

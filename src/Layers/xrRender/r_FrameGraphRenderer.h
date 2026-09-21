@@ -23,6 +23,7 @@
 #include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 #include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/RenderView.h"
 
 struct ImDrawData;
 
@@ -423,22 +424,12 @@ private:
     // ═══════════════════════════════════════════════════
     // Instead of depth prepass, reuse previous frame's depth for Hi-Z
     // Eliminates double vertex processing cost (~1.5-2ms savings)
-    nvrhi::TextureHandle m_normals[2];
-    u32 m_pingPongIndex = 0;
     nvrhi::TextureHandle m_hizHistory[2];
     u32 m_hizHistoryWidth = 0;
     u32 m_hizHistoryHeight = 0;
-    bool m_hasPrevHiZ = false;
     nvrhi::TextureHandle m_sceneDepth;
+    fg::RenderView m_mainView;
 
-    Fmatrix m_prevViewProj;                       // Previous frame's view-projection
-    Fmatrix m_prevView;
-    Fmatrix m_prevProject;
-    float m_prevDetailTime = 0.0f;
-    Fvector m_prevCameraPos;                      // Previous frame's camera position
-    bool m_hasPrevFrameData = false;              // Valid previous frame exists
-    u32 m_prevFrameWidth = 0;                     // Previous frame resolution
-    u32 m_prevFrameHeight = 0;
 
     // Debug preview texture for Render Inspector (persistent, not part of framegraph)
     nvrhi::TextureHandle m_inspectorPreview;
@@ -481,12 +472,6 @@ private:
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     fg::LightingFrameState m_lightingState;
-    u32 m_ptSampleIndex = 0;
-    Fvector m_ptPrevCameraPos = {0, 0, 0};
-    Fvector m_ptPrevCameraDir = {0, 0, 0};
-    int m_ptPrevBounces = 0;
-    int m_ptPrevDiffuseMode = 0;
-    bool m_ptWasEnabled = false;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
     xr_unique_ptr<fg::FGUIRender> m_uiRender;

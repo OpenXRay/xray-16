@@ -53,6 +53,7 @@ void TerrainMaterialBuffer::Shutdown()
 {
     GPUStructuredBuffer::Shutdown();
     m_materialCount = 0;
+    ++m_revision;
 }
 
 u32 TerrainMaterialBuffer::RegisterMaterial(const TerrainMaterialData& material)
@@ -62,6 +63,7 @@ u32 TerrainMaterialBuffer::RegisterMaterial(const TerrainMaterialData& material)
 
     u32 id = m_materialCount++;
     Set(id, material);
+    ++m_revision;
     return id;
 }
 
@@ -69,7 +71,16 @@ void TerrainMaterialBuffer::UpdateMaterial(u32 materialID, const TerrainMaterial
 {
     if (!IsInitialized() || materialID >= m_materialCount)
         return;
+    const auto* previous = Get(materialID);
+    if (previous && memcmp(previous, &material, sizeof(material)) == 0)
+        return;
     Set(materialID, material);
+    ++m_revision;
+}
+
+u64 TerrainMaterialBuffer::GetRevision() const
+{
+    return m_revision;
 }
 
 } // namespace xray::render::fg::bindless

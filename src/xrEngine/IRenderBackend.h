@@ -105,6 +105,7 @@ public:
     virtual u64 OpenSubmissionLease() { return 0; }
     virtual void CloseSubmissionLease(u64 lease) {}
     virtual SubmissionLeaseState PollSubmissionLease(u64 lease) { return SubmissionLeaseState::Unknown; }
+    virtual bool IsSubmissionLeaseSubmitted(u64 lease) const;
     virtual void ReleaseSubmissionLease(u64 lease) {}
     virtual u32 GetPendingSubmissionCount() const { return 0; }
 
@@ -205,6 +206,7 @@ public:
     // Returns UINT32_MAX if not supported
     virtual u32 RegisterBindlessTexture(nvrhi::ITexture* texture) { return UINT32_MAX; }
     virtual void UnregisterBindlessTexture(u32 index) {}
+    virtual nvrhi::ITexture* GetBindlessTexture(u32 index);
     virtual bool RetainBindlessTextures(const u32* indices, u32 count);
     virtual void ReleaseBindlessTextures(const u32* indices, u32 count);
     virtual nvrhi::IBindingLayout* GetBindlessLayout() const { return nullptr; }

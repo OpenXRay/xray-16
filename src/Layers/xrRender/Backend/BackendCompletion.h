@@ -28,6 +28,7 @@ public:
     void ReleaseLease(u64 lease);
     IRenderBackend::SubmissionLeaseState PollLease(u64 lease);
     IRenderBackend::SubmissionLeaseState PeekLease(u64 lease) const;
+    bool IsLeaseSubmitted(u64 lease) const;
 
     u32 PendingTicketCount() const;
     u32 OpenLeaseCount() const;

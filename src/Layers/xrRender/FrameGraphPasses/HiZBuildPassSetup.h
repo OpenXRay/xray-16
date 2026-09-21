@@ -53,6 +53,7 @@ struct HiZBuildPassState {
     nvrhi::BindingLayoutHandle layout;
     bool initialized = false;
     bool computeEnabled = false;
+    bool recorded = false;
     u32 currentWidth = 0;
     u32 currentHeight = 0;
     u32 mipLevels = 0;

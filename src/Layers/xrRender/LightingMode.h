@@ -38,6 +38,9 @@ public:
     bool conflictingRequests = false;
     bool recorded = false;
     bool reuseReservoirs = true;
+    bool previousSurfacesValid = false;
+    bool historyUsed = false;
+    u64 sceneRevision = 0;
 };
 
 const char* LightingModeName(LightingMode mode);

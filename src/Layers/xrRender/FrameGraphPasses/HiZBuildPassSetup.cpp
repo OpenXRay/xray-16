@@ -90,6 +90,7 @@ HiZPyramidOutput setupHiZBuildPass(
     HiZBuildPassState& hizState,
     VirtualResourceHandle target)
 {
+    hizState.recorded = false;
     InitializeHiZResources(device, width, height, hizState);
 
     if (!hizState.computeEnabled) {
@@ -225,7 +226,7 @@ HiZPyramidOutput setupHiZBuildPass(
 
                 auto* hizRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("hiz_build", ".cs");
                 if (!hizRefl)
-                    continue;
+                    return;
                 framegraph::BindingSetBuilder bsb(*hizRefl, nvDevice, "HiZBuild");
                 if (mip == 0)
                     bsb.Texture("g_input_depth", depthTexture);
@@ -238,7 +239,7 @@ HiZPyramidOutput setupHiZBuildPass(
 
                 if (!bindingSet) {
                     Msg("! [HiZBuild] Failed to create binding set for mip %d", mip);
-                    continue;
+                    return;
                 }
 
                 // Set compute state and dispatch
@@ -262,6 +263,7 @@ HiZPyramidOutput setupHiZBuildPass(
             // Final state: transition entire pyramid to ShaderResource for culling pass
             cmdList->setTextureState(hizTexture, nvrhi::AllSubresources,
                 nvrhi::ResourceStates::NonPixelShaderResource);
+            data.passState->recorded = true;
         }
     );
 

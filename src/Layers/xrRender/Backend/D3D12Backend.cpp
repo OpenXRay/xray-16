@@ -1,5 +1,3 @@
-// D3D12Backend.cpp
-// DirectX 12 backend implementation with bindless texture support
 #include "stdafx.h"
 #include "D3D12Backend.h"
 
@@ -50,6 +48,11 @@ D3D12Backend::D3D12Backend() = default;
 
 D3D12Backend::~D3D12Backend() {
     Shutdown();
+}
+
+bool D3D12Backend::IsSubmissionLeaseSubmitted(u64 lease) const
+{
+    return m_completion.IsLeaseSubmitted(lease);
 }
 
 bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
@@ -538,6 +541,12 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
 void D3D12Backend::UnregisterBindlessTexture(u32 index)
 {
     ReleaseBindlessTextures(&index, 1);
+}
+
+nvrhi::ITexture* D3D12Backend::GetBindlessTexture(u32 index)
+{
+    std::lock_guard<std::mutex> lock(m_bindlessMutex);
+    return index < m_bindlessTextureResources.size() ? m_bindlessTextureResources[index].Get() : nullptr;
 }
 
 bool D3D12Backend::RetainBindlessTextures(const u32* indices, u32 count)
