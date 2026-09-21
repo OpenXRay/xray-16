@@ -434,6 +434,7 @@ private:
     Fvector m_ptPrevCameraPos = {0, 0, 0};
     Fvector m_ptPrevCameraDir = {0, 0, 0};
     int m_ptPrevBounces = 0;
+    int m_ptPrevDiffuseMode = 0;
     bool m_ptWasEnabled = false;
 
     xr_unique_ptr<fg::FGUIRender> m_uiRender;

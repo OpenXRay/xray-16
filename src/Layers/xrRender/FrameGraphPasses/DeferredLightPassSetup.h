@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
+#include "Layers/xrRender/LightingMode.h"
 #include "LocalShadowPassSetup.h"
 #include "ClusterLightPassSetup.h"
 #include <nvrhi/nvrhi.h>
@@ -50,18 +51,34 @@ struct DeferredLightPassState {
     u32 tileCounts[kLightTileClasses] = {};
 };
 
+class DeferredLightPassData
+{
+public:
+    framegraph::VirtualResourceHandle depth;
+    framegraph::VirtualResourceHandle normal;
+    framegraph::VirtualResourceHandle baseColor;
+    framegraph::VirtualResourceHandle material;
+    framegraph::VirtualResourceHandle color;
+    framegraph::VirtualResourceHandle sunMask;
+    framegraph::VirtualResourceHandle localTiles;
+    framegraph::VirtualResourceHandle localStatic;
+    framegraph::VirtualResourceHandle localDyn;
+    framegraph::VirtualResourceHandle localHud;
+    framegraph::VirtualResourceHandle clusterLightData;
+    framegraph::VirtualResourceHandle clusterGrid;
+    framegraph::VirtualResourceHandle clusterLightIndexList;
+    LocalShadowOutput localShadow;
+    RenderDevice* device = nullptr;
+    DeferredLightPassState* state = nullptr;
+    LightingFrameState* lighting = nullptr;
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr;
+    u32 width = 0;
+    u32 height = 0;
+};
+
 void ProcessDeferredLightStats(DeferredLightPassState& state, nvrhi::IDevice* device);
 
-framegraph::DefaultOutputLayout setupDeferredLightPass(
-    framegraph::FrameGraph& fg,
-    fg::RenderDevice* device,
-    const framegraph::DefaultOutputLayout& inputs,
-    u32 width,
-    u32 height,
-    framegraph::VirtualResourceHandle sunMask,
-    const LocalShadowOutput& localShadow,
-    const ClusterLightOutput& clusterLights,
-    xray::profiler::GPUProfiler* gpuProfiler,
-    DeferredLightPassState* state);
-
+framegraph::DefaultOutputLayout setupDeferredLightPass(framegraph::FrameGraph& fg, fg::RenderDevice* device, const framegraph::DefaultOutputLayout& inputs,
+    u32 width, u32 height, framegraph::VirtualResourceHandle sunMask, const LocalShadowOutput& localShadow, const ClusterLightOutput& clusterLights,
+    xray::profiler::GPUProfiler* gpuProfiler, DeferredLightPassState* state, LightingFrameState* lighting);
 }

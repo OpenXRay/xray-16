@@ -1,5 +1,7 @@
+#define BINDLESS_NO_IMPLICIT_GRAD
 #include "bindless_common.h"
 #include "rt_common.h"
+#include "shared/pbr_brdf.h"
 
 cbuffer PathTracerParams : register(b5) {
     float4x4 g_InvViewProj;
@@ -16,13 +18,14 @@ cbuffer PathTracerParams : register(b5) {
     uint g_SkinnedBatchStart;
     uint g_GrassBatchStart;
     uint g_DetailAtlasIndex;
-    uint2 g_Pad;
+    uint g_DiffuseMode;
+    uint g_Pad;
 };
 
 RaytracingAccelerationStructure g_SceneTLAS : register(t1);
 StructuredBuffer<RTBatchInfo> g_BatchInfo : register(t2);
 ByteAddressBuffer g_MegaVB : register(t3);
-ByteAddressBuffer g_MegaIB : register(t4);
+ByteAddressBuffer g_MegaIB : register(t18);
 TextureCube<float4> g_Sky0 : register(t5);
 TextureCube<float4> g_Sky1 : register(t6);
 ByteAddressBuffer g_SkinnedVB : register(t7);
@@ -53,7 +56,7 @@ float4 SampleTerrainTexture(uint index, float2 uv)
     return GetBindlessTexture(index).SampleLevel(smp_linear, uv, 0);
 }
 
-float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)
+float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv, out float metallic, out float roughness)
 {
     float2 baseUV = uv;
     float2 detailUV = uv * mat.detailScale;
@@ -73,6 +76,17 @@ float3 SampleTerrainAlbedo(TerrainMaterialData mat, float2 uv)
     float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV).rgb;
 
     float3 blendedDetail = detailR * mask.r + detailG * mask.g + detailB * mask.b + detailA * mask.a;
+    metallic = 0.0;
+    roughness = 0.5;
+    if ((mat.flags & MAT_FLAG_HAS_PBR_LAYER) != 0)
+    {
+        float2 pbr = SampleTerrainTexture(mat.pbrR_Index, detailUV).rg * mask.r
+            + SampleTerrainTexture(mat.pbrG_Index, detailUV).rg * mask.g
+            + SampleTerrainTexture(mat.pbrB_Index, detailUV).rg * mask.b
+            + SampleTerrainTexture(mat.pbrA_Index, detailUV).rg * mask.a;
+        metallic = pbr.r;
+        roughness = pbr.g;
+    }
     return baseSample.rgb * blendedDetail * 2.0;
 }
 
@@ -114,7 +128,7 @@ HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
 
     if (IsTerrainBatch(batchIdx)) {
         TerrainMaterialData tmat = g_TerrainMaterials[info.materialID];
-        result.albedo = SampleTerrainAlbedo(tmat, hitUV);
+        result.albedo = SampleTerrainAlbedo(tmat, hitUV, result.metallic, result.roughness);
         result.flags = tmat.flags;
         return result;
     }
@@ -126,13 +140,57 @@ HitMaterial GetHitMaterial(RTBatchInfo info, float2 hitUV, uint batchIdx)
     result.alphaRef = mat.alphaRef;
     result.flags = mat.flags;
 
-    if (mat.flags & MAT_FLAG_HAS_PBR) {
-        float3 pbr = SamplePBR(mat, hitUV);
+    if ((mat.flags & MAT_FLAG_HAS_PBR) != 0)
+    {
+        float3 pbr = SamplePBRLevel(mat, hitUV);
         result.metallic = pbr.r;
         result.roughness = pbr.g;
     }
 
     return result;
+}
+
+bool SampleHitMaterial(HitMaterial material, float3 N, float3 V, inout uint rng,
+    out float3 direction, out float3 weight)
+{
+    direction = N;
+    weight = 0.0;
+    float metallic = saturate(material.metallic);
+    float roughness = clamp(material.roughness, MIN_ROUGHNESS, 1.0);
+    float3 fresnel = F_Schlick(saturate(dot(N, V)), CalculateF0(material.albedo, metallic));
+    float specularProbability = clamp(dot(fresnel, float3(0.2126, 0.7152, 0.0722)), 0.05, 0.95);
+    float lobeSample = rand_float(rng);
+    float2 u = float2(rand_float(rng), rand_float(rng));
+    if (lobeSample < specularProbability)
+    {
+        float3 H = sample_ggx(u, N, roughness);
+        if (dot(V, H) <= 0.0)
+            return false;
+        direction = reflect(-V, H);
+    }
+    else
+    {
+        direction = cosine_weighted_hemisphere(u, N);
+    }
+
+    float NdotL = dot(N, direction);
+    if (NdotL <= 0.0)
+        return false;
+
+    float3 H = normalize(V + direction);
+    float NdotH = saturate(dot(N, H));
+    float VdotH = saturate(dot(V, H));
+    if (VdotH <= 0.0)
+        return false;
+    float specularPdf = D_GGX(NdotH, roughness) * NdotH / (4.0 * VdotH);
+    float diffusePdf = NdotL / PI;
+    float pdf = specularProbability * specularPdf + (1.0 - specularProbability) * diffusePdf;
+    if (!(pdf > 0.0))
+        return false;
+
+    weight = PBRDirectLighting(material.albedo, N, V, direction, float3(1.0, 1.0, 1.0),
+        metallic, roughness, g_DiffuseMode) / pdf;
+    return true;
 }
 
 float3 SampleSky(float3 dir)
@@ -252,6 +310,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             geoN = -geoN;
         if (dot(hitN, geoN) < 0)
             hitN = -hitN;
+        if (dot(hitN, direction) >= 0.0)
+            hitN = geoN;
 
         HitMaterial hitMat = GetHitMaterial(info, hit.uv, batchIdx);
 
@@ -289,7 +349,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         float3 hitPos = origin + direction * hitT;
         float3 biasedPos = hitPos + geoN * 0.005;
+        float3 viewDir = -direction;
 
+        if (dot(hitN, sunDir) > 0.0 && dot(geoN, sunDir) > 0.0)
         {
             float shadowAtten = 1.0;
             float3 shadowOrigin = biasedPos;
@@ -374,19 +436,23 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             }
 
             if (shadowAtten > 0.001) {
-                float NdotL = max(0.0, dot(hitN, sunDir));
-                radiance += throughput * hitMat.albedo * NdotL * sunColor * shadowAtten;
+                radiance += throughput * PBRDirectLighting(hitMat.albedo, hitN, viewDir, sunDir, sunColor,
+                    hitMat.metallic, hitMat.roughness, g_DiffuseMode) * shadowAtten;
             }
         }
 
-        float2 u = float2(rand_float(rng), rand_float(rng));
-        float3 bounceDir = cosine_weighted_hemisphere(u, hitN);
-        throughput *= hitMat.albedo;
+        float3 bounceDir;
+        float3 bounceWeight;
+        if (!SampleHitMaterial(hitMat, hitN, viewDir, rng, bounceDir, bounceWeight) ||
+            dot(bounceDir, geoN) <= 0.0)
+            break;
+        throughput *= bounceWeight;
 
-        if (bounce >= 3) {
-            float p = max(throughput.r, max(throughput.g, throughput.b));
-            if (p < 0.01) break;
-            if (rand_float(rng) > p) break;
+        if (bounce >= 3)
+        {
+            float p = min(max(throughput.r, max(throughput.g, throughput.b)), 0.95);
+            if (p <= 0.0 || rand_float(rng) >= p)
+                break;
             throughput /= p;
         }
 

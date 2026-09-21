@@ -19,6 +19,7 @@ Texture2D<float4> t_BaseColor : register(t5);
 Texture2D<float4> t_Normal : register(t8);
 
 RWTexture2D<float4> u_SceneColor : register(u0);
+RWTexture2D<float4> u_IndirectLighting : register(u1);
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
@@ -28,7 +29,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     float depth = t_Depth.Load(int3(pixel, 0));
-    if (depth <= 0.0 || depth >= 0.9) {
+    float4 normalData = t_Normal.Load(int3(pixel, 0));
+    if (depth <= 0.0 || dot(normalData.xyz, normalData.xyz) < 0.25) {
         return;
     }
 
@@ -43,9 +45,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (IsReservoirValid(r) && r.W > 0) {
         float2 giUV = (float2(pixel) + 0.5) / g_ScreenSize;
         float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
+        if (depth >= 0.9)
+            giClip.z = (depth - 0.9) * 10.0;
         float4 giWorld = mul(g_InvViewProj, giClip);
         float3 worldPos = giWorld.xyz / giWorld.w;
-        float4 normalData = t_Normal.Load(int3(pixel, 0));
         float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
 
         float3 N = normalize(normalData.xyz);
@@ -61,9 +64,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         indirect = r.Lo * brdfCos * r.W;
         indirect = min(indirect, RESTIR_MAX_RADIANCE);
-        indirect *= g_GIIntensity;
     }
 
-    float3 finalColor = direct + indirect;
-    u_SceneColor[pixel] = float4(finalColor, 1.0);
+    indirect = (u_IndirectLighting[pixel].rgb + indirect) * g_GIIntensity;
+    u_IndirectLighting[pixel] = float4(indirect, 1.0);
+    float3 emission = u_SceneColor[pixel].rgb;
+    u_SceneColor[pixel] = float4(emission + direct + indirect, 1.0);
 }

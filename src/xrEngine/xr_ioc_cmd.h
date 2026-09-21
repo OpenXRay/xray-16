@@ -34,6 +34,7 @@ extern ENGINE_API int ps_fg_pbr_diffuse_mode;
 extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_r_path_tracer_bounces;
 extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_rt_gi_restir;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API Fvector4 ps_dev_param_1;
 extern ENGINE_API Fvector4 ps_dev_param_2;
