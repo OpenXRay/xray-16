@@ -8,6 +8,7 @@
 #include "xrRender_console.h"
 #include "xrCDB/Frustum.h"
 #include "xrEngine/device.h"
+#include <cmath>
 
 extern ENGINE_API float ps_r3_grass_lod_close;
 extern ENGINE_API float ps_r3_grass_lod_mid;
@@ -66,26 +67,35 @@ void FGDetailManager::UpdateInstanceMemoryStats()
         instanceMemoryStats.activeBytes = generatedInstances->bytes;
     for (const auto& frame : m_visibilityFrames)
         instanceMemoryStats.frameBytes += frame->bytes;
-    instanceMemoryStats.frames = u32(m_visibilityFrames.size());
+    for (const auto& frame : m_rayVisibilityFrames)
+        instanceMemoryStats.frameBytes += frame->bytes;
+    instanceMemoryStats.frames = u32(m_visibilityFrames.size() + m_rayVisibilityFrames.size());
     if (generationWork)
         instanceMemoryStats.pendingBytes = generationWork->bytes;
 }
 
-void FGDetailManager::RequireInstanceMemory(u64 bytes, const char* purpose)
+u64 FGDetailManager::AvailableInstanceMemory()
 {
     UpdateInstanceMemoryStats();
     const auto& memory = instanceMemoryStats.device;
     if (!memory.budgetBytes)
-        return;
+        return UINT64_MAX;
     u64 used = memory.usageBytes;
     if (!memory.usageKnown)
         used = instanceMemoryStats.residentBytes + instanceMemoryStats.frameBytes + instanceMemoryStats.pendingBytes;
     const u64 limit = memory.budgetBytes - memory.budgetBytes / 20;
-    const u64 available = used < limit ? limit - used : 0;
-    if (bytes > available)
-        FATAL_F("[DetailManager] %s needs %llu additional bytes; %llu bytes available below the GPU budget with 5%% headroom (budget=%llu usage=%llu usageKnown=%u). Density was not reduced.",
-            purpose, static_cast<unsigned long long>(bytes), static_cast<unsigned long long>(available),
-            static_cast<unsigned long long>(memory.budgetBytes), static_cast<unsigned long long>(used), u32(memory.usageKnown));
+    return used < limit ? limit - used : 0;
+}
+
+void FGDetailManager::RequireInstanceMemory(u64 bytes, const char* purpose)
+{
+    const u64 available = AvailableInstanceMemory();
+    if (available == UINT64_MAX || bytes <= available)
+        return;
+    const auto& memory = instanceMemoryStats.device;
+    FATAL_F("[DetailManager] %s needs %llu additional bytes; %llu bytes available below the GPU budget with 5%% headroom (budget=%llu usage=%llu usageKnown=%u). Density was not reduced.",
+        purpose, static_cast<unsigned long long>(bytes), static_cast<unsigned long long>(available),
+        static_cast<unsigned long long>(memory.budgetBytes), static_cast<unsigned long long>(memory.usageBytes), u32(memory.usageKnown));
 }
 
 nvrhi::BufferHandle FGDetailManager::CreateInstanceBuffer(nvrhi::IDevice* device, u64 bytes, u32 stride,
@@ -126,6 +136,13 @@ bool FGDetailManager::IsChunkVisible(const InstanceChunk& chunk, const DetailCul
             return false;
     }
     return true;
+}
+
+bool FGDetailManager::IsChunkRayRelevant(const InstanceChunk& chunk, const Fvector3& cameraPos, float cellRadius) const
+{
+    const float dx = std::max({ chunk.bounds.vMin.x - cameraPos.x, 0.f, cameraPos.x - chunk.bounds.vMax.x });
+    const float dz = std::max({ chunk.bounds.vMin.z - cameraPos.z, 0.f, cameraPos.z - chunk.bounds.vMax.z });
+    return dx * dx + dz * dz <= cellRadius * cellRadius;
 }
 
 void FGDetailManager::AllocateGeneration(nvrhi::IDevice* device, GenerationWork& work)
@@ -248,22 +265,34 @@ void FGDetailManager::AllocateGeneration(nvrhi::IDevice* device, GenerationWork&
     work.stage = GenerationWork::Stage::EmitReady;
 }
 
-void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, VisibilityFrame& frame)
+bool FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, VisibilityFrame& frame, bool ray)
 {
     auto& params = frame.cullParams;
     params = {};
-    params.viewProj = Device.mFullTransform;
     params.cameraPos = Device.vCameraPosition;
     params.lodDistanceCloseSqr = ps_r3_grass_lod_close * ps_r3_grass_lod_close;
     params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
-    CFrustum frustum;
-    frustum.CreateFromMatrix(params.viewProj, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-    for (u32 i = 0; i < 6; ++i)
+    if (ray)
     {
-        if (i < u32(frustum.p_count))
-            params.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
-        else
-            params.frustumPlanes[i].set(0.f, 0.f, 0.f, -1000000.f);
+        const float jitter = frame.source ? std::max(frame.source->params.detailDensity, 0.001f) : 0.001f;
+        const float guard = std::min(RAY_COVERAGE_GUARD_MAX, m_rayCoverageRadius * RAY_COVERAGE_GUARD_FRACTION);
+        params.rayMode = RAY_MODE_COVERAGE;
+        params.rayRadius = m_rayCoverageRadius + guard;
+        params.rayCellRadius = params.rayRadius + m_rayModelReach + jitter;
+    }
+    else
+    {
+        params.rayMode = RAY_MODE_RASTER;
+        params.viewProj = Device.mFullTransform;
+        CFrustum frustum;
+        frustum.CreateFromMatrix(params.viewProj, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+        for (u32 i = 0; i < 6; ++i)
+        {
+            if (i < u32(frustum.p_count))
+                params.frustumPlanes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y, frustum.planes[i].n.z, frustum.planes[i].d);
+            else
+                params.frustumPlanes[i].set(0.f, 0.f, 0.f, -1000000.f);
+        }
     }
     u64 potential[VIS_KIND_COUNT] = {};
     frame.visibleChunks.clear();
@@ -274,7 +303,7 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
         for (u32 i = 0; i < frame.source->chunks.size(); ++i)
         {
             const auto& chunk = frame.source->chunks[i];
-            if (!IsChunkVisible(chunk, params))
+            if (ray ? !IsChunkRayRelevant(chunk, params.cameraPos, params.rayCellRadius) : !IsChunkVisible(chunk, params))
                 continue;
             frame.visibleChunks.push_back(i);
             potential[VIS_KIND_DECAL] += chunk.staticCount;
@@ -305,12 +334,18 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
     };
     for (u32 kind = 0; kind < VIS_KIND_COUNT; ++kind)
     {
+        if (ray && potential[kind] > maximum)
+        {
+            Msg("! [DetailManager] ray grass coverage unavailable: %llu instances of kind %u exceed the %llu native list range; no truncated ray lists were produced",
+                static_cast<unsigned long long>(potential[kind]), kind, static_cast<unsigned long long>(maximum));
+            return false;
+        }
         desired[kind] = u32(std::max<u64>(1, std::min(potential[kind], maximum)));
         additional += additionalBytes(frame.visible[kind], u64(desired[kind]) * 8);
         additional += additionalBytes(frame.drawArgs[kind], 5 * sizeof(u32));
         if (kind < LOD_COUNT)
         {
-            prepared[kind] = std::min(desired[kind], PREPARED_BLADE_CAPACITY);
+            prepared[kind] = ray ? 1u : std::min(desired[kind], PREPARED_BLADE_CAPACITY);
             additional += additionalBytes(frame.prepared[kind], u64(prepared[kind]) * 36);
         }
     }
@@ -322,7 +357,18 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
     additional += additionalBytes(frame.packets, VIS_KIND_COUNT * 16);
     additional += additionalBytes(frame.workStatus, VISIBILITY_STATUS_BYTES);
     additional += additionalBytes(frame.readback, VISIBILITY_STATUS_BYTES);
-    RequireInstanceMemory(additional, "detail visibility frame");
+    if (ray)
+    {
+        const u64 available = AvailableInstanceMemory();
+        if (additional > available)
+        {
+            Msg("! [DetailManager] ray grass coverage unavailable: %llu bytes needed, %llu available below the GPU budget with 5%% headroom; no truncated ray lists were produced",
+                static_cast<unsigned long long>(additional), static_cast<unsigned long long>(available));
+            return false;
+        }
+    }
+    else
+        RequireInstanceMemory(additional, "detail visibility frame");
     const auto ensure = [&](nvrhi::BufferHandle& buffer, u64 bytes, u32 stride, const char* name,
         bool readback = false, bool indirect = false)
     {
@@ -342,7 +388,7 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
         if (kind < LOD_COUNT)
         {
             ensure(frame.prepared[kind], u64(prepared[kind]) * 36, 36, preparedNames[kind]);
-            frame.preparedCapacity[kind] = u32(frame.prepared[kind]->getDesc().byteSize / 36);
+            frame.preparedCapacity[kind] = ray ? 0u : u32(frame.prepared[kind]->getDesc().byteSize / 36);
             frame.bytes += frame.prepared[kind]->getDesc().byteSize;
             params.visibleBladeCapacity[kind] = frame.visibleCapacity[kind];
             params.preparedCapacity[kind] = frame.preparedCapacity[kind];
@@ -359,6 +405,7 @@ void FGDetailManager::AllocateVisibilityFrame(nvrhi::IDevice* device, Visibility
     params.totalSlotCount = slot_count;
     params.visibleBillboardCapacity = frame.visibleCapacity[VIS_KIND_MESH];
     params.visibleDecalCapacity = frame.visibleCapacity[VIS_KIND_DECAL];
+    return true;
 }
 
 void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
@@ -366,40 +413,59 @@ void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
     if (!device || !GEnv.Backend)
         return;
     for (const auto& frame : m_visibilityFrames)
+        FinalizeVisibilityFrame(device, frame, false);
+    for (const auto& frame : m_rayVisibilityFrames)
+        FinalizeVisibilityFrame(device, frame, true);
+}
+
+void FGDetailManager::FinalizeVisibilityFrame(nvrhi::IDevice* device, const std::shared_ptr<VisibilityFrame>& frame, bool ray)
+{
+    if (!frame->lease)
+        return;
+    GEnv.Backend->CloseSubmissionLease(frame->lease);
+    const auto state = GEnv.Backend->PollSubmissionLease(frame->lease);
+    if (state == IRenderBackend::SubmissionLeaseState::Failed || state == IRenderBackend::SubmissionLeaseState::Unknown)
+        FATAL("[DetailManager] detail visibility submission failed");
+    if (state != IRenderBackend::SubmissionLeaseState::Complete)
+        return;
+    GEnv.Backend->ReleaseSubmissionLease(frame->lease);
+    frame->lease = 0;
+    if (!frame->statsRecorded)
+        return;
+    const void* mapped = device->mapBuffer(frame->readback, nvrhi::CpuAccessMode::Read);
+    R_ASSERT2(mapped, "[DetailManager] completed visibility readback could not be mapped");
+    static_assert(sizeof(DetailCullingStats) == 32);
+    std::memcpy(&frame->stats, mapped, sizeof(DetailCullingStats));
+    DetailMembershipFingerprint fingerprint;
+    std::memcpy(&fingerprint, static_cast<const u8*>(mapped) + sizeof(DetailCullingStats), sizeof(fingerprint));
+    device->unmapBuffer(frame->readback);
+    if (frame->stats.overflowFlags)
     {
-        if (!frame->lease)
-            continue;
-        GEnv.Backend->CloseSubmissionLease(frame->lease);
-        const auto state = GEnv.Backend->PollSubmissionLease(frame->lease);
-        if (state == IRenderBackend::SubmissionLeaseState::Failed || state == IRenderBackend::SubmissionLeaseState::Unknown)
-            FATAL("[DetailManager] detail visibility submission failed");
-        if (state != IRenderBackend::SubmissionLeaseState::Complete)
-            continue;
-        GEnv.Backend->ReleaseSubmissionLease(frame->lease);
-        frame->lease = 0;
-        if (!frame->statsRecorded)
-            continue;
-        const void* mapped = device->mapBuffer(frame->readback, nvrhi::CpuAccessMode::Read);
-        R_ASSERT2(mapped, "[DetailManager] completed visibility readback could not be mapped");
-        static_assert(sizeof(DetailCullingStats) == 32);
-        std::memcpy(&frame->stats, mapped, sizeof(DetailCullingStats));
-        DetailMembershipFingerprint fingerprint;
-        std::memcpy(&fingerprint, static_cast<const u8*>(mapped) + sizeof(DetailCullingStats), sizeof(fingerprint));
-        device->unmapBuffer(frame->readback);
-        if (frame->stats.overflowFlags)
+        if (!ray)
             FATAL_F("[DetailManager] visible work overflow: flags=%u packets=%u availableEntries=%u counts=%u/%u/%u/%u/%u capacities=%u/%u/%u/%u/%u. No aliased IDs or partial density were drawn.",
                 frame->stats.overflowFlags, frame->stats.packetCount, passes::kVisIdEntryLimit - frame->entryBase,
                 frame->stats.visibleLOD0Count, frame->stats.visibleLOD1Count, frame->stats.visibleLOD2Count,
                 frame->stats.visibleBillboardCount, frame->stats.visibleDecalCount,
                 frame->visibleCapacity[0], frame->visibleCapacity[1], frame->visibleCapacity[2],
                 frame->visibleCapacity[3], frame->visibleCapacity[4]);
-        frame->contentSignature = ComposeContentSignature(frame->source ? frame->source->id : 0, frame->stats, fingerprint);
-        frame->statsReady = true;
-        if (!m_completedVisibilityFrame || frame->id > m_completedVisibilityFrame->id)
-        {
-            m_completedVisibilityFrame = frame;
-            cullingStats = frame->stats;
-        }
+        Msg("! [DetailManager] ray grass coverage unavailable: flags=%u packets=%u counts=%u/%u/%u/%u capacities=%u/%u/%u. The incomplete ray frame was not published.",
+            frame->stats.overflowFlags, frame->stats.packetCount,
+            frame->stats.visibleLOD0Count, frame->stats.visibleLOD1Count, frame->stats.visibleLOD2Count,
+            frame->stats.visibleBillboardCount,
+            frame->visibleCapacity[0], frame->visibleCapacity[1], frame->visibleCapacity[2]);
+        return;
+    }
+    frame->contentSignature = ComposeContentSignature(frame->source ? frame->source->id : 0, frame->stats, fingerprint);
+    frame->statsReady = true;
+    if (ray)
+    {
+        if (!m_completedRayVisibilityFrame || frame->id > m_completedRayVisibilityFrame->id)
+            m_completedRayVisibilityFrame = frame;
+    }
+    else if (!m_completedVisibilityFrame || frame->id > m_completedVisibilityFrame->id)
+    {
+        m_completedVisibilityFrame = frame;
+        cullingStats = frame->stats;
     }
 }
 
@@ -408,12 +474,63 @@ std::shared_ptr<const FGDetailManager::VisibilityFrame> FGDetailManager::GetComp
     return m_detailsEnabled ? m_completedVisibilityFrame : nullptr;
 }
 
+bool FGDetailManager::RayVisibilityFrameCovers(const VisibilityFrame& frame) const
+{
+    if (frame.cullParams.rayMode != RAY_MODE_COVERAGE || frame.source != generatedInstances)
+        return false;
+    const float reach = frame.cullParams.rayRadius - m_rayCoverageRadius + RAY_COVERAGE_TOLERANCE;
+    if (reach < 0.0f)
+        return false;
+    const Fvector3& camera = Device.vCameraPosition;
+    const float dx = camera.x - frame.cullParams.cameraPos.x;
+    const float dy = camera.y - frame.cullParams.cameraPos.y;
+    const float dz = camera.z - frame.cullParams.cameraPos.z;
+    return dx * dx + dy * dy + dz * dz <= reach * reach;
+}
+
+void FGDetailManager::SetRayTracingCoverage(bool enabled, float radius)
+{
+    const bool valid = radius > 0.0f && std::isfinite(radius);
+    const bool requested = enabled && valid;
+    const float applied = requested ? radius : 0.0f;
+    if (m_rayCoverageRequested == requested && m_rayCoverageRadius == applied)
+        return;
+    m_rayCoverageRequested = requested;
+    m_rayCoverageRadius = applied;
+    if (!requested)
+        m_completedRayVisibilityFrame.reset();
+}
+
+std::shared_ptr<const FGDetailManager::VisibilityFrame> FGDetailManager::GetCompletedRayVisibilityFrame() const
+{
+    if (!IsRayTracingCoverageEnabled() || !m_completedRayVisibilityFrame)
+        return nullptr;
+    return RayVisibilityFrameCovers(*m_completedRayVisibilityFrame) ? m_completedRayVisibilityFrame : nullptr;
+}
+
+bool FGDetailManager::IsRayTracingCoverageEnabled() const
+{
+    if (!m_detailsEnabled || !m_rayCoverageRequested || m_rayCoverageRadius <= 0.0f || !slot_count)
+        return false;
+    return !generatedInstances || !generatedInstances->chunks.empty() ||
+        generationWork != nullptr || m_instancesNeedRegeneration;
+}
+
+bool FGDetailManager::IsRayTracingCoveragePending() const
+{
+    return IsRayTracingCoverageEnabled() && !GetCompletedRayVisibilityFrame();
+}
+
 void FGDetailManager::PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool enabled)
 {
     m_detailsEnabled = enabled;
     visibilityFrame.reset();
+    rayVisibilityFrame.reset();
     ProcessStatsReadback(device);
     for (const auto& frame : m_visibilityFrames)
+        if (!frame->lease && frame.use_count() == 1)
+            frame->source.reset();
+    for (const auto& frame : m_rayVisibilityFrames)
         if (!frame->lease && frame.use_count() == 1)
             frame->source.reset();
     if (!device || !slot_count || !slotDataBuffer)
@@ -517,7 +634,32 @@ void FGDetailManager::PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool e
     visibilityFrame->statsReady = false;
     visibilityFrame->stats = {};
     visibilityFrame->contentSignature = 0;
-    AllocateVisibilityFrame(device, *visibilityFrame);
+    AllocateVisibilityFrame(device, *visibilityFrame, false);
+    if (IsRayTracingCoverageEnabled() && generatedInstances && !generatedInstances->chunks.empty())
+    {
+        for (const auto& frame : m_rayVisibilityFrames)
+        {
+            if (!frame->lease && frame.use_count() == 1)
+            {
+                rayVisibilityFrame = frame;
+                break;
+            }
+        }
+        if (!rayVisibilityFrame)
+        {
+            rayVisibilityFrame = std::make_shared<VisibilityFrame>();
+            m_rayVisibilityFrames.push_back(rayVisibilityFrame);
+        }
+        rayVisibilityFrame->source = generatedInstances;
+        rayVisibilityFrame->entryBase = entryBase;
+        rayVisibilityFrame->id = ++m_rayVisibilityFrameId;
+        rayVisibilityFrame->statsRecorded = false;
+        rayVisibilityFrame->statsReady = false;
+        rayVisibilityFrame->stats = {};
+        rayVisibilityFrame->contentSignature = 0;
+        if (!AllocateVisibilityFrame(device, *rayVisibilityFrame, true))
+            rayVisibilityFrame.reset();
+    }
     if (generatedInstances && !generatedInstances->chunks.empty())
         R_ASSERT2(CreateComputePipeline(GEnv.Render->GetRenderDevice()), "[DetailManager] source-compatible culling pipeline unavailable");
     UpdateInstanceMemoryStats();
@@ -610,7 +752,8 @@ void FGDetailManager::RecordVisibilityWork(nvrhi::ICommandList* cmdList, nvrhi::
         bindings.BufferUAV("g_SlotDispatch", frame.slotDispatch);
     else
     {
-        const u32 params[8] = { passes::kVisIdEntryLimit - frame.entryBase,
+        const u32 entryCapacity = frame.cullParams.rayMode ? UINT32_MAX : passes::kVisIdEntryLimit - frame.entryBase;
+        const u32 params[8] = { entryCapacity,
             frame.visibleCapacity[0], frame.visibleCapacity[1], frame.visibleCapacity[2],
             frame.visibleCapacity[3], frame.visibleCapacity[4], 0, 0 };
         auto cb = framegraph::GetPassResourceCache().GetOrCreateVolatileCB("Detail", "DetailWorkParams", sizeof(params), GEnv.Render->GetRenderDevice());
@@ -643,7 +786,10 @@ void FGDetailManager::DestroyInstanceStorage()
         for (const auto& frame : m_visibilityFrames)
             if (frame->lease)
                 GEnv.Backend->CloseSubmissionLease(frame->lease);
-        if (generationWork || !m_visibilityFrames.empty())
+        for (const auto& frame : m_rayVisibilityFrames)
+            if (frame->lease)
+                GEnv.Backend->CloseSubmissionLease(frame->lease);
+        if (generationWork || !m_visibilityFrames.empty() || !m_rayVisibilityFrames.empty())
             GEnv.Backend->WaitForIdle();
         if (generationWork && generationWork->lease)
             GEnv.Backend->ReleaseSubmissionLease(generationWork->lease);
@@ -653,10 +799,19 @@ void FGDetailManager::DestroyInstanceStorage()
                 GEnv.Backend->ReleaseSubmissionLease(frame->lease);
             frame->lease = 0;
         }
+        for (const auto& frame : m_rayVisibilityFrames)
+        {
+            if (frame->lease)
+                GEnv.Backend->ReleaseSubmissionLease(frame->lease);
+            frame->lease = 0;
+        }
     }
     visibilityFrame.reset();
+    rayVisibilityFrame.reset();
     m_completedVisibilityFrame.reset();
+    m_completedRayVisibilityFrame.reset();
     m_visibilityFrames.clear();
+    m_rayVisibilityFrames.clear();
     generationWork.reset();
     generatedInstances.reset();
     m_instanceGenerations.clear();
@@ -666,6 +821,9 @@ void FGDetailManager::DestroyInstanceStorage()
     totalGeneratedInstances = 0;
     m_instancesNeedRegeneration = true;
     m_detailsEnabled = false;
+    m_rayCoverageRequested = false;
+    m_rayCoverageRadius = 0.0f;
+    m_rayVisibilityFrameId = 0;
 }
 
 }

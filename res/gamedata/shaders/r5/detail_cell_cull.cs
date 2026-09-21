@@ -15,7 +15,14 @@ void main(uint3 group_id : SV_GroupID, uint group_index : SV_GroupIndex)
     SlotAABB slot = g_slot_aabbs[slot_idx];
     if (slot.instance_count == 0u)
         return;
-    if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))
+    if (g_ray_mode != 0u)
+    {
+        float2 closest = clamp(g_camera_pos.xz, slot.aabb_min.xz, slot.aabb_max.xz);
+        float2 delta = closest - g_camera_pos.xz;
+        if (dot(delta, delta) > g_ray_cell_radius * g_ray_cell_radius)
+            return;
+    }
+    else if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))
         return;
     uint insert_index;
     g_visible_slot_counter.InterlockedAdd(0, 1u, insert_index);

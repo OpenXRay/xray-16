@@ -25,6 +25,8 @@ ByteAddressBuffer g_GrassIB : register(t13);
 static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
 static const float RT_GRASS_ALPHA_REF = 0.3;
+#define RT_RAY_MASK_WORLD 0x01u
+#define RT_RAY_MASK_HUD 0x02u
 
 struct RTSceneParams
 {
@@ -42,6 +44,8 @@ struct RTSceneParams
     float skyWeight;
     float skyRotation;
     float sunAngularRadius;
+    uint rayMask;
+    float rayDistance;
 };
 
 RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCount,
@@ -64,6 +68,8 @@ RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCoun
     scene.skyWeight = saturate(sunColorSkyWeight.w);
     scene.skyRotation = skyRotation;
     scene.sunAngularRadius = sunAngularRadius;
+    scene.rayMask = RT_RAY_MASK_WORLD;
+    scene.rayDistance = RT_RAY_DISTANCE;
     return scene;
 }
 
@@ -175,7 +181,8 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
 
 RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
     bool shadowRay, inout uint rng, float coneWidth, float coneSpread,
-    float3 previousPosition, float previousPdf, bool previousDelta)
+    float3 previousPosition, float previousPdf, bool previousDelta,
+    uint rayMask = RT_RAY_MASK_WORLD)
 {
     RTSceneTrace trace = (RTSceneTrace)0;
     trace.transmittance = 1.0;
@@ -197,7 +204,7 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         ray.TMin = rayMinDistance;
         ray.TMax = maxDistance;
         RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_FORCE_NON_OPAQUE> q;
-        q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, 0xFF, ray);
+        q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, rayMask, ray);
         while (q.Proceed())
         {
             if (++candidates > scene.maxNullEvents * 64u)
@@ -260,7 +267,7 @@ float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, f
 {
     uint rng = 0u;
     RTSceneTrace trace = RTTraceRay(scene, origin, direction, maxDistance, true, rng,
-        coneWidth, coneSpread, origin, 0.0, true);
+        coneWidth, coneSpread, origin, 0.0, true, RT_RAY_MASK_WORLD);
     exhausted = trace.exhausted;
     return trace.hit ? float3(0.0, 0.0, 0.0) : trace.transmittance;
 }

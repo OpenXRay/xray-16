@@ -269,6 +269,9 @@ public:
 
     fg::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
 
+    u32 GetRTRayAdmittedCount() const;
+    u32 GetRTRayAdmittedSkinnedCount() const;
+
     fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
     fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
 
@@ -476,6 +479,7 @@ private:
     xr_vector<const fg::light*> m_culledLights;
     xr_vector<ISpatial*> m_touchingLights;
     xr_vector<ISpatial*> m_localCasters;
+    xr_vector<ISpatial*> m_rtCandidates;
     u32 m_collectGeneration = 0;
     u32 m_lightsFrustum = 0;
     u32 m_lightsTouching = 0;
@@ -483,6 +487,8 @@ private:
     u32 m_lightsLodCulled = 0;
     u32 m_lightsHomCulled = 0;
     u32 m_localShadowCasters = 0;
+    u32 m_rtRayAdmitted = 0;
+    u32 m_rtRayAdmittedSkinned = 0;
     bool m_collectShadowOnly = false;
     struct ShadowCasterRegion {
         Fmatrix sunView;

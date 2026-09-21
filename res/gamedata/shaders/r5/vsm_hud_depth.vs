@@ -1,22 +1,6 @@
 #define SM_6_0
 #include "common.h"
-
-struct ClusterEntry
-{
-    float4 sphere;
-    float4 lodSelf;
-    float4 lodParent;
-    uint indexCount;
-    uint ibFirst;
-    uint firstVertex;
-    uint batchIndex;
-    uint materialID;
-    uint flags;
-    float selfError;
-    float parentError;
-    float3 extent;
-    float extentPad;
-};
+#include "visbuffer_common.h"
 
 cbuffer VsmHudParams : register(b5)
 {

@@ -116,20 +116,6 @@ GIReservoir UnpackReservoir(float4 A, float4 B)
     return r;
 }
 
-MaterialSurface GBufferMaterialSurface(float4 normalData, float4 baseColorData, float2 materialData)
-{
-    MaterialSurface surface;
-    surface.albedo = baseColorData.rgb;
-    surface.N = normalize(normalData.xyz);
-    surface.roughness = abs(normalData.w);
-    surface.metallic = baseColorData.a;
-    surface.ao = 1.0;
-    surface.emissive = 0.0;
-    surface.shadingClass = GBufferShadingClass(materialData);
-    surface.transmission = materialData.y;
-    return surface;
-}
-
 float3 GITargetRadiance(MaterialSurface primary, float3 V, float3 worldPos, float3 samplePos, float3 Lo, uint diffuseMode)
 {
     float3 toSample = samplePos - worldPos;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#include "xrCommon/xr_map.h"
 #include "xrCommon/xr_set.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
@@ -25,6 +26,7 @@ namespace xray::render::fg
 class FGDetailManager;
 class GPUCullingManager;
 class RenderDevice;
+class IndexStagingBuffer;
 
 class RTBatchInfo
 {
@@ -43,6 +45,7 @@ public:
     u32 terrain = 0;
     u32 transparent = 0;
     u32 instancedTotal = 0;
+    u32 dynamic = 0;
     u32 skinned = 0;
     u32 grass = 0;
 };
@@ -207,6 +210,36 @@ public:
     RTTextureBindings textures;
     bool emptySource = false;
     bool recorded = false;
+    bool failed = false;
+};
+
+class RTDynamicRange
+{
+public:
+    u32 vertexOffset;
+    u32 indexOffset;
+    u32 vertexCount;
+    u32 indexCount;
+
+    bool operator<(const RTDynamicRange& other) const;
+};
+
+class RTDynamicGeometry
+{
+public:
+    xr_vector<RTGeometryBuild> builds;
+    xr_map<RTDynamicRange, u32> recordBuilds;
+    bool failed = false;
+    bool recorded = false;
+};
+
+class RTSkinTopology
+{
+public:
+    nvrhi::BufferHandle indices;
+    xr_vector<u32> staging;
+    u32 indexCount = 0;
+    bool uploadPending = false;
 };
 
 class RTSkinJob
@@ -220,6 +253,20 @@ public:
     u64 geometryID;
 };
 
+class RTSkinSourcePlan
+{
+public:
+    nvrhi::IBuffer* source = nullptr;
+    IndexStagingBuffer* staging = nullptr;
+    u32 format = 0;
+    u32 firstIndex = 0;
+    u32 indexCount = 0;
+    u32 indexOffset = 0;
+    u32 vertexCount = 0;
+    u32 baseVertex = 0;
+    bool pooled = false;
+};
+
 class RTGrassJob
 {
 public:
@@ -231,9 +278,11 @@ class RTSceneGeneration
 {
 public:
     std::shared_ptr<RTStaticGeometry> geometry;
+    std::shared_ptr<RTDynamicGeometry> dynamicGeometry;
     RTTextureBindings textures;
     nvrhi::rt::AccelStructHandle tlas;
     RTGeometryBuild skinBuild;
+    RTGeometryBuild hudSkinBuild;
     RTGeometryBuild grassBuild;
     nvrhi::BufferHandle batchInfo;
     nvrhi::BufferHandle materials;
@@ -253,8 +302,9 @@ public:
     nvrhi::BindingLayoutHandle grassLayout;
     nvrhi::TextureHandle grassWind;
     xr_vector<RTSkinJob> skinJobs;
+    xr_vector<RTSkinJob> hudSkinJobs;
     xr_vector<RTGrassJob> grassJobs;
-    xr_vector<u32> skinIndexData;
+    std::shared_ptr<RTSkinTopology> skinTopology;
     xr_vector<RTBatchInfo> batches;
     xr_vector<RTBatchTransform> batchTransforms;
     xr_vector<u64> batchIdentities;
@@ -342,6 +392,8 @@ private:
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches) const;
     void AppendMaterialTextures(u32 materialID, bool terrain);
     void PrepareStatic(GPUCullingManager* gpuCulling);
+    bool EnsureDynamicGeometry(GPUCullingManager* gpuCulling);
+    void PrepareDynamic(RTSceneGeneration& scene, GPUCullingManager* gpuCulling);
     void PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpuCulling,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
     void PrepareGrass(RTSceneGeneration& scene, FGDetailManager* detailMgr);
@@ -364,6 +416,10 @@ private:
     RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
     std::shared_ptr<RTStaticGeometry> m_staticGeometry;
+    std::shared_ptr<RTDynamicGeometry> m_dynamicGeometry;
+    nvrhi::IBuffer* m_dynamicSourceVertices = nullptr;
+    nvrhi::IBuffer* m_dynamicSourceIndices = nullptr;
+    xr_map<u64, std::shared_ptr<RTSkinTopology>> m_skinTopologies;
     std::shared_ptr<RTSceneGeneration> m_scene;
     xr_vector<std::shared_ptr<RTSceneGeneration>> m_generations;
     xr_vector<RTLeaseRecord> m_leases;

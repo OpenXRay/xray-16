@@ -16,23 +16,22 @@ namespace xray::render::fg::passes
 class ReSTIRGIPassState
 {
 public:
-    nvrhi::ComputePipelineHandle initialPipeline;
-    nvrhi::BindingLayoutHandle initialLayout;
-    nvrhi::ComputePipelineHandle temporalPipeline;
-    nvrhi::BindingLayoutHandle temporalLayout;
+    nvrhi::ComputePipelineHandle tracePipeline;
+    nvrhi::BindingLayoutHandle traceLayout;
     nvrhi::ComputePipelineHandle compositePipeline;
     nvrhi::BindingLayoutHandle compositeLayout;
     nvrhi::IBuffer* cb = nullptr;
-    nvrhi::SamplerHandle sampler;
-    nvrhi::TextureHandle reservoirA[2];
-    nvrhi::TextureHandle reservoirB[2];
-    nvrhi::TextureHandle directLighting;
-    nvrhi::TextureHandle indirectLighting;
-    u32 currTemporalIdx = 0;
+    nvrhi::TextureHandle rawDiffuse;
+    nvrhi::TextureHandle rawSpecular;
+    nvrhi::TextureHandle emission;
+    nvrhi::TextureHandle normalRoughness;
+    nvrhi::TextureHandle albedoMetallic;
+    nvrhi::TextureHandle pathData;
+    nvrhi::TextureHandle surfaceData;
+    nvrhi::TextureHandle motion;
     u32 texWidth = 0;
     u32 texHeight = 0;
     LightingFallback readiness = LightingFallback::ResourcesUnavailable;
-    LightingFallback temporalReadiness = LightingFallback::ResourcesUnavailable;
     bool initialized = false;
     bool historyValid = false;
     bool initialRecorded = false;
@@ -42,13 +41,20 @@ class ReSTIRGIOutput
 {
 public:
     framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle rawDiffuse;
+    framegraph::VirtualResourceHandle rawSpecular;
+    framegraph::VirtualResourceHandle emission;
+    framegraph::VirtualResourceHandle normalRoughness;
+    framegraph::VirtualResourceHandle albedoMetallic;
+    framegraph::VirtualResourceHandle pathData;
+    framegraph::VirtualResourceHandle surfaceData;
+    framegraph::VirtualResourceHandle motionVectors;
 };
 
-class ReSTIRGICB
+class RTGIRawCB
 {
 public:
     Fmatrix invViewProj;
-    Fmatrix prevViewProj;
     Fvector4 cameraPos;
     Fvector4 sunDir_intensity;
     Fvector4 sunColor_skyWeight;
@@ -63,46 +69,31 @@ public:
     u32 detailAtlasIndex;
     u32 diffuseMode;
     u32 lightCount;
-    u32 reuseReservoirs;
     u32 emissiveCount;
     u32 maxNullEvents;
+    u32 maxBounces;
+    u32 samplesPerPixel;
+    float rayDistance;
     float environmentRotation;
     float sunAngularRadius;
+    float cameraConeSpread;
+    u32 pad;
 };
 
-static_assert(sizeof(ReSTIRGICB) == 240);
+static_assert(sizeof(RTGIRawCB) == 192);
 
-class TemporalCB
+class RTGICompositeParams
 {
 public:
-    Fmatrix invViewProj;
-    Fmatrix prevInvViewProj;
-    Fvector4 cameraPos;
-    float screenWidth;
-    float screenHeight;
-    float invScreenWidth;
-    float invScreenHeight;
-    u32 frameIndex;
-    u32 diffuseMode;
-    u32 pad[2];
+    u32 width;
+    u32 height;
+    u32 pad0;
+    u32 pad1;
 };
 
-static_assert(sizeof(TemporalCB) == 176);
+static_assert(sizeof(RTGICompositeParams) == 16);
 
-class CompositeCB
-{
-public:
-    Fmatrix invViewProj;
-    Fvector4 cameraPos;
-    float screenWidth;
-    float screenHeight;
-    float giIntensity;
-    u32 diffuseMode;
-};
-
-static_assert(sizeof(CompositeCB) == 96);
-
-class InitialPassData
+class RTGITracePassData
 {
 public:
     RenderDevice* device = nullptr;
@@ -113,63 +104,44 @@ public:
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle baseColor;
     framegraph::VirtualResourceHandle material;
+    framegraph::VirtualResourceHandle sourceColor;
+    framegraph::VirtualResourceHandle motionVectors;
     framegraph::VirtualResourceHandle lightData;
     framegraph::VirtualResourceHandle environmentDistribution;
-    framegraph::VirtualResourceHandle directLighting;
-    framegraph::VirtualResourceHandle indirectLighting;
-    framegraph::VirtualResourceHandle reservoirA;
-    framegraph::VirtualResourceHandle reservoirB;
-    ReSTIRGICB cbData;
+    framegraph::VirtualResourceHandle rawDiffuse;
+    framegraph::VirtualResourceHandle rawSpecular;
+    framegraph::VirtualResourceHandle emission;
+    framegraph::VirtualResourceHandle normalRoughness;
+    framegraph::VirtualResourceHandle albedoMetallic;
+    framegraph::VirtualResourceHandle pathData;
+    framegraph::VirtualResourceHandle surfaceData;
+    framegraph::VirtualResourceHandle outMotion;
+    RTGIRawCB cbData;
     u32 width = 0;
     u32 height = 0;
     nvrhi::TextureHandle sky0;
     nvrhi::TextureHandle sky1;
 };
 
-class TemporalPassData
+class RTGICompositePassData
 {
 public:
     RenderDevice* device = nullptr;
     ReSTIRGIPassState* state = nullptr;
     LightingFrameState* lighting = nullptr;
-    framegraph::VirtualResourceHandle depth;
-    framegraph::VirtualResourceHandle normal;
-    framegraph::VirtualResourceHandle prevNormals;
-    framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle material;
-    framegraph::VirtualResourceHandle prevDepth;
-    framegraph::VirtualResourceHandle motionVectors;
-    framegraph::VirtualResourceHandle reservoirA;
-    framegraph::VirtualResourceHandle reservoirB;
-    framegraph::VirtualResourceHandle previousA;
-    framegraph::VirtualResourceHandle previousB;
-    TemporalCB cbData;
-    u32 width = 0;
-    u32 height = 0;
-};
-
-class CompositePassData
-{
-public:
-    RenderDevice* device = nullptr;
-    ReSTIRGIPassState* state = nullptr;
-    LightingFrameState* lighting = nullptr;
-    framegraph::VirtualResourceHandle depth;
-    framegraph::VirtualResourceHandle normal;
-    framegraph::VirtualResourceHandle baseColor;
-    framegraph::VirtualResourceHandle material;
+    framegraph::VirtualResourceHandle rawDiffuse;
+    framegraph::VirtualResourceHandle rawSpecular;
+    framegraph::VirtualResourceHandle emission;
     framegraph::VirtualResourceHandle sceneColor;
-    framegraph::VirtualResourceHandle directLighting;
-    framegraph::VirtualResourceHandle indirectLighting;
-    framegraph::VirtualResourceHandle reservoirA;
-    framegraph::VirtualResourceHandle reservoirB;
-    CompositeCB cbData;
+    RTGICompositeParams cbData;
+    u32 bounces = 0;
+    u32 samples = 0;
+    float rayDistance = 0.0f;
     u32 width = 0;
     u32 height = 0;
-    u32 reservoirIdx = 0;
 };
 
-LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseReservoirs);
+LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested);
 ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr, const framegraph::DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, framegraph::VirtualResourceHandle prevNormals,
     framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,

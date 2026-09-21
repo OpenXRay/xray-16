@@ -14,6 +14,7 @@ struct DetailCullPassData
 {
     VirtualResourceHandle hiZPyramid;
     std::shared_ptr<FGDetailManager::VisibilityFrame> frame;
+    std::shared_ptr<FGDetailManager::VisibilityFrame> rayFrame;
     std::shared_ptr<FGDetailManager::GenerationWork> generation;
     fg::RenderDevice* device;
     fg::FGDetailManager* detailManager;
@@ -215,6 +216,24 @@ DetailPassResources setupDetailCullPass(
                         passBuilder.write(importBuffer(work.source->chunks[i].buffer), ResourceState::UnorderedAccess);
                 }
             }
+            const auto ray = detailManager->rayVisibilityFrame;
+            if (ray && ray->source && !ray->source->chunks.empty())
+            {
+                data.rayFrame = ray;
+                for (auto buffer : ray->visible)
+                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                for (auto buffer : ray->drawArgs)
+                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                for (auto buffer : ray->prepared)
+                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                for (auto buffer : { ray->visibleSlots, ray->visibleSlotCount, ray->slotDispatch, ray->packets, ray->swDispatch, ray->workStatus })
+                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                passBuilder.write(importBuffer(ray->readback), ResourceState::CopyDest);
+                for (u32 chunk : ray->visibleChunks)
+                    passBuilder.read(importBuffer(ray->source->chunks[chunk].buffer), ResourceState::ShaderResource);
+                for (auto buffer : { ray->source->slots, ray->source->models, ray->source->pulledVertices })
+                    passBuilder.read(importBuffer(buffer), ResourceState::ShaderResource);
+            }
         },
         [](const DetailCullPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
@@ -261,6 +280,12 @@ DetailPassResources setupDetailCullPass(
             dm->DispatchCulling(cmdList, nvDevice, hiZTexture, *data.frame, data.generation,
                 data.prevViewProj, fadeDistance, hiZWidth, hiZHeight, hiZMipLevels, data.gpuProfiler);
             dm->ScheduleStatsReadback(cmdList, nvDevice, *data.frame);
+            if (data.rayFrame)
+            {
+                dm->DispatchCulling(cmdList, nvDevice, hiZTexture, *data.rayFrame, nullptr,
+                    data.prevViewProj, fadeDistance, 0, 1, 0, data.gpuProfiler);
+                dm->ScheduleStatsReadback(cmdList, nvDevice, *data.rayFrame);
+            }
         });
     return result;
 }

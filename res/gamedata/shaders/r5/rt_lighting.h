@@ -235,8 +235,8 @@ void RTAddLight(RTSceneParams scene, MaterialSurface surface, float3 position, f
     float side = dot(L, geoNormal) >= 0.0 ? 1.0 : -1.0;
     float3 origin = position + geoNormal * (RT_RAY_ORIGIN_OFFSET * side);
     float3 shadowDirection = L;
-    float shadowDistance = RT_RAY_DISTANCE;
-    if (distance < RT_RAY_DISTANCE)
+    float shadowDistance = scene.rayDistance;
+    if (distance < scene.rayDistance)
     {
         float3 toLight = position + L * distance - origin;
         shadowDistance = length(toLight);
@@ -262,7 +262,7 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
     bool deltaSun = !(solidAngle > 0.0);
     float sunPdf = deltaSun ? 1.0 : 1.0 / solidAngle;
     RTAddLight(scene, surface, position, geoNormal, V, sunDirection, scene.sunColor * sunPdf,
-        sunPdf, RT_RAY_DISTANCE, deltaSun, continuation, coneWidth, coneSpread, result);
+        sunPdf, scene.rayDistance, deltaSun, continuation, coneWidth, coneSpread, result);
 
     for (uint i = 0u; i < scene.lightCount; ++i)
     {
@@ -270,7 +270,7 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
         float3 L;
         float distance;
         float attenuation = PunctualLightAttenuation(light, position, L, distance);
-        if (attenuation > 0.0)
+        if (attenuation > 0.0 && distance <= scene.rayDistance)
             RTAddLight(scene, surface, position, geoNormal, V, L, light.colorAndRange.xyz * attenuation,
                 1.0, distance, true, continuation, coneWidth, coneSpread, result);
     }
@@ -278,7 +278,7 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
     float environmentPdf;
     float3 environmentDirection = RTSampleEnvironment(scene, rng, environmentPdf);
     RTAddLight(scene, surface, position, geoNormal, V, environmentDirection, SampleRTSky(scene, environmentDirection),
-        environmentPdf, RT_RAY_DISTANCE, false, continuation, coneWidth, coneSpread, result);
+        environmentPdf, scene.rayDistance, false, continuation, coneWidth, coneSpread, result);
 
     if (scene.emissiveCount > 0u)
     {
@@ -294,7 +294,7 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
         float3 lightPosition = v0.position * (1.0 - root) + v1.position * barycentrics.x + v2.position * barycentrics.y;
         float3 toLight = lightPosition - position;
         float distance = length(toLight);
-        if (distance > 0.0 && distance < RT_RAY_DISTANCE)
+        if (distance > 0.0 && distance <= scene.rayDistance)
         {
             float3 L = toLight / distance;
             float pdf = RTEmissivePdf(scene, emitter.batchIndex, info, emitter.primitiveIndex, position, lightPosition);
