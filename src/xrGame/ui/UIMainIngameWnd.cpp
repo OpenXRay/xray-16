@@ -208,7 +208,7 @@ void CUIMainIngameWnd::Init()
     const bool attachedToMinimap = UIMotionIcon->Init();
 
     //индикаторы
-    UIZoneMap->Init(attachedToMinimap);
+    UIZoneMap->Init(attachedToMinimap, uiXml);
 
     if (attachedToMinimap)
     {

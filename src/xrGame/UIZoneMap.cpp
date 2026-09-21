@@ -18,7 +18,7 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-void CUIZoneMap::Init(bool motionIconAttached)
+void CUIZoneMap::Init(bool motionIconAttached, CUIXml& maingameXml)
 {
     ZoneScoped;
 
@@ -93,10 +93,20 @@ void CUIZoneMap::Init(bool motionIconAttached)
 
     if (IsGameTypeSingle())
     {
-        CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter);
-        m_background.AttachChild(&m_Counter);
-        CUIXmlInit::InitStatic(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
-        m_Counter.AttachChild(&m_Counter_text);
+        if (CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter, false))
+        {
+            m_background.AttachChild(&m_Counter);
+            CUIXmlInit::InitStatic(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
+            m_Counter.AttachChild(&m_Counter_text);
+        }
+        else // SOC
+        {
+            m_Counter.Show(false);
+            if (CUIXmlInit::InitStatic(maingameXml, "static_pda_online", 0, &m_Counter_text, false))
+                m_background.AttachChild(&m_Counter_text);
+            else
+                m_Counter_text.Show(false);
+        }
 
         if (motionIconAttached)
         {

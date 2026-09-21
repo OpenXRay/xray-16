@@ -25,7 +25,7 @@ private:
     u8 m_current_map_idx{ u8(-1) };
 
 public:
-    void Init(bool motionIconAttached);
+    void Init(bool motionIconAttached, CUIXml& maingameXml);
 
     void Render();
     void Update();
