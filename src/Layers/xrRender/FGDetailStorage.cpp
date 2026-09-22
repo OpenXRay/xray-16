@@ -488,6 +488,26 @@ bool FGDetailManager::RayVisibilityFrameCovers(const VisibilityFrame& frame) con
     return dx * dx + dy * dy + dz * dz <= reach * reach;
 }
 
+bool FGDetailManager::RayVisibilityFrameWanted() const
+{
+    const auto& completed = m_completedRayVisibilityFrame;
+    if (!completed || !RayVisibilityFrameCovers(*completed))
+        return true;
+    for (const auto& frame : m_rayVisibilityFrames)
+    {
+        if (frame->lease && frame->id > completed->id && frame->cullParams.rayMode == RAY_MODE_COVERAGE &&
+            frame->source == generatedInstances)
+            return false;
+    }
+    const float guard = completed->cullParams.rayRadius - m_rayCoverageRadius;
+    const float refresh = guard * RAY_COVERAGE_REFRESH_FRACTION;
+    const Fvector3& camera = Device.vCameraPosition;
+    const float dx = camera.x - completed->cullParams.cameraPos.x;
+    const float dy = camera.y - completed->cullParams.cameraPos.y;
+    const float dz = camera.z - completed->cullParams.cameraPos.z;
+    return dx * dx + dy * dy + dz * dz > refresh * refresh;
+}
+
 void FGDetailManager::SetRayTracingCoverage(bool enabled, float radius)
 {
     const bool valid = radius > 0.0f && std::isfinite(radius);
@@ -635,7 +655,7 @@ void FGDetailManager::PrepareFrame(nvrhi::IDevice* device, u32 entryBase, bool e
     visibilityFrame->stats = {};
     visibilityFrame->contentSignature = 0;
     AllocateVisibilityFrame(device, *visibilityFrame, false);
-    if (IsRayTracingCoverageEnabled() && generatedInstances && !generatedInstances->chunks.empty())
+    if (IsRayTracingCoverageEnabled() && generatedInstances && !generatedInstances->chunks.empty() && RayVisibilityFrameWanted())
     {
         for (const auto& frame : m_rayVisibilityFrames)
         {
