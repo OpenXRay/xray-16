@@ -746,8 +746,12 @@ bool CLocatorAPI::Recurse(pcstr path)
         // do nothing
 #elif defined(XR_PLATFORM_ANDROID)
         xr_strcpy(findData.name, entries[handle - done].c_str());
-        struct stat fi;
-        stat(findData.name, &fi);
+        struct stat fi{};
+        if (stat(findData.name, &fi) != 0)
+        {
+            --done;
+            continue;
+        }
         findData.size = fi.st_size;
         findData.time_access = fi.st_atim.tv_sec;
         findData.time_create = fi.st_ctim.tv_sec;
