@@ -462,9 +462,9 @@ private:
     static bool AccelStructShapeMatches(const nvrhi::rt::AccelStructDesc& cached,
         const nvrhi::rt::AccelStructDesc& requested);
     static bool AccelStructUpdateMatches(const nvrhi::rt::AccelStructDesc& cached,
-        const nvrhi::rt::AccelStructDesc& requested);
+        const nvrhi::rt::AccelStructDesc& requested, bool sourceMayMove);
     void AcquireGeometryBuild(const nvrhi::rt::AccelStructDesc& requested, RTGeometryBuild& slot,
-        bool topologyStable, u64 topologyKey = 0);
+        bool topologyStable, u64 topologyKey = 0, bool sourceMayMove = false);
     bool IsSceneReady(const RTSceneGeneration& scene) const;
     u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling);
     u64 ComputeTopologySignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,

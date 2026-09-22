@@ -202,10 +202,12 @@ bool RTAccelStructManager::AccelStructShapeMatches(const nvrhi::rt::AccelStructD
 }
 
 bool RTAccelStructManager::AccelStructUpdateMatches(const nvrhi::rt::AccelStructDesc& cached,
-    const nvrhi::rt::AccelStructDesc& requested)
+    const nvrhi::rt::AccelStructDesc& requested, bool sourceMayMove)
 {
     if (!AccelStructShapeMatches(cached, requested) || cached.buildFlags != requested.buildFlags)
         return false;
+    if (sourceMayMove)
+        return true;
     for (size_t i = 0; i < cached.bottomLevelGeometries.size(); ++i)
     {
         const nvrhi::rt::GeometryTriangles& a = cached.bottomLevelGeometries[i].geometryData.triangles;
@@ -219,14 +221,14 @@ bool RTAccelStructManager::AccelStructUpdateMatches(const nvrhi::rt::AccelStruct
 }
 
 void RTAccelStructManager::AcquireGeometryBuild(const nvrhi::rt::AccelStructDesc& requested, RTGeometryBuild& slot,
-    bool topologyStable, u64 topologyKey)
+    bool topologyStable, u64 topologyKey, bool sourceMayMove)
 {
     R_ASSERT(!requested.bottomLevelGeometries.empty());
     nvrhi::rt::AccelStructDesc desc = requested;
     const bool retain = slot.handle && AccelStructShapeMatches(slot.desc, desc);
     const bool update = retain && m_inPlaceUpdates && topologyStable && slot.built &&
         (desc.buildFlags & nvrhi::rt::AccelStructBuildFlags::AllowUpdate) != nvrhi::rt::AccelStructBuildFlags::None &&
-        slot.topologyKey == topologyKey && AccelStructUpdateMatches(slot.desc, desc);
+        slot.topologyKey == topologyKey && AccelStructUpdateMatches(slot.desc, desc, sourceMayMove);
     if (!retain)
     {
         slot.desc = std::move(desc);
@@ -1339,9 +1341,9 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         batchKey = RTIdentity(batchKey, u64(baseVertex));
         batchKey = RTIdentity(batchKey, u64(reinterpret_cast<size_t>(source)));
         batchKey = RTIdentity(batchKey, u64(reinterpret_cast<size_t>(mapped)));
-        batchKey = RTIdentity(batchKey, u64(job.constants.outputOffset));
-        batchKey = RTIdentity(batchKey, u64(job.indexOffset));
         job.topologyKey = batchKey;
+        topologyKey = RTIdentity(topologyKey, u64(job.constants.outputOffset));
+        topologyKey = RTIdentity(topologyKey, u64(job.indexOffset));
         topologyKey = RTIdentity(topologyKey, batchKey);
         plans.push_back(plan);
         indexCount += batch.indexCount;
@@ -1462,7 +1464,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         auto& slot = m_skinBuilds[job.geometryID];
         if (!slot || std::find(pinned.begin(), pinned.end(), slot.get()) != pinned.end())
             slot = std::make_shared<RTGeometryBuild>();
-        AcquireGeometryBuild(desc, *slot, topologyStable, job.topologyKey);
+        AcquireGeometryBuild(desc, *slot, true, job.topologyKey, true);
         if (!slot->handle)
         {
             scene.failed = true;

@@ -118,6 +118,7 @@ public:
     static constexpr float RAY_COVERAGE_GUARD_MAX = 4.0f;
     static constexpr float RAY_COVERAGE_GUARD_FRACTION = 0.25f;
     static constexpr float RAY_COVERAGE_TOLERANCE = 0.05f;
+    static constexpr float RAY_COVERAGE_REFRESH_FRACTION = 0.5f;
 
     struct GrassObjectTint { float r, g, b, pad; };
 
@@ -525,6 +526,7 @@ private:
     bool IsChunkVisible(const InstanceChunk& chunk, const DetailCullParams& params) const;
     bool IsChunkRayRelevant(const InstanceChunk& chunk, const Fvector3& cameraPos, float cellRadius) const;
     bool RayVisibilityFrameCovers(const VisibilityFrame& frame) const;
+    bool RayVisibilityFrameWanted() const;
     xr_vector<std::shared_ptr<VisibilityFrame>> m_visibilityFrames;
     xr_vector<std::shared_ptr<VisibilityFrame>> m_rayVisibilityFrames;
     xr_vector<std::weak_ptr<const InstanceGeneration>> m_instanceGenerations;
