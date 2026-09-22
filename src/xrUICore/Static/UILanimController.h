@@ -29,6 +29,7 @@ class CUILightAnimColorConroller
 public:
     virtual bool IsColorAnimationPresent() = 0;
     virtual void ResetColorAnimation() = 0;
+    virtual color_animation& GetColorAnimation() = 0;
     virtual void SetColorAnimation(LPCSTR lanim, u8 const& flags, float delay = 0.0f) = 0;
     virtual void ColorAnimationSetTextureColor(u32 color, bool only_alpha){};
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha){};
@@ -39,6 +40,16 @@ class CUILightAnimColorConrollerImpl : public CUILightAnimColorConroller
     color_animation m_lanim_clr;
 
 public:
+    color_animation& GetColorAnimation() override
+    {
+        return m_lanim_clr;
+    }
+
+    void SetColorAnimation(const color_animation& lanim)
+    {
+        m_lanim_clr = lanim;
+    }
+
     void SetColorAnimation(LPCSTR lanim, u8 const& flags, float delay = 0.0f)
     {
         if (lanim && lanim[0] != 0)
