@@ -258,6 +258,8 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         ray.Direction = direction;
         ray.TMin = rayMinDistance;
         ray.TMax = maxDistance;
+        uint4 cachedHit = uint4(0xFFFFFFFFu, 0u, 0u, 0u);
+        RTHitClass cachedClassification = (RTHitClass)0;
         RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> q;
         q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, rayMask, ray);
         while (q.Proceed())
@@ -280,7 +282,15 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
                 candidate.objectToWorld = q.CandidateObjectToWorld3x4();
                 RTHitClass classification = RTClassifyHit(scene, candidate, direction, shadowRay, false);
                 if (classification.opaque || any(classification.transmittance < 1.0) || any(classification.emissive > 0.0))
+                {
+                    if (!shadowRay)
+                    {
+                        cachedHit = uint4(q.CandidateInstanceIndex(), q.CandidateGeometryIndex(),
+                            candidate.primitiveIndex, asuint(candidate.t));
+                        cachedClassification = classification;
+                    }
                     q.CommitNonOpaqueTriangleHit();
+                }
             }
         }
         if (q.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
@@ -292,7 +302,16 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         trace.t = q.CommittedRayT();
         trace.objectToWorld = q.CommittedObjectToWorld3x4();
         trace.frontFace = q.CommittedTriangleFrontFace();
-        RTHitClass hitClass = RTClassifyHit(scene, trace, direction, shadowRay, true);
+        RTHitClass hitClass;
+        if (!shadowRay && all(cachedHit == uint4(q.CommittedInstanceIndex(), q.CommittedGeometryIndex(),
+            trace.primitiveIndex, asuint(trace.t))))
+        {
+            hitClass = cachedClassification;
+        }
+        else
+        {
+            hitClass = RTClassifyHit(scene, trace, direction, shadowRay, true);
+        }
         bool accept = hitClass.opaque;
         if (accept && hitClass.opacity < 1.0)
             accept = rand_float(rng) < hitClass.opacity;
