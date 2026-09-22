@@ -119,6 +119,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     deviceDesc.deviceExtensions = m_deviceExtensions.data();
     deviceDesc.numDeviceExtensions = m_deviceExtensions.size();
+    deviceDesc.bufferDeviceAddressSupported = m_bufferDeviceAddressEnabled;
 
     m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
     if (!m_nvrhiVulkanDevice) {
@@ -439,6 +440,10 @@ bool VulkanBackend::CreateLogicalDevice() {
     m_deviceExtensions.push_back("VK_KHR_portability_subset");
 #endif
 
+    m_bufferDeviceAddressEnabled = false;
+    bool accelerationStructureExtension = false;
+    bool rayQueryExtension = false;
+    bool deferredHostOperationsExtension = false;
     m_capabilities.meshShaders = false;
     m_capabilities.meshShaderMaxGroups = 0;
     u32 meshShaderMaxGroups = 0;
@@ -452,6 +457,12 @@ bool VulkanBackend::CreateLogicalDevice() {
             {
                 if (strcmp(extension.extensionName, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0)
                     m_deviceExtensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
+                if (strcmp(extension.extensionName, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) == 0)
+                    accelerationStructureExtension = true;
+                if (strcmp(extension.extensionName, VK_KHR_RAY_QUERY_EXTENSION_NAME) == 0)
+                    rayQueryExtension = true;
+                if (strcmp(extension.extensionName, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
+                    deferredHostOperationsExtension = true;
             }
             for (u32 i = 0; i < extensionCount; ++i) {
                 if (strcmp(extensions[i].extensionName, VK_EXT_MESH_SHADER_EXTENSION_NAME) != 0)
@@ -531,6 +542,11 @@ bool VulkanBackend::CreateLogicalDevice() {
     if (meshFeatures.meshShader)
         vulkan11Features.pNext = &meshFeatures;
 
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {};
+    accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+    rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+
     VkPhysicalDeviceFeatures2 features2 = {};
     features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     features2.pNext = &vulkan12Features;
@@ -545,17 +561,19 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.shaderClipDistance = VK_TRUE;
     features2.features.textureCompressionBC = VK_TRUE;
 
-    VkDeviceCreateInfo deviceCreateInfo = {};
-    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.pNext = &features2;
-    deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
-    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(m_deviceExtensions.size());
-    deviceCreateInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
-
     {
         VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
         VkPhysicalDeviceVulkan11Features sup11 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR supportedAccelerationStructureFeatures = {};
+        supportedAccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+        VkPhysicalDeviceRayQueryFeaturesKHR supportedRayQueryFeatures = {};
+        supportedRayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+        const bool rayTracingExtensions = accelerationStructureExtension && rayQueryExtension && deferredHostOperationsExtension;
+        if (rayTracingExtensions)
+        {
+            sup11.pNext = &supportedAccelerationStructureFeatures;
+            supportedAccelerationStructureFeatures.pNext = &supportedRayQueryFeatures;
+        }
         VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         sup2.pNext = &sup12;
         sup12.pNext = &sup11;
@@ -592,6 +610,33 @@ bool VulkanBackend::CreateLogicalDevice() {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
             vulkan11Features.shaderDrawParameters = VK_FALSE;
         }
+        if (rayTracingExtensions && sup12.bufferDeviceAddress &&
+            supportedAccelerationStructureFeatures.accelerationStructure && supportedRayQueryFeatures.rayQuery)
+        {
+            vulkan12Features.bufferDeviceAddress = VK_TRUE;
+            accelerationStructureFeatures.accelerationStructure = VK_TRUE;
+            rayQueryFeatures.rayQuery = VK_TRUE;
+            rayQueryFeatures.pNext = vulkan11Features.pNext;
+            accelerationStructureFeatures.pNext = &rayQueryFeatures;
+            vulkan11Features.pNext = &accelerationStructureFeatures;
+            m_deviceExtensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+            m_deviceExtensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+            m_deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+        }
+        else if (!rayTracingExtensions)
+        {
+            Msg("* [VulkanBackend] Ray tracing disabled: required extensions unavailable "
+                "(acceleration structure: %s, ray query: %s, deferred host operations: %s)",
+                accelerationStructureExtension ? "yes" : "no", rayQueryExtension ? "yes" : "no",
+                deferredHostOperationsExtension ? "yes" : "no");
+        }
+        else
+        {
+            Msg("* [VulkanBackend] Ray tracing disabled: required features unavailable "
+                "(buffer device address: %s, acceleration structure: %s, ray query: %s)",
+                sup12.bufferDeviceAddress ? "yes" : "no", supportedAccelerationStructureFeatures.accelerationStructure ? "yes" : "no",
+                supportedRayQueryFeatures.rayQuery ? "yes" : "no");
+        }
 
         Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
             vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
@@ -601,12 +646,21 @@ bool VulkanBackend::CreateLogicalDevice() {
             sup2.features.shaderClipDistance ? "supported" : "unsupported");
     }
 
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = &features2;
+    deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(m_deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
+
     VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
     if (result != VK_SUCCESS) {
         Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
         return false;
     }
 
+    m_bufferDeviceAddressEnabled = vulkan12Features.bufferDeviceAddress == VK_TRUE;
     m_capabilities.meshShaders = meshFeatures.meshShader == VK_TRUE;
     m_capabilities.meshShaderMaxGroups = meshShaderMaxGroups;
 
@@ -828,6 +882,10 @@ void VulkanBackend::QueryCapabilities() {
     m_capabilities.bindlessTextures = true;
     m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
     m_capabilities.shaderModel = 60;
+    m_capabilities.rayTracing = m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct) &&
+        m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayQuery);
+    m_capabilities.rayTracingUpdates = m_capabilities.rayTracing;
+    Msg("* [VulkanBackend] Ray tracing (path tracer / RTGI): %s", m_capabilities.rayTracing ? "ENABLED" : "DISABLED");
 
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
