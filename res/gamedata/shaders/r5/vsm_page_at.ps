@@ -1,6 +1,7 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "common_dither.h"
 
 struct PS_INPUT
 {
@@ -15,9 +16,13 @@ struct PS_INPUT
 void main(PS_INPUT input)
 {
     MaterialData mat = g_Materials[input.materialID];
-    if (mat.flags & MAT_FLAG_ALPHA_TEST)
-    {
-        float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-        clip(diffuseSample.a - mat.alphaRef);
-    }
+    if ((mat.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_ALPHA_BLEND)) == 0u)
+        return;
+    float alpha = (mat.flags & MAT_FLAG_ALPHA_BLEND) != 0u
+        ? SampleDiffuseLevel(mat, input.texcoord).a
+        : SampleDiffuse(mat, input.texcoord).a;
+    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0u)
+        clip(alpha - mat.alphaRef);
+    if ((mat.flags & MAT_FLAG_ALPHA_BLEND) != 0u)
+        clip(saturate(alpha) - Bayer4x4Threshold(uint2(input.position.xy)));
 }

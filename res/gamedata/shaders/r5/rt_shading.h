@@ -189,7 +189,10 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     if (shadowRay && (variant.flags & VARIANT_FLAG_NO_SHADOW) != 0u)
         return result;
     result.diffuse = SampleDiffuseGrad(mat, geometry.uv, geometry.uvDx, geometry.uvDy);
-    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0u && result.diffuse.a < mat.alphaRef)
+    float coverageAlpha = result.diffuse.a;
+    if (shadowRay && (mat.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_ALPHA_BLEND)) != 0u)
+        coverageAlpha = SampleDiffuseLevel(mat, geometry.uv).a;
+    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0u && coverageAlpha < mat.alphaRef)
         return result;
     if ((mat.flags & MAT_FLAG_WATER) != 0u)
     {
@@ -210,7 +213,7 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     }
     if ((mat.flags & MAT_FLAG_ALPHA_BLEND) != 0u)
     {
-        result.opacity = saturate(result.diffuse.a);
+        result.opacity = saturate(coverageAlpha);
         result.transmittance = 1.0 - result.opacity;
         result.opaque = shadowRay ? result.opacity >= 1.0 : result.opacity > 0.0;
         return result;

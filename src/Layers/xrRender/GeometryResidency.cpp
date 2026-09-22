@@ -430,6 +430,7 @@ bool GeometryResidencyManager::BeginLevel(ClusterDAG* dag, const char* storePath
     m_frameLease = 0;
     m_tablesInitialized = false;
     m_cookBytesReleased = false;
+    m_cookDemandStarted = false;
     m_stats.groups = m_groupCount;
     m_stats.pages = u32(pages.size());
     m_stats.vertexArenaBytes = vertexArenaBytes;
@@ -518,6 +519,7 @@ void GeometryResidencyManager::EndLevel()
     m_active = false;
     m_tablesInitialized = false;
     m_cookBytesReleased = false;
+    m_cookDemandStarted = false;
     m_groupCount = 0;
     m_fineGroupCount = 0;
     m_storePageCount = 0;
@@ -1163,23 +1165,33 @@ void GeometryResidencyManager::ReleaseCookBytesIfConfirmed()
 {
     if (m_cookBytesReleased || !m_dag || !m_dag->LevelPageBytesResident())
         return;
+    if (IsStreaming() && !m_cookDemandStarted)
+        return;
 
-    for (u32 p = 0; p < u32(m_pageSlots.size()); ++p) {
+    for (const FrameRecord& frame : m_frames)
+    {
+        if (frame.usesCookBytes)
+            return;
+    }
+
+    for (u32 p = 0; p < u32(m_pageSlots.size()); ++p)
+    {
         const PageSlot& slot = m_pageSlots[p];
-        if (slot.runtime || !slot.pinned)
+        if (slot.runtime || (!slot.pinned && !slot.cpuSourced))
             continue;
         if (slot.state != PageState::Resident)
             return;
     }
 
-    for (PageSlot& slot : m_pageSlots) {
+    for (PageSlot& slot : m_pageSlots)
+    {
         if (!slot.runtime && slot.cpuSourced)
             slot.cpuSourced = false;
     }
 
     m_dag->ReleaseLevelPageBytes();
     m_cookBytesReleased = true;
-    Msg("* [GeoResidency] released the level page cook arena after the pinned residency upload completed");
+    Msg("* [GeoResidency] released the level page cook arena after the initial geometry uploads completed");
 }
 
 void GeometryResidencyManager::CompleteFrames(IRenderBackend* backend)
@@ -1251,8 +1263,6 @@ void GeometryResidencyManager::CompleteFrames(IRenderBackend* backend)
         m_payloadArena.Release(it->payloadBlock, it->payloadBlocks, it->pinned);
         it = m_retiring.erase(it);
     }
-
-    ReleaseCookBytesIfConfirmed();
 }
 
 void GeometryResidencyManager::BeginFrame(IRenderBackend* backend)
@@ -1368,6 +1378,8 @@ void GeometryResidencyManager::AddInstanceDemand(u32 assetMember, const Fmatrix&
         return;
     if (assetMember >= u32(m_memberGroupCount.size()))
         return;
+
+    m_cookDemandStarted = true;
 
     const u32 first = m_memberGroupOffset[assetMember];
     const u32 count = m_memberGroupCount[assetMember];
@@ -1530,6 +1542,11 @@ void GeometryResidencyManager::ResolveDemand()
                 continue;
             if (m_pageSlots[page].state != PageState::Absent)
                 continue;
+            if (!m_pageSlots[page].runtime && m_dag->LevelPageBytesResident())
+            {
+                StageFromCook(page);
+                continue;
+            }
             if (inFlight >= maxReads)
             {
                 m_stats.readThrottles++;
@@ -1640,7 +1657,7 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
             vertexBytes = CookVertexBytes(page, vertexSize);
             payloadBytes = CookPayloadBytes(page, payloadSize);
             if (!vertexBytes || !payloadBytes)
-                FATAL_F("[GeoResidency] cook bytes for pinned page %u are no longer retained", page);
+                FATAL_F("[GeoResidency] cook bytes for page %u are no longer retained", page);
         } else {
             vertexBytes = slot.vertexStaging.data();
             vertexSize = u32(slot.vertexStaging.size());
@@ -1675,6 +1692,7 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
         slot.state = PageState::Uploading;
         PublishPage(page);
         frame.uploadedPages.push_back(page);
+        frame.usesCookBytes |= slot.cpuSourced && !slot.runtime;
         uploaded += bytes;
         m_stats.uploadsRecorded++;
         m_stats.uploadKiB += u32(bytes / 1024ull);
@@ -1712,6 +1730,8 @@ void GeometryResidencyManager::RecordUploads(nvrhi::ICommandList* cmdList)
 
     if (frame.lease || !frame.uploadedPages.empty())
         m_frames.push_back(std::move(frame));
+
+    ReleaseCookBytesIfConfirmed();
 
     m_stats.vertexUsedBytes = m_vertexArena.UsedBytes();
     m_stats.payloadUsedBytes = m_payloadArena.UsedBytes();
