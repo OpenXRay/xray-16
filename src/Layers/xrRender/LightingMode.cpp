@@ -3,7 +3,7 @@
 
 namespace xray::render::fg
 {
-void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
+void LightingFrameState::Begin(bool requestRTGI, bool requestPT, bool profileRTGI)
 {
     requested = requestPT ? LightingMode::ReferencePT : (requestRTGI ? LightingMode::RTGI : LightingMode::Raster);
     effective = requested;
@@ -29,16 +29,16 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
     rayGrassEnabled = false;
     rayGrassPending = false;
     rayStaticDetailInstances = 0;
+    rtgiProfile = requested == LightingMode::RTGI && profileRTGI;
     rawSignalsRecorded = false;
     sceneRevision = 0;
     poseRevision = 0;
 
     if (m_latchedReason == LightingFallback::None)
         return;
-    if (m_latchedMode != requested)
+    if (m_latchedMode != requested || m_latchedRTGIProfile != rtgiProfile)
     {
-        m_latchedMode = LightingMode::Raster;
-        m_latchedReason = LightingFallback::None;
+        ResetRecovery();
         return;
     }
     effective = LightingMode::Raster;
@@ -72,6 +72,7 @@ void LightingFrameState::Fail(LightingFallback reason)
         rayStaticDetailInstances = 0;
         m_latchedMode = requested;
         m_latchedReason = reason;
+        m_latchedRTGIProfile = rtgiProfile;
         return;
     }
 
@@ -89,6 +90,7 @@ void LightingFrameState::ResetRecovery()
 {
     m_latchedMode = LightingMode::Raster;
     m_latchedReason = LightingFallback::None;
+    m_latchedRTGIProfile = false;
 }
 
 const char* LightingModeName(LightingMode mode)

@@ -11,6 +11,8 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
@@ -30,6 +32,37 @@ namespace xray::render::fg::passes
 using namespace framegraph;
 
 static nvrhi::BufferHandle s_rtgiPlaceholderBuffer;
+
+static constexpr const char* s_rtgiProfileShaders[RTGIProfileState::StageCount] =
+{
+    "rtgi_profile_setup",
+    "rtgi_profile_trace",
+    "rtgi_profile_material",
+    "rtgi_profile_sun",
+    "rtgi_profile_local_lights",
+    "rtgi_profile_environment",
+    "rtgi_profile_emissive",
+    "rtgi_profile_advance",
+    "rtgi_profile_resolve"
+};
+
+static constexpr RTGIProfileState::Stage s_rtgiProfileLightStages[RTGIProfileState::LightingStageCount] =
+{
+    RTGIProfileState::Stage::Sun,
+    RTGIProfileState::Stage::LocalLights,
+    RTGIProfileState::Stage::Environment,
+    RTGIProfileState::Stage::Emissive
+};
+
+static constexpr const char* s_rtgiProfileLightNames[RTGIProfileState::LightingStageCount] =
+{
+    "Sun",
+    "Local lights",
+    "Environment",
+    "Emissive + accumulate"
+};
+
+static constexpr const char* s_rtgiProfileName = "RTGI Raw Transport [diagnostic]";
 
 static void CreatePlaceholders(nvrhi::IDevice* nvDevice)
 {
@@ -178,6 +211,89 @@ static void EnsureRawTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& state
     state.texHeight = height;
 }
 
+static LightingFallback EnsureRTGIProfileResources(RenderDevice* device, RTGIProfileState& state, u32 width, u32 height)
+{
+    auto* nvDevice = device->GetNVRHIDevice();
+    if (!state.initialized)
+    {
+        auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+        if (!shaderLoader)
+            return LightingFallback::ShaderUnavailable;
+        auto* backend = device->GetBackend();
+        if (!backend || !backend->GetBindlessLayout())
+            return LightingFallback::BindingUnavailable;
+
+        auto& cache = GetPassResourceCache();
+        state.cb = cache.GetOrCreateVolatileCB("RTGI.Profile", "Params", sizeof(RTGIProfileParams),
+            device, RTGIProfileState::ParameterVersions);
+        if (!state.cb)
+            return LightingFallback::ResourcesUnavailable;
+
+        state.initialized = true;
+        for (u32 stage = 0; stage < RTGIProfileState::StageCount; ++stage)
+        {
+            const char* shader = s_rtgiProfileShaders[stage];
+            auto result = shaderLoader->LoadComputeShader(shader);
+            if (!result.handle || !result.reflection)
+            {
+                state.readiness = LightingFallback::ShaderUnavailable;
+                Msg("! [RTGI Profile] Shader unavailable: %s", shader);
+                return state.readiness;
+            }
+            state.layouts[stage] = cache.GetOrCreateBindingLayoutFromReflection(shader, *result.reflection, nvDevice);
+            if (!state.layouts[stage])
+            {
+                state.readiness = LightingFallback::PipelineUnavailable;
+                return state.readiness;
+            }
+            nvrhi::ComputePipelineDesc desc;
+            desc.CS = result.handle;
+            desc.bindingLayouts = { state.layouts[stage], backend->GetBindlessLayout() };
+            state.pipelines[stage] = nvDevice->createComputePipeline(desc);
+            if (!state.pipelines[stage])
+            {
+                state.readiness = LightingFallback::PipelineUnavailable;
+                return state.readiness;
+            }
+        }
+        state.readiness = LightingFallback::None;
+    }
+    if (state.readiness != LightingFallback::None)
+        return state.readiness;
+    if (width > RTGIProfileState::MaxLanes)
+        return LightingFallback::ResourcesUnavailable;
+
+    const u32 rows = RTGIProfileState::MaxLanes / width;
+    const u32 tileHeight = std::min(height, std::max(1u, rows & ~7u));
+    const u32 capacity = width * tileHeight;
+    state.tileHeight = tileHeight;
+    if (state.paths && state.hits && state.sums && state.capacity >= capacity)
+        return LightingFallback::None;
+
+    const auto create = [nvDevice, capacity](const char* name, u32 stride)
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = name;
+        desc.byteSize = u64(capacity) * stride;
+        desc.canHaveRawViews = true;
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        return nvDevice->createBuffer(desc);
+    };
+
+    auto paths = create("RTGI_ProfilePaths", RTGIProfileState::PathStride);
+    auto hits = create("RTGI_ProfileHits", RTGIProfileState::HitStride);
+    auto sums = create("RTGI_ProfileSums", RTGIProfileState::SumStride);
+    if (!paths || !hits || !sums)
+        return LightingFallback::ResourcesUnavailable;
+    state.paths = std::move(paths);
+    state.hits = std::move(hits);
+    state.sums = std::move(sums);
+    state.capacity = capacity;
+    return LightingFallback::None;
+}
+
 LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested)
 {
     if (!device || !device->GetNVRHIDevice() || !width || !height)
@@ -189,6 +305,13 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
     if (!state.rawDiffuse || !state.rawSpecular || !state.emission || !state.normalRoughness ||
         !state.albedoMetallic || !state.pathData || !state.surfaceData || !state.motion)
         return LightingFallback::ResourcesUnavailable;
+    if (ps_r_rt_gi_profile != 0)
+        return EnsureRTGIProfileResources(device, state.profile, width, height);
+    state.profile.paths = nullptr;
+    state.profile.hits = nullptr;
+    state.profile.sums = nullptr;
+    state.profile.capacity = 0;
+    state.profile.tileHeight = 0;
     return LightingFallback::None;
 }
 
@@ -394,8 +517,34 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     fg.GetRTRegistry().RegisterRT("rt_GI_SurfaceData", fgSurfaceData);
     fg.GetRTRegistry().RegisterRT("rt_GI_Motion", fgOutMotion);
 
+    const bool profileEnabled = ps_r_rt_gi_profile != 0;
+    const auto importProfile = [&](const char* name, nvrhi::IBuffer* buffer)
+    {
+        ResourceDesc desc;
+        desc.type = ResourceDesc::Type::Buffer;
+        desc.bufferSize = buffer->getDesc().byteSize;
+        desc.isImported = true;
+        desc.isTransient = false;
+        desc.allowUAV = true;
+        return fg.ImportBuffer(name, buffer, desc);
+    };
+    VirtualResourceHandle profilePaths;
+    VirtualResourceHandle profileHits;
+    VirtualResourceHandle profileSums;
+    if (profileEnabled)
+    {
+        profilePaths = importProfile("rtgi_ProfilePaths", state.profile.paths);
+        profileHits = importProfile("rtgi_ProfileHits", state.profile.hits);
+        profileSums = importProfile("rtgi_ProfileSums", state.profile.sums);
+        if (!profilePaths.is_valid() || !profileHits.is_valid() || !profileSums.is_valid())
+        {
+            lighting.Fail(LightingFallback::ResourcesUnavailable);
+            return { sourceColorIn };
+        }
+    }
+
     fg.addCallbackPass<RTGITracePassData>(
-        "RTGI Raw Transport",
+        profileEnabled ? s_rtgiProfileName : "RTGI Raw Transport",
         [&](FrameGraph& builder, PassHandle passHandle, RTGITracePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
@@ -415,6 +564,13 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.pathData = pb.write(fgPathData, ResourceState::UnorderedAccess);
             data.surfaceData = pb.write(fgSurfaceData, ResourceState::UnorderedAccess);
             data.outMotion = pb.write(fgOutMotion, ResourceState::UnorderedAccess);
+            data.profileEnabled = profileEnabled;
+            if (profileEnabled)
+            {
+                data.profilePaths = pb.readWrite(profilePaths, ResourceState::UnorderedAccess);
+                data.profileHits = pb.readWrite(profileHits, ResourceState::UnorderedAccess);
+                data.profileSums = pb.readWrite(profileSums, ResourceState::UnorderedAccess);
+            }
             pb.sideEffects();
             data.device = device;
             data.scene = accelMgr->UseScene(builder, pb);
@@ -485,12 +641,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             }
 
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
-            auto* csReflection = shaderLoader->GetCachedReflection("rtgi_trace", ".cs");
-            if (!csReflection)
-            {
-                data.lighting->Fail(LightingFallback::ShaderUnavailable);
-                return;
-            }
 
             nvrhi::IBuffer* skinnedVB = scene.skinnedVertices;
             nvrhi::IBuffer* skinnedIB = scene.skinnedIndices;
@@ -509,57 +659,210 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(RTGIRawCB));
 
-            framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "RTGI.Trace");
-            bsb.ConstantBuffer("RTGIRawParams", data.state->cb);
-            bsb.ConstantBuffer("static_globals", staticGlobals);
-            bsb.BufferSRV("g_LightData", lightData);
-            bsb.AccelStruct("g_SceneTLAS", tlas);
-            bsb.BufferSRV("g_BatchInfo", batchInfo);
-            bsb.BufferSRV("g_MegaVB", megaVB);
-            bsb.BufferSRV("g_MegaIB", megaIB);
-            bsb.Texture("g_Sky0", sky0);
-            bsb.Texture("g_Sky1", sky1);
-            bsb.BufferSRV("g_SkinnedVB", skinnedVB);
-            bsb.BufferSRV("g_Materials", matBuf);
-            bsb.BufferSRV("g_GrassMaterials", scene.grassMaterials);
-            bsb.BufferSRV("g_TerrainMaterials", terrainBuf);
-            bsb.BufferSRV("g_Variants", scene.variants);
-            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
-            bsb.BufferSRV("g_GrassVB", grassVB);
-            bsb.BufferSRV("g_GrassIB", grassIB);
-            bsb.BufferSRV("g_EmissiveTriangles", scene.emissiveTriangles);
-            bsb.BufferSRV("g_RTBatchTransforms", scene.batchTransforms);
-            bsb.BufferSRV("g_EmissiveBatchOffsets", scene.emissiveBatchOffsets);
-            bsb.BufferSRV("g_EnvironmentCDF", environmentDistribution);
-            bsb.Texture("t_Depth", depthTex);
-            bsb.Texture("t_Normal", normalTex);
-            bsb.Texture("t_BaseColor", baseColorTex);
-            bsb.Texture("t_Material", materialTex);
-            bsb.Texture("t_SourceColor", sourceColorTex);
-            bsb.Texture("t_MotionVectors", motionTex);
-            bsb.TextureUAV("u_RawDiffuse", rawDiffuse);
-            bsb.TextureUAV("u_RawSpecular", rawSpecular);
-            bsb.TextureUAV("u_Emission", emission);
-            bsb.TextureUAV("u_NormalRoughness", normalRoughness);
-            bsb.TextureUAV("u_AlbedoMetallic", albedoMetallic);
-            bsb.TextureUAV("u_PathData", pathData);
-            bsb.TextureUAV("u_SurfaceData", surfaceData);
-            bsb.TextureUAV("u_Motion", outMotion);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->traceLayout);
-            if (!bindingSet)
+            nvrhi::IBuffer* profilePaths = nullptr;
+            nvrhi::IBuffer* profileHits = nullptr;
+            nvrhi::IBuffer* profileSums = nullptr;
+            if (data.profileEnabled)
             {
-                data.lighting->Fail(LightingFallback::BindingUnavailable);
-                return;
+                profilePaths = fg.GetPhysicalBuffer(data.profilePaths);
+                profileHits = fg.GetPhysicalBuffer(data.profileHits);
+                profileSums = fg.GetPhysicalBuffer(data.profileSums);
+                if (!profilePaths || !profileHits || !profileSums || !data.state->profile.tileHeight)
+                {
+                    data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                    return;
+                }
             }
 
-            nvrhi::ComputeState cs;
-            cs.pipeline = data.state->tracePipeline;
-            cs.bindings = { bindingSet };
-            if (scene.textures)
-                cs.addBindingSet(scene.textures);
+            const auto createBindings = [&](const char* shader, nvrhi::IBindingLayout* layout) -> nvrhi::BindingSetHandle
+            {
+                auto* reflection = shaderLoader->GetCachedReflection(shader, ".cs");
+                if (!reflection)
+                {
+                    data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                    return nullptr;
+                }
+                framegraph::BindingSetBuilder bsb(*reflection, nvDevice, shader);
+                const auto hasInput = [&](const char* name)
+                {
+                    return !data.profileEnabled || std::any_of(reflection->rtBindings.inputTextures.begin(),
+                        reflection->rtBindings.inputTextures.end(), [name](const auto& input)
+                        {
+                            return input.name == name;
+                        });
+                };
+                const auto hasOutput = [&](const char* name)
+                {
+                    return !data.profileEnabled || std::any_of(reflection->rtBindings.uavBindings.begin(),
+                        reflection->rtBindings.uavBindings.end(), [name](const auto& output)
+                        {
+                            return output.name == name;
+                        });
+                };
+                const auto constant = [&](const char* name, nvrhi::IBuffer* buffer)
+                {
+                    const auto& constants = reflection->constantLayout.constantBuffers.buffers;
+                    if (!data.profileEnabled || std::any_of(constants.begin(), constants.end(),
+                        [name](const auto& item)
+                        {
+                            return item.name == name;
+                        }))
+                        bsb.ConstantBuffer(name, buffer);
+                };
+                const auto buffer = [&](const char* name, nvrhi::IBuffer* resource)
+                {
+                    if (hasInput(name))
+                        bsb.BufferSRV(name, resource);
+                };
+                const auto texture = [&](const char* name, nvrhi::ITexture* resource)
+                {
+                    if (hasInput(name))
+                        bsb.Texture(name, resource);
+                };
+                const auto output = [&](const char* name, nvrhi::ITexture* resource)
+                {
+                    if (hasOutput(name))
+                        bsb.TextureUAV(name, resource);
+                };
+                constant("RTGIRawParams", data.state->cb);
+                constant("static_globals", staticGlobals);
+                buffer("g_LightData", lightData);
+                if (hasInput("g_SceneTLAS"))
+                    bsb.AccelStruct("g_SceneTLAS", tlas);
+                buffer("g_BatchInfo", batchInfo);
+                buffer("g_MegaVB", megaVB);
+                buffer("g_MegaIB", megaIB);
+                texture("g_Sky0", sky0);
+                texture("g_Sky1", sky1);
+                buffer("g_SkinnedVB", skinnedVB);
+                buffer("g_Materials", matBuf);
+                buffer("g_GrassMaterials", scene.grassMaterials);
+                buffer("g_TerrainMaterials", terrainBuf);
+                buffer("g_Variants", scene.variants);
+                buffer("g_SkinnedIB", skinnedIB);
+                buffer("g_GrassVB", grassVB);
+                buffer("g_GrassIB", grassIB);
+                buffer("g_EmissiveTriangles", scene.emissiveTriangles);
+                buffer("g_RTBatchTransforms", scene.batchTransforms);
+                buffer("g_EmissiveBatchOffsets", scene.emissiveBatchOffsets);
+                buffer("g_EnvironmentCDF", environmentDistribution);
+                texture("t_Depth", depthTex);
+                texture("t_Normal", normalTex);
+                texture("t_BaseColor", baseColorTex);
+                texture("t_Material", materialTex);
+                texture("t_SourceColor", sourceColorTex);
+                texture("t_MotionVectors", motionTex);
+                output("u_RawDiffuse", rawDiffuse);
+                output("u_RawSpecular", rawSpecular);
+                output("u_Emission", emission);
+                output("u_NormalRoughness", normalRoughness);
+                output("u_AlbedoMetallic", albedoMetallic);
+                output("u_PathData", pathData);
+                output("u_SurfaceData", surfaceData);
+                output("u_Motion", outMotion);
+                if (data.profileEnabled)
+                {
+                    constant("RTGIProfileParams", data.state->profile.cb);
+                    if (hasOutput("u_ProfilePaths"))
+                        bsb.BufferUAV("u_ProfilePaths", profilePaths);
+                    if (hasOutput("u_ProfileHits"))
+                        bsb.BufferUAV("u_ProfileHits", profileHits);
+                    if (hasOutput("u_ProfileSums"))
+                        bsb.BufferUAV("u_ProfileSums", profileSums);
+                }
+                auto bindingSet = nvDevice->createBindingSet(bsb.Build(), layout);
+                if (!bindingSet)
+                    data.lighting->Fail(LightingFallback::BindingUnavailable);
+                return bindingSet;
+            };
 
-            cmdList->setComputeState(cs);
-            cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+            if (data.profileEnabled)
+            {
+                auto& profile = data.state->profile;
+                nvrhi::BindingSetHandle bindings[RTGIProfileState::StageCount];
+                nvrhi::ComputeState stages[RTGIProfileState::StageCount];
+                for (u32 stage = 0; stage < RTGIProfileState::StageCount; ++stage)
+                {
+                    bindings[stage] = createBindings(s_rtgiProfileShaders[stage], profile.layouts[stage]);
+                    if (!bindings[stage])
+                        return;
+                    stages[stage].pipeline = profile.pipelines[stage];
+                    stages[stage].bindings = { bindings[stage] };
+                    stages[stage].addBindingSet(scene.textures);
+                }
+                cmdList->setEnableUavBarriersForBuffer(profilePaths, true);
+                cmdList->setEnableUavBarriersForBuffer(profileHits, true);
+                cmdList->setEnableUavBarriersForBuffer(profileSums, true);
+
+                using Stage = RTGIProfileState::Stage;
+                const auto dispatch = [&](Stage stage, const char* label, u32 tileHeight)
+                {
+                    xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, label);
+                    cmdList->setComputeState(stages[static_cast<u32>(stage)]);
+                    cmdList->dispatch((data.width + 7) / 8, (tileHeight + 7) / 8, 1);
+                    cmdList->setBufferState(profilePaths, nvrhi::ResourceStates::UnorderedAccess);
+                    cmdList->setBufferState(profileHits, nvrhi::ResourceStates::UnorderedAccess);
+                    cmdList->setBufferState(profileSums, nvrhi::ResourceStates::UnorderedAccess);
+                    cmdList->commitBarriers();
+                };
+                const auto dispatchLighting = [&](const char* label, const string128* children, u32 tileHeight)
+                {
+                    xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, label);
+                    for (u32 stage = 0; stage < RTGIProfileState::LightingStageCount; ++stage)
+                        dispatch(s_rtgiProfileLightStages[stage], children[stage], tileHeight);
+                };
+
+                string128 stepLabels[16][4];
+                for (u32 step = 0; step < data.cbData.maxBounces; ++step)
+                {
+                    xr_sprintf(stepLabels[step][0], "%s.Step %u trace + coverage", s_rtgiProfileName, step + 1);
+                    xr_sprintf(stepLabels[step][1], "%s.Step %u materials", s_rtgiProfileName, step + 1);
+                    xr_sprintf(stepLabels[step][2], "%s.Step %u light + shadows", s_rtgiProfileName, step + 1);
+                    xr_sprintf(stepLabels[step][3], "%s.Step %u advance", s_rtgiProfileName, step + 1);
+                }
+                constexpr const char* primaryLightLabel = "RTGI Raw Transport [diagnostic].Primary light + shadows";
+                string128 lightLabels[17][RTGIProfileState::LightingStageCount];
+                for (u32 step = 0; step <= data.cbData.maxBounces; ++step)
+                {
+                    const char* parent = step == 0 ? primaryLightLabel : stepLabels[step - 1][2];
+                    for (u32 stage = 0; stage < RTGIProfileState::LightingStageCount; ++stage)
+                        xr_sprintf(lightLabels[step][stage], "%s.%s", parent, s_rtgiProfileLightNames[stage]);
+                }
+
+                for (u32 tileY = 0; tileY < data.height; tileY += profile.tileHeight)
+                {
+                    RTGIProfileParams params;
+                    params.tileY = tileY;
+                    params.tileHeight = std::min(profile.tileHeight, data.height - tileY);
+                    for (params.sampleIndex = 0; params.sampleIndex < data.cbData.samplesPerPixel; ++params.sampleIndex)
+                    {
+                        cmdList->writeBuffer(profile.cb, &params, sizeof(params));
+                        dispatch(Stage::Setup, "RTGI Raw Transport [diagnostic].Setup", params.tileHeight);
+                        dispatchLighting(primaryLightLabel, lightLabels[0], params.tileHeight);
+                        dispatch(Stage::Advance, "RTGI Raw Transport [diagnostic].Primary advance", params.tileHeight);
+                        for (u32 step = 0; step < data.cbData.maxBounces; ++step)
+                        {
+                            dispatch(Stage::Trace, stepLabels[step][0], params.tileHeight);
+                            dispatch(Stage::Material, stepLabels[step][1], params.tileHeight);
+                            dispatchLighting(stepLabels[step][2], lightLabels[step + 1], params.tileHeight);
+                            dispatch(Stage::Advance, stepLabels[step][3], params.tileHeight);
+                        }
+                        dispatch(Stage::Resolve, "RTGI Raw Transport [diagnostic].Tail + resolve", params.tileHeight);
+                    }
+                }
+            }
+            else
+            {
+                auto bindingSet = createBindings("rtgi_trace", data.state->traceLayout);
+                if (!bindingSet)
+                    return;
+                nvrhi::ComputeState cs;
+                cs.pipeline = data.state->tracePipeline;
+                cs.bindings = { bindingSet };
+                cs.addBindingSet(scene.textures);
+                cmdList->setComputeState(cs);
+                cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+            }
             data.state->initialRecorded = true;
         });
 
@@ -667,6 +970,7 @@ void ShutdownReSTIRGI(ReSTIRGIPassState& state)
     state.compositePipeline = nullptr;
     state.compositeLayout = nullptr;
     state.cb = nullptr;
+    state.profile = {};
     state.rawDiffuse = nullptr;
     state.rawSpecular = nullptr;
     state.emission = nullptr;

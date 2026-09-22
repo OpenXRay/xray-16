@@ -5,6 +5,8 @@
 
 #define RT_INTEGRATOR_RR_DEPTH 3u
 #define RT_INTEGRATOR_RR_CAP 0.95
+#define RT_INTEGRATOR_STAGE_DONE 0u
+#define RT_INTEGRATOR_STAGE_READY 1u
 
 struct RTIntegratorSettings
 {
@@ -135,33 +137,79 @@ void RTIntegratorRecordSegment(inout RTIntegratorState s, float segmentDistance)
     s.result.firstSegmentDefined = true;
 }
 
-bool RTIntegratorContinue(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
-    RTHitGeometry geometry, float3 hitPosition, float segmentDistance, inout uint rng)
+struct RTIntegratorLightingContext
 {
-    if (s.bounces == s.settings.maxBounces && (hit.flags & MAT_FLAG_WATER) == 0u)
-        return false;
+    bool apply;
+    float3 V;
+    MaterialSurface surface;
+    float3 position;
+    float3 geoNormal;
+    float coneWidth;
+    float coneSpread;
+};
 
-    float3 V = -s.direction;
-    if ((hit.flags & MAT_FLAG_WATER) == 0u)
+void RTIntegratorLightingResolve(RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
+    float3 hitPosition, out RTIntegratorLightingContext lighting)
+{
+    lighting.apply = (hit.flags & MAT_FLAG_WATER) == 0u;
+    lighting.V = -s.direction;
+    lighting.surface = hit.surface;
+    lighting.position = hitPosition;
+    lighting.geoNormal = geometry.geoNormal;
+    lighting.coneWidth = s.coneWidth;
+    lighting.coneSpread = s.coneSpread;
+}
+
+bool RTIntegratorLightingBegin(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
+    float3 hitPosition, out RTIntegratorLightingContext lighting)
+{
+    RTIntegratorLightingResolve(s, hit, geometry, hitPosition, lighting);
+    if (s.bounces == s.settings.maxBounces && lighting.apply)
+        return false;
+    if (lighting.apply)
     {
         s.coneSpread = max(s.coneSpread, max(hit.surface.roughness * hit.surface.roughness, 1.0 - hit.surface.metallic));
-        RTDirectTerms direct = RTDirectLightingTerms(scene, hit.surface, hitPosition,
-            geometry.geoNormal, V, s.coneWidth, s.coneSpread, true, rng);
-        s.result.invalid = s.result.invalid || direct.invalid;
-        float3 directRadiance = direct.diffuse + direct.specular;
-        s.result.radiance += s.throughput * directRadiance;
-        if (s.bounces == 0u)
-        {
-            s.result.directDiffuse += s.throughput * direct.diffuse;
-            s.result.directSpecular += s.throughput * direct.specular;
-        }
-        else
-        {
-            s.result.indirectDiffuse += s.diffuseThroughput * directRadiance;
-            s.result.indirectSpecular += s.specularThroughput * directRadiance;
-        }
+        lighting.coneSpread = s.coneSpread;
     }
+    return true;
+}
 
+void RTIntegratorLightingApply(inout RTIntegratorState s, RTDirectTerms direct)
+{
+    s.result.invalid = s.result.invalid || direct.invalid;
+    float3 directRadiance = direct.diffuse + direct.specular;
+    s.result.radiance += s.throughput * directRadiance;
+    if (s.bounces == 0u)
+    {
+        s.result.directDiffuse += s.throughput * direct.diffuse;
+        s.result.directSpecular += s.throughput * direct.specular;
+    }
+    else
+    {
+        s.result.indirectDiffuse += s.diffuseThroughput * directRadiance;
+        s.result.indirectSpecular += s.specularThroughput * directRadiance;
+    }
+}
+
+bool RTIntegratorLightingStage(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
+    RTHitGeometry geometry, float3 hitPosition, inout uint rng)
+{
+    RTIntegratorLightingContext lighting;
+    if (!RTIntegratorLightingBegin(s, hit, geometry, hitPosition, lighting))
+        return false;
+    if (!lighting.apply)
+        return true;
+
+    RTDirectTerms direct = RTDirectLightingTerms(scene, lighting.surface, lighting.position,
+        lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng);
+    RTIntegratorLightingApply(s, direct);
+    return true;
+}
+
+bool RTIntegratorAdvanceStage(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
+    RTHitGeometry geometry, float3 hitPosition, float segmentDistance, inout uint rng)
+{
+    float3 V = -s.direction;
     bool passthrough;
     RTBSDFSample bounce = RTSampleSurface(hit, geometry, V, scene.diffuseMode, rng, passthrough);
     if (!bounce.valid)
@@ -236,13 +284,22 @@ bool RTIntegratorContinue(inout RTIntegratorState s, RTSceneParams scene, RTHitS
     return true;
 }
 
-bool RTIntegratorStep(inout RTIntegratorState s, RTSceneParams scene, inout uint rng)
+bool RTIntegratorContinue(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
+    RTHitGeometry geometry, float3 hitPosition, float segmentDistance, inout uint rng)
+{
+    if (!RTIntegratorLightingStage(s, scene, hit, geometry, hitPosition, rng))
+        return false;
+    return RTIntegratorAdvanceStage(s, scene, hit, geometry, hitPosition, segmentDistance, rng);
+}
+
+uint RTIntegratorTraceStage(inout RTIntegratorState s, RTSceneParams scene, inout uint rng,
+    out RTSceneTrace trace, out float3 hitPosition)
 {
     s.result.pathLength = s.bounces;
     uint rayMask = (s.settings.allowHudFirstRay && !s.firstRayTraced)
         ? (RT_RAY_MASK_WORLD | RT_RAY_MASK_HUD) : RT_RAY_MASK_WORLD;
     s.firstRayTraced = true;
-    RTSceneTrace trace = RTTraceRay(scene, s.origin, s.direction, s.remainingReach, false, rng,
+    trace = RTTraceRay(scene, s.origin, s.direction, s.remainingReach, false, rng,
         s.coneWidth, s.coneSpread, s.previousPosition, s.previousPdf, s.previousDelta, rayMask);
     s.result.invalid = s.result.invalid || trace.exhausted;
     RTIntegratorAddSource(s, trace.emissive);
@@ -256,23 +313,29 @@ bool RTIntegratorStep(inout RTIntegratorState s, RTSceneParams scene, inout uint
     if (trace.exhausted || s.nullEvents >= scene.maxNullEvents)
     {
         s.result.invalid = true;
-        return false;
+        return RT_INTEGRATOR_STAGE_DONE;
     }
     if (!trace.hit)
     {
         RTIntegratorAddSource(s, RTMissRadiance(scene, s.direction, s.previousPdf, s.previousDelta));
-        return false;
+        return RT_INTEGRATOR_STAGE_DONE;
     }
 
-    float3 hitPosition = s.origin + s.direction * trace.t;
-    RTHitGeometry geometry = RTFetchHitGeometry(scene, trace, s.direction);
-    RTHitSurface hit = RTResolveHitSurface(scene, trace, geometry);
+    hitPosition = s.origin + s.direction * trace.t;
+    return RT_INTEGRATOR_STAGE_READY;
+}
+
+uint RTIntegratorMaterialStage(inout RTIntegratorState s, RTSceneParams scene, RTSceneTrace trace,
+    float3 hitPosition, out RTHitGeometry geometry, out RTHitSurface hit)
+{
+    geometry = RTFetchHitGeometry(scene, trace, s.direction);
+    hit = RTResolveHitSurface(scene, trace, geometry);
     s.coneWidth += s.coneSpread * trace.t;
     if (!all(isfinite(hit.surface.albedo)) || !all(isfinite(hit.surface.N)) ||
         !isfinite(hit.surface.roughness) || !isfinite(hit.surface.metallic))
     {
         s.result.invalid = true;
-        return false;
+        return RT_INTEGRATOR_STAGE_DONE;
     }
     if (s.settings.trackDiagnostics && !s.firstSurfaceRecorded)
     {
@@ -283,6 +346,19 @@ bool RTIntegratorStep(inout RTIntegratorState s, RTSceneParams scene, inout uint
     float emissionWeight = RTEmissionWeight(scene, trace.batchIdx, trace.info, trace.primitiveIndex,
         s.previousPosition, hitPosition, s.previousPdf, s.previousDelta);
     RTIntegratorAddSource(s, hit.surface.emissive * emissionWeight);
+    return RT_INTEGRATOR_STAGE_READY;
+}
+
+bool RTIntegratorStep(inout RTIntegratorState s, RTSceneParams scene, inout uint rng)
+{
+    RTSceneTrace trace;
+    float3 hitPosition;
+    if (RTIntegratorTraceStage(s, scene, rng, trace, hitPosition) != RT_INTEGRATOR_STAGE_READY)
+        return false;
+    RTHitGeometry geometry;
+    RTHitSurface hit;
+    if (RTIntegratorMaterialStage(s, scene, trace, hitPosition, geometry, hit) != RT_INTEGRATOR_STAGE_READY)
+        return false;
     return RTIntegratorContinue(s, scene, hit, geometry, hitPosition, trace.t, rng);
 }
 

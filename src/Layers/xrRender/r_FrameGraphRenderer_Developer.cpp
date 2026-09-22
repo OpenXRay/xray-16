@@ -12,7 +12,7 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
-#include "Layers/xrRender/Light.h"
+#include "Layers/xrRender/light.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
 #include "Layers/xrRender/FrameGraphPasses/LocalShadowPassSetup.h"

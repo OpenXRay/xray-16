@@ -50,6 +50,24 @@ const char* PathTracerDiagnosticName(u32 mode)
     return mode < sizeof(kNames) / sizeof(kNames[0]) ? kNames[mode] : "unknown";
 }
 
+static bool HasGPUPassNamed(const xr_vector<GPUPassTiming>& passTimings, const char* name)
+{
+    for (const auto& pass : passTimings)
+    {
+        if (strcmp(pass.name.c_str(), name) == 0)
+            return true;
+    }
+    return false;
+}
+
+static bool IsGPUPassChildName(const char* parentName, const char* childName)
+{
+    const size_t parentLength = strlen(parentName);
+    const size_t childLength = strlen(childName);
+    return childLength > parentLength + 1 && childName[parentLength] == '.' &&
+        strncmp(childName, parentName, parentLength) == 0;
+}
+
 StatsOverlay::StatsOverlay()
 {
     // Get the ImGui context from Device - required for proper input handling
@@ -167,8 +185,8 @@ void StatsOverlay::Render()
     if (lighting.frameFailed)
         ImGui::Text("Failed RT frame: world clear %s", lighting.failureCleared ? "recorded (opaque black)" : "left to present");
     if (lighting.recoveryActive)
-        ImGui::Text("Raster recovery: latched for %s | rearm on requested-mode change, shader reload, level load or reset",
-            render::fg::LightingModeName(lighting.requested));
+        ImGui::Text("Raster recovery: latched for %s%s | rearm on mode or RTGI profile change, shader reload, level load or reset",
+            render::fg::LightingModeName(lighting.requested), lighting.rtgiProfile ? " [diagnostic]" : "");
     if (lighting.requested != render::fg::LightingMode::Raster)
         ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
     ImGui::Text("Surface history: %s", lighting.previousSurfacesValid ? "valid" : "rejected");
@@ -481,51 +499,141 @@ void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, 
     ImGui::PopID();
 }
 
-void StatsOverlay::RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly)
+void StatsOverlay::BuildGPUPassTree(const xr_vector<GPUPassTiming>& passTimings, xr_vector<GPUPassNode>& nodes, xr_vector<u32>& roots, bool asyncOnly, bool includeOrphans) const
 {
+    nodes.clear();
+    roots.clear();
+
+    xr_vector<GPUPassNode> candidates;
     for (const auto& pass : passTimings)
     {
         if (pass.isAsync != asyncOnly)
             continue;
-        if (strchr(pass.name.c_str(), '.') != nullptr)
+
+        GPUPassNode node;
+        node.name = pass.name.c_str();
+        node.label = pass.name.c_str();
+        node.timeMs = pass.timeMs;
+        node.isAsync = pass.isAsync;
+        candidates.push_back(node);
+    }
+
+    const u32 count = u32(candidates.size());
+    for (u32 child = 0; child < count; ++child)
+    {
+        u32 parent = GPUPassNode::InvalidIndex;
+        size_t parentLength = 0;
+
+        for (u32 candidate = 0; candidate < count; ++candidate)
+        {
+            if (candidate == child)
+                continue;
+
+            const size_t candidateLength = candidates[candidate].name.size();
+            if (candidateLength <= parentLength ||
+                !IsGPUPassChildName(candidates[candidate].name.c_str(), candidates[child].name.c_str()))
+                continue;
+
+            parent = candidate;
+            parentLength = candidateLength;
+        }
+
+        candidates[child].parent = parent;
+        if (parent != GPUPassNode::InvalidIndex)
+            candidates[child].label = candidates[child].name.c_str() + parentLength + 1;
+    }
+
+    xr_vector<u32> remap(count, GPUPassNode::InvalidIndex);
+    for (u32 index = 0; index < count; ++index)
+    {
+        u32 ancestor = index;
+        while (candidates[ancestor].parent != GPUPassNode::InvalidIndex)
+            ancestor = candidates[ancestor].parent;
+
+        if (!includeOrphans && candidates[ancestor].name.find('.') != xr_string::npos)
             continue;
 
-        u32 color = GetTimeColor(pass.timeMs, totalGPU);
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
+        remap[index] = u32(nodes.size());
 
-        float percent = totalGPU > 0.0f ? (pass.timeMs / totalGPU) * 100.0f : 0.0f;
+        GPUPassNode node = candidates[index];
+        node.parent = GPUPassNode::InvalidIndex;
+        nodes.push_back(node);
+    }
 
-        ImGui::BulletText("%s", pass.name.c_str());
-        ImGui::SameLine();
-        ImGui::TextDisabled("%s (%.1f%%)", FormatTime(pass.timeMs), percent);
+    for (u32 index = 0; index < count; ++index)
+    {
+        if (remap[index] == GPUPassNode::InvalidIndex)
+            continue;
 
-        ImGui::PopStyleColor();
-
-        xr_string parentPrefix(pass.name.c_str());
-        parentPrefix += '.';
-
-        for (const auto& sub : passTimings)
+        const u32 parent = candidates[index].parent;
+        if (parent == GPUPassNode::InvalidIndex)
         {
-            if (sub.isAsync != asyncOnly)
-                continue;
-            if (strncmp(sub.name.c_str(), parentPrefix.c_str(), parentPrefix.size()) != 0)
-                continue;
+            roots.push_back(remap[index]);
+            continue;
+        }
 
-            const char* subName = sub.name.c_str() + parentPrefix.size();
-            u32 subColor = GetTimeColor(sub.timeMs, totalGPU);
-            ImGui::PushStyleColor(ImGuiCol_Text, subColor);
+        nodes[remap[index]].parent = remap[parent];
+        nodes[remap[parent]].children.push_back(remap[index]);
+    }
+}
 
-            float subPercent = totalGPU > 0.0f ? (sub.timeMs / totalGPU) * 100.0f : 0.0f;
+void StatsOverlay::RenderGPUPassNode(const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU) const
+{
+    const GPUPassNode& node = nodes[index];
+    const float percent = totalGPU > 0.0f ? (node.timeMs / totalGPU) * 100.0f : 0.0f;
 
-            ImGui::Indent();
-            ImGui::BulletText("%s", subName);
-            ImGui::SameLine();
-            ImGui::TextDisabled("%s (%.1f%%)", FormatTime(sub.timeMs), subPercent);
-            ImGui::Unindent();
+    ImGui::PushID(node.name.c_str());
+    ImGui::PushID(node.isAsync ? 1 : 0);
+    ImGui::PushStyleColor(ImGuiCol_Text, GetTimeColor(node.timeMs, totalGPU));
 
-            ImGui::PopStyleColor();
+    const bool nested = !node.children.empty() && node.parent != GPUPassNode::InvalidIndex;
+    bool expanded = false;
+
+    if (nested)
+    {
+        expanded = ImGui::TreeNodeEx(node.label.c_str(), ImGuiTreeNodeFlags_None, "%s", node.label.c_str());
+        ImGui::SameLine();
+    }
+    else
+    {
+        ImGui::Bullet();
+        ImGui::SameLine();
+        ImGui::Text("%s", node.label.c_str());
+        ImGui::SameLine();
+    }
+
+    ImGui::TextDisabled("%s (%.1f%%)", FormatTime(node.timeMs), percent);
+    ImGui::PopStyleColor();
+
+    if (nested)
+    {
+        if (expanded)
+        {
+            for (u32 child : node.children)
+                RenderGPUPassNode(nodes, child, totalGPU);
+            ImGui::TreePop();
         }
     }
+    else if (!node.children.empty())
+    {
+        ImGui::Indent();
+        for (u32 child : node.children)
+            RenderGPUPassNode(nodes, child, totalGPU);
+        ImGui::Unindent();
+    }
+
+    ImGui::PopID();
+    ImGui::PopID();
+}
+
+void StatsOverlay::RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly)
+{
+    xr_vector<GPUPassNode> nodes;
+    xr_vector<u32> roots;
+    BuildGPUPassTree(passTimings, nodes, roots, asyncOnly, false);
+
+    for (u32 root : roots)
+        RenderGPUPassNode(nodes, root, totalGPU);
 }
 
 void StatsOverlay::RenderGPUSection()
@@ -550,6 +658,25 @@ void StatsOverlay::RenderGPUSection()
         {
             ImGui::TextDisabled("No GPU passes recorded");
             return;
+        }
+
+        if (HasGPUPassNamed(passTimings, "RTGI Raw Transport [diagnostic]"))
+        {
+            ImGui::TextColored(ImVec4(1.f, 0.7f, 0.3f, 1.f), "RTGI diagnostic sample: expand light + shadows for emitters");
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Staged RTGI Raw Transport sample, not the normal monolithic kernel.\n"
+                    "Leaf rows bracket individual dispatches, including scratch traffic and synchronization.\n"
+                    "Repeated tile/sample scopes are summed per name and queue.\n"
+                    "Primary/Step N light + shadows are inclusive groups. Expand for:\n"
+                    "Sun, Local lights, Environment, and Emissive + accumulate.\n"
+                    "Emitter rows include scratch, serialization, and timer overhead.\n"
+                    "Emissive + accumulate performs the direct-light finite-value check and applies all four groups,\n"
+                    "even with zero emissive emitters.\n"
+                    "Group and child timers have separate boundaries, so their sums need not match exactly.\n"
+                    "Only top-level rows contribute to the frame total. Do not add parents and children.\n"
+                    "Step N is a ray iteration; water/null events may not advance a bounce.\n"
+                    "Tail + resolve finishes remaining water paths and writes guides on the final sample.\n"
+                    "Normal mode still uses one dispatch; staged numbers are not its phase breakdown.");
         }
 
         ImGui::Text("Total: %s", FormatTime(totalGPU));
@@ -1246,6 +1373,20 @@ void StatsOverlay::CopyZoneTreeToClipboard()
     ImGui::SetClipboardText(text.c_str());
 }
 
+void StatsOverlay::AppendGPUPassNode(xr_string& out, const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU, u32 depth) const
+{
+    const GPUPassNode& node = nodes[index];
+    const xr_string indent(size_t(2 + depth * 2), ' ');
+
+    char line[256];
+    xr_sprintf(line, sizeof(line), "%s%-40s %9.3f ms %5.1f%%\n", indent.c_str(), node.name.c_str(), node.timeMs,
+        totalGPU > 0.0f ? node.timeMs / totalGPU * 100.0f : 0.0f);
+    out += line;
+
+    for (u32 child : node.children)
+        AppendGPUPassNode(out, nodes, child, totalGPU, depth + 1);
+}
+
 void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
 {
     const u32 now = Device.dwTimeGlobal;
@@ -1278,8 +1419,8 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
     text += line;
     if (rs.lighting.frameFailed)
     {
-        xr_sprintf(line, sizeof(line), "lighting recovery: frame kept %s scheduling | world clear=%s | black presentation fallback requested | raster latched until requested-mode change, shader reload, level load or reset\n",
-            render::fg::LightingModeName(rs.lighting.scheduled),
+        xr_sprintf(line, sizeof(line), "lighting recovery: frame kept %s%s scheduling | world clear=%s | black presentation fallback requested | raster latched until mode or RTGI profile change, shader reload, level load or reset\n",
+            render::fg::LightingModeName(rs.lighting.scheduled), rs.lighting.rtgiProfile ? " [diagnostic]" : "",
             rs.lighting.failureCleared ? "recorded before UI" : "unavailable");
         text += line;
     }
@@ -1412,6 +1553,18 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         xr_sprintf(line, sizeof(line), "\nGPU total %.3f ms | async %.3f ms | graphics %.3f ms | sample %llu\n",
             totalGPU, asyncTotal, graphicsTotal, (unsigned long long)m_gpuProfiler->GetCompletedSampleId());
         text += line;
+        if (HasGPUPassNamed(passes, "RTGI Raw Transport [diagnostic]"))
+        {
+            text += "RTGI Raw Transport [diagnostic]: staged leaf timings include scratch traffic and synchronization\n";
+            text += "  rows nest under their name prefix | repeated tile and sample scopes are summed per name and queue\n";
+            text += "  only top-level rows contribute to the frame total; do not add parents and children\n";
+            text += "  Primary/Step N light + shadows are inclusive groups: Sun, Local lights, Environment, Emissive + accumulate\n";
+            text += "  emitter rows include scratch, serialization and timer overhead\n";
+            text += "  Emissive + accumulate checks direct-light finiteness and applies all four groups, even with zero emissive emitters\n";
+            text += "  group and child timers have separate boundaries, so their sums need not match exactly\n";
+            text += "  Step N = one ray iteration, water may not advance a bounce | Tail + resolve finishes remaining water paths and writes guides\n";
+            text += "  not phase attribution for the normal single-dispatch kernel\n";
+        }
         if (FormatQueueTimingsLine(line, sizeof(line)))
         {
             text += line;
@@ -1420,15 +1573,21 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         for (int asyncOnly = 1; asyncOnly >= 0; --asyncOnly)
         {
             text += asyncOnly ? "[async]\n" : "[graphics]\n";
+
+            xr_vector<GPUPassTiming> visiblePasses;
             for (const auto& pass : passes)
             {
                 if (pass.isAsync != (asyncOnly != 0) || pass.pending)
                     continue;
-                const bool sub = strchr(pass.name.c_str(), '.') != nullptr;
-                xr_sprintf(line, sizeof(line), "%s%-40s %9.3f ms %5.1f%%\n", sub ? "    " : "  ",
-                    pass.name.c_str(), pass.timeMs, totalGPU > 0.0f ? pass.timeMs / totalGPU * 100.0f : 0.0f);
-                text += line;
+                visiblePasses.push_back(pass);
             }
+
+            xr_vector<GPUPassNode> nodes;
+            xr_vector<u32> roots;
+            BuildGPUPassTree(visiblePasses, nodes, roots, asyncOnly != 0, true);
+
+            for (u32 root : roots)
+                AppendGPUPassNode(text, nodes, root, totalGPU, nodes[root].name.find('.') == xr_string::npos ? 0 : 1);
         }
     }
 

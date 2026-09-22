@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GPUProfiler.h"
+#include <utility>
 
 namespace xray::profiler
 {
@@ -235,11 +236,30 @@ void GPUProfiler::ResolvePendingQueries()
     {
         m_passTimings.clear();
         m_totalGPUTimeMs = 0.0f;
+
+        xr_map<std::pair<shared_str, bool>, size_t> aggregatedRows;
         for (const auto& pending : newestFrame->queries)
         {
-            m_passTimings.push_back(pending.timing);
-            if (strchr(pending.timing.name.c_str(), '.') == nullptr)
-                m_totalGPUTimeMs += pending.timing.timeMs;
+            const auto key = std::make_pair(pending.timing.name, pending.timing.isAsync);
+
+            auto it = aggregatedRows.find(key);
+            if (it == aggregatedRows.end())
+            {
+                aggregatedRows.emplace(key, m_passTimings.size());
+                m_passTimings.push_back(pending.timing);
+            }
+            else
+            {
+                GPUPassTiming& row = m_passTimings[it->second];
+                row.timeMs += pending.timing.timeMs;
+                row.pending = row.pending || pending.timing.pending;
+            }
+        }
+
+        for (const auto& row : m_passTimings)
+        {
+            if (strchr(row.name.c_str(), '.') == nullptr)
+                m_totalGPUTimeMs += row.timeMs;
         }
         m_completedSampleId = newestSampleId;
     }

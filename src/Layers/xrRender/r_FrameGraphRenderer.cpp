@@ -27,6 +27,8 @@
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
 #include "xrEngine/device.h"
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
 #include <imgui.h>
 
 // Lambda-based pass setup functions
@@ -605,7 +607,7 @@ void FrameGraphRenderer::Render() {
 
 void FrameGraphRenderer::RenderMenu() {
     ZoneScopedN("FrameGraphRenderer::RenderMenu");
-    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
+    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0, ps_r_rt_gi_profile != 0);
     ApplyRTLightingSettings(m_lightingState);
     if (m_lightingState.requested != fg::LightingMode::Raster)
         m_lightingState.Fail(fg::LightingFallback::NoScene);
@@ -1191,7 +1193,7 @@ u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
-    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0);
+    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0, ps_r_rt_gi_profile != 0);
     ApplyRTLightingSettings(m_lightingState);
     m_lightingState.rayGrassEnabled = m_detailManager && m_detailManager->IsRayTracingCoverageEnabled();
     m_lightingState.rayGrassPending = m_detailManager && m_detailManager->IsRayTracingCoveragePending();

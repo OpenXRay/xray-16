@@ -333,9 +333,25 @@ public:
     void WriteProfileDump(u32 intervalSeconds);
 
 private:
+    class GPUPassNode
+    {
+    public:
+        static constexpr u32 InvalidIndex = static_cast<u32>(-1);
+
+        xr_string name;
+        xr_string label;
+        float timeMs = 0.0f;
+        bool isAsync = false;
+        u32 parent = InvalidIndex;
+        xr_vector<u32> children;
+    };
+
     void RenderCPUSection();
     void RenderGPUSection();
     void RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly);
+    void BuildGPUPassTree(const xr_vector<GPUPassTiming>& passTimings, xr_vector<GPUPassNode>& nodes, xr_vector<u32>& roots, bool asyncOnly, bool includeOrphans) const;
+    void RenderGPUPassNode(const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU) const;
+    void AppendGPUPassNode(xr_string& out, const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU, u32 depth) const;
     void RenderGeometrySection();
     void RenderAllocationsSection();
     void RenderInspectorSection();

@@ -253,17 +253,22 @@ void RTAddLight(RTSceneParams scene, MaterialSurface surface, float3 position, f
     result.specular += terms.specular * scale;
 }
 
-RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface, float3 position,
-    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng)
+void RTDirectLightingSun(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
+    inout uint rng, inout RTDirectTerms result)
 {
-    RTDirectTerms result = (RTDirectTerms)0;
     float3 sunDirection = RTSampleSun(scene, rng);
     float solidAngle = RTSunSolidAngle(scene);
     bool deltaSun = !(solidAngle > 0.0);
     float sunPdf = deltaSun ? 1.0 : 1.0 / solidAngle;
     RTAddLight(scene, surface, position, geoNormal, V, sunDirection, scene.sunColor * sunPdf,
         sunPdf, scene.rayDistance, deltaSun, continuation, coneWidth, coneSpread, result);
+}
 
+void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
+    inout RTDirectTerms result)
+{
     for (uint i = 0u; i < scene.lightCount; ++i)
     {
         GPULightData light = g_LightData[i];
@@ -274,12 +279,22 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
             RTAddLight(scene, surface, position, geoNormal, V, L, light.colorAndRange.xyz * attenuation,
                 1.0, distance, true, continuation, coneWidth, coneSpread, result);
     }
+}
 
+void RTDirectLightingEnvironment(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
+    inout uint rng, inout RTDirectTerms result)
+{
     float environmentPdf;
     float3 environmentDirection = RTSampleEnvironment(scene, rng, environmentPdf);
     RTAddLight(scene, surface, position, geoNormal, V, environmentDirection, SampleRTSky(scene, environmentDirection),
         environmentPdf, scene.rayDistance, false, continuation, coneWidth, coneSpread, result);
+}
 
+void RTDirectLightingEmissive(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
+    inout uint rng, inout RTDirectTerms result)
+{
     if (scene.emissiveCount > 0u)
     {
         uint index = min(uint(rand_float(rng) * float(scene.emissiveCount)), scene.emissiveCount - 1u);
@@ -314,12 +329,31 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
                 continuation, coneWidth, coneSpread, result);
         }
     }
+}
+
+void RTDirectLightingSanitize(inout RTDirectTerms result)
+{
     if (!all(isfinite(result.diffuse)) || !all(isfinite(result.specular)))
     {
         result.diffuse = 0.0;
         result.specular = 0.0;
         result.invalid = true;
     }
+}
+
+RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng)
+{
+    RTDirectTerms result = (RTDirectTerms)0;
+    RTDirectLightingSun(scene, surface, position, geoNormal, V, coneWidth, coneSpread, continuation,
+        rng, result);
+    RTDirectLightingLocalLights(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
+        continuation, result);
+    RTDirectLightingEnvironment(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
+        continuation, rng, result);
+    RTDirectLightingEmissive(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
+        continuation, rng, result);
+    RTDirectLightingSanitize(result);
     return result;
 }
 

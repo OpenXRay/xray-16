@@ -29,6 +29,7 @@ public:
     bool hizRecorded = false;
     passes::PathTracerHistory pathTracer;
     xr_vector<nvrhi::TextureHandle> textures;
+    xr_vector<nvrhi::BufferHandle> buffers;
 };
 
 class ViewSurfaceHistoryData
