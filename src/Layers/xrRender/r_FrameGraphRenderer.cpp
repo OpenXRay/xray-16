@@ -1200,25 +1200,32 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
         return;
     }
 
-    xr_vector<GeometryBatch> worldSkinned;
-    xr_vector<GeometryBatch> hudSkinned;
-    for (const auto& batch : m_geometryCollector->GetBatches())
+    const bool frozenSnapshotReusable = m_lightingState.effective == fg::LightingMode::ReferencePT &&
+        passes::EvaluatePathTracerSnapshotReuse(m_device, m_rtAccelMgr.get(), m_mainView.pathTracer,
+            ps_r_path_tracer_freeze != 0).reusable;
+
+    if (!frozenSnapshotReusable)
     {
-        if (batch.isSkinned && batch.visual && batch.indexCount)
-            worldSkinned.push_back(batch);
-    }
-    const Fmatrix hudFov = passes::HudFovWarp();
-    for (const auto& batch : m_hudBatches)
-    {
-        if (batch.isSkinned && batch.visual && batch.indexCount)
+        xr_vector<GeometryBatch> worldSkinned;
+        xr_vector<GeometryBatch> hudSkinned;
+        for (const auto& batch : m_geometryCollector->GetBatches())
         {
-            auto adjusted = batch;
-            adjusted.worldMatrix.mul(hudFov, batch.worldMatrix);
-            hudSkinned.push_back(std::move(adjusted));
+            if (batch.isSkinned && batch.visual && batch.indexCount)
+                worldSkinned.push_back(batch);
         }
+        const Fmatrix hudFov = passes::HudFovWarp();
+        for (const auto& batch : m_hudBatches)
+        {
+            if (batch.isSkinned && batch.visual && batch.indexCount)
+            {
+                auto adjusted = batch;
+                adjusted.worldMatrix.mul(hudFov, batch.worldMatrix);
+                hudSkinned.push_back(std::move(adjusted));
+            }
+        }
+        if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned))
+            m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
     }
-    if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned))
-        m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
     m_lightingState.sceneRevision = m_rtAccelMgr->GetSceneRevision();
 }
 

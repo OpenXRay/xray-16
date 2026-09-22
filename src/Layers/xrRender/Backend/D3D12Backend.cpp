@@ -462,6 +462,7 @@ void D3D12Backend::QueryCapabilities() {
     if (SUCCEEDED(m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options5, sizeof(options5)))) {
         m_capabilities.rayTracing = (options5.RaytracingTier != D3D12_RAYTRACING_TIER_NOT_SUPPORTED);
     }
+    m_capabilities.rayTracingUpdates = m_capabilities.rayTracing;
 
     // Check for VRS
     D3D12_FEATURE_DATA_D3D12_OPTIONS6 options6 = {};

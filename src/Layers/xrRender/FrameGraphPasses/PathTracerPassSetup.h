@@ -156,6 +156,13 @@ public:
     PathTracerSnapshotStats snapshotStats;
 };
 
+class PathTracerSnapshotReuse
+{
+public:
+    bool reusable = false;
+    bool invalid = false;
+};
+
 class PathTracerCaptureData
 {
 public:
@@ -194,6 +201,8 @@ public:
 };
 
 LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height, PathTracerPassState& state);
+PathTracerSnapshotReuse EvaluatePathTracerSnapshotReuse(RenderDevice* device, RTAccelStructManager* accelMgr,
+    PathTracerPassState& state, bool freezeRequested);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights,
     LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& view, const Fmatrix& project,

@@ -189,6 +189,9 @@ class RTGeometryBuild
 public:
     nvrhi::rt::AccelStructDesc desc;
     nvrhi::rt::AccelStructHandle handle;
+    u64 topologyKey = 0;
+    bool built = false;
+    bool update = false;
 };
 
 class RTTextureBindings
@@ -234,6 +237,7 @@ public:
     u32 indexOffset;
     u32 vertexCount;
     u32 indexCount;
+    bool opaque;
 
     bool operator<(const RTDynamicRange& other) const;
 };
@@ -302,6 +306,10 @@ public:
     std::shared_ptr<RTDynamicGeometry> dynamicGeometry;
     RTTextureBindings textures;
     nvrhi::rt::AccelStructHandle tlas;
+    u32 tlasCapacity = 0;
+    u32 tlasBuildCount = 0;
+    bool tlasBuilt = false;
+    bool tlasUpdate = false;
     RTGeometryBuild skinBuild;
     RTGeometryBuild hudSkinBuild;
     RTGeometryBuild grassBuild;
@@ -421,6 +429,13 @@ public:
 
 private:
     static void HashSceneData(u64& signature, const void* data, size_t size);
+    static bool IsOpaqueMaterialForRT(u32 materialID, bool terrain);
+    static bool AccelStructShapeMatches(const nvrhi::rt::AccelStructDesc& cached,
+        const nvrhi::rt::AccelStructDesc& requested);
+    static bool AccelStructUpdateMatches(const nvrhi::rt::AccelStructDesc& cached,
+        const nvrhi::rt::AccelStructDesc& requested);
+    void AcquireGeometryBuild(const nvrhi::rt::AccelStructDesc& requested, RTGeometryBuild& slot,
+        bool topologyStable, u64 topologyKey = 0);
     bool IsSceneReady(const RTSceneGeneration& scene) const;
     u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling) const;
     u64 ComputeSceneSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
@@ -450,6 +465,7 @@ private:
 
     RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
+    bool m_inPlaceUpdates = false;
     std::shared_ptr<RTStaticGeometry> m_staticGeometry;
     std::shared_ptr<RTDynamicGeometry> m_dynamicGeometry;
     nvrhi::IBuffer* m_dynamicSourceVertices = nullptr;

@@ -138,7 +138,6 @@ struct RTSceneTrace
     float2 barycentrics;
     float t;
     float3x4 objectToWorld;
-    float4 diffuse;
     float coneWidth;
     float coneSpread;
     bool frontFace;
@@ -155,26 +154,24 @@ struct RTHitClass
     float3 transmittance;
     float opacity;
     float3 emissive;
-    float4 diffuse;
 };
 
-RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction, bool shadowRay)
+RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction,
+    bool shadowRay, bool resolveTransmission)
 {
     RTHitClass result = (RTHitClass)0;
     result.transmittance = 1.0;
     result.opacity = 1.0;
-    RTHitGeometry geometry = RTFetchHitGeometry(scene, hit, direction);
     if (IsGrassBatch(scene, hit.batchIdx))
     {
-        if (IsStaticDetailBatch(scene, hit.batchIdx))
+        bool wavingCard = IsDetailMeshBatch(scene, hit.batchIdx);
+        if (!wavingCard && !IsStaticDetailBatch(scene, hit.batchIdx))
         {
-            result.opaque = RTPulledDetailOpaque(scene, geometry, false, shadowRay);
+            result.opaque = true;
             return result;
         }
-        if (IsDetailMeshBatch(scene, hit.batchIdx))
-            result.opaque = RTPulledDetailOpaque(scene, geometry, true, shadowRay);
-        else
-            result.opaque = true;
+        RTHitGeometry coverage = RTFetchHitCoverage(scene, hit, direction, !(shadowRay && wavingCard));
+        result.opaque = RTPulledDetailOpaque(scene, coverage, wavingCard, shadowRay);
         return result;
     }
     if (IsTerrainBatch(scene, hit.batchIdx))
@@ -187,27 +184,43 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     VariantData variant = g_Variants[mat.shaderVariant];
     if (shadowRay && (variant.flags & VARIANT_FLAG_NO_SHADOW) != 0u)
         return result;
-    result.diffuse = SampleDiffuseGrad(mat, geometry.uv, geometry.uvDx, geometry.uvDy);
-    float coverageAlpha = result.diffuse.a;
-    if (shadowRay && MaterialHasAlphaCoverage(mat))
-        coverageAlpha = MaterialRayShadowAlpha(mat, geometry.uv);
+    bool water = (mat.flags & MAT_FLAG_WATER) != 0u;
+    bool additive = (variant.flags & VARIANT_FLAG_ADDITIVE_EMISSION) != 0u;
+    if (shadowRay && additive && !water)
+        return result;
+
+    bool alphaCoverage = MaterialHasAlphaCoverage(mat);
+    RTHitGeometry coverage = (RTHitGeometry)0;
+    if (alphaCoverage || (!shadowRay && additive && !water))
+        coverage = RTFetchHitCoverage(scene, hit, direction, !shadowRay);
+    float coverageAlpha = 1.0;
+    if (alphaCoverage)
+    {
+        coverageAlpha = shadowRay ? MaterialRayShadowAlpha(mat, coverage.uv) :
+            SampleDiffuseGrad(mat, coverage.uv, coverage.uvDx, coverage.uvDy).a;
+    }
     if (MaterialAlphaTestRejects(mat, coverageAlpha))
         return result;
-    if ((mat.flags & MAT_FLAG_WATER) != 0u)
+    if (water)
     {
         result.opaque = !shadowRay;
         if (shadowRay)
         {
-            RTHitSurface water = RTResolveHitSurface(scene, hit, geometry);
-            result.transmittance = RTWaterTransmission() * (1.0 - RTWaterFresnel(water.surface.N, -direction));
+            result.transmittance = 0.0;
+            if (resolveTransmission)
+            {
+                RTHitGeometry geometry = RTFetchHitGeometry(scene, hit, direction);
+                RTHitSurface surface = RTResolveHitSurface(scene, hit, geometry);
+                result.transmittance = RTWaterTransmission() * (1.0 - RTWaterFresnel(surface.surface.N, -direction));
+            }
         }
         return result;
     }
-    if ((variant.flags & VARIANT_FLAG_ADDITIVE_EMISSION) != 0u)
+    if (additive)
     {
         if (!shadowRay)
-            result.emissive = RTEvaluateEmitter(scene, hit.batchIdx, hit.info, geometry.uv,
-                geometry.uvDx, geometry.uvDy, false);
+            result.emissive = RTEvaluateEmitter(scene, hit.batchIdx, hit.info, coverage.uv,
+                coverage.uvDx, coverage.uvDy, false);
         return result;
     }
     if (MaterialHasAlphaBlend(mat))
@@ -245,7 +258,7 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         ray.Direction = direction;
         ray.TMin = rayMinDistance;
         ray.TMax = maxDistance;
-        RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_FORCE_NON_OPAQUE> q;
+        RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES> q;
         q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, rayMask, ray);
         while (q.Proceed())
         {
@@ -265,7 +278,7 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
                 candidate.barycentrics = q.CandidateTriangleBarycentrics();
                 candidate.t = q.CandidateTriangleRayT();
                 candidate.objectToWorld = q.CandidateObjectToWorld3x4();
-                RTHitClass classification = RTClassifyHit(scene, candidate, direction, shadowRay);
+                RTHitClass classification = RTClassifyHit(scene, candidate, direction, shadowRay, false);
                 if (classification.opaque || any(classification.transmittance < 1.0) || any(classification.emissive > 0.0))
                     q.CommitNonOpaqueTriangleHit();
             }
@@ -279,14 +292,13 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         trace.t = q.CommittedRayT();
         trace.objectToWorld = q.CommittedObjectToWorld3x4();
         trace.frontFace = q.CommittedTriangleFrontFace();
-        RTHitClass hitClass = RTClassifyHit(scene, trace, direction, shadowRay);
+        RTHitClass hitClass = RTClassifyHit(scene, trace, direction, shadowRay, true);
         bool accept = hitClass.opaque;
         if (accept && hitClass.opacity < 1.0)
             accept = rand_float(rng) < hitClass.opacity;
         if (accept)
         {
             trace.hit = true;
-            trace.diffuse = hitClass.diffuse;
             return trace;
         }
         if (!hitClass.opaque)
@@ -307,6 +319,53 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
 float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
     float coneWidth, float coneSpread, out bool exhausted)
 {
+    exhausted = false;
+    if (!(maxDistance > 0.001))
+        return 1.0;
+
+    RayDesc ray;
+    ray.Origin = origin;
+    ray.Direction = direction;
+    ray.TMin = 0.001;
+    ray.TMax = maxDistance;
+    RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH> q;
+    q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, RT_RAY_MASK_WORLD, ray);
+    bool transmission = false;
+    uint candidates = 0u;
+    while (q.Proceed())
+    {
+        if (++candidates > scene.maxNullEvents * 64u)
+        {
+            q.Abort();
+            exhausted = true;
+            return 0.0;
+        }
+        if (q.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE)
+        {
+            RTSceneTrace candidate = (RTSceneTrace)0;
+            candidate.batchIdx = q.CandidateInstanceID() + q.CandidateGeometryIndex();
+            candidate.info = g_BatchInfo[candidate.batchIdx];
+            candidate.primitiveIndex = q.CandidatePrimitiveIndex();
+            candidate.barycentrics = q.CandidateTriangleBarycentrics();
+            candidate.t = q.CandidateTriangleRayT();
+            candidate.objectToWorld = q.CandidateObjectToWorld3x4();
+            candidate.coneWidth = coneWidth;
+            candidate.coneSpread = coneSpread;
+            RTHitClass classification = RTClassifyHit(scene, candidate, direction, true, false);
+            if (classification.opaque)
+            {
+                q.CommitNonOpaqueTriangleHit();
+                q.Abort();
+                return 0.0;
+            }
+            transmission = transmission || any(classification.transmittance < 1.0);
+        }
+    }
+    if (q.CommittedStatus() == COMMITTED_TRIANGLE_HIT)
+        return 0.0;
+    if (!transmission)
+        return 1.0;
+
     uint rng = 0u;
     RTSceneTrace trace = RTTraceRay(scene, origin, direction, maxDistance, true, rng,
         coneWidth, coneSpread, origin, 0.0, true, RT_RAY_MASK_WORLD);
