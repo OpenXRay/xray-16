@@ -1839,6 +1839,8 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     nvrhi::rt::AccelStructDesc grassDesc;
     grassDesc.debugName = "RT_GrassBLAS";
     grassDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+    if (m_inPlaceUpdates)
+        grassDesc.buildFlags = grassDesc.buildFlags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
     const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
     const u32 grassBatch = u32(scene.batches.size());
     auto appendRange = [&](u64 indexStart, u64 indexCount, u64 vertexEnd, bool opaque)
@@ -2245,37 +2247,35 @@ bool RTAccelStructManager::RefreshPose(GPUCullingManager* gpu, FGDetailManager* 
             return false;
         auto frame = detail->GetCompletedRayVisibilityFrame();
         if (!frame || !frame->source || !frame->statsReady || !scene.grassFrame || !scene.grassFrame->source ||
-            frame->source->id != scene.grassFrame->source->id)
+            frame->source->id != scene.grassFrame->source->id ||
+            frame->contentSignature != scene.grassFrame->contentSignature)
             return false;
         const auto& stats = frame->stats;
         const u32 lodCounts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
-        for (auto& job : scene.grassJobs)
+        for (const auto& job : scene.grassJobs)
         {
             if (job.lod >= FGDetailManager::LOD_COUNT || lodCounts[job.lod] != job.constants.bladeCount ||
-                !frame->visible[job.lod])
+                !job.visible)
                 return false;
-            job.visible = frame->visible[job.lod];
         }
-        auto refreshPulled = [&](xr_vector<RTPulledJob>& jobs, u32 kind, u32 count)
+        auto pulledStable = [&](const xr_vector<RTPulledJob>& jobs, u32 kind, u32 count)
         {
-            for (auto& job : jobs)
+            for (const auto& job : jobs)
             {
-                if (job.constants.detailKind != kind || job.constants.billboardCount != count || !frame->visible[kind])
+                if (job.constants.detailKind != kind || job.constants.billboardCount != count || !job.visible)
                     return false;
-                job.visible = frame->visible[kind];
             }
             return true;
         };
-        if (!refreshPulled(scene.detailMeshJobs, FGDetailManager::VIS_KIND_MESH, stats.visibleBillboardCount) ||
-            !refreshPulled(scene.staticDetailJobs, FGDetailManager::VIS_KIND_DECAL, stats.visibleDecalCount))
+        if (!pulledStable(scene.detailMeshJobs, FGDetailManager::VIS_KIND_MESH, stats.visibleBillboardCount) ||
+            !pulledStable(scene.staticDetailJobs, FGDetailManager::VIS_KIND_DECAL, stats.visibleDecalCount))
             return false;
-        scene.grassFrame = std::move(frame);
         scene.grassWind = detail->perlin4dTexture;
         for (u32 i = 0; i < 2; ++i)
             scene.grassInteraction[i] = detail->interactionTexture[i];
         if (!scene.grassWind || !scene.grassInteraction[0] || !scene.grassInteraction[1])
             return false;
-        scene.grassBuild.update = false;
+        RefreshGeometryBuild(scene.grassBuild);
     }
     scene.tlasUpdate = m_inPlaceUpdates && scene.tlasBuilt && scene.tlasBuildCount == u32(scene.instances.size());
     return true;
