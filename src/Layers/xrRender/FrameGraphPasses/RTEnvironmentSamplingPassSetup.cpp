@@ -197,7 +197,7 @@ RTEnvironmentSamplingOutput setupRTEnvironmentSamplingPass(
                .Texture("g_Sky1", sky1Tex)
                .BufferUAV("g_EnvironmentCDF", cdfBuffer);
 
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_envLayout);
+            auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), s_envLayout, nvDevice);
             if (!bindingSet)
             {
                 clearDistribution();

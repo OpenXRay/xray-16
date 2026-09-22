@@ -158,7 +158,16 @@ void ClusteredLightManager::BeginFrame(bool rayTracingLighting)
     m_numOmni = 0;
 }
 
-GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadowSlot)
+u32 ClusteredLightManager::ResolveSpotTexture(const light* L)
+{
+    const u32 lightType = L->flags.type;
+    const bool isSpot = (lightType == IRender_Light::SPOT || lightType == IRender_Light::OMNIPART);
+    if (!isSpot || L->spot_texture_name.empty())
+        return 0;
+    return GetOrLoadSpotTexture(L->spot_texture_name);
+}
+
+GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture) const
 {
     GPULightData gpu;
 
@@ -184,9 +193,7 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
         const float scale = 1.0f / std::max(cosInner - cosOuter, 0.001f);
         const float offset = -cosOuter * scale;
 
-        u32 texIdx = 0;
-        if (!L->spot_texture_name.empty())
-            texIdx = GetOrLoadSpotTexture(L->spot_texture_name);
+        const u32 texIdx = spotTexture;
 
         gpu.directionAndSpotScale.set(L->direction.x, L->direction.y, L->direction.z, scale);
 
@@ -247,7 +254,7 @@ void ClusteredLightManager::CollectLight(const light* L)
 {
     EnsureLightCapacity(m_numLights + 1u);
 
-    m_lightsCPU.push_back(BuildGPULightData(L, 0));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L)));
     m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }
@@ -259,14 +266,9 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
         return;
     EnsureLightCapacity(count);
 
+    m_spotTextureScratch.resize(count);
     for (u32 i = 0; i < count; i++)
-    {
-        const light* L = lights[i];
-        const u32 lt = L->flags.type;
-        const bool isSpot = (lt == IRender_Light::SPOT || lt == IRender_Light::OMNIPART);
-        if (isSpot && !L->spot_texture_name.empty())
-            GetOrLoadSpotTexture(L->spot_texture_name);
-    }
+        m_spotTextureScratch[i] = ResolveSpotTexture(lights[i]);
 
     m_lightsCPU.resize(count);
     m_lightIDs.resize(count);
@@ -276,7 +278,7 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
-            m_lightsCPU[i] = BuildGPULightData(lights[i], i < shadowSlots.size() ? shadowSlots[i] : 0u);
+            m_lightsCPU[i] = BuildGPULightData(lights[i], i < shadowSlots.size() ? shadowSlots[i] : 0u, m_spotTextureScratch[i]);
             m_lightIDs[i] = lights[i]->GetLightID();
         }
     });
@@ -300,7 +302,7 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
 {
     EnsureLightCapacity(m_numLights + 1u);
 
-    m_lightsCPU.push_back(BuildGPULightData(L, 0));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L)));
     m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }

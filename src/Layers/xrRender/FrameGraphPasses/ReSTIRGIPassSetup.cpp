@@ -787,7 +787,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                     if (hasOutput("u_ProfileSums"))
                         bsb.BufferUAV("u_ProfileSums", profileSums);
                 }
-                auto bindingSet = nvDevice->createBindingSet(bsb.Build(), layout);
+                auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
                 if (!bindingSet)
                     data.lighting->Fail(LightingFallback::BindingUnavailable);
                 return bindingSet;
@@ -945,7 +945,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             bsb.Texture("t_RawSpecular", rawSpecular);
             bsb.Texture("t_Emission", emission);
             bsb.TextureUAV("u_SceneColor", outTex);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), data.state->compositeLayout);
+            auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
             if (!bindingSet)
             {
                 data.lighting->Fail(LightingFallback::BindingUnavailable);
