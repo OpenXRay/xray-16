@@ -406,18 +406,29 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         lighting.Fail(LightingFallback::ResourcesUnavailable);
         return { sourceColorIn };
     }
-    auto lightData = clusterLights.lightData;
-    if (!lightData.is_valid())
+    const auto importLightBuffer = [&](const char* name, nvrhi::IBuffer* buffer)
     {
-        auto* buffer = lightManager.GetLightDataBuffer();
         ResourceDesc desc;
         desc.type = ResourceDesc::Type::Buffer;
         desc.bufferSize = buffer->getDesc().byteSize;
         desc.structStride = buffer->getDesc().structStride;
         desc.isImported = true;
         desc.isTransient = false;
-        lightData = fg.ImportBuffer("cluster_light_data", buffer, desc);
-    }
+        return fg.ImportBuffer(name, buffer, desc);
+    };
+    auto lightData = clusterLights.lightData;
+    if (!lightData.is_valid())
+        lightData = importLightBuffer("cluster_light_data", lightManager.GetLightDataBuffer());
+    const bool clusterListsActive = clusterLights.active && clusterLights.clusterGrid.is_valid() &&
+        clusterLights.lightIndexList.is_valid();
+    auto clusterGrid = clusterListsActive ? clusterLights.clusterGrid : VirtualResourceHandle();
+    auto lightIndexList = clusterListsActive ? clusterLights.lightIndexList : VirtualResourceHandle();
+    if (!clusterGrid.is_valid())
+        clusterGrid = lightManager.GetClusterGridBuffer() ?
+            importLightBuffer("cluster_light_grid", lightManager.GetClusterGridBuffer()) : lightData;
+    if (!lightIndexList.is_valid())
+        lightIndexList = lightManager.GetLightIndexListBuffer() ?
+            importLightBuffer("cluster_light_index_list", lightManager.GetLightIndexListBuffer()) : lightData;
 
     const auto environmentSampling = setupRTEnvironmentSamplingPass(fg, device, sky0Tex, sky1Tex, skyWeight);
     if (!environmentSampling.distribution.is_valid())
@@ -470,7 +481,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.environmentRotation = env.CurrentEnv.sky_rotation;
     rawCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
     rawCB.cameraConeSpread = ComputeRTGICameraConeSpread(invViewProj, cameraPos, width, height);
-    rawCB.pad = 0;
+    rawCB.clusterLights = clusterListsActive ? 1u : 0u;
     rawCB.detailMeshBatchStart = scene->detailMeshBatchStart;
     rawCB.staticDetailBatchStart = scene->staticDetailBatchStart;
     rawCB.detailPbrIndex = scene->detailPbrIndex;
@@ -555,6 +566,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.sourceColor = pb.read(sourceColorIn, ResourceState::ShaderResource);
             data.motionVectors = pb.read(motionVectors, ResourceState::ShaderResource);
             data.lightData = pb.read(lightData, ResourceState::ShaderResource);
+            data.clusterGrid = pb.read(clusterGrid, ResourceState::ShaderResource);
+            data.lightIndexList = pb.read(lightIndexList, ResourceState::ShaderResource);
             data.environmentDistribution = pb.read(environmentSampling.distribution, ResourceState::ShaderResource);
             data.rawDiffuse = pb.write(fgRawDiffuse, ResourceState::UnorderedAccess);
             data.rawSpecular = pb.write(fgRawSpecular, ResourceState::UnorderedAccess);
@@ -633,6 +646,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             }
 
             auto* lightData = fg.GetPhysicalBuffer(data.lightData);
+            auto* clusterGridBuffer = fg.GetPhysicalBuffer(data.clusterGrid);
+            auto* lightIndexListBuffer = fg.GetPhysicalBuffer(data.lightIndexList);
             auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
             if (!lightData || !staticGlobals)
             {
@@ -727,6 +742,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 constant("RTGIRawParams", data.state->cb);
                 constant("static_globals", staticGlobals);
                 buffer("g_LightData", lightData);
+                buffer("g_ClusterGrid", clusterGridBuffer ? clusterGridBuffer : lightData);
+                buffer("g_LightIndexList", lightIndexListBuffer ? lightIndexListBuffer : lightData);
                 if (hasInput("g_SceneTLAS"))
                     bsb.AccelStruct("g_SceneTLAS", tlas);
                 buffer("g_BatchInfo", batchInfo);

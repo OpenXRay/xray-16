@@ -21,7 +21,7 @@ void RTGIProfileLightingStage(uint3 dispatchID)
     if (!active)
         return;
 
-    RTSceneParams scene = RTGIBuildRawScene();
+    RTSceneParams scene = RTGIBuildRawScene(lane.pixel);
     RTHitSurface hit;
     RTHitGeometry geometry;
     float3 hitPosition;
@@ -48,7 +48,7 @@ void RTGIProfileLightingStage(uint3 dispatchID)
     terms = RTGIProfileLoadDirectTerms(u_ProfilePaths, lane.pathBase);
 #if defined(RTGI_PROFILE_LIGHTING_LOCAL_LIGHTS)
     RTDirectLightingLocalLights(scene, lighting.surface, lighting.position, lighting.geoNormal,
-        lighting.V, lighting.coneWidth, lighting.coneSpread, true, terms);
+        lighting.V, lighting.coneWidth, lighting.coneSpread, true, terms, state.bounces == 0u);
 #elif defined(RTGI_PROFILE_LIGHTING_ENVIRONMENT)
     RTDirectLightingEnvironment(scene, lighting.surface, lighting.position, lighting.geoNormal,
         lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng, terms);

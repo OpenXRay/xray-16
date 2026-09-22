@@ -201,7 +201,7 @@ bool RTIntegratorLightingStage(inout RTIntegratorState s, RTSceneParams scene, R
         return true;
 
     RTDirectTerms direct = RTDirectLightingTerms(scene, lighting.surface, lighting.position,
-        lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng);
+        lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng, s.bounces == 0u);
     RTIntegratorLightingApply(s, direct);
     return true;
 }

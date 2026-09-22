@@ -10,7 +10,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
 
     RTGIPrimarySurface primary = RTGIDecodePrimary(lane.pixel);
-    RTSceneParams scene = RTGIBuildRawScene();
+    RTSceneParams scene = RTGIBuildRawScene(lane.pixel);
     RTIntegratorSettings settings = RTGIBuildRawSettings(primary);
 
     RTIntegratorState state = RTIntegratorBegin(scene, settings);

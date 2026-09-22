@@ -59,7 +59,7 @@ public:
     float environmentRotation;
     float sunAngularRadius;
     float cameraConeSpread;
-    float transportPad;
+    u32 clusterLights;
     u32 detailMeshBatchStart;
     u32 staticDetailBatchStart;
     u32 detailPbrIndex;
@@ -186,6 +186,8 @@ public:
     framegraph::VirtualResourceHandle outputTex;
     framegraph::VirtualResourceHandle accumulation;
     framegraph::VirtualResourceHandle lightData;
+    framegraph::VirtualResourceHandle clusterGrid;
+    framegraph::VirtualResourceHandle lightIndexList;
     framegraph::VirtualResourceHandle environmentCdf;
     PathTracerCB cbData;
     Fmatrix cameraView = Fidentity;

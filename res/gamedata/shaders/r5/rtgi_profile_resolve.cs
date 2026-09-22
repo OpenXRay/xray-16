@@ -14,7 +14,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     bool validPrimary;
     RTIntegratorState state = RTGIProfileLoadState(u_ProfilePaths, lane.pathBase, rng, active, validPrimary);
     RTGIPrimarySurface primary = RTGIDecodePrimary(lane.pixel);
-    RTSceneParams scene = RTGIBuildRawScene();
+    RTSceneParams scene = RTGIBuildRawScene(lane.pixel);
 
     if (validPrimary && active)
     {

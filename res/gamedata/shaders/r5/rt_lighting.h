@@ -265,13 +265,41 @@ void RTDirectLightingSun(RTSceneParams scene, MaterialSurface surface, float3 po
         sunPdf, scene.rayDistance, deltaSun, continuation, coneWidth, coneSpread, result);
 }
 
+struct RTLightList
+{
+    uint offset;
+    uint count;
+    bool indexed;
+};
+
+RTLightList RTResolveLightList(RTSceneParams scene, float3 position, bool primary)
+{
+    RTLightList list;
+    list.offset = 0u;
+    list.count = scene.lightCount;
+    list.indexed = false;
+    if (!primary || scene.clusterLights == 0u || list.count == 0u || !(cluster_params.w > 0.0))
+        return list;
+    float linearDepth = mul(m_V, float4(position, 1.0)).z;
+    if (!(linearDepth > 0.0) || linearDepth > cluster_scales.y)
+        return list;
+    uint clusterIdx = GetClusterIndex(float2(scene.clusterPixel) + 0.5, linearDepth, cluster_params.xyz, cluster_scales);
+    uint2 clusterData = g_ClusterGrid[clusterIdx];
+    list.indexed = clusterData.x != 0xFFFFFFFFu;
+    list.offset = list.indexed ? clusterData.x : 0u;
+    list.count = clusterData.y;
+    return list;
+}
+
 void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
-    inout RTDirectTerms result)
+    inout RTDirectTerms result, bool primary = false)
 {
-    for (uint i = 0u; i < scene.lightCount; ++i)
+    RTLightList list = RTResolveLightList(scene, position, primary);
+    for (uint i = 0u; i < list.count; ++i)
     {
-        GPULightData light = g_LightData[i];
+        uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
+        GPULightData light = g_LightData[lightIndex];
         float3 L;
         float distance;
         float attenuation = PunctualLightAttenuation(light, position, L, distance);
@@ -342,13 +370,14 @@ void RTDirectLightingSanitize(inout RTDirectTerms result)
 }
 
 RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface, float3 position,
-    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng)
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng,
+    bool primary = false)
 {
     RTDirectTerms result = (RTDirectTerms)0;
     RTDirectLightingSun(scene, surface, position, geoNormal, V, coneWidth, coneSpread, continuation,
         rng, result);
     RTDirectLightingLocalLights(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
-        continuation, result);
+        continuation, result, primary);
     RTDirectLightingEnvironment(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
         continuation, rng, result);
     RTDirectLightingEmissive(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
