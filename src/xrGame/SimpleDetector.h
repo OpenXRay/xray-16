@@ -9,11 +9,9 @@ class CSimpleDetector : public CCustomDetector
 
 public:
     CSimpleDetector();
-    virtual ~CSimpleDetector();
 
 protected:
-    //.	virtual void 	UpdateZones					();
-    virtual void UpdateAf();
-    virtual void CreateUI();
-    CUIArtefactDetectorSimple& ui();
+    void Scan() override;
+    void CreateUI() override;
+    CUIArtefactDetectorSimple& ui() const;
 };

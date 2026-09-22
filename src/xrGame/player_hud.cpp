@@ -856,6 +856,9 @@ bool player_hud::allow_activation(CHudItem* item) const
 
 void player_hud::attach_item(CHudItem* item)
 {
+    if (item->HudSection().empty())
+        return; // No hud section – no attach
+
     attachable_hud_item* pi = create_hud_item(item->HudSection());
     const int item_idx = pi->m_attach_place_idx;
 

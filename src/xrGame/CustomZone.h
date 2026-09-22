@@ -294,6 +294,13 @@ protected:
     Fvector m_vPrevPos;
     u32 m_dwLastTimeMoved;
 
+    //видимость зоны детектором
+public:
+    bool VisibleByDetector() const
+    {
+        return m_zone_flags.test(eVisibleByDetector);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     // список артефактов
 protected:

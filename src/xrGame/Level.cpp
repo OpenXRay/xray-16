@@ -118,8 +118,6 @@ CLevel::~CLevel()
 
     xr_delete(g_player_hud);
     xr_delete(pHUD);
-    delete_data(hud_zones_list);
-    hud_zones_list = nullptr;
     Msg("- Destroying level");
     Engine.Event.Handler_Detach(eEntitySpawn, this);
     Engine.Event.Handler_Detach(eEnvironment, this);
@@ -1079,28 +1077,3 @@ void CLevel::OnAlifeSimulatorLoaded()
 
 void CLevel::OnSessionTerminate(pcstr reason) { MainMenu()->OnSessionTerminate(reason); }
 u32 GameID() { return Game().Type(); }
-CZoneList* CLevel::create_hud_zones_list()
-{
-    hud_zones_list = xr_new<CZoneList>();
-    hud_zones_list->clear();
-    return hud_zones_list;
-}
-
-bool CZoneList::feel_touch_contact(IGameObject* O)
-{
-    TypesMapIt it = m_TypesMap.find(O->cNameSect());
-    bool res = (it != m_TypesMap.end());
-    CCustomZone* pZone = smart_cast<CCustomZone*>(O);
-    if (pZone && !pZone->IsEnabled())
-    {
-        res = false;
-    }
-    return res;
-}
-
-CZoneList::CZoneList() {}
-CZoneList::~CZoneList()
-{
-    clear();
-    destroy();
-}

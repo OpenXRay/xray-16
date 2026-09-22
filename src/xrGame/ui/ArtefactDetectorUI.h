@@ -14,7 +14,7 @@ class CBoneInstance;
 class XR_NOVTABLE CUIArtefactDetectorBase
 {
 public:
-    virtual ~CUIArtefactDetectorBase();
+    virtual ~CUIArtefactDetectorBase() = 0;
     virtual void update() {}
 };
 
@@ -43,8 +43,8 @@ class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
     typedef CUIArtefactDetectorBase inherited;
 
     CSimpleDetector* m_parent;
-    u16 m_flash_bone;
-    u16 m_on_off_bone;
+    u16 m_flash_bone{ BI_NONE };
+    u16 m_on_off_bone{ BI_NONE };
     u32 m_turn_off_flash_time;
 
     ref_light m_flash_light;
@@ -54,11 +54,36 @@ class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
     void setup_internals();
 
 public:
+    CUIArtefactDetectorSimple(CSimpleDetector* parent);
     ~CUIArtefactDetectorSimple() override;
     void update() override;
     void Flash(bool bOn, float fRelPower);
+};
 
-    void construct(CSimpleDetector* p);
+class CUIArtefactDetectorAdv final : public CUIArtefactDetectorBase
+{
+    typedef CUIArtefactDetectorBase inherited;
+
+    CAdvancedDetector* m_parent{};
+    Fvector m_target_dir{};
+    float m_cur_y_rot{};
+    float m_curr_ang_speed{};
+    u16 m_bid{ BI_NONE };
+
+public:
+    CUIArtefactDetectorAdv(CAdvancedDetector* parent) : m_parent(parent) {}
+
+    void update() override;
+
+    void SetValue(const Fvector& direction)
+    {
+        m_target_dir = direction;
+    }
+
+    float CurrentYRotation() const;
+    static void BoneCallback(CBoneInstance* B);
+    void ResetBoneCallbacks();
+    void SetBoneCallbacks();
 };
 
 class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CUIWindow
@@ -77,39 +102,18 @@ class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CU
     };
     xr_vector<SDrawOneItem> m_items_to_draw;
     CEliteDetector* m_parent{};
-    Fmatrix m_map_attach_offset;
+    Fmatrix m_map_attach_offset{};
 
-    void GetUILocatorMatrix(Fmatrix& _m);
+    void GetUILocatorMatrix(Fmatrix& m) const;
 
 public:
-    CUIArtefactDetectorElite() : CUIWindow(CUIArtefactDetectorElite::GetDebugType()) {}
+    CUIArtefactDetectorElite(CEliteDetector* parent);
 
     void update() override;
     void Draw() override;
 
-    void construct(CEliteDetector* p);
     void Clear();
     void RegisterItemToDraw(const Fvector& p, const shared_str& palette_idx);
 
     pcstr GetDebugType() override { return "CUIArtefactDetectorElite"; }
-};
-
-class CUIArtefactDetectorAdv final : public CUIArtefactDetectorBase
-{
-    typedef CUIArtefactDetectorBase inherited;
-
-    CAdvancedDetector* m_parent{};
-    Fvector m_target_dir;
-    float m_cur_y_rot;
-    float m_curr_ang_speed;
-    u16 m_bid;
-
-public:
-    void update() override;
-    void construct(CAdvancedDetector* p);
-    void SetValue(const float v1, const Fvector& v2);
-    float CurrentYRotation() const;
-    static void BoneCallback(CBoneInstance* B);
-    void ResetBoneCallbacks();
-    void SetBoneCallbacks();
 };

@@ -158,6 +158,33 @@ enum EWeaponAddonStatus
 EHitType g_tfString2HitType(LPCSTR caHitType);
 pcstr g_cafHitType2String(EHitType tHitType);
 
+constexpr EInfluenceType g_tfHitType2InfluenceType(EHitType tHitType)
+{
+    switch (tHitType)
+    {
+    case eHitTypeBurn:         return infl_fire;
+    case eHitTypeShock:        return infl_electra;
+    case eHitTypeChemicalBurn: return infl_acid;
+    case eHitTypeRadiation:    return infl_rad;
+    case eHitTypeTelepatic:    return infl_psi;
+    case eHitTypeLightBurn:    return infl_fire;
+    }
+    return infl_max_count;
+}
+
+constexpr EHitType g_tfInfluenceType2HitType(EInfluenceType tInfluenceType)
+{
+    switch (tInfluenceType)
+    {
+    case infl_rad:     return eHitTypeRadiation;
+    case infl_fire:    return eHitTypeBurn;
+    case infl_acid:    return eHitTypeChemicalBurn;
+    case infl_psi:     return eHitTypeTelepatic;
+    case infl_electra: return eHitTypeShock;
+    }
+    return eHitTypeMax;
+}
+
 using INT_VECTOR = xr_vector<int>;
 using OBJECT_VECTOR = xr_vector<_OBJECT_ID>;
 using OBJECT_IT = OBJECT_VECTOR::iterator;

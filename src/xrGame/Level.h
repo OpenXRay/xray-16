@@ -232,8 +232,6 @@ public:
     xr_deque<CSE_Abstract*> game_spawn_queue;
     xrServer* Server = nullptr;
     GlobalFeelTouch m_feel_deny;
-    CZoneList* hud_zones_list = nullptr;
-    CZoneList* create_hud_zones_list();
 
 private:
     // preload sounds registry

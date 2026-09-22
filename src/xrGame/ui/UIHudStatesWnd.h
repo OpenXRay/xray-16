@@ -1,8 +1,12 @@
 #pragma once
+
 #include "xrUICore/Windows/UIWindow.h"
+
 #include "xrServerEntities/alife_space.h"
 #include "xrServerEntities/inventory_space.h"
+
 #include "actor_defs.h"
+#include "CustomDetector.h" // for CZonesList
 
 class CUIStatic;
 class CUIProgressBar;
@@ -10,8 +14,6 @@ class CUIProgressShape;
 class CUIXml;
 class UI_Arrow;
 class CActor;
-
-int const it_max = ALife::infl_max_count - 1;
 
 class CUIHudStatesWnd final : public CUIWindow
 {
@@ -26,7 +28,6 @@ private:
     CUIStatic* m_static_armor;
     CUIStatic* m_static_weapon;
 
-    xr_map<ALife::EInfluenceType, CUIStatic*> m_resist_back;
     xr_map<ALife::EInfluenceType, CUIStatic*> m_indik;
 
     CUIStatic* m_ui_weapon_cur_ammo;
@@ -67,18 +68,15 @@ private:
     //	float				m_actor_radia_factor;
     float m_radia_hit{};
 
-    float m_zone_cur_power[ALife::infl_max_count];
-    //--	float				m_zone_max_power[hud_it_max];//<-- CActorCondition
-    float m_zone_feel_radius[ALife::infl_max_count];
-    ALife::EHitType m_zone_hit_type[ALife::infl_max_count];
     float m_zone_threshold[ALife::infl_max_count];
     color_animation m_color_animation[ALife::infl_max_count];
 
     float m_zone_feel_radius_max{};
-    u32 m_timer_1sec{};
 
     bool m_fake_indicators_update{};
     bool m_b_force_update;
+
+    CZoneList hud_zones_list;
 
 public:
     CUIHudStatesWnd();
@@ -98,17 +96,25 @@ public:
     void UpdateIndicators(CActor* actor);
     void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float power = 0.0f);
 
-    float get_zone_cur_power(ALife::EHitType hit_type);
-    float get_main_sensor_value() { return m_radia_hit; }
+    [[nodiscard]]
+    float get_zone_cur_power(const ALife::EHitType hit_type) const
+    {
+        ALife::EInfluenceType iz_type = g_tfHitType2InfluenceType(hit_type);
+        if (iz_type == ALife::infl_max_count)
+            return 0.0f;
+        return hud_zones_list.zone_cur_power[iz_type];
+    }
+
+    [[nodiscard]]
+    float get_main_sensor_value() const
+    {
+        return m_radia_hit;
+    }
+
     void DrawZoneIndicators();
 
     void EnableFakeIndicators(bool enable);
 
     pcstr GetDebugType() override { return "CUIHudStatesWnd"; }
-
-protected:
-    static ALife::EInfluenceType get_indik_type(ALife::EHitType hit_type);
-
-    void Load_section_type(ALife::EInfluenceType type, LPCSTR section);
 
 }; // class CUIHudStatesWnd

@@ -23,55 +23,15 @@
 CUIHudStatesWnd::CUIHudStatesWnd()
     : CUIWindow(CUIHudStatesWnd::GetDebugType()), m_b_force_update(true)
 {
-    for (int i = 0; i < ALife::infl_max_count; ++i)
-    {
-        m_zone_cur_power[i] = 0.0f;
-        //--		m_zone_max_power[i] = 1.0f;
-        m_zone_feel_radius[i] = 1.0f;
-    }
-    m_zone_hit_type[ALife::infl_rad] = ALife::eHitTypeRadiation;
-    m_zone_hit_type[ALife::infl_fire] = ALife::eHitTypeBurn;
-    m_zone_hit_type[ALife::infl_acid] = ALife::eHitTypeChemicalBurn;
-    m_zone_hit_type[ALife::infl_psi] = ALife::eHitTypeTelepatic;
-    m_zone_hit_type[ALife::infl_electra] = ALife::eHitTypeShock;
-
     m_health_blink = pSettings->read_if_exists<float>("actor_condition", "hud_health_blink", 0.f);
     clamp(m_health_blink, 0.0f, 1.0f);
-    //-	Load_section();
+
+    hud_zones_list.anomalies_always_visible = true;
 }
 
 void CUIHudStatesWnd::reset_ui()
 {
-    if (g_pGameLevel)
-    {
-        Level().hud_zones_list->clear();
-    }
-}
-
-ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
-{
-    ALife::EInfluenceType iz_type = ALife::infl_max_count;
-    switch (hit_type)
-    {
-    case ALife::eHitTypeRadiation: iz_type = ALife::infl_rad; break;
-    case ALife::eHitTypeLightBurn:
-    case ALife::eHitTypeBurn: iz_type = ALife::infl_fire; break;
-    case ALife::eHitTypeChemicalBurn: iz_type = ALife::infl_acid; break;
-    case ALife::eHitTypeTelepatic: iz_type = ALife::infl_psi; break;
-    case ALife::eHitTypeShock:
-        iz_type = ALife::infl_electra;
-        break; // it hasnt CStatic
-
-    case ALife::eHitTypeStrike:
-    case ALife::eHitTypeWound:
-    case ALife::eHitTypeExplosion:
-    case ALife::eHitTypeFireWound:
-    case ALife::eHitTypeWound_2:
-    case ALife::eHitTypePhysicStrike:
-        return ALife::infl_max_count;
-    default: NODEFAULT;
-    }
-    return iz_type;
+    hud_zones_list.clear();
 }
 
 void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
@@ -130,26 +90,26 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
             xml.m_xml_file_name);
     }
 
-    m_resist_back[ALife::infl_rad] = UIHelper::CreateStatic(xml, "resist_back_rad", this, false);
-    m_resist_back[ALife::infl_fire] = UIHelper::CreateStatic(xml, "resist_back_fire", this, false);
-    m_resist_back[ALife::infl_acid] = UIHelper::CreateStatic(xml, "resist_back_acid", this, false);
-    m_resist_back[ALife::infl_psi] = UIHelper::CreateStatic(xml, "resist_back_psi", this, false);
-    // electra = no has CStatic!!
-
-    m_indik[ALife::infl_rad]  = UIHelper::CreateStatic(xml, "indik_rad", this);
-    m_indik[ALife::infl_fire] = UIHelper::CreateStatic(xml, "indik_fire", this);
-    m_indik[ALife::infl_acid] = UIHelper::CreateStatic(xml, "indik_acid", this);
-    m_indik[ALife::infl_psi]  = UIHelper::CreateStatic(xml, "indik_psi", this);
-
-    // Will crash if LALib contents are updated/reloaded during the game
-    m_color_animation[ALife::infl_rad]  = m_indik[ALife::infl_rad]->GetColorAnimation();
-    m_color_animation[ALife::infl_fire] = m_indik[ALife::infl_fire]->GetColorAnimation();
-    m_color_animation[ALife::infl_acid] = m_indik[ALife::infl_acid]->GetColorAnimation();
-    m_color_animation[ALife::infl_psi]  = m_indik[ALife::infl_psi]->GetColorAnimation();
-
-    for (int i = 0; i < it_max; ++i)
+    constexpr std::tuple<ALife::EInfluenceType, cpcstr, cpcstr> resistance_indicators[] =
     {
-        m_indik[(ALife::EInfluenceType)i]->SetColorAnimation(nullptr, 0); // turn off
+        { ALife::infl_rad,  "resist_back_rad",  "indik_rad"     },
+        { ALife::infl_fire, "resist_back_fire", "indik_fire"    },
+        { ALife::infl_acid, "resist_back_acid", "indik_acid"    },
+        { ALife::infl_psi,  "resist_back_psi",  "indik_psi"     },
+        // electra = no has CStatic!!
+    };
+
+    for (const auto& [type, back, indik] : resistance_indicators)
+    {
+        std::ignore = UIHelper::CreateStatic(xml, back, this, false);
+        const auto indicator = UIHelper::CreateStatic(xml, indik, this, false);
+        if (!indicator)
+            continue;
+        m_indik[type] = indicator;
+        // Will crash if LALib contents are updated/reloaded during the game
+        // because pointers might become invalid
+        m_color_animation[type] = indicator->GetColorAnimation();
+        indicator->SetColorAnimation(nullptr, 0);
     }
 
     m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
@@ -200,40 +160,54 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
 void CUIHudStatesWnd::on_connected() { Load_section(); }
 void CUIHudStatesWnd::Load_section()
 {
-    VERIFY(g_pGameLevel);
-    if (!Level().hud_zones_list)
-    {
-        Level().create_hud_zones_list();
-        VERIFY(Level().hud_zones_list);
-    }
-
     //	m_actor_radia_factor = pSettings->r_float( "radiation_zone_detector", "actor_radia_factor" );
-    Level().hud_zones_list->load("all_zone_detector", "zone");
+
+    float zone_feel_radius[ALife::infl_max_count];
+
+    const auto Load_section_type = [this, &zone_feel_radius](ALife::EInfluenceType type, pcstr section)
+    {
+        zone_feel_radius[type] = pSettings->read_if_exists<float>(section, "zone_radius", 1.0f);
+        if (zone_feel_radius[type] <= 0.0f)
+        {
+            zone_feel_radius[type] = 1.0f;
+        }
+        if (m_zone_feel_radius_max < zone_feel_radius[type])
+        {
+            m_zone_feel_radius_max = zone_feel_radius[type];
+        }
+        m_zone_threshold[type] = pSettings->read_if_exists<float>(section, "threshold", 0.05f);
+    };
 
     Load_section_type(ALife::infl_rad, "radiation_zone_detector");
     Load_section_type(ALife::infl_fire, "fire_zone_detector");
     Load_section_type(ALife::infl_acid, "acid_zone_detector");
     Load_section_type(ALife::infl_psi, "psi_zone_detector");
     Load_section_type(ALife::infl_electra, "electra_zone_detector"); // no uistatic
-}
 
-void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, LPCSTR section)
-{
-    /*m_zone_max_power[type] = pSettings->r_float( section, "max_power" );
-    if ( m_zone_max_power[type] <= 0.0f )
+    hud_zones_list.load("all_zone_detector", "zone", [this, zone_feel_radius](const shared_str& item_sect) -> ITEM_TYPE
     {
-        m_zone_max_power[type] = 1.0f;
-    }*/
-    m_zone_feel_radius[type] = pSettings->read_if_exists<float>(section, "zone_radius", 1.0f);
-    if (m_zone_feel_radius[type] <= 0.0f)
-    {
-        m_zone_feel_radius[type] = 1.0f;
-    }
-    if (m_zone_feel_radius_max < m_zone_feel_radius[type])
-    {
-        m_zone_feel_radius_max = m_zone_feel_radius[type];
-    }
-    m_zone_threshold[type] = pSettings->read_if_exists<float>(section, "threshold", 0.05f);
+        const auto hit_type = pSettings->read_if_exists<pcstr>(item_sect, "hit_type", nullptr);
+        if (!hit_type)
+            return {};
+
+        float radius = 5.0f;
+
+        switch (const auto type = g_tfHitType2InfluenceType(ALife::g_tfString2HitType(hit_type)))
+        {
+        case ALife::infl_rad:
+        case ALife::infl_fire:
+        case ALife::infl_acid:
+        case ALife::infl_psi:
+        case ALife::infl_electra:
+            radius = zone_feel_radius[type];
+            break;
+        }
+
+        return
+        {
+            .radius = radius,
+        };
+    });
 }
 
 void CUIHudStatesWnd::Update()
@@ -553,18 +527,15 @@ void CUIHudStatesWnd::UpdateZones()
     // float actor_radia = m_actor->conditions().GetRadiation() * m_actor_radia_factor;
     // m_radia_hit = _max( m_zone_cur_power[it_rad], actor_radia );
 
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor)
-    {
         return;
-    }
-    CPda* const pda = actor->GetPDA();
-    if (pda)
+
+    if (const CPda* pda = actor->GetPDA())
     {
-        typedef xr_vector<IGameObject*> monsters;
-        for (monsters::const_iterator it = pda->feel_touch.begin(); it != pda->feel_touch.end(); ++it)
+        for (const auto& game_object : pda->feel_touch)
         {
-            CBaseMonster* const monster = smart_cast<CBaseMonster*>(*it);
+            CBaseMonster* const monster = smart_cast<CBaseMonster*>(game_object);
             if (!monster || !monster->g_Alive())
                 continue;
 
@@ -578,16 +549,11 @@ void CUIHudStatesWnd::UpdateZones()
     float power = actor->conditions().GetInjuriousMaterialDamage();
     power = power / zone_max_power;
     clamp(power, 0.0f, 1.1f);
-    if (m_zone_cur_power[ALife::infl_rad] < power)
+    if (hud_zones_list.zone_cur_power[ALife::infl_rad] < power)
     {
-        m_zone_cur_power[ALife::infl_rad] = power;
+        hud_zones_list.zone_cur_power[ALife::infl_rad] = power;
     }
-    m_radia_hit = m_zone_cur_power[ALife::infl_rad];
-
-    /*	if ( Device.dwFrame % 20 == 0 )
-        {
-            Msg(" self = %.2f   hit = %.2f", m_radia_self, m_radia_hit );
-        }*/
+    m_radia_hit = hud_zones_list.zone_cur_power[ALife::infl_rad];
 
     if (m_arrow)
         m_arrow->SetNewValue(m_radia_hit);
@@ -596,101 +562,17 @@ void CUIHudStatesWnd::UpdateZones()
     /*
         power = actor->conditions().GetPsy();
         clamp( power, 0.0f, 1.1f );
-        if ( m_zone_cur_power[ALife::infl_psi] < power )
+        if ( hud_zones_list.zone_cur_power[ALife::infl_psi] < power )
         {
-            m_zone_cur_power[ALife::infl_psi] = power;
+            hud_zones_list.zone_cur_power[ALife::infl_psi] = power;
         }
     */
-    if (!Level().hud_zones_list)
-    {
-        return;
-    }
 
-    for (int i = 0; i < ALife::infl_max_count; ++i)
-    {
-        if (Device.fTimeDelta < 1.0f)
-        {
-            m_zone_cur_power[i] *= 0.9f * (1.0f - Device.fTimeDelta);
-        }
-        if (m_zone_cur_power[i] < 0.01f)
-        {
-            m_zone_cur_power[i] = 0.0f;
-        }
-    }
+    Fvector pos = Device.vCameraPosition;
+    hud_zones_list.feel_touch_update(pos, m_zone_feel_radius_max);
 
-    Fvector posf;
-    posf.set(Device.vCameraPosition);
-    Level().hud_zones_list->feel_touch_update(posf, m_zone_feel_radius_max);
-
-    if (Level().hud_zones_list->m_ItemInfos.size() == 0)
-    {
-        return;
-    }
-
-    CZoneList::ItemsMapIt itb = Level().hud_zones_list->m_ItemInfos.begin();
-    CZoneList::ItemsMapIt ite = Level().hud_zones_list->m_ItemInfos.end();
-    for (; itb != ite; ++itb)
-    {
-        CCustomZone* pZone = itb->first;
-        ITEM_INFO& zone_info = itb->second;
-        ITEM_TYPE* zone_type = zone_info.curr_ref;
-
-        ALife::EHitType hit_type = pZone->GetHitType();
-        ALife::EInfluenceType z_type = get_indik_type(hit_type);
-        /*		if ( z_type == indik_type_max )
-                {
-                    continue;
-                }
-        */
-
-        Fvector P = Device.vCameraPosition;
-        P.y -= 0.5f;
-        float dist_to_zone = 0.0f;
-        float rad_zone = 0.0f;
-        pZone->CalcDistanceTo(P, dist_to_zone, rad_zone);
-        clamp(dist_to_zone, 0.0f, flt_max * 0.5f);
-
-        float fRelPow =
-            (dist_to_zone / (rad_zone + (z_type == ALife::infl_max_count) ? 5.0f : m_zone_feel_radius[z_type] + 0.1f)) -
-            0.1f;
-
-        zone_max_power = actor->conditions().GetZoneMaxPower(z_type);
-        power = pZone->Power(dist_to_zone, rad_zone);
-        // power = power / zone_max_power;
-        clamp(power, 0.0f, 1.1f);
-
-        if ((z_type != ALife::infl_max_count) && (m_zone_cur_power[z_type] < power)) // max
-        {
-            m_zone_cur_power[z_type] = power;
-        }
-
-        if (dist_to_zone < rad_zone + 0.9f * ((z_type == ALife::infl_max_count) ? 5.0f : m_zone_feel_radius[z_type]))
-        {
-            fRelPow *= 0.6f;
-            if (dist_to_zone < rad_zone)
-            {
-                fRelPow *= 0.3f;
-                fRelPow *= (2.5f - 2.0f * power); // звук зависит от силы зоны
-            }
-        }
-        clamp(fRelPow, 0.0f, 1.0f);
-
-        //определить текущую частоту срабатывания сигнала
-        zone_info.cur_period = zone_type->freq.x + (zone_type->freq.y - zone_type->freq.x) * (fRelPow * fRelPow);
-
-        // string256	buff_z;
-        // xr_sprintf( buff_z, "zone %2.2f\n", zone_info.cur_period );
-        // xr_strcat( buff, buff_z );
-        if (zone_info.snd_time > zone_info.cur_period)
-        {
-            zone_info.snd_time = 0.0f;
-            HUD_SOUND_ITEM::PlaySound(zone_type->detect_snds, Fvector().set(0, 0, 0), NULL, true, false);
-        }
-        else
-        {
-            zone_info.snd_time += Device.fTimeDelta;
-        }
-    } // for itb
+    pos.y -= 0.5f;
+    hud_zones_list.scan(pos, nullptr);
 }
 
 void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
@@ -698,7 +580,7 @@ void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
     if (m_fake_indicators_update)
         return;
 
-    for (int i = 0; i < it_max; ++i) // it_max = ALife::infl_max_count-1
+    for (int i = 0; i < ALife::infl_max_count - 1; ++i)
     {
         ALife::EInfluenceType type = static_cast<ALife::EInfluenceType>(i);
         UpdateIndicatorType(actor, type);
@@ -707,23 +589,24 @@ void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
 
 void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float power /*= 0.0f*/)
 {
-    if (type < ALife::infl_rad || ALife::infl_psi < type)
-    {
-        VERIFY2(0, "Failed EIndicatorType for CStatic!");
-        return;
-    }
-
-    pcstr base_texture = "";
+    pcstr base_texture{};
     switch (type)
     {
     case ALife::infl_rad:  base_texture = "ui_inGame2_triangle_Radiation_"; break;
     case ALife::infl_fire: base_texture = "ui_inGame2_triangle_Fire_"; break;
     case ALife::infl_acid: base_texture = "ui_inGame2_triangle_Biological_"; break;
     case ALife::infl_psi:  base_texture = "ui_inGame2_triangle_Psy_"; break;
-    default: NODEFAULT;
+
+    default:
+        VERIFY(!"Failed EIndicatorType for CStatic!");
+        [[fallthrough]];
+
+    case ALife::infl_electra:
+        return;
     }
-    float hit_power = m_fake_indicators_update ? power : m_zone_cur_power[type];
-    ALife::EHitType hit_type = m_zone_hit_type[type];
+
+    const float hit_power = m_fake_indicators_update ? power : hud_zones_list.zone_cur_power[type];
+    ALife::EHitType hit_type = g_tfInfluenceType2HitType(type);
 
     CCustomOutfit* outfit = actor->GetOutfit();
     CHelmet* helmet = smart_cast<CHelmet*>(actor->inventory().ItemFromSlot(HELMET_SLOT));
@@ -794,40 +677,35 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
         zone_danger = (hit_power - protect) / max_power;
     }
 
+    actor->conditions().SetZoneDanger(zone_danger, type);
+
+    CUIStatic* indicator = m_indik[type];
+    if (!indicator)
+        return;
+
     // Switch LA
     if (light_anim)
     {
-        m_indik[type]->SetColorAnimation(m_color_animation[type]);
+        indicator->SetColorAnimation(m_color_animation[type]);
     }
     else
     {
-        m_indik[type]->SetColorAnimation(nullptr, 0); // turn off
+        indicator->SetColorAnimation(nullptr, 0); // turn off
     }
 
     string256 final_texture;
     xr_sprintf(final_texture, "%s%s", base_texture, texture_color);
     if (CUITextureMaster::ItemExist(final_texture))
     {
-        m_indik[type]->Show(hit_power >= EPS);
-        m_indik[type]->InitTexture(final_texture);
+        indicator->Show(hit_power >= EPS);
+        indicator->InitTexture(final_texture);
     }
     else
     {
-        m_indik[type]->Show(true);
-        m_indik[type]->SetTextureColor(color);
+        indicator->Show(true);
+        indicator->SetTextureColor(color);
     }
 
-    actor->conditions().SetZoneDanger(zone_danger, type);
-}
-
-float CUIHudStatesWnd::get_zone_cur_power(ALife::EHitType hit_type)
-{
-    ALife::EInfluenceType iz_type = get_indik_type(hit_type);
-    if (iz_type == ALife::infl_max_count)
-    {
-        return 0.0f;
-    }
-    return m_zone_cur_power[iz_type];
 }
 
 void CUIHudStatesWnd::DrawZoneIndicators()
@@ -838,17 +716,11 @@ void CUIHudStatesWnd::DrawZoneIndicators()
 
     UpdateIndicators(actor);
 
-    if (m_indik[ALife::infl_rad]->IsShown())
-        m_indik[ALife::infl_rad]->Draw();
-
-    if (m_indik[ALife::infl_fire]->IsShown())
-        m_indik[ALife::infl_fire]->Draw();
-
-    if (m_indik[ALife::infl_acid]->IsShown())
-        m_indik[ALife::infl_acid]->Draw();
-
-    if (m_indik[ALife::infl_psi]->IsShown())
-        m_indik[ALife::infl_psi]->Draw();
+    for (const auto& [_, indicator] : m_indik)
+    {
+        if (indicator && indicator->IsShown())
+            indicator->Draw();
+    }
 }
 
 void CUIHudStatesWnd::EnableFakeIndicators(bool enable) { m_fake_indicators_update = enable; }

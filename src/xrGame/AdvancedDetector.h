@@ -8,14 +8,12 @@ class CAdvancedDetector : public CCustomDetector
 
 public:
     CAdvancedDetector();
-    virtual ~CAdvancedDetector();
-    virtual void on_a_hud_attach();
-    virtual void on_b_hud_detach();
+
+    void on_a_hud_attach() override;
+    void on_b_hud_detach() override;
 
 protected:
-    virtual void UpdateAf();
-    virtual void CreateUI();
-    CUIArtefactDetectorAdv& ui();
+    void Scan() override;
+    void CreateUI() override;
+    CUIArtefactDetectorAdv& ui() const;
 };
-
-//	static void 		BoneCallback					(CBoneInstance *B);
