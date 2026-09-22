@@ -88,6 +88,7 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
         InvalidateHistory();
     if (previous && !failed && previous->width == width && previous->height == height)
     {
+        pathTracer.history = previous->pathTracer;
         const bool cameraCut = cameraPos.distance_to(previous->cameraPos) > 5.0f ||
             cameraDir.dotproduct(previous->cameraDir) < 0.5f ||
             memcmp(&previous->project, &project, sizeof(project)) != 0;
@@ -104,7 +105,6 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
             hasPrevHiZ = previous->hizRecorded;
             if (previous->surfacesRecorded || previous->hizRecorded)
                 writeIndex = 1 - previous->guideIndex;
-            pathTracer.history = previous->pathTracer;
         }
     }
     m_recording = std::make_shared<RenderViewFrame>();

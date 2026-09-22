@@ -1834,7 +1834,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
         ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
         const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, m_lightingState, ptConfig,
-            Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
+            Device.mView, Device.mProject, Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
     }
 

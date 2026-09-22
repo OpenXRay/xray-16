@@ -125,6 +125,10 @@ public:
 class PathTracerHistory
 {
 public:
+    bool MatchesCamera(const Fmatrix& view, const Fmatrix& project, const Fvector& position) const;
+
+    Fmatrix cameraView = Fidentity;
+    Fmatrix cameraProject = Fidentity;
     PathTracerCB parameters = {};
     nvrhi::TextureHandle sky0;
     nvrhi::TextureHandle sky1;
@@ -175,6 +179,8 @@ public:
     framegraph::VirtualResourceHandle lightData;
     framegraph::VirtualResourceHandle environmentCdf;
     PathTracerCB cbData;
+    Fmatrix cameraView = Fidentity;
+    Fmatrix cameraProject = Fidentity;
     u32 width = 0;
     u32 height = 0;
     u32 sampleCount = 0;
@@ -190,8 +196,8 @@ public:
 LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 height, PathTracerPassState& state);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights,
-    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& invViewProj,
-    const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
+    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& view, const Fmatrix& project,
+    const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
 
 void DiscardPathTracerSnapshot(PathTracerPassState& state);
 void ShutdownPathTracer();
