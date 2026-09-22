@@ -304,7 +304,7 @@ static bool HasBindlessTexture(u32 index)
     return GEnv.Backend && GEnv.Backend->GetBindlessTexture(index) != nullptr;
 }
 
-static bool HasStaticDetailTextures(const FGDetailManager* detail)
+static bool HasPulledDetailTextures(const FGDetailManager* detail)
 {
     const u32 atlas = detail->buildDetailsBindlessIndex;
     if (atlas == 0 || atlas == bindless::INVALID_TEXTURE_INDEX || !HasBindlessTexture(atlas))
@@ -1320,13 +1320,10 @@ bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool ne
             return false;
         if (waved && !frame->visible[FGDetailManager::VIS_KIND_MESH])
             return false;
-        if (staticDetail)
-        {
-            if (!frame->visible[FGDetailManager::VIS_KIND_DECAL])
-                return false;
-            if (!HasStaticDetailTextures(detail))
-                return false;
-        }
+        if (staticDetail && !frame->visible[FGDetailManager::VIS_KIND_DECAL])
+            return false;
+        if (!HasPulledDetailTextures(detail))
+            return false;
         if (!InitBillboardPipeline(source))
             return false;
     }
@@ -1385,7 +1382,7 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         scene.failed = true;
         return;
     }
-    if (staticDetail && !HasStaticDetailTextures(detail))
+    if (pulled && !HasPulledDetailTextures(detail))
     {
         scene.failed = true;
         return;
@@ -1411,11 +1408,8 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
             return;
         }
         scene.detailAtlasIndex = detail->buildDetailsBindlessIndex;
-        if (staticDetail)
-        {
-            scene.detailPbrIndex = NormalizeDetailTextureIndex(detail->buildDetailsPbrBindlessIndex);
-            scene.detailBumpIndex = NormalizeDetailTextureIndex(detail->buildDetailsBumpBindlessIndex);
-        }
+        scene.detailPbrIndex = NormalizeDetailTextureIndex(detail->buildDetailsPbrBindlessIndex);
+        scene.detailBumpIndex = NormalizeDetailTextureIndex(detail->buildDetailsBumpBindlessIndex);
     }
     if (waved && !frame->visible[FGDetailManager::VIS_KIND_MESH])
     {
@@ -1730,18 +1724,12 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     const u32 terrainEnd = scene.counts.identityStatic + scene.counts.terrain;
     for (u32 i = 0; i < skinEnd; ++i)
         AppendMaterialTextures(scene.batches[i].materialID, i >= scene.counts.identityStatic && i < terrainEnd);
-    if (scene.counts.grass)
+    if (scene.counts.grass && (!scene.detailMeshJobs.empty() || !scene.staticDetailJobs.empty()))
     {
-        if ((!scene.detailMeshJobs.empty() || !scene.staticDetailJobs.empty()) &&
-            scene.detailAtlasIndex != 0 && scene.detailAtlasIndex != bindless::INVALID_TEXTURE_INDEX)
-            m_textureScratch.push_back(scene.detailAtlasIndex);
-        if (!scene.staticDetailJobs.empty())
+        for (u32 index : { scene.detailAtlasIndex, scene.detailPbrIndex, scene.detailBumpIndex })
         {
-            for (u32 index : { scene.detailPbrIndex, scene.detailBumpIndex })
-            {
-                if (index)
-                    m_textureScratch.push_back(index);
-            }
+            if (index != 0 && index != bindless::INVALID_TEXTURE_INDEX)
+                m_textureScratch.push_back(index);
         }
     }
     scene.textures.Capture(m_textureScratch);

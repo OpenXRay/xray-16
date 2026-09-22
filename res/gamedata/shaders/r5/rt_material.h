@@ -74,8 +74,13 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     if (dot(geoNormal, rayDirection) > 0.0)
         geoNormal = -geoNormal;
 
+    bool pulledWavingCard = IsDetailMeshBatch(scene, trace.batchIdx);
+    bool pulledStaticPatch = IsStaticDetailBatch(scene, trace.batchIdx);
+
     float3 normal;
-    if (RTPackedVectorValid(vertex.normal))
+    if (pulledWavingCard)
+        normal = geoNormal;
+    else if (RTPackedVectorValid(vertex.normal))
         normal = worldSpaceVertices ? vertex.normal : TransformNormalToWorld(vertex.normal, trace.objectToWorld);
     else
         normal = geoNormal;
@@ -107,9 +112,9 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     }
 
     float3 basisTangent, basisBitangent;
-    if (IsStaticDetailBatch(scene, trace.batchIdx))
+    if (pulledStaticPatch || pulledWavingCard)
     {
-        float3 up = float3(0.0, 1.0, 0.0);
+        float3 up = pulledStaticPatch ? float3(0.0, 1.0, 0.0) : geoNormal;
         basisTangent = uvTangent - up * dot(up, uvTangent);
         float tangentLength = length(basisTangent);
         basisTangent = tangentLength > 1e-8 ? basisTangent / tangentLength : 0.0;
@@ -138,27 +143,41 @@ struct RTHitSurface
     uint flags;
 };
 
-RTHitSurface RTResolveStaticDetail(RTSceneParams scene, RTHitGeometry geometry)
+float RTPulledDetailAlphaRef(bool wavingCard)
+{
+    return wavingCard ? RT_PULLED_CARD_ALPHA_REF : RT_STATIC_DETAIL_ALPHA_REF;
+}
+
+bool RTPulledDetailOpaque(RTSceneParams scene, RTHitGeometry geometry, bool wavingCard)
+{
+    if (!HasDetailAtlas(scene))
+        return true;
+
+    return GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
+        geometry.uvDx, geometry.uvDy).a >= RTPulledDetailAlphaRef(wavingCard);
+}
+
+RTHitSurface RTResolvePulledDetail(RTSceneParams scene, RTHitGeometry geometry, bool wavingCard)
 {
     RTHitSurface result;
     result.flags = 0;
-    result.surface.shadingClass = SHADING_CLASS_STANDARD;
-    result.surface.transmission = 0.0;
+    result.surface.shadingClass = wavingCard ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD;
+    result.surface.transmission = wavingCard ? foliage_params.y : 0.0;
     result.surface.emissive = 0.0;
     result.surface.albedo = HasDetailAtlas(scene)
         ? GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
             geometry.uvDx, geometry.uvDy).rgb
         : float3(0.0, 0.0, 0.0);
 
-    float3 worldUp = float3(0.0, 1.0, 0.0);
-    float3 N = worldUp;
+    float3 baseNormal = wavingCard ? geometry.geoNormal : float3(0.0, 1.0, 0.0);
+    float3 N = baseNormal;
     float gloss = 0.0;
     float variance = 0.0;
     if (HasDetailBump(scene))
     {
         BumpSample bump = DecodeBump(GetBindlessTexture(scene.detailBumpIndex).SampleGrad(smp_linear,
             geometry.uv, geometry.uvDx, geometry.uvDy));
-        N = RTSafeNormalize(mul(bump.normal, float3x3(geometry.tangent, geometry.bitangent, worldUp)), worldUp);
+        N = RTSafeNormalize(mul(bump.normal, float3x3(geometry.tangent, geometry.bitangent, baseNormal)), baseNormal);
         gloss = bump.gloss;
         variance = bump.variance;
     }
@@ -193,18 +212,12 @@ RTHitSurface RTResolveHitSurface(RTSceneParams scene, RTSceneTrace trace, RTHitG
     if (IsGrassBatch(scene, trace.batchIdx))
     {
         if (IsStaticDetailBatch(scene, trace.batchIdx))
-            return RTResolveStaticDetail(scene, geometry);
+            return RTResolvePulledDetail(scene, geometry, false);
 
-        if (IsDetailMeshBatch(scene, trace.batchIdx) && HasDetailAtlas(scene))
-        {
-            float4 texel = GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
-                geometry.uvDx, geometry.uvDy);
-            result.surface.albedo = texel.rgb;
-        }
-        else
-        {
-            result.surface.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), 1.0 - geometry.uv.y);
-        }
+        if (IsDetailMeshBatch(scene, trace.batchIdx))
+            return RTResolvePulledDetail(scene, geometry, true);
+
+        result.surface.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), 1.0 - geometry.uv.y);
         result.surface.N = geometry.normal;
         result.surface.roughness = 1.0;
         result.surface.metallic = 0.0;
