@@ -14,7 +14,7 @@ cbuffer RTGIRawParams : register(b5)
     uint g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart;
     uint g_DetailAtlasIndex, g_DiffuseMode, g_RTLightCount, g_EmissiveCount;
     uint g_MaxNullEvents, g_MaxBounces, g_SamplesPerPixel; float g_RayDistance;
-    float g_EnvironmentRotation, g_SunAngularRadius, g_CameraConeSpread; uint g_Pad;
+    float g_EnvironmentRotation, g_SunAngularRadius, g_CameraConeSpread; uint g_ClusterLights;
     uint g_DetailMeshBatchStart, g_StaticDetailBatchStart, g_DetailPbrIndex, g_DetailBumpIndex;
 };
 
@@ -123,7 +123,7 @@ RTGIPrimarySurface RTGIDecodePrimary(uint2 pixel)
     return primary;
 }
 
-RTSceneParams RTGIBuildRawScene()
+RTSceneParams RTGIBuildRawScene(uint2 pixel)
 {
     RTSceneParams scene = RTBuildSceneParams(g_IdentityStaticCount, g_TerrainBatchCount,
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
@@ -135,6 +135,8 @@ RTSceneParams RTGIBuildRawScene()
     scene.detailBumpIndex = g_DetailBumpIndex;
     scene.rayDistance = g_RayDistance;
     scene.rayMask = RT_RAY_MASK_WORLD;
+    scene.clusterLights = g_ClusterLights;
+    scene.clusterPixel = pixel;
     return scene;
 }
 

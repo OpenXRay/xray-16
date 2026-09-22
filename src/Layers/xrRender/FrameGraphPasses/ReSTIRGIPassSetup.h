@@ -115,7 +115,7 @@ public:
     float environmentRotation;
     float sunAngularRadius;
     float cameraConeSpread;
-    u32 pad;
+    u32 clusterLights;
     u32 detailMeshBatchStart;
     u32 staticDetailBatchStart;
     u32 detailPbrIndex;
@@ -160,6 +160,8 @@ public:
     framegraph::VirtualResourceHandle sourceColor;
     framegraph::VirtualResourceHandle motionVectors;
     framegraph::VirtualResourceHandle lightData;
+    framegraph::VirtualResourceHandle clusterGrid;
+    framegraph::VirtualResourceHandle lightIndexList;
     framegraph::VirtualResourceHandle environmentDistribution;
     framegraph::VirtualResourceHandle rawDiffuse;
     framegraph::VirtualResourceHandle rawSpecular;

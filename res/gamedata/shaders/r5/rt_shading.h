@@ -23,6 +23,8 @@ ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
 StructuredBuffer<float4> g_GrassMaterials : register(t30);
+StructuredBuffer<uint2> g_ClusterGrid : register(t21);
+StructuredBuffer<uint> g_LightIndexList : register(t22);
 
 static const uint RT_GRASS_MATERIAL_TINT_BASE = 2u;
 
@@ -53,6 +55,8 @@ struct RTSceneParams
     float sunAngularRadius;
     uint rayMask;
     float rayDistance;
+    uint clusterLights;
+    uint2 clusterPixel;
 };
 
 RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCount,
@@ -81,6 +85,8 @@ RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCoun
     scene.sunAngularRadius = sunAngularRadius;
     scene.rayMask = RT_RAY_MASK_WORLD;
     scene.rayDistance = RT_RAY_DISTANCE;
+    scene.clusterLights = 0u;
+    scene.clusterPixel = uint2(0u, 0u);
     return scene;
 }
 

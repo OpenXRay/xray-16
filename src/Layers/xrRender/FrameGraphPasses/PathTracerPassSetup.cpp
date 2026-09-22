@@ -791,6 +791,16 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     if (!lightData.is_valid())
         lightData = fg.ImportBuffer("cluster_light_data", lightManager.GetLightDataBuffer(),
             SnapshotBufferDesc(lightManager.GetLightDataBuffer(), "cluster_light_data"));
+    const bool clusterListsActive = clusterLights.active && clusterLights.clusterGrid.is_valid() &&
+        clusterLights.lightIndexList.is_valid();
+    auto clusterGrid = clusterListsActive ? clusterLights.clusterGrid : VirtualResourceHandle();
+    auto lightIndexList = clusterListsActive ? clusterLights.lightIndexList : VirtualResourceHandle();
+    if (!clusterGrid.is_valid())
+        clusterGrid = lightManager.GetClusterGridBuffer() ? fg.ImportBuffer("cluster_light_grid",
+            lightManager.GetClusterGridBuffer(), SnapshotBufferDesc(lightManager.GetClusterGridBuffer(), "cluster_light_grid")) : lightData;
+    if (!lightIndexList.is_valid())
+        lightIndexList = lightManager.GetLightIndexListBuffer() ? fg.ImportBuffer("cluster_light_index_list",
+            lightManager.GetLightIndexListBuffer(), SnapshotBufferDesc(lightManager.GetLightIndexListBuffer(), "cluster_light_index_list")) : lightData;
 
     PathTracerCaptureData* capture = nullptr;
     if (config.freezeScene && !state.snapshot)
@@ -874,7 +884,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     cbData.maxSamples = config.maxSamples;
     cbData.sunAngularRadius = config.sunAngularRadius;
     cbData.cameraConeSpread = ComputeCameraConeSpread(invViewProj, cameraPos, width, height);
-    cbData.transportPad = 0.0f;
+    cbData.clusterLights = clusterListsActive && !frozen ? 1u : 0u;
 
     const auto& history = state.history;
     state.pending.cameraView = view;
@@ -959,6 +969,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             if (frozen)
                 data.scene.textures = state.snapshot->textureTable;
             data.lightData = passBuilder.read(frozen ? frozenLightHandle : lightData, ResourceState::ShaderResource);
+            data.clusterGrid = passBuilder.read(clusterGrid, ResourceState::ShaderResource);
+            data.lightIndexList = passBuilder.read(lightIndexList, ResourceState::ShaderResource);
             data.environmentCdf = passBuilder.read(cdfHandle, ResourceState::ShaderResource);
             if (frozen)
             {
@@ -1055,6 +1067,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             }
 
             auto* lightData = fg.GetPhysicalBuffer(data.lightData);
+            auto* clusterGridBuffer = fg.GetPhysicalBuffer(data.clusterGrid);
+            auto* lightIndexListBuffer = fg.GetPhysicalBuffer(data.lightIndexList);
             auto* cdfBuffer = fg.GetPhysicalBuffer(data.environmentCdf);
             if (!lightData || !staticGlobals || !cdfBuffer)
             {
@@ -1066,6 +1080,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             bsb.ConstantBuffer("PathTracerParams", s_cb);
             bsb.ConstantBuffer("static_globals", staticGlobals);
             bsb.BufferSRV("g_LightData", lightData);
+            bsb.BufferSRV("g_ClusterGrid", clusterGridBuffer ? clusterGridBuffer : lightData);
+            bsb.BufferSRV("g_LightIndexList", lightIndexListBuffer ? lightIndexListBuffer : lightData);
             bsb.AccelStruct("g_SceneTLAS", scene.tlas);
             bsb.BufferSRV("g_BatchInfo", scene.batchInfo);
             bsb.BufferSRV("g_MegaVB", scene.vertices);

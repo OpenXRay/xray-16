@@ -16,7 +16,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    RTSceneParams scene = RTGIBuildRawScene();
+    RTSceneParams scene = RTGIBuildRawScene(pixel);
     RTIntegratorSettings settings = RTGIBuildRawSettings(primary);
 
     uint samples = RTGISampleCount();

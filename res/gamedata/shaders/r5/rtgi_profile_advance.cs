@@ -16,7 +16,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (!active)
         return;
 
-    RTSceneParams scene = RTGIBuildRawScene();
+    RTSceneParams scene = RTGIBuildRawScene(lane.pixel);
     RTHitSurface hit;
     RTHitGeometry geometry;
     float3 hitPosition;

@@ -27,7 +27,7 @@ cbuffer PathTracerParams : register(b5)
     float g_EnvironmentRotation;
     float g_SunAngularRadius;
     float g_CameraConeSpread;
-    float g_TransportPad;
+    uint g_ClusterLights;
     uint g_DetailMeshBatchStart;
     uint g_StaticDetailBatchStart;
     uint g_DetailPbrIndex;
@@ -91,6 +91,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     scene.staticDetailBatchStart = g_StaticDetailBatchStart;
     scene.detailPbrIndex = g_DetailPbrIndex;
     scene.detailBumpIndex = g_DetailBumpIndex;
+    scene.clusterLights = g_ClusterLights;
+    scene.clusterPixel = pixel;
     uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_SampleIndex * 26699u);
     float3 origin;
     float3 direction = GenerateCameraRay(pixel, rng, origin);
