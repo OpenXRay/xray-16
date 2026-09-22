@@ -374,6 +374,9 @@ DefaultOutputLayout setupSmokeTrailPass(
         }
     );
 
+    if (lighting && lighting->scheduled == LightingMode::ReferencePT)
+        return inputs;
+
     // ── Pass 4: Draw (smoke_trail.vs pipeline with drawIndirect) ──
     InitSmokeDrawPipeline(device, state);
 

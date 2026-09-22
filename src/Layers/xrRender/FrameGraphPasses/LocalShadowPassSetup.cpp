@@ -1467,6 +1467,28 @@ void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device)
     device->unmapBuffer(oldest);
 }
 
+void SuspendLocalShadows(LocalShadowState& state)
+{
+    state.staticComplete = false;
+    state.dynComplete = false;
+    state.statAccepted = 0;
+    state.statDeferred = 0;
+    state.statUpToDate = 0;
+    state.statPairs = 0;
+    state.statDynPairs = 0;
+    state.statSkinnedPairs = 0;
+    state.statDrops = 0;
+    state.statDynDrops = 0;
+    state.statMaxVisited = 0;
+    state.statDynRefresh = 0;
+    state.statOverflowViews = 0;
+    state.statCasterBatches = 0;
+    for (auto& page : state.overflowPages)
+    {
+        SuspendLocalShadows(*page);
+    }
+}
+
 namespace {
 struct ShadowCandidate {
     const light* source;

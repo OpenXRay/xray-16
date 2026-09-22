@@ -2277,6 +2277,15 @@ void InvalidateVSMCache(VSMState& state)
     state.primeTraceQuiet = 0;
 }
 
+void SuspendVSM(nvrhi::IDevice* device, VSMState& state)
+{
+    state.active = false;
+    state.suspended = true;
+    state.pivotValid = false;
+    if (device)
+        ProcessReadback(device, state);
+}
+
 Fmatrix VSMSunView(const Fvector& sunDir, const Fvector& eye)
 {
     Fvector sd = sunDir;
@@ -2450,6 +2459,11 @@ VSMOutput setupVSMPasses(
         state->binRecorded = false;
         state->dynRendered = false;
         state->hudRendered = false;
+        if (state->suspended)
+        {
+            state->suspended = false;
+            InvalidateVSMCache(*state);
+        }
     }
     if (!state || !device || !depth.is_valid() || width == 0 || height == 0)
         return out;

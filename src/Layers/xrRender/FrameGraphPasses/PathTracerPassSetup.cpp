@@ -980,7 +980,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.globals = frozen ? state.snapshot->globals : nullptr;
 
             data.accumulation = passBuilder.readWrite(accumulation, ResourceState::UnorderedAccess);
-            data.outputTex = passBuilder.readWrite(sceneColorIn, ResourceState::UnorderedAccess);
+            data.outputTex = passBuilder.write(sceneColorIn, ResourceState::UnorderedAccess);
         },
 
         [](const PathTracerData& data, const FrameGraph& fg, fg::RenderContext* ctx)
