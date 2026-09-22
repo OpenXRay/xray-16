@@ -24,7 +24,7 @@ ByteAddressBuffer g_GrassIB : register(t13);
 
 static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
-static const float RT_GRASS_ALPHA_REF = 0.3;
+static const float RT_PULLED_CARD_ALPHA_REF = 96.0 / 255.0;
 static const float RT_STATIC_DETAIL_ALPHA_REF = 0.5;
 #define RT_RAY_MASK_WORLD 0x01u
 #define RT_RAY_MASK_HUD 0x02u
@@ -166,13 +166,11 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     {
         if (IsStaticDetailBatch(scene, hit.batchIdx))
         {
-            result.opaque = !HasDetailAtlas(scene) || GetBindlessTexture(scene.detailAtlasIndex)
-                .SampleGrad(smp_linear, geometry.uv, geometry.uvDx, geometry.uvDy).a >= RT_STATIC_DETAIL_ALPHA_REF;
+            result.opaque = RTPulledDetailOpaque(scene, geometry, false);
             return result;
         }
         if (IsDetailMeshBatch(scene, hit.batchIdx))
-            result.opaque = !HasDetailAtlas(scene) || GetBindlessTexture(scene.detailAtlasIndex)
-                .SampleGrad(smp_linear, geometry.uv, geometry.uvDx, geometry.uvDy).a >= RT_GRASS_ALPHA_REF;
+            result.opaque = RTPulledDetailOpaque(scene, geometry, true);
         else
             result.opaque = true;
         return result;
