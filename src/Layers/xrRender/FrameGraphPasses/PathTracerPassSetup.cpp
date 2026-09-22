@@ -1102,7 +1102,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             bsb.BufferSRV("g_GrassIB", grassIB);
             bsb.TextureUAV("g_Accumulation", accumulationTex);
             bsb.TextureUAV("g_Output", outTex);
-            auto bindingSet = nvDevice->createBindingSet(bsb.Build(), s_layout);
+            auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), s_layout, nvDevice);
             if (!bindingSet)
             {
                 data.lighting->Fail(LightingFallback::BindingUnavailable);

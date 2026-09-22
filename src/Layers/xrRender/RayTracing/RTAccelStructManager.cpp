@@ -2286,7 +2286,6 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
 {
     if (!m_rtSupported || !gpu || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
         return false;
-    RetireScenes();
     if ((gpu->GetRTVertexBuffer() || gpu->GetRTIndexBuffer()) && !gpu->IsRTSourceReady())
         return false;
     PrepareStatic(gpu);
@@ -2628,7 +2627,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
                 bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[job.sourceSlot]))
                     .BufferSRV("g_BoneMatrices", bones)
                     .BufferUAV("g_Output", output).ConstantBuffer("RTSkinningCB", m_device->GetNativeBuffer(s_skinCB));
-                auto bindingSet = device->createBindingSet(bindings.Build(), s_skinLayout);
+                auto bindingSet = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindings.Build(), s_skinLayout, device);
                 R_ASSERT(bindingSet);
                 commandList->writeBuffer(m_device->GetNativeBuffer(s_skinCB), &job.constants, sizeof(job.constants));
                 nvrhi::ComputeState state;
@@ -2673,7 +2672,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
                 .Texture("g_Interaction", interaction)
                 .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
                 .ConstantBuffer("GrassRTCB", m_device->GetNativeBuffer(s_grassCB));
-            auto set = device->createBindingSet(bindings.Build(), scene.grassLayout);
+            auto set = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindings.Build(), scene.grassLayout, device);
             R_ASSERT(set);
             commandList->writeBuffer(m_device->GetNativeBuffer(s_grassCB), &constants, sizeof(constants));
             nvrhi::ComputeState state;
@@ -2711,7 +2710,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
                     .Texture("g_Interaction", interaction)
                     .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
                     .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
-                auto set = device->createBindingSet(bindings.Build(), scene.pulledLayout);
+                auto set = framegraph::GetPassResourceCache().GetOrCreateBindingSet(bindings.Build(), scene.pulledLayout, device);
                 R_ASSERT(set);
                 commandList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &constants, sizeof(constants));
                 nvrhi::ComputeState state;

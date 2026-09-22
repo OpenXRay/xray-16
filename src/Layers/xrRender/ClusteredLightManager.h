@@ -93,8 +93,9 @@ public:
 private:
     void EnsureLightCapacity(u32 count);
     void AddLight(const light* L, u32 type);
-    GPULightData BuildGPULightData(const light* L, u32 shadowSlot);
+    GPULightData BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture) const;
     u32 GetOrLoadSpotTexture(const shared_str& name);
+    u32 ResolveSpotTexture(const light* L);
 
     nvrhi::DeviceHandle m_device;
 
@@ -104,6 +105,7 @@ private:
     u32 m_lightCapacity = 0;
     bool m_rayTracingLighting = false;
     xr_map<shared_str, u32> m_spotTextureCache;
+    xr_vector<u32> m_spotTextureScratch;
     u32 m_numLights = 0;
     u32 m_numPoint = 0;
     u32 m_numSpot = 0;
