@@ -11,6 +11,7 @@
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
 #include "Layers/xrRender/Light.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/FrameGraph/Blackboard.h"
@@ -95,9 +96,11 @@ u64 DeveloperSceneRenderer::HashScene(const xr_string& sceneName, const Fbox& bo
     for (const xray::render::DeveloperSceneMaterial& material : materials)
     {
         hash = FoldHash(hash, material.name.c_str(), material.name.size());
+        hash = FoldHash(hash, material.shaderName.c_str(), material.shaderName.size());
         hash = FoldHash(hash, &material.color, sizeof(material.color));
         hash = FoldHash(hash, &material.metallic, sizeof(material.metallic));
         hash = FoldHash(hash, &material.roughness, sizeof(material.roughness));
+        hash = FoldHash(hash, &material.opacity, sizeof(material.opacity));
     }
 
     for (const xray::render::DeveloperSceneMesh& mesh : meshes)
@@ -125,19 +128,29 @@ bool FrameGraphRenderer::PrepareDeveloperMaterials(const DeveloperScene& scene)
     {
         const DeveloperSceneMaterial& source = scene.materials[index];
 
+        if (!source.shaderName.empty()
+            && ShaderVariantRegistry::Instance().GetVariantIndex(source.shaderName.c_str()) == 0)
+        {
+            Msg("! [dev_level] event=load stage=materials result=fail material=%u name='%s' shader='%s' reason=missing_shader_variant",
+                index, source.name.c_str(), source.shaderName.c_str());
+            return false;
+        }
+
         string64 materialSuffix;
         xr_sprintf(materialSuffix, "\\mat_%u", index);
 
         DeveloperMaterialRecord record;
         record.key = "$developer\\" + sceneKey + materialSuffix;
-        record.shaderName = shaderName;
+        record.shaderName = source.shaderName.empty() ? shaderName : source.shaderName;
         record.textureName = record.key;
         record.color = source.color;
         record.metallic = source.metallic;
         record.roughness = source.roughness;
+        record.opacity = source.opacity;
 
         const u32 materialID = m_materialCache->RegisterDeveloperMaterial(record.key.c_str(),
-            record.shaderName.c_str(), record.textureName.c_str(), record.color, record.metallic, record.roughness);
+            record.shaderName.c_str(), record.textureName.c_str(), record.color, record.metallic, record.roughness,
+            record.opacity);
         if (materialID == UINT32_MAX)
         {
             Msg("! [dev_level] event=load stage=materials result=fail material=%u name='%s'",
@@ -150,7 +163,7 @@ bool FrameGraphRenderer::PrepareDeveloperMaterials(const DeveloperScene& scene)
 
     m_developerMaterialEpoch = m_materialCache->GetVisualMaterialEpoch();
 
-    Msg("* [dev_level] event=load stage=materials result=ok count=%u shader='%s'",
+    Msg("* [dev_level] event=load stage=materials result=ok count=%u default_shader='%s'",
         u32(m_developerMaterials.size()), shaderName.c_str());
 
     return true;
@@ -480,7 +493,7 @@ void FrameGraphRenderer::ReRegisterDeveloperMaterials()
     for (const DeveloperMaterialRecord& record : m_developerMaterials)
     {
         const u32 materialID = m_materialCache->RegisterDeveloperMaterial(record.key.c_str(), record.shaderName.c_str(),
-            record.textureName.c_str(), record.color, record.metallic, record.roughness);
+            record.textureName.c_str(), record.color, record.metallic, record.roughness, record.opacity);
         R_ASSERT2(materialID != UINT32_MAX, "Failed to restore a developer material after renderer reset");
     }
 

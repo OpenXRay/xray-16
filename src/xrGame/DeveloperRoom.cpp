@@ -2,13 +2,16 @@
 #include "DeveloperRoom.h"
 
 u32 CDeveloperRoom::AddMaterial(xray::render::DeveloperScene& scene, pcstr name,
-    float red, float green, float blue, float metallic, float roughness)
+    float red, float green, float blue, float metallic, float roughness,
+    pcstr shaderName, float opacity)
 {
     auto& material = scene.materials.emplace_back();
     material.name = name;
     material.color.set(red, green, blue);
     material.metallic = metallic;
     material.roughness = roughness;
+    material.shaderName = shaderName ? shaderName : "";
+    material.opacity = opacity;
     return static_cast<u32>(scene.materials.size() - 1);
 }
 
@@ -109,6 +112,60 @@ void CDeveloperRoom::AddSphere(xray::render::DeveloperScene& scene, pcstr name,
     }
 }
 
+void CDeveloperRoom::AddGlassDisplay(xray::render::DeveloperScene& scene, pcstr name,
+    const Fvector& center, const Fvector& halfSize, u32 glass, u32 frame)
+{
+    string64 mesh;
+    xr_sprintf(mesh, "%s_pane", name);
+    AddBox(scene, mesh, center, halfSize, glass);
+    xr_sprintf(mesh, "%s_base", name);
+    AddBox(scene, mesh, Fvector{ center.x, 0.175f, center.z },
+        Fvector{ halfSize.x + 0.05f, 0.175f, 0.08f }, frame);
+    xr_sprintf(mesh, "%s_jamb_left", name);
+    AddBox(scene, mesh, Fvector{ center.x - halfSize.x - 0.05f, center.y, center.z },
+        Fvector{ 0.05f, halfSize.y + 0.1f, 0.06f }, frame);
+    xr_sprintf(mesh, "%s_jamb_right", name);
+    AddBox(scene, mesh, Fvector{ center.x + halfSize.x + 0.05f, center.y, center.z },
+        Fvector{ 0.05f, halfSize.y + 0.1f, 0.06f }, frame);
+    xr_sprintf(mesh, "%s_rail_top", name);
+    AddBox(scene, mesh, Fvector{ center.x, center.y + halfSize.y + 0.05f, center.z },
+        Fvector{ halfSize.x + 0.1f, 0.05f, 0.06f }, frame);
+}
+
+void CDeveloperRoom::AddPanelDisplay(xray::render::DeveloperScene& scene, pcstr name,
+    const Fvector& center, const Fvector& halfSize, u32 panel, u32 support)
+{
+    string64 mesh;
+    xr_sprintf(mesh, "%s_panel", name);
+    AddBox(scene, mesh, center, halfSize, panel);
+    xr_sprintf(mesh, "%s_base", name);
+    AddBox(scene, mesh, Fvector{ center.x, 0.08f, center.z }, Fvector{ 0.5f, 0.08f, 0.3f }, support);
+    xr_sprintf(mesh, "%s_post", name);
+    const float postTop = center.y - halfSize.y + 0.1f;
+    AddBox(scene, mesh, Fvector{ center.x, postTop * 0.5f, center.z },
+        Fvector{ 0.22f, postTop * 0.5f, 0.06f }, support);
+}
+
+void CDeveloperRoom::AddPlinthSample(xray::render::DeveloperScene& scene, pcstr name,
+    const Fvector& center, float radius, float height, u32 material, u32 plinth)
+{
+    string64 mesh;
+    xr_sprintf(mesh, "%s_sphere", name);
+    AddSphere(scene, mesh, center, radius, material);
+    xr_sprintf(mesh, "%s_plinth", name);
+    AddBox(scene, mesh, Fvector{ center.x, height * 0.5f, center.z },
+        Fvector{ radius + 0.1f, height * 0.5f, radius + 0.1f }, plinth);
+}
+
+void CDeveloperRoom::AddSampleRecord(pcstr group, const xray::render::DeveloperSceneMaterial& material,
+    const Fvector& position)
+{
+    Msg("[dev_level] event=sample group=%s name=%s pos=%.2f,%.2f,%.2f shader=%s opacity=%.2f roughness=%.2f",
+        group, material.name.c_str(), position.x, position.y, position.z,
+        material.shaderName.empty() ? "opaque" : material.shaderName.c_str(),
+        material.opacity, material.roughness);
+}
+
 Fvector CDeveloperRoom::ActorPosition()
 {
     return Fvector{ 0.0f, 0.25f, -8.0f };
@@ -167,6 +224,57 @@ void CDeveloperRoom::Build(xray::render::DeveloperScene& scene)
         AddBox(scene, name, Fvector{ -9.0f, height * 0.5f, -7.0f + float(step) },
             Fvector{ 1.4f, height * 0.5f, 0.5f }, white);
     }
+    const u32 glass_clear = AddMaterial(scene, "glass_clear", 0.88f, 0.89f, 0.90f, 0.0f, 0.05f,
+        "models\\transparent", 0.12f);
+    const u32 glass_green = AddMaterial(scene, "glass_green", 0.52f, 0.85f, 0.58f, 0.0f, 0.08f,
+        "models\\transparent", 0.25f);
+    const u32 glass_blue = AddMaterial(scene, "glass_blue", 0.48f, 0.66f, 0.92f, 0.0f, 0.12f,
+        "models\\transparent", 0.3f);
+    const u32 glass_rough = AddMaterial(scene, "glass_rough", 0.82f, 0.83f, 0.85f, 0.0f, 0.55f,
+        "models\\transparent", 0.4f);
+    const u32 glassMaterials[] = { glass_clear, glass_green, glass_blue, glass_rough };
+    const float glassX[] = { -6.0f, -2.0f, 2.0f, 6.0f };
+    for (u32 index = 0; index < 4; ++index)
+    {
+        const Fvector position{ glassX[index], 1.5f, -1.0f };
+        const auto& sample = scene.materials[glassMaterials[index]];
+        AddGlassDisplay(scene, sample.name.c_str(), position, Fvector{ 0.9f, 1.15f, 0.045f },
+            glassMaterials[index], plinth);
+        AddSampleRecord("glass", sample, position);
+    }
+    const u32 ref_silver = AddMaterial(scene, "reference_polished_silver", 0.95f, 0.93f, 0.88f, 1.0f, 0.025f);
+    const u32 ref_copper = AddMaterial(scene, "reference_copper", 0.955f, 0.637f, 0.538f, 1.0f, 0.18f);
+    const u32 ref_black = AddMaterial(scene, "reference_glossy_black", 0.02f, 0.02f, 0.02f, 0.0f, 0.07f);
+    const u32 ref_white = AddMaterial(scene, "reference_matte_white", 0.8f, 0.8f, 0.8f, 0.0f, 0.92f);
+    const u32 referenceMaterials[] = { ref_silver, ref_copper, ref_black, ref_white };
+    const float referenceZ[] = { -1.0f, 2.0f, 5.0f, 8.0f };
+    for (u32 index = 0; index < 4; ++index)
+    {
+        const Fvector position{ -10.0f, 1.5f, referenceZ[index] };
+        const auto& sample = scene.materials[referenceMaterials[index]];
+        AddPlinthSample(scene, sample.name.c_str(), position, 0.6f, 0.9f, referenceMaterials[index], plinth);
+        AddSampleRecord("reference", sample, position);
+    }
+    const u32 emissive_warm = AddMaterial(scene, "emissive_warm", 0.95f, 0.55f, 0.2f, 0.0f, 0.5f,
+        "models\\selflight");
+    const u32 emissive_cool = AddMaterial(scene, "emissive_cool", 0.2f, 0.5f, 1.0f, 0.0f, 0.5f,
+        "models\\selflight");
+    const u32 emissive_dim = AddMaterial(scene, "emissive_dim", 0.85f, 0.85f, 0.85f, 0.0f, 0.5f,
+        "models\\selflight_det");
+    const u32 emissiveMaterials[] = { emissive_warm, emissive_cool, emissive_dim };
+    const pcstr witnessNames[] = { "witness_warm", "witness_cool", "witness_dim" };
+    const float emissiveX[] = { -6.0f, 0.0f, 6.0f };
+    for (u32 index = 0; index < 3; ++index)
+    {
+        const Fvector position{ emissiveX[index], 2.4f, 10.8f };
+        const auto& sample = scene.materials[emissiveMaterials[index]];
+        AddPanelDisplay(scene, sample.name.c_str(), position, Fvector{ 0.9f, 0.75f, 0.08f },
+            emissiveMaterials[index], plinth);
+        AddSampleRecord("emissive", sample, position);
+        const Fvector witness{ emissiveX[index], 0.5f, 9.3f };
+        AddBox(scene, witnessNames[index], witness, Fvector{ 0.5f, 0.5f, 0.5f }, ref_white);
+        AddSampleRecord("witness", scene.materials[ref_white], witness);
+    }
     Msg("[dev_level] event=room name=%s meshes=%u materials=%u bounds=%.1f,%.1f,%.1f:%.1f,%.1f,%.1f",
         scene.name.c_str(), static_cast<u32>(scene.meshes.size()), static_cast<u32>(scene.materials.size()),
         scene.bounds.vMin.x, scene.bounds.vMin.y, scene.bounds.vMin.z,
@@ -174,8 +282,9 @@ void CDeveloperRoom::Build(xray::render::DeveloperScene& scene)
     for (u32 index = 0; index < scene.materials.size(); ++index)
     {
         const auto& material = scene.materials[index];
-        Msg("[dev_level] event=material id=%u name=%s color=%.3f,%.3f,%.3f metallic=%.3f roughness=%.3f",
+        Msg("[dev_level] event=material id=%u name=%s color=%.3f,%.3f,%.3f metallic=%.3f roughness=%.3f shader=%s opacity=%.3f",
             index, material.name.c_str(), material.color.x, material.color.y, material.color.z,
-            material.metallic, material.roughness);
+            material.metallic, material.roughness,
+            material.shaderName.empty() ? "opaque" : material.shaderName.c_str(), material.opacity);
     }
 }
