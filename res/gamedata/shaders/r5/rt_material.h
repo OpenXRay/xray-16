@@ -2,6 +2,8 @@
 #define RT_MATERIAL_H
 
 #include "rt_common.h"
+#include "material_coverage.h"
+#include "shared/detail_alpha.h"
 #include "detail_blade_material.h"
 #include "detail_blade_ray.h"
 
@@ -179,7 +181,7 @@ struct RTHitSurface
 
 float RTPulledDetailAlphaRef(bool wavingCard)
 {
-    return wavingCard ? RT_PULLED_CARD_ALPHA_REF : RT_STATIC_DETAIL_ALPHA_REF;
+    return wavingCard ? DETAIL_PULLED_CARD_ALPHA_REF : DETAIL_STATIC_PATCH_ALPHA_REF;
 }
 
 bool RTPulledDetailOpaque(RTSceneParams scene, RTHitGeometry geometry, bool wavingCard, bool shadowRay)
@@ -311,7 +313,7 @@ float3 RTEvaluateEmitter(RTSceneParams scene, uint batchIdx, RTBatchInfo info, f
         return 0.0;
 
     float4 diffuseSample = SampleDiffuseGrad(mat, uv, uvDx, uvDy);
-    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0 && diffuseSample.a < mat.alphaRef)
+    if (MaterialAlphaTestRejects(mat, diffuseSample.a))
         return 0.0;
 
     float3 albedo = diffuseSample.rgb;

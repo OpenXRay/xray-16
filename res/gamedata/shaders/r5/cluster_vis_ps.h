@@ -5,6 +5,7 @@
 #include "cluster_fade.h"
 #ifdef CLUSTER_VIS_AT
 #include "bindless_common.h"
+#include "material_coverage.h"
 #endif
 
 
@@ -43,11 +44,8 @@ uint main(PS_INPUT input) : SV_Target0
 
 #ifdef CLUSTER_VIS_AT
     MaterialData mat = g_Materials[input.materialID];
-    if (mat.flags & MAT_FLAG_ALPHA_TEST)
-    {
-        float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-        clip(diffuseSample.a - mat.alphaRef);
-    }
+    if (MaterialHasAlphaTest(mat))
+        clip(MaterialAlphaTestClip(mat, SampleDiffuse(mat, input.texcoord).a));
 #endif
 
     return ClusterVisID(input);

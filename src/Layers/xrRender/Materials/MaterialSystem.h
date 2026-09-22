@@ -18,13 +18,15 @@ namespace xray::render
 class MaterialSystem
 {
 public:
-    struct MaterialInfo
+    class MaterialInfo
     {
+    public:
         bool alphaTest = false;
         u32 alphaRef = 0;
         bool transparent = false;
         u8 priority = 1;
         bool foliage = false;
+        bool water = false;
 
         float metallic = 0.0f;
         float roughness = 0.5f;
@@ -35,6 +37,9 @@ public:
 
         u32 shaderVariant = 0;
         float emissive = 0.0f;
+
+        u32 GetMaterialFlags() const;
+        float GetAlphaReference() const;
     };
 
     struct TextureSet

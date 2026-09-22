@@ -238,6 +238,8 @@ public:
 
     void Clear();
 
+    void InvalidateFramebufferDependent();
+
     struct Stats {
         u32 numCachedPSOs = 0;
         u32 numCacheHits = 0;
@@ -363,6 +365,9 @@ public:
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 
 private:
+
+    static bool IsFramebufferDependentKey(const MaterialKey& key);
+    void ReleasePSOTextures(MaterialPSO* pso);
 
     static u32 GetVertexFormatID(dxRender_Visual* visual);
 };

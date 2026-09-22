@@ -5,6 +5,7 @@
 #include "common.h"
 #include "bindless_common.h"
 #include "material_eval.h"
+#include "material_coverage.h"
 
 struct PS_INPUT
 {
@@ -34,10 +35,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
-    if (mat.flags & MAT_FLAG_ALPHA_TEST)
-    {
-        clip(diffuseSample.a - mat.alphaRef);
-    }
+    clip(MaterialAlphaTestClip(mat, diffuseSample.a));
 
     VariantData variant = g_Variants[mat.shaderVariant];
     uint colorMode = VariantColorMode(variant);

@@ -5,6 +5,7 @@
 #include "rt_common.h"
 #include "rt_bsdf.h"
 #include "material_eval.h"
+#include "material_coverage.h"
 
 #ifndef CLUSTERED_LIGHTING_PUNCTUAL
 #define CLUSTERED_LIGHTING_PUNCTUAL
@@ -27,8 +28,6 @@ static const uint RT_GRASS_MATERIAL_TINT_BASE = 2u;
 
 static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
-static const float RT_PULLED_CARD_ALPHA_REF = 96.0 / 255.0;
-static const float RT_STATIC_DETAIL_ALPHA_REF = 0.5;
 #define RT_RAY_MASK_WORLD 0x01u
 #define RT_RAY_MASK_HUD 0x02u
 
@@ -190,9 +189,9 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
         return result;
     result.diffuse = SampleDiffuseGrad(mat, geometry.uv, geometry.uvDx, geometry.uvDy);
     float coverageAlpha = result.diffuse.a;
-    if (shadowRay && (mat.flags & (MAT_FLAG_ALPHA_TEST | MAT_FLAG_ALPHA_BLEND)) != 0u)
-        coverageAlpha = SampleDiffuseLevel(mat, geometry.uv).a;
-    if ((mat.flags & MAT_FLAG_ALPHA_TEST) != 0u && coverageAlpha < mat.alphaRef)
+    if (shadowRay && MaterialHasAlphaCoverage(mat))
+        coverageAlpha = MaterialRayShadowAlpha(mat, geometry.uv);
+    if (MaterialAlphaTestRejects(mat, coverageAlpha))
         return result;
     if ((mat.flags & MAT_FLAG_WATER) != 0u)
     {
@@ -211,9 +210,9 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
                 geometry.uvDx, geometry.uvDy, false);
         return result;
     }
-    if ((mat.flags & MAT_FLAG_ALPHA_BLEND) != 0u)
+    if (MaterialHasAlphaBlend(mat))
     {
-        result.opacity = saturate(coverageAlpha);
+        result.opacity = MaterialBlendOpacity(mat, coverageAlpha);
         result.transmittance = 1.0 - result.opacity;
         result.opaque = shadowRay ? result.opacity >= 1.0 : result.opacity > 0.0;
         return result;
