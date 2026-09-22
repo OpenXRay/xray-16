@@ -376,6 +376,7 @@ public:
     u32 staticDetailInstanceCount = 0;
     u32 leases = 0;
     u32 retention = 0;
+    u32 tableClearMask = 0;
     bool billboard = false;
     bool recorded = false;
     bool failed = false;
@@ -454,7 +455,7 @@ private:
     void AcquireGeometryBuild(const nvrhi::rt::AccelStructDesc& requested, RTGeometryBuild& slot,
         bool topologyStable, u64 topologyKey = 0);
     bool IsSceneReady(const RTSceneGeneration& scene) const;
-    u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling) const;
+    u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling);
     u64 ComputeTopologySignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
     RTPoseSignature ComputePoseSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
@@ -506,6 +507,10 @@ private:
     u64 m_poseRevision = 0;
     u64 m_staticIdentityHash = 0;
     u32 m_staticIdentityBuildCount = UINT32_MAX;
+    u64 m_staticArraysHash = 0;
+    u32 m_staticArraysBuildCount = UINT32_MAX;
+    u64 m_staticArraysMaterialRevision = 0;
+    u64 m_staticArraysVariantRevision = 0;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;

@@ -128,16 +128,27 @@ static framegraph::VirtualResourceHandle ImportRTBuffer(framegraph::FrameGraph& 
 }
 
 static bool EnsureRTBuffer(nvrhi::IDevice* device, nvrhi::BufferHandle& buffer,
-    const nvrhi::BufferDesc& desc)
+    const nvrhi::BufferDesc& desc, bool* reallocated = nullptr)
 {
     R_ASSERT(desc.byteSize != 0);
-    if (!buffer || buffer->getDesc().byteSize < desc.byteSize ||
-        buffer->getDesc().structStride != desc.structStride)
+    if (reallocated)
+        *reallocated = false;
+    const bool strideMatches = buffer && buffer->getDesc().structStride == desc.structStride;
+    if (strideMatches && buffer->getDesc().byteSize >= desc.byteSize)
+        return true;
+    nvrhi::BufferDesc grown = desc;
+    if (strideMatches)
     {
-        buffer = device->createBuffer(desc);
-        if (!buffer)
-            return false;
+        const u64 previous = buffer->getDesc().byteSize;
+        grown.byteSize = std::max(desc.byteSize, previous + previous / 2);
     }
+    if (desc.structStride)
+        grown.byteSize = (grown.byteSize + desc.structStride - 1) / desc.structStride * desc.structStride;
+    buffer = device->createBuffer(grown);
+    if (!buffer)
+        return false;
+    if (reallocated)
+        *reallocated = true;
     return true;
 }
 
@@ -277,6 +288,9 @@ static constexpr u32 RT_SOURCE_STATIC = 0;
 static constexpr u32 RT_SOURCE_TERRAIN = 1;
 static constexpr u32 RT_SOURCE_TRANSPARENT = 2;
 static constexpr u32 RT_SOURCE_COUNT = 3;
+static constexpr u32 RT_TABLE_EMISSIVE = 1u << 0;
+static constexpr u32 RT_TABLE_TRANSFORMS = 1u << 1;
+static constexpr u32 RT_TABLE_OFFSETS = 1u << 2;
 
 static u64 RTIdentity(u64 seed, u64 value)
 {
@@ -425,6 +439,10 @@ void RTAccelStructManager::Shutdown()
     m_textureScratch.shrink_to_fit();
     m_staticIdentityHash = 0;
     m_staticIdentityBuildCount = UINT32_MAX;
+    m_staticArraysHash = 0;
+    m_staticArraysBuildCount = UINT32_MAX;
+    m_staticArraysMaterialRevision = 0;
+    m_staticArraysVariantRevision = 0;
     InvalidateShaderPipelines();
     m_device = nullptr;
     m_rtSupported = false;
@@ -630,52 +648,64 @@ void RTAccelStructManager::HashSceneData(u64& signature, const void* data, size_
     }
 }
 
-u64 RTAccelStructManager::ComputeStaticSignature(const GPUCullingManager* gpu) const
+u64 RTAccelStructManager::ComputeStaticSignature(const GPUCullingManager* gpu)
 {
     u64 signature = 14695981039346656037ull;
     const auto* vertices = gpu->GetRTVertexBuffer();
     const auto* indices = gpu->GetRTIndexBuffer();
     HashSceneData(signature, &vertices, sizeof(vertices));
     HashSceneData(signature, &indices, sizeof(indices));
-    auto append = [&](const auto& values)
+    auto append = [](u64& target, const auto& values)
     {
         const size_t count = values.size();
-        HashSceneData(signature, &count, sizeof(count));
-        HashSceneData(signature, values.data(), count * sizeof(*values.data()));
+        HashSceneData(target, &count, sizeof(count));
+        HashSceneData(target, values.data(), count * sizeof(*values.data()));
     };
-    auto appendInstanceShape = [&](const xr_vector<GPUInstanceData>& instances)
+    auto appendInstanceShape = [](u64& target, const xr_vector<GPUInstanceData>& instances)
     {
         const size_t count = instances.size();
-        HashSceneData(signature, &count, sizeof(count));
+        HashSceneData(target, &count, sizeof(count));
         for (const auto& instance : instances)
         {
             const u8 identityTransform = IsIdentityWorld(instance.world) ? 1u : 0u;
-            HashSceneData(signature, &identityTransform, sizeof(identityTransform));
+            HashSceneData(target, &identityTransform, sizeof(identityTransform));
         }
     };
-    auto appendOpacity = [&](const xr_vector<u32>& materials, bool terrain)
+    auto appendOpacity = [](u64& target, const xr_vector<u32>& materials, bool terrain)
     {
         const size_t count = materials.size();
-        HashSceneData(signature, &count, sizeof(count));
+        HashSceneData(target, &count, sizeof(count));
         for (u32 materialID : materials)
         {
             const u8 opaque = IsOpaqueMaterialForRT(materialID, terrain) ? 1u : 0u;
-            HashSceneData(signature, &opaque, sizeof(opaque));
+            HashSceneData(target, &opaque, sizeof(opaque));
         }
     };
-    append(gpu->GetStaticDrawArgsData());
-    appendInstanceShape(gpu->GetStaticInstanceData());
-    append(gpu->GetStaticBatchVertexCounts());
-    append(gpu->GetStaticMaterialIDData());
-    appendOpacity(gpu->GetStaticMaterialIDData(), false);
-    append(gpu->GetTerrainDrawArgsData());
-    append(gpu->GetTerrainMaterialIDData());
-    appendOpacity(gpu->GetTerrainMaterialIDData(), true);
-    appendInstanceShape(gpu->GetTerrainInstanceData());
-    append(gpu->GetTransparentDrawArgsData());
-    append(gpu->GetTransparentMaterialIDData());
-    appendOpacity(gpu->GetTransparentMaterialIDData(), false);
-    appendInstanceShape(gpu->GetTransparentInstanceData());
+    const u64 materialRevision = bindless::MaterialBuffer::Instance().GetRevision();
+    const u64 variantRevision = bindless::VariantBuffer::Instance().GetRevision();
+    if (m_staticArraysBuildCount != gpu->GetStaticBuildCount() || m_staticArraysMaterialRevision != materialRevision ||
+        m_staticArraysVariantRevision != variantRevision)
+    {
+        u64 arrays = RT_IDENTITY_SEED;
+        append(arrays, gpu->GetStaticDrawArgsData());
+        appendInstanceShape(arrays, gpu->GetStaticInstanceData());
+        append(arrays, gpu->GetStaticBatchVertexCounts());
+        append(arrays, gpu->GetStaticMaterialIDData());
+        appendOpacity(arrays, gpu->GetStaticMaterialIDData(), false);
+        append(arrays, gpu->GetTerrainDrawArgsData());
+        append(arrays, gpu->GetTerrainMaterialIDData());
+        appendOpacity(arrays, gpu->GetTerrainMaterialIDData(), true);
+        appendInstanceShape(arrays, gpu->GetTerrainInstanceData());
+        m_staticArraysHash = arrays;
+        m_staticArraysBuildCount = gpu->GetStaticBuildCount();
+        m_staticArraysMaterialRevision = materialRevision;
+        m_staticArraysVariantRevision = variantRevision;
+    }
+    HashSceneData(signature, &m_staticArraysHash, sizeof(m_staticArraysHash));
+    append(signature, gpu->GetTransparentDrawArgsData());
+    append(signature, gpu->GetTransparentMaterialIDData());
+    appendOpacity(signature, gpu->GetTransparentMaterialIDData(), false);
+    appendInstanceShape(signature, gpu->GetTransparentInstanceData());
     return signature;
 }
 
@@ -1920,13 +1950,16 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     R_ASSERT(scene.batchIdentities.size() == scene.batches.size());
     R_ASSERT(scene.emissiveBatchOffsets.size() == scene.batches.size());
     scene.emissiveCount = u32(scene.emissiveTriangles.size());
+    bool emissiveReallocated = false;
+    bool transformsReallocated = false;
+    bool offsetsReallocated = false;
     if (!EnsureRTBuffer(device, scene.batchInfo, batches) ||
         !EnsureRTBuffer(device, scene.emissiveTriangleBuffer, RTTableBufferDesc("RT_EmissiveTriangles",
-            sizeof(RTEmissiveTriangle), scene.emissiveTriangles.size())) ||
+            sizeof(RTEmissiveTriangle), scene.emissiveTriangles.size()), &emissiveReallocated) ||
         !EnsureRTBuffer(device, scene.batchTransformBuffer, RTTableBufferDesc("RT_BatchTransforms",
-            sizeof(RTBatchTransform), scene.batchTransforms.size())) ||
+            sizeof(RTBatchTransform), scene.batchTransforms.size()), &transformsReallocated) ||
         !EnsureRTBuffer(device, scene.emissiveBatchOffsetBuffer, RTTableBufferDesc("RT_EmissiveBatchOffsets",
-            sizeof(u32), scene.emissiveBatchOffsets.size())) ||
+            sizeof(u32), scene.emissiveBatchOffsets.size()), &offsetsReallocated) ||
         !EnsureRTBuffer(device, scene.grassMaterials, RTTableBufferDesc("RT_GrassMaterials",
             sizeof(Fvector4), sizeof(FGDetailManager::GrassMaterialConstants) / sizeof(Fvector4))))
     {
@@ -1934,6 +1967,12 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
         m_scene.reset();
         return;
     }
+    if (emissiveReallocated)
+        scene.tableClearMask |= RT_TABLE_EMISSIVE;
+    if (transformsReallocated)
+        scene.tableClearMask |= RT_TABLE_TRANSFORMS;
+    if (offsetsReallocated)
+        scene.tableClearMask |= RT_TABLE_OFFSETS;
     scene.sourceMaterials = bindless::MaterialBuffer::Instance().GetBuffer();
     scene.sourceTerrainMaterials = bindless::TerrainMaterialBuffer::Instance().GetBuffer();
     scene.sourceVariants = bindless::VariantBuffer::Instance().GetBuffer();
@@ -2418,35 +2457,39 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
 void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     const framegraph::FrameGraph& graph, nvrhi::ICommandList* commandList)
 {
-    const auto& scene = *data.scene;
+    auto& scene = *data.scene;
     const bool full = data.scope == RTBuildScope::Full;
     auto buffer = [&](framegraph::VirtualResourceHandle handle)
     {
         return graph.GetPhysicalBuffer(handle);
     };
-    auto upload = [&](framegraph::VirtualResourceHandle handle, const void* contents, size_t bytes)
+    auto upload = [&](framegraph::VirtualResourceHandle handle, const void* contents, size_t bytes, u32 clearBit)
     {
         auto* destination = buffer(handle);
+        if (scene.tableClearMask & clearBit)
+        {
+            static const u8 zeros[65536] = {};
+            const u64 capacity = destination->getDesc().byteSize;
+            for (u64 offset = 0; offset < capacity;)
+            {
+                const u64 remaining = capacity - offset;
+                const u64 chunk = remaining < sizeof(zeros) ? remaining : sizeof(zeros);
+                commandList->writeBuffer(destination, zeros, size_t(chunk), offset);
+                offset += chunk;
+            }
+            scene.tableClearMask &= ~clearBit;
+        }
         if (bytes)
             commandList->writeBuffer(destination, contents, bytes);
-        const u64 capacity = destination->getDesc().byteSize;
-        const u8 zeros[64] = {};
-        for (u64 offset = bytes; offset < capacity;)
-        {
-            const u64 remaining = capacity - offset;
-            const u64 chunk = remaining < sizeof(zeros) ? remaining : sizeof(zeros);
-            commandList->writeBuffer(destination, zeros, size_t(chunk), offset);
-            offset += chunk;
-        }
     };
     if (full)
     {
         commandList->writeBuffer(buffer(data.resources.batchInfo), scene.batches.data(),
             scene.batches.size() * sizeof(RTBatchInfo));
         upload(data.resources.emissiveTriangles, scene.emissiveTriangles.data(),
-            scene.emissiveTriangles.size() * sizeof(RTEmissiveTriangle));
+            scene.emissiveTriangles.size() * sizeof(RTEmissiveTriangle), RT_TABLE_EMISSIVE);
         upload(data.resources.emissiveBatchOffsets, scene.emissiveBatchOffsets.data(),
-            scene.emissiveBatchOffsets.size() * sizeof(u32));
+            scene.emissiveBatchOffsets.size() * sizeof(u32), RT_TABLE_OFFSETS);
         auto* source = buffer(data.sourceMaterials);
         commandList->copyBuffer(buffer(data.resources.materials), 0, source, 0, source->getDesc().byteSize);
         source = buffer(data.sourceTerrainMaterials);
@@ -2455,7 +2498,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
         commandList->copyBuffer(buffer(data.resources.variants), 0, source, 0, source->getDesc().byteSize);
     }
     upload(data.resources.batchTransforms, scene.batchTransforms.data(),
-        scene.batchTransforms.size() * sizeof(RTBatchTransform));
+        scene.batchTransforms.size() * sizeof(RTBatchTransform), RT_TABLE_TRANSFORMS);
     FGDetailManager::GrassMaterialConstants grassMaterialConstants = {};
     if (data.detailManager)
         data.detailManager->FillGrassMaterialConstants(grassMaterialConstants);
