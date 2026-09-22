@@ -366,12 +366,23 @@ RTLightList RTResolveLightList(RTSceneParams scene, float3 position, bool primar
     list.offset = 0u;
     list.count = scene.lightCount;
     list.indexed = false;
-    if (!primary || scene.clusterLights == 0u || list.count == 0u || !(cluster_params.w > 0.0))
+    if (scene.clusterLights == 0u || list.count == 0u || !(cluster_params.w > 0.0))
         return list;
     float linearDepth = mul(m_V, float4(position, 1.0)).z;
     if (!(linearDepth > 0.0) || linearDepth > cluster_scales.y)
         return list;
-    uint clusterIdx = GetClusterIndex(float2(scene.clusterPixel) + 0.5, linearDepth, cluster_params.xyz, cluster_scales);
+    float2 screenPos = float2(scene.clusterPixel) + 0.5;
+    if (!primary)
+    {
+        float4 clip = mul(m_VP, float4(position, 1.0));
+        if (!(clip.w > 0.0))
+            return list;
+        float2 ndc = clip.xy / clip.w;
+        if (any(abs(ndc) > 1.0))
+            return list;
+        screenPos = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5) * screen_res.xy;
+    }
+    uint clusterIdx = GetClusterIndex(screenPos, linearDepth, cluster_params.xyz, cluster_scales);
     uint2 clusterData = g_ClusterGrid[clusterIdx];
     list.indexed = clusterData.x != 0xFFFFFFFFu;
     list.offset = list.indexed ? clusterData.x : 0u;
