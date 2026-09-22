@@ -18,6 +18,7 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
+#include <limits>
 #include <nvrhi/utils.h>
 
 namespace fg
@@ -216,16 +217,65 @@ static float ComputeCameraConeSpread(const Fmatrix& invViewProj, const Fvector& 
     return std::isfinite(spread) ? spread : 0.0f;
 }
 
-static void ApplyLiveCameraSettings(StaticGlobals& target, const Fmatrix& invViewProj)
+bool PathTracerHistory::MatchesCamera(const Fmatrix& view, const Fmatrix& project, const Fvector& position) const
+{
+    const auto positionMatches = [](float current, float previous)
+    {
+        if (!std::isfinite(current) || !std::isfinite(previous))
+            return false;
+        const float tolerance = std::max(1e-4f, 4.0f * std::numeric_limits<float>::epsilon() * fabsf(previous));
+        return fabsf(current - previous) <= tolerance;
+    };
+    if (!valid ||
+        !positionMatches(position.x, parameters.cameraPos_pad.x) ||
+        !positionMatches(position.y, parameters.cameraPos_pad.y) ||
+        !positionMatches(position.z, parameters.cameraPos_pad.z))
+        return false;
+
+    for (u32 row = 0; row < 3; ++row)
+    {
+        for (u32 column = 0; column < 4; ++column)
+        {
+            if (!(fabsf(view.m[row][column] - cameraView.m[row][column]) <= 1e-6f))
+                return false;
+        }
+    }
+    if (view._44 != cameraView._44)
+        return false;
+
+    const bool perspective = project._34 == 1.0f && project._44 == 0.0f &&
+        cameraProject._34 == 1.0f && cameraProject._44 == 0.0f;
+    for (u32 row = 0; row < 4; ++row)
+    {
+        for (u32 column = 0; column < 4; ++column)
+        {
+            const float current = project.m[row][column];
+            const float previous = cameraProject.m[row][column];
+            if (!std::isfinite(current) || !std::isfinite(previous))
+                return false;
+            if (perspective && column == 2 && row >= 2)
+                continue;
+            const float tolerance = 1e-6f * std::max(1.0f, std::max(fabsf(current), fabsf(previous)));
+            if (!(fabsf(current - previous) <= tolerance))
+                return false;
+        }
+    }
+    return true;
+}
+
+static void ApplyCameraSettings(StaticGlobals& target, const PathTracerData& data)
 {
     const StaticGlobals live = BuildStaticGlobals();
-    target.m_V = live.m_V;
-    target.m_P = live.m_P;
-    target.m_VP = live.m_VP;
-    target.m_InvVP = invViewProj;
-    target.eye_position = live.eye_position;
-    target.camera_direction = live.camera_direction;
-    target.pos_decompression_params = live.pos_decompression_params;
+    target.m_V = data.cameraView;
+    target.m_P = data.cameraProject;
+    target.m_VP.mul(data.cameraProject, data.cameraView);
+    target.m_InvVP = data.cbData.invViewProj;
+    target.eye_position.set(data.cbData.cameraPos_pad.x, data.cbData.cameraPos_pad.y, data.cbData.cameraPos_pad.z);
+    target.camera_direction.set(data.cameraView._13, data.cameraView._23, data.cameraView._33, 0.0f);
+    const float horizontalTan = 1.0f / data.cameraProject._11;
+    const float verticalTan = -1.0f / data.cameraProject._22;
+    target.pos_decompression_params.set(horizontalTan, verticalTan,
+        2.0f * horizontalTan / data.cbData.screenWidth, 2.0f * verticalTan / data.cbData.screenHeight);
     target.pos_decompression_params2 = live.pos_decompression_params2;
     target.screen_res = live.screen_res;
     target.parallax = live.parallax;
@@ -592,7 +642,7 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
 
 PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, VirtualResourceHandle sceneColorIn,
     const ClusterLightOutput& clusterLights, LightingFrameState& lighting, const PathTracerConfig& config,
-    const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
+    const Fmatrix& view, const Fmatrix& project, const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
     PathTracerPassState& state)
 {
     state.pending.valid = false;
@@ -804,6 +854,18 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     cbData.cameraConeSpread = ComputeCameraConeSpread(invViewProj, cameraPos, width, height);
     cbData.transportPad = 0.0f;
 
+    const auto& history = state.history;
+    state.pending.cameraView = view;
+    state.pending.cameraProject = project;
+    if (frozen && history.snapshot == state.snapshot && history.MatchesCamera(view, project, cameraPos))
+    {
+        state.pending.cameraView = history.cameraView;
+        state.pending.cameraProject = history.cameraProject;
+        cbData.invViewProj = history.parameters.invViewProj;
+        cbData.cameraPos_pad = history.parameters.cameraPos_pad;
+        cbData.cameraConeSpread = history.parameters.cameraConeSpread;
+    }
+
     state.pending.parameters = cbData;
     state.pending.sky0 = sky0Used;
     state.pending.sky1 = sky1Used;
@@ -824,7 +886,6 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         state.pending.foliageParams2 = liveGlobals.foliage_params2;
     }
 
-    const auto& history = state.history;
     u32 sampleIndex = 0;
     const bool historyMatches = history.valid && history.sceneRevision == state.pending.sceneRevision &&
         history.textureRevision == state.pending.textureRevision &&
@@ -885,6 +946,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.width = width;
             data.height = height;
             data.cbData = cbData;
+            data.cameraView = state.pending.cameraView;
+            data.cameraProject = state.pending.cameraProject;
             data.sampleCount = sampleCount;
             data.staticDetailInstanceCount = frozen ? state.snapshot->scene->staticDetailInstanceCount :
                 accelMgr->GetScene()->staticDetailInstanceCount;
@@ -927,7 +990,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
                     return;
                 }
                 StaticGlobals patched = data.globals->values;
-                ApplyLiveCameraSettings(patched, data.cbData.invViewProj);
+                ApplyCameraSettings(patched, data);
                 cmdList->writeBuffer(data.staticGlobals, &patched, sizeof(StaticGlobals));
                 staticGlobals = data.staticGlobals;
             }
