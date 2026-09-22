@@ -52,15 +52,22 @@ static u32 MaterialObjectFlags(u32 materialID)
     return 0u;
 }
 
-static bool MaterialCastsShadow(u32 materialID)
+bool GPUCullingManager::MaterialCastsShadow(u32 materialID)
 {
     const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
     if (!material)
         return true;
-    if (material->flags & bindless::MAT_FLAG_ALPHA_BLEND)
+    const bool blended = (material->flags & bindless::MAT_FLAG_ALPHA_BLEND) != 0u;
+    if (blended && (material->flags & bindless::MAT_FLAG_WATER) != 0u)
         return false;
-    const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant);
-    return !variant || variant->castsShadow;
+    if (const auto* variant = bindless::VariantBuffer::Instance().Get(material->shaderVariant))
+    {
+        const u32 excludedFlags = bindless::VARIANT_FLAG_NO_SHADOW
+            | (blended ? bindless::VARIANT_FLAG_ADDITIVE_EMISSION : 0u);
+        return (variant->flags & excludedFlags) == 0u;
+    }
+    const auto* registry = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant);
+    return !registry || registry->castsShadow;
 }
 
 static u32 TransparentKeyForMaterial(u32 materialID)
@@ -849,12 +856,12 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
     }
 
     if (!m_staticUploaded) {
-        BuildStaticGeometryInstances();
+        BuildStaticGeometryInstances(geometry);
         m_geometryHistoryFrame = 0;
     }
     m_staticHistoryValid = m_geometryHistoryFrame != 0 && m_geometryHistoryFrame + 1u == Device.dwFrame;
     m_geometryHistoryFrame = Device.dwFrame;
-    BuildDynamicGeometryInstances();
+    BuildDynamicGeometryInstances(geometry);
     m_clusterSet.traversalDepth = m_clusterDAG.MaxAssetNodeDepth();
     if (m_clusterSet.traversalDepth > kMaxClusterTraversalDepth)
         FATAL_F("[GPUCulling] asset hierarchy depth %u exceeds the supported traversal depth %u",
@@ -918,10 +925,12 @@ void GPUCullingManager::UploadSceneObjects(fg::RenderContext* ctx)
 
     UploadGeometryTables(cmdList);
 
-    if (m_staticObjectCount > 0 && !m_staticUploaded) {
+    if (!m_staticUploaded && (m_staticObjectCount > 0 || m_clusterSet.instanceCount > 0))
+    {
         m_staticUploaded = true;
         m_staticDataCached = true;
-        Msg("* [GPUCulling] Static object data prepared: %u objects", m_staticObjectCount);
+        Msg("* [GPUCulling] Static object data prepared: %u objects, %u cluster instances",
+            m_staticObjectCount, m_clusterSet.instanceCount);
     }
 
     if (m_clusterSet.uploaded) {
@@ -1146,6 +1155,22 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
     u64 hudEntryDemand = 0;
     u64 vertexDemand = 0;
 
+    auto resolveSkinnedKind = [](const GeometryBatch& batch, u8& kind) -> bool
+    {
+        const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
+        if (forward && kind == 0u)
+            kind = 3u;
+        const bool formatValid = batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
+            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT;
+        if (!formatValid)
+            return false;
+        if (!forward || kind == 3u)
+            return true;
+        if (kind != 1u)
+            return false;
+        return MaterialCastsShadow(batch.bindlessMaterialID);
+    };
+
     auto account = [&](const GeometryBatch& batch, u8 kind)
     {
         if (!batch.isSkinned)
@@ -1153,25 +1178,21 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
         PrepareSkeletonPalette(GetBatchSkeleton(batch));
         if (kind != 2u)
             ++m_skinnedObjectCount;
-        const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
-        const bool pooled = batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
-            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT
-            && !(forward && kind != 0u);
-        if (!pooled)
+        if (!resolveSkinnedKind(batch, kind))
             return;
-        if (forward)
-            kind = 3u;
 
         ++pooledTotal;
         vertexDemand += batch.vertexCount;
         chunkDemand += (u64(batch.vertexCount) + SKINNED_CHUNK_VERTICES - 1ull) / SKINNED_CHUNK_VERTICES;
+        const u64 entries = (u64(batch.indexCount) + SKINNED_ENTRY_INDICES - 1ull) / SKINNED_ENTRY_INDICES;
         if (kind != 3u)
         {
-            const u64 entries = (u64(batch.indexCount) + SKINNED_ENTRY_INDICES - 1ull) / SKINNED_ENTRY_INDICES;
             entryDemand += entries;
             if (kind == 2u)
                 hudEntryDemand += entries;
         }
+        else if (MaterialCastsShadow(batch.bindlessMaterialID))
+            entryDemand += entries;
     };
 
     for (const auto& batch : geometry->GetBatches())
@@ -1202,15 +1223,8 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
     EnsureSkinnedEntryBuffers(nvDevice, u32(entryDemand), u32(hudEntryDemand));
 
     auto addBatch = [&](const GeometryBatch& batch, u8 kind) {
-        const bool forward = (MaterialObjectFlags(batch.bindlessMaterialID) & GPU_OBJECT_NO_RESOLVE) != 0;
-        const bool pooled = batch.skinnedPoolFormat >= SkinnedGeometryPools::FIRST_FORMAT
-            && batch.skinnedPoolFormat < SkinnedGeometryPools::FORMAT_COUNT
-            && !(forward && kind != 0u);
-        if (!pooled) {
+        if (!resolveSkinnedKind(batch, kind))
             return;
-        }
-        if (forward)
-            kind = 3u;
 
         CKinematics* skeleton = GetBatchSkeleton(batch);
 
@@ -1290,7 +1304,9 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
                     m_skinnedChunkData.push_back(chunk);
                 }
                 const u32 ibBase = formatIndexBase + batch.skinnedPoolFirstIndex;
-                if (kind == 3u) {
+                const bool castsShadow = MaterialCastsShadow(batch.bindlessMaterialID);
+                if (kind == 3u)
+                {
                     IndirectDrawArgs forwardArgs;
                     forwardArgs.indexCountPerInstance = batch.indexCount;
                     forwardArgs.instanceCount = 1;
@@ -1307,22 +1323,28 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
                     m_skinnedForwardInstanceData.push_back(inst);
                     m_skinnedForwardKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
                     m_skinnedForwardSort.push_back(batch.ssa);
-                } else {
+                }
+                if (kind != 3u || castsShadow)
+                {
+                    const bool shadowOnlyEntry = kind == 1u || kind == 3u;
                     GPUClusterEntry entry = {};
                     entry.sphere = rec.bounds;
                     entry.extent.set(rec.bounds.w, rec.bounds.w, rec.bounds.w, 0.0f);
                     entry.firstVertex = vertexTotal;
                     entry.batchIndex = slot;
                     entry.materialID = batch.bindlessMaterialID;
-                    entry.flags = GPU_CLUSTER_ENTRY_SKINNED | (kind == 2u ? GPU_CLUSTER_ENTRY_HUD : 0u) | (kind == 1u ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
-                    if (!MaterialCastsShadow(entry.materialID))
+                    entry.flags = GPU_CLUSTER_ENTRY_SKINNED
+                        | (kind == 2u ? GPU_CLUSTER_ENTRY_HUD : 0u)
+                        | (shadowOnlyEntry ? GPU_CLUSTER_ENTRY_SHADOW_ONLY : 0u);
+                    if (!castsShadow)
                         entry.flags |= GPU_CLUSTER_ENTRY_NO_SHADOW;
-                    for (u64 i0 = 0; i0 < batch.indexCount; i0 += SKINNED_ENTRY_INDICES) {
+                    for (u64 i0 = 0; i0 < batch.indexCount; i0 += SKINNED_ENTRY_INDICES)
+                    {
                         entry.indexCount = u32(std::min<u64>(SKINNED_ENTRY_INDICES, u64(batch.indexCount) - i0));
                         entry.ibFirst = ibBase + u32(i0);
                         if (kind == 2u)
                             m_skinnedHudEntryData.push_back(static_cast<u32>(m_skinnedEntryData.size()));
-                        (kind == 1u ? m_skinnedShadowEntryData : m_skinnedEntryData).push_back(entry);
+                        (shadowOnlyEntry ? m_skinnedShadowEntryData : m_skinnedEntryData).push_back(entry);
                     }
                 }
                 vertexTotal += vertexCount;
@@ -3247,7 +3269,7 @@ static float ConservativeScaleBound(const Fmatrix& m)
     return _sqrt(std::max(best, 0.0f));
 }
 
-void GPUCullingManager::BuildStaticGeometryInstances()
+void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* geometry)
 {
     m_geoInstanceData.clear();
     m_clusterRefData.clear();
@@ -3326,6 +3348,7 @@ void GPUCullingManager::BuildStaticGeometryInstances()
 
     u32 clusteredBatches = 0;
     u32 shadowOnlyBatches = 0;
+    u32 transparentShadowBatches = 0;
     u32 unallocatedBatches = 0;
 
     for (u32 i = 0; i < staticCount; ++i) {
@@ -3337,15 +3360,37 @@ void GPUCullingManager::BuildStaticGeometryInstances()
 
         u32 extraFlags = 0;
         if (m_staticObjectFlags[i] & GPU_OBJECT_NO_RESOLVE) {
-            const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(m_staticMaterialIDData[i]);
-            if (!mat || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
+            if (!MaterialCastsShadow(m_staticMaterialIDData[i]))
                 continue;
-            extraFlags = GPU_CLUSTER_ENTRY_SHADOW_ONLY;
+            extraFlags = GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT;
             ++shadowOnlyBatches;
         }
 
         if (emitInstance(bindBatch(key), m_staticInstanceData[i].world, m_staticMaterialIDData[i], extraFlags))
             ++clusteredBatches;
+    }
+
+    if (geometry)
+    {
+        const xr_vector<GeometryBatch>& staticBatches = geometry->GetStaticBatches();
+        for (u32 index : geometry->GetStaticTransparentIndices())
+        {
+            if (index >= staticBatches.size())
+                continue;
+            const GeometryBatch& batch = staticBatches[index];
+            if (batch.isSkinned || batch.isTerrain || !batch.megaBufferAlloc.valid)
+                continue;
+            if (!MaterialCastsShadow(batch.bindlessMaterialID))
+                continue;
+            ClusterMeshKey key = {};
+            key.vertexOffset = batch.megaBufferAlloc.vertexOffset;
+            key.indexOffset = batch.megaBufferAlloc.indexOffset;
+            key.vertexCount = batch.megaBufferAlloc.vertexCount;
+            key.indexCount = batch.megaBufferAlloc.indexCount;
+            if (emitInstance(bindBatch(key), batch.worldMatrix, batch.bindlessMaterialID,
+                    GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT))
+                ++transparentShadowBatches;
+        }
     }
 
     set.staticRefCount = u32(refTotal);
@@ -3371,15 +3416,15 @@ void GPUCullingManager::BuildStaticGeometryInstances()
     set.residualStaticCount = unallocatedBatches;
     set.residualTerrainCount = unallocatedTerrain;
 
-    Msg("* [GPUCulling] geometry instances: %u static (%u shadow-only) + %u terrain, %u references (%u static + %u terrain), %u hierarchy node references",
-        clusteredBatches, shadowOnlyBatches, clusteredTerrain, set.refCount, set.staticRefCount, set.terrainRefCount,
-        set.staticNodeRefs);
+    Msg("* [GPUCulling] geometry instances: %u static (%u shadow-only) + %u transparent casters + %u terrain, %u references (%u static + %u terrain), %u hierarchy node references",
+        clusteredBatches, shadowOnlyBatches, transparentShadowBatches, clusteredTerrain,
+        set.refCount, set.staticRefCount, set.terrainRefCount, set.staticNodeRefs);
     if (unallocatedBatches || unallocatedTerrain)
         Msg("! [GPUCulling] %u static and %u terrain batches have no mega-buffer allocation and are not part of the geometry path",
             unallocatedBatches, unallocatedTerrain);
 }
 
-void GPUCullingManager::BuildDynamicGeometryInstances()
+void GPUCullingManager::BuildDynamicGeometryInstances(const GeometryCollector* geometry)
 {
     ClusterCullBuffers& set = m_clusterSet;
     m_dynamicGeoInstanceData.clear();
@@ -3396,7 +3441,8 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
     nextHistory.clear();
 
     const bool tablesReady = !m_clusterDAG.Empty() && !m_clusterDAG.AssetMembers().empty();
-    if (tablesReady && dynamicCount > 0) {
+    if (tablesReady)
+    {
         const xr_vector<GPUClusterAssetMember>& members = m_clusterDAG.AssetMembers();
         const xr_vector<GPUClusterMeta>& meta = m_clusterDAG.ClusterMeta();
 
@@ -3404,23 +3450,9 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
         u64 nodeTotal = 0;
         u32 residual = 0;
 
-        for (u32 i = 0; i < dynamicCount; ++i) {
-            const ClusterMeshKey& key = m_dynamicBatchKeys[i];
-            if (key.indexCount == 0) {
-                ++residual;
-                continue;
-            }
-
-            u32 extraFlags = GPU_CLUSTER_ENTRY_DYNAMIC;
-            if (m_dynamicObjectFlags[i] & GPU_OBJECT_NO_RESOLVE) {
-                const auto* mat = bindless::MaterialBuffer::Instance().GetMaterial(m_dynamicMaterialIDData[i]);
-                if (!mat || (mat->flags & bindless::MAT_FLAG_ALPHA_BLEND))
-                    continue;
-                extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY;
-            }
-            if (m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY)
-                extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY;
-
+        auto emitDynamic = [&](const ClusterMeshKey& key, const Fmatrix& world, u32 materialID,
+            const GeometryInstanceKey& identity, u32 extraFlags)
+        {
             u32 assetMember = 0;
             if (!m_clusterDAG.FindAssetMember(key, assetMember))
                 FATAL_F("[GPUCulling] dynamic geometry v=%u+%u i=%u+%u has no cluster representation",
@@ -3428,10 +3460,7 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
 
             const GPUClusterAssetMember& am = members[assetMember];
             if (am.clusterCount == 0)
-                continue;
-
-            const Fmatrix& world = m_dynamicInstanceData[i].world;
-            const GeometryInstanceKey& identity = m_dynamicInstanceIdentities[i];
+                return;
 
             Fmatrix prevWorld = world;
             u32 historyValid = 0;
@@ -3448,7 +3477,6 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
             nextHistory[identity] = record;
 
             const bool terrain = (meta[am.firstCluster].flags & CLUSTER_META_FLAG_TERRAIN) != 0;
-            const u32 materialID = m_dynamicMaterialIDData[i];
             const bool castsShadow = terrain || MaterialCastsShadow(materialID);
 
             GPUGeoInstance inst;
@@ -3477,6 +3505,55 @@ void GPUCullingManager::BuildDynamicGeometryInstances()
             for (u32 c = 0; c < am.clusterCount; ++c) {
                 m_dynamicRefData.push_back(instanceIndex);
                 m_dynamicRefData.push_back(am.firstCluster + c);
+            }
+        };
+
+        for (u32 i = 0; i < dynamicCount; ++i) {
+            const ClusterMeshKey& key = m_dynamicBatchKeys[i];
+            if (key.indexCount == 0) {
+                ++residual;
+                continue;
+            }
+
+            u32 extraFlags = GPU_CLUSTER_ENTRY_DYNAMIC;
+            if (m_dynamicObjectFlags[i] & GPU_OBJECT_NO_RESOLVE) {
+                if (!MaterialCastsShadow(m_dynamicMaterialIDData[i]))
+                    continue;
+                extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT;
+            }
+            if (m_dynamicObjectFlags[i] & GPU_OBJECT_SHADOW_ONLY)
+                extraFlags |= GPU_CLUSTER_ENTRY_SHADOW_ONLY;
+
+            emitDynamic(key, m_dynamicInstanceData[i].world, m_dynamicMaterialIDData[i],
+                m_dynamicInstanceIdentities[i], extraFlags);
+        }
+
+        xr_set<GeometryInstanceKey> emittedTransparent;
+        if (geometry)
+        {
+            for (const GeometryBatch& batch : geometry->GetBatches())
+            {
+                if (batch.isSkinned || batch.isTerrain || !batch.IsStrictB2F())
+                    continue;
+                if (!batch.megaBufferAlloc.valid)
+                    continue;
+                if (!MaterialCastsShadow(batch.bindlessMaterialID))
+                    continue;
+
+                GeometryInstanceKey identity;
+                identity.renderable = batch.renderableLifetimeID;
+                identity.visual = batch.visualLifetimeID;
+                identity.subset = batch.geometrySubset;
+                if (!emittedTransparent.insert(identity).second)
+                    continue;
+
+                ClusterMeshKey key = {};
+                key.vertexOffset = batch.megaBufferAlloc.vertexOffset;
+                key.indexOffset = batch.megaBufferAlloc.indexOffset;
+                key.vertexCount = batch.megaBufferAlloc.vertexCount;
+                key.indexCount = batch.megaBufferAlloc.indexCount;
+                emitDynamic(key, batch.worldMatrix, batch.bindlessMaterialID, identity,
+                    GPU_CLUSTER_ENTRY_DYNAMIC | GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT);
             }
         }
 
@@ -4642,10 +4719,13 @@ MeshAllocation GPUCullingManager::RegisterRuntimeGeometry(
     alloc.valid = true;
     if ((source.flags & GEOMETRY_SOURCE_FORWARD) != 0)
         AppendForwardGeometry(alloc, leafSource);
-    else
+    if ((source.flags & GEOMETRY_SOURCE_SHADOW) != 0
+        || (source.flags & GEOMETRY_SOURCE_POLICY_MASK) == 0)
     {
+        const u32 leafFlags = (source.flags & ~GEOMETRY_SOURCE_POLICY_MASK)
+            | ((source.flags & GEOMETRY_SOURCE_SHADOW) != 0 ? CLUSTER_RANGE_FLAG_AT : 0u);
         u32 assetMember = 0;
-        if (!m_clusterDAG.AppendRuntimeLeafAsset(key, source.flags, leafSource, assetMember))
+        if (!m_clusterDAG.AppendRuntimeLeafAsset(key, leafFlags, leafSource, assetMember))
             FATAL_F("[GPUCulling] runtime geometry with %u vertices and %u indices cannot be represented as clusters",
                 source.vertexCount, source.indexCount);
         m_residency.RegisterRuntimePages();

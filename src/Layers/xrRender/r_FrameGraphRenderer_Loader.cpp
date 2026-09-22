@@ -609,6 +609,17 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
 
     xr_map<fg::ClusterMeshKey, u32> refCounts;
 
+    auto makeRange = [](const MeshAllocation& alloc)
+    {
+        fg::ClusterBakeRange range;
+        range.key.vertexOffset = alloc.vertexOffset;
+        range.key.indexOffset = alloc.indexOffset;
+        range.key.vertexCount = alloc.vertexCount;
+        range.key.indexCount = alloc.indexCount;
+        range.flags = 0;
+        return range;
+    };
+
     for (dxRender_Visual* visual : BufferPool.Visuals)
     {
         if (!visual)
@@ -685,18 +696,22 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
             && MaterialSystem::Instance().GetMaterialInfo(visual->shaderName).transparent;
         if (forward)
         {
+            const u32 materialID = m_materialCache
+                ? m_materialCache->PreRegisterBindlessMaterial(visual) : UINT32_MAX;
+            if (fg::GPUCullingManager::MaterialCastsShadow(materialID))
+            {
+                fg::ClusterBakeRange range = makeRange(alloc);
+                range.flags = fg::CLUSTER_RANGE_FLAG_AT;
+                ranges.push_back(range);
+                refCounts[range.key]++;
+            }
             gpuCulling->RetainForwardGeometry(alloc);
             continue;
         }
         shader_info::ShaderBlendInfo blendInfo;
         shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo);
 
-        fg::ClusterBakeRange range;
-        range.key.vertexOffset = alloc.vertexOffset;
-        range.key.indexOffset = alloc.indexOffset;
-        range.key.vertexCount = alloc.vertexCount;
-        range.key.indexCount = alloc.indexCount;
-        range.flags = 0;
+        fg::ClusterBakeRange range = makeRange(alloc);
         if (isTerrain) {
             range.flags |= fg::CLUSTER_RANGE_FLAG_TERRAIN;
             if (mergeableType)

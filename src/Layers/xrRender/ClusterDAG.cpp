@@ -1870,8 +1870,9 @@ void ClusterDAG::PageBuilder::Flush()
     xr_vector<u8>& payloadData = *payloadArena;
     const u64 vertexBase = vertexData.size();
     const u64 payloadBase = payloadData.size();
+    const u64 payloadEnd = payloadBase + pagePayload.size() + CLUSTER_PAYLOAD_TAIL_PAD;
     if (vertexBase + AlignUp(vertexBytes, CLUSTER_PAGE_ALIGNMENT) > UINT32_MAX
-        || payloadBase + pagePayload.size() + CLUSTER_PAGE_ALIGNMENT > UINT32_MAX)
+        || payloadEnd + CLUSTER_PAGE_ALIGNMENT > UINT32_MAX)
         FATAL("[ClusterDAG] compact geometry arena exceeds the addressable range");
 
     vertexData.resize(size_t(vertexBase) + AlignUp(vertexBytes, CLUSTER_PAGE_ALIGNMENT), 0);
@@ -1902,7 +1903,7 @@ void ClusterDAG::PageBuilder::Flush()
     }
 
     payloadData.insert(payloadData.end(), pagePayload.begin(), pagePayload.end());
-    payloadData.resize(AlignUp(u32(payloadData.size()), CLUSTER_PAGE_ALIGNMENT), 0);
+    payloadData.resize(AlignUp(u32(payloadEnd), CLUSTER_PAGE_ALIGNMENT), 0);
 
     GPUClusterPage& page = dag->m_pages[pageIndex];
     page.vertexBase = u32(vertexBase);

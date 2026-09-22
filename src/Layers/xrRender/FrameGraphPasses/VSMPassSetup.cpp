@@ -1591,7 +1591,7 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     }
     state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPage", *dynVsRefl, *psRefl, nvDevice);
     state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPageAT", *dynVsRefl, *atRefl, nvDevice);
-    state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *psRefl, nvDevice);
+    state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *atRefl, nvDevice);
     if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout) {
         state.dynPipelinesFailed = true;
         return false;
@@ -1626,7 +1626,7 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
     xr_sprintf(name, "VSMDynPageAT_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
     state.dynPageATPipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynPageVS, state.pageATPS, state.dynPageATLayout, true), fbInfo, nvDevice);
     xr_sprintf(name, "VSMDynSkinPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
-    state.dynSkinPagePipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynSkinPageVS, state.pagePS, state.dynSkinPageLayout, false), fbInfo, nvDevice);
+    state.dynSkinPagePipeline = cache.GetOrCreatePipeline(name, makeDesc(state.dynSkinPageVS, state.pageATPS, state.dynSkinPageLayout, true), fbInfo, nvDevice);
     {
         nvrhi::GraphicsPipelineDesc clearDesc;
         clearDesc.VS = state.dynClearVS;
@@ -1959,15 +1959,16 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     nvrhi::IBuffer* preVB = cfg.geometry.deformedVertices;
     nvrhi::IBuffer* skinnedIB = cfg.geometry.skinnedIndices;
     if (gpuCulling.GetSkinnedEntryCount() > 0 && skinnedEntries && preVB && skinnedIB) {
-        BindingSetBuilder bsb(*skinVsRefl, *psRefl, nvDevice, "VSM.DynSkinPage");
+        BindingSetBuilder bsb(*skinVsRefl, *atRefl, nvDevice, "VSM.DynSkinPage");
         bsb.ConstantBuffer("VsmParams", vsmCB)
            .BufferSRV("g_Pairs", state.dynPairs[2])
            .BufferSRV("g_Entries", skinnedEntries)
            .BufferSRV("g_PageList", state.dynPageList)
            .BufferSRV("g_SkinnedVB", preVB)
-           .BufferSRV("g_SkinnedIB", skinnedIB);
+           .BufferSRV("g_SkinnedIB", skinnedIB)
+           .BufferSRV("g_Materials", cfg.geometry.materials);
         if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.dynSkinPageLayout, nvDevice))
-            draw(state.dynSkinPagePipeline, bindingSet, state.dynArgs[2], false);
+            draw(state.dynSkinPagePipeline, bindingSet, state.dynArgs[2], true);
     }
 }
 

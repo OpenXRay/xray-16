@@ -230,6 +230,7 @@ private:
     public:
         u64 id = 0;
         u64 lease = 0;
+        bool usesCookBytes = false;
         xr_vector<u32> uploadedPages;
         nvrhi::BufferHandle vertexCopySource;
         nvrhi::BufferHandle payloadCopySource;
@@ -286,6 +287,7 @@ private:
     bool m_active = false;
     bool m_tablesInitialized = false;
     bool m_cookBytesReleased = false;
+    bool m_cookDemandStarted = false;
     u32 m_ioEpoch = 0;
     shared_str m_storePath;
     u64 m_storeIdentity = 0;

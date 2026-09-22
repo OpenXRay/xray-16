@@ -2351,7 +2351,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             source.indexCount = batch.indexCount;
             source.flags = batch.isAlphaTested ? fg::CLUSTER_RANGE_FLAG_AT : 0u;
             if (batch.isTransparent)
+            {
                 source.flags |= fg::GEOMETRY_SOURCE_FORWARD;
+                if (fg::GPUCullingManager::MaterialCastsShadow(batch.bindlessMaterialID))
+                    source.flags |= fg::GEOMETRY_SOURCE_SHADOW | fg::CLUSTER_RANGE_FLAG_AT;
+            }
             source.vertexStride = stride;
             source.vertexFormat = bindless::BuildSourceVertexLayout(
                 meshVisual->rm_geom->dcl->dcl_code.data(), stride).Signature();

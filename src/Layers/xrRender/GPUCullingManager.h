@@ -198,6 +198,8 @@ public:
 static_assert(sizeof(ForwardVertex) == 60);
 
 constexpr u32 GEOMETRY_SOURCE_FORWARD = 1u << 31;
+constexpr u32 GEOMETRY_SOURCE_SHADOW = 1u << 30;
+constexpr u32 GEOMETRY_SOURCE_POLICY_MASK = GEOMETRY_SOURCE_FORWARD | GEOMETRY_SOURCE_SHADOW;
 
 struct GPUInstanceData {
     Fmatrix world;          // World transform (64 bytes)
@@ -765,7 +767,7 @@ private:
     u32 m_dynamicHistoryFrame = 0;
     u32 m_geometryHistoryFrame = 0;
     bool m_staticHistoryValid = false;
-    void BuildDynamicGeometryInstances();
+    void BuildDynamicGeometryInstances(const GeometryCollector* geometry);
     nvrhi::ComputePipelineHandle m_clusterInstancePipeline;
     nvrhi::BindingLayoutHandle m_clusterInstanceLayout;
     nvrhi::ComputePipelineHandle m_clusterNodePipeline;
@@ -780,7 +782,7 @@ private:
     fg::BufferHandle m_clusterArgsParamsCB;
     fg::BufferHandle m_clusterQueueParamsCB;
 
-    void BuildStaticGeometryInstances();
+    void BuildStaticGeometryInstances(const GeometryCollector* geometry);
     bool EnsureGeometryTableBuffers(nvrhi::IDevice* nvDevice);
     void UploadGeometryTables(nvrhi::ICommandList* cmdList);
     bool EnsureClusterStreamBuffers(nvrhi::IDevice* nvDevice);
@@ -1091,6 +1093,8 @@ public:
         u32 ibID, u32 iBase, u32 iCount,
         bool alternative = false
     ) const;
+
+    static bool MaterialCastsShadow(u32 materialID);
 
     void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges,
         const char* cachePath, u64 geomStamp);
