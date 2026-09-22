@@ -19,14 +19,9 @@
 #include "Layers/xrRender/FGDetailManager.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "xrEngine/IRenderBackend.h"
-#include "xrEngine/IGame_Persistent.h"
-#include "xrEngine/Environment.h"
 #include <nvrhi/utils.h>
 #include <tuple>
 
-extern ENGINE_API float ps_r3_grass_blade_width;
-extern ENGINE_API float ps_r3_grass_blade_height;
-extern ENGINE_API float ps_r3_grass_wind_displacement;
 
 namespace xray::render::fg
 {
@@ -391,6 +386,8 @@ bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
         return false;
     if (scene.counts.grass && (!scene.grassVertices || !scene.grassIndices || !scene.grassBuild.handle))
         return false;
+    if (scene.counts.grass && (!scene.grassWind || !scene.grassInteraction[0] || !scene.grassInteraction[1]))
+        return false;
     if (!scene.grassJobs.empty() && (!scene.grassPipeline || !scene.grassLayout || !scene.grassWind ||
         !scene.grassFrame || !scene.grassFrame->source))
         return false;
@@ -516,6 +513,8 @@ void RTAccelStructManager::RetireScenes()
             it->scene->pulledPipeline = nullptr;
             it->scene->pulledLayout = nullptr;
             it->scene->grassWind = nullptr;
+            for (auto& texture : it->scene->grassInteraction)
+                texture = nullptr;
             it->scene->detailMeshBatchStart = UINT32_MAX;
             it->scene->staticDetailBatchStart = UINT32_MAX;
             it->scene->staticDetailInstanceCount = 0;
@@ -646,20 +645,11 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
         append(detail->buildDetailsBindlessIndex);
         append(detail->buildDetailsPbrBindlessIndex);
         append(detail->buildDetailsBumpBindlessIndex);
-        if (frame->source->params.grassMode &&
-            (frame->stats.visibleLOD0Count || frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count))
-        {
-            append(ps_r3_grass_blade_height);
-            append(ps_r3_grass_blade_width);
-            append(ps_r3_grass_wind_displacement);
-            append(Device.fTimeGlobal);
-            if (ps_r3_grass_wind_displacement != 0.0f)
-            {
-                append(detail->windSpeed);
-                if (g_pGamePersistent)
-                    append(g_pGamePersistent->Environment().CurrentEnv.wind_direction);
-            }
-        }
+        const bool procedural = frame->source->params.grassMode &&
+            (frame->stats.visibleLOD0Count || frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count);
+        const bool waved = !frame->source->params.grassMode && frame->stats.visibleBillboardCount;
+        if (procedural || waved)
+            append(Device.dwFrame);
     }
     return signature;
 }
@@ -1312,6 +1302,22 @@ bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool ne
     const auto& stats = frame->stats;
     const bool waved = !source.params.grassMode && stats.visibleBillboardCount != 0;
     const bool staticDetail = stats.visibleDecalCount != 0;
+    const bool procedural = source.params.grassMode &&
+        (stats.visibleLOD0Count || stats.visibleLOD1Count || stats.visibleLOD2Count);
+    if (waved || staticDetail || procedural)
+    {
+        if (!detail->visibilityFrame || !detail->perlin4dTexture ||
+            !detail->interactionTexture[0] || !detail->interactionTexture[1])
+            return false;
+    }
+    if (waved || procedural)
+    {
+        if (!detail->perlin4dPipeline || !detail->perlin4dCB.IsValid() ||
+            !m_device->GetNativeBuffer(detail->perlin4dCB) || !detail->interactionPipeline ||
+            !detail->interactionCB.IsValid() || !m_device->GetNativeBuffer(detail->interactionCB) ||
+            !detail->interactionEntityBuffer || !detail->heightmapTexture)
+            return false;
+    }
     if (waved || staticDetail)
     {
         if (source.maxPulledIndexCount / 3 * 3 == 0)
@@ -1349,6 +1355,9 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     scene.grassLayout = nullptr;
     scene.pulledPipeline = nullptr;
     scene.pulledLayout = nullptr;
+    scene.grassWind = nullptr;
+    for (auto& texture : scene.grassInteraction)
+        texture = nullptr;
     scene.detailMeshBatchStart = UINT32_MAX;
     scene.staticDetailBatchStart = UINT32_MAX;
     scene.detailPbrIndex = 0;
@@ -1377,6 +1386,9 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     const bool pulled = waved || staticDetail;
     if (!procedural && !pulled)
         return;
+    scene.grassWind = detail->perlin4dTexture;
+    for (u32 i = 0; i < 2; ++i)
+        scene.grassInteraction[i] = detail->interactionTexture[i];
     if (pulled && maximum == 0)
     {
         scene.failed = true;
@@ -1452,23 +1464,14 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     }
     if (procedural)
     {
-        scene.grassWind = detail->perlin4dTexture;
-        GrassRTCB constants = {};
-        const float angle = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.wind_direction : 0.0f;
-        constants.wind_direction.set(angle, detail->windSpeed, 0.0f, 0.0f);
-        constants.wave.set(1.0f / 5.0f, 1.0f / 7.0f, 1.0f / 3.0f, Device.fTimeGlobal);
-        constants.grass_wind_displacement = ps_r3_grass_wind_displacement;
-        constants.grass_blade_height = ps_r3_grass_blade_height;
-        constants.grass_blade_width = ps_r3_grass_blade_width;
         u64 vertexOffset = 0;
         u64 indexOffset = 0;
         for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
         {
             if (!lodCounts[lod])
                 continue;
-            RTGrassJob job;
+            RTGrassJob job = {};
             job.visible = frame->visible[lod];
-            job.constants = constants;
             job.constants.segments = FGDetailManager::LOD_SEGMENTS[lod];
             job.constants.vertsPerBlade = job.constants.segments * 2 + 1;
             job.constants.indicesPerBlade = (job.constants.segments - 1) * 6 + 3;
@@ -1490,6 +1493,7 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         job.constants.billboardCount = wavedCount;
         job.constants.outputVertexOffset = u32(proceduralVertices);
         job.constants.outputIndexOffset = u32(proceduralIndices);
+        job.constants.detailKind = FGDetailManager::VIS_KIND_MESH;
         scene.detailMeshJobs.push_back(std::move(job));
     }
     if (staticDetail)
@@ -1501,6 +1505,7 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         job.constants.billboardCount = staticCount;
         job.constants.outputVertexOffset = u32(proceduralVertices + wavedVertices);
         job.constants.outputIndexOffset = u32(proceduralIndices + wavedIndices);
+        job.constants.detailKind = FGDetailManager::VIS_KIND_DECAL;
         scene.staticDetailJobs.push_back(std::move(job));
         scene.staticDetailInstanceCount = staticCount;
     }
@@ -1806,6 +1811,7 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
         {
             RenderPassBuilder pb(builder, pass);
             data.manager = this;
+            data.detailManager = detail;
             data.scene = scene;
             data.resources = resources;
             pb.write(resources.batchInfo, ResourceState::CopyDest);
@@ -1864,21 +1870,27 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
                     data.detailPulledVertices = pb.read(ImportRTBuffer(builder, "RT_DetailPulledVertices",
                         frame.source->pulledVertices), ResourceState::ShaderResource);
                 }
-                if (!scene->grassJobs.empty())
+                const auto readDeformationTexture = [&](nvrhi::ITexture* texture)
                 {
-                    R_ASSERT(scene->grassWind);
-                    const auto& source = scene->grassWind->getDesc();
+                    const auto& native = texture->getDesc();
                     ResourceDesc desc;
-                    desc.type = ResourceDesc::Type::Texture3D;
-                    desc.width = source.width;
-                    desc.height = source.height;
-                    desc.depth = source.depth;
-                    desc.mipLevels = source.mipLevels;
-                    desc.format = source.format;
-                    desc.isUAV = source.isUAV;
+                    desc.type = native.dimension == nvrhi::TextureDimension::Texture3D ?
+                        ResourceDesc::Type::Texture3D : ResourceDesc::Type::Texture2D;
+                    desc.width = native.width;
+                    desc.height = native.height;
+                    desc.depth = native.depth;
+                    desc.mipLevels = native.mipLevels;
+                    desc.arraySize = native.arraySize;
+                    desc.format = native.format;
+                    desc.isUAV = native.isUAV;
                     desc.isTransient = false;
-                    data.wind = pb.read(builder.ImportTexture("RT_GrassWind", scene->grassWind, desc), ResourceState::ShaderResource);
-                }
+                    desc.debugName = native.debugName.c_str();
+                    return pb.read(builder.ImportTexture(native.debugName.c_str(), texture, desc),
+                        ResourceState::ShaderResource);
+                };
+                data.wind = readDeformationTexture(scene->grassWind);
+                for (u32 i = 0; i < 2; ++i)
+                    data.interaction[i] = readDeformationTexture(scene->grassInteraction[i]);
             }
         },
         [](const RTBuildPassData& data, const FrameGraph& fg, RenderContext* ctx)
@@ -2052,6 +2064,10 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     const auto& grassSource = *scene.grassFrame->source;
     for (auto handle : data.grassSources)
         commandList->setBufferState(buffer(handle), nvrhi::ResourceStates::NonPixelShaderResource);
+    R_ASSERT(data.detailManager);
+    FGDetailManager::DetailFrameConstants frameConstants = {};
+    data.detailManager->FillFrameConstants(frameConstants);
+    auto* interaction = graph.GetPhysicalTexture(data.interaction[data.detailManager->interactionCurrent]);
     if (!scene.grassJobs.empty())
     {
         const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_vertices", ".cs");
@@ -2059,14 +2075,24 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
         for (u32 i = 0; i < scene.grassJobs.size(); ++i)
         {
             const auto& job = scene.grassJobs[i];
+            GrassRTCB constants = job.constants;
+            constants.wind_direction = frameConstants.g_wind_direction;
+            constants.wave = frameConstants.wave;
+            constants.grass_wind_displacement = frameConstants.grass_wind_displacement;
+            constants.grass_blade_height = frameConstants.grass_blade_height;
+            constants.grass_blade_width = frameConstants.grass_blade_width;
+            constants.interaction_window = frameConstants.interaction_window;
+            constants.grass_interaction_displacement = frameConstants.grass_interaction_displacement;
+            constants.grass_interaction_max_angle = frameConstants.grass_interaction_max_angle;
             framegraph::BindingSetBuilder bindings(*reflection, device, "RT.Grass");
             bindings.BufferSRV("g_VisibleIndices", buffer(data.grassVisible[i]))
                 .Texture("g_WindTexture", graph.GetPhysicalTexture(data.wind))
+                .Texture("g_Interaction", interaction)
                 .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
                 .ConstantBuffer("GrassRTCB", m_device->GetNativeBuffer(s_grassCB));
             auto set = device->createBindingSet(bindings.Build(), scene.grassLayout);
             R_ASSERT(set);
-            commandList->writeBuffer(m_device->GetNativeBuffer(s_grassCB), &job.constants, sizeof(job.constants));
+            commandList->writeBuffer(m_device->GetNativeBuffer(s_grassCB), &constants, sizeof(constants));
             nvrhi::ComputeState state;
             state.pipeline = scene.grassPipeline;
             state.bindings = { set, m_device->GetBackend()->GetBindlessDescriptorTable(), grassSource.descriptorTable };
@@ -2087,15 +2113,24 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
             for (u32 i = 0; i < jobs.size(); ++i)
             {
                 const auto& job = jobs[i];
+                BillboardRTCB constants = job.constants;
+                constants.wind_direction = frameConstants.g_wind_direction;
+                constants.wave = frameConstants.wave;
+                constants.interaction_window = frameConstants.interaction_window;
+                constants.grass_wind_displacement = frameConstants.grass_wind_displacement;
+                constants.grass_interaction_displacement = frameConstants.grass_interaction_displacement;
+                constants.grass_interaction_max_angle = frameConstants.grass_interaction_max_angle;
                 framegraph::BindingSetBuilder bindings(*reflection, device, "RT.Pulled");
                 bindings.BufferSRV("g_VisibleIndices", buffer(visible[i]))
                     .BufferSRV("g_DetailModels", buffer(data.detailModels))
                     .BufferSRV("g_PulledVerts", buffer(data.detailPulledVertices))
+                    .Texture("g_WindTexture", graph.GetPhysicalTexture(data.wind))
+                    .Texture("g_Interaction", interaction)
                     .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
                     .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
                 auto set = device->createBindingSet(bindings.Build(), scene.pulledLayout);
                 R_ASSERT(set);
-                commandList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &job.constants, sizeof(job.constants));
+                commandList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &constants, sizeof(constants));
                 nvrhi::ComputeState state;
                 state.pipeline = scene.pulledPipeline;
                 state.bindings = { set, m_device->GetBackend()->GetBindlessDescriptorTable(), grassSource.descriptorTable };

@@ -81,8 +81,7 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
         if (g_Kind == DETAIL_KIND_MESH)
         {
             float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, inst.pos.xz, interaction_window);
-            wp = PulledInteractionBend(inst, wp, inter, grass_interaction_displacement, grass_interaction_max_angle);
-            wp = PulledSway(wp, PulledHeightFactor(v, mdl), wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            wp = PulledDeform(inst, wp, PulledHeightFactor(v, mdl), wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
         }
         o.position = mul(m_VP, float4(wp, 1.0));
         o.uv = float2(v.u, v.v);

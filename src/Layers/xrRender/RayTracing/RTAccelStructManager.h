@@ -158,8 +158,12 @@ public:
     u32 indicesPerBlade;
     u32 outputIndexOffset;
     u32 pad[3];
+    Fvector4 interaction_window;
+    float grass_interaction_displacement;
+    float grass_interaction_max_angle;
+    float interactionPad[2];
 };
-static_assert(sizeof(GrassRTCB) == 80);
+static_assert(sizeof(GrassRTCB) == 112);
 
 class BillboardRTCB
 {
@@ -168,8 +172,15 @@ public:
     u32 billboardCount;
     u32 outputVertexOffset;
     u32 outputIndexOffset;
+    Fvector4 wind_direction;
+    Fvector4 wave;
+    Fvector4 interaction_window;
+    float grass_wind_displacement;
+    float grass_interaction_displacement;
+    float grass_interaction_max_angle;
+    u32 detailKind;
 };
-static_assert(sizeof(BillboardRTCB) == 16);
+static_assert(sizeof(BillboardRTCB) == 80);
 
 class RTGeometryBuild
 {
@@ -311,6 +322,7 @@ public:
     nvrhi::ComputePipelineHandle pulledPipeline;
     nvrhi::BindingLayoutHandle pulledLayout;
     nvrhi::TextureHandle grassWind;
+    nvrhi::TextureHandle grassInteraction[2];
     xr_vector<RTSkinJob> skinJobs;
     xr_vector<RTSkinJob> hudSkinJobs;
     xr_vector<RTGrassJob> grassJobs;
@@ -354,6 +366,7 @@ class RTBuildPassData
 {
 public:
     class RTAccelStructManager* manager = nullptr;
+    FGDetailManager* detailManager = nullptr;
     std::shared_ptr<RTSceneGeneration> scene;
     RTFrameResources resources;
     framegraph::VirtualResourceHandle sourceMaterials;
@@ -370,6 +383,7 @@ public:
     xr_vector<framegraph::VirtualResourceHandle> buffers;
     xr_vector<framegraph::VirtualResourceHandle> structures;
     framegraph::VirtualResourceHandle wind;
+    framegraph::VirtualResourceHandle interaction[2];
 };
 
 class RTAccelStructManager

@@ -119,12 +119,9 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     if (sway)
     {
         inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, inst.pos.xz, interaction_window);
-        w0 = PulledInteractionBend(inst, b0, inter, grass_interaction_displacement, grass_interaction_max_angle);
-        w1 = PulledInteractionBend(inst, b1, inter, grass_interaction_displacement, grass_interaction_max_angle);
-        w2 = PulledInteractionBend(inst, b2, inter, grass_interaction_displacement, grass_interaction_max_angle);
-        w0 = PulledSway(w0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-        w1 = PulledSway(w1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-        w2 = PulledSway(w2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+        w0 = PulledDeform(inst, b0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        w1 = PulledDeform(inst, b1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        w2 = PulledDeform(inst, b2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
     }
 
     float4 c0 = mul(m_VP, float4(w0, 1.0));
@@ -175,12 +172,9 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
         if (sway)
         {
             float2 interPrev = SampleGrassInteraction(g_InteractionPrev, smp_rtlinear, inst.pos.xz, interaction_window_prev);
-            p0 = PulledInteractionBend(inst, b0, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
-            p1 = PulledInteractionBend(inst, b1, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
-            p2 = PulledInteractionBend(inst, b2, interPrev, grass_interaction_displacement, grass_interaction_max_angle);
-            p0 = PulledSway(p0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-            p1 = PulledSway(p1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
-            p2 = PulledSway(p2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, g_Perlin4D, smp_linear);
+            p0 = PulledDeform(inst, b0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+            p1 = PulledDeform(inst, b1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+            p2 = PulledDeform(inst, b2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
         }
         motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
     }
