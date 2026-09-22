@@ -72,6 +72,8 @@ private:
 
     void Load(IReader* F, pcstr path, allow_include_func_t allow_include_func = nullptr);
 
+    pcstr r_value(pcstr S, pcstr L) const;
+
 public:
     CInifile(IReader* F, pcstr path = nullptr, allow_include_func_t allow_include_func = nullptr);
 
