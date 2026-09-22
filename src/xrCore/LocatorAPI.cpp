@@ -713,6 +713,7 @@ bool CLocatorAPI::Recurse(pcstr path)
 
     while (const dirent* entry = readdir(directory))
     {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
         xr_string fullPath(scanPath);
         if (!fullPath.empty() && fullPath.back() != '/')
             fullPath += '/';
