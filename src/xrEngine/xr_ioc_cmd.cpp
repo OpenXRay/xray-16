@@ -28,6 +28,7 @@ ENGINE_API int ps_r_path_tracer_debug = 0;
 ENGINE_API int ps_r_path_tracer_freeze = 0;
 ENGINE_API int ps_r_path_tracer_samples = 0;
 ENGINE_API int ps_r_rt_max_null_events = 256;
+ENGINE_API int ps_r_rt_light_rays = 1;
 ENGINE_API float ps_r_rt_sun_radius = 0.0f;
 ENGINE_API int ps_r_rt_gi = 0;
 ENGINE_API int ps_r_rt_gi_profile = 0;

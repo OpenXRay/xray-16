@@ -486,6 +486,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.staticDetailBatchStart = scene->staticDetailBatchStart;
     rawCB.detailPbrIndex = scene->detailPbrIndex;
     rawCB.detailBumpIndex = scene->detailBumpIndex;
+    rawCB.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
 
     ResourceDesc rawDesc;
     rawDesc.type = ResourceDesc::Type::Texture2D;

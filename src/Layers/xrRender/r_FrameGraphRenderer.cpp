@@ -163,6 +163,7 @@ extern ENGINE_API int ps_r_rt_gi;
 extern ENGINE_API int ps_r_rt_gi_restir;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_rt_gi_bounces;
+extern ENGINE_API int ps_r_rt_light_rays;
 extern ENGINE_API int ps_r_rt_gi_samples;
 extern ENGINE_API float ps_r_rt_gi_ray_distance;
 extern ENGINE_API float ps_r_rt_scene_radius;
@@ -1823,6 +1824,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ptConfig.diagnosticMode = static_cast<u32>(ps_r_path_tracer_debug);
         ptConfig.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
         ptConfig.maxSamples = static_cast<u32>(ps_r_path_tracer_samples);
+        ptConfig.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
         ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
         ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
         const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, m_lightingState, ptConfig,

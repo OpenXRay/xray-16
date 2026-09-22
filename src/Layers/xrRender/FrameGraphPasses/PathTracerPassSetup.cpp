@@ -885,6 +885,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     cbData.sunAngularRadius = config.sunAngularRadius;
     cbData.cameraConeSpread = ComputeCameraConeSpread(invViewProj, cameraPos, width, height);
     cbData.clusterLights = clusterListsActive && !frozen ? 1u : 0u;
+    cbData.lightRays = config.lightRays;
 
     const auto& history = state.history;
     state.pending.cameraView = view;

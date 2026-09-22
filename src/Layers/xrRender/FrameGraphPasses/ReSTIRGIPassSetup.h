@@ -120,9 +120,13 @@ public:
     u32 staticDetailBatchStart;
     u32 detailPbrIndex;
     u32 detailBumpIndex;
+    u32 lightRays;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
 
-static_assert(sizeof(RTGIRawCB) == 208);
+static_assert(sizeof(RTGIRawCB) == 224);
 
 class RTGIProfileParams
 {

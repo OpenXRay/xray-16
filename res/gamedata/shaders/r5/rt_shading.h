@@ -57,6 +57,7 @@ struct RTSceneParams
     float rayDistance;
     uint clusterLights;
     uint2 clusterPixel;
+    uint lightRays;
 };
 
 RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCount,
@@ -87,6 +88,7 @@ RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCoun
     scene.rayDistance = RT_RAY_DISTANCE;
     scene.clusterLights = 0u;
     scene.clusterPixel = uint2(0u, 0u);
+    scene.lightRays = 0u;
     return scene;
 }
 

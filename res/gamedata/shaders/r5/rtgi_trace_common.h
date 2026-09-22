@@ -16,6 +16,7 @@ cbuffer RTGIRawParams : register(b5)
     uint g_MaxNullEvents, g_MaxBounces, g_SamplesPerPixel; float g_RayDistance;
     float g_EnvironmentRotation, g_SunAngularRadius, g_CameraConeSpread; uint g_ClusterLights;
     uint g_DetailMeshBatchStart, g_StaticDetailBatchStart, g_DetailPbrIndex, g_DetailBumpIndex;
+    uint g_LightRays, g_RawPad0, g_RawPad1, g_RawPad2;
 };
 
 Texture2D<float> t_Depth : register(t14);
@@ -137,6 +138,7 @@ RTSceneParams RTGIBuildRawScene(uint2 pixel)
     scene.rayMask = RT_RAY_MASK_WORLD;
     scene.clusterLights = g_ClusterLights;
     scene.clusterPixel = pixel;
+    scene.lightRays = g_LightRays;
     return scene;
 }
 

@@ -23,6 +23,7 @@ public:
     u32 diagnosticMode = 0;
     u32 maxNullEvents = 256;
     u32 maxSamples = 0;
+    u32 lightRays = 1;
     float sunAngularRadius = 0.0f;
     bool freezeScene = false;
 };
@@ -64,9 +65,13 @@ public:
     u32 staticDetailBatchStart;
     u32 detailPbrIndex;
     u32 detailBumpIndex;
+    u32 lightRays;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
 };
 
-static_assert(sizeof(PathTracerCB) == 208);
+static_assert(sizeof(PathTracerCB) == 224);
 
 class PathTracerSnapshotStats
 {
