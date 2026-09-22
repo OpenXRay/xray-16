@@ -136,9 +136,9 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
         return;
     }
     auto& frame = *m_recording;
-    frame.hizRecorded = hiz && hizRecorded;
-    const bool ptRecorded = lighting.effective == LightingMode::ReferencePT && lighting.recorded;
-    if (ptRecorded || pathTracer.pending.capturedSnapshot)
+    frame.hizRecorded = !lighting.frameFailed && hiz && hizRecorded;
+    const bool ptRecorded = !lighting.frameFailed && lighting.effective == LightingMode::ReferencePT && lighting.recorded;
+    if (ptRecorded || pathTracer.pending.capturedSnapshot || (lighting.frameFailed && pathTracer.pending.snapshot))
     {
         frame.pathTracer = pathTracer.pending;
         if (!ptRecorded)
@@ -146,6 +146,23 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
             frame.pathTracer.valid = false;
             frame.pathTracer.samples = 0;
         }
+    }
+    if (lighting.frameFailed)
+    {
+        frame.surfacesRecorded = false;
+        frame.pathTracer.valid = false;
+        frame.pathTracer.samples = 0;
+        frame.pathTracer.capturedSnapshot = false;
+        pathTracer.pending.valid = false;
+        pathTracer.pending.samples = 0;
+        passes::DiscardPathTracerSnapshot(pathTracer);
+        pathTracer.snapshotStats.frozen = false;
+        pathTracer.snapshotStats.capturePending = false;
+        pathTracer.snapshotStats.valid = false;
+        pathTracer.snapshotStats.sceneValid = false;
+        pathTracer.snapshotStats.fallback = pathTracer.snapshotStats.freezeRequested;
+        pathTracer.snapshotStats.cdfActive = false;
+        InvalidateHistory();
     }
     frame.textures.push_back(hiz);
     frame.textures.push_back(pathTracer.accumulation);

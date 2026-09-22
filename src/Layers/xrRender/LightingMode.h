@@ -22,20 +22,28 @@ enum class LightingFallback : u8
     SceneUnavailable,
     EnvironmentUnavailable,
     InputsUnavailable,
-    BindingUnavailable
+    BindingUnavailable,
+    RecordingUnavailable
 };
 
 class LightingFrameState
 {
 public:
     void Begin(bool requestRTGI, bool requestPT);
+    void ScheduleOpaqueLighting();
     void Fail(LightingFallback reason);
+    void ResetRecovery();
 
     LightingMode requested = LightingMode::Raster;
     LightingMode effective = LightingMode::Raster;
+    LightingMode scheduled = LightingMode::Raster;
     LightingFallback fallback = LightingFallback::None;
     u32 recordedSamples = 0;
     bool conflictingRequests = false;
+    bool opaqueScheduled = false;
+    bool frameFailed = false;
+    bool recoveryActive = false;
+    bool failureCleared = false;
     bool recorded = false;
     bool reuseRequested = false;
     bool reuseAvailable = false;
@@ -49,8 +57,13 @@ public:
     float rayGrassRadius = 0.0f;
     bool rayGrassEnabled = false;
     bool rayGrassPending = false;
+    u32 rayStaticDetailInstances = 0;
     bool rawSignalsRecorded = false;
     u64 sceneRevision = 0;
+
+private:
+    LightingMode m_latchedMode = LightingMode::Raster;
+    LightingFallback m_latchedReason = LightingFallback::None;
 };
 
 const char* LightingModeName(LightingMode mode);

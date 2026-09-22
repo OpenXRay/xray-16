@@ -503,6 +503,7 @@ void FrameGraphRenderer::CleanupDeveloperLoad()
 bool FrameGraphRenderer::level_LoadDeveloper(const DeveloperScene& scene)
 {
     ZoneScoped;
+    m_lightingState.ResetRecovery();
 
     if (GEnv.isDedicatedServer)
     {

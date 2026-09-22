@@ -294,6 +294,29 @@ static bool IsIdentityWorld(const Fmatrix& world)
     return memcmp(&world, &Fidentity, sizeof(Fmatrix)) == 0;
 }
 
+static u32 NormalizeDetailTextureIndex(u32 index)
+{
+    return index == bindless::INVALID_TEXTURE_INDEX ? 0u : index;
+}
+
+static bool HasBindlessTexture(u32 index)
+{
+    return GEnv.Backend && GEnv.Backend->GetBindlessTexture(index) != nullptr;
+}
+
+static bool HasStaticDetailTextures(const FGDetailManager* detail)
+{
+    const u32 atlas = detail->buildDetailsBindlessIndex;
+    if (atlas == 0 || atlas == bindless::INVALID_TEXTURE_INDEX || !HasBindlessTexture(atlas))
+        return false;
+    for (u32 index : { detail->buildDetailsPbrBindlessIndex, detail->buildDetailsBumpBindlessIndex })
+    {
+        if (index != 0 && index != bindless::INVALID_TEXTURE_INDEX && !HasBindlessTexture(index))
+            return false;
+    }
+    return true;
+}
+
 void RTAccelStructManager::Initialize(RenderDevice* device)
 {
     m_device = device;
@@ -366,9 +389,17 @@ bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
     if (!scene.hudSkinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology ||
         !scene.hudSkinBuild.handle))
         return false;
-    if (scene.counts.grass && (!scene.grassVertices || !scene.grassIndices || !scene.grassBuild.handle ||
-        !scene.grassPipeline || !scene.grassLayout))
+    if (scene.counts.grass && (!scene.grassVertices || !scene.grassIndices || !scene.grassBuild.handle))
         return false;
+    if (!scene.grassJobs.empty() && (!scene.grassPipeline || !scene.grassLayout || !scene.grassWind ||
+        !scene.grassFrame || !scene.grassFrame->source))
+        return false;
+    if (!scene.detailMeshJobs.empty() || !scene.staticDetailJobs.empty())
+    {
+        if (!scene.pulledPipeline || !scene.pulledLayout || !scene.grassFrame || !scene.grassFrame->source ||
+            !scene.grassFrame->source->models || !scene.grassFrame->source->pulledVertices)
+            return false;
+    }
     return true;
 }
 
@@ -468,6 +499,8 @@ void RTAccelStructManager::RetireScenes()
             it->scene->hudSkinJobs.clear();
             it->scene->skinSources.clear();
             it->scene->grassJobs.clear();
+            it->scene->detailMeshJobs.clear();
+            it->scene->staticDetailJobs.clear();
             it->scene->emissiveTriangles.clear();
             it->scene->emissiveBatchOffsets.clear();
             it->scene->batchTransforms.clear();
@@ -480,7 +513,12 @@ void RTAccelStructManager::RetireScenes()
             it->scene->grassFrame.reset();
             it->scene->grassPipeline = nullptr;
             it->scene->grassLayout = nullptr;
+            it->scene->pulledPipeline = nullptr;
+            it->scene->pulledLayout = nullptr;
             it->scene->grassWind = nullptr;
+            it->scene->detailMeshBatchStart = UINT32_MAX;
+            it->scene->staticDetailBatchStart = UINT32_MAX;
+            it->scene->staticDetailInstanceCount = 0;
         }
         it = m_leases.erase(it);
     }
@@ -601,10 +639,13 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
         append(frame->source->id);
         append(frame->statsReady ? frame->contentSignature : frame->id);
         append(frame->stats.visibleBillboardCount);
+        append(frame->stats.visibleDecalCount);
         append(frame->stats.visibleLOD0Count);
         append(frame->stats.visibleLOD1Count);
         append(frame->stats.visibleLOD2Count);
         append(detail->buildDetailsBindlessIndex);
+        append(detail->buildDetailsPbrBindlessIndex);
+        append(detail->buildDetailsBumpBindlessIndex);
         if (frame->source->params.grassMode &&
             (frame->stats.visibleLOD0Count || frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count))
         {
@@ -1269,17 +1310,33 @@ bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool ne
         return true;
     const auto& source = *frame->source;
     const auto& stats = frame->stats;
-    if (!source.params.grassMode)
+    const bool waved = !source.params.grassMode && stats.visibleBillboardCount != 0;
+    const bool staticDetail = stats.visibleDecalCount != 0;
+    if (waved || staticDetail)
     {
-        if (!source.maxPulledIndexCount || !stats.visibleBillboardCount)
-            return true;
-        return source.bindingLayout && source.descriptorTable && frame->visible[FGDetailManager::VIS_KIND_MESH] && InitBillboardPipeline(source);
+        if (source.maxPulledIndexCount / 3 * 3 == 0)
+            return false;
+        if (!source.bindingLayout || !source.descriptorTable || !source.models || !source.pulledVertices)
+            return false;
+        if (waved && !frame->visible[FGDetailManager::VIS_KIND_MESH])
+            return false;
+        if (staticDetail)
+        {
+            if (!frame->visible[FGDetailManager::VIS_KIND_DECAL])
+                return false;
+            if (!HasStaticDetailTextures(detail))
+                return false;
+        }
+        if (!InitBillboardPipeline(source))
+            return false;
     }
-    if (!stats.visibleLOD0Count && !stats.visibleLOD1Count && !stats.visibleLOD2Count)
+    if (!source.params.grassMode)
+        return true;
+    const u32 counts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
+    if (!counts[0] && !counts[1] && !counts[2])
         return true;
     if (!source.bindingLayout || !source.descriptorTable || !detail->perlin4dTexture)
         return false;
-    const u32 counts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
     for (u32 i = 0; i < 3; ++i)
     {
         if (counts[i] && !frame->visible[i])
@@ -1293,6 +1350,13 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     scene.grassFrame.reset();
     scene.grassPipeline = nullptr;
     scene.grassLayout = nullptr;
+    scene.pulledPipeline = nullptr;
+    scene.pulledLayout = nullptr;
+    scene.detailMeshBatchStart = UINT32_MAX;
+    scene.staticDetailBatchStart = UINT32_MAX;
+    scene.detailPbrIndex = 0;
+    scene.detailBumpIndex = 0;
+    scene.staticDetailInstanceCount = 0;
     if (!detail)
         return;
     auto frame = detail->GetCompletedRayVisibilityFrame();
@@ -1306,32 +1370,28 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     const auto& source = *frame->source;
     const auto& stats = frame->stats;
     scene.billboard = !source.params.grassMode;
-    u64 vertices = 0;
-    u64 indices = 0;
-    if (scene.billboard)
+    const u32 lodCounts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
+    const bool procedural = source.params.grassMode && (lodCounts[0] || lodCounts[1] || lodCounts[2]);
+    const u32 maximum = source.maxPulledIndexCount / 3 * 3;
+    const u32 wavedCount = scene.billboard ? stats.visibleBillboardCount : 0;
+    const u32 staticCount = stats.visibleDecalCount;
+    const bool waved = wavedCount != 0;
+    const bool staticDetail = staticCount != 0;
+    const bool pulled = waved || staticDetail;
+    if (!procedural && !pulled)
+        return;
+    if (pulled && maximum == 0)
     {
-        const u32 maximum = source.maxPulledIndexCount / 3 * 3;
-        if (!maximum || !stats.visibleBillboardCount)
-            return;
-        scene.grassPipeline = s_billboardPipeline;
-        scene.grassLayout = s_billboardLayout;
-        if (!scene.grassPipeline || !scene.grassLayout)
-        {
-            scene.failed = true;
-            return;
-        }
-        scene.billboardConstants.maxVertsPerBillboard = maximum;
-        scene.billboardConstants.billboardCount = stats.visibleBillboardCount;
-        vertices = u64(maximum) * stats.visibleBillboardCount;
-        indices = vertices;
-        scene.grassJobs.push_back({ frame->visible[FGDetailManager::VIS_KIND_MESH], {} });
-        scene.detailAtlasIndex = detail->buildDetailsBindlessIndex;
+        scene.failed = true;
+        return;
     }
-    else
+    if (staticDetail && !HasStaticDetailTextures(detail))
     {
-        const u32 counts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
-        if (!counts[0] && !counts[1] && !counts[2])
-            return;
+        scene.failed = true;
+        return;
+    }
+    if (procedural)
+    {
         scene.grassPipeline = s_grassPipeline;
         scene.grassLayout = s_grassLayout;
         if (!scene.grassPipeline || !scene.grassLayout)
@@ -1339,6 +1399,65 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
             scene.failed = true;
             return;
         }
+    }
+    if (pulled)
+    {
+        scene.pulledPipeline = s_billboardPipeline;
+        scene.pulledLayout = s_billboardLayout;
+        if (!scene.pulledPipeline || !scene.pulledLayout || !source.bindingLayout || !source.descriptorTable ||
+            !source.models || !source.pulledVertices)
+        {
+            scene.failed = true;
+            return;
+        }
+        scene.detailAtlasIndex = detail->buildDetailsBindlessIndex;
+        if (staticDetail)
+        {
+            scene.detailPbrIndex = NormalizeDetailTextureIndex(detail->buildDetailsPbrBindlessIndex);
+            scene.detailBumpIndex = NormalizeDetailTextureIndex(detail->buildDetailsBumpBindlessIndex);
+        }
+    }
+    if (waved && !frame->visible[FGDetailManager::VIS_KIND_MESH])
+    {
+        scene.failed = true;
+        return;
+    }
+    if (staticDetail && !frame->visible[FGDetailManager::VIS_KIND_DECAL])
+    {
+        scene.failed = true;
+        return;
+    }
+    u64 proceduralVertices = 0;
+    u64 proceduralIndices = 0;
+    if (procedural)
+    {
+        for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
+        {
+            if (!lodCounts[lod])
+                continue;
+            const u32 vertsPerBlade = FGDetailManager::LOD_SEGMENTS[lod] * 2 + 1;
+            const u32 indicesPerBlade = (FGDetailManager::LOD_SEGMENTS[lod] - 1) * 6 + 3;
+            proceduralVertices += u64(lodCounts[lod]) * vertsPerBlade;
+            proceduralIndices += u64(lodCounts[lod]) * indicesPerBlade;
+        }
+    }
+    const u64 streamPerInstance = maximum;
+    const u64 wavedVertices = streamPerInstance * wavedCount;
+    const u64 wavedIndices = wavedVertices;
+    const u64 staticVertices = streamPerInstance * staticCount;
+    const u64 staticIndices = staticVertices;
+    const u64 vertices = proceduralVertices + wavedVertices + staticVertices;
+    const u64 indices = proceduralIndices + wavedIndices + staticIndices;
+    const auto memory = m_device->GetBackend()->GetMemoryBudget();
+    const u64 rawRange = u64(UINT32_MAX) + 1;
+    const u64 range = memory.bufferRangeBytes ? std::min(rawRange, memory.bufferRangeBytes) : rawRange;
+    if (!vertices || !indices || vertices > range / 24 || indices > range / sizeof(u32))
+    {
+        scene.failed = true;
+        return;
+    }
+    if (procedural)
+    {
         scene.grassWind = detail->perlin4dTexture;
         GrassRTCB constants = {};
         const float angle = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.wind_direction : 0.0f;
@@ -1347,9 +1466,11 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         constants.grass_wind_displacement = ps_r3_grass_wind_displacement;
         constants.grass_blade_height = ps_r3_grass_blade_height;
         constants.grass_blade_width = ps_r3_grass_blade_width;
+        u64 vertexOffset = 0;
+        u64 indexOffset = 0;
         for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; ++lod)
         {
-            if (!counts[lod])
+            if (!lodCounts[lod])
                 continue;
             RTGrassJob job;
             job.visible = frame->visible[lod];
@@ -1357,20 +1478,38 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
             job.constants.segments = FGDetailManager::LOD_SEGMENTS[lod];
             job.constants.vertsPerBlade = job.constants.segments * 2 + 1;
             job.constants.indicesPerBlade = (job.constants.segments - 1) * 6 + 3;
-            job.constants.bladeCount = counts[lod];
-            R_ASSERT(vertices <= UINT32_MAX && indices <= UINT32_MAX);
-            job.constants.outputVertexOffset = u32(vertices);
-            job.constants.outputIndexOffset = u32(indices);
-            vertices += u64(counts[lod]) * job.constants.vertsPerBlade;
-            indices += u64(counts[lod]) * job.constants.indicesPerBlade;
+            job.constants.bladeCount = lodCounts[lod];
+            job.constants.outputVertexOffset = u32(vertexOffset);
+            job.constants.outputIndexOffset = u32(indexOffset);
+            vertexOffset += u64(lodCounts[lod]) * job.constants.vertsPerBlade;
+            indexOffset += u64(lodCounts[lod]) * job.constants.indicesPerBlade;
             scene.grassJobs.push_back(std::move(job));
         }
+        R_ASSERT(vertexOffset == proceduralVertices && indexOffset == proceduralIndices);
     }
-    const auto memory = m_device->GetBackend()->GetMemoryBudget();
-    const u64 rawRange = u64(UINT32_MAX) + 1;
-    const u64 range = memory.bufferRangeBytes ? std::min(rawRange, memory.bufferRangeBytes) : rawRange;
-    R_ASSERT2(vertices && indices && vertices <= range / 24 && indices <= range / sizeof(u32),
-        "[RT] visible grass expansion exceeds the native raw-buffer address range");
+    if (waved)
+    {
+        RTPulledJob job;
+        job.visible = frame->visible[FGDetailManager::VIS_KIND_MESH];
+        job.constants = {};
+        job.constants.maxVertsPerBillboard = maximum;
+        job.constants.billboardCount = wavedCount;
+        job.constants.outputVertexOffset = u32(proceduralVertices);
+        job.constants.outputIndexOffset = u32(proceduralIndices);
+        scene.detailMeshJobs.push_back(std::move(job));
+    }
+    if (staticDetail)
+    {
+        RTPulledJob job;
+        job.visible = frame->visible[FGDetailManager::VIS_KIND_DECAL];
+        job.constants = {};
+        job.constants.maxVertsPerBillboard = maximum;
+        job.constants.billboardCount = staticCount;
+        job.constants.outputVertexOffset = u32(proceduralVertices + wavedVertices);
+        job.constants.outputIndexOffset = u32(proceduralIndices + wavedIndices);
+        scene.staticDetailJobs.push_back(std::move(job));
+        scene.staticDetailInstanceCount = staticCount;
+    }
     scene.grassFrame = std::move(frame);
     scene.grassVertexCount = u32(vertices);
     scene.grassIndexCount = u32(indices);
@@ -1383,24 +1522,42 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
     }
     scene.grassBuild.desc.debugName = "RT_GrassBLAS";
     scene.grassBuild.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
-    scene.grassBuild.desc.addBottomLevelGeometry(RTTriangles(scene.grassVertices, scene.grassIndices,
-        24, 0, scene.grassVertexCount, 0, scene.grassIndexCount, !scene.billboard));
+    const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
+    const u32 grassBatch = u32(scene.batches.size());
+    auto appendRange = [&](u64 indexStart, u64 indexCount, u64 vertexEnd, bool opaque)
+    {
+        scene.grassBuild.desc.addBottomLevelGeometry(RTTriangles(scene.grassVertices, scene.grassIndices,
+            24, 0, u32(vertexEnd), u32(indexStart), u32(indexCount), opaque));
+        scene.batches.push_back({ 0, u32(indexStart), 0, u32(indexCount) });
+        scene.batchTransforms.push_back(identityTransform);
+        scene.batchIdentities.push_back(0);
+        scene.emissiveBatchOffsets.push_back(UINT32_MAX);
+    };
+    if (procedural)
+        appendRange(0, proceduralIndices, proceduralVertices, true);
+    if (waved)
+    {
+        scene.detailMeshBatchStart = u32(scene.batches.size());
+        appendRange(proceduralIndices, wavedIndices, proceduralVertices + wavedVertices, false);
+    }
+    if (staticDetail)
+    {
+        scene.staticDetailBatchStart = u32(scene.batches.size());
+        appendRange(proceduralIndices + wavedIndices, staticIndices,
+            proceduralVertices + wavedVertices + staticVertices, false);
+    }
     scene.grassBuild.handle = device->createAccelStruct(scene.grassBuild.desc);
     if (!scene.grassBuild.handle)
     {
         scene.failed = true;
         return;
     }
-    const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
-    const u32 grassBatch = u32(scene.batches.size());
     scene.instances.push_back(RTInstance(scene.grassBuild.handle, grassBatch,
-        identityTransform, !scene.billboard, RT_MASK_WORLD));
-    scene.batches.push_back({ 0, 0, 0, scene.grassIndexCount });
-    scene.batchTransforms.push_back(identityTransform);
-    scene.batchIdentities.push_back(0);
-    scene.emissiveBatchOffsets.push_back(UINT32_MAX);
+        identityTransform, !pulled, RT_MASK_WORLD));
     R_ASSERT(scene.emissiveBatchOffsets.size() == scene.batches.size());
-    scene.counts.grass = 1;
+    scene.counts.grass = u32(scene.batches.size()) - grassBatch;
+    R_ASSERT(scene.detailMeshBatchStart == UINT32_MAX || scene.detailMeshBatchStart < scene.batches.size());
+    R_ASSERT(scene.staticDetailBatchStart == UINT32_MAX || scene.staticDetailBatchStart < scene.batches.size());
 }
 
 void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager* detail,
@@ -1430,12 +1587,21 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     scene.hudSkinJobs.clear();
     scene.skinSources.clear();
     scene.grassJobs.clear();
+    scene.detailMeshJobs.clear();
+    scene.staticDetailJobs.clear();
+    scene.pulledPipeline = nullptr;
+    scene.pulledLayout = nullptr;
     scene.skinTopology.reset();
     scene.skinnedIndices = nullptr;
     scene.batches = m_staticGeometry->batches;
     scene.instances = m_staticGeometry->instances;
     scene.counts = m_staticGeometry->counts;
     scene.detailAtlasIndex = 0;
+    scene.detailMeshBatchStart = UINT32_MAX;
+    scene.staticDetailBatchStart = UINT32_MAX;
+    scene.detailPbrIndex = 0;
+    scene.detailBumpIndex = 0;
+    scene.staticDetailInstanceCount = 0;
     scene.grassVertexCount = 0;
     scene.grassIndexCount = 0;
     scene.recorded = false;
@@ -1564,8 +1730,20 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     const u32 terrainEnd = scene.counts.identityStatic + scene.counts.terrain;
     for (u32 i = 0; i < skinEnd; ++i)
         AppendMaterialTextures(scene.batches[i].materialID, i >= scene.counts.identityStatic && i < terrainEnd);
-    if (scene.counts.grass && scene.billboard && scene.detailAtlasIndex != bindless::INVALID_TEXTURE_INDEX)
-        m_textureScratch.push_back(scene.detailAtlasIndex);
+    if (scene.counts.grass)
+    {
+        if ((!scene.detailMeshJobs.empty() || !scene.staticDetailJobs.empty()) &&
+            scene.detailAtlasIndex != 0 && scene.detailAtlasIndex != bindless::INVALID_TEXTURE_INDEX)
+            m_textureScratch.push_back(scene.detailAtlasIndex);
+        if (!scene.staticDetailJobs.empty())
+        {
+            for (u32 index : { scene.detailPbrIndex, scene.detailBumpIndex })
+            {
+                if (index)
+                    m_textureScratch.push_back(index);
+            }
+        }
+    }
     scene.textures.Capture(m_textureScratch);
     m_scene = std::move(next);
 }
@@ -1684,12 +1862,21 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
                 for (const auto& job : scene->grassJobs)
                     data.grassVisible.push_back(pb.read(ImportRTBuffer(builder, "RT_GrassVisible", job.visible),
                         ResourceState::ShaderResource));
-                if (scene->billboard)
+                for (const auto& job : scene->detailMeshJobs)
+                    data.detailMeshVisible.push_back(pb.read(ImportRTBuffer(builder, "RT_DetailMeshVisible", job.visible),
+                        ResourceState::ShaderResource));
+                for (const auto& job : scene->staticDetailJobs)
+                    data.staticDetailVisible.push_back(pb.read(ImportRTBuffer(builder, "RT_StaticDetailVisible", job.visible),
+                        ResourceState::ShaderResource));
+                if (!scene->detailMeshJobs.empty() || !scene->staticDetailJobs.empty())
                 {
-                    data.grassModels = pb.read(ImportRTBuffer(builder, "RT_GrassModels", frame.source->models), ResourceState::ShaderResource);
-                    data.grassPulledVertices = pb.read(ImportRTBuffer(builder, "RT_GrassPulledVertices", frame.source->pulledVertices), ResourceState::ShaderResource);
+                    R_ASSERT(frame.source->models && frame.source->pulledVertices);
+                    data.detailModels = pb.read(ImportRTBuffer(builder, "RT_DetailModels", frame.source->models),
+                        ResourceState::ShaderResource);
+                    data.detailPulledVertices = pb.read(ImportRTBuffer(builder, "RT_DetailPulledVertices",
+                        frame.source->pulledVertices), ResourceState::ShaderResource);
                 }
-                else
+                if (!scene->grassJobs.empty())
                 {
                     R_ASSERT(scene->grassWind);
                     const auto& source = scene->grassWind->getDesc();
@@ -1877,28 +2064,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     const auto& grassSource = *scene.grassFrame->source;
     for (auto handle : data.grassSources)
         commandList->setBufferState(buffer(handle), nvrhi::ResourceStates::NonPixelShaderResource);
-    if (scene.billboard)
-    {
-        const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
-        R_ASSERT(reflection);
-        framegraph::BindingSetBuilder bindings(*reflection, device, "RT.Billboard");
-        bindings.BufferSRV("g_VisibleIndices", buffer(data.grassVisible.front()))
-            .BufferSRV("g_DetailModels", buffer(data.grassModels))
-            .BufferSRV("g_PulledVerts", buffer(data.grassPulledVertices))
-            .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
-            .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
-        auto set = device->createBindingSet(bindings.Build(), scene.grassLayout);
-        R_ASSERT(set);
-        commandList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &scene.billboardConstants,
-            sizeof(scene.billboardConstants));
-        nvrhi::ComputeState state;
-        state.pipeline = scene.grassPipeline;
-        state.bindings = { set, m_device->GetBackend()->GetBindlessDescriptorTable(), grassSource.descriptorTable };
-        commandList->setComputeState(state);
-        const u32 groups = (scene.billboardConstants.billboardCount + 255u) / 256u;
-        commandList->dispatch(std::min(groups, 1024u), (groups + 1023u) / 1024u, 1);
-    }
-    else
+    if (!scene.grassJobs.empty())
     {
         const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_vertices", ".cs");
         R_ASSERT(reflection);
@@ -1917,10 +2083,41 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
             state.pipeline = scene.grassPipeline;
             state.bindings = { set, m_device->GetBackend()->GetBindlessDescriptorTable(), grassSource.descriptorTable };
             commandList->setComputeState(state);
-            const u32 vertices = job.constants.bladeCount * job.constants.vertsPerBlade;
-            const u32 groups = (vertices + 255u) / 256u;
+            const u32 jobVertices = job.constants.bladeCount * job.constants.vertsPerBlade;
+            const u32 groups = (jobVertices + 255u) / 256u;
             commandList->dispatch(std::min(groups, 1024u), (groups + 1023u) / 1024u, 1);
         }
+    }
+    if (scene.detailMeshJobs.empty() && scene.staticDetailJobs.empty())
+        return;
+    {
+        const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_grass_billboard", ".cs");
+        R_ASSERT(reflection);
+        auto dispatch = [&](const xr_vector<RTPulledJob>& jobs,
+            const xr_vector<framegraph::VirtualResourceHandle>& visible)
+        {
+            for (u32 i = 0; i < jobs.size(); ++i)
+            {
+                const auto& job = jobs[i];
+                framegraph::BindingSetBuilder bindings(*reflection, device, "RT.Pulled");
+                bindings.BufferSRV("g_VisibleIndices", buffer(visible[i]))
+                    .BufferSRV("g_DetailModels", buffer(data.detailModels))
+                    .BufferSRV("g_PulledVerts", buffer(data.detailPulledVertices))
+                    .BufferUAV("g_Output", vertices).BufferUAV("g_OutputIB", indices)
+                    .ConstantBuffer("BillboardRTCB", m_device->GetNativeBuffer(s_billboardCB));
+                auto set = device->createBindingSet(bindings.Build(), scene.pulledLayout);
+                R_ASSERT(set);
+                commandList->writeBuffer(m_device->GetNativeBuffer(s_billboardCB), &job.constants, sizeof(job.constants));
+                nvrhi::ComputeState state;
+                state.pipeline = scene.pulledPipeline;
+                state.bindings = { set, m_device->GetBackend()->GetBindlessDescriptorTable(), grassSource.descriptorTable };
+                commandList->setComputeState(state);
+                const u32 groups = (job.constants.billboardCount + 255u) / 256u;
+                commandList->dispatch(std::min(groups, 1024u), (groups + 1023u) / 1024u, 1);
+            }
+        };
+        dispatch(scene.detailMeshJobs, data.detailMeshVisible);
+        dispatch(scene.staticDetailJobs, data.staticDetailVisible);
     }
 }
 

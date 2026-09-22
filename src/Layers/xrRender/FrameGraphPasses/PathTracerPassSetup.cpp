@@ -331,8 +331,9 @@ static u64 EstimateSceneBufferBytes(const RTSceneGeneration& scene)
     return total;
 }
 
-static void AddSceneCounts(PathTracerCB& cb, const RTBatchCounts& batchCounts)
+static void AddSceneParameters(PathTracerCB& cb, const RTSceneGeneration& scene)
 {
+    const auto& batchCounts = scene.counts;
     cb.identityStaticCount = batchCounts.identityStatic;
     cb.terrainBatchCount = batchCounts.terrain;
     cb.transparentBatchCount = batchCounts.transparent;
@@ -344,6 +345,11 @@ static void AddSceneCounts(PathTracerCB& cb, const RTBatchCounts& batchCounts)
         cb.grassBatchStart = batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned;
     else
         cb.grassBatchStart = UINT32_MAX;
+    cb.detailAtlasIndex = scene.detailAtlasIndex;
+    cb.detailMeshBatchStart = scene.detailMeshBatchStart;
+    cb.staticDetailBatchStart = scene.staticDetailBatchStart;
+    cb.detailPbrIndex = scene.detailPbrIndex;
+    cb.detailBumpIndex = scene.detailBumpIndex;
 }
 
 static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
@@ -476,8 +482,7 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
     PathTracerCB world = {};
     world.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
     world.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyBlend };
-    AddSceneCounts(world, scene->counts);
-    world.detailAtlasIndex = scene->detailAtlasIndex;
+    AddSceneParameters(world, *scene);
     world.lightCount = ClusteredLightManager::Instance().GetLightCount();
     world.emissiveCount = scene->emissiveCount;
     world.environmentRotation = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.sky_rotation : 0.0f;
@@ -779,10 +784,9 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
 
         cbData.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
         cbData.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
-        AddSceneCounts(cbData, accelMgr->GetBatchCounts());
-        cbData.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
-        cbData.lightCount = lightManager.GetLightCount();
         const auto liveScene = accelMgr->GetScene();
+        AddSceneParameters(cbData, *liveScene);
+        cbData.lightCount = lightManager.GetLightCount();
         cbData.emissiveCount = liveScene ? liveScene->emissiveCount : 0;
         cbData.environmentRotation = env.CurrentEnv.sky_rotation;
     }
@@ -882,6 +886,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.height = height;
             data.cbData = cbData;
             data.sampleCount = sampleCount;
+            data.staticDetailInstanceCount = frozen ? state.snapshot->scene->staticDetailInstanceCount :
+                accelMgr->GetScene()->staticDetailInstanceCount;
             data.sky0 = sky0Used;
             data.sky1 = sky1Used;
             data.textureTable = data.scene.textures;
@@ -1012,6 +1018,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.state->pending.samples = data.sampleCount;
             data.lighting->recorded = true;
             data.lighting->recordedSamples = data.sampleCount;
+            data.lighting->rayStaticDetailInstances = data.staticDetailInstanceCount;
         });
 
     return { passData.outputTex };

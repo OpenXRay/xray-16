@@ -25,6 +25,7 @@ ByteAddressBuffer g_GrassIB : register(t13);
 static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
 static const float RT_GRASS_ALPHA_REF = 0.3;
+static const float RT_STATIC_DETAIL_ALPHA_REF = 0.5;
 #define RT_RAY_MASK_WORLD 0x01u
 #define RT_RAY_MASK_HUD 0x02u
 
@@ -35,6 +36,10 @@ struct RTSceneParams
     uint skinnedBatchStart;
     uint grassBatchStart;
     uint detailAtlasIndex;
+    uint detailMeshBatchStart;
+    uint staticDetailBatchStart;
+    uint detailPbrIndex;
+    uint detailBumpIndex;
     uint lightCount;
     uint diffuseMode;
     uint emissiveCount;
@@ -59,6 +64,10 @@ RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCoun
     scene.skinnedBatchStart = skinnedBatchStart;
     scene.grassBatchStart = grassBatchStart;
     scene.detailAtlasIndex = detailAtlasIndex;
+    scene.detailMeshBatchStart = grassBatchStart;
+    scene.staticDetailBatchStart = 0xFFFFFFFFu;
+    scene.detailPbrIndex = 0u;
+    scene.detailBumpIndex = 0u;
     scene.lightCount = lightCount;
     scene.diffuseMode = diffuseMode;
     scene.emissiveCount = emissiveCount;
@@ -84,6 +93,17 @@ bool IsGrassBatch(RTSceneParams scene, uint batchIdx)
     return scene.grassBatchStart != 0xFFFFFFFFu && batchIdx >= scene.grassBatchStart;
 }
 
+bool IsDetailMeshBatch(RTSceneParams scene, uint batchIdx)
+{
+    return scene.detailMeshBatchStart != 0xFFFFFFFFu && batchIdx >= scene.detailMeshBatchStart &&
+        !(scene.staticDetailBatchStart != 0xFFFFFFFFu && batchIdx >= scene.staticDetailBatchStart);
+}
+
+bool IsStaticDetailBatch(RTSceneParams scene, uint batchIdx)
+{
+    return scene.staticDetailBatchStart != 0xFFFFFFFFu && batchIdx >= scene.staticDetailBatchStart;
+}
+
 bool IsTerrainBatch(RTSceneParams scene, uint batchIdx)
 {
     return batchIdx >= scene.identityStaticCount &&
@@ -93,6 +113,16 @@ bool IsTerrainBatch(RTSceneParams scene, uint batchIdx)
 bool HasDetailAtlas(RTSceneParams scene)
 {
     return scene.detailAtlasIndex != 0u && scene.detailAtlasIndex != INVALID_TEXTURE_INDEX;
+}
+
+bool HasDetailBump(RTSceneParams scene)
+{
+    return scene.detailBumpIndex != 0u && scene.detailBumpIndex != INVALID_TEXTURE_INDEX;
+}
+
+bool HasDetailPbr(RTSceneParams scene)
+{
+    return scene.detailPbrIndex != 0u && scene.detailPbrIndex != INVALID_TEXTURE_INDEX;
 }
 
 struct RTSceneTrace
@@ -134,8 +164,17 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     RTHitGeometry geometry = RTFetchHitGeometry(scene, hit, direction);
     if (IsGrassBatch(scene, hit.batchIdx))
     {
-        result.opaque = !HasDetailAtlas(scene) || GetBindlessTexture(scene.detailAtlasIndex)
-            .SampleGrad(smp_linear, geometry.uv, geometry.uvDx, geometry.uvDy).a >= RT_GRASS_ALPHA_REF;
+        if (IsStaticDetailBatch(scene, hit.batchIdx))
+        {
+            result.opaque = !HasDetailAtlas(scene) || GetBindlessTexture(scene.detailAtlasIndex)
+                .SampleGrad(smp_linear, geometry.uv, geometry.uvDx, geometry.uvDy).a >= RT_STATIC_DETAIL_ALPHA_REF;
+            return result;
+        }
+        if (IsDetailMeshBatch(scene, hit.batchIdx))
+            result.opaque = !HasDetailAtlas(scene) || GetBindlessTexture(scene.detailAtlasIndex)
+                .SampleGrad(smp_linear, geometry.uv, geometry.uvDx, geometry.uvDy).a >= RT_GRASS_ALPHA_REF;
+        else
+            result.opaque = true;
         return result;
     }
     if (IsTerrainBatch(scene, hit.batchIdx))

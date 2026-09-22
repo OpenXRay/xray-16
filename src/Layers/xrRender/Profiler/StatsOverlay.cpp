@@ -154,10 +154,21 @@ void StatsOverlay::Render()
     }
     const auto& lighting = m_renderStats.lighting;
     ImGui::Text("Lighting: %s -> %s", render::fg::LightingModeName(lighting.requested), render::fg::LightingModeName(lighting.effective));
+    ImGui::Text("Opaque pass: %s", lighting.opaqueScheduled ? render::fg::LightingModeName(lighting.scheduled) : "none");
+    ImGui::Text("Deferred raster lighting: %s", !lighting.opaqueScheduled ? "not evaluated"
+        : (lighting.scheduled == render::fg::LightingMode::Raster ? "selected" : "omitted (RT dispatch)"));
+    ImGui::Text("RT dispatch pass: %s", lighting.opaqueScheduled && lighting.scheduled != render::fg::LightingMode::Raster ? "scheduled" : "none");
     if (lighting.conflictingRequests)
         ImGui::TextDisabled("Both RT switches enabled: PT takes precedence");
     if (lighting.fallback != render::fg::LightingFallback::None)
-        ImGui::Text("Fallback: %s", render::fg::LightingFallbackName(lighting.fallback));
+        ImGui::Text("Fallback: %s%s", render::fg::LightingFallbackName(lighting.fallback),
+            lighting.frameFailed ? " (RT frame failure, not preflight)"
+            : (lighting.recoveryActive ? " (raster recovery latch held)" : " (preflight, raster selected)"));
+    if (lighting.frameFailed)
+        ImGui::Text("Failed RT frame: world clear %s", lighting.failureCleared ? "recorded (opaque black)" : "left to present");
+    if (lighting.recoveryActive)
+        ImGui::Text("Raster recovery: latched for %s | rearm on requested-mode change, shader reload, level load or reset",
+            render::fg::LightingModeName(lighting.requested));
     if (lighting.requested != render::fg::LightingMode::Raster)
         ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
     ImGui::Text("Surface history: %s", lighting.previousSurfacesValid ? "valid" : "rejected");
@@ -165,6 +176,12 @@ void StatsOverlay::Render()
     {
         ImGui::Text("RT history used: %s", lighting.historyUsed ? "yes" : "no");
         ImGui::Text("RT scene revision: %llu", static_cast<unsigned long long>(lighting.sceneRevision));
+        ImGui::Text("RT static detail instances: %u (%s)", lighting.rayStaticDetailInstances,
+            lighting.recorded ? "recorded scene" : "not recorded");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Static DO_NO_WAVING detail meshes use the bounded ray-detail membership in either grass mode.\n"
+                "They retain atlas cutouts, standard shading and zero foliage transmission.\n"
+                "Frozen reference scenes retain the captured membership; recapture to change the envelope.");
     }
     if (lighting.requested == render::fg::LightingMode::RTGI)
     {
@@ -1250,6 +1267,27 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
         rs.pathTracerSamples);
     text += line;
+    xr_sprintf(line, sizeof(line), "lighting schedule: opaque=%s | deferred raster branch=%s | RT dispatch=%s | failure=%s | failure clear=%s | raster recovery latch=%s\n",
+        rs.lighting.opaqueScheduled ? render::fg::LightingModeName(rs.lighting.scheduled) : "none",
+        !rs.lighting.opaqueScheduled ? "not evaluated" : (rs.lighting.scheduled == render::fg::LightingMode::Raster ? "selected" : "omitted"),
+        rs.lighting.opaqueScheduled && rs.lighting.scheduled != render::fg::LightingMode::Raster ? "scheduled" : "none",
+        rs.lighting.frameFailed ? render::fg::LightingFallbackName(rs.lighting.fallback) : "none",
+        rs.lighting.failureCleared ? "recorded" : "none",
+        rs.lighting.recoveryActive ? "active" : "inactive");
+    text += line;
+    if (rs.lighting.frameFailed)
+    {
+        xr_sprintf(line, sizeof(line), "lighting recovery: frame kept %s scheduling | world clear=%s | black presentation fallback requested | raster latched until requested-mode change, shader reload, level load or reset\n",
+            render::fg::LightingModeName(rs.lighting.scheduled),
+            rs.lighting.failureCleared ? "recorded before UI" : "unavailable");
+        text += line;
+    }
+    if (rs.lighting.requested != render::fg::LightingMode::Raster)
+    {
+        xr_sprintf(line, sizeof(line), "RT static detail instances: %u (%s) | bounded ray membership in both grass modes | standard cutout, zero foliage transmission\n",
+            rs.lighting.rayStaticDetailInstances, rs.lighting.recorded ? "recorded scene" : "not recorded");
+        text += line;
+    }
     if (rs.lighting.requested == render::fg::LightingMode::RTGI)
     {
         xr_sprintf(line, sizeof(line), "RTGI: implementation=%s | budgets samples=%u bounces=%u ray distance=%.0f m (%s) | reuse requested=%s available=%s reservoirs=%s | raw guides=%s\n",

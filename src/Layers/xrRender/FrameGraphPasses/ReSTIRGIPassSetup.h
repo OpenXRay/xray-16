@@ -78,9 +78,13 @@ public:
     float sunAngularRadius;
     float cameraConeSpread;
     u32 pad;
+    u32 detailMeshBatchStart;
+    u32 staticDetailBatchStart;
+    u32 detailPbrIndex;
+    u32 detailBumpIndex;
 };
 
-static_assert(sizeof(RTGIRawCB) == 192);
+static_assert(sizeof(RTGIRawCB) == 208);
 
 class RTGICompositeParams
 {
@@ -137,6 +141,7 @@ public:
     u32 bounces = 0;
     u32 samples = 0;
     float rayDistance = 0.0f;
+    u32 staticDetailInstanceCount = 0;
     u32 width = 0;
     u32 height = 0;
 };

@@ -13,6 +13,7 @@ cbuffer RTGIRawParams : register(b5)
     uint g_DetailAtlasIndex, g_DiffuseMode, g_RTLightCount, g_EmissiveCount;
     uint g_MaxNullEvents, g_MaxBounces, g_SamplesPerPixel; float g_RayDistance;
     float g_EnvironmentRotation, g_SunAngularRadius, g_CameraConeSpread; uint g_Pad;
+    uint g_DetailMeshBatchStart, g_StaticDetailBatchStart, g_DetailPbrIndex, g_DetailBumpIndex;
 };
 
 Texture2D<float> t_Depth : register(t14);
@@ -106,6 +107,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
             g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
             g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
             g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+        scene.detailMeshBatchStart = g_DetailMeshBatchStart;
+        scene.staticDetailBatchStart = g_StaticDetailBatchStart;
+        scene.detailPbrIndex = g_DetailPbrIndex;
+        scene.detailBumpIndex = g_DetailBumpIndex;
         scene.rayDistance = g_RayDistance;
         scene.rayMask = RT_RAY_MASK_WORLD;
 

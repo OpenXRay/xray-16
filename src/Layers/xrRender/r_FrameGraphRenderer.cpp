@@ -214,6 +214,7 @@ FrameGraphRenderer::~FrameGraphRenderer() {
 bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     VERIFY(device != nullptr);
     m_device = device;
+    m_lightingState.ResetRecovery();
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
@@ -312,6 +313,7 @@ void FrameGraphRenderer::Shutdown() {
         m_processHOMTask.Reset();
     }
     if (!m_device) return;
+    m_lightingState.ResetRecovery();
 
     Msg("* [FrameGraphRenderer] Shutting down");
     if (auto* backend = m_device->GetBackend())
@@ -447,6 +449,7 @@ void FrameGraphRenderer::Render() {
                     framegraph::BindingSetBuilder::InvalidateReflectionCache();
                     passes::ShutdownPathTracer();
                     passes::ShutdownRTEnvironmentSampling();
+                    m_lightingState.ResetRecovery();
                     m_mainView.InvalidateHistory();
                     passes::ShutdownReSTIRGI(m_mainView.rtgi);
 
@@ -1835,8 +1838,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         opaqueOutputs.albedo = ptOutput.composited;
     }
 
-    auto litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
-        m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
+    m_lightingState.ScheduleOpaqueLighting();
+    auto litOutputs = opaqueOutputs;
+    if (m_lightingState.scheduled == fg::LightingMode::Raster)
+    {
+        litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
+            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
+    }
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
     {
         m_gpuCullingManager->SetupDebugVisualizationPass(*m_framegraph, m_hizPyramid, litOutputs.albedo, depthBuffer, hizOutput.width, hizOutput.height,
@@ -1963,6 +1971,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
+    sceneColor = passes::setupLightingFailurePass(*m_framegraph, sceneColor, m_lightingState);
+
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
         sceneColor,
@@ -1989,7 +1999,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         backbufferHandle,
         width,
         height,
-        m_blackboard->get_or_add<passes::PresentPassState>()
+        m_blackboard->get_or_add<passes::PresentPassState>(),
+        &m_lightingState
     );
 
     // ═══════════════════════════════════════════════════════
@@ -3523,6 +3534,7 @@ void FrameGraphRenderer::destroy()
 void FrameGraphRenderer::reset_begin()
 {
     ZoneScoped;
+    m_lightingState.ResetRecovery();
     m_mainView.InvalidateHistory();
     if (Resources)
         Resources->reset_begin();
@@ -3545,6 +3557,7 @@ void FrameGraphRenderer::reset_end()
 void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
 {
     ZoneScoped;
+    m_lightingState.ResetRecovery();
     m_mainView.InvalidateHistory();
     framegraph::GetPassResourceCache().ClearFramebufferDependent();
     if (m_materialCache)

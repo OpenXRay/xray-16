@@ -28,6 +28,10 @@ cbuffer PathTracerParams : register(b5)
     float g_SunAngularRadius;
     float g_CameraConeSpread;
     float g_TransportPad;
+    uint g_DetailMeshBatchStart;
+    uint g_StaticDetailBatchStart;
+    uint g_DetailPbrIndex;
+    uint g_DetailBumpIndex;
 };
 
 RWTexture2D<float4> g_Accumulation : register(u0);
@@ -83,6 +87,10 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
         g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
         g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+    scene.detailMeshBatchStart = g_DetailMeshBatchStart;
+    scene.staticDetailBatchStart = g_StaticDetailBatchStart;
+    scene.detailPbrIndex = g_DetailPbrIndex;
+    scene.detailBumpIndex = g_DetailBumpIndex;
     uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_SampleIndex * 26699u);
     float3 origin;
     float3 direction = GenerateCameraRay(pixel, rng, origin);

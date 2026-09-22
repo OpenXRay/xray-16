@@ -166,7 +166,8 @@ class BillboardRTCB
 public:
     u32 maxVertsPerBillboard;
     u32 billboardCount;
-    u32 pad[2];
+    u32 outputVertexOffset;
+    u32 outputIndexOffset;
 };
 static_assert(sizeof(BillboardRTCB) == 16);
 
@@ -274,6 +275,13 @@ public:
     GrassRTCB constants;
 };
 
+class RTPulledJob
+{
+public:
+    nvrhi::BufferHandle visible;
+    BillboardRTCB constants;
+};
+
 class RTSceneGeneration
 {
 public:
@@ -300,10 +308,14 @@ public:
     std::shared_ptr<const FGDetailManager::VisibilityFrame> grassFrame;
     nvrhi::ComputePipelineHandle grassPipeline;
     nvrhi::BindingLayoutHandle grassLayout;
+    nvrhi::ComputePipelineHandle pulledPipeline;
+    nvrhi::BindingLayoutHandle pulledLayout;
     nvrhi::TextureHandle grassWind;
     xr_vector<RTSkinJob> skinJobs;
     xr_vector<RTSkinJob> hudSkinJobs;
     xr_vector<RTGrassJob> grassJobs;
+    xr_vector<RTPulledJob> detailMeshJobs;
+    xr_vector<RTPulledJob> staticDetailJobs;
     std::shared_ptr<RTSkinTopology> skinTopology;
     xr_vector<RTBatchInfo> batches;
     xr_vector<RTBatchTransform> batchTransforms;
@@ -315,11 +327,15 @@ public:
     nvrhi::BufferHandle emissiveTriangleBuffer;
     nvrhi::BufferHandle batchTransformBuffer;
     nvrhi::BufferHandle emissiveBatchOffsetBuffer;
-    BillboardRTCB billboardConstants = {};
     u32 emissiveCount = 0;
     u32 grassVertexCount = 0;
     u32 grassIndexCount = 0;
     u32 detailAtlasIndex = 0;
+    u32 detailMeshBatchStart = UINT32_MAX;
+    u32 staticDetailBatchStart = UINT32_MAX;
+    u32 detailPbrIndex = 0;
+    u32 detailBumpIndex = 0;
+    u32 staticDetailInstanceCount = 0;
     u32 leases = 0;
     u32 retention = 0;
     bool billboard = false;
@@ -347,8 +363,10 @@ public:
     xr_vector<framegraph::VirtualResourceHandle> skinSources;
     xr_vector<framegraph::VirtualResourceHandle> grassSources;
     xr_vector<framegraph::VirtualResourceHandle> grassVisible;
-    framegraph::VirtualResourceHandle grassModels;
-    framegraph::VirtualResourceHandle grassPulledVertices;
+    xr_vector<framegraph::VirtualResourceHandle> detailMeshVisible;
+    xr_vector<framegraph::VirtualResourceHandle> staticDetailVisible;
+    framegraph::VirtualResourceHandle detailModels;
+    framegraph::VirtualResourceHandle detailPulledVertices;
     xr_vector<framegraph::VirtualResourceHandle> buffers;
     xr_vector<framegraph::VirtualResourceHandle> structures;
     framegraph::VirtualResourceHandle wind;

@@ -52,6 +52,7 @@ using namespace fg;
 void FrameGraphRenderer::level_Load(IReader* fs)
 {
     ZoneScoped;
+    m_lightingState.ResetRecovery();
 
     R_ASSERT(g_pGameLevel);
     R_ASSERT(!b_loaded);
@@ -360,6 +361,7 @@ void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName
 void FrameGraphRenderer::level_Unload()
 {
     ZoneScoped;
+    m_lightingState.ResetRecovery();
     m_mainView.InvalidateHistory();
     passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_particleEditor)

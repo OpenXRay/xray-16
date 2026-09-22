@@ -11,7 +11,8 @@ RWByteAddressBuffer g_OutputIB : register(u1);
 cbuffer BillboardRTCB : register(b5) {
     uint maxVertsPerBillboard;
     uint billboardCount;
-    uint2 pad;
+    uint outputVertexOffset;
+    uint outputIndexOffset;
 };
 
 uint pack_normal(float3 n)
@@ -44,19 +45,21 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
         float3 p2 = PulledWorldPos(inst, pv2);
         uint packedN = pack_normal(PulledFaceNormal(p0, p1, p2));
         for (uint c = 0; c < 3; c++) {
-            uint vi = vertBase + t + c;
+            uint local = vertBase + t + c;
+            uint vi = outputVertexOffset + local;
             PulledVertex pv = (c == 0) ? pv0 : ((c == 1) ? pv1 : pv2);
             g_Output.Store3(vi * 24, asuint((c == 0) ? p0 : ((c == 1) ? p1 : p2)));
             g_Output.Store(vi * 24 + 12, packedN);
             g_Output.Store2(vi * 24 + 16, asuint(float2(pv.u, pv.v)));
-            g_OutputIB.Store(vi * 4, vi);
+            g_OutputIB.Store((outputIndexOffset + local) * 4, vi);
         }
     }
 
     for (uint w = vertCount; w < maxVertsPerBillboard; w++) {
-        uint vi = vertBase + w;
+        uint local = vertBase + w;
+        uint vi = outputVertexOffset + local;
         g_Output.Store4(vi * 24, uint4(0, 0, 0, 0));
         g_Output.Store2(vi * 24 + 16, uint2(0, 0));
-        g_OutputIB.Store(vi * 4, vi);
+        g_OutputIB.Store((outputIndexOffset + local) * 4, vi);
     }
 }
