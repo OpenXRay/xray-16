@@ -829,10 +829,11 @@ void StatsOverlay::RenderGeometrySection()
                 s.geometryRTSourceBytes / 1048576.0, s.geometryRTGenerationBytes / 1048576.0,
                 s.geometryRTGenerations, s.geometryRTLeases);
             if (s.geometryRTAccelerationKnown)
-                ImGui::Text("RT acceleration structures: %.2f MiB", s.geometryRTAccelerationBytes / 1048576.0);
+                ImGui::Text("RT acceleration structures: %.2f MiB (%u/%u BLAS compacted)", s.geometryRTAccelerationBytes / 1048576.0,
+                    s.geometryRTCompacted, s.geometryRTCompactable);
             else
-                ImGui::Text("RT acceleration structures: %.2f MiB reported; native total unavailable",
-                    s.geometryRTAccelerationBytes / 1048576.0);
+                ImGui::Text("RT acceleration structures: %.2f MiB reported; native total unavailable (%u/%u BLAS compacted)",
+                    s.geometryRTAccelerationBytes / 1048576.0, s.geometryRTCompacted, s.geometryRTCompactable);
             ImGui::Text("Retiring: %.2f MiB forward, %.2f MiB arenas; forward upload leases %u",
                 s.geometryRetiringSourceBytes / 1048576.0, s.geometryRetiringArenaBytes / 1048576.0,
                 s.geometryForwardUploadLeases);
@@ -1507,10 +1508,10 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         rs.geometryHostSourceBytes / 1048576.0, rs.geometryForwardUploadLeases,
         rs.geometryShadowSnapshotBytes / 1048576.0, rs.geometryShadowHostBytes / 1048576.0);
     text += line;
-    xr_sprintf(line, sizeof(line), "exact RT MiB: source %.2f | generations %.2f | AS %.2f (%s) | generations %u | leases %u\n",
+    xr_sprintf(line, sizeof(line), "exact RT MiB: source %.2f | generations %.2f | AS %.2f (%s) | compacted %u/%u | generations %u | leases %u\n",
         rs.geometryRTSourceBytes / 1048576.0, rs.geometryRTGenerationBytes / 1048576.0,
         rs.geometryRTAccelerationBytes / 1048576.0, rs.geometryRTAccelerationKnown ? "known" : "partial/unknown",
-        rs.geometryRTGenerations, rs.geometryRTLeases);
+        rs.geometryRTCompacted, rs.geometryRTCompactable, rs.geometryRTGenerations, rs.geometryRTLeases);
     text += line;
     xr_sprintf(line, sizeof(line), "paging level policy: requested %u | fine budget %u MiB | reload pending %u\n",
         u32(rs.geometryPagingRequested), rs.geometryPageBudgetMiB, u32(rs.geometryPolicyPending));

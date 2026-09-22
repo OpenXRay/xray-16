@@ -868,6 +868,8 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.geometryRTAccelerationKnown = rt.accelerationBytesKnown;
             stats.geometryRTGenerations = rt.generations;
             stats.geometryRTLeases = rt.pendingLeases;
+            stats.geometryRTCompactable = rt.compactableStructures;
+            stats.geometryRTCompacted = rt.compactedStructures;
         }
 
         if (m_blackboard)

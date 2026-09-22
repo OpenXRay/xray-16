@@ -153,6 +153,7 @@ public:
         u32 meshShaderMaxGroups = 0;
         bool rayTracing = false;
         bool rayTracingUpdates = false;
+        bool rayTracingCompaction = false;
         bool variableRateShading = false;
         u32 maxBindlessResources = 0;
         u32 shaderModel = 50;  // 50 = SM5.0, 60 = SM6.0, etc.

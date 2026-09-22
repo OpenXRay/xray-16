@@ -81,6 +81,8 @@ struct RenderStats
     u32 geometryForwardUploadLeases = 0;
     u32 geometryRTGenerations = 0;
     u32 geometryRTLeases = 0;
+    u32 geometryRTCompactable = 0;
+    u32 geometryRTCompacted = 0;
     u32 geometryPageBudgetMiB = 0;
     bool geometryPagingRequested = false;
     bool geometryPolicyPending = false;
@@ -250,6 +252,7 @@ struct RenderStats
         geometryRetiringArenaBytes = geometryShadowSnapshotBytes = geometryShadowHostBytes = 0;
         geometryRTSourceBytes = geometryRTGenerationBytes = geometryRTAccelerationBytes = 0;
         geometryForwardUploadLeases = geometryRTGenerations = geometryRTLeases = geometryPageBudgetMiB = 0;
+        geometryRTCompactable = geometryRTCompacted = 0;
         geometryPagingRequested = geometryPolicyPending = geometryPagingDetails = false;
         geometryRTAccelerationKnown = true;
         geometryPageVertexSlots = geometryUniqueVertices = geometryClusterVertexReferences = 0;

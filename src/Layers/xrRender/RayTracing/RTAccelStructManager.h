@@ -127,6 +127,8 @@ public:
     u64 accelerationBytes = 0;
     u32 pendingLeases = 0;
     u32 generations = 0;
+    u32 compactedStructures = 0;
+    u32 compactableStructures = 0;
     bool accelerationBytesKnown = true;
 };
 
@@ -192,6 +194,7 @@ public:
     u64 topologyKey = 0;
     bool built = false;
     bool update = false;
+    bool compacted = false;
 };
 
 class RTTextureBindings
@@ -323,6 +326,7 @@ public:
     nvrhi::rt::AccelStructHandle tlas;
     u32 tlasCapacity = 0;
     u32 tlasBuildCount = 0;
+    u32 tlasRefits = 0;
     bool tlasBuilt = false;
     bool tlasUpdate = false;
     RTGeometryBuild skinBuild;
@@ -479,6 +483,9 @@ private:
         nvrhi::ICommandList* commandList);
     void RecordTLAS(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
         nvrhi::ICommandList* commandList);
+    bool RecordCompaction(RTSceneGeneration& scene, nvrhi::ICommandList* commandList);
+    bool AnySceneRetained() const;
+    nvrhi::rt::AccelStructBuildFlags StaticBuildFlags() const;
     RTFrameResources ImportScene(framegraph::FrameGraph& graph,
         const RTSceneGeneration& scene) const;
     bool EnsureBuildResources(FGDetailManager* detailMgr, bool needsSkin);
@@ -490,6 +497,7 @@ private:
     RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
     bool m_inPlaceUpdates = false;
+    bool m_compaction = false;
     std::shared_ptr<RTStaticGeometry> m_staticGeometry;
     std::shared_ptr<RTDynamicGeometry> m_dynamicGeometry;
     nvrhi::IBuffer* m_dynamicSourceVertices = nullptr;
