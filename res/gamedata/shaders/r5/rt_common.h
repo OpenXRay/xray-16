@@ -21,6 +21,11 @@ struct RTTriangleVertex
     float3 tangent;
     float3 bitangent;
     bool authoredBasis;
+    float3 edgeNormal1;
+    float3 edgeNormal2;
+    uint bladeObjectId;
+    float bladeHash;
+    bool proceduralBlade;
 };
 
 float3 DecodePackedNormal(uint packed)
@@ -46,6 +51,12 @@ float2 RTInterpolateUV(float2 uv0, float2 uv1, float2 uv2, float2 barycentrics)
     return uv0 * w0 + uv1 * barycentrics.x + uv2 * barycentrics.y;
 }
 
+float3 RTInterpolatePoint(float3 p0, float3 p1, float3 p2, float2 barycentrics)
+{
+    float w0 = 1.0 - barycentrics.x - barycentrics.y;
+    return p0 * w0 + p1 * barycentrics.x + p2 * barycentrics.y;
+}
+
 float2 RTLoadStaticVertexUV(ByteAddressBuffer vb, uint index)
 {
     return asfloat(vb.Load2(index * RT_STATIC_VERTEX_STRIDE + 24));
@@ -54,11 +65,6 @@ float2 RTLoadStaticVertexUV(ByteAddressBuffer vb, uint index)
 float2 RTLoadSkinnedVertexUV(ByteAddressBuffer vb, uint index)
 {
     return asfloat(vb.Load2(index * RT_SKINNED_VERTEX_STRIDE + 16));
-}
-
-float2 RTLoadGrassVertexUV(ByteAddressBuffer vb, uint index)
-{
-    return asfloat(vb.Load2(index * RT_GRASS_VERTEX_STRIDE + 16));
 }
 
 RTTriangleVertex RTLoadStaticVertex(ByteAddressBuffer vb, uint index)
@@ -71,6 +77,11 @@ RTTriangleVertex RTLoadStaticVertex(ByteAddressBuffer vb, uint index)
     v.tangent = DecodePackedNormal(vb.Load(addr + 32));
     v.bitangent = DecodePackedNormal(vb.Load(addr + 36));
     v.authoredBasis = true;
+    v.edgeNormal1 = 0.0;
+    v.edgeNormal2 = 0.0;
+    v.bladeObjectId = 0u;
+    v.bladeHash = 0.0;
+    v.proceduralBlade = false;
     return v;
 }
 
@@ -84,19 +95,45 @@ RTTriangleVertex RTLoadSkinnedVertex(ByteAddressBuffer vb, uint index)
     v.tangent = DecodePackedNormal(vb.Load(addr + 24));
     v.bitangent = DecodePackedNormal(vb.Load(addr + 28));
     v.authoredBasis = true;
+    v.edgeNormal1 = 0.0;
+    v.edgeNormal2 = 0.0;
+    v.bladeObjectId = 0u;
+    v.bladeHash = 0.0;
+    v.proceduralBlade = false;
     return v;
 }
 
-RTTriangleVertex RTLoadGrassVertex(ByteAddressBuffer vb, uint index)
+RTTriangleVertex RTLoadGrassVertex(ByteAddressBuffer vb, uint index, bool procedural)
 {
     uint addr = index * RT_GRASS_VERTEX_STRIDE;
     RTTriangleVertex v;
     v.position = asfloat(vb.Load3(addr));
-    v.normal = DecodePackedNormal(vb.Load(addr + 12));
-    v.uv = asfloat(vb.Load2(addr + 16));
     v.tangent = 0.0;
     v.bitangent = 0.0;
     v.authoredBasis = false;
+    v.edgeNormal1 = 0.0;
+    v.edgeNormal2 = 0.0;
+    v.bladeObjectId = 0u;
+    v.bladeHash = 0.0;
+    v.proceduralBlade = procedural;
+    if (!procedural)
+    {
+        v.normal = DecodePackedNormal(vb.Load(addr + 12));
+        v.uv = asfloat(vb.Load2(addr + 16));
+        return v;
+    }
+    uint word0 = vb.Load(addr + 12);
+    uint word1 = vb.Load(addr + 16);
+    uint word2 = vb.Load(addr + 20);
+    v.edgeNormal1 = DecodePackedNormal(word0 & 0xFFFFFFu);
+    v.edgeNormal2 = DecodePackedNormal(word1 & 0xFFFFFFu);
+    v.bladeObjectId = (word0 >> 24u) & 0x3Fu;
+    v.uv = float2(float(word0 >> 30u) * 0.5, f16tof32(word2 & 0xFFFFu));
+    uint hash16 = ((word1 >> 24u) & 0xFFu) | (((word2 >> 16u) & 0xFFu) << 8u);
+    v.bladeHash = float(hash16) / 65535.0;
+    float3 normalSum = v.edgeNormal1 + v.edgeNormal2;
+    float normalLenSq = dot(normalSum, normalSum);
+    v.normal = normalLenSq > 1e-12 ? normalSum * rsqrt(normalLenSq) : float3(0.0, 1.0, 0.0);
     return v;
 }
 
@@ -107,6 +144,11 @@ struct RTShadingVertex
     float3 tangent;
     float3 bitangent;
     bool authoredBasis;
+    float3 edgeNormal1;
+    float3 edgeNormal2;
+    uint bladeObjectId;
+    float bladeHash;
+    bool proceduralBlade;
 };
 
 RTShadingVertex RTInterpolateTriangleVertex(RTTriangleVertex v0, RTTriangleVertex v1, RTTriangleVertex v2, float2 barycentrics)
@@ -118,6 +160,11 @@ RTShadingVertex RTInterpolateTriangleVertex(RTTriangleVertex v0, RTTriangleVerte
     r.tangent = v0.tangent * w0 + v1.tangent * barycentrics.x + v2.tangent * barycentrics.y;
     r.bitangent = v0.bitangent * w0 + v1.bitangent * barycentrics.x + v2.bitangent * barycentrics.y;
     r.authoredBasis = v0.authoredBasis;
+    r.edgeNormal1 = v0.edgeNormal1 * w0 + v1.edgeNormal1 * barycentrics.x + v2.edgeNormal1 * barycentrics.y;
+    r.edgeNormal2 = v0.edgeNormal2 * w0 + v1.edgeNormal2 * barycentrics.x + v2.edgeNormal2 * barycentrics.y;
+    r.bladeObjectId = v0.bladeObjectId;
+    r.bladeHash = v0.bladeHash;
+    r.proceduralBlade = v0.proceduralBlade;
     return r;
 }
 
