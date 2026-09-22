@@ -314,7 +314,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     else
         sunColor.set(0, 0, 0);
 
-    const auto& batchCounts = accelMgr->GetBatchCounts();
+    const auto scene = accelMgr->GetScene();
+    const auto& batchCounts = scene->counts;
     const u32 bounces = static_cast<u32>(std::clamp(ps_r_rt_gi_bounces, 1, 16));
     const u32 samples = static_cast<u32>(std::clamp(ps_r_rt_gi_samples, 1, 8));
     const float rayDistance = std::clamp(ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
@@ -335,10 +336,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.grassBatchStart = batchCounts.grass > 0 ?
         batchCounts.identityStatic + batchCounts.terrain + batchCounts.transparent + batchCounts.instancedTotal + batchCounts.skinned :
         UINT32_MAX;
-    rawCB.detailAtlasIndex = accelMgr->GetDetailAtlasIndex();
+    rawCB.detailAtlasIndex = scene->detailAtlasIndex;
     rawCB.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
     rawCB.lightCount = lightManager.GetLightCount();
-    rawCB.emissiveCount = accelMgr->GetScene()->emissiveCount;
+    rawCB.emissiveCount = scene->emissiveCount;
     rawCB.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
     rawCB.maxBounces = bounces;
     rawCB.samplesPerPixel = samples;
@@ -347,6 +348,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
     rawCB.cameraConeSpread = ComputeRTGICameraConeSpread(invViewProj, cameraPos, width, height);
     rawCB.pad = 0;
+    rawCB.detailMeshBatchStart = scene->detailMeshBatchStart;
+    rawCB.staticDetailBatchStart = scene->staticDetailBatchStart;
+    rawCB.detailPbrIndex = scene->detailPbrIndex;
+    rawCB.detailBumpIndex = scene->detailBumpIndex;
 
     ResourceDesc rawDesc;
     rawDesc.type = ResourceDesc::Type::Texture2D;
@@ -580,6 +585,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.bounces = bounces;
             data.samples = samples;
             data.rayDistance = rayDistance;
+            data.staticDetailInstanceCount = scene->staticDetailInstanceCount;
             data.width = width;
             data.height = height;
         },
@@ -637,6 +643,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.lighting->rtgiBounces = data.bounces;
             data.lighting->rtgiSamples = data.samples;
             data.lighting->rtgiRayDistance = data.rayDistance;
+            data.lighting->rayStaticDetailInstances = data.staticDetailInstanceCount;
         });
 
     ReSTIRGIOutput output;

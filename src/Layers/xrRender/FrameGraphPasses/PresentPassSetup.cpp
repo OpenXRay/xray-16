@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
@@ -42,6 +43,50 @@ static void InitializePresentPass(nvrhi::IDevice* device, nvrhi::Format outputFo
     state.initialized = true;
 }
 
+framegraph::VirtualResourceHandle setupLightingFailurePass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle sceneColor,
+    LightingFrameState& lighting)
+{
+    using namespace framegraph;
+
+    if (!lighting.opaqueScheduled || lighting.scheduled == LightingMode::Raster || !sceneColor.is_valid())
+        return sceneColor;
+
+    auto& passData = fg.addCallbackPass<LightingFailurePassData>(
+        "LightingFailure",
+        [sceneColor, &lighting](FrameGraph& builder, PassHandle passHandle, LightingFailurePassData& data)
+        {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.sceneColor = passBuilder.readWrite(sceneColor, ResourceState::RenderTarget);
+            passBuilder.sideEffects();
+            data.lighting = &lighting;
+        },
+        [](const LightingFailurePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        {
+            auto* lightingState = data.lighting;
+            if (!lightingState || (lightingState->recorded && !lightingState->frameFailed))
+                return;
+
+            if (!lightingState->frameFailed)
+                lightingState->Fail(LightingFallback::RecordingUnavailable);
+
+            Msg("! [LightingFailure] ray traced lighting recorded no world color (%s); clearing the world to black",
+                LightingFallbackName(lightingState->fallback));
+
+            nvrhi::ICommandList* cmdList = ctx ? ctx->GetCommandList() : nullptr;
+            auto* sceneTarget = fg.GetPhysicalTexture(data.sceneColor);
+            if (!cmdList || !sceneTarget)
+                return;
+
+            cmdList->clearTextureFloat(sceneTarget, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+            lightingState->failureCleared = true;
+        }
+    );
+
+    return passData.sceneColor;
+}
+
 framegraph::VirtualResourceHandle setupPresentPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -49,7 +94,8 @@ framegraph::VirtualResourceHandle setupPresentPass(
     framegraph::VirtualResourceHandle outputTarget,
     u32 width,
     u32 height,
-    PresentPassState& state)
+    PresentPassState& state,
+    LightingFrameState* lighting)
 {
     using namespace framegraph;
 
@@ -59,25 +105,28 @@ framegraph::VirtualResourceHandle setupPresentPass(
     if (device)
         InitializePresentPass(device->GetNVRHIDevice(), fg.GetResourceDesc(outputTarget).format, state);
 
-    struct PresentPassData {
-        VirtualResourceHandle sceneColor;
-        VirtualResourceHandle output;
-        u32 width;
-        u32 height;
-        PresentPassState* passState;
-    };
-
     auto& passData = fg.addCallbackPass<PresentPassData>(
         "Present",
-        [sceneColor, outputTarget, width, height, &state](FrameGraph& builder, PassHandle passHandle, PresentPassData& data) {
+        [sceneColor, outputTarget, width, height, &state, lighting](FrameGraph& builder, PassHandle passHandle, PresentPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.sceneColor = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.output = passBuilder.write(outputTarget, ResourceState::RenderTarget);
             data.width = width;
             data.height = height;
             data.passState = &state;
+            data.lighting = lighting;
         },
         [](const PresentPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            if (data.lighting && data.lighting->frameFailed)
+            {
+                nvrhi::ICommandList* cmdList = ctx ? ctx->GetCommandList() : nullptr;
+                auto* target = fg.GetPhysicalTexture(data.output);
+                if (cmdList && target)
+                    cmdList->clearTextureFloat(target, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+                if (!data.lighting->failureCleared)
+                    return;
+            }
+
             auto* ps = data.passState;
             if (!ps->pipeline || !ps->bindingLayout)
                 return;

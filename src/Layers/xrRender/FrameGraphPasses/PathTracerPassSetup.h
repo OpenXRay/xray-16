@@ -60,9 +60,13 @@ public:
     float sunAngularRadius;
     float cameraConeSpread;
     float transportPad;
+    u32 detailMeshBatchStart;
+    u32 staticDetailBatchStart;
+    u32 detailPbrIndex;
+    u32 detailBumpIndex;
 };
 
-static_assert(sizeof(PathTracerCB) == 192);
+static_assert(sizeof(PathTracerCB) == 208);
 
 class PathTracerSnapshotStats
 {
@@ -174,6 +178,7 @@ public:
     u32 width = 0;
     u32 height = 0;
     u32 sampleCount = 0;
+    u32 staticDetailInstanceCount = 0;
     nvrhi::TextureHandle sky0;
     nvrhi::TextureHandle sky1;
     nvrhi::DescriptorTableHandle textureTable;

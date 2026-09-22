@@ -107,7 +107,20 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     }
 
     float3 basisTangent, basisBitangent;
-    RTNormalizedBasis(normal, tangent, bitangent, basisTangent, basisBitangent);
+    if (IsStaticDetailBatch(scene, trace.batchIdx))
+    {
+        float3 up = float3(0.0, 1.0, 0.0);
+        basisTangent = uvTangent - up * dot(up, uvTangent);
+        float tangentLength = length(basisTangent);
+        basisTangent = tangentLength > 1e-8 ? basisTangent / tangentLength : 0.0;
+        basisBitangent = uvBitangent - up * dot(up, uvBitangent) - basisTangent * dot(basisTangent, uvBitangent);
+        float bitangentLength = length(basisBitangent);
+        basisBitangent = bitangentLength > 1e-8 ? basisBitangent / bitangentLength : 0.0;
+    }
+    else
+    {
+        RTNormalizedBasis(normal, tangent, bitangent, basisTangent, basisBitangent);
+    }
 
     geometry.uv = vertex.uv;
     geometry.normal = normal;
@@ -125,6 +138,50 @@ struct RTHitSurface
     uint flags;
 };
 
+RTHitSurface RTResolveStaticDetail(RTSceneParams scene, RTHitGeometry geometry)
+{
+    RTHitSurface result;
+    result.flags = 0;
+    result.surface.shadingClass = SHADING_CLASS_STANDARD;
+    result.surface.transmission = 0.0;
+    result.surface.emissive = 0.0;
+    result.surface.albedo = HasDetailAtlas(scene)
+        ? GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
+            geometry.uvDx, geometry.uvDy).rgb
+        : float3(0.0, 0.0, 0.0);
+
+    float3 worldUp = float3(0.0, 1.0, 0.0);
+    float3 N = worldUp;
+    float gloss = 0.0;
+    float variance = 0.0;
+    if (HasDetailBump(scene))
+    {
+        BumpSample bump = DecodeBump(GetBindlessTexture(scene.detailBumpIndex).SampleGrad(smp_linear,
+            geometry.uv, geometry.uvDx, geometry.uvDy));
+        N = RTSafeNormalize(mul(bump.normal, float3x3(geometry.tangent, geometry.bitangent, worldUp)), worldUp);
+        gloss = bump.gloss;
+        variance = bump.variance;
+    }
+
+    float metallic = 0.0;
+    float roughness = 1.0 - gloss;
+    float ao = 1.0;
+    if (HasDetailPbr(scene))
+    {
+        float4 pbr = GetBindlessTexture(scene.detailPbrIndex).SampleGrad(smp_linear, geometry.uv,
+            geometry.uvDx, geometry.uvDy);
+        metallic = pbr.r;
+        roughness = pbr.g;
+        ao = pbr.b;
+    }
+
+    result.surface.N = N;
+    result.surface.roughness = RoughnessWithVariance(roughness, variance);
+    result.surface.metallic = metallic;
+    result.surface.ao = ao;
+    return result;
+}
+
 RTHitSurface RTResolveHitSurface(RTSceneParams scene, RTSceneTrace trace, RTHitGeometry geometry)
 {
     RTHitSurface result;
@@ -135,7 +192,10 @@ RTHitSurface RTResolveHitSurface(RTSceneParams scene, RTSceneTrace trace, RTHitG
 
     if (IsGrassBatch(scene, trace.batchIdx))
     {
-        if (HasDetailAtlas(scene))
+        if (IsStaticDetailBatch(scene, trace.batchIdx))
+            return RTResolveStaticDetail(scene, geometry);
+
+        if (IsDetailMeshBatch(scene, trace.batchIdx) && HasDetailAtlas(scene))
         {
             float4 texel = GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
                 geometry.uvDx, geometry.uvDy);

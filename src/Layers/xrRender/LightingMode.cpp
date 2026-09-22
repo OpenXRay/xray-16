@@ -7,8 +7,13 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
 {
     requested = requestPT ? LightingMode::ReferencePT : (requestRTGI ? LightingMode::RTGI : LightingMode::Raster);
     effective = requested;
+    scheduled = LightingMode::Raster;
     fallback = LightingFallback::None;
     conflictingRequests = requestRTGI && requestPT;
+    opaqueScheduled = false;
+    frameFailed = false;
+    recoveryActive = false;
+    failureCleared = false;
     recorded = false;
     recordedSamples = 0;
     reuseRequested = false;
@@ -23,12 +28,52 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
     rayGrassRadius = 0.0f;
     rayGrassEnabled = false;
     rayGrassPending = false;
+    rayStaticDetailInstances = 0;
     rawSignalsRecorded = false;
     sceneRevision = 0;
+
+    if (m_latchedReason == LightingFallback::None)
+        return;
+    if (m_latchedMode != requested)
+    {
+        m_latchedMode = LightingMode::Raster;
+        m_latchedReason = LightingFallback::None;
+        return;
+    }
+    effective = LightingMode::Raster;
+    recoveryActive = true;
+    fallback = m_latchedReason;
+}
+
+void LightingFrameState::ScheduleOpaqueLighting()
+{
+    scheduled = effective;
+    opaqueScheduled = true;
 }
 
 void LightingFrameState::Fail(LightingFallback reason)
 {
+    if (opaqueScheduled && scheduled != LightingMode::Raster)
+    {
+        if (frameFailed)
+            return;
+        if (reason == LightingFallback::None)
+            reason = LightingFallback::RecordingUnavailable;
+        frameFailed = true;
+        effective = scheduled;
+        fallback = reason;
+        recorded = false;
+        recordedSamples = 0;
+        reuseAvailable = false;
+        reuseReservoirs = false;
+        historyUsed = false;
+        rawSignalsRecorded = false;
+        rayStaticDetailInstances = 0;
+        m_latchedMode = requested;
+        m_latchedReason = reason;
+        return;
+    }
+
     effective = LightingMode::Raster;
     fallback = reason;
     recorded = false;
@@ -36,6 +81,13 @@ void LightingFrameState::Fail(LightingFallback reason)
     reuseReservoirs = false;
     historyUsed = false;
     rawSignalsRecorded = false;
+    rayStaticDetailInstances = 0;
+}
+
+void LightingFrameState::ResetRecovery()
+{
+    m_latchedMode = LightingMode::Raster;
+    m_latchedReason = LightingFallback::None;
 }
 
 const char* LightingModeName(LightingMode mode)
@@ -68,6 +120,7 @@ const char* LightingFallbackName(LightingFallback reason)
     case LightingFallback::EnvironmentUnavailable: return "sky textures unavailable";
     case LightingFallback::InputsUnavailable:      return "lighting frame inputs unavailable";
     case LightingFallback::BindingUnavailable:     return "lighting bindings unavailable";
+    case LightingFallback::RecordingUnavailable:   return "RT dispatch recording unavailable";
     }
     return "unknown fallback";
 }

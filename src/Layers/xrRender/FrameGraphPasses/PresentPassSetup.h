@@ -9,6 +9,7 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg {
     class RenderDevice;
+    class LightingFrameState;
 }
 
 namespace xray::render::fg::passes {
@@ -19,6 +20,30 @@ struct PresentPassState {
     bool initialized = false;
 };
 
+class PresentPassData
+{
+public:
+    framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle output;
+    u32 width = 0;
+    u32 height = 0;
+    PresentPassState* passState = nullptr;
+    const LightingFrameState* lighting = nullptr;
+};
+
+class LightingFailurePassData
+{
+public:
+    framegraph::VirtualResourceHandle sceneColor;
+    LightingFrameState* lighting = nullptr;
+};
+
+framegraph::VirtualResourceHandle setupLightingFailurePass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle sceneColor,
+    LightingFrameState& lighting
+);
+
 framegraph::VirtualResourceHandle setupPresentPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
@@ -26,7 +51,8 @@ framegraph::VirtualResourceHandle setupPresentPass(
     framegraph::VirtualResourceHandle outputTarget,
     u32 width,
     u32 height,
-    PresentPassState& state
+    PresentPassState& state,
+    LightingFrameState* lighting = nullptr
 );
 
 }
