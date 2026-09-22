@@ -1,0 +1,7 @@
+#ifndef DETAIL_ALPHA_H
+#define DETAIL_ALPHA_H
+
+#define DETAIL_PULLED_CARD_ALPHA_REF (96.0f / 255.0f)
+#define DETAIL_STATIC_PATCH_ALPHA_REF 0.5f
+
+#endif

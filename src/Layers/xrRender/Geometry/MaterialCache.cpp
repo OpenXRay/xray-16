@@ -1015,22 +1015,51 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
 
 
+bool MaterialCache::IsFramebufferDependentKey(const MaterialKey& key)
+{
+    return key.psoType == PSOType::UI || key.psoType == PSOType::Depth;
+}
+
+void MaterialCache::ReleasePSOTextures(MaterialPSO* pso)
+{
+    if (!pso)
+        return;
+
+    resources::TextureManager* texMgr = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
+    if (!texMgr)
+        return;
+
+    for (auto& slot : pso->textures)
+        if (slot.handle.IsValid())
+            texMgr->Release(slot.handle);
+
+    pso->textures.clear();
+}
+
+void MaterialCache::InvalidateFramebufferDependent()
+{
+    for (auto it = m_cache.begin(); it != m_cache.end();)
+    {
+        if (!IsFramebufferDependentKey(it->first))
+        {
+            ++it;
+            continue;
+        }
+
+        ReleasePSOTextures(it->second.get());
+        it = m_cache.erase(it);
+    }
+
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+}
+
 void MaterialCache::Clear()
 {
-    if (m_resourceManager)
-    {
-        if (resources::TextureManager* texMgr = m_resourceManager->GetTextureManager())
-        {
-            for (auto& [key, pso] : m_cache)
-            {
-                if (!pso) continue;
-                for (auto& slot : pso->textures)
-                    if (slot.handle.IsValid())
-                        texMgr->Release(slot.handle);
-                pso->textures.clear();
-            }
-        }
-    }
+    InvalidateFramebufferDependent();
+
+    for (auto& [key, pso] : m_cache)
+        ReleasePSOTextures(pso.get());
+
     m_cache.clear();
     m_textureHandleCache.clear();
     m_detailScaleCache.clear();
@@ -1425,28 +1454,20 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         matData.detailScale = GetDetailScale(visual->textureName);
     }
 
-    if (visual->shaderName.size() > 0) {
+    if (visual->shaderName.size() > 0)
+    {
         const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str(), visual->textureName.c_str());
-        if (matInfo.alphaTest) {
-            matData.flags |= MAT_FLAG_ALPHA_TEST;
-            matData.alphaRef = matInfo.alphaRef / 255.0f;
+        matData.alphaRef = matInfo.GetAlphaReference();
+        matData.flags = matInfo.GetMaterialFlags() | MAT_FLAG_HAS_NORMAL;
+        matData.shaderVariant = matInfo.shaderVariant;
+        if (matInfo.alphaTest)
+        {
             auto it = m_alphaRefByTexture.find(visual->textureName);
             if (it == m_alphaRefByTexture.end())
                 m_alphaRefByTexture[visual->textureName] = matInfo.alphaRef;
             else
                 it->second = std::max(it->second, matInfo.alphaRef);
         }
-        if (matInfo.transparent) {
-            matData.flags |= MAT_FLAG_ALPHA_BLEND;
-        }
-        if (matInfo.foliage)
-            matData.flags |= MAT_FLAG_FOLIAGE;
-        if (strstr(visual->shaderName.c_str(), "water") != nullptr)
-            matData.flags |= MAT_FLAG_WATER;
-        matData.shaderVariant = matInfo.shaderVariant;
-        if (matInfo.emissive > 0.0f)
-            matData.flags |= MAT_FLAG_EMISSIVE;
-        matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);

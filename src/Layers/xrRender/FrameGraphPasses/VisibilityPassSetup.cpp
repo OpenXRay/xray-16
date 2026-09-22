@@ -12,6 +12,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "../../../../res/gamedata/shaders/r5/shared/detail_alpha.h"
 #include "Layers/xrRender/xrRender_console.h"
 
 namespace xray::render::fg::passes {
@@ -716,10 +717,10 @@ void renderVisibilityRaster(
 
             if (pulledPsRefl && state.pulledPipeline && source.maxPulledIndexCount > 0) {
                 drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Meshes",
-                         FGDetailManager::VIS_KIND_MESH, 0, 96.0f / 255.0f,
+                         FGDetailManager::VIS_KIND_MESH, 0, DETAIL_PULLED_CARD_ALPHA_REF,
                          frame.visible[FGDetailManager::VIS_KIND_MESH], frame.drawArgs[FGDetailManager::VIS_KIND_MESH], nullptr, nullptr);
                 drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Patches",
-                         FGDetailManager::VIS_KIND_DECAL, 0, 0.5f,
+                         FGDetailManager::VIS_KIND_DECAL, 0, DETAIL_STATIC_PATCH_ALPHA_REF,
                          frame.visible[FGDetailManager::VIS_KIND_DECAL], frame.drawArgs[FGDetailManager::VIS_KIND_DECAL], nullptr, nullptr);
             }
         }

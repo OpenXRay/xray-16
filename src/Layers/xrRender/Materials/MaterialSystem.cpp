@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/Bindless/BindlessTypes.h"
 #include "Layers/xrRender/Bindless/VariantBuffer.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 
@@ -23,6 +24,29 @@ MaterialSystem& GetMaterialSystemInstance()
 MaterialSystem& MaterialSystem::Instance()
 {
     return GetMaterialSystemInstance();
+}
+
+u32 MaterialSystem::MaterialInfo::GetMaterialFlags() const
+{
+    using namespace fg::bindless;
+
+    u32 flags = 0;
+    if (alphaTest)
+        flags |= MAT_FLAG_ALPHA_TEST;
+    if (transparent)
+        flags |= MAT_FLAG_ALPHA_BLEND;
+    if (foliage)
+        flags |= MAT_FLAG_FOLIAGE;
+    if (water)
+        flags |= MAT_FLAG_WATER;
+    if (emissive > 0.0f)
+        flags |= MAT_FLAG_EMISSIVE;
+    return flags;
+}
+
+float MaterialSystem::MaterialInfo::GetAlphaReference() const
+{
+    return alphaTest ? float(alphaRef) / 255.0f : 0.5f;
 }
 
 bool MaterialSystem::TextureSet::IsValid() const
@@ -89,6 +113,7 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared
     const shared_str& key = shaderNameStr;
 
     MaterialInfo info = GetDefaultMaterialInfo();
+    info.water = strstr(shaderName, "water") != nullptr;
 
     using BlendMode = shader_info::ShaderBlendMode;
     shader_info::ShaderBlendInfo blendInfo;

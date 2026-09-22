@@ -1,4 +1,3 @@
-// xrRender/GPUCullingManager.cpp
 #include "stdafx.h"
 #include "GPUCullingManager.h"
 #include "ClusterShadowBVH.h"
@@ -46,9 +45,6 @@ static u32 MaterialObjectFlags(u32 materialID)
         return 0u;
     if (material->flags & bindless::MAT_FLAG_ALPHA_BLEND)
         return GPU_OBJECT_NO_RESOLVE;
-    if (const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant))
-        if (variant->transparent || (!variant->passes.empty() && variant->passes[0].blendEnabled))
-            return GPU_OBJECT_NO_RESOLVE;
     return 0u;
 }
 

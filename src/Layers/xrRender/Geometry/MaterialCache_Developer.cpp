@@ -159,19 +159,9 @@ u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shader
     materialData.detailIndex = fg::bindless::INVALID_TEXTURE_INDEX;
     materialData.pbrIndex = pbrIndex;
     materialData.detailScale = 1.0f;
-    materialData.alphaRef = 0.5f;
-    materialData.flags = fg::bindless::MAT_FLAG_HAS_PBR;
+    materialData.alphaRef = materialInfo.GetAlphaReference();
+    materialData.flags = materialInfo.GetMaterialFlags() | fg::bindless::MAT_FLAG_HAS_PBR;
     materialData.shaderVariant = materialInfo.shaderVariant;
-
-    if (materialInfo.alphaTest)
-    {
-        materialData.flags |= fg::bindless::MAT_FLAG_ALPHA_TEST;
-        materialData.alphaRef = materialInfo.alphaRef / 255.0f;
-    }
-    if (materialInfo.transparent)
-        materialData.flags |= fg::bindless::MAT_FLAG_ALPHA_BLEND;
-    if (materialInfo.emissive > 0.0f)
-        materialData.flags |= fg::bindless::MAT_FLAG_EMISSIVE;
 
     if (materialID != UINT32_MAX)
         materialBuffer.UpdateMaterial(materialID, materialData);

@@ -37,7 +37,6 @@
 #include "Layers/xrRender/FProgressive.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
-#include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -692,8 +691,8 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
             mesh->ibPoolID, iBase, iCount, mesh->useAlternativeGeom);
         if (!alloc.valid)
             continue;
-        const bool forward = !isTerrain && visual->shaderName.size()
-            && MaterialSystem::Instance().GetMaterialInfo(visual->shaderName).transparent;
+        const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName, visual->textureName);
+        const bool forward = !isTerrain && materialInfo.transparent;
         if (forward)
         {
             const u32 materialID = m_materialCache
@@ -708,15 +707,14 @@ void FrameGraphRenderer::CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange
             gpuCulling->RetainForwardGeometry(alloc);
             continue;
         }
-        shader_info::ShaderBlendInfo blendInfo;
-        shader_info::GetShaderBlendInfo(visual->shaderName.c_str(), blendInfo);
-
         fg::ClusterBakeRange range = makeRange(alloc);
         if (isTerrain) {
             range.flags |= fg::CLUSTER_RANGE_FLAG_TERRAIN;
             if (mergeableType)
                 range.flags |= fg::CLUSTER_RANGE_FLAG_MERGEABLE;
-        } else if (blendInfo.mode == shader_info::ShaderBlendMode::AlphaTest) {
+        }
+        else if (materialInfo.alphaTest)
+        {
             range.flags |= fg::CLUSTER_RANGE_FLAG_AT;
         } else if (mergeableType) {
             range.flags |= fg::CLUSTER_RANGE_FLAG_MERGEABLE;

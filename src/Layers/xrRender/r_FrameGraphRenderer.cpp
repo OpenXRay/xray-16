@@ -3565,9 +3565,9 @@ void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
     m_mainView.InvalidateHistory();
     framegraph::GetPassResourceCache().ClearFramebufferDependent();
     if (m_materialCache)
-        m_materialCache->Clear();
+        m_materialCache->InvalidateFramebufferDependent();
     if (m_uiMaterialCache)
-        m_uiMaterialCache->Clear();
+        m_uiMaterialCache->InvalidateFramebufferDependent();
     ReRegisterDeveloperMaterials();
 }
 
