@@ -4,6 +4,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "Layers/xrRender/Bindless/BindlessTypes.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "xrEngine/IRenderBackend.h"
 
 namespace xray::render
@@ -23,18 +24,19 @@ void MaterialCache::BuildDeveloperTextureDesc(fg::RenderDevice::TextureDesc& des
     desc.debugName = debugName;
 }
 
-void MaterialCache::FillDeveloperColorPixels(u8* pixels, const Fvector& color)
+void MaterialCache::FillDeveloperColorPixels(u8* pixels, const Fvector& color, float opacity)
 {
     const u8 r = QuantizeDeveloperChannel(color.x);
     const u8 g = QuantizeDeveloperChannel(color.y);
     const u8 b = QuantizeDeveloperChannel(color.z);
+    const u8 a = QuantizeDeveloperChannel(opacity);
 
     for (u32 texel = 0; texel < DEVELOPER_TEXTURE_SIZE * DEVELOPER_TEXTURE_SIZE; ++texel)
     {
         pixels[texel * 4 + 0] = r;
         pixels[texel * 4 + 1] = g;
         pixels[texel * 4 + 2] = b;
-        pixels[texel * 4 + 3] = 255;
+        pixels[texel * 4 + 3] = a;
     }
 }
 
@@ -53,7 +55,7 @@ void MaterialCache::FillDeveloperPbrPixels(u8* pixels, float metallic, float rou
 }
 
 u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shaderName, const char* textureName,
-    const Fvector& color, float metallic, float roughness)
+    const Fvector& color, float metallic, float roughness, float opacity)
 {
     if (!key || !key[0] || !shaderName || !shaderName[0] || !textureName || !textureName[0])
     {
@@ -108,7 +110,7 @@ u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shader
     BuildDeveloperTextureDesc(diffuseDesc, nvrhi::Format::RGBA8_UNORM, debugName);
 
     u8 diffusePixels[DEVELOPER_TEXTURE_SIZE * DEVELOPER_TEXTURE_SIZE * 4];
-    FillDeveloperColorPixels(diffusePixels, color);
+    FillDeveloperColorPixels(diffusePixels, color, opacity);
     const fg::TextureHandle diffuse = m_device->CreateTexture(diffuseDesc, diffusePixels);
 
     fg::RenderDevice::TextureDesc pbrDesc;
@@ -150,6 +152,7 @@ u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shader
         return UINT32_MAX;
     }
 
+    const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(shaderName, textureName);
     fg::bindless::MaterialData materialData = {};
     materialData.diffuseIndex = diffuseIndex;
     materialData.normalIndex = fg::bindless::INVALID_TEXTURE_INDEX;
@@ -158,7 +161,17 @@ u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shader
     materialData.detailScale = 1.0f;
     materialData.alphaRef = 0.5f;
     materialData.flags = fg::bindless::MAT_FLAG_HAS_PBR;
-    materialData.shaderVariant = 0;
+    materialData.shaderVariant = materialInfo.shaderVariant;
+
+    if (materialInfo.alphaTest)
+    {
+        materialData.flags |= fg::bindless::MAT_FLAG_ALPHA_TEST;
+        materialData.alphaRef = materialInfo.alphaRef / 255.0f;
+    }
+    if (materialInfo.transparent)
+        materialData.flags |= fg::bindless::MAT_FLAG_ALPHA_BLEND;
+    if (materialInfo.emissive > 0.0f)
+        materialData.flags |= fg::bindless::MAT_FLAG_EMISSIVE;
 
     if (materialID != UINT32_MAX)
         materialBuffer.UpdateMaterial(materialID, materialData);
@@ -197,8 +210,9 @@ u32 MaterialCache::RegisterDeveloperMaterial(const char* key, const char* shader
     else
         m_developerMaterials.emplace(key, material);
 
-    Msg("* [dev_level] material '%s' registered (matID=%u diffuse=%u pbr=%u metallic=%.3f roughness=%.3f)",
-        key, materialID, diffuseIndex, pbrIndex, metallic, roughness);
+    Msg("* [dev_level] event=material_registered key='%s' shader='%s' mat_id=%u diffuse=%u pbr=%u metallic=%.3f roughness=%.3f opacity=%.3f emissive=%.3f transparent=%u variant=%u flags=0x%X",
+        key, shaderName, materialID, diffuseIndex, pbrIndex, metallic, roughness, opacity, materialInfo.emissive,
+        u32(materialInfo.transparent), materialData.shaderVariant, materialData.flags);
 
     return materialID;
 }

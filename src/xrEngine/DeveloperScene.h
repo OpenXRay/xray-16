@@ -22,9 +22,11 @@ class DeveloperSceneMaterial
 {
 public:
     xr_string name;
+    xr_string shaderName;
     Fvector color = { 1.0f, 1.0f, 1.0f };
     float metallic = 0.0f;
     float roughness = 0.5f;
+    float opacity = 1.0f;
 };
 
 class DeveloperSceneMesh

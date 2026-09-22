@@ -308,7 +308,7 @@ private:
 
     static u8 QuantizeDeveloperChannel(float value);
     static void BuildDeveloperTextureDesc(fg::RenderDevice::TextureDesc& desc, nvrhi::Format format, pcstr debugName);
-    static void FillDeveloperColorPixels(u8* pixels, const Fvector& color);
+    static void FillDeveloperColorPixels(u8* pixels, const Fvector& color, float opacity);
     static void FillDeveloperPbrPixels(u8* pixels, float metallic, float roughness);
 
     void CreateDefaultPBRTextures();
@@ -345,7 +345,7 @@ public:
     u32 PreRegisterParticleMaterial(const shared_str& textureName);
 
     u32 RegisterDeveloperMaterial(const char* key, const char* shaderName, const char* textureName,
-        const Fvector& color, float metallic, float roughness);
+        const Fvector& color, float metallic, float roughness, float opacity);
 
     void ReleaseDeveloperMaterials();
 
