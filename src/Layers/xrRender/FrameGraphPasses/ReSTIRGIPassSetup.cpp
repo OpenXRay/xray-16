@@ -467,7 +467,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
             auto* environmentDistribution = fg.GetPhysicalBuffer(data.environmentDistribution);
             if (!sky0 || !sky1 || !tlas || !batchInfo || !megaVB || !megaIB || !matBuf || !terrainBuf ||
-                !scene.variants || !scene.textures || !scene.emissiveTriangles || !scene.batchTransforms ||
+                !scene.grassMaterials || !scene.variants || !scene.textures || !scene.emissiveTriangles || !scene.batchTransforms ||
                 !scene.emissiveBatchOffsets || !environmentDistribution)
             {
                 Msg("! [RTGI Trace] Null binding: sky0=%d sky1=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
@@ -521,6 +521,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             bsb.Texture("g_Sky1", sky1);
             bsb.BufferSRV("g_SkinnedVB", skinnedVB);
             bsb.BufferSRV("g_Materials", matBuf);
+            bsb.BufferSRV("g_GrassMaterials", scene.grassMaterials);
             bsb.BufferSRV("g_TerrainMaterials", terrainBuf);
             bsb.BufferSRV("g_Variants", scene.variants);
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);

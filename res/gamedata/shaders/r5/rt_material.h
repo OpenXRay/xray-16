@@ -1,6 +1,10 @@
 #ifndef RT_MATERIAL_H
 #define RT_MATERIAL_H
 
+#include "rt_common.h"
+#include "detail_blade_material.h"
+#include "detail_blade_ray.h"
+
 struct RTHitGeometry
 {
     float2 uv;
@@ -10,11 +14,21 @@ struct RTHitGeometry
     float3 geoNormal;
     float3 tangent;
     float3 bitangent;
+    float3 position;
+    float bladeVariance;
+    uint bladeObjectId;
+    float bladeHash;
+    bool proceduralBlade;
 };
 
 bool RTBatchVerticesInWorldSpace(RTSceneParams scene, uint batchIdx)
 {
     return IsGrassBatch(scene, batchIdx) || IsSkinnedBatch(scene, batchIdx);
+}
+
+bool RTGrassBatchProcedural(RTSceneParams scene, uint batchIdx)
+{
+    return IsGrassBatch(scene, batchIdx) && !IsDetailMeshBatch(scene, batchIdx) && !IsStaticDetailBatch(scene, batchIdx);
 }
 
 void RTLoadBatchTriangleVertices(RTSceneParams scene, uint batchIdx, RTBatchInfo info, uint primitiveIndex,
@@ -23,10 +37,11 @@ void RTLoadBatchTriangleVertices(RTSceneParams scene, uint batchIdx, RTBatchInfo
     uint i0, i1, i2;
     if (IsGrassBatch(scene, batchIdx))
     {
+        bool procedural = RTGrassBatchProcedural(scene, batchIdx);
         RTLoadTriangleIndices(g_GrassIB, info, primitiveIndex, i0, i1, i2);
-        v0 = RTLoadGrassVertex(g_GrassVB, i0);
-        v1 = RTLoadGrassVertex(g_GrassVB, i1);
-        v2 = RTLoadGrassVertex(g_GrassVB, i2);
+        v0 = RTLoadGrassVertex(g_GrassVB, i0, procedural);
+        v1 = RTLoadGrassVertex(g_GrassVB, i1, procedural);
+        v2 = RTLoadGrassVertex(g_GrassVB, i2, procedural);
         return;
     }
 
@@ -77,22 +92,36 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     bool pulledWavingCard = IsDetailMeshBatch(scene, trace.batchIdx);
     bool pulledStaticPatch = IsStaticDetailBatch(scene, trace.batchIdx);
 
+    float3 uvTangent, uvBitangent;
+    RTUVDerivedBasis(p0, p1, p2, v0.uv, v1.uv, v2.uv, uvTangent, uvBitangent);
+
+    float2 uvDx, uvDy;
+    RTUVFootprintFromRayCone(uvTangent, uvBitangent, geoNormal, rayDirection, trace.t,
+        trace.coneWidth, trace.coneSpread, uvDx, uvDy);
+
+    float bladeVariance = 0.0;
     float3 normal;
-    if (pulledWavingCard)
-        normal = geoNormal;
-    else if (RTPackedVectorValid(vertex.normal))
-        normal = worldSpaceVertices ? vertex.normal : TransformNormalToWorld(vertex.normal, trace.objectToWorld);
+    if (vertex.proceduralBlade)
+    {
+        RTBladeShading blade = RTResolveBladeShading(v0, v1, v2, vertex, uvDx, uvDy, -rayDirection);
+        normal = blade.normal;
+        bladeVariance = blade.variance;
+    }
     else
-        normal = geoNormal;
+    {
+        if (pulledWavingCard)
+            normal = geoNormal;
+        else if (RTPackedVectorValid(vertex.normal))
+            normal = worldSpaceVertices ? vertex.normal : TransformNormalToWorld(vertex.normal, trace.objectToWorld);
+        else
+            normal = geoNormal;
+    }
 
     normal = RTSafeNormalize(normal, geoNormal);
     if (dot(normal, geoNormal) < 0.0)
         normal = -normal;
     if (dot(normal, rayDirection) >= 0.0)
         normal = geoNormal;
-
-    float3 uvTangent, uvBitangent;
-    RTUVDerivedBasis(p0, p1, p2, v0.uv, v1.uv, v2.uv, uvTangent, uvBitangent);
 
     float3 tangent = vertex.tangent;
     float3 bitangent = vertex.bitangent;
@@ -128,12 +157,17 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     }
 
     geometry.uv = vertex.uv;
+    geometry.uvDx = uvDx;
+    geometry.uvDy = uvDy;
     geometry.normal = normal;
     geometry.geoNormal = geoNormal;
     geometry.tangent = basisTangent;
     geometry.bitangent = basisBitangent;
-    RTUVFootprintFromRayCone(uvTangent, uvBitangent, geoNormal, rayDirection, trace.t,
-        trace.coneWidth, trace.coneSpread, geometry.uvDx, geometry.uvDy);
+    geometry.position = RTInterpolatePoint(p0, p1, p2, trace.barycentrics);
+    geometry.bladeVariance = bladeVariance;
+    geometry.bladeObjectId = vertex.bladeObjectId;
+    geometry.bladeHash = vertex.bladeHash;
+    geometry.proceduralBlade = vertex.proceduralBlade;
     return geometry;
 }
 
@@ -148,10 +182,13 @@ float RTPulledDetailAlphaRef(bool wavingCard)
     return wavingCard ? RT_PULLED_CARD_ALPHA_REF : RT_STATIC_DETAIL_ALPHA_REF;
 }
 
-bool RTPulledDetailOpaque(RTSceneParams scene, RTHitGeometry geometry, bool wavingCard)
+bool RTPulledDetailOpaque(RTSceneParams scene, RTHitGeometry geometry, bool wavingCard, bool shadowRay)
 {
     if (!HasDetailAtlas(scene))
         return true;
+
+    if (shadowRay && wavingCard)
+        return GetBindlessTexture(scene.detailAtlasIndex).SampleLevel(smp_linear, geometry.uv, 0.0).a >= RTPulledDetailAlphaRef(true);
 
     return GetBindlessTexture(scene.detailAtlasIndex).SampleGrad(smp_linear, geometry.uv,
         geometry.uvDx, geometry.uvDy).a >= RTPulledDetailAlphaRef(wavingCard);
@@ -201,6 +238,31 @@ RTHitSurface RTResolvePulledDetail(RTSceneParams scene, RTHitGeometry geometry, 
     return result;
 }
 
+RTHitSurface RTResolveBladeMaterial(RTHitGeometry geometry)
+{
+    RTHitSurface result;
+    result.flags = 0;
+
+    float4 base = g_GrassMaterials[0];
+    float4 tip = g_GrassMaterials[1];
+    float3 tint = g_GrassMaterials[RT_GRASS_MATERIAL_TINT_BASE + geometry.bladeObjectId].rgb;
+    float4 vein = BLADE_NEUTRAL_VEIN;
+    float heightParam = 1.0 - geometry.uv.y;
+    float widthPercent = geometry.uv.x;
+
+    float3 albedo = BladeBaseAlbedo(base.rgb, tip.rgb, tint, base.w, geometry.bladeHash, heightParam);
+    albedo = BladeVeinAlbedo(albedo, vein, vein.a);
+    result.surface.albedo = BladeDistanceFade(albedo, base.rgb, tip.rgb, geometry.position);
+    result.surface.N = geometry.normal;
+    result.surface.roughness = BladeRoughness(heightParam, vein.a, geometry.bladeVariance);
+    result.surface.metallic = 0.0;
+    result.surface.ao = BladeAmbientOcclusion(heightParam, widthPercent, vein.a);
+    result.surface.emissive = 0.0;
+    result.surface.shadingClass = SHADING_CLASS_FOLIAGE;
+    result.surface.transmission = foliage_params.x;
+    return result;
+}
+
 RTHitSurface RTResolveHitSurface(RTSceneParams scene, RTSceneTrace trace, RTHitGeometry geometry)
 {
     RTHitSurface result;
@@ -217,14 +279,7 @@ RTHitSurface RTResolveHitSurface(RTSceneParams scene, RTSceneTrace trace, RTHitG
         if (IsDetailMeshBatch(scene, trace.batchIdx))
             return RTResolvePulledDetail(scene, geometry, true);
 
-        result.surface.albedo = lerp(float3(0.08, 0.18, 0.03), float3(0.15, 0.35, 0.06), 1.0 - geometry.uv.y);
-        result.surface.N = geometry.normal;
-        result.surface.roughness = 1.0;
-        result.surface.metallic = 0.0;
-        result.surface.ao = 1.0;
-        result.surface.shadingClass = SHADING_CLASS_FOLIAGE;
-        result.surface.transmission = foliage_params.x;
-        return result;
+        return RTResolveBladeMaterial(geometry);
     }
 
     if (IsTerrainBatch(scene, trace.batchIdx))

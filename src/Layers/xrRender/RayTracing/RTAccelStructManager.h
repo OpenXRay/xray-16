@@ -85,6 +85,7 @@ public:
     framegraph::VirtualResourceHandle materials;
     framegraph::VirtualResourceHandle terrainMaterials;
     framegraph::VirtualResourceHandle variants;
+    framegraph::VirtualResourceHandle grassMaterials;
     framegraph::VirtualResourceHandle skinnedVertices;
     framegraph::VirtualResourceHandle skinnedIndices;
     framegraph::VirtualResourceHandle grassVertices;
@@ -106,6 +107,7 @@ public:
     nvrhi::IBuffer* materials = nullptr;
     nvrhi::IBuffer* terrainMaterials = nullptr;
     nvrhi::IBuffer* variants = nullptr;
+    nvrhi::IBuffer* grassMaterials = nullptr;
     nvrhi::IBuffer* skinnedVertices = nullptr;
     nvrhi::IBuffer* skinnedIndices = nullptr;
     nvrhi::IBuffer* grassVertices = nullptr;
@@ -310,6 +312,7 @@ public:
     nvrhi::BufferHandle sourceTerrainMaterials;
     nvrhi::BufferHandle sourceVariants;
     nvrhi::BufferHandle variants;
+    nvrhi::BufferHandle grassMaterials;
     nvrhi::BufferHandle bones;
     xr_vector<nvrhi::BufferHandle> skinSources;
     nvrhi::BufferHandle skinnedVertices;

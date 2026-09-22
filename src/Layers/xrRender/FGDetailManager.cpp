@@ -1793,17 +1793,29 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.grass_pad0 = fc.grass_pad1 = fc.grass_pad2 = 0.0f;
 }
 
+void FGDetailManager::FillGrassMaterialConstants(GrassMaterialConstants& out) const
+{
+    out.colorBase.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y,
+        ps_r3_grass_color_base.z, ps_r3_grass_color_variation);
+    out.colorTip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
+    for (u32 i = 0; i < 64; i++)
+        out.objectTints[i].set(ps_r3_grass_object_tints[i].x, ps_r3_grass_object_tints[i].y,
+            ps_r3_grass_object_tints[i].z, 1.0f);
+}
+
 void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)
 {
     if (!cmdList || !cachedGrassTintsBuffer)
         return;
+    GrassMaterialConstants materialConstants = {};
+    FillGrassMaterialConstants(materialConstants);
     GrassObjectTint tintData[64];
     for (int i = 0; i < 64; i++)
     {
-        tintData[i].r = ps_r3_grass_object_tints[i].x;
-        tintData[i].g = ps_r3_grass_object_tints[i].y;
-        tintData[i].b = ps_r3_grass_object_tints[i].z;
-        tintData[i].pad = 1.0f;
+        tintData[i].r = materialConstants.objectTints[i].x;
+        tintData[i].g = materialConstants.objectTints[i].y;
+        tintData[i].b = materialConstants.objectTints[i].z;
+        tintData[i].pad = materialConstants.objectTints[i].w;
     }
     cmdList->writeBuffer(cachedGrassTintsBuffer, tintData, sizeof(tintData));
 }

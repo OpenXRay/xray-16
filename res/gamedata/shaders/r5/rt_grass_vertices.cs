@@ -52,14 +52,14 @@ void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
     BladeBend w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_WindTexture, smp_linear);
     BladeVertex v = EvalBladeVertex(b, w, local_vert, segments, wave.w, grass_blade_width, g_WindTexture, smp_linear);
 
-    float3 normal_sum = v.rotatedNormal1 + v.rotatedNormal2;
-    float normal_len = length(normal_sum);
-    float3 normal = (normal_len > 0.001) ? (normal_sum / normal_len) : b.facing;
+    uint hash16 = uint(round(b.bladeHash * 65535.0)) & 0xFFFFu;
+    uint sideBits = uint(round(v.uv.x * 2.0)) & 0x3u;
 
     uint outAddr = (outputVertexOffset + global_vert) * 24;
     g_Output.Store3(outAddr, asuint(v.pos));
-    g_Output.Store(outAddr + 12, pack_normal(normal));
-    g_Output.Store2(outAddr + 16, asuint(v.uv));
+    g_Output.Store(outAddr + 12, pack_normal(v.rotatedNormal1) | (b.objectId << 24) | (sideBits << 30));
+    g_Output.Store(outAddr + 16, pack_normal(v.rotatedNormal2) | ((hash16 & 0xFFu) << 24));
+    g_Output.Store(outAddr + 20, f32tof16(v.uv.y) | (((hash16 >> 8u) & 0xFFu) << 16));
 
     if (local_vert % 2 == 0 && local_vert < segments * 2) {
         uint seg = local_vert / 2;

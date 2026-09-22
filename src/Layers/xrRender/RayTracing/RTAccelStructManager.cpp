@@ -373,6 +373,7 @@ bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
         !scene.materials ||
         !scene.terrainMaterials ||
         !scene.variants ||
+        !scene.grassMaterials ||
         !scene.emissiveTriangleBuffer ||
         !scene.batchTransformBuffer ||
         !scene.emissiveBatchOffsetBuffer ||
@@ -1694,7 +1695,9 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
         !EnsureRTBuffer(device, scene.batchTransformBuffer, RTTableBufferDesc("RT_BatchTransforms",
             sizeof(RTBatchTransform), scene.batchTransforms.size())) ||
         !EnsureRTBuffer(device, scene.emissiveBatchOffsetBuffer, RTTableBufferDesc("RT_EmissiveBatchOffsets",
-            sizeof(u32), scene.emissiveBatchOffsets.size())))
+            sizeof(u32), scene.emissiveBatchOffsets.size())) ||
+        !EnsureRTBuffer(device, scene.grassMaterials, RTTableBufferDesc("RT_GrassMaterials",
+            sizeof(Fvector4), sizeof(FGDetailManager::GrassMaterialConstants) / sizeof(Fvector4))))
     {
         scene.failed = true;
         m_scene.reset();
@@ -1752,6 +1755,7 @@ RTFrameResources RTAccelStructManager::ImportScene(framegraph::FrameGraph& graph
     resources.materials = ImportRTBuffer(graph, "RT_MaterialSnapshot", scene.materials);
     resources.terrainMaterials = ImportRTBuffer(graph, "RT_TerrainMaterialSnapshot", scene.terrainMaterials);
     resources.variants = ImportRTBuffer(graph, "RT_VariantSnapshot", scene.variants);
+    resources.grassMaterials = ImportRTBuffer(graph, "RT_GrassMaterials", scene.grassMaterials);
     resources.emissiveTriangles = ImportRTBuffer(graph, "RT_EmissiveTriangles", scene.emissiveTriangleBuffer);
     resources.batchTransforms = ImportRTBuffer(graph, "RT_BatchTransforms", scene.batchTransformBuffer);
     resources.emissiveBatchOffsets = ImportRTBuffer(graph, "RT_EmissiveBatchOffsets", scene.emissiveBatchOffsetBuffer);
@@ -1818,6 +1822,7 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             pb.write(resources.materials, ResourceState::CopyDest);
             pb.write(resources.terrainMaterials, ResourceState::CopyDest);
             pb.write(resources.variants, ResourceState::CopyDest);
+            pb.write(resources.grassMaterials, ResourceState::CopyDest);
             pb.write(resources.emissiveTriangles, ResourceState::CopyDest);
             pb.write(resources.batchTransforms, ResourceState::CopyDest);
             pb.write(resources.emissiveBatchOffsets, ResourceState::CopyDest);
@@ -2021,6 +2026,11 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     commandList->copyBuffer(buffer(data.resources.terrainMaterials), 0, source, 0, source->getDesc().byteSize);
     source = buffer(data.sourceVariants);
     commandList->copyBuffer(buffer(data.resources.variants), 0, source, 0, source->getDesc().byteSize);
+    FGDetailManager::GrassMaterialConstants grassMaterialConstants = {};
+    if (data.detailManager)
+        data.detailManager->FillGrassMaterialConstants(grassMaterialConstants);
+    commandList->writeBuffer(buffer(data.resources.grassMaterials), &grassMaterialConstants,
+        sizeof(grassMaterialConstants));
     auto* device = m_device->GetNVRHIDevice();
     if (scene.counts.skinned)
     {
@@ -2204,6 +2214,7 @@ static void DeclareSceneReads(framegraph::RenderPassBuilder& builder, const RTFr
     input(resources.materials);
     input(resources.terrainMaterials);
     input(resources.variants);
+    input(resources.grassMaterials);
     input(resources.emissiveTriangles);
     input(resources.batchTransforms);
     input(resources.emissiveBatchOffsets);
@@ -2266,6 +2277,7 @@ RTFrameBuffers RTAccelStructManager::ResolveScene(const framegraph::FrameGraph& 
     result.materials = buffer(resources.materials);
     result.terrainMaterials = buffer(resources.terrainMaterials);
     result.variants = buffer(resources.variants);
+    result.grassMaterials = buffer(resources.grassMaterials);
     result.skinnedVertices = buffer(resources.skinnedVertices);
     result.skinnedIndices = buffer(resources.skinnedIndices);
     result.grassVertices = buffer(resources.grassVertices);
@@ -2304,7 +2316,7 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
         const auto& scene = *m_generations[i];
         result.generationBytes += bufferBytes(scene.batchInfo) + bufferBytes(scene.materials) +
             bufferBytes(scene.terrainMaterials) + bufferBytes(scene.variants) +
-            bufferBytes(scene.skinnedVertices) +
+            bufferBytes(scene.grassMaterials) + bufferBytes(scene.skinnedVertices) +
             bufferBytes(scene.grassVertices) + bufferBytes(scene.grassIndices) +
             bufferBytes(scene.emissiveTriangleBuffer) + bufferBytes(scene.batchTransformBuffer) +
             bufferBytes(scene.emissiveBatchOffsetBuffer);

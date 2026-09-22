@@ -4,6 +4,7 @@
 #include "detail_visibility_common.h"
 #include "detail_source_common.h"
 #include "detail_pulled_common.h"
+#include "detail_blade_material.h"
 
 cbuffer DetailGlobals : register(b3)
 {
@@ -64,12 +65,6 @@ RWTexture2D<float4> g_OutColor : register(u2);
 RWTexture2D<float2> g_OutMotion : register(u3);
 RWTexture2D<float> g_OutVisDepth : register(u4);
 RWTexture2D<float2> g_OutMaterial : register(u5);
-
-static const float GRASS_ROUGHNESS_BASE = 0.85;
-static const float GRASS_ROUGHNESS_TIP = 0.55;
-static const float GRASS_AO_BASE = 0.35;
-static const float GRASS_AO_TIP = 1.0;
-static const float GRASS_AO_POWER = 0.6;
 
 float2 PrevMotion(float3 prevWorld, float2 uvPix)
 {
@@ -258,32 +253,25 @@ void main(uint3 dtid : SV_DispatchThreadID)
     float3 rn2 = InterpolateBary3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2);
 
     float widthPercent = uv.x;
-    float3 Nu = lerp(rn1, rn2, widthPercent);
-    float invLen = 1.0 / max(length(Nu), 1e-4);
-    float3 dNdx = (lerp(InterpolateBaryDdx3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdx3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), widthPercent) + (rn2 - rn1) * uvDdx.x) * invLen;
-    float3 dNdy = (lerp(InterpolateBaryDdy3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdy3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), widthPercent) + (rn2 - rn1) * uvDdy.x) * invLen;
-    float variance = min(0.5 * (dot(dNdx, dNdx) + dot(dNdy, dNdy)), 0.18);
+    float3 Nu = BladeWidthNormal(rn1, rn2, widthPercent);
+    float invLen = BladeWidthNormalScale(Nu);
+    float3 dNdx = BladeWidthNormalDerivative(InterpolateBaryDdx3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdx3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), rn1, rn2, widthPercent, uvDdx.x);
+    float3 dNdy = BladeWidthNormalDerivative(InterpolateBaryDdy3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdy3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), rn1, rn2, widthPercent, uvDdy.x);
+    float variance = BladeNormalVariance(dNdx, dNdy, invLen);
     float3 N = FoliageViewerNormal(Nu * invLen, v1.pos - v0.pos, v2.pos - v0.pos, eye_position - worldPos);
 
-    float4 veinDetail = GetBindlessTexture(g_VeinIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+    float4 veinDetail = BLADE_NEUTRAL_VEIN;
+    if (g_VeinIndex != 0u)
+        veinDetail = GetBindlessTexture(g_VeinIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
     float veinValue = veinDetail.a;
 
-    float colorBlend = smoothstep(0.2, 0.8, t);
-    float3 albedo = lerp(grass_color_base.rgb, grass_color_tip.rgb, colorBlend);
-    albedo *= lerp(1.0 - grass_color_variation, 1.0 + grass_color_variation, b.bladeHash);
     GrassObjectTint tint = grass_object_tints[b.objectId];
-    albedo *= float3(tint.r, tint.g, tint.b);
-    albedo = lerp(albedo, albedo * veinDetail.rgb, veinValue * 0.15);
+    float3 albedo = BladeBaseAlbedo(grass_color_base.rgb, grass_color_tip.rgb, float3(tint.r, tint.g, tint.b), grass_color_variation, b.bladeHash, t);
+    albedo = BladeVeinAlbedo(albedo, veinDetail, veinValue);
+    albedo = BladeDistanceFade(albedo, grass_color_base.rgb, grass_color_tip.rgb, worldPos);
 
-    float roughness = RoughnessWithVariance(saturate(lerp(GRASS_ROUGHNESS_BASE, GRASS_ROUGHNESS_TIP, t) + veinValue * 0.1), variance);
-    float heightAO = lerp(GRASS_AO_BASE, GRASS_AO_TIP, pow(saturate(t), GRASS_AO_POWER));
-    float edgeFactor = abs(widthPercent - 0.5) * 2.0;
-    float ao = heightAO * lerp(0.95, 1.0, edgeFactor) * lerp(0.9, 1.0, veinValue);
-
-    float viewDist = length(worldPos - eye_position);
-    float distFade = exp(-viewDist * 0.017);
-    float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
-    albedo = lerp(midColor, albedo, distFade);
+    float roughness = BladeRoughness(t, veinValue, variance);
+    float ao = BladeAmbientOcclusion(t, widthPercent, veinValue);
 
     if (g_InteractionDebug != 0u)
         albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));

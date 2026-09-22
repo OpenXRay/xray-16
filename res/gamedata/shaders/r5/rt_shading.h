@@ -21,6 +21,9 @@ ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
 ByteAddressBuffer g_GrassIB : register(t13);
+StructuredBuffer<float4> g_GrassMaterials : register(t30);
+
+static const uint RT_GRASS_MATERIAL_TINT_BASE = 2u;
 
 static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
@@ -166,11 +169,11 @@ RTHitClass RTClassifyHit(RTSceneParams scene, RTSceneTrace hit, float3 direction
     {
         if (IsStaticDetailBatch(scene, hit.batchIdx))
         {
-            result.opaque = RTPulledDetailOpaque(scene, geometry, false);
+            result.opaque = RTPulledDetailOpaque(scene, geometry, false, shadowRay);
             return result;
         }
         if (IsDetailMeshBatch(scene, hit.batchIdx))
-            result.opaque = RTPulledDetailOpaque(scene, geometry, true);
+            result.opaque = RTPulledDetailOpaque(scene, geometry, true, shadowRay);
         else
             result.opaque = true;
         return result;

@@ -121,6 +121,15 @@ public:
 
     struct GrassObjectTint { float r, g, b, pad; };
 
+    class GrassMaterialConstants
+    {
+    public:
+        Fvector4 colorBase;
+        Fvector4 colorTip;
+        Fvector4 objectTints[64];
+    };
+    static_assert(sizeof(GrassMaterialConstants) == 1056, "GrassMaterialConstants must be 1056 bytes");
+
     struct InteractionEntity
     {
         Fvector pos;
@@ -476,6 +485,7 @@ public:
     void DispatchInteraction(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
 
     void FillFrameConstants(DetailFrameConstants& out);
+    void FillGrassMaterialConstants(GrassMaterialConstants& out) const;
     void UploadGrassTints(nvrhi::ICommandList* cmdList);
     void ClearDrawArgs(nvrhi::ICommandList* cmdList, VisibilityFrame& frame);
     void ComputeSlotAABBs();

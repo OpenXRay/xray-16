@@ -360,6 +360,7 @@ static u64 EstimateSceneBufferBytes(const RTSceneGeneration& scene)
     };
     add(scene.batchInfo);
     add(scene.materials);
+    add(scene.grassMaterials);
     add(scene.terrainMaterials);
     add(scene.variants);
     add(scene.sourceMaterials);
@@ -418,7 +419,8 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
 
     std::shared_ptr<RTSceneGeneration> scene = accelMgr->GetScene();
     if (!scene || scene->failed || !scene->geometry || !scene->tlas || !scene->batchInfo ||
-        !scene->materials || !scene->terrainMaterials || !scene->variants || !scene->textures.GetTable())
+        !scene->materials || !scene->grassMaterials || !scene->terrainMaterials ||
+        !scene->variants || !scene->textures.GetTable())
         return false;
 
     auto snapshot = std::make_shared<PathTracerSnapshot>();
@@ -1003,7 +1005,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
 
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
             if (!scene.tlas || !scene.batchInfo || !scene.vertices || !scene.indices || !scene.materials ||
-                !scene.terrainMaterials || !scene.variants || !scene.textures ||
+                !scene.grassMaterials || !scene.terrainMaterials || !scene.variants || !scene.textures ||
                 !scene.emissiveTriangles || !scene.batchTransforms || !scene.emissiveBatchOffsets)
             {
                 data.lighting->Fail(LightingFallback::SceneUnavailable);
@@ -1054,6 +1056,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             bsb.Texture("g_Sky1", data.sky1);
             bsb.BufferSRV("g_SkinnedVB", skinnedVB);
             bsb.BufferSRV("g_Materials", scene.materials);
+            bsb.BufferSRV("g_GrassMaterials", scene.grassMaterials);
             bsb.BufferSRV("g_TerrainMaterials", scene.terrainMaterials);
             bsb.BufferSRV("g_Variants", scene.variants);
             bsb.BufferSRV("g_SkinnedIB", skinnedIB);
