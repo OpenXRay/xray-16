@@ -281,7 +281,12 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
                 candidate.t = q.CandidateTriangleRayT();
                 candidate.objectToWorld = q.CandidateObjectToWorld3x4();
                 RTHitClass classification = RTClassifyHit(scene, candidate, direction, shadowRay, false);
-                if (classification.opaque || any(classification.transmittance < 1.0) || any(classification.emissive > 0.0))
+                bool commit = false;
+                if (classification.opaque)
+                    commit = shadowRay || classification.opacity >= 1.0 || rand_float(rng) < classification.opacity;
+                else
+                    commit = any(classification.transmittance < 1.0) || any(classification.emissive > 0.0);
+                if (commit)
                 {
                     if (!shadowRay)
                     {
@@ -312,23 +317,17 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
         {
             hitClass = RTClassifyHit(scene, trace, direction, shadowRay, true);
         }
-        bool accept = hitClass.opaque;
-        if (accept && hitClass.opacity < 1.0)
-            accept = rand_float(rng) < hitClass.opacity;
-        if (accept)
+        if (hitClass.opaque)
         {
             trace.hit = true;
             return trace;
         }
-        if (!hitClass.opaque)
-        {
-            float emissionWeight = shadowRay ? 1.0 : RTEmissionWeight(scene, trace.batchIdx, trace.info,
-                trace.primitiveIndex, previousPosition, origin + direction * trace.t, previousPdf, previousDelta);
-            trace.emissive += trace.transmittance * hitClass.emissive * emissionWeight;
-            trace.transmittance *= hitClass.transmittance;
-            if (!any(trace.transmittance > 0.0))
-                return trace;
-        }
+        float emissionWeight = shadowRay ? 1.0 : RTEmissionWeight(scene, trace.batchIdx, trace.info,
+            trace.primitiveIndex, previousPosition, origin + direction * trace.t, previousPdf, previousDelta);
+        trace.emissive += trace.transmittance * hitClass.emissive * emissionWeight;
+        trace.transmittance *= hitClass.transmittance;
+        if (!any(trace.transmittance > 0.0))
+            return trace;
         ++trace.nullEvents;
         rayMinDistance = asfloat(asuint(trace.t) + 1u);
     }
@@ -349,8 +348,9 @@ float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, f
     ray.TMax = maxDistance;
     RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH> q;
     q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, RT_RAY_MASK_WORLD, ray);
-    bool transmission = false;
+    float3 transmittance = 1.0;
     uint candidates = 0u;
+    uint nullEvents = 0u;
     while (q.Proceed())
     {
         if (++candidates > scene.maxNullEvents * 64u)
@@ -370,26 +370,33 @@ float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, f
             candidate.objectToWorld = q.CandidateObjectToWorld3x4();
             candidate.coneWidth = coneWidth;
             candidate.coneSpread = coneSpread;
-            RTHitClass classification = RTClassifyHit(scene, candidate, direction, true, false);
+            RTHitClass classification = RTClassifyHit(scene, candidate, direction, true, true);
             if (classification.opaque)
             {
                 q.CommitNonOpaqueTriangleHit();
                 q.Abort();
                 return 0.0;
             }
-            transmission = transmission || any(classification.transmittance < 1.0);
+            if (any(classification.transmittance < 1.0))
+            {
+                transmittance *= classification.transmittance;
+                if (!any(transmittance > 0.0))
+                {
+                    q.Abort();
+                    return 0.0;
+                }
+                if (++nullEvents >= scene.maxNullEvents)
+                {
+                    q.Abort();
+                    exhausted = true;
+                    return 0.0;
+                }
+            }
         }
     }
     if (q.CommittedStatus() == COMMITTED_TRIANGLE_HIT)
         return 0.0;
-    if (!transmission)
-        return 1.0;
-
-    uint rng = 0u;
-    RTSceneTrace trace = RTTraceRay(scene, origin, direction, maxDistance, true, rng,
-        coneWidth, coneSpread, origin, 0.0, true, RT_RAY_MASK_WORLD);
-    exhausted = trace.exhausted;
-    return trace.hit ? float3(0.0, 0.0, 0.0) : trace.transmittance;
+    return transmittance;
 }
 
 #endif
