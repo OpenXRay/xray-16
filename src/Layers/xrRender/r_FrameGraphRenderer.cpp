@@ -844,6 +844,9 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.geometryRTLeases = rt.pendingLeases;
             stats.geometryRTCompactable = rt.compactableStructures;
             stats.geometryRTCompacted = rt.compactedStructures;
+            stats.geometryRTSkinStructures = rt.skinStructures;
+            stats.geometryRTSkinJobs = rt.skinJobs;
+            stats.geometryRTSkinDispatches = rt.skinJobsSkinned;
         }
 
         if (m_blackboard)

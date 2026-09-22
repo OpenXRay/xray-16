@@ -129,6 +129,9 @@ public:
     u32 generations = 0;
     u32 compactedStructures = 0;
     u32 compactableStructures = 0;
+    u32 skinStructures = 0;
+    u32 skinJobs = 0;
+    u32 skinJobsSkinned = 0;
     bool accelerationBytesKnown = true;
 };
 
@@ -272,6 +275,10 @@ public:
     u32 indexCount;
     u32 materialID;
     u64 geometryID;
+    u64 topologyKey = 0;
+    u64 poseHash = 0;
+    bool dirty = true;
+    std::shared_ptr<RTGeometryBuild> build;
 };
 
 class RTSkinSourcePlan
@@ -329,7 +336,6 @@ public:
     u32 tlasRefits = 0;
     bool tlasBuilt = false;
     bool tlasUpdate = false;
-    RTGeometryBuild skinBuild;
     RTGeometryBuild hudSkinBuild;
     RTGeometryBuild grassBuild;
     nvrhi::BufferHandle batchInfo;
@@ -384,6 +390,7 @@ public:
     bool billboard = false;
     bool recorded = false;
     bool failed = false;
+    bool HudSkinDirty() const;
 };
 
 class RTLeaseRecord
@@ -463,7 +470,7 @@ private:
     u64 ComputeTopologySignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
     RTPoseSignature ComputePoseSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
-        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches) const;
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
     void AppendMaterialTextures(u32 materialID, bool terrain);
     void PrepareStatic(GPUCullingManager* gpuCulling);
     bool EnsureDynamicGeometry(GPUCullingManager* gpuCulling);
@@ -493,6 +500,8 @@ private:
     bool InitGrassPipeline(const FGDetailManager::InstanceGeneration& source);
     bool InitBillboardPipeline(const FGDetailManager::InstanceGeneration& source);
     static u32 GetSkinningFormatID(u32 poolFormat);
+    static u64 SkinPoseHash(const GPUCullingManager* gpuCulling, const GeometryBatch& batch);
+    void PruneSkinBuilds();
 
     RenderDevice* m_device = nullptr;
     bool m_rtSupported = false;
@@ -503,10 +512,14 @@ private:
     nvrhi::IBuffer* m_dynamicSourceVertices = nullptr;
     nvrhi::IBuffer* m_dynamicSourceIndices = nullptr;
     xr_map<u64, std::shared_ptr<RTSkinTopology>> m_skinTopologies;
+    xr_map<u64, std::shared_ptr<RTGeometryBuild>> m_skinBuilds;
     std::shared_ptr<RTSceneGeneration> m_scene;
     xr_vector<std::shared_ptr<RTSceneGeneration>> m_generations;
     xr_vector<RTLeaseRecord> m_leases;
     xr_vector<u32> m_textureScratch;
+    xr_vector<u64> m_poseHashes;
+    u32 m_skinDispatches = 0;
+    u32 m_skinDispatchesLast = 0;
     u64 m_staticSignature = 0;
     u64 m_sceneSignature = 0;
     u64 m_sceneRevision = 0;

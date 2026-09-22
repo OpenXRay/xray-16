@@ -486,9 +486,13 @@ bool RTAccelStructManager::IsSceneReady(const RTSceneGeneration& scene) const
         !scene.emissiveBatchOffsetBuffer ||
         !scene.textures.GetTable())
         return false;
-    if (!scene.skinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology ||
-        !scene.skinBuild.handle))
+    if (!scene.skinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology))
         return false;
+    for (const auto& job : scene.skinJobs)
+    {
+        if (!job.build || !job.build->handle)
+            return false;
+    }
     if (!scene.hudSkinJobs.empty() && (!scene.skinnedVertices || !scene.skinnedIndices || !scene.skinTopology ||
         !scene.hudSkinBuild.handle))
         return false;
@@ -549,8 +553,13 @@ void RTAccelStructManager::RetireScenes()
         {
             it->scene->recorded = false;
             it->scene->failed = true;
-            it->scene->skinBuild.built = false;
-            it->scene->skinBuild.update = false;
+            for (auto& job : it->scene->skinJobs)
+            {
+                if (!job.build)
+                    continue;
+                job.build->built = false;
+                job.build->update = false;
+            }
             it->scene->hudSkinBuild.built = false;
             it->scene->hudSkinBuild.update = false;
             it->scene->grassBuild.built = false;
@@ -824,7 +833,7 @@ u64 RTAccelStructManager::ComputeTopologySignature(const GPUCullingManager* gpu,
 }
 
 RTPoseSignature RTAccelStructManager::ComputePoseSignature(const GPUCullingManager* gpu, const FGDetailManager* detail,
-    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud) const
+    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud)
 {
     u64 motion = RT_IDENTITY_SEED;
     auto append = [&](const auto& value)
@@ -839,19 +848,16 @@ RTPoseSignature RTAccelStructManager::ComputePoseSignature(const GPUCullingManag
     };
     appendWorlds(gpu->GetTransparentInstanceData());
     appendWorlds(gpu->GetDynamicInstanceData());
+    m_poseHashes.clear();
+    m_poseHashes.reserve(world.size() + hud.size());
     auto appendBatches = [&](const xr_vector<GeometryBatch>& batches)
     {
         append(batches.size());
         for (const auto& batch : batches)
         {
-            append(batch.worldMatrix);
-            CKinematics* skeleton = RTBatchSkeleton(batch);
-            R_ASSERT(skeleton);
-            append(gpu->GetPreparedSkeletonOffset(skeleton));
-            u32 boneCount = 0;
-            const Fmatrix* bones = gpu->GetPreparedSkeletonMatrices(skeleton, boneCount);
-            append(boneCount);
-            HashSceneData(motion, bones, size_t(boneCount) * sizeof(Fmatrix));
+            const u64 pose = SkinPoseHash(gpu, batch);
+            m_poseHashes.push_back(pose);
+            append(pose);
         }
     };
     appendBatches(world);
@@ -1224,10 +1230,9 @@ bool RTAccelStructManager::InitSkinningPipeline()
 void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpu,
     const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud)
 {
-    RTGeometryBuild retainedSkinBuild = std::move(scene.skinBuild);
     RTGeometryBuild retainedHudSkinBuild = std::move(scene.hudSkinBuild);
-    scene.skinBuild = {};
     scene.hudSkinBuild = {};
+    PruneSkinBuilds();
     if (world.empty() && hud.empty())
         return;
     const auto& pools = gpu->GetSkinnedPools();
@@ -1246,14 +1251,11 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         scene.skinSources.push_back(source);
         return u32(scene.skinSources.size() - 1);
     };
+    R_ASSERT(m_poseHashes.size() == world.size() + hud.size());
     auto append = [&](const GeometryBatch& batch, xr_vector<RTSkinJob>& jobs)
     {
         R_ASSERT(batch.visual && batch.indexCount && batch.isSkinned);
-        CKinematics* skeleton = nullptr;
-        if (batch.visual->getType() == MT_SKELETON_GEOMDEF_ST)
-            skeleton = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
-        else if (batch.visual->getType() == MT_SKELETON_GEOMDEF_PM)
-            skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+        CKinematics* skeleton = RTBatchSkeleton(batch);
         R_ASSERT(skeleton);
         auto* mesh = static_cast<IRender_Mesh*>(static_cast<Fvisual*>(batch.visual));
         const u32 format = batch.skinnedPoolFormat;
@@ -1315,6 +1317,8 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         job.materialID = batch.bindlessMaterialID;
         job.geometryID = RTInstanceIdentity(batch.renderableLifetimeID, batch.visualLifetimeID,
             batch.geometrySubset);
+        job.poseHash = m_poseHashes[plans.size()];
+        job.dirty = true;
         RTSkinSourcePlan plan;
         plan.source = source;
         plan.staging = mapped;
@@ -1325,16 +1329,20 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         plan.vertexCount = vertices;
         plan.baseVertex = baseVertex;
         plan.pooled = pooled;
-        topologyKey = RTIdentity(topologyKey, batch.renderableLifetimeID);
-        topologyKey = RTIdentity(topologyKey, batch.visualLifetimeID);
-        topologyKey = RTIdentity(topologyKey, u64(batch.geometrySubset));
-        topologyKey = RTIdentity(topologyKey, u64(pooled ? format : 0xFFFFFFFFu));
-        topologyKey = RTIdentity(topologyKey, u64(plan.firstIndex));
-        topologyKey = RTIdentity(topologyKey, u64(batch.indexCount));
-        topologyKey = RTIdentity(topologyKey, u64(vertices));
-        topologyKey = RTIdentity(topologyKey, u64(baseVertex));
-        topologyKey = RTIdentity(topologyKey, u64(reinterpret_cast<size_t>(source)));
-        topologyKey = RTIdentity(topologyKey, u64(reinterpret_cast<size_t>(mapped)));
+        u64 batchKey = RTIdentity(RT_IDENTITY_SEED, batch.renderableLifetimeID);
+        batchKey = RTIdentity(batchKey, batch.visualLifetimeID);
+        batchKey = RTIdentity(batchKey, u64(batch.geometrySubset));
+        batchKey = RTIdentity(batchKey, u64(pooled ? format : 0xFFFFFFFFu));
+        batchKey = RTIdentity(batchKey, u64(plan.firstIndex));
+        batchKey = RTIdentity(batchKey, u64(batch.indexCount));
+        batchKey = RTIdentity(batchKey, u64(vertices));
+        batchKey = RTIdentity(batchKey, u64(baseVertex));
+        batchKey = RTIdentity(batchKey, u64(reinterpret_cast<size_t>(source)));
+        batchKey = RTIdentity(batchKey, u64(reinterpret_cast<size_t>(mapped)));
+        batchKey = RTIdentity(batchKey, u64(job.constants.outputOffset));
+        batchKey = RTIdentity(batchKey, u64(job.indexOffset));
+        job.topologyKey = batchKey;
+        topologyKey = RTIdentity(topologyKey, batchKey);
         plans.push_back(plan);
         indexCount += batch.indexCount;
         vertexCount += vertices;
@@ -1414,54 +1422,116 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
         return;
     }
     const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
-    auto buildSkin = [&](xr_vector<RTSkinJob>& jobs, RTGeometryBuild& build, const char* name, u32 mask)
+    nvrhi::rt::AccelStructBuildFlags skinFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+    if (m_inPlaceUpdates)
+        skinFlags = skinFlags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+    auto appendBatch = [&](const RTSkinJob& job, u32 mask)
     {
-        if (jobs.empty())
+        const u32 batchIndex = u32(scene.batches.size());
+        scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
+        scene.batchTransforms.push_back(identityTransform);
+        scene.batchIdentities.push_back(job.geometryID);
+        if (mask == RT_MASK_WORLD)
+            AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, batchIndex,
+                job.materialID, job.indexCount, job.geometryID);
+        else
+            scene.emissiveBatchOffsets.push_back(UINT32_MAX);
+        return batchIndex;
+    };
+    xr_vector<const RTGeometryBuild*> pinned;
+    for (const auto& generation : m_generations)
+    {
+        if (generation->retention == 0)
+            continue;
+        for (const auto& job : generation->skinJobs)
         {
-            build = {};
+            if (job.build)
+                pinned.push_back(job.build.get());
+        }
+    }
+    for (auto& job : scene.skinJobs)
+    {
+        const bool jobOpaque = IsOpaqueMaterialForRT(job.materialID, false);
+        nvrhi::rt::AccelStructDesc desc;
+        desc.debugName = "RT_SkinBLAS";
+        desc.buildFlags = skinFlags;
+        desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices, topology->indices,
+            SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
+            job.indexOffset, job.indexCount, jobOpaque));
+        const u32 batchIndex = appendBatch(job, RT_MASK_WORLD);
+        auto& slot = m_skinBuilds[job.geometryID];
+        if (!slot || std::find(pinned.begin(), pinned.end(), slot.get()) != pinned.end())
+            slot = std::make_shared<RTGeometryBuild>();
+        AcquireGeometryBuild(desc, *slot, topologyStable, job.topologyKey);
+        if (!slot->handle)
+        {
+            scene.failed = true;
             return;
         }
+        job.build = slot;
+        scene.instances.push_back(RTInstance(slot->handle, batchIndex, identityTransform, jobOpaque, RT_MASK_WORLD));
+    }
+    if (!scene.hudSkinJobs.empty())
+    {
         nvrhi::rt::AccelStructDesc desc;
-        desc.debugName = name;
-        desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
-        if (m_inPlaceUpdates)
-            desc.buildFlags = desc.buildFlags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+        desc.debugName = "RT_HudSkinBLAS";
+        desc.buildFlags = skinFlags;
         const u32 firstBatch = u32(scene.batches.size());
         bool opaque = true;
-        for (const auto& job : jobs)
+        for (const auto& job : scene.hudSkinJobs)
         {
             const bool jobOpaque = IsOpaqueMaterialForRT(job.materialID, false);
             desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices, topology->indices,
                 SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
                 job.indexOffset, job.indexCount, jobOpaque));
             opaque = opaque && jobOpaque;
-            const u32 batchIndex = u32(scene.batches.size());
-            scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
-            scene.batchTransforms.push_back(identityTransform);
-            scene.batchIdentities.push_back(job.geometryID);
-            if (mask == RT_MASK_WORLD)
-                AppendEmissiveBatch(scene.emissiveBatchOffsets, scene.emissiveTriangles, batchIndex,
-                    job.materialID, job.indexCount, job.geometryID);
-            else
-                scene.emissiveBatchOffsets.push_back(UINT32_MAX);
+            appendBatch(job, RT_MASK_HUD);
         }
-        AcquireGeometryBuild(desc, build, topologyStable, topologyKey);
-        if (!build.handle)
+        AcquireGeometryBuild(desc, retainedHudSkinBuild, topologyStable, topologyKey);
+        if (!retainedHudSkinBuild.handle)
         {
             scene.failed = true;
             return;
         }
-        scene.instances.push_back(RTInstance(build.handle, firstBatch, identityTransform, opaque, mask));
-    };
-    buildSkin(scene.skinJobs, retainedSkinBuild, "RT_SkinBLAS", RT_MASK_WORLD);
-    if (scene.failed)
-        return;
-    buildSkin(scene.hudSkinJobs, retainedHudSkinBuild, "RT_HudSkinBLAS", RT_MASK_HUD);
-    if (scene.failed)
-        return;
-    scene.skinBuild = std::move(retainedSkinBuild);
+        scene.instances.push_back(RTInstance(retainedHudSkinBuild.handle, firstBatch, identityTransform, opaque, RT_MASK_HUD));
+    }
     scene.hudSkinBuild = std::move(retainedHudSkinBuild);
     scene.counts.skinned = u32(scene.skinJobs.size() + scene.hudSkinJobs.size());
+}
+
+u64 RTAccelStructManager::SkinPoseHash(const GPUCullingManager* gpu, const GeometryBatch& batch)
+{
+    u64 hash = RT_IDENTITY_SEED;
+    HashSceneData(hash, &batch.worldMatrix, sizeof(batch.worldMatrix));
+    CKinematics* skeleton = RTBatchSkeleton(batch);
+    if (!skeleton)
+        return hash;
+    u32 boneCount = 0;
+    const Fmatrix* bones = gpu->GetPreparedSkeletonMatrices(skeleton, boneCount);
+    HashSceneData(hash, &boneCount, sizeof(boneCount));
+    HashSceneData(hash, bones, size_t(boneCount) * sizeof(Fmatrix));
+    return hash;
+}
+
+void RTAccelStructManager::PruneSkinBuilds()
+{
+    for (auto it = m_skinBuilds.begin(); it != m_skinBuilds.end();)
+    {
+        if (it->second.use_count() == 1)
+            it = m_skinBuilds.erase(it);
+        else
+            ++it;
+    }
+}
+
+bool RTSceneGeneration::HudSkinDirty() const
+{
+    for (const auto& job : hudSkinJobs)
+    {
+        if (job.dirty)
+            return true;
+    }
+    return false;
 }
 
 bool RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGeneration& source)
@@ -1828,7 +1898,11 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
     auto& scene = *next;
     if (scene.failed)
     {
-        scene.skinBuild.built = false;
+        for (auto& job : scene.skinJobs)
+        {
+            if (job.build)
+                job.build->built = false;
+        }
         scene.hudSkinBuild.built = false;
         scene.grassBuild.built = false;
         scene.tlasBuilt = false;
@@ -2129,7 +2203,9 @@ bool RTAccelStructManager::RefreshPose(GPUCullingManager* gpu, FGDetailManager* 
     {
         if (scene.skinJobs.size() != world.size() || scene.hudSkinJobs.size() != hud.size())
             return false;
-        auto refreshJobs = [&](xr_vector<RTSkinJob>& jobs, const xr_vector<GeometryBatch>& batches)
+        if (m_poseHashes.size() != world.size() + hud.size())
+            return false;
+        auto refreshJobs = [&](xr_vector<RTSkinJob>& jobs, const xr_vector<GeometryBatch>& batches, u32 firstPose)
         {
             for (u32 i = 0; i < jobs.size(); ++i)
             {
@@ -2137,7 +2213,11 @@ bool RTAccelStructManager::RefreshPose(GPUCullingManager* gpu, FGDetailManager* 
                 CKinematics* skeleton = RTBatchSkeleton(batch);
                 if (!skeleton)
                     return false;
-                RTSkinningCB& constants = jobs[i].constants;
+                RTSkinJob& job = jobs[i];
+                const u64 pose = m_poseHashes[firstPose + i];
+                job.dirty = pose != job.poseHash;
+                job.poseHash = pose;
+                RTSkinningCB& constants = job.constants;
                 constants.worldMatrix = batch.worldMatrix;
                 Fmatrix inverse;
                 inverse.invert(batch.worldMatrix);
@@ -2146,13 +2226,18 @@ bool RTAccelStructManager::RefreshPose(GPUCullingManager* gpu, FGDetailManager* 
             }
             return true;
         };
-        if (!refreshJobs(scene.skinJobs, world) || !refreshJobs(scene.hudSkinJobs, hud))
+        if (!refreshJobs(scene.skinJobs, world, 0) || !refreshJobs(scene.hudSkinJobs, hud, u32(world.size())))
             return false;
         scene.bones = gpu->GetGlobalBoneBuffer();
         if (!scene.bones || !scene.skinTopology || scene.skinTopology->uploadPending)
             return false;
-        RefreshGeometryBuild(scene.skinBuild);
-        RefreshGeometryBuild(scene.hudSkinBuild);
+        for (auto& job : scene.skinJobs)
+        {
+            if (job.dirty && job.build)
+                RefreshGeometryBuild(*job.build);
+        }
+        if (scene.HudSkinDirty())
+            RefreshGeometryBuild(scene.hudSkinBuild);
     }
     if (scene.counts.grass)
     {
@@ -2209,6 +2294,8 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
         return false;
     const u64 topology = ComputeTopologySignature(gpu, detail, world, hud);
     const RTPoseSignature pose = ComputePoseSignature(gpu, detail, world, hud);
+    m_skinDispatchesLast = m_skinDispatches;
+    m_skinDispatches = 0;
     RTBuildScope scope = RTBuildScope::None;
     bool rebuild = !m_scene || topology != m_sceneSignature || m_scene->geometry != m_staticGeometry ||
         !m_scene->recorded;
@@ -2406,8 +2493,13 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
             {
                 input(resources.skinnedVertices);
                 input(resources.skinnedIndices);
-                output(scene->skinBuild);
-                output(scene->hudSkinBuild);
+                for (const auto& job : scene->skinJobs)
+                {
+                    if (job.dirty && job.build)
+                        output(*job.build);
+                }
+                if (scene->HudSkinDirty())
+                    output(scene->hudSkinBuild);
             }
             if (scene->counts.grass)
             {
@@ -2445,7 +2537,11 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
                 for (const auto& build : scene->dynamicGeometry->builds)
                     input(build);
             }
-            input(scene->skinBuild);
+            for (const auto& job : scene->skinJobs)
+            {
+                if (job.build)
+                    input(*job.build);
+            }
             input(scene->hudSkinBuild);
             input(scene->grassBuild);
         },
@@ -2526,6 +2622,8 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
             const xr_vector<RTSkinJob>& jobs = list == 0 ? scene.skinJobs : scene.hudSkinJobs;
             for (const auto& job : jobs)
             {
+                if (!job.dirty)
+                    continue;
                 framegraph::BindingSetBuilder bindings(*reflection, device, "RT.SkinVertices");
                 bindings.BufferSRV("g_SrcVB", buffer(data.skinSources[job.sourceSlot]))
                     .BufferSRV("g_BoneMatrices", bones)
@@ -2538,6 +2636,7 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
                 state.bindings = { bindingSet };
                 commandList->setComputeState(state);
                 commandList->dispatch((job.constants.vertexCount + 255) / 256, 1, 1);
+                ++m_skinDispatches;
             }
         }
     }
@@ -2661,8 +2760,16 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
     }
     if (scene.counts.skinned)
     {
-        build(scene.skinBuild);
-        build(scene.hudSkinBuild);
+        for (auto& job : scene.skinJobs)
+        {
+            if (job.dirty && job.build)
+                build(*job.build);
+            job.dirty = false;
+        }
+        if (scene.HudSkinDirty())
+            build(scene.hudSkinBuild);
+        for (auto& job : scene.hudSkinJobs)
+            job.dirty = false;
     }
     if (scene.counts.grass)
         build(scene.grassBuild);
@@ -2856,6 +2963,24 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
             ++result.compactedStructures;
     };
     xr_set<RTSkinTopology*> countedTopologies;
+    xr_set<const RTGeometryBuild*> countedSkinBuilds;
+    for (const auto& entry : m_skinBuilds)
+    {
+        if (countedSkinBuilds.insert(entry.second.get()).second)
+            acceleration(entry.second->handle);
+    }
+    for (const auto& generation : m_generations)
+    {
+        for (const auto& job : generation->skinJobs)
+        {
+            if (job.build && countedSkinBuilds.insert(job.build.get()).second)
+                acceleration(job.build->handle);
+        }
+    }
+    result.skinStructures = u32(countedSkinBuilds.size());
+    if (m_scene)
+        result.skinJobs = u32(m_scene->skinJobs.size() + m_scene->hudSkinJobs.size());
+    result.skinJobsSkinned = m_skinDispatchesLast;
     for (u32 i = 0; i < m_generations.size(); ++i)
     {
         const auto& scene = *m_generations[i];
@@ -2868,7 +2993,6 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
         if (scene.skinTopology && countedTopologies.insert(scene.skinTopology.get()).second)
             result.generationBytes += bufferBytes(scene.skinTopology->indices);
         acceleration(scene.tlas);
-        acceleration(scene.skinBuild.handle);
         acceleration(scene.hudSkinBuild.handle);
         acceleration(scene.grassBuild.handle);
         bool first = scene.geometry != nullptr;
