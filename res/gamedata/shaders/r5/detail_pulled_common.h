@@ -99,6 +99,12 @@ float3 PulledInteractionBend(PulledInstance inst, float3 worldPos, float2 intera
     return inst.pos + float3(local.x, 0.0, local.z) + up * local.y;
 }
 
+float3 PulledDeform(PulledInstance inst, float3 worldPos, float heightFactor, float time, float2 windAngleSpeed, float windDisplacement, float2 interaction, float interactionDisplacement, float interactionMaxAngle, Texture3D perlin, SamplerState smp)
+{
+    float3 bent = PulledInteractionBend(inst, worldPos, interaction, interactionDisplacement, interactionMaxAngle);
+    return PulledSway(bent, heightFactor, time, windAngleSpeed, windDisplacement, perlin, smp);
+}
+
 float3 PulledFaceNormal(float3 p0, float3 p1, float3 p2)
 {
     float3 n = cross(p1 - p0, p2 - p0);
