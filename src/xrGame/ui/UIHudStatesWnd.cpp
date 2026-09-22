@@ -136,12 +136,21 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_resist_back[ALife::infl_psi] = UIHelper::CreateStatic(xml, "resist_back_psi", this, false);
     // electra = no has CStatic!!
 
-    m_indik[ALife::infl_rad] = UIHelper::CreateStatic(xml, "indik_rad", this);
+    m_indik[ALife::infl_rad]  = UIHelper::CreateStatic(xml, "indik_rad", this);
     m_indik[ALife::infl_fire] = UIHelper::CreateStatic(xml, "indik_fire", this);
     m_indik[ALife::infl_acid] = UIHelper::CreateStatic(xml, "indik_acid", this);
-    m_indik[ALife::infl_psi] = UIHelper::CreateStatic(xml, "indik_psi", this);
+    m_indik[ALife::infl_psi]  = UIHelper::CreateStatic(xml, "indik_psi", this);
 
-    m_lanim_name = xml.ReadAttrib("indik_rad", 0, "light_anim", "");
+    // Will crash if LALib contents are updated/reloaded during the game
+    m_color_animation[ALife::infl_rad]  = m_indik[ALife::infl_rad]->GetColorAnimation();
+    m_color_animation[ALife::infl_fire] = m_indik[ALife::infl_fire]->GetColorAnimation();
+    m_color_animation[ALife::infl_acid] = m_indik[ALife::infl_acid]->GetColorAnimation();
+    m_color_animation[ALife::infl_psi]  = m_indik[ALife::infl_psi]->GetColorAnimation();
+
+    for (int i = 0; i < it_max; ++i)
+    {
+        m_indik[(ALife::EInfluenceType)i]->SetColorAnimation(nullptr, 0); // turn off
+    }
 
     m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
     //m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
@@ -184,12 +193,6 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
         m_radiation_lev3 = UIHelper::CreateStatic( xml, "radiation_level_3", this );
         m_radiation_lev3->Show( false );
     */
-
-    m_cur_state_LA.set();
-    for (int i = 0; i < it_max; ++i)
-    {
-        SwitchLA(false, static_cast<ALife::EInfluenceType>(i));
-    }
 
     xml.SetLocalRoot(stored_root);
 }
@@ -697,11 +700,12 @@ void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
 
     for (int i = 0; i < it_max; ++i) // it_max = ALife::infl_max_count-1
     {
-        UpdateIndicatorType(actor, (ALife::EInfluenceType)i);
+        ALife::EInfluenceType type = static_cast<ALife::EInfluenceType>(i);
+        UpdateIndicatorType(actor, type);
     }
 }
 
-void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type)
+void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float power /*= 0.0f*/)
 {
     if (type < ALife::infl_rad || ALife::infl_psi < type)
     {
@@ -709,22 +713,16 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
         return;
     }
 
-    constexpr u32 c_white = color_rgba(255, 255, 255, 255);
-    constexpr u32 c_green = color_rgba(0, 255, 0, 255);
-    constexpr u32 c_yellow = color_rgba(255, 255, 0, 255);
-    constexpr u32 c_red = color_rgba(255, 0, 0, 255);
-
-    LPCSTR texture = "";
-    string256 str;
+    pcstr base_texture = "";
     switch (type)
     {
-    case ALife::infl_rad: texture = "ui_inGame2_triangle_Radiation_"; break;
-    case ALife::infl_fire: texture = "ui_inGame2_triangle_Fire_"; break;
-    case ALife::infl_acid: texture = "ui_inGame2_triangle_Biological_"; break;
-    case ALife::infl_psi: texture = "ui_inGame2_triangle_Psy_"; break;
+    case ALife::infl_rad:  base_texture = "ui_inGame2_triangle_Radiation_"; break;
+    case ALife::infl_fire: base_texture = "ui_inGame2_triangle_Fire_"; break;
+    case ALife::infl_acid: base_texture = "ui_inGame2_triangle_Biological_"; break;
+    case ALife::infl_psi:  base_texture = "ui_inGame2_triangle_Psy_"; break;
     default: NODEFAULT;
     }
-    float hit_power = m_zone_cur_power[type];
+    float hit_power = m_fake_indicators_update ? power : m_zone_cur_power[type];
     ALife::EHitType hit_type = m_zone_hit_type[type];
 
     CCustomOutfit* outfit = actor->GetOutfit();
@@ -754,91 +752,72 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
             protect += it->second.fBoostValue;
     }
 
-    //	float max_power = actor->conditions().GetZoneMaxPower( hit_type );
-    //	protect = protect / max_power; // = 0..1
-    m_indik[type]->Show(true);
+    float max_power = actor->conditions().GetZoneMaxPower(hit_type);
+    R_ASSERT1_CURE(_valid(max_power) && !fis_zero(max_power),
+    {
+        max_power = 1.0f;
+    });
+
+    bool green_condition = hit_power <= protect;
+    if (m_fake_indicators_update || ClearSkyMode)
+    {
+        protect /= max_power; // = 0..1
+        max_power = 1.0f;
+        green_condition = hit_power < protect;
+    }
+
+    pcstr texture_color;
+    u32 color;
+    float zone_danger = 0.0f;
+    bool light_anim = false;
 
     if (hit_power < EPS)
     {
-        string256 greenTexture;
-        // If we have green texture and white is missing
-        // Assume it's CoP and use it's standard scheme
-        xr_sprintf(greenTexture, sizeof(greenTexture), "%s%s", texture, "green");
-
-        SwitchLA(false, type);
-        xr_sprintf(str, sizeof(str), "%s%s", texture, "white");
-        texture = str;
-
-        if (CUITextureMaster::ItemExist(texture))
-            m_indik[type]->InitTexture(texture);
-        else if (CUITextureMaster::ItemExist(greenTexture))
-            m_indik[type]->Show(false); // Use standard CoP scheme
-        else
-            m_indik[type]->SetTextureColor(c_white);
-
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
+        texture_color = "green";
+        color = color_rgba(255, 255, 255, 255);
     }
-
-    if (hit_power <= protect)
+    else if (green_condition)
     {
-        SwitchLA(false, type);
-        xr_sprintf(str, sizeof(str), "%s%s", texture, "green");
-        texture = str;
-
-        if (CUITextureMaster::ItemExist(texture))
-            m_indik[type]->InitTexture(texture);
-        else
-            m_indik[type]->SetTextureColor(c_green);
-
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
+        texture_color = "green";
+        color = color_rgba(0, 255, 0, 255);
     }
-
-    if (hit_power - protect < m_zone_threshold[type])
+    else if (hit_power - protect < m_zone_threshold[type])
     {
-        SwitchLA(false, type);
-        xr_sprintf(str, sizeof(str), "%s%s", texture, "yellow");
-        texture = str;
-
-        if (CUITextureMaster::ItemExist(texture))
-            m_indik[type]->InitTexture(texture);
-        else
-            m_indik[type]->SetTextureColor(c_yellow);
-
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
-    }
-
-    SwitchLA(true, type);
-    xr_sprintf(str, sizeof(str), "%s%s", texture, "red");
-    texture = str;
-
-    if (CUITextureMaster::ItemExist(texture))
-        m_indik[type]->InitTexture(texture);
-    else
-        m_indik[type]->SetTextureColor(c_red);
-
-    VERIFY(actor->conditions().GetZoneMaxPower(hit_type));
-    actor->conditions().SetZoneDanger((hit_power - protect) / actor->conditions().GetZoneMaxPower(hit_type), type);
-}
-void CUIHudStatesWnd::SwitchLA(bool state, ALife::EInfluenceType type)
-{
-    if (state == m_cur_state_LA[type])
-    {
-        return;
-    }
-
-    if (state)
-    {
-        m_indik[type]->SetColorAnimation(m_lanim_name.c_str(), LA_CYCLIC | LA_TEXTURECOLOR);
-        m_cur_state_LA[type] = true;
+        texture_color = "yellow";
+        color = color_rgba(255, 255, 0, 255);
     }
     else
     {
-        m_indik[type]->SetColorAnimation(nullptr, 0); //off
-        m_cur_state_LA[type] = false;
+        light_anim = true;
+        texture_color = "red";
+        color = color_rgba(255, 0, 0, 255);
+        zone_danger = (hit_power - protect) / max_power;
     }
+
+    // Switch LA
+    if (light_anim)
+    {
+        m_indik[type]->SetColorAnimation(m_color_animation[type]);
+    }
+    else
+    {
+        m_indik[type]->SetColorAnimation(nullptr, 0); // turn off
+    }
+
+    string256 final_texture;
+    xr_sprintf(final_texture, "%s%s", base_texture, texture_color);
+    if (CUITextureMaster::ItemExist(final_texture))
+    {
+        m_indik[type]->Show(hit_power >= EPS);
+        m_indik[type]->InitTexture(final_texture);
+    }
+    else
+    {
+        m_indik[type]->Show(true);
+        m_indik[type]->SetTextureColor(color);
+    }
+
+    actor->conditions().SetZoneDanger(zone_danger, type);
 }
 
 float CUIHudStatesWnd::get_zone_cur_power(ALife::EHitType hit_type)
@@ -870,92 +849,6 @@ void CUIHudStatesWnd::DrawZoneIndicators()
 
     if (m_indik[ALife::infl_psi]->IsShown())
         m_indik[ALife::infl_psi]->Draw();
-}
-
-void CUIHudStatesWnd::FakeUpdateIndicatorType(u8 t, float power)
-{
-    ALife::EInfluenceType type = (ALife::EInfluenceType)t;
-    if (type < ALife::infl_rad || ALife::infl_psi < type)
-    {
-        VERIFY2(0, "Failed EIndicatorType for CStatic!");
-        return;
-    }
-
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor)
-        return;
-
-    LPCSTR texture = "";
-    string128 str;
-    switch (type)
-    {
-    case ALife::infl_rad: texture = "ui_inGame2_triangle_Radiation_"; break;
-    case ALife::infl_fire: texture = "ui_inGame2_triangle_Fire_"; break;
-    case ALife::infl_acid: texture = "ui_inGame2_triangle_Biological_"; break;
-    case ALife::infl_psi: texture = "ui_inGame2_triangle_Psy_"; break;
-    default: NODEFAULT;
-    }
-    float hit_power = power;
-    ALife::EHitType hit_type = m_zone_hit_type[type];
-
-    CCustomOutfit* outfit = actor->GetOutfit();
-    CHelmet* helmet = smart_cast<CHelmet*>(actor->inventory().ItemFromSlot(HELMET_SLOT));
-    float protect = (outfit) ? outfit->GetDefHitTypeProtection(hit_type) : 0.0f;
-    protect += (helmet) ? helmet->GetDefHitTypeProtection(hit_type) : 0.0f;
-    protect += actor->GetProtection_ArtefactsOnBelt(hit_type);
-
-    const auto& cur_booster_influences = actor->conditions().GetCurBoosterInfluences();
-    CEntityCondition::BOOSTER_MAP::const_iterator it;
-    if (hit_type == ALife::eHitTypeChemicalBurn)
-    {
-        it = cur_booster_influences.find(eBoostChemicalBurnProtection);
-        if (it != cur_booster_influences.end())
-            protect += it->second.fBoostValue;
-    }
-    else if (hit_type == ALife::eHitTypeRadiation)
-    {
-        it = cur_booster_influences.find(eBoostRadiationProtection);
-        if (it != cur_booster_influences.end())
-            protect += it->second.fBoostValue;
-    }
-    else if (hit_type == ALife::eHitTypeTelepatic)
-    {
-        it = cur_booster_influences.find(eBoostTelepaticProtection);
-        if (it != cur_booster_influences.end())
-            protect += it->second.fBoostValue;
-    }
-
-    float max_power = actor->conditions().GetZoneMaxPower(hit_type);
-    protect = protect / max_power; // = 0..1
-
-    if (hit_power < EPS)
-    {
-        m_indik[type]->Show(false);
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
-    }
-
-    m_indik[type]->Show(true);
-    if (hit_power < protect)
-    {
-        xr_sprintf(str, sizeof(str), "%s%s", texture, "green");
-        texture = str;
-        m_indik[type]->InitTexture(texture);
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
-    }
-    if (hit_power - protect < m_zone_threshold[type])
-    {
-        xr_sprintf(str, sizeof(str), "%s%s", texture, "yellow");
-        texture = str;
-        m_indik[type]->InitTexture(texture);
-        actor->conditions().SetZoneDanger(0.0f, type);
-        return;
-    }
-    xr_sprintf(str, sizeof(str), "%s%s", texture, "red");
-    texture = str;
-    m_indik[type]->InitTexture(texture);
-    actor->conditions().SetZoneDanger(hit_power - protect, type);
 }
 
 void CUIHudStatesWnd::EnableFakeIndicators(bool enable) { m_fake_indicators_update = enable; }

@@ -292,7 +292,8 @@ void CUIGameCustom::CommonMessageOut(LPCSTR text) { m_pMessagesWnd->AddLogMessag
 void CUIGameCustom::UpdatePda() { GetPdaMenu().UpdatePda(); }
 void CUIGameCustom::update_fake_indicators(u8 type, float power)
 {
-    UIMainIngameWnd->get_hud_states()->FakeUpdateIndicatorType(type, power);
+    if (CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity()))
+        UIMainIngameWnd->get_hud_states()->UpdateIndicatorType(actor, (ALife::EInfluenceType)type, power);
 }
 
 void CUIGameCustom::enable_fake_indicators(bool enable)
