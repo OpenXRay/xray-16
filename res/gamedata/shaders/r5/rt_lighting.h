@@ -236,48 +236,121 @@ struct RTDirectTerms
     bool invalid;
 };
 
+struct RTLightCandidate
+{
+    float3 diffuse;
+    float3 specular;
+    float3 origin;
+    float3 direction;
+    float distance;
+    bool valid;
+};
+
+RTLightCandidate RTEvaluateLightCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float3 L, float3 radiance, float pdf, float distance, bool delta, bool continuation)
+{
+    RTLightCandidate candidate = (RTLightCandidate)0;
+    if (!(pdf > 0.0) || !any(radiance > 0.0))
+        return candidate;
+    if (surface.shadingClass != SHADING_CLASS_FOLIAGE && dot(L, geoNormal) <= 0.0)
+        return candidate;
+    RTBSDFTerms terms = RTEvaluateBSDFTerms(surface, V, L, radiance, scene.diffuseMode);
+    if (!any(terms.bsdf > 0.0) && !any(terms.transmission > 0.0))
+        return candidate;
+    float side = dot(L, geoNormal) >= 0.0 ? 1.0 : -1.0;
+    candidate.origin = position + geoNormal * (RT_RAY_ORIGIN_OFFSET * side);
+    candidate.direction = L;
+    candidate.distance = scene.rayDistance;
+    if (distance < scene.rayDistance)
+    {
+        float3 toLight = position + L * distance - candidate.origin;
+        float shadowDistance = length(toLight);
+        candidate.direction = toLight / max(shadowDistance, 1e-20);
+        candidate.distance = max(0.0, shadowDistance - RT_RAY_ORIGIN_OFFSET);
+    }
+    float weight = delta || !continuation ? 1.0 : RTPowerHeuristic(pdf, RTBSDFPdf(surface, V, L));
+    float scale = weight / pdf;
+    candidate.diffuse = (terms.diffuse + terms.transmission) * scale;
+    candidate.specular = terms.specular * scale;
+    candidate.valid = true;
+    return candidate;
+}
+
+void RTTraceLightCandidate(RTSceneParams scene, RTLightCandidate candidate, float scale, float coneWidth,
+    float coneSpread, inout RTDirectTerms result)
+{
+    if (!candidate.valid)
+        return;
+    bool exhausted;
+    float3 visibility = RTTraceVisibility(scene, candidate.origin, candidate.direction, candidate.distance,
+        coneWidth, coneSpread, exhausted);
+    result.invalid = result.invalid || exhausted;
+    result.diffuse += candidate.diffuse * (visibility * scale);
+    result.specular += candidate.specular * (visibility * scale);
+}
+
+struct RTLightReservoir
+{
+    RTLightCandidate selected;
+    float weightSum;
+    float selectedTarget;
+};
+
+RTLightReservoir RTLightReservoirBegin()
+{
+    RTLightReservoir reservoir = (RTLightReservoir)0;
+    return reservoir;
+}
+
+void RTLightReservoirAdd(inout RTLightReservoir reservoir, RTLightCandidate candidate, inout uint rng)
+{
+    if (!candidate.valid)
+        return;
+    float target = Luminance(candidate.diffuse + candidate.specular);
+    if (!(target > 0.0) || !isfinite(target))
+        return;
+    reservoir.weightSum += target;
+    if (rand_float(rng) * reservoir.weightSum < target)
+    {
+        reservoir.selected = candidate;
+        reservoir.selectedTarget = target;
+    }
+}
+
+void RTLightReservoirResolve(RTSceneParams scene, RTLightReservoir reservoir, float coneWidth, float coneSpread,
+    inout RTDirectTerms result)
+{
+    if (!(reservoir.weightSum > 0.0) || !(reservoir.selectedTarget > 0.0))
+        return;
+    RTTraceLightCandidate(scene, reservoir.selected, reservoir.weightSum / reservoir.selectedTarget,
+        coneWidth, coneSpread, result);
+}
+
 void RTAddLight(RTSceneParams scene, MaterialSurface surface, float3 position, float3 geoNormal,
     float3 V, float3 L, float3 radiance, float pdf, float distance, bool delta,
     bool continuation, float coneWidth, float coneSpread, inout RTDirectTerms result)
 {
-    if (!(pdf > 0.0) || !any(radiance > 0.0))
-        return;
-    if (surface.shadingClass != SHADING_CLASS_FOLIAGE && dot(L, geoNormal) <= 0.0)
-        return;
-    RTBSDFTerms terms = RTEvaluateBSDFTerms(surface, V, L, radiance, scene.diffuseMode);
-    if (!any(terms.bsdf > 0.0) && !any(terms.transmission > 0.0))
-        return;
-    float side = dot(L, geoNormal) >= 0.0 ? 1.0 : -1.0;
-    float3 origin = position + geoNormal * (RT_RAY_ORIGIN_OFFSET * side);
-    float3 shadowDirection = L;
-    float shadowDistance = scene.rayDistance;
-    if (distance < scene.rayDistance)
-    {
-        float3 toLight = position + L * distance - origin;
-        shadowDistance = length(toLight);
-        shadowDirection = toLight / max(shadowDistance, 1e-20);
-        shadowDistance = max(0.0, shadowDistance - RT_RAY_ORIGIN_OFFSET);
-    }
-    bool exhausted;
-    float3 visibility = RTTraceVisibility(scene, origin, shadowDirection, shadowDistance,
-        coneWidth, coneSpread, exhausted);
-    result.invalid = result.invalid || exhausted;
-    float weight = delta || !continuation ? 1.0 : RTPowerHeuristic(pdf, RTBSDFPdf(surface, V, L));
-    float3 scale = visibility * (weight / pdf);
-    result.diffuse += (terms.diffuse + terms.transmission) * scale;
-    result.specular += terms.specular * scale;
+    RTTraceLightCandidate(scene, RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, L, radiance,
+        pdf, distance, delta, continuation), 1.0, coneWidth, coneSpread, result);
+}
+
+RTLightCandidate RTSunCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, bool continuation, inout uint rng)
+{
+    float3 sunDirection = RTSampleSun(scene, rng);
+    float solidAngle = RTSunSolidAngle(scene);
+    bool deltaSun = !(solidAngle > 0.0);
+    float sunPdf = deltaSun ? 1.0 : 1.0 / solidAngle;
+    return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, sunDirection, scene.sunColor * sunPdf,
+        sunPdf, scene.rayDistance, deltaSun, continuation);
 }
 
 void RTDirectLightingSun(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
     inout uint rng, inout RTDirectTerms result)
 {
-    float3 sunDirection = RTSampleSun(scene, rng);
-    float solidAngle = RTSunSolidAngle(scene);
-    bool deltaSun = !(solidAngle > 0.0);
-    float sunPdf = deltaSun ? 1.0 : 1.0 / solidAngle;
-    RTAddLight(scene, surface, position, geoNormal, V, sunDirection, scene.sunColor * sunPdf,
-        sunPdf, scene.rayDistance, deltaSun, continuation, coneWidth, coneSpread, result);
+    RTTraceLightCandidate(scene, RTSunCandidate(scene, surface, position, geoNormal, V, continuation, rng), 1.0,
+        coneWidth, coneSpread, result);
 }
 
 struct RTLightList
@@ -306,6 +379,22 @@ RTLightList RTResolveLightList(RTSceneParams scene, float3 position, bool primar
     return list;
 }
 
+RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, bool continuation, uint lightIndex)
+{
+    GPULightData light = g_LightData[lightIndex];
+    float3 L;
+    float distance;
+    float attenuation = PunctualLightAttenuation(light, position, L, distance);
+    if (!(attenuation > 0.0) || distance > scene.rayDistance)
+    {
+        RTLightCandidate none = (RTLightCandidate)0;
+        return none;
+    }
+    return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, L, light.colorAndRange.xyz * attenuation,
+        1.0, distance, true, continuation);
+}
+
 void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
     inout RTDirectTerms result, bool primary = false)
@@ -314,55 +403,63 @@ void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, f
     for (uint i = 0u; i < list.count; ++i)
     {
         uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
-        GPULightData light = g_LightData[lightIndex];
-        float3 L;
-        float distance;
-        float attenuation = PunctualLightAttenuation(light, position, L, distance);
-        if (attenuation > 0.0 && distance <= scene.rayDistance)
-            RTAddLight(scene, surface, position, geoNormal, V, L, light.colorAndRange.xyz * attenuation,
-                1.0, distance, true, continuation, coneWidth, coneSpread, result);
+        RTTraceLightCandidate(scene, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
+            lightIndex), 1.0, coneWidth, coneSpread, result);
     }
+}
+
+RTLightCandidate RTEnvironmentCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, bool continuation, inout uint rng)
+{
+    float environmentPdf;
+    float3 environmentDirection = RTSampleEnvironment(scene, rng, environmentPdf);
+    return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, environmentDirection,
+        SampleRTSky(scene, environmentDirection), environmentPdf, scene.rayDistance, false, continuation);
 }
 
 void RTDirectLightingEnvironment(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
     inout uint rng, inout RTDirectTerms result)
 {
-    float environmentPdf;
-    float3 environmentDirection = RTSampleEnvironment(scene, rng, environmentPdf);
-    RTAddLight(scene, surface, position, geoNormal, V, environmentDirection, SampleRTSky(scene, environmentDirection),
-        environmentPdf, scene.rayDistance, false, continuation, coneWidth, coneSpread, result);
+    RTTraceLightCandidate(scene, RTEnvironmentCandidate(scene, surface, position, geoNormal, V, continuation, rng),
+        1.0, coneWidth, coneSpread, result);
+}
+
+RTLightCandidate RTEmissiveCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, bool continuation, inout uint rng)
+{
+    RTLightCandidate none = (RTLightCandidate)0;
+    if (scene.emissiveCount == 0u)
+        return none;
+    uint index = min(uint(rand_float(rng) * float(scene.emissiveCount)), scene.emissiveCount - 1u);
+    RTEmissiveTriangle emitter = g_EmissiveTriangles[index];
+    RTBatchInfo info = g_BatchInfo[emitter.batchIndex];
+    RTTriangleVertex v0, v1, v2;
+    float3x4 transform = RTEmitterTransform(emitter.batchIndex);
+    RTLoadWorldTriangle(scene, emitter.batchIndex, info, emitter.primitiveIndex, transform, v0, v1, v2);
+    float root = sqrt(rand_float(rng));
+    float2 barycentrics = float2(root * (1.0 - rand_float(rng)), 0.0);
+    barycentrics.y = root - barycentrics.x;
+    float3 lightPosition = v0.position * (1.0 - root) + v1.position * barycentrics.x + v2.position * barycentrics.y;
+    float3 toLight = lightPosition - position;
+    float distance = length(toLight);
+    if (!(distance > 0.0) || distance > scene.rayDistance)
+        return none;
+    float3 L = toLight / distance;
+    float3 areaNormal = cross(v1.position - v0.position, v2.position - v0.position);
+    float pdf = RTEmissivePdfFromArea(scene, areaNormal, position, lightPosition);
+    float2 uv = RTInterpolateUV(v0.uv, v1.uv, v2.uv, barycentrics);
+    float3 emission = RTEvaluateEmitter(scene, emitter.batchIndex, info, uv, 0.0, 0.0, true);
+    return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, L, emission, pdf, distance, false,
+        continuation);
 }
 
 void RTDirectLightingEmissive(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
     inout uint rng, inout RTDirectTerms result)
 {
-    if (scene.emissiveCount > 0u)
-    {
-        uint index = min(uint(rand_float(rng) * float(scene.emissiveCount)), scene.emissiveCount - 1u);
-        RTEmissiveTriangle emitter = g_EmissiveTriangles[index];
-        RTBatchInfo info = g_BatchInfo[emitter.batchIndex];
-        RTTriangleVertex v0, v1, v2;
-        float3x4 transform = RTEmitterTransform(emitter.batchIndex);
-        RTLoadWorldTriangle(scene, emitter.batchIndex, info, emitter.primitiveIndex, transform, v0, v1, v2);
-        float root = sqrt(rand_float(rng));
-        float2 barycentrics = float2(root * (1.0 - rand_float(rng)), 0.0);
-        barycentrics.y = root - barycentrics.x;
-        float3 lightPosition = v0.position * (1.0 - root) + v1.position * barycentrics.x + v2.position * barycentrics.y;
-        float3 toLight = lightPosition - position;
-        float distance = length(toLight);
-        if (distance > 0.0 && distance <= scene.rayDistance)
-        {
-            float3 L = toLight / distance;
-            float3 areaNormal = cross(v1.position - v0.position, v2.position - v0.position);
-            float pdf = RTEmissivePdfFromArea(scene, areaNormal, position, lightPosition);
-            float2 uv = RTInterpolateUV(v0.uv, v1.uv, v2.uv, barycentrics);
-            float3 emission = RTEvaluateEmitter(scene, emitter.batchIndex, info, uv, 0.0, 0.0, true);
-            RTAddLight(scene, surface, position, geoNormal, V, L, emission, pdf, distance, false,
-                continuation, coneWidth, coneSpread, result);
-        }
-    }
+    RTTraceLightCandidate(scene, RTEmissiveCandidate(scene, surface, position, geoNormal, V, continuation, rng),
+        1.0, coneWidth, coneSpread, result);
 }
 
 void RTDirectLightingSanitize(inout RTDirectTerms result)
@@ -375,10 +472,38 @@ void RTDirectLightingSanitize(inout RTDirectTerms result)
     }
 }
 
+RTDirectTerms RTDirectLightingResampled(RTSceneParams scene, MaterialSurface surface, float3 position,
+    float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng,
+    bool primary)
+{
+    RTDirectTerms result = (RTDirectTerms)0;
+    RTLightReservoir reservoir = RTLightReservoirBegin();
+    RTLightCandidate sun = RTSunCandidate(scene, surface, position, geoNormal, V, continuation, rng);
+    if (scene.lightRays >= 2u)
+        RTTraceLightCandidate(scene, sun, 1.0, coneWidth, coneSpread, result);
+    else
+        RTLightReservoirAdd(reservoir, sun, rng);
+    RTLightReservoirAdd(reservoir, RTEnvironmentCandidate(scene, surface, position, geoNormal, V, continuation, rng), rng);
+    RTLightReservoirAdd(reservoir, RTEmissiveCandidate(scene, surface, position, geoNormal, V, continuation, rng), rng);
+    RTLightList list = RTResolveLightList(scene, position, primary);
+    for (uint i = 0u; i < list.count; ++i)
+    {
+        uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
+        RTLightReservoirAdd(reservoir, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
+            lightIndex), rng);
+    }
+    RTLightReservoirResolve(scene, reservoir, coneWidth, coneSpread, result);
+    RTDirectLightingSanitize(result);
+    return result;
+}
+
 RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng,
     bool primary = false)
 {
+    if (scene.lightRays != 0u)
+        return RTDirectLightingResampled(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
+            continuation, rng, primary);
     RTDirectTerms result = (RTDirectTerms)0;
     RTDirectLightingSun(scene, surface, position, geoNormal, V, coneWidth, coneSpread, continuation,
         rng, result);

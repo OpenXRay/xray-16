@@ -32,6 +32,10 @@ cbuffer PathTracerParams : register(b5)
     uint g_StaticDetailBatchStart;
     uint g_DetailPbrIndex;
     uint g_DetailBumpIndex;
+    uint g_LightRays;
+    uint g_PathPad0;
+    uint g_PathPad1;
+    uint g_PathPad2;
 };
 
 RWTexture2D<float4> g_Accumulation : register(u0);
@@ -93,6 +97,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     scene.detailBumpIndex = g_DetailBumpIndex;
     scene.clusterLights = g_ClusterLights;
     scene.clusterPixel = pixel;
+    scene.lightRays = g_LightRays;
     uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_SampleIndex * 26699u);
     float3 origin;
     float3 direction = GenerateCameraRay(pixel, rng, origin);
