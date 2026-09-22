@@ -391,15 +391,15 @@ target_sources(xrRender_GL PRIVATE
 target_include_directories(xrRender_GL
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender"
-    "${CMAKE_SOURCE_DIR}/src/Include/xrRender"
-    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
-    "${CMAKE_SOURCE_DIR}/sdk/include"
-    "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
-    "${CMAKE_SOURCE_DIR}/Externals"
-    "${CMAKE_SOURCE_DIR}/Externals/gli"
-    "${CMAKE_SOURCE_DIR}/Externals/gli/external"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src/Layers/xrRender"
+    "${XRAY_SOURCE_DIR}/src/Include/xrRender"
+    "${XRAY_SOURCE_DIR}/src/Layers/xrRender_R2"
+    "${XRAY_SOURCE_DIR}/sdk/include"
+    "${XRAY_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${XRAY_SOURCE_DIR}/Externals"
+    "${XRAY_SOURCE_DIR}/Externals/gli"
+    "${XRAY_SOURCE_DIR}/Externals/gli/external"
 )
 
 target_link_libraries(xrRender_GL

@@ -16,7 +16,7 @@ set(ABIVER 5.1)
 set(NODOTABIVER 51)
 
 set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
+set(LUAJIT_DIR ${XRAY_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
 option(BUILD_SHARED_LIBS "Build as shared library" ON)
 option(LUAJIT_BUILD_APP "Build application" OFF)
@@ -562,7 +562,7 @@ endif()
 
 target_include_directories(xrLuaJIT
     PUBLIC
-    "${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src"
+    "${XRAY_SOURCE_DIR}/Externals/LuaJIT/src"
 
     PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}"

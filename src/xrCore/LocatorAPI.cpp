@@ -11,7 +11,11 @@
 #include <sys/utime.h>
 #elif defined(XR_PLATFORM_POSIX)
 #include <SDL.h>
+#if defined(XR_PLATFORM_ANDROID)
+#include <dirent.h>
+#else
 #include <glob.h>
+#endif
 #endif
 
 #include "FS_internal.h"
@@ -697,6 +701,28 @@ bool CLocatorAPI::Recurse(pcstr path)
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
         return false;
+#elif defined(XR_PLATFORM_ANDROID)
+    xr_vector<xr_string> entries;
+    const size_t scanLength = xr_strlen(scanPath);
+    if (scanLength > 0 && scanPath[scanLength - 1] == '*')
+        scanPath[scanLength - 1] = '\0';
+
+    DIR* directory = opendir(scanPath[0] ? scanPath : ".");
+    if (!directory)
+        return false;
+
+    while (const dirent* entry = readdir(directory))
+    {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+        xr_string fullPath(scanPath);
+        if (!fullPath.empty() && fullPath.back() != '/')
+            fullPath += '/';
+        fullPath += entry->d_name;
+        entries.emplace_back(std::move(fullPath));
+    }
+    closedir(directory);
+
+    intptr_t handle = static_cast<intptr_t>(entries.size()) - 1;
 #elif defined(XR_PLATFORM_POSIX)
     glob_t globbuf;
 
@@ -718,6 +744,25 @@ bool CLocatorAPI::Recurse(pcstr path)
     {
 #if defined(XR_PLATFORM_WINDOWS)
         // do nothing
+#elif defined(XR_PLATFORM_ANDROID)
+        xr_strcpy(findData.name, entries[handle - done].c_str());
+        struct stat fi{};
+        if (stat(findData.name, &fi) != 0)
+        {
+            --done;
+            continue;
+        }
+        findData.size = fi.st_size;
+        findData.time_access = fi.st_atim.tv_sec;
+        findData.time_create = fi.st_ctim.tv_sec;
+        findData.time_write = fi.st_mtim.tv_sec;
+        switch (fi.st_mode & S_IFMT)
+        {
+        case S_IFDIR: findData.attrib = _A_SUBDIR; break;
+        case S_IFREG: findData.attrib = 0;         break; // File
+        default:      findData.attrib = _A_HIDDEN; break; // Skip
+        }
+        restore_path_separators(findData.name);
 #elif defined(XR_PLATFORM_POSIX)
         xr_strcpy(findData.name, globbuf.gl_pathv[handle - done]);
         struct stat fi;
@@ -765,6 +810,8 @@ bool CLocatorAPI::Recurse(pcstr path)
             rec_files.push_back(findData);
 #ifdef XR_PLATFORM_WINDOWS
         done = _findnext(handle, &findData);
+#elif defined(XR_PLATFORM_ANDROID)
+        done--;
 #elif defined(XR_PLATFORM_POSIX)
         done--;
 #else
@@ -773,6 +820,8 @@ bool CLocatorAPI::Recurse(pcstr path)
     }
 #ifdef XR_PLATFORM_WINDOWS
     _findclose(handle);
+#elif defined(XR_PLATFORM_ANDROID)
+    // The directory stream is closed immediately after collecting its entries.
 #elif defined(XR_PLATFORM_POSIX)
     globfree(&globbuf);
 #else

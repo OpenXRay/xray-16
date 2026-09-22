@@ -19,8 +19,8 @@ target_sources(xrRenderPC_R4 PRIVATE
 
 target_include_directories(xrRenderPC_R4
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/sdk/include"
 )
 
 target_link_libraries(xrRenderPC_R4

@@ -87,8 +87,8 @@ target_sources_grouped(
 target_include_directories(xrScriptEngine
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/Externals"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/Externals"
 )
 
 target_link_libraries(xrScriptEngine
@@ -102,6 +102,9 @@ target_link_libraries(xrScriptEngine
 )
 
 target_compile_definitions(xrScriptEngine
+    PUBLIC
+    XRAY_USE_LUAJIT=$<BOOL:${XRAY_USE_LUAJIT}>
+
     PRIVATE
     XRSCRIPTENGINE_EXPORTS
 )
