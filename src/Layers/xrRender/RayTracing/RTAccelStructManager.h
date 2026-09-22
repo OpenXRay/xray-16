@@ -290,6 +290,7 @@ class RTGrassJob
 public:
     nvrhi::BufferHandle visible;
     GrassRTCB constants;
+    u32 lod = 0;
 };
 
 class RTPulledJob
@@ -297,6 +298,20 @@ class RTPulledJob
 public:
     nvrhi::BufferHandle visible;
     BillboardRTCB constants;
+};
+
+enum class RTBuildScope : u8
+{
+    None,
+    Pose,
+    Full,
+};
+
+class RTPoseSignature
+{
+public:
+    u64 refresh = 0;
+    u64 motion = 0;
 };
 
 class RTSceneGeneration
@@ -395,6 +410,7 @@ public:
     xr_vector<framegraph::VirtualResourceHandle> structures;
     framegraph::VirtualResourceHandle wind;
     framegraph::VirtualResourceHandle interaction[2];
+    RTBuildScope scope = RTBuildScope::Full;
 };
 
 class RTAccelStructManager
@@ -424,6 +440,7 @@ public:
     u32 GetDetailAtlasIndex() const;
     RTMemoryStats GetMemoryStats(const GPUCullingManager* gpu) const;
     u64 GetSceneRevision() const;
+    u64 GetPoseRevision() const;
     u64 GetTextureRevision(nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
     void RetireScenes();
 
@@ -438,7 +455,9 @@ private:
         bool topologyStable, u64 topologyKey = 0);
     bool IsSceneReady(const RTSceneGeneration& scene) const;
     u64 ComputeStaticSignature(const GPUCullingManager* gpuCulling) const;
-    u64 ComputeSceneSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
+    u64 ComputeTopologySignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
+    RTPoseSignature ComputePoseSignature(const GPUCullingManager* gpuCulling, const FGDetailManager* detailMgr,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches) const;
     void AppendMaterialTextures(u32 materialID, bool terrain);
     void PrepareStatic(GPUCullingManager* gpuCulling);
@@ -449,6 +468,10 @@ private:
     void PrepareGrass(RTSceneGeneration& scene, FGDetailManager* detailMgr);
     void PrepareScene(GPUCullingManager* gpuCulling, FGDetailManager* detailMgr,
         const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
+    void RefreshGeometryBuild(RTGeometryBuild& slot) const;
+    bool RefreshPose(GPUCullingManager* gpuCulling, FGDetailManager* detailMgr,
+        const xr_vector<GeometryBatch>& worldBatches, const xr_vector<GeometryBatch>& hudBatches);
+    void RegisterBuildPasses(framegraph::FrameGraph& graph, FGDetailManager* detailMgr, RTBuildScope scope);
     void RecordInputs(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
         nvrhi::ICommandList* commandList);
     void RecordBLAS(const RTBuildPassData& data, const framegraph::FrameGraph& graph,
@@ -478,6 +501,11 @@ private:
     u64 m_staticSignature = 0;
     u64 m_sceneSignature = 0;
     u64 m_sceneRevision = 0;
+    u64 m_poseSignature = 0;
+    u64 m_motionSignature = 0;
+    u64 m_poseRevision = 0;
+    u64 m_staticIdentityHash = 0;
+    u32 m_staticIdentityBuildCount = UINT32_MAX;
 
     static nvrhi::ComputePipelineHandle s_skinPipeline;
     static nvrhi::BindingLayoutHandle s_skinLayout;

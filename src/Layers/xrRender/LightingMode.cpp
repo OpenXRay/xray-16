@@ -31,6 +31,7 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT)
     rayStaticDetailInstances = 0;
     rawSignalsRecorded = false;
     sceneRevision = 0;
+    poseRevision = 0;
 
     if (m_latchedReason == LightingFallback::None)
         return;

@@ -60,6 +60,7 @@ public:
     u32 rayStaticDetailInstances = 0;
     bool rawSignalsRecorded = false;
     u64 sceneRevision = 0;
+    u64 poseRevision = 0;
 
 private:
     LightingMode m_latchedMode = LightingMode::Raster;

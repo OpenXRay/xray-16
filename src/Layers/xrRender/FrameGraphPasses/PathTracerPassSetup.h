@@ -111,6 +111,7 @@ public:
     PathTracerCB world = {};
     float skyBlend = 0.0f;
     u64 sceneRevision = 0;
+    u64 poseRevision = 0;
     u64 textureRevision = 0;
     u64 lightingSignature = 0;
     nvrhi::IDevice* device = nullptr;
@@ -133,6 +134,7 @@ public:
     nvrhi::TextureHandle sky0;
     nvrhi::TextureHandle sky1;
     u64 sceneRevision = 0;
+    u64 poseRevision = 0;
     u64 textureRevision = 0;
     u64 lightingSignature = 0;
     Fvector4 foliageSSS = {};

@@ -1219,6 +1219,7 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
             m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
     }
     m_lightingState.sceneRevision = m_rtAccelMgr->GetSceneRevision();
+    m_lightingState.poseRevision = m_rtAccelMgr->GetPoseRevision();
 }
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {

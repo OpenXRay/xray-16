@@ -730,6 +730,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
             m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
             m_staticBatchKeys.push_back(batchKey(batch));
         }
+        ++m_staticBuildCount;
     }
 
     for (u32 index : geometry->GetStaticTransparentIndices()) {
@@ -939,6 +940,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticDataCached = false;
     m_staticUploaded = false;
     m_staticObjectCount = 0;
+    ++m_staticBuildCount;
 
     m_staticObjectFlags.clear();
     m_staticDrawArgsData.clear();

@@ -575,6 +575,7 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
     snapshot->world = world;
     snapshot->skyBlend = skyBlend;
     snapshot->sceneRevision = accelMgr->GetSceneRevision();
+    snapshot->poseRevision = accelMgr->GetPoseRevision();
     snapshot->textureRevision = accelMgr->GetTextureRevision(sky0, sky1);
     snapshot->lightingSignature = ClusteredLightManager::Instance().GetTransportSignature();
     snapshot->device = nvDevice;
@@ -891,6 +892,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     state.pending.sky0 = sky0Used;
     state.pending.sky1 = sky1Used;
     state.pending.sceneRevision = frozen ? snapshot->sceneRevision : accelMgr->GetSceneRevision();
+    state.pending.poseRevision = frozen ? snapshot->poseRevision : accelMgr->GetPoseRevision();
     state.pending.textureRevision = frozen ? snapshot->textureRevision : accelMgr->GetTextureRevision(sky0Used, sky1Used);
     state.pending.lightingSignature = frozen ? snapshot->lightingSignature : lightManager.GetTransportSignature();
     const StaticGlobals liveGlobals = BuildStaticGlobals();
@@ -909,6 +911,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
 
     u32 sampleIndex = 0;
     const bool historyMatches = history.valid && history.sceneRevision == state.pending.sceneRevision &&
+        history.poseRevision == state.pending.poseRevision &&
         history.textureRevision == state.pending.textureRevision &&
         history.lightingSignature == state.pending.lightingSignature &&
         memcmp(&history.foliageSSS, &state.pending.foliageSSS, sizeof(Fvector4)) == 0 &&
