@@ -795,6 +795,7 @@ void MetalBackend::UpdateCapabilities() {
     {
         caps.rayTracingUpdates = caps.rayTracing && impl.nativeDevice != nil;
     }
+    caps.rayTracingCompaction = caps.rayTracing && impl.device->queryFeatureSupport(nvrhi::Feature::RayTracingCompaction);
     caps.variableRateShading = impl.device->queryFeatureSupport(nvrhi::Feature::VariableRateShading);
     caps.bindlessTextures = impl.bindlessTable != nullptr;
     caps.maxBindlessResources = caps.bindlessTextures ? Impl::MaxBindlessTextures : 0;

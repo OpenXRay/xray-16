@@ -433,6 +433,8 @@ void D3D12Backend::QueryCapabilities() {
         m_capabilities.rayTracing = (options5.RaytracingTier != D3D12_RAYTRACING_TIER_NOT_SUPPORTED);
     }
     m_capabilities.rayTracingUpdates = m_capabilities.rayTracing;
+    m_capabilities.rayTracingCompaction = m_capabilities.rayTracing &&
+        m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingCompaction);
 
     D3D12_FEATURE_DATA_D3D12_OPTIONS6 options6 = {};
     if (SUCCEEDED(m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &options6, sizeof(options6)))) {

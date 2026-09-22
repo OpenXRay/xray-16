@@ -417,6 +417,7 @@ void RTAccelStructManager::Initialize(RenderDevice* device)
         native->queryFeatureSupport(nvrhi::Feature::RayQuery);
     const auto* backend = device->GetBackend();
     m_inPlaceUpdates = m_rtSupported && backend && backend->GetCapabilities().rayTracingUpdates;
+    m_compaction = m_rtSupported && backend && backend->GetCapabilities().rayTracingCompaction;
 }
 
 void RTAccelStructManager::Shutdown()
@@ -971,7 +972,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
     {
         RTGeometryBuild shared;
         shared.desc.debugName = name;
-        shared.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+        shared.desc.buildFlags = StaticBuildFlags();
         const u32 firstBatch = u32(geometry->batches.size());
         bool opaque = true;
         for (u32 i = 0; i < args.size(); ++i)
@@ -1022,7 +1023,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
             {
                 RTGeometryBuild build;
                 build.desc.debugName = "RT_InstancedBLAS";
-                build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+                build.desc.buildFlags = StaticBuildFlags();
                 build.desc.addBottomLevelGeometry(RTTriangles(geometry->vertices, geometry->indices,
                     GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, batchOpaque));
                 build.handle = device->createAccelStruct(build.desc);
@@ -1126,7 +1127,7 @@ bool RTAccelStructManager::EnsureDynamicGeometry(GPUCullingManager* gpu)
             continue;
         RTGeometryBuild build;
         build.desc.debugName = "RT_DynamicBLAS";
-        build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+        build.desc.buildFlags = StaticBuildFlags();
         build.desc.addBottomLevelGeometry(RTTriangles(vertices, indices, GPUCullingManager::RT_VERTEX_STRIDE,
             range.vertexOffset, range.vertexCount, range.indexOffset, range.indexCount, range.opaque));
         build.handle = device->createAccelStruct(build.desc);
@@ -2668,6 +2669,50 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
     R_ASSERT(index == data.structures.size());
 }
 
+static constexpr u32 RT_TLAS_MAX_REFITS = 32;
+
+nvrhi::rt::AccelStructBuildFlags RTAccelStructManager::StaticBuildFlags() const
+{
+    nvrhi::rt::AccelStructBuildFlags flags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+    if (m_compaction)
+        flags = flags | nvrhi::rt::AccelStructBuildFlags::AllowCompaction;
+    return flags;
+}
+
+bool RTAccelStructManager::AnySceneRetained() const
+{
+    for (const auto& generation : m_generations)
+    {
+        if (generation->retention != 0)
+            return true;
+    }
+    return false;
+}
+
+bool RTAccelStructManager::RecordCompaction(RTSceneGeneration& scene, nvrhi::ICommandList* commandList)
+{
+    if (!m_compaction || AnySceneRetained())
+        return false;
+    commandList->compactBottomLevelAccelStructs();
+    bool swapped = false;
+    auto observe = [&](xr_vector<RTGeometryBuild>& builds)
+    {
+        for (auto& build : builds)
+        {
+            if (build.handle && build.built && !build.compacted && build.handle->isCompacted())
+            {
+                build.compacted = true;
+                swapped = true;
+            }
+        }
+    };
+    if (scene.geometry)
+        observe(scene.geometry->builds);
+    if (scene.dynamicGeometry)
+        observe(scene.dynamicGeometry->builds);
+    return swapped;
+}
+
 void RTAccelStructManager::RecordTLAS(const RTBuildPassData& data,
     const framegraph::FrameGraph& graph, nvrhi::ICommandList* commandList)
 {
@@ -2675,12 +2720,15 @@ void RTAccelStructManager::RecordTLAS(const RTBuildPassData& data,
         R_ASSERT(graph.GetPhysicalAccelerationStructure(handle));
     auto* tlas = graph.GetPhysicalAccelerationStructure(data.resources.tlas);
     auto& scene = *data.scene;
+    if (RecordCompaction(scene, commandList) || scene.tlasRefits >= RT_TLAS_MAX_REFITS)
+        scene.tlasUpdate = false;
     nvrhi::rt::AccelStructBuildFlags flags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
     if (m_inPlaceUpdates)
         flags = flags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
     if (scene.tlasUpdate)
         flags = flags | nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
     commandList->buildTopLevelAccelStruct(tlas, scene.instances.data(), u32(scene.instances.size()), flags);
+    scene.tlasRefits = scene.tlasUpdate ? scene.tlasRefits + 1 : 0;
     scene.tlasBuildCount = u32(scene.instances.size());
     scene.tlasBuilt = true;
     scene.tlasUpdate = false;
@@ -2797,6 +2845,16 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
         result.accelerationBytes += bytes;
         result.accelerationBytesKnown &= bytes != 0;
     };
+    auto compactable = [&](const RTGeometryBuild& build)
+    {
+        acceleration(build.handle);
+        if (!build.handle)
+            return;
+        if ((build.desc.buildFlags & nvrhi::rt::AccelStructBuildFlags::AllowCompaction) != nvrhi::rt::AccelStructBuildFlags::None)
+            ++result.compactableStructures;
+        if (build.compacted)
+            ++result.compactedStructures;
+    };
     xr_set<RTSkinTopology*> countedTopologies;
     for (u32 i = 0; i < m_generations.size(); ++i)
     {
@@ -2823,7 +2881,7 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
             if (scene.geometry->indices != sourceIndices)
                 result.sourceBytes += bufferBytes(scene.geometry->indices);
             for (const auto& build : scene.geometry->builds)
-                acceleration(build.handle);
+                compactable(build);
         }
         bool firstDynamic = scene.dynamicGeometry != nullptr;
         for (u32 j = 0; j < i; ++j)
@@ -2831,7 +2889,7 @@ RTMemoryStats RTAccelStructManager::GetMemoryStats(const GPUCullingManager* gpu)
         if (firstDynamic)
         {
             for (const auto& build : scene.dynamicGeometry->builds)
-                acceleration(build.handle);
+                compactable(build);
         }
     }
     for (const auto& topology : m_skinTopologies)

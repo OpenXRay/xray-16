@@ -885,6 +885,8 @@ void VulkanBackend::QueryCapabilities() {
     m_capabilities.rayTracing = m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct) &&
         m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayQuery);
     m_capabilities.rayTracingUpdates = m_capabilities.rayTracing;
+    m_capabilities.rayTracingCompaction = m_capabilities.rayTracing &&
+        m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingCompaction);
     Msg("* [VulkanBackend] Ray tracing (path tracer / RTGI): %s", m_capabilities.rayTracing ? "ENABLED" : "DISABLED");
 
     VkPhysicalDeviceProperties props;
