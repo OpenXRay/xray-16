@@ -423,6 +423,8 @@ void RTAccelStructManager::Shutdown()
     m_skinTopologies.clear();
     m_textureScratch.clear();
     m_textureScratch.shrink_to_fit();
+    m_staticIdentityHash = 0;
+    m_staticIdentityBuildCount = UINT32_MAX;
     InvalidateShaderPipelines();
     m_device = nullptr;
     m_rtSupported = false;
@@ -677,8 +679,43 @@ u64 RTAccelStructManager::ComputeStaticSignature(const GPUCullingManager* gpu) c
     return signature;
 }
 
-u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, const FGDetailManager* detail,
-    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud) const
+static CKinematics* RTBatchSkeleton(const GeometryBatch& batch)
+{
+    if (batch.visual->getType() == MT_SKELETON_GEOMDEF_ST)
+        return static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    if (batch.visual->getType() == MT_SKELETON_GEOMDEF_PM)
+        return static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+    return nullptr;
+}
+
+static void RTSkinBatchSources(const GeometryBatch& batch, const SkinnedGeometryPools& pools,
+    const void*& vertices, const void*& staging)
+{
+    vertices = nullptr;
+    staging = nullptr;
+    const u32 format = batch.skinnedPoolFormat;
+    if (format >= SkinnedGeometryPools::FIRST_FORMAT && format < SkinnedGeometryPools::FORMAT_COUNT)
+    {
+        vertices = pools.GetVertexBuffer(format);
+        return;
+    }
+    auto* mesh = static_cast<IRender_Mesh*>(static_cast<Fvisual*>(batch.visual));
+    if (mesh->p_rm_Vertices)
+        vertices = mesh->p_rm_Vertices->GetBufferHandle().Get();
+    staging = mesh->p_rm_Indices;
+}
+
+static bool RTGrassWaves(const FGDetailManager::VisibilityFrame& frame)
+{
+    const auto& stats = frame.stats;
+    const bool procedural = frame.source->params.grassMode &&
+        (stats.visibleLOD0Count || stats.visibleLOD1Count || stats.visibleLOD2Count);
+    const bool waved = !frame.source->params.grassMode && stats.visibleBillboardCount;
+    return procedural || waved;
+}
+
+u64 RTAccelStructManager::ComputeTopologySignature(const GPUCullingManager* gpu, const FGDetailManager* detail,
+    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud)
 {
     u64 signature = m_staticSignature;
     auto append = [&](const auto& value)
@@ -688,27 +725,31 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
     append(bindless::MaterialBuffer::Instance().GetRevision());
     append(bindless::TerrainMaterialBuffer::Instance().GetRevision());
     append(bindless::VariantBuffer::Instance().GetRevision());
-    auto appendScenes = [&](const xr_vector<GPUInstanceData>& instances,
-        const xr_vector<GeometryInstanceKey>& identities)
+    auto appendIdentities = [](u64& target, const xr_vector<GeometryInstanceKey>& identities)
     {
-        R_ASSERT(instances.size() == identities.size());
-        append(instances.size());
-        for (const auto& instance : instances)
-            HashSceneData(signature, &instance.world, sizeof(instance.world));
+        const size_t count = identities.size();
+        HashSceneData(target, &count, sizeof(count));
         for (const auto& identity : identities)
         {
             const u64 value = RTInstanceIdentity(identity);
-            HashSceneData(signature, &value, sizeof(value));
+            HashSceneData(target, &value, sizeof(value));
         }
     };
-    appendScenes(gpu->GetStaticInstanceData(), gpu->GetStaticInstanceIdentities());
-    appendScenes(gpu->GetTerrainInstanceData(), gpu->GetTerrainInstanceIdentities());
-    appendScenes(gpu->GetTransparentInstanceData(), gpu->GetTransparentInstanceIdentities());
-    appendScenes(gpu->GetDynamicInstanceData(), gpu->GetDynamicInstanceIdentities());
+    if (m_staticIdentityBuildCount != gpu->GetStaticBuildCount())
+    {
+        m_staticIdentityHash = RT_IDENTITY_SEED;
+        appendIdentities(m_staticIdentityHash, gpu->GetStaticInstanceIdentities());
+        appendIdentities(m_staticIdentityHash, gpu->GetTerrainInstanceIdentities());
+        m_staticIdentityBuildCount = gpu->GetStaticBuildCount();
+    }
+    append(m_staticIdentityHash);
+    appendIdentities(signature, gpu->GetTransparentInstanceIdentities());
+    appendIdentities(signature, gpu->GetDynamicInstanceIdentities());
     const auto& dynamicKeys = gpu->GetDynamicMeshKeys();
     const size_t dynamicKeyCount = dynamicKeys.size();
     HashSceneData(signature, &dynamicKeyCount, sizeof(dynamicKeyCount));
     HashSceneData(signature, dynamicKeys.data(), dynamicKeyCount * sizeof(ClusterMeshKey));
+    const auto& pools = gpu->GetSkinnedPools();
     auto appendBatches = [&](const xr_vector<GeometryBatch>& batches)
     {
         append(batches.size());
@@ -717,7 +758,6 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
             append(batch.visualLifetimeID);
             append(batch.renderableLifetimeID);
             append(batch.geometrySubset);
-            append(batch.worldMatrix);
             append(batch.bindlessMaterialID);
             append(batch.indexCount);
             append(batch.startIndex);
@@ -726,16 +766,11 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
             append(batch.skinnedPoolBaseVertex);
             append(batch.skinnedPoolFirstIndex);
             append(batch.skinningRenderMode);
-            CKinematics* skeleton = nullptr;
-            if (batch.visual->getType() == MT_SKELETON_GEOMDEF_ST)
-                skeleton = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
-            else if (batch.visual->getType() == MT_SKELETON_GEOMDEF_PM)
-                skeleton = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
-            R_ASSERT(skeleton);
-            u32 boneCount = 0;
-            const Fmatrix* bones = gpu->GetPreparedSkeletonMatrices(skeleton, boneCount);
-            append(boneCount);
-            HashSceneData(signature, bones, size_t(boneCount) * sizeof(Fmatrix));
+            const void* vertices;
+            const void* staging;
+            RTSkinBatchSources(batch, pools, vertices, staging);
+            append(vertices);
+            append(staging);
         }
     };
     appendBatches(world);
@@ -753,18 +788,60 @@ u64 RTAccelStructManager::ComputeSceneSignature(const GPUCullingManager* gpu, co
         append(detail->buildDetailsBindlessIndex);
         append(detail->buildDetailsPbrBindlessIndex);
         append(detail->buildDetailsBumpBindlessIndex);
-        const bool procedural = frame->source->params.grassMode &&
-            (frame->stats.visibleLOD0Count || frame->stats.visibleLOD1Count || frame->stats.visibleLOD2Count);
-        const bool waved = !frame->source->params.grassMode && frame->stats.visibleBillboardCount;
-        if (procedural || waved)
-            append(Device.dwFrame);
     }
     return signature;
+}
+
+RTPoseSignature RTAccelStructManager::ComputePoseSignature(const GPUCullingManager* gpu, const FGDetailManager* detail,
+    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud) const
+{
+    u64 motion = RT_IDENTITY_SEED;
+    auto append = [&](const auto& value)
+    {
+        HashSceneData(motion, &value, sizeof(value));
+    };
+    auto appendWorlds = [&](const xr_vector<GPUInstanceData>& instances)
+    {
+        append(instances.size());
+        for (const auto& instance : instances)
+            HashSceneData(motion, &instance.world, sizeof(instance.world));
+    };
+    appendWorlds(gpu->GetTransparentInstanceData());
+    appendWorlds(gpu->GetDynamicInstanceData());
+    auto appendBatches = [&](const xr_vector<GeometryBatch>& batches)
+    {
+        append(batches.size());
+        for (const auto& batch : batches)
+        {
+            append(batch.worldMatrix);
+            CKinematics* skeleton = RTBatchSkeleton(batch);
+            R_ASSERT(skeleton);
+            append(gpu->GetPreparedSkeletonOffset(skeleton));
+            u32 boneCount = 0;
+            const Fmatrix* bones = gpu->GetPreparedSkeletonMatrices(skeleton, boneCount);
+            append(boneCount);
+            HashSceneData(motion, bones, size_t(boneCount) * sizeof(Fmatrix));
+        }
+    };
+    appendBatches(world);
+    appendBatches(hud);
+    RTPoseSignature result;
+    result.motion = motion;
+    result.refresh = motion;
+    const auto frame = detail ? detail->GetCompletedRayVisibilityFrame() : nullptr;
+    if (frame && frame->source && frame->statsReady && RTGrassWaves(*frame))
+        HashSceneData(result.refresh, &Device.fTimeGlobal, sizeof(Device.fTimeGlobal));
+    return result;
 }
 
 u64 RTAccelStructManager::GetSceneRevision() const
 {
     return m_sceneRevision;
+}
+
+u64 RTAccelStructManager::GetPoseRevision() const
+{
+    return m_poseRevision;
 }
 
 u64 RTAccelStructManager::GetTextureRevision(nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const
@@ -1610,6 +1687,7 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
                 continue;
             RTGrassJob job = {};
             job.visible = frame->visible[lod];
+            job.lod = lod;
             job.constants.segments = FGDetailManager::LOD_SEGMENTS[lod];
             job.constants.vertsPerBlade = job.constants.segments * 2 + 1;
             job.constants.indicesPerBlade = (job.constants.segments - 1) * 6 + 3;
@@ -1928,6 +2006,156 @@ RTFrameResources RTAccelStructManager::ImportScene(framegraph::FrameGraph& graph
     return resources;
 }
 
+void RTAccelStructManager::RefreshGeometryBuild(RTGeometryBuild& slot) const
+{
+    slot.update = slot.handle && slot.built && m_inPlaceUpdates &&
+        (slot.desc.buildFlags & nvrhi::rt::AccelStructBuildFlags::AllowUpdate) != nvrhi::rt::AccelStructBuildFlags::None;
+}
+
+bool RTAccelStructManager::RefreshPose(GPUCullingManager* gpu, FGDetailManager* detail,
+    const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud)
+{
+    auto& scene = *m_scene;
+    if (scene.geometry != m_staticGeometry || scene.failed || !scene.recorded)
+        return false;
+    if (scene.counts.skinned && (!s_skinPipeline || !s_skinLayout))
+        return false;
+    if (!scene.grassJobs.empty() && (!s_grassPipeline || scene.grassPipeline != s_grassPipeline ||
+        scene.grassLayout != s_grassLayout))
+        return false;
+    if ((!scene.detailMeshJobs.empty() || !scene.staticDetailJobs.empty()) &&
+        (!s_billboardPipeline || scene.pulledPipeline != s_billboardPipeline || scene.pulledLayout != s_billboardLayout))
+        return false;
+    const auto& geometry = *m_staticGeometry;
+    const xr_vector<GPUInstanceData>* worlds[RT_SOURCE_COUNT] = { &gpu->GetStaticInstanceData(),
+        &gpu->GetTerrainInstanceData(), &gpu->GetTransparentInstanceData() };
+    const u32 staticBatchCount = u32(geometry.batches.size());
+    if (geometry.batchSources.size() != staticBatchCount || scene.batchTransforms.size() < staticBatchCount ||
+        scene.instances.size() < geometry.instances.size())
+        return false;
+    for (u32 i = 0; i < staticBatchCount; ++i)
+    {
+        const RTBatchSource& source = geometry.batchSources[i];
+        if (source.array >= RT_SOURCE_COUNT || source.index >= worlds[source.array]->size())
+            return false;
+        scene.batchTransforms[i] = RTBatchTransformOf((*worlds[source.array])[source.index].world);
+    }
+    auto applyTransform = [&](u32 instance, u32 batch)
+    {
+        nvrhi::rt::AffineTransform affine;
+        memcpy(&affine, &scene.batchTransforms[batch].rows, sizeof(affine));
+        scene.instances[instance].setTransform(affine);
+    };
+    for (u32 i = 0; i < geometry.instances.size(); ++i)
+    {
+        const s32 batch = geometry.instanceBatches[i];
+        if (batch >= 0)
+            applyTransform(i, u32(batch));
+    }
+    u32 batchIndex = staticBatchCount;
+    u32 instanceIndex = u32(geometry.instances.size());
+    if (scene.counts.dynamic)
+    {
+        if (!scene.dynamicGeometry || scene.dynamicGeometry != m_dynamicGeometry)
+            return false;
+        const auto& instances = gpu->GetDynamicInstanceData();
+        const auto& keys = gpu->GetDynamicMeshKeys();
+        if (instances.size() != keys.size())
+            return false;
+        const u32 dynamicEnd = staticBatchCount + scene.counts.dynamic;
+        if (scene.batchTransforms.size() < dynamicEnd || scene.instances.size() < instanceIndex + scene.counts.dynamic)
+            return false;
+        for (u32 i = 0; i < keys.size(); ++i)
+        {
+            RTDynamicRange range = {};
+            range.vertexOffset = keys[i].vertexOffset;
+            range.indexOffset = keys[i].indexOffset;
+            range.vertexCount = keys[i].vertexCount;
+            range.indexCount = keys[i].indexCount;
+            range.opaque = IsOpaqueMaterialForRT(instances[i].materialID, false);
+            if (scene.dynamicGeometry->recordBuilds.find(range) == scene.dynamicGeometry->recordBuilds.end())
+                continue;
+            if (batchIndex >= dynamicEnd)
+                return false;
+            scene.batchTransforms[batchIndex] = RTBatchTransformOf(instances[i].world);
+            applyTransform(instanceIndex, batchIndex);
+            ++batchIndex;
+            ++instanceIndex;
+        }
+        if (batchIndex != dynamicEnd)
+            return false;
+    }
+    if (scene.counts.skinned)
+    {
+        if (scene.skinJobs.size() != world.size() || scene.hudSkinJobs.size() != hud.size())
+            return false;
+        auto refreshJobs = [&](xr_vector<RTSkinJob>& jobs, const xr_vector<GeometryBatch>& batches)
+        {
+            for (u32 i = 0; i < jobs.size(); ++i)
+            {
+                const GeometryBatch& batch = batches[i];
+                CKinematics* skeleton = RTBatchSkeleton(batch);
+                if (!skeleton)
+                    return false;
+                RTSkinningCB& constants = jobs[i].constants;
+                constants.worldMatrix = batch.worldMatrix;
+                Fmatrix inverse;
+                inverse.invert(batch.worldMatrix);
+                constants.normalMatrix.transpose(inverse);
+                constants.boneOffset = gpu->GetPreparedSkeletonOffset(skeleton);
+            }
+            return true;
+        };
+        if (!refreshJobs(scene.skinJobs, world) || !refreshJobs(scene.hudSkinJobs, hud))
+            return false;
+        scene.bones = gpu->GetGlobalBoneBuffer();
+        if (!scene.bones || !scene.skinTopology || scene.skinTopology->uploadPending)
+            return false;
+        RefreshGeometryBuild(scene.skinBuild);
+        RefreshGeometryBuild(scene.hudSkinBuild);
+    }
+    if (scene.counts.grass)
+    {
+        if (!detail)
+            return false;
+        auto frame = detail->GetCompletedRayVisibilityFrame();
+        if (!frame || !frame->source || !frame->statsReady || !scene.grassFrame || !scene.grassFrame->source ||
+            frame->source->id != scene.grassFrame->source->id)
+            return false;
+        const auto& stats = frame->stats;
+        const u32 lodCounts[] = { stats.visibleLOD0Count, stats.visibleLOD1Count, stats.visibleLOD2Count };
+        for (auto& job : scene.grassJobs)
+        {
+            if (job.lod >= FGDetailManager::LOD_COUNT || lodCounts[job.lod] != job.constants.bladeCount ||
+                !frame->visible[job.lod])
+                return false;
+            job.visible = frame->visible[job.lod];
+        }
+        auto refreshPulled = [&](xr_vector<RTPulledJob>& jobs, u32 kind, u32 count)
+        {
+            for (auto& job : jobs)
+            {
+                if (job.constants.detailKind != kind || job.constants.billboardCount != count || !frame->visible[kind])
+                    return false;
+                job.visible = frame->visible[kind];
+            }
+            return true;
+        };
+        if (!refreshPulled(scene.detailMeshJobs, FGDetailManager::VIS_KIND_MESH, stats.visibleBillboardCount) ||
+            !refreshPulled(scene.staticDetailJobs, FGDetailManager::VIS_KIND_DECAL, stats.visibleDecalCount))
+            return false;
+        scene.grassFrame = std::move(frame);
+        scene.grassWind = detail->perlin4dTexture;
+        for (u32 i = 0; i < 2; ++i)
+            scene.grassInteraction[i] = detail->interactionTexture[i];
+        if (!scene.grassWind || !scene.grassInteraction[0] || !scene.grassInteraction[1])
+            return false;
+        scene.grassBuild.update = false;
+    }
+    scene.tlasUpdate = m_inPlaceUpdates && scene.tlasBuilt && scene.tlasBuildCount == u32(scene.instances.size());
+    return true;
+}
+
 bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCullingManager* gpu, FGDetailManager* detail, const xr_vector<GeometryBatch>& world,
     const xr_vector<GeometryBatch>& hud)
 {
@@ -1939,16 +2167,39 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
     PrepareStatic(gpu);
     if (!m_staticGeometry || m_staticGeometry->failed)
         return false;
-    const u64 signature = ComputeSceneSignature(gpu, detail, world, hud);
-    if (!m_scene || signature != m_sceneSignature || m_scene->geometry != m_staticGeometry || !m_scene->recorded)
+    const u64 topology = ComputeTopologySignature(gpu, detail, world, hud);
+    const RTPoseSignature pose = ComputePoseSignature(gpu, detail, world, hud);
+    RTBuildScope scope = RTBuildScope::None;
+    bool rebuild = !m_scene || topology != m_sceneSignature || m_scene->geometry != m_staticGeometry ||
+        !m_scene->recorded;
+    if (!rebuild && pose.refresh != m_poseSignature)
+    {
+        if (m_scene->retention == 0 && RefreshPose(gpu, detail, world, hud))
+        {
+            scope = RTBuildScope::Pose;
+            m_poseSignature = pose.refresh;
+            if (pose.motion != m_motionSignature)
+            {
+                m_motionSignature = pose.motion;
+                ++m_poseRevision;
+            }
+        }
+        else
+            rebuild = true;
+    }
+    if (rebuild)
     {
         if (!EnsureBuildResources(detail, !world.empty() || !hud.empty()))
             return false;
         PrepareScene(gpu, detail, world, hud);
         if (IsReady())
         {
-            m_sceneSignature = signature;
+            scope = RTBuildScope::Full;
+            m_sceneSignature = topology;
+            m_poseSignature = pose.refresh;
+            m_motionSignature = pose.motion;
             ++m_sceneRevision;
+            ++m_poseRevision;
         }
     }
     if (!IsReady())
@@ -1958,9 +2209,19 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
         return false;
     ++m_scene->leases;
     m_leases.push_back({ m_scene, lease });
-    if (m_scene->recorded)
+    if (scope == RTBuildScope::None)
+    {
+        R_ASSERT(m_scene->recorded);
         return true;
+    }
+    RegisterBuildPasses(graph, detail, scope);
+    return true;
+}
+
+void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FGDetailManager* detail, RTBuildScope scope)
+{
     using namespace framegraph;
+    const bool full = scope == RTBuildScope::Full;
     const auto scene = m_scene;
     const auto resources = ImportScene(graph, *scene);
     graph.addCallbackPass<RTBuildPassData>("RT Source and Pose",
@@ -1971,24 +2232,29 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             data.detailManager = detail;
             data.scene = scene;
             data.resources = resources;
-            pb.write(resources.batchInfo, ResourceState::CopyDest);
-            pb.write(resources.materials, ResourceState::CopyDest);
-            pb.write(resources.terrainMaterials, ResourceState::CopyDest);
-            pb.write(resources.variants, ResourceState::CopyDest);
+            data.scope = scope;
+            if (full)
+            {
+                pb.write(resources.batchInfo, ResourceState::CopyDest);
+                pb.write(resources.materials, ResourceState::CopyDest);
+                pb.write(resources.terrainMaterials, ResourceState::CopyDest);
+                pb.write(resources.variants, ResourceState::CopyDest);
+                pb.write(resources.emissiveTriangles, ResourceState::CopyDest);
+                pb.write(resources.emissiveBatchOffsets, ResourceState::CopyDest);
+                data.sourceMaterials = pb.read(ImportRTBuffer(builder, "bindless_materials",
+                    scene->sourceMaterials), ResourceState::CopySource);
+                data.sourceTerrainMaterials = pb.read(ImportRTBuffer(builder, "terrain_materials",
+                    scene->sourceTerrainMaterials), ResourceState::CopySource);
+                data.sourceVariants = pb.read(ImportRTBuffer(builder, "bindless_variants",
+                    scene->sourceVariants), ResourceState::CopySource);
+            }
             pb.write(resources.grassMaterials, ResourceState::CopyDest);
-            pb.write(resources.emissiveTriangles, ResourceState::CopyDest);
             pb.write(resources.batchTransforms, ResourceState::CopyDest);
-            pb.write(resources.emissiveBatchOffsets, ResourceState::CopyDest);
-            data.sourceMaterials = pb.read(ImportRTBuffer(builder, "bindless_materials",
-                scene->sourceMaterials), ResourceState::CopySource);
-            data.sourceTerrainMaterials = pb.read(ImportRTBuffer(builder, "terrain_materials",
-                scene->sourceTerrainMaterials), ResourceState::CopySource);
-            data.sourceVariants = pb.read(ImportRTBuffer(builder, "bindless_variants",
-                scene->sourceVariants), ResourceState::CopySource);
             if (scene->counts.skinned)
             {
                 pb.write(resources.skinnedVertices, ResourceState::UnorderedAccess);
-                pb.write(resources.skinnedIndices, ResourceState::CopyDest);
+                if (full || scene->skinTopology->uploadPending)
+                    pb.write(resources.skinnedIndices, ResourceState::CopyDest);
                 data.bones = pb.read(ImportRTBuffer(builder, "skinned_bone_matrices", scene->bones),
                     ResourceState::ShaderResource);
                 data.skinSources.clear();
@@ -2062,6 +2328,7 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             data.manager = this;
             data.scene = scene;
             data.resources = resources;
+            data.scope = scope;
             auto input = [&](VirtualResourceHandle handle)
             {
                 if (handle.is_valid())
@@ -2120,6 +2387,7 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             data.manager = this;
             data.scene = scene;
             data.resources = resources;
+            data.scope = scope;
             if (scene->tlasUpdate)
                 pb.readWrite(resources.tlas, ResourceState::AccelStructWrite);
             else
@@ -2145,19 +2413,17 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
         {
             data.manager->RecordTLAS(data, fg, ctx->GetCommandList());
         });
-    return true;
 }
 
 void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
     const framegraph::FrameGraph& graph, nvrhi::ICommandList* commandList)
 {
     const auto& scene = *data.scene;
+    const bool full = data.scope == RTBuildScope::Full;
     auto buffer = [&](framegraph::VirtualResourceHandle handle)
     {
         return graph.GetPhysicalBuffer(handle);
     };
-    commandList->writeBuffer(buffer(data.resources.batchInfo), scene.batches.data(),
-        scene.batches.size() * sizeof(RTBatchInfo));
     auto upload = [&](framegraph::VirtualResourceHandle handle, const void* contents, size_t bytes)
     {
         auto* destination = buffer(handle);
@@ -2173,18 +2439,23 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
             offset += chunk;
         }
     };
-    upload(data.resources.emissiveTriangles, scene.emissiveTriangles.data(),
-        scene.emissiveTriangles.size() * sizeof(RTEmissiveTriangle));
+    if (full)
+    {
+        commandList->writeBuffer(buffer(data.resources.batchInfo), scene.batches.data(),
+            scene.batches.size() * sizeof(RTBatchInfo));
+        upload(data.resources.emissiveTriangles, scene.emissiveTriangles.data(),
+            scene.emissiveTriangles.size() * sizeof(RTEmissiveTriangle));
+        upload(data.resources.emissiveBatchOffsets, scene.emissiveBatchOffsets.data(),
+            scene.emissiveBatchOffsets.size() * sizeof(u32));
+        auto* source = buffer(data.sourceMaterials);
+        commandList->copyBuffer(buffer(data.resources.materials), 0, source, 0, source->getDesc().byteSize);
+        source = buffer(data.sourceTerrainMaterials);
+        commandList->copyBuffer(buffer(data.resources.terrainMaterials), 0, source, 0, source->getDesc().byteSize);
+        source = buffer(data.sourceVariants);
+        commandList->copyBuffer(buffer(data.resources.variants), 0, source, 0, source->getDesc().byteSize);
+    }
     upload(data.resources.batchTransforms, scene.batchTransforms.data(),
         scene.batchTransforms.size() * sizeof(RTBatchTransform));
-    upload(data.resources.emissiveBatchOffsets, scene.emissiveBatchOffsets.data(),
-        scene.emissiveBatchOffsets.size() * sizeof(u32));
-    auto* source = buffer(data.sourceMaterials);
-    commandList->copyBuffer(buffer(data.resources.materials), 0, source, 0, source->getDesc().byteSize);
-    source = buffer(data.sourceTerrainMaterials);
-    commandList->copyBuffer(buffer(data.resources.terrainMaterials), 0, source, 0, source->getDesc().byteSize);
-    source = buffer(data.sourceVariants);
-    commandList->copyBuffer(buffer(data.resources.variants), 0, source, 0, source->getDesc().byteSize);
     FGDetailManager::GrassMaterialConstants grassMaterialConstants = {};
     if (data.detailManager)
         data.detailManager->FillGrassMaterialConstants(grassMaterialConstants);

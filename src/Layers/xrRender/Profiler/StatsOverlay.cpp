@@ -175,7 +175,8 @@ void StatsOverlay::Render()
     if (lighting.requested != render::fg::LightingMode::Raster)
     {
         ImGui::Text("RT history used: %s", lighting.historyUsed ? "yes" : "no");
-        ImGui::Text("RT scene revision: %llu", static_cast<unsigned long long>(lighting.sceneRevision));
+        ImGui::Text("RT scene revision: %llu | pose revision: %llu", static_cast<unsigned long long>(lighting.sceneRevision),
+            static_cast<unsigned long long>(lighting.poseRevision));
         ImGui::Text("RT static detail instances: %u (%s)", lighting.rayStaticDetailInstances,
             lighting.recorded ? "recorded scene" : "not recorded");
         if (ImGui::IsItemHovered())
@@ -1306,9 +1307,10 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         xr_sprintf(line, sizeof(line), "RTGI rays: world-only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | raw multibounce, unreconstructed, uncached, unclamped\n");
         text += line;
     }
-    xr_sprintf(line, sizeof(line), "history: surfaces=%s | used=%s | RT scene revision=%llu | PT recorded samples=%u\n",
+    xr_sprintf(line, sizeof(line), "history: surfaces=%s | used=%s | RT scene revision=%llu | RT pose revision=%llu | PT recorded samples=%u\n",
         rs.lighting.previousSurfacesValid ? "valid" : "rejected", rs.lighting.historyUsed ? "yes" : "no",
-        static_cast<unsigned long long>(rs.lighting.sceneRevision), rs.lighting.recordedSamples);
+        static_cast<unsigned long long>(rs.lighting.sceneRevision), static_cast<unsigned long long>(rs.lighting.poseRevision),
+        rs.lighting.recordedSamples);
     text += line;
     if (rs.lighting.requested == render::fg::LightingMode::ReferencePT)
     {

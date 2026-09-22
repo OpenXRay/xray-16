@@ -461,6 +461,7 @@ public:
     const xr_vector<GeometryInstanceKey>& GetStaticInstanceIdentities() const { return m_staticInstanceIdentities; }
     const xr_vector<GeometryInstanceKey>& GetTerrainInstanceIdentities() const { return m_terrainInstanceIdentities; }
     const xr_vector<GeometryInstanceKey>& GetTransparentInstanceIdentities() const { return m_transparentInstanceIdentities; }
+    u32 GetStaticBuildCount() const { return m_staticBuildCount; }
     const xr_vector<GPUInstanceData>& GetDynamicInstanceData() const;
     const xr_vector<GeometryInstanceKey>& GetDynamicInstanceIdentities() const;
     const xr_vector<ClusterMeshKey>& GetDynamicMeshKeys() const;
@@ -553,6 +554,7 @@ public:
     bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled; }
     nvrhi::IBuffer* GetSkinnedRecordsBuffer() const { return m_skinnedRecordsBuffer.Get(); }
     SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
+    const SkinnedGeometryPools& GetSkinnedPools() const { return m_skinnedPools; }
 
     struct SkinnedDrawRecord {
         Fmatrix world;
@@ -807,6 +809,7 @@ private:
     nvrhi::TextureHandle m_dummyHiZ;
 
     bool m_staticDataCached = false;
+    u32 m_staticBuildCount = 0;
 
     u32 m_terrainObjectCount = 0;
     u32 m_maxTerrainObjects = 0;
