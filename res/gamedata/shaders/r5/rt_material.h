@@ -17,6 +17,7 @@ struct RTHitGeometry
     float3 tangent;
     float3 bitangent;
     float3 position;
+    float3 areaNormal;
     float bladeVariance;
     uint bladeObjectId;
     float bladeHash;
@@ -106,14 +107,21 @@ RTHitGeometry RTFetchHitCoverage(RTSceneParams scene, RTSceneTrace trace, float3
         p1 = TransformPointToWorld(p1, trace.objectToWorld);
         p2 = TransformPointToWorld(p2, trace.objectToWorld);
     }
-    float3 geoNormal = RTSafeNormalize(cross(p1 - p0, p2 - p0), float3(0.0, 1.0, 0.0));
-    if (dot(geoNormal, rayDirection) > 0.0)
-        geoNormal = -geoNormal;
-
-    float3 uvTangent, uvBitangent;
-    RTUVDerivedBasis(p0, p1, p2, v0.uv, v1.uv, v2.uv, uvTangent, uvBitangent);
-    RTUVFootprintFromRayCone(uvTangent, uvBitangent, geoNormal, rayDirection, trace.t,
-        trace.coneWidth, trace.coneSpread, geometry.uvDx, geometry.uvDy);
+    float3 areaNormal = cross(p1 - p0, p2 - p0);
+    float worldTwiceArea = length(areaNormal);
+    float2 d1 = v1.uv - v0.uv;
+    float2 d2 = v2.uv - v0.uv;
+    float uvTwiceArea = abs(d1.x * d2.y - d2.x * d1.y);
+    float radius = trace.coneWidth + trace.coneSpread * max(trace.t, 0.0);
+    if (!(worldTwiceArea > 1e-12) || !(radius > 0.0) || !isfinite(radius))
+        return geometry;
+    float cosine = max(abs(dot(areaNormal, rayDirection)) / worldTwiceArea, RT_FOOTPRINT_MIN_COS);
+    float footprint = min(radius, RT_FOOTPRINT_MAX_RADIUS) * sqrt(uvTwiceArea / (worldTwiceArea * cosine));
+    if (!isfinite(footprint))
+        return geometry;
+    geometry.areaNormal = areaNormal;
+    geometry.uvDx = float2(footprint, 0.0);
+    geometry.uvDy = float2(0.0, footprint);
     return geometry;
 }
 
@@ -129,7 +137,8 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     float3 p0 = v0.position;
     float3 p1 = v1.position;
     float3 p2 = v2.position;
-    float3 geoNormal = RTSafeNormalize(cross(p1 - p0, p2 - p0), float3(0.0, 1.0, 0.0));
+    float3 areaNormal = cross(p1 - p0, p2 - p0);
+    float3 geoNormal = RTSafeNormalize(areaNormal, float3(0.0, 1.0, 0.0));
 
     if (dot(geoNormal, rayDirection) > 0.0)
         geoNormal = -geoNormal;
@@ -209,6 +218,7 @@ RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3
     geometry.tangent = basisTangent;
     geometry.bitangent = basisBitangent;
     geometry.position = RTInterpolatePoint(p0, p1, p2, trace.barycentrics);
+    geometry.areaNormal = areaNormal;
     geometry.bladeVariance = bladeVariance;
     geometry.bladeObjectId = vertex.bladeObjectId;
     geometry.bladeHash = vertex.bladeHash;

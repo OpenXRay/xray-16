@@ -343,9 +343,12 @@ uint RTIntegratorMaterialStage(inout RTIntegratorState s, RTSceneParams scene, R
         s.firstSurfaceRecorded = true;
     }
 
-    float emissionWeight = RTEmissionWeight(scene, trace.batchIdx, trace.info, trace.primitiveIndex,
-        s.previousPosition, hitPosition, s.previousPdf, s.previousDelta);
-    RTIntegratorAddSource(s, hit.surface.emissive * emissionWeight);
+    if (any(hit.surface.emissive > 0.0))
+    {
+        float emissionWeight = RTEmissionWeightFromArea(scene, trace.batchIdx, geometry.areaNormal,
+            s.previousPosition, hitPosition, s.previousPdf, s.previousDelta);
+        RTIntegratorAddSource(s, hit.surface.emissive * emissionWeight);
+    }
     return RT_INTEGRATOR_STAGE_READY;
 }
 

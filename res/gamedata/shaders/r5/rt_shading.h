@@ -328,9 +328,12 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
             trace.hit = true;
             return trace;
         }
-        float emissionWeight = shadowRay ? 1.0 : RTEmissionWeight(scene, trace.batchIdx, trace.info,
-            trace.primitiveIndex, previousPosition, origin + direction * trace.t, previousPdf, previousDelta);
-        trace.emissive += trace.transmittance * hitClass.emissive * emissionWeight;
+        if (any(hitClass.emissive > 0.0))
+        {
+            float emissionWeight = shadowRay ? 1.0 : RTEmissionWeight(scene, trace.batchIdx, trace.info,
+                trace.primitiveIndex, previousPosition, origin + direction * trace.t, previousPdf, previousDelta);
+            trace.emissive += trace.transmittance * hitClass.emissive * emissionWeight;
+        }
         trace.transmittance *= hitClass.transmittance;
         if (!any(trace.transmittance > 0.0))
             return trace;

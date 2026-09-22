@@ -146,6 +146,19 @@ float3x4 RTEmitterTransform(uint batchIndex)
     return float3x4(transform.row0, transform.row1, transform.row2);
 }
 
+float RTEmissivePdfFromArea(RTSceneParams scene, float3 areaNormal, float3 previousPosition, float3 position)
+{
+    float twiceArea = length(areaNormal);
+    float3 toEmitter = position - previousPosition;
+    float distanceSquared = dot(toEmitter, toEmitter);
+    if (scene.emissiveCount == 0u || !(twiceArea > 0.0) || !(distanceSquared > 0.0))
+        return 0.0;
+    float cosine = abs(dot(areaNormal / twiceArea, toEmitter * rsqrt(distanceSquared)));
+    if (!(cosine > 0.0))
+        return 0.0;
+    return 2.0 * distanceSquared / (float(scene.emissiveCount) * twiceArea * cosine);
+}
+
 float RTEmissivePdf(RTSceneParams scene, uint batchIndex, RTBatchInfo info, uint primitiveIndex,
     float3 previousPosition, float3 position)
 {
@@ -153,16 +166,18 @@ float RTEmissivePdf(RTSceneParams scene, uint batchIndex, RTBatchInfo info, uint
         return 0.0;
     RTTriangleVertex v0, v1, v2;
     RTLoadWorldTriangle(scene, batchIndex, info, primitiveIndex, RTEmitterTransform(batchIndex), v0, v1, v2);
-    float3 areaNormal = cross(v1.position - v0.position, v2.position - v0.position);
-    float twiceArea = length(areaNormal);
-    float3 toEmitter = position - previousPosition;
-    float distanceSquared = dot(toEmitter, toEmitter);
-    if (!(twiceArea > 0.0) || !(distanceSquared > 0.0))
-        return 0.0;
-    float cosine = abs(dot(areaNormal / twiceArea, toEmitter * rsqrt(distanceSquared)));
-    if (!(cosine > 0.0))
-        return 0.0;
-    return 2.0 * distanceSquared / (float(scene.emissiveCount) * twiceArea * cosine);
+    return RTEmissivePdfFromArea(scene, cross(v1.position - v0.position, v2.position - v0.position),
+        previousPosition, position);
+}
+
+float RTEmissionWeightFromArea(RTSceneParams scene, uint batchIndex, float3 areaNormal,
+    float3 previousPosition, float3 position, float bsdfPdf, bool delta)
+{
+    if (delta)
+        return 1.0;
+    if (scene.emissiveCount == 0u || g_EmissiveBatchOffsets[batchIndex] == 0xFFFFFFFFu)
+        return 1.0;
+    return RTPowerHeuristic(bsdfPdf, RTEmissivePdfFromArea(scene, areaNormal, previousPosition, position));
 }
 
 float RTEmissionWeight(RTSceneParams scene, uint batchIndex, RTBatchInfo info, uint primitiveIndex,
@@ -340,19 +355,10 @@ void RTDirectLightingEmissive(RTSceneParams scene, MaterialSurface surface, floa
         if (distance > 0.0 && distance <= scene.rayDistance)
         {
             float3 L = toLight / distance;
-            float pdf = RTEmissivePdf(scene, emitter.batchIndex, info, emitter.primitiveIndex, position, lightPosition);
-            RTSceneTrace lightTrace = (RTSceneTrace)0;
-            lightTrace.batchIdx = emitter.batchIndex;
-            lightTrace.info = info;
-            lightTrace.primitiveIndex = emitter.primitiveIndex;
-            lightTrace.barycentrics = barycentrics;
-            lightTrace.objectToWorld = transform;
-            lightTrace.t = distance;
-            lightTrace.coneWidth = coneWidth;
-            lightTrace.coneSpread = coneSpread;
-            RTHitGeometry geometry = RTFetchHitGeometry(scene, lightTrace, L);
-            float3 emission = RTEvaluateEmitter(scene, emitter.batchIndex, info, geometry.uv,
-                geometry.uvDx, geometry.uvDy, true);
+            float3 areaNormal = cross(v1.position - v0.position, v2.position - v0.position);
+            float pdf = RTEmissivePdfFromArea(scene, areaNormal, position, lightPosition);
+            float2 uv = RTInterpolateUV(v0.uv, v1.uv, v2.uv, barycentrics);
+            float3 emission = RTEvaluateEmitter(scene, emitter.batchIndex, info, uv, 0.0, 0.0, true);
             RTAddLight(scene, surface, position, geoNormal, V, L, emission, pdf, distance, false,
                 continuation, coneWidth, coneSpread, result);
         }
