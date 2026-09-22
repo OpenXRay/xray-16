@@ -39,6 +39,7 @@ extern ENGINE_API int ps_r_path_tracer_samples;
 extern ENGINE_API int ps_r_rt_max_null_events;
 extern ENGINE_API float ps_r_rt_sun_radius;
 extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_rt_gi_profile;
 extern ENGINE_API int ps_r_rt_gi_restir;
 extern ENGINE_API float ps_r_rt_gi_intensity;
 extern ENGINE_API int ps_r_rt_gi_bounces;

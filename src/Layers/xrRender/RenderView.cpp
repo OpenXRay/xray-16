@@ -174,6 +174,12 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     frame.textures.push_back(rtgi.pathData);
     frame.textures.push_back(rtgi.surfaceData);
     frame.textures.push_back(rtgi.motion);
+    if (rtgi.profile.paths)
+    {
+        frame.buffers.push_back(rtgi.profile.paths);
+        frame.buffers.push_back(rtgi.profile.hits);
+        frame.buffers.push_back(rtgi.profile.sums);
+    }
     for (u32 i = 0; i < 2; ++i)
     {
         frame.textures.push_back(m_depth[i]);
