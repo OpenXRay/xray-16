@@ -165,6 +165,69 @@ static nvrhi::BufferDesc RTTableBufferDesc(const char* name, u32 stride, size_t 
     return desc;
 }
 
+bool RTAccelStructManager::AccelStructShapeMatches(const nvrhi::rt::AccelStructDesc& cached,
+    const nvrhi::rt::AccelStructDesc& requested)
+{
+    if (cached.isTopLevel != requested.isTopLevel || cached.buildFlags != requested.buildFlags ||
+        cached.bottomLevelGeometries.size() != requested.bottomLevelGeometries.size())
+        return false;
+    for (size_t i = 0; i < cached.bottomLevelGeometries.size(); ++i)
+    {
+        const nvrhi::rt::GeometryDesc& lhs = cached.bottomLevelGeometries[i];
+        const nvrhi::rt::GeometryDesc& rhs = requested.bottomLevelGeometries[i];
+        if (lhs.geometryType != nvrhi::rt::GeometryType::Triangles ||
+            rhs.geometryType != nvrhi::rt::GeometryType::Triangles)
+            return false;
+        if (lhs.flags != rhs.flags || lhs.useTransform != rhs.useTransform)
+            return false;
+        const nvrhi::rt::GeometryTriangles& a = lhs.geometryData.triangles;
+        const nvrhi::rt::GeometryTriangles& b = rhs.geometryData.triangles;
+        if (a.indexFormat != b.indexFormat || a.indexCount != b.indexCount ||
+            a.vertexFormat != b.vertexFormat || a.vertexStride != b.vertexStride ||
+            a.vertexCount != b.vertexCount)
+            return false;
+    }
+    return true;
+}
+
+bool RTAccelStructManager::AccelStructUpdateMatches(const nvrhi::rt::AccelStructDesc& cached,
+    const nvrhi::rt::AccelStructDesc& requested)
+{
+    if (!AccelStructShapeMatches(cached, requested) || cached.buildFlags != requested.buildFlags)
+        return false;
+    for (size_t i = 0; i < cached.bottomLevelGeometries.size(); ++i)
+    {
+        const nvrhi::rt::GeometryTriangles& a = cached.bottomLevelGeometries[i].geometryData.triangles;
+        const nvrhi::rt::GeometryTriangles& b = requested.bottomLevelGeometries[i].geometryData.triangles;
+        if (a.vertexBuffer != b.vertexBuffer || a.indexBuffer != b.indexBuffer ||
+            a.vertexOffset != b.vertexOffset || a.vertexCount != b.vertexCount ||
+            a.indexOffset != b.indexOffset)
+            return false;
+    }
+    return true;
+}
+
+void RTAccelStructManager::AcquireGeometryBuild(const nvrhi::rt::AccelStructDesc& requested, RTGeometryBuild& slot,
+    bool topologyStable, u64 topologyKey)
+{
+    R_ASSERT(!requested.bottomLevelGeometries.empty());
+    nvrhi::rt::AccelStructDesc desc = requested;
+    const bool retain = slot.handle && AccelStructShapeMatches(slot.desc, desc);
+    const bool update = retain && m_inPlaceUpdates && topologyStable && slot.built &&
+        (desc.buildFlags & nvrhi::rt::AccelStructBuildFlags::AllowUpdate) != nvrhi::rt::AccelStructBuildFlags::None &&
+        slot.topologyKey == topologyKey && AccelStructUpdateMatches(slot.desc, desc);
+    if (!retain)
+    {
+        slot.desc = std::move(desc);
+        slot.handle = m_device->GetNVRHIDevice()->createAccelStruct(slot.desc);
+        slot.built = false;
+    }
+    else
+        slot.desc = std::move(desc);
+    slot.topologyKey = topologyKey;
+    slot.update = slot.handle && update;
+}
+
 static nvrhi::rt::GeometryDesc RTTriangles(nvrhi::IBuffer* vertices,
     nvrhi::IBuffer* indices, u32 stride, u32 firstVertex, u32 vertexCount,
     u32 firstIndex, u32 indexCount, bool opaque)
@@ -188,16 +251,19 @@ static constexpr u32 RT_MASK_WORLD = 0x01;
 static constexpr u32 RT_MASK_HUD = 0x02;
 
 static nvrhi::rt::InstanceDesc RTInstance(nvrhi::rt::IAccelStruct* blas,
-    u32 firstBatch, const RTBatchTransform& transform, bool opaque, u32 mask)
+    u32 firstBatch, const RTBatchTransform& transform, bool opaque, u32 mask, bool cullDisable = false)
 {
     R_ASSERT(firstBatch < (1u << 24));
     R_ASSERT(mask);
     nvrhi::rt::AffineTransform affine;
     memcpy(&affine, &transform.rows, sizeof(affine));
     nvrhi::rt::InstanceDesc result;
-    result.setTransform(affine).setInstanceID(firstBatch).setInstanceMask(mask)
-        .setFlags(opaque ? nvrhi::rt::InstanceFlags::ForceOpaque :
-            nvrhi::rt::InstanceFlags::TriangleCullDisable).setBLAS(blas);
+    result.setFlags(nvrhi::rt::InstanceFlags::None);
+    if (opaque)
+        result.setFlags(nvrhi::rt::InstanceFlags::ForceOpaque);
+    if (cullDisable)
+        result.setFlags(result.flags | nvrhi::rt::InstanceFlags::TriangleCullDisable);
+    result.setTransform(affine).setInstanceID(firstBatch).setInstanceMask(mask).setBLAS(blas);
     return result;
 }
 
@@ -246,6 +312,23 @@ static bool IsEmissiveMaterial(u32 materialID)
         return false;
     return (variant->flags &
         (bindless::VARIANT_FLAG_EMISSIVE | bindless::VARIANT_FLAG_ADDITIVE_EMISSION)) != 0;
+}
+
+bool RTAccelStructManager::IsOpaqueMaterialForRT(u32 materialID, bool terrain)
+{
+    constexpr u32 rejectedMaterialFlags = bindless::MAT_FLAG_ALPHA_TEST | bindless::MAT_FLAG_ALPHA_BLEND |
+        bindless::MAT_FLAG_WATER;
+    constexpr u32 rejectedVariantFlags = bindless::VARIANT_FLAG_NO_SHADOW |
+        bindless::VARIANT_FLAG_ADDITIVE_EMISSION;
+    if (terrain)
+        return true;
+    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
+    if (!material || (material->flags & rejectedMaterialFlags))
+        return false;
+    const auto* variant = bindless::VariantBuffer::Instance().Get(material->shaderVariant);
+    if (!variant)
+        return false;
+    return (variant->flags & rejectedVariantFlags) == 0;
 }
 
 static void AppendEmissiveBatch(xr_vector<u32>& offsets, xr_vector<RTEmissiveTriangle>& triangles,
@@ -318,6 +401,8 @@ void RTAccelStructManager::Initialize(RenderDevice* device)
     auto* native = device->GetNVRHIDevice();
     m_rtSupported = native->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct) &&
         native->queryFeatureSupport(nvrhi::Feature::RayQuery);
+    const auto* backend = device->GetBackend();
+    m_inPlaceUpdates = m_rtSupported && backend && backend->GetCapabilities().rayTracingUpdates;
 }
 
 void RTAccelStructManager::Shutdown()
@@ -341,6 +426,7 @@ void RTAccelStructManager::Shutdown()
     InvalidateShaderPipelines();
     m_device = nullptr;
     m_rtSupported = false;
+    m_inPlaceUpdates = false;
 }
 
 void RTAccelStructManager::InvalidateShaderPipelines()
@@ -442,6 +528,14 @@ void RTAccelStructManager::RetireScenes()
         {
             it->scene->recorded = false;
             it->scene->failed = true;
+            it->scene->skinBuild.built = false;
+            it->scene->skinBuild.update = false;
+            it->scene->hudSkinBuild.built = false;
+            it->scene->hudSkinBuild.update = false;
+            it->scene->grassBuild.built = false;
+            it->scene->grassBuild.update = false;
+            it->scene->tlasBuilt = false;
+            it->scene->tlasUpdate = false;
             RTSkinTopology* failedTopology = it->scene->skinTopology.get();
             if (failedTopology)
             {
@@ -557,15 +651,28 @@ u64 RTAccelStructManager::ComputeStaticSignature(const GPUCullingManager* gpu) c
             HashSceneData(signature, &identityTransform, sizeof(identityTransform));
         }
     };
+    auto appendOpacity = [&](const xr_vector<u32>& materials, bool terrain)
+    {
+        const size_t count = materials.size();
+        HashSceneData(signature, &count, sizeof(count));
+        for (u32 materialID : materials)
+        {
+            const u8 opaque = IsOpaqueMaterialForRT(materialID, terrain) ? 1u : 0u;
+            HashSceneData(signature, &opaque, sizeof(opaque));
+        }
+    };
     append(gpu->GetStaticDrawArgsData());
     appendInstanceShape(gpu->GetStaticInstanceData());
     append(gpu->GetStaticBatchVertexCounts());
     append(gpu->GetStaticMaterialIDData());
+    appendOpacity(gpu->GetStaticMaterialIDData(), false);
     append(gpu->GetTerrainDrawArgsData());
     append(gpu->GetTerrainMaterialIDData());
+    appendOpacity(gpu->GetTerrainMaterialIDData(), true);
     appendInstanceShape(gpu->GetTerrainInstanceData());
     append(gpu->GetTransparentDrawArgsData());
     append(gpu->GetTransparentMaterialIDData());
+    appendOpacity(gpu->GetTransparentMaterialIDData(), false);
     appendInstanceShape(gpu->GetTransparentInstanceData());
     return signature;
 }
@@ -730,7 +837,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
     R_ASSERT(transparentArgs.size() == transparentMaterials.size());
     R_ASSERT(transparentArgs.size() == transparentIdentities.size());
     auto* device = m_device->GetNVRHIDevice();
-    xr_map<std::tuple<u32, s32, u32, u32>, u32> unique;
+    xr_map<std::tuple<u32, s32, u32, u32, bool>, u32> unique;
     auto resolveBatch = [&](const IndirectDrawArgs& args, u32 index, const xr_vector<u32>* batchCounts,
         u32& startIndex, s32& baseVertex, u32& indexCount, u32& vertices)
     {
@@ -759,6 +866,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
         shared.desc.debugName = name;
         shared.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
         const u32 firstBatch = u32(geometry->batches.size());
+        bool opaque = true;
         for (u32 i = 0; i < args.size(); ++i)
         {
             if (!IsIdentityWorld(instances[i].world))
@@ -767,8 +875,10 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
             s32 baseVertex = 0;
             if (!resolveBatch(args[i], i, batchCounts, startIndex, baseVertex, indexCount, vertices))
                 continue;
+            const bool batchOpaque = IsOpaqueMaterialForRT(materials[i], arrayIndex == RT_SOURCE_TERRAIN);
             shared.desc.addBottomLevelGeometry(RTTriangles(geometry->vertices, geometry->indices,
-                GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, true));
+                GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, batchOpaque));
+            opaque = opaque && batchOpaque;
             geometry->batches.push_back({ materials[i], startIndex, baseVertex, indexCount });
             geometry->batchSources.push_back({ arrayIndex, i });
         }
@@ -780,7 +890,8 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
             geometry->failed = true;
             return;
         }
-        geometry->instances.push_back(RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), true, RT_MASK_WORLD));
+        geometry->instances.push_back(
+            RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), opaque, RT_MASK_WORLD));
         geometry->instanceBatches.push_back(-1);
         geometry->builds.push_back(std::move(shared));
     };
@@ -796,7 +907,8 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
             s32 baseVertex = 0;
             if (!resolveBatch(args[i], i, batchCounts, startIndex, baseVertex, indexCount, vertices))
                 continue;
-            const auto key = std::make_tuple(startIndex, baseVertex, indexCount, vertices);
+            const bool batchOpaque = IsOpaqueMaterialForRT(materials[i], arrayIndex == RT_SOURCE_TERRAIN);
+            const auto key = std::make_tuple(startIndex, baseVertex, indexCount, vertices, batchOpaque);
             auto found = unique.find(key);
             u32 buildIndex;
             if (found == unique.end())
@@ -805,7 +917,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
                 build.desc.debugName = "RT_InstancedBLAS";
                 build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
                 build.desc.addBottomLevelGeometry(RTTriangles(geometry->vertices, geometry->indices,
-                    GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, true));
+                    GPUCullingManager::RT_VERTEX_STRIDE, u32(baseVertex), vertices, startIndex, indexCount, batchOpaque));
                 build.handle = device->createAccelStruct(build.desc);
                 if (!build.handle)
                 {
@@ -820,7 +932,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
                 buildIndex = found->second;
             const u32 batchIndex = u32(geometry->batches.size());
             geometry->instances.push_back(RTInstance(geometry->builds[buildIndex].handle,
-                batchIndex, RTBatchTransformOf(Fidentity), true, RT_MASK_WORLD));
+                batchIndex, RTBatchTransformOf(Fidentity), batchOpaque, RT_MASK_WORLD));
             geometry->instanceBatches.push_back(s32(batchIndex));
             geometry->batches.push_back({ materials[i], startIndex, baseVertex, indexCount });
             geometry->batchSources.push_back({ arrayIndex, i });
@@ -866,7 +978,9 @@ bool RTDynamicRange::operator<(const RTDynamicRange& other) const
         return indexOffset < other.indexOffset;
     if (vertexCount != other.vertexCount)
         return vertexCount < other.vertexCount;
-    return indexCount < other.indexCount;
+    if (indexCount != other.indexCount)
+        return indexCount < other.indexCount;
+    return opaque < other.opaque;
 }
 
 bool RTAccelStructManager::EnsureDynamicGeometry(GPUCullingManager* gpu)
@@ -884,8 +998,11 @@ bool RTAccelStructManager::EnsureDynamicGeometry(GPUCullingManager* gpu)
         return false;
     auto* device = m_device->GetNVRHIDevice();
     const auto& keys = gpu->GetDynamicMeshKeys();
-    for (const auto& key : keys)
+    const auto& instances = gpu->GetDynamicInstanceData();
+    R_ASSERT(instances.size() == keys.size());
+    for (u32 index = 0; index < keys.size(); ++index)
     {
+        const auto& key = keys[index];
         if (!key.vertexCount || !key.indexCount)
             continue;
         R_ASSERT(key.indexCount % 3 == 0);
@@ -897,13 +1014,14 @@ bool RTAccelStructManager::EnsureDynamicGeometry(GPUCullingManager* gpu)
         range.indexOffset = key.indexOffset;
         range.vertexCount = key.vertexCount;
         range.indexCount = key.indexCount;
+        range.opaque = IsOpaqueMaterialForRT(instances[index].materialID, false);
         if (m_dynamicGeometry->recordBuilds.find(range) != m_dynamicGeometry->recordBuilds.end())
             continue;
         RTGeometryBuild build;
         build.desc.debugName = "RT_DynamicBLAS";
         build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
         build.desc.addBottomLevelGeometry(RTTriangles(vertices, indices, GPUCullingManager::RT_VERTEX_STRIDE,
-            range.vertexOffset, range.vertexCount, range.indexOffset, range.indexCount, true));
+            range.vertexOffset, range.vertexCount, range.indexOffset, range.indexCount, range.opaque));
         build.handle = device->createAccelStruct(build.desc);
         if (!build.handle)
         {
@@ -934,6 +1052,7 @@ void RTAccelStructManager::PrepareDynamic(RTSceneGeneration& scene, GPUCullingMa
         range.indexOffset = keys[i].indexOffset;
         range.vertexCount = keys[i].vertexCount;
         range.indexCount = keys[i].indexCount;
+        range.opaque = IsOpaqueMaterialForRT(instances[i].materialID, false);
         auto found = m_dynamicGeometry->recordBuilds.find(range);
         if (found == m_dynamicGeometry->recordBuilds.end())
             continue;
@@ -941,7 +1060,7 @@ void RTAccelStructManager::PrepareDynamic(RTSceneGeneration& scene, GPUCullingMa
         const RTBatchTransform transform = RTBatchTransformOf(instances[i].world);
         const u64 identity = RTInstanceIdentity(identities[i]);
         scene.instances.push_back(RTInstance(m_dynamicGeometry->builds[found->second].handle,
-            batchIndex, transform, true, RT_MASK_WORLD));
+            batchIndex, transform, range.opaque, RT_MASK_WORLD));
         scene.batches.push_back({ instances[i].materialID, range.indexOffset, s32(range.vertexOffset), range.indexCount });
         scene.batchTransforms.push_back(transform);
         scene.batchIdentities.push_back(identity);
@@ -997,6 +1116,10 @@ bool RTAccelStructManager::InitSkinningPipeline()
 void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManager* gpu,
     const xr_vector<GeometryBatch>& world, const xr_vector<GeometryBatch>& hud)
 {
+    RTGeometryBuild retainedSkinBuild = std::move(scene.skinBuild);
+    RTGeometryBuild retainedHudSkinBuild = std::move(scene.hudSkinBuild);
+    scene.skinBuild = {};
+    scene.hudSkinBuild = {};
     if (world.empty() && hud.empty())
         return;
     const auto& pools = gpu->GetSkinnedPools();
@@ -1119,6 +1242,7 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     auto cached = m_skinTopologies.find(topologyKey);
     if (cached != m_skinTopologies.end() && cached->second->indexCount == u32(indexCount))
         topology = cached->second;
+    const bool topologyStable = topology && !topology->uploadPending;
     for (auto it = m_skinTopologies.begin(); it != m_skinTopologies.end();)
     {
         if (it->second.use_count() == 1)
@@ -1185,15 +1309,24 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
     auto buildSkin = [&](xr_vector<RTSkinJob>& jobs, RTGeometryBuild& build, const char* name, u32 mask)
     {
         if (jobs.empty())
+        {
+            build = {};
             return;
-        build.desc.debugName = name;
-        build.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+        }
+        nvrhi::rt::AccelStructDesc desc;
+        desc.debugName = name;
+        desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+        if (m_inPlaceUpdates)
+            desc.buildFlags = desc.buildFlags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
         const u32 firstBatch = u32(scene.batches.size());
+        bool opaque = true;
         for (const auto& job : jobs)
         {
-            build.desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices, topology->indices,
+            const bool jobOpaque = IsOpaqueMaterialForRT(job.materialID, false);
+            desc.addBottomLevelGeometry(RTTriangles(scene.skinnedVertices, topology->indices,
                 SKIN_VERTEX_STRIDE, job.constants.outputOffset, job.constants.vertexCount,
-                job.indexOffset, job.indexCount, true));
+                job.indexOffset, job.indexCount, jobOpaque));
+            opaque = opaque && jobOpaque;
             const u32 batchIndex = u32(scene.batches.size());
             scene.batches.push_back({ job.materialID, job.indexOffset, s32(job.constants.outputOffset), job.indexCount });
             scene.batchTransforms.push_back(identityTransform);
@@ -1204,20 +1337,22 @@ void RTAccelStructManager::PrepareSkin(RTSceneGeneration& scene, GPUCullingManag
             else
                 scene.emissiveBatchOffsets.push_back(UINT32_MAX);
         }
-        build.handle = device->createAccelStruct(build.desc);
+        AcquireGeometryBuild(desc, build, topologyStable, topologyKey);
         if (!build.handle)
         {
             scene.failed = true;
             return;
         }
-        scene.instances.push_back(RTInstance(build.handle, firstBatch, identityTransform, true, mask));
+        scene.instances.push_back(RTInstance(build.handle, firstBatch, identityTransform, opaque, mask));
     };
-    buildSkin(scene.skinJobs, scene.skinBuild, "RT_SkinBLAS", RT_MASK_WORLD);
+    buildSkin(scene.skinJobs, retainedSkinBuild, "RT_SkinBLAS", RT_MASK_WORLD);
     if (scene.failed)
         return;
-    buildSkin(scene.hudSkinJobs, scene.hudSkinBuild, "RT_HudSkinBLAS", RT_MASK_HUD);
+    buildSkin(scene.hudSkinJobs, retainedHudSkinBuild, "RT_HudSkinBLAS", RT_MASK_HUD);
     if (scene.failed)
         return;
+    scene.skinBuild = std::move(retainedSkinBuild);
+    scene.hudSkinBuild = std::move(retainedHudSkinBuild);
     scene.counts.skinned = u32(scene.skinJobs.size() + scene.hudSkinJobs.size());
 }
 
@@ -1351,6 +1486,8 @@ bool RTAccelStructManager::EnsureBuildResources(FGDetailManager* detail, bool ne
 
 void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManager* detail)
 {
+    RTGeometryBuild retainedGrassBuild = std::move(scene.grassBuild);
+    scene.grassBuild = {};
     scene.grassFrame.reset();
     scene.grassPipeline = nullptr;
     scene.grassLayout = nullptr;
@@ -1520,13 +1657,14 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         scene.failed = true;
         return;
     }
-    scene.grassBuild.desc.debugName = "RT_GrassBLAS";
-    scene.grassBuild.desc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
+    nvrhi::rt::AccelStructDesc grassDesc;
+    grassDesc.debugName = "RT_GrassBLAS";
+    grassDesc.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastBuild;
     const RTBatchTransform identityTransform = RTBatchTransformOf(Fidentity);
     const u32 grassBatch = u32(scene.batches.size());
     auto appendRange = [&](u64 indexStart, u64 indexCount, u64 vertexEnd, bool opaque)
     {
-        scene.grassBuild.desc.addBottomLevelGeometry(RTTriangles(scene.grassVertices, scene.grassIndices,
+        grassDesc.addBottomLevelGeometry(RTTriangles(scene.grassVertices, scene.grassIndices,
             24, 0, u32(vertexEnd), u32(indexStart), u32(indexCount), opaque));
         scene.batches.push_back({ 0, u32(indexStart), 0, u32(indexCount) });
         scene.batchTransforms.push_back(identityTransform);
@@ -1546,14 +1684,15 @@ void RTAccelStructManager::PrepareGrass(RTSceneGeneration& scene, FGDetailManage
         appendRange(proceduralIndices + wavedIndices, staticIndices,
             proceduralVertices + wavedVertices + staticVertices, false);
     }
-    scene.grassBuild.handle = device->createAccelStruct(scene.grassBuild.desc);
-    if (!scene.grassBuild.handle)
+    AcquireGeometryBuild(grassDesc, retainedGrassBuild, false);
+    if (!retainedGrassBuild.handle)
     {
         scene.failed = true;
         return;
     }
+    scene.grassBuild = std::move(retainedGrassBuild);
     scene.instances.push_back(RTInstance(scene.grassBuild.handle, grassBatch,
-        identityTransform, !pulled, RT_MASK_WORLD));
+        identityTransform, !pulled, RT_MASK_WORLD, pulled));
     R_ASSERT(scene.emissiveBatchOffsets.size() == scene.batches.size());
     scene.counts.grass = u32(scene.batches.size()) - grassBatch;
     R_ASSERT(scene.detailMeshBatchStart == UINT32_MAX || scene.detailMeshBatchStart < scene.batches.size());
@@ -1578,11 +1717,15 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
         m_generations.push_back(next);
     }
     auto& scene = *next;
+    if (scene.failed)
+    {
+        scene.skinBuild.built = false;
+        scene.hudSkinBuild.built = false;
+        scene.grassBuild.built = false;
+        scene.tlasBuilt = false;
+    }
     scene.geometry = m_staticGeometry;
     scene.dynamicGeometry.reset();
-    scene.skinBuild = {};
-    scene.hudSkinBuild = {};
-    scene.grassBuild = {};
     scene.skinJobs.clear();
     scene.hudSkinJobs.clear();
     scene.skinSources.clear();
@@ -1667,18 +1810,28 @@ void RTAccelStructManager::PrepareScene(GPUCullingManager* gpu, FGDetailManager*
         return;
     }
     auto* device = m_device->GetNVRHIDevice();
-    nvrhi::rt::AccelStructDesc tlas;
-    tlas.debugName = "RT_SceneTLAS";
-    tlas.isTopLevel = true;
-    tlas.topLevelMaxInstances = u32(scene.instances.size());
-    tlas.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
-    scene.tlas = device->createAccelStruct(tlas);
+    const u32 tlasInstances = u32(scene.instances.size());
+    if (!scene.tlas || scene.tlasCapacity < tlasInstances)
+    {
+        nvrhi::rt::AccelStructDesc tlas;
+        tlas.debugName = "RT_SceneTLAS";
+        tlas.isTopLevel = true;
+        tlas.topLevelMaxInstances = tlasInstances;
+        tlas.buildFlags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+        if (m_inPlaceUpdates)
+            tlas.buildFlags = tlas.buildFlags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+        scene.tlas = device->createAccelStruct(tlas);
+        scene.tlasCapacity = tlasInstances;
+        scene.tlasBuildCount = 0;
+        scene.tlasBuilt = false;
+    }
     if (!scene.tlas)
     {
         scene.failed = true;
         m_scene.reset();
         return;
     }
+    scene.tlasUpdate = m_inPlaceUpdates && scene.tlasBuilt && scene.tlasBuildCount == tlasInstances;
     nvrhi::BufferDesc batches;
     batches.debugName = "RT_BatchInfo";
     batches.byteSize = scene.batches.size() * sizeof(RTBatchInfo);
@@ -1917,8 +2070,11 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             auto output = [&](const RTGeometryBuild& build)
             {
                 if (build.handle)
-                    data.structures.push_back(pb.write(builder.ImportAccelerationStructure(
-                        build.desc.debugName.c_str(), build.handle), ResourceState::AccelStructWrite));
+                {
+                    const auto handle = builder.ImportAccelerationStructure(build.desc.debugName.c_str(), build.handle);
+                    data.structures.push_back(build.update ? pb.readWrite(handle, ResourceState::AccelStructWrite) :
+                        pb.write(handle, ResourceState::AccelStructWrite));
+                }
             };
             bool sourceDeclared = false;
             if (!scene->geometry->recorded)
@@ -1964,7 +2120,10 @@ bool RTAccelStructManager::SetupBuildPass(framegraph::FrameGraph& graph, GPUCull
             data.manager = this;
             data.scene = scene;
             data.resources = resources;
-            pb.write(resources.tlas, ResourceState::AccelStructWrite);
+            if (scene->tlasUpdate)
+                pb.readWrite(resources.tlas, ResourceState::AccelStructWrite);
+            else
+                pb.write(resources.tlas, ResourceState::AccelStructWrite);
             auto input = [&](const RTGeometryBuild& build)
             {
                 if (build.handle)
@@ -2160,23 +2319,28 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
     for (const auto handle : data.buffers)
         R_ASSERT(graph.GetPhysicalBuffer(handle));
     u32 index = 0;
-    auto build = [&](const RTGeometryBuild& item)
+    auto build = [&](RTGeometryBuild& item)
     {
         if (!item.handle)
             return;
         auto* destination = graph.GetPhysicalAccelerationStructure(data.structures[index++]);
-        nvrhi::utils::BuildBottomLevelAccelStruct(commandList, destination, item.desc);
+        nvrhi::rt::AccelStructDesc desc = item.desc;
+        if (item.update)
+            desc.buildFlags = desc.buildFlags | nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
+        nvrhi::utils::BuildBottomLevelAccelStruct(commandList, destination, desc);
+        item.built = true;
+        item.update = false;
     };
-    const auto& scene = *data.scene;
+    auto& scene = *data.scene;
     if (!scene.geometry->recorded)
     {
-        for (const auto& item : scene.geometry->builds)
+        for (auto& item : scene.geometry->builds)
             build(item);
         scene.geometry->recorded = true;
     }
     if (scene.dynamicGeometry && !scene.dynamicGeometry->recorded)
     {
-        for (const auto& item : scene.dynamicGeometry->builds)
+        for (auto& item : scene.dynamicGeometry->builds)
             build(item);
         scene.dynamicGeometry->recorded = true;
     }
@@ -2196,8 +2360,17 @@ void RTAccelStructManager::RecordTLAS(const RTBuildPassData& data,
     for (const auto handle : data.structures)
         R_ASSERT(graph.GetPhysicalAccelerationStructure(handle));
     auto* tlas = graph.GetPhysicalAccelerationStructure(data.resources.tlas);
-    commandList->buildTopLevelAccelStruct(tlas, data.scene->instances.data(), u32(data.scene->instances.size()));
-    data.scene->recorded = true;
+    auto& scene = *data.scene;
+    nvrhi::rt::AccelStructBuildFlags flags = nvrhi::rt::AccelStructBuildFlags::PreferFastTrace;
+    if (m_inPlaceUpdates)
+        flags = flags | nvrhi::rt::AccelStructBuildFlags::AllowUpdate;
+    if (scene.tlasUpdate)
+        flags = flags | nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
+    commandList->buildTopLevelAccelStruct(tlas, scene.instances.data(), u32(scene.instances.size()), flags);
+    scene.tlasBuildCount = u32(scene.instances.size());
+    scene.tlasBuilt = true;
+    scene.tlasUpdate = false;
+    scene.recorded = true;
 }
 
 static void DeclareSceneReads(framegraph::RenderPassBuilder& builder, const RTFrameResources& resources)

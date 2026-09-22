@@ -350,6 +350,40 @@ static void InvalidateReferenceSnapshot(PathTracerPassState& state)
     DiscardPathTracerSnapshot(state);
 }
 
+PathTracerSnapshotReuse EvaluatePathTracerSnapshotReuse(RenderDevice* device, RTAccelStructManager* accelMgr,
+    PathTracerPassState& state, bool freezeRequested)
+{
+    PathTracerSnapshotReuse reuse;
+    if (!state.snapshot)
+        return reuse;
+
+    PathTracerSnapshot& snapshot = *state.snapshot;
+    nvrhi::IDevice* nvDevice = device ? device->GetNVRHIDevice() : nullptr;
+    if (!nvDevice ||
+        snapshot.device != nvDevice ||
+        snapshot.pipelineRevision != s_pipelineRevision ||
+        !snapshot.captured ||
+        !snapshot.scene ||
+        snapshot.scene->failed ||
+        !freezeRequested)
+    {
+        reuse.invalid = true;
+        return reuse;
+    }
+
+    if (!snapshot.submitted)
+        return reuse;
+
+    if (accelMgr && accelMgr->IsSceneValid(*snapshot.scene))
+    {
+        snapshot.promoted = true;
+        reuse.reusable = true;
+    }
+    else
+        reuse.invalid = true;
+    return reuse;
+}
+
 static u64 EstimateSceneBufferBytes(const RTSceneGeneration& scene)
 {
     u64 total = 0;
@@ -651,6 +685,10 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     state.pending.capturedSnapshot = false;
     state.pending.snapshot.reset();
 
+    const auto snapshotReuse = EvaluatePathTracerSnapshotReuse(device, accelMgr, state, config.freezeScene);
+    if (snapshotReuse.invalid)
+        InvalidateReferenceSnapshot(state);
+
     auto syncStats = [&]()
     {
         PathTracerSnapshotStats stats = state.snapshot ? state.snapshot->stats : PathTracerSnapshotStats{};
@@ -674,7 +712,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         lighting.Fail(readiness);
         return { sceneColorIn };
     }
-    if (!accelMgr || !accelMgr->IsReady())
+    if (!accelMgr || (!snapshotReuse.reusable && !accelMgr->IsReady()))
     {
         lighting.Fail(LightingFallback::SceneUnavailable);
         return { sceneColorIn };
@@ -752,25 +790,6 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     if (!lightData.is_valid())
         lightData = fg.ImportBuffer("cluster_light_data", lightManager.GetLightDataBuffer(),
             SnapshotBufferDesc(lightManager.GetLightDataBuffer(), "cluster_light_data"));
-
-    if (state.snapshot)
-    {
-        PathTracerSnapshot& snapshot = *state.snapshot;
-        bool discard = snapshot.device != device->GetNVRHIDevice() ||
-            snapshot.pipelineRevision != s_pipelineRevision ||
-            !snapshot.captured ||
-            !snapshot.scene || snapshot.scene->failed ||
-            !config.freezeScene;
-        if (!discard && snapshot.submitted)
-        {
-            if (accelMgr->IsSceneValid(*snapshot.scene))
-                snapshot.promoted = true;
-            else
-                discard = true;
-        }
-        if (discard)
-            InvalidateReferenceSnapshot(state);
-    }
 
     PathTracerCaptureData* capture = nullptr;
     if (config.freezeScene && !state.snapshot)

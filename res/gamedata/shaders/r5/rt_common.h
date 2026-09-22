@@ -67,6 +67,28 @@ float2 RTLoadSkinnedVertexUV(ByteAddressBuffer vb, uint index)
     return asfloat(vb.Load2(index * RT_SKINNED_VERTEX_STRIDE + 16));
 }
 
+RTTriangleVertex RTLoadCoverageVertex(ByteAddressBuffer vb, uint index, uint stride, uint uvOffset,
+    bool derivatives)
+{
+    uint addr = index * stride;
+    RTTriangleVertex vertex = (RTTriangleVertex)0;
+    vertex.uv = asfloat(vb.Load2(addr + uvOffset));
+    if (derivatives)
+        vertex.position = asfloat(vb.Load3(addr));
+    return vertex;
+}
+
+void RTLoadCoverageTriangle(ByteAddressBuffer vb, ByteAddressBuffer ib, RTBatchInfo info,
+    uint primitiveIndex, uint stride, uint uvOffset, bool derivatives,
+    out RTTriangleVertex v0, out RTTriangleVertex v1, out RTTriangleVertex v2)
+{
+    uint i0, i1, i2;
+    RTLoadTriangleIndices(ib, info, primitiveIndex, i0, i1, i2);
+    v0 = RTLoadCoverageVertex(vb, i0, stride, uvOffset, derivatives);
+    v1 = RTLoadCoverageVertex(vb, i1, stride, uvOffset, derivatives);
+    v2 = RTLoadCoverageVertex(vb, i2, stride, uvOffset, derivatives);
+}
+
 RTTriangleVertex RTLoadStaticVertex(ByteAddressBuffer vb, uint index)
 {
     uint addr = index * RT_STATIC_VERTEX_STRIDE;

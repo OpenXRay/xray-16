@@ -74,6 +74,49 @@ void RTLoadWorldTriangle(RTSceneParams scene, uint batchIdx, RTBatchInfo info, u
     v2.position = TransformPointToWorld(v2.position, objectToWorld);
 }
 
+RTHitGeometry RTFetchHitCoverage(RTSceneParams scene, RTSceneTrace trace, float3 rayDirection, bool derivatives)
+{
+    RTHitGeometry geometry = (RTHitGeometry)0;
+    RTTriangleVertex v0, v1, v2;
+    if (IsGrassBatch(scene, trace.batchIdx))
+    {
+        RTLoadCoverageTriangle(g_GrassVB, g_GrassIB, trace.info, trace.primitiveIndex,
+            RT_GRASS_VERTEX_STRIDE, 16u, derivatives, v0, v1, v2);
+    }
+    else if (IsSkinnedBatch(scene, trace.batchIdx))
+    {
+        RTLoadCoverageTriangle(g_SkinnedVB, g_SkinnedIB, trace.info, trace.primitiveIndex,
+            RT_SKINNED_VERTEX_STRIDE, 16u, derivatives, v0, v1, v2);
+    }
+    else
+    {
+        RTLoadCoverageTriangle(g_MegaVB, g_MegaIB, trace.info, trace.primitiveIndex,
+            RT_STATIC_VERTEX_STRIDE, 24u, derivatives, v0, v1, v2);
+    }
+    geometry.uv = RTInterpolateUV(v0.uv, v1.uv, v2.uv, trace.barycentrics);
+    if (!derivatives)
+        return geometry;
+
+    float3 p0 = v0.position;
+    float3 p1 = v1.position;
+    float3 p2 = v2.position;
+    if (!RTBatchVerticesInWorldSpace(scene, trace.batchIdx))
+    {
+        p0 = TransformPointToWorld(p0, trace.objectToWorld);
+        p1 = TransformPointToWorld(p1, trace.objectToWorld);
+        p2 = TransformPointToWorld(p2, trace.objectToWorld);
+    }
+    float3 geoNormal = RTSafeNormalize(cross(p1 - p0, p2 - p0), float3(0.0, 1.0, 0.0));
+    if (dot(geoNormal, rayDirection) > 0.0)
+        geoNormal = -geoNormal;
+
+    float3 uvTangent, uvBitangent;
+    RTUVDerivedBasis(p0, p1, p2, v0.uv, v1.uv, v2.uv, uvTangent, uvBitangent);
+    RTUVFootprintFromRayCone(uvTangent, uvBitangent, geoNormal, rayDirection, trace.t,
+        trace.coneWidth, trace.coneSpread, geometry.uvDx, geometry.uvDy);
+    return geometry;
+}
+
 RTHitGeometry RTFetchHitGeometry(RTSceneParams scene, RTSceneTrace trace, float3 rayDirection)
 {
     RTHitGeometry geometry;
