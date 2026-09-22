@@ -115,6 +115,7 @@ struct VSMState {
     static constexpr u32 kReadbackSlots = 6;
 
     bool active = false;
+    bool suspended = false;
     VsmParams params;
     VsmResidParams residParams = {};
     Fmatrix sunView;
@@ -313,6 +314,7 @@ struct VSMOutput {
 };
 
 void InvalidateVSMCache(VSMState& state);
+void SuspendVSM(nvrhi::IDevice* device, VSMState& state);
 bool VSMLoadScreenFrozen();
 Fmatrix VSMSunView(const Fvector& sunDir);
 Fmatrix VSMSunView(const Fvector& sunDir, const Fvector& eye);

@@ -791,6 +791,10 @@ void MetalBackend::UpdateCapabilities() {
     caps.meshShaders = impl.device->queryFeatureSupport(nvrhi::Feature::Meshlets);
     caps.rayTracing = impl.device->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct)
         && impl.device->queryFeatureSupport(nvrhi::Feature::RayQuery);
+    if (@available(macOS 13.0, *))
+    {
+        caps.rayTracingUpdates = caps.rayTracing && impl.nativeDevice != nil;
+    }
     caps.variableRateShading = impl.device->queryFeatureSupport(nvrhi::Feature::VariableRateShading);
     caps.bindlessTextures = impl.bindlessTable != nullptr;
     caps.maxBindlessResources = caps.bindlessTextures ? Impl::MaxBindlessTextures : 0;

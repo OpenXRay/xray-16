@@ -351,6 +351,9 @@ DefaultOutputLayout setupSmokeTrailPass(
         }
     );
 
+    if (lighting && lighting->scheduled == LightingMode::ReferencePT)
+        return inputs;
+
     InitSmokeDrawPipeline(device, state);
 
     auto& passData = fg.addCallbackPass<SmokeDrawPassData>(

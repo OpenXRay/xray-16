@@ -196,6 +196,29 @@ static u8 QueryParticleBlendMode(LPCSTR shaderName)
     return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
 }
 
+static bool RangesShadeWithShadows(const xr_vector<TransparentDrawRange>* ranges)
+{
+    if (!ranges)
+        return false;
+    for (const auto& range : *ranges)
+    {
+        if (range.count == 0)
+            continue;
+        if (range.key & (TRANSPARENT_KEY_WMARK | TRANSPARENT_KEY_NO_COLOR | TRANSPARENT_KEY_UNLIT))
+            continue;
+        return true;
+    }
+    return false;
+}
+
+static bool ForwardGeometryShadesWithShadows(const passes::TransparentPassConfig& config)
+{
+    if (config.HasRigid() && RangesShadeWithShadows(config.ranges))
+        return true;
+    return config.skinned && config.gpuCulling && config.gpuCulling->GetSkinnedForwardCount() > 0
+        && RangesShadeWithShadows(&config.gpuCulling->GetSkinnedForwardRanges());
+}
+
 namespace fg {
     extern xray::render::FrameGraphRenderer RImplementation;
 }
@@ -1577,9 +1600,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     PrepareLightingMode(width, height);
 
-    framegraph::VirtualResourceHandle vsmMaskHandle;
-    bool vsmPassesActive = false;
-
     framegraph::ResourceDesc colorDesc;
     colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     colorDesc.width = width;
@@ -1630,40 +1650,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             Device.mFullTransform,
             hizOutput.pyramid.is_valid()
         );
-    }
-
-    passes::VSMDrawConfig vsmCfg;
-    passes::VSMDynConfig vsmDyn;
-    {
-        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        vsmState.active = false;
-        if (visActive && hizOutput.pyramid.is_valid()) {
-            passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
-            vsmCfg.geometryResources = geometryResources;
-            vsmCfg.refCount = m_gpuCullingManager->GetClusterRefCount();
-            vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
-            vsmCfg.residencyStreaming = m_gpuCullingManager->GetResidency().IsStreaming();
-            vsmDyn.gpuCulling = m_gpuCullingManager.get();
-            vsmDyn.geometryResources = geometryResources;
-            const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
-            if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
-                coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
-                passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
-                auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
-                    vsmCfg, vsmDyn, width, height, &vsmState, m_gpuProfiler.get());
-                vsmMaskHandle = vsmOut.mask;
-                vsmPassesActive = vsmOut.active;
-            }
-        }
-    }
-
-    passes::LocalShadowConfig localCfg;
-    if (m_blackboard && m_gpuCullingManager) {
-        localCfg.gpuCulling = m_gpuCullingManager.get();
-        localCfg.geometryResources = geometryResources;
-        localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
-        passes::setupLocalShadowBinPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
-            &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
     }
 
     framegraph::VirtualResourceHandle visMotionHandle;
@@ -1757,25 +1743,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    if (vsmPassesActive) {
-        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
-        passes::setupVSMAtlasPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmCfg, vsmDyn, &vsmState, m_gpuProfiler.get());
-        framegraph::VirtualResourceHandle vsmDebugView;
-        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
-        if (vsmDebugView.is_valid())
-            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
-    }
+    const bool rayHistoryRequired = m_lightingState.effective != fg::LightingMode::ReferencePT;
+    const bool motionVectorsRequired = rayHistoryRequired || ps_r_vis_debug != 0;
 
+    passes::MotionVectorOutput motionOutput;
+    if (motionVectorsRequired)
+        motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
+            visMotionHandle, Device.mInvFullTransform, m_mainView.prevViewProj, m_mainView.hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
 
-    passes::LocalShadowOutput localShadowOut;
-    if (m_blackboard && m_gpuCullingManager)
-        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
-            &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
-
-    passes::MotionVectorOutput motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
-        visMotionHandle, Device.mInvFullTransform, m_mainView.prevViewProj, m_mainView.hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
-
-    m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
+    if (rayHistoryRequired)
+        m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
     if (m_lightingState.effective == fg::LightingMode::RTGI)
@@ -1801,6 +1778,81 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     m_lightingState.ScheduleOpaqueLighting();
+
+    const bool shadowDebugRequested = ps_r_vsm_debug != 0 || ps_r_vsm_debug_dyn != 0 || ps_r_local_shadow_debug != 0;
+    const bool shadowReceiversActive = m_lightingState.scheduled == fg::LightingMode::Raster
+        || (m_lightingState.scheduled == fg::LightingMode::RTGI && ForwardGeometryShadesWithShadows(transparentConfig));
+    const bool rasterShadowWork = shadowDebugRequested || shadowReceiversActive;
+    const bool rasterDrawPasses = m_lightingState.scheduled != fg::LightingMode::ReferencePT;
+
+    framegraph::VirtualResourceHandle vsmMaskHandle;
+    bool vsmPassesActive = false;
+    passes::VSMDrawConfig vsmCfg;
+    passes::VSMDynConfig vsmDyn;
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        const bool vsmReady = visActive && hizOutput.pyramid.is_valid();
+        if (!rasterShadowWork)
+        {
+            passes::SuspendVSM(nvDevice, vsmState);
+        }
+        else
+        {
+            vsmState.active = false;
+            if (vsmReady)
+            {
+                passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
+                vsmCfg.geometryResources = geometryResources;
+                vsmCfg.refCount = m_gpuCullingManager->GetClusterRefCount();
+                vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+                vsmCfg.residencyStreaming = m_gpuCullingManager->GetResidency().IsStreaming();
+                vsmDyn.gpuCulling = m_gpuCullingManager.get();
+                vsmDyn.geometryResources = geometryResources;
+                const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
+                if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
+                    coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
+                    passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
+                    auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
+                        vsmCfg, vsmDyn, width, height, &vsmState, m_gpuProfiler.get());
+                    vsmMaskHandle = vsmOut.mask;
+                    vsmPassesActive = vsmOut.active;
+                }
+            }
+        }
+    }
+
+    passes::LocalShadowConfig localCfg;
+    passes::LocalShadowOutput localShadowOut;
+    if (m_blackboard && m_gpuCullingManager)
+    {
+        if (rasterShadowWork)
+        {
+            localCfg.gpuCulling = m_gpuCullingManager.get();
+            localCfg.geometryResources = geometryResources;
+            localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+            passes::setupLocalShadowBinPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+                &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
+        }
+        else
+        {
+            passes::SuspendLocalShadows(m_blackboard->get_or_add<passes::LocalShadowState>());
+        }
+    }
+
+    if (vsmPassesActive)
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        passes::setupVSMAtlasPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmCfg, vsmDyn, &vsmState, m_gpuProfiler.get());
+        framegraph::VirtualResourceHandle vsmDebugView;
+        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
+        if (vsmDebugView.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
+    }
+
+    if (rasterShadowWork && m_blackboard && m_gpuCullingManager)
+        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+            &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
+
     auto litOutputs = opaqueOutputs;
     if (m_lightingState.scheduled == fg::LightingMode::Raster)
     {
@@ -1813,18 +1865,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.mipLevels, Device.mFullTransform, &m_worldParticleBatches);
     }
 
-    auto transparentOutputs = passes::setupTransparentPass(
-        *m_framegraph,
-        m_device,
-        litOutputs,
-        transparentConfig,
-        localShadowOut,
-        clusterLightOut,
-        vsmMaskHandle,
-        skinnedDrawArgsBuffer,
-        width, height,
-        m_blackboard->get_or_add<passes::TransparentPassState>()
-    );
+    auto transparentOutputs = litOutputs;
+    if (rasterDrawPasses)
+    {
+        transparentOutputs = passes::setupTransparentPass(
+            *m_framegraph,
+            m_device,
+            litOutputs,
+            transparentConfig,
+            localShadowOut,
+            clusterLightOut,
+            vsmMaskHandle,
+            skinnedDrawArgsBuffer,
+            width, height,
+            m_blackboard->get_or_add<passes::TransparentPassState>()
+        );
+    }
 
     if (ps_r_vis_debug && visIdBuffer.is_valid()) {
         auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, motionOutput.motionVectors, width, height, u32(ps_r_vis_debug), &m_blackboard->get_or_add<passes::VisibilityPassState>());
@@ -1834,7 +1890,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     passes::GpuParticlePassOutputs particleOutputs{
         transparentOutputs.albedo, transparentOutputs.distortion};
-    if (psDeviceFlags.test(rsDrawParticles)) {
+    if (psDeviceFlags.test(rsDrawParticles) && rasterDrawPasses) {
         particleOutputs = passes::setupGpuParticlePass(
             *m_framegraph, m_device, gpuParticles.GetDrawResources(), geometryResources.materials,
             transparentOutputs.albedo, transparentOutputs.depth, transparentOutputs.normal,
@@ -1863,7 +1919,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto sceneColor = smokeOutputs.albedo;
 
-    if (particleOutputs.distortion.is_valid()) {
+    if (particleOutputs.distortion.is_valid() && rasterDrawPasses) {
         sceneColor = passes::setupDistortionApplyPass(
             *m_framegraph, m_device, sceneColor, particleOutputs.distortion,
             particleLayout.depth, width, height,
@@ -1876,7 +1932,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         effRain->Render();
         if (auto* fgRain = dynamic_cast<FGRainRender*>(effRain->GetRenderer()))
         {
-            if (fgRain->HasWork())
+            if (fgRain->HasWork() && rasterDrawPasses)
             {
                 sceneColor = passes::setupRainPass(
                     *m_framegraph,
@@ -1894,7 +1950,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         effTB->Render();
         if (auto* fgTB = dynamic_cast<FGThunderboltRender*>(effTB->GetRenderer()))
         {
-            if (fgTB->HasWork())
+            if (fgTB->HasWork() && rasterDrawPasses)
             {
                 sceneColor = passes::setupThunderboltPass(
                     *m_framegraph,
@@ -1912,7 +1968,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         effLF->Render(true, true, true);
         if (auto* fgLF = dynamic_cast<FGLensFlareRender*>(effLF->GetRenderer()))
         {
-            if (fgLF->HasWork())
+            if (fgLF->HasWork() && rasterDrawPasses)
             {
                 sceneColor = passes::setupLensFlarePass(
                     *m_framegraph,

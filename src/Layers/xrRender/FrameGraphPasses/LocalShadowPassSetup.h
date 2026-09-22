@@ -214,6 +214,8 @@ void WarmLocalShadowPool(fg::RenderDevice* device, LocalShadowState& state);
 
 void ProcessLocalShadowStats(LocalShadowState& state, nvrhi::IDevice* device);
 
+void SuspendLocalShadows(LocalShadowState& state);
+
 void SelectLocalShadowLights(
     LocalShadowState& state,
     const xr_vector<const light*>& lights,
