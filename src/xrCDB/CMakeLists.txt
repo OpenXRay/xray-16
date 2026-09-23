@@ -30,11 +30,18 @@ target_sources_grouped(
     StdAfx.cpp
     xrCDB.cpp
     xrCDB.h
-    xrCDB_box.cpp
+    ModelTree.h
     xrCDB_Collector.cpp
-    xrCDB_frustum.cpp
-    xrCDB_ray.cpp
 )
+
+if (XRAY_USE_JOLT_CDB)
+    target_sources(xrCDB PRIVATE ModelTree.cpp JoltQueries.cpp)
+    target_link_libraries(xrCDB PRIVATE Jolt)
+    target_compile_definitions(xrCDB PRIVATE XRAY_USE_JOLT_CDB)
+else()
+    target_sources(xrCDB PRIVATE xrCDB_box.cpp xrCDB_frustum.cpp xrCDB_ray.cpp)
+    target_link_libraries(xrCDB PRIVATE xrOPCODE)
+endif()
 
 target_include_directories(xrCDB
     PRIVATE
@@ -47,7 +54,6 @@ target_link_libraries(xrCDB
     PRIVATE
     xrCore
     xrMiscMath
-    xrOPCODE
     xrAPI
 )
 
@@ -69,4 +75,8 @@ if (BUILD_SHARED_LIBS)
     install(TARGETS xrCDB LIBRARY
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
+endif()
+
+if (XRAY_BUILD_CDB_TESTS)
+    add_subdirectory(tests)
 endif()

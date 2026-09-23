@@ -1,0 +1,63 @@
+TITLE: Experimental Jolt collision backend
+STATUS: Initial work toward #2139; not a complete physics-engine replacement
+
+Scope
+  XRAY_USE_JOLT_CDB enables a CMake-only alternative to OPCODE in xrCDB. It uses Jolt Physics 5.6.0's
+  AABBTreeBuilder and TriangleSplitterBinning, with Jolt bounds tests and the existing CDB query interface.
+  The original ODE simulation remains in use. This does not create a shared Jolt PhysicsSystem, convert rigid
+  bodies, characters or joints, or remove xrCDB. The native engine.sln projects continue to use OPCODE.
+
+  The backend is off by default pending gameplay validation and performance measurements. Enabling it removes
+  the xrOPCODE build/link dependency. CMake downloads Jolt at the pinned commit on the first configuration.
+  An existing Jolt checkout can be supplied with -DFETCHCONTENT_SOURCE_DIR_JOLT=/path/to/JoltPhysics.
+
+Compatibility
+  Triangle indices, original vertex coordinates, materials, sector IDs and suppression flags are retained.
+  Jolt's mesh sanitization is deliberately not used: coincident and degenerate input triangles retain their IDs.
+  Rays use the existing CDB triangle intersection routine, including backface culling, barycentric coordinates,
+  positive hit distances and inclusive range endpoints. Box queries preserve the optional full separating-axis
+  test; frustum queries use the engine's existing polygon clipping routine.
+
+  Result order, which valid triangle ONLYFIRST returns, and broad frustum candidate sets may differ between trees.
+  ONLYNEAREST returns the nearest accepted hit. Combining ONLYFIRST with ONLYNEAREST still stops at the first hit.
+  Model construction publishes readiness atomically, including when -mt_cdb is enabled. Destruction joins the
+  construction thread before releasing model data and its lock.
+
+Caches
+  Jolt caches use the original cache path plus .jolt, leaving OPCODE caches separate. The format starts with a
+  version (currently 1), followed by the source CRC, callback data, geometry CRC, counts, vertices and triangles.
+  The Jolt tree is rebuilt from validated cached geometry on load. This avoids persisting architecture-dependent
+  Jolt internals, but tree construction time is still paid on cache hits. deserialize_tree also rebuilds from the
+  geometry supplied through load_geom; it does not consume a serialized OPCODE tree in Jolt builds.
+
+Build and regression checks
+  Follow the normal platform dependency instructions, then configure:
+
+    cmake -S . -B build-jolt -DCMAKE_BUILD_TYPE=Debug -DXRAY_USE_JOLT_CDB=ON -DXRAY_BUILD_CDB_TESTS=ON
+    cmake --build build-jolt --parallel
+    ctest --test-dir build-jolt --output-on-failure -R "^xrCDB\."
+
+  Tests do not require game assets. They exercise the actual xrCDB library, including cache round trips,
+  metadata, duplicate/degenerate triangles, ray flags and deterministic randomized geometry. Ray traversal is
+  checked against exhaustive triangle intersections; volume results use independent double-precision clipping.
+  CTest runs the suite with both synchronous construction and -mt_cdb. The same suite can be built with
+  XRAY_USE_JOLT_CDB=OFF to check the original backend.
+
+  On macOS, CMAKE_PREFIX_PATH may need both the Homebrew prefix and its opt/openal-soft directory. Keep CMake
+  and Ninja on PATH: the LuaJIT build configures nested host tools that also invoke the selected generator.
+
+Footguns
+  All build directories write binaries to bin/<architecture>/<configuration>. Use different configurations or
+  source checkouts when comparing backends, or one build can overwrite the other's libraries.
+  Jolt/Jolt.h must precede other Jolt headers; keep its include group separate from alphabetical sorting.
+  xr_types.h redefines FLT_MAX as flt_max, which conflicts with a local variable in Jolt's RayAABox.h. The include
+  temporarily restores a numeric definition and then restores the engine macro.
+  The inherited clang-format configuration contains invalid values for AlignConsecutiveShortCaseStatements,
+  InsertTrailingCommas and QualifierOrder with clang-format 21.1.8. For these changes, formatting used a temporary
+  copy with the first converted to a mapping, the second set to None, and QualifierOrder omitted.
+
+Remaining validation and work
+  Run gameplay checks with real Call of Pripyat and Clear Sky data: level transitions, bullets, AI visibility,
+  decals, sound occlusion, portals, contact queries and physics interactions. Measure query throughput, tree
+  memory and build/load time on representative levels before changing the default.
+  The ODE migration and unified physics world in #2139 remain separate work. This branch must not close #2139.
