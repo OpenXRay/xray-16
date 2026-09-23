@@ -170,7 +170,6 @@ extern ENGINE_API int ps_r_rt_gi_samples;
 extern ENGINE_API float ps_r_rt_gi_ray_distance;
 extern ENGINE_API float ps_r_rt_scene_radius;
 extern ENGINE_API float ps_r_rt_grass_radius;
-extern ENGINE_API int ps_r_path_tracer;
 extern ENGINE_API int ps_profile_dump;
 extern ENGINE_API int ps_r_path_tracer_bounces;
 extern ENGINE_API int ps_r_path_tracer_debug;
@@ -623,7 +622,7 @@ void FrameGraphRenderer::Render() {
 
 void FrameGraphRenderer::RenderMenu() {
     ZoneScopedN("FrameGraphRenderer::RenderMenu");
-    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0, ps_r_rt_gi_profile != 0);
+    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi), ps_r_rt_gi_profile != 0);
     ApplyRTLightingSettings(m_lightingState);
     if (m_lightingState.requested != fg::LightingMode::Raster)
         m_lightingState.Fail(fg::LightingFallback::NoScene);
@@ -1158,7 +1157,7 @@ void FrameGraphRenderer::SetupFrame() {
         m_worldParticleBatches.clear();
         m_hudParticleBatches.clear();
 
-        const bool rayTracingLighting = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+        const bool rayTracingLighting = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
             m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
         fg::ClusteredLightManager::Instance().BeginFrame(rayTracingLighting);
     }
@@ -1214,7 +1213,7 @@ u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
-    m_lightingState.Begin(ps_r_rt_gi != 0, ps_r_path_tracer != 0, ps_r_rt_gi_profile != 0);
+    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi), ps_r_rt_gi_profile != 0);
     ApplyRTLightingSettings(m_lightingState);
     m_lightingState.rayGrassEnabled = m_detailManager && m_detailManager->IsRayTracingCoverageEnabled();
     m_lightingState.rayGrassPending = m_detailManager && m_detailManager->IsRayTracingCoveragePending();
@@ -1225,12 +1224,17 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
         m_mainView.pathTracer.history.valid = false;
         m_mainView.pathTracer.history.samples = 0;
     }
-    if (ps_r_path_tracer == 0 || ps_r_path_tracer_freeze == 0)
+    if (m_lightingState.requested != fg::LightingMode::ReferencePT || ps_r_path_tracer_freeze == 0)
         passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_rtAccelMgr)
         m_rtAccelMgr->RetireScenes();
     if (m_lightingState.effective == fg::LightingMode::Raster)
         return;
+    if (m_lightingState.effective == fg::LightingMode::RadianceCascades)
+    {
+        m_lightingState.Fail(fg::LightingFallback::PipelineUnavailable);
+        return;
+    }
     if (!m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
     {
         m_lightingState.Fail(fg::LightingFallback::Unsupported);
@@ -1525,7 +1529,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     {
         const bool enabled = psDeviceFlags.is(rsDrawDetails);
         R_ASSERT2(!enabled || clusterIdsFit, "[FrameGraph] rigid and skinned entries exhaust the visibility identifier range");
-        const bool rayCoverageRequested = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+        const bool rayCoverageRequested = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
             m_rtAccelMgr && m_rtAccelMgr->IsSupported() &&
             GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
         m_detailManager->SetRayTracingCoverage(rayCoverageRequested, ps_r_rt_grass_radius);
@@ -2816,7 +2820,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     xr_vector<const light*>& culledLights = m_culledLights;
     culledLights.clear();
     const bool debugLights = ps_r_local_shadow_debug != 0;
-    const bool rayTracingLighting = (ps_r_rt_gi != 0 || ps_r_path_tracer != 0) &&
+    const bool rayTracingLighting = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
         m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
     auto cullLight = [&](const light* L) {
         if (debugLights)

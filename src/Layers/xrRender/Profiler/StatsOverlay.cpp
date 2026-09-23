@@ -176,8 +176,6 @@ void StatsOverlay::Render()
     ImGui::Text("Deferred raster lighting: %s", !lighting.opaqueScheduled ? "not evaluated"
         : (lighting.scheduled == render::fg::LightingMode::Raster ? "selected" : "omitted (RT dispatch)"));
     ImGui::Text("RT dispatch pass: %s", lighting.opaqueScheduled && lighting.scheduled != render::fg::LightingMode::Raster ? "scheduled" : "none");
-    if (lighting.conflictingRequests)
-        ImGui::TextDisabled("Both RT switches enabled: PT takes precedence");
     if (lighting.fallback != render::fg::LightingFallback::None)
         ImGui::Text("Fallback: %s%s", render::fg::LightingFallbackName(lighting.fallback),
             lighting.frameFailed ? " (RT frame failure, not preflight)"
@@ -201,6 +199,13 @@ void StatsOverlay::Render()
             ImGui::SetTooltip("Static DO_NO_WAVING detail meshes use the bounded ray-detail membership in either grass mode.\n"
                 "They retain atlas cutouts, standard shading and zero foliage transmission.\n"
                 "Frozen reference scenes retain the captured membership; recapture to change the envelope.");
+    }
+    if (lighting.requested == render::fg::LightingMode::RadianceCascades)
+    {
+        ImGui::Text("Radiance cascades: %s", lighting.effective == render::fg::LightingMode::RadianceCascades
+            ? "scheduled" : "not implemented yet (raster selected)");
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("r_rt_gi 2 selects the radiance cascade mode. Passes land in follow-up slices; until then the frame renders raster with the fallback reason above.");
     }
     if (lighting.requested == render::fg::LightingMode::RTGI)
     {
@@ -1457,7 +1462,7 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
     const RenderStats& rs = m_renderStats;
     xr_sprintf(line, sizeof(line), "lighting: requested=%s | effective=%s | reason=%s | conflict=%s | recorded=%s | PT submitted samples=%u\n",
         render::fg::LightingModeName(rs.lighting.requested), render::fg::LightingModeName(rs.lighting.effective),
-        render::fg::LightingFallbackName(rs.lighting.fallback), rs.lighting.conflictingRequests ? "PT precedence" : "none", rs.lighting.recorded ? "yes" : "no",
+        render::fg::LightingFallbackName(rs.lighting.fallback), "none", rs.lighting.recorded ? "yes" : "no",
         rs.pathTracerSamples);
     text += line;
     xr_sprintf(line, sizeof(line), "lighting schedule: opaque=%s | deferred raster branch=%s | RT dispatch=%s | failure=%s | failure clear=%s | raster recovery latch=%s\n",

@@ -22,7 +22,6 @@ ENGINE_API int g_debug_utils = 0;
 ENGINE_API bool renderer_allow_override = false;
 ENGINE_API int ps_r4_use_pbr = 0;
 ENGINE_API int ps_fg_pbr_diffuse_mode = 0;
-ENGINE_API int ps_r_path_tracer = 0;
 ENGINE_API int ps_r_path_tracer_bounces = 8;
 ENGINE_API int ps_r_path_tracer_debug = 0;
 ENGINE_API int ps_r_path_tracer_freeze = 0;

@@ -703,7 +703,7 @@ void FrameGraphRenderer::DumpDeveloperSceneDiagnostics()
         fg::LightingModeName(m_lightingState.requested), fg::LightingModeName(m_lightingState.effective),
         fg::LightingFallbackName(m_lightingState.fallback),
         m_lightingState.recorded ? 1 : 0, m_lightingState.recordedSamples,
-        m_lightingState.conflictingRequests ? 1 : 0, m_lightingState.historyUsed ? 1 : 0,
+        0, m_lightingState.historyUsed ? 1 : 0,
         (unsigned long long)m_lightingState.sceneRevision,
         m_mainView.pathTracer.history.samples, m_mainView.pathTracer.history.valid ? 1 : 0);
 

@@ -1015,7 +1015,6 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
     // GPU Culling debug visualization
     CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
-    CMD4(CCC_Integer, "r_path_tracer", &ps_r_path_tracer, 0, 1);
     CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
     CMD4(CCC_Integer, "r_path_tracer_debug", &ps_r_path_tracer_debug, 0, 13);
     CMD4(CCC_Integer, "r_path_tracer_freeze", &ps_r_path_tracer_freeze, 0, 1);
@@ -1023,7 +1022,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_rt_max_null_events", &ps_r_rt_max_null_events, 1, 4096);
     CMD4(CCC_Integer, "r_rt_light_rays", &ps_r_rt_light_rays, 0, 2);
     CMD4(CCC_Float, "r_rt_sun_radius", &ps_r_rt_sun_radius, 0.0f, 5.0f);
-    CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
+    CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 3);
     CMD4(CCC_Integer, "r_rt_gi_profile", &ps_r_rt_gi_profile, 0, 1);
     CMD4(CCC_Integer, "r_rt_gi_reconstruct", &ps_r_rt_gi_reconstruct, 0, 2);
     CMD4(CCC_Integer, "r_rt_gi_history", &ps_r_rt_gi_history, 1, 64);
