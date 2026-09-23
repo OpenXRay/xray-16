@@ -310,6 +310,9 @@ bool RTIntegratorAdvanceStage(inout RTIntegratorState s, RTSceneParams scene, RT
 }
 
 #ifdef RT_WORLD_CACHE
+#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN 0.25
+#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX 0.5
+
 bool RTIntegratorCacheStage(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
     float3 hitPosition, inout uint rng)
 {
@@ -319,13 +322,24 @@ bool RTIntegratorCacheStage(inout RTIntegratorState s, RTHitSurface hit, RTHitGe
         return false;
     RTWorldCacheLookup lookup = RTWorldCacheQuery(hitPosition, geometry.geoNormal, s.settings.cacheLife,
         true, true, rng);
-    float3 indirect = hit.surface.albedo * (1.0 - hit.surface.metallic) * lookup.radiance;
-    if (!all(isfinite(indirect)))
-        indirect = 0.0;
+    float3 V = -s.direction;
+    float NdotV = saturate(dot(hit.surface.N, V));
+    float roughness = clamp(hit.surface.roughness, 0.0, 1.0);
+    float specularShare = saturate((roughness - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN) /
+        (RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN));
+    float3 F0 = CalculateF0(hit.surface.albedo, hit.surface.metallic);
+    float3 diffuse = hit.surface.albedo * (1.0 - hit.surface.metallic) * lookup.radiance;
+    float3 specular = EnvBRDFApprox(F0, roughness, NdotV) * specularShare * lookup.radiance;
+    if (!all(isfinite(diffuse)))
+        diffuse = 0.0;
+    if (!all(isfinite(specular)))
+        specular = 0.0;
+    float3 indirect = diffuse + specular;
     s.result.radiance += s.throughput * indirect;
     if (s.bounces == 0u)
     {
-        s.result.indirectDiffuse += s.throughput * indirect;
+        s.result.indirectDiffuse += s.throughput * diffuse;
+        s.result.indirectSpecular += s.throughput * specular;
     }
     else
     {
