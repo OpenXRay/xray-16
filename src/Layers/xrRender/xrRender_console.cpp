@@ -1025,6 +1025,9 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_rt_sun_radius", &ps_r_rt_sun_radius, 0.0f, 5.0f);
     CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 1);
     CMD4(CCC_Integer, "r_rt_gi_profile", &ps_r_rt_gi_profile, 0, 1);
+    CMD4(CCC_Integer, "r_rt_gi_reconstruct", &ps_r_rt_gi_reconstruct, 0, 2);
+    CMD4(CCC_Integer, "r_rt_gi_history", &ps_r_rt_gi_history, 1, 64);
+    CMD4(CCC_Integer, "r_rt_gi_filter_passes", &ps_r_rt_gi_filter_passes, 1, 6);
     CMD4(CCC_Integer, "r_rt_gi_restir", &ps_r_rt_gi_restir, 0, 1);
     CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
     CMD4(CCC_Integer, "r_rt_gi_bounces", &ps_r_rt_gi_bounces, 1, 16);

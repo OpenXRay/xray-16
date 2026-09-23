@@ -214,13 +214,47 @@ void StatsOverlay::Render()
         if (lighting.reuseRequested && !lighting.reuseAvailable)
             ImGui::TextDisabled("Reuse requested but unavailable: no reservoir reuse runs");
         ImGui::Text("RTGI raw guides: %s", lighting.rawSignalsRecorded ? "recorded" : "not recorded");
+        if (!lighting.reconstructionRequested)
+            ImGui::Text("RTGI reconstruction: off (raw composite)");
+        else if (lighting.reconstructionActive)
+            ImGui::Text("RTGI reconstruction: temporal v1 recorded | history cap %u frames | previous history %s",
+                lighting.reconstructionHistory, lighting.historyUsed ? "reprojected" : "rejected (current frame only)");
+        else if (lighting.reconstructionFallback != render::fg::LightingFallback::None)
+            ImGui::Text("RTGI reconstruction: requested, unavailable (%s) | raw composite",
+                render::fg::LightingFallbackName(lighting.reconstructionFallback));
+        else
+            ImGui::Text("RTGI reconstruction: requested, not recorded | history cap %u frames", lighting.reconstructionHistory);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Temporal v1: albedo/F0-demodulated diffuse and specular are reprojected with previous depth, previous normals and the previous inverse view-projection,\n"
+                "validated per bilinear tap by plane distance and normal agreement, then accumulated with per-signal history length and compressed-luminance moments.\n"
+                "A fast/slow history comparison shortens history on lighting change. No radiance clamp; HUD pixels reproject in view space through the HUD projection.\n"
+                "Inspect rt_GI_Reconstruction: R diffuse history/cap, G specular history/cap, B rejection reason/8, A diffuse variance.");
+        if (lighting.reconstructionRequested)
+        {
+            if (!lighting.reconstructionSpatialRequested)
+                ImGui::Text("RTGI spatial filter: off (r_rt_gi_reconstruct 1)");
+            else if (lighting.reconstructionSpatialActive)
+                ImGui::Text("RTGI spatial filter: SVGF a-trous recorded | %u passes | variance-guided, edge-stopped on depth, normal and roughness",
+                    lighting.reconstructionFilterPasses);
+            else if (lighting.reconstructionSpatialFallback != render::fg::LightingFallback::None)
+                ImGui::Text("RTGI spatial filter: requested, unavailable (%s) | temporal result composited",
+                    render::fg::LightingFallbackName(lighting.reconstructionSpatialFallback));
+            else
+                ImGui::Text("RTGI spatial filter: requested, not recorded | %u passes", lighting.reconstructionFilterPasses);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Pixels with fewer than 4 frames of history get a 7x7 bilateral prefilter and spatially estimated variance (boosted 4/history);\n"
+                    "each a-trous pass widens a 5x5 B3-spline kernel by 2x and stops on depth gradient, normal power 128, roughness and luminance/sqrt(variance).\n"
+                    "Filtered results are composited, not fed back into history. Inspect rt_GI_Variance (A) and rt_GI_FilteredDiffuse/Specular.");
+        }
         const char* grassCoverage = !lighting.rayGrassEnabled ? "disabled"
             : (lighting.rayGrassPending ? "pending/unavailable" : "covered");
         ImGui::Text("RTGI ray scope: scene radius %.0f m (offscreen dynamic admission envelope) | grass radius %.0f m%s | grass coverage %s | frustum/HiZ-independent",
             lighting.raySceneRadius, lighting.rayGrassRadius,
             lighting.rayGrassRadius > 0.0f ? "" : " (radius 0)", grassCoverage);
         ImGui::TextDisabled("Scene radius adds offscreen dynamic admission only; resident static coverage is retained and camera/shadow-admitted dynamics may extend farther");
-        ImGui::TextDisabled("RTGI rays: world only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | not reconstructed | not cached | not clamped");
+        ImGui::TextDisabled("RTGI rays: world only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | %s | not cached | not clamped",
+            lighting.reconstructionSpatialActive ? "temporally and spatially reconstructed"
+                : (lighting.reconstructionActive ? "temporally reconstructed" : "not reconstructed"));
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("RTGI traces raw multibounce transport from raster primaries with world-only rays; HUD geometry stays visible in color but is excluded from world occlusion and reflection.\n"
                 "The scene radius only adds an offscreen dynamic admission envelope: resident static coverage is retained (static geometry is not clipped to that radius) and camera- or shadow-admitted dynamics may extend beyond it.\n"
@@ -1448,7 +1482,27 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
             rs.lighting.raySceneRadius, rs.lighting.rayGrassRadius,
             rs.lighting.rayGrassRadius > 0.0f ? "" : " (radius 0)", grassCoverage);
         text += line;
-        xr_sprintf(line, sizeof(line), "RTGI rays: world-only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | raw multibounce, unreconstructed, uncached, unclamped\n");
+        xr_sprintf(line, sizeof(line), "RTGI rays: world-only (HUD excluded from occlusion/reflection) | primary geometric normal = resolved shading normal (approximation) | raw multibounce, %s, uncached, unclamped\n",
+            rs.lighting.reconstructionSpatialActive ? "temporally and spatially reconstructed"
+                : (rs.lighting.reconstructionActive ? "temporally reconstructed" : "unreconstructed"));
+        text += line;
+        const char* reconstruction = !rs.lighting.reconstructionRequested ? "off"
+            : (rs.lighting.reconstructionActive ? "temporal v1 recorded"
+                : (rs.lighting.reconstructionFallback != render::fg::LightingFallback::None ? "requested, unavailable" : "requested, not recorded"));
+        xr_sprintf(line, sizeof(line), "RTGI reconstruction: %s%s%s | history cap=%u frames | previous history=%s\n",
+            reconstruction,
+            rs.lighting.reconstructionFallback != render::fg::LightingFallback::None ? " reason=" : "",
+            rs.lighting.reconstructionFallback != render::fg::LightingFallback::None ? render::fg::LightingFallbackName(rs.lighting.reconstructionFallback) : "",
+            rs.lighting.reconstructionHistory, rs.lighting.historyUsed ? "reprojected" : "rejected");
+        text += line;
+        const char* spatial = !rs.lighting.reconstructionSpatialRequested ? "off"
+            : (rs.lighting.reconstructionSpatialActive ? "SVGF a-trous recorded"
+                : (rs.lighting.reconstructionSpatialFallback != render::fg::LightingFallback::None ? "requested, unavailable" : "requested, not recorded"));
+        xr_sprintf(line, sizeof(line), "RTGI spatial filter: %s%s%s | passes=%u | variance-guided, edge-stopped on depth/normal/roughness, not fed back into history\n",
+            spatial,
+            rs.lighting.reconstructionSpatialFallback != render::fg::LightingFallback::None ? " reason=" : "",
+            rs.lighting.reconstructionSpatialFallback != render::fg::LightingFallback::None ? render::fg::LightingFallbackName(rs.lighting.reconstructionSpatialFallback) : "",
+            rs.lighting.reconstructionFilterPasses);
         text += line;
     }
     xr_sprintf(line, sizeof(line), "history: surfaces=%s | used=%s | RT scene revision=%llu | RT pose revision=%llu | PT recorded samples=%u\n",

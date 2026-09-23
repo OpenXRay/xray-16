@@ -90,8 +90,7 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
     {
         pathTracer.history = previous->pathTracer;
         const bool cameraCut = cameraPos.distance_to(previous->cameraPos) > 5.0f ||
-            cameraDir.dotproduct(previous->cameraDir) < 0.5f ||
-            memcmp(&previous->project, &project, sizeof(project)) != 0;
+            cameraDir.dotproduct(previous->cameraDir) < 0.5f;
         if (!cameraCut)
         {
             prevView = previous->view;
@@ -103,6 +102,7 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
             prevFrameHeight = previous->height;
             hasPrevFrameData = previous->surfacesRecorded;
             hasPrevHiZ = previous->hizRecorded;
+            rtgi.historyValid = previous->rtgiHistoryRecorded;
             if (previous->surfacesRecorded || previous->hizRecorded)
                 writeIndex = 1 - previous->guideIndex;
         }
@@ -137,6 +137,8 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     }
     auto& frame = *m_recording;
     frame.hizRecorded = !lighting.frameFailed && hiz && hizRecorded;
+    frame.rtgiHistoryRecorded = !lighting.frameFailed && lighting.effective == LightingMode::RTGI && lighting.recorded &&
+        rtgi.reconstruction.recorded;
     const bool ptRecorded = !lighting.frameFailed && lighting.effective == LightingMode::ReferencePT && lighting.recorded;
     if (ptRecorded || pathTracer.pending.capturedSnapshot || (lighting.frameFailed && pathTracer.pending.snapshot))
     {
@@ -174,6 +176,13 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     frame.textures.push_back(rtgi.pathData);
     frame.textures.push_back(rtgi.surfaceData);
     frame.textures.push_back(rtgi.motion);
+    for (u32 i = 0; i < 2; ++i)
+    {
+        frame.textures.push_back(rtgi.reconstruction.historyDiffuse[i]);
+        frame.textures.push_back(rtgi.reconstruction.historySpecular[i]);
+        frame.textures.push_back(rtgi.reconstruction.moments[i]);
+        frame.textures.push_back(rtgi.reconstruction.fast[i]);
+    }
     if (rtgi.profile.paths)
     {
         frame.buffers.push_back(rtgi.profile.paths);

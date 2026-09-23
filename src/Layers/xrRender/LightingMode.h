@@ -60,6 +60,14 @@ public:
     u32 rayStaticDetailInstances = 0;
     bool rtgiProfile = false;
     bool rawSignalsRecorded = false;
+    bool reconstructionRequested = false;
+    bool reconstructionActive = false;
+    LightingFallback reconstructionFallback = LightingFallback::None;
+    u32 reconstructionHistory = 0;
+    bool reconstructionSpatialRequested = false;
+    bool reconstructionSpatialActive = false;
+    LightingFallback reconstructionSpatialFallback = LightingFallback::None;
+    u32 reconstructionFilterPasses = 0;
     u64 sceneRevision = 0;
     u64 poseRevision = 0;
 

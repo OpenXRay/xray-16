@@ -191,6 +191,10 @@ static void ApplyRTLightingSettings(fg::LightingFrameState& lighting)
     lighting.rtgiRayDistance = std::clamp(ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
     lighting.raySceneRadius = std::clamp(ps_r_rt_scene_radius, 1.0f, 10000.0f);
     lighting.rayGrassRadius = std::clamp(ps_r_rt_grass_radius, 0.0f, 256.0f);
+    lighting.reconstructionRequested = ps_r_rt_gi_reconstruct != 0;
+    lighting.reconstructionSpatialRequested = ps_r_rt_gi_reconstruct >= 2;
+    lighting.reconstructionHistory = static_cast<u32>(std::clamp(ps_r_rt_gi_history, 1, 64));
+    lighting.reconstructionFilterPasses = static_cast<u32>(std::clamp(ps_r_rt_gi_filter_passes, 1, 6));
 }
 
 static u8 QueryParticleBlendMode(LPCSTR shaderName)
@@ -1812,7 +1816,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs, clusterLightOut,
-            prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj, Device.vCameraPosition,
+            prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj,
+            Device.mView, m_mainView.prevView, Device.mProject, m_mainView.prevProject, Device.vCameraPosition,
             ps_r_rt_gi_intensity, width, height, m_mainView.rtgi, m_mainView.hasPrevFrameData, m_lightingState);
         opaqueOutputs.albedo = rtgiOutput.sceneColor;
     }
