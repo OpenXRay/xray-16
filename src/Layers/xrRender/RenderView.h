@@ -27,6 +27,7 @@ public:
     u64 lease = 0;
     bool surfacesRecorded = false;
     bool hizRecorded = false;
+    bool rtgiHistoryRecorded = false;
     passes::PathTracerHistory pathTracer;
     xr_vector<nvrhi::TextureHandle> textures;
     xr_vector<nvrhi::BufferHandle> buffers;

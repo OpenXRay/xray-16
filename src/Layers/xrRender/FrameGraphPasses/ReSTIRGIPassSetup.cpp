@@ -294,6 +294,129 @@ static LightingFallback EnsureRTGIProfileResources(RenderDevice* device, RTGIPro
     return LightingFallback::None;
 }
 
+static void ReleaseReconstructionResources(RTGIReconstructionState& recon)
+{
+    for (u32 i = 0; i < 2; ++i)
+    {
+        recon.historyDiffuse[i] = nullptr;
+        recon.historySpecular[i] = nullptr;
+        recon.moments[i] = nullptr;
+        recon.fast[i] = nullptr;
+    }
+    recon.width = 0;
+    recon.height = 0;
+    recon.recorded = false;
+}
+
+static LightingFallback EnsureReconstructionResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height)
+{
+    auto& recon = state.reconstruction;
+    auto* nvDevice = device->GetNVRHIDevice();
+    if (!recon.initialized)
+    {
+        auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+        if (!shaderLoader)
+            return LightingFallback::ShaderUnavailable;
+        auto& cache = GetPassResourceCache();
+        recon.cb = cache.GetOrCreateVolatileCB("RTGI", "RTGI_TemporalCB", sizeof(RTGITemporalCB), device);
+        if (!recon.cb)
+            return LightingFallback::ResourcesUnavailable;
+        recon.initialized = true;
+        auto result = shaderLoader->LoadComputeShader("rtgi_temporal");
+        if (!result.handle || !result.reflection)
+        {
+            recon.readiness = LightingFallback::ShaderUnavailable;
+            return recon.readiness;
+        }
+        recon.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Temporal", *result.reflection, nvDevice);
+        if (!recon.temporalLayout)
+        {
+            recon.readiness = LightingFallback::PipelineUnavailable;
+            return recon.readiness;
+        }
+        nvrhi::ComputePipelineDesc desc;
+        desc.CS = result.handle;
+        desc.bindingLayouts = { recon.temporalLayout };
+        recon.temporalPipeline = nvDevice->createComputePipeline(desc);
+        recon.readiness = recon.temporalPipeline ? LightingFallback::None : LightingFallback::PipelineUnavailable;
+    }
+    if (recon.readiness != LightingFallback::None)
+        return recon.readiness;
+    if (ps_r_rt_gi_reconstruct >= 2 && !recon.filterInitialized)
+    {
+        auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+        auto& cache = GetPassResourceCache();
+        recon.filterInitialized = true;
+        recon.filterCB = cache.GetOrCreateVolatileCB("RTGI", "RTGI_FilterCB", sizeof(RTGIFilterCB), device, 64);
+        recon.filterReadiness = shaderLoader && recon.filterCB ? LightingFallback::None : LightingFallback::ResourcesUnavailable;
+        const auto createFilterPipeline = [&](const char* shader, const char* name, nvrhi::BindingLayoutHandle& layout,
+            nvrhi::ComputePipelineHandle& pipeline)
+        {
+            if (recon.filterReadiness != LightingFallback::None)
+                return;
+            auto result = shaderLoader->LoadComputeShader(shader);
+            if (!result.handle || !result.reflection)
+            {
+                recon.filterReadiness = LightingFallback::ShaderUnavailable;
+                return;
+            }
+            layout = cache.GetOrCreateBindingLayoutFromReflection(name, *result.reflection, nvDevice);
+            if (!layout)
+            {
+                recon.filterReadiness = LightingFallback::PipelineUnavailable;
+                return;
+            }
+            nvrhi::ComputePipelineDesc desc;
+            desc.CS = result.handle;
+            desc.bindingLayouts = { layout };
+            pipeline = nvDevice->createComputePipeline(desc);
+            if (!pipeline)
+                recon.filterReadiness = LightingFallback::PipelineUnavailable;
+        };
+        createFilterPipeline("rtgi_variance", "RTGI_Variance", recon.varianceLayout, recon.variancePipeline);
+        createFilterPipeline("rtgi_atrous", "RTGI_Atrous", recon.atrousLayout, recon.atrousPipeline);
+    }
+
+    bool texturesMatch = recon.width == width && recon.height == height;
+    for (u32 i = 0; i < 2 && texturesMatch; ++i)
+        texturesMatch = recon.historyDiffuse[i] && recon.historySpecular[i] && recon.moments[i] && recon.fast[i];
+    if (texturesMatch)
+        return LightingFallback::None;
+
+    const auto create = [nvDevice, width, height](const char* name, nvrhi::Format format)
+    {
+        nvrhi::TextureDesc desc;
+        desc.debugName = name;
+        desc.width = width;
+        desc.height = height;
+        desc.format = format;
+        desc.isUAV = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        return nvDevice->createTexture(desc);
+    };
+    ReleaseReconstructionResources(recon);
+    state.historyValid = false;
+    recon.historyIndex = 0;
+    bool created = true;
+    for (u32 i = 0; i < 2; ++i)
+    {
+        recon.historyDiffuse[i] = create(i ? "RTGI_HistoryDiffuse_B" : "RTGI_HistoryDiffuse_A", nvrhi::Format::RGBA16_FLOAT);
+        recon.historySpecular[i] = create(i ? "RTGI_HistorySpecular_B" : "RTGI_HistorySpecular_A", nvrhi::Format::RGBA16_FLOAT);
+        recon.moments[i] = create(i ? "RTGI_HistoryMoments_B" : "RTGI_HistoryMoments_A", nvrhi::Format::RGBA16_FLOAT);
+        recon.fast[i] = create(i ? "RTGI_HistoryFast_B" : "RTGI_HistoryFast_A", nvrhi::Format::RG16_FLOAT);
+        created = created && recon.historyDiffuse[i] && recon.historySpecular[i] && recon.moments[i] && recon.fast[i];
+    }
+    if (!created)
+    {
+        ReleaseReconstructionResources(recon);
+        return LightingFallback::ResourcesUnavailable;
+    }
+    recon.width = width;
+    recon.height = height;
+    return LightingFallback::None;
+}
+
 LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested)
 {
     if (!device || !device->GetNVRHIDevice() || !width || !height)
@@ -305,6 +428,13 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
     if (!state.rawDiffuse || !state.rawSpecular || !state.emission || !state.normalRoughness ||
         !state.albedoMetallic || !state.pathData || !state.surfaceData || !state.motion)
         return LightingFallback::ResourcesUnavailable;
+    if (ps_r_rt_gi_reconstruct != 0)
+        state.reconstruction.status = EnsureReconstructionResources(device, state, width, height);
+    else
+    {
+        ReleaseReconstructionResources(state.reconstruction);
+        state.reconstruction.status = LightingFallback::None;
+    }
     if (ps_r_rt_gi_profile != 0)
         return EnsureRTGIProfileResources(device, state.profile, width, height);
     state.profile.paths = nullptr;
@@ -317,7 +447,9 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
 
 ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, const DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, VirtualResourceHandle prevNormals, VirtualResourceHandle prevDepth,
-    VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj, const Fvector& cameraPos, float giIntensity, u32 width,
+    VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
+    const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
+    const Fvector& cameraPos, float giIntensity, u32 width,
     u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting)
 {
     const auto depth = inputs.depth;
@@ -362,7 +494,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         return { sourceColorIn };
     }
 
-    state.historyValid = false;
     state.initialRecorded = false;
 
     CEnvironment& env = g_pGamePersistent->Environment();
@@ -884,20 +1015,477 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.state->initialRecorded = true;
         });
 
+    auto& recon = state.reconstruction;
+    recon.recorded = false;
+    const bool reconstructionRequested = ps_r_rt_gi_reconstruct != 0;
+    const u32 maxHistory = static_cast<u32>(std::clamp(ps_r_rt_gi_history, 1, 64));
+    bool reconstructionReady = reconstructionRequested && recon.status == LightingFallback::None &&
+        recon.readiness == LightingFallback::None && recon.temporalPipeline && recon.temporalLayout && recon.cb &&
+        recon.width == width && recon.height == height;
+    lighting.reconstructionRequested = reconstructionRequested;
+    lighting.reconstructionHistory = maxHistory;
+    lighting.reconstructionFallback = LightingFallback::None;
+    if (reconstructionRequested && !reconstructionReady)
+        lighting.reconstructionFallback = recon.status != LightingFallback::None ? recon.status : LightingFallback::ResourcesUnavailable;
+
+    VirtualResourceHandle fgHistoryDiffuse;
+    VirtualResourceHandle fgHistorySpecular;
+    VirtualResourceHandle fgMoments;
+    VirtualResourceHandle fgFast;
+    VirtualResourceHandle fgReconstruction;
+    VirtualResourceHandle fgPrevHistoryDiffuse;
+    VirtualResourceHandle fgPrevHistorySpecular;
+    VirtualResourceHandle fgPrevMoments;
+    VirtualResourceHandle fgPrevFast;
+    if (reconstructionReady)
+    {
+        const u32 writeIndex = recon.historyIndex & 1u;
+        const u32 readIndex = writeIndex ^ 1u;
+        fgHistoryDiffuse = importRaw("rtgi_HistoryDiffuse", recon.historyDiffuse[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgHistorySpecular = importRaw("rtgi_HistorySpecular", recon.historySpecular[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgMoments = importRaw("rtgi_HistoryMoments", recon.moments[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgFast = importRaw("rtgi_HistoryFast", recon.fast[writeIndex].Get(), nvrhi::Format::RG16_FLOAT);
+        fgPrevHistoryDiffuse = importRaw("rtgi_PrevHistoryDiffuse", recon.historyDiffuse[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgPrevHistorySpecular = importRaw("rtgi_PrevHistorySpecular", recon.historySpecular[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgPrevMoments = importRaw("rtgi_PrevHistoryMoments", recon.moments[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
+        fgPrevFast = importRaw("rtgi_PrevHistoryFast", recon.fast[readIndex].Get(), nvrhi::Format::RG16_FLOAT);
+        ResourceDesc reconDesc;
+        reconDesc.type = ResourceDesc::Type::Texture2D;
+        reconDesc.debugName = "rt_GI_Reconstruction";
+        reconDesc.width = width;
+        reconDesc.height = height;
+        reconDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        reconDesc.isUAV = true;
+        reconDesc.isTransient = true;
+        fgReconstruction = fg.CreateTexture("rt_GI_Reconstruction", reconDesc);
+        if (!fgHistoryDiffuse.is_valid() || !fgHistorySpecular.is_valid() || !fgMoments.is_valid() || !fgFast.is_valid() ||
+            !fgPrevHistoryDiffuse.is_valid() || !fgPrevHistorySpecular.is_valid() || !fgPrevMoments.is_valid() ||
+            !fgPrevFast.is_valid() || !fgReconstruction.is_valid())
+        {
+            reconstructionReady = false;
+            lighting.reconstructionFallback = LightingFallback::ResourcesUnavailable;
+        }
+        else
+        {
+            fg.GetRTRegistry().RegisterRT("rt_GI_HistoryDiffuse", fgHistoryDiffuse);
+            fg.GetRTRegistry().RegisterRT("rt_GI_HistorySpecular", fgHistorySpecular);
+            fg.GetRTRegistry().RegisterRT("rt_GI_Moments", fgMoments);
+            fg.GetRTRegistry().RegisterRT("rt_GI_Reconstruction", fgReconstruction);
+        }
+    }
+
+    if (reconstructionReady)
+    {
+        const bool historyValid = state.historyValid && hasPrevFrameData && validInput(prevDepth) && validInput(prevNormals);
+        RTGITemporalCB temporalCB = {};
+        temporalCB.invViewProj = invViewProj;
+        temporalCB.prevInvViewProj = Fidentity;
+        temporalCB.view = view;
+        temporalCB.prevView = Fidentity;
+        temporalCB.invProj = Fidentity;
+        temporalCB.invProj.invert_44(project);
+        temporalCB.prevInvProj = Fidentity;
+        if (historyValid)
+        {
+            temporalCB.prevInvViewProj.invert_44(prevViewProj);
+            temporalCB.prevView = prevView;
+            temporalCB.prevInvProj.invert_44(prevProject);
+        }
+        temporalCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
+        temporalCB.screenWidth = static_cast<float>(width);
+        temporalCB.screenHeight = static_cast<float>(height);
+        temporalCB.invScreenWidth = 1.0f / static_cast<float>(width);
+        temporalCB.invScreenHeight = 1.0f / static_cast<float>(height);
+        temporalCB.historyValid = historyValid ? 1u : 0u;
+        temporalCB.maxHistory = maxHistory;
+        temporalCB.planeTolerance = 0.02f;
+        temporalCB.normalTolerance = 0.9f;
+        temporalCB.frameIndex = Device.dwFrame;
+        temporalCB.hudFov = psHUD_FOV > 0.0f ? psHUD_FOV : 1.0f;
+        const auto prevDepthInput = historyValid ? prevDepth : depth;
+        const auto prevNormalInput = historyValid ? prevNormals : normal;
+
+        fg.addCallbackPass<RTGITemporalPassData>(
+            "RTGI Temporal Reconstruction",
+            [&](FrameGraph& builder, PassHandle passHandle, RTGITemporalPassData& data)
+            {
+                RenderPassBuilder pb(builder, passHandle);
+                data.rawDiffuse = pb.read(fgRawDiffuse, ResourceState::ShaderResource);
+                data.rawSpecular = pb.read(fgRawSpecular, ResourceState::ShaderResource);
+                data.normalRoughness = pb.read(fgNormalRoughness, ResourceState::ShaderResource);
+                data.albedoMetallic = pb.read(fgAlbedoMetallic, ResourceState::ShaderResource);
+                data.surfaceData = pb.read(fgSurfaceData, ResourceState::ShaderResource);
+                data.motion = pb.read(fgOutMotion, ResourceState::ShaderResource);
+                data.prevDepth = pb.read(prevDepthInput, ResourceState::ShaderResource);
+                data.prevNormal = pb.read(prevNormalInput, ResourceState::ShaderResource);
+                data.prevHistoryDiffuse = pb.read(fgPrevHistoryDiffuse, ResourceState::ShaderResource);
+                data.prevHistorySpecular = pb.read(fgPrevHistorySpecular, ResourceState::ShaderResource);
+                data.prevMoments = pb.read(fgPrevMoments, ResourceState::ShaderResource);
+                data.prevFast = pb.read(fgPrevFast, ResourceState::ShaderResource);
+                data.historyDiffuse = pb.write(fgHistoryDiffuse, ResourceState::UnorderedAccess);
+                data.historySpecular = pb.write(fgHistorySpecular, ResourceState::UnorderedAccess);
+                data.moments = pb.write(fgMoments, ResourceState::UnorderedAccess);
+                data.fast = pb.write(fgFast, ResourceState::UnorderedAccess);
+                data.reconstruction = pb.write(fgReconstruction, ResourceState::UnorderedAccess);
+                pb.sideEffects();
+                data.device = device;
+                data.state = &state;
+                data.lighting = &lighting;
+                data.cbData = temporalCB;
+                data.width = width;
+                data.height = height;
+            },
+            [](const RTGITemporalPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+            {
+                if (!data.state->initialRecorded || data.lighting->effective != LightingMode::RTGI)
+                    return;
+
+                auto* rawDiffuse = fg.GetPhysicalTexture(data.rawDiffuse);
+                auto* rawSpecular = fg.GetPhysicalTexture(data.rawSpecular);
+                auto* normalRoughness = fg.GetPhysicalTexture(data.normalRoughness);
+                auto* albedoMetallic = fg.GetPhysicalTexture(data.albedoMetallic);
+                auto* surfaceData = fg.GetPhysicalTexture(data.surfaceData);
+                auto* motion = fg.GetPhysicalTexture(data.motion);
+                auto* prevDepth = fg.GetPhysicalTexture(data.prevDepth);
+                auto* prevNormal = fg.GetPhysicalTexture(data.prevNormal);
+                auto* prevHistoryDiffuse = fg.GetPhysicalTexture(data.prevHistoryDiffuse);
+                auto* prevHistorySpecular = fg.GetPhysicalTexture(data.prevHistorySpecular);
+                auto* prevMoments = fg.GetPhysicalTexture(data.prevMoments);
+                auto* prevFast = fg.GetPhysicalTexture(data.prevFast);
+                auto* historyDiffuse = fg.GetPhysicalTexture(data.historyDiffuse);
+                auto* historySpecular = fg.GetPhysicalTexture(data.historySpecular);
+                auto* moments = fg.GetPhysicalTexture(data.moments);
+                auto* fast = fg.GetPhysicalTexture(data.fast);
+                auto* reconstruction = fg.GetPhysicalTexture(data.reconstruction);
+                if (!rawDiffuse || !rawSpecular || !normalRoughness || !albedoMetallic || !surfaceData || !motion ||
+                    !prevDepth || !prevNormal || !prevHistoryDiffuse || !prevHistorySpecular || !prevMoments || !prevFast ||
+                    !historyDiffuse || !historySpecular || !moments || !fast || !reconstruction)
+                {
+                    Msg("! [RTGI Temporal] Null FG texture: raw=%d guides=%d prev=%d history=%d",
+                        !!rawDiffuse && !!rawSpecular, !!normalRoughness && !!albedoMetallic && !!surfaceData && !!motion,
+                        !!prevDepth && !!prevNormal && !!prevHistoryDiffuse && !!prevHistorySpecular && !!prevMoments && !!prevFast,
+                        !!historyDiffuse && !!historySpecular && !!moments && !!fast && !!reconstruction);
+                    data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                    return;
+                }
+
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                auto* reflection = shaderLoader->GetCachedReflection("rtgi_temporal", ".cs");
+                if (!reflection)
+                {
+                    data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                    return;
+                }
+
+                auto& recon = data.state->reconstruction;
+                nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+                nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                cmdList->writeBuffer(recon.cb, &data.cbData, sizeof(RTGITemporalCB));
+
+                framegraph::BindingSetBuilder bsb(*reflection, nvDevice, "RTGI.Temporal");
+                bsb.ConstantBuffer("RTGITemporalParams", recon.cb);
+                bsb.Texture("t_RawDiffuse", rawDiffuse);
+                bsb.Texture("t_RawSpecular", rawSpecular);
+                bsb.Texture("t_NormalRoughness", normalRoughness);
+                bsb.Texture("t_AlbedoMetallic", albedoMetallic);
+                bsb.Texture("t_SurfaceData", surfaceData);
+                bsb.Texture("t_Motion", motion);
+                bsb.Texture("t_PrevDepth", prevDepth);
+                bsb.Texture("t_PrevNormal", prevNormal);
+                bsb.Texture("t_PrevHistoryDiffuse", prevHistoryDiffuse);
+                bsb.Texture("t_PrevHistorySpecular", prevHistorySpecular);
+                bsb.Texture("t_PrevMoments", prevMoments);
+                bsb.Texture("t_PrevFast", prevFast);
+                bsb.TextureUAV("u_HistoryDiffuse", historyDiffuse);
+                bsb.TextureUAV("u_HistorySpecular", historySpecular);
+                bsb.TextureUAV("u_Moments", moments);
+                bsb.TextureUAV("u_Fast", fast);
+                bsb.TextureUAV("u_Reconstruction", reconstruction);
+                auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), recon.temporalLayout, nvDevice);
+                if (!bindingSet)
+                {
+                    data.lighting->Fail(LightingFallback::BindingUnavailable);
+                    return;
+                }
+
+                nvrhi::ComputeState cs;
+                cs.pipeline = recon.temporalPipeline;
+                cs.bindings = { bindingSet };
+                cmdList->setComputeState(cs);
+                cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+                recon.recorded = true;
+                recon.historyIndex ^= 1u;
+                data.lighting->reconstructionActive = true;
+                data.lighting->historyUsed = data.cbData.historyValid != 0;
+            });
+    }
+
+    recon.varianceRecorded = false;
+    recon.filterRecorded = false;
+    recon.filterIterationsRecorded = 0;
+    const bool spatialRequested = ps_r_rt_gi_reconstruct >= 2;
+    const u32 filterPasses = static_cast<u32>(std::clamp(ps_r_rt_gi_filter_passes, 1, 6));
+    bool spatialReady = spatialRequested && reconstructionReady && recon.filterReadiness == LightingFallback::None &&
+        recon.variancePipeline && recon.varianceLayout && recon.atrousPipeline && recon.atrousLayout && recon.filterCB;
+    lighting.reconstructionSpatialRequested = spatialRequested;
+    lighting.reconstructionFilterPasses = filterPasses;
+    lighting.reconstructionSpatialFallback = LightingFallback::None;
+    if (spatialRequested && !spatialReady)
+        lighting.reconstructionSpatialFallback = !reconstructionReady ? lighting.reconstructionFallback
+            : (recon.filterReadiness != LightingFallback::None ? recon.filterReadiness : LightingFallback::ResourcesUnavailable);
+
+    VirtualResourceHandle fgDepthGuide;
+    VirtualResourceHandle fgVarianceDiffuse;
+    VirtualResourceHandle fgVarianceSpecular;
+    VirtualResourceHandle fgFilterDiffuse[2];
+    VirtualResourceHandle fgFilterSpecular[2];
+    VirtualResourceHandle fgFilteredDiffuse;
+    VirtualResourceHandle fgFilteredSpecular;
+    if (spatialReady)
+    {
+        const auto createTransient = [&](const char* name, nvrhi::Format format)
+        {
+            ResourceDesc desc;
+            desc.type = ResourceDesc::Type::Texture2D;
+            desc.debugName = name;
+            desc.width = width;
+            desc.height = height;
+            desc.format = format;
+            desc.isUAV = true;
+            desc.isTransient = true;
+            return fg.CreateTexture(name, desc);
+        };
+        fgDepthGuide = createTransient("rtgi_DepthGuide", nvrhi::Format::R32_FLOAT);
+        fgVarianceDiffuse = createTransient("rt_GI_Variance", nvrhi::Format::RGBA16_FLOAT);
+        fgVarianceSpecular = createTransient("rtgi_VarianceSpecular", nvrhi::Format::RGBA16_FLOAT);
+        fgFilterDiffuse[0] = createTransient("rtgi_FilterDiffuse_A", nvrhi::Format::RGBA16_FLOAT);
+        fgFilterDiffuse[1] = createTransient("rtgi_FilterDiffuse_B", nvrhi::Format::RGBA16_FLOAT);
+        fgFilterSpecular[0] = createTransient("rtgi_FilterSpecular_A", nvrhi::Format::RGBA16_FLOAT);
+        fgFilterSpecular[1] = createTransient("rtgi_FilterSpecular_B", nvrhi::Format::RGBA16_FLOAT);
+        if (!fgDepthGuide.is_valid() || !fgVarianceDiffuse.is_valid() || !fgVarianceSpecular.is_valid() ||
+            !fgFilterDiffuse[0].is_valid() || !fgFilterDiffuse[1].is_valid() ||
+            !fgFilterSpecular[0].is_valid() || !fgFilterSpecular[1].is_valid())
+        {
+            spatialReady = false;
+            lighting.reconstructionSpatialFallback = LightingFallback::ResourcesUnavailable;
+        }
+    }
+
+    if (spatialReady)
+    {
+        RTGIFilterCB filterCB = {};
+        filterCB.width = width;
+        filterCB.height = height;
+        filterCB.stepSize = 1;
+        filterCB.iteration = 0;
+        filterCB.phiColor = 10.0f;
+        filterCB.phiNormal = 128.0f;
+
+        fg.addCallbackPass<RTGIVariancePassData>(
+            "RTGI Variance Estimate",
+            [&](FrameGraph& builder, PassHandle passHandle, RTGIVariancePassData& data)
+            {
+                RenderPassBuilder pb(builder, passHandle);
+                data.historyDiffuse = pb.read(fgHistoryDiffuse, ResourceState::ShaderResource);
+                data.historySpecular = pb.read(fgHistorySpecular, ResourceState::ShaderResource);
+                data.moments = pb.read(fgMoments, ResourceState::ShaderResource);
+                data.normalRoughness = pb.read(fgNormalRoughness, ResourceState::ShaderResource);
+                data.surfaceData = pb.read(fgSurfaceData, ResourceState::ShaderResource);
+                data.diffuse = pb.write(fgVarianceDiffuse, ResourceState::UnorderedAccess);
+                data.specular = pb.write(fgVarianceSpecular, ResourceState::UnorderedAccess);
+                data.depthGuide = pb.write(fgDepthGuide, ResourceState::UnorderedAccess);
+                pb.sideEffects();
+                data.device = device;
+                data.state = &state;
+                data.lighting = &lighting;
+                data.cbData = filterCB;
+                data.width = width;
+                data.height = height;
+            },
+            [](const RTGIVariancePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+            {
+                auto& recon = data.state->reconstruction;
+                if (!data.state->initialRecorded || !recon.recorded || data.lighting->effective != LightingMode::RTGI)
+                    return;
+
+                auto* historyDiffuse = fg.GetPhysicalTexture(data.historyDiffuse);
+                auto* historySpecular = fg.GetPhysicalTexture(data.historySpecular);
+                auto* moments = fg.GetPhysicalTexture(data.moments);
+                auto* normalRoughness = fg.GetPhysicalTexture(data.normalRoughness);
+                auto* surfaceData = fg.GetPhysicalTexture(data.surfaceData);
+                auto* diffuse = fg.GetPhysicalTexture(data.diffuse);
+                auto* specular = fg.GetPhysicalTexture(data.specular);
+                auto* depthGuide = fg.GetPhysicalTexture(data.depthGuide);
+                if (!historyDiffuse || !historySpecular || !moments || !normalRoughness || !surfaceData ||
+                    !diffuse || !specular || !depthGuide)
+                {
+                    Msg("! [RTGI Variance] Null FG texture");
+                    data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                    return;
+                }
+
+                auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rtgi_variance", ".cs");
+                if (!reflection)
+                {
+                    data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                    return;
+                }
+
+                nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+                nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                cmdList->writeBuffer(recon.filterCB, &data.cbData, sizeof(RTGIFilterCB));
+
+                framegraph::BindingSetBuilder bsb(*reflection, nvDevice, "RTGI.Variance");
+                bsb.ConstantBuffer("RTGIFilterParams", recon.filterCB);
+                bsb.Texture("t_HistoryDiffuse", historyDiffuse);
+                bsb.Texture("t_HistorySpecular", historySpecular);
+                bsb.Texture("t_Moments", moments);
+                bsb.Texture("t_NormalRoughness", normalRoughness);
+                bsb.Texture("t_SurfaceData", surfaceData);
+                bsb.TextureUAV("u_Diffuse", diffuse);
+                bsb.TextureUAV("u_Specular", specular);
+                bsb.TextureUAV("u_DepthGuide", depthGuide);
+                auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), recon.varianceLayout, nvDevice);
+                if (!bindingSet)
+                {
+                    data.lighting->Fail(LightingFallback::BindingUnavailable);
+                    return;
+                }
+
+                nvrhi::ComputeState cs;
+                cs.pipeline = recon.variancePipeline;
+                cs.bindings = { bindingSet };
+                cmdList->setComputeState(cs);
+                cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+                recon.varianceRecorded = true;
+            });
+
+        static constexpr const char* s_rtgiAtrousNames[6] =
+        {
+            "RTGI A-Trous 1",
+            "RTGI A-Trous 2",
+            "RTGI A-Trous 3",
+            "RTGI A-Trous 4",
+            "RTGI A-Trous 5",
+            "RTGI A-Trous 6"
+        };
+        VirtualResourceHandle currentDiffuse = fgVarianceDiffuse;
+        VirtualResourceHandle currentSpecular = fgVarianceSpecular;
+        for (u32 iteration = 0; iteration < filterPasses; ++iteration)
+        {
+            const auto inDiffuse = currentDiffuse;
+            const auto inSpecular = currentSpecular;
+            const auto outDiffuse = fgFilterDiffuse[iteration & 1u];
+            const auto outSpecular = fgFilterSpecular[iteration & 1u];
+            RTGIFilterCB iterationCB = filterCB;
+            iterationCB.stepSize = 1u << iteration;
+            iterationCB.iteration = iteration;
+            fg.addCallbackPass<RTGIAtrousPassData>(
+                s_rtgiAtrousNames[iteration],
+                [&](FrameGraph& builder, PassHandle passHandle, RTGIAtrousPassData& data)
+                {
+                    RenderPassBuilder pb(builder, passHandle);
+                    data.inDiffuse = pb.read(inDiffuse, ResourceState::ShaderResource);
+                    data.inSpecular = pb.read(inSpecular, ResourceState::ShaderResource);
+                    data.normalRoughness = pb.read(fgNormalRoughness, ResourceState::ShaderResource);
+                    data.depthGuide = pb.read(fgDepthGuide, ResourceState::ShaderResource);
+                    data.outDiffuse = pb.write(outDiffuse, ResourceState::UnorderedAccess);
+                    data.outSpecular = pb.write(outSpecular, ResourceState::UnorderedAccess);
+                    pb.sideEffects();
+                    data.device = device;
+                    data.state = &state;
+                    data.lighting = &lighting;
+                    data.cbData = iterationCB;
+                    data.width = width;
+                    data.height = height;
+                    data.iteration = iteration;
+                    data.iterations = filterPasses;
+                },
+                [](const RTGIAtrousPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+                {
+                    auto& recon = data.state->reconstruction;
+                    if (!recon.varianceRecorded || recon.filterIterationsRecorded != data.iteration ||
+                        data.lighting->effective != LightingMode::RTGI)
+                        return;
+
+                    auto* inDiffuse = fg.GetPhysicalTexture(data.inDiffuse);
+                    auto* inSpecular = fg.GetPhysicalTexture(data.inSpecular);
+                    auto* normalRoughness = fg.GetPhysicalTexture(data.normalRoughness);
+                    auto* depthGuide = fg.GetPhysicalTexture(data.depthGuide);
+                    auto* outDiffuse = fg.GetPhysicalTexture(data.outDiffuse);
+                    auto* outSpecular = fg.GetPhysicalTexture(data.outSpecular);
+                    if (!inDiffuse || !inSpecular || !normalRoughness || !depthGuide || !outDiffuse || !outSpecular)
+                    {
+                        Msg("! [RTGI A-Trous %u] Null FG texture", data.iteration + 1);
+                        data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                        return;
+                    }
+
+                    auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rtgi_atrous", ".cs");
+                    if (!reflection)
+                    {
+                        data.lighting->Fail(LightingFallback::ShaderUnavailable);
+                        return;
+                    }
+
+                    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+                    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                    cmdList->writeBuffer(recon.filterCB, &data.cbData, sizeof(RTGIFilterCB));
+
+                    framegraph::BindingSetBuilder bsb(*reflection, nvDevice, "RTGI.Atrous");
+                    bsb.ConstantBuffer("RTGIFilterParams", recon.filterCB);
+                    bsb.Texture("t_Diffuse", inDiffuse);
+                    bsb.Texture("t_Specular", inSpecular);
+                    bsb.Texture("t_NormalRoughness", normalRoughness);
+                    bsb.Texture("t_DepthGuide", depthGuide);
+                    bsb.TextureUAV("u_Diffuse", outDiffuse);
+                    bsb.TextureUAV("u_Specular", outSpecular);
+                    auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), recon.atrousLayout, nvDevice);
+                    if (!bindingSet)
+                    {
+                        data.lighting->Fail(LightingFallback::BindingUnavailable);
+                        return;
+                    }
+
+                    nvrhi::ComputeState cs;
+                    cs.pipeline = recon.atrousPipeline;
+                    cs.bindings = { bindingSet };
+                    cmdList->setComputeState(cs);
+                    cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+                    recon.filterIterationsRecorded = data.iteration + 1;
+                    if (recon.filterIterationsRecorded == data.iterations)
+                    {
+                        recon.filterRecorded = true;
+                        data.lighting->reconstructionSpatialActive = true;
+                    }
+                });
+            currentDiffuse = outDiffuse;
+            currentSpecular = outSpecular;
+        }
+        fgFilteredDiffuse = currentDiffuse;
+        fgFilteredSpecular = currentSpecular;
+        fg.GetRTRegistry().RegisterRT("rt_GI_Variance", fgVarianceDiffuse);
+        fg.GetRTRegistry().RegisterRT("rt_GI_FilteredDiffuse", fgFilteredDiffuse);
+        fg.GetRTRegistry().RegisterRT("rt_GI_FilteredSpecular", fgFilteredSpecular);
+    }
+
     RTGICompositeParams compositeCB = {};
     compositeCB.width = width;
     compositeCB.height = height;
-    compositeCB.pad0 = 0;
+    compositeCB.remodulate = reconstructionReady ? 1u : 0u;
     compositeCB.pad1 = 0;
+    const auto compositeDiffuse = spatialReady ? fgFilteredDiffuse : (reconstructionReady ? fgHistoryDiffuse : fgRawDiffuse);
+    const auto compositeSpecular = spatialReady ? fgFilteredSpecular : (reconstructionReady ? fgHistorySpecular : fgRawSpecular);
 
     auto& compositeData = fg.addCallbackPass<RTGICompositePassData>(
         "RTGI Opaque Lighting",
         [&](FrameGraph& builder, PassHandle passHandle, RTGICompositePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
-            data.rawDiffuse = pb.read(fgRawDiffuse, ResourceState::ShaderResource);
-            data.rawSpecular = pb.read(fgRawSpecular, ResourceState::ShaderResource);
+            data.diffuse = pb.read(compositeDiffuse, ResourceState::ShaderResource);
+            data.specular = pb.read(compositeSpecular, ResourceState::ShaderResource);
             data.emission = pb.read(fgEmission, ResourceState::ShaderResource);
+            data.albedoMetallic = pb.read(fgAlbedoMetallic, ResourceState::ShaderResource);
             data.sceneColor = pb.readWrite(sourceColorIn, ResourceState::UnorderedAccess);
             pb.sideEffects();
             data.device = device;
@@ -910,20 +1498,27 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.staticDetailInstanceCount = scene->staticDetailInstanceCount;
             data.width = width;
             data.height = height;
+            data.reconstructed = reconstructionReady;
+            data.spatial = spatialReady;
         },
         [](const RTGICompositePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
             if (!data.state->initialRecorded || data.lighting->effective != LightingMode::RTGI)
                 return;
+            if (data.reconstructed && !data.state->reconstruction.recorded)
+                return;
+            if (data.spatial && !data.state->reconstruction.filterRecorded)
+                return;
 
-            auto* rawDiffuse = fg.GetPhysicalTexture(data.rawDiffuse);
-            auto* rawSpecular = fg.GetPhysicalTexture(data.rawSpecular);
+            auto* diffuse = fg.GetPhysicalTexture(data.diffuse);
+            auto* specular = fg.GetPhysicalTexture(data.specular);
             auto* emission = fg.GetPhysicalTexture(data.emission);
+            auto* albedoMetallic = fg.GetPhysicalTexture(data.albedoMetallic);
             auto* outTex = fg.GetPhysicalTexture(data.sceneColor);
-            if (!rawDiffuse || !rawSpecular || !emission || !outTex)
+            if (!diffuse || !specular || !emission || !albedoMetallic || !outTex)
             {
-                Msg("! [RTGI Composite] Null FG texture: raw=%d spec=%d emission=%d out=%d",
-                    !!rawDiffuse, !!rawSpecular, !!emission, !!outTex);
+                Msg("! [RTGI Composite] Null FG texture: diffuse=%d specular=%d emission=%d albedo=%d out=%d",
+                    !!diffuse, !!specular, !!emission, !!albedoMetallic, !!outTex);
                 data.lighting->Fail(LightingFallback::ResourcesUnavailable);
                 return;
             }
@@ -942,9 +1537,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
             framegraph::BindingSetBuilder bsb(*csReflection, nvDevice, "RTGI.Composite");
             bsb.ConstantBuffer("RTGICompositeParams", data.state->cb);
-            bsb.Texture("t_RawDiffuse", rawDiffuse);
-            bsb.Texture("t_RawSpecular", rawSpecular);
+            bsb.Texture("t_Diffuse", diffuse);
+            bsb.Texture("t_Specular", specular);
             bsb.Texture("t_Emission", emission);
+            bsb.Texture("t_AlbedoMetallic", albedoMetallic);
             bsb.TextureUAV("u_SceneColor", outTex);
             auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), data.state->compositeLayout, nvDevice);
             if (!bindingSet)
@@ -961,7 +1557,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
             data.lighting->recorded = true;
             data.lighting->rawSignalsRecorded = true;
-            data.lighting->historyUsed = false;
             data.lighting->rtgiBounces = data.bounces;
             data.lighting->rtgiSamples = data.samples;
             data.lighting->rtgiRayDistance = data.rayDistance;
@@ -978,6 +1573,13 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     output.pathData = fgPathData;
     output.surfaceData = fgSurfaceData;
     output.motionVectors = fgOutMotion;
+    output.historyDiffuse = fgHistoryDiffuse;
+    output.historySpecular = fgHistorySpecular;
+    output.moments = fgMoments;
+    output.reconstruction = fgReconstruction;
+    output.variance = fgVarianceDiffuse;
+    output.filteredDiffuse = fgFilteredDiffuse;
+    output.filteredSpecular = fgFilteredSpecular;
     return output;
 }
 
@@ -989,6 +1591,7 @@ void ShutdownReSTIRGI(ReSTIRGIPassState& state)
     state.compositeLayout = nullptr;
     state.cb = nullptr;
     state.profile = {};
+    state.reconstruction = {};
     state.rawDiffuse = nullptr;
     state.rawSpecular = nullptr;
     state.emission = nullptr;

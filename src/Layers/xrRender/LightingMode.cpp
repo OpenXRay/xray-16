@@ -31,6 +31,14 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT, bool profileRTG
     rayStaticDetailInstances = 0;
     rtgiProfile = requested == LightingMode::RTGI && profileRTGI;
     rawSignalsRecorded = false;
+    reconstructionRequested = false;
+    reconstructionActive = false;
+    reconstructionFallback = LightingFallback::None;
+    reconstructionHistory = 0;
+    reconstructionSpatialRequested = false;
+    reconstructionSpatialActive = false;
+    reconstructionSpatialFallback = LightingFallback::None;
+    reconstructionFilterPasses = 0;
     sceneRevision = 0;
     poseRevision = 0;
 
@@ -69,6 +77,8 @@ void LightingFrameState::Fail(LightingFallback reason)
         reuseReservoirs = false;
         historyUsed = false;
         rawSignalsRecorded = false;
+        reconstructionActive = false;
+        reconstructionSpatialActive = false;
         rayStaticDetailInstances = 0;
         m_latchedMode = requested;
         m_latchedReason = reason;
@@ -83,6 +93,8 @@ void LightingFrameState::Fail(LightingFallback reason)
     reuseReservoirs = false;
     historyUsed = false;
     rawSignalsRecorded = false;
+    reconstructionActive = false;
+    reconstructionSpatialActive = false;
     rayStaticDetailInstances = 0;
 }
 
