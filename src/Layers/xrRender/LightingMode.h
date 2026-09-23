@@ -70,6 +70,18 @@ public:
     u32 reconstructionFilterPasses = 0;
     u64 sceneRevision = 0;
     u64 poseRevision = 0;
+    bool worldCacheRequested = false;
+    bool worldCacheActive = false;
+    bool worldCacheLiveCellsKnown = false;
+    LightingFallback worldCacheFallback = LightingFallback::None;
+    u32 worldCacheBounce = 0;
+    u32 worldCacheUpdates = 0;
+    u32 worldCacheDebug = 0;
+    u32 worldCacheLifetime = 0;
+    u32 worldCacheCapacity = 0;
+    u32 worldCacheLiveCells = 0;
+    float worldCacheCellSize = 0.0f;
+    u64 worldCacheBytes = 0;
 
 private:
     LightingMode m_latchedMode = LightingMode::Raster;

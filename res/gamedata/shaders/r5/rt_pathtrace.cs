@@ -102,7 +102,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 origin;
     float3 direction = GenerateCameraRay(pixel, rng, origin);
 
-    RTIntegratorSettings settings;
+    RTIntegratorSettings settings = RTIntegratorDefaultSettings();
     settings.maxBounces = g_MaxBounces;
     settings.coneWidth = 0.0;
     settings.coneSpread = g_CameraConeSpread;

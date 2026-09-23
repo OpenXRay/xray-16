@@ -2,6 +2,7 @@
 #include "ReSTIRGIPassSetup.h"
 #include "ShaderConstants.h"
 #include "RTEnvironmentSamplingPassSetup.h"
+#include "WorldCachePassSetup.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 #include "Layers/xrRender/ClusteredLightManager.h"
@@ -445,7 +446,8 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
     return LightingFallback::None;
 }
 
-ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, const DefaultOutputLayout& inputs,
+ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr,
+    WorldRadianceCache* worldCache, const DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, VirtualResourceHandle prevNormals, VirtualResourceHandle prevDepth,
     VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
     const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
@@ -619,6 +621,26 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.detailBumpIndex = scene->detailBumpIndex;
     rawCB.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
 
+    WorldCachePassInputs cacheInputs;
+    cacheInputs.accelMgr = accelMgr;
+    cacheInputs.cache = worldCache;
+    cacheInputs.lighting = &lighting;
+    cacheInputs.lightData = lightData;
+    cacheInputs.clusterGrid = clusterGrid;
+    cacheInputs.lightIndexList = lightIndexList;
+    cacheInputs.environmentDistribution = environmentSampling.distribution;
+    cacheInputs.sky0 = sky0Tex;
+    cacheInputs.sky1 = sky1Tex;
+    cacheInputs.sceneConstants = rawCB;
+    cacheInputs.cameraPos = cameraPos;
+    cacheInputs.frame = Device.dwFrame;
+    const auto worldCacheOutput = setupWorldCachePass(fg, device, cacheInputs);
+    if (!worldCache || !worldCache->IsAllocated() || !worldCacheOutput.constantBuffer)
+    {
+        lighting.Fail(LightingFallback::ResourcesUnavailable);
+        return { sourceColorIn };
+    }
+
     ResourceDesc rawDesc;
     rawDesc.type = ResourceDesc::Type::Texture2D;
     rawDesc.width = width;
@@ -719,6 +741,9 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             pb.sideEffects();
             data.device = device;
             data.scene = accelMgr->UseScene(builder, pb);
+            data.worldCache = worldCache->Use(builder, pb);
+            data.worldCacheConstants = worldCacheOutput.constants;
+            data.worldCacheConstantBuffer = worldCacheOutput.constantBuffer;
             data.state = &state;
             data.lighting = &lighting;
             data.cbData = rawCB;
@@ -805,6 +830,13 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(RTGIRawCB));
+            const auto worldCacheBuffers = WorldRadianceCache::Resolve(fg, data.worldCache);
+            if (!worldCacheBuffers.Valid() || !data.worldCacheConstantBuffer)
+            {
+                data.lighting->Fail(LightingFallback::ResourcesUnavailable);
+                return;
+            }
+            cmdList->writeBuffer(data.worldCacheConstantBuffer, &data.worldCacheConstants, sizeof(WorldRadianceCacheCB));
 
             nvrhi::IBuffer* profilePaths = nullptr;
             nvrhi::IBuffer* profileHits = nullptr;
@@ -909,6 +941,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 output("u_PathData", pathData);
                 output("u_SurfaceData", surfaceData);
                 output("u_Motion", outMotion);
+                BindWorldCacheResources(bsb, *reflection, worldCacheBuffers, data.worldCacheConstantBuffer);
                 if (data.profileEnabled)
                 {
                     constant("RTGIProfileParams", data.state->profile.cb);

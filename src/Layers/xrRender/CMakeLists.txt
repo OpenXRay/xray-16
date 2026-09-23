@@ -139,10 +139,14 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/MotionVectorPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h
     FrameGraphPasses/ReSTIRGIPassSetup.cpp
+    FrameGraphPasses/WorldCachePassSetup.h
+    FrameGraphPasses/WorldCachePassSetup.cpp
     FrameGraphPasses/ClusterLightPassSetup.cpp
 
     RayTracing/RTAccelStructManager.h
     RayTracing/RTAccelStructManager.cpp
+    RayTracing/WorldRadianceCache.h
+    RayTracing/WorldRadianceCache.cpp
 
     FGDetailManager.h
     FGDetailManager.cpp

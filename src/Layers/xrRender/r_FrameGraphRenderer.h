@@ -44,6 +44,7 @@ class xrXRC;
 namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
+    class WorldRadianceCache;
     class CRenderTarget;
     class light;
     namespace PS {
@@ -455,6 +456,7 @@ private:
     xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
 
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
+    xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
     fg::LightingFrameState m_lightingState;
 
     xr_unique_ptr<fg::FGUIRender> m_uiRender;
