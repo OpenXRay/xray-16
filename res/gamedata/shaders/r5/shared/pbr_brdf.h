@@ -87,6 +87,16 @@ float3 CalculateF0(float3 albedo, float metallic)
     return lerp(DIELECTRIC_F0, albedo, metallic);
 }
 
+float3 EnvBRDFApprox(float3 F0, float roughness, float NdotV)
+{
+    const float4 c0 = float4(-1.0f, -0.0275f, -0.572f, 0.022f);
+    const float4 c1 = float4(1.0f, 0.0425f, 1.04f, -0.04f);
+    float4 r = roughness * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28f * NdotV)) * r.x + r.y;
+    float2 AB = float2(-1.04f, 1.04f) * a004 + r.zw;
+    return F0 * AB.x + AB.y;
+}
+
 // Lambertian diffuse (simplest, uniform)
 float LambertianDiffuse()
 {
