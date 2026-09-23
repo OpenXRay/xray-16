@@ -3,13 +3,13 @@
 
 namespace xray::render::fg
 {
-void LightingFrameState::Begin(bool requestRTGI, bool requestPT, bool profileRTGI)
+void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
 {
-    requested = requestPT ? LightingMode::ReferencePT : (requestRTGI ? LightingMode::RTGI : LightingMode::Raster);
+    requested = request;
     effective = requested;
     scheduled = LightingMode::Raster;
     fallback = LightingFallback::None;
-    conflictingRequests = requestRTGI && requestPT;
+    rayTracing = LightingModeUsesRays(requested);
     opaqueScheduled = false;
     frameFailed = false;
     recoveryActive = false;
@@ -117,13 +117,30 @@ void LightingFrameState::ResetRecovery()
     m_latchedRTGIProfile = false;
 }
 
+LightingMode LightingModeFromSetting(int setting)
+{
+    switch (setting)
+    {
+    case 1: return LightingMode::RTGI;
+    case 2: return LightingMode::RadianceCascades;
+    case 3: return LightingMode::ReferencePT;
+    default: return LightingMode::Raster;
+    }
+}
+
+bool LightingModeUsesRays(LightingMode mode)
+{
+    return mode != LightingMode::Raster;
+}
+
 const char* LightingModeName(LightingMode mode)
 {
     switch (mode)
     {
-    case LightingMode::Raster:      return "Raster";
-    case LightingMode::RTGI:        return "RTGI";
-    case LightingMode::ReferencePT: return "Reference Path Tracer";
+    case LightingMode::Raster:           return "Raster";
+    case LightingMode::RTGI:             return "RTGI";
+    case LightingMode::RadianceCascades: return "Radiance Cascades";
+    case LightingMode::ReferencePT:      return "Reference Path Tracer";
     }
     return "Unknown";
 }

@@ -8,6 +8,7 @@ enum class LightingMode : u8
 {
     Raster,
     RTGI,
+    RadianceCascades,
     ReferencePT
 };
 
@@ -29,7 +30,7 @@ enum class LightingFallback : u8
 class LightingFrameState
 {
 public:
-    void Begin(bool requestRTGI, bool requestPT, bool profileRTGI);
+    void Begin(LightingMode request, bool profileRTGI);
     void ScheduleOpaqueLighting();
     void Fail(LightingFallback reason);
     void ResetRecovery();
@@ -39,7 +40,7 @@ public:
     LightingMode scheduled = LightingMode::Raster;
     LightingFallback fallback = LightingFallback::None;
     u32 recordedSamples = 0;
-    bool conflictingRequests = false;
+    bool rayTracing = false;
     bool opaqueScheduled = false;
     bool frameFailed = false;
     bool recoveryActive = false;
@@ -89,6 +90,8 @@ private:
     bool m_latchedRTGIProfile = false;
 };
 
+LightingMode LightingModeFromSetting(int setting);
+bool LightingModeUsesRays(LightingMode mode);
 const char* LightingModeName(LightingMode mode);
 const char* LightingFallbackName(LightingFallback reason);
 const char* RTGIImplementationName();
