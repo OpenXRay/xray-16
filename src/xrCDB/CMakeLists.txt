@@ -78,5 +78,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 if (XRAY_BUILD_CDB_TESTS)
+    target_sources(xrCDB PRIVATE tests/Instrumentation.cpp)
+    target_compile_definitions(xrCDB PRIVATE XRAY_CDB_TEST_HOOKS)
     add_subdirectory(tests)
 endif()

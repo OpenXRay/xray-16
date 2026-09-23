@@ -6,6 +6,10 @@
 #include "xrCDB.h"
 #include "xrCore/Threading/Lock.hpp"
 
+#ifdef XRAY_CDB_TEST_HOOKS
+#    include "tests/Instrumentation.h"
+#endif
+
 #ifndef XRAY_USE_JOLT_CDB
 namespace Opcode
 {
@@ -73,6 +77,9 @@ void MODEL::build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc, vo
                 ScopeLock lock{ pcs };
                 build_internal(V, Vcnt, T, Tcnt, bc, bcp);
                 status = S_READY;
+#ifdef XRAY_CDB_TEST_HOOKS
+                NotifyTestObserver(TestEvent::BuildReady, this);
+#endif
                 // Msg("* xrCDB: cform build completed, memory usage: %d K", memory() / 1024);
             });
 
@@ -109,6 +116,9 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
 
     // Release data pointers
     status = S_BUILD;
+#ifdef XRAY_CDB_TEST_HOOKS
+    NotifyTestObserver(TestEvent::BuildStarted, this);
+#endif
 
     tree = xr_new<ModelTree>();
 #ifdef XRAY_USE_JOLT_CDB

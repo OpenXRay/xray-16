@@ -43,6 +43,16 @@ Build and regression checks
   CTest runs the suite with both synchronous construction and -mt_cdb. The same suite can be built with
   XRAY_USE_JOLT_CDB=OFF to check the original backend.
 
+  Integration fixtures exercise CObjectSpace cache misses, hits, corruption and metadata invalidation, build
+  callbacks, material remapping, embedded CFORM data, dynamic-object ordering and filtering, and real ODE sphere
+  contacts against the collision mesh. Corrupt caches cover headers, counts, geometry, CRCs and invalid indices.
+  Gated construction checks prove that queries, serialization and destruction wait for the construction thread.
+  Rotated frusta use an independent clipping oracle and bound traversal work on a spatially separated mesh.
+  Test-only instrumentation is compiled out when XRAY_BUILD_CDB_TESTS is disabled.
+  The collision-tests workflow builds both backends on Linux and macOS and runs both construction modes.
+  During the coverage audit, disabling frustum bounds rejection, cached geometry CRC verification or build
+  callbacks caused the expanded suite to fail; the restored implementation passed on both backends.
+
   On macOS, CMAKE_PREFIX_PATH may need both the Homebrew prefix and its opt/openal-soft directory. Keep CMake
   and Ninja on PATH: the LuaJIT build configures nested host tools that also invoke the selected generator.
 

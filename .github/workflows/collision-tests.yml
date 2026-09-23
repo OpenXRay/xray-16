@@ -1,0 +1,39 @@
+name: Collision regression tests
+
+on:
+  push:
+    branches-ignore: ["dependabot/*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  collision:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        backend: ["ON", "OFF"]
+    steps:
+      - uses: actions/checkout@main
+        with:
+          submodules: recursive
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ninja-build libsdl2-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install cmake ninja sdl2 lzo jpeg-turbo openal-soft libogg theora libvorbis
+      - name: Configure Linux
+        if: runner.os == 'Linux'
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DXRAY_USE_JOLT_CDB=${{ matrix.backend }} -DXRAY_BUILD_CDB_TESTS=ON
+      - name: Configure macOS
+        if: runner.os == 'macOS'
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCMAKE_PREFIX_PATH="$(brew --prefix);$(brew --prefix openal-soft)" -DXRAY_USE_JOLT_CDB=${{ matrix.backend }} -DXRAY_BUILD_CDB_TESTS=ON
+      - name: Build engine and tests
+        run: cmake --build build --parallel 3
+      - name: Test
+        run: ctest --test-dir build --output-on-failure -R '^xrCDB\.'

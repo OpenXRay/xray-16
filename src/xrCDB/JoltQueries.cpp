@@ -4,6 +4,10 @@
 #include "ModelTree.h"
 #include "xrCDB.h"
 
+#ifdef XRAY_CDB_TEST_HOOKS
+#    include "tests/Instrumentation.h"
+#endif
+
 #pragma push_macro("FLT_MAX")
 #undef FLT_MAX
 #define FLT_MAX (std::numeric_limits<float>::max())
@@ -154,6 +158,9 @@ void COLLIDER::frustum_query(u32 frustum_mode, const MODEL* model, const CFrustu
     model->tree->Query(
         [&](const JPH::AABox& bounds, u32& mask)
         {
+#ifdef XRAY_CDB_TEST_HOOKS
+            NotifyTestObserver(TestEvent::FrustumBounds, model);
+#endif
             const float minimumMaximum[6] = {
                 bounds.mMin.GetX(),
                 bounds.mMin.GetY(),
@@ -169,6 +176,9 @@ void COLLIDER::frustum_query(u32 frustum_mode, const MODEL* model, const CFrustu
             auto result = TriangleResult(*model, id);
             if (frustum_mode & OPT_FULL_TEST)
             {
+#ifdef XRAY_CDB_TEST_HOOKS
+                NotifyTestObserver(TestEvent::FrustumTriangle, model);
+#endif
                 sPoly source(result.verts, 3);
                 sPoly destination;
                 if (!frustum.ClipPoly(source, destination))
