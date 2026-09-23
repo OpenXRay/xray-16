@@ -2,22 +2,8 @@
 #define RTGI_TRACE_COMMON_H
 
 #include "bindless_common.h"
+#include "rtgi_raw_params.h"
 #include "rt_integrator.h"
-
-cbuffer RTGIRawParams : register(b5)
-{
-    float4x4 g_InvViewProj;
-    float4 g_CameraPos;
-    float4 g_SunDir_Intensity;
-    float4 g_SunColor_SkyWeight;
-    float g_ScreenWidth, g_ScreenHeight, g_GIIntensity; uint g_FrameIndex;
-    uint g_IdentityStaticCount, g_TerrainBatchCount, g_SkinnedBatchStart, g_GrassBatchStart;
-    uint g_DetailAtlasIndex, g_DiffuseMode, g_RTLightCount, g_EmissiveCount;
-    uint g_MaxNullEvents, g_MaxBounces, g_SamplesPerPixel; float g_RayDistance;
-    float g_EnvironmentRotation, g_SunAngularRadius, g_CameraConeSpread; uint g_ClusterLights;
-    uint g_DetailMeshBatchStart, g_StaticDetailBatchStart, g_DetailPbrIndex, g_DetailBumpIndex;
-    uint g_LightRays, g_RawPad0, g_RawPad1, g_RawPad2;
-};
 
 Texture2D<float> t_Depth : register(t14);
 Texture2D<float4> t_Normal : register(t15);
@@ -144,7 +130,7 @@ RTSceneParams RTGIBuildRawScene(uint2 pixel)
 
 RTIntegratorSettings RTGIBuildRawSettings(RTGIPrimarySurface primary)
 {
-    RTIntegratorSettings settings;
+    RTIntegratorSettings settings = RTIntegratorDefaultSettings();
     settings.maxBounces = max(g_MaxBounces, 1u);
     settings.coneWidth = primary.coneWidth;
     settings.coneSpread = primary.coneSpread;

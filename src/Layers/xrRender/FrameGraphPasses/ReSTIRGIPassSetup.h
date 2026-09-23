@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/RayTracing/WorldRadianceCache.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "ClusterLightPassSetup.h"
 
@@ -256,6 +257,9 @@ public:
     framegraph::VirtualResourceHandle profilePaths;
     framegraph::VirtualResourceHandle profileHits;
     framegraph::VirtualResourceHandle profileSums;
+    WorldRadianceCacheResources worldCache;
+    WorldRadianceCacheCB worldCacheConstants = {};
+    nvrhi::IBuffer* worldCacheConstantBuffer = nullptr;
     bool profileEnabled = false;
     RTGIRawCB cbData;
     u32 width = 0;
@@ -353,7 +357,8 @@ public:
 };
 
 LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested);
-ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr, const framegraph::DefaultOutputLayout& inputs,
+ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
+    WorldRadianceCache* worldCache, const framegraph::DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, framegraph::VirtualResourceHandle prevNormals,
     framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
     const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,

@@ -214,6 +214,20 @@ void StatsOverlay::Render()
         if (lighting.reuseRequested && !lighting.reuseAvailable)
             ImGui::TextDisabled("Reuse requested but unavailable: no reservoir reuse runs");
         ImGui::Text("RTGI raw guides: %s", lighting.rawSignalsRecorded ? "recorded" : "not recorded");
+        if (!lighting.worldCacheRequested)
+            ImGui::Text("RTGI world cache: off (r_rt_world_cache 1)");
+        else if (lighting.worldCacheActive)
+            ImGui::Text("RTGI world cache: active | %u live / %u cells%s | terminate at bounce %u | %u updates/frame | cell %.2f m | lifetime %u frames | %.1f MB%s",
+                lighting.worldCacheLiveCells, lighting.worldCacheCapacity, lighting.worldCacheLiveCellsKnown ? "" : " (count pending)",
+                lighting.worldCacheBounce, lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
+                double(lighting.worldCacheBytes) / (1024.0 * 1024.0), lighting.worldCacheDebug ? " | DEBUG VIEW" : "");
+        else
+            ImGui::Text("RTGI world cache: requested, unavailable (%s) | full-length paths",
+                render::fg::LightingFallbackName(lighting.worldCacheFallback));
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("World-space hash-grid irradiance cache keyed by camera-relative cell, normal octant and LOD; cells store indirect-only diffuse radiance for unit albedo.\n"
+                "Paths terminate at the configured bounce with albedo x cache; cells are refreshed by one cosine ray each (soft target per frame) with a change-responsive EMA.\n"
+                "r_rt_world_cache_debug: 1 cached indirect at the primary hit, 2 cell hash colors (magenta = no cell), 3 sample count (red = no cell). View with r_rt_gi_reconstruct 0.");
         if (!lighting.reconstructionRequested)
             ImGui::Text("RTGI reconstruction: off (raw composite)");
         else if (lighting.reconstructionActive)

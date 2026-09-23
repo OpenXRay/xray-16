@@ -2,11 +2,15 @@
 #define RT_INTEGRATOR_H
 
 #include "rt_shading.h"
+#ifdef RT_WORLD_CACHE
+#include "rt_world_cache.h"
+#endif
 
 #define RT_INTEGRATOR_RR_DEPTH 3u
 #define RT_INTEGRATOR_RR_CAP 0.95
 #define RT_INTEGRATOR_STAGE_DONE 0u
 #define RT_INTEGRATOR_STAGE_READY 1u
+#define RT_INTEGRATOR_NO_CACHE 0xFFFFFFFFu
 
 struct RTIntegratorSettings
 {
@@ -16,7 +20,27 @@ struct RTIntegratorSettings
     bool trackDiagnostics;
     bool trackSegmentMetrics;
     bool allowHudFirstRay;
+    uint cacheBounce;
+    uint cacheLife;
+    bool indirectOnly;
+    bool pixelPrimary;
 };
+
+RTIntegratorSettings RTIntegratorDefaultSettings()
+{
+    RTIntegratorSettings settings;
+    settings.maxBounces = 1u;
+    settings.coneWidth = 0.0;
+    settings.coneSpread = 0.0;
+    settings.trackDiagnostics = false;
+    settings.trackSegmentMetrics = false;
+    settings.allowHudFirstRay = false;
+    settings.cacheBounce = RT_INTEGRATOR_NO_CACHE;
+    settings.cacheLife = 0u;
+    settings.indirectOnly = false;
+    settings.pixelPrimary = true;
+    return settings;
+}
 
 struct RTIntegratorResult
 {
@@ -201,7 +225,8 @@ bool RTIntegratorLightingStage(inout RTIntegratorState s, RTSceneParams scene, R
         return true;
 
     RTDirectTerms direct = RTDirectLightingTerms(scene, lighting.surface, lighting.position,
-        lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng, s.bounces == 0u);
+        lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng,
+        s.bounces == 0u && s.settings.pixelPrimary);
     RTIntegratorLightingApply(s, direct);
     return true;
 }
@@ -284,11 +309,42 @@ bool RTIntegratorAdvanceStage(inout RTIntegratorState s, RTSceneParams scene, RT
     return true;
 }
 
+#ifdef RT_WORLD_CACHE
+bool RTIntegratorCacheStage(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
+    float3 hitPosition, inout uint rng)
+{
+    if (s.bounces < s.settings.cacheBounce || !RTWorldCacheEnabled())
+        return false;
+    if ((hit.flags & MAT_FLAG_WATER) != 0u)
+        return false;
+    RTWorldCacheLookup lookup = RTWorldCacheQuery(hitPosition, geometry.geoNormal, s.settings.cacheLife,
+        true, true, rng);
+    float3 indirect = hit.surface.albedo * (1.0 - hit.surface.metallic) * lookup.radiance;
+    if (!all(isfinite(indirect)))
+        indirect = 0.0;
+    s.result.radiance += s.throughput * indirect;
+    if (s.bounces == 0u)
+    {
+        s.result.indirectDiffuse += s.throughput * indirect;
+    }
+    else
+    {
+        s.result.indirectDiffuse += s.diffuseThroughput * indirect;
+        s.result.indirectSpecular += s.specularThroughput * indirect;
+    }
+    return true;
+}
+#endif
+
 bool RTIntegratorContinue(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
     RTHitGeometry geometry, float3 hitPosition, float segmentDistance, inout uint rng)
 {
     if (!RTIntegratorLightingStage(s, scene, hit, geometry, hitPosition, rng))
         return false;
+#ifdef RT_WORLD_CACHE
+    if (RTIntegratorCacheStage(s, hit, geometry, hitPosition, rng))
+        return false;
+#endif
     return RTIntegratorAdvanceStage(s, scene, hit, geometry, hitPosition, segmentDistance, rng);
 }
 
@@ -302,7 +358,9 @@ uint RTIntegratorTraceStage(inout RTIntegratorState s, RTSceneParams scene, inou
     trace = RTTraceRay(scene, s.origin, s.direction, s.remainingReach, false, rng,
         s.coneWidth, s.coneSpread, s.previousPosition, s.previousPdf, s.previousDelta, rayMask);
     s.result.invalid = s.result.invalid || trace.exhausted;
-    RTIntegratorAddSource(s, trace.emissive);
+    bool skipSources = s.settings.indirectOnly && s.bounces == 0u;
+    if (!skipSources)
+        RTIntegratorAddSource(s, trace.emissive);
     s.throughput *= trace.transmittance;
     s.diffuseThroughput *= trace.transmittance;
     s.specularThroughput *= trace.transmittance;
@@ -317,7 +375,8 @@ uint RTIntegratorTraceStage(inout RTIntegratorState s, RTSceneParams scene, inou
     }
     if (!trace.hit)
     {
-        RTIntegratorAddSource(s, RTMissRadiance(scene, s.direction, s.previousPdf, s.previousDelta));
+        if (!skipSources)
+            RTIntegratorAddSource(s, RTMissRadiance(scene, s.direction, s.previousPdf, s.previousDelta));
         return RT_INTEGRATOR_STAGE_DONE;
     }
 
@@ -343,7 +402,7 @@ uint RTIntegratorMaterialStage(inout RTIntegratorState s, RTSceneParams scene, R
         s.firstSurfaceRecorded = true;
     }
 
-    if (any(hit.surface.emissive > 0.0))
+    if (any(hit.surface.emissive > 0.0) && !(s.settings.indirectOnly && s.bounces == 0u))
     {
         float emissionWeight = RTEmissionWeightFromArea(scene, trace.batchIdx, geometry.areaNormal,
             s.previousPosition, hitPosition, s.previousPdf, s.previousDelta);

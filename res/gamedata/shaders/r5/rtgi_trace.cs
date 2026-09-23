@@ -1,3 +1,4 @@
+#define RT_WORLD_CACHE 1
 #define BINDLESS_NO_IMPLICIT_GRAD
 #include "bindless_common.h"
 #include "rtgi_trace_common.h"
@@ -16,8 +17,31 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
+    uint debugMode = RTWorldCacheDebugMode();
+    if (debugMode != 0u && RTWorldCacheEnabled())
+    {
+        RTGIAccumulation debug = (RTGIAccumulation)0;
+        debug.validCount = RTGISampleCount();
+        if (primary.depth < 0.9)
+        {
+            uint rng = RTGISampleRng(pixel, 0u);
+            RTWorldCacheLookup lookup = RTWorldCacheQuery(primary.worldPos, primary.surface.N, g_WorldCacheLifetime,
+                true, false, rng);
+            float3 diffuseAlbedo = primary.surface.albedo * (1.0 - primary.surface.metallic);
+            debug.diffuseSum = RTWorldCacheDebugColor(lookup, debugMode, diffuseAlbedo) * float(RTGISampleCount());
+        }
+        RTGIWriteRawOutputs(pixel, primary, debug);
+        return;
+    }
+
     RTSceneParams scene = RTGIBuildRawScene(pixel);
     RTIntegratorSettings settings = RTGIBuildRawSettings(primary);
+    if (RTWorldCacheEnabled())
+    {
+        settings.cacheBounce = g_WorldCacheBounce;
+        settings.cacheLife = g_WorldCacheLifetime;
+        settings.maxBounces = max(settings.maxBounces, settings.cacheBounce + 1u);
+    }
 
     uint samples = RTGISampleCount();
     RTGIAccumulation accumulation = (RTGIAccumulation)0;

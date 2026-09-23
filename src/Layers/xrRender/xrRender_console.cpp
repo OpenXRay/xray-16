@@ -1035,6 +1035,15 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_rt_gi_ray_distance", &ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
     CMD4(CCC_Float, "r_rt_scene_radius", &ps_r_rt_scene_radius, 1.0f, 10000.0f);
     CMD4(CCC_Float, "r_rt_grass_radius", &ps_r_rt_grass_radius, 0.0f, 256.0f);
+    CMD4(CCC_Integer, "r_rt_world_cache", &ps_r_rt_world_cache, 0, 1);
+    CMD4(CCC_Integer, "r_rt_world_cache_bounce", &ps_r_rt_world_cache_bounce, 0, 8);
+    CMD4(CCC_Integer, "r_rt_world_cache_debug", &ps_r_rt_world_cache_debug, 0, 3);
+    CMD4(CCC_Integer, "r_rt_world_cache_size", &ps_r_rt_world_cache_size, 14, 22);
+    CMD4(CCC_Integer, "r_rt_world_cache_lifetime", &ps_r_rt_world_cache_lifetime, 2, 300);
+    CMD4(CCC_Integer, "r_rt_world_cache_updates", &ps_r_rt_world_cache_updates, 1024, 1048576);
+    CMD4(CCC_Integer, "r_rt_world_cache_history", &ps_r_rt_world_cache_history, 1, 256);
+    CMD4(CCC_Float, "r_rt_world_cache_cell", &ps_r_rt_world_cache_cell, 0.05f, 4.0f);
+    CMD4(CCC_Float, "r_rt_world_cache_lod", &ps_r_rt_world_cache_lod, 1.0f, 64.0f);
 
     CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);
     CMD4(CCC_Integer, "r_cluster_merge", &ps_r_cluster_merge, 0, 1);

@@ -42,6 +42,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/RayTracing/WorldRadianceCache.h"
 #include "xrEngine/IRenderBackend.h"
 
 namespace xray::render
@@ -391,6 +392,8 @@ void FrameGraphRenderer::level_Unload()
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr->Initialize(m_device);
     }
+    if (m_worldCache)
+        m_worldCache->Invalidate();
     if (m_detailManager)
         m_detailManager->Unload();
     m_hudBatches.clear();

@@ -41,6 +41,18 @@ void LightingFrameState::Begin(bool requestRTGI, bool requestPT, bool profileRTG
     reconstructionFilterPasses = 0;
     sceneRevision = 0;
     poseRevision = 0;
+    worldCacheRequested = false;
+    worldCacheActive = false;
+    worldCacheLiveCellsKnown = false;
+    worldCacheFallback = LightingFallback::None;
+    worldCacheBounce = 0;
+    worldCacheUpdates = 0;
+    worldCacheDebug = 0;
+    worldCacheLifetime = 0;
+    worldCacheCapacity = 0;
+    worldCacheLiveCells = 0;
+    worldCacheCellSize = 0.0f;
+    worldCacheBytes = 0;
 
     if (m_latchedReason == LightingFallback::None)
         return;

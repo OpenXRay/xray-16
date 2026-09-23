@@ -45,6 +45,7 @@ class xrXRC;
 namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
+    class WorldRadianceCache;
     class CRenderTarget;
     class light;
     namespace PS {
@@ -506,6 +507,7 @@ private:
 
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
+    xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
     fg::LightingFrameState m_lightingState;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
