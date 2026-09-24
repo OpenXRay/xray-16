@@ -3,7 +3,8 @@
 WIP Emscripten build with wasm64, pthreads, WebGL2, load game files in the Origin
 Private File System, sound through Emscripten's OpenAL. Chrome only for now.
 
-Call of Pripyat and Call of Chernobyl are playable, have not tested all the way through, expect crashes. 
+Call of Pripyat and Call of Chernobyl are playable, have not tested all the
+way through, expect crashes. 
 
 ## Install Dependencies
 
