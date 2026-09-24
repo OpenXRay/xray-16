@@ -219,7 +219,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
         float motionPixels = length(motion * float2(g_ScreenWidth, g_ScreenHeight));
         float glossy = 1.0 - saturate(roughness * 2.0);
-        float specularMax = max(2.0, maxHistory * (1.0 - glossy * saturate(motionPixels)));
+        float specularMax = min(max(2.0, maxHistory * (1.0 - glossy * saturate(motionPixels))), maxHistory);
         diffuseLength = min(history.diffuseLength * invWeight + 1.0, maxHistory);
         specularLength = min(history.specularLength * invWeight + 1.0, specularMax);
 

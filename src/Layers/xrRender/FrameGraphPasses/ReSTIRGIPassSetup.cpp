@@ -640,6 +640,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         lighting.Fail(LightingFallback::ResourcesUnavailable);
         return { sourceColorIn };
     }
+    const u64 worldCacheSignature = worldCacheOutput.scheduled ?
+        (u64(worldCache->GetEpoch()) << 8) | (worldCacheOutput.constants.flags & 0xFFu) : 0;
+    const bool worldCacheHistoryCompatible = state.worldCacheSignature == worldCacheSignature;
+    state.worldCacheSignature = worldCacheSignature;
 
     ResourceDesc rawDesc;
     rawDesc.type = ResourceDesc::Type::Texture2D;
@@ -741,7 +745,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             pb.sideEffects();
             data.device = device;
             data.scene = accelMgr->UseScene(builder, pb);
-            data.worldCache = worldCache->Use(builder, pb);
+            data.worldCache = worldCache->Use(builder, pb, WorldRadianceCacheAccess::Query);
+            data.worldCacheOwner = worldCache;
             data.worldCacheConstants = worldCacheOutput.constants;
             data.worldCacheConstantBuffer = worldCacheOutput.constantBuffer;
             data.state = &state;
@@ -831,12 +836,18 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             cmdList->writeBuffer(data.state->cb, &data.cbData, sizeof(RTGIRawCB));
             const auto worldCacheBuffers = WorldRadianceCache::Resolve(fg, data.worldCache);
-            if (!worldCacheBuffers.Valid() || !data.worldCacheConstantBuffer)
+            if (!worldCacheBuffers.Valid() || !data.worldCacheConstantBuffer || !data.worldCacheOwner)
             {
                 data.lighting->Fail(LightingFallback::ResourcesUnavailable);
                 return;
             }
-            cmdList->writeBuffer(data.worldCacheConstantBuffer, &data.worldCacheConstants, sizeof(WorldRadianceCacheCB));
+            WorldRadianceCacheCB worldCacheConstants = data.worldCacheConstants;
+            if (!data.worldCacheOwner->IsContentReady())
+                worldCacheConstants.flags &= ~WorldRadianceCache::kFlagEnabled;
+            else if ((worldCacheConstants.flags & WorldRadianceCache::kFlagEnabled) != 0)
+                data.worldCacheOwner->TrackRecordedWork();
+            const bool worldCacheActive = (worldCacheConstants.flags & WorldRadianceCache::kFlagEnabled) != 0;
+            cmdList->writeBuffer(data.worldCacheConstantBuffer, &worldCacheConstants, sizeof(WorldRadianceCacheCB));
 
             nvrhi::IBuffer* profilePaths = nullptr;
             nvrhi::IBuffer* profileHits = nullptr;
@@ -1046,6 +1057,9 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
             }
             data.state->initialRecorded = true;
+            data.lighting->worldCacheRecorded = worldCacheActive && !data.profileEnabled;
+            if (worldCacheActive)
+                data.worldCacheOwner->ScheduleStatsReadback(cmdList, worldCacheBuffers.stats, !data.profileEnabled);
         });
 
     auto& recon = state.reconstruction;
@@ -1109,7 +1123,8 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
     if (reconstructionReady)
     {
-        const bool historyValid = state.historyValid && hasPrevFrameData && validInput(prevDepth) && validInput(prevNormals);
+        const bool historyValid = state.historyValid && worldCacheHistoryCompatible && hasPrevFrameData &&
+            validInput(prevDepth) && validInput(prevNormals);
         RTGITemporalCB temporalCB = {};
         temporalCB.invViewProj = invViewProj;
         temporalCB.prevInvViewProj = Fidentity;
@@ -1637,6 +1652,7 @@ void ShutdownReSTIRGI(ReSTIRGIPassState& state)
     state.initialized = false;
     state.readiness = LightingFallback::ResourcesUnavailable;
     state.historyValid = false;
+    state.worldCacheSignature = 0;
     state.initialRecorded = false;
     state.texWidth = 0;
     state.texHeight = 0;

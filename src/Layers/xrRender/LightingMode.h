@@ -72,15 +72,23 @@ public:
     u64 sceneRevision = 0;
     u64 poseRevision = 0;
     bool worldCacheRequested = false;
-    bool worldCacheActive = false;
+    bool worldCacheScheduled = false;
+    bool worldCacheUpdateRecorded = false;
+    bool worldCacheRecorded = false;
     bool worldCacheLiveCellsKnown = false;
+    bool worldCacheEventsKnown = false;
     LightingFallback worldCacheFallback = LightingFallback::None;
     u32 worldCacheBounce = 0;
+    u32 worldCacheMaxBounces = 0;
     u32 worldCacheUpdates = 0;
     u32 worldCacheDebug = 0;
     u32 worldCacheLifetime = 0;
     u32 worldCacheCapacity = 0;
     u32 worldCacheLiveCells = 0;
+    u32 worldCacheSubstituted = 0;
+    u32 worldCacheUnsampled = 0;
+    u32 worldCacheAbsent = 0;
+    u32 worldCacheBypassed = 0;
     float worldCacheCellSize = 0.0f;
     u64 worldCacheBytes = 0;
 

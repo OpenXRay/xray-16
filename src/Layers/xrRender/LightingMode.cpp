@@ -42,15 +42,23 @@ void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
     sceneRevision = 0;
     poseRevision = 0;
     worldCacheRequested = false;
-    worldCacheActive = false;
+    worldCacheScheduled = false;
+    worldCacheUpdateRecorded = false;
+    worldCacheRecorded = false;
     worldCacheLiveCellsKnown = false;
+    worldCacheEventsKnown = false;
     worldCacheFallback = LightingFallback::None;
     worldCacheBounce = 0;
+    worldCacheMaxBounces = 0;
     worldCacheUpdates = 0;
     worldCacheDebug = 0;
     worldCacheLifetime = 0;
     worldCacheCapacity = 0;
     worldCacheLiveCells = 0;
+    worldCacheSubstituted = 0;
+    worldCacheUnsampled = 0;
+    worldCacheAbsent = 0;
+    worldCacheBypassed = 0;
     worldCacheCellSize = 0.0f;
     worldCacheBytes = 0;
 
@@ -92,6 +100,8 @@ void LightingFrameState::Fail(LightingFallback reason)
         reconstructionActive = false;
         reconstructionSpatialActive = false;
         rayStaticDetailInstances = 0;
+        worldCacheUpdateRecorded = false;
+        worldCacheRecorded = false;
         m_latchedMode = requested;
         m_latchedReason = reason;
         m_latchedRTGIProfile = rtgiProfile;
@@ -108,6 +118,8 @@ void LightingFrameState::Fail(LightingFallback reason)
     reconstructionActive = false;
     reconstructionSpatialActive = false;
     rayStaticDetailInstances = 0;
+    worldCacheUpdateRecorded = false;
+    worldCacheRecorded = false;
 }
 
 void LightingFrameState::ResetRecovery()

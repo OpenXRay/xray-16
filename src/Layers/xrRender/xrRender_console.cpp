@@ -1036,7 +1036,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_rt_grass_radius", &ps_r_rt_grass_radius, 0.0f, 256.0f);
     CMD4(CCC_Integer, "r_rt_world_cache", &ps_r_rt_world_cache, 0, 1);
     CMD4(CCC_Integer, "r_rt_world_cache_bounce", &ps_r_rt_world_cache_bounce, 0, 8);
-    CMD4(CCC_Integer, "r_rt_world_cache_debug", &ps_r_rt_world_cache_debug, 0, 3);
+    CMD4(CCC_Integer, "r_rt_world_cache_debug", &ps_r_rt_world_cache_debug, 0, 4);
     CMD4(CCC_Integer, "r_rt_world_cache_size", &ps_r_rt_world_cache_size, 14, 22);
     CMD4(CCC_Integer, "r_rt_world_cache_lifetime", &ps_r_rt_world_cache_lifetime, 2, 300);
     CMD4(CCC_Integer, "r_rt_world_cache_updates", &ps_r_rt_world_cache_updates, 1024, 1048576);

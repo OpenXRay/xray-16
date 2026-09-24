@@ -1,4 +1,5 @@
 #define RT_WORLD_CACHE 1
+#define RT_WORLD_CACHE_UPDATE 1
 #define BINDLESS_NO_IMPLICIT_GRAD
 #include "bindless_common.h"
 #include "rtgi_raw_params.h"
@@ -7,6 +8,11 @@
 #define RT_WORLD_CACHE_MIN_HISTORY 8.0
 #define RT_WORLD_CACHE_FAST_ALPHA 0.25
 #define RT_WORLD_CACHE_CHANGE_SIGMA 2.0
+#define RT_WORLD_CACHE_CHANGE_FLOOR 0.02
+#define RT_WORLD_CACHE_CHANGE_INPUT_SIGMA 3.0
+#define RT_WORLD_CACHE_CLAMP_RATIO 4.0
+#define RT_WORLD_CACHE_CLAMP_SIGMA 2.0
+#define RT_WORLD_CACHE_CLAMP_FLOOR 0.5
 
 RTSceneParams RTWorldCacheBuildScene()
 {
@@ -43,11 +49,11 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (life == 0u || life >= g_WorldCacheLifetime)
         return;
 
-    float4 old = u_WorldCacheRadiance[cell];
+    float4 old = t_WorldCacheRadianceInput[cell];
     if (!all(isfinite(old)))
         old = 0.0;
     uint rng = pcg_hash(cell * 7919u + g_WorldCacheFrame * 48611u + 1u);
-    uint liveCells = max(u_WorldCacheStats[0], 1u);
+    uint liveCells = max(u_WorldCacheStats[RT_WORLD_CACHE_STAT_LIVE], 1u);
     float priority = (life + 1u >= g_WorldCacheLifetime ? 1.0 : 0.5) * (old.a < RT_WORLD_CACHE_MIN_HISTORY ? 2.0 : 1.0);
     float acceptance = float(g_WorldCacheUpdateTarget) / float(liveCells) * priority;
     if (acceptance < 1.0 && rand_float(rng) >= acceptance)
@@ -67,7 +73,9 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     settings.coneSpread = 1.0;
     settings.cacheBounce = 0u;
     settings.cacheLife = life;
+    settings.cacheInsert = false;
     settings.indirectOnly = true;
+    settings.roughnessFloor = RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX;
     settings.pixelPrimary = false;
 
     float3 direction = CosineWeightedHemisphere(RTWorldCacheStratifiedSample(cell, g_WorldCacheFrame), normal);
@@ -80,15 +88,27 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     float maxSamples = max(float(g_WorldCacheMaxSamples), 1.0);
     float slowLuminance = Luminance(old.rgb);
-    float fastLuminance = old.a > 0.0 ? lerp(positionFast.w, sampleLuminance, RT_WORLD_CACHE_FAST_ALPHA) : sampleLuminance;
-    float count = min(old.a + 1.0, maxSamples);
-    if (old.a >= RT_WORLD_CACHE_MIN_HISTORY)
+    float sigma = sqrt(max(normalMoment.w - slowLuminance * slowLuminance, 0.0));
+    if (old.a >= 1.0)
     {
-        float variance = max(normalMoment.w - slowLuminance * slowLuminance, 0.0);
-        float threshold = RT_WORLD_CACHE_CHANGE_SIGMA * sqrt(variance) + 1e-4;
-        if (abs(fastLuminance - slowLuminance) > threshold)
-            count = RT_WORLD_CACHE_MIN_HISTORY;
+        float ceiling = max(RT_WORLD_CACHE_CLAMP_RATIO * (slowLuminance + RT_WORLD_CACHE_CLAMP_SIGMA * sigma),
+            RT_WORLD_CACHE_CLAMP_FLOOR);
+        if (sampleLuminance > ceiling)
+        {
+            sample *= ceiling / sampleLuminance;
+            sampleLuminance = ceiling;
+        }
     }
+
+    bool established = old.a >= RT_WORLD_CACHE_MIN_HISTORY;
+    float changeBand = RT_WORLD_CACHE_CHANGE_INPUT_SIGMA * sigma + 2.0 * RT_WORLD_CACHE_CHANGE_FLOOR;
+    float changeLuminance = established
+        ? clamp(sampleLuminance, slowLuminance - changeBand, slowLuminance + changeBand) : sampleLuminance;
+    float fastLuminance = old.a > 0.0 ? lerp(positionFast.w, changeLuminance, RT_WORLD_CACHE_FAST_ALPHA) : sampleLuminance;
+    float count = min(old.a + 1.0, maxSamples);
+    if (established &&
+        abs(fastLuminance - slowLuminance) > RT_WORLD_CACHE_CHANGE_SIGMA * sigma + RT_WORLD_CACHE_CHANGE_FLOOR)
+        count = RT_WORLD_CACHE_MIN_HISTORY;
     float blend = 1.0 / count;
     float3 blended = lerp(old.rgb, sample, blend);
     float moment = lerp(normalMoment.w, sampleLuminance * sampleLuminance, blend);

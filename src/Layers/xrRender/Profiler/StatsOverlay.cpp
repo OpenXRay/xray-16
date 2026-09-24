@@ -221,18 +221,35 @@ void StatsOverlay::Render()
         ImGui::Text("RTGI raw guides: %s", lighting.rawSignalsRecorded ? "recorded" : "not recorded");
         if (!lighting.worldCacheRequested)
             ImGui::Text("RTGI world cache: off (r_rt_world_cache 1)");
-        else if (lighting.worldCacheActive)
-            ImGui::Text("RTGI world cache: active | %u live / %u cells%s | terminate at bounce %u | %u updates/frame | cell %.2f m | lifetime %u frames | %.1f MB%s",
+        else if (lighting.worldCacheScheduled)
+        {
+            ImGui::Text("RTGI world cache: scheduled | update %s | trace %s | %u live / %u cells%s | substitute at bounces %u-%u, max bounces %u | %u updates/frame | cell %.2f m | lifetime %u frames | %.1f MB%s",
+                lighting.worldCacheUpdateRecorded ? "recorded" : "not recorded",
+                lighting.worldCacheRecorded ? "consumed" : (lighting.rtgiProfile ? "not consumed (profile kernels are uncached)" : "not consumed"),
                 lighting.worldCacheLiveCells, lighting.worldCacheCapacity, lighting.worldCacheLiveCellsKnown ? "" : " (count pending)",
-                lighting.worldCacheBounce, lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
+                lighting.worldCacheBounce, lighting.worldCacheMaxBounces - 1, lighting.worldCacheMaxBounces,
+                lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
                 double(lighting.worldCacheBytes) / (1024.0 * 1024.0), lighting.worldCacheDebug ? " | DEBUG VIEW" : "");
+            if (lighting.worldCacheEventsKnown)
+                ImGui::Text("RTGI world cache vertices (latest readback): %u substituted | %u unsampled | %u absent | %u bypassed",
+                    lighting.worldCacheSubstituted, lighting.worldCacheUnsampled, lighting.worldCacheAbsent, lighting.worldCacheBypassed);
+            else
+                ImGui::TextDisabled("RTGI world cache vertices: no consumed readback yet");
+        }
         else
-            ImGui::Text("RTGI world cache: requested, unavailable (%s) | full-length paths",
+            ImGui::Text("RTGI world cache: requested, unavailable (%s) | uncached paths",
                 render::fg::LightingFallbackName(lighting.worldCacheFallback));
         if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("World-space hash-grid irradiance cache keyed by camera-relative cell, normal octant and LOD; cells store indirect-only diffuse radiance for unit albedo.\n"
-                "Paths terminate at the configured bounce with albedo x cache; cells are refreshed by one cosine ray each (soft target per frame) with a change-responsive EMA.\n"
-                "r_rt_world_cache_debug: 1 cached indirect at the primary hit, 2 cell hash colors (magenta = no cell), 3 sample count (red = no cell). View with r_rt_gi_reconstruct 0.");
+            ImGui::SetTooltip("World-space hash-grid irradiance cache keyed by cell, normal octant, LOD and content epoch; cells store indirect-only radiance for unit albedo.\n"
+                "At a vertex in the substitution window reached through a wide BSDF lobe (pdf <= 1/pi, not delta), a rough non-water surface with an entry of at least 4 samples\n"
+                "takes albedo x cache plus the split-sum rough specular response for its indirect light;\n"
+                "direct light keeps MIS: next-event estimation plus one BSDF-sampled segment that only collects emitters and sky, after which the path ends.\n"
+                "Vertices behind glossy or delta bounces, glossy or water surfaces, and absent or unsampled entries continue tracing under the same max bounces (counted as bypassed, absent or unsampled).\n"
+                "Cells are refreshed from a stable radiance snapshot by one cosine ray each (soft target per frame); updates only read published entries and never allocate.\n"
+                "Update samples are clamped to 4 x (mean + 2 sigma) with a 0.5 luminance floor, and change detection ignores single outliers.\n"
+                "Indirect light transmitted through foliage is not represented by the cache; direct transmission is still sampled at the substituted vertex.\n"
+                "r_rt_world_cache_debug: 1 cached indirect at the primary hit, 2 cell hash colors (magenta = no cell), 3 sample count (red = no cell),\n"
+                "4 lookup state (green sampled, yellow unsampled, red absent, blue glossy or water). View with r_rt_gi_reconstruct 0.");
         if (!lighting.reconstructionRequested)
             ImGui::Text("RTGI reconstruction: off (raw composite)");
         else if (lighting.reconstructionActive)

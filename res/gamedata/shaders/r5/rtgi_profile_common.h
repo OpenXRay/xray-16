@@ -180,6 +180,7 @@ RTIntegratorState RTGIProfileLoadState(RWByteAddressBuffer buffer, uint base, ou
     out bool active, out bool validPrimary)
 {
     RTIntegratorState state;
+    state.settings = RTIntegratorDefaultSettings();
     uint4 settings = buffer.Load4(base + RTGI_PROFILE_OFFSET_SETTINGS);
     state.settings.maxBounces = settings.x;
     state.settings.coneWidth = asfloat(settings.y);
