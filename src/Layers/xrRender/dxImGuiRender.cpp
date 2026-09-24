@@ -53,6 +53,11 @@ void dxImGuiRender::Frame()
 
 void dxImGuiRender::Render(ImDrawData* data)
 {
+#ifdef XR_PLATFORM_WEB
+    if (data->CmdListsCount == 0)
+        return;
+#endif
+
 #if defined(USE_DX11)
     ImGui_ImplDX11_RenderDrawData(data);
 #elif defined(USE_OGL)

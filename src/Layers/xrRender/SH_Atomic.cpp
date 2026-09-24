@@ -193,6 +193,9 @@ SDeclaration::~SDeclaration()
         _RELEASE(iLayout->second);
     }
 #elif defined(USE_OGL)
+#   ifdef XR_PLATFORM_WEB
+    ForgetVertexArrays(this);
+#   endif
     glDeleteVertexArrays(1, &dcl);
 #else
 #   error No graphics API selected or enabled!

@@ -2,6 +2,37 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+#ifdef XR_PLATFORM_WEB
+class UniformShadow
+{
+public:
+    bool Update(GLuint program, GLuint location, const void* data, u32 size)
+    {
+        if (program >= programs.size())
+            programs.resize(program + 1);
+        auto& slots = programs[program];
+        if (location >= slots.size())
+            slots.resize(location + 1);
+        Slot& slot = slots[location];
+        if (slot.size == size && memcmp(slot.data, data, size) == 0)
+            return false;
+        slot.size = size;
+        memcpy(slot.data, data, size);
+        return true;
+    }
+
+private:
+    struct Slot
+    {
+        u32 size{};
+        u8 data[sizeof(Fmatrix)];
+    };
+    xr_vector<xr_vector<Slot>> programs;
+};
+
+inline UniformShadow g_uniformShadow;
+#endif
+
 class ECORE_API R_constants
 {
 private:
@@ -9,6 +40,10 @@ private:
     ICF void set(R_constant* C, R_constant_load& L, const Fmatrix& A)
     {
         VERIFY(RC_float == C->type);
+#ifdef XR_PLATFORM_WEB
+        if (!g_uniformShadow.Update(L.program, L.location, &A, sizeof(A)))
+            return;
+#endif
         Fvector4 it[4];
         switch (L.cls)
         {
@@ -54,6 +89,10 @@ private:
     ICF void set(R_constant* C, R_constant_load& L, const Fvector4& A)
     {
         VERIFY(RC_float == C->type);
+#ifdef XR_PLATFORM_WEB
+        if (!g_uniformShadow.Update(L.program, L.location, &A, sizeof(A)))
+            return;
+#endif
         switch (L.cls)
         {
         case RC_1x2:
@@ -89,6 +128,11 @@ private:
     ICF void set(R_constant* C, R_constant_load& L, float x, float y, float z, float w)
     {
         VERIFY(RC_float == C->type);
+#ifdef XR_PLATFORM_WEB
+        const Fvector4 value{ x, y, z, w };
+        if (!g_uniformShadow.Update(L.program, L.location, &value, sizeof(value)))
+            return;
+#endif
         switch (L.cls)
         {
         case RC_1x2:
@@ -126,6 +170,10 @@ private:
     {
         VERIFY(RC_float == C->type);
         VERIFY(RC_1x1 == L.cls);
+#ifdef XR_PLATFORM_WEB
+        if (!g_uniformShadow.Update(L.program, L.location, &A, sizeof(A)))
+            return;
+#endif
         if (GLAD_GL_ARB_separate_shader_objects)
             CHK_GL(glProgramUniform1f(L.program, L.location, A));
         else
@@ -136,6 +184,10 @@ private:
     {
         VERIFY(RC_int == C->type);
         VERIFY(RC_1x1 == L.cls);
+#ifdef XR_PLATFORM_WEB
+        if (!g_uniformShadow.Update(L.program, L.location, &A, sizeof(A)))
+            return;
+#endif
         if (GLAD_GL_ARB_separate_shader_objects)
             CHK_GL(glProgramUniform1i(L.program, L.location, A));
         else
@@ -218,6 +270,22 @@ public:
         L.location += e;
         set(C, L, x, y, z, w);
     }
+
+#ifdef XR_PLATFORM_WEB
+    ICF void seta(R_constant* C, u32 e, const Fvector4* values, u32 count)
+    {
+        VERIFY(RC_float == C->type);
+        R_constant_load L;
+        if (C->destination & RC_dest_pixel) { L = C->ps; }
+        if (C->destination & RC_dest_vertex) { L = C->vs; }
+        if (C->destination & RC_dest_geometry) { L = C->gs; }
+        if (C->destination & RC_dest_all) { L = C->pp; }
+        L.location += e;
+        for (u32 i = 0; i < count; ++i)
+            g_uniformShadow.Update(L.program, L.location + i, &values[i], sizeof(Fvector4));
+        CHK_GL(glUniform4fv(L.location, count, reinterpret_cast<const float*>(values)));
+    }
+#endif
 
     // TODO: OGL: Implement constant caching through UBOs
     ICF void flush() { }

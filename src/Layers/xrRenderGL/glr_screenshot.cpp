@@ -33,7 +33,19 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
         xr_vector<u8> pixels;
         pixels.resize(Device.dwWidth * Device.dwHeight * 3);
 
+#ifdef XR_PLATFORM_WEB
+        xr_vector<u8> rgba;
+        rgba.resize(Device.dwWidth * Device.dwHeight * 4);
+        glReadPixels(0, 0, Device.dwWidth, Device.dwHeight, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
+        for (size_t i = 0, count = size_t(Device.dwWidth) * Device.dwHeight; i < count; ++i)
+        {
+            pixels[i * 3 + 0] = rgba[i * 4 + 0];
+            pixels[i * 3 + 1] = rgba[i * 4 + 1];
+            pixels[i * 3 + 2] = rgba[i * 4 + 2];
+        }
+#else
         glReadPixels(0, 0, Device.dwWidth, Device.dwHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+#endif
 
         Image img{ Device.dwWidth, Device.dwHeight, pixels.data(), ImageDataFormat::RGB8 };
         if (!img.SaveJPEG(*fs, 100, true))

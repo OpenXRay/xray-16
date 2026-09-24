@@ -34,7 +34,7 @@ f_deffer 	_main	( p_flat I 		)
 	float4	d_B	= tex2D		(s_dt_b, I.tcdbump)*mask_t.b;
 	float4	d_A	= tex2D		(s_dt_a, I.tcdbump)*mask_t.a;
 	float4	dt	= d_R+d_G+d_B+d_A;
-		D.rgb	= 2*D.rgb*dt.rgb	 ;
+		D.rgb	= 2.0*D.rgb*dt.rgb	 ;
 
   # ifdef USE_4_BUMP
 
@@ -60,7 +60,7 @@ f_deffer 	_main	( p_flat I 		)
   # endif
 
  # else
-	D.rgb	= 2*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
+	D.rgb	= 2.0*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
  # endif
 # else
 	float3	N 	= I.N.xyz	;

@@ -95,7 +95,7 @@ float3 fetch_eye_pos(float2 uv)
 		//float3	tap_pos	= s_position.Sample(smp_nofilter,tap);
 		float3	tap_pos	= gbd.P;
 #else // SSAO_OPT_DATA
-    float z = textureLod( s_half_depth, uv, 0 ).z;
+    float z = textureLod( s_half_depth, uv, 0.0 ).z;
     return uv_to_eye(uv, z);
 #endif // SSAO_OPT_DATA
 }
@@ -346,7 +346,7 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
     float3 tc1	= mul( m_v2w, float4(P,1) );
     tc1 *= ssao_noise_tile_factor;
     tc1.xz += tc1.y; 
-    float3 rand_Dir = textureLod(jitter4, tc1.xz, 0).xyz; 
+    float3 rand_Dir = textureLod(jitter4, tc1.xz, 0.0 ).xyz; 
 #endif
 
 

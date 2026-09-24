@@ -9,6 +9,7 @@ target_sources(xrRender_GL PRIVATE
     gl_rendertarget_u_set_rt.cpp
     r2_R_sun.cpp
     r2_test_hw.cpp
+    rgl_essl_web.h
     rgl_shaders.cpp
     stdafx.cpp
     stdafx.h

@@ -19,7 +19,7 @@ float3	waterrefl	(out float amount, float3 P, float3 N)	{
 	float3 	v2point	= normalize	(P-eye_position);
 	float3	vreflect= reflect	(v2point, N);
 	float 	fresnel	= (0.5 + 0.5*dot(vreflect,v2point));
-			amount	= 1 - fresnel*fresnel;			// 0=full env, 1=no env
+			amount	= 1.0 - fresnel*fresnel;			// 0=full env, 1=no env
 	return	vreflect;
 }
 

@@ -56,7 +56,7 @@ float4 _main( v2p I )
 		env	*= env*2.0;
 
 	float	fresnel	= saturate (dot(vreflect,v2point));
-	float	power	= pow(fresnel,9);
+	float	power	= pow(fresnel,9.0);
 	float	amount	= 0.15 + 0.25*power;	// 1=full env, 0=no env
 
 	float3	c_reflection	= env*amount;

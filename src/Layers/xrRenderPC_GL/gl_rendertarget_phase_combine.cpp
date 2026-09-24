@@ -219,7 +219,12 @@ void CRenderTarget::phase_combine()
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
+#ifdef XR_PLATFORM_WEB
+        rt_Generic_0_r->copy_into(*rt_Forward);
+        u_setrt(RCache, rt_Forward, nullptr, nullptr, rt_MSAADepth);
+#else
         u_setrt(RCache, rt_Generic_0_r, nullptr, nullptr, rt_MSAADepth); // LDR RT
+#endif
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
@@ -228,6 +233,9 @@ void CRenderTarget::phase_combine()
         RImplementation.render_forward();
         if (g_pGamePersistent)
             g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
+#ifdef XR_PLATFORM_WEB
+        rt_Forward->copy_into(*rt_Generic_0_r);
+#endif
     }
 
     //	Igor: for volumetric lights
