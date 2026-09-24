@@ -34,6 +34,13 @@ void MaterialBuffer::Shutdown()
     ++m_revision;
 }
 
+void MaterialBuffer::Reset()
+{
+    m_materialCount = 0;
+    m_uploadCount = 0;
+    ++m_revision;
+}
+
 u32 MaterialBuffer::RegisterMaterial(const MaterialData& material)
 {
     if (!IsInitialized() || m_materialCount >= MAX_MATERIALS)

@@ -55,13 +55,17 @@ void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
                 additiveEmission |= additivePasses;
                 emissionAlpha = additivePasses && sourceBlend == VariantBlendFactor::SrcAlpha;
             }
+            const bool modulate2x = v->transparent && !v->passes.empty() && v->passes.front().blendEnabled
+                && v->passes.front().srcBlend == VariantBlendFactor::DstColor
+                && v->passes.front().dstBlend == VariantBlendFactor::SrcColor;
             d.emissive = v->emissive || additiveEmission ? v->emissiveIntensity : 0.0f;
             d.flags = (v->fog ? VARIANT_FLAG_FOG : 0u) | (v->distort ? VARIANT_FLAG_DISTORT : 0u)
                 | (v->transparent ? VARIANT_FLAG_TRANSPARENT : 0u) | (v->backToFront ? VARIANT_FLAG_BACK_TO_FRONT : 0u)
                 | (v->emissive || additiveEmission ? VARIANT_FLAG_EMISSIVE : 0u)
                 | (v->castsShadow ? 0u : VARIANT_FLAG_NO_SHADOW)
                 | (additiveEmission ? VARIANT_FLAG_ADDITIVE_EMISSION : 0u)
-                | (emissionAlpha ? VARIANT_FLAG_EMISSION_ALPHA : 0u);
+                | (emissionAlpha ? VARIANT_FLAG_EMISSION_ALPHA : 0u)
+                | (modulate2x ? VARIANT_FLAG_MODULATE2X : 0u);
             d.packed = u32(v->fadeMode) | (u32(v->colorMode) << 8);
             d.fadeScale = v->fadeScale;
         }

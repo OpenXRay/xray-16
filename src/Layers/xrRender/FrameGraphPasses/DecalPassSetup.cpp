@@ -33,8 +33,9 @@ struct DecalPassData {
 
 static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, DecalPassState& state)
 {
-    if (state.initialized)
+    if (state.initialized && state.colorFormat == fbInfo.colorFormats[0])
         return;
+    state.initialized = false;
 
     auto& cache = GetPassResourceCache();
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
@@ -83,6 +84,7 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     blend.setColorWriteMask(nvrhi::ColorMask::Red | nvrhi::ColorMask::Green | nvrhi::ColorMask::Blue);
 
     state.pipeline = cache.GetOrCreatePipeline("Decal", pipeDesc, fbInfo, nvDevice);
+    state.colorFormat = fbInfo.colorFormats[0];
     state.initialized = state.pipeline != nullptr;
 }
 
@@ -95,7 +97,7 @@ DefaultOutputLayout setupDecalPass(
     DecalPassState& state)
 {
     nvrhi::FramebufferInfoEx fbInfo;
-    fbInfo.colorFormats.push_back(nvrhi::Format::RGBA8_UNORM);
+    fbInfo.colorFormats.push_back(fg.GetResourceDesc(inputs.baseColor).format);
     InitializeDecalResources(device, fbInfo, state);
 
     auto& passData = fg.addCallbackPass<DecalPassData>(

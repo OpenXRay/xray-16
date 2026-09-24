@@ -51,6 +51,7 @@ class OverlayManager {
 public:
     void Initialize(fg::RenderDevice* device);
     void Shutdown();
+    void Clear();
 
     void AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
                   float baryU, float baryV, float radius,

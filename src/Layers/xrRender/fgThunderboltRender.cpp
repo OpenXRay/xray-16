@@ -121,7 +121,7 @@ nvrhi::ITexture* FGThunderboltRender::ResolveTexture(const shared_str& name)
 
     auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
     auto* textureManager = fgRenderer->GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str()));
+    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb));
     m_textureCache.emplace(name, handle);
     return handle;
 }

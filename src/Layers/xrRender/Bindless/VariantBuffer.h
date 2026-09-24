@@ -18,6 +18,7 @@ enum VariantFlags : u32 {
     VARIANT_FLAG_NO_SHADOW = (1 << 5),
     VARIANT_FLAG_ADDITIVE_EMISSION = (1 << 6),
     VARIANT_FLAG_EMISSION_ALPHA = (1 << 7),
+    VARIANT_FLAG_MODULATE2X = (1 << 8),
 };
 
 struct alignas(16) VariantData {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrEngine/Render.h"
-#include "Layers/xrRender/xr_effgamma.h"
+#include "Layers/xrRender/DisplayCalibration.h"
 
 #include <thread>
 
@@ -18,7 +18,8 @@ public:
     void setGamma(float fGamma) override;
     void setBrightness(float fGamma) override;
     void setContrast(float fGamma) override;
-    void updateGamma() override;
+
+    const DisplayCalibration& GetDisplayCalibration() const;
 
     void OnDeviceDestroy(bool bKeepTextures) override;
     void Destroy() override;
@@ -76,7 +77,7 @@ protected:
 private:
     void ConvertLegacyAssetsToPBRImpl();
 
-    CGammaControl m_Gamma;
+    DisplayCalibration m_displayCalibration;
     std::thread m_pbrConversionThread;
 };
 }

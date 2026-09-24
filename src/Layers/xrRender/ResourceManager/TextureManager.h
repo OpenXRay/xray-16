@@ -2,6 +2,7 @@
 
 #include "ResourceHandle.h"
 #include "xrCommon/xr_set.h"
+#include "Layers/xrRender/ColorSpace.h"
 #include <nvrhi/nvrhi.h>
 #include <mutex>
 
@@ -20,6 +21,7 @@ enum class TextureState : u8 {
     Resident,
     Evicting,
     Evicted,
+    Missing,
 };
 
 const char* TextureStateToString(TextureState state);
@@ -70,6 +72,7 @@ struct TextureDesc {
 struct TextureMetadata {
     shared_str filePath;
     TextureDesc desc;
+    fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear;
 
     TextureState state = TextureState::Unloaded;
     TexturePriority priority = TexturePriority::Medium;
@@ -114,6 +117,15 @@ struct TextureMetadata {
     }
 };
 
+class TextureKey
+{
+public:
+    shared_str path;
+    fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear;
+
+    bool operator<(const TextureKey& other) const;
+};
+
 class TextureManager {
 public:
     explicit TextureManager(xray::render::fg::RenderDevice* device);
@@ -121,6 +133,12 @@ public:
 
     TextureHandle LoadTexture(
         const char* path,
+        TexturePriority priority = TexturePriority::Medium
+    );
+
+    TextureHandle LoadTexture(
+        const char* path,
+        fg::TextureColorSpace colorSpace,
         TexturePriority priority = TexturePriority::Medium
     );
 
@@ -149,7 +167,7 @@ public:
 
     bool IsResident(TextureHandle handle) const;
 
-    TextureHandle FindTexture(const char* path) const;
+    TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;
 
     void SetMemoryBudget(u64 bytes);
     u64 GetMemoryBudget() const { return m_memoryBudget; }
@@ -198,7 +216,7 @@ private:
     xr_vector<u32> m_freeSlots;
     u64 m_contentRevision = 0;
 
-    xr_map<shared_str, TextureHandle> m_pathToHandle;
+    xr_map<TextureKey, TextureHandle> m_pathToHandle;
 
     u64 m_memoryBudget = 2ULL * 1024 * 1024 * 1024;
     u64 m_memoryUsed = 0;
@@ -210,7 +228,6 @@ private:
     bool ValidateHandle(TextureHandle handle) const;
 
     void LoadTextureSync(TextureHandle handle);
-    void LoadTextureAsync(TextureHandle handle);
     void StreamMips(TextureHandle handle, u32 targetMips);
 
     bool CheckMemoryBudget(u64 requiredBytes) const;

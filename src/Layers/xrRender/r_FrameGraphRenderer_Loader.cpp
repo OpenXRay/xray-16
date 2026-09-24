@@ -41,6 +41,8 @@
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/RayTracing/WorldRadianceCache.h"
+#include "Layers/xrRender/ClusteredLightManager.h"
+#include "Layers/xrRender/Decals/OverlayManager.h"
 #include "xrEngine/IRenderBackend.h"
 
 namespace xray::render
@@ -271,6 +273,9 @@ void FrameGraphRenderer::level_Load(IReader* fs)
 
     g_pGamePersistent->LoadEnd();
 
+    if (GEnv.Backend)
+        GEnv.Backend->SavePipelineCache();
+
     b_loaded = TRUE;
 }
 
@@ -288,7 +293,7 @@ void FrameGraphRenderer::WarmParticles()
                 continue;
             Resources->_ParseList(textures, def.m_TextureName.c_str());
             if (!textures.empty())
-                m_materialCache->PreRegisterParticleMaterial(textures[0]);
+                m_materialCache->PreRegisterParticleMaterial(textures[0], strstr(def.m_ShaderName.c_str(), "distort") != nullptr);
         }
         m_materialCache->FinalizePendingMaterials();
     }
@@ -339,7 +344,10 @@ void FrameGraphRenderer::level_Unload()
     if (!b_loaded)
         return;
     if (GEnv.Backend)
+    {
         GEnv.Backend->WaitForIdle();
+        GEnv.Backend->SavePipelineCache();
+    }
     if (m_framegraph)
         m_framegraph->Reset();
     framegraph::GetPassResourceCache().ClearBindingSets();
@@ -413,6 +421,11 @@ void FrameGraphRenderer::level_Unload()
 
     m_CompiledLevelShaders.clear();
     CleanupDeveloperLoad();
+    if (m_overlayManager)
+        m_overlayManager->Clear();
+    fg::ClusteredLightManager::Instance().ReleaseSpotTextures();
+    if (m_materialCache)
+        m_materialCache->ReleaseLevelMaterials();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

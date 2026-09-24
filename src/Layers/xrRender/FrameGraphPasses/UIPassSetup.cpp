@@ -90,7 +90,7 @@ static void CommitUIStaticGlobals(FGUIRender* uiRender, render::MaterialCache* u
 
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle sceneTarget,
+    framegraph::VirtualResourceHandle interfaceLayer,
     u32 width,
     u32 height)
 {
@@ -99,14 +99,13 @@ framegraph::VirtualResourceHandle setupUIPass(
     auto& passData = fg.addCallbackPass<UIPassData>(
         "UI",
 
-        [sceneTarget, width, height](FrameGraph& builder, PassHandle passHandle, UIPassData& data) {
+        [interfaceLayer, width, height](FrameGraph& builder, PassHandle passHandle, UIPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
 
-            data.sceneInput = passBuilder.read(sceneTarget);
-            data.sceneOutput = passBuilder.write(sceneTarget, ResourceState::RenderTarget);
+            data.target = passBuilder.readWrite(interfaceLayer, ResourceState::RenderTarget);
         },
 
         [](const UIPassData& data,
@@ -115,14 +114,14 @@ framegraph::VirtualResourceHandle setupUIPass(
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            auto* sceneRT = fg.GetPhysicalTexture(data.sceneOutput);
+            auto* interfaceRT = fg.GetPhysicalTexture(data.target);
 
-            if (!sceneRT) {
+            if (!interfaceRT) {
                 return;
             }
 
             nvrhi::FramebufferDesc fbDesc;
-            fbDesc.addColorAttachment(sceneRT);
+            fbDesc.addColorAttachment(interfaceRT);
             auto framebuffer = GetPassResourceCache().GetOrCreateFramebuffer(fbDesc, cmdList->getDevice());
 
             if (!g_pGamePersistent) {
@@ -155,7 +154,7 @@ framegraph::VirtualResourceHandle setupUIPass(
         }
     );
 
-    return passData.sceneOutput;
+    return passData.target;
 }
 
 framegraph::VirtualResourceHandle setupCursorPass(

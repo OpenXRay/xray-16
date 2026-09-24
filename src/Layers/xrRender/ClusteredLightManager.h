@@ -3,6 +3,7 @@
 #include <nvrhi/nvrhi.h>
 #include <array>
 #include "xrCore/xrCore.h"
+#include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
 namespace xray::render::fg { class RenderDevice; }
 
@@ -52,6 +53,7 @@ public:
 
     void Initialize(fg::RenderDevice* device);
     void Shutdown();
+    void ReleaseSpotTextures();
     void BeginFrame(bool rayTracingLighting = false);
     void CollectLight(const light* L);
     void CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots);
@@ -105,6 +107,8 @@ private:
     u32 m_lightCapacity = 0;
     bool m_rayTracingLighting = false;
     xr_map<shared_str, u32> m_spotTextureCache;
+    xr_vector<resources::TextureHandle> m_spotTextureHandles;
+    xr_vector<u32> m_spotTextureIndices;
     xr_vector<u32> m_spotTextureScratch;
     u32 m_numLights = 0;
     u32 m_numPoint = 0;

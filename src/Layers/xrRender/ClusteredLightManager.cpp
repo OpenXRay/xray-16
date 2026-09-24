@@ -120,7 +120,7 @@ void ClusteredLightManager::Shutdown()
     m_culledLights.clear();
     m_lightsCPU.clear();
     m_lightIDs.clear();
-    m_spotTextureCache.clear();
+    ReleaseSpotTextures();
     m_device = nullptr;
 }
 
@@ -175,11 +175,9 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
     const float invRangeSq = 1.0f / (range * range + 0.0001f);
 
     gpu.positionAndInvRangeSq.set(L->position.x, L->position.y, L->position.z, invRangeSq);
-    gpu.colorAndRange.set(L->color.r, L->color.g, L->color.b, range);
+    const Fvector color = SrgbToLinear(Fvector().set(L->color.r, L->color.g, L->color.b));
     const float lod = m_rayTracingLighting ? 1.0f : L->get_LOD();
-    gpu.colorAndRange.x *= lod;
-    gpu.colorAndRange.y *= lod;
-    gpu.colorAndRange.z *= lod;
+    gpu.colorAndRange.set(color.x * lod, color.y * lod, color.z * lod, range);
 
     std::memset(&gpu.spotVP, 0, sizeof(gpu.spotVP));
 
@@ -485,35 +483,51 @@ u32 ClusteredLightManager::GetOrLoadSpotTexture(const shared_str& name)
         return it->second;
 
     auto* renderDevice = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
-    if (!renderDevice)
+    auto* resMgr = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
+    auto* backend = renderDevice ? renderDevice->GetBackend() : nullptr;
+    auto* texManager = resMgr ? resMgr->GetTextureManager() : nullptr;
+    if (!texManager || !backend)
         return 0;
 
-    auto* resMgr = renderDevice->GetFGResourceManager();
-    auto* backend = renderDevice->GetBackend();
-    if (!resMgr || !backend)
-        return 0;
-
-    auto* texManager = resMgr->GetTextureManager();
-    if (!texManager)
-        return 0;
-
-    auto handle = texManager->LoadTexture(name.c_str());
-    if (!handle.IsValid())
+    u32 bindlessIdx = 0;
+    const resources::TextureHandle handle = texManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb);
+    if (handle.IsValid())
     {
-        m_spotTextureCache[name] = 0;
-        return 0;
+        const u32 registered = backend->RegisterBindlessTexture(texManager->GetNVRHITexture(handle));
+        if (registered != UINT32_MAX && registered != 0)
+        {
+            bindlessIdx = registered;
+            m_spotTextureHandles.push_back(handle);
+            m_spotTextureIndices.push_back(registered);
+        }
+        else
+        {
+            if (registered != UINT32_MAX)
+                backend->ReleaseBindlessTextures(&registered, 1);
+            texManager->Release(handle);
+        }
     }
 
-    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-    if (!nvrhiTex)
-    {
-        m_spotTextureCache[name] = 0;
-        return 0;
-    }
-
-    u32 bindlessIdx = backend->RegisterBindlessTexture(nvrhiTex);
     m_spotTextureCache[name] = bindlessIdx;
     return bindlessIdx;
+}
+
+void ClusteredLightManager::ReleaseSpotTextures()
+{
+    auto* renderDevice = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
+    auto* resMgr = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
+    auto* backend = renderDevice ? renderDevice->GetBackend() : nullptr;
+    auto* texManager = resMgr ? resMgr->GetTextureManager() : nullptr;
+    if (backend && !m_spotTextureIndices.empty())
+        backend->ReleaseBindlessTextures(m_spotTextureIndices.data(), u32(m_spotTextureIndices.size()));
+    if (texManager)
+    {
+        for (const resources::TextureHandle& handle : m_spotTextureHandles)
+            texManager->Release(handle);
+    }
+    m_spotTextureIndices.clear();
+    m_spotTextureHandles.clear();
+    m_spotTextureCache.clear();
 }
 
 }

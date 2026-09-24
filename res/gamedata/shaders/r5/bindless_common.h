@@ -1,6 +1,8 @@
 #ifndef BINDLESS_COMMON_H
 #define BINDLESS_COMMON_H
 
+#include "shared/color_space.h"
+
 #define INVALID_TEXTURE_INDEX 0xFFFFFFFF
 
 Texture2D g_BindlessTextures[] : register(t0, space1);
@@ -89,6 +91,7 @@ struct VariantData
 #define VARIANT_FLAG_NO_SHADOW     (1 << 5)
 #define VARIANT_FLAG_ADDITIVE_EMISSION (1 << 6)
 #define VARIANT_FLAG_EMISSION_ALPHA   (1 << 7)
+#define VARIANT_FLAG_MODULATE2X    (1 << 8)
 
 StructuredBuffer<MaterialData> g_Materials : register(t8);
 StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
@@ -164,7 +167,7 @@ BumpSample SampleNormal(MaterialData mat, float2 uv)
 float4 SampleDetail(MaterialData mat, float2 uv)
 {
     if (mat.detailIndex == INVALID_TEXTURE_INDEX)
-        return float4(0.5, 0.5, 0.5, 0.5);
+        return float4(SRGB_MID_GRAY_LINEAR, SRGB_MID_GRAY_LINEAR, SRGB_MID_GRAY_LINEAR, 0.5);
     Texture2D tex = GetBindlessTexture(mat.detailIndex);
     return tex.Sample(smp_linear, uv * mat.detailScale);
 }

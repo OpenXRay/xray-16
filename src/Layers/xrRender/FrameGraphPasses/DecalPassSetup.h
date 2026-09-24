@@ -27,6 +27,7 @@ struct DecalPassState {
     nvrhi::InputLayoutHandle inputLayout;
     nvrhi::ShaderHandle vs;
     nvrhi::ShaderHandle ps;
+    nvrhi::Format colorFormat = nvrhi::Format::UNKNOWN;
     bool initialized = false;
 };
 

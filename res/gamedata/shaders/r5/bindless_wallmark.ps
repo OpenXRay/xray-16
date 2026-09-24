@@ -17,5 +17,8 @@ struct PS_INPUT
 float4 main(PS_INPUT input) : SV_Target0
 {
     MaterialData mat = g_Materials[input.materialID];
-    return SampleDiffuse(mat, input.texcoord);
+    float4 color = SampleDiffuse(mat, input.texcoord);
+    if (g_Variants[mat.shaderVariant].flags & VARIANT_FLAG_MODULATE2X)
+        color.rgb *= 0.5 / SRGB_MID_GRAY_LINEAR;
+    return color;
 }

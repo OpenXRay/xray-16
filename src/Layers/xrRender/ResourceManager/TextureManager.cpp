@@ -112,6 +112,12 @@ u64 TextureDesc::CalculateMemorySize(u32 startMip, u32 mipCount) const {
     return totalSize;
 }
 
+bool TextureKey::operator<(const TextureKey& other) const {
+    if (colorSpace != other.colorSpace)
+        return colorSpace < other.colorSpace;
+    return path < other.path;
+}
+
 TextureManager::TextureManager(RenderDevice* device)
     : m_device(device)
 {
@@ -169,13 +175,16 @@ void TextureManager::FreeHandle(TextureHandle handle) {
     meta.isAlive = false;
 
     if (!meta.filePath.empty()) {
-        m_pathToHandle.erase(meta.filePath);
+        const auto mapped = m_pathToHandle.find(TextureKey{ meta.filePath, meta.colorSpace });
+        if (mapped != m_pathToHandle.end() && mapped->second == handle)
+            m_pathToHandle.erase(mapped);
     }
 
     meta.nvrhiTexture = nullptr;
     meta.videoTextureData.reset();
     meta.sequenceTextureData.reset();
     meta.filePath = shared_str();
+    meta.colorSpace = fg::TextureColorSpace::Linear;
     meta.state = TextureState::Unloaded;
     meta.refCount = 0;
     meta.memoryUsed = 0;
@@ -204,9 +213,17 @@ TextureHandle TextureManager::LoadTexture(
     const char* path,
     TexturePriority priority)
 {
-    shared_str pathStr = path;
+    return LoadTexture(path, fg::TextureColorSpace::Linear, priority);
+}
 
-    auto it = m_pathToHandle.find(pathStr);
+TextureHandle TextureManager::LoadTexture(
+    const char* path,
+    fg::TextureColorSpace colorSpace,
+    TexturePriority priority)
+{
+    const TextureKey key{ shared_str(path), colorSpace };
+
+    auto it = m_pathToHandle.find(key);
     if (it != m_pathToHandle.end()) {
         TextureHandle existing = it->second;
         if (ValidateHandle(existing)) {
@@ -218,13 +235,14 @@ TextureHandle TextureManager::LoadTexture(
     TextureHandle handle = AllocateHandle();
     TextureMetadata& meta = m_textures[handle.index];
 
-    meta.filePath = pathStr;
+    meta.filePath = key.path;
+    meta.colorSpace = colorSpace;
     meta.state = TextureState::Unloaded;
     meta.priority = priority;
     meta.isAlive = true;
     meta.refCount = 1;
 
-    m_pathToHandle[pathStr] = handle;
+    m_pathToHandle[key] = handle;
 
     m_stats.texturesTotal++;
 
@@ -390,8 +408,8 @@ u64 TextureManager::GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
     return revision;
 }
 
-TextureHandle TextureManager::FindTexture(const char* path) const {
-    auto it = m_pathToHandle.find(shared_str(path));
+TextureHandle TextureManager::FindTexture(const char* path, fg::TextureColorSpace colorSpace) const {
+    auto it = m_pathToHandle.find(TextureKey{ shared_str(path), colorSpace });
     if (it != m_pathToHandle.end()) {
         TextureHandle handle = it->second;
         if (ValidateHandle(handle))
@@ -603,7 +621,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     DDSData ddsData;
     if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
         Msg("! [TextureManager] Failed to load texture: %s", meta.filePath.c_str());
-        meta.state = TextureState::Unloaded;
+        meta.state = TextureState::Missing;
         return;
     }
 
@@ -623,84 +641,84 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
-    fg::RenderDevice::TextureDesc deviceDesc;
-    deviceDesc.width = ddsData.desc.width;
-    deviceDesc.height = ddsData.desc.height;
-    deviceDesc.depth = ddsData.desc.depth;
-    deviceDesc.arraySize = ddsData.desc.arraySize;
-    deviceDesc.mipLevels = ddsData.desc.mipLevels;
-    deviceDesc.format = ddsData.desc.format;
-    deviceDesc.debugName = ddsData.filePath.c_str();
+    const TextureDesc sourceDesc = ddsData.desc;
+    const u64 sourceDataSize = ddsData.totalDataSize;
 
-    switch (ddsData.desc.type) {
+    nvrhi::TextureDesc textureDesc;
+    textureDesc.width = sourceDesc.width;
+    textureDesc.height = sourceDesc.height;
+    textureDesc.depth = sourceDesc.depth;
+    textureDesc.arraySize = sourceDesc.arraySize;
+    textureDesc.mipLevels = sourceDesc.mipLevels;
+    textureDesc.format = fg::FormatForColorSpace(sourceDesc.format, meta.colorSpace);
+    textureDesc.debugName = ddsData.filePath.c_str();
+    textureDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    textureDesc.keepInitialState = true;
+    switch (sourceDesc.type) {
         case TextureDesc::Texture1D:
-            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture1D;
+            textureDesc.dimension = nvrhi::TextureDimension::Texture1D;
             break;
-        case TextureDesc::Texture2D:
-            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture2D;
+        case TextureDesc::Texture2DArray:
+            textureDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
             break;
         case TextureDesc::Texture3D:
-            deviceDesc.dimension = fg::RenderDevice::TextureDesc::Texture3D;
+            textureDesc.dimension = nvrhi::TextureDimension::Texture3D;
             break;
         case TextureDesc::TextureCube:
-            deviceDesc.dimension = fg::RenderDevice::TextureDesc::TextureCube;
+            textureDesc.dimension = nvrhi::TextureDimension::TextureCube;
+            break;
+        default:
+            textureDesc.dimension = nvrhi::TextureDimension::Texture2D;
             break;
     }
 
-    fg::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
-    if (!deviceHandle.IsValid()) {
+    nvrhi::TextureHandle texture = m_device->GetNVRHIDevice()->createTexture(textureDesc);
+    if (!texture) {
         Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
-        meta.state = TextureState::Unloaded;
+        meta.state = TextureState::Missing;
         return;
     }
 
+    const u32 mipsPerSlice = std::max(1u, sourceDesc.mipLevels);
     xr_vector<fg::RenderDevice::TextureSliceData> slices;
     slices.reserve(ddsData.mipLevels.size());
-
-    for (const DDSMipLevel& mip : ddsData.mipLevels) {
+    for (u32 index = 0; index < ddsData.mipLevels.size(); ++index) {
+        const DDSMipLevel& mip = ddsData.mipLevels[index];
         fg::RenderDevice::TextureSliceData slice;
-
-        u32 totalMips = ddsData.desc.mipLevels;
-        u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);
-
-        slice.arraySlice = mipIndex / totalMips;
-        slice.mipLevel = mipIndex % totalMips;
+        slice.arraySlice = index / mipsPerSlice;
+        slice.mipLevel = index % mipsPerSlice;
         slice.data = mip.data;
         slice.dataSize = mip.size;
         slice.rowPitch = mip.rowPitch;
         slice.slicePitch = mip.slicePitch;
-
         slices.push_back(slice);
     }
+    m_device->UploadTextureSlices(texture, slices.data(), (u32)slices.size());
 
-    m_device->UploadTextureData(deviceHandle, slices.data(), (u32)slices.size());
-
-    meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
+    meta.nvrhiTexture = texture;
+    meta.desc = sourceDesc;
+    meta.desc.format = textureDesc.format;
+    meta.desc.isSRGB = nvrhi::getFormatInfo(textureDesc.format).isSRGB;
 
     if (isVideoTexture) {
         meta.videoTextureData = xr_make_unique<DDSData>();
         *meta.videoTextureData = std::move(ddsData);
-
     }
 
     if (isSequenceTexture) {
         meta.sequenceTextureData = xr_make_unique<DDSData>();
         *meta.sequenceTextureData = std::move(ddsData);
-
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
-
     }
 
+    const bool singleFrame = isVideoTexture || isSequenceTexture;
     meta.state = TextureState::Resident;
-    meta.residentMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
-    meta.totalMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
-    meta.requestedMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
-    meta.memoryUsed = ddsData.totalDataSize;
+    meta.residentMips = singleFrame ? 1 : sourceDesc.mipLevels;
+    meta.totalMips = singleFrame ? 1 : sourceDesc.mipLevels;
+    meta.requestedMips = singleFrame ? 1 : sourceDesc.mipLevels;
+    meta.memoryUsed = sourceDataSize;
 
     m_memoryUsed += meta.memoryUsed;
-}
-
-void TextureManager::LoadTextureAsync(TextureHandle handle) {
 }
 
 void TextureManager::StreamMips(TextureHandle handle, u32 targetMips) {
@@ -757,12 +775,12 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
     const char* path,
     TexturePriority priority)
 {
-    shared_str pathStr = path;
+    const TextureKey key{ shared_str(path), fg::TextureColorSpace::Linear };
 
     {
         std::lock_guard<std::mutex> lock(m_pathLookupMutex);
 
-        auto it = m_pathToHandle.find(pathStr);
+        auto it = m_pathToHandle.find(key);
         if (it != m_pathToHandle.end()) {
             TextureHandle existing = it->second;
 
@@ -779,7 +797,8 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         std::lock_guard<std::mutex> lock(m_texturesMutex);
 
         TextureMetadata& meta = m_textures[handle.index];
-        meta.filePath = pathStr;
+        meta.filePath = key.path;
+        meta.colorSpace = key.colorSpace;
         meta.state = TextureState::Unloaded;
         meta.priority = priority;
         meta.isAlive = true;
@@ -788,7 +807,7 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
 
     {
         std::lock_guard<std::mutex> lock(m_pathLookupMutex);
-        m_pathToHandle[pathStr] = handle;
+        m_pathToHandle[key] = handle;
     }
 
     LoadTextureSync(handle);
@@ -813,6 +832,7 @@ const char* TextureStateToString(TextureState state) {
         case TextureState::Resident: return "Resident";
         case TextureState::Evicting: return "Evicting";
         case TextureState::Evicted: return "Evicted";
+        case TextureState::Missing: return "Missing";
         default: return "Unknown";
     }
 }

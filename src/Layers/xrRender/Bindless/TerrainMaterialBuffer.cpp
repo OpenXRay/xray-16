@@ -5,6 +5,30 @@
 
 namespace xray::render::fg::bindless {
 
+namespace
+{
+TerrainMaterialData DefaultTerrainMaterial()
+{
+    TerrainMaterialData material = {};
+    material.baseAlbedoIndex = INVALID_TEXTURE_INDEX;
+    material.blendMaskIndex = INVALID_TEXTURE_INDEX;
+    material.detailR_Index = INVALID_TEXTURE_INDEX;
+    material.detailG_Index = INVALID_TEXTURE_INDEX;
+    material.detailB_Index = INVALID_TEXTURE_INDEX;
+    material.detailA_Index = INVALID_TEXTURE_INDEX;
+    material.normalR_Index = INVALID_TEXTURE_INDEX;
+    material.normalG_Index = INVALID_TEXTURE_INDEX;
+    material.normalB_Index = INVALID_TEXTURE_INDEX;
+    material.normalA_Index = INVALID_TEXTURE_INDEX;
+    material.pbrR_Index = INVALID_TEXTURE_INDEX;
+    material.pbrG_Index = INVALID_TEXTURE_INDEX;
+    material.pbrB_Index = INVALID_TEXTURE_INDEX;
+    material.pbrA_Index = INVALID_TEXTURE_INDEX;
+    material.detailScale = 4.0f;
+    return material;
+}
+}
+
 TerrainMaterialBuffer& TerrainMaterialBuffer::Instance()
 {
     static TerrainMaterialBuffer instance;
@@ -16,23 +40,7 @@ void TerrainMaterialBuffer::Initialize(fg::RenderDevice* device)
     if (IsInitialized())
         return;
 
-    TerrainMaterialData defaultMat = {};
-    defaultMat.baseAlbedoIndex = INVALID_TEXTURE_INDEX;
-    defaultMat.blendMaskIndex = INVALID_TEXTURE_INDEX;
-    defaultMat.detailR_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.detailG_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.detailB_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.detailA_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.normalR_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.normalG_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.normalB_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.normalA_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.pbrR_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.pbrG_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.pbrB_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.pbrA_Index = INVALID_TEXTURE_INDEX;
-    defaultMat.detailScale = 4.0f;
-
+    const TerrainMaterialData defaultMat = DefaultTerrainMaterial();
     m_data.resize(MAX_TERRAIN_MATERIALS);
     for (auto& mat : m_data)
         mat = defaultMat;
@@ -52,6 +60,15 @@ void TerrainMaterialBuffer::Initialize(fg::RenderDevice* device)
 void TerrainMaterialBuffer::Shutdown()
 {
     GPUStructuredBuffer::Shutdown();
+    m_materialCount = 0;
+    ++m_revision;
+}
+
+void TerrainMaterialBuffer::Reset()
+{
+    const TerrainMaterialData defaultMat = DefaultTerrainMaterial();
+    for (u32 id = 0; id < m_materialCount; ++id)
+        Set(id, defaultMat);
     m_materialCount = 0;
     ++m_revision;
 }

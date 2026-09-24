@@ -14,6 +14,7 @@ public:
 
     bool Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation = false);
     void Shutdown() override;
+    void SavePipelineCache() override;
 
     API GetAPI() const override { return API::Metal; }
     pcstr GetAPIName() const override { return "Metal"; }

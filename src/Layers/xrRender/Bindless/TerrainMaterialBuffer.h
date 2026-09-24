@@ -11,6 +11,7 @@ public:
 
     void Initialize(fg::RenderDevice* device);
     void Shutdown();
+    void Reset();
 
     u32 RegisterMaterial(const TerrainMaterialData& material);
     void UpdateMaterial(u32 materialID, const TerrainMaterialData& material);

@@ -200,6 +200,7 @@ void MaterialSystem::PreloadMaterialTextures(const char* textureName)
     xr_string albedoPath = GetAlbedoPath(textureName);
     set.albedo = texMgr->LoadTexture(
         albedoPath.c_str(),
+        fg::TextureColorSpace::Srgb,
         TexturePriority::High
     );
 

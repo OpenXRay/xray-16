@@ -5,6 +5,10 @@ target_sources(xrRender PRIVATE
     stdafx.cpp
     RenderView.h
     RenderView.cpp
+    ColorSpace.h
+    ColorSpace.cpp
+    DisplayCalibration.h
+    DisplayCalibration.cpp
 
     RenderContext/ResourceHandle.h
     RenderContext/RCShader.h
@@ -111,8 +115,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/DecalPassSetup.cpp
     FrameGraphPasses/DistortionApplyPassSetup.h
     FrameGraphPasses/DistortionApplyPassSetup.cpp
-    FrameGraphPasses/PresentPassSetup.h
-    FrameGraphPasses/PresentPassSetup.cpp
+    FrameGraphPasses/DisplayPassSetup.h
+    FrameGraphPasses/DisplayPassSetup.cpp
     FrameGraphPasses/UIPassSetup.h
     FrameGraphPasses/UIPassSetup.cpp
     FrameGraphPasses/SkyPassSetup.h
@@ -192,6 +196,8 @@ target_sources(xrRender PRIVATE
     Backend/SubmitTokenRing.h
     Backend/BackendCompletion.h
     Backend/BackendCompletion.cpp
+    Backend/BindlessTextureRegistry.h
+    Backend/BindlessTextureRegistry.cpp
     GeometryResidency.h
     GeometryResidency.cpp
     Backend/VulkanBackend.h
@@ -340,7 +346,6 @@ target_sources(xrRender PRIVATE
     ShaderInfo.cpp
     ./tss_def.cpp
     ./xrRender_console.cpp
-    xr_effgamma.cpp
     ./ResourceManager_Scripting.cpp
 
     ./blenders/Blender_BmmD_deferred.cpp

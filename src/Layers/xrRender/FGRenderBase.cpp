@@ -21,10 +21,11 @@ extern ENGINE_API int ps_r4_use_pbr;
 
 namespace xray::render::fg
 {
-void FGRenderBase::setGamma(float fGamma)     { m_Gamma.Gamma(fGamma); }
-void FGRenderBase::setBrightness(float fGamma){ m_Gamma.Brightness(fGamma); }
-void FGRenderBase::setContrast(float fGamma)  { m_Gamma.Contrast(fGamma); }
-void FGRenderBase::updateGamma()              { m_Gamma.Update(); }
+void FGRenderBase::setGamma(float fGamma)     { m_displayCalibration.SetGamma(fGamma); }
+void FGRenderBase::setBrightness(float fGamma){ m_displayCalibration.SetBrightness(fGamma); }
+void FGRenderBase::setContrast(float fGamma)  { m_displayCalibration.SetContrast(fGamma); }
+
+const DisplayCalibration& FGRenderBase::GetDisplayCalibration() const { return m_displayCalibration; }
 
 void FGRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
@@ -120,8 +121,6 @@ void FGRenderBase::SetupStates()
 void FGRenderBase::OnDeviceCreate(pcstr shName)
 {
     ZoneScoped;
-
-    m_Gamma.Update();
 
     if (Resources)
     {

@@ -88,7 +88,6 @@ void CRenderDevice::RenderEnd(void)
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
         {
-            GEnv.Render->updateGamma();
             if (precache_light)
             {
                 precache_light->set_active(false);

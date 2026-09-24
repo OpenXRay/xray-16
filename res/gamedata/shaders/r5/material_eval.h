@@ -2,6 +2,7 @@
 #define MATERIAL_EVAL_H
 
 #include "shared/material_surface.h"
+#include "shared/color_space.h"
 
 float4 SampleDiffuseGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
 {
@@ -20,7 +21,7 @@ BumpSample SampleNormalGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uv
 float4 SampleDetailGrad(MaterialData mat, float2 uv, float2 uvDdx, float2 uvDdy)
 {
     if (mat.detailIndex == INVALID_TEXTURE_INDEX)
-        return float4(0.5, 0.5, 0.5, 0.5);
+        return float4(SRGB_MID_GRAY_LINEAR, SRGB_MID_GRAY_LINEAR, SRGB_MID_GRAY_LINEAR, 0.5);
     return GetBindlessTexture(mat.detailIndex).SampleGrad(smp_linear, uv * mat.detailScale, uvDdx * mat.detailScale, uvDdy * mat.detailScale);
 }
 
@@ -49,7 +50,7 @@ MaterialSurface EvalStandardMaterial(MaterialData mat, float3 diffuse, float2 uv
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
         float4 detailSample = SampleDetailGrad(mat, uv, uvDdx, uvDdy);
-        s.albedo = s.albedo * (detailSample.rgb * 2.0);
+        s.albedo = ApplyDetailModulation(s.albedo, detailSample.rgb);
     }
     s.metallic = 0.0;
     s.roughness = 1.0 - gloss;
@@ -76,6 +77,13 @@ float4 SampleTerrainTextureGrad(uint index, float2 uv, float2 uvDdx, float2 uvDd
     return GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
 }
 
+float3 SampleTerrainDetailGrad(uint index, float2 uv, float2 uvDdx, float2 uvDdy)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return SRGB_MID_GRAY_LINEAR;
+    return GetBindlessTexture(index).SampleGrad(smp_linear, uv, uvDdx, uvDdy).rgb;
+}
+
 BumpSample SampleTerrainNormalGrad(uint index, float2 uv, float2 uvDdx, float2 uvDdy)
 {
     if (index == INVALID_TEXTURE_INDEX)
@@ -97,14 +105,14 @@ MaterialSurface EvalTerrainMaterial(TerrainMaterialData mat, float2 uv, float2 u
     else
         mask = float4(0.25, 0.25, 0.25, 0.25);
 
-    float3 detailR = SampleTerrainTextureGrad(mat.detailR_Index, detailUV, detailDdx, detailDdy).rgb;
-    float3 detailG = SampleTerrainTextureGrad(mat.detailG_Index, detailUV, detailDdx, detailDdy).rgb;
-    float3 detailB = SampleTerrainTextureGrad(mat.detailB_Index, detailUV, detailDdx, detailDdy).rgb;
-    float3 detailA = SampleTerrainTextureGrad(mat.detailA_Index, detailUV, detailDdx, detailDdy).rgb;
+    float3 detailR = SampleTerrainDetailGrad(mat.detailR_Index, detailUV, detailDdx, detailDdy);
+    float3 detailG = SampleTerrainDetailGrad(mat.detailG_Index, detailUV, detailDdx, detailDdy);
+    float3 detailB = SampleTerrainDetailGrad(mat.detailB_Index, detailUV, detailDdx, detailDdy);
+    float3 detailA = SampleTerrainDetailGrad(mat.detailA_Index, detailUV, detailDdx, detailDdy);
     float3 blendedDetail = detailR * mask.r + detailG * mask.g + detailB * mask.b + detailA * mask.a;
 
     MaterialSurface s;
-    s.albedo = baseSample.rgb * blendedDetail * 2.0;
+    s.albedo = ApplyDetailModulation(baseSample.rgb, blendedDetail);
 
     float3 N = normalize(vertexNormal);
     BumpSample normalR = SampleTerrainNormalGrad(mat.normalR_Index, detailUV, detailDdx, detailDdy);
