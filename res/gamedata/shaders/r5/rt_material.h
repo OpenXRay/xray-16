@@ -371,7 +371,7 @@ float3 RTEvaluateEmitter(RTSceneParams scene, uint batchIdx, RTBatchInfo info, f
 
     float3 albedo = diffuseSample.rgb;
     if ((mat.flags & MAT_FLAG_HAS_DETAIL) != 0)
-        albedo *= SampleDetailGrad(mat, uv, uvDx, uvDy).rgb * 2.0;
+        albedo = ApplyDetailModulation(albedo, SampleDetailGrad(mat, uv, uvDx, uvDy).rgb);
 
     float coverage = 1.0;
     if (additive)

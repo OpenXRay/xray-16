@@ -59,6 +59,7 @@ public:
     virtual void Shutdown() = 0;
     virtual void WaitForIdle() = 0;
     virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
+    virtual void SavePipelineCache() {}
 
     class MemoryBudget
     {

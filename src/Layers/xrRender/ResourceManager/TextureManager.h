@@ -2,6 +2,7 @@
 
 #include "ResourceHandle.h"
 #include "xrCommon/xr_set.h"
+#include "Layers/xrRender/ColorSpace.h"
 #include <nvrhi/nvrhi.h>
 #include <mutex>
 
@@ -28,6 +29,7 @@ enum class TextureState : u8 {
     Resident,       // Fully loaded in VRAM
     Evicting,       // Marked for eviction
     Evicted,        // Was resident, now evicted (keep metadata)
+    Missing,
 };
 
 const char* TextureStateToString(TextureState state);
@@ -94,6 +96,7 @@ struct TextureMetadata {
     // Identity
     shared_str filePath;         // "textures/concrete_diff.dds"
     TextureDesc desc;
+    fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear;
 
     // State
     TextureState state = TextureState::Unloaded;
@@ -148,6 +151,15 @@ struct TextureMetadata {
     }
 };
 
+class TextureKey
+{
+public:
+    shared_str path;
+    fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear;
+
+    bool operator<(const TextureKey& other) const;
+};
+
 // ═══════════════════════════════════════════════════
 //  TEXTURE MANAGER (Main Interface)
 // ═══════════════════════════════════════════════════
@@ -161,9 +173,14 @@ public:
     //  LOADING
     // ═══════════════════════════════════════════════════
 
-    // Load texture from disk (Week 1: synchronous, Week 3: async)
     TextureHandle LoadTexture(
         const char* path,
+        TexturePriority priority = TexturePriority::Medium
+    );
+
+    TextureHandle LoadTexture(
+        const char* path,
+        fg::TextureColorSpace colorSpace,
         TexturePriority priority = TexturePriority::Medium
     );
 
@@ -203,7 +220,7 @@ public:
     bool IsResident(TextureHandle handle) const;
 
     // Find texture by path (returns invalid handle if not found)
-    TextureHandle FindTexture(const char* path) const;
+    TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;
 
     // ═══════════════════════════════════════════════════
     //  STREAMING CONTROL (Week 2)
@@ -284,7 +301,7 @@ private:
     u64 m_contentRevision = 0;
 
     // Name → Handle lookup (for deduplication)
-    xr_map<shared_str, TextureHandle> m_pathToHandle;
+    xr_map<TextureKey, TextureHandle> m_pathToHandle;
 
     // ═══════════════════════════════════════════════════
     //  MEMORY MANAGEMENT
@@ -310,7 +327,6 @@ private:
 
     // Loading (Week 1: sync, Week 2: async)
     void LoadTextureSync(TextureHandle handle);
-    void LoadTextureAsync(TextureHandle handle);  // Week 3
     void StreamMips(TextureHandle handle, u32 targetMips);  // Week 2
 
     // Eviction (Week 2)

@@ -15,6 +15,7 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "Layers/xrRender/fgEnvironmentRender.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -745,32 +746,10 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     fg.GetRTRegistry().RegisterRT("rt_PT_Accumulation", accumulation);
 
     CEnvironment& env = g_pGamePersistent->Environment();
-    auto* resourceManager = device->GetFGResourceManager();
-    resources::TextureManager* texManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
-
     nvrhi::ITexture* sky0Tex = nullptr;
     nvrhi::ITexture* sky1Tex = nullptr;
     float skyWeight = env.CurrentEnv.weight;
-
-    if (texManager && env.Current[0] && env.Current[1])
-    {
-        const shared_str& name0 = env.Current[0]->sky_texture_name;
-        const shared_str& name1 = env.Current[1]->sky_texture_name;
-        if (name0.size())
-        {
-            auto h = texManager->LoadTexture(name0.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h);
-            if (t)
-                sky0Tex = t;
-        }
-        if (name1.size())
-        {
-            auto h = texManager->LoadTexture(name1.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h);
-            if (t)
-                sky1Tex = t;
-        }
-    }
+    ResolveSkyTextures(env, sky0Tex, sky1Tex);
     if (!sky0Tex ||
         !sky1Tex ||
         sky0Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube ||

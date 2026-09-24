@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "OverlayManager.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ColorSpace.h"
 
 namespace xray::render::fg::decals {
 
@@ -26,6 +27,14 @@ void OverlayManager::Shutdown()
     m_rangeCache.clear();
     m_gpuSplats.clear();
     m_splatBuffer = nullptr;
+}
+
+void OverlayManager::Clear()
+{
+    m_objects.clear();
+    m_rangeCache.clear();
+    m_gpuSplats.clear();
+    m_dirty = true;
 }
 
 void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
@@ -82,7 +91,8 @@ void OverlayManager::AddSplat(CKinematics* obj, const TriVertexSkin triVerts[3],
 
     GPUPaintSplat gpu = {};
     gpu.posRadius = { restPos.x, restPos.y, restPos.z, radius };
-    gpu.color = { color.x, color.y, color.z, alpha };
+    const Fvector linearColor = SrgbToLinear(color);
+    gpu.color = { linearColor.x, linearColor.y, linearColor.z, alpha };
     for (u32 i = 0; i < useCount; i++) {
         gpu.boneIdx[i] = contribs[i].idx;
         gpu.boneWeight[i] = contribs[i].weight / totalW;

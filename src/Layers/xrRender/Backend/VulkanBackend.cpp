@@ -3,7 +3,9 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
+#include <filesystem>
 #include <utility>
+#include <vector>
 
 #if defined(__APPLE__)
 #include <pthread/qos.h>
@@ -98,6 +100,22 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     Msg("* [VulkanBackend]   graphicsQueue=%p family=%u", m_graphicsQueue, m_graphicsQueueFamily);
     Msg("* [VulkanBackend]   computeQueue=%p family=%u", m_computeQueue, m_computeQueueFamily);
 
+    string_path pipelineCacheRelativePath;
+    xr_sprintf(pipelineCacheRelativePath, "shaders_cache_fg%svk%spipelines.vkcache", DELIMITER, DELIMITER);
+    if (FS.exist("$app_data_root$", pipelineCacheRelativePath)) {
+        IReader* reader = FS.r_open("$app_data_root$", pipelineCacheRelativePath);
+        if (reader) {
+            m_pipelineCacheData.resize(reader->length());
+            if (!m_pipelineCacheData.empty())
+                reader->r(m_pipelineCacheData.data(), m_pipelineCacheData.size());
+            FS.r_close(reader);
+        }
+    }
+    if (m_pipelineCacheData.empty())
+        Msg("* [VulkanBackend] Pipeline cache miss (%s), starting empty", pipelineCacheRelativePath);
+    else
+        Msg("* [VulkanBackend] Pipeline cache hit (%s, %u bytes)", pipelineCacheRelativePath, static_cast<u32>(m_pipelineCacheData.size()));
+
     nvrhi::vulkan::DeviceDesc deviceDesc;
     deviceDesc.errorCB = &s_nvrhiVkMessageCallback;
     deviceDesc.instance = m_instance;
@@ -120,6 +138,8 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     deviceDesc.deviceExtensions = m_deviceExtensions.data();
     deviceDesc.numDeviceExtensions = m_deviceExtensions.size();
     deviceDesc.bufferDeviceAddressSupported = m_bufferDeviceAddressEnabled;
+    deviceDesc.pipelineCacheData = m_pipelineCacheData.empty() ? nullptr : m_pipelineCacheData.data();
+    deviceDesc.pipelineCacheDataSize = m_pipelineCacheData.size();
 
     m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
     if (!m_nvrhiVulkanDevice) {
@@ -127,6 +147,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
         Shutdown();
         return false;
     }
+    m_pipelineCacheData.clear();
 
     if (!enableValidation) {
         m_nvrhiDevice = m_nvrhiVulkanDevice;
@@ -201,6 +222,7 @@ void VulkanBackend::Shutdown() {
 
     Msg("* [VulkanBackend] Shutting down...");
     WaitForIdle();
+    SavePipelineCache();
 
     if (m_submitThread.joinable()) {
         {
@@ -211,18 +233,12 @@ void VulkanBackend::Shutdown() {
         m_submitThread.join();
     }
 
+    m_bindless.Shutdown();
     {
         std::lock_guard<std::mutex> qk(m_queueMutex);
         m_completion.Shutdown();
     }
 
-    m_bindlessDescriptorTable = nullptr;
-    m_bindlessLayout = nullptr;
-    m_bindlessTextureMap.clear();
-    m_bindlessTextureResources.clear();
-    m_bindlessTextureReferences.clear();
-    m_freeBindlessIndices.clear();
-    m_nextBindlessIndex = 0;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     for (auto& pool : m_graphicsPools)
@@ -265,7 +281,52 @@ void VulkanBackend::Shutdown() {
     }
 
     m_initialized = false;
+    m_pipelineCacheData.clear();
     Msg("* [VulkanBackend] Shutdown complete");
+}
+
+void VulkanBackend::SavePipelineCache() {
+    if (!m_nvrhiVulkanDevice)
+        return;
+    nvrhi::vulkan::IDevice* device = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+    if (!device)
+        return;
+
+    std::vector<uint8_t> data;
+    if (!device->getPipelineCacheData(data) || data.empty()) {
+        Msg("! [VulkanBackend] Failed to read the Vulkan pipeline cache data");
+        return;
+    }
+
+    string_path relativePath;
+    xr_sprintf(relativePath, "shaders_cache_fg%svk%spipelines.vkcache", DELIMITER, DELIMITER);
+    string_path temporaryRelativePath;
+    xr_sprintf(temporaryRelativePath, "%s.tmp", relativePath);
+
+    IWriter* writer = FS.w_open("$app_data_root$", temporaryRelativePath);
+    if (!writer) {
+        Msg("! [VulkanBackend] Failed to open the pipeline cache file: %s", temporaryRelativePath);
+        return;
+    }
+    writer->w(data.data(), data.size());
+    FS.w_close(writer);
+
+    string_path directoryPath;
+    if (!FS.update_path(directoryPath, "$app_data_root$", "shaders_cache_fg" DELIMITER "vk", false)) {
+        Msg("! [VulkanBackend] Failed to resolve the pipeline cache directory");
+        return;
+    }
+    convert_path_separators(directoryPath);
+
+    std::error_code errorCode;
+    const std::filesystem::path directory(directoryPath);
+    std::filesystem::rename(directory / "pipelines.vkcache.tmp", directory / "pipelines.vkcache", errorCode);
+    if (errorCode) {
+        Msg("! [VulkanBackend] Failed to replace the pipeline cache file: %s", errorCode.message().c_str());
+        return;
+    }
+
+    Msg("* [VulkanBackend] Saved the pipeline cache (%u bytes)", static_cast<u32>(data.size()));
 }
 
 bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
@@ -854,28 +915,8 @@ void VulkanBackend::DestroySyncObjects() {
 }
 
 void VulkanBackend::CreateBindlessResources() {
-    Msg("* [VulkanBackend] Creating bindless resources...");
-
-    nvrhi::BindlessLayoutDesc bindlessDesc;
-    bindlessDesc.visibility = nvrhi::ShaderType::All;
-    bindlessDesc.firstSlot = 0;
-    bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
-    bindlessDesc.registerSpaces = { nvrhi::BindingLayoutItem::Texture_SRV(1) };
-
-    m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
-    if (!m_bindlessLayout) {
-        Msg("! [VulkanBackend] Failed to create bindless layout");
-        return;
-    }
-
-    m_bindlessDescriptorTable = m_nvrhiDevice->createDescriptorTable(m_bindlessLayout);
-    if (!m_bindlessDescriptorTable) {
-        Msg("! [VulkanBackend] Failed to create bindless descriptor table");
-        return;
-    }
-
-    m_nvrhiDevice->resizeDescriptorTable(m_bindlessDescriptorTable, MAX_BINDLESS_TEXTURES, false);
-    Msg("* [VulkanBackend] Bindless resources created (max %u textures)", MAX_BINDLESS_TEXTURES);
+    if (!m_bindless.Initialize(m_nvrhiDevice, this, MAX_BINDLESS_TEXTURES))
+        Msg("! [VulkanBackend] Failed to create the bindless texture table");
 }
 
 void VulkanBackend::QueryCapabilities() {
@@ -922,45 +963,7 @@ void VulkanBackend::QueryCapabilities() {
 }
 
 u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    if (!m_bindlessDescriptorTable || !texture)
-        return UINT32_MAX;
-
-    auto it = m_bindlessTextureMap.find(texture);
-    if (it != m_bindlessTextureMap.end())
-    {
-        u32& references = m_bindlessTextureReferences[it->second];
-        R_ASSERT(references != 0 && references != UINT32_MAX);
-        ++references;
-        return it->second;
-    }
-
-    u32 slot;
-    if (!m_freeBindlessIndices.empty()) {
-        slot = m_freeBindlessIndices.back();
-        m_freeBindlessIndices.pop_back();
-    } else {
-        if (m_nextBindlessIndex >= MAX_BINDLESS_TEXTURES) {
-            Msg("! [VulkanBackend] Bindless texture limit reached");
-            return UINT32_MAX;
-        }
-        slot = m_nextBindlessIndex++;
-        m_bindlessTextureResources.resize(m_nextBindlessIndex);
-        m_bindlessTextureReferences.resize(m_nextBindlessIndex);
-    }
-
-    nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
-    item.slot = slot;
-
-    if (!m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
-        m_freeBindlessIndices.push_back(slot);
-        return UINT32_MAX;
-    }
-
-    m_bindlessTextureMap[texture] = slot;
-    m_bindlessTextureResources[slot] = texture;
-    m_bindlessTextureReferences[slot] = 1;
-    return slot;
+    return m_bindless.Register(texture);
 }
 
 void VulkanBackend::UnregisterBindlessTexture(u32 index)
@@ -970,39 +973,17 @@ void VulkanBackend::UnregisterBindlessTexture(u32 index)
 
 nvrhi::ITexture* VulkanBackend::GetBindlessTexture(u32 index)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    return index < m_bindlessTextureResources.size() ? m_bindlessTextureResources[index].Get() : nullptr;
+    return m_bindless.Get(index);
 }
 
 bool VulkanBackend::RetainBindlessTextures(const u32* indices, u32 count)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    for (u32 i = 0; i < count; ++i)
-    {
-        if (indices[i] >= m_bindlessTextureReferences.size() || m_bindlessTextureReferences[indices[i]] == 0)
-            return false;
-        R_ASSERT(m_bindlessTextureReferences[indices[i]] <= UINT32_MAX - count);
-    }
-    for (u32 i = 0; i < count; ++i)
-        ++m_bindlessTextureReferences[indices[i]];
-    return true;
+    return m_bindless.Retain(indices, count);
 }
 
 void VulkanBackend::ReleaseBindlessTextures(const u32* indices, u32 count)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    for (u32 i = 0; i < count; ++i)
-    {
-        const u32 index = indices[i];
-        R_ASSERT(index < m_bindlessTextureReferences.size() && m_bindlessTextureReferences[index] != 0);
-        if (--m_bindlessTextureReferences[index] != 0)
-            continue;
-        R_ASSERT2(m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, nvrhi::BindingSetItem::None(index)),
-            "[VulkanBackend] bindless texture retirement failed");
-        m_bindlessTextureMap.erase(m_bindlessTextureResources[index].Get());
-        m_bindlessTextureResources[index] = nullptr;
-        m_freeBindlessIndices.push_back(index);
-    }
+    m_bindless.Release(indices, count, m_inFrame);
 }
 
 nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
@@ -1059,6 +1040,7 @@ void VulkanBackend::BeginFrame() {
         TaskScheduler->Wait(m_gcTask);
         m_gcTask.Reset();
     }
+    m_bindless.BeginFrame();
 
     using Clock = std::chrono::steady_clock;
     auto usSince = [](Clock::time_point a) -> u64 {

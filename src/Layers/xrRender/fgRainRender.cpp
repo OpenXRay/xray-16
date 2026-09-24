@@ -48,7 +48,7 @@ void FGRainRender::InitResources()
 
     auto* textureManager = renderDevice->GetFGResourceManager()->GetTextureManager();
     R_ASSERT(textureManager);
-    m_streakTexture = textureManager->GetNVRHITexture(textureManager->LoadTexture("fx" DELIMITER "fx_rain"));
+    m_streakTexture = textureManager->GetNVRHITexture(textureManager->LoadTexture("fx" DELIMITER "fx_rain", TextureColorSpace::Srgb));
     R_ASSERT2(m_streakTexture, "FGRainRender: failed to load fx/fx_rain texture");
 
     auto* shaderLoader = RImplementation.GetShaderLoader();
@@ -167,7 +167,7 @@ void FGRainRender::Render(CEffect_Rain& owner)
     }
 
     const float factor_visual = factor / 2.f + .5f;
-    const Fvector3 fc = g_pGamePersistent->Environment().CurrentEnv.rain_color;
+    const Fvector fc = SrgbToLinear(g_pGamePersistent->Environment().CurrentEnv.rain_color);
     const u32 col = color_rgba_f(fc.x, fc.y, fc.z, factor_visual);
     const float radius_wrap_sqr = _sqr(kSourceRadius + .5f);
 

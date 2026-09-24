@@ -19,6 +19,7 @@
 #include "FrameGraph/PassResourceCache.h"
 #include "FrameGraph/BindingSetBuilder.h"
 #include "ResourceManager/DDSLoader.h"
+#include "ColorSpace.h"
 #include <thread>
 #include <atomic>
 
@@ -653,7 +654,7 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
     texDesc.depth = 1;
     texDesc.arraySize = 1;
     texDesc.mipLevels = ddsData.desc.mipLevels;
-    texDesc.format = ddsData.desc.format;
+    texDesc.format = FormatForColorSpace(ddsData.desc.format, TextureColorSpace::Srgb);
     texDesc.dimension = nvrhi::TextureDimension::Texture2D;
     texDesc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     texDesc.keepInitialState = true;
@@ -959,6 +960,17 @@ void FGDetailManager::DestroyGPUBuffers()
 
 
     pulledVertexBuffer = nullptr;
+    if (GEnv.Backend)
+    {
+        for (u32 index : { buildDetailsBindlessIndex, buildDetailsPbrBindlessIndex, buildDetailsBumpBindlessIndex })
+        {
+            if (index != 0 && index != UINT32_MAX)
+                GEnv.Backend->ReleaseBindlessTextures(&index, 1);
+        }
+    }
+    buildDetailsBindlessIndex = 0;
+    buildDetailsPbrBindlessIndex = 0;
+    buildDetailsBumpBindlessIndex = 0;
     buildDetailsTexture = nullptr;
     buildDetailsPbrTexture = nullptr;
     buildDetailsBumpTexture = nullptr;
@@ -1776,8 +1788,10 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
     fc.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
     fc.grass_interaction_max_angle = ps_r3_grass_interaction_max_angle;
     fc.grass_blade_width = ps_r3_grass_blade_width;
-    fc.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
-    fc.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
+    const Fvector tipColor = SrgbToLinear(ps_r3_grass_color_tip);
+    const Fvector baseColor = SrgbToLinear(ps_r3_grass_color_base);
+    fc.grass_color_tip.set(tipColor.x, tipColor.y, tipColor.z, 0.0f);
+    fc.grass_color_base.set(baseColor.x, baseColor.y, baseColor.z, 0.0f);
     fc.grass_color_variation = ps_r3_grass_color_variation;
     fc.grass_blade_height = ps_r3_grass_blade_height;
     fc.buildDetailsIndex = buildDetailsBindlessIndex;
@@ -1795,12 +1809,15 @@ void FGDetailManager::FillFrameConstants(DetailFrameConstants& fc)
 
 void FGDetailManager::FillGrassMaterialConstants(GrassMaterialConstants& out) const
 {
-    out.colorBase.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y,
-        ps_r3_grass_color_base.z, ps_r3_grass_color_variation);
-    out.colorTip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
+    const Fvector baseColor = SrgbToLinear(ps_r3_grass_color_base);
+    const Fvector tipColor = SrgbToLinear(ps_r3_grass_color_tip);
+    out.colorBase.set(baseColor.x, baseColor.y, baseColor.z, ps_r3_grass_color_variation);
+    out.colorTip.set(tipColor.x, tipColor.y, tipColor.z, 0.0f);
     for (u32 i = 0; i < 64; i++)
-        out.objectTints[i].set(ps_r3_grass_object_tints[i].x, ps_r3_grass_object_tints[i].y,
-            ps_r3_grass_object_tints[i].z, 1.0f);
+    {
+        const Fvector tint = SrgbToLinear(ps_r3_grass_object_tints[i]);
+        out.objectTints[i].set(tint.x, tint.y, tint.z, 1.0f);
+    }
 }
 
 void FGDetailManager::UploadGrassTints(nvrhi::ICommandList* cmdList)

@@ -510,7 +510,6 @@ public:
         GEnv.Render->setGamma(ps_gamma);
         GEnv.Render->setBrightness(ps_brightness);
         GEnv.Render->setContrast(ps_contrast);
-        GEnv.Render->updateGamma();
     }
 };
 

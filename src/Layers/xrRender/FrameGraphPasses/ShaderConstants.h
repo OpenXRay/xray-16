@@ -4,6 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_matrix.h"
+#include "Layers/xrRender/ColorSpace.h"
 
 // Forward declarations of X-Ray engine globals
 extern ECORE_API float ps_r2_sun_lumscale_hemi;
@@ -213,7 +214,8 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.dev_param_4.x = float(ps_r_cluster_debug);
     cb.dev_param_3.y = float(ps_r_sun_shadow_debug);
 
-    cb.foliage_sss.set(ps_r_foliage_sss_tint.x, ps_r_foliage_sss_tint.y, ps_r_foliage_sss_tint.z, ps_r_foliage_sss_sigma);
+    const Fvector foliageTint = SrgbToLinear(Fvector().set(ps_r_foliage_sss_tint.x, ps_r_foliage_sss_tint.y, ps_r_foliage_sss_tint.z));
+    cb.foliage_sss.set(foliageTint.x, foliageTint.y, foliageTint.z, ps_r_foliage_sss_sigma);
     cb.foliage_params.set(ps_r_foliage_sss_blade, ps_r_foliage_sss_tuft, ps_r_foliage_sss_tree, ps_r_foliage_sss_ambient);
     cb.foliage_params2.set(ps_r_foliage_sss_forward, 0.f, 0.f, 0.f);
 }
@@ -244,22 +246,17 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
         sun.direction.z
     );
 
-    cb.L_ambient.set(
-        desc.ambient.x,
-        desc.ambient.y,
-        desc.ambient.z
-    );
+    const Fvector ambient = SrgbToLinear(Fvector().set(desc.ambient.x, desc.ambient.y, desc.ambient.z));
+    cb.L_ambient.set(ambient.x, ambient.y, ambient.z);
 
-    cb.L_hemi_color.set(
-        desc.hemi_color.x,
-        desc.hemi_color.y,
-        desc.hemi_color.z
-    );
+    const Fvector hemi = SrgbToLinear(Fvector().set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z));
+    cb.L_hemi_color.set(hemi.x, hemi.y, hemi.z);
     const Fvector& flash = g_pGamePersistent->Environment().ThunderboltFlash();
     if (ps_r_bolt_flash > 0.f && (flash.x + flash.y + flash.z) > 0.001f) {
-        cb.L_hemi_color.x += flash.x * ps_r_bolt_flash;
-        cb.L_hemi_color.y += flash.y * ps_r_bolt_flash;
-        cb.L_hemi_color.z += flash.z * ps_r_bolt_flash;
+        const Fvector linearFlash = SrgbToLinear(flash);
+        cb.L_hemi_color.x += linearFlash.x * ps_r_bolt_flash;
+        cb.L_hemi_color.y += linearFlash.y * ps_r_bolt_flash;
+        cb.L_hemi_color.z += linearFlash.z * ps_r_bolt_flash;
     }
 }
 

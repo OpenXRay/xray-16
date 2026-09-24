@@ -23,6 +23,7 @@ namespace xray::render::fg::passes {
 
 struct GpuParticlePassState {
     MaterialCache* materialCache = nullptr;
+    u32 materialEpoch = 0;
     u32 registeredPrograms = 0;
     nvrhi::GraphicsPipelineHandle pipelines[PARTICLE_BLEND_COUNT];
     nvrhi::GraphicsPipelineHandle distortPipeline;

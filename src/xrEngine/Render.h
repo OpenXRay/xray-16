@@ -347,7 +347,6 @@ public:
     // Main
     virtual void Calculate() = 0;
     virtual void Render() = 0;
-    virtual void RenderMenu() = 0;
 
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
@@ -366,7 +365,6 @@ public:
     virtual void setGamma(float fGamma) = 0;
     virtual void setBrightness(float fGamma) = 0;
     virtual void setContrast(float fGamma) = 0;
-    virtual void updateGamma() = 0;
 
     //	Destroy
     virtual void OnDeviceDestroy(bool bKeepTextures) = 0;

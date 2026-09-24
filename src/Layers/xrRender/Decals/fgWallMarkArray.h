@@ -17,10 +17,11 @@ public:
     u32 GenerateBindlessMaterialID(shared_str* outTextureName = nullptr);
 
 private:
-    u32 TryRegisterMaterial(u32 index);
+    u32 ResolveMaterial(u32 index);
 
     xr_vector<u32> m_materialIDs;
     xr_vector<shared_str> m_textureNames;
+    u32 m_materialEpoch = 0;
 };
 
 } // namespace xray::render::fg::decals

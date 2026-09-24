@@ -10,11 +10,12 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg::passes {
 
-struct UIPassData {
-    framegraph::VirtualResourceHandle sceneInput;
-    framegraph::VirtualResourceHandle sceneOutput;
-    u32 width;
-    u32 height;
+class UIPassData
+{
+public:
+    framegraph::VirtualResourceHandle target;
+    u32 width = 0;
+    u32 height = 0;
 };
 
 struct CursorPassData {
@@ -25,7 +26,7 @@ struct CursorPassData {
 
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle sceneTarget,
+    framegraph::VirtualResourceHandle interfaceLayer,
     u32 width,
     u32 height
 );

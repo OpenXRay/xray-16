@@ -201,7 +201,7 @@ nvrhi::ITexture* FGLensFlareRender::ResolveTexture(const shared_str& name)
 
     auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
     auto* textureManager = fgRenderer->GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str()));
+    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb));
     m_textureCache.emplace(name, handle);
     return handle;
 }
@@ -286,6 +286,9 @@ void FGLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
 
     Fcolor dwLight;
     dwLight.set(owner.LightColor);
+    dwLight.r = SrgbToLinear(dwLight.r);
+    dwLight.g = SrgbToLinear(dwLight.g);
+    dwLight.b = SrgbToLinear(dwLight.b);
 
     const float fDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane * 0.75f;
 

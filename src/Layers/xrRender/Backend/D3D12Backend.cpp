@@ -186,16 +186,10 @@ void D3D12Backend::Shutdown() {
 
     WaitForIdle();
 
+    m_bindless.Shutdown();
     m_completion.Shutdown();
 
     // Release NVRHI resources
-    m_bindlessDescriptorTable = nullptr;
-    m_bindlessLayout = nullptr;
-    m_bindlessTextureMap.clear();
-    m_bindlessTextureResources.clear();
-    m_bindlessTextureReferences.clear();
-    m_freeBindlessIndices.clear();
-    m_nextBindlessIndex = 0;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     m_commandList = nullptr;
@@ -409,36 +403,8 @@ void D3D12Backend::CreateBackBufferTextures() {
 }
 
 void D3D12Backend::CreateBindlessResources() {
-    Msg("* [D3D12Backend] Creating bindless resources...");
-
-    nvrhi::BindlessLayoutDesc bindlessDesc;
-    bindlessDesc.visibility = nvrhi::ShaderType::All;
-    bindlessDesc.firstSlot = 0;
-    bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
-    bindlessDesc.registerSpaces = { nvrhi::BindingLayoutItem::Texture_SRV(1) };
-
-    m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
-    if (!m_bindlessLayout) {
-        Msg("! [D3D12Backend] Failed to create bindless layout - createBindlessLayout returned null");
-        Msg("! [D3D12Backend] This may indicate SM6.6/ResourceBindingTier3 is not supported");
-        return;
-    }
-    Msg("* [D3D12Backend] Bindless layout created: %p", m_bindlessLayout.Get());
-
-    // Create descriptor table
-    m_bindlessDescriptorTable = m_nvrhiDevice->createDescriptorTable(m_bindlessLayout);
-    if (!m_bindlessDescriptorTable) {
-        Msg("! [D3D12Backend] Failed to create bindless descriptor table");
-        return;
-    }
-    Msg("* [D3D12Backend] Bindless descriptor table created: %p", m_bindlessDescriptorTable.Get());
-
-    // Resize the descriptor table to allocate the actual descriptors
-    // Without this, capacity=0 and all writeDescriptorTable calls will fail
-    m_nvrhiDevice->resizeDescriptorTable(m_bindlessDescriptorTable, MAX_BINDLESS_TEXTURES, false);
-    Msg("* [D3D12Backend] Bindless descriptor table resized to %u entries", MAX_BINDLESS_TEXTURES);
-
-    Msg("* [D3D12Backend] Bindless resources created successfully (max %u textures)", MAX_BINDLESS_TEXTURES);
+    if (!m_bindless.Initialize(m_nvrhiDevice, this, MAX_BINDLESS_TEXTURES))
+        Msg("! [D3D12Backend] Failed to create the bindless texture table (SM6.6/ResourceBindingTier3 required)");
 }
 
 void D3D12Backend::QueryCapabilities() {
@@ -500,45 +466,7 @@ void D3D12Backend::QueryCapabilities() {
 }
 
 u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    if (!m_bindlessDescriptorTable || !texture)
-        return UINT32_MAX;
-
-    auto it = m_bindlessTextureMap.find(texture);
-    if (it != m_bindlessTextureMap.end())
-    {
-        u32& references = m_bindlessTextureReferences[it->second];
-        R_ASSERT(references != 0 && references != UINT32_MAX);
-        ++references;
-        return it->second;
-    }
-
-    u32 slot;
-    if (!m_freeBindlessIndices.empty()) {
-        slot = m_freeBindlessIndices.back();
-        m_freeBindlessIndices.pop_back();
-    } else {
-        if (m_nextBindlessIndex >= MAX_BINDLESS_TEXTURES) {
-            Msg("! [D3D12Backend] Bindless texture limit reached");
-            return UINT32_MAX;
-        }
-        slot = m_nextBindlessIndex++;
-        m_bindlessTextureResources.resize(m_nextBindlessIndex);
-        m_bindlessTextureReferences.resize(m_nextBindlessIndex);
-    }
-
-    nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
-    item.slot = slot;
-
-    if (!m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
-        m_freeBindlessIndices.push_back(slot);
-        return UINT32_MAX;
-    }
-
-    m_bindlessTextureMap[texture] = slot;
-    m_bindlessTextureResources[slot] = texture;
-    m_bindlessTextureReferences[slot] = 1;
-    return slot;
+    return m_bindless.Register(texture);
 }
 
 void D3D12Backend::UnregisterBindlessTexture(u32 index)
@@ -548,39 +476,17 @@ void D3D12Backend::UnregisterBindlessTexture(u32 index)
 
 nvrhi::ITexture* D3D12Backend::GetBindlessTexture(u32 index)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    return index < m_bindlessTextureResources.size() ? m_bindlessTextureResources[index].Get() : nullptr;
+    return m_bindless.Get(index);
 }
 
 bool D3D12Backend::RetainBindlessTextures(const u32* indices, u32 count)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    for (u32 i = 0; i < count; ++i)
-    {
-        if (indices[i] >= m_bindlessTextureReferences.size() || m_bindlessTextureReferences[indices[i]] == 0)
-            return false;
-        R_ASSERT(m_bindlessTextureReferences[indices[i]] <= UINT32_MAX - count);
-    }
-    for (u32 i = 0; i < count; ++i)
-        ++m_bindlessTextureReferences[indices[i]];
-    return true;
+    return m_bindless.Retain(indices, count);
 }
 
 void D3D12Backend::ReleaseBindlessTextures(const u32* indices, u32 count)
 {
-    std::lock_guard<std::mutex> lock(m_bindlessMutex);
-    for (u32 i = 0; i < count; ++i)
-    {
-        const u32 index = indices[i];
-        R_ASSERT(index < m_bindlessTextureReferences.size() && m_bindlessTextureReferences[index] != 0);
-        if (--m_bindlessTextureReferences[index] != 0)
-            continue;
-        R_ASSERT2(m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, nvrhi::BindingSetItem::None(index)),
-            "[D3D12Backend] bindless texture retirement failed");
-        m_bindlessTextureMap.erase(m_bindlessTextureResources[index].Get());
-        m_bindlessTextureResources[index] = nullptr;
-        m_freeBindlessIndices.push_back(index);
-    }
+    m_bindless.Release(indices, count, m_inFrame);
 }
 
 nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
@@ -647,6 +553,7 @@ void D3D12Backend::BeginFrame() {
         TaskScheduler->Wait(m_gcTask);
         m_gcTask.Reset();
     }
+    m_bindless.BeginFrame();
 
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
     m_graphicsWaits.Clear();

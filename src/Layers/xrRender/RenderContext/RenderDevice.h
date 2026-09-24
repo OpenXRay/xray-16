@@ -141,6 +141,12 @@ public:
         u32 sliceCount
     );
 
+    void UploadTextureSlices(
+        nvrhi::ITexture* texture,
+        const TextureSliceData* slices,
+        u32 sliceCount
+    );
+
     // ═══════════════════════════════════════════════════
     //  BUFFER CREATION
     // ═══════════════════════════════════════════════════

@@ -318,22 +318,26 @@ void RenderDevice::UploadTextureData(
         return;
     }
 
-    TextureInfo& info = m_textures[handle.index];
-    nvrhi::ITexture* nvrhiTexture = info.nvrhiHandle;
+    UploadTextureSlices(m_textures[handle.index].nvrhiHandle, slices, sliceCount);
+}
 
-    if (!nvrhiTexture) {
-        Msg("! [RenderDevice] UploadTextureData: Texture has no NVRHI handle");
+void RenderDevice::UploadTextureSlices(
+    nvrhi::ITexture* texture,
+    const TextureSliceData* slices,
+    u32 sliceCount
+) {
+    if (!texture) {
+        Msg("! [RenderDevice] UploadTextureSlices: Texture has no NVRHI handle");
         return;
     }
 
-    // Lock for thread safety - textures are loaded in parallel
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
     ScopedUpload upload(m_backend, GetNativeDevice());
 
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
-        upload.Get()->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
+        upload.Get()->writeTexture(texture, slice.arraySlice, slice.mipLevel,
                              slice.data, slice.rowPitch, slice.slicePitch);
     }
 }

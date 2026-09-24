@@ -465,29 +465,7 @@ void CMainMenu::IR_OnControllerHold(int dik, const ControllerAxisState& state)
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
 
-void CMainMenu::OnRender()
-{
-    ZoneScoped;
-
-    if (m_Flags.test(flGameSaveScreenshot))
-        return;
-
-    // Use FrameGraph renderer for main menu
-    if (GEnv.Render && GEnv.Render->IsEnabled())
-    {
-        GEnv.Render->RenderMenu();
-    }
-    else
-    {
-        // Legacy fallback
-        //GEnv.Render->RenderMenu();
-        //if (!OnRenderPPUI_query())
-        //{
-            //DoRenderDialogs();
-            //UI().RenderFont();
-        //}
-    }
-}
+void CMainMenu::OnRender() {}
 
 void CMainMenu::OnRenderPPUI_main()
 {

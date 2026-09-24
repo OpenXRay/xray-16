@@ -17,6 +17,7 @@ public:
     static VariantTextureBuffer& Instance();
 
     void Initialize(fg::RenderDevice* device);
+    void Reset();
 
     void SetVariantTextures(u32 materialID, const VariantTextureData& data) { Set(materialID, data); }
     const VariantTextureData* GetVariantTextures(u32 materialID) const { return Get(materialID); }

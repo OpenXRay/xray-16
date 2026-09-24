@@ -53,29 +53,32 @@ void FGEnvDescriptorRender::Copy(IEnvDescriptorRender& _in)
     *this = *static_cast<FGEnvDescriptorRender*>(&_in);
 }
 
-void FGEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor& owner)
-{
-    if (owner.sky_texture_name.size())
-        sky_texture.create(owner.sky_texture_name.c_str());
-    if (owner.sky_texture_env_name.size())
-        sky_texture_env.create(owner.sky_texture_env_name.c_str());
-    if (owner.clouds_texture_name.size())
-        clouds_texture.create(owner.clouds_texture_name.c_str());
-}
+void FGEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor&) {}
 
-void FGEnvDescriptorRender::OnDeviceDestroy()
-{
-    sky_texture.destroy();
-    sky_texture_env.destroy();
-    clouds_texture.destroy();
-}
+void FGEnvDescriptorRender::OnDeviceDestroy() {}
 
-FGEnvironmentRender::FGEnvironmentRender()
+bool ResolveSkyTextures(CEnvironment& environment, nvrhi::ITexture*& sky0, nvrhi::ITexture*& sky1)
 {
-    tsky0.create(r2_T_sky0);
-    tsky1.create(r2_T_sky1);
-    t_envmap_0.create(r2_T_envs0);
-    t_envmap_1.create(r2_T_envs1);
+    sky0 = nullptr;
+    sky1 = nullptr;
+    auto* renderDevice = RImplementation.GetRenderDevice();
+    auto* resourceManager = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
+    auto* textureManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
+    if (!textureManager || !environment.Current[0] || !environment.Current[1])
+        return false;
+
+    auto resolve = [textureManager](const shared_str& name) -> nvrhi::ITexture*
+    {
+        if (!name.size())
+            return nullptr;
+        resources::TextureHandle handle = textureManager->FindTexture(name.c_str(), TextureColorSpace::Srgb);
+        if (!handle.IsValid())
+            handle = textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb);
+        return textureManager->GetNVRHITexture(handle);
+    };
+    sky0 = resolve(environment.Current[0]->sky_texture_name);
+    sky1 = resolve(environment.Current[1]->sky_texture_name);
+    return sky0 && sky1;
 }
 
 void FGEnvironmentRender::Copy(IEnvironmentRender& _in)
@@ -88,38 +91,9 @@ const particles_systems::library_interface& FGEnvironmentRender::particles_syste
     return RImplementation.m_PSLibrary;
 }
 
-void FGEnvironmentRender::Clear()
-{
-    std::pair<u32, ref_texture> zero = std::make_pair(u32(0), ref_texture(nullptr));
-    sky_r_textures.clear();
-    sky_r_textures.push_back(zero);
-    sky_r_textures.push_back(zero);
+void FGEnvironmentRender::Clear() {}
 
-    clouds_r_textures.clear();
-    clouds_r_textures.push_back(zero);
-    clouds_r_textures.push_back(zero);
-}
-
-void FGEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRender* inA, IEnvDescriptorRender* inB)
-{
-    auto* pA = static_cast<FGEnvDescriptorRender*>(inA);
-    auto* pB = static_cast<FGEnvDescriptorRender*>(inB);
-
-    sky_r_textures.clear();
-    sky_r_textures.emplace_back(tsky0_tstage, pA->sky_texture);
-    sky_r_textures.emplace_back(tsky1_tstage, pB->sky_texture);
-
-    clouds_r_textures.clear();
-    clouds_r_textures.emplace_back(tclouds0_tstage, pA->clouds_texture);
-    clouds_r_textures.emplace_back(tclouds1_tstage, pB->clouds_texture);
-
-    tsky0->surface_set(nvrhi::TextureHandle(sky_r_textures[0].second->surface_get_native()));
-    tsky1->surface_set(nvrhi::TextureHandle(sky_r_textures[1].second->surface_get_native()));
-
-    const bool menu_pp = g_pGamePersistent->OnRenderPPUI_query();
-    t_envmap_0->surface_set(menu_pp ? nvrhi::TextureHandle() : nvrhi::TextureHandle(pA->sky_texture_env->surface_get_native()));
-    t_envmap_1->surface_set(menu_pp ? nvrhi::TextureHandle() : nvrhi::TextureHandle(pB->sky_texture_env->surface_get_native()));
-}
+void FGEnvironmentRender::lerp(CEnvDescriptorMixer&, IEnvDescriptorRender*, IEnvDescriptorRender*) {}
 
 void FGEnvironmentRender::OnDeviceCreate()
 {
@@ -129,19 +103,6 @@ void FGEnvironmentRender::OnDeviceCreate()
 
 void FGEnvironmentRender::OnDeviceDestroy()
 {
-    sky_r_textures.clear();
-    clouds_r_textures.clear();
-
-    tsky0->surface_set(nvrhi::TextureHandle());
-    tsky1->surface_set(nvrhi::TextureHandle());
-    t_envmap_0->surface_set(nvrhi::TextureHandle());
-    t_envmap_1->surface_set(nvrhi::TextureHandle());
-
-    tsky0_tstage = 0;
-    tsky1_tstage = 0;
-    tclouds0_tstage = 0;
-    tclouds1_tstage = 0;
-
     m_skyVertexBuffer = nullptr;
     m_skyIndexBuffer = nullptr;
     m_skyConstantBuffer = nullptr;
@@ -327,17 +288,7 @@ void FGEnvironmentRender::DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
 
     nvrhi::ITexture* sky0Tex = nullptr;
     nvrhi::ITexture* sky1Tex = nullptr;
-    auto* texManager = renderDevice->GetFGResourceManager()
-        ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
-    if (texManager && environment->Current[0] && environment->Current[1])
-    {
-        const shared_str& skyName0 = environment->Current[0]->sky_texture_name;
-        const shared_str& skyName1 = environment->Current[1]->sky_texture_name;
-        if (skyName0.size())
-            sky0Tex = texManager->GetNVRHITexture(texManager->LoadTexture(skyName0.c_str()));
-        if (skyName1.size())
-            sky1Tex = texManager->GetNVRHITexture(texManager->LoadTexture(skyName1.c_str()));
-    }
+    ResolveSkyTextures(*environment, sky0Tex, sky1Tex);
     if (!sky0Tex) sky0Tex = m_skyPlaceholderCube.Get();
     if (!sky1Tex) sky1Tex = m_skyPlaceholderCube.Get();
 
@@ -524,7 +475,10 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     if (ignoreColor)
         sunColor.set(1.0f, 1.0f, 1.0f, 1.0f);
     else
-        sunColor.set(env.sun_color.x, env.sun_color.y, env.sun_color.z, 1.0f);
+    {
+        const Fvector linearSun = SrgbToLinear(Fvector().set(env.sun_color.x, env.sun_color.y, env.sun_color.z));
+        sunColor.set(linearSun.x, linearSun.y, linearSun.z, 1.0f);
+    }
 
     const float intensity = 2.0f;
     sunColor.r *= intensity;
@@ -574,7 +528,12 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
         auto* texManager = renderDevice->GetFGResourceManager()
             ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
         if (texManager)
-            sunTex = texManager->GetNVRHITexture(texManager->LoadTexture(sunTexName.c_str()));
+        {
+            resources::TextureHandle handle = texManager->FindTexture(sunTexName.c_str(), TextureColorSpace::Srgb);
+            if (!handle.IsValid())
+                handle = texManager->LoadTexture(sunTexName.c_str(), TextureColorSpace::Srgb);
+            sunTex = texManager->GetNVRHITexture(handle);
+        }
     }
     if (!sunTex)
         sunTex = m_sunPlaceholderTex.Get();

@@ -58,7 +58,7 @@
 #include "Decals/OverlayManager.h"                    // Per-NPC overlay textures
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/FontPassSetup.h"
-#include "FrameGraphPasses/PresentPassSetup.h"
+#include "FrameGraphPasses/DisplayPassSetup.h"
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
 #include "ClusteredLightManager.h"
@@ -620,107 +620,6 @@ void FrameGraphRenderer::Render() {
     m_stats.numTriangles = 0;
 }
 
-void FrameGraphRenderer::RenderMenu() {
-    ZoneScopedN("FrameGraphRenderer::RenderMenu");
-    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi), ps_r_rt_gi_profile != 0);
-    ApplyRTLightingSettings(m_lightingState);
-    if (m_lightingState.requested != fg::LightingMode::Raster)
-        m_lightingState.Fail(fg::LightingFallback::NoScene);
-    m_mainView.InvalidateHistory();
-
-    if (!m_enabled) return;
-
-    VERIFY(m_framegraph != nullptr);
-
-    if (m_gpuProfiler)
-    {
-        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
-        m_gpuProfiler->FrameStart(xray::profiler::GetCPUProfiler().IsSamplingFrame());
-    }
-    
-    if (m_device && m_device->GetFGResourceManager()) {
-        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
-    }
-    
-    m_framegraph->ResetForNextFrame();
-
-    const u32 width = Device.dwWidth;
-    const u32 height = Device.dwHeight;
-
-    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
-    framegraph::VirtualResourceHandle backbufferHandle;
-
-    if (backbufferTexture) {
-        framegraph::ResourceDesc backbufferDesc;
-        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-        backbufferDesc.width = width;
-        backbufferDesc.height = height;
-        backbufferDesc.format = backbufferTexture->getDesc().format;
-        backbufferDesc.isRenderTarget = true;
-        backbufferDesc.isImported = true;
-        backbufferDesc.isTransient = false;
-        backbufferDesc.debugName = "Backbuffer";
-
-        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
-        m_framegraph->SetPresentTarget(backbufferHandle);
-    }
-
-    framegraph::ResourceDesc bgDesc;
-    bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    bgDesc.width = width;
-    bgDesc.height = height;
-    bgDesc.format = nvrhi::Format::RGBA8_UNORM;
-    bgDesc.isRenderTarget = true;
-    bgDesc.debugName = "rt_MenuBackground";
-
-    auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
-    
-    framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
-    m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
-    m_framegraph->SetPassCallback(clearPass,
-        [backgroundTarget](fg::RenderContext& ctx, const framegraph::FrameGraph& fg) {
-            auto* bgRT = fg.GetPhysicalTexture(backgroundTarget);
-            if (bgRT) {
-                nvrhi::ICommandList* cmdList = ctx.GetCommandList();
-                cmdList->clearTextureFloat(bgRT, nvrhi::AllSubresources, nvrhi::Color(0.0f));
-            }
-        }
-    );
-
-    auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
-    sceneWithUI = passes::setupFontPass(*m_framegraph, sceneWithUI);
-    sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
-    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
-
-    auto ldrOutput = passes::setupPresentPass(
-        *m_framegraph,
-        m_device,
-        sceneWithUI,
-        backbufferHandle,
-        width,
-        height,
-        m_blackboard->get_or_add<passes::PresentPassState>()
-    );
-
-    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
-    passes::setupImGuiPass(
-        *m_framegraph,
-        ldrOutput,  // LDR input (RGBA8_UNORM)
-        imguiRenderer,
-        width,
-        height
-    );
-    m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
-    m_framegraph->SetRenderContext(m_renderContext.get());
-    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
-    m_framegraph->SetAsyncComputeBackend(nullptr);
-    m_framegraph->Compile();
-    m_framegraph->Execute();
-
-    if (m_gpuProfiler)
-        m_gpuProfiler->FrameEnd();
-}
-
 void FrameGraphRenderer::RenderStatsOverlay()
 {
     if (m_statsOverlay && (psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0))
@@ -1085,6 +984,7 @@ void FrameGraphRenderer::SetupFrame() {
     // All scene collection (including camera-touching lights) needs a ready level.
     const bool collectScene = g_pGamePersistent && g_pGameLevel && g_pGameLevel->bReady
         && !g_pGamePersistent->IsLoadingScreenShown() && g_pGamePersistent->SpatialSpace.m_root;
+    m_sceneCollected = collectScene;
 
     if (m_gpuCullingManager) {
         {
@@ -1337,8 +1237,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto& gpuParticles = GetGpuParticleManager();
     auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
-    if (gpuParticleState.materialCache != m_materialCache.get()) {
+    const u32 materialEpoch = m_materialCache ? m_materialCache->GetVisualMaterialEpoch() : 0;
+    if (gpuParticleState.materialCache != m_materialCache.get() || gpuParticleState.materialEpoch != materialEpoch) {
         gpuParticleState.materialCache = m_materialCache.get();
+        gpuParticleState.materialEpoch = materialEpoch;
         gpuParticleState.registeredPrograms = 0;
     }
     const auto& particleDefinitions = gpuParticles.GetDefinitions();
@@ -1350,12 +1252,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
         sh_list textures;
         Resources->_ParseList(textures, definition->m_TextureName.c_str());
+        const bool distortion = strstr(definition->m_ShaderName.c_str(), "distort") != nullptr;
         const u32 material = m_materialCache && definition->m_TextureName.size() && !textures.empty()
-            ? m_materialCache->PreRegisterParticleMaterial(textures[0]) : 0;
+            ? m_materialCache->PreRegisterParticleMaterial(textures[0], distortion) : 0;
         if (material == UINT32_MAX)
             break;
-        const auto variant = strstr(definition->m_ShaderName.c_str(), "distort")
-            ? passes::ParticleShaderVariant::Distort : passes::ParticleShaderVariant::Standard;
+        const auto variant = distortion ? passes::ParticleShaderVariant::Distort : passes::ParticleShaderVariant::Standard;
         gpuParticles.SetProgramMaterial(program, material,
             QueryParticleBlendMode(definition->m_ShaderName.c_str()), static_cast<u32>(variant));
         gpuParticleState.registeredPrograms = program + 1;
@@ -1383,7 +1285,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.debugName = "rt_BaseColor";
     baseColorDesc.width = width;
     baseColorDesc.height = height;
-    baseColorDesc.format = nvrhi::Format::RGBA8_UNORM;
+    baseColorDesc.format = nvrhi::Format::RGBA16_FLOAT;
     baseColorDesc.isRenderTarget = true;
     baseColorDesc.allowUAV = true;
     baseColorDesc.isTransient = true;
@@ -1816,7 +1718,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    const bool rayHistoryRequired = m_lightingState.effective != fg::LightingMode::ReferencePT;
+    const bool rayHistoryRequired = m_lightingState.effective == fg::LightingMode::RTGI;
     const bool motionVectorsRequired = rayHistoryRequired || ps_r_vis_debug != 0;
 
     passes::MotionVectorOutput motionOutput;
@@ -1824,7 +1726,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
             visMotionHandle, Device.mInvFullTransform, m_mainView.prevViewProj, m_mainView.hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
 
-    if (rayHistoryRequired)
+    if (motionVectorsRequired)
         m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
@@ -2066,35 +1968,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     sceneColor = passes::setupLightingFailurePass(*m_framegraph, sceneColor, m_lightingState);
 
-    auto sceneWithUI = passes::setupUIPass(
-        *m_framegraph,
-        sceneColor,
-        width,
-        height
-    );
+    auto& displayState = m_blackboard->get_or_add<passes::DisplayPassState>();
+    const auto exposure = passes::setupExposurePasses(*m_framegraph, m_device, sceneColor, width, height,
+        m_sceneCollected, displayState);
 
-    sceneWithUI = passes::setupFontPass(*m_framegraph, sceneWithUI);
+    auto interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
+    interfaceLayer = passes::setupUIPass(*m_framegraph, interfaceLayer, width, height);
+    interfaceLayer = passes::setupFontPass(*m_framegraph, interfaceLayer);
+    interfaceLayer = passes::setupCursorPass(*m_framegraph, interfaceLayer, width, height);
+    interfaceLayer = passes::setupDebugDrawPass(*m_framegraph, interfaceLayer, width, height);
 
-    // 5. Cursor Pass - Renders cursor on top of UI+Text
-    sceneWithUI = passes::setupCursorPass(
-        *m_framegraph,
-        sceneWithUI,
-        width,
-        height
-    );
-
-    sceneWithUI = passes::setupDebugDrawPass(*m_framegraph, sceneWithUI, width, height);
-
-    auto ldrOutput = passes::setupPresentPass(
-        *m_framegraph,
-        m_device,
-        sceneWithUI,
-        backbufferHandle,
-        width,
-        height,
-        m_blackboard->get_or_add<passes::PresentPassState>(),
-        &m_lightingState
-    );
+    framegraph::VirtualResourceHandle displayOutput;
+    if (backbufferHandle.is_valid())
+        displayOutput = passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, interfaceLayer,
+            backbufferHandle, width, height, GetDisplayCalibration(), displayState, &m_lightingState);
 
     // ═══════════════════════════════════════════════════════
     //  DEBUG PREVIEW PASS (Render Inspector RT visualization)
@@ -2102,6 +1989,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Interface", interfaceLayer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Material", materialBuffer);
     if (motionOutput.motionVectors.is_valid())
@@ -2243,14 +2131,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
-    passes::setupImGuiPass(
-        *m_framegraph,
-        ldrOutput,
-        imguiRenderer,
-        width,
-        height
-    );
+    if (displayOutput.is_valid())
+    {
+        fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
+        passes::setupImGuiPass(*m_framegraph, displayOutput, imguiRenderer, width, height);
+    }
 
 }
 

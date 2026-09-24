@@ -19,6 +19,7 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
+#include "Layers/xrRender/fgEnvironmentRender.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include <nvrhi/utils.h>
@@ -499,30 +500,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     state.initialRecorded = false;
 
     CEnvironment& env = g_pGamePersistent->Environment();
-    auto* resourceManager = device->GetFGResourceManager();
-    auto* texManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
-
     nvrhi::ITexture* sky0Tex = nullptr;
     nvrhi::ITexture* sky1Tex = nullptr;
     float skyWeight = env.CurrentEnv.weight;
-
-    if (texManager && env.Current[0] && env.Current[1])
-    {
-        if (env.Current[0]->sky_texture_name.size())
-        {
-            auto h0 = texManager->LoadTexture(env.Current[0]->sky_texture_name.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h0);
-            if (t)
-                sky0Tex = t;
-        }
-        if (env.Current[1]->sky_texture_name.size())
-        {
-            auto h1 = texManager->LoadTexture(env.Current[1]->sky_texture_name.c_str());
-            nvrhi::ITexture* t = texManager->GetNVRHITexture(h1);
-            if (t)
-                sky1Tex = t;
-        }
-    }
+    ResolveSkyTextures(env, sky0Tex, sky1Tex);
     if (!sky0Tex ||
         !sky1Tex ||
         sky0Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube ||

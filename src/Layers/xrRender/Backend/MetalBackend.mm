@@ -4,6 +4,7 @@
 #include "MetalBackend.h"
 #include "SubmitTokenRing.h"
 #include "BackendCompletion.h"
+#include "BindlessTextureRegistry.h"
 #undef BOOL
 
 #include <nvrhi/metal3.h>
@@ -53,14 +54,7 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     bool asyncCompute = false;
     QueueTimings queueTimings = {};
     static constexpr u32 MaxBindlessTextures = 65536;
-    nvrhi::BindingLayoutHandle bindlessLayout;
-    nvrhi::DescriptorTableHandle bindlessTable;
-    xr_vector<u32> freeBindlessIndices;
-    xr_map<nvrhi::ITexture*, u32> bindlessTextures;
-    u32 nextBindlessIndex = 0;
-    xr_vector<nvrhi::TextureHandle> bindlessResources;
-    xr_vector<u32> bindlessReferences;
-    std::mutex bindlessMutex;
+    xray::render::backend::BindlessTextureRegistry bindless;
     Capabilities capabilities;
     std::mutex queueMutex;
     xray::render::backend::SubmissionTracker completion;
@@ -69,6 +63,8 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     u32 height = 0;
     u32 debugDepth = 0;
     void* framePool = nullptr;
+    xr_string shaderLibraryCacheDirectory;
+    xr_string pipelineArchivePath;
     bool initialized = false;
     bool inFrame = false;
     bool readyToPresent = false;
@@ -292,17 +288,34 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         }
         impl.layer.device = impl.nativeDevice;
         impl.layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
+        CGColorSpaceRef outputColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+        impl.layer.colorspace = outputColorSpace;
+        CGColorSpaceRelease(outputColorSpace);
         impl.layer.framebufferOnly = YES;
         impl.layer.opaque = YES;
         impl.layer.maximumDrawableCount = GetBackBufferCount();
         impl.layer.allowsNextDrawableTimeout = YES;
         impl.layer.displaySyncEnabled = YES;
 
+        string_path cachePath;
+        if (FS.update_path(cachePath, "$app_data_root$", "shaders_cache_fg" DELIMITER "metal" DELIMITER "libraries", false))
+        {
+            convert_path_separators(cachePath);
+            impl.shaderLibraryCacheDirectory = cachePath;
+        }
+        if (FS.update_path(cachePath, "$app_data_root$", "shaders_cache_fg" DELIMITER "metal" DELIMITER "pipelines.metalarchive", false))
+        {
+            convert_path_separators(cachePath);
+            impl.pipelineArchivePath = cachePath;
+        }
+
         nvrhi::metal3::DeviceDesc desc;
         desc.pDevice = impl.nativeDevice;
         desc.commonQueue = impl.queue;
         desc.computeQueue = impl.computeQueue;
         desc.errorCB = &impl;
+        desc.shaderLibraryCacheDirectory = impl.shaderLibraryCacheDirectory.empty() ? nullptr : impl.shaderLibraryCacheDirectory.c_str();
+        desc.pipelineArchivePath = impl.pipelineArchivePath.empty() ? nullptr : impl.pipelineArchivePath.c_str();
         impl.nativeNvrhiDevice = nvrhi::metal3::createDevice(desc);
         if (!impl.nativeNvrhiDevice) {
             impl.fail("Unable to create the NVRHI Metal device.");
@@ -334,20 +347,11 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             Shutdown();
             return false;
         }
-        nvrhi::BindlessLayoutDesc bindlessDesc;
-        bindlessDesc.visibility = nvrhi::ShaderType::All;
-        bindlessDesc.firstSlot = 0;
-        bindlessDesc.maxCapacity = Impl::MaxBindlessTextures;
-        bindlessDesc.registerSpaces = {nvrhi::BindingLayoutItem::Texture_SRV(1)};
-        impl.bindlessLayout = impl.device->createBindlessLayout(bindlessDesc);
-        if (impl.bindlessLayout)
-            impl.bindlessTable = impl.device->createDescriptorTable(impl.bindlessLayout);
-        if (!impl.bindlessTable) {
+        if (!impl.bindless.Initialize(impl.device, this, Impl::MaxBindlessTextures)) {
             impl.fail("Unable to create the native bindless texture table.");
             Shutdown();
             return false;
         }
-        impl.device->resizeDescriptorTable(impl.bindlessTable, Impl::MaxBindlessTextures, false);
         impl.initialized = true;
         UpdateCapabilities();
         ResizeSwapChain(width, height);
@@ -372,6 +376,8 @@ void MetalBackend::Shutdown() {
             impl.inFrame = false;
         }
         WaitForIdle();
+        SavePipelineCache();
+        impl.bindless.Shutdown();
         impl.completion.Shutdown();
         for (Impl::Frame& frame : impl.frames) {
             frame.graphics = {};
@@ -385,13 +391,6 @@ void MetalBackend::Shutdown() {
         impl.graphicsWaits.Clear();
         impl.uploads = nullptr;
         impl.uploadCompletion = nil;
-        impl.bindlessTable = nullptr;
-        impl.bindlessLayout = nullptr;
-        impl.bindlessTextures.clear();
-        impl.freeBindlessIndices.clear();
-        impl.nextBindlessIndex = 0;
-        impl.bindlessResources.clear();
-        impl.bindlessReferences.clear();
         impl.device = nullptr;
         impl.nativeNvrhiDevice = nullptr;
         impl.layer.device = nil;
@@ -409,10 +408,23 @@ void MetalBackend::Shutdown() {
         impl.height = 0;
         impl.debugDepth = 0;
         impl.readyToPresent = false;
+        impl.shaderLibraryCacheDirectory.clear();
+        impl.pipelineArchivePath.clear();
         impl.initialized = false;
         impl.state.store(DeviceState::Lost);
     }
     m_impl->drainFramePool();
+}
+
+void MetalBackend::SavePipelineCache() {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        if (!impl.nativeNvrhiDevice)
+            return;
+        nvrhi::metal3::IDevice* device = static_cast<nvrhi::metal3::IDevice*>(impl.nativeNvrhiDevice.Get());
+        if (!device || !device->serializePipelineArchive())
+            Msg("! [MetalBackend] Failed to write the Metal pipeline archive");
+    }
 }
 
 bool MetalBackend::IsInitialized() const { return m_impl->initialized; }
@@ -467,6 +479,7 @@ void MetalBackend::BeginFrame() {
         impl.completion.DiscardOpenLeases();
         if (!impl.initialized || impl.state.load() == DeviceState::Lost)
             return;
+        impl.bindless.BeginFrame();
         if (impl.inFrame || impl.readyToPresent) {
             impl.fail("BeginFrame requires the previous frame to be ended and presented.");
             return;
@@ -789,6 +802,7 @@ void MetalBackend::UpdateCapabilities() {
     Capabilities& caps = impl.capabilities;
     caps = {};
     caps.meshShaders = impl.device->queryFeatureSupport(nvrhi::Feature::Meshlets);
+    caps.meshShaderMaxGroups = caps.meshShaders ? (1u << 20) : 0u;
     caps.rayTracing = impl.device->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct)
         && impl.device->queryFeatureSupport(nvrhi::Feature::RayQuery);
     if (@available(macOS 13.0, *))
@@ -797,7 +811,7 @@ void MetalBackend::UpdateCapabilities() {
     }
     caps.rayTracingCompaction = caps.rayTracing && impl.device->queryFeatureSupport(nvrhi::Feature::RayTracingCompaction);
     caps.variableRateShading = impl.device->queryFeatureSupport(nvrhi::Feature::VariableRateShading);
-    caps.bindlessTextures = impl.bindlessTable != nullptr;
+    caps.bindlessTextures = impl.bindless.GetTable() != nullptr;
     caps.maxBindlessResources = caps.bindlessTextures ? Impl::MaxBindlessTextures : 0;
     caps.shaderModel = 66;
     caps.raster_major = 6;
@@ -813,41 +827,7 @@ u32 MetalBackend::RegisterBindlessTexture(nvrhi::ITexture* texture)
 {
     @autoreleasepool
     {
-        Impl& impl = *m_impl;
-        std::lock_guard<std::mutex> lock(impl.bindlessMutex);
-        if (!impl.bindlessTable || !texture)
-            return UINT32_MAX;
-        const auto found = impl.bindlessTextures.find(texture);
-        if (found != impl.bindlessTextures.end())
-        {
-            u32& references = impl.bindlessReferences[found->second];
-            R_ASSERT(references != 0 && references != UINT32_MAX);
-            ++references;
-            return found->second;
-        }
-        u32 slot;
-        if (!impl.freeBindlessIndices.empty())
-        {
-            slot = impl.freeBindlessIndices.back();
-            impl.freeBindlessIndices.pop_back();
-        }
-        else
-        {
-            if (impl.nextBindlessIndex == Impl::MaxBindlessTextures)
-                return UINT32_MAX;
-            slot = impl.nextBindlessIndex++;
-            impl.bindlessResources.resize(impl.nextBindlessIndex);
-            impl.bindlessReferences.resize(impl.nextBindlessIndex);
-        }
-        if (!impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::Texture_SRV(slot, texture)))
-        {
-            impl.freeBindlessIndices.push_back(slot);
-            return UINT32_MAX;
-        }
-        impl.bindlessResources[slot] = texture;
-        impl.bindlessReferences[slot] = 1;
-        impl.bindlessTextures.emplace(texture, slot);
-        return slot;
+        return m_impl->bindless.Register(texture);
     }
 }
 
@@ -858,49 +838,24 @@ void MetalBackend::UnregisterBindlessTexture(u32 index)
 
 nvrhi::ITexture* MetalBackend::GetBindlessTexture(u32 index)
 {
-    Impl& impl = *m_impl;
-    std::lock_guard<std::mutex> lock(impl.bindlessMutex);
-    return index < impl.bindlessResources.size() ? impl.bindlessResources[index].Get() : nullptr;
+    return m_impl->bindless.Get(index);
 }
 
 bool MetalBackend::RetainBindlessTextures(const u32* indices, u32 count)
 {
-    Impl& impl = *m_impl;
-    std::lock_guard<std::mutex> lock(impl.bindlessMutex);
-    for (u32 i = 0; i < count; ++i)
-    {
-        if (indices[i] >= impl.bindlessReferences.size() || impl.bindlessReferences[indices[i]] == 0)
-            return false;
-        R_ASSERT(impl.bindlessReferences[indices[i]] <= UINT32_MAX - count);
-    }
-    for (u32 i = 0; i < count; ++i)
-        ++impl.bindlessReferences[indices[i]];
-    return true;
+    return m_impl->bindless.Retain(indices, count);
 }
 
 void MetalBackend::ReleaseBindlessTextures(const u32* indices, u32 count)
 {
     @autoreleasepool
     {
-        Impl& impl = *m_impl;
-        std::lock_guard<std::mutex> lock(impl.bindlessMutex);
-        for (u32 i = 0; i < count; ++i)
-        {
-            const u32 index = indices[i];
-            R_ASSERT(index < impl.bindlessReferences.size() && impl.bindlessReferences[index] != 0);
-            if (--impl.bindlessReferences[index] != 0)
-                continue;
-            R_ASSERT2(impl.device->writeDescriptorTable(impl.bindlessTable, nvrhi::BindingSetItem::None(index)),
-                "[MetalBackend] bindless texture retirement failed");
-            impl.bindlessTextures.erase(impl.bindlessResources[index].Get());
-            impl.bindlessResources[index] = nullptr;
-            impl.freeBindlessIndices.push_back(index);
-        }
+        m_impl->bindless.Release(indices, count, m_impl->inFrame);
     }
 }
 
-nvrhi::IBindingLayout* MetalBackend::GetBindlessLayout() const { return m_impl->bindlessLayout.Get(); }
-nvrhi::IDescriptorTable* MetalBackend::GetBindlessDescriptorTable() const { return m_impl->bindlessTable.Get(); }
+nvrhi::IBindingLayout* MetalBackend::GetBindlessLayout() const { return m_impl->bindless.GetLayout(); }
+nvrhi::IDescriptorTable* MetalBackend::GetBindlessDescriptorTable() const { return m_impl->bindless.GetTable(); }
 
 void MetalBackend::BeginDebugEvent(pcstr name) {
     if (m_impl->inFrame && name) {

@@ -5,6 +5,7 @@
 
 #include "SubmitTokenRing.h"
 #include "BackendCompletion.h"
+#include "BindlessTextureRegistry.h"
 #include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
@@ -83,8 +84,8 @@ public:
     nvrhi::ITexture* GetBindlessTexture(u32 index) override;
     bool RetainBindlessTextures(const u32* indices, u32 count) override;
     void ReleaseBindlessTextures(const u32* indices, u32 count) override;
-    nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindlessLayout.Get(); }
-    nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindlessDescriptorTable.Get(); }
+    nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindless.GetLayout(); }
+    nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindless.GetTable(); }
 
     // ═══════ Debug/Profiling ═══════
     void BeginDebugEvent(pcstr name) override;
@@ -126,14 +127,7 @@ private:
     nvrhi::CommandListHandle m_uploadCommandList;  // Persistent upload command list (out-of-frame)
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
-    nvrhi::BindingLayoutHandle m_bindlessLayout;
-    nvrhi::DescriptorTableHandle m_bindlessDescriptorTable;
-    xr_vector<u32> m_freeBindlessIndices;
-    xr_map<nvrhi::ITexture*, u32> m_bindlessTextureMap;
-    u32 m_nextBindlessIndex = 0;
-    xr_vector<nvrhi::TextureHandle> m_bindlessTextureResources;
-    xr_vector<u32> m_bindlessTextureReferences;
-    std::mutex m_bindlessMutex;
+    xray::render::backend::BindlessTextureRegistry m_bindless;
 
     // State
     bool m_initialized = false;

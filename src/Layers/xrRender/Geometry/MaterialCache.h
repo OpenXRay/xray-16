@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
+#include "Layers/xrRender/ColorSpace.h"
 #include "xrCore/_vector3d.h"
 
 class IRenderBackend;
@@ -263,7 +264,12 @@ private:
     IRenderBackend* m_textureBackend = nullptr;
     xr_unordered_map<nvrhi::ITexture*, u32> m_bindlessTextures;
     xr_vector<u32> m_bindlessTextureIndices;
+    xr_map<std::pair<shared_str, fg::TextureColorSpace>, u32> m_materialTextureIndices;
+    xr_vector<resources::TextureHandle> m_materialTextureHandles;
     u32 RegisterMaterialTexture(nvrhi::ITexture* texture);
+    u32 AcquireMaterialTexture(const char* name, fg::TextureColorSpace colorSpace);
+    u32 AcquireAlbedoTexture(const char* name);
+    void ReleaseMaterialTextures();
 
     xr_map<xr_string, float> m_detailScaleCache;
 
@@ -273,12 +279,13 @@ private:
 
     struct PendingMaterial {
         u32 materialID;
-        dxRender_Visual* visual;
         shared_str textureName;
+        fg::TextureColorSpace diffuseColorSpace;
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
 
-    xr_map<shared_str, u32> m_particleTextureToMaterialID;
+    xr_map<std::pair<shared_str, fg::TextureColorSpace>, u32> m_particleTextureToMaterialID;
+    xr_map<shared_str, u32> m_decalTextureToMaterialID;
 
 
     xr_unordered_map<shared_str, u32> m_shaderToTerrainMaterialID;
@@ -288,8 +295,6 @@ private:
         dxRender_Visual* visual;
     };
     xr_vector<PendingTerrainMaterial> m_pendingTerrainMaterials;
-
-    resources::TextureHandle m_defaultPBR;
 
     class DeveloperMaterial
     {
@@ -312,8 +317,6 @@ private:
     static void BuildDeveloperTextureDesc(fg::RenderDevice::TextureDesc& desc, nvrhi::Format format, pcstr debugName);
     static void FillDeveloperColorPixels(u8* pixels, const Fvector& color, float opacity);
     static void FillDeveloperPbrPixels(u8* pixels, float metallic, float roughness);
-
-    void CreateDefaultPBRTextures();
 
     float GetDetailScale(const shared_str& textureName);
 
@@ -344,7 +347,11 @@ public:
 
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
-    u32 PreRegisterParticleMaterial(const shared_str& textureName);
+    u32 PreRegisterParticleMaterial(const shared_str& textureName, bool distortion);
+
+    u32 RegisterDecalMaterial(const shared_str& textureName);
+
+    void ReleaseLevelMaterials();
 
     u32 RegisterDeveloperMaterial(const char* key, const char* shaderName, const char* textureName,
         const Fvector& color, float metallic, float roughness, float opacity);

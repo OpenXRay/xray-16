@@ -240,7 +240,6 @@ public:
     void Shutdown();
 
     void Render() override;
-    void RenderMenu() override;
     void RenderStatsOverlay() override;
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
@@ -553,6 +552,7 @@ private:
     u32 m_rtRayAdmitted = 0;
     u32 m_rtRayAdmittedSkinned = 0;
     bool m_collectShadowOnly = false;
+    bool m_sceneCollected = false;
     struct ShadowCasterRegion {
         Fmatrix sunView;
         Fvector2 minXY;

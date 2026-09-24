@@ -77,7 +77,7 @@ struct TransparentPassData {
     u32 width, height;
 };
 
-void InitializeTransparentResources(fg::RenderDevice* device, const nvrhi::FramebufferInfoEx& fbInfo, TransparentPassState& state);
+void InitializeTransparentResources(fg::RenderDevice* device, TransparentPassState& state);
 
 framegraph::DefaultOutputLayout setupTransparentPass(
     framegraph::FrameGraph& fg,

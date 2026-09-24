@@ -1,0 +1,58 @@
+#include "shared/color_space.h"
+#include "shared/tonemap.h"
+
+Texture2D<float4> t_Scene : register(t0);
+Texture2D<float4> t_Interface : register(t1);
+StructuredBuffer<float4> t_Exposure : register(t2);
+
+cbuffer DisplayOutputParams : register(b0)
+{
+    uint g_Tonemapper;
+    uint g_SceneValid;
+    uint g_FrameIndex;
+    float g_Gamma;
+    float g_Brightness;
+    float g_Contrast;
+    float2 g_DisplayPad;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float3 ApplyCalibration(float3 encoded)
+{
+    float3 curved = pow(saturate(encoded), 1.0 / max(g_Gamma, 0.01));
+    return (1.0 + g_Contrast) * 0.5 * curved + (g_Brightness - g_Contrast) * 0.25;
+}
+
+float InterleavedGradientNoise(float2 pixel)
+{
+    return frac(52.9829189 * frac(dot(pixel, float2(0.06711056, 0.00583715))));
+}
+
+float QuantizationDither(float2 pixel, uint frame)
+{
+    float2 offset = float2(frame % 64u, (frame / 64u) % 64u) * 5.588238;
+    float a = InterleavedGradientNoise(pixel + offset);
+    float b = InterleavedGradientNoise(pixel + offset + float2(113.0, 57.0));
+    return (a + b - 1.0) / 255.0;
+}
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    int3 pixel = int3(input.position.xy, 0);
+    float3 display = 0.0;
+    if (g_SceneValid != 0u)
+    {
+        float3 radiance = t_Scene.Load(pixel).rgb;
+        radiance = all(isfinite(radiance)) ? max(radiance, 0.0) : 0.0;
+        display = LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper));
+    }
+    float4 ui = t_Interface.Load(pixel);
+    display = ui.rgb + display * (1.0 - ui.a);
+    display = ApplyCalibration(display) + QuantizationDither(input.position.xy, g_FrameIndex);
+    return float4(saturate(display), 1.0);
+}

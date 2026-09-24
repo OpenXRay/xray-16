@@ -1,6 +1,8 @@
 #ifndef SKINNED_COMMON_H
 #define SKINNED_COMMON_H
 
+#include "shared/color_space.h"
+
 StructuredBuffer<float4x4> g_BoneMatrices : register(t3);
 
 cbuffer SkinnedMaterialCB : register(b4)
@@ -142,7 +144,7 @@ float4 sample_procedural_blood(PaintSplat splat, float2 meshUV)
 
     float dry = smoothstep(0.2, 1.0, age);
     float3 freshColor = splat.color.rgb;
-    float3 dryColor = freshColor * float3(0.34, 0.15, 0.13);
+    float3 dryColor = freshColor * SrgbToLinear(float3(0.34, 0.15, 0.13));
     float3 finalColor = lerp(freshColor, dryColor, dry);
 
     // Add a separate impact-hole core so procedural mode reads as blood + entry wound.
@@ -153,7 +155,7 @@ float4 sample_procedural_blood(PaintSplat splat, float2 meshUV)
     holeMask *= saturate(mask * 1.35);
     float holeAgeFade = 1.0 - smoothstep(0.55, 1.0, age);
     holeMask *= lerp(1.0, 0.7, dry) * holeAgeFade;
-    finalColor = lerp(finalColor, float3(0.02, 0.005, 0.005), saturate(holeMask * 0.95));
+    finalColor = lerp(finalColor, SrgbToLinear(float3(0.02, 0.005, 0.005)), saturate(holeMask * 0.95));
 
     float finalAlpha = mask * lerp(1.0, 0.75, dry);
     return float4(finalColor, finalAlpha);

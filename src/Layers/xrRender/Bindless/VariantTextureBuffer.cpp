@@ -36,4 +36,14 @@ void VariantTextureBuffer::Initialize(fg::RenderDevice* device)
         MAX_MATERIALS, (MAX_MATERIALS * sizeof(VariantTextureData)) / 1024);
 }
 
+void VariantTextureBuffer::Reset()
+{
+    VariantTextureData empty;
+    for (u32 i = 0; i < MAX_VARIANT_TEXTURE_SLOTS; i++)
+        empty.tex[i] = INVALID_TEXTURE_INDEX;
+    for (auto& data : m_data)
+        data = empty;
+    m_fullUploadNeeded = IsInitialized();
+}
+
 } // namespace xray::render::fg::bindless
