@@ -58,7 +58,7 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
     return iFloor(res);
 }
 
-GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
+GLuint CRender::texture_load(pcstr fRName, u32& ret_msize, GLenum& ret_desc, u32& ret_width, u32& ret_height)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return 0; });
@@ -113,19 +113,43 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 
     u32 mip_cnt = u32(-1); // XXX: write to it when reading with GLI!
 
+#ifdef XR_PLATFORM_WEB
+    gli::gl GL(gli::gl::PROFILE_ES30);
+#else
     gli::gl GL(gli::gl::PROFILE_GL33);
+#endif
 
     gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
     GLenum target = GL.translate(texture.target());
 
+
+    const texture_upload_unit uploadUnit(target);
     glGenTextures(1, &pTexture);
     glBindTexture(target, pTexture);
 
     glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
+#ifdef XR_PLATFORM_WEB
+    const bool swapRedBlue = !gli::is_compressed(texture.format()) && gli::block_size(texture.format()) == 4
+        && format.Swizzles[gli::SWIZZLE_RED] == GL_BLUE;
+    xr_vector<u8> reordered;
+    const auto texels = [&](size_t layer, size_t face, size_t level) -> const void*
+    {
+        const void* data = texture.data(layer, face, level);
+        if (!swapRedBlue)
+            return data;
+        const size_t size = texture.size(level);
+        reordered.assign(static_cast<const u8*>(data), static_cast<const u8*>(data) + size);
+        for (size_t i = 0; i + 3 < size; i += 4)
+            std::swap(reordered[i], reordered[i + 2]);
+        return reordered.data();
+    };
+#else
     if (gli::gl::EXTERNAL_RED != format.External) // skip for proper greyscale-alpha font textures
         glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
+    const auto texels = [&](size_t layer, size_t face, size_t level) { return texture.data(layer, face, level); };
+#endif
 
     glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
@@ -193,7 +217,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
                         glTexSubImage2D(sub_target, static_cast<GLint>(level),
                                     0, 0, tex_level_extent.x, tex_level_extent.y,
                                     format.External, format.Type,
-                                    texture.data(layer, face, level));
+                                    texels(layer, face, level));
                         err = glGetError();
                         if (err != GL_NO_ERROR)
                         {
@@ -225,7 +249,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
                         glTexSubImage3D(target, static_cast<GLint>(level),
                                     0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                     format.External, format.Type,
-                                    texture.data(layer, face, level));
+                                    texels(layer, face, level));
                         err = glGetError();
                         if (err != GL_NO_ERROR)
                         {
@@ -247,6 +271,8 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 
     xr_strlwr(fn);
     ret_desc = target;
+    ret_width = tex_extent.x;
+    ret_height = tex_extent.y;
     int img_loaded_lod = is_target_cube(texture.target()) ? 0 : get_texture_load_lod(fn);
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture;

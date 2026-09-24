@@ -26,6 +26,9 @@ public:
     void set_slice_write(u32 context_id, int slice);
 
     void resolve_into(CRT& destination) const; // only RTs with same format supported
+#ifdef XR_PLATFORM_WEB
+    void copy_into(CRT& destination) const; // same format and size
+#endif
 
 public:
 #if defined(USE_DX11)

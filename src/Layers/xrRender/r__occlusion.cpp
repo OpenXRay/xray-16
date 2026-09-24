@@ -99,6 +99,10 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     CTimer T;
     T.Start();
     RImplementation.BasicStats.Wait.Begin();
+#ifdef XR_PLATFORM_WEB
+    if ((hr = GetData(used[ID].Q, &fragments, sizeof(fragments))) == S_FALSE)
+        fragments = (occq_result)-1;
+#else
     while ((hr = GetData(used[ID].Q, &fragments, sizeof(fragments))) == S_FALSE)
     {
         if (!SwitchToThread())
@@ -110,6 +114,7 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
             break;
         }
     }
+#endif
     RImplementation.BasicStats.Wait.End();
 
     if (0 == fragments)

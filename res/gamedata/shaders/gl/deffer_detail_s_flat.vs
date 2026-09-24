@@ -23,7 +23,7 @@ v2p_flat 	_main (v_detail v)
  	pos.x 		= dot	(m0, v.pos);
  	pos.y 		= dot	(m1, v.pos);
  	pos.z 		= dot	(m2, v.pos);
-	pos.w 		= 1;
+	pos.w 		= 1.0;
 
 	// Normal in world coords
 	float3 	norm;	

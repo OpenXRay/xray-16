@@ -30,7 +30,7 @@ float4 _main( p_postpr I )
 	float4	t_noise	= tex2D		(s_noise,I.Tex2);
 	float3 	noised 	= image*t_noise.rgb*2.0;                     		// mul_2x
 			image	= lerp( noised, image, I.Color.w); 	// lrp ?
-			image	= (image * I.Color.rgb + c_brightness.rgb)*2;		// mad
+			image	= (image * I.Color.rgb + c_brightness.rgb)*2.0;		// mad
 //		image	= (image + c_brightness) * I.Color;		// mad ?
 
 	// out

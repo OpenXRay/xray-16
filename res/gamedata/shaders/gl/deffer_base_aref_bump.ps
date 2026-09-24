@@ -12,7 +12,7 @@
 float4 	_main	( p_bumped I )
 {
 	surface_bumped 	S 		= sload 	(I);
-	S.base.w = (S.base.w-def_aref*0.5)/(1-def_aref*0.5);
+	S.base.w = (S.base.w-def_aref*0.5)/(1.0-def_aref*0.5);
 	return S.base;
 }
 

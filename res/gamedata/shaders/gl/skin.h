@@ -104,7 +104,7 @@ v_model skinning_1 	(v_model_skinned_1	v)
 	v.B.xyz		= v.B.zyx;
 
 	// matrices
-	int 	mid = int(v.N.w * 255 + 0.3);
+	int 	mid = int(v.N.w * 255.0 + 0.3);
 	float4  m0 	= sbones_array[mid+0];
 	float4  m1 	= sbones_array[mid+1];
 	float4  m2 	= sbones_array[mid+2];
@@ -166,7 +166,7 @@ v_model skinning_3 	(v_model_skinned_3	v)
 	float4  m0_1 	= sbones_array[id_1+0];
 	float4  m1_1 	= sbones_array[id_1+1];
 	float4  m2_1 	= sbones_array[id_1+2];
-	int 	id_2 	= int(v.B.w*255+0.3);
+	int 	id_2 	= int(v.B.w*255.0+0.3);
 	float4  m0_2 	= sbones_array[id_2+0];
 	float4  m1_2 	= sbones_array[id_2+1];
 	float4  m2_2 	= sbones_array[id_2+2];
@@ -174,7 +174,7 @@ v_model skinning_3 	(v_model_skinned_3	v)
 	// lerp
 	float 	w0 	= v.N.w;
 	float 	w1 	= v.T.w;
-	float 	w2 	= 1-w0-w1;
+	float 	w2 	= 1.0-w0-w1;
 	float4  m0 	= m0_0*w0;
 	float4  m1 	= m1_0*w0;
 	float4  m2 	= m2_0*w0;
@@ -214,7 +214,7 @@ v_model skinning_4 	(v_model_skinned_4	v)
 
 	for (int i=0; i<4; ++i)
 	{		
-		id[i] = int(v.ind[i]*255+0.3);
+		id[i] = int(v.ind[i]*255.0+0.3);
 
 		for (int j=0; j<3; ++j)
 			m[i][j] = sbones_array[id[i]+j];
@@ -225,7 +225,7 @@ v_model skinning_4 	(v_model_skinned_4	v)
 	w[0] 	= v.N.w;
 	w[1] 	= v.T.w;
 	w[2] 	= v.B.w;
-	w[3]	= 1-w[0]-w[1]-w[2];
+	w[3]	= 1.0-w[0]-w[1]-w[2];
 
 	float4  m0 	= m[0][0]*w[0];
 	float4  m1 	= m[0][1]*w[0];

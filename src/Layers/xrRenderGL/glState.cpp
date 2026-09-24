@@ -39,6 +39,13 @@ glState* glState::Create()
     return xr_new<glState>();
 }
 
+#ifdef XR_PLATFORM_WEB
+namespace
+{
+GLuint boundSamplers[CTexture::mtMaxCombinedShaderTextures]{};
+}
+#endif
+
 //	TODO: OGL: Does the render cache provide enough state management?
 void glState::Apply()
 {
@@ -47,13 +54,23 @@ void glState::Apply()
     {
         if (m_samplerArray[stage])
         {
+#ifdef XR_PLATFORM_WEB
+            if (boundSamplers[stage] != m_samplerArray[stage])
+            {
+                boundSamplers[stage] = m_samplerArray[stage];
+                glBindSampler(stage, m_samplerArray[stage]);
+            }
+#else
             glBindSampler(stage, m_samplerArray[stage]);
+#endif
 
             if (!fsimilar(m_uiMipLODBias, ps_r__tf_Mipbias))
             {
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MIN_LOD, 0.f));
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MAX_LOD, FLT_MAX));
+#ifndef XR_PLATFORM_WEB
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, ps_r__tf_Mipbias));
+#endif
             }
         }
     }
@@ -74,6 +91,12 @@ void glState::Apply()
         m_pDepthStencilState.StencilDepthFailOp
     );
 
+#ifdef XR_PLATFORM_WEB
+    RCache.set_DepthWrite(m_pDepthStencilState.DepthWriteMask ? TRUE : FALSE);
+    RCache.set_Blend(m_pBlendState.BlendEnable, m_pBlendState.SrcBlend, m_pBlendState.DestBlend,
+        m_pBlendState.SrcBlendAlpha, m_pBlendState.DestBlendAlpha, m_pBlendState.BlendOp,
+        m_pBlendState.BlendOpAlpha);
+#else
     CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask ? GL_TRUE : GL_FALSE));
 
     if (m_pBlendState.BlendEnable)
@@ -91,6 +114,7 @@ void glState::Apply()
         glStateUtils::ConvertBlendOp(m_pBlendState.BlendOp),
         glStateUtils::ConvertBlendOp(m_pBlendState.BlendOpAlpha)
     ));
+#endif
 
     RCache.set_ColorWriteEnable(m_pBlendState.ColorMask);
 }
@@ -235,8 +259,10 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
         break;
     case D3DSAMP_BORDERCOLOR: /* D3DCOLOR */
     {
+#ifndef XR_PLATFORM_WEB
         GLuint color[] = {color_get_R(value), color_get_G(value), color_get_B(value), color_get_A(value)};
         CHK_GL(glSamplerParameterIuiv(m_samplerArray[stage], GL_TEXTURE_BORDER_COLOR, color));
+#endif
     }
         break;
     case D3DSAMP_MAGFILTER: /* D3DTEXTUREFILTER filter to use for magnification */
@@ -252,7 +278,9 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
             value, currentFilter, true)));
         break;
     case D3DSAMP_MIPMAPLODBIAS: /* float Mipmap LOD bias */
+#ifndef XR_PLATFORM_WEB
         CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, value));
+#endif
         break;
     case D3DSAMP_MAXMIPLEVEL: /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));
