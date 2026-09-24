@@ -18,6 +18,8 @@ using namespace framegraph;
 
 static nvrhi::ComputePipelineHandle s_worldCacheDecayPipeline;
 static nvrhi::BindingLayoutHandle s_worldCacheDecayLayout;
+static nvrhi::ComputePipelineHandle s_worldCacheSelectPipeline;
+static nvrhi::BindingLayoutHandle s_worldCacheSelectLayout;
 static nvrhi::ComputePipelineHandle s_worldCacheUpdatePipeline;
 static nvrhi::BindingLayoutHandle s_worldCacheUpdateLayout;
 static nvrhi::BufferHandle s_worldCachePlaceholderBuffer;
@@ -25,6 +27,7 @@ static LightingFallback s_worldCacheReadiness = LightingFallback::ResourcesUnava
 static bool s_worldCacheAttempted = false;
 
 static constexpr const char* s_worldCacheDecayShader = "rt_world_cache_decay";
+static constexpr const char* s_worldCacheSelectShader = "rt_world_cache_select";
 static constexpr const char* s_worldCacheUpdateShader = "rt_world_cache_update";
 
 static bool HasUAV(const ExtractedReflection& reflection, const char* name)
@@ -61,8 +64,12 @@ void BindWorldCacheResources(BindingSetBuilder& bsb, const ExtractedReflection& 
     uav("u_WorldCachePosition", buffers.position);
     uav("u_WorldCacheNormal", buffers.normal);
     uav("u_WorldCacheStats", buffers.stats);
+    uav("u_WorldCacheUpdateList", buffers.updateList);
+    uav("u_WorldCacheUpdateArgs", buffers.updateArgs);
     if (buffers.radianceInput && HasSRV(reflection, "t_WorldCacheRadianceInput"))
         bsb.BufferSRV("t_WorldCacheRadianceInput", buffers.radianceInput);
+    if (buffers.updateList && HasSRV(reflection, "t_WorldCacheUpdateList"))
+        bsb.BufferSRV("t_WorldCacheUpdateList", buffers.updateList);
 }
 
 static LightingFallback LoadWorldCachePipelines(RenderDevice* device)
@@ -121,6 +128,9 @@ static LightingFallback LoadWorldCachePipelines(RenderDevice* device)
     s_worldCacheReadiness = createPipeline(s_worldCacheDecayShader, "WorldCache_Decay", false, s_worldCacheDecayLayout, s_worldCacheDecayPipeline);
     if (s_worldCacheReadiness != LightingFallback::None)
         return s_worldCacheReadiness;
+    s_worldCacheReadiness = createPipeline(s_worldCacheSelectShader, "WorldCache_Select", false, s_worldCacheSelectLayout, s_worldCacheSelectPipeline);
+    if (s_worldCacheReadiness != LightingFallback::None)
+        return s_worldCacheReadiness;
     s_worldCacheReadiness = createPipeline(s_worldCacheUpdateShader, "WorldCache_Update", true, s_worldCacheUpdateLayout, s_worldCacheUpdatePipeline);
     if (s_worldCacheReadiness == LightingFallback::None)
         Msg("* [WorldCache] Radiance cache pipelines initialized");
@@ -157,6 +167,7 @@ static void PublishCacheState(LightingFrameState& lighting, const WorldRadianceC
     const auto stats = cache->GetStats();
     lighting.worldCacheCapacity = config.enabled ? stats.capacity : 0;
     lighting.worldCacheLiveCells = stats.liveCells;
+    lighting.worldCacheUpdated = stats.updatedCells;
     lighting.worldCacheLiveCellsKnown = stats.liveCellsKnown;
     lighting.worldCacheEventsKnown = stats.eventsKnown;
     lighting.worldCacheSubstituted = stats.events[0];
@@ -267,9 +278,57 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             cmdList->dispatch((data.capacity + 255) / 256, 1, 1);
         });
 
+    fg.addCallbackPass<WorldCacheSelectPassData>(
+        "WorldCache Select",
+        [&, cache, device, lighting, constants, constantBuffer, capacity](
+            FrameGraph& builder, PassHandle passHandle, WorldCacheSelectPassData& data)
+        {
+            RenderPassBuilder pb(builder, passHandle);
+            data.resources = cache->Use(builder, pb, WorldRadianceCacheAccess::Select);
+            pb.sideEffects();
+            data.device = device;
+            data.cache = cache;
+            data.lighting = lighting;
+            data.constants = constants;
+            data.constantBuffer = constantBuffer;
+            data.capacity = capacity;
+        },
+        [](const WorldCacheSelectPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
+        {
+            if (data.lighting->effective != LightingMode::RTGI || !data.cache->IsContentReady())
+                return;
+            nvrhi::ICommandList* cmdList = ctx ? ctx->GetCommandList() : nullptr;
+            nvrhi::IDevice* nvDevice = data.device ? data.device->GetNVRHIDevice() : nullptr;
+            const auto buffers = WorldRadianceCache::Resolve(fg, data.resources);
+            if (!cmdList || !nvDevice || !buffers.Valid() || !buffers.updateList || !buffers.updateArgs ||
+                !s_worldCacheSelectPipeline || !s_worldCacheSelectLayout)
+                return;
+            auto* shaderLoader = GEnv.Render ? GEnv.Render->GetShaderLoader() : nullptr;
+            auto* reflection = shaderLoader ? shaderLoader->GetCachedReflection(s_worldCacheSelectShader, ".cs") : nullptr;
+            if (!reflection)
+                return;
+
+            BindingSetBuilder bsb(*reflection, nvDevice, "WorldCache_Select");
+            BindWorldCacheResources(bsb, *reflection, buffers, data.constantBuffer);
+            auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), s_worldCacheSelectLayout, nvDevice);
+            if (!bindingSet)
+                return;
+
+            xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, "WorldCache Select");
+            const u32 args[4] = { 0u, 1u, 1u, 0u };
+            cmdList->writeBuffer(buffers.updateArgs, args, sizeof(args));
+            cmdList->writeBuffer(data.constantBuffer, &data.constants, sizeof(data.constants));
+            nvrhi::ComputeState cs;
+            cs.pipeline = s_worldCacheSelectPipeline;
+            cs.bindings = { bindingSet };
+            cmdList->setComputeState(cs);
+            cmdList->dispatch((data.capacity + 255) / 256, 1, 1);
+            data.lighting->worldCacheSelectRecorded = true;
+        });
+
     fg.addCallbackPass<WorldCacheUpdatePassData>(
         "WorldCache Update",
-        [&, cache, device, lighting, constants, constantBuffer, sceneConstantBuffer, capacity](
+        [&, cache, device, lighting, constants, constantBuffer, sceneConstantBuffer](
             FrameGraph& builder, PassHandle passHandle, WorldCacheUpdatePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
@@ -289,17 +348,17 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             data.constants = constants;
             data.constantBuffer = constantBuffer;
             data.sceneConstantBuffer = sceneConstantBuffer;
-            data.capacity = capacity;
         },
         [](const WorldCacheUpdatePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
-            if (data.lighting->effective != LightingMode::RTGI || !data.cache->IsContentReady())
+            if (data.lighting->effective != LightingMode::RTGI || !data.cache->IsContentReady() ||
+                !data.lighting->worldCacheSelectRecorded)
                 return;
             nvrhi::ICommandList* cmdList = ctx ? ctx->GetCommandList() : nullptr;
             nvrhi::IDevice* nvDevice = data.device ? data.device->GetNVRHIDevice() : nullptr;
             const auto buffers = WorldRadianceCache::Resolve(fg, data.resources);
-            if (!cmdList || !nvDevice || !buffers.Valid() || !buffers.snapshot || !s_worldCacheUpdatePipeline ||
-                !s_worldCacheUpdateLayout)
+            if (!cmdList || !nvDevice || !buffers.Valid() || !buffers.snapshot || !buffers.updateList ||
+                !buffers.updateArgs || !s_worldCacheUpdatePipeline || !s_worldCacheUpdateLayout)
                 return;
 
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
@@ -368,8 +427,9 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             cs.pipeline = s_worldCacheUpdatePipeline;
             cs.bindings = { bindingSet };
             cs.addBindingSet(scene.textures);
+            cs.indirectParams = buffers.updateArgs;
             cmdList->setComputeState(cs);
-            cmdList->dispatch((data.capacity + 63) / 64, 1, 1);
+            cmdList->dispatchIndirect(0);
             data.lighting->worldCacheUpdateRecorded = true;
         });
 
@@ -384,6 +444,8 @@ void ShutdownWorldCache()
 {
     s_worldCacheDecayPipeline = nullptr;
     s_worldCacheDecayLayout = nullptr;
+    s_worldCacheSelectPipeline = nullptr;
+    s_worldCacheSelectLayout = nullptr;
     s_worldCacheUpdatePipeline = nullptr;
     s_worldCacheUpdateLayout = nullptr;
     s_worldCachePlaceholderBuffer = nullptr;

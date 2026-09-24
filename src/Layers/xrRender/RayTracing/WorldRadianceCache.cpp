@@ -9,8 +9,10 @@ namespace xray::render::fg
 {
 bool WorldRadianceCacheResources::Valid() const
 {
+    const bool compacted = access == WorldRadianceCacheAccess::Select || access == WorldRadianceCacheAccess::Update;
     return checksum.is_valid() && life.is_valid() && radiance.is_valid() && position.is_valid() &&
-        normal.is_valid() && stats.is_valid() && (access != WorldRadianceCacheAccess::Update || snapshot.is_valid());
+        normal.is_valid() && stats.is_valid() && (access != WorldRadianceCacheAccess::Update || snapshot.is_valid()) &&
+        (!compacted || (updateList.is_valid() && updateArgs.is_valid()));
 }
 
 bool WorldRadianceCacheBuffers::Valid() const
@@ -35,6 +37,7 @@ void WorldRadianceCache::Shutdown()
     m_readbackSequence = 0;
     m_readbackLatest = 0;
     m_liveCells = 0;
+    m_updatedCells = 0;
     m_liveCellsKnown = false;
     m_eventsKnown = false;
     m_device = nullptr;
@@ -45,6 +48,7 @@ void WorldRadianceCache::Invalidate()
     ++m_epoch;
     m_clearPending = true;
     m_liveCells = 0;
+    m_updatedCells = 0;
     m_liveCellsKnown = false;
     m_eventsKnown = false;
 }
@@ -79,7 +83,8 @@ bool WorldRadianceCache::Prepare(const WorldRadianceCacheConfig& config)
 
 bool WorldRadianceCache::IsAllocated() const
 {
-    return m_capacity != 0 && m_checksum && m_life && m_radiance && m_snapshot && m_position && m_normal && m_stats;
+    return m_capacity != 0 && m_checksum && m_life && m_radiance && m_snapshot && m_position && m_normal && m_stats &&
+        m_updateList && m_updateArgs;
 }
 
 bool WorldRadianceCache::IsContentReady() const
@@ -161,7 +166,8 @@ void WorldRadianceCache::ReleaseLeases()
     m_frameLease = 0;
 }
 
-nvrhi::BufferHandle WorldRadianceCache::CreateCellBuffer(const char* name, u32 capacity, u32 stride) const
+nvrhi::BufferHandle WorldRadianceCache::CreateCellBuffer(const char* name, u32 capacity, u32 stride,
+    bool indirectArgs) const
 {
     nvrhi::BufferDesc desc;
     desc.debugName = name;
@@ -169,6 +175,7 @@ nvrhi::BufferHandle WorldRadianceCache::CreateCellBuffer(const char* name, u32 c
     desc.structStride = stride;
     desc.canHaveUAVs = true;
     desc.canHaveRawViews = true;
+    desc.isDrawIndirectArgs = indirectArgs;
     desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
     desc.keepInitialState = true;
     return m_device->GetNVRHIDevice()->createBuffer(desc);
@@ -177,14 +184,17 @@ nvrhi::BufferHandle WorldRadianceCache::CreateCellBuffer(const char* name, u32 c
 bool WorldRadianceCache::Allocate(u32 capacity)
 {
     Release();
-    m_checksum = CreateCellBuffer("WorldCache_Checksum", capacity, sizeof(u32));
-    m_life = CreateCellBuffer("WorldCache_Life", capacity, sizeof(u32));
-    m_radiance = CreateCellBuffer("WorldCache_Radiance", capacity, sizeof(Fvector4));
-    m_snapshot = CreateCellBuffer("WorldCache_RadianceSnapshot", capacity, sizeof(Fvector4));
-    m_position = CreateCellBuffer("WorldCache_Position", capacity, sizeof(Fvector4));
-    m_normal = CreateCellBuffer("WorldCache_Normal", capacity, sizeof(Fvector4));
-    m_stats = CreateCellBuffer("WorldCache_Stats", kStatsWords, sizeof(u32));
-    if (!m_checksum || !m_life || !m_radiance || !m_snapshot || !m_position || !m_normal || !m_stats)
+    m_checksum = CreateCellBuffer("WorldCache_Checksum", capacity, sizeof(u32), false);
+    m_life = CreateCellBuffer("WorldCache_Life", capacity, sizeof(u32), false);
+    m_radiance = CreateCellBuffer("WorldCache_Radiance", capacity, sizeof(Fvector4), false);
+    m_snapshot = CreateCellBuffer("WorldCache_RadianceSnapshot", capacity, sizeof(Fvector4), false);
+    m_position = CreateCellBuffer("WorldCache_Position", capacity, sizeof(Fvector4), false);
+    m_normal = CreateCellBuffer("WorldCache_Normal", capacity, sizeof(Fvector4), false);
+    m_stats = CreateCellBuffer("WorldCache_Stats", kStatsWords, sizeof(u32), false);
+    m_updateList = CreateCellBuffer("WorldCache_UpdateList", capacity, sizeof(u32), false);
+    m_updateArgs = CreateCellBuffer("WorldCache_UpdateArgs", 4, sizeof(u32), true);
+    if (!m_checksum || !m_life || !m_radiance || !m_snapshot || !m_position || !m_normal || !m_stats ||
+        !m_updateList || !m_updateArgs)
     {
         Release();
         return false;
@@ -203,6 +213,8 @@ void WorldRadianceCache::Release()
     m_position = nullptr;
     m_normal = nullptr;
     m_stats = nullptr;
+    m_updateList = nullptr;
+    m_updateArgs = nullptr;
     m_capacity = 0;
 }
 
@@ -238,6 +250,11 @@ WorldRadianceCacheResources WorldRadianceCache::Use(framegraph::FrameGraph& grap
     resources.stats = ImportCacheBuffer(graph, "WorldCache_Stats", m_stats);
     if (access == WorldRadianceCacheAccess::Update)
         resources.snapshot = ImportCacheBuffer(graph, "WorldCache_RadianceSnapshot", m_snapshot);
+    if (access == WorldRadianceCacheAccess::Select || access == WorldRadianceCacheAccess::Update)
+    {
+        resources.updateList = ImportCacheBuffer(graph, "WorldCache_UpdateList", m_updateList);
+        resources.updateArgs = ImportCacheBuffer(graph, "WorldCache_UpdateArgs", m_updateArgs);
+    }
     if (!resources.Valid())
         return {};
 
@@ -252,6 +269,13 @@ WorldRadianceCacheResources WorldRadianceCache::Use(framegraph::FrameGraph& grap
         builder.readWrite(resources.normal, state);
         builder.readWrite(resources.stats, state);
         break;
+    case WorldRadianceCacheAccess::Select:
+        builder.read(resources.life, state);
+        builder.read(resources.radiance, state);
+        builder.readWrite(resources.stats, state);
+        builder.write(resources.updateList, state);
+        builder.readWrite(resources.updateArgs, state);
+        break;
     case WorldRadianceCacheAccess::Update:
         builder.read(resources.checksum, state);
         builder.readWrite(resources.life, state);
@@ -261,6 +285,8 @@ WorldRadianceCacheResources WorldRadianceCache::Use(framegraph::FrameGraph& grap
         builder.readWrite(resources.position, state);
         builder.readWrite(resources.normal, state);
         builder.readWrite(resources.stats, state);
+        builder.read(resources.updateList, framegraph::ResourceState::ShaderResource);
+        builder.read(resources.updateArgs, framegraph::ResourceState::IndirectArgument);
         break;
     case WorldRadianceCacheAccess::Query:
         builder.readWrite(resources.checksum, state);
@@ -289,6 +315,8 @@ WorldRadianceCacheBuffers WorldRadianceCache::Resolve(const framegraph::FrameGra
     buffers.position = buffer(resources.position);
     buffers.normal = buffer(resources.normal);
     buffers.stats = buffer(resources.stats);
+    buffers.updateList = buffer(resources.updateList);
+    buffers.updateArgs = buffer(resources.updateArgs);
     if (resources.access == WorldRadianceCacheAccess::Update)
         buffers.radianceInput = buffers.snapshot;
     else if (resources.access == WorldRadianceCacheAccess::Query)
@@ -369,6 +397,7 @@ void WorldRadianceCache::ProcessStatsReadback()
             if (words)
             {
                 m_liveCells = words[0];
+                m_updatedCells = words[kStatUpdatedCells];
                 m_liveCellsKnown = true;
                 m_eventsKnown = slot.events;
                 for (u32 i = 0; i < WorldRadianceCacheStats::kEventCount; ++i)
@@ -402,12 +431,13 @@ WorldRadianceCacheStats WorldRadianceCache::GetStats() const
     WorldRadianceCacheStats stats;
     stats.capacity = m_capacity;
     stats.liveCells = m_liveCells;
+    stats.updatedCells = m_updatedCells;
     stats.liveCellsKnown = m_liveCellsKnown;
     stats.eventsKnown = m_eventsKnown;
     for (u32 i = 0; i < WorldRadianceCacheStats::kEventCount; ++i)
         stats.events[i] = m_events[i];
     if (IsAllocated())
-        stats.bytes = u64(m_capacity) * (2 * sizeof(u32) + 4 * sizeof(Fvector4)) + kStatsWords * sizeof(u32);
+        stats.bytes = u64(m_capacity) * (3 * sizeof(u32) + 4 * sizeof(Fvector4)) + (kStatsWords + 4) * sizeof(u32);
     return stats;
 }
 }

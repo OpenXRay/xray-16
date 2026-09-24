@@ -223,12 +223,13 @@ void StatsOverlay::Render()
             ImGui::Text("RTGI world cache: off (r_rt_world_cache 1)");
         else if (lighting.worldCacheScheduled)
         {
-            ImGui::Text("RTGI world cache: scheduled | update %s | trace %s | %u live / %u cells%s | substitute at bounces %u-%u, max bounces %u | %u updates/frame | cell %.2f m | lifetime %u frames | %.1f MB%s",
+            ImGui::Text("RTGI world cache: scheduled | select %s | update %s | trace %s | %u live / %u cells%s | substitute at bounces %u-%u, max bounces %u | %u updated / %u target | cell %.2f m | lifetime %u frames | %.1f MB%s",
+                lighting.worldCacheSelectRecorded ? "recorded" : "not recorded",
                 lighting.worldCacheUpdateRecorded ? "recorded" : "not recorded",
                 lighting.worldCacheRecorded ? "consumed" : (lighting.rtgiProfile ? "not consumed (profile kernels are uncached)" : "not consumed"),
                 lighting.worldCacheLiveCells, lighting.worldCacheCapacity, lighting.worldCacheLiveCellsKnown ? "" : " (count pending)",
                 lighting.worldCacheBounce, lighting.worldCacheMaxBounces - 1, lighting.worldCacheMaxBounces,
-                lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
+                lighting.worldCacheUpdated, lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
                 double(lighting.worldCacheBytes) / (1024.0 * 1024.0), lighting.worldCacheDebug ? " | DEBUG VIEW" : "");
             if (lighting.worldCacheEventsKnown)
                 ImGui::Text("RTGI world cache vertices (latest readback): %u substituted | %u unsampled | %u absent | %u bypassed",
@@ -245,7 +246,8 @@ void StatsOverlay::Render()
                 "takes albedo x cache plus the split-sum rough specular response for its indirect light;\n"
                 "direct light keeps MIS: next-event estimation plus one BSDF-sampled segment that only collects emitters and sky, after which the path ends.\n"
                 "Vertices behind glossy or delta bounces, glossy or water surfaces, and absent or unsampled entries continue tracing under the same max bounces (counted as bypassed, absent or unsampled).\n"
-                "Cells are refreshed from a stable radiance snapshot by one cosine ray each (soft target per frame); updates only read published entries and never allocate.\n"
+                "Each frame a select pass compacts the live cells chosen for refresh (soft per-frame target, favouring recently used and young cells) into a list,\n"
+                "and the update dispatches indirectly over that list: one cosine ray per selected cell from a stable radiance snapshot; updates only read published entries and never allocate.\n"
                 "Update samples are clamped to 4 x (mean + 2 sigma) with a 0.5 luminance floor, and change detection ignores single outliers.\n"
                 "Indirect light transmitted through foliage is not represented by the cache; direct transmission is still sampled at the substituted vertex.\n"
                 "r_rt_world_cache_debug: 1 cached indirect at the primary hit, 2 cell hash colors (magenta = no cell), 3 sample count (red = no cell),\n"

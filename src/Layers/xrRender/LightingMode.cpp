@@ -43,6 +43,7 @@ void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
     poseRevision = 0;
     worldCacheRequested = false;
     worldCacheScheduled = false;
+    worldCacheSelectRecorded = false;
     worldCacheUpdateRecorded = false;
     worldCacheRecorded = false;
     worldCacheLiveCellsKnown = false;
@@ -55,6 +56,7 @@ void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
     worldCacheLifetime = 0;
     worldCacheCapacity = 0;
     worldCacheLiveCells = 0;
+    worldCacheUpdated = 0;
     worldCacheSubstituted = 0;
     worldCacheUnsampled = 0;
     worldCacheAbsent = 0;
@@ -100,6 +102,7 @@ void LightingFrameState::Fail(LightingFallback reason)
         reconstructionActive = false;
         reconstructionSpatialActive = false;
         rayStaticDetailInstances = 0;
+        worldCacheSelectRecorded = false;
         worldCacheUpdateRecorded = false;
         worldCacheRecorded = false;
         m_latchedMode = requested;
@@ -118,6 +121,7 @@ void LightingFrameState::Fail(LightingFallback reason)
     reconstructionActive = false;
     reconstructionSpatialActive = false;
     rayStaticDetailInstances = 0;
+    worldCacheSelectRecorded = false;
     worldCacheUpdateRecorded = false;
     worldCacheRecorded = false;
 }

@@ -5,7 +5,6 @@
 #include "rtgi_raw_params.h"
 #include "rt_integrator.h"
 
-#define RT_WORLD_CACHE_MIN_HISTORY 8.0
 #define RT_WORLD_CACHE_FAST_ALPHA 0.25
 #define RT_WORLD_CACHE_CHANGE_SIGMA 2.0
 #define RT_WORLD_CACHE_CHANGE_FLOOR 0.02
@@ -39,11 +38,13 @@ float2 RTWorldCacheStratifiedSample(uint cell, uint frame)
     return frac(float2(0.7548776662, 0.5698402909) * float(index) + rotation);
 }
 
-[numthreads(64, 1, 1)]
+[numthreads(RT_WORLD_CACHE_UPDATE_GROUP_SIZE, 1, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)
 {
-    uint cell = dispatchID.x;
-    if (cell > g_WorldCacheCapacityMask || !RTWorldCacheEnabled())
+    if (!RTWorldCacheEnabled() || dispatchID.x >= u_WorldCacheStats[RT_WORLD_CACHE_STAT_UPDATES])
+        return;
+    uint cell = t_WorldCacheUpdateList[dispatchID.x];
+    if (cell > g_WorldCacheCapacityMask)
         return;
     uint life = u_WorldCacheLife[cell];
     if (life == 0u || life >= g_WorldCacheLifetime)
@@ -53,11 +54,6 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (!all(isfinite(old)))
         old = 0.0;
     uint rng = pcg_hash(cell * 7919u + g_WorldCacheFrame * 48611u + 1u);
-    uint liveCells = max(u_WorldCacheStats[RT_WORLD_CACHE_STAT_LIVE], 1u);
-    float priority = (life + 1u >= g_WorldCacheLifetime ? 1.0 : 0.5) * (old.a < RT_WORLD_CACHE_MIN_HISTORY ? 2.0 : 1.0);
-    float acceptance = float(g_WorldCacheUpdateTarget) / float(liveCells) * priority;
-    if (acceptance < 1.0 && rand_float(rng) >= acceptance)
-        return;
 
     float4 positionFast = u_WorldCachePosition[cell];
     float4 normalMoment = u_WorldCacheNormal[cell];
