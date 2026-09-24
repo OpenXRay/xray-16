@@ -17,9 +17,11 @@
 
 #include <new> // for std::hardware_destructive_interference_size
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_PPC)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_PPC) \
+    || defined(XR_ARCHITECTURE_WASM32)
 constexpr size_t RECOMMENDED_TASK_SIZE = 64; // bytes
-#elif defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
+#elif defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K) \
+    || defined(XR_ARCHITECTURE_PPC64) || defined(XR_ARCHITECTURE_WASM64)
 constexpr size_t RECOMMENDED_TASK_SIZE = 128; // bytes
 #else
 #error Determine your platform requirements

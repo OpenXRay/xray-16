@@ -56,7 +56,12 @@ void CStreamReader::map(const size_t& new_offset)
         end_offset = m_archive_size;
 
     m_current_window_size = end_offset - start_offset;
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_PLATFORM_WEB)
+    m_current_map_view_of_file = xr_alloc<u8>(m_current_window_size);
+    const ssize_t bytesRead =
+        pread(m_file_mapping_handle, m_current_map_view_of_file, m_current_window_size, start_offset);
+    R_ASSERT2(bytesRead == static_cast<ssize_t>(m_current_window_size), "cannot read stream window");
+#elif defined(XR_PLATFORM_WINDOWS)
     m_current_map_view_of_file =
         static_cast<u8*>(MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, start_offset, m_current_window_size));
 #elif defined(XR_PLATFORM_POSIX)

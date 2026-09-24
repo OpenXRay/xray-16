@@ -35,6 +35,9 @@
 #include "sse2rvv/sse2rvv.h"
 #elif defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
+#elif defined(XR_ARCHITECTURE_WASM64) || defined(XR_ARCHITECTURE_WASM32)
+#include <xmmintrin.h>
+#define _mm_pause() ((void)0)
 #else
 #error Add your platform here
 #endif
@@ -147,7 +150,12 @@ public:
 TaskManager::TaskManager()
 {
     ZoneScoped;
+#ifdef XR_PLATFORM_WEB
+    constexpr u32 MAX_WEB_THREADS = 5;
+    workers.reserve(std::min(std::thread::hardware_concurrency(), MAX_WEB_THREADS));
+#else
     workers.reserve(std::thread::hardware_concurrency());
+#endif
     RegisterThisThreadAsWorker();
 }
 

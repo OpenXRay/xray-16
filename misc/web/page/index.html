@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>OpenXRay Web</title>
+<style>
+  body { margin: 0; background: #0b0b0d; color: #ccc; font: 13px/1.4 ui-monospace, monospace; display: flex; flex-direction: column; height: 100vh; }
+  #toolbar { display: flex; gap: 8px; align-items: center; padding: 6px 10px; background: #1a1a1f; flex-wrap: wrap; }
+  #toolbar input[type=text] { width: 260px; background: #222; color: #ddd; border: 1px solid #444; padding: 3px 6px; }
+  #toolbar select { background: #222; color: #ddd; border: 1px solid #444; padding: 3px 6px; }
+  button { background: #2d2d36; color: #eee; border: 1px solid #555; padding: 4px 10px; cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  progress { width: 220px; }
+  #canvas { display: block; margin: 0 auto; max-width: 100%; max-height: 72vh; background: #000; outline: none; }
+  #log { flex: 1; overflow: auto; margin: 0; padding: 6px 10px; white-space: pre-wrap; color: #9a9; }
+  #status { padding: 2px 10px; color: #888; }
+</style>
+<div id="toolbar">
+  <button id="pick">Add game folder</button>
+  <select id="game"></select>
+  <progress id="progress" value="0" max="1" hidden></progress>
+  <span id="ingest-status">checking game files...</span>
+  <input type="text" id="extra-args" placeholder="extra engine args">
+  <button id="launch" disabled>Launch</button>
+</div>
+<canvas id="canvas" tabindex="0" width="1280" height="720"></canvas>
+<div id="status"></div>
+<pre id="log"></pre>
+<script type="module" src="./main.js"></script>

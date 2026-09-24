@@ -600,8 +600,10 @@ void CLevel::script_gc()
         break;
 
     case 2:
+#ifdef LUA_GCTIMEOUT
         if (lua_gc(GEnv.ScriptEngine->lua(), LUA_GCTIMEOUT, psLUA_GCTIMEOUT) >= 0)
             break;
+#endif
         // LUA_GCTIMEOUT is unsupported, fallback to LUA_GCSTEP
         [[fallthrough]];
 
