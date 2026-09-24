@@ -51,6 +51,7 @@ static_assert(sizeof(WorldRadianceCacheCB) == 64);
 enum class WorldRadianceCacheAccess : u8
 {
     Maintain,
+    Select,
     Update,
     Query
 };
@@ -65,6 +66,8 @@ public:
     framegraph::VirtualResourceHandle position;
     framegraph::VirtualResourceHandle normal;
     framegraph::VirtualResourceHandle stats;
+    framegraph::VirtualResourceHandle updateList;
+    framegraph::VirtualResourceHandle updateArgs;
     WorldRadianceCacheAccess access = WorldRadianceCacheAccess::Query;
     bool Valid() const;
 };
@@ -80,6 +83,8 @@ public:
     nvrhi::IBuffer* position = nullptr;
     nvrhi::IBuffer* normal = nullptr;
     nvrhi::IBuffer* stats = nullptr;
+    nvrhi::IBuffer* updateList = nullptr;
+    nvrhi::IBuffer* updateArgs = nullptr;
     bool Valid() const;
 };
 
@@ -90,6 +95,7 @@ public:
 
     u32 capacity = 0;
     u32 liveCells = 0;
+    u32 updatedCells = 0;
     u32 events[kEventCount] = {};
     u64 bytes = 0;
     bool liveCellsKnown = false;
@@ -111,6 +117,7 @@ class WorldRadianceCache
 public:
     static constexpr u32 kReadbackSlots = 3;
     static constexpr u32 kStatsWords = 8;
+    static constexpr u32 kStatUpdatedCells = 5;
     static constexpr u32 kFlagEnabled = 1u;
     static constexpr u32 kFlagJitter = 2u;
     static constexpr u32 kDebugShift = 4u;
@@ -142,7 +149,7 @@ private:
     void PollSubmittedWork();
     void ProcessStatsReadback();
     void ReleaseLeases();
-    nvrhi::BufferHandle CreateCellBuffer(const char* name, u32 capacity, u32 stride) const;
+    nvrhi::BufferHandle CreateCellBuffer(const char* name, u32 capacity, u32 stride, bool indirectArgs) const;
 
     RenderDevice* m_device = nullptr;
     WorldRadianceCacheConfig m_config;
@@ -153,6 +160,8 @@ private:
     nvrhi::BufferHandle m_position;
     nvrhi::BufferHandle m_normal;
     nvrhi::BufferHandle m_stats;
+    nvrhi::BufferHandle m_updateList;
+    nvrhi::BufferHandle m_updateArgs;
     WorldRadianceCacheReadback m_readback[kReadbackSlots];
     xr_vector<u64> m_workLeases;
     u64 m_frameLease = 0;
@@ -162,6 +171,7 @@ private:
     u32 m_epoch = 0;
     u32 m_readbackWrite = 0;
     u32 m_liveCells = 0;
+    u32 m_updatedCells = 0;
     u32 m_events[WorldRadianceCacheStats::kEventCount] = {};
     bool m_liveCellsKnown = false;
     bool m_eventsKnown = false;

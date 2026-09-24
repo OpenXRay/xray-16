@@ -23,6 +23,9 @@
 #define RT_WORLD_CACHE_EVENT_COUNT 4u
 #define RT_WORLD_CACHE_STAT_LIVE 0u
 #define RT_WORLD_CACHE_STAT_EVENTS 1u
+#define RT_WORLD_CACHE_STAT_UPDATES 5u
+#define RT_WORLD_CACHE_MIN_HISTORY 8.0
+#define RT_WORLD_CACHE_UPDATE_GROUP_SIZE 64
 #define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN 0.25
 #define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX 0.5
 
@@ -54,6 +57,13 @@ StructuredBuffer<float4> t_WorldCacheRadianceInput : register(t19);
 RWStructuredBuffer<float4> u_WorldCachePosition : register(u11);
 RWStructuredBuffer<float4> u_WorldCacheNormal : register(u12);
 RWStructuredBuffer<uint> u_WorldCacheStats : register(u13);
+#ifdef RT_WORLD_CACHE_SELECT
+RWStructuredBuffer<uint> u_WorldCacheUpdateList : register(u14);
+RWStructuredBuffer<uint> u_WorldCacheUpdateArgs : register(u15);
+#endif
+#ifdef RT_WORLD_CACHE_UPDATE
+StructuredBuffer<uint> t_WorldCacheUpdateList : register(t31);
+#endif
 
 struct RTWorldCacheLookup
 {

@@ -73,6 +73,7 @@ public:
     u64 poseRevision = 0;
     bool worldCacheRequested = false;
     bool worldCacheScheduled = false;
+    bool worldCacheSelectRecorded = false;
     bool worldCacheUpdateRecorded = false;
     bool worldCacheRecorded = false;
     bool worldCacheLiveCellsKnown = false;
@@ -85,6 +86,7 @@ public:
     u32 worldCacheLifetime = 0;
     u32 worldCacheCapacity = 0;
     u32 worldCacheLiveCells = 0;
+    u32 worldCacheUpdated = 0;
     u32 worldCacheSubstituted = 0;
     u32 worldCacheUnsampled = 0;
     u32 worldCacheAbsent = 0;

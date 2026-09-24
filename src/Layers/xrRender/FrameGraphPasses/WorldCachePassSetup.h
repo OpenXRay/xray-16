@@ -53,6 +53,18 @@ public:
     u32 capacity = 0;
 };
 
+class WorldCacheSelectPassData
+{
+public:
+    RenderDevice* device = nullptr;
+    WorldRadianceCache* cache = nullptr;
+    LightingFrameState* lighting = nullptr;
+    WorldRadianceCacheResources resources;
+    WorldRadianceCacheCB constants = {};
+    nvrhi::IBuffer* constantBuffer = nullptr;
+    u32 capacity = 0;
+};
+
 class WorldCacheUpdatePassData
 {
 public:
@@ -71,7 +83,6 @@ public:
     WorldRadianceCacheCB constants = {};
     nvrhi::IBuffer* constantBuffer = nullptr;
     nvrhi::IBuffer* sceneConstantBuffer = nullptr;
-    u32 capacity = 0;
 };
 
 WorldRadianceCacheConfig BuildWorldCacheConfig();
