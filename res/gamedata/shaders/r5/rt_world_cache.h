@@ -9,6 +9,22 @@
 #define RT_WORLD_CACHE_FLAG_JITTER 2u
 #define RT_WORLD_CACHE_DEBUG_SHIFT 4u
 #define RT_WORLD_CACHE_DEBUG_MASK 0xF0u
+#define RT_WORLD_CACHE_NO_CELL 0xFFFFFFFFu
+#define RT_WORLD_CACHE_LOOKUP_ABSENT 0u
+#define RT_WORLD_CACHE_LOOKUP_ALLOCATED 1u
+#define RT_WORLD_CACHE_LOOKUP_UNSAMPLED 2u
+#define RT_WORLD_CACHE_LOOKUP_VALID 3u
+#define RT_WORLD_CACHE_MIN_VALID_SAMPLES 4.0
+#define RT_WORLD_CACHE_MAX_LOBE_PDF 0.31830988
+#define RT_WORLD_CACHE_EVENT_SUBSTITUTED 0u
+#define RT_WORLD_CACHE_EVENT_UNSAMPLED 1u
+#define RT_WORLD_CACHE_EVENT_ABSENT 2u
+#define RT_WORLD_CACHE_EVENT_BYPASSED 3u
+#define RT_WORLD_CACHE_EVENT_COUNT 4u
+#define RT_WORLD_CACHE_STAT_LIVE 0u
+#define RT_WORLD_CACHE_STAT_EVENTS 1u
+#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN 0.25
+#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX 0.5
 
 cbuffer RTWorldCacheParams : register(b6)
 {
@@ -22,14 +38,19 @@ cbuffer RTWorldCacheParams : register(b6)
     uint g_WorldCacheMaxSamples;
     uint g_WorldCacheFlags;
     uint g_WorldCacheBounce;
-    uint g_WorldCachePad0;
+    uint g_WorldCacheEpoch;
     uint g_WorldCachePad1;
     uint g_WorldCachePad2;
 };
 
 RWStructuredBuffer<uint> u_WorldCacheChecksum : register(u8);
 RWStructuredBuffer<uint> u_WorldCacheLife : register(u9);
+#if defined(RT_WORLD_CACHE_MAINTENANCE) || defined(RT_WORLD_CACHE_UPDATE)
 RWStructuredBuffer<float4> u_WorldCacheRadiance : register(u10);
+#endif
+#ifndef RT_WORLD_CACHE_MAINTENANCE
+StructuredBuffer<float4> t_WorldCacheRadianceInput : register(t19);
+#endif
 RWStructuredBuffer<float4> u_WorldCachePosition : register(u11);
 RWStructuredBuffer<float4> u_WorldCacheNormal : register(u12);
 RWStructuredBuffer<uint> u_WorldCacheStats : register(u13);
@@ -39,8 +60,18 @@ struct RTWorldCacheLookup
     float3 radiance;
     float sampleCount;
     uint cell;
-    bool found;
+    uint state;
 };
+
+RTWorldCacheLookup RTWorldCacheEmptyLookup()
+{
+    RTWorldCacheLookup lookup;
+    lookup.radiance = 0.0;
+    lookup.sampleCount = 0.0;
+    lookup.cell = RT_WORLD_CACHE_NO_CELL;
+    lookup.state = RT_WORLD_CACHE_LOOKUP_ABSENT;
+    return lookup;
+}
 
 bool RTWorldCacheEnabled()
 {
@@ -94,6 +125,7 @@ uint RTWorldCacheKey(int3 cell, uint octant, uint lod)
     key = pcg_hash(key + asuint(cell.z));
     key = pcg_hash(key + octant);
     key = pcg_hash(key + lod);
+    key = pcg_hash(key + g_WorldCacheEpoch);
     return key & g_WorldCacheCapacityMask;
 }
 
@@ -104,17 +136,15 @@ uint RTWorldCacheChecksum(int3 cell, uint octant, uint lod)
     sum = RTWorldCacheMixHash(sum + asuint(cell.z));
     sum = RTWorldCacheMixHash(sum + octant);
     sum = RTWorldCacheMixHash(sum + lod);
+    sum = RTWorldCacheMixHash(sum + g_WorldCacheEpoch);
     return max(sum, 1u);
 }
 
+#ifndef RT_WORLD_CACHE_MAINTENANCE
 RTWorldCacheLookup RTWorldCacheQuery(float3 position, float3 normal, uint life, bool insert, bool stochastic,
     inout uint rng)
 {
-    RTWorldCacheLookup lookup;
-    lookup.radiance = 0.0;
-    lookup.sampleCount = 0.0;
-    lookup.cell = 0xFFFFFFFFu;
-    lookup.found = false;
+    RTWorldCacheLookup lookup = RTWorldCacheEmptyLookup();
     if (!RTWorldCacheEnabled() || !all(isfinite(position)) || !all(isfinite(normal)))
         return lookup;
 
@@ -143,13 +173,14 @@ RTWorldCacheLookup RTWorldCacheQuery(float3 position, float3 normal, uint life, 
         uint existing = u_WorldCacheChecksum[slot];
         if (existing == checksum)
         {
-            if (insert)
+            if (life != 0u)
                 InterlockedMax(u_WorldCacheLife[slot], life);
-            float4 radiance = u_WorldCacheRadiance[slot];
-            lookup.radiance = all(isfinite(radiance.rgb)) ? max(radiance.rgb, 0.0) : 0.0;
-            lookup.sampleCount = radiance.a;
+            float4 radiance = t_WorldCacheRadianceInput[slot];
+            bool sampled = all(isfinite(radiance)) && radiance.a >= RT_WORLD_CACHE_MIN_VALID_SAMPLES;
+            lookup.radiance = sampled ? max(radiance.rgb, 0.0) : 0.0;
+            lookup.sampleCount = isfinite(radiance.a) ? max(radiance.a, 0.0) : 0.0;
             lookup.cell = slot;
-            lookup.found = true;
+            lookup.state = sampled ? RT_WORLD_CACHE_LOOKUP_VALID : RT_WORLD_CACHE_LOOKUP_UNSAMPLED;
             return lookup;
         }
         if (existing == RT_WORLD_CACHE_EMPTY && firstEmptyProbe == RT_WORLD_CACHE_SEARCH_STEPS)
@@ -167,29 +198,36 @@ RTWorldCacheLookup RTWorldCacheQuery(float3 position, float3 normal, uint life, 
         {
             u_WorldCachePosition[slot] = float4(position, 0.0);
             u_WorldCacheNormal[slot] = float4(normal, 0.0);
-            u_WorldCacheRadiance[slot] = 0.0;
             InterlockedMax(u_WorldCacheLife[slot], g_WorldCacheLifetime);
             lookup.cell = slot;
+            lookup.state = RT_WORLD_CACHE_LOOKUP_ALLOCATED;
             return lookup;
         }
         if (existing == checksum)
         {
-            InterlockedMax(u_WorldCacheLife[slot], life);
+            if (life != 0u)
+                InterlockedMax(u_WorldCacheLife[slot], life);
             lookup.cell = slot;
-            lookup.found = true;
+            lookup.state = RT_WORLD_CACHE_LOOKUP_UNSAMPLED;
             return lookup;
         }
     }
     return lookup;
 }
 
-float3 RTWorldCacheDebugColor(RTWorldCacheLookup lookup, uint mode, float3 diffuseAlbedo)
+float RTWorldCacheRoughnessEligibility(float roughness)
+{
+    return saturate((saturate(roughness) - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN) /
+        (RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN));
+}
+
+float3 RTWorldCacheDebugColor(RTWorldCacheLookup lookup, uint mode, float3 diffuseAlbedo, float eligibility)
 {
     if (mode == 1u)
-        return lookup.found ? diffuseAlbedo * lookup.radiance : 0.0;
+        return lookup.state == RT_WORLD_CACHE_LOOKUP_VALID ? diffuseAlbedo * lookup.radiance : 0.0;
     if (mode == 2u)
     {
-        if (!lookup.found)
+        if (lookup.cell == RT_WORLD_CACHE_NO_CELL)
             return float3(0.5, 0.0, 0.5);
         uint hash = pcg_hash(lookup.cell);
         float3 color = float3(float(hash & 255u), float((hash >> 8u) & 255u), float((hash >> 16u) & 255u)) / 255.0;
@@ -197,12 +235,22 @@ float3 RTWorldCacheDebugColor(RTWorldCacheLookup lookup, uint mode, float3 diffu
     }
     if (mode == 3u)
     {
-        if (!lookup.found)
+        if (lookup.cell == RT_WORLD_CACHE_NO_CELL)
             return float3(0.5, 0.0, 0.0);
         float fill = saturate(lookup.sampleCount / max(float(g_WorldCacheMaxSamples), 1.0));
         return float3(fill, fill, fill);
     }
+    if (mode == 4u)
+    {
+        float3 color = float3(0.9, 0.1, 0.1);
+        if (lookup.state == RT_WORLD_CACHE_LOOKUP_VALID)
+            color = float3(0.1, 0.8, 0.1);
+        else if (lookup.state != RT_WORLD_CACHE_LOOKUP_ABSENT)
+            color = float3(0.9, 0.8, 0.1);
+        return lerp(float3(0.1, 0.2, 0.9), color, saturate(eligibility));
+    }
     return 0.0;
 }
+#endif
 
 #endif

@@ -1,4 +1,5 @@
 #define RT_WORLD_CACHE 1
+#define RT_WORLD_CACHE_MAINTENANCE 1
 #include "rt_world_cache.h"
 
 [numthreads(256, 1, 1)]
@@ -10,7 +11,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     uint life = u_WorldCacheLife[cell];
     if (life == 0u)
         return;
-    life -= 1u;
+    life = min(life, g_WorldCacheLifetime) - 1u;
     u_WorldCacheLife[cell] = life;
     if (life == 0u)
     {
@@ -20,5 +21,5 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         u_WorldCacheNormal[cell] = 0.0;
         return;
     }
-    InterlockedAdd(u_WorldCacheStats[0], 1u);
+    InterlockedAdd(u_WorldCacheStats[RT_WORLD_CACHE_STAT_LIVE], 1u);
 }

@@ -101,6 +101,7 @@ public:
     u32 texWidth = 0;
     u32 texHeight = 0;
     LightingFallback readiness = LightingFallback::ResourcesUnavailable;
+    u64 worldCacheSignature = 0;
     bool initialized = false;
     bool historyValid = false;
     bool initialRecorded = false;
@@ -260,6 +261,7 @@ public:
     WorldRadianceCacheResources worldCache;
     WorldRadianceCacheCB worldCacheConstants = {};
     nvrhi::IBuffer* worldCacheConstantBuffer = nullptr;
+    WorldRadianceCache* worldCacheOwner = nullptr;
     bool profileEnabled = false;
     RTGIRawCB cbData;
     u32 width = 0;

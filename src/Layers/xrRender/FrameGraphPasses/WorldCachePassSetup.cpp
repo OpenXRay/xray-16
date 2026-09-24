@@ -33,6 +33,12 @@ static bool HasUAV(const ExtractedReflection& reflection, const char* name)
         [name](const auto& binding) { return binding.name == name; });
 }
 
+static bool HasSRV(const ExtractedReflection& reflection, const char* name)
+{
+    return std::any_of(reflection.rtBindings.inputTextures.begin(), reflection.rtBindings.inputTextures.end(),
+        [name](const auto& binding) { return binding.name == name; });
+}
+
 static bool HasConstantBuffer(const ExtractedReflection& reflection, const char* name)
 {
     const auto& buffers = reflection.constantLayout.constantBuffers.buffers;
@@ -55,6 +61,8 @@ void BindWorldCacheResources(BindingSetBuilder& bsb, const ExtractedReflection& 
     uav("u_WorldCachePosition", buffers.position);
     uav("u_WorldCacheNormal", buffers.normal);
     uav("u_WorldCacheStats", buffers.stats);
+    if (buffers.radianceInput && HasSRV(reflection, "t_WorldCacheRadianceInput"))
+        bsb.BufferSRV("t_WorldCacheRadianceInput", buffers.radianceInput);
 }
 
 static LightingFallback LoadWorldCachePipelines(RenderDevice* device)
@@ -125,7 +133,7 @@ WorldRadianceCacheConfig BuildWorldCacheConfig()
     config.enabled = ps_r_rt_world_cache != 0;
     config.jitter = true;
     config.bounce = static_cast<u32>(std::clamp(ps_r_rt_world_cache_bounce, 0, 8));
-    config.debug = static_cast<u32>(std::clamp(ps_r_rt_world_cache_debug, 0, 3));
+    config.debug = static_cast<u32>(std::clamp(ps_r_rt_world_cache_debug, 0, 4));
     config.capacityLog2 = static_cast<u32>(std::clamp(ps_r_rt_world_cache_size, 14, 22));
     config.lifetime = static_cast<u32>(std::clamp(ps_r_rt_world_cache_lifetime, 2, 300));
     config.updateTarget = static_cast<u32>(std::clamp(ps_r_rt_world_cache_updates, 1024, 1 << 20));
@@ -150,6 +158,11 @@ static void PublishCacheState(LightingFrameState& lighting, const WorldRadianceC
     lighting.worldCacheCapacity = config.enabled ? stats.capacity : 0;
     lighting.worldCacheLiveCells = stats.liveCells;
     lighting.worldCacheLiveCellsKnown = stats.liveCellsKnown;
+    lighting.worldCacheEventsKnown = stats.eventsKnown;
+    lighting.worldCacheSubstituted = stats.events[0];
+    lighting.worldCacheUnsampled = stats.events[1];
+    lighting.worldCacheAbsent = stats.events[2];
+    lighting.worldCacheBypassed = stats.events[3];
     lighting.worldCacheBytes = config.enabled ? stats.bytes : 0;
 }
 
@@ -177,7 +190,6 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
         return fail(LightingFallback::ResourcesUnavailable);
     if (!cache->Prepare(config))
         return fail(LightingFallback::ResourcesUnavailable);
-    cache->ProcessStatsReadback();
     PublishCacheState(*lighting, config, cache);
 
     auto& resourceCache = GetPassResourceCache();
@@ -214,7 +226,7 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             FrameGraph& builder, PassHandle passHandle, WorldCacheDecayPassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
-            data.resources = cache->Use(builder, pb);
+            data.resources = cache->Use(builder, pb, WorldRadianceCacheAccess::Maintain);
             pb.sideEffects();
             data.device = device;
             data.cache = cache;
@@ -237,23 +249,17 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             if (!reflection)
                 return;
 
-            xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, "WorldCache Decay");
-            if (data.cache->ConsumePendingClear())
-            {
-                cmdList->clearBufferUInt(buffers.checksum, 0);
-                cmdList->clearBufferUInt(buffers.life, 0);
-                cmdList->clearBufferUInt(buffers.radiance, 0);
-                cmdList->clearBufferUInt(buffers.position, 0);
-                cmdList->clearBufferUInt(buffers.normal, 0);
-            }
-            cmdList->clearBufferUInt(buffers.stats, 0);
-            cmdList->writeBuffer(data.constantBuffer, &data.constants, sizeof(data.constants));
-
             BindingSetBuilder bsb(*reflection, nvDevice, "WorldCache_Decay");
             BindWorldCacheResources(bsb, *reflection, buffers, data.constantBuffer);
             auto bindingSet = GetPassResourceCache().GetOrCreateBindingSet(bsb.Build(), s_worldCacheDecayLayout, nvDevice);
             if (!bindingSet)
                 return;
+
+            xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, "WorldCache Decay");
+            data.cache->TrackRecordedWork();
+            data.cache->RecordPendingClear(cmdList, buffers);
+            cmdList->clearBufferUInt(buffers.stats, 0);
+            cmdList->writeBuffer(data.constantBuffer, &data.constants, sizeof(data.constants));
             nvrhi::ComputeState cs;
             cs.pipeline = s_worldCacheDecayPipeline;
             cs.bindings = { bindingSet };
@@ -267,7 +273,7 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             FrameGraph& builder, PassHandle passHandle, WorldCacheUpdatePassData& data)
         {
             RenderPassBuilder pb(builder, passHandle);
-            data.resources = cache->Use(builder, pb);
+            data.resources = cache->Use(builder, pb, WorldRadianceCacheAccess::Update);
             data.lightData = pb.read(inputs.lightData, ResourceState::ShaderResource);
             data.clusterGrid = pb.read(inputs.clusterGrid, ResourceState::ShaderResource);
             data.lightIndexList = pb.read(inputs.lightIndexList, ResourceState::ShaderResource);
@@ -287,12 +293,13 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
         },
         [](const WorldCacheUpdatePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
-            if (data.lighting->effective != LightingMode::RTGI)
+            if (data.lighting->effective != LightingMode::RTGI || !data.cache->IsContentReady())
                 return;
             nvrhi::ICommandList* cmdList = ctx ? ctx->GetCommandList() : nullptr;
             nvrhi::IDevice* nvDevice = data.device ? data.device->GetNVRHIDevice() : nullptr;
             const auto buffers = WorldRadianceCache::Resolve(fg, data.resources);
-            if (!cmdList || !nvDevice || !buffers.Valid() || !s_worldCacheUpdatePipeline || !s_worldCacheUpdateLayout)
+            if (!cmdList || !nvDevice || !buffers.Valid() || !buffers.snapshot || !s_worldCacheUpdatePipeline ||
+                !s_worldCacheUpdateLayout)
                 return;
 
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
@@ -322,8 +329,6 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             nvrhi::IBuffer* grassIB = scene.grassIndices ? scene.grassIndices : s_worldCachePlaceholderBuffer.Get();
 
             xray::profiler::GPUPassScope scope(fg.GetGPUProfiler(), cmdList, "WorldCache Update");
-            cmdList->writeBuffer(data.sceneConstantBuffer, &data.sceneConstants, sizeof(RTGIRawCB));
-            cmdList->writeBuffer(data.constantBuffer, &data.constants, sizeof(data.constants));
 
             BindingSetBuilder bsb(*reflection, nvDevice, "WorldCache_Update");
             bsb.ConstantBuffer("RTGIRawParams", data.sceneConstantBuffer)
@@ -354,17 +359,23 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             if (!bindingSet)
                 return;
 
+            data.cache->TrackRecordedWork();
+            cmdList->copyBuffer(buffers.snapshot, 0, buffers.radiance, 0, buffers.radiance->getDesc().byteSize);
+            cmdList->writeBuffer(data.sceneConstantBuffer, &data.sceneConstants, sizeof(RTGIRawCB));
+            cmdList->writeBuffer(data.constantBuffer, &data.constants, sizeof(data.constants));
+
             nvrhi::ComputeState cs;
             cs.pipeline = s_worldCacheUpdatePipeline;
             cs.bindings = { bindingSet };
             cs.addBindingSet(scene.textures);
             cmdList->setComputeState(cs);
             cmdList->dispatch((data.capacity + 63) / 64, 1, 1);
-            data.cache->ScheduleStatsReadback(cmdList, buffers.stats);
+            data.lighting->worldCacheUpdateRecorded = true;
         });
 
     output.scheduled = true;
-    lighting->worldCacheActive = true;
+    lighting->worldCacheScheduled = true;
+    lighting->worldCacheMaxBounces = std::max(std::max(inputs.sceneConstants.maxBounces, 1u), config.bounce + 1u);
     lighting->worldCacheFallback = LightingFallback::None;
     return output;
 }

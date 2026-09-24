@@ -22,6 +22,8 @@ struct RTIntegratorSettings
     bool allowHudFirstRay;
     uint cacheBounce;
     uint cacheLife;
+    bool cacheInsert;
+    float roughnessFloor;
     bool indirectOnly;
     bool pixelPrimary;
 };
@@ -37,6 +39,8 @@ RTIntegratorSettings RTIntegratorDefaultSettings()
     settings.allowHudFirstRay = false;
     settings.cacheBounce = RT_INTEGRATOR_NO_CACHE;
     settings.cacheLife = 0u;
+    settings.cacheInsert = false;
+    settings.roughnessFloor = 0.0;
     settings.indirectOnly = false;
     settings.pixelPrimary = true;
     return settings;
@@ -63,6 +67,7 @@ struct RTIntegratorResult
     bool firstSegmentDefined;
     bool valid;
     bool invalid;
+    uint4 cacheEvents;
 };
 
 struct RTIntegratorState
@@ -310,26 +315,56 @@ bool RTIntegratorAdvanceStage(inout RTIntegratorState s, RTSceneParams scene, RT
 }
 
 #ifdef RT_WORLD_CACHE
-#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN 0.25
-#define RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX 0.5
-
-bool RTIntegratorCacheStage(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
-    float3 hitPosition, inout uint rng)
+float RTIntegratorCacheEligibility(RTHitSurface hit)
 {
-    if (s.bounces < s.settings.cacheBounce || !RTWorldCacheEnabled())
-        return false;
     if ((hit.flags & MAT_FLAG_WATER) != 0u)
+        return 0.0;
+    return RTWorldCacheRoughnessEligibility(hit.surface.roughness);
+}
+
+bool RTIntegratorCacheLobeAccepted(RTIntegratorState s)
+{
+    return s.bounces == 0u || (!s.previousDelta && s.previousPdf <= RT_WORLD_CACHE_MAX_LOBE_PDF);
+}
+
+void RTIntegratorCacheEvent(inout RTIntegratorState s, uint eventIndex)
+{
+    s.result.cacheEvents += uint4(eventIndex == 0u, eventIndex == 1u, eventIndex == 2u, eventIndex == 3u);
+}
+
+bool RTIntegratorCacheResolve(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
+    float3 hitPosition, inout uint rng, out RTWorldCacheLookup lookup)
+{
+    lookup = RTWorldCacheEmptyLookup();
+    if (!RTWorldCacheEnabled() || s.bounces < s.settings.cacheBounce || s.bounces >= s.settings.maxBounces)
         return false;
-    RTWorldCacheLookup lookup = RTWorldCacheQuery(hitPosition, geometry.geoNormal, s.settings.cacheLife,
-        true, true, rng);
+    float eligibility = RTIntegratorCacheLobeAccepted(s) ? RTIntegratorCacheEligibility(hit) : 0.0;
+    bool eligible = eligibility >= 1.0 || (eligibility > 0.0 && rand_float(rng) < eligibility);
+    if (!eligible)
+    {
+        RTIntegratorCacheEvent(s, RT_WORLD_CACHE_EVENT_BYPASSED);
+        return false;
+    }
+    lookup = RTWorldCacheQuery(hitPosition, geometry.geoNormal, s.settings.cacheLife, s.settings.cacheInsert,
+        true, rng);
+    if (lookup.state == RT_WORLD_CACHE_LOOKUP_VALID)
+    {
+        RTIntegratorCacheEvent(s, RT_WORLD_CACHE_EVENT_SUBSTITUTED);
+        return true;
+    }
+    RTIntegratorCacheEvent(s, lookup.state == RT_WORLD_CACHE_LOOKUP_ABSENT ?
+        RT_WORLD_CACHE_EVENT_ABSENT : RT_WORLD_CACHE_EVENT_UNSAMPLED);
+    return false;
+}
+
+void RTIntegratorCacheApply(inout RTIntegratorState s, RTHitSurface hit, RTWorldCacheLookup lookup)
+{
     float3 V = -s.direction;
     float NdotV = saturate(dot(hit.surface.N, V));
-    float roughness = clamp(hit.surface.roughness, 0.0, 1.0);
-    float specularShare = saturate((roughness - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN) /
-        (RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MAX - RT_WORLD_CACHE_SPECULAR_ROUGHNESS_MIN));
+    float roughness = saturate(hit.surface.roughness);
     float3 F0 = CalculateF0(hit.surface.albedo, hit.surface.metallic);
     float3 diffuse = hit.surface.albedo * (1.0 - hit.surface.metallic) * lookup.radiance;
-    float3 specular = EnvBRDFApprox(F0, roughness, NdotV) * specularShare * lookup.radiance;
+    float3 specular = EnvBRDFApprox(F0, roughness, NdotV) * lookup.radiance;
     if (!all(isfinite(diffuse)))
         diffuse = 0.0;
     if (!all(isfinite(specular)))
@@ -346,18 +381,26 @@ bool RTIntegratorCacheStage(inout RTIntegratorState s, RTHitSurface hit, RTHitGe
         s.result.indirectDiffuse += s.diffuseThroughput * indirect;
         s.result.indirectSpecular += s.specularThroughput * indirect;
     }
-    return true;
 }
 #endif
 
 bool RTIntegratorContinue(inout RTIntegratorState s, RTSceneParams scene, RTHitSurface hit,
     RTHitGeometry geometry, float3 hitPosition, float segmentDistance, inout uint rng)
 {
+#ifdef RT_WORLD_CACHE
+    if (s.settings.roughnessFloor > 0.0)
+        hit.surface.roughness = max(hit.surface.roughness, s.settings.roughnessFloor);
+    RTWorldCacheLookup cache;
+    bool substitute = RTIntegratorCacheResolve(s, hit, geometry, hitPosition, rng, cache);
+#endif
     if (!RTIntegratorLightingStage(s, scene, hit, geometry, hitPosition, rng))
         return false;
 #ifdef RT_WORLD_CACHE
-    if (RTIntegratorCacheStage(s, hit, geometry, hitPosition, rng))
-        return false;
+    if (substitute)
+    {
+        RTIntegratorCacheApply(s, hit, cache);
+        s.settings.maxBounces = s.bounces + 1u;
+    }
 #endif
     return RTIntegratorAdvanceStage(s, scene, hit, geometry, hitPosition, segmentDistance, rng);
 }
