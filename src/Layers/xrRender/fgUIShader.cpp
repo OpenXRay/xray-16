@@ -7,7 +7,37 @@
 
 namespace xray::render::fg
 {
-void fgUIShader::Copy(IUIShader& _in) { *this = *((fgUIShader*)&_in); }
+namespace
+{
+xr_shared_ptr<const framegraph::ExtractedReflection> ShareReflection(framegraph::ExtractedReflection*& reflection)
+{
+    if (!reflection)
+        return {};
+    xr_shared_ptr<const framegraph::ExtractedReflection> shared(reflection, xr_custom_deleter<framegraph::ExtractedReflection>());
+    reflection = nullptr;
+    return shared;
+}
+}
+
+fgUIShader::~fgUIShader()
+{
+    destroy();
+    m_aliveSentinel = DEAD_SENTINEL;
+}
+
+void fgUIShader::Copy(IUIShader& _in)
+{
+    auto& source = static_cast<fgUIShader&>(_in);
+    if (&source == this)
+        return;
+
+    destroy();
+    m_vsHandle = source.m_vsHandle;
+    m_psHandle = source.m_psHandle;
+    m_vsReflection = source.m_vsReflection;
+    m_psReflection = source.m_psReflection;
+    m_baseTexture = source.m_baseTexture;
+}
 
 void fgUIShader::create(LPCSTR sh, LPCSTR tex)
 {
@@ -15,14 +45,16 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
     if (!shaderLoader)
     {
         Msg("! [fgUIShader] ShaderLoader is NULL for shader: %s", sh);
+        destroy();
         return;
     }
 
+    ref_texture texture;
     if (tex)
     {
         bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
         RImplementation.Resources->bDeferredLoad = true;
-        m_baseTexture = RImplementation.Resources->_CreateTexture(tex);
+        texture.create(tex);
         RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
     }
 
@@ -36,14 +68,15 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
         psResult = shaderLoader->LoadPixelShader("stub_default", "main");
     }
 
+    destroy();
+    m_baseTexture = texture;
+
     if (vsResult.handle && psResult.handle)
     {
         m_vsHandle = vsResult.handle;
         m_psHandle = psResult.handle;
-        m_vsReflection = vsResult.reflection;
-        m_psReflection = psResult.reflection;
-        vsResult.reflection = nullptr;
-        psResult.reflection = nullptr;
+        m_vsReflection = ShareReflection(vsResult.reflection);
+        m_psReflection = ShareReflection(psResult.reflection);
     }
     else
     {
@@ -56,15 +89,29 @@ void fgUIShader::create(LPCSTR sh, LPCSTR tex)
 
 u32 fgUIShader::GetBindlessIndex()
 {
-    if (m_bindlessTextureIndex != UINT32_MAX)
+    nvrhi::ITexture* texture = LoadBaseTexture();
+    if (texture && texture == m_bindlessTexture)
         return m_bindlessTextureIndex;
 
-    nvrhi::ITexture* texture = LoadBaseTexture();
+    ReleaseBindlessIndex();
     if (!texture || !GEnv.Backend)
         return UINT32_MAX;
 
-    m_bindlessTextureIndex = GEnv.Backend->RegisterBindlessTexture(texture);
-    return m_bindlessTextureIndex;
+    const u32 index = GEnv.Backend->RegisterBindlessTexture(texture);
+    if (index == UINT32_MAX)
+        return UINT32_MAX;
+
+    m_bindlessTexture = texture;
+    m_bindlessTextureIndex = index;
+    return index;
+}
+
+void fgUIShader::ReleaseBindlessIndex()
+{
+    if (m_bindlessTextureIndex != UINT32_MAX && GEnv.Backend)
+        GEnv.Backend->UnregisterBindlessTexture(m_bindlessTextureIndex);
+    m_bindlessTextureIndex = UINT32_MAX;
+    m_bindlessTexture = nullptr;
 }
 
 nvrhi::ITexture* fgUIShader::LoadBaseTexture()
@@ -78,29 +125,17 @@ nvrhi::ITexture* fgUIShader::LoadBaseTexture()
 
 void fgUIShader::destroy()
 {
-    if (m_bindlessTextureIndex != UINT32_MAX && GEnv.Backend) {
-        GEnv.Backend->UnregisterBindlessTexture(m_bindlessTextureIndex);
-        m_bindlessTextureIndex = UINT32_MAX;
-    }
+    ReleaseBindlessIndex();
     m_vsHandle = nullptr;
     m_psHandle = nullptr;
-    m_baseTexture = nullptr;
-
-    if (m_vsReflection)
-    {
-        xr_delete(m_vsReflection);
-        m_vsReflection = nullptr;
-    }
-    if (m_psReflection)
-    {
-        xr_delete(m_psReflection);
-        m_psReflection = nullptr;
-    }
+    m_vsReflection.reset();
+    m_psReflection.reset();
+    m_baseTexture.destroy();
 }
 
 CTexture* fgUIShader::GetBaseTexture() const
 {
-    return m_baseTexture;
+    return m_baseTexture._get();
 }
 
 xrImTextureData fgUIShader::GetImGuiTextureId()

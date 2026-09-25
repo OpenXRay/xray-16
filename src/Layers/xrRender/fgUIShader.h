@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Include/xrRender/UIShader.h"
+#include "xrCommon/xr_smart_pointers.h"
 
 namespace xray::render::ui {
     class UIRenderCollector;
@@ -12,7 +13,7 @@ namespace xray::render::framegraph {
 
 namespace xray::render::fg
 {
-class fgUIShader : public IUIShader
+class fgUIShader final : public IUIShader
 {
     friend class FrameGraphRenderer;
     friend class xray::render::ui::UIRenderCollector;
@@ -22,17 +23,19 @@ public:
     static constexpr u32 DEAD_SENTINEL  = 0xDEADF6A1u;
 
     fgUIShader() : m_aliveSentinel(ALIVE_SENTINEL) {}
-    ~fgUIShader() { m_aliveSentinel = DEAD_SENTINEL; }
+    ~fgUIShader() override;
+    fgUIShader(const fgUIShader&) = delete;
+    fgUIShader& operator=(const fgUIShader&) = delete;
 
     bool IsAlive() const { return m_aliveSentinel == ALIVE_SENTINEL; }
 
-    virtual void Copy(IUIShader& _in);
-    virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
-    virtual bool inited()
+    void Copy(IUIShader& _in) override;
+    void create(LPCSTR sh, LPCSTR tex = nullptr) override;
+    bool inited() override
     {
         return m_vsHandle && m_psHandle;
     }
-    virtual void destroy();
+    void destroy() override;
 
     CTexture* GetBaseTexture() const;
     bool GetBaseTextureResolution(Fvector2& res) override;
@@ -52,20 +55,18 @@ public:
         return SamePipelineAs(rhs) && m_baseTexture == rhs.m_baseTexture;
     }
 
-    ref_shader hShader;
-
     nvrhi::ShaderHandle m_vsHandle;
     nvrhi::ShaderHandle m_psHandle;
-    framegraph::ExtractedReflection* m_vsReflection = nullptr;
-    framegraph::ExtractedReflection* m_psReflection = nullptr;
-    CTexture* m_baseTexture = nullptr;
-    u32 m_bindlessTextureIndex = UINT32_MAX;
-
-    shared_str baseTexture{ "s_base" };
+    xr_shared_ptr<const framegraph::ExtractedReflection> m_vsReflection;
+    xr_shared_ptr<const framegraph::ExtractedReflection> m_psReflection;
+    ref_texture m_baseTexture;
 
 private:
     nvrhi::ITexture* LoadBaseTexture();
+    void ReleaseBindlessIndex();
 
+    nvrhi::ITexture* m_bindlessTexture = nullptr;
+    u32 m_bindlessTextureIndex = UINT32_MAX;
     u32 m_aliveSentinel{ ALIVE_SENTINEL };
 };
 }
