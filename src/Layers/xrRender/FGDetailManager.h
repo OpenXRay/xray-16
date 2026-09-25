@@ -516,6 +516,7 @@ private:
     u64 AvailableInstanceMemory();
     void UpdateInstanceMemoryStats();
     void DestroyInstanceStorage();
+    void ReleaseBuildDetailsTextures();
     void RecordVisibilityWork(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, VisibilityFrame& frame, bool slots);
     static u64 CombineContentHash(u64 hash, u64 value);
     static u64 FinalizeContentHash(u64 hash);
