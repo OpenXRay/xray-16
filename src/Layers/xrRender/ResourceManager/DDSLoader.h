@@ -3,6 +3,8 @@
 #include "TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
+class ENGINE_API CTheoraSurface;
+
 // DDS File Format Loader
 // Week 1 - Day 2: Task 2.1
 

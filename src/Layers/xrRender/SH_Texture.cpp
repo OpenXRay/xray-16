@@ -1,14 +1,11 @@
 #include "stdafx.h"
 
 #include "SH_Texture.h"
-#include "ResourceManager/DDSLoader.h"
+#include "ColorSpace.h"
 #include "RenderContext/RenderDevice.h"
+#include "ResourceManager/FGResourceManager.h"
+#include "ResourceManager/TextureManager.h"
 #include "r_FrameGraphRenderer.h"
-
-#if defined(XR_PLATFORM_WINDOWS)
-#include "xrEngine/tntQAVI.h"
-#endif
-#include "xrEngine/xrTheora_Surface.h"
 
 namespace xray::render::fg
 {
@@ -24,86 +21,23 @@ void fix_texture_name(pstr fn)
 
 namespace
 {
-nvrhi::TextureHandle nvrhi_texture_load(pcstr name, u32& mem)
-{
-    mem = 0;
+constexpr u64 kMaxReportedTextureMemory = (1u << 28) - 1;
 
+resources::TextureManager* ManagedTextures()
+{
     auto* renderDevice = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
-    if (!renderDevice)
-        return {};
-
-    auto* device = renderDevice->GetNVRHIDevice();
-    if (!device)
-        return {};
-
-    resources::DDSData ddsData;
-    if (!resources::DDSLoader::LoadFromFile(name, ddsData) || !ddsData.isValid || ddsData.mipLevels.empty())
-        return {};
-
-    if (ddsData.type != resources::DDSData::TextureType::Static)
-        return {};
-
-    nvrhi::TextureDesc texDesc;
-    texDesc.width = ddsData.desc.width;
-    texDesc.height = ddsData.desc.height;
-    texDesc.depth = ddsData.desc.depth;
-    texDesc.arraySize = ddsData.desc.arraySize;
-    texDesc.mipLevels = ddsData.desc.mipLevels;
-    texDesc.format = ddsData.desc.format;
-    texDesc.dimension = (ddsData.desc.type == resources::TextureDesc::TextureCube)
-        ? nvrhi::TextureDimension::TextureCube
-        : nvrhi::TextureDimension::Texture2D;
-    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-    texDesc.keepInitialState = true;
-    texDesc.debugName = name;
-
-    nvrhi::TextureHandle tex = device->createTexture(texDesc);
-    if (!tex)
-        return {};
-
-    const u32 mipsPerSlice = texDesc.mipLevels;
-    for (u32 slice = 0; slice < texDesc.arraySize; ++slice)
-    {
-        for (u32 mip = 0; mip < mipsPerSlice; ++mip)
-        {
-            const auto& ml = ddsData.mipLevels[slice * mipsPerSlice + mip];
-            renderDevice->UploadTextureDataToNVRHI(tex, slice, mip, ml.data, ml.size, ml.rowPitch, ml.slicePitch);
-        }
-    }
-
-    mem = static_cast<u32>(ddsData.totalDataSize);
-    return tex;
-}
-
-nvrhi::TextureHandle make_video_texture(u32 width, u32 height, pcstr name)
-{
-    auto* device = GEnv.Render ? GEnv.Render->GetRenderDevice()->GetNVRHIDevice() : nullptr;
-    if (!device)
-        return {};
-
-    nvrhi::TextureDesc desc;
-    desc.width = width;
-    desc.height = height;
-    desc.format = nvrhi::Format::RGBA8_UNORM;
-    desc.dimension = nvrhi::TextureDimension::Texture2D;
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
-    desc.debugName = name;
-    return device->createTexture(desc);
+    auto* resourceManager = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
+    return resourceManager ? resourceManager->GetTextureManager() : nullptr;
 }
 }
 
 void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 
 CTexture::CTexture()
-    : pAVI(nullptr)
-    , pTheora(nullptr)
-    , m_material(1.0f)
-    , m_play_time(0)
+    : m_material(1.0f)
 {
     flags.bLoaded = false;
     flags.bUser = false;
-    flags.seqCycles = FALSE;
     flags.MemoryUsage = 0;
 }
 
@@ -111,12 +45,6 @@ CTexture::~CTexture()
 {
     Unload();
     RImplementation.Resources->_DeleteTexture(this);
-}
-
-void CTexture::surface_set(nvrhi::TextureHandle tex)
-{
-    nvrhiTexture = tex;
-    desc_cache = nullptr;
 }
 
 void CTexture::desc_update()
@@ -136,11 +64,6 @@ void CTexture::desc_update()
 }
 
 void CTexture::PostLoad() {}
-
-void CTexture::set_slice(int slice)
-{
-    curr_slice = slice;
-}
 
 void CTexture::Preload()
 {
@@ -173,94 +96,19 @@ void CTexture::Load()
 
     Preload();
 
-    string_path fn;
-    if (FS.exist(fn, "$game_textures$", cName.c_str(), ".ogm"))
+    resources::TextureManager* textures = ManagedTextures();
+    if (!textures)
     {
-        pTheora = xr_new<CTheoraSurface>();
-        m_play_time = 0xFFFFFFFF;
+        flags.bLoaded = false;
+        return;
+    }
 
-        if (!pTheora->Load(fn))
-        {
-            xr_delete(pTheora);
-            FATAL("Can't open video stream");
-        }
-        else
-        {
-            const u32 w = pTheora->Width(false);
-            const u32 h = pTheora->Height(false);
-            flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
-            pTheora->Play(TRUE, Device.dwTimeContinual);
-            nvrhiTexture = make_video_texture(w, h, cName.c_str());
-            if (!nvrhiTexture)
-            {
-                FATAL("Invalid video stream");
-                xr_delete(pTheora);
-            }
-        }
-    }
-#if defined(XR_PLATFORM_WINDOWS)
-    else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".avi"))
-    {
-        pAVI = xr_new<CAviPlayerCustom>();
-        if (!pAVI->Load(fn))
-        {
-            xr_delete(pAVI);
-            FATAL("Can't open video stream");
-        }
-        else
-        {
-            flags.MemoryUsage = pAVI->m_dwWidth * pAVI->m_dwHeight * 4;
-            nvrhiTexture = make_video_texture(pAVI->m_dwWidth, pAVI->m_dwHeight, cName.c_str());
-            if (!nvrhiTexture)
-            {
-                FATAL("Invalid video stream");
-                xr_delete(pAVI);
-            }
-        }
-    }
-#endif
-    else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".seq"))
-    {
-        string256 buffer;
-        IReader* _fs = FS.r_open(fn);
-
-        flags.seqCycles = FALSE;
-        _fs->r_string(buffer, sizeof(buffer));
-        if (0 == xr_stricmp(buffer, "cycled"))
-        {
-            flags.seqCycles = TRUE;
-            _fs->r_string(buffer, sizeof(buffer));
-        }
-        const u32 fps = atoi(buffer);
-        seqMSPF = 1000 / fps;
-
-        while (!_fs->eof())
-        {
-            _fs->r_string(buffer, sizeof(buffer));
-            _Trim(buffer);
-            if (buffer[0])
-            {
-                u32 mem = 0;
-                nvrhi::TextureHandle frameTex = nvrhi_texture_load(buffer, mem);
-                if (frameTex)
-                {
-                    seqNvrhiTextures.push_back(frameTex);
-                    flags.MemoryUsage += mem;
-                }
-            }
-        }
-        FS.r_close(_fs);
-    }
-    else
-    {
-        u32 mem = 0;
-        nvrhiTexture = nvrhi_texture_load(cName.c_str(), mem);
-        if (nvrhiTexture)
-        {
-            flags.MemoryUsage = mem;
-            desc_update();
-        }
-    }
+    ReleaseManagedTexture();
+    m_managedTexture = textures->LoadTexture(cName.c_str(), TextureColorSpace::Linear);
+    nvrhiTexture = textures->GetNVRHITexture(m_managedTexture);
+    if (const resources::TextureMetadata* metadata = textures->GetMetadata(m_managedTexture))
+        flags.MemoryUsage = u32(std::min(metadata->memoryUsed, kMaxReportedTextureMemory));
+    desc_update();
 
     PostLoad();
 }
@@ -269,38 +117,18 @@ void CTexture::Unload()
 {
     ZoneScoped;
     flags.bLoaded = FALSE;
-
-    seqNvrhiTextures.clear();
     nvrhiTexture = nullptr;
     desc_cache = nullptr;
-
-#if defined(XR_PLATFORM_WINDOWS)
-    xr_delete(pAVI);
-#endif
-    xr_delete(pTheora);
+    ReleaseManagedTexture();
 }
 
-void CTexture::video_Play(BOOL looped, u32 _time)
+void CTexture::ReleaseManagedTexture()
 {
-    if (pTheora)
-        pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : Device.dwTimeContinual);
-}
-
-void CTexture::video_Pause(BOOL state) const
-{
-    if (pTheora)
-        pTheora->Pause(state);
-}
-
-void CTexture::video_Stop() const
-{
-    if (pTheora)
-        pTheora->Stop();
-}
-
-BOOL CTexture::video_IsPlaying() const
-{
-    return (pTheora) ? pTheora->IsPlaying() : FALSE;
+    if (!m_managedTexture.IsValid())
+        return;
+    if (resources::TextureManager* textures = ManagedTextures())
+        textures->Release(m_managedTexture);
+    m_managedTexture = TextureHandle();
 }
 
 ImTextureID CTexture::GetImTextureID()

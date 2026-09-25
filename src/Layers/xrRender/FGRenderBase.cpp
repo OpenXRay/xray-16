@@ -29,6 +29,8 @@ const DisplayCalibration& FGRenderBase::GetDisplayCalibration() const { return m
 
 void FGRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
+    if (Resources)
+        Resources->UnloadTextures();
     destroy();
     if (Resources)
         Resources->OnDeviceDestroy(bKeepTextures);

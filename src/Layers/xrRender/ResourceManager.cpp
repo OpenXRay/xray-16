@@ -354,15 +354,13 @@ void CResourceManager::DeferredUnload()
         return;
 
     ZoneScoped;
+    UnloadTextures();
+}
 
-#if defined(USE_DX11)
-    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
+void CResourceManager::UnloadTextures()
+{
     for (auto& texture : m_textures)
         texture.second->Unload();
-#else
-#   error No graphics API selected or enabled!
-#endif
 }
 
 #ifdef _EDITOR

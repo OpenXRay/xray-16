@@ -1,10 +1,8 @@
 #pragma once
 
 #include "xrCore/xr_resource.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
-
-class CAviPlayerCustom;
-class ENGINE_API CTheoraSurface;
 
 namespace xray::render::fg
 {
@@ -40,14 +38,11 @@ public:
     };
 
 public:
-    void set_slice(int slice);
-
     void Preload();
     void Load();
     void PostLoad();
     void Unload();
 
-    void surface_set(nvrhi::TextureHandle tex);
     [[nodiscard]] nvrhi::ITexture* surface_get_native() const { return nvrhiTexture.Get(); }
 
     [[nodiscard]] BOOL isUser() const
@@ -67,12 +62,6 @@ public:
         return m_height;
     }
 
-    void video_Sync(u32 _time) { m_play_time = _time; }
-    void video_Play(BOOL looped, u32 _time = 0xFFFFFFFF);
-    void video_Pause(BOOL state) const;
-    void video_Stop() const;
-    [[nodiscard]] BOOL video_IsPlaying() const;
-
     CTexture();
     virtual ~CTexture();
 
@@ -88,18 +77,16 @@ private:
     }
 
     void desc_update();
+    void ReleaseManagedTexture();
 
 public:
     struct
     {
         u32 bLoaded : 1;
         u32 bUser : 1;
-        u32 seqCycles : 1;
         u32 MemoryUsage : 28;
     } flags;
 
-    CAviPlayerCustom* pAVI;
-    CTheoraSurface* pTheora;
     float m_material;
     shared_str m_bumpmap;
 
@@ -108,19 +95,10 @@ public:
     shared_str m_ao;
     shared_str m_parallax;
 
-    union
-    {
-        u32 m_play_time; // sync theora time
-        u32 seqMSPF;     // Sequence data milliseconds per frame
-    };
-
-    int curr_slice{ -1 };
-    int last_slice{ -1 };
-
     nvrhi::TextureHandle nvrhiTexture;
-    xr_vector<nvrhi::TextureHandle> seqNvrhiTextures;
 
 private:
+    TextureHandle m_managedTexture;
     u32 m_width{};
     u32 m_height{};
     nvrhi::ITexture* desc_cache{};

@@ -27,8 +27,6 @@ enum class TextureState : u8 {
     Unloaded,       // Not in memory (on disk only)
     Loading,        // Async load in progress
     Resident,       // Fully loaded in VRAM
-    Evicting,       // Marked for eviction
-    Evicted,        // Was resident, now evicted (keep metadata)
     Missing,
 };
 
@@ -143,12 +141,6 @@ struct TextureMetadata {
     bool NeedsStreaming() const {
         return requestedMips > residentMips && state == TextureState::Resident;
     }
-
-    bool CanEvict() const {
-        return priority >= TexturePriority::Low &&
-               refCount == 0 &&
-               state == TextureState::Resident;
-    }
 };
 
 class TextureKey
@@ -226,18 +218,10 @@ public:
     //  STREAMING CONTROL (Week 2)
     // ═══════════════════════════════════════════════════
 
-    // Set memory budget (total VRAM for textures)
-    void SetMemoryBudget(u64 bytes);
     u64 GetMemoryBudget() const { return m_memoryBudget; }
 
     // Request specific number of mips (for LOD)
     void RequestMips(TextureHandle handle, u32 mipCount);
-
-    // Change priority (affects eviction order)
-    void SetPriority(TextureHandle handle, TexturePriority priority);
-
-    // Mark as accessed (updates LRU)
-    void Touch(TextureHandle handle);
 
     // ═══════════════════════════════════════════════════
     //  LIFECYCLE
@@ -248,9 +232,6 @@ public:
 
     // Decrement reference count (evict if zero)
     void Release(TextureHandle handle);
-
-    // Force eviction
-    void Evict(TextureHandle handle);
 
     // ═══════════════════════════════════════════════════
     //  UPDATE (Per Frame)
@@ -269,10 +250,8 @@ public:
         u32 texturesTotal = 0;
         u32 texturesResident = 0;
         u32 texturesLoading = 0;
-        u32 texturesEvicted = 0;
 
         u32 streamingRequestsPending = 0;
-        u32 evictionsPending = 0;
 
         float memoryUsagePercent() const {
             if (memoryBudget == 0) return 0.0f;
@@ -328,12 +307,6 @@ private:
     // Loading (Week 1: sync, Week 2: async)
     void LoadTextureSync(TextureHandle handle);
     void StreamMips(TextureHandle handle, u32 targetMips);  // Week 2
-
-    // Eviction (Week 2)
-    bool CheckMemoryBudget(u64 requiredBytes) const;
-    bool EnforceMemoryBudget(u64 requiredBytes);
-    bool EvictTextures(u64 bytesNeeded);
-    void EvictTextureInternal(TextureHandle handle);
 
     // Video texture update (Week 6)
     void UpdateVideoTextures();
