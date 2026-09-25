@@ -66,16 +66,13 @@ bool GPUCullingManager::MaterialCastsShadow(u32 materialID)
     return !registry || registry->castsShadow;
 }
 
-static u32 TransparentKeyForMaterial(u32 materialID)
+u32 TransparentKeyForVariant(const ShaderVariantDesc* variant)
 {
     u32 key = u32(VariantBlendFactor::SrcAlpha) | (u32(VariantBlendFactor::InvSrcAlpha) << TRANSPARENT_KEY_DST_SHIFT);
-    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
-    if (!material || material->shaderVariant == 0)
-        return key;
-    const auto* variant = ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant);
     if (!variant)
         return key;
-    if (!variant->passes.empty()) {
+    if (!variant->passes.empty())
+    {
         const ShaderPassDesc& pass = variant->passes[0];
         if (pass.blendEnabled)
             key = u32(pass.srcBlend) | (u32(pass.dstBlend) << TRANSPARENT_KEY_DST_SHIFT);
@@ -91,6 +88,14 @@ static u32 TransparentKeyForMaterial(u32 materialID)
     else if (variant->colorMode != VariantColorMode::Lit)
         key |= TRANSPARENT_KEY_UNLIT;
     return key;
+}
+
+static u32 TransparentKeyForMaterial(u32 materialID)
+{
+    const auto* material = bindless::MaterialBuffer::Instance().GetMaterial(materialID);
+    if (!material || material->shaderVariant == 0)
+        return TransparentKeyForVariant(nullptr);
+    return TransparentKeyForVariant(ShaderVariantRegistry::Instance().GetVariantByIndex(material->shaderVariant));
 }
 
 static void PartitionTransparentDraws(xr_vector<IndirectDrawArgs>& args, xr_vector<u32>* materialIDs,

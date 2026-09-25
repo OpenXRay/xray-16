@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PipelineState.h"
 #include "RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 
 namespace xray::render::fg {
 
@@ -429,8 +430,11 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         return nullptr;
     }
 
+    CTimer timer;
+    timer.Start();
     nvrhi::GraphicsPipelineHandle nvrhiPipeline =
         m_device->GetNativeDevice()->createGraphicsPipeline(nvrhiDesc, fbInfo);
+    framegraph::PassResourceCache::ReportPipelineCreation("graphics", desc.debugName.c_str(), timer.GetElapsed_sec() * 1000.f);
 
     if (!nvrhiPipeline) {
         Msg("! [PipelineStateCache] ❌ Failed to create PSO: %s",

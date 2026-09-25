@@ -22,6 +22,7 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/fgUIRender.h"
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
@@ -1216,7 +1217,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         nvrhi::TextureDesc desc;
         desc.width = width;
         desc.height = height;
-        desc.format = nvrhi::Format::D32;
+        desc.format = framegraph::kSceneDepthFormat;
         desc.isShaderResource = true;
         desc.isRenderTarget = true;
         desc.isTypeless = true;
@@ -1232,7 +1233,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     depthDesc.debugName = "rt_Depth";
     depthDesc.width = width;
     depthDesc.height = height;
-    depthDesc.format = nvrhi::Format::D32;
+    depthDesc.format = framegraph::kSceneDepthFormat;
     depthDesc.isDepthStencil = true;
     depthDesc.isImported = true;
     depthDesc.isTransient = false;
@@ -1277,7 +1278,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     normalImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     normalImportDesc.width = width;
     normalImportDesc.height = height;
-    normalImportDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalImportDesc.format = framegraph::kSceneNormalFormat;
     normalImportDesc.isRenderTarget = true;
     normalImportDesc.isUAV = true;
     normalImportDesc.isTransient = true;
@@ -1289,7 +1290,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.debugName = "rt_BaseColor";
     baseColorDesc.width = width;
     baseColorDesc.height = height;
-    baseColorDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    baseColorDesc.format = framegraph::kSceneBaseColorFormat;
     baseColorDesc.isRenderTarget = true;
     baseColorDesc.allowUAV = true;
     baseColorDesc.isTransient = true;
@@ -1297,7 +1298,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::ResourceDesc materialDesc = baseColorDesc;
     materialDesc.debugName = "rt_Material";
-    materialDesc.format = nvrhi::Format::RG8_UNORM;
+    materialDesc.format = framegraph::kSceneMaterialFormat;
     framegraph::VirtualResourceHandle materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
 
     const auto prevNormalsHandle = m_mainView.ImportPreviousNormals(*m_framegraph);
@@ -1579,7 +1580,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     colorDesc.width = width;
     colorDesc.height = height;
-    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    colorDesc.format = framegraph::kSceneColorFormat;
     colorDesc.isRenderTarget = true;
     colorDesc.allowUAV = true;
     colorDesc.debugName = "rt_SceneColor";

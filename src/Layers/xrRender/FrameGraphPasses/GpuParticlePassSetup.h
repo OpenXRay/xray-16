@@ -40,6 +40,8 @@ struct GpuParticlePassOutputs {
     framegraph::VirtualResourceHandle distortion;
 };
 
+void WarmGpuParticlePipelines(fg::RenderDevice* device, GpuParticlePassState& state);
+
 GpuParticlePassOutputs setupGpuParticlePass(
     framegraph::FrameGraph& graph,
     fg::RenderDevice* device,

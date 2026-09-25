@@ -170,6 +170,8 @@ public:
     const Stats& GetStats() const { return m_stats; }
     void ResetStats();
 
+    static void ReportPipelineCreation(const char* kind, const char* name, float milliseconds);
+
 private:
     PassResourceCache() = default;
     ~PassResourceCache() = default;

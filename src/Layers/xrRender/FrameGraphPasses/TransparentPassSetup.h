@@ -78,6 +78,7 @@ struct TransparentPassData {
 };
 
 void InitializeTransparentResources(fg::RenderDevice* device, TransparentPassState& state);
+void WarmTransparentPipelines(fg::RenderDevice* device, TransparentPassState& state);
 
 framegraph::DefaultOutputLayout setupTransparentPass(
     framegraph::FrameGraph& fg,

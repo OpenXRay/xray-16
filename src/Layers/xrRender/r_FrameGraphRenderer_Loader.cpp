@@ -23,6 +23,9 @@
 #include "Layers/xrRender/FrameGraphPasses/VSMPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/LocalShadowPassSetup.h"
 #include "Layers/xrRender/FrameGraphPasses/DistortionApplyPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/TransparentPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/DecalPassSetup.h"
+#include "Layers/xrRender/FrameGraphPasses/GpuParticlePassSetup.h"
 
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -139,13 +142,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             }
         }
         chunk->close();
-    }
-
-    // ═══════════════════════════════════════════════════
-    // D3D12: PSO PRECOMPILATION (eliminates runtime hitches!)
-    // ═══════════════════════════════════════════════════
-    if ((true) && !GEnv.isDedicatedServer) {
-        g_pGamePersistent->LoadTitle("st_precompiling_pso");
     }
 
     if (!GEnv.isDedicatedServer)
@@ -300,7 +296,10 @@ void FrameGraphRenderer::level_Load(IReader* fs)
         passes::WarmLocalShadowPool(GetRenderDevice(), m_blackboard->get_or_add<passes::LocalShadowState>());
 
     if (!GEnv.isDedicatedServer)
+    {
         WarmParticles();
+        WarmGameplayPipelines();
+    }
 
     // End
     g_pGamePersistent->LoadEnd();
@@ -332,10 +331,32 @@ void FrameGraphRenderer::WarmParticles()
     }
     if (nvrhi::IDevice* device = m_device ? m_device->GetNVRHIDevice() : nullptr)
     {
-        GetGpuParticleManager().WarmCollision(device);
+        GetGpuParticleManager().WarmPipelines(device);
         if (m_blackboard)
             passes::InitializeDistortionApplyPass(device, m_blackboard->get_or_add<passes::DistortionApplyPassState>());
     }
+}
+
+void FrameGraphRenderer::WarmGameplayPipelines()
+{
+    ZoneScoped;
+    if (!m_device || !m_blackboard)
+        return;
+
+    g_pGamePersistent->LoadTitle("st_precompiling_pso");
+    auto& cache = framegraph::GetPassResourceCache();
+    const framegraph::PassResourceCache::Stats before = cache.GetStats();
+    CTimer timer;
+    timer.Start();
+
+    passes::WarmTransparentPipelines(m_device, m_blackboard->get_or_add<passes::TransparentPassState>());
+    passes::WarmDecalPipeline(m_device, m_blackboard->get_or_add<passes::DecalPassState>());
+    passes::WarmGpuParticlePipelines(m_device, m_blackboard->get_or_add<passes::GpuParticlePassState>());
+
+    const framegraph::PassResourceCache::Stats& after = cache.GetStats();
+    Msg("* [PipelineWarm] %u pipelines created in %.1f ms",
+        (after.pipelineMisses - before.pipelineMisses) + (after.computePipelineMisses - before.computePipelineMisses),
+        timer.GetElapsed_sec() * 1000.f);
 }
 
 // ═══════════════════════════════════════════════════

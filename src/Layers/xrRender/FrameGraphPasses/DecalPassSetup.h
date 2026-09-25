@@ -31,6 +31,8 @@ struct DecalPassState {
     bool initialized = false;
 };
 
+void WarmDecalPipeline(fg::RenderDevice* device, DecalPassState& state);
+
 framegraph::DefaultOutputLayout setupDecalPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
