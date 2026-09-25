@@ -259,6 +259,7 @@ extern ECORE_API float ps_r_hdr_paper_white;
 extern ECORE_API float ps_r_hdr_peak;
 extern ECORE_API float ps_r_sky_energy;
 extern ECORE_API float ps_r_sky_ground_albedo;
+extern ECORE_API int   ps_r_sky_ibl;
 extern ECORE_API int   ps_r_vis_debug;
 extern ECORE_API int   ps_r_mesh_shaders;
 extern ECORE_API int   ps_r_vis_sw;

@@ -187,8 +187,8 @@ void ProcessDeferredLightStats(DeferredLightPassState& state, nvrhi::IDevice* de
 }
 
 DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* device, const DefaultOutputLayout& inputs, u32 width, u32 height,
-    VirtualResourceHandle sunMask, const LocalShadowOutput& localShadow, const ClusterLightOutput& clusterLights, xray::profiler::GPUProfiler* gpuProfiler,
-    DeferredLightPassState* state, LightingFrameState* lighting)
+    VirtualResourceHandle sunMask, const LocalShadowOutput& localShadow, const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky,
+    xray::profiler::GPUProfiler* gpuProfiler, DeferredLightPassState* state, LightingFrameState* lighting)
 {
     if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid() || !inputs.material.is_valid())
         return inputs;
@@ -199,7 +199,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunMask, localShadow, clusterLights, state, gpuProfiler, lighting](FrameGraph& builder, PassHandle passHandle,
+        [&, width, height, sunMask, localShadow, clusterLights, sky, state, gpuProfiler, lighting](FrameGraph& builder, PassHandle passHandle,
             DeferredLightPassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
@@ -230,6 +230,12 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 data.clusterGrid = passBuilder.read(clusterLights.clusterGrid, ResourceState::ShaderResource);
                 data.clusterLightIndexList = passBuilder.read(clusterLights.lightIndexList, ResourceState::ShaderResource);
             }
+            if (sky.irradiance.is_valid())
+                data.skyIrradiance = passBuilder.read(sky.irradiance, ResourceState::ShaderResource);
+            if (sky.specular.is_valid())
+                data.skySpecular = passBuilder.read(sky.specular, ResourceState::ShaderResource);
+            if (sky.dfg.is_valid())
+                data.skyDFG = passBuilder.read(sky.dfg, ResourceState::ShaderResource);
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
@@ -266,6 +272,9 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
             nvrhi::IBindingSet* bindlessTable = nullptr;
             if (auto* backend = data.device->GetBackend())
                 bindlessTable = backend->GetBindlessDescriptorTable();
+            nvrhi::IBuffer* skyIrradiance = data.skyIrradiance.is_valid() ? fg.GetPhysicalBuffer(data.skyIrradiance) : nullptr;
+            nvrhi::ITexture* skySpecular = data.skySpecular.is_valid() ? fg.GetPhysicalTexture(data.skySpecular) : nullptr;
+            nvrhi::ITexture* skyDFG = data.skyDFG.is_valid() ? fg.GetPhysicalTexture(data.skyDFG) : nullptr;
 
             const u32 argsInit[kLightTileClasses * 3] = { 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 };
             cmdList->writeBuffer(state.tileArgsBuffer, argsInit, sizeof(argsInit));
@@ -323,6 +332,9 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 bsb.Texture("g_GBufferMaterial", materialRT);
                 bsb.TextureUAV("g_SceneColor", colorRT);
                 bsb.BufferSRV("g_TileList", state.tileListBuffer);
+                bsb.BufferSRV("g_SkyIrradiance", skyIrradiance);
+                bsb.Texture("g_SkySpecular", skySpecular);
+                bsb.Texture("g_SkyDFG", skyDFG);
                 if (cls & kTileClassLights)
                 {
                     bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());

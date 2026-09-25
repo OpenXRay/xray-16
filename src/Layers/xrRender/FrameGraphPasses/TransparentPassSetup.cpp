@@ -302,6 +302,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
     const ClusterLightOutput& clusterLights,
+    const SkyEnvironmentFrame& sky,
     framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,
@@ -323,7 +324,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     auto& passData = fg.addCallbackPass<TransparentPassData>(
         "Transparent Pass",
 
-        [&, width, height, config, localShadow, clusterLights, sunMask, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
+        [&, width, height, config, localShadow, clusterLights, sky, sunMask, skinnedOrder, wantDistortion](FrameGraph& builder, PassHandle passHandle, TransparentPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -384,6 +385,12 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.clusterGrid = passBuilder.read(clusterLights.clusterGrid, ResourceState::ShaderResource);
                 data.clusterLightIndexList = passBuilder.read(clusterLights.lightIndexList, ResourceState::ShaderResource);
             }
+            if (sky.irradiance.is_valid())
+                data.skyIrradiance = passBuilder.read(sky.irradiance, ResourceState::ShaderResource);
+            if (sky.specular.is_valid())
+                data.skySpecular = passBuilder.read(sky.specular, ResourceState::ShaderResource);
+            if (sky.dfg.is_valid())
+                data.skyDFG = passBuilder.read(sky.dfg, ResourceState::ShaderResource);
         },
 
         [](const TransparentPassData& data,
@@ -447,6 +454,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::ITexture* localHud = nullptr;
             ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn, localHud);
             nvrhi::ITexture* sunMaskTex = ResolveSunMask(fg, data.sunMask, nvDevice);
+            nvrhi::IBuffer* skyIrradiance = data.skyIrradiance.is_valid() ? fg.GetPhysicalBuffer(data.skyIrradiance) : nullptr;
+            nvrhi::ITexture* skySpecular = data.skySpecular.is_valid() ? fg.GetPhysicalTexture(data.skySpecular) : nullptr;
+            nvrhi::ITexture* skyDFG = data.skyDFG.is_valid() ? fg.GetPhysicalTexture(data.skyDFG) : nullptr;
 
             auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
                 framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, name);
@@ -462,6 +472,9 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 bsb.Texture("g_LocalShadowDyn", localDyn);
                 bsb.Texture("g_LocalShadowHud", localHud);
                 bsb.Texture("g_SunShadowMask", sunMaskTex);
+                bsb.BufferSRV("g_SkyIrradiance", skyIrradiance);
+                bsb.Texture("g_SkySpecular", skySpecular);
+                bsb.Texture("g_SkyDFG", skyDFG);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
                 R_ASSERT2(set, "Transparent binding set creation failed");
                 return set;

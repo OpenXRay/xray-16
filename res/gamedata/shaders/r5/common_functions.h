@@ -192,6 +192,7 @@ float gbuf_unpack_mtl( float mtl_hemi )
 }
 
 #include "shared/pbr_brdf.h"
+#include "shared/sky_ibl.h"
 #include "shared/clustered_lighting.h"
 #include "shared/sun_shadow.h"
 
@@ -250,8 +251,11 @@ float3 shade_pbr(
 		float sunTransmit = sun.x + (1.0 - sun.x) * FoliageTransmittance(sun.y, foliage_sss.w);
 		float3 sunLight = PBRDirectLighting(albedo, N, V, L, L_sun_color, 0.0, roughness, 1u) * sun.x
 			+ FoliageTransmission(N, V, L, foliage_params2.x) * sunTransmit * sssColor * L_sun_color;
-		float3 ambient = PBRAmbient(albedo, N, V, 0.0, roughness, ao, ambientColor)
-			+ albedo * ambientColor * ao * foliage_sss.rgb * (transmission * foliage_params.w);
+		float3 ambient = SkyLightingEnabled()
+			? SkyAmbient(albedo, N, V, 0.0, roughness, ao)
+				+ albedo * SkyIrradiance(-N) * ao * foliage_sss.rgb * (transmission * foliage_params.w)
+			: PBRAmbient(albedo, N, V, 0.0, roughness, ao, ambientColor)
+				+ albedo * ambientColor * ao * foliage_sss.rgb * (transmission * foliage_params.w);
 		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
 	}
 	else
@@ -261,11 +265,9 @@ float3 shade_pbr(
 			L_sun_color,
 			metallic, roughness, (uint)pbr_diffuse_mode
 		) * sun.x;
-		float3 ambient = PBRAmbient(
-			albedo, N, V,
-			metallic, roughness, ao,
-			ambientColor
-		);
+		float3 ambient = SkyLightingEnabled()
+			? SkyAmbient(albedo, N, V, metallic, roughness, ao)
+			: PBRAmbient(albedo, N, V, metallic, roughness, ao, ambientColor);
 		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
 	}
 

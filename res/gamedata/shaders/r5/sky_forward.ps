@@ -6,6 +6,7 @@
 
 #include "shared/common.h"
 #include "common_samplers.h"
+#include "shared/color_space.h"
 
 struct PS_INPUT {
     float4 hpos     : SV_POSITION;
@@ -28,8 +29,7 @@ float4 main(PS_INPUT I) : SV_TARGET {
     float blendFactor = I.color.a;
     float3 sky = lerp(sky0, sky1, blendFactor);
 
-    // Apply sky color tint from environment
-    // sky *= I.color.rgb;
+    sky *= SrgbToLinear(I.color.rgb);
 
     return float4(sky, 1.0f);
 }

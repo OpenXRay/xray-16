@@ -310,6 +310,7 @@ float ps_r_hdr_paper_white     = 1.0f;
 float ps_r_hdr_peak            = 0.0f;
 float ps_r_sky_energy          = 1.0f;
 float ps_r_sky_ground_albedo   = 0.25f;
+int   ps_r_sky_ibl             = 1;
 int   ps_r_vis_debug           = 0;
 int   ps_r_mesh_shaders        = 0;
 int   ps_r_vis_sw              = 1;
@@ -1086,6 +1087,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_hdr_peak", &ps_r_hdr_peak, 0.0f, 64.0f);
     CMD4(CCC_Float, "r_sky_energy", &ps_r_sky_energy, 0.0f, 128.0f);
     CMD4(CCC_Float, "r_sky_ground_albedo", &ps_r_sky_ground_albedo, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_sky_ibl", &ps_r_sky_ibl, 0, 1);
     CMD4(CCC_Integer, "r_vis_debug", &ps_r_vis_debug, 0, 3);
     CMD4(CCC_Integer, "r_mesh_shaders", &ps_r_mesh_shaders, 0, 1);
     CMD4(CCC_Integer, "r_vis_sw", &ps_r_vis_sw, 0, 1);
