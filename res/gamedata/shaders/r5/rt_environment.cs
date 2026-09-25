@@ -33,7 +33,10 @@ void main(uint3 gtid : SV_GroupThreadID)
     float sinTheta = sin(theta);
     float3 dir = float3(sinTheta * cos(phi), cos(theta), sinTheta * sin(phi));
 
-    float3 radiance = g_Sky.SampleLevel(smp_rtlinear, dir, 0).rgb;
+    uint skySize, skyHeight, skyLevels;
+    g_Sky.GetDimensions(0, skySize, skyHeight, skyLevels);
+    float cellLod = clamp(log2(float(skySize) / float(ENV_LAT_CELL_COUNT / 2)), 0.0, float(skyLevels - 1u));
+    float3 radiance = g_Sky.SampleLevel(smp_rtlinear, dir, cellLod).rgb;
 
     float solidAngle = dPhi * (cos(theta0) - cos(theta1));
     float weight = EnvSkyLuminance(radiance) * max(solidAngle, 0.0);

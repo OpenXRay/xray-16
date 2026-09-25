@@ -550,6 +550,8 @@ void FrameGraphRenderer::Render() {
     auto& cache = framegraph::GetPassResourceCache();
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device, FRAME_GLOBALS_CB_VERSIONS);
     auto staticGlobalsData = passes::BuildStaticGlobals();
+    staticGlobalsData.sky_ibl.set(ps_r_sky_ibl != 0 && m_skyLightingReady ? 1.0f : 0.0f,
+        float(fg::SkyEnvironment::kSpecularLevels - 1), 0.0f, 0.0f);
 
     {
         const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
@@ -1702,9 +1704,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
-    fg::SkyEnvironmentFrame skyFrame;
-    if (m_lightingState.effective == fg::LightingMode::RTGI || m_lightingState.effective == fg::LightingMode::ReferencePT)
-        skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
+    const fg::SkyEnvironmentFrame skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
+    m_skyLightingReady = skyFrame.lightingReady;
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), m_worldCache.get(), detailOutputs, clusterLightOut,
@@ -1809,7 +1810,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_lightingState.scheduled == fg::LightingMode::Raster)
     {
         litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
-            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
+            skyFrame, m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
     }
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
     {
@@ -1827,6 +1828,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             transparentConfig,
             localShadowOut,
             clusterLightOut,
+            skyFrame,
             vsmMaskHandle,
             skinnedDrawArgsBuffer,
             width, height,

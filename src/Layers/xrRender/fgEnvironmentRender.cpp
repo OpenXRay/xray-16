@@ -214,7 +214,7 @@ void FGEnvironmentRender::InitSkyResources()
             .setElementStride(sizeof(passes::SkyVertex)),
         nvrhi::VertexAttributeDesc()
             .setName("COLOR")
-            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setFormat(nvrhi::Format::BGRA8_UNORM)
             .setOffset(offsetof(passes::SkyVertex, color))
             .setElementStride(sizeof(passes::SkyVertex)),
         nvrhi::VertexAttributeDesc()

@@ -2,12 +2,12 @@
 
 cbuffer SkySourceParams : register(b0)
 {
+    float3 g_SkyTint;
+    uint g_FaceSize;
     float g_SkyBlend;
     float g_SkyRotation;
     float g_SkyEnergy;
     float g_GroundAlbedo;
-    uint g_FaceSize;
-    uint3 g_SkySourcePad;
 };
 
 TextureCube<float4> g_Sky0 : register(t0);
@@ -45,5 +45,5 @@ void main(uint3 id : SV_DispatchThreadID)
         float2 uv = (float2(id.xy) + offset) / float(g_FaceSize) * 2.0 - 1.0;
         radiance += AuthoredSkyRadiance(SkyCubeFaceDirection(id.z, uv));
     }
-    g_SkyCube[id] = float4(radiance * (0.25 * g_SkyEnergy), 1.0);
+    g_SkyCube[id] = float4(radiance * g_SkyTint * (0.25 * g_SkyEnergy), 1.0);
 }

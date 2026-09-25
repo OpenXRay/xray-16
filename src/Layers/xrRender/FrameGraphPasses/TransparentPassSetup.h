@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/SkyEnvironment.h"
 #include "LocalShadowPassSetup.h"
 #include "ClusterLightPassSetup.h"
 #include <nvrhi/nvrhi.h>
@@ -64,6 +65,9 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle clusterLightData;
     framegraph::VirtualResourceHandle clusterGrid;
     framegraph::VirtualResourceHandle clusterLightIndexList;
+    framegraph::VirtualResourceHandle skyIrradiance;
+    framegraph::VirtualResourceHandle skySpecular;
+    framegraph::VirtualResourceHandle skyDFG;
     LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;
@@ -87,6 +91,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
     const TransparentPassConfig& config,
     const LocalShadowOutput& localShadow,
     const ClusterLightOutput& clusterLights,
+    const SkyEnvironmentFrame& sky,
     framegraph::VirtualResourceHandle sunMask,
     framegraph::VirtualResourceHandle skinnedOrder,
     u32 width, u32 height,

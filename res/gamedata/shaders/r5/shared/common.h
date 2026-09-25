@@ -64,6 +64,7 @@ cbuffer	static_globals : register(b2)
 	float4		foliage_sss;
 	float4		foliage_params;
 	float4		foliage_params2;
+	float4		sky_ibl;
 };
 
 float 	calc_cyclic 	(float x)				
