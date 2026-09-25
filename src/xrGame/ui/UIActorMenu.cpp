@@ -969,6 +969,9 @@ void CUIActorMenu::highlight_equipped() const
 
 void CUIActorMenu::ClearAllLists()
 {
+    m_pCurrentCellItem = nullptr;
+    ClearUpgradeSelection();
+
     m_pLists[eInventoryBagList]->ClearAll(true);
 
     m_pLists[eInventoryBeltList]->ClearAll(true);
