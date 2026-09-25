@@ -117,13 +117,9 @@ nvrhi::ITexture* FGThunderboltRender::ResolveTexture(const shared_str& name)
 
     auto it = m_textureCache.find(name);
     if (it != m_textureCache.end())
-        return it->second;
+        return it->second.Get();
 
-    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
-    auto* textureManager = fgRenderer->GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb));
-    m_textureCache.emplace(name, handle);
-    return handle;
+    return m_textureCache[name].Load(name.c_str(), TextureColorSpace::Srgb);
 }
 
 void FGThunderboltRender::Render(CEffect_Thunderbolt& owner)

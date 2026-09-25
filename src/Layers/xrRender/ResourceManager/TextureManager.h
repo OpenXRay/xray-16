@@ -266,4 +266,25 @@ private:
     mutable Statistics m_stats;
 };
 
+TextureManager* GetActiveTextureManager();
+
+class TextureRef
+{
+public:
+    TextureRef() = default;
+    TextureRef(const TextureRef& other);
+    TextureRef(TextureRef&& other) noexcept;
+    ~TextureRef();
+
+    TextureRef& operator=(const TextureRef& other);
+    TextureRef& operator=(TextureRef&& other) noexcept;
+
+    nvrhi::ITexture* Load(const char* path, fg::TextureColorSpace colorSpace);
+    nvrhi::ITexture* Get() const;
+    void Reset();
+
+private:
+    TextureHandle m_handle;
+};
+
 } // namespace xray::render::resources

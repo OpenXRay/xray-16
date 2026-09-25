@@ -3,6 +3,7 @@
 #include "Include/xrRender/RainRender.h"
 #include "xrEngine/Rain.h"
 #include "Layers/xrRender/IRenderDetailModel.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::fg
@@ -49,6 +50,7 @@ private:
 
     nvrhi::IDevice*                  m_device = nullptr;
     nvrhi::TextureHandle             m_streakTexture;
+    resources::TextureRef            m_streakTextureRef;
     nvrhi::ShaderHandle              m_vs;
     nvrhi::ShaderHandle              m_ps;
     nvrhi::InputLayoutHandle         m_inputLayout;

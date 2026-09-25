@@ -61,24 +61,25 @@ bool ResolveSkyTextures(CEnvironment& environment, nvrhi::ITexture*& sky0, nvrhi
 {
     sky0 = nullptr;
     sky1 = nullptr;
-    auto* renderDevice = RImplementation.GetRenderDevice();
-    auto* resourceManager = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
-    auto* textureManager = resourceManager ? resourceManager->GetTextureManager() : nullptr;
-    if (!textureManager || !environment.Current[0] || !environment.Current[1])
+    auto* render = dynamic_cast<FGEnvironmentRender*>(&*environment.m_pRender);
+    if (!render || !environment.Current[0] || !environment.Current[1])
         return false;
 
-    auto resolve = [textureManager](const shared_str& name) -> nvrhi::ITexture*
-    {
-        if (!name.size())
-            return nullptr;
-        resources::TextureHandle handle = textureManager->FindTexture(name.c_str(), TextureColorSpace::Srgb);
-        if (!handle.IsValid())
-            handle = textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb);
-        return textureManager->GetNVRHITexture(handle);
-    };
-    sky0 = resolve(environment.Current[0]->sky_texture_name);
-    sky1 = resolve(environment.Current[1]->sky_texture_name);
+    sky0 = render->AcquireTexture(environment.Current[0]->sky_texture_name);
+    sky1 = render->AcquireTexture(environment.Current[1]->sky_texture_name);
     return sky0 && sky1;
+}
+
+nvrhi::ITexture* FGEnvironmentRender::AcquireTexture(const shared_str& name)
+{
+    if (!name.size())
+        return nullptr;
+
+    auto found = m_textures.find(name);
+    if (found != m_textures.end())
+        return found->second.Get();
+
+    return m_textures[name].Load(name.c_str(), TextureColorSpace::Srgb);
 }
 
 void FGEnvironmentRender::Copy(IEnvironmentRender& _in)
@@ -124,6 +125,8 @@ void FGEnvironmentRender::OnDeviceDestroy()
     m_sunBindingLayout = nullptr;
     m_sunPipeline = nullptr;
     m_sunInitialized = false;
+
+    m_textures.clear();
 
     m_device = nullptr;
 }
@@ -519,20 +522,7 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     auto dynamicCBBuffer = cache.GetOrCreateVolatileCB(
         "Frame", "DynamicTransforms", sizeof(passes::DynamicTransforms), renderDevice);
 
-    nvrhi::ITexture* sunTex = nullptr;
-    const shared_str& sunTexName = flareDesc->m_Source.texture;
-    if (sunTexName.size())
-    {
-        auto* texManager = renderDevice->GetFGResourceManager()
-            ? renderDevice->GetFGResourceManager()->GetTextureManager() : nullptr;
-        if (texManager)
-        {
-            resources::TextureHandle handle = texManager->FindTexture(sunTexName.c_str(), TextureColorSpace::Srgb);
-            if (!handle.IsValid())
-                handle = texManager->LoadTexture(sunTexName.c_str(), TextureColorSpace::Srgb);
-            sunTex = texManager->GetNVRHITexture(handle);
-        }
-    }
+    nvrhi::ITexture* sunTex = AcquireTexture(flareDesc->m_Source.texture);
     if (!sunTex)
         sunTex = m_sunPlaceholderTex.Get();
 

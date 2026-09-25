@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
+#include "FGResourceManager.h"
 
 // Modern Texture Manager Implementation
 // Week 1 - Day 1-2: Tasks 1.4, 2.2
@@ -817,6 +818,79 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
             }
         }
     }
+}
+
+TextureManager* GetActiveTextureManager()
+{
+    RenderDevice* device = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
+    FGResourceManager* resourceManager = device ? device->GetFGResourceManager() : nullptr;
+    return resourceManager ? resourceManager->GetTextureManager() : nullptr;
+}
+
+TextureRef::TextureRef(const TextureRef& other)
+    : m_handle(other.m_handle)
+{
+    if (TextureManager* textures = m_handle.IsValid() ? GetActiveTextureManager() : nullptr)
+        textures->AddRef(m_handle);
+}
+
+TextureRef::TextureRef(TextureRef&& other) noexcept
+    : m_handle(other.m_handle)
+{
+    other.m_handle = TextureHandle();
+}
+
+TextureRef::~TextureRef()
+{
+    Reset();
+}
+
+TextureRef& TextureRef::operator=(const TextureRef& other)
+{
+    if (this != &other)
+        *this = TextureRef(other);
+    return *this;
+}
+
+TextureRef& TextureRef::operator=(TextureRef&& other) noexcept
+{
+    if (this != &other)
+    {
+        Reset();
+        m_handle = other.m_handle;
+        other.m_handle = TextureHandle();
+    }
+    return *this;
+}
+
+nvrhi::ITexture* TextureRef::Load(const char* path, fg::TextureColorSpace colorSpace)
+{
+    TextureManager* textures = GetActiveTextureManager();
+    if (!textures)
+    {
+        Reset();
+        return nullptr;
+    }
+
+    const TextureHandle handle = textures->LoadTexture(path, colorSpace);
+    Reset();
+    m_handle = handle;
+    return textures->GetNVRHITexture(m_handle);
+}
+
+nvrhi::ITexture* TextureRef::Get() const
+{
+    TextureManager* textures = m_handle.IsValid() ? GetActiveTextureManager() : nullptr;
+    return textures ? textures->GetNVRHITexture(m_handle) : nullptr;
+}
+
+void TextureRef::Reset()
+{
+    if (!m_handle.IsValid())
+        return;
+    if (TextureManager* textures = GetActiveTextureManager())
+        textures->Release(m_handle);
+    m_handle = TextureHandle();
 }
 
 } // namespace xray::render::resources

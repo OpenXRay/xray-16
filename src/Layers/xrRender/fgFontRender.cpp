@@ -130,12 +130,7 @@ void FGFontRender::Initialize(cpcstr, cpcstr cTexture)
     if (!cTexture)
         return;
 
-    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
-    auto* textureManager = fgRenderer->GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    R_ASSERT(textureManager);
-
-    auto handle = textureManager->LoadTexture(cTexture);
-    m_texture = textureManager->GetNVRHITexture(handle);
+    m_texture = m_textureRef.Load(cTexture, TextureColorSpace::Linear);
     R_ASSERT2(m_texture, "FGFontRender: failed to load font texture");
 
     const auto& desc = m_texture->getDesc();

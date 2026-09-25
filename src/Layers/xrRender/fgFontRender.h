@@ -3,6 +3,7 @@
 #include "Include/xrRender/FontRender.h"
 #include "xrEngine/GameFont.h"
 #include <nvrhi/nvrhi.h>
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 
 namespace xray::render::fg
 {
@@ -40,6 +41,7 @@ private:
 
     nvrhi::IDevice*               m_device = nullptr;
     nvrhi::TextureHandle          m_texture;
+    resources::TextureRef         m_textureRef;
     nvrhi::ShaderHandle           m_vs;
     nvrhi::ShaderHandle           m_ps;
     nvrhi::InputLayoutHandle      m_inputLayout;

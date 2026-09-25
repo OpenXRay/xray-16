@@ -197,13 +197,9 @@ nvrhi::ITexture* FGLensFlareRender::ResolveTexture(const shared_str& name)
 
     auto it = m_textureCache.find(name);
     if (it != m_textureCache.end())
-        return it->second;
+        return it->second.Get();
 
-    auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.Render);
-    auto* textureManager = fgRenderer->GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    nvrhi::TextureHandle handle = textureManager->GetNVRHITexture(textureManager->LoadTexture(name.c_str(), TextureColorSpace::Srgb));
-    m_textureCache.emplace(name, handle);
-    return handle;
+    return m_textureCache[name].Load(name.c_str(), TextureColorSpace::Srgb);
 }
 
 void FGLensFlareRender::PushQuad(const Fvector& center, const Fvector& vecX, const Fvector& vecY, u32 color,

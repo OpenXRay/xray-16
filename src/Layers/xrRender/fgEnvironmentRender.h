@@ -2,6 +2,7 @@
 
 #include <nvrhi/nvrhi.h>
 #include "Include/xrRender/EnvironmentRender.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 
 class CEnvironment;
 
@@ -35,6 +36,7 @@ public:
 
     void DrawSky(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
     void DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer, CEnvironment* environment, u32 width, u32 height);
+    nvrhi::ITexture* AcquireTexture(const shared_str& name);
     void InvalidateShadersAndPipelines();
 
 private:
@@ -63,5 +65,7 @@ private:
     nvrhi::BindingLayoutHandle m_sunBindingLayout;
     nvrhi::GraphicsPipelineHandle m_sunPipeline;
     bool m_sunInitialized = false;
+
+    xr_map<shared_str, resources::TextureRef> m_textures;
 };
 } // namespace xray::render::fg
