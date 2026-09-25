@@ -8,7 +8,7 @@ struct InteractionEntity
     float weight;
 };
 
-cbuffer InteractionParams : register(b0)
+cbuffer InteractionParams
 {
     float2 g_origin_cur;
     float2 g_origin_prev;
@@ -26,10 +26,10 @@ cbuffer InteractionParams : register(b0)
     uint g_prev_valid;
 };
 
-StructuredBuffer<InteractionEntity> g_entities : register(t0);
-Texture2D<float4> g_prev : register(t1);
-Texture2D<float> g_heightmap : register(t2);
-RWTexture2D<float4> g_cur : register(u0);
+StructuredBuffer<InteractionEntity> g_entities;
+Texture2D<float4> g_prev;
+Texture2D<float> g_heightmap;
+RWTexture2D<float4> g_cur;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)

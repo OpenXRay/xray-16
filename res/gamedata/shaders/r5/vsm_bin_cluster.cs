@@ -2,16 +2,12 @@
 #include "common.h"
 #include "vsm_common.h"
 #include "vsm_params.h"
-#define CLUSTER_GEO_T_REFS t0
-#define CLUSTER_GEO_T_META t3
-#define CLUSTER_GEO_T_INSTANCES t4
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 #include "vsm_bvh_types.h"
 
-cbuffer VsmBinParams : register(b5)
+cbuffer VsmBinParams
 {
     uint g_IncludeAT;
     uint g_PairCapOpaque;
@@ -23,13 +19,13 @@ cbuffer VsmBinParams : register(b5)
     uint g_BinPad;
 };
 
-StructuredBuffer<uint> g_DirtyList : register(t1);
-StructuredBuffer<uint4> g_PageList : register(t2);
-StructuredBuffer<uint4> g_PairBase : register(t16);
-RWStructuredBuffer<uint> g_Stats : register(u0);
-RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
-RWStructuredBuffer<uint2> g_PairsTerrain : register(u2);
-RWStructuredBuffer<uint2> g_PairsAT : register(u3);
+StructuredBuffer<uint> g_DirtyList;
+StructuredBuffer<uint4> g_PageList;
+StructuredBuffer<uint4> g_PairBase;
+RWStructuredBuffer<uint> g_Stats;
+RWStructuredBuffer<uint2> g_PairsOpaque;
+RWStructuredBuffer<uint2> g_PairsTerrain;
+RWStructuredBuffer<uint2> g_PairsAT;
 
 groupshared uint gs_cursor[3];
 groupshared uint gs_pairs;

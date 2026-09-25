@@ -3,7 +3,7 @@
 
 #include "smoke_common.h"
 
-cbuffer SmokeSimCB : register(b5)
+cbuffer SmokeSimCB
 {
     float g_DT;
     float g_Gravity;
@@ -16,7 +16,7 @@ cbuffer SmokeSimCB : register(b5)
     float g_Heat01;
 };
 
-RWStructuredBuffer<SmokeSimPoint> g_SimBuffer : register(u0);
+RWStructuredBuffer<SmokeSimPoint> g_SimBuffer;
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)

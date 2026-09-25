@@ -3,20 +3,19 @@
 #include "vsm_common.h"
 
 #include "vsm_resid_params.h"
-#define GEOMETRY_CUTS_REGISTER t1
 #include "geometry_cut_common.h"
 
-StructuredBuffer<uint> g_Needed : register(t0);
-StructuredBuffer<float4> g_SlotPivot : register(t2);
-StructuredBuffer<float4> g_SlotSun : register(t3);
-RWStructuredBuffer<uint> g_PageTable : register(u0);
-RWStructuredBuffer<uint4> g_PageList : register(u1);
-StructuredBuffer<uint2> g_PhysTile : register(t4);
-RWStructuredBuffer<uint> g_SlotDirty : register(u3);
-RWStructuredBuffer<uint4> g_CandList : register(u4);
-RWByteAddressBuffer g_Counters : register(u5);
-StructuredBuffer<uint> g_SlotFrame : register(t5);
-RWStructuredBuffer<uint2> g_GeometryDirty : register(u7);
+StructuredBuffer<uint> g_Needed;
+StructuredBuffer<float4> g_SlotPivot;
+StructuredBuffer<float4> g_SlotSun;
+RWStructuredBuffer<uint> g_PageTable;
+RWStructuredBuffer<uint4> g_PageList;
+StructuredBuffer<uint2> g_PhysTile;
+RWStructuredBuffer<uint> g_SlotDirty;
+RWStructuredBuffer<uint4> g_CandList;
+RWByteAddressBuffer g_Counters;
+StructuredBuffer<uint> g_SlotFrame;
+RWStructuredBuffer<uint2> g_GeometryDirty;
 
 void updateGeometryDirty(uint slot, uint level)
 {

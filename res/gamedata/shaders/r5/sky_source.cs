@@ -1,6 +1,6 @@
 #include "shared/sky_source.h"
 
-cbuffer SkySourceParams : register(b0)
+cbuffer SkySourceParams
 {
     float3 g_SkyTint;
     uint g_FaceSize;
@@ -10,10 +10,10 @@ cbuffer SkySourceParams : register(b0)
     float g_GroundAlbedo;
 };
 
-TextureCube<float4> g_Sky0 : register(t0);
-TextureCube<float4> g_Sky1 : register(t1);
-SamplerState smp_rtlinear : register(s0);
-RWTexture2DArray<float4> g_SkyCube : register(u0);
+TextureCube<float4> g_Sky0;
+TextureCube<float4> g_Sky1;
+SamplerState smp_rtlinear;
+RWTexture2DArray<float4> g_SkyCube;
 
 float3 SampleAuthoredSky(float3 direction)
 {

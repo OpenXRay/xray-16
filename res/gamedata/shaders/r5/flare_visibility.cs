@@ -1,4 +1,4 @@
-cbuffer FlareVisParams : register(b0)
+cbuffer FlareVisParams
 {
     float2 sun_pos_px;
     float radius_px;
@@ -7,8 +7,8 @@ cbuffer FlareVisParams : register(b0)
     uint3 pad;
 };
 
-Texture2D<float> g_Depth : register(t0);
-RWStructuredBuffer<float> g_Vis : register(u0);
+Texture2D<float> g_Depth;
+RWStructuredBuffer<float> g_Vis;
 
 groupshared uint gs_visible;
 

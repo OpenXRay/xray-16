@@ -1,20 +1,20 @@
 #include "rtgi_reconstruct_common.h"
 
-cbuffer RTGIFilterParams : register(b5)
+cbuffer RTGIFilterParams
 {
     uint g_Width, g_Height, g_StepSize, g_Iteration;
     float g_PhiColor, g_PhiNormal, g_FilterPad0, g_FilterPad1;
 };
 
-Texture2D<float4> t_HistoryDiffuse : register(t0);
-Texture2D<float4> t_HistorySpecular : register(t1);
-Texture2D<float4> t_Moments : register(t2);
-Texture2D<float4> t_NormalRoughness : register(t3);
-Texture2D<float4> t_SurfaceData : register(t4);
+Texture2D<float4> t_HistoryDiffuse;
+Texture2D<float4> t_HistorySpecular;
+Texture2D<float4> t_Moments;
+Texture2D<float4> t_NormalRoughness;
+Texture2D<float4> t_SurfaceData;
 
-RWTexture2D<float4> u_Diffuse : register(u0);
-RWTexture2D<float4> u_Specular : register(u1);
-RWTexture2D<float> u_DepthGuide : register(u2);
+RWTexture2D<float4> u_Diffuse;
+RWTexture2D<float4> u_Specular;
+RWTexture2D<float> u_DepthGuide;
 
 struct RTGIVarianceSample
 {

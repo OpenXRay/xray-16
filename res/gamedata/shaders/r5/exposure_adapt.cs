@@ -1,9 +1,9 @@
 #include "exposure_common.h"
 
-RWByteAddressBuffer u_Histogram : register(u0);
-RWStructuredBuffer<float4> u_Exposure : register(u1);
+RWByteAddressBuffer u_Histogram;
+RWStructuredBuffer<float4> u_Exposure;
 
-cbuffer ExposureAdaptParams : register(b0)
+cbuffer ExposureAdaptParams
 {
     float g_Compensation;
     float g_MinEv;

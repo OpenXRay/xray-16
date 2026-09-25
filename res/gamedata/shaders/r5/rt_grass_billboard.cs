@@ -2,17 +2,17 @@
 #include "detail_source_common.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<uint2> g_VisibleIndices : register(t1);
-StructuredBuffer<DetailModelGPU> g_DetailModels : register(t2);
-StructuredBuffer<PulledVertex> g_PulledVerts : register(t3);
-Texture3D g_WindTexture : register(t4);
-Texture2D g_Interaction : register(t5);
-SamplerState smp_linear : register(s2);
-SamplerState smp_rtlinear : register(s3);
-RWByteAddressBuffer g_Output : register(u0);
-RWByteAddressBuffer g_OutputIB : register(u1);
+StructuredBuffer<uint2> g_VisibleIndices;
+StructuredBuffer<DetailModelGPU> g_DetailModels;
+StructuredBuffer<PulledVertex> g_PulledVerts;
+Texture3D g_WindTexture;
+Texture2D g_Interaction;
+SamplerState smp_linear;
+SamplerState smp_rtlinear;
+RWByteAddressBuffer g_Output;
+RWByteAddressBuffer g_OutputIB;
 
-cbuffer BillboardRTCB : register(b5) {
+cbuffer BillboardRTCB {
     uint maxVertsPerBillboard;
     uint billboardCount;
     uint outputVertexOffset;

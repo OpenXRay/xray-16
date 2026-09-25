@@ -3,7 +3,7 @@
 #include "vsm_common.h"
 #include "vsm_params.h"
 
-cbuffer VsmResolveParams : register(b5)
+cbuffer VsmResolveParams
 {
     float4x4 g_InvViewProj;
     float4x4 g_PrevViewProj;
@@ -18,16 +18,16 @@ cbuffer VsmResolveParams : register(b5)
     float4 g_HudParams;
 };
 
-Texture2D<float> g_Depth : register(t0);
-Texture2D<float> g_Atlas : register(t1);
-StructuredBuffer<uint> g_PageTable : register(t2);
-Texture2D<float4> g_History : register(t3);
-Texture2D<float> g_AtlasDyn : register(t14);
-StructuredBuffer<uint> g_DynPageTable : register(t15);
-StructuredBuffer<float4> g_SlotPivot : register(t17);
-StructuredBuffer<float4> g_SlotSun : register(t18);
-Texture2D<float> g_HudMap : register(t19);
-RWTexture2D<float4> g_Mask : register(u0);
+Texture2D<float> g_Depth;
+Texture2D<float> g_Atlas;
+StructuredBuffer<uint> g_PageTable;
+Texture2D<float4> g_History;
+Texture2D<float> g_AtlasDyn;
+StructuredBuffer<uint> g_DynPageTable;
+StructuredBuffer<float4> g_SlotPivot;
+StructuredBuffer<float4> g_SlotSun;
+Texture2D<float> g_HudMap;
+RWTexture2D<float4> g_Mask;
 
 static const float2 kDimS = float2(float(VSM_ATLAS_W_S), float(VSM_ATLAS_H_S));
 static const float2 kDimD = float2(float(VSM_ATLAS_W), float(VSM_ATLAS_H));

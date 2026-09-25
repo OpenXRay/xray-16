@@ -20,7 +20,7 @@ struct IndirectDrawArgs {
     uint startInstanceLocation;
 };
 
-cbuffer ParticleCullParams : register(b5) {
+cbuffer ParticleCullParams {
     float4x4 g_PrevViewProj;
     float4 g_FrustumPlanes[6];
     float4 g_CameraPos;
@@ -30,11 +30,11 @@ cbuffer ParticleCullParams : register(b5) {
     uint g_HiZMipLevels;
 };
 
-StructuredBuffer<ParticleData> g_ParticleData : register(t0);
-Texture2D<float> g_HiZPyramid : register(t1);
+StructuredBuffer<ParticleData> g_ParticleData;
+Texture2D<float> g_HiZPyramid;
 
-RWStructuredBuffer<IndirectDrawArgs> g_DrawArgs : register(u0);
-RWByteAddressBuffer g_CullStats : register(u1);
+RWStructuredBuffer<IndirectDrawArgs> g_DrawArgs;
+RWByteAddressBuffer g_CullStats;
 
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(uint3 dispatchThreadID : SV_DispatchThreadID)

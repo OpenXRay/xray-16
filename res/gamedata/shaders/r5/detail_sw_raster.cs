@@ -5,7 +5,7 @@
 #include "sw_raster_common.h"
 #include "sw_dispatch_common.h"
 
-cbuffer DetailGlobals : register(b3)
+cbuffer DetailGlobals
 {
     float4 consts;
     float4 wave;
@@ -29,7 +29,7 @@ cbuffer DetailGlobals : register(b3)
     uint buildDetailsBumpIndex;
 };
 
-cbuffer DetailSwParams : register(b5)
+cbuffer DetailSwParams
 {
     uint g_EntryBase;
     uint g_Lod;
@@ -40,11 +40,11 @@ cbuffer DetailSwParams : register(b5)
     uint2 g_SwPad;
 };
 
-Texture3D g_Perlin4D : register(t12);
-Texture2D g_Interaction : register(t13);
-StructuredBuffer<uint2> visible_indices : register(t33);
-StructuredBuffer<PreparedBlade> prepared_blades : register(t38);
-ByteAddressBuffer g_DrawArgs : register(t39);
+Texture3D g_Perlin4D;
+Texture2D g_Interaction;
+StructuredBuffer<uint2> visible_indices;
+StructuredBuffer<PreparedBlade> prepared_blades;
+ByteAddressBuffer g_DrawArgs;
 
 #define BLADE_MAX_VERTS 10
 

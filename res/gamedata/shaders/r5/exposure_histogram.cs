@@ -1,10 +1,10 @@
 #include "shared/color_space.h"
 #include "exposure_common.h"
 
-Texture2D<float4> t_Scene : register(t0);
-RWByteAddressBuffer u_Histogram : register(u0);
+Texture2D<float4> t_Scene;
+RWByteAddressBuffer u_Histogram;
 
-cbuffer ExposureHistogramParams : register(b0)
+cbuffer ExposureHistogramParams
 {
     uint2 g_SceneSize;
     uint2 g_HistogramPad;

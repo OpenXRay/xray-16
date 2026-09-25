@@ -3,12 +3,12 @@
 #include "vsm_common.h"
 #include "local_shadow_common.h"
 
-StructuredBuffer<uint> g_DirtyList : register(t0);
-ByteAddressBuffer g_DrawArgs : register(t1);
-RWStructuredBuffer<uint2> g_GeometryDirty : register(u0);
-StructuredBuffer<uint4> g_PageList : register(t2);
-RWStructuredBuffer<uint> g_PageTable : register(u1);
-RWStructuredBuffer<LocalShadowView> g_TileState : register(u2);
+StructuredBuffer<uint> g_DirtyList;
+ByteAddressBuffer g_DrawArgs;
+RWStructuredBuffer<uint2> g_GeometryDirty;
+StructuredBuffer<uint4> g_PageList;
+RWStructuredBuffer<uint> g_PageTable;
+RWStructuredBuffer<LocalShadowView> g_TileState;
 
 [numthreads(64, 1, 1)]
 void publishVSM(uint3 id : SV_DispatchThreadID)

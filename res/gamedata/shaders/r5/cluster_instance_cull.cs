@@ -5,15 +5,15 @@
 #include "cluster_cull_params.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<GeoInstance> g_GeoInstances : register(t0);
-StructuredBuffer<ClusterAssetMember> g_AssetMembers : register(t1);
-StructuredBuffer<ClusterAssetNode> g_AssetNodes : register(t2);
-Texture2D<float> g_HiZPyramid : register(t3);
-StructuredBuffer<uint> g_DeferredInstanceList : register(t4);
+StructuredBuffer<GeoInstance> g_GeoInstances;
+StructuredBuffer<ClusterAssetMember> g_AssetMembers;
+StructuredBuffer<ClusterAssetNode> g_AssetNodes;
+Texture2D<float> g_HiZPyramid;
+StructuredBuffer<uint> g_DeferredInstanceList;
 
-RWByteAddressBuffer g_OutCount : register(u0);
-RWStructuredBuffer<uint2> g_OutNodes : register(u1);
-RWStructuredBuffer<uint> g_OutDeferredInstances : register(u2);
+RWByteAddressBuffer g_OutCount;
+RWStructuredBuffer<uint2> g_OutNodes;
+RWStructuredBuffer<uint> g_OutDeferredInstances;
 
 [numthreads(64, 1, 1)]
 void main(uint3 groupID : SV_GroupID, uint lane : SV_GroupIndex)

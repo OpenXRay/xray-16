@@ -19,16 +19,16 @@ struct SimdTestData
 };
 
 // Input buffer
-StructuredBuffer<SimdTestData> g_input : register(t0);
+StructuredBuffer<SimdTestData> g_input;
 
 // Output buffer
-RWStructuredBuffer<SimdTestData> g_output : register(u0);
+RWStructuredBuffer<SimdTestData> g_output;
 
 // Counter
-RWStructuredBuffer<uint> g_counter : register(u1);
+RWStructuredBuffer<uint> g_counter;
 
 // Constant buffer
-cbuffer TestParams : register(b0)
+cbuffer TestParams
 {
     uint g_element_count;       // 4 bytes
     uint g_iteration_count;     // 4 bytes

@@ -2,7 +2,7 @@
 
 #include "sw_dispatch_common.h"
 
-cbuffer ClusterQueueParams : register(b5)
+cbuffer ClusterQueueParams
 {
     uint g_SrcCountOffset;
     uint g_ResetCountOffset;
@@ -10,8 +10,8 @@ cbuffer ClusterQueueParams : register(b5)
     uint g_GroupSize;
 };
 
-RWByteAddressBuffer g_Count : register(u0);
-RWByteAddressBuffer g_QueueArgs : register(u1);
+RWByteAddressBuffer g_Count;
+RWByteAddressBuffer g_QueueArgs;
 
 [numthreads(1, 1, 1)]
 void main()

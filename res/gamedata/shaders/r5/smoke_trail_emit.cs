@@ -3,7 +3,7 @@
 
 #include "smoke_common.h"
 
-cbuffer SmokeEmitCB : register(b5)
+cbuffer SmokeEmitCB
 {
     float g_PrevPosX, g_PrevPosY, g_PrevPosZ, g_CurrPosX;
     float g_CurrPosY, g_CurrPosZ, g_EmitDirX, g_EmitDirY;
@@ -12,8 +12,8 @@ cbuffer SmokeEmitCB : register(b5)
     float g_FrameSeed, g_Pad0;
 };
 
-RWStructuredBuffer<SmokeSimPoint> g_SimBuffer   : register(u0);
-RWByteAddressBuffer               g_StateBuffer : register(u1);
+RWStructuredBuffer<SmokeSimPoint> g_SimBuffer;
+RWByteAddressBuffer               g_StateBuffer;
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)

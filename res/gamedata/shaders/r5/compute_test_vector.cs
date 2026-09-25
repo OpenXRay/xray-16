@@ -14,17 +14,17 @@ struct TestData
 };
 
 // Input buffer
-StructuredBuffer<TestData> g_input : register(t0);
+StructuredBuffer<TestData> g_input;
 
 // Output buffer
-RWStructuredBuffer<TestData> g_output : register(u0);
+RWStructuredBuffer<TestData> g_output;
 
 // Counter
-RWStructuredBuffer<uint> g_counter : register(u1);
+RWStructuredBuffer<uint> g_counter;
 
 // Constant buffer
 // Note: Must be multiple of 16 bytes for DX11
-cbuffer TestParams : register(b0)
+cbuffer TestParams
 {
     uint g_element_count;    // 4 bytes
     uint g_iteration_count;  // 4 bytes - number of computation cycles to run

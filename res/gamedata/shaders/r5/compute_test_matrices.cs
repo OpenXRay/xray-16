@@ -15,16 +15,16 @@ struct MatrixTestData
 };
 
 // Input buffer
-StructuredBuffer<MatrixTestData> g_input : register(t0);
+StructuredBuffer<MatrixTestData> g_input;
 
 // Output buffer
-RWStructuredBuffer<MatrixTestData> g_output : register(u0);
+RWStructuredBuffer<MatrixTestData> g_output;
 
 // Counter
-RWStructuredBuffer<uint> g_counter : register(u1);
+RWStructuredBuffer<uint> g_counter;
 
 // Constant buffer
-cbuffer TestParams : register(b0)
+cbuffer TestParams
 {
     uint g_element_count;       // 4 bytes
     uint g_iteration_count;     // 4 bytes

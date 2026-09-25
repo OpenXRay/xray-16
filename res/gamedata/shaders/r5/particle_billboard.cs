@@ -25,19 +25,19 @@ struct ParticleVertex {
     uint _pad;          //  4 bytes
 };
 
-cbuffer BillboardParams : register(b0) {
+cbuffer BillboardParams {
     float4 g_CameraTop;     // 16 bytes (xyz + pad)
     float4 g_CameraRight;   // 16 bytes (xyz + pad)
     uint g_VisibleCount;    //  4 bytes
     uint3 g_Padding;        // 12 bytes
 };
 
-StructuredBuffer<ParticleData> g_ParticleData : register(t0);
-StructuredBuffer<uint> g_VisibleIndices : register(t1);
-ByteAddressBuffer g_VisibleCountBuf : register(t2);
+StructuredBuffer<ParticleData> g_ParticleData;
+StructuredBuffer<uint> g_VisibleIndices;
+ByteAddressBuffer g_VisibleCountBuf;
 
-RWStructuredBuffer<ParticleVertex> g_Vertices : register(u0);
-RWByteAddressBuffer g_DrawArgs : register(u1);
+RWStructuredBuffer<ParticleVertex> g_Vertices;
+RWByteAddressBuffer g_DrawArgs;
 
 [numthreads(THREAD_GROUP_SIZE, 1, 1)]
 void main(uint3 dispatchThreadID : SV_DispatchThreadID)

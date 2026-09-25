@@ -3,7 +3,7 @@
 #include "vsm_common.h"
 #include "vsm_params.h"
 
-cbuffer VsmMarkParams : register(b5)
+cbuffer VsmMarkParams
 {
     float4x4 g_InvViewProj;
     float4 g_Screen;
@@ -12,8 +12,8 @@ cbuffer VsmMarkParams : register(b5)
     uint2 g_MarkPad;
 };
 
-Texture2D<float> g_Depth : register(t0);
-RWStructuredBuffer<uint> g_Needed : register(u0);
+Texture2D<float> g_Depth;
+RWStructuredBuffer<uint> g_Needed;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)

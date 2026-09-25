@@ -2,15 +2,11 @@
 #include "common.h"
 #include "vsm_common.h"
 #include "vsm_params.h"
-#define CLUSTER_GEO_T_REFS t2
-#define CLUSTER_GEO_T_META t3
-#define CLUSTER_GEO_T_INSTANCES t4
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 
-cbuffer VsmDynBinParams : register(b5)
+cbuffer VsmDynBinParams
 {
     uint g_EntryBase;
     uint g_EntryCount;
@@ -22,8 +18,8 @@ cbuffer VsmDynBinParams : register(b5)
     uint g_DynBinPad;
 };
 
-StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t0);
-RWStructuredBuffer<uint> g_DynPageTable : register(u0);
+StructuredBuffer<ClusterEntry> g_SkinnedEntries;
+RWStructuredBuffer<uint> g_DynPageTable;
 
 ClusterEntry LoadSourceEntry(uint idx)
 {

@@ -13,7 +13,7 @@
 //  CONSTANTS
 // ═══════════════════════════════════════════════════════
 
-cbuffer HiZParams : register(b5)  // b5 to avoid conflicts with common.h
+cbuffer HiZParams
 {
     uint2 g_output_dimensions;    // Output mip dimensions (width, height)
     uint g_input_mip_level;       // Which mip level to read from (0 = full res depth)
@@ -27,10 +27,10 @@ cbuffer HiZParams : register(b5)  // b5 to avoid conflicts with common.h
 // ═══════════════════════════════════════════════════════
 
 // Input: Full-res depth buffer OR previous Hi-Z mip
-Texture2D<float> g_input_depth : register(t0);
+Texture2D<float> g_input_depth;
 
 // Output: Current Hi-Z mip level (R32_FLOAT UAV)
-RWTexture2D<float> g_output_hiz : register(u0);
+RWTexture2D<float> g_output_hiz;
 
 
 // ═══════════════════════════════════════════════════════

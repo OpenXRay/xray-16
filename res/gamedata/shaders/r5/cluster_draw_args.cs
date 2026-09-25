@@ -2,18 +2,18 @@
 
 #include "sw_dispatch_common.h"
 
-cbuffer ClusterArgsParams : register(b5)
+cbuffer ClusterArgsParams
 {
     uint g_CountBase;
     uint g_SwCountOffset;
     uint2 g_ArgsPad;
 };
 
-ByteAddressBuffer g_Count : register(t0);
-RWByteAddressBuffer g_Args : register(u0);
-RWByteAddressBuffer g_TerrainArgs : register(u1);
-RWByteAddressBuffer g_SwArgs : register(u2);
-RWByteAddressBuffer g_RetestArgs : register(u3);
+ByteAddressBuffer g_Count;
+RWByteAddressBuffer g_Args;
+RWByteAddressBuffer g_TerrainArgs;
+RWByteAddressBuffer g_SwArgs;
+RWByteAddressBuffer g_RetestArgs;
 
 [numthreads(1, 1, 1)]
 void main()

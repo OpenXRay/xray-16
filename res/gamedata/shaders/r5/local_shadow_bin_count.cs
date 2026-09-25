@@ -1,19 +1,14 @@
 #define SM_5_0
 #include "common.h"
 #include "local_shadow_common.h"
-#define CLUSTER_GEO_T_REFS t14
-#define CLUSTER_GEO_T_META t20
-#define CLUSTER_GEO_T_INSTANCES t21
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 #include "cluster_bvh_types.h"
 #include "local_shadow_bvh_types.h"
-#define GEOMETRY_CUTS_REGISTER t28
 #include "geometry_cut_common.h"
 
-cbuffer LocalShadowBinParams : register(b5)
+cbuffer LocalShadowBinParams
 {
     uint g_CandCount;
     uint g_NodeCount;
@@ -29,11 +24,11 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_BinPad2;
 };
 
-StructuredBuffer<LocalShadowView> g_Request : register(t15);
-StructuredBuffer<uint4> g_CandList : register(t16);
-StructuredBuffer<LocalShadowView> g_TileState : register(t17);
-RWStructuredBuffer<uint4> g_TileCount : register(u0);
-RWStructuredBuffer<uint2> g_GeometryDirty : register(u1);
+StructuredBuffer<LocalShadowView> g_Request;
+StructuredBuffer<uint4> g_CandList;
+StructuredBuffer<LocalShadowView> g_TileState;
+RWStructuredBuffer<uint4> g_TileCount;
+RWStructuredBuffer<uint2> g_GeometryDirty;
 
 groupshared uint gs_count[3];
 groupshared uint gs_geometryDirty;
@@ -56,8 +51,6 @@ void BvhVisit(bool active, uint entryIdx, LocalViewQuery q)
     InterlockedAdd(gs_count[stream], 1u, d);
 }
 
-#define CLUSTER_BVH_T_NODES t18
-#define CLUSTER_BVH_T_INDEX t19
 #include "cluster_bvh.h"
 
 [numthreads(VSM_BVH_GROUP, 1, 1)]

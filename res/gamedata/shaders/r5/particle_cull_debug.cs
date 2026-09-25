@@ -12,7 +12,7 @@ struct GPUParticleData
     float2 padding;
 };
 
-cbuffer CullDebugParams : register(b5)
+cbuffer CullDebugParams
 {
     float4x4 g_ViewProj;
     float4x4 g_PrevViewProj;
@@ -28,11 +28,11 @@ cbuffer CullDebugParams : register(b5)
     float2 g_Padding;
 };
 
-StructuredBuffer<GPUParticleData> g_Particles : register(t0);
-Texture2D<float> g_HiZPyramid : register(t1);
+StructuredBuffer<GPUParticleData> g_Particles;
+Texture2D<float> g_HiZPyramid;
 
 
-RWStructuredBuffer<CullDebugData> g_DebugOutput : register(u0);
+RWStructuredBuffer<CullDebugData> g_DebugOutput;
 
 float3 OcclusionTestSphereDebug(float3 center, float radius)
 {

@@ -5,16 +5,16 @@
 #include "cluster_cull_params.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<GeoInstance> g_GeoInstances : register(t0);
-StructuredBuffer<ClusterAssetMember> g_AssetMembers : register(t1);
-StructuredBuffer<ClusterAssetNode> g_AssetNodes : register(t2);
-Texture2D<float> g_HiZPyramid : register(t3);
-StructuredBuffer<uint2> g_SrcNodes : register(t4);
+StructuredBuffer<GeoInstance> g_GeoInstances;
+StructuredBuffer<ClusterAssetMember> g_AssetMembers;
+StructuredBuffer<ClusterAssetNode> g_AssetNodes;
+Texture2D<float> g_HiZPyramid;
+StructuredBuffer<uint2> g_SrcNodes;
 
-RWByteAddressBuffer g_OutCount : register(u0);
-RWStructuredBuffer<uint2> g_OutNodes : register(u1);
-RWStructuredBuffer<uint2> g_OutDeferredNodes : register(u2);
-RWStructuredBuffer<uint> g_OutLeaves : register(u3);
+RWByteAddressBuffer g_OutCount;
+RWStructuredBuffer<uint2> g_OutNodes;
+RWStructuredBuffer<uint2> g_OutDeferredNodes;
+RWStructuredBuffer<uint> g_OutLeaves;
 
 void EmitLeaf(uint refIdx)
 {

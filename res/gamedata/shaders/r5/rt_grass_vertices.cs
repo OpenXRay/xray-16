@@ -2,15 +2,15 @@
 #include "detail_source_common.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<uint2> g_VisibleIndices : register(t2);
-Texture3D g_WindTexture : register(t3);
-Texture2D g_Interaction : register(t4);
-SamplerState smp_linear : register(s2);
-SamplerState smp_rtlinear : register(s3);
-RWByteAddressBuffer g_Output : register(u0);
-RWByteAddressBuffer g_OutputIB : register(u1);
+StructuredBuffer<uint2> g_VisibleIndices;
+Texture3D g_WindTexture;
+Texture2D g_Interaction;
+SamplerState smp_linear;
+SamplerState smp_rtlinear;
+RWByteAddressBuffer g_Output;
+RWByteAddressBuffer g_OutputIB;
 
-cbuffer GrassRTCB : register(b5) {
+cbuffer GrassRTCB {
     float4 g_wind_direction;
     float4 wave;
     float grass_wind_displacement;

@@ -2,7 +2,7 @@
 #include "bindless_common.h"
 #include "rt_integrator.h"
 
-cbuffer PathTracerParams : register(b5)
+cbuffer PathTracerParams
 {
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
@@ -38,8 +38,8 @@ cbuffer PathTracerParams : register(b5)
     uint g_PathPad2;
 };
 
-RWTexture2D<float4> g_Accumulation : register(u0);
-RWTexture2D<float4> g_Output : register(u1);
+RWTexture2D<float4> g_Accumulation;
+RWTexture2D<float4> g_Output;
 
 float3 GenerateCameraRay(uint2 pixel, inout uint rng, out float3 origin)
 {

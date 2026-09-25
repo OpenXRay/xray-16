@@ -6,7 +6,7 @@
 
 #include "noise4d.h"
 
-cbuffer Perlin4DGenParams : register(b0)
+cbuffer Perlin4DGenParams
 {
     float g_time;         // 4th dimension (evolution)
     float g_tileScale;    // spatial periods across texture (e.g. 4.0)
@@ -14,7 +14,7 @@ cbuffer Perlin4DGenParams : register(b0)
     float g_pad0;
 };
 
-RWTexture3D<float4> g_output : register(u0);
+RWTexture3D<float4> g_output;
 
 [numthreads(8, 8, 8)]
 void main(uint3 dtid : SV_DispatchThreadID)

@@ -984,28 +984,6 @@ static void FilterReflectionByUsage(ExtractedReflection& result, slang::ICompone
         [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
         cbs.end());
 
-    for (size_t i = 0; i < textures.size(); ++i)
-    {
-        for (size_t j = i + 1; j < textures.size(); )
-        {
-            if (textures[i].slot == textures[j].slot)
-            {
-                if (textures[j].shape != ResourceShape::Texture && textures[i].shape == ResourceShape::Texture)
-                {
-                    textures.erase(textures.begin() + i);
-                    --i;
-                    break;
-                }
-                else
-                {
-                    textures.erase(textures.begin() + j);
-                }
-            }
-            else
-                ++j;
-        }
-    }
-
     Msg("  [FilterReflection] After: %u SRVs, %u UAVs, %u samplers, %u CBs",
         textures.size(), uavs.size(), samplers.size(), cbs.size());
 }

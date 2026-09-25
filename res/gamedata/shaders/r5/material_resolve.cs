@@ -4,26 +4,24 @@
 #include "bindless_common.h"
 #include "skinned_mdi_common.h"
 #include "material_eval.h"
-#define CLUSTER_GEO_T_REFS t40
-#define CLUSTER_GEO_T_META t16
-#define CLUSTER_GEO_T_INSTANCES t46
+#define CLUSTER_GEO_AUTO_BIND
 #include "cluster_geo_bindings.h"
 #include "cluster_geo_payload.h"
 
-Texture2D<uint> g_VisID : register(t30);
-Texture2D<float> g_Depth : register(t31);
-StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t42);
-ByteAddressBuffer g_SkinnedVB : register(t43);
-ByteAddressBuffer g_SkinnedIB : register(t44);
-ByteAddressBuffer g_SkinnedPrevVB : register(t45);
-RWTexture2D<float4> g_OutNormal : register(u0);
-RWTexture2D<float4> g_OutBaseColor : register(u1);
-RWTexture2D<float4> g_OutColor : register(u2);
-RWTexture2D<float2> g_OutMotion : register(u3);
-RWTexture2D<float> g_OutVisDepth : register(u4);
-RWTexture2D<float2> g_OutMaterial : register(u5);
+Texture2D<uint> g_VisID;
+Texture2D<float> g_Depth;
+StructuredBuffer<ClusterEntry> g_SkinnedEntries;
+ByteAddressBuffer g_SkinnedVB;
+ByteAddressBuffer g_SkinnedIB;
+ByteAddressBuffer g_SkinnedPrevVB;
+RWTexture2D<float4> g_OutNormal;
+RWTexture2D<float4> g_OutBaseColor;
+RWTexture2D<float4> g_OutColor;
+RWTexture2D<float2> g_OutMotion;
+RWTexture2D<float> g_OutVisDepth;
+RWTexture2D<float2> g_OutMaterial;
 
-cbuffer MaterialResolveParams : register(b5)
+cbuffer MaterialResolveParams
 {
     float4x4 g_PrevView;
     float4x4 g_PrevProj;

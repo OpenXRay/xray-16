@@ -1,6 +1,6 @@
 #include "restir_gi_common.h"
 
-cbuffer ReSTIRTemporalParams : register(b5) {
+cbuffer ReSTIRTemporalParams {
     float4x4 g_InvViewProj;
     float4x4 g_PrevInvViewProj;
     float4 g_CameraPos;
@@ -12,18 +12,18 @@ cbuffer ReSTIRTemporalParams : register(b5) {
     uint g_Pad1;
 };
 
-Texture2D<float4> t_PrevReservoirA : register(t0);
-Texture2D<float4> t_PrevReservoirB : register(t1);
-Texture2D<float2> t_MotionVectors : register(t2);
-Texture2D<float> t_Depth : register(t3);
-Texture2D<float4> t_PrevNormal : register(t5);
-Texture2D<float4> t_BaseColor : register(t6);
-Texture2D<float> t_PrevDepth : register(t8);
-Texture2D<float4> t_Normal : register(t9);
-Texture2D<float2> t_Material : register(t17);
+Texture2D<float4> t_PrevReservoirA;
+Texture2D<float4> t_PrevReservoirB;
+Texture2D<float2> t_MotionVectors;
+Texture2D<float> t_Depth;
+Texture2D<float4> t_PrevNormal;
+Texture2D<float4> t_BaseColor;
+Texture2D<float> t_PrevDepth;
+Texture2D<float4> t_Normal;
+Texture2D<float2> t_Material;
 
-RWTexture2D<float4> u_ReservoirA : register(u0);
-RWTexture2D<float4> u_ReservoirB : register(u1);
+RWTexture2D<float4> u_ReservoirA;
+RWTexture2D<float4> u_ReservoirB;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)

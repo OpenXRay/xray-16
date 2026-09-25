@@ -1,8 +1,8 @@
-ByteAddressBuffer g_SrcVB : register(t0);
-StructuredBuffer<float4x4> g_BoneMatrices : register(t1);
-RWByteAddressBuffer g_Output : register(u0);
+ByteAddressBuffer g_SrcVB;
+StructuredBuffer<float4x4> g_BoneMatrices;
+RWByteAddressBuffer g_Output;
 
-cbuffer RTSkinningCB : register(b5) {
+cbuffer RTSkinningCB {
     column_major float4x4 g_WorldMatrix;
     column_major float4x4 g_NormalMatrix;
     uint g_VertexCount;

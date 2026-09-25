@@ -1,6 +1,6 @@
 #include "restir_gi_common.h"
 
-cbuffer CompositeParams : register(b5) {
+cbuffer CompositeParams {
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
     float2 g_ScreenSize;
@@ -8,16 +8,16 @@ cbuffer CompositeParams : register(b5) {
     uint g_DiffuseMode;
 };
 
-Texture2D<float4> t_DirectLighting : register(t0);
-Texture2D<float4> t_ReservoirA : register(t1);
-Texture2D<float4> t_ReservoirB : register(t2);
-Texture2D<float> t_Depth : register(t3);
-Texture2D<float4> t_BaseColor : register(t5);
-Texture2D<float4> t_Normal : register(t8);
-Texture2D<float2> t_Material : register(t17);
+Texture2D<float4> t_DirectLighting;
+Texture2D<float4> t_ReservoirA;
+Texture2D<float4> t_ReservoirB;
+Texture2D<float> t_Depth;
+Texture2D<float4> t_BaseColor;
+Texture2D<float4> t_Normal;
+Texture2D<float2> t_Material;
 
-RWTexture2D<float4> u_SceneColor : register(u0);
-RWTexture2D<float4> u_IndirectLighting : register(u1);
+RWTexture2D<float4> u_SceneColor;
+RWTexture2D<float4> u_IndirectLighting;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)

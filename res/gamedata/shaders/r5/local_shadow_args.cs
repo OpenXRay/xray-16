@@ -1,13 +1,13 @@
 #define SM_5_0
 
-cbuffer LocalShadowArgsParams : register(b5)
+cbuffer LocalShadowArgsParams
 {
     uint4 g_Caps0;
     uint4 g_Caps1;
 };
 
-StructuredBuffer<uint> g_Stats : register(t14);
-RWByteAddressBuffer g_Args : register(u0);
+StructuredBuffer<uint> g_Stats;
+RWByteAddressBuffer g_Args;
 
 [numthreads(1, 1, 1)]
 void main()

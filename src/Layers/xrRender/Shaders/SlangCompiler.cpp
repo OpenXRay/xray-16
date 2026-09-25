@@ -6,6 +6,116 @@
 namespace xray::render
 {
 
+namespace
+{
+
+struct BindingRange
+{
+    const char* name;
+    SlangParameterCategory category;
+    u32 space;
+    u32 begin;
+    u32 end;
+};
+
+const char* RegisterClassName(SlangParameterCategory category)
+{
+    switch (category)
+    {
+    case SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER: return "b";
+    case SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE: return "t";
+    case SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS: return "u";
+    case SLANG_PARAMETER_CATEGORY_SAMPLER_STATE: return "s";
+    case SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT: return "binding ";
+    default: return "";
+    }
+}
+
+bool IsRegisterCategory(SlangParameterCategory category)
+{
+    switch (category)
+    {
+    case SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER:
+    case SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE:
+    case SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS:
+    case SLANG_PARAMETER_CATEGORY_SAMPLER_STATE:
+    case SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool AlreadyReported(const xr_vector<std::pair<const char*, const char*>>& pairs, const char* a, const char* b)
+{
+    for (const auto& p : pairs)
+    {
+        if ((p.first == a && p.second == b) || (p.first == b && p.second == a))
+            return true;
+    }
+    return false;
+}
+
+bool CollectBindingOverlaps(slang::ShaderReflection* layout, xr_string& outError)
+{
+    if (!layout)
+        return false;
+
+    xr_vector<BindingRange> ranges;
+    const unsigned paramCount = layout->getParameterCount();
+    for (unsigned i = 0; i < paramCount; ++i)
+    {
+        auto* param = layout->getParameterByIndex(i);
+        if (!param)
+            continue;
+        auto* typeLayout = param->getTypeLayout();
+        if (!typeLayout)
+            continue;
+        const unsigned categoryCount = typeLayout->getCategoryCount();
+        for (unsigned c = 0; c < categoryCount; ++c)
+        {
+            const SlangParameterCategory category =
+                static_cast<SlangParameterCategory>(typeLayout->getCategoryByIndex(c));
+            if (!IsRegisterCategory(category))
+                continue;
+            const size_t size = typeLayout->getSize(category);
+            if (size == 0 || size >= SLANG_UNKNOWN_SIZE)
+                continue;
+            BindingRange range;
+            range.name = param->getName() ? param->getName() : "<unnamed>";
+            range.category = category;
+            range.space = static_cast<u32>(param->getBindingSpace(category));
+            range.begin = static_cast<u32>(param->getOffset(category));
+            range.end = range.begin + static_cast<u32>(size);
+            ranges.push_back(range);
+        }
+    }
+
+    xr_vector<std::pair<const char*, const char*>> reported;
+    for (size_t i = 0; i < ranges.size(); ++i)
+    {
+        for (size_t j = i + 1; j < ranges.size(); ++j)
+        {
+            const BindingRange& a = ranges[i];
+            const BindingRange& b = ranges[j];
+            if (a.category != b.category || a.space != b.space)
+                continue;
+            if (a.end <= b.begin || b.end <= a.begin)
+                continue;
+            if (AlreadyReported(reported, a.name, b.name))
+                continue;
+            reported.emplace_back(a.name, b.name);
+            string256 line;
+            xr_sprintf(line, "register %s%u (space %u) is declared by both '%s' and '%s'\n",
+                RegisterClassName(a.category), std::max(a.begin, b.begin), a.space, a.name, b.name);
+            outError += line;
+        }
+    }
+    return !reported.empty();
+}
+
+}
+
 SlangCompiler::SlangCompiler()
     : m_globalSession(nullptr)
     , m_session(nullptr)
@@ -292,9 +402,35 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     size_t bytecodeSize = codeBlob->getBufferSize();
     result.bytecode.resize(bytecodeSize);
     std::memcpy(result.bytecode.data(), bytecodeData, bytecodeSize);
-    result.success = true;
+    Slang::ComPtr<slang::IBlob> layoutDiagnostics;
+    auto* compositeLayout = compositeProgram->getLayout(0, layoutDiagnostics.writeRef());
+    if (layoutDiagnostics)
+    {
+        auto* msg = static_cast<const char*>(layoutDiagnostics->getBufferPointer());
+        if (msg && msg[0])
+        {
+            if (!result.warningMessage.empty())
+                result.warningMessage += "\n";
+            result.warningMessage += msg;
+        }
+    }
+    if (!compositeLayout)
+    {
+        result.errorMessage = "Failed to compute program layout";
+        Msg("! [SlangCompiler] %s: %s", sourcePath, result.errorMessage.c_str());
+        return result;
+    }
 
-    auto* compositeLayout = compositeProgram->getLayout();
+    xr_string overlaps;
+    if (CollectBindingOverlaps(compositeLayout, overlaps))
+    {
+        result.errorMessage = "Shader resource register overlap:\n" + overlaps;
+        Msg("! [SlangCompiler] %s (entry: %s, stage: %s): %s", sourcePath, entryPoint,
+            GetStageName(stage), result.errorMessage.c_str());
+        return result;
+    }
+
+    result.success = true;
     result.reflection = compositeLayout;
 
     compositeProgram->addRef();
@@ -305,7 +441,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     if (!result.warningMessage.empty())
     {
-        Msg("~ [SlangCompiler] Warnings: %s", result.warningMessage.c_str());
+        Msg("~ [SlangCompiler] %s: %s", sourcePath, result.warningMessage.c_str());
     }
 
     return result;

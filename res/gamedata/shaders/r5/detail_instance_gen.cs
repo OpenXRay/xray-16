@@ -39,7 +39,7 @@ struct DetailModelGPU
     float geomExtentY;
 };
 
-cbuffer InstanceGenParams : register(b6)
+cbuffer InstanceGenParams
 {
     float g_heightmap_world_min_x;
     float g_heightmap_world_min_z;
@@ -54,21 +54,21 @@ cbuffer InstanceGenParams : register(b6)
     uint2 g_gen_padding;
 };
 
-StructuredBuffer<GPUSlotData> g_slot_data : register(t1);
-Texture2D<float> g_heightmap : register(t2);
-StructuredBuffer<DetailModelGPU> g_detail_models : register(t3);
+StructuredBuffer<GPUSlotData> g_slot_data;
+Texture2D<float> g_heightmap;
+StructuredBuffer<DetailModelGPU> g_detail_models;
 #ifdef DETAIL_COUNT_ONLY
-RWStructuredBuffer<uint4> g_per_slot_counts : register(u2);
+RWStructuredBuffer<uint4> g_per_slot_counts;
 #else
-StructuredBuffer<SlotAABB> g_slot_aabbs : register(t4);
-StructuredBuffer<uint> g_emit_slot_ids : register(t5);
+StructuredBuffer<SlotAABB> g_slot_aabbs;
+StructuredBuffer<uint> g_emit_slot_ids;
 
-RWStructuredBuffer<InstanceData> g_instances : register(u0);
-RWByteAddressBuffer g_emit_status : register(u1);
-RWStructuredBuffer<uint> g_local_counters : register(u3);
+RWStructuredBuffer<InstanceData> g_instances;
+RWByteAddressBuffer g_emit_status;
+RWStructuredBuffer<uint> g_local_counters;
 #endif
 
-SamplerState smp_nofilter : register(s0);
+SamplerState smp_nofilter;
 
 uint pcg_hash(uint input)
 {

@@ -2,7 +2,7 @@
 #include "detail_visibility_common.h"
 #include "sw_dispatch_common.h"
 
-cbuffer DetailWorkParams : register(b5)
+cbuffer DetailWorkParams
 {
     uint g_EntryCapacity;
     uint3 g_BladeCapacity;
@@ -11,16 +11,16 @@ cbuffer DetailWorkParams : register(b5)
     uint2 g_WorkPadding;
 };
 
-ByteAddressBuffer g_VisibleSlotCount : register(t0);
-RWByteAddressBuffer g_ArgsLod0 : register(u0);
-RWByteAddressBuffer g_ArgsLod1 : register(u1);
-RWByteAddressBuffer g_ArgsLod2 : register(u2);
-RWByteAddressBuffer g_ArgsMesh : register(u3);
-RWByteAddressBuffer g_ArgsDecal : register(u4);
-RWByteAddressBuffer g_SwArgs : register(u5);
-RWStructuredBuffer<DetailVisibilityRange> g_DetailPackets : register(u6);
-RWByteAddressBuffer g_SlotDispatch : register(u7);
-RWByteAddressBuffer g_WorkStatus : register(u8);
+ByteAddressBuffer g_VisibleSlotCount;
+RWByteAddressBuffer g_ArgsLod0;
+RWByteAddressBuffer g_ArgsLod1;
+RWByteAddressBuffer g_ArgsLod2;
+RWByteAddressBuffer g_ArgsMesh;
+RWByteAddressBuffer g_ArgsDecal;
+RWByteAddressBuffer g_SwArgs;
+RWStructuredBuffer<DetailVisibilityRange> g_DetailPackets;
+RWByteAddressBuffer g_SlotDispatch;
+RWByteAddressBuffer g_WorkStatus;
 
 [numthreads(1, 1, 1)]
 void main_slots()

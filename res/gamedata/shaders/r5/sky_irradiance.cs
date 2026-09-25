@@ -1,15 +1,15 @@
 #include "shared/sky_source.h"
 
-cbuffer SkyIrradianceParams : register(b0)
+cbuffer SkyIrradianceParams
 {
     uint g_FaceSize;
     float g_SourceLod;
     uint2 g_SkyIrradiancePad;
 };
 
-TextureCube<float4> g_Sky : register(t0);
-SamplerState smp_rtlinear : register(s0);
-RWStructuredBuffer<float4> g_SkyIrradiance : register(u0);
+TextureCube<float4> g_Sky;
+SamplerState smp_rtlinear;
+RWStructuredBuffer<float4> g_SkyIrradiance;
 
 #define SKY_SH_THREADS 64
 #define SKY_SH_COEFFICIENTS 9
