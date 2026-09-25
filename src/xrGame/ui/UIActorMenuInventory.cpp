@@ -226,15 +226,27 @@ bool FindItemInList(CUIDragDropListEx* lst, PIItem pItem, CUICellItem*& ci_res)
     return false;
 }
 
-bool RemoveItemFromList(CUIDragDropListEx* lst, PIItem pItem)
-{ // fixme
+bool CUIActorMenu::RemoveItemFromList(CUIDragDropListEx* lst, PIItem pItem)
+{
     CUICellItem* ci = NULL;
     if (FindItemInList(lst, pItem, ci))
     {
         R_ASSERT(ci);
 
         CUICellItem* dying_cell = lst->RemoveItem(ci, false);
-        xr_delete(dying_cell);
+        if (dying_cell)
+        {
+            if (m_pCurrentCellItem == dying_cell)
+            {
+                SetCurrentItem(NULL);
+            }
+            if (m_upgrade_selected == dying_cell)
+            {
+                ClearUpgradeSelection();
+            }
+
+            xr_delete(dying_cell);
+        }
 
         return true;
     }
