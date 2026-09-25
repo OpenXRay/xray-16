@@ -88,6 +88,13 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     state.initialized = state.pipeline != nullptr;
 }
 
+void WarmDecalPipeline(fg::RenderDevice* device, DecalPassState& state)
+{
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(kSceneBaseColorFormat);
+    InitializeDecalResources(device, fbInfo, state);
+}
+
 DefaultOutputLayout setupDecalPass(
     FrameGraph& fg,
     fg::RenderDevice* device,

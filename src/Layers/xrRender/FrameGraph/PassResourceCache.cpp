@@ -2,6 +2,8 @@
 #include "PassResourceCache.h"
 #include "BindingLayoutBuilder.h"
 #include "ShaderCache.h"
+#include "xrEngine/device.h"
+#include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render::framegraph {
 
@@ -225,6 +227,13 @@ static u64 HashGraphicsPipelineKey(const char* passName,
     return hash;
 }
 
+void PassResourceCache::ReportPipelineCreation(const char* kind, const char* name, float milliseconds)
+{
+    if (!g_pGameLevel || Device.dwPrecacheFrame != 0 || !g_pGamePersistent || g_pGamePersistent->IsLoadingScreenShown())
+        return;
+    Msg("* [PipelineWarm] %s pipeline '%s' created during gameplay in %.1f ms", kind, name ? name : "", milliseconds);
+}
+
 nvrhi::GraphicsPipelineHandle PassResourceCache::GetOrCreatePipeline(
     const char* passName,
     const nvrhi::GraphicsPipelineDesc& desc,
@@ -240,7 +249,10 @@ nvrhi::GraphicsPipelineHandle PassResourceCache::GetOrCreatePipeline(
     }
 
     m_stats.pipelineMisses++;
+    CTimer timer;
+    timer.Start();
     nvrhi::GraphicsPipelineHandle pipeline = device->createGraphicsPipeline(desc, fbInfo);
+    ReportPipelineCreation("graphics", passName, timer.GetElapsed_sec() * 1000.f);
     if (pipeline) {
         m_graphicsPipelines[key] = pipeline;
     }
@@ -261,7 +273,10 @@ nvrhi::ComputePipelineHandle PassResourceCache::GetOrCreateComputePipeline(
     }
 
     m_stats.computePipelineMisses++;
+    CTimer timer;
+    timer.Start();
     nvrhi::ComputePipelineHandle pipeline = device->createComputePipeline(desc);
+    ReportPipelineCreation("compute", passName, timer.GetElapsed_sec() * 1000.f);
     if (pipeline) {
         m_computePipelines[key] = pipeline;
     }

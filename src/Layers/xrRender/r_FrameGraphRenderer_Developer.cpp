@@ -647,6 +647,7 @@ bool FrameGraphRenderer::level_LoadDeveloper(const DeveloperScene& scene)
         fg::passes::WarmLocalShadowPool(m_device, m_blackboard->get_or_add<fg::passes::LocalShadowState>());
 
     WarmParticles();
+    WarmGameplayPipelines();
 
     m_developerMeshCount = u32(visuals.size());
     m_developerVertexCount = totalVertices;

@@ -5,6 +5,7 @@
 #include "ShaderConstants.h"
 #include "Layers/xrRender/GpuParticleManager.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -56,19 +57,12 @@ static constexpr u32 gpuParticleColorMask = (1u << 12) - 1;
 static constexpr u32 gpuParticleSoftMask = gpuParticleColorMask & ~gpuParticleSetMask;
 static constexpr u32 gpuParticleDistortionMask = (1u << 12) | (1u << 13);
 
-static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticlePassData& data)
+static void CreateGpuParticlePipelines(fg::RenderDevice* renderDevice, nvrhi::FramebufferInfoEx framebuffer,
+    nvrhi::Format distortionFormat, GpuParticlePassState& state)
 {
-    auto& state = *data.state;
-    nvrhi::FramebufferInfoEx framebuffer;
-    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.color).format);
-    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.normal).format);
-    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.baseColor).format);
-    framebuffer.depthFormat = graph.GetResourceDesc(data.depth).format;
-    framebuffer.sampleCount = graph.GetResourceDesc(data.color).sampleCount;
-    const auto distortionFormat = graph.GetResourceDesc(data.distortion).format;
     if (state.distortPipeline && state.framebuffer == framebuffer && state.distortionFormat == distortionFormat)
         return;
-    auto* device = data.device->GetNVRHIDevice();
+    auto* device = renderDevice->GetNVRHIDevice();
     auto* loader = GEnv.Render->GetShaderLoader();
     VERIFY(device && loader);
     auto vertex = loader->LoadVertexShader("gpu_particle");
@@ -86,7 +80,7 @@ static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticleP
     auto setLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Set", *vertex.reflection, *set.reflection, device);
     auto layout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle", *vertex.reflection, *pixel.reflection, device);
     auto distortLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Distort", *vertex.reflection, *distort.reflection, device);
-    auto* backend = data.device->GetBackend();
+    auto* backend = renderDevice->GetBackend();
     VERIFY(backend && backend->GetBindlessLayout());
     nvrhi::GraphicsPipelineDesc pipeline;
     pipeline.VS = vertex.handle;
@@ -127,6 +121,27 @@ static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticleP
     target.destBlendAlpha = nvrhi::BlendFactor::One;
     state.distortPipeline = cache.GetOrCreatePipeline("GpuParticle.Distort", pipeline, framebuffer, device);
     VERIFY2(state.distortPipeline, "GPU particle distortion pipeline is required");
+}
+
+static void InitializeGpuParticlePipelines(const FrameGraph& graph, GpuParticlePassData& data)
+{
+    nvrhi::FramebufferInfoEx framebuffer;
+    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.color).format);
+    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.normal).format);
+    framebuffer.colorFormats.push_back(graph.GetResourceDesc(data.baseColor).format);
+    framebuffer.depthFormat = graph.GetResourceDesc(data.depth).format;
+    framebuffer.sampleCount = graph.GetResourceDesc(data.color).sampleCount;
+    CreateGpuParticlePipelines(data.device, framebuffer, graph.GetResourceDesc(data.distortion).format, *data.state);
+}
+
+void WarmGpuParticlePipelines(fg::RenderDevice* device, GpuParticlePassState& state)
+{
+    nvrhi::FramebufferInfoEx framebuffer;
+    framebuffer.colorFormats.push_back(kSceneColorFormat);
+    framebuffer.colorFormats.push_back(kSceneNormalFormat);
+    framebuffer.colorFormats.push_back(kSceneBaseColorFormat);
+    framebuffer.depthFormat = kSceneDepthFormat;
+    CreateGpuParticlePipelines(device, framebuffer, kSceneDistortionFormat, state);
 }
 
 static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& graph, fg::RenderContext* context)
@@ -306,7 +321,7 @@ GpuParticlePassOutputs setupGpuParticlePass(
                 ResourceDesc desc;
                 desc.width = width;
                 desc.height = height;
-                desc.format = nvrhi::Format::RGBA16_FLOAT;
+                desc.format = kSceneDistortionFormat;
                 desc.isRenderTarget = true;
                 desc.isUAV = true;
                 desc.debugName = "rt_Distortion";

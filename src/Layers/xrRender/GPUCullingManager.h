@@ -16,6 +16,7 @@ namespace xray::render::fg::passes {
 
 namespace xray::render {
     class GeometryCollector;
+    struct ShaderVariantDesc;
     struct GeometryBatch;
     namespace fg {
         class RenderDevice;
@@ -69,6 +70,8 @@ enum TransparentKeyBits : u32 {
     TRANSPARENT_KEY_UNLIT = 1u << 19,
     TRANSPARENT_KEY_WMARK = 1u << 20,
 };
+
+u32 TransparentKeyForVariant(const ShaderVariantDesc* variant);
 
 struct GPUClusterEntry {
     Fvector4 sphere;

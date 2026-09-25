@@ -5,6 +5,7 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrEngine/IRenderBackend.h"
 
@@ -56,7 +57,7 @@ void FGFontRender::InitResources()
         nvrhi::VertexAttributeDesc().setName("COLOR")   .setFormat(nvrhi::Format::RGBA8_UNORM) .setOffset(16).setElementStride(sizeof(Vertex)),
         nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT)  .setOffset(20).setElementStride(sizeof(Vertex)),
     };
-    m_inputLayout = m_device->createInputLayout(vertexAttrs, 3, m_vs);
+    m_inputLayout = framegraph::GetPassResourceCache().GetOrCreateInputLayout("FGFont", vertexAttrs, 3, m_vs, m_device);
     R_ASSERT2(m_inputLayout, "FGFontRender: createInputLayout failed");
 
     nvrhi::BufferDesc cbDesc;
@@ -81,7 +82,7 @@ void FGFontRender::InitResources()
         nvrhi::BindingLayoutItem::Texture_SRV(0),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
-    m_bindingLayout = m_device->createBindingLayout(bindingLayoutDesc);
+    m_bindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayout("FGFont", bindingLayoutDesc, m_device);
     R_ASSERT2(m_bindingLayout, "FGFontRender: createBindingLayout failed");
 
     xr_vector<u16> quadIndices;
@@ -201,7 +202,7 @@ void FGFontRender::EnsurePipeline(nvrhi::IFramebuffer* framebuffer)
         .setSrcBlendAlpha(nvrhi::BlendFactor::One)
         .setDestBlendAlpha(nvrhi::BlendFactor::InvSrcAlpha);
 
-    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, framebuffer);
+    m_pipeline = framegraph::GetPassResourceCache().GetOrCreatePipeline("FGFont", pipelineDesc, framebuffer->getFramebufferInfo(), m_device);
     R_ASSERT2(m_pipeline, "FGFontRender: createGraphicsPipeline failed");
 }
 

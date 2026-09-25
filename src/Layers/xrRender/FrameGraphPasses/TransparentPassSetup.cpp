@@ -199,8 +199,8 @@ void InitializeTransparentResources(fg::RenderDevice* device, TransparentPassSta
 
 
     nvrhi::FramebufferInfoEx distortFbInfo;
-    distortFbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);
-    distortFbInfo.depthFormat = nvrhi::Format::D32;
+    distortFbInfo.colorFormats.push_back(framegraph::kSceneDistortionFormat);
+    distortFbInfo.depthFormat = framegraph::kSceneDepthFormat;
     nvrhi::GraphicsPipelineDesc distortDesc = MakeBasePipelineDesc(device, state, state.distortPS, state.distortLayout);
     distortDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
     auto& drt0 = distortDesc.renderState.blendState.targets[0];
@@ -252,6 +252,37 @@ static bool BindWallmarkTargets(fg::RenderDevice* device, TransparentPassState& 
         return false;
     QueryBindingLayoutFromPipeline(state.wallmarkPipelines[wallmarkKey], state.wallmarkLayout);
     return true;
+}
+
+void WarmTransparentPipelines(fg::RenderDevice* device, TransparentPassState& state)
+{
+    InitializeTransparentResources(device, state);
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(framegraph::kSceneColorFormat);
+    fbInfo.colorFormats.push_back(framegraph::kSceneNormalFormat);
+    fbInfo.colorFormats.push_back(framegraph::kSceneBaseColorFormat);
+    fbInfo.depthFormat = framegraph::kSceneDepthFormat;
+
+    nvrhi::FramebufferInfoEx wallmarkFbInfo;
+    wallmarkFbInfo.colorFormats.push_back(framegraph::kSceneBaseColorFormat);
+    wallmarkFbInfo.depthFormat = framegraph::kSceneDepthFormat;
+
+    if (!BindTransparentTargets(device, state, fbInfo) || !BindWallmarkTargets(device, state, wallmarkFbInfo))
+        return;
+
+    const ShaderVariantRegistry& variants = ShaderVariantRegistry::Instance();
+    for (u32 index = 0; index < variants.GetVariantCount(); ++index)
+    {
+        const u32 key = TransparentKeyForVariant(variants.GetVariantByIndex(index));
+        if (key & TRANSPARENT_KEY_WMARK)
+            GetWallmarkPipeline(device, state, key);
+        else if ((key & TRANSPARENT_KEY_NO_COLOR) == 0)
+        {
+            GetColorPipeline(device, state, key, false);
+            GetColorPipeline(device, state, key, true);
+        }
+    }
 }
 
 static bool RangesWantDistortion(const xr_vector<TransparentDrawRange>* ranges)
@@ -334,7 +365,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 distDesc.type = ResourceDesc::Type::Texture2D;
                 distDesc.width = width;
                 distDesc.height = height;
-                distDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                distDesc.format = framegraph::kSceneDistortionFormat;
                 distDesc.isRenderTarget = true;
                 distDesc.isTransient = true;
                 distDesc.isUAV = true;
