@@ -226,6 +226,7 @@ void CPHCapture::Release()
     if (m_body)
     {
         m_island.RemoveBody(m_body);
+        CPHContactBodyEffector::InvalidateBody(m_body);
         dBodyDestroy(m_body);
     }
     m_body = NULL;
