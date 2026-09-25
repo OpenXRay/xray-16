@@ -58,6 +58,11 @@ set DASC=..\LuaJIT\src\vm_$(PlatformShortName).dasc
 set OUTDIR=intermediate\$(PlatformShortName)
 
 "$(OutDir)$(TargetName)" "%25DASM%25" -LN %25DASMFLAGS%25 -o "%25OUTDIR%25\buildvm_arch.h" "%25DASC%25"
+if errorlevel 1 exit /b 1
+cd ..\LuaJIT\src
+git log -1 --format=%25%25ct &gt; luajit_relver.txt
+if errorlevel 1 exit /b 1
+"$(OutDir)$(TargetName)" host\genversion.lua
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

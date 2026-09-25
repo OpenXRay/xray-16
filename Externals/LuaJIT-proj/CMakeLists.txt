@@ -10,8 +10,8 @@ project(xrLuaJIT C CXX ASM)
 
 # Version
 set(MAJVER 2)
-set(MINVER 0)
-set(RELVER 5)
+set(MINVER 1)
+set(RELVER 0)
 set(ABIVER 5.1)
 set(NODOTABIVER 51)
 
@@ -131,6 +131,10 @@ endif()
 
 if (LUA_USE_ASSERT)
     list(APPEND XCFLAGS "-DLUA_USE_ASSERT")
+endif()
+
+if (NOT WIN32)
+    list(APPEND XCFLAGS "-funwind-tables" "-DLUAJIT_UNWIND_EXTERNAL")
 endif()
 
 set(CCOPTIONS "${CCOPT};${XCFLAGS}")
@@ -325,6 +329,15 @@ set(DASM_DASC "${LUAJIT_DIR}/vm_${DASM_ARCH}.dasc")
 set(DASM "${LUAJIT_DIR}/../dynasm/dynasm.lua")
 set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 
+execute_process(
+    COMMAND git log -1 --format=%ct
+    WORKING_DIRECTORY "${LUAJIT_DIR}"
+    OUTPUT_VARIABLE LUAJIT_RELEASE_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    COMMAND_ERROR_IS_FATAL ANY
+)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/luajit_relver.txt" "${LUAJIT_RELEASE_VERSION}\n")
+
 # Generate buildvm arch header
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
 set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
@@ -344,6 +357,19 @@ add_custom_command(
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
     COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
 )
+
+add_custom_command(
+    OUTPUT "${LUAJIT_DIR}/luajit.h"
+    COMMAND "${MINILUA_FILE}" "${LUAJIT_DIR}/host/genversion.lua"
+        "${LUAJIT_DIR}/luajit_rolling.h"
+        "${CMAKE_CURRENT_BINARY_DIR}/luajit_relver.txt"
+        "${LUAJIT_DIR}/luajit.h"
+    DEPENDS "${MINILUA_FILE}" "${LUAJIT_DIR}/host/genversion.lua"
+        "${LUAJIT_DIR}/luajit_rolling.h" "${CMAKE_CURRENT_BINARY_DIR}/luajit_relver.txt"
+    VERBATIM
+)
+
+add_custom_target(luajit_version DEPENDS "${LUAJIT_DIR}/luajit.h")
 
 add_custom_command(OUTPUT ${BUILDVM_ARCH}
     COMMAND "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
@@ -386,10 +412,12 @@ set_target_properties(buildvm PROPERTIES
 )
 
 add_dependencies(buildvm buildvm_arch)
+add_dependencies(buildvm luajit_version)
 
 list(APPEND LJLIB_C
     "${LUAJIT_DIR}/lib_base.c"
     "${LUAJIT_DIR}/lib_bit.c"
+    "${LUAJIT_DIR}/lib_buffer.c"
     "${LUAJIT_DIR}/lib_debug.c"
     "${LUAJIT_DIR}/lib_ffi.c"
     "${LUAJIT_DIR}/lib_io.c"
@@ -432,6 +460,7 @@ add_buildvm_target("lj_folddef.h" "folddef" "${LUAJIT_DIR}/lj_opt_fold.c")
 add_buildvm_target("jit/vmdef.lua" "libvm" ${LJLIB_C})
 
 target_sources(xrLuaJIT PRIVATE
+    "${LUAJIT_DIR}/luajit.h"
     "${LJ_VM_SRC}"
     "${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h"
     "${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h"
@@ -530,6 +559,8 @@ else()
         "${LUAJIT_DIR}/lj_profile.h"
         "${LUAJIT_DIR}/lj_record.c"
         "${LUAJIT_DIR}/lj_record.h"
+        "${LUAJIT_DIR}/lj_serialize.c"
+        "${LUAJIT_DIR}/lj_serialize.h"
         "${LUAJIT_DIR}/lj_snap.c"
         "${LUAJIT_DIR}/lj_snap.h"
         "${LUAJIT_DIR}/lj_state.c"
@@ -588,6 +619,13 @@ install(
     TARGETS xrLuaJIT LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if (XRAY_BUILD_LUAJIT_TESTS)
+    add_executable(xrLuaJIT_tests tests/integration.cpp)
+    target_link_libraries(xrLuaJIT_tests PRIVATE xrLuaJIT)
+    add_test(NAME LuaJITIntegration
+        COMMAND xrLuaJIT_tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.lua")
+endif()
 
 if (LUAJIT_BUILD_APP)
     add_executable(luajit

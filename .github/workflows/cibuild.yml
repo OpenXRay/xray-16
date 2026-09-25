@@ -179,11 +179,14 @@ jobs:
           ccache-${{ runner.os }}-${{ matrix.platform.arch }}-
 
     - name: Run CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_BUILD_LUAJIT_TESTS=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
     - name: Run CMake Build
       id: cmake-build
       run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
+
+    - name: Test LuaJIT integration
+      run: ctest --test-dir build --output-on-failure --no-tests=error -R '^LuaJITIntegration$'
 
     - name: Show ccache stats
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}

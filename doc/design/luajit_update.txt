@@ -1,0 +1,33 @@
+TITLE: LuaJIT rolling-release update
+
+  The LuaJIT submodule merges upstream v2.1 commit c6ffc141a8762b41703f9287d63d93622a13dd8f
+  into OpenXRay's 5a5cd82e435a7b08d61b4e0af887493d24d9eca1 fork. The merge retains Lua 5.0
+  compatibility definitions, C-style comments, lj_allow_escape_sequences, coroutine.cstacksize,
+  LUA_GCTIMEOUT, buildvm cleanup, and the fork's E2K and experimental PPC64LE sources.
+
+  The existing non-randomized string interning behavior is retained. The new parser and shared table
+  hashing helpers use the fork's immutable string hash. This is not upstream's hardened string interning.
+  E2K/PPC64 FFI stack bookkeeping is adapted from slot counts to upstream's byte counts. Upstream's
+  line-ending handling supersedes the older WSL buildvm workaround.
+
+  CMake and MSBuild generate luajit.h with the upstream genversion.lua tool and the pinned commit's
+  timestamp. Library-definition generation includes lib_buffer.c; non-unity builds include lj_serialize.c.
+  POSIX CMake builds explicitly enable unwind tables and external unwinding for protected Lua errors.
+
+  Configure with XRAY_BUILD_LUAJIT_TESTS=ON, build xrLuaJIT_tests and xrScriptEngine, then run:
+
+    ctest --test-dir build --output-on-failure -R '^LuaJITIntegration$'
+
+  Coverage includes custom syntax and APIs, C++ unwinding through lua_pcall, FFI stack arguments,
+  buffer serialization, string-table growth, finalizers, and actual JIT trace creation. CI runs this
+  against its CMake platform matrix. Test both CMAKE_UNITY_BUILD=ON and OFF when changing sources.
+
+  Local macOS arm64 Debug/unity and Mixed/non-unity builds and tests pass. The upstream Makefile build
+  also passes. MSBuild project XML is checked, but MSVC execution, E2K/PPC64LE hardware, and game assets
+  are unavailable locally. Retaining those architecture sources does not establish runtime compatibility.
+  In particular, the fork's existing PPC64 configuration remains experimental and rejects a standard
+  PPC64 build. No gameplay, savegame, or frame-time improvement is claimed by these tests.
+
+  Generated headers live in the submodule source directory, as in upstream's build. Do not configure
+  multiple builds of one checkout concurrently: the existing configure-time make clean removes them.
+  Use separate source checkouts for concurrent builds or architectures.
