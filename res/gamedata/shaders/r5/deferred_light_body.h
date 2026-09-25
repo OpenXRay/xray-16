@@ -37,6 +37,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
     float depth = g_GBufferDepth[p];
 
     float4 bc = g_GBufferBaseColor[p];
+    bc.rgb = saturate(bc.rgb);
     float2 m = g_GBufferMaterial[p];
     float4 c = g_SceneColor[p];
     float2 pixel = float2(p) + 0.5;

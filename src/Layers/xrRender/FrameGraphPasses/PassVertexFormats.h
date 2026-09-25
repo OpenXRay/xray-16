@@ -14,7 +14,7 @@ struct SkyVertex {
 
 struct SunVertex {
     Fvector3 position;
-    u32 color;
+    Fcolor color;
     float u, v;
 };
 #pragma pack(pop)

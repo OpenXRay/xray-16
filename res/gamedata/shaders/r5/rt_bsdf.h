@@ -14,7 +14,7 @@ float Luminance(float3 color)
 MaterialSurface GBufferMaterialSurface(float4 normalData, float4 baseColorData, float2 materialData)
 {
     MaterialSurface surface;
-    surface.albedo = baseColorData.rgb;
+    surface.albedo = saturate(baseColorData.rgb);
     surface.N = normalize(normalData.xyz);
     surface.roughness = abs(normalData.w);
     surface.metallic = baseColorData.a;
