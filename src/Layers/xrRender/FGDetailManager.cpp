@@ -632,6 +632,8 @@ bool FGDetailManager::LoadBuildDetailsTexture(nvrhi::IDevice* device)
     if (!device)
         return false;
 
+    ReleaseBuildDetailsTextures();
+
     string_path path;
     FS.update_path(path, "$level$", "build_details.dds");
 
@@ -960,20 +962,7 @@ void FGDetailManager::DestroyGPUBuffers()
 
 
     pulledVertexBuffer = nullptr;
-    if (GEnv.Backend)
-    {
-        for (u32 index : { buildDetailsBindlessIndex, buildDetailsPbrBindlessIndex, buildDetailsBumpBindlessIndex })
-        {
-            if (index != 0 && index != UINT32_MAX)
-                GEnv.Backend->ReleaseBindlessTextures(&index, 1);
-        }
-    }
-    buildDetailsBindlessIndex = 0;
-    buildDetailsPbrBindlessIndex = 0;
-    buildDetailsBumpBindlessIndex = 0;
-    buildDetailsTexture = nullptr;
-    buildDetailsPbrTexture = nullptr;
-    buildDetailsBumpTexture = nullptr;
+    ReleaseBuildDetailsTextures();
 
     perlin4dTexture = nullptr;
     perlin4dComputeShader = nullptr;
@@ -1002,6 +991,24 @@ void FGDetailManager::DestroyGPUBuffers()
     cachedInstanceGenParamsCB = fg::BufferHandle();
     cachedGrassTintsBuffer = nullptr;
     cachedResourcesInitialized = false;
+}
+
+void FGDetailManager::ReleaseBuildDetailsTextures()
+{
+    if (GEnv.Backend)
+    {
+        for (u32 index : { buildDetailsBindlessIndex, buildDetailsPbrBindlessIndex, buildDetailsBumpBindlessIndex })
+        {
+            if (index != 0 && index != UINT32_MAX)
+                GEnv.Backend->ReleaseBindlessTextures(&index, 1);
+        }
+    }
+    buildDetailsBindlessIndex = 0;
+    buildDetailsPbrBindlessIndex = 0;
+    buildDetailsBumpBindlessIndex = 0;
+    buildDetailsTexture = nullptr;
+    buildDetailsPbrTexture = nullptr;
+    buildDetailsBumpTexture = nullptr;
 }
 
 void FGDetailManager::InvalidateShadersAndPipelines()
