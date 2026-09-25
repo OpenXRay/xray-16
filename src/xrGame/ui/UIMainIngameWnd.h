@@ -55,12 +55,13 @@ public:
     CUIArtefactPanel* UIArtefactPanel{};
 
     [[nodiscard]]
-    bool IsZoneMapShown();
+    bool IsZoneMapShown() const;
     void ShowZoneMap(bool status);
-    void DrawZoneMap();
-    void UpdateZoneMap();
+    void DrawZoneMap() const;
+    void UpdateZoneMap(const CActor* actor);
+    void UpdateMotionIcon(const CActor* actor);
 
-    void DrawMainIndicatorsForInventory();
+    void DrawMainIndicatorsForInventory(const CActor* actor);
 
     CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; } // temp
     void OnSectorChanged(IRender_Sector::sector_id_t sector);
@@ -127,11 +128,11 @@ public:
     HUD_SOUND_ITEM m_contactSnd;
 
     void ReceiveNews(const GAME_NEWS_DATA* news);
-    void UpdateMainIndicators();
+    void UpdateMainIndicators(const CActor* actor);
     void UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences);
 
 protected:
-    void UpdateQuickSlots();
+    void UpdateQuickSlots(const CActor* actor);
     void SetWarningIconColorUI(CUIStatic* s, const u32 cl);
     void InitFlashingIcons(CUIXml* node);
     void DestroyFlashingIcons();
@@ -148,10 +149,21 @@ protected:
     //	CInventoryItem*		m_pItem{};
 
     // Отображение подсказок при наведении прицела на объект
-    void RenderQuickInfos();
+    void RenderQuickInfos(const CActor* actor) const;
+
+    struct npc_visibility
+    {
+        ALife::_OBJECT_ID npc_id;
+        float value;
+        bool operator==(const ALife::_OBJECT_ID id) const { return npc_id == id; }
+        bool operator<(const npc_visibility& m) const { return value < m.value; }
+    };
+    xr_vector<npc_visibility> m_npc_visibility;
+    bool m_npc_visibility_changed{};
 
 public:
-    CUIMotionIcon* MotionIcon() { return UIMotionIcon; }
+    CUIMotionIcon* MotionIcon() const { return UIMotionIcon; }
+    void SetActorVisibility(ALife::_OBJECT_ID who_id, float value);
     void OnConnected();
     void reset_ui();
 

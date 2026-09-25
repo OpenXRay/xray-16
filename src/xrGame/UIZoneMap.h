@@ -28,7 +28,7 @@ public:
     void Init(bool motionIconAttached, CUIXml& maingameXml);
 
     void Render();
-    void Update();
+    void Update(const CActor* actor);
 
     bool ZoomIn();
     bool ZoomOut();

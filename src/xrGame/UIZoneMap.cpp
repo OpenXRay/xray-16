@@ -126,18 +126,13 @@ void CUIZoneMap::Render()
     m_background.Draw();
 }
 
-void CUIZoneMap::Update()
+void CUIZoneMap::Update(const CActor* actor)
 {
-    const auto* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor)
-        return;
-
     if (!(Device.dwFrame % 20) && IsGameTypeSingle())
     {
-        string16 text_str;
-        xr_strcpy(text_str, sizeof(text_str), "");
+        string16 text_str{};
 
-        if (CPda* pda = pActor->GetPDA())
+        if (CPda* pda = actor ? actor->GetPDA() : nullptr)
         {
             const u32 cn = pda->ActiveContactsNum();
             if (cn > 0)

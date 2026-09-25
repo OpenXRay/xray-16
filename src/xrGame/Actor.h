@@ -353,8 +353,8 @@ public:
     virtual bool feel_touch_contact(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
 
-    CGameObject* ObjectWeLookingAt() { return m_pObjectWeLookingAt; }
-    CInventoryOwner* PersonWeLookingAt() { return m_pPersonWeLookingAt; }
+    CGameObject* ObjectWeLookingAt() const { return m_pObjectWeLookingAt; }
+    CInventoryOwner* PersonWeLookingAt() const { return m_pPersonWeLookingAt; }
     pcstr GetDefaultActionForObject() const { return m_sDefaultObjAction.c_str(); }
 
 protected:

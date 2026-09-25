@@ -197,7 +197,7 @@ void CUIActorMenu::ShowDialog(bool bDoHideIndicators)
 void CUIActorMenu::Draw()
 {
     CurrentGameUI()->UIMainIngameWnd->DrawZoneMap();
-    CurrentGameUI()->UIMainIngameWnd->DrawMainIndicatorsForInventory();
+    CurrentGameUI()->UIMainIngameWnd->DrawMainIndicatorsForInventory(smart_cast<CActor*>(m_pActorInvOwner));
 
     inherited::Draw();
     if (m_ItemInfo)
@@ -226,7 +226,7 @@ void CUIActorMenu::Update()
                 InventoryUtilities::etpTimeToMinutes).c_str());
         }
 
-        CurrentGameUI()->UIMainIngameWnd->UpdateZoneMap();
+        CurrentGameUI()->UIMainIngameWnd->UpdateZoneMap(smart_cast<CActor*>(m_pActorInvOwner));
         break;
     }
     case mmTrade:

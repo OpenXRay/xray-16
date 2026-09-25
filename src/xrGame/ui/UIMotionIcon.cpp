@@ -1,36 +1,16 @@
 #include "StdAfx.h"
-#include "UIMainIngameWnd.h"
+
 #include "UIMotionIcon.h"
+
+#include "xrUICore/ProgressBar/UIProgressBar.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h"
+
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 
 constexpr pcstr MOTION_ICON_XML = "motion_icon.xml";
 
-CUIMotionIcon* g_pMotionIcon = nullptr;
-
-CUIMotionIcon::CUIMotionIcon()
-    : CUIStatic("Motion Icon")
-{
-    m_current_state = stLast;
-    g_pMotionIcon = this;
-    m_bchanged = true;
-    m_luminosity = 0.0f;
-    m_cur_pos = 0.f;
-
-    m_power_progress = nullptr;
-    m_luminosity_progress_bar = nullptr;
-    m_noise_progress_bar = nullptr;
-    m_luminosity_progress_shape = nullptr;
-    m_noise_progress_shape = nullptr;
-}
-
-CUIMotionIcon::~CUIMotionIcon() { g_pMotionIcon = nullptr; }
-
-void CUIMotionIcon::ResetVisibility()
-{
-    m_npc_visibility.clear();
-    m_bchanged = true;
-}
+CUIMotionIcon::CUIMotionIcon() : CUIStatic("Motion Icon") {}
 
 bool CUIMotionIcon::Init()
 {
@@ -111,16 +91,14 @@ void CUIMotionIcon::ShowState(EState state)
 
     if (m_current_state != stLast)
     {
-        CUIStatic* curState = m_states[m_current_state];
-        if (curState)
+        if (CUIStatic* curState = m_states[m_current_state])
         {
             curState->Show(false);
             curState->Enable(false);
         }
     }
 
-    CUIStatic* newState = m_states[state];
-    if (newState)
+    if (CUIStatic* newState = m_states[state])
     {
         newState->Show(true);
         newState->Enable(true);
@@ -154,17 +132,32 @@ void CUIMotionIcon::SetNoise(float newPos)
     }
 }
 
-void CUIMotionIcon::SetLuminosity(float newPos)
+void CUIMotionIcon::SetLuminosity(float value, const bool absolute /*= true*/)
 {
     if (!IsGameTypeSingle())
         return;
 
+    if (!absolute)
+    {
+        if (m_luminosity_progress_shape)
+        {
+            clamp(value, 0.f, 1.f);
+            value *= 100.f;
+        }
+        else if (m_luminosity_progress_bar)
+        {
+            const float v = float(m_luminosity_progress_bar->GetRange_max() - m_luminosity_progress_bar->GetRange_min());
+            value *= v;
+            value += m_luminosity_progress_bar->GetRange_min();
+        }
+    }
+
     if (m_luminosity_progress_shape)
-        m_luminosity = newPos;
+        m_luminosity = value;
     else if (m_luminosity_progress_bar)
     {
-        newPos = clampr(newPos, m_luminosity_progress_bar->GetRange_min(), m_luminosity_progress_bar->GetRange_max());
-        m_luminosity = newPos;
+        value = clampr(value, m_luminosity_progress_bar->GetRange_min(), m_luminosity_progress_bar->GetRange_max());
+        m_luminosity = value;
     }
 }
 
@@ -176,22 +169,6 @@ void CUIMotionIcon::Draw()
 
 void CUIMotionIcon::Update()
 {
-    if (!IsGameTypeSingle())
-    {
-        inherited::Update();
-        return;
-    }
-    if (m_bchanged)
-    {
-        m_bchanged = false;
-        if (!m_npc_visibility.empty())
-        {
-            std::sort(m_npc_visibility.begin(), m_npc_visibility.end());
-            SetLuminosity(m_npc_visibility.back().value);
-        }
-        else
-            SetLuminosity(0.f);
-    }
     inherited::Update();
 
     if (m_luminosity_progress_shape)
@@ -231,49 +208,4 @@ void CUIMotionIcon::Update()
             m_luminosity_progress_bar->SetProgressPos(m_cur_pos);
         }
     }
-}
-
-void SetActorVisibility(u16 who_id, float value)
-{
-    if (!IsGameTypeSingle())
-        return;
-
-    if (g_pMotionIcon)
-        g_pMotionIcon->SetActorVisibility(who_id, value);
-}
-
-void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)
-{
-    if (m_luminosity_progress_shape)
-    {
-        clamp(value, 0.f, 1.f);
-        value *= 100.f;
-    }
-    else if (m_luminosity_progress_bar)
-    {
-        float v = float(m_luminosity_progress_bar->GetRange_max() - m_luminosity_progress_bar->GetRange_min());
-        value *= v;
-        value += m_luminosity_progress_bar->GetRange_min();
-    }
-
-    auto it = std::find(m_npc_visibility.begin(), m_npc_visibility.end(), who_id);
-
-    if (it == m_npc_visibility.end() && value != 0)
-    {
-        m_npc_visibility.resize(m_npc_visibility.size() + 1);
-        _npc_visibility& v = m_npc_visibility.back();
-        v.id = who_id;
-        v.value = value;
-    }
-    else if (fis_zero(value))
-    {
-        if (it != m_npc_visibility.end())
-            m_npc_visibility.erase(it);
-    }
-    else
-    {
-        (*it).value = value;
-    }
-
-    m_bchanged = true;
 }

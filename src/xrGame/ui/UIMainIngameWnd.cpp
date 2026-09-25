@@ -1,5 +1,7 @@
 #include "StdAfx.h"
+
 #include "UIMainIngameWnd.h"
+
 #include "UIMessagesWindow.h"
 #include "UIZoneMap.h"
 #include "Actor.h"
@@ -41,7 +43,7 @@
 #include "game_cl_capture_the_artefact.h"
 #include "UIHudStatesWnd.h"
 #include "UIActorMenu.h"
-#include "xrUICore/ProgressBar/UIProgressShape.h"
+#include "xrUICore/ProgressBar/UIProgressShape.h" // for g_MissileForceShape
 #include "UIArtefactPanel.h"
 
 #include "Include/xrRender/Kinematics.h"
@@ -261,34 +263,16 @@ void CUIMainIngameWnd::Draw()
 {
     ZoneScoped;
 
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-
-    if (!IsGameTypeSingle())
-    {
-        float luminocity = smart_cast<CGameObject*>(Level().CurrentEntity())->ROS()->get_luminocity();
-        float power = log(luminocity > .001f ? luminocity : .001f) * (1.f /*luminocity_factor*/);
-        luminocity = exp(power);
-
-        static float cur_lum = luminocity;
-        cur_lum = luminocity * 0.01f + cur_lum * 0.99f;
-        UIMotionIcon->SetLuminosity((s16)iFloor(cur_lum * 100.0f));
-    }
-    if (!pActor || !pActor->g_Alive())
-        return;
-
-    UIMotionIcon->SetNoise((s16)(0xffff & iFloor(pActor->m_snd_noise * 100.0f)));
-
-    UIMotionIcon->Draw();
-
     UIZoneMap->visible = true;
     UIZoneMap->Render();
 
-    bool tmp = UIMotionIcon->IsShown();
-    UIMotionIcon->Show(false);
-    CUIWindow::Draw();
-    UIMotionIcon->Show(tmp);
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (!actor || !actor->g_Alive())
+        return;
 
-    RenderQuickInfos();
+    CUIWindow::Draw();
+
+    RenderQuickInfos(actor);
 }
 
 void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog)
@@ -302,7 +286,6 @@ void CUIMainIngameWnd::Update()
     ZoneScoped;
 
     CUIWindow::Update();
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
     if (m_pMPChatWnd)
         m_pMPChatWnd->Update();
@@ -310,13 +293,15 @@ void CUIMainIngameWnd::Update()
     if (m_pMPLogWnd)
         m_pMPLogWnd->Update();
 
-    if (!pActor)
+    const auto actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+
+    UIZoneMap->Update(actor);
+    UpdateMotionIcon(actor);
+
+    if (!actor)
         return;
 
-    UIZoneMap->Update();
-
-    //	UIHealthBar.SetProgressPos	(m_pActor->GetfHealth()*100.0f);
-    UIMotionIcon->SetPower(pActor->conditions().GetPower() * 100.0f);
+    //	UIHealthBar.SetProgressPos	(actor->GetfHealth()*100.0f);
 
     UpdatePickUpItem();
 
@@ -338,14 +323,14 @@ void CUIMainIngameWnd::Update()
         SetWarningIconColor(ewiInvincible, 0x00ffffff);
     }
 
-    UpdateMainIndicators();
+    UpdateMainIndicators(actor);
     if (IsGameTypeSingle())
         return;
 
     // ewiArtefact
     if (GameID() == eGameIDArtefactHunt)
     {
-        bool b_Artefact = !!(pActor->inventory().ItemFromSlot(ARTEFACT_SLOT));
+        bool b_Artefact = !!(actor->inventory().ItemFromSlot(ARTEFACT_SLOT));
         if (b_Artefact)
         {
             SetWarningIconColor(ewiArtefact, 0xffffff00);
@@ -364,12 +349,12 @@ void CUIMainIngameWnd::Update()
         R_ASSERT(cta_game);
         R_ASSERT(lookat_player);
 
-        if ((pActor->ID() == cta_game->GetGreenArtefactOwnerID()) ||
-            (pActor->ID() == cta_game->GetBlueArtefactOwnerID()))
+        if ((actor->ID() == cta_game->GetGreenArtefactOwnerID()) ||
+            (actor->ID() == cta_game->GetBlueArtefactOwnerID()))
         {
             SetWarningIconColor(ewiArtefact, 0xffff0000);
         }
-        else if (pActor->inventory().ItemFromSlot(ARTEFACT_SLOT)) // own artefact
+        else if (actor->inventory().ItemFromSlot(ARTEFACT_SLOT)) // own artefact
         {
             SetWarningIconColor(ewiArtefact, 0xff00ff00);
         }
@@ -380,27 +365,56 @@ void CUIMainIngameWnd::Update()
     }
 } // update
 
-void CUIMainIngameWnd::RenderQuickInfos()
+void SetActorVisibility(u16 who_id, float value)
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor)
+    if (!IsGameTypeSingle())
         return;
 
-    static CGameObject* pObject = NULL;
-    LPCSTR actor_action = pActor->GetDefaultActionForObject();
-    UIStaticQuickHelp->Show(NULL != actor_action);
+    if (auto mainingame = CurrentGameUI()->UIMainIngameWnd)
+        mainingame->SetActorVisibility(who_id, value);
+}
 
-    if (NULL != actor_action)
+void CUIMainIngameWnd::SetActorVisibility(const ALife::_OBJECT_ID who_id, float value)
+{
+    const auto it = std::find(m_npc_visibility.begin(), m_npc_visibility.end(), who_id);
+
+    if (it == m_npc_visibility.end() && !fis_zero(value))
+    {
+        m_npc_visibility.push_back({ who_id, value });
+    }
+    else if (fis_zero(value))
+    {
+        if (it != m_npc_visibility.end())
+            m_npc_visibility.erase(it);
+    }
+    else
+    {
+        it->value = value;
+    }
+
+    m_npc_visibility_changed = true;
+}
+
+void CUIMainIngameWnd::RenderQuickInfos(const CActor* actor) const
+{
+    if (!actor)
+        return;
+
+    static CGameObject* pObject = nullptr;
+    LPCSTR actor_action = actor->GetDefaultActionForObject();
+    UIStaticQuickHelp->Show(nullptr != actor_action);
+
+    if (nullptr != actor_action)
     {
         if (xr_stricmp(actor_action, UIStaticQuickHelp->GetText()))
             UIStaticQuickHelp->SetTextST(actor_action);
     }
 
-    if (pObject != pActor->ObjectWeLookingAt())
+    if (pObject != actor->ObjectWeLookingAt())
     {
         UIStaticQuickHelp->SetTextST(actor_action ? actor_action : " ");
         UIStaticQuickHelp->ResetColorAnimation();
-        pObject = pActor->ObjectWeLookingAt();
+        pObject = actor->ObjectWeLookingAt();
     }
 }
 
@@ -606,24 +620,74 @@ void CUIMainIngameWnd::reset_ui()
 {
     ZoneScoped;
     m_pPickUpItem = NULL;
-    UIMotionIcon->ResetVisibility();
+    m_npc_visibility.clear();
+    m_npc_visibility_changed = true;
     if (m_ui_hud_states)
     {
         m_ui_hud_states->reset_ui();
     }
 }
 
-bool CUIMainIngameWnd::IsZoneMapShown() { return UIZoneMap->visible; }
-void CUIMainIngameWnd::ShowZoneMap(bool status) { UIZoneMap->visible = status; }
-void CUIMainIngameWnd::DrawZoneMap() { UIZoneMap->Render(); }
-void CUIMainIngameWnd::UpdateZoneMap() { UIZoneMap->Update(); }
-void CUIMainIngameWnd::UpdateMainIndicators()
+bool CUIMainIngameWnd::IsZoneMapShown() const
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor)
+    return UIZoneMap->visible;
+}
+
+void CUIMainIngameWnd::ShowZoneMap(bool status)
+{
+    UIZoneMap->visible = status;
+}
+
+void CUIMainIngameWnd::DrawZoneMap() const
+{
+    UIZoneMap->Render();
+}
+
+void CUIMainIngameWnd::UpdateZoneMap(const CActor* actor)
+{
+    UIZoneMap->Update(actor);
+    UpdateMotionIcon(actor);
+}
+
+void CUIMainIngameWnd::UpdateMotionIcon(const CActor* actor)
+{
+    if (actor)
+    {
+        UIMotionIcon->SetPower(actor->conditions().GetPower() * 100.0f);
+        UIMotionIcon->SetNoise((s16)(0xffff & iFloor(actor->m_snd_noise * 100.0f)));
+    }
+    if (IsGameTypeSingle())
+    {
+        if (m_npc_visibility_changed)
+        {
+            m_npc_visibility_changed = false;
+            if (!m_npc_visibility.empty())
+            {
+                std::sort(m_npc_visibility.begin(), m_npc_visibility.end());
+                UIMotionIcon->SetLuminosity(m_npc_visibility.back().value, false);
+            }
+            else
+                UIMotionIcon->SetLuminosity(0.f);
+        }
+    }
+    else
+    {
+        float luminocity = smart_cast<CGameObject*>(Level().CurrentEntity())->ROS()->get_luminocity();
+        float power = log(luminocity > .001f ? luminocity : .001f) * (1.f /*luminocity_factor*/);
+        luminocity = exp(power);
+
+        static float cur_lum = luminocity;
+        cur_lum = luminocity * 0.01f + cur_lum * 0.99f;
+        UIMotionIcon->SetLuminosity((s16)iFloor(cur_lum * 100.0f));
+    }
+}
+
+void CUIMainIngameWnd::UpdateMainIndicators(const CActor* actor)
+{
+    if (!actor)
         return;
 
-    UpdateQuickSlots();
+    UpdateQuickSlots(actor);
     if (IsGameTypeSingle())
         CurrentGameUI()->GetPdaMenu().UpdateRankingWnd();
 
@@ -634,7 +698,7 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Bleeding icon
     if (m_ind_bleeding)
     {
-        const float bleeding = pActor->conditions().BleedingSpeed();
+        const float bleeding = actor->conditions().BleedingSpeed();
         if (fis_zero(bleeding, EPS))
         {
             m_ind_bleeding->Show(false);
@@ -664,7 +728,7 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Radiation icon
     if (m_ind_radiation)
     {
-        const float radiation = pActor->conditions().GetRadiation();
+        const float radiation = actor->conditions().GetRadiation();
         if (fis_zero(radiation, EPS))
         {
             m_ind_radiation->Show(false);
@@ -694,8 +758,8 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Satiety icon
     if (m_ind_starvation)
     {
-        const float satiety = pActor->conditions().GetSatiety();
-        const float satiety_critical = pActor->conditions().SatietyCritical();
+        const float satiety = actor->conditions().GetSatiety();
+        const float satiety_critical = actor->conditions().SatietyCritical();
         const float satiety_koef =
             (satiety - satiety_critical) / (satiety >= satiety_critical ? 1 - satiety_critical : satiety_critical);
         if (satiety_koef > 0.5)
@@ -715,7 +779,7 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Armor broken icon
     if (m_ind_outfit_broken)
     {
-        CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(pActor->inventory().ItemFromSlot(OUTFIT_SLOT));
+        CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(actor->inventory().ItemFromSlot(OUTFIT_SLOT));
         m_ind_outfit_broken->Show(false);
         if (outfit)
         {
@@ -735,7 +799,7 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Helmet broken icon
     if (m_ind_helmet_broken)
     {
-        CHelmet* helmet = smart_cast<CHelmet*>(pActor->inventory().ItemFromSlot(HELMET_SLOT));
+        CHelmet* helmet = smart_cast<CHelmet*>(actor->inventory().ItemFromSlot(HELMET_SLOT));
         m_ind_helmet_broken->Show(false);
         if (helmet)
         {
@@ -756,11 +820,11 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Weapon broken icon
     if (m_ind_weapon_broken)
     {
-        u16 slot = pActor->inventory().GetActiveSlot();
+        u16 slot = actor->inventory().GetActiveSlot();
         m_ind_weapon_broken->Show(false);
         if (slot == INV_SLOT_2 || slot == INV_SLOT_3)
         {
-            CWeapon* weapon = smart_cast<CWeapon*>(pActor->inventory().ItemFromSlot(slot));
+            CWeapon* weapon = smart_cast<CWeapon*>(actor->inventory().ItemFromSlot(slot));
             if (weapon)
             {
                 const float condition = weapon->GetCondition();
@@ -783,8 +847,8 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Overweight icon
     if (m_ind_overweight)
     {
-        const float cur_weight = pActor->inventory().TotalWeight();
-        const float max_weight = pActor->MaxWalkWeight();
+        const float cur_weight = actor->inventory().TotalWeight();
+        const float max_weight = actor->MaxWalkWeight();
         m_ind_overweight->Show(false);
         if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle())
         {
@@ -799,7 +863,7 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     }
 }
 
-void CUIMainIngameWnd::UpdateQuickSlots()
+void CUIMainIngameWnd::UpdateQuickSlots(const CActor* actor)
 {
     int i = 1;
     string32 tmp;
@@ -815,8 +879,7 @@ void CUIMainIngameWnd::UpdateQuickSlots()
         ++i;
     }
 
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor)
+    if (!actor)
         return;
 
     i = -1;
@@ -829,7 +892,7 @@ void CUIMainIngameWnd::UpdateQuickSlots()
             shared_str item_name = g_quick_use_slots[i];
             if (item_name.size())
             {
-                const u32 count = pActor->inventory().dwfGetSameItemCount(item_name.c_str(), true);
+                const u32 count = actor->inventory().dwfGetSameItemCount(item_name.c_str(), true);
                 string32 str;
                 xr_sprintf(str, "x%d", count);
                 wnd->TextItemControl()->SetText(str);
@@ -868,14 +931,13 @@ void CUIMainIngameWnd::UpdateQuickSlots()
     }
 }
 
-void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
+void CUIMainIngameWnd::DrawMainIndicatorsForInventory(const CActor* actor)
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor)
+    if (!actor)
         return;
 
-    UpdateQuickSlots();
-    UpdateBoosterIndicators(pActor->conditions().GetCurBoosterInfluences());
+    UpdateQuickSlots(actor);
+    UpdateBoosterIndicators(actor->conditions().GetCurBoosterInfluences());
 
     for (const auto& slot : m_quick_slots_icons)
         slot->Draw();
