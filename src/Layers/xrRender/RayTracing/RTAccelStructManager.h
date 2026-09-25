@@ -453,7 +453,7 @@ public:
     RTMemoryStats GetMemoryStats(const GPUCullingManager* gpu) const;
     u64 GetSceneRevision() const;
     u64 GetPoseRevision() const;
-    u64 GetTextureRevision(nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
+    u64 GetTextureRevision() const;
     void RetireScenes();
 
 private:

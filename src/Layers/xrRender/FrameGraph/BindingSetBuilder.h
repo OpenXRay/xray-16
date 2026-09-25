@@ -41,7 +41,8 @@ public:
 
     BindingSetBuilder& TextureUAV(const char* name, nvrhi::ITexture* texture,
                                    nvrhi::Format format = nvrhi::Format::UNKNOWN,
-                                   nvrhi::TextureSubresourceSet subresources = nvrhi::AllSubresources);
+                                   nvrhi::TextureSubresourceSet subresources = nvrhi::AllSubresources,
+                                   nvrhi::TextureDimension dimension = nvrhi::TextureDimension::Unknown);
 
     BindingSetBuilder& BufferSRV(const char* name, nvrhi::IBuffer* buffer);
     BindingSetBuilder& BufferUAV(const char* name, nvrhi::IBuffer* buffer);

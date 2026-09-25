@@ -15,8 +15,6 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/fgEnvironmentRender.h"
-#include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
 #include <limits>
@@ -440,11 +438,10 @@ static void AddSceneParameters(PathTracerCB& cb, const RTSceneGeneration& scene)
 
 static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle lightDataSourceHandle, nvrhi::IBuffer* lightDataSource,
-    nvrhi::ITexture* sky0, nvrhi::ITexture* sky1,
-    float skyBlend, PathTracerPassState& state, PathTracerCaptureData*& captureOut)
+    const SkyEnvironmentFrame& sky, PathTracerPassState& state, PathTracerCaptureData*& captureOut)
 {
     captureOut = nullptr;
-    if (!accelMgr || !lightDataSource || !sky0 || !sky1)
+    if (!accelMgr || !lightDataSource || !sky.Valid())
         return false;
 
     auto* nvDevice = device->GetNVRHIDevice();
@@ -550,9 +547,8 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
     snapshot->globals = std::make_shared<PathTracerSnapshotGlobals>();
     snapshot->globals->values = BuildStaticGlobals();
 
-    snapshot->sky0 = CreateSnapshotTexture(nvDevice, sky0, "PT_SnapshotSky0");
-    snapshot->sky1 = CreateSnapshotTexture(nvDevice, sky1, "PT_SnapshotSky1");
-    if (!snapshot->sky0 || !snapshot->sky1)
+    snapshot->sky = CreateSnapshotTexture(nvDevice, sky.texture, "PT_SnapshotSky");
+    if (!snapshot->sky)
         return false;
 
     SunLightData sun = {};
@@ -568,16 +564,15 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
 
     PathTracerCB world = {};
     world.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
-    world.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyBlend };
+    world.sunColor = { sunColor.x, sunColor.y, sunColor.z, 0.0f };
     AddSceneParameters(world, *scene);
     world.lightCount = ClusteredLightManager::Instance().GetLightCount();
     world.emissiveCount = scene->emissiveCount;
-    world.environmentRotation = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.sky_rotation : 0.0f;
     snapshot->world = world;
-    snapshot->skyBlend = skyBlend;
+    snapshot->skyRevision = sky.revision;
     snapshot->sceneRevision = accelMgr->GetSceneRevision();
     snapshot->poseRevision = accelMgr->GetPoseRevision();
-    snapshot->textureRevision = accelMgr->GetTextureRevision(sky0, sky1);
+    snapshot->textureRevision = accelMgr->GetTextureRevision();
     snapshot->lightingSignature = ClusteredLightManager::Instance().GetTransportSignature();
     snapshot->device = nvDevice;
 
@@ -588,14 +583,10 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
     xr_vector<nvrhi::TextureHandle> textureTargets;
     xr_vector<VirtualResourceHandle> sourceHandles;
     xr_vector<VirtualResourceHandle> targetHandles;
-    textureSources.push_back(sky0);
-    textureTargets.push_back(snapshot->sky0);
-    sourceHandles.push_back(ImportNativeTexture(fg, "pt_CaptureSky0", sky0));
-    targetHandles.push_back(ImportNativeTexture(fg, "pt_FrozenSky0", snapshot->sky0));
-    textureSources.push_back(sky1);
-    textureTargets.push_back(snapshot->sky1);
-    sourceHandles.push_back(ImportNativeTexture(fg, "pt_CaptureSky1", sky1));
-    targetHandles.push_back(ImportNativeTexture(fg, "pt_FrozenSky1", snapshot->sky1));
+    textureSources.push_back(sky.texture);
+    textureTargets.push_back(snapshot->sky);
+    sourceHandles.push_back(sky.cube);
+    targetHandles.push_back(ImportNativeTexture(fg, "pt_FrozenSky", snapshot->sky));
     for (const auto& entry : clones)
     {
         textureSources.push_back(entry.first);
@@ -679,7 +670,7 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
 }
 
 PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, VirtualResourceHandle sceneColorIn,
-    const ClusterLightOutput& clusterLights, LightingFrameState& lighting, const PathTracerConfig& config,
+    const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, LightingFrameState& lighting, const PathTracerConfig& config,
     const Fmatrix& view, const Fmatrix& project, const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
     PathTracerPassState& state)
 {
@@ -745,15 +736,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     const auto accumulation = fg.ImportTexture("pt_Accumulation", state.accumulation, accumulationDesc);
     fg.GetRTRegistry().RegisterRT("rt_PT_Accumulation", accumulation);
 
-    CEnvironment& env = g_pGamePersistent->Environment();
-    nvrhi::ITexture* sky0Tex = nullptr;
-    nvrhi::ITexture* sky1Tex = nullptr;
-    float skyWeight = env.CurrentEnv.weight;
-    ResolveSkyTextures(env, sky0Tex, sky1Tex);
-    if (!sky0Tex ||
-        !sky1Tex ||
-        sky0Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube ||
-        sky1Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube)
+    if (!sky.Valid())
     {
         lighting.Fail(LightingFallback::EnvironmentUnavailable);
         return { sceneColorIn };
@@ -785,7 +768,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     if (config.freezeScene && !state.snapshot)
     {
         if (!BuildReferenceSnapshot(fg, device, accelMgr, lightData, lightManager.GetLightDataBuffer(),
-                sky0Tex, sky1Tex, skyWeight, state, capture))
+                sky, state, capture))
         {
             state.history.valid = false;
             state.history.samples = 0;
@@ -799,24 +782,21 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
 
     const bool frozen = state.snapshot != nullptr;
     PathTracerSnapshot* snapshot = state.snapshot.get();
-    nvrhi::ITexture* sky0Used = frozen ? snapshot->sky0.Get() : sky0Tex;
-    nvrhi::ITexture* sky1Used = frozen ? snapshot->sky1.Get() : sky1Tex;
-    const float skyBlendUsed = frozen ? snapshot->skyBlend : skyWeight;
+    nvrhi::ITexture* skyUsed = frozen ? snapshot->sky.Get() : sky.texture;
+    const u64 skyRevisionUsed = frozen ? snapshot->skyRevision : sky.revision;
     VirtualResourceHandle frozenLightHandle;
-    VirtualResourceHandle frozenSky0Handle;
-    VirtualResourceHandle frozenSky1Handle;
+    VirtualResourceHandle skyHandle = sky.cube;
     xr_vector<VirtualResourceHandle> frozenTextureHandles;
     if (frozen)
     {
         frozenLightHandle = fg.ImportBuffer("pt_FrozenLightData", snapshot->lightData,
             SnapshotBufferDesc(snapshot->lightData, "pt_FrozenLightData"));
-        frozenSky0Handle = ImportNativeTexture(fg, "pt_FrozenSky0", sky0Used);
-        frozenSky1Handle = ImportNativeTexture(fg, "pt_FrozenSky1", sky1Used);
+        skyHandle = ImportNativeTexture(fg, "pt_FrozenSky", skyUsed);
         for (const auto& clone : snapshot->textureClones)
             frozenTextureHandles.push_back(ImportNativeTexture(fg, "pt_FrozenTexture", clone));
     }
 
-    const auto environmentCdf = setupRTEnvironmentSamplingPass(fg, device, sky0Used, sky1Used, skyBlendUsed);
+    const auto environmentCdf = setupRTEnvironmentSamplingPass(fg, device, skyHandle);
     state.snapshotStats.cdfActive = environmentCdf.active;
     if (!environmentCdf.distribution.is_valid())
     {
@@ -844,12 +824,11 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             sunColor.set(0, 0, 0);
 
         cbData.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
-        cbData.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
+        cbData.sunColor = { sunColor.x, sunColor.y, sunColor.z, 0.0f };
         const auto liveScene = accelMgr->GetScene();
         AddSceneParameters(cbData, *liveScene);
         cbData.lightCount = lightManager.GetLightCount();
         cbData.emissiveCount = liveScene ? liveScene->emissiveCount : 0;
-        cbData.environmentRotation = env.CurrentEnv.sky_rotation;
     }
     cbData.invViewProj = invViewProj;
     cbData.cameraPos_pad = { cameraPos.x, cameraPos.y, cameraPos.z, 0.0f };
@@ -879,11 +858,11 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     }
 
     state.pending.parameters = cbData;
-    state.pending.sky0 = sky0Used;
-    state.pending.sky1 = sky1Used;
+    state.pending.sky = skyUsed;
+    state.pending.skyRevision = skyRevisionUsed;
     state.pending.sceneRevision = frozen ? snapshot->sceneRevision : accelMgr->GetSceneRevision();
     state.pending.poseRevision = frozen ? snapshot->poseRevision : accelMgr->GetPoseRevision();
-    state.pending.textureRevision = frozen ? snapshot->textureRevision : accelMgr->GetTextureRevision(sky0Used, sky1Used);
+    state.pending.textureRevision = frozen ? snapshot->textureRevision : accelMgr->GetTextureRevision();
     state.pending.lightingSignature = frozen ? snapshot->lightingSignature : lightManager.GetTransportSignature();
     const StaticGlobals liveGlobals = BuildStaticGlobals();
     if (frozen)
@@ -907,7 +886,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         memcmp(&history.foliageSSS, &state.pending.foliageSSS, sizeof(Fvector4)) == 0 &&
         memcmp(&history.foliageParams, &state.pending.foliageParams, sizeof(Fvector4)) == 0 &&
         memcmp(&history.foliageParams2, &state.pending.foliageParams2, sizeof(Fvector4)) == 0 &&
-        history.sky0 == sky0Used && history.sky1 == sky1Used &&
+        history.sky == skyUsed && history.skyRevision == skyRevisionUsed &&
         history.snapshot == state.snapshot &&
         memcmp(&history.parameters, &cbData, sizeof(cbData)) == 0;
     if (historyMatches)
@@ -932,8 +911,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
     auto& passData = fg.addCallbackPass<PathTracerData>(
         "Path Tracer",
 
-        [&, width, height, cbData, sampleCount, sky0Used, sky1Used, frozen,
-            frozenLightHandle, frozenSky0Handle, frozenSky1Handle, frozenTextureHandles,
+        [&, width, height, cbData, sampleCount, frozen,
+            frozenLightHandle, skyHandle, frozenTextureHandles,
             lightData, cdfHandle, accumulation, sceneColorIn]
         (FrameGraph& builder, PassHandle passHandle, PathTracerData& data)
         {
@@ -952,13 +931,9 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.clusterGrid = passBuilder.read(clusterGrid, ResourceState::ShaderResource);
             data.lightIndexList = passBuilder.read(lightIndexList, ResourceState::ShaderResource);
             data.environmentCdf = passBuilder.read(cdfHandle, ResourceState::ShaderResource);
-            if (frozen)
-            {
-                passBuilder.read(frozenSky0Handle, ResourceState::ShaderResource);
-                passBuilder.read(frozenSky1Handle, ResourceState::ShaderResource);
-                for (const auto handle : frozenTextureHandles)
-                    passBuilder.read(handle, ResourceState::ShaderResource);
-            }
+            data.sky = passBuilder.read(skyHandle, ResourceState::ShaderResource);
+            for (const auto handle : frozenTextureHandles)
+                passBuilder.read(handle, ResourceState::ShaderResource);
             data.width = width;
             data.height = height;
             data.cbData = cbData;
@@ -967,8 +942,6 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             data.sampleCount = sampleCount;
             data.staticDetailInstanceCount = frozen ? state.snapshot->scene->staticDetailInstanceCount :
                 accelMgr->GetScene()->staticDetailInstanceCount;
-            data.sky0 = sky0Used;
-            data.sky1 = sky1Used;
             data.textureTable = data.scene.textures;
             data.snapshot = frozen ? state.snapshot : nullptr;
             data.staticGlobals = frozen ? state.snapshot->staticGlobals.Get() : nullptr;
@@ -1050,7 +1023,8 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             auto* clusterGridBuffer = fg.GetPhysicalBuffer(data.clusterGrid);
             auto* lightIndexListBuffer = fg.GetPhysicalBuffer(data.lightIndexList);
             auto* cdfBuffer = fg.GetPhysicalBuffer(data.environmentCdf);
-            if (!lightData || !staticGlobals || !cdfBuffer)
+            nvrhi::ITexture* skyTexture = fg.GetPhysicalTexture(data.sky);
+            if (!lightData || !staticGlobals || !cdfBuffer || !skyTexture)
             {
                 data.lighting->Fail(LightingFallback::ResourcesUnavailable);
                 return;
@@ -1070,8 +1044,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
             bsb.BufferSRV("g_RTBatchTransforms", scene.batchTransforms);
             bsb.BufferSRV("g_EmissiveBatchOffsets", scene.emissiveBatchOffsets);
             bsb.BufferSRV("g_EnvironmentCDF", cdfBuffer);
-            bsb.Texture("g_Sky0", data.sky0);
-            bsb.Texture("g_Sky1", data.sky1);
+            bsb.Texture("g_Sky", skyTexture);
             bsb.BufferSRV("g_SkinnedVB", skinnedVB);
             bsb.BufferSRV("g_Materials", scene.materials);
             bsb.BufferSRV("g_GrassMaterials", scene.grassMaterials);

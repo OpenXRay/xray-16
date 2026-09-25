@@ -398,7 +398,7 @@ u64 ClusteredLightManager::GetTransportSignature() const
     auto* device = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
     auto* resources = device ? device->GetFGResourceManager() : nullptr;
     auto* textureManager = resources ? resources->GetTextureManager() : nullptr;
-    const u64 textureRevision = textureManager ? textureManager->GetContentRevision(textures, nullptr, nullptr) : 0;
+    const u64 textureRevision = textureManager ? textureManager->GetContentRevision(textures) : 0;
     signature ^= u64(m_numLights) * 1099511628211ull;
     signature ^= textureRevision + 0x9e3779b97f4a7c15ull + (signature << 6) + (signature >> 2);
     return signature;

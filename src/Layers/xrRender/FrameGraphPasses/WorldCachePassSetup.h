@@ -25,8 +25,7 @@ public:
     framegraph::VirtualResourceHandle clusterGrid;
     framegraph::VirtualResourceHandle lightIndexList;
     framegraph::VirtualResourceHandle environmentDistribution;
-    nvrhi::ITexture* sky0 = nullptr;
-    nvrhi::ITexture* sky1 = nullptr;
+    framegraph::VirtualResourceHandle sky;
     RTGIRawCB sceneConstants = {};
     Fvector cameraPos = {};
     u32 frame = 0;
@@ -77,8 +76,7 @@ public:
     framegraph::VirtualResourceHandle clusterGrid;
     framegraph::VirtualResourceHandle lightIndexList;
     framegraph::VirtualResourceHandle environmentDistribution;
-    nvrhi::ITexture* sky0 = nullptr;
-    nvrhi::ITexture* sky1 = nullptr;
+    framegraph::VirtualResourceHandle sky;
     RTGIRawCB sceneConstants = {};
     WorldRadianceCacheCB constants = {};
     nvrhi::IBuffer* constantBuffer = nullptr;

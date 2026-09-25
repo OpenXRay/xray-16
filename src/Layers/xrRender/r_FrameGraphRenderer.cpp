@@ -74,6 +74,7 @@
 #include "FrameGraphPasses/LensFlarePassSetup.h"
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "FrameGraphPasses/RTEnvironmentSamplingPassSetup.h"
+#include "FrameGraphPasses/SkyEnvironmentPassSetup.h"
 #include "Layers/xrRender/fgRainRender.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
 #include "Layers/xrRender/fgLensFlareRender.h"
@@ -85,6 +86,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "RayTracing/WorldRadianceCache.h"
+#include "SkyEnvironment.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -283,6 +285,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_overlayManager = xr_make_unique<fg::decals::OverlayManager>();
     m_rtAccelMgr = xr_make_unique<fg::RTAccelStructManager>();
     m_worldCache = xr_make_unique<fg::WorldRadianceCache>();
+    m_skyEnvironment = xr_make_unique<fg::SkyEnvironment>();
     m_smokeTrailManager = xr_make_unique<fg::passes::SmokeTrailManager>();
 
 
@@ -299,6 +302,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_overlayManager->Initialize(device);
     m_rtAccelMgr->Initialize(device);
     m_worldCache->Initialize(device);
+    m_skyEnvironment->Initialize(device);
     m_smokeTrailManager->Initialize(device);
 
     m_renderContext.reset(device->CreateContext());
@@ -399,6 +403,12 @@ void FrameGraphRenderer::Shutdown() {
         m_worldCache = nullptr;
     }
 
+    if (m_skyEnvironment)
+    {
+        m_skyEnvironment->Shutdown();
+        m_skyEnvironment = nullptr;
+    }
+
     if (m_rtAccelMgr) {
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr = nullptr;
@@ -482,6 +492,8 @@ void FrameGraphRenderer::Render() {
                     passes::ShutdownPathTracer();
                     passes::ShutdownRTEnvironmentSampling();
                     passes::ShutdownWorldCache();
+                    if (m_skyEnvironment)
+                        m_skyEnvironment->InvalidatePipelines();
                     m_lightingState.ResetRecovery();
                     m_mainView.InvalidateHistory();
                     passes::ShutdownReSTIRGI(m_mainView.rtgi);
@@ -1690,10 +1702,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
+    fg::SkyEnvironmentFrame skyFrame;
+    if (m_lightingState.effective == fg::LightingMode::RTGI || m_lightingState.effective == fg::LightingMode::ReferencePT)
+        skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), m_worldCache.get(), detailOutputs, clusterLightOut,
-            prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj,
+            skyFrame, prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj,
             Device.mView, m_mainView.prevView, Device.mProject, m_mainView.prevProject, Device.vCameraPosition,
             ps_r_rt_gi_intensity, width, height, m_mainView.rtgi, m_mainView.hasPrevFrameData, m_lightingState);
         opaqueOutputs.albedo = rtgiOutput.sceneColor;
@@ -1709,7 +1724,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ptConfig.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
         ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
         ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
-        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, m_lightingState, ptConfig,
+        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, skyFrame, m_lightingState, ptConfig,
             Device.mView, Device.mProject, Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
     }
