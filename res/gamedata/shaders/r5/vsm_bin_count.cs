@@ -2,16 +2,12 @@
 #include "common.h"
 #include "vsm_common.h"
 #include "vsm_params.h"
-#define CLUSTER_GEO_T_REFS t0
-#define CLUSTER_GEO_T_META t2
-#define CLUSTER_GEO_T_INSTANCES t3
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 #include "vsm_bvh_types.h"
 
-cbuffer VsmBinParams : register(b5)
+cbuffer VsmBinParams
 {
     uint g_IncludeAT;
     uint g_PairCapOpaque;
@@ -23,8 +19,8 @@ cbuffer VsmBinParams : register(b5)
     uint g_BinPad;
 };
 
-StructuredBuffer<uint4> g_CandList : register(t1);
-RWStructuredBuffer<uint4> g_PageCount : register(u0);
+StructuredBuffer<uint4> g_CandList;
+RWStructuredBuffer<uint4> g_PageCount;
 
 groupshared uint gs_count[3];
 

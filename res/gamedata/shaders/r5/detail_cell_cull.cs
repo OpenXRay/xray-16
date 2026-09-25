@@ -2,9 +2,9 @@
 #include "detail_cull_params.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
-RWStructuredBuffer<uint> g_visible_slot_ids : register(u1);
-RWByteAddressBuffer g_visible_slot_counter : register(u2);
+StructuredBuffer<SlotAABB> g_slot_aabbs;
+RWStructuredBuffer<uint> g_visible_slot_ids;
+RWByteAddressBuffer g_visible_slot_counter;
 
 [numthreads(256, 1, 1)]
 void main(uint3 group_id : SV_GroupID, uint group_index : SV_GroupIndex)

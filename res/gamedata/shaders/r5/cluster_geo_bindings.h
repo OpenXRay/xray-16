@@ -13,9 +13,9 @@
 #define CLUSTER_GEO_T_INSTANCES t20
 #endif
 
-StructuredBuffer<uint2> g_ClusterRefs : register(CLUSTER_GEO_T_REFS);
-StructuredBuffer<ClusterMeta> g_ClusterMeta : register(CLUSTER_GEO_T_META);
-StructuredBuffer<GeoInstance> g_GeoInstances : register(CLUSTER_GEO_T_INSTANCES);
+StructuredBuffer<uint2> g_ClusterRefs CLUSTER_GEO_BIND(CLUSTER_GEO_T_REFS);
+StructuredBuffer<ClusterMeta> g_ClusterMeta CLUSTER_GEO_BIND(CLUSTER_GEO_T_META);
+StructuredBuffer<GeoInstance> g_GeoInstances CLUSTER_GEO_BIND(CLUSTER_GEO_T_INSTANCES);
 
 #define CLUSTER_GROUP_NONE 0xFFFFFFFFu
 #define CLUSTER_GROUP_RESIDENT 1u
@@ -29,8 +29,8 @@ StructuredBuffer<GeoInstance> g_GeoInstances : register(CLUSTER_GEO_T_INSTANCES)
 #define CLUSTER_GEO_T_GROUP_STATE t27
 #endif
 
-StructuredBuffer<uint2> g_ClusterGroups : register(CLUSTER_GEO_T_GROUPS);
-ByteAddressBuffer g_ClusterGroupState : register(CLUSTER_GEO_T_GROUP_STATE);
+StructuredBuffer<uint2> g_ClusterGroups CLUSTER_GEO_BIND(CLUSTER_GEO_T_GROUPS);
+ByteAddressBuffer g_ClusterGroupState CLUSTER_GEO_BIND(CLUSTER_GEO_T_GROUP_STATE);
 
 uint ClusterGroupStateOf(uint group)
 {

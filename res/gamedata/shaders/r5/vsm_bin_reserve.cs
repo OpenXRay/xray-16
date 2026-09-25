@@ -4,7 +4,7 @@
 
 #define RESERVE_THREADS 256
 
-cbuffer VsmReserveParams : register(b5)
+cbuffer VsmReserveParams
 {
     int4 g_PageBase[3];
     uint g_Frame;
@@ -21,20 +21,20 @@ cbuffer VsmReserveParams : register(b5)
     float4 g_LevelOrigin[VSM_LEVELS];
 };
 
-StructuredBuffer<uint4> g_PageCount : register(t0);
-StructuredBuffer<uint4> g_CandList : register(t1);
-RWByteAddressBuffer g_Counters : register(u0);
-RWStructuredBuffer<uint> g_DirtyList : register(u1);
-RWStructuredBuffer<uint4> g_PairBase : register(u2);
-RWStructuredBuffer<uint> g_PageTable : register(u3);
-RWStructuredBuffer<uint2> g_PhysTile : register(u4);
-RWStructuredBuffer<uint> g_SlotFrame : register(u5);
-RWStructuredBuffer<float4> g_SlotPivot : register(u6);
-RWStructuredBuffer<float4> g_SlotSun : register(u7);
-RWStructuredBuffer<uint> g_SlotDirty : register(u8);
-RWStructuredBuffer<uint> g_Stats : register(u9);
-RWByteAddressBuffer g_EmitArgs : register(u10);
-RWStructuredBuffer<uint2> g_GeometryDirty : register(u11);
+StructuredBuffer<uint4> g_PageCount;
+StructuredBuffer<uint4> g_CandList;
+RWByteAddressBuffer g_Counters;
+RWStructuredBuffer<uint> g_DirtyList;
+RWStructuredBuffer<uint4> g_PairBase;
+RWStructuredBuffer<uint> g_PageTable;
+RWStructuredBuffer<uint2> g_PhysTile;
+RWStructuredBuffer<uint> g_SlotFrame;
+RWStructuredBuffer<float4> g_SlotPivot;
+RWStructuredBuffer<float4> g_SlotSun;
+RWStructuredBuffer<uint> g_SlotDirty;
+RWStructuredBuffer<uint> g_Stats;
+RWByteAddressBuffer g_EmitArgs;
+RWStructuredBuffer<uint2> g_GeometryDirty;
 
 groupshared uint gs_scan[3][RESERVE_THREADS];
 groupshared uint gs_carry[3];

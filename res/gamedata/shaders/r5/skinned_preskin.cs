@@ -3,11 +3,11 @@
 #include "bindless_common.h"
 #include "skinned_mdi_common.h"
 
-ByteAddressBuffer g_SrcVB : register(t20);
-StructuredBuffer<uint4> g_Chunks : register(t21);
-RWByteAddressBuffer g_DstVB : register(u0);
+ByteAddressBuffer g_SrcVB;
+StructuredBuffer<uint4> g_Chunks;
+RWByteAddressBuffer g_DstVB;
 
-cbuffer PreskinParams : register(b5)
+cbuffer PreskinParams
 {
     uint g_ChunkBase;
     uint g_FormatID;

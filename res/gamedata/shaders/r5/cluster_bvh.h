@@ -3,15 +3,9 @@
 
 #include "cluster_bvh_types.h"
 
-#ifndef CLUSTER_BVH_T_NODES
-#define CLUSTER_BVH_T_NODES t14
-#endif
-#ifndef CLUSTER_BVH_T_INDEX
-#define CLUSTER_BVH_T_INDEX t15
-#endif
 
-StructuredBuffer<ClusterBvhNode> g_BvhNodes : register(CLUSTER_BVH_T_NODES);
-StructuredBuffer<uint> g_BvhIndex : register(CLUSTER_BVH_T_INDEX);
+StructuredBuffer<ClusterBvhNode> g_BvhNodes;
+StructuredBuffer<uint> g_BvhIndex;
 
 groupshared uint gs_bvhStack[VSM_BVH_STACK_CAP];
 groupshared uint gs_bvhStackCount;

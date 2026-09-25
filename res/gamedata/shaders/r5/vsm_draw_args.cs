@@ -1,6 +1,6 @@
 #define SM_5_0
 
-cbuffer VsmArgsParams : register(b5)
+cbuffer VsmArgsParams
 {
     uint g_CapOpaque;
     uint g_CapTerrain;
@@ -8,10 +8,10 @@ cbuffer VsmArgsParams : register(b5)
     uint g_ArgsPad;
 };
 
-StructuredBuffer<uint> g_Stats : register(t0);
-RWByteAddressBuffer g_ArgsOpaque : register(u0);
-RWByteAddressBuffer g_ArgsTerrain : register(u1);
-RWByteAddressBuffer g_ArgsAT : register(u2);
+StructuredBuffer<uint> g_Stats;
+RWByteAddressBuffer g_ArgsOpaque;
+RWByteAddressBuffer g_ArgsTerrain;
+RWByteAddressBuffer g_ArgsAT;
 
 [numthreads(1, 1, 1)]
 void main()

@@ -1,7 +1,7 @@
 #define SM_6_0
 #include "common.h"
 
-cbuffer HiZParams : register(b5)
+cbuffer HiZParams
 {
     uint2 g_output_dimensions;
     uint g_input_mip_level;
@@ -10,9 +10,9 @@ cbuffer HiZParams : register(b5)
     uint2 g_hiz_pad;
 };
 
-Texture2D<float> g_input_depth : register(t0);
+Texture2D<float> g_input_depth;
 
-RWTexture2D<float> g_output_hiz : register(u0);
+RWTexture2D<float> g_output_hiz;
 
 
 [numthreads(8, 8, 1)]

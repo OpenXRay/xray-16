@@ -3,7 +3,7 @@
 #include "rt_shading.h"
 #include "restir_gi_common.h"
 
-cbuffer ReSTIRGIParams : register(b5)
+cbuffer ReSTIRGIParams
 {
     float4x4 g_InvViewProj;
     float4x4 g_PrevViewProj;
@@ -27,15 +27,15 @@ cbuffer ReSTIRGIParams : register(b5)
     float g_SunAngularRadius;
 };
 
-Texture2D<float> t_Depth : register(t14);
-Texture2D<float4> t_Normal : register(t15);
-Texture2D<float4> t_BaseColor : register(t16);
-Texture2D<float2> t_Material : register(t17);
+Texture2D<float> t_Depth;
+Texture2D<float4> t_Normal;
+Texture2D<float4> t_BaseColor;
+Texture2D<float2> t_Material;
 
-RWTexture2D<float4> u_DirectLighting : register(u0);
-RWTexture2D<float4> u_ReservoirA : register(u1);
-RWTexture2D<float4> u_ReservoirB : register(u2);
-RWTexture2D<float4> u_IndirectLighting : register(u3);
+RWTexture2D<float4> u_DirectLighting;
+RWTexture2D<float4> u_ReservoirA;
+RWTexture2D<float4> u_ReservoirB;
+RWTexture2D<float4> u_IndirectLighting;
 
 float3 ReconstructWorldPos(float2 pixel, float depth)
 {

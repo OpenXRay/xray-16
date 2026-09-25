@@ -24,6 +24,21 @@ static void DeduplicateBySlotAndClass(xr_vector<BindingSetBuilder::ReflectedReso
     }
 }
 
+static void ReportStageDisagreements(const xr_vector<BindingSetBuilder::ReflectedResource>& vec,
+    const char* registerClass, const char* debugLabel)
+{
+    for (size_t i = 0; i < vec.size(); ++i) {
+        for (size_t j = i + 1; j < vec.size(); ++j) {
+            if (vec[i].slot != vec[j].slot || NameMatches(vec[i].name, vec[j].name))
+                continue;
+            Msg("! [BindingSetBuilder] %s: register %s%u is '%s' in one stage and '%s' in the other; "
+                "only '%s' will resolve by name",
+                debugLabel ? debugLabel : "(unnamed)", registerClass, vec[i].slot,
+                vec[i].name, vec[j].name, vec[i].name);
+        }
+    }
+}
+
 namespace {
 
 using ReflectionKey = std::pair<const void*, const void*>;
@@ -63,7 +78,8 @@ void Collect(BindingSetBuilder::ReflectedLists& lists,
 }
 
 const BindingSetBuilder::ReflectedLists& GetOrBuildReflectedLists(
-    const ExtractedReflection* a, const ExtractedReflection* b, nvrhi::IDevice* device)
+    const ExtractedReflection* a, const ExtractedReflection* b, nvrhi::IDevice* device,
+    const char* debugLabel)
 {
     const ReflectionKey key{ a, b };
     auto it = s_reflectedListsCache.find(key);
@@ -75,6 +91,10 @@ const BindingSetBuilder::ReflectedLists& GetOrBuildReflectedLists(
     Collect(lists, samplers, *a);
     if (b) {
         Collect(lists, samplers, *b);
+        ReportStageDisagreements(lists.srvs, "t", debugLabel);
+        ReportStageDisagreements(lists.uavs, "u", debugLabel);
+        ReportStageDisagreements(lists.cbs, "b", debugLabel);
+        ReportStageDisagreements(samplers, "s", debugLabel);
         DeduplicateBySlotAndClass(lists.srvs);
         DeduplicateBySlotAndClass(lists.uavs);
         DeduplicateBySlotAndClass(lists.cbs);
@@ -99,8 +119,8 @@ void BindingSetBuilder::InvalidateReflectionCache()
 }
 
 BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
-    const char*)
-    : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device))
+    const char* debugLabel)
+    : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device, debugLabel))
 {
     AcquireBindingStorage();
 }
@@ -109,8 +129,8 @@ BindingSetBuilder::BindingSetBuilder(
     const ExtractedReflection& vsReflection,
     const ExtractedReflection& psReflection,
     nvrhi::IDevice* device,
-    const char*)
-    : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device))
+    const char* debugLabel)
+    : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device, debugLabel))
 {
     AcquireBindingStorage();
 }

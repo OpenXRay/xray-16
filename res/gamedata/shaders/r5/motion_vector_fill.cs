@@ -1,7 +1,7 @@
 #include "common.h"
 #include "visbuffer_common.h"
 
-cbuffer MotionVectorParams : register(b5) {
+cbuffer MotionVectorParams {
     float4x4 g_InvViewProj;
     float4x4 g_PrevViewProj;
     float2 g_ScreenSize;
@@ -11,10 +11,10 @@ cbuffer MotionVectorParams : register(b5) {
     uint2 g_MotionPad;
 };
 
-Texture2D<float> t_Depth : register(t0);
-Texture2D<uint> t_VisID : register(t30);
-Texture2D<float> t_VisDepth : register(t31);
-RWTexture2D<float2> u_MotionVectors : register(u0);
+Texture2D<float> t_Depth;
+Texture2D<uint> t_VisID;
+Texture2D<float> t_VisDepth;
+RWTexture2D<float2> u_MotionVectors;
 
 float3 ReconstructWorldPos(uint2 pixel, float depth)
 {

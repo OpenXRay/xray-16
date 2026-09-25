@@ -1,7 +1,7 @@
 #include "shared/common.h"
 #include "shared/clustered_lighting.h"
 
-cbuffer ClusterParams : register(b5)
+cbuffer ClusterParams
 {
     float4 cb_gridDims;
     float4 cb_screenSize;
@@ -9,13 +9,13 @@ cbuffer ClusterParams : register(b5)
     float4 cb_pad;
 };
 
-StructuredBuffer<GPULightData> g_Lights : register(t0);
-StructuredBuffer<uint> g_VisibleLightIndices : register(t1);
-ByteAddressBuffer g_VisibleLightCount : register(t2);
+StructuredBuffer<GPULightData> g_Lights;
+StructuredBuffer<uint> g_VisibleLightIndices;
+ByteAddressBuffer g_VisibleLightCount;
 
-RWStructuredBuffer<uint2> g_ClusterGrid : register(u0);
-RWStructuredBuffer<uint> g_LightIndexList : register(u1);
-RWByteAddressBuffer g_LightIndexCounter : register(u2);
+RWStructuredBuffer<uint2> g_ClusterGrid;
+RWStructuredBuffer<uint> g_LightIndexList;
+RWByteAddressBuffer g_LightIndexCounter;
 
 #define ASSIGN_THREADS 64
 #define MAX_LIGHTS_PER_CLUSTER 256

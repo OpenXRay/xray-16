@@ -1,7 +1,7 @@
 #include "shared/sky_source.h"
 #include "shared/sky_filter.h"
 
-cbuffer SkySpecularParams : register(b0)
+cbuffer SkySpecularParams
 {
     float g_Roughness;
     uint g_FaceSize;
@@ -11,9 +11,9 @@ cbuffer SkySpecularParams : register(b0)
     uint3 g_SkySpecularPad;
 };
 
-TextureCube<float4> g_Sky : register(t0);
-SamplerState smp_rtlinear : register(s0);
-RWTexture2DArray<float4> g_Specular : register(u0);
+TextureCube<float4> g_Sky;
+SamplerState smp_rtlinear;
+RWTexture2DArray<float4> g_Specular;
 
 [numthreads(8, 8, 1)]
 void main(uint3 id : SV_DispatchThreadID)

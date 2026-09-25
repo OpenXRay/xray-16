@@ -5,9 +5,9 @@
 
 #define PREP_THREADS 256
 
-RWByteAddressBuffer g_Counters : register(u0);
-RWByteAddressBuffer g_BinArgs : register(u1);
-RWStructuredBuffer<uint4> g_CandList : register(u2);
+RWByteAddressBuffer g_Counters;
+RWByteAddressBuffer g_BinArgs;
+RWStructuredBuffer<uint4> g_CandList;
 
 groupshared uint gs_scan[PREP_THREADS];
 groupshared uint gs_coarseRefresh;

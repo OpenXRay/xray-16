@@ -1,6 +1,6 @@
 #include "smoke_common.h"
 
-cbuffer SmokeCompactCB : register(b5)
+cbuffer SmokeCompactCB
 {
     uint  g_MaxPoints;
     uint  g_Subdivisions;
@@ -18,10 +18,10 @@ cbuffer SmokeCompactCB : register(b5)
     float _pad1;
 };
 
-RWStructuredBuffer<TrailControlPoint>   g_CompactBuffer : register(u0);
-RWByteAddressBuffer                     g_StateBuffer   : register(u1);
-RWByteAddressBuffer                     g_DrawArgs      : register(u2);
-RWStructuredBuffer<SmokeSimPoint>       g_SimBuffer     : register(u3);
+RWStructuredBuffer<TrailControlPoint>   g_CompactBuffer;
+RWByteAddressBuffer                     g_StateBuffer;
+RWByteAddressBuffer                     g_DrawArgs;
+RWStructuredBuffer<SmokeSimPoint>       g_SimBuffer;
 
 #define MAX_PTS 256
 

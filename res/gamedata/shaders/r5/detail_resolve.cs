@@ -6,7 +6,7 @@
 #include "detail_pulled_common.h"
 #include "detail_blade_material.h"
 
-cbuffer DetailGlobals : register(b3)
+cbuffer DetailGlobals
 {
     float4 consts;
     float4 wave;
@@ -30,7 +30,7 @@ cbuffer DetailGlobals : register(b3)
     uint buildDetailsBumpIndex;
 };
 
-cbuffer DetailResolveParams : register(b5)
+cbuffer DetailResolveParams
 {
     float4x4 g_PrevView;
     float4x4 g_PrevProj;
@@ -43,28 +43,28 @@ cbuffer DetailResolveParams : register(b5)
     uint3 g_PreparedCapacity;
 };
 
-Texture3D g_Perlin4D : register(t12);
-Texture2D g_Interaction : register(t13);
-Texture2D g_InteractionPrev : register(t14);
-Texture2D<uint> g_VisID : register(t30);
-Texture2D<float> g_Depth : register(t31);
-StructuredBuffer<uint2> g_VisibleLod0 : register(t33);
-StructuredBuffer<uint2> g_VisibleLod1 : register(t34);
-StructuredBuffer<uint2> g_VisibleLod2 : register(t35);
-StructuredBuffer<GrassObjectTint> grass_object_tints : register(t36);
-StructuredBuffer<uint2> g_VisibleMesh : register(t38);
-StructuredBuffer<uint2> g_VisibleDecal : register(t39);
-StructuredBuffer<DetailModelGPU> detail_models : register(t40);
-StructuredBuffer<PulledVertex> pulled_vertices : register(t41);
-StructuredBuffer<PreparedBlade> g_PreparedLod0 : register(t42);
-StructuredBuffer<PreparedBlade> g_PreparedLod1 : register(t43);
-StructuredBuffer<PreparedBlade> g_PreparedLod2 : register(t44);
-RWTexture2D<float4> g_OutNormal : register(u0);
-RWTexture2D<float4> g_OutBaseColor : register(u1);
-RWTexture2D<float4> g_OutColor : register(u2);
-RWTexture2D<float2> g_OutMotion : register(u3);
-RWTexture2D<float> g_OutVisDepth : register(u4);
-RWTexture2D<float2> g_OutMaterial : register(u5);
+Texture3D g_Perlin4D;
+Texture2D g_Interaction;
+Texture2D g_InteractionPrev;
+Texture2D<uint> g_VisID;
+Texture2D<float> g_Depth;
+StructuredBuffer<uint2> g_VisibleLod0;
+StructuredBuffer<uint2> g_VisibleLod1;
+StructuredBuffer<uint2> g_VisibleLod2;
+StructuredBuffer<GrassObjectTint> grass_object_tints;
+StructuredBuffer<uint2> g_VisibleMesh;
+StructuredBuffer<uint2> g_VisibleDecal;
+StructuredBuffer<DetailModelGPU> detail_models;
+StructuredBuffer<PulledVertex> pulled_vertices;
+StructuredBuffer<PreparedBlade> g_PreparedLod0;
+StructuredBuffer<PreparedBlade> g_PreparedLod1;
+StructuredBuffer<PreparedBlade> g_PreparedLod2;
+RWTexture2D<float4> g_OutNormal;
+RWTexture2D<float4> g_OutBaseColor;
+RWTexture2D<float4> g_OutColor;
+RWTexture2D<float2> g_OutMotion;
+RWTexture2D<float> g_OutVisDepth;
+RWTexture2D<float2> g_OutMaterial;
 
 float2 PrevMotion(float3 prevWorld, float2 uvPix)
 {

@@ -1,17 +1,13 @@
 #define SM_5_0
 #include "common.h"
 #include "local_shadow_common.h"
-#define CLUSTER_GEO_T_REFS t14
-#define CLUSTER_GEO_T_META t22
-#define CLUSTER_GEO_T_INSTANCES t23
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 #include "cluster_bvh_types.h"
 #include "local_shadow_bvh_types.h"
 
-cbuffer LocalShadowBinParams : register(b5)
+cbuffer LocalShadowBinParams
 {
     uint g_CandCount;
     uint g_NodeCount;
@@ -27,13 +23,13 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_BinPad2;
 };
 
-StructuredBuffer<LocalShadowView> g_TileState : register(t17);
-StructuredBuffer<uint4> g_PairBase : register(t20);
-StructuredBuffer<uint> g_DirtyList : register(t21);
-RWStructuredBuffer<uint> g_Stats : register(u0);
-RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
-RWStructuredBuffer<uint2> g_PairsTerrain : register(u2);
-RWStructuredBuffer<uint2> g_PairsAT : register(u3);
+StructuredBuffer<LocalShadowView> g_TileState;
+StructuredBuffer<uint4> g_PairBase;
+StructuredBuffer<uint> g_DirtyList;
+RWStructuredBuffer<uint> g_Stats;
+RWStructuredBuffer<uint2> g_PairsOpaque;
+RWStructuredBuffer<uint2> g_PairsTerrain;
+RWStructuredBuffer<uint2> g_PairsAT;
 
 groupshared uint gs_cursor[3];
 groupshared uint gs_visited;
@@ -76,8 +72,6 @@ void BvhVisit(bool active, uint entryIdx, LocalViewQuery q)
     writePair(stream, pos, uint2(entryIdx, q.slot));
 }
 
-#define CLUSTER_BVH_T_NODES t18
-#define CLUSTER_BVH_T_INDEX t19
 #include "cluster_bvh.h"
 
 [numthreads(VSM_BVH_GROUP, 1, 1)]

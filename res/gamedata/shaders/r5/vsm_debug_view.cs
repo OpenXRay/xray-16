@@ -3,7 +3,7 @@
 #include "vsm_common.h"
 #include "vsm_params.h"
 
-cbuffer VsmDebugParams : register(b5)
+cbuffer VsmDebugParams
 {
     float4x4 g_InvViewProj;
     float4 g_Screen;
@@ -11,12 +11,12 @@ cbuffer VsmDebugParams : register(b5)
     uint3 g_DebugPad;
 };
 
-Texture2D<float> g_Depth : register(t0);
-StructuredBuffer<uint> g_Needed : register(t1);
-StructuredBuffer<uint> g_PageTable : register(t2);
-StructuredBuffer<uint> g_SlotDirty : register(t3);
-Texture2D<float4> g_Mask : register(t30);
-RWTexture2D<float4> g_Output : register(u0);
+Texture2D<float> g_Depth;
+StructuredBuffer<uint> g_Needed;
+StructuredBuffer<uint> g_PageTable;
+StructuredBuffer<uint> g_SlotDirty;
+Texture2D<float4> g_Mask;
+RWTexture2D<float4> g_Output;
 
 static const float3 kLevelColors[VSM_LEVELS] = {
     float3(0.90, 0.20, 0.20), float3(0.90, 0.60, 0.10), float3(0.90, 0.90, 0.20),

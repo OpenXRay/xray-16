@@ -1,6 +1,6 @@
-TextureCube<float4> g_Sky : register(t0);
-SamplerState smp_rtlinear : register(s0);
-RWStructuredBuffer<float> g_EnvironmentCDF : register(u0);
+TextureCube<float4> g_Sky;
+SamplerState smp_rtlinear;
+RWStructuredBuffer<float> g_EnvironmentCDF;
 
 #define ENV_LON_CELL_COUNT 32
 #define ENV_LAT_CELL_COUNT 16

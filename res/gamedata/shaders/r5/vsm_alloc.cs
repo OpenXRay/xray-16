@@ -2,10 +2,10 @@
 #include "common.h"
 #include "vsm_common.h"
 
-StructuredBuffer<uint> g_Needed : register(t0);
-RWStructuredBuffer<uint> g_DynPageTable : register(u0);
-RWStructuredBuffer<uint4> g_DynPageList : register(u1);
-RWStructuredBuffer<uint> g_DynAllocInfo : register(u2);
+StructuredBuffer<uint> g_Needed;
+RWStructuredBuffer<uint> g_DynPageTable;
+RWStructuredBuffer<uint4> g_DynPageList;
+RWStructuredBuffer<uint> g_DynAllocInfo;
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)

@@ -1,6 +1,6 @@
 #define SM_5_0
 
-cbuffer VsmDynArgsParams : register(b5)
+cbuffer VsmDynArgsParams
 {
     uint g_CapOpaque;
     uint g_CapAT;
@@ -8,12 +8,12 @@ cbuffer VsmDynArgsParams : register(b5)
     uint g_DynArgsPad;
 };
 
-StructuredBuffer<uint> g_Stats : register(t0);
-StructuredBuffer<uint> g_DynAllocInfo : register(t1);
-RWByteAddressBuffer g_ArgsOpaque : register(u0);
-RWByteAddressBuffer g_ArgsAT : register(u1);
-RWByteAddressBuffer g_ArgsSkinned : register(u2);
-RWByteAddressBuffer g_ArgsClear : register(u3);
+StructuredBuffer<uint> g_Stats;
+StructuredBuffer<uint> g_DynAllocInfo;
+RWByteAddressBuffer g_ArgsOpaque;
+RWByteAddressBuffer g_ArgsAT;
+RWByteAddressBuffer g_ArgsSkinned;
+RWByteAddressBuffer g_ArgsClear;
 
 [numthreads(1, 1, 1)]
 void main()

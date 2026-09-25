@@ -1,17 +1,13 @@
 #define SM_5_0
 #include "common.h"
 #include "local_shadow_common.h"
-#define CLUSTER_GEO_T_REFS t17
-#define CLUSTER_GEO_T_META t18
-#define CLUSTER_GEO_T_INSTANCES t19
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t26
-#define CLUSTER_GEO_T_GROUP_STATE t27
 #include "cluster_geo_bindings.h"
 #include "cluster_bvh_types.h"
 #include "local_shadow_bvh_types.h"
 
-cbuffer LocalShadowDynBinParams : register(b5)
+cbuffer LocalShadowDynBinParams
 {
     uint g_EntryBase;
     uint g_EntryCount;
@@ -25,7 +21,7 @@ cbuffer LocalShadowDynBinParams : register(b5)
     uint3 g_DynBinPad;
 };
 
-StructuredBuffer<ClusterEntry> g_SkinnedEntries : register(t14);
+StructuredBuffer<ClusterEntry> g_SkinnedEntries;
 
 ClusterEntry LoadSourceEntry(uint idx)
 {
@@ -33,12 +29,12 @@ ClusterEntry LoadSourceEntry(uint idx)
         return g_SkinnedEntries[idx];
     return LoadClusterEntry(idx);
 }
-StructuredBuffer<LocalShadowView> g_Tiles : register(t15);
-StructuredBuffer<uint> g_Refresh : register(t16);
-RWStructuredBuffer<uint> g_Stats : register(u0);
-RWStructuredBuffer<uint2> g_PairsOpaque : register(u1);
-RWStructuredBuffer<uint2> g_PairsTerrain : register(u2);
-RWStructuredBuffer<uint2> g_PairsAT : register(u3);
+StructuredBuffer<LocalShadowView> g_Tiles;
+StructuredBuffer<uint> g_Refresh;
+RWStructuredBuffer<uint> g_Stats;
+RWStructuredBuffer<uint2> g_PairsOpaque;
+RWStructuredBuffer<uint2> g_PairsTerrain;
+RWStructuredBuffer<uint2> g_PairsAT;
 
 void emitStream(bool emit, uint cursor, uint cap, uint2 pair, uint stream)
 {

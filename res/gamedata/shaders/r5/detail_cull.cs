@@ -1,11 +1,11 @@
-SamplerState smp_nofilter : register(s0);
-SamplerState smp_rtlinear : register(s1);
-SamplerState smp_linear : register(s2);
+SamplerState smp_nofilter;
+SamplerState smp_rtlinear;
+SamplerState smp_linear;
 #include "cull_utils.h"
 #include "detail_source_common.h"
 #include "detail_cull_params.h"
 
-cbuffer DetailGlobals : register(b3)
+cbuffer DetailGlobals
 {
     float4 consts;
     float4 wave;
@@ -48,29 +48,29 @@ struct DetailModelGPU
     float geomExtentY;
 };
 
-StructuredBuffer<uint> g_visible_slot_ids : register(t1);
-StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
-Texture2D<float> g_hiz_pyramid : register(t3);
-StructuredBuffer<DetailModelGPU> g_detail_models : register(t4);
-ByteAddressBuffer g_visible_slot_count : register(t5);
-Texture3D g_Perlin4D : register(t12);
-Texture2D g_Interaction : register(t13);
+StructuredBuffer<uint> g_visible_slot_ids;
+StructuredBuffer<SlotAABB> g_slot_aabbs;
+Texture2D<float> g_hiz_pyramid;
+StructuredBuffer<DetailModelGPU> g_detail_models;
+ByteAddressBuffer g_visible_slot_count;
+Texture3D g_Perlin4D;
+Texture2D g_Interaction;
 
 
-RWStructuredBuffer<uint2> g_visible_lod0 : register(u0);
-RWByteAddressBuffer g_indirect_args_lod0 : register(u1);
-RWStructuredBuffer<uint2> g_visible_lod1 : register(u2);
-RWByteAddressBuffer g_indirect_args_lod1 : register(u3);
-RWStructuredBuffer<uint2> g_visible_lod2 : register(u4);
-RWByteAddressBuffer g_indirect_args_lod2 : register(u5);
-RWStructuredBuffer<uint2> g_visible_decals : register(u6);
-RWByteAddressBuffer g_indirect_args_decal : register(u7);
-RWStructuredBuffer<uint2> g_visible_billboard : register(u8);
-RWByteAddressBuffer g_indirect_args_billboard : register(u9);
-RWStructuredBuffer<PreparedBlade> g_prepared_lod0 : register(u10);
-RWStructuredBuffer<PreparedBlade> g_prepared_lod1 : register(u11);
-RWStructuredBuffer<PreparedBlade> g_prepared_lod2 : register(u12);
-RWByteAddressBuffer g_work_status : register(u13);
+RWStructuredBuffer<uint2> g_visible_lod0;
+RWByteAddressBuffer g_indirect_args_lod0;
+RWStructuredBuffer<uint2> g_visible_lod1;
+RWByteAddressBuffer g_indirect_args_lod1;
+RWStructuredBuffer<uint2> g_visible_lod2;
+RWByteAddressBuffer g_indirect_args_lod2;
+RWStructuredBuffer<uint2> g_visible_decals;
+RWByteAddressBuffer g_indirect_args_decal;
+RWStructuredBuffer<uint2> g_visible_billboard;
+RWByteAddressBuffer g_indirect_args_billboard;
+RWStructuredBuffer<PreparedBlade> g_prepared_lod0;
+RWStructuredBuffer<PreparedBlade> g_prepared_lod1;
+RWStructuredBuffer<PreparedBlade> g_prepared_lod2;
+RWByteAddressBuffer g_work_status;
 
 static const uint DO_NO_WAVING = 0x0001;
 static const uint MEMBERSHIP_KIND_BILLBOARD = 3u;

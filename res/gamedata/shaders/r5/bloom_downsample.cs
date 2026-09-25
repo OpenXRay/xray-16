@@ -1,7 +1,7 @@
 #include "shared/color_space.h"
 #include "bloom_common.h"
 
-StructuredBuffer<float4> t_Exposure : register(t1);
+StructuredBuffer<float4> t_Exposure;
 
 static const float BLOOM_MAX_RADIANCE = 60000.0;
 

@@ -1,18 +1,18 @@
 #include "rtgi_reconstruct_common.h"
 
-cbuffer RTGIFilterParams : register(b5)
+cbuffer RTGIFilterParams
 {
     uint g_Width, g_Height, g_StepSize, g_Iteration;
     float g_PhiColor, g_PhiNormal, g_FilterPad0, g_FilterPad1;
 };
 
-Texture2D<float4> t_Diffuse : register(t0);
-Texture2D<float4> t_Specular : register(t1);
-Texture2D<float4> t_NormalRoughness : register(t2);
-Texture2D<float> t_DepthGuide : register(t3);
+Texture2D<float4> t_Diffuse;
+Texture2D<float4> t_Specular;
+Texture2D<float4> t_NormalRoughness;
+Texture2D<float> t_DepthGuide;
 
-RWTexture2D<float4> u_Diffuse : register(u0);
-RWTexture2D<float4> u_Specular : register(u1);
+RWTexture2D<float4> u_Diffuse;
+RWTexture2D<float4> u_Specular;
 
 static const float RTGI_ATROUS_KERNEL[3] = { 0.375, 0.25, 0.0625 };
 

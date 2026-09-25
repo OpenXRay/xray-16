@@ -3,7 +3,7 @@
 #include "local_shadow_common.h"
 
 
-cbuffer LocalShadowBinParams : register(b5)
+cbuffer LocalShadowBinParams
 {
     uint g_CandCount;
     uint g_NodeCount;
@@ -19,19 +19,19 @@ cbuffer LocalShadowBinParams : register(b5)
     uint g_BinPad2;
 };
 
-StructuredBuffer<LocalShadowView> g_Request : register(t15);
-StructuredBuffer<uint4> g_CandList : register(t16);
-StructuredBuffer<uint4> g_TileCount : register(t22);
+StructuredBuffer<LocalShadowView> g_Request;
+StructuredBuffer<uint4> g_CandList;
+StructuredBuffer<uint4> g_TileCount;
 
-RWStructuredBuffer<LocalShadowView> g_TileState : register(u0);
-RWStructuredBuffer<uint4> g_Schedule : register(u1);
-RWStructuredBuffer<uint> g_DirtyList : register(u2);
-RWStructuredBuffer<uint> g_RefreshDyn : register(u3);
-RWStructuredBuffer<uint4> g_PairBase : register(u4);
-RWByteAddressBuffer g_EmitArgs : register(u5);
-RWByteAddressBuffer g_ClearArgs : register(u6);
-RWStructuredBuffer<uint> g_Stats : register(u7);
-RWStructuredBuffer<uint2> g_GeometryDirty : register(u8);
+RWStructuredBuffer<LocalShadowView> g_TileState;
+RWStructuredBuffer<uint4> g_Schedule;
+RWStructuredBuffer<uint> g_DirtyList;
+RWStructuredBuffer<uint> g_RefreshDyn;
+RWStructuredBuffer<uint4> g_PairBase;
+RWByteAddressBuffer g_EmitArgs;
+RWByteAddressBuffer g_ClearArgs;
+RWStructuredBuffer<uint> g_Stats;
+RWStructuredBuffer<uint2> g_GeometryDirty;
 
 [numthreads(1, 1, 1)]
 void main()

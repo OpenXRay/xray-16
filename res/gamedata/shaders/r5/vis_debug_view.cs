@@ -1,11 +1,11 @@
 #include "shared/common.h"
 #include "visbuffer_common.h"
 
-Texture2D<uint> g_VisID : register(t30);
-Texture2D<float2> g_Motion : register(t31);
-RWTexture2D<float4> g_VisDebug : register(u0);
+Texture2D<uint> g_VisID;
+Texture2D<float2> g_Motion;
+RWTexture2D<float4> g_VisDebug;
 
-cbuffer VisDebugParams : register(b5)
+cbuffer VisDebugParams
 {
     uint visDebugMode;
     uint3 visDebugPad;

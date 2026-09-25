@@ -13,9 +13,9 @@
 #define CLUSTER_GEO_T_PAGES t24
 #endif
 
-ByteAddressBuffer g_ClusterPayload : register(CLUSTER_GEO_T_PAYLOAD);
-ByteAddressBuffer g_ClusterVertices : register(CLUSTER_GEO_T_VERTICES);
-StructuredBuffer<ClusterPage> g_ClusterPages : register(CLUSTER_GEO_T_PAGES);
+ByteAddressBuffer g_ClusterPayload CLUSTER_GEO_BIND(CLUSTER_GEO_T_PAYLOAD);
+ByteAddressBuffer g_ClusterVertices CLUSTER_GEO_BIND(CLUSTER_GEO_T_VERTICES);
+StructuredBuffer<ClusterPage> g_ClusterPages CLUSTER_GEO_BIND(CLUSTER_GEO_T_PAGES);
 
 #define CLUSTER_PAGE_VERTEX_STRIDE 32u
 #define CLUSTER_MAX_VERTICES 128

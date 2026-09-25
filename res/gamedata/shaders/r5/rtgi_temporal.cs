@@ -1,6 +1,6 @@
 #include "rtgi_reconstruct_common.h"
 
-cbuffer RTGITemporalParams : register(b5)
+cbuffer RTGITemporalParams
 {
     float4x4 g_InvViewProj;
     float4x4 g_PrevInvViewProj;
@@ -14,24 +14,24 @@ cbuffer RTGITemporalParams : register(b5)
     uint g_FrameIndex; float g_HudFov; uint g_TemporalPad1, g_TemporalPad2;
 };
 
-Texture2D<float4> t_RawDiffuse : register(t0);
-Texture2D<float4> t_RawSpecular : register(t1);
-Texture2D<float4> t_NormalRoughness : register(t2);
-Texture2D<float4> t_AlbedoMetallic : register(t3);
-Texture2D<float4> t_SurfaceData : register(t4);
-Texture2D<float2> t_Motion : register(t5);
-Texture2D<float> t_PrevDepth : register(t6);
-Texture2D<float4> t_PrevNormal : register(t7);
-Texture2D<float4> t_PrevHistoryDiffuse : register(t8);
-Texture2D<float4> t_PrevHistorySpecular : register(t9);
-Texture2D<float4> t_PrevMoments : register(t10);
-Texture2D<float2> t_PrevFast : register(t11);
+Texture2D<float4> t_RawDiffuse;
+Texture2D<float4> t_RawSpecular;
+Texture2D<float4> t_NormalRoughness;
+Texture2D<float4> t_AlbedoMetallic;
+Texture2D<float4> t_SurfaceData;
+Texture2D<float2> t_Motion;
+Texture2D<float> t_PrevDepth;
+Texture2D<float4> t_PrevNormal;
+Texture2D<float4> t_PrevHistoryDiffuse;
+Texture2D<float4> t_PrevHistorySpecular;
+Texture2D<float4> t_PrevMoments;
+Texture2D<float2> t_PrevFast;
 
-RWTexture2D<float4> u_HistoryDiffuse : register(u0);
-RWTexture2D<float4> u_HistorySpecular : register(u1);
-RWTexture2D<float4> u_Moments : register(u2);
-RWTexture2D<float2> u_Fast : register(u3);
-RWTexture2D<float4> u_Reconstruction : register(u4);
+RWTexture2D<float4> u_HistoryDiffuse;
+RWTexture2D<float4> u_HistorySpecular;
+RWTexture2D<float4> u_Moments;
+RWTexture2D<float2> u_Fast;
+RWTexture2D<float4> u_Reconstruction;
 
 struct RTGITemporalHistory
 {

@@ -5,10 +5,10 @@
 #include "bindless_common.h"
 #include "deferred_tiles.h"
 
-Texture2D<float> g_GBufferDepth : register(t30);
-Texture2D<float4> g_GBufferNormal : register(t31);
-RWStructuredBuffer<uint> g_TileLists : register(u0);
-RWByteAddressBuffer g_TileArgs : register(u1);
+Texture2D<float> g_GBufferDepth;
+Texture2D<float4> g_GBufferNormal;
+RWStructuredBuffer<uint> g_TileLists;
+RWByteAddressBuffer g_TileArgs;
 
 groupshared uint s_flags;
 

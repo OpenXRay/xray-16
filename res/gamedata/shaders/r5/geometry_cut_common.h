@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_CUT_COMMON_H
 #define GEOMETRY_CUT_COMMON_H
 
-ByteAddressBuffer g_GeometryCuts : register(GEOMETRY_CUTS_REGISTER);
+ByteAddressBuffer g_GeometryCuts;
 
 uint geometryFirstCutAfter(uint revision, uint count)
 {

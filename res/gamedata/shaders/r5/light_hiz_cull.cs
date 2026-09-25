@@ -2,7 +2,7 @@
 #include "cull_utils.h"
 #include "shared/clustered_lighting.h"
 
-cbuffer LightHiZCullParams : register(b5)
+cbuffer LightHiZCullParams
 {
     float4x4 cb_prevViewProj;
     float4x4 cb_curViewProj;
@@ -13,11 +13,11 @@ cbuffer LightHiZCullParams : register(b5)
     uint cb_hizMipLevels;
 };
 
-StructuredBuffer<GPULightData> g_Lights : register(t0);
-Texture2D<float> g_HiZPyramid : register(t1);
+StructuredBuffer<GPULightData> g_Lights;
+Texture2D<float> g_HiZPyramid;
 
-RWStructuredBuffer<uint> g_VisibleLightIndices : register(u0);
-RWByteAddressBuffer g_VisibleLightCount : register(u1);
+RWStructuredBuffer<uint> g_VisibleLightIndices;
+RWByteAddressBuffer g_VisibleLightCount;
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtid : SV_DispatchThreadID)

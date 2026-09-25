@@ -1,7 +1,7 @@
-Texture2D<float4> t_source : register(t0);
-RWTexture2D<float4> u_output : register(u0);
+Texture2D<float4> t_source;
+RWTexture2D<float4> u_output;
 
-cbuffer DebugPreviewParams : register(b5)
+cbuffer DebugPreviewParams
 {
     uint2 g_outputSize;
     uint2 g_sourceSize;

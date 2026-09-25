@@ -2,26 +2,22 @@
 #include "common.h"
 #include "cull_utils.h"
 
-#define CLUSTER_GEO_T_REFS t0
-#define CLUSTER_GEO_T_META t1
-#define CLUSTER_GEO_T_INSTANCES t2
+#define CLUSTER_GEO_AUTO_BIND
 #define CLUSTER_GEO_RESIDENCY
-#define CLUSTER_GEO_T_GROUPS t5
-#define CLUSTER_GEO_T_GROUP_STATE t6
 #include "cluster_geo_bindings.h"
 #include "cluster_cull_params.h"
 #include "sw_dispatch_common.h"
 
-Texture2D<float> g_HiZPyramid : register(t3);
-StructuredBuffer<uint> g_LeafQueue : register(t4);
+Texture2D<float> g_HiZPyramid;
+StructuredBuffer<uint> g_LeafQueue;
 
-RWByteAddressBuffer g_OutCount : register(u0);
-RWStructuredBuffer<uint> g_OutEntryIndices : register(u1);
-RWStructuredBuffer<uint> g_OutFades : register(u2);
-RWStructuredBuffer<uint> g_OutTerrainEntryIndices : register(u3);
-RWStructuredBuffer<uint> g_OutTerrainFades : register(u4);
-RWStructuredBuffer<uint> g_OutCandidates : register(u5);
-RWStructuredBuffer<uint> g_OutSwEntries : register(u6);
+RWByteAddressBuffer g_OutCount;
+RWStructuredBuffer<uint> g_OutEntryIndices;
+RWStructuredBuffer<uint> g_OutFades;
+RWStructuredBuffer<uint> g_OutTerrainEntryIndices;
+RWStructuredBuffer<uint> g_OutTerrainFades;
+RWStructuredBuffer<uint> g_OutCandidates;
+RWStructuredBuffer<uint> g_OutSwEntries;
 
 [numthreads(64, 1, 1)]
 void main(uint3 groupID : SV_GroupID, uint lane : SV_GroupIndex)

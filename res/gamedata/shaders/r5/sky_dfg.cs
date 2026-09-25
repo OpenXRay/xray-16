@@ -1,6 +1,6 @@
 #include "shared/sky_filter.h"
 
-RWTexture2D<float4> g_DFG : register(u0);
+RWTexture2D<float4> g_DFG;
 
 #define SKY_DFG_SAMPLES 1024u
 

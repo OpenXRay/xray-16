@@ -1,16 +1,16 @@
 #include "rtgi_reconstruct_common.h"
 
-cbuffer RTGICompositeParams : register(b5)
+cbuffer RTGICompositeParams
 {
     uint width, height, remodulate, pad1;
 };
 
-Texture2D<float4> t_Diffuse : register(t0);
-Texture2D<float4> t_Specular : register(t1);
-Texture2D<float4> t_Emission : register(t2);
-Texture2D<float4> t_AlbedoMetallic : register(t3);
+Texture2D<float4> t_Diffuse;
+Texture2D<float4> t_Specular;
+Texture2D<float4> t_Emission;
+Texture2D<float4> t_AlbedoMetallic;
 
-RWTexture2D<float4> u_SceneColor : register(u0);
+RWTexture2D<float4> u_SceneColor;
 
 [numthreads(8, 8, 1)]
 void main(uint3 dispatchID : SV_DispatchThreadID)

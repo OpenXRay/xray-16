@@ -1,17 +1,15 @@
 #define SM_6_0
 #include "common.h"
-#define CLUSTER_GEO_T_REFS t14
-#define CLUSTER_GEO_T_META t16
-#define CLUSTER_GEO_T_INSTANCES t20
+#define CLUSTER_GEO_AUTO_BIND
 #include "cluster_geo_bindings.h"
 #include "cluster_geo_payload.h"
 #include "sw_raster_common.h"
 #include "sw_dispatch_common.h"
 
-StructuredBuffer<uint> g_SwEntries : register(t15);
-ByteAddressBuffer g_SwDispatchArgs : register(t22);
+StructuredBuffer<uint> g_SwEntries;
+ByteAddressBuffer g_SwDispatchArgs;
 
-cbuffer SwRasterParams : register(b5)
+cbuffer SwRasterParams
 {
     uint g_Width;
     uint g_Height;

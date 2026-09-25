@@ -3,6 +3,12 @@
 
 #include "visbuffer_common.h"
 
+#ifdef CLUSTER_GEO_AUTO_BIND
+#define CLUSTER_GEO_BIND(reg)
+#else
+#define CLUSTER_GEO_BIND(reg) : register(reg)
+#endif
+
 struct ClusterMeta
 {
     float4 sphere;
