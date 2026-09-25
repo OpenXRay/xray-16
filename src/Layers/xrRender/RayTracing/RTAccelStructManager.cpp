@@ -883,11 +883,11 @@ u64 RTAccelStructManager::GetPoseRevision() const
     return m_poseRevision;
 }
 
-u64 RTAccelStructManager::GetTextureRevision(nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const
+u64 RTAccelStructManager::GetTextureRevision() const
 {
     if (!m_scene || !m_device || !m_device->GetFGResourceManager())
         return 0;
-    return m_device->GetFGResourceManager()->GetTextureManager()->GetContentRevision(m_scene->textures.GetTextures(), sky0, sky1);
+    return m_device->GetFGResourceManager()->GetTextureManager()->GetContentRevision(m_scene->textures.GetTextures());
 }
 
 void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)

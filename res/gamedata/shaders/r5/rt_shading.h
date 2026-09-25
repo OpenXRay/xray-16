@@ -16,8 +16,7 @@ RaytracingAccelerationStructure g_SceneTLAS : register(t1);
 StructuredBuffer<RTBatchInfo> g_BatchInfo : register(t2);
 ByteAddressBuffer g_MegaVB : register(t3);
 ByteAddressBuffer g_MegaIB : register(t18);
-TextureCube<float4> g_Sky0 : register(t5);
-TextureCube<float4> g_Sky1 : register(t6);
+TextureCube<float4> g_Sky : register(t5);
 ByteAddressBuffer g_SkinnedVB : register(t7);
 ByteAddressBuffer g_SkinnedIB : register(t11);
 ByteAddressBuffer g_GrassVB : register(t12);
@@ -50,8 +49,6 @@ struct RTSceneParams
     uint maxNullEvents;
     float3 sunDir;
     float3 sunColor;
-    float skyWeight;
-    float skyRotation;
     float sunAngularRadius;
     uint rayMask;
     float rayDistance;
@@ -62,8 +59,8 @@ struct RTSceneParams
 
 RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCount,
     uint skinnedBatchStart, uint grassBatchStart, uint detailAtlasIndex,
-    uint lightCount, uint diffuseMode, float4 sunDirIntensity, float4 sunColorSkyWeight,
-    uint emissiveCount, uint maxNullEvents, float skyRotation, float sunAngularRadius)
+    uint lightCount, uint diffuseMode, float4 sunDirIntensity, float4 sunColor,
+    uint emissiveCount, uint maxNullEvents, float sunAngularRadius)
 {
     RTSceneParams scene;
     scene.identityStaticCount = identityStaticCount;
@@ -80,9 +77,7 @@ RTSceneParams RTBuildSceneParams(uint identityStaticCount, uint terrainBatchCoun
     scene.emissiveCount = emissiveCount;
     scene.maxNullEvents = max(maxNullEvents, 1u);
     scene.sunDir = RTSafeNormalize(-sunDirIntensity.xyz, float3(0.0, 1.0, 0.0));
-    scene.sunColor = sunColorSkyWeight.xyz * sunDirIntensity.w;
-    scene.skyWeight = saturate(sunColorSkyWeight.w);
-    scene.skyRotation = skyRotation;
+    scene.sunColor = sunColor.xyz * sunDirIntensity.w;
     scene.sunAngularRadius = sunAngularRadius;
     scene.rayMask = RT_RAY_MASK_WORLD;
     scene.rayDistance = RT_RAY_DISTANCE;

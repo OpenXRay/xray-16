@@ -7,7 +7,7 @@ cbuffer PathTracerParams : register(b5)
     float4x4 g_InvViewProj;
     float4 g_CameraPos;
     float4 g_SunDir_Intensity;
-    float4 g_SunColor_SkyWeight;
+    float4 g_SunColor;
     float g_ScreenWidth;
     float g_ScreenHeight;
     uint g_SampleIndex;
@@ -24,7 +24,7 @@ cbuffer PathTracerParams : register(b5)
     uint g_MaxNullEvents;
     uint g_EmissiveCount;
     uint g_MaxSamples;
-    float g_EnvironmentRotation;
+    uint g_PathPad3;
     float g_SunAngularRadius;
     float g_CameraConeSpread;
     uint g_ClusterLights;
@@ -89,8 +89,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
 
     RTSceneParams scene = RTBuildSceneParams(g_IdentityStaticCount, g_TerrainBatchCount,
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
-        g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
-        g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+        g_DiffuseMode, g_SunDir_Intensity, g_SunColor, g_EmissiveCount,
+        g_MaxNullEvents, g_SunAngularRadius);
     scene.detailMeshBatchStart = g_DetailMeshBatchStart;
     scene.staticDetailBatchStart = g_StaticDetailBatchStart;
     scene.detailPbrIndex = g_DetailPbrIndex;

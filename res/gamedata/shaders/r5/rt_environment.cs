@@ -1,11 +1,4 @@
-cbuffer EnvironmentSamplingParams : register(b0)
-{
-    float g_SkyBlend;
-    float3 g_EnvironmentSamplingPad;
-};
-
-TextureCube<float4> g_Sky0 : register(t0);
-TextureCube<float4> g_Sky1 : register(t1);
+TextureCube<float4> g_Sky : register(t0);
 SamplerState smp_rtlinear : register(s0);
 RWStructuredBuffer<float> g_EnvironmentCDF : register(u0);
 
@@ -40,12 +33,10 @@ void main(uint3 gtid : SV_GroupThreadID)
     float sinTheta = sin(theta);
     float3 dir = float3(sinTheta * cos(phi), cos(theta), sinTheta * sin(phi));
 
-    float3 sky0 = g_Sky0.SampleLevel(smp_rtlinear, dir, 0).rgb;
-    float3 sky1 = g_Sky1.SampleLevel(smp_rtlinear, dir, 0).rgb;
-    float3 blended = lerp(sky0, sky1, saturate(g_SkyBlend));
+    float3 radiance = g_Sky.SampleLevel(smp_rtlinear, dir, 0).rgb;
 
     float solidAngle = dPhi * (cos(theta0) - cos(theta1));
-    float weight = EnvSkyLuminance(blended) * max(solidAngle, 0.0);
+    float weight = EnvSkyLuminance(radiance) * max(solidAngle, 0.0);
     if (!isfinite(weight) || weight < 0.0)
         weight = 0.0;
 

@@ -114,8 +114,8 @@ RTSceneParams RTGIBuildRawScene(uint2 pixel)
 {
     RTSceneParams scene = RTBuildSceneParams(g_IdentityStaticCount, g_TerrainBatchCount,
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
-        g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
-        g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+        g_DiffuseMode, g_SunDir_Intensity, g_SunColor, g_EmissiveCount,
+        g_MaxNullEvents, g_SunAngularRadius);
     scene.detailMeshBatchStart = g_DetailMeshBatchStart;
     scene.staticDetailBatchStart = g_StaticDetailBatchStart;
     scene.detailPbrIndex = g_DetailPbrIndex;

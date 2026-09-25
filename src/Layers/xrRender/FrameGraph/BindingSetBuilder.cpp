@@ -171,11 +171,11 @@ BindingSetBuilder& BindingSetBuilder::Texture(const char* name, nvrhi::ITexture*
 }
 
 BindingSetBuilder& BindingSetBuilder::TextureUAV(const char* name, nvrhi::ITexture* texture,
-    nvrhi::Format format, nvrhi::TextureSubresourceSet subresources)
+    nvrhi::Format format, nvrhi::TextureSubresourceSet subresources, nvrhi::TextureDimension dimension)
 {
     int slot = FindUAVSlot(name);
     if (slot >= 0)
-        m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_UAV(slot, texture, format, subresources));
+        m_desc.bindings.push_back(nvrhi::BindingSetItem::Texture_UAV(slot, texture, format, subresources, dimension));
     return *this;
 }
 

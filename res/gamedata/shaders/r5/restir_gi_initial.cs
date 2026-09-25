@@ -9,7 +9,7 @@ cbuffer ReSTIRGIParams : register(b5)
     float4x4 g_PrevViewProj;
     float4 g_CameraPos;
     float4 g_SunDir_Intensity;
-    float4 g_SunColor_SkyWeight;
+    float4 g_SunColor;
     float2 g_ScreenSize;
     float g_GIIntensity;
     uint g_FrameIndex;
@@ -23,7 +23,7 @@ cbuffer ReSTIRGIParams : register(b5)
     uint g_ReuseReservoirs;
     uint g_EmissiveCount;
     uint g_MaxNullEvents;
-    float g_EnvironmentRotation;
+    uint g_ReSTIRPad0;
     float g_SunAngularRadius;
 };
 
@@ -65,8 +65,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     }
     RTSceneParams scene = RTBuildSceneParams(g_IdentityStaticCount, g_TerrainBatchCount,
         g_SkinnedBatchStart, g_GrassBatchStart, g_DetailAtlasIndex, g_RTLightCount,
-        g_DiffuseMode, g_SunDir_Intensity, g_SunColor_SkyWeight, g_EmissiveCount,
-        g_MaxNullEvents, g_EnvironmentRotation, g_SunAngularRadius);
+        g_DiffuseMode, g_SunDir_Intensity, g_SunColor, g_EmissiveCount,
+        g_MaxNullEvents, g_SunAngularRadius);
     uint rng = pcg_hash(pixel.x + pixel.y * 1973u + g_FrameIndex * 26699u);
     float3 worldPos = ReconstructWorldPos(float2(pixel), depth);
     MaterialSurface primary = GBufferMaterialSurface(normalData, t_BaseColor.Load(int3(pixel, 0)), t_Material.Load(int3(pixel, 0)));

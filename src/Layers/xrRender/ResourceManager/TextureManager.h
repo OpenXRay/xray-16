@@ -168,8 +168,7 @@ public:
     // Get metadata (for inspection)
     const TextureMetadata* GetMetadata(TextureHandle handle) const;
     void NotifyContentChanged(TextureMetadata& metadata);
-    u64 GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
-        nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
+    u64 GetContentRevision(const xr_set<nvrhi::ITexture*>& textures) const;
 
     // Find texture by path (returns invalid handle if not found)
     TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;

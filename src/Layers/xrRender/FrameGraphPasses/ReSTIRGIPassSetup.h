@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/RayTracing/WorldRadianceCache.h"
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
+#include "Layers/xrRender/SkyEnvironment.h"
 #include "ClusterLightPassSetup.h"
 
 namespace xray::render::framegraph
@@ -134,7 +135,7 @@ public:
     Fmatrix invViewProj;
     Fvector4 cameraPos;
     Fvector4 sunDir_intensity;
-    Fvector4 sunColor_skyWeight;
+    Fvector4 sunColor;
     float screenWidth;
     float screenHeight;
     float giIntensity;
@@ -151,7 +152,7 @@ public:
     u32 maxBounces;
     u32 samplesPerPixel;
     float rayDistance;
-    float environmentRotation;
+    u32 pad3;
     float sunAngularRadius;
     float cameraConeSpread;
     u32 clusterLights;
@@ -266,8 +267,7 @@ public:
     RTGIRawCB cbData;
     u32 width = 0;
     u32 height = 0;
-    nvrhi::TextureHandle sky0;
-    nvrhi::TextureHandle sky1;
+    framegraph::VirtualResourceHandle sky;
 };
 
 class RTGITemporalPassData
@@ -361,7 +361,7 @@ public:
 LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState& state, u32 width, u32 height, bool reuseRequested);
 ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     WorldRadianceCache* worldCache, const framegraph::DefaultOutputLayout& inputs,
-    const ClusterLightOutput& clusterLights, framegraph::VirtualResourceHandle prevNormals,
+    const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, framegraph::VirtualResourceHandle prevNormals,
     framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
     const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
     const Fvector& cameraPos, float giIntensity, u32 width, u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting);

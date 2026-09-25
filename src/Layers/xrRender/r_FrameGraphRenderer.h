@@ -47,6 +47,7 @@ namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
     class WorldRadianceCache;
+    class SkyEnvironment;
     class light;
     namespace PS {
         class CParticleEffect;
@@ -504,6 +505,7 @@ private:
     // Ray Tracing acceleration structures (for path tracer)
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
+    xr_unique_ptr<fg::SkyEnvironment> m_skyEnvironment;
     fg::LightingFrameState m_lightingState;
     fg::PostProcessEffects m_postProcess;
 

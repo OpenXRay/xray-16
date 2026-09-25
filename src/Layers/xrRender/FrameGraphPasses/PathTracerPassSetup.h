@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
+#include "Layers/xrRender/SkyEnvironment.h"
 #include "ClusterLightPassSetup.h"
 #include <memory>
 
@@ -40,7 +41,7 @@ public:
     Fmatrix invViewProj;
     Fvector4 cameraPos_pad;
     Fvector4 sunDir_intensity;
-    Fvector4 sunColor_skyWeight;
+    Fvector4 sunColor;
     float screenWidth;
     float screenHeight;
     u32 sampleIndex;
@@ -57,7 +58,7 @@ public:
     u32 maxNullEvents;
     u32 emissiveCount;
     u32 maxSamples;
-    float environmentRotation;
+    u32 pad3;
     float sunAngularRadius;
     float cameraConeSpread;
     u32 clusterLights;
@@ -109,12 +110,11 @@ public:
     std::shared_ptr<PathTracerSnapshotGlobals> globals;
     nvrhi::BufferHandle lightData;
     nvrhi::BufferHandle staticGlobals;
-    nvrhi::TextureHandle sky0;
-    nvrhi::TextureHandle sky1;
+    nvrhi::TextureHandle sky;
     nvrhi::DescriptorTableHandle textureTable;
     xr_vector<nvrhi::TextureHandle> textureClones;
     PathTracerCB world = {};
-    float skyBlend = 0.0f;
+    u64 skyRevision = 0;
     u64 sceneRevision = 0;
     u64 poseRevision = 0;
     u64 textureRevision = 0;
@@ -136,8 +136,8 @@ public:
     Fmatrix cameraView = Fidentity;
     Fmatrix cameraProject = Fidentity;
     PathTracerCB parameters = {};
-    nvrhi::TextureHandle sky0;
-    nvrhi::TextureHandle sky1;
+    nvrhi::TextureHandle sky;
+    u64 skyRevision = 0;
     u64 sceneRevision = 0;
     u64 poseRevision = 0;
     u64 textureRevision = 0;
@@ -201,8 +201,7 @@ public:
     u32 height = 0;
     u32 sampleCount = 0;
     u32 staticDetailInstanceCount = 0;
-    nvrhi::TextureHandle sky0;
-    nvrhi::TextureHandle sky1;
+    framegraph::VirtualResourceHandle sky;
     nvrhi::DescriptorTableHandle textureTable;
     std::shared_ptr<PathTracerSnapshot> snapshot;
     nvrhi::IBuffer* staticGlobals = nullptr;
@@ -213,7 +212,7 @@ LightingFallback EnsurePathTracerResources(RenderDevice* device, u32 width, u32 
 PathTracerSnapshotReuse EvaluatePathTracerSnapshotReuse(RenderDevice* device, RTAccelStructManager* accelMgr,
     PathTracerPassState& state, bool freezeRequested);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
-    framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights,
+    framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky,
     LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& view, const Fmatrix& project,
     const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
 

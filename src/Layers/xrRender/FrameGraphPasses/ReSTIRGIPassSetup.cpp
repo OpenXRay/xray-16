@@ -19,8 +19,6 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/fgEnvironmentRender.h"
-#include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
 #include <nvrhi/utils.h>
 
@@ -449,7 +447,7 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
 
 ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr,
     WorldRadianceCache* worldCache, const DefaultOutputLayout& inputs,
-    const ClusterLightOutput& clusterLights, VirtualResourceHandle prevNormals, VirtualResourceHandle prevDepth,
+    const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, VirtualResourceHandle prevNormals, VirtualResourceHandle prevDepth,
     VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
     const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
     const Fvector& cameraPos, float giIntensity, u32 width,
@@ -499,15 +497,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
     state.initialRecorded = false;
 
-    CEnvironment& env = g_pGamePersistent->Environment();
-    nvrhi::ITexture* sky0Tex = nullptr;
-    nvrhi::ITexture* sky1Tex = nullptr;
-    float skyWeight = env.CurrentEnv.weight;
-    ResolveSkyTextures(env, sky0Tex, sky1Tex);
-    if (!sky0Tex ||
-        !sky1Tex ||
-        sky0Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube ||
-        sky1Tex->getDesc().dimension != nvrhi::TextureDimension::TextureCube)
+    if (!sky.Valid())
     {
         lighting.Fail(LightingFallback::EnvironmentUnavailable);
         return { sourceColorIn };
@@ -544,7 +534,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         lightIndexList = lightManager.GetLightIndexListBuffer() ?
             importLightBuffer("cluster_light_index_list", lightManager.GetLightIndexListBuffer()) : lightData;
 
-    const auto environmentSampling = setupRTEnvironmentSamplingPass(fg, device, sky0Tex, sky1Tex, skyWeight);
+    const auto environmentSampling = setupRTEnvironmentSamplingPass(fg, device, sky.cube);
     if (!environmentSampling.distribution.is_valid())
     {
         lighting.Fail(LightingFallback::ResourcesUnavailable);
@@ -572,7 +562,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.invViewProj = invViewProj;
     rawCB.cameraPos = { cameraPos.x, cameraPos.y, cameraPos.z, 0 };
     rawCB.sunDir_intensity = { sunDir.x, sunDir.y, sunDir.z, sunIntensity };
-    rawCB.sunColor_skyWeight = { sunColor.x, sunColor.y, sunColor.z, skyWeight };
+    rawCB.sunColor = { sunColor.x, sunColor.y, sunColor.z, 0.0f };
     rawCB.screenWidth = (float)width;
     rawCB.screenHeight = (float)height;
     rawCB.giIntensity = giIntensity;
@@ -592,7 +582,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.maxBounces = bounces;
     rawCB.samplesPerPixel = samples;
     rawCB.rayDistance = rayDistance;
-    rawCB.environmentRotation = env.CurrentEnv.sky_rotation;
     rawCB.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
     rawCB.cameraConeSpread = ComputeRTGICameraConeSpread(invViewProj, cameraPos, width, height);
     rawCB.clusterLights = clusterListsActive ? 1u : 0u;
@@ -610,8 +599,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     cacheInputs.clusterGrid = clusterGrid;
     cacheInputs.lightIndexList = lightIndexList;
     cacheInputs.environmentDistribution = environmentSampling.distribution;
-    cacheInputs.sky0 = sky0Tex;
-    cacheInputs.sky1 = sky1Tex;
+    cacheInputs.sky = sky.cube;
     cacheInputs.sceneConstants = rawCB;
     cacheInputs.cameraPos = cameraPos;
     cacheInputs.frame = Device.dwFrame;
@@ -708,6 +696,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.clusterGrid = pb.read(clusterGrid, ResourceState::ShaderResource);
             data.lightIndexList = pb.read(lightIndexList, ResourceState::ShaderResource);
             data.environmentDistribution = pb.read(environmentSampling.distribution, ResourceState::ShaderResource);
+            data.sky = pb.read(sky.cube, ResourceState::ShaderResource);
             data.rawDiffuse = pb.write(fgRawDiffuse, ResourceState::UnorderedAccess);
             data.rawSpecular = pb.write(fgRawSpecular, ResourceState::UnorderedAccess);
             data.emission = pb.write(fgEmission, ResourceState::UnorderedAccess);
@@ -735,8 +724,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             data.cbData = rawCB;
             data.width = width;
             data.height = height;
-            data.sky0 = sky0Tex;
-            data.sky1 = sky1Tex;
         },
         [](const RTGITracePassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
@@ -767,8 +754,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 return;
             }
 
-            nvrhi::ITexture* sky0 = data.sky0;
-            nvrhi::ITexture* sky1 = data.sky1;
+            nvrhi::ITexture* skyTexture = fg.GetPhysicalTexture(data.sky);
             const auto scene = RTAccelStructManager::ResolveScene(fg, data.scene);
             auto* tlas = scene.tlas;
             auto* batchInfo = scene.batchInfo;
@@ -778,12 +764,12 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             auto* terrainBuf = scene.terrainMaterials;
 
             auto* environmentDistribution = fg.GetPhysicalBuffer(data.environmentDistribution);
-            if (!sky0 || !sky1 || !tlas || !batchInfo || !megaVB || !megaIB || !matBuf || !terrainBuf ||
+            if (!skyTexture || !tlas || !batchInfo || !megaVB || !megaIB || !matBuf || !terrainBuf ||
                 !scene.grassMaterials || !scene.variants || !scene.textures || !scene.emissiveTriangles || !scene.batchTransforms ||
                 !scene.emissiveBatchOffsets || !environmentDistribution)
             {
-                Msg("! [RTGI Trace] Null binding: sky0=%d sky1=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
-                    !!sky0, !!sky1, !!tlas, !!batchInfo, !!megaVB, !!megaIB, !!matBuf, !!terrainBuf);
+                Msg("! [RTGI Trace] Null binding: sky=%d tlas=%d batch=%d megaVB=%d megaIB=%d mat=%d terrain=%d",
+                    !!skyTexture, !!tlas, !!batchInfo, !!megaVB, !!megaIB, !!matBuf, !!terrainBuf);
                 data.lighting->Fail(LightingFallback::SceneUnavailable);
                 return;
             }
@@ -905,8 +891,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 buffer("g_BatchInfo", batchInfo);
                 buffer("g_MegaVB", megaVB);
                 buffer("g_MegaIB", megaIB);
-                texture("g_Sky0", sky0);
-                texture("g_Sky1", sky1);
+                texture("g_Sky", skyTexture);
                 buffer("g_SkinnedVB", skinnedVB);
                 buffer("g_Materials", matBuf);
                 buffer("g_GrassMaterials", scene.grassMaterials);

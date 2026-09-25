@@ -27,33 +27,18 @@ public:
     bool active = false;
 };
 
-class EnvironmentSamplingCB
-{
-public:
-    float skyBlend;
-    float pad0;
-    float pad1;
-    float pad2;
-};
-
-static_assert(sizeof(EnvironmentSamplingCB) == 16);
-
 class EnvironmentSamplingPassData
 {
 public:
     fg::RenderDevice* device = nullptr;
-    framegraph::VirtualResourceHandle sky0;
-    framegraph::VirtualResourceHandle sky1;
+    framegraph::VirtualResourceHandle sky;
     framegraph::VirtualResourceHandle distribution;
-    float blend = 0.0f;
 };
 
 RTEnvironmentSamplingOutput setupRTEnvironmentSamplingPass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
-    nvrhi::ITexture* sky0,
-    nvrhi::ITexture* sky1,
-    float blend);
+    framegraph::VirtualResourceHandle sky);
 
 void ShutdownRTEnvironmentSampling();
 

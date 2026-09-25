@@ -34,19 +34,9 @@ float RTPowerHeuristic(float pdf, float otherPdf)
     return a * a / (a * a + b * b);
 }
 
-float3 RTRotateY(float3 direction, float angle)
+float3 SampleRTSky(float3 direction)
 {
-    float s, c;
-    sincos(angle, s, c);
-    return float3(c * direction.x + s * direction.z, direction.y, c * direction.z - s * direction.x);
-}
-
-float3 SampleRTSky(RTSceneParams scene, float3 direction)
-{
-    float3 localDirection = RTRotateY(direction, -scene.skyRotation);
-    float3 sky0 = g_Sky0.SampleLevel(smp_rtlinear, localDirection, 0).rgb;
-    float3 sky1 = g_Sky1.SampleLevel(smp_rtlinear, localDirection, 0).rgb;
-    return lerp(sky0, sky1, scene.skyWeight);
+    return g_Sky.SampleLevel(smp_rtlinear, direction, 0).rgb;
 }
 
 float RTEnvironmentCellArea(uint row)
@@ -54,24 +44,23 @@ float RTEnvironmentCellArea(uint row)
     return (2.0 * PI / 32.0) * (cos(PI * float(row) / 16.0) - cos(PI * float(row + 1u) / 16.0));
 }
 
-float RTEnvironmentPdf(RTSceneParams scene, float3 direction)
+float RTEnvironmentPdf(float3 direction)
 {
     float total = g_EnvironmentCDF[512];
     if (!(total > 0.0))
         return 1.0 / (4.0 * PI);
-    float3 localDirection = RTRotateY(direction, -scene.skyRotation);
-    float phi = atan2(localDirection.z, localDirection.x);
+    float phi = atan2(direction.z, direction.x);
     if (phi < 0.0)
         phi += 2.0 * PI;
     uint column = min(uint(phi * (32.0 / (2.0 * PI))), 31u);
-    uint row = min(uint(acos(clamp(localDirection.y, -1.0, 1.0)) * (16.0 / PI)), 15u);
+    uint row = min(uint(acos(clamp(direction.y, -1.0, 1.0)) * (16.0 / PI)), 15u);
     uint index = row * 32u + column;
     float previous = index > 0u ? g_EnvironmentCDF[index - 1u] : 0.0;
     float probability = max(g_EnvironmentCDF[index] - previous, 0.0) / total;
     return 0.95 * probability / RTEnvironmentCellArea(row) + 0.05 / (4.0 * PI);
 }
 
-float3 RTSampleEnvironment(RTSceneParams scene, inout uint rng, out float pdf)
+float3 RTSampleEnvironment(inout uint rng, out float pdf)
 {
     float total = g_EnvironmentCDF[512];
     float3 direction;
@@ -100,9 +89,9 @@ float3 RTSampleEnvironment(RTSceneParams scene, inout uint rng, out float pdf)
         float phi = (float(column) + rand_float(rng)) * (2.0 * PI / 32.0);
         float y = lerp(cos(PI * float(row) / 16.0), cos(PI * float(row + 1u) / 16.0), rand_float(rng));
         float r = sqrt(max(0.0, 1.0 - y * y));
-        direction = RTRotateY(float3(r * cos(phi), y, r * sin(phi)), scene.skyRotation);
+        direction = float3(r * cos(phi), y, r * sin(phi));
     }
-    pdf = RTEnvironmentPdf(scene, direction);
+    pdf = RTEnvironmentPdf(direction);
     return direction;
 }
 
@@ -128,8 +117,8 @@ float3 RTSampleSun(RTSceneParams scene, inout uint rng)
 
 float3 RTMissRadiance(RTSceneParams scene, float3 direction, float bsdfPdf, bool delta)
 {
-    float environmentWeight = delta ? 1.0 : RTPowerHeuristic(bsdfPdf, RTEnvironmentPdf(scene, direction));
-    float3 radiance = SampleRTSky(scene, direction) * environmentWeight;
+    float environmentWeight = delta ? 1.0 : RTPowerHeuristic(bsdfPdf, RTEnvironmentPdf(direction));
+    float3 radiance = SampleRTSky(direction) * environmentWeight;
     float solidAngle = RTSunSolidAngle(scene);
     float3 sunOffset = direction - scene.sunDir;
     if (solidAngle > 0.0 && dot(sunOffset, sunOffset) <= solidAngle / PI)
@@ -423,9 +412,9 @@ RTLightCandidate RTEnvironmentCandidate(RTSceneParams scene, MaterialSurface sur
     float3 geoNormal, float3 V, bool continuation, inout uint rng)
 {
     float environmentPdf;
-    float3 environmentDirection = RTSampleEnvironment(scene, rng, environmentPdf);
+    float3 environmentDirection = RTSampleEnvironment(rng, environmentPdf);
     return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, environmentDirection,
-        SampleRTSky(scene, environmentDirection), environmentPdf, scene.rayDistance, false, continuation);
+        SampleRTSky(environmentDirection), environmentPdf, scene.rayDistance, false, continuation);
 }
 
 void RTDirectLightingEnvironment(RTSceneParams scene, MaterialSurface surface, float3 position,

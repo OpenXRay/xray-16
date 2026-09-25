@@ -414,15 +414,14 @@ void TextureManager::NotifyContentChanged(TextureMetadata& metadata)
     metadata.contentRevision = ++m_contentRevision;
 }
 
-u64 TextureManager::GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
-    nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const
+u64 TextureManager::GetContentRevision(const xr_set<nvrhi::ITexture*>& textures) const
 {
     std::lock_guard<std::mutex> lock(m_texturesMutex);
     u64 revision = 0;
     for (const auto& metadata : m_textures)
     {
         auto* texture = metadata.nvrhiTexture.Get();
-        if (metadata.isAlive && texture && (texture == sky0 || texture == sky1 || textures.find(texture) != textures.end()))
+        if (metadata.isAlive && texture && textures.find(texture) != textures.end())
             revision = std::max(revision, metadata.contentRevision);
     }
     return revision;

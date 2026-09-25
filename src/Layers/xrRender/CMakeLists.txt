@@ -143,6 +143,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/PathTracerPassSetup.cpp
     FrameGraphPasses/RTEnvironmentSamplingPassSetup.h
     FrameGraphPasses/RTEnvironmentSamplingPassSetup.cpp
+    FrameGraphPasses/SkyEnvironmentPassSetup.h
+    FrameGraphPasses/SkyEnvironmentPassSetup.cpp
     FrameGraphPasses/MotionVectorPassSetup.h
     FrameGraphPasses/MotionVectorPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h
@@ -155,6 +157,9 @@ target_sources(xrRender PRIVATE
     RayTracing/RTAccelStructManager.cpp
     RayTracing/WorldRadianceCache.h
     RayTracing/WorldRadianceCache.cpp
+
+    SkyEnvironment.h
+    SkyEnvironment.cpp
 
     FGDetailManager.h
     FGDetailManager.cpp

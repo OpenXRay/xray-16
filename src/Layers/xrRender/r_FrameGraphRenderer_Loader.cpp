@@ -423,6 +423,8 @@ void FrameGraphRenderer::level_Unload()
     }
     if (m_worldCache)
         m_worldCache->Invalidate();
+    if (m_skyEnvironment)
+        m_skyEnvironment->Invalidate();
     if (m_detailManager)
         m_detailManager->Unload();
     m_hudBatches.clear();

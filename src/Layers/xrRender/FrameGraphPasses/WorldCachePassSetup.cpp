@@ -223,7 +223,7 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
         sizeof(RTGIRawCB), device);
     if (!sceneConstantBuffer)
         return fail(LightingFallback::ResourcesUnavailable);
-    if (!inputs.lightData.is_valid() || !inputs.environmentDistribution.is_valid() || !inputs.sky0 || !inputs.sky1)
+    if (!inputs.lightData.is_valid() || !inputs.environmentDistribution.is_valid() || !inputs.sky.is_valid())
         return fail(LightingFallback::InputsUnavailable);
 
     output.constants = cache->BuildConstants(inputs.cameraPos, inputs.frame, true);
@@ -337,13 +337,12 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             data.clusterGrid = pb.read(inputs.clusterGrid, ResourceState::ShaderResource);
             data.lightIndexList = pb.read(inputs.lightIndexList, ResourceState::ShaderResource);
             data.environmentDistribution = pb.read(inputs.environmentDistribution, ResourceState::ShaderResource);
+            data.sky = pb.read(inputs.sky, ResourceState::ShaderResource);
             data.scene = inputs.accelMgr->UseScene(builder, pb);
             pb.sideEffects();
             data.device = device;
             data.cache = cache;
             data.lighting = lighting;
-            data.sky0 = inputs.sky0;
-            data.sky1 = inputs.sky1;
             data.sceneConstants = inputs.sceneConstants;
             data.constants = constants;
             data.constantBuffer = constantBuffer;
@@ -366,12 +365,13 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
             auto* clusterGrid = fg.GetPhysicalBuffer(data.clusterGrid);
             auto* lightIndexList = fg.GetPhysicalBuffer(data.lightIndexList);
             auto* environmentDistribution = fg.GetPhysicalBuffer(data.environmentDistribution);
+            auto* skyTexture = fg.GetPhysicalTexture(data.sky);
             auto* staticGlobals = GetPassResourceCache().GetOrCreateVolatileCB("Frame", "StaticGlobals",
                 sizeof(StaticGlobals), data.device);
             if (!scene.tlas || !scene.batchInfo || !scene.vertices || !scene.indices || !scene.materials ||
                 !scene.terrainMaterials || !scene.grassMaterials || !scene.variants || !scene.textures ||
                 !scene.emissiveTriangles || !scene.batchTransforms || !scene.emissiveBatchOffsets ||
-                !lightData || !environmentDistribution || !staticGlobals || !data.sky0 || !data.sky1)
+                !lightData || !environmentDistribution || !staticGlobals || !skyTexture)
             {
                 Msg("! [WorldCache] Update skipped: scene bindings unavailable");
                 return;
@@ -399,8 +399,7 @@ WorldCachePassOutput setupWorldCachePass(FrameGraph& fg, RenderDevice* device, c
                .BufferSRV("g_BatchInfo", scene.batchInfo)
                .BufferSRV("g_MegaVB", scene.vertices)
                .BufferSRV("g_MegaIB", scene.indices)
-               .Texture("g_Sky0", data.sky0)
-               .Texture("g_Sky1", data.sky1)
+               .Texture("g_Sky", skyTexture)
                .BufferSRV("g_SkinnedVB", skinnedVB)
                .BufferSRV("g_Materials", scene.materials)
                .BufferSRV("g_GrassMaterials", scene.grassMaterials)
