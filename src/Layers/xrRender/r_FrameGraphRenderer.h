@@ -24,6 +24,7 @@
 #include "Layers/xrRender/Profiler/StatsOverlay.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "Layers/xrRender/RenderView.h"
+#include "Layers/xrRender/PostProcessEffects.h"
 
 struct ImDrawData;
 
@@ -46,7 +47,6 @@ namespace xray::render::fg {
     class dxRender_Visual;
     class RTAccelStructManager;
     class WorldRadianceCache;
-    class CRenderTarget;
     class light;
     namespace PS {
         class CParticleEffect;
@@ -399,7 +399,6 @@ public:
     fg::CLight_Compute_XFORM_and_VIS m_LR;
     xr_vector<fg::light*> m_Lights_LastFrame;
     fg::SMAP_Allocator m_LP_smap_pool;
-    fg::CRenderTarget* m_pTarget{ nullptr };
     fg::CPSLibrary m_PSLibrary;
 
     u32 occq_begin(u32& ID) { return m_HWOCC.occq_begin(ID); }
@@ -508,6 +507,7 @@ private:
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
     fg::LightingFrameState m_lightingState;
+    fg::PostProcessEffects m_postProcess;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
     xr_unique_ptr<fg::FGUIRender> m_uiRender;

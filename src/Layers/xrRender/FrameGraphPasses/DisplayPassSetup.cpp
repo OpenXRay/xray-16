@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "DisplayPassSetup.h"
+#include "BloomPassSetup.h"
 #include "Layers/xrRender/DisplayCalibration.h"
 #include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/PostProcessEffects.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -25,7 +27,28 @@ constexpr float kExposureMaxDeltaTime = 0.25f;
 
 static_assert(sizeof(ExposureHistogramConstants) == 16, "ExposureHistogramParams layout");
 static_assert(sizeof(ExposureAdaptConstants) == 32, "ExposureAdaptParams layout");
-static_assert(sizeof(DisplayOutputConstants) == 32, "DisplayOutputParams layout");
+static_assert(sizeof(DisplayOutputConstants) == 128, "DisplayOutputParams layout");
+
+void ApplyPostProcess(const PostProcessFrame& postProcess, DisplayOutputConstants& constants)
+{
+    if (!postProcess.active)
+        return;
+
+    constants.effectsEnabled = 1u;
+    constants.blurShift.set(
+        0.5f * postProcess.blur * constants.invSceneSize.x,
+        0.5f * postProcess.blur * constants.invSceneSize.y);
+    constants.dualityShift = postProcess.dualityShift;
+    constants.noiseOffset = postProcess.noiseOffset;
+    constants.noiseScale = postProcess.noiseScale;
+    constants.gray = postProcess.gray;
+    constants.noiseIntensity = postProcess.noiseIntensity;
+    constants.colorGray = postProcess.colorGray;
+    constants.colorMapInfluence = postProcess.colorMapInfluence;
+    constants.colorBase = postProcess.colorBase;
+    constants.colorMapInterpolate = postProcess.colorMapInterpolate;
+    constants.colorAdd = postProcess.colorAdd;
+}
 
 VirtualResourceHandle ImportDisplayBuffer(FrameGraph& fg, const char* name, nvrhi::IBuffer* buffer)
 {
@@ -422,11 +445,13 @@ VirtualResourceHandle setupDisplayOutputPass(
     fg::RenderDevice* device,
     VirtualResourceHandle sceneColor,
     VirtualResourceHandle exposure,
+    const BloomOutput& bloom,
     VirtualResourceHandle interfaceLayer,
     VirtualResourceHandle output,
     u32 width,
     u32 height,
     const DisplayCalibration& calibration,
+    const PostProcessFrame& postProcess,
     DisplayPassState& state,
     const LightingFrameState* lighting)
 {
@@ -440,10 +465,19 @@ VirtualResourceHandle setupDisplayOutputPass(
     constants.gamma = calibration.GetGamma();
     constants.brightness = calibration.GetBrightness();
     constants.contrast = calibration.GetContrast();
+    constants.invSceneSize.set(1.0f / float(std::max(width, 1u)), 1.0f / float(std::max(height, 1u)));
+    const bool bloomValid = bloom.texture.is_valid() && bloom.levels > 0;
+    if (bloomValid)
+    {
+        constants.bloomIntensity = std::clamp(ps_r_bloom_intensity, 0.0f, 1.0f);
+        constants.bloomNormalization = 1.0f / float(bloom.levels);
+    }
+    ApplyPostProcess(postProcess, constants);
 
+    const VirtualResourceHandle bloomTexture = bloomValid ? bloom.texture : VirtualResourceHandle();
     auto& passData = fg.addCallbackPass<DisplayOutputPassData>(
         "Display Output",
-        [sceneColor, exposure, interfaceLayer, output, device, width, height, constants, &state, lighting](
+        [sceneColor, exposure, bloomTexture, interfaceLayer, output, device, width, height, constants, &postProcess, &state, lighting](
             FrameGraph& builder, PassHandle passHandle, DisplayOutputPassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
@@ -451,9 +485,17 @@ VirtualResourceHandle setupDisplayOutputPass(
             {
                 data.sceneColor = passBuilder.read(sceneColor, ResourceState::ShaderResource);
                 data.exposure = passBuilder.read(exposure, ResourceState::ShaderResource);
+                if (bloomTexture.is_valid())
+                    data.bloom = passBuilder.read(bloomTexture, ResourceState::ShaderResource);
             }
             data.interfaceLayer = passBuilder.read(interfaceLayer, ResourceState::ShaderResource);
             data.output = passBuilder.write(output, ResourceState::RenderTarget);
+            if (constants.effectsEnabled != 0u)
+            {
+                data.noise = postProcess.noise;
+                data.colorMap0 = postProcess.colorMap0;
+                data.colorMap1 = postProcess.colorMap1;
+            }
             data.device = device;
             data.state = &state;
             data.lighting = lighting;
@@ -476,6 +518,7 @@ VirtualResourceHandle setupDisplayOutputPass(
             }
 
             nvrhi::ITexture* sceneTexture = data.sceneColor.is_valid() ? fg.GetPhysicalTexture(data.sceneColor) : nullptr;
+            nvrhi::ITexture* bloomTexture = data.bloom.is_valid() ? fg.GetPhysicalTexture(data.bloom) : nullptr;
             nvrhi::IBuffer* exposureBuffer = data.exposure.is_valid() ? fg.GetPhysicalBuffer(data.exposure) : state.exposure.Get();
             const bool lightingLost = data.lighting && data.lighting->frameFailed && !data.lighting->failureCleared;
             const bool sceneValid = sceneTexture && exposureBuffer && state.exposureInitialized && !lightingLost;
@@ -496,12 +539,22 @@ VirtualResourceHandle setupDisplayOutputPass(
             DisplayOutputConstants constants = data.constants;
             constants.sceneValid = sceneValid ? 1u : 0u;
             constants.frameIndex = state.frameIndex++;
+            if (!bloomTexture)
+                constants.bloomIntensity = 0.0f;
+            if (!data.noise)
+                constants.noiseIntensity = 0.0f;
+            if (!data.colorMap0 || !data.colorMap1)
+                constants.colorMapInfluence = 0.0f;
             cmdList->writeBuffer(constantBuffer, &constants, sizeof(constants));
 
             BindingSetBuilder bindings(*vertexReflection, *pixelReflection, nvDevice, "DisplayOutput");
             bindings.Texture("t_Scene", sceneValid ? sceneTexture : interfaceTexture)
                 .Texture("t_Interface", interfaceTexture)
                 .BufferSRV("t_Exposure", exposureBuffer)
+                .Texture("t_Bloom", bloomTexture ? bloomTexture : interfaceTexture)
+                .Texture("t_Noise", data.noise ? data.noise.Get() : interfaceTexture)
+                .Texture("t_ColorMap0", data.colorMap0 ? data.colorMap0.Get() : interfaceTexture)
+                .Texture("t_ColorMap1", data.colorMap1 ? data.colorMap1.Get() : interfaceTexture)
                 .ConstantBuffer("DisplayOutputParams", constantBuffer);
             nvrhi::BindingSetHandle bindingSet = cache.GetOrCreateBindingSet(bindings.Build(), state.outputLayout, nvDevice);
             if (!bindingSet)

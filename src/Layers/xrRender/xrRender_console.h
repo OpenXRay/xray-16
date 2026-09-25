@@ -253,6 +253,7 @@ extern ECORE_API float ps_r_exposure_min_ev;
 extern ECORE_API float ps_r_exposure_max_ev;
 extern ECORE_API float ps_r_exposure_speed_up;
 extern ECORE_API float ps_r_exposure_speed_down;
+extern ECORE_API float ps_r_bloom_intensity;
 extern ECORE_API int   ps_r_vis_debug;
 extern ECORE_API int   ps_r_mesh_shaders;
 extern ECORE_API int   ps_r_vis_sw;

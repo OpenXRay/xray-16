@@ -307,6 +307,7 @@ float ps_r_exposure_min_ev     = -2.0f;
 float ps_r_exposure_max_ev     = 1.0f;
 float ps_r_exposure_speed_up   = 1.0f;
 float ps_r_exposure_speed_down = 3.0f;
+float ps_r_bloom_intensity     = 0.04f;
 int   ps_r_vis_debug           = 0;
 int   ps_r_mesh_shaders        = 0;
 int   ps_r_vis_sw              = 1;
@@ -1077,6 +1078,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_exposure_max_ev", &ps_r_exposure_max_ev, -8.0f, 8.0f);
     CMD4(CCC_Float, "r_exposure_speed_up", &ps_r_exposure_speed_up, 0.05f, 20.0f);
     CMD4(CCC_Float, "r_exposure_speed_down", &ps_r_exposure_speed_down, 0.05f, 20.0f);
+    CMD4(CCC_Float, "r_bloom_intensity", &ps_r_bloom_intensity, 0.0f, 1.0f);
     CMD4(CCC_Integer, "r_vis_debug", &ps_r_vis_debug, 0, 3);
     CMD4(CCC_Integer, "r_mesh_shaders", &ps_r_mesh_shaders, 0, 1);
     CMD4(CCC_Integer, "r_vis_sw", &ps_r_vis_sw, 0, 1);

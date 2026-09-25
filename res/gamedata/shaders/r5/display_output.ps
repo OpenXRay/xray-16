@@ -4,6 +4,12 @@
 Texture2D<float4> t_Scene : register(t0);
 Texture2D<float4> t_Interface : register(t1);
 StructuredBuffer<float4> t_Exposure : register(t2);
+Texture2D<float4> t_Bloom : register(t3);
+Texture2D<float4> t_Noise : register(t4);
+Texture2D<float4> t_ColorMap0 : register(t5);
+Texture2D<float4> t_ColorMap1 : register(t6);
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_linear : register(s1);
 
 cbuffer DisplayOutputParams : register(b0)
 {
@@ -13,7 +19,21 @@ cbuffer DisplayOutputParams : register(b0)
     float g_Gamma;
     float g_Brightness;
     float g_Contrast;
-    float2 g_DisplayPad;
+    float g_BloomIntensity;
+    uint g_EffectsEnabled;
+    float2 g_InvSceneSize;
+    float2 g_BlurShift;
+    float2 g_DualityShift;
+    float2 g_NoiseOffset;
+    float2 g_NoiseScale;
+    float g_Gray;
+    float g_NoiseIntensity;
+    float3 g_ColorGray;
+    float g_ColorMapInfluence;
+    float3 g_ColorBase;
+    float g_ColorMapInterpolate;
+    float3 g_ColorAdd;
+    float g_BloomNormalization;
 };
 
 struct PS_INPUT
@@ -41,15 +61,70 @@ float QuantizationDither(float2 pixel, uint frame)
     return (a + b - 1.0) / 255.0;
 }
 
+float3 SanitizeRadiance(float3 radiance)
+{
+    return all(isfinite(radiance)) ? max(radiance, 0.0) : 0.0;
+}
+
+float3 AddBloom(float3 radiance, float2 uv)
+{
+    if (g_BloomIntensity <= 0.0)
+        return radiance;
+    float3 bloom = SanitizeRadiance(t_Bloom.SampleLevel(smp_rtlinear, uv, 0).rgb) * g_BloomNormalization;
+    return lerp(radiance, bloom, g_BloomIntensity);
+}
+
+float3 EncodeDisplay(float3 radiance)
+{
+    return LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper));
+}
+
+float3 SampleDisplay(float2 uv)
+{
+    float3 radiance = SanitizeRadiance(t_Scene.SampleLevel(smp_rtlinear, uv, 0).rgb);
+    return EncodeDisplay(AddBloom(radiance, uv));
+}
+
+float3 ApplyColorMap(float3 image)
+{
+    float2 coord = float2(dot(image, (1.0 / 3.0).xxx), 0.5);
+    float3 mapped = lerp(
+        t_ColorMap0.SampleLevel(smp_rtlinear, coord, 0).rgb,
+        t_ColorMap1.SampleLevel(smp_rtlinear, coord, 0).rgb,
+        g_ColorMapInterpolate);
+    return lerp(image, mapped, g_ColorMapInfluence);
+}
+
+float3 ApplyEffects(float3 image, float2 position)
+{
+    if (g_ColorMapInfluence > 0.0)
+        image = ApplyColorMap(image);
+    image = lerp(image, dot(image, g_ColorGray).xxx, g_Gray);
+    if (g_NoiseIntensity > 0.0)
+    {
+        float3 noise = t_Noise.SampleLevel(smp_linear, g_NoiseOffset + position * g_NoiseScale, 0).rgb;
+        image = lerp(image, image * noise * 2.0, g_NoiseIntensity);
+    }
+    return saturate((image * g_ColorBase + g_ColorAdd) * 2.0);
+}
+
 float4 main(PS_INPUT input) : SV_TARGET
 {
     int3 pixel = int3(input.position.xy, 0);
     float3 display = 0.0;
     if (g_SceneValid != 0u)
     {
-        float3 radiance = t_Scene.Load(pixel).rgb;
-        radiance = all(isfinite(radiance)) ? max(radiance, 0.0) : 0.0;
-        display = LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper));
+        float2 uv = input.position.xy * g_InvSceneSize;
+        if (g_EffectsEnabled != 0u)
+        {
+            float2 base = uv * (1.0 - g_DualityShift) + g_BlurShift;
+            display = 0.5 * (SampleDisplay(base) + SampleDisplay(base + g_DualityShift));
+            display = ApplyEffects(display, input.position.xy);
+        }
+        else
+        {
+            display = EncodeDisplay(AddBloom(SanitizeRadiance(t_Scene.Load(pixel).rgb), uv));
+        }
     }
     float4 ui = t_Interface.Load(pixel);
     display = ui.rgb + display * (1.0 - ui.a);
