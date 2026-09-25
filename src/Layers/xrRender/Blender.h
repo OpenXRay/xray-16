@@ -5,7 +5,6 @@
 #pragma once
 
 #include "xrEngine/Properties.h"
-#include "Blender_Recorder.h"
 
 namespace xray::render::fg
 {
@@ -33,8 +32,6 @@ public:
 
 class ECORE_API IBlender : public CPropertyBase
 {
-    friend class CBlender_Compile;
-
 protected:
     CBlender_DESC description;
     xrP_Integer oPriority;
@@ -65,8 +62,6 @@ public:
 
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
-
-    virtual void Compile(CBlender_Compile& C);
 
     IBlender();
     virtual ~IBlender();

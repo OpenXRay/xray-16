@@ -16,7 +16,6 @@ namespace xray::render::fg {
 
 namespace xray::render::resources {
 
-class StreamingManager;  // Forward declaration
 struct DDSData;           // Forward declaration for video texture support
 
 // ═══════════════════════════════════════════════════
@@ -30,8 +29,6 @@ enum class TextureState : u8 {
     Missing,
 };
 
-const char* TextureStateToString(TextureState state);
-
 // ═══════════════════════════════════════════════════
 //  TEXTURE PRIORITY (For Streaming Decisions)
 // ═══════════════════════════════════════════════════
@@ -43,8 +40,6 @@ enum class TexturePriority : u8 {
     Low = 3,        // Not visible, keep if memory available
     VeryLow = 4,    // Evict first
 };
-
-const char* TexturePriorityToString(TexturePriority priority);
 
 // ═══════════════════════════════════════════════════
 //  TEXTURE DESCRIPTOR (Logical Description)
@@ -76,10 +71,6 @@ struct TextureDesc {
     bool isUAV = false;
     bool isSRGB = false;     // sRGB color space
 
-    // Streaming hints
-    bool allowStreaming = true;   // Can stream mips?
-    u32 minResidentMips = 3;      // Always keep this many mips
-
     shared_str debugName;
 
     // Calculate memory size for specific mip range
@@ -102,17 +93,11 @@ struct TextureMetadata {
     u32 generation = 0;          // For handle validation
     bool isAlive = true;         // Still valid?
 
-    // Streaming state
-    u32 residentMips = 0;        // How many mips currently loaded
-    u32 requestedMips = 0;       // How many mips needed
-    u32 totalMips = 0;           // Total mips available on disk
-
     // Memory tracking
     u64 memoryUsed = 0;          // Bytes in VRAM
 
     // Usage tracking (for eviction)
     float lastAccessTime = 0.0f; // Time since last use
-    u32 accessCount = 0;         // Total access count
     u32 refCount = 0;            // Active references
 
     // Physical resource
@@ -132,15 +117,6 @@ struct TextureMetadata {
         u32 targetMips = 0;
         // Add thread handle, etc. in Week 3
     } loadRequest;
-
-    // Helpers
-    bool IsResident() const {
-        return state == TextureState::Resident;
-    }
-
-    bool NeedsStreaming() const {
-        return requestedMips > residentMips && state == TextureState::Resident;
-    }
 };
 
 class TextureKey
@@ -176,23 +152,10 @@ public:
         TexturePriority priority = TexturePriority::Medium
     );
 
-    // Thread-safe loading (for background threads) - Week 3
-    TextureHandle LoadTextureThreadSafe(
-        const char* path,
-        TexturePriority priority = TexturePriority::Medium
-    );
-
     // Create runtime texture (not from disk)
     TextureHandle CreateTexture(
         const TextureDesc& desc,
         const void* initialData = nullptr
-    );
-
-    // Create from existing NVRHI texture (e.g. backbuffer)
-    TextureHandle ImportTexture(
-        nvrhi::TextureHandle nvrhiTexture,
-        const TextureDesc& desc,
-        const char* debugName
     );
 
     // ═══════════════════════════════════════════════════
@@ -208,9 +171,6 @@ public:
     u64 GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
         nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
 
-    // Check if texture is resident
-    bool IsResident(TextureHandle handle) const;
-
     // Find texture by path (returns invalid handle if not found)
     TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;
 
@@ -219,9 +179,6 @@ public:
     // ═══════════════════════════════════════════════════
 
     u64 GetMemoryBudget() const { return m_memoryBudget; }
-
-    // Request specific number of mips (for LOD)
-    void RequestMips(TextureHandle handle, u32 mipCount);
 
     // ═══════════════════════════════════════════════════
     //  LIFECYCLE
@@ -251,8 +208,6 @@ public:
         u32 texturesResident = 0;
         u32 texturesLoading = 0;
 
-        u32 streamingRequestsPending = 0;
-
         float memoryUsagePercent() const {
             if (memoryBudget == 0) return 0.0f;
             return (float)totalMemoryUsed / (float)memoryBudget * 100.0f;
@@ -261,12 +216,6 @@ public:
 
     Statistics GetStatistics() const;
     void PrintStatistics() const;
-
-    // ═══════════════════════════════════════════════════
-    //  STREAMING (Week 2)
-    // ═══════════════════════════════════════════════════
-
-    StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
 
 private:
     xray::render::fg::RenderDevice* m_device;
@@ -290,12 +239,6 @@ private:
     u64 m_memoryUsed = 0;
 
     // ═══════════════════════════════════════════════════
-    //  STREAMING (Week 2)
-    // ═══════════════════════════════════════════════════
-
-    xr_unique_ptr<StreamingManager> m_streamingManager;
-
-    // ═══════════════════════════════════════════════════
     //  INTERNAL METHODS
     // ═══════════════════════════════════════════════════
 
@@ -306,7 +249,6 @@ private:
 
     // Loading (Week 1: sync, Week 2: async)
     void LoadTextureSync(TextureHandle handle);
-    void StreamMips(TextureHandle handle, u32 targetMips);  // Week 2
 
     // Video texture update (Week 6)
     void UpdateVideoTextures();
@@ -319,11 +261,6 @@ private:
     // ═══════════════════════════════════════════════════
 
     mutable std::mutex m_texturesMutex;     // Protects m_textures
-    mutable std::mutex m_pathLookupMutex;   // Protects m_pathToHandle
-
-    // Thread-safe handle operations
-    TextureHandle AllocateHandleThreadSafe();
-    bool ValidateHandleThreadSafe(TextureHandle handle) const;
 
     // Statistics
     mutable Statistics m_stats;

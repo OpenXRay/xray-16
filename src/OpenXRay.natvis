@@ -87,14 +87,6 @@
     <DisplayString>CRenderTarget: Size: {dwWidth}x{dwHeight}</DisplayString>
   </Type>
   
-  <Type Name="CRT">
-    <DisplayString>{cName}, Size: {dwWidth}x{dwHeight}, Format: {fmt}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;CRT&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>{p_->cName}, Size: {p_->dwWidth}x{p_->dwHeight}, FMT: {p_->fmt}</DisplayString>
-  </Type>
-  
   <Type Name="CTexture">
     <DisplayString>{cName}, Size: {m_width}x{m_height}, Format: {desc.Format}</DisplayString>
   </Type>
@@ -103,32 +95,12 @@
     <DisplayString>{p_->cName}, Size: {p_->m_width}x{p_->m_height}, Format: {p_->desc.Format}</DisplayString>
   </Type>
 
-  <Type Name="SPass">
-    <DisplayString>PS: {ps}, VS: {vs}, GS: {gs}, HS: {hs}, DS: {ds}, CS: {cs}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;SPass&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>PS: {p_->ps}, VS: {p_->vs}, GS: {p_->gs}, HS: {p_->hs}, DS: {p_->ds}, CS: {p_->cs}</DisplayString>
-  </Type>
-
-  <Type Name="ShaderElement::Sflags">
-    <DisplayString>Priority: {iPriority}, StrictB2F: {bStrictB2F}, Emissive: {bEmissive}, Distort: {bDistort}, Wallmark: {bWmark}</DisplayString>
-  </Type>
-  
-  <Type Name="ShaderElement">
-    <DisplayString>Passes: {passes.count}, Flags: {flags}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;ShaderElement&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>Passes: {p_->passes.count}, Flags: {p_->flags}</DisplayString>
-  </Type>
-
   <Type Name="SDeclaration">
-    <DisplayString>DX11 Dcl: {dx11_dcl_code}, Dcl: {dcl_code}</DisplayString>
+    <DisplayString>Dcl: {dcl_code}</DisplayString>
   </Type>
   <Type Name="resptr_base&lt;SDeclaration&gt;">
     <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>DX11 Dcl: {p_->dx11_dcl_code}, Dcl: {p_->dcl_code}</DisplayString>
+    <DisplayString>Dcl: {p_->dcl_code}</DisplayString>
   </Type>
   
   <Type Name="SGeometry">
@@ -139,36 +111,8 @@
     <DisplayString>Stride: {p_->vb_stride}, Dcl: {p_->dcl}</DisplayString>
   </Type>
 
-  <Type Name="Shader">
-    <DisplayString>{E}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;Shader&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>{p_->E}</DisplayString>
-  </Type>
-
-  <Type Name="R_constant">
-    <DisplayString>{name}, Type: {type}, Dest: {destination}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;R_constant&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>{p_->name}, Type: {p_->type}, Dest: {p_->destination}</DisplayString>
-  </Type>
-
   <Type Name="R_constant_table">
-    <DisplayString>Table: {table}, CBTable: {m_CBTable}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;R_constant_table&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>Table: {p_->table}, CBTable: {p_->m_CBTable}</DisplayString>
-  </Type>
-
-  <Type Name="dx11ConstantBuffer">
-    <DisplayString>{cName}, {m_strBufferName}</DisplayString>
-  </Type>
-  <Type Name="resptr_base&lt;dx11ConstantBuffer&gt;">
-    <DisplayString Condition="p_ == 0">nullptr</DisplayString>
-    <DisplayString>{p_->cName}, {p_->m_strBufferName}</DisplayString>
+    <DisplayString>DX9 compatible: {dx9compatibility}</DisplayString>
   </Type>
 
   <Type Name="CBlender_DESC">

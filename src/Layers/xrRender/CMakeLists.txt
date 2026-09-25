@@ -259,12 +259,7 @@ target_sources(xrRender PRIVATE
     ResourceManager/FGResourceManager.cpp
     ResourceManager/NativeRTFactory.cpp
     ResourceManager/SamplerCache.cpp
-    ResourceManager/TestTextureManager.cpp
     ResourceManager/TextureManager.cpp
-    ResourceManager/TextureStreaming.cpp
-    SH_Constant.cpp
-    SH_Matrix.cpp
-    ShaderKey.cpp
     SkeletonAnimated.cpp
     SkeletonCustom.cpp
     SH_Texture.h
@@ -274,7 +269,6 @@ target_sources(xrRender PRIVATE
     SkeletonXSkinXW_CPP.cpp
     SkeletonXSkinXW_SSE.cpp
     TextureDescrManager.cpp
-    Utils/dxHashHelper.cpp
     VertexCache.cpp
     Decals/DecalManager.h
     Decals/DecalManager.cpp
@@ -326,9 +320,6 @@ target_sources(xrRender PRIVATE
     ../../../Externals/bc7enc_rdo/bc7decomp.cpp
 
     ./Blender.cpp
-    ./Blender_Recorder.cpp
-    ./Blender_Recorder_R2.cpp
-    ./Blender_Recorder_R3.cpp
     ./ResourceManager.cpp
     ./ResourceManager_Loader.cpp
     ./ResourceManager_Reset.cpp
@@ -343,11 +334,8 @@ target_sources(xrRender PRIVATE
     ./occRasterizer.cpp
     ./occRasterizer_core.cpp
     ./R_DStreams.cpp
-    ./r_constants.cpp
     ShaderInfo.cpp
-    ./tss_def.cpp
     ./xrRender_console.cpp
-    ./ResourceManager_Scripting.cpp
 
     ./blenders/Blender_BmmD_deferred.cpp
     ./blenders/Blender_Editor_Selection.cpp
@@ -361,7 +349,6 @@ target_sources(xrRender PRIVATE
     ./blenders/blender_deffer_aref.cpp
     ./blenders/blender_deffer_flat.cpp
     ./blenders/blender_deffer_model.cpp
-    ./blenders/uber_deffer.cpp
 
 )
 
@@ -454,7 +441,6 @@ target_link_libraries(xrRender
     xrMaterialSystem
     xrUICore
     xrParticles
-    xrScriptEngine
     xrAPI
     xrAnimation
     xrMiscMath

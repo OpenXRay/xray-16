@@ -134,7 +134,6 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             if (pstr comma = strchr(firstTexture, ','))
                 *comma = 0;  // Truncate at first comma
 
-            // D3D12: Compile NVRHI shaders directly (NO legacy ref_shader!)
             if (true) {
                 CompileLevelShader(i, n_sh, firstTexture);
             }

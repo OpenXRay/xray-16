@@ -820,7 +820,6 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
 
     MaterialKey key;
     key.psoType = PSOType::UI;
-    key.shader = nullptr;
     key.textureHash = shaderHash ^ (static_cast<u64>(topology) << 56);
     key.element = elementIndex;
     key.framebuffer = framebuffer;
@@ -833,7 +832,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
 
     m_stats.numCacheMisses++;
     m_stats.totalPSOCreations++;
-    MaterialPSO* pso = CreateUIPSO(uiShader, nullptr, nullptr, framebuffer, topology);
+    MaterialPSO* pso = CreateUIPSO(uiShader, framebuffer, topology);
     if (!pso)
         return nullptr;
 
@@ -846,8 +845,6 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
 
 MaterialPSO* MaterialCache::CreateUIPSO(
     IUIShader* uiShader,
-    ShaderElement* elem,
-    SPass* pass,
     nvrhi::IFramebuffer* framebuffer,
     fg::PrimitiveTopology topology)
 {
@@ -1193,19 +1190,6 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matData.alphaRef = 0.5f;
     matData.flags = 0;
     matData.shaderVariant = 0;
-
-    if (matPSO->pass) {
-        fg::STextureList* texList = matPSO->pass->T._get();
-        if (texList && !texList->empty()) {
-            for (size_t i = 0; i < texList->size(); i++) {
-                const auto& texPair = (*texList)[i];
-                if (texPair.first == 1) {
-                    matData.flags |= MAT_FLAG_HAS_NORMAL;
-                }
-            }
-        }
-    }
-
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
     matPSO->bindlessMaterialID = materialID;

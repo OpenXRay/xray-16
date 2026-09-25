@@ -9,9 +9,6 @@ struct r_aabb_ssa
 
 class r_pixel_calculator
 {
-    ref_rt rt;
-    ref_rt zb;
-
 public:
     void begin();
     r_aabb_ssa calculate(dxRender_Visual* V);

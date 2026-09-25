@@ -8,9 +8,7 @@
 #include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
-#include "Layers/xrRender/tss.h"
 #include "Layers/xrRender/Blender.h"
-#include "Layers/xrRender/Blender_Recorder.h"
 
 #include "Layers/xrRender/Blender_CLSID.h"
 #include "Layers/xrRender/blenders/blender_deffer_aref.h"
@@ -229,31 +227,6 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     }
 }
 
-ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
-{
-    if (S.passes.empty())
-        return nullptr;
-
-    // Search equal in shaders array
-    for (ShaderElement* elem : v_elements)
-        if (S.equal(*elem))
-            return elem;
-
-    // Create _new_ entry
-    ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
-    N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    return N;
-}
-
-void CResourceManager::_DeleteElement(const ShaderElement* S)
-{
-    if (0 == (S->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_elements, S))
-        return;
-    Msg("! ERROR: Failed to find compiled 'shader-element'");
-}
-
 
 
 IReader* open_shader(pcstr shader)
@@ -309,25 +282,6 @@ void CResourceManager::CompatibilityCheck()
         RImplementation.m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
-}
-
-Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    return nullptr;
-}
-
-Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    return nullptr;
-}
-
-void CResourceManager::Delete(const Shader* S)
-{
-    if (0 == (S->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_shaders, S))
-        return;
-    Msg("! ERROR: Failed to find complete shader");
 }
 
 void CResourceManager::DeferredUpload()

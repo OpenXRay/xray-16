@@ -34,7 +34,6 @@ u64 dxRender_Visual::AllocateLifetimeID()
 dxRender_Visual::dxRender_Visual()
 {
     Type = 0;
-    shader = nullptr;
     lifetimeID = AllocateLifetimeID();
     vis.clear();
 }
@@ -98,7 +97,6 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
 void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 {
     PCOPY(Type);
-    PCOPY(shader);
     PCOPY(shaderName);   // FrameGraph: copy shader name for deferred compilation
     PCOPY(textureName);  // FrameGraph: copy texture name for deferred compilation
     PCOPY(vis);

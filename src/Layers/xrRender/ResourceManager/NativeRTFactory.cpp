@@ -295,7 +295,6 @@ TextureHandle NativeRTFactory::CreateRenderTargetInternal(
     desc.isRenderTarget = !isDepthStencil;
     desc.isDepthStencil = isDepthStencil;
     desc.isUAV = isUAV;
-    desc.allowStreaming = false;  // Never stream render targets
     desc.debugName = debugName;
 
     // Determine texture type

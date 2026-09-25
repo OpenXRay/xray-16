@@ -189,8 +189,6 @@ BOOL CParticleEffect::Compile(CPEDef* def)
         if (m_Def->m_Flags.is(CPEDef::dfTimeLimit))
             m_fElapsedLimit = m_Def->m_fTimeLimit;
     }
-    if (def)
-        shader = def->m_CachedShader;
     return TRUE;
 }
 
@@ -356,14 +354,6 @@ u32 CParticleEffect::ParticlesCount()
 void CParticleEffect::Copy(dxRender_Visual*) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
 void CParticleEffect::OnDeviceCreate()
 {
-    if (m_Def)
-    {
-        if (m_Def->m_Flags.is(CPEDef::dfSprite))
-        {
-            if (m_Def)
-                shader = m_Def->m_CachedShader;
-        }
-    }
 }
 
 void CParticleEffect::OnDeviceDestroy()
@@ -373,7 +363,6 @@ void CParticleEffect::OnDeviceDestroy()
         if (m_Def->m_Flags.is(CPEDef::dfSprite))
         {
             geom.destroy();
-            shader.destroy();
         }
     }
 }

@@ -405,9 +405,6 @@ public:
     void occq_end(u32& ID) { m_HWOCC.occq_end(ID); }
     fg::R_occlusion::occq_result occq_get(u32& ID) { return m_HWOCC.occq_get(ID); }
 
-    fg::ref_shader m_WireShader;
-    fg::ref_shader m_SelectionShader;
-    fg::ref_shader m_PortalFadeShader;
     fg::_VertexStream Vertex;
     fg::_IndexStream Index;
     fg::IndexStagingBuffer QuadIB;

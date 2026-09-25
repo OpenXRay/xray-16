@@ -18,7 +18,6 @@ class FGDetailManager
 public:
     struct DetailObject
     {
-        ref_shader shader;
         ref_geom geometry;
         u32 number_vertices;
         u32 number_indices;

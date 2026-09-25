@@ -47,20 +47,3 @@ using HostBufferHandle     = void*;
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/r2_types.h"
 
-namespace xray::render::fg
-{
-IC void jitter(CBlender_Compile& C)
-{
-    //	C.r_Sampler	("jitter0",	JITTER(0), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
-    //	C.r_Sampler	("jitter1",	JITTER(1), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
-    //	C.r_Sampler	("jitter2",	JITTER(2), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
-    //	C.r_Sampler	("jitter3",	JITTER(3), true, nvrhi::SamplerAddressMode::Wrap, SamplerFilter::Point, SamplerFilter::Point, SamplerFilter::Point);
-    C.r_dx11Texture("jitter0", JITTER(0));
-    C.r_dx11Texture("jitter1", JITTER(1));
-    C.r_dx11Texture("jitter2", JITTER(2));
-    C.r_dx11Texture("jitter3", JITTER(3));
-    C.r_dx11Texture("jitter4", JITTER(4));
-    C.r_dx11Texture("jitterMipped", r2_jitter_mipped);
-    C.r_dx11Sampler("smp_jitter");
-}
-} // namespace xray::render::fg

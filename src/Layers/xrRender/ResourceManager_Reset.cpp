@@ -13,8 +13,6 @@ namespace xray::render::fg
 void CResourceManager::reset_begin()
 {
     ZoneScoped;
-    for (SState* sstate : v_states)
-        sstate->state = nullptr;
 
     // destroy RTs - stubbed, FrameGraph handles render targets
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
@@ -62,12 +60,6 @@ void CResourceManager::reset_end()
     }
 
     // create RTs - stubbed, FrameGraph handles render targets
-
-    // create state-blocks
-    for (SState* sstate : v_states)
-    {
-        sstate->state_code.record(sstate->state);
-    }
 }
 
 template <class C>
@@ -92,9 +84,6 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: textures  : %d", m_textures.size());
     if (!bBrief)
         mdump(m_textures);
-    Msg("* RM_Dump: rtargets  : %d", m_rtargets.size());
-    if (!bBrief)
-        mdump(m_rtargets);
     //  DX10 cut    Msg("* RM_Dump: rtargetsc : %d", m_rtargets_c.size()); if(!bBrief) mdump(m_rtargets_c);
     Msg("* RM_Dump: vs        : %d", m_vs.size());
     if (!bBrief)
@@ -117,12 +106,5 @@ void CResourceManager::Dump(bool bBrief)
         mdump(m_ds);
 #endif
     Msg("* RM_Dump: dcl       : %d", v_declarations.size());
-    Msg("* RM_Dump: states    : %d", v_states.size());
-    Msg("* RM_Dump: tex_list  : %d", lst_textures.size());
-    Msg("* RM_Dump: matrices  : %d", lst_matrices.size());
-    Msg("* RM_Dump: lst_constants: %d", lst_constants.size());
-    Msg("* RM_Dump: v_passes  : %d", v_passes.size());
-    Msg("* RM_Dump: v_elements: %d", v_elements.size());
-    Msg("* RM_Dump: v_shaders : %d", v_shaders.size());
 }
 } // namespace xray::render::fg

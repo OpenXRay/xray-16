@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureManager.h"
 #include "DDSLoader.h"
-#include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
 
 // Modern Texture Manager Implementation
@@ -145,9 +144,6 @@ TextureManager::TextureManager(RenderDevice* device)
     // Pre-allocate some capacity
     m_textures.reserve(1024);
 
-    // Create streaming manager
-    m_streamingManager = xr_make_unique<StreamingManager>(device, this);
-
     // Msg("! [TextureManager] Created with budget: %llu MB",
     //     m_memoryBudget / (1024 * 1024));
 }
@@ -220,11 +216,7 @@ void TextureManager::FreeHandle(TextureHandle handle) {
     meta.state = TextureState::Unloaded;
     meta.refCount = 0;
     meta.memoryUsed = 0;
-    meta.residentMips = 0;
-    meta.requestedMips = 0;
-    meta.totalMips = 0;
     meta.lastAccessTime = 0.0f;
-    meta.accessCount = 0;
     meta.videoActiveThisFrame = false;
 
     m_freeSlots.push_back(handle.index);
@@ -365,8 +357,6 @@ TextureHandle TextureManager::CreateTexture(
 
     if (meta.nvrhiTexture) {
         meta.state = TextureState::Resident;
-        meta.residentMips = desc.mipLevels;
-        meta.requestedMips = desc.mipLevels;
 
         // Calculate memory
         meta.memoryUsed = desc.CalculateMemorySize();
@@ -386,35 +376,6 @@ TextureHandle TextureManager::CreateTexture(
     return handle;
 }
 
-TextureHandle TextureManager::ImportTexture(
-    nvrhi::TextureHandle nvrhiTexture,
-    const TextureDesc& desc,
-    const char* debugName)
-{
-    // Allocate handle
-    TextureHandle handle = AllocateHandle();
-    TextureMetadata& meta = m_textures[handle.index];
-
-    // Setup metadata
-    meta.desc = desc;
-    meta.filePath = debugName;
-    meta.state = TextureState::Resident;
-    meta.priority = TexturePriority::Critical;  // Imported textures (like backbuffer) never evict
-    meta.isAlive = true;
-    meta.refCount = 1;
-    meta.nvrhiTexture = nvrhiTexture;
-    meta.residentMips = desc.mipLevels;
-    meta.totalMips = desc.mipLevels;
-    meta.memoryUsed = desc.CalculateMemorySize();
-
-    m_memoryUsed += meta.memoryUsed;
-
-    m_stats.texturesTotal++;
-    m_stats.texturesResident++;
-
-    return handle;
-}
-
 // ═══════════════════════════════════════════════════
 //  ACCESS
 // ═══════════════════════════════════════════════════
@@ -429,7 +390,6 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     // ═══════════════════════════════════════════════════
 
     meta.lastAccessTime = 0.0f;  // Reset LRU timer
-    meta.accessCount++;
 
     // Mark video as active for this frame (enables decoding)
     if (meta.videoTextureData) {
@@ -475,28 +435,6 @@ TextureHandle TextureManager::FindTexture(const char* path, fg::TextureColorSpac
             return handle;
     }
     return TextureHandle();  // Invalid handle
-}
-
-bool TextureManager::IsResident(TextureHandle handle) const {
-    if (!ValidateHandle(handle)) return false;
-    return m_textures[handle.index].IsResident();
-}
-
-// ═══════════════════════════════════════════════════
-//  STREAMING CONTROL (Stubs for Week 2)
-// ═══════════════════════════════════════════════════
-
-void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
-    if (!ValidateHandle(handle)) return;
-
-    const TextureMetadata& meta = m_textures[handle.index];
-    u32 targetMips = std::min(mipCount, meta.totalMips);
-
-    // Update requested count
-    m_textures[handle.index].requestedMips = targetMips;
-
-    // Forward to streaming manager
-    m_streamingManager->RequestMips(handle, targetMips, meta.priority);
 }
 
 // ═══════════════════════════════════════════════════
@@ -549,9 +487,6 @@ void TextureManager::Update(float deltaTime) {
 
     // Update sequence textures (animated .seq)
     UpdateSequenceTextures(deltaTime);
-
-    // Update streaming
-    m_streamingManager->Update(deltaTime);
 }
 
 // ═══════════════════════════════════════════════════
@@ -672,19 +607,10 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
     }
 
-    const bool singleFrame = isVideoTexture || isSequenceTexture;
     meta.state = TextureState::Resident;
-    meta.residentMips = singleFrame ? 1 : sourceDesc.mipLevels;
-    meta.totalMips = singleFrame ? 1 : sourceDesc.mipLevels;
-    meta.requestedMips = singleFrame ? 1 : sourceDesc.mipLevels;
     meta.memoryUsed = sourceDataSize;
 
     m_memoryUsed += meta.memoryUsed;
-}
-
-void TextureManager::StreamMips(TextureHandle handle, u32 targetMips) {
-    // Forward to streaming manager
-    m_streamingManager->RequestMips(handle, targetMips, TexturePriority::Medium);
 }
 
 // ═══════════════════════════════════════════════════
@@ -730,94 +656,6 @@ void TextureManager::PrintStatistics() const {
         stats.texturesTotal,
         stats.texturesResident,
         stats.texturesLoading);
-}
-
-// ═══════════════════════════════════════════════════
-//  THREAD-SAFE OPERATIONS (Week 3)
-// ═══════════════════════════════════════════════════
-
-TextureHandle TextureManager::LoadTextureThreadSafe(
-    const char* path,
-    TexturePriority priority)
-{
-    const TextureKey key{ shared_str(path), fg::TextureColorSpace::Linear };
-
-    // Check if already loaded (thread-safe)
-    {
-        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
-
-        auto it = m_pathToHandle.find(key);
-        if (it != m_pathToHandle.end()) {
-            TextureHandle existing = it->second;
-
-            if (ValidateHandleThreadSafe(existing)) {
-                AddRef(existing);
-                return existing;
-            }
-        }
-    }
-
-    // Allocate handle (thread-safe)
-    TextureHandle handle = AllocateHandleThreadSafe();
-
-    // Setup metadata
-    {
-        std::lock_guard<std::mutex> lock(m_texturesMutex);
-
-        TextureMetadata& meta = m_textures[handle.index];
-        meta.filePath = key.path;
-        meta.colorSpace = key.colorSpace;
-        meta.state = TextureState::Unloaded;
-        meta.priority = priority;
-        meta.isAlive = true;
-        meta.refCount = 1;  // Initial reference
-    }
-
-    // Register path
-    {
-        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
-        m_pathToHandle[key] = handle;
-    }
-
-    // Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
-
-    // Load synchronously (thread-safe mutex protection above ensures correctness)
-    LoadTextureSync(handle);
-
-    return handle;
-}
-
-TextureHandle TextureManager::AllocateHandleThreadSafe() {
-    std::lock_guard<std::mutex> lock(m_texturesMutex);
-    return AllocateHandle();  // Use existing non-thread-safe version under lock
-}
-
-bool TextureManager::ValidateHandleThreadSafe(TextureHandle handle) const {
-    std::lock_guard<std::mutex> lock(m_texturesMutex);
-    return ValidateHandle(handle);  // Use existing non-thread-safe version under lock
-}
-
-// ═══════════════════════════════════════════════════
-
-const char* TextureStateToString(TextureState state) {
-    switch (state) {
-        case TextureState::Unloaded: return "Unloaded";
-        case TextureState::Loading: return "Loading";
-        case TextureState::Resident: return "Resident";
-        case TextureState::Missing: return "Missing";
-        default: return "Unknown";
-    }
-}
-
-const char* TexturePriorityToString(TexturePriority priority) {
-    switch (priority) {
-        case TexturePriority::Critical: return "Critical";
-        case TexturePriority::High: return "High";
-        case TexturePriority::Medium: return "Medium";
-        case TexturePriority::Low: return "Low";
-        case TexturePriority::VeryLow: return "VeryLow";
-        default: return "Unknown";
-    }
 }
 
 // ═══════════════════════════════════════════════════

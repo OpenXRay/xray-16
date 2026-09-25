@@ -23,7 +23,6 @@
 #include "Layers/xrRender/Materials/ShaderInfo.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/fgUIRender.h"
-#include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
 #include "xrEngine/device.h"

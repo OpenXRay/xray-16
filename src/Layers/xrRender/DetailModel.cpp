@@ -21,7 +21,6 @@ void CDetail::Unload()
         xr_free(indices);
         indices = nullptr;
     }
-    shader.destroy();
 
 #if !defined(_EDITOR) && defined(USE_DX11)
     // Release per-object VB/IB/Geom

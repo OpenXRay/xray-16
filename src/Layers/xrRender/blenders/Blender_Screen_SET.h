@@ -13,10 +13,6 @@ public:
     xrP_BOOL oFog;
     xrP_BOOL oClamp;
 
-private:
-    void CompileFixed(CBlender_Compile& C);
-    void CompileProgrammed(CBlender_Compile& C);
-
 public:
     CBlender_Screen_SET();
     ~CBlender_Screen_SET() override = default;
@@ -25,7 +21,5 @@ public:
 
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 };
 } // namespace xray::render::fg

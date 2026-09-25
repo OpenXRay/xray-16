@@ -7,8 +7,8 @@
 
 namespace xray::render::fg
 {
-fgObjectSpaceRender::fgObjectSpaceRender() { m_shDebug.create("debug" DELIMITER "wireframe", "$null"); }
-fgObjectSpaceRender::~fgObjectSpaceRender() { m_shDebug.destroy(); }
+fgObjectSpaceRender::fgObjectSpaceRender() {}
+fgObjectSpaceRender::~fgObjectSpaceRender() {}
 void fgObjectSpaceRender::Copy(IObjectSpaceRender& _in) { *this = *(fgObjectSpaceRender*)&_in; }
 void fgObjectSpaceRender::dbgAddSphere(const Fsphere& sphere, u32 colour) { dbg_S.emplace_back(sphere, colour); }
 void fgObjectSpaceRender::dbgReserveSphere(size_t count) { dbg_S.reserve(count); }

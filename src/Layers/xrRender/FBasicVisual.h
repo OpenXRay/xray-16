@@ -73,7 +73,6 @@ public:
     // Common data for rendering
     u32 Type; // visual's type
     vis_data vis; // visibility-data
-    ref_shader shader; // pipe state, shared
 
     // FrameGraph: deferred shader compilation (store names, compile on-demand)
     shared_str shaderName;   // e.g., "models\\model"

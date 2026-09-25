@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrCore/xr_resource.h"
-#include "tss_def.h"
+#include "r_constants.h"
 
 // Forward declarations for Slang reflection
 namespace slang {
@@ -98,24 +98,6 @@ struct ECORE_API SCS : public xr_resource_named
 
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Compute; }
 };
-
-struct ECORE_API resptrcode_cs : public resptr_base<SCS>
-{
-    void create(LPCSTR name);
-    void destroy() { _set(nullptr); }
-};
-
-typedef resptr_core<SCS, resptrcode_cs> ref_cs;
-
-//////////////////////////////////////////////////////////////////////////
-struct ECORE_API SState : public xr_resource_flagged
-{
-    void* state = nullptr;
-    SimulatorStates state_code;
-    SState() = default;
-    ~SState();
-};
-typedef resptr_core<SState, resptr_base<SState>> ref_state;
 
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SDeclaration : public xr_resource_flagged

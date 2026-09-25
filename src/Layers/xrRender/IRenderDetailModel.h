@@ -28,7 +28,6 @@ public:
     float m_fMinScale;
     float m_fMaxScale;
 
-    ref_shader shader;
     shared_str shaderName;   // D3D12: Store for MaterialSystem lookup
     shared_str textureName;  // D3D12: Store for MaterialSystem lookup
     fvfVertexIn* vertices;

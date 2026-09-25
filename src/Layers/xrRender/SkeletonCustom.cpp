@@ -647,7 +647,7 @@ bool CKinematics::PickBone(const Fmatrix& parent_xform, IKinematics::pick_result
 }
 
 void CKinematics::AddWallmark(
-    const Fmatrix* parent_xform, const Fvector3& start, const Fvector3& dir, ref_shader shader, float size)
+    const Fmatrix* parent_xform, const Fvector3& start, const Fvector3& dir, float size)
 {
     ZoneScoped;
 
@@ -714,7 +714,7 @@ void CKinematics::AddWallmark(
     for (u32 wm_idx = 0; wm_idx < wallmarks.size(); wm_idx++)
     {
         intrusive_ptr<CSkeletonWallmark>& wm = wallmarks[wm_idx];
-        if (wm->Similar(shader, cp, 0.02f))
+        if (wm->Similar(cp, 0.02f))
         {
             if (wm_idx < wallmarks.size() - 1)
                 wm = wallmarks.back();
@@ -724,7 +724,7 @@ void CKinematics::AddWallmark(
     }
 
     // ok. allocate wallmark
-    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, shader, cp, Device.fTimeGlobal);
+    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, cp, Device.fTimeGlobal);
     wm->m_LocalBounds.set(cp, size * 2.f);
     wm->XFORM()->transform_tiny(wm->m_Bounds.P, cp);
     wm->m_Bounds.R = wm->m_LocalBounds.R;

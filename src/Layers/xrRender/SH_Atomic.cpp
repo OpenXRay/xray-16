@@ -21,11 +21,6 @@ namespace xray::render::fg
 //     _RELEASE(ps);
 //     dxRenderDeviceRender::Instance().Resources->_DeletePS(this);
 //}
-//SState::~SState()
-//{
-//    _RELEASE(state);
-//    dxRenderDeviceRender::Instance().Resources->_DeleteState(this);
-//}
 //SDeclaration::~SDeclaration()
 //{
 //    _RELEASE(dcl);
@@ -134,14 +129,6 @@ SPP::~SPP()
 }
 #endif // USE_OGL
 
-
-///////////////////////////////////////////////////////////////////////
-//	SState
-SState::~SState()
-{
-    state = nullptr;
-    RImplementation.Resources->_DeleteState(this);
-}
 
 ///////////////////////////////////////////////////////////////////////
 //	SDeclaration

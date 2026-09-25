@@ -34,34 +34,4 @@ void CBlender_Editor_Wire::Load(IReader& fs, u16 version)
 
     xrPREAD_PROP(fs, xrPID_CONSTANT, oT_Factor);
 }
-
-void CBlender_Editor_Wire::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        // Stage0 - Base texture
-        C.StageBegin();
-        C.Stage_Texture("$null");
-        C.Stage_Matrix("$null", 0);
-        C.Stage_Constant("$null");
-    }
-    C.PassEnd();
-}
-
-void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
-{
-    IBlender::Compile(C);
-
-    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
-    {
-        CompileForEditor(C);
-        return;
-    }
-
-    C.PassBegin();
-    {
-        C.PassSET_Shaders("editor", "simple_color");
-    }
-    C.PassEnd();
-}
 } // namespace xray::render::fg

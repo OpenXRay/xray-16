@@ -9,10 +9,6 @@ public:
     string64 oT2_xform; // xform for secondary texture
     xrP_BOOL oBlend;
 
-private:
-    void CompileFFP(CBlender_Compile& C) const;
-    void CompileProgrammable(CBlender_Compile& C) const;
-
 public:
     CBlender_Model_EbB();
     ~CBlender_Model_EbB() override = default;
@@ -20,7 +16,5 @@ public:
     LPCSTR getComment() override;
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 };
 } // namespace xray::render::fg

@@ -34,43 +34,4 @@ void CBlender_Editor_Selection::Load(IReader& fs, u16 version)
 
     xrPREAD_PROP(fs, xrPID_CONSTANT, oT_Factor);
 }
-
-void CBlender_Editor_Selection::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        C.PassSET_ZB(true, false);
-        C.PassSET_Blend(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha, false, 0);
-
-        // Stage0 - Base texture
-        C.StageBegin();
-        C.StageSET_Address(nvrhi::SamplerAddressMode::Clamp);
-        C.Stage_Texture(oT_Name);
-        C.Stage_Matrix(oT_xform, 0);
-        C.Stage_Constant("$null");
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
-void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
-{
-    IBlender::Compile(C);
-
-    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
-    {
-        CompileForEditor(C);
-        return;
-    }
-
-    C.PassBegin();
-    {
-        C.PassSET_Shaders("editor", "simple_color");
-
-        C.PassSET_LightFog(false, true);
-        C.PassSET_ZB(true, false);
-        C.PassSET_ablend_mode(true, nvrhi::BlendFactor::SrcAlpha, nvrhi::BlendFactor::InvSrcAlpha);
-    }
-    C.PassEnd();
-}
 } // namespace xray::render::fg

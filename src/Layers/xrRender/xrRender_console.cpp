@@ -24,9 +24,6 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/Shaders/SlangCompilerTest.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
-#ifdef DEBUG
-#include "Layers/xrRender/ResourceManager/TestTextureManager.h"
-#endif
 #endif
 
 // Detail manager debug
@@ -1145,43 +1142,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
     CMD4(CCC_Integer, "fg_hot_reload_shaders", &ps_fg_hot_reload_shaders, 0, 1);
     CMD4(CCC_Integer, "fg_retina", &ps_fg_retina, 0, 1);
-
-#ifdef DEBUG
-    // TextureManager unit tests (Week 1 Day 2)
-    using namespace xray::render::resources::test;
-
-    class CCC_TestTextureManager : public IConsole_Command {
-    public:
-        CCC_TestTextureManager(LPCSTR N) : IConsole_Command(N) {
-            bEmptyArgsHandled = true;
-        }
-
-        virtual void Execute(LPCSTR args) {
-            // Run tests
-            if (!args || !args[0] || EQ(args, "all")) {
-                RunAllTests();
-            } else if (EQ(args, "handles")) {
-                RunHandleTests();
-            } else if (EQ(args, "dds")) {
-                RunDDSTests();
-            } else if (EQ(args, "manager")) {
-                RunTextureManagerTests();
-            } else {
-                Msg("! Usage: test_texture_manager [handles|dds|manager|all]");
-                Msg("!   handles - Test handle allocation and validation");
-                Msg("!   dds     - Test DDS file loader");
-                Msg("!   manager - Test TextureManager functionality");
-                Msg("!   all     - Run all tests (default)");
-            }
-        }
-
-        virtual void Info(TInfo& I) {
-            xr_strcpy(I, "[handles|dds|manager|all]");
-        }
-    };
-
-    CMD1(CCC_TestTextureManager, "test_texture_manager");
-#endif // DEBUG
 #endif // RENDER == R_R4
 #endif // USE_DX11
 }

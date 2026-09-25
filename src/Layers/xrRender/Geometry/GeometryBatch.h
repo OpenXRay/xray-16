@@ -3,7 +3,7 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
-#include "Layers/xrRender/Shader.h"  // For ShaderElement flags (legacy)
+#include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"  // For dxRender_Visual
 #include "Layers/xrRender/GPUCullingManager.h"  // For MeshAllocation
 #include "Layers/xrRender/Materials/MaterialSystem.h"  // For D3D12 material info

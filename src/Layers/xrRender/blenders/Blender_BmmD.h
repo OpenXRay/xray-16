@@ -11,10 +11,6 @@ class CBlender_BmmD : public IBlender
     string64 oB_Name; //. задел на будущее
     string64 oA_Name; //. задел на будущее
 
-private:
-    void CompileFFP(CBlender_Compile& C) const;
-    void CompileProgrammable(CBlender_Compile& C) const;
-
 public:
     LPCSTR getComment() override;
     BOOL canBeDetailed() override;
@@ -22,8 +18,6 @@ public:
     BOOL canUseSteepParallax() override;
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 
     // Accessor methods for detail texture names (used by bindless terrain rendering)
     const char* GetDetailR() const { return oR_Name; }

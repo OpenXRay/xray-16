@@ -79,7 +79,6 @@ public:
     {
         DrawCross(p, sz, sz, sz, sz, sz, sz, clr, bRot45);
     }
-    virtual void DrawEntity(u32 clr, ref_shader s);
     virtual void DrawFlag(
         const Fvector& p, float heading, float height, float sz, float sz_fl, u32 clr, BOOL bDrawEntity);
     virtual void DrawRomboid(const Fvector& p, float radius, u32 clr);
