@@ -200,8 +200,31 @@ u32 FGRenderBase::GetCacheStatPolys()
 
 void FGRenderBase::Begin()
 {
-    if (GEnv.Backend)
-        GEnv.Backend->BeginFrame();
+    if (!GEnv.Backend)
+        return;
+    ApplyHDROutputRequest();
+    GEnv.Backend->BeginFrame();
+}
+
+void FGRenderBase::ApplyHDROutputRequest()
+{
+    const bool requested = ps_r_hdr_output != 0;
+    if (GEnv.Backend->GetDisplayOutput().hdr == requested || GEnv.Backend->GetDeviceState() != DeviceState::Normal)
+        return;
+
+    const auto [width, height] = GEnv.Backend->GetBackBufferSize();
+    OnBackBufferResizing(width, height);
+    const bool applied = GEnv.Backend->SetHDROutput(requested);
+    OnBackBufferResized(width, height);
+
+    if (applied)
+    {
+        Msg("* [Display] HDR output %s on %s", requested ? "enabled" : "disabled", GEnv.Backend->GetAPIName());
+        return;
+    }
+
+    Msg("! [Display] HDR output could not be %s on %s", requested ? "enabled" : "disabled", GEnv.Backend->GetAPIName());
+    ps_r_hdr_output = GEnv.Backend->GetDisplayOutput().hdr ? 1 : 0;
 }
 
 void FGRenderBase::End()

@@ -27,3 +27,13 @@ nvrhi::ITexture* IRenderBackend::GetBindlessTexture(u32)
 {
     return nullptr;
 }
+
+bool IRenderBackend::SetHDROutput(bool enabled)
+{
+    return !enabled;
+}
+
+IRenderBackend::DisplayOutput IRenderBackend::GetDisplayOutput() const
+{
+    return {};
+}

@@ -27,7 +27,21 @@ constexpr float kExposureMaxDeltaTime = 0.25f;
 
 static_assert(sizeof(ExposureHistogramConstants) == 16, "ExposureHistogramParams layout");
 static_assert(sizeof(ExposureAdaptConstants) == 32, "ExposureAdaptParams layout");
-static_assert(sizeof(DisplayOutputConstants) == 128, "DisplayOutputParams layout");
+static_assert(sizeof(DisplayOutputConstants) == 144, "DisplayOutputParams layout");
+
+constexpr float kMinSdrWhiteLevel = 0.1f;
+constexpr float kMaxDisplayPeak = 64.0f;
+
+void ApplyDisplayOutput(const IRenderBackend::DisplayOutput& displayOutput, nvrhi::Format outputFormat,
+    DisplayOutputConstants& constants)
+{
+    if (!displayOutput.hdr || nvrhi::getFormatInfo(outputFormat).kind != nvrhi::FormatKind::Float)
+        return;
+
+    constants.outputHdr = 1u;
+    constants.sdrWhiteLevel = std::max(displayOutput.sdrWhiteLevel, kMinSdrWhiteLevel);
+    constants.displayPeak = std::clamp(displayOutput.headroom, 1.0f, kMaxDisplayPeak);
+}
 
 void ApplyPostProcess(const PostProcessFrame& postProcess, DisplayOutputConstants& constants)
 {
@@ -452,13 +466,15 @@ VirtualResourceHandle setupDisplayOutputPass(
     u32 height,
     const DisplayCalibration& calibration,
     const PostProcessFrame& postProcess,
+    const IRenderBackend::DisplayOutput& displayOutput,
     DisplayPassState& state,
     const LightingFrameState* lighting)
 {
     VERIFY(interfaceLayer.is_valid());
     VERIFY(output.is_valid());
 
-    EnsureOutputPipeline(device, fg.GetResourceDesc(output).format, state);
+    const nvrhi::Format outputFormat = fg.GetResourceDesc(output).format;
+    EnsureOutputPipeline(device, outputFormat, state);
 
     DisplayOutputConstants constants;
     constants.tonemapper = ps_r_tonemap;
@@ -473,6 +489,7 @@ VirtualResourceHandle setupDisplayOutputPass(
         constants.bloomNormalization = 1.0f / float(bloom.levels);
     }
     ApplyPostProcess(postProcess, constants);
+    ApplyDisplayOutput(displayOutput, outputFormat, constants);
 
     const VirtualResourceHandle bloomTexture = bloomValid ? bloom.texture : VirtualResourceHandle();
     auto& passData = fg.addCallbackPass<DisplayOutputPassData>(

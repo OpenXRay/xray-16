@@ -118,6 +118,17 @@ public:
     virtual std::pair<u32, u32> GetBackBufferSize() const = 0;
     virtual void ResizeSwapChain(u32 width, u32 height) {}
 
+    class DisplayOutput
+    {
+    public:
+        bool hdr = false;
+        float sdrWhiteLevel = 1.0f;
+        float headroom = 1.0f;
+    };
+
+    virtual bool SetHDROutput(bool enabled);
+    virtual DisplayOutput GetDisplayOutput() const;
+
     // ═══════ Frame Sync ═══════
     virtual void BeginFrame() = 0;
     virtual void EndFrame() = 0;

@@ -65,6 +65,8 @@ public:
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
     void ResizeSwapChain(u32 width, u32 height) override;
+    bool SetHDROutput(bool enabled) override;
+    DisplayOutput GetDisplayOutput() const override;
 
     void BeginFrame() override;
     void EndFrame() override;
@@ -101,6 +103,7 @@ private:
     void DestroySyncObjects();
     void CreateBindlessResources();
     void QueryCapabilities();
+    bool SurfaceSupportsHDR() const;
 
     VkInstance m_instance = VK_NULL_HANDLE;
     VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
@@ -152,6 +155,10 @@ private:
     u32 m_acquiredImageCount = 0;
     u32 m_maxAcquiredImageCount = 1;
     VkFormat m_swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
+    SDL_Window* m_window = nullptr;
+    bool m_swapchainColorSpaceEnabled = false;
+    bool m_hdrOutput = false;
+    bool m_hdrActive = false;
 
     TaskHandle m_gcTask;
     bool m_asyncComputeEnabled = false;

@@ -56,6 +56,30 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
     return VK_FALSE;
 }
 
+static bool ContainsExtension(const xr_vector<const char*>& extensions, const char* name)
+{
+    for (const char* extension : extensions)
+    {
+        if (!strcmp(extension, name))
+            return true;
+    }
+    return false;
+}
+
+static bool FindSurfaceFormat(const xr_vector<VkSurfaceFormatKHR>& formats, VkFormat format,
+    VkColorSpaceKHR colorSpace, bool anyColorSpace, VkSurfaceFormatKHR& selected)
+{
+    for (const VkSurfaceFormatKHR& candidate : formats)
+    {
+        if (candidate.format == format && (anyColorSpace || candidate.colorSpace == colorSpace))
+        {
+            selected = candidate;
+            return true;
+        }
+    }
+    return false;
+}
+
 VulkanBackend::VulkanBackend() = default;
 
 VulkanBackend::~VulkanBackend() {
@@ -74,6 +98,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
 
     Msg("* [VulkanBackend] Initializing...");
     m_validationEnabled = enableValidation;
+    m_window = window;
 
     if (!CreateInstance(window, enableValidation)) { Shutdown(); return false; }
     Msg("* [VulkanBackend] Instance created, m_instance=%p", m_instance);
@@ -132,6 +157,8 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     const char* const* sdlExts = SDL_Vulkan_GetInstanceExtensions(&sdlExtCount);
     xr_vector<const char*> instanceExts(sdlExts, sdlExts + sdlExtCount);
     instanceExts.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    if (m_swapchainColorSpaceEnabled && !ContainsExtension(instanceExts, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+        instanceExts.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
     deviceDesc.instanceExtensions = instanceExts.data();
     deviceDesc.numInstanceExtensions = instanceExts.size();
 
@@ -280,6 +307,8 @@ void VulkanBackend::Shutdown() {
         m_instance = VK_NULL_HANDLE;
     }
 
+    m_window = nullptr;
+    m_hdrActive = false;
     m_initialized = false;
     m_pipelineCacheData.clear();
     Msg("* [VulkanBackend] Shutdown complete");
@@ -346,6 +375,19 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     }
     xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    u32 availableExtensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
+    xr_vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
+    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
+    m_swapchainColorSpaceEnabled = false;
+    for (const VkExtensionProperties& available : availableExtensions)
+    {
+        if (!strcmp(available.extensionName, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+            m_swapchainColorSpaceEnabled = true;
+    }
+    if (m_swapchainColorSpaceEnabled && !ContainsExtension(extensions, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+        extensions.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
 
     xr_vector<const char*> layers;
     if (enableValidation) {
@@ -752,26 +794,17 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     xr_vector<VkSurfaceFormatKHR> formats(formatCount);
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
 
-    m_swapchainFormat = VK_FORMAT_R8G8B8A8_UNORM;
-    VkColorSpaceKHR colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-    bool foundFormat = false;
-    for (const auto& fmt : formats) {
-        if (fmt.format == VK_FORMAT_R8G8B8A8_UNORM) {
-            m_swapchainFormat = fmt.format;
-            colorSpace = fmt.colorSpace;
-            foundFormat = true;
-            break;
-        }
-    }
-    if (!foundFormat) {
-        for (const auto& fmt : formats) {
-            if (fmt.format == VK_FORMAT_B8G8R8A8_UNORM) {
-                m_swapchainFormat = fmt.format;
-                colorSpace = fmt.colorSpace;
-                break;
-            }
-        }
-    }
+    VkSurfaceFormatKHR surfaceFormat = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+    const bool hdr = m_hdrOutput && m_swapchainColorSpaceEnabled
+        && FindSurfaceFormat(formats, VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT, false, surfaceFormat);
+    if (!hdr
+        && !FindSurfaceFormat(formats, VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, false, surfaceFormat)
+        && !FindSurfaceFormat(formats, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, false, surfaceFormat)
+        && !FindSurfaceFormat(formats, VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, true, surfaceFormat))
+        FindSurfaceFormat(formats, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, true, surfaceFormat);
+    m_swapchainFormat = surfaceFormat.format;
+    const VkColorSpaceKHR colorSpace = surfaceFormat.colorSpace;
+    m_hdrActive = hdr;
 
     u32 presentModeCount = 0;
     vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
@@ -839,8 +872,8 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_swapchainVSync = wantVSync;
     m_swapchainNeedsReset.store(false, std::memory_order_release);
 
-    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d",
-        extent.width, extent.height, imageCount, m_swapchainFormat);
+    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d, color space %d",
+        extent.width, extent.height, imageCount, m_swapchainFormat, colorSpace);
     return true;
 }
 
@@ -855,9 +888,11 @@ void VulkanBackend::DestroySwapChain() {
 }
 
 void VulkanBackend::CreateBackBufferTextures() {
-    nvrhi::Format nvFormat = (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
-        ? nvrhi::Format::RGBA8_UNORM
-        : nvrhi::Format::BGRA8_UNORM;
+    nvrhi::Format nvFormat = nvrhi::Format::BGRA8_UNORM;
+    if (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
+        nvFormat = nvrhi::Format::RGBA8_UNORM;
+    else if (m_swapchainFormat == VK_FORMAT_R16G16B16A16_SFLOAT)
+        nvFormat = nvrhi::Format::RGBA16_FLOAT;
 
     m_backBuffers.resize(m_swapchainImages.size());
     for (u32 i = 0; i < m_swapchainImages.size(); i++) {
@@ -1028,6 +1063,44 @@ void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
     R_ASSERT2(CreateSwapChain(width, height), "Vulkan swapchain recreation failed");
     CreateBackBufferTextures();
     CreateSyncObjects();
+}
+
+bool VulkanBackend::SurfaceSupportsHDR() const {
+    if (!m_swapchainColorSpaceEnabled || !m_physicalDevice || !m_surface)
+        return false;
+    u32 formatCount = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    xr_vector<VkSurfaceFormatKHR> formats(formatCount);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+    VkSurfaceFormatKHR selected = {};
+    return FindSurfaceFormat(formats, VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT, false, selected);
+}
+
+bool VulkanBackend::SetHDROutput(bool enabled) {
+    if (enabled == m_hdrActive) {
+        m_hdrOutput = enabled;
+        return true;
+    }
+    if (!m_initialized || m_inFrame)
+        return false;
+    const bool windowHDR = m_window
+        && SDL_GetBooleanProperty(SDL_GetWindowProperties(m_window), SDL_PROP_WINDOW_HDR_ENABLED_BOOLEAN, false);
+    if (enabled && (!windowHDR || !SurfaceSupportsHDR()))
+        return false;
+    m_hdrOutput = enabled;
+    ResizeSwapChain(m_backBufferWidth, m_backBufferHeight);
+    return m_hdrActive == enabled;
+}
+
+IRenderBackend::DisplayOutput VulkanBackend::GetDisplayOutput() const {
+    DisplayOutput output;
+    output.hdr = m_hdrActive;
+    if (m_hdrActive && m_window) {
+        const SDL_PropertiesID properties = SDL_GetWindowProperties(m_window);
+        output.sdrWhiteLevel = SDL_GetFloatProperty(properties, SDL_PROP_WINDOW_SDR_WHITE_LEVEL_FLOAT, 1.0f);
+        output.headroom = SDL_GetFloatProperty(properties, SDL_PROP_WINDOW_HDR_HEADROOM_FLOAT, 1.0f);
+    }
+    return output;
 }
 
 void VulkanBackend::BeginFrame() {
