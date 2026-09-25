@@ -1,14 +1,9 @@
 #include "stdafx.h"
 #include "Layers/xrRender/fgUIShader.h"
 #include "Layers/xrRender/xrRender_console.h"
-#include "Layers/xrRender/RenderContext/RenderDevice.h"
-#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
-#include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "xrEngine/IRenderBackend.h"
-
-using namespace xray::render::resources;
 
 namespace xray::render::fg
 {
@@ -64,24 +59,21 @@ u32 fgUIShader::GetBindlessIndex()
     if (m_bindlessTextureIndex != UINT32_MAX)
         return m_bindlessTextureIndex;
 
-    if (!m_baseTexture)
+    nvrhi::ITexture* texture = LoadBaseTexture();
+    if (!texture || !GEnv.Backend)
         return UINT32_MAX;
 
-    auto* texManager = RImplementation.GetRenderDevice()->GetFGResourceManager()->GetTextureManager();
-    auto handle = texManager->LoadTexture(m_baseTexture->cName.c_str());
-
-    if (!handle.IsValid())
-        return UINT32_MAX;
-
-    nvrhi::ITexture* nvTex = texManager->GetNVRHITexture(handle);
-    if (!nvTex)
-        return UINT32_MAX;
-
-    if (!GEnv.Backend)
-        return UINT32_MAX;
-
-    m_bindlessTextureIndex = GEnv.Backend->RegisterBindlessTexture(nvTex);
+    m_bindlessTextureIndex = GEnv.Backend->RegisterBindlessTexture(texture);
     return m_bindlessTextureIndex;
+}
+
+nvrhi::ITexture* fgUIShader::LoadBaseTexture()
+{
+    if (!m_baseTexture)
+        return nullptr;
+    if (!m_baseTexture->flags.bLoaded)
+        m_baseTexture->Load();
+    return m_baseTexture->surface_get_native();
 }
 
 void fgUIShader::destroy()
@@ -130,27 +122,12 @@ xrImTextureData fgUIShader::GetImGuiTextureId()
 bool fgUIShader::GetBaseTextureResolution(Fvector2& res)
 {
     res = { 1.0f, 1.0f };
-    const auto texture = GetBaseTexture();
+    nvrhi::ITexture* texture = LoadBaseTexture();
     if (!texture)
         return false;
 
-    FGResourceManager* resourceMgr = RImplementation.GetRenderDevice()->GetFGResourceManager();
-    if (!resourceMgr)
-        return false;
-
-    TextureManager* texManager = resourceMgr->GetTextureManager();
-    TextureHandle handle = texManager->LoadTexture(texture->cName.c_str());
-    if (!handle.IsValid())
-        return false;
-
-    nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
-    bool ok = (nvrhiTexture != nullptr);
-    if (ok)
-    {
-        const auto& desc = nvrhiTexture->getDesc();
-        res = { float(desc.width), float(desc.height) };
-    }
-    texManager->Release(handle);
-    return ok;
+    const auto& desc = texture->getDesc();
+    res = { float(desc.width), float(desc.height) };
+    return true;
 }
 }

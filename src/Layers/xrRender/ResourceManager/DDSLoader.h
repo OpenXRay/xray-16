@@ -3,6 +3,8 @@
 #include "TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
+class ENGINE_API CTheoraSurface;
+
 namespace xray::render::resources {
 
 #define DDS_MAGIC 0x20534444

@@ -19,8 +19,6 @@ enum class TextureState : u8 {
     Unloaded,
     Loading,
     Resident,
-    Evicting,
-    Evicted,
     Missing,
 };
 
@@ -109,12 +107,6 @@ struct TextureMetadata {
     bool NeedsStreaming() const {
         return requestedMips > residentMips && state == TextureState::Resident;
     }
-
-    bool CanEvict() const {
-        return priority >= TexturePriority::Low &&
-               refCount == 0 &&
-               state == TextureState::Resident;
-    }
 };
 
 class TextureKey
@@ -169,20 +161,13 @@ public:
 
     TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;
 
-    void SetMemoryBudget(u64 bytes);
     u64 GetMemoryBudget() const { return m_memoryBudget; }
 
     void RequestMips(TextureHandle handle, u32 mipCount);
 
-    void SetPriority(TextureHandle handle, TexturePriority priority);
-
-    void Touch(TextureHandle handle);
-
     void AddRef(TextureHandle handle);
 
     void Release(TextureHandle handle);
-
-    void Evict(TextureHandle handle);
 
     void Update(float deltaTime);
 
@@ -193,10 +178,8 @@ public:
         u32 texturesTotal = 0;
         u32 texturesResident = 0;
         u32 texturesLoading = 0;
-        u32 texturesEvicted = 0;
 
         u32 streamingRequestsPending = 0;
-        u32 evictionsPending = 0;
 
         float memoryUsagePercent() const {
             if (memoryBudget == 0) return 0.0f;
@@ -229,11 +212,6 @@ private:
 
     void LoadTextureSync(TextureHandle handle);
     void StreamMips(TextureHandle handle, u32 targetMips);
-
-    bool CheckMemoryBudget(u64 requiredBytes) const;
-    bool EnforceMemoryBudget(u64 requiredBytes);
-    bool EvictTextures(u64 bytesNeeded);
-    void EvictTextureInternal(TextureHandle handle);
 
     void UpdateVideoTextures();
 

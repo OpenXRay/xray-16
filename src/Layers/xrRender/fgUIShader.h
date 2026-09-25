@@ -60,6 +60,8 @@ public:
     shared_str baseTexture{ "s_base" };
 
 private:
+    nvrhi::ITexture* LoadBaseTexture();
+
     u32 m_aliveSentinel{ ALIVE_SENTINEL };
 };
 }

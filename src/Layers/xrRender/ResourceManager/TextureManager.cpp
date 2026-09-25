@@ -376,9 +376,8 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
         meta.videoActiveThisFrame = true;
     }
 
-    if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
+    if (meta.state == TextureState::Unloaded)
         LoadTextureSync(handle);
-    }
 
     return meta.nvrhiTexture.Get();
 }
@@ -423,10 +422,6 @@ bool TextureManager::IsResident(TextureHandle handle) const {
     return m_textures[handle.index].IsResident();
 }
 
-void TextureManager::SetMemoryBudget(u64 bytes) {
-    m_memoryBudget = bytes;
-}
-
 void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
     if (!ValidateHandle(handle)) return;
 
@@ -436,25 +431,6 @@ void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
     m_textures[handle.index].requestedMips = targetMips;
 
     m_streamingManager->RequestMips(handle, targetMips, meta.priority);
-}
-
-void TextureManager::SetPriority(TextureHandle handle, TexturePriority priority) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-    meta.priority = priority;
-}
-
-void TextureManager::Touch(TextureHandle handle) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-    meta.lastAccessTime = 0.0f;
-    meta.accessCount++;
-
-    if (meta.videoTextureData) {
-        meta.videoActiveThisFrame = true;
-    }
 }
 
 void TextureManager::AddRef(TextureHandle handle) {
@@ -484,107 +460,6 @@ void TextureManager::Release(TextureHandle handle) {
     }
 }
 
-void TextureManager::Evict(TextureHandle handle) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-
-    if (meta.state == TextureState::Resident) {
-        EvictTextureInternal(handle);
-    }
-}
-
-bool TextureManager::CheckMemoryBudget(u64 requiredBytes) const {
-    return (m_memoryUsed + requiredBytes) <= m_memoryBudget;
-}
-
-bool TextureManager::EnforceMemoryBudget(u64 requiredBytes) {
-    if (CheckMemoryBudget(requiredBytes)) {
-        return true;
-    }
-
-    u64 bytesNeeded = (m_memoryUsed + requiredBytes) - m_memoryBudget;
-
-    return EvictTextures(bytesNeeded);
-}
-
-bool TextureManager::EvictTextures(u64 bytesNeeded) {
-    u64 bytesFreed = 0;
-
-    struct EvictionCandidate {
-        TextureHandle handle;
-        float score;
-        u64 memoryUsed;
-
-        bool operator<(const EvictionCandidate& other) const {
-            return score > other.score;
-        }
-    };
-
-    xr_vector<EvictionCandidate> candidates;
-
-    for (u32 i = 0; i < m_textures.size(); i++) {
-        const TextureMetadata& meta = m_textures[i];
-
-        if (!meta.isAlive) continue;
-        if (!meta.CanEvict()) continue;
-
-        float score = 0.0f;
-
-        score += meta.lastAccessTime * 10.0f;
-
-        score += (float)meta.priority * 100.0f;
-
-        score -= (float)meta.accessCount * 0.1f;
-
-        score += (float)meta.memoryUsed / (1024.0f * 1024.0f);
-
-        EvictionCandidate candidate;
-        candidate.handle = TextureHandle(i, meta.generation);
-        candidate.score = score;
-        candidate.memoryUsed = meta.memoryUsed;
-
-        candidates.push_back(candidate);
-    }
-
-    std::sort(candidates.begin(), candidates.end());
-
-    for (const auto& candidate : candidates) {
-        if (bytesFreed >= bytesNeeded) {
-            break;
-        }
-
-        const TextureMetadata* meta = GetMetadata(candidate.handle);
-
-        EvictTextureInternal(candidate.handle);
-
-        bytesFreed += candidate.memoryUsed;
-    }
-
-    return bytesFreed >= bytesNeeded;
-}
-
-void TextureManager::EvictTextureInternal(TextureHandle handle) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-
-    if (meta.state != TextureState::Resident) {
-        return;
-    }
-
-    if (meta.nvrhiTexture) {
-        meta.nvrhiTexture = nullptr;
-    }
-
-    meta.state = TextureState::Evicted;
-    meta.residentMips = 0;
-
-    m_memoryUsed -= meta.memoryUsed;
-    meta.memoryUsed = 0;
-
-}
-
 void TextureManager::Update(float deltaTime) {
     for (auto& meta : m_textures) {
         if (!meta.isAlive) continue;
@@ -596,11 +471,6 @@ void TextureManager::Update(float deltaTime) {
     UpdateSequenceTextures(deltaTime);
 
     m_streamingManager->Update(deltaTime);
-
-    if (m_memoryUsed > m_memoryBudget) {
-        u64 excess = m_memoryUsed - m_memoryBudget;
-        EvictTextures(excess);
-    }
 }
 
 
@@ -627,19 +497,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
     bool isSequenceTexture = (ddsData.type == DDSData::TextureType::Sequence);
-
-
-    u64 requiredMemory = ddsData.totalDataSize;
-
-    if (!EnforceMemoryBudget(requiredMemory)) {
-        Msg("! [TextureManager] ❌ Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
-            meta.filePath.c_str(),
-            requiredMemory / (1024 * 1024),
-            m_memoryUsed / (1024 * 1024),
-            m_memoryBudget / (1024 * 1024));
-        meta.state = TextureState::Unloaded;
-        return;
-    }
 
     const TextureDesc sourceDesc = ddsData.desc;
     const u64 sourceDataSize = ddsData.totalDataSize;
@@ -731,7 +588,6 @@ TextureManager::Statistics TextureManager::GetStatistics() const {
     m_stats.texturesTotal = 0;
     m_stats.texturesResident = 0;
     m_stats.texturesLoading = 0;
-    m_stats.texturesEvicted = 0;
 
     for (const auto& meta : m_textures) {
         if (!meta.isAlive) continue;
@@ -744,9 +600,6 @@ TextureManager::Statistics TextureManager::GetStatistics() const {
                 break;
             case TextureState::Loading:
                 m_stats.texturesLoading++;
-                break;
-            case TextureState::Evicted:
-                m_stats.texturesEvicted++;
                 break;
             default:
                 break;
@@ -764,11 +617,10 @@ void TextureManager::PrintStatistics() const {
         stats.totalMemoryUsed / (1024 * 1024),
         stats.memoryBudget / (1024 * 1024),
         stats.memoryUsagePercent());
-    Msg("!   Textures: %u total, %u resident, %u loading, %u evicted",
+    Msg("!   Textures: %u total, %u resident, %u loading",
         stats.texturesTotal,
         stats.texturesResident,
-        stats.texturesLoading,
-        stats.texturesEvicted);
+        stats.texturesLoading);
 }
 
 TextureHandle TextureManager::LoadTextureThreadSafe(
@@ -830,8 +682,6 @@ const char* TextureStateToString(TextureState state) {
         case TextureState::Unloaded: return "Unloaded";
         case TextureState::Loading: return "Loading";
         case TextureState::Resident: return "Resident";
-        case TextureState::Evicting: return "Evicting";
-        case TextureState::Evicted: return "Evicted";
         case TextureState::Missing: return "Missing";
         default: return "Unknown";
     }
