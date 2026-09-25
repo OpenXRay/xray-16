@@ -247,7 +247,6 @@ TextureHandle NativeRTFactory::CreateRenderTargetInternal(
     desc.isRenderTarget = !isDepthStencil;
     desc.isDepthStencil = isDepthStencil;
     desc.isUAV = isUAV;
-    desc.allowStreaming = false;
     desc.debugName = debugName;
 
     if (depth > 1) {

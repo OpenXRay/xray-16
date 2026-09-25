@@ -71,7 +71,6 @@ public:
     // Common data for rendering
     u32 Type; // visual's type
     vis_data vis; // visibility-data
-    ref_shader shader; // pipe state, shared
 
     shared_str shaderName;
     shared_str textureName;

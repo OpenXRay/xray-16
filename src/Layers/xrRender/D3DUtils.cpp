@@ -339,49 +339,6 @@ void CDrawUtilities::DrawPointLight(const Fvector& p, float radius, u32 c)
     DrawCross(p, radius, radius, radius, radius, radius, radius, c, true);
 }
 
-void CDrawUtilities::DrawEntity(u32 clr, ref_shader s)
-{
-    // fill VB
-    u32 vBase = 0;
-    {
-        g_du_l_scratch.resize(5);
-        FVF::L* pv = g_du_l_scratch.data();
-        pv->set(0.f, 0.f, 0.f, clr);
-        pv++;
-        pv->set(0.f, 1.f, 0.f, clr);
-        pv++;
-        pv->set(0.f, 1.f, .5f, clr);
-        pv++;
-        pv->set(0.f, .5f, .5f, clr);
-        pv++;
-        pv->set(0.f, .5f, 0.f, clr);
-        pv++;
-    }
-    // render flagshtok
-    g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, g_du_l_scratch.data(), 4);
-
-    if (s)
-    {
-        // fill VB
-        g_du_lit_scratch.resize(6);
-        FVF::LIT* pv = g_du_lit_scratch.data();
-        pv->set(0.f, 1.f, 0.f, clr, 0.f, 0.f);
-        pv++;
-        pv->set(0.f, 1.f, .5f, clr, 1.f, 0.f);
-        pv++;
-        pv->set(0.f, .5f, .5f, clr, 1.f, 1.f);
-        pv++;
-        pv->set(0.f, .5f, 0.f, clr, 0.f, 1.f);
-        pv++;
-        pv->set(0.f, .5f, .5f, clr, 1.f, 1.f);
-        pv++;
-        pv->set(0.f, 1.f, .5f, clr, 1.f, 0.f);
-        pv++;
-            // and Render it as line list
-        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleFan, g_du_lit_scratch.data(), 4);
-    }
-}
-
 void CDrawUtilities::DrawFlag(
     const Fvector& p, float heading, float height, float sz, float sz_fl, u32 clr, BOOL bDrawEntity)
 {

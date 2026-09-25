@@ -13,22 +13,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
         return;
     TextureDescr.UnLoad();
 
-    // Matrices
-    for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); ++m)
-    {
-        R_ASSERT(1 == m->second->ref_count);
-        xr_delete(m->second);
-    }
-    m_matrices.clear();
-
-    // Constants
-    for (map_Constant::iterator c = m_constants.begin(); c != m_constants.end(); ++c)
-    {
-        R_ASSERT(1 == c->second->ref_count);
-        xr_delete(c->second);
-    }
-    m_constants.clear();
-
     // Release blenders
     for (auto b = m_blenders.begin(); b != m_blenders.end(); ++b)
     {
@@ -44,9 +28,6 @@ void CResourceManager::OnDeviceDestroy(BOOL)
         xr_free((char*&)_t->second.T);
     }
     m_td.clear();
-#ifndef _EDITOR
-    LS_Unload();
-#endif
 }
 
 void CResourceManager::OnDeviceCreate(IReader* F)
@@ -57,39 +38,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     ZoneScoped;
     string256 name;
 
-#ifndef _EDITOR
-    // scripting
-    LS_Load();
-#endif
     IReader* fs = nullptr;
-    // Load constants
-    fs = F->open_chunk(0);
-    if (fs)
-    {
-        ZoneScopedN("Load constants");
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CConstant* C = _CreateConstant(name);
-            C->Load(fs);
-        }
-        fs->close();
-    }
-
-    // Load matrices
-    fs = F->open_chunk(1);
-    if (fs)
-    {
-        ZoneScopedN("Load matrices");
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CMatrix* M = _CreateMatrix(name);
-            M->Load(fs);
-        }
-        fs->close();
-    }
-
     // Load blenders
     fs = F->open_chunk(2);
     if (fs)

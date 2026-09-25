@@ -11,12 +11,7 @@
 class IRenderBackend;
 
 namespace xray::render::fg {
-    struct Shader;
-    struct ShaderElement;
-    struct SPass;
     class dxRender_Visual;
-    struct SVS;
-    struct SPS;
     class CTexture;
 }
 
@@ -41,12 +36,7 @@ namespace framegraph {
     struct DefaultOutputLayout;
 }
 
-using fg::Shader;
-using fg::ShaderElement;
-using fg::SPass;
 using fg::dxRender_Visual;
-using fg::SVS;
-using fg::SPS;
 
 
 enum class PSOType : u8 {
@@ -60,7 +50,6 @@ enum class PSOType : u8 {
 
 struct MaterialKey {
     PSOType psoType;
-    Shader* shader;
     u64 textureHash;
     u64 stateHash;
 
@@ -69,7 +58,6 @@ struct MaterialKey {
 
     MaterialKey()
         : psoType(PSOType::Material)
-        , shader(nullptr)
         , textureHash(0)
         , stateHash(0)
         , element(0)
@@ -77,9 +65,8 @@ struct MaterialKey {
     {
     }
 
-    MaterialKey(Shader* s, u64 texHash, u64 stHash, PSOType type = PSOType::Material)
+    MaterialKey(u64 texHash, u64 stHash, PSOType type = PSOType::Material)
         : psoType(type)
-        , shader(s)
         , textureHash(texHash)
         , stateHash(stHash)
         , element(0)
@@ -96,12 +83,10 @@ struct MaterialKey {
         }
 
         if (psoType == PSOType::Depth) {
-            if (shader != other.shader) return shader < other.shader;
             if (element != other.element) return element < other.element;
             return framebuffer < other.framebuffer;
         }
 
-        if (shader != other.shader) return shader < other.shader;
         if (textureHash != other.textureHash) return textureHash < other.textureHash;
         return stateHash < other.stateHash;
     }
@@ -115,13 +100,11 @@ struct MaterialKey {
         }
 
         if (psoType == PSOType::Depth) {
-            return shader == other.shader &&
-                   element == other.element &&
+            return element == other.element &&
                    framebuffer == other.framebuffer;
         }
 
-        return shader == other.shader &&
-               textureHash == other.textureHash &&
+        return textureHash == other.textureHash &&
                stateHash == other.stateHash;
     }
 };
@@ -180,10 +163,6 @@ struct MaterialPSO {
         nvrhi::SamplerHandle nvrhiSampler;
     };
     xr_vector<SamplerInfo> samplers;
-
-    SVS* vertexShader = nullptr;
-    SPS* pixelShader = nullptr;
-    SPass* pass = nullptr;
 
     framegraph::ShaderRTBindings rtBindings;
 
@@ -325,8 +304,6 @@ private:
 
     MaterialPSO* CreateUIPSO(
         IUIShader* uiShader,
-        ShaderElement* elem,
-        SPass* pass,
         nvrhi::IFramebuffer* framebuffer,
         fg::PrimitiveTopology topology);
 

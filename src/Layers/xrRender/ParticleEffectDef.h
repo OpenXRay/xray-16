@@ -77,7 +77,6 @@ public:
     // texture
     shared_str m_ShaderName;
     shared_str m_TextureName;
-    ref_shader m_CachedShader;
     SFrame m_Frame;
     // compiled actions
     CMemoryWriter m_Actions;

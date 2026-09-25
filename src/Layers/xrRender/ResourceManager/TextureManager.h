@@ -12,7 +12,6 @@ namespace xray::render::fg {
 
 namespace xray::render::resources {
 
-class StreamingManager;
 struct DDSData;
 
 enum class TextureState : u8 {
@@ -22,8 +21,6 @@ enum class TextureState : u8 {
     Missing,
 };
 
-const char* TextureStateToString(TextureState state);
-
 enum class TexturePriority : u8 {
     Critical = 0,
     High = 1,
@@ -31,8 +28,6 @@ enum class TexturePriority : u8 {
     Low = 3,
     VeryLow = 4,
 };
-
-const char* TexturePriorityToString(TexturePriority priority);
 
 struct TextureDesc {
     enum Type {
@@ -59,9 +54,6 @@ struct TextureDesc {
     bool isUAV = false;
     bool isSRGB = false;
 
-    bool allowStreaming = true;
-    u32 minResidentMips = 3;
-
     shared_str debugName;
 
     u64 CalculateMemorySize(u32 startMip = 0, u32 mipCount = 0) const;
@@ -77,14 +69,9 @@ struct TextureMetadata {
     u32 generation = 0;
     bool isAlive = true;
 
-    u32 residentMips = 0;
-    u32 requestedMips = 0;
-    u32 totalMips = 0;
-
     u64 memoryUsed = 0;
 
     float lastAccessTime = 0.0f;
-    u32 accessCount = 0;
     u32 refCount = 0;
 
     nvrhi::TextureHandle nvrhiTexture;
@@ -99,14 +86,6 @@ struct TextureMetadata {
         bool inProgress = false;
         u32 targetMips = 0;
     } loadRequest;
-
-    bool IsResident() const {
-        return state == TextureState::Resident;
-    }
-
-    bool NeedsStreaming() const {
-        return requestedMips > residentMips && state == TextureState::Resident;
-    }
 };
 
 class TextureKey
@@ -134,20 +113,9 @@ public:
         TexturePriority priority = TexturePriority::Medium
     );
 
-    TextureHandle LoadTextureThreadSafe(
-        const char* path,
-        TexturePriority priority = TexturePriority::Medium
-    );
-
     TextureHandle CreateTexture(
         const TextureDesc& desc,
         const void* initialData = nullptr
-    );
-
-    TextureHandle ImportTexture(
-        nvrhi::TextureHandle nvrhiTexture,
-        const TextureDesc& desc,
-        const char* debugName
     );
 
     nvrhi::ITexture* GetNVRHITexture(TextureHandle handle);
@@ -157,13 +125,9 @@ public:
     u64 GetContentRevision(const xr_set<nvrhi::ITexture*>& textures,
         nvrhi::ITexture* sky0, nvrhi::ITexture* sky1) const;
 
-    bool IsResident(TextureHandle handle) const;
-
     TextureHandle FindTexture(const char* path, fg::TextureColorSpace colorSpace = fg::TextureColorSpace::Linear) const;
 
     u64 GetMemoryBudget() const { return m_memoryBudget; }
-
-    void RequestMips(TextureHandle handle, u32 mipCount);
 
     void AddRef(TextureHandle handle);
 
@@ -179,8 +143,6 @@ public:
         u32 texturesResident = 0;
         u32 texturesLoading = 0;
 
-        u32 streamingRequestsPending = 0;
-
         float memoryUsagePercent() const {
             if (memoryBudget == 0) return 0.0f;
             return (float)totalMemoryUsed / (float)memoryBudget * 100.0f;
@@ -189,8 +151,6 @@ public:
 
     Statistics GetStatistics() const;
     void PrintStatistics() const;
-
-    StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
 
 private:
     xray::render::fg::RenderDevice* m_device;
@@ -204,24 +164,17 @@ private:
     u64 m_memoryBudget = 2ULL * 1024 * 1024 * 1024;
     u64 m_memoryUsed = 0;
 
-    xr_unique_ptr<StreamingManager> m_streamingManager;
-
     TextureHandle AllocateHandle();
     void FreeHandle(TextureHandle handle);
     bool ValidateHandle(TextureHandle handle) const;
 
     void LoadTextureSync(TextureHandle handle);
-    void StreamMips(TextureHandle handle, u32 targetMips);
 
     void UpdateVideoTextures();
 
     void UpdateSequenceTextures(float deltaTime);
 
     mutable std::mutex m_texturesMutex;
-    mutable std::mutex m_pathLookupMutex;
-
-    TextureHandle AllocateHandleThreadSafe();
-    bool ValidateHandleThreadSafe(TextureHandle handle) const;
 
     mutable Statistics m_stats;
 };

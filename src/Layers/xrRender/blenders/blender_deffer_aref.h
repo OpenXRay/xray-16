@@ -16,7 +16,6 @@ public:
     virtual BOOL canUseSteepParallax() { return TRUE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
-    virtual void Compile(CBlender_Compile& C);
 
     CBlender_deffer_aref(bool _lmapped = false);
     virtual ~CBlender_deffer_aref();

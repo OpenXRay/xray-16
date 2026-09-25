@@ -23,7 +23,6 @@ CPEDef::CPEDef()
 {
     m_Frame.InitDefault();
     m_MaxParticles = 0;
-    m_CachedShader = nullptr;
     m_fTimeLimit = 0.f;
     // collision
     m_fCollideOneMinusFriction = 1.f;
@@ -44,16 +43,8 @@ CPEDef::~CPEDef()
         xr_delete(*it);
 #endif
 }
-void CPEDef::CreateShader()
-{
-#if 0
-    if (m_ShaderName.c_str() && m_TextureName.c_str())
-    {
-        m_CachedShader.create(m_ShaderName.c_str(), m_TextureName.c_str());
-    }
-#endif
-}
-void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
+void CPEDef::CreateShader() {}
+void CPEDef::DestroyShader() {}
 void CPEDef::SetName(LPCSTR name) { m_Name = name; }
 /*
 void CPEDef::pAlignToPath(float rot_x, float rot_y, float rot_z)

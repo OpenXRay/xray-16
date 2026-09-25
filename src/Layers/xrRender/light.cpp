@@ -35,8 +35,6 @@ light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     ZeroMemory(omnipart, sizeof(omnipart));
-    s_spot = nullptr;
-    s_point = nullptr;
     vis.frame2test = 0; // xffffffff;
     vis.query_id = 0;
     vis.query_order = 0;
@@ -320,25 +318,6 @@ void light::Export(light_Package& package)
                 L->set_virtual_size(virtual_size);
                 L->set_color(color);
                 L->spatial.sector_id = spatial.sector_id; //. dangerous?
-                L->s_spot = s_spot;
-                L->s_point = s_point;
-
-#if 0
-                if (RImplementation.o.msaa)
-                {
-                    int bound = 1;
-
-                    if (!RImplementation.o.msaa_opt)
-                        bound = RImplementation.o.msaa_samples;
-
-                    for (int i = 0; i < bound; ++i)
-                    {
-                        L->s_point_msaa[i] = s_point_msaa[i];
-                        L->s_spot_msaa[i] = s_spot_msaa[i];
-                        // L->s_volumetric_msaa[i] = s_volumetric_msaa[i];
-                    }
-                }
-#endif // (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
                 //  Igor: add volumetric support
                 L->set_volumetric(flags.bVolumetric);
