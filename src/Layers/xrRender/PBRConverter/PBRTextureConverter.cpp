@@ -1985,14 +1985,23 @@ static bool RecompressLooseRGBA8(const char* root_alias, const xr_string& relati
     if (!desc || desc->vfs != std::numeric_limits<size_t>::max())
         return false;
 
-    resources::DDSData dds;
-    if (!resources::DDSLoader::LoadFromFile(full_path, dds) || !dds.isValid || dds.mipLevels.empty())
-        return false;
-    if (dds.desc.format != nvrhi::Format::RGBA8_UNORM)
+    IReader* reader = FS.r_open(full_path);
+    if (!reader)
         return false;
 
-    const auto& mip0 = dds.mipLevels[0];
-    MipChain chain = BuildMipChain(mip0.data, mip0.width, mip0.height, dds.mipLevels.size() > 1, filter);
+    resources::DDSData dds;
+    const bool rgba8 = resources::DDSLoader::LoadFromMemory(static_cast<const u8*>(reader->pointer()), reader->length(), dds, full_path)
+        && !dds.mipLevels.empty() && dds.desc.format == nvrhi::Format::RGBA8_UNORM;
+    MipChain chain;
+    if (rgba8)
+    {
+        const auto& mip0 = dds.mipLevels[0];
+        chain = BuildMipChain(mip0.data, mip0.width, mip0.height, dds.mipLevels.size() > 1, filter);
+    }
+    FS.r_close(reader);
+    if (!rgba8)
+        return false;
+
     if (preserveCoverage)
         PreserveAlphaCoverage(chain, alphaRef);
     const xr_string temp_path = relative_path + ".bc7";
