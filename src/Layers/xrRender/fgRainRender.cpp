@@ -46,9 +46,7 @@ void FGRainRender::InitResources()
     m_device = renderDevice->GetNVRHIDevice();
     R_ASSERT(m_device);
 
-    auto* textureManager = renderDevice->GetFGResourceManager()->GetTextureManager();
-    R_ASSERT(textureManager);
-    m_streakTexture = textureManager->GetNVRHITexture(textureManager->LoadTexture("fx" DELIMITER "fx_rain", TextureColorSpace::Srgb));
+    m_streakTexture = m_streakTextureRef.Load("fx" DELIMITER "fx_rain", TextureColorSpace::Srgb);
     R_ASSERT2(m_streakTexture, "FGRainRender: failed to load fx/fx_rain texture");
 
     auto* shaderLoader = RImplementation.GetShaderLoader();

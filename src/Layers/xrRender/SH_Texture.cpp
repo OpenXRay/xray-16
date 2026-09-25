@@ -22,13 +22,6 @@ void fix_texture_name(pstr fn)
 namespace
 {
 constexpr u64 kMaxReportedTextureMemory = (1u << 28) - 1;
-
-resources::TextureManager* ManagedTextures()
-{
-    auto* renderDevice = GEnv.Render ? GEnv.Render->GetRenderDevice() : nullptr;
-    auto* resourceManager = renderDevice ? renderDevice->GetFGResourceManager() : nullptr;
-    return resourceManager ? resourceManager->GetTextureManager() : nullptr;
-}
 }
 
 void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
@@ -97,7 +90,7 @@ void CTexture::Load()
 
     Preload();
 
-    resources::TextureManager* textures = ManagedTextures();
+    resources::TextureManager* textures = resources::GetActiveTextureManager();
     if (!textures)
     {
         flags.bLoaded = false;
@@ -127,7 +120,7 @@ void CTexture::ReleaseManagedTexture()
 {
     if (!m_managedTexture.IsValid())
         return;
-    if (resources::TextureManager* textures = ManagedTextures())
+    if (resources::TextureManager* textures = resources::GetActiveTextureManager())
         textures->Release(m_managedTexture);
     m_managedTexture = TextureHandle();
 }

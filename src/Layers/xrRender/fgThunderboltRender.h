@@ -4,6 +4,7 @@
 #include "Include/xrRender/ThunderboltRender.h"
 #include "Layers/xrRender/IRenderDetailModel.h"
 #include "xrEngine/thunderbolt.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 
 namespace xray::render::fg
 {
@@ -47,7 +48,7 @@ private:
     xr_vector<Vertex> m_vertices;
     xr_vector<u16> m_indices;
     xr_vector<Batch> m_batches;
-    xr_map<shared_str, nvrhi::TextureHandle> m_textureCache;
+    xr_map<shared_str, resources::TextureRef> m_textureCache;
     xr_unordered_map<nvrhi::ITexture*, nvrhi::BindingSetHandle> m_bindingSetCache;
 
     nvrhi::IDevice* m_device = nullptr;
