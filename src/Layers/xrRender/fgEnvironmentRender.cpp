@@ -393,7 +393,7 @@ void FGEnvironmentRender::InitSunResources()
             .setElementStride(sizeof(passes::SunVertex)),
         nvrhi::VertexAttributeDesc()
             .setName("COLOR")
-            .setFormat(nvrhi::Format::RGBA8_UNORM)
+            .setFormat(nvrhi::Format::RGBA32_FLOAT)
             .setOffset(offsetof(passes::SunVertex, color))
             .setElementStride(sizeof(passes::SunVertex)),
         nvrhi::VertexAttributeDesc()
@@ -489,28 +489,26 @@ void FGEnvironmentRender::DrawSun(nvrhi::ICommandList* cmdList, nvrhi::IFramebuf
     vecSx.mul(vecX, sunRadius * fDistance);
     vecSy.mul(vecY, sunRadius * fDistance);
 
-    u32 c = sunColor.get();
-
     passes::SunVertex vertices[4];
     vertices[0].position.x = vecLight.x + vecSx.x - vecSy.x;
     vertices[0].position.y = vecLight.y + vecSx.y - vecSy.y;
     vertices[0].position.z = vecLight.z + vecSx.z - vecSy.z;
-    vertices[0].color = c; vertices[0].u = 0.0f; vertices[0].v = 0.0f;
+    vertices[0].color = sunColor; vertices[0].u = 0.0f; vertices[0].v = 0.0f;
 
     vertices[1].position.x = vecLight.x + vecSx.x + vecSy.x;
     vertices[1].position.y = vecLight.y + vecSx.y + vecSy.y;
     vertices[1].position.z = vecLight.z + vecSx.z + vecSy.z;
-    vertices[1].color = c; vertices[1].u = 0.0f; vertices[1].v = 1.0f;
+    vertices[1].color = sunColor; vertices[1].u = 0.0f; vertices[1].v = 1.0f;
 
     vertices[2].position.x = vecLight.x - vecSx.x - vecSy.x;
     vertices[2].position.y = vecLight.y - vecSx.y - vecSy.y;
     vertices[2].position.z = vecLight.z - vecSx.z - vecSy.z;
-    vertices[2].color = c; vertices[2].u = 1.0f; vertices[2].v = 0.0f;
+    vertices[2].color = sunColor; vertices[2].u = 1.0f; vertices[2].v = 0.0f;
 
     vertices[3].position.x = vecLight.x - vecSx.x + vecSy.x;
     vertices[3].position.y = vecLight.y - vecSx.y + vecSy.y;
     vertices[3].position.z = vecLight.z - vecSx.z + vecSy.z;
-    vertices[3].color = c; vertices[3].u = 1.0f; vertices[3].v = 1.0f;
+    vertices[3].color = sunColor; vertices[3].u = 1.0f; vertices[3].v = 1.0f;
 
     cmdList->writeBuffer(m_sunVertexBuffer, vertices, sizeof(vertices));
 
