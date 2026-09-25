@@ -243,7 +243,7 @@ bool CInventory::DropItem(CGameObject* pObj, bool just_before_destroy, bool dont
     case eItemPlaceBelt:
     {
         VERIFY(InBelt(pIItem));
-        TIItemContainer::iterator temp_iter = std::find(m_belt.begin(), m_belt.end(), pIItem);
+        auto temp_iter = std::find(m_belt.begin(), m_belt.end(), pIItem);
         if (temp_iter != m_belt.end())
         {
             m_belt.erase(temp_iter);
@@ -258,7 +258,7 @@ bool CInventory::DropItem(CGameObject* pObj, bool just_before_destroy, bool dont
     case eItemPlaceRuck:
     {
         VERIFY(InRuck(pIItem));
-        TIItemContainer::iterator temp_iter = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
+        auto temp_iter = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
         if (temp_iter != m_ruck.end())
         {
             m_ruck.erase(temp_iter);
@@ -299,7 +299,7 @@ bool CInventory::DropItem(CGameObject* pObj, bool just_before_destroy, bool dont
     break;
     default: NODEFAULT;
     };
-    TIItemContainer::iterator it = std::find(m_all.begin(), m_all.end(), pIItem);
+    auto it = std::find(m_all.begin(), m_all.end(), pIItem);
     if (it != m_all.end())
         m_all.erase(std::find(m_all.begin(), m_all.end(), pIItem));
     else
@@ -361,8 +361,8 @@ bool CInventory::Slot(u16 slot_id, PIItem pIItem, bool bNotActivate, bool strict
     m_slots[slot_id].m_pIItem = pIItem;
 
     //удалить из рюкзака или пояса
-    TIItemContainer::iterator it_ruck = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
-    TIItemContainer::iterator it_belt = std::find(m_belt.begin(), m_belt.end(), pIItem);
+    auto it_ruck = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
+    auto it_belt = std::find(m_belt.begin(), m_belt.end(), pIItem);
     if (!IsGameTypeSingle())
     {
         if (it_ruck != m_ruck.end())
@@ -441,7 +441,7 @@ bool CInventory::Belt(PIItem pIItem, bool strict_placement)
 
     if (!in_slot)
     {
-        TIItemContainer::iterator it = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
+        auto it = std::find(m_ruck.begin(), m_ruck.end(), pIItem);
         if (m_ruck.end() != it)
             m_ruck.erase(it);
     }
@@ -490,7 +490,7 @@ bool CInventory::Ruck(PIItem pIItem, bool strict_placement)
     else
     {
         //вещь была на поясе или вообще только поднята с земли
-        TIItemContainer::iterator it = std::find(m_belt.begin(), m_belt.end(), pIItem);
+        auto it = std::find(m_belt.begin(), m_belt.end(), pIItem);
         if (m_belt.end() != it)
             m_belt.erase(it);
 
@@ -853,16 +853,15 @@ void CInventory::UpdateDropTasks()
     //проверить слоты
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
-        PIItem itm = ItemFromSlot(i);
-        if (itm)
+        if (PIItem itm = ItemFromSlot(i))
             UpdateDropItem(itm);
     }
 
     for (u16 i = 0; i < 2; ++i)
     {
         TIItemContainer& list = i ? m_ruck : m_belt;
-        TIItemContainer::iterator it = list.begin();
-        TIItemContainer::iterator it_e = list.end();
+        auto it = list.begin();
+        auto it_e = list.end();
 
         for (; it != it_e; ++it)
         {
@@ -899,7 +898,7 @@ PIItem CInventory::Same(const PIItem pIItem, bool bSearchRuck) const
 {
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
         const PIItem l_pIItem = *it;
 
@@ -918,7 +917,7 @@ PIItem CInventory::SameSlot(const u16 slot, PIItem pIItem, bool bSearchRuck) con
 
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
         PIItem _pIItem = *it;
         if (_pIItem != pIItem && _pIItem->BaseSlot() == slot)
@@ -933,7 +932,7 @@ PIItem CInventory::Get(LPCSTR name, bool bSearchRuck) const
 {
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
         PIItem pIItem = *it;
         if (!xr_strcmp(pIItem->object().cNameSect(), name) && pIItem->Useful())
@@ -946,9 +945,9 @@ PIItem CInventory::Get(CLASS_ID cls_id, bool bSearchRuck) const
 {
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
-        PIItem pIItem = *it;
+        const PIItem pIItem = *it;
         if (pIItem->object().CLS_ID == cls_id && pIItem->Useful())
             return pIItem;
     }
@@ -959,9 +958,9 @@ PIItem CInventory::Get(const u16 id, bool bSearchRuck) const
 {
     const TIItemContainer& list = bSearchRuck ? m_ruck : m_belt;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
-        PIItem pIItem = *it;
+        const PIItem pIItem = *it;
         if (pIItem->object().ID() == id)
             return pIItem;
     }
@@ -981,7 +980,7 @@ PIItem CInventory::item(CLASS_ID cls_id) const
 {
     const TIItemContainer& list = m_all;
 
-    for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+    for (auto it = list.cbegin(); list.cend() != it; ++it)
     {
         PIItem pIItem = *it;
         if (pIItem->object().CLS_ID == cls_id && pIItem->Useful())
@@ -999,33 +998,33 @@ float CInventory::TotalWeight() const
 float CInventory::CalcTotalWeight()
 {
     float weight = 0;
-    for (TIItemContainer::const_iterator it = m_all.begin(); m_all.end() != it; ++it)
+    for (auto it = m_all.cbegin(); m_all.cend() != it; ++it)
         weight += (*it)->Weight();
 
     m_fTotalWeight = weight;
     return m_fTotalWeight;
 }
 
-u32 CInventory::dwfGetSameItemCount(LPCSTR caSection, bool SearchAll)
+u32 CInventory::dwfGetSameItemCount(LPCSTR caSection, bool SearchAll) const
 {
     u32 l_dwCount = 0;
-    TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
-    for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
+    const TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
+    for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it)
     {
-        PIItem l_pIItem = *l_it;
+        const PIItem l_pIItem = *l_it;
         if (!xr_strcmp(l_pIItem->object().cNameSect(), caSection))
             ++l_dwCount;
     }
 
     return (l_dwCount);
 }
-u32 CInventory::dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll)
+u32 CInventory::dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll) const
 {
     u32 l_dwCount = 0;
-    TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
-    for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
+    const TIItemContainer& l_list = SearchAll ? m_all : m_ruck;
+    for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it)
     {
-        PIItem l_pIItem = *l_it;
+        const PIItem l_pIItem = *l_it;
         if (l_pIItem->object().CLS_ID == CLSID_GRENADE_F1 || l_pIItem->object().CLS_ID == CLSID_GRENADE_RGD5)
             ++l_dwCount;
     }
@@ -1033,24 +1032,24 @@ u32 CInventory::dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll)
     return (l_dwCount);
 }
 
-bool CInventory::bfCheckForObject(ALife::_OBJECT_ID tObjectID)
+bool CInventory::bfCheckForObject(ALife::_OBJECT_ID tObjectID) const
 {
-    TIItemContainer& l_list = m_all;
-    for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
+    const TIItemContainer& l_list = m_all;
+    for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it)
     {
-        PIItem l_pIItem = *l_it;
+        const PIItem l_pIItem = *l_it;
         if (l_pIItem->object().ID() == tObjectID)
             return (true);
     }
     return (false);
 }
 
-CInventoryItem* CInventory::get_object_by_id(ALife::_OBJECT_ID tObjectID)
+CInventoryItem* CInventory::get_object_by_id(ALife::_OBJECT_ID tObjectID) const
 {
-    TIItemContainer& l_list = m_all;
-    for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
+    const TIItemContainer& l_list = m_all;
+    for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it)
     {
-        PIItem l_pIItem = *l_it;
+        const PIItem l_pIItem = *l_it;
         if (l_pIItem->object().ID() == tObjectID)
             return (l_pIItem);
     }
@@ -1219,16 +1218,19 @@ bool CInventory::CanPutInRuck(PIItem pIItem) const
     return true;
 }
 
-u32 CInventory::dwfGetObjectCount() { return (m_all.size()); }
-CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
+u32 CInventory::dwfGetObjectCount() const { return (m_all.size()); }
+
+CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex) const
 {
     if ((iIndex >= 0) && (iIndex < (int)m_all.size()))
     {
-        TIItemContainer& l_list = m_all;
+        const TIItemContainer& l_list = m_all;
         int i = 0;
-        for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it, ++i)
+        for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it, ++i)
+        {
             if (i == iIndex)
                 return (*l_it);
+        }
     }
     else
     {
@@ -1239,18 +1241,20 @@ CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
     return (0);
 }
 
-CInventoryItem* CInventory::GetItemFromInventory(LPCSTR caItemName)
+CInventoryItem* CInventory::GetItemFromInventory(LPCSTR caItemName) const
 {
-    TIItemContainer& l_list = m_all;
+    const TIItemContainer& l_list = m_all;
 
     u32 crc = crc32(caItemName, xr_strlen(caItemName));
 
-    for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
+    for (auto l_it = l_list.cbegin(); l_list.cend() != l_it; ++l_it)
+    {
         if ((*l_it)->object().cNameSect()._get()->dwCRC == crc)
         {
             VERIFY(0 == xr_strcmp((*l_it)->object().cNameSect().c_str(), caItemName));
             return (*l_it);
         }
+    }
     return (0);
 }
 
@@ -1265,10 +1269,10 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
     if (!inventory_item->CanTake())
         return false;
     TIItemContainer::const_iterator it;
-    for (it = m_all.begin(); it != m_all.end(); ++it)
+    for (it = m_all.cbegin(); it != m_all.cend(); ++it)
         if ((*it)->object().ID() == inventory_item->object().ID())
             break;
-    VERIFY3(it == m_all.end(), "item already exists in inventory", inventory_item->object().cName().c_str());
+    VERIFY3(it == m_all.cend(), "item already exists in inventory", inventory_item->object().cName().c_str());
 
     CActor* pActor = smart_cast<CActor*>(m_pOwner);
     //актер всегда может взять вещь
@@ -1301,7 +1305,7 @@ u32 CInventory::BeltMaxWidth() const
 
 void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade, bool bOverride /*= false*/) const
 {
-    for (TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it)
+    for (auto it = m_ruck.cbegin(); m_ruck.cend() != it; ++it)
     {
         PIItem pIItem = *it;
         if (!for_trade || pIItem->CanTrade())
@@ -1321,7 +1325,7 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
 
     if (m_bBeltUseful)
     {
-        for (TIItemContainer::const_iterator it = m_belt.begin(); m_belt.end() != it; ++it)
+        for (auto it = m_belt.cbegin(); m_belt.cend() != it; ++it)
         {
             PIItem pIItem = *it;
             if (!for_trade || pIItem->CanTrade())
@@ -1390,12 +1394,10 @@ void CInventory::InvalidateState() throw()
 
 void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 {
-    TIItemContainer::iterator it;
-    for (it = m_all.begin(); m_all.end() != it; ++it)
+    for (auto it = m_all.cbegin(); m_all.cend() != it; ++it)
     {
         PIItem pIItem = *it;
-        CWeapon* pWeapon = smart_cast<CWeapon*>(pIItem);
-        if (pWeapon)
+        if (CWeapon* pWeapon = smart_cast<CWeapon*>(pIItem))
         {
             pWeapon->InitAddons();
             pWeapon->UpdateAddonsVisibility();
