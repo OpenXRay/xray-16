@@ -1,4 +1,5 @@
 #include "xrPhysics/StdAfx.h"
+#include "PhysicsContacts.h"
 
 #include "Common/LevelStructure.hpp"
 #include "TestSupport.h"

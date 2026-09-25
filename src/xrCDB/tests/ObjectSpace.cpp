@@ -1,4 +1,5 @@
 #include "TestSupport.h"
+#include "PhysicsContacts.h"
 
 #include "Common/LevelStructure.hpp"
 #include "xrCDB/ISpatial.h"
@@ -7,8 +8,6 @@
 
 #include <chrono>
 #include <thread>
-
-void CheckPhysicsContacts();
 
 void CheckDynamicQueries(CObjectSpace& space, ISpatial_DB& spatial);
 static u32 buildCalls, remapCalls, materialGeneration = 1;
