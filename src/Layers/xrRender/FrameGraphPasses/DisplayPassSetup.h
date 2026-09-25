@@ -13,10 +13,13 @@ namespace xray::render::fg
 class RenderDevice;
 class LightingFrameState;
 class DisplayCalibration;
+class PostProcessFrame;
 }
 
 namespace xray::render::fg::passes
 {
+class BloomOutput;
+
 class DisplayPassState
 {
 public:
@@ -67,8 +70,21 @@ public:
     float gamma = 1.0f;
     float brightness = 1.0f;
     float contrast = 1.0f;
-    float pad0 = 0.0f;
-    float pad1 = 0.0f;
+    float bloomIntensity = 0.0f;
+    u32 effectsEnabled = 0;
+    Fvector2 invSceneSize = {};
+    Fvector2 blurShift = {};
+    Fvector2 dualityShift = {};
+    Fvector2 noiseOffset = {};
+    Fvector2 noiseScale = {};
+    float gray = 0.0f;
+    float noiseIntensity = 0.0f;
+    Fvector colorGray = {};
+    float colorMapInfluence = 0.0f;
+    Fvector colorBase = {};
+    float colorMapInterpolate = 0.0f;
+    Fvector colorAdd = {};
+    float bloomNormalization = 0.0f;
 };
 
 class LightingFailurePassData
@@ -118,7 +134,11 @@ class DisplayOutputPassData
 public:
     framegraph::VirtualResourceHandle sceneColor;
     framegraph::VirtualResourceHandle exposure;
+    framegraph::VirtualResourceHandle bloom;
     framegraph::VirtualResourceHandle interfaceLayer;
+    nvrhi::TextureHandle noise;
+    nvrhi::TextureHandle colorMap0;
+    nvrhi::TextureHandle colorMap1;
     framegraph::VirtualResourceHandle output;
     fg::RenderDevice* device = nullptr;
     DisplayPassState* state = nullptr;
@@ -152,11 +172,13 @@ framegraph::VirtualResourceHandle setupDisplayOutputPass(
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle sceneColor,
     framegraph::VirtualResourceHandle exposure,
+    const BloomOutput& bloom,
     framegraph::VirtualResourceHandle interfaceLayer,
     framegraph::VirtualResourceHandle output,
     u32 width,
     u32 height,
     const DisplayCalibration& calibration,
+    const PostProcessFrame& postProcess,
     DisplayPassState& state,
     const LightingFrameState* lighting);
 }

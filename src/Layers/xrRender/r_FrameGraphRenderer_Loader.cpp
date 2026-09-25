@@ -44,6 +44,7 @@
 #include "Layers/xrRender/ClusteredLightManager.h"
 #include "Layers/xrRender/Decals/OverlayManager.h"
 #include "xrEngine/IRenderBackend.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 
 namespace xray::render
 {
@@ -424,6 +425,8 @@ void FrameGraphRenderer::level_Unload()
     if (m_overlayManager)
         m_overlayManager->Clear();
     fg::ClusteredLightManager::Instance().ReleaseSpotTextures();
+    if (auto* resourceManager = m_device ? m_device->GetFGResourceManager() : nullptr)
+        m_postProcess.ReleaseTextures(resourceManager->GetTextureManager());
     if (m_materialCache)
         m_materialCache->ReleaseLevelMaterials();
     b_loaded = FALSE;

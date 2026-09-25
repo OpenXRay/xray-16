@@ -57,6 +57,7 @@
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/FontPassSetup.h"
 #include "FrameGraphPasses/DisplayPassSetup.h"
+#include "FrameGraphPasses/BloomPassSetup.h"
 #include "FrameGraphPasses/SmokeTrailPassSetup.h"
 #include "FrameGraphPasses/ClusterLightPassSetup.h"
 #include "ClusteredLightManager.h"
@@ -108,6 +109,8 @@
 #include "xrEngine/IGameFont.hpp"
 #include "xrEngine/IPerformanceAlert.hpp"
 #include "xrCore/PostProcess/PPInfo.hpp"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 
 namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
 
@@ -347,6 +350,8 @@ void FrameGraphRenderer::Shutdown() {
     Msg("* [FrameGraphRenderer] Shutting down");
     if (auto* backend = m_device->GetBackend())
         backend->WaitForIdle();
+    if (auto* resourceManager = m_device->GetFGResourceManager())
+        m_postProcess.ReleaseTextures(resourceManager->GetTextureManager());
 
     m_particleEditor = nullptr;
     GetGpuParticleManager().Reset();
@@ -1918,6 +1923,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const auto exposure = passes::setupExposurePasses(*m_framegraph, m_device, sceneColor, width, height,
         m_sceneCollected, displayState);
 
+    passes::BloomOutput bloom;
+    if (m_sceneCollected && ps_r_bloom_intensity > 0.0f)
+        bloom = passes::setupBloomPass(*m_framegraph, m_device, sceneColor, exposure, width, height,
+            m_blackboard->get_or_add<passes::BloomPassState>());
+
+    auto* resourceManager = m_device ? m_device->GetFGResourceManager() : nullptr;
+    const fg::PostProcessFrame postProcess = m_postProcess.Prepare(
+        resourceManager ? resourceManager->GetTextureManager() : nullptr, Device.fTimeDelta);
+
     auto interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
     interfaceLayer = passes::setupUIPass(*m_framegraph, interfaceLayer, width, height);
     interfaceLayer = passes::setupFontPass(*m_framegraph, interfaceLayer);
@@ -1926,8 +1940,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     framegraph::VirtualResourceHandle displayOutput;
     if (backbufferHandle.is_valid())
-        displayOutput = passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, interfaceLayer,
-            backbufferHandle, width, height, GetDisplayCalibration(), displayState, &m_lightingState);
+        displayOutput = passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, bloom, interfaceLayer,
+            backbufferHandle, width, height, GetDisplayCalibration(), postProcess, displayState, &m_lightingState);
 
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
@@ -1943,6 +1957,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
     if (m_lightingState.effective == fg::LightingMode::RTGI)
         m_framegraph->GetRTRegistry().RegisterRT("rt_RTGI_SceneColor", sceneColor);
+    if (bloom.texture.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_Bloom", bloom.texture);
 
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
     {
@@ -3379,8 +3395,6 @@ void FrameGraphRenderer::create()
 
     SetEnabled(true);
 
-    m_pTarget = xr_new<fg::CRenderTarget>();
-
     if (!g_pModelPool)
         g_pModelPool = xr_new<CModelPool>();
 
@@ -3396,8 +3410,6 @@ void FrameGraphRenderer::destroy()
 
     m_HWOCC.occq_destroy();
     m_PSLibrary.OnDestroy();
-
-    xr_delete(m_pTarget);
 
     if (g_pModelPool)
     {
@@ -3430,8 +3442,6 @@ void FrameGraphRenderer::reset_begin()
         Resources->reset_begin();
 
     m_Lights_LastFrame.clear();
-
-    xr_delete(m_pTarget);
     m_HWOCC.occq_destroy();
 }
 
@@ -3439,7 +3449,6 @@ void FrameGraphRenderer::reset_end()
 {
     ZoneScoped;
     m_HWOCC.occq_create(occq_size);
-    m_pTarget = xr_new<fg::CRenderTarget>();
 
     m_bFirstFrameAfterReset = true;
 }
@@ -3465,21 +3474,7 @@ void FrameGraphRenderer::OnBackBufferResized(u32, u32)
 
 void FrameGraphRenderer::SetPostProcessParams(const SPPInfo& ppi)
 {
-    if (!m_pTarget)
-        return;
-    m_pTarget->set_blur(ppi.blur);
-    m_pTarget->set_gray(ppi.gray);
-    m_pTarget->set_duality_h(ppi.duality.h);
-    m_pTarget->set_duality_v(ppi.duality.v);
-    m_pTarget->set_noise(ppi.noise.intensity);
-    m_pTarget->set_noise_scale(ppi.noise.grain);
-    m_pTarget->set_noise_fps(ppi.noise.fps);
-    m_pTarget->set_color_base(ppi.color_base);
-    m_pTarget->set_color_gray(ppi.color_gray);
-    m_pTarget->set_color_add(ppi.color_add);
-    m_pTarget->set_cm_imfluence(ppi.cm_influence);
-    m_pTarget->set_cm_interpolate(ppi.cm_interpolate);
-    m_pTarget->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
+    m_postProcess.SetParams(ppi);
 }
 
 void FrameGraphRenderer::Screenshot(IRender::ScreenshotMode mode, pcstr name)

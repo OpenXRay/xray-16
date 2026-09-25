@@ -9,6 +9,8 @@ target_sources(xrRender PRIVATE
     ColorSpace.cpp
     DisplayCalibration.h
     DisplayCalibration.cpp
+    PostProcessEffects.h
+    PostProcessEffects.cpp
 
     RenderContext/ResourceHandle.h
     RenderContext/RCShader.h
@@ -115,6 +117,8 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/DecalPassSetup.cpp
     FrameGraphPasses/DistortionApplyPassSetup.h
     FrameGraphPasses/DistortionApplyPassSetup.cpp
+    FrameGraphPasses/BloomPassSetup.h
+    FrameGraphPasses/BloomPassSetup.cpp
     FrameGraphPasses/DisplayPassSetup.h
     FrameGraphPasses/DisplayPassSetup.cpp
     FrameGraphPasses/UIPassSetup.h
@@ -205,12 +209,9 @@ target_sources(xrRender PRIVATE
 
     Animation.cpp
     ClusteredLightManager.cpp
-    ColorMapManager.cpp
     ConstantSystem/FGConstantSystem.cpp
     FGRenderBase.h
     FGRenderBase.cpp
-    r4_rendertarget.h
-    r4_rendertarget.cpp
     DetailModel.cpp
     ETextureParams.cpp
     FBasicVisual.cpp
