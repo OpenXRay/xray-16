@@ -702,6 +702,7 @@ public:
         throw std::runtime_error("Unexpected TestObject::can_validate_position_on_spawn");
     }
 
+#ifdef DEBUG
     bool ShouldProcessOnRender() const override
     {
         throw std::runtime_error("Unexpected TestObject::ShouldProcessOnRender");
@@ -716,6 +717,7 @@ public:
     {
         throw std::runtime_error("Unexpected TestObject::OnRender");
     }
+#endif
 
     void reinit() override
     {
@@ -747,6 +749,7 @@ public:
         throw std::runtime_error("Unexpected TestObject::PH_I_CrPr");
     }
 
+#ifdef DEBUG
     void PH_Ch_CrPr() override
     {
         throw std::runtime_error("Unexpected TestObject::PH_Ch_CrPr");
@@ -756,6 +759,7 @@ public:
     {
         throw std::runtime_error("Unexpected TestObject::dbg_DrawSkeleton");
     }
+#endif
 
     void PH_A_CrPr() override
     {

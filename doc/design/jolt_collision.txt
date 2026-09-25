@@ -58,7 +58,8 @@ Build and regression checks
 
 Footguns
   All build directories write binaries to bin/<architecture>/<configuration>. Use different configurations or
-  source checkouts when comparing backends, or one build can overwrite the other's libraries.
+  source checkouts when comparing backends, or one build can overwrite the other's libraries. The Windows
+  collision test script described below stages separate runtime folders automatically.
   Jolt/Jolt.h must precede other Jolt headers; keep its include group separate from alphabetical sorting.
   xr_types.h redefines FLT_MAX as flt_max, which conflicts with a local variable in Jolt's RayAABox.h. The include
   temporarily restores a numeric definition and then restores the engine macro.
@@ -71,3 +72,59 @@ Remaining validation and work
   decals, sound occlusion, portals, contact queries and physics interactions. Measure query throughput, tree
   memory and build/load time on representative levels before changing the default.
   The ODE migration and unified physics world in #2139 remain separate work. This branch must not close #2139.
+
+Windows collision tests and comparison builds
+  Prerequisites: a recursive checkout, Visual Studio 2022 C++ tools with a Windows SDK, Git, CMake >= 3.23,
+  and NuGet CLI. Put Git, CMake and NuGet on PATH. From PowerShell at the repository root, run:
+
+    ./misc/windows/test-collision.ps1 -Configuration Debug
+    ./misc/windows/test-collision.ps1 -Configuration Release -Benchmark
+
+  Optional arguments: -Backend OPCODE|Jolt|Both (default Both), -Jobs 4, -BuildRoot <directory>,
+  -CMake <cmake.exe> and -NuGet <nuget.exe>. The supported configurations are Debug and Release, x64 only.
+  Native Mixed is not an optimized configuration: xray_build.props explicitly disables its optimization.
+  Release Master Gold uses a different static-library/exception configuration and is not covered here.
+
+  The script restores packages and builds the native engine.sln. It then builds the actual xrCDB and
+  xrPhysics CMake targets and tests, importing the other native engine libraries with matching configuration
+  and runtime-library settings. This is a collision-specific bridge, not a fix for top-level Windows CMake.
+  The latter still needs broader work such as PR #1953, which conflicts with this branch as of 2026-09-25.
+
+  Each backend has an isolated engine runtime in:
+    build/windows-collision/OPCODE/<configuration>/bin/<configuration>/
+    build/windows-collision/Jolt/<configuration>/bin/<configuration>/
+  These contain xrEngine.exe, dependencies, the selected collision/physics DLLs and collision-build.json.
+  These are test-enabled builds, including collision instrumentation; account for that when profiling gameplay.
+  Native binaries in bin/x64/<configuration> remain unchanged by the CMake builds. On incremental reruns,
+  staging deliberately excludes native xrCDB/xrPhysics files so they cannot replace the selected backend.
+  Tests run against the DLLs beside the test executable; no machine-specific DLL search path is required.
+  Logs are in build/windows-collision/logs/<configuration>. CI runs both backends in Debug and Release.
+
+Synthetic benchmark
+  -Benchmark runs xrCDBBenchmark after the tests and writes <backend>-benchmark.json beside the logs.
+  The executable is also built by XRAY_BUILD_CDB_TESTS on other platforms. Run it explicitly in an optimized
+  build, passing an optional output JSON filename. It is not registered as a timed CTest pass/fail check.
+
+  The fixed fixture has 32,768 terrain triangles and 20,000 deterministic query positions (seed 2139).
+  It reports medians of five samples after one warm-up: synchronous build+destruction, nearest downward rays,
+  full triangle/box queries and warm-cache load+destruction. Cache loading includes integrity validation and,
+  for Jolt, rebuilding the tree. It also records the model's reported memory usage, cache size, ray-distance
+  sum and box-hit count. Compare these result checksums before interpreting timing differences.
+
+  Run benchmarks without simultaneous builds or other heavy work. These are synthetic, single-thread query
+  measurements with warm OS caches, not gameplay FPS, cold-disk loading or process peak-memory measurements.
+  The independent correctness suite remains the gate for correctness; timings have no CI threshold.
+
+Gameplay comparison once game data is available
+  Use the isolated Release runtime folders and the same game version, renderer, settings and starting save.
+  Give each backend its own writable app-data/log/cache directory using an appropriate fsgame.ltx; keep the
+  source game installation and original saves untouched. Record collision-build.json with each result.
+  Exercise, in order:
+    1. New game and saved-game load, repeated load/unload, then a level transition.
+    2. Walking, stairs, crouching, jumping and contact with walls/terrain.
+    3. Bullet impacts and decals on level geometry and moving objects; NPC visibility through cover.
+    4. Movable objects, ragdolls, explosions and contact sounds; sound occlusion and portal transitions.
+    5. Repeat cache-miss and cache-hit loads, then repeat with -mt_cdb.
+  Capture crashes/assertions, missing or extra hits, material mismatches and loading/query timings.
+  Camera demo playback is useful for repeatability but does not replace interactive physics/gameplay checks.
+  Call of Pripyat results do not establish Clear Sky compatibility; repeat there before changing the default.
