@@ -103,6 +103,12 @@ void CUIScrollView::InitScrollView()
 }
 
 void CUIScrollView::SetScrollBarProfile(LPCSTR profile) { m_scrollbar_profile = profile; }
+
+bool CUIScrollView::IsAdded(CUIWindow* pPossibleChild) const
+{
+    return m_pad->IsChild(pPossibleChild);
+}
+
 void CUIScrollView::AddWindow(CUIWindow* pWnd, bool auto_delete)
 {
     if (auto_delete)

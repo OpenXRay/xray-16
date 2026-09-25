@@ -51,6 +51,7 @@ public:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void Draw();
     virtual void Update();
+    bool IsAdded(CUIWindow* pPossibleChild) const;
     void AddWindow(CUIWindow* pWnd, bool auto_delete);
     void RemoveWindow(CUIWindow* pWnd);
     void Clear();
