@@ -235,4 +235,8 @@ public:
     virtual void BeginDebugEvent(pcstr name) {}
     virtual void EndDebugEvent() {}
     virtual void SetMarker(pcstr name) {}
+
+protected:
+    static bool IsWindowHDREnabled(SDL_Window* window);
+    static DisplayOutput QueryWindowDisplayOutput(SDL_Window* window, bool hdrActive);
 };

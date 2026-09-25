@@ -44,6 +44,19 @@ public:
 // Static instance (must outlive the NVRHI device)
 static NVRHIMessageCallback s_nvrhiMessageCallback;
 
+namespace
+{
+DXGI_FORMAT SwapChainFormat(bool hdr)
+{
+    return hdr ? DXGI_FORMAT_R16G16B16A16_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
+}
+
+DXGI_COLOR_SPACE_TYPE SwapChainColorSpace(bool hdr)
+{
+    return hdr ? DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709 : DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709;
+}
+}
+
 D3D12Backend::D3D12Backend() = default;
 
 D3D12Backend::~D3D12Backend() {
@@ -65,6 +78,7 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         Msg("! [D3D12Backend] No window provided");
         return false;
     }
+    m_window = window;
 
     Msg("* [D3D12Backend] Initializing...");
 
@@ -223,6 +237,8 @@ void D3D12Backend::Shutdown() {
         m_dxgiFactory = nullptr;
     }
 
+    m_window = nullptr;
+    m_hdrOutput = false;
     m_initialized = false;
     Msg("* [D3D12Backend] Shutdown complete");
 }
@@ -338,7 +354,7 @@ bool D3D12Backend::CreateSwapChain(HWND hwnd, u32 width, u32 height) {
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
     swapChainDesc.Width = width;
     swapChainDesc.Height = height;
-    swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc.Format = SwapChainFormat(m_hdrOutput);
     swapChainDesc.SampleDesc.Count = 1;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.BufferCount = BACK_BUFFER_COUNT;
@@ -386,7 +402,7 @@ void D3D12Backend::CreateBackBufferTextures() {
         nvrhi::TextureDesc desc;
         desc.width = m_backBufferWidth;
         desc.height = m_backBufferHeight;
-        desc.format = nvrhi::Format::RGBA8_UNORM;
+        desc.format = m_hdrOutput ? nvrhi::Format::RGBA16_FLOAT : nvrhi::Format::RGBA8_UNORM;
         desc.isRenderTarget = true;
         desc.debugName = "BackBuffer";
         desc.keepInitialState = true;
@@ -508,34 +524,69 @@ void D3D12Backend::Present(bool vsync) {
     }
 }
 
-void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
+void D3D12Backend::ResizeSwapChain(u32 width, u32 height)
+{
+    ResizeSwapChainBuffers(width, height);
+}
+
+bool D3D12Backend::ResizeSwapChainBuffers(u32 width, u32 height)
+{
     WaitForIdle();
 
-    // Release back buffers
     for (auto& bb : m_backBuffers)
         bb = nullptr;
 
-    // Resize (preserve tearing flag)
-    UINT swapChainFlags = m_tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
-    HRESULT hr = m_swapChain->ResizeBuffers(
-        BACK_BUFFER_COUNT,
-        width,
-        height,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
-        swapChainFlags
-    );
-
-    if (FAILED(hr)) {
+    const UINT swapChainFlags = m_tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+    const HRESULT hr = m_swapChain->ResizeBuffers(BACK_BUFFER_COUNT, width, height, SwapChainFormat(m_hdrOutput), swapChainFlags);
+    if (FAILED(hr))
+    {
         Msg("! [D3D12Backend] Failed to resize swap chain");
-        return;
+        return false;
     }
 
     m_backBufferWidth = width;
     m_backBufferHeight = height;
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-    // Recreate back buffer textures
+    const bool colorSpaceApplied = ApplySwapChainColorSpace();
     CreateBackBufferTextures();
+    return colorSpaceApplied;
+}
+
+bool D3D12Backend::ApplySwapChainColorSpace()
+{
+    const DXGI_COLOR_SPACE_TYPE colorSpace = SwapChainColorSpace(m_hdrOutput);
+    UINT support = 0;
+    if (SUCCEEDED(m_swapChain->CheckColorSpaceSupport(colorSpace, &support))
+        && (support & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT) != 0
+        && SUCCEEDED(m_swapChain->SetColorSpace1(colorSpace)))
+        return true;
+
+    Msg("! [D3D12Backend] Swap chain color space %d is not supported", int(colorSpace));
+    return !m_hdrOutput;
+}
+
+bool D3D12Backend::SetHDROutput(bool enabled)
+{
+    if (enabled == m_hdrOutput)
+        return true;
+    if (!m_initialized || m_inFrame || !m_swapChain)
+        return false;
+    if (enabled && !IsWindowHDREnabled(m_window))
+        return false;
+
+    m_hdrOutput = enabled;
+    if (ResizeSwapChainBuffers(m_backBufferWidth, m_backBufferHeight))
+        return true;
+
+    m_hdrOutput = !enabled;
+    ResizeSwapChainBuffers(m_backBufferWidth, m_backBufferHeight);
+    return false;
+}
+
+IRenderBackend::DisplayOutput D3D12Backend::GetDisplayOutput() const
+{
+    return QueryWindowDisplayOutput(m_window, m_hdrOutput);
 }
 
 void D3D12Backend::BeginFrame() {

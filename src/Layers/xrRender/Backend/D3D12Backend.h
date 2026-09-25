@@ -69,6 +69,8 @@ public:
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
     void Present(bool vsync) override;
     void ResizeSwapChain(u32 width, u32 height) override;
+    bool SetHDROutput(bool enabled) override;
+    DisplayOutput GetDisplayOutput() const override;
 
     void BeginFrame() override;
     void EndFrame() override;
@@ -107,6 +109,8 @@ private:
     bool CreateCommandQueue();
     bool CreateSwapChain(HWND hwnd, u32 width, u32 height);
     void CreateBackBufferTextures();
+    bool ResizeSwapChainBuffers(u32 width, u32 height);
+    bool ApplySwapChainColorSpace();
     void CreateBindlessResources();
     void QueryCapabilities();
 
@@ -133,6 +137,8 @@ private:
     bool m_initialized = false;
     bool m_inFrame = false;  // True between BeginFrame/EndFrame
     bool m_tearingSupported = false;  // For uncapped framerate in windowed mode
+    bool m_hdrOutput = false;
+    SDL_Window* m_window = nullptr;
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;

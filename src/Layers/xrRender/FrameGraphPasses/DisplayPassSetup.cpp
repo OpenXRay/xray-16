@@ -31,6 +31,8 @@ static_assert(sizeof(DisplayOutputConstants) == 144, "DisplayOutputParams layout
 
 constexpr float kMinSdrWhiteLevel = 0.1f;
 constexpr float kMaxDisplayPeak = 64.0f;
+constexpr float kMinPaperWhite = 0.25f;
+constexpr float kMaxPaperWhite = 4.0f;
 
 void ApplyDisplayOutput(const IRenderBackend::DisplayOutput& displayOutput, nvrhi::Format outputFormat,
     DisplayOutputConstants& constants)
@@ -38,9 +40,14 @@ void ApplyDisplayOutput(const IRenderBackend::DisplayOutput& displayOutput, nvrh
     if (!displayOutput.hdr || nvrhi::getFormatInfo(outputFormat).kind != nvrhi::FormatKind::Float)
         return;
 
+    const float paperWhite = std::clamp(ps_r_hdr_paper_white, kMinPaperWhite, kMaxPaperWhite);
+    float peak = displayOutput.headroom / paperWhite;
+    if (ps_r_hdr_peak > 0.0f)
+        peak = std::min(peak, ps_r_hdr_peak);
+
     constants.outputHdr = 1u;
-    constants.sdrWhiteLevel = std::max(displayOutput.sdrWhiteLevel, kMinSdrWhiteLevel);
-    constants.displayPeak = std::clamp(displayOutput.headroom, 1.0f, kMaxDisplayPeak);
+    constants.sdrWhiteLevel = std::max(displayOutput.sdrWhiteLevel * paperWhite, kMinSdrWhiteLevel);
+    constants.displayPeak = std::clamp(peak, 1.0f, kMaxDisplayPeak);
 }
 
 void ApplyPostProcess(const PostProcessFrame& postProcess, DisplayOutputConstants& constants)

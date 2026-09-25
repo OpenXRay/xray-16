@@ -306,6 +306,8 @@ float ps_r_exposure_speed_up   = 1.0f;
 float ps_r_exposure_speed_down = 3.0f;
 float ps_r_bloom_intensity     = 0.04f;
 int   ps_r_hdr_output          = 0;
+float ps_r_hdr_paper_white     = 1.0f;
+float ps_r_hdr_peak            = 0.0f;
 int   ps_r_vis_debug           = 0;
 int   ps_r_mesh_shaders        = 0;
 int   ps_r_vis_sw              = 1;
@@ -1078,6 +1080,8 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_exposure_speed_down", &ps_r_exposure_speed_down, 0.05f, 20.0f);
     CMD4(CCC_Float, "r_bloom_intensity", &ps_r_bloom_intensity, 0.0f, 1.0f);
     CMD4(CCC_Integer, "r_hdr_output", &ps_r_hdr_output, 0, 1);
+    CMD4(CCC_Float, "r_hdr_paper_white", &ps_r_hdr_paper_white, 0.25f, 4.0f);
+    CMD4(CCC_Float, "r_hdr_peak", &ps_r_hdr_peak, 0.0f, 64.0f);
     CMD4(CCC_Integer, "r_vis_debug", &ps_r_vis_debug, 0, 3);
     CMD4(CCC_Integer, "r_mesh_shaders", &ps_r_mesh_shaders, 0, 1);
     CMD4(CCC_Integer, "r_vis_sw", &ps_r_vis_sw, 0, 1);
