@@ -7,6 +7,7 @@
 #include "BindlessTextureRegistry.h"
 #undef BOOL
 
+#import <AppKit/AppKit.h>
 #include <nvrhi/metal3.h>
 #include <nvrhi/validation.h>
 #include <SDL3/SDL.h>
@@ -68,6 +69,45 @@ struct MetalBackend::Impl final : nvrhi::IMessageCallback {
     bool initialized = false;
     bool inFrame = false;
     bool readyToPresent = false;
+    bool hdrOutput = false;
+
+    MTLPixelFormat outputPixelFormat() const {
+        return hdrOutput ? MTLPixelFormatRGBA16Float : MTLPixelFormatBGRA8Unorm;
+    }
+
+    nvrhi::Format outputFormat() const {
+        return hdrOutput ? nvrhi::Format::RGBA16_FLOAT : nvrhi::Format::BGRA8_UNORM;
+    }
+
+    void configureOutput() {
+        layer.pixelFormat = outputPixelFormat();
+        layer.wantsExtendedDynamicRangeContent = hdrOutput;
+        CGColorSpaceRef outputColorSpace = CGColorSpaceCreateWithName(
+            hdrOutput ? kCGColorSpaceExtendedLinearSRGB : kCGColorSpaceSRGB);
+        layer.colorspace = outputColorSpace;
+        CGColorSpaceRelease(outputColorSpace);
+    }
+
+    NSScreen* outputScreen() const {
+        NSWindow* nsWindow = window
+            ? (__bridge NSWindow*)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr)
+            : nil;
+        NSScreen* screen = nsWindow ? nsWindow.screen : nil;
+        return screen ? screen : NSScreen.mainScreen;
+    }
+
+    float headroom(bool potential) const {
+        NSScreen* screen = outputScreen();
+        if (!screen)
+            return 1.0f;
+        if (@available(macOS 10.15, *)) {
+            const CGFloat value = potential
+                ? screen.maximumPotentialExtendedDynamicRangeColorComponentValue
+                : screen.maximumExtendedDynamicRangeColorComponentValue;
+            return std::max(1.0f, float(value));
+        }
+        return 1.0f;
+    }
 
     nvrhi::ICommandList* acquire(Pool& pool, nvrhi::CommandQueue queueType) {
         if (pool.used < pool.lists.size())
@@ -287,10 +327,7 @@ bool MetalBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
             return false;
         }
         impl.layer.device = impl.nativeDevice;
-        impl.layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
-        CGColorSpaceRef outputColorSpace = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
-        impl.layer.colorspace = outputColorSpace;
-        CGColorSpaceRelease(outputColorSpace);
+        impl.configureOutput();
         impl.layer.framebufferOnly = YES;
         impl.layer.opaque = YES;
         impl.layer.maximumDrawableCount = GetBackBufferCount();
@@ -529,8 +566,8 @@ void MetalBackend::BeginFrame() {
             return;
         }
         id<MTLTexture> texture = frame.drawable.texture;
-        if (!texture || texture.pixelFormat != MTLPixelFormatBGRA8Unorm || !texture.width || !texture.height) {
-            impl.fail("The Metal drawable has no valid BGRA8 pixel texture.");
+        if (!texture || texture.pixelFormat != impl.outputPixelFormat() || !texture.width || !texture.height) {
+            impl.fail("The Metal drawable does not match the configured output pixel format.");
             frame.drawable = nil;
             return;
         }
@@ -539,7 +576,7 @@ void MetalBackend::BeginFrame() {
         nvrhi::TextureDesc desc;
         desc.width = impl.width;
         desc.height = impl.height;
-        desc.format = nvrhi::Format::BGRA8_UNORM;
+        desc.format = impl.outputFormat();
         desc.isRenderTarget = true;
         desc.isShaderResource = false;
         desc.initialState = nvrhi::ResourceStates::Present;
@@ -634,6 +671,37 @@ void MetalBackend::ResizeSwapChain(u32, u32) {
         if (!impl.initialized || impl.state.load() == DeviceState::Lost || impl.inFrame || impl.readyToPresent)
             return;
         impl.updateDrawableSize();
+    }
+}
+
+bool MetalBackend::SetHDROutput(bool enabled) {
+    @autoreleasepool {
+        Impl& impl = *m_impl;
+        if (enabled == impl.hdrOutput)
+            return true;
+        if (!impl.initialized || impl.inFrame || impl.readyToPresent || impl.state.load() == DeviceState::Lost)
+            return false;
+        if (enabled && impl.headroom(true) <= 1.0f)
+            return false;
+        WaitForIdle();
+        for (Impl::Frame& frame : impl.frames) {
+            frame.texture = nullptr;
+            frame.drawable = nil;
+        }
+        impl.hdrOutput = enabled;
+        impl.configureOutput();
+        return true;
+    }
+}
+
+IRenderBackend::DisplayOutput MetalBackend::GetDisplayOutput() const {
+    @autoreleasepool {
+        const Impl& impl = *m_impl;
+        DisplayOutput output;
+        output.hdr = impl.hdrOutput;
+        if (impl.hdrOutput)
+            output.headroom = impl.headroom(false);
+        return output;
     }
 }
 

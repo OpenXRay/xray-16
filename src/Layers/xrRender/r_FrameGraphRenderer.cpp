@@ -1937,11 +1937,13 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     interfaceLayer = passes::setupFontPass(*m_framegraph, interfaceLayer);
     interfaceLayer = passes::setupCursorPass(*m_framegraph, interfaceLayer, width, height);
     interfaceLayer = passes::setupDebugDrawPass(*m_framegraph, interfaceLayer, width, height);
-
-    framegraph::VirtualResourceHandle displayOutput;
     if (backbufferHandle.is_valid())
-        displayOutput = passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, bloom, interfaceLayer,
-            backbufferHandle, width, height, GetDisplayCalibration(), postProcess, displayState, &m_lightingState);
+        interfaceLayer = passes::setupImGuiPass(*m_framegraph, interfaceLayer, GEnv.Render->GetImGuiRendererNVRHI(), width, height);
+
+    const IRenderBackend::DisplayOutput outputMode = GEnv.Backend ? GEnv.Backend->GetDisplayOutput() : IRenderBackend::DisplayOutput();
+    if (backbufferHandle.is_valid())
+        passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, bloom, interfaceLayer,
+            backbufferHandle, width, height, GetDisplayCalibration(), postProcess, outputMode, displayState, &m_lightingState);
 
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
@@ -2089,13 +2091,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             }
         }
     }
-
-    if (displayOutput.is_valid())
-    {
-        fg::ImGuiRendererNVRHI* imguiRenderer = GEnv.Render->GetImGuiRendererNVRHI();
-        passes::setupImGuiPass(*m_framegraph, displayOutput, imguiRenderer, width, height);
-    }
-
 }
 
 void FrameGraphRenderer::PrintStats() const {

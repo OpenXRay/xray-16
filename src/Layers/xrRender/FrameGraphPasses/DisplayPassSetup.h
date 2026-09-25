@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::framegraph
@@ -85,6 +86,10 @@ public:
     float colorMapInterpolate = 0.0f;
     Fvector colorAdd = {};
     float bloomNormalization = 0.0f;
+    u32 outputHdr = 0;
+    float sdrWhiteLevel = 1.0f;
+    float displayPeak = 1.0f;
+    float outputPad = 0.0f;
 };
 
 class LightingFailurePassData
@@ -179,6 +184,7 @@ framegraph::VirtualResourceHandle setupDisplayOutputPass(
     u32 height,
     const DisplayCalibration& calibration,
     const PostProcessFrame& postProcess,
+    const IRenderBackend::DisplayOutput& displayOutput,
     DisplayPassState& state,
     const LightingFrameState* lighting);
 }

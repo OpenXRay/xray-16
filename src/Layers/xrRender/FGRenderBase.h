@@ -76,6 +76,7 @@ protected:
 
 private:
     void ConvertLegacyAssetsToPBRImpl();
+    void ApplyHDROutputRequest();
 
     DisplayCalibration m_displayCalibration;
     std::thread m_pbrConversionThread;

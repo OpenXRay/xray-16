@@ -34,6 +34,10 @@ cbuffer DisplayOutputParams : register(b0)
     float g_ColorMapInterpolate;
     float3 g_ColorAdd;
     float g_BloomNormalization;
+    uint g_OutputHdr;
+    float g_SdrWhiteLevel;
+    float g_DisplayPeak;
+    float g_OutputPad;
 };
 
 struct PS_INPUT
@@ -42,9 +46,9 @@ struct PS_INPUT
     float2 texcoord : TEXCOORD0;
 };
 
-float3 ApplyCalibration(float3 encoded)
+float3 ApplyCalibration(float3 encoded, float encodedPeak)
 {
-    float3 curved = pow(saturate(encoded), 1.0 / max(g_Gamma, 0.01));
+    float3 curved = pow(clamp(encoded, 0.0, encodedPeak), 1.0 / max(g_Gamma, 0.01));
     return (1.0 + g_Contrast) * 0.5 * curved + (g_Brightness - g_Contrast) * 0.25;
 }
 
@@ -76,7 +80,7 @@ float3 AddBloom(float3 radiance, float2 uv)
 
 float3 EncodeDisplay(float3 radiance)
 {
-    return LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper));
+    return LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper, g_DisplayPeak));
 }
 
 float3 SampleDisplay(float2 uv)
@@ -95,7 +99,7 @@ float3 ApplyColorMap(float3 image)
     return lerp(image, mapped, g_ColorMapInfluence);
 }
 
-float3 ApplyEffects(float3 image, float2 position)
+float3 ApplyEffects(float3 image, float2 position, float encodedPeak)
 {
     if (g_ColorMapInfluence > 0.0)
         image = ApplyColorMap(image);
@@ -105,12 +109,13 @@ float3 ApplyEffects(float3 image, float2 position)
         float3 noise = t_Noise.SampleLevel(smp_linear, g_NoiseOffset + position * g_NoiseScale, 0).rgb;
         image = lerp(image, image * noise * 2.0, g_NoiseIntensity);
     }
-    return saturate((image * g_ColorBase + g_ColorAdd) * 2.0);
+    return clamp((image * g_ColorBase + g_ColorAdd) * 2.0, 0.0, encodedPeak);
 }
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
     int3 pixel = int3(input.position.xy, 0);
+    float encodedPeak = g_OutputHdr != 0u ? LinearToSrgb(g_DisplayPeak.xxx).x : 1.0;
     float3 display = 0.0;
     if (g_SceneValid != 0u)
     {
@@ -119,7 +124,7 @@ float4 main(PS_INPUT input) : SV_TARGET
         {
             float2 base = uv * (1.0 - g_DualityShift) + g_BlurShift;
             display = 0.5 * (SampleDisplay(base) + SampleDisplay(base + g_DualityShift));
-            display = ApplyEffects(display, input.position.xy);
+            display = ApplyEffects(display, input.position.xy, encodedPeak);
         }
         else
         {
@@ -128,6 +133,9 @@ float4 main(PS_INPUT input) : SV_TARGET
     }
     float4 ui = t_Interface.Load(pixel);
     display = ui.rgb + display * (1.0 - ui.a);
-    display = ApplyCalibration(display) + QuantizationDither(input.position.xy, g_FrameIndex);
+    display = ApplyCalibration(display, encodedPeak);
+    if (g_OutputHdr != 0u)
+        return float4(SrgbToLinear(clamp(display, 0.0, encodedPeak)) * g_SdrWhiteLevel, 1.0);
+    display += QuantizationDither(input.position.xy, g_FrameIndex);
     return float4(saturate(display), 1.0);
 }

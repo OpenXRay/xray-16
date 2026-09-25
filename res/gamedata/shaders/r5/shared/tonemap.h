@@ -6,7 +6,7 @@
 #define TONEMAP_AGX 2
 #define TONEMAP_ACES 3
 
-float3 TonemapPbrNeutral(float3 color)
+float3 TonemapPbrNeutral(float3 color, float peakWhite)
 {
     const float startCompression = 0.8 - 0.04;
     const float desaturation = 0.15;
@@ -16,8 +16,8 @@ float3 TonemapPbrNeutral(float3 color)
     float peak = max(color.r, max(color.g, color.b));
     if (peak < startCompression)
         return color;
-    const float d = 1.0 - startCompression;
-    float newPeak = 1.0 - d * d / (peak + d - startCompression);
+    const float d = peakWhite - startCompression;
+    float newPeak = peakWhite - d * d / (peak + d - startCompression);
     color *= newPeak / peak;
     float g = 1.0 - 1.0 / (desaturation * (peak - newPeak) + 1.0);
     return lerp(color, newPeak.xxx, g);
@@ -64,15 +64,15 @@ float3 TonemapAcesFitted(float3 color)
     return saturate(mul(acesOutput, a / b));
 }
 
-float3 Tonemap(float3 color, uint tonemapper)
+float3 Tonemap(float3 color, uint tonemapper, float peakWhite)
 {
     if (tonemapper == TONEMAP_PBR_NEUTRAL)
-        return saturate(TonemapPbrNeutral(color));
+        return clamp(TonemapPbrNeutral(color, peakWhite), 0.0, peakWhite);
     if (tonemapper == TONEMAP_AGX)
         return saturate(TonemapAgx(color));
     if (tonemapper == TONEMAP_ACES)
         return TonemapAcesFitted(color);
-    return saturate(color);
+    return clamp(color, 0.0, peakWhite);
 }
 
 #endif

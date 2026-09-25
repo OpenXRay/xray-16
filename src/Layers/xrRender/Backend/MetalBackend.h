@@ -53,6 +53,8 @@ public:
     std::pair<u32, u32> GetBackBufferSize() const override;
     void Present(bool vsync) override;
     void ResizeSwapChain(u32 width, u32 height) override;
+    bool SetHDROutput(bool enabled) override;
+    DisplayOutput GetDisplayOutput() const override;
     void BeginFrame() override;
     void EndFrame() override;
     bool IsInFrame() const override;
