@@ -869,7 +869,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
 
     if (dxShader->m_vsReflection) {
-        pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection);
+        pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection.get());
         pso->constantLayout = dxShader->m_vsReflection->constantLayout;
 
         for (const auto& cb : dxShader->m_vsReflection->constantLayout.constantBuffers.buffers) {

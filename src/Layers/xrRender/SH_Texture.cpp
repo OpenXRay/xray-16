@@ -44,7 +44,8 @@ CTexture::CTexture()
 CTexture::~CTexture()
 {
     Unload();
-    RImplementation.Resources->_DeleteTexture(this);
+    if (RImplementation.Resources)
+        RImplementation.Resources->_DeleteTexture(this);
 }
 
 void CTexture::desc_update()
