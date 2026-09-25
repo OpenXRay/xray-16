@@ -1083,9 +1083,7 @@ bool VulkanBackend::SetHDROutput(bool enabled) {
     }
     if (!m_initialized || m_inFrame)
         return false;
-    const bool windowHDR = m_window
-        && SDL_GetBooleanProperty(SDL_GetWindowProperties(m_window), SDL_PROP_WINDOW_HDR_ENABLED_BOOLEAN, false);
-    if (enabled && (!windowHDR || !SurfaceSupportsHDR()))
+    if (enabled && (!IsWindowHDREnabled(m_window) || !SurfaceSupportsHDR()))
         return false;
     m_hdrOutput = enabled;
     ResizeSwapChain(m_backBufferWidth, m_backBufferHeight);
@@ -1093,14 +1091,7 @@ bool VulkanBackend::SetHDROutput(bool enabled) {
 }
 
 IRenderBackend::DisplayOutput VulkanBackend::GetDisplayOutput() const {
-    DisplayOutput output;
-    output.hdr = m_hdrActive;
-    if (m_hdrActive && m_window) {
-        const SDL_PropertiesID properties = SDL_GetWindowProperties(m_window);
-        output.sdrWhiteLevel = SDL_GetFloatProperty(properties, SDL_PROP_WINDOW_SDR_WHITE_LEVEL_FLOAT, 1.0f);
-        output.headroom = SDL_GetFloatProperty(properties, SDL_PROP_WINDOW_HDR_HEADROOM_FLOAT, 1.0f);
-    }
-    return output;
+    return QueryWindowDisplayOutput(m_window, m_hdrActive);
 }
 
 void VulkanBackend::BeginFrame() {

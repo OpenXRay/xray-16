@@ -64,14 +64,26 @@ float3 TonemapAcesFitted(float3 color)
     return saturate(mul(acesOutput, a / b));
 }
 
+float3 ExtendHighlights(float3 color, float peakWhite)
+{
+    const float knee = 0.76;
+    float peak = max(color.r, max(color.g, color.b));
+    if (peakWhite <= 1.0 || peak <= knee)
+        return color;
+    float slope = (1.0 - knee) / (peakWhite - knee);
+    float t = min((peak - knee) / (1.0 - knee), 1.0);
+    float extended = knee + (1.0 - knee) * t / (1.0 - (1.0 - slope) * t);
+    return color * (extended / peak);
+}
+
 float3 Tonemap(float3 color, uint tonemapper, float peakWhite)
 {
     if (tonemapper == TONEMAP_PBR_NEUTRAL)
         return clamp(TonemapPbrNeutral(color, peakWhite), 0.0, peakWhite);
     if (tonemapper == TONEMAP_AGX)
-        return saturate(TonemapAgx(color));
+        return ExtendHighlights(saturate(TonemapAgx(color)), peakWhite);
     if (tonemapper == TONEMAP_ACES)
-        return TonemapAcesFitted(color);
+        return ExtendHighlights(TonemapAcesFitted(color), peakWhite);
     return clamp(color, 0.0, peakWhite);
 }
 
