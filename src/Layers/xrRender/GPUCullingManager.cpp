@@ -1599,6 +1599,7 @@ u32 GPUCullingManager::PrepareSkeletonPalette(CKinematics* skeleton)
     m_currentBoneOffset += boneCount;
     skeleton->fg_bone_upload_frame = m_boneUploadFrameId;
     skeleton->fg_bone_upload_offset = offset;
+    skeleton->fg_bone_pose_signature_valid = false;
     return offset;
 }
 
@@ -3158,6 +3159,31 @@ const Fmatrix* GPUCullingManager::GetPreparedSkeletonMatrices(CKinematics* skele
     count = skeleton->LL_BoneCount();
     R_ASSERT(u64(offset) + count <= m_currentBoneOffset);
     return m_boneStagingBuffer.data() + offset;
+}
+
+u64 GPUCullingManager::GetPreparedSkeletonPoseSignature(CKinematics* skeleton) const
+{
+    u32 boneCount = 0;
+    const Fmatrix* bones = GetPreparedSkeletonMatrices(skeleton, boneCount);
+    if (!skeleton->fg_bone_pose_signature_valid)
+    {
+        ZoneScopedN("Animation::PalettePoseSignature");
+        u64 signature = 14695981039346656037ull;
+        const auto append = [&](const void* data, size_t size)
+        {
+            const auto* bytes = static_cast<const u8*>(data);
+            for (size_t i = 0; i < size; ++i)
+            {
+                signature ^= bytes[i];
+                signature *= 1099511628211ull;
+            }
+        };
+        append(&boneCount, sizeof(boneCount));
+        append(bones, size_t(boneCount) * sizeof(Fmatrix));
+        skeleton->fg_bone_pose_signature = signature;
+        skeleton->fg_bone_pose_signature_valid = true;
+    }
+    return skeleton->fg_bone_pose_signature;
 }
 
 void GPUCullingManager::BeginGeometryResidencyFrame()

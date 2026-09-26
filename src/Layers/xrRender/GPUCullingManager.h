@@ -435,6 +435,7 @@ public:
     static constexpr u32 RT_VERTEX_STRIDE = 40u;
     u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
     const Fmatrix* GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const;
+    u64 GetPreparedSkeletonPoseSignature(CKinematics* skeleton) const;
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
     nvrhi::IBuffer* GetClusterPageBuffer() const { return m_residency.GetPageTableBuffer(); }
     nvrhi::IBuffer* GetClusterPayloadBuffer() const { return m_residency.GetPayloadArenaBuffer(); }

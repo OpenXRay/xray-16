@@ -135,6 +135,8 @@ public:
 
     u32 fg_bone_upload_frame{0};
     u32 fg_bone_upload_offset{0};
+    u64 fg_bone_pose_signature{0};
+    bool fg_bone_pose_signature_valid{false};
 
 protected:
     SkeletonWMVec wallmarks;

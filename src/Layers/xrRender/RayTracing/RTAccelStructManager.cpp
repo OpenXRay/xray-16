@@ -1508,10 +1508,8 @@ u64 RTAccelStructManager::SkinPoseHash(const GPUCullingManager* gpu, const Geome
     CKinematics* skeleton = RTBatchSkeleton(batch);
     if (!skeleton)
         return hash;
-    u32 boneCount = 0;
-    const Fmatrix* bones = gpu->GetPreparedSkeletonMatrices(skeleton, boneCount);
-    HashSceneData(hash, &boneCount, sizeof(boneCount));
-    HashSceneData(hash, bones, size_t(boneCount) * sizeof(Fmatrix));
+    const u64 pose = gpu->GetPreparedSkeletonPoseSignature(skeleton);
+    HashSceneData(hash, &pose, sizeof(pose));
     return hash;
 }
 
