@@ -36,14 +36,6 @@ FGResourceManager::~FGResourceManager() {
 //  FRAME MANAGEMENT
 // ═══════════════════════════════════════════════════
 
-void FGResourceManager::BeginFrame() {
-    m_bufferManager->BeginFrame();
-}
-
-void FGResourceManager::EndFrame() {
-    m_bufferManager->EndFrame();
-}
-
 void FGResourceManager::Update(float deltaTime) {
     m_ioService->Pump();
     m_textureManager->Update(deltaTime);

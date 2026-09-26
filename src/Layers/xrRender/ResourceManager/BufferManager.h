@@ -75,44 +75,6 @@ struct BufferMetadata {
 };
 
 // ═══════════════════════════════════════════════════
-//  RING BUFFER (For Dynamic Allocations)
-// ═══════════════════════════════════════════════════
-
-class RingBuffer {
-public:
-    RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName);
-    ~RingBuffer();
-
-    // Allocate from ring buffer
-    struct Allocation {
-        nvrhi::BufferHandle buffer;
-        u64 offset;
-        u64 size;
-        void* cpuAddress;  // If mapped
-    };
-
-    Allocation Allocate(u64 size, u32 alignment = 256);
-
-    // Advance to next frame (wrap around)
-    void AdvanceFrame();
-
-    // Get statistics
-    u64 GetSize() const { return m_size; }
-    u64 GetUsed() const { return m_used; }
-    u64 GetAvailable() const { return m_size - m_used; }
-
-private:
-    xray::render::fg::RenderDevice* m_device;
-    nvrhi::BufferHandle m_buffer;
-
-    u64 m_size;
-    u64 m_head;      // Current write position
-    u64 m_used;      // Bytes used this frame
-
-    void* m_cpuAddress;  // Persistent mapping
-};
-
-// ═══════════════════════════════════════════════════
 //  BUFFER MANAGER
 // ═══════════════════════════════════════════════════
 
@@ -140,23 +102,6 @@ public:
     );
 
     // ═══════════════════════════════════════════════════
-    //  DYNAMIC BUFFERS (Ring Buffer Allocation)
-    // ═══════════════════════════════════════════════════
-
-    // Allocate from ring buffer (per-frame data)
-    RingBuffer::Allocation AllocateDynamic(u64 size, u32 alignment = 256);
-
-    // Allocate constant buffer data (convenience)
-    template<typename T>
-    RingBuffer::Allocation AllocateConstants(const T& data) {
-        auto alloc = AllocateDynamic(sizeof(T), 256);
-        if (alloc.cpuAddress) {
-            memcpy(alloc.cpuAddress, &data, sizeof(T));
-        }
-        return alloc;
-    }
-
-    // ═══════════════════════════════════════════════════
     //  ACCESS
     // ═══════════════════════════════════════════════════
 
@@ -172,24 +117,17 @@ public:
     void DestroyBuffer(BufferHandle handle);
 
     // ═══════════════════════════════════════════════════
-    //  FRAME MANAGEMENT
-    // ═══════════════════════════════════════════════════
-
-    void BeginFrame();
-    void EndFrame();
-
-    // ═══════════════════════════════════════════════════
     //  STATISTICS
     // ═══════════════════════════════════════════════════
 
-    struct Statistics {
+    class Statistics
+    {
+    public:
         u64 staticMemoryUsed = 0;
-        u64 dynamicMemoryUsed = 0;
         u64 totalMemoryUsed = 0;
 
         u32 buffersTotal = 0;
         u32 buffersStatic = 0;
-        u32 dynamicAllocationsThisFrame = 0;
     };
 
     Statistics GetStatistics() const;
@@ -201,11 +139,6 @@ private:
     // Static buffers
     xr_vector<BufferMetadata> m_buffers;
     xr_vector<u32> m_freeSlots;
-
-    // Dynamic buffers (ring buffers)
-    xr_unique_ptr<RingBuffer> m_constantBufferRing;
-    xr_unique_ptr<RingBuffer> m_vertexBufferRing;
-    xr_unique_ptr<RingBuffer> m_indexBufferRing;
 
     // Handle management
     BufferHandle AllocateHandle();

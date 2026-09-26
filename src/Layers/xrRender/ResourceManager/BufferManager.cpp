@@ -7,121 +7,10 @@
 
 namespace xray::render::resources {
 
-// ═══════════════════════════════════════════════════
-//  RING BUFFER IMPLEMENTATION
-// ═══════════════════════════════════════════════════
-
-RingBuffer::RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName)
-    : m_device(device)
-    , m_size(size)
-    , m_head(0)
-    , m_used(0)
-    , m_cpuAddress(nullptr)
-{
-    VERIFY(m_device);
-    // Create upload buffer for D3D12 - NOT volatile, just CPU-writable
-    // This allows persistent mapping which is needed for ring buffer pattern
-    nvrhi::BufferDesc desc;
-    desc.byteSize = size;
-    desc.structStride = 0;
-    desc.debugName = debugName;
-    desc.isConstantBuffer = false;  // Generic upload buffer
-    desc.cpuAccess = nvrhi::CpuAccessMode::Write;
-    desc.isVolatile = false;  // Allows persistent mapping
-    desc.keepInitialState = true;
-    desc.initialState = nvrhi::ResourceStates::CopySource;  // Upload heap state
-
-    m_buffer = m_device->GetNativeDevice()->createBuffer(desc);
-
-    if (!m_buffer) {
-        Msg("! [RingBuffer] ❌ Failed to create buffer: %s", debugName);
-        return;
-    }
-
-    // Persistent map - this works for non-volatile upload buffers in D3D12
-    m_cpuAddress = m_device->GetNativeDevice()->mapBuffer(m_buffer, nvrhi::CpuAccessMode::Write);
-
-    if (!m_cpuAddress) {
-        Msg("! [RingBuffer] ❌ Failed to map buffer: %s", debugName);
-        m_buffer = nullptr;
-        return;
-    }
-
-    // Msg("! [RingBuffer] Created: %s (%llu MB)",
-    //     debugName, size / (1024 * 1024));
-}
-
-RingBuffer::~RingBuffer() {
-    if (m_buffer && m_cpuAddress) {
-        m_device->GetNativeDevice()->unmapBuffer(m_buffer);
-    }
-}
-
-RingBuffer::Allocation RingBuffer::Allocate(u64 size, u32 alignment) {
-    // Align head
-    u64 alignedHead = (m_head + alignment - 1) & ~(u64)(alignment - 1);
-
-    // Check if we have space
-    if (alignedHead + size > m_size) {
-        // Wrap around
-        // Msg("! [RingBuffer] ⚠️ Wrapping around (head=%llu, size=%llu)",
-        //     m_head, m_size);
-
-        alignedHead = 0;
-        m_head = 0;
-        m_used = 0;  // Reset usage for new frame
-    }
-
-    // Create allocation
-    Allocation alloc;
-    alloc.buffer = m_buffer;
-    alloc.offset = alignedHead;
-    alloc.size = size;
-    alloc.cpuAddress = m_cpuAddress ?
-        (u8*)m_cpuAddress + alignedHead : nullptr;
-
-    // Advance head
-    m_head = alignedHead + size;
-    m_used += size;
-
-    return alloc;
-}
-
-void RingBuffer::AdvanceFrame() {
-    // Could implement per-frame tracking here
-    // For now, just reset usage counter
-    m_used = 0;
-}
-
-// ═══════════════════════════════════════════════════
-//  BUFFER MANAGER IMPLEMENTATION
-// ═══════════════════════════════════════════════════
-
 BufferManager::BufferManager(xray::render::fg::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);
-
-    // Create ring buffers
-    m_constantBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        16 * 1024 * 1024,  // 16 MB
-        "ConstantBufferRing"
-    );
-
-    m_vertexBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        32 * 1024 * 1024,  // 32 MB
-        "VertexBufferRing"
-    );
-
-    m_indexBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        16 * 1024 * 1024,  // 16 MB
-        "IndexBufferRing"
-    );
-
-    // Msg("! [BufferManager] Created");
 }
 
 BufferManager::~BufferManager() {
@@ -255,21 +144,6 @@ void BufferManager::UpdateBuffer(
 }
 
 // ═══════════════════════════════════════════════════
-//  DYNAMIC ALLOCATION
-// ═══════════════════════════════════════════════════
-
-RingBuffer::Allocation BufferManager::AllocateDynamic(u64 size, u32 alignment) {
-    // Use constant buffer ring by default
-    // TODO: Route to appropriate ring based on usage
-    auto alloc = m_constantBufferRing->Allocate(size, alignment);
-
-    m_stats.dynamicAllocationsThisFrame++;
-    m_stats.dynamicMemoryUsed += size;
-
-    return alloc;
-}
-
-// ═══════════════════════════════════════════════════
 //  LIFECYCLE
 // ═══════════════════════════════════════════════════
 
@@ -305,22 +179,6 @@ void BufferManager::DestroyBuffer(BufferHandle handle) {
 
     // Free handle
     FreeHandle(handle);
-}
-
-// ═══════════════════════════════════════════════════
-//  FRAME MANAGEMENT
-// ═══════════════════════════════════════════════════
-
-void BufferManager::BeginFrame() {
-    m_stats.dynamicAllocationsThisFrame = 0;
-    m_stats.dynamicMemoryUsed = 0;
-}
-
-void BufferManager::EndFrame() {
-    // Advance ring buffers
-    m_constantBufferRing->AdvanceFrame();
-    m_vertexBufferRing->AdvanceFrame();
-    m_indexBufferRing->AdvanceFrame();
 }
 
 // ═══════════════════════════════════════════════════
@@ -387,23 +245,23 @@ bool BufferManager::ValidateHandle(BufferHandle handle) const {
 //  STATISTICS
 // ═══════════════════════════════════════════════════
 
-BufferManager::Statistics BufferManager::GetStatistics() const {
-    m_stats.totalMemoryUsed = m_stats.staticMemoryUsed + m_stats.dynamicMemoryUsed;
+BufferManager::Statistics BufferManager::GetStatistics() const
+{
+    m_stats.totalMemoryUsed = m_stats.staticMemoryUsed;
     return m_stats;
 }
 
-void BufferManager::PrintStatistics() const {
+void BufferManager::PrintStatistics() const
+{
     auto stats = GetStatistics();
 
     Msg("! [BufferManager] Statistics:");
-    Msg("!   Memory: %llu MB static, %llu MB dynamic, %llu MB total",
+    Msg("!   Memory: %llu MB static, %llu MB total",
         stats.staticMemoryUsed / (1024 * 1024),
-        stats.dynamicMemoryUsed / (1024 * 1024),
         stats.totalMemoryUsed / (1024 * 1024));
-    Msg("!   Buffers: %u total, %u static, %u dynamic allocs this frame",
+    Msg("!   Buffers: %u total, %u static",
         stats.buffersTotal,
-        stats.buffersStatic,
-        stats.dynamicAllocationsThisFrame);
+        stats.buffersStatic);
 }
 
 } // namespace xray::render::resources

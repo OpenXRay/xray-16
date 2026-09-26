@@ -39,8 +39,6 @@ public:
     //  FRAME MANAGEMENT
     // ═══════════════════════════════════════════════════
 
-    void BeginFrame();
-    void EndFrame();
     void Update(float deltaTime);
 
     // ═══════════════════════════════════════════════════
