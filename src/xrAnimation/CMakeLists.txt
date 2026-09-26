@@ -13,6 +13,10 @@ target_sources_grouped(
     TARGET xrAnimation
     NAME "Runtime"
     FILES
+    OzzMath.h
+    OzzMath.cpp
+    OzzLimbSolver.h
+    OzzLimbSolver.cpp
     OzzMotionLibrary.h
     OzzMotionLibrary.cpp
     OzzSkeletonMirror.h
@@ -47,6 +51,7 @@ target_link_libraries(xrAnimation
     ozz_animation
     ozz_base
     PRIVATE
+    xrMiscMath
     ozz_animation_offline
 )
 

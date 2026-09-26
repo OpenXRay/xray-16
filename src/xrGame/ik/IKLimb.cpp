@@ -18,6 +18,8 @@ extern int ik_allign_free_foot;
 int ik_blend_free_foot = 1;
 int ik_local_blending = 0;
 int ik_collide_blend = 0;
+u32 ps_ik_solver = ikSolverVanilla;
+static_assert(u32(XRay::Animation::OzzLimbSolver::Failure::Count) <= 32);
 
 //const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
 
@@ -57,7 +59,7 @@ IC Fmatrix& SCalculateData::goal(Fmatrix& g) const
 
 CIKLimb::CIKLimb() { Invalidate(); }
 CIKLimb::CIKLimb(const CIKLimb& l)
-    : m_limb(l.m_limb), m_K(l.m_K), m_foot(l.m_foot), collider(l.collider),
+    : m_limb(l.m_limb), m_ozz_limb(l.m_ozz_limb), m_K(l.m_K), m_foot(l.m_foot), collider(l.collider),
       m_id(l.m_id), m_collide(l.m_collide), collide_data(l.collide_data),
       anim_state(l.anim_state), state_predict(l.state_predict)
 {
@@ -220,6 +222,13 @@ bool CIKLimb::SetGoalToLimb(const SCalculateData& cd)
 
 void CIKLimb::Solve(SCalculateData& cd)
 {
+    if (ps_ik_solver == ikSolverOzz)
+    {
+        SolveOzz(cd);
+        return;
+    }
+
+    m_ozz_failures_reported = 0;
     if (!SetGoalToLimb(cd))
         return;
 
@@ -256,6 +265,35 @@ void CIKLimb::Solve(SCalculateData& cd)
         DBG_DrawPoint(dbg_pos, 0.02f, color_xrgb(255, 255, 0));
     }
 #endif
+}
+
+void CIKLimb::SolveOzz(SCalculateData& cd)
+{
+    using Solver = XRay::Animation::OzzLimbSolver;
+    Fmatrix inverseStart;
+    GetHipInvert(inverseStart, cd);
+    Fmatrix start;
+    start.invert(inverseStart);
+    Fmatrix goal;
+    cd.goal(goal);
+    Fvector knee;
+    GetKnee(knee, cd);
+    Fmatrix rotations[3];
+    const Solver::Result result = m_ozz_limb.Solve(start, goal, knee, rotations);
+    if (result.failure != Solver::Failure::None)
+    {
+        const u32 failureMask = u32(1) << u32(result.failure);
+        if (!(m_ozz_failures_reported & failureMask))
+        {
+            Msg("! [IK] ozz rejected limb %u (%s), skeleton=%p, reason=%s, %s=%.9g, limit=%.9g; "
+                "retaining animation without vanilla fallback",
+                u32(m_id), Kinematics()->LL_BoneName_dbg(m_bones[0]), static_cast<void*>(m_K),
+                Solver::FailureName(result.failure), result.metric, result.value, result.limit);
+            m_ozz_failures_reported |= failureMask;
+        }
+        return;
+    }
+    CalculateBones(cd, rotations);
 }
 
 IC void set_limits(float& min, float& max, SJointLimit& l)
@@ -328,6 +366,8 @@ void CIKLimb::Create(u16 id, IKinematicsAnimated* K, bool collide_)
     XS.set(binds[m_bones[1]]);
     XS.invert();
     XS.mulB_43(binds[m_bones[2]]);
+    m_ozz_limb.Initialize(XT, XS);
+    m_ozz_failures_reported = 0;
     Matrix T, S;
     XM2IM(XT, T);
     XM2IM(XS, S);
@@ -1118,17 +1158,30 @@ Matrix& CIKLimb::Goal(Matrix& gl, const Fmatrix& xm, const SCalculateData& cd)
     return gl;
 }
 
-void CIKLimb::CalculateBones(SCalculateData& cd)
+void CIKLimb::CalculateBones(SCalculateData& cd, const Fmatrix* rotations)
 {
-    VERIFY(cd.m_angles);
+    VERIFY(cd.m_angles || rotations);
     IKinematics* K = cd.m_limb->Kinematics();
     ssaved_callback sv0(K->LL_GetBoneInstance(m_bones[0]));
     ssaved_callback sv1(K->LL_GetBoneInstance(m_bones[1]));
     ssaved_callback sv2(K->LL_GetBoneInstance(m_bones[2]));
 
-    K->LL_GetBoneInstance(m_bones[0]).set_callback(bctCustom, BonesCallback0, &cd, TRUE);
-    K->LL_GetBoneInstance(m_bones[1]).set_callback(bctCustom, BonesCallback1, &cd, TRUE);
-    K->LL_GetBoneInstance(m_bones[2]).set_callback(bctCustom, BonesCallback2, &cd, TRUE);
+    const BoneCallback callbacks[3] = {BonesCallback0, BonesCallback1, BonesCallback2};
+    OzzCallbackData ozzCallbacks[3];
+    for (u16 i = 0; i < 3; ++i)
+    {
+        if (rotations)
+        {
+            ozzCallbacks[i].calculation = &cd;
+            ozzCallbacks[i].rotation = &rotations[i];
+            ozzCallbacks[i].bone = i;
+            K->LL_GetBoneInstance(m_bones[i]).set_callback(bctCustom, OzzBonesCallback, &ozzCallbacks[i], TRUE);
+        }
+        else
+        {
+            K->LL_GetBoneInstance(m_bones[i]).set_callback(bctCustom, callbacks[i], &cd, TRUE);
+        }
+    }
 
     CBoneData& BD = K->LL_GetData(m_bones[0]);
     K->Bone_Calculate(&BD, &K->LL_GetTransform(BD.GetParentID()));
@@ -1136,6 +1189,14 @@ void CIKLimb::CalculateBones(SCalculateData& cd)
     sv0.restore();
     sv1.restore();
     sv2.restore();
+}
+
+void CIKLimb::OzzBonesCallback(CBoneInstance* B)
+{
+    const auto* data = static_cast<const OzzCallbackData*>(B->callback_param());
+    Fmatrix start;
+    get_start(start, *data->calculation, data->bone);
+    B->mTransform.mul_43(start, *data->rotation);
 }
 
 void DBG_DrawRotationLimitsY(const Fmatrix& start, float ang, float l, float h)

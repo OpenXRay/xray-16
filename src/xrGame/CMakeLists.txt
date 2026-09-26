@@ -2499,6 +2499,7 @@ target_link_libraries(xrGame
     xrCDB
     xrPhysics
     xrNetServer
+    xrAnimation
     $<$<PLATFORM_ID:Windows>:xray_ansel>
 )
 
