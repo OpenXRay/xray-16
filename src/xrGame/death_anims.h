@@ -72,6 +72,4 @@ private:
     rnd_motion rnd_anims;
 };
 
-#ifdef DEBUG
 extern BOOL death_anim_debug;
-#endif

@@ -4,7 +4,9 @@
 #include "OzzSkeletonMirror.h"
 
 #include "xrCore/Profiler/Profiler.h"
+#include "xrCore/_quaternion.h"
 #include <ozz/animation/runtime/sampling_job.h>
+#include <ozz/base/maths/math_constant.h>
 #include <ozz/base/maths/soa_float4x4.h>
 #include <ozz/base/maths/soa_transform.h>
 #include <algorithm>
@@ -107,6 +109,15 @@ void ComputeLocalMatrices(const SoaTransform& pose, Float4x4 (&result)[4])
     const auto matrices = SoaFloat4x4::FromAffine(pose.translation, rotation, pose.scale);
     Transpose16x16(&matrices.cols[0].x, result->cols);
 }
+
+SoaTransform BroadcastPose(SimdFloat4 translation, SimdFloat4 rotation)
+{
+    SoaTransform value;
+    value.translation = {SplatX(translation), SplatY(translation), SplatZ(translation)};
+    value.rotation = {SplatX(rotation), SplatY(rotation), SplatZ(rotation), SplatW(rotation)};
+    value.scale = SoaFloat3::one();
+    return value;
+}
 }
 
 struct OzzPose::State
@@ -150,6 +161,7 @@ struct OzzPose::State
     {
         u64 revision = 0;
         u8 channels = 0;
+        bool includeBasePose = false;
         Fmatrix matrices[4];
     };
 
@@ -160,6 +172,10 @@ struct OzzPose::State
     xr_vector<Packet> packets;
     SamplingBank normal;
     SamplingBank query;
+    xr_vector<SoaTransform, ozz::StdAllocator<SoaTransform>> basePose;
+    xr_vector<SimdInt4, ozz::StdAllocator<SimdInt4>> basePoseMask;
+    float basePoseWeight = 0.f;
+    bool basePoseActive = false;
     float factors[channelCount] = {1.f, 1.f, 1.f, 1.f};
     u64 revision = 1;
 
@@ -215,8 +231,8 @@ struct OzzPose::State
         return sample.locals;
     }
 
-    SoaTransform Compose(SamplingBank& bank, size_t packet, u8 channels, u16 queryBone = noBlend,
-        const OzzPoseOverride* controls = nullptr) const
+    SoaTransform Compose(SamplingBank& bank, size_t packet, u8 channels, bool includeBasePose,
+        u16 queryBone = noBlend, const OzzPoseOverride* controls = nullptr) const
     {
         const auto zero = simd_float4::zero();
         const auto one = simd_float4::one();
@@ -318,6 +334,17 @@ struct OzzPose::State
             }
         }
         result.rotation.w = Select(CmpEq(Dot(result.rotation, result.rotation), zero), one, result.rotation.w);
+        if (includeBasePose && basePoseActive && basePoseWeight > 0.f)
+        {
+            SoaTransform captured = basePose[packet];
+            if (basePoseWeight < 1.f)
+            {
+                SoaTransform animated = result;
+                animated.rotation = Normalize(animated.rotation);
+                captured = Interpolate(animated, captured, simd_float4::Load1(basePoseWeight));
+            }
+            result = SelectPose(basePoseMask[packet], captured, result);
+        }
         result.rotation = Conjugate(result.rotation);
         return result;
     }
@@ -389,19 +416,167 @@ bool OzzPose::SetChannelFactor(u16 channel, float factor)
     return true;
 }
 
-const Fmatrix& OzzPose::EvaluateLocalBone(u16 bone, u8 channels)
+bool OzzPose::SetBasePose(ozz::span<const Fmatrix> modelPose, float weight,
+    ozz::span<const u8> visibleBones, PoseCaptureResult* result)
 {
+    if (result)
+        *result = {};
+    const auto reject = [result](pcstr reason, u16 bone, float value, float limit)
+    {
+        if (result)
+            *result = {reason, bone, value, limit};
+        return false;
+    };
+    if (!state || !state->assets || !state->assets->skeleton)
+        return reject("missing-skeleton", BI_NONE, 0.f, 0.f);
+    if (!std::isfinite(weight))
+        return reject("invalid-weight", BI_NONE, weight, 1.f);
+
+    const auto& mirror = *state->assets->skeleton;
+    if (modelPose.size() != mirror.boneToJoint.size())
+        return reject("bone-count", BI_NONE, float(modelPose.size()), float(mirror.boneToJoint.size()));
+    if (!visibleBones.empty() && visibleBones.size() != modelPose.size())
+        return reject("visibility-count", BI_NONE, float(visibleBones.size()), float(modelPose.size()));
+
+    size_t visibleCount = 0;
+    for (size_t bone = 0; bone < modelPose.size(); ++bone)
+    {
+        if (!visibleBones.empty() && !visibleBones[bone])
+            continue;
+        ++visibleCount;
+        const Fmatrix& matrix = modelPose[bone];
+        if (!_valid(matrix))
+            return reject("non-finite-model-transform", u16(bone), 0.f, 0.f);
+        const float affineError = std::max({_abs(matrix._14), _abs(matrix._24), _abs(matrix._34),
+            _abs(matrix._44 - 1.f)});
+        if (affineError > EPS)
+            return reject("non-affine-model-transform", u16(bone), affineError, EPS);
+        const Float4x4 transform = ImportOzzMatrix(matrix);
+        if (!AreAllTrue3(IsNormalizedEst(transform)))
+        {
+            const float lengthError = std::max({_abs(matrix.i.square_magnitude() - 1.f),
+                _abs(matrix.j.square_magnitude() - 1.f), _abs(matrix.k.square_magnitude() - 1.f)});
+            return reject("non-unit-model-basis", u16(bone), lengthError, kNormalizationToleranceEstSq);
+        }
+        const float orthogonalityError = std::max({_abs(matrix.i.dotproduct(matrix.j)),
+            _abs(matrix.i.dotproduct(matrix.k)), _abs(matrix.j.dotproduct(matrix.k))});
+        if (orthogonalityError > kNormalizationToleranceEstSq)
+            return reject("non-orthogonal-model-basis", u16(bone), orthogonalityError, kNormalizationToleranceEstSq);
+        Fvector normal;
+        normal.crossproduct(matrix.i, matrix.j);
+        const float handedness = normal.dotproduct(matrix.k);
+        if (handedness <= 0.f)
+            return reject("reflected-model-basis", u16(bone), handedness, 0.f);
+    }
+    if (!visibleCount)
+        return reject("no-visible-bones", BI_NONE, 0.f, 1.f);
+
+    const auto jointParents = mirror.skeleton.joint_parents();
+    xr_vector<SoaTransform, ozz::StdAllocator<SoaTransform>> capturedPose(size_t(mirror.skeleton.num_soa_joints()));
+    xr_vector<SimdInt4, ozz::StdAllocator<SimdInt4>> capturedMask(capturedPose.size());
+    for (size_t packet = 0; packet < capturedPose.size(); ++packet)
+    {
+        SoaTransform value = SoaTransform::identity();
+        s32 mask[4]{};
+        for (size_t lane = 0; lane < 4; ++lane)
+        {
+            const size_t joint = packet * 4 + lane;
+            if (joint >= mirror.jointToBone.size())
+                break;
+            const u16 bone = mirror.jointToBone[joint];
+            if (bone >= modelPose.size())
+                return reject("bone-map", bone, float(bone), float(modelPose.size()));
+            if (!visibleBones.empty() && !visibleBones[bone])
+                continue;
+            Fmatrix local = modelPose[bone];
+            const auto parentJoint = jointParents[joint];
+            if (parentJoint >= 0)
+            {
+                if (size_t(parentJoint) >= mirror.jointToBone.size())
+                    return reject("parent-map", bone, float(parentJoint), float(mirror.jointToBone.size()));
+                const u16 parentBone = mirror.jointToBone[size_t(parentJoint)];
+                if (parentBone >= modelPose.size())
+                    return reject("parent-bone-map", bone, float(parentBone), float(modelPose.size()));
+                if (visibleBones.empty() || visibleBones[parentBone])
+                {
+                    Fmatrix inverseParent;
+                    if (!inverseParent.invert_b(modelPose[parentBone]))
+                        return reject("singular-parent-transform", parentBone, 0.f, 0.f);
+                    local.mul_43(inverseParent, modelPose[bone]);
+                }
+            }
+            if (!_valid(local))
+                return reject("non-finite-local-transform", bone, 0.f, 0.f);
+            Fquaternion rotation;
+            rotation.set(local);
+            const float lengthSquared = rotation.magnitude();
+            if (!std::isfinite(lengthSquared) || lengthSquared <= EPS_S * EPS_S)
+                return reject("invalid-local-quaternion", bone, lengthSquared, EPS_S * EPS_S);
+            rotation.normalize();
+            const auto translation = simd_float4::Load3PtrU(&local.c.x);
+            const auto quaternion = simd_float4::LoadPtrU(&rotation.x);
+            CopyPoseLane<0>(value, int(lane), BroadcastPose(translation, quaternion));
+            mask[lane] = -1;
+        }
+        capturedPose[packet] = value;
+        capturedMask[packet] = simd_int4::Load(mask[0], mask[1], mask[2], mask[3]);
+    }
+    state->basePose.swap(capturedPose);
+    state->basePoseMask.swap(capturedMask);
+    state->basePoseWeight = std::clamp(weight, 0.f, 1.f);
+    state->basePoseActive = true;
+    ++state->revision;
+    return true;
+}
+
+bool OzzPose::SetBasePoseWeight(float weight)
+{
+    if (!HasBasePose() || !std::isfinite(weight))
+        return false;
+    weight = std::clamp(weight, 0.f, 1.f);
+    if (state->basePoseWeight != weight)
+    {
+        state->basePoseWeight = weight;
+        ++state->revision;
+    }
+    return true;
+}
+
+void OzzPose::ClearBasePose()
+{
+    if (!state || !state->basePoseActive)
+        return;
+    state->basePoseActive = false;
+    state->basePoseWeight = 0.f;
+    ++state->revision;
+}
+
+bool OzzPose::HasBasePose() const
+{
+    return state && state->basePoseActive;
+}
+
+float OzzPose::BasePoseWeight() const
+{
+    return state ? state->basePoseWeight : 0.f;
+}
+
+const Fmatrix& OzzPose::EvaluateLocalBone(u16 bone, u8 channels, bool includeBasePose)
+{
+    includeBasePose = includeBasePose && state->basePoseActive && state->basePoseWeight > 0.f;
     const u16 joint = state->assets->skeleton->boneToJoint[bone];
     auto& packet = state->packets[joint / 4];
-    if (packet.revision != state->revision || packet.channels != channels)
+    if (packet.revision != state->revision || packet.channels != channels ||
+        packet.includeBasePose != includeBasePose)
     {
         ZoneScopedN("Animation::LocalPose");
         Float4x4 matrices[4];
-        ComputeLocalMatrices(state->Compose(state->normal, joint / 4, channels), matrices);
+        ComputeLocalMatrices(state->Compose(state->normal, joint / 4, channels, includeBasePose), matrices);
         for (size_t lane = 0; lane < 4; ++lane)
             ExportOzzMatrix(matrices[lane], packet.matrices[lane]);
         packet.revision = state->revision;
         packet.channels = channels;
+        packet.includeBasePose = includeBasePose;
     }
     return packet.matrices[joint % 4];
 }
@@ -411,7 +586,7 @@ void OzzPose::QueryBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 cha
 {
     const u16 joint = state->assets->skeleton->boneToJoint[bone];
     Float4x4 matrices[4];
-    ComputeLocalMatrices(state->Compose(state->query, joint / 4, channels, bone, &controls), matrices);
+    ComputeLocalMatrices(state->Compose(state->query, joint / 4, channels, false, bone, &controls), matrices);
     ExportOzzMatrix(ImportOzzMatrix(parent) * matrices[joint % 4], result);
 }
 }

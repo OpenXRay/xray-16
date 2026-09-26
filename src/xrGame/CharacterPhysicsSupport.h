@@ -11,6 +11,7 @@
 #include "death_anims.h"
 #include "character_shell_control.h"
 #include "animation_utils.h"
+#include "xrEngine/pure.h"
 class CPhysicsShell;
 class CPHMovementControl;
 class CIKLimbsController;
@@ -20,8 +21,12 @@ class physics_shell_animated;
 class CODEGeom;
 class CPhysicsElement;
 class activating_character_delay;
+class IPhysicsGeometry;
 
-class CCharacterPhysicsSupport : public CPHSkeleton, public CPHDestroyable
+extern BOOL dbg_draw_character_bones;
+extern BOOL dbg_draw_character_physics;
+
+class CCharacterPhysicsSupport : public CPHSkeleton, public CPHDestroyable, public pureFrame
 {
 public:
     enum EType
@@ -119,6 +124,7 @@ public:
     bool CollisionCorrectObjPos();
 
     void in_UpdateCL();
+    void OnFrame() override;
     void in_shedule_Update(u32 DT);
     void in_NetSpawn(CSE_Abstract* e);
     void in_NetDestroy();
@@ -172,6 +178,10 @@ private:
     static void DeathAnimCallback(CBlend* B);
     void CreateIKController();
     void DestroyIKController();
+    void ClearPoseBase();
+    void DrawDebugBones(IKinematics& kinematics) const;
+    void DrawDebugGeometry(const IPhysicsGeometry& geometry, u32 color) const;
+    void DrawDebugAxes(const Fmatrix& transform, float size) const;
     bool CollisionCorrectObjPos(const Fvector& start_from, bool character_create = false);
 
     void FlyTo(const Fvector& disp);
