@@ -7,6 +7,11 @@
 #include "Layers/xrRender/KinematicAnimatedDefs.h"
 #include "Layers/xrRender/KinematicsAddBoneTransform.hpp" //--#SM+#--
 
+namespace XRay::Animation
+{
+class PoseCaptureResult;
+}
+
 class IKinematics;
 class CBlend;
 class CKinematicsAnimated;
@@ -57,6 +62,9 @@ public:
     virtual float LL_MotionDuration(MotionID id) = 0;
     virtual void LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
         const BonePoseQuery& query) = 0;
+    virtual bool LL_CapturePoseBase(float weight, XRay::Animation::PoseCaptureResult* result = nullptr) = 0;
+    virtual bool LL_SetPoseBaseWeight(float weight) = 0;
+    virtual void LL_ClearPoseBase() = 0;
 
     virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) = 0; //--#SM+#--
     virtual void LL_ClearAdditionalTransform(u16 bone_id) = 0; //--#SM+#--

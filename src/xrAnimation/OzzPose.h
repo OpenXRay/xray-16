@@ -16,6 +16,15 @@ struct OzzPoseOverride
     const Fvector* translation = nullptr;
 };
 
+class PoseCaptureResult
+{
+public:
+    pcstr reason = "none";
+    u16 bone = u16(-1);
+    float value = 0.f;
+    float limit = 0.f;
+};
+
 class XRANIMATION_API OzzPose
 {
 public:
@@ -29,7 +38,13 @@ public:
     bool SetBlend(u16 slot, MotionID motion, float time, float weight, u8 channel);
     bool SetBoneBlends(u16 bone, ozz::span<const u16> slots);
     bool SetChannelFactor(u16 channel, float factor);
-    const Fmatrix& EvaluateLocalBone(u16 bone, u8 channels);
+    bool SetBasePose(ozz::span<const Fmatrix> modelPose, float weight,
+        ozz::span<const u8> visibleBones = {}, PoseCaptureResult* result = nullptr);
+    bool SetBasePoseWeight(float weight);
+    void ClearBasePose();
+    bool HasBasePose() const;
+    float BasePoseWeight() const;
+    const Fmatrix& EvaluateLocalBone(u16 bone, u8 channels, bool includeBasePose = true);
     void QueryBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 channels,
         const OzzPoseOverride& controls);
 

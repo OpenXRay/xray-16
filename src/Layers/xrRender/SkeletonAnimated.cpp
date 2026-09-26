@@ -616,6 +616,8 @@ void CKinematicsAnimated::Spawn()
 {
     inherited::Spawn();
     LL_SetBoneRoot(m_animations->skeleton->jointToBone.front());
+    m_pose.ClearBasePose();
+    m_includePoseBase = true;
     m_poseDirty = true;
 
     IBlend_Startup();
@@ -733,9 +735,95 @@ void CKinematicsAnimated::LL_EvaluateBonePose(Fmatrix& result, u16 bone, const F
     m_pose.QueryBone(result, bone, parent, query.channels, controls);
 }
 
+void CKinematicsAnimated::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks)
+{
+    UCalc_mtlock lock;
+    const bool includePoseBase = m_includePoseBase;
+    m_includePoseBase = includePoseBase && !ignore_callbacks;
+    inherited::Bone_GetAnimPos(pos, id, channel_mask, ignore_callbacks);
+    m_includePoseBase = includePoseBase;
+}
+
+bool CKinematicsAnimated::LL_CapturePoseBase(float weight, XRay::Animation::PoseCaptureResult* result)
+{
+    UCalc_mtlock lock;
+    if (result)
+        *result = {};
+    const auto reject = [result](pcstr reason, u16 bone, float value, float limit)
+    {
+        if (result)
+            *result = {reason, bone, value, limit};
+        return false;
+    };
+
+    if (!m_animations || !m_animations->skeleton)
+        return reject("missing-skeleton", BI_NONE, 0.f, 0.f);
+    if (!m_bones_offsets.empty())
+        return reject("additional-bone-transform", m_bones_offsets.front().m_bone_id,
+            float(m_bones_offsets.size()), 0.f);
+
+    const u16 count = LL_BoneCount();
+    if (!count)
+        return reject("empty-skeleton", BI_NONE, 0.f, 1.f);
+
+    xr_vector<Fmatrix> modelPose(count);
+    xr_vector<u8> visibleBones(count);
+    for (u16 bone = 0; bone < count; ++bone)
+    {
+        visibleBones[bone] = LL_GetBoneVisible(bone) ? 1 : 0;
+        if (!visibleBones[bone])
+        {
+            modelPose[bone].identity();
+            continue;
+        }
+        auto& instance = bone_instances[bone];
+        if (instance.callback() && !instance.callback_overwrite())
+            return reject("non-overwriting-callback", bone, float(instance.callback_type()), 0.f);
+        const u16 parent = LL_GetData(bone).GetParentID();
+        if (parent != BI_NONE && !LL_GetBoneVisible(parent) && !instance.callback_overwrite())
+            return reject("hidden-parent-without-overwrite", bone, 0.f, 1.f);
+        modelPose[bone].set(instance.mTransform);
+    }
+
+    if (!m_pose.SetBasePose(ozz::span<const Fmatrix>(modelPose.data(), modelPose.size()), weight,
+            ozz::span<const u8>(visibleBones.data(), visibleBones.size()), result))
+        return false;
+
+    m_poseDirty = true;
+    CalculateBones_Invalidate();
+    return true;
+}
+
+bool CKinematicsAnimated::LL_SetPoseBaseWeight(float weight)
+{
+    UCalc_mtlock lock;
+    const float previousWeight = m_pose.BasePoseWeight();
+    if (!m_pose.SetBasePoseWeight(weight))
+        return false;
+    if (m_pose.BasePoseWeight() != previousWeight)
+    {
+        m_poseDirty = true;
+        CalculateBones_Invalidate();
+    }
+    return true;
+}
+
+void CKinematicsAnimated::LL_ClearPoseBase()
+{
+    UCalc_mtlock lock;
+    if (!m_pose.HasBasePose())
+        return;
+
+    m_pose.ClearBasePose();
+    m_poseDirty = true;
+    CalculateBones_Invalidate();
+}
+
 // Добавить скриптовое смещение для кости --#SM+#--
 void CKinematicsAnimated::LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset)
 {
+    UCalc_mtlock lock;
+    LL_ClearPoseBase();
     inherited::LL_AddTransformToBone(offset);
 }
 
@@ -745,7 +833,7 @@ void CKinematicsAnimated::LL_ClearAdditionalTransform(u16 bone_id) { inherited::
 void CKinematicsAnimated::BuildBoneMatrix(
     const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask)
 {
-    bi.mTransform.mul_43(*parent, m_pose.EvaluateLocalBone(bd->GetSelfID(), channel_mask));
+    bi.mTransform.mul_43(*parent, m_pose.EvaluateLocalBone(bd->GetSelfID(), channel_mask, m_includePoseBase));
     CalculateBonesAdditionalTransforms(bd, bi, parent, channel_mask);
 }
 

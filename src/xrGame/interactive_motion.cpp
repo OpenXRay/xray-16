@@ -11,7 +11,6 @@
 
 void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsShell* s)
 {
-#ifdef DEBUG
     if (!death_anim_debug)
         return;
     VERIFY(m.valid());
@@ -20,10 +19,9 @@ void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsSh
     VERIFY(KA);
     CPhysicsShellHolder* O = smart_cast<CPhysicsShellHolder*>(s->get_ElementByStoreOrder(0)->PhysicsRefObject());
     VERIFY(O);
-    LPCSTR motion_name = KA->LL_MotionDefName_dbg(m).first;
+    LPCSTR motion_name = KA->LL_MotionsSlot(m.slot).clips[m.idx].name.c_str();
     Msg("death anims - interactive_motion:- %s, motion: %s, obj: %s, model:  %s ", message, motion_name,
         O->cName().c_str(), O->cNameVisual().c_str());
-#endif
 }
 
 interactive_motion::interactive_motion() { init(); }
@@ -85,7 +83,9 @@ void interactive_motion::play()
 {
     VERIFY(shell);
     VERIFY(motion.valid());
-    smart_cast<IKinematicsAnimated*>(shell->PKinematics())->PlayCycle(motion, TRUE, anim_callback, this);
+    IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(shell->PKinematics());
+    KA->LL_ClearPoseBase();
+    KA->PlayCycle(motion, TRUE, anim_callback, this);
     state_start();
 }
 

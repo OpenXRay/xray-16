@@ -3,6 +3,7 @@
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/MathUtils.h"
 #include "xrPhysics/ExtendedGeom.h"
+#include "xrPhysics/IPhysicsShellHolder.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Common/Noncopyable.hpp"
 #include "PhysicsShellHolder.h"
@@ -28,6 +29,7 @@ static constexpr float collide_adwance_delta = 2.f * max_collide_timedelta;
 static constexpr float depth_resolve = 0.01f;
 
 static float depth = 0;
+static shared_str collide_object_name;
 }
 
 imotion_position::imotion_position()
@@ -38,7 +40,6 @@ imotion_position::imotion_position()
 [[maybe_unused]]
 static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShell* s, float time_left)
 {
-#ifdef DEBUG
     if (!death_anim_debug)
         return;
     const MotionID& m = b.motionID;
@@ -48,54 +49,34 @@ static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShe
     VERIFY(KA);
     CPhysicsShellHolder* O = smart_cast<CPhysicsShellHolder*>(s->get_ElementByStoreOrder(0)->PhysicsRefObject());
     VERIFY(O);
-    LPCSTR motion_name = KA->LL_MotionDefName_dbg(m).first;
+    LPCSTR motion_name = KA->LL_MotionsSlot(m.slot).clips[m.idx].name.c_str();
     Msg("death anims - interactive_motion:- %s, motion: %s, blend time %f , total blend time %f , time left: %f , obj: "
         "%s, "
         "model:  %s ",
         message, motion_name, b.timeCurrent, b.timeTotal, time_left, O->cName().c_str(), O->cNameVisual().c_str());
-#endif
 }
 
 void imotion_position::interactive_motion_diagnostic(LPCSTR message)
 {
-#ifdef DEBUG
+    if (!death_anim_debug)
+        return;
     VERIFY(blend);
     interactive_motion_diag(message, *blend, shell, time_to_end);
-#endif
 }
-#ifdef DEBUG
-CPhysicsShellHolder* collide_obj = 0;
-#endif
-
 static void get_depth(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
     using namespace ::detail::imotion_position;
 
     save_max(depth, c.geom.depth);
-#ifdef DEBUG
-    if (depth != c.geom.depth)
+    if (!death_anim_debug || depth != c.geom.depth)
         return;
-    dxGeomUserData* ud = 0;
-    if (bo1)
-        ud = PHRetrieveGeomUserData(c.geom.g2);
-    else
-        ud = PHRetrieveGeomUserData(c.geom.g1);
-    if (ud)
-        collide_obj = static_cast<CPhysicsShellHolder*>(ud->ph_ref_object);
-    else
-        collide_obj = 0;
-#endif
+    const dxGeomUserData* data = PHRetrieveGeomUserData(bo1 ? c.geom.g2 : c.geom.g1);
+    collide_object_name = data && data->ph_ref_object ? data->ph_ref_object->ObjectName() : nullptr;
 }
-static std::string collide_diag()
+static pcstr collide_diag()
 {
-#ifdef DEBUG
-    if (collide_obj)
-        return make_string("collide obj: %s", collide_obj->cName().c_str());
-    else
-        return make_string("collide static");
-#else
-    return std::string("");
-#endif
+    using namespace ::detail::imotion_position;
+    return collide_object_name.size() ? collide_object_name.c_str() : "static geometry";
 }
 
 void disable_bone_calculation(IKinematics& K, bool v)
@@ -107,7 +88,7 @@ void disable_bone_calculation(IKinematics& K, bool v)
         if (bi.callback_param() != 0)
             continue;
 #ifdef DEBUG
-        if (v && bi.callback_overwrite() == BOOL(v))
+        if (death_anim_debug && v && bi.callback_overwrite() == BOOL(v))
             Msg("! bone callback_overwrite may have different states");
 #endif
         bi.set_callback_overwrite(v);
@@ -142,8 +123,11 @@ void imotion_position::state_start()
 #ifdef DEBUG
     if (!get_blend.blend)
     {
-        Msg("bad animation params : %p", anim_callback);
-        KA->LL_DumpBlends_dbg();
+        if (death_anim_debug)
+        {
+            Msg("bad animation params : %p", anim_callback);
+            KA->LL_DumpBlends_dbg();
+        }
         NODEFAULT;
     }
 #endif
@@ -400,6 +384,7 @@ float imotion_position::collide_animation(float dt, IKinematicsAnimated& k)
 #endif
     shell->ToAnimBonesPositions(shell_motion_has_history ? mh_not_clear : mh_unspecified);
     depth = 0;
+    collide_object_name = nullptr;
 #ifdef DEBUG
     if (dbg_imotion_collide_debug)
         DBG_OpenCashedDraw();
@@ -533,6 +518,7 @@ float imotion_position::move(float dt, IKinematicsAnimated& KA)
             if (dbg_imotion_collide_debug)
             {
                 depth = 0;
+                collide_object_name = nullptr;
                 shell->CollideAll();
                 interactive_motion_diagnostic(make_string(" move (to ragdoll): deppth= %f", depth).c_str());
                 DBG_OpenCashedDraw();
@@ -568,7 +554,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
         {
             // interactive_motion_diagnostic( make_string( " motion_collide collided0: deppth= %f", depth ).c_str() );
             interactive_motion_diagnostic(
-                make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag().c_str(), depth).c_str());
+                make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag(), depth).c_str());
             DBG_OpenCashedDraw();
             shell->dbg_draw_geometry(0.02, color_argb(255, 0, 255, 0));
             DBG_ClosedCashedDraw(50000);
@@ -593,7 +579,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
         if (depth > depth0)
         {
             interactive_motion_diagnostic(
-                make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag().c_str(), depth).c_str());
+                make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag(), depth).c_str());
             flags.set(fl_switch_dm_toragdoll, TRUE);
         }
         else
@@ -613,7 +599,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
             if (depth > depth_resolve)
             {
                 interactive_motion_diagnostic(make_string("motion_collide 2: stoped: colide: %s, depth %f",
-                    collide_diag().c_str(), depth).c_str());
+                    collide_diag(), depth).c_str());
                 flags.set(fl_switch_dm_toragdoll, TRUE);
             }
         }
@@ -628,6 +614,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
         if (dbg_imotion_collide_debug)
         {
             depth = 0;
+            collide_object_name = nullptr;
             shell->CollideAll();
             interactive_motion_diagnostic(make_string(" motion_collide restore: %f ", depth).c_str());
             DBG_OpenCashedDraw();
