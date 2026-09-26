@@ -44,7 +44,6 @@ enum
     phDbgDispObjCollisionDammage = 1 << 25,
     phDbgIK = 1 << 26,
     phDbgDrawIKGoal = 1 << 27,
-    phDbgIKLimits = 1 << 28,
     phDbgCharacterControl = 1 << 29,
     phDbgDrawRayMotions = 1 << 30,
     phDbgTrackObject = 1 << 31
@@ -57,7 +56,6 @@ enum
     ph_m1_DbgActorRestriction = 1 << 1,
     phDbgIKOff = 1 << 2,
     phDbgHitAnims = 1 << 3,
-    phDbgDrawIKLimits = 1 << 4,
     phDbgDrawIKPredict = 1 << 5,
     phDbgDrawIKSHiftObject = 1 << 6,
     phDbgDrawIKCollision = 1 << 7,
