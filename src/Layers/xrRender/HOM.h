@@ -4,7 +4,6 @@
 #pragma once
 
 #include "xrCore/_fbox2.h"
-#include "xrCore/Threading/Task.hpp"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Render.h"
 
@@ -54,8 +53,6 @@ public:
 
     void Disable();
     void Enable();
-
-    TaskHandle DispatchMTRender();
 
     BOOL visible(vis_data& vis) const;
     BOOL visible(const Fbox3& B) const;
