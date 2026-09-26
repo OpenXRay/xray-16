@@ -1,3 +1,4 @@
+#include "StdAfx.h"
 #include "pch_script.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
@@ -50,6 +51,7 @@
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
+#include "ik/IKLimb.h"
 #include "GametaskManager.h"
 
 #ifdef DEBUG
@@ -157,6 +159,13 @@ const xr_token lua_gc_method_token[] =
     { "gc_step", 1 },
     { "gc_timeout", 2 },
     { "gc_full", 3 },
+    { nullptr, -1 }
+};
+
+const xr_token ik_solver_token[] =
+{
+    { "vanilla", ikSolverVanilla },
+    { "ozz", ikSolverOzz },
     { nullptr, -1 }
 };
 
@@ -2328,6 +2337,7 @@ void CCC_RegisterCommands()
     // Physics
     CMD1(CCC_PHFps, "ph_frequency");
     CMD1(CCC_PHIterations, "ph_iterations");
+    CMD3(CCC_Token, "ik_solver", &ps_ik_solver, ik_solver_token);
 
 #ifdef DEBUG
     CMD1(CCC_PHGravity, "ph_gravity");

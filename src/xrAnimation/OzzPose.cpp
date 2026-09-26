@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "OzzPose.h"
+#include "OzzMath.h"
 #include "OzzSkeletonMirror.h"
 
 #include "xrCore/Profiler/Profiler.h"
@@ -100,23 +101,10 @@ SoaQuaternion ScaleRotation(const SoaQuaternion& q, float factor)
     return {q.x * scale, q.y * scale, q.z * scale, Cos(angle)};
 }
 
-Float4x4 ImportMatrix(const Fmatrix& matrix)
-{
-    return {{simd_float4::LoadPtrU(&matrix._11), simd_float4::LoadPtrU(&matrix._21),
-        simd_float4::LoadPtrU(&matrix._31), simd_float4::LoadPtrU(&matrix._41)}};
-}
-
-void ExportMatrix(const Float4x4& matrix, Fmatrix& result)
-{
-    StorePtrU(matrix.cols[0], &result._11);
-    StorePtrU(matrix.cols[1], &result._21);
-    StorePtrU(matrix.cols[2], &result._31);
-    StorePtrU(matrix.cols[3], &result._41);
-}
-
 void ComputeLocalMatrices(const SoaTransform& pose, Float4x4 (&result)[4])
 {
-    const auto matrices = SoaFloat4x4::FromAffine(pose.translation, pose.rotation, pose.scale);
+    const auto rotation = Normalize(pose.rotation);
+    const auto matrices = SoaFloat4x4::FromAffine(pose.translation, rotation, pose.scale);
     Transpose16x16(&matrices.cols[0].x, result->cols);
 }
 }
@@ -411,7 +399,7 @@ const Fmatrix& OzzPose::EvaluateLocalBone(u16 bone, u8 channels)
         Float4x4 matrices[4];
         ComputeLocalMatrices(state->Compose(state->normal, joint / 4, channels), matrices);
         for (size_t lane = 0; lane < 4; ++lane)
-            ExportMatrix(matrices[lane], packet.matrices[lane]);
+            ExportOzzMatrix(matrices[lane], packet.matrices[lane]);
         packet.revision = state->revision;
         packet.channels = channels;
     }
@@ -424,6 +412,6 @@ void OzzPose::QueryBone(Fmatrix& result, u16 bone, const Fmatrix& parent, u8 cha
     const u16 joint = state->assets->skeleton->boneToJoint[bone];
     Float4x4 matrices[4];
     ComputeLocalMatrices(state->Compose(state->query, joint / 4, channels, bone, &controls), matrices);
-    ExportMatrix(ImportMatrix(parent) * matrices[joint % 4], result);
+    ExportOzzMatrix(ImportOzzMatrix(parent) * matrices[joint % 4], result);
 }
 }
