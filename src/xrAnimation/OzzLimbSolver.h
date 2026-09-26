@@ -42,12 +42,21 @@ public:
         float limit = 0.f;
     };
 
+    class DebugData
+    {
+    public:
+        Fvector target{};
+        Fvector pole{};
+        bool hasTarget = false;
+        bool hasPole = false;
+    };
+
     OzzLimbSolver();
 
     bool Initialize(const Fmatrix& middleBind, const Fmatrix& endBind);
     float Length() const;
     Result Solve(const Fmatrix& start, const Fmatrix& goal, const Fvector& knee,
-        Fmatrix (&rotations)[3]) const;
+        Fmatrix (&rotations)[3], DebugData* debug = nullptr) const;
     static pcstr FailureName(Failure failure);
 
 private:

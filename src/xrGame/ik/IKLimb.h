@@ -1,5 +1,6 @@
 #pragma once
 #include "IKFoot.h"
+#include "IKDebugDraw.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "ik_anim_state.h"
 #include "ik_calculate_data.h"
@@ -35,6 +36,7 @@ public:
 public:
     void Create(u16 id, IKinematicsAnimated* K, bool collide_);
     void Destroy();
+    void RenderDebug();
 
 public:
     void SolveBones(SCalculateData& cd);
@@ -98,6 +100,7 @@ private:
 private:
     XRay::Animation::OzzLimbSolver m_ozz_limb;
     u32 m_ozz_failures_reported = 0;
+    CIKDebugDraw m_debug;
     IKinematicsAnimated* m_K;
     CIKFoot m_foot;
     ik_foot_collider collider;

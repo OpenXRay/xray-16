@@ -9,6 +9,7 @@
 #include "xrPhysics/matrix_utils.h"
 #include "pose_extrapolation.h"
 #include "xrCore/buffer_vector.h"
+#include <optional>
 #ifdef DEBUG
 #include "PHDebug.h"
 #endif
@@ -151,8 +152,24 @@ void CIKLimb::Solve(SCalculateData& cd)
     cd.goal(goal);
     Fvector knee;
     GetKnee(knee, cd);
+    std::optional<CIKDebugData> debug;
+    if (m_debug.Enabled())
+    {
+        debug.emplace();
+        debug->object = *cd.m_obj;
+        debug->start = start;
+        debug->goal = goal;
+        debug->knee = knee;
+        debug->length = m_ozz_limb.Length();
+        debug->frame = Device.dwFrame;
+        for (u16 i = 0; i < 3; ++i)
+        {
+            debug->animated[i] = Kinematics()->LL_GetTransform(m_bones[i]).c;
+        }
+    }
     Fmatrix rotations[3];
-    const Solver::Result result = m_ozz_limb.Solve(start, goal, knee, rotations);
+    const Solver::Result result = m_ozz_limb.Solve(start, goal, knee, rotations,
+        debug ? &debug->solver : nullptr);
     if (result.failure != Solver::Failure::None)
     {
         const u32 failureMask = u32(1) << u32(result.failure);
@@ -164,9 +181,20 @@ void CIKLimb::Solve(SCalculateData& cd)
                 Solver::FailureName(result.failure), result.metric, result.value, result.limit);
             m_ozz_failures_reported |= failureMask;
         }
-        return;
     }
-    CalculateBones(cd, rotations);
+    else
+    {
+        CalculateBones(cd, rotations);
+    }
+    if (debug)
+    {
+        debug->solved = result.failure == Solver::Failure::None;
+        for (u16 i = 0; i < 3; ++i)
+        {
+            debug->resolved[i] = Kinematics()->LL_GetTransform(m_bones[i]).c;
+        }
+        m_debug.Capture(*debug);
+    }
 }
 
 u16 get_ik_bone(IKinematics* K, LPCSTR S, u16 i)
@@ -227,7 +255,15 @@ void CIKLimb::Create(u16 id, IKinematicsAnimated* K, bool collide_)
     m_ozz_failures_reported = 0;
 }
 
-void CIKLimb::Destroy() {}
+void CIKLimb::Destroy()
+{
+    m_debug.Clear();
+}
+
+void CIKLimb::RenderDebug()
+{
+    m_debug.Render();
+}
 #ifdef DEBUG
 bool dbg_always_valide = false;
 #endif

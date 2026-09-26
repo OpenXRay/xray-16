@@ -144,9 +144,14 @@ bool OzzLimbSolver::Initialize(const Fmatrix& middleBind, const Fmatrix& endBind
 }
 
 OzzLimbSolver::Result OzzLimbSolver::Solve(const Fmatrix& start, const Fmatrix& goal, const Fvector& knee,
-    Fmatrix (&rotations)[3]) const
+    Fmatrix (&rotations)[3], DebugData* debug) const
 {
     ZoneScopedN("Animation::OzzIK");
+
+    if (debug)
+    {
+        *debug = {};
+    }
 
     if (m_bindResult.failure != Failure::None)
     {
@@ -189,6 +194,11 @@ OzzLimbSolver::Result OzzLimbSolver::Solve(const Fmatrix& start, const Fmatrix& 
     const float bendAngle = std::acos(std::clamp(bendCosine, -1.f, 1.f));
     Fvector target;
     target.mad(start.c, direction, targetDistance);
+    if (debug)
+    {
+        debug->target = target;
+        debug->hasTarget = true;
+    }
 
     Fvector pole;
     pole.sub(knee, start.c);
@@ -207,6 +217,11 @@ OzzLimbSolver::Result OzzLimbSolver::Solve(const Fmatrix& start, const Fmatrix& 
                 }
             }
         }
+    }
+    if (debug)
+    {
+        debug->pole = pole;
+        debug->hasPole = true;
     }
 
     using namespace ozz::math;

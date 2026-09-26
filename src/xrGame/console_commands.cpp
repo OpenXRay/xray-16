@@ -46,6 +46,7 @@
 #include "Torch.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
+#include "ik/IKDebugDraw.h"
 
 #include "xrGameSpy/GameSpy_Full.h"
 
@@ -2329,6 +2330,12 @@ void CCC_RegisterCommands()
     // Physics
     CMD1(CCC_PHFps, "ph_frequency");
     CMD1(CCC_PHIterations, "ph_iterations");
+
+    CMD3(CCC_Mask, "ik_dbg_solver", &ps_ik_debug, ikDebugSolver);
+    CMD3(CCC_Mask, "ik_dbg_targets", &ps_ik_debug, ikDebugTargets);
+    CMD3(CCC_Mask, "ik_dbg_chains", &ps_ik_debug, ikDebugChains);
+    CMD4(CCC_Float, "ik_dbg_distance", &ps_ik_debug_distance, 1.f, 500.f);
+    CMD4(CCC_Float, "ik_dbg_size", &ps_ik_debug_size, 0.005f, 0.5f);
 
 #ifdef DEBUG
     CMD1(CCC_PHGravity, "ph_gravity");
