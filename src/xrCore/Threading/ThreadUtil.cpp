@@ -22,6 +22,8 @@ static int pthread_setname_np(pthread_t /*threadId*/, const char* name)
 {
     return pthread_setname_np(name);
 }
+#   elif defined(XR_PLATFORM_WEB)
+#include <emscripten/threading.h>
 #   elif defined(XR_PLATFORM_HAIKU)
 #include <OS.h>
 
@@ -144,10 +146,14 @@ void SetCurrentProcessPriorityClass(priority_class cls)
 #elif defined(XR_PLATFORM_POSIX)
 void SetCurrentThreadName(cpcstr name)
 {
+#ifdef XR_PLATFORM_WEB
+    emscripten_set_thread_name(pthread_self(), name);
+#else
     if (auto error = pthread_setname_np(pthread_self(), name) != 0)
     {
         Msg("SetCurrentThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
     }
+#endif
 #ifdef TRACY_ENABLE
     tracy::SetThreadName(name);
 #endif

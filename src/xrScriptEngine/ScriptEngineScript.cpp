@@ -188,6 +188,9 @@ void CScriptProfiler::script_register(lua_State* luaState)
 
     module(luaState, "profiler")
     [
+#if !XRAY_USE_LUAJIT
+        def("setup_hook", +[]() {}),
+#endif
         def("is_active", +[]() -> bool
         {
             return GEnv.ScriptEngine->m_profiler->IsActive();

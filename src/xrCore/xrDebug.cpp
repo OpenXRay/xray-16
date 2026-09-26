@@ -25,6 +25,10 @@
 #   include "Debug/dxerr.h"
 #endif
 
+#if defined(XR_PLATFORM_WEB)
+#   include <emscripten.h>
+#endif
+
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
 #   if __has_include(<sys/ptrace.h>)
 #       include <sys/ptrace.h>
@@ -71,6 +75,10 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
     case IDCONTINUE: return AssertionResult::ignore;
     default: return AssertionResult::undefined;
     }
+#elif defined(XR_PLATFORM_WEB)
+    emscripten_log(EM_LOG_ERROR | EM_LOG_CONSOLE, "%s: %s", title, message);
+    MAIN_THREAD_EM_ASM({ alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1)); }, title, message);
+    return simpleMode ? AssertionResult::ok : AssertionResult::abort;
 #else
     if (simpleMode)
     {

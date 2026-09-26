@@ -1063,8 +1063,17 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             lp_capt = cnt >= 6 ? capt : 0;
 
             auto p_it = m_paths.find(root);
+            pcstr rootPath = p_it != m_paths.end() ? p_it->second->m_Path : root;
+#ifdef XR_PLATFORM_WEB
+            string_path anchoredRoot;
+            if (p_it == m_paths.end() && root[0] && root[0] != _DELIMITER && root[0] != '/')
+            {
+                strconcat(anchoredRoot, m_paths.find("$fs_root$")->second->m_Path, root);
+                rootPath = anchoredRoot;
+            }
+#endif
 
-            FS_Path* P = xr_new<FS_Path>(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+            FS_Path* P = xr_new<FS_Path>(rootPath, lp_add, lp_def, lp_capt, fl);
             bNoRecurse = !(fl & FS_Path::flRecurse);
             Recurse(P->m_Path);
             auto I = m_paths.emplace(xr_strdup(id), P);
@@ -1412,6 +1421,10 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
 
 void CLocatorAPI::file_from_cache_impl(IReader*& R, pstr fname, const file& desc)
 {
+#ifdef XR_PLATFORM_WEB
+    R = xr_new<CFileReader>(fname); // no memory mapping on WasmFS
+    return;
+#endif
     if (desc.size_real < 16 * 1024)
     {
         R = xr_new<CFileReader>(fname);
@@ -1442,6 +1455,21 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
 {
     // Archived one
     archive& A = m_archives[desc.vfs];
+#ifdef XR_PLATFORM_WEB
+    u8* compressed = xr_alloc<u8>(desc.size_compressed);
+    const ssize_t bytesRead = pread(A.hSrcFile, compressed, desc.size_compressed, desc.ptr);
+    R_ASSERT3(bytesRead == static_cast<ssize_t>(desc.size_compressed), "cannot read archive entry", fname);
+    if (desc.size_real == desc.size_compressed)
+    {
+        R = xr_new<CTempReader>(compressed, desc.size_real, 0);
+        return;
+    }
+    u8* decompressed = xr_alloc<u8>(desc.size_real);
+    rtc_decompress(decompressed, desc.size_real, compressed, desc.size_compressed);
+    xr_free(compressed);
+    R = xr_new<CTempReader>(decompressed, desc.size_real, 0);
+    return;
+#endif
     size_t start = desc.ptr / dwAllocGranularity * dwAllocGranularity;
     size_t end = (desc.ptr + desc.size_compressed) / dwAllocGranularity;
     if ((desc.ptr + desc.size_compressed) % dwAllocGranularity)

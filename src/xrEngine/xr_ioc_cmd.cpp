@@ -716,6 +716,9 @@ ENGINE_API shared_str current_player_hud_sect{};
 
 extern int ps_fps_limit;
 extern int ps_fps_limit_in_menu;
+#ifdef XR_PLATFORM_WEB
+extern int ps_vsync_interval;
+#endif
 
 void CCC_Register()
 {
@@ -763,6 +766,9 @@ void CCC_Register()
 
     CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 30, 501);
     CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 30, 501);
+#ifdef XR_PLATFORM_WEB
+    CMD4(CCC_Integer, "rs_vsync_interval", &ps_vsync_interval, 0, 4);
+#endif
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );

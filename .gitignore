@@ -5,6 +5,10 @@
 !.editorconfig
 !.vscode
 
+# Exclude web build files
+misc/web/dist
+misc/web/out
+
 # exclude binaries and temporary files
 [Bb]in/
 [Bb]uild*/

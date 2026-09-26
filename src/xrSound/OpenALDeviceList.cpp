@@ -134,6 +134,18 @@ void ALDeviceList::Enumerate()
     else
     {
         Msg("~ SOUND: OpenAL: EnumerationExtension NOT Present");
+#ifdef XR_PLATFORM_WEB
+        // Without an enumeration extension ALC has exactly one device, openable only by its specifier.
+        if (pcstr defaultDevice = alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER))
+        {
+            xr_strcpy(m_defaultDeviceName, defaultDevice);
+            Log("SOUND: OpenAL: system default sound device name is", m_defaultDeviceName);
+
+            string256 singleDeviceList{};
+            xr_strcpy(singleDeviceList, defaultDevice);
+            IterateAndAddDevicesString(singleDeviceList);
+        }
+#endif
     }
 
     // make token

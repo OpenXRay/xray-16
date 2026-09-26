@@ -71,6 +71,7 @@ public:
 #define FillMemory(dst, size, val) memset(dst, val, size)
 
 // Global C++ new/delete overrides.
+#ifndef XR_PLATFORM_WEB
 [[nodiscard]] void* operator new(size_t size);
 [[nodiscard]] void* operator new[](size_t size);
 [[nodiscard]] void* operator new(size_t size, const std::nothrow_t&) noexcept;
@@ -88,6 +89,7 @@ void operator delete(void* ptr, size_t) noexcept;
 void operator delete[](void* ptr, size_t) noexcept;
 void operator delete(void* ptr, size_t, std::align_val_t alignment) noexcept;
 void operator delete[](void* ptr, size_t, std::align_val_t alignment) noexcept;
+#endif // !XR_PLATFORM_WEB
 
 // generic "C"-like allocations/deallocations
 

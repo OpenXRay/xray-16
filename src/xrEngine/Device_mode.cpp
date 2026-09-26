@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#ifdef XR_PLATFORM_WEB
+#include <emscripten/html5.h>
+#endif
+
 #include "xrCore/xr_token.h"
 #include "xr_input.h"
 
@@ -134,6 +138,10 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowSize(m_sdlWnd, current.w, current.h);
     }
 
+#ifdef XR_PLATFORM_WEB
+    emscripten_set_canvas_element_size("#canvas", psDeviceMode.Width, psDeviceMode.Height);
+#endif
+
     if (windowed)
     {
         const bool drawBorders = psDeviceMode.WindowStyle == rsWindowed;
@@ -184,6 +192,17 @@ void CRenderDevice::UpdateWindowRects()
 
 void CRenderDevice::SelectResolution(const bool windowed)
 {
+#ifdef XR_PLATFORM_WEB
+    if (psDeviceMode.Width == 0 || psDeviceMode.Height == 0)
+    {
+        psDeviceMode.Width = 1280;
+        psDeviceMode.Height = 720;
+    }
+    dwWidth = psDeviceMode.Width;
+    dwHeight = psDeviceMode.Height;
+    return;
+#endif
+
     // Dedicated server hardcoded resolution
     // XXX: to be removed
     if (GEnv.isDedicatedServer)

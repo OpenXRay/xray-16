@@ -765,6 +765,24 @@ void CScriptEngine::setup_auto_load()
     // lua_settop(lua(), 0);
 }
 
+#if !XRAY_USE_LUAJIT
+static int luajit_compatible_random(lua_State* L)
+{
+    const lua_Number r = lua_Number(rand() % RAND_MAX) / lua_Number(RAND_MAX);
+    switch (lua_gettop(L))
+    {
+    case 0: lua_pushnumber(L, r); break;
+    case 1: lua_pushnumber(L, std::floor(r * luaL_checknumber(L, 1)) + 1); break;
+    default:
+    {
+        const lua_Number lower = luaL_checknumber(L, 1);
+        lua_pushnumber(L, std::floor(r * (luaL_checknumber(L, 2) - lower + 1)) + lower);
+    }
+    }
+    return 1;
+}
+#endif
+
 // initialize lua standard library functions
 struct luajit
 {
@@ -906,6 +924,12 @@ void CScriptEngine::init(export_func exporter, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_IOLIBNAME, luaopen_io);
     luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
     luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
+#if !XRAY_USE_LUAJIT
+    lua_getglobal(lua(), LUA_MATHLIBNAME);
+    lua_pushcfunction(lua(), luajit_compatible_random);
+    lua_setfield(lua(), -2, "random");
+    lua_pop(lua(), 1);
+#endif
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
 #if XRAY_USE_LUAJIT
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
