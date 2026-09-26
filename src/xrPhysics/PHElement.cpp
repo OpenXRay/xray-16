@@ -120,6 +120,7 @@ void CPHElement::destroy()
     {
         if (m_body->world)
             m_shell->Island().RemoveBody(m_body);
+        CPHContactBodyEffector::InvalidateBody(m_body);
         dBodyDestroy(m_body);
         m_body = NULL;
     }
