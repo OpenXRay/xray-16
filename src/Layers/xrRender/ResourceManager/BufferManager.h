@@ -55,37 +55,6 @@ struct BufferMetadata {
     u64 memoryUsed = 0;
 };
 
-class RingBuffer {
-public:
-    RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName);
-    ~RingBuffer();
-
-    struct Allocation {
-        nvrhi::BufferHandle buffer;
-        u64 offset;
-        u64 size;
-        void* cpuAddress;
-    };
-
-    Allocation Allocate(u64 size, u32 alignment = 256);
-
-    void AdvanceFrame();
-
-    u64 GetSize() const { return m_size; }
-    u64 GetUsed() const { return m_used; }
-    u64 GetAvailable() const { return m_size - m_used; }
-
-private:
-    xray::render::fg::RenderDevice* m_device;
-    nvrhi::BufferHandle m_buffer;
-
-    u64 m_size;
-    u64 m_head;
-    u64 m_used;
-
-    void* m_cpuAddress;
-};
-
 class BufferManager {
 public:
     explicit BufferManager(xray::render::fg::RenderDevice* device);
@@ -103,17 +72,6 @@ public:
         u64 offset = 0
     );
 
-    RingBuffer::Allocation AllocateDynamic(u64 size, u32 alignment = 256);
-
-    template<typename T>
-    RingBuffer::Allocation AllocateConstants(const T& data) {
-        auto alloc = AllocateDynamic(sizeof(T), 256);
-        if (alloc.cpuAddress) {
-            memcpy(alloc.cpuAddress, &data, sizeof(T));
-        }
-        return alloc;
-    }
-
     nvrhi::IBuffer* GetNVRHIBuffer(BufferHandle handle);
     const BufferMetadata* GetMetadata(BufferHandle handle) const;
 
@@ -121,17 +79,14 @@ public:
     void Release(BufferHandle handle);
     void DestroyBuffer(BufferHandle handle);
 
-    void BeginFrame();
-    void EndFrame();
-
-    struct Statistics {
+    class Statistics
+    {
+    public:
         u64 staticMemoryUsed = 0;
-        u64 dynamicMemoryUsed = 0;
         u64 totalMemoryUsed = 0;
 
         u32 buffersTotal = 0;
         u32 buffersStatic = 0;
-        u32 dynamicAllocationsThisFrame = 0;
     };
 
     Statistics GetStatistics() const;
@@ -142,10 +97,6 @@ private:
 
     xr_vector<BufferMetadata> m_buffers;
     xr_vector<u32> m_freeSlots;
-
-    xr_unique_ptr<RingBuffer> m_constantBufferRing;
-    xr_unique_ptr<RingBuffer> m_vertexBufferRing;
-    xr_unique_ptr<RingBuffer> m_indexBufferRing;
 
     BufferHandle AllocateHandle();
     void FreeHandle(BufferHandle handle);

@@ -23,8 +23,6 @@ public:
     SamplerCache* GetSamplerCache() { return m_samplerCache.get(); }
     NativeRTFactory* GetRTFactory() { return m_rtFactory.get(); }
 
-    void BeginFrame();
-    void EndFrame();
     void Update(float deltaTime);
 
     struct Statistics {

@@ -4,97 +4,10 @@
 
 namespace xray::render::resources {
 
-RingBuffer::RingBuffer(xray::render::fg::RenderDevice* device, u64 size, const char* debugName)
-    : m_device(device)
-    , m_size(size)
-    , m_head(0)
-    , m_used(0)
-    , m_cpuAddress(nullptr)
-{
-    VERIFY(m_device);
-    nvrhi::BufferDesc desc;
-    desc.byteSize = size;
-    desc.structStride = 0;
-    desc.debugName = debugName;
-    desc.isConstantBuffer = false;
-    desc.cpuAccess = nvrhi::CpuAccessMode::Write;
-    desc.isVolatile = false;
-    desc.keepInitialState = true;
-    desc.initialState = nvrhi::ResourceStates::CopySource;
-
-    m_buffer = m_device->GetNativeDevice()->createBuffer(desc);
-
-    if (!m_buffer) {
-        Msg("! [RingBuffer] ❌ Failed to create buffer: %s", debugName);
-        return;
-    }
-
-    m_cpuAddress = m_device->GetNativeDevice()->mapBuffer(m_buffer, nvrhi::CpuAccessMode::Write);
-
-    if (!m_cpuAddress) {
-        Msg("! [RingBuffer] ❌ Failed to map buffer: %s", debugName);
-        m_buffer = nullptr;
-        return;
-    }
-
-}
-
-RingBuffer::~RingBuffer() {
-    if (m_buffer && m_cpuAddress) {
-        m_device->GetNativeDevice()->unmapBuffer(m_buffer);
-    }
-}
-
-RingBuffer::Allocation RingBuffer::Allocate(u64 size, u32 alignment) {
-    u64 alignedHead = (m_head + alignment - 1) & ~(u64)(alignment - 1);
-
-    if (alignedHead + size > m_size) {
-
-        alignedHead = 0;
-        m_head = 0;
-        m_used = 0;
-    }
-
-    Allocation alloc;
-    alloc.buffer = m_buffer;
-    alloc.offset = alignedHead;
-    alloc.size = size;
-    alloc.cpuAddress = m_cpuAddress ?
-        (u8*)m_cpuAddress + alignedHead : nullptr;
-
-    m_head = alignedHead + size;
-    m_used += size;
-
-    return alloc;
-}
-
-void RingBuffer::AdvanceFrame() {
-    m_used = 0;
-}
-
 BufferManager::BufferManager(xray::render::fg::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);
-
-    m_constantBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        16 * 1024 * 1024,
-        "ConstantBufferRing"
-    );
-
-    m_vertexBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        32 * 1024 * 1024,
-        "VertexBufferRing"
-    );
-
-    m_indexBufferRing = xr_make_unique<RingBuffer>(
-        device,
-        16 * 1024 * 1024,
-        "IndexBufferRing"
-    );
-
 }
 
 BufferManager::~BufferManager() {
@@ -211,15 +124,6 @@ void BufferManager::UpdateBuffer(
     meta.lastAccessTime = 0.0f;
 }
 
-RingBuffer::Allocation BufferManager::AllocateDynamic(u64 size, u32 alignment) {
-    auto alloc = m_constantBufferRing->Allocate(size, alignment);
-
-    m_stats.dynamicAllocationsThisFrame++;
-    m_stats.dynamicMemoryUsed += size;
-
-    return alloc;
-}
-
 void BufferManager::AddRef(BufferHandle handle) {
     if (!ValidateHandle(handle)) return;
     m_buffers[handle.index].refCount++;
@@ -249,17 +153,6 @@ void BufferManager::DestroyBuffer(BufferHandle handle) {
     m_stats.staticMemoryUsed -= meta.memoryUsed;
 
     FreeHandle(handle);
-}
-
-void BufferManager::BeginFrame() {
-    m_stats.dynamicAllocationsThisFrame = 0;
-    m_stats.dynamicMemoryUsed = 0;
-}
-
-void BufferManager::EndFrame() {
-    m_constantBufferRing->AdvanceFrame();
-    m_vertexBufferRing->AdvanceFrame();
-    m_indexBufferRing->AdvanceFrame();
 }
 
 nvrhi::IBuffer* BufferManager::GetNVRHIBuffer(BufferHandle handle) {
@@ -314,23 +207,23 @@ bool BufferManager::ValidateHandle(BufferHandle handle) const {
     return true;
 }
 
-BufferManager::Statistics BufferManager::GetStatistics() const {
-    m_stats.totalMemoryUsed = m_stats.staticMemoryUsed + m_stats.dynamicMemoryUsed;
+BufferManager::Statistics BufferManager::GetStatistics() const
+{
+    m_stats.totalMemoryUsed = m_stats.staticMemoryUsed;
     return m_stats;
 }
 
-void BufferManager::PrintStatistics() const {
+void BufferManager::PrintStatistics() const
+{
     auto stats = GetStatistics();
 
     Msg("! [BufferManager] Statistics:");
-    Msg("!   Memory: %llu MB static, %llu MB dynamic, %llu MB total",
+    Msg("!   Memory: %llu MB static, %llu MB total",
         stats.staticMemoryUsed / (1024 * 1024),
-        stats.dynamicMemoryUsed / (1024 * 1024),
         stats.totalMemoryUsed / (1024 * 1024));
-    Msg("!   Buffers: %u total, %u static, %u dynamic allocs this frame",
+    Msg("!   Buffers: %u total, %u static",
         stats.buffersTotal,
-        stats.buffersStatic,
-        stats.dynamicAllocationsThisFrame);
+        stats.buffersStatic);
 }
 
 }
