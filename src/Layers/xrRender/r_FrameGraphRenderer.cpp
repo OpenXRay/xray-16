@@ -4,7 +4,6 @@
 #include "Layers/xrRender/DetailModel.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "xrCore/FMesh.hpp"
-#include "xrCore/Threading/TaskManager.hpp"
 #include "FHierrarhyVisual.h"
 #include "SkeletonAnimated.h"
 #include "FVisual.h"
@@ -348,10 +347,6 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
 }
 
 void FrameGraphRenderer::Shutdown() {
-    if (m_processHOMTask) {
-        TaskScheduler->Wait(m_processHOMTask);
-        m_processHOMTask.Reset();
-    }
     if (!m_device) return;
     m_lightingState.ResetRecovery();
 
@@ -2725,11 +2720,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
     }
 
-    if (m_processHOMTask) {
-        ZoneScopedN("CollectVisibleGeometry::WaitHOM");
-        TaskScheduler->Wait(m_processHOMTask);
-        m_processHOMTask.Reset();
-    }
     xr_vector<const light*>& culledLights = m_culledLights;
     culledLights.clear();
     const bool debugLights = ps_r_local_shadow_debug != 0;
@@ -3310,11 +3300,6 @@ void FrameGraphRenderer::OnCameraUpdated()
 {
     ZoneScoped;
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
-        return;
-    if (m_processHOMTask)
-        TaskScheduler->Wait(m_processHOMTask);
-    m_processHOMTask = m_HOM.DispatchMTRender();
 }
 
 namespace

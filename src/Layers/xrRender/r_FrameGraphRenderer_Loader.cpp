@@ -3,7 +3,6 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
-#include "xrCore/Threading/TaskManager.hpp"
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
@@ -278,15 +277,7 @@ void FrameGraphRenderer::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
     LoadSectors(fs);
 
-    // HOM - Skip if using FrameGraph renderer (GPU Hi-Z culling replaces CPU HOM)
-    if (!true)
-    {
-        m_HOM.Load();
-    }
-    else
-    {
-        Msg("* [FrameGraph] Skipping HOM load - using GPU Hi-Z culling instead");
-    }
+    Msg("* [FrameGraph] Skipping HOM load - using GPU Hi-Z culling instead");
 
     // Lights
     g_pGamePersistent->LoadTitle("st_loading_lights");
@@ -392,10 +383,6 @@ void FrameGraphRenderer::level_Unload()
     passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_particleEditor)
         m_particleEditor->OnLevelUnload();
-    if (m_processHOMTask) {
-        TaskScheduler->Wait(m_processHOMTask);
-        m_processHOMTask.Reset();
-    }
 
     if (m_geometryCollector) {
         m_geometryCollector->ClearStatic();
