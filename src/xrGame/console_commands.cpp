@@ -51,7 +51,6 @@
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
-#include "ik/IKLimb.h"
 #include "GametaskManager.h"
 
 #ifdef DEBUG
@@ -159,13 +158,6 @@ const xr_token lua_gc_method_token[] =
     { "gc_step", 1 },
     { "gc_timeout", 2 },
     { "gc_full", 3 },
-    { nullptr, -1 }
-};
-
-const xr_token ik_solver_token[] =
-{
-    { "vanilla", ikSolverVanilla },
-    { "ozz", ikSolverOzz },
     { nullptr, -1 }
 };
 
@@ -2337,7 +2329,6 @@ void CCC_RegisterCommands()
     // Physics
     CMD1(CCC_PHFps, "ph_frequency");
     CMD1(CCC_PHIterations, "ph_iterations");
-    CMD3(CCC_Token, "ik_solver", &ps_ik_solver, ik_solver_token);
 
 #ifdef DEBUG
     CMD1(CCC_PHGravity, "ph_gravity");
@@ -2428,7 +2419,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "dbg_ph_ik", &ph_dbg_draw_mask, phDbgIK);
     CMD3(CCC_Mask, "dbg_ph_ik_off", &ph_dbg_draw_mask1, phDbgIKOff);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_goal", &ph_dbg_draw_mask, phDbgDrawIKGoal);
-    CMD3(CCC_Mask, "dbg_ph_ik_limits", &ph_dbg_draw_mask, phDbgIKLimits);
     CMD3(CCC_Mask, "dbg_ph_character_control", &ph_dbg_draw_mask, phDbgCharacterControl);
     CMD3(CCC_Mask, "dbg_draw_ph_ray_motions", &ph_dbg_draw_mask, phDbgDrawRayMotions);
     CMD4(CCC_Float, "dbg_ph_vel_collid_damage_to_display", &dbg_vel_collid_damage_to_display, 0.f, 1000.f);
@@ -2437,7 +2427,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_DbgPhTrackObj, "dbg_track_obj");
     CMD3(CCC_Mask, "dbg_ph_actor_restriction", &ph_dbg_draw_mask1, ph_m1_DbgActorRestriction);
     CMD3(CCC_Mask, "dbg_draw_ph_hit_anims", &ph_dbg_draw_mask1, phDbgHitAnims);
-    CMD3(CCC_Mask, "dbg_draw_ph_ik_limits", &ph_dbg_draw_mask1, phDbgDrawIKLimits);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_predict", &ph_dbg_draw_mask1, phDbgDrawIKPredict);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_collision", &ph_dbg_draw_mask1, phDbgDrawIKCollision);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_shift_object", &ph_dbg_draw_mask1, phDbgDrawIKSHiftObject);

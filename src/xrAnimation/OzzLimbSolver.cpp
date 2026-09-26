@@ -17,6 +17,11 @@ OzzLimbSolver::OzzLimbSolver()
     m_endBind = Fidentity;
 }
 
+float OzzLimbSolver::Length() const
+{
+    return m_upperLength + m_lowerLength;
+}
+
 pcstr OzzLimbSolver::FailureName(Failure failure)
 {
     switch (failure)
@@ -98,14 +103,14 @@ bool OzzLimbSolver::ProjectPole(Fvector& pole, const Fvector& direction)
 bool OzzLimbSolver::Initialize(const Fmatrix& middleBind, const Fmatrix& endBind)
 {
     m_bindResult = {};
+    m_upperLength = middleBind.c.magnitude();
+    m_lowerLength = endBind.c.magnitude();
     if (!IsRigidTransform(middleBind, m_bindResult, Failure::MiddleBindTransform) ||
         !IsRigidTransform(endBind, m_bindResult, Failure::EndBindTransform))
     {
         return false;
     }
 
-    m_upperLength = middleBind.c.magnitude();
-    m_lowerLength = endBind.c.magnitude();
     if (m_upperLength <= EPS || m_lowerLength <= EPS)
     {
         m_bindResult = {Failure::BindLength, "min_bone_length",

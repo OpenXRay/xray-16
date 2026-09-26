@@ -11,9 +11,6 @@ class ik_limb_state
 {
     calculate_state state;
     const CIKLimb* limb;
-#ifdef IK_DBG_STATE_SEQUENCE
-    xr_vector<calculate_state> sv_state;
-#endif
 
 public:
     ik_limb_state() : state(), limb(0) {}
@@ -22,11 +19,6 @@ public:
 
     IC void save_new_state(const calculate_state& s)
     {
-#ifdef IK_DBG_STATE_SEQUENCE
-        if (sv_state.size() > 130)
-            sv_state.erase(sv_state.begin());
-        sv_state.push_back(state);
-#endif
         state = s;
     }
 

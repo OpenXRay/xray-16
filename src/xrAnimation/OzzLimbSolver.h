@@ -45,6 +45,7 @@ public:
     OzzLimbSolver();
 
     bool Initialize(const Fmatrix& middleBind, const Fmatrix& endBind);
+    float Length() const;
     Result Solve(const Fmatrix& start, const Fmatrix& goal, const Fvector& knee,
         Fmatrix (&rotations)[3]) const;
     static pcstr FailureName(Failure failure);
