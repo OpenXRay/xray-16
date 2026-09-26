@@ -86,8 +86,13 @@ void CSE_ALifeDynamicObject::add_offline(
 
 bool CSE_ALifeDynamicObject::synchronize_location()
 {
-    if (!ai().level_graph().valid_vertex_position(o_Position) ||
-        ai().level_graph().inside(ai().level_graph().vertex(m_tNodeID), o_Position))
+    if (!ai().level_graph().valid_vertex_position(o_Position))
+        return (true);
+
+    if (!ai().level_graph().valid_vertex_id(m_tNodeID))
+        return (true);
+
+    if (ai().level_graph().inside(ai().level_graph().vertex(m_tNodeID), o_Position))
         return (true);
 
     u32 const new_vertex_id = ai().level_graph().vertex(m_tNodeID, o_Position);
