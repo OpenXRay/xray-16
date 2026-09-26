@@ -201,7 +201,12 @@ void TextureManager::FreeHandle(TextureHandle handle) {
     if (!ValidateHandle(handle)) return;
 
     TextureMetadata& meta = m_textures[handle.index];
-    meta.isAlive = false;
+    {
+        std::lock_guard<std::mutex> lock(m_texturesMutex);
+        meta.isAlive = false;
+        m_textureContentRevisions.erase(meta.nvrhiTexture.Get());
+        meta.contentRevision = 0;
+    }
 
     if (!meta.filePath.empty()) {
         const auto mapped = m_pathToHandle.find(TextureKey{ meta.filePath, meta.colorSpace });
@@ -411,18 +416,34 @@ const TextureMetadata* TextureManager::GetMetadata(TextureHandle handle) const {
 void TextureManager::NotifyContentChanged(TextureMetadata& metadata)
 {
     std::lock_guard<std::mutex> lock(m_texturesMutex);
+    if (!metadata.isAlive || !metadata.nvrhiTexture)
+        return;
     metadata.contentRevision = ++m_contentRevision;
+    m_textureContentRevisions[metadata.nvrhiTexture.Get()] = metadata.contentRevision;
 }
 
 u64 TextureManager::GetContentRevision(const xr_set<nvrhi::ITexture*>& textures) const
 {
+    if (textures.empty())
+        return 0;
     std::lock_guard<std::mutex> lock(m_texturesMutex);
     u64 revision = 0;
-    for (const auto& metadata : m_textures)
+    if (m_textureContentRevisions.size() <= textures.size())
     {
-        auto* texture = metadata.nvrhiTexture.Get();
-        if (metadata.isAlive && texture && textures.find(texture) != textures.end())
-            revision = std::max(revision, metadata.contentRevision);
+        for (const auto& [texture, contentRevision] : m_textureContentRevisions)
+        {
+            if (textures.find(texture) != textures.end())
+                revision = std::max(revision, contentRevision);
+        }
+    }
+    else
+    {
+        for (auto* texture : textures)
+        {
+            const auto it = m_textureContentRevisions.find(texture);
+            if (it != m_textureContentRevisions.end())
+                revision = std::max(revision, it->second);
+        }
     }
     return revision;
 }
@@ -462,7 +483,6 @@ void TextureManager::Release(TextureHandle handle) {
         // Release GPU resources
         if (meta.nvrhiTexture) {
             m_memoryUsed -= meta.memoryUsed;
-            meta.nvrhiTexture = nullptr;
             meta.memoryUsed = 0;
         }
 

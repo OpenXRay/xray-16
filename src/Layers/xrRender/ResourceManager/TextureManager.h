@@ -226,6 +226,7 @@ private:
     xr_vector<TextureMetadata> m_textures;
     xr_vector<u32> m_freeSlots;  // Reusable indices
     u64 m_contentRevision = 0;
+    xr_map<nvrhi::ITexture*, u64> m_textureContentRevisions;
 
     // Name → Handle lookup (for deduplication)
     xr_map<TextureKey, TextureHandle> m_pathToHandle;
