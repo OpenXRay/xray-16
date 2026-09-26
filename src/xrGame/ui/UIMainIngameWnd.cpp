@@ -76,7 +76,8 @@ void CUIMainIngameWnd::Init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
-    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
+    if (!CUIXmlInit::InitWindow(uiXml, "main", 0, this, false))
+        SetWndSize({ UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
     Enable(false);
 

@@ -38,14 +38,16 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
 {
     ZoneScoped;
 
-    CUIXmlInit::InitWindow(xml, path, 0, this);
+    if (!CUIXmlInit::InitWindow(xml, path, 0, this, false))
+        SetWndSize(GetParent()->GetWndSize());
+
     XML_NODE stored_root = xml.GetLocalRoot();
 
     XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
 
-    m_back = UIHelper::CreateStatic(xml, "back", this);
-    m_back_v = UIHelper::CreateStatic(xml, "back_v", this, false);
+    std::ignore = UIHelper::CreateStatic(xml, "back", this, false);
+    std::ignore = UIHelper::CreateStatic(xml, "back_v", this, false);
 
     // XXX: replace with UIHelper
     if (xml.NavigateToNode("arrow"))
@@ -61,10 +63,10 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
         m_arrow_shadow->init_from_xml(xml, "arrow_shadow", this);
     }
 
-    m_back_over_arrow = UIHelper::CreateStatic(xml, "back_over_arrow", this, false);
+    std::ignore = UIHelper::CreateStatic(xml, "back_over_arrow", this, false);
     m_static_health = UIHelper::CreateStatic(xml, "static_health", this, false);
     m_static_armor = UIHelper::CreateStatic(xml, "static_armor", this, false);
-    m_static_weapon = UIHelper::CreateStatic(xml, "static_weapon", this, false);;
+    m_static_weapon = UIHelper::CreateStatic(xml, "static_weapon", this, false);
 
     CUIWindow* healthBarParent = this;
     CUIWindow* armorBarParent = this;
@@ -119,7 +121,7 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_ui_weapon_fmj_ammo = UIHelper::CreateStatic(xml, "static_fmj_ammo", this, false);
     m_ui_weapon_ap_ammo = UIHelper::CreateStatic(xml, "static_ap_ammo", this, false);
     m_ui_weapon_third_ammo = UIHelper::CreateStatic(xml, "static_third_ammo", this, false); //Alundaio: Option to display a third ammo type
-    m_fire_mode = UIHelper::CreateStatic(xml, "static_fire_mode", this);
+    m_fire_mode = UIHelper::CreateStatic(xml, "static_fire_mode", this, false);
     m_ui_grenade = UIHelper::CreateStatic(xml, "static_grenade", this, false);
 
     m_ui_weapon_icon = UIHelper::CreateStatic(xml, "static_wpn_icon", weaponsParent);
@@ -325,29 +327,30 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_b_force_update = false;
         }
 
-        item->GetBriefInfo(m_item_info);
+        II_BriefInfo item_info;
+        item->GetBriefInfo(item_info);
 
-        //		UIWeaponBack.SetText		( str_name.c_str() );
-        m_fire_mode->SetText(m_item_info.fire_mode.c_str());
-        SetAmmoIcon(m_item_info.icon.c_str());
+        if (m_fire_mode)
+            m_fire_mode->SetText(item_info.fire_mode.c_str());
+        SetAmmoIcon(item_info.icon.c_str());
 
         if (m_ui_weapon_cur_ammo)
         {
             m_ui_weapon_cur_ammo->Show(true);
-            m_ui_weapon_cur_ammo->SetText(m_item_info.cur_ammo.c_str());
+            m_ui_weapon_cur_ammo->SetText(item_info.cur_ammo.c_str());
         }
 
         if (m_ui_weapon_fmj_ammo)
         {
             m_ui_weapon_fmj_ammo->Show(true);
-            m_ui_weapon_fmj_ammo->SetText(m_item_info.fmj_ammo.c_str());
+            m_ui_weapon_fmj_ammo->SetText(item_info.fmj_ammo.c_str());
             m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
         if (m_ui_weapon_ap_ammo)
         {
             m_ui_weapon_ap_ammo->Show(true);
-            m_ui_weapon_ap_ammo->SetText(m_item_info.ap_ammo.c_str());
+            m_ui_weapon_ap_ammo->SetText(item_info.ap_ammo.c_str());
             m_ui_weapon_ap_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
@@ -355,16 +358,16 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
         if (m_ui_weapon_third_ammo)
         {
             m_ui_weapon_third_ammo->Show(true);
-            m_ui_weapon_third_ammo->SetText(m_item_info.third_ammo.c_str());
+            m_ui_weapon_third_ammo->SetText(item_info.third_ammo.c_str());
             m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
         if (m_ui_weapon_sign_ammo)
         {
-            if (m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
+            if (item_info.cur_ammo.size() && item_info.total_ammo.size())
             {
                 string64 temp;
-                xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
+                xr_sprintf(temp, "%s/%s", item_info.cur_ammo.c_str(), item_info.total_ammo.c_str());
 
                 m_ui_weapon_sign_ammo->Show(true);
                 m_ui_weapon_sign_ammo->SetText(temp);
@@ -393,13 +396,14 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             }
         }
 
-        m_fire_mode->Show(true);
+        if (m_fire_mode)
+            m_fire_mode->Show(true);
 
         if (m_ui_grenade)
         {
             m_ui_grenade->Show(true);
 
-            m_ui_grenade->SetText(m_item_info.grenade.c_str());
+            m_ui_grenade->SetText(item_info.grenade.c_str());
 
             CWeaponMagazinedWGrenade* wpn = smart_cast<CWeaponMagazinedWGrenade*>(item);
             if (wpn && wpn->m_bGrenadeMode)
@@ -408,8 +412,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
                 m_ui_grenade->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
-        CWeaponMagazined* wpnm = smart_cast<CWeaponMagazined*>(item);
-        if (wpnm)
+        if (CWeaponMagazined* wpnm = smart_cast<CWeaponMagazined*>(item))
         {
             if (wpnm->m_ammoType == 0 && m_ui_weapon_fmj_ammo)
                 m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238, 155, 23, 255));
@@ -439,7 +442,8 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
         if (m_ui_weapon_sign_ammo)
             m_ui_weapon_sign_ammo->Show(false);
 
-        m_fire_mode->Show(false);
+        if (m_fire_mode)
+            m_fire_mode->Show(false);
 
         if (m_ui_grenade)
             m_ui_grenade->Show(false);

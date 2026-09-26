@@ -21,9 +21,6 @@ private:
     typedef CUIWindow inherited;
     //-	typedef ALife::EInfluenceType	EIndicatorType;
 
-    CUIStatic* m_back;
-    CUIStatic* m_back_v;
-    CUIStatic* m_back_over_arrow;
     CUIStatic* m_static_health;
     CUIStatic* m_static_armor;
     CUIStatic* m_static_weapon;
@@ -36,7 +33,6 @@ private:
     CUIStatic* m_ui_weapon_third_ammo; //Alundaio
     CUIStatic* m_fire_mode;
     CUIStatic* m_ui_grenade;
-    II_BriefInfo m_item_info;
 
     CUIStatic* m_ui_weapon_sign_ammo;
     CUIStatic* m_ui_weapon_icon;
