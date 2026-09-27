@@ -10,19 +10,21 @@ class CUICustomMap : public CUIStatic, public CUIWndCallback
 protected:
     shared_str m_name;
 
-    Frect m_BoundRect_; // real map size (meters)
-    Flags16 m_flags;
+    Frect m_BoundRect_{}; // real map size (meters)
+    Flags16 m_flags{};
+
     enum EFlags
     {
         eLocked = (1 << 0),
         eRounded = (1 << 1)
     };
-    float m_pointer_dist;
-    Frect m_workingArea;
+
+    float m_pointer_dist{};
+    Frect m_workingArea{};
 
 public:
     Frect& WorkingArea() { return m_workingArea; }
-    Frect m_prevRect;
+    Frect m_prevRect{};
     shared_str m_texture;
     shared_str m_shader_name;
 
@@ -44,29 +46,35 @@ public:
 
     void FitToWidth(float width);
     void FitToHeight(float height);
+
+    [[nodiscard]]
     Fvector2 GetCurrentZoom() const
     {
-        return Fvector2().set(GetWndRect().height() / BoundRect().height(), GetWndRect().width() / BoundRect().width());
+        return { GetWndRect().height() / BoundRect().height(), GetWndRect().width() / BoundRect().width() };
     }
+
+    [[nodiscard]]
     const Frect& BoundRect() const { return m_BoundRect_; }
     virtual void OptimalFit(const Frect& r);
 
     const shared_str& MapName() { return m_name; }
-    virtual CUIGlobalMapSpot* GlobalMapSpot() { return NULL; }
+    virtual CUIGlobalMapSpot* GlobalMapSpot() { return nullptr; }
     virtual void Draw();
     virtual void Update();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     virtual bool IsRectVisible(Frect r);
     virtual bool NeedShowPointer(Frect r);
-    bool Locked() { return !!m_flags.test(eLocked); }
+
+    bool Locked() const { return m_flags.test(eLocked); }
     void SetLocked(bool b) { m_flags.set(eLocked, b); }
-    bool IsRounded() { return m_flags.test(eRounded); }
+    bool IsRounded() const { return m_flags.test(eRounded); }
     void SetRounded(bool b) { m_flags.set(eRounded, b); }
-    void SetPointerDistance(float d) { m_pointer_dist = d; };
-    float GetPointerDistance() { return m_pointer_dist; };
+    void SetPointerDistance(const float d) { m_pointer_dist = d; }
+    float GetPointerDistance() const { return m_pointer_dist; }
+
 protected:
-    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name);
-    virtual void UpdateSpots(){};
+    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name);
+    virtual void UpdateSpots() {}
 };
 
 class CUIGlobalMap final : public CUICustomMap
@@ -102,7 +110,7 @@ public:
     pcstr GetDebugType() override { return "CUIGlobalMap"; }
 
 protected:
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };
 
 class CUILevelMap final : public CUICustomMap
@@ -131,7 +139,7 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };
 
 // Rounded by default
@@ -152,5 +160,5 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
+    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };

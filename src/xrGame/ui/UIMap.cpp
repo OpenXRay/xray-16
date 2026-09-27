@@ -12,12 +12,7 @@
 //const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 //const u32 ourLevelMapColor = 0xffffffff;
 
-CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
-{
-    m_BoundRect_.set(0, 0, 0, 0);
-    m_flags.zero();
-    SetPointerDistance(0.0f);
-}
+CUICustomMap::CUICustomMap() : CUIStatic("Custom Map") {}
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
@@ -65,7 +60,7 @@ void CUICustomMap::Draw()
     UI().PopScissor();
 }
 
-void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
     m_name = name;
 
@@ -89,7 +84,7 @@ void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, c
     Fvector2 sz;
     m_BoundRect_.getsize(sz);
     CUIStatic::SetWndSize(sz);
-    CUIStatic::SetWndPos(Fvector2().set(0, 0));
+    CUIStatic::SetWndPos({});
     CUIStatic::InitTextureEx(m_texture.c_str(), m_shader_name.c_str());
 
     SetStretchTexture(true);
@@ -279,11 +274,14 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
     Show(false);
 }
 
-void CUIGlobalMap::Initialize() { Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"); }
-void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIGlobalMap::Initialize()
+{
+    Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default");
+}
+
+void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
-    //	Fvector2 size = CUIStatic::GetWndSize();
     SetMaxZoom(pLtx.r_float(m_name, "max_zoom"));
 }
 
@@ -436,7 +434,7 @@ void CUILevelMap::Draw()
     inherited::Draw();
 }
 
-void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     Fvector4 tmp = pGameIni->r_fvector4(MapName(), "global_rect");
@@ -446,10 +444,10 @@ void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, co
     m_GlobalRect.set(tmp.x, tmp.y, tmp.z, tmp.w);
 
 #ifdef DEBUG
-    float kw = m_GlobalRect.width() / BoundRect().width();
-    float kh = m_GlobalRect.height() / BoundRect().height();
+    const float kw = m_GlobalRect.width() / BoundRect().width();
+    const float kh = m_GlobalRect.height() / BoundRect().height();
 
-    if (FALSE == fsimilar(kw, kh, EPS_L))
+    if (!fsimilar(kw, kh, EPS_L))
     {
         Msg(" --incorrect global rect definition for map [%s]  kw=%f kh=%f", MapName().c_str(), kw, kh);
         Msg(" --try x2=%f or  y2=%f", m_GlobalRect.x1 + kh * BoundRect().width(),
@@ -570,7 +568,7 @@ CUIMiniMap::CUIMiniMap()
     SetRounded(true);
 }
 
-void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name)
+void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
     inherited::Init_internal(name, pLtx, sect_name, sh_name);
     CUIStatic::SetTextureColor(0x7fffffff);
