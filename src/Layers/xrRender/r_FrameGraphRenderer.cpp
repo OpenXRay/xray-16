@@ -569,10 +569,8 @@ void FrameGraphRenderer::Render() {
 
     {
         const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
-        if (vsm.maskReady && !vsm.sunDown && !vsm.nightFrozen)
+        if (vsm.maskReady)
             staticGlobalsData.cascade_splits.x = 2.0f;
-        if (vsm.sunDown)
-            staticGlobalsData.L_sun_color.set(0.0f, 0.0f, 0.0f);
     }
 
     auto& clm = fg::ClusteredLightManager::Instance();

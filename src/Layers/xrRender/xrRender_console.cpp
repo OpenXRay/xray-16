@@ -292,10 +292,6 @@ int   ps_r_geo_page_stats  = 0;
 float ps_r_ssa_px        = 2.0f;
 
 int   ps_r_sun_shadow_debug    = 0;
-int   ps_r_sun_night_freeze    = 1;
-float ps_r_sun_night_lum       = 0.05f;
-float ps_r_sun_night_alt       = 0.02f;
-float ps_r_bolt_flash          = 1.0f;
 u32   ps_r_tonemap             = 1;
 const xr_token r_tonemap_token[] = {{"none", 0}, {"neutral", 1}, {"agx", 2}, {"aces", 3}, {nullptr, 0}};
 int   ps_r_exposure_auto       = 1;
@@ -1070,10 +1066,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_ssa_px", &ps_r_ssa_px, 0.25f, 16.0f);
 
     CMD4(CCC_Integer, "r_sun_shadow_debug", &ps_r_sun_shadow_debug, 0, 2);
-    CMD4(CCC_Integer, "r_sun_night_freeze", &ps_r_sun_night_freeze, 0, 1);
-    CMD4(CCC_Float, "r_sun_night_lum", &ps_r_sun_night_lum, 0.0f, 0.5f);
-    CMD4(CCC_Float, "r_sun_night_alt", &ps_r_sun_night_alt, -0.2f, 0.5f);
-    CMD4(CCC_Float, "r_bolt_flash", &ps_r_bolt_flash, 0.0f, 4.0f);
     CMD3(CCC_Token, "r_tonemap", &ps_r_tonemap, r_tonemap_token);
     CMD4(CCC_Integer, "r_exposure_auto", &ps_r_exposure_auto, 0, 1);
     CMD4(CCC_Float, "r_exposure_compensation", &ps_r_exposure_compensation, -8.0f, 8.0f);

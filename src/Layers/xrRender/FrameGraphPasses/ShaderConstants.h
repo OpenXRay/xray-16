@@ -253,13 +253,6 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
 
     const Fvector hemi = SrgbToLinear(Fvector().set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z));
     cb.L_hemi_color.set(hemi.x, hemi.y, hemi.z);
-    const Fvector& flash = g_pGamePersistent->Environment().ThunderboltFlash();
-    if (ps_r_bolt_flash > 0.f && (flash.x + flash.y + flash.z) > 0.001f) {
-        const Fvector linearFlash = SrgbToLinear(flash);
-        cb.L_hemi_color.x += linearFlash.x * ps_r_bolt_flash;
-        cb.L_hemi_color.y += linearFlash.y * ps_r_bolt_flash;
-        cb.L_hemi_color.z += linearFlash.z * ps_r_bolt_flash;
-    }
 }
 
 void GetSunLightData(SunLightData& outSun);

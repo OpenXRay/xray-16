@@ -94,7 +94,6 @@ protected:
 private:
     Fmatrix current_xform;
     Fvector3 current_direction;
-    Fvector current_flash{};
 
     FactoryPtr<IThunderboltRender> m_pRender;
     // ref_geom hGeom_model;
@@ -145,7 +144,6 @@ public:
     IThunderboltRender* GetRenderer() const { return &*m_pRender; }
 
     bool IsActive() const { return state == stWorking; }
-    const Fvector& Flash() const { return current_flash; }
 
     SThunderboltCollection* AppendDef(const shared_str& sect);
 

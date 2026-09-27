@@ -295,10 +295,7 @@ void CEffect_Thunderbolt::OnFrame(CEnvDescriptorMixer& currentEnv)
     if (state == stWorking)
     {
         if (current_time > life_time)
-        {
             state = stIdle;
-            current_flash.set(0.f, 0.f, 0.f);
-        }
         current_time += Device.fTimeDelta;
         Fvector fClr;
         int frame;
@@ -308,8 +305,6 @@ void CEffect_Thunderbolt::OnFrame(CEnvDescriptorMixer& currentEnv)
 
         lightning_phase = 1.5f * (current_time / life_time);
         clamp(lightning_phase, 0.f, 1.f);
-
-        current_flash.set(fClr);
 
         Fvector& sky_color = currentEnv.sky_color;
         sky_color.mad(fClr, p_sky_color);

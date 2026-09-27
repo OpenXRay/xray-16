@@ -242,10 +242,6 @@ extern ECORE_API int   ps_r_geo_page_stats;
 extern ECORE_API float ps_r_ssa_px;
 
 extern ECORE_API int   ps_r_sun_shadow_debug;
-extern ECORE_API int   ps_r_sun_night_freeze;
-extern ECORE_API float ps_r_sun_night_lum;
-extern ECORE_API float ps_r_sun_night_alt;
-extern ECORE_API float ps_r_bolt_flash;
 extern ECORE_API u32   ps_r_tonemap;
 extern ECORE_API int   ps_r_exposure_auto;
 extern ECORE_API float ps_r_exposure_compensation;
