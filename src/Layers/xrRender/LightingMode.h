@@ -30,7 +30,7 @@ enum class LightingFallback : u8
 class LightingFrameState
 {
 public:
-    void Begin(LightingMode request, bool profileRTGI);
+    void Begin(LightingMode request);
     void ScheduleOpaqueLighting();
     void Fail(LightingFallback reason);
     void ResetRecovery();
@@ -59,7 +59,6 @@ public:
     bool rayGrassEnabled = false;
     bool rayGrassPending = false;
     u32 rayStaticDetailInstances = 0;
-    bool rtgiProfile = false;
     bool rawSignalsRecorded = false;
     bool reconstructionRequested = false;
     bool reconstructionActive = false;
@@ -97,7 +96,6 @@ public:
 private:
     LightingMode m_latchedMode = LightingMode::Raster;
     LightingFallback m_latchedReason = LightingFallback::None;
-    bool m_latchedRTGIProfile = false;
 };
 
 LightingMode LightingModeFromSetting(int setting);

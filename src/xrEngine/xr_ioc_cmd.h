@@ -39,7 +39,6 @@ extern ENGINE_API int ps_r_rt_max_null_events;
 extern ENGINE_API int ps_r_rt_light_rays;
 extern ENGINE_API float ps_r_rt_sun_radius;
 extern ENGINE_API int ps_r_rt_gi;
-extern ENGINE_API int ps_r_rt_gi_profile;
 extern ENGINE_API int ps_r_rt_gi_reconstruct;
 extern ENGINE_API int ps_r_rt_gi_history;
 extern ENGINE_API int ps_r_rt_gi_filter_passes;
