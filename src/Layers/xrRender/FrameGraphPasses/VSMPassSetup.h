@@ -135,8 +135,6 @@ struct VSMState {
     float refreshStretch = 1.0f;
     u32 lodBias = 0;
     u32 lodBiasHold = 0;
-    bool sunDown = false;
-    bool nightFrozen = false;
     u32 frame = 0;
     u32 invalidations = 0;
     float sunStepMax = 0.0f;

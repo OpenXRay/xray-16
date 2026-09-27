@@ -306,7 +306,6 @@ public:
     CEffect_Thunderbolt* eff_Thunderbolt{};
 
     bool IsThunderboltActive() const;
-    const Fvector& ThunderboltFlash() const;
 
     float fTimeFactor;
 
