@@ -15,43 +15,6 @@ class FrameGraph;
 
 namespace xray::render::fg::passes
 {
-class RTGIProfileState
-{
-public:
-    enum class Stage : u32
-    {
-        Setup,
-        Trace,
-        Material,
-        Sun,
-        LocalLights,
-        Environment,
-        Emissive,
-        Advance,
-        Resolve,
-        Count
-    };
-
-    static constexpr u32 StageCount = static_cast<u32>(Stage::Count);
-    static constexpr u32 LightingStageCount = 4;
-    static constexpr u32 MaxLanes = 262144;
-    static constexpr u32 PathStride = 304;
-    static constexpr u32 HitStride = 96;
-    static constexpr u32 SumStride = 48;
-    static constexpr u32 ParameterVersions = 65536;
-
-    nvrhi::ComputePipelineHandle pipelines[StageCount];
-    nvrhi::BindingLayoutHandle layouts[StageCount];
-    nvrhi::BufferHandle paths;
-    nvrhi::BufferHandle hits;
-    nvrhi::BufferHandle sums;
-    nvrhi::IBuffer* cb = nullptr;
-    u32 capacity = 0;
-    u32 tileHeight = 0;
-    LightingFallback readiness = LightingFallback::ResourcesUnavailable;
-    bool initialized = false;
-};
-
 class RTGIReconstructionState
 {
 public:
@@ -97,7 +60,6 @@ public:
     nvrhi::TextureHandle pathData;
     nvrhi::TextureHandle surfaceData;
     nvrhi::TextureHandle motion;
-    RTGIProfileState profile;
     RTGIReconstructionState reconstruction;
     u32 texWidth = 0;
     u32 texHeight = 0;
@@ -167,17 +129,6 @@ public:
 };
 
 static_assert(sizeof(RTGIRawCB) == 224);
-
-class RTGIProfileParams
-{
-public:
-    u32 tileY = 0;
-    u32 tileHeight = 0;
-    u32 sampleIndex = 0;
-    u32 pad = 0;
-};
-
-static_assert(sizeof(RTGIProfileParams) == 16);
 
 class RTGICompositeParams
 {
@@ -256,14 +207,10 @@ public:
     framegraph::VirtualResourceHandle pathData;
     framegraph::VirtualResourceHandle surfaceData;
     framegraph::VirtualResourceHandle outMotion;
-    framegraph::VirtualResourceHandle profilePaths;
-    framegraph::VirtualResourceHandle profileHits;
-    framegraph::VirtualResourceHandle profileSums;
     WorldRadianceCacheResources worldCache;
     WorldRadianceCacheCB worldCacheConstants = {};
     nvrhi::IBuffer* worldCacheConstantBuffer = nullptr;
     WorldRadianceCache* worldCacheOwner = nullptr;
-    bool profileEnabled = false;
     RTGIRawCB cbData;
     u32 width = 0;
     u32 height = 0;

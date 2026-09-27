@@ -1125,7 +1125,7 @@ u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
-    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi), ps_r_rt_gi_profile != 0);
+    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi));
     ApplyRTLightingSettings(m_lightingState);
     m_lightingState.rayGrassEnabled = m_detailManager && m_detailManager->IsRayTracingCoverageEnabled();
     m_lightingState.rayGrassPending = m_detailManager && m_detailManager->IsRayTracingCoveragePending();

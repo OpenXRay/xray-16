@@ -30,7 +30,6 @@ ENGINE_API int ps_r_rt_max_null_events = 256;
 ENGINE_API int ps_r_rt_light_rays = 1;
 ENGINE_API float ps_r_rt_sun_radius = 0.0f;
 ENGINE_API int ps_r_rt_gi = 0;
-ENGINE_API int ps_r_rt_gi_profile = 0;
 ENGINE_API int ps_r_rt_gi_reconstruct = 2;
 ENGINE_API int ps_r_rt_gi_history = 32;
 ENGINE_API int ps_r_rt_gi_filter_passes = 5;

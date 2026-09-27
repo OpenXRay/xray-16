@@ -50,16 +50,6 @@ const char* PathTracerDiagnosticName(u32 mode)
     return mode < sizeof(kNames) / sizeof(kNames[0]) ? kNames[mode] : "unknown";
 }
 
-static bool HasGPUPassNamed(const xr_vector<GPUPassTiming>& passTimings, const char* name)
-{
-    for (const auto& pass : passTimings)
-    {
-        if (strcmp(pass.name.c_str(), name) == 0)
-            return true;
-    }
-    return false;
-}
-
 static bool IsGPUPassChildName(const char* parentName, const char* childName)
 {
     const size_t parentLength = strlen(parentName);
@@ -183,8 +173,8 @@ void StatsOverlay::Render()
     if (lighting.frameFailed)
         ImGui::Text("Failed RT frame: world clear %s", lighting.failureCleared ? "recorded (opaque black)" : "left to present");
     if (lighting.recoveryActive)
-        ImGui::Text("Raster recovery: latched for %s%s | rearm on mode or RTGI profile change, shader reload, level load or reset",
-            render::fg::LightingModeName(lighting.requested), lighting.rtgiProfile ? " [diagnostic]" : "");
+        ImGui::Text("Raster recovery: latched for %s | rearm on mode change, shader reload, level load or reset",
+            render::fg::LightingModeName(lighting.requested));
     if (lighting.requested != render::fg::LightingMode::Raster)
         ImGui::Text("RT dispatch recorded: %s", lighting.recorded ? "yes" : "no");
     ImGui::Text("Surface history: %s", lighting.previousSurfacesValid ? "valid" : "rejected");
@@ -226,7 +216,7 @@ void StatsOverlay::Render()
             ImGui::Text("RTGI world cache: scheduled | select %s | update %s | trace %s | %u live / %u cells%s | substitute at bounces %u-%u, max bounces %u | %u updated / %u target | cell %.2f m | lifetime %u frames | %.1f MB%s",
                 lighting.worldCacheSelectRecorded ? "recorded" : "not recorded",
                 lighting.worldCacheUpdateRecorded ? "recorded" : "not recorded",
-                lighting.worldCacheRecorded ? "consumed" : (lighting.rtgiProfile ? "not consumed (profile kernels are uncached)" : "not consumed"),
+                lighting.worldCacheRecorded ? "consumed" : "not consumed",
                 lighting.worldCacheLiveCells, lighting.worldCacheCapacity, lighting.worldCacheLiveCellsKnown ? "" : " (count pending)",
                 lighting.worldCacheBounce, lighting.worldCacheMaxBounces - 1, lighting.worldCacheMaxBounces,
                 lighting.worldCacheUpdated, lighting.worldCacheUpdates, lighting.worldCacheCellSize, lighting.worldCacheLifetime,
@@ -730,25 +720,6 @@ void StatsOverlay::RenderGPUSection()
         {
             ImGui::TextDisabled("No GPU passes recorded");
             return;
-        }
-
-        if (HasGPUPassNamed(passTimings, "RTGI Raw Transport [diagnostic]"))
-        {
-            ImGui::TextColored(ImVec4(1.f, 0.7f, 0.3f, 1.f), "RTGI diagnostic sample: expand light + shadows for emitters");
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Staged RTGI Raw Transport sample, not the normal monolithic kernel.\n"
-                    "Leaf rows bracket individual dispatches, including scratch traffic and synchronization.\n"
-                    "Repeated tile/sample scopes are summed per name and queue.\n"
-                    "Primary/Step N light + shadows are inclusive groups. Expand for:\n"
-                    "Sun, Local lights, Environment, and Emissive + accumulate.\n"
-                    "Emitter rows include scratch, serialization, and timer overhead.\n"
-                    "Emissive + accumulate performs the direct-light finite-value check and applies all four groups,\n"
-                    "even with zero emissive emitters.\n"
-                    "Group and child timers have separate boundaries, so their sums need not match exactly.\n"
-                    "Only top-level rows contribute to the frame total. Do not add parents and children.\n"
-                    "Step N is a ray iteration; water/null events may not advance a bounce.\n"
-                    "Tail + resolve finishes remaining water paths and writes guides on the final sample.\n"
-                    "Normal mode still uses one dispatch; staged numbers are not its phase breakdown.");
         }
 
         ImGui::Text("Total: %s", FormatTime(totalGPU));
@@ -1494,8 +1465,8 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
     text += line;
     if (rs.lighting.frameFailed)
     {
-        xr_sprintf(line, sizeof(line), "lighting recovery: frame kept %s%s scheduling | world clear=%s | black presentation fallback requested | raster latched until mode or RTGI profile change, shader reload, level load or reset\n",
-            render::fg::LightingModeName(rs.lighting.scheduled), rs.lighting.rtgiProfile ? " [diagnostic]" : "",
+        xr_sprintf(line, sizeof(line), "lighting recovery: frame kept %s scheduling | world clear=%s | black presentation fallback requested | raster latched until mode change, shader reload, level load or reset\n",
+            render::fg::LightingModeName(rs.lighting.scheduled),
             rs.lighting.failureCleared ? "recorded before UI" : "unavailable");
         text += line;
     }
@@ -1649,18 +1620,6 @@ void StatsOverlay::WriteProfileDump(u32 intervalSeconds)
         xr_sprintf(line, sizeof(line), "\nGPU total %.3f ms | async %.3f ms | graphics %.3f ms | sample %llu\n",
             totalGPU, asyncTotal, graphicsTotal, (unsigned long long)m_gpuProfiler->GetCompletedSampleId());
         text += line;
-        if (HasGPUPassNamed(passes, "RTGI Raw Transport [diagnostic]"))
-        {
-            text += "RTGI Raw Transport [diagnostic]: staged leaf timings include scratch traffic and synchronization\n";
-            text += "  rows nest under their name prefix | repeated tile and sample scopes are summed per name and queue\n";
-            text += "  only top-level rows contribute to the frame total; do not add parents and children\n";
-            text += "  Primary/Step N light + shadows are inclusive groups: Sun, Local lights, Environment, Emissive + accumulate\n";
-            text += "  emitter rows include scratch, serialization and timer overhead\n";
-            text += "  Emissive + accumulate checks direct-light finiteness and applies all four groups, even with zero emissive emitters\n";
-            text += "  group and child timers have separate boundaries, so their sums need not match exactly\n";
-            text += "  Step N = one ray iteration, water may not advance a bounce | Tail + resolve finishes remaining water paths and writes guides\n";
-            text += "  not phase attribution for the normal single-dispatch kernel\n";
-        }
         if (FormatQueueTimingsLine(line, sizeof(line)))
         {
             text += line;

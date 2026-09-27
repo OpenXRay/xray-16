@@ -3,7 +3,7 @@
 
 namespace xray::render::fg
 {
-void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
+void LightingFrameState::Begin(LightingMode request)
 {
     requested = request;
     effective = requested;
@@ -29,7 +29,6 @@ void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
     rayGrassEnabled = false;
     rayGrassPending = false;
     rayStaticDetailInstances = 0;
-    rtgiProfile = requested == LightingMode::RTGI && profileRTGI;
     rawSignalsRecorded = false;
     reconstructionRequested = false;
     reconstructionActive = false;
@@ -66,7 +65,7 @@ void LightingFrameState::Begin(LightingMode request, bool profileRTGI)
 
     if (m_latchedReason == LightingFallback::None)
         return;
-    if (m_latchedMode != requested || m_latchedRTGIProfile != rtgiProfile)
+    if (m_latchedMode != requested)
     {
         ResetRecovery();
         return;
@@ -107,7 +106,6 @@ void LightingFrameState::Fail(LightingFallback reason)
         worldCacheRecorded = false;
         m_latchedMode = requested;
         m_latchedReason = reason;
-        m_latchedRTGIProfile = rtgiProfile;
         return;
     }
 
@@ -130,7 +128,6 @@ void LightingFrameState::ResetRecovery()
 {
     m_latchedMode = LightingMode::Raster;
     m_latchedReason = LightingFallback::None;
-    m_latchedRTGIProfile = false;
 }
 
 LightingMode LightingModeFromSetting(int setting)
