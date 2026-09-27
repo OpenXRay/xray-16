@@ -227,6 +227,11 @@ private:
         const char* entryPoint,
         xray::render::SlangCompiler::Stage stage
     );
+    void CollectIncludePaths(const char* source, size_t sourceLen, xr_vector<xr_string>& out, xr_set<xr_string>& visited);
+    void WatchIncludes(xr_vector<xr_string>& includes, const char* source, size_t sourceLen);
+    bool IsIncludeChanged(const xr_string& path) const;
+    void RefreshIncludeTimes();
+    bool ValidateChangedFilesImpl();
 
     xray::render::SlangCompiler* m_slangCompiler;
     xray::render::SlangCompiler::Target m_target = xray::render::SlangCompiler::Target::DXIL;
@@ -246,8 +251,11 @@ private:
         xr_string entryPoint;
         xray::render::SlangCompiler::Stage stage = xray::render::SlangCompiler::Stage::Vertex;
         std::filesystem::file_time_type lastWriteTime;
+        xr_vector<xr_string> includes;
     };
     xr_map<xr_string, WatchedFile> m_watchedFiles;
+    bool IsWatchedFileChanged(const WatchedFile& file) const;
+    xr_map<xr_string, std::filesystem::file_time_type> m_watchedIncludes;
     bool m_hotReloadPrimed = false;
 };
 

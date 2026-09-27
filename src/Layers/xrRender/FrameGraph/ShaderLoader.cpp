@@ -120,6 +120,7 @@ void ShaderLoader::SetTarget(xray::render::SlangCompiler::Target target)
     {
         ClearAllCaches();
         m_watchedFiles.clear();
+        m_watchedIncludes.clear();
         m_hotReloadPrimed = false;
     }
     m_target = target;
@@ -242,7 +243,116 @@ void ShaderLoader::WatchShaderFile(
     watchedFile.stage = stage;
     watchedFile.lastWriteTime = writeTime;
 
+    if (IReader* source = OpenShaderFile(name, extension))
+    {
+        WatchIncludes(watchedFile.includes, (const char*)source->pointer(), (size_t)source->length());
+        source->close();
+    }
+
     m_watchedFiles[cacheKey] = std::move(watchedFile);
+}
+
+void ShaderLoader::CollectIncludePaths(const char* source, size_t sourceLen, xr_vector<xr_string>& out, xr_set<xr_string>& visited)
+{
+    static constexpr char token[] = "#include";
+    constexpr size_t tokenLen = sizeof(token) - 1;
+
+    if (sourceLen < tokenLen)
+        return;
+
+    for (size_t i = 0; i + tokenLen <= sourceLen; ++i)
+    {
+        if (source[i] != '#' || memcmp(source + i, token, tokenLen) != 0)
+            continue;
+
+        size_t p = i + tokenLen;
+        while (p < sourceLen && (source[p] == ' ' || source[p] == '\t'))
+            ++p;
+        if (p >= sourceLen || source[p] != '"')
+            continue;
+
+        size_t start = ++p;
+        while (p < sourceLen && source[p] != '"' && source[p] != '\n' && source[p] != '\r')
+            ++p;
+        if (p >= sourceLen || source[p] != '"' || p == start)
+            continue;
+
+        xr_string includeName(source + start, p - start);
+        for (char& c : includeName)
+            if (c == '/' || c == '\\')
+                c = DELIMITER[0];
+
+        if (!visited.insert(includeName).second)
+            continue;
+
+        string_path relPath;
+        strconcat(sizeof(relPath), relPath, "r5" DELIMITER, includeName.c_str());
+
+        string_path fullPath;
+        FS.update_path(fullPath, "$game_shaders$", relPath);
+#ifndef WINDOWS
+        for (char* c = fullPath; *c; ++c)
+            if (*c == '\\') *c = '/';
+#endif
+        out.emplace_back(fullPath);
+
+        IReader* R = FS.r_open("$game_shaders$", relPath);
+        if (!R)
+            continue;
+        CollectIncludePaths((const char*)R->pointer(), (size_t)R->length(), out, visited);
+        R->close();
+    }
+}
+
+void ShaderLoader::WatchIncludes(xr_vector<xr_string>& includes, const char* source, size_t sourceLen)
+{
+    includes.clear();
+    xr_set<xr_string> visited;
+    CollectIncludePaths(source, sourceLen, includes, visited);
+    for (const xr_string& path : includes)
+    {
+        if (m_watchedIncludes.find(path) != m_watchedIncludes.end())
+            continue;
+        std::error_code ec;
+        const auto writeTime = std::filesystem::last_write_time(path, ec);
+        if (!ec)
+            m_watchedIncludes.emplace(path, writeTime);
+    }
+}
+
+bool ShaderLoader::IsIncludeChanged(const xr_string& path) const
+{
+    const auto found = m_watchedIncludes.find(path);
+    if (found == m_watchedIncludes.end())
+        return false;
+    std::error_code ec;
+    const auto currentTime = std::filesystem::last_write_time(path, ec);
+    return !ec && currentTime != found->second;
+}
+
+bool ShaderLoader::IsWatchedFileChanged(const WatchedFile& file) const
+{
+    std::error_code ec;
+    const auto currentTime = std::filesystem::last_write_time(file.absolutePath, ec);
+    if (!ec && currentTime != file.lastWriteTime)
+        return true;
+    for (const xr_string& include : file.includes)
+    {
+        if (IsIncludeChanged(include))
+            return true;
+    }
+    return false;
+}
+
+void ShaderLoader::RefreshIncludeTimes()
+{
+    for (auto& [path, writeTime] : m_watchedIncludes)
+    {
+        std::error_code ec;
+        const auto currentTime = std::filesystem::last_write_time(path, ec);
+        if (!ec)
+            writeTime = currentTime;
+    }
 }
 
 bool ShaderLoader::CompileShader(
@@ -1143,10 +1253,27 @@ bool ShaderLoader::CheckForChangedFiles()
         }
     }
 
+    for (const auto& [path, writeTime] : m_watchedIncludes)
+    {
+        if (IsIncludeChanged(path))
+        {
+            Msg("* Shader hot-reload: %s changed", path.c_str());
+            return true;
+        }
+    }
+
     return false;
 }
 
 bool ShaderLoader::ValidateChangedFiles()
+{
+    if (ValidateChangedFilesImpl())
+        return true;
+    RefreshIncludeTimes();
+    return false;
+}
+
+bool ShaderLoader::ValidateChangedFilesImpl()
 {
     if (!GEnv.Render || !GEnv.Render->GetRenderDevice())
     {
@@ -1159,9 +1286,7 @@ bool ShaderLoader::ValidateChangedFiles()
     {
         const auto& info = watchedEntry.second;
 
-        std::error_code ec;
-        const auto currentTime = std::filesystem::last_write_time(info.absolutePath, ec);
-        if (ec || currentTime == info.lastWriteTime)
+        if (!IsWatchedFileChanged(info))
             continue;
 
         hasChangedFiles = true;
@@ -1242,10 +1367,10 @@ bool ShaderLoader::ReloadChangedShaders()
 
     for (auto& [cacheKey, watchInfo] : m_watchedFiles)
     {
+        if (!IsWatchedFileChanged(watchInfo))
+            continue;
         std::error_code ec;
         const auto currentTime = std::filesystem::last_write_time(watchInfo.absolutePath, ec);
-        if (ec || currentTime == watchInfo.lastWriteTime)
-            continue;
 
         IReader* shaderFile = OpenShaderFile(watchInfo.shaderName.c_str(), watchInfo.extension.c_str());
         if (!shaderFile)
@@ -1306,6 +1431,8 @@ bool ShaderLoader::ReloadChangedShaders()
         else
             m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
 
+        WatchIncludes(watchInfo.includes, sourceCode.c_str(), sourceCode.size());
+
         u32 sourceHash = ComputeSourceHash(sourceCode.c_str(), sourceCode.size(), watchInfo.entryPoint.c_str());
         m_cache.Save(watchInfo.shaderName.c_str(), watchInfo.extension.c_str(),
             sourceHash, compileResult.bytecode, &extractedReflection);
@@ -1316,6 +1443,8 @@ bool ShaderLoader::ReloadChangedShaders()
         Msg("* [ShaderLoader] Hot-reloaded: %s%s (entry: %s)",
             watchInfo.shaderName.c_str(), watchInfo.extension.c_str(), watchInfo.entryPoint.c_str());
     }
+
+    RefreshIncludeTimes();
 
     if (reloaded > 0)
         Msg("* [ShaderLoader] Reloaded %u shader(s)", reloaded);
@@ -1342,6 +1471,7 @@ void ShaderLoader::ClearAllCaches()
         if (!ec)
             info.lastWriteTime = currentTime;
     }
+    RefreshIncludeTimes();
 }
 
 // ══════════════════════════════════════════════════════════
