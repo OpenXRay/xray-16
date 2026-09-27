@@ -12,11 +12,24 @@
 //const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 //const u32 ourLevelMapColor = 0xffffffff;
 
+constexpr cpcstr DEFAULT_MAP_SECTION = "def_map";
+
 CUICustomMap::CUICustomMap() : CUIStatic("Custom Map") {}
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
-    const CInifile* levelIni{};
+    /*
+     * Original logic:
+     * SOC:
+     * 1. Load level name section from game.ltx  (pGameIni)
+     * 2. Load level name section from level.ltx (g_pGameLevel->pLevel)
+     *
+     * CS/COP:
+     * 1. Load level_map section from level.ltx    (g_pGameLevel->pLevel)
+     * 2. Fall back to def_map section in game.ltx (pGameIni)
+    */
+
+    const CInifile* levelIni;
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
     else
@@ -28,16 +41,31 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         levelIni = xr_new<CInifile>(map_cfg_fn);
     }
 
-    if (levelIni->section_exist("level_map"))
-    {
-        Init_internal(name, *levelIni, "level_map", sh_name);
-    }
-    else
+    // Implemented OXR logic:
+    // 1. Load level_map section from level.ltx (COP step 1)
+    bool result = Init_internal(name, *levelIni, "level_map", sh_name);
+
+    // 2. Load level name section from game.ltx (SOC step 1)
+    if (!result)
+        result = Init_internal(name, *pGameIni, name, sh_name);
+
+    // 3. Load level name section from level.ltx (SOC step 2)
+    if (!result)
+        result = Init_internal(name, *levelIni, name, sh_name);
+
+    // 4. Fall back to def_map section in game.ltx (COP step 2)
+    if (!result)
     {
         Msg("! default LevelMap used for level[%s]", name.c_str());
-        Init_internal(name, *pGameIni, "def_map", sh_name);
-        m_name = name;
+        result = Init_internal(name, *pGameIni, DEFAULT_MAP_SECTION, sh_name);
     }
+
+    // 5. Fall back to hardcoded defaults
+    if (!result)
+    {
+        InitBoundRectAndTexture({ -10000.0f, -10000.0f, 10000.0f, 10000.0f }, "ui\\ui_nomap2", sh_name);
+    }
+
     if (levelIni != g_pGameLevel->pLevel)
     {
         xr_delete(const_cast<CInifile*>(levelIni));
@@ -60,18 +88,18 @@ void CUICustomMap::Draw()
     UI().PopScissor();
 }
 
-void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
+bool CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
+    if (!pLtx.section_exist(sect_name))
+        return false;
+
+    if (!pLtx.line_exist(sect_name, "texture") || !pLtx.line_exist(sect_name, "bound_rect"))
+        return false;
+
     m_name = name;
 
-    m_texture = pLtx.read_if_exists<pcstr>(sect_name, "texture", "ui\\ui_nomap2");
-    if (pLtx.line_exist(m_name, "texture"))
-        m_texture = pLtx.r_string(m_name, "texture"); // Override if needed
-
-    Fvector4 tmp = pLtx.read_if_exists<Fvector4>(sect_name, "bound_rect", {-10000.0f, -10000.0f, 10000.0f, 10000.0f});
-    pLtx.read_if_exists(tmp, m_name, "bound_rect"); // Override if needed
-
-    m_shader_name = sh_name;
+    pcstr texture = pLtx.r_string(sect_name, "texture");
+    Fvector4 tmp = pLtx.r_fvector4(sect_name, "bound_rect");
 
     if (!Heading())
     {
@@ -79,14 +107,23 @@ void CUICustomMap::Init_internal(const shared_str& name, const CInifile& pLtx, c
         tmp.z *= UI().get_current_kx();
     }
 
-    m_BoundRect_.set(tmp.x, tmp.y, tmp.z, tmp.w);
+    InitBoundRectAndTexture(*reinterpret_cast<Frect*>(&tmp), texture, sh_name);
+    return true;
+}
+
+void CUICustomMap::InitBoundRectAndTexture(const Frect& rect, pcstr texture, pcstr shader)
+{
+    m_texture = texture;
+    m_shader_name = shader;
+
+    m_BoundRect_ = rect;
 
     Fvector2 sz;
-    m_BoundRect_.getsize(sz);
+    rect.getsize(sz);
     CUIStatic::SetWndSize(sz);
     CUIStatic::SetWndPos({});
-    CUIStatic::InitTextureEx(m_texture.c_str(), m_shader_name.c_str());
 
+    CUIStatic::InitTextureEx(m_texture.c_str(), m_shader_name.c_str());
     SetStretchTexture(true);
 }
 
@@ -276,13 +313,19 @@ CUIGlobalMap::CUIGlobalMap(CUIMapWnd* pMapWnd)
 
 void CUIGlobalMap::Initialize()
 {
-    Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default");
+    if (!Init_internal("global_map", *pGameIni, "global_map", "hud" DELIMITER "default"))
+    {
+        Log("! Couldn't load 'global_map' from game.ltx. "
+            "Check that section exists and it has correctly set 'texture' and 'bound_rect'.");
+    }
 }
 
-void CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
+bool CUIGlobalMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
-    inherited::Init_internal(name, pLtx, sect_name, sh_name);
+    if (!inherited::Init_internal(name, pLtx, sect_name, sh_name))
+        return false;
     SetMaxZoom(pLtx.r_float(m_name, "max_zoom"));
+    return true;
 }
 
 void CUIGlobalMap::Update()
@@ -434,16 +477,18 @@ void CUILevelMap::Draw()
     inherited::Draw();
 }
 
-void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
+bool CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
-    inherited::Init_internal(name, pLtx, sect_name, sh_name);
+    if (!inherited::Init_internal(name, pLtx, sect_name, sh_name))
+        return false;
+
     Fvector4 tmp = pGameIni->r_fvector4(MapName(), "global_rect");
 
     tmp.x *= UI().get_current_kx();
     tmp.z *= UI().get_current_kx();
     m_GlobalRect.set(tmp.x, tmp.y, tmp.z, tmp.w);
 
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     const float kw = m_GlobalRect.width() / BoundRect().width();
     const float kh = m_GlobalRect.height() / BoundRect().height();
 
@@ -454,6 +499,7 @@ void CUILevelMap::Init_internal(const shared_str& name, const CInifile& pLtx, co
             m_GlobalRect.y1 + kw * BoundRect().height());
     }
 #endif
+    return true;
 }
 
 void CUILevelMap::UpdateSpots()
@@ -568,10 +614,11 @@ CUIMiniMap::CUIMiniMap()
     SetRounded(true);
 }
 
-void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
+bool CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name)
 {
-    inherited::Init_internal(name, pLtx, sect_name, sh_name);
+    const bool result = inherited::Init_internal(name, pLtx, sect_name, sh_name);
     CUIStatic::SetTextureColor(0x7fffffff);
+    return result;
 }
 
 void CUIMiniMap::UpdateSpots()

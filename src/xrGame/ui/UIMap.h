@@ -73,7 +73,8 @@ public:
     float GetPointerDistance() const { return m_pointer_dist; }
 
 protected:
-    virtual void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name);
+    void InitBoundRectAndTexture(const Frect& rect, pcstr texture, pcstr shader);
+    virtual bool Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name);
     virtual void UpdateSpots() {}
 };
 
@@ -110,7 +111,7 @@ public:
     pcstr GetDebugType() override { return "CUIGlobalMap"; }
 
 protected:
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
+    bool Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };
 
 class CUILevelMap final : public CUICustomMap
@@ -139,7 +140,7 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
+    bool Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };
 
 // Rounded by default
@@ -160,5 +161,5 @@ public:
 
 protected:
     virtual void UpdateSpots();
-    void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
+    bool Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, pcstr sh_name) override;
 };
