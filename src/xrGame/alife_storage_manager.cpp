@@ -108,11 +108,20 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
-	//Alundaio: So we can get the fname to make our own custom save states
+    // The file name we were called with comes from $game_saves$, whose path is spelled
+    // with backslashes in fsgame.ltx, so it cannot be used as is by scripts that open the
+    // file directly. On POSIX the open fails, and CoC's *.scoc save state is then skipped
+    // silently, leaving task_manager with no tasks, which it reports as all completed.
+    // See issue #1988
+    string_path script_file_name;
+    xr_strcpy(script_file_name, file_name);
+    convert_path_separators(script_file_name);
+
+    //Alundaio: So we can get the fname to make our own custom save states
     luabind::functor<void> funct;
     if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_load", funct))
-        funct(file_name);
-	//-Alundaio
+        funct(script_file_name);
+    //-Alundaio
 
     IReader source(buffer, buffer_size);
     header().load(source);
@@ -144,11 +153,11 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
 
     Level().autosave_manager().on_game_loaded();
 
-	//Neloreck: For consistency with before/after save callbacks.
+    //Neloreck: For consistency with before/after save callbacks.
     luabind::functor<void> funct2;
     if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_after_load", funct2))
-        funct2(file_name);
-	//-Neloreck
+        funct2(script_file_name);
+    //-Neloreck
 }
 
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
