@@ -5,6 +5,7 @@
 #include "stdafx.h"
 
 #include <gli/gli.hpp>
+#include "glTextureView.h"
 
 #if defined(XR_PLATFORM_ANDROID)
 #include "xrEngine/x_ray.h"
@@ -622,11 +623,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc,
         appliedLod = std::clamp(appliedLod, 0, static_cast<int>(sourceMipCount - 1));
         if (appliedLod > 0)
         {
-            texture = gli::texture(texture, texture.target(), texture.format(),
-                texture.base_layer(), texture.max_layer(),
-                texture.base_face(), texture.max_face(),
-                texture.base_level() + static_cast<size_t>(appliedLod), texture.max_level(),
-            texture.swizzles());
+            texture = texture_mip_view(texture, static_cast<size_t>(appliedLod));
         }
     }
     else
@@ -641,11 +638,13 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc,
     if (appliedLod || decodeDownscale)
     {
         Msg("[texture-trace] lod-policy name='%s' source=%dx%d levels=%u configured=%d applied=%d "
-            "decode-scale=%u software=%d result=%dx%d levels=%zu",
+            "decode-scale=%u software=%d result=%dx%d levels=%zu format=%u swizzle=%u,%u,%u,%u",
             fRName, sourceExtent.x, sourceExtent.y, sourceMipCount, configuredLod, appliedLod,
             decodeDownscale, softwareDecode ? 1 : 0,
             texture.extent().x >> decodeDownscale, texture.extent().y >> decodeDownscale,
-            texture.levels());
+            texture.levels(), static_cast<u32>(texture.format()),
+            static_cast<u32>(texture.swizzles().r), static_cast<u32>(texture.swizzles().g),
+            static_cast<u32>(texture.swizzles().b), static_cast<u32>(texture.swizzles().a));
     }
 
     if (gli::is_compressed(texture.format()) && softwareDecode)

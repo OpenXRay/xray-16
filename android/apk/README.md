@@ -5,12 +5,11 @@ launcher into a debug APK. No proprietary S.T.A.L.K.E.R. resources are
 included. Required packages, pinned toolchain versions and full build/install
 commands are in [../README.md](../README.md).
 
-Quick build and install:
+Build and install with the separately installed components described in [../README.md](../README.md):
 
 ```sh
-export XRAY_ANDROID_KIT_ROOT=/absolute/path/to/openxray-android-build-kit-v0.8.0
-./android/build-harness.sh --apk
-adb install -r build/openxray-armv7-launcher-v0.9.24-debug.apk
+./android/build-apk-armv7.sh
+adb install -r "build/openxray-armv7-launcher-v$(head -n1 android/PORT_VERSION)-debug.apk"
 ```
 
 The application ID is `org.openxray.stalker`; the main activity is

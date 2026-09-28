@@ -62,6 +62,20 @@ using serialize_callback = void(IWriter& writer);
 using deserialize_callback = bool(IReader& reader);
 using remapping_materials_callback = void(TRI* T, u32 Tcnt, xr_map<u16, shared_str>& gameMtls);
 
+#if defined(XR_PLATFORM_ANDROID)
+struct RayPathAudit
+{
+    struct Frame
+    {
+        const Opcode::AABBNoLeafNode* node;
+        u32 child = 0;
+    };
+    xr_vector<Frame> path;
+    u32 visited = 0;
+    bool started = false;
+};
+#endif
+
 // Model definition
 class XRCDB_API MODEL : Noncopyable
 {
@@ -118,6 +132,11 @@ public:
     bool serialize(pcstr fileName, serialize_callback callback = nullptr) const;
     bool deserialize(pcstr fileName, bool skipCrc32Check = false, deserialize_callback callback = nullptr);
     void deserialize_tree(IReader* rstream);
+
+#if defined(XR_PLATFORM_ANDROID)
+    bool audit_ray_path_step(RayPathAudit& audit, const Fvector& origin, const Fvector& direction,
+        u32 triangle, float referenceRange, u32 frame, u32 query) const;
+#endif
 
     size_t memory();
 

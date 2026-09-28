@@ -411,6 +411,21 @@ target_sources(xrEngine
     TODO.txt
 )
 
+if(ANDROID)
+    include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")
+    xray_gli_include_dir(XRAY_GLI_INCLUDE_DIR)
+    target_sources(xrEngine PRIVATE
+        ../Layers/xrRenderVK/DdsTexture.cpp
+        ../Layers/xrRenderVK/DdsTexture.h
+        ../Layers/xrRenderVK/TextureUpload.cpp
+        ../Layers/xrRenderVK/TextureUpload.h
+    )
+    target_include_directories(xrEngine PRIVATE
+        "${XRAY_GLI_INCLUDE_DIR}"
+        "${CMAKE_SOURCE_DIR}/Externals/gli/external"
+    )
+endif()
+
 target_include_directories(xrEngine
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"

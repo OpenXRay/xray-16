@@ -63,9 +63,8 @@ if [ ! -f "$native_lib" ]; then
     exit 1
 fi
 
-project_dir="$build_dir/gradle-project"
-remove_path "$project_dir"
-mkdir -p "$project_dir"
+project_dir=$(mktemp -d "$build_dir/gradle-project.XXXXXXXX")
+trap 'remove_path "$project_dir"' EXIT
 cp -R "$sdl_dir/android-project/." "$project_dir/"
 
 # A reusable SDL tree may contain Gradle task history and outputs from an
@@ -85,6 +84,7 @@ for stale_path in \
 done
 
 cp "$repo_dir/android/apk/app/build.gradle" "$project_dir/app/build.gradle"
+cp "$repo_dir/android/PORT_VERSION" "$project_dir/android-version.txt"
 python3 "$repo_dir/android/apk/generate-options.py" --check
 cp "$repo_dir/android/apk/app/src/main/AndroidManifest.xml" "$project_dir/app/src/main/AndroidManifest.xml"
 mkdir -p "$project_dir/app/src/main/java/org/openxray/app"
@@ -136,7 +136,12 @@ chmod +x "$project_dir/gradlew"
 
 apk="$project_dir/app/build/outputs/apk/debug/app-debug.apk"
 mkdir -p "$repo_dir/build"
-port_version=$(sed -n '1p' "$script_dir/PORT_VERSION")
+port_version=$(sed -n '1p' "$project_dir/android-version.txt")
+port_version_code=$(sed -n '2p' "$project_dir/android-version.txt")
+if ! cmp -s "$script_dir/PORT_VERSION" "$project_dir/android-version.txt"; then
+    echo "Android version changed during the build; rebuild from a stable commit" >&2
+    exit 1
+fi
 output_apk="$repo_dir/build/openxray-armv7-launcher-v$port_version-debug.apk"
 
 # AGP 8.1 aligns uncompressed native-library ZIP entries to 4 KiB. Re-align
@@ -153,8 +158,9 @@ if [ ! -x "$zipalign_bin" ] || [ ! -x "$apksigner_bin" ] || [ ! -x "$aapt_bin" ]
     exit 2
 fi
 
-if ! "$aapt_bin" dump badging "$apk" | grep -Fq "versionName='$port_version'"; then
-    echo "Gradle produced an APK with a stale launcher version (expected $port_version)" >&2
+apk_badging=$("$aapt_bin" dump badging "$apk")
+if ! printf '%s\n' "$apk_badging" | grep -Fq "versionCode='$port_version_code' versionName='$port_version'"; then
+    echo "Gradle produced an APK with a stale launcher version (expected $port_version / $port_version_code)" >&2
     exit 1
 fi
 if ! unzip -p "$apk" lib/armeabi-v7a/libmain.so | cmp - "$native_lib_dir/libmain.so"; then
@@ -206,3 +212,17 @@ unlink "$aligned_apk"
 "$zipalign_bin" -c -P 16 4 "$output_apk"
 "$apksigner_bin" verify "$output_apk"
 printf '%s\n' "$output_apk"
+
+manifest="$build_dir/build-manifest.txt"
+{
+    echo "repo_commit=$(git -C "$repo_dir" rev-parse HEAD)"
+    echo "version=$port_version"
+    echo "version_code=$port_version_code"
+    echo "ndk=$ndk_dir"
+    echo "sdk=$sdk_dir"
+    echo "deps=$deps_prefix"
+    echo "sdl=$sdl_dir"
+    echo "arm_mode=${XRAY_ANDROID_ARM_MODE:-arm}"
+    echo "lto=$android_lto"
+} > "$manifest"
+echo "Build manifest: $manifest"

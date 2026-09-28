@@ -389,32 +389,8 @@ target_sources(xrRender_GL PRIVATE
     ../../../sdk/include/KHR/khrplatform.h
 )
 
-set(XRAY_GLI_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/Externals/gli")
-if (ANDROID)
-    # GLI 0.8.2 aliases the DDS header directly from an arbitrary byte buffer.
-    # X-Ray archive readers may return a byte-aligned pointer; dereferencing the
-    # aliased 32-bit fields then raises SIGBUS/BUS_ADRALN on ARM.  Keep the
-    # pinned submodule immutable and generate an Android-only header overlay
-    # that copies the small header into aligned local storage first.
-    set(XRAY_GLI_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/android-gli")
-    file(COPY "${CMAKE_SOURCE_DIR}/Externals/gli/gli"
-        DESTINATION "${XRAY_GLI_INCLUDE_DIR}")
-    set(XRAY_GLI_DDS_LOADER
-        "${XRAY_GLI_INCLUDE_DIR}/gli/core/load_dds.inl")
-    file(READ "${XRAY_GLI_DDS_LOADER}" XRAY_GLI_DDS_SOURCE)
-    set(XRAY_GLI_UNALIGNED_HEADER
-        "detail::dds_header const & Header(*reinterpret_cast<detail::dds_header const *>(Data + Offset));")
-    set(XRAY_GLI_ALIGNED_HEADER
-        "detail::dds_header Header;\n\t\tstd::memcpy(&Header, Data + Offset, sizeof(Header));")
-    string(FIND "${XRAY_GLI_DDS_SOURCE}" "${XRAY_GLI_UNALIGNED_HEADER}"
-        XRAY_GLI_UNALIGNED_HEADER_OFFSET)
-    if (XRAY_GLI_UNALIGNED_HEADER_OFFSET EQUAL -1)
-        message(FATAL_ERROR "Pinned GLI DDS loader changed; Android alignment overlay must be reviewed")
-    endif()
-    string(REPLACE "${XRAY_GLI_UNALIGNED_HEADER}" "${XRAY_GLI_ALIGNED_HEADER}"
-        XRAY_GLI_DDS_SOURCE "${XRAY_GLI_DDS_SOURCE}")
-    file(WRITE "${XRAY_GLI_DDS_LOADER}" "${XRAY_GLI_DDS_SOURCE}")
-endif()
+include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")
+xray_gli_include_dir(XRAY_GLI_INCLUDE_DIR)
 
 target_include_directories(xrRender_GL
     PRIVATE

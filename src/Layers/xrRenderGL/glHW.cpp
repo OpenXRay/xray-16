@@ -6,6 +6,7 @@
 
 #include "glHW.h"
 #include "xrEngine/XR_IOConsole.h"
+#include <atomic>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -20,8 +21,8 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
         return;
 #if defined(XR_PLATFORM_ANDROID)
-    static u32 reportedMessages = 0;
-    if (reportedMessages++ >= 32)
+    static std::atomic<u32> reportedMessages{0};
+    if (reportedMessages.fetch_add(1, std::memory_order_relaxed) >= 32)
         return;
 #endif
     Log(message, id);
@@ -195,7 +196,9 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         if (debugOutput && glDebugMessageCallback)
         {
             CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+#if !defined(XR_PLATFORM_ANDROID)
             CHK_GL(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
+#endif
             CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #if defined(XR_PLATFORM_ANDROID)
             androidDebugCallbackInstalled = true;

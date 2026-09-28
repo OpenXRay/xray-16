@@ -14,6 +14,15 @@ final class OptionCatalog {
     static final String[] GRAPHICS_LABELS = { "Автоматически для Android (Low)", "Minimum", "Low", "Default", "High", "Extreme" };
     static final String[] GRAPHICS_PRESETS = { "Low", "Minimum", "Low", "Default", "High", "Extreme" };
 
+    static final String[] TABS = { "Игра", "Параметры", "Диагностика" };
+    static final String[] SETTINGS_SECTIONS = { "Рендерер", "Графика", "Разрешение 3D-рендера", "Управление и экран", "Расширенные параметры", "Дополнительные аргументы" };
+    static final int[] RESOLUTION_WIDTHS = { 854, 960, 1280, 1600, 1920, 2240, 2560 };
+    static final String ADVANCED_RESET_LABEL = "Сбросить диагностические параметры";
+    static final String[] ADVANCED_KEYS = { "disable_hom", "disable_occq", "gl_debug" };
+    static final String[] ADVANCED_LABELS = { "Отключить программное отсечение HOM", "Отключить GPU-запросы видимости", "Подробные сообщения OpenGL" };
+    static final String[] ADVANCED_DESCRIPTIONS = { "Проверка ошибок видимости; может снизить FPS.", "Проверка ошибок драйвера; может снизить FPS.", "Записывает ошибки драйвера в журнал; может снизить FPS." };
+    static final String[] ADVANCED_ARGS = { "-no_hom", "-no_occq", "-android-gl-debug" };
+
     static String value(String[] values, int index, int fallback) {
         return values[index >= 0 && index < values.length ? index : fallback];
     }

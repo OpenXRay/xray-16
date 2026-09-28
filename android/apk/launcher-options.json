@@ -17,5 +17,14 @@
     {"label": "Default", "preset": "Default"},
     {"label": "High", "preset": "High"},
     {"label": "Extreme", "preset": "Extreme"}
+  ],
+  "resolution_widths": [854, 960, 1280, 1600, 1920, 2240, 2560],
+  "tabs": ["Игра", "Параметры", "Диагностика"],
+  "settings_sections": ["Рендерер", "Графика", "Разрешение 3D-рендера", "Управление и экран", "Расширенные параметры", "Дополнительные аргументы"],
+  "advanced_reset_label": "Сбросить диагностические параметры",
+  "advanced": [
+    {"key": "disable_hom", "label": "Отключить программное отсечение HOM", "description": "Проверка ошибок видимости; может снизить FPS.", "arg": "-no_hom"},
+    {"key": "disable_occq", "label": "Отключить GPU-запросы видимости", "description": "Проверка ошибок драйвера; может снизить FPS.", "arg": "-no_occq"},
+    {"key": "gl_debug", "label": "Подробные сообщения OpenGL", "description": "Записывает ошибки драйвера в журнал; может снизить FPS.", "arg": "-android-gl-debug"}
   ]
 }

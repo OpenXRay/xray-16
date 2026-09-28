@@ -75,7 +75,15 @@ u32 R_occlusion::occq_begin(u32& ID)
     pool.pop_back();
     if (FAILED(BeginQuery(used[ID].Q)))
     {
-        pool.emplace_back(std::move(used[ID]));
+#if defined(USE_OGL)
+        if (used[ID].Q && !glIsQuery(used[ID].Q))
+        {
+            ReleaseQuery(used[ID].Q);
+            used[ID].Q = 0;
+        }
+#endif
+        if (used[ID].Q)
+            pool.emplace_back(std::move(used[ID]));
         used[ID].Q = 0;
         fids.emplace_back(ID);
         ID = iInvalidHandle;
@@ -133,7 +141,19 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 
     // insert into pool (sorting in decreasing order)
     Query& Q = used[ID];
-    if (pool.empty())
+    if (FAILED(hr))
+    {
+        ReleaseQuery(Q.Q);
+#if defined(XR_PLATFORM_ANDROID)
+        static u32 lastInvalidQueryReport = 0;
+        if (Device.dwTimeContinual - lastInvalidQueryReport >= 5000)
+        {
+            Msg("! [render-query] retired invalid occlusion query; result treated as visible");
+            lastInvalidQueryReport = Device.dwTimeContinual;
+        }
+#endif
+    }
+    else if (pool.empty())
         pool.emplace_back(Q);
     else
     {

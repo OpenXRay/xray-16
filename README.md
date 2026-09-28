@@ -57,12 +57,7 @@ rewritten; settings, saves, screenshots and normal logs use the desktop-style
 See [android/README.md](android/README.md) for the current build, installation,
 runtime and diagnostics instructions.
 
-Quick build with a prepared build kit:
-
-```sh
-export XRAY_ANDROID_KIT_ROOT=/absolute/path/to/openxray-android-build-kit-v0.8.0
-./android/build-harness.sh --apk
-```
+Build requirements and commands: [Android build instructions](android/README.md).
 
 ## Main differences from the original X-Ray
 - Support for 64-bit.

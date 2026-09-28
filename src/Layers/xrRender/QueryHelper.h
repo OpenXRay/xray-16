@@ -68,6 +68,10 @@ IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
 {
     if (!query)
         return E_FAIL;
+#if defined(XR_PLATFORM_ANDROID)
+    if (!glIsQuery(query))
+        return E_FAIL;
+#endif
     if (GLAD_GL_ES_VERSION_3_0)
     {
         VERIFY(DataSize == sizeof(GLuint));
@@ -92,6 +96,10 @@ IC HRESULT BeginQuery(GLuint query)
     if (active != 0)
         return E_FAIL;
     CHK_GL(glBeginQuery(target, query));
+#if defined(XR_PLATFORM_ANDROID)
+    if (!glIsQuery(query))
+        return E_FAIL;
+#endif
     return S_OK;
 }
 

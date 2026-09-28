@@ -39,7 +39,7 @@ patchset_present()
         && grep -Fq 'm_Overlay' "$repo_dir/src/xrCore/LocatorAPI_defs.h" \
         && grep -Fq 'profilePreference(PREF_GAME_PATH_PREFIX' \
             "$repo_dir/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java" \
-        && grep -Fq "versionName '$expected_version'" "$repo_dir/android/apk/app/build.gradle"
+        && grep -Fq "versionName portVersion[0]" "$repo_dir/android/apk/app/build.gradle"
 }
 
 if patchset_present; then

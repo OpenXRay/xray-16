@@ -205,21 +205,6 @@ void CHOM::Render_DB(CFrustum& base)
         const occTri& T = m_pTris[_1.id];
         return T.skip > Device.dwFrame;
     });
-#if defined(XR_PLATFORM_ANDROID)
-    static u64 acceptedTris = 0;
-    static u64 skippedTris = 0;
-    static u32 lastVisibilityReport = 0;
-    acceptedTris += static_cast<u64>(end - it);
-    skippedTris += xrc.r_count() - static_cast<size_t>(end - it);
-    if (Device.dwTimeContinual - lastVisibilityReport >= 5000)
-    {
-        Msg("[visibility-trace] HOM accepted=%llu skipped=%llu",
-            static_cast<unsigned long long>(acceptedTris),
-            static_cast<unsigned long long>(skippedTris));
-        acceptedTris = skippedTris = 0;
-        lastVisibilityReport = Device.dwTimeContinual;
-    }
-#endif
     std::sort(it, end, [this, &COP](const CDB::RESULT& _1, const CDB::RESULT& _2)
     {
         const occTri& t0 = m_pTris[_1.id];
@@ -384,8 +369,6 @@ BOOL CHOM::visible(const Fbox2& B, float depth) const
 
 BOOL CHOM::visible(vis_data& vis) const
 {
-    if (vis.box.contains(Device.vCameraPosition))
-        return TRUE;
     if (Device.dwFrame < vis.hom_frame)
         return TRUE; // not at this time :)
     if (!bEnabled)

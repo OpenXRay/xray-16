@@ -35,21 +35,71 @@ The launcher creates the four `_appdata_` directories when needed and performs
 an actual write/delete test before starting the engine. Game resources,
 archives, shaders and `fsgame.ltx` are not rewritten.
 
-## Supported build host
+## Building from installed components
 
-The maintained build path is Linux x86_64. On Debian or Ubuntu install the host
-tools first:
+Use a Linux x86_64 host, JDK 17, Python 3, CMake 3.31 or newer, Ninja, Git,
+Gradle 8.1.1, and `qemu-user-static`. On Debian/Ubuntu:
 
 ```sh
 sudo apt update
-sudo apt install git openjdk-17-jdk python3 ninja-build cmake unzip zip zstd
+sudo apt install git openjdk-17-jdk python3 ninja-build cmake unzip zip zstd qemu-user-static autoconf automake libtool pkg-config
 ```
 
-JDK 17 is required by the pinned Android Gradle Plugin. `adb`, `aapt`,
-`zipalign` and `apksigner` come from the Android SDK in the prepared kit. The
-kit also supplies the static `qemu-i386` used by the LuaJIT cross-build helper.
+Install the Android SDK command-line tools from Google, set `ANDROID_SDK_ROOT`,
+and install platform tools, platform 36, build tools 36.0.0 and NDK r30:
 
-Clone the fork with submodules and select its `dev` branch:
+```sh
+export ANDROID_SDK_ROOT="$HOME/Android/Sdk"
+"$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
+"$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+  'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' 'ndk;30.0.16248370'
+export ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/30.0.16248370"
+```
+
+Install Gradle 8.1.1 and set `GRADLE_BIN` to its executable. Obtain SDL 2.30.2
+sources and set `SDL2_ANDROID_HOME` to the source directory (which contains
+`android-project/gradlew`). The Gradle project builds the SDL Android activity.
+
+The native engine also needs an **ARMv7 / API 26** prefix containing `libSDL2.a`,
+`libopenal.so`, `libjpeg.a`, `libogg.a`, `libvorbis.a`, `libvorbisenc.a`,
+`libvorbisfile.a`, `libtheora.a`, `libtheoradec.a`, `libtheoraenc.a` and
+`liblzo2.a` with matching headers. Sources are SDL2, OpenAL Soft,
+libjpeg-turbo, libogg, libvorbis, libtheora and LZO. Each must be compiled for
+`armeabi-v7a` with the same NDK and API level. For a CMake dependency (SDL2,
+OpenAL Soft or libjpeg-turbo), the pattern is:
+
+```sh
+export ANDROID_DEPS_PREFIX="$HOME/openxray-android-deps/armv7"
+cmake -S /path/to/dependency -B /tmp/dependency-armv7 -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
+  -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-26 \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$ANDROID_DEPS_PREFIX" \
+  -DBUILD_SHARED_LIBS=OFF
+cmake --build /tmp/dependency-armv7
+cmake --install /tmp/dependency-armv7
+```
+
+Build OpenAL Soft as a shared library; SDL2 and the other dependencies must
+provide the static libraries listed above. For Autotools projects (Ogg,
+Vorbis, Theora and LZO), use the NDK host compiler and build in dependency
+order:
+
+```sh
+export TOOLCHAIN="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+export CC="$TOOLCHAIN/armv7a-linux-androideabi26-clang"
+export CXX="$TOOLCHAIN/armv7a-linux-androideabi26-clang++"
+export AR="$TOOLCHAIN/llvm-ar" RANLIB="$TOOLCHAIN/llvm-ranlib"
+export PKG_CONFIG_LIBDIR="$ANDROID_DEPS_PREFIX/lib/pkgconfig"
+export CPPFLAGS="-I$ANDROID_DEPS_PREFIX/include"
+export LDFLAGS="-L$ANDROID_DEPS_PREFIX/lib"
+# Run each source project's ./configure --host=arm-linux-androideabi \
+#   --prefix="$ANDROID_DEPS_PREFIX" --disable-shared --enable-static,
+# then make -j$(nproc) && make install.
+```
+
+The LuaJIT cross build also needs an executable `qemu-i386-static`; set
+`XRAY_QEMU_I386_STATIC` to its path. `ANDROID_DEPS_PREFIX` must contain
+`lib/cmake/SDL2/SDL2Config.cmake`. Clone the repository and its submodules:
 
 ```sh
 git clone --recursive https://github.com/r0shn1ch/xray-16.git
@@ -58,87 +108,31 @@ git switch dev
 git submodule update --init --recursive
 ```
 
-## Recommended build with the prepared kit
-
-Extract the OpenXRay Android build-kit archive. Its top-level directory must
-contain `build-kit-env.sh`, `BUILD-MANIFEST.txt` and `toolchain/`. The currently
-tested kit contains:
-
-- Android NDK r30 (`30.0.16248370`);
-- Android SDK platform 36, build-tools 36.0.0 and platform-tools;
-- CMake 3.31.6 and Ninja;
-- Gradle 8.1.1 with an offline dependency cache;
-- SDL 2.30.2 source and prebuilt ARMv7 SDL2, OpenAL Soft, JPEG, Ogg, Vorbis,
-  Theora and LZO dependencies;
-- `qemu-i386-static` for the LuaJIT host bootstrap.
-
-Build the complete APK from the repository root:
+Build the native engine or the APK directly with the repository scripts:
 
 ```sh
-export XRAY_ANDROID_KIT_ROOT=/absolute/path/to/openxray-android-build-kit-v0.8.0
-test -f "$XRAY_ANDROID_KIT_ROOT/build-kit-env.sh"
-./android/build-harness.sh --apk
-```
-
-Build only the native engine with:
-
-```sh
-./android/build-harness.sh --native
-```
-
-The APK and reproducibility manifest are written to:
-
-```text
-build/openxray-armv7-launcher-v<android/PORT_VERSION>-debug.apk
-build/android-apk-armv7/build-manifest.txt
-```
-
-Android ReleaseMasterGold builds use ARM instruction mode and `-O2`. LTO is
-disabled by default while the ARMv7 startup regression is being isolated. Both
-settings can be changed explicitly for comparison builds:
-
-```sh
-XRAY_ANDROID_ENABLE_LTO=ON ./android/build-harness.sh --apk
-XRAY_ANDROID_ARM_MODE=thumb ./android/build-harness.sh --apk
-```
-
-Do not use those overrides for a baseline bug report. The manifest records the
-commit, toolchain paths, ARM mode and LTO choice used for each build.
-
-## Build with a separately installed toolchain
-
-This path is for maintainers who already have matching ARMv7 dependencies. The
-repository does not currently build all third-party Android libraries from
-source, so `ANDROID_DEPS_PREFIX` is mandatory.
-
-Install SDK components equivalent to the prepared kit, for example:
-
-```sh
-sdkmanager \
-  "platform-tools" \
-  "platforms;android-36" \
-  "build-tools;36.0.0" \
-  "cmake;3.31.6" \
-  "ndk;30.0.16248370"
-```
-
-Then export absolute paths and build:
-
-```sh
-export ANDROID_NDK_HOME=/absolute/path/to/android-sdk/ndk/30.0.16248370
-export ANDROID_SDK_ROOT=/absolute/path/to/android-sdk
-export ANDROID_DEPS_PREFIX=/absolute/path/to/android-deps-armv7
-export SDL2_ANDROID_HOME=/absolute/path/to/SDL-2.30.2
-export GRADLE_BIN=/absolute/path/to/gradle-8.1.1/bin/gradle
-export XRAY_QEMU_I386_STATIC=/absolute/path/to/qemu-i386-static
+export SDL2_ANDROID_HOME=/path/to/SDL2-2.30.2
+export GRADLE_BIN=/path/to/gradle-8.1.1/bin/gradle
+export XRAY_QEMU_I386_STATIC=/usr/bin/qemu-i386-static
+./android/build-armv7.sh
 ./android/build-apk-armv7.sh
 ```
 
-The dependency prefix must provide `lib/cmake/SDL2/SDL2Config.cmake` and ARMv7
-builds of SDL2, OpenAL Soft, JPEG, Ogg, Vorbis, Theora and LZO. The packaging
-script checks the version and ABI, compares the packaged `libmain.so` with the
-just-built engine, rejects duplicate assets, applies 16 KiB ZIP alignment and
-verifies the debug signature.
+The APK is written to `build/openxray-armv7-launcher-v<version>-debug.apk`;
+the version comes from `android/PORT_VERSION`. The second line of that file is
+Android's monotonically increasing `versionCode`. Enable the repository's
+commit hook once per clone with `git config core.hooksPath .githooks`. Each
+subsequent commit then increments both values in the same commit. The hook runs locally; no GitHub Actions job is needed. Re-running a failed
+commit does not increment the version twice. For commits prepared through an API,
+run `python3 android/update-version.py --pending` and include `android/PORT_VERSION`
+in the same commit. `--check` verifies an already committed version.
+The Gradle build, launcher display,
+APK filename and archive scripts all read this file.
+
+`XRAY_ANDROID_ARM_MODE=thumb` and `XRAY_ANDROID_ENABLE_LTO=ON` can be set for
+comparison builds; normal builds use ARM mode and no LTO. The build manifest
+in `build/android-apk-armv7/build-manifest.txt` records the source commit and
+toolchain paths.
 
 ## Install and run
 
@@ -147,7 +141,7 @@ Enable USB debugging, connect the device, then check its ABI support:
 ```sh
 adb devices
 adb shell getprop ro.product.cpu.abilist
-adb install -r build/openxray-armv7-launcher-v0.9.24-debug.apk
+adb install -r "build/openxray-armv7-launcher-v$(head -n1 android/PORT_VERSION)-debug.apk"
 adb shell am start -n org.openxray.stalker/org.openxray.app.LauncherActivity
 ```
 
@@ -156,7 +150,7 @@ signed with another debug key. Back up anything important, then reinstall:
 
 ```sh
 adb uninstall org.openxray.stalker
-adb install build/openxray-armv7-launcher-v0.9.24-debug.apk
+adb install "build/openxray-armv7-launcher-v$(head -n1 android/PORT_VERSION)-debug.apk"
 ```
 
 Uninstalling clears launcher preferences and private renderer support files,
@@ -210,3 +204,42 @@ identified.
 
 Platform boundaries are documented in [PORT_AUDIT.md](PORT_AUDIT.md). Launcher
 behavior is summarized in [apk/README.md](apk/README.md).
+
+### Frame scheduling and visibility diagnostics
+
+`rs_sheduler_budget` sets the maximum adaptive scheduling budget in milliseconds
+(3–66; Android default 10, desktop default 66). Real-time updates and precaching
+are unaffected. A running object callback cannot be interrupted; pending objects
+retain their due-time order. Lower budgets can delay AI updates under load.
+`[scheduler-profile]` records callback time, the current budget and maximum
+lateness of processed objects.
+
+On Android, `[sector-audit]` compares downward and upward camera rays against
+both the collision tree and an independent double-precision triangle scan.
+It captures the camera position and frame before scanning, so movement during
+an audit does not change the reference ray. The two directions share a single scan per model, with an independent XZ
+interval rejection before triangle intersection. Work is limited to 32768
+triangles and a 1 ms target per frame, checked every 64 triangles. Up to eight samples
+are collected per level, with at least five seconds between completed samples.
+The audit only reports results; it does not override visibility.
+
+For ordinary performance measurements, leave HOM and GPU occlusion enabled
+and disable detailed OpenGL output. The launcher provides a reset button for
+these diagnostic options. The sector and scheduler summaries are available
+without enabling them.
+
+Local checks:
+
+```sh
+python3 tests/test_android_version.py
+python3 android/apk/generate-options.py --check
+c++ -std=c++17 -O2 -Isrc tests/ray_query_audit.cpp -o /tmp/ray-query-audit
+/tmp/ray-query-audit
+```
+
+Use `python3 android/analyze-sector-audit.py android.log` to check the capture.
+Exit code 0 means all recorded audits completed and their ray results agree;
+this does not prove rendering correctness. Exit code 1 reports differing ray
+results. Exit code 2 indicates missing or incomplete audit evidence. Hit triangle
+coordinates and metadata are recorded for offline reproduction, including when
+the tree and reference agree. Progress reports identify long-running scans.

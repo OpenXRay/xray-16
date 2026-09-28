@@ -2,6 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
+def portVersion = rootProject.file('android-version.txt').readLines('UTF-8')
+if (portVersion.size() != 2 || !(portVersion[0] ==~ /\d+\.\d+\.\d+/) || !(portVersion[1] ==~ /\d+/)) {
+    throw new GradleException('Invalid Android version file')
+}
+
 android {
     namespace 'org.openxray.app'
     compileSdk 36
@@ -10,8 +15,8 @@ android {
         applicationId 'org.openxray.stalker'
         minSdk 26
         targetSdk 36
-        versionCode 38
-        versionName '0.9.24'
+        versionCode portVersion[1].toInteger()
+        versionName portVersion[0]
 
         ndk {
             abiFilters 'armeabi-v7a'

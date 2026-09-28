@@ -6,11 +6,18 @@
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
+#endif
 
 #include "FLOD.h"
 #include "LightTrack.h"
 #include "ParticleGroup.h"
 #include "FTreeVisual.h"
+
+#include <cstdio>
+#include <string>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -551,10 +558,25 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     // Check frustum visibility and calculate distance to visual's center
     const EFC_Visible VIS = view.testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
     if (fcvNone == VIS)
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        if (visibility_sample_root)
+            ++visibility_sample_frustum;
+#endif
         return;
+    }
 
     if (o.use_hom && !RImplementation.HOM.visible(vis))
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        if (visibility_sample_root)
+        {
+            ++visibility_sample_hom;
+            visibility_sample_largest_hom = _max(visibility_sample_largest_hom, vis.sphere.R);
+        }
+#endif
         return;
+    }
 
     // If we get here visual is visible or partially visible
     switch (pVisual->Type)
@@ -702,6 +724,9 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
 
 void R_dsgraph_structure::unload()
 {
+#if defined(XR_PLATFORM_ANDROID)
+    sector_audit = {};
+#endif
     for (auto* sector : Sectors)
         xr_delete(sector);
     Sectors.clear();
@@ -734,6 +759,15 @@ void R_dsgraph_structure::build_subspace()
 
     if (o.is_main_pass && (o.sector_id == IRender_Sector::INVALID_SECTOR_ID))
     {
+#if defined(XR_PLATFORM_ANDROID)
+        static u32 lastMissingSectorReport = 0;
+        if (Device.dwTimeContinual - lastMissingSectorReport >= 1000)
+        {
+            Msg("! [visibility-frame] frame=%u camera-sector=invalid pos=(%.2f,%.2f,%.2f)",
+                Device.dwFrame, o.view_pos.x, o.view_pos.y, o.view_pos.z);
+            lastMissingSectorReport = Device.dwTimeContinual;
+        }
+#endif
         if (g_pGameLevel)
             g_pGameLevel->pHUD->Render_Last(context_id);
         return;
@@ -741,6 +775,17 @@ void R_dsgraph_structure::build_subspace()
 
     // Traverse sector/portal structure
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
+
+#if defined(XR_PLATFORM_ANDROID)
+    const bool visibilityMainPass = o.is_main_pass && o.phase == CRender::PHASE_NORMAL;
+    static u32 lastVisibilitySample = 0;
+    const bool sampleVisibility = visibilityMainPass &&
+        Device.dwTimeContinual - lastVisibilitySample >= 250;
+    if (sampleVisibility)
+        lastVisibilitySample = Device.dwTimeContinual;
+    const u32 staticSubmittedBefore = counter_S;
+    std::string sectorDetails;
+#endif
 
     // Determine visibility for static geometry hierarchy
 #if 0
@@ -754,6 +799,15 @@ void R_dsgraph_structure::build_subspace()
         {
             CSector* sector = PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
+#if defined(XR_PLATFORM_ANDROID)
+            const u32 sectorSubmittedBefore = counter_S;
+            if (sampleVisibility)
+            {
+                visibility_sample_root = root;
+                visibility_sample_frustum = visibility_sample_hom = 0;
+                visibility_sample_largest_hom = 0;
+            }
+#endif
             //VERIFY(root->getType() == MT_HIERRARHY);
 
             const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
@@ -783,18 +837,28 @@ void R_dsgraph_structure::build_subspace()
                 add_static(root, view, view.getMask());
 #endif
             }
+#if defined(XR_PLATFORM_ANDROID)
+            if (sampleVisibility && s_it < 16)
+            {
+                char entry[128];
+                std::snprintf(entry, sizeof(entry), " %u:f%zu/g%u/clip%u/hom%u/max-radius%.1f",
+                    static_cast<u32>(sector->unique_id), sector->r_frustums.size(),
+                    counter_S - sectorSubmittedBefore, visibility_sample_frustum, visibility_sample_hom,
+                    visibility_sample_largest_hom);
+                sectorDetails += entry;
+            }
+            visibility_sample_root = nullptr;
+#endif
         }
     }
 
     const bool collect_dynamic_any = (o.spatial_types != 0) && psDeviceFlags.test(rsDrawDynamic);
+#if defined(XR_PLATFORM_ANDROID)
+    u32 dynamicInvalid = 0, dynamicInactive = 0, dynamicHom = 0;
+#endif
 
     if (collect_dynamic_any)
     {
-#if defined(XR_PLATFORM_ANDROID)
-        u32 invalidSectorCount = 0;
-        u32 inactiveSectorCount = 0;
-        u32 homRejectedCount = 0;
-#endif
         // Traverse object database
         g_pGamePersistent->SpatialSpace.q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
 
@@ -835,7 +899,7 @@ void R_dsgraph_structure::build_subspace()
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
             ISpatial* spatial = lstRenderables[o_it];
-            if (o.is_main_pass)
+            if (o.is_main_pass && (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR))
             {
                 const auto& entity_pos = spatial->spatial_sector_point();
                 const auto sector_id = detect_sector(entity_pos);
@@ -846,7 +910,8 @@ void R_dsgraph_structure::build_subspace()
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             {
 #if defined(XR_PLATFORM_ANDROID)
-                ++invalidSectorCount;
+                if (sampleVisibility)
+                    ++dynamicInvalid;
 #endif
                 continue; // disassociated from S/P structure
             }
@@ -871,7 +936,8 @@ void R_dsgraph_structure::build_subspace()
             if (PortalTraverser.i_marker != sector->r_marker)
             {
 #if defined(XR_PLATFORM_ANDROID)
-                ++inactiveSectorCount;
+                if (sampleVisibility)
+                    ++dynamicInactive;
 #endif
                 continue; // inactive (untouched) sector
             }
@@ -902,7 +968,8 @@ void R_dsgraph_structure::build_subspace()
                         if (!bVisible)
                         {
 #if defined(XR_PLATFORM_ANDROID)
-                            ++homRejectedCount;
+                            if (sampleVisibility)
+                                ++dynamicHom;
 #endif
                             break; // exit loop on frustums
                         }
@@ -932,28 +999,6 @@ void R_dsgraph_structure::build_subspace()
             }
         }
 
-#if defined(XR_PLATFORM_ANDROID)
-        if (o.is_main_pass)
-        {
-            static u64 invalidTotal = 0, inactiveTotal = 0, homTotal = 0;
-            static u32 frames = 0, lastReport = 0;
-            invalidTotal += invalidSectorCount;
-            inactiveTotal += inactiveSectorCount;
-            homTotal += homRejectedCount;
-            ++frames;
-            if (Device.dwTimeContinual - lastReport >= 5000)
-            {
-                Msg("[object-visibility] camera-sector=%u sectors=%zu frames=%u invalid=%llu inactive=%llu hom=%llu",
-                    static_cast<u32>(o.sector_id), PortalTraverser.r_sectors.size(), frames,
-                    static_cast<unsigned long long>(invalidTotal), static_cast<unsigned long long>(inactiveTotal),
-                    static_cast<unsigned long long>(homTotal));
-                invalidTotal = inactiveTotal = homTotal = 0;
-                frames = 0;
-                lastReport = Device.dwTimeContinual;
-            }
-        }
-#endif
-
         if (g_pGameLevel)
         {
 #if RENDER != R_R1
@@ -965,8 +1010,11 @@ void R_dsgraph_structure::build_subspace()
                     IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
                     if (viewEntity == nullptr)
                         break;
-                    const auto& entity_pos = viewEntity->spatial_sector_point();
-                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    if (viewEntity->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+                    {
+                        const auto& entity_pos = viewEntity->spatial_sector_point();
+                        viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    }
                     const auto sector_id = viewEntity->GetSpatialData().sector_id;
                     if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                         break; // disassociated from S/P structure
@@ -990,6 +1038,42 @@ void R_dsgraph_structure::build_subspace()
                 g_pGameLevel->pHUD->Render_Last(context_id);
         }
     }
+
+#if defined(XR_PLATFORM_ANDROID)
+    if (visibilityMainPass)
+    {
+        static u32 previousStatic = 0, previousSectors = 0, lastDropReport = 0;
+        const u32 submitted = counter_S - staticSubmittedBefore;
+        const u32 visited = static_cast<u32>(PortalTraverser.r_sectors.size());
+        const bool dropped = previousStatic > 24 && submitted * 2 < previousStatic &&
+            Device.dwTimeContinual - lastDropReport >= 250;
+        if (sampleVisibility || dropped)
+        {
+            const auto& rejects = PortalTraverser.traversal_stats;
+            Msg("[visibility-frame] frame=%u camera-sector=%u pos=(%.2f,%.2f,%.2f) "
+                "sectors=%u prev=%u static=%u prev-static=%u portals=%u portal-hom=%u portal-frustum=%u "
+                "portal-sphere=%u portal-scissor=%u portal-facing=%u portal-ssa=%u "
+                "dynamic-invalid=%u dynamic-inactive=%u dynamic-hom=%u roots:%s",
+                Device.dwFrame, static_cast<u32>(o.sector_id), o.view_pos.x, o.view_pos.y, o.view_pos.z,
+                visited, previousSectors, submitted, previousStatic, rejects.traversed, rejects.hom,
+                rejects.frustum, rejects.sphere, rejects.scissor, rejects.facing, rejects.ssa,
+                dynamicInvalid, dynamicInactive, dynamicHom, sectorDetails.c_str());
+            if (sampleVisibility && g_pGamePersistent)
+            {
+                const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+                Msg("[lighting-frame] ambient=(%.3f,%.3f,%.3f) hemi=(%.3f,%.3f,%.3f) "
+                    "sun=(%.3f,%.3f,%.3f) rain=%.3f",
+                    env.ambient.x, env.ambient.y, env.ambient.z,
+                    env.hemi_color.x, env.hemi_color.y, env.hemi_color.z,
+                    env.sun_color.x, env.sun_color.y, env.sun_color.z, env.rain_density);
+            }
+            if (dropped)
+                lastDropReport = Device.dwTimeContinual;
+        }
+        previousStatic = submitted;
+        previousSectors = visited;
+    }
+#endif
 
 #if 0
     // wait for static geo collecting to be done.

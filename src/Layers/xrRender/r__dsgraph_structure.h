@@ -1,6 +1,9 @@
 #pragma once
 
 #include "r__sector.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrCDB/RayQueryAudit.h"
+#endif
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -80,6 +83,25 @@ struct R_dsgraph_structure
 
     u32 counter_S{};
     u32 counter_D{};
+#if defined(XR_PLATFORM_ANDROID)
+    struct sector_audit_t
+    {
+        CDB::RayQueryAudit reference[4];
+        int accelerated_id[4]{-1, -1, -1, -1};
+        float accelerated_range[4]{};
+        Fvector position{};
+        u32 next_triangle{}, query{4}, frame{}, last_sample{}, samples{};
+        IRender_Sector::sector_id_t sector{IRender_Sector::INVALID_SECTOR_ID};
+        double work_ms{};
+        CDB::RayPathAudit path;
+        u32 path_query = 4;
+    } sector_audit;
+    void audit_camera_sector(const Fvector& position, IRender_Sector::sector_id_t sector);
+    dxRender_Visual* visibility_sample_root{};
+    u32 visibility_sample_frustum{};
+    u32 visibility_sample_hom{};
+    float visibility_sample_largest_hom{};
+#endif
 
     void set_Feedback(R_feedback* V, u32 id)
     {

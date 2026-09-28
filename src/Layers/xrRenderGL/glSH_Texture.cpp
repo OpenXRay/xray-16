@@ -209,7 +209,11 @@ void CTexture::Load()
 {
     flags.bLoaded = true;
     desc_cache = 0;
-    if (pSurface) return;
+    if (pSurface)
+    {
+        PostLoad();
+        return;
+    }
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
@@ -408,6 +412,10 @@ void CTexture::Unload()
 
     CHK_GL(glDeleteTextures(1, &pSurface));
     CHK_GL(glDeleteBuffers(1, &pBuffer));
+    pSurface = 0;
+    pBuffer = 0;
+    desc_cache = 0;
+    m_width = m_height = 0;
 
 #ifdef XR_PLATFORM_WINDOWS
     xr_delete(pAVI);

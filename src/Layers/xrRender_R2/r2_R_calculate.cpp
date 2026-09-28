@@ -98,20 +98,6 @@ void CRender::Calculate()
         !Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L))
     {
         const auto sector_id = dsgraph_main.detect_sector(Device.vCameraPosition);
-#if defined(XR_PLATFORM_ANDROID)
-        static u32 failedSectorDetections = 0;
-        static u32 lastSectorReport = 0;
-        if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-            ++failedSectorDetections;
-        if (Device.dwTimeContinual - lastSectorReport >= 5000)
-        {
-            Msg("[sector-detect] camera=%u candidate=%u failed=%u position=(%.2f,%.2f,%.2f)",
-                static_cast<u32>(last_sector_id), static_cast<u32>(sector_id), failedSectorDetections,
-                Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
-            failedSectorDetections = 0;
-            lastSectorReport = Device.dwTimeContinual;
-        }
-#endif
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             if (sector_id != last_sector_id)
@@ -121,6 +107,10 @@ void CRender::Calculate()
         }
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    dsgraph_main.audit_camera_sector(Device.vCameraPosition, last_sector_id);
+#endif
+
     //
     Lights.Update();
 
@@ -129,8 +119,11 @@ void CRender::Calculate()
     g_pGamePersistent->SpatialSpace.q_sphere(spatial_lights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
     for (auto spatial : spatial_lights)
     {
-        const auto& entity_pos = spatial->spatial_sector_point();
-        spatial->spatial_updatesector(dsgraph_main.detect_sector(entity_pos));
+        if (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+        {
+            const auto& entity_pos = spatial->spatial_sector_point();
+            spatial->spatial_updatesector(dsgraph_main.detect_sector(entity_pos));
+        }
         const auto sector_id = spatial->GetSpatialData().sector_id;
         if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             continue; // disassociated from S/P structure

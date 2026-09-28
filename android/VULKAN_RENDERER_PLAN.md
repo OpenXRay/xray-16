@@ -94,3 +94,14 @@ descriptor/attachment limits, BC/ETC2/ASTC support and the color/depth formats
 needed by the deferred path. Gameplay still falls back explicitly to GLES;
 these diagnostics narrow VK1/VK2 implementation decisions but do not satisfy
 those gates.
+
+Version 0.9.25 adds a Vulkan-specific DDS decoder for two-dimensional game
+textures. It reads the original virtual filesystem bytes, maps BC1/BC2/BC3
+and RGBA/BGRA formats, expands BC textures when the Vulkan device cannot sample
+BC, and produces aligned mip upload regions. The probe checks one available
+game texture against the device's sampled-image format support. Shader pipelines and gameplay rendering remain future VK2/VK3 work.
+
+Version 0.9.26 uploads a supported game DDS through a Vulkan staging buffer
+into device-local image memory, transitions its layouts, and creates a sampled
+image view. This Vulkan-only resource path is exercised by the probe when
+Vulkan is selected; the gameplay draw pipeline remains on GLES.

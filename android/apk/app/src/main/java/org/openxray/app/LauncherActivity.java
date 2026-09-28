@@ -123,6 +123,7 @@ public final class LauncherActivity extends Activity {
     private CheckBox immersiveMode;
     private CheckBox touchControlsEnabled;
     private CheckBox showFps;
+    private CheckBox[] advancedOptions;
     private TextView accessStatus;
     private TextView gameInspection;
     private TextView status;
@@ -278,9 +279,8 @@ public final class LauncherActivity extends Activity {
         LinearLayout tabs = new LinearLayout(this);
         tabs.setOrientation(LinearLayout.HORIZONTAL);
         tabButtons = new Button[3];
-        tabButtons[PAGE_GAME] = makeTab("Игра", PAGE_GAME);
-        tabButtons[PAGE_SETTINGS] = makeTab("Параметры", PAGE_SETTINGS);
-        tabButtons[PAGE_DIAGNOSTICS] = makeTab("Диагностика", PAGE_DIAGNOSTICS);
+        for (int page = 0; page < tabButtons.length; ++page)
+            tabButtons[page] = makeTab(OptionCatalog.TABS[page], page);
         for (Button button : tabButtons)
             tabs.addView(button, new LinearLayout.LayoutParams(0, dp(48), 1));
         root.addView(tabs, matchWrap());
@@ -378,7 +378,7 @@ public final class LauncherActivity extends Activity {
 
     private View buildSettingsPage() {
         LinearLayout content = pageContent();
-        addSectionTitle(content, "Рендерер");
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[0]);
         content.addView(bodyText("Для игры используется OpenGL ES. Vulkan доступен для проверки."),
                 matchWrap());
         rendererMode = new Spinner(this);
@@ -388,7 +388,7 @@ public final class LauncherActivity extends Activity {
         rendererMode.setAdapter(rendererAdapter);
         content.addView(rendererMode, matchWrap());
 
-        addSectionTitle(content, "Графика");
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[1]);
         content.addView(bodyText("Автоматический профиль: Low."),
                 matchWrap());
         graphicsPreset = new Spinner(this);
@@ -398,7 +398,7 @@ public final class LauncherActivity extends Activity {
         graphicsPreset.setAdapter(graphicsAdapter);
         content.addView(graphicsPreset, matchWrap());
 
-        addSectionTitle(content, "Разрешение 3D-рендера");
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[2]);
         content.addView(bodyText("Снижение разрешения ускоряет рендеринг, но уменьшает чёткость."), matchWrap());
         buildRenderResolutionList();
         renderResolution = new Spinner(this);
@@ -408,7 +408,7 @@ public final class LauncherActivity extends Activity {
         renderResolution.setAdapter(resolutionAdapter);
         content.addView(renderResolution, matchWrap());
 
-        addSectionTitle(content, "Управление и экран");
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[3]);
         gamepadEnabled = makeCheckBox("Включить поддержку геймпада", "Подключённый контроллер.");
         touchControlsEnabled = makeCheckBox("Показывать сенсорное управление",
                 "Экранный стик и кнопки движения, огня, взаимодействия и инвентаря. "
@@ -426,7 +426,21 @@ public final class LauncherActivity extends Activity {
         content.addView(immersiveMode, matchWrap());
         content.addView(showFps, matchWrap());
 
-        addSectionTitle(content, "Дополнительные аргументы");
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[4]);
+        advancedOptions = new CheckBox[OptionCatalog.ADVANCED_KEYS.length];
+        for (int index = 0; index < advancedOptions.length; ++index) {
+            advancedOptions[index] = makeCheckBox(OptionCatalog.ADVANCED_LABELS[index],
+                    OptionCatalog.ADVANCED_DESCRIPTIONS[index]);
+            content.addView(advancedOptions[index], matchWrap());
+        }
+
+        content.addView(actionButton(OptionCatalog.ADVANCED_RESET_LABEL, view -> {
+            for (CheckBox option : advancedOptions)
+                option.setChecked(false);
+            savePreferences();
+        }), matchWrap());
+
+        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[5]);
         content.addView(bodyText("Необязательные параметры движка."), matchWrap());
         customArgs = new EditText(this);
         customArgs.setHint("Например: -novtf");
@@ -540,6 +554,9 @@ public final class LauncherActivity extends Activity {
                 preferences.getInt(PREF_GRAPHICS_PRESET, GRAPHICS_AUTO)));
         selectStoredResolution(preferences.getString(PREF_RENDER_RESOLUTION, "auto"));
         showFps.setChecked(preferences.getBoolean(PREF_SHOW_FPS, true));
+        for (int index = 0; index < advancedOptions.length; ++index)
+            advancedOptions[index].setChecked(preferences.getBoolean(
+                    "advanced_" + OptionCatalog.ADVANCED_KEYS[index], false));
         showPage(preferences.getInt(PREF_ACTIVE_PAGE, PAGE_GAME));
     }
 
@@ -563,6 +580,11 @@ public final class LauncherActivity extends Activity {
                 .putBoolean(PREF_SHOW_FPS, showFps.isChecked())
                 .putInt(PREF_ACTIVE_PAGE, activePage)
                 .apply();
+        SharedPreferences.Editor advancedEditor = preferences.edit();
+        for (int index = 0; index < advancedOptions.length; ++index)
+            advancedEditor.putBoolean("advanced_" + OptionCatalog.ADVANCED_KEYS[index],
+                    advancedOptions[index].isChecked());
+        advancedEditor.apply();
     }
 
     private int clampVariant(int value) {
@@ -593,8 +615,7 @@ public final class LauncherActivity extends Activity {
         renderResolutions.add(new RenderResolution("auto",
                 "Автоматически — " + autoWidth + "×" + autoHeight, autoWidth, autoHeight));
 
-        int[] candidateWidths = { 854, 960, 1280, 1600, 1920, 2240, 2560 };
-        for (int width : candidateWidths) {
+        for (int width : OptionCatalog.RESOLUTION_WIDTHS) {
             if (width >= nativeWidth)
                 continue;
             int height = aspectHeight(width, nativeWidth, nativeHeight);
@@ -805,6 +826,13 @@ public final class LauncherActivity extends Activity {
         String[] additionalArgs;
         try {
             additionalArgs = parseAdditionalArguments(customArgs.getText().toString());
+            List<String> selectedArgs = new ArrayList<>();
+            for (String argument : additionalArgs)
+                selectedArgs.add(argument);
+            for (int index = 0; index < advancedOptions.length; ++index)
+                if (advancedOptions[index].isChecked())
+                    selectedArgs.add(OptionCatalog.ADVANCED_ARGS[index]);
+            additionalArgs = selectedArgs.toArray(new String[0]);
         } catch (IllegalArgumentException error) {
             setStatus("Ошибка в дополнительных аргументах: " + error.getMessage());
             showPage(PAGE_SETTINGS);

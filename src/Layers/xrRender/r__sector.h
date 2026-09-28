@@ -121,6 +121,18 @@ public:
     CSector* i_start; // input:	starting point
     xr_vector<CSector*> r_sectors; // result
     xr_vector<std::pair<CPortal*, float>> f_portals; //
+#if defined(XR_PLATFORM_ANDROID)
+    struct traversal_stats_t
+    {
+        u32 facing = 0;
+        u32 sphere = 0;
+        u32 ssa = 0;
+        u32 frustum = 0;
+        u32 scissor = 0;
+        u32 hom = 0;
+        u32 traversed = 0;
+    } traversal_stats;
+#endif
 
 public:
     CPortalTraverser();
