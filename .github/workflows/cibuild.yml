@@ -8,6 +8,69 @@ on:
   workflow_dispatch:
 
 jobs:
+  alpine-bootstrap:
+    name: Prepare Alpine bootstrap
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      apk_sha256: ${{ steps.bootstrap.outputs.apk_sha256 }}
+    steps:
+    - name: Download apk.static with mirror failover
+      id: bootstrap
+      shell: bash
+      env:
+        APK_TOOLS_SHA256: 34bb1a96f0258982377a289392d4ea9f3f4b767a4bb5806b1b87179b79ad8a1c
+      run: |
+          set -euo pipefail
+          package="$RUNNER_TEMP/apk-tools-static.apk"
+          apk="$RUNNER_TEMP/apk"
+          mirrors=(
+            "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/apk-tools-static-2.14.12-r0.apk"
+            "https://mirror.yandex.ru/mirrors/alpine/v3.22/main/x86_64/apk-tools-static-2.14.12-r0.apk"
+            "https://mirrors.gigenet.com/alpinelinux/v3.22/main/x86_64/apk-tools-static-2.14.12-r0.apk"
+          )
+          apk_sha256=""
+          for mirror in "${mirrors[@]}"; do
+            rm -f "$package" "$apk"
+            if curl --fail --location --silent --show-error \
+                --connect-timeout 10 --max-time 30 \
+                --retry 2 --retry-all-errors --retry-delay 2 --retry-max-time 75 \
+                "$mirror" --output "$package" \
+                && tar -xzOf "$package" sbin/apk.static > "$apk" \
+                && test -s "$apk"; then
+              apk_sha256="$(sha256sum "$apk" | cut -d ' ' -f 1)"
+              echo "Downloaded apk.static from $mirror"
+              break
+            fi
+            echo "Alpine mirror failed: $mirror; trying the next source" >&2
+          done
+          if [[ -z "$apk_sha256" ]]; then
+            rm -f "$package" "$apk"
+            gitlab_url="https://gitlab.alpinelinux.org/api/v4/projects/5/packages/generic/v2.14.10/x86_64/apk.static"
+            if curl --fail --location --silent --show-error \
+                --connect-timeout 10 --max-time 30 \
+                --retry 5 --retry-all-errors --retry-delay 2 --retry-max-time 180 \
+                "$gitlab_url" --output "$apk" \
+                && echo "$APK_TOOLS_SHA256  $apk" | sha256sum --check --status; then
+              apk_sha256="$APK_TOOLS_SHA256"
+              echo "Using the pinned GitLab apk.static fallback"
+            fi
+          fi
+          if [[ -z "$apk_sha256" ]]; then
+            echo "::error::Could not fetch a valid Alpine apk.static from any source."
+            exit 1
+          fi
+          chmod 755 "$apk"
+          echo "apk_sha256=$apk_sha256" >> "$GITHUB_OUTPUT"
+          echo "Prepared Alpine bootstrap SHA-256: $apk_sha256"
+    - uses: actions/upload-artifact@main
+      with:
+        name: alpine-apk-static
+        path: ${{ runner.temp }}/apk
+        if-no-files-found: error
+        retention-days: 1
+        overwrite: true
+
   windows:
     name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
     runs-on: windows-latest
@@ -55,21 +118,44 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res/Utils.*.7z
 
+
+  nightly-release:
+    name: Publish Windows nightly
+    if: github.event_name == 'push' && github.ref_name == 'dev'
+    needs: windows
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@main
+
+    - uses: actions/download-artifact@main
+      with:
+        pattern: OpenXRay.*.7z
+        path: release-assets
+        merge-multiple: true
+
     - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
-      if: github.ref_name == 'dev'
-      id: update-latest-nightly-tag
       with:
         ref: latest-nightly
 
     - name: Publish latest nightly build
-      if: ${{ steps.update-latest-nightly-tag.outcome == 'success' }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release view latest-nightly 2>$null | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+          gh release create latest-nightly --title "OpenXRay Windows Nightly" --notes "Automated Windows nightly artifacts from the dev branch." --verify-tag --prerelease --latest=false
+          if ($LASTEXITCODE -ne 0) { throw "Could not create the latest-nightly GitHub Release." }
+        }
+        $assets = Get-ChildItem -Path release-assets -Filter '*.7z' -File | ForEach-Object { $_.FullName }
+        if (-not $assets) { throw "No OpenXRay artifacts were downloaded." }
+        gh release upload --clobber latest-nightly @assets
 
   cmake:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})
+    needs: alpine-bootstrap
     runs-on: ${{ matrix.platform.os }}
 
     container: ${{ matrix.platform.container || '' }}
@@ -111,12 +197,19 @@ jobs:
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]
 
     steps:
+    - name: Download Alpine bootstrap artifact
+      if: ${{ matrix.platform.name == 'Alpine' }}
+      uses: actions/download-artifact@main
+      with:
+        name: alpine-apk-static
+        path: ${{ runner.temp }}
     - name: Install latest stable Alpine Linux and packages
       if: ${{ matrix.platform.name == 'Alpine' }}
-      uses: jirutka/setup-alpine@master
+      uses: jirutka/setup-alpine@ae3b3ddba35054804fc4a3507b519fa7e8152050
       with:
         arch: ${{ matrix.platform.arch }}
         branch: 'latest-stable'
+        apk-tools-url: https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/apk-tools-static-2.14.12-r0.apk#!sha256!${{ needs.alpine-bootstrap.outputs.apk_sha256 }}
         packages: build-base cmake git mold sdl2-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
     - name: Install Ubuntu packages
