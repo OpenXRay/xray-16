@@ -393,7 +393,8 @@ bool FrameContext::create_sync(std::string& error)
     return true;
 }
 
-bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error)
+bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
+    FrameRecorder recorder, void* user_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -459,6 +460,12 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     render_info.clearValueCount = 1;
     render_info.pClearValues = &clear_value;
     m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+    if (recorder)
+    {
+        const FrameRecordingContext frame{command, m_render_pass, m_framebuffers[image_index], m_extent,
+            image_index, m_current_frame};
+        recorder(frame, user_data);
+    }
     m_vk.cmd_end_render_pass(command);
     if (m_vk.end_command_buffer(command) != VK_SUCCESS)
     {

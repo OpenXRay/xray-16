@@ -47,6 +47,18 @@ enum class FrameStatus
     RecreateRequired
 };
 
+struct FrameRecordingContext
+{
+    VkCommandBuffer command_buffer = VK_NULL_HANDLE;
+    VkRenderPass render_pass = VK_NULL_HANDLE;
+    VkFramebuffer framebuffer = VK_NULL_HANDLE;
+    VkExtent2D extent{};
+    uint32_t image_index = 0;
+    uint32_t frame_index = 0;
+};
+
+using FrameRecorder = void (*)(const FrameRecordingContext& frame, void* user_data);
+
 bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_instance_proc,
     VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc, FrameDispatch& dispatch, std::string& error);
 
@@ -63,7 +75,8 @@ public:
     bool initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
         const FrameDispatch& dispatch, std::string& error);
-    bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error);
+    bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
+        FrameRecorder recorder = nullptr, void* user_data = nullptr);
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }

@@ -31,6 +31,21 @@ namespace
 using GetInstanceExtensions = SDL_bool (*)(SDL_Window*, unsigned int*, const char**);
 using CreateSurface = SDL_bool (*)(SDL_Window*, VkInstance, VkSurfaceKHR*);
 
+struct FrameCallbackAudit
+{
+    uint32_t calls = 0;
+    bool valid = true;
+};
+
+void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& frame, void* user_data)
+{
+    auto& audit = *static_cast<FrameCallbackAudit*>(user_data);
+    audit.valid = audit.valid && frame.command_buffer && frame.render_pass && frame.framebuffer &&
+        frame.extent.width && frame.extent.height &&
+        frame.frame_index < xray::render::vulkan::FrameContext::FramesInFlight;
+    ++audit.calls;
+}
+
 template <typename T>
 T load_instance_proc(VkInstance instance, PFN_vkGetInstanceProcAddr get_proc, const char* name)
 {
@@ -250,13 +265,17 @@ bool Run(std::string& reason)
     clear.float32[1] = 0.18f;
     clear.float32[2] = 0.32f;
     clear.float32[3] = 1.0f;
+    FrameCallbackAudit callback_audit;
     for (uint32_t frame = 0; frame <= xray::render::vulkan::FrameContext::FramesInFlight; ++frame)
     {
         xray::render::vulkan::FrameStatus frame_status{};
-        if (!frame_context.render_frame(clear, frame_status, frame_error))
+        if (!frame_context.render_frame(clear, frame_status, frame_error,
+                audit_frame_callback, &callback_audit))
             return fail(frame_error);
         if (frame_status != xray::render::vulkan::FrameStatus::Presented)
             return fail("Vulkan surface changed during the smoke test");
+        if (!callback_audit.valid || callback_audit.calls != frame + 1)
+            return fail("Vulkan frame recorder received an invalid frame context");
     }
     if (frame_dispatch.device_wait_idle(device) != VK_SUCCESS)
         return fail("Vulkan queue did not become idle after present");

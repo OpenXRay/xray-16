@@ -9,7 +9,7 @@ selects the OpenGL ES backend for gameplay.
 | Part | Source | Current behavior |
 |---|---|---|
 | Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
-| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Takes a platform surface, creates the swapchain and clear pass, tracks two frames in flight, and reports when recreation is needed |
+| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass, tracks two frames in flight, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
 | Android surface probe | `src/xrEngine/android_vulkan_smoke.cpp` | Uses SDL to create the window and surface, then exercises the shared frame context |
 | DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
 | Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
@@ -55,14 +55,13 @@ The eventual backend should keep these constraints:
 
 Work should proceed in dependencies-first order:
 
-1. expose frame command recording to the engine renderer;
-2. add the HLSL-to-SPIR-V compiler and reflection cache;
-3. add GPU buffers, descriptor allocation and graphics pipelines;
-4. render an engine UI/static-geometry pass through Vulkan;
-5. port deferred targets, lighting, shadows and post-processing;
-6. integrate swapchain recreation and Android lifecycle handling;
-7. add Windows and Linux surfaces and CI coverage;
-8. remove the GLES fallback only after complete levels and representative mods
+1. add the HLSL-to-SPIR-V compiler and reflection cache;
+2. add GPU buffers, descriptor allocation and graphics pipelines;
+3. render an engine UI/static-geometry pass through Vulkan;
+4. port deferred targets, lighting, shadows and post-processing;
+5. integrate swapchain recreation and Android lifecycle handling;
+6. add Windows and Linux surfaces and CI coverage;
+7. remove the GLES fallback only after complete levels and representative mods
    run through Vulkan.
 
 Useful host tests live in `tests/vulkan_dds.cpp` and
