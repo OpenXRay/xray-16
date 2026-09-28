@@ -33,9 +33,6 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     i_mXFORM_01.mul(m_viewport_01, mXFORM);
     i_start = (CSector*)start;
     r_sectors.clear();
-#if defined(XR_PLATFORM_ANDROID)
-    traversal_stats = {};
-#endif
     _scissor scissor;
     scissor.set(0, 0, 1, 1);
     scissor.depth = 0;
@@ -190,22 +187,12 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         {
             pSector = PORTAL->getSectorBack(i_vBase);
             if (pSector == sector || pSector == i_start)
-            {
-#if defined(XR_PLATFORM_ANDROID)
-                ++traversal_stats.facing;
-#endif
                 continue;
-            }
         }
 
         // Early-out sphere
         if (!F.testSphere_dirty(PORTAL->S.P, PORTAL->S.R))
-        {
-#if defined(XR_PLATFORM_ANDROID)
-            ++traversal_stats.sphere;
-#endif
             continue;
-        }
 
         // SSA  (if required)
         if (i_options & CPortalTraverser::VQ_SSA)
@@ -218,12 +205,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
             dir2portal.div(_sqrt(distSQ));
             ssa *= _abs(PORTAL->P.n.dotproduct(dir2portal));
             if (ssa < r_ssaDISCARD)
-            {
-#if defined(XR_PLATFORM_ANDROID)
-                ++traversal_stats.ssa;
-#endif
                 continue;
-            }
 
             if (i_options & CPortalTraverser::VQ_FADE)
             {
@@ -240,12 +222,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         D.clear();
         sPoly* P = F.ClipPoly(S, D);
         if (nullptr == P)
-        {
-#if defined(XR_PLATFORM_ANDROID)
-            ++traversal_stats.frustum;
-#endif
             continue;
-        }
 
         // Scissor and optimized HOM-testing
         _scissor scissor;
@@ -303,12 +280,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
 
                 // Cull by HOM (slower algo)
                 if ((i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
-                {
-#if defined(XR_PLATFORM_ANDROID)
-                    ++traversal_stats.hom;
-#endif
                     continue;
-                }
             }
             else
             {
@@ -334,29 +306,14 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
                 // Msg("scissor: (%f,%f)-(%f,%f)", scissor.min.x, scissor.min.y, scissor.max.x, scissor.max.y);
                 //  Check if box is non-empty
                 if (scissor.min.x >= scissor.max.x)
-                {
-#if defined(XR_PLATFORM_ANDROID)
-                    ++traversal_stats.scissor;
-#endif
                     continue;
-                }
                 if (scissor.min.y >= scissor.max.y)
-                {
-#if defined(XR_PLATFORM_ANDROID)
-                    ++traversal_stats.scissor;
-#endif
                     continue;
-                }
 
                 // Cull by HOM (faster algo)
                 if ((i_options & CPortalTraverser::VQ_HOM) &&
                     !RImplementation.HOM.visible(scissor, depth))
-                {
-#if defined(XR_PLATFORM_ANDROID)
-                    ++traversal_stats.hom;
-#endif
                     continue;
-                }
             }
         }
         else
@@ -365,12 +322,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
 
             // Cull by HOM (slower algo)
             if ((i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
-            {
-#if defined(XR_PLATFORM_ANDROID)
-                ++traversal_stats.hom;
-#endif
                 continue;
-            }
         }
 
         // Create _new_ frustum and recurse
@@ -378,9 +330,6 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         Clip.CreateFromPortal(P, PORTAL->P.n, i_vBase, i_mXFORM);
         PORTAL->marker = i_marker;
         PORTAL->bDualRender = FALSE;
-#if defined(XR_PLATFORM_ANDROID)
-        ++traversal_stats.traversed;
-#endif
         traverse_sector(pSector, Clip, scissor);
     }
 }

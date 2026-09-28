@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <chrono>
 
@@ -15,10 +16,17 @@ class FramePhaseProfile
         Clock::time_point report = Clock::now();
     };
     static Totals& totals() { static Totals value; return value; }
-    Clock::time_point mark = Clock::now();
+    bool enabled;
+    Clock::time_point mark;
 public:
+    explicit FramePhaseProfile(bool enabled)
+        : enabled(enabled), mark(enabled ? Clock::now() : Clock::time_point{})
+    {}
+
     void end(unsigned phase)
     {
+        if (!enabled)
+            return;
         auto now = Clock::now();
         const double ms = std::chrono::duration<double, std::milli>(now - mark).count();
         auto& t = totals();
@@ -28,6 +36,8 @@ public:
     }
     ~FramePhaseProfile()
     {
+        if (!enabled)
+            return;
         end(6);
         auto& t = totals();
         ++t.frames;

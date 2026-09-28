@@ -111,10 +111,16 @@ void CRender::Render()
     auto& dsgraph = get_imm_context();
 
 #if defined(XR_PLATFORM_ANDROID)
-    xray::render::FramePhaseProfile profile;
+    const bool profileFrame = strstr(Core.Params, "-android-frame-profile") != nullptr;
+    xray::render::FramePhaseProfile profile(profileFrame);
 #if defined(USE_OGL)
-    HW.frameProfiler.begin();
-    struct GpuProfileEnd { ~GpuProfileEnd() { HW.frameProfiler.end(); } } gpuProfileEnd;
+    if (profileFrame)
+        HW.frameProfiler.begin();
+    struct GpuProfileEnd
+    {
+        bool active;
+        ~GpuProfileEnd() { if (active) HW.frameProfiler.end(); }
+    } gpuProfileEnd{profileFrame};
 #endif
 #endif
     //******* Z-prefill calc - DEFERRER RENDERER

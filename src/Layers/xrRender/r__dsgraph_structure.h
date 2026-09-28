@@ -97,10 +97,6 @@ struct R_dsgraph_structure
         u32 path_query = 4;
     } sector_audit;
     void audit_camera_sector(const Fvector& position, IRender_Sector::sector_id_t sector);
-    dxRender_Visual* visibility_sample_root{};
-    u32 visibility_sample_frustum{};
-    u32 visibility_sample_hom{};
-    float visibility_sample_largest_hom{};
 #endif
 
     void set_Feedback(R_feedback* V, u32 id)
