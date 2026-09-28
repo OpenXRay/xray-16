@@ -73,11 +73,13 @@ private:
 
     static int LuaMemoryUsed(lua_State* L);
     static bool LuaIsJitProfilerDefined();
+#if XRAY_USE_LUAJIT
     static void LuaJitSamplingProfilerAttach(CScriptProfiler* profiler, u32 interval);
     static void LuaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_profile_callback callback, void* data);
     static void LuaJitProfilerStop(lua_State* L);
     static shared_str LuaJitProfilerDumpToString(lua_State* L, cpcstr format, int depth);
     static std::pair<cpcstr, size_t> LuaJitProfilerDump(lua_State* L, cpcstr format, int depth);
+#endif
     static std::pair<lua_Debug, bool> LuaDebugStackInfo(lua_State* L, int level, cpcstr what);
 
 private:

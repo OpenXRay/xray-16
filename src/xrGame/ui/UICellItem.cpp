@@ -42,6 +42,11 @@ CUICellItem::CUICellItem()
 
 CUICellItem::~CUICellItem()
 {
+    if (m_mouse_selected_item == this)
+    {
+        m_mouse_selected_item = NULL;
+    }
+
     if (m_b_destroy_childs)
         delete_data(m_childs);
 

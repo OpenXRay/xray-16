@@ -40,11 +40,11 @@ target_sources_grouped(
 
 target_include_directories(xrGameSpy
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/src/xrServerEntities"
-    "${CMAKE_SOURCE_DIR}/Externals/GameSpy/src"
-    "${CMAKE_SOURCE_DIR}/Externals/ode/include"
-    "${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src/xrServerEntities"
+    "${XRAY_SOURCE_DIR}/Externals/GameSpy/src"
+    "${XRAY_SOURCE_DIR}/Externals/ode/include"
+    "${XRAY_SOURCE_DIR}/Externals/OpenAutomate/inc"
 )
 
 target_link_libraries(xrGameSpy

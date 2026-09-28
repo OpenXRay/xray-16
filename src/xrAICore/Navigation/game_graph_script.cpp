@@ -77,7 +77,7 @@ void CGameGraph::script_register(lua_State* luaState)
         }),
         def("gg_distance", +[](u32 vid1, u32 vid2)
         {
-            const auto game_graph = GEnv.AISpace->game_graph();
+            const auto& game_graph = GEnv.AISpace->game_graph();
             const auto p1 = game_graph.vertex(vid1)->game_point();
             const auto p2 = game_graph.vertex(vid2)->game_point();
             return p1.distance_to(p2);

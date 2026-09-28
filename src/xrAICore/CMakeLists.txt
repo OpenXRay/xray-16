@@ -286,8 +286,8 @@ target_sources_grouped(
 target_include_directories(xrAICore
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/sdk/include"
 )
 
 target_link_libraries(xrAICore

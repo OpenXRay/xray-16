@@ -120,8 +120,8 @@ target_sources_grouped(
 
 target_include_directories(xrSound
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/src/xrEngine"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src/xrEngine"
 )
 
 target_link_libraries(xrSound

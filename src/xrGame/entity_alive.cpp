@@ -789,7 +789,11 @@ void CEntityAlive::fill_hit_bone_surface_areas() const
             surface_area = 2.f * PI * shape.cylinder.m_radius * (shape.cylinder.m_radius + shape.cylinder.m_height);
             break;
         }
-        default: NODEFAULT;
+        default:
+        {
+          Msg("! CEntityAlive::fill_hit_bone_surface_areas: unknown bone shape type %d for bone %s", shape.type, kinematics->LL_BoneName_dbg(i));
+          continue;
+        }
         }
 
         m_hit_bone_surface_areas.emplace_back(i, surface_area);

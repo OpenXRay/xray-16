@@ -243,6 +243,8 @@ protected:
     void InitCellForSlot(u16 slot_idx);
     void InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyBagList = false);
     void ClearAllLists();
+    void ClearUpgradeSelection();
+    bool RemoveItemFromList(CUIDragDropListEx* lst, PIItem pItem);
 
     void BindDragDropListEvents(CUIDragDropListEx* lst);
     void RegisterCallback(CUIWindow* window, s16 event, const CUIWndCallback::void_function& callback);

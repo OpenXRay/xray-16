@@ -8,7 +8,7 @@ target_sources(xrAPI PRIVATE
 
 target_include_directories(xrAPI
     PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/src"
 )
 
 target_compile_definitions(xrAPI

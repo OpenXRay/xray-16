@@ -39,11 +39,8 @@ void CUIActorMenu::DeInitUpgradeMode()
         m_pUpgradeWnd->m_btn_repair->Enable(false);
     }
 
-    if (m_upgrade_selected)
-    {
-        m_upgrade_selected->Mark(false);
-        m_upgrade_selected = NULL;
-    }
+    ClearUpgradeSelection();
+
     if (m_pPartnerInvOwner)
     {
         m_pPartnerInvOwner->StopTrading();
@@ -62,12 +59,19 @@ void CUIActorMenu::DeInitUpgradeMode()
     }
 }
 
-void CUIActorMenu::SetupUpgradeItem()
+void CUIActorMenu::ClearUpgradeSelection()
 {
     if (m_upgrade_selected)
     {
         m_upgrade_selected->Mark(false);
     }
+
+    m_upgrade_selected = NULL;
+}
+
+void CUIActorMenu::SetupUpgradeItem()
+{
+    ClearUpgradeSelection();
 
     bool can_upgrade = false;
     PIItem item = CurrentIItem();
