@@ -1,43 +1,37 @@
-# Android launcher APK
+# Android launcher
 
-`build-apk-armv7.sh` packages the ARMv7 OpenXRay engine, SDL2 activity and
-launcher into a debug APK. No proprietary S.T.A.L.K.E.R. resources are
-included. Required packages, pinned toolchain versions and full build/install
-commands are in [../README.md](../README.md).
+Build and installation commands are in [../README.md](../README.md). This file
+describes the APK that those scripts produce.
 
-Build and install with the separately installed components described in [../README.md](../README.md):
+| Property | Value |
+|---|---|
+| Application ID | `org.openxray.stalker` |
+| Launcher activity | `org.openxray.app.LauncherActivity` |
+| Engine activity | `org.openxray.app.XRayActivity` |
+| Engine process | `org.openxray.stalker:engine` |
+| ABI | `armeabi-v7a` |
+| Minimum Android version | API 26 |
+| Orientation | portrait launcher, landscape engine |
 
-```sh
-./android/build-apk-armv7.sh
-adb install -r "build/openxray-armv7-launcher-v$(head -n1 android/PORT_VERSION)-debug.apk"
-```
+The APK contains the launcher, native engine, OpenAL, the C++ runtime and
+OpenXRay-owned support files. It does not contain proprietary S.T.A.L.K.E.R.
+archives or other game assets.
 
-The application ID is `org.openxray.stalker`; the main activity is
-`org.openxray.app.LauncherActivity`.
+## Starting a game
 
-## Launcher workflow
+1. Grant storage access.
+2. Select the installation directory containing `fsgame.ltx` and the original
+   game resources.
+3. Select the game profile and renderer settings.
+4. Run a smoke test if you are checking a new device.
+5. Start the engine.
 
-1. Grant storage access. Android 11+ opens the system **All files access**
-   page; Android 8–10 uses runtime storage permissions.
-2. Select the installation root containing `fsgame.ltx` and the original game
-   resources. Call of Pripyat is the intended profile.
-3. Configure renderer, graphics preset, internal 3D resolution, controls and
-   FPS display under **Settings**.
-4. Optionally run the GLES smoke test or Vulkan probe without game files.
-5. Start the game. Before launch, the app verifies a real write to
-   `<STALKER>/_appdata_` and refuses to continue if Android denies it.
+The selected path must be a filesystem directory in shared storage, for
+example `/storage/emulated/0/STALKER`. Android document-provider and cloud URIs
+are not supported. Before launching, the app creates the usual `_appdata_`
+subdirectories and verifies them with an actual write/delete test.
 
-Auto renderer and explicit OpenGL ES both use the GLES gameplay backend.
-Vulkan currently runs the surface/device/swapchain probe and then uses GLES; it
-does not select a native Vulkan gameplay renderer.
-
-Graphics choices are applied in memory after loading
-`<STALKER>/_appdata_/user.ltx`. Auto graphics maps to Low. Auto resolution
-preserves the physical aspect ratio and caps internal width at 1280 unless the
-display is smaller. The physical landscape surface remains native and receives
-the scaled final frame.
-
-The engine keeps the desktop filesystem layout:
+The engine uses the desktop filesystem layout:
 
 ```text
 <STALKER>/_appdata_/user.ltx
@@ -46,62 +40,68 @@ The engine keeps the desktop filesystem layout:
 <STALKER>/_appdata_/logs/
 ```
 
-These files survive APK uninstall as long as the selected game directory is
-not removed. The private application directory contains only launcher state
-and the OpenXRay-owned renderer fallback data shipped in the APK.
+These files are outside the APK's private data directory and normally survive
+an APK uninstall. The launcher does not edit `fsgame.ltx`, game archives,
+textures or shader sources.
 
-The launcher is portrait and the engine activity is landscape. The FPS counter
-is opaque red at the top center. Touch controls include Escape.
+## Renderer choices
 
-## Running-engine controls
+- **Auto** and **OpenGL ES** both run the GLES gameplay backend.
+- **Vulkan** runs the Vulkan surface/device/swapchain/render-pass probe, then
+  deliberately starts gameplay with GLES. It is not a Vulkan gameplay backend.
+- **GLES smoke test** creates the real SDL/EGL context, compiles a minimal GLES
+  shader and verifies pixel readback without loading game data.
+- **Vulkan smoke test** clears and presents one Vulkan frame and exercises the
+  current DDS upload path when a suitable game texture is available.
 
-While the `:engine` process exists, **Start game** changes to **Return to
-running game**. The adjacent stop button force-terminates a stuck engine after
-confirmation. These controls cannot restore a process that Android has already
-killed or that has crashed natively.
+A smoke-test pass is limited to those operations. It does not validate level
+loading, all shaders or sustained gameplay.
+
+Graphics presets and internal render resolution are applied after `user.ltx`
+has been read. `Auto` graphics maps to `Low`. `Auto` resolution keeps the
+display aspect ratio and caps the internal width at 1280 pixels.
+
+## Process and lifecycle controls
+
+The launcher and engine use separate Android processes. While the engine
+process is alive, the start button returns to its activity instead of creating
+a second engine. The stop action sends the engine control broadcast and then
+terminates a stuck process after confirmation. It cannot recover a process
+that Android has already killed or a native process that has crashed.
 
 ## Logs
 
-The diagnostics page polls bounded 32 KiB tails on a background executor, so
-it does not load whole growing files on the UI thread. Primary Android paths:
+Each launch creates separate Android session logs under the selected game's
+`_appdata_/logs` directory:
 
 ```text
-<game>/_appdata_/logs/android_<timestamp>_<pid>_<id>.log
-<game>/_appdata_/logs/activity_<timestamp>_<pid>_<id>.log
+android_<timestamp>_<pid>_<id>.log
+activity_<timestamp>_<pid>_<id>.log
 ```
 
-Normal engine logs are also written under `<STALKER>/_appdata_/logs/`.
-Each engine launch creates new, uniquely named files. Diagnostics displays and
-shares the latest session; previous sessions remain in the game directory.
-**Clear** removes the latest Android diagnostic files while the engine is stopped; it does not delete saves,
-screenshots, game files or `user.ltx`.
+The diagnostics tab reads a bounded tail of the latest session. **Clear**
+removes Android diagnostic files only while the engine is stopped; it does not
+remove saves, screenshots, `user.ltx` or game resources.
 
-Useful collection commands:
+For native crashes, collect `logcat`, the Android crash buffer and the game log
+directory as described in [../README.md](../README.md). Symbolication requires
+the unstripped `libmain.so` from the same build.
 
-```sh
-adb logcat -c
-adb shell am force-stop org.openxray.stalker
-adb shell am start -n org.openxray.stalker/org.openxray.app.LauncherActivity
-adb logcat -d -b all -v threadtime OpenXRay:I DEBUG:E '*:S' > openxray-logcat.txt
-adb logcat -d -b crash -v threadtime > openxray-crash.txt
-adb pull /sdcard/STALKER/_appdata_/logs openxray-game-logs
-```
+## Update mechanism
 
-Native crashes must be symbolicated against the unstripped `libmain.so` built
-from the same commit as the APK.
+The launcher checks published, non-prerelease GitHub releases. A release is an
+Android update only when it contains both:
 
-## Checking and installing updates
+- `android-update.json`;
+- the APK named by that manifest.
 
-Open **Settings → Updates → Check for updates** to query published releases in
-`r0shn1ch/xray-16`. Releases without `android-update.json` are ignored. When an
-update is available, the launcher downloads the named APK, checks its SHA-256,
-and hands installation to Android. Android asks the user to approve the update;
-on Android 8 and later, allow installs from OpenXRay when prompted.
+`android/build-apk-armv7.sh` writes the manifest to
+`build/android-apk-armv7/android-update.json`. It records the application ID,
+version, minimum SDK, APK size and SHA-256 digest. The launcher verifies those
+fields before handing the APK to Android's installer.
 
-`android/build-apk-armv7.sh` creates `build/android-update.json` beside the APK.
-To publish an Android update, attach both files to a **published** GitHub
-release, preserving the APK's filename from the manifest. The APK must be signed
-with the same certificate as the installed app; Android rejects updates signed
-with a different key. The checked-in build script produces a debug-signed APK,
-so distributing updates beyond builds made with the same debug key requires a
-stable release keystore.
+The repository workflow currently publishes Windows nightly files, not Android
+updates. To publish Android builds, attach the manifest and its APK to a normal
+published release. Do not use a draft or prerelease. Every update must be
+signed with the same certificate as the installed APK; a newly generated debug
+key is not a release-signing strategy.

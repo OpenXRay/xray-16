@@ -115,7 +115,7 @@ fi
 cmake -S "$repo_dir" -B "$build_dir" -G "${CMAKE_GENERATOR:-Ninja}" \
     -DCMAKE_TOOLCHAIN_FILE="$ndk_dir/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI=armeabi-v7a \
-    -DANDROID_PLATFORM=android-36 \
+    -DANDROID_PLATFORM=android-26 \
     -DANDROID_STL=c++_shared \
     -DANDROID_ARM_MODE="$android_arm_mode" \
     -DBUILD_SHARED_LIBS=OFF \

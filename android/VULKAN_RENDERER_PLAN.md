@@ -1,121 +1,70 @@
-# Portable Vulkan renderer plan
+# Vulkan renderer status
 
-The target is one `xrRenderVK` implementation shared by Android, Linux, and
-Windows. It must consume original PC resources and mod overrides without
-requiring Android-specific shader or asset copies.
+OpenXRay does not currently render gameplay through Vulkan. The Android
+launcher option named Vulkan runs the implemented probe and then explicitly
+selects the OpenGL ES backend for gameplay.
 
-## Upstream research
+## Implemented
 
-OpenXRay issue [#447](https://github.com/OpenXRay/xray-16/issues/447) defines
-Vulkan as a separate renderer and lists hardware, backend, resource, state, and
-shader work. Its shader requirement is to cross-compile the existing HLSL
-sources. Issue [#258](https://github.com/OpenXRay/xray-16/issues/258) tracks the
-type-aware compiler options.
+| Part | Source | Current behavior |
+|---|---|---|
+| Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
+| Android surface and swapchain probe | `src/xrEngine/android_vulkan_smoke.cpp` | Uses SDL to create the surface and swapchain, records a clear render pass, submits it and presents one image |
+| DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
+| Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
+| Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
 
-The old [PR #558](https://github.com/OpenXRay/xray-16/pull/558) was reviewed and
-must not be revived as the implementation: it registers an R5-shaped stub but
-does not create a Vulkan instance, device, swapchain, resources, pipelines, or
-synchronization. The unmerged DX12 [PR #1620](https://github.com/OpenXRay/xray-16/pull/1620)
-is a large Windows/CryEngine-derived backend and is not a portable base.
+The probe logs the selected device, queue, relevant limits, compression
+features and attachment formats. These results are diagnostics, not a Vulkan
+compatibility guarantee for gameplay.
 
-NVRHI was also evaluated because it is mentioned by OpenXRay maintainers. Its
-current supported targets are Windows and Linux on 64-bit CPUs; it does not
-cover Android or ARMv7. It therefore cannot be the common foundation for this
-port. LLGL supports Vulkan on all three requested platforms, but adopting it
-does not remove the hardest compatibility task: compiling and reflecting the
-existing X-Ray HLSL shader model. The initial design consequently keeps the
-Vulkan backend inside OpenXRay and limits third-party components to focused,
-replaceable libraries such as Vulkan headers/loader, memory allocation, and a
-shader compiler.
+## Not implemented
 
-## Non-negotiable architecture
+- compilation of the existing HLSL shaders to SPIR-V;
+- descriptor layouts and descriptor allocation for engine resources;
+- graphics and compute pipeline creation for renderer passes;
+- vertex, index, constant and storage-buffer integration;
+- render targets for the deferred G-buffer, lighting, shadows and
+  post-processing;
+- model, terrain, particle, UI and video draw paths;
+- frame scheduling, fences and lifetime management for sustained rendering;
+- swapchain recreation integrated with pause, resume, resize and surface loss;
+- Win32 and Linux surface integration for `xrRenderVK`;
+- Vulkan selection as an engine gameplay renderer.
 
-1. `xrRenderVK` owns Vulkan objects only. Game and renderer-generation code
-   must not contain Android/Win32/X11 Vulkan branches.
-2. SDL supplies the native window and creates the `VkSurfaceKHR`; all later
-   instance/device/swapchain/resource code is common.
-3. Shaders have one source path. Existing HLSL plus engine defines is compiled
-   to SPIR-V in memory, reflected for bindings, and cached by source, includes,
-   defines, compiler version, and target capabilities. No `shaders/vk` asset
-   fork is allowed.
-4. GPU selection uses queried Vulkan features, formats, limits, and extensions.
-   Unsupported devices receive a precise requirement report. No vendor or
-   model allowlist is allowed.
-5. Surface loss, resize, rotation, pause/resume, and `VK_ERROR_OUT_OF_DATE_KHR`
-   recreate only swapchain-dependent objects. Game state and long-lived GPU
-   resources survive when the device remains valid.
-6. Packed PC resource formats and shader semantics are preserved. Any format
-   expansion or transcoding happens in engine-owned memory.
+Until those items exist, documentation and launcher text must use the words
+"probe" or "smoke test", not "Vulkan renderer" without qualification.
 
-## Delivery gates
+## Required architecture
 
-| Gate | Required result |
-|---|---|
-| VK0: platform bootstrap | The same source creates instance, physical/logical device, queues, SDL surface, and swapchain on Android, Linux, and Windows; reports missing features clearly |
-| VK1: shader pipeline | Existing HLSL includes/defines compile to SPIR-V with reflection and deterministic cache invalidation; a mod override follows the same path |
-| VK2: backend primitives | Vertex/index/constant/storage buffers, textures, samplers, render targets, descriptors, graphics/compute pipelines, queries, and barriers pass validation |
-| VK3: renderer integration | UI, static geometry, models, particles, deferred G-buffer, lighting, shadows, post-processing, and video paths render without resource edits |
-| VK4: lifecycle | Repeated pause/resume, focus loss, resize, and swapchain recreation do not freeze, black-screen, leak, or restart the game |
-| VK5: compatibility | Clean PC resources for CoP, CS, and SoC mode plus representative shader/texture mods run from read-only directories on all three platforms |
-| VK6: release | Validation layers are clean in debug builds; release builds include capability diagnostics, reproducible shaders, and cross-platform CI artifacts |
+The eventual backend should keep these constraints:
 
-## Minimum-capability policy
+1. `xrRenderVK` owns Vulkan objects; platform code only supplies a window and
+   surface.
+2. Existing game and mod shader sources remain the source of truth. Shader
+   conversion must not require a parallel `shaders/vk` resource tree.
+3. Resource formats are preserved on disk. Unsupported formats may be expanded
+   in memory.
+4. Feature selection is based on queried limits, formats and extensions, not a
+   GPU-name allowlist.
+5. Image and buffer transitions are centralized instead of being added as
+   one-off barriers in individual passes.
 
-The minimum version and feature set must be derived from the first complete
-render pass set, not guessed from a single test triangle. The probe records at
-least API version, queue families, swapchain support, descriptor and attachment
-limits, texture formats/compression, geometry/tessellation support, and shader
-numeric features. Optional effects are enabled by capability; a feature used by
-core resources either has an engine fallback or becomes an explicit launch
-requirement.
+## Next implementation steps
 
-## Migration order
+Work should proceed in dependencies-first order:
 
-- First isolate API-neutral render resource descriptions and shader reflection
-  from the current GL/DX implementation.
-- Add a validation-enabled Vulkan smoke executable that uses the future backend
-  objects, not a parallel sample implementation.
-- Port resource management and the UI/static passes before deferred lighting.
-- Introduce render-pass/resource dependency tracking before the full deferred
-  pipeline so barriers are generated centrally rather than patched per GPU.
-- Keep GLES available during development and remove no working backend.
+1. move the Android-only probe onto an API-neutral `xrRenderVK` frame context;
+2. add buffer allocation, descriptor management and frame synchronization;
+3. add the HLSL-to-SPIR-V compiler and reflection cache;
+4. render a normal engine UI/static-geometry pass through Vulkan;
+5. port deferred targets, lighting, shadows and post-processing;
+6. integrate swapchain recreation and Android lifecycle handling;
+7. add Windows and Linux surfaces and CI coverage;
+8. remove the GLES fallback only after complete levels and representative mods
+   run through Vulkan.
 
-Version 0.9.0 adds an Android VK0 bring-up probe. The probe dynamically loads
-`libvulkan.so`, creates the SDL-provided Android surface, selects a graphics
-queue with swapchain support, creates a swapchain, acquires an image and
-presents it through the selected queue. The launcher exposes this as “Vulkan + GLES
-fallback”; gameplay remains on the proven GLES renderer when the device or
-SDL build does not provide Vulkan. Gates VK1–VK6 are intentionally not claimed
-complete until the probe is replaced by the common `xrRenderVK` backend.
-
-Version 0.9.8 also runs that probe when Vulkan is selected for gameplay and
-logs the physical device, Vulkan/driver versions, queue, device-local memory,
-descriptor/attachment limits, BC/ETC2/ASTC support and the color/depth formats
-needed by the deferred path. Gameplay still falls back explicitly to GLES;
-these diagnostics narrow VK1/VK2 implementation decisions but do not satisfy
-those gates.
-
-Version 0.9.25 adds a Vulkan-specific DDS decoder for two-dimensional game
-textures. It reads the original virtual filesystem bytes, maps BC1/BC2/BC3
-and RGBA/BGRA formats, expands BC textures when the Vulkan device cannot sample
-BC, and produces aligned mip upload regions. The probe checks one available
-game texture against the device's sampled-image format support. Shader pipelines and gameplay rendering remain future VK2/VK3 work.
-
-Version 0.9.26 uploads a supported game DDS through a Vulkan staging buffer
-into device-local image memory, transitions its layouts, and creates a sampled
-image view. This Vulkan-only resource path is exercised by the probe when
-Vulkan is selected; the gameplay draw pipeline remains on GLES.
-
-The DDS resource path also handles complete six-face cubemaps and preserves
-sRGB formats, including software BC decoding. Image allocation, copy regions,
-barriers and views cover every face and mip without GL dependencies. DX10 DDS
-headers validate resource dimension and cube flags separately. This resource
-support does not complete the shader, scene or gameplay integration gates.
-
-Version 0.9.45 centralizes whole-image layout and access transitions in
-`ImageStateTracker`. Texture uploads now use the same tracked transitions from
-undefined to transfer destination to shader sampled, with tests checking the
-generated Vulkan barrier masks and layouts. The tracker is currently scoped to
-one externally synchronized graphics queue and whole-image ranges; it does not
-yet provide render-graph scheduling, cross-queue ownership transfers, or a
-gameplay draw pipeline.
+Useful host tests live in `tests/vulkan_dds.cpp` and
+`tests/vulkan_image_state.cpp`. Device validation still requires the launcher's
+Vulkan smoke test on real Android hardware. A successful one-frame probe does
+not close any of the gameplay items above.
