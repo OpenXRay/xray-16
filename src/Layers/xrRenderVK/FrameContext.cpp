@@ -1,0 +1,558 @@
+#include "FrameContext.h"
+
+#include <algorithm>
+#include <limits>
+
+namespace xray::render::vulkan
+{
+namespace
+{
+bool complete(const FrameDispatch& vk)
+{
+    return vk.get_surface_capabilities && vk.get_surface_formats && vk.create_swapchain && vk.destroy_swapchain &&
+        vk.get_swapchain_images && vk.acquire_next_image && vk.queue_present && vk.create_image_view &&
+        vk.destroy_image_view && vk.create_render_pass && vk.destroy_render_pass && vk.create_framebuffer &&
+        vk.destroy_framebuffer && vk.create_command_pool && vk.destroy_command_pool && vk.allocate_command_buffers &&
+        vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
+        vk.end_command_buffer && vk.create_semaphore && vk.destroy_semaphore && vk.create_fence && vk.destroy_fence &&
+        vk.wait_for_fences && vk.reset_fences && vk.queue_submit && vk.device_wait_idle;
+}
+
+template <typename T, typename Query>
+bool enumerate(Query query, std::vector<T>& values)
+{
+    for (unsigned attempt = 0; attempt != 3; ++attempt)
+    {
+        uint32_t count = 0;
+        if (query(&count, nullptr) != VK_SUCCESS || count == 0)
+            return false;
+        values.resize(count);
+        const VkResult result = query(&count, values.data());
+        if (result == VK_SUCCESS)
+        {
+            values.resize(count);
+            return !values.empty();
+        }
+        if (result != VK_INCOMPLETE)
+            return false;
+    }
+    return false;
+}
+
+template <typename T>
+T load_instance_proc(VkInstance instance, PFN_vkGetInstanceProcAddr get_proc, const char* name)
+{
+    return reinterpret_cast<T>(get_proc(instance, name));
+}
+
+template <typename T>
+T load_device_proc(VkDevice device, PFN_vkGetDeviceProcAddr get_proc, const char* name)
+{
+    return reinterpret_cast<T>(get_proc(device, name));
+}
+}
+
+bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_instance_proc,
+    VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc, FrameDispatch& dispatch, std::string& error)
+{
+    dispatch = {};
+    if (!instance || !get_instance_proc || !device || !get_device_proc)
+    {
+        error = "Vulkan frame dispatch requires valid instance and device handles";
+        return false;
+    }
+
+#define XRAY_LOAD_INSTANCE(member, name) \
+    dispatch.member = load_instance_proc<decltype(dispatch.member)>(instance, get_instance_proc, name)
+#define XRAY_LOAD_DEVICE(member, name) \
+    dispatch.member = load_device_proc<decltype(dispatch.member)>(device, get_device_proc, name)
+    XRAY_LOAD_INSTANCE(get_surface_capabilities, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+    XRAY_LOAD_INSTANCE(get_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+    XRAY_LOAD_DEVICE(create_swapchain, "vkCreateSwapchainKHR");
+    XRAY_LOAD_DEVICE(destroy_swapchain, "vkDestroySwapchainKHR");
+    XRAY_LOAD_DEVICE(get_swapchain_images, "vkGetSwapchainImagesKHR");
+    XRAY_LOAD_DEVICE(acquire_next_image, "vkAcquireNextImageKHR");
+    XRAY_LOAD_DEVICE(queue_present, "vkQueuePresentKHR");
+    XRAY_LOAD_DEVICE(create_image_view, "vkCreateImageView");
+    XRAY_LOAD_DEVICE(destroy_image_view, "vkDestroyImageView");
+    XRAY_LOAD_DEVICE(create_render_pass, "vkCreateRenderPass");
+    XRAY_LOAD_DEVICE(destroy_render_pass, "vkDestroyRenderPass");
+    XRAY_LOAD_DEVICE(create_framebuffer, "vkCreateFramebuffer");
+    XRAY_LOAD_DEVICE(destroy_framebuffer, "vkDestroyFramebuffer");
+    XRAY_LOAD_DEVICE(create_command_pool, "vkCreateCommandPool");
+    XRAY_LOAD_DEVICE(destroy_command_pool, "vkDestroyCommandPool");
+    XRAY_LOAD_DEVICE(allocate_command_buffers, "vkAllocateCommandBuffers");
+    XRAY_LOAD_DEVICE(reset_command_buffer, "vkResetCommandBuffer");
+    XRAY_LOAD_DEVICE(begin_command_buffer, "vkBeginCommandBuffer");
+    XRAY_LOAD_DEVICE(cmd_begin_render_pass, "vkCmdBeginRenderPass");
+    XRAY_LOAD_DEVICE(cmd_end_render_pass, "vkCmdEndRenderPass");
+    XRAY_LOAD_DEVICE(end_command_buffer, "vkEndCommandBuffer");
+    XRAY_LOAD_DEVICE(create_semaphore, "vkCreateSemaphore");
+    XRAY_LOAD_DEVICE(destroy_semaphore, "vkDestroySemaphore");
+    XRAY_LOAD_DEVICE(create_fence, "vkCreateFence");
+    XRAY_LOAD_DEVICE(destroy_fence, "vkDestroyFence");
+    XRAY_LOAD_DEVICE(wait_for_fences, "vkWaitForFences");
+    XRAY_LOAD_DEVICE(reset_fences, "vkResetFences");
+    XRAY_LOAD_DEVICE(queue_submit, "vkQueueSubmit");
+    XRAY_LOAD_DEVICE(device_wait_idle, "vkDeviceWaitIdle");
+#undef XRAY_LOAD_DEVICE
+#undef XRAY_LOAD_INSTANCE
+
+    if (!complete(dispatch))
+    {
+        dispatch = {};
+        error = "required Vulkan frame procedures are unavailable";
+        return false;
+    }
+    error.clear();
+    return true;
+}
+
+FrameContext::~FrameContext()
+{
+    destroy();
+}
+
+bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
+    VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
+    const FrameDispatch& dispatch, std::string& error)
+{
+    destroy();
+    if (!physical_device || !device || !surface || !queue || queue_family == UINT32_MAX)
+    {
+        error = "Vulkan frame context requires valid device, surface and queue handles";
+        return false;
+    }
+    if (!complete(dispatch))
+    {
+        error = "Vulkan frame context dispatch is incomplete";
+        return false;
+    }
+
+    m_device = device;
+    m_queue = queue;
+    m_queue_family = queue_family;
+    m_vk = dispatch;
+
+    if (!create_swapchain(physical_device, surface, requested_extent, error) ||
+        !create_render_targets(error) || !create_commands(error) || !create_sync(error))
+    {
+        destroy();
+        return false;
+    }
+    error.clear();
+    return true;
+}
+
+bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
+    VkExtent2D requested_extent, std::string& error)
+{
+    VkSurfaceCapabilitiesKHR capabilities{};
+    if (m_vk.get_surface_capabilities(physical_device, surface, &capabilities) != VK_SUCCESS)
+    {
+        error = "could not query Vulkan surface capabilities";
+        return false;
+    }
+    if (!(capabilities.supportedUsageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
+    {
+        error = "Vulkan surface does not support color attachments";
+        return false;
+    }
+
+    std::vector<VkSurfaceFormatKHR> formats;
+    if (!enumerate<VkSurfaceFormatKHR>([&](uint32_t* count, VkSurfaceFormatKHR* values)
+        { return m_vk.get_surface_formats(physical_device, surface, count, values); }, formats))
+    {
+        error = "Vulkan surface has no supported formats";
+        return false;
+    }
+
+    VkSurfaceFormatKHR surface_format = formats.front();
+    if (formats.size() == 1 && formats.front().format == VK_FORMAT_UNDEFINED)
+    {
+        surface_format.format = VK_FORMAT_B8G8R8A8_UNORM;
+        surface_format.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    }
+    else
+    {
+        const auto preferred = std::find_if(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format)
+        {
+            return format.format == VK_FORMAT_B8G8R8A8_UNORM &&
+                format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        });
+        if (preferred != formats.end())
+            surface_format = *preferred;
+    }
+
+    if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+        m_extent = capabilities.currentExtent;
+    else
+    {
+        m_extent.width = std::clamp(requested_extent.width,
+            capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        m_extent.height = std::clamp(requested_extent.height,
+            capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+    }
+    if (!m_extent.width || !m_extent.height)
+    {
+        error = "Vulkan surface has zero extent";
+        return false;
+    }
+
+    VkCompositeAlphaFlagBitsKHR composite_alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    if (!(capabilities.supportedCompositeAlpha & composite_alpha))
+    {
+        constexpr std::array<VkCompositeAlphaFlagBitsKHR, 3> alternatives{
+            VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
+            VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
+            VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR
+        };
+        const auto supported = std::find_if(alternatives.begin(), alternatives.end(), [&](auto candidate)
+        {
+            return capabilities.supportedCompositeAlpha & candidate;
+        });
+        if (supported == alternatives.end())
+        {
+            error = "Vulkan surface has no supported composite alpha mode";
+            return false;
+        }
+        composite_alpha = *supported;
+    }
+
+    uint32_t image_count = capabilities.minImageCount;
+    if (image_count < std::numeric_limits<uint32_t>::max())
+        ++image_count;
+    if (capabilities.maxImageCount && image_count > capabilities.maxImageCount)
+        image_count = capabilities.maxImageCount;
+
+    VkSwapchainCreateInfoKHR info{};
+    info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    info.surface = surface;
+    info.minImageCount = image_count;
+    info.imageFormat = surface_format.format;
+    info.imageColorSpace = surface_format.colorSpace;
+    info.imageExtent = m_extent;
+    info.imageArrayLayers = 1;
+    info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    info.preTransform = capabilities.currentTransform;
+    info.compositeAlpha = composite_alpha;
+    info.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    info.clipped = VK_TRUE;
+    if (m_vk.create_swapchain(m_device, &info, nullptr, &m_swapchain) != VK_SUCCESS)
+    {
+        error = "vkCreateSwapchainKHR failed";
+        return false;
+    }
+    m_format = surface_format.format;
+
+    if (!enumerate<VkImage>([&](uint32_t* count, VkImage* values)
+        { return m_vk.get_swapchain_images(m_device, m_swapchain, count, values); }, m_images))
+    {
+        error = "could not enumerate Vulkan swapchain images";
+        return false;
+    }
+    return true;
+}
+
+bool FrameContext::create_render_targets(std::string& error)
+{
+    VkAttachmentDescription attachment{};
+    attachment.format = m_format;
+    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &color;
+
+    std::array<VkSubpassDependency, 2> dependencies{};
+    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[0].dstSubpass = 0;
+    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependencies[1].srcSubpass = 0;
+    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    VkRenderPassCreateInfo render_pass_info{};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    render_pass_info.attachmentCount = 1;
+    render_pass_info.pAttachments = &attachment;
+    render_pass_info.subpassCount = 1;
+    render_pass_info.pSubpasses = &subpass;
+    render_pass_info.dependencyCount = static_cast<uint32_t>(dependencies.size());
+    render_pass_info.pDependencies = dependencies.data();
+    if (m_vk.create_render_pass(m_device, &render_pass_info, nullptr, &m_render_pass) != VK_SUCCESS)
+    {
+        error = "vkCreateRenderPass failed";
+        return false;
+    }
+
+    m_image_views.reserve(m_images.size());
+    m_framebuffers.reserve(m_images.size());
+    for (VkImage image : m_images)
+    {
+        VkImageViewCreateInfo view_info{};
+        view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_info.image = image;
+        view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_info.format = m_format;
+        view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view_info.subresourceRange.levelCount = 1;
+        view_info.subresourceRange.layerCount = 1;
+        VkImageView view = VK_NULL_HANDLE;
+        if (m_vk.create_image_view(m_device, &view_info, nullptr, &view) != VK_SUCCESS)
+        {
+            error = "vkCreateImageView failed";
+            return false;
+        }
+        m_image_views.push_back(view);
+
+        VkFramebufferCreateInfo framebuffer_info{};
+        framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_info.renderPass = m_render_pass;
+        framebuffer_info.attachmentCount = 1;
+        framebuffer_info.pAttachments = &m_image_views.back();
+        framebuffer_info.width = m_extent.width;
+        framebuffer_info.height = m_extent.height;
+        framebuffer_info.layers = 1;
+        VkFramebuffer framebuffer = VK_NULL_HANDLE;
+        if (m_vk.create_framebuffer(m_device, &framebuffer_info, nullptr, &framebuffer) != VK_SUCCESS)
+        {
+            error = "vkCreateFramebuffer failed";
+            return false;
+        }
+        m_framebuffers.push_back(framebuffer);
+    }
+    return true;
+}
+
+bool FrameContext::create_commands(std::string& error)
+{
+    VkCommandPoolCreateInfo pool_info{};
+    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    pool_info.queueFamilyIndex = m_queue_family;
+    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    if (m_vk.create_command_pool(m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
+    {
+        error = "vkCreateCommandPool failed";
+        return false;
+    }
+
+    m_commands.resize(m_images.size());
+    VkCommandBufferAllocateInfo allocate_info{};
+    allocate_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocate_info.commandPool = m_command_pool;
+    allocate_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocate_info.commandBufferCount = static_cast<uint32_t>(m_commands.size());
+    if (m_vk.allocate_command_buffers(m_device, &allocate_info, m_commands.data()) != VK_SUCCESS)
+    {
+        error = "vkAllocateCommandBuffers failed";
+        return false;
+    }
+
+    return true;
+}
+
+bool FrameContext::create_sync(std::string& error)
+{
+    VkSemaphoreCreateInfo semaphore_info{};
+    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    VkFenceCreateInfo fence_info{};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    for (uint32_t frame = 0; frame < FramesInFlight; ++frame)
+    {
+        if (m_vk.create_semaphore(m_device, &semaphore_info, nullptr, &m_image_available[frame]) != VK_SUCCESS ||
+            m_vk.create_fence(m_device, &fence_info, nullptr, &m_frame_fences[frame]) != VK_SUCCESS)
+        {
+            error = "could not create Vulkan frame synchronization objects";
+            return false;
+        }
+    }
+
+    m_render_finished.resize(m_images.size());
+    for (VkSemaphore& semaphore : m_render_finished)
+        if (m_vk.create_semaphore(m_device, &semaphore_info, nullptr, &semaphore) != VK_SUCCESS)
+        {
+            error = "could not create Vulkan presentation semaphores";
+            return false;
+        }
+    m_image_fences.resize(m_images.size(), VK_NULL_HANDLE);
+    return true;
+}
+
+bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error)
+{
+    status = FrameStatus::Presented;
+    if (!m_device || !m_swapchain)
+    {
+        error = "Vulkan frame context is not initialized";
+        return false;
+    }
+
+    VkFence frame_fence = m_frame_fences[m_current_frame];
+    if (m_vk.wait_for_fences(m_device, 1, &frame_fence, VK_TRUE, UINT64_MAX) != VK_SUCCESS)
+    {
+        error = "could not wait for Vulkan frame fence";
+        return false;
+    }
+
+    uint32_t image_index = 0;
+    const VkResult acquire = m_vk.acquire_next_image(m_device, m_swapchain, UINT64_MAX,
+        m_image_available[m_current_frame], VK_NULL_HANDLE, &image_index);
+    if (acquire == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        status = FrameStatus::RecreateRequired;
+        error.clear();
+        return true;
+    }
+    if (acquire != VK_SUCCESS && acquire != VK_SUBOPTIMAL_KHR)
+    {
+        error = "vkAcquireNextImageKHR failed";
+        return false;
+    }
+    if (image_index >= m_commands.size())
+    {
+        error = "Vulkan returned an invalid swapchain image index";
+        return false;
+    }
+
+    VkFence image_fence = m_image_fences[image_index];
+    if (image_fence && image_fence != frame_fence &&
+        m_vk.wait_for_fences(m_device, 1, &image_fence, VK_TRUE, UINT64_MAX) != VK_SUCCESS)
+    {
+        error = "could not wait for the previous Vulkan image submission";
+        return false;
+    }
+    VkCommandBuffer command = m_commands[image_index];
+    if (m_vk.reset_command_buffer(command, 0) != VK_SUCCESS)
+    {
+        error = "could not reset Vulkan command buffer";
+        return false;
+    }
+    VkCommandBufferBeginInfo begin_info{};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    if (m_vk.begin_command_buffer(command, &begin_info) != VK_SUCCESS)
+    {
+        error = "vkBeginCommandBuffer failed";
+        return false;
+    }
+    VkClearValue clear_value{};
+    clear_value.color = clear;
+    VkRenderPassBeginInfo render_info{};
+    render_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    render_info.renderPass = m_render_pass;
+    render_info.framebuffer = m_framebuffers[image_index];
+    render_info.renderArea.extent = m_extent;
+    render_info.clearValueCount = 1;
+    render_info.pClearValues = &clear_value;
+    m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+    m_vk.cmd_end_render_pass(command);
+    if (m_vk.end_command_buffer(command) != VK_SUCCESS)
+    {
+        error = "vkEndCommandBuffer failed";
+        return false;
+    }
+    if (m_vk.reset_fences(m_device, 1, &frame_fence) != VK_SUCCESS)
+    {
+        error = "could not reset Vulkan frame fence";
+        return false;
+    }
+
+    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkSubmitInfo submit{};
+    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.waitSemaphoreCount = 1;
+    submit.pWaitSemaphores = &m_image_available[m_current_frame];
+    submit.pWaitDstStageMask = &wait_stage;
+    submit.commandBufferCount = 1;
+    submit.pCommandBuffers = &command;
+    submit.signalSemaphoreCount = 1;
+    submit.pSignalSemaphores = &m_render_finished[image_index];
+    if (m_vk.queue_submit(m_queue, 1, &submit, frame_fence) != VK_SUCCESS)
+    {
+        error = "vkQueueSubmit failed";
+        return false;
+    }
+    m_image_fences[image_index] = frame_fence;
+
+    VkPresentInfoKHR present{};
+    present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present.waitSemaphoreCount = 1;
+    present.pWaitSemaphores = &m_render_finished[image_index];
+    present.swapchainCount = 1;
+    present.pSwapchains = &m_swapchain;
+    present.pImageIndices = &image_index;
+    const VkResult result = m_vk.queue_present(m_queue, &present);
+    m_current_frame = (m_current_frame + 1) % FramesInFlight;
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        error = "vkQueuePresentKHR failed";
+        return false;
+    }
+    if (acquire == VK_SUBOPTIMAL_KHR || result != VK_SUCCESS)
+        status = FrameStatus::RecreateRequired;
+    error.clear();
+    return true;
+}
+
+void FrameContext::destroy()
+{
+    if (m_device && m_vk.device_wait_idle)
+        m_vk.device_wait_idle(m_device);
+    if (m_device)
+    {
+        for (VkFramebuffer framebuffer : m_framebuffers)
+            if (framebuffer)
+                m_vk.destroy_framebuffer(m_device, framebuffer, nullptr);
+        for (VkImageView view : m_image_views)
+            if (view)
+                m_vk.destroy_image_view(m_device, view, nullptr);
+        if (m_render_pass)
+            m_vk.destroy_render_pass(m_device, m_render_pass, nullptr);
+        if (m_command_pool)
+            m_vk.destroy_command_pool(m_device, m_command_pool, nullptr);
+        for (VkSemaphore semaphore : m_render_finished)
+            if (semaphore)
+                m_vk.destroy_semaphore(m_device, semaphore, nullptr);
+        for (VkSemaphore semaphore : m_image_available)
+            if (semaphore)
+                m_vk.destroy_semaphore(m_device, semaphore, nullptr);
+        for (VkFence fence : m_frame_fences)
+            if (fence)
+                m_vk.destroy_fence(m_device, fence, nullptr);
+        if (m_swapchain)
+            m_vk.destroy_swapchain(m_device, m_swapchain, nullptr);
+    }
+    m_device = VK_NULL_HANDLE;
+    m_queue = VK_NULL_HANDLE;
+    m_queue_family = UINT32_MAX;
+    m_vk = {};
+    m_swapchain = VK_NULL_HANDLE;
+    m_render_pass = VK_NULL_HANDLE;
+    m_command_pool = VK_NULL_HANDLE;
+    m_extent = {};
+    m_format = VK_FORMAT_UNDEFINED;
+    m_images.clear();
+    m_image_views.clear();
+    m_framebuffers.clear();
+    m_commands.clear();
+    m_render_finished.clear();
+    m_image_available = {};
+    m_frame_fences = {};
+    m_image_fences.clear();
+    m_current_frame = 0;
+}
+}

@@ -9,7 +9,8 @@ selects the OpenGL ES backend for gameplay.
 | Part | Source | Current behavior |
 |---|---|---|
 | Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
-| Android surface and swapchain probe | `src/xrEngine/android_vulkan_smoke.cpp` | Uses SDL to create the surface and swapchain, records a clear render pass, submits it and presents one image |
+| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Takes a platform surface, creates the swapchain and clear pass, tracks two frames in flight, and reports when recreation is needed |
+| Android surface probe | `src/xrEngine/android_vulkan_smoke.cpp` | Uses SDL to create the window and surface, then exercises the shared frame context |
 | DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
 | Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
 | Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
@@ -27,7 +28,7 @@ compatibility guarantee for gameplay.
 - render targets for the deferred G-buffer, lighting, shadows and
   post-processing;
 - model, terrain, particle, UI and video draw paths;
-- frame scheduling, fences and lifetime management for sustained rendering;
+- recording engine draw commands and managing engine resource lifetimes;
 - swapchain recreation integrated with pause, resume, resize and surface loss;
 - Win32 and Linux surface integration for `xrRenderVK`;
 - Vulkan selection as an engine gameplay renderer.
@@ -54,10 +55,10 @@ The eventual backend should keep these constraints:
 
 Work should proceed in dependencies-first order:
 
-1. move the Android-only probe onto an API-neutral `xrRenderVK` frame context;
-2. add buffer allocation, descriptor management and frame synchronization;
-3. add the HLSL-to-SPIR-V compiler and reflection cache;
-4. render a normal engine UI/static-geometry pass through Vulkan;
+1. expose frame command recording to the engine renderer;
+2. add the HLSL-to-SPIR-V compiler and reflection cache;
+3. add GPU buffers, descriptor allocation and graphics pipelines;
+4. render an engine UI/static-geometry pass through Vulkan;
 5. port deferred targets, lighting, shadows and post-processing;
 6. integrate swapchain recreation and Android lifecycle handling;
 7. add Windows and Linux surfaces and CI coverage;
