@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'org.openxray.app'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'org.openxray.stalker'
+        minSdk 26
+        targetSdk 36
+        versionCode 38
+        versionName '0.9.24'
+
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}

@@ -94,9 +94,24 @@ void CRender::Calculate()
     auto& dsgraph_main = get_imm_context();
 
     // Detect camera-sector
-    if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
+    if (last_sector_id == IRender_Sector::INVALID_SECTOR_ID ||
+        !Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L))
     {
         const auto sector_id = dsgraph_main.detect_sector(Device.vCameraPosition);
+#if defined(XR_PLATFORM_ANDROID)
+        static u32 failedSectorDetections = 0;
+        static u32 lastSectorReport = 0;
+        if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+            ++failedSectorDetections;
+        if (Device.dwTimeContinual - lastSectorReport >= 5000)
+        {
+            Msg("[sector-detect] camera=%u candidate=%u failed=%u position=(%.2f,%.2f,%.2f)",
+                static_cast<u32>(last_sector_id), static_cast<u32>(sector_id), failedSectorDetections,
+                Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
+            failedSectorDetections = 0;
+            lastSectorReport = Device.dwTimeContinual;
+        }
+#endif
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             if (sector_id != last_sector_id)

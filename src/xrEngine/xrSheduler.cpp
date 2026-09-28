@@ -411,8 +411,23 @@ void CSheduler::ProcessStep()
         }
     }
 
-    // Push "processed" back
-    while (ItemsProcessed.size())
+    // Rebuilding the heap is cheaper than a push_heap per object when a
+    // substantial fraction of scheduled objects ran in the same frame.
+    // Both paths preserve the heap's due-time ordering and process each
+    // object at most once per frame.
+#if defined(XR_PLATFORM_ANDROID)
+    if (ItemsProcessed.size() > 32 && ItemsProcessed.size() > Items.size() / 4)
+    {
+        Items.reserve(Items.size() + ItemsProcessed.size());
+        for (auto& processed : ItemsProcessed)
+            Items.emplace_back(std::move(processed));
+        ItemsProcessed.clear();
+        std::make_heap(Items.begin(), Items.end());
+    }
+    else while (!ItemsProcessed.empty())
+#else
+    while (!ItemsProcessed.empty())
+#endif
     {
         Push(ItemsProcessed.back());
         ItemsProcessed.pop_back();
@@ -425,6 +440,9 @@ void CSheduler::ProcessStep()
 void CSheduler::Update()
 {
     ZoneScoped;
+#if defined(XR_PLATFORM_ANDROID)
+    const u64 updateStart = CPU::QPC();
+#endif
 
     // Initialize
     stats.Update.Begin();
@@ -477,4 +495,24 @@ void CSheduler::Update()
     isSheduleInProgress = false;
     internal_Registration();
     stats.Update.End();
+#if defined(XR_PLATFORM_ANDROID)
+    static u64 updateTotal = 0;
+    static u64 updateMaximum = 0;
+    static u32 updateSamples = 0;
+    static u32 lastReport = 0;
+    const u64 elapsed = CPU::QPC() - updateStart;
+    updateTotal += elapsed;
+    updateMaximum = std::max(updateMaximum, elapsed);
+    ++updateSamples;
+    if (Device.dwTimeContinual - lastReport >= 5000 && CPU::qpc_freq)
+    {
+        const double tickToMs = 1000.0 / CPU::qpc_freq;
+        Msg("[update-trace] scheduler=%.2fms max=%.2fms samples=%u scheduled=%zu realtime=%zu",
+            tickToMs * updateTotal / updateSamples, tickToMs * updateMaximum,
+            updateSamples, Items.size(), ItemsRT.size());
+        updateTotal = updateMaximum = 0;
+        updateSamples = 0;
+        lastReport = Device.dwTimeContinual;
+    }
+#endif
 }

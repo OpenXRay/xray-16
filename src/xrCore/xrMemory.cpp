@@ -11,6 +11,9 @@
 #elif defined(XR_PLATFORM_BSD)
 #include <sys/time.h>
 #include <sys/resource.h>
+#elif defined(XR_PLATFORM_ANDROID)
+#include <sys/time.h>
+#include <sys/resource.h>
 #elif defined(XR_PLATFORM_HAIKU)
 #include <OS.h>
 #include <sys/time.h>
@@ -159,10 +162,15 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_ANDROID)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
-    return (size_t)ru.ru_maxrss;
+    // Linux and Android report ru_maxrss in KiB; callers expect bytes.
+    return static_cast<size_t>(ru.ru_maxrss) * 1024;
+#elif defined(XR_PLATFORM_APPLE)
+    struct rusage ru;
+    getrusage(RUSAGE_SELF, &ru);
+    return static_cast<size_t>(ru.ru_maxrss);
 #elif defined(XR_PLATFORM_HAIKU)
     system_info info;
     get_system_info(&info);

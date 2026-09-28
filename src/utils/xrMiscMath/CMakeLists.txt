@@ -16,7 +16,7 @@ target_include_directories(xrMiscMath
 )
 
 set_target_properties(xrMiscMath PROPERTIES
-    POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
+    POSITION_INDEPENDENT_CODE ${XRAY_STATIC_PIC}
 )
 
 target_precompile_headers(xrMiscMath

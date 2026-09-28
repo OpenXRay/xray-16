@@ -11,6 +11,9 @@
 #include "tss.h"
 #include "Blender.h"
 #include "Blender_Recorder.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/x_ray.h"
+#endif
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -364,8 +367,31 @@ void CResourceManager::DeferredUpload()
 #if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
+    CTimer uploadTimer;
+    uploadTimer.Start();
+    const size_t textureCount = m_textures.size();
+    size_t textureIndex = 0;
+    Msg("[load-trace] deferred-textures begin count=%zu mem=%uK", textureCount, Memory.mem_usage() / 1024);
     for (auto& texture : m_textures)
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        string512 androidLoadContext;
+        xr_sprintf(androidLoadContext, "deferred-texture %zu/%zu %s", textureIndex + 1,
+            textureCount, texture.first);
+        android_set_load_context(androidLoadContext);
+#endif
+        if ((textureIndex % 32) == 0 || textureIndex + 1 == textureCount)
+            Msg("[load-trace] deferred-textures progress=%zu/%zu elapsed=%llu ms current='%s'",
+                textureIndex + 1, textureCount,
+                static_cast<unsigned long long>(uploadTimer.GetElapsed_ms()), texture.first);
         texture.second->Load();
+        ++textureIndex;
+    }
+    Msg("[load-trace] deferred-textures end count=%zu elapsed=%llu ms mem=%uK", textureCount,
+        static_cast<unsigned long long>(uploadTimer.GetElapsed_ms()), Memory.mem_usage() / 1024);
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_load_context("deferred-textures complete");
+#endif
 #else
 #   error No graphics API selected or enabled!
 #endif

@@ -14,6 +14,10 @@ constexpr pcstr RENDERER_R2_5_MODE = "renderer_r2.5"; // id 3
 constexpr pcstr RENDERER_R3_MODE   = "renderer_r3";   // id 4
 constexpr pcstr RENDERER_R4_MODE   = "renderer_r4";   // id 5
 constexpr pcstr RENDERER_RGL_MODE = "renderer_rgl";   // id 6
+#if defined(XR_PLATFORM_ANDROID)
+constexpr pcstr RENDERER_GLES_MODE = "renderer_gles";       // id 6
+constexpr pcstr RENDERER_VULKAN_MODE = "renderer_vulkan";   // id 7, GLES fallback
+#endif
 
 class RGLRendererModule final : public RendererModule
 {
@@ -38,6 +42,12 @@ public:
         {
 #ifdef XR_PLATFORM_WINDOWS
             modes.emplace_back(RENDERER_RGL_MODE, 6);
+#elif defined(XR_PLATFORM_ANDROID)
+            // Keep both names visible to the standard renderer selector.
+            // Vulkan is currently an opt-in compatibility mode backed by the
+            // proven GLES renderer while native Vulkan work continues.
+            modes.emplace_back(RENDERER_GLES_MODE, 6);
+            modes.emplace_back(RENDERER_VULKAN_MODE, 7);
 #else
             //modes.emplace_back(RENDERER_R2_MODE, 2);
             //modes.emplace_back(RENDERER_R2_5_MODE, 3);
@@ -80,6 +90,10 @@ public:
         case strhash(RENDERER_R3_MODE):
         case strhash(RENDERER_R4_MODE):
         case strhash(RENDERER_RGL_MODE):
+#if defined(XR_PLATFORM_ANDROID)
+        case strhash(RENDERER_GLES_MODE):
+        case strhash(RENDERER_VULKAN_MODE):
+#endif
             ps_r2_advanced_pp = true;
             break;
         }

@@ -227,6 +227,10 @@ target_sources_grouped(
     defines.cpp
     defines.h
     embedded_resources_management.h
+    android_touch_controls.cpp
+    android_touch_controls.h
+    android_vulkan_smoke.cpp
+    android_vulkan_smoke.h
     mp_logging.h
     stdafx.cpp
     stdafx.h
@@ -411,6 +415,7 @@ target_include_directories(xrEngine
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc"
 )

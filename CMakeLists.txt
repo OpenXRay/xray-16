@@ -18,6 +18,14 @@ option(XRAY_USE_LUAJIT   "Use LuaJIT"                 ON)
 option(XRAY_USE_ASAN     "Use AddressSanitizer"       OFF)
 option(XRAY_ENABLE_TRACY "Enable tracy profiler"      OFF)
 
+# The Android SDL activity loads the engine as libmain.so. Static archives
+# linked into that shared object must therefore retain position-independent
+# code even though the normal desktop build keeps BUILD_SHARED_LIBS disabled.
+set(XRAY_STATIC_PIC ${BUILD_SHARED_LIBS})
+if (ANDROID AND XRAY_ANDROID_SHARED)
+    set(XRAY_STATIC_PIC ON)
+endif()
+
 include(XRay.Build)
 include(XRay.Packaging)
 

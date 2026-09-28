@@ -179,6 +179,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
     if (0 == init_counter)
     {
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: entering first initialization");
+#endif
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
         R_ASSERT2(CPU::HasSSE2, "Your CPU must support SSE2.");
 #endif
@@ -200,7 +203,13 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #elif defined(XR_PLATFORM_POSIX)
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: resolving SDL application path");
+#endif
         char* base_path = SDL_GetBasePath();
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: SDL application path resolved");
+#endif
         if (!base_path)
         {
             if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
@@ -210,8 +219,21 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
             else
                 base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
         }
-        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
-        SDL_free(base_path);
+        if (base_path)
+        {
+            SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
+            SDL_free(base_path);
+        }
+        else
+        {
+            // Android can return no base/pref path during an early SDL
+            // bootstrap. Keep Core.Initialize usable instead of passing a
+            // null pointer into SDL_strlcpy.
+            xr_strcpy(ApplicationPath, ".");
+#if defined(XR_PLATFORM_ANDROID)
+            Msg("! [android] SDL did not provide an application path; using current directory");
+#endif
+        }
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -229,7 +251,13 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 #if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #elif defined(XR_PLATFORM_POSIX)
-        getcwd(WorkingPath, sizeof(WorkingPath));
+        if (!getcwd(WorkingPath, sizeof(WorkingPath)))
+        {
+            xr_strcpy(WorkingPath, ApplicationPath);
+#if defined(XR_PLATFORM_ANDROID)
+            Msg("! [android] getcwd failed; using application path as working path");
+#endif
+        }
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -242,13 +270,27 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
 #elif defined(XR_PLATFORM_POSIX)
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: resolving platform identity");
+#endif
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: platform passwd resolved");
+#endif
         if (pw)
         {
-            strncpy(UserName, pw->pw_gecos, sizeof(UserName) - 1);
-            if (UserName[0] == '\0')
-                strncpy(UserName, pw->pw_name, sizeof(UserName) - 1);
+            // Android's passwd record may have a null/empty GECOS field.
+            // Never pass it to strncpy: this happens before the engine log
+            // reaches the renderer and used to cause an opaque SIGSEGV.
+            const char* identity = nullptr;
+            if (pw->pw_gecos && pw->pw_gecos[0] != '\0')
+                identity = pw->pw_gecos;
+            else if (pw->pw_name)
+                identity = pw->pw_name;
+
+            if (identity)
+                xr_strcpy(UserName, sizeof(UserName), identity);
         }
         else
             Msg("! Failed to get user name");
@@ -261,6 +303,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 #   error Select or add implementation for your platform
 #endif
 
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: platform identity resolved");
+#endif
         SanitizeString(UserName);
         SanitizeString(CompName);
 
@@ -270,12 +315,21 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 #endif
 
         Memory._initialize();
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: memory initialized");
+#endif
 
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: CPU initialized");
+#endif
         TaskScheduler = xr_make_unique<TaskManager>();
         TaskScheduler->SpawnThreads();
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: task scheduler initialized");
+#endif
         // xrDebug::Initialize ();
 
         rtc_initialize();
@@ -283,6 +337,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         xr_FS = xr_make_unique<CLocatorAPI>();
 
         xr_EFS = xr_make_unique<EFS_Utils>();
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android] Core.Initialize: complete");
+#endif
         //. R_ASSERT (co_res==S_OK);
     }
     if (init_fs)

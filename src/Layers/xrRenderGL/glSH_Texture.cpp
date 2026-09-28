@@ -14,6 +14,29 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+#if defined(XR_PLATFORM_ANDROID)
+namespace
+{
+void clear_video_texture_errors()
+{
+    while (glGetError() != GL_NO_ERROR)
+    {
+    }
+}
+
+bool check_video_texture_errors(cpcstr operation, cpcstr filename)
+{
+    bool valid = true;
+    for (GLenum error = glGetError(); error != GL_NO_ERROR; error = glGetError())
+    {
+        Msg("! OpenGL ES: 0x%x during %s for video '%s'", error, operation, filename);
+        valid = false;
+    }
+    return valid;
+}
+} // namespace
+#endif
+
 void resptrcode_texture::create(LPCSTR _name)
 {
     _set(RImplementation.Resources->_CreateTexture(_name));
@@ -36,6 +59,8 @@ CTexture::CTexture()
     flags.bUser = false;
     flags.seqCycles = FALSE;
     m_material = 1.0f;
+    m_width = 0;
+    m_height = 0;
     bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
@@ -50,6 +75,13 @@ void CTexture::surface_set(GLenum target, GLuint surf)
 {
     desc = target;
     pSurface = surf;
+}
+
+void CTexture::surface_set(GLenum target, GLuint surf, GLint width, GLint height)
+{
+    surface_set(target, surf);
+    m_width = width;
+    m_height = height;
 }
 
 GLuint CTexture::surface_get() const
@@ -80,20 +112,43 @@ void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
-        u32* pBits;
+        u32* pBits = nullptr;
         u32 _w = pTheora->Width(true);
         u32 _h = pTheora->Height(true);
 
         // Clear and map buffer for writing
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pBuffer);
         CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, _w * _h * 4, nullptr, GL_STREAM_DRAW)); // Invalidate buffer
+#if defined(XR_PLATFORM_ANDROID)
+        CHK_GL(pBits = (u32*)glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, _w * _h * 4,
+            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+#else
         CHK_GL(pBits = (u32*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
+#endif
+        if (!pBits)
+        {
+            Msg("! OpenGL: failed to map the pixel buffer for video texture '%s'", cName.c_str());
+            CHK_GL(glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
+            return;
+        }
 
         // Write to the buffer and copy it to the texture
         int _pos = 0;
         pTheora->DecompressFrame(pBits, 0, _pos);
+#if defined(XR_PLATFORM_ANDROID)
+        // color_rgba is stored as BGRA bytes on little-endian ARM.  GLES 3.0
+        // does not guarantee the desktop GL_BGRA upload format, so swizzle
+        // the mapped frame to the core GL_RGBA upload format.
+        u8* pixels = reinterpret_cast<u8*>(pBits);
+        for (u32 pixel = 0, count = _w * _h; pixel < count; ++pixel)
+            std::swap(pixels[pixel * 4], pixels[pixel * 4 + 2]);
+#endif
         CHK_GL(glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
+#if defined(XR_PLATFORM_ANDROID)
+        CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
+#else
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
+#endif
 
         // Unmap the buffer to restore normal texture functionality
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -196,23 +251,50 @@ void CTexture::Load()
             u32 _w = pTheora->Width(false);
             u32 _h = pTheora->Height(false);
 
+#if defined(XR_PLATFORM_ANDROID)
+            clear_video_texture_errors();
+#endif
             glGenBuffers(1, &pBuffer);
             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pBuffer);
             CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, flags.MemoryUsage, nullptr, GL_STREAM_DRAW));
             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_2D, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
-
-            pSurface = pTexture;
-            desc = GL_TEXTURE_2D;
-            GLenum err = glGetError();
-            if (err != GL_NO_ERROR)
+#if defined(XR_PLATFORM_ANDROID)
+            if (!pBuffer || !check_video_texture_errors("pixel buffer allocation", fn))
             {
-                Msg("Invalid video stream: 0x%x", err);
+                if (pBuffer)
+                    glDeleteBuffers(1, &pBuffer);
+                pBuffer = 0;
                 xr_delete(pTheora);
-                pSurface = 0;
+            }
+            else
+#endif
+            {
+                glGenTextures(1, &pTexture);
+                glBindTexture(GL_TEXTURE_2D, pTexture);
+                CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
+
+                pSurface = pTexture;
+                desc = GL_TEXTURE_2D;
+                m_width = static_cast<GLint>(_w);
+                m_height = static_cast<GLint>(_h);
+#if defined(XR_PLATFORM_ANDROID)
+                if (!pTexture || !check_video_texture_errors("video texture allocation", fn))
+#else
+                const GLenum err = glGetError();
+                if (err != GL_NO_ERROR)
+#endif
+                {
+#if !defined(XR_PLATFORM_ANDROID)
+                    Msg("Invalid video stream: 0x%x", err);
+#endif
+                    if (pTexture)
+                        glDeleteTextures(1, &pTexture);
+                    xr_delete(pTheora);
+                    pSurface = 0;
+                    m_width = 0;
+                    m_height = 0;
+                }
             }
         }
     }
@@ -277,7 +359,7 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-                pSurface = RImplementation.texture_load(buffer, mem, desc);
+                pSurface = RImplementation.texture_load(buffer, mem, desc, &m_width, &m_height);
                 if (pSurface)
                 {
                     // pSurface->SetPriority	(PRIORITY_LOW);
@@ -293,7 +375,7 @@ void CTexture::Load()
     {
         // Normal texture
         u32 mem = 0;
-        pSurface = RImplementation.texture_load(cName.c_str(), mem, desc);
+        pSurface = RImplementation.texture_load(cName.c_str(), mem, desc, &m_width, &m_height);
 
         // Calc memory usage and preload into vid-mem
         if (pSurface)
@@ -341,8 +423,10 @@ void CTexture::desc_update()
     if (pSurface && (GL_TEXTURE_2D == desc || GL_TEXTURE_2D_MULTISAMPLE == desc))
     {
         glBindTexture(desc, pSurface);
+#if !defined(XR_PLATFORM_ANDROID)
         CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_WIDTH, &m_width));
         CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_HEIGHT, &m_height));
+#endif
     }
 }
 

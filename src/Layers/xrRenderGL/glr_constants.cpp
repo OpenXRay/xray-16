@@ -23,14 +23,16 @@ static class cl_sampler : public R_constant_setup
 BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     GLuint program = *(GLuint*)_desc;
+    if (!program)
+        return FALSE;
 
     // Get the maximum length of the constant name and allocate a buffer for it
-    GLint maxLength;
+    GLint maxLength{};
     CHK_GL(glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
     GLchar* name = xr_alloc<GLchar>(maxLength + 1); // Null terminator
 
     // Iterate all uniforms and parse the entries for the constant table.
-    GLint uniformCount;
+    GLint uniformCount{};
     CHK_GL(glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount));
 
     for (GLint i = 0; i < uniformCount; i++)

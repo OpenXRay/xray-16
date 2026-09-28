@@ -790,6 +790,11 @@ void R_dsgraph_structure::build_subspace()
 
     if (collect_dynamic_any)
     {
+#if defined(XR_PLATFORM_ANDROID)
+        u32 invalidSectorCount = 0;
+        u32 inactiveSectorCount = 0;
+        u32 homRejectedCount = 0;
+#endif
         // Traverse object database
         g_pGamePersistent->SpatialSpace.q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
 
@@ -839,7 +844,12 @@ void R_dsgraph_structure::build_subspace()
             const auto& data = spatial->GetSpatialData();
             const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+            {
+#if defined(XR_PLATFORM_ANDROID)
+                ++invalidSectorCount;
+#endif
                 continue; // disassociated from S/P structure
+            }
             auto* sector = Sectors[sector_id];
 
             if (collect_lights && (type & STYPE_LIGHTSOURCE))
@@ -859,7 +869,12 @@ void R_dsgraph_structure::build_subspace()
             }
 
             if (PortalTraverser.i_marker != sector->r_marker)
+            {
+#if defined(XR_PLATFORM_ANDROID)
+                ++inactiveSectorCount;
+#endif
                 continue; // inactive (untouched) sector
+            }
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 const CFrustum& view = sector->r_frustums[v_it];
@@ -885,7 +900,12 @@ void R_dsgraph_structure::build_subspace()
                         v_orig.hom_frame = v_copy.hom_frame;
                         v_orig.hom_tested = v_copy.hom_tested;
                         if (!bVisible)
+                        {
+#if defined(XR_PLATFORM_ANDROID)
+                            ++homRejectedCount;
+#endif
                             break; // exit loop on frustums
+                        }
 
                         // update light-vis for selected entity
                         if (o_it == uID_LTRACK && renderable->renderable_ROS())
@@ -911,6 +931,28 @@ void R_dsgraph_structure::build_subspace()
                 }
             }
         }
+
+#if defined(XR_PLATFORM_ANDROID)
+        if (o.is_main_pass)
+        {
+            static u64 invalidTotal = 0, inactiveTotal = 0, homTotal = 0;
+            static u32 frames = 0, lastReport = 0;
+            invalidTotal += invalidSectorCount;
+            inactiveTotal += inactiveSectorCount;
+            homTotal += homRejectedCount;
+            ++frames;
+            if (Device.dwTimeContinual - lastReport >= 5000)
+            {
+                Msg("[object-visibility] camera-sector=%u sectors=%zu frames=%u invalid=%llu inactive=%llu hom=%llu",
+                    static_cast<u32>(o.sector_id), PortalTraverser.r_sectors.size(), frames,
+                    static_cast<unsigned long long>(invalidTotal), static_cast<unsigned long long>(inactiveTotal),
+                    static_cast<unsigned long long>(homTotal));
+                invalidTotal = inactiveTotal = homTotal = 0;
+                frames = 0;
+                lastReport = Device.dwTimeContinual;
+            }
+        }
+#endif
 
         if (g_pGameLevel)
         {

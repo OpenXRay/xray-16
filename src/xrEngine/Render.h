@@ -385,6 +385,7 @@ public:
     //	Device state
     virtual DeviceState GetDeviceState() = 0;
     virtual bool GetForceGPU_REF() = 0;
+    virtual u32 GetCacheStatCalls() = 0;
     virtual u32 GetCacheStatPolys() = 0;
     virtual void OnCameraUpdated() = 0;
     virtual void Begin() = 0;

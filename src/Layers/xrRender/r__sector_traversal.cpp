@@ -36,6 +36,25 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     scissor.depth = 0;
     traverse_sector(i_start, F, scissor);
 
+#if defined(XR_PLATFORM_ANDROID)
+    if (options & VQ_HOM)
+    {
+        static u64 visitedSectors = 0;
+        static u32 traversals = 0;
+        static u32 lastReport = 0;
+        visitedSectors += r_sectors.size();
+        ++traversals;
+        if (Device.dwTimeContinual - lastReport >= 5000)
+        {
+            Msg("[sector-trace] visited=%llu traversals=%u",
+                static_cast<unsigned long long>(visitedSectors), traversals);
+            visitedSectors = 0;
+            traversals = 0;
+            lastReport = Device.dwTimeContinual;
+        }
+    }
+#endif
+
     if (options & VQ_SCISSOR)
     {
         // dbg_sectors					= r_sectors;

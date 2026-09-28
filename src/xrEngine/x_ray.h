@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <array>
+#include <filesystem>
 
 #include "xrEngine/Engine.h"
 
@@ -14,6 +15,14 @@ namespace discord
 class Core;
 }
 
+#if defined(XR_PLATFORM_ANDROID)
+// Installed before the native engine starts so a crash in SDL, GLES setup, or
+// the first renderer call leaves a small async-signal-safe record on disk.
+void android_install_crash_handler();
+void android_engine_log_early(pcstr message);
+void android_set_load_context(pcstr context);
+#endif
+
 // definition
 class ENGINE_API CApplication final
 {
@@ -22,6 +31,11 @@ class ENGINE_API CApplication final
     std::atomic_bool m_should_exit;
 
     SDL_Surface* m_surface;
+    bool m_headless_smoke{};
+    bool m_renderer_smoke{};
+    bool m_renderer_vulkan_smoke{};
+    std::filesystem::path m_headless_root;
+    void* m_renderer_smoke_state{};
 
 private:
     std::mutex m_discord_lock;

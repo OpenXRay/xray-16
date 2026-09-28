@@ -1,0 +1,12 @@
+<resources>
+    <style name="LauncherTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#2E7D32</item>
+        <item name="android:navigationBarColor">#101410</item>
+        <item name="android:statusBarColor">#1B5E20</item>
+    </style>
+    <style name="EngineTheme" parent="android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>

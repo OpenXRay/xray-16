@@ -79,6 +79,7 @@ public:
     [[nodiscard]] ID3DBaseTexture* surface_get() const;
 #elif defined(USE_OGL)
     void surface_set(GLenum target, GLuint surf);
+    void surface_set(GLenum target, GLuint surf, GLint width, GLint height);
     [[nodiscard]] GLuint surface_get() const;
 #else
 #   error No graphics API selected or enabled!

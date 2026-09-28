@@ -2,6 +2,9 @@
 
 #include "Level.h"
 #include "xrEngine/IGame_Persistent.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/x_ray.h"
+#endif
 
 #include "ai_space.h"
 #include "game_cl_base.h"
@@ -199,8 +202,20 @@ void CLevel::ClientSendProfileData()
 #endif
     NET_Packet NP;
     NP.w_begin(M_CREATE_PLAYER_STATE);
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_load_context("client-profile constructing aligned player state");
+    Msg("[load-trace] client-profile state construct begin size=%u align=%u",
+        static_cast<u32>(sizeof(game_PlayerState)), static_cast<u32>(alignof(game_PlayerState)));
+#endif
     game_PlayerState tmp_player_state(NULL);
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[load-trace] client-profile state constructed ptr=%p", static_cast<void*>(&tmp_player_state));
+    android_set_load_context("client-profile exporting player state");
+#endif
     tmp_player_state.net_Export(NP, TRUE);
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_load_context("client-profile sending player state");
+#endif
     SecureSend(NP, net_flags(TRUE, TRUE, TRUE, TRUE));
 }
 
@@ -209,6 +224,9 @@ bool CLevel::net_start_client5()
     if (connected_to_server)
     {
         ZoneScoped;
+        CTimer textureTimer;
+        textureTimer.Start();
+        Msg("[load-trace] client5 begin connected=1 mem=%uK", Memory.mem_usage() / 1024);
 
         // HUD
 
@@ -217,11 +235,31 @@ bool CLevel::net_start_client5()
         {
             g_pGamePersistent->LoadTitle("st_loading_textures");
             GEnv.Render->DeferredLoad(FALSE);
+#if defined(XR_PLATFORM_ANDROID)
+            if (strstr(Core.Params, "-android-lazy-textures"))
+            {
+                // CTexture::apply_load already performs a safe first-bind
+                // load after DeferredLoad(FALSE). Uploading every registered
+                // CoP texture here blocks the SDL thread for minutes and can
+                // exhaust a 32-bit process before the first frame. Mobile
+                // devices instead load only textures actually encountered.
+                Msg("[load-trace] client5 deferred-upload skipped; Android lazy first-bind loading enabled");
+                android_set_load_context("deferred-textures skipped; lazy first-bind enabled");
+            }
+            else
+#endif
+            {
+            Msg("[load-trace] client5 deferred-upload begin total=%llu ms",
+                static_cast<unsigned long long>(textureTimer.GetElapsed_ms()));
             GEnv.Render->ResourcesDeferredUpload();
+            Msg("[load-trace] client5 deferred-upload end elapsed=%llu ms mem=%uK",
+                static_cast<unsigned long long>(textureTimer.GetElapsed_ms()), Memory.mem_usage() / 1024);
+            }
             LL_CheckTextures();
         }
         sended_request_connection_data = FALSE;
         deny_m_spawn = TRUE;
+        Msg("[load-trace] client5 end elapsed=%llu ms", static_cast<unsigned long long>(textureTimer.GetElapsed_ms()));
     }
     return true;
 }
@@ -231,10 +269,21 @@ bool CLevel::net_start_client6()
     if (connected_to_server)
     {
         ZoneScoped;
+        CTimer clientTimer;
+        clientTimer.Start();
+        Msg("[load-trace] client6 begin configured=%d mem=%uK", game_configured ? 1 : 0,
+            Memory.mem_usage() / 1024);
 
         // Sync
+        Msg("[load-trace] client6 synchronize-map begin");
         if (!synchronize_map_data())
+        {
+            Msg("[load-trace] client6 synchronize-map pending elapsed=%llu ms",
+                static_cast<unsigned long long>(clientTimer.GetElapsed_ms()));
             return false;
+        }
+        Msg("[load-trace] client6 synchronize-map end elapsed=%llu ms",
+            static_cast<unsigned long long>(clientTimer.GetElapsed_ms()));
 
         if (!game_configured)
         {
@@ -243,8 +292,13 @@ bool CLevel::net_start_client6()
         }
         if (!GEnv.isDedicatedServer)
         {
+            Msg("[load-trace] client6 hud-load begin");
             pHUD->Load();
+            Msg("[load-trace] client6 hud-load end elapsed=%llu ms",
+                static_cast<unsigned long long>(clientTimer.GetElapsed_ms()));
             pHUD->OnConnected();
+            Msg("[load-trace] client6 hud-connected elapsed=%llu ms",
+                static_cast<unsigned long long>(clientTimer.GetElapsed_ms()));
         }
 
 #ifdef DEBUG
@@ -253,7 +307,10 @@ bool CLevel::net_start_client6()
 
         if (game)
         {
+            Msg("[load-trace] client6 game-connected begin");
             game->OnConnected();
+            Msg("[load-trace] client6 game-connected end elapsed=%llu ms",
+                static_cast<unsigned long long>(clientTimer.GetElapsed_ms()));
             if (game->Type() != eGameIDSingle)
             {
                 m_file_transfer = xr_new<file_transfer::client_site>();
@@ -261,7 +318,26 @@ bool CLevel::net_start_client6()
         }
 
         g_pGamePersistent->LoadTitle("st_client_synchronising");
-        Device.PreCache(60, true);
+#if defined(XR_PLATFORM_ANDROID)
+        if (strstr(Core.Params, "-android-lazy-textures"))
+        {
+            // Keep the loading screen over the normal rotating-camera
+            // pre-cache. This touches only resources visible in the level,
+            // unlike ResourcesDeferredUpload(), and prevents hundreds of DDS
+            // decodes from blocking the first interactive gameplay frames.
+            Msg("[load-trace] client6 Android visible-set precache begin frames=60 mem=%uK",
+                Memory.mem_usage() / 1024);
+            android_set_load_context("client6 visible-set precache scheduled");
+            Device.PreCache(60, true);
+        }
+        else
+#endif
+        {
+            Msg("[load-trace] client6 precache begin frames=60 mem=%uK", Memory.mem_usage() / 1024);
+            Device.PreCache(60, true);
+            Msg("[load-trace] client6 precache scheduled elapsed=%llu ms mem=%uK",
+                static_cast<unsigned long long>(clientTimer.GetElapsed_ms()), Memory.mem_usage() / 1024);
+        }
         net_start_result_total = TRUE;
     }
     else
@@ -270,5 +346,6 @@ bool CLevel::net_start_client6()
     }
 
     g_pGamePersistent->LoadEnd();
+    Msg("[load-trace] client6 end");
     return true;
 }

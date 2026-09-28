@@ -33,6 +33,11 @@ option(LUAJIT_USE_SYSMALLOC "Use the system provided memory allocator (realloc) 
 option(LUAJIT_USE_VALGRIND "This option is required to run LuaJIT under Valgrind. The Valgrind header files must be installed. You should enable debug information, too." OFF)
 option(LUAJIT_USE_GDBJIT "This is the client for the GDB JIT API. GDB 7.0 or higher is required to make use of it. See lj_gdbjit.c for details. Enabling this causes a non-negligible overhead, even when not running under GDB" OFF)
 
+set(LUAJIT_HOST_C_COMPILER "" CACHE FILEPATH
+    "C compiler for LuaJIT's build-time host tools")
+set(LUAJIT_HOST_EXTRA_LDFLAGS "" CACHE STRING
+    "Extra linker flags for LuaJIT's build-time host tools")
+
 option(LUA_USE_APICHECK "Turn on assertions for the Lua/C API to debug problems with lua_* calls. This is rather slow, use only while developing C libraries/embeddings" OFF)
 option(LUA_USE_ASSERT "Turn on assertions for the whole LuaJIT VM. This significantly slows down everything. Use only if you suspect a problem with LuaJIT itself" OFF)
 
@@ -135,10 +140,20 @@ endif()
 
 set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
+if (ANDROID)
+    # CMake adds these flags to normal compile rules, but this architecture
+    # probe invokes the compiler directly. Keep the probe on the Android ABI
+    # instead of inspecting the host compiler target.
+    set(LUAJIT_TARGET_FLAGS
+        "--target=${CMAKE_C_COMPILER_TARGET}"
+        "--sysroot=${CMAKE_SYSROOT}"
+    )
+endif()
+
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
 execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
+    COMMAND ${CMAKE_C_COMPILER} ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM
     WORKING_DIRECTORY "${LUAJIT_DIR}"
     OUTPUT_VARIABLE TESTARCH_OUTPUT
     ERROR_VARIABLE TESTARCH_ERROR
@@ -306,8 +321,25 @@ if (TARGET_LJARCH STREQUAL "ppc")
     endif()
 endif()
 
-set(HOST_ACFLAGS "${CMAKE_C_FLAGS} ${CCOPTIONS} ${TARGET_ARCH}")
-set(HOST_ALDFLAGS "${CMAKE_C_FLAGS}")
+# minilua/buildvm run on the build machine. Do not pass Android target flags
+# (for example -mthumb) to these host-only helper projects.
+set(HOST_ACFLAGS "${TARGET_ARCH}")
+set(HOST_ALDFLAGS "")
+
+if (ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    # LuaJIT's buildvm validates that its host pointer size matches the
+    # target ABI. Build the helper tools as i386 binaries for armeabi-v7a.
+    string(APPEND HOST_ACFLAGS " -m32")
+    string(APPEND HOST_ALDFLAGS " -m32")
+
+    # Some sandboxed Linux environments cannot execute i386 ELF binaries
+    # natively even when multilib compilation is available. Use qemu-i386
+    # when present; on regular Linux hosts the prefix remains empty.
+    find_program(LUAJIT_HOST_EXECUTABLE_PREFIX qemu-i386)
+    if (LUAJIT_HOST_EXECUTABLE_PREFIX MATCHES "-NOTFOUND$")
+        set(LUAJIT_HOST_EXECUTABLE_PREFIX "")
+    endif()
+endif()
 
 string(APPEND TARGET_XCFLAGS " -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
 
@@ -329,6 +361,19 @@ set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
 set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
 
+set(LUAJIT_HOST_CMAKE_ARGS)
+if (LUAJIT_HOST_C_COMPILER)
+    string(JOIN " " LUAJIT_HOST_C_FLAGS_STRING ${HOST_ACFLAGS})
+    string(JOIN " " LUAJIT_HOST_LD_FLAGS_STRING ${HOST_ALDFLAGS})
+    if (LUAJIT_HOST_EXTRA_LDFLAGS)
+        string(APPEND LUAJIT_HOST_LD_FLAGS_STRING " ${LUAJIT_HOST_EXTRA_LDFLAGS}")
+    endif()
+    list(APPEND LUAJIT_HOST_CMAKE_ARGS
+        "-DCMAKE_C_COMPILER=${LUAJIT_HOST_C_COMPILER}"
+        "-DCMAKE_C_FLAGS=-static ${LUAJIT_HOST_C_FLAGS_STRING}"
+        "-DCMAKE_EXE_LINKER_FLAGS=-static ${LUAJIT_HOST_LD_FLAGS_STRING}")
+endif()
+
 add_custom_command(
     OUTPUT "${MINILUA_FILE}"
     COMMAND ${CMAKE_COMMAND}
@@ -342,11 +387,12 @@ add_custom_command(
         -DLUA_USE_POSIX=${LUA_USE_POSIX}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
+        ${LUAJIT_HOST_CMAKE_ARGS}
     COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
 )
 
 add_custom_command(OUTPUT ${BUILDVM_ARCH}
-    COMMAND "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+    COMMAND ${LUAJIT_HOST_EXECUTABLE_PREFIX} "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
     DEPENDS "${MINILUA_FILE}"
 )
 
@@ -374,6 +420,7 @@ add_custom_command(
         -DBUILDVM_ARCH=${BUILDVM_ARCH}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
+        ${LUAJIT_HOST_CMAKE_ARGS}
     COMMAND ${CMAKE_COMMAND} --build ${BUILDVM_BINARY_DIR} --config Release --verbose
 )
 
@@ -409,7 +456,7 @@ endif()
 macro(add_buildvm_target target mode)
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${target}"
-        COMMAND "${BUILDVM_FILE}" ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
+        COMMAND ${LUAJIT_HOST_EXECUTABLE_PREFIX} "${BUILDVM_FILE}" ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         DEPENDS buildvm ${ARGN}
     )

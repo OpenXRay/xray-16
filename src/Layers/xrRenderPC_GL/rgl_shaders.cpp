@@ -6,6 +6,366 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+#if defined(XR_PLATFORM_ANDROID)
+namespace
+{
+constexpr cpcstr AndroidVaryingPrefix = "_xray_gles_varying_";
+
+struct AndroidGlslLineRewrite
+{
+    cpcstr path;
+    cpcstr source;
+    cpcstr replacement;
+};
+
+constexpr AndroidGlslLineRewrite AndroidGlslLineRewrites[] =
+{
+#define XR_GLES_LINE_REWRITE(path, source, replacement) { path, source, replacement },
+#include "AndroidGlslCompatRules.inl"
+#undef XR_GLES_LINE_REWRITE
+};
+
+bool is_glsl_space(char value)
+{
+    return value == ' ' || value == '\t' || value == '\r';
+}
+
+size_t skip_glsl_space(const xr_string& value, size_t position)
+{
+    while (position < value.size() && is_glsl_space(value[position]))
+        ++position;
+    return position;
+}
+
+bool read_glsl_identifier(const xr_string& value, size_t& position, size_t& begin, size_t& end)
+{
+    position = skip_glsl_space(value, position);
+    if (position >= value.size())
+        return false;
+
+    const char first = value[position];
+    if (!((first >= 'A' && first <= 'Z') || (first >= 'a' && first <= 'z') || first == '_'))
+        return false;
+
+    begin = position++;
+    while (position < value.size())
+    {
+        const char current = value[position];
+        if (!((current >= 'A' && current <= 'Z') || (current >= 'a' && current <= 'z') ||
+                (current >= '0' && current <= '9') || current == '_'))
+            break;
+        ++position;
+    }
+    end = position;
+    return true;
+}
+
+bool is_glsl_qualifier(const xr_string& token)
+{
+    return token == "flat" || token == "smooth" || token == "noperspective" || token == "centroid" ||
+        token == "sample" || token == "invariant" || token == "precise";
+}
+
+bool glsl_line_matches_ignoring_space(const xr_string& line, size_t first, size_t last, cpcstr source)
+{
+    size_t linePosition = first;
+    size_t sourcePosition = 0;
+    while (true)
+    {
+        while (linePosition < last && is_glsl_space(line[linePosition]))
+            ++linePosition;
+        while (source[sourcePosition] && is_glsl_space(source[sourcePosition]))
+            ++sourcePosition;
+
+        if (linePosition == last || !source[sourcePosition])
+            return linePosition == last && !source[sourcePosition];
+        if (line[linePosition++] != source[sourcePosition++])
+            return false;
+    }
+}
+
+xr_string normalize_android_shader_path(cpcstr sourcePath)
+{
+    xr_string normalized = sourcePath ? sourcePath : "";
+    for (char& character : normalized)
+    {
+        if (character == '\\')
+            character = '/';
+        else if (character >= 'A' && character <= 'Z')
+            character = static_cast<char>(character - 'A' + 'a');
+    }
+    return normalized;
+}
+
+bool android_shader_path_matches(const xr_string& sourcePath, cpcstr rulePath)
+{
+    const size_t ruleLength = xr_strlen(rulePath);
+    if (sourcePath.size() < ruleLength ||
+        sourcePath.compare(sourcePath.size() - ruleLength, ruleLength, rulePath) != 0)
+        return false;
+
+    return sourcePath.size() == ruleLength || sourcePath[sourcePath.size() - ruleLength - 1] == '/';
+}
+
+bool apply_android_line_rewrite(
+    xr_string& line, size_t first, size_t last, const xr_string& sourcePath)
+{
+    const size_t length = last - first;
+    for (const auto& rewrite : AndroidGlslLineRewrites)
+    {
+        if (!android_shader_path_matches(sourcePath, rewrite.path))
+            continue;
+
+        const bool exact = xr_strlen(rewrite.source) == length &&
+            line.compare(first, length, rewrite.source) == 0;
+        if (exact || glsl_line_matches_ignoring_space(line, first, last, rewrite.source))
+        {
+            line.replace(first, length, rewrite.replacement);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool get_android_varying_type(const xr_string& type, xr_string& physicalType, pcstr& swizzle)
+{
+    xr_string family;
+    int width = 0;
+
+    if (type == "float" || type == "half")
+    {
+        family = "float";
+        width = 1;
+    }
+    else if ((type.size() == 6 && type.compare(0, 5, "float") == 0) ||
+        (type.size() == 5 && type.compare(0, 4, "half") == 0))
+    {
+        family = "float";
+        width = type.back() - '0';
+    }
+    else if (type.size() == 4 && type.compare(0, 3, "vec") == 0)
+    {
+        family = "float";
+        width = type.back() - '0';
+    }
+    else if (type == "int")
+    {
+        family = "int";
+        width = 1;
+    }
+    else if (type.size() == 4 && type.compare(0, 3, "int") == 0)
+    {
+        family = "int";
+        width = type.back() - '0';
+    }
+    else if (type.size() == 5 && type.compare(0, 4, "ivec") == 0)
+    {
+        family = "int";
+        width = type.back() - '0';
+    }
+    else if (type == "uint")
+    {
+        family = "uint";
+        width = 1;
+    }
+    else if (type.size() == 5 && type.compare(0, 4, "uint") == 0)
+    {
+        family = "uint";
+        width = type.back() - '0';
+    }
+    else if (type.size() == 5 && type.compare(0, 4, "uvec") == 0)
+    {
+        family = "uint";
+        width = type.back() - '0';
+    }
+
+    if (width < 1 || width > 4)
+        return false;
+
+    physicalType = family == "float" ? "vec4" : family == "int" ? "ivec4" : "uvec4";
+    static constexpr cpcstr Swizzles[] = { nullptr, ".x", ".xy", ".xyz", "" };
+    swizzle = Swizzles[width];
+    return true;
+}
+
+bool add_android_fragment_output_location(xr_string& line)
+{
+    if (line.find("layout") != xr_string::npos)
+        return false;
+
+    size_t position = 0;
+    size_t begin = 0;
+    size_t end = 0;
+    if (!read_glsl_identifier(line, position, begin, end) || line.compare(begin, end - begin, "out") != 0)
+        return false;
+    if (!read_glsl_identifier(line, position, begin, end))
+        return false;
+    const xr_string type = line.substr(begin, end - begin);
+    if (type != "vec4" && type != "float4")
+        return false;
+    if (!read_glsl_identifier(line, position, begin, end))
+        return false;
+
+    const xr_string name = line.substr(begin, end - begin);
+    constexpr cpcstr Target = "SV_Target";
+    if (name.compare(0, xr_strlen(Target), Target) != 0)
+        return false;
+
+    const xr_string suffix = name.substr(xr_strlen(Target));
+    u32 location = 0;
+    if (!suffix.empty())
+    {
+        for (const char character : suffix)
+        {
+            if (character < '0' || character > '9')
+                return false;
+            location = location * 10 + u32(character - '0');
+        }
+    }
+
+    const size_t indentation = skip_glsl_space(line, 0);
+    string64 layout;
+    xr_sprintf(layout, "layout(location = %u) ", location);
+    line.insert(indentation, layout);
+    return true;
+}
+
+bool normalize_android_stage_varying(xr_string& line, char stage)
+{
+    const cpcstr wantedStorage = stage == 'v' ? "out" : stage == 'p' ? "in" : nullptr;
+    if (!wantedStorage)
+        return false;
+
+    const size_t layoutPosition = line.find("layout");
+    if (layoutPosition == xr_string::npos)
+        return false;
+    const size_t open = line.find('(', layoutPosition + 6);
+    const size_t close = open == xr_string::npos ? xr_string::npos : line.find(')', open + 1);
+    const size_t location = line.find("location", open + 1);
+    if (close == xr_string::npos || location > close)
+        return false;
+
+    const size_t equals = line.find('=', location + xr_strlen("location"));
+    if (equals == xr_string::npos || equals > close)
+        return false;
+    xr_string locationKey;
+    for (size_t cursor = equals + 1; cursor < close && line[cursor] != ','; ++cursor)
+    {
+        const char value = line[cursor];
+        if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') ||
+            (value >= '0' && value <= '9') || value == '_')
+            locationKey += value;
+        else if (!is_glsl_space(value))
+            locationKey += '_';
+    }
+    if (locationKey.empty())
+        return false;
+
+    size_t position = close + 1;
+    size_t begin = 0;
+    size_t end = 0;
+    xr_string storage;
+    while (read_glsl_identifier(line, position, begin, end))
+    {
+        const xr_string token = line.substr(begin, end - begin);
+        if (token == "in" || token == "out")
+        {
+            storage = token;
+            break;
+        }
+        if (!is_glsl_qualifier(token))
+            return false;
+    }
+    if (storage != wantedStorage)
+        return false;
+
+    size_t typeBegin = 0;
+    size_t typeEnd = 0;
+    if (!read_glsl_identifier(line, position, typeBegin, typeEnd))
+        return false;
+    xr_string type = line.substr(typeBegin, typeEnd - typeBegin);
+    if (type == "lowp" || type == "mediump" || type == "highp")
+    {
+        if (!read_glsl_identifier(line, position, typeBegin, typeEnd))
+            return false;
+        type = line.substr(typeBegin, typeEnd - typeBegin);
+    }
+
+    size_t nameBegin = 0;
+    size_t nameEnd = 0;
+    if (!read_glsl_identifier(line, position, nameBegin, nameEnd))
+        return false;
+    const xr_string name = line.substr(nameBegin, nameEnd - nameBegin);
+    if (name.compare(0, 3, "gl_") == 0 ||
+        name.compare(0, xr_strlen(AndroidVaryingPrefix), AndroidVaryingPrefix) == 0)
+        return false;
+
+    xr_string physicalType;
+    pcstr swizzle = nullptr;
+    if (!get_android_varying_type(type, physicalType, swizzle))
+        return false;
+
+    // Some mobile linkers still require matching varying identifiers even
+    // when both stages use explicit locations. Derive the physical name from
+    // the location expression (for example TEXCOORD1) so independently named
+    // PC shader inputs/outputs link without any per-resource rename rule.
+    const xr_string physicalName = xr_string(AndroidVaryingPrefix) + locationKey;
+    line.replace(nameBegin, nameEnd - nameBegin, physicalName);
+    line.replace(typeBegin, typeEnd - typeBegin, physicalType);
+    line += "\n#define ";
+    line += name;
+    line += " ";
+    line += physicalName;
+    line += swizzle;
+    return true;
+}
+
+xr_string transform_android_glsl_source(cpcstr source, size_t length, char stage, cpcstr sourceName)
+{
+    xr_string transformed;
+    transformed.reserve(length + 256);
+    const xr_string sourcePath = normalize_android_shader_path(sourceName);
+
+    size_t offset = 0;
+    while (offset < length)
+    {
+        const cpcstr newline = static_cast<cpcstr>(memchr(source + offset, '\n', length - offset));
+        const size_t lineEnd = newline ? size_t(newline - source) : length;
+        xr_string line(source + offset, lineEnd - offset);
+
+        const size_t first = skip_glsl_space(line, 0);
+        size_t last = line.size();
+        while (last > first && is_glsl_space(line[last - 1]))
+            --last;
+        const xr_string trimmed = line.substr(first, last - first);
+
+        // The PC renderer's HLSL-like GLSL accepts a handful of implicit
+        // conversions that strict GLSL ES drivers reject. Keep the original
+        // resource tree byte-for-byte intact and normalize only the source
+        // copy passed to the Android compiler.
+        apply_android_line_rewrite(line, first, last, sourcePath);
+
+        // These are built-ins in GLSL ES.  Redeclaring them is accepted by
+        // desktop GLSL but rejected by Adreno as a reserved-name violation.
+        if (stage == 'p' && (trimmed == "in vec4 gl_FragCoord;" || trimmed == "in int gl_SampleID;"))
+            line.assign(line.size(), ' ');
+        else
+        {
+            if (stage == 'p')
+                add_android_fragment_output_location(line);
+            normalize_android_stage_varying(line, stage);
+        }
+
+        transformed += line;
+        transformed += '\n';
+        offset = newline ? lineEnd + 1 : length;
+    }
+
+    return transformed;
+}
+} // namespace
+#endif
+
 void CRender::addShaderOption(const char* name, const char* value)
 {
     m_ShaderOptions += "#define ";
@@ -130,24 +490,30 @@ public:
     [[nodiscard]] auto get() const { return m_sources; }
     [[nodiscard]] auto length() const { return m_sources_lines; }
 
-    void compile(IReader* file, shader_options_holder& options)
+    void compile(IReader* file, shader_options_holder& options, cpcstr target, cpcstr sourceName)
     {
-        load_includes(file);
+        load_includes(file, target[0], sourceName);
         apply_options(options);
     }
 
 private:
     // TODO: OGL: make ignore commented includes
-    void load_includes(IReader* file)
+    void load_includes(IReader* file, char stage, cpcstr sourceName)
     {
         cpcstr sourceData = static_cast<cpcstr>(file->pointer());
         const size_t dataLength = file->length();
 
         // Copy source file data into a null-terminated buffer
+#if defined(XR_PLATFORM_ANDROID)
+        const xr_string transformed = transform_android_glsl_source(sourceData, dataLength, stage, sourceName);
+        cpstr data = xr_alloc<char>(transformed.size() + 1);
+        CopyMemory(data, transformed.c_str(), transformed.size() + 1);
+#else
         cpstr data = xr_alloc<char>(dataLength + 2);
         CopyMemory(data, sourceData, dataLength);
         data[dataLength] = '\n';
         data[dataLength + 1] = '\0';
+#endif
         m_includes.push_back(data);
         m_source.push_back(data);
 
@@ -171,7 +537,7 @@ private:
             // Open and read file, recursively load includes
             IReader* R = FS.r_open(path);
             R_ASSERT2(R, path);
-            load_includes(R);
+            load_includes(R, stage, fn);
             FS.r_close(R);
 
             // Add next source, skip quotation
@@ -224,14 +590,51 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(option);
     };
 
+#if defined(XR_PLATFORM_ANDROID)
+    // Prefer GLSL ES 3.20 when the context exposes it and retain 3.10 for
+    // GLES 3.1 devices. The source compatibility layer below is still needed:
+    // mixed integer/float operators remain stricter than desktop GLSL.
+    options.add(GLAD_GL_ES_VERSION_3_2 ? "#version 320 es" : "#version 310 es");
+
+    // Some GLES 3.1 drivers expose the shader I/O blocks as an extension even
+    // though the feature is also available in the 3.10 language version.
+    if (GLAD_GL_EXT_shader_io_blocks)
+        options.add("#extension GL_EXT_shader_io_blocks : enable");
+    else if (GLAD_GL_OES_shader_io_blocks)
+        options.add("#extension GL_OES_shader_io_blocks : enable");
+
+    // v_volumetric.h redeclares gl_ClipDistance in the same built-in block.
+    if (GLAD_GL_EXT_clip_cull_distance)
+        options.add("#extension GL_EXT_clip_cull_distance : enable");
+    if (GLAD_GL_EXT_gpu_shader5)
+        options.add("#extension GL_EXT_gpu_shader5 : enable");
+    else if (GLAD_GL_OES_gpu_shader5)
+        options.add("#extension GL_OES_gpu_shader5 : enable");
+    if (GLAD_GL_EXT_shader_implicit_conversions)
+        options.add("#extension GL_EXT_shader_implicit_conversions : enable");
+    options.add("precision highp float;");
+    options.add("precision highp int;");
+    // GLSL ES 3.10 has no implicit precision for the sampler types that
+    // OpenXRay's deferred and MSAA shader headers use.  Desktop GLSL accepts
+    // these declarations without a precision qualifier, while Adreno rejects
+    // them and the engine later reports the misleading video-card message.
+    options.add("precision lowp sampler3D;");
+    options.add("precision lowp sampler2DMS;");
+    options.add("precision lowp sampler2DShadow;");
+#else
     options.add("#version 410");
     options.add("#extension GL_ARB_separate_shader_objects : enable");
+#endif
 
 #ifdef DEBUG
+#if !defined(XR_PLATFORM_ANDROID)
     options.add("#pragma optimize (off)");
+#endif
     sh_name.append(0u);
 #else
+#if !defined(XR_PLATFORM_ANDROID)
     options.add("#pragma optimize (on)");
+#endif
     sh_name.append(1u);
 #endif
 
@@ -358,6 +761,11 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
     else
     {
+#if defined(XR_PLATFORM_ANDROID)
+        // Some GLES preprocessors reject an undefined identifier used in a
+        // numeric #if expression.  A zero value preserves the disabled path.
+        options.add("SSR_QUALITY", "0");
+#endif
         sh_name.append(static_cast<u32>(0));
     }
 
@@ -381,7 +789,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(ps_r_sun_shafts);
     }
     else
+    {
+        // Do not define SUN_SHAFTS_QUALITY to zero. The volumetric shader uses
+        // #ifdef to remove the ray-march entirely; defining zero entered that
+        // branch without defining RAY_SAMPLES and broke shader compilation.
         sh_name.append(static_cast<u32>(0));
+    }
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
@@ -390,7 +803,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(ps_r_ssao);
     }
     else
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        options.add("SSAO_QUALITY", "0");
+#endif
         sh_name.append(static_cast<u32>(0));
+    }
 
     // Sun quality
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
@@ -400,7 +818,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(ps_r_sun_quality);
     }
     else
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        options.add("SUN_QUALITY", "0");
+#endif
         sh_name.append(static_cast<u32>(0));
+    }
 
     // Steep parallax
     {
@@ -483,6 +906,35 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    // This suffix is part of the on-disk shader cache key. Bump it whenever
+    // the Android source compatibility pass changes: the source-file CRC
+    // alone cannot detect translator changes and would otherwise mix old
+    // program binaries with newly translated stages after an APK update.
+    sh_name.append("glescompat4");
+
+    // Vertex declarations use different physical widths for the same logical
+    // attributes in the skinning variants. The original resources rely on
+    // desktop GLSL's permissive vector narrowing; make it explicit after the
+    // SKIN_* option has been selected, without changing game or mod files.
+    options.add(
+        "#if defined(SKIN_NONE) || defined(SKIN_0)\n"
+        "#define skin_input_normal(value) value.xyz\n"
+        "#else\n"
+        "#define skin_input_normal(value) value\n"
+        "#endif\n"
+        "#if defined(SKIN_NONE) || defined(SKIN_0) || defined(SKIN_1) || defined(SKIN_2)\n"
+        "#define skin_input_tangent(value) value.xyz\n"
+        "#else\n"
+        "#define skin_input_tangent(value) value\n"
+        "#endif\n"
+        "#if defined(SKIN_2) || defined(SKIN_3)\n"
+        "#define skin_input_tc(value) value\n"
+        "#else\n"
+        "#define skin_input_tc(value) value.xy\n"
+        "#endif");
+#endif
+
     // finish
     options.finish();
     sh_name.finish();
@@ -549,7 +1001,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 #endif
         // Compile sources list
         shader_sources_manager sources;
-        sources.compile(fs, options);
+        string_path sourceFileName;
+        strconcat(sizeof(sourceFileName), sourceFileName, name, ".", extension);
+        sources.compile(fs, options, pTarget, sourceFileName);
 
         // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);

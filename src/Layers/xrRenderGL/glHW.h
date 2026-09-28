@@ -15,6 +15,7 @@ public:
 
     void CreateDevice(SDL_Window* sdlWnd);
     void DestroyDevice();
+    bool IsReady() const { return m_context != nullptr; }
 
     void Reset();
 
@@ -61,6 +62,10 @@ public:
     pcstr OpenGLVersionString;
     pcstr ShadingVersion;
     bool ComputeShadersSupported;
+
+#if defined(XR_PLATFORM_ANDROID)
+    bool m_surfaceNeedsReset{};
+#endif
 };
 
 extern ECORE_API CHW HW;

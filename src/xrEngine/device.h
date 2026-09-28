@@ -108,12 +108,16 @@ private:
         CStatTimer RenderTotal; // pureRender
         CStatTimer EngineTotal; // pureFrame
         float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+        float fFrameMoveReal, fRenderReal, fParallelWaitReal;
 
         RenderDeviceStatistics()
         {
             fFPS = 30.f;
             fRFPS = 30.f;
             fTPS = 0;
+            fFrameMoveReal = 0.f;
+            fRenderReal = 0.f;
+            fParallelWaitReal = 0.f;
         }
     };
 

@@ -154,7 +154,14 @@ struct XRCORE_API vertBoned4W // 76 bytes
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
+// These records are serialized field-for-field using their historical sizes,
+// but they are also kept as live physics data.  A pack value of 1 gave the
+// types byte alignment and placed SJointIKData at an address ending in +2
+// inside CBoneData.  ARM VFP scalar loads require float alignment and crash
+// with SIGBUS when reading joint limits from that address.  Four-byte packing
+// preserves every serialized field offset and total size while making all
+// float members safe to access on ARM.
+#pragma pack(push, 4)
 enum EJointType
 {
     jtRigid,
@@ -180,7 +187,7 @@ struct XRCORE_API SJointLimit
     }
 };
 
-struct XRCORE_API SBoneShape
+struct alignas(4) XRCORE_API SBoneShape
 {
     enum EShapeType
     {
@@ -253,6 +260,13 @@ struct XRCORE_API SJointIKData
     bool Import(IReader& F, u16 vers);
 };
 #pragma pack(pop)
+
+static_assert(sizeof(SJointLimit) == 0x10, "SJointLimit file layout changed");
+static_assert(sizeof(SBoneShape) == 0x70, "SBoneShape file layout changed");
+static_assert(sizeof(SJointIKData) == 0x4c, "SJointIKData file layout changed");
+static_assert(alignof(SJointLimit) >= alignof(float), "SJointLimit floats must be aligned");
+static_assert(alignof(SBoneShape) >= alignof(float), "SBoneShape floats must be aligned");
+static_assert(alignof(SJointIKData) >= alignof(float), "SJointIKData floats must be aligned");
 
 class XRCORE_API IBoneData
 {

@@ -25,6 +25,45 @@ Installation instructions are on the [How to install and play](https://github.co
 Shadow of Chernobyl is **not supported** yet. (see [#392](https://github.com/OpenXRay/xray-16/issues/392)) <br>
 Legends of the Zone/Enhanced Edition is not supported and won't ever be likely. (see [#1865](https://github.com/OpenXRay/xray-16/issues/1865))
 
+## Experimental Android port in this fork
+
+This fork contains an experimental Android launcher and ARMv7 engine build.
+It is not part of upstream OpenXRay's supported release targets. The APK ships
+the launcher and engine only; users must provide their own legally obtained PC
+game files. Call of Pripyat is the intended game profile. The launcher's SoC
+and CS profile switches only pass compatibility flags and do not change the
+upstream support status listed above.
+
+The current APK requires Android 8.0 (API 26) or newer, support for 32-bit
+`armeabi-v7a` applications, and OpenGL ES 3.1 with at least four draw buffers
+and four color attachments. A 64-bit phone is compatible only when its Android
+system still supports 32-bit apps. The engine remains limited by a 32-bit
+process address space, which can affect large levels and mods.
+
+Gameplay uses OpenGL ES. The Vulkan option runs an instance/device/surface/
+swapchain capability probe and then explicitly falls back to GLES; it is not a
+Vulkan gameplay renderer. Renderer decisions and optimizations are based on
+reported API capabilities rather than GPU vendor or model names.
+
+The launcher is locked to portrait and the engine activity to landscape. It
+offers internal resolution and graphics-preset selection, optional touch
+controls, a red FPS counter at the top center, log diagnostics, return-to-game,
+and a force-stop action for a stuck engine process. Auto graphics selects
+Low and an aspect-correct width of at most 1280 pixels. These choices are
+applied in memory after `user.ltx`. Game resources and `fsgame.ltx` are not
+rewritten; settings, saves, screenshots and normal logs use the desktop-style
+`<STALKER>/_appdata_` directory, which must be writable.
+
+See [android/README.md](android/README.md) for the current build, installation,
+runtime and diagnostics instructions.
+
+Quick build with a prepared build kit:
+
+```sh
+export XRAY_ANDROID_KIT_ROOT=/absolute/path/to/openxray-android-build-kit-v0.8.0
+./android/build-harness.sh --apk
+```
+
 ## Main differences from the original X-Ray
 - Support for 64-bit.
 - Improved performance, better FPS.

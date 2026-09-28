@@ -224,13 +224,24 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
     unload();
     reload(m_section);
     spawns().load(save_name);
+#if defined(XR_PLATFORM_ANDROID)
+    // unload() releases the previous menu/session graph. Compact after that
+    // release, immediately before the large synchronous ALife spawn pass.
+    Memory.mem_compact();
+    Msg("[android] new game memory compacted before ALife spawn pass (%7.3f Mb)",
+        float(Memory.mem_usage()) / 1048576.0f);
+#endif
+    Msg("* New game: spawn registry ready; initializing graph registry...");
     graph().on_load();
+    Msg("* New game: graph registry ready; initializing object IDs...");
     server().PerformIDgen(0x0000);
     time_manager().init(m_section);
     VERIFY(can_register_objects());
 
     can_register_objects(false);
+    Msg("* New game: creating ALife objects...");
     spawn_new_objects();
+    Msg("* New game: ALife objects created; running registration callbacks...");
     can_register_objects(true);
 
     CALifeObjectRegistry::OBJECT_REGISTRY::iterator I = objects().objects().begin();

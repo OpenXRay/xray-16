@@ -97,7 +97,7 @@ public:
     dxRender_Visual* root() { return m_root; }
     void setup(const level_sector_data_t& data, const xr_vector<CPortal*>& portals);
 
-    CSector() { m_root = nullptr; }
+    CSector() : m_root(nullptr), r_marker(0xffffffff) {}
     virtual ~CSector() = default;
 };
 

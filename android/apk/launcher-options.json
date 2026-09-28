@@ -1,0 +1,21 @@
+{
+  "game": [
+    {"label": "Автоматически / без ключа", "name": "автоопределение", "arg": ""},
+    {"label": "Shadow of Chernobyl (-soc)", "name": "Shadow of Chernobyl", "arg": "-soc"},
+    {"label": "Clear Sky (-cs)", "name": "Clear Sky", "arg": "-cs"},
+    {"label": "Call of Pripyat (-cop)", "name": "Call of Pripyat", "arg": "-cop"}
+  ],
+  "renderer": [
+    {"label": "Автоматически (OpenGL ES)", "arg": "-renderer-auto"},
+    {"label": "OpenGL ES", "arg": "-renderer-gles"},
+    {"label": "Vulkan (экспериментальный fallback)", "arg": "-renderer-vulkan"}
+  ],
+  "graphics": [
+    {"label": "Автоматически для Android (Low)", "preset": "Low"},
+    {"label": "Minimum", "preset": "Minimum"},
+    {"label": "Low", "preset": "Low"},
+    {"label": "Default", "preset": "Default"},
+    {"label": "High", "preset": "High"},
+    {"label": "Extreme", "preset": "Extreme"}
+  ]
+}

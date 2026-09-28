@@ -11,7 +11,11 @@
 #include <sys/utime.h>
 #elif defined(XR_PLATFORM_POSIX)
 #include <SDL.h>
+#if defined(XR_PLATFORM_ANDROID)
+#include <SDL_system.h>
+#endif
 #include <glob.h>
+#include <sys/stat.h>
 #endif
 
 #include "FS_internal.h"
@@ -937,6 +941,19 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
     return result;
 }
 
+#if defined(XR_PLATFORM_ANDROID)
+static xr_string android_engine_data_root()
+{
+    const char* internal_path = SDL_AndroidGetInternalStoragePath();
+    if (!internal_path || !internal_path[0])
+        return {};
+
+    string_path result;
+    strconcat(sizeof(result), result, internal_path, "/openxray/engine-gamedata");
+    return result;
+}
+#endif
+
 void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 {
     ZoneScoped;
@@ -1013,10 +1030,51 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
             lp_def = cnt >= 5 ? def : 0;
             lp_capt = cnt >= 6 ? capt : 0;
 
+#if defined(XR_PLATFORM_ANDROID)
+            const bool is_game_data = 0 == xr_strcmp(id, "$game_data$");
+            const bool is_app_data = 0 == xr_strcmp(id, "$app_data_root$");
+#endif
+
             auto p_it = m_paths.find(root);
 
             FS_Path* P = xr_new<FS_Path>(p_it != m_paths.end() ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+#if defined(XR_PLATFORM_ANDROID)
+            if (is_app_data)
+            {
+                // Preserve the desktop filesystem contract: user.ltx, saves,
+                // screenshots and normal engine logs live under the selected
+                // installation's _appdata_ directory.  LauncherActivity
+                // verifies this exact path with a real write before startup.
+                Msg("* Android game app-data root: %s", P->m_Path);
+            }
+            else if (is_game_data)
+            {
+                const xr_string overlay_root = android_engine_data_root();
+                struct stat overlay_info;
+                if (!overlay_root.empty() && ::stat(overlay_root.c_str(), &overlay_info) == 0
+                    && S_ISDIR(overlay_info.st_mode))
+                {
+                    P->_set_overlay(overlay_root.c_str());
+                    Msg("* Android engine data overlay: %s", overlay_root.c_str());
+                }
+            }
+            else if (p_it != m_paths.end() && p_it->second->m_Overlay)
+            {
+                P->_set_overlay(p_it->second->m_Overlay, lp_add);
+            }
+#endif
             bNoRecurse = !(fl & FS_Path::flRecurse);
+#if defined(XR_PLATFORM_ANDROID)
+            if (P->m_Overlay)
+            {
+                // Register the engine fallback first.  Register() replaces an
+                // existing entry, so scanning the game/mod directory second
+                // gives user resources the same precedence they have on PC.
+                Recurse(P->m_Overlay);
+                if (0 == xr_strcmp(id, "$game_shaders$"))
+                    Msg("* Android shader fallback indexed: %s", P->m_Overlay);
+            }
+#endif
             Recurse(P->m_Path);
             auto I = m_paths.emplace(xr_strdup(id), P);
 #ifndef DEBUG

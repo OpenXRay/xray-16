@@ -33,6 +33,9 @@ void CRender::level_Load(IReader* fs)
         chunk = fs->open_chunk(fsL_SHADERS);
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
+        CTimer shaderTimer;
+        shaderTimer.Start();
+        Msg("[load-trace] level-shaders begin count=%u", count);
         Shaders.resize(count);
         for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
@@ -45,8 +48,13 @@ void CRender::level_Load(IReader* fs)
             pstr delim = strchr(n_sh, '/');
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
+            if ((i % 64) == 0 || i + 1 == count)
+                Msg("[load-trace] level-shaders progress=%u/%u elapsed=%llu ms shader='%s' textures='%s'",
+                    i + 1, count, static_cast<unsigned long long>(shaderTimer.GetElapsed_ms()), n_sh, n_tlist);
             Shaders[i] = Resources->Create(n_sh, n_tlist);
         }
+        Msg("[load-trace] level-shaders end count=%u elapsed=%llu ms", count,
+            static_cast<unsigned long long>(shaderTimer.GetElapsed_ms()));
         chunk->close();
     }
 
