@@ -77,6 +77,8 @@ IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P,
 #if defined(XR_PLATFORM_ANDROID)
 void R_dsgraph_structure::audit_camera_sector(const Fvector& position, IRender_Sector::sector_id_t sector)
 {
+    if (!strstr(Core.Params, "-android-sector-audit"))
+        return;
     auto& audit = sector_audit;
     if (audit.query == 3)
     {

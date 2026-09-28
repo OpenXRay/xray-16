@@ -6,6 +6,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrCore/Text/LegacyFilename.h"
+#endif
 #include "line_edit_control.h"
 
 #include "xrCore/os_clipboard.h"
@@ -371,8 +374,12 @@ void line_edit_control::on_text_input(const char *text)
     clear_inserted();
     compute_positions();
 
+#if defined(XR_PLATFORM_ANDROID)
+    const auto str = xray::text::filename_from_utf8(text);
+#else
     static std::locale locale("");
     const auto str = StringFromUTF8(text, locale);
+#endif
 
     for (char c : str)
     {

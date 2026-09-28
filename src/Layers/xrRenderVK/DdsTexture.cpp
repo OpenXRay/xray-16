@@ -23,6 +23,8 @@ VkFormat vk_format(gli::format format)
     {
     case gli::FORMAT_RGBA8_UNORM_PACK8: return VK_FORMAT_R8G8B8A8_UNORM;
     case gli::FORMAT_BGRA8_UNORM_PACK8: return VK_FORMAT_B8G8R8A8_UNORM;
+    case gli::FORMAT_RGBA8_SRGB_PACK8: return VK_FORMAT_R8G8B8A8_SRGB;
+    case gli::FORMAT_BGRA8_SRGB_PACK8: return VK_FORMAT_B8G8R8A8_SRGB;
     case gli::FORMAT_RGB_DXT1_UNORM_BLOCK8: return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
     case gli::FORMAT_RGB_DXT1_SRGB_BLOCK8: return VK_FORMAT_BC1_RGB_SRGB_BLOCK;
     case gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8: return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
@@ -55,7 +57,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
     const uint32_t width = read32(bytes, 16), height = read32(bytes, 12);
     const uint32_t mip_count = (read32(bytes, 8) & 0x20000u) ? read32(bytes, 28) : 1;
     if (!width || !height || width > 16384 || height > 16384 || !mip_count || mip_count > 15 ||
-        (read32(bytes, 112) & 0x200u) || (read32(bytes, 8) & 0x800000u))
+        (read32(bytes, 8) & 0x800000u))
     {
         error = "unsupported DDS dimensions or target";
         return false;
@@ -64,11 +66,20 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
     const uint32_t fourcc = read32(bytes, 84);
     const bool extended = fourcc == 0x30315844u; // DX10
     const size_t header_size = extended ? 148 : 128;
-    if (size < header_size || (extended && (read32(bytes, 140) != 1 || read32(bytes, 136) != 3)))
+    if (size < header_size || (extended && (read32(bytes, 140) != 1 || read32(bytes, 132) != 3)))
     {
         error = "unsupported DDS extension";
         return false;
     }
+
+    const uint32_t cube_caps = read32(bytes, 112) & 0xfe00u;
+    const bool cube = extended ? (read32(bytes, 136) & 4u) != 0 : (cube_caps & 0x200u) != 0;
+    if ((cube && width != height) || (!extended && cube_caps && cube_caps != 0xfe00u))
+    {
+        error = "DDS cubemap requires six square faces";
+        return false;
+    }
+    const uint32_t faces = cube ? 6 : 1;
 
     // GLI's pinned loader asserts on truncated payloads. Validate its expected layout first.
     const uint32_t dxgi = extended ? read32(bytes, 128) : 0;
@@ -98,6 +109,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         const size_t w = std::max(1u, width >> level), h = std::max(1u, height >> level);
         expected += block_bytes ? ((w + 3) / 4) * ((h + 3) / 4) * block_bytes : w * h * 4;
     }
+    expected = header_size + (expected - header_size) * faces;
     if (expected != size || expected > 256u * 1024u * 1024u)
     {
         error = "DDS mip payload has an invalid size";
@@ -106,7 +118,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
 
     const auto* characters = reinterpret_cast<const char*>(bytes);
     gli::texture loaded = gli::load_dds(characters, size);
-    if (loaded.empty() || loaded.target() != gli::TARGET_2D || loaded.layers() != 1 || loaded.faces() != 1 ||
+    if (loaded.empty() || loaded.target() != (cube ? gli::TARGET_CUBE : gli::TARGET_2D) || loaded.layers() != 1 || loaded.faces() != faces ||
         loaded.levels() != mip_count || static_cast<uint32_t>(loaded.extent().x) != width ||
         static_cast<uint32_t>(loaded.extent().y) != height)
     {
@@ -122,23 +134,30 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
 
     if (!bc_supported && compressed(format))
     {
-        loaded = gli::convert(gli::texture2d(loaded), gli::FORMAT_RGBA8_UNORM_PACK8);
-        format = VK_FORMAT_R8G8B8A8_UNORM;
+        const bool srgb = gli::is_srgb(loaded.format());
+        const auto decodedFormat = srgb ? gli::FORMAT_RGBA8_SRGB_PACK8 : gli::FORMAT_RGBA8_UNORM_PACK8;
+        loaded = cube ? gli::texture(gli::convert(gli::texture_cube(loaded), decodedFormat)) :
+            gli::texture(gli::convert(gli::texture2d(loaded), decodedFormat));
+        format = srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
     }
 
     DdsTexture decoded;
     decoded.format = format;
     decoded.extent = { width, height, 1 };
+    decoded.mip_levels = mip_count;
+    decoded.layers = faces;
+    decoded.cube = cube;
+    for (uint32_t face = 0; face < faces; ++face)
     for (uint32_t level = 0; level < mip_count; ++level)
     {
         const size_t offset = (decoded.pixels.size() + 3u) & ~size_t(3u);
         decoded.pixels.resize(offset, 0);
         VkBufferImageCopy copy{};
         copy.bufferOffset = offset;
-        copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, level, 0, 1 };
+        copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, level, face, 1 };
         copy.imageExtent = { std::max(1u, width >> level), std::max(1u, height >> level), 1 };
         decoded.copies.push_back(copy);
-        const auto* src = static_cast<const std::uint8_t*>(loaded.data(0, 0, level));
+        const auto* src = static_cast<const std::uint8_t*>(loaded.data(0, face, level));
         decoded.pixels.insert(decoded.pixels.end(), src, src + loaded.size(level));
     }
     result = std::move(decoded);

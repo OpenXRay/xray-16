@@ -105,3 +105,17 @@ Version 0.9.26 uploads a supported game DDS through a Vulkan staging buffer
 into device-local image memory, transitions its layouts, and creates a sampled
 image view. This Vulkan-only resource path is exercised by the probe when
 Vulkan is selected; the gameplay draw pipeline remains on GLES.
+
+The DDS resource path also handles complete six-face cubemaps and preserves
+sRGB formats, including software BC decoding. Image allocation, copy regions,
+barriers and views cover every face and mip without GL dependencies. DX10 DDS
+headers validate resource dimension and cube flags separately. This resource
+support does not complete the shader, scene or gameplay integration gates.
+
+Version 0.9.45 centralizes whole-image layout and access transitions in
+`ImageStateTracker`. Texture uploads now use the same tracked transitions from
+undefined to transfer destination to shader sampled, with tests checking the
+generated Vulkan barrier masks and layouts. The tracker is currently scoped to
+one externally synchronized graphics queue and whole-image ranges; it does not
+yet provide render-graph scheduling, cross-queue ownership transfers, or a
+gameplay draw pipeline.

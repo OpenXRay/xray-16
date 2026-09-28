@@ -1,30 +1,145 @@
 {
   "game": [
-    {"label": "Автоматически / без ключа", "name": "автоопределение", "arg": ""},
-    {"label": "Shadow of Chernobyl (-soc)", "name": "Shadow of Chernobyl", "arg": "-soc"},
-    {"label": "Clear Sky (-cs)", "name": "Clear Sky", "arg": "-cs"},
-    {"label": "Call of Pripyat (-cop)", "name": "Call of Pripyat", "arg": "-cop"}
+    {
+      "label": "Автоматически / без ключа",
+      "name": "автоопределение",
+      "arg": ""
+    },
+    {
+      "label": "Shadow of Chernobyl (-soc)",
+      "name": "Shadow of Chernobyl",
+      "arg": "-soc"
+    },
+    {
+      "label": "Clear Sky (-cs)",
+      "name": "Clear Sky",
+      "arg": "-cs"
+    },
+    {
+      "label": "Call of Pripyat (-cop)",
+      "name": "Call of Pripyat",
+      "arg": "-cop"
+    }
   ],
   "renderer": [
-    {"label": "Автоматически (OpenGL ES)", "arg": "-renderer-auto"},
-    {"label": "OpenGL ES", "arg": "-renderer-gles"},
-    {"label": "Vulkan (экспериментальный fallback)", "arg": "-renderer-vulkan"}
+    {
+      "label": "Автоматически (OpenGL ES)",
+      "arg": "-renderer-auto"
+    },
+    {
+      "label": "OpenGL ES",
+      "arg": "-renderer-gles"
+    },
+    {
+      "label": "Vulkan (экспериментальный fallback)",
+      "arg": "-renderer-vulkan"
+    }
   ],
   "graphics": [
-    {"label": "Автоматически для Android (Low)", "preset": "Low"},
-    {"label": "Minimum", "preset": "Minimum"},
-    {"label": "Low", "preset": "Low"},
-    {"label": "Default", "preset": "Default"},
-    {"label": "High", "preset": "High"},
-    {"label": "Extreme", "preset": "Extreme"}
+    {
+      "label": "Автоматически для Android (Low)",
+      "preset": "Low"
+    },
+    {
+      "label": "Minimum",
+      "preset": "Minimum"
+    },
+    {
+      "label": "Low",
+      "preset": "Low"
+    },
+    {
+      "label": "Default",
+      "preset": "Default"
+    },
+    {
+      "label": "High",
+      "preset": "High"
+    },
+    {
+      "label": "Extreme",
+      "preset": "Extreme"
+    }
   ],
-  "resolution_widths": [854, 960, 1280, 1600, 1920, 2240, 2560],
-  "tabs": ["Игра", "Параметры", "Диагностика"],
-  "settings_sections": ["Рендерер", "Графика", "Разрешение 3D-рендера", "Управление и экран", "Расширенные параметры", "Дополнительные аргументы"],
+  "resolution_widths": [
+    854,
+    960,
+    1280,
+    1600,
+    1920,
+    2240,
+    2560
+  ],
+  "tabs": [
+    "Игра",
+    "Параметры",
+    "Диагностика"
+  ],
+  "settings_sections": [
+    "Рендерер",
+    "Качество рендеринга",
+    "Разрешение 3D-рендера",
+    "Управление и экран",
+    "Расширенные параметры",
+    "Дополнительные аргументы"
+  ],
   "advanced_reset_label": "Сбросить диагностические параметры",
   "advanced": [
-    {"key": "disable_hom", "label": "Отключить программное отсечение HOM", "description": "Проверка ошибок видимости; может снизить FPS.", "arg": "-no_hom"},
-    {"key": "disable_occq", "label": "Отключить GPU-запросы видимости", "description": "Проверка ошибок драйвера; может снизить FPS.", "arg": "-no_occq"},
-    {"key": "gl_debug", "label": "Подробные сообщения OpenGL", "description": "Записывает ошибки драйвера в журнал; может снизить FPS.", "arg": "-android-gl-debug"}
-  ]
+    {
+      "key": "disable_hom",
+      "label": "Отключить программное отсечение HOM",
+      "description": "Проверка ошибок видимости; может снизить FPS.",
+      "arg": "-no_hom"
+    },
+    {
+      "key": "disable_occq",
+      "label": "Отключить GPU-запросы видимости",
+      "description": "Проверка ошибок драйвера; может снизить FPS.",
+      "arg": "-no_occq"
+    },
+    {
+      "key": "gl_debug",
+      "label": "Подробные сообщения OpenGL",
+      "description": "Записывает ошибки драйвера в журнал; может снизить FPS.",
+      "arg": "-android-gl-debug"
+    },
+    {
+      "key": "sector_audit",
+      "label": "Проверка коллизий и секторов",
+      "description": "Независимая проверка видимости; увеличивает нагрузку на процессор.",
+      "arg": "-android-sector-audit"
+    }
+  ],
+  "quality_overrides": {
+    "Minimum": {
+      "r3_water_refl": "st_opt_off",
+      "r2_smap_size": "1024",
+      "r2_sun_details": "off",
+      "r__tf_aniso": "2"
+    },
+    "Low": {
+      "r3_water_refl": "st_opt_off",
+      "r2_smap_size": "1024",
+      "r2_sun_details": "off",
+      "r__tf_aniso": "4"
+    },
+    "Default": {
+      "r3_water_refl": "st_opt_low",
+      "r2_smap_size": "2048",
+      "r2_sun_details": "on",
+      "r__tf_aniso": "8"
+    },
+    "High": {
+      "r3_water_refl": "st_opt_medium",
+      "r2_smap_size": "2048",
+      "r2_sun_details": "on",
+      "r__tf_aniso": "16"
+    },
+    "Extreme": {
+      "r3_water_refl": "st_opt_high",
+      "r2_smap_size": "4096",
+      "r2_sun_details": "on",
+      "r__tf_aniso": "16"
+    }
+  }
 }

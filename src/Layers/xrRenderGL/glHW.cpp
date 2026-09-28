@@ -256,6 +256,9 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
 void CHW::DestroyDevice()
 {
+#if defined(XR_PLATFORM_ANDROID)
+    frameProfiler.destroy();
+#endif
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     pFB = 0;
 

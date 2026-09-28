@@ -5,3 +5,7 @@ if (WIN32)
 endif()
 
 add_subdirectory(xrRenderPC_GL)
+
+if (ANDROID)
+    add_subdirectory(xrRenderVK)
+endif()

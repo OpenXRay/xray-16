@@ -3,6 +3,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "Text/LegacyFilename.h"
+#endif
 #pragma hdrstop // huh?
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -189,8 +192,11 @@ CLocatorAPI::~CLocatorAPI()
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
 {
-    struct stat buffer;
-    if (stat(name, &buffer) == -1)
+    struct stat buffer{};
+    string_path nativeName;
+    xr_strcpy(nativeName, name);
+    convert_path_separators(nativeName);
+    if (stat(nativeName, &buffer) == -1)
         return nullptr;
     return Register(name, size_t(-1), 0, 0, buffer.st_size, buffer.st_size, u32(buffer.st_mtime));
 }
@@ -1165,8 +1171,11 @@ FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
     }
     if ((fsType | FSType::External) == FSType::External)
     {
-        struct stat buffer;
-        return FileStatus(stat(fn, &buffer) == 0, true);
+        struct stat buffer{};
+        string_path nativeName;
+        xr_strcpy(nativeName, fn);
+        convert_path_separators(nativeName);
+        return FileStatus(stat(nativeName, &buffer) == 0, true);
     }
     return FileStatus(false, false);
 }
@@ -1238,7 +1247,12 @@ xr_vector<pstr>* CLocatorAPI::file_list_open(pcstr _path, u32 flags)
             const char* entry_begin = entry.name + base_len;
             if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER))
                 continue; // folder in folder
-            dest->push_back(xr_strdup(entry_begin));
+#if defined(XR_PLATFORM_ANDROID)
+            if (path_exist("$game_saves$") && 0 == xr_strcmp(N, get_path("$game_saves$")->m_Path))
+                dest->push_back(xr_strdup(xray::text::filename_from_utf8(entry_begin).c_str()));
+            else
+#endif
+                dest->push_back(xr_strdup(entry_begin));
             pstr fname = dest->back();
             if (flags & FS_ClampExt)
                 if (nullptr != strext(fname))
@@ -1327,6 +1341,10 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
                 file.name = EFS.ChangeFileExt(entry_begin, "");
             else
                 file.name = entry_begin;
+#if defined(XR_PLATFORM_ANDROID)
+            if (path_exist("$game_saves$") && 0 == xr_strcmp(N, get_path("$game_saves$")->m_Path))
+                file.name = xray::text::filename_from_utf8(file.name.c_str()).c_str();
+#endif
             u32 fl = entry.vfs != VFS_STANDARD_FILE ? FS_File::flVFS : 0;
             file.size = entry.size_real;
             file.time_write = entry.modif;
@@ -1730,9 +1748,12 @@ void CLocatorAPI::w_close(IWriter*& S)
             _stat(fname, &st);
             Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #elif defined(XR_PLATFORM_POSIX)
-            struct stat st;
-            ::stat(fname, &st);
-            Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
+            struct stat st{};
+            string_path nativeName;
+            xr_strcpy(nativeName, fname);
+            convert_path_separators(nativeName);
+            if (::stat(nativeName, &st) == 0)
+                Register(fname, VFS_STANDARD_FILE, 0, 0, st.st_size, st.st_size, (u32)st.st_mtime);
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -1933,6 +1954,10 @@ pcstr CLocatorAPI::update_path(string_path& dest, pcstr initial, pcstr src, bool
         return nullptr;
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    if (0 == xr_strcmp(initial, "$game_saves$"))
+        return path->_update(dest, xray::text::filename_to_utf8(src).c_str());
+#endif
     return path->_update(dest, src);
 }
 /*

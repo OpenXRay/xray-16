@@ -50,7 +50,7 @@ public final class XRayActivity extends SDLActivity {
             diagnosticsFile = createDiagnosticsFile();
         } catch (RuntimeException error) {
             Log.e(TAG, "Unable to initialize diagnostics storage", error);
-            diagnosticsFile = new File(getFilesDir(), "activity.log");
+            diagnosticsFile = null;
         }
         installCrashHandler();
         writeDiagnostic("activity onCreate; version=" + BuildConfig.VERSION_NAME
@@ -162,6 +162,7 @@ public final class XRayActivity extends SDLActivity {
         int renderHeight = getIntent().getIntExtra(LauncherActivity.EXTRA_RENDER_HEIGHT, 720);
         boolean showFps = getIntent().getBooleanExtra(LauncherActivity.EXTRA_SHOW_FPS, true);
         ArrayList<String> args = new ArrayList<>();
+        args.add("-unique_logs");
 
         if (rendererSmoke) {
             args.add(vulkanRendererSmoke ? "-renderer-vulkan-smoke" : "-renderer-smoke");
@@ -248,28 +249,25 @@ public final class XRayActivity extends SDLActivity {
     }
 
     private File createDiagnosticsFile() {
-        File publicFile = new File(Environment.getExternalStorageDirectory(), "openxray/activity.log");
-        if (canAppend(publicFile))
-            return publicFile;
-
-        File root = getExternalFilesDir("openxray");
-        if (root == null)
-            root = new File(getFilesDir(), "openxray");
-        if (!root.exists() && !root.mkdirs())
-            Log.e(TAG, "Unable to create diagnostics directory: " + root);
-        return new File(root, "activity.log");
-    }
-
-    private boolean canAppend(File file) {
-        File parent = file.getParentFile();
-        if (parent == null || (!parent.exists() && !parent.mkdirs()))
-            return false;
-
-        try (FileOutputStream stream = new FileOutputStream(file, true)) {
-            return true;
+        try {
+            String enginePath = getIntent().getStringExtra(LauncherActivity.EXTRA_ENGINE_LOG);
+            String activityPath = getIntent().getStringExtra(LauncherActivity.EXTRA_ACTIVITY_LOG);
+            if (activityPath == null || activityPath.isEmpty())
+                throw new IOException("Missing activity log path");
+            SessionLogs.activate(enginePath);
+            File activity = new File(activityPath);
+            if (!activity.isFile()) throw new IOException("Activity log was not created: " + activity);
+            return activity;
         } catch (IOException | SecurityException error) {
-            Log.w(TAG, "Shared-storage diagnostics unavailable: " + file, error);
-            return false;
+            Log.e(TAG, "Unable to activate launcher log session", error);
+            try {
+                SessionLogs.Session fallback = SessionLogs.start(this,
+                        getIntent().getStringExtra(LauncherActivity.EXTRA_GAME_PATH));
+                SessionLogs.activate(fallback.engine.getAbsolutePath());
+                return fallback.activity;
+            } catch (IOException fallback) {
+                throw new IllegalStateException("Unable to create diagnostics", fallback);
+            }
         }
     }
 
@@ -288,7 +286,12 @@ public final class XRayActivity extends SDLActivity {
     private synchronized void writeDiagnostic(String message) {
         Log.i(TAG, message);
         if (diagnosticsFile == null) {
-            diagnosticsFile = createDiagnosticsFile();
+            try {
+                diagnosticsFile = createDiagnosticsFile();
+            } catch (RuntimeException error) {
+                Log.e(TAG, "Unable to open a timestamped diagnostic log", error);
+                return;
+            }
         }
         try (PrintWriter writer = new PrintWriter(new FileWriter(diagnosticsFile, true))) {
             String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)

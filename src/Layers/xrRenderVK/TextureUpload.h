@@ -1,6 +1,9 @@
 #pragma once
 
 #include "DdsTexture.h"
+#include "ImageStateTracker.h"
+
+#include <vector>
 
 namespace xray::render::vulkan
 {
@@ -27,7 +30,10 @@ struct TextureUploadDispatch
     PFN_vkCmdPipelineBarrier cmd_pipeline_barrier{};
     PFN_vkCmdCopyBufferToImage cmd_copy_buffer_to_image{};
     PFN_vkQueueSubmit queue_submit{};
-    PFN_vkQueueWaitIdle queue_wait_idle{};
+    PFN_vkCreateFence create_fence{};
+    PFN_vkDestroyFence destroy_fence{};
+    PFN_vkGetFenceStatus get_fence_status{};
+    PFN_vkWaitForFences wait_for_fences{};
 };
 
 struct UploadedTexture
@@ -37,8 +43,24 @@ struct UploadedTexture
     VkDeviceMemory memory = VK_NULL_HANDLE;
 };
 
+// Staging resources and command buffers stay alive until the GPU signals the
+// submission fence. Keeping these in a queue avoids vkQueueWaitIdle per asset.
+struct PendingTextureUpload
+{
+    VkBuffer staging = VK_NULL_HANDLE;
+    VkDeviceMemory staging_memory = VK_NULL_HANDLE;
+    VkCommandBuffer command = VK_NULL_HANDLE;
+    VkFence fence = VK_NULL_HANDLE;
+};
+
 bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory_types, const TextureUploadDispatch& vk,
-    const DdsTexture& source, UploadedTexture& result, std::string& error);
+    const DdsTexture& source, UploadedTexture& result,
+    std::vector<PendingTextureUpload>& pending_uploads, ImageStateTracker& image_states,
+    std::string& error);
+void collect_completed_uploads(VkDevice device, VkCommandPool pool, const TextureUploadDispatch& vk,
+    std::vector<PendingTextureUpload>& pending_uploads);
+bool wait_for_uploads(VkDevice device, VkCommandPool pool, const TextureUploadDispatch& vk,
+    std::vector<PendingTextureUpload>& pending_uploads);
 void destroy_texture(VkDevice device, const TextureUploadDispatch& vk, UploadedTexture& texture);
 }

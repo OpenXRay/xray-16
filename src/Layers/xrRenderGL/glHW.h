@@ -2,6 +2,9 @@
 
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
+#if defined(XR_PLATFORM_ANDROID)
+#include "glFrameProfiler.h"
+#endif
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -64,6 +67,7 @@ public:
     bool ComputeShadersSupported;
 
 #if defined(XR_PLATFORM_ANDROID)
+    GlFrameProfiler frameProfiler;
     bool m_surfaceNeedsReset{};
 #endif
 };

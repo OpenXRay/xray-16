@@ -66,12 +66,14 @@ The diagnostics page polls bounded 32 KiB tails on a background executor, so
 it does not load whole growing files on the UI thread. Primary Android paths:
 
 ```text
-/storage/emulated/0/openxray/android.log
-/storage/emulated/0/openxray/activity.log
+<game>/_appdata_/logs/android_<timestamp>_<pid>_<id>.log
+<game>/_appdata_/logs/activity_<timestamp>_<pid>_<id>.log
 ```
 
 Normal engine logs are also written under `<STALKER>/_appdata_/logs/`.
-**Clear** only removes the Android diagnostic files; it does not delete saves,
+Each engine launch creates new, uniquely named files. Diagnostics displays and
+shares the latest session; previous sessions remain in the game directory.
+**Clear** removes the latest Android diagnostic files while the engine is stopped; it does not delete saves,
 screenshots, game files or `user.ltx`.
 
 Useful collection commands:
@@ -82,10 +84,24 @@ adb shell am force-stop org.openxray.stalker
 adb shell am start -n org.openxray.stalker/org.openxray.app.LauncherActivity
 adb logcat -d -b all -v threadtime OpenXRay:I DEBUG:E '*:S' > openxray-logcat.txt
 adb logcat -d -b crash -v threadtime > openxray-crash.txt
-adb pull /sdcard/openxray/android.log openxray-engine.log
-adb pull /sdcard/openxray/activity.log openxray-activity.log
 adb pull /sdcard/STALKER/_appdata_/logs openxray-game-logs
 ```
 
 Native crashes must be symbolicated against the unstripped `libmain.so` built
 from the same commit as the APK.
+
+## Checking and installing updates
+
+Open **Settings → Updates → Check for updates** to query published releases in
+`r0shn1ch/xray-16`. Releases without `android-update.json` are ignored. When an
+update is available, the launcher downloads the named APK, checks its SHA-256,
+and hands installation to Android. Android asks the user to approve the update;
+on Android 8 and later, allow installs from OpenXRay when prompted.
+
+`android/build-apk-armv7.sh` creates `build/android-update.json` beside the APK.
+To publish an Android update, attach both files to a **published** GitHub
+release, preserving the APK's filename from the manifest. The APK must be signed
+with the same certificate as the installed app; Android rejects updates signed
+with a different key. The checked-in build script produces a debug-signed APK,
+so distributing updates beyond builds made with the same debug key requires a
+stable release keystore.

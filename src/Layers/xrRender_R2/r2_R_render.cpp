@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "Layers/xrRender/FramePhaseProfile.h"
+#endif
 
 #include "xrCore/Threading/TaskManager.hpp"
 
@@ -107,6 +110,13 @@ void CRender::Render()
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
     auto& dsgraph = get_imm_context();
 
+#if defined(XR_PLATFORM_ANDROID)
+    xray::render::FramePhaseProfile profile;
+#if defined(USE_OGL)
+    HW.frameProfiler.begin();
+    struct GpuProfileEnd { ~GpuProfileEnd() { HW.frameProfiler.end(); } } gpuProfileEnd;
+#endif
+#endif
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
@@ -140,6 +150,9 @@ void CRender::Render()
         BasicStats.Culling.End();
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(0);
+#endif
     //*******
     // Sync point
     BasicStats.WaitS.Begin();
@@ -149,6 +162,9 @@ void CRender::Render()
     BasicStats.WaitS.End();
     q_sync_point.End();
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(1);
+#endif
     r_main.sync();
 
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
@@ -198,6 +214,9 @@ void CRender::Render()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(2);
+#endif
     //******* Occlusion testing of volume-limited light-sources
     Target->phase_occq();
     LP_normal.clear();
@@ -328,6 +347,9 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(3);
+#endif
     r_rain.sync();
 
     // Directional light - fucking sun
@@ -341,6 +363,9 @@ void CRender::Render()
         Target->accum_direct_blend(dsgraph.cmd_list);
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(4);
+#endif
     {
         PIX_EVENT(DEFER_SELF_ILLUM);
         Target->phase_accumulator(dsgraph.cmd_list);
@@ -375,6 +400,9 @@ void CRender::Render()
         render_lights(LP_pending);
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    profile.end(5);
+#endif
     // Postprocess
     {
         PIX_EVENT(DEFER_LIGHT_COMBINE);

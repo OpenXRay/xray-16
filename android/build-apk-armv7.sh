@@ -98,8 +98,7 @@ remove_path "$asset_root"
 mkdir -p "$asset_root/gamedata"
 cp "$repo_dir/res/fsgame.ltx" "$asset_root/fsgame.ltx"
 cp -R "$repo_dir/res/gamedata/." "$asset_root/gamedata/"
-cp "$repo_dir/android/apk/android_mobile_minimum.ltx" \
-    "$asset_root/gamedata/configs/android_mobile_minimum.ltx"
+cp "$repo_dir"/android/apk/quality_*.ltx "$asset_root/gamedata/configs/"
 if [ -d "$asset_root/gamedata/gamedata" ]; then
     echo "APK asset staging unexpectedly nested gamedata inside itself" >&2
     exit 1
@@ -211,6 +210,9 @@ aligned_apk="$build_dir/app-debug-16k-aligned.apk"
 unlink "$aligned_apk"
 "$zipalign_bin" -c -P 16 4 "$output_apk"
 "$apksigner_bin" verify "$output_apk"
+python3 "$script_dir/create-update-manifest.py" \
+    --apk "$output_apk" \
+    --output "$build_dir/android-update.json"
 printf '%s\n' "$output_apk"
 
 manifest="$build_dir/build-manifest.txt"
@@ -226,3 +228,4 @@ manifest="$build_dir/build-manifest.txt"
     echo "lto=$android_lto"
 } > "$manifest"
 echo "Build manifest: $manifest"
+echo "Android release update manifest: $build_dir/android-update.json"

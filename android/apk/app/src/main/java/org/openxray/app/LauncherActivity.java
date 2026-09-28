@@ -3,7 +3,9 @@ package org.openxray.app;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.pm.PackageInstaller;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -68,6 +70,8 @@ public final class LauncherActivity extends Activity {
     public static final String EXTRA_TOUCH_CONTROLS = "org.openxray.extra.TOUCH_CONTROLS";
     public static final String EXTRA_RENDERER_MODE = "org.openxray.extra.RENDERER_MODE";
     public static final String EXTRA_GRAPHICS_PRESET = "org.openxray.extra.GRAPHICS_PRESET";
+    public static final String EXTRA_ENGINE_LOG = "org.openxray.extra.ENGINE_LOG";
+    public static final String EXTRA_ACTIVITY_LOG = "org.openxray.extra.ACTIVITY_LOG";
     public static final String EXTRA_RENDER_WIDTH = "org.openxray.extra.RENDER_WIDTH";
     public static final String EXTRA_RENDER_HEIGHT = "org.openxray.extra.RENDER_HEIGHT";
     public static final String EXTRA_SHOW_FPS = "org.openxray.extra.SHOW_FPS";
@@ -111,6 +115,7 @@ public final class LauncherActivity extends Activity {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService logExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
     private EditText gamePath;
     private EditText customArgs;
     private Spinner gameVariant;
@@ -127,9 +132,11 @@ public final class LauncherActivity extends Activity {
     private TextView accessStatus;
     private TextView gameInspection;
     private TextView status;
+    private TextView updateStatus;
     private TextView logView;
     private Button launchButton;
     private Button stopButton;
+    private Button updateButton;
     private Button[] tabButtons;
     private View[] pages;
     private SharedPreferences preferences;
@@ -141,6 +148,7 @@ public final class LauncherActivity extends Activity {
     private int activePage = PAGE_GAME;
     private boolean logReadPending;
     private String cachedLog = "";
+    private AppUpdater.Update pendingUpdate;
     private final ArrayList<RenderResolution> renderResolutions = new ArrayList<>();
 
     private static final class RenderResolution {
@@ -194,6 +202,12 @@ public final class LauncherActivity extends Activity {
         refreshRunningState();
         handler.removeCallbacks(logPoller);
         handler.post(logPoller);
+        if (pendingUpdate != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && getPackageManager().canRequestPackageInstalls()) {
+            AppUpdater.Update update = pendingUpdate;
+            pendingUpdate = null;
+            handler.post(() -> installUpdate(update));
+        }
     }
 
     @Override
@@ -207,6 +221,7 @@ public final class LauncherActivity extends Activity {
     protected void onDestroy() {
         handler.removeCallbacks(logPoller);
         logExecutor.shutdownNow();
+        updateExecutor.shutdownNow();
         super.onDestroy();
     }
 
@@ -455,7 +470,142 @@ public final class LauncherActivity extends Activity {
         }), new LinearLayout.LayoutParams(-1, dp(52)));
         content.addView(actionButton("Сбросить настройки лаунчера", view -> confirmResetPreferences()),
                 new LinearLayout.LayoutParams(-1, dp(52)));
+
+        addSectionTitle(content, "Обновления");
+        content.addView(bodyText("Проверка опубликованных версий OpenXRay для Android. "
+                + "Перед установкой APK проверяется по SHA-256."), matchWrap());
+        updateStatus = bodyText("Установлена версия " + BuildConfig.VERSION_NAME + ".");
+        content.addView(updateStatus, matchWrap());
+        updateButton = actionButton("Проверить обновления", view -> checkForUpdates());
+        content.addView(updateButton, new LinearLayout.LayoutParams(-1, dp(52)));
         return scrollPage(content);
+    }
+
+    private void checkForUpdates() {
+        if (updateButton != null)
+            updateButton.setEnabled(false);
+        setUpdateStatus("Проверяю опубликованные релизы…");
+        updateExecutor.execute(() -> {
+            AppUpdater.Update update = null;
+            String error = null;
+            try {
+                update = AppUpdater.checkForUpdate(BuildConfig.VERSION_CODE);
+            } catch (IOException exception) {
+                error = exception.getMessage();
+            }
+
+            final AppUpdater.Update availableUpdate = update;
+            final String checkError = error;
+            handler.post(() -> {
+                if (isFinishing())
+                    return;
+                if (updateButton != null)
+                    updateButton.setEnabled(true);
+                if (checkError != null) {
+                    setUpdateStatus("Не удалось проверить обновления: " + checkError);
+                    return;
+                }
+                if (availableUpdate == null) {
+                    setUpdateStatus("Обновлений нет. Установлена последняя опубликованная версия.");
+                    return;
+                }
+
+                String message = "Доступна версия " + availableUpdate.versionName + ".\n\n"
+                        + (availableUpdate.releaseNotes.isEmpty()
+                                ? "APK будет проверен по SHA-256 перед установкой."
+                                : availableUpdate.releaseNotes);
+                new AlertDialog.Builder(this)
+                        .setTitle("Доступно обновление")
+                        .setMessage(message)
+                        .setPositiveButton("Установить", (dialog, which) -> installUpdate(availableUpdate))
+                        .setNegativeButton("Позже", (dialog, which) ->
+                                setUpdateStatus("Доступна версия " + availableUpdate.versionName + "."))
+                        .show();
+            });
+        });
+    }
+
+    private void installUpdate(AppUpdater.Update update) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && !getPackageManager().canRequestPackageInstalls()) {
+            pendingUpdate = update;
+            try {
+                Intent settingsIntent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:" + getPackageName()));
+                startActivity(settingsIntent);
+                setUpdateStatus("Разрешите установку из OpenXRay. После возврата начнётся загрузка.");
+            } catch (ActivityNotFoundException error) {
+                pendingUpdate = null;
+                setUpdateStatus("Android не открыл разрешение на установку приложений.");
+            }
+            return;
+        }
+
+        pendingUpdate = null;
+        if (updateButton != null)
+            updateButton.setEnabled(false);
+        setUpdateStatus("Загружаю и проверяю APK версии " + update.versionName + "…");
+        updateExecutor.execute(() -> {
+            File apk = null;
+            String error = null;
+            try {
+                apk = AppUpdater.download(this, update);
+                installDownloadedApk(apk);
+            } catch (IOException | RuntimeException exception) {
+                error = exception.getMessage();
+            }
+
+            final String installError = error;
+            handler.post(() -> {
+                if (isFinishing())
+                    return;
+                if (updateButton != null)
+                    updateButton.setEnabled(true);
+                if (installError != null) {
+                    setUpdateStatus("Не удалось установить обновление: " + installError);
+                } else {
+                    setUpdateStatus("APK версии " + update.versionName
+                            + " проверен. Подтвердите установку в системном окне Android.");
+                }
+            });
+        });
+    }
+
+    private void installDownloadedApk(File apk) throws IOException {
+        PackageInstaller installer = getPackageManager().getPackageInstaller();
+        PackageInstaller.SessionParams parameters = new PackageInstaller.SessionParams(
+                PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+        parameters.setAppPackageName(getPackageName());
+        parameters.setSize(apk.length());
+
+        int sessionId = installer.createSession(parameters);
+        PackageInstaller.Session session = installer.openSession(sessionId);
+        try {
+            try (InputStream input = new FileInputStream(apk);
+                    OutputStream output = session.openWrite("openxray-update.apk", 0, apk.length())) {
+                byte[] buffer = new byte[32 * 1024];
+                int count;
+                while ((count = input.read(buffer)) != -1)
+                    output.write(buffer, 0, count);
+                session.fsync(output);
+            }
+
+            Intent statusIntent = new Intent(this, UpdateInstallReceiver.class)
+                    .setAction(UpdateInstallReceiver.ACTION_INSTALL_STATUS);
+            PendingIntent statusPendingIntent = PendingIntent.getBroadcast(this, sessionId, statusIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+            session.commit(statusPendingIntent.getIntentSender());
+        } catch (IOException | RuntimeException error) {
+            session.abandon();
+            throw error;
+        } finally {
+            session.close();
+        }
+    }
+
+    private void setUpdateStatus(String message) {
+        if (updateStatus != null)
+            updateStatus.setText(message);
     }
 
     private View buildDiagnosticsPage() {
@@ -839,18 +989,39 @@ public final class LauncherActivity extends Activity {
             return;
         }
 
-        clearLogs();
         savePreferences();
         String selectedPath = gamePath.getText().toString().trim();
+        SessionLogs.Session logSession;
+        try {
+            logSession = SessionLogs.start(this, rendererSmoke ? null : selectedPath);
+        } catch (IOException | SecurityException error) {
+            setStatus("Не удалось создать журналы в папке игры: " + error.getMessage());
+            return;
+        }
         writeLauncherLog("[launcher] starting "
-                + (rendererSmoke ? "renderer smoke test" : "OpenXRay; game root=" + selectedPath));
+                + (rendererSmoke ? "renderer smoke test" : "OpenXRay; game root=" + selectedPath),
+                logSession.activity);
         engineLaunchTime = SystemClock.elapsedRealtime();
         engineFailureToastShown = false;
 
         Intent intent = createEngineIntent(rendererSmoke, vulkanRendererSmoke);
+        intent.putExtra(EXTRA_ENGINE_LOG, logSession.engine.getAbsolutePath());
+        intent.putExtra(EXTRA_ACTIVITY_LOG, logSession.activity.getAbsolutePath());
         intent.putExtra(EXTRA_ADDITIONAL_ARGS, additionalArgs);
-        setStatus(vulkanRendererSmoke ? "Запускаю Vulkan probe и GLES fallback…" :
-                (rendererSmoke ? "Запускаю GLES smoke test…" : "Запускаю OpenXRay…"));
+        String launchStatus;
+        if (vulkanRendererSmoke) {
+            launchStatus = "Запускаю Vulkan probe и GLES fallback…";
+        } else if (rendererSmoke) {
+            launchStatus = "Запускаю GLES smoke test…";
+        } else {
+            launchStatus = "Запускаю OpenXRay: "
+                    + OptionCatalog.value(OptionCatalog.RENDERER_LABELS,
+                            clampRendererMode(rendererMode.getSelectedItemPosition()), 0)
+                    + ", качество: "
+                    + OptionCatalog.value(OptionCatalog.GRAPHICS_LABELS,
+                            clampGraphicsPreset(graphicsPreset.getSelectedItemPosition()), 0);
+        }
+        setStatus(launchStatus);
         Toast.makeText(this, "OpenXRay: запуск движка…", Toast.LENGTH_SHORT).show();
         try {
             startActivity(intent);
@@ -1309,16 +1480,8 @@ public final class LauncherActivity extends Activity {
 
     private String collectLogs() {
         StringBuilder result = new StringBuilder();
-        appendLog(result, new File(Environment.getExternalStorageDirectory(), "openxray/android.log"));
-        appendLog(result, new File(Environment.getExternalStorageDirectory(), "openxray/activity.log"));
-        File external = getExternalFilesDir("openxray");
-        if (external != null) {
-            appendLog(result, new File(external, "android.log"));
-            appendLog(result, new File(external, "activity.log"));
-        }
-        File internal = new File(getFilesDir(), "openxray");
-        appendLog(result, new File(internal, "android.log"));
-        appendLog(result, new File(internal, "activity.log"));
+        File[] session = SessionLogs.latest(this);
+        for (File file : session) appendLog(result, file);
         return result.toString();
     }
 
@@ -1424,41 +1587,35 @@ public final class LauncherActivity extends Activity {
     }
 
     private void clearLogs() {
-        deleteLog(new File(Environment.getExternalStorageDirectory(), "openxray/android.log"));
-        deleteLog(new File(Environment.getExternalStorageDirectory(), "openxray/activity.log"));
-        File external = getExternalFilesDir("openxray");
-        if (external != null) {
-            deleteLog(new File(external, "android.log"));
-            deleteLog(new File(external, "activity.log"));
+        if (isEngineProcessRunning()) {
+            Toast.makeText(this, "Закройте игру перед очисткой текущего журнала", Toast.LENGTH_LONG).show();
+            return;
         }
-        File internal = new File(getFilesDir(), "openxray");
-        deleteLog(new File(internal, "android.log"));
-        deleteLog(new File(internal, "activity.log"));
+        for (File file : SessionLogs.latest(this)) deleteLog(file);
         refreshLog();
     }
 
     private void writeLauncherLog(String message) {
-        File externalRoot = getExternalFilesDir("openxray");
-        File[] candidates = new File[] {
-                new File(Environment.getExternalStorageDirectory(), "openxray/android.log"),
-                externalRoot == null ? null : new File(externalRoot, "android.log"),
-                new File(getFilesDir(), "openxray/android.log")
-        };
+        File[] session = SessionLogs.latest(this);
+        writeLauncherLog(message, session.length != 0 ? session[1] : null);
+    }
+
+    private void writeLauncherLog(String message, File sessionFile) {
+        if (sessionFile == null) {
+            String gameRoot = gamePath == null ? "" : gamePath.getText().toString().trim();
+            File directory = gameRoot.isEmpty() ? new File(getFilesDir(), "openxray/logs")
+                    : new File(gameRoot, "_appdata_/logs");
+            if (!directory.isDirectory() && !directory.mkdirs()) return;
+            String stamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(new Date());
+            sessionFile = new File(directory, "activity_" + stamp + "_launcher.log");
+        }
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
                 .format(new Date());
-        for (File file : candidates) {
-            if (file == null)
-                continue;
-            File parent = file.getParentFile();
-            if (parent == null || (!parent.exists() && !parent.mkdirs()))
-                continue;
-            try (PrintWriter writer = new PrintWriter(new FileWriter(file, true))) {
-                writer.println(timestamp + " " + message);
-                return;
-            } catch (IOException | SecurityException ignored) {
-                // Try the app-specific fallback when shared storage is unavailable.
-            }
-        }
+        File parent = sessionFile.getParentFile();
+        if (parent == null || (!parent.exists() && !parent.mkdirs())) return;
+        try (PrintWriter writer = new PrintWriter(new FileWriter(sessionFile, true))) {
+            writer.println(timestamp + " " + message);
+        } catch (IOException | SecurityException ignored) { }
     }
 
     private void deleteLog(File file) {

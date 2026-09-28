@@ -442,23 +442,8 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
 
 void android_open_early_crash_logs()
 {
-    static constexpr pcstr paths[] =
-    {
-        "/storage/emulated/0/openxray/android.log",
-        "/storage/emulated/0/Android/data/org.openxray.stalker/files/openxray/android.log",
-        "/data/user/0/org.openxray.stalker/files/openxray/android.log",
-        "/data/data/org.openxray.stalker/files/openxray/android.log",
-    };
-
-    // The public path needs the user-granted all-files access.  The app-scoped
-    // paths remain useful when the permission is not available yet.
-    mkdir("/storage/emulated/0/openxray", 0775);
-    mkdir("/storage/emulated/0/Android/data/org.openxray.stalker/files/openxray", 0775);
-    mkdir("/data/user/0/org.openxray.stalker/files/openxray", 0775);
-    mkdir("/data/data/org.openxray.stalker/files/openxray", 0775);
-
-    for (pcstr path : paths)
-        android_add_crash_log_fd(path);
+    if (const char* session = std::getenv("OPENXRAY_ENGINE_LOG"); session && *session)
+        android_add_crash_log_fd(session);
 }
 
 void android_install_crash_handler()
@@ -535,41 +520,39 @@ void android_engine_log_callback(void*, const char* line)
         return;
 
     g_android_engine_log.stream << line << '\n';
-    g_android_engine_log.stream.flush();
+    static auto lastFlush = std::chrono::steady_clock::now();
+    const auto now = std::chrono::steady_clock::now();
+    if (now - lastFlush >= std::chrono::seconds(1) || line[0] == '!')
+    {
+        g_android_engine_log.stream.flush();
+        lastFlush = now;
+    }
 }
 
 bool initialize_android_engine_log()
 {
-    std::vector<std::filesystem::path> candidates;
-    candidates.emplace_back("/storage/emulated/0/openxray/android.log");
+    const char* session = std::getenv("OPENXRAY_ENGINE_LOG");
+    if (!session || !*session)
+        return false;
+    const std::filesystem::path candidate(session);
 
-    if (const char* external_path = SDL_AndroidGetExternalStoragePath())
-        candidates.emplace_back(std::filesystem::path(external_path) / "openxray/android.log");
+    std::error_code error;
+    std::filesystem::create_directories(candidate.parent_path(), error);
+    if (error)
+        return false;
 
-    if (const char* internal_path = SDL_AndroidGetInternalStoragePath())
-        candidates.emplace_back(std::filesystem::path(internal_path) / "openxray/android.log");
+    g_android_engine_log.stream.open(candidate, std::ios::out | std::ios::app);
+    if (!g_android_engine_log.stream)
+        return false;
 
-    for (const auto& candidate : candidates)
-    {
-        std::error_code error;
-        std::filesystem::create_directories(candidate.parent_path(), error);
-        if (error)
-            continue;
+    g_android_engine_log.path = candidate;
+    android_add_crash_log_fd(candidate.string().c_str());
+    g_android_engine_log.previous_callback = SetLogCB({ android_engine_log_callback, nullptr });
+    g_android_engine_log.callback_installed = true;
+    Msg("[android] engine log: %s", g_android_engine_log.path.string().c_str());
+    android_write_early_to_logs("[android] engine log opened");
+    return true;
 
-        g_android_engine_log.stream.open(candidate, std::ios::out | std::ios::app);
-        if (!g_android_engine_log.stream)
-            continue;
-
-        g_android_engine_log.path = candidate;
-        android_add_crash_log_fd(candidate.string().c_str());
-        g_android_engine_log.previous_callback = SetLogCB({ android_engine_log_callback, nullptr });
-        g_android_engine_log.callback_installed = true;
-        Msg("[android] engine log: %s", g_android_engine_log.path.string().c_str());
-        android_write_early_to_logs("[android] engine log opened");
-        return true;
-    }
-
-    return false;
 }
 
 void shutdown_android_engine_log()
@@ -1009,21 +992,25 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         {
             string128 command{};
             xr_sprintf(command, "_preset %s", preset);
-            Msg("[android] applying launcher mobile preset: %s", preset);
+            Msg("[android] applying rendering quality: %s", preset);
             Console->Execute(command);
 
-            if (0 == xr_stricmp(preset, "Minimum"))
+            if (0 == xr_stricmp(preset, "Minimum") || 0 == xr_stricmp(preset, "Low") ||
+                0 == xr_stricmp(preset, "Default") || 0 == xr_stricmp(preset, "High") ||
+                0 == xr_stricmp(preset, "Extreme"))
             {
                 if (const char* internal = SDL_AndroidGetInternalStoragePath())
                 {
-                    const auto config = std::filesystem::path(internal) / "openxray/engine-gamedata/configs/android_mobile_minimum.ltx";
+                    xr_strlwr(preset);
+                    const auto config = std::filesystem::path(internal) / "openxray/engine-gamedata/configs" /
+                        (std::string("quality_") + preset + ".ltx");
                     if (std::filesystem::is_regular_file(config))
                     {
-                        Msg("[android] loading mobile adjustments: %s", config.string().c_str());
+                        Msg("[android] loading rendering settings: %s", config.string().c_str());
                         Console->ExecuteScript(config.string().c_str());
                     }
                     else
-                        Msg("! [android] mobile adjustments unavailable: %s", config.string().c_str());
+                        Msg("! [android] rendering settings unavailable: %s", config.string().c_str());
                 }
             }
         }

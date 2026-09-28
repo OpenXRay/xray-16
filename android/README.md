@@ -178,8 +178,8 @@ The diagnostics page reads bounded log tails on a background thread. Android
 bootstrap/crash logs are normally available at:
 
 ```text
-/storage/emulated/0/openxray/android.log
-/storage/emulated/0/openxray/activity.log
+<game>/_appdata_/logs/android_<timestamp>_<pid>_<id>.log
+<game>/_appdata_/logs/activity_<timestamp>_<pid>_<id>.log
 ```
 
 The engine's normal log path remains `<STALKER>/_appdata_/logs/`. For a crash
@@ -192,8 +192,6 @@ adb shell am start -n org.openxray.stalker/org.openxray.app.LauncherActivity
 # Reproduce the problem, then run:
 adb logcat -d -b all -v threadtime OpenXRay:I DEBUG:E '*:S' > openxray-logcat.txt
 adb logcat -d -b crash -v threadtime > openxray-crash.txt
-adb pull /sdcard/openxray/android.log openxray-engine.log
-adb pull /sdcard/openxray/activity.log openxray-activity.log
 adb pull /sdcard/STALKER/_appdata_/logs openxray-game-logs
 ```
 
@@ -237,9 +235,27 @@ c++ -std=c++17 -O2 -Isrc tests/ray_query_audit.cpp -o /tmp/ray-query-audit
 /tmp/ray-query-audit
 ```
 
-Use `python3 android/analyze-sector-audit.py android.log` to check the capture.
+Use `python3 android/analyze-sector-audit.py <timestamped-engine-log>` to check the capture.
 Exit code 0 means all recorded audits completed and their ray results agree;
 this does not prove rendering correctness. Exit code 1 reports differing ray
 results. Exit code 2 indicates missing or incomplete audit evidence. Hit triangle
 coordinates and metadata are recorded for offline reproduction, including when
 the tree and reference agree. Progress reports identify long-running scans.
+
+### Rendering measurements
+
+`[render-quality]` records effective shadow-map size, reflections, sun, SSAO,
+texture LOD and anisotropy. The original game preset is loaded first; generated
+`quality_*.ltx` files apply the renderer-specific settings from
+`android/apk/launcher-options.json`. Restart the engine after changing quality.
+
+`[render-phases]` reports CPU average/maximum times for frame phases, including
+GPU synchronization. `[gpu-time]` reports asynchronous elapsed-query samples
+when supported; disjoint results are discarded and unavailable results never
+block the CPU. GPU elapsed time can include gaps in command submission.
+Enable **Проверка коллизий и секторов** only when investigating visibility;
+the independent full-mesh audit is disabled during normal gameplay.
+
+Saves, `user.ltx`, screenshots and logs follow the installation's `fsgame.ltx`
+paths. Russian save names cross the Android filesystem boundary as UTF-8;
+the original game's UI continues to use Windows-1251.
