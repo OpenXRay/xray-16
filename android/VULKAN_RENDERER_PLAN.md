@@ -18,15 +18,16 @@ selects the OpenGL ES backend for gameplay.
 | Buffer upload | `src/Layers/xrRenderVK/BufferUpload.*` | Copies host data into a device-local buffer asynchronously, inserts a transfer-to-use memory barrier, and retires staging resources by fence |
 | Shader module | `src/Layers/xrRenderVK/ShaderModule.*` | Creates and owns a Vulkan shader module from precompiled SPIR-V bytes |
 | Screen-copy pass | `src/Layers/xrRenderVK/ScreenCopyPass.*` | Creates a sampled-image descriptor set and graphics pipeline, and records a fullscreen draw through the frame callback |
-| Engine DDS bridge | `src/Layers/xrRenderVK/EngineTextureSource.*`, `src/xrEngine/android_vulkan_smoke.cpp` | Decodes bytes from the mounted engine VFS and uploads the standard fallback DDS into a sampled image during the gameplay selection probe, when present |
+| Engine DDS bridge | `src/Layers/xrRenderVK/EngineTextureSource.*`, `src/xrEngine/android_vulkan_smoke.cpp` | Decodes bytes from the mounted engine VFS and uploads the standard fallback DDS into a sampled image when the probe has a mounted VFS |
+| Renderer registration | `src/Layers/xrRenderVK/VulkanRendererModule.cpp` | Owns the `renderer_vulkan` mode independently of GLES and refuses game initialization until Vulkan implementations of the engine render interfaces exist |
 | Offline HLSL compiler | `tools/compile_vulkan_shader.py` | Invokes a host DXC executable on an existing game/mod HLSL file, with entry point, include roots and defines, and atomically writes checked SPIR-V output |
 
 The screen-copy pass takes compiled vertex and fragment modules, a sampled
 image view, and a sampler. The caller must transition the image to shader-read
 layout, keep resources alive through submitted frames, and rebuild the pipeline
-when the render pass changes. The gameplay selection probe uploads an engine
-DDS and, if both compiled screen-copy shaders are present in the game VFS,
-draws it as a fullscreen triangle. The no-game smoke test uses embedded SPIR-V
+when the render pass changes. With mounted game data, the probe can upload an
+engine DDS and, if both compiled screen-copy shaders are present in the game VFS,
+draw it as a fullscreen triangle. The no-game smoke test uses embedded SPIR-V
 made from `src/Layers/xrRenderVK/smoke/triangle.vert` and `.frag`, creates a
 graphics pipeline, verifies a center pixel by copying it from the swapchain
 to a mapped buffer, and presents three frames. To regenerate the embedded
@@ -76,7 +77,9 @@ compatibility guarantee for gameplay.
 - recording engine draw commands and managing engine resource lifetimes;
 - swapchain recreation integrated with pause, resume, resize and surface loss;
 - Win32 and Linux surface integration for `xrRenderVK`;
-- Vulkan selection as an engine gameplay renderer.
+- Vulkan implementations of `IRender`, `IRenderFactory`, `IUIRender`,
+  `IRenderDeviceRender` and the debug renderer; the separately registered
+  Vulkan module rejects gameplay until these are present.
 
 Until those items exist, documentation and launcher text must use the words
 "probe" or "smoke test", not "Vulkan renderer" without qualification.
@@ -107,8 +110,8 @@ Work should proceed in dependencies-first order:
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling;
 6. add Windows and Linux surfaces and CI coverage;
-7. remove the GLES fallback only after complete levels and representative mods
-   run through Vulkan.
+7. enable Vulkan gameplay selection only after complete levels and representative
+   mods run through Vulkan.
 
 Useful host tests live in `tests/vulkan_dds.cpp`,
 `tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,

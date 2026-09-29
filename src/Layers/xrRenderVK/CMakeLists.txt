@@ -1,6 +1,7 @@
 add_library(xrRenderVK STATIC)
 
 target_sources(xrRenderVK PRIVATE
+    VulkanRendererModule.cpp
     BufferResource.cpp
     BufferResource.h
     BufferUpload.cpp
@@ -33,9 +34,16 @@ target_include_directories(xrRenderVK
     PUBLIC
     "${CMAKE_SOURCE_DIR}/Externals/Vulkan-Headers/include"
     PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/Externals"
+    "${CMAKE_SOURCE_DIR}/Externals/tracy/public"
+    "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${XRAY_GLI_INCLUDE_DIR}"
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
 )
+
+target_link_libraries(xrRenderVK PRIVATE SDL2::SDL2)
 
 set_target_properties(xrRenderVK PROPERTIES
     PREFIX ""

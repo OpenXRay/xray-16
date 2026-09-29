@@ -31,7 +31,7 @@
       "arg": "-renderer-gles"
     },
     {
-      "label": "Vulkan (экспериментальный fallback)",
+      "label": "Vulkan (игровой рендерер в разработке)",
       "arg": "-renderer-vulkan"
     }
   ],

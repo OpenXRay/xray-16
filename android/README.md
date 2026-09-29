@@ -237,8 +237,9 @@ Runtime data uses the normal desktop paths:
 ## Renderer status
 
 Gameplay currently uses OpenGL ES. `Auto` and `OpenGL ES` select the same GLES
-backend. Selecting Vulkan runs the Vulkan probe and then falls back to GLES;
-there is no Vulkan gameplay renderer yet. See
+backend. Vulkan has a separate engine module, but its gameplay implementation
+is incomplete. The launcher blocks Vulkan game launches, and an explicit native
+`renderer_vulkan` request fails with an error instead of falling back to GLES. See
 [VULKAN_RENDERER_PLAN.md](VULKAN_RENDERER_PLAN.md) for the implemented Vulkan
 pieces and remaining work.
 

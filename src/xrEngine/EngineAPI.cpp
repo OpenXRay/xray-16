@@ -66,6 +66,10 @@ void CEngineAPI::SelectRenderer()
             selectedRenderer = it->second;
     }
 
+    // A request for Vulkan must never become a successful GLES game launch.
+    if (!selectedRenderer && xr_strcmp(selected_mode, "renderer_vulkan") == 0)
+        R_ASSERT2(false, "Vulkan gameplay renderer is not ready: world, UI, and resource pipelines must be implemented before starting a game");
+
     // Renderer is either fully unsupported (hardware)
     // or we don't comply with it's requirements (e.g. shaders missing)
     if (!selectedRenderer)
@@ -123,7 +127,7 @@ void CEngineAPI::Destroy()
     XRC.r_clear_compact();
 }
 
-void CEngineAPI::CreateRendererList(const std::array<RendererModule*, 2>& modules)
+void CEngineAPI::CreateRendererList(const std::array<RendererModule*, 3>& modules)
 {
     if (!VidQualityToken.empty())
         return;

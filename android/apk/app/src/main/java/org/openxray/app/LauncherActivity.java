@@ -394,7 +394,7 @@ public final class LauncherActivity extends Activity {
     private View buildSettingsPage() {
         LinearLayout content = pageContent();
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[0]);
-        content.addView(bodyText("Для игры используется OpenGL ES. Vulkan доступен для проверки."),
+        content.addView(bodyText("Игровой Vulkan ещё не реализован. Отдельная проверка Vulkan доступна на экране запуска."),
                 matchWrap());
         rendererMode = new Spinner(this);
         ArrayAdapter<String> rendererAdapter = new ArrayAdapter<>(this,
@@ -959,6 +959,11 @@ public final class LauncherActivity extends Activity {
 
     private void launchEngine(boolean rendererSmoke, boolean vulkanRendererSmoke) {
         ++stopGeneration; // Cancel pending retries before any new launch or reattach.
+        if (!rendererSmoke && rendererMode.getSelectedItemPosition() == RENDERER_VULKAN) {
+            setStatus("Игровой Vulkan ещё не готов. Выберите OpenGL ES или запустите проверку Vulkan.");
+            showPage(PAGE_SETTINGS);
+            return;
+        }
         if (!rendererSmoke && isEngineProcessRunning()) {
             setStatus("Возвращаю уже запущенный движок на экран…");
             Intent resume = new Intent(this, XRayActivity.class);
@@ -1010,7 +1015,7 @@ public final class LauncherActivity extends Activity {
         intent.putExtra(EXTRA_ADDITIONAL_ARGS, additionalArgs);
         String launchStatus;
         if (vulkanRendererSmoke) {
-            launchStatus = "Запускаю Vulkan probe и GLES fallback…";
+            launchStatus = "Запускаю независимую проверку Vulkan…";
         } else if (rendererSmoke) {
             launchStatus = "Запускаю GLES smoke test…";
         } else {

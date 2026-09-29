@@ -55,7 +55,7 @@ private:
 
 public:
     // Other
-    CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules);
+    CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 3>& modules);
     ~CApplication();
 
     int Run();

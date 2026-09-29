@@ -8,7 +8,7 @@ final class OptionCatalog {
     static final String[] GAME_NAMES = { "автоопределение", "Shadow of Chernobyl", "Clear Sky", "Call of Pripyat" };
     static final String[] GAME_ARGS = { "", "-soc", "-cs", "-cop" };
 
-    static final String[] RENDERER_LABELS = { "Автоматически (OpenGL ES)", "OpenGL ES", "Vulkan (экспериментальный fallback)" };
+    static final String[] RENDERER_LABELS = { "Автоматически (OpenGL ES)", "OpenGL ES", "Vulkan (игровой рендерер в разработке)" };
     static final String[] RENDERER_ARGS = { "-renderer-auto", "-renderer-gles", "-renderer-vulkan" };
 
     static final String[] GRAPHICS_LABELS = { "Автоматически для Android (Low)", "Minimum", "Low", "Default", "High", "Extreme" };

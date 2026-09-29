@@ -809,7 +809,7 @@ void destroy_renderer_smoke(renderer_smoke_state& state)
 }
 #endif
 
-CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules)
+CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 3>& modules)
 {
     commandLine = commandLine ? commandLine : "";
     m_headless_smoke = commandLine && strstr(commandLine, "-headless-smoke");
@@ -954,14 +954,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
 #if defined(XR_PLATFORM_ANDROID)
-    if (strstr(commandLine, "-renderer-vulkan"))
-    {
-        std::string vulkanReason;
-        const bool vulkanReady = AndroidVulkanSmoke::Run(vulkanReason);
-        Msg("[renderer-vulkan] gameplay selection probe: %s; %s",
-            vulkanReady ? "PASS" : "FAILED", vulkanReason.c_str());
-        Msg("[renderer-vulkan] xrRenderVK gameplay pipeline is not complete; GLES fallback will be used");
-    }
+    // The Vulkan smoke test is a separate no-game mode. A game request goes
+    // through renderer selection and cannot turn into an implicit GLES launch.
 #endif
 
     InitSettings();
