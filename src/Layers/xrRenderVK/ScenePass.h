@@ -45,6 +45,13 @@ struct ScenePassDispatch
     PFN_vkCmdBindIndexBuffer cmd_bind_index_buffer{};
     PFN_vkCmdPushConstants cmd_push_constants{};
     PFN_vkCmdDrawIndexed cmd_draw_indexed{};
+    PFN_vkCreateDescriptorSetLayout create_descriptor_set_layout{};
+    PFN_vkDestroyDescriptorSetLayout destroy_descriptor_set_layout{};
+    PFN_vkCreateDescriptorPool create_descriptor_pool{};
+    PFN_vkDestroyDescriptorPool destroy_descriptor_pool{};
+    PFN_vkAllocateDescriptorSets allocate_descriptor_sets{};
+    PFN_vkUpdateDescriptorSets update_descriptor_sets{};
+    PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets{};
 };
 
 bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
@@ -65,13 +72,16 @@ public:
     bool initialize(VkDevice device, VkRenderPass render_pass,
         VkShaderModule scene_vertex, VkShaderModule scene_fragment,
         VkShaderModule ui_vertex, VkShaderModule ui_fragment,
-        const ScenePassDispatch& dispatch, std::string& error);
+        const ScenePassDispatch& dispatch, std::string& error, bool use_depth = false);
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         VkIndexType index_type, uint32_t index_count, const SceneConstants& constants,
         VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0) const;
     bool record_ui(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
-        VkIndexType index_type, uint32_t index_count, const VkRect2D* scissor = nullptr,
+        VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
+        const VkRect2D* scissor = nullptr,
         VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0) const;
+    bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
+        std::string& error);
     void destroy();
 
 private:
@@ -82,6 +92,8 @@ private:
     VkPipelineLayout m_ui_layout = VK_NULL_HANDLE;
     VkPipeline m_scene_pipeline = VK_NULL_HANDLE;
     VkPipeline m_ui_pipeline = VK_NULL_HANDLE;
+    VkDescriptorSetLayout m_ui_descriptor_layout = VK_NULL_HANDLE;
+    VkDescriptorPool m_ui_descriptor_pool = VK_NULL_HANDLE;
     ScenePassDispatch m_vk{};
 };
 }

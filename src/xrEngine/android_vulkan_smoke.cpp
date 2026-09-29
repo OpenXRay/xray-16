@@ -49,6 +49,7 @@ struct FrameCallbackAudit
     VkBuffer scene_indices = VK_NULL_HANDLE;
     VkBuffer ui_vertices = VK_NULL_HANDLE;
     VkBuffer ui_indices = VK_NULL_HANDLE;
+    VkDescriptorSet ui_texture_set = VK_NULL_HANDLE;
     xray::render::vulkan::SceneConstants scene_constants{};
 };
 
@@ -102,7 +103,7 @@ void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& fra
         audit.valid = audit.scene->record_geometry(frame, audit.scene_vertices, audit.scene_indices,
             VK_INDEX_TYPE_UINT16, 3, audit.scene_constants) && audit.valid;
         audit.valid = audit.scene->record_ui(frame, audit.ui_vertices, audit.ui_indices,
-            VK_INDEX_TYPE_UINT16, 6) && audit.valid;
+            VK_INDEX_TYPE_UINT16, 6, audit.ui_texture_set) && audit.valid;
     }
     ++audit.calls;
 }
@@ -153,6 +154,7 @@ bool Run(std::string& reason)
     VkQueue queue = VK_NULL_HANDLE;
     xray::render::vulkan::TextureUploadDispatch texture_dispatch{};
     xray::render::vulkan::UploadedTexture engine_texture{};
+    xray::render::vulkan::UploadedTexture ui_texture{};
     xray::render::vulkan::ImageStateTracker image_states;
     std::vector<xray::render::vulkan::PendingTextureUpload> texture_uploads;
     xray::render::vulkan::ShaderModule copy_vertex;
@@ -199,6 +201,11 @@ bool Run(std::string& reason)
             image_states.forget_image(engine_texture.image);
             xray::render::vulkan::destroy_texture(device, texture_dispatch, engine_texture);
         }
+        if (ui_texture.image)
+        {
+            image_states.forget_image(ui_texture.image);
+            xray::render::vulkan::destroy_texture(device, texture_dispatch, ui_texture);
+        }
         platform.destroy();
         if (window)
             SDL_DestroyWindow(window);
@@ -218,7 +225,7 @@ bool Run(std::string& reason)
         return fail(SDL_GetError());
     const bool no_game_vfs = !FS.path_exist("$game_textures$");
     std::string frame_error;
-    if (!platform.initialize(window, {960, 540}, no_game_vfs, frame_error))
+    if (!platform.initialize(window, {960, 540}, no_game_vfs, frame_error, no_game_vfs))
         return fail(frame_error);
     device = platform.device();
     queue = platform.queue();
@@ -272,14 +279,7 @@ bool Run(std::string& reason)
         return fail(frame_error);
     wait_idle = frame_dispatch.device_wait_idle;
 
-    // A normal game boot has a mounted VFS. The no-game smoke boot does not.
-    // Exercise an actual engine-owned DDS through the same archive-aware reader
-    // used by the other renderers when the standard fallback texture exists.
-    if (FS.path_exist("$game_textures$"))
-    {
-        string_path texture_path;
-        if (FS.exist(texture_path, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"))
-        {
+    // Both game DDS resources and the no-game UI atlas use the same upload path.
 #define XRAY_TEXTURE_PROC(field, name) \
             texture_dispatch.field = load_device_proc<decltype(texture_dispatch.field)>(device, get_device_proc, name)
             XRAY_TEXTURE_PROC(create_buffer, "vkCreateBuffer");
@@ -323,6 +323,14 @@ bool Run(std::string& reason)
                 !texture_dispatch.wait_for_fences)
                 return fail("required Vulkan texture upload procedures are unavailable");
 
+    // A normal game boot has a mounted VFS. The no-game smoke boot does not.
+    // Exercise an actual engine-owned DDS through the same archive-aware reader
+    // used by the other renderers when the standard fallback texture exists.
+    if (FS.path_exist("$game_textures$"))
+    {
+        string_path texture_path;
+        if (FS.exist(texture_path, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"))
+        {
             IReader* reader = FS.r_open(texture_path);
             if (!reader)
                 return fail("engine VFS could not open the fallback DDS");
@@ -371,6 +379,35 @@ bool Run(std::string& reason)
         if (!pixel_buffer.initialize(device, 8, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, physical_selection.memory, buffer_dispatch, draw_error))
             return fail(draw_error);
+        xray::render::vulkan::DdsTexture ui_source;
+        ui_source.format = VK_FORMAT_R8G8B8A8_UNORM;
+        ui_source.extent = {2, 2, 1};
+        ui_source.mip_levels = 1;
+        ui_source.pixels = {255, 230, 255, 255, 255, 230, 255, 255,
+                            255, 230, 255, 255, 255, 230, 255, 255};
+        VkBufferImageCopy ui_copy{};
+        ui_copy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ui_copy.imageSubresource.layerCount = 1;
+        ui_copy.imageExtent = ui_source.extent;
+        ui_source.copies.push_back(ui_copy);
+        if (!xray::render::vulkan::upload_texture(device, queue, frame_context.command_pool(),
+                physical_selection.memory, texture_dispatch, ui_source, ui_texture,
+                texture_uploads, image_states, draw_error))
+            return fail(draw_error);
+        const auto create_sampler = load_device_proc<PFN_vkCreateSampler>(device, get_device_proc,
+            "vkCreateSampler");
+        destroy_sampler = load_device_proc<PFN_vkDestroySampler>(device, get_device_proc,
+            "vkDestroySampler");
+        if (!create_sampler || !destroy_sampler)
+            return fail("Vulkan UI sampler procedures are unavailable");
+        VkSamplerCreateInfo ui_sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
+        ui_sampler_info.magFilter = VK_FILTER_NEAREST;
+        ui_sampler_info.minFilter = VK_FILTER_NEAREST;
+        ui_sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        ui_sampler_info.addressModeU = ui_sampler_info.addressModeV =
+            ui_sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        if (create_sampler(device, &ui_sampler_info, nullptr, &copy_sampler) != VK_SUCCESS)
+            return fail("could not create Vulkan UI sampler");
         xray::render::vulkan::ScenePassDispatch scene_dispatch;
         if (!xray::render::vulkan::load_scene_pass_dispatch(device, get_device_proc,
                 scene_dispatch, draw_error) ||
@@ -383,7 +420,11 @@ bool Run(std::string& reason)
             !ui_fragment.initialize(device, shaders, xray::render::vulkan::scene_shaders::UiFragment,
                 sizeof(xray::render::vulkan::scene_shaders::UiFragment), draw_error) ||
             !scene_pass.initialize(device, frame_context.render_pass(), scene_vertex.handle(),
-                scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(), scene_dispatch, draw_error))
+                scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(), scene_dispatch, draw_error,
+                frame_context.depth_format() != VK_FORMAT_UNDEFINED))
+            return fail(draw_error);
+        if (!scene_pass.create_ui_texture_set(ui_texture.view, copy_sampler,
+                callback_audit.ui_texture_set, draw_error))
             return fail(draw_error);
 
         using xray::render::vulkan::SceneVertex;

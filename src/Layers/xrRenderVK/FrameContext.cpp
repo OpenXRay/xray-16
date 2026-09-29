@@ -11,7 +11,10 @@ bool complete(const FrameDispatch& vk)
 {
     return vk.get_surface_capabilities && vk.get_surface_formats && vk.create_swapchain && vk.destroy_swapchain &&
         vk.get_swapchain_images && vk.acquire_next_image && vk.queue_present && vk.create_image_view &&
-        vk.destroy_image_view && vk.create_render_pass && vk.destroy_render_pass && vk.create_framebuffer &&
+        vk.destroy_image_view && vk.get_format_properties && vk.get_memory_properties &&
+        vk.create_image && vk.destroy_image &&
+        vk.get_image_memory_requirements && vk.allocate_memory && vk.free_memory && vk.bind_image_memory &&
+        vk.create_render_pass && vk.destroy_render_pass && vk.create_framebuffer &&
         vk.destroy_framebuffer && vk.create_command_pool && vk.destroy_command_pool && vk.allocate_command_buffers &&
         vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
         vk.cmd_copy_image_to_buffer && vk.cmd_pipeline_barrier &&
@@ -69,6 +72,8 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     dispatch.member = load_device_proc<decltype(dispatch.member)>(device, get_device_proc, name)
     XRAY_LOAD_INSTANCE(get_surface_capabilities, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
     XRAY_LOAD_INSTANCE(get_surface_formats, "vkGetPhysicalDeviceSurfaceFormatsKHR");
+    XRAY_LOAD_INSTANCE(get_format_properties, "vkGetPhysicalDeviceFormatProperties");
+    XRAY_LOAD_INSTANCE(get_memory_properties, "vkGetPhysicalDeviceMemoryProperties");
     XRAY_LOAD_DEVICE(create_swapchain, "vkCreateSwapchainKHR");
     XRAY_LOAD_DEVICE(destroy_swapchain, "vkDestroySwapchainKHR");
     XRAY_LOAD_DEVICE(get_swapchain_images, "vkGetSwapchainImagesKHR");
@@ -76,6 +81,12 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     XRAY_LOAD_DEVICE(queue_present, "vkQueuePresentKHR");
     XRAY_LOAD_DEVICE(create_image_view, "vkCreateImageView");
     XRAY_LOAD_DEVICE(destroy_image_view, "vkDestroyImageView");
+    XRAY_LOAD_DEVICE(create_image, "vkCreateImage");
+    XRAY_LOAD_DEVICE(destroy_image, "vkDestroyImage");
+    XRAY_LOAD_DEVICE(get_image_memory_requirements, "vkGetImageMemoryRequirements");
+    XRAY_LOAD_DEVICE(allocate_memory, "vkAllocateMemory");
+    XRAY_LOAD_DEVICE(free_memory, "vkFreeMemory");
+    XRAY_LOAD_DEVICE(bind_image_memory, "vkBindImageMemory");
     XRAY_LOAD_DEVICE(create_render_pass, "vkCreateRenderPass");
     XRAY_LOAD_DEVICE(destroy_render_pass, "vkDestroyRenderPass");
     XRAY_LOAD_DEVICE(create_framebuffer, "vkCreateFramebuffer");
@@ -118,7 +129,7 @@ FrameContext::~FrameContext()
 
 bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
     VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
-    const FrameDispatch& dispatch, std::string& error, bool allow_readback)
+    const FrameDispatch& dispatch, std::string& error, bool allow_readback, bool use_depth)
 {
     destroy();
     if (!physical_device || !device || !surface || !queue || queue_family == UINT32_MAX)
@@ -137,6 +148,27 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_queue_family = queue_family;
     m_vk = dispatch;
     m_allow_readback = allow_readback;
+    if (use_depth)
+    {
+        const VkFormat candidates[]{VK_FORMAT_D32_SFLOAT, VK_FORMAT_D16_UNORM};
+        for (VkFormat candidate : candidates)
+        {
+            VkFormatProperties properties{};
+            m_vk.get_format_properties(physical_device, candidate, &properties);
+            if (properties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+            {
+                m_depth_format = candidate;
+                break;
+            }
+        }
+        if (m_depth_format == VK_FORMAT_UNDEFINED)
+        {
+            error = "Vulkan device has no supported depth attachment format";
+            destroy();
+            return false;
+        }
+        m_vk.get_memory_properties(physical_device, &m_memory_properties);
+    }
 
     if (!create_swapchain(physical_device, surface, requested_extent, error) ||
         !create_render_targets(error) || !create_commands(error) || !create_sync(error))
@@ -281,21 +313,31 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
 
 bool FrameContext::create_render_targets(std::string& error)
 {
-    VkAttachmentDescription attachment{};
-    attachment.format = m_format;
-    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachment.finalLayout = m_allow_readback ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    VkAttachmentDescription attachments[2]{};
+    attachments[0].format = m_format;
+    attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[0].finalLayout = m_allow_readback ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL :
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachments[1].format = m_depth_format;
+    attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+    VkAttachmentReference depth{1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &color;
+    if (m_depth_format != VK_FORMAT_UNDEFINED)
+        subpass.pDepthStencilAttachment = &depth;
 
     std::array<VkSubpassDependency, 2> dependencies{};
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -303,6 +345,12 @@ bool FrameContext::create_render_targets(std::string& error)
     dependencies[0].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    if (m_depth_format != VK_FORMAT_UNDEFINED)
+    {
+        dependencies[0].srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        dependencies[0].dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        dependencies[0].dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -313,8 +361,8 @@ bool FrameContext::create_render_targets(std::string& error)
 
     VkRenderPassCreateInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    render_pass_info.attachmentCount = 1;
-    render_pass_info.pAttachments = &attachment;
+    render_pass_info.attachmentCount = m_depth_format != VK_FORMAT_UNDEFINED ? 2 : 1;
+    render_pass_info.pAttachments = attachments;
     render_pass_info.subpassCount = 1;
     render_pass_info.pSubpasses = &subpass;
     render_pass_info.dependencyCount = static_cast<uint32_t>(dependencies.size());
@@ -326,6 +374,9 @@ bool FrameContext::create_render_targets(std::string& error)
     }
 
     m_image_views.reserve(m_images.size());
+    m_depth_images.reserve(m_images.size());
+    m_depth_memories.reserve(m_images.size());
+    m_depth_views.reserve(m_images.size());
     m_framebuffers.reserve(m_images.size());
     for (VkImage image : m_images)
     {
@@ -345,11 +396,76 @@ bool FrameContext::create_render_targets(std::string& error)
         }
         m_image_views.push_back(view);
 
+        VkImageView framebuffer_views[2]{view, VK_NULL_HANDLE};
+        if (m_depth_format != VK_FORMAT_UNDEFINED)
+        {
+            VkImageCreateInfo image_info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+            image_info.imageType = VK_IMAGE_TYPE_2D;
+            image_info.format = m_depth_format;
+            image_info.extent = {m_extent.width, m_extent.height, 1};
+            image_info.mipLevels = image_info.arrayLayers = 1;
+            image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+            image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+            image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+            image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            VkImage depth_image = VK_NULL_HANDLE;
+            if (m_vk.create_image(m_device, &image_info, nullptr, &depth_image) != VK_SUCCESS)
+            {
+                error = "vkCreateImage failed for depth attachment";
+                return false;
+            }
+            m_depth_images.push_back(depth_image);
+            VkMemoryRequirements requirements{};
+            m_vk.get_image_memory_requirements(m_device, depth_image, &requirements);
+            uint32_t memory_type = UINT32_MAX;
+            for (uint32_t i = 0; i < m_memory_properties.memoryTypeCount; ++i)
+                if ((requirements.memoryTypeBits & (1u << i)) &&
+                    (m_memory_properties.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
+                {
+                    memory_type = i;
+                    break;
+                }
+            if (memory_type == UINT32_MAX)
+            {
+                error = "no device-local memory type for depth attachment";
+                return false;
+            }
+            VkMemoryAllocateInfo allocation{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+            allocation.allocationSize = requirements.size;
+            allocation.memoryTypeIndex = memory_type;
+            VkDeviceMemory memory = VK_NULL_HANDLE;
+            if (m_vk.allocate_memory(m_device, &allocation, nullptr, &memory) != VK_SUCCESS)
+            {
+                error = "vkAllocateMemory failed for depth attachment";
+                return false;
+            }
+            m_depth_memories.push_back(memory);
+            if (m_vk.bind_image_memory(m_device, depth_image, memory, 0) != VK_SUCCESS)
+            {
+                error = "vkBindImageMemory failed for depth attachment";
+                return false;
+            }
+            VkImageViewCreateInfo depth_view_info{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+            depth_view_info.image = depth_image;
+            depth_view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            depth_view_info.format = m_depth_format;
+            depth_view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            depth_view_info.subresourceRange.levelCount = depth_view_info.subresourceRange.layerCount = 1;
+            VkImageView depth_view = VK_NULL_HANDLE;
+            if (m_vk.create_image_view(m_device, &depth_view_info, nullptr, &depth_view) != VK_SUCCESS)
+            {
+                error = "vkCreateImageView failed for depth attachment";
+                return false;
+            }
+            m_depth_views.push_back(depth_view);
+            framebuffer_views[1] = depth_view;
+        }
+
         VkFramebufferCreateInfo framebuffer_info{};
         framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebuffer_info.renderPass = m_render_pass;
-        framebuffer_info.attachmentCount = 1;
-        framebuffer_info.pAttachments = &m_image_views.back();
+        framebuffer_info.attachmentCount = m_depth_format != VK_FORMAT_UNDEFINED ? 2 : 1;
+        framebuffer_info.pAttachments = framebuffer_views;
         framebuffer_info.width = m_extent.width;
         framebuffer_info.height = m_extent.height;
         framebuffer_info.layers = 1;
@@ -476,15 +592,16 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         error = "vkBeginCommandBuffer failed";
         return false;
     }
-    VkClearValue clear_value{};
-    clear_value.color = clear;
+    VkClearValue clear_values[2]{};
+    clear_values[0].color = clear;
+    clear_values[1].depthStencil = {1.0f, 0};
     VkRenderPassBeginInfo render_info{};
     render_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     render_info.renderPass = m_render_pass;
     render_info.framebuffer = m_framebuffers[image_index];
     render_info.renderArea.extent = m_extent;
-    render_info.clearValueCount = 1;
-    render_info.pClearValues = &clear_value;
+    render_info.clearValueCount = m_depth_format != VK_FORMAT_UNDEFINED ? 2 : 1;
+    render_info.pClearValues = clear_values;
     m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
     if (recorder)
     {
@@ -570,6 +687,15 @@ void FrameContext::destroy()
         for (VkImageView view : m_image_views)
             if (view)
                 m_vk.destroy_image_view(m_device, view, nullptr);
+        for (VkImageView view : m_depth_views)
+            if (view)
+                m_vk.destroy_image_view(m_device, view, nullptr);
+        for (VkImage image : m_depth_images)
+            if (image)
+                m_vk.destroy_image(m_device, image, nullptr);
+        for (VkDeviceMemory memory : m_depth_memories)
+            if (memory)
+                m_vk.free_memory(m_device, memory, nullptr);
         if (m_render_pass)
             m_vk.destroy_render_pass(m_device, m_render_pass, nullptr);
         if (m_command_pool)
@@ -595,9 +721,14 @@ void FrameContext::destroy()
     m_command_pool = VK_NULL_HANDLE;
     m_extent = {};
     m_format = VK_FORMAT_UNDEFINED;
+    m_depth_format = VK_FORMAT_UNDEFINED;
+    m_memory_properties = {};
     m_allow_readback = false;
     m_images.clear();
     m_image_views.clear();
+    m_depth_images.clear();
+    m_depth_memories.clear();
+    m_depth_views.clear();
     m_framebuffers.clear();
     m_commands.clear();
     m_render_finished.clear();

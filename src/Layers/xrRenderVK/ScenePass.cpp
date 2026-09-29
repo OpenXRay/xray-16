@@ -10,11 +10,14 @@ bool complete(const ScenePassDispatch& vk)
 {
     return vk.create_pipeline_layout && vk.destroy_pipeline_layout && vk.create_graphics_pipelines &&
         vk.destroy_pipeline && vk.cmd_bind_pipeline && vk.cmd_set_viewport && vk.cmd_set_scissor &&
-        vk.cmd_bind_vertex_buffers && vk.cmd_bind_index_buffer && vk.cmd_push_constants && vk.cmd_draw_indexed;
+        vk.cmd_bind_vertex_buffers && vk.cmd_bind_index_buffer && vk.cmd_push_constants && vk.cmd_draw_indexed &&
+        vk.create_descriptor_set_layout && vk.destroy_descriptor_set_layout && vk.create_descriptor_pool &&
+        vk.destroy_descriptor_pool && vk.allocate_descriptor_sets && vk.update_descriptor_sets &&
+        vk.cmd_bind_descriptor_sets;
 }
 
 bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout layout,
-    VkShaderModule vertex, VkShaderModule fragment, bool ui, const ScenePassDispatch& vk,
+    VkShaderModule vertex, VkShaderModule fragment, bool ui, bool use_depth, const ScenePassDispatch& vk,
     VkPipeline& result)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
@@ -54,6 +57,10 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
     raster.lineWidth = 1.0f;
     VkPipelineMultisampleStateCreateInfo multisample{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
     multisample.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    VkPipelineDepthStencilStateCreateInfo depth{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
+    depth.depthTestEnable = use_depth && !ui ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = use_depth && !ui ? VK_TRUE : VK_FALSE;
+    depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachment{};
     attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -79,6 +86,7 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
     info.pViewportState = &viewport;
     info.pRasterizationState = &raster;
     info.pMultisampleState = &multisample;
+    info.pDepthStencilState = use_depth ? &depth : nullptr;
     info.pColorBlendState = &blend;
     info.pDynamicState = &dynamics;
     info.layout = layout;
@@ -108,6 +116,13 @@ bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
     XRAY_LOAD(cmd_bind_index_buffer, "vkCmdBindIndexBuffer");
     XRAY_LOAD(cmd_push_constants, "vkCmdPushConstants");
     XRAY_LOAD(cmd_draw_indexed, "vkCmdDrawIndexed");
+    XRAY_LOAD(create_descriptor_set_layout, "vkCreateDescriptorSetLayout");
+    XRAY_LOAD(destroy_descriptor_set_layout, "vkDestroyDescriptorSetLayout");
+    XRAY_LOAD(create_descriptor_pool, "vkCreateDescriptorPool");
+    XRAY_LOAD(destroy_descriptor_pool, "vkDestroyDescriptorPool");
+    XRAY_LOAD(allocate_descriptor_sets, "vkAllocateDescriptorSets");
+    XRAY_LOAD(update_descriptor_sets, "vkUpdateDescriptorSets");
+    XRAY_LOAD(cmd_bind_descriptor_sets, "vkCmdBindDescriptorSets");
 #undef XRAY_LOAD
     if (!complete(dispatch))
     {
@@ -122,7 +137,7 @@ bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
 bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     VkShaderModule scene_vertex, VkShaderModule scene_fragment,
     VkShaderModule ui_vertex, VkShaderModule ui_fragment,
-    const ScenePassDispatch& dispatch, std::string& error)
+    const ScenePassDispatch& dispatch, std::string& error, bool use_depth)
 {
     destroy();
     if (!device || !render_pass || !scene_vertex || !scene_fragment || !ui_vertex || !ui_fragment ||
@@ -134,6 +149,29 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     m_device = device;
     m_render_pass = render_pass;
     m_vk = dispatch;
+    const VkDescriptorSetLayoutBinding binding{0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr};
+    VkDescriptorSetLayoutCreateInfo descriptor_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+    descriptor_info.bindingCount = 1;
+    descriptor_info.pBindings = &binding;
+    if (m_vk.create_descriptor_set_layout(device, &descriptor_info, nullptr,
+            &m_ui_descriptor_layout) != VK_SUCCESS)
+    {
+        error = "could not create Vulkan UI texture layout";
+        destroy();
+        return false;
+    }
+    const VkDescriptorPoolSize pool_size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 128};
+    VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
+    pool_info.maxSets = 128;
+    pool_info.poolSizeCount = 1;
+    pool_info.pPoolSizes = &pool_size;
+    if (m_vk.create_descriptor_pool(device, &pool_info, nullptr, &m_ui_descriptor_pool) != VK_SUCCESS)
+    {
+        error = "could not create Vulkan UI texture pool";
+        destroy();
+        return false;
+    }
     const VkPushConstantRange scene_range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(SceneConstants)};
     const VkPushConstantRange ui_range{VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float) * 2};
@@ -147,11 +185,13 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
         return false;
     }
     layout.pPushConstantRanges = &ui_range;
+    layout.setLayoutCount = 1;
+    layout.pSetLayouts = &m_ui_descriptor_layout;
     if (m_vk.create_pipeline_layout(device, &layout, nullptr, &m_ui_layout) != VK_SUCCESS ||
         !make_pipeline(device, render_pass, m_scene_layout, scene_vertex, scene_fragment,
-            false, m_vk, m_scene_pipeline) ||
+            false, use_depth, m_vk, m_scene_pipeline) ||
         !make_pipeline(device, render_pass, m_ui_layout, ui_vertex, ui_fragment,
-            true, m_vk, m_ui_pipeline))
+            true, use_depth, m_vk, m_ui_pipeline))
     {
         error = "could not create Vulkan geometry, lighting or UI pipeline";
         destroy();
@@ -189,10 +229,11 @@ bool ScenePass::record_geometry(const FrameRecordingContext& frame, VkBuffer ver
 }
 
 bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
-    VkIndexType index_type, uint32_t index_count, const VkRect2D* requested_scissor,
+    VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
+    const VkRect2D* requested_scissor,
     VkDeviceSize vertex_offset, VkDeviceSize index_offset) const
 {
-    if (!valid_frame(frame) || !vertices || !indices || !index_count ||
+    if (!valid_frame(frame) || !vertices || !indices || !texture_set || !index_count ||
         (index_type != VK_INDEX_TYPE_UINT16 && index_type != VK_INDEX_TYPE_UINT32))
         return false;
     VkRect2D scissor{{0, 0}, frame.extent};
@@ -219,9 +260,41 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     m_vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
     m_vk.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &vertex_offset);
     m_vk.cmd_bind_index_buffer(frame.command_buffer, indices, index_offset, index_type);
+    m_vk.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_ui_layout, 0, 1, &texture_set, 0, nullptr);
     m_vk.cmd_push_constants(frame.command_buffer, m_ui_layout,
         VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(dimensions), dimensions);
     m_vk.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
+    return true;
+}
+
+bool ScenePass::create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
+    std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    if (!m_device || !m_ui_descriptor_pool || !view || !sampler)
+    {
+        error = "Vulkan UI texture requires a pass, image view and sampler";
+        return false;
+    }
+    VkDescriptorSetAllocateInfo allocate{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    allocate.descriptorPool = m_ui_descriptor_pool;
+    allocate.descriptorSetCount = 1;
+    allocate.pSetLayouts = &m_ui_descriptor_layout;
+    if (m_vk.allocate_descriptor_sets(m_device, &allocate, &result) != VK_SUCCESS)
+    {
+        error = "Vulkan UI texture descriptor pool is exhausted";
+        return false;
+    }
+    const VkDescriptorImageInfo image{sampler, view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = result;
+    write.dstBinding = 0;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.pImageInfo = &image;
+    m_vk.update_descriptor_sets(m_device, 1, &write, 0, nullptr);
+    error.clear();
     return true;
 }
 
@@ -237,10 +310,16 @@ void ScenePass::destroy()
         if (m_ui_layout) m_vk.destroy_pipeline_layout(m_device, m_ui_layout, nullptr);
         if (m_scene_layout) m_vk.destroy_pipeline_layout(m_device, m_scene_layout, nullptr);
     }
+    if (m_device && m_ui_descriptor_pool && m_vk.destroy_descriptor_pool)
+        m_vk.destroy_descriptor_pool(m_device, m_ui_descriptor_pool, nullptr);
+    if (m_device && m_ui_descriptor_layout && m_vk.destroy_descriptor_set_layout)
+        m_vk.destroy_descriptor_set_layout(m_device, m_ui_descriptor_layout, nullptr);
     m_device = VK_NULL_HANDLE;
     m_render_pass = VK_NULL_HANDLE;
     m_scene_layout = m_ui_layout = VK_NULL_HANDLE;
     m_scene_pipeline = m_ui_pipeline = VK_NULL_HANDLE;
+    m_ui_descriptor_pool = VK_NULL_HANDLE;
+    m_ui_descriptor_layout = VK_NULL_HANDLE;
     m_vk = {};
 }
 }

@@ -19,6 +19,14 @@ struct FrameDispatch
     PFN_vkQueuePresentKHR queue_present{};
     PFN_vkCreateImageView create_image_view{};
     PFN_vkDestroyImageView destroy_image_view{};
+    PFN_vkGetPhysicalDeviceFormatProperties get_format_properties{};
+    PFN_vkGetPhysicalDeviceMemoryProperties get_memory_properties{};
+    PFN_vkCreateImage create_image{};
+    PFN_vkDestroyImage destroy_image{};
+    PFN_vkGetImageMemoryRequirements get_image_memory_requirements{};
+    PFN_vkAllocateMemory allocate_memory{};
+    PFN_vkFreeMemory free_memory{};
+    PFN_vkBindImageMemory bind_image_memory{};
     PFN_vkCreateRenderPass create_render_pass{};
     PFN_vkDestroyRenderPass destroy_render_pass{};
     PFN_vkCreateFramebuffer create_framebuffer{};
@@ -77,7 +85,8 @@ public:
 
     bool initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
-        const FrameDispatch& dispatch, std::string& error, bool allow_readback = false);
+        const FrameDispatch& dispatch, std::string& error, bool allow_readback = false,
+        bool use_depth = false);
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr);
@@ -86,6 +95,7 @@ public:
     VkExtent2D extent() const { return m_extent; }
     VkFormat format() const { return m_format; }
     VkRenderPass render_pass() const { return m_render_pass; }
+    VkFormat depth_format() const { return m_depth_format; }
     VkCommandPool command_pool() const { return m_command_pool; }
 
 private:
@@ -104,9 +114,14 @@ private:
     VkCommandPool m_command_pool = VK_NULL_HANDLE;
     VkExtent2D m_extent{};
     VkFormat m_format = VK_FORMAT_UNDEFINED;
+    VkFormat m_depth_format = VK_FORMAT_UNDEFINED;
+    VkPhysicalDeviceMemoryProperties m_memory_properties{};
     bool m_allow_readback = false;
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_image_views;
+    std::vector<VkImage> m_depth_images;
+    std::vector<VkDeviceMemory> m_depth_memories;
+    std::vector<VkImageView> m_depth_views;
     std::vector<VkFramebuffer> m_framebuffers;
     std::vector<VkCommandBuffer> m_commands;
     std::vector<VkSemaphore> m_render_finished;
