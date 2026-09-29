@@ -15,6 +15,7 @@ selects the OpenGL ES backend for gameplay.
 | Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
 | Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
 | Buffer allocation | `src/Layers/xrRenderVK/BufferResource.*` | Owns buffer allocations, selects a compatible memory type, and supports bounded writes to host-visible coherent memory |
+| Buffer upload | `src/Layers/xrRenderVK/BufferUpload.*` | Copies host data into a device-local buffer asynchronously, inserts a transfer-to-use memory barrier, and retires staging resources by fence |
 
 The probe logs the selected device, queue, relevant limits, compression
 features and attachment formats. These results are diagnostics, not a Vulkan
@@ -25,7 +26,7 @@ compatibility guarantee for gameplay.
 - compilation of the existing HLSL shaders to SPIR-V;
 - descriptor layouts and descriptor allocation for engine resources;
 - graphics and compute pipeline creation for renderer passes;
-- staging uploads and engine integration for vertex, index, constant and storage buffers;
+- engine integration for vertex, index, constant and storage buffers, with descriptors and pipelines;
 - render targets for the deferred G-buffer, lighting, shadows and
   post-processing;
 - model, terrain, particle, UI and video draw paths;
@@ -57,7 +58,7 @@ The eventual backend should keep these constraints:
 Work should proceed in dependencies-first order:
 
 1. add the HLSL-to-SPIR-V compiler and reflection cache;
-2. connect buffer resources to staging uploads, engine allocations, descriptor allocation and graphics pipelines;
+2. connect buffer uploads to engine allocations, descriptor allocation and graphics pipelines;
 3. render an engine UI/static-geometry pass through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling;
@@ -66,7 +67,7 @@ Work should proceed in dependencies-first order:
    run through Vulkan.
 
 Useful host tests live in `tests/vulkan_dds.cpp`,
-`tests/vulkan_image_state.cpp`, and `tests/vulkan_buffer_resource.cpp`. Device
-validation still requires the launcher's Vulkan smoke test on real Android
-hardware. A successful one-frame probe does not close any of the gameplay
-items above.
+`tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`, and
+`tests/vulkan_buffer_upload.cpp`. Device validation still requires the
+launcher's Vulkan smoke test on real Android hardware. A successful one-frame
+probe does not close any of the gameplay items above.

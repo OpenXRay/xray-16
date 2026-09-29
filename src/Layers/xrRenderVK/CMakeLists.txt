@@ -3,6 +3,8 @@ add_library(xrRenderVK STATIC)
 target_sources(xrRenderVK PRIVATE
     BufferResource.cpp
     BufferResource.h
+    BufferUpload.cpp
+    BufferUpload.h
     DdsTexture.cpp
     DdsTexture.h
     FrameContext.cpp
