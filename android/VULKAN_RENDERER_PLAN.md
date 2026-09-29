@@ -21,6 +21,9 @@ selects the OpenGL ES backend for gameplay.
 | Screen-copy pass | `src/Layers/xrRenderVK/ScreenCopyPass.*` | Creates a sampled-image descriptor set and graphics pipeline, and records a fullscreen draw through the frame callback |
 | Indexed scene and UI | `src/Layers/xrRenderVK/ScenePass.*`, `SceneShaders.h` | Records depth-tested indexed geometry with per-fragment directional light and an alpha-blended sampled-texture UI pass. The no-game smoke uploads a tiny UI texture and reads back pixels from both draws; this is not an engine `IRender` or `IUIRender` implementation |
 | Engine DDS bridge | `src/Layers/xrRenderVK/EngineTextureSource.*`, `src/xrEngine/android_vulkan_smoke.cpp` | Decodes bytes from the mounted engine VFS and uploads the standard fallback DDS into a sampled image when the probe has a mounted VFS |
+| OGF catalogue and level bytes | `src/Layers/xrRenderVK/VisualCatalog.*`, `EngineLevelModels.*`, `LevelModels.*` | Reads all OGF visual type headers and retains their chunks, child links and standalone model files; decodes the common static container geometry subset. Other types have metadata only and cannot yet be drawn |
+| Deferred primitives | `src/Layers/xrRenderVK/DeferredPass.*`, `DeferredShaderFactory.*` | Creates a two-color/depth G-buffer render pass and separate geometry and fullscreen directional-light pipelines; the caller still needs per-frame images, command recording and game scene traversal |
+| Game texture descriptors | `src/Layers/xrRenderVK/GameTextureFactory.*` | Loads DDS assets through the mounted VFS, caches images and creates sampled descriptors for the current deferred material and diagnostic UI passes; no game-facing shader or UI factory is bound yet |
 | Renderer registration | `src/Layers/xrRenderVK/VulkanRendererModule.cpp` | Owns the `renderer_vulkan` mode independently of GLES and refuses game initialization until Vulkan implementations of the engine render interfaces exist |
 | Offline HLSL compiler | `tools/compile_vulkan_shader.py` | Invokes a host DXC executable on an existing game/mod HLSL file, with entry point, include roots and defines, and atomically writes checked SPIR-V output |
 
@@ -75,9 +78,9 @@ compatibility guarantee for gameplay.
 - descriptor layouts and descriptor allocation for engine resources;
 - graphics and compute pipelines for gameplay passes;
 - engine integration for vertex, index, constant and storage buffers, with descriptors and pipelines;
-- engine scene geometry and materials, deferred G-buffer and lighting,
-  shadows and post-processing;
-- model, terrain, particle, UI and video draw paths;
+- full engine scene geometry/material shader permutations, per-frame G-buffer
+  targets and command recording, shadows and post-processing;
+- skeletal/progressive/tree model, terrain, particle, game UI and video draw paths;
 - recording engine draw commands and managing engine resource lifetimes;
 - swapchain recreation integrated with pause, resume, resize and surface loss;
 - Win32 and Linux surface integration for `xrRenderVK`;

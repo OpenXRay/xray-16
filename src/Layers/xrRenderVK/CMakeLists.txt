@@ -19,6 +19,8 @@ target_sources(xrRenderVK PRIVATE
     EngineLevelModels.h
     FrameContext.cpp
     FrameContext.h
+    GameTextureFactory.cpp
+    GameTextureFactory.h
     ImageStateTracker.cpp
     ImageStateTracker.h
     LevelModels.cpp
@@ -38,6 +40,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanHardware.h
     VulkanWindowDevice.cpp
     VulkanWindowDevice.h
+    VisualCatalog.cpp
+    VisualCatalog.h
 )
 
 include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")

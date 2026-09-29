@@ -6,6 +6,49 @@
 
 namespace xray::render::vulkan
 {
+bool load_engine_visual_catalog(IReader& level, std::vector<VisualRecord>& result, std::string& error)
+{
+    IReader* visuals = level.open_chunk(fsL_VISUALS);
+    if (!visuals)
+    {
+        error = "level has no OGF visual table";
+        return false;
+    }
+    const bool loaded = parse_level_visuals(
+        {static_cast<const uint8_t*>(visuals->pointer()), visuals->length()}, result, error);
+    visuals->close();
+    return loaded;
+}
+
+bool load_engine_model_visual(const char* name, VisualRecord& result, std::string& error)
+{
+    if (!name || !*name)
+    {
+        error = "model name is empty";
+        return false;
+    }
+    string_path filename;
+    if (strext(name)) xr_strcpy(filename, name);
+    else strconcat(sizeof(filename), filename, name, ".ogf");
+    string_path path;
+    if (!FS.exist(filename) && !FS.exist(path, "$level$", filename) &&
+        !FS.exist(path, "$game_meshes$", filename))
+    {
+        error = std::string("model not found: ") + filename;
+        return false;
+    }
+    IReader* reader = FS.r_open(FS.exist(filename) ? filename : path);
+    if (!reader)
+    {
+        error = std::string("model cannot be opened: ") + path;
+        return false;
+    }
+    const bool loaded = parse_ogf_visual(
+        {static_cast<const uint8_t*>(reader->pointer()), reader->length()}, result, error);
+    FS.r_close(reader);
+    return loaded;
+}
+
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error)
 {
     IReader* shaders = level.open_chunk(fsL_SHADERS);
