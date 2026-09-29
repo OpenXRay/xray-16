@@ -7,10 +7,13 @@
 #include "../Layers/xrRenderVK/BufferResource.h"
 #include "../Layers/xrRenderVK/EngineTextureSource.h"
 #include "../Layers/xrRenderVK/ScreenCopyPass.h"
+#include "../Layers/xrRenderVK/ScenePass.h"
+#include "../Layers/xrRenderVK/SceneShaders.h"
 #include "../Layers/xrRenderVK/ShaderModule.h"
 #include "../Layers/xrRenderVK/SmokeShaders.h"
 #include "../Layers/xrRenderVK/SmokeTrianglePass.h"
 #include "../Layers/xrRenderVK/VulkanHardware.h"
+#include "../Layers/xrRenderVK/VulkanWindowDevice.h"
 
 #include <SDL.h>
 
@@ -35,15 +38,18 @@ namespace AndroidVulkanSmoke
 #if defined(XRAY_ANDROID_HAS_VULKAN_HEADERS)
 namespace
 {
-using GetInstanceExtensions = SDL_bool (*)(SDL_Window*, unsigned int*, const char**);
-using CreateSurface = SDL_bool (*)(SDL_Window*, VkInstance, VkSurfaceKHR*);
-
 struct FrameCallbackAudit
 {
     uint32_t calls = 0;
     bool valid = true;
     const xray::render::vulkan::ScreenCopyPass* screen_copy = nullptr;
     const xray::render::vulkan::SmokeTrianglePass* triangle = nullptr;
+    const xray::render::vulkan::ScenePass* scene = nullptr;
+    VkBuffer scene_vertices = VK_NULL_HANDLE;
+    VkBuffer scene_indices = VK_NULL_HANDLE;
+    VkBuffer ui_vertices = VK_NULL_HANDLE;
+    VkBuffer ui_indices = VK_NULL_HANDLE;
+    xray::render::vulkan::SceneConstants scene_constants{};
 };
 
 struct PixelReadback
@@ -57,20 +63,25 @@ struct PixelReadback
 void record_pixel_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user_data)
 {
     auto& readback = *static_cast<PixelReadback*>(user_data);
-    VkBufferImageCopy region{};
-    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    region.imageSubresource.layerCount = 1;
-    region.imageOffset = {static_cast<int32_t>(extent.width / 2),
+    VkBufferImageCopy regions[2]{};
+    for (auto& region : regions)
+    {
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.layerCount = 1;
+        region.imageExtent = {1, 1, 1};
+    }
+    regions[0].imageOffset = {static_cast<int32_t>(extent.width / 2),
         static_cast<int32_t>(extent.height / 2), 0};
-    region.imageExtent = {1, 1, 1};
-    readback.copy(command, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, readback.buffer, 1, &region);
+    regions[1].bufferOffset = 4;
+    regions[1].imageOffset = {60, 40, 0};
+    readback.copy(command, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, readback.buffer, 2, regions);
     VkBufferMemoryBarrier host_read{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
     host_read.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     host_read.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
     host_read.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     host_read.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     host_read.buffer = readback.buffer;
-    host_read.size = 4;
+    host_read.size = 8;
     readback.barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT,
         0, 0, nullptr, 1, &host_read, 0, nullptr);
     ++readback.copies;
@@ -86,6 +97,13 @@ void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& fra
         audit.screen_copy->record(frame);
     else if (audit.triangle)
         audit.triangle->record(frame);
+    if (audit.scene)
+    {
+        audit.valid = audit.scene->record_geometry(frame, audit.scene_vertices, audit.scene_indices,
+            VK_INDEX_TYPE_UINT16, 3, audit.scene_constants) && audit.valid;
+        audit.valid = audit.scene->record_ui(frame, audit.ui_vertices, audit.ui_indices,
+            VK_INDEX_TYPE_UINT16, 6) && audit.valid;
+    }
     ++audit.calls;
 }
 
@@ -112,24 +130,11 @@ bool load_shader_from_vfs(pcstr name, VkDevice device,
 }
 
 template <typename T>
-T load_instance_proc(VkInstance instance, PFN_vkGetInstanceProcAddr get_proc, const char* name)
-{
-    return reinterpret_cast<T>(get_proc(instance, name));
-}
-
-template <typename T>
 T load_device_proc(VkDevice device, PFN_vkGetDeviceProcAddr get_proc, const char* name)
 {
     return reinterpret_cast<T>(get_proc(device, name));
 }
 
-bool has_extension(const std::vector<const char*>& extensions, const char* name)
-{
-    return std::any_of(extensions.begin(), extensions.end(), [name](const char* extension)
-    {
-        return std::strcmp(extension, name) == 0;
-    });
-}
 
 }
 #endif
@@ -141,20 +146,11 @@ bool Run(std::string& reason)
     Msg("! [renderer-vulkan] %s", reason.c_str());
     return false;
 #else
-    void* vulkan_library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
-    if (!vulkan_library)
-    {
-        reason = "libvulkan.so is unavailable";
-        Msg("! [renderer-vulkan] %s", reason.c_str());
-        return false;
-    }
-
     SDL_Window* window = nullptr;
-    VkInstance instance = VK_NULL_HANDLE;
-    VkSurfaceKHR surface = VK_NULL_HANDLE;
+    xray::render::vulkan::VulkanWindowDevice platform;
+    auto& frame_context = platform.frame();
     VkDevice device = VK_NULL_HANDLE;
     VkQueue queue = VK_NULL_HANDLE;
-    xray::render::vulkan::FrameContext frame_context;
     xray::render::vulkan::TextureUploadDispatch texture_dispatch{};
     xray::render::vulkan::UploadedTexture engine_texture{};
     xray::render::vulkan::ImageStateTracker image_states;
@@ -165,20 +161,28 @@ bool Run(std::string& reason)
     xray::render::vulkan::ShaderModule smoke_vertex;
     xray::render::vulkan::ShaderModule smoke_fragment;
     xray::render::vulkan::SmokeTrianglePass smoke_triangle;
+    xray::render::vulkan::ShaderModule scene_vertex, scene_fragment, ui_vertex, ui_fragment;
+    xray::render::vulkan::ScenePass scene_pass;
+    xray::render::vulkan::BufferResource scene_vertices, scene_indices, ui_vertices, ui_indices;
     xray::render::vulkan::BufferResource pixel_buffer;
     VkSampler copy_sampler = VK_NULL_HANDLE;
     PFN_vkDestroySampler destroy_sampler = nullptr;
     PFN_vkDeviceWaitIdle wait_idle = nullptr;
-
-    PFN_vkDestroyInstance destroy_instance = nullptr;
-    PFN_vkDestroySurfaceKHR destroy_surface = nullptr;
-    PFN_vkDestroyDevice destroy_device = nullptr;
 
     auto cleanup = [&]
     {
         if (device && wait_idle)
             wait_idle(device);
         screen_copy.destroy();
+        scene_pass.destroy();
+        scene_vertex.destroy();
+        scene_fragment.destroy();
+        ui_vertex.destroy();
+        ui_fragment.destroy();
+        scene_vertices.destroy();
+        scene_indices.destroy();
+        ui_vertices.destroy();
+        ui_indices.destroy();
         smoke_triangle.destroy();
         smoke_vertex.destroy();
         smoke_fragment.destroy();
@@ -195,16 +199,9 @@ bool Run(std::string& reason)
             image_states.forget_image(engine_texture.image);
             xray::render::vulkan::destroy_texture(device, texture_dispatch, engine_texture);
         }
-        frame_context.destroy();
-        if (device && destroy_device)
-            destroy_device(device, nullptr);
-        if (instance && surface && destroy_surface)
-            destroy_surface(instance, surface, nullptr);
-        if (instance && destroy_instance)
-            destroy_instance(instance, nullptr);
+        platform.destroy();
         if (window)
             SDL_DestroyWindow(window);
-        dlclose(vulkan_library);
     };
 
     auto fail = [&](const std::string& message)
@@ -215,97 +212,25 @@ bool Run(std::string& reason)
         return false;
     };
 
-    const auto get_instance_proc = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
-        dlsym(vulkan_library, "vkGetInstanceProcAddr"));
-    if (!get_instance_proc)
-        return fail("vkGetInstanceProcAddr is unavailable");
-
-    const auto get_instance_extensions = reinterpret_cast<GetInstanceExtensions>(
-        dlsym(RTLD_DEFAULT, "SDL_Vulkan_GetInstanceExtensions"));
-    const auto create_surface = reinterpret_cast<CreateSurface>(
-        dlsym(RTLD_DEFAULT, "SDL_Vulkan_CreateSurface"));
-    if (!get_instance_extensions || !create_surface)
-        return fail("SDL was built without Vulkan window support");
-
     window = SDL_CreateWindow("OpenXRay Vulkan surface smoke", SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 960, 540, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window)
-    {
-        reason = SDL_GetError();
-        return fail(reason);
-    }
-
-    unsigned int extension_count = 0;
-    if (!get_instance_extensions(window, &extension_count, nullptr) || extension_count == 0)
-        return fail("SDL returned no Vulkan instance extensions");
-
-    std::vector<const char*> extensions(extension_count);
-    if (!get_instance_extensions(window, &extension_count, extensions.data()))
-        return fail("SDL could not enumerate Vulkan instance extensions");
-    if (!has_extension(extensions, VK_KHR_SURFACE_EXTENSION_NAME))
-        return fail("SDL Vulkan extensions do not include VK_KHR_surface");
-
-    VkApplicationInfo application_info{};
-    application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    application_info.pApplicationName = "OpenXRay";
-    application_info.applicationVersion = VK_MAKE_VERSION(0, 9, 0);
-    application_info.pEngineName = "OpenXRay";
-    application_info.engineVersion = VK_MAKE_VERSION(0, 9, 0);
-    application_info.apiVersion = VK_API_VERSION_1_0;
-
-    VkInstanceCreateInfo instance_info{};
-    instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instance_info.pApplicationInfo = &application_info;
-    instance_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    instance_info.ppEnabledExtensionNames = extensions.data();
-
-    const auto create_instance = reinterpret_cast<PFN_vkCreateInstance>(
-        get_instance_proc(VK_NULL_HANDLE, "vkCreateInstance"));
-    if (!create_instance || create_instance(&instance_info, nullptr, &instance) != VK_SUCCESS)
-        return fail("vkCreateInstance failed");
-
-    destroy_instance = load_instance_proc<PFN_vkDestroyInstance>(instance, get_instance_proc, "vkDestroyInstance");
-    destroy_surface = load_instance_proc<PFN_vkDestroySurfaceKHR>(instance, get_instance_proc, "vkDestroySurfaceKHR");
-    const auto get_physical_properties = load_instance_proc<PFN_vkGetPhysicalDeviceProperties>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceProperties");
-    const auto get_physical_features = load_instance_proc<PFN_vkGetPhysicalDeviceFeatures>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceFeatures");
-    const auto get_memory_properties = load_instance_proc<PFN_vkGetPhysicalDeviceMemoryProperties>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceMemoryProperties");
-    const auto get_format_properties = load_instance_proc<PFN_vkGetPhysicalDeviceFormatProperties>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceFormatProperties");
-    const auto get_device_proc = load_instance_proc<PFN_vkGetDeviceProcAddr>(
-        instance, get_instance_proc, "vkGetDeviceProcAddr");
-    if (!destroy_instance || !destroy_surface || !get_device_proc || !get_physical_properties ||
-        !get_physical_features || !get_memory_properties || !get_format_properties)
-        return fail("required Vulkan instance procedures are unavailable");
-
-    if (!create_surface(window, instance, &surface))
-        return fail("SDL could not create a Vulkan window surface");
-
-    const auto enumerate_physical_devices = load_instance_proc<PFN_vkEnumeratePhysicalDevices>(
-        instance, get_instance_proc, "vkEnumeratePhysicalDevices");
-    const auto get_queue_families = load_instance_proc<PFN_vkGetPhysicalDeviceQueueFamilyProperties>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceQueueFamilyProperties");
-    const auto get_surface_support = load_instance_proc<PFN_vkGetPhysicalDeviceSurfaceSupportKHR>(
-        instance, get_instance_proc, "vkGetPhysicalDeviceSurfaceSupportKHR");
-    const auto enumerate_device_extensions = load_instance_proc<PFN_vkEnumerateDeviceExtensionProperties>(
-        instance, get_instance_proc, "vkEnumerateDeviceExtensionProperties");
-    xray::render::vulkan::HardwareDispatch hardware_dispatch{
-        enumerate_physical_devices, get_queue_families, get_surface_support, enumerate_device_extensions,
-        get_physical_properties, get_physical_features, get_memory_properties
-    };
-    xray::render::vulkan::PhysicalDevice physical_selection;
-    std::string hardware_error;
-    if (!xray::render::vulkan::select_physical_device(instance, surface, hardware_dispatch,
-            physical_selection, hardware_error))
-        return fail(hardware_error);
+        return fail(SDL_GetError());
+    const bool no_game_vfs = !FS.path_exist("$game_textures$");
+    std::string frame_error;
+    if (!platform.initialize(window, {960, 540}, no_game_vfs, frame_error))
+        return fail(frame_error);
+    device = platform.device();
+    queue = platform.queue();
+    const auto get_device_proc = platform.device_proc();
+    const auto& physical_selection = platform.physical();
     const VkPhysicalDevice physical_device = physical_selection.handle;
     const uint32_t queue_family = physical_selection.graphics_present_family;
     const VkPhysicalDeviceProperties& physical_properties = physical_selection.properties;
     const VkPhysicalDeviceFeatures& physical_features = physical_selection.features;
     const VkDeviceSize device_local_bytes = physical_selection.local_memory_bytes;
-
+    const auto get_format_properties = reinterpret_cast<PFN_vkGetPhysicalDeviceFormatProperties>(
+        platform.instance_proc()(platform.instance(), "vkGetPhysicalDeviceFormatProperties"));
     const auto format_features = [&](VkFormat format)
     {
         VkFormatProperties properties{};
@@ -341,24 +266,11 @@ bool Run(std::string& reason)
     Msg("[renderer-vulkan] attachment formats: RGBA8=%u RGBA16F=%u R32F=%u D24S8=%u D32S8=%u",
         rgba8_attachment, rgba16f_attachment, r32f_attachment, d24s8_attachment, d32s8_attachment);
 
-    const auto create_device = load_instance_proc<PFN_vkCreateDevice>(instance, get_instance_proc, "vkCreateDevice");
-    xray::render::vulkan::DeviceDispatch device_dispatch{create_device, get_device_proc};
-    std::string device_error;
-    if (!xray::render::vulkan::create_logical_device(physical_selection, device_dispatch,
-            device, queue, device_error))
-        return fail(device_error);
-
-    destroy_device = load_device_proc<PFN_vkDestroyDevice>(device, get_device_proc, "vkDestroyDevice");
     xray::render::vulkan::FrameDispatch frame_dispatch;
-    std::string frame_error;
-    if (!destroy_device || !xray::render::vulkan::load_frame_dispatch(instance, get_instance_proc,
+    if (!xray::render::vulkan::load_frame_dispatch(platform.instance(), platform.instance_proc(),
             device, get_device_proc, frame_dispatch, frame_error))
-        return fail(frame_error.empty() ? "vkDestroyDevice is unavailable" : frame_error);
-    wait_idle = frame_dispatch.device_wait_idle;
-    const bool no_game_vfs = !FS.path_exist("$game_textures$");
-    if (!frame_context.initialize(physical_device, device, surface, queue, queue_family, {960, 540},
-            frame_dispatch, frame_error, no_game_vfs))
         return fail(frame_error);
+    wait_idle = frame_dispatch.device_wait_idle;
 
     // A normal game boot has a mounted VFS. The no-game smoke boot does not.
     // Exercise an actual engine-owned DDS through the same archive-aware reader
@@ -456,12 +368,66 @@ bool Run(std::string& reason)
             load_device_proc<PFN_vkBindBufferMemory>(device, get_device_proc, "vkBindBufferMemory"),
             load_device_proc<PFN_vkMapMemory>(device, get_device_proc, "vkMapMemory"),
             load_device_proc<PFN_vkUnmapMemory>(device, get_device_proc, "vkUnmapMemory")};
-        if (!pixel_buffer.initialize(device, 4, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        if (!pixel_buffer.initialize(device, 8, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, physical_selection.memory, buffer_dispatch, draw_error))
             return fail(draw_error);
+        xray::render::vulkan::ScenePassDispatch scene_dispatch;
+        if (!xray::render::vulkan::load_scene_pass_dispatch(device, get_device_proc,
+                scene_dispatch, draw_error) ||
+            !scene_vertex.initialize(device, shaders, xray::render::vulkan::scene_shaders::SceneVertex,
+                sizeof(xray::render::vulkan::scene_shaders::SceneVertex), draw_error) ||
+            !scene_fragment.initialize(device, shaders, xray::render::vulkan::scene_shaders::SceneFragment,
+                sizeof(xray::render::vulkan::scene_shaders::SceneFragment), draw_error) ||
+            !ui_vertex.initialize(device, shaders, xray::render::vulkan::scene_shaders::UiVertex,
+                sizeof(xray::render::vulkan::scene_shaders::UiVertex), draw_error) ||
+            !ui_fragment.initialize(device, shaders, xray::render::vulkan::scene_shaders::UiFragment,
+                sizeof(xray::render::vulkan::scene_shaders::UiFragment), draw_error) ||
+            !scene_pass.initialize(device, frame_context.render_pass(), scene_vertex.handle(),
+                scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(), scene_dispatch, draw_error))
+            return fail(draw_error);
+
+        using xray::render::vulkan::SceneVertex;
+        using xray::render::vulkan::UiVertex;
+        const SceneVertex geometry[] = {
+            {{-0.65f, -0.65f, 0}, {0, 0, 1}, {0.6f, 0.7f, 1.0f, 1}},
+            {{0.65f, -0.65f, 0}, {0, 0, 1}, {0.6f, 0.7f, 1.0f, 1}},
+            {{0, 0.7f, 0}, {0, 0, 1}, {0.6f, 0.7f, 1.0f, 1}}
+        };
+        const uint16_t geometry_indices[]{0, 1, 2};
+        const UiVertex overlay[] = {
+            {{20, 20}, {0, 0}, 0xcce0a040u},
+            {{200, 20}, {1, 0}, 0xcce0a040u},
+            {{200, 80}, {1, 1}, 0xcce0a040u},
+            {{20, 80}, {0, 1}, 0xcce0a040u}
+        };
+        const uint16_t overlay_indices[]{0, 1, 2, 0, 2, 3};
+        const auto make_buffer = [&](xray::render::vulkan::BufferResource& buffer,
+            const void* bytes, size_t count, VkBufferUsageFlags usage)
+        {
+            return buffer.initialize(device, count, usage,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                physical_selection.memory, buffer_dispatch, draw_error) &&
+                buffer.write(0, bytes, count, draw_error);
+        };
+        if (!make_buffer(scene_vertices, geometry, sizeof(geometry), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) ||
+            !make_buffer(scene_indices, geometry_indices, sizeof(geometry_indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT) ||
+            !make_buffer(ui_vertices, overlay, sizeof(overlay), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) ||
+            !make_buffer(ui_indices, overlay_indices, sizeof(overlay_indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT))
+            return fail(draw_error);
+        auto& constants = callback_audit.scene_constants;
+        constants.model_view_projection[0] = constants.model_view_projection[5] =
+            constants.model_view_projection[10] = constants.model_view_projection[15] = 1.0f;
+        constants.light_direction_ambient[2] = -1.0f;
+        constants.light_direction_ambient[3] = 0.2f;
+        constants.light_color[0] = constants.light_color[1] = constants.light_color[2] = 0.8f;
+        callback_audit.scene = &scene_pass;
+        callback_audit.scene_vertices = scene_vertices.handle();
+        callback_audit.scene_indices = scene_indices.handle();
+        callback_audit.ui_vertices = ui_vertices.handle();
+        callback_audit.ui_indices = ui_indices.handle();
         pixel_readback = {pixel_buffer.handle(), frame_dispatch.cmd_copy_image_to_buffer,
             frame_dispatch.cmd_pipeline_barrier, 0};
-        Msg("[renderer-vulkan] game-independent SPIR-V triangle pipeline initialized");
+        Msg("[renderer-vulkan] indexed geometry, directional lighting and UI pipelines initialized");
     }
     if (engine_texture.view && FS.path_exist("$game_shaders$"))
     {
@@ -533,7 +499,7 @@ bool Run(std::string& reason)
 
     if (no_game_vfs)
     {
-        std::array<uint8_t, 4> pixel{};
+        std::array<uint8_t, 8> pixel{};
         if (pixel_readback.copies != 1 ||
             !pixel_buffer.read(0, pixel.data(), pixel.size(), frame_error))
             return fail("Vulkan triangle center pixel readback failed");
@@ -542,15 +508,22 @@ bool Run(std::string& reason)
         const uint8_t blue = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[0] : pixel[2];
         Msg("[renderer-vulkan] center pixel RGBA=(%u,%u,%u,%u)", red, green, blue, pixel[3]);
         if (red < 50 || green < 60 || blue < 90 || pixel[3] < 250)
-            return fail("Vulkan triangle center pixel did not contain the drawn color");
+            return fail("Vulkan lit geometry center pixel did not contain the drawn color");
+        const uint8_t ui_red = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[6] : pixel[4];
+        const uint8_t ui_green = pixel[5];
+        const uint8_t ui_blue = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[4] : pixel[6];
+        Msg("[renderer-vulkan] UI pixel RGBA=(%u,%u,%u,%u)",
+            ui_red, ui_green, ui_blue, pixel[7]);
+        if (ui_green < 100 || ui_blue < 150 || pixel[7] < 200)
+            return fail("Vulkan UI pixel did not contain the alpha-blended overlay");
     }
 
     Msg("[renderer-vulkan] %s PASS: %s, Vulkan %u.%u.%u",
-        no_game_vfs ? "triangle draw, pixel readback and present" : "frame submit and present",
+        no_game_vfs ? "lit geometry, UI draw, two pixel readbacks and present" : "frame submit and present",
         physical_properties.deviceName,
         VK_VERSION_MAJOR(physical_properties.apiVersion), VK_VERSION_MINOR(physical_properties.apiVersion),
         VK_VERSION_PATCH(physical_properties.apiVersion));
-    reason = no_game_vfs ? "three Vulkan triangle draws and center pixel readback passed" :
+    reason = no_game_vfs ? "three Vulkan lit geometry and UI draws with two pixel readbacks passed" :
         "three Vulkan frame-context submits and presents passed";
     cleanup();
     return true;

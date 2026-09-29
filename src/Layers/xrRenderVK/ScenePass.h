@@ -1,0 +1,87 @@
+#pragma once
+
+#include "FrameContext.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+
+namespace xray::render::vulkan
+{
+// The first game-shaped draw format. Resource ownership and synchronization
+// remain with the caller; do not modify buffers used by in-flight frames.
+struct SceneVertex
+{
+    float position[3];
+    float normal[3];
+    float color[4];
+};
+
+struct UiVertex
+{
+    float position[2]; // framebuffer pixels, top-left origin
+    float uv[2];       // reserved for the textured UI pipeline
+    uint32_t color;    // normalized RGBA8
+};
+
+struct SceneConstants
+{
+    float model_view_projection[16]; // column-major
+    float light_direction_ambient[4]; // direction xyz, ambient intensity w
+    float light_color[4]; // RGB intensity, alpha ignored
+};
+static_assert(sizeof(SceneConstants) == 96);
+
+struct ScenePassDispatch
+{
+    PFN_vkCreatePipelineLayout create_pipeline_layout{};
+    PFN_vkDestroyPipelineLayout destroy_pipeline_layout{};
+    PFN_vkCreateGraphicsPipelines create_graphics_pipelines{};
+    PFN_vkDestroyPipeline destroy_pipeline{};
+    PFN_vkCmdBindPipeline cmd_bind_pipeline{};
+    PFN_vkCmdSetViewport cmd_set_viewport{};
+    PFN_vkCmdSetScissor cmd_set_scissor{};
+    PFN_vkCmdBindVertexBuffers cmd_bind_vertex_buffers{};
+    PFN_vkCmdBindIndexBuffer cmd_bind_index_buffer{};
+    PFN_vkCmdPushConstants cmd_push_constants{};
+    PFN_vkCmdDrawIndexed cmd_draw_indexed{};
+};
+
+bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
+    ScenePassDispatch& dispatch, std::string& error);
+
+// A forward geometry+directional-light pass followed by an alpha-blended
+// vertex-colored UI pass. The caller supplies valid SPIR-V modules and buffers.
+// This is not a deferred level renderer: depth, materials and textured UI are
+// deliberately outside this bounded pass.
+class ScenePass
+{
+public:
+    ScenePass() = default;
+    ~ScenePass() { destroy(); }
+    ScenePass(const ScenePass&) = delete;
+    ScenePass& operator=(const ScenePass&) = delete;
+
+    bool initialize(VkDevice device, VkRenderPass render_pass,
+        VkShaderModule scene_vertex, VkShaderModule scene_fragment,
+        VkShaderModule ui_vertex, VkShaderModule ui_fragment,
+        const ScenePassDispatch& dispatch, std::string& error);
+    bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        VkIndexType index_type, uint32_t index_count, const SceneConstants& constants,
+        VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0) const;
+    bool record_ui(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        VkIndexType index_type, uint32_t index_count, const VkRect2D* scissor = nullptr,
+        VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0) const;
+    void destroy();
+
+private:
+    bool valid_frame(const FrameRecordingContext& frame) const;
+    VkDevice m_device = VK_NULL_HANDLE;
+    VkRenderPass m_render_pass = VK_NULL_HANDLE;
+    VkPipelineLayout m_scene_layout = VK_NULL_HANDLE;
+    VkPipelineLayout m_ui_layout = VK_NULL_HANDLE;
+    VkPipeline m_scene_pipeline = VK_NULL_HANDLE;
+    VkPipeline m_ui_pipeline = VK_NULL_HANDLE;
+    ScenePassDispatch m_vk{};
+};
+}

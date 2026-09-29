@@ -1493,8 +1493,8 @@ public final class LauncherActivity extends Activity {
     private void updateEngineStatus(String log) {
         if (engineLaunchTime == 0)
             return;
-        if (log.contains("[renderer-vulkan] PASS: Vulkan command buffer")) {
-            setStatus("Самостоятельный Vulkan render pass завершён: PASS.");
+        if (log.contains("[renderer-vulkan] PASS: three Vulkan lit geometry and UI draws")) {
+            setStatus("Vulkan: геометрия, освещение и UI-проверка завершены: PASS.");
             return;
         }
         if (log.contains("[renderer-smoke] center pixel") && log.contains(": PASS")) {

@@ -16,6 +16,8 @@ target_sources(xrRenderVK PRIVATE
     ImageStateTracker.h
     ScreenCopyPass.cpp
     ScreenCopyPass.h
+    ScenePass.cpp
+    ScenePass.h
     ShaderModule.cpp
     ShaderModule.h
     SmokeShaders.h
@@ -25,6 +27,8 @@ target_sources(xrRenderVK PRIVATE
     TextureUpload.h
     VulkanHardware.cpp
     VulkanHardware.h
+    VulkanWindowDevice.cpp
+    VulkanWindowDevice.h
 )
 
 include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")

@@ -244,7 +244,8 @@ is incomplete. The launcher blocks Vulkan game launches, and an explicit native
 pieces and remaining work.
 
 The launcher can run GLES and Vulkan smoke tests without game data. The Vulkan
-test draws a triangle, reads back its center pixel and presents three frames.
+test draws indexed, lit geometry and a colored UI overlay, reads back one pixel
+from each draw and presents three frames.
 A passing smoke test verifies a small render path only; it does not prove that
 a level can be loaded or rendered correctly.
 
