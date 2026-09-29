@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <utility>
 
 namespace
@@ -48,9 +49,15 @@ int main()
     assert(module.handle());
     assert(create_count == 1);
 
+    uint8_t unaligned[sizeof(code) + 1]{};
+    std::memcpy(unaligned + 1, code, sizeof(code));
+    assert(module.initialize_bytes(device, dispatch, unaligned + 1, sizeof(code), error));
+    assert(create_count == 2);
+    assert(destroy_count == 1);
+
     xray::render::vulkan::ShaderModule moved(std::move(module));
     assert(!module.handle());
     assert(moved.handle());
     moved.destroy();
-    assert(destroy_count == 1);
+    assert(destroy_count == 2);
 }

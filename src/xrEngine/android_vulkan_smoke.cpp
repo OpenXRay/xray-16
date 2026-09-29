@@ -4,6 +4,7 @@
 
 #include "android_vulkan_smoke.h"
 #include "../Layers/xrRenderVK/FrameContext.h"
+#include "../Layers/xrRenderVK/EngineTextureSource.h"
 #include "../Layers/xrRenderVK/VulkanHardware.h"
 
 #include <SDL.h>
@@ -90,6 +91,10 @@ bool Run(std::string& reason)
     VkDevice device = VK_NULL_HANDLE;
     VkQueue queue = VK_NULL_HANDLE;
     xray::render::vulkan::FrameContext frame_context;
+    xray::render::vulkan::TextureUploadDispatch texture_dispatch{};
+    xray::render::vulkan::UploadedTexture engine_texture{};
+    xray::render::vulkan::ImageStateTracker image_states;
+    std::vector<xray::render::vulkan::PendingTextureUpload> texture_uploads;
 
     PFN_vkDestroyInstance destroy_instance = nullptr;
     PFN_vkDestroySurfaceKHR destroy_surface = nullptr;
@@ -97,6 +102,14 @@ bool Run(std::string& reason)
 
     auto cleanup = [&]
     {
+        if (!texture_uploads.empty())
+            xray::render::vulkan::wait_for_uploads(device, frame_context.command_pool(),
+                texture_dispatch, texture_uploads);
+        if (engine_texture.image)
+        {
+            image_states.forget_image(engine_texture.image);
+            xray::render::vulkan::destroy_texture(device, texture_dispatch, engine_texture);
+        }
         frame_context.destroy();
         if (device && destroy_device)
             destroy_device(device, nullptr);
@@ -259,6 +272,72 @@ bool Run(std::string& reason)
     if (!frame_context.initialize(physical_device, device, surface, queue, queue_family, {960, 540},
             frame_dispatch, frame_error))
         return fail(frame_error);
+
+    // A normal game boot has a mounted VFS. The no-game smoke boot does not.
+    // Exercise an actual engine-owned DDS through the same archive-aware reader
+    // used by the other renderers when the standard fallback texture exists.
+    if (FS.path_exist("$game_textures$"))
+    {
+        string_path texture_path;
+        if (FS.exist(texture_path, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"))
+        {
+#define XRAY_TEXTURE_PROC(field, name) \
+            texture_dispatch.field = load_device_proc<decltype(texture_dispatch.field)>(device, get_device_proc, name)
+            XRAY_TEXTURE_PROC(create_buffer, "vkCreateBuffer");
+            XRAY_TEXTURE_PROC(destroy_buffer, "vkDestroyBuffer");
+            XRAY_TEXTURE_PROC(get_buffer_memory_requirements, "vkGetBufferMemoryRequirements");
+            XRAY_TEXTURE_PROC(create_image, "vkCreateImage");
+            XRAY_TEXTURE_PROC(destroy_image, "vkDestroyImage");
+            XRAY_TEXTURE_PROC(get_image_memory_requirements, "vkGetImageMemoryRequirements");
+            XRAY_TEXTURE_PROC(allocate_memory, "vkAllocateMemory");
+            XRAY_TEXTURE_PROC(free_memory, "vkFreeMemory");
+            XRAY_TEXTURE_PROC(bind_buffer_memory, "vkBindBufferMemory");
+            XRAY_TEXTURE_PROC(bind_image_memory, "vkBindImageMemory");
+            XRAY_TEXTURE_PROC(map_memory, "vkMapMemory");
+            XRAY_TEXTURE_PROC(unmap_memory, "vkUnmapMemory");
+            XRAY_TEXTURE_PROC(create_image_view, "vkCreateImageView");
+            XRAY_TEXTURE_PROC(destroy_image_view, "vkDestroyImageView");
+            XRAY_TEXTURE_PROC(allocate_command_buffers, "vkAllocateCommandBuffers");
+            XRAY_TEXTURE_PROC(free_command_buffers, "vkFreeCommandBuffers");
+            XRAY_TEXTURE_PROC(begin_command_buffer, "vkBeginCommandBuffer");
+            XRAY_TEXTURE_PROC(end_command_buffer, "vkEndCommandBuffer");
+            XRAY_TEXTURE_PROC(cmd_pipeline_barrier, "vkCmdPipelineBarrier");
+            XRAY_TEXTURE_PROC(cmd_copy_buffer_to_image, "vkCmdCopyBufferToImage");
+            XRAY_TEXTURE_PROC(queue_submit, "vkQueueSubmit");
+            XRAY_TEXTURE_PROC(create_fence, "vkCreateFence");
+            XRAY_TEXTURE_PROC(destroy_fence, "vkDestroyFence");
+            XRAY_TEXTURE_PROC(get_fence_status, "vkGetFenceStatus");
+            XRAY_TEXTURE_PROC(wait_for_fences, "vkWaitForFences");
+#undef XRAY_TEXTURE_PROC
+            if (!texture_dispatch.create_buffer || !texture_dispatch.destroy_buffer ||
+                !texture_dispatch.get_buffer_memory_requirements || !texture_dispatch.create_image ||
+                !texture_dispatch.destroy_image || !texture_dispatch.get_image_memory_requirements ||
+                !texture_dispatch.allocate_memory || !texture_dispatch.free_memory ||
+                !texture_dispatch.bind_buffer_memory || !texture_dispatch.bind_image_memory ||
+                !texture_dispatch.map_memory || !texture_dispatch.unmap_memory ||
+                !texture_dispatch.create_image_view || !texture_dispatch.destroy_image_view ||
+                !texture_dispatch.allocate_command_buffers || !texture_dispatch.free_command_buffers ||
+                !texture_dispatch.begin_command_buffer || !texture_dispatch.end_command_buffer ||
+                !texture_dispatch.cmd_pipeline_barrier || !texture_dispatch.cmd_copy_buffer_to_image ||
+                !texture_dispatch.queue_submit || !texture_dispatch.create_fence ||
+                !texture_dispatch.destroy_fence || !texture_dispatch.get_fence_status ||
+                !texture_dispatch.wait_for_fences)
+                return fail("required Vulkan texture upload procedures are unavailable");
+
+            IReader* reader = FS.r_open(texture_path);
+            if (!reader)
+                return fail("engine VFS could not open the fallback DDS");
+            std::string texture_error;
+            const bool uploaded = xray::render::vulkan::upload_engine_texture(device, queue,
+                frame_context.command_pool(), physical_selection.memory, texture_dispatch,
+                reader->pointer(), reader->length(), physical_features.textureCompressionBC,
+                engine_texture, texture_uploads, image_states, texture_error);
+            FS.r_close(reader);
+            if (!uploaded)
+                return fail("engine DDS Vulkan upload failed: " + texture_error);
+            Msg("[renderer-vulkan] engine VFS DDS uploaded to sampled image: %s", texture_path);
+        }
+    }
 
     VkClearColorValue clear{};
     clear.float32[0] = 0.08f;

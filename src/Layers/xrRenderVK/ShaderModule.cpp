@@ -1,6 +1,8 @@
 #include "ShaderModule.h"
 
+#include <cstring>
 #include <utility>
+#include <vector>
 
 namespace xray::render::vulkan
 {
@@ -60,6 +62,20 @@ bool ShaderModule::initialize(VkDevice device, const ShaderModuleDispatch& dispa
     m_destroy = dispatch.destroy;
     error.clear();
     return true;
+}
+
+bool ShaderModule::initialize_bytes(VkDevice device, const ShaderModuleDispatch& dispatch,
+    const void* bytes, size_t size, std::string& error)
+{
+    if (!bytes || size < 5 * sizeof(uint32_t) || size % sizeof(uint32_t))
+    {
+        destroy();
+        error = "invalid SPIR-V shader module input";
+        return false;
+    }
+    std::vector<uint32_t> words(size / sizeof(uint32_t));
+    std::memcpy(words.data(), bytes, size);
+    return initialize(device, dispatch, words.data(), size, error);
 }
 
 void ShaderModule::destroy()

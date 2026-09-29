@@ -18,12 +18,28 @@ selects the OpenGL ES backend for gameplay.
 | Buffer upload | `src/Layers/xrRenderVK/BufferUpload.*` | Copies host data into a device-local buffer asynchronously, inserts a transfer-to-use memory barrier, and retires staging resources by fence |
 | Shader module | `src/Layers/xrRenderVK/ShaderModule.*` | Creates and owns a Vulkan shader module from precompiled SPIR-V bytes |
 | Screen-copy pass | `src/Layers/xrRenderVK/ScreenCopyPass.*` | Creates a sampled-image descriptor set and graphics pipeline, and records a fullscreen draw through the frame callback |
+| Engine DDS bridge | `src/Layers/xrRenderVK/EngineTextureSource.*`, `src/xrEngine/android_vulkan_smoke.cpp` | Decodes bytes from the mounted engine VFS and uploads the standard fallback DDS into a sampled image during the gameplay selection probe, when present |
+| Offline HLSL compiler | `tools/compile_vulkan_shader.py` | Invokes a host DXC executable on an existing game/mod HLSL file, with entry point, include roots and defines, and atomically writes checked SPIR-V output |
 
 The screen-copy pass takes already compiled vertex and fragment modules, a
 sampled image view, and a sampler. The caller must transition the image to
 shader-read layout, keep the resources alive through submitted frames, and
 rebuild the pipeline when the frame render pass changes. The pass has no engine
-image source yet.
+image bound to it yet. The game boot probe uploads an engine DDS but does not
+draw it. The no-game smoke test runs without a mounted game VFS and skips it.
+
+To compile an existing game or mod HLSL file on a host with DXC installed:
+
+```sh
+python3 tools/compile_vulkan_shader.py --dxc dxc \
+  --source path/to/game/shaders/r3/editor.vs --stage vs --entry main \
+  --include path/to/game/shaders/r3 --output build/shaders/r3/editor.vs.spv
+```
+
+Use `--define NAME=VALUE` for each shader variant. Compilation failures leave
+the previous output intact. DXC is not shipped with the engine, and legacy
+shader syntax or features may require porting. This tool does not yet compile
+the complete game shader set or package SPIR-V into game resources.
 
 The probe logs the selected device, queue, relevant limits, compression
 features and attachment formats. These results are diagnostics, not a Vulkan
@@ -31,7 +47,7 @@ compatibility guarantee for gameplay.
 
 ## Not implemented
 
-- compilation of the existing HLSL shaders to SPIR-V;
+- runtime compilation, shader permutation coverage and reflection for the existing HLSL shaders;
 - descriptor layouts and descriptor allocation for engine resources;
 - graphics and compute pipelines for gameplay passes;
 - engine integration for vertex, index, constant and storage buffers, with descriptors and pipelines;
@@ -65,9 +81,9 @@ The eventual backend should keep these constraints:
 
 Work should proceed in dependencies-first order:
 
-1. add the HLSL-to-SPIR-V compiler and reflection cache;
+1. expand the host HLSL-to-SPIR-V compiler to cover game shader permutations and add reflection;
 2. connect buffer uploads to engine allocations, descriptor allocation and graphics pipelines;
-3. connect the screen-copy pass to an engine-owned image, then render UI and
+3. bind the uploaded engine image to the screen-copy pass, then render UI and
    static geometry through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling;

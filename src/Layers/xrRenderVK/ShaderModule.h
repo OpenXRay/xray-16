@@ -25,6 +25,9 @@ public:
 
     bool initialize(VkDevice device, const ShaderModuleDispatch& dispatch,
         const uint32_t* code, size_t size, std::string& error);
+    // IReader::pointer() is byte-aligned; copy to aligned words before Vulkan.
+    bool initialize_bytes(VkDevice device, const ShaderModuleDispatch& dispatch,
+        const void* bytes, size_t size, std::string& error);
     void destroy();
 
     VkShaderModule handle() const { return m_module; }

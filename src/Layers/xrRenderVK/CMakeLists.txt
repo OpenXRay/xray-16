@@ -7,6 +7,8 @@ target_sources(xrRenderVK PRIVATE
     BufferUpload.h
     DdsTexture.cpp
     DdsTexture.h
+    EngineTextureSource.cpp
+    EngineTextureSource.h
     FrameContext.cpp
     FrameContext.h
     ImageStateTracker.cpp
