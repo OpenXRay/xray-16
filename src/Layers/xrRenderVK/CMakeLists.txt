@@ -10,6 +10,8 @@ target_sources(xrRenderVK PRIVATE
     DdsTexture.h
     DeferredPass.cpp
     DeferredPass.h
+    DeferredFrame.cpp
+    DeferredFrame.h
     DeferredShaderFactory.cpp
     DeferredShaderFactory.h
     DeferredShaders.h
@@ -21,6 +23,10 @@ target_sources(xrRenderVK PRIVATE
     FrameContext.h
     GameTextureFactory.cpp
     GameTextureFactory.h
+    GBufferTargets.cpp
+    GBufferTargets.h
+    GpuLevel.cpp
+    GpuLevel.h
     ImageStateTracker.cpp
     ImageStateTracker.h
     LevelModels.cpp

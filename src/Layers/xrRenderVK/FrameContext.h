@@ -69,6 +69,9 @@ struct FrameRecordingContext
 
 using FrameRecorder = void (*)(const FrameRecordingContext& frame, void* user_data);
 using FrameReadbackRecorder = void (*)(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user_data);
+// Records offscreen work before the swapchain render pass. render_pass and
+// framebuffer are null; the callback owns any pass it begins and ends.
+using FramePrepassRecorder = void (*)(const FrameRecordingContext& frame, void* user_data);
 
 bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_instance_proc,
     VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc, FrameDispatch& dispatch, std::string& error);
@@ -89,7 +92,8 @@ public:
         bool use_depth = false);
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
-        FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr);
+        FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
+        FramePrepassRecorder prepass = nullptr, void* prepass_data = nullptr);
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }
@@ -97,6 +101,7 @@ public:
     VkRenderPass render_pass() const { return m_render_pass; }
     VkFormat depth_format() const { return m_depth_format; }
     VkCommandPool command_pool() const { return m_command_pool; }
+    size_t image_count() const { return m_images.size(); }
 
 private:
     bool create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,

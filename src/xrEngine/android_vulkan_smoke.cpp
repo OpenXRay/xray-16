@@ -6,6 +6,9 @@
 #include "../Layers/xrRenderVK/FrameContext.h"
 #include "../Layers/xrRenderVK/BufferResource.h"
 #include "../Layers/xrRenderVK/EngineTextureSource.h"
+#include "../Layers/xrRenderVK/DeferredPass.h"
+#include "../Layers/xrRenderVK/DeferredShaderFactory.h"
+#include "../Layers/xrRenderVK/GBufferTargets.h"
 #include "../Layers/xrRenderVK/ScreenCopyPass.h"
 #include "../Layers/xrRenderVK/ScenePass.h"
 #include "../Layers/xrRenderVK/SceneShaders.h"
@@ -60,6 +63,40 @@ struct PixelReadback
     PFN_vkCmdPipelineBarrier barrier{};
     uint32_t copies = 0;
 };
+
+struct DeferredAudit
+{
+    xray::render::vulkan::GBufferTargets* targets{};
+    xray::render::vulkan::DeferredPass* pass{};
+    xray::render::vulkan::ScenePass* ui{};
+    VkBuffer vertices{}, indices{}, ui_vertices{}, ui_indices{};
+    VkDescriptorSet material{}, ui_texture{};
+    float mvp[16]{};
+    xray::render::vulkan::DeferredLight light{};
+    uint32_t geometry_calls{}, lighting_calls{};
+    bool valid{true};
+};
+
+void record_deferred_geometry(const xray::render::vulkan::FrameRecordingContext& frame, void* user)
+{
+    auto& audit = *static_cast<DeferredAudit*>(user);
+    xray::render::vulkan::FrameRecordingContext geometry;
+    if (!audit.targets->begin(frame, geometry)) { audit.valid = false; return; }
+    audit.valid = audit.pass->record_geometry(geometry, audit.vertices,
+        audit.indices, 3, audit.mvp, audit.material) && audit.valid;
+    audit.targets->end(frame.command_buffer);
+    ++audit.geometry_calls;
+}
+
+void record_deferred_lighting(const xray::render::vulkan::FrameRecordingContext& frame, void* user)
+{
+    auto& audit = *static_cast<DeferredAudit*>(user);
+    audit.valid = audit.pass->record_lighting(frame,
+        audit.targets->lighting_set(frame.image_index), audit.light) && audit.valid;
+    audit.valid = audit.ui->record_ui(frame, audit.ui_vertices, audit.ui_indices,
+        VK_INDEX_TYPE_UINT16, 6, audit.ui_texture) && audit.valid;
+    ++audit.lighting_calls;
+}
 
 void record_pixel_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user_data)
 {
@@ -165,6 +202,9 @@ bool Run(std::string& reason)
     xray::render::vulkan::SmokeTrianglePass smoke_triangle;
     xray::render::vulkan::ShaderModule scene_vertex, scene_fragment, ui_vertex, ui_fragment;
     xray::render::vulkan::ScenePass scene_pass;
+    xray::render::vulkan::GBufferTargets deferred_targets;
+    xray::render::vulkan::DeferredPass deferred_pass;
+    xray::render::vulkan::BufferResource deferred_vertices, deferred_indices;
     xray::render::vulkan::BufferResource scene_vertices, scene_indices, ui_vertices, ui_indices;
     xray::render::vulkan::BufferResource pixel_buffer;
     VkSampler copy_sampler = VK_NULL_HANDLE;
@@ -176,6 +216,10 @@ bool Run(std::string& reason)
         if (device && wait_idle)
             wait_idle(device);
         screen_copy.destroy();
+        deferred_pass.destroy();
+        deferred_targets.destroy();
+        deferred_vertices.destroy();
+        deferred_indices.destroy();
         scene_pass.destroy();
         scene_vertex.destroy();
         scene_fragment.destroy();
@@ -557,14 +601,94 @@ bool Run(std::string& reason)
             ui_red, ui_green, ui_blue, pixel[7]);
         if (ui_green < 100 || ui_blue < 150 || pixel[7] < 200)
             return fail("Vulkan UI pixel did not contain the alpha-blended overlay");
+
+        // Exercise the real two-attachment geometry pass, shader-read
+        // transition and fullscreen light pass on the same present submission.
+        std::string deferred_error;
+        const auto create_sampler = load_device_proc<PFN_vkCreateSampler>(device, get_device_proc,
+            "vkCreateSampler");
+        xray::render::vulkan::ScenePassDispatch deferred_dispatch;
+        if (!xray::render::vulkan::load_scene_pass_dispatch(device, get_device_proc,
+                deferred_dispatch, deferred_error) ||
+            !deferred_targets.initialize(physical_device, device, frame_context.extent(),
+                static_cast<uint32_t>(frame_context.image_count()), frame_context.depth_format(),
+                physical_selection.memory, frame_dispatch, create_sampler,
+                destroy_sampler, deferred_error))
+            return fail(deferred_error);
+        const xray::render::vulkan::ShaderModuleDispatch shader_dispatch{
+            load_device_proc<PFN_vkCreateShaderModule>(device, get_device_proc, "vkCreateShaderModule"),
+            load_device_proc<PFN_vkDestroyShaderModule>(device, get_device_proc, "vkDestroyShaderModule")};
+        xray::render::vulkan::DeferredShaderFactory factory;
+        if (!factory.create(device, shader_dispatch, deferred_dispatch, deferred_targets.render_pass(),
+                frame_context.render_pass(), deferred_pass, deferred_error) ||
+            !deferred_targets.bind_lighting(deferred_pass, deferred_error))
+            return fail(deferred_error);
+        VkDescriptorSet material = VK_NULL_HANDLE;
+        if (!deferred_pass.material(ui_texture.view, copy_sampler, material, deferred_error))
+            return fail(deferred_error);
+        const xray::render::vulkan::LevelVertex vertices[]{
+            {{-0.65f, -0.65f, 0}, {0, 0, 1}, {0, 0}},
+            {{0.65f, -0.65f, 0}, {0, 0, 1}, {1, 0}},
+            {{0, 0.7f, 0}, {0, 0, 1}, {0.5f, 1}}
+        };
+        const uint32_t indices[]{0, 1, 2};
+        const xray::render::vulkan::BufferResourceDispatch buffer_dispatch{
+            load_device_proc<PFN_vkCreateBuffer>(device, get_device_proc, "vkCreateBuffer"),
+            load_device_proc<PFN_vkDestroyBuffer>(device, get_device_proc, "vkDestroyBuffer"),
+            load_device_proc<PFN_vkGetBufferMemoryRequirements>(device, get_device_proc,
+                "vkGetBufferMemoryRequirements"),
+            load_device_proc<PFN_vkAllocateMemory>(device, get_device_proc, "vkAllocateMemory"),
+            load_device_proc<PFN_vkFreeMemory>(device, get_device_proc, "vkFreeMemory"),
+            load_device_proc<PFN_vkBindBufferMemory>(device, get_device_proc, "vkBindBufferMemory"),
+            load_device_proc<PFN_vkMapMemory>(device, get_device_proc, "vkMapMemory"),
+            load_device_proc<PFN_vkUnmapMemory>(device, get_device_proc, "vkUnmapMemory")};
+        if (!deferred_vertices.initialize(device, sizeof(vertices), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                physical_selection.memory, buffer_dispatch, deferred_error) ||
+            !deferred_vertices.write(0, vertices, sizeof(vertices), deferred_error) ||
+            !deferred_indices.initialize(device, sizeof(indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                physical_selection.memory, buffer_dispatch, deferred_error) ||
+            !deferred_indices.write(0, indices, sizeof(indices), deferred_error))
+            return fail(deferred_error);
+        DeferredAudit deferred{};
+        deferred.targets = &deferred_targets;
+        deferred.pass = &deferred_pass;
+        deferred.ui = &scene_pass;
+        deferred.vertices = deferred_vertices.handle();
+        deferred.indices = deferred_indices.handle();
+        deferred.ui_vertices = ui_vertices.handle();
+        deferred.ui_indices = ui_indices.handle();
+        deferred.material = material;
+        deferred.ui_texture = callback_audit.ui_texture_set;
+        deferred.mvp[0] = deferred.mvp[5] = deferred.mvp[10] = deferred.mvp[15] = 1;
+        deferred.light.direction_ambient[2] = -1;
+        deferred.light.direction_ambient[3] = 0.2f;
+        deferred.light.color[0] = deferred.light.color[1] = deferred.light.color[2] = 0.8f;
+        xray::render::vulkan::FrameStatus deferred_status{};
+        if (!frame_context.render_frame(clear, deferred_status, deferred_error,
+                record_deferred_lighting, &deferred, record_pixel_readback, &pixel_readback,
+                record_deferred_geometry, &deferred) ||
+            deferred_status != xray::render::vulkan::FrameStatus::Presented ||
+            !deferred.valid || deferred.geometry_calls != 1 || deferred.lighting_calls != 1 ||
+            frame_dispatch.device_wait_idle(device) != VK_SUCCESS ||
+            !pixel_buffer.read(0, pixel.data(), pixel.size(), deferred_error))
+            return fail(deferred_error.empty() ? "Vulkan deferred smoke recording failed" : deferred_error);
+        const uint8_t deferred_red = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[2] : pixel[0];
+        const uint8_t deferred_green = pixel[1];
+        const uint8_t deferred_blue = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[0] : pixel[2];
+        if (deferred_red < 190 || deferred_green < 170 || deferred_blue < 190)
+            return fail("Vulkan deferred light pixel does not contain textured geometry");
+        Msg("[renderer-vulkan] deferred G-buffer and lighting pixel RGB=(%u,%u,%u)",
+            deferred_red, deferred_green, deferred_blue);
     }
 
     Msg("[renderer-vulkan] %s PASS: %s, Vulkan %u.%u.%u",
-        no_game_vfs ? "lit geometry, UI draw, two pixel readbacks and present" : "frame submit and present",
+        no_game_vfs ? "forward and deferred geometry, UI, pixel readbacks and present" : "frame submit and present",
         physical_properties.deviceName,
         VK_VERSION_MAJOR(physical_properties.apiVersion), VK_VERSION_MINOR(physical_properties.apiVersion),
         VK_VERSION_PATCH(physical_properties.apiVersion));
-    reason = no_game_vfs ? "three Vulkan lit geometry and UI draws with two pixel readbacks passed" :
+    reason = no_game_vfs ? "Vulkan geometry, deferred lighting and textured UI readbacks passed" :
         "three Vulkan frame-context submits and presents passed";
     cleanup();
     return true;

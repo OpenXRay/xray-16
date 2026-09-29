@@ -536,7 +536,8 @@ bool FrameContext::create_sync(std::string& error)
 }
 
 bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
-    FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data)
+    FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data,
+    FramePrepassRecorder prepass, void* prepass_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -591,6 +592,12 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     {
         error = "vkBeginCommandBuffer failed";
         return false;
+    }
+    if (prepass)
+    {
+        const FrameRecordingContext frame{command, VK_NULL_HANDLE, VK_NULL_HANDLE,
+            m_extent, image_index, m_current_frame};
+        prepass(frame, prepass_data);
     }
     VkClearValue clear_values[2]{};
     clear_values[0].color = clear;
