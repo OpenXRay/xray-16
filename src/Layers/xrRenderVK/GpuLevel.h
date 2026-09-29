@@ -4,16 +4,20 @@
 #include "DeferredPass.h"
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
+#include <memory>
+
+class IRenderVisual;
 
 namespace xray::render::vulkan
 {
+class VulkanVisual;
 // GPU ownership of the supported static level subset. A failed load leaves
 // the previous level intact; no partially uploaded scene is exposed.
 class GpuLevel
 {
 public:
     GpuLevel() = default;
-    ~GpuLevel() { destroy(); }
+    ~GpuLevel();
     GpuLevel(const GpuLevel&) = delete;
     GpuLevel& operator=(const GpuLevel&) = delete;
 
@@ -22,7 +26,12 @@ public:
         GameTextureFactory& textures, DeferredPass& pass, std::string& error);
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16]) const;
+    bool record_visual(size_t index, const FrameRecordingContext& frame,
+        const DeferredPass& pass, const float (&mvp)[16]) const;
     size_t model_count() const { return meshes_.size(); }
+    size_t visual_count() const { return visuals_.size(); }
+    IRenderVisual* get_visual(size_t index) const;
+    const LevelVisual* visual_node(size_t index) const;
     void destroy();
 
 private:
@@ -37,5 +46,8 @@ private:
     BufferUploadDispatch upload_{};
     std::vector<PendingBufferUpload> pending_;
     std::vector<Mesh> meshes_;
+    std::vector<LevelVisual> visuals_;
+    std::vector<uint32_t> roots_;
+    std::vector<std::unique_ptr<VulkanVisual>> visual_objects_;
 };
 }

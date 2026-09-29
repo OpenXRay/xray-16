@@ -48,6 +48,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanWindowDevice.h
     VisualCatalog.cpp
     VisualCatalog.h
+    VulkanVisual.cpp
+    VulkanVisual.h
 )
 
 include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")

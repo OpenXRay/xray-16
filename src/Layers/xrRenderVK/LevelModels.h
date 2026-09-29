@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <array>
 #include <string>
 #include <vector>
 
@@ -35,10 +36,22 @@ struct LevelModel
     std::vector<uint32_t> indices;
 };
 
+// The index of a visual in the level OGF table is stable. Hierarchies keep
+// their child references instead of duplicating every child as a scene draw.
+struct LevelVisual
+{
+    uint8_t type{};
+    int32_t mesh{-1};
+    std::array<float, 10> bounds{}; // OGF box min/max, sphere center/radius
+    std::vector<uint32_t> children;
+};
+
 struct LevelModelData
 {
     std::vector<LevelMaterial> materials;
     std::vector<LevelModel> models;
+    std::vector<LevelVisual> visuals;
+    std::vector<uint32_t> roots;
 };
 
 // A missing/unsupported format fails the entire load. This ensures that a

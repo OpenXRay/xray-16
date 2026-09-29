@@ -1,9 +1,13 @@
+#include "xrEngine/stdafx.h"
 #include "GpuLevel.h"
+#include "VulkanVisual.h"
 
 #include <limits>
 
 namespace xray::render::vulkan
 {
+GpuLevel::~GpuLevel() { destroy(); }
+
 bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
     GameTextureFactory& textures, DeferredPass& pass, std::string& error)
@@ -19,6 +23,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     prepared.device_ = device;
     prepared.pool_ = pool;
     prepared.upload_ = upload;
+    prepared.visuals_ = std::move(models.visuals);
+    prepared.roots_ = std::move(models.roots);
     prepared.meshes_.reserve(models.models.size());
     for (const LevelModel& model : models.models)
     {
@@ -49,6 +55,12 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     upload_ = prepared.upload_;
     pending_ = std::move(prepared.pending_);
     meshes_ = std::move(prepared.meshes_);
+    visuals_ = std::move(prepared.visuals_);
+    roots_ = std::move(prepared.roots_);
+    visual_objects_.reserve(visuals_.size());
+    for (size_t index = 0; index < visuals_.size(); ++index)
+        visual_objects_.emplace_back(std::make_unique<VulkanVisual>(*this,
+            static_cast<uint32_t>(index), visuals_[index]));
     prepared.device_ = VK_NULL_HANDLE;
     prepared.pool_ = VK_NULL_HANDLE;
     error.clear();
@@ -58,16 +70,45 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
 bool GpuLevel::record(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16]) const
 {
-    for (const Mesh& mesh : meshes_)
+    for (uint32_t root : roots_)
+        if (!record_visual(root, frame, pass, mvp)) return false;
+    return true;
+}
+
+bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
+    const DeferredPass& pass, const float (&mvp)[16]) const
+{
+    if (index >= visuals_.size()) return false;
+    const LevelVisual& visual = visuals_[index];
+    if (visual.mesh >= 0)
+    {
+        if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
+        const Mesh& mesh = meshes_[visual.mesh];
         if (!pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material)) return false;
+    }
+    for (uint32_t child : visual.children)
+        if (!record_visual(child, frame, pass, mvp)) return false;
     return true;
+}
+
+IRenderVisual* GpuLevel::get_visual(size_t index) const
+{
+    return index < visual_objects_.size() ? visual_objects_[index].get() : nullptr;
+}
+
+const LevelVisual* GpuLevel::visual_node(size_t index) const
+{
+    return index < visuals_.size() ? &visuals_[index] : nullptr;
 }
 
 void GpuLevel::destroy()
 {
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
+    visual_objects_.clear();
     meshes_.clear();
+    visuals_.clear();
+    roots_.clear();
     pending_.clear();
     device_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;

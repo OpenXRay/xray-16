@@ -7,7 +7,8 @@ namespace xray::render::vulkan
 {
 namespace
 {
-constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4, ogf_container = 21;
+constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4,
+    ogf_swi = 6, ogf_children = 9, ogf_links = 10, ogf_container = 21;
 constexpr size_t max_vertices = 4'000'000, max_indices = 12'000'000;
 
 struct Cursor
@@ -148,50 +149,144 @@ bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
     return c.done();
 }
 
+bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
+    const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
+    std::vector<LevelModel>& models, std::vector<LevelVisual>& nodes,
+    size_t node_index, unsigned depth)
+{
+    if (depth > 32 || node_index >= nodes.size()) return false;
+    LevelBytes header;
+    if (!chunk(visual, ogf_header, header) || header.size != 44 || header.data[0] != 4)
+        return false;
+    const uint8_t type = header.data[1];
+    const uint16_t material = uint16_t(header.data[2]) | (uint16_t(header.data[3]) << 8);
+    nodes[node_index].type = type;
+    std::memcpy(nodes[node_index].bounds.data(), header.data + 4, 10 * sizeof(float));
+    if (type == 1) // MT_HIERRARHY
+    {
+        LevelBytes links, embedded;
+        const bool has_links = chunk(visual, ogf_links, links);
+        const bool has_embedded = chunk(visual, ogf_children, embedded);
+        if (has_links == has_embedded) return false;
+        if (has_links)
+        {
+            Cursor c{links};
+            uint32_t count;
+            if (!c.u32(count) || count > nodes.size() || links.size != 4 + size_t(count) * 4)
+                return false;
+            nodes[node_index].children.reserve(count);
+            for (uint32_t i = 0; i < count; ++i)
+            {
+                uint32_t child;
+                if (!c.u32(child) || child >= nodes.size()) return false;
+                nodes[node_index].children.push_back(child);
+            }
+        }
+        else
+        {
+            Cursor c{embedded};
+            uint32_t expected = 0;
+            while (!c.done())
+            {
+                uint32_t id, size;
+                LevelBytes child;
+                if (!c.u32(id) || !c.u32(size) || id != expected++ ||
+                    !c.take(size, child) || nodes.size() >= 1'000'000) return false;
+                const size_t index = nodes.size();
+                nodes.emplace_back();
+                nodes[node_index].children.push_back(static_cast<uint32_t>(index));
+                if (!decode_visual(child, vertices, indices, material_count, models,
+                        nodes, index, depth + 1)) return false;
+            }
+        }
+        return true;
+    }
+    // Progressive meshes use a sliding window; the first window is full
+    // detail. LOD selection can later choose among validated windows.
+    if (type != 0 && type != 2) return false;
+    if (material >= material_count) return false;
+    LevelBytes container, unused;
+    if (!chunk(visual, ogf_container, container) || container.size != 24 ||
+        chunk(visual, ogf_vertices, unused) || chunk(visual, ogf_indices, unused)) return false;
+    Cursor geometry{container};
+    uint32_t vb, vbase, vcount, ib, ibase, icount;
+    if (!geometry.u32(vb) || !geometry.u32(vbase) || !geometry.u32(vcount) ||
+        !geometry.u32(ib) || !geometry.u32(ibase) || !geometry.u32(icount) ||
+        vb >= vertices.size() || ib >= indices.size() || icount % 3 ||
+        vbase > vertices[vb].vertices.size() ||
+        vcount > vertices[vb].vertices.size() - vbase ||
+        ibase > indices[ib].size() || icount > indices[ib].size() - ibase) return false;
+    if (type == 2)
+    {
+        LevelBytes swi;
+        if (!chunk(visual, ogf_swi, swi) || swi.size < 28) return false;
+        Cursor c{swi};
+        uint32_t ignored, count, offset;
+        for (unsigned n = 0; n < 4; ++n)
+            if (!c.u32(ignored)) return false;
+        if (!c.u32(count) || !count || count > 65536 ||
+            swi.size != 20 + size_t(count) * 8 || !c.u32(offset)) return false;
+        LevelBytes first;
+        if (!c.take(4, first)) return false;
+        const uint32_t tris = uint32_t(first.data[0]) | (uint32_t(first.data[1]) << 8);
+        const uint32_t verts = uint32_t(first.data[2]) | (uint32_t(first.data[3]) << 8);
+        if (offset > icount || tris > (icount - offset) / 3 || verts > vcount) return false;
+        ibase += offset;
+        icount = tris * 3;
+    }
+    LevelModel model;
+    model.material = material;
+    model.vertices.assign(vertices[vb].vertices.begin() + vbase,
+        vertices[vb].vertices.begin() + vbase + vcount);
+    model.indices.reserve(icount);
+    for (size_t n = ibase; n < size_t(ibase) + icount; ++n)
+    {
+        if (indices[ib][n] >= vcount) return false;
+        model.indices.push_back(indices[ib][n]);
+    }
+    nodes[node_index].mesh = static_cast<int32_t>(models.size());
+    models.push_back(std::move(model));
+    return true;
+}
+
 bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices,
     const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
-    std::vector<LevelModel>& models)
+    LevelModelData& loaded)
 {
     Cursor c{bytes};
-    uint32_t expected = 0;
+    std::vector<LevelBytes> records;
     while (!c.done())
     {
         uint32_t id, size;
-        if (!c.u32(id) || !c.u32(size) || id != expected++ || (id & 0x80000000u)) return false;
-        LevelBytes visual;
-        if (!c.take(size, visual)) return false;
-        LevelBytes header;
-        if (!chunk(visual, ogf_header, header) || header.size != 44 || header.data[0] != 4)
+        LevelBytes body;
+        if (!c.u32(id) || !c.u32(size) || id != records.size() ||
+            (id & 0x80000000u) || !c.take(size, body) || records.size() >= 1'000'000)
             return false;
-        // Other visual types require hierarchy, progressive mesh or skeletal
-        // handling; fail explicitly until each can be represented faithfully.
-        if (header.data[1] != 0) return false;
-        const uint16_t material = uint16_t(header.data[2]) | (uint16_t(header.data[3]) << 8);
-        if (material >= material_count) return false;
-        LevelBytes container;
-        if (!chunk(visual, ogf_container, container) || container.size != 24 ||
-            chunk(visual, ogf_vertices, container) || chunk(visual, ogf_indices, container)) return false;
-        Cursor geometry{container};
-        uint32_t vb, vbase, vcount, ib, ibase, icount;
-        if (!geometry.u32(vb) || !geometry.u32(vbase) || !geometry.u32(vcount) ||
-            !geometry.u32(ib) || !geometry.u32(ibase) || !geometry.u32(icount) ||
-            vb >= vertices.size() || ib >= indices.size() || icount % 3 ||
-            vbase > vertices[vb].vertices.size() ||
-            vcount > vertices[vb].vertices.size() - vbase ||
-            ibase > indices[ib].size() || icount > indices[ib].size() - ibase) return false;
-        LevelModel model;
-        model.material = material;
-        model.vertices.assign(vertices[vb].vertices.begin() + vbase,
-            vertices[vb].vertices.begin() + vbase + vcount);
-        model.indices.reserve(icount);
-        for (size_t n = ibase; n < size_t(ibase) + icount; ++n)
-        {
-            // DrawIndexed uses vBase as baseVertex; OGF indices are local.
-            if (indices[ib][n] >= vcount) return false;
-            model.indices.push_back(indices[ib][n]);
-        }
-        models.push_back(std::move(model));
+        records.push_back(body);
     }
+    loaded.visuals.resize(records.size());
+    for (size_t i = 0; i < records.size(); ++i)
+        if (!decode_visual(records[i], vertices, indices, material_count,
+                loaded.models, loaded.visuals, i, 0)) return false;
+    std::vector<uint8_t> state(loaded.visuals.size()), referenced(loaded.visuals.size());
+    auto visit = [&](auto&& self, size_t index) -> bool
+    {
+        if (state[index] == 1) return false;
+        if (state[index] == 2) return true;
+        state[index] = 1;
+        for (uint32_t child : loaded.visuals[index].children)
+        {
+            if (child >= loaded.visuals.size()) return false;
+            referenced[child] = 1;
+            if (!self(self, child)) return false;
+        }
+        state[index] = 2;
+        return true;
+    };
+    for (size_t i = 0; i < loaded.visuals.size(); ++i)
+        if (!visit(visit, i)) return false;
+    for (size_t i = 0; i < records.size(); ++i)
+        if (!referenced[i]) loaded.roots.push_back(static_cast<uint32_t>(i));
     return true;
 }
 }
@@ -206,7 +301,7 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
     if (!read_materials(shaders, loaded.materials)) error = "invalid level shader table";
     else if (!read_vertices(vertex_buffers, vertices)) error = "unsupported or invalid level vertex buffers";
     else if (!read_indices(index_buffers, indices)) error = "invalid level index buffers";
-    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded.models))
+    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded))
         error = "unsupported or invalid level OGF visuals";
     else
     {
