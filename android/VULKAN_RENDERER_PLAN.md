@@ -16,6 +16,14 @@ selects the OpenGL ES backend for gameplay.
 | Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
 | Buffer allocation | `src/Layers/xrRenderVK/BufferResource.*` | Owns buffer allocations, selects a compatible memory type, and supports bounded writes to host-visible coherent memory |
 | Buffer upload | `src/Layers/xrRenderVK/BufferUpload.*` | Copies host data into a device-local buffer asynchronously, inserts a transfer-to-use memory barrier, and retires staging resources by fence |
+| Shader module | `src/Layers/xrRenderVK/ShaderModule.*` | Creates and owns a Vulkan shader module from precompiled SPIR-V bytes |
+| Screen-copy pass | `src/Layers/xrRenderVK/ScreenCopyPass.*` | Creates a sampled-image descriptor set and graphics pipeline, and records a fullscreen draw through the frame callback |
+
+The screen-copy pass takes already compiled vertex and fragment modules, a
+sampled image view, and a sampler. The caller must transition the image to
+shader-read layout, keep the resources alive through submitted frames, and
+rebuild the pipeline when the frame render pass changes. The pass has no engine
+image source yet.
 
 The probe logs the selected device, queue, relevant limits, compression
 features and attachment formats. These results are diagnostics, not a Vulkan
@@ -25,7 +33,7 @@ compatibility guarantee for gameplay.
 
 - compilation of the existing HLSL shaders to SPIR-V;
 - descriptor layouts and descriptor allocation for engine resources;
-- graphics and compute pipeline creation for renderer passes;
+- graphics and compute pipelines for gameplay passes;
 - engine integration for vertex, index, constant and storage buffers, with descriptors and pipelines;
 - render targets for the deferred G-buffer, lighting, shadows and
   post-processing;
@@ -59,7 +67,8 @@ Work should proceed in dependencies-first order:
 
 1. add the HLSL-to-SPIR-V compiler and reflection cache;
 2. connect buffer uploads to engine allocations, descriptor allocation and graphics pipelines;
-3. render an engine UI/static-geometry pass through Vulkan;
+3. connect the screen-copy pass to an engine-owned image, then render UI and
+   static geometry through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling;
 6. add Windows and Linux surfaces and CI coverage;
@@ -67,7 +76,8 @@ Work should proceed in dependencies-first order:
    run through Vulkan.
 
 Useful host tests live in `tests/vulkan_dds.cpp`,
-`tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`, and
-`tests/vulkan_buffer_upload.cpp`. Device validation still requires the
+`tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,
+`tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`, and
+`tests/vulkan_screen_copy_pass.cpp`. Device validation still requires the
 launcher's Vulkan smoke test on real Android hardware. A successful one-frame
 probe does not close any of the gameplay items above.

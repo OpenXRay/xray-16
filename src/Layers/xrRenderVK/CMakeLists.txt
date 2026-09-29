@@ -11,6 +11,10 @@ target_sources(xrRenderVK PRIVATE
     FrameContext.h
     ImageStateTracker.cpp
     ImageStateTracker.h
+    ScreenCopyPass.cpp
+    ScreenCopyPass.h
+    ShaderModule.cpp
+    ShaderModule.h
     TextureUpload.cpp
     TextureUpload.h
     VulkanHardware.cpp

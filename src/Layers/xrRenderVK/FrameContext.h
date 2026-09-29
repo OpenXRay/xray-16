@@ -81,6 +81,7 @@ public:
 
     VkExtent2D extent() const { return m_extent; }
     VkFormat format() const { return m_format; }
+    VkRenderPass render_pass() const { return m_render_pass; }
 
 private:
     bool create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
