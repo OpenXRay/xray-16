@@ -37,6 +37,8 @@ public:
         const VkPhysicalDeviceMemoryProperties& memory_properties,
         const BufferResourceDispatch& dispatch, std::string& error);
     bool write(VkDeviceSize offset, const void* data, size_t size, std::string& error);
+    // Caller waits for the GPU write before reading coherent host memory.
+    bool read(VkDeviceSize offset, void* data, size_t size, std::string& error) const;
     void destroy();
 
     VkBuffer handle() const { return m_buffer; }

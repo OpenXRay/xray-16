@@ -30,6 +30,8 @@ struct FrameDispatch
     PFN_vkBeginCommandBuffer begin_command_buffer{};
     PFN_vkCmdBeginRenderPass cmd_begin_render_pass{};
     PFN_vkCmdEndRenderPass cmd_end_render_pass{};
+    PFN_vkCmdCopyImageToBuffer cmd_copy_image_to_buffer{};
+    PFN_vkCmdPipelineBarrier cmd_pipeline_barrier{};
     PFN_vkEndCommandBuffer end_command_buffer{};
     PFN_vkCreateSemaphore create_semaphore{};
     PFN_vkDestroySemaphore destroy_semaphore{};
@@ -58,6 +60,7 @@ struct FrameRecordingContext
 };
 
 using FrameRecorder = void (*)(const FrameRecordingContext& frame, void* user_data);
+using FrameReadbackRecorder = void (*)(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user_data);
 
 bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_instance_proc,
     VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc, FrameDispatch& dispatch, std::string& error);
@@ -74,9 +77,10 @@ public:
 
     bool initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
-        const FrameDispatch& dispatch, std::string& error);
+        const FrameDispatch& dispatch, std::string& error, bool allow_readback = false);
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
-        FrameRecorder recorder = nullptr, void* user_data = nullptr);
+        FrameRecorder recorder = nullptr, void* user_data = nullptr,
+        FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr);
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }
@@ -100,6 +104,7 @@ private:
     VkCommandPool m_command_pool = VK_NULL_HANDLE;
     VkExtent2D m_extent{};
     VkFormat m_format = VK_FORMAT_UNDEFINED;
+    bool m_allow_readback = false;
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_image_views;
     std::vector<VkFramebuffer> m_framebuffers;

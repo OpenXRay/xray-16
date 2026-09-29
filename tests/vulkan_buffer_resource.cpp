@@ -117,6 +117,10 @@ int main()
     const unsigned char source[] = {4, 5, 6, 7};
     assert(buffer.write(3, source, sizeof(source), error));
     assert(!std::memcmp(mapped_bytes.data() + 3, source, sizeof(source)));
+    unsigned char readback[sizeof(source)]{};
+    assert(buffer.read(3, readback, sizeof(readback), error));
+    assert(!std::memcmp(readback, source, sizeof(source)));
+    assert(!buffer.read(14, readback, sizeof(readback), error));
     assert(!buffer.write(14, source, sizeof(source), error));
     assert(!error.empty());
     assert(!buffer.write(0, nullptr, sizeof(source), error));

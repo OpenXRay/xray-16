@@ -573,7 +573,7 @@ void shutdown_android_engine_log()
 
 void show_renderer_smoke_status(bool success, bool vulkan_probe)
 {
-    SDL_AndroidShowToast(success ? (vulkan_probe ? "OpenXRay: Vulkan render pass passed" : "OpenXRay: GLES renderer passed") :
+    SDL_AndroidShowToast(success ? (vulkan_probe ? "OpenXRay: Vulkan triangle and pixel passed" : "OpenXRay: GLES renderer passed") :
         "OpenXRay: engine load failed; see android.log", 1, -1, 0, 0);
 }
 

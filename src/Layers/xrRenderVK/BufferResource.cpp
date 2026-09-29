@@ -149,6 +149,19 @@ bool BufferResource::write(VkDeviceSize offset, const void* data, size_t size, s
     return true;
 }
 
+bool BufferResource::read(VkDeviceSize offset, void* data, size_t size, std::string& error) const
+{
+    if (!m_buffer || !m_mapped || !data || !size || offset > m_size || size > m_size - offset ||
+        offset > std::numeric_limits<size_t>::max())
+    {
+        error = "buffer read requires mapped storage and a non-empty in-range data span";
+        return false;
+    }
+    std::memcpy(data, static_cast<const unsigned char*>(m_mapped) + offset, size);
+    error.clear();
+    return true;
+}
+
 void BufferResource::destroy()
 {
     if (m_device && m_memory && m_mapped && m_vk.unmap_memory)

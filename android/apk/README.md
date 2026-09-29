@@ -51,8 +51,9 @@ textures or shader sources.
   deliberately starts gameplay with GLES. It is not a Vulkan gameplay backend.
 - **GLES smoke test** creates the real SDL/EGL context, compiles a minimal GLES
   shader and verifies pixel readback without loading game data.
-- **Vulkan smoke test** clears and presents one Vulkan frame and exercises the
-  current DDS upload path when a suitable game texture is available.
+- **Vulkan smoke test** draws a triangle through a Vulkan graphics pipeline,
+  reads back its center pixel, and presents three frames without game files.
+  The separate gameplay selection probe can also upload an engine DDS.
 
 A smoke-test pass is limited to those operations. It does not validate level
 loading, all shaders or sustained gameplay.

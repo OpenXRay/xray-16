@@ -242,9 +242,10 @@ there is no Vulkan gameplay renderer yet. See
 [VULKAN_RENDERER_PLAN.md](VULKAN_RENDERER_PLAN.md) for the implemented Vulkan
 pieces and remaining work.
 
-The launcher can run GLES and Vulkan smoke tests without game data. A passing
-smoke test verifies context/device setup and a small render path only; it does
-not prove that a level can be loaded or rendered correctly.
+The launcher can run GLES and Vulkan smoke tests without game data. The Vulkan
+test draws a triangle, reads back its center pixel and presents three frames.
+A passing smoke test verifies a small render path only; it does not prove that
+a level can be loaded or rendered correctly.
 
 ## Diagnostics
 

@@ -4,9 +4,12 @@
 
 #include "android_vulkan_smoke.h"
 #include "../Layers/xrRenderVK/FrameContext.h"
+#include "../Layers/xrRenderVK/BufferResource.h"
 #include "../Layers/xrRenderVK/EngineTextureSource.h"
 #include "../Layers/xrRenderVK/ScreenCopyPass.h"
 #include "../Layers/xrRenderVK/ShaderModule.h"
+#include "../Layers/xrRenderVK/SmokeShaders.h"
+#include "../Layers/xrRenderVK/SmokeTrianglePass.h"
 #include "../Layers/xrRenderVK/VulkanHardware.h"
 
 #include <SDL.h>
@@ -19,6 +22,7 @@
 #include <dlfcn.h>
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <vector>
 
@@ -39,7 +43,38 @@ struct FrameCallbackAudit
     uint32_t calls = 0;
     bool valid = true;
     const xray::render::vulkan::ScreenCopyPass* screen_copy = nullptr;
+    const xray::render::vulkan::SmokeTrianglePass* triangle = nullptr;
 };
+
+struct PixelReadback
+{
+    VkBuffer buffer = VK_NULL_HANDLE;
+    PFN_vkCmdCopyImageToBuffer copy{};
+    PFN_vkCmdPipelineBarrier barrier{};
+    uint32_t copies = 0;
+};
+
+void record_pixel_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user_data)
+{
+    auto& readback = *static_cast<PixelReadback*>(user_data);
+    VkBufferImageCopy region{};
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.layerCount = 1;
+    region.imageOffset = {static_cast<int32_t>(extent.width / 2),
+        static_cast<int32_t>(extent.height / 2), 0};
+    region.imageExtent = {1, 1, 1};
+    readback.copy(command, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, readback.buffer, 1, &region);
+    VkBufferMemoryBarrier host_read{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
+    host_read.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    host_read.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+    host_read.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    host_read.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    host_read.buffer = readback.buffer;
+    host_read.size = 4;
+    readback.barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT,
+        0, 0, nullptr, 1, &host_read, 0, nullptr);
+    ++readback.copies;
+}
 
 void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& frame, void* user_data)
 {
@@ -49,6 +84,8 @@ void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& fra
         frame.frame_index < xray::render::vulkan::FrameContext::FramesInFlight;
     if (audit.screen_copy)
         audit.screen_copy->record(frame);
+    else if (audit.triangle)
+        audit.triangle->record(frame);
     ++audit.calls;
 }
 
@@ -125,6 +162,10 @@ bool Run(std::string& reason)
     xray::render::vulkan::ShaderModule copy_vertex;
     xray::render::vulkan::ShaderModule copy_fragment;
     xray::render::vulkan::ScreenCopyPass screen_copy;
+    xray::render::vulkan::ShaderModule smoke_vertex;
+    xray::render::vulkan::ShaderModule smoke_fragment;
+    xray::render::vulkan::SmokeTrianglePass smoke_triangle;
+    xray::render::vulkan::BufferResource pixel_buffer;
     VkSampler copy_sampler = VK_NULL_HANDLE;
     PFN_vkDestroySampler destroy_sampler = nullptr;
     PFN_vkDeviceWaitIdle wait_idle = nullptr;
@@ -138,10 +179,14 @@ bool Run(std::string& reason)
         if (device && wait_idle)
             wait_idle(device);
         screen_copy.destroy();
+        smoke_triangle.destroy();
+        smoke_vertex.destroy();
+        smoke_fragment.destroy();
         copy_vertex.destroy();
         copy_fragment.destroy();
         if (copy_sampler && destroy_sampler)
             destroy_sampler(device, copy_sampler, nullptr);
+        pixel_buffer.destroy();
         if (!texture_uploads.empty())
             xray::render::vulkan::wait_for_uploads(device, frame_context.command_pool(),
                 texture_dispatch, texture_uploads);
@@ -310,8 +355,9 @@ bool Run(std::string& reason)
             device, get_device_proc, frame_dispatch, frame_error))
         return fail(frame_error.empty() ? "vkDestroyDevice is unavailable" : frame_error);
     wait_idle = frame_dispatch.device_wait_idle;
+    const bool no_game_vfs = !FS.path_exist("$game_textures$");
     if (!frame_context.initialize(physical_device, device, surface, queue, queue_family, {960, 540},
-            frame_dispatch, frame_error))
+            frame_dispatch, frame_error, no_game_vfs))
         return fail(frame_error);
 
     // A normal game boot has a mounted VFS. The no-game smoke boot does not.
@@ -381,6 +427,42 @@ bool Run(std::string& reason)
     }
 
     FrameCallbackAudit callback_audit;
+    PixelReadback pixel_readback;
+    if (no_game_vfs)
+    {
+        const xray::render::vulkan::ShaderModuleDispatch shaders{
+            load_device_proc<PFN_vkCreateShaderModule>(device, get_device_proc, "vkCreateShaderModule"),
+            load_device_proc<PFN_vkDestroyShaderModule>(device, get_device_proc, "vkDestroyShaderModule")};
+        xray::render::vulkan::SmokeTriangleDispatch draw;
+        std::string draw_error;
+        if (!shaders.create || !shaders.destroy ||
+            !xray::render::vulkan::load_smoke_triangle_dispatch(device, get_device_proc, draw, draw_error))
+            return fail(draw_error.empty() ? "Vulkan smoke shader procedures are unavailable" : draw_error);
+        if (!smoke_vertex.initialize(device, shaders, xray::render::vulkan::smoke::TriangleVertex,
+                sizeof(xray::render::vulkan::smoke::TriangleVertex), draw_error) ||
+            !smoke_fragment.initialize(device, shaders, xray::render::vulkan::smoke::TriangleFragment,
+                sizeof(xray::render::vulkan::smoke::TriangleFragment), draw_error) ||
+            !smoke_triangle.initialize(device, frame_context.render_pass(), smoke_vertex.handle(),
+                smoke_fragment.handle(), draw, draw_error))
+            return fail(draw_error);
+        callback_audit.triangle = &smoke_triangle;
+        xray::render::vulkan::BufferResourceDispatch buffer_dispatch{
+            load_device_proc<PFN_vkCreateBuffer>(device, get_device_proc, "vkCreateBuffer"),
+            load_device_proc<PFN_vkDestroyBuffer>(device, get_device_proc, "vkDestroyBuffer"),
+            load_device_proc<PFN_vkGetBufferMemoryRequirements>(device, get_device_proc,
+                "vkGetBufferMemoryRequirements"),
+            load_device_proc<PFN_vkAllocateMemory>(device, get_device_proc, "vkAllocateMemory"),
+            load_device_proc<PFN_vkFreeMemory>(device, get_device_proc, "vkFreeMemory"),
+            load_device_proc<PFN_vkBindBufferMemory>(device, get_device_proc, "vkBindBufferMemory"),
+            load_device_proc<PFN_vkMapMemory>(device, get_device_proc, "vkMapMemory"),
+            load_device_proc<PFN_vkUnmapMemory>(device, get_device_proc, "vkUnmapMemory")};
+        if (!pixel_buffer.initialize(device, 4, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, physical_selection.memory, buffer_dispatch, draw_error))
+            return fail(draw_error);
+        pixel_readback = {pixel_buffer.handle(), frame_dispatch.cmd_copy_image_to_buffer,
+            frame_dispatch.cmd_pipeline_barrier, 0};
+        Msg("[renderer-vulkan] game-independent SPIR-V triangle pipeline initialized");
+    }
     if (engine_texture.view && FS.path_exist("$game_shaders$"))
     {
         string_path vertex_path, fragment_path;
@@ -437,7 +519,9 @@ bool Run(std::string& reason)
     {
         xray::render::vulkan::FrameStatus frame_status{};
         if (!frame_context.render_frame(clear, frame_status, frame_error,
-                audit_frame_callback, &callback_audit))
+                audit_frame_callback, &callback_audit,
+                no_game_vfs && frame == 0 ? record_pixel_readback : nullptr,
+                no_game_vfs && frame == 0 ? &pixel_readback : nullptr))
             return fail(frame_error);
         if (frame_status != xray::render::vulkan::FrameStatus::Presented)
             return fail("Vulkan surface changed during the smoke test");
@@ -447,11 +531,27 @@ bool Run(std::string& reason)
     if (frame_dispatch.device_wait_idle(device) != VK_SUCCESS)
         return fail("Vulkan queue did not become idle after present");
 
-    Msg("[renderer-vulkan] render-pass clear and present PASS: %s, Vulkan %u.%u.%u",
+    if (no_game_vfs)
+    {
+        std::array<uint8_t, 4> pixel{};
+        if (pixel_readback.copies != 1 ||
+            !pixel_buffer.read(0, pixel.data(), pixel.size(), frame_error))
+            return fail("Vulkan triangle center pixel readback failed");
+        const uint8_t red = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[2] : pixel[0];
+        const uint8_t green = pixel[1];
+        const uint8_t blue = frame_context.format() == VK_FORMAT_B8G8R8A8_UNORM ? pixel[0] : pixel[2];
+        Msg("[renderer-vulkan] center pixel RGBA=(%u,%u,%u,%u)", red, green, blue, pixel[3]);
+        if (red < 50 || green < 60 || blue < 90 || pixel[3] < 250)
+            return fail("Vulkan triangle center pixel did not contain the drawn color");
+    }
+
+    Msg("[renderer-vulkan] %s PASS: %s, Vulkan %u.%u.%u",
+        no_game_vfs ? "triangle draw, pixel readback and present" : "frame submit and present",
         physical_properties.deviceName,
         VK_VERSION_MAJOR(physical_properties.apiVersion), VK_VERSION_MINOR(physical_properties.apiVersion),
         VK_VERSION_PATCH(physical_properties.apiVersion));
-    reason = "three Vulkan frame-context submits and presents passed";
+    reason = no_game_vfs ? "three Vulkan triangle draws and center pixel readback passed" :
+        "three Vulkan frame-context submits and presents passed";
     cleanup();
     return true;
 #endif

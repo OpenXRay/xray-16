@@ -14,6 +14,7 @@ bool complete(const FrameDispatch& vk)
         vk.destroy_image_view && vk.create_render_pass && vk.destroy_render_pass && vk.create_framebuffer &&
         vk.destroy_framebuffer && vk.create_command_pool && vk.destroy_command_pool && vk.allocate_command_buffers &&
         vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
+        vk.cmd_copy_image_to_buffer && vk.cmd_pipeline_barrier &&
         vk.end_command_buffer && vk.create_semaphore && vk.destroy_semaphore && vk.create_fence && vk.destroy_fence &&
         vk.wait_for_fences && vk.reset_fences && vk.queue_submit && vk.device_wait_idle;
 }
@@ -86,6 +87,8 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     XRAY_LOAD_DEVICE(begin_command_buffer, "vkBeginCommandBuffer");
     XRAY_LOAD_DEVICE(cmd_begin_render_pass, "vkCmdBeginRenderPass");
     XRAY_LOAD_DEVICE(cmd_end_render_pass, "vkCmdEndRenderPass");
+    XRAY_LOAD_DEVICE(cmd_copy_image_to_buffer, "vkCmdCopyImageToBuffer");
+    XRAY_LOAD_DEVICE(cmd_pipeline_barrier, "vkCmdPipelineBarrier");
     XRAY_LOAD_DEVICE(end_command_buffer, "vkEndCommandBuffer");
     XRAY_LOAD_DEVICE(create_semaphore, "vkCreateSemaphore");
     XRAY_LOAD_DEVICE(destroy_semaphore, "vkDestroySemaphore");
@@ -115,7 +118,7 @@ FrameContext::~FrameContext()
 
 bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
     VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
-    const FrameDispatch& dispatch, std::string& error)
+    const FrameDispatch& dispatch, std::string& error, bool allow_readback)
 {
     destroy();
     if (!physical_device || !device || !surface || !queue || queue_family == UINT32_MAX)
@@ -133,6 +136,7 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_queue = queue;
     m_queue_family = queue_family;
     m_vk = dispatch;
+    m_allow_readback = allow_readback;
 
     if (!create_swapchain(physical_device, surface, requested_extent, error) ||
         !create_render_targets(error) || !create_commands(error) || !create_sync(error))
@@ -156,6 +160,11 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
     if (!(capabilities.supportedUsageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
     {
         error = "Vulkan surface does not support color attachments";
+        return false;
+    }
+    if (m_allow_readback && !(capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT))
+    {
+        error = "Vulkan smoke surface does not support transfer-source swapchain images";
         return false;
     }
 
@@ -182,6 +191,20 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
         });
         if (preferred != formats.end())
             surface_format = *preferred;
+    }
+    if (m_allow_readback && surface_format.format != VK_FORMAT_B8G8R8A8_UNORM &&
+        surface_format.format != VK_FORMAT_R8G8B8A8_UNORM)
+    {
+        const auto compatible = std::find_if(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format)
+        {
+            return format.format == VK_FORMAT_R8G8B8A8_UNORM || format.format == VK_FORMAT_B8G8R8A8_UNORM;
+        });
+        if (compatible == formats.end())
+        {
+            error = "Vulkan smoke surface has no 8-bit RGBA swapchain format for pixel readback";
+            return false;
+        }
+        surface_format = *compatible;
     }
 
     if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
@@ -233,7 +256,8 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
     info.imageColorSpace = surface_format.colorSpace;
     info.imageExtent = m_extent;
     info.imageArrayLayers = 1;
-    info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+        (m_allow_readback ? VK_IMAGE_USAGE_TRANSFER_SRC_BIT : 0);
     info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     info.preTransform = capabilities.currentTransform;
     info.compositeAlpha = composite_alpha;
@@ -265,7 +289,7 @@ bool FrameContext::create_render_targets(std::string& error)
     attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachment.finalLayout = m_allow_readback ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL : VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
     VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
     VkSubpassDescription subpass{};
@@ -282,8 +306,10 @@ bool FrameContext::create_render_targets(std::string& error)
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[1].dstStageMask = m_allow_readback ? VK_PIPELINE_STAGE_TRANSFER_BIT :
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependencies[1].dstAccessMask = m_allow_readback ? VK_ACCESS_TRANSFER_READ_BIT : 0;
 
     VkRenderPassCreateInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -394,7 +420,7 @@ bool FrameContext::create_sync(std::string& error)
 }
 
 bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
-    FrameRecorder recorder, void* user_data)
+    FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -467,6 +493,23 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         recorder(frame, user_data);
     }
     m_vk.cmd_end_render_pass(command);
+    if (m_allow_readback)
+    {
+        if (readback)
+            readback(command, m_images[image_index], m_extent, readback_data);
+        VkImageMemoryBarrier present_barrier{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+        present_barrier.srcAccessMask = readback ? VK_ACCESS_TRANSFER_READ_BIT : 0;
+        present_barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        present_barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        present_barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        present_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        present_barrier.image = m_images[image_index];
+        present_barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        present_barrier.subresourceRange.levelCount = 1;
+        present_barrier.subresourceRange.layerCount = 1;
+        m_vk.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &present_barrier);
+    }
     if (m_vk.end_command_buffer(command) != VK_SUCCESS)
     {
         error = "vkEndCommandBuffer failed";
@@ -552,6 +595,7 @@ void FrameContext::destroy()
     m_command_pool = VK_NULL_HANDLE;
     m_extent = {};
     m_format = VK_FORMAT_UNDEFINED;
+    m_allow_readback = false;
     m_images.clear();
     m_image_views.clear();
     m_framebuffers.clear();

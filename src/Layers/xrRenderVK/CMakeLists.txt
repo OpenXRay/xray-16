@@ -17,6 +17,9 @@ target_sources(xrRenderVK PRIVATE
     ScreenCopyPass.h
     ShaderModule.cpp
     ShaderModule.h
+    SmokeShaders.h
+    SmokeTrianglePass.cpp
+    SmokeTrianglePass.h
     TextureUpload.cpp
     TextureUpload.h
     VulkanHardware.cpp

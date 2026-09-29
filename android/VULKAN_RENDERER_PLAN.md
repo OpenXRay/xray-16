@@ -10,7 +10,7 @@ selects the OpenGL ES backend for gameplay.
 |---|---|---|
 | Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
 | Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass, tracks two frames in flight, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
-| Android surface probe | `src/xrEngine/android_vulkan_smoke.cpp` | Uses SDL to create the window and surface, then exercises the shared frame context |
+| Android Vulkan smoke | `src/xrEngine/android_vulkan_smoke.cpp`, `src/Layers/xrRenderVK/SmokeTrianglePass.*` | Creates an SDL Vulkan surface, draws a bundled SPIR-V triangle without game assets, copies its center pixel to coherent host memory, checks the pixel and presents three frames |
 | DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
 | Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
 | Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
@@ -26,8 +26,11 @@ image view, and a sampler. The caller must transition the image to shader-read
 layout, keep resources alive through submitted frames, and rebuild the pipeline
 when the render pass changes. The gameplay selection probe uploads an engine
 DDS and, if both compiled screen-copy shaders are present in the game VFS,
-draws it as a fullscreen triangle. The no-game smoke test has no game VFS and
-continues to test clear/present.
+draws it as a fullscreen triangle. The no-game smoke test uses embedded SPIR-V
+made from `src/Layers/xrRenderVK/smoke/triangle.vert` and `.frag`, creates a
+graphics pipeline, verifies a center pixel by copying it from the swapchain
+to a mapped buffer, and presents three frames. To regenerate the embedded
+header, run `python3 tools/embed_vulkan_smoke_shaders.py --glslang glslangValidator`.
 
 To compile an existing game or mod HLSL file on a host with DXC installed:
 
@@ -110,6 +113,6 @@ Work should proceed in dependencies-first order:
 Useful host tests live in `tests/vulkan_dds.cpp`,
 `tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,
 `tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`, and
-`tests/vulkan_screen_copy_pass.cpp`. Device validation still requires the
-launcher's Vulkan smoke test on real Android hardware. A successful one-frame
-probe does not close any of the gameplay items above.
+`tests/vulkan_screen_copy_pass.cpp`, and `tests/vulkan_smoke_triangle.cpp`. Device validation still requires the
+launcher's Vulkan smoke test on real Android hardware. A successful triangle
+smoke test does not close any of the gameplay items above.
