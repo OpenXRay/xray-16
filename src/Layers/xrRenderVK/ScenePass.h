@@ -52,15 +52,14 @@ struct ScenePassDispatch
     PFN_vkAllocateDescriptorSets allocate_descriptor_sets{};
     PFN_vkUpdateDescriptorSets update_descriptor_sets{};
     PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets{};
+    PFN_vkCmdDraw cmd_draw{};
 };
 
 bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
     ScenePassDispatch& dispatch, std::string& error);
 
-// A forward geometry+directional-light pass followed by an alpha-blended
-// vertex-colored UI pass. The caller supplies valid SPIR-V modules and buffers.
-// This is not a deferred level renderer: depth, materials and textured UI are
-// deliberately outside this bounded pass.
+// A diagnostic forward geometry pass followed by alpha-blended textured UI.
+// The caller supplies SPIR-V modules, vertex/index buffers and optional depth.
 class ScenePass
 {
 public:

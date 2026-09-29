@@ -116,6 +116,7 @@ bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
     XRAY_LOAD(cmd_bind_index_buffer, "vkCmdBindIndexBuffer");
     XRAY_LOAD(cmd_push_constants, "vkCmdPushConstants");
     XRAY_LOAD(cmd_draw_indexed, "vkCmdDrawIndexed");
+    XRAY_LOAD(cmd_draw, "vkCmdDraw");
     XRAY_LOAD(create_descriptor_set_layout, "vkCreateDescriptorSetLayout");
     XRAY_LOAD(destroy_descriptor_set_layout, "vkDestroyDescriptorSetLayout");
     XRAY_LOAD(create_descriptor_pool, "vkCreateDescriptorPool");

@@ -8,12 +8,21 @@ target_sources(xrRenderVK PRIVATE
     BufferUpload.h
     DdsTexture.cpp
     DdsTexture.h
+    DeferredPass.cpp
+    DeferredPass.h
+    DeferredShaderFactory.cpp
+    DeferredShaderFactory.h
+    DeferredShaders.h
     EngineTextureSource.cpp
     EngineTextureSource.h
+    EngineLevelModels.cpp
+    EngineLevelModels.h
     FrameContext.cpp
     FrameContext.h
     ImageStateTracker.cpp
     ImageStateTracker.h
+    LevelModels.cpp
+    LevelModels.h
     ScreenCopyPass.cpp
     ScreenCopyPass.h
     ScenePass.cpp
