@@ -5,6 +5,8 @@
 #include "android_vulkan_smoke.h"
 #include "../Layers/xrRenderVK/FrameContext.h"
 #include "../Layers/xrRenderVK/EngineTextureSource.h"
+#include "../Layers/xrRenderVK/ScreenCopyPass.h"
+#include "../Layers/xrRenderVK/ShaderModule.h"
 #include "../Layers/xrRenderVK/VulkanHardware.h"
 
 #include <SDL.h>
@@ -36,6 +38,7 @@ struct FrameCallbackAudit
 {
     uint32_t calls = 0;
     bool valid = true;
+    const xray::render::vulkan::ScreenCopyPass* screen_copy = nullptr;
 };
 
 void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& frame, void* user_data)
@@ -44,7 +47,31 @@ void audit_frame_callback(const xray::render::vulkan::FrameRecordingContext& fra
     audit.valid = audit.valid && frame.command_buffer && frame.render_pass && frame.framebuffer &&
         frame.extent.width && frame.extent.height &&
         frame.frame_index < xray::render::vulkan::FrameContext::FramesInFlight;
+    if (audit.screen_copy)
+        audit.screen_copy->record(frame);
     ++audit.calls;
+}
+
+bool load_shader_from_vfs(pcstr name, VkDevice device,
+    const xray::render::vulkan::ShaderModuleDispatch& dispatch,
+    xray::render::vulkan::ShaderModule& module, std::string& error)
+{
+    string_path path;
+    if (!FS.exist(path, "$game_shaders$", name, ".spv"))
+    {
+        error = std::string("compiled Vulkan shader is missing: ") + name;
+        return false;
+    }
+    IReader* reader = FS.r_open(path);
+    if (!reader)
+    {
+        error = std::string("could not read compiled Vulkan shader: ") + path;
+        return false;
+    }
+    const bool loaded = module.initialize_bytes(device, dispatch,
+        reader->pointer(), reader->length(), error);
+    FS.r_close(reader);
+    return loaded;
 }
 
 template <typename T>
@@ -95,6 +122,12 @@ bool Run(std::string& reason)
     xray::render::vulkan::UploadedTexture engine_texture{};
     xray::render::vulkan::ImageStateTracker image_states;
     std::vector<xray::render::vulkan::PendingTextureUpload> texture_uploads;
+    xray::render::vulkan::ShaderModule copy_vertex;
+    xray::render::vulkan::ShaderModule copy_fragment;
+    xray::render::vulkan::ScreenCopyPass screen_copy;
+    VkSampler copy_sampler = VK_NULL_HANDLE;
+    PFN_vkDestroySampler destroy_sampler = nullptr;
+    PFN_vkDeviceWaitIdle wait_idle = nullptr;
 
     PFN_vkDestroyInstance destroy_instance = nullptr;
     PFN_vkDestroySurfaceKHR destroy_surface = nullptr;
@@ -102,6 +135,13 @@ bool Run(std::string& reason)
 
     auto cleanup = [&]
     {
+        if (device && wait_idle)
+            wait_idle(device);
+        screen_copy.destroy();
+        copy_vertex.destroy();
+        copy_fragment.destroy();
+        if (copy_sampler && destroy_sampler)
+            destroy_sampler(device, copy_sampler, nullptr);
         if (!texture_uploads.empty())
             xray::render::vulkan::wait_for_uploads(device, frame_context.command_pool(),
                 texture_dispatch, texture_uploads);
@@ -269,6 +309,7 @@ bool Run(std::string& reason)
     if (!destroy_device || !xray::render::vulkan::load_frame_dispatch(instance, get_instance_proc,
             device, get_device_proc, frame_dispatch, frame_error))
         return fail(frame_error.empty() ? "vkDestroyDevice is unavailable" : frame_error);
+    wait_idle = frame_dispatch.device_wait_idle;
     if (!frame_context.initialize(physical_device, device, surface, queue, queue_family, {960, 540},
             frame_dispatch, frame_error))
         return fail(frame_error);
@@ -339,12 +380,59 @@ bool Run(std::string& reason)
         }
     }
 
+    FrameCallbackAudit callback_audit;
+    if (engine_texture.view && FS.path_exist("$game_shaders$"))
+    {
+        string_path vertex_path, fragment_path;
+        const bool has_vertex = FS.exist(vertex_path, "$game_shaders$", "r3\\screen_copy_vk.vs", ".spv");
+        const bool has_fragment = FS.exist(fragment_path, "$game_shaders$", "r3\\screen_copy_vk.ps", ".spv");
+        if (has_vertex != has_fragment)
+            return fail("screen-copy SPIR-V files must be installed as a pair");
+        if (has_vertex)
+        {
+            const xray::render::vulkan::ShaderModuleDispatch shader_dispatch{
+                load_device_proc<PFN_vkCreateShaderModule>(device, get_device_proc, "vkCreateShaderModule"),
+                load_device_proc<PFN_vkDestroyShaderModule>(device, get_device_proc, "vkDestroyShaderModule")};
+            const auto create_sampler = load_device_proc<PFN_vkCreateSampler>(device, get_device_proc,
+                "vkCreateSampler");
+            destroy_sampler = load_device_proc<PFN_vkDestroySampler>(device, get_device_proc,
+                "vkDestroySampler");
+            xray::render::vulkan::ScreenCopyDispatch copy_dispatch;
+            std::string copy_error;
+            if (!shader_dispatch.create || !shader_dispatch.destroy || !create_sampler || !destroy_sampler ||
+                !xray::render::vulkan::load_screen_copy_dispatch(device, get_device_proc,
+                    copy_dispatch, copy_error))
+                return fail(copy_error.empty() ? "Vulkan shader or sampler procedures are unavailable" : copy_error);
+            if (!load_shader_from_vfs("r3\\screen_copy_vk.vs", device, shader_dispatch,
+                    copy_vertex, copy_error) ||
+                !load_shader_from_vfs("r3\\screen_copy_vk.ps", device, shader_dispatch,
+                    copy_fragment, copy_error))
+                return fail(copy_error);
+            VkSamplerCreateInfo sampler_info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
+            sampler_info.magFilter = VK_FILTER_NEAREST;
+            sampler_info.minFilter = VK_FILTER_NEAREST;
+            sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+            sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            sampler_info.maxLod = 0.0f;
+            if (create_sampler(device, &sampler_info, nullptr, &copy_sampler) != VK_SUCCESS)
+                return fail("Vulkan screen-copy sampler creation failed");
+            if (!screen_copy.initialize(device, frame_context.render_pass(), engine_texture.view,
+                    copy_sampler, copy_vertex.handle(), copy_fragment.handle(), copy_dispatch, copy_error))
+                return fail(copy_error);
+            callback_audit.screen_copy = &screen_copy;
+            Msg("[renderer-vulkan] screen-copy pipeline bound to engine VFS DDS");
+        }
+        else
+            Msg("[renderer-vulkan] compiled screen-copy shaders absent; clear/present probe continues");
+    }
+
     VkClearColorValue clear{};
     clear.float32[0] = 0.08f;
     clear.float32[1] = 0.18f;
     clear.float32[2] = 0.32f;
     clear.float32[3] = 1.0f;
-    FrameCallbackAudit callback_audit;
     for (uint32_t frame = 0; frame <= xray::render::vulkan::FrameContext::FramesInFlight; ++frame)
     {
         xray::render::vulkan::FrameStatus frame_status{};
