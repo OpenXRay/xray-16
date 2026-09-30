@@ -34,6 +34,7 @@
 #include "PhysicObject.h"
 #include "Artefact.h"
 #include "level_changer.h"
+#include "ui/UITalkWnd.h"
 
 /*
     New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
@@ -52,6 +53,42 @@ TClass* ObjectCast(CScriptGameObject* scriptObj)
 
     return nullptr;
 }
+
+namespace
+{
+void give_news(cpcstr caption, cpcstr text, cpcstr texture_name, const Frect& tex_rect,
+    const int delay, const int show_time, const GAME_NEWS_DATA::eNewsType type)
+{
+    GAME_NEWS_DATA news_data;
+    news_data.m_type = type;
+    news_data.news_caption = caption;
+    news_data.news_text = text;
+    if (show_time != 0)
+        news_data.show_time = show_time; // override default
+
+    VERIFY2(texture_name && texture_name[0], "No game news texture provided");
+
+    news_data.texture_name = texture_name;
+    news_data.tex_rect = tex_rect;
+
+    if (delay == 0)
+        Actor()->AddGameNews(std::move(news_data));
+    else
+        Actor()->AddGameNews_deffered(std::move(news_data), delay);
+}
+
+void AddIconedTalkMessage(pcstr caption, pcstr text, pcstr texture_name, const Frect& tex_rect, pcstr templ_name)
+{
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+    if (!pGameSP)
+        return;
+
+    if (pGameSP->TalkMenu->IsShown())
+    {
+        pGameSP->TalkMenu->AddIconedMessage(caption, text, texture_name, tex_rect, templ_name ? templ_name : "iconed_answer_item");
+    }
+}
+} // namespace
 
 luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_<CScriptGameObject>& instance)
 {
@@ -164,30 +201,43 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("give_info_portion", &CScriptGameObject::GiveInfoPortion)
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
 
-        .def("give_game_news", +[](CScriptGameObject* self,
-            pcstr news, pcstr texture_name, Frect /*tex_rect*/, int delay, int show_time)
+        // SOC
+        .def("give_game_news", +[](CScriptGameObject*, pcstr news, pcstr texture_name, Frect tex_rect, int delay, int show_time)
         {
-            // SOC give_game_news style
-            // tex_rect is ignored, we could add support for it back, if really needed.
-            // It also should be safe to pass nullptr to caption param
-            self->GiveGameNews(nullptr, news, texture_name, delay, show_time);
+            tex_rect.x2 += tex_rect.x1;
+            tex_rect.y2 += tex_rect.y1;
+            give_news(nullptr, news, texture_name, tex_rect, delay, show_time, GAME_NEWS_DATA::eNews);
             return true;
         })
-        .def("give_game_news",
-            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int))(&CScriptGameObject::GiveGameNews))
-        .def("give_game_news",
-            (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int, int))(&CScriptGameObject::GiveGameNews))
+        // CS/COP
+        .def("give_game_news", +[](CScriptGameObject*, pcstr caption, pcstr news, pcstr texture_name, int delay, int show_time)
+        {
+            give_news(caption, news, texture_name, {}, delay, show_time, GAME_NEWS_DATA::eNews);
+        })
+        // COP
+        .def("give_game_news", +[](CScriptGameObject*, pcstr caption, pcstr news, pcstr texture_name, int delay, int show_time, int type)
+        {
+            give_news(caption, news, texture_name, {}, delay, show_time, static_cast<GAME_NEWS_DATA::eNewsType>(type));
+        })
 
         .def("clear_game_news", &CScriptGameObject::ClearGameNews)
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(pcstr, pcstr, Frect, pcstr))
-            (&CScriptGameObject::AddIconedTalkMessage))
-
-        .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))
-            (&CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
-
-        .def("give_talk_message2", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))
-            (&CScriptGameObject::AddIconedTalkMessage))
+        // SOC
+        .def("give_talk_message", +[](CScriptGameObject*, pcstr text, pcstr texture_name, Frect tex_rect, pcstr templ_name)
+        {
+            tex_rect.x2 += tex_rect.x1;
+            tex_rect.y2 += tex_rect.y1;
+            AddIconedTalkMessage(nullptr, text, texture_name, tex_rect, templ_name);
+        })
+        // CS/COP
+        .def("give_talk_message", +[](CScriptGameObject*, pcstr text, pcstr texture_name, pcstr templ_name)
+        {
+            AddIconedTalkMessage(nullptr, text, texture_name, {}, templ_name);
+        })
+        .def("give_talk_message2", +[](CScriptGameObject*, pcstr caption, pcstr text, pcstr texture_name, pcstr templ_name)
+        {
+            AddIconedTalkMessage(caption, text, texture_name, {}, templ_name);
+        })
 
         .def("has_info", &CScriptGameObject::HasInfo)
         .def("dont_has_info", &CScriptGameObject::DontHasInfo)

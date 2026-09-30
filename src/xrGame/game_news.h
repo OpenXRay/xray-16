@@ -20,6 +20,7 @@ struct GAME_NEWS_DATA : public ISerializable
     shared_str news_caption;
     shared_str news_text;
     shared_str texture_name;
+    Frect      tex_rect{};
     ALife::_TIME_ID receive_time;
 };
 

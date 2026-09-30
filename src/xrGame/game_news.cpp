@@ -7,15 +7,10 @@
 #include "game_news.h"
 #include "Common/object_broker.h"
 
-#include "ai_space.h"
-#include "alife_simulator.h"
-#include "alife_object_registry.h"
-#include "xrAICore/Navigation/game_graph.h"
+// #include "date_time.h"
 
-#include "date_time.h"
-#include "xrServer_Objects_ALife_Monsters.h"
-
-#include "specific_character.h"
+// XXX: introduce PROPER versioning for saves instead of such hacks
+constexpr char TEXTURE_RECT_MARKER[] = "$TEXTURE_RECT$";
 
 void GAME_NEWS_DATA::save(IWriter& stream)
 {
@@ -24,7 +19,8 @@ void GAME_NEWS_DATA::save(IWriter& stream)
     save_data(news_text, stream);
     save_data(receive_time, stream);
     save_data(texture_name, stream);
-    //	save_data(tex_rect,		stream);
+    stream.w_stringZ(TEXTURE_RECT_MARKER);
+    save_data(tex_rect, stream);
 }
 
 void GAME_NEWS_DATA::load(IReader& stream)
@@ -34,8 +30,20 @@ void GAME_NEWS_DATA::load(IReader& stream)
     load_data(news_text, stream);
     load_data(receive_time, stream);
     load_data(texture_name, stream);
-    //	load_data(tex_rect,		stream);
+
+    const char* data = static_cast<char*>(stream.pointer());
+    constexpr auto marker_size = sizeof(TEXTURE_RECT_MARKER);
+
+    if (stream.elapsed() < marker_size || memcmp(data, TEXTURE_RECT_MARKER, marker_size) != 0)
+    {
+        tex_rect = {};
+        return;
+    }
+
+    stream.advance(marker_size);
+    load_data(tex_rect, stream);
 }
+
 /*
 LPCSTR GAME_NEWS_DATA::SingleLineText()
 {

@@ -113,6 +113,11 @@ void CUIMessagesWindow::AddIconedPdaMessage(const GAME_NEWS_DATA* news)
     pItem->UICaptionText.SetWndPos(p);
     pItem->UICaptionText.SetTextST(news->news_caption.c_str());
     pItem->UIMsgText.SetTextST(news->news_text.c_str());
+    if (!fis_zero(news->tex_rect.width()) || !fis_zero(news->tex_rect.height()))
+    {
+        pItem->UIIcon.SetTextureRect(news->tex_rect);
+        pItem->UIMsgText.SetWndPos({ pItem->UIIcon.GetWidth(), pItem->UIMsgText.GetWndPos().y });
+    }
     pItem->UIMsgText.AdjustHeightToText();
 
     pItem->SetColorAnimation(

@@ -115,37 +115,33 @@ void CUITextureMaster::script_register(lua_State* luaState)
     module(luaState)
     [
         class_<TEX_INFO>("TEX_INFO")
-            .def("get_file_name", &TEX_INFO::get_file_name)
-            .def("get_rect", &TEX_INFO::get_rect),
+            .def("get_file_name", +[](TEX_INFO* self) -> pcstr
+            {
+                return self->file.c_str();
+            })
+            .def("get_rect", +[](TEX_INFO* self) -> Frect
+            {
+                return self->rect;
+            }),
 
         def("GetTextureName", +[](pcstr iconName)
         {
-            return CUITextureMaster::GetTextureFileName(iconName);
+            return GetTextureFileName(iconName);
         }),
 
-            def("GetTextureRect", +[](pcstr iconName)
+        def("GetTextureRect", +[](pcstr iconName)
         {
-            return CUITextureMaster::GetTextureRect(iconName);
+            return GetTextureRect(iconName);
         }),
 
-            def("GetTextureInfo", +[](pcstr name)
+        def("GetTextureInfo", +[](pcstr name) -> TEX_INFO
         {
-            return CUITextureMaster::FindItem(name);
+            return FindItem(name);
         }),
 
-            def("GetTextureInfo", +[](pcstr name, pcstr defaultName)
+        def("GetTextureInfo", +[](pcstr name, pcstr defaultName) -> TEX_INFO
         {
-            return CUITextureMaster::FindItem(name, defaultName);
-        }),
-
-            def("GetTextureInfo", +[](pcstr name, TEX_INFO& outValue)
-        {
-            return CUITextureMaster::FindItem(name, outValue);
-        }),
-
-            def("GetTextureInfo", +[](pcstr name, pcstr defaultName, TEX_INFO& outValue)
-        {
-            return CUITextureMaster::FindItem(name, defaultName, outValue);
+            return FindItem(name, defaultName);
         })
     ];
 }

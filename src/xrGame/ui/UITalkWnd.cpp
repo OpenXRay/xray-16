@@ -476,14 +476,9 @@ void CUITalkWnd::StopSnd()
         m_sound.stop();
 }
 
-void CUITalkWnd::AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
+void CUITalkWnd::AddIconedMessage(pcstr caption, pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
 {
-    UITalkDialogWnd->AddIconedAnswer(caption, text, texture_name, templ_name);
-}
-
-void CUITalkWnd::AddIconedMessage(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
-{
-    UITalkDialogWnd->AddIconedAnswer(text, texture_name, texture_rect, templ_name);
+    UITalkDialogWnd->AddIconedAnswer(caption, text, texture_name, texture_rect, templ_name);
 }
 
 void CUITalkWnd::StopTalk() { HideDialog(); }

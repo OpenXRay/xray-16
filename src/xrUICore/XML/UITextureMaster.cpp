@@ -97,15 +97,10 @@ void CUITextureMaster::ParseShTexInfo(CUIXml& xml, bool override)
     }
 }
 
-bool CUITextureMaster::IsSh(const shared_str& texture_name)
-{
-    return strchr(texture_name.c_str(), _DELIMITER) == nullptr;
-}
-
 bool CUITextureMaster::InitTexture(
     const shared_str& texture_name, const shared_str& shader_name, ui_shader& out_shader, Frect& out_rect)
 {
-    xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(texture_name);
+    const auto it = m_textures.find(texture_name);
     if (it != m_textures.end())
     {
         sh_pair p = {it->second.file, shader_name};
@@ -124,7 +119,7 @@ bool CUITextureMaster::InitTexture(
 
 bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name)
 {
-    xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(texture_name);
+    const auto it = m_textures.find(texture_name);
     if (it != m_textures.end())
     {
         sh_pair p = {it->second.file, shader_name};
@@ -138,7 +133,16 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
         return true;
     }
 
+    // Renderer has some path transformations
+    // that are invisible to the ui code
     tc->CreateShader(texture_name.c_str(), shader_name.c_str());
+
+    // We can make sure that texture physically exists
+    // only after creating ui_shader instance
+    Fvector2 temp;
+    if (tc->GetShader()->GetBaseTextureResolution(temp))
+        return true;
+
     return false;
 }
 
@@ -193,7 +197,7 @@ TEX_INFO CUITextureMaster::FindItem(const shared_str& texture_name, pcstr defaul
 {
     TEX_INFO info;
 
-    VERIFY4(FindItem(texture_name, default_texture, info),
+    R_ASSERT4(FindItem(texture_name, info) || FindItem(default_texture, info),
         "Can't find texture", texture_name.c_str(), default_texture);
 
     return info;
@@ -201,26 +205,14 @@ TEX_INFO CUITextureMaster::FindItem(const shared_str& texture_name, pcstr defaul
 
 bool CUITextureMaster::FindItem(const shared_str& texture_name, TEX_INFO& outValue)
 {
-    return FindItem(texture_name, nullptr, outValue);
-}
-
-bool CUITextureMaster::FindItem(const shared_str& texture_name, pcstr default_texture, TEX_INFO& outValue)
-{
-    auto it = m_textures.find(texture_name);
-
-    if (it != m_textures.end())
+    if (!texture_name.empty())
     {
-        outValue = it->second;
-        return true;
+        if (const auto it = m_textures.find(texture_name); it != m_textures.end())
+        {
+            outValue = it->second;
+            return true;
+        }
     }
-
-    it = m_textures.find(default_texture);
-    if (it != m_textures.end())
-    {
-        outValue = it->second;
-        return true;
-    }
-
     return false;
 }
 

@@ -9,16 +9,15 @@
 
 #pragma once
 
+#include "xrUICore/ui_defs.h"
+
 class CUIXml;
 class CUIStaticItem;
-#include "xrUICore/ui_defs.h"
 
 struct TEX_INFO
 {
     shared_str file;
     Frect rect;
-    pcstr get_file_name() const { return file.c_str(); }
-    Frect get_rect() { return rect; }
 };
 
 struct sh_pair
@@ -34,7 +33,7 @@ struct sh_pair
     }
 };
 
-class XRUICORE_API CUITextureMaster
+class XRUICORE_API CUITextureMaster final
 {
 public:
     static void ParseShTexInfo(pcstr xml_file);
@@ -56,12 +55,9 @@ public:
     static void GetTextureShader(const shared_str& texture_name, ui_shader& sh);
     static TEX_INFO FindItem(const shared_str& texture_name, pcstr default_texture = nullptr);
     static bool FindItem(const shared_str& texture_name, TEX_INFO& outValue);
-    static bool FindItem(const shared_str& texture_name, pcstr default_texture, TEX_INFO& outValue);
     static bool ItemExist(const shared_str& texture_name);
 
 protected:
-    IC static bool IsSh(const shared_str& texture_name);
-
     static xr_map<shared_str, TEX_INFO> m_textures;
 
     static xr_map<sh_pair, ui_shader> m_shaders;

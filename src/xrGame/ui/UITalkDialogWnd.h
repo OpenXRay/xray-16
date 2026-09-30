@@ -53,8 +53,7 @@ public:
 
     void AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_finalizer);
     void AddAnswer(LPCSTR SpeakerName, const char* str, bool bActor);
-    void AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
-    void AddIconedAnswer(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name);
+    void AddIconedAnswer(pcstr caption, pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name);
     void ClearAll();
     void ClearQuestions();
 
@@ -129,7 +128,6 @@ class CUIAnswerItemIconed final : public CUIAnswerItem
 
 public:
     CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path);
-    void Init(LPCSTR text, LPCSTR name, LPCSTR texture_name);
-    void Init(pcstr text, pcstr texture_name, Frect texture_rect);
+    void Init(pcstr text, pcstr name, pcstr texture_name, Frect texture_rect);
     pcstr GetDebugType() override { return "CUIAnswerItemIconed"; }
 };

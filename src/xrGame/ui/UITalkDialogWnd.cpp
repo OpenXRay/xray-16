@@ -253,37 +253,28 @@ void CUITalkDialogWnd::AddAnswer(LPCSTR SpeakerName, LPCSTR str, bool bActor)
     Actor()->game_news_registry->registry().objects().emplace_back(std::move(news_data));
 }
 
-void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name)
+void CUITalkDialogWnd::AddIconedAnswer(pcstr caption, pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
 {
     CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
-    itm->Init(text, caption, texture_name);
+    itm->Init(text, caption, texture_name, texture_rect);
     UIAnswersList->AddWindow(itm, true);
     UIAnswersList->ScrollToEnd();
 
     GAME_NEWS_DATA news_data;
-    news_data.news_caption = caption;
-    news_data.news_text._set(text);
+    if (caption)
+    {
+        news_data.news_caption = caption;
+        news_data.news_text = text;
+    }
+    else
+    {
+        news_data.news_caption = text;
+        news_data.news_text = "";
+    }
 
     news_data.m_type = GAME_NEWS_DATA::eTalk;
     news_data.texture_name = texture_name;
-    news_data.receive_time = Level().GetGameTime();
-
-    Actor()->game_news_registry->registry().objects().emplace_back(std::move(news_data));
-}
-
-void CUITalkDialogWnd::AddIconedAnswer(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
-{
-    CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
-    itm->Init(text, texture_name, texture_rect);
-    UIAnswersList->AddWindow(itm, true);
-    UIAnswersList->ScrollToEnd();
-
-    GAME_NEWS_DATA news_data;
-    news_data.news_caption = text;
-    news_data.news_text = "";
-
-    news_data.m_type = GAME_NEWS_DATA::eTalk;
-    news_data.texture_name = texture_name;
+    news_data.tex_rect = texture_rect;
     news_data.receive_time = Level().GetGameTime();
 
     Actor()->game_news_registry->registry().objects().emplace_back(std::move(news_data));
@@ -503,24 +494,22 @@ CUIAnswerItemIconed::CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path) : CUIAnsw
     CUIXmlInit::InitStatic(*xml_doc, str, 0, m_icon);
 }
 
-void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)
+void CUIAnswerItemIconed::Init(pcstr text, pcstr name, pcstr texture_name, Frect texture_rect)
 {
-    xr_string res;
-    res += name;
-    res += "\\n %c[250,255,232,208]";
-    res += text;
+    if (!name)
+        inherited::Init(text, "");
+    else
+    {
+        xr_string res;
+        res += name;
+        res += "\\n %c[250,255,232,208]";
+        res += text;
 
-    inherited::Init(res.c_str(), "");
+        inherited::Init(res.c_str(), "");
+    }
     m_icon->InitTexture(texture_name);
-    m_icon->TextureOn();
-    m_icon->SetStretchTexture(true);
-}
-
-void CUIAnswerItemIconed::Init(pcstr text, pcstr texture_name, Frect texture_rect)
-{
-    inherited::Init(text, "");
-    m_icon->InitTexture(texture_name);
-    m_icon->SetTextureRect(texture_rect);
+    if (!fis_zero(texture_rect.width()) || !fis_zero(texture_rect.height()))
+        m_icon->SetTextureRect(texture_rect);
     m_icon->TextureOn();
     m_icon->SetStretchTexture(true);
 }
