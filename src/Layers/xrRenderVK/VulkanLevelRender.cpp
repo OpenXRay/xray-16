@@ -5,6 +5,7 @@
 #include "xrEngine/device.h"
 
 #include <SDL.h>
+#include <SDL_vulkan.h>
 
 #include <cstring>
 
@@ -50,7 +51,13 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
     half_height = static_cast<float>(height) * 0.5f;
 
     owned_game_device_ = std::move(device);
+    window_ = window;
+    int drawable_width = 0, drawable_height = 0;
+    SDL_Vulkan_GetDrawableSize(window, &drawable_width, &drawable_height);
+    requested_drawable_ = drawable_width > 0 && drawable_height > 0 ?
+        VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*owned_game_device_);
+    reset_pending_ = false;
 }
 
 void VulkanLevelRender::Destroy()
@@ -70,11 +77,69 @@ void VulkanLevelRender::Destroy()
     textures_ = nullptr;
     pass_ = nullptr;
     wait_idle_ = nullptr;
+    window_ = nullptr;
+    requested_drawable_ = {};
+    reset_pending_ = false;
     if (owned_game_device_)
     {
         owned_game_device_->destroy();
         owned_game_device_.reset();
     }
+}
+
+void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
+    float& half_width, float& half_height)
+{
+    R_ASSERT2(window && window == window_ && (SDL_GetWindowFlags(window) & SDL_WINDOW_VULKAN),
+        "Vulkan renderer reset requires its original SDL Vulkan window");
+    if (!game_device_)
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer reset requires an initialized device");
+        return;
+    }
+
+    int drawable_width = 0, drawable_height = 0;
+    SDL_Vulkan_GetDrawableSize(window, &drawable_width, &drawable_height);
+    if (drawable_width <= 0 || drawable_height <= 0)
+    {
+        reset_pending_ = true;
+        return;
+    }
+
+    std::string error;
+    if (!game_device_->recreate_swapchain(
+            {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)}, error))
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan swapchain recreation failed: %s", error.c_str());
+        return;
+    }
+    const VkExtent2D extent = game_device_->window().frame().extent();
+    width = extent.width;
+    height = extent.height;
+    half_width = static_cast<float>(width) * 0.5f;
+    half_height = static_cast<float>(height) * 0.5f;
+    game_device_->clear_reset_required();
+    requested_drawable_ = {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)};
+    reset_pending_ = false;
+}
+
+DeviceState VulkanLevelRender::GetDeviceState()
+{
+    if (!game_device_ || !window_ || !game_device_->window().device())
+        return DeviceState::Lost;
+    if (game_device_->device_lost())
+        return DeviceState::Lost;
+
+    int drawable_width = 0, drawable_height = 0;
+    SDL_Vulkan_GetDrawableSize(window_, &drawable_width, &drawable_height);
+    if (drawable_width <= 0 || drawable_height <= 0)
+        return DeviceState::Lost;
+
+    if (reset_pending_ || game_device_->reset_required() ||
+        requested_drawable_.width != static_cast<uint32_t>(drawable_width) ||
+        requested_drawable_.height != static_cast<uint32_t>(drawable_height))
+        return DeviceState::NeedReset;
+    return DeviceState::Normal;
 }
 
 void VulkanLevelRender::SetupStates()

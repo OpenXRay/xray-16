@@ -132,6 +132,20 @@ bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
     return true;
 }
 
+bool VulkanWindowDevice::recreate_frame(VkExtent2D extent, std::string& error)
+{
+    if (!m_device || !m_surface || !m_queue || !m_instance || !m_instance_proc || !m_device_proc ||
+        !extent.width || !extent.height)
+    {
+        error = "Vulkan window device cannot recreate a frame for an invalid window or extent";
+        return false;
+    }
+    if (!m_frame.recreate(m_physical.handle, m_surface, extent, error))
+        return false;
+    error.clear();
+    return true;
+}
+
 void VulkanWindowDevice::destroy()
 {
     if (m_device && m_wait_idle)

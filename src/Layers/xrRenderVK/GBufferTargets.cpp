@@ -154,6 +154,12 @@ bool GBufferTargets::bind_lighting(DeferredPass& deferred, std::string& error)
     return true;
 }
 
+void GBufferTargets::release_lighting(DeferredPass& deferred)
+{
+    for (auto& target : targets_)
+        deferred.release_gbuffer(target.lighting);
+}
+
 bool GBufferTargets::begin(const FrameRecordingContext& frame, FrameRecordingContext& geometry_frame) const
 {
     if (!pass_ || !frame.command_buffer || frame.image_index >= targets_.size() ||

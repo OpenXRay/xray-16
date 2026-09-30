@@ -74,6 +74,8 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
     {
         const auto create_sampler = proc<PFN_vkCreateSampler>(device, get, "vkCreateSampler");
         const auto destroy_sampler = proc<PFN_vkDestroySampler>(device, get, "vkDestroySampler");
+        create_sampler_ = create_sampler;
+        destroy_sampler_ = destroy_sampler;
         ScenePassDispatch scene_dispatch;
         if (!load_scene_pass_dispatch(device, get, scene_dispatch, error) ||
             !create_sampler || !destroy_sampler || !buffer_upload_.cmd_copy_buffer)
@@ -186,11 +188,15 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             light, status, error, record_ui, this, record_models, this,
             scene_visibility_ ? record_level_visuals : nullptr, this))
     {
+        if (!window_.frame().device_lost())
+            reset_required_ = true;
         model_draws_.clear();
         level_draws_.clear();
         current_level_ = nullptr;
         return false;
     }
+    if (status == FrameStatus::RecreateRequired)
+        reset_required_ = true;
     model_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
@@ -215,6 +221,40 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     return true;
 }
 
+bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error)
+{
+    if (!window_.device() || !extent.width || !extent.height)
+    {
+        error = "Vulkan swapchain reset requires a live device and nonzero drawable extent";
+        return false;
+    }
+    if (!window_.frame().wait_idle())
+    {
+        error = "could not wait for Vulkan device before renderer reset";
+        return false;
+    }
+
+    targets_.release_lighting(deferred_);
+    targets_.destroy();
+    if (!window_.recreate_frame(extent, error))
+        return false;
+
+    auto& frame = window_.frame();
+    const auto& physical = window_.physical();
+    if (!targets_.initialize(physical.handle, window_.device(), frame.extent(),
+            static_cast<uint32_t>(frame.image_count()), frame.depth_format(), physical.memory,
+            frame_dispatch_, create_sampler_, destroy_sampler_, error))
+        return false;
+    deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass());
+    ui_pass_.rebind_render_pass(frame.render_pass());
+    if (!targets_.bind_lighting(deferred_, error))
+        return false;
+
+    reset_required_ = false;
+    error.clear();
+    return true;
+}
+
 void VulkanGameDevice::destroy()
 {
     if (window_.device() && frame_dispatch_.device_wait_idle)
@@ -226,11 +266,15 @@ void VulkanGameDevice::destroy()
     scene_visibility_ = false;
     textures_.destroy();
     ui_pass_.destroy();
-    deferred_.destroy();
+    targets_.release_lighting(deferred_);
     targets_.destroy();
+    deferred_.destroy();
     window_.destroy();
     frame_dispatch_ = {};
     texture_dispatch_ = {};
     buffer_upload_ = {};
+    create_sampler_ = nullptr;
+    destroy_sampler_ = nullptr;
+    reset_required_ = false;
 }
 }

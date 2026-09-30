@@ -16,6 +16,7 @@ bool complete(const FrameDispatch& vk)
         vk.get_image_memory_requirements && vk.allocate_memory && vk.free_memory && vk.bind_image_memory &&
         vk.create_render_pass && vk.destroy_render_pass && vk.create_framebuffer &&
         vk.destroy_framebuffer && vk.create_command_pool && vk.destroy_command_pool && vk.allocate_command_buffers &&
+        vk.free_command_buffers &&
         vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
         vk.cmd_copy_image_to_buffer && vk.cmd_pipeline_barrier &&
         vk.end_command_buffer && vk.create_semaphore && vk.destroy_semaphore && vk.create_fence && vk.destroy_fence &&
@@ -94,6 +95,7 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     XRAY_LOAD_DEVICE(create_command_pool, "vkCreateCommandPool");
     XRAY_LOAD_DEVICE(destroy_command_pool, "vkDestroyCommandPool");
     XRAY_LOAD_DEVICE(allocate_command_buffers, "vkAllocateCommandBuffers");
+    XRAY_LOAD_DEVICE(free_command_buffers, "vkFreeCommandBuffers");
     XRAY_LOAD_DEVICE(reset_command_buffer, "vkResetCommandBuffer");
     XRAY_LOAD_DEVICE(begin_command_buffer, "vkBeginCommandBuffer");
     XRAY_LOAD_DEVICE(cmd_begin_render_pass, "vkCmdBeginRenderPass");
@@ -122,6 +124,55 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     return true;
 }
 
+bool FrameContext::recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
+    VkExtent2D requested_extent, std::string& error)
+{
+    if (!m_device || !m_queue || !m_command_pool || !physical_device || !surface)
+    {
+        error = "Vulkan frame context cannot recreate an uninitialized swapchain";
+        return false;
+    }
+    if (!wait_idle())
+    {
+        error = "could not wait for Vulkan device before swapchain recreation";
+        return false;
+    }
+
+    const VkFormat previous_format = m_format;
+    if (!m_commands.empty())
+        m_vk.free_command_buffers(m_device, m_command_pool,
+            static_cast<uint32_t>(m_commands.size()), m_commands.data());
+    m_commands.clear();
+    destroy_swapchain_resources();
+    m_device_lost = false;
+
+    if (!create_swapchain(physical_device, surface, requested_extent, error))
+        goto failed;
+    if (m_format != previous_format)
+    {
+        error = "Vulkan surface format changed; existing renderer pipelines must be rebuilt";
+        goto failed;
+    }
+    if (!create_render_targets(error) || !create_commands(error) || !create_sync(error))
+        goto failed;
+    m_current_frame = 0;
+    error.clear();
+    return true;
+
+failed:
+    destroy_swapchain_resources();
+    return false;
+}
+
+bool FrameContext::wait_idle()
+{
+    if (!m_device || !m_vk.device_wait_idle)
+        return false;
+    const VkResult result = m_vk.device_wait_idle(m_device);
+    m_device_lost = result == VK_ERROR_DEVICE_LOST;
+    return result == VK_SUCCESS;
+}
+
 FrameContext::~FrameContext()
 {
     destroy();
@@ -147,6 +198,7 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_queue = queue;
     m_queue_family = queue_family;
     m_vk = dispatch;
+    m_device_lost = false;
     m_allow_readback = allow_readback;
     if (use_depth)
     {
@@ -211,16 +263,27 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
     VkSurfaceFormatKHR surface_format = formats.front();
     if (formats.size() == 1 && formats.front().format == VK_FORMAT_UNDEFINED)
     {
-        surface_format.format = VK_FORMAT_B8G8R8A8_UNORM;
-        surface_format.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        surface_format.format = m_format != VK_FORMAT_UNDEFINED ? m_format : VK_FORMAT_B8G8R8A8_UNORM;
+        surface_format.colorSpace = formats.front().colorSpace;
     }
     else
     {
-        const auto preferred = std::find_if(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format)
+        auto preferred = std::find_if(formats.begin(), formats.end(), [&](const VkSurfaceFormatKHR& format)
         {
-            return format.format == VK_FORMAT_B8G8R8A8_UNORM &&
-                format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+            return m_format != VK_FORMAT_UNDEFINED && format.format == m_format &&
+                format.colorSpace == m_color_space;
         });
+        if (preferred == formats.end())
+            preferred = std::find_if(formats.begin(), formats.end(), [&](const VkSurfaceFormatKHR& format)
+            {
+                return m_format != VK_FORMAT_UNDEFINED && format.format == m_format;
+            });
+        if (preferred == formats.end())
+            preferred = std::find_if(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format)
+            {
+                return format.format == VK_FORMAT_B8G8R8A8_UNORM &&
+                    format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+            });
         if (preferred != formats.end())
             surface_format = *preferred;
     }
@@ -301,6 +364,7 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
         return false;
     }
     m_format = surface_format.format;
+    m_color_space = surface_format.colorSpace;
 
     if (!enumerate<VkImage>([&](uint32_t* count, VkImage* values)
         { return m_vk.get_swapchain_images(m_device, m_swapchain, count, values); }, m_images))
@@ -482,14 +546,17 @@ bool FrameContext::create_render_targets(std::string& error)
 
 bool FrameContext::create_commands(std::string& error)
 {
-    VkCommandPoolCreateInfo pool_info{};
-    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    pool_info.queueFamilyIndex = m_queue_family;
-    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    if (m_vk.create_command_pool(m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
+    if (!m_command_pool)
     {
-        error = "vkCreateCommandPool failed";
-        return false;
+        VkCommandPoolCreateInfo pool_info{};
+        pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        pool_info.queueFamilyIndex = m_queue_family;
+        pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        if (m_vk.create_command_pool(m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
+        {
+            error = "vkCreateCommandPool failed";
+            return false;
+        }
     }
 
     m_commands.resize(m_images.size());
@@ -547,8 +614,10 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     }
 
     VkFence frame_fence = m_frame_fences[m_current_frame];
-    if (m_vk.wait_for_fences(m_device, 1, &frame_fence, VK_TRUE, UINT64_MAX) != VK_SUCCESS)
+    const VkResult fence_wait = m_vk.wait_for_fences(m_device, 1, &frame_fence, VK_TRUE, UINT64_MAX);
+    if (fence_wait != VK_SUCCESS)
     {
+        m_device_lost = fence_wait == VK_ERROR_DEVICE_LOST;
         error = "could not wait for Vulkan frame fence";
         return false;
     }
@@ -564,6 +633,7 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     }
     if (acquire != VK_SUCCESS && acquire != VK_SUBOPTIMAL_KHR)
     {
+        m_device_lost = acquire == VK_ERROR_DEVICE_LOST;
         error = "vkAcquireNextImageKHR failed";
         return false;
     }
@@ -574,22 +644,31 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     }
 
     VkFence image_fence = m_image_fences[image_index];
-    if (image_fence && image_fence != frame_fence &&
-        m_vk.wait_for_fences(m_device, 1, &image_fence, VK_TRUE, UINT64_MAX) != VK_SUCCESS)
+    if (image_fence && image_fence != frame_fence)
     {
-        error = "could not wait for the previous Vulkan image submission";
-        return false;
+        const VkResult image_fence_wait = m_vk.wait_for_fences(
+            m_device, 1, &image_fence, VK_TRUE, UINT64_MAX);
+        if (image_fence_wait != VK_SUCCESS)
+        {
+            m_device_lost = image_fence_wait == VK_ERROR_DEVICE_LOST;
+            error = "could not wait for the previous Vulkan image submission";
+            return false;
+        }
     }
     VkCommandBuffer command = m_commands[image_index];
-    if (m_vk.reset_command_buffer(command, 0) != VK_SUCCESS)
+    const VkResult reset_command = m_vk.reset_command_buffer(command, 0);
+    if (reset_command != VK_SUCCESS)
     {
+        m_device_lost = reset_command == VK_ERROR_DEVICE_LOST;
         error = "could not reset Vulkan command buffer";
         return false;
     }
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (m_vk.begin_command_buffer(command, &begin_info) != VK_SUCCESS)
+    const VkResult begin_result = m_vk.begin_command_buffer(command, &begin_info);
+    if (begin_result != VK_SUCCESS)
     {
+        m_device_lost = begin_result == VK_ERROR_DEVICE_LOST;
         error = "vkBeginCommandBuffer failed";
         return false;
     }
@@ -634,13 +713,17 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         m_vk.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &present_barrier);
     }
-    if (m_vk.end_command_buffer(command) != VK_SUCCESS)
+    const VkResult end_result = m_vk.end_command_buffer(command);
+    if (end_result != VK_SUCCESS)
     {
+        m_device_lost = end_result == VK_ERROR_DEVICE_LOST;
         error = "vkEndCommandBuffer failed";
         return false;
     }
-    if (m_vk.reset_fences(m_device, 1, &frame_fence) != VK_SUCCESS)
+    const VkResult reset_fence = m_vk.reset_fences(m_device, 1, &frame_fence);
+    if (reset_fence != VK_SUCCESS)
     {
+        m_device_lost = reset_fence == VK_ERROR_DEVICE_LOST;
         error = "could not reset Vulkan frame fence";
         return false;
     }
@@ -655,8 +738,10 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     submit.pCommandBuffers = &command;
     submit.signalSemaphoreCount = 1;
     submit.pSignalSemaphores = &m_render_finished[image_index];
-    if (m_vk.queue_submit(m_queue, 1, &submit, frame_fence) != VK_SUCCESS)
+    const VkResult submit_result = m_vk.queue_submit(m_queue, 1, &submit, frame_fence);
+    if (submit_result != VK_SUCCESS)
     {
+        m_device_lost = submit_result == VK_ERROR_DEVICE_LOST;
         error = "vkQueueSubmit failed";
         return false;
     }
@@ -673,6 +758,7 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     m_current_frame = (m_current_frame + 1) % FramesInFlight;
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR)
     {
+        m_device_lost = result == VK_ERROR_DEVICE_LOST;
         error = "vkQueuePresentKHR failed";
         return false;
     }
@@ -685,39 +771,15 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
 void FrameContext::destroy()
 {
     if (m_device && m_vk.device_wait_idle)
-        m_vk.device_wait_idle(m_device);
+    {
+        const VkResult result = m_vk.device_wait_idle(m_device);
+        m_device_lost = result == VK_ERROR_DEVICE_LOST;
+    }
     if (m_device)
     {
-        for (VkFramebuffer framebuffer : m_framebuffers)
-            if (framebuffer)
-                m_vk.destroy_framebuffer(m_device, framebuffer, nullptr);
-        for (VkImageView view : m_image_views)
-            if (view)
-                m_vk.destroy_image_view(m_device, view, nullptr);
-        for (VkImageView view : m_depth_views)
-            if (view)
-                m_vk.destroy_image_view(m_device, view, nullptr);
-        for (VkImage image : m_depth_images)
-            if (image)
-                m_vk.destroy_image(m_device, image, nullptr);
-        for (VkDeviceMemory memory : m_depth_memories)
-            if (memory)
-                m_vk.free_memory(m_device, memory, nullptr);
-        if (m_render_pass)
-            m_vk.destroy_render_pass(m_device, m_render_pass, nullptr);
+        destroy_swapchain_resources();
         if (m_command_pool)
             m_vk.destroy_command_pool(m_device, m_command_pool, nullptr);
-        for (VkSemaphore semaphore : m_render_finished)
-            if (semaphore)
-                m_vk.destroy_semaphore(m_device, semaphore, nullptr);
-        for (VkSemaphore semaphore : m_image_available)
-            if (semaphore)
-                m_vk.destroy_semaphore(m_device, semaphore, nullptr);
-        for (VkFence fence : m_frame_fences)
-            if (fence)
-                m_vk.destroy_fence(m_device, fence, nullptr);
-        if (m_swapchain)
-            m_vk.destroy_swapchain(m_device, m_swapchain, nullptr);
     }
     m_device = VK_NULL_HANDLE;
     m_queue = VK_NULL_HANDLE;
@@ -728,6 +790,7 @@ void FrameContext::destroy()
     m_command_pool = VK_NULL_HANDLE;
     m_extent = {};
     m_format = VK_FORMAT_UNDEFINED;
+    m_color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     m_depth_format = VK_FORMAT_UNDEFINED;
     m_memory_properties = {};
     m_allow_readback = false;
@@ -743,5 +806,42 @@ void FrameContext::destroy()
     m_frame_fences = {};
     m_image_fences.clear();
     m_current_frame = 0;
+}
+
+void FrameContext::destroy_swapchain_resources()
+{
+    if (!m_device)
+        return;
+    for (VkFramebuffer framebuffer : m_framebuffers)
+        if (framebuffer) m_vk.destroy_framebuffer(m_device, framebuffer, nullptr);
+    for (VkImageView view : m_image_views)
+        if (view) m_vk.destroy_image_view(m_device, view, nullptr);
+    for (VkImageView view : m_depth_views)
+        if (view) m_vk.destroy_image_view(m_device, view, nullptr);
+    for (VkImage image : m_depth_images)
+        if (image) m_vk.destroy_image(m_device, image, nullptr);
+    for (VkDeviceMemory memory : m_depth_memories)
+        if (memory) m_vk.free_memory(m_device, memory, nullptr);
+    if (m_render_pass) m_vk.destroy_render_pass(m_device, m_render_pass, nullptr);
+    for (VkSemaphore semaphore : m_render_finished)
+        if (semaphore) m_vk.destroy_semaphore(m_device, semaphore, nullptr);
+    for (VkSemaphore semaphore : m_image_available)
+        if (semaphore) m_vk.destroy_semaphore(m_device, semaphore, nullptr);
+    for (VkFence fence : m_frame_fences)
+        if (fence) m_vk.destroy_fence(m_device, fence, nullptr);
+    if (m_swapchain) m_vk.destroy_swapchain(m_device, m_swapchain, nullptr);
+    m_swapchain = VK_NULL_HANDLE;
+    m_render_pass = VK_NULL_HANDLE;
+    m_extent = {};
+    m_images.clear();
+    m_image_views.clear();
+    m_depth_images.clear();
+    m_depth_memories.clear();
+    m_depth_views.clear();
+    m_framebuffers.clear();
+    m_render_finished.clear();
+    m_image_available = {};
+    m_frame_fences = {};
+    m_image_fences.clear();
 }
 }

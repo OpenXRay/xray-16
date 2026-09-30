@@ -96,6 +96,10 @@ void VKAPI_CALL update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet
     assert(writes[0].pImageInfo->sampler == handle<VkSampler>(34));
     ++descriptor_updates;
 }
+VkResult VKAPI_CALL free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescriptorSet*)
+{
+    return VK_SUCCESS;
+}
 void VKAPI_CALL bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout, uint32_t,
     uint32_t count, const VkDescriptorSet* sets, uint32_t, const uint32_t*)
 {
@@ -112,7 +116,7 @@ int main()
     ScenePassDispatch dispatch{create_layout, destroy_layout, create_pipeline, destroy_pipeline,
         bind_pipeline, viewport, scissor, bind_vertices, bind_indices, push, draw,
         create_descriptor_layout, destroy_descriptor_layout, create_pool, destroy_pool,
-        allocate_sets, update_sets, bind_sets};
+        allocate_sets, free_sets, update_sets, bind_sets};
     ScenePass pass;
     std::string error;
     const auto device = handle<VkDevice>(1);

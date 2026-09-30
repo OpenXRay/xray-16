@@ -22,10 +22,14 @@ public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error);
+    bool recreate_swapchain(VkExtent2D extent, std::string& error);
     void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16]);
     void queue_level_visual(uint32_t index, const float (&mvp)[16]);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
     void destroy();
+    bool reset_required() const { return reset_required_; }
+    bool device_lost() const { return window_.frame().device_lost(); }
+    void clear_reset_required() { reset_required_ = false; }
     ~VulkanGameDevice() { destroy(); }
 
     VulkanUIRender& ui() { return ui_; }
@@ -78,5 +82,8 @@ private:
     bool level_recorded_{true};
     bool models_recorded_{true};
     std::string model_error_;
+    PFN_vkCreateSampler create_sampler_{};
+    PFN_vkDestroySampler destroy_sampler_{};
+    bool reset_required_{};
 };
 }

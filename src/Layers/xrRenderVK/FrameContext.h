@@ -34,6 +34,7 @@ struct FrameDispatch
     PFN_vkCreateCommandPool create_command_pool{};
     PFN_vkDestroyCommandPool destroy_command_pool{};
     PFN_vkAllocateCommandBuffers allocate_command_buffers{};
+    PFN_vkFreeCommandBuffers free_command_buffers{};
     PFN_vkResetCommandBuffer reset_command_buffer{};
     PFN_vkBeginCommandBuffer begin_command_buffer{};
     PFN_vkCmdBeginRenderPass cmd_begin_render_pass{};
@@ -90,6 +91,9 @@ public:
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
         const FrameDispatch& dispatch, std::string& error, bool allow_readback = false,
         bool use_depth = false);
+    bool recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
+        VkExtent2D requested_extent, std::string& error);
+    bool wait_idle();
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
@@ -102,6 +106,7 @@ public:
     VkFormat depth_format() const { return m_depth_format; }
     VkCommandPool command_pool() const { return m_command_pool; }
     size_t image_count() const { return m_images.size(); }
+    bool device_lost() const { return m_device_lost; }
 
 private:
     bool create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
@@ -109,6 +114,7 @@ private:
     bool create_render_targets(std::string& error);
     bool create_commands(std::string& error);
     bool create_sync(std::string& error);
+    void destroy_swapchain_resources();
 
     VkDevice m_device = VK_NULL_HANDLE;
     VkQueue m_queue = VK_NULL_HANDLE;
@@ -119,6 +125,7 @@ private:
     VkCommandPool m_command_pool = VK_NULL_HANDLE;
     VkExtent2D m_extent{};
     VkFormat m_format = VK_FORMAT_UNDEFINED;
+    VkColorSpaceKHR m_color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkFormat m_depth_format = VK_FORMAT_UNDEFINED;
     VkPhysicalDeviceMemoryProperties m_memory_properties{};
     bool m_allow_readback = false;
@@ -134,5 +141,6 @@ private:
     std::array<VkFence, FramesInFlight> m_frame_fences{};
     std::vector<VkFence> m_image_fences;
     uint32_t m_current_frame{};
+    bool m_device_lost{};
 };
 }

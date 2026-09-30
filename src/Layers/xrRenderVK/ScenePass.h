@@ -50,6 +50,7 @@ struct ScenePassDispatch
     PFN_vkCreateDescriptorPool create_descriptor_pool{};
     PFN_vkDestroyDescriptorPool destroy_descriptor_pool{};
     PFN_vkAllocateDescriptorSets allocate_descriptor_sets{};
+    PFN_vkFreeDescriptorSets free_descriptor_sets{};
     PFN_vkUpdateDescriptorSets update_descriptor_sets{};
     PFN_vkCmdBindDescriptorSets cmd_bind_descriptor_sets{};
     PFN_vkCmdDraw cmd_draw{};
@@ -82,6 +83,7 @@ public:
         float alpha_ref = 0.0f) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
         std::string& error);
+    void rebind_render_pass(VkRenderPass compatible_render_pass) { m_render_pass = compatible_render_pass; }
     void destroy();
 
 private:

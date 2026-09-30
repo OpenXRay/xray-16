@@ -20,6 +20,7 @@ public:
 
     bool initialize(SDL_Window* window, VkExtent2D extent, bool allow_readback,
         std::string& error, bool use_depth = false);
+    bool recreate_frame(VkExtent2D extent, std::string& error);
     void destroy();
     VkDevice device() const { return m_device; }
     VkInstance instance() const { return m_instance; }

@@ -36,6 +36,12 @@ public:
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
     bool gbuffer(VkImageView albedo, VkImageView normal, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
+    void release_gbuffer(VkDescriptorSet& set);
+    void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass)
+    {
+        geometry_pass_ = geometry_pass;
+        light_pass_ = light_pass;
+    }
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,

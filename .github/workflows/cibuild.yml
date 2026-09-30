@@ -191,7 +191,7 @@ jobs:
         # macOS images have tighter concurrency limits; keep the matrix minimal.
         # Pin the deployment target so newer runner images don't pass an unsupported
         # system version (e.g. 25.4.0) down to AppleClang/LuaJIT architecture detection.
-        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
+        - { name: macOS,          os: macos-15,        arch: arm64,  cc: clang, threads: 3, flags: "-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
         - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
 
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]

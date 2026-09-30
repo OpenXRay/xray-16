@@ -12,7 +12,8 @@ bool complete(const ScenePassDispatch& vk)
         vk.destroy_pipeline && vk.cmd_bind_pipeline && vk.cmd_set_viewport && vk.cmd_set_scissor &&
         vk.cmd_bind_vertex_buffers && vk.cmd_bind_index_buffer && vk.cmd_push_constants && vk.cmd_draw_indexed &&
         vk.create_descriptor_set_layout && vk.destroy_descriptor_set_layout && vk.create_descriptor_pool &&
-        vk.destroy_descriptor_pool && vk.allocate_descriptor_sets && vk.update_descriptor_sets &&
+        vk.destroy_descriptor_pool && vk.allocate_descriptor_sets && vk.free_descriptor_sets &&
+        vk.update_descriptor_sets &&
         vk.cmd_bind_descriptor_sets;
 }
 
@@ -122,6 +123,7 @@ bool load_scene_pass_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_proc,
     XRAY_LOAD(create_descriptor_pool, "vkCreateDescriptorPool");
     XRAY_LOAD(destroy_descriptor_pool, "vkDestroyDescriptorPool");
     XRAY_LOAD(allocate_descriptor_sets, "vkAllocateDescriptorSets");
+    XRAY_LOAD(free_descriptor_sets, "vkFreeDescriptorSets");
     XRAY_LOAD(update_descriptor_sets, "vkUpdateDescriptorSets");
     XRAY_LOAD(cmd_bind_descriptor_sets, "vkCmdBindDescriptorSets");
 #undef XRAY_LOAD

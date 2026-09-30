@@ -20,6 +20,7 @@ public:
         const FrameDispatch& dispatch, PFN_vkCreateSampler create_sampler,
         PFN_vkDestroySampler destroy_sampler, std::string& error);
     bool bind_lighting(DeferredPass& pass, std::string& error);
+    void release_lighting(DeferredPass& pass);
     bool begin(const FrameRecordingContext& frame, FrameRecordingContext& geometry_frame) const;
     void end(VkCommandBuffer command) const;
     VkDescriptorSet lighting_set(uint32_t image_index) const;

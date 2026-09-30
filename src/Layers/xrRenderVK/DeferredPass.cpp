@@ -176,6 +176,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     {
         const VkDescriptorPoolSize size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 512};
         VkDescriptorPoolCreateInfo pool{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
+        pool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool.maxSets = 256;
         pool.poolSizeCount = 1;
         pool.pPoolSizes = &size;
@@ -253,6 +254,13 @@ bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkSampler sam
     VkDescriptorSet& set, std::string& error)
 {
     return allocate(gbuffer_layout_, albedo, normal, sampler, set, error);
+}
+
+void DeferredPass::release_gbuffer(VkDescriptorSet& set)
+{
+    if (device_ && pool_ && set && vk_.free_descriptor_sets)
+        vk_.free_descriptor_sets(device_, pool_, 1, &set);
+    set = VK_NULL_HANDLE;
 }
 
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
