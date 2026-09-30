@@ -10,7 +10,7 @@ selects the OpenGL ES backend for gameplay.
 |---|---|---|
 | Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
 | Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass with an optional per-image depth attachment, tracks two frames in flight, detects lost surfaces, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
-| SDL Vulkan device | `src/Layers/xrRenderVK/VulkanWindowDevice.*` | Owns the Vulkan loader, instance, SDL surface, selected device and frame context for a caller-owned window; it can recreate the surface and swapchain after Android replaces the native window |
+| SDL Vulkan device | `src/Layers/xrRenderVK/VulkanWindowDevice.*`, `VulkanProbe.*` | Uses SDL's platform Vulkan loader and surface API instead of a hard-coded Android/Linux shared-library name; owns the instance, selected device and frame context and can recreate the surface after Android replaces its native window |
 | Android lifecycle | `src/xrEngine/x_ray.cpp`, `src/xrEngine/Render.h`, `src/Layers/xrRenderVK/VulkanLevelRender.*` | Forwards app pause/resume to the renderer, waits for submitted Vulkan work before suspension, and recreates the surface and swapchain after resume |
 | Android Vulkan smoke | `src/xrEngine/android_vulkan_smoke.cpp`, `src/Layers/xrRenderVK/SmokeTrianglePass.*` | Creates an SDL Vulkan surface, draws the triangle plus lit indexed geometry and a colored UI overlay without game assets, checks pixels from geometry and UI and presents three frames |
 | DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
@@ -128,11 +128,12 @@ Work should proceed in dependencies-first order:
    geometry through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling (implemented; device validation remains);
-6. add Windows and Linux surfaces and CI coverage;
-7. enable Vulkan gameplay selection only after complete levels and representative
+6. route Vulkan WSI through SDL's platform API and include `xrRenderVK` in desktop CMake builds (implemented; CI validation pending);
+7. register desktop Vulkan modes, add explicit Windows CMake coverage, and run Windows/Linux surface smoke tests;
+8. enable Vulkan gameplay selection only after complete levels and representative
    mods run through Vulkan.
 
-Useful host tests live in `tests/vulkan_dds.cpp`,
+Useful host tests live in `tests/vulkan_probe.cpp`, `tests/vulkan_dds.cpp`,
 `tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,
 `tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`,
 `tests/vulkan_screen_copy_pass.cpp`, `tests/vulkan_frame_lifecycle.cpp`, and

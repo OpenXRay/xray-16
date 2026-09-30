@@ -1,26 +1,59 @@
 #include "VulkanProbe.h"
 
-#include <vulkan/vulkan.h>
-
-#include <dlfcn.h>
+#include <SDL_vulkan.h>
 
 namespace xray::render::vulkan
 {
-bool probe_vulkan_loader(std::string& error)
+namespace
 {
-    void* library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
-    if (!library)
+int load_sdl_vulkan(const char* path)
+{
+    return SDL_Vulkan_LoadLibrary(path);
+}
+
+void unload_sdl_vulkan()
+{
+    SDL_Vulkan_UnloadLibrary();
+}
+
+PFN_vkGetInstanceProcAddr get_sdl_instance_proc_addr()
+{
+    return reinterpret_cast<PFN_vkGetInstanceProcAddr>(SDL_Vulkan_GetVkGetInstanceProcAddr());
+}
+}
+
+bool probe_vulkan_loader(std::string& error, const VulkanLoaderDispatch& dispatch)
+{
+    if (!dispatch.get_instance_proc_addr)
     {
-        error = "libvulkan.so is unavailable";
+        error = "Vulkan loader procedure lookup is unavailable";
         return false;
     }
-
-    const auto get_instance_proc = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
-        dlsym(library, "vkGetInstanceProcAddr"));
+    auto get_instance_proc = dispatch.get_instance_proc_addr();
+    bool loaded_here = false;
+    if (!get_instance_proc)
+    {
+        if (!dispatch.load_library || !dispatch.unload_library || dispatch.load_library(nullptr) != 0)
+        {
+            error = "SDL could not load the platform Vulkan loader";
+            return false;
+        }
+        loaded_here = true;
+        get_instance_proc = dispatch.get_instance_proc_addr();
+    }
+    struct LoaderGuard
+    {
+        const VulkanLoaderDispatch& dispatch;
+        bool loaded_here;
+        ~LoaderGuard()
+        {
+            if (loaded_here)
+                dispatch.unload_library();
+        }
+    } loader_guard{dispatch, loaded_here};
     if (!get_instance_proc)
     {
         error = "vkGetInstanceProcAddr is unavailable";
-        dlclose(library);
         return false;
     }
 
@@ -29,7 +62,6 @@ bool probe_vulkan_loader(std::string& error)
     if (!create_instance)
     {
         error = "vkCreateInstance is unavailable";
-        dlclose(library);
         return false;
     }
 
@@ -47,21 +79,23 @@ bool probe_vulkan_loader(std::string& error)
     if (create_result != VK_SUCCESS)
     {
         error = "vkCreateInstance failed (VkResult " + std::to_string(create_result) + ")";
-        dlclose(library);
         return false;
     }
 
     const auto destroy_instance = reinterpret_cast<PFN_vkDestroyInstance>(
         get_instance_proc(instance, "vkDestroyInstance"));
+    if (!destroy_instance)
+    {
+        error = "vkDestroyInstance is unavailable";
+        return false;
+    }
     const auto enumerate_devices = reinterpret_cast<PFN_vkEnumeratePhysicalDevices>(
         get_instance_proc(instance, "vkEnumeratePhysicalDevices"));
     uint32_t device_count = 0;
     const VkResult enumerate_result = enumerate_devices ?
         enumerate_devices(instance, &device_count, nullptr) : VK_ERROR_INITIALIZATION_FAILED;
 
-    if (destroy_instance)
-        destroy_instance(instance, nullptr);
-    dlclose(library);
+    destroy_instance(instance, nullptr);
 
     if (enumerate_result != VK_SUCCESS || device_count == 0)
     {
@@ -72,5 +106,12 @@ bool probe_vulkan_loader(std::string& error)
 
     error.clear();
     return true;
+}
+
+bool probe_vulkan_loader(std::string& error)
+{
+    static const VulkanLoaderDispatch sdl_dispatch{
+        load_sdl_vulkan, unload_sdl_vulkan, get_sdl_instance_proc_addr};
+    return probe_vulkan_loader(error, sdl_dispatch);
 }
 }

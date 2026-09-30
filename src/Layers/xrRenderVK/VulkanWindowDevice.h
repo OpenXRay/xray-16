@@ -33,7 +33,6 @@ public:
     PFN_vkGetDeviceProcAddr device_proc() const { return m_device_proc; }
 
 private:
-    void* m_library = nullptr;
     VkInstance m_instance = VK_NULL_HANDLE;
     SDL_Window* m_window{};
     VkSurfaceKHR m_surface = VK_NULL_HANDLE;

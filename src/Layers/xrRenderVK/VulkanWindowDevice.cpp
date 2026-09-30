@@ -1,7 +1,7 @@
 #include "VulkanWindowDevice.h"
 
 #include <SDL.h>
-#include <dlfcn.h>
+#include <SDL_vulkan.h>
 
 #include <algorithm>
 #include <cstring>
@@ -11,9 +11,6 @@ namespace xray::render::vulkan
 {
 namespace
 {
-using GetExtensions = SDL_bool (*)(SDL_Window*, unsigned int*, const char**);
-using CreateSurface = SDL_bool (*)(SDL_Window*, VkInstance, VkSurfaceKHR*);
-
 template <typename T> T load_instance_proc(VkInstance instance, PFN_vkGetInstanceProcAddr get, const char* name)
 {
     return reinterpret_cast<T>(get(instance, name));
@@ -31,30 +28,22 @@ bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
     }
     m_window = window;
     const auto fail = [&]() { destroy(); return false; };
-    m_library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
-    if (!m_library)
+    // SDL loads the platform Vulkan loader for SDL_WINDOW_VULKAN windows and
+    // selects the matching Win32/X11/Wayland/Android surface implementation.
+    m_instance_proc = reinterpret_cast<PFN_vkGetInstanceProcAddr>(SDL_Vulkan_GetVkGetInstanceProcAddr());
+    if (!m_instance_proc)
     {
-        error = "libvulkan.so is unavailable";
-        return fail();
-    }
-    m_instance_proc = reinterpret_cast<PFN_vkGetInstanceProcAddr>(dlsym(m_library, "vkGetInstanceProcAddr"));
-    const auto get_extensions = reinterpret_cast<GetExtensions>(dlsym(RTLD_DEFAULT,
-        "SDL_Vulkan_GetInstanceExtensions"));
-    const auto create_surface = reinterpret_cast<CreateSurface>(dlsym(RTLD_DEFAULT,
-        "SDL_Vulkan_CreateSurface"));
-    if (!m_instance_proc || !get_extensions || !create_surface)
-    {
-        error = "Vulkan loader or SDL Vulkan surface procedures are unavailable";
+        error = "SDL has no Vulkan loader for this window";
         return fail();
     }
     unsigned int extension_count = 0;
-    if (!get_extensions(window, &extension_count, nullptr) || !extension_count)
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &extension_count, nullptr) || !extension_count)
     {
         error = "SDL returned no Vulkan instance extensions";
         return fail();
     }
     std::vector<const char*> extensions(extension_count);
-    if (!get_extensions(window, &extension_count, extensions.data()))
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &extension_count, extensions.data()))
     {
         error = "SDL could not enumerate Vulkan instance extensions";
         return fail();
@@ -91,7 +80,7 @@ bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
         error = "required Vulkan instance procedures are unavailable";
         return fail();
     }
-    if (!create_surface(window, m_instance, &m_surface))
+    if (!SDL_Vulkan_CreateSurface(window, m_instance, &m_surface))
     {
         error = "SDL could not create a Vulkan window surface";
         return fail();
@@ -168,15 +157,8 @@ bool VulkanWindowDevice::recreate_surface(VkExtent2D extent, std::string& error)
         m_destroy_surface(m_instance, previous, nullptr);
     m_surface = VK_NULL_HANDLE;
 
-    const auto create_surface = reinterpret_cast<CreateSurface>(dlsym(RTLD_DEFAULT,
-        "SDL_Vulkan_CreateSurface"));
-    if (!create_surface)
-    {
-        error = "SDL Vulkan surface creation procedure is unavailable";
-        return false;
-    }
     VkSurfaceKHR replacement = VK_NULL_HANDLE;
-    if (!create_surface(m_window, m_instance, &replacement) || !replacement)
+    if (!SDL_Vulkan_CreateSurface(m_window, m_instance, &replacement) || !replacement)
     {
         error = "SDL could not create a replacement Vulkan surface";
         return false;
@@ -212,9 +194,6 @@ void VulkanWindowDevice::destroy()
         m_destroy_surface(m_instance, m_surface, nullptr);
     if (m_instance && m_destroy_instance)
         m_destroy_instance(m_instance, nullptr);
-    if (m_library)
-        dlclose(m_library);
-    m_library = nullptr;
     m_instance = VK_NULL_HANDLE;
     m_surface = VK_NULL_HANDLE;
     m_device = VK_NULL_HANDLE;
