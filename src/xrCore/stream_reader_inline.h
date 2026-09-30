@@ -16,7 +16,11 @@ IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mappin
 #if defined(XR_PLATFORM_WINDOWS)
 IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
 #elif defined(XR_PLATFORM_POSIX)
+#if defined(XR_PLATFORM_WEB)
+IC void CStreamReader::unmap() { xr_free(m_current_map_view_of_file); } // read into memory, see map()
+#else
 IC void CStreamReader::unmap() { ::munmap(const_cast<u8*>(m_current_map_view_of_file), m_current_window_size); }
+#endif
 #else
 #   error Select or add implementation for your platform
 #endif

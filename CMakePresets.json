@@ -1,0 +1,31 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "web-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "XRAY_USE_LUAJIT": "OFF",
+        "CMAKE_UNITY_BUILD": "ON",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "OFF"
+      }
+    },
+    {
+      "name": "web-release",
+      "inherits": "web-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "web-debug",
+      "inherits": "web-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "web-release", "configurePreset": "web-release" },
+    { "name": "web-debug", "configurePreset": "web-debug" }
+  ]
+}

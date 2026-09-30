@@ -9,6 +9,11 @@
 
 #include <locale>
 
+#ifdef XR_PLATFORM_WEB
+#include <atomic>
+#include <emscripten.h>
+#endif
+
 CInput* pInput = nullptr;
 
 class DummyReceiver : public IInputReceiver
@@ -59,6 +64,25 @@ constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
 constexpr size_t MAX_CONTROLLER_EVENTS = 256;
 
+#ifdef XR_PLATFORM_WEB
+namespace
+{
+constexpr s32 WebMouseFixedPoint = 256;
+std::atomic<s32> webMouseDelta[2]{};
+float webMouseResidual[2]{};
+
+void TakeWebMouseDelta(int (&offs)[2])
+{
+    for (int axis = 0; axis < 2; ++axis)
+    {
+        webMouseResidual[axis] += float(webMouseDelta[axis].exchange(0)) / WebMouseFixedPoint;
+        offs[axis] = int(webMouseResidual[axis]);
+        webMouseResidual[axis] -= float(offs[axis]);
+    }
+}
+} // namespace
+#endif
+
 CInput::CInput(const bool exclusive)
 {
     ZoneScoped;
@@ -94,6 +118,22 @@ CInput::CInput(const bool exclusive)
 
     for (int i = 0; i < SDL_NumJoysticks(); ++i)
         OpenController(i);
+
+#ifdef XR_PLATFORM_WEB
+    MAIN_THREAD_EM_ASM({
+        const index = $0 / 4;
+        const fixedPoint = $1;
+        const canvas = Module['canvas'];
+        const accumulate = (event) => {
+            const scaleX = canvas.clientWidth > 0 ? canvas.width / canvas.clientWidth : 1;
+            const scaleY = canvas.clientHeight > 0 ? canvas.height / canvas.clientHeight : 1;
+            growMemViews();
+            Atomics.add(HEAP32, index, Math.round(event.movementX * scaleX * fixedPoint));
+            Atomics.add(HEAP32, index + 1, Math.round(event.movementY * scaleY * fixedPoint));
+        };
+        canvas.addEventListener('onpointerrawupdate' in canvas ? 'pointerrawupdate' : 'mousemove', accumulate);
+    }, double(uintptr_t(webMouseDelta)), WebMouseFixedPoint);
+#endif
 }
 
 CInput::~CInput()
@@ -199,8 +239,10 @@ void CInput::MouseUpdate()
         {
         case SDL_MOUSEMOTION:
             mouseMoved = true;
+#ifndef XR_PLATFORM_WEB
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
+#endif
             mouseAxisState[0] = event.motion.x;
             mouseAxisState[1] = event.motion.y;
             break;
@@ -229,6 +271,12 @@ void CInput::MouseUpdate()
         }
     }
 
+#ifdef XR_PLATFORM_WEB
+    TakeWebMouseDelta(offs);
+    if (offs[0] || offs[1])
+        mouseMoved = true;
+#endif
+
     for (int i = 0; i < MOUSE_COUNT; ++i)
     {
         if (mouseState[i] && mousePrev[i])
@@ -244,6 +292,15 @@ void CInput::MouseUpdate()
             cbStack.back()->IR_OnMouseWheel(scroll[0], scroll[1]);
     }
 }
+
+#ifdef XR_PLATFORM_WEB
+static SDL_Scancode WebKeyboardScancode(SDL_Scancode scancode)
+{
+    return scancode == SDL_SCANCODE_RSHIFT ? SDL_SCANCODE_ESCAPE : scancode;
+}
+#else
+static SDL_Scancode WebKeyboardScancode(SDL_Scancode scancode) { return scancode; }
+#endif
 
 void CInput::KeyUpdate()
 {
@@ -263,11 +320,11 @@ void CInput::KeyUpdate()
         case SDL_KEYDOWN:
             if (event.key.repeat)
                 continue;
-            keyboardState[event.key.keysym.scancode] = true;
+            keyboardState[WebKeyboardScancode(event.key.keysym.scancode)] = true;
             break;
 
         case SDL_KEYUP:
-            keyboardState[event.key.keysym.scancode] = false;
+            keyboardState[WebKeyboardScancode(event.key.keysym.scancode)] = false;
             break;
         }
     }
@@ -299,11 +356,11 @@ void CInput::KeyUpdate()
         case SDL_KEYDOWN:
             if (event.key.repeat)
                 continue;
-            cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
+            cbStack.back()->IR_OnKeyboardPress(WebKeyboardScancode(event.key.keysym.scancode));
             break;
 
         case SDL_KEYUP:
-            cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
+            cbStack.back()->IR_OnKeyboardRelease(WebKeyboardScancode(event.key.keysym.scancode));
             break;
 
         case SDL_TEXTINPUT:
@@ -519,7 +576,11 @@ void CInput::ControllerUpdate()
 
 bool KbdKeyToButtonName(const int dik, xr_string& result)
 {
+#ifdef XR_PLATFORM_WEB
+    static std::locale locale = std::locale::classic();
+#else
     static std::locale locale("");
+#endif
 
     if (dik >= 0)
     {

@@ -45,6 +45,7 @@ public:
     ~CApplication();
 
     int Run();
+    bool RunFrame();
 };
 
 #endif //__XR_BASE_H__

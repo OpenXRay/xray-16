@@ -13,6 +13,9 @@ add_subdirectory(ode)
 add_compile_options(${XRAY_DISABLE_WARNINGS})
 
 add_subdirectory(GameSpy)
+if (EMSCRIPTEN)
+    target_compile_definitions(GameSpy-oxr PRIVATE _LINUX)
+endif()
 add_subdirectory(imgui-proj)
 
 if (NOT TARGET xrLuabind)

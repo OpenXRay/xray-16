@@ -93,7 +93,8 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
-#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_PPC64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_PPC64) \
+    || defined(XR_ARCHITECTURE_WASM64) || defined(XR_ARCHITECTURE_WASM32)
 #define _MM_SET_FLUSH_ZERO_MODE(mode)
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else

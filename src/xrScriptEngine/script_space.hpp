@@ -17,6 +17,10 @@
 
 #include "lua.hpp"
 
+#ifndef LUA_OK
+#define LUA_OK 0
+#endif
+
 #pragma warning(disable : 4127) // conditional expression is constant
 #pragma warning(disable : 4456) // declaration of 'x' hides previous local declaration
 #pragma warning(disable : 4458) // declaration of 'x' hides class member

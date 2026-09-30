@@ -15,6 +15,11 @@
 
 #include <SDL.h>
 
+#ifdef XR_PLATFORM_WEB
+#include <emscripten.h>
+#include "WebFramePacer.h"
+#endif
+
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
@@ -25,6 +30,111 @@ string512 g_sBenchmarkName;
 
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
+#ifdef XR_PLATFORM_WEB
+int ps_vsync_interval = 0;
+
+CWebFramePacer g_webFramePacer;
+
+void CWebFramePacer::SetVsyncPaced(bool paced)
+{
+    if (paced && !displayHookInstalled)
+    {
+        displayHookInstalled = true;
+        MAIN_THREAD_EM_ASM({
+            const index = $0 / 4;
+            const samples = [];
+            let last = 0;
+            const tick = (now) => {
+                if (last > 0) {
+                    samples.push(now - last);
+                    if (samples.length > 32)
+                        samples.shift();
+                    const sorted = samples.slice().sort((a, b) => a - b);
+                    growMemViews();
+                    Atomics.store(HEAP32, index, Math.round(sorted[sorted.length >> 2] * 1000));
+                }
+                last = now;
+                requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+        }, double(uintptr_t(&displayPeriodUs)));
+    }
+    if (vsyncPaced == paced)
+        return;
+    vsyncPaced = paced;
+    lastTick = 0;
+    lastTickRendered = false;
+    refreshesSinceFrame = 0;
+}
+
+bool CWebFramePacer::IsFrameDue(double now)
+{
+    const double period = displayPeriodUs.load(std::memory_order_relaxed) / 1000.0;
+    if (!vsyncPaced || period <= 0)
+        return true;
+
+    const double elapsed = lastTick > 0 ? now - lastTick : 0;
+    const bool previousRendered = lastTickRendered;
+    lastTick = now;
+
+    if (elapsed <= 0 || elapsed > StallMs)
+    {
+        refreshesSinceFrame = 0;
+        missFrames = misses = spareFrames = 0;
+        lastTickRendered = true;
+        return true;
+    }
+
+    const u32 maxInterval = std::clamp(u32(1000.0 / (period * MinPacedHz)), 1u, MaxInterval);
+    const u32 refreshes = std::max(1u, u32(elapsed / period + 0.5));
+    if (previousRendered)
+        RecordFrame(refreshes, maxInterval);
+
+    refreshesSinceFrame += refreshes;
+    const u32 paced = ps_vsync_interval > 0 ? u32(ps_vsync_interval) : std::min(interval, maxInterval);
+    const u32 limited = frameLimitHz > 0 ? u32(1000.0 / (period * frameLimitHz) + 0.5) : 1;
+    const u32 target = std::max(paced, limited);
+    lastTickRendered = refreshesSinceFrame >= target;
+    if (lastTickRendered)
+        refreshesSinceFrame = 0;
+    return lastTickRendered;
+}
+
+void CWebFramePacer::RecordFrame(u32 refreshes, u32 maxInterval)
+{
+    if (ps_vsync_interval > 0)
+        return;
+    if (interval > maxInterval)
+        ChangeInterval(maxInterval);
+
+    ++missFrames;
+    if (refreshes > interval)
+        ++misses;
+    if (missFrames >= MissWindow)
+    {
+        if (misses >= MissLimit && interval < maxInterval)
+        {
+            if (lastChangeDown && lastTick - changeTime < QuickFailMs)
+                spareWindow = std::min(spareWindow * 2, MaxSpareWindow);
+            ChangeInterval(interval + 1);
+            return;
+        }
+        missFrames = misses = 0;
+    }
+
+    spareFrames = refreshes < interval ? spareFrames + 1 : 0;
+    if (spareFrames >= spareWindow && interval > 1)
+        ChangeInterval(interval - 1);
+}
+
+void CWebFramePacer::ChangeInterval(u32 value)
+{
+    lastChangeDown = value < interval;
+    interval = value;
+    changeTime = lastTick;
+    spareFrames = missFrames = misses = 0;
+}
+#endif
 
 bool g_bLoaded = false;
 ref_light precache_light = 0;
@@ -295,8 +405,15 @@ void CRenderDevice::ProcessFrame()
     else if (Paused() || g_pGameLevel == nullptr)
         updateDelta = 1000 / ps_fps_limit_in_menu;
 
+#ifdef XR_PLATFORM_WEB
+    UNUSED(frameTime);
+    emscripten_set_main_loop_timing(EM_TIMING_RAF, 1);
+    g_webFramePacer.SetVsyncPaced(true);
+    g_webFramePacer.SetFrameLimit(1000.0 / updateDelta);
+#else
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
+#endif
 
     if (!b_is_Active)
         Sleep(1);

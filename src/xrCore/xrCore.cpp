@@ -261,6 +261,11 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 #   error Select or add implementation for your platform
 #endif
 
+#ifdef XR_PLATFORM_WEB
+        if (UserName[0] == '\0')
+            xr_strcpy(UserName, "Player");
+#endif
+
         SanitizeString(UserName);
         SanitizeString(CompName);
 

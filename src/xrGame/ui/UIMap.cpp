@@ -15,6 +15,7 @@
 CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 {
     m_BoundRect_.set(0, 0, 0, 0);
+    m_workingArea.set(0, 0, 0, 0); // the scissor rect Draw() uses, set for real once a map is shown
     m_flags.zero();
     SetPointerDistance(0.0f);
 }

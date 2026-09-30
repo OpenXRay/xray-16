@@ -15,6 +15,8 @@
 #include <OS.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#elif defined(XR_PLATFORM_WEB)
+#include <emscripten/heap.h>
 #endif
 
 // On other platforms these options are controlled by CMake
@@ -139,6 +141,9 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
         *reserved = B_PAGE_SIZE * (uint64)info.cached_pages;
         *committed = B_PAGE_SIZE * (uint64)info.used_pages;
     }
+#elif defined(XR_PLATFORM_WEB)
+    *_free = *reserved = 0;
+    *committed = emscripten_get_heap_size();
 #endif
 }
 
@@ -167,6 +172,8 @@ size_t xrMemory::mem_usage()
     system_info info;
     get_system_info(&info);
     return B_PAGE_SIZE * (uint64)info.used_pages;
+#elif defined(XR_PLATFORM_WEB)
+    return emscripten_get_heap_size();
 #else
     return 0;
 #endif
@@ -280,6 +287,7 @@ XRCORE_API pstr xr_strdup(pcstr string)
 #endif
 }
 
+#ifndef XR_PLATFORM_WEB
 [[nodiscard]] void* operator new(size_t size)
 {
     return Memory.mem_alloc(size);
@@ -359,6 +367,7 @@ void operator delete[](void* ptr, size_t, std::align_val_t alignment) noexcept
 {
     Memory.mem_free(ptr, static_cast<size_t>(alignment));
 }
+#endif // !XR_PLATFORM_WEB
 
 XRCORE_API void* xr_malloc(size_t size)
 {
