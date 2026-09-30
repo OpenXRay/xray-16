@@ -118,6 +118,37 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res/Utils.*.7z
 
+  windows-vulkan-cmake:
+    name: Windows CMake xrRenderVK (MSVC)
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+    - uses: actions/checkout@main
+      with:
+        submodules: recursive
+
+    - name: Install vcpkg SDL2
+      shell: pwsh
+      run: |
+        $env:VCPKG_ROOT = Join-Path $env:RUNNER_TEMP "vcpkg"
+        git clone --depth 1 https://github.com/microsoft/vcpkg.git $env:VCPKG_ROOT
+        if ($LASTEXITCODE -ne 0) { throw "Could not clone vcpkg." }
+        & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat" -disableMetrics
+        if ($LASTEXITCODE -ne 0) { throw "Could not bootstrap vcpkg." }
+        & "$env:VCPKG_ROOT\vcpkg.exe" install "sdl2[vulkan]:x64-windows"
+        if ($LASTEXITCODE -ne 0) { throw "Could not install SDL2." }
+        "VCPKG_ROOT=$env:VCPKG_ROOT" >> $env:GITHUB_ENV
+
+    - name: Configure Windows CMake build
+      run: >-
+        cmake -S . -B build/windows-vulkan -G "Visual Studio 17 2022" -A x64
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+        -DVCPKG_TARGET_TRIPLET=x64-windows
+        -DXRAY_ENABLE_LTO=OFF
+
+    - name: Build Vulkan renderer layer
+      run: cmake --build build/windows-vulkan --config Release --target xrRenderVK --parallel 4
+
 
   nightly-release:
     name: Publish Windows nightly

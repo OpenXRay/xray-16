@@ -12,6 +12,13 @@ project(OpenXRay
     LANGUAGES CXX C
 )
 
+# Unix toolchains discover SDL2 in XRay.Compiler.GNULike.cmake. The MSVC path
+# uses vcpkg in CMake builds, so provide the imported target before engine and
+# renderer subdirectories reference SDL2::SDL2.
+if (WIN32)
+    find_package(SDL2 2.0.18 CONFIG REQUIRED)
+endif()
+
 # Keep a stable engine root when OpenXRay is embedded with add_subdirectory().
 # CMAKE_SOURCE_DIR belongs to the outer application in that configuration.
 set(XRAY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")

@@ -128,8 +128,8 @@ Work should proceed in dependencies-first order:
    geometry through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
 5. integrate swapchain recreation and Android lifecycle handling (implemented; device validation remains);
-6. route Vulkan WSI through SDL's platform API and include `xrRenderVK` in desktop CMake builds (implemented; CI validation pending);
-7. register desktop Vulkan modes, add explicit Windows CMake coverage, and run Windows/Linux surface smoke tests;
+6. route Vulkan WSI through SDL's platform API and include `xrRenderVK` in desktop CMake builds (implemented; Linux/macOS matrix and a focused Windows MSVC build now cover compilation, CI results pending);
+7. register desktop Vulkan modes and run Windows/Linux surface smoke tests;
 8. enable Vulkan gameplay selection only after complete levels and representative
    mods run through Vulkan.
 
