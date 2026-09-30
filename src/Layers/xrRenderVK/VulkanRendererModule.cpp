@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "Include/xrRender/xrRender.h"
+#include "VulkanProbe.h"
 
 namespace xray::render::vulkan
 {
@@ -7,13 +8,32 @@ namespace
 {
 class VulkanRendererModule final : public RendererModule
 {
-    xr_vector<std::pair<pcstr, int>> modes{{"renderer_vulkan", 7}};
+    xr_vector<std::pair<pcstr, int>> modes;
+    bool probe_attempted{};
+    bool loader_available{};
+    std::string probe_error;
 
 public:
-    const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() override { return modes; }
+    const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() override
+    {
+        if (!probe_attempted)
+        {
+            probe_attempted = true;
+            loader_available = probe_vulkan_loader(probe_error);
+            if (loader_available)
+                modes.emplace_back("renderer_vulkan", 7);
+            else
+                Log("~ [renderer-vulkan] unavailable: %s", probe_error.c_str());
+        }
+        return modes;
+    }
 
     bool CheckGameRequirements() override
     {
+        if (!probe_attempted)
+            ObtainSupportedModes();
+        if (!loader_available)
+            return false;
         // The device, swapchain, shader and texture building blocks live in
         // this target, but an IRender implementation and its companion factory,
         // UI and device renderers do not exist yet. Never bind GL objects to a

@@ -2,6 +2,8 @@ add_library(xrRenderVK STATIC)
 
 target_sources(xrRenderVK PRIVATE
     VulkanRendererModule.cpp
+    VulkanProbe.cpp
+    VulkanProbe.h
     BufferResource.cpp
     BufferResource.h
     BufferUpload.cpp
@@ -82,7 +84,7 @@ target_include_directories(xrRenderVK
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
 )
 
-target_link_libraries(xrRenderVK PRIVATE SDL2::SDL2)
+target_link_libraries(xrRenderVK PRIVATE SDL2::SDL2 ${CMAKE_DL_LIBS})
 
 set_target_properties(xrRenderVK PROPERTIES
     PREFIX ""
