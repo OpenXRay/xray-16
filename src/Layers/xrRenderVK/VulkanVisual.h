@@ -17,6 +17,8 @@ public:
     vis_data& getVisData() override { return visibility_; }
     u32 getType() const override { return type_; }
     IRenderVisual* getSubModel(u8 index) override;
+    uint32_t index() const { return index_; }
+    const GpuLevel& owner() const { return owner_; }
 #ifdef DEBUG
     shared_str getDebugName() override { return name_; }
 #endif

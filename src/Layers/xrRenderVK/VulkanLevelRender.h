@@ -19,6 +19,8 @@ public:
     void level_Load(IReader* reader) override;
     void level_Unload() override;
     IRenderVisual* getVisual(int index) override;
+    void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
+        Fmatrix& world) override;
 
 protected:
     GpuLevel& gpu_level() { return level_; }
@@ -34,5 +36,6 @@ private:
     GameTextureFactory* textures_{};
     DeferredPass* pass_{};
     PFN_vkDeviceWaitIdle wait_idle_{};
+    VulkanGameDevice* game_device_{};
 };
 }

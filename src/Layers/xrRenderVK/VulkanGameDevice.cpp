@@ -131,6 +131,29 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
     model_draws_.push_back(draw);
 }
 
+void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16])
+{
+    LevelDraw draw;
+    draw.index = index;
+    std::copy_n(mvp, 16, draw.mvp.data());
+    level_draws_.push_back(draw);
+}
+
+void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    for (const auto& draw : owner.level_draws_)
+    {
+        float mvp[16];
+        std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
+        if (!owner.current_level_->record_visual(draw.index, frame, owner.deferred_, mvp))
+        {
+            owner.level_recorded_ = false;
+            return;
+        }
+    }
+}
+
 void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
@@ -155,15 +178,27 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
 {
     ui_recorded_ = true;
     models_recorded_ = true;
+    level_recorded_ = true;
+    current_level_ = &level;
     ui_error_.clear();
     model_error_.clear();
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
-            light, status, error, record_ui, this, record_models, this))
+            light, status, error, record_ui, this, record_models, this,
+            scene_visibility_ ? record_level_visuals : nullptr, this))
     {
         model_draws_.clear();
+        level_draws_.clear();
+        current_level_ = nullptr;
         return false;
     }
     model_draws_.clear();
+    level_draws_.clear();
+    current_level_ = nullptr;
+    if (!level_recorded_)
+    {
+        error = "Vulkan level visual recording failed";
+        return false;
+    }
     if (!models_recorded_)
     {
         error = model_error_;
@@ -186,6 +221,9 @@ void VulkanGameDevice::destroy()
         frame_dispatch_.device_wait_idle(window_.device());
     ui_.DestroyUIGeom();
     model_draws_.clear();
+    level_draws_.clear();
+    current_level_ = nullptr;
+    scene_visibility_ = false;
     textures_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();

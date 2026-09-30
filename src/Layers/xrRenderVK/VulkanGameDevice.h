@@ -23,6 +23,8 @@ public:
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error);
     void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16]);
+    void queue_level_visual(uint32_t index, const float (&mvp)[16]);
+    void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
     void destroy();
     ~VulkanGameDevice() { destroy(); }
 
@@ -45,6 +47,12 @@ public:
 private:
     static void record_ui(const FrameRecordingContext& frame, void* user);
     static void record_models(const FrameRecordingContext& frame, void* user);
+    static void record_level_visuals(const FrameRecordingContext& frame, void* user);
+    struct LevelDraw
+    {
+        uint32_t index{};
+        std::array<float, 16> mvp{};
+    };
     struct ModelDraw
     {
         GpuModel* model{};
@@ -64,6 +72,10 @@ private:
     bool ui_recorded_{true};
     std::string ui_error_;
     std::vector<ModelDraw> model_draws_;
+    std::vector<LevelDraw> level_draws_;
+    const GpuLevel* current_level_{};
+    bool scene_visibility_{};
+    bool level_recorded_{true};
     bool models_recorded_{true};
     std::string model_error_;
 };

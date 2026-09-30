@@ -14,7 +14,8 @@ public:
         const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
         FrameStatus& status, std::string& error,
         FrameRecorder ui = nullptr, void* ui_data = nullptr,
-        FrameRecorder models = nullptr, void* models_data = nullptr);
+        FrameRecorder models = nullptr, void* models_data = nullptr,
+        FrameRecorder level_visuals = nullptr, void* level_data = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
@@ -28,6 +29,8 @@ private:
     void* ui_data_{};
     FrameRecorder models_{};
     void* models_data_{};
+    FrameRecorder level_visuals_{};
+    void* level_data_{};
     bool recorded_{};
 };
 }
