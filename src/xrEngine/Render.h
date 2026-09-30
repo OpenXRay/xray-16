@@ -142,7 +142,8 @@ public:
         D3D9,
         D3D10,
         D3D11,
-        OpenGL
+        OpenGL,
+        Vulkan
     };
 
     enum ScreenshotMode : u32

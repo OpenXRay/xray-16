@@ -56,6 +56,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanVisual.h
     VulkanUIShader.cpp
     VulkanUIShader.h
+    VulkanFontRender.cpp
+    VulkanFontRender.h
     VulkanLevelRender.cpp
     VulkanLevelRender.h
     VulkanUIRender.cpp

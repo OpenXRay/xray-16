@@ -7,6 +7,7 @@
 #include "VulkanUIShader.h"
 #include "VulkanWindowDevice.h"
 #include "GpuModel.h"
+#include "VulkanFontRender.h"
 
 #include <array>
 #include <memory>
@@ -30,8 +31,13 @@ public:
     {
         return std::make_unique<VulkanUIShader>(textures_, ui_pass_);
     }
+    std::unique_ptr<VulkanFontRender> create_font_render()
+    {
+        return std::make_unique<VulkanFontRender>(*this);
+    }
     GameTextureFactory& textures() { return textures_; }
     DeferredPass& deferred() { return deferred_; }
+    ScenePass& ui_pass() { return ui_pass_; }
     VulkanWindowDevice& window() { return window_; }
     const BufferUploadDispatch& buffer_upload() const { return buffer_upload_; }
     PFN_vkDeviceWaitIdle wait_idle() const { return frame_dispatch_.device_wait_idle; }
