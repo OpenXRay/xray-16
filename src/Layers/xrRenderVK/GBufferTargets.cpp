@@ -87,6 +87,15 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
         error = "RGBA8 cannot be used as a sampled G-buffer attachment";
         return false;
     }
+    VkFormatProperties depth_support{};
+    dispatch.get_format_properties(physical_device, depth_format, &depth_support);
+    if ((depth_support.optimalTilingFeatures &
+            (VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)) !=
+        (VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT))
+    {
+        error = "selected depth format cannot be stored and sampled as a G-buffer attachment";
+        return false;
+    }
     device_ = device;
     extent_ = extent;
     memory_ = memory;
@@ -115,7 +124,7 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
                 VK_IMAGE_ASPECT_COLOR_BIT, target.albedo, error) ||
             !create_attachment(color, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_IMAGE_ASPECT_COLOR_BIT, target.normal, error) ||
-            !create_attachment(depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+            !create_attachment(depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_IMAGE_ASPECT_DEPTH_BIT, target.depth, error))
         {
             destroy();
@@ -188,6 +197,11 @@ void GBufferTargets::end(VkCommandBuffer command) const
 VkDescriptorSet GBufferTargets::lighting_set(uint32_t index) const
 {
     return index < targets_.size() ? targets_[index].lighting : VK_NULL_HANDLE;
+}
+
+VkImageView GBufferTargets::depth_view(uint32_t index) const
+{
+    return index < targets_.size() ? targets_[index].depth.view : VK_NULL_HANDLE;
 }
 
 void GBufferTargets::destroy()

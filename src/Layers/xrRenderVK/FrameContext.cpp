@@ -232,7 +232,9 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
         {
             VkFormatProperties properties{};
             m_vk.get_format_properties(physical_device, candidate, &properties);
-            if (properties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+            const VkFormatFeatureFlags required = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+            if ((properties.optimalTilingFeatures & required) == required)
             {
                 m_depth_format = candidate;
                 break;
@@ -240,7 +242,7 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
         }
         if (m_depth_format == VK_FORMAT_UNDEFINED)
         {
-            error = "Vulkan device has no supported depth attachment format";
+            error = "Vulkan device has no depth format that supports attachment and sampling";
             destroy();
             return false;
         }

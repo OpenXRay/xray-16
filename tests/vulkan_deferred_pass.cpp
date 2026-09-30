@@ -12,8 +12,14 @@ static VkResult VKAPI_PTR create_render_pass(VkDevice, const VkRenderPassCreateI
     assert(info->pSubpasses[0].pDepthStencilAttachment->attachment == 2);
     assert(info->pAttachments[0].finalLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     assert(info->pAttachments[1].finalLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    assert(info->pAttachments[0].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
+    assert(info->pAttachments[1].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
+    assert(info->pAttachments[2].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
+    assert(info->pAttachments[2].finalLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
     assert(info->dependencyCount == 2);
     assert(info->pDependencies[1].dstAccessMask & VK_ACCESS_SHADER_READ_BIT);
+    assert(info->pDependencies[1].srcAccessMask & VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
+    assert(info->pDependencies[1].srcStageMask & VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT);
     *result = reinterpret_cast<VkRenderPass>(uintptr_t(3));
     return VK_SUCCESS;
 }

@@ -12,8 +12,9 @@ struct DeferredLight
     float color[4];
 };
 
-// Framebuffer attachment order: albedo, normal, depth. Both color images must
-// have VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT.
+// Framebuffer attachment order: albedo, normal, depth. Color images must
+// support color attachment and sampling; depth must support attachment and
+// sampling because the render pass preserves it in a read-only layout.
 bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
     VkFormat normal_format, VkFormat depth_format, const FrameDispatch& vk,
     VkRenderPass& result, std::string& error);

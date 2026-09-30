@@ -6,11 +6,20 @@ using namespace xray::render::vulkan;
 
 namespace
 {
-uint32_t images, image_views, framebuffers, passes, samplers, begun, ended;
+uint32_t images, image_views, framebuffers, passes, samplers, begun, ended, depth_images;
+bool depth_sampling_supported = true;
 VkResult VKAPI_PTR create_image(VkDevice, const VkImageCreateInfo* info,
     const VkAllocationCallbacks*, VkImage* output)
 {
-    assert(info->usage & (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT));
+    if (info->format == VK_FORMAT_D24_UNORM_S8_UINT)
+    {
+        assert((info->usage & (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)) ==
+            (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT));
+        ++depth_images;
+    }
+    else
+        assert((info->usage & (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)) ==
+            (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT));
     *output = reinterpret_cast<VkImage>(uintptr_t(++images));
     return VK_SUCCESS;
 }
@@ -28,17 +37,23 @@ VkResult VKAPI_PTR allocate(VkDevice, const VkMemoryAllocateInfo* info,
 }
 void VKAPI_PTR free_memory(VkDevice, VkDeviceMemory, const VkAllocationCallbacks*) {}
 VkResult VKAPI_PTR bind(VkDevice, VkImage, VkDeviceMemory, VkDeviceSize) { return VK_SUCCESS; }
-VkResult VKAPI_PTR create_view(VkDevice, const VkImageViewCreateInfo*,
+VkResult VKAPI_PTR create_view(VkDevice, const VkImageViewCreateInfo* info,
     const VkAllocationCallbacks*, VkImageView* output)
 {
+    if (info->format == VK_FORMAT_D24_UNORM_S8_UINT)
+        assert(info->subresourceRange.aspectMask == VK_IMAGE_ASPECT_DEPTH_BIT);
     *output = reinterpret_cast<VkImageView>(uintptr_t(++image_views));
     return VK_SUCCESS;
 }
 void VKAPI_PTR destroy_view(VkDevice, VkImageView, const VkAllocationCallbacks*) { --image_views; }
-void VKAPI_PTR formats(VkPhysicalDevice, VkFormat, VkFormatProperties* output)
+void VKAPI_PTR formats(VkPhysicalDevice, VkFormat format, VkFormatProperties* output)
 {
-    output->optimalTilingFeatures = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
-        VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    if (format == VK_FORMAT_D24_UNORM_S8_UINT)
+        output->optimalTilingFeatures = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT |
+            (depth_sampling_supported ? VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT : 0);
+    else
+        output->optimalTilingFeatures = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+            VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
 }
 VkResult VKAPI_PTR create_framebuffer(VkDevice, const VkFramebufferCreateInfo* info,
     const VkAllocationCallbacks*, VkFramebuffer* output)
@@ -95,10 +110,17 @@ int main()
     memory.memoryTypes[0].propertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     GBufferTargets targets;
     std::string error;
+    depth_sampling_supported = false;
+    assert(!targets.initialize(reinterpret_cast<VkPhysicalDevice>(uintptr_t(1)),
+        reinterpret_cast<VkDevice>(uintptr_t(2)), {640, 480}, 2, VK_FORMAT_D24_UNORM_S8_UINT,
+        memory, dispatch, create_sampler, destroy_sampler, error));
+    assert(error.find("depth format") != std::string::npos && !images && !passes);
+    depth_sampling_supported = true;
     assert(targets.initialize(reinterpret_cast<VkPhysicalDevice>(uintptr_t(1)),
         reinterpret_cast<VkDevice>(uintptr_t(2)), {640, 480}, 2, VK_FORMAT_D24_UNORM_S8_UINT,
         memory, dispatch, create_sampler, destroy_sampler, error));
-    assert(images == 6 && image_views == 6 && framebuffers == 2 && passes == 1 && samplers == 1);
+    assert(images == 6 && depth_images == 2 && image_views == 6 && framebuffers == 2 && passes == 1 && samplers == 1);
+    assert(targets.depth_view(0) && targets.depth_view(1) && !targets.depth_view(2));
     FrameRecordingContext frame{reinterpret_cast<VkCommandBuffer>(uintptr_t(3)),
         VK_NULL_HANDLE, VK_NULL_HANDLE, {640, 480}, 1, 0};
     FrameRecordingContext geometry;
@@ -107,5 +129,5 @@ int main()
     assert(begun == 1 && ended == 1);
     assert(!targets.begin({frame.command_buffer, VK_NULL_HANDLE, VK_NULL_HANDLE, {640, 480}, 2, 0}, geometry));
     targets.destroy();
-    assert(!images && !image_views && !framebuffers && !passes && !samplers);
+    assert(!images && depth_images == 2 && !image_views && !framebuffers && !passes && !samplers);
 }

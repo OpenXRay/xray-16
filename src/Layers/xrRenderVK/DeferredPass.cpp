@@ -96,12 +96,14 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
         attachments[i].format = i == 0 ? albedo_format : i == 1 ? normal_format : depth_format;
         attachments[i].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[i].storeOp = i < 2 ? VK_ATTACHMENT_STORE_OP_STORE : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        // Keep depth alongside albedo and normals so later deferred passes can
+        // reconstruct positions and test depth without rerendering geometry.
+        attachments[i].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[i].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         attachments[i].finalLayout = i < 2 ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL :
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
     }
     const VkAttachmentReference color[]{{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
         {1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL}};
@@ -116,8 +118,10 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
             0, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
             VK_DEPENDENCY_BY_REGION_BIT},
-        {0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        {0, VK_SUBPASS_EXTERNAL, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
             VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT}
     };
     VkRenderPassCreateInfo info{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
