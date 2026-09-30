@@ -25,6 +25,7 @@
         IMGUI_DISABLE_OBSOLETE_KEYIO;
         IMGUI_DISABLE_OBSOLETE_FUNCTIONS;
         IMGUI_DEFINE_MATH_OPERATORS;
+        XRAY_USE_LUAJIT=1;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
