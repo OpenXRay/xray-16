@@ -119,7 +119,7 @@ jobs:
         path: res/Utils.*.7z
 
   windows-vulkan-cmake:
-    name: Windows CMake xrRenderVK (MSVC)
+    name: Windows CMake xrRenderVK (ClangCL)
     # Keep this generator paired with its VS 2022 installation. windows-latest
     # moved to the VS 2026 image, where the requested VS 2022 generator fails.
     runs-on: windows-2022
@@ -143,7 +143,7 @@ jobs:
 
     - name: Configure Windows CMake build
       run: >-
-        cmake -S . -B build/windows-vulkan -G "Visual Studio 17 2022" -A x64
+        cmake -S . -B build/windows-vulkan -G "Visual Studio 17 2022" -A x64 -T ClangCL
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
         -DVCPKG_TARGET_TRIPLET=x64-windows
         -DXRAY_ENABLE_LTO=OFF
