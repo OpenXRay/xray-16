@@ -3,7 +3,9 @@
 #include "VulkanGameDevice.h"
 #include "VulkanVisual.h"
 #include "xrEngine/device.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/xr_object.h"
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -252,6 +254,21 @@ void VulkanLevelRender::Calculate()
 {
     R_ASSERT2(game_device_ && frame_active_ && !world_calculated_,
         "Vulkan renderer Calculate requires one active frame");
+
+    std::vector<uint32_t> visible_roots;
+    IGameObject* view_entity = g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : nullptr;
+    const size_t camera_sector = view_entity ? view_entity->Sector() :
+        IRender_Sector::INVALID_SECTOR_ID;
+    if (!level_.visible_sector_roots(camera_sector, Device.mFullTransform,
+            Device.vCameraPosition, visible_roots))
+        level_.all_level_roots(visible_roots);
+
+    float view_projection[16];
+    static_assert(sizeof(Device.mFullTransform) == sizeof(view_projection));
+    std::memcpy(view_projection, &Device.mFullTransform, sizeof(view_projection));
+    for (uint32_t root : visible_roots)
+        game_device_->queue_level_visual(root, view_projection);
+
     // Engine renderables are submitted after this scene-calculation phase;
     // VulkanLevelRender::add_Visual stores their transforms for End().
     world_calculated_ = true;

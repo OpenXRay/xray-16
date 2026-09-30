@@ -103,4 +103,24 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
     visuals->close();
     return error.empty();
 }
+
+bool load_engine_level_visibility(IReader& level, LevelModelData& result, std::string& error)
+{
+    IReader* portals_chunk = level.open_chunk(fsL_PORTALS);
+    IReader* sectors_chunk = level.open_chunk(fsL_SECTORS);
+    if (!portals_chunk || !sectors_chunk)
+    {
+        if (portals_chunk) portals_chunk->close();
+        if (sectors_chunk) sectors_chunk->close();
+        error = "level has no complete portal and sector tables";
+        return false;
+    }
+    const bool parsed = parse_level_visibility(
+        {static_cast<const uint8_t*>(portals_chunk->pointer()), portals_chunk->length()},
+        {static_cast<const uint8_t*>(sectors_chunk->pointer()), sectors_chunk->length()},
+        result, error);
+    portals_chunk->close();
+    sectors_chunk->close();
+    return parsed;
+}
 }

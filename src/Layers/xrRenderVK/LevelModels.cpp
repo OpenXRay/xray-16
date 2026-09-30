@@ -1,5 +1,7 @@
 #include "LevelModels.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <utility>
 
@@ -29,6 +31,20 @@ struct Cursor
         if (!take(4, part)) return false;
         value = uint32_t(part.data[0]) | (uint32_t(part.data[1]) << 8) |
             (uint32_t(part.data[2]) << 16) | (uint32_t(part.data[3]) << 24);
+        return true;
+    }
+    bool u16(uint16_t& value)
+    {
+        LevelBytes part;
+        if (!take(2, part)) return false;
+        value = uint16_t(part.data[0]) | (uint16_t(part.data[1]) << 8);
+        return true;
+    }
+    bool f32(float& value)
+    {
+        uint32_t bits;
+        if (!u32(bits)) return false;
+        std::memcpy(&value, &bits, sizeof(value));
         return true;
     }
     bool done() const { return offset == bytes.size; }
@@ -310,5 +326,156 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
         return true;
     }
     return false;
+}
+
+bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
+    LevelModelData& result, std::string& error)
+{
+    constexpr uint32_t sector_portals_chunk = 1;
+    constexpr uint32_t sector_root_chunk = 2;
+    constexpr size_t serialized_portal_size = 80;
+    if (portals.size % serialized_portal_size || portals.size / serialized_portal_size > 65536)
+    {
+        error = "invalid level portal table";
+        return false;
+    }
+
+    std::vector<LevelPortal> parsed_portals;
+    parsed_portals.reserve(portals.size / serialized_portal_size);
+    Cursor portal_cursor{portals};
+    while (!portal_cursor.done())
+    {
+        LevelPortal portal;
+        uint32_t vertex_count;
+        if (!portal_cursor.u16(portal.sector_front) || !portal_cursor.u16(portal.sector_back))
+        {
+            error = "truncated level portal record";
+            return false;
+        }
+        std::array<std::array<float, 3>, 6> vertices{};
+        for (auto& vertex : vertices)
+        {
+            for (float& coordinate : vertex)
+            {
+                if (!portal_cursor.f32(coordinate))
+                {
+                    error = "truncated level portal vertex data";
+                    return false;
+                }
+            }
+        }
+        if (!portal_cursor.u32(vertex_count) || vertex_count < 3 || vertex_count > vertices.size())
+        {
+            error = "invalid level portal vertex count";
+            return false;
+        }
+        for (size_t vertex = 0; vertex < vertex_count; ++vertex)
+            for (float coordinate : vertices[vertex])
+                if (!std::isfinite(coordinate))
+                {
+                    error = "invalid level portal vertex";
+                    return false;
+                }
+        portal.vertices.assign(vertices.begin(), vertices.begin() + vertex_count);
+        for (const auto& vertex : portal.vertices)
+            for (size_t axis = 0; axis < 3; ++axis)
+                portal.center[axis] += vertex[axis];
+        const float inverse_count = 1.f / static_cast<float>(vertex_count);
+        for (float& coordinate : portal.center)
+            coordinate *= inverse_count;
+        for (const auto& vertex : portal.vertices)
+        {
+            const float x = vertex[0] - portal.center[0];
+            const float y = vertex[1] - portal.center[1];
+            const float z = vertex[2] - portal.center[2];
+            portal.radius = std::max(portal.radius, std::sqrt(x * x + y * y + z * z));
+        }
+        if (!std::isfinite(portal.center[0]) || !std::isfinite(portal.center[1]) ||
+            !std::isfinite(portal.center[2]) || !std::isfinite(portal.radius))
+        {
+            error = "non-finite level portal bounds";
+            return false;
+        }
+        parsed_portals.push_back(std::move(portal));
+    }
+
+    std::vector<LevelSector> parsed_sectors;
+    Cursor sector_cursor{sectors};
+    while (!sector_cursor.done())
+    {
+        uint32_t sector_id, chunk_size;
+        LevelBytes sector_bytes;
+        if (!sector_cursor.u32(sector_id) || !sector_cursor.u32(chunk_size) ||
+            sector_id != parsed_sectors.size() || parsed_sectors.size() >= 65536 ||
+            !sector_cursor.take(chunk_size, sector_bytes))
+        {
+            error = "invalid level sector table";
+            return false;
+        }
+
+        LevelBytes portal_ids, root_bytes;
+        if (!chunk(sector_bytes, sector_portals_chunk, portal_ids) || portal_ids.size % 2 ||
+            !chunk(sector_bytes, sector_root_chunk, root_bytes) || root_bytes.size != sizeof(uint32_t))
+        {
+            error = "sector is missing portal links or its root visual";
+            return false;
+        }
+        LevelSector sector;
+        Cursor root_cursor{root_bytes};
+        if (!root_cursor.u32(sector.root) || sector.root >= result.visuals.size())
+        {
+            error = "sector references an invalid root visual";
+            return false;
+        }
+        Cursor links_cursor{portal_ids};
+        while (!links_cursor.done())
+        {
+            uint16_t portal_id;
+            if (!links_cursor.u16(portal_id) || portal_id >= parsed_portals.size())
+            {
+                error = "sector references an invalid portal";
+                return false;
+            }
+            sector.portals.push_back(portal_id);
+        }
+        parsed_sectors.push_back(std::move(sector));
+    }
+
+    for (size_t portal_id = 0; portal_id < parsed_portals.size(); ++portal_id)
+    {
+        const LevelPortal& portal = parsed_portals[portal_id];
+        if (portal.sector_front >= parsed_sectors.size() ||
+            portal.sector_back >= parsed_sectors.size())
+        {
+            error = "portal references an invalid sector";
+            return false;
+        }
+        for (uint32_t sector_id : {uint32_t(portal.sector_front), uint32_t(portal.sector_back)})
+        {
+            const auto& links = parsed_sectors[sector_id].portals;
+            if (std::find(links.begin(), links.end(), static_cast<uint16_t>(portal_id)) == links.end())
+            {
+                error = "portal is not linked from both of its sectors";
+                return false;
+            }
+        }
+    }
+    for (size_t sector_id = 0; sector_id < parsed_sectors.size(); ++sector_id)
+    {
+        for (uint16_t portal_id : parsed_sectors[sector_id].portals)
+        {
+            const LevelPortal& portal = parsed_portals[portal_id];
+            if (portal.sector_front != sector_id && portal.sector_back != sector_id)
+            {
+                error = "sector links a portal belonging to other sectors";
+                return false;
+            }
+        }
+    }
+
+    result.sectors = std::move(parsed_sectors);
+    result.portals = std::move(parsed_portals);
+    error.clear();
+    return true;
 }
 }

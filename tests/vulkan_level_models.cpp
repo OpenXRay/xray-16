@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <limits>
 #include <vector>
 
 using namespace xray::render::vulkan;
@@ -10,6 +11,19 @@ using Bytes = std::vector<uint8_t>;
 static void u32(Bytes& data, uint32_t value)
 {
     for (unsigned i = 0; i < 4; ++i) data.push_back(uint8_t(value >> (8 * i)));
+}
+
+static void u16(Bytes& data, uint16_t value)
+{
+    data.push_back(uint8_t(value));
+    data.push_back(uint8_t(value >> 8));
+}
+
+static void f32(Bytes& data, float value)
+{
+    uint32_t bits;
+    std::memcpy(&bits, &value, sizeof(bits));
+    u32(data, bits);
 }
 
 static void decl(Bytes& data, uint16_t offset, uint8_t type, uint8_t usage)
@@ -63,6 +77,44 @@ int main()
     assert(result.models[0].vertices.size() == 3 && result.models[0].vertices[2].position[0] == 2);
     assert(result.models[0].indices[2] == 2);
     assert(result.visuals.size() == 1 && result.roots.size() == 1 && result.roots[0] == 0);
+
+    // Level portal records contain storage for six points even when only a
+    // triangle or quad is active; unused point slots need not be initialized.
+    result.visuals.push_back(result.visuals[0]);
+    Bytes portal_data;
+    u16(portal_data, 0); u16(portal_data, 1);
+    const float portal_vertices[6][3] = {
+        {-1, -1, 0}, {1, -1, 0}, {1, 1, 0}, {-1, 1, 0},
+        {std::numeric_limits<float>::quiet_NaN(), 0, 0},
+        {std::numeric_limits<float>::quiet_NaN(), 0, 0}};
+    for (const auto& vertex : portal_vertices)
+        for (float coordinate : vertex)
+            f32(portal_data, coordinate);
+    u32(portal_data, 4);
+    Bytes sector0_links, sector1_links, sector0, sector1, sector_data;
+    u16(sector0_links, 0); u16(sector1_links, 0);
+    part(sector0, 1, sector0_links);
+    part(sector0, 2, Bytes(4));
+    part(sector1, 1, sector1_links);
+    Bytes sector1_root; u32(sector1_root, 1);
+    part(sector1, 2, sector1_root);
+    part(sector_data, 0, sector0);
+    part(sector_data, 1, sector1);
+    assert(parse_level_visibility(input(portal_data), input(sector_data), result, error));
+    assert(error.empty() && result.sectors.size() == 2 && result.portals.size() == 1);
+    assert(result.sectors[0].root == 0 && result.sectors[1].root == 1);
+    assert(result.portals[0].vertices.size() == 4 && result.portals[0].center[0] == 0 &&
+        result.portals[0].center[1] == 0 && result.portals[0].radius > 1.4f);
+    // Reject one-sided portal links atomically so the runtime can fail open.
+    Bytes invalid_sector_data, invalid_sector1;
+    part(invalid_sector1, 1, Bytes{});
+    Bytes invalid_root; u32(invalid_root, 1);
+    part(invalid_sector1, 2, invalid_root);
+    part(invalid_sector_data, 0, sector0);
+    part(invalid_sector_data, 1, invalid_sector1);
+    assert(!parse_level_visibility(input(portal_data), input(invalid_sector_data), result, error));
+    assert(result.sectors.size() == 2 && result.portals.size() == 1);
+
     // A linked hierarchy keeps stable visual IDs and draws its child once.
     Bytes hierarchy, links;
     header[1] = 1;

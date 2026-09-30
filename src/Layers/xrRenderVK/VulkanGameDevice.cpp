@@ -135,6 +135,14 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
 
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16])
 {
+    const auto duplicate = std::find_if(level_draws_.begin(), level_draws_.end(),
+        [index, &mvp](const LevelDraw& draw)
+        {
+            return draw.index == index && std::equal(draw.mvp.begin(), draw.mvp.end(), mvp);
+        });
+    if (duplicate != level_draws_.end())
+        return;
+
     LevelDraw draw;
     draw.index = index;
     std::copy_n(mvp, 16, draw.mvp.data());

@@ -46,12 +46,29 @@ struct LevelVisual
     std::vector<uint32_t> children;
 };
 
+struct LevelPortal
+{
+    uint16_t sector_front{};
+    uint16_t sector_back{};
+    std::vector<std::array<float, 3>> vertices;
+    std::array<float, 3> center{};
+    float radius{};
+};
+
+struct LevelSector
+{
+    uint32_t root{};
+    std::vector<uint16_t> portals;
+};
+
 struct LevelModelData
 {
     std::vector<LevelMaterial> materials;
     std::vector<LevelModel> models;
     std::vector<LevelVisual> visuals;
     std::vector<uint32_t> roots;
+    std::vector<LevelSector> sectors;
+    std::vector<LevelPortal> portals;
 };
 
 // A missing/unsupported format fails the entire load. This ensures that a
@@ -59,4 +76,6 @@ struct LevelModelData
 bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
     LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result,
     std::string& error);
+bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
+    LevelModelData& result, std::string& error);
 }

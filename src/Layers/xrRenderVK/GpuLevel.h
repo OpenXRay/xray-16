@@ -4,6 +4,7 @@
 #include "DeferredPass.h"
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
+#include "xrCore/_matrix.h"
 #include <memory>
 
 class IRenderVisual;
@@ -32,6 +33,9 @@ public:
     size_t visual_count() const { return visuals_.size(); }
     IRenderVisual* get_visual(size_t index) const;
     const LevelVisual* visual_node(size_t index) const;
+    bool visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
+        const Fvector& camera_position, std::vector<uint32_t>& roots) const;
+    void all_level_roots(std::vector<uint32_t>& roots) const;
     void destroy();
 
 private:
@@ -48,6 +52,8 @@ private:
     std::vector<Mesh> meshes_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint32_t> roots_;
+    std::vector<LevelSector> sectors_;
+    std::vector<LevelPortal> portals_;
     std::vector<std::unique_ptr<VulkanVisual>> visual_objects_;
 };
 }
