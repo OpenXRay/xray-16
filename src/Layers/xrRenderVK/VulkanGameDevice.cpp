@@ -257,6 +257,29 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     return true;
 }
 
+bool VulkanGameDevice::prepare_for_reset(std::string& error)
+{
+    if (!window_.device())
+    {
+        error = "Vulkan renderer reset requires a live device";
+        return false;
+    }
+    if (!window_.frame().wait_idle())
+    {
+        error = "could not wait for Vulkan device before renderer reset";
+        return false;
+    }
+
+    // A reset starts between frames. Drop commands accumulated for a frame
+    // that will no longer be submitted, while keeping device-owned UI buffers.
+    model_draws_.clear();
+    level_draws_.clear();
+    current_level_ = nullptr;
+    ui_.setup_states();
+    error.clear();
+    return true;
+}
+
 void VulkanGameDevice::destroy()
 {
     if (window_.device() && frame_dispatch_.device_wait_idle)

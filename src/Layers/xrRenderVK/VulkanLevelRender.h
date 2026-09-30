@@ -21,6 +21,8 @@ public:
         GameTextureFactory& textures, DeferredPass& pass, PFN_vkDeviceWaitIdle wait_idle);
     void level_Load(IReader* reader) override;
     void level_Unload() override;
+    void reset_begin() override;
+    void reset_end() override;
     IRenderVisual* getVisual(int index) override;
     void Create(SDL_Window* window, u32& width, u32& height,
         float& half_width, float& half_height) override;
@@ -54,6 +56,7 @@ private:
     VkExtent2D requested_drawable_{};
     std::unique_ptr<VulkanGameDevice> owned_game_device_;
     bool device_resources_ready_{};
+    bool reset_in_progress_{};
     bool reset_pending_{};
     bool app_suspended_{};
     bool recreate_surface_pending_{};

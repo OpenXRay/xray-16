@@ -23,6 +23,7 @@ public:
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error);
     bool recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface = false);
+    bool prepare_for_reset(std::string& error);
     bool wait_idle() { return window_.frame().wait_idle(); }
     void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16]);
     void queue_level_visual(uint32_t index, const float (&mvp)[16]);

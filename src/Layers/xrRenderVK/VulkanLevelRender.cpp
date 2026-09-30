@@ -58,6 +58,7 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*owned_game_device_);
     reset_pending_ = false;
+    reset_in_progress_ = false;
     app_suspended_ = false;
     recreate_surface_pending_ = false;
 }
@@ -82,6 +83,7 @@ void VulkanLevelRender::Destroy()
     window_ = nullptr;
     requested_drawable_ = {};
     reset_pending_ = false;
+    reset_in_progress_ = false;
     app_suspended_ = false;
     recreate_surface_pending_ = false;
     if (owned_game_device_)
@@ -102,11 +104,15 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
         return;
     }
 
+    if (!reset_in_progress_)
+        reset_begin();
+
     int drawable_width = 0, drawable_height = 0;
     SDL_Vulkan_GetDrawableSize(window, &drawable_width, &drawable_height);
     if (drawable_width <= 0 || drawable_height <= 0)
     {
         reset_pending_ = true;
+        reset_end();
         return;
     }
 
@@ -115,6 +121,7 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
             {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)}, error,
             recreate_surface_pending_))
     {
+        reset_end();
         xrDebug::Fatal(DEBUG_INFO, "Vulkan swapchain recreation failed: %s", error.c_str());
         return;
     }
@@ -127,6 +134,26 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
     requested_drawable_ = {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)};
     reset_pending_ = false;
     recreate_surface_pending_ = false;
+    reset_end();
+}
+
+void VulkanLevelRender::reset_begin()
+{
+    R_ASSERT2(game_device_ && !reset_in_progress_,
+        "Vulkan renderer reset_begin requires an idle initialized renderer");
+    std::string error;
+    if (!game_device_->prepare_for_reset(error))
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer reset preparation failed: %s", error.c_str());
+        return;
+    }
+    reset_in_progress_ = true;
+}
+
+void VulkanLevelRender::reset_end()
+{
+    R_ASSERT2(reset_in_progress_, "Vulkan renderer reset_end without reset_begin");
+    reset_in_progress_ = false;
 }
 
 DeviceState VulkanLevelRender::GetDeviceState()

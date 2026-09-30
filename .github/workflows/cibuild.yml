@@ -120,7 +120,9 @@ jobs:
 
   windows-vulkan-cmake:
     name: Windows CMake xrRenderVK (MSVC)
-    runs-on: windows-latest
+    # Keep this generator paired with its VS 2022 installation. windows-latest
+    # moved to the VS 2026 image, where the requested VS 2022 generator fails.
+    runs-on: windows-2022
     timeout-minutes: 35
     steps:
     - uses: actions/checkout@main
