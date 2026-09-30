@@ -279,7 +279,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         SanitizeString(UserName);
         SanitizeString(CompName);
 
-        auto is_usable_name = [](pcstr str) {
+        auto is_usable_name = [](pcstr str)
+        {
             if (!str || !str[0])
                 return false;
             for (pcstr p = str; *p; ++p)
