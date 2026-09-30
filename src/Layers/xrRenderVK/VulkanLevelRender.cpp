@@ -86,6 +86,9 @@ void VulkanLevelRender::Destroy()
     reset_in_progress_ = false;
     app_suspended_ = false;
     recreate_surface_pending_ = false;
+    frame_active_ = false;
+    clear_target_pending_ = false;
+    frame_clear_target_ = false;
     if (owned_game_device_)
     {
         owned_game_device_->destroy();
@@ -139,7 +142,7 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
 
 void VulkanLevelRender::reset_begin()
 {
-    R_ASSERT2(game_device_ && !reset_in_progress_,
+    R_ASSERT2(game_device_ && !reset_in_progress_ && !frame_active_,
         "Vulkan renderer reset_begin requires an idle initialized renderer");
     std::string error;
     if (!game_device_->prepare_for_reset(error))
@@ -228,6 +231,62 @@ void VulkanLevelRender::OnDeviceDestroy(bool)
     level_Unload();
     game_device_->ui().DestroyUIGeom();
     device_resources_ready_ = false;
+}
+
+void VulkanLevelRender::Begin()
+{
+    R_ASSERT2(game_device_ && !frame_active_,
+        "Vulkan renderer Begin requires an initialized idle frame");
+    game_device_->begin_frame();
+    frame_active_ = true;
+    frame_clear_target_ = clear_target_pending_;
+    clear_target_pending_ = false;
+}
+
+void VulkanLevelRender::Clear()
+{
+    R_ASSERT2(game_device_, "Vulkan renderer Clear requires an initialized device");
+    // GBufferTargets begins each frame with clear load operations for albedo,
+    // normal and depth, so this request is already part of the deferred pass.
+    // Match D3D's optional backbuffer clear using the engine's existing flag.
+    if (psDeviceFlags.test(rsClearBB))
+        ClearTarget();
+}
+
+void VulkanLevelRender::ClearTarget()
+{
+    R_ASSERT2(game_device_, "Vulkan renderer ClearTarget requires an initialized device");
+    if (frame_active_)
+        frame_clear_target_ = true;
+    else
+        clear_target_pending_ = true;
+}
+
+void VulkanLevelRender::End()
+{
+    R_ASSERT2(game_device_ && frame_active_,
+        "Vulkan renderer End requires a begun frame");
+    frame_active_ = false;
+
+    float mvp[16];
+    static_assert(sizeof(Device.mFullTransform) == sizeof(mvp));
+    std::memcpy(mvp, &Device.mFullTransform, sizeof(mvp));
+
+    // Until game sun/environment lighting is connected, use a stable ambient
+    // light so submitted albedo remains visible through the deferred pass.
+    const DeferredLight light{{0.0f, -1.0f, 0.0f, 0.2f},
+        {1.0f, 1.0f, 1.0f, 0.0f}};
+    FrameStatus status = FrameStatus::Presented;
+    std::string error;
+    const bool clear_target = frame_clear_target_;
+    frame_clear_target_ = false;
+    if (!game_device_->render(level_, mvp, light, status, error, clear_target))
+    {
+        Msg("! Vulkan frame recording/submission failed: %s", error.c_str());
+        return;
+    }
+    if (status == FrameStatus::RecreateRequired)
+        reset_pending_ = true;
 }
 
 void VulkanLevelRender::bind_level_device(VulkanGameDevice& resources)

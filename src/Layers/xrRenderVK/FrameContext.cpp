@@ -27,6 +27,7 @@ bool complete(const FrameDispatch& vk)
         vk.destroy_framebuffer && vk.create_command_pool && vk.destroy_command_pool && vk.allocate_command_buffers &&
         vk.free_command_buffers &&
         vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
+        vk.cmd_clear_attachments &&
         vk.cmd_copy_image_to_buffer && vk.cmd_pipeline_barrier &&
         vk.end_command_buffer && vk.create_semaphore && vk.destroy_semaphore && vk.create_fence && vk.destroy_fence &&
         vk.wait_for_fences && vk.reset_fences && vk.queue_submit && vk.device_wait_idle;
@@ -109,6 +110,7 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     XRAY_LOAD_DEVICE(begin_command_buffer, "vkBeginCommandBuffer");
     XRAY_LOAD_DEVICE(cmd_begin_render_pass, "vkCmdBeginRenderPass");
     XRAY_LOAD_DEVICE(cmd_end_render_pass, "vkCmdEndRenderPass");
+    XRAY_LOAD_DEVICE(cmd_clear_attachments, "vkCmdClearAttachments");
     XRAY_LOAD_DEVICE(cmd_copy_image_to_buffer, "vkCmdCopyImageToBuffer");
     XRAY_LOAD_DEVICE(cmd_pipeline_barrier, "vkCmdPipelineBarrier");
     XRAY_LOAD_DEVICE(end_command_buffer, "vkEndCommandBuffer");
@@ -627,7 +629,7 @@ bool FrameContext::create_sync(std::string& error)
 
 bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
     FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data,
-    FramePrepassRecorder prepass, void* prepass_data)
+    FramePrepassRecorder prepass, void* prepass_data, bool clear_target)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -717,6 +719,17 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     render_info.clearValueCount = m_depth_format != VK_FORMAT_UNDEFINED ? 2 : 1;
     render_info.pClearValues = clear_values;
     m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+    if (clear_target)
+    {
+        VkClearAttachment attachment{};
+        attachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        attachment.colorAttachment = 0;
+        attachment.clearValue.color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+        VkClearRect rect{};
+        rect.rect.extent = m_extent;
+        rect.layerCount = 1;
+        m_vk.cmd_clear_attachments(command, 1, &attachment, 1, &rect);
+    }
     if (recorder)
     {
         const FrameRecordingContext frame{command, m_render_pass, m_framebuffers[image_index], m_extent,

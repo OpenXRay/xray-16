@@ -129,7 +129,7 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install vcpkg SDL2
+    - name: Install vcpkg dependencies
       shell: pwsh
       run: |
         $env:VCPKG_ROOT = Join-Path $env:RUNNER_TEMP "vcpkg"
@@ -137,7 +137,10 @@ jobs:
         if ($LASTEXITCODE -ne 0) { throw "Could not clone vcpkg." }
         & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat" -disableMetrics
         if ($LASTEXITCODE -ne 0) { throw "Could not bootstrap vcpkg." }
-        & "$env:VCPKG_ROOT\vcpkg.exe" install "sdl2[vulkan]:x64-windows"
+        & "$env:VCPKG_ROOT\vcpkg.exe" install `
+          "sdl2[vulkan]:x64-windows" "openal-soft:x64-windows" `
+          "libogg:x64-windows" "libvorbis:x64-windows" "libtheora:x64-windows" `
+          "lzo:x64-windows" "libjpeg-turbo:x64-windows"
         if ($LASTEXITCODE -ne 0) { throw "Could not install SDL2." }
         "VCPKG_ROOT=$env:VCPKG_ROOT" >> $env:GITHUB_ENV
 

@@ -32,6 +32,10 @@ public:
     void SetupStates() override;
     void OnDeviceCreate(pcstr shader_archive) override;
     void OnDeviceDestroy(bool keep_textures) override;
+    void Begin() override;
+    void Clear() override;
+    void End() override;
+    void ClearTarget() override;
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
     DeviceState GetDeviceState() override;
@@ -60,5 +64,8 @@ private:
     bool reset_pending_{};
     bool app_suspended_{};
     bool recreate_surface_pending_{};
+    bool frame_active_{};
+    bool clear_target_pending_{};
+    bool frame_clear_target_{};
 };
 }

@@ -15,7 +15,8 @@ public:
         FrameStatus& status, std::string& error,
         FrameRecorder ui = nullptr, void* ui_data = nullptr,
         FrameRecorder models = nullptr, void* models_data = nullptr,
-        FrameRecorder level_visuals = nullptr, void* level_data = nullptr);
+        FrameRecorder level_visuals = nullptr, void* level_data = nullptr,
+        bool clear_target = false);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);

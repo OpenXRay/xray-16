@@ -78,6 +78,7 @@ target_include_directories(xrRenderVK
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/Externals"
+    "${CMAKE_SOURCE_DIR}/Externals/luabind"
     "${CMAKE_SOURCE_DIR}/Externals/tracy/public"
     "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${XRAY_GLI_INCLUDE_DIR}"

@@ -150,6 +150,16 @@ if (ANDROID)
         "--target=${CMAKE_C_COMPILER_TARGET}"
         "--sysroot=${CMAKE_SYSROOT}"
     )
+elseif (MSVC)
+    # The probe compiler is clang.exe, not clang-cl.exe. Give it a GNU-style
+    # target triple instead of passing the MSVC /DWIN32 flags from CMAKE_C_FLAGS.
+    if (CMAKE_GENERATOR_PLATFORM MATCHES "^(Win32|x86|i686)$" OR CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(LUAJIT_TARGET_FLAGS "--target=i686-pc-windows-msvc")
+    elseif (CMAKE_GENERATOR_PLATFORM MATCHES "^(ARM64|arm64|aarch64)$")
+        set(LUAJIT_TARGET_FLAGS "--target=aarch64-pc-windows-msvc")
+    else()
+        set(LUAJIT_TARGET_FLAGS "--target=x86_64-pc-windows-msvc")
+    endif()
 endif()
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
@@ -158,8 +168,20 @@ if (LUAJIT_ARCH_PROBE_COMPILER STREQUAL "")
     set(LUAJIT_ARCH_PROBE_COMPILER "${CMAKE_C_COMPILER}")
 endif()
 
+if (MSVC)
+    if (LUAJIT_ARCH_PROBE_COMPILER STREQUAL "${CMAKE_C_COMPILER}")
+        message(FATAL_ERROR "Set LUAJIT_ARCH_PROBE_COMPILER to a GNU-compatible clang.exe for MSVC builds")
+    endif()
+    # MSVC's /D, /W and /EH flags are not valid arguments to clang.exe.
+    # The target triple supplies the platform and architecture built-ins;
+    # retain only the LuaJIT feature defines needed by the generated headers.
+    set(LUAJIT_ARCH_PROBE_FLAGS ${LUAJIT_TARGET_FLAGS} ${XCFLAGS})
+else()
+    set(LUAJIT_ARCH_PROBE_FLAGS ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS})
+endif()
+
 execute_process(
-    COMMAND "${LUAJIT_ARCH_PROBE_COMPILER}" ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM
+    COMMAND "${LUAJIT_ARCH_PROBE_COMPILER}" ${LUAJIT_ARCH_PROBE_FLAGS} -E lj_arch.h -dM
     WORKING_DIRECTORY "${LUAJIT_DIR}"
     OUTPUT_VARIABLE TESTARCH_OUTPUT
     ERROR_VARIABLE TESTARCH_ERROR

@@ -175,8 +175,16 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
     }
 }
 
+void VulkanGameDevice::begin_frame()
+{
+    model_draws_.clear();
+    level_draws_.clear();
+    current_level_ = nullptr;
+    ui_.reset_frame();
+}
+
 bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
-    const DeferredLight& light, FrameStatus& status, std::string& error)
+    const DeferredLight& light, FrameStatus& status, std::string& error, bool clear_target)
 {
     ui_recorded_ = true;
     models_recorded_ = true;
@@ -186,13 +194,14 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     model_error_.clear();
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_models, this,
-            scene_visibility_ ? record_level_visuals : nullptr, this))
+            scene_visibility_ ? record_level_visuals : nullptr, this, clear_target))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
         model_draws_.clear();
         level_draws_.clear();
         current_level_ = nullptr;
+        ui_.reset_frame();
         return false;
     }
     if (status == FrameStatus::RecreateRequired)
@@ -200,6 +209,9 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     model_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
+    // A successful submission consumes every CPU-side command, even when an
+    // individual recorder reported malformed input after recording began.
+    ui_.reset_frame();
     if (!level_recorded_)
     {
         error = "Vulkan level visual recording failed";
@@ -215,9 +227,6 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         error = ui_error_;
         return false;
     }
-    // The per-frame GPU buffers own the submitted vertices. Clear the CPU
-    // command list so the next game frame cannot replay stale UI primitives.
-    ui_.reset_frame();
     return true;
 }
 

@@ -39,6 +39,7 @@ struct FrameDispatch
     PFN_vkBeginCommandBuffer begin_command_buffer{};
     PFN_vkCmdBeginRenderPass cmd_begin_render_pass{};
     PFN_vkCmdEndRenderPass cmd_end_render_pass{};
+    PFN_vkCmdClearAttachments cmd_clear_attachments{};
     PFN_vkCmdCopyImageToBuffer cmd_copy_image_to_buffer{};
     PFN_vkCmdPipelineBarrier cmd_pipeline_barrier{};
     PFN_vkEndCommandBuffer end_command_buffer{};
@@ -100,7 +101,8 @@ public:
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
-        FramePrepassRecorder prepass = nullptr, void* prepass_data = nullptr);
+        FramePrepassRecorder prepass = nullptr, void* prepass_data = nullptr,
+        bool clear_target = false); // Clear the swapchain color target after its render pass begins.
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }

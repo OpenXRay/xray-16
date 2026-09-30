@@ -35,7 +35,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
     FrameStatus& status, std::string& error, FrameRecorder ui, void* ui_data,
     FrameRecorder models, void* models_data,
-    FrameRecorder level_visuals, void* level_data)
+    FrameRecorder level_visuals, void* level_data, bool clear_target)
 {
     targets_ = &targets;
     level_ = &level;
@@ -51,7 +51,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     recorded_ = true;
     const VkClearColorValue clear{{0, 0, 0, 1}};
     if (!frame.render_frame(clear, status, error, lighting, this,
-            nullptr, nullptr, geometry, this)) return false;
+            nullptr, nullptr, geometry, this, clear_target)) return false;
     if (!recorded_)
     {
         error = "Vulkan deferred level command recording failed";
