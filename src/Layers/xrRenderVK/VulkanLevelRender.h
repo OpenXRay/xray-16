@@ -3,6 +3,8 @@
 #include "xrEngine/Render.h"
 #include "GpuLevel.h"
 
+#include <memory>
+
 namespace xray::render::vulkan
 {
 class VulkanGameDevice;
@@ -12,6 +14,7 @@ class VulkanGameDevice;
 class VulkanLevelRender : public IRender
 {
 public:
+    ~VulkanLevelRender() override;
     void bind_level_device(VulkanGameDevice& resources);
     void bind_level_device(VkDevice device, VkQueue queue, VkCommandPool pool,
         const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
@@ -19,6 +22,9 @@ public:
     void level_Load(IReader* reader) override;
     void level_Unload() override;
     IRenderVisual* getVisual(int index) override;
+    void Create(SDL_Window* window, u32& width, u32& height,
+        float& half_width, float& half_height) override;
+    void Destroy() override;
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
 
@@ -37,5 +43,6 @@ private:
     DeferredPass* pass_{};
     PFN_vkDeviceWaitIdle wait_idle_{};
     VulkanGameDevice* game_device_{};
+    std::unique_ptr<VulkanGameDevice> owned_game_device_;
 };
 }

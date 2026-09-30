@@ -4,10 +4,76 @@
 #include "VulkanVisual.h"
 #include "xrEngine/device.h"
 
+#include <SDL.h>
+
 #include <cstring>
 
 namespace xray::render::vulkan
 {
+VulkanLevelRender::~VulkanLevelRender()
+{
+    Destroy();
+}
+
+void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
+    float& half_width, float& half_height)
+{
+    if (!window)
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer requires the engine SDL window");
+        return;
+    }
+    if (!(SDL_GetWindowFlags(window) & SDL_WINDOW_VULKAN))
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer requires SDL_WINDOW_VULKAN on the engine window");
+        return;
+    }
+
+    Destroy();
+    auto device = std::make_unique<VulkanGameDevice>();
+    std::string error;
+    if (!device->initialize(window, {width, height}, error))
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan device creation failed: %s", error.c_str());
+        return;
+    }
+
+    const VkExtent2D extent = device->window().frame().extent();
+    if (!extent.width || !extent.height)
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan swapchain has an empty extent");
+        return;
+    }
+    width = extent.width;
+    height = extent.height;
+    half_width = static_cast<float>(width) * 0.5f;
+    half_height = static_cast<float>(height) * 0.5f;
+
+    owned_game_device_ = std::move(device);
+    bind_level_device(*owned_game_device_);
+}
+
+void VulkanLevelRender::Destroy()
+{
+    level_Unload();
+    if (game_device_)
+        game_device_->use_scene_visibility(false);
+    game_device_ = nullptr;
+    device_ = VK_NULL_HANDLE;
+    queue_ = VK_NULL_HANDLE;
+    pool_ = VK_NULL_HANDLE;
+    memory_ = {};
+    upload_ = {};
+    textures_ = nullptr;
+    pass_ = nullptr;
+    wait_idle_ = nullptr;
+    if (owned_game_device_)
+    {
+        owned_game_device_->destroy();
+        owned_game_device_.reset();
+    }
+}
+
 void VulkanLevelRender::bind_level_device(VulkanGameDevice& resources)
 {
     auto& window = resources.window();
