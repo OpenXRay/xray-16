@@ -16,6 +16,7 @@ class VulkanUIRender final : public IUIRender
 public:
     void configure(VkDevice device, const VkPhysicalDeviceMemoryProperties& memory,
         const BufferResourceDispatch& dispatch, const ScenePass& pass);
+    void setup_states();
     void reset_frame();
     bool record(const FrameRecordingContext& frame, std::string& error);
 

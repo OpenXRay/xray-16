@@ -55,7 +55,10 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
 
 void VulkanLevelRender::Destroy()
 {
-    level_Unload();
+    if (device_resources_ready_)
+        OnDeviceDestroy(false);
+    else
+        level_Unload();
     if (game_device_)
         game_device_->use_scene_visibility(false);
     game_device_ = nullptr;
@@ -72,6 +75,39 @@ void VulkanLevelRender::Destroy()
         owned_game_device_->destroy();
         owned_game_device_.reset();
     }
+}
+
+void VulkanLevelRender::SetupStates()
+{
+    R_ASSERT2(game_device_ && game_device_->window().device(),
+        "Vulkan renderer state setup requires a created Vulkan device");
+    game_device_->ui().setup_states();
+}
+
+void VulkanLevelRender::OnDeviceCreate(pcstr)
+{
+    R_ASSERT2(game_device_ && game_device_->window().device(),
+        "Vulkan renderer resources require a created Vulkan device");
+    if (device_resources_ready_)
+        return;
+
+    game_device_->ui().CreateUIGeom();
+    device_resources_ready_ = true;
+}
+
+void VulkanLevelRender::OnDeviceDestroy(bool)
+{
+    if (!game_device_)
+    {
+        level_Unload();
+        device_resources_ready_ = false;
+        return;
+    }
+
+    // level_Unload waits for submitted work before dropping level buffers.
+    level_Unload();
+    game_device_->ui().DestroyUIGeom();
+    device_resources_ready_ = false;
 }
 
 void VulkanLevelRender::bind_level_device(VulkanGameDevice& resources)

@@ -26,6 +26,17 @@ void VulkanUIRender::reset_frame()
     batches_.clear();
 }
 
+void VulkanUIRender::setup_states()
+{
+    R_ASSERT2(primitive_ == ptNone, "Vulkan UI state reset with an unfinished primitive");
+    reset_frame();
+    texture_ = VK_NULL_HANDLE;
+    scissor_ = {};
+    has_scissor_ = false;
+    alpha_ref_ = 0;
+    cull_ = cmNONE;
+}
+
 bool VulkanUIRender::ensure(BufferResource& buffer, VkDeviceSize bytes,
     VkBufferUsageFlags usage, std::string& error)
 {
@@ -64,7 +75,7 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
     return true;
 }
 
-void VulkanUIRender::CreateUIGeom() { reset_frame(); }
+void VulkanUIRender::CreateUIGeom() { setup_states(); }
 
 void VulkanUIRender::DestroyUIGeom()
 {

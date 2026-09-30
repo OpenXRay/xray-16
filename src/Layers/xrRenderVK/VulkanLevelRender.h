@@ -25,6 +25,9 @@ public:
     void Create(SDL_Window* window, u32& width, u32& height,
         float& half_width, float& half_height) override;
     void Destroy() override;
+    void SetupStates() override;
+    void OnDeviceCreate(pcstr shader_archive) override;
+    void OnDeviceDestroy(bool keep_textures) override;
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
 
@@ -44,5 +47,6 @@ private:
     PFN_vkDeviceWaitIdle wait_idle_{};
     VulkanGameDevice* game_device_{};
     std::unique_ptr<VulkanGameDevice> owned_game_device_;
+    bool device_resources_ready_{};
 };
 }
