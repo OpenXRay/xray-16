@@ -1,5 +1,11 @@
 add_library(xrPhysics)
 
+if (XRAY_GAMEPLAY_BENCHMARK)
+    target_sources(xrPhysics PRIVATE GameplayBenchmark.cpp GameplayBenchmark.h)
+    target_compile_definitions(xrPhysics PRIVATE XRAY_GAMEPLAY_BENCHMARK
+        $<$<BOOL:${XRAY_USE_JOLT_CDB}>:XRAY_BENCHMARK_JOLT_CDB>)
+endif()
+
 if (XRAY_USE_JOLT_PHYSICS)
     target_sources(xrPhysics PRIVATE JoltDynamicsWorld.cpp JoltDynamicsWorld.h)
     target_link_libraries(xrPhysics PRIVATE Jolt)

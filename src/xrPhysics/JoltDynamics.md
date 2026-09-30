@@ -88,6 +88,9 @@ also exercised. See [validation notes](tests/Validation.md) for details.
 
 ## Remaining work for #2139
 
+For performance measurements, see the [in-game benchmark procedure](tests/GameplayBenchmark.md)
+and [initial results](tests/GameplayBenchmarkResults.md).
+
 1. Replace dummy bodies and legacy collision generation with real Jolt shapes,
    including level triangles, compound shells and character volumes. Carry
    triangle material identity, collision filtering and callbacks into Jolt

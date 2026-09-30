@@ -9,6 +9,7 @@ param(
     [string]$CMake = 'cmake',
     [string]$NuGet = 'nuget',
     [switch]$Benchmark,
+    [switch]$GameplayBenchmark,
     [ValidateRange(1, 64)]
     [int]$Jobs = 4
 )
@@ -67,10 +68,12 @@ try {
 
         $jolt = if ($selectedBackend -eq 'Jolt') { 'ON' } else { 'OFF' }
         $joltDynamics = if ($Dynamics -eq 'Jolt') { 'ON' } else { 'OFF' }
+        $gameplayCapture = if ($GameplayBenchmark) { 'ON' } else { 'OFF' }
         Invoke-Logged $cmakeExe @('-S', 'misc/windows/collision', '-B', $buildDir,
             '-G', 'Visual Studio 17 2022', '-A', 'x64', "-DCMAKE_GENERATOR_INSTANCE=$vsPath",
             "-DXRAY_NATIVE_CONFIGURATION=$Configuration", "-DXRAY_USE_JOLT_CDB=$jolt",
-            "-DXRAY_USE_JOLT_PHYSICS=$joltDynamics", '-DXRAY_BUILD_PHYSICS_TESTS=ON') "$selectedBackend-configure"
+            "-DXRAY_USE_JOLT_PHYSICS=$joltDynamics", '-DXRAY_BUILD_PHYSICS_TESTS=ON',
+            "-DXRAY_GAMEPLAY_BENCHMARK=$gameplayCapture") "$selectedBackend-configure"
         Invoke-Logged $cmakeExe @('--build', $buildDir, '--config', $Configuration,
             '--parallel', "$Jobs") "$selectedBackend-build"
         Invoke-Logged $ctestExe @('--test-dir', $buildDir, '-C', $Configuration,
@@ -81,6 +84,7 @@ try {
         [ordered]@{
             backend = $selectedBackend
             dynamics = $Dynamics
+            gameplay_capture = [bool]$GameplayBenchmark
             configuration = $Configuration
             source_commit = $revision
             # Local edits can affect this build even when HEAD is unchanged.

@@ -1,6 +1,9 @@
 #include "StdAfx.h"
 
 #include "PHWorld.h"
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+#include "GameplayBenchmark.h"
+#endif
 #ifdef XRAY_USE_JOLT_PHYSICS
 #include "JoltDynamicsWorld.h"
 #endif
@@ -165,6 +168,9 @@ dVector3 center			=	{level_center.x,0.f,level_center.z};
     Msg("* Physics dynamics backend: Jolt (legacy contact/joint bridge)");
 #endif
     ContactGroup = dJointGroupCreate(0);
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    m_benchmark = xr_new<GameplayBenchmark>();
+#endif
     dWorldSetGravity(phWorld, 0, -Gravity(), 0); //-2.f*9.81f
     Mesh.Create(0, phWorld);
 #ifdef PH_PLAIN
@@ -199,6 +205,9 @@ void CPHWorld::Destroy()
     xr_delete(m_dynamics);
 #endif
     r_spatial.clear();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    xr_delete(m_benchmark);
+#endif
     xr_delete(m_commander);
     Mesh.Destroy();
 #ifdef PH_PLAIN
@@ -238,6 +247,9 @@ void CPHWorld::OnFrame()
 {
     ZoneScoped;
     stats.FrameStart();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    m_benchmark->Frame();
+#endif
 // Msg									("------------- physics: %d / %d",u32(Device.dwFrame),u32(m_steps_num));
 //calculate the flight of bullets
 /*
@@ -276,6 +288,13 @@ void CPHWorld::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 static u32 start_time = 0;
 void CPHWorld::Step()
 {
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const bool capturing = m_benchmark->Active();
+    if (capturing)
+        m_benchmark->MaintainWorkload(fixed_step);
+    GameplayBenchmark::StepSample sample{};
+    const auto captureStart = capturing ? GameplayBenchmark::Clock::now() : GameplayBenchmark::Clock::time_point{};
+#endif
 #ifdef DEBUG
     debug_output().dbg_reused_queries_per_step() = 0;
     debug_output().dbg_new_queries_per_step() = 0;
@@ -301,6 +320,9 @@ void CPHWorld::Step()
 
     ++m_steps_num;
     ++m_steps_short_num;
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCollisionStart = capturing ? GameplayBenchmark::Clock::now() : captureStart;
+#endif
     stats.Collision.Begin();
 
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
@@ -317,6 +339,9 @@ void CPHWorld::Step()
     }
 
     stats.Collision.End();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCollisionEnd = capturing ? GameplayBenchmark::Clock::now() : captureStart;
+#endif
 
 #ifdef DEBUG
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
@@ -352,6 +377,9 @@ void CPHWorld::Step()
     }
 
     stats.Core.Begin();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCoreStart = capturing ? GameplayBenchmark::Clock::now() : captureStart;
+#endif
 
 #ifdef DEBUG
     debug_output().dbg_bodies_num() = 0;
@@ -383,6 +411,14 @@ void CPHWorld::Step()
 #ifdef DEBUG
         debug_output().DBG_ObjBeforeStep(obj);
 #endif
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+        if (capturing && obj->Island().IsActive())
+        {
+            ++sample.islands;
+            sample.bodies += obj->Island().nb;
+            sample.joints += obj->Island().nj;
+        }
+#endif
 #ifdef XRAY_USE_JOLT_PHYSICS
         if (obj->Island().IsActive())
             active_islands.push_back(&obj->Island());
@@ -405,6 +441,9 @@ void CPHWorld::Step()
 #endif
 #endif
     stats.Core.End();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCoreEnd = capturing ? GameplayBenchmark::Clock::now() : captureStart;
+#endif
 
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
@@ -435,6 +474,10 @@ void CPHWorld::Step()
 #ifdef DEBUG
     debug_output().dbg_contacts_num() = ContactGroup->num;
 #endif
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    if (capturing)
+        sample.contacts = ContactGroup->num;
+#endif
     dJointGroupEmpty(ContactGroup); // this is to be called after PhDataUpdate!!!-the order is critical!!!
     ContactFeedBacks.empty();
     ContactEffectors.empty();
@@ -444,6 +487,17 @@ void CPHWorld::Step()
         physics_step_time_callback(start_time, start_time + u32(fixed_step * 1000));
         start_time += u32(fixed_step * 1000);
     };
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    if (capturing)
+    {
+        sample.step = m_steps_num;
+        sample.dt = fixed_step;
+        sample.total = GameplayBenchmark::Milliseconds(GameplayBenchmark::Clock::now() - captureStart);
+        sample.collision = GameplayBenchmark::Milliseconds(captureCollisionEnd - captureCollisionStart);
+        sample.solver = GameplayBenchmark::Milliseconds(captureCoreEnd - captureCoreStart);
+        m_benchmark->Record(sample);
+    }
+#endif
 }
 
 void CPHWorld::StepTouch()
