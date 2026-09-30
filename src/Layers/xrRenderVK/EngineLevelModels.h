@@ -2,6 +2,7 @@
 
 #include "LevelModels.h"
 #include "VisualCatalog.h"
+#include "ModelGeometry.h"
 
 class IReader;
 
@@ -12,4 +13,6 @@ namespace xray::render::vulkan
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error);
 bool load_engine_visual_catalog(IReader& level, std::vector<VisualRecord>& result, std::string& error);
 bool load_engine_model_visual(const char* name, VisualRecord& result, std::string& error);
+bool load_engine_model_geometry(const char* name, IReader* source,
+    ModelGeometry& result, std::string& error);
 }

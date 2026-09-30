@@ -27,10 +27,14 @@ target_sources(xrRenderVK PRIVATE
     GBufferTargets.h
     GpuLevel.cpp
     GpuLevel.h
+    GpuModel.cpp
+    GpuModel.h
     ImageStateTracker.cpp
     ImageStateTracker.h
     LevelModels.cpp
     LevelModels.h
+    ModelGeometry.cpp
+    ModelGeometry.h
     ScreenCopyPass.cpp
     ScreenCopyPass.h
     ScenePass.cpp

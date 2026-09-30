@@ -49,6 +49,19 @@ bool load_engine_model_visual(const char* name, VisualRecord& result, std::strin
     return loaded;
 }
 
+bool load_engine_model_geometry(const char* name, IReader* source,
+    ModelGeometry& result, std::string& error)
+{
+    VisualRecord visual;
+    if (source)
+    {
+        if (!parse_ogf_visual({static_cast<const uint8_t*>(source->pointer()),
+                source->length()}, visual, error)) return false;
+    }
+    else if (!load_engine_model_visual(name, visual, error)) return false;
+    return decode_model_geometry(visual, result, error);
+}
+
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error)
 {
     IReader* shaders = level.open_chunk(fsL_SHADERS);

@@ -13,7 +13,8 @@ public:
     bool render(FrameContext& frame, GBufferTargets& targets, const GpuLevel& level,
         const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
         FrameStatus& status, std::string& error,
-        FrameRecorder ui = nullptr, void* ui_data = nullptr);
+        FrameRecorder ui = nullptr, void* ui_data = nullptr,
+        FrameRecorder models = nullptr, void* models_data = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
@@ -25,6 +26,8 @@ private:
     DeferredLight light_{};
     FrameRecorder ui_{};
     void* ui_data_{};
+    FrameRecorder models_{};
+    void* models_data_{};
     bool recorded_{};
 };
 }

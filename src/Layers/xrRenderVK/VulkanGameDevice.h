@@ -6,7 +6,9 @@
 #include "VulkanUIRender.h"
 #include "VulkanUIShader.h"
 #include "VulkanWindowDevice.h"
+#include "GpuModel.h"
 
+#include <array>
 #include <memory>
 
 namespace xray::render::vulkan
@@ -19,6 +21,7 @@ public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error);
+    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16]);
     void destroy();
     ~VulkanGameDevice() { destroy(); }
 
@@ -35,6 +38,13 @@ public:
 
 private:
     static void record_ui(const FrameRecordingContext& frame, void* user);
+    static void record_models(const FrameRecordingContext& frame, void* user);
+    struct ModelDraw
+    {
+        GpuModel* model{};
+        IKinematics* skeleton{};
+        std::array<float, 16> mvp{};
+    };
     VulkanWindowDevice window_;
     FrameDispatch frame_dispatch_{};
     TextureUploadDispatch texture_dispatch_{};
@@ -47,5 +57,8 @@ private:
     DeferredFrame frame_;
     bool ui_recorded_{true};
     std::string ui_error_;
+    std::vector<ModelDraw> model_draws_;
+    bool models_recorded_{true};
+    std::string model_error_;
 };
 }

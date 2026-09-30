@@ -77,6 +77,14 @@ compatibility guarantee for gameplay.
 
 ## Not implemented
 
+The Vulkan model geometry path now decodes standalone OGF static/progressive
+meshes and skeleton child meshes with 1–4 bone weights. `GpuModel` owns
+per-frame vertex buffers, can skin from an existing `IKinematics` pose and
+can be queued into the deferred geometry pass. This does not yet make model
+creation available through the game's `IRender::model_Create`: the concrete
+`IRender` model pool, skeletal object/animation lifetime and scene submission
+are still missing. Do not enable `renderer_vulkan` on this basis.
+
 - runtime compilation, shader permutation coverage and reflection for the existing HLSL shaders;
 - descriptor layouts and descriptor allocation for engine resources;
 - graphics and compute pipelines for gameplay passes;

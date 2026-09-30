@@ -3,6 +3,8 @@
 #include "SceneShaders.h"
 #include "ShaderModule.h"
 
+#include <algorithm>
+
 namespace xray::render::vulkan
 {
 namespace
@@ -119,13 +121,54 @@ void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
 }
 
+void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
+    const float (&mvp)[16])
+{
+    ModelDraw draw;
+    draw.model = &model;
+    draw.skeleton = skeleton;
+    std::copy_n(mvp, 16, draw.mvp.data());
+    model_draws_.push_back(draw);
+}
+
+void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    for (auto& draw : owner.model_draws_)
+    {
+        float mvp[16];
+        std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
+        if (draw.skeleton ?
+                !draw.model->record_animated(frame, owner.deferred_, mvp,
+                    *draw.skeleton, owner.model_error_) :
+                !draw.model->record(frame, owner.deferred_, mvp,
+                    nullptr, 0, owner.model_error_))
+        {
+            owner.models_recorded_ = false;
+            return;
+        }
+    }
+}
+
 bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     const DeferredLight& light, FrameStatus& status, std::string& error)
 {
     ui_recorded_ = true;
+    models_recorded_ = true;
     ui_error_.clear();
+    model_error_.clear();
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
-            light, status, error, record_ui, this)) return false;
+            light, status, error, record_ui, this, record_models, this))
+    {
+        model_draws_.clear();
+        return false;
+    }
+    model_draws_.clear();
+    if (!models_recorded_)
+    {
+        error = model_error_;
+        return false;
+    }
     if (!ui_recorded_)
     {
         error = ui_error_;
@@ -142,6 +185,7 @@ void VulkanGameDevice::destroy()
     if (window_.device() && frame_dispatch_.device_wait_idle)
         frame_dispatch_.device_wait_idle(window_.device());
     ui_.DestroyUIGeom();
+    model_draws_.clear();
     textures_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();
