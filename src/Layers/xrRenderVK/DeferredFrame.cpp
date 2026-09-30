@@ -15,11 +15,14 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
     }
     float transform[16];
     std::memcpy(transform, context.mvp_, sizeof(transform));
-    if (context.level_visuals_)
-        context.level_visuals_(geometry_frame, context.level_data_);
-    else
-        context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform);
-    if (context.models_) context.models_(geometry_frame, context.models_data_);
+    if (context.render_world_)
+    {
+        if (context.level_visuals_)
+            context.level_visuals_(geometry_frame, context.level_data_);
+        else
+            context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform);
+        if (context.models_) context.models_(geometry_frame, context.models_data_);
+    }
     context.targets_->end(frame.command_buffer);
 }
 
@@ -35,7 +38,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
     FrameStatus& status, std::string& error, FrameRecorder ui, void* ui_data,
     FrameRecorder models, void* models_data,
-    FrameRecorder level_visuals, void* level_data, bool clear_target)
+    FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target)
 {
     targets_ = &targets;
     level_ = &level;
@@ -48,6 +51,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     models_data_ = models_data;
     level_visuals_ = level_visuals;
     level_data_ = level_data;
+    render_world_ = render_world;
     recorded_ = true;
     const VkClearColorValue clear{{0, 0, 0, 1}};
     if (!frame.render_frame(clear, status, error, lighting, this,

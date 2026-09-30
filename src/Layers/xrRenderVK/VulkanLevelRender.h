@@ -33,6 +33,9 @@ public:
     void OnDeviceCreate(pcstr shader_archive) override;
     void OnDeviceDestroy(bool keep_textures) override;
     void Begin() override;
+    void Calculate() override;
+    void Render() override;
+    void RenderMenu() override;
     void Clear() override;
     void End() override;
     void ClearTarget() override;
@@ -65,6 +68,8 @@ private:
     bool app_suspended_{};
     bool recreate_surface_pending_{};
     bool frame_active_{};
+    bool world_calculated_{};
+    bool world_rendered_{};
     bool clear_target_pending_{};
     bool frame_clear_target_{};
 };

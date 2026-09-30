@@ -3,6 +3,7 @@
 #include "VulkanGameDevice.h"
 #include "VulkanVisual.h"
 #include "xrEngine/device.h"
+#include "xrEngine/IGame_Persistent.h"
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -87,6 +88,8 @@ void VulkanLevelRender::Destroy()
     app_suspended_ = false;
     recreate_surface_pending_ = false;
     frame_active_ = false;
+    world_calculated_ = false;
+    world_rendered_ = false;
     clear_target_pending_ = false;
     frame_clear_target_ = false;
     if (owned_game_device_)
@@ -239,8 +242,41 @@ void VulkanLevelRender::Begin()
         "Vulkan renderer Begin requires an initialized idle frame");
     game_device_->begin_frame();
     frame_active_ = true;
+    world_calculated_ = false;
+    world_rendered_ = false;
     frame_clear_target_ = clear_target_pending_;
     clear_target_pending_ = false;
+}
+
+void VulkanLevelRender::Calculate()
+{
+    R_ASSERT2(game_device_ && frame_active_ && !world_calculated_,
+        "Vulkan renderer Calculate requires one active frame");
+    // Engine renderables are submitted after this scene-calculation phase;
+    // VulkanLevelRender::add_Visual stores their transforms for End().
+    world_calculated_ = true;
+}
+
+void VulkanLevelRender::Render()
+{
+    R_ASSERT2(game_device_ && frame_active_ && world_calculated_ && !world_rendered_,
+        "Vulkan renderer Render requires a calculated world in the active frame");
+    // Geometry is recorded into the deferred G-buffer at End(), after all
+    // engine callbacks have queued their transforms and before the UI pass.
+    world_rendered_ = true;
+}
+
+void VulkanLevelRender::RenderMenu()
+{
+    R_ASSERT2(game_device_ && frame_active_,
+        "Vulkan renderer RenderMenu requires an active frame");
+    if (!g_pGamePersistent)
+        return;
+
+    // Match the engine's menu callback order. Both callbacks enqueue ordinary
+    // UI batches; DeferredFrame records those batches after deferred lighting.
+    g_pGamePersistent->OnRenderPPUI_main();
+    g_pGamePersistent->OnRenderPPUI_PP();
 }
 
 void VulkanLevelRender::Clear()
@@ -266,6 +302,8 @@ void VulkanLevelRender::End()
 {
     R_ASSERT2(game_device_ && frame_active_,
         "Vulkan renderer End requires a begun frame");
+    R_ASSERT2(!world_calculated_ || world_rendered_,
+        "Vulkan renderer End was reached before the calculated world was rendered");
     frame_active_ = false;
 
     float mvp[16];
@@ -279,8 +317,11 @@ void VulkanLevelRender::End()
     FrameStatus status = FrameStatus::Presented;
     std::string error;
     const bool clear_target = frame_clear_target_;
+    const bool render_world = world_rendered_;
     frame_clear_target_ = false;
-    if (!game_device_->render(level_, mvp, light, status, error, clear_target))
+    world_calculated_ = false;
+    world_rendered_ = false;
+    if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target))
     {
         Msg("! Vulkan frame recording/submission failed: %s", error.c_str());
         return;

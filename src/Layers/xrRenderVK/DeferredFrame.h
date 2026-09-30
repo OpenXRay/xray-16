@@ -16,7 +16,7 @@ public:
         FrameRecorder ui = nullptr, void* ui_data = nullptr,
         FrameRecorder models = nullptr, void* models_data = nullptr,
         FrameRecorder level_visuals = nullptr, void* level_data = nullptr,
-        bool clear_target = false);
+        bool render_world = true, bool clear_target = false);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
@@ -32,6 +32,7 @@ private:
     void* models_data_{};
     FrameRecorder level_visuals_{};
     void* level_data_{};
+    bool render_world_{true};
     bool recorded_{};
 };
 }

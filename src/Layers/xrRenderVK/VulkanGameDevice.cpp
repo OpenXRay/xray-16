@@ -184,7 +184,8 @@ void VulkanGameDevice::begin_frame()
 }
 
 bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
-    const DeferredLight& light, FrameStatus& status, std::string& error, bool clear_target)
+    const DeferredLight& light, FrameStatus& status, std::string& error,
+    bool render_world, bool clear_target)
 {
     ui_recorded_ = true;
     models_recorded_ = true;
@@ -194,7 +195,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     model_error_.clear();
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_models, this,
-            scene_visibility_ ? record_level_visuals : nullptr, this, clear_target))
+            scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
