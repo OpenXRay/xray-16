@@ -1,16 +1,23 @@
 #include "StdAfx.h"
 #include "PHIsland.h"
 #include "Physics.h"
+#ifdef XRAY_USE_JOLT_PHYSICS
+#include "PHWorld.h"
+#endif
 #include "ph_valid_ode.h"
 void CPHIsland::Step(dReal step)
 {
     if (!m_flags.is_active())
         return;
     // dWorldStepFast1	(DWorld(),	fixed_step,	phIterations/*+Random.randI(0,phIterationCycle)*/);
+#ifdef XRAY_USE_JOLT_PHYSICS
+    inl_ph_world().StepIsland(*this, step);
+#else
     if (m_flags.is_exact_integration_prefeared() && nj < max_joint_allowed_for_exeact_integration)
         dWorldStep(DWorld(), fixed_step);
     else
         dWorldQuickStep(DWorld(), fixed_step);
+#endif
     // dWorldStep(DWorld(),fixed_step);
 }
 

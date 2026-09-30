@@ -3,6 +3,8 @@ param(
     [string]$Configuration = 'Debug',
     [ValidateSet('Both', 'OPCODE', 'Jolt')]
     [string]$Backend = 'Both',
+    [ValidateSet('ODE', 'Jolt')]
+    [string]$Dynamics = 'ODE',
     [string]$BuildRoot,
     [string]$CMake = 'cmake',
     [string]$NuGet = 'nuget',
@@ -18,7 +20,7 @@ if ($Benchmark -and $Configuration -ne 'Release') {
 $sourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 if (!$BuildRoot) { $BuildRoot = Join-Path $sourceRoot 'build/windows-collision' }
 $BuildRoot = [IO.Path]::GetFullPath($BuildRoot)
-$logRoot = Join-Path $BuildRoot "logs/$Configuration"
+$logRoot = Join-Path $BuildRoot "logs/$Dynamics/$Configuration"
 New-Item -ItemType Directory -Force -Path $logRoot | Out-Null
 
 $cmakeExe = (Get-Command $CMake -ErrorAction Stop).Source
@@ -52,7 +54,7 @@ try {
 
     $backends = if ($Backend -eq 'Both') { @('OPCODE', 'Jolt') } else { @($Backend) }
     foreach ($selectedBackend in $backends) {
-        $buildDir = Join-Path $BuildRoot "$selectedBackend/$Configuration"
+        $buildDir = Join-Path $BuildRoot "$selectedBackend/$Dynamics/$Configuration"
         $runtimeDir = Join-Path $buildDir "bin/$Configuration"
         New-Item -ItemType Directory -Force -Path $runtimeDir | Out-Null
 
@@ -64,18 +66,21 @@ try {
             Copy-Item -Destination $runtimeDir -Force
 
         $jolt = if ($selectedBackend -eq 'Jolt') { 'ON' } else { 'OFF' }
+        $joltDynamics = if ($Dynamics -eq 'Jolt') { 'ON' } else { 'OFF' }
         Invoke-Logged $cmakeExe @('-S', 'misc/windows/collision', '-B', $buildDir,
             '-G', 'Visual Studio 17 2022', '-A', 'x64', "-DCMAKE_GENERATOR_INSTANCE=$vsPath",
-            "-DXRAY_NATIVE_CONFIGURATION=$Configuration", "-DXRAY_USE_JOLT_CDB=$jolt") "$selectedBackend-configure"
+            "-DXRAY_NATIVE_CONFIGURATION=$Configuration", "-DXRAY_USE_JOLT_CDB=$jolt",
+            "-DXRAY_USE_JOLT_PHYSICS=$joltDynamics", '-DXRAY_BUILD_PHYSICS_TESTS=ON') "$selectedBackend-configure"
         Invoke-Logged $cmakeExe @('--build', $buildDir, '--config', $Configuration,
             '--parallel', "$Jobs") "$selectedBackend-build"
         Invoke-Logged $ctestExe @('--test-dir', $buildDir, '-C', $Configuration,
-            '--output-on-failure', '--no-tests=error', '-R', '^xrCDB\.') "$selectedBackend-tests"
+            '--output-on-failure', '--no-tests=error', '-R', '^xr(CDB|Physics)\.') "$selectedBackend-tests"
         Get-Content -LiteralPath (Join-Path $logRoot "$selectedBackend-tests.log") | Write-Host
         $revision = & git rev-parse HEAD
         if ($LASTEXITCODE -ne 0) { throw 'Could not identify the source revision.' }
         [ordered]@{
             backend = $selectedBackend
+            dynamics = $Dynamics
             configuration = $Configuration
             source_commit = $revision
             # Local edits can affect this build even when HEAD is unchanged.
