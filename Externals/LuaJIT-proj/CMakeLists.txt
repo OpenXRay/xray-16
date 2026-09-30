@@ -37,6 +37,8 @@ set(LUAJIT_HOST_C_COMPILER "" CACHE FILEPATH
     "C compiler for LuaJIT's build-time host tools")
 set(LUAJIT_HOST_EXTRA_LDFLAGS "" CACHE STRING
     "Extra linker flags for LuaJIT's build-time host tools")
+set(LUAJIT_ARCH_PROBE_COMPILER "" CACHE FILEPATH
+    "GNU-compatible C compiler used to inspect LuaJIT target architecture macros")
 
 option(LUA_USE_APICHECK "Turn on assertions for the Lua/C API to debug problems with lua_* calls. This is rather slow, use only while developing C libraries/embeddings" OFF)
 option(LUA_USE_ASSERT "Turn on assertions for the whole LuaJIT VM. This significantly slows down everything. Use only if you suspect a problem with LuaJIT itself" OFF)
@@ -152,8 +154,12 @@ endif()
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
+if (LUAJIT_ARCH_PROBE_COMPILER STREQUAL "")
+    set(LUAJIT_ARCH_PROBE_COMPILER "${CMAKE_C_COMPILER}")
+endif()
+
 execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM
+    COMMAND "${LUAJIT_ARCH_PROBE_COMPILER}" ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM
     WORKING_DIRECTORY "${LUAJIT_DIR}"
     OUTPUT_VARIABLE TESTARCH_OUTPUT
     ERROR_VARIABLE TESTARCH_ERROR
