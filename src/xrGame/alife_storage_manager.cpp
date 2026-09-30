@@ -82,6 +82,16 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
     string_path temp;
     FS.update_path(temp, "$game_saves$", m_save_name);
     IWriter* writer = FS.w_open(temp);
+    if (!writer || !writer->valid())
+    {
+        Msg("! Cannot open savegame file '%s'", temp);
+        if (writer)
+            FS.w_close(writer);
+        xr_free(dest_data);
+        if (!update_name)
+            xr_strcpy(m_save_name, saveBackup);
+        return;
+    }
     writer->w_u32(u32(-1));
     writer->w_u32(ALIFE_VERSION);
 
