@@ -71,17 +71,32 @@ void SanitizeString(pcstr str)
 
     while (*mut_str != '\0')
     {
-        switch (*mut_str)
+        if (static_cast<u8>(*mut_str) < 32)
         {
-        case '\\':
-        case '/':
-        case ',':
-        case '.':
             *mut_str = '_';
-            [[fallthrough]];
-        default:
-            ++mut_str;
         }
+        else
+        {
+            switch (*mut_str)
+            {
+            case '\\':
+            case '/':
+            case ':':
+            case '*':
+            case '?':
+            case '"':
+            case '<':
+            case '>':
+            case '|':
+            case ',':
+            case '.':
+                *mut_str = '_';
+                break;
+            default:
+                break;
+            }
+        }
+        ++mut_str;
     }
 }
 
@@ -263,6 +278,23 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
         SanitizeString(UserName);
         SanitizeString(CompName);
+
+        auto is_usable_name = [](pcstr str)
+        {
+            if (!str || !str[0])
+                return false;
+            for (pcstr p = str; *p; ++p)
+            {
+                if (*p != '_')
+                    return true;
+            }
+            return false;
+        };
+
+        if (!is_usable_name(UserName))
+            xr_strcpy(UserName, sizeof(UserName), "Player");
+        if (!is_usable_name(CompName))
+            xr_strcpy(CompName, sizeof(CompName), "Computer");
 
 #ifdef DEBUG
         Msg("UserName: %s", UserName);

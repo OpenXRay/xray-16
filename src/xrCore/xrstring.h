@@ -237,7 +237,7 @@ IC char* xr_strlwr(char* src)
     size_t i = 0;
     while (src[i])
     {
-        src[i] = (char)tolower(src[i]);// TODO rewrite locale-independent toupper_l()
+        src[i] = (char)tolower((unsigned char)src[i]);// TODO rewrite locale-independent toupper_l()
         i++;
     }
     return src;
