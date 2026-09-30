@@ -26,7 +26,7 @@ public:
     bool material(const std::string& texture_list, DeferredPass& pass,
         VkDescriptorSet& result, std::string& error);
     bool ui(const std::string& texture_name, ScenePass& pass,
-        VkDescriptorSet& result, std::string& error);
+        VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
     void destroy();
 
 private:
@@ -35,6 +35,7 @@ private:
         UploadedTexture texture;
         VkDescriptorSet material_set{};
         VkDescriptorSet ui_set{};
+        VkExtent2D extent{};
     };
     bool load(const std::string& name, Asset*& asset, std::string& error);
     VkDevice device_{};

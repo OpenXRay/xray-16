@@ -24,7 +24,7 @@ VkResult VKAPI_CALL create_layout(VkDevice, const VkPipelineLayoutCreateInfo* in
     const VkAllocationCallbacks*, VkPipelineLayout* layout)
 {
     assert(info->pushConstantRangeCount == 1);
-    assert(info->pPushConstantRanges[0].size == (layouts % 2 ? 8u : 96u));
+    assert(info->pPushConstantRanges[0].size == (layouts % 2 ? 12u : 96u));
     *layout = handle<VkPipelineLayout>(++layouts);
     return VK_SUCCESS;
 }
@@ -58,7 +58,7 @@ void VKAPI_CALL bind_indices(VkCommandBuffer, VkBuffer buffer, VkDeviceSize, VkI
 { assert(buffer == handle<VkBuffer>(21) && type == VK_INDEX_TYPE_UINT16); }
 void VKAPI_CALL push(VkCommandBuffer, VkPipelineLayout, VkShaderStageFlags, uint32_t,
     uint32_t size, const void* data)
-{ assert(data && size == (bound == handle<VkPipeline>(11) ? 96u : 8u)); }
+{ assert(data && size == (bound == handle<VkPipeline>(11) ? 96u : 12u)); }
 void VKAPI_CALL draw(VkCommandBuffer, uint32_t count, uint32_t instances, uint32_t, int32_t, uint32_t)
 {
     assert(instances == 1);

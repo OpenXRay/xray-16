@@ -9,5 +9,6 @@ namespace xray::render::vulkan
 bool upload_engine_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory_types, const TextureUploadDispatch& vk,
     const void* bytes, size_t size, bool bc_supported, UploadedTexture& result,
-    std::vector<PendingTextureUpload>& pending, ImageStateTracker& states, std::string& error);
+    std::vector<PendingTextureUpload>& pending, ImageStateTracker& states, std::string& error,
+    VkExtent3D* decoded_extent = nullptr);
 }

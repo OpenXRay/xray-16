@@ -175,7 +175,8 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     }
     const VkPushConstantRange scene_range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(SceneConstants)};
-    const VkPushConstantRange ui_range{VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float) * 2};
+    const VkPushConstantRange ui_range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+        0, sizeof(float) * 3};
     VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
     layout.pushConstantRangeCount = 1;
     layout.pPushConstantRanges = &scene_range;
@@ -232,7 +233,7 @@ bool ScenePass::record_geometry(const FrameRecordingContext& frame, VkBuffer ver
 bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
     VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
     const VkRect2D* requested_scissor,
-    VkDeviceSize vertex_offset, VkDeviceSize index_offset) const
+    VkDeviceSize vertex_offset, VkDeviceSize index_offset, float alpha_ref) const
 {
     if (!valid_frame(frame) || !vertices || !indices || !texture_set || !index_count ||
         (index_type != VK_INDEX_TYPE_UINT16 && index_type != VK_INDEX_TYPE_UINT32))
@@ -255,7 +256,8 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     }
     const VkViewport viewport{0, 0, static_cast<float>(frame.extent.width),
         static_cast<float>(frame.extent.height), 0, 1};
-    const float dimensions[]{static_cast<float>(frame.extent.width), static_cast<float>(frame.extent.height)};
+    const float constants[]{static_cast<float>(frame.extent.width),
+        static_cast<float>(frame.extent.height), std::clamp(alpha_ref, 0.0f, 1.0f)};
     m_vk.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_ui_pipeline);
     m_vk.cmd_set_viewport(frame.command_buffer, 0, 1, &viewport);
     m_vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
@@ -264,7 +266,8 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     m_vk.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_ui_layout, 0, 1, &texture_set, 0, nullptr);
     m_vk.cmd_push_constants(frame.command_buffer, m_ui_layout,
-        VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(dimensions), dimensions);
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+        0, sizeof(constants), constants);
     m_vk.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
     return true;
 }

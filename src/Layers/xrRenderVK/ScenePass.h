@@ -78,7 +78,8 @@ public:
     bool record_ui(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
         const VkRect2D* scissor = nullptr,
-        VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0) const;
+        VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0,
+        float alpha_ref = 0.0f) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
         std::string& error);
     void destroy();

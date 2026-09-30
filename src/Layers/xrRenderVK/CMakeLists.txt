@@ -50,6 +50,14 @@ target_sources(xrRenderVK PRIVATE
     VisualCatalog.h
     VulkanVisual.cpp
     VulkanVisual.h
+    VulkanUIShader.cpp
+    VulkanUIShader.h
+    VulkanLevelRender.cpp
+    VulkanLevelRender.h
+    VulkanUIRender.cpp
+    VulkanUIRender.h
+    VulkanGameDevice.cpp
+    VulkanGameDevice.h
 )
 
 include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")

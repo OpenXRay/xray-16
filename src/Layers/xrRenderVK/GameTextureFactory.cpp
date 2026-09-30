@@ -76,12 +76,14 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
         return false;
     }
     UploadedTexture texture;
+    VkExtent3D extent{};
     const bool uploaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
-        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error);
+        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent);
     FS.r_close(reader);
     if (!uploaded) return false;
     auto inserted = assets_.emplace(normalized, Asset{}).first;
     inserted->second.texture = texture;
+    inserted->second.extent = {extent.width, extent.height};
     asset = &inserted->second;
     return true;
 }
@@ -106,7 +108,7 @@ bool GameTextureFactory::material(const std::string& texture_list, DeferredPass&
 }
 
 bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
-    VkDescriptorSet& result, std::string& error)
+    VkDescriptorSet& result, std::string& error, VkExtent2D* extent)
 {
     result = VK_NULL_HANDLE;
     Asset* asset;
@@ -114,6 +116,7 @@ bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     if (!asset->ui_set && !pass.create_ui_texture_set(asset->texture.view, sampler_, asset->ui_set, error))
         return false;
     result = asset->ui_set;
+    if (extent) *extent = asset->extent;
     error.clear();
     return true;
 }
