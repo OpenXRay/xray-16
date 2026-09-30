@@ -10,6 +10,7 @@ target_include_directories(xrAPI
     PRIVATE
     "${XRAY_SOURCE_DIR}/src"
     "${XRAY_SOURCE_DIR}/Externals"
+    "${XRAY_SOURCE_DIR}/Externals/luabind"
 )
 
 target_compile_definitions(xrAPI
