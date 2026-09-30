@@ -58,6 +58,8 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*owned_game_device_);
     reset_pending_ = false;
+    app_suspended_ = false;
+    recreate_surface_pending_ = false;
 }
 
 void VulkanLevelRender::Destroy()
@@ -80,6 +82,8 @@ void VulkanLevelRender::Destroy()
     window_ = nullptr;
     requested_drawable_ = {};
     reset_pending_ = false;
+    app_suspended_ = false;
+    recreate_surface_pending_ = false;
     if (owned_game_device_)
     {
         owned_game_device_->destroy();
@@ -108,7 +112,8 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
 
     std::string error;
     if (!game_device_->recreate_swapchain(
-            {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)}, error))
+            {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)}, error,
+            recreate_surface_pending_))
     {
         xrDebug::Fatal(DEBUG_INFO, "Vulkan swapchain recreation failed: %s", error.c_str());
         return;
@@ -121,6 +126,7 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
     game_device_->clear_reset_required();
     requested_drawable_ = {static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)};
     reset_pending_ = false;
+    recreate_surface_pending_ = false;
 }
 
 DeviceState VulkanLevelRender::GetDeviceState()
@@ -129,17 +135,39 @@ DeviceState VulkanLevelRender::GetDeviceState()
         return DeviceState::Lost;
     if (game_device_->device_lost())
         return DeviceState::Lost;
+    if (app_suspended_)
+        return DeviceState::Lost;
 
     int drawable_width = 0, drawable_height = 0;
     SDL_Vulkan_GetDrawableSize(window_, &drawable_width, &drawable_height);
     if (drawable_width <= 0 || drawable_height <= 0)
         return DeviceState::Lost;
 
-    if (reset_pending_ || game_device_->reset_required() ||
+    if (reset_pending_ || game_device_->reset_required() || game_device_->surface_lost() ||
         requested_drawable_.width != static_cast<uint32_t>(drawable_width) ||
         requested_drawable_.height != static_cast<uint32_t>(drawable_height))
         return DeviceState::NeedReset;
     return DeviceState::Normal;
+}
+
+void VulkanLevelRender::OnAppLifecycleChanged(bool active)
+{
+    if (!game_device_ || app_suspended_ == !active)
+        return;
+
+    app_suspended_ = !active;
+    if (!active)
+    {
+        if (!game_device_->wait_idle())
+            Msg("! Vulkan: device idle wait failed while suspending the Android surface");
+        return;
+    }
+
+    // Android may destroy and recreate its native window surface while the
+    // engine process and VkDevice remain alive. Recreate both the VkSurfaceKHR
+    // and swapchain on the next engine reset, after SDL exposes a drawable.
+    recreate_surface_pending_ = true;
+    reset_pending_ = true;
 }
 
 void VulkanLevelRender::SetupStates()

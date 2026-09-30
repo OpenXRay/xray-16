@@ -21,18 +21,21 @@ public:
     bool initialize(SDL_Window* window, VkExtent2D extent, bool allow_readback,
         std::string& error, bool use_depth = false);
     bool recreate_frame(VkExtent2D extent, std::string& error);
+    bool recreate_surface(VkExtent2D extent, std::string& error);
     void destroy();
     VkDevice device() const { return m_device; }
     VkInstance instance() const { return m_instance; }
     VkQueue queue() const { return m_queue; }
     const PhysicalDevice& physical() const { return m_physical; }
     FrameContext& frame() { return m_frame; }
+    const FrameContext& frame() const { return m_frame; }
     PFN_vkGetInstanceProcAddr instance_proc() const { return m_instance_proc; }
     PFN_vkGetDeviceProcAddr device_proc() const { return m_device_proc; }
 
 private:
     void* m_library = nullptr;
     VkInstance m_instance = VK_NULL_HANDLE;
+    SDL_Window* m_window{};
     VkSurfaceKHR m_surface = VK_NULL_HANDLE;
     VkDevice m_device = VK_NULL_HANDLE;
     VkQueue m_queue = VK_NULL_HANDLE;

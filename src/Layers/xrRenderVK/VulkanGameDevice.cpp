@@ -221,7 +221,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     return true;
 }
 
-bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error)
+bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface)
 {
     if (!window_.device() || !extent.width || !extent.height)
     {
@@ -236,7 +236,9 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error)
 
     targets_.release_lighting(deferred_);
     targets_.destroy();
-    if (!window_.recreate_frame(extent, error))
+    const bool replace_surface = recreate_surface || window_.frame().surface_lost();
+    if (!(replace_surface ? window_.recreate_surface(extent, error) :
+              window_.recreate_frame(extent, error)))
         return false;
 
     auto& frame = window_.frame();

@@ -29,6 +29,7 @@ bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
         error = "Vulkan device requires an SDL window and a nonzero extent";
         return false;
     }
+    m_window = window;
     const auto fail = [&]() { destroy(); return false; };
     m_library = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
     if (!m_library)
@@ -146,6 +147,60 @@ bool VulkanWindowDevice::recreate_frame(VkExtent2D extent, std::string& error)
     return true;
 }
 
+bool VulkanWindowDevice::recreate_surface(VkExtent2D extent, std::string& error)
+{
+    if (!m_window || !m_instance || !m_device || !m_surface ||
+        !m_physical.handle || !extent.width || !extent.height)
+    {
+        error = "Vulkan surface recreation requires a live window, device and drawable extent";
+        return false;
+    }
+    // The native Android window may only be associated with one live Vulkan
+    // surface/swapchain. Retire the old chain and surface before creating its
+    // replacement from the resumed SDL window.
+    const VkSurfaceKHR previous = m_surface;
+    if (!m_frame.release_swapchain())
+    {
+        error = "could not release the old Vulkan swapchain before surface recreation";
+        return false;
+    }
+    if (m_destroy_surface)
+        m_destroy_surface(m_instance, previous, nullptr);
+    m_surface = VK_NULL_HANDLE;
+
+    const auto create_surface = reinterpret_cast<CreateSurface>(dlsym(RTLD_DEFAULT,
+        "SDL_Vulkan_CreateSurface"));
+    if (!create_surface)
+    {
+        error = "SDL Vulkan surface creation procedure is unavailable";
+        return false;
+    }
+    VkSurfaceKHR replacement = VK_NULL_HANDLE;
+    if (!create_surface(m_window, m_instance, &replacement) || !replacement)
+    {
+        error = "SDL could not create a replacement Vulkan surface";
+        return false;
+    }
+    m_surface = replacement;
+    const auto get_surface_support = load_instance_proc<PFN_vkGetPhysicalDeviceSurfaceSupportKHR>(
+        m_instance, m_instance_proc, "vkGetPhysicalDeviceSurfaceSupportKHR");
+    VkBool32 supported = VK_FALSE;
+    if (!get_surface_support || get_surface_support(m_physical.handle,
+            m_physical.graphics_present_family, replacement, &supported) != VK_SUCCESS || !supported)
+    {
+        if (m_destroy_surface)
+            m_destroy_surface(m_instance, replacement, nullptr);
+        m_surface = VK_NULL_HANDLE;
+        error = "selected Vulkan queue cannot present to the replacement surface";
+        return false;
+    }
+
+    if (!m_frame.recreate(m_physical.handle, replacement, extent, error))
+        return false;
+    error.clear();
+    return true;
+}
+
 void VulkanWindowDevice::destroy()
 {
     if (m_device && m_wait_idle)
@@ -171,5 +226,6 @@ void VulkanWindowDevice::destroy()
     m_destroy_surface = nullptr;
     m_destroy_device = nullptr;
     m_wait_idle = nullptr;
+    m_window = nullptr;
 }
 }

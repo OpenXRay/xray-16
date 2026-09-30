@@ -58,6 +58,8 @@ enum class FrameStatus
     RecreateRequired
 };
 
+bool mark_surface_lost(VkResult result, bool& surface_lost, FrameStatus& status);
+
 struct FrameRecordingContext
 {
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
@@ -93,6 +95,7 @@ public:
         bool use_depth = false);
     bool recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
         VkExtent2D requested_extent, std::string& error);
+    bool release_swapchain();
     bool wait_idle();
     bool render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
@@ -107,6 +110,7 @@ public:
     VkCommandPool command_pool() const { return m_command_pool; }
     size_t image_count() const { return m_images.size(); }
     bool device_lost() const { return m_device_lost; }
+    bool surface_lost() const { return m_surface_lost; }
 
 private:
     bool create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
@@ -142,5 +146,6 @@ private:
     std::vector<VkFence> m_image_fences;
     uint32_t m_current_frame{};
     bool m_device_lost{};
+    bool m_surface_lost{};
 };
 }

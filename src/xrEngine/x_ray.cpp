@@ -1200,6 +1200,9 @@ int CApplication::Run()
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;
+        bool hasAppLifecycleChange = false;
+        bool appIsActive = true;
+        bool appWentToBackground = false;
 
 #if defined(XR_PLATFORM_ANDROID)
         // SDLActivity reports process/task lifecycle with SDL_APP_* events,
@@ -1217,11 +1220,16 @@ int CApplication::Run()
             case SDL_APP_DIDENTERBACKGROUND:
                 canCallActivate = true;
                 shouldActivate = false;
+                hasAppLifecycleChange = true;
+                appIsActive = false;
+                appWentToBackground = true;
                 break;
             case SDL_APP_WILLENTERFOREGROUND:
             case SDL_APP_DIDENTERFOREGROUND:
                 canCallActivate = true;
                 shouldActivate = true;
+                hasAppLifecycleChange = true;
+                appIsActive = true;
                 break;
             case SDL_APP_TERMINATING:
                 Engine.Event.Defer("KERNEL:disconnect");
@@ -1283,6 +1291,13 @@ int CApplication::Run()
         } // for (int i = 0; i < count; ++i)
 
         // Workaround for screen blinking when there's too much timeouts
+        if (hasAppLifecycleChange && GEnv.Render)
+        {
+            if (appWentToBackground)
+                GEnv.Render->OnAppLifecycleChanged(false);
+            GEnv.Render->OnAppLifecycleChanged(appIsActive);
+        }
+
         if (canCallActivate)
         {
             Device.OnWindowActivate(Device.m_sdlWnd, shouldActivate);

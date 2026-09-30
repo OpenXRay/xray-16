@@ -33,6 +33,7 @@ public:
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
     DeviceState GetDeviceState() override;
+    void OnAppLifecycleChanged(bool active) override;
 
 protected:
     GpuLevel& gpu_level() { return level_; }
@@ -54,5 +55,7 @@ private:
     std::unique_ptr<VulkanGameDevice> owned_game_device_;
     bool device_resources_ready_{};
     bool reset_pending_{};
+    bool app_suspended_{};
+    bool recreate_surface_pending_{};
 };
 }

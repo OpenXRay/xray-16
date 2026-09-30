@@ -5,6 +5,15 @@
 
 namespace xray::render::vulkan
 {
+bool mark_surface_lost(VkResult result, bool& surface_lost, FrameStatus& status)
+{
+    if (result != VK_ERROR_SURFACE_LOST_KHR)
+        return false;
+    surface_lost = true;
+    status = FrameStatus::RecreateRequired;
+    return true;
+}
+
 namespace
 {
 bool complete(const FrameDispatch& vk)
@@ -156,12 +165,25 @@ bool FrameContext::recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surfa
     if (!create_render_targets(error) || !create_commands(error) || !create_sync(error))
         goto failed;
     m_current_frame = 0;
+    m_surface_lost = false;
     error.clear();
     return true;
 
 failed:
     destroy_swapchain_resources();
     return false;
+}
+
+bool FrameContext::release_swapchain()
+{
+    if (!m_device || !m_command_pool || !wait_idle())
+        return false;
+    if (!m_commands.empty())
+        m_vk.free_command_buffers(m_device, m_command_pool,
+            static_cast<uint32_t>(m_commands.size()), m_commands.data());
+    m_commands.clear();
+    destroy_swapchain_resources();
+    return true;
 }
 
 bool FrameContext::wait_idle()
@@ -199,6 +221,7 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_queue_family = queue_family;
     m_vk = dispatch;
     m_device_lost = false;
+    m_surface_lost = false;
     m_allow_readback = allow_readback;
     if (use_depth)
     {
@@ -631,6 +654,11 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         error.clear();
         return true;
     }
+    if (mark_surface_lost(acquire, m_surface_lost, status))
+    {
+        error.clear();
+        return true;
+    }
     if (acquire != VK_SUCCESS && acquire != VK_SUBOPTIMAL_KHR)
     {
         m_device_lost = acquire == VK_ERROR_DEVICE_LOST;
@@ -756,6 +784,11 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     present.pImageIndices = &image_index;
     const VkResult result = m_vk.queue_present(m_queue, &present);
     m_current_frame = (m_current_frame + 1) % FramesInFlight;
+    if (mark_surface_lost(result, m_surface_lost, status))
+    {
+        error.clear();
+        return true;
+    }
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR && result != VK_ERROR_OUT_OF_DATE_KHR)
     {
         m_device_lost = result == VK_ERROR_DEVICE_LOST;
@@ -806,6 +839,7 @@ void FrameContext::destroy()
     m_frame_fences = {};
     m_image_fences.clear();
     m_current_frame = 0;
+    m_surface_lost = false;
 }
 
 void FrameContext::destroy_swapchain_resources()

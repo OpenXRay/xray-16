@@ -9,8 +9,9 @@ selects the OpenGL ES backend for gameplay.
 | Part | Source | Current behavior |
 |---|---|---|
 | Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
-| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass with an optional per-image depth attachment, tracks two frames in flight, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
-| SDL Vulkan device | `src/Layers/xrRenderVK/VulkanWindowDevice.*` | Owns the Vulkan loader, instance, SDL surface, selected device and frame context for a caller-owned window; the smoke test uses this shared device path |
+| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass with an optional per-image depth attachment, tracks two frames in flight, detects lost surfaces, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
+| SDL Vulkan device | `src/Layers/xrRenderVK/VulkanWindowDevice.*` | Owns the Vulkan loader, instance, SDL surface, selected device and frame context for a caller-owned window; it can recreate the surface and swapchain after Android replaces the native window |
+| Android lifecycle | `src/xrEngine/x_ray.cpp`, `src/xrEngine/Render.h`, `src/Layers/xrRenderVK/VulkanLevelRender.*` | Forwards app pause/resume to the renderer, waits for submitted Vulkan work before suspension, and recreates the surface and swapchain after resume |
 | Android Vulkan smoke | `src/xrEngine/android_vulkan_smoke.cpp`, `src/Layers/xrRenderVK/SmokeTrianglePass.*` | Creates an SDL Vulkan surface, draws the triangle plus lit indexed geometry and a colored UI overlay without game assets, checks pixels from geometry and UI and presents three frames |
 | DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
 | Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
@@ -93,12 +94,12 @@ are still missing. Do not enable `renderer_vulkan` on this basis.
   shadows and post-processing;
 - skeletal/progressive/tree model, terrain, particle, game UI and video draw paths;
 - recording engine draw commands and managing engine resource lifetimes;
-- swapchain recreation integrated with pause, resume, resize and surface loss;
 - Win32 and Linux surface integration for `xrRenderVK`;
 - Vulkan implementations of `IRender`, `IRenderFactory`, `IUIRender`,
   `IRenderDeviceRender` and the debug renderer; the separately registered
   Vulkan module rejects gameplay until these are present.
 
+Pause/resume and surface-loss recovery still need validation on Android hardware.
 Until those items exist, documentation and launcher text must use the words
 "probe" or "smoke test", not "Vulkan renderer" without qualification.
 
@@ -126,14 +127,15 @@ Work should proceed in dependencies-first order:
 3. validate the image draw on Android hardware, then render UI and static
    geometry through Vulkan;
 4. port deferred targets, lighting, shadows and post-processing;
-5. integrate swapchain recreation and Android lifecycle handling;
+5. integrate swapchain recreation and Android lifecycle handling (implemented; device validation remains);
 6. add Windows and Linux surfaces and CI coverage;
 7. enable Vulkan gameplay selection only after complete levels and representative
    mods run through Vulkan.
 
 Useful host tests live in `tests/vulkan_dds.cpp`,
 `tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,
-`tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`, and
-`tests/vulkan_screen_copy_pass.cpp`, and `tests/vulkan_smoke_triangle.cpp`. Device validation still requires the
+`tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`,
+`tests/vulkan_screen_copy_pass.cpp`, `tests/vulkan_frame_lifecycle.cpp`, and
+`tests/vulkan_smoke_triangle.cpp`. Device validation still requires the
 launcher's Vulkan smoke test on real Android hardware. A successful triangle
 smoke test does not close any of the gameplay items above.
