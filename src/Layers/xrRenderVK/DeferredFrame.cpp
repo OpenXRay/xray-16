@@ -1,3 +1,4 @@
+#include "xrEngine/stdafx.h"
 #include "DeferredFrame.h"
 
 #include <cstring>
