@@ -14,7 +14,6 @@ target_include_directories(xrMiscMath
     PRIVATE
     "${XRAY_SOURCE_DIR}/src"
     "${XRAY_SOURCE_DIR}/Externals"
-    "${XRAY_SOURCE_DIR}/Externals/luabind"
 )
 
 set_target_properties(xrMiscMath PROPERTIES

@@ -7,6 +7,10 @@ add_compile_definitions(
 
 add_compile_options(${XRAY_ENABLE_WARNINGS})
 
+# Common engine headers validate that the luabind submodule is present. Make
+# its public include root available to every engine target that includes them.
+include_directories("${XRAY_SOURCE_DIR}/Externals/luabind")
+
 add_subdirectory(utils)
 add_subdirectory(Layers)
 add_subdirectory(xr_3da)
