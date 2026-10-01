@@ -556,6 +556,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");
     if (game_device_) game_device_->discard_scene_draws();
     models_Clear(true);
+    model_gpu_cache_.clear();
     std::string error;
     if (!level_.load(*reader, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
         xrDebug::Fatal(DEBUG_INFO, "Vulkan level load failed: %s", error.c_str());
@@ -568,6 +569,7 @@ void VulkanLevelRender::level_Unload()
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
     if (game_device_) game_device_->discard_scene_draws();
     models_Clear(true);
+    model_gpu_cache_.clear();
     level_.destroy();
 }
 
@@ -664,12 +666,21 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
         Msg("! [renderer-vulkan] OGF model '%s': unsupported static model type %u", name ? name : "<reader>", record.type);
         return nullptr;
     }
-    auto model = std::make_unique<VulkanModelVisual>(record, !data && name ? name : "");
-    if (!model->gpu().load(name, data, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
+    std::shared_ptr<GpuModel> gpu;
+    if (!data && name)
+        gpu = model_gpu_cache_[name].lock();
+    if (!gpu)
     {
-        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
-        return nullptr;
+        gpu = std::make_shared<GpuModel>();
+        if (!gpu->load(name, data, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
+        {
+            Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
+            return nullptr;
+        }
+        if (!data && name)
+            model_gpu_cache_[name] = gpu;
     }
+    auto model = std::make_unique<VulkanModelVisual>(record, !data && name ? name : "", std::move(gpu));
     IRenderVisual* visual = model.get();
     models_.emplace(visual, std::move(model));
     return visual;
@@ -680,6 +691,16 @@ IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
     return model_Create(name, data);
 }
 
+IRenderVisual* VulkanLevelRender::model_Duplicate(IRenderVisual* visual)
+{
+    auto found = models_.find(visual);
+    R_ASSERT2(found != models_.end(), "Vulkan duplication requires a live model instance");
+    auto copy = std::make_unique<VulkanModelVisual>(*found->second);
+    IRenderVisual* result = copy.get();
+    models_.emplace(result, std::move(copy));
+    return result;
+}
+
 void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
 {
     if (!visual)
@@ -687,7 +708,7 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
     auto found = models_.find(visual);
     R_ASSERT2(found != models_.end(), "Vulkan model deletion received an unknown visual");
     if (game_device_)
-        game_device_->discard_model_draws(&found->second->gpu());
+        game_device_->discard_model_draws(visual);
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model deletion requires idle GPU frames");
     if (!discard && !found->second->cache_name().empty())
@@ -705,6 +726,11 @@ void VulkanLevelRender::models_Clear(bool)
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model clear requires idle GPU frames");
     model_pool_.clear();
+    for (auto it = model_gpu_cache_.begin(); it != model_gpu_cache_.end();)
+        if (it->second.expired())
+            it = model_gpu_cache_.erase(it);
+        else
+            ++it;
 }
 
 void VulkanLevelRender::destroy_all_models()
@@ -717,6 +743,7 @@ void VulkanLevelRender::destroy_all_models()
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model teardown requires idle GPU frames");
     models_.clear();
     model_pool_.clear();
+    model_gpu_cache_.clear();
 }
 
 void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)
@@ -743,7 +770,7 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     else
         camera_position.set(Device.vCameraPosition);
     if (model != models_.end())
-        game_device_->queue_model(model->second->gpu(), nullptr, transform, hud, distance_squared(center, camera_position));
+        game_device_->queue_model(model->second->gpu(), nullptr, transform, hud, distance_squared(center, camera_position), visual);
     else
         game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud, distance_squared(center, camera_position));
 }

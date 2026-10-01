@@ -26,13 +26,14 @@ public:
         bool render_world = true, bool clear_target = false);
     bool recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface = false);
     bool prepare_for_reset(std::string& error);
-    bool wait_idle() { return window_.frame().wait_idle(); }
-    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
-        bool hud = false, float sort_distance = 0.f);
+    bool wait_idle() { return window_.frame().wait_idle();
+    }
+
+    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud = false, float sort_distance = 0.f, const void* instance = nullptr);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
         bool hud = false, float sort_distance = 0.f);
     void discard_scene_draws();
-    void discard_model_draws(const GpuModel* model);
+    void discard_model_draws(const void* instance);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
     void destroy();
     bool reset_required() const { return reset_required_; }
@@ -73,6 +74,7 @@ private:
     struct ModelDraw
     {
         GpuModel* model{};
+        const void* instance{};
         IKinematics* skeleton{};
         std::array<float, 16> mvp{};
         float sort_distance{};

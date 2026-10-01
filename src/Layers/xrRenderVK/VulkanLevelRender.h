@@ -19,6 +19,7 @@ class VulkanGameDevice;
 class VulkanFontRender;
 class VulkanUIShader;
 class VulkanModelVisual;
+class GpuModel;
 // Shared IRender level contract for the Vulkan gameplay renderer. Its caller
 // must have created a device, deferred pass and texture factory first. Other
 // IRender operations remain abstract until their Vulkan implementations exist.
@@ -40,6 +41,7 @@ public:
     HRESULT shader_compile(pcstr name, IReader* source, pcstr entry, pcstr target, u32 flags, void*& result) override;
     IRenderVisual* model_Create(pcstr name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
+    IRenderVisual* model_Duplicate(IRenderVisual* visual) override;
     void model_Delete(IRenderVisual*& visual, bool discard = false) override;
     void models_Clear(bool complete) override;
     void Create(SDL_Window* window, u32& width, u32& height,
@@ -82,6 +84,7 @@ private:
     GpuLevel level_;
     std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
     std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
+    std::unordered_map<std::string, std::weak_ptr<GpuModel>> model_gpu_cache_;
     std::vector<std::unique_ptr<ShaderModule>> compiled_shaders_;
     VulkanCameraState camera_state_;
     VulkanRenderContextState context_state_;

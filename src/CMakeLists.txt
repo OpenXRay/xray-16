@@ -104,7 +104,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
-    target_link_libraries(vulkan_model_geometry_test PRIVATE xrRenderVK xrCDB xrCore)
+    target_link_libraries(vulkan_model_geometry_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_model_geometry COMMAND vulkan_model_geometry_test)
 
     add_executable(vulkan_shader_module_test

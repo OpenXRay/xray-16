@@ -1,4 +1,6 @@
+#include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
+#include "src/Layers/xrRenderVK/VulkanModelVisual.h"
 
 #include <cassert>
 #include <cmath>
@@ -53,6 +55,23 @@ VisualRecord record(unsigned links)
 }
 int main()
 {
+    VisualRecord static_record;
+    static_record.type = 0;
+    static_record.bounds = { -1, -2, -3, 1, 2, 3 };
+    auto shared_geometry = std::make_shared<GpuModel>();
+    const std::weak_ptr<GpuModel> lifetime = shared_geometry;
+    auto first = std::make_unique<VulkanModelVisual>(static_record, "test.ogf", shared_geometry);
+    auto second = std::make_unique<VulkanModelVisual>(*first);
+    assert(&first->gpu() == &second->gpu());
+    assert(&first->getVisData() != &second->getVisData());
+    first->getVisData().box.vMin.x = -9;
+    assert(second->getVisData().box.vMin.x == -1);
+    shared_geometry.reset();
+    first.reset();
+    assert(!lifetime.expired());
+    second.reset();
+    assert(lifetime.expired());
+
     for (unsigned links = 1; links <= 4; ++links)
     {
         auto visual = record(links);

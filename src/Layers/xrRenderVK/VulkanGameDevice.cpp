@@ -124,11 +124,11 @@ void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
 }
 
-void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
-    const float (&mvp)[16], bool hud, float sort_distance)
+void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud, float sort_distance, const void* instance)
 {
     ModelDraw draw;
     draw.model = &model;
+    draw.instance = instance;
     draw.skeleton = skeleton;
     std::copy_n(mvp, 16, draw.mvp.data());
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
@@ -136,12 +136,12 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
     model_draws_.push_back(draw);
 }
 
-void VulkanGameDevice::discard_model_draws(const GpuModel* model)
+void VulkanGameDevice::discard_model_draws(const void* instance)
 {
     model_draws_.erase(std::remove_if(model_draws_.begin(), model_draws_.end(),
-                           [model](const ModelDraw& draw)
+                           [instance](const ModelDraw& draw)
                            {
-                               return draw.model == model;
+                               return draw.instance == instance;
                            }),
         model_draws_.end());
 }

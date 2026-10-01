@@ -4,6 +4,7 @@
 #include "Include/xrRender/RenderVisual.h"
 #include "xrEngine/vis_common.h"
 
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -14,13 +15,23 @@ namespace xray::render::vulkan
 class VulkanModelVisual final : public IRenderVisual
 {
 public:
-    VulkanModelVisual(const VisualRecord& record, std::string cache_name) : cache_name_(std::move(cache_name))
+    VulkanModelVisual(const VisualRecord& record, std::string cache_name, std::shared_ptr<GpuModel> gpu)
+        : gpu_(std::move(gpu)), cache_name_(std::move(cache_name))
     {
         visibility_.clear();
         const auto& b = record.bounds;
         visibility_.box.set(b[0], b[1], b[2], b[3], b[4], b[5]);
         visibility_.sphere.P.set(b[6], b[7], b[8]);
         visibility_.sphere.R = b[9];
+    }
+
+    // Copies own independent visibility state; static OGF geometry and its
+    // Vulkan buffers/descriptors live until the final instance is retired.
+    explicit VulkanModelVisual(const VulkanModelVisual& other) : gpu_(other.gpu_), cache_name_(other.cache_name_)
+    {
+        visibility_.clear();
+        visibility_.box = other.visibility_.box;
+        visibility_.sphere = other.visibility_.sphere;
     }
 
     vis_data& getVisData() override
@@ -35,7 +46,7 @@ public:
 
     GpuModel& gpu()
     {
-        return gpu_;
+        return *gpu_;
     }
 
     const std::string& cache_name() const
@@ -51,7 +62,7 @@ public:
 
 private:
     vis_data visibility_;
-    GpuModel gpu_;
+    std::shared_ptr<GpuModel> gpu_;
     std::string cache_name_;
 };
 } // namespace xray::render::vulkan
