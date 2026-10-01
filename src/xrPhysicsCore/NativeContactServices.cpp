@@ -11,6 +11,7 @@
 #include <Jolt/Physics/Collision/TransformedShape.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Body/BodyLock.h>
+#include <Jolt/Physics/Body/BodyLockMulti.h>
 #include <chrono>
 #include <cstdlib>
 
@@ -241,14 +242,21 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
     m_query_bodies.clear();
     m_preparation_targets.clear();
     m_physics_system->GetBodies(m_query_bodies);
-    for (const auto id : m_query_bodies) {
+    // Snapshot under one shared mutex mask instead of locking/unlocking for
+    // every body. Policy callbacks only inspect geometry/material metadata.
+    // Keep body locking: external readers/writers still use the native API.
+    JPH::BodyLockMultiRead snapshots(m_physics_system->GetBodyLockInterface(),
+        m_query_bodies.data(), static_cast<int>(m_query_bodies.size()));
+    for (size_t index = 0; index < m_query_bodies.size(); ++index) {
+        const auto id = m_query_bodies[index];
         if (m_contact_bodies.size() <= id.GetIndex()) m_contact_bodies.resize(size_t(id.GetIndex()) + 1);
         auto& snapshot = m_contact_bodies[id.GetIndex()];
-        JPH::BodyLockRead lock(m_physics_system->GetBodyLockInterface(), id);
-        if (!lock.SucceededAndIsInBroadPhase()) { snapshot.id = JPH::BodyID(); continue; }
+        const auto* pointer = snapshots.GetBody(static_cast<int>(index));
+        if (!pointer || !pointer->IsInBroadPhase()) { snapshot.id = JPH::BodyID(); continue; }
         ++addedCount;
-        const auto& body = lock.GetBody();
+        const auto& body = *pointer;
         snapshot.id = id;
+        snapshot.static_body = body.IsStatic();
         snapshot.bounds = body.GetWorldSpaceBounds();
         snapshot.bounds.ExpandBy(JPH::Vec3::sReplicate(m_physics_system->GetPhysicsSettings().mSpeculativeContactDistance));
         if (!body.IsStatic() && body.GetMotionProperties()->GetMotionQuality() == JPH::EMotionQuality::LinearCast) {
@@ -280,6 +288,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         }
         if (snapshot.policy.immediate || snapshot.fluid_bounds.IsValid()) m_preparation_targets.push_back(id);
     }
+    snapshots.ReleaseLocks();
     const auto fluidStart = profile ? Clock::now() : Clock::time_point{};
     double queryMilliseconds = 0, collectMilliseconds = 0;
     size_t hitCount = 0;
@@ -378,19 +387,44 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
             +[](void* state, JPH::BodyID first, JPH::BodyID second) {
                 return static_cast<JoltPhysicsCore*>(state)->NeedsContactPreparation(first, second);
             }, continuous);
+        JPH::ShapeFilter shapeFilter;
+        struct MeshPreparation {
+            JoltPhysicsCore* core;
+            JPH::BodyID source;
+            const JPH::ShapeFilter* filter;
+        } meshPreparation{this, firstID, &shapeFilter};
+        // Fluid preparation needs only slowdown triangles. Leave ordinary
+        // collision/effects to Update; response-changing policies still query
+        // every triangle. The optional filter is local to this query thread.
+        const JPH::XRayMeshTriangleFilter meshFilter(&meshPreparation,
+            +[](void* state, const JPH::MeshShape& mesh, JPH::SubShapeID id) {
+                const auto& query = *static_cast<const MeshPreparation*>(state);
+                const auto targetID = query.filter->mBodyID2;
+                if (targetID.GetIndex() >= query.core->m_contact_bodies.size()) return true;
+                const auto& target = query.core->m_contact_bodies[targetID.GetIndex()];
+                // Only plain tagged level meshes have a material/ID mapping
+                // validated by the body snapshot. Keep all other shapes.
+                if (target.id != targetID || !target.fluid_mesh || !target.static_body ||
+                    mesh.GetUserData() != JPH::XRayMeshMaterial::Tag) return true;
+                NativePhysicsContact contact;
+                contact.body1 = query.source.GetIndexAndSequenceNumber();
+                contact.body2 = targetID.GetIndexAndSequenceNumber();
+                contact.material2 = JPH::XRayTriangleMaterial(&mesh, id);
+                return query.core->NeedsPreparedContact(contact);
+            });
         const auto queryStart = profile ? Clock::now() : Clock::time_point{};
         ++queryCount;
         m_physics_system->GetNarrowPhaseQuery().CollideShape(firstShape.mShape, firstShape.GetShapeScale(),
             firstShape.GetCenterOfMassTransform(), settings, JPH::RVec3::sZero(), collector,
             m_physics_system->GetDefaultBroadPhaseLayerFilter(initial.kind1),
-            m_physics_system->GetDefaultLayerFilter(initial.kind1), filter);
+            m_physics_system->GetDefaultLayerFilter(initial.kind1), filter, shapeFilter);
         if (continuous && travel.LengthSq() > 1e-8f) {
             sweep.Reset();
             JPH::ShapeCastSettings castSettings;
             const JPH::RShapeCast cast(firstShape.mShape, firstShape.GetShapeScale(), firstShape.GetCenterOfMassTransform(), travel);
             m_physics_system->GetNarrowPhaseQuery().CastShape(cast, castSettings, JPH::RVec3::sZero(), sweep,
                 m_physics_system->GetDefaultBroadPhaseLayerFilter(initial.kind1),
-                m_physics_system->GetDefaultLayerFilter(initial.kind1), filter);
+                m_physics_system->GetDefaultLayerFilter(initial.kind1), filter, shapeFilter);
             sweep.Sort();
             for (const auto& hit : sweep.mHits) collector.mHits.push_back(hit);
         }
@@ -457,6 +491,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         }
     }
     static unsigned profileStep = 0;
+    const auto dispatchEnd = profile ? Clock::now() : Clock::time_point{};
     if (profile && (profileStep + 1) % 100 == 0)
         Msg("NATIVE_PREPARATION_PROFILE bodies=%zu added=%zu queries=%zu fluid_cache_hits=%zu fluid_queries=%zu snapshot_ms=%.6f fluid_ms=%.6f selection_ms=%.6f",
             m_query_bodies.size(), addedCount, queryCount, fluidCacheHits, fluidQueries,
@@ -467,7 +502,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         Msg("NATIVE_CONTACT_PROFILE active=%zu immediate=%zu hits=%zu pending=%zu query_ms=%.6f collect_ms=%.6f dispatch_ms=%.6f",
             active.size(), static_cast<size_t>(std::count_if(active.begin(), active.end(), [this](const auto id) { return m_contact_bodies[id.GetIndex()].policy.immediate; })),
             hitCount, pending.size(), queryMilliseconds, collectMilliseconds,
-            std::chrono::duration<double, std::milli>(Clock::now() - dispatchStart).count());
+            std::chrono::duration<double, std::milli>(dispatchEnd - dispatchStart).count());
     if (profile && profileStep == 100) {
         for (const auto id : m_query_bodies) {
             JPH::BodyLockRead lock(m_physics_system->GetBodyLockInterface(), id);
@@ -495,10 +530,29 @@ bool JoltPhysicsCore::NeedsContactPreparation(JPH::BodyID first, JPH::BodyID sec
     return fluid(a, b) || fluid(b, a);
 }
 
+bool JoltPhysicsCore::NeedsPreparedContact(const NativePhysicsContact& contact) const {
+    const JPH::BodyID first(contact.body1), second(contact.body2);
+    if (!NeedsContactPreparation(first, second)) return false;
+    if (!m_body_contact_policy_callback || first.GetIndex() >= m_contact_bodies.size() ||
+        second.GetIndex() >= m_contact_bodies.size()) return true;
+    const auto& a = m_contact_bodies[first.GetIndex()];
+    const auto& b = m_contact_bodies[second.GetIndex()];
+    if (a.id != first || b.id != second || a.policy.immediate || b.policy.immediate) return true;
+    const auto fluid = [this](const auto& source, const auto& target, u16 material) {
+        if (!source.policy.fluids || !target.fluid_bounds.IsValid() || !source.bounds.Overlaps(target.fluid_bounds)) return false;
+        // Non-mesh/moving meshes and unresolved materials retain pair-wide
+        // preparation. A mesh used as the query source has reversed shape
+        // order, so filter only static target meshes with validated metadata.
+        return !target.fluid_mesh || !target.static_body || material >= GMLib.CountMaterial() ||
+            std::binary_search(m_slowdown_materials.begin(), m_slowdown_materials.end(), material);
+    };
+    return fluid(a, b, contact.material2) || fluid(b, a, contact.material1);
+}
+
 void JoltPhysicsCore::QueueDeferredContact(const JPH::Body& first, const JPH::Body& second,
     JPH::SubShapeID shape1, JPH::SubShapeID shape2, JPH::RVec3Arg point, JPH::Vec3Arg normal, float depth)
 {
-    if (!m_deferred_rb_contact_callback || NeedsContactPreparation(first.GetID(), second.GetID())) return;
+    if (!m_deferred_rb_contact_callback) return;
     NativePhysicsContact contact;
     contact.body1 = first.GetID().GetIndexAndSequenceNumber();
     contact.body2 = second.GetID().GetIndexAndSequenceNumber();
@@ -508,6 +562,7 @@ void JoltPhysicsCore::QueueDeferredContact(const JPH::Body& first, const JPH::Bo
     contact.subshape1 = shape1.GetValue(); contact.subshape2 = shape2.GetValue();
     Describe(contact, true, first.GetShape(), shape1);
     Describe(contact, false, second.GetShape(), shape2);
+    if (NeedsPreparedContact(contact)) return;
     Store(JPH::Vec3(point), contact.position); Store(normal, contact.normal);
     Store(first.GetPointVelocity(point), contact.point_velocity1);
     Store(second.GetPointVelocity(point), contact.point_velocity2);

@@ -404,6 +404,43 @@ void PlacementAndCharacters(IPhysicsCore& core) {
     core.DestroyCharacterVirtual(character);
     core.DestroyCDBModel(box);
 }
+int queryWall, queryOwner;
+bool rejectQueryWall = false;
+bool FilterQueryWall(void* object, u16, void* ignored, bool camera) {
+    return object != &queryWall || (!camera && (!rejectQueryWall || ignored != &queryOwner));
+}
+void CharacterQueryFiltering(IPhysicsCore& core) {
+    core.Clear();
+    core.SetSimulationParameters(0, 18);
+    const auto wallShape = core.CreateBoxShape(V(.5f, 5, 5));
+    const auto wall = core.CreateStaticBody(wallShape, V(2, 4, 0));
+    core.SetBodyUserData(wall, &queryWall);
+    Fquaternion identity;
+    identity.identity();
+    Require(!core.CheckShapePlacement(wallShape, V(2, 4, 0), identity, false), "Ordinary placement respects a wall");
+    Require(core.CheckShapePlacement(wallShape, V(2, 4, 0), identity, false, &queryWall), "Placement ignores its owner's body");
+    core.SetQueryFilter(FilterQueryWall);
+    Require(core.CheckShapePlacement(wallShape, V(2, 4, 0), identity, false, nullptr, true), "Camera placement uses the query filter");
+    Require(!core.CheckShapePlacement(wallShape, V(2, 4, 0), identity, false), "Camera filtering does not suppress ordinary placement");
+    core.DestroyCDBModel(wallShape);
+    const auto capsule = core.CreateCapsuleShape(.3f, .5f);
+    const auto character = core.CreateCharacterVirtual(capsule, V(0, 4, 0), 80);
+    core.DestroyCDBModel(capsule);
+    core.SetCharacterVirtualUserData(character, &queryOwner);
+    core.SetCharacterVirtualVelocity(character, V(20, 0, 0));
+    core.UpdateCharacterVirtual(character, .1f, V(0, 0, 0));
+    Fvector position;
+    core.GetCharacterVirtualPosition(character, position);
+    Require(position.x < 1.3f, "Character collides with an accepted body");
+    rejectQueryWall = true;
+    core.SetCharacterVirtualPosition(character, V(0, 4, 0));
+    core.SetCharacterVirtualVelocity(character, V(20, 0, 0));
+    core.UpdateCharacterVirtual(character, .1f, V(0, 0, 0));
+    core.GetCharacterVirtualPosition(character, position);
+    Require(position.x > 1.9f, "Character ignores a body rejected for its owner");
+    rejectQueryWall = false;
+    core.SetQueryFilter(nullptr);
+}
 void CharacterPolicies(IPhysicsCore& core) {
     core.Clear();
     const auto shape = core.CreateCapsuleShape(.3f, .5f);
@@ -648,6 +685,53 @@ void OptimizedContactsAndSleeping(IPhysicsCore& core) {
     core.GetBodyAngularVelocity(hingeBody, velocity);
     Require(std::abs(velocity.y) > .01f, "Changed motor drives its constraint");
 }
+void ChangingPassiveResistance(IPhysicsCore& core) {
+    for (const int type : {1, 3, 4}) { // hinge, full-control and slider
+        core.Clear();
+        core.SetSimulationParameters(0, 18);
+        const auto body = core.CreateBox(V(.5f, .5f, .5f), V(0, 0, 0), 2);
+        const auto joint = core.CreateJoint(type, INVALID_BODY_HANDLE, body, V(0, 0, 0),
+            V(1, 0, 0), V(0, 1, 0), V(0, 0, 1), V(-3, -3, -3), V(3, 3, 3));
+        Require(joint != INVALID_JOINT_HANDLE, "Passive resistance fixture joint");
+        for (int step = 0; step < 200; ++step) {
+            core.SetJointMotor(joint, 0, 1.f + step * .01f, 0);
+            core.Step(.01f);
+        }
+        Require(!core.IsBodyActive(body), "Changing passive resistance permits native sleeping");
+        core.SetJointMotor(joint, 0, 10, 0);
+        Require(!core.IsBodyActive(body), "A changed brake cap does not wake a resting body");
+        if (type == 4) core.SetBodyLinearVelocity(body, V(2, 0, 0));
+        else core.SetBodyAngularVelocity(body, V(2, 0, 0));
+        Require(core.IsBodyActive(body), "External motion wakes a body with passive resistance");
+        core.Step(.01f);
+        Fvector velocity;
+        if (type == 4) core.GetBodyLinearVelocity(body, velocity);
+        else core.GetBodyAngularVelocity(body, velocity);
+        Require(velocity.x < 1.99f && velocity.x >= -.01f, "Native passive friction brakes imposed motion");
+        for (int step = 0; step < 200; ++step) core.Step(.01f);
+        Require(!core.IsBodyActive(body), "A braked body returns to rest");
+        core.SetJointMotor(joint, 0, 10, 1);
+        Require(core.IsBodyActive(body), "A powered drive still wakes a resting body");
+        core.Step(.01f);
+        if (type == 4) core.GetBodyLinearVelocity(body, velocity);
+        else core.GetBodyAngularVelocity(body, velocity);
+        Require(velocity.x > .01f, "Powered drive replaces passive friction");
+        core.SetJointMotor(joint, 0, 10, 0);
+        for (int step = 0; step < 200; ++step) core.Step(.01f);
+        Require(!core.IsBodyActive(body), "Stopping a powered drive restores sleeping passive resistance");
+    }
+}
+int preparedDryHits, preparedWetHits, deferredDryHits, deferredWetHits;
+bool TrackFluidPreparation(const NativePhysicsContact& contact) {
+    if (contact.material1 == 1 || contact.material2 == 1) ++preparedWetHits;
+    else ++preparedDryHits;
+    return ContactPolicy(contact);
+}
+void TrackFluidEffects(const NativePhysicsContact& contact) {
+    if (contact.material1 == 1 || contact.material2 == 1) ++deferredWetHits;
+    else ++deferredDryHits;
+    DeferredPolicy(contact);
+}
 void FluidExclusionRegions(IPhysicsCore& core) {
     struct Fixture {
         IPhysicsCore& core;
@@ -737,6 +821,56 @@ void FluidExclusionRegions(IPhysicsCore& core) {
     drySteps();
     fixture.dry.Flags.set(SGameMtl::flSlowDown, true);
     wetStep("Changing material flags invalidates cached dry regions without a count change");
+
+    // Both materials share one BVH leaf. Broad leaf bounds cannot distinguish
+    // the dry floor from the wet wall; filtering must happen before the exact
+    // triangle collision and dry effects must still arrive from the solver.
+    fixture.dry.Flags.set(SGameMtl::flSlowDown, false);
+    const Fvector mixedVertices[]{V(-4, 0, -4), V(4, 0, -4), V(-4, 0, 4), V(4, 0, 4),
+        V(0, 0, -4), V(0, 4, -4), V(0, 0, 4), V(0, 4, 4)};
+    CDB::TRI mixedTriangles[4]{};
+    const u32 indices[4][3]{{0, 2, 1}, {1, 2, 3}, {4, 6, 5}, {5, 6, 7}};
+    for (u32 index = 0; index < 4; ++index) {
+        for (u32 vertex = 0; vertex < 3; ++vertex) mixedTriangles[index].verts[vertex] = indices[index][vertex];
+        mixedTriangles[index].material = index < 2 ? 0 : 1;
+    }
+    for (bool sphere : {false, true}) {
+        core.Clear();
+        core.SetSimulationParameters(0, 18);
+        const auto mixed = core.BuildCDBModel(mixedVertices, 8, mixedTriangles, 4);
+        core.CreateStaticBody(mixed, V(0, 0, 0));
+        core.DestroyCDBModel(mixed);
+        const auto movingShape = sphere ? core.CreateSphereShape(.5f) : core.CreateBoxShape(V(.5f, .5f, .5f));
+        const auto moving = core.CreateBodyFromShape(movingShape, V(-.49f, .49f, 0), 2);
+        core.DestroyCDBModel(movingShape);
+        core.SetBodyUserData(moving, &core);
+        core.SetBodyContactPolicyCallback(BodyPolicy);
+        core.SetRigidBodyContactCallback(TrackFluidPreparation);
+        core.SetDeferredRigidBodyContactCallback(TrackFluidEffects);
+        auto resetCounts = [&] { preparedDryHits = preparedWetHits = deferredDryHits = deferredWetHits = 0; };
+        resetCounts();
+        core.Step(.01f);
+        Require(preparedWetHits > 0 && preparedDryHits == 0, "Mixed-leaf preparation retains only fluid triangles");
+        Require(deferredDryHits > 0 && deferredWetHits == 0, "Mixed-leaf dry effects survive without duplicate fluid effects");
+        Fmatrix transform = Fidentity;
+        transform.c = V(-.49f, .49f, 0);
+        core.SetBodyTransform(moving, transform);
+        core.SetBodyLinearVelocity(moving, V(0, 0, 0));
+        immediateFixture = true;
+        resetCounts();
+        core.ActivateBody(moving);
+        core.Step(.01f);
+        Require(preparedWetHits > 0 && preparedDryHits > 0 && deferredDryHits == 0 && deferredWetHits == 0,
+            "Response-changing policies retain every mixed-leaf preparatory contact");
+        immediateFixture = false;
+        transform.c = V(-2, .49f, 0);
+        core.SetBodyTransform(moving, transform);
+        core.SetBodyLinearVelocity(moving, V(200, 0, 0));
+        core.SetBodyContinuousCollision(moving, true);
+        resetCounts();
+        core.Step(.01f);
+        Require(preparedWetHits > 0 && preparedDryHits == 0, "Mixed-leaf fluid sweeps retain first-step preparation");
+    }
 }
 }
 int main() {
@@ -754,12 +888,14 @@ int main() {
         AnimatedTarget(*core);
         CaptureTarget(*core);
         PlacementAndCharacters(*core);
+        CharacterQueryFiltering(*core);
         CharacterPolicies(*core);
         CharacterRestrictions(*core);
         CollisionOwners(*core);
         StaticEnvironmentPolicy(*core);
         CollisionPolicies(*core);
         OptimizedContactsAndSleeping(*core);
+        ChangingPassiveResistance(*core);
         FluidExclusionRegions(*core);
         core->Clear();
         Require(core->GetStatistics().bodies == 0 && core->GetStatistics().characters == 0 &&

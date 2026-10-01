@@ -47,4 +47,21 @@ bool XRayVisitMeshRay(const MeshShape& mesh, void* context, Vec3Arg origin,
     Vec3Arg direction, float& range, XRayMeshTriangleCallback triangle);
 bool XRayVisitMeshBox(const MeshShape& mesh, void* context, Vec3Arg minimum,
     Vec3Arg maximum, XRayMeshTriangleCallback triangle);
+// Optional filter for synchronous mesh overlap/sweep queries. The simulation
+// and unrelated threads keep their ordinary collision behavior. Nested scopes
+// restore the previous filter, including when a query exits early.
+class XRayMeshTriangleFilter final
+{
+public:
+    using Callback = bool(*)(void*, const MeshShape&, SubShapeID);
+    XRayMeshTriangleFilter(void* state, Callback function);
+    ~XRayMeshTriangleFilter();
+    XRayMeshTriangleFilter(const XRayMeshTriangleFilter&) = delete;
+    XRayMeshTriangleFilter& operator=(const XRayMeshTriangleFilter&) = delete;
+    void* context;
+    Callback callback;
+private:
+    const XRayMeshTriangleFilter* previous;
+};
+const XRayMeshTriangleFilter* XRayGetMeshTriangleFilter();
 }

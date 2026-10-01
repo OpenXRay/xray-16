@@ -1,4 +1,15 @@
 // Included in the generated MeshShape translation unit, alongside its codecs.
+namespace {
+thread_local const XRayMeshTriangleFilter* currentMeshTriangleFilter = nullptr;
+}
+XRayMeshTriangleFilter::XRayMeshTriangleFilter(void* state, Callback function)
+    : context(state), callback(function), previous(currentMeshTriangleFilter)
+{
+    currentMeshTriangleFilter = this;
+}
+XRayMeshTriangleFilter::~XRayMeshTriangleFilter() { currentMeshTriangleFilter = previous; }
+const XRayMeshTriangleFilter* XRayGetMeshTriangleFilter() { return currentMeshTriangleFilter; }
+
 class XRayMeshQueries
 {
 public:

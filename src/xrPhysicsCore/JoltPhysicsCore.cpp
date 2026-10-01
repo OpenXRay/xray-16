@@ -141,6 +141,7 @@ static bool JoltAssertFailedImpl(const char* inExpression, const char* inMessage
 void JoltPhysicsCore::Initialize()
 {
     if (m_physics_system) return;
+    m_profile_enabled = std::getenv("XRAY_JOLT_CONTACT_PROFILE") != nullptr;
 
     JPH::Trace = JoltTraceImpl;
 #ifdef JPH_ENABLE_ASSERTS
@@ -282,21 +283,58 @@ void JoltPhysicsCore::Step(float delta_time)
     m_contact_forces.clear();
     const auto preparationStart = std::chrono::steady_clock::now();
     PrepareContacts(delta_time);
+    const auto contactEnd = m_profile_enabled ? std::chrono::steady_clock::now() : preparationStart;
     if (m_pre_integration_callback) m_pre_integration_callback();
+    const auto forcesEnd = m_profile_enabled ? std::chrono::steady_clock::now() : preparationStart;
     PrepareJointFeedback();
     const auto integrationStart = std::chrono::steady_clock::now();
     const auto result = m_physics_system->Update(delta_time, collision_steps, m_temp_allocator, m_job_system);
     R_ASSERT2(result == JPH::EPhysicsUpdateError::None, "Native Jolt simulation capacity exceeded");
     const auto feedbackStart = std::chrono::steady_clock::now();
     UpdateJointFeedback(delta_time);
-
+    const auto jointsEnd = m_profile_enabled ? std::chrono::steady_clock::now() : feedbackStart;
     FlushDeferredRigidBodyContacts();
+    const auto rigidEnd = m_profile_enabled ? std::chrono::steady_clock::now() : feedbackStart;
     FlushDeferredContacts();
+    const auto characterEnd = m_profile_enabled ? std::chrono::steady_clock::now() : feedbackStart;
     FlushDeferredActivations(*m_physics_system, m_body_activation_callback);
     const auto finish = std::chrono::steady_clock::now();
     m_step_statistics.contact_preparation_ms = std::chrono::duration<double, std::milli>(integrationStart - preparationStart).count();
     m_step_statistics.integration_ms = std::chrono::duration<double, std::milli>(feedbackStart - integrationStart).count();
     m_step_statistics.feedback_ms = std::chrono::duration<double, std::milli>(finish - feedbackStart).count();
+    if (m_profile_enabled) {
+        const std::array boundaries{preparationStart, contactEnd, forcesEnd, integrationStart,
+            feedbackStart, jointsEnd, rigidEnd, characterEnd, finish};
+        for (size_t index = 0; index < m_profile_times.size(); ++index)
+            m_profile_times[index] += std::chrono::duration<double, std::milli>(boundaries[index + 1] - boundaries[index]).count();
+        if (++m_profile_steps % 100 == 0) {
+            Msg("NATIVE_CORE_PROFILE contacts_ms=%.6f forces_ms=%.6f joints_prepare_ms=%.6f integration_ms=%.6f joints_feedback_ms=%.6f rigid_effects_ms=%.6f character_effects_ms=%.6f activations_ms=%.6f",
+                m_profile_times[0] / 100, m_profile_times[1] / 100, m_profile_times[2] / 100, m_profile_times[3] / 100,
+                m_profile_times[4] / 100, m_profile_times[5] / 100, m_profile_times[6] / 100, m_profile_times[7] / 100);
+            Msg("NATIVE_WAKE_PROFILE explicit=%llu/%llu motor=%llu/%llu limit=%llu/%llu force=%llu/%llu torque=%llu/%llu linear=%llu/%llu angular=%llu/%llu",
+                m_profile_wake_calls[0], m_profile_wake_sleeping[0], m_profile_wake_calls[1], m_profile_wake_sleeping[1],
+                m_profile_wake_calls[2], m_profile_wake_sleeping[2], m_profile_wake_calls[3], m_profile_wake_sleeping[3],
+                m_profile_wake_calls[4], m_profile_wake_sleeping[4], m_profile_wake_calls[5], m_profile_wake_sleeping[5],
+                m_profile_wake_calls[6], m_profile_wake_sleeping[6]);
+            m_profile_times.fill(0);
+            Msg("NATIVE_CHARACTER_PROFILE calls=%llu update_ms=%.6f contacts_ms=%.6f", m_profile_character_calls,
+                m_profile_character_update_ms / 100, m_profile_character_contacts_ms / 100);
+            m_profile_character_calls = 0;
+            m_profile_character_update_ms = m_profile_character_contacts_ms = 0;
+            m_profile_wake_calls.fill(0);
+            m_profile_wake_sleeping.fill(0);
+            Msg("NATIVE_MOTOR_PROFILE brakes=%llu drives=%llu invalid=%llu", m_profile_motor_brakes, m_profile_motor_drives, m_profile_motor_invalid);
+            m_profile_motor_brakes = m_profile_motor_drives = m_profile_motor_invalid = 0;
+        }
+    }
+}
+
+void JoltPhysicsCore::ProfileWake(WakeSource source, JPH::BodyID body)
+{
+    if (!m_profile_enabled) return;
+    const auto index = static_cast<size_t>(source);
+    ++m_profile_wake_calls[index];
+    if (!m_physics_system->GetBodyInterface().IsActive(body)) ++m_profile_wake_sleeping[index];
 }
 
 void JoltPhysicsCore::SetRigidBodyContactCallback(RigidBodyContactCallbackFun callback)
@@ -1408,8 +1446,8 @@ void JoltPhysicsCore::SetJointLimits(JointHandle joint, int axis_num, float lo, 
         const JPH::Body* b1 = two_body_c->GetBody1();
         const JPH::Body* b2 = two_body_c->GetBody2();
         JPH::BodyInterface& bi = m_physics_system->GetBodyInterface();
-        if (b1 && b1->IsDynamic()) bi.ActivateBody(b1->GetID());
-        if (b2 && b2->IsDynamic()) bi.ActivateBody(b2->GetID());
+        if (b1 && b1->IsDynamic()) { ProfileWake(WakeSource::Limit, b1->GetID()); bi.ActivateBody(b1->GetID()); }
+        if (b2 && b2->IsDynamic()) { ProfileWake(WakeSource::Limit, b2->GetID()); bi.ActivateBody(b2->GetID()); }
     }
 }
 
@@ -1421,30 +1459,38 @@ void JoltPhysicsCore::SetJointMotor(JointHandle joint, int axis_num, float force
     JPH::Constraint* c = it->second.GetPtr();
     // A zero-speed powered motor is a brake, not an inactive motor.
     bool active = force > 0.0f;
+    const bool brake = active && velocity == 0;
+    bool wasDriving = false;
     // Identical resistance updates must preserve warm starts and sleeping.
     auto& motors = m_joint_motors[joint];
     auto previous = std::find_if(motors.begin(), motors.end(),
         [axis_num](const JointMotor& value) { return value.axis == axis_num; });
     if (previous != motors.end()) {
+        wasDriving = previous->force > 0 && previous->velocity != 0;
         if ((!active && previous->force <= 0) ||
             (previous->force == force && previous->velocity == velocity)) return;
         *previous = {axis_num, force, velocity};
     } else motors.push_back({axis_num, force, velocity});
 
+    if (m_profile_enabled) {
+        if (!_valid(force) || !_valid(velocity)) ++m_profile_motor_invalid;
+        else if (velocity == 0) ++m_profile_motor_brakes;
+        else ++m_profile_motor_drives;
+    }
+
     if (c->GetSubType() == JPH::EConstraintSubType::Hinge) {
         auto* hinge = static_cast<JPH::HingeConstraint*>(c);
-        hinge->SetMotorState(active ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
-        if (active) {
+        hinge->SetMaxFrictionTorque(brake ? force : 0);
+        hinge->SetMotorState(active && !brake ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
+        if (active && !brake) {
             hinge->SetTargetAngularVelocity(velocity);
             hinge->GetMotorSettings().SetTorqueLimit(force);
-            hinge->ResetWarmStart();
-        } else {
-            hinge->ResetWarmStart();
         }
     } else if (c->GetSubType() == JPH::EConstraintSubType::Slider) {
         auto* slider = static_cast<JPH::SliderConstraint*>(c);
-        slider->SetMotorState(active ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
-        if (active) {
+        slider->SetMaxFrictionForce(brake ? force : 0);
+        slider->SetMotorState(active && !brake ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
+        if (active && !brake) {
             slider->SetTargetVelocity(velocity);
             slider->GetMotorSettings().SetForceLimit(force);
         }
@@ -1453,8 +1499,9 @@ void JoltPhysicsCore::SetJointMotor(JointHandle joint, int axis_num, float force
         auto axis = (axis_num == 0) ? JPH::SixDOFConstraintSettings::EAxis::RotationX :
                     (axis_num == 1) ? JPH::SixDOFConstraintSettings::EAxis::RotationY :
                                       JPH::SixDOFConstraintSettings::EAxis::RotationZ;
-        six->SetMotorState(axis, active ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
-        if (active) {
+        six->SetMaxFriction(axis, brake ? force : 0);
+        six->SetMotorState(axis, active && !brake ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
+        if (active && !brake) {
             JPH::Vec3 target_vel = six->GetTargetAngularVelocityCS();
             if (axis_num == 0) target_vel.SetX(velocity);
             else if (axis_num == 1) target_vel.SetY(velocity);
@@ -1464,13 +1511,17 @@ void JoltPhysicsCore::SetJointMotor(JointHandle joint, int axis_num, float force
         }
     }
 
-    if (m_physics_system) {
+    // Passive resistance cannot accelerate a resting body. Changing its cap
+    // preserves native friction warm starts and does not reset sleep timers.
+    // Starting/changing a drive, or stopping a previously powered drive,
+    // still wakes connected bodies so the new command takes effect.
+    if (m_physics_system && (wasDriving || (active && !brake))) {
         JPH::TwoBodyConstraint* two_body_c = static_cast<JPH::TwoBodyConstraint*>(c);
         const JPH::Body* b1 = two_body_c->GetBody1();
         const JPH::Body* b2 = two_body_c->GetBody2();
         JPH::BodyInterface& bi = m_physics_system->GetBodyInterface();
-        if (b1 && b1->IsDynamic()) bi.ActivateBody(b1->GetID());
-        if (b2 && b2->IsDynamic()) bi.ActivateBody(b2->GetID());
+        if (b1 && b1->IsDynamic()) { ProfileWake(WakeSource::Motor, b1->GetID()); bi.ActivateBody(b1->GetID()); }
+        if (b2 && b2->IsDynamic()) { ProfileWake(WakeSource::Motor, b2->GetID()); bi.ActivateBody(b2->GetID()); }
     }
 }
 
@@ -1564,6 +1615,7 @@ void JoltPhysicsCore::SetBodyLinearVelocity(BodyHandle body_handle, const Fvecto
     JPH::BodyID id(body_handle);
     JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 
+    if (m_profile_enabled && (vel.x != 0 || vel.y != 0 || vel.z != 0)) ProfileWake(WakeSource::LinearVelocity, id);
     body_interface.SetLinearVelocity(id, JPH::Vec3(vel.x, vel.y, vel.z));
 }
 
@@ -1583,6 +1635,7 @@ void JoltPhysicsCore::SetBodyAngularVelocity(BodyHandle body_handle, const Fvect
     JPH::BodyID id(body_handle);
     JPH::BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 
+    if (m_profile_enabled && (vel.x != 0 || vel.y != 0 || vel.z != 0)) ProfileWake(WakeSource::AngularVelocity, id);
     body_interface.SetAngularVelocity(id, JPH::Vec3(vel.x, vel.y, vel.z));
 }
 
@@ -1624,12 +1677,14 @@ void JoltPhysicsCore::ApplyPointImpulse(BodyHandle body_handle, const Fvector& i
 void JoltPhysicsCore::ApplyForce(BodyHandle body_handle, const Fvector& force) {
     if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) return;
     JPH::BodyID id(body_handle);
+    if (m_profile_enabled) ProfileWake(WakeSource::Force, id);
     m_physics_system->GetBodyInterface().AddForce(id, JPH::Vec3(force.x, force.y, force.z));
 }
 
 void JoltPhysicsCore::ApplyTorque(BodyHandle body_handle, const Fvector& torque) {
     if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) return;
     JPH::BodyID id(body_handle);
+    if (m_profile_enabled) ProfileWake(WakeSource::Torque, id);
     m_physics_system->GetBodyInterface().AddTorque(id, JPH::Vec3(torque.x, torque.y, torque.z));
 }
 
@@ -1643,7 +1698,7 @@ void JoltPhysicsCore::ActivateBody(BodyHandle body_handle) {
     if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) return;
     JPH::BodyID id(body_handle);
     auto& bodies = m_physics_system->GetBodyInterface();
-    if (bodies.IsAdded(id)) bodies.ActivateBody(id);
+    if (bodies.IsAdded(id)) { ProfileWake(WakeSource::Explicit, id); bodies.ActivateBody(id); }
 }
 
 void JoltPhysicsCore::DeactivateBody(BodyHandle body_handle) {
@@ -1829,29 +1884,26 @@ PhysicsShapeHandle JoltPhysicsCore::CreateCapsuleShape(float radius, float half_
 
 class JoltIgnoreActorBodyFilter : public JPH::BodyFilter {
 public:
-    JPH::PhysicsSystem* m_system;
     JPH::uint64 m_actor_user_data;
     IPhysicsCore::QueryFilterFun m_filter;
     bool m_camera;
 
-    JoltIgnoreActorBodyFilter(JPH::PhysicsSystem* system, JPH::uint64 user_data,
+    JoltIgnoreActorBodyFilter(JPH::uint64 user_data,
         IPhysicsCore::QueryFilterFun filter = nullptr, bool camera = false)
-        : m_system(system), m_actor_user_data(user_data), m_filter(filter), m_camera(camera) {}
+        : m_actor_user_data(user_data), m_filter(filter), m_camera(camera) {}
 
-    virtual bool ShouldCollide(const JPH::BodyID &inBodyID) const override {
-        JPH::BodyLockRead lock(m_system->GetBodyLockInterface(), inBodyID);
-        if (lock.Succeeded()) {
-            const JPH::Body& body = lock.GetBody();
-            if (body.IsSensor()) return false;
-            if (m_filter && !m_filter(reinterpret_cast<void*>(body.GetUserData()),
-                body.GetObjectLayer(), reinterpret_cast<void*>(m_actor_user_data), m_camera)) return false;
-            if (m_actor_user_data != 0 && body.GetUserData() == m_actor_user_data) {
-                return false;
-            }
-            // Ignore kinematic active ragdoll parts of alive characters - their CharacterVirtual handles collision
-            if (body.GetObjectLayer() == Layers::RAGDOLL && body.IsKinematic()) {
-                return false;
-            }
+    bool ShouldCollideLocked(const JPH::Body& body) const override {
+        // NarrowPhaseQuery already holds the read lock here. Inspecting body
+        // members in ShouldCollide used to acquire and release it a second time.
+        if (body.IsSensor()) return false;
+        if (m_filter && !m_filter(reinterpret_cast<void*>(body.GetUserData()),
+            body.GetObjectLayer(), reinterpret_cast<void*>(m_actor_user_data), m_camera)) return false;
+        if (m_actor_user_data != 0 && body.GetUserData() == m_actor_user_data) {
+            return false;
+        }
+        // Alive characters collide through their CharacterVirtual controller.
+        if (body.GetObjectLayer() == Layers::RAGDOLL && body.IsKinematic()) {
+            return false;
         }
         return true;
     }
@@ -2263,7 +2315,7 @@ void JoltPhysicsCore::SetCharacterVirtualPosition(CharacterVirtualHandle handle,
         pos += character->GetUp() * character->GetCharacterPadding();
         character->SetPosition(pos);
         if (m_physics_system && m_temp_allocator) {
-            JoltIgnoreActorBodyFilter filter(m_physics_system, character->GetUserData(), m_query_filter);
+            JoltIgnoreActorBodyFilter filter(character->GetUserData(), m_query_filter);
             character->RefreshContacts(m_physics_system->GetDefaultBroadPhaseLayerFilter(Layers::MOVING),
                 m_physics_system->GetDefaultLayerFilter(Layers::MOVING), filter, {}, *m_temp_allocator);
         }
@@ -2277,7 +2329,7 @@ void JoltPhysicsCore::SetCharacterVirtualShape(CharacterVirtualHandle handle, Ph
         JPH::CharacterVirtual* character = it->second.GetPtr();
         if (!character) return;
 
-        JoltIgnoreActorBodyFilter body_filter(m_physics_system, character->GetUserData(), m_query_filter);
+        JoltIgnoreActorBodyFilter body_filter(character->GetUserData(), m_query_filter);
 
         if (character->SetShape(jolt_shape, 1.5f,
                              m_physics_system->GetDefaultBroadPhaseLayerFilter(Layers::MOVING),
@@ -2452,8 +2504,9 @@ void JoltPhysicsCore::UpdateCharacterVirtual(CharacterVirtualHandle handle, floa
         update_settings.mWalkStairsCosAngleForwardContact = JPH::Cos(JPH::DegreesToRadians(80.0f));
         update_settings.mWalkStairsStepDownExtra = -character->GetUp() * 0.20f;
 
-        JoltIgnoreActorBodyFilter body_filter(m_physics_system, character->GetUserData(), m_query_filter);
+        JoltIgnoreActorBodyFilter body_filter(character->GetUserData(), m_query_filter);
 
+        const auto profileStart = m_profile_enabled ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
         character->ExtendedUpdate(
             delta_time,
             jolt_gravity * gravity_factor,
@@ -2462,6 +2515,7 @@ void JoltPhysicsCore::UpdateCharacterVirtual(CharacterVirtualHandle handle, floa
             m_physics_system->GetDefaultLayerFilter(Layers::MOVING),
             body_filter, {}, *m_temp_allocator
         );
+        const auto profileContacts = m_profile_enabled ? std::chrono::steady_clock::now() : profileStart;
 
         auto cb_it = m_character_callbacks.find(handle);
         if (cb_it != m_character_callbacks.end() && cb_it->second.callback) {
@@ -2492,6 +2546,11 @@ void JoltPhysicsCore::UpdateCharacterVirtual(CharacterVirtualHandle handle, floa
             );
 
             FlushDeferredContacts();
+        }
+        if (m_profile_enabled) {
+            ++m_profile_character_calls;
+            m_profile_character_update_ms += std::chrono::duration<double, std::milli>(profileContacts - profileStart).count();
+            m_profile_character_contacts_ms += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - profileContacts).count();
         }
     }
 }
@@ -3269,7 +3328,7 @@ bool JoltPhysicsCore::CheckShapePlacement(PhysicsShapeHandle shape, const Fvecto
 
     JPH::uint64 actor_user_data = reinterpret_cast<JPH::uint64>(ignore_user_data);
     PlacementCollector collector;
-    JoltIgnoreActorBodyFilter body_filter(m_physics_system, actor_user_data, m_query_filter, camera);
+    JoltIgnoreActorBodyFilter body_filter(actor_user_data, m_query_filter, camera);
 
     m_physics_system->GetNarrowPhaseQuery().CollideShape(
         jolt_shape,

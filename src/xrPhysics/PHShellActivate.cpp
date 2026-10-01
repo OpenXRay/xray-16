@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <cstdlib>
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "PHShellSplitter.h"
@@ -187,6 +188,25 @@ void CPHShell::PhDataUpdate(float dTime)
         (*i)->PhDataUpdate(dTime);
         if (GetPhysicsCore()->IsBodyActive((*i)->get_body())) disabled = false;
         if (!(*i)->isFixed() && GetPhysicsCore()->IsBodyActive((*i)->get_body()) && !(*i)->WantsSleep()) wantsSleep = false;
+    }
+    static const bool profile = std::getenv("XRAY_JOLT_CONTACT_PROFILE") != nullptr;
+    if (profile && ph_world->StepsNum() % 100 == 0) {
+        unsigned active = 0, votes = 0, level1 = 0, level2 = 0;
+        float linear = 0, angular = 0;
+        for (auto* element : elements) {
+            if (!GetPhysicsCore()->IsBodyActive(element->get_body())) continue;
+            ++active;
+            votes += element->WantsSleep();
+            level1 += bool(element->SleepProfileFlags() & 1);
+            level2 += bool(element->SleepProfileFlags() & 4);
+            Fvector velocity;
+            GetPhysicsCore()->GetBodyLinearVelocity(element->get_body(), velocity);
+            linear = std::max(linear, velocity.magnitude());
+            GetPhysicsCore()->GetBodyAngularVelocity(element->get_body(), velocity);
+            angular = std::max(angular, velocity.magnitude());
+        }
+        Msg("NATIVE_SLEEP_PROFILE name=%s active=%u votes=%u l1=%u l2=%u linear=%g angular=%g",
+            PhysicsRefObject() ? PhysicsRefObject()->ObjectName() : "fixture", active, votes, level1, level2, linear, angular);
     }
     if (wantsSleep && !disabled)
     {

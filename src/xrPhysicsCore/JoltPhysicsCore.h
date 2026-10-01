@@ -20,6 +20,7 @@
 #include <atomic>
 #include <unordered_set>
 #include <mutex>
+#include <array>
 
 class JoltPhysicsCore : public IPhysicsCore {
 private:
@@ -28,6 +29,15 @@ private:
     JPH::JobSystemThreadPool* m_job_system = nullptr;
     u32 m_worker_count = 0;
     PhysicsCoreStatistics m_step_statistics;
+    bool m_profile_enabled = false;
+    u32 m_profile_steps = 0;
+    enum class WakeSource { Explicit, Motor, Limit, Force, Torque, LinearVelocity, AngularVelocity, Count };
+    std::array<u64, static_cast<size_t>(WakeSource::Count)> m_profile_wake_calls{}, m_profile_wake_sleeping{};
+    std::array<double, 8> m_profile_times{};
+    double m_profile_character_update_ms = 0, m_profile_character_contacts_ms = 0;
+    u64 m_profile_character_calls = 0;
+    u64 m_profile_motor_brakes = 0, m_profile_motor_drives = 0, m_profile_motor_invalid = 0;
+    void ProfileWake(WakeSource source, JPH::BodyID body);
     struct CollisionOwner { u32 group, references; };
     std::unordered_map<void*, CollisionOwner> m_collision_owners;
     std::unordered_map<BodyHandle, void*> m_body_owners;
@@ -108,6 +118,7 @@ private:
         JPH::AABox bounds;
         JPH::AABox fluid_bounds;
         bool fluid_mesh = false;
+        bool static_body = false;
     };
     std::vector<ContactBody> m_contact_bodies;
     JPH::BodyIDVector m_query_bodies, m_active_query_bodies;
@@ -126,6 +137,7 @@ private:
     std::vector<NativePhysicsContact> m_deferred_rb_contacts;
     std::mutex m_deferred_rb_mutex;
     bool NeedsContactPreparation(JPH::BodyID first, JPH::BodyID second) const;
+    bool NeedsPreparedContact(const NativePhysicsContact& contact) const;
     void QueueDeferredContact(const JPH::Body& first, const JPH::Body& second,
         JPH::SubShapeID shape1, JPH::SubShapeID shape2, JPH::RVec3Arg point,
         JPH::Vec3Arg normal, float depth);

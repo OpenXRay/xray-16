@@ -1,4 +1,6 @@
 #include "StdAfx.h"
+#include <chrono>
+#include <cstdlib>
 #include "PHWorld.h"
 #include "PHActorCharacter.h"
 #ifdef XRAY_GAMEPLAY_BENCHMARK
@@ -536,6 +538,9 @@ void CPHWorld::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 static u32 start_time = 0;
 void CPHWorld::Step()
 {
+    static const bool profile = std::getenv("XRAY_JOLT_CONTACT_PROFILE") != nullptr;
+    using ProfileClock = std::chrono::steady_clock;
+    const auto profileStart = profile ? ProfileClock::now() : ProfileClock::time_point{};
 #ifdef XRAY_GAMEPLAY_BENCHMARK
     const bool capturing = m_benchmark->Active();
     if (capturing)
@@ -594,6 +599,7 @@ void CPHWorld::Step()
 #endif
 
     stats.Core.End();
+    const auto profileDataStart = profile ? ProfileClock::now() : profileStart;
 
     // Синхронизируем результаты обратно в движок
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
@@ -616,6 +622,16 @@ void CPHWorld::Step()
         physics_step_time_callback(start_time, start_time + u32(fixed_step * 1000));
         start_time += u32(fixed_step * 1000);
     };
+    if (profile) {
+        static unsigned count = 0;
+        static double before = 0, data = 0;
+        before += std::chrono::duration<double, std::milli>(profileDataStart - profileStart).count();
+        data += std::chrono::duration<double, std::milli>(ProfileClock::now() - profileDataStart).count();
+        if (++count % 100 == 0) {
+            Msg("NATIVE_WORLD_PROFILE before_data_ms=%.6f data_ms=%.6f objects=%u update_objects=%u", before / 100, data / 100, unsigned(m_objects.count()), unsigned(m_update_objects.count()));
+            before = data = 0;
+        }
+    }
 #ifdef XRAY_GAMEPLAY_BENCHMARK
     if (capturing) {
         sample.step = m_steps_num;

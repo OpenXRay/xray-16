@@ -54,6 +54,11 @@ class CPHElement : public CPhysicsElement,
     };
 public:
     bool WantsSleep() const { return m_disabled; }
+    unsigned SleepProfileFlags() const {
+        return unsigned(m_stateL1.disable) | (unsigned(m_stateL1.enable) << 1) |
+            (unsigned(m_stateL2.disable) << 2) | (unsigned(m_stateL2.enable) << 3) |
+            (unsigned(m_disabled) << 4);
+    }
     CPHFracturesHolder* m_fratures_holder;
     PhysicsMassProperties NativeMassProperties();
     PhysicsMassProperties CalculateMassProperties(u16 from, u16 to, bool inside, Fvector& center);
