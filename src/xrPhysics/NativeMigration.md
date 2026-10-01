@@ -168,17 +168,21 @@ ODE, 0.062 m for Jolt 0, and 0.031 m for Jolt 4.
 Complete physics step times in milliseconds; p95 is the median of the three
 per-process p95 values:
 
-| Phase | ODE mean | Jolt 0 mean | Jolt 4 mean | ODE p95 | Jolt 4 p95 | ODE awake bodies | Jolt 4 awake bodies |
+| Phase | ODE mean | Jolt 0 mean | Jolt 4 mean | ODE p95 | Jolt 4 p95 | ODE body count | Jolt 4 active count |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Idle | 0.060 | 1.046 | 0.860 | 0.068 | 1.064 | 27.0 | 126.0 |
 | Driven ragdolls | 0.869 | 2.238 | 1.755 | 0.995 | 2.108 | 166.9 | 265.3 |
 
 Jolt 4's three ragdoll means range from 1.744 to 1.814 ms; ODE's range from
 0.747 to 0.915 ms. In this saved scene the native port takes 14.3 times the idle
-physics time and 2.02 times the ragdoll physics time. It also keeps more bodies
-awake, so this measures the behavior and cost of the complete port rather than
-equal-body solver throughput. Contact counts and the ODE/native constraint
-counters are not directly equivalent either.
+physics time and 2.02 times the ragdoll physics time. The reported active workload
+is larger, but these counters have different definitions: ODE counts bodies in
+active islands; native Jolt counts active rigid bodies plus active virtual
+characters. They do not establish an exact difference in awake rigid bodies.
+A per-object activation/sleep audit is needed to attribute the extra work.
+This measures the behavior and cost of the complete port rather than equal-body
+solver throughput. Contact counts and the ODE/native constraint counters are
+not directly equivalent either.
 
 Jolt 4 spends about 0.523 ms idle / 1.112 ms ragdolls in contact preparation,
 and 0.201 / 0.415 ms in native integration. Preparation accounts for roughly
@@ -236,7 +240,7 @@ will differ from ODE even when gameplay interfaces and invariants are preserved.
 
 The contact callback prepass repeats narrow-phase work so gameplay code can
 change collision response before native worker jobs. Its cost, and differences
-in the number of awake bodies in a loaded scene, must be included when judging
+in activation and character representation in a loaded scene, must be included when judging
 [issue #2139](https://github.com/OpenXRay/xray-16/issues/2139)'s performance
 premise. A local native migration is not a recommendation to ship it solely
 because the standalone solver benchmarks win.
