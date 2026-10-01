@@ -5,6 +5,7 @@ param(
     [Parameter(Mandatory)][string]$OutputRoot,
     # Reuse one game workspace across comparisons; results remain in OutputRoot.
     [string]$ScratchRoot,
+    [ValidateSet('cop', 'cs')][string]$GameMode = 'cop',
     [string]$Save = 'collision-start',
     [ValidateRange(1, 20)][int]$Repetitions = 3,
     [switch]$ValidateReload,
@@ -18,6 +19,7 @@ if (!$Resume -and (Test-Path -LiteralPath (Join-Path $OutputRoot 'results'))) {
     throw 'Use a fresh OutputRoot so captures from different comparisons cannot be mixed.'
 }
 $runtimes = Get-Content -LiteralPath $RuntimeManifest -Raw | ConvertFrom-Json
+$saveExtension = if ($GameMode -eq 'cs') { '.sav' } else { '.scop' }
 if (@($runtimes.name | Select-Object -Unique).Count -ne @($runtimes).Count) { throw 'Runtime names must be unique.' }
 if (Get-Process xrEngine -ErrorAction SilentlyContinue) { throw 'Close the existing game before benchmarking.' }
 foreach ($runtime in $runtimes) {
@@ -60,6 +62,7 @@ $machine = [ordered]@{
     repetitions = $Repetitions
     engine_sha256 = $engineHashes[0]
     shader_compiler_sha256 = @($compilerHashes.Values)[0]
+    game_mode = $GameMode
 }
 $configFile = Join-Path $OutputRoot 'benchmark-user.ltx'
 if ($Resume -and (Test-Path -LiteralPath $configFile)) {
@@ -102,6 +105,8 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
             if ($previous.shader_compiler_sha256 -and $previous.shader_compiler_sha256 -ne $compilerHashes[$runtime.name]) {
                 throw 'Shader compiler changed since the completed capture.'
             }
+            $previousMode = if ($previous.game_mode) { $previous.game_mode } else { 'cop' }
+            if ($previousMode -ne $GameMode) { throw 'Game mode changed since the completed capture.' }
             Write-Host "Keeping completed $($runtime.name), repetition $repetition"
             continue
         }
@@ -116,7 +121,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
         Copy-Item -LiteralPath (Join-Path $TemplateRoot 'gamedata') -Destination $root -Recurse -Force
         New-Item -ItemType Directory -Path (Join-Path $root 'gamedata/scripts') -Force | Out-Null
         Copy-Item -LiteralPath (Join-Path $sourceRoot 'src/xrPhysics/tests/gameplay_benchmark.script') -Destination (Join-Path $root 'gamedata/scripts') -Force
-        Copy-Item -LiteralPath (Join-Path $TemplateRoot "userdata/savedgames/$Save.scop") -Destination (Join-Path $root 'userdata/savedgames') -Force
+        Copy-Item -LiteralPath (Join-Path $TemplateRoot "userdata/savedgames/$Save$saveExtension") -Destination (Join-Path $root 'userdata/savedgames') -Force
         Copy-Item -LiteralPath $configFile -Destination (Join-Path $root 'userdata/user.ltx') -Force
         foreach ($file in 'benchmark-idle.csv','benchmark-ragdolls.csv','benchmark-queries.csv') {
             $old = Join-Path $root "userdata/$file"
@@ -132,7 +137,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
             $env:XRAY_JOLT_WORKERS = [string]$runtime.workers
         }
         $game = Start-Process -FilePath (Join-Path $runtime.directory 'xrEngine.exe') -WorkingDirectory $root -WindowStyle Hidden -PassThru -ArgumentList @(
-            '-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
+            "-$GameMode",'-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
             '-start',"server($Save/single/alife/load)",'client(localhost)','-$run_script','gameplay_benchmark')
         # Retain the process handle so its exit status remains available after
         # a fast exit, including on Windows PowerShell 5.
@@ -167,7 +172,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
             }
             $benchmarkExitCode = $game.ExitCode
             if ($ValidateReload) {
-                $saveFile = Join-Path $root 'userdata/savedgames/native-physics-validation.scop'
+                $saveFile = Join-Path $root "userdata/savedgames/native-physics-validation$saveExtension"
                 if (!(Test-Path -LiteralPath $saveFile)) { throw 'Game did not write the validation save.' }
                 $states = [regex]::Matches($contents, 'SAVE_OBJECT id=(\d+) elements=(\d+) joints=(\d+) mass=([\d.]+) x=([-\d.]+) y=([-\d.]+) z=([-\d.]+) bx=([-\d.]+) by=([-\d.]+) bz=([-\d.]+)')
                 if ($states.Count -ne 12) { throw 'Missing saved ragdoll states.' }
@@ -182,7 +187,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                 Copy-Item -LiteralPath $log.FullName -Destination (Join-Path $result 'engine.log') -Force
                 Copy-Item -LiteralPath $saveFile -Destination $result -Force
                 $reload = Start-Process -FilePath (Join-Path $runtime.directory 'xrEngine.exe') -WorkingDirectory $root -WindowStyle Hidden -PassThru -ArgumentList @(
-                    '-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
+                    "-$GameMode",'-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
                     '-start','server(native-physics-validation/single/alife/load)','client(localhost)','-$run_script','gameplay_reload')
                 $null = $reload.Handle
                 try {
@@ -224,6 +229,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                     (Get-FileHash -LiteralPath (Join-Path $runtime.directory 'xrPhysicsCore.dll')).Hash
                 } else { $null })
                 shader_compiler_sha256 = $compilerHashes[$runtime.name]
+                game_mode = $GameMode
                 saved_at_utc = [DateTime]::UtcNow.ToString('o')
             } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $result 'run.json')
             if ($benchmarkExitCode -ne 0) {

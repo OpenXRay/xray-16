@@ -311,6 +311,18 @@ Runtime manifests are `native-second-final-runtimes.json` and
 `native-game-bin-performance-final`. New records include matched compiler
 SHA256 `A05F99734F7C4822FEFC12B367AF21FD0976ED6608752FB1E1E80B6ECE7ECBBB`.
 
+### Clear Sky cross-game check
+
+The additional [Clear Sky starting-base comparison](tests/benchmark-results/2026-10-01-clear-sky.md)
+reuses these native binaries and the ODE reference, with three captures each
+at one native worker. The local changes lower idle step time from 0.746 to
+0.716 ms (4.0%), nearest/any rays by 5.3%/6.7%; ragdoll ranges overlap.
+All nine captures and reloads pass, including all 35 checks in each native run.
+ODE remains faster at 0.030 ms idle / 0.853 ms ragdolls vs new native's
+0.716 / 1.098 ms. This is a second measured scene where full native migration
+has not established an in-game speedup. Shared-mesh full-box queries are
+about 3.0 times faster than the parent CDB here; query gains depend on scene.
+
 ### Disk usage
 
 The new comparisons reuse `native-game-bin-second-profile` and the existing

@@ -273,6 +273,24 @@ Captured logs, CSVs and saved states remain under each comparison's separate
 candidate directory; reuse one candidate runtime while keeping the baseline
 frozen. Build in the existing build directory rather than creating another
 complete checkout/build for each candidate.
+
+For Clear Sky, pass `-GameMode cs -Save clear-sky-benchmark-start`; the runner
+uses `-cs` for both processes and `.sav` rather than CoP's `.scop`. Use a
+separate template and scratch directory with junctions to the Clear Sky
+assets. `tests/clear_sky_benchmark_prepare.script` creates the common save
+from `server(all/single/alife/new)` on the ODE reference runtime, outside
+timing. The starting-base fixture has 23 live stalkers and uses the same
+12-NPC benchmark script as CoP.
+
+The supplied Clear Sky 1.5.10 scripts need compatibility adjustments with the
+current Lua runtime. In the isolated template only, extract `_g.script`,
+`gulag_general.script`, `xr_logic.script` and `bind_smart_cover.script` from
+`patches/xpatch_10.db`. Guard the initial `_g.script` profiler call with
+`profiler.setup_hook ~= nil`; in `gulag_general.script`, replace the invalid
+Lua string `"\scripts\\"` with `"scripts\\"`. Use the extracted Clear Sky
+`xr_logic` and `bind_smart_cover` instead of the CoP versions in `res/gamedata`.
+Keep the same template for every backend. These edits are benchmark setup,
+not changes to the installed game or an assertion of full Clear Sky support.
 Local final artifact directories are
 `C:/code/migration-benchmark/native-scenes-matched-20261001` and
 `C:/code/migration-benchmark/native-game-final-20261001`.
