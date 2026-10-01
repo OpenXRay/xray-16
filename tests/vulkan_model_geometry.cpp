@@ -1,6 +1,7 @@
 #include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
 #include "src/Layers/xrRenderVK/VulkanModelVisual.h"
+#include "src/Layers/xrRenderVK/VulkanVisual.h"
 
 #include <cassert>
 #include <cmath>
@@ -71,6 +72,40 @@ int main()
     assert(!lifetime.expired());
     second.reset();
     assert(lifetime.expired());
+
+    // Embedded hierarchy instances own separate child identities and bounds,
+    // while every duplicate keeps the same leaf buffers alive.
+    VisualRecord hierarchy;
+    hierarchy.type = 1;
+    hierarchy.bounds = {-2, -2, -2, 2, 2, 2, 0, 0, 0, 3};
+    auto leaf_gpu = std::make_shared<GpuModel>();
+    const std::weak_ptr<GpuModel> leaf_lifetime = leaf_gpu;
+    auto parent = std::make_unique<VulkanModelVisual>(hierarchy, "tree.ogf", nullptr);
+    parent->add_child(std::make_unique<VulkanModelVisual>(static_record, "", leaf_gpu));
+    auto parent_copy = std::make_unique<VulkanModelVisual>(*parent);
+    auto* child = parent->getSubModel(0);
+    auto* child_copy = parent_copy->getSubModel(0);
+    assert(parent->getType() == 1 && parent->getSubModel(1) == nullptr);
+    assert(child && child_copy && child != child_copy);
+    assert(parent_copy->find(child_copy) && !parent->find(child_copy));
+    assert(&static_cast<VulkanModelVisual*>(child)->gpu() ==
+        &static_cast<VulkanModelVisual*>(child_copy)->gpu());
+    child->getVisData().sphere.R = 12;
+    assert(child_copy->getVisData().sphere.R != 12);
+    assert(parent_copy->getVisData().sphere.R == 3);
+    leaf_gpu.reset(); parent.reset();
+    assert(!leaf_lifetime.expired());
+    parent_copy.reset();
+    assert(leaf_lifetime.expired());
+
+    GpuLevel level;
+    VisualRecord linked;
+    linked.type = 1;
+    linked.linked_children = {0};
+    VulkanModelVisual borrowed(linked, "", nullptr, &level);
+    assert(borrowed.linked_valid() && borrowed.getSubModel(0) == nullptr);
+    level.destroy();
+    assert(!borrowed.linked_valid() && borrowed.getSubModel(0) == nullptr);
 
     for (unsigned links = 1; links <= 4; ++links)
     {

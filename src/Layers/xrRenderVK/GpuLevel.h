@@ -37,6 +37,7 @@ public:
         const DeferredPass& pass, const float (&mvp)[16]) const;
     size_t model_count() const { return meshes_.size(); }
     size_t visual_count() const { return visuals_.size(); }
+    uint64_t revision() const { return revision_; }
     IRenderVisual* get_visual(size_t index) const;
     int find_visual_index(const IRenderVisual* visual) const;
     const LevelVisual* visual_node(size_t index) const;
@@ -66,5 +67,6 @@ private:
     std::vector<LevelPortal> portals_;
     std::vector<std::unique_ptr<VulkanVisual>> visual_objects_;
     std::unordered_map<const IRenderVisual*, uint32_t> visual_indices_;
+    uint64_t revision_{};
 };
 }

@@ -91,6 +91,22 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_link_libraries(vulkan_level_models_test PRIVATE xrRenderVK xrCDB xrCore)
     add_test(NAME vulkan_level_models COMMAND vulkan_level_models_test)
 
+    add_executable(vulkan_visual_catalog_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_visual_catalog.cpp"
+    )
+    target_include_directories(vulkan_visual_catalog_test PRIVATE
+        "${XRAY_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>
+    )
+    target_compile_definitions(vulkan_visual_catalog_test PRIVATE DEBUG)
+    target_compile_options(vulkan_visual_catalog_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
+    )
+    target_link_libraries(vulkan_visual_catalog_test PRIVATE xrRenderVK xrCDB xrCore)
+    add_test(NAME vulkan_visual_catalog COMMAND vulkan_visual_catalog_test)
+
     add_executable(vulkan_model_geometry_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_model_geometry.cpp"
     )

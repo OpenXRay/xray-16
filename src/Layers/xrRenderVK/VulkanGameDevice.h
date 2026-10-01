@@ -31,7 +31,7 @@ public:
 
     void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud = false, float sort_distance = 0.f, const void* instance = nullptr);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
-        bool hud = false, float sort_distance = 0.f);
+        bool hud = false, float sort_distance = 0.f, const void* instance = nullptr);
     void discard_scene_draws();
     void discard_model_draws(const void* instance);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
@@ -70,6 +70,7 @@ private:
         std::array<float, 16> mvp{};
         float sort_distance{};
         bool hud{};
+        const void* instance{};
     };
     struct ModelDraw
     {

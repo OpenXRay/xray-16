@@ -59,7 +59,7 @@ bool parse_visual(LevelBytes bytes, VisualRecord& result, unsigned depth)
                 header = true;
                 visual.type = body.data[1];
                 visual.shader_id = uint16_t(body.data[2]) | (uint16_t(body.data[3]) << 8);
-                std::memcpy(visual.bounds.data(), body.data + 4, sizeof(float) * 6);
+                std::memcpy(visual.bounds.data(), body.data + 4, sizeof(float) * 10);
             }
             else if (id == texture_id)
             {

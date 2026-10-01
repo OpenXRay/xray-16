@@ -144,15 +144,18 @@ void VulkanGameDevice::discard_model_draws(const void* instance)
                                return draw.instance == instance;
                            }),
         model_draws_.end());
+    level_draws_.erase(std::remove_if(level_draws_.begin(), level_draws_.end(),
+                           [instance](const LevelDraw& draw) { return draw.instance == instance; }),
+        level_draws_.end());
 }
 
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16],
-    bool hud, float sort_distance)
+    bool hud, float sort_distance, const void* instance)
 {
     const auto duplicate = std::find_if(level_draws_.begin(), level_draws_.end(),
-        [index, hud, &mvp](const LevelDraw& draw)
+        [index, hud, instance, &mvp](const LevelDraw& draw)
         {
-            return draw.index == index && draw.hud == hud &&
+            return draw.index == index && draw.hud == hud && draw.instance == instance &&
                 std::equal(draw.mvp.begin(), draw.mvp.end(), mvp);
         });
     if (duplicate != level_draws_.end())
@@ -160,6 +163,7 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
 
     LevelDraw draw;
     draw.index = index;
+    draw.instance = instance;
     std::copy_n(mvp, 16, draw.mvp.data());
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
     draw.hud = hud;

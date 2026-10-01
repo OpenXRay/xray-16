@@ -187,6 +187,7 @@ void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const
 
 void GpuLevel::destroy()
 {
+    ++revision_;
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
     visual_indices_.clear();
     visual_objects_.clear();

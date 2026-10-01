@@ -13,7 +13,7 @@ struct VisualRecord
 {
     uint8_t type{};
     uint16_t shader_id{};
-    std::array<float, 6> bounds{};
+    std::array<float, 10> bounds{};
     std::string shader;
     std::string texture;
     std::vector<uint32_t> linked_children;

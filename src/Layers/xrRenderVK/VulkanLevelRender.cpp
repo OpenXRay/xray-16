@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <functional>
 #include <vector>
 
 namespace xray::render::vulkan
@@ -659,31 +660,67 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
         Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
         return nullptr;
     }
-    // Progressive, hierarchical, skinned and linked models have separate
-    // milestones. Do not return a drawable instance with silently lost parts.
-    if (record.type != 0 || !record.embedded_children.empty() || !record.linked_children.empty())
+    const std::string cache_name = !data && name ? name : "";
+    auto model = create_model_tree(record, "", cache_name, error);
+    if (!model)
     {
-        Msg("! [renderer-vulkan] OGF model '%s': unsupported static model type %u", name ? name : "<reader>", record.type);
+        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
         return nullptr;
     }
-    std::shared_ptr<GpuModel> gpu;
-    if (!data && name)
-        gpu = model_gpu_cache_[name].lock();
-    if (!gpu)
-    {
-        gpu = std::make_shared<GpuModel>();
-        if (!gpu->load(name, data, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
-        {
-            Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
-            return nullptr;
-        }
-        if (!data && name)
-            model_gpu_cache_[name] = gpu;
-    }
-    auto model = std::make_unique<VulkanModelVisual>(record, !data && name ? name : "", std::move(gpu));
     IRenderVisual* visual = model.get();
     models_.emplace(visual, std::move(model));
     return visual;
+}
+
+std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const VisualRecord& record,
+    const std::string& inherited_texture, const std::string& cache_name, std::string& error)
+{
+    if (record.type != 0 && record.type != 1)
+    {
+        error = "unsupported OGF model type " + std::to_string(record.type);
+        return nullptr;
+    }
+    if (record.type == 0 && (!record.embedded_children.empty() || !record.linked_children.empty()))
+    {
+        error = "OGF mesh unexpectedly contains child references";
+        return nullptr;
+    }
+    if (record.type == 1 && (record.embedded_children.empty() == record.linked_children.empty()))
+    {
+        error = "OGF hierarchy needs exactly one nonempty child table";
+        return nullptr;
+    }
+    std::shared_ptr<GpuModel> gpu;
+    if (record.type == 0)
+    {
+        if (!cache_name.empty()) gpu = model_gpu_cache_[cache_name].lock();
+        if (!gpu)
+        {
+            gpu = std::make_shared<GpuModel>();
+            if (!gpu->load_record(record, inherited_texture, device_, queue_, pool_, memory_,
+                    upload_, *textures_, *pass_, error)) return nullptr;
+            if (!cache_name.empty()) model_gpu_cache_[cache_name] = gpu;
+        }
+    }
+    else if (!record.linked_children.empty())
+    {
+        for (uint32_t child : record.linked_children)
+            if (!level_.get_visual(child))
+            {
+                error = "OGF hierarchy refers to a missing level visual";
+                return nullptr;
+            }
+    }
+    auto model = std::make_unique<VulkanModelVisual>(record, cache_name, std::move(gpu),
+        record.linked_children.empty() ? nullptr : &level_);
+    const std::string texture = record.texture.empty() ? inherited_texture : record.texture;
+    for (const auto& child : record.embedded_children)
+    {
+        auto instance = create_model_tree(child, texture, "", error);
+        if (!instance) return nullptr;
+        model->add_child(std::move(instance));
+    }
+    return model;
 }
 
 IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
@@ -694,8 +731,12 @@ IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
 IRenderVisual* VulkanLevelRender::model_Duplicate(IRenderVisual* visual)
 {
     auto found = models_.find(visual);
-    R_ASSERT2(found != models_.end(), "Vulkan duplication requires a live model instance");
-    auto copy = std::make_unique<VulkanModelVisual>(*found->second);
+    const VulkanModelVisual* source = found == models_.end() ? nullptr : found->second.get();
+    if (!source)
+        for (const auto& entry : models_)
+            if ((source = entry.second->find(visual))) break;
+    R_ASSERT2(source, "Vulkan duplication requires a live model instance");
+    auto copy = std::make_unique<VulkanModelVisual>(*source);
     IRenderVisual* result = copy.get();
     models_.emplace(result, std::move(copy));
     return result;
@@ -750,12 +791,20 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
 {
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
     const int visual_index = level_.find_visual_index(visual);
-    const auto model = models_.find(visual);
-    R_ASSERT2(visual_index >= 0 || model != models_.end(), "Vulkan scene submission received a visual outside this renderer");
+    const VulkanModelVisual* model = nullptr;
+    const void* model_owner = nullptr;
+    for (const auto& entry : models_)
+        if ((model = entry.second->find(visual)))
+        {
+            model_owner = entry.first;
+            break;
+        }
+    R_ASSERT2(visual_index >= 0 || model, "Vulkan scene submission received a visual outside this renderer");
     const Fmatrix view_projection = current_view_projection();
     Fmatrix mvp;
     mvp.mul(view_projection, world);
-    Fvector center = model != models_.end() ? model->second->getVisData().sphere.P : visual_center(level_.visual_node(static_cast<size_t>(visual_index)));
+    Fvector center = model ? model->visibility().sphere.P :
+        visual_center(level_.visual_node(static_cast<size_t>(visual_index)));
     Fvector world_center;
     world.transform_tiny(world_center, center);
     center = world_center;
@@ -769,10 +818,26 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             camera_state_.camera_position()[2]);
     else
         camera_position.set(Device.vCameraPosition);
-    if (model != models_.end())
-        game_device_->queue_model(model->second->gpu(), nullptr, transform, hud, distance_squared(center, camera_position), visual);
+    const float sort_distance = distance_squared(center, camera_position);
+    if (model)
+    {
+        std::function<void(const VulkanModelVisual&)> submit = [&](const VulkanModelVisual& node)
+        {
+            if (node.has_gpu())
+                game_device_->queue_model(node.gpu(), nullptr,
+                    transform, hud, sort_distance, model_owner);
+            for (const auto& child : node.children()) submit(*child);
+            if (!node.linked().empty())
+            {
+                R_ASSERT2(node.linked_valid(), "Vulkan model has level references from an unloaded level");
+                for (uint32_t index : node.linked())
+                    game_device_->queue_level_visual(index, transform, hud, sort_distance, model_owner);
+            }
+        };
+        submit(*model);
+    }
     else
-        game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud, distance_squared(center, camera_position));
+        game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud, sort_distance);
 }
 
 IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)

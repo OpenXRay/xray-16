@@ -24,6 +24,10 @@ public:
         VkCommandPool pool, const VkPhysicalDeviceMemoryProperties& memory,
         const BufferUploadDispatch& upload, GameTextureFactory& textures,
         DeferredPass& pass, std::string& error);
+    bool load_record(const VisualRecord& record, const std::string& inherited_texture,
+        VkDevice device, VkQueue queue, VkCommandPool pool,
+        const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
+        GameTextureFactory& textures, DeferredPass& pass, std::string& error);
     // Call from the acquired frame's geometry recorder. Pose matrices have
     // the same layout as Fmatrix and include inverse bind transforms.
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
@@ -36,6 +40,10 @@ public:
     void destroy(); // Caller waits for all submitted frames first.
 
 private:
+    bool load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue queue,
+        VkCommandPool pool, const VkPhysicalDeviceMemoryProperties& memory,
+        const BufferUploadDispatch& upload, GameTextureFactory& textures,
+        DeferredPass& pass, std::string& error);
     struct Mesh
     {
         ModelGeometry geometry;

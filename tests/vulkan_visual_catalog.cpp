@@ -1,6 +1,7 @@
 #include "src/Layers/xrRenderVK/VisualCatalog.h"
 
 #include <cassert>
+#include <cstring>
 
 using namespace xray::render::vulkan;
 using Bytes = std::vector<uint8_t>;
@@ -22,6 +23,8 @@ static Bytes visual(uint8_t type)
     Bytes header(44);
     header[0] = 4;
     header[1] = type;
+    const float radius = 7.f;
+    std::memcpy(header.data() + 4 + 9 * sizeof(float), &radius, sizeof(radius));
     Bytes data;
     chunk(data, 1, header);
     return data;
@@ -54,6 +57,7 @@ int main()
     assert(parse_level_visuals(bytes(table), records, error));
     assert(error.empty() && records.size() == 13);
     assert(records[1].linked_children.size() == 1 && records[1].linked_children[0] == 0);
+    assert(records[1].bounds[9] == 7.f);
     assert(records[3].embedded_children.size() == 1 && records[3].embedded_children[0].type == 5);
     Bytes cyclic = visual(1), links;
     u32(links, 1); u32(links, 0);

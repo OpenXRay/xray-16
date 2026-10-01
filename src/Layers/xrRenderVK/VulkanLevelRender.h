@@ -79,6 +79,9 @@ protected:
     const GpuLevel& gpu_level() const { return level_; }
 
 private:
+    std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord& record,
+        const std::string& inherited_texture, const std::string& cache_name,
+        std::string& error);
     void destroy_all_models();
     Fmatrix current_view_projection() const;
     GpuLevel level_;

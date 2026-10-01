@@ -49,14 +49,33 @@ bool GpuModel::load(const char* name, IReader* source, VkDevice device, VkQueue 
     const BufferUploadDispatch& upload, GameTextureFactory& textures,
     DeferredPass& pass, std::string& error)
 {
+    ModelGeometry decoded;
+    if (!load_engine_model_geometry(name, source, decoded, error)) return false;
+    return load_geometry(std::move(decoded), device, queue, pool, memory, upload, textures, pass, error);
+}
+
+bool GpuModel::load_record(const VisualRecord& record, const std::string& inherited_texture,
+    VkDevice device, VkQueue queue, VkCommandPool pool,
+    const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
+    GameTextureFactory& textures, DeferredPass& pass, std::string& error)
+{
+    ModelGeometry decoded;
+    if (!decode_model_geometry(record, decoded, error)) return false;
+    if (decoded.texture.empty()) decoded.texture = inherited_texture;
+    return load_geometry(std::move(decoded), device, queue, pool, memory, upload, textures, pass, error);
+}
+
+bool GpuModel::load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue queue,
+    VkCommandPool pool, const VkPhysicalDeviceMemoryProperties& memory,
+    const BufferUploadDispatch& upload, GameTextureFactory& textures,
+    DeferredPass& pass, std::string& error)
+{
     destroy();
     if (!device || !queue || !pool)
     {
         error = "OGF model requires a Vulkan device, queue and command pool";
         return false;
     }
-    ModelGeometry decoded;
-    if (!load_engine_model_geometry(name, source, decoded, error)) return false;
     device_ = device;
     pool_ = pool;
     upload_ = upload;
