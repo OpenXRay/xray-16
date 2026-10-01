@@ -140,7 +140,7 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
     bool hud, float sort_distance)
 {
     const auto duplicate = std::find_if(level_draws_.begin(), level_draws_.end(),
-        [index, &mvp](const LevelDraw& draw)
+        [index, hud, &mvp](const LevelDraw& draw)
         {
             return draw.index == index && draw.hud == hud &&
                 std::equal(draw.mvp.begin(), draw.mvp.end(), mvp);
