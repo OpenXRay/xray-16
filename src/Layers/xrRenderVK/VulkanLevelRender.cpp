@@ -551,6 +551,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
     // and visual identities are released. Uploads use the same graphics queue.
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");
     if (game_device_) game_device_->discard_scene_draws();
+    models_Clear(true);
     std::string error;
     if (!level_.load(*reader, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
         xrDebug::Fatal(DEBUG_INFO, "Vulkan level load failed: %s", error.c_str());
@@ -562,6 +563,7 @@ void VulkanLevelRender::level_Unload()
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
     if (game_device_) game_device_->discard_scene_draws();
+    models_Clear(true);
     level_.destroy();
 }
 
