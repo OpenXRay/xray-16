@@ -20,6 +20,7 @@ struct ModelGeometry
 {
     uint8_t type{};
     std::string shader, texture;
+    SurfaceMode mode{SurfaceMode::Opaque};
     std::vector<ModelVertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<ModelGeometry> children;

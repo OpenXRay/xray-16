@@ -186,6 +186,7 @@ bool decode(const VisualRecord& source, ModelGeometry& out, std::string& error, 
     out.type = source.type;
     out.shader = source.shader;
     out.texture = source.texture;
+    out.mode = classify_surface_material(out.shader, out.texture);
     if (source.type == 0 || source.type == 2 || source.type == 4 || source.type == 5)
     {
         if (!mesh(source, out, error)) return false;

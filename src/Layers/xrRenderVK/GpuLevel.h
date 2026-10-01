@@ -27,7 +27,12 @@ public:
         GameTextureFactory& textures, DeferredPass& pass, std::string& error);
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16]) const;
+    bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
+        const float (&mvp)[16], GeometryPhase phase) const;
     bool record_visual(size_t index, const FrameRecordingContext& frame,
+        const DeferredPass& pass, const float (&mvp)[16],
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest) const;
+    bool record_hud_visual(size_t index, const FrameRecordingContext& frame,
         const DeferredPass& pass, const float (&mvp)[16]) const;
     size_t model_count() const { return meshes_.size(); }
     size_t visual_count() const { return visuals_.size(); }
@@ -44,6 +49,7 @@ private:
         BufferResource vertices, indices;
         uint32_t index_count{};
         VkDescriptorSet material{};
+        SurfaceMode mode{SurfaceMode::Opaque};
     };
     VkDevice device_{};
     VkCommandPool pool_{};

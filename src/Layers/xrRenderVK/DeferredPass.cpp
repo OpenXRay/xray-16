@@ -9,7 +9,8 @@ namespace xray::render::vulkan
 namespace
 {
 bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
-    VkShaderModule vertex, VkShaderModule fragment, bool geometry,
+    VkShaderModule vertex, VkShaderModule fragment, bool geometry_input, bool gbuffer,
+    bool transparent, bool hud,
     const ScenePassDispatch& vk, VkPipeline& pipeline)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
@@ -27,10 +28,10 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, uv)}
     };
     VkPipelineVertexInputStateCreateInfo inputs{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
-    inputs.vertexBindingDescriptionCount = geometry ? 1 : 0;
-    inputs.pVertexBindingDescriptions = geometry ? &binding : nullptr;
-    inputs.vertexAttributeDescriptionCount = geometry ? 3 : 0;
-    inputs.pVertexAttributeDescriptions = geometry ? attributes : nullptr;
+    inputs.vertexBindingDescriptionCount = geometry_input ? 1 : 0;
+    inputs.pVertexBindingDescriptions = geometry_input ? &binding : nullptr;
+    inputs.vertexAttributeDescriptionCount = geometry_input ? 3 : 0;
+    inputs.pVertexAttributeDescriptions = geometry_input ? attributes : nullptr;
     VkPipelineInputAssemblyStateCreateInfo assembly{VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
     assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     VkPipelineViewportStateCreateInfo viewport{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
@@ -43,14 +44,24 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkPipelineMultisampleStateCreateInfo multi{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
     multi.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     VkPipelineDepthStencilStateCreateInfo depth{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
-    depth.depthTestEnable = depth.depthWriteEnable = geometry ? VK_TRUE : VK_FALSE;
+    depth.depthTestEnable = gbuffer ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = gbuffer && !transparent ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
+    {
         attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
             VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        attachment.blendEnable = transparent || hud ? VK_TRUE : VK_FALSE;
+        attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        attachment.colorBlendOp = VK_BLEND_OP_ADD;
+        attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+    }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
-    blend.attachmentCount = geometry ? 2 : 1;
+    blend.attachmentCount = gbuffer ? 2 : 1;
     blend.pAttachments = attachments;
     const VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
@@ -176,11 +187,13 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
 
 bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRenderPass light_pass,
     VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
+    VkShaderModule alpha_test_fragment,
     VkShaderModule light_vertex, VkShaderModule light_fragment,
     const ScenePassDispatch& dispatch, std::string& error)
 {
     destroy();
     if (!device || !geometry_pass || !light_pass || !geometry_vertex || !geometry_fragment ||
+        !alpha_test_fragment ||
         !light_vertex || !light_fragment || !dispatch.create_pipeline_layout ||
         !dispatch.destroy_pipeline_layout || !dispatch.create_graphics_pipelines ||
         !dispatch.destroy_pipeline || !dispatch.create_descriptor_set_layout ||
@@ -235,9 +248,15 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             goto failed;
     }
     if (!make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
-            geometry_fragment, true, vk_, geometry_) ||
+            geometry_fragment, true, true, false, false, vk_, geometry_) ||
+        !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
+            alpha_test_fragment, true, true, false, false, vk_, alpha_test_) ||
+        !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
+            geometry_fragment, true, true, true, false, vk_, transparent_) ||
+        !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
+            geometry_fragment, true, false, false, true, vk_, hud_) ||
         !make_pipeline(device, light_pass, light_layout_, light_vertex,
-            light_fragment, false, vk_, lighting_)) goto failed;
+            light_fragment, false, false, false, false, vk_, lighting_)) goto failed;
     error.clear();
     return true;
 failed:
@@ -302,12 +321,34 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 }
 
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
-    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+    SurfaceMode mode) const
 {
-    if (!geometry_ || frame.render_pass != geometry_pass_ || !frame.command_buffer ||
+    const VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ :
+        mode == SurfaceMode::Transparent ? transparent_ : geometry_;
+    if (!pipeline || frame.render_pass != geometry_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
-    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, geometry_);
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        geometry_layout_, 0, 1, &material_set, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
+    return true;
+}
+
+bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const
+{
+    if (!hud_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
+        !frame.extent.width || !frame.extent.height || !vertices || !indices ||
+        !index_count || !material_set) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hud_);
     viewport_scissor(frame, vk_);
     const VkDeviceSize offset = 0;
     vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
@@ -341,6 +382,9 @@ void DeferredPass::destroy()
     if (device_ && vk_.destroy_pipeline)
     {
         if (geometry_) vk_.destroy_pipeline(device_, geometry_, nullptr);
+        if (alpha_test_) vk_.destroy_pipeline(device_, alpha_test_, nullptr);
+        if (transparent_) vk_.destroy_pipeline(device_, transparent_, nullptr);
+        if (hud_) vk_.destroy_pipeline(device_, hud_, nullptr);
         if (lighting_) vk_.destroy_pipeline(device_, lighting_, nullptr);
     }
     if (device_ && vk_.destroy_pipeline_layout)
@@ -357,7 +401,7 @@ void DeferredPass::destroy()
     }
     device_ = VK_NULL_HANDLE;
     geometry_pass_ = light_pass_ = VK_NULL_HANDLE;
-    geometry_ = lighting_ = VK_NULL_HANDLE;
+    geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = VK_NULL_HANDLE;
     geometry_layout_ = light_layout_ = VK_NULL_HANDLE;
     material_layout_ = gbuffer_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;

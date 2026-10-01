@@ -27,8 +27,10 @@ public:
     bool recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface = false);
     bool prepare_for_reset(std::string& error);
     bool wait_idle() { return window_.frame().wait_idle(); }
-    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16]);
-    void queue_level_visual(uint32_t index, const float (&mvp)[16]);
+    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
+        bool hud = false, float sort_distance = 0.f);
+    void queue_level_visual(uint32_t index, const float (&mvp)[16],
+        bool hud = false, float sort_distance = 0.f);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
     void destroy();
     bool reset_required() const { return reset_required_; }
@@ -51,22 +53,28 @@ public:
     ScenePass& ui_pass() { return ui_pass_; }
     VulkanWindowDevice& window() { return window_; }
     const BufferUploadDispatch& buffer_upload() const { return buffer_upload_; }
-    PFN_vkDeviceWaitIdle wait_idle() const { return frame_dispatch_.device_wait_idle; }
+    PFN_vkDeviceWaitIdle device_wait_idle_proc() const { return frame_dispatch_.device_wait_idle; }
 
 private:
     static void record_ui(const FrameRecordingContext& frame, void* user);
+    static void record_hud(const FrameRecordingContext& frame, void* user);
     static void record_models(const FrameRecordingContext& frame, void* user);
+    static void record_transparent(const FrameRecordingContext& frame, void* user);
     static void record_level_visuals(const FrameRecordingContext& frame, void* user);
     struct LevelDraw
     {
         uint32_t index{};
         std::array<float, 16> mvp{};
+        float sort_distance{};
+        bool hud{};
     };
     struct ModelDraw
     {
         GpuModel* model{};
         IKinematics* skeleton{};
         std::array<float, 16> mvp{};
+        float sort_distance{};
+        bool hud{};
     };
     VulkanWindowDevice window_;
     FrameDispatch frame_dispatch_{};

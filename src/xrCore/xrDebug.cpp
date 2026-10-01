@@ -558,8 +558,10 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         msgRes = ShowMessage(fatalError, msg);
     }
 
+#ifdef USE_BUG_TRAP
     BT_SetUserMessage(fatalError);
     BT_SaveSnapshotEx(exPtrs, nullptr);
+#endif
 
     const auto reportRes = ReportFault(exPtrs, 0);
     if (msgRes != AssertionResult::abort ||

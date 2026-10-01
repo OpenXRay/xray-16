@@ -1,12 +1,34 @@
 #include "LevelModels.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstring>
 #include <utility>
 
 namespace xray::render::vulkan
 {
+SurfaceMode classify_surface_material(const std::string& shader, const std::string& texture)
+{
+    std::string name;
+    name.reserve(shader.size() + texture.size() + 1);
+    for (unsigned char ch : shader) name.push_back(static_cast<char>(std::tolower(ch)));
+    name.push_back(' ');
+    for (unsigned char ch : texture) name.push_back(static_cast<char>(std::tolower(ch)));
+
+    // Blend modes take precedence when names contain both an alpha marker and
+    // a blend marker (for example a transparent foliage texture).
+    for (const char* marker : {"transparent", "translucent", "_blend", "blend_",
+             "glass", "water", "flare", "glow", "particle"})
+        if (name.find(marker) != std::string::npos)
+            return SurfaceMode::Transparent;
+    for (const char* marker : {"alpha_test", "alphatest", "aref",
+             "cutout", "foliage", "leaves", "leaf", "grass", "tree"})
+        if (name.find(marker) != std::string::npos)
+            return SurfaceMode::AlphaTest;
+    return SurfaceMode::Opaque;
+}
+
 namespace
 {
 constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4,
@@ -159,8 +181,14 @@ bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
         const size_t slash = name.find('/');
         if (!name.empty() && (slash == std::string::npos || slash == 0 || slash == name.size() - 1))
             return false;
-        materials.push_back(slash == std::string::npos ? LevelMaterial{} :
-            LevelMaterial{name.substr(0, slash), name.substr(slash + 1)});
+        LevelMaterial material;
+        if (slash != std::string::npos)
+        {
+            material.shader = name.substr(0, slash);
+            material.textures = name.substr(slash + 1);
+            material.mode = classify_surface_material(material.shader, material.textures);
+        }
+        materials.push_back(std::move(material));
     }
     return c.done();
 }

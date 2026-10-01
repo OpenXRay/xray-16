@@ -20,8 +20,13 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
         if (context.level_visuals_)
             context.level_visuals_(geometry_frame, context.level_data_);
         else
-            context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform);
+            context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform,
+                GeometryPhase::OpaqueAndAlphaTest);
         if (context.models_) context.models_(geometry_frame, context.models_data_);
+        if (context.transparent_) context.transparent_(geometry_frame, context.transparent_data_);
+        else if (!context.level_visuals_)
+            context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform,
+                GeometryPhase::Transparent);
     }
     context.targets_->end(frame.command_buffer);
 }
@@ -31,13 +36,16 @@ void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data
     auto& context = *static_cast<DeferredFrame*>(user_data);
     context.recorded_ &= context.pass_->record_lighting(frame,
         context.targets_->lighting_set(frame.image_index), context.light_);
+    if (context.hud_) context.hud_(frame, context.hud_data_);
     if (context.ui_) context.ui_(frame, context.ui_data_);
 }
 
 bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const GpuLevel& level,
     const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
     FrameStatus& status, std::string& error, FrameRecorder ui, void* ui_data,
+    FrameRecorder hud, void* hud_data,
     FrameRecorder models, void* models_data,
+    FrameRecorder transparent, void* transparent_data,
     FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target)
 {
     targets_ = &targets;
@@ -47,8 +55,12 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     light_ = light;
     ui_ = ui;
     ui_data_ = ui_data;
+    hud_ = hud;
+    hud_data_ = hud_data;
     models_ = models;
     models_data_ = models_data;
+    transparent_ = transparent;
+    transparent_data_ = transparent_data;
     level_visuals_ = level_visuals;
     level_data_ = level_data;
     render_world_ = render_world;

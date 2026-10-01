@@ -14,7 +14,9 @@ public:
         const DeferredPass& pass, const float (&mvp)[16], const DeferredLight& light,
         FrameStatus& status, std::string& error,
         FrameRecorder ui = nullptr, void* ui_data = nullptr,
+        FrameRecorder hud = nullptr, void* hud_data = nullptr,
         FrameRecorder models = nullptr, void* models_data = nullptr,
+        FrameRecorder transparent = nullptr, void* transparent_data = nullptr,
         FrameRecorder level_visuals = nullptr, void* level_data = nullptr,
         bool render_world = true, bool clear_target = false);
 
@@ -28,8 +30,12 @@ private:
     DeferredLight light_{};
     FrameRecorder ui_{};
     void* ui_data_{};
+    FrameRecorder hud_{};
+    void* hud_data_{};
     FrameRecorder models_{};
     void* models_data_{};
+    FrameRecorder transparent_{};
+    void* transparent_data_{};
     FrameRecorder level_visuals_{};
     void* level_data_{};
     bool render_world_{true};

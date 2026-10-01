@@ -28,9 +28,11 @@ public:
     // the same layout as Fmatrix and include inverse bind transforms.
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16], const float* pose, size_t bones,
-        std::string& error);
+        std::string& error,
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest);
     bool record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
-        const float (&mvp)[16], IKinematics& skeleton, std::string& error);
+        const float (&mvp)[16], IKinematics& skeleton, std::string& error,
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest);
     void destroy(); // Caller waits for all submitted frames first.
 
 private:

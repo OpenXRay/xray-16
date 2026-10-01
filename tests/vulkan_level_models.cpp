@@ -40,6 +40,11 @@ static void part(Bytes& data, uint32_t id, const Bytes& value)
 
 int main()
 {
+    assert(classify_surface_material("default", "concrete") == SurfaceMode::Opaque);
+    assert(classify_surface_material("deffer_aref", "foliage/oak") == SurfaceMode::AlphaTest);
+    assert(classify_surface_material("default_blend", "effects/smoke") == SurfaceMode::Transparent);
+    assert(classify_surface_material("glass", "window") == SurfaceMode::Transparent);
+
     Bytes shaders{1, 0, 0, 0};
     const char material[] = "def_shaders\\default/concrete";
     shaders.insert(shaders.end(), material, material + sizeof(material));

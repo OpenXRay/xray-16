@@ -8,6 +8,15 @@
 
 namespace xray::render::vulkan
 {
+enum class SurfaceMode : uint8_t
+{
+    Opaque,
+    AlphaTest,
+    Transparent
+};
+
+SurfaceMode classify_surface_material(const std::string& shader, const std::string& texture);
+
 // Decoded static subset of level.geom and the level's OGF visual table. The
 // caller supplies decompressed chunk payloads from the engine's IReader.
 struct LevelBytes
@@ -20,6 +29,7 @@ struct LevelMaterial
 {
     std::string shader;
     std::string textures;
+    SurfaceMode mode{SurfaceMode::Opaque};
 };
 
 struct LevelVertex

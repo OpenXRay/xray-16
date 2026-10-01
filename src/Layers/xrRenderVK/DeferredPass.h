@@ -20,6 +20,13 @@ struct DeferredEnvironment
     float hemi_color[3]{};
 };
 
+enum class GeometryPhase
+{
+    OpaqueAndAlphaTest,
+    Transparent,
+    Hud
+};
+
 DeferredLight make_environment_deferred_light(const DeferredEnvironment& environment);
 
 // Framebuffer attachment order: albedo, normal, depth. Color images must
@@ -30,8 +37,10 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
     VkRenderPass& result, std::string& error);
 
 // Geometry pass expects two color attachments (RGBA albedo, encoded normal)
-// and depth. The light pass expects one swapchain color attachment. Attachments,
-// render-pass transitions and per-frame synchronization belong to the caller.
+// and depth. It owns opaque, alpha-test and blended pipelines. HUD geometry and
+// lighting share the swapchain pass; the caller records HUD after lighting.
+// Attachments, render-pass transitions and per-frame synchronization belong to
+// the caller.
 class DeferredPass
 {
 public:
@@ -42,6 +51,7 @@ public:
 
     bool initialize(VkDevice device, VkRenderPass geometry_pass, VkRenderPass light_pass,
         VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
+        VkShaderModule alpha_test_fragment,
         VkShaderModule light_vertex, VkShaderModule light_fragment,
         const ScenePassDispatch& dispatch, std::string& error);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
@@ -54,6 +64,9 @@ public:
         light_pass_ = light_pass;
     }
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+        SurfaceMode mode = SurfaceMode::Opaque) const;
+    bool record_hud(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         const DeferredLight& light) const;
@@ -64,7 +77,7 @@ private:
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
     VkDevice device_{};
     VkRenderPass geometry_pass_{}, light_pass_{};
-    VkPipeline geometry_{}, lighting_{};
+    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{};
     VkPipelineLayout geometry_layout_{}, light_layout_{};
     VkDescriptorSetLayout material_layout_{}, gbuffer_layout_{};
     VkDescriptorPool pool_{};

@@ -72,7 +72,8 @@ bool GpuModel::load(const char* name, IReader* source, VkDevice device, VkQueue 
 }
 
 bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pass,
-    const float (&mvp)[16], const float* pose, size_t bones, std::string& error)
+    const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
+    GeometryPhase phase)
 {
     if (!device_ || frame.frame_index >= FrameContext::FramesInFlight)
     {
@@ -81,6 +82,39 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
     }
     for (auto& mesh : meshes_)
     {
+        if (phase == GeometryPhase::Hud)
+        {
+            std::vector<LevelVertex> vertices;
+            if (mesh.geometry.type == 4 || mesh.geometry.type == 5)
+            {
+                if (!skin_model_mesh(mesh.geometry, pose, bones, vertices, error)) return false;
+            }
+            else
+            {
+                vertices.reserve(mesh.geometry.vertices.size());
+                for (const auto& vertex : mesh.geometry.vertices)
+                {
+                    LevelVertex result;
+                    std::copy_n(vertex.position, 3, result.position);
+                    std::copy_n(vertex.normal, 3, result.normal);
+                    std::copy_n(vertex.uv, 2, result.uv);
+                    vertices.push_back(result);
+                }
+            }
+            if (!mesh.vertices[frame.frame_index].write(0, vertices.data(),
+                    vertices.size() * sizeof(LevelVertex), error) ||
+                !pass.record_hud(frame, mesh.vertices[frame.frame_index].handle(),
+                    mesh.indices.handle(), static_cast<uint32_t>(mesh.geometry.indices.size()),
+                    mvp, mesh.material))
+            {
+                if (error.empty()) error = "Vulkan HUD model geometry recording failed";
+                return false;
+            }
+            continue;
+        }
+        const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent;
+        if ((phase == GeometryPhase::Transparent) != transparent)
+            continue;
         std::vector<LevelVertex> vertices;
         if (mesh.geometry.type == 4 || mesh.geometry.type == 5)
         {
@@ -102,7 +136,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                 vertices.size() * sizeof(LevelVertex), error)) return false;
         if (!pass.record_geometry(frame, mesh.vertices[frame.frame_index].handle(),
                 mesh.indices.handle(), static_cast<uint32_t>(mesh.geometry.indices.size()),
-                mvp, mesh.material))
+                mvp, mesh.material, mesh.geometry.mode))
         {
             error = "Vulkan model geometry recording failed";
             return false;
@@ -113,7 +147,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
 }
 
 bool GpuModel::record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
-    const float (&mvp)[16], IKinematics& skeleton, std::string& error)
+    const float (&mvp)[16], IKinematics& skeleton, std::string& error,
+    GeometryPhase phase)
 {
     static_assert(sizeof(Fmatrix) == 16 * sizeof(float));
     skeleton.CalculateBones();
@@ -128,7 +163,7 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
         std::memcpy(pose.data() + bone * 16,
             &skeleton.LL_GetBoneInstance(static_cast<u16>(bone)).mRenderTransform,
             16 * sizeof(float));
-    return record(frame, pass, mvp, pose.data(), count, error);
+    return record(frame, pass, mvp, pose.data(), count, error, phase);
 }
 
 void GpuModel::destroy()

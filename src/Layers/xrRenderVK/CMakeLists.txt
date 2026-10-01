@@ -14,6 +14,7 @@ target_sources(xrRenderVK PRIVATE
     DeferredPass.h
     DeferredFrame.cpp
     DeferredFrame.h
+    DeferredAlphaTestShaders.h
     DeferredShaderFactory.cpp
     DeferredShaderFactory.h
     DeferredShaders.h
@@ -93,4 +94,5 @@ target_link_libraries(xrRenderVK PRIVATE SDL2::SDL2 xrCDB)
 
 set_target_properties(xrRenderVK PROPERTIES
     PREFIX ""
+    UNITY_BUILD OFF
 )

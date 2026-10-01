@@ -11,6 +11,7 @@
 #include <SDL_vulkan.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <vector>
 
@@ -18,6 +19,25 @@ namespace xray::render::vulkan
 {
 namespace
 {
+float distance_squared(const Fvector& left, const Fvector& right)
+{
+    const float x = left.x - right.x;
+    const float y = left.y - right.y;
+    const float z = left.z - right.z;
+    const float result = x * x + y * y + z * z;
+    return std::isfinite(result) ? result : 0.f;
+}
+
+Fvector visual_center(const LevelVisual* visual)
+{
+    Fvector center;
+    if (visual)
+        center.set(visual->bounds[6], visual->bounds[7], visual->bounds[8]);
+    else
+        center.set(0.f, 0.f, 0.f);
+    return center;
+}
+
 DeferredEnvironment current_environment()
 {
     DeferredEnvironment environment;
@@ -313,7 +333,11 @@ void VulkanLevelRender::Calculate()
     static_assert(sizeof(Device.mFullTransform) == sizeof(view_projection));
     std::memcpy(view_projection, &Device.mFullTransform, sizeof(view_projection));
     for (uint32_t root : visible_roots)
-        game_device_->queue_level_visual(root, view_projection);
+    {
+        const Fvector center = visual_center(level_.visual_node(root));
+        game_device_->queue_level_visual(root, view_projection, false,
+            distance_squared(center, Device.vCameraPosition));
+    }
 
     // Engine renderables are submitted after this scene-calculation phase;
     // VulkanLevelRender::add_Visual stores their transforms for End().
@@ -396,7 +420,7 @@ void VulkanLevelRender::bind_level_device(VulkanGameDevice& resources)
     auto& window = resources.window();
     bind_level_device(window.device(), window.queue(), window.frame().command_pool(),
         window.physical().memory, resources.buffer_upload(), resources.textures(),
-        resources.deferred(), resources.wait_idle());
+        resources.deferred(), resources.device_wait_idle_proc());
     game_device_ = &resources;
     resources.use_scene_visibility(true);
 }
@@ -443,7 +467,7 @@ IRenderVisual* VulkanLevelRender::getVisual(int index)
     return index >= 0 ? level_.get_visual(static_cast<size_t>(index)) : nullptr;
 }
 
-void VulkanLevelRender::add_Visual(u32, IRenderable*, IRenderVisual* visual, Fmatrix& world)
+void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)
 {
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
     const auto* level_visual = dynamic_cast<const VulkanVisual*>(visual);
@@ -451,10 +475,16 @@ void VulkanLevelRender::add_Visual(u32, IRenderable*, IRenderVisual* visual, Fma
         "Vulkan scene submission received a visual outside this level");
     Fmatrix mvp;
     mvp.mul(Device.mFullTransform, world);
+    Fvector center = visual_center(level_.visual_node(level_visual->index()));
+    Fvector world_center;
+    world.transform_tiny(world_center, center);
+    center = world_center;
     static_assert(sizeof(Fmatrix) == 16 * sizeof(float));
     float transform[16];
     std::memcpy(transform, &mvp, sizeof(transform));
-    game_device_->queue_level_visual(level_visual->index(), transform);
+    const bool hud = root && root->renderable_HUD();
+    game_device_->queue_level_visual(level_visual->index(), transform, hud,
+        distance_squared(center, Device.vCameraPosition));
 }
 
 IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)
