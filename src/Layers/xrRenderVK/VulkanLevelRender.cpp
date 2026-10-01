@@ -2,6 +2,7 @@
 #include "VulkanLevelRender.h"
 #include "VulkanGameDevice.h"
 #include "VulkanVisual.h"
+#include "VulkanModelVisual.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -130,7 +131,10 @@ void VulkanLevelRender::Destroy()
     if (device_resource_state_.can_create_factory_objects())
         OnDeviceDestroy(false);
     else
+    {
+        models_Clear(true);
         level_Unload();
+    }
     if (game_device_)
         game_device_->use_scene_visibility(false);
     game_device_ = nullptr;
@@ -324,6 +328,7 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
 
 void VulkanLevelRender::OnDeviceDestroy(bool)
 {
+    models_Clear(true);
     if (!game_device_)
     {
         level_Unload();
@@ -538,16 +543,79 @@ IRenderVisual* VulkanLevelRender::getVisual(int index)
     return index >= 0 ? level_.get_visual(static_cast<size_t>(index)) : nullptr;
 }
 
+IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
+{
+    R_ASSERT2(device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ &&
+        device_resource_state_.can_create_factory_objects(),
+        "Vulkan model creation requires an initialized gameplay device");
+    VisualRecord record;
+    std::string error;
+    const bool parsed = data ? parse_ogf_visual(
+        {static_cast<const uint8_t*>(data->pointer()), data->length()}, record, error) :
+        load_engine_model_visual(name, record, error);
+    if (!parsed)
+    {
+        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
+        return nullptr;
+    }
+    // Progressive, hierarchical, skinned and linked models have separate
+    // milestones. Do not return a drawable instance with silently lost parts.
+    if (record.type != 0 || !record.embedded_children.empty() || !record.linked_children.empty())
+    {
+        Msg("! [renderer-vulkan] OGF model '%s': unsupported static model type %u",
+            name ? name : "<reader>", record.type);
+        return nullptr;
+    }
+    auto model = std::make_unique<VulkanModelVisual>(record);
+    if (!model->gpu().load(name, data, device_, queue_, pool_, memory_, upload_,
+            *textures_, *pass_, error))
+    {
+        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
+        return nullptr;
+    }
+    IRenderVisual* visual = model.get();
+    models_.emplace(visual, std::move(model));
+    return visual;
+}
+
+IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
+{
+    return model_Create(name, data);
+}
+
+void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool)
+{
+    if (!visual) return;
+    auto found = models_.find(visual);
+    R_ASSERT2(found != models_.end(), "Vulkan model deletion received an unknown visual");
+    if (game_device_) game_device_->discard_model_draws(&found->second->gpu());
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model deletion requires idle GPU frames");
+    models_.erase(found);
+    visual = nullptr;
+}
+
+void VulkanLevelRender::models_Clear(bool)
+{
+    if (models_.empty()) return;
+    if (game_device_) game_device_->discard_scene_draws();
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model clear requires idle GPU frames");
+    models_.clear();
+}
+
 void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)
 {
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
     const int visual_index = level_.find_visual_index(visual);
-    R_ASSERT2(visual_index >= 0,
-        "Vulkan scene submission received a visual outside this level");
+    const auto model = models_.find(visual);
+    R_ASSERT2(visual_index >= 0 || model != models_.end(),
+        "Vulkan scene submission received a visual outside this renderer");
     const Fmatrix view_projection = current_view_projection();
     Fmatrix mvp;
     mvp.mul(view_projection, world);
-    Fvector center = visual_center(level_.visual_node(static_cast<size_t>(visual_index)));
+    Fvector center = model != models_.end() ? model->second->getVisData().sphere.P :
+        visual_center(level_.visual_node(static_cast<size_t>(visual_index)));
     Fvector world_center;
     world.transform_tiny(world_center, center);
     center = world_center;
@@ -561,8 +629,12 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             camera_state_.camera_position()[2]);
     else
         camera_position.set(Device.vCameraPosition);
-    game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud,
-        distance_squared(center, camera_position));
+    if (model != models_.end())
+        game_device_->queue_model(model->second->gpu(), nullptr, transform, hud,
+            distance_squared(center, camera_position));
+    else
+        game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud,
+            distance_squared(center, camera_position));
 }
 
 IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)

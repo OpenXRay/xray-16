@@ -9,6 +9,7 @@
 #include "VulkanRenderContextState.h"
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace xray::render::vulkan
@@ -16,6 +17,7 @@ namespace xray::render::vulkan
 class VulkanGameDevice;
 class VulkanFontRender;
 class VulkanUIShader;
+class VulkanModelVisual;
 // Shared IRender level contract for the Vulkan gameplay renderer. Its caller
 // must have created a device, deferred pass and texture factory first. Other
 // IRender operations remain abstract until their Vulkan implementations exist.
@@ -34,6 +36,10 @@ public:
     void reset_begin() override;
     void reset_end() override;
     IRenderVisual* getVisual(int index) override;
+    IRenderVisual* model_Create(pcstr name, IReader* data = nullptr) override;
+    IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
+    void model_Delete(IRenderVisual*& visual, bool discard = false) override;
+    void models_Clear(bool complete) override;
     void Create(SDL_Window* window, u32& width, u32& height,
         float& half_width, float& half_height) override;
     void Destroy() override;
@@ -71,6 +77,7 @@ protected:
 private:
     Fmatrix current_view_projection() const;
     GpuLevel level_;
+    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
     VulkanCameraState camera_state_;
     VulkanRenderContextState context_state_;
     VkDevice device_{};

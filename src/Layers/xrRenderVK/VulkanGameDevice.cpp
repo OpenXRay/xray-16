@@ -136,6 +136,12 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton,
     model_draws_.push_back(draw);
 }
 
+void VulkanGameDevice::discard_model_draws(const GpuModel* model)
+{
+    model_draws_.erase(std::remove_if(model_draws_.begin(), model_draws_.end(),
+        [model](const ModelDraw& draw) { return draw.model == model; }), model_draws_.end());
+}
+
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16],
     bool hud, float sort_distance)
 {
