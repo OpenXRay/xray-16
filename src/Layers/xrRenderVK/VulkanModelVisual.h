@@ -14,8 +14,7 @@ namespace xray::render::vulkan
 class VulkanModelVisual final : public IRenderVisual
 {
 public:
-    VulkanModelVisual(const VisualRecord& record, std::string cache_name)
-        : cache_name_(std::move(cache_name))
+    VulkanModelVisual(const VisualRecord& record, std::string cache_name) : cache_name_(std::move(cache_name))
     {
         visibility_.clear();
         const auto& b = record.bounds;
@@ -24,12 +23,30 @@ public:
         visibility_.sphere.R = b[9];
     }
 
-    vis_data& getVisData() override { return visibility_; }
-    u32 getType() const override { return 0; }
-    GpuModel& gpu() { return gpu_; }
-    const std::string& cache_name() const { return cache_name_; }
+    vis_data& getVisData() override
+    {
+        return visibility_;
+    }
+
+    u32 getType() const override
+    {
+        return 0;
+    }
+
+    GpuModel& gpu()
+    {
+        return gpu_;
+    }
+
+    const std::string& cache_name() const
+    {
+        return cache_name_;
+    }
 #ifdef DEBUG
-    shared_str getDebugName() override { return "vulkan_static_ogf"; }
+    shared_str getDebugName() override
+    {
+        return "vulkan_static_ogf";
+    }
 #endif
 
 private:
@@ -37,4 +54,4 @@ private:
     GpuModel gpu_;
     std::string cache_name_;
 };
-}
+} // namespace xray::render::vulkan
