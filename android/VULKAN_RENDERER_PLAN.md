@@ -58,6 +58,21 @@ the previous output intact. DXC is not shipped with the engine, and legacy
 shader syntax or features may require porting. This tool does not yet compile
 the complete game shader set or package SPIR-V into game resources.
 
+For a group of named variants, the host can compile
+`tools/vulkan_shader_variants.json` with:
+
+```sh
+python3 tools/compile_vulkan_shader.py --dxc dxc \
+  --manifest tools/vulkan_shader_variants.json --output-dir build/vulkan-shaders
+```
+
+The paths in the manifest are relative to its own directory. Its entries cover
+the editor vertex shader and the screen-copy pair, including an alpha-tested
+pixel variant. The compiler keeps the previous outputs if any variant fails and
+prints the failed source, stage, defines and DXC diagnostics. More gameplay
+shader families and the engine `IRender::shader_compile` bridge remain to be
+implemented before the shader-variant plan item can be closed.
+
 For the diagnostic image draw, compile the supplied HLSL pair on a host with
 DXC and install both outputs under the game's `$game_shaders$/r3/` directory:
 

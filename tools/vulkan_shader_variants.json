@@ -1,0 +1,30 @@
+{
+  "include": ["../res/gamedata/shaders/r3/shared"],
+  "variants": [
+    {
+      "source": "../res/gamedata/shaders/r3/editor.vs",
+      "stage": "vs",
+      "entry": "main",
+      "output": "r3/editor.vs.spv"
+    },
+    {
+      "source": "../res/gamedata/shaders/r3/screen_copy_vk.vs",
+      "stage": "vs",
+      "entry": "main",
+      "output": "r3/screen_copy_vk.vs.spv"
+    },
+    {
+      "source": "../res/gamedata/shaders/r3/screen_copy_vk.ps",
+      "stage": "ps",
+      "entry": "main",
+      "output": "r3/screen_copy_vk.ps.spv"
+    },
+    {
+      "source": "../res/gamedata/shaders/r3/screen_copy_vk.ps",
+      "stage": "ps",
+      "entry": "main",
+      "output": "r3/screen_copy_vk.aref.ps.spv",
+      "define": ["USE_AREF=1"]
+    }
+  ]
+}

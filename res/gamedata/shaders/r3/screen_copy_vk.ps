@@ -4,5 +4,9 @@
 
 float4 main(float4 position : SV_Position, float2 uv : TEXCOORD0) : SV_Target
 {
-    return source_image.Sample(source_sampler, uv);
+    float4 color = source_image.Sample(source_sampler, uv);
+#if defined(USE_AREF)
+    clip(color.a - 0.5);
+#endif
+    return color;
 }
