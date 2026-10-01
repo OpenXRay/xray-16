@@ -452,9 +452,11 @@ target_include_directories(xrCore
     "${XRAY_SOURCE_DIR}/Externals/mimalloc/include"
 )
 
+find_package(Threads REQUIRED)
+
 target_link_libraries(xrCore
     PUBLIC
-    $<$<NOT:$<PLATFORM_ID:Android>>:pthread>
+    Threads::Threads
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     SDL2::SDL2
 
