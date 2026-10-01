@@ -2,18 +2,21 @@
 
 #include "PHDefs.h"
 #include "PHImpact.h"
-#include <ode/common.h>
-#include <ode/mass.h>
+#include "xrPhysicsCore/IPhysicsCore.h"
+#include "PHJointDestroyInfo.h"
 
 class CPHFracture;
 class CPHElement;
 
-using CFEEDBACK_STORAGE = xr_vector<dJointFeedback>;
+struct SPhysicsJointFeedback;
+
+using CFEEDBACK_STORAGE = xr_vector<SPhysicsJointFeedback>;
 
 IC void sub_diapasones(u16& from1, u16& to1, const u16& from0, const u16& to0);
 
 class CShellSplitInfo
 {
+    friend class CPHWorld;
     friend class CPHFracturesHolder;
     friend class CPHShellSplitterHolder;
     friend class CPHElement;
@@ -39,14 +42,21 @@ protected:
 
 class CPHFracture : public CShellSplitInfo
 {
+    friend class CPHWorld;
     friend class CPHFracturesHolder;
     friend class CPHElement;
     friend class CPHShell;
     bool m_breaked;
-    dMass m_firstM;
-    dMass m_secondM;
-    // when breaked m_pos_in_element-additional force m_break_force-additional torque -x additional torque-y
-    // add_torque_z - additional torque z
+
+    float m_firstM;
+    float m_secondM;
+    PhysicsMassProperties m_first_properties, m_second_properties;
+    Fvector m_first_center = {0, 0, 0}, m_second_center = {0, 0, 0};
+    Fvector m_cached_center = {0, 0, 0};
+    u32 m_cached_revision = u32(-1);
+    u16 m_cached_geometry_count = 0;
+    float m_cached_mass = -1;
+
     float m_break_force;
     float m_break_torque;
     Fvector m_pos_in_element;
@@ -56,17 +66,19 @@ class CPHFracture : public CShellSplitInfo
 public:
     bool Update(CPHElement* element);
     bool Breaked() { return m_breaked; }
-    void SetMassParts(const dMass& first, const dMass& second);
+
+    void SetMassParts(float first, float second);
     void MassSetZerro();
-    void MassAddToFirst(const dMass& m);
-    void MassAddToSecond(const dMass& m);
-    void MassSubFromFirst(const dMass& m);
-    void MassSubFromSecond(const dMass& m);
-    void MassSetFirst(const dMass& m);
-    void MassSetSecond(const dMass& m);
-    const dMass& MassFirst() { return m_firstM; }
-    const dMass& MassSecond() { return m_secondM; }
-    void MassUnsplitFromFirstToSecond(const dMass& m);
+    void MassAddToFirst(float m);
+    void MassAddToSecond(float m);
+    void MassSubFromFirst(float m);
+    void MassSubFromSecond(float m);
+    void MassSetFirst(float m);
+    void MassSetSecond(float m);
+
+    float MassFirst() { return m_firstM; }
+    float MassSecond() { return m_secondM; }
+    void MassUnsplitFromFirstToSecond(float m);
 };
 
 using FRACTURE_STORAGE = xr_vector<CPHFracture>;
@@ -82,34 +94,31 @@ class CPHFracturesHolder // stored in CPHElement
     bool m_has_breaks;
 
     FRACTURE_STORAGE m_fractures;
-    PH_IMPACT_STORAGE m_impacts; // filled in anytime from CPHElement applyImpulseTrace cleared in PhDataUpdate
-    CFEEDBACK_STORAGE m_feedbacks; // this store feedbacks for non contact joints
+    PH_IMPACT_STORAGE m_impacts;
+    CFEEDBACK_STORAGE m_feedbacks;
 public:
     CPHFracturesHolder();
-
     ~CPHFracturesHolder();
-    void DistributeAdditionalMass(u16 geom_num, const dMass& m); //
+
+    void DistributeAdditionalMass(u16 geom_num, float m);
     void SubFractureMass(u16 fracture_num);
     void AddImpact(const Fvector& force, const Fvector& point, u16 id);
     PH_IMPACT_STORAGE& Impacts() { return m_impacts; }
     CPHFracture& LastFracture() { return m_fractures.back(); }
 protected:
 private:
-    u16 CheckFractured(); // returns first breaked fracture
+    u16 CheckFractured();
 
     element_fracture SplitFromEnd(CPHElement* element, u16 geom_num);
-    void InitNewElement(CPHElement* element, const Fmatrix& shift_pivot, float density);
     void PassEndFractures(u16 from, CPHElement* dest);
 
 public:
     void SplitProcess(CPHElement* element, ELEMENT_PAIR_VECTOR& new_elements);
     u16 AddFracture(const CPHFracture& fracture);
     CPHFracture& Fracture(u16 num);
-    void PhTune(dBodyID body); // set feedback for joints called from PhTune of ShellSplitterHolder
-    bool PhDataUpdate(CPHElement* element); // collect joints and external impacts in fractures Update which set
-    // m_fractured; called from PhDataUpdate of ShellSplitterHolder returns true
-    // if has breaks
-    void ApplyImpactsToElement(CPHElement* element);
+
+    void PhTune(CharacterVirtualHandle body);
+    bool PhDataUpdate(CPHElement* element);
 };
 
 IC void sub_diapasones(u16& from1, u16& to1, const u16& from0, const u16& to0)
