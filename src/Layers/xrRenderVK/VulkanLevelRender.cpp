@@ -155,7 +155,7 @@ void VulkanLevelRender::Destroy()
         OnDeviceDestroy(false);
     else
     {
-        models_Clear(true);
+        destroy_all_models();
         level_Unload();
     }
     if (game_device_)
@@ -352,7 +352,7 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
 
 void VulkanLevelRender::OnDeviceDestroy(bool)
 {
-    models_Clear(true);
+    destroy_all_models();
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader teardown requires idle GPU frames");
     compiled_shaders_.clear();
@@ -632,6 +632,18 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
     R_ASSERT2(device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ &&
         device_resource_state_.can_create_factory_objects(),
         "Vulkan model creation requires an initialized gameplay device");
+    if (!data && name && *name)
+    {
+        auto reused = model_pool_.find(name);
+        if (reused != model_pool_.end())
+        {
+            auto instance = std::move(reused->second);
+            model_pool_.erase(reused);
+            IRenderVisual* visual = instance.get();
+            models_.emplace(visual, std::move(instance));
+            return visual;
+        }
+    }
     VisualRecord record;
     std::string error;
     const bool parsed = data ? parse_ogf_visual(
@@ -650,7 +662,8 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
             name ? name : "<reader>", record.type);
         return nullptr;
     }
-    auto model = std::make_unique<VulkanModelVisual>(record);
+    auto model = std::make_unique<VulkanModelVisual>(record,
+        !data && name ? name : "");
     if (!model->gpu().load(name, data, device_, queue_, pool_, memory_, upload_,
             *textures_, *pass_, error))
     {
@@ -667,7 +680,7 @@ IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
     return model_Create(name, data);
 }
 
-void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool)
+void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
 {
     if (!visual) return;
     auto found = models_.find(visual);
@@ -675,17 +688,30 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool)
     if (game_device_) game_device_->discard_model_draws(&found->second->gpu());
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model deletion requires idle GPU frames");
+    if (!discard && !found->second->cache_name().empty())
+        model_pool_.emplace(found->second->cache_name(), std::move(found->second));
     models_.erase(found);
     visual = nullptr;
 }
 
 void VulkanLevelRender::models_Clear(bool)
 {
-    if (models_.empty()) return;
-    if (game_device_) game_device_->discard_scene_draws();
+    // The engine calls models_Clear(false) while live objects still hold
+    // visuals. As in CModelPool::ClearPool, only unused instances are evicted.
+    if (model_pool_.empty()) return;
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model clear requires idle GPU frames");
+    model_pool_.clear();
+}
+
+void VulkanLevelRender::destroy_all_models()
+{
+    if (models_.empty() && model_pool_.empty()) return;
+    if (game_device_) game_device_->discard_scene_draws();
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model teardown requires idle GPU frames");
     models_.clear();
+    model_pool_.clear();
 }
 
 void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)

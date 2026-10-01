@@ -4,6 +4,9 @@
 #include "Include/xrRender/RenderVisual.h"
 #include "xrEngine/vis_common.h"
 
+#include <string>
+#include <utility>
+
 namespace xray::render::vulkan
 {
 // An independent, renderer-owned static OGF instance. GPU resources are
@@ -11,7 +14,8 @@ namespace xray::render::vulkan
 class VulkanModelVisual final : public IRenderVisual
 {
 public:
-    explicit VulkanModelVisual(const VisualRecord& record)
+    VulkanModelVisual(const VisualRecord& record, std::string cache_name)
+        : cache_name_(std::move(cache_name))
     {
         visibility_.clear();
         const auto& b = record.bounds;
@@ -23,6 +27,7 @@ public:
     vis_data& getVisData() override { return visibility_; }
     u32 getType() const override { return 0; }
     GpuModel& gpu() { return gpu_; }
+    const std::string& cache_name() const { return cache_name_; }
 #ifdef DEBUG
     shared_str getDebugName() override { return "vulkan_static_ogf"; }
 #endif
@@ -30,5 +35,6 @@ public:
 private:
     vis_data visibility_;
     GpuModel gpu_;
+    std::string cache_name_;
 };
 }

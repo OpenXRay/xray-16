@@ -78,9 +78,11 @@ protected:
     const GpuLevel& gpu_level() const { return level_; }
 
 private:
+    void destroy_all_models();
     Fmatrix current_view_projection() const;
     GpuLevel level_;
     std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
+    std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
     std::vector<std::unique_ptr<ShaderModule>> compiled_shaders_;
     VulkanCameraState camera_state_;
     VulkanRenderContextState context_state_;
