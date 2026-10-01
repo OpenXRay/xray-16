@@ -17,7 +17,7 @@ template <typename T> T handle(uintptr_t value)
     else return static_cast<T>(value);
 }
 
-uint32_t pipeline_count{}, draw_count{}, descriptor_updates{};
+uint32_t pipeline_count{}, draw_count{}, descriptor_updates{}, descriptor_frees{};
 VkPipeline bound_pipeline{};
 VkPipelineLayout geometry_layout{}, lighting_layout{};
 VkDescriptorSet updated_material{};
@@ -138,7 +138,7 @@ VkResult VKAPI_PTR allocate_sets(VkDevice, const VkDescriptorSetAllocateInfo* in
     return VK_SUCCESS;
 }
 VkResult VKAPI_PTR free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescriptorSet*)
-{ return VK_SUCCESS; }
+{ ++descriptor_frees; return VK_SUCCESS; }
 void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
@@ -273,4 +273,6 @@ int main()
         6, expected_mvp, material));
     assert(bound_pipeline == handle<VkPipeline>(103));
     assert(draw_count == 4 && error.empty());
+    deferred.release_gbuffer(material);
+    assert(material == VK_NULL_HANDLE && descriptor_frees == 1);
 }

@@ -83,6 +83,7 @@ public:
         float alpha_ref = 0.0f) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
         std::string& error);
+    void release_ui_texture_set(VkDescriptorSet& set);
     void rebind_render_pass(VkRenderPass compatible_render_pass) { m_render_pass = compatible_render_pass; }
     void destroy();
 

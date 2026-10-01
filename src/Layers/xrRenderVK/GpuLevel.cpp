@@ -32,6 +32,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     prepared.device_ = device;
     prepared.pool_ = pool;
     prepared.upload_ = upload;
+    prepared.textures_ = &textures;
+    prepared.pass_ = &pass;
     prepared.visuals_ = std::move(models.visuals);
     prepared.roots_ = std::move(models.roots);
     prepared.sectors_ = std::move(models.sectors);
@@ -65,6 +67,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     device_ = prepared.device_;
     pool_ = prepared.pool_;
     upload_ = prepared.upload_;
+    textures_ = prepared.textures_;
+    pass_ = prepared.pass_;
     pending_ = std::move(prepared.pending_);
     meshes_ = std::move(prepared.meshes_);
     visuals_ = std::move(prepared.visuals_);
@@ -76,6 +80,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         visual_objects_.emplace_back(std::make_unique<VulkanVisual>(*this,
             static_cast<uint32_t>(index), visuals_[index]));
     prepared.device_ = VK_NULL_HANDLE;
+    prepared.textures_ = nullptr;
+    prepared.pass_ = nullptr;
     prepared.pool_ = VK_NULL_HANDLE;
     error.clear();
     return true;
@@ -174,6 +180,9 @@ void GpuLevel::destroy()
 {
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
     visual_objects_.clear();
+    if (textures_ && pass_)
+        for (const Mesh& mesh : meshes_)
+            textures_->release_material(mesh.material, *pass_);
     meshes_.clear();
     visuals_.clear();
     roots_.clear();
@@ -183,5 +192,7 @@ void GpuLevel::destroy()
     device_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     upload_ = {};
+    textures_ = nullptr;
+    pass_ = nullptr;
 }
 }

@@ -60,6 +60,8 @@ bool GpuModel::load(const char* name, IReader* source, VkDevice device, VkQueue 
     device_ = device;
     pool_ = pool;
     upload_ = upload;
+    textures_ = &textures;
+    pass_ = &pass;
     if (!add_meshes(std::move(decoded), "", device, queue, pool, memory,
             upload, textures, pass, error) || meshes_.empty())
     {
@@ -169,10 +171,15 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
 void GpuModel::destroy()
 {
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
+    if (textures_ && pass_)
+        for (const Mesh& mesh : meshes_)
+            textures_->release_material(mesh.material, *pass_);
     meshes_.clear();
     pending_.clear();
     device_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     upload_ = {};
+    textures_ = nullptr;
+    pass_ = nullptr;
 }
 }

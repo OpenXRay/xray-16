@@ -54,6 +54,8 @@ private:
     VkDevice device_{};
     VkCommandPool pool_{};
     BufferUploadDispatch upload_{};
+    GameTextureFactory* textures_{};
+    DeferredPass* pass_{};
     std::vector<PendingBufferUpload> pending_;
     std::vector<Mesh> meshes_;
     std::vector<LevelVisual> visuals_;

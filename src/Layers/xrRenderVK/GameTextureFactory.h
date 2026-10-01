@@ -22,11 +22,16 @@ public:
     bool initialize(VkDevice device, VkQueue queue, VkCommandPool pool,
         const VkPhysicalDeviceMemoryProperties& memory, bool bc_supported,
         const TextureUploadDispatch& dispatch, PFN_vkCreateSampler create_sampler,
-        PFN_vkDestroySampler destroy_sampler, std::string& error);
+        PFN_vkDestroySampler destroy_sampler, PFN_vkDeviceWaitIdle wait_idle,
+        std::string& error);
     bool material(const std::string& texture_list, DeferredPass& pass,
         VkDescriptorSet& result, std::string& error);
     bool ui(const std::string& texture_name, ScenePass& pass,
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
+    // Release only after the consumer has stopped recording the descriptor.
+    // The last release waits for submitted frames before freeing GPU objects.
+    void release_material(VkDescriptorSet set, DeferredPass& pass);
+    void release_ui(VkDescriptorSet set, ScenePass& pass);
     void destroy();
 
 private:
@@ -36,8 +41,13 @@ private:
         VkDescriptorSet material_set{};
         VkDescriptorSet ui_set{};
         VkExtent2D extent{};
+        size_t material_refs{};
+        size_t ui_refs{};
+        DeferredPass* material_pass{};
+        ScenePass* ui_pass{};
     };
     bool load(const std::string& name, Asset*& asset, std::string& error);
+    void evict_if_unused(const std::string& name);
     VkDevice device_{};
     VkQueue queue_{};
     VkCommandPool pool_{};
@@ -45,6 +55,7 @@ private:
     bool bc_supported_{};
     TextureUploadDispatch dispatch_{};
     PFN_vkDestroySampler destroy_sampler_{};
+    PFN_vkDeviceWaitIdle wait_idle_{};
     VkSampler sampler_{};
     ImageStateTracker states_;
     std::vector<PendingTextureUpload> pending_;

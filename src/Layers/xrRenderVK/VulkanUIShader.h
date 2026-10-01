@@ -15,6 +15,7 @@ class VulkanUIShader final : public IUIShader
 public:
     VulkanUIShader(GameTextureFactory& textures, ScenePass& pass)
         : textures_(&textures), pass_(&pass) {}
+    ~VulkanUIShader() override { destroy(); }
     void Copy(IUIShader& source) override;
     void create(LPCSTR shader, LPCSTR texture = nullptr) override;
     bool inited() override { return descriptor_ != VK_NULL_HANDLE; }

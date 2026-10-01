@@ -15,7 +15,7 @@ template <typename T> T handle(uintptr_t value)
 }
 uint32_t layouts = 0, pipelines = 0, destroyed_layouts = 0, destroyed_pipelines = 0;
 uint32_t geometry_draws = 0, ui_draws = 0;
-uint32_t descriptor_updates = 0, descriptor_binds = 0;
+uint32_t descriptor_updates = 0, descriptor_binds = 0, descriptor_frees = 0;
 uint32_t scissor_width = 0;
 VkResult ui_result = VK_SUCCESS;
 VkPipeline bound = VK_NULL_HANDLE;
@@ -78,6 +78,7 @@ VkResult VKAPI_CALL create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info
     const VkAllocationCallbacks*, VkDescriptorPool* pool)
 {
     assert(info->maxSets == 128);
+    assert(info->flags & VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT);
     *pool = handle<VkDescriptorPool>(31);
     return VK_SUCCESS;
 }
@@ -98,6 +99,7 @@ void VKAPI_CALL update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet
 }
 VkResult VKAPI_CALL free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescriptorSet*)
 {
+    ++descriptor_frees;
     return VK_SUCCESS;
 }
 void VKAPI_CALL bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout, uint32_t,
@@ -141,6 +143,11 @@ int main()
         VK_INDEX_TYPE_UINT16, 3, constants));
     assert(!pass.record_ui(frame, VK_NULL_HANDLE, handle<VkBuffer>(21),
         VK_INDEX_TYPE_UINT16, 6, texture));
+    pass.release_ui_texture_set(texture);
+    assert(texture == VK_NULL_HANDLE && descriptor_frees == 1);
+    assert(pass.create_ui_texture_set(handle<VkImageView>(33), handle<VkSampler>(34), texture, error));
+    pass.release_ui_texture_set(texture);
+    assert(texture == VK_NULL_HANDLE && descriptor_frees == 2 && descriptor_updates == 2);
     pass.destroy();
     assert(destroyed_pipelines == 2 && destroyed_layouts == 2);
     ui_result = VK_ERROR_INITIALIZATION_FAILED;

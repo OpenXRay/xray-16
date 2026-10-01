@@ -166,6 +166,7 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     }
     const VkDescriptorPoolSize pool_size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 128};
     VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
+    pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
     pool_info.maxSets = 128;
     pool_info.poolSizeCount = 1;
     pool_info.pPoolSizes = &pool_size;
@@ -302,6 +303,13 @@ bool ScenePass::create_ui_texture_set(VkImageView view, VkSampler sampler, VkDes
     m_vk.update_descriptor_sets(m_device, 1, &write, 0, nullptr);
     error.clear();
     return true;
+}
+
+void ScenePass::release_ui_texture_set(VkDescriptorSet& set)
+{
+    if (m_device && m_ui_descriptor_pool && set && m_vk.free_descriptor_sets)
+        m_vk.free_descriptor_sets(m_device, m_ui_descriptor_pool, 1, &set);
+    set = VK_NULL_HANDLE;
 }
 
 void ScenePass::destroy()

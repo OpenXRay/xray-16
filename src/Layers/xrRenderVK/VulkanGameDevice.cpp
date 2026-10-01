@@ -108,7 +108,7 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                 scene_dispatch, error, true) ||
             !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory,
                 physical.features.textureCompressionBC, texture_dispatch_,
-                create_sampler, destroy_sampler, error)) goto failed;
+                create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error)) goto failed;
     }
     ui_.configure(device, physical.memory, buffer_upload_.buffer, ui_pass_);
     error.clear();
@@ -418,9 +418,9 @@ void VulkanGameDevice::destroy()
     current_level_ = nullptr;
     scene_visibility_ = false;
     textures_.destroy();
-    ui_pass_.destroy();
     targets_.release_lighting(deferred_);
     targets_.destroy();
+    ui_pass_.destroy();
     deferred_.destroy();
     window_.destroy();
     frame_dispatch_ = {};

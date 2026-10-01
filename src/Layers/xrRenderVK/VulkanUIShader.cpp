@@ -9,10 +9,19 @@ void VulkanUIShader::Copy(IUIShader& source)
     const auto* other = dynamic_cast<VulkanUIShader*>(&source);
     R_ASSERT2(other && other->textures_ == textures_ && other->pass_ == pass_,
         "Vulkan UI shaders can only be copied within their owning device");
+    if (other == this) return;
+    destroy();
     shader_ = other->shader_;
     texture_ = other->texture_;
-    descriptor_ = other->descriptor_;
-    extent_ = other->extent_;
+    if (other->descriptor_)
+    {
+        std::string error;
+        if (!textures_->ui(texture_, *pass_, descriptor_, error, &extent_))
+        {
+            Msg("! [renderer-vulkan] UI shader copy '%s': %s", texture_.c_str(), error.c_str());
+            destroy();
+        }
+    }
 }
 
 void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
@@ -31,6 +40,8 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
 
 void VulkanUIShader::destroy()
 {
+    if (descriptor_)
+        textures_->release_ui(descriptor_, *pass_);
     shader_.clear();
     texture_.clear();
     descriptor_ = VK_NULL_HANDLE;
