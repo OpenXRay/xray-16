@@ -67,6 +67,9 @@ The two solvers produce different contacts and trajectories.
 
 ## Artifacts
 
+Published CSV summaries and their provenance are listed in
+[the benchmark index](tests/benchmark-results/2026-10-01-native.md).
+
 - Game: `C:/code/migration-benchmark/native-game-performance-final-20261001`
 - Synthetic: `C:/code/migration-benchmark/native-scenes-performance-final-20261001`
 - Frozen runtimes: `native-game-bin-performance-final` and
