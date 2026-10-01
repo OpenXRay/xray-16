@@ -44,8 +44,11 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkPipelineMultisampleStateCreateInfo multi{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
     multi.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     VkPipelineDepthStencilStateCreateInfo depth{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
-    depth.depthTestEnable = gbuffer ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = gbuffer && !transparent ? VK_TRUE : VK_FALSE;
+    // The present pass has its own cleared depth attachment. HUD geometry
+    // draws after world lighting, so depth testing here orders HUD surfaces
+    // against one another without occluding the HUD with world geometry.
+    depth.depthTestEnable = (gbuffer || hud) ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = ((gbuffer && !transparent) || hud) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
