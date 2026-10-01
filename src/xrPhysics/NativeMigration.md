@@ -1,5 +1,9 @@
 # Native Jolt physics migration
 
+The results below describe the initial native port. See
+[NativePerformance.md](NativePerformance.md) for the local performance followup
+and its separate comparisons.
+
 This branch, `followup/jolt-native-physics`, is stacked on
 `followup/jolt-physics` at `888ab2d02`. It is a separate worktree at
 `C:/code/xray-jolt-native`. Nothing from this branch has been pushed.
@@ -47,8 +51,10 @@ The CDB API retains its original query results, cache behavior, degenerate
 triangle handling, and coincident triangle IDs. The existing game spatial
 registry remains the interface for locating gameplay objects.
 
-Game contact callbacks execute on the simulation caller's thread before Jolt's
-worker jobs. Their collision rejection, friction, and static-environment
+Response-changing game contact callbacks execute on the simulation caller's
+thread before Jolt's worker jobs. Ordinary impact effects can execute after
+the workers with pre-solver snapshots, as described in the performance followup.
+Collision rejection, friction, and static-environment
 responses are then read by the native contact listener. The adapter preserves
 material friction, restitution, passable/actor-obstacle policies, water and
 slowdown effects, damage, sound/particle/wallmark effects, and missile callbacks.

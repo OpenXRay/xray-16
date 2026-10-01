@@ -199,6 +199,9 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                 } else { $null })
                 saved_at_utc = [DateTime]::UtcNow.ToString('o')
             } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $result 'run.json')
+            if ($benchmarkExitCode -ne 0) {
+                throw "Game exited with code $benchmarkExitCode; the failed capture is retained in $result."
+            }
             Write-Host "Completed $($runtime.name), repetition $repetition"
         }
         finally {

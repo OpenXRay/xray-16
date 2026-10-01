@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdio>
 #include <stdexcept>
+#include <thread>
 
 namespace {
 void Require(bool condition, const char* message) {
@@ -562,6 +563,89 @@ void CollisionPolicies(IPhysicsCore& core) {
     stopImpact = rejectContacts = false;
     core.SetRigidBodyContactCallback(nullptr);
 }
+bool immediateFixture = false;
+bool fluidFixture = false;
+int fluidMarker = 0;
+u32 deferredCalls = 0;
+std::thread::id callerThread;
+NativeBodyContactPolicy BodyPolicy(void* data, u16) {
+    if (data == &fluidMarker) return {false, false, -1, true};
+    return {data && immediateFixture, data && fluidFixture, data ? contactFriction : -1.f};
+}
+void DeferredPolicy(const NativePhysicsContact& contact) {
+    Require(std::this_thread::get_id() == callerThread, "Deferred effects run on the caller thread");
+    Require(contact.has_snapshot && contact.mass1 + contact.mass2 > 0, "Deferred effects retain impact mass/velocity");
+    Fvector velocity;
+    policyCore->GetBodyLinearVelocity(contact.object1 ? contact.body1 : contact.body2, velocity);
+    Require(std::isfinite(contact.relative_velocity), "Deferred contact snapshot is finite");
+    ++deferredCalls;
+}
+void OptimizedContactsAndSleeping(IPhysicsCore& core) {
+    policyCore = &core;
+    callerThread = std::this_thread::get_id();
+    core.Clear();
+    core.SetSimulationParameters(9.81f, 18);
+    const auto floorShape = core.CreateBoxShape(V(50, .5f, 50));
+    const auto floor = core.CreateStaticBody(floorShape, V(0, -.5f, 0));
+    core.DestroyCDBModel(floorShape);
+    const auto box = core.CreateBox(V(.5f, .5f, .5f), V(0, 2, 0), 2);
+    core.SetBodyUserData(box, &core);
+    core.SetRigidBodyContactCallback(ContactPolicy);
+    core.SetBodyContactPolicyCallback(BodyPolicy);
+    core.SetDeferredRigidBodyContactCallback(DeferredPolicy);
+    contactFriction = 1;
+    contactCalls = deferredCalls = 0;
+    immediateFixture = false;
+    for (int step = 0; step < 100; ++step) core.Step(.01f);
+    Require(contactCalls == 0 && deferredCalls > 0, "Pure contacts skip gameplay preparation and retain effects");
+    core.SetBodyUserData(floor, &fluidMarker);
+    fluidFixture = true;
+    contactCalls = deferredCalls = 0;
+    core.ActivateBody(box);
+    core.Step(.01f);
+    Require(contactCalls > 0 && deferredCalls == 0, "Fluid effects retain their pre-integration callback timing");
+    fluidFixture = false;
+    core.SetBodyUserData(floor, nullptr);
+    core.SetBodyLinearVelocity(box, V(4, 0, 0));
+    for (int step = 0; step < 60; ++step) core.Step(.01f);
+    Fvector velocity;
+    core.GetBodyLinearVelocity(box, velocity);
+    Require(std::abs(velocity.x) < 1, "Native body friction policy slows a sliding box");
+    contactFriction = 0;
+    core.SetBodyLinearVelocity(box, V(4, 0, 0));
+    for (int step = 0; step < 60; ++step) core.Step(.01f);
+    core.GetBodyLinearVelocity(box, velocity);
+    Require(velocity.x > 3, "Changed native friction policy applies to persistent contacts");
+    immediateFixture = rejectContacts = true;
+    core.ActivateBody(box);
+    for (int step = 0; step < 100; ++step) core.Step(.01f);
+    Fvector position;
+    core.GetBodyPosition(box, position);
+    Require(contactCalls > 0 && position.y < -2, "Immediate callbacks retain rejection before integration");
+    rejectContacts = immediateFixture = false;
+    core.SetBodyContactPolicyCallback(nullptr);
+    core.SetDeferredRigidBodyContactCallback(nullptr);
+    core.SetRigidBodyContactCallback(nullptr);
+
+    core.Clear();
+    core.SetSimulationParameters(0, 18);
+    const auto hingeBody = core.CreateBox(V(.5f, .5f, .5f), V(0, 0, 0), 2);
+    const auto hinge = core.CreateJoint(1, INVALID_BODY_HANDLE, hingeBody, V(0, 0, 0),
+        V(0, 1, 0), V(1, 0, 0), V(0, 0, 1), V(-3, 0, 0), V(3, 0, 0));
+    core.SetJointMotor(hinge, 0, 10, 0);
+    for (int step = 0; step < 200; ++step) {
+        core.SetJointMotor(hinge, 0, 10, 0);
+        core.SetJointLimits(hinge, 0, -3, 3);
+        core.SetBodyTransform(hingeBody, Fidentity);
+        core.Step(.01f);
+    }
+    Require(!core.IsBodyActive(hingeBody), "Unchanged motor/limits/transform permit sleeping");
+    core.SetJointMotor(hinge, 0, 10, 1);
+    Require(core.IsBodyActive(hingeBody), "A changed motor wakes the body");
+    core.Step(.01f);
+    core.GetBodyAngularVelocity(hingeBody, velocity);
+    Require(std::abs(velocity.y) > .01f, "Changed motor drives its constraint");
+}
 }
 int main() {
     Core.Initialize("NativePhysicsTests", "", false);
@@ -583,6 +667,7 @@ int main() {
         CollisionOwners(*core);
         StaticEnvironmentPolicy(*core);
         CollisionPolicies(*core);
+        OptimizedContactsAndSleeping(*core);
         core->Clear();
         Require(core->GetStatistics().bodies == 0 && core->GetStatistics().characters == 0 &&
             core->GetStatistics().constraints == 0, "World teardown");

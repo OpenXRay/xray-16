@@ -19,9 +19,16 @@ bool ContactShotMarkGetEffectPars(const Fvector& pos, const Fvector& normal, CPh
         } else {
             const auto body = geometry->get_body();
             if (body == INVALID_BODY_HANDLE) return false;
-            mass = GetPhysicsCore()->GetBodyMass(body);
-            if (mass <= 0) return false;
-            GetPhysicsCore()->GetBodyPointVelocity(body, pos, velocity);
+            const auto* contact = geometry->contact_response;
+            if (contact && contact->has_snapshot && (body == contact->body1 || body == contact->body2)) {
+                const bool first = body == contact->body1;
+                mass = first ? contact->mass1 : contact->mass2;
+                velocity = first ? contact->point_velocity1 : contact->point_velocity2;
+            } else {
+                mass = GetPhysicsCore()->GetBodyMass(body);
+                if (mass <= 0) return false;
+                GetPhysicsCore()->GetBodyPointVelocity(body, pos, velocity);
+            }
         }
         if (mass <= 0) return false;
         data = geometry;

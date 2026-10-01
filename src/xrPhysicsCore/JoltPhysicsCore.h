@@ -12,6 +12,9 @@
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 #include <Jolt/Physics/Ragdoll/Ragdoll.h>
 #include <Jolt/Physics/Collision/GroupFilterTable.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
 
 #include <unordered_map>
 #include <atomic>
@@ -36,6 +39,10 @@ private:
     float m_step_time = 0.025f;
     struct JointSpring { int axis; float erp, cfm; };
     std::unordered_map<JointHandle, std::vector<JointSpring>> m_joint_springs;
+    struct JointMotor { int axis; float force, velocity; };
+    struct JointLimit { int axis; float low, high; };
+    std::unordered_map<JointHandle, std::vector<JointMotor>> m_joint_motors;
+    std::unordered_map<JointHandle, std::vector<JointLimit>> m_joint_limits;
     std::unordered_set<JointHandle> m_wheel_joints;
     struct FeedbackFrame {
         JPH::Mat44 first, second;
@@ -93,6 +100,29 @@ private:
     MyBodyActivationListener m_body_activation_listener{this};
     BodyActivationCallbackFun m_body_activation_callback = nullptr;
     RigidBodyContactCallbackFun m_rb_contact_callback = nullptr;
+    BodyContactPolicyFun m_body_contact_policy_callback = nullptr;
+    void (*m_deferred_rb_contact_callback)(const NativePhysicsContact&) = nullptr;
+    struct ContactBody {
+        JPH::BodyID id;
+        NativeBodyContactPolicy policy;
+        JPH::AABox bounds;
+        JPH::AABox fluid_bounds;
+        bool fluid_mesh = false;
+    };
+    std::vector<ContactBody> m_contact_bodies;
+    JPH::BodyIDVector m_query_bodies, m_active_query_bodies;
+    JPH::BodyIDVector m_preparation_targets;
+    std::vector<u64> m_fluid_preparation_pairs;
+    std::vector<NativePhysicsContact> m_prepared_contacts;
+    JPH::AllHitCollisionCollector<JPH::CollideShapeCollector> m_preparation_hits;
+    JPH::AllHitCollisionCollector<JPH::CastShapeCollector> m_preparation_sweeps;
+    std::vector<NativePhysicsContact> m_deferred_rb_contacts;
+    std::mutex m_deferred_rb_mutex;
+    bool NeedsContactPreparation(JPH::BodyID first, JPH::BodyID second) const;
+    void QueueDeferredContact(const JPH::Body& first, const JPH::Body& second,
+        JPH::SubShapeID shape1, JPH::SubShapeID shape2, JPH::RVec3Arg point,
+        JPH::Vec3Arg normal, float depth);
+    void FlushDeferredRigidBodyContacts();
     CollisionFilterFun m_collision_filter = nullptr;
     QueryFilterFun m_query_filter = nullptr;
     struct ContactKey {
@@ -345,6 +375,8 @@ public:
     void SetBodyContinuousCollision(BodyHandle body, bool enabled) override;
     bool CharacterHasDynamicContact(CharacterVirtualHandle character) const override;
     void SetCollisionFilter(CollisionFilterFun callback) override { m_collision_filter = callback; }
+    void SetBodyContactPolicyCallback(BodyContactPolicyFun callback) override { m_body_contact_policy_callback = callback; }
+    void SetDeferredRigidBodyContactCallback(void (*callback)(const NativePhysicsContact&)) override { m_deferred_rb_contact_callback = callback; }
     void SetQueryFilter(QueryFilterFun callback) override { m_query_filter = callback; }
     float GetCharacterVirtualGravityFactor(CharacterVirtualHandle handle) const override;
     bool CheckShapePlacement(PhysicsShapeHandle shape, const Fvector& pos, const Fquaternion& rot, bool check_characters = true, void* ignore_user_data = nullptr, bool camera = false) const override;

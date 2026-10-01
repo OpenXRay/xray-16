@@ -57,9 +57,16 @@ bool ModelTree::Build(const Fvector* vertices, u32 vertexCount, const TRI* trian
     simulationTriangles.reserve(triangleCount);
     JPH::Ref<JPH::XRayMeshMaterial> metadata = new JPH::XRayMeshMaterial;
     metadata->materials.reserve(triangleCount);
+    u16 maxMaterial = 0;
+    for (u32 index = 0; index < triangleCount; ++index)
+        maxMaterial = std::max(maxMaterial, static_cast<u16>(triangles[index].material));
+    metadata->materialBounds.resize(size_t(maxMaterial) + 1);
     for (u32 index = 0; index < triangleCount; ++index) {
         metadata->materials.push_back(static_cast<u16>(triangles[index].material));
         const auto& triangle = indices[index];
+        auto& materialBounds = metadata->materialBounds[triangles[index].material];
+        for (const auto vertex : triangle.mIdx)
+            materialBounds.Encapsulate(JPH::Vec3::sLoadFloat3Unsafe(points[vertex]));
         if (triangle.IsDegenerate(points) || validation.IsDegenerate(triangle)) {
             JPH::AABox bounds;
             for (const auto vertex : triangle.mIdx) bounds.Encapsulate(JPH::Vec3::sLoadFloat3Unsafe(points[vertex]));
@@ -89,6 +96,7 @@ size_t ModelTree::GetUsedBytes() const
     if (mesh) {
         bytes += mesh->GetStats().mSizeBytes;
         bytes += static_cast<const JPH::XRayMeshMaterial*>(mesh->GetMaterialList().front().GetPtr())->materials.capacity() * sizeof(u16);
+        bytes += static_cast<const JPH::XRayMeshMaterial*>(mesh->GetMaterialList().front().GetPtr())->materialBounds.capacity() * sizeof(JPH::AABox);
     }
     return bytes;
 }

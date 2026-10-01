@@ -176,6 +176,8 @@ void JoltPhysicsCore::SetJointAxisDir(JointHandle handle, int axis_num, const Fv
     m_physics_system->RemoveConstraint(previous);
     found->second = replacement;
     m_physics_system->AddConstraint(replacement);
+    m_joint_motors.erase(handle);
+    m_joint_limits.erase(handle);
     ActivateBody(first->GetID().GetIndexAndSequenceNumber());
     ActivateBody(second->GetID().GetIndexAndSequenceNumber());
 }

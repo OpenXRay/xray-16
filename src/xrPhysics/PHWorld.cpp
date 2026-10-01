@@ -228,6 +228,8 @@ static bool OnJoltRBContact(const NativePhysicsContact& contact)
     } firstResponse(geom_1, contact), secondResponse(geom_2, contact);
 
     if (!g_mtl1 || !g_mtl2) return true;
+    if (geom_1->native_contact_friction >= 0) contact.friction = geom_1->native_contact_friction;
+    if (geom_2->native_contact_friction >= 0) contact.friction = geom_2->native_contact_friction;
     auto collectEffector = [&norm, &contact](CPhysicsGeom* geometry, SGameMtl* material, bool first) {
         const auto body = first ? contact.body1 : contact.body2;
         if (body == INVALID_BODY_HANDLE || !geometry->collide_fluids() ||
@@ -282,6 +284,49 @@ static bool OnJoltRBContact(const NativePhysicsContact& contact)
     else if (layer_1 != 6 && layer_2 != 6 && ph_world->default_contact_shotmark())
         ph_world->default_contact_shotmark()(do_collide, bo1, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
     return do_collide;
+}
+
+static NativeBodyContactPolicy NativeContactPolicy(void* data, u16 kind)
+{
+    NativeBodyContactPolicy policy{false, false, -1};
+    if (!data) return policy;
+    CPHGeometryOwner* owner = nullptr;
+    IPhysicsShellHolder* holder = nullptr;
+    if (kind == 0 || kind == 1 || kind == 3) {
+        auto* element = static_cast<CPHElement*>(data);
+        owner = element;
+        holder = element->PhysicsRefObject();
+    } else if (kind == 5) {
+        auto* shell = static_cast<CPHStaticGeomShell*>(data);
+        owner = shell;
+        holder = shell->PhysicsRefObject();
+    } else { policy.immediate = true; return policy; }
+    if (holder && holder->ObjectGetDestroy()) policy.immediate = true;
+    bool haveFriction = false;
+    bool mixedFriction = false;
+    for (u16 index = 0; index < owner->numberOfGeoms(); ++index) {
+        auto* geometry = owner->Geom(index);
+        if (geometry->object_callbacks ||
+            (geometry->contact_callback && geometry->contact_callback != ph_world->default_contact_shotmark() &&
+             geometry->contact_callback != ph_world->default_character_contact_shotmark())) policy.immediate = true;
+        if ((kind == 1 || kind == 3) && geometry->collide_fluids()) policy.fluids = true;
+        if (geometry->material < GMLib.CountMaterial() &&
+            GMLib.GetMaterialByIdx(geometry->material)->Flags.test(SGameMtl::flSlowDown)) policy.slowdown_material = true;
+        if (haveFriction && policy.friction != geometry->native_contact_friction) mixedFriction = true;
+        policy.friction = geometry->native_contact_friction;
+        haveFriction = true;
+    }
+    if (mixedFriction) {
+        policy.immediate = true;
+        policy.friction = -1; // Let the preparatory callback choose the contacted geometry.
+    }
+    return policy;
+}
+static void NativeDeferredContact(const NativePhysicsContact& contact)
+{
+    // Only contacts without response-changing callbacks or immediate fluid
+    // effects reach this path. Impact effects use the pre-solver snapshot.
+    OnJoltRBContact(contact);
 }
 
 IPHWorld* physics_world() { return ph_world; }
@@ -404,6 +449,8 @@ void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo)
     GetPhysicsCore()->Initialize();
     GetPhysicsCore()->SetBodyActivationCallback(OnJoltBodyActivation);
     GetPhysicsCore()->SetRigidBodyContactCallback(OnJoltRBContact);
+    GetPhysicsCore()->SetBodyContactPolicyCallback(NativeContactPolicy);
+    GetPhysicsCore()->SetDeferredRigidBodyContactCallback(NativeDeferredContact);
     GetPhysicsCore()->SetCollisionFilter(NativeCollisionFilter);
     GetPhysicsCore()->SetPreIntegrationCallback(ApplyNativeContactEffectors);
     GetPhysicsCore()->SetQueryFilter(NativeQueryFilter);
@@ -434,6 +481,8 @@ void CPHWorld::Destroy()
     ZoneScoped;
     GetPhysicsCore()->SetBodyActivationCallback(nullptr);
     GetPhysicsCore()->SetRigidBodyContactCallback(nullptr);
+    GetPhysicsCore()->SetBodyContactPolicyCallback(nullptr);
+    GetPhysicsCore()->SetDeferredRigidBodyContactCallback(nullptr);
     GetPhysicsCore()->SetCollisionFilter(nullptr);
     GetPhysicsCore()->SetPreIntegrationCallback(nullptr);
     native_contact_effectors.clear();

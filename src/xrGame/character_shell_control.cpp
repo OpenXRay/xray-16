@@ -57,34 +57,20 @@ void character_shell_control::set_fatal_impulse(SHit& H) const
         H.impulse *= (H.type() == ALife::eHitTypeExplosion ? 1.f : skel_fatal_impulse_factor);
     }
 }
-void OnCharacterContactInDeath(
-    bool& do_colide, bool bo1,
-    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
-    const Fvector& contact_normal, const Fvector& contact_pos,
-    SGameMtl* material_1, SGameMtl* material_2)
+static void SetNativeSkinFriction(CPhysicsShell* shell, float friction)
 {
-    character_shell_control* l_character_physic_support = nullptr;
-
-    if (bo1 && my_geom)
-    {
-        l_character_physic_support = (character_shell_control*)my_geom->get_callback_data();
-    }
-    else if (!bo1 && oposite_geom)
-    {
-        l_character_physic_support = (character_shell_control*)oposite_geom->get_callback_data();
-    }
-
-    if (l_character_physic_support)
-    {
-        auto* geometry = bo1 ? my_geom : oposite_geom;
-        if (geometry->contact_response)
-            geometry->contact_response->friction = l_character_physic_support->curr_skin_friction_in_death();
+    // A uniform response policy is read by Jolt's native listener. It does not
+    // require discovering every contact again to invoke a game callback.
+    for (u16 index = 0; index < shell->get_ElementsNumber(); ++index) {
+        auto* element = shell->get_ElementByStoreOrder(index);
+        for (u16 geometry = 0; geometry < element->numberOfGeoms(); ++geometry)
+            element->geometry(geometry)->native_contact_friction = friction;
     }
 }
 void character_shell_control::set_start_shell_params(CPhysicsShell* sh) const
 {
     sh->SetAirResistance(skel_airr_lin_factor, skel_airr_ang_factor);
-    sh->add_ObjectContactCallback(OnCharacterContactInDeath);
+    SetNativeSkinFriction(sh, m_curr_skin_friction_in_death);
     sh->set_CallbackData((void*)this);
 }
 
@@ -191,4 +177,5 @@ void character_shell_control::UpdateFrictionAndJointResistanse(CPhysicsShell* sh
 
     m_curr_skin_friction_in_death =
         skeleton_skin_friction_end + (remain / ddelay) * (skeleton_skin_friction_start - skeleton_skin_friction_end);
+    SetNativeSkinFriction(sh, m_curr_skin_friction_in_death);
 };

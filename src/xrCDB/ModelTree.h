@@ -6,6 +6,7 @@
 #    include "Jolt-proj/XRayMeshQuery.h"
 
 #    include "xrCDB.h"
+#    include <limits>
 
 namespace CDB
 {
@@ -25,6 +26,26 @@ public:
     }
 
     template <typename BoundsTest, typename TriangleTest>
+    void QueryRay(BoundsTest boundsTest, TriangleTest triangleTest, JPH::Vec3Arg origin,
+        JPH::Vec3Arg direction, float& range) const
+    {
+        if (range == std::numeric_limits<float>::max()) {
+            Query(boundsTest, triangleTest);
+            return;
+        }
+        if (mesh && JPH::XRayVisitMeshRay(*mesh, &triangleTest, origin, direction, range,
+            +[](void* state, u32 id) { return (*static_cast<TriangleTest*>(state))(id); })) return;
+        QueryDegenerate(boundsTest, triangleTest, 0);
+    }
+    template <typename BoundsTest, typename TriangleTest>
+    void QueryBox(BoundsTest boundsTest, TriangleTest triangleTest, JPH::Vec3Arg minimum,
+        JPH::Vec3Arg maximum) const
+    {
+        if (mesh && JPH::XRayVisitMeshBox(*mesh, &triangleTest, minimum, maximum,
+            +[](void* state, u32 id) { return (*static_cast<TriangleTest*>(state))(id); })) return;
+        QueryDegenerate(boundsTest, triangleTest, 0);
+    }
+    template <typename BoundsTest, typename TriangleTest>
     void Query(BoundsTest boundsTest, TriangleTest triangleTest, u32 mask = 0) const
     {
         struct Context { BoundsTest& bounds; TriangleTest& triangle; } context{boundsTest, triangleTest};
@@ -32,6 +53,12 @@ public:
             +[](void* state, const JPH::AABox& bounds, u32& stateMask) {
                 return static_cast<Context*>(state)->bounds(bounds, stateMask);
             }, +[](void* state, u32 id) { return static_cast<Context*>(state)->triangle(id); }, mask)) return;
+        QueryDegenerate(boundsTest, triangleTest, mask);
+    }
+private:
+    template <typename BoundsTest, typename TriangleTest>
+    void QueryDegenerate(BoundsTest& boundsTest, TriangleTest& triangleTest, u32 mask) const
+    {
         // Degenerate triangles cannot enter a simulation mesh. Retain their
         // original query behavior without building a second spatial tree.
         for (const auto& triangle : degenerateTriangles) {

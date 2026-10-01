@@ -51,7 +51,7 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* model, const Fvector& start,
     const bool nearest = (ray_mode & OPT_ONLYNEAREST) != 0;
     const bool first = (ray_mode & OPT_ONLYFIRST) != 0;
     const bool cull = (ray_mode & OPT_CULL) != 0;
-    model->tree->Query(
+    model->tree->QueryRay(
         [&](const JPH::AABox& bounds, u32&)
         {
             return JPH::RayAABoxHits(origin, inverse, bounds.mMin, bounds.mMax, range);
@@ -75,7 +75,7 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* model, const Fvector& start,
             if (nearest)
                 range = result.range;
             return first;
-        });
+        }, origin, ToJolt(direction), range);
 }
 
 static bool TriangleOverlapsBox(const RESULT& triangle, JPH::Vec3Arg center, JPH::Vec3Arg extents, bool fullTest)
@@ -103,19 +103,22 @@ static bool TriangleOverlapsBox(const RESULT& triangle, JPH::Vec3Arg center, JPH
 
     if (fullTest)
     {
-        const JPH::Vec3 axes[3] = { JPH::Vec3::sAxisX(), JPH::Vec3::sAxisY(), JPH::Vec3::sAxisZ() };
         for (const auto& edge : edges)
         {
-            for (const auto& axis : axes)
-            {
-                const auto separatingAxis = edge.Cross(axis);
-                const float radius = extents.Dot(separatingAxis.Abs());
-                const float p0 = vertices[0].Dot(separatingAxis);
-                const float p1 = vertices[1].Dot(separatingAxis);
-                const float p2 = vertices[2].Dot(separatingAxis);
-                if (std::min({ p0, p1, p2 }) > radius || std::max({ p0, p1, p2 }) < -radius)
-                    return false;
-            }
+            // The components of vertex x edge are projections onto all three
+            // edge/cardinal separating axes. Test them together using SIMD.
+            const auto absolute = edge.Abs();
+            const auto radius = extents.Swizzle<JPH::SWIZZLE_Y, JPH::SWIZZLE_Z, JPH::SWIZZLE_X>() *
+                absolute.Swizzle<JPH::SWIZZLE_Z, JPH::SWIZZLE_X, JPH::SWIZZLE_Y>() +
+                extents.Swizzle<JPH::SWIZZLE_Z, JPH::SWIZZLE_X, JPH::SWIZZLE_Y>() *
+                absolute.Swizzle<JPH::SWIZZLE_Y, JPH::SWIZZLE_Z, JPH::SWIZZLE_X>();
+            const auto p0 = vertices[0].Cross(edge);
+            const auto p1 = vertices[1].Cross(edge);
+            const auto p2 = vertices[2].Cross(edge);
+            const auto minimum = JPH::Vec3::sMin(p0, JPH::Vec3::sMin(p1, p2));
+            const auto maximum = JPH::Vec3::sMax(p0, JPH::Vec3::sMax(p1, p2));
+            if (JPH::Vec3::sGreater(minimum, radius).TestAnyXYZTrue() ||
+                JPH::Vec3::sLess(maximum, -radius).TestAnyXYZTrue()) return false;
         }
     }
     return true;
@@ -132,7 +135,7 @@ void COLLIDER::box_query(u32 box_mode, const MODEL* model, const Fvector& center
     const auto boxCenter = ToJolt(center);
     const auto boxExtents = ToJolt(extents);
     const JPH::AABox box(boxCenter - boxExtents, boxCenter + boxExtents);
-    model->tree->Query(
+    model->tree->QueryBox(
         [&](const JPH::AABox& bounds, u32&)
         {
             return box.Overlaps(bounds);
@@ -144,7 +147,7 @@ void COLLIDER::box_query(u32 box_mode, const MODEL* model, const Fvector& center
                 return false;
             r_add() = result;
             return (box_mode & OPT_ONLYFIRST) != 0;
-        });
+        }, box.mMin, box.mMax);
 }
 
 void COLLIDER::frustum_query(u32 frustum_mode, const MODEL* model, const CFrustum& frustum)

@@ -92,10 +92,21 @@ struct NativePhysicsContact {
     u32 triangle1 = u32(-1), triangle2 = u32(-1);
     Fvector position, normal;
     float relative_velocity = 0, depth = 0;
+    // Pre-solver snapshots used by deferred cosmetic callbacks, avoiding
+    // repeated body locks and changes in impact energy after integration.
+    Fvector point_velocity1 = {0, 0, 0}, point_velocity2 = {0, 0, 0};
+    float mass1 = 0, mass2 = 0;
+    bool has_snapshot = false;
     // Main-thread gameplay policies can replace or scale the material friction
     // before the native solver builds this contact, including cached contacts.
     mutable float friction = -1, friction_scale = 1;
     mutable bool static_body1 = false, static_body2 = false;
+};
+struct NativeBodyContactPolicy {
+    bool immediate = true;
+    bool fluids = false;
+    float friction = -1;
+    bool slowdown_material = false;
 };
 
 struct PhysicsMassProperties {
@@ -120,6 +131,10 @@ public:
     virtual void SetSimulationParameters(float gravity, u32 iterations) = 0;
     // Runs after contact policies and before integration, outside native locks.
     virtual void SetPreIntegrationCallback(void (*callback)()) = 0;
+    // Snapshot game policies on the caller's thread before worker jobs.
+    using BodyContactPolicyFun = NativeBodyContactPolicy(*)(void*, u16);
+    virtual void SetBodyContactPolicyCallback(BodyContactPolicyFun callback) = 0;
+    virtual void SetDeferredRigidBodyContactCallback(void (*callback)(const NativePhysicsContact&)) = 0;
 
     virtual void DebugDraw(const Fvector& camera_pos) = 0;
     virtual void SetDebugDrawFlags(u32 flags) = 0;

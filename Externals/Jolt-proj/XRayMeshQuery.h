@@ -12,6 +12,9 @@ class XRayMeshMaterial final : public PhysicsMaterial
 public:
     static constexpr uint64 Tag = 0x585241594d455348ULL;
     Array<uint16> materials;
+    // Conservative bounds per material let gameplay prequeries skip regions
+    // without slowdown volumes without introducing a second collision BVH.
+    Array<AABox> materialBounds;
     const char* GetDebugName() const override { return "X-Ray triangle materials"; }
 };
 inline uint16 XRayTriangleMaterial(const Shape* shape, SubShapeID id)
@@ -38,4 +41,10 @@ using XRayMeshTriangleCallback = bool(*)(void*, uint32);
 // triangles in the engine callback. Return true for an early-out query.
 bool XRayVisitMesh(const MeshShape& mesh, void* context, XRayMeshBoundsCallback bounds,
     XRayMeshTriangleCallback triangle, uint32 mask);
+// Specialized traversals test the four BVH children together and retain
+// original triangle callbacks/order. Ray range is narrowed by exact hits.
+bool XRayVisitMeshRay(const MeshShape& mesh, void* context, Vec3Arg origin,
+    Vec3Arg direction, float& range, XRayMeshTriangleCallback triangle);
+bool XRayVisitMeshBox(const MeshShape& mesh, void* context, Vec3Arg minimum,
+    Vec3Arg maximum, XRayMeshTriangleCallback triangle);
 }

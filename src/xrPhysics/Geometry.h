@@ -55,6 +55,7 @@ public:
     u16 tri_material = 0;
     u32 contact_triangle = u32(-1);
     const NativePhysicsContact* contact_response = nullptr;
+    float native_contact_friction = -1;
 
 #ifdef DEBUG
     virtual void dbg_draw(float scale, u32 color, Flags32 flags) const;

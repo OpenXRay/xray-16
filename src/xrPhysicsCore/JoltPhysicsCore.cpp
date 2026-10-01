@@ -210,9 +210,14 @@ void JoltPhysicsCore::Clear()
     m_constraints.clear();
     m_joint_feedback.clear();
     m_joint_springs.clear();
+    m_joint_motors.clear();
+    m_joint_limits.clear();
     m_wheel_joints.clear();
     m_rejected_contacts.clear();
     m_contact_friction.clear();
+    m_contact_bodies.clear();
+    m_prepared_contacts.clear();
+    m_deferred_rb_contacts.clear();
     m_feedback_frames.clear();
     m_connected_bodies.clear();
     m_ignore_static_bodies.clear();
@@ -282,6 +287,7 @@ void JoltPhysicsCore::Step(float delta_time)
     const auto feedbackStart = std::chrono::steady_clock::now();
     UpdateJointFeedback(delta_time);
 
+    FlushDeferredRigidBodyContacts();
     FlushDeferredContacts();
     FlushDeferredActivations(*m_physics_system, m_body_activation_callback);
     const auto finish = std::chrono::steady_clock::now();
@@ -962,7 +968,7 @@ void JoltPhysicsCore::SetBodyTransform(BodyHandle body_handle, const Fmatrix& ma
     JPH::Vec3 com_local = body_interface.GetShape(id)->GetCenterOfMass();
     JPH::Vec3 shape_origin = com_world - rotation * com_local;
 
-    body_interface.SetPositionAndRotation(id, shape_origin, rotation,
+    body_interface.SetPositionAndRotationWhenChanged(id, shape_origin, rotation,
         body_interface.IsAdded(id) ? JPH::EActivation::Activate : JPH::EActivation::DontActivate);
 }
 
@@ -1357,6 +1363,8 @@ void JoltPhysicsCore::DestroyJoint(JointHandle joint)
         m_constraints.erase(it);
         m_joint_feedback.erase(joint);
         m_joint_springs.erase(joint);
+        m_joint_motors.erase(joint);
+        m_joint_limits.erase(joint);
         m_wheel_joints.erase(joint);
     }
 }
@@ -1368,6 +1376,13 @@ void JoltPhysicsCore::SetJointLimits(JointHandle joint, int axis_num, float lo, 
 
     JPH::Constraint* c = it->second.GetPtr();
     if (lo > hi) std::swap(lo, hi);
+    auto& limits = m_joint_limits[joint];
+    auto previous = std::find_if(limits.begin(), limits.end(),
+        [axis_num](const JointLimit& value) { return value.axis == axis_num; });
+    if (previous != limits.end()) {
+        if (previous->low == lo && previous->high == hi) return;
+        *previous = {axis_num, lo, hi};
+    } else limits.push_back({axis_num, lo, hi});
 
     if (c->GetSubType() == JPH::EConstraintSubType::Hinge) {
         auto* hinge = static_cast<JPH::HingeConstraint*>(c);
@@ -1402,16 +1417,18 @@ void JoltPhysicsCore::SetJointMotor(JointHandle joint, int axis_num, float force
     JPH::Constraint* c = it->second.GetPtr();
     // A zero-speed powered motor is a brake, not an inactive motor.
     bool active = force > 0.0f;
+    // Identical resistance updates must preserve warm starts and sleeping.
+    auto& motors = m_joint_motors[joint];
+    auto previous = std::find_if(motors.begin(), motors.end(),
+        [axis_num](const JointMotor& value) { return value.axis == axis_num; });
+    if (previous != motors.end()) {
+        if ((!active && previous->force <= 0) ||
+            (previous->force == force && previous->velocity == velocity)) return;
+        *previous = {axis_num, force, velocity};
+    } else motors.push_back({axis_num, force, velocity});
 
     if (c->GetSubType() == JPH::EConstraintSubType::Hinge) {
         auto* hinge = static_cast<JPH::HingeConstraint*>(c);
-        float cur_vel = (hinge->GetMotorState() == JPH::EMotorState::Velocity) ? hinge->GetTargetAngularVelocity() : 0.0f;
-        if (std::abs(cur_vel - velocity) > 1e-3f || (hinge->GetMotorState() == JPH::EMotorState::Velocity) != active) {
-            float cur_angle = hinge->GetCurrentAngle();
-            float lim_min = hinge->GetLimitsMin();
-            float lim_max = hinge->GetLimitsMax();
-        }
-
         hinge->SetMotorState(active ? JPH::EMotorState::Velocity : JPH::EMotorState::Off);
         if (active) {
             hinge->SetTargetAngularVelocity(velocity);
@@ -1874,7 +1891,18 @@ void JoltPhysicsCore::MyContactListener::OnContactAdded(
     }
     m_core->m_contact_points.fetch_add(static_cast<u32>(inManifold.mRelativeContactPointsOn1.size()),
         std::memory_order_relaxed);
+    m_core->QueueDeferredContact(inBody1, inBody2, inManifold.mSubShapeID1, inManifold.mSubShapeID2,
+        inManifold.GetWorldSpaceContactPointOn2(0), -inManifold.mWorldSpaceNormal, inManifold.mPenetrationDepth);
     auto applyFrictionPolicy = [&] {
+        float nativeFriction = -1;
+        // Match the canonical order used by prepared game callbacks.
+        const auto firstID = inBody1.GetID(), secondID = inBody2.GetID();
+        for (const auto id : {std::min(firstID, secondID), std::max(firstID, secondID)})
+            if (id.GetIndex() < m_core->m_contact_bodies.size()) {
+                const auto& snapshot = m_core->m_contact_bodies[id.GetIndex()];
+                if (snapshot.id == id && snapshot.policy.friction >= 0) nativeFriction = snapshot.policy.friction;
+            }
+        if (nativeFriction >= 0) ioSettings.mCombinedFriction = nativeFriction;
         const auto policy = m_core->m_contact_friction.find(Key(inBody1.GetID().GetIndexAndSequenceNumber(),
             inBody2.GetID().GetIndexAndSequenceNumber(), inManifold.mSubShapeID1.GetValue(), inManifold.mSubShapeID2.GetValue()));
         if (policy != m_core->m_contact_friction.end()) {
@@ -2147,6 +2175,9 @@ JPH::ValidateResult JoltPhysicsCore::MyContactListener::OnContactValidate(
                 SGameMtl* mtl = (mtl_idx < GMLib.CountMaterial()) ? GMLib.GetMaterialByIdx(mtl_idx) : nullptr;
                 if (mtl && IsPassableMaterial(mtl))
                 {
+                    m_core->QueueDeferredContact(inBody1, inBody2, inCollisionResult.mSubShapeID1,
+                        inCollisionResult.mSubShapeID2, inBaseOffset + inCollisionResult.mContactPointOn2,
+                        -inCollisionResult.mPenetrationAxis.NormalizedOr(JPH::Vec3::sAxisY()), inCollisionResult.mPenetrationDepth);
                     return JPH::ValidateResult::RejectContact;
                 }
             }
