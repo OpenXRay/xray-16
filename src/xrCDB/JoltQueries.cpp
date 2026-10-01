@@ -58,11 +58,18 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* model, const Fvector& start,
         },
         [&](u32 id)
         {
-            auto result = TriangleResult(*model, id);
-            if (!TestRayTri(start, direction, result.verts, result.u, result.v, result.range, cull) || result.range <= 0.f || result.range > range)
+            const auto& triangle = model->get_tris()[id];
+            const auto* vertices = model->get_verts();
+            const Fvector* points[3] = {vertices + triangle.verts[0], vertices + triangle.verts[1], vertices + triangle.verts[2]};
+            float u, v, distance;
+            if (!TestRayTri(start, direction, points, u, v, distance, cull) || distance <= 0.f || distance > range)
             {
                 return false;
             }
+            auto result = TriangleResult(*model, id);
+            result.u = u;
+            result.v = v;
+            result.range = distance;
 
             if (nearest && r_count())
             {

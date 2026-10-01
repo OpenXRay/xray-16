@@ -113,6 +113,13 @@ private:
     JPH::BodyIDVector m_query_bodies, m_active_query_bodies;
     JPH::BodyIDVector m_preparation_targets;
     std::vector<u64> m_fluid_preparation_pairs;
+    // Caller-thread cache of mesh-local regions proven to contain no fluid.
+    struct FluidExclusion {
+        JPH::RefConst<JPH::Shape> shape;
+        JPH::AABox bounds;
+    };
+    std::unordered_map<u64, FluidExclusion> m_fluid_exclusions;
+    std::vector<u16> m_slowdown_materials, m_current_slowdown_materials;
     std::vector<NativePhysicsContact> m_prepared_contacts;
     JPH::AllHitCollisionCollector<JPH::CollideShapeCollector> m_preparation_hits;
     JPH::AllHitCollisionCollector<JPH::CastShapeCollector> m_preparation_sweeps;

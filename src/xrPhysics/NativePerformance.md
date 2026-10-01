@@ -1,7 +1,8 @@
 # Native Jolt performance followup
 
-Local followup on `followup/jolt-native-physics`, after `3fb3ff501`.
-Nothing has been pushed. The initial migration's measurements remain in
+The first optimization is published in draft PR #2167 at `25ad9bb2e`.
+Further optimization on `followup/jolt-native-physics` remains local.
+The initial migration's measurements remain in
 [NativeMigration.md](NativeMigration.md); this report describes the optimized
 implementation and its separate captures.
 
@@ -191,3 +192,131 @@ collision/solver throughput and cannot substitute for these gameplay costs.
 Keep the migration experimental until the unexplained shutdown exit is
 resolved and gameplay coverage is broader. Full campaign, vehicles,
 multiplayer, Linux and Debug runtime coverage remain outside these tests.
+
+## Further local optimization
+
+This change builds on `25ad9bb2e` and remains local:
+
+- Retain mesh-local regions proven to contain no slowdown material. Each step
+  checks the current transformed, swept/speculative body bounds against the
+  cached region and the same mesh shape. A successful containment test avoids
+  revisiting mesh leaves. Only negative results are retained; expansion of a
+  dry region cannot add preparatory contacts for the current body pair.
+- Compare the sorted set of slowdown-material indices every step, invalidating
+  exclusions when flags change even if the material count stays the same.
+  Clear exclusions on world clearing/body retirement. Shape references protect
+  against pointer reuse; no second mesh BVH is created. Worker jobs read the
+  already prepared pair list and do not access the exclusion map.
+- Test ray/triangle intersection using the original vertex pointers, constructing
+  and copying a complete CDB result only after a hit. Intersection arithmetic,
+  triangle order, equal-distance behavior and result metadata are preserved.
+- Add `-ScratchRoot` to the gameplay runner so different comparisons can share
+  one isolated game workspace/cache. Reuse the existing build and one candidate
+  runtime, keeping the baseline frozen and avoiding further PDB copies.
+
+The fluid regression fixture checks dry contacts across steps, movement into
+water, a mesh moving beneath a stationary body, and changed material flags.
+It passes with 0/1/4 workers. CDB query and threaded-query tests pass with the
+lazy ray-result change. Release core/CDB/physics builds pass. These changes do
+not alter the native public interface or the isolated solver benchmark path,
+so the earlier synthetic measurements are retained rather than repeated.
+
+### Local comparison and exit-status exclusion
+
+`native-second-final-20261001` contains three repetitions each of the first
+optimization and the new candidate, at one and four workers. All twelve
+accepted captures pass all 35 loaded-game checks, saving, process reload and
+zero main-process exit. Contact profiling/test hooks are disabled; builds do
+not run during timing. Query origins, hit counts and ranges match. The engine,
+game DLL, save, settings and scratch workspace are shared.
+
+One earlier candidate-four-worker reload reached `GAMEPLAY_RELOAD DONE` and
+the quit log, but the runner rejected its process exit. Its numeric exit code
+was not retained, so this is an ambiguous rejection, not an established crash.
+Logs, save and CSVs are preserved in the comparison's `excluded-captures`
+directory. The replacement exits normally. The runner now retains the process
+handle, waits for exited processes, records `reload-status.json`, includes the
+exit code in reload errors and retains CSVs even if reload fails. This does
+not establish a cause for the rejection or fix the previously confirmed
+shutdown access violation described above.
+
+The targeted four-worker repeat later captured a confirmed reload exit of
+`0xc0000005` after successful validation, retained and excluded separately.
+ProcDump first-chance minidumps reproduce the failure with both the candidate
+and the frozen first-optimization baseline. Matching Microsoft symbols show
+`D3DCompiler_47.dll`'s `CDiaSymbol::rgpropinfo` exit destructor freeing memory,
+with the access violation detected in `ntdll!RtlpCoalesceFreeBlocks` during
+`LdrShutdownProcess`. This locates detection; it does not identify the write
+that damaged the heap or exonerate all migration code.
+
+The copied compiler is version `10.0.26100.7705`. A diagnostic substitution of
+the installed `10.0.26100.9457` compiler also fails, so it is not a workaround.
+The candidate compiler is restored from the frozen baseline before continuing
+timing. The runner now checks that effective shader-compiler hashes match
+across runtimes and records them for new captures. Three roughly 50 MiB
+minidumps and the matching 6 MiB Microsoft symbols are retained, without
+installing a debugger package or making further runtime/PDB copies.
+
+Diagnostic artifacts are `native-second-shutdown-dumps`, including candidate,
+`baseline` and `current-compiler` captures. The interrupted timing repeat and
+its retained failure are under `native-second-four-repeat-20261001`.
+
+### Further game measurements
+
+Medians of three process means in each capture set, milliseconds per complete
+step. The second set was added to investigate the variable four-worker
+ragdoll result; it is reported separately instead of selecting a favorable run.
+
+| Set | Workers | Phase | Frozen baseline | Local candidate | Reduction |
+| --- | ---: | --- | ---: | ---: | ---: |
+| First | 1 | Idle | 0.402 | 0.379 | 5.6% |
+| First | 1 | Driven ragdolls | 0.778 | 0.726 | 6.7% |
+| First | 4 | Idle | 0.369 | 0.346 | 6.4% |
+| First | 4 | Driven ragdolls | 0.689 | 0.765 | -11.1% |
+| Repeat | 4 | Idle | 0.376 | 0.352 | 6.6% |
+| Repeat | 4 | Driven ragdolls | 0.842 | 0.813 | 3.4% |
+
+Idle preparation falls from 0.126-0.127 to 0.102-0.106 ms across these
+comparisons. The first one-worker ragdoll preparation median falls from 0.189
+to 0.108 ms. Four-worker ragdoll preparation is roughly unchanged, while
+integration varies substantially. Its complete-step run ranges overlap:
+first baseline 0.682-0.946 vs candidate 0.671-0.827 ms; repeat baseline
+0.704-0.874 vs candidate 0.692-0.814 ms. The change of direction between sets
+does not support a consistent four-worker ragdoll speedup or regression.
+
+Nearest rays fall from 0.954-0.961 to 0.883-0.894 microseconds per query
+(6.3-7.8%); any rays from 0.628-0.631 to 0.591-0.595 (5.4-6.3%). Full-box
+queries are roughly unchanged, with differences of at most 1.2%. Reported
+static model bytes remain 96,089,734; that counter does not include the small
+physics exclusion map. Whole-process peak working-set differences vary in
+direction and do not demonstrate a memory reduction.
+
+All eighteen accepted captures pass all 35 loaded-game checks, saving and
+process reload, with zero main exit and no contact-profile output. The
+rejected captures and three diagnostic minidumps remain part of the evidence;
+the shutdown limitation remains unresolved. No fresh ODE or isolated-solver
+comparison is included in this experiment, so these adapter/query gains do
+not establish that native migration now beats ODE in gameplay.
+
+The local CSV summaries are indexed in
+[the benchmark index](tests/benchmark-results/2026-10-01-native.md).
+Candidate core SHA256:
+`83B1F5666EF1E5E977569FCB246FDA815C43FBF723445392EBF17251331D7BBA`;
+CDB SHA256:
+`BAA789F219ADF9E300618D235F078567EAF1A7FDF0A0E56EEB6F57D052161236`.
+Runtime manifests are `native-second-final-runtimes.json` and
+`native-second-four-runtimes.json`. Captures are
+`native-second-final-20261001` and `native-second-four-repeat-20261001` under
+`C:/code/migration-benchmark`; baseline binaries remain frozen in
+`native-game-bin-performance-final`. New records include matched compiler
+SHA256 `A05F99734F7C4822FEFC12B367AF21FD0976ED6608752FB1E1E80B6ECE7ECBBB`.
+
+### Disk usage
+
+The new comparisons reuse `native-game-bin-second-profile` and the existing
+`native-second-profile-20261001/games/ProfileNative4` game workspace; only result
+files are added. C: remained near 25.1 GiB free during the first comparison and
+has about 24.9 GiB free after the minidumps and symbols. Older
+diagnostic runtime copies and old build intermediates still occupy substantial
+space. Automatic approval review rejected cleanup with only "blocked by
+policy"; no files were deleted and no reclamation is claimed.

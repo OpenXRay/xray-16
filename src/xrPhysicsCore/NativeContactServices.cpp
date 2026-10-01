@@ -218,6 +218,22 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
     m_rejected_contacts.clear();
     m_contact_friction.clear();
     if (!m_rb_contact_callback) return;
+    static const bool profile = std::getenv("XRAY_JOLT_CONTACT_PROFILE") != nullptr;
+    using Clock = std::chrono::steady_clock;
+    const auto snapshotStart = profile ? Clock::now() : Clock::time_point{};
+    size_t addedCount = 0, queryCount = 0, fluidCacheHits = 0, fluidQueries = 0;
+    m_current_slowdown_materials.clear();
+    if (m_body_contact_policy_callback) {
+        for (u32 material = 0; material < GMLib.CountMaterial() && material <= 0xffffu; ++material)
+            if (GMLib.GetMaterialByIdx(material)->Flags.test(SGameMtl::flSlowDown))
+                m_current_slowdown_materials.push_back(static_cast<u16>(material));
+    }
+    // Flags may change without a material-count change. Compare the actual
+    // sorted set before reusing any exclusion from an earlier physics step.
+    if (m_current_slowdown_materials != m_slowdown_materials) {
+        m_fluid_exclusions.clear();
+        m_slowdown_materials.swap(m_current_slowdown_materials);
+    }
     // The game callbacks can destroy shells, change velocities and wake bodies.
     // Collect contacts first and dispatch after all native locks are released.
     auto& pending = m_prepared_contacts;
@@ -230,6 +246,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         auto& snapshot = m_contact_bodies[id.GetIndex()];
         JPH::BodyLockRead lock(m_physics_system->GetBodyLockInterface(), id);
         if (!lock.SucceededAndIsInBroadPhase()) { snapshot.id = JPH::BodyID(); continue; }
+        ++addedCount;
         const auto& body = lock.GetBody();
         snapshot.id = id;
         snapshot.bounds = body.GetWorldSpaceBounds();
@@ -249,8 +266,8 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
             const auto* mesh = static_cast<const JPH::MeshShape*>(shape);
             const auto* metadata = static_cast<const JPH::XRayMeshMaterial*>(mesh->GetMaterialList().front().GetPtr());
             if (metadata->materialBounds.empty()) snapshot.fluid_bounds = snapshot.bounds;
-            else for (u16 material = 0; material < metadata->materialBounds.size() && material < GMLib.CountMaterial(); ++material)
-                if (GMLib.GetMaterialByIdx(material)->Flags.test(SGameMtl::flSlowDown) && metadata->materialBounds[material].IsValid())
+            else for (const auto material : m_slowdown_materials)
+                if (material < metadata->materialBounds.size() && metadata->materialBounds[material].IsValid())
                     snapshot.fluid_bounds.Encapsulate(metadata->materialBounds[material].Transformed(body.GetCenterOfMassTransform()));
         } else {
             // Game policies cover all compound children; plain shapes also
@@ -263,8 +280,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         }
         if (snapshot.policy.immediate || snapshot.fluid_bounds.IsValid()) m_preparation_targets.push_back(id);
     }
-    static const bool profile = std::getenv("XRAY_JOLT_CONTACT_PROFILE") != nullptr;
-    using Clock = std::chrono::steady_clock;
+    const auto fluidStart = profile ? Clock::now() : Clock::time_point{};
     double queryMilliseconds = 0, collectMilliseconds = 0;
     size_t hitCount = 0;
     auto& active = m_active_query_bodies;
@@ -284,21 +300,44 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         const auto* mesh = static_cast<const JPH::MeshShape*>(shape);
         const auto inverse = lock.GetBody().GetCenterOfMassTransform().InversedRotationTranslation();
         const auto* metadata = static_cast<const JPH::XRayMeshMaterial*>(mesh->GetMaterialList().front().GetPtr());
+        struct FluidQuery {
+            const JPH::XRayMeshMaterial* metadata;
+            const std::vector<u16>* materials;
+        } fluidQuery{metadata, &m_slowdown_materials};
+        auto containsFluid = [&](const JPH::AABox& bounds) {
+            ++fluidQueries;
+            return JPH::XRayVisitMeshBox(*mesh, &fluidQuery, bounds.mMin, bounds.mMax,
+                +[](void* state, u32 triangle) {
+                    const auto& query = *static_cast<const FluidQuery*>(state);
+                    const auto material = query.metadata->materials[triangle];
+                    return std::binary_search(query.materials->begin(), query.materials->end(), material);
+                });
+        };
         for (const auto sourceID : active) {
             const auto& source = m_contact_bodies[sourceID.GetIndex()];
             if (!source.policy.fluids || source.policy.immediate || target.policy.immediate ||
                 !source.bounds.Overlaps(target.fluid_bounds)) continue;
             const auto bounds = source.bounds.Transformed(inverse);
-            if (JPH::XRayVisitMeshBox(*mesh, const_cast<JPH::XRayMeshMaterial*>(metadata), bounds.mMin, bounds.mMax,
-                +[](void* state, u32 triangle) {
-                    const auto* data = static_cast<const JPH::XRayMeshMaterial*>(state);
-                    const auto material = data->materials[triangle];
-                    return material < GMLib.CountMaterial() && GMLib.GetMaterialByIdx(material)->Flags.test(SGameMtl::flSlowDown);
-                })) m_fluid_preparation_pairs.push_back(Key(sourceID.GetIndexAndSequenceNumber(),
-                    targetID.GetIndexAndSequenceNumber(), 0, 0).bodies);
+            const auto key = Key(sourceID.GetIndexAndSequenceNumber(), targetID.GetIndexAndSequenceNumber(), 0, 0).bodies;
+            const auto cached = m_fluid_exclusions.find(key);
+            if (cached != m_fluid_exclusions.end() && cached->second.shape.GetPtr() == mesh && cached->second.bounds.Contains(bounds)) {
+                ++fluidCacheHits;
+                continue;
+            }
+            if (containsFluid(bounds)) m_fluid_preparation_pairs.push_back(key);
+            else {
+                // Expand only a proven dry region. If its margin includes a
+                // fluid leaf, retain the tighter bounds: the margin must not
+                // introduce extra preparation for the current body pair.
+                auto exclusion = bounds;
+                exclusion.ExpandBy(JPH::Vec3::sReplicate(.5f));
+                if (containsFluid(exclusion)) exclusion = bounds;
+                m_fluid_exclusions.insert_or_assign(key, FluidExclusion{mesh, exclusion});
+            }
         }
     }
     std::sort(m_fluid_preparation_pairs.begin(), m_fluid_preparation_pairs.end());
+    const auto selectionStart = profile ? Clock::now() : Clock::time_point{};
     auto& collector = m_preparation_hits;
     auto& sweep = m_preparation_sweeps;
     for (const auto firstID : active) {
@@ -340,6 +379,7 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
                 return static_cast<JoltPhysicsCore*>(state)->NeedsContactPreparation(first, second);
             }, continuous);
         const auto queryStart = profile ? Clock::now() : Clock::time_point{};
+        ++queryCount;
         m_physics_system->GetNarrowPhaseQuery().CollideShape(firstShape.mShape, firstShape.GetShapeScale(),
             firstShape.GetCenterOfMassTransform(), settings, JPH::RVec3::sZero(), collector,
             m_physics_system->GetDefaultBroadPhaseLayerFilter(initial.kind1),
@@ -417,6 +457,12 @@ void JoltPhysicsCore::PrepareContacts(float delta_time) {
         }
     }
     static unsigned profileStep = 0;
+    if (profile && (profileStep + 1) % 100 == 0)
+        Msg("NATIVE_PREPARATION_PROFILE bodies=%zu added=%zu queries=%zu fluid_cache_hits=%zu fluid_queries=%zu snapshot_ms=%.6f fluid_ms=%.6f selection_ms=%.6f",
+            m_query_bodies.size(), addedCount, queryCount, fluidCacheHits, fluidQueries,
+            std::chrono::duration<double, std::milli>(fluidStart - snapshotStart).count(),
+            std::chrono::duration<double, std::milli>(selectionStart - fluidStart).count(),
+            std::chrono::duration<double, std::milli>(dispatchStart - selectionStart).count() - queryMilliseconds - collectMilliseconds);
     if (profile && ++profileStep % 100 == 0)
         Msg("NATIVE_CONTACT_PROFILE active=%zu immediate=%zu hits=%zu pending=%zu query_ms=%.6f collect_ms=%.6f dispatch_ms=%.6f",
             active.size(), static_cast<size_t>(std::count_if(active.begin(), active.end(), [this](const auto id) { return m_contact_bodies[id.GetIndex()].policy.immediate; })),

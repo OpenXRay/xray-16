@@ -28,7 +28,7 @@ IC bool IntersectRaySphere(const Fvector& rO, const Fvector& rV, const Fvector& 
 }
 
 //-- Ray-Triangle : 2nd level of indirection --------------------------------
-IC bool TestRayTri(const Fvector& C, const Fvector& D, Fvector** p, float& u, float& v, float& range, bool bCull)
+IC bool TestRayTri(const Fvector& C, const Fvector& D, const Fvector* const* p, float& u, float& v, float& range, bool bCull)
 {
     Fvector edge1, edge2, tvec, pvec, qvec;
     float det, inv_det;

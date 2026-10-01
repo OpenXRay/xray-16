@@ -265,6 +265,14 @@ Use `misc/windows/benchmark-native-physics.ps1` and
 Use `misc/windows/benchmark-gameplay.ps1 -ValidateReload` with a runtime
 manifest and isolated template, followed by
 `misc/windows/summarize-gameplay-benchmark.ps1`, for the loaded-save comparison.
+Pass `-ScratchRoot <isolated-game-directory>` to reuse one workspace and its
+collision cache across runtimes and comparisons. Use a benchmark workspace,
+since its configuration, scripts, logs and validation save are overwritten.
+Captured logs, CSVs and saved states remain under each comparison's separate
+`OutputRoot`. Keep runtime DLLs and executables without copying PDBs into each
+candidate directory; reuse one candidate runtime while keeping the baseline
+frozen. Build in the existing build directory rather than creating another
+complete checkout/build for each candidate.
 Local final artifact directories are
 `C:/code/migration-benchmark/native-scenes-matched-20261001` and
 `C:/code/migration-benchmark/native-game-final-20261001`.

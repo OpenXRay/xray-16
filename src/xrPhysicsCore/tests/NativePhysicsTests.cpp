@@ -2,6 +2,8 @@
 #include "xrCore/xrCore.h"
 #include "xrPhysicsCore/IPhysicsCore.h"
 #include "xrPhysics/PHJointDestroyInfo.h"
+#include "xrCDB/xrCDB.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include <cmath>
 #include <cstdio>
 #include <stdexcept>
@@ -646,6 +648,96 @@ void OptimizedContactsAndSleeping(IPhysicsCore& core) {
     core.GetBodyAngularVelocity(hingeBody, velocity);
     Require(std::abs(velocity.y) > .01f, "Changed motor drives its constraint");
 }
+void FluidExclusionRegions(IPhysicsCore& core) {
+    struct Fixture {
+        IPhysicsCore& core;
+        SGameMtl dry, wet;
+        xr_vector<SGameMtl*>& materials;
+        Fixture(IPhysicsCore& physics) : core(physics),
+            materials(const_cast<xr_vector<SGameMtl*>&>(GMLib.Materials())) {
+            Require(materials.empty(), "Standalone fluid fixture owns an empty material library");
+            core.Clear();
+            materials.reserve(2);
+            wet.Flags.set(SGameMtl::flSlowDown, true);
+            materials.push_back(&dry);
+            materials.push_back(&wet);
+        }
+        ~Fixture() {
+            core.SetBodyContactPolicyCallback(nullptr);
+            core.SetDeferredRigidBodyContactCallback(nullptr);
+            core.SetRigidBodyContactCallback(nullptr);
+            core.Clear();
+            materials.clear();
+            fluidFixture = false;
+        }
+    } fixture(core);
+    policyCore = &core;
+    callerThread = std::this_thread::get_id();
+    immediateFixture = false;
+    fluidFixture = true;
+    contactFriction = 0;
+    core.SetSimulationParameters(0, 18);
+    xr_vector<Fvector> vertices;
+    xr_vector<CDB::TRI> triangles;
+    auto patch = [&](int firstX, int lastX, u16 material) {
+        for (int x = firstX; x < lastX; ++x) for (int z = -4; z < 4; ++z) {
+            const auto base = static_cast<u32>(vertices.size());
+            vertices.push_back(V(float(x), 0, float(z)));
+            vertices.push_back(V(float(x + 1), 0, float(z)));
+            vertices.push_back(V(float(x), 0, float(z + 1)));
+            vertices.push_back(V(float(x + 1), 0, float(z + 1)));
+            CDB::TRI triangle{};
+            triangle.material = material;
+            triangle.verts[0] = base; triangle.verts[1] = base + 2; triangle.verts[2] = base + 1;
+            triangles.push_back(triangle);
+            triangle.verts[0] = base + 1; triangle.verts[1] = base + 2; triangle.verts[2] = base + 3;
+            triangles.push_back(triangle);
+        }
+    };
+    // Separate leaves are essential: a leaf containing both materials would
+    // conservatively request preparation and never establish a dry region.
+    patch(-8, 0, 0);
+    patch(8, 12, 1);
+    const auto shape = core.BuildCDBModel(vertices.data(), static_cast<u32>(vertices.size()),
+        triangles.data(), static_cast<u32>(triangles.size()));
+    Require(shape != nullptr, "Fluid fixture mesh");
+    const auto mesh = core.CreateStaticBody(shape, V(0, 0, 0));
+    core.DestroyCDBModel(shape);
+    const auto box = core.CreateBox(V(.5f, .5f, .5f), V(-6, .49f, 0), 2);
+    core.SetBodyUserData(box, &core);
+    core.SetRigidBodyContactCallback(ContactPolicy);
+    core.SetBodyContactPolicyCallback(BodyPolicy);
+    core.SetDeferredRigidBodyContactCallback(DeferredPolicy);
+    auto place = [&](BodyHandle handle, const Fvector& position) {
+        Fmatrix transform = Fidentity;
+        transform.c = position;
+        core.SetBodyTransform(handle, transform);
+        if (handle == box) core.SetBodyLinearVelocity(box, V(0, 0, 0));
+    };
+    auto drySteps = [&] {
+        contactCalls = deferredCalls = 0;
+        for (int step = 0; step < 4; ++step) { core.ActivateBody(box); core.Step(.01f); }
+        Require(contactCalls == 0 && deferredCalls > 0, "Dry mesh contacts bypass fluid preparation across steps");
+    };
+    auto wetStep = [&](const char* message) {
+        contactCalls = deferredCalls = 0;
+        core.ActivateBody(box);
+        core.Step(.01f);
+        Require(contactCalls > 0 && deferredCalls == 0, message);
+    };
+    drySteps();
+    place(box, V(9, .49f, 0));
+    wetStep("Moving out of a cached dry region retains fluid preparation");
+    place(box, V(-6, .49f, 0));
+    drySteps();
+    place(mesh, V(-15, 0, 0));
+    wetStep("Moving a mesh beneath a body retains fluid preparation");
+    place(mesh, V(0, 0, 0));
+    place(box, V(-6, .49f, 0));
+    drySteps();
+    fixture.dry.Flags.set(SGameMtl::flSlowDown, true);
+    wetStep("Changing material flags invalidates cached dry regions without a count change");
+}
 }
 int main() {
     Core.Initialize("NativePhysicsTests", "", false);
@@ -668,6 +760,7 @@ int main() {
         StaticEnvironmentPolicy(*core);
         CollisionPolicies(*core);
         OptimizedContactsAndSleeping(*core);
+        FluidExclusionRegions(*core);
         core->Clear();
         Require(core->GetStatistics().bodies == 0 && core->GetStatistics().characters == 0 &&
             core->GetStatistics().constraints == 0, "World teardown");

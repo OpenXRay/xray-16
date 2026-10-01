@@ -3,6 +3,8 @@ param(
     [Parameter(Mandatory)][string]$TemplateRoot,
     [Parameter(Mandatory)][string]$GameFiles,
     [Parameter(Mandatory)][string]$OutputRoot,
+    # Reuse one game workspace across comparisons; results remain in OutputRoot.
+    [string]$ScratchRoot,
     [string]$Save = 'collision-start',
     [ValidateRange(1, 20)][int]$Repetitions = 3,
     [switch]$ValidateReload,
@@ -11,6 +13,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $sourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $OutputRoot = [IO.Path]::GetFullPath($OutputRoot)
+if ($ScratchRoot) { $ScratchRoot = [IO.Path]::GetFullPath($ScratchRoot) }
 if (!$Resume -and (Test-Path -LiteralPath (Join-Path $OutputRoot 'results'))) {
     throw 'Use a fresh OutputRoot so captures from different comparisons cannot be mixed.'
 }
@@ -25,6 +28,15 @@ foreach ($runtime in $runtimes) {
 }
 $engineHashes = @($runtimes | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $_.directory 'xrEngine.exe')).Hash } | Select-Object -Unique)
 if ($engineHashes.Count -ne 1) { throw 'Use the same engine executable for every backend.' }
+$compilerHashes = @{}
+foreach ($runtime in $runtimes) {
+    $compiler = Join-Path $runtime.directory 'D3DCompiler_47.dll'
+    if (!(Test-Path -LiteralPath $compiler)) { $compiler = Join-Path $env:SystemRoot 'System32/D3DCompiler_47.dll' }
+    $compilerHashes[$runtime.name] = (Get-FileHash -LiteralPath $compiler).Hash
+}
+if (@($compilerHashes.Values | Select-Object -Unique).Count -ne 1) {
+    throw 'Use the same D3DCompiler_47.dll for every backend, including the system fallback.'
+}
 New-Item -ItemType Directory -Path $OutputRoot -Force | Out-Null
 function Setting([string]$text, [string]$key, [string]$value) {
     $pattern = '(?m)^' + [regex]::Escape($key) + '\s+[^\r\n]*'
@@ -47,6 +59,7 @@ $machine = [ordered]@{
     resolution = '800x600'
     repetitions = $Repetitions
     engine_sha256 = $engineHashes[0]
+    shader_compiler_sha256 = @($compilerHashes.Values)[0]
 }
 $configFile = Join-Path $OutputRoot 'benchmark-user.ltx'
 if ($Resume -and (Test-Path -LiteralPath $configFile)) {
@@ -65,7 +78,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
     $order = @($runtimes)
     if ($repetition % 2 -eq 0) { [array]::Reverse($order) }
     foreach ($runtime in $order) {
-        $root = Join-Path $OutputRoot "games/$($runtime.name)"
+        $root = if ($ScratchRoot) { $ScratchRoot } else { Join-Path $OutputRoot "games/$($runtime.name)" }
         $result = Join-Path $OutputRoot "results/$($runtime.name)/run-$repetition"
         $completed = Join-Path $result 'run.json'
         if ($Resume -and (Test-Path -LiteralPath $completed)) {
@@ -85,6 +98,9 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
             if ($previous.core_sha256 -and $previous.core_sha256 -ne
                 (Get-FileHash -LiteralPath (Join-Path $runtime.directory 'xrPhysicsCore.dll')).Hash) {
                 throw 'Native core changed since the completed capture.'
+            }
+            if ($previous.shader_compiler_sha256 -and $previous.shader_compiler_sha256 -ne $compilerHashes[$runtime.name]) {
+                throw 'Shader compiler changed since the completed capture.'
             }
             Write-Host "Keeping completed $($runtime.name), repetition $repetition"
             continue
@@ -118,6 +134,9 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
         $game = Start-Process -FilePath (Join-Path $runtime.directory 'xrEngine.exe') -WorkingDirectory $root -WindowStyle Hidden -PassThru -ArgumentList @(
             '-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
             '-start',"server($Save/single/alife/load)",'client(localhost)','-$run_script','gameplay_benchmark')
+        # Retain the process handle so its exit status remains available after
+        # a fast exit, including on Windows PowerShell 5.
+        $null = $game.Handle
         try {
             $watch = [Diagnostics.Stopwatch]::StartNew()
             $log = $null
@@ -141,6 +160,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                 Start-Sleep -Milliseconds 500
             }
             if (!$game.HasExited) { throw 'Timed out running the benchmark.' }
+            $game.WaitForExit()
             $contents = Get-Content -LiteralPath $log.FullName -Raw
             if ($contents -notmatch 'GAMEPLAY_BENCHMARK DONE' -or $contents -match 'FATAL ERROR|GAMEPLAY_BENCHMARK FAIL|NATIVE_GAMEPLAY_CHECK FAIL|SCRIPT RUNTIME ERROR') {
                 throw 'Benchmark did not complete cleanly; inspect the saved log.'
@@ -164,6 +184,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                 $reload = Start-Process -FilePath (Join-Path $runtime.directory 'xrEngine.exe') -WorkingDirectory $root -WindowStyle Hidden -PassThru -ArgumentList @(
                     '-nosplash','-force_flushlog','-fsltx','fsgame.ltx',
                     '-start','server(native-physics-validation/single/alife/load)','client(localhost)','-$run_script','gameplay_reload')
+                $null = $reload.Handle
                 try {
                     $watch.Restart()
                     while (!$reload.HasExited -and $watch.Elapsed.TotalSeconds -lt 150) {
@@ -174,12 +195,17 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                         Start-Sleep -Milliseconds 500
                     }
                     if (!$reload.HasExited) { throw 'Timed out reloading validation save.' }
+                    $reload.WaitForExit()
                     if ($reload.ExitCode -ne 0 -or (Get-Content -LiteralPath $log.FullName -Raw) -notmatch 'GAMEPLAY_RELOAD DONE') {
-                        throw 'Validation reload did not complete cleanly.'
+                        throw "Validation reload did not complete cleanly (exit code: $($reload.ExitCode))."
                     }
                 } finally {
                     if (!$reload.HasExited) { Stop-Process -Id $reload.Id; $reload.WaitForExit(10000) | Out-Null }
                     Copy-Item -LiteralPath $log.FullName -Destination (Join-Path $result 'reload.log') -Force
+                    [ordered]@{
+                        exit_code = $(if ($reload.HasExited) { $reload.ExitCode } else { $null })
+                        validation_done = (Get-Content -LiteralPath $log.FullName -Raw) -match 'GAMEPLAY_RELOAD DONE'
+                    } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $result 'reload-status.json')
                 }
             }
             foreach ($file in 'benchmark-idle.csv','benchmark-ragdolls.csv','benchmark-queries.csv') {
@@ -197,6 +223,7 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
                 core_sha256 = $(if (Test-Path -LiteralPath (Join-Path $runtime.directory 'xrPhysicsCore.dll')) {
                     (Get-FileHash -LiteralPath (Join-Path $runtime.directory 'xrPhysicsCore.dll')).Hash
                 } else { $null })
+                shader_compiler_sha256 = $compilerHashes[$runtime.name]
                 saved_at_utc = [DateTime]::UtcNow.ToString('o')
             } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $result 'run.json')
             if ($benchmarkExitCode -ne 0) {
@@ -207,6 +234,13 @@ for ($repetition = 1; $repetition -le $Repetitions; ++$repetition) {
         finally {
             $env:XRAY_JOLT_WORKERS = $previousWorkers
             if (!$game.HasExited) { Stop-Process -Id $game.Id; $game.WaitForExit(10000) | Out-Null }
+            foreach ($file in 'benchmark-idle.csv','benchmark-ragdolls.csv','benchmark-queries.csv') {
+                $capture = Join-Path $root "userdata/$file"
+                $retained = Join-Path $result $file
+                if ((Test-Path -LiteralPath $capture) -and !(Test-Path -LiteralPath $retained)) {
+                    Copy-Item -LiteralPath $capture -Destination $retained
+                }
+            }
             if ($log -and !($ValidateReload -and (Test-Path -LiteralPath (Join-Path $result 'engine.log')))) {
                 Copy-Item -LiteralPath $log.FullName -Destination (Join-Path $result 'engine.log') -Force
             }

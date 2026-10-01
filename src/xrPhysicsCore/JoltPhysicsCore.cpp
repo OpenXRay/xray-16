@@ -216,6 +216,9 @@ void JoltPhysicsCore::Clear()
     m_rejected_contacts.clear();
     m_contact_friction.clear();
     m_contact_bodies.clear();
+    m_fluid_exclusions.clear();
+    m_slowdown_materials.clear();
+    m_current_slowdown_materials.clear();
     m_prepared_contacts.clear();
     m_deferred_rb_contacts.clear();
     m_feedback_frames.clear();
@@ -859,6 +862,7 @@ void JoltPhysicsCore::SetBoxExtents(BodyHandle body_handle, const Fvector& exten
 
 void JoltPhysicsCore::DestroyBody(BodyHandle body_handle) {
     if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) return;
+    m_fluid_exclusions.clear();
 
     const JPH::BodyID retiring(body_handle);
     SetBodyContactFeedback(body_handle, false);
