@@ -7,6 +7,7 @@
 #include "VulkanFramePhaseState.h"
 #include "VulkanGameLighting.h"
 #include "VulkanRenderContextState.h"
+#include "ShaderModule.h"
 
 #include <memory>
 #include <unordered_map>
@@ -36,6 +37,8 @@ public:
     void reset_begin() override;
     void reset_end() override;
     IRenderVisual* getVisual(int index) override;
+    HRESULT shader_compile(pcstr name, IReader* source, pcstr entry, pcstr target,
+        u32 flags, void*& result) override;
     IRenderVisual* model_Create(pcstr name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
     void model_Delete(IRenderVisual*& visual, bool discard = false) override;
@@ -78,6 +81,7 @@ private:
     Fmatrix current_view_projection() const;
     GpuLevel level_;
     std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
+    std::vector<std::unique_ptr<ShaderModule>> compiled_shaders_;
     VulkanCameraState camera_state_;
     VulkanRenderContextState context_state_;
     VkDevice device_{};

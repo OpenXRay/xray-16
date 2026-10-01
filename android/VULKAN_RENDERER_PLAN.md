@@ -32,7 +32,7 @@ selects the OpenGL ES backend for gameplay.
 | Portal visibility | `LevelVisibility.*`, `GpuLevel.*`, `VulkanLevelRender.*` | Traverses camera-visible sector portals and submits sector roots; invalid or missing visibility data falls back to every level root |
 | Game texture descriptors | `src/Layers/xrRenderVK/GameTextureFactory.*` | Loads DDS assets through the mounted VFS, caches images and creates sampled descriptors for deferred materials and game UI, including texture dimensions |
 | Renderer registration | `src/Layers/xrRenderVK/VulkanRendererModule.cpp` | Owns the `renderer_vulkan` mode independently of GLES and refuses game initialization until Vulkan implementations of the engine render interfaces exist |
-| Offline HLSL compiler | `tools/compile_vulkan_shader.py` | Invokes a host DXC executable on an existing game/mod HLSL file, with entry point, include roots and defines, and atomically writes checked SPIR-V output |
+| Offline HLSL compiler | `tools/compile_vulkan_shader.py`, `res/gamedata/shaders/r3/*.spv` | Invokes host DXC for the checked-in editor and screen-copy variants; the APK stages the compiled outputs with its game shader assets |
 
 The screen-copy pass takes compiled vertex and fragment modules, a sampled
 image view, and a sampler. The caller must transition the image to shader-read
@@ -69,9 +69,17 @@ python3 tools/compile_vulkan_shader.py --dxc dxc \
 The paths in the manifest are relative to its own directory. Its entries cover
 the editor vertex shader and the screen-copy pair, including an alpha-tested
 pixel variant. The compiler keeps the previous outputs if any variant fails and
-prints the failed source, stage, defines and DXC diagnostics. More gameplay
-shader families and the engine `IRender::shader_compile` bridge remain to be
-implemented before the shader-variant plan item can be closed.
+prints the failed source, stage, defines and DXC diagnostics. The four outputs
+in `res/gamedata/shaders/r3/` were built with DXC 1.9.2609. To regenerate
+them, use `--output-dir res/gamedata/shaders` with the same manifest. The
+`VulkanLevelRender::shader_compile` path resolves a named `.vs.spv` or
+`.ps.spv` from the mounted VFS, checks the SPIR-V entry point and stage,
+creates a Vulkan shader module and reports missing/invalid variants. It owns
+the modules until device teardown. The legacy resource manager currently
+expects GL-specific shader resource objects, while this path returns a Vulkan
+module; `SetupEnv` stays disabled until the Vulkan resource adapter is wired
+at the later interface-integration step. General gameplay HLSL families and
+their option permutations are still not covered, so item 13 remains open.
 
 For the diagnostic image draw, compile the supplied HLSL pair on a host with
 DXC and install both outputs under the game's `$game_shaders$/r3/` directory:
@@ -99,10 +107,11 @@ compatibility guarantee for gameplay.
 The Vulkan model geometry path now decodes standalone OGF static/progressive
 meshes and skeleton child meshes with 1–4 bone weights. `GpuModel` owns
 per-frame vertex buffers, can skin from an existing `IKinematics` pose and
-can be queued into the deferred geometry pass. This does not yet make model
-creation available through the game's `IRender::model_Create`: the concrete
-`IRender` model pool, skeletal object/animation lifetime and scene submission
-are still missing. Do not enable `renderer_vulkan` on this basis.
+can be queued into the deferred geometry pass. `VulkanLevelRender` now creates
+independent static OGF instances from VFS paths and `IReader`, queues them
+through `add_Visual` and waits for submitted GPU work before releasing them.
+Progressive, hierarchical and skeletal model lifetime remains pending. Do not
+enable `renderer_vulkan` on this basis.
 
 - runtime compilation, shader permutation coverage and reflection for the existing HLSL shaders;
 - descriptor layouts and descriptor allocation for engine resources;

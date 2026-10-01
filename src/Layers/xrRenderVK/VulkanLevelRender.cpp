@@ -60,6 +60,29 @@ DeferredEnvironment current_environment()
     }
     return environment;
 }
+
+bool has_spirv_entry(const void* bytes, size_t size, uint32_t stage, const char* entry)
+{
+    if (!bytes || size < 20 || size % 4) return false;
+    std::vector<uint32_t> words(size / 4);
+    std::memcpy(words.data(), bytes, size);
+    if (words[0] != 0x07230203u) return false;
+    for (size_t offset = 5; offset < words.size();)
+    {
+        const uint32_t count = words[offset] >> 16;
+        const uint32_t opcode = words[offset] & 0xffffu;
+        if (!count || count > words.size() - offset) return false;
+        if (opcode == 15 && count >= 4 && words[offset + 1] == stage)
+        {
+            const char* name = reinterpret_cast<const char*>(words.data() + offset + 3);
+            const size_t capacity = (count - 3) * sizeof(uint32_t);
+            const void* terminator = std::memchr(name, 0, capacity);
+            if (terminator && xr_strcmp(name, entry) == 0) return true;
+        }
+        offset += count;
+    }
+    return false;
+}
 }
 
 VulkanLevelRender::~VulkanLevelRender()
@@ -137,6 +160,7 @@ void VulkanLevelRender::Destroy()
     }
     if (game_device_)
         game_device_->use_scene_visibility(false);
+    compiled_shaders_.clear();
     game_device_ = nullptr;
     device_ = VK_NULL_HANDLE;
     queue_ = VK_NULL_HANDLE;
@@ -329,6 +353,9 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
 void VulkanLevelRender::OnDeviceDestroy(bool)
 {
     models_Clear(true);
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader teardown requires idle GPU frames");
+    compiled_shaders_.clear();
     if (!game_device_)
     {
         level_Unload();
@@ -541,6 +568,61 @@ void VulkanLevelRender::level_Unload()
 IRenderVisual* VulkanLevelRender::getVisual(int index)
 {
     return index >= 0 ? level_.get_visual(static_cast<size_t>(index)) : nullptr;
+}
+
+HRESULT VulkanLevelRender::shader_compile(pcstr name, IReader* source, pcstr entry,
+    pcstr target, u32 flags, void*& result)
+{
+    result = nullptr;
+    // The Android runtime has no DXC. Host builds put compiled variants in
+    // the mounted game shader directory; the original IReader is retained by
+    // the resource manager, while this path creates an actual Vulkan module.
+    (void)flags;
+    if (!device_ || !game_device_ || !source || !source->length() || !name || !*name || !entry ||
+        xr_strcmp(entry, "main") || !target ||
+        !((target[0] == 'v' && target[1] == 's') ||
+          (target[0] == 'p' && target[1] == 's')))
+    {
+        Msg("! [renderer-vulkan] shader_compile: invalid device, entry or stage for '%s'",
+            name ? name : "<unnamed>");
+        return E_FAIL;
+    }
+    const char stage[] = {target[0], target[1], '\0'};
+    string_path relative, path;
+    strconcat(sizeof(relative), relative, getShaderPath(), name, ".", stage, ".spv");
+    FS.update_path(path, "$game_shaders$", relative);
+    IReader* binary = FS.r_open(path);
+    if (!binary)
+    {
+        Msg("! [renderer-vulkan] shader_compile: missing precompiled SPIR-V '%s'", path);
+        return E_FAIL;
+    }
+    const uint32_t execution_model = stage[0] == 'v' ? 0u : 4u;
+    if (!has_spirv_entry(binary->pointer(), binary->length(), execution_model, entry))
+    {
+        Msg("! [renderer-vulkan] shader_compile: '%s' has no %s entry '%s'",
+            path, stage, entry);
+        FS.r_close(binary);
+        return E_FAIL;
+    }
+    const VkDevice device = game_device_->window().device();
+    const auto get = game_device_->window().device_proc();
+    const ShaderModuleDispatch dispatch{
+        reinterpret_cast<PFN_vkCreateShaderModule>(get(device, "vkCreateShaderModule")),
+        reinterpret_cast<PFN_vkDestroyShaderModule>(get(device, "vkDestroyShaderModule"))};
+    auto module = std::make_unique<ShaderModule>();
+    std::string error;
+    const bool compiled = module->initialize_bytes(device, dispatch,
+        binary->pointer(), binary->length(), error);
+    FS.r_close(binary);
+    if (!compiled)
+    {
+        Msg("! [renderer-vulkan] shader_compile: '%s': %s", path, error.c_str());
+        return E_FAIL;
+    }
+    result = module.get();
+    compiled_shaders_.push_back(std::move(module));
+    return S_OK;
 }
 
 IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
