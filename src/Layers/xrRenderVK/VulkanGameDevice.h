@@ -31,6 +31,7 @@ public:
         bool hud = false, float sort_distance = 0.f);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
         bool hud = false, float sort_distance = 0.f);
+    void discard_scene_draws();
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
     void destroy();
     bool reset_required() const { return reset_required_; }

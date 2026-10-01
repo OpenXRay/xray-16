@@ -118,6 +118,8 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
 
 void VulkanLevelRender::Destroy()
 {
+    // Shutdown can interrupt a calculated frame that will never be submitted.
+    frame_phase_.reset();
     // Game objects own the reference-counted light resources. Disable them
     // while the renderer is shutting down, but never delete through this
     // non-owning registry.
@@ -509,12 +511,14 @@ void VulkanLevelRender::bind_level_device(VkDevice device, VkQueue queue, VkComm
 
 void VulkanLevelRender::level_Load(IReader* reader)
 {
+    R_ASSERT2(!frame_phase_.active(), "Vulkan level replacement requires an idle frame");
     R_ASSERT2(reader && device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ &&
         device_resource_state_.can_load_level(),
         "Vulkan level load requires OnDeviceCreate and an initialized gameplay device");
     // Replacing a level must wait for every submitted draw before its buffers
     // and visual identities are released. Uploads use the same graphics queue.
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");
+    if (game_device_) game_device_->discard_scene_draws();
     std::string error;
     if (!level_.load(*reader, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
         xrDebug::Fatal(DEBUG_INFO, "Vulkan level load failed: %s", error.c_str());
@@ -522,8 +526,10 @@ void VulkanLevelRender::level_Load(IReader* reader)
 
 void VulkanLevelRender::level_Unload()
 {
+    R_ASSERT2(!frame_phase_.active(), "Vulkan level unload requires an idle frame");
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
+    if (game_device_) game_device_->discard_scene_draws();
     level_.destroy();
 }
 
@@ -535,13 +541,13 @@ IRenderVisual* VulkanLevelRender::getVisual(int index)
 void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)
 {
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
-    const auto* level_visual = dynamic_cast<const VulkanVisual*>(visual);
-    R_ASSERT2(level_visual && &level_visual->owner() == &level_,
+    const int visual_index = level_.find_visual_index(visual);
+    R_ASSERT2(visual_index >= 0,
         "Vulkan scene submission received a visual outside this level");
     const Fmatrix view_projection = current_view_projection();
     Fmatrix mvp;
     mvp.mul(view_projection, world);
-    Fvector center = visual_center(level_.visual_node(level_visual->index()));
+    Fvector center = visual_center(level_.visual_node(static_cast<size_t>(visual_index)));
     Fvector world_center;
     world.transform_tiny(world_center, center);
     center = world_center;
@@ -555,7 +561,7 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             camera_state_.camera_position()[2]);
     else
         camera_position.set(Device.vCameraPosition);
-    game_device_->queue_level_visual(level_visual->index(), transform, hud,
+    game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud,
         distance_squared(center, camera_position));
 }
 

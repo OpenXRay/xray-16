@@ -57,19 +57,22 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     std::string normalized = name;
     if (normalized.size() >= 4 && normalized.compare(normalized.size() - 4, 4, ".dds") == 0)
         normalized.resize(normalized.size() - 4);
-    auto existing = assets_.find(normalized);
-    if (existing != assets_.end())
-    {
-        asset = &existing->second;
-        error.clear();
-        return true;
-    }
     string_path path;
     if (!FS.exist(path, "$level$", normalized.c_str(), ".dds") &&
         !FS.exist(path, "$game_textures$", normalized.c_str(), ".dds"))
     {
         error = "game DDS not found: " + normalized;
         return false;
+    }
+    // A new level may have a different $level$ texture with the same name.
+    // Cache by the resolved VFS path, not the material's local texture name.
+    const std::string key(path);
+    auto existing = assets_.find(key);
+    if (existing != assets_.end())
+    {
+        asset = &existing->second;
+        error.clear();
+        return true;
     }
     IReader* reader = FS.r_open(path);
     if (!reader)
@@ -83,7 +86,7 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
         reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent);
     FS.r_close(reader);
     if (!uploaded) return false;
-    auto inserted = assets_.emplace(normalized, Asset{}).first;
+    auto inserted = assets_.emplace(key, Asset{}).first;
     inserted->second.texture = texture;
     inserted->second.extent = {extent.width, extent.height};
     asset = &inserted->second;

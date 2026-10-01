@@ -165,4 +165,18 @@ int main()
     visual.clear(); visuals.clear();
     part(visual, 1, header); part(visual, 21, container); part(visuals, 0, visual);
     assert(!load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
+
+    // A failed replacement preserved the previous hierarchy. A subsequent
+    // successful level replacement and an unload/reload must both rebuild IDs.
+    assert(result.visuals.size() == 2 && result.visuals[0].children[0] == 1);
+    header[1] = 0;
+    visual.clear(); visuals.clear();
+    part(visual, 1, header); part(visual, 21, container); part(visuals, 0, visual);
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
+    assert(result.visuals.size() == 1 && result.visuals[0].mesh == 0 &&
+        result.visuals[0].children.empty() && result.roots.size() == 1);
+    result = {};
+    assert(result.visuals.empty() && result.models.empty());
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
+    assert(result.visuals.size() == 1 && result.models.size() == 1);
 }

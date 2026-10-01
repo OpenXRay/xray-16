@@ -6,6 +6,7 @@
 #include "GameTextureFactory.h"
 #include "xrCore/_matrix.h"
 #include <memory>
+#include <unordered_map>
 
 class IRenderVisual;
 
@@ -37,6 +38,7 @@ public:
     size_t model_count() const { return meshes_.size(); }
     size_t visual_count() const { return visuals_.size(); }
     IRenderVisual* get_visual(size_t index) const;
+    int find_visual_index(const IRenderVisual* visual) const;
     const LevelVisual* visual_node(size_t index) const;
     bool visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
         const Fvector& camera_position, std::vector<uint32_t>& roots) const;
@@ -63,5 +65,6 @@ private:
     std::vector<LevelSector> sectors_;
     std::vector<LevelPortal> portals_;
     std::vector<std::unique_ptr<VulkanVisual>> visual_objects_;
+    std::unordered_map<const IRenderVisual*, uint32_t> visual_indices_;
 };
 }

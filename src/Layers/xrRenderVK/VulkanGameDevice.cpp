@@ -294,10 +294,15 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
 
 void VulkanGameDevice::begin_frame()
 {
+    discard_scene_draws();
+    ui_.reset_frame();
+}
+
+void VulkanGameDevice::discard_scene_draws()
+{
     model_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
-    ui_.reset_frame();
 }
 
 bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],

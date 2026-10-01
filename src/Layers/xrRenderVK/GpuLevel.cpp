@@ -77,8 +77,11 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     portals_ = std::move(prepared.portals_);
     visual_objects_.reserve(visuals_.size());
     for (size_t index = 0; index < visuals_.size(); ++index)
+    {
         visual_objects_.emplace_back(std::make_unique<VulkanVisual>(*this,
             static_cast<uint32_t>(index), visuals_[index]));
+        visual_indices_.emplace(visual_objects_.back().get(), static_cast<uint32_t>(index));
+    }
     prepared.device_ = VK_NULL_HANDLE;
     prepared.textures_ = nullptr;
     prepared.pass_ = nullptr;
@@ -146,6 +149,12 @@ IRenderVisual* GpuLevel::get_visual(size_t index) const
     return index < visual_objects_.size() ? visual_objects_[index].get() : nullptr;
 }
 
+int GpuLevel::find_visual_index(const IRenderVisual* visual) const
+{
+    const auto it = visual_indices_.find(visual);
+    return it == visual_indices_.end() ? -1 : static_cast<int>(it->second);
+}
+
 const LevelVisual* GpuLevel::visual_node(size_t index) const
 {
     return index < visuals_.size() ? &visuals_[index] : nullptr;
@@ -179,6 +188,7 @@ void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const
 void GpuLevel::destroy()
 {
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
+    visual_indices_.clear();
     visual_objects_.clear();
     if (textures_ && pass_)
         for (const Mesh& mesh : meshes_)
