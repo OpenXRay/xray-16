@@ -10,10 +10,37 @@
 #include <SDL.h>
 #include <SDL_vulkan.h>
 
+#include <algorithm>
 #include <cstring>
+#include <vector>
 
 namespace xray::render::vulkan
 {
+namespace
+{
+DeferredEnvironment current_environment()
+{
+    DeferredEnvironment environment;
+    if (g_pGamePersistent)
+    {
+        const CEnvDescriptorMixer& current = g_pGamePersistent->Environment().CurrentEnv;
+        environment.sun_direction[0] = current.sun_dir.x;
+        environment.sun_direction[1] = current.sun_dir.y;
+        environment.sun_direction[2] = current.sun_dir.z;
+        environment.sun_color[0] = current.sun_color.x;
+        environment.sun_color[1] = current.sun_color.y;
+        environment.sun_color[2] = current.sun_color.z;
+        environment.ambient_color[0] = current.ambient.x;
+        environment.ambient_color[1] = current.ambient.y;
+        environment.ambient_color[2] = current.ambient.z;
+        environment.hemi_color[0] = current.hemi_color.x;
+        environment.hemi_color[1] = current.hemi_color.y;
+        environment.hemi_color[2] = current.hemi_color.z;
+    }
+    return environment;
+}
+}
+
 VulkanLevelRender::~VulkanLevelRender()
 {
     Destroy();
@@ -68,6 +95,13 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
 
 void VulkanLevelRender::Destroy()
 {
+    // Game objects own the reference-counted light resources. Disable them
+    // while the renderer is shutting down, but never delete through this
+    // non-owning registry.
+    for (VulkanLight* light : lights_)
+        if (light) light->set_active(false);
+    for (VulkanGlow* glow : glows_)
+        if (glow) glow->set_active(false);
     if (device_resources_ready_)
         OnDeviceDestroy(false);
     else
@@ -255,6 +289,18 @@ void VulkanLevelRender::Calculate()
     R_ASSERT2(game_device_ && frame_active_ && !world_calculated_,
         "Vulkan renderer Calculate requires one active frame");
 
+    // The game queries ROS from simulation, AI, rain and HUD code. Refresh its
+    // environment and local-light values before the frame's render callbacks.
+    const DeferredEnvironment environment = current_environment();
+    std::vector<VulkanLightSnapshot> light_snapshots;
+    light_snapshots.reserve(lights_.size());
+    for (const VulkanLight* light : lights_)
+        if (light) light_snapshots.push_back(light->snapshot());
+    for (VulkanObjectSpecific* object : object_specifics_)
+        if (object)
+            object->update(environment.ambient_color, environment.hemi_color,
+                environment.sun_color, light_snapshots);
+
     std::vector<uint32_t> visible_roots;
     IGameObject* view_entity = g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : nullptr;
     const size_t camera_sector = view_entity ? view_entity->Sector() :
@@ -327,23 +373,7 @@ void VulkanLevelRender::End()
     static_assert(sizeof(Device.mFullTransform) == sizeof(mvp));
     std::memcpy(mvp, &Device.mFullTransform, sizeof(mvp));
 
-    DeferredEnvironment environment;
-    if (g_pGamePersistent)
-    {
-        const CEnvDescriptorMixer& current = g_pGamePersistent->Environment().CurrentEnv;
-        environment.sun_direction[0] = current.sun_dir.x;
-        environment.sun_direction[1] = current.sun_dir.y;
-        environment.sun_direction[2] = current.sun_dir.z;
-        environment.sun_color[0] = current.sun_color.x;
-        environment.sun_color[1] = current.sun_color.y;
-        environment.sun_color[2] = current.sun_color.z;
-        environment.ambient_color[0] = current.ambient.x;
-        environment.ambient_color[1] = current.ambient.y;
-        environment.ambient_color[2] = current.ambient.z;
-        environment.hemi_color[0] = current.hemi_color.x;
-        environment.hemi_color[1] = current.hemi_color.y;
-        environment.hemi_color[2] = current.hemi_color.z;
-    }
+    const DeferredEnvironment environment = current_environment();
     const DeferredLight light = make_environment_deferred_light(environment);
     FrameStatus status = FrameStatus::Presented;
     std::string error;
@@ -425,5 +455,59 @@ void VulkanLevelRender::add_Visual(u32, IRenderable*, IRenderVisual* visual, Fma
     float transform[16];
     std::memcpy(transform, &mvp, sizeof(transform));
     game_device_->queue_level_visual(level_visual->index(), transform);
+}
+
+IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)
+{
+    R_ASSERT2(parent, "Vulkan object lighting requires a renderable parent");
+    auto* object = xr_new<VulkanObjectSpecific>(parent);
+    object_specifics_.push_back(object);
+    return object;
+}
+
+void VulkanLevelRender::ros_destroy(IRender_ObjectSpecific*& object)
+{
+    if (!object)
+        return;
+    auto* vulkan_object = dynamic_cast<VulkanObjectSpecific*>(object);
+    R_ASSERT2(vulkan_object, "Vulkan renderer received foreign object-specific data");
+    if (!vulkan_object)
+        return;
+    object_specifics_.erase(std::remove(object_specifics_.begin(), object_specifics_.end(), vulkan_object),
+        object_specifics_.end());
+    xr_delete(vulkan_object);
+    object = nullptr;
+}
+
+IRender_Light* VulkanLevelRender::light_create()
+{
+    auto* light = xr_new<VulkanLight>();
+    lights_.push_back(light);
+    return light;
+}
+
+void VulkanLevelRender::light_destroy(IRender_Light* light)
+{
+    // Called by IRender_Light's base destructor after the derived subobject is
+    // gone: compare identities only and do not dereference the pointer.
+    lights_.erase(std::remove_if(lights_.begin(), lights_.end(),
+        [light](const VulkanLight* candidate) { return static_cast<const IRender_Light*>(candidate) == light; }),
+        lights_.end());
+}
+
+IRender_Glow* VulkanLevelRender::glow_create()
+{
+    auto* glow = xr_new<VulkanGlow>();
+    glows_.push_back(glow);
+    return glow;
+}
+
+void VulkanLevelRender::glow_destroy(IRender_Glow* glow)
+{
+    // Like lights, glows are xr_resources and call back from their base
+    // destructor. Avoid accessing the object during that callback.
+    glows_.erase(std::remove_if(glows_.begin(), glows_.end(),
+        [glow](const VulkanGlow* candidate) { return static_cast<const IRender_Glow*>(candidate) == glow; }),
+        glows_.end());
 }
 }

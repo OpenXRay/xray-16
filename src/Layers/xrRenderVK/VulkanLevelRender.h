@@ -2,8 +2,10 @@
 
 #include "xrEngine/Render.h"
 #include "GpuLevel.h"
+#include "VulkanGameLighting.h"
 
 #include <memory>
+#include <vector>
 
 namespace xray::render::vulkan
 {
@@ -41,6 +43,12 @@ public:
     void ClearTarget() override;
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
+    IRender_ObjectSpecific* ros_create(IRenderable* parent) override;
+    void ros_destroy(IRender_ObjectSpecific*& object) override;
+    IRender_Light* light_create() override;
+    void light_destroy(IRender_Light* light) override;
+    IRender_Glow* glow_create() override;
+    void glow_destroy(IRender_Glow* glow) override;
     DeviceState GetDeviceState() override;
     void OnAppLifecycleChanged(bool active) override;
 
@@ -62,6 +70,9 @@ private:
     SDL_Window* window_{};
     VkExtent2D requested_drawable_{};
     std::unique_ptr<VulkanGameDevice> owned_game_device_;
+    std::vector<VulkanLight*> lights_;
+    std::vector<VulkanGlow*> glows_;
+    std::vector<VulkanObjectSpecific*> object_specifics_;
     bool device_resources_ready_{};
     bool reset_in_progress_{};
     bool reset_pending_{};
