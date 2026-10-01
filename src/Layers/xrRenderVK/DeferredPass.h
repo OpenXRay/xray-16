@@ -12,6 +12,16 @@ struct DeferredLight
     float color[4];
 };
 
+struct DeferredEnvironment
+{
+    float sun_direction[3]{0.f, -1.f, 0.f};
+    float sun_color[3]{1.f, 1.f, 1.f};
+    float ambient_color[3]{};
+    float hemi_color[3]{};
+};
+
+DeferredLight make_environment_deferred_light(const DeferredEnvironment& environment);
+
 // Framebuffer attachment order: albedo, normal, depth. Color images must
 // support color attachment and sampling; depth must support attachment and
 // sampling because the render pass preserves it in a read-only layout.

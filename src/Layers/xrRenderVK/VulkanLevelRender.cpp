@@ -327,10 +327,24 @@ void VulkanLevelRender::End()
     static_assert(sizeof(Device.mFullTransform) == sizeof(mvp));
     std::memcpy(mvp, &Device.mFullTransform, sizeof(mvp));
 
-    // Until game sun/environment lighting is connected, use a stable ambient
-    // light so submitted albedo remains visible through the deferred pass.
-    const DeferredLight light{{0.0f, -1.0f, 0.0f, 0.2f},
-        {1.0f, 1.0f, 1.0f, 0.0f}};
+    DeferredEnvironment environment;
+    if (g_pGamePersistent)
+    {
+        const CEnvDescriptorMixer& current = g_pGamePersistent->Environment().CurrentEnv;
+        environment.sun_direction[0] = current.sun_dir.x;
+        environment.sun_direction[1] = current.sun_dir.y;
+        environment.sun_direction[2] = current.sun_dir.z;
+        environment.sun_color[0] = current.sun_color.x;
+        environment.sun_color[1] = current.sun_color.y;
+        environment.sun_color[2] = current.sun_color.z;
+        environment.ambient_color[0] = current.ambient.x;
+        environment.ambient_color[1] = current.ambient.y;
+        environment.ambient_color[2] = current.ambient.z;
+        environment.hemi_color[0] = current.hemi_color.x;
+        environment.hemi_color[1] = current.hemi_color.y;
+        environment.hemi_color[2] = current.hemi_color.z;
+    }
+    const DeferredLight light = make_environment_deferred_light(environment);
     FrameStatus status = FrameStatus::Presented;
     std::string error;
     const bool clear_target = frame_clear_target_;

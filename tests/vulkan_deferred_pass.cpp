@@ -1,6 +1,8 @@
 #include "src/Layers/xrRenderVK/DeferredPass.h"
 
 #include <cassert>
+#include <cmath>
+#include <limits>
 
 using namespace xray::render::vulkan;
 
@@ -26,6 +28,33 @@ static VkResult VKAPI_PTR create_render_pass(VkDevice, const VkRenderPassCreateI
 
 int main()
 {
+    DeferredEnvironment environment;
+    environment.sun_direction[0] = 0.f;
+    environment.sun_direction[1] = -4.f;
+    environment.sun_direction[2] = 0.f;
+    environment.sun_color[0] = 0.3f;
+    environment.sun_color[1] = 0.6f;
+    environment.sun_color[2] = 0.9f;
+    environment.ambient_color[0] = 0.2f;
+    environment.ambient_color[1] = 0.2f;
+    environment.ambient_color[2] = 0.2f;
+    environment.hemi_color[0] = 0.4f;
+    environment.hemi_color[1] = 0.4f;
+    environment.hemi_color[2] = 0.4f;
+    const DeferredLight environment_light = make_environment_deferred_light(environment);
+    assert(environment_light.direction_ambient[0] == 0.f);
+    assert(environment_light.direction_ambient[1] == -1.f);
+    assert(environment_light.direction_ambient[2] == 0.f);
+    assert(environment_light.color[0] == 0.3f && environment_light.color[1] == 0.6f &&
+        environment_light.color[2] == 0.9f);
+    assert(environment_light.direction_ambient[3] > 0.29f && environment_light.direction_ambient[3] < 0.31f);
+    environment.sun_direction[0] = environment.sun_direction[1] = environment.sun_direction[2] = 0.f;
+    environment.sun_color[0] = -1.f;
+    environment.ambient_color[0] = std::numeric_limits<float>::quiet_NaN();
+    const DeferredLight safe_light = make_environment_deferred_light(environment);
+    assert(safe_light.direction_ambient[1] == -1.f && safe_light.color[0] == 0.f);
+    assert(std::isfinite(safe_light.direction_ambient[3]));
+
     VkRenderPass result{};
     std::string error;
     FrameDispatch dispatch{};

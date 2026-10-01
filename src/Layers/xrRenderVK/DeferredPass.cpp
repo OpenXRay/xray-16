@@ -1,5 +1,7 @@
 #include "DeferredPass.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstddef>
 
 namespace xray::render::vulkan
@@ -77,6 +79,38 @@ void viewport_scissor(const FrameRecordingContext& frame, const ScenePassDispatc
     vk.cmd_set_viewport(frame.command_buffer, 0, 1, &viewport);
     vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
 }
+}
+
+DeferredLight make_environment_deferred_light(const DeferredEnvironment& environment)
+{
+    const auto safe_nonnegative = [](float value)
+    {
+        return std::isfinite(value) ? std::max(value, 0.f) : 0.f;
+    };
+    float direction[3]{environment.sun_direction[0], environment.sun_direction[1], environment.sun_direction[2]};
+    const float magnitude = std::sqrt(direction[0] * direction[0] +
+        direction[1] * direction[1] + direction[2] * direction[2]);
+    if (std::isfinite(magnitude) && magnitude > 1e-6f)
+        for (float& value : direction) value /= magnitude;
+    else
+    {
+        direction[0] = 0.f;
+        direction[1] = -1.f;
+        direction[2] = 0.f;
+    }
+
+    const auto luminance = [&](const float (&color)[3])
+    {
+        return 0.2126f * safe_nonnegative(color[0]) +
+            0.7152f * safe_nonnegative(color[1]) +
+            0.0722f * safe_nonnegative(color[2]);
+    };
+    const float ambient = luminance(environment.ambient_color) +
+        0.25f * luminance(environment.hemi_color);
+    return {{direction[0], direction[1], direction[2], ambient},
+        {safe_nonnegative(environment.sun_color[0]),
+            safe_nonnegative(environment.sun_color[1]),
+            safe_nonnegative(environment.sun_color[2]), 0.f}};
 }
 
 bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
