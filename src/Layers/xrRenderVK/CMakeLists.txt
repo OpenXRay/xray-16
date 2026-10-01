@@ -36,6 +36,8 @@ target_sources(xrRenderVK PRIVATE
     ImageStateTracker.h
     LevelModels.cpp
     LevelModels.h
+    LevelVisibility.cpp
+    LevelVisibility.h
     ModelGeometry.cpp
     ModelGeometry.h
     ScreenCopyPass.cpp
@@ -64,6 +66,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanLevelRender.cpp
     VulkanLevelRender.h
     VulkanCameraState.h
+    VulkanDeviceResourceState.h
+    VulkanFramePhaseState.h
     VulkanRenderContextState.h
     VulkanGameLighting.cpp
     VulkanGameLighting.h

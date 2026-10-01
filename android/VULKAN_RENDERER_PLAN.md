@@ -28,6 +28,8 @@ selects the OpenGL ES backend for gameplay.
 | GPU level visuals | `src/Layers/xrRenderVK/GpuLevel.*`, `VulkanVisual.*`, `VulkanLevelRender.*` | Uploads supported static and progressive OGF geometry, preserves level visual IDs and hierarchy, exposes bounds and child visuals through `IRenderVisual`. The abstract `VulkanLevelRender` implements `IRender::level_Load`, `level_Unload` and `getVisual`; no concrete gameplay renderer inherits it yet, and unsupported model types still fail loading |
 | Game frame and UI | `src/Layers/xrRenderVK/VulkanGameDevice.*`, `VulkanUIRender.*`, `VulkanUIShader.*` | Creates Vulkan frame, G-buffer, deferred and UI resources; batches engine `IUIRender` vertices and sampled UI shaders. These are not yet bound into `GEnv` by a concrete `IRender` and `IRenderFactory` |
 | Camera and render contexts | `src/Layers/xrRenderVK/VulkanCameraState.h`, `VulkanRenderContextState.h`, `VulkanLevelRender.*` | Caches `OnCameraUpdated` and `SetCacheXform` matrices for scene visibility, level visuals and queued draws. Engine context scopes resolve to Vulkan's single primary frame-recording context without creating or switching an OpenGL context |
+| Device resources and callback order | `VulkanDeviceResourceState.h`, `VulkanFramePhaseState.h`, `VulkanLevelRender.*` | Enforces device → `SetupStates` → `OnDeviceCreate` before Vulkan font/UI shader products or level loading, and checks world/menu frame ordering. Binding them through the engine `IRenderFactory` remains pending |
+| Portal visibility | `LevelVisibility.*`, `GpuLevel.*`, `VulkanLevelRender.*` | Traverses camera-visible sector portals and submits sector roots; invalid or missing visibility data falls back to every level root |
 | Game texture descriptors | `src/Layers/xrRenderVK/GameTextureFactory.*` | Loads DDS assets through the mounted VFS, caches images and creates sampled descriptors for deferred materials and game UI, including texture dimensions |
 | Renderer registration | `src/Layers/xrRenderVK/VulkanRendererModule.cpp` | Owns the `renderer_vulkan` mode independently of GLES and refuses game initialization until Vulkan implementations of the engine render interfaces exist |
 | Offline HLSL compiler | `tools/compile_vulkan_shader.py` | Invokes a host DXC executable on an existing game/mod HLSL file, with entry point, include roots and defines, and atomically writes checked SPIR-V output |
@@ -141,3 +143,16 @@ Useful host tests live in `tests/vulkan_probe.cpp`, `tests/vulkan_dds.cpp`,
 `tests/vulkan_smoke_triangle.cpp`. Device validation still requires the
 launcher's Vulkan smoke test on real Android hardware. A successful triangle
 smoke test does not close any of the gameplay items above.
+
+The lifecycle, camera, callback-order, portal-visibility and deferred G-buffer
+host tests can be enabled and run with:
+
+```sh
+cmake -S . -B build/vulkan-host -DXRAY_BUILD_VULKAN_TESTS=ON
+cmake --build build/vulkan-host
+ctest --test-dir build/vulkan-host --output-on-failure
+```
+
+These tests validate state transitions, conservative visibility fallback,
+G-buffer attachments and geometry command setup. They do not replace a GPU
+render or gameplay run on an Android device.

@@ -108,6 +108,8 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*owned_game_device_);
     context_state_.device_created();
+    R_ASSERT2(device_resource_state_.device_created(),
+        "Vulkan renderer device resource state was not empty at creation");
     reset_pending_ = false;
     reset_in_progress_ = false;
     app_suspended_ = false;
@@ -123,7 +125,7 @@ void VulkanLevelRender::Destroy()
         if (light) light->set_active(false);
     for (VulkanGlow* glow : glows_)
         if (glow) glow->set_active(false);
-    if (device_resources_ready_)
+    if (device_resource_state_.can_create_factory_objects())
         OnDeviceDestroy(false);
     else
         level_Unload();
@@ -144,11 +146,11 @@ void VulkanLevelRender::Destroy()
     reset_in_progress_ = false;
     app_suspended_ = false;
     recreate_surface_pending_ = false;
-    frame_active_ = false;
+    frame_phase_.reset();
     camera_state_.reset();
     context_state_.device_destroyed();
-    world_calculated_ = false;
-    world_rendered_ = false;
+    R_ASSERT2(device_resource_state_.device_destroyed(),
+        "Vulkan renderer device resources must be destroyed before the device");
     clear_target_pending_ = false;
     frame_clear_target_ = false;
     if (owned_game_device_)
@@ -204,7 +206,7 @@ void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
 
 void VulkanLevelRender::reset_begin()
 {
-    R_ASSERT2(game_device_ && !reset_in_progress_ && !frame_active_,
+    R_ASSERT2(game_device_ && !reset_in_progress_ && !frame_phase_.active(),
         "Vulkan renderer reset_begin requires an idle initialized renderer");
     std::string error;
     if (!game_device_->prepare_for_reset(error))
@@ -266,6 +268,8 @@ void VulkanLevelRender::SetupStates()
 {
     R_ASSERT2(game_device_ && game_device_->window().device(),
         "Vulkan renderer state setup requires a created Vulkan device");
+    R_ASSERT2(device_resource_state_.setup_states(),
+        "Vulkan renderer SetupStates was called before device creation");
     game_device_->ui().setup_states();
 }
 
@@ -306,11 +310,14 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
 {
     R_ASSERT2(game_device_ && game_device_->window().device(),
         "Vulkan renderer resources require a created Vulkan device");
-    if (device_resources_ready_)
+    R_ASSERT2(device_resource_state_.setup_states(),
+        "Vulkan renderer resources require SetupStates first");
+    if (device_resource_state_.can_create_factory_objects())
         return;
 
     game_device_->ui().CreateUIGeom();
-    device_resources_ready_ = true;
+    R_ASSERT2(device_resource_state_.device_resources_created(),
+        "Vulkan renderer device resources were created out of order");
 }
 
 void VulkanLevelRender::OnDeviceDestroy(bool)
@@ -318,31 +325,44 @@ void VulkanLevelRender::OnDeviceDestroy(bool)
     if (!game_device_)
     {
         level_Unload();
-        device_resources_ready_ = false;
         return;
     }
 
     // level_Unload waits for submitted work before dropping level buffers.
     level_Unload();
     game_device_->ui().DestroyUIGeom();
-    device_resources_ready_ = false;
+    R_ASSERT2(device_resource_state_.device_resources_destroyed(),
+        "Vulkan renderer device resources were not active during destruction");
+}
+
+std::unique_ptr<VulkanUIShader> VulkanLevelRender::create_ui_shader()
+{
+    R_ASSERT2(game_device_ && device_resource_state_.can_create_factory_objects(),
+        "Vulkan UI shaders require OnDeviceCreate before level loading");
+    return game_device_->create_ui_shader();
+}
+
+std::unique_ptr<VulkanFontRender> VulkanLevelRender::create_font_render()
+{
+    R_ASSERT2(game_device_ && device_resource_state_.can_create_factory_objects(),
+        "Vulkan fonts require OnDeviceCreate before level loading");
+    return game_device_->create_font_render();
 }
 
 void VulkanLevelRender::Begin()
 {
-    R_ASSERT2(game_device_ && !frame_active_,
+    R_ASSERT2(game_device_ && !frame_phase_.active(),
         "Vulkan renderer Begin requires an initialized idle frame");
     game_device_->begin_frame();
-    frame_active_ = true;
-    world_calculated_ = false;
-    world_rendered_ = false;
+    R_ASSERT2(frame_phase_.begin(), "Vulkan renderer frame phase could not begin");
     frame_clear_target_ = clear_target_pending_;
     clear_target_pending_ = false;
 }
 
 void VulkanLevelRender::Calculate()
 {
-    R_ASSERT2(game_device_ && frame_active_ && !world_calculated_,
+    R_ASSERT2(game_device_ && frame_phase_.active() &&
+        !frame_phase_.world_calculated() && !frame_phase_.world_rendered(),
         "Vulkan renderer Calculate requires one active frame");
 
     // The game queries ROS from simulation, AI, rain and HUD code. Refresh its
@@ -384,22 +404,24 @@ void VulkanLevelRender::Calculate()
 
     // Engine renderables are submitted after this scene-calculation phase;
     // VulkanLevelRender::add_Visual stores their transforms for End().
-    world_calculated_ = true;
+    R_ASSERT2(frame_phase_.calculate(), "Vulkan renderer world calculation is out of order");
 }
 
 void VulkanLevelRender::Render()
 {
-    R_ASSERT2(game_device_ && frame_active_ && world_calculated_ && !world_rendered_,
+    R_ASSERT2(game_device_ && frame_phase_.active() &&
+        frame_phase_.world_calculated() && !frame_phase_.world_rendered(),
         "Vulkan renderer Render requires a calculated world in the active frame");
     // Geometry is recorded into the deferred G-buffer at End(), after all
     // engine callbacks have queued their transforms and before the UI pass.
-    world_rendered_ = true;
+    R_ASSERT2(frame_phase_.render(), "Vulkan renderer world rendering is out of order");
 }
 
 void VulkanLevelRender::RenderMenu()
 {
-    R_ASSERT2(game_device_ && frame_active_,
+    R_ASSERT2(game_device_ && frame_phase_.active(),
         "Vulkan renderer RenderMenu requires an active frame");
+    R_ASSERT2(frame_phase_.render_menu(), "Vulkan renderer menu callbacks are out of order");
     if (!g_pGamePersistent)
         return;
 
@@ -422,7 +444,7 @@ void VulkanLevelRender::Clear()
 void VulkanLevelRender::ClearTarget()
 {
     R_ASSERT2(game_device_, "Vulkan renderer ClearTarget requires an initialized device");
-    if (frame_active_)
+    if (frame_phase_.active())
         frame_clear_target_ = true;
     else
         clear_target_pending_ = true;
@@ -430,11 +452,12 @@ void VulkanLevelRender::ClearTarget()
 
 void VulkanLevelRender::End()
 {
-    R_ASSERT2(game_device_ && frame_active_,
+    R_ASSERT2(game_device_ && frame_phase_.active(),
         "Vulkan renderer End requires a begun frame");
-    R_ASSERT2(!world_calculated_ || world_rendered_,
+    R_ASSERT2(frame_phase_.can_end(),
         "Vulkan renderer End was reached before the calculated world was rendered");
-    frame_active_ = false;
+    const bool render_world = frame_phase_.world_rendered();
+    R_ASSERT2(frame_phase_.end(), "Vulkan renderer frame end is out of order");
 
     float mvp[16];
     static_assert(sizeof(Fmatrix) == sizeof(mvp));
@@ -446,10 +469,7 @@ void VulkanLevelRender::End()
     FrameStatus status = FrameStatus::Presented;
     std::string error;
     const bool clear_target = frame_clear_target_;
-    const bool render_world = world_rendered_;
     frame_clear_target_ = false;
-    world_calculated_ = false;
-    world_rendered_ = false;
     if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target))
     {
         Msg("! Vulkan frame recording/submission failed: %s", error.c_str());
@@ -489,8 +509,9 @@ void VulkanLevelRender::bind_level_device(VkDevice device, VkQueue queue, VkComm
 
 void VulkanLevelRender::level_Load(IReader* reader)
 {
-    R_ASSERT2(reader && device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_,
-        "Vulkan level load requires an initialized gameplay device and resources");
+    R_ASSERT2(reader && device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ &&
+        device_resource_state_.can_load_level(),
+        "Vulkan level load requires OnDeviceCreate and an initialized gameplay device");
     // Replacing a level must wait for every submitted draw before its buffers
     // and visual identities are released. Uploads use the same graphics queue.
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");

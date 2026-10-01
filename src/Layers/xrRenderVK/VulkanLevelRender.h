@@ -3,6 +3,8 @@
 #include "xrEngine/Render.h"
 #include "GpuLevel.h"
 #include "VulkanCameraState.h"
+#include "VulkanDeviceResourceState.h"
+#include "VulkanFramePhaseState.h"
 #include "VulkanGameLighting.h"
 #include "VulkanRenderContextState.h"
 
@@ -12,6 +14,8 @@
 namespace xray::render::vulkan
 {
 class VulkanGameDevice;
+class VulkanFontRender;
+class VulkanUIShader;
 // Shared IRender level contract for the Vulkan gameplay renderer. Its caller
 // must have created a device, deferred pass and texture factory first. Other
 // IRender operations remain abstract until their Vulkan implementations exist.
@@ -20,6 +24,8 @@ class VulkanLevelRender : public IRender
 public:
     ~VulkanLevelRender() override;
     void bind_level_device(VulkanGameDevice& resources);
+    std::unique_ptr<VulkanUIShader> create_ui_shader();
+    std::unique_ptr<VulkanFontRender> create_font_render();
     void bind_level_device(VkDevice device, VkQueue queue, VkCommandPool pool,
         const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
         GameTextureFactory& textures, DeferredPass& pass, PFN_vkDeviceWaitIdle wait_idle);
@@ -82,14 +88,12 @@ private:
     std::vector<VulkanLight*> lights_;
     std::vector<VulkanGlow*> glows_;
     std::vector<VulkanObjectSpecific*> object_specifics_;
-    bool device_resources_ready_{};
+    VulkanDeviceResourceState device_resource_state_;
     bool reset_in_progress_{};
     bool reset_pending_{};
     bool app_suspended_{};
     bool recreate_surface_pending_{};
-    bool frame_active_{};
-    bool world_calculated_{};
-    bool world_rendered_{};
+    VulkanFramePhaseState frame_phase_;
     bool clear_target_pending_{};
     bool frame_clear_target_{};
 };

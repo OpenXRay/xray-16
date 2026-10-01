@@ -1,10 +1,9 @@
 #include "xrEngine/stdafx.h"
 #include "GpuLevel.h"
+#include "LevelVisibility.h"
 #include "VulkanVisual.h"
-#include "xrCDB/Frustum.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 
 namespace xray::render::vulkan
@@ -149,93 +148,8 @@ const LevelVisual* GpuLevel::visual_node(size_t index) const
 bool GpuLevel::visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
     const Fvector& camera_position, std::vector<uint32_t>& roots) const
 {
-    roots.clear();
-    if (sectors_.empty() || camera_sector >= sectors_.size() || portals_.empty() ||
-        !std::isfinite(camera_position.x) || !std::isfinite(camera_position.y) ||
-        !std::isfinite(camera_position.z))
-        return false;
-
-    const float* matrix_values = reinterpret_cast<const float*>(&view_projection);
-    for (size_t index = 0; index < 16; ++index)
-        if (!std::isfinite(matrix_values[index]))
-            return false;
-
-    Fmatrix full_transform = view_projection;
-    CFrustum camera_frustum;
-    camera_frustum.CreateFromMatrix(full_transform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-    if (!camera_frustum.p_count || camera_frustum.p_count > FRUSTUM_MAXPLANES)
-        return false;
-    for (size_t plane = 0; plane < camera_frustum.p_count; ++plane)
-    {
-        const auto& p = camera_frustum.planes[plane];
-        if (!std::isfinite(p.n.x) || !std::isfinite(p.n.y) ||
-            !std::isfinite(p.n.z) || !std::isfinite(p.d))
-            return false;
-    }
-
-    std::vector<uint32_t> pending{static_cast<uint32_t>(camera_sector)};
-    std::vector<uint8_t> visited_sectors(sectors_.size(), 0);
-    std::vector<uint8_t> processed_portals(portals_.size(), 0);
-    std::vector<uint8_t> added_roots(visuals_.size(), 0);
-    visited_sectors[camera_sector] = 1;
-
-    while (!pending.empty())
-    {
-        const uint32_t current = pending.back();
-        pending.pop_back();
-        const LevelSector& sector = sectors_[current];
-        if (sector.root >= visuals_.size())
-            return false;
-        if (!added_roots[sector.root])
-        {
-            roots.push_back(sector.root);
-            added_roots[sector.root] = 1;
-        }
-
-        for (uint16_t portal_id : sector.portals)
-        {
-            if (portal_id >= portals_.size())
-                return false;
-            if (processed_portals[portal_id])
-                continue;
-
-            const LevelPortal& portal = portals_[portal_id];
-            if (portal.vertices.size() < 3 || portal.vertices.size() > 6 ||
-                portal.sector_front >= sectors_.size() || portal.sector_back >= sectors_.size() ||
-                (portal.sector_front != current && portal.sector_back != current) ||
-                !std::isfinite(portal.center[0]) || !std::isfinite(portal.center[1]) ||
-                !std::isfinite(portal.center[2]) || !std::isfinite(portal.radius) || portal.radius < 0.f)
-                return false;
-
-            Fvector sphere_center;
-            sphere_center.set(portal.center[0], portal.center[1], portal.center[2]);
-            if (!camera_frustum.testSphere_dirty(sphere_center, portal.radius))
-                continue;
-
-            sPoly source, clipped;
-            for (const auto& point : portal.vertices)
-            {
-                Fvector vertex;
-                vertex.set(point[0], point[1], point[2]);
-                source.push_back(vertex);
-            }
-            sPoly* visible_polygon = camera_frustum.ClipPoly(source, clipped);
-            if (!visible_polygon)
-                continue;
-            if (visible_polygon->size() < 3)
-                continue;
-
-            const uint32_t destination = portal.sector_front == current ?
-                portal.sector_back : portal.sector_front;
-            processed_portals[portal_id] = 1;
-            if (!visited_sectors[destination])
-            {
-                visited_sectors[destination] = 1;
-                pending.push_back(destination);
-            }
-        }
-    }
-    return !roots.empty();
+    return select_visible_sector_roots(sectors_, portals_, visuals_.size(),
+        camera_sector, view_projection, camera_position, roots);
 }
 
 void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const
