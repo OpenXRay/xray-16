@@ -21,6 +21,15 @@ option(BUILD_SHARED_LIBS "Build shared libraries"     ${BUILD_SHARED_LIBS_DEFAUL
 option(XRAY_USE_LUAJIT   "Use LuaJIT"                 ON)
 option(XRAY_USE_ASAN     "Use AddressSanitizer"       OFF)
 option(XRAY_ENABLE_TRACY "Enable tracy profiler"      OFF)
+option(XRAY_USE_JOLT_CDB "Use the experimental Jolt collision tree" OFF)
+option(XRAY_USE_JOLT_PHYSICS "Use the experimental Jolt dynamics solver in xrPhysics" OFF)
+option(XRAY_BUILD_PHYSICS_TESTS "Build physics backend regression tests" OFF)
+option(XRAY_GAMEPLAY_BENCHMARK "Enable opt-in in-game benchmark capture" OFF)
+option(XRAY_BUILD_CDB_TESTS "Build collision query regression tests" OFF)
+
+if (XRAY_BUILD_CDB_TESTS OR XRAY_BUILD_PHYSICS_TESTS)
+    enable_testing()
+endif()
 
 include(XRay.Build)
 include(XRay.Packaging)
