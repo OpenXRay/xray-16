@@ -32,3 +32,5 @@ FetchContent_Declare(Jolt
     SOURCE_SUBDIR Build
 )
 FetchContent_MakeAvailable(Jolt)
+include(NativeContactFeedback.cmake)
+include(NativeMeshQuery.cmake)

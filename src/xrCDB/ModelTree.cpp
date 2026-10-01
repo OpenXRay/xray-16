@@ -2,6 +2,7 @@
 #include "ModelTree.h"
 
 #include <Jolt/TriangleSplitter/TriangleSplitterBinning.h>
+#include <Jolt/AABBTree/TriangleCodec/TriangleCodecIndexed8BitPackSOA4Flags.h>
 #include <cstdarg>
 #include <mutex>
 
@@ -49,21 +50,46 @@ bool ModelTree::Build(const Fvector* vertices, u32 vertexCount, const TRI* trian
         indices.emplace_back(triangle.verts[0], triangle.verts[1], triangle.verts[2], 0, i);
     }
 
-    JPH::TriangleSplitterBinning splitter(points, indices);
-    JPH::AABBTreeBuilder builder(splitter, 4);
-    JPH::AABBTreeBuilderStats stats;
-    builder.Build(stats);
-
-    nodes = builder.GetNodes();
-    triangleIds.clear();
-    triangleIds.reserve(triangleCount);
-    for (const auto& triangle : builder.GetTriangles())
-        triangleIds.push_back(triangle.mUserData);
+    mesh = nullptr;
+    degenerateTriangles.clear();
+    JPH::TriangleCodecIndexed8BitPackSOA4Flags::ValidationContext validation(indices, points);
+    JPH::IndexedTriangleList simulationTriangles;
+    simulationTriangles.reserve(triangleCount);
+    JPH::Ref<JPH::XRayMeshMaterial> metadata = new JPH::XRayMeshMaterial;
+    metadata->materials.reserve(triangleCount);
+    for (u32 index = 0; index < triangleCount; ++index) {
+        metadata->materials.push_back(static_cast<u16>(triangles[index].material));
+        const auto& triangle = indices[index];
+        if (triangle.IsDegenerate(points) || validation.IsDegenerate(triangle)) {
+            JPH::AABox bounds;
+            for (const auto vertex : triangle.mIdx) bounds.Encapsulate(JPH::Vec3::sLoadFloat3Unsafe(points[vertex]));
+            degenerateTriangles.push_back({bounds, index});
+        } else simulationTriangles.push_back(triangle);
+    }
+    if (!simulationTriangles.empty()) {
+        // Do not sanitize away coincident triangles: original IDs and metadata
+        // are observable through CDB queries and must all remain available.
+        JPH::MeshShapeSettings settings;
+        settings.mTriangleVertices = std::move(points);
+        settings.mIndexedTriangles = std::move(simulationTriangles);
+        settings.mMaterials.emplace_back(metadata.GetPtr());
+        settings.mPerTriangleUserData = true;
+        settings.mMaxTrianglesPerLeaf = 4;
+        settings.mUserData = JPH::XRayMeshMaterial::Tag;
+        const auto result = settings.Create();
+        if (result.HasError()) { Msg("! Jolt level mesh: %s", result.GetError().c_str()); return false; }
+        mesh = static_cast<const JPH::MeshShape*>(result.Get().GetPtr());
+    }
     return true;
 }
 
 size_t ModelTree::GetUsedBytes() const
 {
-    return nodes.capacity() * sizeof(JPH::AABBTreeBuilder::Node) + triangleIds.capacity() * sizeof(u32);
+    size_t bytes = degenerateTriangles.capacity() * sizeof(DegenerateTriangle);
+    if (mesh) {
+        bytes += mesh->GetStats().mSizeBytes;
+        bytes += static_cast<const JPH::XRayMeshMaterial*>(mesh->GetMaterialList().front().GetPtr())->materials.capacity() * sizeof(u16);
+    }
+    return bytes;
 }
 }

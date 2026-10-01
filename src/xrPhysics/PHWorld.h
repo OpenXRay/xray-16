@@ -1,24 +1,16 @@
 #pragma once
 
 #include "Common/Noncopyable.hpp"
-
 #include "xrEngine/pure.h"
-
 #include "Physics.h"
 #include "PHUpdateObject.h"
 #include "IPHWorld.h"
-
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
-// refs
 struct SGameMtlPair;
 class CPHCommander;
-#ifdef XRAY_GAMEPLAY_BENCHMARK
 class GameplayBenchmark;
-#endif
-#ifdef XRAY_USE_JOLT_PHYSICS
-class JoltDynamicsWorld;
-#endif
 class CPHCondition;
 class CPHAction;
 struct SPHNetState;
@@ -27,18 +19,17 @@ typedef xr_vector<std::pair<CPHSynchronize*, SPHNetState>> V_PH_WORLD_STATE;
 
 class CPHMesh
 {
-    dGeomID Geom;
+    PhysicsShapeHandle m_mesh_handle = nullptr;
+    BodyHandle m_body = INVALID_BODY_HANDLE;
 
 public:
-    dGeomID GetGeom() { return Geom; }
-    void Create(dSpaceID space, dWorldID world);
+    PhysicsShapeHandle GetGeom() { return m_mesh_handle; }
+    void Create(CObjectSpace& space);
     void Destroy();
 };
 
 #define PHWORLD_SOUND_CACHE_SIZE 8
 
-////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 class CObjectSpace;
 class CObjectList;
 class CPHWorld final : public IPHWorld,
@@ -50,10 +41,6 @@ class CPHWorld final : public IPHWorld,
 #endif
 {
 private:
-#ifdef XRAY_USE_JOLT_PHYSICS
-    JoltDynamicsWorld* m_dynamics = nullptr;
-    JoltDynamicsWorld* m_isolated_dynamics = nullptr;
-#endif
     PHWorldStatistics stats;
 #ifdef XRAY_GAMEPLAY_BENCHMARK
     GameplayBenchmark* m_benchmark = nullptr;
@@ -67,7 +54,6 @@ private:
     bool b_processing;
     bool b_exist;
     static const u32 update_delay = 1;
-    ///	dSpaceID					Space														;
 
     CPHMesh Mesh;
     PH_OBJECT_STORAGE m_objects;
@@ -75,7 +61,7 @@ private:
     PH_OBJECT_STORAGE m_recently_disabled_objects;
     PH_UPDATE_OBJECT_STORAGE m_update_objects;
     PH_UPDATE_OBJECT_STORAGE m_freezed_update_objects;
-    dGeomID m_motion_ray;
+
     CPHCommander* m_commander;
     CObjectSpace* m_object_space;
     CObjectList* m_level_objects;
@@ -91,22 +77,21 @@ private:
 
 public:
     double m_frame_sum;
-    dReal m_previous_frame_time;
+    float m_previous_frame_time;
     bool b_frame_mark;
-    dReal m_frame_time;
+    float m_frame_time;
     float m_update_time;
     u16 disable_count;
     float m_gravity;
 
 private:
-    ContactCallbackFun* m_default_contact_shotmark;
-    ContactCallbackFun* m_default_character_contact_shotmark;
+    ObjectContactCallbackFun* m_default_contact_shotmark;
+    ObjectContactCallbackFun* m_default_character_contact_shotmark;
     PhysicsStepTimeCallback* physics_step_time_callback;
 
 public:
     CPHWorld();
 
-    // IC	dSpaceID					GetSpace						()			{return Space;}	;
     IC bool Exist() { return b_exist; }
     void Create(bool mt, CObjectSpace* os, CObjectList* lo);
     void SetGravity(float g);
@@ -117,12 +102,13 @@ public:
     void RemoveFromRecentlyDisabled(PH_OBJECT_I i);
     void RemoveObject(PH_OBJECT_I i);
     void RemoveUpdateObject(PH_UPDATE_OBJECT_I i);
-    dGeomID GetMeshGeom() { return Mesh.GetGeom(); }
-    IC dGeomID GetMotionRayGeom() { return m_motion_ray; }
+
+    PhysicsShapeHandle GetMeshGeom() { return Mesh.GetGeom(); }
+
     void SetStep(float s);
     void Destroy();
     IC float FrameTime(bool frame_mark) { return b_frame_mark == frame_mark ? m_frame_time : m_previous_frame_time; }
-    void FrameStep(dReal step = 0.025f);
+    void FrameStep(float step = 0.025f);
     void Step();
     void StepTouch();
 #ifdef XRAY_GAMEPLAY_BENCHMARK
@@ -130,9 +116,7 @@ public:
     void BenchmarkEnd();
     void BenchmarkForceShell(CPhysicsShell* shell);
     void BenchmarkQueries(const Fvector& origin);
-#endif
-#ifdef XRAY_USE_JOLT_PHYSICS
-    void StepIsland(CPHIsland& island, float step);
+    bool BenchmarkNativeChecks(const Fvector& origin);
 #endif
     void CutVelocity(float l_limit, float a_limit);
     void GetState(V_PH_WORLD_STATE& state);
@@ -148,10 +132,10 @@ public:
     IC u16 StepsShortCnt() { return m_steps_short_num; }
     u64& StepsNum() { return m_steps_num; }
     float FrameTime() { return m_frame_time; }
-    ContactCallbackFun* default_contact_shotmark() { return m_default_contact_shotmark; }
-    ContactCallbackFun* default_character_contact_shotmark() { return m_default_character_contact_shotmark; }
-    void set_default_contact_shotmark(ContactCallbackFun* f) { m_default_contact_shotmark = f; }
-    void set_default_character_contact_shotmark(ContactCallbackFun* f) { m_default_character_contact_shotmark = f; }
+    ObjectContactCallbackFun* default_contact_shotmark() { return m_default_contact_shotmark; }
+    ObjectContactCallbackFun* default_character_contact_shotmark() { return m_default_character_contact_shotmark; }
+    void set_default_contact_shotmark(ObjectContactCallbackFun* f) { m_default_contact_shotmark = f; }
+    void set_default_character_contact_shotmark(ObjectContactCallbackFun* f) { m_default_character_contact_shotmark = f; }
     void NetRelcase(CPhysicsShell* s);
     CObjectSpace& ObjectSpace()
     {
@@ -164,7 +148,7 @@ public:
         return *m_level_objects;
     }
 
-	void AddCall(CPHCondition* c, CPHAction* a) override;
+    void AddCall(CPHCondition* c, CPHAction* a) override;
 
 #ifdef DEBUG
     virtual void OnRender();

@@ -1,89 +1,59 @@
-#include "xrPhysics/StdAfx.h"
-#include "PhysicsContacts.h"
-
-#include "Common/LevelStructure.hpp"
 #include "TestSupport.h"
-#include "xrCDB/xr_area.h"
-#include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/PHWorld.h"
+#include "PhysicsContacts.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
+namespace {
+#ifdef XRAY_USE_JOLT_CDB
+unsigned contactCount;
+bool contactValid;
+bool Contact(const NativePhysicsContact& contact) {
+    ++contactCount;
+    contactValid = contactValid && (contact.material1 == 4099 || contact.material2 == 4099) &&
+        (contact.triangle1 < 2 || contact.triangle2 < 2) &&
+        std::abs(contact.depth - .25f) < .001f && std::abs(std::abs(contact.normal.y) - 1) < .001f;
+    return true;
+}
+#endif
+}
 void CheckPhysicsContacts()
 {
-    Mesh floor;
-    floor.Add(Vector(-5, 0, -5), Vector(-5, 0, 5), Vector(5, 0, -5));
-    floor.Add(Vector(5, 0, 5), Vector(5, 0, -5), Vector(-5, 0, 5));
-    for (auto& triangle : floor.triangles)
-        triangle.material = 7;
-    hdrCFORM header{};
-    header.version = CFORM_CURRENT_VERSION;
-    header.vertcount = floor.vertices.size();
-    header.facecount = floor.triangles.size();
-    header.aabb.set(-10, -10, -10, 10, 10, 10);
-    CObjectSpace space(nullptr);
-    space.GetStaticModel()->set_model_crc32(999);
-    space.Create(floor.vertices.data(), floor.triangles.data(), header, nullptr, nullptr, nullptr, nullptr);
-    space.GetStaticModel()->syncronize();
-    Require(physics_world() == nullptr, "Physics fixture found an existing world");
-    create_physics_world(false, &space, nullptr);
-
-    struct World
+#ifdef XRAY_USE_JOLT_CDB
+    auto* core = GetPhysicsCore();
+    core->Clear();
+    core->SetSimulationParameters(0, 18);
+    BodyHandle floorBody;
     {
-        ~World()
-        {
-            destroy_physics_world();
-        }
-    } world;
-
-    auto* concrete = static_cast<CPHWorld*>(physics_world());
-    auto dynamics = dWorldCreate();
-
-    struct Dynamics
-    {
-        dWorldID world;
-
-        ~Dynamics()
-        {
-            dWorldDestroy(world);
-        }
-    } dynamicsCleanup{ dynamics };
-
-    auto body = dBodyCreate(dynamics);
-
-    struct Body
-    {
-        dBodyID body;
-
-        ~Body()
-        {
-            dBodyDestroy(body);
-        }
-    } bodyCleanup{ body };
-
-    auto sphere = dCreateSphere(nullptr, .5f);
-    dGeomSetBody(sphere, body);
-    dGeomCreateUserData(sphere);
-
-    struct Sphere
-    {
-        dGeomID geometry;
-
-        ~Sphere()
-        {
-            dGeomDestroyUserData(geometry);
-            dGeomDestroy(geometry);
-        }
-    } cleanup{ sphere };
-
-    dGeomSetPosition(sphere, 1, .25f, 1);
-    std::array<dContact, 16> contacts{};
-    const auto count = dCollide(concrete->GetMeshGeom(), sphere, contacts.size(), &contacts[0].geom, sizeof(dContact));
-    Require(count > 0, "ODE contact query missed the collision mesh");
-    for (int i = 0; i < count; i++)
-    {
-        Require(std::abs(contacts[i].geom.depth - .25f) < 1.e-4f, "ODE contact depth changed");
-        Require(std::abs(std::abs(contacts[i].geom.normal[1]) - 1.f) < 1.e-4f, "ODE contact normal changed");
-        Require(contacts[i].surface.mode == 7, "ODE contact lost the triangle material");
-    }
-    dGeomSetPosition(sphere, 1, 2, 1);
-    Require(dCollide(concrete->GetMeshGeom(), sphere, contacts.size(), &contacts[0].geom, sizeof(dContact)) == 0, "ODE reused stale collision candidates");
+        Mesh floor;
+        floor.Add(Vector(-5, 0, -5), Vector(-5, 0, 5), Vector(5, 0, -5));
+        floor.Add(Vector(5, 0, 5), Vector(5, 0, -5), Vector(-5, 0, 5));
+        for (auto& triangle : floor.triangles) triangle.material = 4099;
+        CDB::MODEL model;
+        floor.Build(model);
+        auto first = model.acquire_physics_shape(), second = model.acquire_physics_shape();
+        Require(first && first == second, "Level queries and physics did not share one native mesh");
+        floorBody = core->CreateStaticBody(first, Vector(0, 0, 0));
+        std::vector<CDBRaycastHit> hits;
+        core->RaycastCDBModel(first, Vector(1, 2, 1), Vector(0, -1, 0), 4, CDBRayMode::Nearest, false, hits);
+        Require(hits.size() == 1 && hits[0].tri_index < 2 && std::abs(hits[0].range - 2) < .001f,
+            "Native shared-mesh ray lost its original triangle ID");
+        core->DestroyCDBModel(first);
+        core->DestroyCDBModel(second);
+    } // The body retains the mesh and its materials after MODEL destruction.
+    const auto body = core->CreateBox(Vector(.5f, .5f, .5f), Vector(1, .25f, 1), 2);
+    core->SetBodyUserData(body, core);
+    contactCount = 0;
+    contactValid = true;
+    core->SetRigidBodyContactCallback(Contact);
+    core->Step(.01f);
+    Require(contactCount > 0 && contactValid, "Shared level mesh lost depth, normal, or 14-bit material metadata");
+    core->SetBodyPosition(body, Vector(1, 2, 1));
+    core->SetBodyLinearVelocity(body, Vector(0, 0, 0));
+    contactCount = 0;
+    core->Step(.01f);
+    Require(contactCount == 0, "Native contacts reused stale level collision candidates");
+    core->SetRigidBodyContactCallback(nullptr);
+    core->DestroyBody(body);
+    core->DestroyBody(floorBody);
+    core->Clear();
+#endif
 }

@@ -119,6 +119,9 @@ public:
     void deserialize_tree(IReader* rstream);
 
     size_t memory();
+    // Returns an owned native shape reference, or nullptr on another backend.
+    // The caller releases it through IPhysicsCore::DestroyCDBModel.
+    void* acquire_physics_shape() const;
 
 private:
     void syncronize_impl() const;

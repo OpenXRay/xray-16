@@ -21,6 +21,7 @@ void CPHWorld::script_register(lua_State* luaState)
             .def("benchmark_end", &CPHWorld::BenchmarkEnd)
             .def("benchmark_force_shell", &CPHWorld::BenchmarkForceShell)
             .def("benchmark_queries", &CPHWorld::BenchmarkQueries)
+            .def("benchmark_native_checks", &CPHWorld::BenchmarkNativeChecks)
 #endif
 	];
 

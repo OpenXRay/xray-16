@@ -3,6 +3,10 @@ $ErrorActionPreference = 'Stop'
 $culture = [Globalization.CultureInfo]::InvariantCulture
 function Number($value) { [double]::Parse([string]$value, $culture) }
 function Mean($values) { ($values | Measure-Object -Average).Average }
+function NativeMean($steps, [string]$field) {
+    if (!$steps[0].PSObject.Properties[$field]) { return 0 }
+    Mean @($steps | ForEach-Object { Number $_.$field })
+}
 function Quantile($values, [double]$fraction) {
     $sorted = @($values | Sort-Object)
     if (!$sorted.Count) { throw 'Empty benchmark sample.' }
@@ -34,6 +38,9 @@ foreach ($metadata in Get-ChildItem -LiteralPath (Join-Path $OutputRoot 'results
             mean_total_ms = Mean $total; median_total_ms = Quantile $total .5; p95_total_ms = Quantile $total .95
             mean_solver_ms = Mean $solver; p95_solver_ms = Quantile $solver .95
             mean_collision_ms = Mean $collision
+            mean_native_preparation_ms = NativeMean $steps 'native_preparation_ms'
+            mean_native_integration_ms = NativeMean $steps 'native_integration_ms'
+            mean_native_feedback_ms = NativeMean $steps 'native_feedback_ms'
             mean_bodies = Mean @($steps | ForEach-Object { Number $_.bodies })
             mean_contacts = Mean @($steps | ForEach-Object { Number $_.contacts })
             mean_joints = Mean @($steps | ForEach-Object { Number $_.joints })
@@ -62,7 +69,12 @@ foreach ($metadata in Get-ChildItem -LiteralPath (Join-Path $OutputRoot 'results
             model_reported_bytes = Number $first.model_bytes
         }
     }
-    $runs += [pscustomobject]@{ runtime = $run.runtime; repetition = $run.repetition; collision = $run.collision; dynamics = $run.dynamics; phases = $phases; queries = $queries }
+    $runs += [pscustomobject]@{
+        runtime = $run.runtime; repetition = $run.repetition; collision = $run.collision; dynamics = $run.dynamics
+        maximum_working_set_mib = $run.maximum_observed_working_set_bytes / 1MB
+        save_reload_validated = [bool]$run.save_reload_validated
+        phases = $phases; queries = $queries
+    }
 }
 if (!$runs.Count) { throw 'No completed runs found.' }
 $summary = @()
@@ -73,11 +85,17 @@ foreach ($group in ($runs | Group-Object runtime)) {
         $summary += [pscustomobject]@{
             runtime = $group.Name; phase = $phase; runs = $values.Count
             mean_total_ms = Quantile @($values.mean_total_ms) .5
+            p95_total_ms = Quantile @($values.p95_total_ms) .5
             total_min_run_ms = ($values.mean_total_ms | Measure-Object -Minimum).Minimum
             total_max_run_ms = ($values.mean_total_ms | Measure-Object -Maximum).Maximum
             mean_solver_ms = Quantile @($values.mean_solver_ms) .5
             p95_solver_ms = Quantile @($values.p95_solver_ms) .5
             mean_collision_ms = Quantile @($values.mean_collision_ms) .5
+            mean_native_preparation_ms = Quantile @($values.mean_native_preparation_ms) .5
+            mean_native_integration_ms = Quantile @($values.mean_native_integration_ms) .5
+            mean_native_feedback_ms = Quantile @($values.mean_native_feedback_ms) .5
+            median_peak_working_set_mib = Quantile @($group.Group.maximum_working_set_mib) .5
+            save_reload_validated_runs = @($group.Group | Where-Object save_reload_validated).Count
             mean_bodies = Quantile @($values.mean_bodies) .5
             mean_contacts = Quantile @($values.mean_contacts) .5
             mean_joints = Quantile @($values.mean_joints) .5

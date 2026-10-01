@@ -18,16 +18,13 @@
     <ClCompile Include="xrCDB.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="xrCDB_box.cpp">
+    <ClCompile Include="ModelTree.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="xrCDB_Collector.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="xrCDB_frustum.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="xrCDB_ray.cpp">
+    <ClCompile Include="JoltQueries.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="ISpatial.cpp">

@@ -1,6 +1,18 @@
 -- Run `run_script gameplay_benchmark` after loading the same isolated save.
 -- Requires XRAY_GAMEPLAY_BENCHMARK=ON. Writes CSVs, then closes the game.
 local function report(message) log1("GAMEPLAY_BENCHMARK " .. message) end
+local function population(phase)
+    local alive, dead = 0, 0
+    for _, entry in pairs(db.storage or {}) do
+        local object = entry.object
+        if object and IsStalker(object) then
+            if object:alive() then alive = alive + 1 else dead = dead + 1 end
+        end
+    end
+    local p = db.actor:position()
+    report(string.format("POPULATION phase=%s alive=%d dead=%d actor=%.3f,%.3f,%.3f",
+                         phase, alive, dead, p.x, p.y, p.z))
+end
 local function wait(milliseconds)
     local finish = time_global() + milliseconds
     while time_global() < finish do coroutine.yield() end
@@ -25,8 +37,13 @@ function main()
     console:execute("ph_iterations 18")
     if not db.actor then report("FAIL no actor"); return end
     local world = level.physics_world()
+    if world.benchmark_native_checks and not world:benchmark_native_checks(db.actor:position()) then
+        report("FAIL native gameplay checks"); return
+    end
     report("WARMUP")
+    population("load")
     wait(10000)
+    population("idle")
     local p = db.actor:position()
     -- Round to the same level coordinates even if the actor settles slightly
     -- differently between solvers. The comparator checks these coordinates.
@@ -34,6 +51,7 @@ function main()
     world:benchmark_begin("idle")
     wait(10000)
     world:benchmark_end()
+    population("after-idle")
     world:benchmark_queries(origin)
 
     local ids = {}
@@ -67,6 +85,22 @@ function main()
     end
     wait(20000)
     world:benchmark_end()
+    -- Validate a real save separately from the timed phases.
+    wait(2000)
+    for _, id in ipairs(ids) do
+        local npc = level.object_by_id(id)
+        local shell = npc and npc:get_physics_shell()
+        if not shell then report("FAIL shell missing before save"); return end
+        local position, mass = npc:position(), 0
+        local root = shell:get_element_by_order(0):global_transform().c
+        for index = 0, shell:get_elements_number() - 1 do
+            mass = mass + shell:get_element_by_order(index):get_mass()
+        end
+        report(string.format("SAVE_OBJECT id=%d elements=%d joints=%d mass=%.6f x=%.6f y=%.6f z=%.6f bx=%.6f by=%.6f bz=%.6f",
+            id, shell:get_elements_number(), shell:get_joints_number(), mass, position.x, position.y, position.z, root.x, root.y, root.z))
+    end
+    console:execute("save native-physics-validation")
+    wait(2000)
     report("DONE")
     wait(1000)
     console:execute("quit")

@@ -26,7 +26,7 @@ void CPHCollisionDamageReceiver::Init()
             u16 index = K->LL_BoneID(item.first.c_str());
             R_ASSERT3(index != BI_NONE, "Wrong bone name", item.first.c_str());
             BoneInsert(index, float(atof(item.second.c_str())));
-            CODEGeom* og = sh->PPhysicsShell()->get_GeomByID(index);
+            CPhysicsGeom* og = sh->PPhysicsShell()->get_GeomByID(index);
             // R_ASSERT3(og, "collision damage bone has no physics collision", *item.first);
             if (og)
                 og->add_obj_contact_cb(DamageReceiverCollisionCallback);
@@ -68,7 +68,7 @@ void CPHCollisionDamageReceiver::Clear()
     // xr_map<u16,float>::iterator i=m_controled_bones.begin(),e=m_controled_bones.end();
     // for(;e!=i;++i)
     //{
-    //	CODEGeom* og= sh->PPhysicsShell()->get_GeomByID(i->first);
+    //	CPhysicsGeom* og= sh->PPhysicsShell()->get_GeomByID(i->first);
     //	if(og)og->set_obj_contact_cb(NULL);
     //}
     m_controled_bones.clear();

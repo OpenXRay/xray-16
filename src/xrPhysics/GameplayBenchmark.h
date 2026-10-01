@@ -18,6 +18,7 @@ public:
         u64 step = 0;
         float dt = 0;
         double total = 0, collision = 0, solver = 0;
+        double nativePreparation = 0, nativeIntegration = 0, nativeFeedback = 0;
         unsigned islands = 0, bodies = 0, joints = 0, contacts = 0;
     };
     struct FrameSample { u32 frame; double milliseconds; };

@@ -52,6 +52,16 @@ void MODEL::syncronize_impl() const
     C->Leave();
 }
 
+void* MODEL::acquire_physics_shape() const
+{
+    syncronize();
+#ifdef XRAY_USE_JOLT_CDB
+    return tree ? tree->AcquirePhysicsShape() : nullptr;
+#else
+    return nullptr;
+#endif
+}
+
 void MODEL::build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc, void* bcp)
 {
     ZoneScoped;

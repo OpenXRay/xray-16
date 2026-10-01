@@ -6,13 +6,10 @@ endif()
 
 add_subdirectory(luabind)
 add_subdirectory(xrLuaFix)
-if (XRAY_USE_JOLT_CDB OR XRAY_USE_JOLT_PHYSICS)
-    add_subdirectory(Jolt-proj)
-endif()
+add_subdirectory(Jolt-proj)
 if (NOT XRAY_USE_JOLT_CDB)
     add_subdirectory(OPCODE)
 endif()
-add_subdirectory(ode)
 
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})
