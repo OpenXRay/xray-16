@@ -63,6 +63,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanFontRender.h
     VulkanLevelRender.cpp
     VulkanLevelRender.h
+    VulkanCameraState.h
+    VulkanRenderContextState.h
     VulkanGameLighting.cpp
     VulkanGameLighting.h
     VulkanGameLightingMath.cpp

@@ -107,6 +107,7 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
     requested_drawable_ = drawable_width > 0 && drawable_height > 0 ?
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*owned_game_device_);
+    context_state_.device_created();
     reset_pending_ = false;
     reset_in_progress_ = false;
     app_suspended_ = false;
@@ -144,6 +145,8 @@ void VulkanLevelRender::Destroy()
     app_suspended_ = false;
     recreate_surface_pending_ = false;
     frame_active_ = false;
+    camera_state_.reset();
+    context_state_.device_destroyed();
     world_calculated_ = false;
     world_rendered_ = false;
     clear_target_pending_ = false;
@@ -266,6 +269,39 @@ void VulkanLevelRender::SetupStates()
     game_device_->ui().setup_states();
 }
 
+void VulkanLevelRender::OnCameraUpdated()
+{
+    camera_state_.on_camera_updated(Device.mFullTransform.m,
+        Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
+}
+
+void VulkanLevelRender::SetCacheXform(Fmatrix& view, Fmatrix& project)
+{
+    camera_state_.set_cache_xform(view.m, project.m);
+}
+
+IRender::RenderContext VulkanLevelRender::GetCurrentContext() const
+{
+    static_assert(VulkanRenderContextState::NoContext == IRender::NoContext);
+    static_assert(VulkanRenderContextState::PrimaryContext == IRender::PrimaryContext);
+    static_assert(VulkanRenderContextState::HelperContext == IRender::HelperContext);
+    return static_cast<IRender::RenderContext>(context_state_.current());
+}
+
+void VulkanLevelRender::MakeContextCurrent(IRender::RenderContext context)
+{
+    R_ASSERT2(context_state_.make_current(static_cast<int>(context)),
+        "Vulkan renderer received an unknown render context");
+}
+
+Fmatrix VulkanLevelRender::current_view_projection() const
+{
+    Fmatrix result = Device.mFullTransform;
+    if (camera_state_.has_view_projection())
+        camera_state_.copy_view_projection(result.m);
+    return result;
+}
+
 void VulkanLevelRender::OnDeviceCreate(pcstr)
 {
     R_ASSERT2(game_device_ && game_device_->window().device(),
@@ -325,18 +361,25 @@ void VulkanLevelRender::Calculate()
     IGameObject* view_entity = g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : nullptr;
     const size_t camera_sector = view_entity ? view_entity->Sector() :
         IRender_Sector::INVALID_SECTOR_ID;
-    if (!level_.visible_sector_roots(camera_sector, Device.mFullTransform,
-            Device.vCameraPosition, visible_roots))
+    const Fmatrix view_projection_matrix = current_view_projection();
+    Fvector camera_position;
+    if (camera_state_.has_camera_position())
+        camera_position.set(camera_state_.camera_position()[0], camera_state_.camera_position()[1],
+            camera_state_.camera_position()[2]);
+    else
+        camera_position.set(Device.vCameraPosition);
+    if (!level_.visible_sector_roots(camera_sector, view_projection_matrix,
+            camera_position, visible_roots))
         level_.all_level_roots(visible_roots);
 
     float view_projection[16];
-    static_assert(sizeof(Device.mFullTransform) == sizeof(view_projection));
-    std::memcpy(view_projection, &Device.mFullTransform, sizeof(view_projection));
+    static_assert(sizeof(Fmatrix) == sizeof(view_projection));
+    std::memcpy(view_projection, &view_projection_matrix, sizeof(view_projection));
     for (uint32_t root : visible_roots)
     {
         const Fvector center = visual_center(level_.visual_node(root));
         game_device_->queue_level_visual(root, view_projection, false,
-            distance_squared(center, Device.vCameraPosition));
+            distance_squared(center, camera_position));
     }
 
     // Engine renderables are submitted after this scene-calculation phase;
@@ -394,8 +437,9 @@ void VulkanLevelRender::End()
     frame_active_ = false;
 
     float mvp[16];
-    static_assert(sizeof(Device.mFullTransform) == sizeof(mvp));
-    std::memcpy(mvp, &Device.mFullTransform, sizeof(mvp));
+    static_assert(sizeof(Fmatrix) == sizeof(mvp));
+    const Fmatrix view_projection = current_view_projection();
+    std::memcpy(mvp, &view_projection, sizeof(mvp));
 
     const DeferredEnvironment environment = current_environment();
     const DeferredLight light = make_environment_deferred_light(environment);
@@ -473,8 +517,9 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     const auto* level_visual = dynamic_cast<const VulkanVisual*>(visual);
     R_ASSERT2(level_visual && &level_visual->owner() == &level_,
         "Vulkan scene submission received a visual outside this level");
+    const Fmatrix view_projection = current_view_projection();
     Fmatrix mvp;
-    mvp.mul(Device.mFullTransform, world);
+    mvp.mul(view_projection, world);
     Fvector center = visual_center(level_.visual_node(level_visual->index()));
     Fvector world_center;
     world.transform_tiny(world_center, center);
@@ -483,8 +528,14 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     float transform[16];
     std::memcpy(transform, &mvp, sizeof(transform));
     const bool hud = root && root->renderable_HUD();
+    Fvector camera_position;
+    if (camera_state_.has_camera_position())
+        camera_position.set(camera_state_.camera_position()[0], camera_state_.camera_position()[1],
+            camera_state_.camera_position()[2]);
+    else
+        camera_position.set(Device.vCameraPosition);
     game_device_->queue_level_visual(level_visual->index(), transform, hud,
-        distance_squared(center, Device.vCameraPosition));
+        distance_squared(center, camera_position));
 }
 
 IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)

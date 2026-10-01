@@ -2,7 +2,9 @@
 
 #include "xrEngine/Render.h"
 #include "GpuLevel.h"
+#include "VulkanCameraState.h"
 #include "VulkanGameLighting.h"
+#include "VulkanRenderContextState.h"
 
 #include <memory>
 #include <vector>
@@ -41,6 +43,10 @@ public:
     void Clear() override;
     void End() override;
     void ClearTarget() override;
+    void OnCameraUpdated() override;
+    void SetCacheXform(Fmatrix& view, Fmatrix& project) override;
+    RenderContext GetCurrentContext() const override;
+    void MakeContextCurrent(RenderContext context) override;
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* visual,
         Fmatrix& world) override;
     IRender_ObjectSpecific* ros_create(IRenderable* parent) override;
@@ -57,7 +63,10 @@ protected:
     const GpuLevel& gpu_level() const { return level_; }
 
 private:
+    Fmatrix current_view_projection() const;
     GpuLevel level_;
+    VulkanCameraState camera_state_;
+    VulkanRenderContextState context_state_;
     VkDevice device_{};
     VkQueue queue_{};
     VkCommandPool pool_{};

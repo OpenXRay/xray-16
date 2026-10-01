@@ -70,6 +70,7 @@ target_sources(xrOPCODE PRIVATE
 target_include_directories(xrOPCODE
     PRIVATE
     "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/Externals"
 )
 
 target_link_libraries(xrOPCODE
