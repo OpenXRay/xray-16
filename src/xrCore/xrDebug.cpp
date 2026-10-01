@@ -17,8 +17,8 @@
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
 
-#   define USE_BUG_TRAP
-#   ifdef USE_BUG_TRAP
+#   if __has_include("BugTrap.h")
+#       define USE_BUG_TRAP
 #       include "BugTrap.h"
 #   endif
 

@@ -21,7 +21,8 @@
 #endif
 
 // On other platforms these options are controlled by CMake
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS) && !defined(USE_PURE_ALLOC) && \
+    !defined(USE_XR_ALIGNED_MALLOC) && !defined(USE_MIMALLOC)
 #   ifdef _DEBUG
 #       define USE_PURE_ALLOC
 #   else
