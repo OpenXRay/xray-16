@@ -504,7 +504,21 @@ add_buildvm_target("lj_ffdef.h" "ffdef" ${LJLIB_C})
 add_buildvm_target("lj_libdef.h" "libdef" ${LJLIB_C})
 add_buildvm_target("lj_recdef.h" "recdef" ${LJLIB_C})
 add_buildvm_target("lj_folddef.h" "folddef" "${LUAJIT_DIR}/lj_opt_fold.c")
-add_buildvm_target("jit/vmdef.lua" "libvm" ${LJLIB_C})
+add_buildvm_target("jit/vmdef.lua" "vmdef" ${LJLIB_C})
+
+# These headers are included by ordinary LuaJIT C sources. Listing them as
+# target sources alone does not make Ninja wait for their custom commands
+# before compiling those C files on a clean parallel build.
+add_custom_target(xrLuaJITGenerated DEPENDS
+    "${LJ_VM_SRC}"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_libdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_recdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_folddef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/jit/vmdef.lua"
+)
+add_dependencies(xrLuaJIT xrLuaJITGenerated)
 
 target_sources(xrLuaJIT PRIVATE
     "${LJ_VM_SRC}"
