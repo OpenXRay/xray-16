@@ -504,6 +504,9 @@ add_buildvm_target("lj_ffdef.h" "ffdef" ${LJLIB_C})
 add_buildvm_target("lj_libdef.h" "libdef" ${LJLIB_C})
 add_buildvm_target("lj_recdef.h" "recdef" ${LJLIB_C})
 add_buildvm_target("lj_folddef.h" "folddef" "${LUAJIT_DIR}/lj_opt_fold.c")
+# buildvm writes vmdef.lua into this directory without creating it. Generate
+# the directory during configuration so clean parallel builds work on BSD too.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/jit")
 add_buildvm_target("jit/vmdef.lua" "vmdef" ${LJLIB_C})
 
 # These headers are included by ordinary LuaJIT C sources. Listing them as
