@@ -127,40 +127,41 @@ void CPhysicObject::stop_bones_sound()
     bones_snd_player->stop();
 }
 
-static CPhysicsShellHolder* retrive_collide_object(bool bo1, dContact& c)
+static CPhysicsShellHolder* retrive_collide_object(bool bo1, CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom)
 {
-    CPhysicsShellHolder* collide_obj = 0;
+    CPhysicsShellHolder* collide_obj = nullptr;
+    if (!bo1) std::swap(my_geom, oposite_geom);
 
-    dxGeomUserData* ud = 0;
-    if (bo1)
-        ud = PHRetrieveGeomUserData(c.geom.g2);
-    else
-        ud = PHRetrieveGeomUserData(c.geom.g1);
+    if (oposite_geom)
+    {
+        collide_obj = smart_cast<CPhysicsShellHolder*>(oposite_geom->ph_ref_object);
+    }
 
-    if (ud)
-        collide_obj = static_cast<CPhysicsShellHolder*>(ud->ph_ref_object);
-    else
-        collide_obj = 0;
     return collide_obj;
 }
-static void door_ignore(bool& do_collide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+
+static void door_ignore(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* geom1, CPhysicsGeom* geom2,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2
+)
 {
-    CPhysicsShellHolder* collide_obj = retrive_collide_object(bo1, c);
-    if (!collide_obj || collide_obj->cast_actor())
+    CPhysicsShellHolder* collide_obj = retrive_collide_object(bo1, geom1, geom2);
+    if (!collide_obj || collide_obj->cast_actor() || collide_obj->cast_stalker() || collide_obj->cast_custom_monster())
         return;
 
     CPhysicsShell* ph_shell = collide_obj->PPhysicsShell();
     if (!ph_shell)
     {
-        do_collide = false; //? must be AI
+        do_colide = false;
         return;
     }
-    VERIFY(ph_shell);
 
     if (ph_shell->HasTracedGeoms())
         return;
 
-    do_collide = false;
+    do_colide = false;
 }
 
 void CPhysicObject::set_door_ignore_dynamics()
@@ -326,20 +327,18 @@ void CPhysicObject::UpdateCL()
 {
     inherited::UpdateCL();
 
-    //Если наш физический объект анимированный, то
-    //двигаем объект за анимацией
-    if (m_pPhysicsShell->PPhysicsShellAnimator())
+    if (m_pPhysicsShell && m_pPhysicsShell->PPhysicsShellAnimator())
     {
-        m_pPhysicsShell->AnimatorOnFrame();
+        m_pPhysicsShell->AnimatorOnFrame(); //
     }
 
     if (!IsGameTypeSingle())
     {
-        Interpolate();
+        Interpolate(); //
     }
 
-    m_anim_script_callback.update(*this);
-    PHObjectPositionUpdate();
+    m_anim_script_callback.update(*this); //
+    PHObjectPositionUpdate(); //
 
 #ifdef DEBUG
     if (dbg_draw_doors)
@@ -350,9 +349,10 @@ void CPhysicObject::UpdateCL()
 #endif
 
     if (!is_active(bones_snd_player))
-        return;
-    bones_snd_player->update(Device.fTimeDelta, *this);
+        return; //
+    bones_snd_player->update(Device.fTimeDelta, *this); //
 }
+
 void CPhysicObject::PHObjectPositionUpdate()
 {
     if (m_pPhysicsShell)
@@ -580,17 +580,17 @@ void CPhysicObject::net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mask
     }
     else
     {
-        /*		float				invert_magnitude = 1.f/magnitude;
+        float invert_magnitude = 1.f/magnitude;
 
         State.quaternion.x	*= invert_magnitude;
         State.quaternion.y	*= invert_magnitude;
         State.quaternion.z	*= invert_magnitude;
         State.quaternion.w	*= invert_magnitude;
 
-        clamp				(State.quaternion.x,-1.f,1.f);
-        clamp				(State.quaternion.y,-1.f,1.f);
-        clamp				(State.quaternion.z,-1.f,1.f);
-        clamp				(State.quaternion.w,-1.f,1.f);*/
+        clamp(State.quaternion.x,-1.f,1.f);
+        clamp(State.quaternion.y,-1.f,1.f);
+        clamp(State.quaternion.z,-1.f,1.f);
+        clamp(State.quaternion.w,-1.f,1.f);
     }
 
     P.w_float(State.quaternion.x);
@@ -699,6 +699,16 @@ void CPhysicObject::net_Import_PH_Params(NET_Packet& P, net_update_PItem& N, mas
     P.r_float(N.State.quaternion.z);
     P.r_float(N.State.quaternion.w);
 
+    float mag2 = N.State.quaternion.x*N.State.quaternion.x + N.State.quaternion.y*N.State.quaternion.y +
+                 N.State.quaternion.z*N.State.quaternion.z + N.State.quaternion.w*N.State.quaternion.w;
+    if (mag2 > EPS) {
+        float inv = 1.0f / _sqrt(mag2);
+        N.State.quaternion.x *= inv; N.State.quaternion.y *= inv;
+        N.State.quaternion.z *= inv; N.State.quaternion.w *= inv;
+    } else {
+        N.State.quaternion.identity();
+    }
+
     N.State.enabled = num_items.mask & CSE_ALifeObjectPhysic::inventory_item_state_enabled;
     // UI().Font().pFontStat->OutNext("Import N.State.enabled:%i",int(N.State.enabled));
     if (!(num_items.mask & CSE_ALifeObjectPhysic::inventory_item_angular_null))
@@ -731,15 +741,14 @@ void CPhysicObject::PH_I_CrPr() // actions & operations between two phisic predi
     {};
 void CPhysicObject::PH_A_CrPr()
 {
-    if (m_just_after_spawn)
+if (m_just_after_spawn)
     {
         VERIFY(Visual());
         IKinematics* K = Visual()->dcast_PKinematics();
         VERIFY(K);
         if (!PPhysicsShell())
-        {
             return;
-        }
+
         if (!PPhysicsShell()->isFullActive())
         {
             K->CalculateBones_Invalidate();
@@ -765,12 +774,10 @@ void CPhysicObject::PH_A_CrPr()
         spatial_move();
         m_just_after_spawn = false;
 
-        VERIFY(!OnServer());
+        if (!OnServer()) return;
 
-        PPhysicsShell()->get_ElementByStoreOrder(0)->Fix();
-        PPhysicsShell()->SetIgnoreStatic();
-        // PPhysicsShell()->SetIgnoreDynamic	();
-        // PPhysicsShell()->DisableCollision();
+        // Отключаем коллизию со статикой только для динамических костей двери
+        PPhysicsShell()->SetElementsCollideWithStatics(false);
     }
     // CalculateInterpolationParams()
 };
@@ -839,6 +846,22 @@ float CPhysicObject::interpolate_states(
     current.previous_position = current.position;
 
     current.quaternion.slerp(first.State.quaternion, last.State.quaternion, factor);
+
+    float mag2 = current.quaternion.x * current.quaternion.x +
+                 current.quaternion.y * current.quaternion.y +
+                 current.quaternion.z * current.quaternion.z +
+                 current.quaternion.w * current.quaternion.w;
+
+    if (mag2 > EPS) {
+        float inv = 1.0f / _sqrt(mag2);
+        current.quaternion.x *= inv;
+        current.quaternion.y *= inv;
+        current.quaternion.z *= inv;
+        current.quaternion.w *= inv;
+    } else {
+        current.quaternion.identity();
+    }
+
     current.previous_quaternion = current.quaternion;
     return ret_val;
 }
