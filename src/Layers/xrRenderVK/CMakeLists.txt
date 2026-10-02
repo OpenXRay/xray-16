@@ -88,6 +88,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanUISequenceVideoItem.h
     VulkanFontRender.cpp
     VulkanFontRender.h
+    VulkanStatGraphRender.cpp
+    VulkanStatGraphRender.h
     VulkanLevelRender.cpp
     VulkanLevelRender.h
     VulkanCameraState.h

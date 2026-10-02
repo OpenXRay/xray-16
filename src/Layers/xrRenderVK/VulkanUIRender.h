@@ -27,6 +27,7 @@ public:
     void CreateUIGeom() override;
     void DestroyUIGeom() override;
     void SetShader(IUIShader& shader) override;
+    void SetTextureDescriptor(VkDescriptorSet descriptor);
     void SetAlphaRef(int aref) override;
     void SetScissor(Irect* rect = nullptr) override;
     void PushPoint(float x, float y, float z, u32 color, float u, float v) override;

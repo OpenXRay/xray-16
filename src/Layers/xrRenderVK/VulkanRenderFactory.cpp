@@ -3,6 +3,7 @@
 #include "VulkanGameDevice.h"
 #include "VulkanUIShader.h"
 #include "VulkanFontRender.h"
+#include "VulkanStatGraphRender.h"
 #include "VulkanImGuiRender.h"
 #include "VulkanUISequenceVideoItem.h"
 
@@ -41,13 +42,21 @@ void VulkanRenderFactory::DestroyUISequenceVideoItem(IUISequenceVideoItem* objec
     delete object;
 }
 
+IStatGraphRender* VulkanRenderFactory::CreateStatGraphRender()
+{
+    return new VulkanStatGraphRender(device_);
+}
+void VulkanRenderFactory::DestroyStatGraphRender(IStatGraphRender* object)
+{
+    delete object;
+}
+
 // These contracts belong to the subsequent environment and debug milestones.
 #define VK_PENDING_FACTORY(Class) \
     I##Class* VulkanRenderFactory::Create##Class() { return nullptr; } \
     void VulkanRenderFactory::Destroy##Class(I##Class* object) \
     { R_ASSERT2(!object, "Vulkan factory object has not been implemented"); }
 #ifndef _EDITOR
-VK_PENDING_FACTORY(StatGraphRender)
 #ifdef DEBUG
 VK_PENDING_FACTORY(ObjectSpaceRender)
 #endif

@@ -108,6 +108,13 @@ void VulkanUIRender::SetShader(IUIShader& shader)
     texture_ = vk_shader->current_descriptor(Device.dwTimeContinual);
 }
 
+void VulkanUIRender::SetTextureDescriptor(VkDescriptorSet descriptor)
+{
+    R_ASSERT2(descriptor, "Vulkan UI requires a valid texture descriptor");
+    shader_ = nullptr;
+    texture_ = descriptor;
+}
+
 void VulkanUIRender::SetAlphaRef(int aref) { alpha_ref_ = std::clamp(aref, 0, 255); }
 
 void VulkanUIRender::SetScissor(Irect* rect)
