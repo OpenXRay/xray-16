@@ -120,6 +120,28 @@ void VulkanLevelRender::ResourcesDumpMemoryUsage()
 }
 void VulkanLevelRender::OnAssetsChanged()
 {
+    if (g_pGamePersistent && game_device_)
+    {
+        auto& environment = g_pGamePersistent->Environment();
+        // Clear descriptors before releasing their image views. The weather
+        // mixer binds the new views on the next environment update.
+        environment.m_pRender->Clear();
+        const auto visit = [](CEnvironment::EnvsMap& presets, bool create)
+        {
+            for (auto& [name, descriptors] : presets)
+                for (CEnvDescriptor* descriptor : descriptors)
+                {
+                    if (!descriptor || !descriptor->m_pDescriptor) continue;
+                    if (create) descriptor->on_device_create();
+                    else descriptor->on_device_destroy();
+                }
+        };
+        visit(environment.WeatherCycles, false);
+        visit(environment.WeatherFXs, false);
+        if (textures_) textures_->retire_unused();
+        visit(environment.WeatherCycles, true);
+        visit(environment.WeatherFXs, true);
+    }
     if (textures_) textures_->reload_assets();
     models_Clear(false);
     particle_catalog_.reset();
