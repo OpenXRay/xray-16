@@ -60,9 +60,9 @@ void CScriptEngine::script_register(lua_State* luaState)
         {
             FlushLog();
         }),
-        def("print_stack", +[]()
+        def("print_stack", +[](lua_State* L)
         {
-            GEnv.ScriptEngine->print_stack();
+            GEnv.ScriptEngine->print_stack(L);
         }),
         def("prefetch", +[](pcstr file_name)
         {
