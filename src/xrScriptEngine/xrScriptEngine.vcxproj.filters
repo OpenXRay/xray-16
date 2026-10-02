@@ -90,6 +90,9 @@
     <ClInclude Include="script_callback_ex.h">
       <Filter>ScriptCallbackEx</Filter>
     </ClInclude>
+    <ClInclude Include="script_snapshot_iterator.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
     <ClInclude Include="script_space.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
