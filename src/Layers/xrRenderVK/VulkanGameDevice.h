@@ -28,6 +28,8 @@ public:
     void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
     void queue_rain(VulkanRainRender& rain);
     void queue_thunderbolt(VulkanThunderboltRender& bolt);
+    void request_screenshot() { screenshot_requested_ = true; }
+    bool take_screenshot(std::vector<uint8_t>& pixels, VkExtent2D& extent, VkFormat& format);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error,
         bool render_world = true, bool clear_target = false);
@@ -74,6 +76,7 @@ private:
     static void record_models(const FrameRecordingContext& frame, void* user);
     static void record_transparent(const FrameRecordingContext& frame, void* user);
     static void record_level_visuals(const FrameRecordingContext& frame, void* user);
+    static void record_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user);
     struct LevelDraw
     {
         uint32_t index{};
@@ -128,5 +131,8 @@ private:
     bool reset_required_{};
     VkDescriptorSet weather_set_{};
     WeatherLighting weather_lighting_{};
+    BufferResource screenshot_buffer_;
+    bool screenshot_requested_{}, screenshot_ready_{}, readback_enabled_{};
+    VkExtent2D screenshot_extent_{};
 };
 }

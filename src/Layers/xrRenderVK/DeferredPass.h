@@ -10,11 +10,12 @@ struct DeferredLight
 {
     float direction_ambient[4];
     float color[4];
+    float grade[4]{1.f, 1.f, 1.f, 0.f}; // gamma, brightness, contrast, grayscale
 };
 
 struct WeatherLighting
 {
-    float inverse_view_projection[16]{};
+    float ray_base[4]{}, ray_dx[4]{}, ray_dy[4]{};
     DeferredLight light{};
     float sky_color[4]{};
     float clouds_color[4]{};
@@ -65,6 +66,7 @@ public:
         VkShaderModule weather_fragment,
         const ScenePassDispatch& dispatch, std::string& error);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
+    void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     bool weather_set(VkImageView sky_a, VkImageView sky_b,
@@ -89,6 +91,9 @@ public:
         const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr) const;
     void destroy();
+    void reset_draw_statistics() { draw_calls_ = triangles_ = 0; }
+    uint32_t draw_calls() const { return draw_calls_; }
+    uint32_t triangles() const { return triangles_; }
 
 private:
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,
@@ -100,5 +105,6 @@ private:
     VkDescriptorSetLayout material_layout_{}, gbuffer_layout_{}, weather_set_layout_{};
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
+    mutable uint32_t draw_calls_{}, triangles_{};
 };
 }

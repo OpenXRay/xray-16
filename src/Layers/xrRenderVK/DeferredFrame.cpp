@@ -58,7 +58,8 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     FrameRecorder models, void* models_data,
     FrameRecorder transparent, void* transparent_data,
     FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target,
-    VkDescriptorSet weather_set, const WeatherLighting* weather)
+    VkDescriptorSet weather_set, const WeatherLighting* weather,
+    FrameReadbackRecorder readback, void* readback_data)
 {
     targets_ = &targets;
     frame_ = &frame;
@@ -82,7 +83,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     recorded_ = true;
     const VkClearColorValue clear{{0, 0, 0, 1}};
     if (!frame.render_frame(clear, status, error, lighting, this,
-            nullptr, nullptr, geometry, this, clear_target)) return false;
+            readback, readback_data, geometry, this, clear_target)) return false;
     if (!recorded_)
     {
         error = "Vulkan deferred level command recording failed";

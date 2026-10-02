@@ -325,6 +325,17 @@ bool DeferredPass::material(VkImageView albedo, VkSampler sampler, VkDescriptorS
     return allocate(material_layout_, albedo, VK_NULL_HANDLE, sampler, set, error);
 }
 
+void DeferredPass::update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler)
+{
+    const VkDescriptorImageInfo image{sampler, view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = set;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.pImageInfo = &image;
+    vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+}
+
 bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
@@ -402,6 +413,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
 
@@ -422,6 +434,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
 
@@ -442,6 +455,7 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
 
@@ -464,6 +478,7 @@ bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescrip
         0, has_weather ? sizeof(WeatherLighting) : sizeof(light),
         has_weather ? static_cast<const void*>(weather) : static_cast<const void*>(&light));
     vk_.cmd_draw(frame.command_buffer, 3, 1, 0, 0);
+    ++draw_calls_; ++triangles_;
     return true;
 }
 

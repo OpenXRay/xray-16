@@ -15,7 +15,11 @@
 #include "xrEngine/thunderbolt.h"
 #include "xrEngine/device.h"
 #include "xrEngine/xr_object.h"
+#include "xrEngine/IGameFont.hpp"
+#include "xrEngine/vis_common.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/Media/Image.hpp"
+#include "xrCore/PostProcess/PPInfo.hpp"
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -25,10 +29,225 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
+#include <type_traits>
 #include <vector>
 
 namespace xray::render::vulkan
 {
+static_assert(!std::is_abstract_v<VulkanLevelRender>, "Vulkan IRender implementation must be complete");
+void VulkanLevelRender::create()
+{
+    m_skinning = -1;
+    m_MSAASample = -1;
+}
+void VulkanLevelRender::destroy()
+{
+    if (frame_phase_.active()) frame_phase_.reset();
+    destroy_all_models();
+    level_Unload();
+}
+
+void VulkanLevelRender::DumpStatistics(IGameFont& font, IPerformanceAlert*)
+{
+    font.OutNext("Vulkan: %u draws, %u triangles", frame_draw_calls_, frame_triangles_);
+    font.OutNext("Textures: %zu, %llu bytes", textures_ ? textures_->resident_count() : 0,
+        static_cast<unsigned long long>(textures_ ? textures_->resident_bytes() : 0));
+    font.OutNext("Models: %zu live, %zu pooled", models_.size(), model_pool_.size());
+}
+
+xrImTextureData VulkanLevelRender::GetImGuiTextureId(pcstr name)
+{
+    xrImTextureData result{};
+    if (!game_device_ || !name || !*name) return result;
+    VkDescriptorSet descriptor{};
+    VkExtent2D extent{};
+    auto it = imgui_textures_.find(name);
+    if (it == imgui_textures_.end())
+    {
+        std::string error;
+        if (!textures_->ui(name, game_device_->ui_pass(), descriptor, error, &extent))
+        { Msg("! [renderer-vulkan] ImGui texture %s: %s", name, error.c_str()); return result; }
+        imgui_textures_.emplace(name, ImGuiTexture{descriptor, extent});
+    }
+    else { descriptor = it->second.descriptor; extent = it->second.extent; }
+    static_assert(sizeof(descriptor) <= sizeof(result.texture));
+    std::memcpy(&result.texture, &descriptor, sizeof(descriptor));
+    result.size.set(float(extent.width), float(extent.height));
+    return result;
+}
+
+void VulkanLevelRender::models_Prefetch()
+{
+    // Uploads are queued at material creation; force completion at the engine's prefetch barrier.
+    ResourcesDeferredUpload();
+}
+bool VulkanLevelRender::occ_visible(vis_data& visual) { return occ_visible(visual.box); }
+bool VulkanLevelRender::occ_visible(Fbox& bounds)
+{
+    u32 mask = FRUSTUM_P_ALL;
+    return ViewBase.testAABB(bounds.data(), mask) != fcvNone;
+}
+bool VulkanLevelRender::occ_visible(sPoly&) { return true; }
+void VulkanLevelRender::BeforeWorldRender() {}
+void VulkanLevelRender::AfterWorldRender() {}
+void VulkanLevelRender::ObtainRequiredWindowFlags(u32& flags) { flags |= SDL_WINDOW_VULKAN; }
+void VulkanLevelRender::overdrawBegin() {}
+void VulkanLevelRender::overdrawEnd() {}
+void VulkanLevelRender::DeferredLoad(bool enabled) { deferred_load_ = enabled; }
+void VulkanLevelRender::ResourcesDeferredUpload()
+{
+    if (textures_) R_ASSERT2(textures_->finish_uploads(), "Vulkan deferred texture upload failed");
+}
+void VulkanLevelRender::ResourcesDeferredUnload()
+{
+    if (textures_) textures_->retire_unused();
+    models_Clear(false);
+}
+void VulkanLevelRender::ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps)
+{
+    const uint64_t bytes = textures_ ? textures_->resident_bytes() : 0;
+    m_base = static_cast<u32>(std::min<uint64_t>(bytes, UINT32_MAX));
+    c_base = textures_ ? static_cast<u32>(textures_->resident_count()) : 0;
+    m_lmaps = c_lmaps = 0;
+}
+void VulkanLevelRender::ResourcesDestroyNecessaryTextures() { ResourcesDeferredUnload(); }
+void VulkanLevelRender::ResourcesStoreNecessaryTextures() { ResourcesDeferredUpload(); }
+void VulkanLevelRender::ResourcesDumpMemoryUsage()
+{
+    Msg("* [renderer-vulkan] textures: %zu, approximate bytes: %llu",
+        textures_ ? textures_->resident_count() : 0,
+        static_cast<unsigned long long>(textures_ ? textures_->resident_bytes() : 0));
+}
+void VulkanLevelRender::OnAssetsChanged()
+{
+    if (textures_) textures_->reload_assets();
+    models_Clear(false);
+    particle_catalog_.reset();
+}
+void VulkanLevelRender::Screenshot(ScreenshotMode mode, pcstr name)
+{
+    if (!game_device_) return;
+    if (mode != SM_NORMAL && (!name || !*name))
+    { Msg("! [renderer-vulkan] screenshot requires a path or postfix"); return; }
+    screenshot_ = std::make_unique<ScreenshotRequest>(ScreenshotRequest{mode, name ? name : ""});
+    game_device_->request_screenshot();
+}
+
+void VulkanLevelRender::save_screenshot()
+{
+    if (!screenshot_) return;
+    std::vector<u8> pixels;
+    VkExtent2D extent{};
+    VkFormat format{};
+    if (!game_device_->take_screenshot(pixels, extent, format))
+    { Msg("! [renderer-vulkan] screenshot readback unavailable on this surface"); screenshot_.reset(); return; }
+    if (format == VK_FORMAT_B8G8R8A8_UNORM)
+        for (size_t i = 0; i < pixels.size(); i += 4) std::swap(pixels[i], pixels[i + 2]);
+    const auto request = std::move(screenshot_);
+    string_path filename{};
+    IWriter* writer = nullptr;
+    if (request->mode == SM_NORMAL)
+    {
+        string64 time;
+        xr_sprintf(filename, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(time),
+            g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+        writer = FS.w_open("$screenshots$", filename);
+    }
+    else if (request->mode == SM_FOR_GAMESAVE)
+        writer = FS.w_open(request->name.c_str());
+    else
+    {
+        strconcat(sizeof(filename), filename, request->name.c_str(), ".tga");
+        writer = FS.w_open("$screenshots$", filename);
+    }
+    if (!writer) { Msg("! [renderer-vulkan] screenshot output could not be opened"); return; }
+
+    if (request->mode == SM_NORMAL)
+    {
+        std::vector<u8> rgb(size_t(extent.width) * extent.height * 3);
+        for (size_t i = 0, j = 0; i < pixels.size(); i += 4, j += 3)
+            std::copy_n(pixels.data() + i, 3, rgb.data() + j);
+        XRay::Media::Image img(extent.width, extent.height, rgb.data(), XRay::Media::ImageDataFormat::RGB8);
+        if (!img.SaveJPEG(*writer, 100)) Msg("! [renderer-vulkan] JPEG screenshot encoding failed");
+    }
+    else if (request->mode == SM_FOR_GAMESAVE)
+    {
+        // 128x128 BC1 DDS, matching the game save preview's on-disk format.
+        constexpr u32 side = 128;
+        u32 header[32]{};
+        header[0] = 0x20534444; header[1] = 124; header[2] = 0x81007;
+        header[3] = side; header[4] = side; header[5] = side * side / 2;
+        header[19] = 32; header[20] = 4; header[21] = 0x31545844;
+        header[27] = 0x1000;
+        writer->w(header, sizeof(header));
+        std::array<u8, side * side * 3> scaled{};
+        for (u32 y = 0; y < side; ++y) for (u32 x = 0; x < side; ++x)
+        {
+            const size_t src = (size_t(y) * extent.height / side * extent.width +
+                size_t(x) * extent.width / side) * 4;
+            const size_t dst = (size_t(y) * side + x) * 3;
+            std::copy_n(pixels.data() + src, 3, scaled.data() + dst);
+        }
+        for (u32 by = 0; by < side; by += 4) for (u32 bx = 0; bx < side; bx += 4)
+        {
+            u8 low[3]{255, 255, 255}, high[3]{};
+            for (u32 y = 0; y < 4; ++y) for (u32 x = 0; x < 4; ++x)
+                for (u32 c = 0; c < 3; ++c)
+                {
+                    u8 v = scaled[((by + y) * side + bx + x) * 3 + c];
+                    low[c] = std::min(low[c], v); high[c] = std::max(high[c], v);
+                }
+            const auto pack = [](const u8* v) -> u16
+            { return u16((v[0] >> 3) << 11 | (v[1] >> 2) << 5 | (v[2] >> 3)); };
+            u16 endpoints[2]{pack(high), pack(low)};
+            if (endpoints[0] <= endpoints[1])
+                endpoints[0] = endpoints[1] < 65535 ? endpoints[1] + 1 : 65535;
+            u8 palette[4][3]{};
+            for (u32 c = 0; c < 3; ++c)
+            {
+                palette[0][c] = high[c]; palette[1][c] = low[c];
+                palette[2][c] = (2 * high[c] + low[c]) / 3;
+                palette[3][c] = (high[c] + 2 * low[c]) / 3;
+            }
+            u32 selectors = 0;
+            for (u32 y = 0; y < 4; ++y) for (u32 x = 0; x < 4; ++x)
+            {
+                const u8* p = &scaled[((by + y) * side + bx + x) * 3];
+                u32 best = 0, distance = UINT32_MAX;
+                for (u32 i = 0; i < 4; ++i)
+                {
+                    u32 d = 0;
+                    for (u32 c = 0; c < 3; ++c) { int delta = int(p[c]) - palette[i][c]; d += delta * delta; }
+                    if (d < distance) { distance = d; best = i; }
+                }
+                selectors |= best << (2 * (y * 4 + x));
+            }
+            writer->w(endpoints, sizeof(endpoints)); writer->w(&selectors, sizeof(selectors));
+        }
+    }
+    else
+    {
+        const u32 side = extent.height;
+        std::vector<u8> square(size_t(side) * side * 4);
+        for (u32 y = 0; y < side; ++y) for (u32 x = 0; x < side; ++x)
+        {
+            const u32 source_x = u32(uint64_t(x) * extent.width / side);
+            std::copy_n(pixels.data() + (size_t(y) * extent.width + source_x) * 4,
+                4, square.data() + (size_t(y) * side + x) * 4);
+        }
+        XRay::Media::Image img(side, side, square.data(), XRay::Media::ImageDataFormat::RGBA8);
+        img.SaveTGA(*writer, true);
+    }
+    FS.w_close(writer);
+}
+void VulkanLevelRender::SetPostProcessParams(const SPPInfo& ppi)
+{
+    gray_ = std::clamp(ppi.gray, 0.f, 1.f);
+}
+void VulkanLevelRender::setGamma(float value) { gamma_ = std::clamp(value, .01f, 4.f); }
+void VulkanLevelRender::setBrightness(float value) { brightness_ = std::clamp(value, 0.f, 4.f); }
+void VulkanLevelRender::setContrast(float value) { contrast_ = std::clamp(value, 0.f, 4.f); }
+void VulkanLevelRender::updateGamma() {}
 namespace
 {
 bool wallmark_geometry(const Fvector (&triangle)[3], const Fvector& point,
@@ -402,6 +621,11 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
 
 void VulkanLevelRender::OnDeviceDestroy(bool)
 {
+    if (game_device_ && textures_)
+        for (const auto& [name, texture] : imgui_textures_)
+            textures_->release_ui(texture.descriptor, game_device_->ui_pass());
+    imgui_textures_.clear();
+    screenshot_.reset();
     destroy_all_models();
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader teardown requires idle GPU frames");
@@ -438,6 +662,8 @@ void VulkanLevelRender::Begin()
     R_ASSERT2(game_device_ && !frame_phase_.active(),
         "Vulkan renderer Begin requires an initialized idle frame");
     game_device_->begin_frame();
+    frame_draw_calls_ = frame_triangles_ = 0;
+    if (pass_) pass_->reset_draw_statistics();
     const auto expired = std::remove_if(wallmarks_.begin(), wallmarks_.end(),
         [](const Wallmark& mark) { return Device.fTimeGlobal >= mark.expires; });
     if (expired != wallmarks_.end())
@@ -578,7 +804,11 @@ void VulkanLevelRender::End()
         }
 
     const DeferredEnvironment environment = current_environment();
-    const DeferredLight light = make_environment_deferred_light(environment);
+    DeferredLight light = make_environment_deferred_light(environment);
+    light.grade[0] = gamma_;
+    light.grade[1] = brightness_;
+    light.grade[2] = contrast_;
+    light.grade[3] = gray_;
     FrameStatus status = FrameStatus::Presented;
     std::string error;
     const bool clear_target = frame_clear_target_;
@@ -587,6 +817,12 @@ void VulkanLevelRender::End()
     {
         Msg("! Vulkan frame recording/submission failed: %s", error.c_str());
         return;
+    }
+    if (status == FrameStatus::Presented) save_screenshot();
+    if (pass_)
+    {
+        frame_draw_calls_ = pass_->draw_calls();
+        frame_triangles_ = pass_->triangles();
     }
     if (status == FrameStatus::RecreateRequired)
         reset_pending_ = true;

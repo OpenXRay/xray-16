@@ -121,7 +121,25 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
     }
     Fmatrix inverse;
     inverse.invert(Device.mFullTransform);
-    std::memcpy(lighting_.inverse_view_projection, &inverse, sizeof(inverse));
+    const auto ray = [&inverse](float x, float y)
+    {
+        Fvector4 near_clip, far_clip, near_world, far_world;
+        near_clip.set(x, y, 0.f, 1.f);
+        far_clip.set(x, y, 1.f, 1.f);
+        inverse.transform(near_world, near_clip);
+        inverse.transform(far_world, far_clip);
+        Fvector result;
+        result.set(far_world.x / far_world.w - near_world.x / near_world.w,
+            far_world.y / far_world.w - near_world.y / near_world.w,
+            far_world.z / far_world.w - near_world.z / near_world.w);
+        return result;
+    };
+    const Fvector base = ray(-1.f, -1.f);
+    const Fvector dx = ray(1.f, -1.f);
+    const Fvector dy = ray(-1.f, 1.f);
+    lighting_.ray_base[0] = base.x; lighting_.ray_base[1] = base.y; lighting_.ray_base[2] = base.z;
+    lighting_.ray_dx[0] = dx.x - base.x; lighting_.ray_dx[1] = dx.y - base.y; lighting_.ray_dx[2] = dx.z - base.z;
+    lighting_.ray_dy[0] = dy.x - base.x; lighting_.ray_dy[1] = dy.y - base.y; lighting_.ray_dy[2] = dy.z - base.z;
     const auto& current = env.CurrentEnv;
     lighting_.light.color[3] = blend_;
     lighting_.sky_color[0] = current.sky_color.x;

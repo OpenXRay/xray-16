@@ -39,6 +39,12 @@ public:
     // The last release waits for submitted frames before freeing GPU objects.
     void release_material(VkDescriptorSet set, DeferredPass& pass);
     void release_ui(VkDescriptorSet set, ScenePass& pass);
+    bool finish_uploads();
+    void retire_unused();
+    void invalidate_unused();
+    void reload_assets();
+    uint64_t resident_bytes() const;
+    size_t resident_count() const { return assets_.size(); }
     void destroy();
 
 private:
@@ -48,6 +54,7 @@ private:
         VkDescriptorSet material_set{};
         VkDescriptorSet ui_set{};
         VkExtent2D extent{};
+        uint64_t bytes{};
         size_t material_refs{};
         size_t ui_refs{};
         size_t environment_refs{};

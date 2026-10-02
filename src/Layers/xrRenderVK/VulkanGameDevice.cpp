@@ -22,7 +22,12 @@ template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const
 bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::string& error)
 {
     destroy();
-    if (!window_.initialize(window, extent, false, error, true, true)) return false;
+    readback_enabled_ = window_.initialize(window, extent, true, error, true, true);
+    if (!readback_enabled_)
+    {
+        // Some surfaces lack TRANSFER_SRC. Rendering still works on those devices.
+        if (!window_.initialize(window, extent, false, error, true, true)) return false;
+    }
     const VkDevice device = window_.device();
     const auto get = window_.device_proc();
     const auto& physical = window_.physical();
@@ -397,6 +402,40 @@ void VulkanGameDevice::queue_thunderbolt(VulkanThunderboltRender& bolt)
     thunderbolt_draws_.push_back(&bolt);
 }
 
+void VulkanGameDevice::record_readback(VkCommandBuffer command, VkImage image,
+    VkExtent2D extent, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    VkBufferImageCopy region{};
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.layerCount = 1;
+    region.imageExtent = {extent.width, extent.height, 1};
+    owner.frame_dispatch_.cmd_copy_image_to_buffer(command, image,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, owner.screenshot_buffer_.handle(), 1, &region);
+    VkBufferMemoryBarrier barrier{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+    barrier.srcQueueFamilyIndex = barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.buffer = owner.screenshot_buffer_.handle();
+    barrier.size = VK_WHOLE_SIZE;
+    owner.frame_dispatch_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_HOST_BIT, 0, 0, nullptr, 1, &barrier, 0, nullptr);
+}
+
+bool VulkanGameDevice::take_screenshot(std::vector<uint8_t>& pixels,
+    VkExtent2D& extent, VkFormat& format)
+{
+    if (!screenshot_ready_) return false;
+    screenshot_ready_ = false;
+    extent = screenshot_extent_;
+    format = window_.frame().format();
+    pixels.resize(size_t(extent.width) * extent.height * 4);
+    std::string error;
+    if (!screenshot_buffer_.read(0, pixels.data(), pixels.size(), error))
+    { Msg("! [renderer-vulkan] screenshot: %s", error.c_str()); return false; }
+    return true;
+}
+
 void VulkanGameDevice::discard_scene_draws()
 {
     model_draws_.clear();
@@ -420,11 +459,25 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     const float weather_blend = weather_lighting_.light.color[3];
     weather_lighting_.light = light;
     weather_lighting_.light.color[3] = weather_blend;
+    screenshot_ready_ = false;
+    if (screenshot_requested_ && readback_enabled_)
+    {
+        screenshot_extent_ = window_.frame().extent();
+        const VkDeviceSize bytes = VkDeviceSize(screenshot_extent_.width) * screenshot_extent_.height * 4;
+        if (screenshot_buffer_.size() < bytes)
+        {
+            if (!window_.frame().wait_idle() || !screenshot_buffer_.initialize(window_.device(), bytes,
+                    VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, window_.physical().memory,
+                    buffer_upload_.buffer, error)) return false;
+        }
+    }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
             scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target,
-            render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_))
+            render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_,
+            screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
@@ -437,6 +490,9 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     }
     if (status == FrameStatus::RecreateRequired)
         reset_required_ = true;
+    else if (screenshot_requested_ && readback_enabled_)
+        screenshot_ready_ = window_.frame().wait_idle();
+    screenshot_requested_ = false;
     model_draws_.clear();
     particle_draws_.clear();
     level_draws_.clear();
@@ -538,6 +594,8 @@ void VulkanGameDevice::destroy()
     if (window_.device() && frame_dispatch_.device_wait_idle)
         frame_dispatch_.device_wait_idle(window_.device());
     ui_.DestroyUIGeom();
+    screenshot_buffer_.destroy();
+    screenshot_requested_ = screenshot_ready_ = readback_enabled_ = false;
     model_draws_.clear();
     particle_draws_.clear();
     level_draws_.clear();

@@ -305,6 +305,17 @@ bool ScenePass::create_ui_texture_set(VkImageView view, VkSampler sampler, VkDes
     return true;
 }
 
+void ScenePass::update_ui_texture_set(VkDescriptorSet set, VkImageView view, VkSampler sampler)
+{
+    const VkDescriptorImageInfo image{sampler, view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = set;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.pImageInfo = &image;
+    m_vk.update_descriptor_sets(m_device, 1, &write, 0, nullptr);
+}
+
 void ScenePass::release_ui_texture_set(VkDescriptorSet& set)
 {
     if (m_device && m_ui_descriptor_pool && set && m_vk.free_descriptor_sets)

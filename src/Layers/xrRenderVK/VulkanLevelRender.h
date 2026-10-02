@@ -85,6 +85,43 @@ public:
     void clear_static_wallmarks() override;
     DeviceState GetDeviceState() override;
     void OnAppLifecycleChanged(bool active) override;
+    GenerationLevel GetGeneration() const override { return GENERATION_R2; }
+    BackendAPI GetBackendAPI() const override { return BackendAPI::Vulkan; }
+    bool is_sun_static() override { return false; }
+    u32 get_dx_level() override { return 110; }
+    void create() override;
+    void destroy() override;
+    void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) override;
+    pcstr getShaderPath() override { return "vk\\"; }
+    xrImTextureData GetImGuiTextureId(pcstr texture_name) override;
+    void model_Logging(bool enabled) override { model_logging_ = enabled; }
+    void models_Prefetch() override;
+    bool occ_visible(vis_data& visual) override;
+    bool occ_visible(Fbox& bounds) override;
+    bool occ_visible(sPoly& polygon) override;
+    void BeforeWorldRender() override;
+    void AfterWorldRender() override;
+    void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) override;
+    void SetPostProcessParams(const SPPInfo& ppi) override;
+    void setGamma(float value) override;
+    void setBrightness(float value) override;
+    void setContrast(float value) override;
+    void updateGamma() override;
+    void ObtainRequiredWindowFlags(u32& flags) override;
+    void overdrawBegin() override;
+    void overdrawEnd() override;
+    void DeferredLoad(bool enabled) override;
+    void ResourcesDeferredUpload() override;
+    void ResourcesDeferredUnload() override;
+    void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) override;
+    void ResourcesDestroyNecessaryTextures() override;
+    void ResourcesStoreNecessaryTextures() override;
+    void ResourcesDumpMemoryUsage() override;
+    bool HWSupportsShaderYUV2RGB() override { return false; }
+    bool GetForceGPU_REF() override { return false; }
+    u32 GetCacheStatCalls() override { return frame_draw_calls_; }
+    u32 GetCacheStatPolys() override { return frame_triangles_; }
+    void OnAssetsChanged() override;
 
 protected:
     GpuLevel& gpu_level() { return level_; }
@@ -143,5 +180,13 @@ private:
     VulkanFramePhaseState frame_phase_;
     bool clear_target_pending_{};
     bool frame_clear_target_{};
+    bool deferred_load_{}, model_logging_{};
+    u32 frame_draw_calls_{}, frame_triangles_{};
+    float gamma_{1.f}, brightness_{1.f}, contrast_{1.f}, gray_{};
+    struct ImGuiTexture { VkDescriptorSet descriptor{}; VkExtent2D extent{}; };
+    std::unordered_map<std::string, ImGuiTexture> imgui_textures_;
+    struct ScreenshotRequest { ScreenshotMode mode; std::string name; };
+    std::unique_ptr<ScreenshotRequest> screenshot_;
+    void save_screenshot();
 };
 }

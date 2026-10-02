@@ -89,6 +89,8 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     auto inserted = assets_.emplace(key, Asset{}).first;
     inserted->second.texture = texture;
     inserted->second.extent = {extent.width, extent.height};
+    // Conservative RGBA-equivalent residency estimate for DDS mip chains.
+    inserted->second.bytes = uint64_t(extent.width) * extent.height * 4;
     asset = &inserted->second;
     return true;
 }
@@ -172,6 +174,7 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
         return false;
     }
     asset.extent = {width, height};
+    asset.bytes = size_t(width) * height * 4;
     asset.ui_refs = 1;
     asset.ui_pass = &pass;
     result = asset.ui_set;
@@ -287,5 +290,73 @@ void GameTextureFactory::destroy()
     destroy_sampler_ = nullptr;
     wait_idle_ = nullptr;
     dispatch_ = {};
+}
+
+bool GameTextureFactory::finish_uploads()
+{
+    return !device_ || wait_for_uploads(device_, pool_, dispatch_, pending_);
+}
+
+void GameTextureFactory::retire_unused()
+{
+    if (!device_) return;
+    R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan texture retirement requires idle frames");
+    for (auto it = assets_.begin(); it != assets_.end();)
+    {
+        if (it->second.material_refs || it->second.ui_refs || it->second.environment_refs)
+        { ++it; continue; }
+        auto name = it->first;
+        ++it;
+        evict_if_unused(name);
+    }
+}
+
+void GameTextureFactory::invalidate_unused()
+{
+    // Active descriptors retain their image views until consumers release them.
+    // Newly requested assets resolve their VFS path again after retirement.
+    retire_unused();
+}
+
+void GameTextureFactory::reload_assets()
+{
+    if (!device_) return;
+    R_ASSERT2(wait_idle_(device_) == VK_SUCCESS && finish_uploads(),
+        "Vulkan asset reload needs idle frames and completed uploads");
+    for (auto& [path, asset] : assets_)
+    {
+        if (path[0] == '#' || asset.environment_refs) continue;
+        IReader* source = FS.r_open(path.c_str());
+        if (!source) continue;
+        UploadedTexture replacement;
+        VkExtent3D extent{};
+        std::string error;
+        const bool loaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
+            source->pointer(), source->length(), bc_supported_, replacement, pending_, states_,
+            error, &extent);
+        FS.r_close(source);
+        if (!loaded || !finish_uploads())
+        {
+            Msg("! [renderer-vulkan] texture reload %s: %s", path.c_str(), error.c_str());
+            continue;
+        }
+        if (asset.material_set && asset.material_pass)
+            asset.material_pass->update_material(asset.material_set, replacement.view, sampler_);
+        if (asset.ui_set && asset.ui_pass)
+            asset.ui_pass->update_ui_texture_set(asset.ui_set, replacement.view, sampler_);
+        states_.forget_image(asset.texture.image);
+        destroy_texture(device_, dispatch_, asset.texture);
+        asset.texture = replacement;
+        asset.extent = {extent.width, extent.height};
+        asset.bytes = uint64_t(extent.width) * extent.height * 4;
+    }
+    retire_unused();
+}
+
+uint64_t GameTextureFactory::resident_bytes() const
+{
+    uint64_t bytes = 0;
+    for (const auto& [name, asset] : assets_) bytes += asset.bytes;
+    return bytes;
 }
 }
