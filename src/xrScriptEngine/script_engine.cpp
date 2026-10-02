@@ -573,11 +573,21 @@ void CScriptEngine::print_error(lua_State* L, int iErrorCode, pcstr message)
 
     switch (iErrorCode)
     {
-    case LUA_ERRRUN:    header = "SCRIPT RUNTIME ERROR"; break;
-    case LUA_ERRMEM:    header = "SCRIPT ERROR (memory allocation)"; break;
-    case LUA_ERRERR:    header = "SCRIPT ERROR (while running the error handler function)"; break;
-    case LUA_ERRFILE:   header = "SCRIPT ERROR (while running file)"; break;
-    case LUA_ERRSYNTAX: header = "SCRIPT SYNTAX ERROR"; break;
+    case LUA_ERRRUN:
+        header = "SCRIPT RUNTIME ERROR";
+        break;
+    case LUA_ERRMEM:
+        header = "SCRIPT ERROR (memory allocation)";
+        break;
+    case LUA_ERRERR:
+        header = "SCRIPT ERROR (while running the error handler function)";
+        break;
+    case LUA_ERRFILE:
+        header = "SCRIPT ERROR (while running file)";
+        break;
+    case LUA_ERRSYNTAX:
+        header = "SCRIPT SYNTAX ERROR";
+        break;
     case LUA_YIELD:
         scriptEngine->script_log(LuaMessageType::Info, "Thread is yielded");
         return;
