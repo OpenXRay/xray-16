@@ -46,6 +46,9 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_camera_state_test tests/vulkan_camera_state.cpp)
     xray_add_vulkan_state_test(vulkan_slide_windows_test tests/vulkan_slide_windows.cpp)
     xray_add_vulkan_state_test(vulkan_skeleton_bones_test tests/vulkan_skeleton_bones.cpp)
+    xray_add_vulkan_state_test(vulkan_skeleton_motions_test tests/vulkan_skeleton_motions.cpp)
+    target_sources(vulkan_skeleton_motions_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SkeletonMotions.cpp")
     target_sources(vulkan_skeleton_bones_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SkeletonBones.cpp")
     target_include_directories(vulkan_skeleton_bones_test PRIVATE

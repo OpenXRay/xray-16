@@ -745,6 +745,17 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
             return nullptr;
         auto instance = VulkanKinematics::create(bones, model.get(), error);
         if (!instance) return nullptr;
+        if (record.type == 3)
+        {
+            std::vector<std::string> bone_names;
+            bone_names.reserve(bones.bones.size());
+            for (const auto& bone : bones.bones)
+                bone_names.push_back(bone.name);
+            std::vector<MotionSlot> motions;
+            if (!parse_skeleton_motions({ record.source.data(), record.source.size() }, bone_names, cache_name, load_engine_motion_files, motions, error))
+                return nullptr;
+            instance->set_motions(std::move(motions));
+        }
         model->set_skeleton(std::move(instance));
     }
     const std::string texture = record.texture.empty() ? inherited_texture : record.texture;

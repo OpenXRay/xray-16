@@ -38,6 +38,10 @@ int main()
     assert(kinematics && error.empty());
     visual->set_skeleton(std::move(kinematics));
     auto* pose = visual->dcast_PKinematics();
+    MotionSlot slot;
+    slot.source = "actor.omf";
+    slot.clips.emplace_back().name = "idle";
+    static_cast<VulkanKinematics*>(pose)->set_motions({ slot });
     ModelGeometry geometry;
     geometry.type = 3;
     geometry.children.resize(1);
@@ -85,6 +89,7 @@ int main()
 
     auto duplicate = std::make_unique<VulkanModelVisual>(*visual);
     auto* copied = duplicate->dcast_PKinematics();
+    assert(static_cast<VulkanKinematics*>(copied)->motions()[0].clips[0].name == "idle");
     assert(copied && copied->dcast_RenderVisual() == duplicate.get());
     assert(copied->LL_BoneCount() == 2 && !copied->LL_GetBoneVisible(1));
     copied->LL_SetBoneVisible(1, TRUE, FALSE);

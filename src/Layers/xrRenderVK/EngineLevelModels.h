@@ -1,8 +1,9 @@
 #pragma once
 
 #include "LevelModels.h"
-#include "VisualCatalog.h"
 #include "ModelGeometry.h"
+#include "SkeletonMotions.h"
+#include "VisualCatalog.h"
 
 class IReader;
 
@@ -17,4 +18,5 @@ bool load_engine_model_visual(const char* name, VisualRecord& result, std::strin
 bool load_engine_model_geometry(const char* name, IReader* source,
     ModelGeometry& result, std::string& error);
 bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& result, std::string& error);
+bool load_engine_motion_files(const std::string& pattern, std::vector<MotionFile>& files, std::string& error);
 }

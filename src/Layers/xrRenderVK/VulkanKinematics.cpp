@@ -19,7 +19,18 @@ struct VulkanKinematics::Data
     u16 root = BI_NONE;
     std::unique_ptr<CInifile> user_data;
     std::vector<ModelGeometry> meshes;
+    std::vector<MotionSlot> motions;
 };
+
+void VulkanKinematics::set_motions(std::vector<MotionSlot> motions)
+{
+    data_->motions = std::move(motions);
+}
+
+const std::vector<MotionSlot>& VulkanKinematics::motions() const
+{
+    return data_->motions;
+}
 
 VulkanKinematics::VulkanKinematics(std::shared_ptr<Data> data, IRenderVisual* owner)
     : data_(std::move(data)), owner_(owner), instances_(data_->bones.size())

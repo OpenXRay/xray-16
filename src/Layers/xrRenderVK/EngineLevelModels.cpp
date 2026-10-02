@@ -175,6 +175,92 @@ bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& res
     return true;
 }
 
+bool load_engine_motion_files(const std::string& pattern, std::vector<MotionFile>& files, std::string& error)
+{
+    std::vector<std::string> names;
+    if (pattern.find('*') != std::string::npos)
+    {
+        FS_FileSet found;
+        FS.file_list(found, "$game_meshes$", FS_ListFiles, pattern.c_str());
+        FS.file_list(found, "$level$", FS_ListFiles, pattern.c_str());
+        for (const auto& entry : found)
+            names.push_back(entry.name.c_str());
+    }
+    else
+        names.push_back(pattern);
+
+    std::vector<MotionFile> loaded;
+    for (const auto& name : names)
+    {
+        string_path filename;
+        if (!FS.exist(filename, "$level$", name.c_str()) && !FS.exist(filename, "$game_meshes$", name.c_str()))
+        {
+            error = "motion file not found: " + name;
+            return false;
+        }
+        IReader* reader = FS.r_open(filename);
+        if (!reader)
+        {
+            error = "motion file cannot be opened: " + name;
+            return false;
+        }
+        IReader* params = reader->open_chunk(OGF_S_SMPARAMS);
+        IReader* motions = reader->open_chunk(OGF_S_MOTIONS);
+        std::vector<uint8_t> bytes;
+        if (params && motions && params->length() <= UINT32_MAX)
+        {
+            IReader* count = motions->open_chunk(0);
+            std::vector<uint8_t> tracks;
+            if (count && count->length() == sizeof(u32))
+            {
+                append_chunk(tracks, 0, static_cast<const uint8_t*>(count->pointer()), count->length());
+                const u32 clip_count = count->r_u32();
+                if (clip_count == 0 || clip_count >= 0x3fff)
+                    tracks.clear();
+                else
+                    for (u32 i = 1; i <= clip_count; ++i)
+                    {
+                        IReader* clip = motions->open_chunk(i);
+                        if (!clip || clip->length() > UINT32_MAX)
+                            tracks.clear();
+                        else if (!tracks.empty())
+                            append_chunk(tracks, i, static_cast<const uint8_t*>(clip->pointer()), clip->length());
+                        if (clip)
+                            clip->close();
+                        if (tracks.empty())
+                            break;
+                    }
+            }
+            if (count)
+                count->close();
+            if (!tracks.empty())
+            {
+                append_chunk(bytes, OGF_S_SMPARAMS, static_cast<const uint8_t*>(params->pointer()), params->length());
+                append_chunk(bytes, OGF_S_MOTIONS, tracks.data(), tracks.size());
+            }
+        }
+        if (params)
+            params->close();
+        if (motions)
+            motions->close();
+        FS.r_close(reader);
+        if (bytes.empty())
+        {
+            error = "motion file is missing parameters or clips: " + name;
+            return false;
+        }
+        loaded.emplace_back(name, std::move(bytes));
+    }
+    if (loaded.empty())
+    {
+        error = "motion file not found: " + pattern;
+        return false;
+    }
+    files = std::move(loaded);
+    error.clear();
+    return true;
+}
+
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error)
 {
     error.clear();

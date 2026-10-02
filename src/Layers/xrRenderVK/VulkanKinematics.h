@@ -3,6 +3,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "ModelGeometry.h"
 #include "SkeletonBones.h"
+#include "SkeletonMotions.h"
 #include "xrCore/Animation/Bone.hpp"
 
 #include <memory>
@@ -17,6 +18,8 @@ public:
         IRenderVisual* owner, std::string& error);
     VulkanKinematics(const VulkanKinematics& source, IRenderVisual* owner);
     bool attach_geometry(const ModelGeometry& geometry, std::string& error);
+    void set_motions(std::vector<MotionSlot> motions);
+    const std::vector<MotionSlot>& motions() const;
     void reset_instance_state();
 
     void Bone_Calculate(CBoneData* bone, Fmatrix* parent) override;

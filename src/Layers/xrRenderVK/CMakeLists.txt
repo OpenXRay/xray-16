@@ -44,6 +44,8 @@ target_sources(xrRenderVK PRIVATE
     ModelGeometry.h
     SkeletonBones.cpp
     SkeletonBones.h
+    SkeletonMotions.cpp
+    SkeletonMotions.h
     VulkanKinematics.cpp
     VulkanKinematics.h
     ScreenCopyPass.cpp
