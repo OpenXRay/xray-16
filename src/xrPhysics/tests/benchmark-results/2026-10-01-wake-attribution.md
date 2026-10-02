@@ -2,7 +2,8 @@
 
 Local continuation of [issue #2139](https://github.com/OpenXRay/xray-16/issues/2139),
 following the [Clear Sky comparison](2026-10-01-clear-sky.md).
-Production changes are in `7d973f106`; these changes have not been pushed.
+Production changes are in `7d973f106`, following the first optimization in
+draft PR #2167. Measurements were collected locally before publication.
 
 ## What caused the excess work
 
@@ -191,5 +192,5 @@ callback fallback. Existing fluid-region movement/material-flag, friction,
 capture, suspension, joint-feedback, character and collision-owner checks pass.
 The CDB build passes; final game query comparisons exercise the loaded meshes.
 
-This remains a local experiment. The previously observed shader-compiler exit
+This remains an experimental draft. The previously observed shader-compiler exit
 heap exception has no identified corrupting write and is not claimed fixed.

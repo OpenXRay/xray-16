@@ -1,13 +1,13 @@
 # Native Jolt physics migration
 
 The results below describe the initial native port. See
-[NativePerformance.md](NativePerformance.md) for the local performance followup
+[NativePerformance.md](NativePerformance.md) for the performance followups
 and its separate comparisons.
 
 This branch, `followup/jolt-native-physics`, is stacked on
 `followup/jolt-physics` at `888ab2d02`. It is a separate worktree at
 `C:/code/xray-jolt-native`. The migration and first optimization are published
-as draft PRs #2166 and #2167. Later optimizations remain local; the latest
+as draft PRs #2166 and #2167. The further optimization follows #2167; the latest
 [wake/contact investigation](tests/benchmark-results/2026-10-01-wake-attribution.md)
 and [body/effects followup](tests/benchmark-results/2026-10-02-body-effects.md)
 include new matched comparisons with ODE in both games.
@@ -224,7 +224,7 @@ allocations.
 The premise is supported for the measured synthetic workloads, particularly
 large stacks with worker threads. It is not supported as an in-game performance
 upgrade by this implementation. The native architecture and worker scaling are
-useful results, but the port should remain a local experimental followup.
+useful results, but the port should remain an experimental draft followup.
 
 The next performance work is to eliminate duplicate contact discovery while
 preserving callback rejection/response timing, reconcile sleeping/activation

@@ -1,7 +1,8 @@
 # Native Jolt performance followup
 
 The first optimization is published in draft PR #2167 at `25ad9bb2e`.
-Further optimization on `followup/jolt-native-physics` remains local.
+Further optimization is prepared on `followup/jolt-native-performance-2`,
+following #2167; its separate measurements are documented below.
 The initial migration's measurements remain in
 [NativeMigration.md](NativeMigration.md); this report describes the optimized
 implementation and its separate captures.
@@ -197,7 +198,7 @@ multiplayer, Linux and Debug runtime coverage remain outside these tests.
 
 ## Further local optimization
 
-This change builds on `25ad9bb2e` and remains local:
+This change builds on `25ad9bb2e`:
 
 - Retain mesh-local regions proven to contain no slowdown material. Each step
   checks the current transformed, swept/speculative body bounds against the
@@ -355,7 +356,8 @@ not proof that replacing the full engine physics improves frame time.
 All 30 accepted captures and reloads pass. Two additional attempts fail on
 shutdown and are retained; a diagnostic minidump reproduces the previously
 observed D3DCompiler_47 exit-heap detection stack. No corrupting write has
-been identified. These changes and findings remain local.
+been identified. These changes and findings belong to the further draft
+followup to #2167, with each capture set reported separately.
 
 ### Disk usage (historical second-optimization comparison)
 

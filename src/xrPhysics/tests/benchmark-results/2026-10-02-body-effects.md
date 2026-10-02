@@ -2,8 +2,8 @@
 
 Local continuation of [issue #2139](https://github.com/OpenXRay/xray-16/issues/2139)
 and the [wake investigation](2026-10-01-wake-attribution.md). Production source:
-`82307c47d`, followed by the inactive-read shortcut in `a2d963eef`. No changes
-from this investigation have been pushed.
+`82307c47d`, followed by the inactive-read shortcut in `a2d963eef`. This is the
+further draft followup to #2167; measurements preceded publication.
 
 ## Changes
 
