@@ -23,6 +23,8 @@ public:
     bool record(const FrameRecordingContext& frame, std::string& error);
     void append_imgui(ImDrawData* data);
     VulkanUIShader* current_shader() const { return shader_; }
+    uint32_t draw_calls() const { return static_cast<uint32_t>(batches_.size()); }
+    uint32_t triangles() const { return static_cast<uint32_t>(indices_.size() / 3); }
 
     void CreateUIGeom() override;
     void DestroyUIGeom() override;

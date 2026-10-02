@@ -55,6 +55,8 @@ public:
     ~VulkanGameDevice() { destroy(); }
 
     VulkanUIRender& ui() { return ui_; }
+    uint32_t last_ui_draw_calls() const { return last_ui_draw_calls_; }
+    uint32_t last_ui_triangles() const { return last_ui_triangles_; }
     std::unique_ptr<VulkanUIShader> create_ui_shader()
     {
         return std::make_unique<VulkanUIShader>(textures_, ui_pass_);
@@ -133,6 +135,7 @@ private:
     WeatherLighting weather_lighting_{};
     BufferResource screenshot_buffer_;
     bool screenshot_requested_{}, screenshot_ready_{}, readback_enabled_{};
+    uint32_t last_ui_draw_calls_{}, last_ui_triangles_{};
     VkExtent2D screenshot_extent_{};
 };
 }

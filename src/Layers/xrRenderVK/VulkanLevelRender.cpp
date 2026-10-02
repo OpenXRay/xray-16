@@ -120,6 +120,12 @@ void VulkanLevelRender::ResourcesDumpMemoryUsage()
 }
 void VulkanLevelRender::OnAssetsChanged()
 {
+    if (frame_phase_.active())
+    {
+        assets_dirty_ = true;
+        return;
+    }
+    assets_dirty_ = false;
     if (g_pGamePersistent && game_device_)
     {
         auto& environment = g_pGamePersistent->Environment();
@@ -138,11 +144,11 @@ void VulkanLevelRender::OnAssetsChanged()
         };
         visit(environment.WeatherCycles, false);
         visit(environment.WeatherFXs, false);
-        if (textures_) textures_->retire_unused();
+        if (textures_) textures_->reload_assets();
         visit(environment.WeatherCycles, true);
         visit(environment.WeatherFXs, true);
     }
-    if (textures_) textures_->reload_assets();
+    else if (textures_) textures_->reload_assets();
     models_Clear(false);
     particle_catalog_.reset();
 }
@@ -683,6 +689,7 @@ void VulkanLevelRender::Begin()
 {
     R_ASSERT2(game_device_ && !frame_phase_.active(),
         "Vulkan renderer Begin requires an initialized idle frame");
+    if (assets_dirty_) OnAssetsChanged();
     game_device_->begin_frame();
     frame_draw_calls_ = frame_triangles_ = 0;
     if (pass_) pass_->reset_draw_statistics();
@@ -843,8 +850,8 @@ void VulkanLevelRender::End()
     if (status == FrameStatus::Presented) save_screenshot();
     if (pass_)
     {
-        frame_draw_calls_ = pass_->draw_calls();
-        frame_triangles_ = pass_->triangles();
+        frame_draw_calls_ = pass_->draw_calls() + game_device_->last_ui_draw_calls();
+        frame_triangles_ = pass_->triangles() + game_device_->last_ui_triangles();
     }
     if (status == FrameStatus::RecreateRequired)
         reset_pending_ = true;

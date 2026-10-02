@@ -459,6 +459,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     const float weather_blend = weather_lighting_.light.color[3];
     weather_lighting_.light = light;
     weather_lighting_.light.color[3] = weather_blend;
+    last_ui_draw_calls_ = ui_.draw_calls();
+    last_ui_triangles_ = ui_.triangles();
     screenshot_ready_ = false;
     if (screenshot_requested_ && readback_enabled_)
     {

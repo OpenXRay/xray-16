@@ -181,6 +181,7 @@ private:
     bool clear_target_pending_{};
     bool frame_clear_target_{};
     bool deferred_load_{}, model_logging_{};
+    bool assets_dirty_{};
     u32 frame_draw_calls_{}, frame_triangles_{};
     float gamma_{1.f}, brightness_{1.f}, contrast_{1.f}, gray_{};
     struct ImGuiTexture { VkDescriptorSet descriptor{}; VkExtent2D extent{}; };
