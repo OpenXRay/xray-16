@@ -16,6 +16,8 @@ namespace xray::render::vulkan
 {
 class VulkanParticleEffect;
 class VulkanParticleGroup;
+class VulkanRainRender;
+class VulkanThunderboltRender;
 // Owns the Vulkan gameplay frame resources. Destruction waits for submitted
 // work before releasing descriptors, pipelines, images and the device.
 class VulkanGameDevice
@@ -24,6 +26,8 @@ public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     void begin_frame();
     void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
+    void queue_rain(VulkanRainRender& rain);
+    void queue_thunderbolt(VulkanThunderboltRender& bolt);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error,
         bool render_world = true, bool clear_target = false);
@@ -111,6 +115,8 @@ private:
     std::string ui_error_;
     std::vector<ModelDraw> model_draws_;
     std::vector<ParticleDraw> particle_draws_;
+    std::vector<VulkanRainRender*> rain_draws_;
+    std::vector<VulkanThunderboltRender*> thunderbolt_draws_;
     std::vector<LevelDraw> level_draws_;
     const GpuLevel* current_level_{};
     bool scene_visibility_{};

@@ -19,6 +19,10 @@ namespace render_gl
 {
 class dxLensFlareRender;
 }
+namespace vulkan
+{
+class VulkanLensFlareRender;
+}
 } // namespace xray::render
 
 class ENGINE_API CLensFlareDescriptor
@@ -82,6 +86,7 @@ class ENGINE_API CLensFlare
 {
     friend class xray::render::render_r4::dxLensFlareRender;
     friend class xray::render::render_gl::dxLensFlareRender;
+    friend class xray::render::vulkan::VulkanLensFlareRender;
 
 public:
     enum

@@ -11,6 +11,8 @@
 #include "WallmarkGeometry.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Rain.h"
+#include "xrEngine/thunderbolt.h"
 #include "xrEngine/device.h"
 #include "xrEngine/xr_object.h"
 #include "xrCore/FMesh.hpp"
@@ -510,6 +512,9 @@ void VulkanLevelRender::Render()
         auto& environment = g_pGamePersistent->Environment();
         environment.RenderSky();
         environment.RenderClouds();
+        if (environment.eff_Rain) environment.eff_Rain->Render();
+        environment.RenderFlares();
+        if (environment.eff_Thunderbolt) environment.eff_Thunderbolt->Render();
     }
     R_ASSERT2(frame_phase_.render(), "Vulkan renderer world rendering is out of order");
 }

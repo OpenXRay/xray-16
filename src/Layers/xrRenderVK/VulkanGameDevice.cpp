@@ -1,6 +1,8 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
 #include "ParticleVisual.h"
+#include "VulkanRainRender.h"
+#include "VulkanThunderboltRender.h"
 #include "SceneShaders.h"
 #include "ShaderModule.h"
 
@@ -274,6 +276,18 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             }
         }
     }
+    for (VulkanRainRender* rain : owner.rain_draws_)
+        if (rain && !rain->record(frame, owner.model_error_))
+        {
+            owner.models_recorded_ = false;
+            return;
+        }
+    for (VulkanThunderboltRender* bolt : owner.thunderbolt_draws_)
+        if (bolt && !bolt->record(frame, owner.model_error_))
+        {
+            owner.models_recorded_ = false;
+            return;
+        }
 }
 
 void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user)
@@ -373,10 +387,22 @@ void VulkanGameDevice::queue_weather(VkDescriptorSet set, const WeatherLighting&
     weather_lighting_ = lighting;
 }
 
+void VulkanGameDevice::queue_rain(VulkanRainRender& rain)
+{
+    rain_draws_.push_back(&rain);
+}
+
+void VulkanGameDevice::queue_thunderbolt(VulkanThunderboltRender& bolt)
+{
+    thunderbolt_draws_.push_back(&bolt);
+}
+
 void VulkanGameDevice::discard_scene_draws()
 {
     model_draws_.clear();
     particle_draws_.clear();
+    rain_draws_.clear();
+    thunderbolt_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
 }

@@ -98,6 +98,12 @@ target_sources(xrRenderVK PRIVATE
     VulkanEnvDescriptorRender.h
     VulkanEnvironmentRender.cpp
     VulkanEnvironmentRender.h
+    VulkanRainRender.cpp
+    VulkanRainRender.h
+    VulkanLensFlareRender.cpp
+    VulkanLensFlareRender.h
+    VulkanThunderboltRender.cpp
+    VulkanThunderboltRender.h
     EngineParticleSource.cpp
     EngineParticleSource.h
     WallmarkGeometry.cpp

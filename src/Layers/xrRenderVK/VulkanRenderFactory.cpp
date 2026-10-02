@@ -7,6 +7,9 @@
 #include "VulkanWallMarkArray.h"
 #include "VulkanEnvDescriptorRender.h"
 #include "VulkanEnvironmentRender.h"
+#include "VulkanRainRender.h"
+#include "VulkanLensFlareRender.h"
+#include "VulkanThunderboltRender.h"
 #include "VulkanImGuiRender.h"
 #include "VulkanUISequenceVideoItem.h"
 
@@ -80,6 +83,46 @@ void VulkanRenderFactory::DestroyEnvironmentRender(IEnvironmentRender* object)
 {
     delete object;
 }
+IRainRender* VulkanRenderFactory::CreateRainRender()
+{
+    return new VulkanRainRender(device_);
+}
+void VulkanRenderFactory::DestroyRainRender(IRainRender* object)
+{
+    delete object;
+}
+IFlareRender* VulkanRenderFactory::CreateFlareRender()
+{
+    return new VulkanFlareRender(device_);
+}
+void VulkanRenderFactory::DestroyFlareRender(IFlareRender* object)
+{
+    delete object;
+}
+ILensFlareRender* VulkanRenderFactory::CreateLensFlareRender()
+{
+    return new VulkanLensFlareRender(device_);
+}
+void VulkanRenderFactory::DestroyLensFlareRender(ILensFlareRender* object)
+{
+    delete object;
+}
+IThunderboltDescRender* VulkanRenderFactory::CreateThunderboltDescRender()
+{
+    return new VulkanThunderboltDescRender(device_);
+}
+void VulkanRenderFactory::DestroyThunderboltDescRender(IThunderboltDescRender* object)
+{
+    delete object;
+}
+IThunderboltRender* VulkanRenderFactory::CreateThunderboltRender()
+{
+    return new VulkanThunderboltRender(device_);
+}
+void VulkanRenderFactory::DestroyThunderboltRender(IThunderboltRender* object)
+{
+    delete object;
+}
 #endif
 
 // These contracts belong to the subsequent environment and debug milestones.
@@ -91,11 +134,6 @@ void VulkanRenderFactory::DestroyEnvironmentRender(IEnvironmentRender* object)
 #ifdef DEBUG
 VK_PENDING_FACTORY(ObjectSpaceRender)
 #endif
-VK_PENDING_FACTORY(RainRender)
-VK_PENDING_FACTORY(LensFlareRender)
-VK_PENDING_FACTORY(ThunderboltRender)
-VK_PENDING_FACTORY(ThunderboltDescRender)
-VK_PENDING_FACTORY(FlareRender)
 #endif
 #undef VK_PENDING_FACTORY
 }
