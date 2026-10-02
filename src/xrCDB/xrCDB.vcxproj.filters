@@ -57,6 +57,9 @@
     <ClCompile Include="xrXRC.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="ModelTree.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frustum.h">
@@ -81,6 +84,9 @@
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Intersect.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelTree.h">
       <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,7 +20,6 @@
 class CFrustum;
 namespace Opcode
 {
-class OPCODE_Model;
 class AABBNoLeafNode;
 };
 
@@ -31,6 +30,7 @@ class Lock;
 #pragma pack(push, 8)
 namespace CDB
 {
+class ModelTree;
 // Triangle
 class TRI //*** 16 bytes total (was 32 :)
 {
@@ -76,7 +76,7 @@ class XRCDB_API MODEL : Noncopyable
 
 private:
     Lock* pcs;
-    Opcode::OPCODE_Model* tree{};
+    ModelTree* tree{};
     volatile u32 status{ S_INIT }; // 0=ready, 1=init, 2=building
     u32 model_crc32{};
 

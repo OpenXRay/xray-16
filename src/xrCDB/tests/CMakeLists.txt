@@ -1,0 +1,10 @@
+add_executable(xrCDBOpcode13Tests CollisionQueries.cpp CacheFailures.cpp LegacyCache.cpp)
+target_include_directories(xrCDBOpcode13Tests PRIVATE "${XRAY_SOURCE_DIR}/src")
+target_link_libraries(xrCDBOpcode13Tests PRIVATE xrCDB xrCore xrMiscMath)
+add_test(NAME xrCDB.opcode13_queries COMMAND xrCDBOpcode13Tests)
+add_test(NAME xrCDB.opcode13_threaded_queries COMMAND xrCDBOpcode13Tests -mt_cdb)
+set_tests_properties(xrCDB.opcode13_queries xrCDB.opcode13_threaded_queries PROPERTIES TIMEOUT 60)
+
+add_executable(xrCDBBenchmark Benchmark.cpp)
+target_include_directories(xrCDBBenchmark PRIVATE "${XRAY_SOURCE_DIR}/src")
+target_link_libraries(xrCDBBenchmark PRIVATE xrCDB xrCore)
