@@ -970,14 +970,15 @@ void JoltPhysicsCore::GetBodyTransform(BodyHandle body_handle, Fmatrix& out_matr
     StoreBodyTransform(m_physics_system->GetBodyInterface().GetCenterOfMassTransform(JPH::BodyID(body_handle)), out_matrix);
 }
 
-bool JoltPhysicsCore::ReadBodyState(BodyHandle handle, NativeBodyState& state) const {
+bool JoltPhysicsCore::ReadBodyState(BodyHandle handle, NativeBodyState& state, bool active_only) const {
     state = NativeBodyState{};
     if (!m_physics_system || handle == INVALID_BODY_HANDLE) return false;
     JPH::BodyLockRead lock(m_physics_system->GetBodyLockInterface(), JPH::BodyID(handle));
     if (!lock.Succeeded()) return false;
     const auto& body = lock.GetBody();
-    StoreBodyTransform(body.GetCenterOfMassTransform(), state.transform);
     state.active = body.IsActive();
+    if (active_only && !state.active) return true;
+    StoreBodyTransform(body.GetCenterOfMassTransform(), state.transform);
     if (!body.IsStatic()) {
         const auto linear = body.GetLinearVelocity(), angular = body.GetAngularVelocity();
         state.linear_velocity.set(linear.GetX(), linear.GetY(), linear.GetZ());
@@ -3283,8 +3284,8 @@ void JoltPhysicsCore::SetRagdollCollisionGroup(RagdollHandle handle, u32 group_i
 
 static JoltPhysicsCore g_physics_core;
 
-bool GetPhysicsBodyState(BodyHandle body, NativeBodyState& state) {
-    return g_physics_core.ReadBodyState(body, state);
+bool GetPhysicsBodyState(BodyHandle body, NativeBodyState& state, bool active_only) {
+    return g_physics_core.ReadBodyState(body, state, active_only);
 }
 
 extern "C" PHYSICS_CORE_API IPhysicsCore* GetPhysicsCore() {

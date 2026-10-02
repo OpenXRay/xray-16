@@ -451,7 +451,7 @@ void CPHElement::PhDataUpdate(float step)
 #endif
 
     NativeBodyState state;
-    if (!GetPhysicsBodyState(m_char_handle, state)) return;
+    if (!GetPhysicsBodyState(m_char_handle, state, true)) return;
     m_flags.set(flEnabledOnStep, state.active);
     if (!state.active)
         return;

@@ -129,9 +129,14 @@ void CompoundTransforms(IPhysicsCore& core) {
     Near(state.angular_velocity.z, 6, .0001f, "Coherent state angular velocity");
     Near(state.force.z, 9, .0001f, "Coherent state force accumulator");
     Near(state.torque.y, 11, .0001f, "Coherent state torque accumulator");
+    Require(GetPhysicsBodyState(body, state, true) && state.active, "Active-only state retains awake data");
+    Near(state.force.z, 9, .0001f, "Active-only state retains awake force");
     // The read releases its lock before returning, so mutation is safe.
     core.DeactivateBody(body);
     Require(GetPhysicsBodyState(body, state) && !state.active, "Coherent state reads a sleeping body");
+    Require(GetPhysicsBodyState(body, state, true) && !state.active, "Active-only state recognizes sleeping bodies");
+    Near(state.mass, 0, 0, "Inactive shortcut clears unused state");
+    Near(state.transform.c.x, 0, 0, "Inactive shortcut avoids unused transform");
     core.DestroyBody(body);
     Require(!GetPhysicsBodyState(body, state), "Coherent state rejects retired handles");
     Near(state.mass, 0, 0, "Failed coherent read clears previous data");

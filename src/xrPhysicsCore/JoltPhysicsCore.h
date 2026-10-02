@@ -245,7 +245,7 @@ private:
 public:
     JoltPhysicsCore() = default;
     virtual ~JoltPhysicsCore() override;
-    bool ReadBodyState(BodyHandle body, NativeBodyState& state) const;
+    bool ReadBodyState(BodyHandle body, NativeBodyState& state, bool active_only) const;
 
     void Initialize() override;
     void SetPreIntegrationCallback(void (*callback)()) override { m_pre_integration_callback = callback; }

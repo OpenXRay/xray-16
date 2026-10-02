@@ -10,4 +10,6 @@ struct NativeBodyState
     float mass = 0;
     bool active = false;
 };
-PHYSICS_CORE_API bool GetPhysicsBodyState(BodyHandle body, NativeBodyState& state);
+// With active_only, a valid inactive body returns true with active=false and
+// the remaining fields at their defaults. This avoids work discarded by sync.
+PHYSICS_CORE_API bool GetPhysicsBodyState(BodyHandle body, NativeBodyState& state, bool active_only = false);
