@@ -92,6 +92,12 @@ target_sources(xrRenderVK PRIVATE
     VulkanStatGraphRender.h
     VulkanWallMarkArray.cpp
     VulkanWallMarkArray.h
+    VulkanEnvDescriptorRender.cpp
+    VulkanEnvDescriptorRender.h
+    VulkanEnvironmentRender.cpp
+    VulkanEnvironmentRender.h
+    EngineParticleSource.cpp
+    EngineParticleSource.h
     WallmarkGeometry.cpp
     WallmarkGeometry.h
     VulkanLevelRender.cpp

@@ -183,13 +183,41 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
 void GameTextureFactory::evict_if_unused(const std::string& name)
 {
     auto it = assets_.find(name);
-    if (it == assets_.end() || it->second.material_refs || it->second.ui_refs)
+    if (it == assets_.end() || it->second.material_refs || it->second.ui_refs ||
+        it->second.environment_refs)
         return;
     R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
         "Vulkan texture upload did not complete before release");
     states_.forget_image(it->second.texture.image);
     destroy_texture(device_, dispatch_, it->second.texture);
     assets_.erase(it);
+}
+
+bool GameTextureFactory::environment(const std::string& name, VkImageView& view,
+    std::string& error)
+{
+    view = VK_NULL_HANDLE;
+    Asset* asset = nullptr;
+    if (!load(name, asset, error)) return false;
+    ++asset->environment_refs;
+    view = asset->texture.view;
+    return true;
+}
+
+void GameTextureFactory::release_environment(VkImageView view)
+{
+    if (!view) return;
+    for (auto& [name, asset] : assets_)
+    {
+        if (asset.texture.view != view) continue;
+        R_ASSERT2(asset.environment_refs, "Vulkan environment texture is not leased");
+        if (--asset.environment_refs) return;
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS,
+            "Vulkan device did not become idle before environment texture release");
+        evict_if_unused(name);
+        return;
+    }
+    R_ASSERT2(false, "unknown Vulkan environment texture");
 }
 
 void GameTextureFactory::release_material(VkDescriptorSet set, DeferredPass& pass)

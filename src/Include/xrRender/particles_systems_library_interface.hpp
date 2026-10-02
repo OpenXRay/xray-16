@@ -28,6 +28,15 @@ public:
     virtual PS::CPGDef const* const* particles_group_end() const = 0;
     virtual void particles_group_next(PS::CPGDef const* const*& iterator) const = 0;
     virtual shared_str const& particles_group_id(PS::CPGDef const& particles_group) const = 0;
+    // A renderer-neutral listing also works with backends whose particle
+    // definitions are not legacy CPGDef objects.
+    virtual void particles_group_ids(xr_vector<shared_str>& ids) const
+    {
+        auto i = particles_group_begin();
+        const auto end = particles_group_end();
+        for (; i != end; particles_group_next(i))
+            ids.push_back(particles_group_id(**i));
+    }
 }; // class library_interface
 
 } // namespace particles_systems

@@ -30,6 +30,11 @@ public:
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
     bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
         ScenePass& pass, VkDescriptorSet& result, std::string& error);
+    // Weather textures are leased independently of material/UI descriptor sets.
+    // Cubemaps retain their cube image view for sky sampling.
+    bool environment(const std::string& name, VkImageView& view, std::string& error);
+    void release_environment(VkImageView view);
+    VkSampler sampler() const { return sampler_; }
     // Release only after the consumer has stopped recording the descriptor.
     // The last release waits for submitted frames before freeing GPU objects.
     void release_material(VkDescriptorSet set, DeferredPass& pass);
@@ -45,6 +50,7 @@ private:
         VkExtent2D extent{};
         size_t material_refs{};
         size_t ui_refs{};
+        size_t environment_refs{};
         DeferredPass* material_pass{};
         ScenePass* ui_pass{};
     };

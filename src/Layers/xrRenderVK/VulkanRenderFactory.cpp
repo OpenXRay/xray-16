@@ -5,6 +5,8 @@
 #include "VulkanFontRender.h"
 #include "VulkanStatGraphRender.h"
 #include "VulkanWallMarkArray.h"
+#include "VulkanEnvDescriptorRender.h"
+#include "VulkanEnvironmentRender.h"
 #include "VulkanImGuiRender.h"
 #include "VulkanUISequenceVideoItem.h"
 
@@ -61,6 +63,25 @@ void VulkanRenderFactory::DestroyWallMarkArray(IWallMarkArray* object)
     delete object;
 }
 
+#ifndef _EDITOR
+IEnvDescriptorRender* VulkanRenderFactory::CreateEnvDescriptorRender()
+{
+    return new VulkanEnvDescriptorRender(device_.textures());
+}
+void VulkanRenderFactory::DestroyEnvDescriptorRender(IEnvDescriptorRender* object)
+{
+    delete object;
+}
+IEnvironmentRender* VulkanRenderFactory::CreateEnvironmentRender()
+{
+    return new VulkanEnvironmentRender(device_);
+}
+void VulkanRenderFactory::DestroyEnvironmentRender(IEnvironmentRender* object)
+{
+    delete object;
+}
+#endif
+
 // These contracts belong to the subsequent environment and debug milestones.
 #define VK_PENDING_FACTORY(Class) \
     I##Class* VulkanRenderFactory::Create##Class() { return nullptr; } \
@@ -70,8 +91,6 @@ void VulkanRenderFactory::DestroyWallMarkArray(IWallMarkArray* object)
 #ifdef DEBUG
 VK_PENDING_FACTORY(ObjectSpaceRender)
 #endif
-VK_PENDING_FACTORY(EnvironmentRender)
-VK_PENDING_FACTORY(EnvDescriptorRender)
 VK_PENDING_FACTORY(RainRender)
 VK_PENDING_FACTORY(LensFlareRender)
 VK_PENDING_FACTORY(ThunderboltRender)
