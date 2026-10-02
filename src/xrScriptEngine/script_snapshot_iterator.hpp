@@ -1,7 +1,8 @@
 #pragma once
 
-#include <memory>
 #include <type_traits>
+
+#include "xrCommon/xr_smart_pointers.h"
 
 #include "script_space.hpp"
 
@@ -14,7 +15,7 @@ template <typename Container>
 class snapshot_iterator
 {
 public:
-    snapshot_iterator(std::shared_ptr<const Container> values, typename Container::const_iterator position)
+    snapshot_iterator(xr_shared_ptr<const Container> values, typename Container::const_iterator position)
         : m_values(std::move(values)), m_position(position) {}
 
     decltype(auto) operator*() const
@@ -34,7 +35,7 @@ public:
     }
 
 private:
-    std::shared_ptr<const Container> m_values;
+    xr_shared_ptr<const Container> m_values;
     typename Container::const_iterator m_position;
 };
 
@@ -46,7 +47,7 @@ struct snapshot_iterator_converter
     template <typename Container>
     void to_lua(lua_State* luaState, const Container& container)
     {
-        const auto values = std::make_shared<const Container>(container);
+        const xr_shared_ptr<const Container> values = xr_make_shared<Container>(container);
         make_range(luaState, snapshot_iterator<Container>(values, values->begin()), snapshot_iterator<Container>(values, values->end()));
     }
 };
