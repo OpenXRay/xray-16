@@ -1,0 +1,117 @@
+No .natvis files found at C:\Windows\System32\Visualizers.
+No .natvis files found at C:\Users\kotlo\AppData\Local\Dbg\Visualizers.
+
+Microsoft (R) Windows Debugger Version 10.0.26100.1 AMD64
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+
+Loading Dump File [C:\code\migration-benchmark\body-effects-shutdown-dumps\reload-1\xrEngine.exe_261002_092247.dmp]
+Comment: '
+*** "C:\code\tools\procdump\procdump64.exe" -accepteula -mm -e 1 -f C0000005 -n 1 -x C:/code/migration-benchmark/body-effects-shutdown-dumps/reload-1 C:/code/migration-benchmark/native-game-bin-second-profile/xrEngine.exe -cop -nosplash -force_flushlog -fsltx fsgame.ltx -start server(native-physics-validation/single/alife/load) client(localhost) -$run_script gameplay_reload 
+*** First chance exception: C0000005.ACCESS_VIOLATION'
+User Mini Dump File: Only registers, stack and portions of memory are available
+
+Symbol search path is: srv*
+Executable search path is: 
+Windows 10 Version 26200 MP (32 procs) Free x64
+Product: WinNt, suite: SingleUserTS Personal
+Edition build lab: 26100.1.amd64fre.ge_release.240331-1435
+Debug session time: Fri Oct  2 09:22:47.000 2026 (UTC + 2:00)
+System Uptime: 16 days 16:52:57.537
+Process Uptime: 0 days 0:01:13.000
+................................................................
+................................................................
+........................
+Loading unloaded module list
+....................
+Unable to add extension DLL: ntsdexts
+Unable to add extension DLL: uext
+Unable to add extension DLL: exts
+This dump file has an exception of interest stored in it.
+The stored exception information can be accessed via .ecxr.
+(6b64.4850): Access violation - code c0000005 (first/second chance not available)
+
++------------------------------------------------------------------------+
+| This target supports Hardware-enforced Stack Protection. A HW based    |
+| "Shadow Stack" may be available to assist in debugging and analysis.   |
+| See aka.ms/userhsp for more info.                                      |
+|                                                                        |
+| dps @ssp                                                               |
+|                                                                        |
++------------------------------------------------------------------------+
+
+For analysis of this file, run !analyze -v
+Symbol search path is: C:/code/tools/symbols/ntdll.pdb/C3093720177DA6851519DCFFE8DF53FE1;C:/code/tools/symbols/D3DCompiler_47.pdb/6E13B8FB4285F536E40B69FC96A9B31D1;C:/code/xray-jolt-native/build/native/bin/Release
+Expanded Symbol search path is: c:/code/tools/symbols/ntdll.pdb/c3093720177da6851519dcffe8df53fe1;c:/code/tools/symbols/d3dcompiler_47.pdb/6e13b8fb4285f536e40b69fc96a9b31d1;c:/code/xray-jolt-native/build/native/bin/release
+
+************* Path validation summary **************
+Response                         Time (ms)     Location
+OK                                             C:/code/tools/symbols/ntdll.pdb/C3093720177DA6851519DCFFE8DF53FE1
+OK                                             C:/code/tools/symbols/D3DCompiler_47.pdb/6E13B8FB4285F536E40B69FC96A9B31D1
+OK                                             C:/code/xray-jolt-native/build/native/bin/Release
+rax=00000000000c0400 rbx=0000028b1e2c4e90 rcx=0000000000000c0c
+rdx=000000000000000c rsi=00007ffc948bc290 rdi=0000028b1e270000
+rip=00007ffd85a7f9c6 rsp=000000e3c3d6ef30 rbp=0000028b1e2c4e50
+ r8=000000e3c3d6eff8  r9=0000000000000000 r10=0000028b1e2c4ea0
+r11=000000e3c3d6f068 r12=0000000000000000 r13=0000000000000000
+r14=000000e3c3d6eff8 r15=baadf00d00000000
+iopl=0         nv up ei pl zr na po nc
+cs=0033  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00010246
+ntdll!RtlpCoalesceFreeBlocks+0x116:
+00007ffd`85a7f9c6 498b07          mov     rax,qword ptr [r15] ds:baadf00d`00000000=????????????????
+  *** Stack trace for last set context - .thread/.cxr resets it
+Child-SP          RetAddr               : Args to Child                                                           : Call Site
+000000e3`c3d6ef30 00007ffd`85a4bbef     : 0000028b`1e2c4e50 0000028b`1e2c5230 0000028b`1e270000 00007ffd`85a7f969 : ntdll!RtlpCoalesceFreeBlocks+0x116
+000000e3`c3d6efa0 00007ffd`85a3d200     : 0000028b`1e270000 0000028b`1e270000 0000028b`1e2c4e50 0000028b`1e2c4e50 : ntdll!RtlpFreeHeap+0x12f
+000000e3`c3d6f070 00007ffd`85b28fcd     : 0000028b`1e270000 0000028b`50000063 0000028b`1e2c4e60 00000000`00000000 : ntdll!RtlFreeHeap+0x620
+000000e3`c3d6f160 00007ffd`85a4c4b7     : 0000028b`1e270000 0000028b`50000063 00000000`0000119b 0000028b`1e2c4e50 : ntdll!RtlDebugFreeHeap+0xed
+000000e3`c3d6f1c0 00007ffd`85a3d200     : 0000028b`1e270000 0000028b`1e2c4e60 0000028b`1e2c4e50 0000028b`1e2c4e50 : ntdll!RtlpFreeHeap+0x9f7
+000000e3`c3d6f290 00007ffc`946a91dc     : 0000028b`1e270000 0000028b`00000000 0000028b`1e2c4e60 0000028b`1e270000 : ntdll!RtlFreeHeap+0x620
+000000e3`c3d6f380 00007ffc`946c9272     : 00000000`00000004 00000000`00000000 00000000`40000062 0000028b`1e270000 : D3DCOMPILER_47!free_base+0x1c
+000000e3`c3d6f3b0 00007ffc`9485ea6f     : 0000028b`1e270000 0000028b`50000063 00000000`23590000 0000028b`1e2d4cd0 : D3DCOMPILER_47!CDiaPropertyStorage<CDiaFrameData>::Functor<int,{CDiaFrameData::`vcall'{112}',0}>::`vector deleting destructor'+0x22
+000000e3`c3d6f3e0 00007ffc`946b8916     : 0000028b`1e2c4f68 000000e3`c3d6f4a0 0000028b`1e2c4f20 00007ffc`9b081fa0 : D3DCOMPILER_47!`dynamic atexit destructor for 'CDiaSymbol::rgpropinfo''+0x4f
+000000e3`c3d6f410 00007ffc`946b86b9     : 000000e3`c3d6f4d0 000000e3`c3d6f580 00000000`00000001 00000000`7ffe0385 : D3DCOMPILER_47!<lambda_f03950bc5685219e0bcd2087efbe011e>::operator()+0x8a
+000000e3`c3d6f450 00007ffc`946b89fd     : 000000e3`c3d6f568 0000028b`1e270000 00000000`00000000 000000e3`c3d6f4d0 : D3DCOMPILER_47!__crt_seh_guarded_call<int>::operator()<<lambda_7777bce6b2f8c936911f934f8298dc43>,<lambda_f03950bc5685219e0bcd2087efbe011e> &,<lambda_3883c3dff614d5e0c5f61bb1ac94921c> >+0x25
+000000e3`c3d6f480 00007ffc`946afa82     : 00007ffc`949a9210 0000028b`1e2d4cd0 0000028b`00000002 00000000`00000002 : D3DCOMPILER_47!execute_onexit_table+0x3d
+000000e3`c3d6f4c0 00007ffc`946af9f9     : 000000e3`c3d6f554 0000028b`23599580 00007ffc`94550000 00007ffc`94550000 : D3DCOMPILER_47!<lambda_6e4b09c48022b2350581041d5f6b0c4c>::operator()+0x6e
+000000e3`c3d6f500 00007ffc`946afb87     : 00000000`00000000 00007ffd`85acc248 00000000`00000028 000000e3`c3d6f554 : D3DCOMPILER_47!__crt_seh_guarded_call<void>::operator()<<lambda_d80eeec6fff315bfe5c115232f3240e3>,<lambda_6e4b09c48022b2350581041d5f6b0c4c> &,<lambda_2358e3775559c9db80273638284d5e45> >+0x25
+000000e3`c3d6f530 00007ffc`946bd5df     : 00000000`00000000 00007ffc`00000000 0000028b`00000001 00000000`00000000 : D3DCOMPILER_47!common_exit+0xab
+000000e3`c3d6f590 00007ffc`946bc985     : 00000000`00000000 00007ffc`945ef6ad 00000000`7ffe0384 000000e3`c3d6fb20 : D3DCOMPILER_47!_scrt_dllmain_uninitialize_c+0x2b
+000000e3`c3d6f5c0 00007ffc`946bcaae     : 00000000`00000001 00000000`00000000 00000000`00000000 00000000`00000000 : D3DCOMPILER_47!dllmain_crt_process_detach+0x45
+000000e3`c3d6f600 00007ffd`85b3eada     : 00007ffc`94550000 00000000`00000000 00000000`00000001 00000000`7ffe0384 : D3DCOMPILER_47!dllmain_dispatch+0xe6
+000000e3`c3d6f660 00007ffd`85a30c33     : 00000000`00000000 0000028b`1e270000 00000001`1e286e01 00000000`00000000 : ntdll!LdrpCallInitRoutineInternal+0x22
+000000e3`c3d6f690 00007ffd`85acdf1f     : 0000028b`1e2872a0 0000028b`1e27a730 00000000`00000000 00007ffd`28206a20 : ntdll!LdrpCallInitRoutine+0x93
+000000e3`c3d6f960 00007ffd`85accc2e     : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : ntdll!LdrShutdownProcess+0x17f
+000000e3`c3d6fa70 00007ffd`8492141b     : 00000000`00000000 00000000`00000000 ffffffff`fffffffe 00000000`00000000 : ntdll!RtlExitUserProcess+0x9e
+000000e3`c3d6faa0 00007ffd`83430813     : 00000000`00000000 00000000`00000000 0000028b`1e277cf8 000000e3`c3d6faf0 : kernel32!FatalExit+0xb
+*** WARNING: Unable to verify checksum for xrEngine.exe
+000000e3`c3d6fad0 00007ff7`f35d1354     : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000001 : ucrtbase!logbf+0x2c3
+000000e3`c3d6fb30 00007ffd`8490cd87     : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : xrEngine_exe!__scrt_common_main_seh+0x168
+000000e3`c3d6fb70 00007ffd`85accaec     : 00000000`00000000 00000000`00000000 000004f0`fffffb30 000004d0`fffffb30 : kernel32!BaseThreadInitThunk+0x17
+000000e3`c3d6fba0 00000000`00000000     : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : ntdll!RtlUserThreadStart+0x2c
+start             end                 module name
+00007ffc`94550000 00007ffc`949dd000   D3DCOMPILER_47   (pdb symbols)          c:/code/tools/symbols/d3dcompiler_47.pdb/6e13b8fb4285f536e40b69fc96a9b31d1\D3DCompiler_47.pdb
+    Loaded symbol image file: D3DCOMPILER_47.dll
+    Mapped memory image file: c:/code/xray-jolt-native/build/native/bin/release\D3DCOMPILER_47.dll
+    Image path: C:\code\migration-benchmark\native-game-bin-second-profile\D3DCOMPILER_47.dll
+    Image name: D3DCOMPILER_47.dll
+    Image was built with /Brepro flag.
+    Timestamp:        A710F7CE (This is a reproducible build file hash, not a timestamp)
+    CheckSum:         004942B6
+    ImageSize:        0048D000
+    File version:     10.0.26100.7705
+    Product version:  10.0.26100.7705
+    File flags:       0 (Mask 3F)
+    File OS:          40004 NT Win32
+    File type:        2.0 Dll
+    File date:        00000000.00000000
+    Translations:     0409.04b0
+    Information from resource tables:
+        CompanyName:      Microsoft Corporation
+        ProductName:      Microsoft� Windows� Operating System
+        InternalName:     d3dcompiler_47.dll
+        OriginalFilename: d3dcompiler_47.dll
+        ProductVersion:   10.0.26100.7705
+        FileVersion:      10.0.26100.7705 (WinBuild.160101.0800)
+        FileDescription:  Direct3D HLSL Compiler for Redistribution
+        LegalCopyright:   � Microsoft Corporation. All rights reserved.

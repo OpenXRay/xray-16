@@ -49,8 +49,8 @@ public:
     virtual void Step() = 0;
     virtual void SetStep(float s) = 0;
     virtual void StepNumIterations(int num_it) = 0;
-    virtual void set_default_contact_shotmark(ContactCallbackFun* f) = 0;
-    virtual void set_default_character_contact_shotmark(ContactCallbackFun* f) = 0;
+    virtual void set_default_contact_shotmark(ObjectContactCallbackFun* f) = 0;
+    virtual void set_default_character_contact_shotmark(ObjectContactCallbackFun* f) = 0;
     virtual void set_step_time_callback(PhysicsStepTimeCallback* cb) = 0;
     virtual void AddCall(CPHCondition* c, CPHAction* a) = 0;
     virtual const PHWorldStatistics& GetStats() = 0;

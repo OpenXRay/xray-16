@@ -537,12 +537,12 @@ BOOL dbg_draw_character_physics = false;
 BOOL dbg_draw_character_binds = false;
 BOOL dbg_draw_character_physics_pones = false;
 
-void dbg_draw_geoms(xr_vector<CODEGeom*>& m_weapon_geoms)
+void dbg_draw_geoms(xr_vector<CPhysicsGeom*>& m_weapon_geoms)
 {
-    xr_vector<CODEGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
+    xr_vector<CPhysicsGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
     for (; ii != ee; ++ii)
     {
-        CODEGeom* g = (*ii);
+        CPhysicsGeom* g = (*ii);
 
         g->dbg_draw(0.01f, color_xrgb(0, 255, 100), Flags32());
     }
@@ -745,7 +745,7 @@ void reset_root_bone_start_pose( CPhysicsShell& shell )
 
     u16	animation_root_bone_id = K->LL_GetBoneRoot();
 
-    CODEGeom	*physics_root_bone_geom = physics_root_element->geometry( 0 );
+    CPhysicsGeom	*physics_root_bone_geom = physics_root_element->geometry( 0 );
     VERIFY( physics_root_bone_geom );
 
     u16 physics_root_bone_id = physics_root_bone_geom->bone_id();
@@ -856,11 +856,11 @@ void CCharacterPhysicsSupport::RemoveActiveWeaponCollision()
     VERIFY(m_pPhysicsShell);
     VERIFY(m_weapon_attach_bone);
     VERIFY(!m_weapon_geoms.empty());
-    xr_vector<CODEGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
+    xr_vector<CPhysicsGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
     Fmatrix m0;
     (*ii)->get_xform(m0);
     CPhysicsElement* root = m_active_item_obj->PPhysicsShell()->get_ElementByStoreOrder(0);
-    CODEGeom* rg = root->geometry(0);
+    CPhysicsGeom* rg = root->geometry(0);
     VERIFY(rg);
     Fmatrix m1;
     rg->get_xform(m1);
@@ -875,7 +875,7 @@ void CCharacterPhysicsSupport::RemoveActiveWeaponCollision()
 
     for (; ii != ee; ++ii)
     {
-        CODEGeom* g = (*ii);
+        CPhysicsGeom* g = (*ii);
 
         // g->dbg_draw( 0.01f, color_xrgb( 0, 0, 255 ), Flags32() );
 
@@ -977,13 +977,13 @@ void CCharacterPhysicsSupport::AddActiveWeaponCollision()
     u16 geom_num = weapon_element->numberOfGeoms();
     for (u16 i = 0; i < geom_num; ++i)
         m_weapon_geoms.push_back(weapon_element->geometry(i));
-    xr_vector<CODEGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
+    xr_vector<CPhysicsGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
 
     // DBG_OpenCashedDraw();
 
     for (; ii != ee; ++ii)
     {
-        CODEGeom* g = (*ii);
+        CPhysicsGeom* g = (*ii);
         // g->dbg_draw( 0.01f, color_xrgb( 255, 0, 0 ), Flags32() );
         weapon_element->remove_geom(g);
         g->set_bone_id(weapon_attach_bone->m_SelfID);
