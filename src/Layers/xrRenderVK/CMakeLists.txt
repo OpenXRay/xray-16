@@ -90,6 +90,10 @@ target_sources(xrRenderVK PRIVATE
     VulkanFontRender.h
     VulkanStatGraphRender.cpp
     VulkanStatGraphRender.h
+    VulkanWallMarkArray.cpp
+    VulkanWallMarkArray.h
+    WallmarkGeometry.cpp
+    WallmarkGeometry.h
     VulkanLevelRender.cpp
     VulkanLevelRender.h
     VulkanCameraState.h

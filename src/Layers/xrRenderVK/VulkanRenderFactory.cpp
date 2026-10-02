@@ -4,6 +4,7 @@
 #include "VulkanUIShader.h"
 #include "VulkanFontRender.h"
 #include "VulkanStatGraphRender.h"
+#include "VulkanWallMarkArray.h"
 #include "VulkanImGuiRender.h"
 #include "VulkanUISequenceVideoItem.h"
 
@@ -51,6 +52,15 @@ void VulkanRenderFactory::DestroyStatGraphRender(IStatGraphRender* object)
     delete object;
 }
 
+IWallMarkArray* VulkanRenderFactory::CreateWallMarkArray()
+{
+    return new VulkanWallMarkArray(device_);
+}
+void VulkanRenderFactory::DestroyWallMarkArray(IWallMarkArray* object)
+{
+    delete object;
+}
+
 // These contracts belong to the subsequent environment and debug milestones.
 #define VK_PENDING_FACTORY(Class) \
     I##Class* VulkanRenderFactory::Create##Class() { return nullptr; } \
@@ -60,7 +70,6 @@ void VulkanRenderFactory::DestroyStatGraphRender(IStatGraphRender* object)
 #ifdef DEBUG
 VK_PENDING_FACTORY(ObjectSpaceRender)
 #endif
-VK_PENDING_FACTORY(WallMarkArray)
 VK_PENDING_FACTORY(EnvironmentRender)
 VK_PENDING_FACTORY(EnvDescriptorRender)
 VK_PENDING_FACTORY(RainRender)

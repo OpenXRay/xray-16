@@ -5,6 +5,9 @@
 #include "SpecialVisuals.h"
 #include "ParticleVisual.h"
 #include "VulkanVisual.h"
+#include "VulkanUIShader.h"
+#include "VulkanWallMarkArray.h"
+#include "WallmarkGeometry.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/device.h"
@@ -25,6 +28,54 @@ namespace xray::render::vulkan
 {
 namespace
 {
+bool wallmark_geometry(const Fvector (&triangle)[3], const Fvector& point,
+    float size, const std::string& texture, ModelGeometry& result)
+{
+    if (!(size > EPS_L) || texture.empty() || !_valid(point)) return false;
+    Fvector normal;
+    normal.mknormal(triangle[0], triangle[1], triangle[2]);
+    if (!_valid(normal) || normal.square_magnitude() < EPS_L) return false;
+    Fvector axis;
+    axis.set(std::abs(normal.y) > .99f ? 1.f : 0.f,
+        std::abs(normal.y) > .99f ? 0.f : 1.f, 0.f);
+    Fvector right, up;
+    right.crossproduct(axis, normal).normalize_safe();
+    up.crossproduct(normal, right).normalize_safe();
+    std::array<WallmarkVertex, 3> input;
+    for (size_t i = 0; i < 3; ++i)
+    {
+        Fvector delta;
+        delta.sub(triangle[i], point);
+        input[i].position = {triangle[i].x, triangle[i].y, triangle[i].z};
+        input[i].u = .5f + delta.dotproduct(right) / size;
+        input[i].v = .5f - delta.dotproduct(up) / size;
+    }
+    const auto clipped = clip_wallmark_triangle(input);
+    if (clipped.empty()) return false;
+    result = {};
+    result.texture = texture;
+    result.mode = SurfaceMode::Transparent;
+    for (const auto& vertex : clipped)
+    {
+        ModelVertex model;
+        Fvector offset;
+        offset.sub(Device.vCameraPosition, point).normalize_safe();
+        for (size_t axis = 0; axis < 3; ++axis)
+        {
+            const float component = axis == 0 ? offset.x : axis == 1 ? offset.y : offset.z;
+            model.position[axis] = vertex.position[axis] + component * .003f;
+        }
+        model.normal[0] = normal.x;
+        model.normal[1] = normal.y;
+        model.normal[2] = normal.z;
+        model.uv[0] = vertex.u;
+        model.uv[1] = vertex.v;
+        result.indices.push_back(static_cast<uint32_t>(result.vertices.size()));
+        result.vertices.push_back(model);
+    }
+    return true;
+}
+
 std::string model_cache_name(pcstr name)
 {
     std::string result = name ? name : "";
@@ -430,6 +481,13 @@ void VulkanLevelRender::Begin()
     R_ASSERT2(game_device_ && !frame_phase_.active(),
         "Vulkan renderer Begin requires an initialized idle frame");
     game_device_->begin_frame();
+    const auto expired = std::remove_if(wallmarks_.begin(), wallmarks_.end(),
+        [](const Wallmark& mark) { return Device.fTimeGlobal >= mark.expires; });
+    if (expired != wallmarks_.end())
+    {
+        R_ASSERT2(game_device_->wait_idle(), "Vulkan wallmark retirement requires idle GPU frames");
+        wallmarks_.erase(expired, wallmarks_.end());
+    }
     R_ASSERT2(frame_phase_.begin(), "Vulkan renderer frame phase could not begin");
     frame_clear_target_ = clear_target_pending_;
     clear_target_pending_ = false;
@@ -542,6 +600,17 @@ void VulkanLevelRender::End()
     const Fmatrix view_projection = current_view_projection();
     std::memcpy(mvp, &view_projection, sizeof(mvp));
 
+    if (render_world)
+        for (auto& mark : wallmarks_)
+        {
+            Fmatrix transform = view_projection;
+            if (mark.transform) transform.mul(view_projection, *mark.transform);
+            float matrix[16];
+            std::memcpy(matrix, &transform, sizeof(matrix));
+            game_device_->queue_model(*mark.model, mark.skeleton, matrix, false,
+                distance_squared(mark.center, Device.vCameraPosition), mark.model.get());
+        }
+
     const DeferredEnvironment environment = current_environment();
     const DeferredLight light = make_environment_deferred_light(environment);
     FrameStatus status = FrameStatus::Presented;
@@ -595,6 +664,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
     // and visual identities are released. Uploads use the same graphics queue.
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");
     if (game_device_) game_device_->discard_scene_draws();
+    wallmarks_.clear();
     models_Clear(true);
     model_bases_.clear();
     model_gpu_cache_.clear();
@@ -609,6 +679,7 @@ void VulkanLevelRender::level_Unload()
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
     if (game_device_) game_device_->discard_scene_draws();
+    wallmarks_.clear();
     models_Clear(true);
     model_bases_.clear();
     model_gpu_cache_.clear();
@@ -988,6 +1059,20 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
         game_device_->discard_model_draws(visual);
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model deletion requires idle GPU frames");
+    std::vector<IKinematics*> doomed_skeletons;
+    std::function<void(const VulkanModelVisual&)> collect_skeletons =
+        [&](const VulkanModelVisual& node)
+    {
+        if (node.skeleton()) doomed_skeletons.push_back(node.skeleton());
+        for (const auto& child : node.children()) collect_skeletons(*child);
+    };
+    collect_skeletons(*found->second);
+    wallmarks_.erase(std::remove_if(wallmarks_.begin(), wallmarks_.end(),
+        [&](const Wallmark& mark)
+    {
+        return std::find(doomed_skeletons.begin(), doomed_skeletons.end(), mark.skeleton) !=
+            doomed_skeletons.end();
+    }), wallmarks_.end());
     found->second->release_pose_buffers();
     if (!discard && !found->second->cache_name().empty())
         model_pool_.emplace(found->second->cache_name(), std::move(found->second));
@@ -1133,6 +1218,105 @@ IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)
     auto* object = xr_new<VulkanObjectSpecific>(parent);
     object_specifics_.push_back(object);
     return object;
+}
+
+void VulkanLevelRender::create_wallmark(ModelGeometry&& geometry, const Fvector& center,
+    IKinematics* skeleton, const Fmatrix* transform)
+{
+    if (!device_ || !game_device_) return;
+    auto model = std::make_unique<GpuModel>();
+    std::string error;
+    if (!model->load_decoded(std::move(geometry), device_, queue_, pool_, memory_,
+            upload_, *textures_, *pass_, error))
+    {
+        Msg("! [renderer-vulkan] wallmark: %s", error.c_str());
+        return;
+    }
+    wallmarks_.push_back({std::move(model), skeleton, transform, center,
+        Device.fTimeGlobal + 50.f});
+}
+
+void VulkanLevelRender::add_StaticWallmark(const wm_shader& shader, const Fvector& point,
+    float size, CDB::TRI* triangle, Fvector* vertices)
+{
+    if (!triangle || !vertices || triangle->suppress_wm) return;
+    const auto* material = dynamic_cast<const VulkanUIShader*>(&*shader);
+    R_ASSERT2(material, "Vulkan wallmark requires a Vulkan material");
+    Fvector corners[3] = {vertices[triangle->verts[0]],
+        vertices[triangle->verts[1]], vertices[triangle->verts[2]]};
+    ModelGeometry geometry;
+    if (wallmark_geometry(corners, point, size, material->texture_name(), geometry))
+        create_wallmark(std::move(geometry), point);
+}
+
+void VulkanLevelRender::add_StaticWallmark(IWallMarkArray* array, const Fvector& point,
+    float size, CDB::TRI* triangle, Fvector* vertices)
+{
+    auto* materials = dynamic_cast<VulkanWallMarkArray*>(array);
+    R_ASSERT2(materials, "Vulkan wallmark requires a Vulkan material array");
+    if (!triangle || !vertices || triangle->suppress_wm) return;
+    const std::string* texture = materials->select_texture();
+    if (!texture) return;
+    Fvector corners[3] = {vertices[triangle->verts[0]],
+        vertices[triangle->verts[1]], vertices[triangle->verts[2]]};
+    ModelGeometry geometry;
+    if (wallmark_geometry(corners, point, size, *texture, geometry))
+        create_wallmark(std::move(geometry), point);
+}
+
+void VulkanLevelRender::add_SkeletonWallmark(const Fmatrix* transform, IKinematics* skeleton,
+    IWallMarkArray* array, const Fvector& start, const Fvector& direction, float size)
+{
+    auto* materials = dynamic_cast<VulkanWallMarkArray*>(array);
+    R_ASSERT2(materials && transform && skeleton,
+        "Vulkan skeletal wallmark requires a live skeleton and material array");
+    const std::string* texture = materials->select_texture();
+    if (!texture || !(size > EPS_L)) return;
+    skeleton->CalculateBones();
+    IKinematics::pick_result picked{};
+    u16 bone = BI_NONE;
+    float nearest = size * 3.f;
+    for (u16 id = 0; id < skeleton->LL_BoneCount(); ++id)
+    {
+        IKinematics::pick_result hit{};
+        if (skeleton->PickBone(*transform, hit, nearest, start, direction, id))
+        {
+            nearest = hit.dist;
+            picked = hit;
+            bone = id;
+        }
+    }
+    if (bone == BI_NONE) return;
+    Fvector contact;
+    contact.mad(start, direction, nearest);
+    ModelGeometry geometry;
+    if (!wallmark_geometry(picked.tri, contact, size, *texture, geometry)) return;
+    // Store the decal in bind space; the model's ordinary skinning path then
+    // carries it with the hit bone as its pose changes.
+    Fmatrix inverse_world, inverse_bone;
+    inverse_world.invert(*transform);
+    inverse_bone.invert(skeleton->LL_GetBoneInstance(bone).mRenderTransform);
+    for (auto& vertex : geometry.vertices)
+    {
+        Fvector world, local, bind;
+        world.set(vertex.position[0], vertex.position[1], vertex.position[2]);
+        inverse_world.transform_tiny(local, world);
+        inverse_bone.transform_tiny(bind, local);
+        vertex.position[0] = bind.x;
+        vertex.position[1] = bind.y;
+        vertex.position[2] = bind.z;
+        vertex.bones[0] = bone;
+    }
+    geometry.type = 4;
+    create_wallmark(std::move(geometry), contact, skeleton, transform);
+}
+
+void VulkanLevelRender::clear_static_wallmarks()
+{
+    if (game_device_)
+        R_ASSERT2(game_device_->wait_idle(), "Vulkan wallmark clear requires idle GPU frames");
+    wallmarks_.erase(std::remove_if(wallmarks_.begin(), wallmarks_.end(),
+        [](const Wallmark& mark) { return !mark.skeleton; }), wallmarks_.end());
 }
 
 void VulkanLevelRender::ros_destroy(IRender_ObjectSpecific*& object)

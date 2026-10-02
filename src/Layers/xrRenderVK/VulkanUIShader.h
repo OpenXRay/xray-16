@@ -25,6 +25,7 @@ public:
     bool GetBaseTextureResolution(Fvector2& size) override;
     xrImTextureData GetImGuiTextureId() override;
     VkDescriptorSet descriptor() const { return descriptor_; }
+    const std::string& texture_name() const { return texture_; }
     VkDescriptorSet current_descriptor(u32 time);
     std::shared_ptr<VulkanVideoTexture> video() const { return video_; }
 

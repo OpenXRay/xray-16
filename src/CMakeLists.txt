@@ -49,6 +49,9 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_skeleton_motions_test tests/vulkan_skeleton_motions.cpp)
     xray_add_vulkan_state_test(vulkan_motion_playback_test tests/vulkan_motion_playback.cpp)
     xray_add_vulkan_state_test(vulkan_particle_catalog_test tests/vulkan_particle_catalog.cpp)
+    xray_add_vulkan_state_test(vulkan_wallmark_geometry_test tests/vulkan_wallmark_geometry.cpp)
+    target_sources(vulkan_wallmark_geometry_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/WallmarkGeometry.cpp")
     target_sources(vulkan_particle_catalog_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ParticleCatalog.cpp")
     target_sources(vulkan_motion_playback_test PRIVATE

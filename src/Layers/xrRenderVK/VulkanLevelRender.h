@@ -75,6 +75,14 @@ public:
     void light_destroy(IRender_Light* light) override;
     IRender_Glow* glow_create() override;
     void glow_destroy(IRender_Glow* glow) override;
+    void add_StaticWallmark(const wm_shader& shader, const Fvector& point,
+        float size, CDB::TRI* triangle, Fvector* vertices) override;
+    void add_StaticWallmark(IWallMarkArray* array, const Fvector& point,
+        float size, CDB::TRI* triangle, Fvector* vertices) override;
+    void add_SkeletonWallmark(const Fmatrix* transform, IKinematics* skeleton,
+        IWallMarkArray* array, const Fvector& start, const Fvector& direction,
+        float size) override;
+    void clear_static_wallmarks() override;
     DeviceState GetDeviceState() override;
     void OnAppLifecycleChanged(bool active) override;
 
@@ -89,6 +97,8 @@ private:
     std::unique_ptr<VulkanModelVisual> load_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error);
     VulkanModelVisual* get_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error);
     void destroy_all_models();
+    void create_wallmark(ModelGeometry&& geometry, const Fvector& center,
+        IKinematics* skeleton = nullptr, const Fmatrix* transform = nullptr);
     Fmatrix current_view_projection() const;
     GpuLevel level_;
     std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
@@ -116,6 +126,15 @@ private:
     std::vector<VulkanLight*> lights_;
     std::vector<VulkanGlow*> glows_;
     std::vector<VulkanObjectSpecific*> object_specifics_;
+    struct Wallmark
+    {
+        std::unique_ptr<GpuModel> model;
+        IKinematics* skeleton{};
+        const Fmatrix* transform{};
+        Fvector center{};
+        float expires{};
+    };
+    std::vector<Wallmark> wallmarks_;
     VulkanDeviceResourceState device_resource_state_;
     bool reset_in_progress_{};
     bool reset_pending_{};
