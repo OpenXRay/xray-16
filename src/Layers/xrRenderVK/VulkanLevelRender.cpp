@@ -649,9 +649,13 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
 }
 
 std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const VisualRecord& record,
-    const std::string& inherited_texture, const std::string& cache_name, std::string& error)
+    const std::string& inherited_texture, const std::string& cache_name, std::string& error,
+    bool skeletal_child)
 {
-    if (record.type != 0 && record.type != 1 && record.type != 2)
+    const bool skeleton = record.type == 3 || record.type == 10;
+    const bool skinned = record.type == 4 || record.type == 5;
+    if (record.type != 0 && record.type != 1 && record.type != 2 && !skeleton &&
+        !(skeletal_child && skinned))
     {
         error = "unsupported OGF model type " + std::to_string(record.type);
         return nullptr;
@@ -662,13 +666,18 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
         error = "OGF mesh unexpectedly contains child references";
         return nullptr;
     }
+    if (skinned && (!record.embedded_children.empty() || !record.linked_children.empty()))
+    {
+        error = "OGF skinned child unexpectedly contains nested visuals";
+        return nullptr;
+    }
     if (record.type == 1 && (record.embedded_children.empty() == record.linked_children.empty()))
     {
         error = "OGF hierarchy needs exactly one nonempty child table";
         return nullptr;
     }
     std::shared_ptr<GpuModel> gpu;
-    if (record.type == 0 || record.type == 2)
+    if (record.type == 0 || record.type == 2 || skinned)
     {
         if (!cache_name.empty()) gpu = model_gpu_cache_[cache_name].lock();
         if (!gpu)
@@ -690,10 +699,24 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
     }
     auto model = std::make_unique<VulkanModelVisual>(record, cache_name, std::move(gpu),
         record.linked_children.empty() ? nullptr : &level_);
+    if (skeleton)
+    {
+        if (record.embedded_children.empty() || !record.linked_children.empty())
+        {
+            error = "Vulkan skeleton needs embedded child meshes";
+            return nullptr;
+        }
+        SkeletonBones bones;
+        if (!parse_skeleton_bones({record.source.data(), record.source.size()}, bones, error))
+            return nullptr;
+        auto instance = VulkanKinematics::create(bones, model.get(), error);
+        if (!instance) return nullptr;
+        model->set_skeleton(std::move(instance));
+    }
     const std::string texture = record.texture.empty() ? inherited_texture : record.texture;
     for (const auto& child : record.embedded_children)
     {
-        auto instance = create_model_tree(child, texture, "", error);
+        auto instance = create_model_tree(child, texture, "", error, skeletal_child || skeleton);
         if (!instance) return nullptr;
         model->add_child(std::move(instance));
     }
@@ -802,12 +825,14 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     const float lod = lod_for_distance(radius, sort_distance);
     if (model)
     {
-        std::function<void(const VulkanModelVisual&)> submit = [&](const VulkanModelVisual& node)
+        std::function<void(const VulkanModelVisual&, IKinematics*)> submit =
+            [&](const VulkanModelVisual& node, IKinematics* skeleton)
         {
+            if (node.skeleton()) skeleton = node.skeleton();
             if (node.has_gpu())
-                game_device_->queue_model(node.gpu(), nullptr,
+                game_device_->queue_model(node.gpu(), skeleton,
                     transform, hud, sort_distance, model_owner, lod);
-            for (const auto& child : node.children()) submit(*child);
+            for (const auto& child : node.children()) submit(*child, skeleton);
             if (!node.linked().empty())
             {
                 R_ASSERT2(node.linked_valid(), "Vulkan model has level references from an unloaded level");
@@ -815,7 +840,7 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
                     game_device_->queue_level_visual(index, transform, hud, sort_distance, model_owner, lod);
             }
         };
-        submit(*model);
+        submit(*model, nullptr);
     }
     else
         game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud,

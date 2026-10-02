@@ -44,6 +44,11 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_frame_phase_test tests/vulkan_frame_phase.cpp)
     xray_add_vulkan_state_test(vulkan_camera_state_test tests/vulkan_camera_state.cpp)
     xray_add_vulkan_state_test(vulkan_slide_windows_test tests/vulkan_slide_windows.cpp)
+    xray_add_vulkan_state_test(vulkan_skeleton_bones_test tests/vulkan_skeleton_bones.cpp)
+    target_sources(vulkan_skeleton_bones_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SkeletonBones.cpp")
+    target_include_directories(vulkan_skeleton_bones_test PRIVATE
+        "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
     target_sources(vulkan_slide_windows_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SlidingWindows.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ModelGeometry.cpp"
@@ -127,6 +132,22 @@ if (XRAY_BUILD_VULKAN_TESTS)
     )
     target_link_libraries(vulkan_model_geometry_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_model_geometry COMMAND vulkan_model_geometry_test)
+
+    add_executable(vulkan_kinematics_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_kinematics.cpp"
+    )
+    target_include_directories(vulkan_kinematics_test PRIVATE
+        "${XRAY_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>
+    )
+    target_compile_definitions(vulkan_kinematics_test PRIVATE DEBUG)
+    target_compile_options(vulkan_kinematics_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
+    )
+    target_link_libraries(vulkan_kinematics_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
+    add_test(NAME vulkan_kinematics COMMAND vulkan_kinematics_test)
 
     add_executable(vulkan_shader_module_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_shader_module.cpp"

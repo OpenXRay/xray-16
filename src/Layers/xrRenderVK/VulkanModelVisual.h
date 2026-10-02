@@ -2,6 +2,7 @@
 
 #include "GpuModel.h"
 #include "GpuLevel.h"
+#include "VulkanKinematics.h"
 #include "Include/xrRender/RenderVisual.h"
 #include "xrEngine/vis_common.h"
 
@@ -38,6 +39,8 @@ public:
         visibility_.clear();
         visibility_.box = other.visibility_.box;
         visibility_.sphere = other.visibility_.sphere;
+        if (other.skeleton_)
+            skeleton_ = std::make_unique<VulkanKinematics>(*other.skeleton_, this);
         for (const auto& child : other.children_)
             children_.push_back(std::make_unique<VulkanModelVisual>(*child));
     }
@@ -66,6 +69,9 @@ public:
     const auto& linked() const { return linked_; }
     bool linked_valid() const { return level_ && level_->revision() == level_revision_; }
     bool has_gpu() const { return !!gpu_; }
+    void set_skeleton(std::unique_ptr<VulkanKinematics> skeleton) { skeleton_ = std::move(skeleton); }
+    IKinematics* dcast_PKinematics() override { return skeleton_.get(); }
+    VulkanKinematics* skeleton() const { return skeleton_.get(); }
     const VulkanModelVisual* find(const IRenderVisual* visual) const
     {
         if (this == visual) return this;
@@ -94,6 +100,7 @@ public:
 private:
     vis_data visibility_;
     std::shared_ptr<GpuModel> gpu_;
+    std::unique_ptr<VulkanKinematics> skeleton_;
     std::string cache_name_;
     u32 type_{};
     std::vector<std::unique_ptr<VulkanModelVisual>> children_;

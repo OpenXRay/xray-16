@@ -42,6 +42,10 @@ target_sources(xrRenderVK PRIVATE
     LevelVisibility.h
     ModelGeometry.cpp
     ModelGeometry.h
+    SkeletonBones.cpp
+    SkeletonBones.h
+    VulkanKinematics.cpp
+    VulkanKinematics.h
     ScreenCopyPass.cpp
     ScreenCopyPass.h
     ScenePass.cpp

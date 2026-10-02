@@ -81,7 +81,7 @@ protected:
 private:
     std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord& record,
         const std::string& inherited_texture, const std::string& cache_name,
-        std::string& error);
+        std::string& error, bool skeletal_child = false);
     void destroy_all_models();
     Fmatrix current_view_projection() const;
     GpuLevel level_;
