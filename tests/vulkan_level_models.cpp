@@ -1,5 +1,6 @@
 #include "src/Layers/xrRenderVK/LevelModels.h"
 #include "src/Layers/xrRenderVK/VisualCatalog.h"
+#include "src/Layers/xrRenderVK/SpecialVisuals.h"
 
 #include <cassert>
 #include <cstring>
@@ -250,4 +251,72 @@ int main()
     assert(result.visuals.empty() && result.models.empty());
     assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     assert(result.visuals.size() == 1 && result.models.size() == 1);
+
+    // Type 6 preserves eight camera-facing impostor facets and its near child.
+    Bytes facets;
+    for (int face = 0; face < 8; ++face)
+        for (int vertex = 0; vertex < 4; ++vertex)
+        {
+            f32(facets, vertex == 1 || vertex == 2 ? 1.f : 0.f);
+            f32(facets, vertex >= 2 ? 1.f : 0.f);
+            f32(facets, float(face));
+            f32(facets, float(vertex & 1)); f32(facets, float(vertex >> 1));
+            u32(facets, 0); u32(facets, 0);
+        }
+    Bytes child, children, lod, lod_visuals;
+    part(child, 1, header); part(child, 21, container);
+    part(children, 0, child);
+    header[1] = 6;
+    part(lod, 1, header); part(lod, 9, children); part(lod, 11, facets);
+    part(lod_visuals, 0, lod);
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(lod_visuals), result, error));
+    assert(result.visuals.size() == 2 && result.models.size() == 9 &&
+        result.visuals[0].children[0] == 1 && result.visuals[0].lod_facets[7] == 7);
+    assert(select_lod_facet(result.visuals[0].lod_normals, {0, 0, -1}) == 0);
+    auto directional = result.visuals[0].lod_normals;
+    directional[3] = {1.f, 0.f, 0.f};
+    assert(select_lod_facet(directional, {1.f, 0.f, 0.f}) == 3);
+    facets.pop_back();
+    lod.clear(); lod_visuals.clear();
+    part(lod, 1, header); part(lod, 9, children); part(lod, 11, facets);
+    part(lod_visuals, 0, lod);
+    assert(!load_level_models(input(shaders), input(vb), input(ib), input(lod_visuals), result, error));
+    assert(result.models.size() == 9);
+
+    // Tree type 7 has a per-instance transform; tree type 11 additionally
+    // selects windows from level.geom's fsL_SWIS table.
+    Bytes tree_def, tree_visual, tree_visuals, tree_table, tree_ref;
+    for (int i = 0; i < 16; ++i)
+        f32(tree_def, i == 0 || i == 5 || i == 10 || i == 15 ? 2048.f :
+            i == 12 ? 3.f : 0.f);
+    tree_def.insert(tree_def.end(), 40, 0);
+    header[1] = 7;
+    part(tree_visual, 1, header); part(tree_visual, 21, container);
+    part(tree_visual, 12, tree_def); part(tree_visuals, 0, tree_visual);
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals), result, error));
+    assert(result.models[0].vertices[1].position[0] == 4.f);
+    header[1] = 11;
+    tree_visual.clear(); tree_visuals.clear();
+    part(tree_visual, 1, header); part(tree_visual, 21, container);
+    part(tree_visual, 12, tree_def);
+    u32(tree_ref, 0); part(tree_visual, 20, tree_ref);
+    part(tree_visuals, 0, tree_visual);
+    u32(tree_table, 1);
+    tree_table.insert(tree_table.end(), 16, 0);
+    u32(tree_table, 1); u32(tree_table, 0); u16(tree_table, 1); u16(tree_table, 3);
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals),
+        result, error, {}, {}, input(tree_table)));
+    assert(result.models[0].windows.size() == 1 && result.models[0].indices.size() == 3);
+    tree_table.pop_back();
+    assert(!load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals),
+        result, error, {}, {}, input(tree_table)));
+    assert(result.models[0].windows.size() == 1);
+
+    // The OGF model pool has no type-12 case. DX11 loads its separate
+    // level.fog_vol stream; an OGF type-12 must fail without partial visuals.
+    header[1] = 12; tree_visual.clear(); tree_visuals.clear();
+    part(tree_visual, 1, header); part(tree_visual, 21, container);
+    part(tree_visuals, 0, tree_visual);
+    assert(!load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals), result, error));
+    assert(result.models[0].windows.size() == 1);
 }

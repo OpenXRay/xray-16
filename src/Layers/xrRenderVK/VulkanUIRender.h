@@ -6,9 +6,11 @@
 
 #include <array>
 #include <vector>
+struct ImDrawData;
 
 namespace xray::render::vulkan
 {
+class VulkanUIShader;
 // Accumulates engine UI primitives on the CPU and records Vulkan indexed
 // draws when FrameContext reaches the swapchain render pass.
 class VulkanUIRender final : public IUIRender
@@ -19,6 +21,8 @@ public:
     void setup_states();
     void reset_frame();
     bool record(const FrameRecordingContext& frame, std::string& error);
+    void append_imgui(ImDrawData* data);
+    VulkanUIShader* current_shader() const { return shader_; }
 
     void CreateUIGeom() override;
     void DestroyUIGeom() override;
@@ -56,9 +60,12 @@ private:
     const ScenePass* pass_{};
     std::array<FrameBuffers, FrameContext::FramesInFlight> frames_{};
     std::vector<UiVertex> vertices_;
+    std::vector<Fvector> world_positions_;
+    std::vector<uint8_t> visible_;
     std::vector<uint32_t> indices_;
     std::vector<Batch> batches_;
     VkDescriptorSet texture_{};
+    VulkanUIShader* shader_{};
     VkRect2D scissor_{};
     bool has_scissor_{};
     ePrimitiveType primitive_{ptNone};
@@ -66,5 +73,6 @@ private:
     uint32_t first_vertex_{}, limit_{};
     int alpha_ref_{};
     CullMode cull_{cmNONE};
+    Fmatrix world_{};
 };
 }

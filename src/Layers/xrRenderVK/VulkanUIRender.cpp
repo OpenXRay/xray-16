@@ -1,6 +1,8 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanUIRender.h"
 #include "VulkanUIShader.h"
+#include "xrEngine/device.h"
+#include "imgui.h"
 
 #include <algorithm>
 #include <cmath>
@@ -22,6 +24,8 @@ void VulkanUIRender::reset_frame()
 {
     R_ASSERT2(primitive_ == ptNone, "Vulkan UI primitive was not flushed");
     vertices_.clear();
+    world_positions_.clear();
+    visible_.clear();
     indices_.clear();
     batches_.clear();
 }
@@ -31,10 +35,12 @@ void VulkanUIRender::setup_states()
     R_ASSERT2(primitive_ == ptNone, "Vulkan UI state reset with an unfinished primitive");
     reset_frame();
     texture_ = VK_NULL_HANDLE;
+    shader_ = nullptr;
     scissor_ = {};
     has_scissor_ = false;
     alpha_ref_ = 0;
     cull_ = cmNONE;
+    world_.identity();
 }
 
 bool VulkanUIRender::ensure(BufferResource& buffer, VkDeviceSize bytes,
@@ -88,6 +94,7 @@ void VulkanUIRender::DestroyUIGeom()
     primitive_ = ptNone;
     reset_frame();
     texture_ = VK_NULL_HANDLE;
+    shader_ = nullptr;
     has_scissor_ = false;
     alpha_ref_ = 0;
     cull_ = cmNONE;
@@ -97,7 +104,8 @@ void VulkanUIRender::SetShader(IUIShader& shader)
 {
     auto* vk_shader = dynamic_cast<VulkanUIShader*>(&shader);
     R_ASSERT2(vk_shader && vk_shader->inited(), "Vulkan UI requires a loaded Vulkan texture shader");
-    texture_ = vk_shader->descriptor();
+    shader_ = vk_shader;
+    texture_ = vk_shader->current_descriptor(Device.dwTimeContinual);
 }
 
 void VulkanUIRender::SetAlphaRef(int aref) { alpha_ref_ = std::clamp(aref, 0, 255); }
@@ -126,18 +134,23 @@ void VulkanUIRender::StartPrimitive(u32 max_vertices, ePrimitiveType type, ePoin
     vertices_.reserve(vertices_.size() + max_vertices);
 }
 
-void VulkanUIRender::PushPoint(float x, float y, float, u32 color, float u, float v)
+void VulkanUIRender::PushPoint(float x, float y, float z, u32 color, float u, float v)
 {
     R_ASSERT2(primitive_ != ptNone && vertices_.size() - first_vertex_ < limit_,
         "Vulkan UI primitive exceeds its reserved vertex count");
     // D3D's packed ARGB bytes are BGRA in memory; Vulkan's R8G8B8A8
     // vertex input expects RGBA bytes.
     const u32 rgba = (color & 0xff00ff00u) | ((color >> 16) & 0xffu) | ((color & 0xffu) << 16);
+    R_ASSERT2(world_positions_.size() == vertices_.size(), "Vulkan UI position buffers diverged");
+    Fvector position; position.set(x, y, z);
+    world_positions_.push_back(position);
+    visible_.push_back(1);
     vertices_.push_back({{x, y}, {u, v}, rgba});
 }
 
 void VulkanUIRender::add_line(uint32_t a, uint32_t b)
 {
+    if (!visible_[a] || !visible_[b]) return;
     const UiVertex& va = vertices_[a];
     const UiVertex& vb = vertices_[b];
     const float dx = vb.position[0] - va.position[0], dy = vb.position[1] - va.position[1];
@@ -156,6 +169,7 @@ void VulkanUIRender::add_line(uint32_t a, uint32_t b)
 
 void VulkanUIRender::add_triangle(uint32_t a, uint32_t b, uint32_t c)
 {
+    if (!visible_[a] || !visible_[b] || !visible_[c]) return;
     const auto& p = vertices_[a].position;
     const auto& q = vertices_[b].position;
     const auto& r = vertices_[c].position;
@@ -171,6 +185,21 @@ void VulkanUIRender::FlushPrimitive()
 {
     R_ASSERT2(primitive_ != ptNone && texture_, "Vulkan UI primitive has no texture");
     const uint32_t count = static_cast<uint32_t>(vertices_.size()) - first_vertex_;
+    if (point_type_ == pttLIT)
+        for (uint32_t i = first_vertex_; i < first_vertex_ + count; ++i)
+        {
+            Fvector position;
+            world_.transform_tiny(position, world_positions_[i]);
+            Fvector4 clip;
+            Device.mFullTransform.transform(clip, position);
+            if (std::isfinite(clip.w) && std::abs(clip.w) > 1.e-6f)
+            {
+                if (clip.w <= 0.f) { visible_[i] = 0; continue; }
+                vertices_[i].position[0] = (clip.x / clip.w + 1.f) * .5f * Device.dwWidth;
+                vertices_[i].position[1] = (1.f - clip.y / clip.w) * .5f * Device.dwHeight;
+            }
+            else visible_[i] = 0;
+        }
     const uint32_t first_index = static_cast<uint32_t>(indices_.size());
     if (primitive_ == ptTriList)
         for (uint32_t i = 0; i + 2 < count; i += 3)
@@ -187,10 +216,70 @@ void VulkanUIRender::FlushPrimitive()
         batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index,
             texture_, scissor_, has_scissor_, float(alpha_ref_) / 255.0f});
     primitive_ = ptNone;
+    world_positions_.resize(vertices_.size());
+    visible_.resize(vertices_.size(), 1);
     point_type_ = pttNone;
 }
 
-LPCSTR VulkanUIRender::UpdateShaderName(LPCSTR, LPCSTR shader) { return shader; }
-void VulkanUIRender::CacheSetXformWorld(const Fmatrix&) {}
+void VulkanUIRender::append_imgui(ImDrawData* data)
+{
+    if (!data || !data->Valid || data->DisplaySize.x <= 0 || data->DisplaySize.y <= 0) return;
+    R_ASSERT2(primitive_ == ptNone, "ImGui cannot interrupt an unfinished UI primitive");
+    const ImVec2 origin = data->DisplayPos;
+    const ImVec2 scale = data->FramebufferScale;
+    for (int list_index = 0; list_index < data->CmdListsCount; ++list_index)
+    {
+        const ImDrawList* list = data->CmdLists[list_index];
+        const size_t first_vertex = vertices_.size();
+        vertices_.reserve(first_vertex + list->VtxBuffer.Size);
+        for (const ImDrawVert& vertex : list->VtxBuffer)
+            vertices_.push_back({{(vertex.pos.x - origin.x) * scale.x,
+                (vertex.pos.y - origin.y) * scale.y},
+                {vertex.uv.x, vertex.uv.y}, vertex.col});
+        world_positions_.resize(vertices_.size());
+        visible_.resize(vertices_.size(), 1);
+        for (const ImDrawCmd& command : list->CmdBuffer)
+        {
+            if (command.UserCallback)
+            {
+                if (command.UserCallback != ImDrawCallback_ResetRenderState)
+                    command.UserCallback(list, &command);
+                continue;
+            }
+            const float x1 = (command.ClipRect.x - origin.x) * scale.x;
+            const float y1 = (command.ClipRect.y - origin.y) * scale.y;
+            const float x2 = (command.ClipRect.z - origin.x) * scale.x;
+            const float y2 = (command.ClipRect.w - origin.y) * scale.y;
+            const int32_t x = std::max(0, static_cast<int32_t>(std::floor(x1)));
+            const int32_t y = std::max(0, static_cast<int32_t>(std::floor(y1)));
+            const int32_t right = std::min<int32_t>(Device.dwWidth, static_cast<int32_t>(std::ceil(x2)));
+            const int32_t bottom = std::min<int32_t>(Device.dwHeight, static_cast<int32_t>(std::ceil(y2)));
+            if (right <= x || bottom <= y || !command.ElemCount) continue;
+            VkDescriptorSet descriptor{};
+            const ImTextureID id = command.GetTexID();
+            static_assert(sizeof(descriptor) <= sizeof(id));
+            std::memcpy(&descriptor, &id, sizeof(descriptor));
+            if (!descriptor) continue;
+            const uint32_t begin = static_cast<uint32_t>(indices_.size());
+            for (unsigned i = 0; i < command.ElemCount; ++i)
+            {
+                const size_t index = size_t(command.IdxOffset) + i;
+                R_ASSERT2(index < size_t(list->IdxBuffer.Size), "invalid ImGui index offset");
+                const size_t vertex = first_vertex + command.VtxOffset + list->IdxBuffer[index];
+                R_ASSERT2(vertex < first_vertex + size_t(list->VtxBuffer.Size), "invalid ImGui vertex offset");
+                indices_.push_back(static_cast<uint32_t>(vertex));
+            }
+            batches_.push_back({begin, command.ElemCount, descriptor,
+                {{x, y}, {static_cast<uint32_t>(right - x), static_cast<uint32_t>(bottom - y)}}, true, 0.f});
+        }
+    }
+}
+
+LPCSTR VulkanUIRender::UpdateShaderName(LPCSTR texture, LPCSTR shader)
+{
+    string_path path;
+    return texture && FS.exist(path, "$game_textures$", texture, ".ogm") ? "hud\\movie" : shader;
+}
+void VulkanUIRender::CacheSetXformWorld(const Fmatrix& matrix) { world_ = matrix; }
 void VulkanUIRender::CacheSetCullMode(CullMode mode) { cull_ = mode; }
 }

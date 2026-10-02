@@ -78,6 +78,7 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
     }
     CStreamReader* vb = geometry->open_chunk(fsL_VB);
     CStreamReader* ib = geometry->open_chunk(fsL_IB);
+    CStreamReader* swi = geometry->open_chunk(fsL_SWIS);
     bool loaded = false;
     LevelModel model;
     if (vb && ib)
@@ -85,7 +86,14 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
         xr_vector<uint8_t> vb_bytes(vb->length()), ib_bytes(ib->length());
         vb->r(vb_bytes.data(), vb_bytes.size());
         ib->r(ib_bytes.data(), ib_bytes.size());
-        loaded = load_container_model({ vb_bytes.data(), vb_bytes.size() }, { ib_bytes.data(), ib_bytes.size() }, visual, model, error);
+        xr_vector<uint8_t> swi_bytes;
+        if (swi)
+        {
+            swi_bytes.resize(swi->length());
+            swi->r(swi_bytes.data(), swi_bytes.size());
+        }
+        loaded = load_container_model({ vb_bytes.data(), vb_bytes.size() }, { ib_bytes.data(), ib_bytes.size() }, visual, model, error,
+            {swi_bytes.data(), swi_bytes.size()});
     }
     else
         error = std::string(geometry_name) + " has no vertex or index buffers";
@@ -93,6 +101,8 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
         vb->close();
     if (ib)
         ib->close();
+    if (swi)
+        swi->close();
     FS.r_close(geometry);
     if (!loaded)
         return false;
@@ -131,7 +141,7 @@ bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& res
     ModelGeometry decoded;
     if (!decode_model_geometry(visual, decoded, error))
     {
-        if ((visual.type != 0 && visual.type != 2) || visual.source.empty())
+        if ((visual.type != 0 && visual.type != 2 && visual.type != 7 && visual.type != 11) || visual.source.empty())
             return false;
         IReader source(const_cast<uint8_t*>(visual.source.data()), visual.source.size());
         if (!source.find_chunk(OGF_GCONTAINER) || !decode_container_geometry(visual, "level.geom", decoded, error))
@@ -283,6 +293,7 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
     }
     CStreamReader* vb = geometry->open_chunk(fsL_VB);
     CStreamReader* ib = geometry->open_chunk(fsL_IB);
+    CStreamReader* swi = geometry->open_chunk(fsL_SWIS);
     if (!vb || !ib)
         error = "level.geom is missing vertex or index chunks";
     else
@@ -292,6 +303,12 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
         xr_vector<uint8_t> vb_bytes(vb->length()), ib_bytes(ib->length());
         vb->r(vb_bytes.data(), vb_bytes.size());
         ib->r(ib_bytes.data(), ib_bytes.size());
+        xr_vector<uint8_t> swi_bytes;
+        if (swi)
+        {
+            swi_bytes.resize(swi->length());
+            swi->r(swi_bytes.data(), swi_bytes.size());
+        }
         CStreamReader* fast = FS.rs_open("$level$", "level.geomX");
         xr_vector<uint8_t> fast_vb_bytes, fast_ib_bytes;
         if (fast)
@@ -317,10 +334,12 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
             load_level_models({ static_cast<const uint8_t*>(shaders->pointer()), shaders->length() }, { vb_bytes.data(), vb_bytes.size() },
                 { ib_bytes.data(), ib_bytes.size() }, { static_cast<const uint8_t*>(visuals->pointer()), visuals->length() }, result, error,
                 fast_vb_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_vb_bytes.data(), fast_vb_bytes.size() },
-                fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_ib_bytes.data(), fast_ib_bytes.size() });
+                fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_ib_bytes.data(), fast_ib_bytes.size() },
+                {swi_bytes.data(), swi_bytes.size()});
     }
     if (vb) vb->close();
     if (ib) ib->close();
+    if (swi) swi->close();
     FS.r_close(geometry);
     shaders->close();
     visuals->close();

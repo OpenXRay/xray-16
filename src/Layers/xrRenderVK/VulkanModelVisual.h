@@ -7,6 +7,7 @@
 #include "xrEngine/vis_common.h"
 
 #include <memory>
+#include <array>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,8 +36,9 @@ public:
     // Every copy has independent bounds and child identities, while GPU
     // buffers and materials remain alive until the final copy is retired.
     explicit VulkanModelVisual(const VulkanModelVisual& other)
-        : gpu_(other.gpu_), cache_name_(other.cache_name_), type_(other.type_),
-          linked_(other.linked_), level_(other.level_), level_revision_(other.level_revision_)
+        : gpu_(other.gpu_), lod_gpu_(other.lod_gpu_), lod_normals_(other.lod_normals_),
+          cache_name_(other.cache_name_), type_(other.type_), linked_(other.linked_),
+          level_(other.level_), level_revision_(other.level_revision_)
     {
         visibility_.clear();
         visibility_.box = other.visibility_.box;
@@ -96,6 +98,15 @@ public:
     const auto& linked() const { return linked_; }
     bool linked_valid() const { return level_ && level_->revision() == level_revision_; }
     bool has_gpu() const { return !!gpu_; }
+    void set_lod(std::array<std::shared_ptr<GpuModel>, 8> gpu,
+        std::array<std::array<float, 3>, 8> normals)
+    {
+        lod_gpu_ = std::move(gpu);
+        lod_normals_ = normals;
+    }
+    bool has_lod() const { return !!lod_gpu_[0]; }
+    GpuModel& lod_gpu(uint8_t facet) const { return *lod_gpu_[facet]; }
+    const auto& lod_normals() const { return lod_normals_; }
     void set_skeleton(std::unique_ptr<VulkanKinematics> skeleton) { skeleton_ = std::move(skeleton); }
     IKinematics* dcast_PKinematics() override { return skeleton_.get(); }
     VulkanKinematics* skeleton() const { return skeleton_.get(); }
@@ -134,6 +145,8 @@ private:
     Fbox initial_box_;
     Fsphere initial_sphere_;
     std::shared_ptr<GpuModel> gpu_;
+    std::array<std::shared_ptr<GpuModel>, 8> lod_gpu_{};
+    std::array<std::array<float, 3>, 8> lod_normals_{};
     std::unique_ptr<VulkanKinematics> skeleton_;
     std::string cache_name_;
     u32 type_{};

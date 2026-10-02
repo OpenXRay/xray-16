@@ -2,6 +2,8 @@
 #include "GpuLevel.h"
 #include "LevelVisibility.h"
 #include "VulkanVisual.h"
+#include "SpecialVisuals.h"
+#include "xrEngine/device.h"
 
 #include <algorithm>
 #include <limits>
@@ -124,6 +126,24 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
 {
     if (index >= visuals_.size()) return false;
     const LevelVisual& visual = visuals_[index];
+    if (visual.type == 6 && lod < .33f)
+    {
+        Fvector direction;
+        direction.set(visual.bounds[6] - Device.vCameraPosition.x,
+            visual.bounds[7] - Device.vCameraPosition.y,
+            visual.bounds[8] - Device.vCameraPosition.z);
+        const auto facet = select_lod_facet(visual.lod_normals, {direction.x, direction.y, direction.z});
+        const int32_t mesh_index = visual.lod_facets[facet];
+        if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size()) return false;
+        const Mesh& mesh = meshes_[mesh_index];
+        const bool transparent = mesh.mode == SurfaceMode::Transparent;
+        if (phase == GeometryPhase::Transparent ? transparent : !transparent)
+            return transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                mesh.index_count, mvp, mesh.material) :
+                pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                    mesh.index_count, mvp, mesh.material, mesh.mode);
+        return true;
+    }
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
@@ -149,6 +169,19 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
 {
     if (index >= visuals_.size()) return false;
     const LevelVisual& visual = visuals_[index];
+    if (visual.type == 6 && lod < .33f)
+    {
+        Fvector direction;
+        direction.set(visual.bounds[6] - Device.vCameraPosition.x,
+            visual.bounds[7] - Device.vCameraPosition.y,
+            visual.bounds[8] - Device.vCameraPosition.z);
+        const auto facet = select_lod_facet(visual.lod_normals, {direction.x, direction.y, direction.z});
+        const int32_t mesh_index = visual.lod_facets[facet];
+        if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size()) return false;
+        const Mesh& mesh = meshes_[mesh_index];
+        return pass.record_hud(frame, mesh.vertices.handle(), mesh.indices.handle(),
+            mesh.index_count, mvp, mesh.material);
+    }
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;

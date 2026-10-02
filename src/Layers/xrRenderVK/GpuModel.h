@@ -29,6 +29,14 @@ public:
         VkDevice device, VkQueue queue, VkCommandPool pool,
         const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
         GameTextureFactory& textures, DeferredPass& pass, std::string& error);
+    bool load_decoded(ModelGeometry&& geometry, VkDevice device, VkQueue queue,
+        VkCommandPool pool, const VkPhysicalDeviceMemoryProperties& memory,
+        const BufferUploadDispatch& upload, GameTextureFactory& textures,
+        DeferredPass& pass, std::string& error)
+    {
+        return load_geometry(std::move(geometry), device, queue, pool, memory,
+            upload, textures, pass, error);
+    }
     // Call from the acquired frame's geometry recorder. Pose matrices have
     // the same layout as Fmatrix and include inverse bind transforms.
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,

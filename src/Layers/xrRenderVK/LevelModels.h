@@ -59,6 +59,8 @@ struct LevelVisual
     int32_t mesh{-1};
     std::array<float, 10> bounds{}; // OGF box min/max, sphere center/radius
     std::vector<uint32_t> children;
+    std::array<int32_t, 8> lod_facets{-1, -1, -1, -1, -1, -1, -1, -1};
+    std::array<std::array<float, 3>, 8> lod_normals{};
 };
 
 struct LevelPortal
@@ -89,10 +91,11 @@ struct LevelModelData
 // A missing/unsupported format fails the entire load. This ensures that a
 // partially rendered level cannot accidentally be advertised as playable.
 bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
-    LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {});
+    LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {});
 // Resolve a standalone visual's GCONTAINER against level.geom, using the
 // same bounds and index validation as the level visual table.
-bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error);
+bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error,
+    LevelBytes tree_windows = {});
 bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
     LevelModelData& result, std::string& error);
 }

@@ -6,6 +6,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanProbe.h
     SlidingWindows.cpp
     SlidingWindows.h
+    SpecialVisuals.cpp
+    SpecialVisuals.h
     BufferResource.cpp
     BufferResource.h
     BufferUpload.cpp
@@ -76,6 +78,14 @@ target_sources(xrRenderVK PRIVATE
     VulkanModelVisual.h
     VulkanUIShader.cpp
     VulkanUIShader.h
+    VulkanRenderFactory.cpp
+    VulkanRenderFactory.h
+    VulkanImGuiRender.cpp
+    VulkanImGuiRender.h
+    VulkanVideoTexture.cpp
+    VulkanVideoTexture.h
+    VulkanUISequenceVideoItem.cpp
+    VulkanUISequenceVideoItem.h
     VulkanFontRender.cpp
     VulkanFontRender.h
     VulkanLevelRender.cpp

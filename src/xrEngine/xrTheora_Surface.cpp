@@ -287,7 +287,7 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
             for (u32 w = 0; w < width; ++w)
             {
                 u8 y = Y[w];
-                u32& clr = data[++pos];
+                u32& clr = data[pos++];
                 clr = subst_alpha(clr, iFloor(float((y - 16)) / K));
             }
         }

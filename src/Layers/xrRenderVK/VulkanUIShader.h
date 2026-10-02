@@ -3,6 +3,7 @@
 #include "xrEngine/Render.h"
 #include "Include/xrRender/UIShader.h"
 #include "GameTextureFactory.h"
+#include "VulkanVideoTexture.h"
 
 namespace xray::render::vulkan
 {
@@ -24,6 +25,8 @@ public:
     bool GetBaseTextureResolution(Fvector2& size) override;
     xrImTextureData GetImGuiTextureId() override;
     VkDescriptorSet descriptor() const { return descriptor_; }
+    VkDescriptorSet current_descriptor(u32 time);
+    std::shared_ptr<VulkanVideoTexture> video() const { return video_; }
 
 private:
     GameTextureFactory* textures_{};
@@ -31,5 +34,6 @@ private:
     std::string shader_, texture_;
     VkDescriptorSet descriptor_{};
     VkExtent2D extent_{};
+    std::shared_ptr<VulkanVideoTexture> video_;
 };
 }

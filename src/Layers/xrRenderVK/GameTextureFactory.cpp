@@ -144,6 +144,42 @@ bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     return true;
 }
 
+bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
+    ScenePass& pass, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    if (!device_ || !rgba || !width || !height || width > 8192 || height > 8192)
+    { error = "invalid dynamic UI texture"; return false; }
+    DdsTexture pixels;
+    pixels.format = VK_FORMAT_R8G8B8A8_UNORM;
+    pixels.extent = {width, height, 1};
+    pixels.mip_levels = 1;
+    pixels.pixels.assign(rgba, rgba + size_t(width) * height * 4);
+    VkBufferImageCopy copy{};
+    copy.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    copy.imageSubresource.layerCount = 1;
+    copy.imageExtent = {width, height, 1};
+    pixels.copies.push_back(copy);
+    Asset asset;
+    if (!upload_texture(device_, queue_, pool_, memory_, dispatch_, pixels,
+            asset.texture, pending_, states_, error)) return false;
+    if (!pass.create_ui_texture_set(asset.texture.view, sampler_, asset.ui_set, error))
+    {
+        R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
+            "dynamic UI upload did not finish");
+        states_.forget_image(asset.texture.image);
+        destroy_texture(device_, dispatch_, asset.texture);
+        return false;
+    }
+    asset.extent = {width, height};
+    asset.ui_refs = 1;
+    asset.ui_pass = &pass;
+    result = asset.ui_set;
+    assets_.emplace("#dynamic-ui-" + std::to_string(++transient_id_), std::move(asset));
+    error.clear();
+    return true;
+}
+
 void GameTextureFactory::evict_if_unused(const std::string& name)
 {
     auto it = assets_.find(name);
@@ -213,6 +249,7 @@ void GameTextureFactory::destroy()
         if (sampler_ && destroy_sampler_) destroy_sampler_(device_, sampler_, nullptr);
     }
     assets_.clear();
+    transient_id_ = 0;
     pending_.clear();
     states_ = {};
     device_ = VK_NULL_HANDLE;

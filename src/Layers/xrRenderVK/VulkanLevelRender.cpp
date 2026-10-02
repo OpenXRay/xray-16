@@ -2,12 +2,14 @@
 #include "VulkanLevelRender.h"
 #include "VulkanGameDevice.h"
 #include "VulkanModelVisual.h"
+#include "SpecialVisuals.h"
 #include "ParticleVisual.h"
 #include "VulkanVisual.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/device.h"
 #include "xrEngine/xr_object.h"
+#include "xrCore/FMesh.hpp"
 
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -793,13 +795,14 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
 {
     const bool skeleton = record.type == 3 || record.type == 10;
     const bool skinned = record.type == 4 || record.type == 5;
-    if (record.type != 0 && record.type != 1 && record.type != 2 && !skeleton &&
+    const bool tree = record.type == 7 || record.type == 11;
+    if (record.type != 0 && record.type != 1 && record.type != 2 && record.type != 6 && !tree && !skeleton &&
         !(skeletal_child && skinned))
     {
         error = "unsupported OGF model type " + std::to_string(record.type);
         return nullptr;
     }
-    if ((record.type == 0 || record.type == 2) &&
+    if ((record.type == 0 || record.type == 2 || tree) &&
         (!record.embedded_children.empty() || !record.linked_children.empty()))
     {
         error = "OGF mesh unexpectedly contains child references";
@@ -810,13 +813,14 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
         error = "OGF skinned child unexpectedly contains nested visuals";
         return nullptr;
     }
-    if (record.type == 1 && (record.embedded_children.empty() == record.linked_children.empty()))
+    if ((record.type == 1 || record.type == 6) &&
+        (record.embedded_children.empty() == record.linked_children.empty()))
     {
         error = "OGF hierarchy needs exactly one nonempty child table";
         return nullptr;
     }
     std::shared_ptr<GpuModel> gpu;
-    if (record.type == 0 || record.type == 2 || skinned)
+    if (record.type == 0 || record.type == 2 || tree || skinned)
     {
         if (!cache_name.empty()) gpu = model_gpu_cache_[cache_name].lock();
         if (!gpu)
@@ -838,6 +842,43 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
     }
     auto model = std::make_unique<VulkanModelVisual>(record, cache_name, std::move(gpu),
         record.linked_children.empty() ? nullptr : &level_);
+    if (record.type == 6)
+    {
+        IReader source(const_cast<uint8_t*>(record.source.data()), record.source.size());
+        IReader* raw = source.open_chunk(OGF_LODDEF2);
+        LodFacets facets;
+        if (!raw || !decode_lod_facets({static_cast<const uint8_t*>(raw->pointer()),
+                raw->length()}, 0, facets, error))
+        {
+            if (raw) raw->close();
+            if (error.empty()) error = "OGF LOD has no valid facets";
+            return nullptr;
+        }
+        raw->close();
+        std::array<std::shared_ptr<GpuModel>, 8> lod_gpu;
+        const auto& texture = !record.texture.empty() ? record.texture :
+            !record.embedded_children.empty() ? record.embedded_children.front().texture : inherited_texture;
+        for (size_t face = 0; face < lod_gpu.size(); ++face)
+        {
+            ModelGeometry geometry;
+            geometry.type = 0;
+            geometry.texture = texture;
+            geometry.mode = classify_surface_material(record.shader, texture);
+            geometry.indices = std::move(facets.meshes[face].indices);
+            for (const LevelVertex& vertex : facets.meshes[face].vertices)
+            {
+                ModelVertex converted;
+                std::copy_n(vertex.position, 3, converted.position);
+                std::copy_n(vertex.normal, 3, converted.normal);
+                std::copy_n(vertex.uv, 2, converted.uv);
+                geometry.vertices.push_back(converted);
+            }
+            lod_gpu[face] = std::make_shared<GpuModel>();
+            if (!lod_gpu[face]->load_decoded(std::move(geometry), device_, queue_, pool_,
+                    memory_, upload_, *textures_, *pass_, error)) return nullptr;
+        }
+        model->set_lod(std::move(lod_gpu), facets.normals);
+    }
     if (skeleton)
     {
         if (record.embedded_children.empty() || !record.linked_children.empty())
@@ -1049,6 +1090,25 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             [&](const VulkanModelVisual& node, IKinematics* skeleton)
         {
             if (node.skeleton()) skeleton = node.skeleton();
+            if (node.has_lod() && lod < .33f)
+            {
+                std::array<std::array<float, 3>, 8> normals = node.lod_normals();
+                for (auto& normal : normals)
+                {
+                    Fvector direction, transformed;
+                    direction.set(normal[0], normal[1], normal[2]);
+                    world.transform_dir(transformed, direction);
+                    normal = {transformed.x, transformed.y, transformed.z};
+                }
+                Fvector center;
+                world.transform_tiny(center, node.visibility().sphere.P);
+                const uint8_t facet = select_lod_facet(normals,
+                    {center.x - camera_position.x, center.y - camera_position.y,
+                        center.z - camera_position.z});
+                game_device_->queue_model(node.lod_gpu(facet), skeleton,
+                    transform, hud, sort_distance, model_owner, lod);
+                return;
+            }
             if (node.has_gpu())
                 game_device_->queue_model(node.gpu(), skeleton,
                     transform, hud, sort_distance, model_owner, lod);

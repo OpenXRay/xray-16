@@ -47,6 +47,7 @@ public:
 
     bool Update(u32 _time);
     void DecompressFrame(u32* dst, u32 _width, int& count);
+    void ForceSoftwareRGB() { bShaderYUV2RGB = false; }
 
     void Play(bool _looped, u32 _time);
     void Pause(bool _pause) { playing = !_pause; }

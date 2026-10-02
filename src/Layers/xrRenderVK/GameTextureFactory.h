@@ -28,6 +28,8 @@ public:
         VkDescriptorSet& result, std::string& error);
     bool ui(const std::string& texture_name, ScenePass& pass,
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
+    bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
+        ScenePass& pass, VkDescriptorSet& result, std::string& error);
     // Release only after the consumer has stopped recording the descriptor.
     // The last release waits for submitted frames before freeing GPU objects.
     void release_material(VkDescriptorSet set, DeferredPass& pass);
@@ -60,5 +62,6 @@ private:
     ImageStateTracker states_;
     std::vector<PendingTextureUpload> pending_;
     std::unordered_map<std::string, Asset> assets_;
+    uint64_t transient_id_{};
 };
 }

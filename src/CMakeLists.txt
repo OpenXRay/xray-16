@@ -62,7 +62,8 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_sources(vulkan_slide_windows_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SlidingWindows.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ModelGeometry.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/LevelModels.cpp")
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/LevelModels.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SpecialVisuals.cpp")
 
     add_executable(vulkan_deferred_pass_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_deferred_pass.cpp"

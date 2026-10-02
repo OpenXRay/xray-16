@@ -1,5 +1,6 @@
 #include "LevelModels.h"
 #include "VisualCatalog.h"
+#include "SpecialVisuals.h"
 
 #include <algorithm>
 #include <cctype>
@@ -32,7 +33,8 @@ SurfaceMode classify_surface_material(const std::string& shader, const std::stri
 
 namespace
 {
-constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4, ogf_swi = 6, ogf_children = 9, ogf_links = 10, ogf_container = 21, ogf_fastpath = 22;
+constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4, ogf_swi = 6, ogf_children = 9, ogf_links = 10,
+    ogf_lod = 11, ogf_tree = 12, ogf_tree_swi = 20, ogf_container = 21, ogf_fastpath = 22;
 constexpr size_t max_vertices = 4'000'000, max_indices = 12'000'000;
 
 struct Cursor
@@ -233,7 +235,8 @@ bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
 
 bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices, const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
     std::vector<LevelModel>& models, std::vector<LevelVisual>& nodes, size_t node_index, unsigned depth,
-    const std::vector<VertexBuffer>* fast_vertices = nullptr, const std::vector<std::vector<uint16_t>>* fast_indices = nullptr)
+    const std::vector<VertexBuffer>* fast_vertices = nullptr, const std::vector<std::vector<uint16_t>>* fast_indices = nullptr,
+    LevelBytes tree_windows = {})
 {
     if (depth > 32 || node_index >= nodes.size()) return false;
     LevelBytes header;
@@ -243,8 +246,22 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
     const uint16_t material = uint16_t(header.data[2]) | (uint16_t(header.data[3]) << 8);
     nodes[node_index].type = type;
     std::memcpy(nodes[node_index].bounds.data(), header.data + 4, 10 * sizeof(float));
-    if (type == 1) // MT_HIERRARHY
+    if (type == 1 || type == 6) // Hierarchy or its eight-sided LOD impostor.
     {
+        if (type == 6)
+        {
+            LevelBytes facet_bytes;
+            LodFacets facets;
+            std::string error;
+            if (material >= material_count || !chunk(visual, ogf_lod, facet_bytes) ||
+                !decode_lod_facets(facet_bytes, material, facets, error)) return false;
+            nodes[node_index].lod_normals = facets.normals;
+            for (size_t i = 0; i < 8; ++i)
+            {
+                nodes[node_index].lod_facets[i] = static_cast<int32_t>(models.size());
+                models.push_back(std::move(facets.meshes[i]));
+            }
+        }
         LevelBytes links, embedded;
         const bool has_links = chunk(visual, ogf_links, links);
         const bool has_embedded = chunk(visual, ogf_children, embedded);
@@ -276,13 +293,14 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
                 const size_t index = nodes.size();
                 nodes.emplace_back();
                 nodes[node_index].children.push_back(static_cast<uint32_t>(index));
-                if (!decode_visual(child, vertices, indices, material_count, models, nodes, index, depth + 1, fast_vertices, fast_indices))
+                if (!decode_visual(child, vertices, indices, material_count, models, nodes, index, depth + 1,
+                        fast_vertices, fast_indices, tree_windows))
                     return false;
             }
         }
         return true;
     }
-    if (type != 0 && type != 2) return false;
+    if (type != 0 && type != 2 && type != 7 && type != 11) return false;
     if (material >= material_count) return false;
     LevelBytes container, unused;
     if (!chunk(visual, ogf_container, container) || container.size != 24 ||
@@ -304,6 +322,22 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
     {
         if (indices[ib][n] >= vcount) return false;
         model.indices.push_back(indices[ib][n]);
+    }
+    if (type == 7 || type == 11)
+    {
+        LevelBytes definition;
+        std::string error;
+        if (!chunk(visual, ogf_tree, definition) || !transform_tree_vertices(definition, model, error))
+            return false;
+        if (type == 11)
+        {
+            LevelBytes reference;
+            uint32_t item;
+            if (!chunk(visual, ogf_tree_swi, reference) || reference.size != 4) return false;
+            Cursor cursor{reference};
+            if (!cursor.u32(item) ||
+                !decode_tree_windows(tree_windows, item, model, model.windows, error)) return false;
+        }
     }
     if (type == 2)
     {
@@ -338,7 +372,8 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
 }
 
 bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices, const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
-    LevelModelData& loaded, const std::vector<VertexBuffer>* fast_vertices, const std::vector<std::vector<uint16_t>>* fast_indices)
+    LevelModelData& loaded, const std::vector<VertexBuffer>* fast_vertices, const std::vector<std::vector<uint16_t>>* fast_indices,
+    LevelBytes tree_windows)
 {
     Cursor c{bytes};
     std::vector<LevelBytes> records;
@@ -353,7 +388,8 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices, c
     }
     loaded.visuals.resize(records.size());
     for (size_t i = 0; i < records.size(); ++i)
-        if (!decode_visual(records[i], vertices, indices, material_count, loaded.models, loaded.visuals, i, 0, fast_vertices, fast_indices))
+        if (!decode_visual(records[i], vertices, indices, material_count, loaded.models, loaded.visuals, i, 0,
+                fast_vertices, fast_indices, tree_windows))
             return false;
     std::vector<uint8_t> state(loaded.visuals.size()), referenced(loaded.visuals.size());
     auto visit = [&](auto&& self, size_t index) -> bool
@@ -379,7 +415,7 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices, c
 }
 
 bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
-    LevelBytes fast_vertex_buffers, LevelBytes fast_index_buffers)
+    LevelBytes fast_vertex_buffers, LevelBytes fast_index_buffers, LevelBytes tree_windows)
 {
     LevelModelData loaded;
     std::vector<VertexBuffer> vertices;
@@ -396,7 +432,8 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
             !read_vertices(fast_vertex_buffers, fast_vertices) ||
             !read_indices(fast_index_buffers, fast_indices)))
         error = "invalid level.geomX vertex or index buffers";
-    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded, has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr))
+    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded,
+        has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr, tree_windows))
         error = "unsupported or invalid level OGF visuals";
     else
     {
@@ -407,9 +444,10 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
     return false;
 }
 
-bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error)
+bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error,
+    LevelBytes tree_windows)
 {
-    if (visual.type != 0 && visual.type != 2)
+    if (visual.type != 0 && visual.type != 2 && visual.type != 7 && visual.type != 11)
     {
         error = "container-backed standalone visual must be static or progressive";
         return false;
@@ -420,7 +458,8 @@ bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, c
     std::vector<LevelVisual> nodes(1);
     if (!read_vertices(vertex_buffers, vertices) ||
         !read_indices(index_buffers, indices) ||
-        !decode_visual({ visual.source.data(), visual.source.size() }, vertices, indices, size_t(visual.shader_id) + 1, models, nodes, 0, 0) ||
+        !decode_visual({ visual.source.data(), visual.source.size() }, vertices, indices,
+            size_t(visual.shader_id) + 1, models, nodes, 0, 0, nullptr, nullptr, tree_windows) ||
         models.size() != 1)
     {
         error = "standalone OGF GCONTAINER cannot be resolved against level.geom";
