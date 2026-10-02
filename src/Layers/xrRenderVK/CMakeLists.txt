@@ -22,6 +22,8 @@ target_sources(xrRenderVK PRIVATE
     DeferredShaderFactory.cpp
     DeferredShaderFactory.h
     DeferredShaders.h
+    WeatherShaders.h
+    smoke/weather.frag
     EngineTextureSource.cpp
     EngineTextureSource.h
     EngineLevelModels.cpp

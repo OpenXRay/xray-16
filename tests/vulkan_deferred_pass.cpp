@@ -19,8 +19,9 @@ template <typename T> T handle(uintptr_t value)
 
 uint32_t pipeline_count{}, draw_count{}, descriptor_updates{}, descriptor_frees{};
 uint32_t expected_first_index{};
+bool weather_bind{}, weather_push{};
 VkPipeline bound_pipeline{};
-VkPipelineLayout geometry_layout{}, lighting_layout{};
+VkPipelineLayout geometry_layout{}, lighting_layout{}, weather_layout{};
 VkDescriptorSet updated_material{};
 VkImageView updated_albedo{};
 VkSampler updated_sampler{};
@@ -29,7 +30,7 @@ float expected_mvp[16]{};
 VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkPipelineLayout* output)
 {
-    assert(info->setLayoutCount == 1 && info->pushConstantRangeCount == 1);
+    assert((info->setLayoutCount == 1 || info->setLayoutCount == 2) && info->pushConstantRangeCount == 1);
     const auto& range = info->pPushConstantRanges[0];
     if (range.stageFlags == VK_SHADER_STAGE_VERTEX_BIT)
     {
@@ -38,8 +39,17 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     }
     else
     {
-        assert(range.stageFlags == VK_SHADER_STAGE_FRAGMENT_BIT && range.size == sizeof(DeferredLight));
-        *output = lighting_layout = handle<VkPipelineLayout>(42);
+        assert(range.stageFlags == VK_SHADER_STAGE_FRAGMENT_BIT);
+        if (info->setLayoutCount == 2)
+        {
+            assert(range.size == sizeof(WeatherLighting));
+            *output = weather_layout = handle<VkPipelineLayout>(43);
+        }
+        else
+        {
+            assert(range.size == sizeof(DeferredLight));
+            *output = lighting_layout = handle<VkPipelineLayout>(42);
+        }
     }
     return VK_SUCCESS;
 }
@@ -77,7 +87,8 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     }
     else
     {
-        assert(pipeline_count == 4 && info->renderPass == handle<VkRenderPass>(11));
+        assert((pipeline_count == 4 || pipeline_count == 5) &&
+            info->renderPass == handle<VkRenderPass>(11));
         assert(info->pVertexInputState->vertexBindingDescriptionCount == 0);
         assert(info->pColorBlendState->attachmentCount == 1);
     }
@@ -99,6 +110,12 @@ void VKAPI_PTR bind_indices(VkCommandBuffer, VkBuffer value, VkDeviceSize, VkInd
 void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShaderStageFlags stage,
     uint32_t, uint32_t size, const void* data)
 {
+    if (layout == weather_layout)
+    {
+        assert(stage == VK_SHADER_STAGE_FRAGMENT_BIT && size == sizeof(WeatherLighting));
+        weather_push = true;
+        return;
+    }
     assert(layout == geometry_layout && stage == VK_SHADER_STAGE_VERTEX_BIT && size == sizeof(expected_mvp));
     assert(std::memcmp(data, expected_mvp, sizeof(expected_mvp)) == 0);
 }
@@ -115,18 +132,18 @@ void VKAPI_PTR draw(VkCommandBuffer, uint32_t, uint32_t, uint32_t, uint32_t) {}
 VkResult VKAPI_PTR create_descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* output)
 {
-    assert(info->bindingCount == 1 || info->bindingCount == 2);
+    assert(info->bindingCount >= 1 && info->bindingCount <= 4);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    if (info->bindingCount == 2)
+    if (info->bindingCount >= 2)
         assert(info->pBindings[1].binding == 1);
-    *output = handle<VkDescriptorSetLayout>(info->bindingCount == 1 ? 31 : 32);
+    *output = handle<VkDescriptorSetLayout>(30 + info->bindingCount);
     return VK_SUCCESS;
 }
 void VKAPI_PTR destroy_descriptor_layout(VkDevice, VkDescriptorSetLayout, const VkAllocationCallbacks*) {}
 VkResult VKAPI_PTR create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorPool* output)
 {
-    assert(info->maxSets == 256 && info->pPoolSizes[0].descriptorCount == 512);
+    assert(info->maxSets == 512 && info->pPoolSizes[0].descriptorCount == 2048);
     *output = handle<VkDescriptorPool>(33);
     return VK_SUCCESS;
 }
@@ -143,8 +160,16 @@ VkResult VKAPI_PTR free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescr
 void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
-    assert(count == 1 && writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-    assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    assert((count == 1 || count == 2 || count == 4) &&
+        writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+    assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
+        (writes[0].dstBinding == 2 &&
+            writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL));
+    if (count == 4)
+    {
+        for (uint32_t i = 0; i < count; ++i)
+            assert(writes[i].dstBinding == i && writes[i].pImageInfo->imageView == handle<VkImageView>(60 + i));
+    }
     updated_albedo = writes[0].pImageInfo->imageView;
     updated_sampler = writes[0].pImageInfo->sampler;
     ++descriptor_updates;
@@ -152,6 +177,12 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
 void VKAPI_PTR bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout layout,
     uint32_t, uint32_t count, const VkDescriptorSet* sets, uint32_t, const uint32_t*)
 {
+    if (layout == weather_layout)
+    {
+        assert(count == 2 && sets[0] && sets[1]);
+        weather_bind = true;
+        return;
+    }
     assert(layout == geometry_layout && count == 1 && *sets == updated_material);
 }
 }
@@ -248,6 +279,7 @@ int main()
     assert(deferred.initialize(handle<VkDevice>(2), handle<VkRenderPass>(10),
         handle<VkRenderPass>(11), handle<VkShaderModule>(12), handle<VkShaderModule>(13),
         handle<VkShaderModule>(14), handle<VkShaderModule>(15), handle<VkShaderModule>(16),
+        handle<VkShaderModule>(17),
         pass_dispatch, error));
     VkDescriptorSet material{};
     const auto albedo = handle<VkImageView>(50);
@@ -280,6 +312,16 @@ int main()
         6, expected_mvp, material, 3));
     assert(bound_pipeline == handle<VkPipeline>(103));
     assert(draw_count == 4 && error.empty());
+    VkDescriptorSet gbuffer{}, weather_set{};
+    assert(deferred.gbuffer(albedo, handle<VkImageView>(52), handle<VkImageView>(53),
+        sampler, gbuffer, error));
+    assert(deferred.weather_set(handle<VkImageView>(60), handle<VkImageView>(61),
+        handle<VkImageView>(62), handle<VkImageView>(63), sampler, weather_set, error));
+    WeatherLighting weather{};
+    assert(deferred.record_lighting(hud_frame, gbuffer, environment_light, weather_set, &weather));
+    assert(bound_pipeline == handle<VkPipeline>(105) && weather_bind && weather_push);
+    deferred.release_gbuffer(gbuffer);
+    deferred.release_gbuffer(weather_set);
     deferred.release_gbuffer(material);
-    assert(material == VK_NULL_HANDLE && descriptor_frees == 1);
+    assert(material == VK_NULL_HANDLE && descriptor_frees == 3);
 }

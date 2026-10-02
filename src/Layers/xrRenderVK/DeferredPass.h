@@ -12,6 +12,15 @@ struct DeferredLight
     float color[4];
 };
 
+struct WeatherLighting
+{
+    float inverse_view_projection[16]{};
+    DeferredLight light{};
+    float sky_color[4]{};
+    float clouds_color[4]{};
+};
+static_assert(sizeof(WeatherLighting) == 128);
+
 struct DeferredEnvironment
 {
     float sun_direction[3]{0.f, -1.f, 0.f};
@@ -53,9 +62,13 @@ public:
         VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
         VkShaderModule alpha_test_fragment,
         VkShaderModule light_vertex, VkShaderModule light_fragment,
+        VkShaderModule weather_fragment,
         const ScenePassDispatch& dispatch, std::string& error);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
-    bool gbuffer(VkImageView albedo, VkImageView normal, VkSampler sampler,
+    bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
+        VkDescriptorSet& set, std::string& error);
+    bool weather_set(VkImageView sky_a, VkImageView sky_b,
+        VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
     void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass)
@@ -73,7 +86,8 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
-        const DeferredLight& light) const;
+        const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
+        const WeatherLighting* weather = nullptr) const;
     void destroy();
 
 private:
@@ -81,9 +95,9 @@ private:
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
     VkDevice device_{};
     VkRenderPass geometry_pass_{}, light_pass_{};
-    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{};
-    VkPipelineLayout geometry_layout_{}, light_layout_{};
-    VkDescriptorSetLayout material_layout_{}, gbuffer_layout_{};
+    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{};
+    VkPipelineLayout geometry_layout_{}, light_layout_{}, weather_layout_{};
+    VkDescriptorSetLayout material_layout_{}, gbuffer_layout_{}, weather_set_layout_{};
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
 };

@@ -505,6 +505,12 @@ void VulkanLevelRender::Render()
         "Vulkan renderer Render requires a calculated world in the active frame");
     // Geometry is recorded into the deferred G-buffer at End(), after all
     // engine callbacks have queued their transforms and before the UI pass.
+    if (g_pGamePersistent && g_pGameLevel)
+    {
+        auto& environment = g_pGamePersistent->Environment();
+        environment.RenderSky();
+        environment.RenderClouds();
+    }
     R_ASSERT2(frame_phase_.render(), "Vulkan renderer world rendering is out of order");
 }
 

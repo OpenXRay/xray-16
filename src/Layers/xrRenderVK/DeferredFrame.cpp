@@ -32,7 +32,8 @@ void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data
 {
     auto& context = *static_cast<DeferredFrame*>(user_data);
     context.recorded_ &= context.pass_->record_lighting(frame,
-        context.targets_->lighting_set(frame.image_index), context.light_);
+        context.targets_->lighting_set(frame.image_index), context.light_,
+        context.weather_set_, context.weather_set_ ? &context.weather_ : nullptr);
     if (context.render_world_)
     {
         if (context.transparent_) context.transparent_(frame, context.transparent_data_);
@@ -56,7 +57,8 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     FrameRecorder hud, void* hud_data,
     FrameRecorder models, void* models_data,
     FrameRecorder transparent, void* transparent_data,
-    FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target)
+    FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target,
+    VkDescriptorSet weather_set, const WeatherLighting* weather)
 {
     targets_ = &targets;
     frame_ = &frame;
@@ -64,6 +66,8 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     pass_ = &pass;
     mvp_ = mvp;
     light_ = light;
+    weather_set_ = weather_set;
+    if (weather) weather_ = *weather;
     ui_ = ui;
     ui_data_ = ui_data;
     hud_ = hud;

@@ -23,6 +23,7 @@ class VulkanGameDevice
 public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     void begin_frame();
+    void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error,
         bool render_world = true, bool clear_target = false);
@@ -119,5 +120,7 @@ private:
     PFN_vkCreateSampler create_sampler_{};
     PFN_vkDestroySampler destroy_sampler_{};
     bool reset_required_{};
+    VkDescriptorSet weather_set_{};
+    WeatherLighting weather_lighting_{};
 };
 }

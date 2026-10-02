@@ -364,6 +364,13 @@ void VulkanGameDevice::begin_frame()
 {
     discard_scene_draws();
     ui_.reset_frame();
+    weather_set_ = VK_NULL_HANDLE;
+}
+
+void VulkanGameDevice::queue_weather(VkDescriptorSet set, const WeatherLighting& lighting)
+{
+    weather_set_ = set;
+    weather_lighting_ = lighting;
 }
 
 void VulkanGameDevice::discard_scene_draws()
@@ -384,10 +391,14 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     current_level_ = &level;
     ui_error_.clear();
     model_error_.clear();
+    const float weather_blend = weather_lighting_.light.color[3];
+    weather_lighting_.light = light;
+    weather_lighting_.light.color[3] = weather_blend;
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
-            scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target))
+            scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target,
+            render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;

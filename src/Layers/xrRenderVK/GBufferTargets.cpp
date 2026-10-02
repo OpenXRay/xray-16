@@ -158,7 +158,7 @@ bool GBufferTargets::bind_lighting(DeferredPass& deferred, std::string& error)
     }
     for (auto& target : targets_)
         if (!target.lighting && !deferred.gbuffer(target.albedo.view,
-                target.normal.view, sampler_, target.lighting, error)) return false;
+                target.normal.view, target.depth.view, sampler_, target.lighting, error)) return false;
     error.clear();
     return true;
 }

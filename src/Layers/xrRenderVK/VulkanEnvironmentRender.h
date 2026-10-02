@@ -3,6 +3,7 @@
 #include "Include/xrRender/EnvironmentRender.h"
 #include "Include/xrRender/particles_systems_library_interface.hpp"
 #include "ParticleCatalog.h"
+#include "DeferredPass.h"
 #include "VulkanEnvDescriptorRender.h"
 
 namespace xray::render::vulkan
@@ -12,6 +13,7 @@ class VulkanEnvironmentRender final : public IEnvironmentRender
 {
 public:
     explicit VulkanEnvironmentRender(VulkanGameDevice& device) : device_(device) {}
+    ~VulkanEnvironmentRender() override { Clear(); }
     void Copy(IEnvironmentRender& source) override;
     void RenderSky(CEnvironment& env) override;
     void RenderClouds(CEnvironment& env) override;
@@ -40,6 +42,9 @@ private:
     } particles_;
     VulkanGameDevice& device_;
     VkImageView sky_a_{}, sky_b_{}, environment_a_{}, environment_b_{}, clouds_a_{}, clouds_b_{};
+    VkDescriptorSet weather_set_{};
+    WeatherLighting lighting_{};
     float blend_{};
+    bool weather_error_reported_{};
 };
 }

@@ -3,6 +3,9 @@
 #include "EngineParticleSource.h"
 #include "VulkanGameDevice.h"
 #include "xrEngine/Environment.h"
+#include "xrEngine/device.h"
+
+#include <cstring>
 
 namespace xray::render::vulkan
 {
@@ -48,7 +51,9 @@ void VulkanEnvironmentRender::Library::clear()
 
 void VulkanEnvironmentRender::Copy(IEnvironmentRender& source)
 {
+    if (&source == this) return;
     const auto& other = static_cast<VulkanEnvironmentRender&>(source);
+    Clear();
     sky_a_ = other.sky_a_;
     sky_b_ = other.sky_b_;
     environment_a_ = other.environment_a_;
@@ -62,8 +67,14 @@ void VulkanEnvironmentRender::OnDeviceCreate() { particles_.load(); }
 void VulkanEnvironmentRender::OnDeviceDestroy() { Clear(); particles_.clear(); }
 void VulkanEnvironmentRender::Clear()
 {
+    if (weather_set_)
+    {
+        R_ASSERT2(device_.wait_idle(), "weather descriptor release requires idle GPU frames");
+        device_.deferred().release_gbuffer(weather_set_);
+    }
     sky_a_ = sky_b_ = environment_a_ = environment_b_ = clouds_a_ = clouds_b_ = VK_NULL_HANDLE;
     blend_ = 0.f;
+    weather_error_reported_ = false;
 }
 
 void VulkanEnvironmentRender::lerp(CEnvDescriptorMixer& current,
@@ -71,6 +82,18 @@ void VulkanEnvironmentRender::lerp(CEnvDescriptorMixer& current,
 {
     const auto* first = static_cast<const VulkanEnvDescriptorRender*>(a);
     const auto* second = static_cast<const VulkanEnvDescriptorRender*>(b);
+    if (weather_set_ && (!first || !second || sky_a_ != first->sky() ||
+        sky_b_ != second->sky() || clouds_a_ != first->clouds() ||
+        clouds_b_ != second->clouds()))
+    {
+        R_ASSERT2(device_.wait_idle(), "weather texture change requires idle GPU frames");
+        device_.deferred().release_gbuffer(weather_set_);
+    }
+    if (sky_a_ != (first ? first->sky() : VK_NULL_HANDLE) ||
+        sky_b_ != (second ? second->sky() : VK_NULL_HANDLE) ||
+        clouds_a_ != (first ? first->clouds() : VK_NULL_HANDLE) ||
+        clouds_b_ != (second ? second->clouds() : VK_NULL_HANDLE))
+        weather_error_reported_ = false;
     sky_a_ = first ? first->sky() : VK_NULL_HANDLE;
     sky_b_ = second ? second->sky() : VK_NULL_HANDLE;
     environment_a_ = first ? first->sky_environment() : VK_NULL_HANDLE;
@@ -80,6 +103,42 @@ void VulkanEnvironmentRender::lerp(CEnvDescriptorMixer& current,
     blend_ = current.weight;
 }
 
-void VulkanEnvironmentRender::RenderSky(CEnvironment&) {}
-void VulkanEnvironmentRender::RenderClouds(CEnvironment&) {}
+void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
+{
+    if (!weather_set_)
+    {
+        std::string error;
+        if (!device_.deferred().weather_set(sky_a_, sky_b_, clouds_a_, clouds_b_,
+                device_.textures().sampler(), weather_set_, error))
+        {
+            // Some weather presets omit textures. Retain the ordinary deferred
+            // lighting path and report the asset error once per preset.
+            if (!weather_error_reported_ && (sky_a_ || sky_b_))
+                Msg("! [renderer-vulkan] weather: %s", error.c_str());
+            weather_error_reported_ = true;
+            return;
+        }
+    }
+    Fmatrix inverse;
+    inverse.invert(Device.mFullTransform);
+    std::memcpy(lighting_.inverse_view_projection, &inverse, sizeof(inverse));
+    const auto& current = env.CurrentEnv;
+    lighting_.light.color[3] = blend_;
+    lighting_.sky_color[0] = current.sky_color.x;
+    lighting_.sky_color[1] = current.sky_color.y;
+    lighting_.sky_color[2] = current.sky_color.z;
+    lighting_.sky_color[3] = current.sky_rotation;
+    lighting_.clouds_color[0] = current.clouds_color.x;
+    lighting_.clouds_color[1] = current.clouds_color.y;
+    lighting_.clouds_color[2] = current.clouds_color.z;
+    lighting_.clouds_color[3] = 0.f;
+    device_.queue_weather(weather_set_, lighting_);
+}
+
+void VulkanEnvironmentRender::RenderClouds(CEnvironment& env)
+{
+    if (!weather_set_) return;
+    lighting_.clouds_color[3] = env.CurrentEnv.clouds_color.w;
+    device_.queue_weather(weather_set_, lighting_);
+}
 }

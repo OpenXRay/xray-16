@@ -18,7 +18,9 @@ public:
         FrameRecorder models = nullptr, void* models_data = nullptr,
         FrameRecorder transparent = nullptr, void* transparent_data = nullptr,
         FrameRecorder level_visuals = nullptr, void* level_data = nullptr,
-        bool render_world = true, bool clear_target = false);
+        bool render_world = true, bool clear_target = false,
+        VkDescriptorSet weather_set = VK_NULL_HANDLE,
+        const WeatherLighting* weather = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
@@ -29,6 +31,8 @@ private:
     const DeferredPass* pass_{};
     const float* mvp_{};
     DeferredLight light_{};
+    VkDescriptorSet weather_set_{};
+    WeatherLighting weather_{};
     FrameRecorder ui_{};
     void* ui_data_{};
     FrameRecorder hud_{};

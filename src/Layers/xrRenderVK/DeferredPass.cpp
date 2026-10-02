@@ -192,12 +192,13 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
     VkShaderModule alpha_test_fragment,
     VkShaderModule light_vertex, VkShaderModule light_fragment,
+    VkShaderModule weather_fragment,
     const ScenePassDispatch& dispatch, std::string& error)
 {
     destroy();
     if (!device || !geometry_pass || !light_pass || !geometry_vertex || !geometry_fragment ||
         !alpha_test_fragment ||
-        !light_vertex || !light_fragment || !dispatch.create_pipeline_layout ||
+        !light_vertex || !light_fragment || !weather_fragment || !dispatch.create_pipeline_layout ||
         !dispatch.destroy_pipeline_layout || !dispatch.create_graphics_pipelines ||
         !dispatch.destroy_pipeline || !dispatch.create_descriptor_set_layout ||
         !dispatch.destroy_descriptor_set_layout || !dispatch.create_descriptor_pool ||
@@ -217,21 +218,26 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     vk_ = dispatch;
     const VkDescriptorSetLayoutBinding bindings[]{
         {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-        {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+        {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
     };
     VkDescriptorSetLayoutCreateInfo descriptor{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
     descriptor.bindingCount = 1;
     descriptor.pBindings = bindings;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &material_layout_) != VK_SUCCESS)
         goto failed;
-    descriptor.bindingCount = 2;
+    descriptor.bindingCount = 3;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &gbuffer_layout_) != VK_SUCCESS)
         goto failed;
+    descriptor.bindingCount = 4;
+    if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &weather_set_layout_) != VK_SUCCESS)
+        goto failed;
     {
-        const VkDescriptorPoolSize size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 512};
+        const VkDescriptorPoolSize size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048};
         VkDescriptorPoolCreateInfo pool{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
         pool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool.maxSets = 256;
+        pool.maxSets = 512;
         pool.poolSizeCount = 1;
         pool.pPoolSizes = &size;
         if (vk_.create_descriptor_pool(device, &pool, nullptr, &pool_) != VK_SUCCESS) goto failed;
@@ -249,6 +255,13 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         layout.pPushConstantRanges = &light;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &light_layout_) != VK_SUCCESS)
             goto failed;
+        const VkDescriptorSetLayout weather_sets[]{gbuffer_layout_, weather_set_layout_};
+        const VkPushConstantRange weather_range{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(WeatherLighting)};
+        layout.setLayoutCount = 2;
+        layout.pSetLayouts = weather_sets;
+        layout.pPushConstantRanges = &weather_range;
+        if (vk_.create_pipeline_layout(device, &layout, nullptr, &weather_layout_) != VK_SUCCESS)
+            goto failed;
     }
     if (!make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
             geometry_fragment, true, true, false, false, vk_, geometry_) ||
@@ -259,7 +272,9 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
             geometry_fragment, true, false, false, true, vk_, hud_) ||
         !make_pipeline(device, light_pass, light_layout_, light_vertex,
-            light_fragment, false, false, false, false, vk_, lighting_)) goto failed;
+            light_fragment, false, false, false, false, vk_, lighting_) ||
+        !make_pipeline(device, light_pass, weather_layout_, light_vertex,
+            weather_fragment, false, false, false, false, vk_, weather_pipeline_)) goto failed;
     error.clear();
     return true;
 failed:
@@ -310,10 +325,55 @@ bool DeferredPass::material(VkImageView albedo, VkSampler sampler, VkDescriptorS
     return allocate(material_layout_, albedo, VK_NULL_HANDLE, sampler, set, error);
 }
 
-bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkSampler sampler,
+bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
-    return allocate(gbuffer_layout_, albedo, normal, sampler, set, error);
+    if (!depth || !allocate(gbuffer_layout_, albedo, normal, sampler, set, error)) return false;
+    const VkDescriptorImageInfo image{sampler, depth, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = set;
+    write.dstBinding = 2;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = 1;
+    write.pImageInfo = &image;
+    vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+    return true;
+}
+
+bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
+    VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
+    VkDescriptorSet& set, std::string& error)
+{
+    set = VK_NULL_HANDLE;
+    if (!pool_ || !sampler || !sky_a || !sky_b || !clouds_a || !clouds_b)
+    {
+        error = "weather requires both sky cubemaps and cloud textures";
+        return false;
+    }
+    VkDescriptorSetAllocateInfo info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    info.descriptorPool = pool_;
+    info.descriptorSetCount = 1;
+    info.pSetLayouts = &weather_set_layout_;
+    if (vk_.allocate_descriptor_sets(device_, &info, &set) != VK_SUCCESS)
+    {
+        error = "weather descriptor pool is exhausted";
+        return false;
+    }
+    const VkImageView views[]{sky_a, sky_b, clouds_a, clouds_b};
+    VkDescriptorImageInfo images[4]{};
+    VkWriteDescriptorSet writes[4]{};
+    for (uint32_t i = 0; i < 4; ++i)
+    {
+        images[i] = {sampler, views[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].descriptorCount = 1;
+        writes[i].pImageInfo = &images[i];
+    }
+    vk_.update_descriptor_sets(device_, 4, writes, 0, nullptr);
+    return true;
 }
 
 void DeferredPass::release_gbuffer(VkDescriptorSet& set)
@@ -386,17 +446,23 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
 }
 
 bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
-    const DeferredLight& light) const
+    const DeferredLight& light, VkDescriptorSet weather_set,
+    const WeatherLighting* weather) const
 {
     if (!lighting_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !gbuffer_set || !vk_.cmd_draw)
         return false;
-    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, lighting_);
+    const bool has_weather = weather_set && weather && weather_pipeline_;
+    const VkPipelineLayout layout = has_weather ? weather_layout_ : light_layout_;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        has_weather ? weather_pipeline_ : lighting_);
     viewport_scissor(frame, vk_);
+    const VkDescriptorSet sets[]{gbuffer_set, weather_set};
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        light_layout_, 0, 1, &gbuffer_set, 0, nullptr);
-    vk_.cmd_push_constants(frame.command_buffer, light_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
-        0, sizeof(light), &light);
+        layout, 0, has_weather ? 2 : 1, sets, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+        0, has_weather ? sizeof(WeatherLighting) : sizeof(light),
+        has_weather ? static_cast<const void*>(weather) : static_cast<const void*>(&light));
     vk_.cmd_draw(frame.command_buffer, 3, 1, 0, 0);
     return true;
 }
@@ -410,11 +476,13 @@ void DeferredPass::destroy()
         if (transparent_) vk_.destroy_pipeline(device_, transparent_, nullptr);
         if (hud_) vk_.destroy_pipeline(device_, hud_, nullptr);
         if (lighting_) vk_.destroy_pipeline(device_, lighting_, nullptr);
+        if (weather_pipeline_) vk_.destroy_pipeline(device_, weather_pipeline_, nullptr);
     }
     if (device_ && vk_.destroy_pipeline_layout)
     {
         if (geometry_layout_) vk_.destroy_pipeline_layout(device_, geometry_layout_, nullptr);
         if (light_layout_) vk_.destroy_pipeline_layout(device_, light_layout_, nullptr);
+        if (weather_layout_) vk_.destroy_pipeline_layout(device_, weather_layout_, nullptr);
     }
     if (device_ && vk_.destroy_descriptor_pool && pool_)
         vk_.destroy_descriptor_pool(device_, pool_, nullptr);
@@ -422,12 +490,13 @@ void DeferredPass::destroy()
     {
         if (material_layout_) vk_.destroy_descriptor_set_layout(device_, material_layout_, nullptr);
         if (gbuffer_layout_) vk_.destroy_descriptor_set_layout(device_, gbuffer_layout_, nullptr);
+        if (weather_set_layout_) vk_.destroy_descriptor_set_layout(device_, weather_set_layout_, nullptr);
     }
     device_ = VK_NULL_HANDLE;
     geometry_pass_ = light_pass_ = VK_NULL_HANDLE;
-    geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = VK_NULL_HANDLE;
-    geometry_layout_ = light_layout_ = VK_NULL_HANDLE;
-    material_layout_ = gbuffer_layout_ = VK_NULL_HANDLE;
+    geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = weather_pipeline_ = VK_NULL_HANDLE;
+    geometry_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
+    material_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     vk_ = {};
 }
