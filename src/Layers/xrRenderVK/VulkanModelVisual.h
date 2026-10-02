@@ -28,7 +28,8 @@ public:
         visibility_.box.set(b[0], b[1], b[2], b[3], b[4], b[5]);
         visibility_.sphere.P.set(b[6], b[7], b[8]);
         visibility_.sphere.R = b[9];
-        initial_visibility_ = visibility_;
+        initial_box_ = visibility_.box;
+        initial_sphere_ = visibility_.sphere;
     }
 
     // Every copy has independent bounds and child identities, while GPU
@@ -40,7 +41,8 @@ public:
         visibility_.clear();
         visibility_.box = other.visibility_.box;
         visibility_.sphere = other.visibility_.sphere;
-        initial_visibility_ = other.initial_visibility_;
+        initial_box_ = other.initial_box_;
+        initial_sphere_ = other.initial_sphere_;
         if (other.skeleton_)
             skeleton_ = std::make_unique<VulkanKinematics>(*other.skeleton_, this);
         for (const auto& child : other.children_)
@@ -71,8 +73,10 @@ public:
 
     void reset_instance_state()
     {
-        visibility_.box = initial_visibility_.box;
-        visibility_.sphere = initial_visibility_.sphere;
+        visibility_.clear();
+        visibility_.reset_object_data();
+        visibility_.box = initial_box_;
+        visibility_.sphere = initial_sphere_;
         if (skeleton_)
             skeleton_->reset_instance_state();
         for (auto& child : children_)
@@ -122,7 +126,8 @@ public:
 
 private:
     vis_data visibility_;
-    vis_data initial_visibility_;
+    Fbox initial_box_;
+    Fsphere initial_sphere_;
     std::shared_ptr<GpuModel> gpu_;
     std::unique_ptr<VulkanKinematics> skeleton_;
     std::string cache_name_;

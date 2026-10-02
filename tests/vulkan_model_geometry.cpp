@@ -94,8 +94,12 @@ int main()
     assert(child_copy->getVisData().sphere.R != 12);
     assert(parent_copy->getVisData().sphere.R == 3);
     parent->getVisData().box.vMin.x = -99;
+    parent->getVisData().marker[0] = 123;
+    vis_data external;
+    parent->getVisData().obj_data = external.obj_data;
     parent->reset_instance_state();
     assert(parent->getVisData().box.vMin.x == -2);
+    assert(parent->getVisData().marker[0] == 0 && parent->getVisData().obj_data != external.obj_data);
     assert(child->getVisData().sphere.R == 0);
     leaf_gpu.reset(); parent.reset();
     assert(!leaf_lifetime.expired());
