@@ -10,6 +10,7 @@
 #include "VulkanRainRender.h"
 #include "VulkanLensFlareRender.h"
 #include "VulkanThunderboltRender.h"
+#include "VulkanDebugRender.h"
 #include "VulkanImGuiRender.h"
 #include "VulkanUISequenceVideoItem.h"
 
@@ -132,7 +133,14 @@ void VulkanRenderFactory::DestroyThunderboltRender(IThunderboltRender* object)
     { R_ASSERT2(!object, "Vulkan factory object has not been implemented"); }
 #ifndef _EDITOR
 #ifdef DEBUG
-VK_PENDING_FACTORY(ObjectSpaceRender)
+IObjectSpaceRender* VulkanRenderFactory::CreateObjectSpaceRender()
+{
+    return new VulkanObjectSpaceRender();
+}
+void VulkanRenderFactory::DestroyObjectSpaceRender(IObjectSpaceRender* object)
+{
+    delete object;
+}
 #endif
 #endif
 #undef VK_PENDING_FACTORY

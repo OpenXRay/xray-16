@@ -104,6 +104,10 @@ target_sources(xrRenderVK PRIVATE
     VulkanLensFlareRender.h
     VulkanThunderboltRender.cpp
     VulkanThunderboltRender.h
+    VulkanDrawUtils.cpp
+    VulkanDrawUtils.h
+    VulkanDebugRender.cpp
+    VulkanDebugRender.h
     EngineParticleSource.cpp
     EngineParticleSource.h
     WallmarkGeometry.cpp
