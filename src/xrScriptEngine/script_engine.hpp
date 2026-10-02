@@ -193,7 +193,7 @@ public:
     static bool print_output(lua_State* L, pcstr caScriptName, int iErrorCode = 0, pcstr caErrorText = nullptr);
 
 private:
-    static void print_error(lua_State* L, int iErrorCode);
+    static void print_error(lua_State* L, int iErrorCode, pcstr message);
 
 public:
     static void on_error(lua_State* state);
