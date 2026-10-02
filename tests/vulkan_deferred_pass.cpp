@@ -49,7 +49,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* output)
 {
     assert(count == 1 && info->stageCount == 2);
-    if (pipeline_count < 3)
+    if (pipeline_count < 2)
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
         assert(info->pVertexInputState->vertexAttributeDescriptionCount == 3);
@@ -63,16 +63,15 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(info->pColorBlendState->attachmentCount == 2);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
         assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
-        assert(info->pDepthStencilState->depthWriteEnable == (pipeline_count == 2 ? VK_FALSE : VK_TRUE));
-        assert(info->pColorBlendState->pAttachments[0].blendEnable ==
-            (pipeline_count == 2 ? VK_TRUE : VK_FALSE));
+        assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
+        assert(info->pColorBlendState->pAttachments[0].blendEnable == VK_FALSE);
     }
-    else if (pipeline_count == 3)
+    else if (pipeline_count == 2 || pipeline_count == 3)
     {
         assert(info->renderPass == handle<VkRenderPass>(11));
         assert(info->pColorBlendState->attachmentCount == 1);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
-        assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
+        assert(info->pDepthStencilState->depthWriteEnable == (pipeline_count == 3 ? VK_TRUE : VK_FALSE));
         assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
         assert(info->pColorBlendState->pAttachments[0].blendEnable == VK_TRUE);
     }
@@ -267,11 +266,16 @@ int main()
         handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::AlphaTest));
     assert(bound_pipeline == handle<VkPipeline>(101));
     expected_first_index = 3;
-    assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
+    assert(!deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
         handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Transparent, 3));
-    assert(bound_pipeline == handle<VkPipeline>(102));
+    assert(draw_count == 2);
     FrameRecordingContext hud_frame{handle<VkCommandBuffer>(17),
         handle<VkRenderPass>(11), handle<VkFramebuffer>(18), {640, 480}, 0, 0};
+    assert(!deferred.record_transparent(geometry_frame, handle<VkBuffer>(20),
+        handle<VkBuffer>(21), 6, expected_mvp, material, 3));
+    assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20),
+        handle<VkBuffer>(21), 6, expected_mvp, material, 3));
+    assert(bound_pipeline == handle<VkPipeline>(102));
     assert(deferred.record_hud(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, material, 3));
     assert(bound_pipeline == handle<VkPipeline>(103));

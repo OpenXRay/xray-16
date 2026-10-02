@@ -2,6 +2,10 @@
 
 #include <SDL_vulkan.h>
 
+#include <algorithm>
+#include <cstring>
+#include <vector>
+
 namespace xray::render::vulkan
 {
 namespace
@@ -94,13 +98,44 @@ bool probe_vulkan_loader(std::string& error, const VulkanLoaderDispatch& dispatc
     uint32_t device_count = 0;
     const VkResult enumerate_result = enumerate_devices ?
         enumerate_devices(instance, &device_count, nullptr) : VK_ERROR_INITIALIZATION_FAILED;
-
-    destroy_instance(instance, nullptr);
-
     if (enumerate_result != VK_SUCCESS || device_count == 0)
     {
+        destroy_instance(instance, nullptr);
         error = enumerate_result == VK_SUCCESS ? "no Vulkan physical device is available" :
             "vkEnumeratePhysicalDevices failed (VkResult " + std::to_string(enumerate_result) + ")";
+        return false;
+    }
+
+    std::vector<VkPhysicalDevice> devices(device_count);
+    const VkResult fetch_result = enumerate_devices(instance, &device_count, devices.data());
+    const auto get_queues = reinterpret_cast<PFN_vkGetPhysicalDeviceQueueFamilyProperties>(
+        get_instance_proc(instance, "vkGetPhysicalDeviceQueueFamilyProperties"));
+    const auto get_extensions = reinterpret_cast<PFN_vkEnumerateDeviceExtensionProperties>(
+        get_instance_proc(instance, "vkEnumerateDeviceExtensionProperties"));
+    bool suitable = false;
+    if (fetch_result == VK_SUCCESS && get_queues && get_extensions)
+        for (uint32_t i = 0; i < device_count && !suitable; ++i)
+        {
+            uint32_t queue_count = 0, extension_count = 0;
+            get_queues(devices[i], &queue_count, nullptr);
+            if (!queue_count || get_extensions(devices[i], nullptr, &extension_count, nullptr) != VK_SUCCESS ||
+                !extension_count) continue;
+            std::vector<VkQueueFamilyProperties> queues(queue_count);
+            std::vector<VkExtensionProperties> extensions(extension_count);
+            get_queues(devices[i], &queue_count, queues.data());
+            if (get_extensions(devices[i], nullptr, &extension_count, extensions.data()) != VK_SUCCESS)
+                continue;
+            const bool graphics = std::any_of(queues.begin(), queues.begin() + queue_count,
+                [](const auto& queue) { return queue.queueCount && (queue.queueFlags & VK_QUEUE_GRAPHICS_BIT); });
+            const bool swapchain = std::any_of(extensions.begin(), extensions.begin() + extension_count,
+                [](const auto& extension) { return std::strcmp(extension.extensionName, VK_KHR_SWAPCHAIN_EXTENSION_NAME) == 0; });
+            suitable = graphics && swapchain;
+        }
+    destroy_instance(instance, nullptr);
+    if (!suitable)
+    {
+        error = fetch_result != VK_SUCCESS ? "could not enumerate Vulkan physical devices" :
+            "no Vulkan device with graphics queue and VK_KHR_swapchain is available";
         return false;
     }
 

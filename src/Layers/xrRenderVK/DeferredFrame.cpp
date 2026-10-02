@@ -24,10 +24,6 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
             context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform,
                 GeometryPhase::OpaqueAndAlphaTest);
         if (context.models_) context.models_(geometry_frame, context.models_data_);
-        if (context.transparent_) context.transparent_(geometry_frame, context.transparent_data_);
-        else if (!context.level_visuals_)
-            context.recorded_ &= context.level_->record(geometry_frame, *context.pass_, transform,
-                GeometryPhase::Transparent);
     }
     context.targets_->end(frame.command_buffer);
 }
@@ -37,6 +33,19 @@ void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data
     auto& context = *static_cast<DeferredFrame*>(user_data);
     context.recorded_ &= context.pass_->record_lighting(frame,
         context.targets_->lighting_set(frame.image_index), context.light_);
+    if (context.render_world_)
+    {
+        if (context.transparent_) context.transparent_(frame, context.transparent_data_);
+        else if (!context.level_visuals_)
+        {
+            float transform[16];
+            std::memcpy(transform, context.mvp_, sizeof(transform));
+            context.recorded_ &= context.level_->record(frame, *context.pass_, transform,
+                GeometryPhase::Transparent);
+        }
+    }
+    // The HUD uses its own depth hierarchy and is never hidden by world geometry.
+    context.frame_->clear_depth(frame.command_buffer);
     if (context.hud_) context.hud_(frame, context.hud_data_);
     if (context.ui_) context.ui_(frame, context.ui_data_);
 }
@@ -50,6 +59,7 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target)
 {
     targets_ = &targets;
+    frame_ = &frame;
     level_ = &level;
     pass_ = &pass;
     mvp_ = mvp;

@@ -157,9 +157,12 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         if (!mesh.vertices[frame.frame_index].write(0, vertices.data(),
                 vertices.size() * sizeof(LevelVertex), error)) return false;
-        if (!pass.record_geometry(frame, mesh.vertices[frame.frame_index].handle(),
-                mesh.indices.handle(), window.index_count,
-                mvp, mesh.material, mesh.geometry.mode, window.offset))
+        if (!(transparent ?
+                pass.record_transparent(frame, mesh.vertices[frame.frame_index].handle(),
+                    mesh.indices.handle(), window.index_count, mvp, mesh.material, window.offset) :
+                pass.record_geometry(frame, mesh.vertices[frame.frame_index].handle(),
+                    mesh.indices.handle(), window.index_count,
+                    mvp, mesh.material, mesh.geometry.mode, window.offset)))
         {
             error = "Vulkan model geometry recording failed";
             return false;

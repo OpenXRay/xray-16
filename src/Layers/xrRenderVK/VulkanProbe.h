@@ -13,9 +13,8 @@ struct VulkanLoaderDispatch
     PFN_vkGetInstanceProcAddr (*get_instance_proc_addr)(){};
 };
 
-// Tests that the system Vulkan loader can create an instance and enumerate at
-// least one physical device. Surface and presentation support are checked once
-// the engine has created its SDL Vulkan window.
+// Tests the loader, instance and a graphics device with the swapchain extension.
+// Surface presentation support is checked once SDL has created the game window.
 bool probe_vulkan_loader(std::string& error, const VulkanLoaderDispatch& dispatch);
 bool probe_vulkan_loader(std::string& error);
 }

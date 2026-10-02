@@ -19,7 +19,7 @@ template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const
 bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::string& error)
 {
     destroy();
-    if (!window_.initialize(window, extent, false, error, true)) return false;
+    if (!window_.initialize(window, extent, false, error, true, true)) return false;
     const VkDevice device = window_.device();
     const auto get = window_.device_proc();
     const auto& physical = window_.physical();
@@ -87,6 +87,12 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
         if (!targets_.initialize(physical.handle, device, frame.extent(),
                 static_cast<uint32_t>(frame.image_count()), frame.depth_format(),
                 physical.memory, frame_dispatch_, create_sampler, destroy_sampler, error)) goto failed;
+        {
+            std::vector<VkImageView> depth_views;
+            for (uint32_t i = 0; i < frame.image_count(); ++i)
+                depth_views.push_back(targets_.depth_view(i));
+            if (!window_.frame().attach_scene_depth(depth_views, error)) goto failed;
+        }
         const ShaderModuleDispatch shaders{
             proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
             proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
@@ -384,9 +390,14 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
         return false;
     }
 
-    targets_.release_lighting(deferred_);
-    targets_.destroy();
     const bool replace_surface = recreate_surface || window_.frame().surface_lost();
+    targets_.release_lighting(deferred_);
+    if (!window_.frame().release_swapchain())
+    {
+        error = "could not release Vulkan framebuffers before scene depth";
+        return false;
+    }
+    targets_.destroy();
     if (!(replace_surface ? window_.recreate_surface(extent, error) :
               window_.recreate_frame(extent, error)))
         return false;
@@ -397,6 +408,12 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
             static_cast<uint32_t>(frame.image_count()), frame.depth_format(), physical.memory,
             frame_dispatch_, create_sampler_, destroy_sampler_, error))
         return false;
+    {
+        std::vector<VkImageView> depth_views;
+        for (uint32_t i = 0; i < frame.image_count(); ++i)
+            depth_views.push_back(targets_.depth_view(i));
+        if (!frame.attach_scene_depth(depth_views, error)) return false;
+    }
     deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass());
     ui_pass_.rebind_render_pass(frame.render_pass());
     if (!targets_.bind_lighting(deferred_, error))
@@ -441,6 +458,7 @@ void VulkanGameDevice::destroy()
     scene_visibility_ = false;
     textures_.destroy();
     targets_.release_lighting(deferred_);
+    if (window_.device()) window_.frame().release_swapchain();
     targets_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();

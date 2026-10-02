@@ -24,6 +24,7 @@ private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
     static void lighting(const FrameRecordingContext& frame, void* user_data);
     GBufferTargets* targets_{};
+    FrameContext* frame_{};
     const GpuLevel* level_{};
     const DeferredPass* pass_{};
     const float* mvp_{};

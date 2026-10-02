@@ -18,7 +18,7 @@ template <typename T> T load_instance_proc(VkInstance instance, PFN_vkGetInstanc
 }
 
 bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
-    bool allow_readback, std::string& error, bool use_depth)
+    bool allow_readback, std::string& error, bool use_depth, bool preserve_prepass_depth)
 {
     destroy();
     if (!window || !extent.width || !extent.height)
@@ -116,7 +116,8 @@ bool VulkanWindowDevice::initialize(SDL_Window* window, VkExtent2D extent,
     }
     m_wait_idle = frame_dispatch.device_wait_idle;
     if (!m_frame.initialize(m_physical.handle, m_device, m_surface, m_queue,
-            m_physical.graphics_present_family, extent, frame_dispatch, error, allow_readback, use_depth))
+            m_physical.graphics_present_family, extent, frame_dispatch, error,
+            allow_readback, use_depth, preserve_prepass_depth))
         return fail();
     error.clear();
     return true;

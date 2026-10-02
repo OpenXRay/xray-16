@@ -17,6 +17,8 @@ bool loader_ready{};
 bool no_loader_proc{};
 bool no_create_proc{};
 bool no_enumerate_proc{};
+bool graphics_queue{true};
+bool swapchain_extension{true};
 int sdl_load_result{-1};
 int sdl_loads{};
 int sdl_unloads{};
@@ -34,10 +36,35 @@ void VKAPI_CALL destroy_instance(VkInstance, const VkAllocationCallbacks*)
     ++destroyed_instances;
 }
 
-VkResult VKAPI_CALL enumerate_devices(VkInstance, uint32_t* count, VkPhysicalDevice*)
+VkResult VKAPI_CALL enumerate_devices(VkInstance, uint32_t* count, VkPhysicalDevice* devices)
 {
     *count = physical_devices;
+    if (devices && physical_devices) devices[0] = reinterpret_cast<VkPhysicalDevice>(std::uintptr_t(2));
     return enumeration_result;
+}
+
+void VKAPI_CALL queue_families(VkPhysicalDevice, uint32_t* count, VkQueueFamilyProperties* queues)
+{
+    *count = 1;
+    if (queues)
+    {
+        queues[0] = {};
+        queues[0].queueCount = 1;
+        queues[0].queueFlags = graphics_queue ? VK_QUEUE_GRAPHICS_BIT : VK_QUEUE_COMPUTE_BIT;
+    }
+}
+
+VkResult VKAPI_CALL device_extensions(VkPhysicalDevice, const char*, uint32_t* count,
+    VkExtensionProperties* extensions)
+{
+    *count = 1;
+    if (extensions)
+    {
+        extensions[0] = {};
+        std::strcpy(extensions[0].extensionName,
+            swapchain_extension ? VK_KHR_SWAPCHAIN_EXTENSION_NAME : "VK_EXT_other");
+    }
+    return VK_SUCCESS;
 }
 
 PFN_vkVoidFunction VKAPI_CALL get_instance_proc(VkInstance, const char* name)
@@ -48,6 +75,10 @@ PFN_vkVoidFunction VKAPI_CALL get_instance_proc(VkInstance, const char* name)
         return reinterpret_cast<PFN_vkVoidFunction>(destroy_instance);
     if (std::strcmp(name, "vkEnumeratePhysicalDevices") == 0 && !no_enumerate_proc)
         return reinterpret_cast<PFN_vkVoidFunction>(enumerate_devices);
+    if (std::strcmp(name, "vkGetPhysicalDeviceQueueFamilyProperties") == 0)
+        return reinterpret_cast<PFN_vkVoidFunction>(queue_families);
+    if (std::strcmp(name, "vkEnumerateDeviceExtensionProperties") == 0)
+        return reinterpret_cast<PFN_vkVoidFunction>(device_extensions);
     return nullptr;
 }
 
@@ -131,12 +162,18 @@ int main()
 
     physical_devices = 1;
     loader_ready = true;
+    graphics_queue = false;
+    assert(!probe_vulkan_loader(error, dispatch) && !error.empty());
+    graphics_queue = true;
+    swapchain_extension = false;
+    assert(!probe_vulkan_loader(error, dispatch) && !error.empty());
+    swapchain_extension = true;
     assert(probe_vulkan_loader(error, dispatch) && error.empty());
-    assert(loads == 7 && unloads == 6 && destroyed_instances == 4);
+    assert(loads == 7 && unloads == 6 && destroyed_instances == 6);
 
     loader_ready = false;
     assert(probe_vulkan_loader(error, dispatch) && error.empty());
-    assert(loads == 8 && unloads == 7 && destroyed_instances == 5);
+    assert(loads == 8 && unloads == 7 && destroyed_instances == 7);
 
     assert(!probe_vulkan_loader(error) && !error.empty());
     assert(sdl_loads == 1 && sdl_unloads == 0);

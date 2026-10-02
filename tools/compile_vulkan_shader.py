@@ -10,11 +10,33 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 
 STAGES = ("vs", "ps", "cs", "gs", "hs", "ds")
 SPIRV_MAGIC = b"\x03\x02\x23\x07"
+EXECUTION_MODEL = {"vs": 0, "hs": 1, "ds": 2, "gs": 3, "ps": 4, "cs": 5}
+
+
+def _valid_spirv(data, stage, entry):
+    if len(data) < 20 or len(data) % 4 or data[:4] != SPIRV_MAGIC:
+        return False
+    words = struct.unpack(f"<{len(data) // 4}I", data)
+    if words[3] == 0 or words[4] != 0:
+        return False
+    cursor = 5
+    found = False
+    while cursor < len(words):
+        instruction = words[cursor]
+        size, opcode = instruction >> 16, instruction & 0xFFFF
+        if size == 0 or cursor + size > len(words):
+            return False
+        if opcode == 15 and size >= 4:
+            name = struct.pack(f"<{size - 3}I", *words[cursor + 3:cursor + size]).split(b"\0", 1)[0]
+            found |= words[cursor + 1] == EXECUTION_MODEL[stage] and name == entry.encode("utf-8")
+        cursor += size
+    return found
 
 
 def _variant(source, stage, entry, output, includes, defines):
@@ -73,8 +95,9 @@ def _compile(variant, dxc, temporary):
               f"{result.stdout}{result.stderr}", file=sys.stderr)
         return result.returncode
     data = temporary.read_bytes()
-    if len(data) < 20 or len(data) % 4 or data[:4] != SPIRV_MAGIC:
-        print(f"DXC produced invalid SPIR-V for {source} [{variant['stage']}]", file=sys.stderr)
+    if not _valid_spirv(data, variant["stage"], variant["entry"]):
+        print(f"DXC produced invalid SPIR-V or missing {variant['stage']} entry "
+              f"'{variant['entry']}' for {source}", file=sys.stderr)
         return 1
     return 0
 

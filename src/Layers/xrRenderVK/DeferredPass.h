@@ -37,8 +37,8 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
     VkRenderPass& result, std::string& error);
 
 // Geometry pass expects two color attachments (RGBA albedo, encoded normal)
-// and depth. It owns opaque, alpha-test and blended pipelines. HUD geometry and
-// lighting share the swapchain pass; the caller records HUD after lighting.
+// and depth. Transparent geometry blends into the lit swapchain color, using
+// the opaque scene depth; HUD follows with a fresh depth buffer.
 // Attachments, render-pass transitions and per-frame synchronization belong to
 // the caller.
 class DeferredPass
@@ -67,6 +67,9 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         SurfaceMode mode = SurfaceMode::Opaque, uint32_t first_index = 0) const;
     bool record_hud(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+        uint32_t first_index = 0) const;
+    bool record_transparent(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,

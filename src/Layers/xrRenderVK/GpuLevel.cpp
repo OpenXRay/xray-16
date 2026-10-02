@@ -120,9 +120,11 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool selected = phase == GeometryPhase::Transparent ? transparent :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        if (selected &&
-            !pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                window.index_count, mvp, mesh.material, mesh.mode, window.offset)) return false;
+        if (selected && !(transparent ?
+                pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                    window.index_count, mvp, mesh.material, window.offset) :
+                pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                    window.index_count, mvp, mesh.material, mesh.mode, window.offset))) return false;
     }
     for (uint32_t child : visual.children)
         if (!record_visual(child, frame, pass, mvp, phase, lod)) return false;

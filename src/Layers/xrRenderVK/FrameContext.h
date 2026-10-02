@@ -93,7 +93,11 @@ public:
     bool initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
         const FrameDispatch& dispatch, std::string& error, bool allow_readback = false,
-        bool use_depth = false);
+        bool use_depth = false, bool preserve_prepass_depth = false);
+    // Borrow depth views produced by the offscreen pass. Caller must restore
+    // the owned views (empty vector) before destroying the borrowed images.
+    bool attach_scene_depth(const std::vector<VkImageView>& views, std::string& error);
+    void clear_depth(VkCommandBuffer command) const;
     bool recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
         VkExtent2D requested_extent, std::string& error);
     bool release_swapchain();
@@ -135,6 +139,8 @@ private:
     VkFormat m_depth_format = VK_FORMAT_UNDEFINED;
     VkPhysicalDeviceMemoryProperties m_memory_properties{};
     bool m_allow_readback = false;
+    bool m_preserve_prepass_depth = false;
+    bool m_scene_depth_attached = false;
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_image_views;
     std::vector<VkImage> m_depth_images;

@@ -204,7 +204,8 @@ FrameContext::~FrameContext()
 
 bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
     VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
-    const FrameDispatch& dispatch, std::string& error, bool allow_readback, bool use_depth)
+    const FrameDispatch& dispatch, std::string& error, bool allow_readback, bool use_depth,
+    bool preserve_prepass_depth)
 {
     destroy();
     if (!physical_device || !device || !surface || !queue || queue_family == UINT32_MAX)
@@ -225,6 +226,13 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_device_lost = false;
     m_surface_lost = false;
     m_allow_readback = allow_readback;
+    m_preserve_prepass_depth = preserve_prepass_depth;
+    if (preserve_prepass_depth && !use_depth)
+    {
+        error = "prepass depth requires a depth attachment";
+        destroy();
+        return false;
+    }
     if (use_depth)
     {
         const VkFormat candidates[]{VK_FORMAT_D32_SFLOAT, VK_FORMAT_D16_UNORM};
@@ -404,6 +412,7 @@ bool FrameContext::create_swapchain(VkPhysicalDevice physical_device, VkSurfaceK
 
 bool FrameContext::create_render_targets(std::string& error)
 {
+    m_scene_depth_attached = false;
     VkAttachmentDescription attachments[2]{};
     attachments[0].format = m_format;
     attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
@@ -416,9 +425,10 @@ bool FrameContext::create_render_targets(std::string& error)
         VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     attachments[1].format = m_depth_format;
     attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
-    attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachments[1].loadOp = m_preserve_prepass_depth ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[1].initialLayout = m_preserve_prepass_depth ?
+        VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
@@ -438,9 +448,12 @@ bool FrameContext::create_render_targets(std::string& error)
     dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     if (m_depth_format != VK_FORMAT_UNDEFINED)
     {
-        dependencies[0].srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        dependencies[0].srcStageMask |= m_preserve_prepass_depth ?
+            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT : VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependencies[0].dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependencies[0].dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        dependencies[0].srcAccessMask |= m_preserve_prepass_depth ? VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT : 0;
+        dependencies[0].dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
     }
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
@@ -571,6 +584,54 @@ bool FrameContext::create_render_targets(std::string& error)
     return true;
 }
 
+bool FrameContext::attach_scene_depth(const std::vector<VkImageView>& views, std::string& error)
+{
+    if (!m_preserve_prepass_depth || !m_render_pass ||
+        (!views.empty() && (views.size() != m_image_views.size() ||
+            std::any_of(views.begin(), views.end(), [](VkImageView view) { return !view; }))))
+    {
+        error = "invalid borrowed Vulkan scene depth views";
+        return false;
+    }
+    std::vector<VkFramebuffer> replacements;
+    replacements.reserve(m_image_views.size());
+    for (size_t i = 0; i < m_image_views.size(); ++i)
+    {
+        const VkImageView attachments[]{m_image_views[i], views.empty() ? m_depth_views[i] : views[i]};
+        VkFramebufferCreateInfo info{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
+        info.renderPass = m_render_pass;
+        info.attachmentCount = 2;
+        info.pAttachments = attachments;
+        info.width = m_extent.width;
+        info.height = m_extent.height;
+        info.layers = 1;
+        VkFramebuffer framebuffer = VK_NULL_HANDLE;
+        if (m_vk.create_framebuffer(m_device, &info, nullptr, &framebuffer) != VK_SUCCESS)
+        {
+            for (auto created : replacements) m_vk.destroy_framebuffer(m_device, created, nullptr);
+            error = "could not attach Vulkan scene depth to swapchain";
+            return false;
+        }
+        replacements.push_back(framebuffer);
+    }
+    for (auto old : m_framebuffers) m_vk.destroy_framebuffer(m_device, old, nullptr);
+    m_framebuffers.swap(replacements);
+    m_scene_depth_attached = !views.empty();
+    error.clear();
+    return true;
+}
+
+void FrameContext::clear_depth(VkCommandBuffer command) const
+{
+    VkClearAttachment attachment{};
+    attachment.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    attachment.clearValue.depthStencil = {1.0f, 0};
+    VkClearRect rect{};
+    rect.rect.extent = m_extent;
+    rect.layerCount = 1;
+    m_vk.cmd_clear_attachments(command, 1, &attachment, 1, &rect);
+}
+
 bool FrameContext::create_commands(std::string& error)
 {
     if (!m_command_pool)
@@ -637,6 +698,11 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     if (!m_device || !m_swapchain)
     {
         error = "Vulkan frame context is not initialized";
+        return false;
+    }
+    if (m_preserve_prepass_depth && !m_scene_depth_attached)
+    {
+        error = "Vulkan swapchain has no attached scene depth";
         return false;
     }
 
@@ -842,6 +908,8 @@ void FrameContext::destroy()
     m_depth_format = VK_FORMAT_UNDEFINED;
     m_memory_properties = {};
     m_allow_readback = false;
+    m_preserve_prepass_depth = false;
+    m_scene_depth_attached = false;
     m_images.clear();
     m_image_views.clear();
     m_depth_images.clear();
@@ -888,6 +956,7 @@ void FrameContext::destroy_swapchain_resources()
     m_depth_memories.clear();
     m_depth_views.clear();
     m_framebuffers.clear();
+    m_scene_depth_attached = false;
     m_render_finished.clear();
     m_image_available = {};
     m_frame_fences = {};

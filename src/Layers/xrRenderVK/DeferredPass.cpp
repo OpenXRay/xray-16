@@ -47,7 +47,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // The present pass has its own cleared depth attachment. HUD geometry
     // draws after world lighting, so depth testing here orders HUD surfaces
     // against one another without occluding the HUD with world geometry.
-    depth.depthTestEnable = (gbuffer || hud) ? VK_TRUE : VK_FALSE;
+    depth.depthTestEnable = (gbuffer || hud || transparent) ? VK_TRUE : VK_FALSE;
     depth.depthWriteEnable = ((gbuffer && !transparent) || hud) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
@@ -254,8 +254,8 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             geometry_fragment, true, true, false, false, vk_, geometry_) ||
         !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
             alpha_test_fragment, true, true, false, false, vk_, alpha_test_) ||
-        !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
-            geometry_fragment, true, true, true, false, vk_, transparent_) ||
+        !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
+            geometry_fragment, true, false, true, false, vk_, transparent_) ||
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
             geometry_fragment, true, false, false, true, vk_, hud_) ||
         !make_pipeline(device, light_pass, light_layout_, light_vertex,
@@ -327,12 +327,32 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index) const
 {
-    const VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ :
-        mode == SurfaceMode::Transparent ? transparent_ : geometry_;
+    if (mode == SurfaceMode::Transparent) return false;
+    const VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
     if (!pipeline || frame.render_pass != geometry_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
     vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        geometry_layout_, 0, 1, &material_set, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    return true;
+}
+
+bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+    uint32_t first_index) const
+{
+    if (!transparent_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
+        !frame.extent.width || !frame.extent.height || !vertices || !indices ||
+        !index_count || !material_set) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, transparent_);
     viewport_scissor(frame, vk_);
     const VkDeviceSize offset = 0;
     vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
