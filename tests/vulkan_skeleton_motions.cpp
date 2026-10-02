@@ -56,7 +56,7 @@ Bytes omf()
     u16(params, 1); // one definition
     name(params, "idle");
     u32(params, 0);
-    u16(params, 0);
+    u16(params, UINT16_MAX); // BI_NONE uses the default partition
     u16(params, 0);
     for (int i = 0; i < 4; ++i)
         f32(params, 1.f);
@@ -70,7 +70,7 @@ Bytes omf()
     u32(motions, 1);
     name(clip, "idle");
     u32(clip, 2);
-    clip.push_back(3); // hand: constant rotation, 16-bit translations
+    clip.push_back(3); // hand: constant rotation, 8-bit translations
     for (int i = 0; i < 4; ++i)
         u16(clip, i == 3 ? 32767 : 0);
     u32(clip, 0x12345678);
@@ -106,6 +106,7 @@ int main()
     };
     assert(parse_skeleton_motions({ bytes.data(), bytes.size() }, { "root", "hand" }, "actor.ogf", resolve, slots, error));
     assert(slots.size() == 1 && slots[0].clips[0].frames == 2);
+    assert(slots[0].definitions[0].bone_or_part == UINT16_MAX);
     assert(slots[0].clips[0].bones[1].rotations.size() == 1);
     assert(slots[0].clips[0].bones[1].translations8.size() == 2);
     assert(slots[0].clips[0].bones[0].rotations.size() == 2);

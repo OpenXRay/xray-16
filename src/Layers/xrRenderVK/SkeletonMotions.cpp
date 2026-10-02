@@ -178,7 +178,8 @@ bool read_params(LevelBytes bytes, const std::vector<std::string>& bones, Motion
         if (!r.string_z(def.name) || def.name.empty() || !r.u32(def.flags) || !r.u16(def.bone_or_part) || !r.u16(def.motion))
             return false;
         lowercase(def.name);
-        if (def.motion >= count || ((def.flags & 1u) ? def.bone_or_part >= bones.size() : def.bone_or_part >= slot.partitions.size()))
+        if (def.motion >= count ||
+            (def.bone_or_part != UINT16_MAX && ((def.flags & 1u) ? def.bone_or_part >= bones.size() : def.bone_or_part >= slot.partitions.size())))
             return false;
         for (auto& param : def.parameters)
             if (!r.f32(param))
