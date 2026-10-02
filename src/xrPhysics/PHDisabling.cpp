@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "PHDisabling.h"
+#include "xrPhysicsCore/BodyState.h"
 #include "PhysicsCommon.h"
 #include "Physics.h"
 #ifdef DEBUG
@@ -59,13 +60,27 @@ CBaseDisableData::CBaseDisableData()
 
 void CBaseDisableData::Disabling()
 {
+    if (!BeginDisabling()) return;
+    UpdateL1();
+    Fvector force, torque;
+    GetPhysicsCore()->GetBodyForce(get_body(), force);
+    GetPhysicsCore()->GetBodyTorque(get_body(), torque);
+    EndDisabling(force, torque);
+}
+
+bool CBaseDisableData::BeginDisabling()
+{
     if (!ph_world || ph_world->IsFreezed() || m_last_frame_updated == ph_world->StepsShortCnt())
-        return;
+        return false;
     m_last_frame_updated = ph_world->StepsShortCnt();
     VERIFY(m_frames > 0);
     if (m_count == 0) m_count = m_frames;
     --m_count;
-    UpdateL1();
+    return true;
+}
+
+void CBaseDisableData::EndDisabling(const Fvector& force, const Fvector& torque)
+{
     CheckState(m_stateL1);
     if (m_count == 0)
     {
@@ -73,9 +88,6 @@ void CBaseDisableData::Disabling()
         CheckState(m_stateL2);
         m_count = m_frames;
     }
-    Fvector force, torque;
-    GetPhysicsCore()->GetBodyForce(get_body(), force);
-    GetPhysicsCore()->GetBodyTorque(get_body(), torque);
     if (force.square_magnitude() > 0 || torque.square_magnitude() > 0) m_disabled = false;
     // Jolt wakes connected bodies together. CPHShell applies this decision to
     // all of its elements at once instead of cycling individual bodies asleep.
@@ -197,6 +209,20 @@ void CPHDisablingFull::Reinit()
 {
     CPHDisablingRotational::Reinit();
     CPHDisablingTranslational::Reinit();
+}
+
+void CPHDisablingFull::Disabling(const NativeBodyState& state)
+{
+    if (!BeginDisabling()) return;
+    m_stateL1.Reset();
+    Fvector rotation;
+    rotation.set(state.transform.k.y, state.transform.i.z, state.transform.j.x);
+    CPHDisablingRotational::UpdateValues(rotation, state.angular_velocity);
+    auto rotational = m_stateL1;
+    m_stateL1.Reset();
+    CPHDisablingTranslational::UpdateValues(state.transform.c, state.linear_velocity);
+    m_stateL1 &= rotational;
+    EndDisabling(state.force, state.torque);
 }
 
 void CPHDisablingFull::UpdateL1()

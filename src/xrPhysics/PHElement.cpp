@@ -19,6 +19,7 @@
 #include "PHElement.h"
 #include "PHElementInline.h"
 #include "xrPhysicsCore/IPhysicsCore.h"
+#include "xrPhysicsCore/BodyState.h"
 
 extern CPHWorld* ph_world;
 
@@ -449,14 +450,14 @@ void CPHElement::PhDataUpdate(float step)
     }
 #endif
 
-    bool is_active_body = GetPhysicsCore()->IsBodyActive(m_char_handle);
-    m_flags.set(flEnabledOnStep, is_active_body);
-    if (!is_active_body)
+    NativeBodyState state;
+    if (!GetPhysicsBodyState(m_char_handle, state)) return;
+    m_flags.set(flEnabledOnStep, state.active);
+    if (!state.active)
         return;
 
-    Fvector linear_velocity, angular_velocity;
-    GetPhysicsCore()->GetBodyLinearVelocity(m_char_handle, linear_velocity);
-    GetPhysicsCore()->GetBodyAngularVelocity(m_char_handle, angular_velocity);
+    auto& linear_velocity = state.linear_velocity;
+    auto& angular_velocity = state.angular_velocity;
 
     VERIFY(_valid(linear_velocity));
     VERIFY(_valid(angular_velocity));
@@ -475,34 +476,36 @@ void CPHElement::PhDataUpdate(float step)
     float linear_velocity_mag = linear_velocity.magnitude();
     float angular_velocity_mag = angular_velocity.magnitude();
 
-    if (linear_velocity_mag > m_l_limit || angular_velocity_mag > m_w_limit)
-    {
-        CutVelocity(m_l_limit, m_w_limit);
+    if (linear_velocity_mag > m_l_limit) {
+        linear_velocity.normalize();
+        linear_velocity.mul(m_l_limit);
+        GetPhysicsCore()->SetBodyLinearVelocity(m_char_handle, linear_velocity);
+    }
+    if (angular_velocity_mag > m_w_limit) {
+        angular_velocity.normalize();
+        angular_velocity.mul(m_w_limit);
+        GetPhysicsCore()->SetBodyAngularVelocity(m_char_handle, angular_velocity);
     }
 
-    Disabling();
-    Fmatrix tr;
-    GetPhysicsCore()->GetBodyTransform(m_char_handle, tr);
-    VERIFY_BOUNDARIES2(tr.c, phBoundaries, PhysicsRefObject(), "PhDataUpdate end, body position");
+    Disabling(state);
+    VERIFY_BOUNDARIES2(state.transform.c, phBoundaries, PhysicsRefObject(), "PhDataUpdate end, body position");
 
-    UpdateInterpolation();
-    if (!GetPhysicsCore()->IsBodyActive(m_char_handle)) return;
-    GetPhysicsCore()->GetBodyLinearVelocity(m_char_handle, linear_velocity);
-    GetPhysicsCore()->GetBodyAngularVelocity(m_char_handle, angular_velocity);
+    m_char_handle_interpolation.UpdateBody(state.transform);
+    m_flags.set(flUpdate, TRUE);
     // Air resistance acts on an already active body. Adding it through the
     // waking force APIs would reset Jolt's sleep timer on every frame.
     Fvector accumulated;
     if (!fis_zero(k_w))
     {
-        GetPhysicsCore()->GetBodyTorque(m_char_handle, accumulated);
+        accumulated = state.torque;
         accumulated.mad(angular_velocity, -k_w);
         GetPhysicsCore()->SetBodyTorque(m_char_handle, accumulated);
     }
     const float drag = std::min(linear_velocity.magnitude() * k_l,
-        GetPhysicsCore()->GetBodyMass(m_char_handle) / step);
+        state.mass / step);
     if (!fis_zero(drag))
     {
-        GetPhysicsCore()->GetBodyForce(m_char_handle, accumulated);
+        accumulated = state.force;
         accumulated.mad(linear_velocity, -drag);
         GetPhysicsCore()->SetBodyForce(m_char_handle, accumulated);
     }

@@ -939,18 +939,7 @@ void JoltPhysicsCore::SetBodyInWorld(BodyHandle handle, bool enabled) {
     if (!enabled && bodies.IsAdded(id)) bodies.RemoveBody(id);
 }
 
-void JoltPhysicsCore::GetBodyTransform(BodyHandle body_handle, Fmatrix& out_matrix) const {
-    if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) {
-        out_matrix.i.set(1.0f, 0.0f, 0.0f);
-        out_matrix.j.set(0.0f, 1.0f, 0.0f);
-        out_matrix.k.set(0.0f, 0.0f, 1.0f);
-        out_matrix.c.set(0.0f, 0.0f, 0.0f);
-        out_matrix._14_ = 0.0f; out_matrix._24_ = 0.0f; out_matrix._34_ = 0.0f; out_matrix._44_ = 1.0f;
-        return;
-    }
-
-    JPH::BodyID id(body_handle);
-    JPH::Mat44 transform = m_physics_system->GetBodyInterface().GetCenterOfMassTransform(id);
+static void StoreBodyTransform(const JPH::Mat44& transform, Fmatrix& out_matrix) {
     JPH::Vec3 pos = transform.GetTranslation();
 
     if (_isnan(pos.GetX()) || _isnan(pos.GetY()) || _isnan(pos.GetZ())) {
@@ -971,6 +960,37 @@ void JoltPhysicsCore::GetBodyTransform(BodyHandle body_handle, Fmatrix& out_matr
     out_matrix.k.set(axis_z.GetX(), axis_z.GetY(), axis_z.GetZ());
     out_matrix.c.set(pos.GetX(), pos.GetY(), pos.GetZ());
     out_matrix._14_ = 0.0f; out_matrix._24_ = 0.0f; out_matrix._34_ = 0.0f; out_matrix._44_ = 1.0f;
+}
+
+void JoltPhysicsCore::GetBodyTransform(BodyHandle body_handle, Fmatrix& out_matrix) const {
+    if (!m_physics_system || body_handle == INVALID_BODY_HANDLE) {
+        out_matrix = Fidentity;
+        return;
+    }
+    StoreBodyTransform(m_physics_system->GetBodyInterface().GetCenterOfMassTransform(JPH::BodyID(body_handle)), out_matrix);
+}
+
+bool JoltPhysicsCore::ReadBodyState(BodyHandle handle, NativeBodyState& state) const {
+    state = NativeBodyState{};
+    if (!m_physics_system || handle == INVALID_BODY_HANDLE) return false;
+    JPH::BodyLockRead lock(m_physics_system->GetBodyLockInterface(), JPH::BodyID(handle));
+    if (!lock.Succeeded()) return false;
+    const auto& body = lock.GetBody();
+    StoreBodyTransform(body.GetCenterOfMassTransform(), state.transform);
+    state.active = body.IsActive();
+    if (!body.IsStatic()) {
+        const auto linear = body.GetLinearVelocity(), angular = body.GetAngularVelocity();
+        state.linear_velocity.set(linear.GetX(), linear.GetY(), linear.GetZ());
+        state.angular_velocity.set(angular.GetX(), angular.GetY(), angular.GetZ());
+    }
+    const auto* motion = body.GetMotionPropertiesUnchecked();
+    if (motion && motion->GetInverseMass() > 0) state.mass = 1.f / motion->GetInverseMass();
+    if (body.IsDynamic()) {
+        const auto force = body.GetAccumulatedForce(), torque = body.GetAccumulatedTorque();
+        state.force.set(force.GetX(), force.GetY(), force.GetZ());
+        state.torque.set(torque.GetX(), torque.GetY(), torque.GetZ());
+    }
+    return true;
 }
 
 void JoltPhysicsCore::SetBodyTransform(BodyHandle body_handle, const Fmatrix& matrix) {
@@ -3262,6 +3282,10 @@ void JoltPhysicsCore::SetRagdollCollisionGroup(RagdollHandle handle, u32 group_i
 }
 
 static JoltPhysicsCore g_physics_core;
+
+bool GetPhysicsBodyState(BodyHandle body, NativeBodyState& state) {
+    return g_physics_core.ReadBodyState(body, state);
+}
 
 extern "C" PHYSICS_CORE_API IPhysicsCore* GetPhysicsCore() {
     g_physics_core.Initialize();

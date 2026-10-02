@@ -1,6 +1,8 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 #include "xrPhysicsCore/IPhysicsCore.h"
+#include "xrPhysicsCore/BodyState.h"
+#include "xrPhysics/NativeContactEffects.h"
 #include "xrPhysics/PHJointDestroyInfo.h"
 #include "xrCDB/xrCDB.h"
 #include "xrMaterialSystem/GameMtlLib.h"
@@ -113,6 +115,51 @@ void CompoundTransforms(IPhysicsCore& core) {
     Near(center.x, 2, .0001f, "Rotated compound geometry matches bone transform");
     core.GetBodyPosition(body, position);
     Near(position.x, 4, .0001f, "Compound transform round trip");
+    core.SetBodyLinearVelocity(body, V(1, 2, 3));
+    core.SetBodyAngularVelocity(body, V(4, 5, 6));
+    core.SetBodyForce(body, V(7, 8, 9));
+    core.SetBodyTorque(body, V(10, 11, 12));
+    NativeBodyState state;
+    Require(GetPhysicsBodyState(body, state) && state.active, "Coherent state reads an active compound");
+    Near(state.transform.c.x, 4, .0001f, "Coherent state uses mass center, not offset geometry");
+    Near(state.transform.c.y, 3, .0001f, "Coherent state position");
+    Near(state.transform.i.x, -1, .0001f, "Coherent state rotation");
+    Near(state.mass, 2, .0001f, "Coherent state mass");
+    Near(state.linear_velocity.y, 2, .0001f, "Coherent state linear velocity");
+    Near(state.angular_velocity.z, 6, .0001f, "Coherent state angular velocity");
+    Near(state.force.z, 9, .0001f, "Coherent state force accumulator");
+    Near(state.torque.y, 11, .0001f, "Coherent state torque accumulator");
+    // The read releases its lock before returning, so mutation is safe.
+    core.DeactivateBody(body);
+    Require(GetPhysicsBodyState(body, state) && !state.active, "Coherent state reads a sleeping body");
+    core.DestroyBody(body);
+    Require(!GetPhysicsBodyState(body, state), "Coherent state rejects retired handles");
+    Near(state.mass, 0, 0, "Failed coherent read clears previous data");
+    Require(!GetPhysicsBodyState(INVALID_BODY_HANDLE, state), "Coherent state rejects invalid handles");
+    child = core.CreateBoxShape(V(.5f, .5f, .5f));
+    const auto fixed = core.CreateStaticBody(child, V(1, 2, 3));
+    core.DestroyCDBModel(child);
+    Require(GetPhysicsBodyState(fixed, state) && !state.active, "Coherent state reads a static body");
+    Near(state.transform.c.z, 3, .0001f, "Static coherent state position");
+    Near(state.linear_velocity.x, 0, 0, "Static coherent state has zero velocity");
+    Near(state.force.x, 0, 0, "Static coherent state has zero force");
+}
+struct ContactEffectTestParameters {
+    static constexpr float vel_cret_wallmark = 10, vel_cret_sound = 5, vel_cret_particles = 2;
+};
+void ContactEffectEligibility() {
+    auto eligible = [](float energy, float distance, bool passable, bool triangle) {
+        return NativeContactHasEffects<ContactEffectTestParameters>(energy, distance, passable, triangle, 100, 25);
+    };
+    Require(!eligible(2, 0, false, true), "Exact dry effect thresholds stay silent");
+    Require(eligible(2.01f, 24, false, false), "Nearby particles survive the early effect filter");
+    Require(!eligible(2.01f, 25, false, false), "Exact particle distance remains excluded");
+    Require(eligible(5.01f, 99, false, false), "Nearby impact sounds survive the early filter");
+    Require(!eligible(5.01f, 100, false, false), "Exact sound distance remains excluded");
+    Require(eligible(0, 99, true, false), "Continuous passable sounds need no impact threshold");
+    Require(!eligible(0, 100, true, false), "Distant passable sounds remain excluded");
+    Require(eligible(10.01f, 10000, false, true), "Distant wallmarks remain eligible");
+    Require(!eligible(10.01f, 10000, false, false), "Wallmarks require a static triangle");
 }
 void Contact(IPhysicsCore& core) {
     core.Clear();
@@ -742,6 +789,8 @@ void FluidExclusionRegions(IPhysicsCore& core) {
             Require(materials.empty(), "Standalone fluid fixture owns an empty material library");
             core.Clear();
             materials.reserve(2);
+            dry.m_Name = "fixture_dry";
+            wet.m_Name = "fixture_wet";
             wet.Flags.set(SGameMtl::flSlowDown, true);
             materials.push_back(&dry);
             materials.push_back(&wet);
@@ -755,6 +804,16 @@ void FluidExclusionRegions(IPhysicsCore& core) {
             fluidFixture = false;
         }
     } fixture(core);
+    NativePhysicsContact materialContact{};
+    materialContact.material1 = 1;
+    materialContact.material2 = 0;
+    Require(NativeContactMaterialIndex(&fixture.dry, &materialContact) == 0 &&
+        NativeContactMaterialIndex(&fixture.wet, &materialContact) == 1, "Native effect material indices follow resolved pointers");
+    materialContact.material1 = materialContact.material2 = 1;
+    Require(NativeContactMaterialIndex(&fixture.dry, &materialContact) == 0, "Changed callback materials use the name fallback");
+    materialContact.material1 = materialContact.material2 = u16(-1);
+    Require(NativeContactMaterialIndex(&fixture.wet, &materialContact) == 1 &&
+        NativeContactMaterialIndex(&fixture.dry, nullptr) == 0, "Untagged effect materials use the name fallback");
     policyCore = &core;
     callerThread = std::this_thread::get_id();
     immediateFixture = false;
@@ -880,6 +939,7 @@ int main() {
     try {
         Motion(*core);
         CompoundTransforms(*core);
+        ContactEffectEligibility();
         Contact(*core);
         ContactFeedback(*core);
         Joints(*core);

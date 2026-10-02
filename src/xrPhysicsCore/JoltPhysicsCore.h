@@ -1,5 +1,6 @@
 #pragma once
 #include "xrPhysicsCore/IPhysicsCore.h"
+#include "BodyState.h"
 #include "JoltLayers.h"
 #include "JoltDebugRenderer.h"
 
@@ -244,6 +245,7 @@ private:
 public:
     JoltPhysicsCore() = default;
     virtual ~JoltPhysicsCore() override;
+    bool ReadBodyState(BodyHandle body, NativeBodyState& state) const;
 
     void Initialize() override;
     void SetPreIntegrationCallback(void (*callback)()) override { m_pre_integration_callback = callback; }

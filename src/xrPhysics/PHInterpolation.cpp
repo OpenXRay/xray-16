@@ -79,6 +79,16 @@ void CPHInterpolation::UpdateRotations()
     qRotations.push_back(fQ);
 }
 
+void CPHInterpolation::UpdateBody(const Fmatrix& transform)
+{
+    if (m_handle_type != HandleType::Body) return;
+    auto position = transform.c;
+    qPositions.push_back(position);
+    Fquaternion rotation;
+    rotation.set(transform);
+    qRotations.push_back(rotation);
+}
+
 void CPHInterpolation::InterpolatePosition(Fvector& pos)
 {
     float t = ph_world->m_frame_time / fixed_step;

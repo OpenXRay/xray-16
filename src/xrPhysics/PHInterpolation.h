@@ -19,6 +19,7 @@ public:
     void InterpolateRotation(Fmatrix& rot);
     void UpdatePositions();
     void UpdateRotations();
+    void UpdateBody(const Fmatrix& transform);
     void ResetPositions();
     void ResetRotations();
 

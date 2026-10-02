@@ -2,6 +2,7 @@
 
 #include "DisablingParams.h"
 #include "xrPhysicsCore/IPhysicsCore.h"
+struct NativeBodyState;
 
 struct SDisableVector
 {
@@ -47,6 +48,8 @@ protected:
     }
 
     void Disabling();
+    bool BeginDisabling();
+    void EndDisabling(const Fvector& force, const Fvector& torque);
     void Reinit();
     virtual void Disable() = 0;
     virtual void ReEnable() = 0;
@@ -100,6 +103,8 @@ public:
 class CPHDisablingFull : public CPHDisablingRotational, public CPHDisablingTranslational
 {
 public:
+    using CBaseDisableData::Disabling;
+    void Disabling(const NativeBodyState& state);
     void Reinit();
     virtual void UpdateL1();
     virtual void UpdateL2();

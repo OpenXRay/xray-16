@@ -7,6 +7,7 @@
 #include "PhysicsGamePars.h"
 
 #include "xrPhysics/PhysicsExternalCommon.h"
+#include "xrPhysics/NativeContactEffects.h"
 #include "PHSoundPlayer.h"
 #include "PhysicsShellHolder.h"
 #include "xrPhysics/PHCommander.h"
@@ -223,13 +224,18 @@ void TContactShotMark(
     to_camera.sub(contact_pos, Device.vCameraPosition);
     float square_cam_dist = to_camera.square_magnitude();
 
-    u16 static_mat_id = GMLib.GetMaterialIdx(static_mat->m_Name.c_str());
-    u16 dyn_mat_id = GMLib.GetMaterialIdx(dyn_mat->m_Name.c_str());
+    const auto* staticGeometry = b_invert_normal ? my_geom : oposite_geom;
+    if (!NativeContactHasEffects<Pars>(vel_cret, square_cam_dist,
+        static_mat->Flags.test(SGameMtl::flPassable), staticGeometry && staticGeometry->contact_triangle != u32(-1),
+        SQUARE_SOUND_EFFECT_DIST, SQUARE_PARTICLE_EFFECT_DIST)) return;
+    const auto* response = my_geom ? my_geom->contact_response : nullptr;
+    if (!response && oposite_geom) response = oposite_geom->contact_response;
+    u16 static_mat_id = NativeContactMaterialIndex(static_mat, response);
+    u16 dyn_mat_id = NativeContactMaterialIndex(dyn_mat, response);
 
     SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(static_mat_id, dyn_mat_id);
     if (mtl_pair)
     {
-        const auto* staticGeometry = b_invert_normal ? my_geom : oposite_geom;
         if (staticGeometry && staticGeometry->contact_triangle != u32(-1) &&
             vel_cret > Pars::vel_cret_wallmark && !mtl_pair->CollideMarks->empty()) {
             auto* triangle = Level().ObjectSpace.GetStaticTris() + staticGeometry->contact_triangle;
