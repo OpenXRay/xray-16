@@ -1,7 +1,8 @@
 #pragma once
 
-#include "SkeletonBones.h"
 #include "Include/xrRender/Kinematics.h"
+#include "ModelGeometry.h"
+#include "SkeletonBones.h"
 #include "xrCore/Animation/Bone.hpp"
 
 #include <memory>
@@ -15,6 +16,8 @@ public:
     static std::unique_ptr<VulkanKinematics> create(const SkeletonBones& source,
         IRenderVisual* owner, std::string& error);
     VulkanKinematics(const VulkanKinematics& source, IRenderVisual* owner);
+    bool attach_geometry(const ModelGeometry& geometry, std::string& error);
+    void reset_instance_state();
 
     void Bone_Calculate(CBoneData* bone, Fmatrix* parent) override;
     void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8, bool) override;
@@ -23,7 +26,7 @@ public:
     u16 LL_BoneID(LPCSTR name) override;
     u16 LL_BoneID(const shared_str& name) override;
     LPCSTR LL_BoneName_dbg(u16 id) override;
-    CInifile* LL_UserData() override { return nullptr; }
+    CInifile* LL_UserData() override;
     accel* LL_Bones() override;
     CBoneInstance& LL_GetBoneInstance(u16 id) override;
     CBoneData& LL_GetData(u16 id) override;

@@ -61,6 +61,11 @@ int main()
     assert(bones.root == 0 && bones.bones.size() == 2);
     assert(bones.bones[0].name == "root" && bones.bones[1].parent == 0);
     assert(!bones.bones[0].ik_data.empty() && !bones.bones[1].ik_data.empty());
+    const std::vector<uint8_t> user_data{ '[', 'i', 'n', 'f', 'o', ']', '\n' };
+    u32(bytes, 17);
+    u32(bytes, static_cast<uint32_t>(user_data.size()));
+    bytes.insert(bytes.end(), user_data.begin(), user_data.end());
+    assert(parse(bytes, bones, error) && bones.user_data == user_data);
 
     auto bad = skeleton("missing");
     assert(!parse(bad, bones, error) && !error.empty());

@@ -28,6 +28,7 @@ public:
         visibility_.box.set(b[0], b[1], b[2], b[3], b[4], b[5]);
         visibility_.sphere.P.set(b[6], b[7], b[8]);
         visibility_.sphere.R = b[9];
+        initial_visibility_ = visibility_;
     }
 
     // Every copy has independent bounds and child identities, while GPU
@@ -39,6 +40,7 @@ public:
         visibility_.clear();
         visibility_.box = other.visibility_.box;
         visibility_.sphere = other.visibility_.sphere;
+        initial_visibility_ = other.initial_visibility_;
         if (other.skeleton_)
             skeleton_ = std::make_unique<VulkanKinematics>(*other.skeleton_, this);
         for (const auto& child : other.children_)
@@ -64,7 +66,28 @@ public:
             level_->get_visual(linked_[linked_index]) : nullptr;
     }
 
-    void add_child(std::unique_ptr<VulkanModelVisual> child) { children_.push_back(std::move(child)); }
+    void add_child(std::unique_ptr<VulkanModelVisual> child) { children_.push_back(std::move(child));
+    }
+
+    void reset_instance_state()
+    {
+        visibility_.box = initial_visibility_.box;
+        visibility_.sphere = initial_visibility_.sphere;
+        if (skeleton_)
+            skeleton_->reset_instance_state();
+        for (auto& child : children_)
+            child->reset_instance_state();
+    }
+
+    void release_pose_buffers(IKinematics* owner = nullptr)
+    {
+        if (skeleton_)
+            owner = skeleton_.get();
+        if (owner && gpu_)
+            gpu_->release_instance(owner);
+        for (auto& child : children_)
+            child->release_pose_buffers(owner);
+    }
     const auto& children() const { return children_; }
     const auto& linked() const { return linked_; }
     bool linked_valid() const { return level_ && level_->revision() == level_revision_; }
@@ -99,6 +122,7 @@ public:
 
 private:
     vis_data visibility_;
+    vis_data initial_visibility_;
     std::shared_ptr<GpuModel> gpu_;
     std::unique_ptr<VulkanKinematics> skeleton_;
     std::string cache_name_;

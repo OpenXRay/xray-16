@@ -1,14 +1,16 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <array>
+#include <memory>
 #include <string>
 #include <vector>
 #include "SlidingWindows.h"
 
 namespace xray::render::vulkan
 {
+struct VisualRecord;
 enum class SurfaceMode : uint8_t
 {
     Opaque,
@@ -46,6 +48,7 @@ struct LevelModel
     std::vector<LevelVertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<SlideWindow> windows;
+    std::shared_ptr<LevelModel> fast;
 };
 
 // The index of a visual in the level OGF table is stable. Hierarchies keep
@@ -85,9 +88,11 @@ struct LevelModelData
 
 // A missing/unsupported format fails the entire load. This ensures that a
 // partially rendered level cannot accidentally be advertised as playable.
-bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
-    LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result,
-    std::string& error);
+bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
+    LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {});
+// Resolve a standalone visual's GCONTAINER against level.geom, using the
+// same bounds and index validation as the level visual table.
+bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error);
 bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
     LevelModelData& result, std::string& error);
 }

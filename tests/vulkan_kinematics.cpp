@@ -1,9 +1,25 @@
 #include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/VulkanModelVisual.h"
+#include "xrEngine/EnnumerateVertices.h"
 
 #include <cassert>
 
 using namespace xray::render::vulkan;
+
+static void move_bone(CBoneInstance* instance)
+{
+    instance->mTransform.c.x = 2.f;
+}
+
+struct VertexCounter : SEnumVerticesCallback
+{
+    int count = 0;
+
+    void operator()(const Fvector&) override
+    {
+        ++count;
+    }
+};
 
 int main()
 {
@@ -22,6 +38,41 @@ int main()
     assert(kinematics && error.empty());
     visual->set_skeleton(std::move(kinematics));
     auto* pose = visual->dcast_PKinematics();
+    ModelGeometry geometry;
+    geometry.type = 3;
+    geometry.children.resize(1);
+    auto& child = geometry.children[0];
+    child.type = 5;
+    child.vertices.resize(3);
+    child.indices = { 0, 1, 2 };
+    child.vertices[0].position[0] = 0.f;
+    child.vertices[1].position[0] = 1.f;
+    child.vertices[2].position[1] = 1.f;
+    for (auto& vertex : child.vertices)
+        vertex.bones[0] = 1;
+    assert(static_cast<VulkanKinematics*>(pose)->attach_geometry(geometry, error));
+    xr_vector<xr_vector<u16>> groups;
+    assert(pose->LL_GetBoneGroups(groups) == 1 && groups[0].size() == 1 && groups[0][0] == 1);
+    VertexCounter counter;
+    pose->EnumBoneVertices(counter, 1);
+    assert(counter.count == 3);
+    Fmatrix identity;
+    identity.identity();
+    IKinematics::pick_result hit{};
+    Fvector start, direction;
+    start.set(0.25f, 0.25f, -1.f);
+    direction.set(0.f, 0.f, 1.f);
+    assert(pose->PickBone(identity, hit, 5.f, start, direction, 1));
+    assert(hit.dist == 1.f);
+    pose->LL_GetBoneInstance(1).set_callback(0, move_bone, nullptr);
+    pose->CalculateBones_Invalidate();
+    pose->CalculateBones(TRUE);
+    assert(pose->LL_GetTransform_R(1).c.x == 2.f);
+    pose->LL_GetBoneInstance(1).set_callback(0, move_bone, nullptr, TRUE);
+    pose->CalculateBones(TRUE);
+    assert(pose->LL_GetTransform_R(1).c.x == 2.f);
+    static_cast<VulkanKinematics*>(pose)->reset_instance_state();
+    assert(!pose->LL_GetBoneInstance(1).callback() && pose->LL_GetTransform_R(1).c.x == 0.f);
     assert(pose && pose->LL_BoneCount() == 2 && pose->LL_GetBoneRoot() == 0);
     assert(pose->LL_BoneID("HAND") == 1 && pose->LL_BoneID("missing") == BI_NONE);
     assert(pose->LL_GetData(1).GetParentID() == 0);
@@ -40,4 +91,5 @@ int main()
     assert(copied->LL_GetBoneVisible(1) && !pose->LL_GetBoneVisible(1));
     copied->LL_GetBoneInstance(1).mTransform.c.x = 7.f;
     assert(pose->LL_GetBoneInstance(1).mTransform.c.x != 7.f);
+    return 0;
 }

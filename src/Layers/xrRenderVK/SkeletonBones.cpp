@@ -70,7 +70,7 @@ bool parse_skeleton_bones(LevelBytes ogf, SkeletonBones& result, std::string& er
         }
         cursor += 8 + length;
     }
-    LevelBytes names, ik;
+    LevelBytes names, ik, user_data;
     if (!chunk(ogf, 13, names) || names.size < 4)
     {
         error = "OGF skeleton has no valid bone-name chunk";
@@ -184,6 +184,8 @@ bool parse_skeleton_bones(LevelBytes ogf, SkeletonBones& result, std::string& er
             return false;
         }
     }
+    if (chunk(ogf, 17, user_data))
+        parsed.user_data.assign(user_data.data, user_data.data + user_data.size);
     result = std::move(parsed);
     error.clear();
     return true;

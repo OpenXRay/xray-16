@@ -1,4 +1,5 @@
 #include "src/Layers/xrRenderVK/LevelModels.h"
+#include "src/Layers/xrRenderVK/VisualCatalog.h"
 
 #include <cassert>
 #include <cstring>
@@ -82,6 +83,33 @@ int main()
     assert(result.models[0].vertices.size() == 3 && result.models[0].vertices[2].position[0] == 2);
     assert(result.models[0].indices[2] == 2);
     assert(result.visuals.size() == 1 && result.roots.size() == 1 && result.roots[0] == 0);
+    VisualRecord standalone;
+    assert(parse_ogf_visual(input(visual), standalone, error));
+    LevelModel container_model;
+    assert(load_container_model(input(vb), input(ib), standalone, container_model, error));
+    assert(container_model.vertices.size() == 3 && container_model.indices[2] == 2);
+    Bytes corrupt_ib = ib;
+    corrupt_ib.back() = 9;
+    assert(!load_container_model(input(vb), input(corrupt_ib), standalone, container_model, error));
+    assert(container_model.indices[2] == 2);
+    Bytes packed_vb;
+    u32(packed_vb, 1);
+    decl(packed_vb, 0, 2, 0);
+    decl(packed_vb, 12, 4, 3);
+    decl(packed_vb, 16, 6, 5);
+    packed_vb.insert(packed_vb.end(), { 0xff, 0, 0, 0, 17, 0, 0, 0 });
+    u32(packed_vb, 3);
+    for (int i = 0; i < 3; ++i)
+    {
+        f32(packed_vb, float(i));
+        f32(packed_vb, 0.f);
+        f32(packed_vb, 0.f);
+        u32(packed_vb, 0xff808080);
+        u16(packed_vb, 512);
+        u16(packed_vb, 1024);
+    }
+    assert(load_container_model(input(packed_vb), input(ib), standalone, container_model, error));
+    assert(container_model.vertices[1].uv[0] == 0.5f && container_model.vertices[1].normal[0] > 0.f);
 
     // Level portal records contain storage for six points even when only a
     // triangle or quad is active; unused point slots need not be initialized.
@@ -158,6 +186,22 @@ int main()
         input(progressive_visuals), result, error));
     assert(result.models[0].indices.size() == 6 && result.models[0].windows.size() == 2);
     assert(select_slide_window(result.models[0].windows, 0.f, 6).offset == 3);
+    Bytes fast_chunks, fast_visual, fast_visuals;
+    part(fast_chunks, 21, progressive_container);
+    part(fast_chunks, 6, progressive_swi);
+    fast_visual = progressive_visual;
+    part(fast_visual, 22, fast_chunks);
+    part(fast_visuals, 0, fast_visual);
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals), result, error, input(vb), input(progressive_ib)));
+    assert(result.models[0].fast && result.models[0].fast->windows.size() == 2);
+    assert(select_slide_window(result.models[0].fast->windows, 0.f, 6).offset == 3);
+    fast_chunks.pop_back(); // Corrupt fast SWI: fail rather than draw a partial model.
+    fast_visual = progressive_visual;
+    fast_visuals.clear();
+    part(fast_visual, 22, fast_chunks);
+    part(fast_visuals, 0, fast_visual);
+    assert(!load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals), result, error, input(vb), input(progressive_ib)));
+    assert(result.models[0].fast && result.models[0].fast->windows.size() == 2);
     progressive_swi[20 + 8 + 6] = 2; // Index 2 is inactive with only two vertices.
     progressive_visual.clear(); progressive_visuals.clear();
     part(progressive_visual, 1, header);

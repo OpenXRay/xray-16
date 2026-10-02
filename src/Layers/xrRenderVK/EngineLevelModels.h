@@ -16,4 +16,5 @@ bool load_engine_visual_catalog(IReader& level, std::vector<VisualRecord>& resul
 bool load_engine_model_visual(const char* name, VisualRecord& result, std::string& error);
 bool load_engine_model_geometry(const char* name, IReader* source,
     ModelGeometry& result, std::string& error);
+bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& result, std::string& error);
 }

@@ -1,9 +1,12 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanKinematics.h"
-#include "xrEngine/vis_common.h"
 #include "xrCore/FS.h"
+#include "xrCore/xr_ini.h"
+#include "xrEngine/EnnumerateVertices.h"
+#include "xrEngine/vis_common.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 
 namespace xray::render::vulkan
@@ -13,6 +16,9 @@ struct VulkanKinematics::Data
     std::vector<std::unique_ptr<CBoneData>> owned;
     vecBones bones;
     accel names;
+    u16 root = BI_NONE;
+    std::unique_ptr<CInifile> user_data;
+    std::vector<ModelGeometry> meshes;
 };
 
 VulkanKinematics::VulkanKinematics(std::shared_ptr<Data> data, IRenderVisual* owner)
@@ -40,6 +46,12 @@ std::unique_ptr<VulkanKinematics> VulkanKinematics::create(const SkeletonBones& 
         return nullptr;
     }
     auto data = std::make_shared<Data>();
+    data->root = source.root;
+    if (!source.user_data.empty())
+    {
+        IReader reader(const_cast<uint8_t*>(source.user_data.data()), source.user_data.size());
+        data->user_data = std::make_unique<CInifile>(&reader, FS.get_path("$game_config$") ? FS.get_path("$game_config$")->m_Path : nullptr);
+    }
     data->owned.reserve(source.bones.size());
     data->bones.reserve(source.bones.size());
     for (u16 i = 0; i < source.bones.size(); ++i)
@@ -90,15 +102,109 @@ std::unique_ptr<VulkanKinematics> VulkanKinematics::create(const SkeletonBones& 
     return result;
 }
 
+bool VulkanKinematics::attach_geometry(const ModelGeometry& geometry, std::string& error)
+{
+    if (!data_->meshes.empty() || (geometry.type != 3 && geometry.type != 10))
+    {
+        error = "Vulkan skeleton has invalid or duplicate child geometry";
+        return false;
+    }
+    std::vector<ModelGeometry> meshes = geometry.children;
+    bool has_skinned = false;
+    for (const auto& child : meshes)
+    {
+        if (child.type != 4 && child.type != 5)
+            continue;
+        has_skinned = true;
+        if (child.indices.size() % 3)
+        {
+            error = "Vulkan skeletal child has incomplete triangles";
+            return false;
+        }
+    }
+    if (!has_skinned)
+    {
+        error = "Vulkan skeleton has no skinned child geometry";
+        return false;
+    }
+    for (auto* bone : data_->bones)
+        bone->child_faces.resize(meshes.size());
+    for (size_t child = 0; child < meshes.size(); ++child)
+    {
+        const auto& mesh = meshes[child];
+        if (mesh.type != 4 && mesh.type != 5)
+            continue;
+        if (mesh.indices.size() / 3 > UINT16_MAX)
+        {
+            error = "Vulkan skeletal child exceeds the bone face index range";
+            for (auto* bone : data_->bones)
+                bone->child_faces.clear();
+            return false;
+        }
+        for (size_t face = 0; face < mesh.indices.size() / 3; ++face)
+        {
+            u64 mask = 0;
+            for (size_t corner = 0; corner < 3; ++corner)
+            {
+                const auto& vertex = mesh.vertices[mesh.indices[face * 3 + corner]];
+                for (size_t link = 0; link < 4; ++link)
+                    if (vertex.weights[link] > 0.f)
+                    {
+                        if (vertex.bones[link] >= data_->bones.size())
+                        {
+                            error = "Vulkan skeletal child references an unknown bone";
+                            for (auto* bone : data_->bones)
+                                bone->child_faces.clear();
+                            return false;
+                        }
+                        mask |= u64(1) << vertex.bones[link];
+                    }
+            }
+            for (size_t bone = 0; bone < data_->bones.size(); ++bone)
+                if (mask & (u64(1) << bone))
+                    data_->bones[bone]->child_faces[child].push_back(static_cast<u16>(face));
+        }
+    }
+    data_->meshes = std::move(meshes);
+    error.clear();
+    return true;
+}
+
+void VulkanKinematics::reset_instance_state()
+{
+    for (auto& instance : instances_)
+        instance.construct();
+    offsets_.clear();
+    root_ = data_->root;
+    visible_ = instances_.size() == 64 ? ~u64(0) : (u64(1) << instances_.size()) - 1;
+    update_ = nullptr;
+    update_param_ = nullptr;
+    dirty_ = true;
+    CalculateBones(TRUE);
+}
+
 void VulkanKinematics::Bone_Calculate(CBoneData* bone, Fmatrix* parent)
 {
     if (!bone || !parent) return;
     auto& instance = LL_GetBoneInstance(bone->GetSelfID());
-    instance.mTransform.mul_43(*parent, bone->bind_transform);
-    for (const auto& offset : offsets_)
-        if (offset.m_bone_id == bone->GetSelfID()) instance.mTransform.mulB_43(offset.m_transform);
-    instance.mRenderTransform.mul_43(instance.mTransform, bone->m2b_transform);
-    if (instance.callback()) instance.callback()(&instance);
+    if (LL_GetBoneVisible(bone->GetSelfID()))
+    {
+        if (instance.callback_overwrite())
+        {
+            if (instance.callback())
+                instance.callback()(&instance);
+        }
+        else
+        {
+            instance.mTransform.mul_43(*parent, bone->bind_transform);
+            for (const auto& offset : offsets_)
+                if (offset.m_bone_id == bone->GetSelfID())
+                    instance.mTransform.mulB_43(offset.m_transform);
+            if (instance.callback())
+                instance.callback()(&instance);
+        }
+        instance.mRenderTransform.mul_43(instance.mTransform, bone->m2b_transform);
+    }
     for (auto* child : bone->children)
         Bone_Calculate(child, &instance.mTransform);
 }
@@ -109,14 +215,88 @@ void VulkanKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8, bool)
     pos = LL_GetTransform(id);
 }
 
-bool VulkanKinematics::PickBone(const Fmatrix&, pick_result&, float, const Fvector&,
-    const Fvector&, u16)
+bool VulkanKinematics::PickBone(const Fmatrix& parent, pick_result& result, float range, const Fvector& start, const Fvector& direction, u16 id)
 {
-    // Collision and bone vertex enumeration are implemented with #24.
-    return false;
+    R_ASSERT2(id < data_->bones.size(), "invalid Vulkan pick bone ID");
+    CalculateBones();
+    Fmatrix inverse;
+    inverse.invert(parent);
+    Fvector origin, ray;
+    inverse.transform_tiny(origin, start);
+    inverse.transform_dir(ray, direction);
+    bool hit = false;
+    for (size_t child = 0; child < data_->meshes.size(); ++child)
+    {
+        const auto& mesh = data_->meshes[child];
+        if (mesh.type != 4 && mesh.type != 5)
+            continue;
+        std::vector<float> pose(instances_.size() * 16);
+        for (size_t bone = 0; bone < instances_.size(); ++bone)
+            std::memcpy(pose.data() + bone * 16, &instances_[bone].mRenderTransform, sizeof(Fmatrix));
+        std::vector<LevelVertex> vertices;
+        std::string error;
+        if (!skin_model_mesh(mesh, pose.data(), instances_.size(), vertices, error))
+            continue;
+        for (u16 face : data_->bones[id]->child_faces[child])
+        {
+            Fvector tri[3];
+            for (size_t corner = 0; corner < 3; ++corner)
+            {
+                const auto& vertex = vertices[mesh.indices[size_t(face) * 3 + corner]];
+                tri[corner].set(vertex.position[0], vertex.position[1], vertex.position[2]);
+            }
+            Fvector edge1, edge2, cross, from;
+            edge1.sub(tri[1], tri[0]);
+            edge2.sub(tri[2], tri[0]);
+            cross.crossproduct(ray, edge2);
+            const float determinant = edge1.dotproduct(cross);
+            if (std::abs(determinant) < 0.000001f)
+                continue;
+            const float inv_det = 1.f / determinant;
+            from.sub(origin, tri[0]);
+            const float u = from.dotproduct(cross) * inv_det;
+            if (u < 0.f || u > 1.f)
+                continue;
+            Fvector q;
+            q.crossproduct(from, edge1);
+            const float v = ray.dotproduct(q) * inv_det;
+            if (v < 0.f || u + v > 1.f)
+                continue;
+            const float distance = edge2.dotproduct(q) * inv_det;
+            if (distance < 0.f || distance >= range)
+                continue;
+            range = distance;
+            result.dist = distance;
+            for (size_t corner = 0; corner < 3; ++corner)
+                parent.transform_tiny(result.tri[corner], tri[corner]);
+            result.normal.mknormal(result.tri[0], result.tri[1], result.tri[2]);
+            hit = true;
+        }
+    }
+    return hit;
 }
 
-void VulkanKinematics::EnumBoneVertices(SEnumVerticesCallback&, u16) {}
+void VulkanKinematics::EnumBoneVertices(SEnumVerticesCallback& callback, u16 id)
+{
+    R_ASSERT2(id < data_->bones.size(), "invalid Vulkan bone enumeration ID");
+    for (size_t child = 0; child < data_->meshes.size(); ++child)
+    {
+        const auto& mesh = data_->meshes[child];
+        for (u16 face : data_->bones[id]->child_faces[child])
+            for (size_t corner = 0; corner < 3; ++corner)
+            {
+                const auto& vertex = mesh.vertices[mesh.indices[size_t(face) * 3 + corner]];
+                Fvector position;
+                position.set(vertex.position[0], vertex.position[1], vertex.position[2]);
+                callback(position);
+            }
+    }
+}
+
+CInifile* VulkanKinematics::LL_UserData()
+{
+    return data_->user_data.get();
+}
 
 u16 VulkanKinematics::LL_BoneID(LPCSTR name)
 {
@@ -182,7 +362,12 @@ void VulkanKinematics::LL_GetBindTransform(xr_vector<Fmatrix>& matrices)
 int VulkanKinematics::LL_GetBoneGroups(xr_vector<xr_vector<u16>>& groups)
 {
     groups.clear();
-    return 0; // Child face groups are populated by the #23 skeletal mesh path.
+    groups.resize(data_->meshes.size());
+    for (size_t child = 0; child < groups.size(); ++child)
+        for (u16 id = 0; id < data_->bones.size(); ++id)
+            if (!data_->bones[id]->child_faces[child].empty())
+                groups[child].push_back(id);
+    return static_cast<int>(groups.size());
 }
 
 void VulkanKinematics::LL_SetBoneRoot(u16 id)
@@ -241,6 +426,34 @@ void VulkanKinematics::CalculateBones(BOOL force)
     Fmatrix identity = Fidentity;
     Bone_Calculate(data_->bones[root_], &identity);
     dirty_ = false;
+    Fbox box;
+    box.invalidate();
+    bool has_visible = false;
+    for (size_t index = 0; index < instances_.size(); ++index)
+    {
+        if (!LL_GetBoneVisible(static_cast<u16>(index)))
+            continue;
+        Fobb& obb = data_->bones[index]->obb;
+        Fmatrix local, transformed;
+        obb.xform_get(local);
+        transformed.mul_43(instances_[index].mTransform, local);
+        for (int sx : { -1, 1 })
+            for (int sy : { -1, 1 })
+                for (int sz : { -1, 1 })
+                {
+                    Fvector corner, point;
+                    corner.set(sx * obb.m_halfsize.x, sy * obb.m_halfsize.y, sz * obb.m_halfsize.z);
+                    transformed.transform_tiny(point, corner);
+                    box.modify(point);
+                }
+        has_visible = true;
+    }
+    if (has_visible)
+    {
+        auto& visibility = owner_->getVisData();
+        visibility.box = box;
+        box.getsphere(visibility.sphere.P, visibility.sphere.R);
+    }
     if (update_) update_(this);
 }
 

@@ -1,4 +1,5 @@
 #include "LevelModels.h"
+#include "VisualCatalog.h"
 
 #include <algorithm>
 #include <cctype>
@@ -31,8 +32,7 @@ SurfaceMode classify_surface_material(const std::string& shader, const std::stri
 
 namespace
 {
-constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4,
-    ogf_swi = 6, ogf_children = 9, ogf_links = 10, ogf_container = 21;
+constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4, ogf_swi = 6, ogf_children = 9, ogf_links = 10, ogf_container = 21, ogf_fastpath = 22;
 constexpr size_t max_vertices = 4'000'000, max_indices = 12'000'000;
 
 struct Cursor
@@ -99,7 +99,8 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
     buffers.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
-        int position = -1, normal = -1, uv = -1;
+        int position = -1, normal = -1, uv = -1, tangent = -1, binormal = -1;
+        uint8_t normal_type = 0, uv_type = 0;
         size_t stride = 0;
         bool ended = false;
         // D3DVERTEXELEMENT9: stream u16, offset u16, type, method, usage, index.
@@ -120,8 +121,20 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
             if (end > 4096 || end < offset) return false;
             if (end > stride) stride = end;
             if (usage == 0 && index == 0 && type == 2) position = static_cast<int>(offset);
-            if (usage == 3 && index == 0 && type == 2) normal = static_cast<int>(offset);
-            if (usage == 5 && index == 0 && type == 1) uv = static_cast<int>(offset);
+            if (usage == 3 && index == 0 && (type == 2 || type == 4))
+            {
+                normal = static_cast<int>(offset);
+                normal_type = type;
+            }
+            if (usage == 5 && index == 0 && (type == 1 || type == 6 || type == 7))
+            {
+                uv = static_cast<int>(offset);
+                uv_type = type;
+            }
+            if (usage == 6 && index == 0 && type == 4)
+                tangent = static_cast<int>(offset);
+            if (usage == 7 && index == 0 && type == 4)
+                binormal = static_cast<int>(offset);
         }
         uint32_t vertex_count;
         if (!ended || position < 0 || normal < 0 || !stride || !c.u32(vertex_count) ||
@@ -135,8 +148,33 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
             LevelVertex vertex;
             const uint8_t* source = data.data + stride * v;
             std::memcpy(vertex.position, source + position, sizeof(vertex.position));
-            std::memcpy(vertex.normal, source + normal, sizeof(vertex.normal));
-            if (uv >= 0) std::memcpy(vertex.uv, source + uv, sizeof(vertex.uv));
+            if (normal_type == 2)
+                std::memcpy(vertex.normal, source + normal, sizeof(vertex.normal));
+            else
+            {
+                const uint32_t packed = uint32_t(source[normal]) | (uint32_t(source[normal + 1]) << 8) | (uint32_t(source[normal + 2]) << 16);
+                for (int axis = 0; axis < 3; ++axis)
+                    vertex.normal[axis] = float((packed >> ((2 - axis) * 8)) & 255) * (2.f / 255.f) - 1.f;
+            }
+            if (uv_type == 1)
+                std::memcpy(vertex.uv, source + uv, sizeof(vertex.uv));
+            else if (uv_type == 6 || uv_type == 7)
+                for (int axis = 0; axis < 2; ++axis)
+                {
+                    const auto primary = int16_t(uint16_t(source[uv + axis * 2]) | (uint16_t(source[uv + axis * 2 + 1]) << 8));
+                    const int extra = axis == 0 ? tangent : binormal;
+                    const float fraction = extra >= 0 && uv_type == 6 ? float(source[extra + 3]) * (1.f / 255.f) : 0.f;
+                    vertex.uv[axis] = (float(primary) + fraction) * (32.f / 32768.f);
+                }
+            for (float coordinate : vertex.position)
+                if (!std::isfinite(coordinate))
+                    return false;
+            for (float coordinate : vertex.normal)
+                if (!std::isfinite(coordinate))
+                    return false;
+            for (float coordinate : vertex.uv)
+                if (!std::isfinite(coordinate))
+                    return false;
             buffer.vertices.push_back(vertex);
         }
         buffers.push_back(std::move(buffer));
@@ -193,10 +231,9 @@ bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
     return c.done();
 }
 
-bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
-    const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
-    std::vector<LevelModel>& models, std::vector<LevelVisual>& nodes,
-    size_t node_index, unsigned depth)
+bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices, const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
+    std::vector<LevelModel>& models, std::vector<LevelVisual>& nodes, size_t node_index, unsigned depth,
+    const std::vector<VertexBuffer>* fast_vertices = nullptr, const std::vector<std::vector<uint16_t>>* fast_indices = nullptr)
 {
     if (depth > 32 || node_index >= nodes.size()) return false;
     LevelBytes header;
@@ -239,8 +276,8 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
                 const size_t index = nodes.size();
                 nodes.emplace_back();
                 nodes[node_index].children.push_back(static_cast<uint32_t>(index));
-                if (!decode_visual(child, vertices, indices, material_count, models,
-                        nodes, index, depth + 1)) return false;
+                if (!decode_visual(child, vertices, indices, material_count, models, nodes, index, depth + 1, fast_vertices, fast_indices))
+                    return false;
             }
         }
         return true;
@@ -275,15 +312,33 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         if (!chunk(visual, ogf_swi, swi) ||
             !decode_slide_windows(swi.data, swi.size, model.indices,
                 model.vertices.size(), model.windows, error)) return false;
+        LevelBytes fast;
+        if (fast_vertices && fast_indices && chunk(visual, ogf_fastpath, fast))
+        {
+            if (fast.size > 64 * 1024 * 1024)
+                return false;
+            std::vector<uint8_t> combined;
+            combined.reserve(8 + header.size + fast.size);
+            for (uint32_t word : { ogf_header, static_cast<uint32_t>(header.size) })
+                for (unsigned byte = 0; byte < 4; ++byte)
+                    combined.push_back(static_cast<uint8_t>(word >> (byte * 8)));
+            combined.insert(combined.end(), header.data, header.data + header.size);
+            combined.insert(combined.end(), fast.data, fast.data + fast.size);
+            std::vector<LevelVisual> fast_nodes(1);
+            std::vector<LevelModel> fast_models;
+            if (!decode_visual({ combined.data(), combined.size() }, *fast_vertices, *fast_indices, material_count, fast_models, fast_nodes, 0, depth + 1) ||
+                fast_models.size() != 1)
+                return false;
+            model.fast = std::make_shared<LevelModel>(std::move(fast_models.front()));
+        }
     }
     nodes[node_index].mesh = static_cast<int32_t>(models.size());
     models.push_back(std::move(model));
     return true;
 }
 
-bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices,
-    const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
-    LevelModelData& loaded)
+bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices, const std::vector<std::vector<uint16_t>>& indices, size_t material_count,
+    LevelModelData& loaded, const std::vector<VertexBuffer>* fast_vertices, const std::vector<std::vector<uint16_t>>* fast_indices)
 {
     Cursor c{bytes};
     std::vector<LevelBytes> records;
@@ -298,8 +353,8 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices,
     }
     loaded.visuals.resize(records.size());
     for (size_t i = 0; i < records.size(); ++i)
-        if (!decode_visual(records[i], vertices, indices, material_count,
-                loaded.models, loaded.visuals, i, 0)) return false;
+        if (!decode_visual(records[i], vertices, indices, material_count, loaded.models, loaded.visuals, i, 0, fast_vertices, fast_indices))
+            return false;
     std::vector<uint8_t> state(loaded.visuals.size()), referenced(loaded.visuals.size());
     auto visit = [&](auto&& self, size_t index) -> bool
     {
@@ -323,17 +378,25 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer>& vertices,
 }
 }
 
-bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
-    LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result,
-    std::string& error)
+bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
+    LevelBytes fast_vertex_buffers, LevelBytes fast_index_buffers)
 {
     LevelModelData loaded;
     std::vector<VertexBuffer> vertices;
     std::vector<std::vector<uint16_t>> indices;
+    std::vector<VertexBuffer> fast_vertices;
+    std::vector<std::vector<uint16_t>> fast_indices;
+    const bool has_fast = fast_vertex_buffers.data || fast_index_buffers.data;
     if (!read_materials(shaders, loaded.materials)) error = "invalid level shader table";
     else if (!read_vertices(vertex_buffers, vertices)) error = "unsupported or invalid level vertex buffers";
     else if (!read_indices(index_buffers, indices)) error = "invalid level index buffers";
-    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded))
+    else if (has_fast &&
+        (!fast_vertex_buffers.data ||
+            !fast_index_buffers.data ||
+            !read_vertices(fast_vertex_buffers, fast_vertices) ||
+            !read_indices(fast_index_buffers, fast_indices)))
+        error = "invalid level.geomX vertex or index buffers";
+    else if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded, has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr))
         error = "unsupported or invalid level OGF visuals";
     else
     {
@@ -342,6 +405,30 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers,
         return true;
     }
     return false;
+}
+
+bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error)
+{
+    if (visual.type != 0 && visual.type != 2)
+    {
+        error = "container-backed standalone visual must be static or progressive";
+        return false;
+    }
+    std::vector<VertexBuffer> vertices;
+    std::vector<std::vector<uint16_t>> indices;
+    std::vector<LevelModel> models;
+    std::vector<LevelVisual> nodes(1);
+    if (!read_vertices(vertex_buffers, vertices) ||
+        !read_indices(index_buffers, indices) ||
+        !decode_visual({ visual.source.data(), visual.source.size() }, vertices, indices, size_t(visual.shader_id) + 1, models, nodes, 0, 0) ||
+        models.size() != 1)
+    {
+        error = "standalone OGF GCONTAINER cannot be resolved against level.geom";
+        return false;
+    }
+    result = std::move(models.front());
+    error.clear();
+    return true;
 }
 
 bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,

@@ -2,7 +2,11 @@
 #include "EngineLevelModels.h"
 
 #include "Common/LevelStructure.hpp"
+#include "xrCore/FMesh.hpp"
 #include "xrCore/stream_reader.h"
+
+#include <algorithm>
+#include <memory>
 
 namespace xray::render::vulkan
 {
@@ -59,11 +63,121 @@ bool load_engine_model_geometry(const char* name, IReader* source,
                 source->length()}, visual, error)) return false;
     }
     else if (!load_engine_model_visual(name, visual, error)) return false;
-    return decode_model_geometry(visual, result, error);
+    return decode_engine_model_geometry(visual, result, error);
+}
+
+namespace
+{
+bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, ModelGeometry& result, std::string& error)
+{
+    CStreamReader* geometry = FS.rs_open("$level$", geometry_name);
+    if (!geometry)
+    {
+        error = std::string("container-backed OGF needs ") + geometry_name;
+        return false;
+    }
+    CStreamReader* vb = geometry->open_chunk(fsL_VB);
+    CStreamReader* ib = geometry->open_chunk(fsL_IB);
+    bool loaded = false;
+    LevelModel model;
+    if (vb && ib)
+    {
+        xr_vector<uint8_t> vb_bytes(vb->length()), ib_bytes(ib->length());
+        vb->r(vb_bytes.data(), vb_bytes.size());
+        ib->r(ib_bytes.data(), ib_bytes.size());
+        loaded = load_container_model({ vb_bytes.data(), vb_bytes.size() }, { ib_bytes.data(), ib_bytes.size() }, visual, model, error);
+    }
+    else
+        error = std::string(geometry_name) + " has no vertex or index buffers";
+    if (vb)
+        vb->close();
+    if (ib)
+        ib->close();
+    FS.r_close(geometry);
+    if (!loaded)
+        return false;
+    ModelGeometry converted;
+    converted.type = visual.type;
+    converted.shader = visual.shader;
+    converted.texture = visual.texture;
+    converted.mode = classify_surface_material(converted.shader, converted.texture);
+    converted.indices = std::move(model.indices);
+    converted.windows = std::move(model.windows);
+    converted.vertices.reserve(model.vertices.size());
+    for (const auto& vertex : model.vertices)
+    {
+        ModelVertex out;
+        std::copy_n(vertex.position, 3, out.position);
+        std::copy_n(vertex.normal, 3, out.normal);
+        std::copy_n(vertex.uv, 2, out.uv);
+        converted.vertices.push_back(out);
+    }
+    result = std::move(converted);
+    error.clear();
+    return true;
+}
+
+void append_chunk(std::vector<uint8_t>& bytes, uint32_t id, const uint8_t* data, size_t size)
+{
+    for (uint32_t value : { id, static_cast<uint32_t>(size) })
+        for (unsigned i = 0; i < 4; ++i)
+            bytes.push_back(static_cast<uint8_t>(value >> (8 * i)));
+    bytes.insert(bytes.end(), data, data + size);
+}
+} // namespace
+
+bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& result, std::string& error)
+{
+    ModelGeometry decoded;
+    if (!decode_model_geometry(visual, decoded, error))
+    {
+        if ((visual.type != 0 && visual.type != 2) || visual.source.empty())
+            return false;
+        IReader source(const_cast<uint8_t*>(visual.source.data()), visual.source.size());
+        if (!source.find_chunk(OGF_GCONTAINER) || !decode_container_geometry(visual, "level.geom", decoded, error))
+            return false;
+    }
+    if (visual.type == 2)
+    {
+        IReader source(const_cast<uint8_t*>(visual.source.data()), visual.source.size());
+        IReader* fast = source.open_chunk(OGF_FASTPATH);
+        if (fast)
+        {
+            const auto* fast_bytes = static_cast<const uint8_t*>(fast->pointer());
+            const size_t fast_size = fast->length();
+            IReader* header = source.open_chunk(OGF_HEADER);
+            if (!header || !fast->find_chunk(OGF_GCONTAINER) || !fast->find_chunk(OGF_SWIDATA))
+            {
+                if (header)
+                    header->close();
+                fast->close();
+                error = "progressive OGF fast path is missing its header, geometry or sliding windows";
+                return false;
+            }
+            std::vector<uint8_t> nested;
+            append_chunk(nested, OGF_HEADER, static_cast<const uint8_t*>(header->pointer()), header->length());
+            nested.insert(nested.end(), fast_bytes, fast_bytes + fast_size);
+            header->close();
+            fast->close();
+            VisualRecord variant;
+            if (!parse_ogf_visual({ nested.data(), nested.size() }, variant, error))
+                return false;
+            variant.texture = visual.texture;
+            variant.shader = visual.shader;
+            auto fast_geometry = std::make_shared<ModelGeometry>();
+            if (!decode_container_geometry(variant, "level.geomX", *fast_geometry, error))
+                return false;
+            decoded.fast = std::move(fast_geometry);
+        }
+    }
+    result = std::move(decoded);
+    error.clear();
+    return true;
 }
 
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error)
 {
+    error.clear();
     IReader* shaders = level.open_chunk(fsL_SHADERS);
     IReader* visuals = level.open_chunk(fsL_VISUALS);
     if (!shaders || !visuals)
@@ -92,9 +206,32 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
         xr_vector<uint8_t> vb_bytes(vb->length()), ib_bytes(ib->length());
         vb->r(vb_bytes.data(), vb_bytes.size());
         ib->r(ib_bytes.data(), ib_bytes.size());
-        load_level_models({static_cast<const uint8_t*>(shaders->pointer()), shaders->length()},
-            {vb_bytes.data(), vb_bytes.size()}, {ib_bytes.data(), ib_bytes.size()},
-            {static_cast<const uint8_t*>(visuals->pointer()), visuals->length()}, result, error);
+        CStreamReader* fast = FS.rs_open("$level$", "level.geomX");
+        xr_vector<uint8_t> fast_vb_bytes, fast_ib_bytes;
+        if (fast)
+        {
+            CStreamReader* fast_vb = fast->open_chunk(fsL_VB);
+            CStreamReader* fast_ib = fast->open_chunk(fsL_IB);
+            if (fast_vb && fast_ib)
+            {
+                fast_vb_bytes.resize(fast_vb->length());
+                fast_ib_bytes.resize(fast_ib->length());
+                fast_vb->r(fast_vb_bytes.data(), fast_vb_bytes.size());
+                fast_ib->r(fast_ib_bytes.data(), fast_ib_bytes.size());
+            }
+            else
+                error = "level.geomX is missing vertex or index chunks";
+            if (fast_vb)
+                fast_vb->close();
+            if (fast_ib)
+                fast_ib->close();
+            FS.r_close(fast);
+        }
+        if (error.empty())
+            load_level_models({ static_cast<const uint8_t*>(shaders->pointer()), shaders->length() }, { vb_bytes.data(), vb_bytes.size() },
+                { ib_bytes.data(), ib_bytes.size() }, { static_cast<const uint8_t*>(visuals->pointer()), visuals->length() }, result, error,
+                fast_vb_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_vb_bytes.data(), fast_vb_bytes.size() },
+                fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_ib_bytes.data(), fast_ib_bytes.size() });
     }
     if (vb) vb->close();
     if (ib) ib->close();

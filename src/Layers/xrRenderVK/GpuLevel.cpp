@@ -39,7 +39,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     prepared.sectors_ = std::move(models.sectors);
     prepared.portals_ = std::move(models.portals);
     prepared.meshes_.reserve(models.models.size());
-    for (const LevelModel& model : models.models)
+    const auto upload_mesh = [&](const LevelModel& model, Mesh& mesh) -> bool
     {
         if (model.material >= models.materials.size() || model.vertices.empty() ||
             model.indices.empty() || model.indices.size() > std::numeric_limits<uint32_t>::max())
@@ -47,8 +47,6 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             error = "invalid or empty Vulkan level model";
             return false;
         }
-        prepared.meshes_.emplace_back();
-        Mesh& mesh = prepared.meshes_.back();
         if (!textures.material(models.materials[model.material].textures, pass, mesh.material, error) ||
             !upload_buffer(device, queue, pool, memory, upload,
                 model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
@@ -60,6 +58,20 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
         mesh.windows = model.windows;
         mesh.mode = models.materials[model.material].mode;
+        return true;
+    };
+    for (const LevelModel& model : models.models)
+    {
+        prepared.meshes_.emplace_back();
+        Mesh& mesh = prepared.meshes_.back();
+        if (!upload_mesh(model, mesh))
+            return false;
+        if (model.fast)
+        {
+            mesh.fast = std::make_unique<Mesh>();
+            if (!upload_mesh(*model.fast, *mesh.fast))
+                return false;
+        }
     }
     // The old level may still have been submitted. Its owner must wait for
     // those frames before replacing the level. Uploads within prepared use
@@ -115,7 +127,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
-        const Mesh& mesh = meshes_[visual.mesh];
+        const Mesh& base = meshes_[visual.mesh];
+        const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         const bool selected = phase == GeometryPhase::Transparent ? transparent :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
@@ -139,7 +152,8 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
-        const Mesh& mesh = meshes_[visual.mesh];
+        const Mesh& base = meshes_[visual.mesh];
+        const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
         if (!pass.record_hud(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 window.index_count, mvp, mesh.material, window.offset)) return false;
@@ -198,7 +212,11 @@ void GpuLevel::destroy()
     visual_objects_.clear();
     if (textures_ && pass_)
         for (const Mesh& mesh : meshes_)
+        {
             textures_->release_material(mesh.material, *pass_);
+            if (mesh.fast)
+                textures_->release_material(mesh.fast->material, *pass_);
+        }
     meshes_.clear();
     visuals_.clear();
     roots_.clear();

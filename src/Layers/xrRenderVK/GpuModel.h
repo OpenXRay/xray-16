@@ -6,6 +6,7 @@
 #include "GameTextureFactory.h"
 
 #include <array>
+#include <unordered_map>
 
 class IKinematics;
 namespace xray::render::vulkan
@@ -30,14 +31,13 @@ public:
         GameTextureFactory& textures, DeferredPass& pass, std::string& error);
     // Call from the acquired frame's geometry recorder. Pose matrices have
     // the same layout as Fmatrix and include inverse bind transforms.
-    bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
-        const float (&mvp)[16], const float* pose, size_t bones,
-        std::string& error,
-        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f);
+    bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f, const IKinematics* instance = nullptr);
     bool record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16], IKinematics& skeleton, std::string& error,
         GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f);
     void destroy(); // Caller waits for all submitted frames first.
+    void release_instance(const IKinematics* skeleton); // Caller waits for submitted frames first.
 
 private:
     bool load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue queue,
@@ -48,8 +48,11 @@ private:
     {
         ModelGeometry geometry;
         std::array<BufferResource, FrameContext::FramesInFlight> vertices;
+        std::unordered_map<const IKinematics*, std::array<BufferResource, FrameContext::FramesInFlight>> instance_vertices;
         BufferResource indices;
         VkDescriptorSet material{};
+        size_t fast_index = SIZE_MAX;
+        bool fast_variant = false;
     };
     bool add_meshes(ModelGeometry&& geometry, const std::string& inherited_texture,
         VkDevice device, VkQueue queue, VkCommandPool pool,
@@ -59,6 +62,7 @@ private:
 
     VkDevice device_{};
     VkCommandPool pool_{};
+    VkPhysicalDeviceMemoryProperties memory_{};
     BufferUploadDispatch upload_{};
     GameTextureFactory* textures_{};
     DeferredPass* pass_{};

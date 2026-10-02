@@ -155,10 +155,23 @@ jobs:
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
         -DVCPKG_TARGET_TRIPLET=x64-windows
         -DLUAJIT_ARCH_PROBE_COMPILER="$clang"
+        -DXRAY_BUILD_VULKAN_TESTS=ON
         -DXRAY_ENABLE_LTO=OFF
 
     - name: Build Vulkan renderer layer
       run: cmake --build build/windows-vulkan --config Release --target xrRenderVK --parallel 4
+
+    - name: Build focused Vulkan model tests
+      run: >-
+        cmake --build build/windows-vulkan --config Debug
+        --target vulkan_skeleton_bones_test vulkan_level_models_test
+        vulkan_model_geometry_test vulkan_kinematics_test vulkan_slide_windows_test
+        --parallel 4
+
+    - name: Run focused Vulkan model tests
+      run: >-
+        ctest --test-dir build/windows-vulkan -C Debug --output-on-failure
+        -R "^(vulkan_skeleton_bones_test|vulkan_level_models|vulkan_model_geometry|vulkan_kinematics|vulkan_slide_windows_test)$"
 
 
   nightly-release:

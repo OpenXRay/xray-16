@@ -54,6 +54,7 @@ private:
         std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
         SurfaceMode mode{SurfaceMode::Opaque};
+        std::unique_ptr<Mesh> fast;
     };
     VkDevice device_{};
     VkCommandPool pool_{};

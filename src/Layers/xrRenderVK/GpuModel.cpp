@@ -17,26 +17,43 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
     const std::string texture = geometry.texture.empty() ? inherited_texture : geometry.texture;
     auto children = std::move(geometry.children);
     geometry.children.clear();
-    if (!geometry.vertices.empty())
+    auto fast = std::move(geometry.fast);
+    geometry.fast.reset();
+    const auto upload_mesh = [&](ModelGeometry&& decoded) -> bool
     {
-        if (texture.empty() || geometry.indices.empty() ||
-            geometry.indices.size() > UINT32_MAX)
+        if (texture.empty() || decoded.indices.empty() || decoded.indices.size() > UINT32_MAX)
         {
             error = "OGF model mesh is missing a texture or triangle indices";
             return false;
         }
         meshes_.emplace_back();
         auto& mesh = meshes_.back();
-        mesh.geometry = std::move(geometry);
+        mesh.geometry = std::move(decoded);
         if (!textures.material(texture, pass, mesh.material, error) ||
             !upload_buffer(device, queue, pool, memory, upload,
                 mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
-                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error)) return false;
+                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
+            return false;
         const auto bytes = mesh.geometry.vertices.size() * sizeof(LevelVertex);
-        for (auto& buffer : mesh.vertices)
-            if (!buffer.initialize(device, bytes, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                    memory, upload.buffer, error)) return false;
+        if (mesh.geometry.type != 4 && mesh.geometry.type != 5)
+            for (auto& buffer : mesh.vertices)
+                if (!buffer.initialize(device, bytes, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory, upload.buffer, error))
+                    return false;
+        return true;
+    };
+    if (!geometry.vertices.empty())
+    {
+        if (!upload_mesh(std::move(geometry)))
+            return false;
+        if (fast)
+        {
+            const size_t base = meshes_.size() - 1;
+            if (!upload_mesh(std::move(*fast)))
+                return false;
+            meshes_[base].fast_index = meshes_.size() - 1;
+            meshes_.back().fast_variant = true;
+        }
     }
     for (auto& child : children)
         if (!add_meshes(std::move(child), texture, device, queue, pool,
@@ -60,7 +77,8 @@ bool GpuModel::load_record(const VisualRecord& record, const std::string& inheri
     GameTextureFactory& textures, DeferredPass& pass, std::string& error)
 {
     ModelGeometry decoded;
-    if (!decode_model_geometry(record, decoded, error)) return false;
+    if (!decode_engine_model_geometry(record, decoded, error))
+        return false;
     if (decoded.texture.empty()) decoded.texture = inherited_texture;
     return load_geometry(std::move(decoded), device, queue, pool, memory, upload, textures, pass, error);
 }
@@ -78,6 +96,7 @@ bool GpuModel::load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue q
     }
     device_ = device;
     pool_ = pool;
+    memory_ = memory;
     upload_ = upload;
     textures_ = &textures;
     pass_ = &pass;
@@ -92,23 +111,43 @@ bool GpuModel::load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue q
     return true;
 }
 
-bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pass,
-    const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
-    GeometryPhase phase, float lod)
+bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
+    GeometryPhase phase, float lod, const IKinematics* instance)
 {
     if (!device_ || frame.frame_index >= FrameContext::FramesInFlight)
     {
         error = "Vulkan model has no acquired frame";
         return false;
     }
-    for (auto& mesh : meshes_)
+    for (size_t index = 0; index < meshes_.size(); ++index)
     {
+        auto& base = meshes_[index];
+        if (base.fast_variant)
+            continue;
+        // The alternative OGF geometry is the low-detail path. Its own SWI
+        // is selected below; the normal mesh remains available for near LOD.
+        auto& mesh = base.fast_index != SIZE_MAX && lod < 0.33f ? meshes_[base.fast_index] : base;
+        const bool skinned = mesh.geometry.type == 4 || mesh.geometry.type == 5;
+        std::array<BufferResource, FrameContext::FramesInFlight>* buffers = &mesh.vertices;
+        if (skinned)
+        {
+            if (!instance)
+            {
+                error = "skinned Vulkan draw has no owning skeleton instance";
+                return false;
+            }
+            buffers = &mesh.instance_vertices[instance];
+            if (!(*buffers)[frame.frame_index].handle())
+                if (!(*buffers)[frame.frame_index].initialize(device_, mesh.geometry.vertices.size() * sizeof(LevelVertex), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory_, upload_.buffer, error))
+                    return false;
+        }
         const SlideWindow window = select_slide_window(mesh.geometry.windows, lod,
             mesh.geometry.indices.size());
         if (phase == GeometryPhase::Hud)
         {
             std::vector<LevelVertex> vertices;
-            if (mesh.geometry.type == 4 || mesh.geometry.type == 5)
+            if (skinned)
             {
                 if (!skin_model_mesh(mesh.geometry, pose, bones, vertices, error)) return false;
             }
@@ -124,11 +163,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     vertices.push_back(result);
                 }
             }
-            if (!mesh.vertices[frame.frame_index].write(0, vertices.data(),
-                    vertices.size() * sizeof(LevelVertex), error) ||
-                !pass.record_hud(frame, mesh.vertices[frame.frame_index].handle(),
-                    mesh.indices.handle(), window.index_count,
-                    mvp, mesh.material, window.offset))
+            if (!(*buffers)[frame.frame_index].write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
+                !pass.record_hud(frame, (*buffers)[frame.frame_index].handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material, window.offset))
             {
                 if (error.empty()) error = "Vulkan HUD model geometry recording failed";
                 return false;
@@ -139,7 +175,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         if ((phase == GeometryPhase::Transparent) != transparent)
             continue;
         std::vector<LevelVertex> vertices;
-        if (mesh.geometry.type == 4 || mesh.geometry.type == 5)
+        if (skinned)
         {
             if (!skin_model_mesh(mesh.geometry, pose, bones, vertices, error)) return false;
         }
@@ -155,14 +191,12 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                 vertices.push_back(result);
             }
         }
-        if (!mesh.vertices[frame.frame_index].write(0, vertices.data(),
-                vertices.size() * sizeof(LevelVertex), error)) return false;
-        if (!(transparent ?
-                pass.record_transparent(frame, mesh.vertices[frame.frame_index].handle(),
-                    mesh.indices.handle(), window.index_count, mvp, mesh.material, window.offset) :
-                pass.record_geometry(frame, mesh.vertices[frame.frame_index].handle(),
-                    mesh.indices.handle(), window.index_count,
-                    mvp, mesh.material, mesh.geometry.mode, window.offset)))
+        if (!(*buffers)[frame.frame_index].write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error))
+            return false;
+        if (!(transparent ? pass.record_transparent(frame, (*buffers)[frame.frame_index].handle(), mesh.indices.handle(), window.index_count, mvp,
+                                mesh.material, window.offset) :
+                            pass.record_geometry(frame, (*buffers)[frame.frame_index].handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
+                                mesh.geometry.mode, window.offset)))
         {
             error = "Vulkan model geometry recording failed";
             return false;
@@ -189,7 +223,13 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
         std::memcpy(pose.data() + bone * 16,
             &skeleton.LL_GetBoneInstance(static_cast<u16>(bone)).mRenderTransform,
             16 * sizeof(float));
-    return record(frame, pass, mvp, pose.data(), count, error, phase, lod);
+    return record(frame, pass, mvp, pose.data(), count, error, phase, lod, &skeleton);
+}
+
+void GpuModel::release_instance(const IKinematics* skeleton)
+{
+    for (auto& mesh : meshes_)
+        mesh.instance_vertices.erase(skeleton);
 }
 
 void GpuModel::destroy()
@@ -202,6 +242,7 @@ void GpuModel::destroy()
     pending_.clear();
     device_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
+    memory_ = {};
     upload_ = {};
     textures_ = nullptr;
     pass_ = nullptr;

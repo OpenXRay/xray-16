@@ -21,6 +21,7 @@ struct SkeletonBones
 {
     std::vector<SkeletonBone> bones;
     uint16_t root = UINT16_MAX;
+    std::vector<uint8_t> user_data;
 };
 
 // Parses raw, uncompressed OGF chunks without touching engine/GPU state.

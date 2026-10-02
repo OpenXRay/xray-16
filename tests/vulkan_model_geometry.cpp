@@ -93,6 +93,10 @@ int main()
     child->getVisData().sphere.R = 12;
     assert(child_copy->getVisData().sphere.R != 12);
     assert(parent_copy->getVisData().sphere.R == 3);
+    parent->getVisData().box.vMin.x = -99;
+    parent->reset_instance_state();
+    assert(parent->getVisData().box.vMin.x == -2);
+    assert(child->getVisData().sphere.R == 0);
     leaf_gpu.reset(); parent.reset();
     assert(!leaf_lifetime.expired());
     parent_copy.reset();

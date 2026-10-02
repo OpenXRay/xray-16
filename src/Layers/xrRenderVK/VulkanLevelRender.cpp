@@ -12,6 +12,7 @@
 #include <SDL_vulkan.h>
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstring>
 #include <functional>
@@ -21,6 +22,19 @@ namespace xray::render::vulkan
 {
 namespace
 {
+std::string model_cache_name(pcstr name)
+{
+    std::string result = name ? name : "";
+    std::transform(result.begin(), result.end(), result.begin(),
+        [](unsigned char c)
+        {
+            return static_cast<char>(std::tolower(c == '\\' ? '/' : c));
+        });
+    if (result.size() >= 4 && result.compare(result.size() - 4, 4, ".ogf") == 0)
+        result.resize(result.size() - 4);
+    return result;
+}
+
 float distance_squared(const Fvector& left, const Fvector& right)
 {
     const float x = left.x - right.x;
@@ -615,13 +629,15 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
 {
     R_ASSERT2(device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ && device_resource_state_.can_create_factory_objects(),
         "Vulkan model creation requires an initialized gameplay device");
-    if (!data && name && *name)
+    const std::string cache_name = !data ? model_cache_name(name) : "";
+    if (!cache_name.empty())
     {
-        auto reused = model_pool_.find(name);
+        auto reused = model_pool_.find(cache_name);
         if (reused != model_pool_.end())
         {
             auto instance = std::move(reused->second);
             model_pool_.erase(reused);
+            instance->reset_instance_state();
             IRenderVisual* visual = instance.get();
             models_.emplace(visual, std::move(instance));
             return visual;
@@ -636,7 +652,6 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
         Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
         return nullptr;
     }
-    const std::string cache_name = !data && name ? name : "";
     auto model = create_model_tree(record, "", cache_name, error);
     if (!model)
     {
@@ -720,6 +735,12 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
         if (!instance) return nullptr;
         model->add_child(std::move(instance));
     }
+    if (skeleton)
+    {
+        ModelGeometry geometry;
+        if (!decode_model_geometry(record, geometry, error) || !model->skeleton()->attach_geometry(geometry, error))
+            return nullptr;
+    }
     return model;
 }
 
@@ -752,6 +773,7 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
         game_device_->discard_model_draws(visual);
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model deletion requires idle GPU frames");
+    found->second->release_pose_buffers();
     if (!discard && !found->second->cache_name().empty())
         model_pool_.emplace(found->second->cache_name(), std::move(found->second));
     models_.erase(found);

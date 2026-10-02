@@ -3,6 +3,8 @@
 #include "VisualCatalog.h"
 #include "LevelModels.h"
 
+#include <memory>
+
 namespace xray::render::vulkan
 {
 // OGF mesh data independent of the rendering API. Skinning weights use the
@@ -24,6 +26,8 @@ struct ModelGeometry
     std::vector<ModelVertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<SlideWindow> windows;
+    // OGF_FASTPATH has its own index/vertex data and sliding windows.
+    std::shared_ptr<ModelGeometry> fast;
     std::vector<ModelGeometry> children;
 };
 
