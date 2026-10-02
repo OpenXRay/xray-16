@@ -13,6 +13,10 @@ struct ShaderModuleDispatch
     PFN_vkDestroyShaderModule destroy{};
 };
 
+// Reject malformed binaries before creating a Vulkan shader module. SPIR-V
+// execution model 0 is vertex, 4 is fragment.
+bool has_spirv_entry(const void* bytes, size_t size, uint32_t stage, const char* entry);
+
 class ShaderModule
 {
 public:

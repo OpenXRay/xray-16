@@ -62,32 +62,6 @@ DeferredEnvironment current_environment()
     return environment;
 }
 
-bool has_spirv_entry(const void* bytes, size_t size, uint32_t stage, const char* entry)
-{
-    if (!bytes || size < 20 || size % 4)
-        return false;
-    std::vector<uint32_t> words(size / 4);
-    std::memcpy(words.data(), bytes, size);
-    if (words[0] != 0x07230203u)
-        return false;
-    for (size_t offset = 5; offset < words.size();)
-    {
-        const uint32_t count = words[offset] >> 16;
-        const uint32_t opcode = words[offset] & 0xffffu;
-        if (!count || count > words.size() - offset)
-            return false;
-        if (opcode == 15 && count >= 4 && words[offset + 1] == stage)
-        {
-            const char* name = reinterpret_cast<const char*>(words.data() + offset + 3);
-            const size_t capacity = (count - 3) * sizeof(uint32_t);
-            const void* terminator = std::memchr(name, 0, capacity);
-            if (terminator && xr_strcmp(name, entry) == 0)
-                return true;
-        }
-        offset += count;
-    }
-    return false;
-}
 }
 
 VulkanLevelRender::~VulkanLevelRender()

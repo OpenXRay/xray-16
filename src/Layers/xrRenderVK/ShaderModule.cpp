@@ -11,6 +11,35 @@ namespace
 constexpr uint32_t SpirvMagic = 0x07230203;
 }
 
+bool has_spirv_entry(const void* bytes, size_t size, uint32_t stage, const char* entry)
+{
+    if (!bytes || !entry || !*entry || size < 20 || size % sizeof(uint32_t))
+        return false;
+    std::vector<uint32_t> words(size / sizeof(uint32_t));
+    std::memcpy(words.data(), bytes, size);
+    if (words[0] != SpirvMagic || !words[3] || words[4])
+        return false;
+    bool found = false;
+    for (size_t offset = 5; offset < words.size();)
+    {
+        const uint32_t count = words[offset] >> 16;
+        const uint32_t opcode = words[offset] & 0xffffu;
+        if (!count || count > words.size() - offset)
+            return false;
+        if (opcode == 15 && count >= 4 && words[offset + 1] == stage)
+        {
+            const char* name = reinterpret_cast<const char*>(words.data() + offset + 3);
+            const size_t capacity = (count - 3) * sizeof(uint32_t);
+            const void* terminator = std::memchr(name, 0, capacity);
+            if (terminator && std::strlen(entry) == static_cast<const char*>(terminator) - name &&
+                std::memcmp(name, entry, std::strlen(entry)) == 0)
+                found = true;
+        }
+        offset += count;
+    }
+    return found;
+}
+
 ShaderModule::~ShaderModule()
 {
     destroy();

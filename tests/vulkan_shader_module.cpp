@@ -40,6 +40,15 @@ int main()
     const VkDevice device = reinterpret_cast<VkDevice>(static_cast<uintptr_t>(1));
     const xray::render::vulkan::ShaderModuleDispatch dispatch{create_module, destroy_module};
     const uint32_t code[] = {0x07230203, 0x00010000, 0, 1, 0};
+    const uint32_t vertex_entry[] = {0x07230203, 0x00010000, 0, 2, 0,
+        0x0005000f, 0, 1, 0x6e69616d, 0};
+    assert(xray::render::vulkan::has_spirv_entry(vertex_entry, sizeof(vertex_entry), 0, "main"));
+    assert(!xray::render::vulkan::has_spirv_entry(vertex_entry, sizeof(vertex_entry), 4, "main"));
+    assert(!xray::render::vulkan::has_spirv_entry(vertex_entry, sizeof(vertex_entry), 0, "other"));
+    uint32_t malformed[10]{};
+    std::memcpy(malformed, vertex_entry, sizeof(vertex_entry));
+    malformed[5] = 0x000b000f;
+    assert(!xray::render::vulkan::has_spirv_entry(malformed, sizeof(malformed), 0, "main"));
     std::string error;
     xray::render::vulkan::ShaderModule module;
 
