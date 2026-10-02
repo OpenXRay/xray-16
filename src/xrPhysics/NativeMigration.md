@@ -6,7 +6,11 @@ and its separate comparisons.
 
 This branch, `followup/jolt-native-physics`, is stacked on
 `followup/jolt-physics` at `888ab2d02`. It is a separate worktree at
-`C:/code/xray-jolt-native`. Nothing from this branch has been pushed.
+`C:/code/xray-jolt-native`. The migration and first optimization are published
+as draft PRs #2166 and #2167. Later optimizations remain local; the latest
+[wake/contact investigation](tests/benchmark-results/2026-10-01-wake-attribution.md)
+and [body/effects followup](tests/benchmark-results/2026-10-02-body-effects.md)
+include new matched comparisons with ODE in both games.
 
 ## Source attribution
 

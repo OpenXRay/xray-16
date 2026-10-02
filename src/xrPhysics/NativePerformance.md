@@ -9,7 +9,9 @@ implementation and its separate captures.
 ## Changes
 
 - Cache joint motor and limit settings. Repeating the same settings preserves
-  warm starts and sleep timers; changing a setting still wakes the bodies. A
+  warm starts and sleep timers; in this first iteration, changing a setting
+  still wakes the bodies. The later passive-resistance fix below removes that
+  wake for changing brake caps. A
   powered motor with zero target velocity remains a brake. Unchanged animated
   transforms also avoid waking bodies. The previous hinge path reset warm
   starts and activated bodies on every resistance update.
@@ -323,7 +325,39 @@ ODE remains faster at 0.030 ms idle / 0.853 ms ragdolls vs new native's
 has not established an in-game speedup. Shared-mesh full-box queries are
 about 3.0 times faster than the parent CDB here; query gains depend on scene.
 
-### Disk usage
+## Wake and contact cost investigation
+
+The latest [local attribution report](tests/benchmark-results/2026-10-01-wake-attribution.md)
+traces excessive activation to changing zero-speed death-shell resistance.
+`7d973f106` maps this to passive native joint friction, preserving braking while
+allowing sleep. It also batches body snapshot locks, uses already locked bodies
+for character/placement filtering, and filters static mesh fluid preparation
+before exact triangle collisions. Immediate callbacks and dry impact effects
+remain covered by tests. Diagnostic runs are separate from final unprofiled
+comparisons, and the report includes primary Jolt guidance and its limits.
+
+## Body synchronization and effects
+
+The [next local report](tests/benchmark-results/2026-10-02-body-effects.md)
+records coherent body state reads, an inactive-read shortcut, early effect
+eligibility and checked native material indices (`82307c47d`, `a2d963eef`).
+Its first matched comparison lowers native ragdoll physics medians about 20%
+against the frozen previous native version. Instrumented synchronization and
+rigid effect costs fall 21% and 82%; those diagnostic scopes must not be summed
+as independent whole-frame gains.
+
+CoP native physics medians are 9.8% and 8.6% below ODE in two separate sets,
+with overlapping run ranges. Clear Sky's near-tie in the first set does not
+hold in the repeat, where native is 41% slower. Idle and whole-frame results
+still favor ODE in both scenes. These are workload-dependent improvements,
+not proof that replacing the full engine physics improves frame time.
+
+All 30 accepted captures and reloads pass. Two additional attempts fail on
+shutdown and are retained; a diagnostic minidump reproduces the previously
+observed D3DCompiler_47 exit-heap detection stack. No corrupting write has
+been identified. These changes and findings remain local.
+
+### Disk usage (historical second-optimization comparison)
 
 The new comparisons reuse `native-game-bin-second-profile` and the existing
 `native-second-profile-20261001/games/ProfileNative4` game workspace; only result
