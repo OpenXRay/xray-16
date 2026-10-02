@@ -388,6 +388,9 @@ set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 # Generate buildvm arch header
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
 set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(MINILUA_FILE "${MINILUA_BINARY_DIR}/Release/minilua.exe")
+endif()
 
 set(LUAJIT_HOST_CMAKE_ARGS)
 if (LUAJIT_HOST_C_COMPILER)
@@ -435,6 +438,9 @@ set_target_properties(buildvm_arch PROPERTIES
 # Buildvm
 set(BUILDVM_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm")
 set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/buildvm")
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/Release/buildvm.exe")
+endif()
 
 add_custom_command(
     OUTPUT "${BUILDVM_FILE}"

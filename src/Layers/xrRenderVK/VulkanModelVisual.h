@@ -117,6 +117,11 @@ public:
     {
         return cache_name_;
     }
+
+    void set_cache_name(std::string name)
+    {
+        cache_name_ = std::move(name);
+    }
 #ifdef DEBUG
     shared_str getDebugName() override
     {

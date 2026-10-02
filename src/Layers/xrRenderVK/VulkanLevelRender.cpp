@@ -547,6 +547,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level load");
     if (game_device_) game_device_->discard_scene_draws();
     models_Clear(true);
+    model_bases_.clear();
     model_gpu_cache_.clear();
     std::string error;
     if (!level_.load(*reader, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
@@ -560,6 +561,7 @@ void VulkanLevelRender::level_Unload()
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
     if (game_device_) game_device_->discard_scene_draws();
     models_Clear(true);
+    model_bases_.clear();
     model_gpu_cache_.clear();
     level_.destroy();
 }
@@ -629,7 +631,7 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
 {
     R_ASSERT2(device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ && device_resource_state_.can_create_factory_objects(),
         "Vulkan model creation requires an initialized gameplay device");
-    const std::string cache_name = !data ? model_cache_name(name) : "";
+    const std::string cache_name = model_cache_name(name);
     if (!cache_name.empty())
     {
         auto reused = model_pool_.find(cache_name);
@@ -643,16 +645,12 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
             return visual;
         }
     }
-    VisualRecord record;
     std::string error;
-    const bool parsed = data ? parse_ogf_visual({ static_cast<const uint8_t*>(data->pointer()), data->length() }, record, error) :
-                               load_engine_model_visual(name, record, error);
-    if (!parsed)
-    {
-        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
-        return nullptr;
-    }
-    auto model = create_model_tree(record, "", cache_name, error);
+    std::unique_ptr<VulkanModelVisual> model;
+    if (cache_name.empty())
+        model = load_model_base(name, data, "", error);
+    else if (VulkanModelVisual* base = get_model_base(name, data, cache_name, error))
+        model = std::make_unique<VulkanModelVisual>(*base);
     if (!model)
     {
         Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
@@ -660,6 +658,27 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
     }
     IRenderVisual* visual = model.get();
     models_.emplace(visual, std::move(model));
+    return visual;
+}
+
+std::unique_ptr<VulkanModelVisual> VulkanLevelRender::load_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error)
+{
+    VisualRecord record;
+    const bool parsed = data ? parse_ogf_visual({ static_cast<const uint8_t*>(data->pointer()), data->length() }, record, error) :
+                               load_engine_model_visual(name, record, error);
+    return parsed ? create_model_tree(record, "", cache_name, error) : nullptr;
+}
+
+VulkanModelVisual* VulkanLevelRender::get_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error)
+{
+    auto found = model_bases_.find(cache_name);
+    if (found != model_bases_.end())
+        return found->second.get();
+    auto base = load_model_base(name, data, cache_name, error);
+    if (!base)
+        return nullptr;
+    VulkanModelVisual* visual = base.get();
+    model_bases_.emplace(cache_name, std::move(base));
     return visual;
 }
 
@@ -746,7 +765,28 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
 
 IRenderVisual* VulkanLevelRender::model_CreateChild(pcstr name, IReader* data)
 {
-    return model_Create(name, data);
+    R_ASSERT2(device_ && queue_ && pool_ && textures_ && pass_ && wait_idle_ && device_resource_state_.can_create_factory_objects(),
+        "Vulkan child model creation requires an initialized gameplay device");
+    const std::string cache_name = model_cache_name(name);
+    std::string error;
+    std::unique_ptr<VulkanModelVisual> child;
+    if (cache_name.empty())
+        child = load_model_base(name, data, "", error);
+    else if (VulkanModelVisual* base = get_model_base(name, data, cache_name, error))
+    {
+        child = std::make_unique<VulkanModelVisual>(*base);
+        // Children belong to their parent; deleting one must not put it in
+        // the pool of standalone model instances.
+        child->set_cache_name("");
+    }
+    if (!child)
+    {
+        Msg("! [renderer-vulkan] OGF child '%s': %s", name ? name : "<reader>", error.c_str());
+        return nullptr;
+    }
+    IRenderVisual* visual = child.get();
+    models_.emplace(visual, std::move(child));
+    return visual;
 }
 
 IRenderVisual* VulkanLevelRender::model_Duplicate(IRenderVisual* visual)
@@ -798,7 +838,7 @@ void VulkanLevelRender::models_Clear(bool)
 
 void VulkanLevelRender::destroy_all_models()
 {
-    if (models_.empty() && model_pool_.empty())
+    if (models_.empty() && model_pool_.empty() && model_bases_.empty())
         return;
     if (game_device_)
         game_device_->discard_scene_draws();
@@ -806,6 +846,7 @@ void VulkanLevelRender::destroy_all_models()
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model teardown requires idle GPU frames");
     models_.clear();
     model_pool_.clear();
+    model_bases_.clear();
     model_gpu_cache_.clear();
 }
 
