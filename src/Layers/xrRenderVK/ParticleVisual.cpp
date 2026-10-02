@@ -268,6 +268,11 @@ VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> 
         { on_particle(i, birth, particle); });
 }
 
+VulkanParticleGroup::~VulkanParticleGroup()
+{
+    for (auto& effect : effects_) effect->set_events({});
+}
+
 bool VulkanParticleGroup::initialize(VkDevice device, const VkPhysicalDeviceMemoryProperties& memory,
     const BufferResourceDispatch& dispatch, GameTextureFactory& textures, DeferredPass& pass,
     std::string& error)

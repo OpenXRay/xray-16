@@ -81,7 +81,7 @@ class VulkanParticleGroup final : public IRenderVisual, public IParticleCustom
 {
 public:
     VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog, const ParticleGroupDef& def);
-    ~VulkanParticleGroup() override = default;
+    ~VulkanParticleGroup() override;
     bool initialize(VkDevice device, const VkPhysicalDeviceMemoryProperties& memory,
         const BufferResourceDispatch& dispatch, GameTextureFactory& textures, DeferredPass& pass,
         std::string& error);
