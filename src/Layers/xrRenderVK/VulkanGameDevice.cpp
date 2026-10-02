@@ -124,7 +124,8 @@ void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
 }
 
-void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud, float sort_distance, const void* instance)
+void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
+    bool hud, float sort_distance, const void* instance, float lod)
 {
     ModelDraw draw;
     draw.model = &model;
@@ -132,6 +133,7 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const
     draw.skeleton = skeleton;
     std::copy_n(mvp, 16, draw.mvp.data());
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
+    draw.lod = lod;
     draw.hud = hud;
     model_draws_.push_back(draw);
 }
@@ -150,7 +152,7 @@ void VulkanGameDevice::discard_model_draws(const void* instance)
 }
 
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16],
-    bool hud, float sort_distance, const void* instance)
+    bool hud, float sort_distance, const void* instance, float lod)
 {
     const auto duplicate = std::find_if(level_draws_.begin(), level_draws_.end(),
         [index, hud, instance, &mvp](const LevelDraw& draw)
@@ -166,6 +168,7 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
     draw.instance = instance;
     std::copy_n(mvp, 16, draw.mvp.data());
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
+    draw.lod = lod;
     draw.hud = hud;
     level_draws_.push_back(draw);
 }
@@ -179,7 +182,7 @@ void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, 
         float mvp[16];
         std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
         if (!owner.current_level_->record_visual(draw.index, frame, owner.deferred_, mvp,
-                GeometryPhase::OpaqueAndAlphaTest))
+                GeometryPhase::OpaqueAndAlphaTest, draw.lod))
         {
             owner.level_recorded_ = false;
             return;
@@ -214,9 +217,9 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             if (model.skeleton ?
                     !model.model->record_animated(frame, owner.deferred_, mvp,
-                        *model.skeleton, owner.model_error_, GeometryPhase::Transparent) :
+                        *model.skeleton, owner.model_error_, GeometryPhase::Transparent, model.lod) :
                     !model.model->record(frame, owner.deferred_, mvp,
-                        nullptr, 0, owner.model_error_, GeometryPhase::Transparent))
+                        nullptr, 0, owner.model_error_, GeometryPhase::Transparent, model.lod))
             {
                 owner.models_recorded_ = false;
                 return;
@@ -227,7 +230,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             const LevelDraw& level = owner.level_draws_[draw.index];
             std::copy(level.mvp.begin(), level.mvp.end(), mvp);
             if (!owner.current_level_->record_visual(level.index, frame,
-                    owner.deferred_, mvp, GeometryPhase::Transparent))
+                    owner.deferred_, mvp, GeometryPhase::Transparent, level.lod))
             {
                 owner.level_recorded_ = false;
                 return;
@@ -263,9 +266,9 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             const bool recorded = model.skeleton ?
                 model.model->record_animated(frame, owner.deferred_, mvp,
-                    *model.skeleton, owner.model_error_, GeometryPhase::Hud) :
+                    *model.skeleton, owner.model_error_, GeometryPhase::Hud, model.lod) :
                 model.model->record(frame, owner.deferred_, mvp,
-                    nullptr, 0, owner.model_error_, GeometryPhase::Hud);
+                    nullptr, 0, owner.model_error_, GeometryPhase::Hud, model.lod);
             if (!recorded)
             {
                 owner.models_recorded_ = false;
@@ -277,7 +280,7 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
             const LevelDraw& level = owner.level_draws_[draw.index];
             std::copy(level.mvp.begin(), level.mvp.end(), mvp);
             if (!owner.current_level_->record_hud_visual(level.index, frame,
-                    owner.deferred_, mvp))
+                    owner.deferred_, mvp, level.lod))
             {
                 owner.level_recorded_ = false;
                 return;
@@ -296,9 +299,9 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
         std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
         if (draw.skeleton ?
                 !draw.model->record_animated(frame, owner.deferred_, mvp,
-                    *draw.skeleton, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest) :
+                    *draw.skeleton, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod) :
                 !draw.model->record(frame, owner.deferred_, mvp,
-                    nullptr, 0, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest))
+                    nullptr, 0, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod))
         {
             owner.models_recorded_ = false;
             return;

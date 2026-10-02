@@ -18,6 +18,7 @@ template <typename T> T handle(uintptr_t value)
 }
 
 uint32_t pipeline_count{}, draw_count{}, descriptor_updates{}, descriptor_frees{};
+uint32_t expected_first_index{};
 VkPipeline bound_pipeline{};
 VkPipelineLayout geometry_layout{}, lighting_layout{};
 VkDescriptorSet updated_material{};
@@ -103,9 +104,10 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(std::memcmp(data, expected_mvp, sizeof(expected_mvp)) == 0);
 }
 void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
-    uint32_t, int32_t, uint32_t)
+    uint32_t first_index, int32_t, uint32_t)
 {
     assert(count == 6 && instances == 1);
+    assert(first_index == expected_first_index);
     assert(bound_pipeline == handle<VkPipeline>(100 + draw_count));
     ++draw_count;
 }
@@ -264,13 +266,14 @@ int main()
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
         handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::AlphaTest));
     assert(bound_pipeline == handle<VkPipeline>(101));
+    expected_first_index = 3;
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
-        handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Transparent));
+        handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Transparent, 3));
     assert(bound_pipeline == handle<VkPipeline>(102));
     FrameRecordingContext hud_frame{handle<VkCommandBuffer>(17),
         handle<VkRenderPass>(11), handle<VkFramebuffer>(18), {640, 480}, 0, 0};
     assert(deferred.record_hud(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
-        6, expected_mvp, material));
+        6, expected_mvp, material, 3));
     assert(bound_pipeline == handle<VkPipeline>(103));
     assert(draw_count == 4 && error.empty());
     deferred.release_gbuffer(material);

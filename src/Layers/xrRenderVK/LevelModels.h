@@ -5,6 +5,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include "SlidingWindows.h"
 
 namespace xray::render::vulkan
 {
@@ -44,6 +45,7 @@ struct LevelModel
     uint16_t material{};
     std::vector<LevelVertex> vertices;
     std::vector<uint32_t> indices;
+    std::vector<SlideWindow> windows;
 };
 
 // The index of a visual in the level OGF table is stable. Hierarchies keep

@@ -32,9 +32,9 @@ public:
         const float (&mvp)[16], GeometryPhase phase) const;
     bool record_visual(size_t index, const FrameRecordingContext& frame,
         const DeferredPass& pass, const float (&mvp)[16],
-        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest) const;
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f) const;
     bool record_hud_visual(size_t index, const FrameRecordingContext& frame,
-        const DeferredPass& pass, const float (&mvp)[16]) const;
+        const DeferredPass& pass, const float (&mvp)[16], float lod = 1.f) const;
     size_t model_count() const { return meshes_.size(); }
     size_t visual_count() const { return visuals_.size(); }
     uint64_t revision() const { return revision_; }
@@ -51,6 +51,7 @@ private:
     {
         BufferResource vertices, indices;
         uint32_t index_count{};
+        std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
         SurfaceMode mode{SurfaceMode::Opaque};
     };

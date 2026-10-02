@@ -23,6 +23,7 @@ struct ModelGeometry
     SurfaceMode mode{SurfaceMode::Opaque};
     std::vector<ModelVertex> vertices;
     std::vector<uint32_t> indices;
+    std::vector<SlideWindow> windows;
     std::vector<ModelGeometry> children;
 };
 

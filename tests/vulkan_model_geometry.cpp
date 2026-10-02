@@ -150,11 +150,21 @@ int main()
     std::string error;
     assert(decode_model_geometry(plain, geometry, error));
     assert(geometry.vertices[2].position[0] == 2 && geometry.indices.size() == 3);
-    plain.type = 2;
+    VisualRecord progressive = plain;
+    progressive.type = 2;
+    progressive.source.clear();
+    indices.clear();
+    put32(indices, 6);
+    for (uint16_t index : {0, 1, 2, 0, 1, 2}) put16(indices, index);
+    chunk(progressive.source, 3, vertices); chunk(progressive.source, 4, indices);
     std::vector<uint8_t> windows;
     for (unsigned i = 0; i < 4; ++i) put32(windows, 0);
-    put32(windows, 1); put32(windows, 0); put16(windows, 1); put16(windows, 3);
-    chunk(plain.source, 6, windows);
-    assert(decode_model_geometry(plain, geometry, error));
-    assert(geometry.indices.size() == 3);
+    put32(windows, 2);
+    put32(windows, 0); put16(windows, 2); put16(windows, 3);
+    put32(windows, 3); put16(windows, 1); put16(windows, 3);
+    chunk(progressive.source, 6, windows);
+    assert(decode_model_geometry(progressive, geometry, error));
+    assert(geometry.indices.size() == 6 && geometry.windows.size() == 2);
+    assert(select_slide_window(geometry.windows, 1.f, geometry.indices.size()).index_count == 6);
+    assert(select_slide_window(geometry.windows, 0.f, geometry.indices.size()).offset == 3);
 }

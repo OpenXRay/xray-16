@@ -141,6 +141,33 @@ int main()
         result.roots.size() == 1 && result.roots[0] == 0 &&
         result.visuals[0].children.size() == 1 && result.visuals[0].children[0] == 1 &&
         result.visuals[1].mesh == 0);
+    Bytes progressive_ib, progressive_container, progressive_swi, progressive_visual, progressive_visuals;
+    u32(progressive_ib, 1); u32(progressive_ib, 6);
+    for (uint16_t index : {0, 1, 2, 0, 1, 2}) u16(progressive_ib, index);
+    u32(progressive_container, 0); u32(progressive_container, 0); u32(progressive_container, 3);
+    u32(progressive_container, 0); u32(progressive_container, 0); u32(progressive_container, 6);
+    for (unsigned n = 0; n < 4; ++n) u32(progressive_swi, 0);
+    u32(progressive_swi, 2);
+    u32(progressive_swi, 0); u16(progressive_swi, 2); u16(progressive_swi, 3);
+    u32(progressive_swi, 3); u16(progressive_swi, 1); u16(progressive_swi, 3);
+    part(progressive_visual, 1, header);
+    part(progressive_visual, 21, progressive_container);
+    part(progressive_visual, 6, progressive_swi);
+    part(progressive_visuals, 0, progressive_visual);
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib),
+        input(progressive_visuals), result, error));
+    assert(result.models[0].indices.size() == 6 && result.models[0].windows.size() == 2);
+    assert(select_slide_window(result.models[0].windows, 0.f, 6).offset == 3);
+    progressive_swi[20 + 8 + 6] = 2; // Index 2 is inactive with only two vertices.
+    progressive_visual.clear(); progressive_visuals.clear();
+    part(progressive_visual, 1, header);
+    part(progressive_visual, 21, progressive_container);
+    part(progressive_visual, 6, progressive_swi);
+    part(progressive_visuals, 0, progressive_visual);
+    assert(!load_level_models(input(shaders), input(vb), input(progressive_ib),
+        input(progressive_visuals), result, error));
+    assert(result.models[0].windows.size() == 2); // Failed load keeps the old model.
+    assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     Bytes embedded;
     part(embedded, 0, visual);
     hierarchy.clear(); links.clear();

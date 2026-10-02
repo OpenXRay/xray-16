@@ -245,8 +245,6 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         }
         return true;
     }
-    // Progressive meshes use a sliding window; the first window is full
-    // detail. LOD selection can later choose among validated windows.
     if (type != 0 && type != 2) return false;
     if (material >= material_count) return false;
     LevelBytes container, unused;
@@ -260,24 +258,6 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         vbase > vertices[vb].vertices.size() ||
         vcount > vertices[vb].vertices.size() - vbase ||
         ibase > indices[ib].size() || icount > indices[ib].size() - ibase) return false;
-    if (type == 2)
-    {
-        LevelBytes swi;
-        if (!chunk(visual, ogf_swi, swi) || swi.size < 28) return false;
-        Cursor c{swi};
-        uint32_t ignored, count, offset;
-        for (unsigned n = 0; n < 4; ++n)
-            if (!c.u32(ignored)) return false;
-        if (!c.u32(count) || !count || count > 65536 ||
-            swi.size != 20 + size_t(count) * 8 || !c.u32(offset)) return false;
-        LevelBytes first;
-        if (!c.take(4, first)) return false;
-        const uint32_t tris = uint32_t(first.data[0]) | (uint32_t(first.data[1]) << 8);
-        const uint32_t verts = uint32_t(first.data[2]) | (uint32_t(first.data[3]) << 8);
-        if (offset > icount || tris > (icount - offset) / 3 || verts > vcount) return false;
-        ibase += offset;
-        icount = tris * 3;
-    }
     LevelModel model;
     model.material = material;
     model.vertices.assign(vertices[vb].vertices.begin() + vbase,
@@ -287,6 +267,14 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
     {
         if (indices[ib][n] >= vcount) return false;
         model.indices.push_back(indices[ib][n]);
+    }
+    if (type == 2)
+    {
+        LevelBytes swi;
+        std::string error;
+        if (!chunk(visual, ogf_swi, swi) ||
+            !decode_slide_windows(swi.data, swi.size, model.indices,
+                model.vertices.size(), model.windows, error)) return false;
     }
     nodes[node_index].mesh = static_cast<int32_t>(models.size());
     models.push_back(std::move(model));

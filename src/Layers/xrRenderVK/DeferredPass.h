@@ -65,9 +65,10 @@ public:
     }
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-        SurfaceMode mode = SurfaceMode::Opaque) const;
+        SurfaceMode mode = SurfaceMode::Opaque, uint32_t first_index = 0) const;
     bool record_hud(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
-        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const;
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+        uint32_t first_index = 0) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         const DeferredLight& light) const;
     void destroy();

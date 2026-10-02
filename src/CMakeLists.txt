@@ -43,6 +43,11 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_device_resource_state_test tests/vulkan_device_resource_state.cpp)
     xray_add_vulkan_state_test(vulkan_frame_phase_test tests/vulkan_frame_phase.cpp)
     xray_add_vulkan_state_test(vulkan_camera_state_test tests/vulkan_camera_state.cpp)
+    xray_add_vulkan_state_test(vulkan_slide_windows_test tests/vulkan_slide_windows.cpp)
+    target_sources(vulkan_slide_windows_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SlidingWindows.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ModelGeometry.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/LevelModels.cpp")
 
     add_executable(vulkan_deferred_pass_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_deferred_pass.cpp"

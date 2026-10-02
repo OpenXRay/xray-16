@@ -325,7 +325,7 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    SurfaceMode mode) const
+    SurfaceMode mode, uint32_t first_index) const
 {
     const VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ :
         mode == SurfaceMode::Transparent ? transparent_ : geometry_;
@@ -341,12 +341,13 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     return true;
 }
 
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
-    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set) const
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+    uint32_t first_index) const
 {
     if (!hud_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
@@ -360,7 +361,7 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     return true;
 }
 

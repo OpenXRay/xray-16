@@ -436,9 +436,11 @@ void VulkanLevelRender::Calculate()
     std::memcpy(view_projection, &view_projection_matrix, sizeof(view_projection));
     for (uint32_t root : visible_roots)
     {
-        const Fvector center = visual_center(level_.visual_node(root));
+        const LevelVisual* node = level_.visual_node(root);
+        const Fvector center = visual_center(node);
+        const float distance = distance_squared(center, camera_position);
         game_device_->queue_level_visual(root, view_projection, false,
-            distance_squared(center, camera_position));
+            distance, nullptr, lod_for_distance(node ? node->bounds[9] : 0.f, distance));
     }
 
     // Engine renderables are submitted after this scene-calculation phase;
@@ -675,12 +677,13 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
 std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const VisualRecord& record,
     const std::string& inherited_texture, const std::string& cache_name, std::string& error)
 {
-    if (record.type != 0 && record.type != 1)
+    if (record.type != 0 && record.type != 1 && record.type != 2)
     {
         error = "unsupported OGF model type " + std::to_string(record.type);
         return nullptr;
     }
-    if (record.type == 0 && (!record.embedded_children.empty() || !record.linked_children.empty()))
+    if ((record.type == 0 || record.type == 2) &&
+        (!record.embedded_children.empty() || !record.linked_children.empty()))
     {
         error = "OGF mesh unexpectedly contains child references";
         return nullptr;
@@ -691,7 +694,7 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
         return nullptr;
     }
     std::shared_ptr<GpuModel> gpu;
-    if (record.type == 0)
+    if (record.type == 0 || record.type == 2)
     {
         if (!cache_name.empty()) gpu = model_gpu_cache_[cache_name].lock();
         if (!gpu)
@@ -819,25 +822,30 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     else
         camera_position.set(Device.vCameraPosition);
     const float sort_distance = distance_squared(center, camera_position);
+    const float scale = std::max({world.i.magnitude(), world.j.magnitude(), world.k.magnitude()});
+    const float radius = (model ? model->visibility().sphere.R :
+        level_.visual_node(static_cast<size_t>(visual_index))->bounds[9]) * scale;
+    const float lod = lod_for_distance(radius, sort_distance);
     if (model)
     {
         std::function<void(const VulkanModelVisual&)> submit = [&](const VulkanModelVisual& node)
         {
             if (node.has_gpu())
                 game_device_->queue_model(node.gpu(), nullptr,
-                    transform, hud, sort_distance, model_owner);
+                    transform, hud, sort_distance, model_owner, lod);
             for (const auto& child : node.children()) submit(*child);
             if (!node.linked().empty())
             {
                 R_ASSERT2(node.linked_valid(), "Vulkan model has level references from an unloaded level");
                 for (uint32_t index : node.linked())
-                    game_device_->queue_level_visual(index, transform, hud, sort_distance, model_owner);
+                    game_device_->queue_level_visual(index, transform, hud, sort_distance, model_owner, lod);
             }
         };
         submit(*model);
     }
     else
-        game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud, sort_distance);
+        game_device_->queue_level_visual(static_cast<uint32_t>(visual_index), transform, hud,
+            sort_distance, nullptr, lod);
 }
 
 IRender_ObjectSpecific* VulkanLevelRender::ros_create(IRenderable* parent)

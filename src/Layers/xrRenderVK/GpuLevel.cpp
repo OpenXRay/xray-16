@@ -58,6 +58,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, prepared.pending_, error))
             return false;
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
+        mesh.windows = model.windows;
         mesh.mode = models.materials[model.material].mode;
     }
     // The old level may still have been submitted. Its owner must wait for
@@ -107,7 +108,7 @@ bool GpuLevel::record(const FrameRecordingContext& frame, const DeferredPass& pa
 }
 
 bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
-    const DeferredPass& pass, const float (&mvp)[16], GeometryPhase phase) const
+    const DeferredPass& pass, const float (&mvp)[16], GeometryPhase phase, float lod) const
 {
     if (index >= visuals_.size()) return false;
     const LevelVisual& visual = visuals_[index];
@@ -118,17 +119,18 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         const bool selected = phase == GeometryPhase::Transparent ? transparent :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
+        const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
         if (selected &&
             !pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, mvp, mesh.material, mesh.mode)) return false;
+                window.index_count, mvp, mesh.material, mesh.mode, window.offset)) return false;
     }
     for (uint32_t child : visual.children)
-        if (!record_visual(child, frame, pass, mvp, phase)) return false;
+        if (!record_visual(child, frame, pass, mvp, phase, lod)) return false;
     return true;
 }
 
 bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& frame,
-    const DeferredPass& pass, const float (&mvp)[16]) const
+    const DeferredPass& pass, const float (&mvp)[16], float lod) const
 {
     if (index >= visuals_.size()) return false;
     const LevelVisual& visual = visuals_[index];
@@ -136,11 +138,12 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
         const Mesh& mesh = meshes_[visual.mesh];
+        const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
         if (!pass.record_hud(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, mvp, mesh.material)) return false;
+                window.index_count, mvp, mesh.material, window.offset)) return false;
     }
     for (uint32_t child : visual.children)
-        if (!record_hud_visual(child, frame, pass, mvp)) return false;
+        if (!record_hud_visual(child, frame, pass, mvp, lod)) return false;
     return true;
 }
 

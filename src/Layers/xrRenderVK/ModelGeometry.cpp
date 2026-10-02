@@ -159,23 +159,10 @@ bool mesh(const VisualRecord& source, ModelGeometry& out, std::string& error)
     if (source.type == 2 || source.type == 4)
     {
         LevelBytes windows;
-        if (!find_chunk(source.source, sliding_id, windows) || windows.size < 28)
+        if (!find_chunk(source.source, sliding_id, windows))
         { error = "progressive OGF mesh has no sliding window"; return false; }
-        const uint32_t n = u32(windows.data + 16);
-        if (!n || n > 65536 || windows.size != 20 + size_t(n) * 8)
-        { error = "invalid progressive OGF window table"; return false; }
-        const uint32_t offset = u32(windows.data + 20);
-        const uint16_t triangles = u16(windows.data + 24);
-        const uint16_t active_vertices = u16(windows.data + 26);
-        if (!triangles || !active_vertices || active_vertices > count ||
-            offset > out.indices.size() ||
-            size_t(triangles) * 3 > out.indices.size() - offset)
-        { error = "progressive OGF window exceeds index buffer"; return false; }
-        for (size_t i = offset; i < offset + size_t(triangles) * 3; ++i)
-            if (out.indices[i] >= active_vertices)
-            { error = "progressive OGF window has an inactive vertex"; return false; }
-        out.indices = std::vector<uint32_t>(out.indices.begin() + offset,
-            out.indices.begin() + offset + size_t(triangles) * 3);
+        if (!decode_slide_windows(windows.data, windows.size, out.indices,
+                out.vertices.size(), out.windows, error)) return false;
     }
     return true;
 }

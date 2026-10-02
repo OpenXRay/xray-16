@@ -4,6 +4,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanRendererModule.cpp
     VulkanProbe.cpp
     VulkanProbe.h
+    SlidingWindows.cpp
+    SlidingWindows.h
     BufferResource.cpp
     BufferResource.h
     BufferUpload.cpp

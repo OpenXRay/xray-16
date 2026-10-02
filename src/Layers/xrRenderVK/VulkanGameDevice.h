@@ -29,9 +29,10 @@ public:
     bool wait_idle() { return window_.frame().wait_idle();
     }
 
-    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud = false, float sort_distance = 0.f, const void* instance = nullptr);
+    void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud = false,
+        float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
-        bool hud = false, float sort_distance = 0.f, const void* instance = nullptr);
+        bool hud = false, float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f);
     void discard_scene_draws();
     void discard_model_draws(const void* instance);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
@@ -69,6 +70,7 @@ private:
         uint32_t index{};
         std::array<float, 16> mvp{};
         float sort_distance{};
+        float lod{1.f};
         bool hud{};
         const void* instance{};
     };
@@ -79,6 +81,7 @@ private:
         IKinematics* skeleton{};
         std::array<float, 16> mvp{};
         float sort_distance{};
+        float lod{1.f};
         bool hud{};
     };
     VulkanWindowDevice window_;

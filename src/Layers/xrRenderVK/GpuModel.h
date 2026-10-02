@@ -33,10 +33,10 @@ public:
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16], const float* pose, size_t bones,
         std::string& error,
-        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest);
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f);
     bool record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16], IKinematics& skeleton, std::string& error,
-        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest);
+        GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f);
     void destroy(); // Caller waits for all submitted frames first.
 
 private:
