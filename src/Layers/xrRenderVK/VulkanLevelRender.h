@@ -20,6 +20,9 @@ class VulkanFontRender;
 class VulkanUIShader;
 class VulkanModelVisual;
 class GpuModel;
+class VulkanParticleEffect;
+class VulkanParticleGroup;
+struct ParticleCatalog;
 // Shared IRender level contract for the Vulkan gameplay renderer. Its caller
 // must have created a device, deferred pass and texture factory first. Other
 // IRender operations remain abstract until their Vulkan implementations exist.
@@ -42,6 +45,7 @@ public:
     IRenderVisual* model_Create(pcstr name, IReader* data = nullptr) override;
     IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
     IRenderVisual* model_Duplicate(IRenderVisual* visual) override;
+    IRenderVisual* model_CreateParticles(pcstr name) override;
     void model_Delete(IRenderVisual*& visual, bool discard = false) override;
     void models_Clear(bool complete) override;
     void Create(SDL_Window* window, u32& width, u32& height,
@@ -88,6 +92,9 @@ private:
     Fmatrix current_view_projection() const;
     GpuLevel level_;
     std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
+    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanParticleEffect>> particle_effects_;
+    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanParticleGroup>> particle_groups_;
+    std::shared_ptr<const ParticleCatalog> particle_catalog_;
     std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
     std::unordered_map<std::string, std::unique_ptr<VulkanModelVisual>> model_bases_;
     std::unordered_map<std::string, std::weak_ptr<GpuModel>> model_gpu_cache_;

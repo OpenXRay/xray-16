@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
+#include "ParticleVisual.h"
 #include "SceneShaders.h"
 #include "ShaderModule.h"
 
@@ -144,8 +145,24 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const
     model_draws_.push_back(draw);
 }
 
+void VulkanGameDevice::queue_particle(IRenderVisual* visual, const float (&mvp)[16],
+    const Fvector& right, const Fvector& up, bool hud, float distance)
+{
+    ParticleDraw draw;
+    draw.visual = visual;
+    std::copy_n(mvp, 16, draw.mvp.data());
+    draw.right = right;
+    draw.up = up;
+    draw.hud = hud;
+    draw.sort_distance = std::isfinite(distance) ? std::max(distance, 0.f) : 0.f;
+    particle_draws_.push_back(draw);
+}
+
 void VulkanGameDevice::discard_model_draws(const void* instance)
 {
+    particle_draws_.erase(std::remove_if(particle_draws_.begin(), particle_draws_.end(),
+                              [instance](const ParticleDraw& draw) { return draw.visual == instance; }),
+        particle_draws_.end());
     model_draws_.erase(std::remove_if(model_draws_.begin(), model_draws_.end(),
                            [instance](const ModelDraw& draw)
                            {
@@ -204,12 +221,15 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         float distance{};
         bool model{};
         size_t index{};
+        bool particle{};
     };
     std::vector<DrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
         if (!owner.level_draws_[i].hud) draws.push_back({owner.level_draws_[i].sort_distance, false, i});
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
         if (!owner.model_draws_[i].hud) draws.push_back({owner.model_draws_[i].sort_distance, true, i});
+    for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
+        if (!owner.particle_draws_[i].hud) draws.push_back({owner.particle_draws_[i].sort_distance, false, i, true});
     std::stable_sort(draws.begin(), draws.end(), [](const DrawRef& left, const DrawRef& right)
     {
         return left.distance > right.distance;
@@ -217,7 +237,18 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
     for (const DrawRef& draw : draws)
     {
         float mvp[16];
-        if (draw.model)
+        if (draw.particle)
+        {
+            auto& particle = owner.particle_draws_[draw.index];
+            std::copy(particle.mvp.begin(), particle.mvp.end(), mvp);
+            bool ok = particle.visual->getType() == 8 ?
+                static_cast<VulkanParticleEffect*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                    particle.right, particle.up, false, owner.model_error_) :
+                static_cast<VulkanParticleGroup*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                    particle.right, particle.up, false, owner.model_error_);
+            if (!ok) { owner.models_recorded_ = false; return; }
+        }
+        else if (draw.model)
         {
             ModelDraw& model = owner.model_draws_[draw.index];
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
@@ -253,12 +284,15 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
         float distance{};
         bool model{};
         size_t index{};
+        bool particle{};
     };
     std::vector<DrawRef> hud;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
         if (owner.level_draws_[i].hud) hud.push_back({owner.level_draws_[i].sort_distance, false, i});
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
         if (owner.model_draws_[i].hud) hud.push_back({owner.model_draws_[i].sort_distance, true, i});
+    for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
+        if (owner.particle_draws_[i].hud) hud.push_back({owner.particle_draws_[i].sort_distance, false, i, true});
     std::stable_sort(hud.begin(), hud.end(), [](const DrawRef& left, const DrawRef& right)
     {
         return left.distance > right.distance;
@@ -266,7 +300,18 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
     for (const DrawRef& draw : hud)
     {
         float mvp[16];
-        if (draw.model)
+        if (draw.particle)
+        {
+            auto& particle = owner.particle_draws_[draw.index];
+            std::copy(particle.mvp.begin(), particle.mvp.end(), mvp);
+            bool ok = particle.visual->getType() == 8 ?
+                static_cast<VulkanParticleEffect*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                    particle.right, particle.up, true, owner.model_error_) :
+                static_cast<VulkanParticleGroup*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                    particle.right, particle.up, true, owner.model_error_);
+            if (!ok) { owner.models_recorded_ = false; return; }
+        }
+        else if (draw.model)
         {
             ModelDraw& model = owner.model_draws_[draw.index];
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
@@ -324,6 +369,7 @@ void VulkanGameDevice::begin_frame()
 void VulkanGameDevice::discard_scene_draws()
 {
     model_draws_.clear();
+    particle_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
 }
@@ -346,6 +392,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         if (!window_.frame().device_lost())
             reset_required_ = true;
         model_draws_.clear();
+        particle_draws_.clear();
         level_draws_.clear();
         current_level_ = nullptr;
         ui_.reset_frame();
@@ -354,6 +401,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     if (status == FrameStatus::RecreateRequired)
         reset_required_ = true;
     model_draws_.clear();
+    particle_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
     // A successful submission consumes every CPU-side command, even when an
@@ -440,6 +488,7 @@ bool VulkanGameDevice::prepare_for_reset(std::string& error)
     // A reset starts between frames. Drop commands accumulated for a frame
     // that will no longer be submitted, while keeping device-owned UI buffers.
     model_draws_.clear();
+    particle_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
     ui_.setup_states();
@@ -453,6 +502,7 @@ void VulkanGameDevice::destroy()
         frame_dispatch_.device_wait_idle(window_.device());
     ui_.DestroyUIGeom();
     model_draws_.clear();
+    particle_draws_.clear();
     level_draws_.clear();
     current_level_ = nullptr;
     scene_visibility_ = false;

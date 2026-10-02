@@ -56,6 +56,7 @@ VisualRecord record(unsigned links)
 }
 int main()
 {
+    Core.Initialize("vulkan_model_geometry_test", nullptr, false);
     VisualRecord static_record;
     static_record.type = 0;
     static_record.bounds = { -1, -2, -3, 1, 2, 3 };
@@ -143,6 +144,39 @@ int main()
         visual.embedded_children[0].source.pop_back();
         assert(!decode_model_geometry(visual, geometry, error));
     }
+    // Skeletal progressive children use the same active index windows as
+    // static progressive meshes, with vertices evaluated per instance.
+    auto animated = record(1);
+    auto& progressive_child = animated.embedded_children[0];
+    progressive_child.type = 4;
+    auto& source = progressive_child.source;
+    const size_t vertex_chunk = 8 + 8 + 3 * 60;
+    source.resize(vertex_chunk);
+    std::vector<uint8_t> skinned_indices, skinned_windows;
+    put32(skinned_indices, 6);
+    for (uint16_t index : {0, 1, 2, 0, 1, 2}) put16(skinned_indices, index);
+    chunk(source, 4, skinned_indices);
+    for (unsigned i = 0; i < 4; ++i) put32(skinned_windows, 0);
+    put32(skinned_windows, 2);
+    put32(skinned_windows, 0); put16(skinned_windows, 2); put16(skinned_windows, 3);
+    put32(skinned_windows, 3); put16(skinned_windows, 1); put16(skinned_windows, 3);
+    chunk(source, 6, skinned_windows);
+    ModelGeometry skinned_geometry;
+    std::string skinned_error;
+    assert(decode_model_geometry(animated, skinned_geometry, skinned_error));
+    assert(skinned_geometry.children[0].windows.size() == 2);
+    assert(select_slide_window(skinned_geometry.children[0].windows, 0.f, 6).offset == 3);
+    float first_pose[4][16]{}, second_pose[4][16]{};
+    for (unsigned bone = 0; bone < 4; ++bone)
+    {
+        first_pose[bone][0] = first_pose[bone][5] = first_pose[bone][10] = first_pose[bone][15] = 1.f;
+        second_pose[bone][0] = second_pose[bone][5] = second_pose[bone][10] = second_pose[bone][15] = 1.f;
+        second_pose[bone][12] = 4.f;
+    }
+    std::vector<LevelVertex> first_vertices, second_vertices;
+    assert(skin_model_mesh(skinned_geometry.children[0], &first_pose[0][0], 4, first_vertices, skinned_error));
+    assert(skin_model_mesh(skinned_geometry.children[0], &second_pose[0][0], 4, second_vertices, skinned_error));
+    assert(second_vertices[0].position[0] == first_vertices[0].position[0] + 4.f);
     VisualRecord plain;
     plain.type = 0;
     std::vector<uint8_t> vertices, indices;

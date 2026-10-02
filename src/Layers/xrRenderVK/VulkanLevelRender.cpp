@@ -2,6 +2,7 @@
 #include "VulkanLevelRender.h"
 #include "VulkanGameDevice.h"
 #include "VulkanModelVisual.h"
+#include "ParticleVisual.h"
 #include "VulkanVisual.h"
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -52,6 +53,52 @@ Fvector visual_center(const LevelVisual* visual)
     else
         center.set(0.f, 0.f, 0.f);
     return center;
+}
+
+void particle_chunk(std::vector<uint8_t>& out, uint32_t id, const void* data, size_t size)
+{
+    for (unsigned shift = 0; shift < 32; shift += 8) out.push_back(uint8_t(id >> shift));
+    for (unsigned shift = 0; shift < 32; shift += 8) out.push_back(uint8_t(size >> shift));
+    if (size)
+    {
+        const auto* bytes = static_cast<const uint8_t*>(data);
+        out.insert(out.end(), bytes, bytes + size);
+    }
+}
+
+// IReader::open_chunk transparently decompresses CFS_CompressMark chunks.
+// Reassemble only the particle library fields used by the portable decoder.
+std::vector<uint8_t> particle_library_bytes(IReader& source)
+{
+    std::vector<uint8_t> library;
+    if (IReader* version = source.open_chunk(1))
+    {
+        particle_chunk(library, 1, version->pointer(), version->length());
+        version->close();
+    }
+    for (uint32_t kind : {3u, 4u})
+    {
+        IReader* container = source.open_chunk(kind);
+        if (!container) continue;
+        std::vector<uint8_t> definitions;
+        for (uint32_t index = 0; index < 100000; ++index)
+        {
+            IReader* definition = container->open_chunk(index);
+            if (!definition) break;
+            std::vector<uint8_t> fields;
+            for (uint32_t field = 1; field <= (kind == 3 ? 11u : 5u); ++field)
+                if (IReader* value = definition->open_chunk(field))
+                {
+                    particle_chunk(fields, field, value->pointer(), value->length());
+                    value->close();
+                }
+            particle_chunk(definitions, index, fields.data(), fields.size());
+            definition->close();
+        }
+        particle_chunk(library, kind, definitions.data(), definitions.size());
+        container->close();
+    }
+    return library;
 }
 
 DeferredEnvironment current_environment()
@@ -661,6 +708,64 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
     return visual;
 }
 
+IRenderVisual* VulkanLevelRender::model_CreateParticles(pcstr name)
+{
+    R_ASSERT2(device_ && textures_ && pass_ && wait_idle_ &&
+        device_resource_state_.can_create_factory_objects(),
+        "Vulkan particles require an initialized gameplay device");
+    if (!name || !*name) return nullptr;
+    if (!particle_catalog_)
+    {
+        string_path path;
+        FS.update_path(path, _game_data_, "particles.xr");
+        IReader* source = FS.r_open(path);
+        if (!source)
+        {
+            Msg("! [renderer-vulkan] particle library not found: %s", path);
+            return nullptr;
+        }
+        auto catalog = std::make_shared<ParticleCatalog>();
+        std::string error;
+        const auto normalized = particle_library_bytes(*source);
+        const bool parsed = parse_particle_catalog(
+            {normalized.data(), normalized.size()}, *catalog, error);
+        FS.r_close(source);
+        if (!parsed)
+        {
+            Msg("! [renderer-vulkan] particle library: %s", error.c_str());
+            return nullptr;
+        }
+        particle_catalog_ = std::move(catalog);
+    }
+    std::string error;
+    if (const auto* def = particle_catalog_->effect(name))
+    {
+        auto visual = std::make_unique<VulkanParticleEffect>(particle_catalog_, *def);
+        if (!visual->initialize(device_, memory_, upload_.buffer, *textures_, *pass_, error))
+        {
+            Msg("! [renderer-vulkan] particle effect '%s': %s", name, error.c_str());
+            return nullptr;
+        }
+        IRenderVisual* result = visual.get();
+        particle_effects_.emplace(result, std::move(visual));
+        return result;
+    }
+    if (const auto* def = particle_catalog_->group(name))
+    {
+        auto visual = std::make_unique<VulkanParticleGroup>(particle_catalog_, *def);
+        if (!visual->initialize(device_, memory_, upload_.buffer, *textures_, *pass_, error))
+        {
+            Msg("! [renderer-vulkan] particle group '%s': %s", name, error.c_str());
+            return nullptr;
+        }
+        IRenderVisual* result = visual.get();
+        particle_groups_.emplace(result, std::move(visual));
+        return result;
+    }
+    Msg("! [renderer-vulkan] particle effect or group not found: %s", name);
+    return nullptr;
+}
+
 std::unique_ptr<VulkanModelVisual> VulkanLevelRender::load_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error)
 {
     VisualRecord record;
@@ -818,6 +923,24 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
 {
     if (!visual)
         return;
+    if (auto particle = particle_effects_.find(visual); particle != particle_effects_.end())
+    {
+        if (game_device_) game_device_->discard_model_draws(visual);
+        if (device_ && wait_idle_)
+            R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan particle deletion requires idle GPU frames");
+        particle_effects_.erase(particle);
+        visual = nullptr;
+        return;
+    }
+    if (auto particle = particle_groups_.find(visual); particle != particle_groups_.end())
+    {
+        if (game_device_) game_device_->discard_model_draws(visual);
+        if (device_ && wait_idle_)
+            R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan particle deletion requires idle GPU frames");
+        particle_groups_.erase(particle);
+        visual = nullptr;
+        return;
+    }
     auto found = models_.find(visual);
     R_ASSERT2(found != models_.end(), "Vulkan model deletion received an unknown visual");
     if (game_device_)
@@ -849,13 +972,20 @@ void VulkanLevelRender::models_Clear(bool)
 
 void VulkanLevelRender::destroy_all_models()
 {
-    if (models_.empty() && model_pool_.empty() && model_bases_.empty())
+    if (models_.empty() && model_pool_.empty() && model_bases_.empty() &&
+        particle_effects_.empty() && particle_groups_.empty())
+    {
+        particle_catalog_.reset();
         return;
+    }
     if (game_device_)
         game_device_->discard_scene_draws();
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan model teardown requires idle GPU frames");
     models_.clear();
+    particle_effects_.clear();
+    particle_groups_.clear();
+    particle_catalog_.reset();
     model_pool_.clear();
     model_bases_.clear();
     model_gpu_cache_.clear();
@@ -864,6 +994,22 @@ void VulkanLevelRender::destroy_all_models()
 void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual, Fmatrix& world)
 {
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
+    if (particle_effects_.count(visual) || particle_groups_.count(visual))
+    {
+        const Fmatrix view_projection = current_view_projection();
+        Fvector camera_position;
+        if (camera_state_.has_camera_position())
+            camera_position.set(camera_state_.camera_position()[0], camera_state_.camera_position()[1],
+                camera_state_.camera_position()[2]);
+        else camera_position.set(Device.vCameraPosition);
+        const Fvector center = visual->getVisData().sphere.P;
+        const bool hud = root && root->renderable_HUD();
+        float transform[16];
+        std::memcpy(transform, &view_projection, sizeof(transform));
+        game_device_->queue_particle(visual, transform, Device.vCameraRight, Device.vCameraTop,
+            hud, distance_squared(center, camera_position));
+        return;
+    }
     const int visual_index = level_.find_visual_index(visual);
     const VulkanModelVisual* model = nullptr;
     const void* model_owner = nullptr;

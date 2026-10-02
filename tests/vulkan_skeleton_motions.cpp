@@ -42,7 +42,7 @@ void chunk(Bytes& out, uint32_t id, const Bytes& value)
     out.insert(out.end(), value.begin(), value.end());
 }
 
-Bytes omf()
+Bytes omf(bool remap = false)
 {
     Bytes params, motions, clip, result;
     u16(params, 4);
@@ -53,11 +53,11 @@ Bytes omf()
     u32(params, 0); // file order differs from skeleton order
     name(params, "root");
     u32(params, 1);
-    u16(params, 1); // one definition
+    u16(params, remap ? 2 : 1);
     name(params, "idle");
     u32(params, 0);
     u16(params, UINT16_MAX); // BI_NONE uses the default partition
-    u16(params, 0);
+    u16(params, remap ? 1 : 0); // playback track may differ from lookup index
     for (int i = 0; i < 4; ++i)
         f32(params, 1.f);
     u32(params, 1); // one mark
@@ -65,9 +65,18 @@ Bytes omf()
     u32(params, 1);
     f32(params, 0.f);
     f32(params, 0.03f);
+    if (remap)
+    {
+        name(params, "move");
+        u32(params, 0);
+        u16(params, UINT16_MAX);
+        u16(params, 0);
+        for (int i = 0; i < 4; ++i) f32(params, 1.f);
+        u32(params, 0);
+    }
     u32(motions, 0);
     u32(motions, 4);
-    u32(motions, 1);
+    u32(motions, remap ? 2 : 1);
     name(clip, "idle");
     u32(clip, 2);
     clip.push_back(3); // hand: constant rotation, 8-bit translations
@@ -87,6 +96,13 @@ Bytes omf()
     for (int i = 0; i < 3; ++i)
         f32(clip, 0.f);
     chunk(motions, 1, clip);
+    if (remap)
+    {
+        Bytes other;
+        name(other, "move");
+        other.insert(other.end(), clip.begin() + 5, clip.end());
+        chunk(motions, 2, other);
+    }
     chunk(result, 15, params);
     chunk(result, 14, motions);
     return result;
@@ -111,6 +127,14 @@ int main()
     assert(slots[0].clips[0].bones[1].translations8.size() == 2);
     assert(slots[0].clips[0].bones[0].rotations.size() == 2);
     assert(slots[0].partitions[0][0] == 1 && slots[0].definitions[0].marks[0].name == "step");
+
+    // Names follow lookup order, while each definition's motion field can
+    // select a different numbered track for playback.
+    bytes = omf(true);
+    assert(parse_skeleton_motions({ bytes.data(), bytes.size() }, { "root", "hand" },
+        "actor.ogf", resolve, slots, error));
+    assert(slots[0].definitions[0].motion == 1 && slots[0].clips[1].name == "move");
+    bytes = omf();
 
     Bytes refs, ogf;
     name(refs, "actor");

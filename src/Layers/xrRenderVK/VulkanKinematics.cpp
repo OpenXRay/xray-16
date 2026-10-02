@@ -20,11 +20,43 @@ struct VulkanKinematics::Data
     std::unique_ptr<CInifile> user_data;
     std::vector<ModelGeometry> meshes;
     std::vector<MotionSlot> motions;
+    // Legacy motion objects back the low-level IKinematicsAnimated queries.
+    // Destroy handles before their private container (reverse field order).
+    std::unique_ptr<motions_container> motion_container;
+    std::vector<shared_motions> legacy_motions;
 };
 
 void VulkanKinematics::set_motions(std::vector<MotionSlot> motions)
 {
     data_->motions = std::move(motions);
+    playback_.reset();
+    if (data_->motions.empty()) return;
+    const auto& first = data_->motions.front();
+    for (size_t part = 0; part < first.partitions.size(); ++part)
+    {
+        partitions_[static_cast<u16>(part)].Name = first.partition_names[part].c_str();
+        for (uint16_t bone : first.partitions[part])
+            partitions_[static_cast<u16>(part)].bones.push_back(bone);
+    }
+    data_->legacy_motions.clear();
+    data_->motion_container = std::make_unique<motions_container>();
+    for (size_t index = 0; index < data_->motions.size(); ++index)
+    {
+        const auto& slot = data_->motions[index];
+        if (slot.raw.empty())
+        {
+            data_->legacy_motions.emplace_back();
+            continue;
+        }
+        IReader reader(const_cast<uint8_t*>(slot.raw.data()), slot.raw.size());
+        shared_motions legacy;
+        auto* previous = g_pMotionsContainer;
+        g_pMotionsContainer = data_->motion_container.get();
+        const bool loaded = legacy.create(slot.source.c_str(), &reader, &data_->bones);
+        g_pMotionsContainer = previous;
+        R_ASSERT2(loaded, "validated Vulkan motion source failed legacy interface loading");
+        data_->legacy_motions.push_back(std::move(legacy));
+    }
 }
 
 const std::vector<MotionSlot>& VulkanKinematics::motions() const
@@ -32,8 +64,38 @@ const std::vector<MotionSlot>& VulkanKinematics::motions() const
     return data_->motions;
 }
 
+bool VulkanKinematics::play_motion(const std::string& name, bool fx, bool mixing,
+    float power, MotionPlayback::Finished finished)
+{
+    MotionPlayback::Handle id;
+    if (!playback_.find(name, fx, id) ||
+        !playback_.play(id, fx, mixing, power, std::move(finished))) return false;
+    dirty_ = true;
+    return true;
+}
+
+void VulkanKinematics::advance_motions(float seconds)
+{
+    if (!playback_.active_count()) return;
+    playback_.advance(seconds);
+    dirty_ = true;
+}
+
+void VulkanKinematics::stop_motions(uint16_t part)
+{
+    playback_.stop_cycles(part);
+    dirty_ = true;
+}
+
 VulkanKinematics::VulkanKinematics(std::shared_ptr<Data> data, IRenderVisual* owner)
-    : data_(std::move(data)), owner_(owner), instances_(data_->bones.size())
+    : data_(std::move(data)), owner_(owner), instances_(data_->bones.size()),
+      playback_(std::shared_ptr<const std::vector<MotionSlot>>(data_, &data_->motions), [&]
+      {
+          std::vector<uint16_t> parents;
+          parents.reserve(data_->bones.size());
+          for (const auto* bone : data_->bones) parents.push_back(bone->GetParentID());
+          return parents;
+      }())
 {
     for (auto& instance : instances_) instance.construct();
     visible_ = instances_.size() == 64 ? ~u64(0) : (u64(1) << instances_.size()) - 1;
@@ -41,11 +103,21 @@ VulkanKinematics::VulkanKinematics(std::shared_ptr<Data> data, IRenderVisual* ow
 
 VulkanKinematics::VulkanKinematics(const VulkanKinematics& source, IRenderVisual* owner)
     : data_(source.data_), owner_(owner), instances_(source.instances_), offsets_(source.offsets_),
-      root_(source.root_), visible_(source.visible_), dirty_(source.dirty_)
+      playback_(source.playback_), partitions_(source.partitions_), root_(source.root_),
+      visible_(source.visible_), dirty_(source.dirty_)
 {
     // Callbacks commonly carry a pointer into the old model instance. Copies
     // start without it and may install their own callback after creation.
     for (auto& instance : instances_) instance.reset_callback();
+    playback_.clear_callbacks();
+    for (const auto& old : source.blends_)
+        if (old->blend_state() != CBlend::eFREE_SLOT)
+        {
+            auto blend = std::make_unique<CBlend>(*old);
+            blend->Callback = nullptr;
+            blend->CallbackParam = nullptr;
+            blends_.push_back(std::move(blend));
+        }
 }
 
 std::unique_ptr<VulkanKinematics> VulkanKinematics::create(const SkeletonBones& source,
@@ -186,6 +258,9 @@ void VulkanKinematics::reset_instance_state()
     for (auto& instance : instances_)
         instance.construct();
     offsets_.clear();
+    playback_.reset();
+    blends_.clear();
+    last_motion_frame_ = UINT32_MAX;
     root_ = data_->root;
     visible_ = instances_.size() == 64 ? ~u64(0) : (u64(1) << instances_.size()) - 1;
     update_ = nullptr;
@@ -207,7 +282,21 @@ void VulkanKinematics::Bone_Calculate(CBoneData* bone, Fmatrix* parent)
         }
         else
         {
-            instance.mTransform.mul_43(*parent, bone->bind_transform);
+            MotionKey key;
+            if (playback_.sample(bone->GetSelfID(), key))
+            {
+                Fquaternion rotation;
+                rotation.x = key.rotation[0];
+                rotation.y = key.rotation[1];
+                rotation.z = key.rotation[2];
+                rotation.w = key.rotation[3];
+                Fvector translation;
+                translation.set(key.translation[0], key.translation[1], key.translation[2]);
+                Fmatrix local;
+                local.mk_xform(rotation, translation);
+                instance.mTransform.mul_43(*parent, local);
+            }
+            else instance.mTransform.mul_43(*parent, bone->bind_transform);
             for (const auto& offset : offsets_)
                 if (offset.m_bone_id == bone->GetSelfID())
                     instance.mTransform.mulB_43(offset.m_transform);
@@ -290,13 +379,21 @@ bool VulkanKinematics::PickBone(const Fmatrix& parent, pick_result& result, floa
 void VulkanKinematics::EnumBoneVertices(SEnumVerticesCallback& callback, u16 id)
 {
     R_ASSERT2(id < data_->bones.size(), "invalid Vulkan bone enumeration ID");
+    CalculateBones();
+    std::vector<float> pose(instances_.size() * 16);
+    for (size_t bone = 0; bone < instances_.size(); ++bone)
+        std::memcpy(pose.data() + bone * 16, &instances_[bone].mRenderTransform, sizeof(Fmatrix));
     for (size_t child = 0; child < data_->meshes.size(); ++child)
     {
         const auto& mesh = data_->meshes[child];
+        if (mesh.type != 4 && mesh.type != 5) continue;
+        std::vector<LevelVertex> vertices;
+        std::string error;
+        if (!skin_model_mesh(mesh, pose.data(), instances_.size(), vertices, error)) continue;
         for (u16 face : data_->bones[id]->child_faces[child])
             for (size_t corner = 0; corner < 3; ++corner)
             {
-                const auto& vertex = mesh.vertices[mesh.indices[size_t(face) * 3 + corner]];
+                const auto& vertex = vertices[mesh.indices[size_t(face) * 3 + corner]];
                 Fvector position;
                 position.set(vertex.position[0], vertex.position[1], vertex.position[2]);
                 callback(position);
@@ -433,6 +530,7 @@ void VulkanKinematics::LL_ClearAdditionalTransform(u16 id)
 
 void VulkanKinematics::CalculateBones(BOOL force)
 {
+    if (playback_.active_count()) UpdateTracks();
     if (!dirty_ && !force) return;
     Fmatrix identity = Fidentity;
     Bone_Calculate(data_->bones[root_], &identity);
@@ -474,3 +572,319 @@ void VulkanKinematics::Callback(UpdateCallback callback, void* param)
     update_param_ = param;
 }
 }
+#include "xrEngine/stdafx.h"
+#include "VulkanKinematics.h"
+#include "xrEngine/device.h"
+
+#include <algorithm>
+#include <cmath>
+
+namespace xray::render::vulkan
+{
+bool VulkanKinematics::valid_motion(MotionID id) const
+{
+    return id.valid() && id.slot < data_->motions.size() &&
+        id.idx < data_->motions[id.slot].definitions.size() &&
+        data_->motions[id.slot].definitions[id.idx].motion < data_->motions[id.slot].clips.size();
+}
+
+u16 VulkanKinematics::LL_MotionsSlotCount()
+{
+    return static_cast<u16>(data_->motions.size());
+}
+
+const shared_motions& VulkanKinematics::LL_MotionsSlot(u16 index)
+{
+    R_ASSERT2(index < data_->legacy_motions.size(), "invalid Vulkan motion slot");
+    return data_->legacy_motions[index];
+}
+
+CMotionDef* VulkanKinematics::LL_GetMotionDef(MotionID id)
+{
+    if (!valid_motion(id) || id.slot >= data_->legacy_motions.size()) return nullptr;
+    return data_->legacy_motions[id.slot].motion_def(id.idx);
+}
+
+CMotion* VulkanKinematics::LL_GetMotion(MotionID id, u16 bone)
+{
+    if (!valid_motion(id) || bone >= LL_BoneCount() || id.slot >= data_->legacy_motions.size()) return nullptr;
+    MotionVec* tracks = data_->legacy_motions[id.slot].bone_motions(LL_GetData(bone).name);
+    const auto* def = LL_GetMotionDef(id);
+    return tracks && def && def->motion < tracks->size() ? &(*tracks)[def->motion] : nullptr;
+}
+
+CMotion* VulkanKinematics::LL_GetRootMotion(MotionID id)
+{
+    return LL_GetMotion(id, root_);
+}
+
+MotionID VulkanKinematics::LL_MotionID(LPCSTR name)
+{
+    if (!name) return {};
+    for (size_t slot = data_->motions.size(); slot > 0; --slot)
+        for (size_t index = 0; index < data_->motions[slot - 1].definitions.size(); ++index)
+            if (xr_stricmp(data_->motions[slot - 1].definitions[index].name.c_str(), name) == 0)
+                return MotionID(static_cast<u16>(slot - 1), static_cast<u16>(index));
+    return {};
+}
+
+u16 VulkanKinematics::LL_PartID(LPCSTR name)
+{
+    if (name && !data_->motions.empty())
+        for (size_t index = 0; index < data_->motions[0].partition_names.size(); ++index)
+            if (xr_stricmp(data_->motions[0].partition_names[index].c_str(), name) == 0)
+                return static_cast<u16>(index);
+    return BI_NONE;
+}
+
+MotionID VulkanKinematics::ID_Cycle_Safe(LPCSTR name)
+{
+    if (!name) return {};
+    for (size_t slot = data_->motions.size(); slot > 0; --slot)
+        for (size_t index = 0; index < data_->motions[slot - 1].definitions.size(); ++index)
+        {
+            const auto& def = data_->motions[slot - 1].definitions[index];
+            if (!(def.flags & 1) && xr_stricmp(def.name.c_str(), name) == 0)
+                return MotionID(static_cast<u16>(slot - 1), static_cast<u16>(index));
+        }
+    return {};
+}
+MotionID VulkanKinematics::ID_Cycle(LPCSTR name)
+{
+    MotionID id = ID_Cycle_Safe(name);
+    R_ASSERT2(id.valid(), "Vulkan skeleton has no requested cycle");
+    return id;
+}
+MotionID VulkanKinematics::ID_Cycle(shared_str name) { return ID_Cycle(name.c_str()); }
+MotionID VulkanKinematics::ID_Cycle_Safe(shared_str name) { return ID_Cycle_Safe(name.c_str()); }
+MotionID VulkanKinematics::ID_FX_Safe(LPCSTR name)
+{
+    if (!name) return {};
+    for (size_t slot = data_->motions.size(); slot > 0; --slot)
+        for (size_t index = 0; index < data_->motions[slot - 1].definitions.size(); ++index)
+        {
+            const auto& def = data_->motions[slot - 1].definitions[index];
+            if ((def.flags & 1) && xr_stricmp(def.name.c_str(), name) == 0)
+                return MotionID(static_cast<u16>(slot - 1), static_cast<u16>(index));
+        }
+    return {};
+}
+MotionID VulkanKinematics::ID_FX(LPCSTR name)
+{
+    MotionID id = ID_FX_Safe(name);
+    R_ASSERT2(id.valid(), "Vulkan skeleton has no requested FX");
+    return id;
+}
+
+CBlend* VulkanKinematics::create_blend(u16 part, MotionID id, bool fx, bool mixing,
+    float accrue, float falloff, float speed, float power, bool noloop,
+    PlayCallback callback, LPVOID param, u8 channel)
+{
+    if (!valid_motion(id) || channel >= 4 || !std::isfinite(power) || power < 0.f ||
+        blends_.size() >= MAX_BLENDED_POOL) return nullptr;
+    const auto& definition = data_->motions[id.slot].definitions[id.idx];
+    if (bool(definition.flags & 1) != fx) return nullptr;
+    if (!fx && part != BI_NONE && part >= data_->motions[0].partitions.size()) return nullptr;
+    if (fx && part == BI_NONE) part = root_;
+    auto blend = std::make_unique<CBlend>();
+    CBlend* result = blend.get();
+    result->motionID = id;
+    result->bone_or_part = part;
+    result->channel = channel;
+    result->blendAccrue = accrue;
+    result->blendFalloff = falloff;
+    result->blendPower = power * definition.parameters[1];
+    result->speed = speed;
+    result->timeCurrent = 0.f;
+    result->timeTotal = get_animation_length(id);
+    result->blendAmount = mixing ? 0.f : result->blendPower;
+    result->playing = true;
+    result->stop_at_end = fx || noloop;
+    result->stop_at_end_callback = true;
+    result->fall_at_end = fx;
+    result->Callback = callback;
+    result->CallbackParam = param;
+    result->dwFrame = UINT32_MAX;
+    result->set_accrue_state();
+    MotionPlayback::Handle handle{id.slot, id.idx};
+    if (!playback_.play(handle, fx, mixing, power,
+            [callback, result] { if (callback) callback(result); }, accrue, falloff, speed, noloop, channel, part))
+        return nullptr;
+    if (!fx && !mixing)
+        for (auto& old : blends_)
+            if (old->blend_state() != CBlend::eFREE_SLOT && old->channel == channel &&
+                old->bone_or_part == part) old->set_falloff_state();
+    blends_.push_back(std::move(blend));
+    dirty_ = true;
+    return result;
+}
+
+CBlend* VulkanKinematics::LL_PlayCycle(u16 part, MotionID id, BOOL mixing, float accrue,
+    float falloff, float speed, BOOL noloop, PlayCallback callback, LPVOID param, u8 channel)
+{
+    if (!valid_motion(id)) return nullptr;
+    if (part == BI_NONE)
+    {
+        CBlend* result = nullptr;
+        for (u16 index = 0; index < data_->motions[0].partitions.size(); ++index)
+            result = LL_PlayCycle(index, id, mixing, accrue, falloff, speed, noloop, callback, param, channel);
+        return result;
+    }
+    return create_blend(part, id, false, mixing, accrue, falloff, speed, 1.f,
+        noloop, callback, param, channel);
+}
+
+CBlend* VulkanKinematics::LL_PlayCycle(u16 part, MotionID id, BOOL mixing,
+    PlayCallback callback, LPVOID param, u8 channel)
+{
+    if (!valid_motion(id)) return nullptr;
+    const auto& def = data_->motions[id.slot].definitions[id.idx];
+    return LL_PlayCycle(part, id, mixing, def.parameters[2], def.parameters[3],
+        def.parameters[0], (def.flags & 2) != 0, callback, param, channel);
+}
+
+CBlend* VulkanKinematics::PlayCycle(LPCSTR name, BOOL mixing,
+    PlayCallback callback, LPVOID param, u8 channel)
+{
+    return PlayCycle(ID_Cycle_Safe(name), mixing, callback, param, channel);
+}
+CBlend* VulkanKinematics::PlayCycle(MotionID id, BOOL mixing,
+    PlayCallback callback, LPVOID param, u8 channel)
+{
+    if (!valid_motion(id)) return nullptr;
+    return LL_PlayCycle(data_->motions[id.slot].definitions[id.idx].bone_or_part,
+        id, mixing, callback, param, channel);
+}
+CBlend* VulkanKinematics::PlayCycle(u16 part, MotionID id, BOOL mixing,
+    PlayCallback callback, LPVOID param, u8 channel)
+{
+    return LL_PlayCycle(part, id, mixing, callback, param, channel);
+}
+
+CBlend* VulkanKinematics::PlayFX(MotionID id, float power)
+{
+    if (!valid_motion(id)) return nullptr;
+    const auto& def = data_->motions[id.slot].definitions[id.idx];
+    return create_blend(def.bone_or_part, id, true, true, def.parameters[2],
+        def.parameters[3], def.parameters[0], power,
+        true, nullptr, nullptr, 0);
+}
+CBlend* VulkanKinematics::PlayFX(LPCSTR name, float power) { return PlayFX(ID_FX_Safe(name), power); }
+CBlend* VulkanKinematics::PlayFX_Safe(cpcstr name, float power) { return PlayFX(ID_FX_Safe(name), power); }
+
+void VulkanKinematics::LL_CloseCycle(u16 part, u8 mask)
+{
+    playback_.stop_cycles(part, mask);
+    for (auto& blend : blends_)
+        if (blend->blend_state() != CBlend::eFREE_SLOT && blend->channel < 4 &&
+            (mask & (1u << blend->channel)) &&
+            (part == BI_NONE || part == blend->bone_or_part) &&
+            !(data_->motions[blend->motionID.slot].definitions[blend->motionID.idx].flags & 1))
+            blend->set_falloff_state();
+    dirty_ = true;
+}
+
+void VulkanKinematics::LL_SetChannelFactor(u16 channel, float factor)
+{
+    if (channel < 4 && std::isfinite(factor))
+    {
+        channel_factors_[channel] = std::clamp(factor, 0.f, 1.f);
+        playback_.set_channel_factor(static_cast<u8>(channel), factor);
+        dirty_ = true;
+    }
+}
+
+void VulkanKinematics::LL_UpdateTracks(float dt, bool, bool leave_blends)
+{
+    if (tracks_update_ && tracks_update_->operator()(dt, *this)) return;
+    playback_.advance(dt);
+    for (auto& blend : blends_)
+    {
+        if (blend->blend_state() == CBlend::eFREE_SLOT) continue;
+        blend->timeCurrent = std::min(blend->timeCurrent + dt * blend->speed, blend->timeTotal);
+        if (blend->blend_state() == CBlend::eFalloff)
+            blend->blendAmount = std::max(0.f, blend->blendAmount - dt * blend->blendFalloff * blend->blendPower);
+        else
+            blend->blendAmount = std::min(blend->blendPower, blend->blendAmount + dt * blend->blendAccrue * blend->blendPower);
+        if (blend->timeCurrent >= blend->timeTotal && blend->stop_at_end)
+            blend->set_falloff_state();
+        if (!leave_blends && blend->blendAmount <= 0.f && blend->blend_state() == CBlend::eFalloff)
+        {
+            if (blend_destroy_) blend_destroy_->BlendDestroy(*blend);
+            blend->set_free_state();
+        }
+    }
+    dirty_ = true;
+}
+
+void VulkanKinematics::UpdateTracks()
+{
+    if (last_motion_frame_ == Device.dwFrame) return;
+    last_motion_frame_ = Device.dwFrame;
+    LL_UpdateTracks(Device.fTimeDelta, false, false);
+}
+
+u32 VulkanKinematics::LL_PartBlendsCount(u32 part)
+{
+    u32 count = 0;
+    for (const auto& blend : blends_)
+        if (blend->blend_state() != CBlend::eFREE_SLOT && blend->bone_or_part == part &&
+            !(data_->motions[blend->motionID.slot].definitions[blend->motionID.idx].flags & 1)) ++count;
+    return count;
+}
+CBlend* VulkanKinematics::LL_PartBlend(u32 part, u32 index)
+{
+    for (const auto& blend : blends_)
+        if (blend->blend_state() != CBlend::eFREE_SLOT && blend->bone_or_part == part &&
+            !(data_->motions[blend->motionID.slot].definitions[blend->motionID.idx].flags & 1))
+        {
+            if (!index--) return blend.get();
+        }
+    return nullptr;
+}
+void VulkanKinematics::LL_IterateBlends(IterateBlendsCallback& callback)
+{
+    for (const auto& blend : blends_)
+        if (blend->blend_state() != CBlend::eFREE_SLOT) callback(*blend);
+}
+
+void VulkanKinematics::LL_BuldBoneMatrixDequatize(const CBoneData* bone, u8 mask, SKeyTable& keys)
+{
+    if (!bone || !(mask & 1)) return;
+    MotionKey key;
+    if (!playback_.sample(bone->GetSelfID(), key)) return;
+    CKey& out = keys.keys[0][0];
+    out.Q.x = key.rotation[0]; out.Q.y = key.rotation[1];
+    out.Q.z = key.rotation[2]; out.Q.w = key.rotation[3];
+    out.T.set(key.translation[0], key.translation[1], key.translation[2]);
+    keys.chanel_blend_conts[0] = 1;
+    keys.blends[0][0] = nullptr;
+}
+void VulkanKinematics::LL_BoneMatrixBuild(CBoneInstance& instance, const Fmatrix* parent, const SKeyTable& keys)
+{
+    R_ASSERT2(parent, "Vulkan bone matrix requires a parent");
+    if (!keys.chanel_blend_conts[0]) { instance.mTransform = *parent; return; }
+    Fmatrix local;
+    local.mk_xform(keys.keys[0][0].Q, keys.keys[0][0].T);
+    instance.mTransform.mul_43(*parent, local);
+}
+
+float VulkanKinematics::get_animation_length(MotionID id)
+{
+    if (!valid_motion(id)) return 0.f;
+    const auto& slot = data_->motions[id.slot];
+    return slot.clips[slot.definitions[id.idx].motion].frames / 30.f;
+}
+
+#ifdef DEBUG
+std::pair<LPCSTR, LPCSTR> VulkanKinematics::LL_MotionDefName_dbg(MotionID id)
+{
+    if (!valid_motion(id)) return {nullptr, nullptr};
+    return {data_->motions[id.slot].definitions[id.idx].name.c_str(), data_->motions[id.slot].source.c_str()};
+}
+void VulkanKinematics::LL_DumpBlends_dbg()
+{
+    Msg("* Vulkan skeleton: %zu active blend slots", blends_.size());
+}
+#endif
+} // namespace xray::render::vulkan

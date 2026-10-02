@@ -48,6 +48,7 @@ struct MotionClip
 struct MotionSlot
 {
     std::string source;
+    std::vector<uint8_t> raw; // retained for legacy IKinematicsAnimated motion access
     std::vector<std::string> partition_names;
     std::vector<std::vector<uint16_t>> partitions;
     std::vector<MotionDefinition> definitions;

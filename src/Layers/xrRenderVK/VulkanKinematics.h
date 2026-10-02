@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 #include "ModelGeometry.h"
 #include "SkeletonBones.h"
 #include "SkeletonMotions.h"
+#include "MotionPlayback.h"
 #include "xrCore/Animation/Bone.hpp"
 
 #include <memory>
@@ -11,7 +13,7 @@
 
 namespace xray::render::vulkan
 {
-class VulkanKinematics final : public IKinematics
+class VulkanKinematics final : public IKinematics, public IKinematicsAnimated
 {
 public:
     static std::unique_ptr<VulkanKinematics> create(const SkeletonBones& source,
@@ -20,6 +22,10 @@ public:
     bool attach_geometry(const ModelGeometry& geometry, std::string& error);
     void set_motions(std::vector<MotionSlot> motions);
     const std::vector<MotionSlot>& motions() const;
+    bool play_motion(const std::string& name, bool fx = false, bool mixing = true,
+        float power = 1.f, MotionPlayback::Finished finished = {});
+    void advance_motions(float seconds);
+    void stop_motions(uint16_t part = UINT16_MAX);
     void reset_instance_state();
 
     void Bone_Calculate(CBoneData* bone, Fmatrix* parent) override;
@@ -59,7 +65,51 @@ public:
     UpdateCallback GetUpdateCallback() override { return update_; }
     void* GetUpdateCallbackParam() override { return update_param_; }
     IRenderVisual* dcast_RenderVisual() override { return owner_; }
-    IKinematicsAnimated* dcast_PKinematicsAnimated() override { return nullptr; }
+    IKinematicsAnimated* dcast_PKinematicsAnimated() override { return this; }
+    IKinematics* dcast_PKinematics() override { return this; }
+    void OnCalculateBones() override { UpdateTracks(); }
+#ifdef DEBUG
+    std::pair<LPCSTR, LPCSTR> LL_MotionDefName_dbg(MotionID id) override;
+    void LL_DumpBlends_dbg() override;
+#endif
+    u32 LL_PartBlendsCount(u32 part) override;
+    CBlend* LL_PartBlend(u32 part, u32 index) override;
+    void LL_IterateBlends(IterateBlendsCallback& callback) override;
+    u16 LL_MotionsSlotCount() override;
+    const shared_motions& LL_MotionsSlot(u16 index) override;
+    CMotionDef* LL_GetMotionDef(MotionID id) override;
+    CMotion* LL_GetRootMotion(MotionID id) override;
+    CMotion* LL_GetMotion(MotionID id, u16 bone) override;
+    void LL_BuldBoneMatrixDequatize(const CBoneData* bone, u8 mask, SKeyTable& keys) override;
+    void LL_BoneMatrixBuild(CBoneInstance& instance, const Fmatrix* parent, const SKeyTable& keys) override;
+    IBlendDestroyCallback* GetBlendDestroyCallback() override { return blend_destroy_; }
+    void SetBlendDestroyCallback(IBlendDestroyCallback* callback) override { blend_destroy_ = callback; }
+    void SetUpdateTracksCalback(IUpdateTracksCallback* callback) override { tracks_update_ = callback; }
+    IUpdateTracksCallback* GetUpdateTracksCalback() override { return tracks_update_; }
+    MotionID LL_MotionID(LPCSTR name) override;
+    u16 LL_PartID(LPCSTR name) override;
+    CBlend* LL_PlayCycle(u16 part, MotionID id, BOOL mixing, float accrue, float falloff,
+        float speed, BOOL noloop, PlayCallback callback, LPVOID param, u8 channel) override;
+    CBlend* LL_PlayCycle(u16 part, MotionID id, BOOL mixing, PlayCallback callback,
+        LPVOID param, u8 channel) override;
+    void LL_CloseCycle(u16 part, u8 mask) override;
+    void LL_SetChannelFactor(u16 channel, float factor) override;
+    void UpdateTracks() override;
+    void LL_UpdateTracks(float dt, bool force, bool leave_blends) override;
+    MotionID ID_Cycle(LPCSTR name) override;
+    MotionID ID_Cycle_Safe(LPCSTR name) override;
+    MotionID ID_Cycle(shared_str name) override;
+    MotionID ID_Cycle_Safe(shared_str name) override;
+    CBlend* PlayCycle(LPCSTR name, BOOL mixing, PlayCallback callback, LPVOID param, u8 channel) override;
+    CBlend* PlayCycle(MotionID id, BOOL mixing, PlayCallback callback, LPVOID param, u8 channel) override;
+    CBlend* PlayCycle(u16 part, MotionID id, BOOL mixing, PlayCallback callback, LPVOID param, u8 channel) override;
+    MotionID ID_FX(LPCSTR name) override;
+    MotionID ID_FX_Safe(LPCSTR name) override;
+    CBlend* PlayFX(LPCSTR name, float power) override;
+    CBlend* PlayFX(MotionID id, float power) override;
+    CBlend* PlayFX_Safe(cpcstr name, float power) override;
+    const CPartition& partitions() const override { return partitions_; }
+    float get_animation_length(MotionID id) override;
 #ifdef DEBUG
     void DebugRender(Fmatrix&) override {}
     shared_str getDebugName() override { return "vulkan_kinematics"; }
@@ -67,6 +117,10 @@ public:
 
 private:
     struct Data;
+    CBlend* create_blend(u16 part, MotionID id, bool fx, bool mixing,
+        float accrue, float falloff, float speed, float power, bool noloop,
+        PlayCallback callback, LPVOID param, u8 channel);
+    bool valid_motion(MotionID id) const;
     VulkanKinematics(std::shared_ptr<Data> data, IRenderVisual* owner);
     void bind_transform(u16 id, const Fmatrix& parent, xr_vector<Fmatrix>& matrices);
     void set_visible(u16 id, BOOL visible, BOOL recursive);
@@ -74,6 +128,13 @@ private:
     IRenderVisual* owner_{};
     std::vector<CBoneInstance> instances_;
     std::vector<KinematicsABT::additional_bone_transform> offsets_;
+    MotionPlayback playback_;
+    CPartition partitions_;
+    std::vector<std::unique_ptr<CBlend>> blends_;
+    IBlendDestroyCallback* blend_destroy_{};
+    IUpdateTracksCallback* tracks_update_{};
+    u32 last_motion_frame_{UINT32_MAX};
+    float channel_factors_[4]{1.f, 1.f, 1.f, 1.f};
     u16 root_ = BI_NONE;
     u64 visible_{};
     bool dirty_{true};

@@ -46,6 +46,12 @@ target_sources(xrRenderVK PRIVATE
     SkeletonBones.h
     SkeletonMotions.cpp
     SkeletonMotions.h
+    MotionPlayback.cpp
+    MotionPlayback.h
+    ParticleCatalog.cpp
+    ParticleCatalog.h
+    ParticleVisual.cpp
+    ParticleVisual.h
     VulkanKinematics.cpp
     VulkanKinematics.h
     ScreenCopyPass.cpp

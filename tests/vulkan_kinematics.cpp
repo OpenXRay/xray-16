@@ -14,15 +14,18 @@ static void move_bone(CBoneInstance* instance)
 struct VertexCounter : SEnumVerticesCallback
 {
     int count = 0;
+    float first_x = 0.f;
 
-    void operator()(const Fvector&) override
+    void operator()(const Fvector& position) override
     {
+        if (!count) first_x = position.x;
         ++count;
     }
 };
 
 int main()
 {
+    Core.Initialize("vulkan_kinematics_test", nullptr, false);
     SkeletonBones bones;
     bones.root = 0;
     bones.bones.resize(2);
@@ -40,7 +43,24 @@ int main()
     auto* pose = visual->dcast_PKinematics();
     MotionSlot slot;
     slot.source = "actor.omf";
-    slot.clips.emplace_back().name = "idle";
+    slot.partition_names = {"all"};
+    slot.partitions = {{0, 1}};
+    MotionDefinition idle;
+    idle.name = "idle";
+    idle.bone_or_part = 0;
+    idle.parameters = {1.f, 1.f, 10.f, 10.f};
+    slot.definitions.push_back(idle);
+    auto& clip = slot.clips.emplace_back();
+    clip.name = "idle";
+    clip.frames = 2;
+    clip.bones.resize(2);
+    for (auto& track : clip.bones)
+    {
+        track.flags = 3;
+        track.rotations.push_back({0, 0, 0, 32767});
+        track.translation_size = {0.01f, 0.f, 0.f};
+        track.translations8 = {{{0, 0, 0}}, {{100, 0, 0}}};
+    }
     static_cast<VulkanKinematics*>(pose)->set_motions({ slot });
     ModelGeometry geometry;
     geometry.type = 3;
@@ -72,6 +92,9 @@ int main()
     pose->CalculateBones_Invalidate();
     pose->CalculateBones(TRUE);
     assert(pose->LL_GetTransform_R(1).c.x == 2.f);
+    VertexCounter moved;
+    pose->EnumBoneVertices(moved, 1);
+    assert(moved.count == 3 && moved.first_x == 2.f);
     pose->LL_GetBoneInstance(1).set_callback(0, move_bone, nullptr, TRUE);
     pose->CalculateBones(TRUE);
     assert(pose->LL_GetTransform_R(1).c.x == 2.f);
@@ -96,5 +119,22 @@ int main()
     assert(copied->LL_GetBoneVisible(1) && !pose->LL_GetBoneVisible(1));
     copied->LL_GetBoneInstance(1).mTransform.c.x = 7.f;
     assert(pose->LL_GetBoneInstance(1).mTransform.c.x != 7.f);
+    auto* animated = pose->dcast_PKinematicsAnimated();
+    auto* copied_animated = copied->dcast_PKinematicsAnimated();
+    pose->LL_SetBoneVisible(1, TRUE, FALSE);
+    assert(animated && copied_animated && animated->LL_MotionsSlotCount() == 1);
+    assert(animated->ID_Cycle_Safe("idle").valid());
+    assert(animated->LL_PartID("all") == 0);
+    assert(animated->PlayCycle("idle", FALSE, nullptr, nullptr, 0));
+    assert(copied_animated->PlayCycle("idle", FALSE, nullptr, nullptr, 0));
+    animated->LL_UpdateTracks(1.f / 30.f, true, false);
+    copied_animated->LL_UpdateTracks(0.01f, true, false);
+    pose->CalculateBones(TRUE);
+    copied->CalculateBones(TRUE);
+    assert(pose->LL_GetTransform(1).c.x > copied->LL_GetTransform(1).c.x);
+    assert(animated->LL_PartBlendsCount(0) == 1);
+    animated->LL_CloseCycle(0, 1);
+    animated->LL_UpdateTracks(0.2f, true, false);
+    assert(animated->LL_PartBlendsCount(0) == 0);
     return 0;
 }

@@ -47,6 +47,12 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_slide_windows_test tests/vulkan_slide_windows.cpp)
     xray_add_vulkan_state_test(vulkan_skeleton_bones_test tests/vulkan_skeleton_bones.cpp)
     xray_add_vulkan_state_test(vulkan_skeleton_motions_test tests/vulkan_skeleton_motions.cpp)
+    xray_add_vulkan_state_test(vulkan_motion_playback_test tests/vulkan_motion_playback.cpp)
+    xray_add_vulkan_state_test(vulkan_particle_catalog_test tests/vulkan_particle_catalog.cpp)
+    target_sources(vulkan_particle_catalog_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ParticleCatalog.cpp")
+    target_sources(vulkan_motion_playback_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/MotionPlayback.cpp")
     target_sources(vulkan_skeleton_motions_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/SkeletonMotions.cpp")
     target_sources(vulkan_skeleton_bones_test PRIVATE
@@ -152,6 +158,22 @@ if (XRAY_BUILD_VULKAN_TESTS)
     )
     target_link_libraries(vulkan_kinematics_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_kinematics COMMAND vulkan_kinematics_test)
+
+    add_executable(vulkan_particle_visual_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_particle_visual.cpp"
+    )
+    target_include_directories(vulkan_particle_visual_test PRIVATE
+        "${XRAY_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>
+    )
+    target_compile_definitions(vulkan_particle_visual_test PRIVATE DEBUG)
+    target_compile_options(vulkan_particle_visual_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
+    )
+    target_link_libraries(vulkan_particle_visual_test PRIVATE xrRenderVK xrParticles xrEngine xrScriptEngine xrCDB xrCore)
+    add_test(NAME vulkan_particle_visual COMMAND vulkan_particle_visual_test)
 
     add_executable(vulkan_shader_module_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_shader_module.cpp"

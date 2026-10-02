@@ -178,8 +178,8 @@ bool read_params(LevelBytes bytes, const std::vector<std::string>& bones, Motion
         if (!r.string_z(def.name) || def.name.empty() || !r.u32(def.flags) || !r.u16(def.bone_or_part) || !r.u16(def.motion))
             return false;
         lowercase(def.name);
-        if (def.motion >= count ||
-            (def.bone_or_part != UINT16_MAX && ((def.flags & 1u) ? def.bone_or_part >= bones.size() : def.bone_or_part >= slot.partitions.size())))
+        if (def.bone_or_part != UINT16_MAX &&
+            ((def.flags & 1u) ? def.bone_or_part >= bones.size() : def.bone_or_part >= slot.partitions.size()))
             return false;
         for (auto& param : def.parameters)
             if (!r.f32(param))
@@ -225,6 +225,9 @@ bool read_motions(LevelBytes bytes, const std::vector<uint16_t>& remap, MotionSl
     uint32_t count;
     if (!header.u32(count) || !count || count > max_motions || count != slot.definitions.size())
         return false;
+    for (const auto& definition : slot.definitions)
+        if (definition.motion >= count)
+            return false;
     for (uint32_t m = 0; m < count; ++m)
     {
         LevelBytes data;
@@ -235,8 +238,9 @@ bool read_motions(LevelBytes bytes, const std::vector<uint16_t>& remap, MotionSl
         if (!r.string_z(clip.name) || !r.u32(clip.frames) || !clip.frames || clip.frames > max_frames)
             return false;
         lowercase(clip.name);
-        if (slot.definitions[m].name != clip.name || slot.definitions[m].motion != m)
-            return false;
+        // Definition lookup indices follow the named motion chunks. The
+        // definition's separate motion field selects its playback track.
+        if (slot.definitions[m].name != clip.name) return false;
         clip.bones.resize(remap.size());
         for (uint16_t id : remap)
         {
@@ -328,6 +332,7 @@ bool read_slot(LevelBytes bytes, const std::vector<std::string>& bones, MotionSl
         error = "motion source has invalid partitions, definitions or tracks: " + slot.source;
         return false;
     }
+    slot.raw.assign(bytes.data, bytes.data + bytes.size);
     return true;
 }
 } // namespace

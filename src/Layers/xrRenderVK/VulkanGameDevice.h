@@ -14,6 +14,8 @@
 
 namespace xray::render::vulkan
 {
+class VulkanParticleEffect;
+class VulkanParticleGroup;
 // Owns the Vulkan gameplay frame resources. Destruction waits for submitted
 // work before releasing descriptors, pipelines, images and the device.
 class VulkanGameDevice
@@ -33,6 +35,8 @@ public:
         float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
         bool hud = false, float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f);
+    void queue_particle(IRenderVisual* visual, const float (&mvp)[16],
+        const Fvector& right, const Fvector& up, bool hud, float distance);
     void discard_scene_draws();
     void discard_model_draws(const void* instance);
     void use_scene_visibility(bool enabled) { scene_visibility_ = enabled; }
@@ -84,6 +88,14 @@ private:
         float lod{1.f};
         bool hud{};
     };
+    struct ParticleDraw
+    {
+        IRenderVisual* visual{};
+        std::array<float, 16> mvp{};
+        Fvector right{}, up{};
+        float sort_distance{};
+        bool hud{};
+    };
     VulkanWindowDevice window_;
     FrameDispatch frame_dispatch_{};
     TextureUploadDispatch texture_dispatch_{};
@@ -97,6 +109,7 @@ private:
     bool ui_recorded_{true};
     std::string ui_error_;
     std::vector<ModelDraw> model_draws_;
+    std::vector<ParticleDraw> particle_draws_;
     std::vector<LevelDraw> level_draws_;
     const GpuLevel* current_level_{};
     bool scene_visibility_{};
