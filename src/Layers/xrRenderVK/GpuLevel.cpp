@@ -141,7 +141,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
         const char* fragment = transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
-        const bool named = pass.has_game_pipeline(vertex, fragment);
+        std::string shader_error;
+        const bool named = pass.require_game_pipeline(vertex, fragment, mesh.mode, false, false, shader_error);
+        if (!named) { Msg("! Vulkan level: %s", shader_error.c_str()); return false; }
         if (phase == GeometryPhase::Transparent ? transparent : !transparent)
             return transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr) :
@@ -164,7 +166,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
         const char* fragment = transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
-        const bool named = pass.has_game_pipeline(vertex, fragment);
+        std::string shader_error;
+        const bool named = pass.require_game_pipeline(vertex, fragment, mesh.mode, false, false, shader_error);
+        if (!named) { Msg("! Vulkan level: %s", shader_error.c_str()); return false; }
         if (selected && !(transparent ?
                 pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, window.offset,

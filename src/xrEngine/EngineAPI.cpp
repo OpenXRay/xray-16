@@ -7,6 +7,7 @@
 
 #include "EngineAPI.h"
 #include "XR_IOConsole.h"
+#include "AndroidRendererChoice.h"
 
 #include "xrCore/xr_token.h"
 
@@ -52,8 +53,17 @@ void CEngineAPI::SelectRenderer()
 {
     ZoneScoped;
 
+#if defined(XR_PLATFORM_ANDROID)
+    // A rejected console token must not silently leave the previous GLES mode selected.
+    const bool explicit_vulkan = strstr(Core.Params, "-renderer-vulkan") != nullptr;
+#endif
+
     // User has some renderer selected, find it
     pcstr selected_mode = Console->GetString("renderer");
+#if defined(XR_PLATFORM_ANDROID)
+    R_ASSERT2(!explicit_vulkan || xr_strcmp(selected_mode, "renderer_vulkan") == 0,
+        "Explicit Vulkan selection was rejected by the renderer console command");
+#endif
     const auto it = std::find_if(renderModes.begin(), renderModes.end(), [selected_mode](const auto& pair)
     {
         return xr_strcmp(selected_mode, pair.first) == 0;

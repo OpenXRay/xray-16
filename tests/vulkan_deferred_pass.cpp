@@ -339,6 +339,15 @@ int main()
     assert(deferred.create_game_pipeline("vk\\skinned_4.vs", "vk\\object_opaque.ps",
         handle<VkShaderModule>(54), handle<VkShaderModule>(55), SurfaceMode::Opaque, false, error, true));
     assert(deferred.has_game_pipeline("vk\\object_blended.vs", "vk\\object_blended.ps"));
+    assert(deferred.require_game_pipeline("vk\\level_opaque.vs", "vk\\level_opaque.ps",
+        SurfaceMode::Opaque, false, false, error));
+    assert(!deferred.require_game_pipeline("missing.vs", "missing.ps",
+        SurfaceMode::Opaque, false, false, error) && error.find("unknown") != std::string::npos);
+    assert(!deferred.require_game_pipeline("vk\\level_opaque.vs", "vk\\level_opaque.ps",
+        SurfaceMode::AlphaTest, false, false, error) && error.find("parameters") != std::string::npos);
+    assert(!deferred.create_game_pipeline("wrong.ps", "wrong.vs",
+        handle<VkShaderModule>(60), handle<VkShaderModule>(61), SurfaceMode::Opaque, false, error) &&
+        error.find("stages") != std::string::npos);
     VkDescriptorSet material{};
     const auto albedo = handle<VkImageView>(50);
     const auto sampler = handle<VkSampler>(51);

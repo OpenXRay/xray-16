@@ -236,10 +236,10 @@ Runtime data uses the normal desktop paths:
 
 ## Renderer status
 
-Gameplay currently uses OpenGL ES. `Auto` and `OpenGL ES` select the same GLES
-backend. Vulkan has a separate engine module, but its gameplay implementation
-is incomplete. The launcher blocks Vulkan game launches, and an explicit native
-`renderer_vulkan` request fails with an error instead of falling back to GLES. See
+The launcher can request the separate Vulkan gameplay module. `Auto` selects it
+only when the Vulkan probe and required game shaders pass, then selects GLES
+otherwise. Explicit Vulkan requests fail if those requirements are missing.
+Android hardware and representative gameplay have not yet been validated. See
 [VULKAN_RENDERER_PLAN.md](VULKAN_RENDERER_PLAN.md) for the implemented Vulkan
 pieces and remaining work.
 

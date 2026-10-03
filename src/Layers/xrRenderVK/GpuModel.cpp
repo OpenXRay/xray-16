@@ -246,7 +246,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         // The geometry was CPU-skinned into LevelVertex for this frame. The
         // Vulkan game pair therefore receives exactly the same input layout
         // as static meshes; pose-buffer variants use a separate GPU layout.
-        const bool named = pass.has_game_pipeline(vertex, fragment);
+        const bool named = pass.require_game_pipeline(vertex, fragment, mesh.geometry.mode, false, false, error);
+        if (!named) return false;
         std::vector<LevelVertex> vertices;
         if (skinned)
         {

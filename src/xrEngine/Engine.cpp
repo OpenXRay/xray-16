@@ -9,6 +9,7 @@
 #include "xr_ioc_cmd.h"
 #if defined(XR_PLATFORM_ANDROID)
 #include "Include/xrRender/xrRender.h"
+#include "AndroidRendererChoice.h"
 #endif
 
 struct SoundProcessor final : public pureFrame
@@ -41,12 +42,14 @@ void CheckAndSetupRenderer()
     }
 
 #if defined(XR_PLATFORM_ANDROID)
-    if (strstr(Core.Params, "-renderer-vulkan"))
+    const bool wants_vulkan = strstr(Core.Params, "-renderer-vulkan") || strstr(Core.Params, "-renderer-auto");
+    const auto choice = xray::render::choose_android_renderer(Core.Params,
+        wants_vulkan && xray::render::vulkan::GetRendererModule()->CheckGameRequirements());
+    R_ASSERT2(choice != xray::render::AndroidRendererChoice::VulkanUnavailable,
+        "Explicit Vulkan renderer unavailable: inspect the Vulkan probe and shader resource diagnostics");
+    if (choice == xray::render::AndroidRendererChoice::Vulkan)
         Console->Execute("renderer renderer_vulkan");
-    else if (strstr(Core.Params, "-renderer-auto"))
-        Console->Execute(xray::render::vulkan::GetRendererModule()->CheckGameRequirements() ?
-            "renderer renderer_vulkan" : "renderer renderer_gles");
-    else if (strstr(Core.Params, "-renderer-gles"))
+    else if (choice == xray::render::AndroidRendererChoice::GLES)
         Console->Execute("renderer renderer_gles");
     else
 #endif

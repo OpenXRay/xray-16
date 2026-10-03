@@ -74,6 +74,8 @@ public:
         VkShaderModule vertex, VkShaderModule fragment, SurfaceMode mode, bool hud,
         std::string& error, bool skinned = false);
     bool has_game_pipeline(const std::string& vertex_name, const std::string& fragment_name) const;
+    bool require_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
+        SurfaceMode mode, bool hud, bool skinned, std::string& error) const;
     void begin_game_pipeline_reload();
     void commit_game_pipeline_reload();
     void abort_game_pipeline_reload();

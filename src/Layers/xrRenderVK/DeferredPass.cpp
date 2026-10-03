@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 
 namespace xray::render::vulkan
 {
@@ -359,6 +360,22 @@ bool DeferredPass::has_game_pipeline(const std::string& vertex_name, const std::
     return game_pipeline(vertex_name.c_str(), fragment_name.c_str()) != nullptr;
 }
 
+bool DeferredPass::require_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
+    SurfaceMode mode, bool hud, bool skinned, std::string& error) const
+{
+    const auto* pair = game_pipeline(vertex_name.c_str(), fragment_name.c_str());
+    if (!pair)
+        error = "unknown Vulkan SVS/SPS pair: " + vertex_name + " / " + fragment_name;
+    else if (pair->mode != mode || pair->hud != hud || pair->skinned != skinned)
+        error = "incompatible Vulkan SVS/SPS pass parameters: " + vertex_name + " / " + fragment_name;
+    else
+    {
+        error.clear();
+        return true;
+    }
+    return false;
+}
+
 void DeferredPass::abort_game_pipeline_reload()
 {
     if (device_ && vk_.destroy_pipeline)
@@ -389,6 +406,16 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     VkShaderModule vertex, VkShaderModule fragment, SurfaceMode mode, bool hud, std::string& error,
     bool skinned)
 {
+    const auto has_suffix = [](const std::string& name, const char* suffix)
+    {
+        const size_t length = std::strlen(suffix);
+        return name.size() > length && name.compare(name.size() - length, length, suffix) == 0;
+    };
+    if (!has_suffix(vertex_name, ".vs") || !has_suffix(fragment_name, ".ps"))
+    {
+        error = "invalid Vulkan SVS/SPS shader stages: " + vertex_name + " / " + fragment_name;
+        return false;
+    }
     if (!device_ || vertex_name.empty() || fragment_name.empty() || !vertex || !fragment ||
         (hud && mode == SurfaceMode::AlphaTest))
     {

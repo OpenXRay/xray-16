@@ -959,11 +959,6 @@ public final class LauncherActivity extends Activity {
 
     private void launchEngine(boolean rendererSmoke, boolean vulkanRendererSmoke) {
         ++stopGeneration; // Cancel pending retries before any new launch or reattach.
-        if (!rendererSmoke && rendererMode.getSelectedItemPosition() == RENDERER_VULKAN) {
-            setStatus("Игровой Vulkan ещё не готов. Выберите OpenGL ES или запустите проверку Vulkan.");
-            showPage(PAGE_SETTINGS);
-            return;
-        }
         if (!rendererSmoke && isEngineProcessRunning()) {
             setStatus("Возвращаю уже запущенный движок на экран…");
             Intent resume = new Intent(this, XRayActivity.class);

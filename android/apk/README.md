@@ -46,9 +46,12 @@ textures or shader sources.
 
 ## Renderer choices
 
-- **Auto** and **OpenGL ES** both run the GLES gameplay backend.
-- **Vulkan** runs the Vulkan surface/device/swapchain/render-pass probe, then
-  deliberately starts gameplay with GLES. It is not a Vulkan gameplay backend.
+- **Auto** probes Vulkan gameplay requirements and selects Vulkan when they pass;
+  otherwise it selects OpenGL ES.
+- **OpenGL ES** explicitly selects the GLES gameplay backend.
+- **Vulkan** explicitly selects the separate Vulkan gameplay module. An
+  unavailable Vulkan device or missing shader asset produces a launch error.
+  Game compatibility and Android hardware behavior still need validation.
 - **GLES smoke test** creates the real SDL/EGL context, compiles a minimal GLES
   shader and verifies pixel readback without loading game data.
 - **Vulkan smoke test** draws a triangle through a Vulkan graphics pipeline,
