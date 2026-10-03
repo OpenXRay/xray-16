@@ -99,7 +99,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     }
     else
     {
-        const bool skinned = pipeline_count == 8;
+        const bool skinned = pipeline_count == 8 || (pipeline_count >= 13 && pipeline_count <= 16);
         assert(info->pVertexInputState->vertexAttributeDescriptionCount == (skinned ? 5u : 3u));
         if (skinned)
         {
@@ -109,8 +109,14 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         }
         assert(info->pStages[0].module == handle<VkShaderModule>(50 + 2 * (pipeline_count - 6)));
         assert(info->pStages[1].module == handle<VkShaderModule>(51 + 2 * (pipeline_count - 6)));
-        assert(info->renderPass == handle<VkRenderPass>(pipeline_count == 7 ? 11 : 10));
-        assert(info->pColorBlendState->pAttachments[0].blendEnable == (pipeline_count == 7 ? VK_TRUE : VK_FALSE));
+        const bool present = pipeline_count == 7 || pipeline_count == 16;
+        assert(info->renderPass == handle<VkRenderPass>(present ? 11 : 10));
+        assert(info->pColorBlendState->pAttachments[0].blendEnable == (present ? VK_TRUE : VK_FALSE));
+        assert(info->pRasterizationState->cullMode == VK_CULL_MODE_NONE);
+        if (pipeline_count == 11 || pipeline_count == 12 || (pipeline_count >= 13 && pipeline_count <= 15))
+            assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
+        if (pipeline_count == 16)
+            assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
     }
     *output = handle<VkPipeline>(100 + pipeline_count++);
     return VK_SUCCESS;
@@ -406,4 +412,20 @@ int main()
     assert(deferred.has_game_pipeline("vk\\level_opaque.vs", "vk\\level_opaque.ps"));
     assert(!deferred.has_game_pipeline("vk\\object_blended.vs", "vk\\object_blended.ps"));
     assert(pipeline_destroys == 4);
+    assert(deferred.create_game_pipeline("vk\\object_cutout.vs", "vk\\object_cutout.ps",
+        handle<VkShaderModule>(60), handle<VkShaderModule>(61), SurfaceMode::AlphaTest, false, error));
+    assert(deferred.create_game_pipeline("vk\\object_double_sided.vs", "vk\\object_double_sided.ps",
+        handle<VkShaderModule>(62), handle<VkShaderModule>(63), SurfaceMode::Opaque, false, error));
+    for (unsigned weights = 1; weights <= 3; ++weights)
+    {
+        const auto vertex = "vk\\skinned_" + std::to_string(weights) + ".vs";
+        assert(deferred.create_game_pipeline(vertex, "vk\\object_opaque.ps",
+            handle<VkShaderModule>(64 + 2 * (weights - 1)),
+            handle<VkShaderModule>(65 + 2 * (weights - 1)),
+            SurfaceMode::Opaque, false, error, true));
+        assert(deferred.has_game_pipeline(vertex, "vk\\object_opaque.ps"));
+    }
+    assert(deferred.create_game_pipeline("vk\\hud_skinned_4.vs", "vk\\object_blended.ps",
+        handle<VkShaderModule>(70), handle<VkShaderModule>(71),
+        SurfaceMode::Opaque, true, error, true));
 }
