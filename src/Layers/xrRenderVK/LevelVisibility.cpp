@@ -2,6 +2,7 @@
 #include "xrCDB/Frustum.h"
 
 #include <cmath>
+#include <algorithm>
 
 namespace xray::render::vulkan
 {
@@ -35,6 +36,7 @@ bool select_visible_sector_roots(const std::vector<LevelSector>& sectors,
     }
 
     std::vector<uint32_t> pending{static_cast<uint32_t>(camera_sector)};
+    std::vector<uint32_t> selected;
     std::vector<uint8_t> visited_sectors(sectors.size(), 0);
     std::vector<uint8_t> processed_portals(portals.size(), 0);
     std::vector<uint8_t> added_roots(visual_count, 0);
@@ -49,7 +51,7 @@ bool select_visible_sector_roots(const std::vector<LevelSector>& sectors,
             return false;
         if (!added_roots[sector.root])
         {
-            roots.push_back(sector.root);
+            selected.push_back(sector.root);
             added_roots[sector.root] = 1;
         }
 
@@ -94,6 +96,24 @@ bool select_visible_sector_roots(const std::vector<LevelSector>& sectors,
             }
         }
     }
+    roots = std::move(selected);
     return !roots.empty();
+}
+
+void append_unsectored_level_roots(const std::vector<uint32_t>& level_roots,
+    const std::vector<LevelSector>& sectors, size_t visual_count,
+    std::vector<uint32_t>& visible_roots)
+{
+    std::vector<uint8_t> sector_owned(visual_count, 0), added(visual_count, 0);
+    for (const LevelSector& sector : sectors)
+        if (sector.root < visual_count) sector_owned[sector.root] = 1;
+    for (uint32_t root : visible_roots)
+        if (root < visual_count) added[root] = 1;
+    for (uint32_t root : level_roots)
+        if (root < visual_count && !sector_owned[root] && !added[root])
+        {
+            visible_roots.push_back(root);
+            added[root] = 1;
+        }
 }
 }

@@ -3,6 +3,7 @@
 #include "LevelVisibility.h"
 #include "VulkanVisual.h"
 #include "SpecialVisuals.h"
+#include "SlidingWindows.h"
 #include "xrEngine/device.h"
 
 #include <algorithm>
@@ -184,7 +185,15 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                     named ? vertex : nullptr, named ? fragment : nullptr))) return false;
     }
     for (uint32_t child : visual.children)
-        if (!record_visual(child, frame, pass, mvp, phase, lod)) return false;
+    {
+        if (child >= visuals_.size()) return false;
+        const auto& bounds = visuals_[child].bounds;
+        const float dx = bounds[6] - Device.vCameraPosition.x;
+        const float dy = bounds[7] - Device.vCameraPosition.y;
+        const float dz = bounds[8] - Device.vCameraPosition.z;
+        const float child_lod = lod_for_distance(bounds[9], dx * dx + dy * dy + dz * dz);
+        if (!record_visual(child, frame, pass, mvp, phase, child_lod)) return false;
+    }
     return true;
 }
 
@@ -239,8 +248,11 @@ const LevelVisual* GpuLevel::visual_node(size_t index) const
 bool GpuLevel::visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
     const Fvector& camera_position, std::vector<uint32_t>& roots) const
 {
-    return select_visible_sector_roots(sectors_, portals_, visuals_.size(),
-        camera_sector, view_projection, camera_position, roots);
+    if (!select_visible_sector_roots(sectors_, portals_, visuals_.size(),
+            camera_sector, view_projection, camera_position, roots))
+        return false;
+    append_unsectored_level_roots(roots_, sectors_, visuals_.size(), roots);
+    return true;
 }
 
 void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const

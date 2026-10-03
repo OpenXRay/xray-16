@@ -356,6 +356,9 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         }
         return true;
     }
+    // Types 8/9 are runtime particle effects/groups loaded from particles.xr,
+    // never level.geom containers. Type 12 is the DX11-only volume in
+    // level.fog_vol; the GLES model pool cannot instantiate it from OGF.
     if (type != 0 && type != 2 && type != 7 && type != 11) return false;
     if (material >= material_count) return false;
     LevelBytes container, unused;

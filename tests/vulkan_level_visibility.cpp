@@ -38,6 +38,16 @@ int main()
     assert(select_visible_sector_roots(sectors, portals, 3, 0,
         view_projection, camera, roots));
     assert((roots == std::vector<uint32_t>{0, 1}));
+    append_unsectored_level_roots({0, 1, 2, 3, 3}, sectors, 4, roots);
+    assert((roots == std::vector<uint32_t>{0, 1, 3}));
+
+    // A malformed portal reached after some valid sectors must not expose a
+    // partial visibility set as a successful result.
+    auto broken = portals;
+    broken[1].sector_back = 99;
+    assert(!select_visible_sector_roots(sectors, broken, 3, 1,
+        view_projection, camera, roots));
+    assert(roots.empty());
 
     // Any invalid visibility input asks the caller to fail open, and leaves
     // the output clear so stale roots cannot be reused.

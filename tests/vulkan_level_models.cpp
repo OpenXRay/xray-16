@@ -287,6 +287,14 @@ int main()
     // A failed replacement preserved the previous hierarchy. A subsequent
     // successful level replacement and an unload/reload must both rebuild IDs.
     assert(result.visuals.size() == 2 && result.visuals[0].children[0] == 1);
+    for (uint8_t independent_type : {uint8_t(8), uint8_t(9), uint8_t(12)})
+    {
+        header[1] = independent_type;
+        visual.clear(); visuals.clear();
+        part(visual, 1, header); part(visual, 21, container); part(visuals, 0, visual);
+        assert(!load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
+        assert(result.visuals.size() == 2);
+    }
     header[1] = 0;
     visual.clear(); visuals.clear();
     part(visual, 1, header); part(visual, 21, container); part(visuals, 0, visual);
