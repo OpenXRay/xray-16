@@ -37,7 +37,9 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                                                                             : "object_opaque";
         const std::string shader = std::string("vk\\") + family;
         const std::string vertex = animated ? "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs" : shader + ".vs";
-        if (!pass.request_game_pipeline(vertex, shader + ".ps", mesh.geometry.mode, false, animated, error))
+        const std::string fragment = animated && mesh.geometry.mode == SurfaceMode::Transparent ?
+            "vk\\skinned_blended.ps" : shader + ".ps";
+        if (!pass.request_game_pipeline(vertex, fragment, mesh.geometry.mode, false, animated, error))
         {
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
             return false;
@@ -49,7 +51,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         if (animated && mesh.geometry.skin_weights >= 1 && mesh.geometry.skin_weights <= 4)
         {
             const std::string vertex = "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs";
-            mesh.gpu_skinning = pass.has_game_pipeline(vertex, "vk\\object_opaque.ps");
+            mesh.gpu_skinning = pass.has_game_pipeline(vertex, fragment);
             for (const ModelVertex& vertex : mesh.geometry.vertices)
                 for (unsigned i = 0; i < mesh.geometry.skin_weights; ++i)
                     if (vertex.weights[i] > 0)
@@ -203,7 +205,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             if (!pose_buffer.write(0, pose, pose_bytes, error)) return false;
             const std::string vertex_name = hud ? "vk\\hud_skinned_4.vs" :
                 "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs";
-            const char* fragment_name = hud || transparent ? "vk\\object_blended.ps" :
+            const char* fragment_name = hud ? "vk\\hud_blended.ps" :
+                transparent ? "vk\\skinned_blended.ps" :
                 mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" : "vk\\object_opaque.ps";
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, descriptor,

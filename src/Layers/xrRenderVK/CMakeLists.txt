@@ -20,6 +20,7 @@ target_sources(xrRenderVK PRIVATE
     DeferredPass.h
     DeferredFrame.cpp
     DeferredFrame.h
+    ForwardLighting.h
     DeferredAlphaTestShaders.h
     VulkanGameShaders.h
     DeferredShaderFactory.cpp

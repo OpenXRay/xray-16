@@ -14,6 +14,8 @@
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_cutout.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_ALPHA_TEST=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_blended.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_SKINNED=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/hud_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_double_sided.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_double_sided.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_DOUBLE_SIDED=1"] },
     { "source": "skinned.vs", "stage": "vs", "output": "vk/skinned_1.vs.spv", "define": ["SKIN_WEIGHTS=1"] },

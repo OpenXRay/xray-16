@@ -40,7 +40,8 @@ class GameShaderVariantsTest(unittest.TestCase):
             "vk/level_opaque.vs.spv", "vk/level_opaque.ps.spv",
             "vk/object_opaque.vs.spv", "vk/object_opaque.ps.spv",
             "vk/level_cutout.ps.spv", "vk/object_cutout.ps.spv",
-            "vk/object_blended.ps.spv", "vk/object_double_sided.ps.spv",
+            "vk/object_blended.ps.spv", "vk/skinned_blended.ps.spv",
+            "vk/hud_blended.ps.spv", "vk/object_double_sided.ps.spv",
             *{f"vk/skinned_{n}.vs.spv" for n in range(1, 5)},
             "vk/hud_skinned_4.vs.spv", "vk/tree_opaque.vs.spv",
             "vk/progressive_opaque.vs.spv",
@@ -66,7 +67,7 @@ class GameShaderVariantsTest(unittest.TestCase):
                         self.assertEqual(output_locations, {0})
                     else:
                         self.assertEqual(output_locations, {0, 1})
-                if "skinned" in name:
+                if "skinned" in name and name.endswith(".vs.spv"):
                     self.assertTrue({0, 1, 2, 3, 4} <= locations)
                     self.assertIn(0, bindings.values())
                     self.assertIn(1, {value for (identifier, kind), value in decorations.items()
@@ -78,6 +79,17 @@ class GameShaderVariantsTest(unittest.TestCase):
             self.assertIn(252, opcodes)  # OpKill
         blended = {op for op, _ in instructions(SHADERS / "vk/object_blended.ps.spv")}
         self.assertNotIn(252, blended)
+
+    def test_forward_transparent_layouts(self):
+        for name, expected_set in (("object_blended", 1), ("skinned_blended", 2)):
+            code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
+            sets = {args[2] for op, args in code if op == 71 and len(args) >= 3 and args[1] == 34}
+            self.assertIn(expected_set, sets)
+            offsets = {args[3] for op, args in code if op == 72 and len(args) >= 4 and args[2] == 35}
+            self.assertTrue({0, 64, 80, 96, 112} <= offsets)
+        hud = list(instructions(SHADERS / "vk/hud_blended.ps.spv"))
+        self.assertFalse(any(op == 71 and len(args) >= 3 and args[1] == 34 and args[2] != 0
+                             for op, args in hud))
 
     def test_apk_contains_every_game_pipeline_asset(self):
         variants = json.loads(MANIFEST.read_text())["variants"]

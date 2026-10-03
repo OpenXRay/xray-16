@@ -99,7 +99,7 @@ bool DeferredShaderFactory::reload_game_pipelines(VkDevice device, const ShaderM
     constexpr SkinnedFragment skinned_fragments[]{
         {"object_opaque", SurfaceMode::Opaque},
         {"object_cutout", SurfaceMode::AlphaTest},
-        {"object_blended", SurfaceMode::Transparent}
+        {"skinned_blended", SurfaceMode::Transparent}
     };
     for (unsigned weights = 1; weights <= 4; ++weights)
     {
@@ -114,7 +114,7 @@ bool DeferredShaderFactory::reload_game_pipelines(VkDevice device, const ShaderM
             }
         }
     }
-    if (!resources.pipeline(pass, "vk\\hud_skinned_4.vs", "vk\\object_blended.ps", SurfaceMode::Opaque, true, true, error))
+    if (!resources.pipeline(pass, "vk\\hud_skinned_4.vs", "vk\\hud_blended.ps", SurfaceMode::Opaque, true, true, error))
     {
         pass.abort_game_pipeline_reload();
         return false;

@@ -3,6 +3,7 @@
 #include "FrameContext.h"
 #include "LevelModels.h"
 #include "ScenePass.h"
+#include "ForwardLighting.h"
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -121,6 +122,8 @@ public:
         VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
+    bool forward_set(uint32_t image, VkBuffer buffer, std::string& error);
+    void release_forward_sets();
     void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass,
         VkRenderPass shadow_pass = VK_NULL_HANDLE, VkRenderPass local_shadow_pass = VK_NULL_HANDLE)
     {
@@ -169,8 +172,9 @@ private:
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;
     bool reloading_game_pipelines_{};
     VkPipelineLayout geometry_layout_{}, skinned_layout_{}, light_layout_{}, weather_layout_{}, local_light_layout_{}, water_layout_{};
-    VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{}, local_set_layout_{}, water_set_layout_{};
+    VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{}, local_set_layout_{}, water_set_layout_{}, forward_layout_{};
     std::vector<VkDescriptorSet> water_sets_;
+    std::vector<VkDescriptorSet> forward_sets_;
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
     GamePipelineRequest game_pipeline_request_;

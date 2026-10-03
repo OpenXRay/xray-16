@@ -33,7 +33,7 @@ float expected_mvp[16]{};
 VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkPipelineLayout* output)
 {
-    assert(info->setLayoutCount == 1 || info->setLayoutCount == 2);
+    assert(info->setLayoutCount >= 1 && info->setLayoutCount <= 3);
     if (!info->pushConstantRangeCount)
     {
         assert(info->setLayoutCount == 2);
@@ -53,7 +53,7 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     if (range.stageFlags == VK_SHADER_STAGE_VERTEX_BIT)
     {
         assert(range.size == sizeof(expected_mvp));
-        *output = info->setLayoutCount == 2 ?
+        *output = info->setLayoutCount == 3 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
     }
@@ -181,7 +181,8 @@ VkResult VKAPI_PTR create_descriptor_layout(VkDevice, const VkDescriptorSetLayou
 {
     assert(info->bindingCount >= 1 && info->bindingCount <= 5);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
-        info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
+        info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
+        info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     if (info->bindingCount >= 2)
         assert(info->pBindings[1].binding == 1);
     if (info->bindingCount == 5)
@@ -222,6 +223,12 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     if (writes[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER)
     {
         assert(count == 1 && writes[0].pBufferInfo->buffer == handle<VkBuffer>(23));
+        return;
+    }
+    if (writes[0].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+    {
+        assert(count == 1 && writes[0].pBufferInfo->buffer == handle<VkBuffer>(24) &&
+            writes[0].pBufferInfo->range == sizeof(ForwardLightUniform));
         return;
     }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
@@ -406,6 +413,7 @@ int main()
     assert(draw_count == 4);
     FrameRecordingContext hud_frame{handle<VkCommandBuffer>(17),
         handle<VkRenderPass>(11), handle<VkFramebuffer>(18), {640, 480}, 0, 0};
+    assert(deferred.forward_set(0, handle<VkBuffer>(24), error));
     assert(!deferred.record_transparent(geometry_frame, handle<VkBuffer>(20),
         handle<VkBuffer>(21), 6, expected_mvp, material, 3));
     assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20),
@@ -430,7 +438,8 @@ int main()
     deferred.release_gbuffer(weather_set);
     deferred.release_gbuffer(material);
     deferred.release_pose_descriptor(pose);
-    assert(material == VK_NULL_HANDLE && pose == VK_NULL_HANDLE && descriptor_frees == 4);
+    deferred.release_forward_sets();
+    assert(material == VK_NULL_HANDLE && pose == VK_NULL_HANDLE && descriptor_frees == 5);
     deferred.begin_game_pipeline_reload();
     assert(deferred.create_game_pipeline("vk\\level_opaque.vs", "vk\\level_opaque.ps",
         handle<VkShaderModule>(56), handle<VkShaderModule>(57), SurfaceMode::Opaque, false, error));

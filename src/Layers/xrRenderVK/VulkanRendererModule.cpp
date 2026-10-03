@@ -55,7 +55,7 @@ public:
             "vk\\object_opaque.vs", "vk\\object_opaque.ps",
             "vk\\level_cutout.vs", "vk\\level_cutout.ps",
             "vk\\object_cutout.vs", "vk\\object_cutout.ps",
-            "vk\\object_blended.vs", "vk\\object_blended.ps",
+            "vk\\object_blended.vs", "vk\\object_blended.ps", "vk\\skinned_blended.ps", "vk\\hud_blended.ps",
             "vk\\object_double_sided.vs", "vk\\object_double_sided.ps",
             "vk\\tree_opaque.vs", "vk\\progressive_opaque.vs",
             "vk\\skinned_1.vs", "vk\\skinned_2.vs",

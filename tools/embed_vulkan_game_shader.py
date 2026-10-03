@@ -8,7 +8,7 @@ import struct
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = (("level_cutout.ps.spv", "CutoutFragment"),
-           ("object_blended.ps.spv", "TransparentFragment"))
+           ("hud_blended.ps.spv", "TransparentFragment"))
 HEADER = ROOT / "src/Layers/xrRenderVK/VulkanGameShaders.h"
 
 

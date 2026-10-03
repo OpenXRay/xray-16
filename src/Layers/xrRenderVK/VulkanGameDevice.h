@@ -117,6 +117,8 @@ private:
     static void record_postprocess(const FrameRecordingContext& frame, void* user);
     bool create_postprocess(std::string& error);
     bool refresh_color_maps(std::string& error);
+    bool create_forward_targets(std::string& error);
+    void release_forward_targets();
     struct LevelDraw
     {
         uint32_t index{};
@@ -155,6 +157,8 @@ private:
     std::vector<std::array<VkDescriptorSet, LocalLightCapacity>> local_sets_;
     std::vector<VulkanLightSnapshot> light_snapshots_;
     std::vector<LocalLightUniform> local_uniforms_;
+    std::vector<BufferResource> forward_buffers_;
+    ForwardLightUniform forward_lighting_{};
     bool local_lights_recorded_{true};
     DeferredPass deferred_;
     GameShaderResources shader_resources_;

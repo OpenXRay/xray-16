@@ -247,6 +247,8 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     const VkDescriptorSetLayoutBinding pose_binding{
         0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
+    const VkDescriptorSetLayoutBinding forward_binding{
+        0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr};
     const VkDescriptorSetLayoutBinding local_bindings[]{
         {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
@@ -281,6 +283,10 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     descriptor.bindingCount = 4;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &water_set_layout_) != VK_SUCCESS)
         goto failed;
+    descriptor.pBindings = &forward_binding;
+    descriptor.bindingCount = 1;
+    if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &forward_layout_) != VK_SUCCESS)
+        goto failed;
     {
         const VkDescriptorPoolSize sizes[]{
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4096},
@@ -298,13 +304,15 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         const VkPushConstantRange camera{VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float) * 16};
         const VkPushConstantRange light{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(DeferredLight)};
         VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
-        layout.setLayoutCount = layout.pushConstantRangeCount = 1;
-        layout.pSetLayouts = &material_layout_;
+        layout.pushConstantRangeCount = 1;
+        const VkDescriptorSetLayout forward_sets[]{material_layout_, forward_layout_};
+        layout.setLayoutCount = 2;
+        layout.pSetLayouts = forward_sets;
         layout.pPushConstantRanges = &camera;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &geometry_layout_) != VK_SUCCESS)
             goto failed;
-        const VkDescriptorSetLayout skinned_sets[]{material_layout_, pose_layout_};
-        layout.setLayoutCount = 2;
+        const VkDescriptorSetLayout skinned_sets[]{material_layout_, pose_layout_, forward_layout_};
+        layout.setLayoutCount = 3;
         layout.pSetLayouts = skinned_sets;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &skinned_layout_) != VK_SUCCESS)
             goto failed;
@@ -582,6 +590,12 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
         skinned_layout_, 0, 2, sets, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (mode == SurfaceMode::Transparent && !hud)
+    {
+        if (frame.image_index >= forward_sets_.size() || !forward_sets_[frame.image_index]) return false;
+        vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            skinned_layout_, 2, 1, &forward_sets_[frame.image_index], 0, nullptr);
+    }
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -739,6 +753,37 @@ void DeferredPass::release_water_sets()
     water_sets_.clear();
 }
 
+bool DeferredPass::forward_set(uint32_t image, VkBuffer buffer, std::string& error)
+{
+    if (!pool_ || !forward_layout_ || !buffer || image >= 16)
+    { error = "invalid forward light uniform"; return false; }
+    if (forward_sets_.size() <= image) forward_sets_.resize(image + 1);
+    release_gbuffer(forward_sets_[image]);
+    VkDescriptorSetAllocateInfo allocation{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    allocation.descriptorPool = pool_;
+    allocation.descriptorSetCount = 1;
+    allocation.pSetLayouts = &forward_layout_;
+    VkDescriptorSet& set = forward_sets_[image];
+    if (vk_.allocate_descriptor_sets(device_, &allocation, &set) != VK_SUCCESS)
+    { error = "forward light descriptor pool exhausted"; return false; }
+    const VkDescriptorBufferInfo info{buffer, 0, sizeof(ForwardLightUniform)};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = set;
+    write.dstBinding = 0;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    write.descriptorCount = 1;
+    write.pBufferInfo = &info;
+    vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+    error.clear();
+    return true;
+}
+
+void DeferredPass::release_forward_sets()
+{
+    for (auto& set : forward_sets_) release_gbuffer(set);
+    forward_sets_.clear();
+}
+
 bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
     VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
@@ -856,6 +901,12 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (vertex_name || fragment_name)
+    {
+        if (frame.image_index >= forward_sets_.size() || !forward_sets_[frame.image_index]) return false;
+        vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            geometry_layout_, 1, 1, &forward_sets_[frame.image_index], 0, nullptr);
+    }
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -956,6 +1007,7 @@ bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer ver
 void DeferredPass::destroy()
 {
     game_pipeline_request_ = {};
+    release_forward_sets();
     release_water_sets();
     abort_game_pipeline_reload();
     if (device_ && vk_.destroy_pipeline)
@@ -993,6 +1045,7 @@ void DeferredPass::destroy()
         if (weather_set_layout_) vk_.destroy_descriptor_set_layout(device_, weather_set_layout_, nullptr);
         if (local_set_layout_) vk_.destroy_descriptor_set_layout(device_, local_set_layout_, nullptr);
         if (water_set_layout_) vk_.destroy_descriptor_set_layout(device_, water_set_layout_, nullptr);
+        if (forward_layout_) vk_.destroy_descriptor_set_layout(device_, forward_layout_, nullptr);
     }
     device_ = VK_NULL_HANDLE;
     geometry_pass_ = light_pass_ = shadow_pass_ = local_shadow_pass_ = VK_NULL_HANDLE;
@@ -1006,6 +1059,7 @@ void DeferredPass::destroy()
     material_layout_ = pose_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
     local_set_layout_ = VK_NULL_HANDLE;
     water_set_layout_ = VK_NULL_HANDLE;
+    forward_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     vk_ = {};
 }

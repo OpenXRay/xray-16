@@ -120,6 +120,7 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
             !targets_.bind_lighting(deferred_, error))
             goto failed;
         targets_.bind_sun_shadow(deferred_, sun_shadows_);
+        if (!create_forward_targets(error)) goto failed;
         ShaderModule scene_vertex, scene_fragment, ui_vertex, ui_fragment;
         if (!scene_vertex.initialize(device, shaders, scene_shaders::SceneVertex, sizeof(scene_shaders::SceneVertex), error) ||
             !scene_fragment.initialize(device, shaders, scene_shaders::SceneFragment, sizeof(scene_shaders::SceneFragment), error) ||
@@ -168,6 +169,27 @@ void VulkanGameDevice::record_ui(const FrameRecordingContext &frame, void *user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
+}
+
+bool VulkanGameDevice::create_forward_targets(std::string& error)
+{
+    release_forward_targets();
+    const auto& frame = window_.frame();
+    forward_buffers_.resize(frame.image_count());
+    for (uint32_t i = 0; i < frame.image_count(); ++i)
+        if (!forward_buffers_[i].initialize(window_.device(), sizeof(ForwardLightUniform),
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                window_.physical().memory, buffer_upload_.buffer, error) ||
+            !deferred_.forward_set(i, forward_buffers_[i].handle(), error))
+        { release_forward_targets(); return false; }
+    return true;
+}
+
+void VulkanGameDevice::release_forward_targets()
+{
+    deferred_.release_forward_sets();
+    forward_buffers_.clear();
 }
 
 bool VulkanGameDevice::create_postprocess(std::string& error)
@@ -339,6 +361,10 @@ void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, 
 void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
+    if (frame.image_index >= owner.forward_buffers_.size() ||
+        !owner.forward_buffers_[frame.image_index].write(0, &owner.forward_lighting_,
+            sizeof(owner.forward_lighting_), owner.model_error_))
+    { owner.models_recorded_ = false; return; }
     struct DrawRef
     {
         float distance{};
@@ -655,6 +681,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         std::memcpy(sun_uniform.inverse_view_projection, &inverse, sizeof(inverse));
         std::memcpy(water_uniform.view_projection, &camera, sizeof(camera));
         std::memcpy(water_uniform.inverse_view_projection, &inverse, sizeof(inverse));
+        std::memcpy(forward_lighting_.inverse_view_projection, &inverse, sizeof(inverse));
         water_uniform.camera_position[0] = Device.vCameraPosition.x;
         water_uniform.camera_position[1] = Device.vCameraPosition.y;
         water_uniform.camera_position[2] = Device.vCameraPosition.z;
@@ -755,6 +782,19 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             local_uniforms_.push_back(local);
         }
     }
+    std::copy_n(light.direction_ambient, 4, forward_lighting_.sun_direction_ambient);
+    std::copy_n(light.color, 3, forward_lighting_.sun_color_count);
+    const uint32_t forward_count = std::min<size_t>(local_uniforms_.size(), ForwardLightCapacity);
+    forward_lighting_.sun_color_count[3] = static_cast<float>(forward_count);
+    const VkExtent2D forward_extent = window_.frame().extent();
+    forward_lighting_.viewport[0] = forward_extent.width ? 1.f / forward_extent.width : 0.f;
+    forward_lighting_.viewport[1] = forward_extent.height ? 1.f / forward_extent.height : 0.f;
+    for (uint32_t i = 0; i < forward_count; ++i)
+    {
+        std::copy_n(local_uniforms_[i].position_range, 4, forward_lighting_.local[i].position_range);
+        std::copy_n(local_uniforms_[i].direction_cone, 4, forward_lighting_.local[i].direction_cone);
+        std::copy_n(local_uniforms_[i].color_type, 4, forward_lighting_.local[i].color_type);
+    }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
@@ -825,6 +865,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     const bool replace_surface = recreate_surface || window_.frame().surface_lost();
     targets_.release_lighting(deferred_);
     deferred_.release_water_sets();
+    release_forward_targets();
     postprocess_passes_.clear();
     if (!window_.frame().release_swapchain())
     {
@@ -876,6 +917,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     for (uint32_t i = 0; i < frame.image_count(); ++i)
         if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
                 targets_.sampled_depth_view(i), textures_.sampler(), water_targets_.uniform(i), error)) return false;
+    if (!create_forward_targets(error)) return false;
     if (!create_postprocess(error)) return false;
 
     reset_required_ = false;
@@ -926,6 +968,7 @@ void VulkanGameDevice::destroy()
     active_map_names_[1].clear();
     targets_.release_lighting(deferred_);
     deferred_.release_water_sets();
+    release_forward_targets();
     release_level_glows();
     textures_.destroy();
     if (window_.device()) window_.frame().release_swapchain();
