@@ -1,182 +1,217 @@
-# Vulkan renderer status
+# План отдельного игрового Vulkan-рендерера
 
-OpenXRay does not currently render gameplay through Vulkan. The Android
-launcher option named Vulkan runs the implemented probe and then explicitly
-selects the OpenGL ES backend for gameplay.
+План разделён на реализацию и заключительные испытания. Vulkan — второй самостоятельный рендерер рядом с OpenGL ES: явный выбор Vulkan не запускает GLES, auto использует GLES при недоступности требований Vulkan.
 
-## Implemented
+**Порядок:** #1–102 — вся реализация и проверки без устройства; #103 — допуск к аппаратным испытаниям; #104–144 — испытания готового кода на Android; #145 — заключительная приёмка.
 
-| Part | Source | Current behavior |
-|---|---|---|
-| Loader and device setup | `src/Layers/xrRenderVK/VulkanHardware.*` | Loads Vulkan procedures, selects a physical device and graphics/present queue, and creates the logical device |
-| Frame context | `src/Layers/xrRenderVK/FrameContext.*` | Creates the swapchain and clear pass with an optional per-image depth attachment, tracks two frames in flight, detects lost surfaces, and provides the command buffer, render pass, framebuffer and extent to a frame recorder |
-| SDL Vulkan device | `src/Layers/xrRenderVK/VulkanWindowDevice.*`, `VulkanProbe.*` | Uses SDL's platform Vulkan loader and surface API instead of a hard-coded Android/Linux shared-library name; owns the instance, selected device and frame context and can recreate the surface after Android replaces its native window |
-| Android lifecycle | `src/xrEngine/x_ray.cpp`, `src/xrEngine/Render.h`, `src/Layers/xrRenderVK/VulkanLevelRender.*` | Forwards app pause/resume to the renderer, waits for submitted Vulkan work before suspension, and recreates the surface and swapchain after resume |
-| Android Vulkan smoke | `src/xrEngine/android_vulkan_smoke.cpp`, `src/Layers/xrRenderVK/SmokeTrianglePass.*` | Creates an SDL Vulkan surface, draws the triangle plus lit indexed geometry and a colored UI overlay without game assets, checks pixels from geometry and UI and presents three frames |
-| DDS decoding | `src/Layers/xrRenderVK/DdsTexture.*` | Reads 2D and cubemap DDS data, including mip chains; maps BC1/2/3 and RGBA/BGRA formats and can decode BC data to RGBA |
-| Texture upload | `src/Layers/xrRenderVK/TextureUpload.*` | Stages decoded pixels into a device-local image and creates a sampled image view |
-| Image state tracking | `src/Layers/xrRenderVK/ImageStateTracker.*` | Tracks layout/access state per aspect, mip and array layer on one externally synchronized queue |
-| Buffer allocation | `src/Layers/xrRenderVK/BufferResource.*` | Owns buffer allocations, selects a compatible memory type, and supports bounded writes to host-visible coherent memory |
-| Buffer upload | `src/Layers/xrRenderVK/BufferUpload.*` | Copies host data into a device-local buffer asynchronously, inserts a transfer-to-use memory barrier, and retires staging resources by fence |
-| Shader module | `src/Layers/xrRenderVK/ShaderModule.*` | Creates and owns a Vulkan shader module from precompiled SPIR-V bytes |
-| Screen-copy pass | `src/Layers/xrRenderVK/ScreenCopyPass.*` | Creates a sampled-image descriptor set and graphics pipeline, and records a fullscreen draw through the frame callback |
-| Indexed scene and UI | `src/Layers/xrRenderVK/ScenePass.*`, `SceneShaders.h` | Records depth-tested indexed geometry with per-fragment directional light and an alpha-blended sampled-texture UI pass with alpha reference. The no-game smoke uploads a tiny UI texture and reads back pixels from both draws |
-| Engine DDS bridge | `src/Layers/xrRenderVK/EngineTextureSource.*`, `src/xrEngine/android_vulkan_smoke.cpp` | Decodes bytes from the mounted engine VFS and uploads the standard fallback DDS into a sampled image when the probe has a mounted VFS |
-| OGF catalogue and level bytes | `src/Layers/xrRenderVK/VisualCatalog.*`, `EngineLevelModels.*`, `LevelModels.*` | Reads all OGF visual type headers and retains their chunks, child links and standalone model files; decodes static and progressive container geometry and hierarchy children. Skeletal, particles, trees and other types have metadata only and cannot yet be drawn |
-| Deferred primitives | `src/Layers/xrRenderVK/DeferredPass.*`, `DeferredShaderFactory.*` | Creates a two-color/depth G-buffer render pass and separate geometry and fullscreen directional-light pipelines |
-| Deferred frame and targets | `src/Layers/xrRenderVK/GBufferTargets.*`, `DeferredFrame.*`, `FrameContext.*` | Allocates a G-buffer triplet per swapchain image and records an offscreen geometry pass before fullscreen lighting and UI in the present pass. The no-game Android smoke runs this path and reads back the lit pixel |
-| GPU level visuals | `src/Layers/xrRenderVK/GpuLevel.*`, `VulkanVisual.*`, `VulkanLevelRender.*` | Uploads supported static and progressive OGF geometry, preserves level visual IDs and hierarchy, exposes bounds and child visuals through `IRenderVisual`. The abstract `VulkanLevelRender` implements `IRender::level_Load`, `level_Unload` and `getVisual`; no concrete gameplay renderer inherits it yet, and unsupported model types still fail loading |
-| Game frame and UI | `src/Layers/xrRenderVK/VulkanGameDevice.*`, `VulkanUIRender.*`, `VulkanUIShader.*` | Creates Vulkan frame, G-buffer, deferred and UI resources; batches engine `IUIRender` vertices and sampled UI shaders. These are not yet bound into `GEnv` by a concrete `IRender` and `IRenderFactory` |
-| Camera and render contexts | `src/Layers/xrRenderVK/VulkanCameraState.h`, `VulkanRenderContextState.h`, `VulkanLevelRender.*` | Caches `OnCameraUpdated` and `SetCacheXform` matrices for scene visibility, level visuals and queued draws. Engine context scopes resolve to Vulkan's single primary frame-recording context without creating or switching an OpenGL context |
-| Device resources and callback order | `VulkanDeviceResourceState.h`, `VulkanFramePhaseState.h`, `VulkanLevelRender.*` | Enforces device → `SetupStates` → `OnDeviceCreate` before Vulkan font/UI shader products or level loading, and checks world/menu frame ordering. Binding them through the engine `IRenderFactory` remains pending |
-| Portal visibility | `LevelVisibility.*`, `GpuLevel.*`, `VulkanLevelRender.*` | Traverses camera-visible sector portals and submits sector roots; invalid or missing visibility data falls back to every level root |
-| Game texture descriptors | `src/Layers/xrRenderVK/GameTextureFactory.*` | Loads DDS assets through the mounted VFS, caches images and creates sampled descriptors for deferred materials and game UI, including texture dimensions |
-| Renderer registration | `src/Layers/xrRenderVK/VulkanRendererModule.cpp` | Owns the `renderer_vulkan` mode independently of GLES and refuses game initialization until Vulkan implementations of the engine render interfaces exist |
-| Offline HLSL compiler | `tools/compile_vulkan_shader.py`, `res/gamedata/shaders/r3/*.spv` | Invokes host DXC for the checked-in editor and screen-copy variants; the APK stages the compiled outputs with its game shader assets |
+**Статус:** выполнены 53 из 145 пунктов (#1–52 и #54); остаются 92. В кодовом блоке #1–103 остаются 50 пунктов. Перестройка плана не закрывает незавершённую реализацию: #53 и #55 открыты. Первая следующая задача — #53.
 
-The screen-copy pass takes compiled vertex and fragment modules, a sampled
-image view, and a sampler. The caller must transition the image to shader-read
-layout, keep resources alive through submitted frames, and rebuild the pipeline
-when the render pass changes. With mounted game data, the probe can upload an
-engine DDS and, if both compiled screen-copy shaders are present in the game VFS,
-draw it as a fullscreen triangle. The no-game smoke test uses embedded SPIR-V
-made from the GLSL sources in `src/Layers/xrRenderVK/smoke`, creates graphics
-pipelines, verifies geometry and UI pixels by copying from the swapchain to a
-mapped buffer, and presents three frames. To regenerate the original triangle
-header, run `python3 tools/embed_vulkan_smoke_shaders.py --glslang glslangValidator`.
+## Правила выполнения
 
-To compile an existing game or mod HLSL file on a host with DXC installed:
+- Каждый кодовый пункт — один участок реализации и его проверка, рассчитанные на одну итерацию. Он закрывается по коду, сборке и подходящей host-проверке: unit/fixture, mock Vulkan dispatch, анализу владения, компиляции SPIR-V или проверке APK. Телефон, GPU-кадр и JNI-трасса телефона не требуются для закрытия кодового пункта.
+- В #1–102 не должно оставаться запланированной реализации, перенесённой на аппаратные испытания. Если участок требует больше одной итерации, его разделяют на кодовые подпункты до #103. Имеющиеся реализации в поздних пунктах нужно проверить и завершить; эти пункты не требуют повторного написания уже готового кода.
+- #103 закрывается только после выполнения всего запланированного кода, сборки обеих Android ABI и прохождения проверок без устройства. Аппаратные испытания начинаются после этого допуска.
+- Каждый аппаратный пункт — воспроизводимый сценарий с commit/APK hash, моделью устройства, Android/GPU/драйвером, логом и нужными кадрами/метриками. Отсутствие устройства не блокирует работу над #1–103.
+- Дефекты, обнаруженные при испытаниях #104–144, фиксируются в журнале. После испытания выполняются отдельные итерации исправлений и повторная проверка затронутых сценариев. Приёмка #145 требует устранения всех блокирующих дефектов; host-проверка сама по себе не подтверждает качество кадра на устройстве.
+- Отметки #1–54 сохраняют ранее согласованный объём кодовых/host-проверок. Проверки фактического изображения и игрового поведения перенесены в заключительный блок.
 
-```sh
-python3 tools/compile_vulkan_shader.py --dxc dxc \
-  --source path/to/game/shaders/r3/editor.vs --stage vs --entry main \
-  --include path/to/game/shaders/r3 --output build/shaders/r3/editor.vs.spv
-```
+## Архитектурные требования
 
-Use `--define NAME=VALUE` for each shader variant. Compilation failures leave
-the previous output intact. DXC is not shipped with the engine, and legacy
-shader syntax or features may require porting. This tool does not yet compile
-the complete game shader set or package SPIR-V into game resources.
+- xrRenderVK владеет Vulkan объектами; платформенный слой передаёт окно и поверхность. Объекты и состояние GLES принадлежат отдельному модулю.
+- Существующие игровые/mod HLSL остаются источником shader semantics. Precompiled SPIR-V — результат сборки; интеграция legacy имён, permutations и layouts завершается в #53 и проверяется в #102.
+- Дисковые форматы ресурсов сохраняются; неподдерживаемое аппаратное представление преобразуется в памяти.
+- Features выбираются по extensions, limits и formats, без GPU-name allowlist.
+- Переходы изображений и буферов централизованы, а освобождение ресурсов согласовано с кадрами в полёте.
 
-For a group of named variants, the host can compile
-`tools/vulkan_shader_variants.json` with:
+## Реализация и проверки без устройства: #1–103
 
-```sh
-python3 tools/compile_vulkan_shader.py --dxc dxc \
-  --manifest tools/vulkan_shader_variants.json --output-dir build/vulkan-shaders
-```
+### Устройство и игровой кадр
 
-The paths in the manifest are relative to its own directory. Its entries cover
-the editor vertex shader and the screen-copy pair, including an alpha-tested
-pixel variant. The compiler keeps the previous outputs if any variant fails and
-prints the failed source, stage, defines and DXC diagnostics. The four outputs
-in `res/gamedata/shaders/r3/` were built with DXC 1.9.2609. To regenerate
-them, use `--output-dir res/gamedata/shaders` with the same manifest. The
-`VulkanLevelRender::shader_compile` path resolves a named `.vs.spv` or
-`.ps.spv` from the mounted VFS, checks the SPIR-V entry point and stage,
-creates a Vulkan shader module and reports missing/invalid variants. It owns
-the modules until device teardown. The legacy resource manager currently
-expects GL-specific shader resource objects, while this path returns a Vulkan
-module; `SetupEnv` stays disabled until the Vulkan resource adapter is wired
-at the later interface-integration step. General gameplay HLSL families and
-their option permutations are still not covered, so item 13 remains open.
+- [x] **1. Vulkan probe и защита выбора**
+  - [x] Probe проверяет loader, instance, физическое устройство, графическую очередь и `VK_KHR_swapchain`; режим предлагается лишь при успешной проверке.
+  - [x] Явный выбор Vulkan не запускает GLES при неготовом игровом renderer.
+  - Активация игрового режима в `CheckGameRequirements` перенесена в **#49**: она должна происходить одновременно с готовым `SetupEnv`, иначе выбор ведёт к assert.
+- [x] **2. `IRender::Create/Destroy` и владение `VulkanGameDevice`** — Окно с `SDL_WINDOW_VULKAN`, устройство создаётся и освобождается без двойного владения.
+- [x] **3. `OnDeviceCreate/OnDeviceDestroy`, `SetupStates` и порядок создания ресурсов** — Шрифты и фабрика могут работать до загрузки уровня.
+- [x] **4. `GetDeviceState`, `Reset`, `reset_begin/reset_end`** — Изменение размера пересоздаёт зависимые от swapchain ресурсы.
+- [x] **5. `Begin/Clear/ClearTarget/End`** — Один игровой кадр записывает команды, отправляет их и показывает результат.
+- [x] **6. Камера, `SetCacheXform`, контексты и `OnCameraUpdated`** — Геометрия получает актуальные матрицы без GL-состояния.
+- [x] **7. `Calculate/Render/RenderMenu` и порядок вызовов UI** — Мир, меню и интерфейс попадают в нужные проходы одного кадра.
+- [x] **8. Видимость и отправка статических визуалов** — Порталы/фрустум не теряют видимые объекты; `add_Visual` рисует выбранные узлы.
+- [x] **9. Основной G-buffer для непрозрачных игровых материалов** — Альбедо, нормали и глубина корректны для геометрии уровня.
+- [x] **10. Солнце и окружение в deferred-проходе** — Их параметры влияют на освещённый кадр.
+- [x] **11. Динамические источники, `IRender_Light`, `IRender_Glow`, `IRender_ObjectSpecific`** — Игровые объекты создают, обновляют и удаляют свет без утечек.
+- [x] **12. Прозрачные материалы, alpha test и HUD-геометрия** — Эти объекты видны в правильном порядке и с глубиной. Alpha test пишет G-buffer и глубину; прозрачные draw отсортированы от дальних к ближним и смешиваются с цветом после освещения с тестом глубины мира без записи глубины; перед HUD глубина очищается. Собственное forward освещение прозрачных материалов завершается в кодовом #79; проверка внешнего вида — #124 и #136.
+- [x] **13. Подготовка HLSL/SPIR-V вариантов и диагностика `shader_compile`**
+  - [x] Manifest собирает editor и screen-copy HLSL, включая alpha-test; host DXC подтвердил разные бинарные варианты.
+  - [x] Компилятор отклоняет повреждённый SPIR-V и неверную стадию/entry point, сохраняя предыдущие файлы; `IRender::shader_compile` проверяет полный поток и загружает модуль из VFS.
+  - Варианты **игровых материалов** и связь с legacy SVS/SPS перенесены в **#50–54**, когда появится реальный игровой путь создания ресурсов.
+- [x] **14. Загрузка и кэш материалов/текстур** — Повторное использование и выгрузка не оставляют устаревших дескрипторов.
 
-For the diagnostic image draw, compile the supplied HLSL pair on a host with
-DXC and install both outputs under the game's `$game_shaders$/r3/` directory:
+### Уровень и модели (пересмотренные независимые критерии)
 
-```sh
-python3 tools/compile_vulkan_shader.py --source res/gamedata/shaders/r3/screen_copy_vk.vs \
-  --stage vs --entry main --output GAME_ROOT/gamedata/shaders/r3/screen_copy_vk.vs.spv
-python3 tools/compile_vulkan_shader.py --source res/gamedata/shaders/r3/screen_copy_vk.ps \
-  --stage ps --entry main --output GAME_ROOT/gamedata/shaders/r3/screen_copy_vk.ps.spv
-```
+Каждый пункт 15–30 закрывается по своему контракту на декодированных данных, host-тесте и сборке затронутого кода. Проверка полного игрового пути на устройстве вынесена в #104–145; новые типы OGF и интерфейсы закрываются своими кодовыми этапами до #103. Пункты 15–20 повторно проверены по этим границам.
 
-The paths above are an example for a loose-file game installation. The engine
-also resolves files from mounted archives and mod overrides. Both outputs must
-be available for the image draw; if neither is present, the probe clears and
-presents as before.
+- [x] **15. Статический уровень и смена таблицы визуалов** — level_Load/level_Unload/getVisual корректно заменяют level.geom, OGF 0/1/2 и их ресурсы; старые ссылки не перенаправляются на новую таблицу. Типы 6–12 — #23–29, полный переход в игре — #126.
+- [x] **16. Пул статических OGF** — model_Create/model_CreateChild/model_Delete/models_Clear для 0/1/2 из файла и IReader сохраняют базу отдельно, сбрасывают instance state; очистка пула сохраняет живые экземпляры, которые удаляются через model_Delete. Skeletal/particle модели — #20–26, игровой сценарий — #127–130.
+- [x] **17. Дублирование и общие GPU-ресурсы** — статические копии имеют независимое состояние при общем GPU-буфере и безопасном удалении/повторном использовании. Независимые анимированные позы — #22–23, игровой стресс-сценарий — #128–130.
+- [x] **18. Статические иерархии OGF** — вложенные 0/1/2 и ссылки на visual текущего уровня разрешаются без повторного владения, после выгрузки не становятся ссылками на другой уровень. Skeletal/LOD/tree children — #23–29.
+- [x] **19. Progressive 2 и sliding windows** — обычные и fast windows, level.geomX и диапазоны индексов корректны на host-геометрии. Skeletal progressive — #23; наблюдение LOD на GPU — #114 и #128.
+- [x] **20. Базовый IKinematics** — имена, иерархия, bind/pose transforms, видимость, instance state, callbacks и bounds доступны для скелета без motion. Декодирование motion — #21, blends — #22, skinning и face groups — #23, rigid и collision/pick — #24, игровые обращения — #127–130.
+- [x] **21. Данные анимации OGF/OMF** — встроенные клипы и обе формы refs, wildcard, partitions, bone remap, определения, marks и quantized keys загружаются из VFS; ошибка загрузки атомарна. Предыдущая реализация: [загрузчик](https://github.com/r0shn1ch/xray-16/commit/da63ad1a6b77d5bb3d56c1890d3ad9904dbfdc80), [BI_NONE](https://github.com/r0shn1ch/xray-16/commit/6a14def0fc9992610f55512785cc059544734772). Runtime IKinematicsAnimated и playback — #22; игровые файлы на устройстве — #127–128.
+- [x] **22. IKinematicsAnimated, blends и независимые позы** — lookup/slots, cycles, FX, callbacks, advance и две разные позы копий работают на host-сценарии. Отрисовка skinned поз — #23, NPC/HUD в игре — #127–130.
+- [x] **23. Skeletal skinned и progressive OGF** — 1–4 weights, текущая поза и sliding windows дают правильную геометрию и независимые GPU-буферы копий. NPC/HUD проверяются в #127–130.
+- [x] **24. Skeleton rigid и коллизия** — жёсткие children следуют кости; face groups, bone pick и collision queries работают на текущей позе. Игровые обращения — #130.
+- [x] **25. Particle effect** — model_CreateParticles, обновление, рисование и уничтожение типа 8 работают с отдельным временем жизни; игровая сцена — #122–124.
+- [x] **26. Particle group** — тип 9 создаёт/обновляет/удаляет дочерние effects без двойного владения; игровая сцена — #122–124.
+- [x] **27. OGF LOD/impostor** — тип 6 декодируется и выбирает нужное изображение/LOD; финальный уровень — #109–125.
+- [x] **28. Деревья OGF** — типы 7/11 декодируются, рисуются и переключают LOD; финальный уровень — #109–125.
+- [x] **29. Fluid visual и таблица OGF** — тип 12 реализован либо по игровым вызовам доказано, что он недостижим; таблица 0–12 закрыта с учётом #15–28. Реальные игровые архивы и полный переход — #109–126.
 
-The scene diagnostic shaders can be regenerated with
-`python3 tools/embed_vulkan_scene_shaders.py --glslc PATH/TO/glslc`.
-The probe logs the selected device, queue, relevant limits, compression
-features and attachment formats. These results are diagnostics, not a Vulkan
-compatibility guarantee for gameplay.
+### UI, фабрика и игровые эффекты
 
-## Not implemented
+- [x] **30. `IRenderFactory` для `IUIShader` и `IFontRender`** — Создание, копирование, связывание текстур/метрик и уничтожение работают до и после уровня; фактические UI draw/state — #31, регистрация интерфейсов — #46–48.
+- [x] **31. `IUIRender`: текстуры, TL/LIT, world transform и состояния** — Игровые элементы UI рисуются со scissor, alpha и culling.
+- [x] **32. `IImGuiRender` и его текстуры** — Шрифтовый атлас и draw lists работают через Vulkan, включая reset.
+- [x] **33. `IUISequenceVideoItem`** — Видео декодируется и обновляет Vulkan-текстуру без GL.
+- [x] **34. `IStatGraphRender`** — [fcaf0eb4](https://github.com/r0shn1ch/xray-16/commit/fcaf0eb4f6addc996663b13b1937b6d45ea4e01e) создаёт и уничтожает объект графика через фабрику; фон, сетка, кривые, столбцы, точки и маркеры записываются в общий Vulkan UI pass. MSVC `Build Vulkan renderer layer` и StyleCheck прошли. Проверка GPU остаётся в #131–136.
+- [x] **35. `IWallMarkArray` и методы wallmarks в `IRender`** — [e3eab50e](https://github.com/r0shn1ch/xray-16/commit/e3eab50e49d0974409332927230325f6f7a48d45): массив материалов выбирает и копирует текстуры; статический контакт проецируется и обрезается по UV на треугольнике, скелетный контакт привязан к найденной кости и следует позе. Декали идут в прозрачный проход с тестом глубины, освобождаются по времени, при смене уровня и удалении модели; очистка статических декалей реализована. GPU-видимость требует игровой проверки в #124 и #136.
+- [x] **36. `IEnvDescriptorRender` и игровая библиотека частиц окружения** — Дескрипторы погоды создаются и интерполируются.
+- [x] **37. `IEnvironmentRender`: небо и облака** — Окружение рисуется при загрузке и смене погоды.
+- [x] **38. `IRainRender`** — Дождь создаётся и рисуется через Vulkan.
+- [x] **39. `IFlareRender` и `ILensFlareRender`** — Блики реагируют на положение источника и видимость.
+- [x] **40. `IThunderboltRender` и `IThunderboltDescRender`** — Гроза загружает описание и воспроизводит эффект.
+- [x] **41. `IDrawUtils` и отладочные примитивы** — Утилиты движка рисуют собственными Vulkan-командами.
+- [x] **42. `IDebugRender` и `IObjectSpaceRender` для debug-сборки** — Отладочная конфигурация собирается и показывает геометрию.
 
-The Vulkan model geometry path now decodes standalone OGF static/progressive
-meshes and skeleton child meshes with 1–4 bone weights. `GpuModel` owns
-per-frame vertex buffers, can skin from an existing `IKinematics` pose and
-can be queued into the deferred geometry pass. `VulkanLevelRender` now creates
-independent static OGF instances from VFS paths and `IReader`, queues them
-through `add_Visual` and waits for submitted GPU work before releasing them.
-Progressive, hierarchical and skeletal model lifetime remains pending. Do not
-enable `renderer_vulkan` on this basis.
+### Остальной контракт и включение режима
 
-- runtime compilation, shader permutation coverage and reflection for the existing HLSL shaders;
-- descriptor layouts and descriptor allocation for engine resources;
-- graphics and compute pipelines for gameplay passes;
-- engine integration for vertex, index, constant and storage buffers, with descriptors and pipelines;
-- full engine scene geometry/material shader permutations, scene traversal,
-  shadows and post-processing;
-- skeletal/progressive/tree model, terrain, particle, game UI and video draw paths;
-- recording engine draw commands and managing engine resource lifetimes;
-- Win32 and Linux surface integration for `xrRenderVK`;
-- Vulkan implementations of `IRender`, `IRenderFactory`, `IUIRender`,
-  `IRenderDeviceRender` and the debug renderer; the separately registered
-  Vulkan module rejects gameplay until these are present.
+- [x] **43. Управление ресурсами `IRender`: deferred upload/unload, память, `OnAssetsChanged`** — Перезагрузка ресурсов и precache не ломают кадры в полёте.
+- [x] **44. `Screenshot`, gamma/brightness/contrast и postprocess** — [42f7ea9a](https://github.com/r0shn1ch/xray-16/commit/42f7ea9ab52299375df6ec302ee19d932a22be6e): прежние JPEG/TGA/DDS снимки теперь считывают итоговый кадр. После мира, прозрачных материалов, HUD и UI отдельный Vulkan-проход применяет gamma/brightness/contrast, grayscale, blur, duality, noise, цветовые множители и добавку `SPPInfo`, а также две цветовые карты с интерполяцией. Промежуточные изображения и дескрипторы пересоздаются при reset. Linux Debug `xrRenderVK`, три профильных теста и `spirv-val` прошли; фактический результат на Android GPU требует проверки владельцем устройства.
+- [x] **45. Статистика, счётчики и остальные диагностические методы `IRender`** — В интерфейсе не осталось заглушек на достижимых игровых путях.
 
-Pause/resume and surface-loss recovery still need validation on Android hardware.
-Until those items exist, documentation and launcher text must use the words
-"probe" or "smoke test", not "Vulkan renderer" without qualification.
+### Подключение отдельного игрового рендерера и шейдеров
 
-## Required architecture
+- [x] **46. `IRender` в `SetupEnv/ClearEnv`** — Vulkan-модуль создаёт и освобождает только свой `IRender`; повторная инициализация проходит host-тест и сборку.
+- [x] **47. Фабрика, UI и ImGui в `SetupEnv/ClearEnv`** — `IRenderFactory`, `IUIRender`, `IImGuiRender` живут от запуска до выхода и пересоздаются без ссылок на GLES; сборка и lifecycle-тест проходят.
+- [x] **48. `DU`, debug и `IObjectSpaceRender`** — Обычная и debug-конфигурации привязывают Vulkan-реализации и очищают их в обратном порядке; обе цели собираются.
+- [x] **49. Выбор режима и `CheckGameRequirements`** — Probe и готовность игрового модуля разрешают `renderer_vulkan`; авто выбирает GLES лишь при недоступности Vulkan, явный выбор выдаёт ошибку без создания GLES; тест ветвлений проходит.
+- [x] **50. Варианты непрозрачных игровых шейдеров** — Нужные level/object HLSL варианты компилируются в SPIR-V; manifest, `spirv-val` и сборка цели проходят.
+- [x] **51. Alpha test и прозрачные shader variants** — Варианты cutout, blended и двусторонних материалов собираются с нужными состояниями глубины и смешивания; shader-тест проходит.
+- [x] **52. Skeletal, HUD, tree и progressive variants** — Варианты 1–4 весов, HUD и LOD создают совместимые pipeline/layout; тест матрицы вариантов и сборка проходят.
+- [ ] **53. Связь legacy SVS/SPS с Vulkan pipeline** — Игровой запрос пары шейдеров создаёт Vulkan pipeline и диагностирует неизвестные имена, стадии и параметры; host-тест проходит.
+- [x] **54. VFS-кэш игровых shader/material ресурсов** — Повторная загрузка, ошибка отсутствующего варианта, смена уровня и reload не оставляют старых модулей/дескрипторов; тест проходит.
 
-The eventual backend should keep these constraints:
+### Завершение игрового пути: #55–89
 
-1. `xrRenderVK` owns Vulkan objects; platform code only supplies a window and
-   surface.
-2. Existing game and mod shader sources remain the source of truth. Shader
-   conversion must not require a parallel `shaders/vk` resource tree.
-3. Resource formats are preserved on disk. Unsupported formats may be expanded
-   in memory.
-4. Feature selection is based on queried limits, formats and extensions, not a
-   GPU-name allowlist.
-5. Image and buffer transitions are centralized instead of being added as
-   one-off barriers in individual passes.
+- [ ] **55. Android/JNI и упаковка Vulkan** — Игровой модуль, SPIR-V и зависимости включены в APK; аргументы лаунчера проходят JNI в выбор Vulkan. Убрать достижимое создание EGL/GLES при явном Vulkan; сборка ARMv7, проверка содержимого APK и host-проверка маршрута инициализации проходят. Трасса телефона — #104.
+- [ ] **56. Инициализация игрового запуска** — Связать лаунчер, выбранный модуль, SDL Vulkan window и первую загрузочную фазу; явный Vulkan завершается диагностикой при ошибке без подмены рендерера. Проверить порядок вызовов и ветви отказа на host.
+- [ ] **57. Загрузочный экран до уровня** — Подключить шрифты, progress и смену загрузочных экранов до level_Load; Vulkan ресурсы создаются в допустимом порядке. Сборка и проверка команд UI проходят.
+- [ ] **58. Главное меню** — Подключить фон, видео, шрифты, кнопки и ввод к Vulkan UI; обновление видео и пересоздание меню не используют GL. Проверить host-контракт и сборку.
+- [ ] **59. Действия меню** — Реализовать применение графических настроек, переход к загрузке, отмену и выход; очистка UI согласована с кадрами в полёте. Проверить сценарий состояний без устройства.
+- [ ] **60. Загрузка геометрии SoC** — Реализовать чтение и преобразование форматов уровня SoC из VFS в Vulkan геометрию и материалы; проверить декодирование на fixtures и сборку. Игровой кадр — #109.
+- [ ] **61. Загрузка геометрии CS** — Подключить отличия форматов уровня CS к тому же Vulkan пути; отсутствующие ресурсы сообщают имя файла и этап. Проверить fixtures и сборку.
+- [ ] **62. Загрузка геометрии CoP** — Подключить форматы уровня CoP, таблицы материалов и геометрии без GLES; проверить fixtures, ошибочные данные и сборку.
+- [ ] **63. Полный путь OGF 0–5** — Связать декодирование, создание, отправку и удаление базовых/скелетных типов; неподдерживаемые данные диагностируют файл и id. Проверить host-матрицу типов.
+- [ ] **64. Полный путь OGF 6–12** — Связать impostor, деревья, progressive и particle-типы с draw; для 12 документировать недостижимость через OGF и реализовать нужный отдельный путь. Проверить таблицу типов и сборку.
+- [ ] **65. Порталы, frustum и LOD** — Завершить отбор уровня, смену обычных/fast окон и сохранение видимых узлов; проверить границы буферов и консервативный fallback на host.
+- [ ] **66. Детальные объекты и трава** — Реализовать чтение detail assets, GPU ресурсы, отсечение по расстоянию и отправку draw. Проверить декодирование, выбор диапазонов и сборку.
+- [ ] **67. Запечённый свет и lightmap** — Сохранить lightmap/vertex lighting и нужные UV при загрузке; подключить текстуры и shader variants к G-buffer/lighting. Проверить layouts, manifest и сборку.
+- [ ] **68. Карта теней солнца** — Реализовать shadow depth-pass, отбор cast-геометрии и пересоздание shadow map при reset. Проверить матрицы, диапазоны и владение ресурсами.
+- [ ] **69. Применение теней солнца** — Подключить shadow map к deferred light, bias и фильтрацию; проверить descriptor/pipeline layouts, shader validation и сборку.
+- [ ] **70. Карты теней локальных источников** — Реализовать GPU данные и depth-pass для заявленных spot/point источников, создание и отложенное освобождение. Проверить ресурсный host-тест и сборку.
+- [ ] **71. Применение локальных теней** — Подключить sampling локальных shadow map к освещению, обновлению и удалению света; проверить отсутствие stale descriptors и сборку.
+- [ ] **72. Туман уровня** — Реализовать дистанционный fog по глубине и параметрам погоды; проверить передачу двух наборов параметров, SPIR-V и сборку.
+- [ ] **73. Водная поверхность** — Реализовать water shader/material с глубиной, alpha, нормалями и анимацией; проверить состояния pass, descriptors и сборку.
+- [ ] **74. Отражения и преломления** — Реализовать необходимые render targets и выборку для воды/специальных материалов; проверить переходы изображений, reset и сборку.
+- [ ] **75. Небо и смена погоды** — Связать weather assets, интерполяцию неба/облаков и смену descriptors с игровым кадром; проверить параметры, ресурсные состояния и сборку.
+- [ ] **76. Динамическое освещение** — Завершить создание, перемещение, выключение и удаление игровых lights/glow; проверить параметры освещения и отложенное освобождение.
+- [ ] **77. Частицы эффектов и групп** — Завершить загрузку particle assets, update, прозрачный/HUD draw и удаление дочерних эффектов; проверить события, порядок и время жизни.
+- [ ] **78. Дождь, flare и thunderbolt** — Завершить игровые настройки, обновление, draw и выключение погодных эффектов; проверить ресурсное владение и сборку.
+- [ ] **79. Alpha test, прозрачность и декали** — Подключить растительность, стекло, forward освещение прозрачных материалов и статические/скелетные wallmarks к нужным pass; проверить lighting inputs, сортировку, глубину, bone attachment и сборку.
+- [ ] **80. Postprocess, UI и screenshot** — Завершить применение gamma/brightness/contrast и SPPInfo после мира/UI; JPEG/TGA/DDS получают финальный кадр. Проверить pass order, readback и сборку.
+- [ ] **81. Выгрузка уровня в меню** — Завершить level_Unload и возврат UI, освобождая ресурсы после завершения GPU работы; проверить повторный host-сценарий и счётчики ресурсов.
+- [ ] **82. Замена уровня в одном процессе** — Завершить загрузку другого уровня и revision/pool переходы; проверить, что старые visual/texture ссылки не перенаправляются и не используются после освобождения.
+- [ ] **83. Reload ассетов при кадрах в полёте** — Завершить OnAssetsChanged, precache и deferred unload; проверить атомарную замену ресурсов, отказ reload и отложенное освобождение.
+- [ ] **84. Игровой NPC motion из OMF** — Подключить все необходимые формы OMF refs, клипы, bone remap и callbacks к runtime NPC; проверить fixtures, playback и сборку.
+- [ ] **85. Независимые экземпляры NPC** — Завершить отдельные poses/blends и GPU состояние копий общей модели; проверить два разных playback и удаление одной копии.
+- [ ] **86. Скиннинг и skeletal LOD** — Завершить GPU передачу текущей позы для 1–4 весов и progressive windows; проверить матрицу vertex layouts, bone bounds и pipeline.
+- [ ] **87. HUD рук и оружия** — Связать загрузку, анимацию, замену моделей и HUD pass со своей глубиной; проверить порядок и ресурсный lifecycle без устройства.
+- [ ] **88. Rigid, bone queries и collision** — Завершить rigid children, pick, visibility и collision на текущей позе NPC/HUD; проверить запросы и callbacks на host.
+- [ ] **89. Удаление и повторное создание NPC/HUD** — Завершить сброс pose/callback и освобождение GPU буферов при удалении, respawn и возврате в меню; проверить повторный host-сценарий.
 
-## Next implementation steps
+### Android, сборка, диагностика и допуск: #90–103
 
-Work should proceed in dependencies-first order:
+- [ ] **90. Интеграция Validation Layers** — Добавить включение доступных Vulkan validation и synchronization validation в debug APK, управление через настройку и сохранение VUID-лога. Проверить конфигурацию, callback и сборку без устройства.
+- [ ] **91. Подготовка воспроизводимых испытаний** — Добавить сценарии/настройки фиксированной камеры, выбора уровня и эффектов, сбор логов и кадров с build hash. Проверить host-инструменты и документацию.
+- [ ] **92. Синхронизация ресурсов** — Завершить barriers, очереди upload/reload, fence retirement и безопасное удаление descriptors при кадрах в полёте; проверить host-сценарии с отложенным завершением GPU.
+- [ ] **93. Present и владение swapchain** — Завершить fence/semaphore lifecycle, retirement старого swapchain и обработку ошибок present/recreate; проверить host-модель состояний и сборку.
+- [ ] **94. Матрица возможностей и форматов** — Проверять минимальные extensions, limits, attachment/sampling/BC форматы до создания игровых ресурсов; проверить успешные и отрицательные ветви probe, explicit и auto.
+- [ ] **95. Pause/resume в коде** — Завершить обработку app lifecycle, остановку отправки кадров и восстановление поверхности/зависимых ресурсов; проверить повторные переходы host-модели.
+- [ ] **96. Размер, ориентация и zero extent** — Завершить resize/rotation и приостановку при нулевой поверхности без создания некорректного swapchain; проверить последовательности событий и сборку.
+- [ ] **97. Потеря Android surface** — Завершить уничтожение и замену native surface, пересоздание swapchain и descriptors; проверить host-сценарий потери/восстановления без старых GPU ссылок.
+- [ ] **98. VK_ERROR_DEVICE_LOST** — Реализовать контролируемое завершение рендерера, диагностику и чистый повторный запуск; проверить fault injection на host и teardown.
+- [ ] **99. Сборка arm64-v8a** — Добавить ARM64 toolchain/dependencies и устранить ABI/указательные предположения в Vulkan и JNI; native ARM64 цель собирается.
+- [ ] **100. APK с обеими ABI** — Собирать APK с Vulkan, SPIR-V и зависимостями для armeabi-v7a и arm64-v8a; проверить архив, ABI ELF, manifest, zipalign и подпись без установки на устройство.
+- [ ] **101. Метрики кадра и памяти** — Добавить сбор CPU/GPU времени, FPS/P95 и памяти по ресурсам с выгрузкой отчёта; проверить обработку samples, недоступных timestamps и счётчиков на host.
+- [ ] **102. Аудит полноты игровых путей** — Сверить достижимые интерфейсы, legacy shader families/permutations и материалы с целевыми SoC/CS/CoP; устранить известные заглушки и молчаливые generic/GLES подмены. Все найденные незавершённые реализации закрыть кодовыми подпунктами до #103.
+- [ ] **103. Допуск к испытаниям на устройстве** — Все пункты #1–102 выполнены именно в коде; Debug/Release и обе Android ABI собираются, профильные host-тесты, SPIR-V и упаковка проходят. Зафиксировать commit, APK и сценарии; отсутствие телефона/игровых кадров не блокирует предшествующие кодовые этапы. Известная незавершённая реализация блокирует этот допуск.
 
-1. expand the host HLSL-to-SPIR-V compiler to cover game shader permutations and add reflection;
-2. connect buffer uploads to engine allocations, descriptor allocation and graphics pipelines;
-3. validate the image draw on Android hardware, then render UI and static
-   geometry through Vulkan;
-4. port deferred targets, lighting, shadows and post-processing;
-5. integrate swapchain recreation and Android lifecycle handling (implemented; device validation remains);
-6. route Vulkan WSI through SDL's platform API and include `xrRenderVK` in desktop CMake builds (implemented; Linux/macOS matrix and a focused Windows MSVC build now cover compilation, CI results pending);
-7. register desktop Vulkan modes and run Windows/Linux surface smoke tests;
-8. enable Vulkan gameplay selection only after complete levels and representative
-   mods run through Vulkan.
+## Заключительные испытания на устройстве: #104–145
 
-Useful host tests live in `tests/vulkan_probe.cpp`, `tests/vulkan_dds.cpp`,
-`tests/vulkan_image_state.cpp`, `tests/vulkan_buffer_resource.cpp`,
-`tests/vulkan_buffer_upload.cpp`, `tests/vulkan_shader_module.cpp`,
-`tests/vulkan_screen_copy_pass.cpp`, `tests/vulkan_frame_lifecycle.cpp`, and
-`tests/vulkan_smoke_triangle.cpp`. Device validation still requires the
-launcher's Vulkan smoke test on real Android hardware. A successful triangle
-smoke test does not close any of the gameplay items above.
+Этот блок начинается только после закрытия #103. Его пункты проверяют уже реализованный рендерер. Исправления по результатам испытаний выполняются последующими итерациями и отражаются в журнале дефектов.
 
-The lifecycle, camera, callback-order, portal-visibility and deferred G-buffer
-host tests can be enabled and run with:
+- [ ] **104. JNI-запуск Vulkan без EGL/GLES** — Запустить подготовленный APK с явным Vulkan; получить трассу libmain.so → Vulkan module → SDL Vulkan window → device/present и подтвердить отсутствие создания EGL/GL контекста.
+- [ ] **105. Выбор Vulkan/GLES/Auto** — Проверить явный Vulkan, явный GLES и auto при доступном/недоступном Vulkan, включая отказ требований; подтвердить предсказуемую диагностику и отсутствие скрытой подмены.
+- [ ] **106. Первый загрузочный экран** — Проверить шрифты, progress и смену экранов до level_Load; сохранить лог и кадры воспроизводимого запуска.
+- [ ] **107. Главное меню** — Проверить фон/видео, шрифты, кнопки и ввод; сохранить кадр и лог обновления видео.
+- [ ] **108. Действия меню** — Пройти настройки графики, загрузку, отмену и выход; проверить UI и освобождение ресурсов.
+- [ ] **109. Уровень SoC** — Загрузить один реальный уровень SoC; проверить непрозрачную геометрию, альбедо, нормали и глубину по зафиксированным кадрам.
+- [ ] **110. Уровень CS** — Загрузить один реальный уровень CS; проверить геометрию и диагностику отсутствующих ресурсов.
+- [ ] **111. Уровень CoP** — Загрузить один реальный уровень CoP; проверить геометрию, материалы и отсутствие ошибок загрузки.
+- [ ] **112. OGF 0–5 на игровых данных** — Проверить встреченные базовые и скелетные visual types, имена/id при ошибках и фактические draw.
+- [ ] **113. OGF 6–12 на игровых данных** — Проверить impostor, деревья, progressive и particle assets; подтвердить отдельный путь или недостижимость типа 12 на выбранных архивах.
+- [ ] **114. Порталы, frustum и LOD** — Пройти фиксированный маршрут камеры; сопоставить видимые узлы/LOD с GLES и проверить диапазоны буферов.
+- [ ] **115. Детали и трава** — Проверить реальные detail assets, дистанционное отсечение и отсутствие пропусков на одном маршруте.
+- [ ] **116. Lightmap и запечённый свет** — Сопоставить освещённость, UV/lightmap и vertex lighting с эталонным кадром GLES.
+- [ ] **117. Тени солнца** — Проверить cast-геометрию, движение теней, bias и фильтрацию на фиксированном маршруте.
+- [ ] **118. Тени локальных источников** — Проверить spot/point shadows при создании, перемещении и удалении источника без stale descriptors.
+- [ ] **119. Туман, вода и отражения** — Проверить два fog preset и сцену с водой/отражением: глубину, alpha, анимацию и порядок проходов.
+- [ ] **120. Небо и погода** — Переключить два weather preset; проверить интерполяцию неба/облаков и сохранность текстур.
+- [ ] **121. Динамический свет и glow** — Создать, переместить, выключить и удалить источники в уровне; проверить фактическое изменение кадра и ресурсов.
+- [ ] **122. Частицы эффектов и групп** — Проверить два игровых particle assets, их прозрачный/HUD draw и завершение без утечек.
+- [ ] **123. Дождь, flare и thunderbolt** — Пройти один управляемый погодный сценарий с включением/выключением всех эффектов и сменой погоды.
+- [ ] **124. Cutout, стекло и декали** — Проверить растительность, стекло, статические и скелетные wallmarks на контрольных кадрах глубины и порядка.
+- [ ] **125. Postprocess, UI и снимки** — Изменить gamma/brightness/contrast и SPPInfo; проверить мир/UI и соответствие JPEG/TGA/DDS показанному кадру.
+- [ ] **126. Переходы и reload уровня** — Пройти уровень → меню → другой уровень → меню и reload ассетов; проверить счётчики памяти, stale ссылки и кадры в полёте.
+- [ ] **127. NPC motion из OMF** — Проверить клип реального NPC, bone remap, имена и callbacks игрового кода.
+- [ ] **128. Копии NPC, skinning и LOD** — Проверить две независимые poses/blends, 1–4 веса, progressive windows и удаление одной копии.
+- [ ] **129. HUD рук и оружия** — Проверить загрузку, анимацию и смену оружия, отдельную глубину HUD и корректное перекрытие мира.
+- [ ] **130. Rigid, queries и удаление моделей** — Проверить rigid children, bone pick/visibility/collision, respawn NPC/HUD и возврат в меню без старых callbacks/буферов.
+- [ ] **131. Validation: запуск и меню** — Пройти запуск и меню с доступными validation layers; сохранить VUID-лог и проверить ошибки API/времени жизни.
+- [ ] **132. Validation: уровень и эффекты** — Пройти фиксированный маршрут с UI, погодой, частицами и декалями; сохранить VUID-лог.
+- [ ] **133. Synchronization validation** — Нагрузить upload/reload/удаление descriptors при кадрах в полёте; проверить гонки и use-after-free.
+- [ ] **134. Present и swapchain recreation** — Повторить resize/recreate с validation; проверить fence/semaphore, завершение present и освобождение старого swapchain.
+- [ ] **135. Эталон непрозрачного кадра** — Сопоставить геометрию, глубину, базовый свет и тени с GLES в одной фиксированной сцене SoC.
+- [ ] **136. Эталон прозрачности и UI** — Сопоставить стекло, растительность, HUD, меню, видео и postprocess с GLES на фиксированном маршруте.
+- [ ] **137. Android lifecycle и surface** — Выполнить пять background/foreground циклов, resize/rotation, zero extent и замену native surface; проверить восстановление меню/уровня и validation.
+- [ ] **138. Device lost и неподдерживаемые возможности** — Проверить контролируемый fault-injection device lost и повторный запуск; проверить понятный отказ неподдерживаемого профиля и auto fallback.
+- [ ] **139. Бюджет кадра и памяти** — На объявленном минимальном устройстве/профиле измерить ≥30 FPS и P95 ≤50 мс за 10 минут; проверить отсутствие роста памяти после переходов.
+- [ ] **140. Второй GPU/драйвер** — Повторить меню, уровень, эффекты и pause/resume на другом GPU/драйвере; записать ограничения и дефекты.
+- [ ] **141. Установка обеих ABI и независимость GLES** — Установить подписанные builds на совместимые ARMv7/ARM64 системы; проверить явные GLES/auto после рестарта и отсутствие Vulkan ресурсов у GLES.
+- [ ] **142. Сквозной сценарий SoC** — Пройти лаунчер → меню → уровень → NPC/HUD → меню → повторная загрузка на Vulkan; сохранить лог и состояние.
+- [ ] **143. Сквозной сценарий CS** — Пройти тот же сценарий CS с проверкой ресурсов, анимации и возврата в меню.
+- [ ] **144. Сквозной сценарий CoP** — Пройти тот же сценарий CoP с проверкой ресурсов, анимации и возврата в меню.
+- [ ] **145. Заключительная приёмка и выпуск** — После испытаний и последующих исправлений закрыть все блокирующие дефекты, повторить затронутые сценарии; подтвердить поддержку GPU/Android, настройки и ограничения, приложить release APK и итоговую матрицу.
 
-```sh
-cmake -S . -B build/vulkan-host -DXRAY_BUILD_VULKAN_TESTS=ON
-cmake --build build/vulkan-host
-ctest --test-dir build/vulkan-host --output-on-failure
-```
+## Уже полученные результаты
 
-These tests validate state transitions, conservative visibility fallback,
-G-buffer attachments and geometry command setup. They do not replace a GPU
-render or gameplay run on an Android device.
+- Код #1–52 и #54 закрыт в указанном host-объёме. Последняя реализация: [выбор Android Vulkan и проверка игровых pipeline](https://github.com/r0shn1ch/xray-16/commit/137f3a7b7ccd348cccfb6775b720f38cdee9fb53). Debug/Release xrRenderVK, профильные CTest, shader/manifest проверки и ARMv7 APK ранее собраны.
+- [ARMv7 APK v0.9.47](https://chatgpt.com/library/libfile_a65406a8098c8191bc863df4c063a0b7) содержит libmain.so и 19 игровых SPIR-V. SHA-256: `583fc3b4f262a6d88932408fbc8d656a6983f0aeecb96b966d2cfe8a1d4af287`. Это промежуточный APK, до допуска #103.
+- Для #53 есть именованные Vulkan pipeline и диагностика неизвестной пары/стадии/параметров; интеграция произвольных legacy SVS/SPS requests ещё не завершена.
+- Для #55 готова ARMv7 сборка и передача выбранного режима лаунчером; host-проверка всего JNI-маршрута остаётся отдельным кодовым критерием. Фактическая JNI/Vulkan трасса телефона перенесена в #104.
+- Аппаратные игровые испытания, обе ABI на устройствах, сравнение с GLES и матрица SoC/CS/CoP ещё не выполнены. Они не нужны для продолжения кодового блока.
+
+## Журнал исправлений после испытаний
+
+Пока записей нет. Для каждого обнаруженного дефекта: номер аппаратного сценария, воспроизведение, лог/кадр, причина, отдельный коммит исправления и результат повторной проверки. Блокирующий дефект удерживает соответствующую аппаратную отметку и #145 открытыми.
