@@ -148,7 +148,7 @@ private:
     std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
     std::unordered_map<std::string, std::unique_ptr<VulkanModelVisual>> model_bases_;
     std::unordered_map<std::string, std::weak_ptr<GpuModel>> model_gpu_cache_;
-    std::vector<std::unique_ptr<ShaderModule>> compiled_shaders_;
+    ShaderModuleCache compiled_shaders_;
     VulkanCameraState camera_state_;
     VulkanRenderContextState context_state_;
     VkDevice device_{};

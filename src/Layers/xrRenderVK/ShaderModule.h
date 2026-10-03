@@ -3,7 +3,9 @@
 #include <vulkan/vulkan.h>
 
 #include <cstddef>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace xray::render::vulkan
 {
@@ -40,5 +42,21 @@ private:
     VkDevice m_device = VK_NULL_HANDLE;
     VkShaderModule m_module = VK_NULL_HANDLE;
     PFN_vkDestroyShaderModule m_destroy{};
+};
+
+// Device-scoped SPIR-V modules. Call clear only after submitted frames have
+// completed; callers keep borrowed pointers until the next level/reload.
+class ShaderModuleCache
+{
+public:
+    ShaderModule* find(const std::string& key) const;
+    bool load(const std::string& key, VkDevice device, const ShaderModuleDispatch& dispatch,
+        const void* bytes, size_t size, uint32_t stage, const char* entry,
+        ShaderModule*& result, std::string& error);
+    void clear() { modules_.clear(); }
+    size_t size() const { return modules_.size(); }
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<ShaderModule>> modules_;
 };
 }

@@ -80,7 +80,7 @@ def _compile(variant, dxc, temporary, compiler="dxc"):
     if compiler == "glslc":
         stage = {"vs": "vertex", "ps": "fragment", "cs": "compute",
                  "gs": "geometry", "hs": "tesscontrol", "ds": "tesseval"}[variant["stage"]]
-        command = [dxc, "-x", "hlsl", f"-fshader-stage={stage}",
+        command = [dxc, "-x", "hlsl", "-fauto-combined-image-sampler", f"-fshader-stage={stage}",
                    f"-fentry-point={variant['entry']}", "--target-env=vulkan1.0",
                    "-o", str(temporary), str(source)]
         for directory in [source.parent, *variant["includes"]]:

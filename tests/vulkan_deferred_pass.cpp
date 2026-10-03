@@ -78,6 +78,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     }
     else if (pipeline_count == 2 || pipeline_count == 3)
     {
+        assert(info->pStages[1].module == handle<VkShaderModule>(18));
         assert(info->renderPass == handle<VkRenderPass>(11));
         assert(info->pColorBlendState->attachmentCount == 1);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
@@ -278,7 +279,7 @@ int main()
     DeferredPass deferred;
     assert(deferred.initialize(handle<VkDevice>(2), handle<VkRenderPass>(10),
         handle<VkRenderPass>(11), handle<VkShaderModule>(12), handle<VkShaderModule>(13),
-        handle<VkShaderModule>(14), handle<VkShaderModule>(15), handle<VkShaderModule>(16),
+        handle<VkShaderModule>(14), handle<VkShaderModule>(18), handle<VkShaderModule>(15), handle<VkShaderModule>(16),
         handle<VkShaderModule>(17),
         pass_dispatch, error));
     VkDescriptorSet material{};

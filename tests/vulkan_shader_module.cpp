@@ -22,7 +22,7 @@ VkShaderModule test_module_handle()
 VkResult VKAPI_CALL create_module(VkDevice, const VkShaderModuleCreateInfo* info,
     const VkAllocationCallbacks*, VkShaderModule* module)
 {
-    assert(info->codeSize == 5 * sizeof(uint32_t));
+    assert(info->codeSize >= 5 * sizeof(uint32_t));
     assert(info->pCode[0] == 0x07230203);
     *module = test_module_handle();
     ++create_count;
@@ -69,4 +69,24 @@ int main()
     assert(moved.handle());
     moved.destroy();
     assert(destroy_count == 2);
+
+    xray::render::vulkan::ShaderModuleCache cache;
+    xray::render::vulkan::ShaderModule* first = nullptr;
+    assert(cache.load("vk/level_opaque.vs.spv", device, dispatch,
+        vertex_entry, sizeof(vertex_entry), 0, "main", first, error));
+    assert(first && cache.size() == 1 && create_count == 3);
+    xray::render::vulkan::ShaderModule* again = nullptr;
+    assert(cache.load("vk/level_opaque.vs.spv", device, dispatch,
+        vertex_entry, sizeof(vertex_entry), 0, "main", again, error));
+    assert(first == again && create_count == 3);
+    assert(!cache.load("vk/invalid.ps.spv", device, dispatch,
+        vertex_entry, sizeof(vertex_entry), 4, "main", again, error));
+    assert(!again && cache.size() == 1 && create_count == 3);
+    cache.clear();
+    assert(destroy_count == 3 && !cache.size());
+    assert(cache.load("vk/level_opaque.vs.spv", device, dispatch,
+        vertex_entry, sizeof(vertex_entry), 0, "main", again, error));
+    assert(again && create_count == 4);
+    cache.clear();
+    assert(destroy_count == 4);
 }

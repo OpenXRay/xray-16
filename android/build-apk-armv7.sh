@@ -98,6 +98,9 @@ remove_path "$asset_root"
 mkdir -p "$asset_root/gamedata"
 cp "$repo_dir/res/fsgame.ltx" "$asset_root/fsgame.ltx"
 cp -R "$repo_dir/res/gamedata/." "$asset_root/gamedata/"
+python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
+    --shader-root "$asset_root/gamedata/shaders" \
+    --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json"
 cp "$repo_dir"/android/apk/quality_*.ltx "$asset_root/gamedata/configs/"
 if [ -d "$asset_root/gamedata/gamedata" ]; then
     echo "APK asset staging unexpectedly nested gamedata inside itself" >&2

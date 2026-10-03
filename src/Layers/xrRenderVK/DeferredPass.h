@@ -61,7 +61,7 @@ public:
 
     bool initialize(VkDevice device, VkRenderPass geometry_pass, VkRenderPass light_pass,
         VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
-        VkShaderModule alpha_test_fragment,
+        VkShaderModule alpha_test_fragment, VkShaderModule transparent_fragment,
         VkShaderModule light_vertex, VkShaderModule light_fragment,
         VkShaderModule weather_fragment,
         const ScenePassDispatch& dispatch, std::string& error);

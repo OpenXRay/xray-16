@@ -19,6 +19,7 @@ target_sources(xrRenderVK PRIVATE
     DeferredFrame.cpp
     DeferredFrame.h
     DeferredAlphaTestShaders.h
+    VulkanGameShaders.h
     DeferredShaderFactory.cpp
     DeferredShaderFactory.h
     DeferredShaders.h

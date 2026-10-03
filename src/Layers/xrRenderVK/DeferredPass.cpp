@@ -190,14 +190,14 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
 
 bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRenderPass light_pass,
     VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
-    VkShaderModule alpha_test_fragment,
+    VkShaderModule alpha_test_fragment, VkShaderModule transparent_fragment,
     VkShaderModule light_vertex, VkShaderModule light_fragment,
     VkShaderModule weather_fragment,
     const ScenePassDispatch& dispatch, std::string& error)
 {
     destroy();
     if (!device || !geometry_pass || !light_pass || !geometry_vertex || !geometry_fragment ||
-        !alpha_test_fragment ||
+        !alpha_test_fragment || !transparent_fragment ||
         !light_vertex || !light_fragment || !weather_fragment || !dispatch.create_pipeline_layout ||
         !dispatch.destroy_pipeline_layout || !dispatch.create_graphics_pipelines ||
         !dispatch.destroy_pipeline || !dispatch.create_descriptor_set_layout ||
@@ -268,9 +268,9 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
             alpha_test_fragment, true, true, false, false, vk_, alpha_test_) ||
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
-            geometry_fragment, true, false, true, false, vk_, transparent_) ||
+            transparent_fragment, true, false, true, false, vk_, transparent_) ||
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
-            geometry_fragment, true, false, false, true, vk_, hud_) ||
+            transparent_fragment, true, false, false, true, vk_, hud_) ||
         !make_pipeline(device, light_pass, light_layout_, light_vertex,
             light_fragment, false, false, false, false, vk_, lighting_) ||
         !make_pipeline(device, light_pass, weather_layout_, light_vertex,

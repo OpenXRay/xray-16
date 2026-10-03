@@ -7,16 +7,33 @@ struct Fragment
     [[vk::location(1)]] float2 uv : TEXCOORD1;
 };
 
+#if defined(VK_ALPHA_TEST)
+static const float alpha_threshold = 0.5;
+#endif
+
+#if defined(VK_TRANSPARENT)
+float4 main(Fragment fragment) : SV_Target0
+{
+    return diffuse.Sample(diffuse_sampler, fragment.uv);
+}
+#else
 struct GBuffer
 {
     [[vk::location(0)]] float4 albedo : SV_Target0;
     [[vk::location(1)]] float4 normal : SV_Target1;
 };
 
-GBuffer main(Fragment fragment)
+GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_ALPHA_TEST)
+    clip(output.albedo.a - alpha_threshold);
+#endif
+#if defined(VK_DOUBLE_SIDED)
+    if (!front_face) fragment.normal = -fragment.normal;
+#endif
     output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
     return output;
 }
+#endif

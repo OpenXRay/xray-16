@@ -130,6 +130,9 @@ void VulkanLevelRender::OnAssetsChanged()
         return;
     }
     assets_dirty_ = false;
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader reload needs idle GPU frames");
+    compiled_shaders_.clear();
     if (g_pGamePersistent && game_device_)
     {
         auto& environment = g_pGamePersistent->Environment();
@@ -422,9 +425,10 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
         xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer requires the engine SDL window");
         return;
     }
-    if (!(SDL_GetWindowFlags(window) & SDL_WINDOW_VULKAN))
+    const u32 window_flags = SDL_GetWindowFlags(window);
+    if (!(window_flags & SDL_WINDOW_VULKAN) || (window_flags & SDL_WINDOW_OPENGL))
     {
-        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer requires SDL_WINDOW_VULKAN on the engine window");
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan renderer requires an SDL Vulkan window without OpenGL");
         return;
     }
 
@@ -948,6 +952,7 @@ void VulkanLevelRender::level_Unload()
     R_ASSERT2(!frame_phase_.active(), "Vulkan level unload requires an idle frame");
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
+    compiled_shaders_.clear();
     if (game_device_) game_device_->discard_scene_draws();
     wallmarks_.clear();
     models_Clear(true);
@@ -993,27 +998,21 @@ HRESULT VulkanLevelRender::shader_compile(pcstr name, IReader* source, pcstr ent
         return E_FAIL;
     }
     const uint32_t execution_model = stage[0] == 'v' ? 0u : 4u;
-    if (!has_spirv_entry(binary->pointer(), binary->length(), execution_model, entry))
-    {
-        Msg("! [renderer-vulkan] shader_compile: '%s' has no %s entry '%s'", path, stage, entry);
-        FS.r_close(binary);
-        return E_FAIL;
-    }
     const VkDevice device = game_device_->window().device();
     const auto get = game_device_->window().device_proc();
     const ShaderModuleDispatch dispatch{ reinterpret_cast<PFN_vkCreateShaderModule>(get(device, "vkCreateShaderModule")),
         reinterpret_cast<PFN_vkDestroyShaderModule>(get(device, "vkDestroyShaderModule")) };
-    auto module = std::make_unique<ShaderModule>();
     std::string error;
-    const bool compiled = module->initialize_bytes(device, dispatch, binary->pointer(), binary->length(), error);
+    ShaderModule* module = nullptr;
+    const bool compiled = compiled_shaders_.load(path, device, dispatch, binary->pointer(), binary->length(),
+        execution_model, entry, module, error);
     FS.r_close(binary);
     if (!compiled)
     {
         Msg("! [renderer-vulkan] shader_compile: '%s': %s", path, error.c_str());
         return E_FAIL;
     }
-    result = module.get();
-    compiled_shaders_.push_back(std::move(module));
+    result = module;
     return S_OK;
 }
 

@@ -115,4 +115,34 @@ void ShaderModule::destroy()
     m_module = VK_NULL_HANDLE;
     m_destroy = nullptr;
 }
+
+ShaderModule* ShaderModuleCache::find(const std::string& key) const
+{
+    const auto it = modules_.find(key);
+    return it == modules_.end() ? nullptr : it->second.get();
+}
+
+bool ShaderModuleCache::load(const std::string& key, VkDevice device, const ShaderModuleDispatch& dispatch,
+    const void* bytes, size_t size, uint32_t stage, const char* entry,
+    ShaderModule*& result, std::string& error)
+{
+    result = nullptr;
+    if (key.empty() || !has_spirv_entry(bytes, size, stage, entry))
+    {
+        error = "invalid SPIR-V stage or entry for '" + key + "'";
+        return false;
+    }
+    if (auto* existing = find(key))
+    {
+        result = existing;
+        error.clear();
+        return true;
+    }
+    auto module = std::make_unique<ShaderModule>();
+    if (!module->initialize_bytes(device, dispatch, bytes, size, error))
+        return false;
+    result = module.get();
+    modules_.emplace(key, std::move(module));
+    return true;
+}
 }
