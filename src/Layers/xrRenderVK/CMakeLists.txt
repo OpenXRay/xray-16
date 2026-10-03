@@ -60,6 +60,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanKinematics.h
     ScreenCopyPass.cpp
     ScreenCopyPass.h
+    PostProcessShaders.h
+    smoke/postprocess.frag
     ScenePass.cpp
     ScenePass.h
     ShaderModule.cpp

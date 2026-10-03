@@ -21,7 +21,8 @@ public:
         bool render_world = true, bool clear_target = false,
         VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr,
-        FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr);
+        FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
+        FrameRecorder compositor = nullptr, void* compositor_data = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
@@ -46,5 +47,7 @@ private:
     void* level_data_{};
     bool render_world_{true};
     bool recorded_{};
+    FrameRecorder compositor_{};
+    void* compositor_data_{};
 };
 }

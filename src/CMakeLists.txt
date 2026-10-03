@@ -50,6 +50,16 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_motion_playback_test tests/vulkan_motion_playback.cpp)
     xray_add_vulkan_state_test(vulkan_particle_catalog_test tests/vulkan_particle_catalog.cpp)
     xray_add_vulkan_state_test(vulkan_wallmark_geometry_test tests/vulkan_wallmark_geometry.cpp)
+    xray_add_vulkan_state_test(vulkan_screen_copy_pass_test tests/vulkan_screen_copy_pass.cpp)
+    target_sources(vulkan_screen_copy_pass_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ScreenCopyPass.cpp")
+    target_include_directories(vulkan_screen_copy_pass_test PRIVATE
+        "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    xray_add_vulkan_state_test(vulkan_frame_lifecycle_test tests/vulkan_frame_lifecycle.cpp)
+    target_sources(vulkan_frame_lifecycle_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/FrameContext.cpp")
+    target_include_directories(vulkan_frame_lifecycle_test PRIVATE
+        "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
     target_sources(vulkan_wallmark_geometry_test PRIVATE
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/WallmarkGeometry.cpp")
     target_sources(vulkan_particle_catalog_test PRIVATE

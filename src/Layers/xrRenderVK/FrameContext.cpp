@@ -28,7 +28,7 @@ bool complete(const FrameDispatch& vk)
         vk.free_command_buffers &&
         vk.reset_command_buffer && vk.begin_command_buffer && vk.cmd_begin_render_pass && vk.cmd_end_render_pass &&
         vk.cmd_clear_attachments &&
-        vk.cmd_copy_image_to_buffer && vk.cmd_pipeline_barrier &&
+        vk.cmd_copy_image_to_buffer && vk.cmd_copy_image && vk.cmd_pipeline_barrier &&
         vk.end_command_buffer && vk.create_semaphore && vk.destroy_semaphore && vk.create_fence && vk.destroy_fence &&
         vk.wait_for_fences && vk.reset_fences && vk.queue_submit && vk.device_wait_idle;
 }
@@ -112,6 +112,7 @@ bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_inst
     XRAY_LOAD_DEVICE(cmd_end_render_pass, "vkCmdEndRenderPass");
     XRAY_LOAD_DEVICE(cmd_clear_attachments, "vkCmdClearAttachments");
     XRAY_LOAD_DEVICE(cmd_copy_image_to_buffer, "vkCmdCopyImageToBuffer");
+    XRAY_LOAD_DEVICE(cmd_copy_image, "vkCmdCopyImage");
     XRAY_LOAD_DEVICE(cmd_pipeline_barrier, "vkCmdPipelineBarrier");
     XRAY_LOAD_DEVICE(end_command_buffer, "vkEndCommandBuffer");
     XRAY_LOAD_DEVICE(create_semaphore, "vkCreateSemaphore");
@@ -205,7 +206,7 @@ FrameContext::~FrameContext()
 bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
     VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
     const FrameDispatch& dispatch, std::string& error, bool allow_readback, bool use_depth,
-    bool preserve_prepass_depth)
+    bool preserve_prepass_depth, bool postprocess)
 {
     destroy();
     if (!physical_device || !device || !surface || !queue || queue_family == UINT32_MAX)
@@ -227,12 +228,21 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     m_surface_lost = false;
     m_allow_readback = allow_readback;
     m_preserve_prepass_depth = preserve_prepass_depth;
+    m_postprocess = postprocess;
+    if (postprocess && !allow_readback)
+    {
+        error = "Vulkan postprocess requires swapchain transfer-source support";
+        destroy();
+        return false;
+    }
     if (preserve_prepass_depth && !use_depth)
     {
         error = "prepass depth requires a depth attachment";
         destroy();
         return false;
     }
+    if (use_depth || postprocess)
+        m_vk.get_memory_properties(physical_device, &m_memory_properties);
     if (use_depth)
     {
         const VkFormat candidates[]{VK_FORMAT_D32_SFLOAT, VK_FORMAT_D16_UNORM};
@@ -254,7 +264,6 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
             destroy();
             return false;
         }
-        m_vk.get_memory_properties(physical_device, &m_memory_properties);
     }
 
     if (!create_swapchain(physical_device, surface, requested_extent, error) ||
@@ -581,6 +590,126 @@ bool FrameContext::create_render_targets(std::string& error)
         }
         m_framebuffers.push_back(framebuffer);
     }
+    if (m_postprocess && !create_postprocess_targets(error)) return false;
+    return true;
+}
+
+bool FrameContext::create_postprocess_targets(std::string& error)
+{
+    VkAttachmentDescription color{};
+    color.format = m_format;
+    color.samples = VK_SAMPLE_COUNT_1_BIT;
+    color.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    color.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    color.initialLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    color.finalLayout = m_allow_readback ? VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL :
+        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    const VkAttachmentReference reference{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &reference;
+    VkSubpassDependency deps[2]{};
+    deps[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    deps[0].dstSubpass = 0;
+    deps[0].srcStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    deps[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    deps[0].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    deps[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    deps[1].srcSubpass = 0;
+    deps[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    deps[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    deps[1].dstStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    deps[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    deps[1].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    VkRenderPassCreateInfo pass{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
+    pass.attachmentCount = 1;
+    pass.pAttachments = &color;
+    pass.subpassCount = 1;
+    pass.pSubpasses = &subpass;
+    pass.dependencyCount = 2;
+    pass.pDependencies = deps;
+    if (m_vk.create_render_pass(m_device, &pass, nullptr, &m_composite_pass) != VK_SUCCESS)
+    {
+        error = "could not create Vulkan postprocess render pass";
+        return false;
+    }
+    for (size_t i = 0; i < m_images.size(); ++i)
+    {
+        VkImageCreateInfo info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+        info.imageType = VK_IMAGE_TYPE_2D;
+        info.format = m_format;
+        info.extent = {m_extent.width, m_extent.height, 1};
+        info.mipLevels = info.arrayLayers = 1;
+        info.samples = VK_SAMPLE_COUNT_1_BIT;
+        info.tiling = VK_IMAGE_TILING_OPTIMAL;
+        info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        VkImage image = VK_NULL_HANDLE;
+        if (m_vk.create_image(m_device, &info, nullptr, &image) != VK_SUCCESS)
+        {
+            error = "could not create Vulkan postprocess source image";
+            return false;
+        }
+        m_post_images.push_back(image);
+        VkMemoryRequirements requirements{};
+        m_vk.get_image_memory_requirements(m_device, image, &requirements);
+        uint32_t type = UINT32_MAX;
+        for (uint32_t n = 0; n < m_memory_properties.memoryTypeCount; ++n)
+            if ((requirements.memoryTypeBits & (1u << n)) &&
+                (m_memory_properties.memoryTypes[n].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
+            {
+                type = n;
+                break;
+            }
+        if (type == UINT32_MAX)
+        {
+            error = "no device-local memory for Vulkan postprocess source";
+            return false;
+        }
+        VkMemoryAllocateInfo allocation{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+        allocation.allocationSize = requirements.size;
+        allocation.memoryTypeIndex = type;
+        VkDeviceMemory memory = VK_NULL_HANDLE;
+        if (m_vk.allocate_memory(m_device, &allocation, nullptr, &memory) != VK_SUCCESS)
+        {
+            error = "could not allocate Vulkan postprocess source";
+            return false;
+        }
+        m_post_memories.push_back(memory);
+        if (m_vk.bind_image_memory(m_device, image, memory, 0) != VK_SUCCESS)
+        {
+            error = "could not bind Vulkan postprocess source";
+            return false;
+        }
+        VkImageViewCreateInfo view{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+        view.image = image;
+        view.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view.format = m_format;
+        view.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view.subresourceRange.levelCount = view.subresourceRange.layerCount = 1;
+        VkImageView source = VK_NULL_HANDLE;
+        if (m_vk.create_image_view(m_device, &view, nullptr, &source) != VK_SUCCESS)
+        {
+            error = "could not create Vulkan postprocess source view";
+            return false;
+        }
+        m_post_views.push_back(source);
+        VkFramebufferCreateInfo framebuffer{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
+        framebuffer.renderPass = m_composite_pass;
+        framebuffer.attachmentCount = 1;
+        framebuffer.pAttachments = &m_image_views[i];
+        framebuffer.width = m_extent.width;
+        framebuffer.height = m_extent.height;
+        framebuffer.layers = 1;
+        VkFramebuffer output = VK_NULL_HANDLE;
+        if (m_vk.create_framebuffer(m_device, &framebuffer, nullptr, &output) != VK_SUCCESS)
+        {
+            error = "could not create Vulkan postprocess framebuffer";
+            return false;
+        }
+        m_composite_framebuffers.push_back(output);
+    }
     return true;
 }
 
@@ -692,7 +821,8 @@ bool FrameContext::create_sync(std::string& error)
 
 bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
     FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data,
-    FramePrepassRecorder prepass, void* prepass_data, bool clear_target)
+    FramePrepassRecorder prepass, void* prepass_data, bool clear_target,
+    FrameRecorder compositor, void* compositor_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -805,6 +935,46 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         recorder(frame, user_data);
     }
     m_vk.cmd_end_render_pass(command);
+    if (m_postprocess)
+    {
+        if (!compositor)
+        {
+            error = "Vulkan postprocess compositor was not provided";
+            return false;
+        }
+        VkImageMemoryBarrier to_copy{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+        to_copy.srcAccessMask = 0;
+        to_copy.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        to_copy.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED; // Discard the previous use of this image.
+        to_copy.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_copy.srcQueueFamilyIndex = to_copy.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        to_copy.image = m_post_images[image_index];
+        to_copy.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        to_copy.subresourceRange.levelCount = to_copy.subresourceRange.layerCount = 1;
+        m_vk.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &to_copy);
+        VkImageCopy region{};
+        region.srcSubresource.aspectMask = region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.srcSubresource.layerCount = region.dstSubresource.layerCount = 1;
+        region.extent = {m_extent.width, m_extent.height, 1};
+        m_vk.cmd_copy_image(command, m_images[image_index], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            m_post_images[image_index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        to_copy.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        to_copy.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        to_copy.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_copy.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        m_vk.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &to_copy);
+        VkRenderPassBeginInfo composite{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+        composite.renderPass = m_composite_pass;
+        composite.framebuffer = m_composite_framebuffers[image_index];
+        composite.renderArea.extent = m_extent;
+        m_vk.cmd_begin_render_pass(command, &composite, VK_SUBPASS_CONTENTS_INLINE);
+        const FrameRecordingContext context{command, m_composite_pass,
+            m_composite_framebuffers[image_index], m_extent, image_index, m_current_frame};
+        compositor(context, compositor_data);
+        m_vk.cmd_end_render_pass(command);
+    }
     if (m_allow_readback)
     {
         if (readback)
@@ -909,6 +1079,7 @@ void FrameContext::destroy()
     m_memory_properties = {};
     m_allow_readback = false;
     m_preserve_prepass_depth = false;
+    m_postprocess = false;
     m_scene_depth_attached = false;
     m_images.clear();
     m_image_views.clear();
@@ -916,6 +1087,11 @@ void FrameContext::destroy()
     m_depth_memories.clear();
     m_depth_views.clear();
     m_framebuffers.clear();
+    m_post_images.clear();
+    m_post_memories.clear();
+    m_post_views.clear();
+    m_composite_framebuffers.clear();
+    m_composite_pass = VK_NULL_HANDLE;
     m_commands.clear();
     m_render_finished.clear();
     m_image_available = {};
@@ -931,6 +1107,15 @@ void FrameContext::destroy_swapchain_resources()
         return;
     for (VkFramebuffer framebuffer : m_framebuffers)
         if (framebuffer) m_vk.destroy_framebuffer(m_device, framebuffer, nullptr);
+    for (VkFramebuffer framebuffer : m_composite_framebuffers)
+        if (framebuffer) m_vk.destroy_framebuffer(m_device, framebuffer, nullptr);
+    for (VkImageView view : m_post_views)
+        if (view) m_vk.destroy_image_view(m_device, view, nullptr);
+    for (VkImage image : m_post_images)
+        if (image) m_vk.destroy_image(m_device, image, nullptr);
+    for (VkDeviceMemory memory : m_post_memories)
+        if (memory) m_vk.free_memory(m_device, memory, nullptr);
+    if (m_composite_pass) m_vk.destroy_render_pass(m_device, m_composite_pass, nullptr);
     for (VkImageView view : m_image_views)
         if (view) m_vk.destroy_image_view(m_device, view, nullptr);
     for (VkImageView view : m_depth_views)
@@ -949,6 +1134,7 @@ void FrameContext::destroy_swapchain_resources()
     if (m_swapchain) m_vk.destroy_swapchain(m_device, m_swapchain, nullptr);
     m_swapchain = VK_NULL_HANDLE;
     m_render_pass = VK_NULL_HANDLE;
+    m_composite_pass = VK_NULL_HANDLE;
     m_extent = {};
     m_images.clear();
     m_image_views.clear();
@@ -956,6 +1142,10 @@ void FrameContext::destroy_swapchain_resources()
     m_depth_memories.clear();
     m_depth_views.clear();
     m_framebuffers.clear();
+    m_post_images.clear();
+    m_post_memories.clear();
+    m_post_views.clear();
+    m_composite_framebuffers.clear();
     m_scene_depth_attached = false;
     m_render_finished.clear();
     m_image_available = {};

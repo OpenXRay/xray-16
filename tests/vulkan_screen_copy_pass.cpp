@@ -25,16 +25,19 @@ uint32_t created_pipelines = 0;
 uint32_t destroyed_pipelines = 0;
 uint32_t descriptor_updates = 0;
 uint32_t draw_calls = 0;
+uint32_t pushed_constants = 0;
 VkResult pipeline_result = VK_SUCCESS;
 
 VkResult VKAPI_CALL create_descriptor_set_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* layout)
 {
-    assert(info->bindingCount == 2);
+    assert(info->bindingCount == 4);
     assert(info->pBindings[0].binding == 0);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);
     assert(info->pBindings[1].binding == 1);
     assert(info->pBindings[1].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER);
+    assert(info->pBindings[2].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);
+    assert(info->pBindings[3].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);
     *layout = fake_handle<VkDescriptorSetLayout>(1);
     ++created_layouts;
     return VK_SUCCESS;
@@ -72,7 +75,16 @@ VkResult VKAPI_CALL allocate_descriptor_sets(VkDevice, const VkDescriptorSetAllo
 void VKAPI_CALL update_descriptor_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
-    assert(count == 2);
+    assert(count == 4 || count == 2);
+    if (count == 2)
+    {
+        assert(writes[0].dstBinding == 2);
+        assert(writes[0].pImageInfo->imageView == fake_handle<VkImageView>(15));
+        assert(writes[1].dstBinding == 3);
+        assert(writes[1].pImageInfo->imageView == fake_handle<VkImageView>(16));
+        ++descriptor_updates;
+        return;
+    }
     assert(writes[0].dstBinding == 0);
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);
     assert(writes[0].pImageInfo->imageView == fake_handle<VkImageView>(4));
@@ -80,6 +92,8 @@ void VKAPI_CALL update_descriptor_sets(VkDevice, uint32_t count, const VkWriteDe
     assert(writes[1].dstBinding == 1);
     assert(writes[1].descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER);
     assert(writes[1].pImageInfo->sampler == fake_handle<VkSampler>(5));
+    assert(writes[2].dstBinding == 2);
+    assert(writes[3].dstBinding == 3);
     ++descriptor_updates;
 }
 
@@ -88,6 +102,8 @@ VkResult VKAPI_CALL create_pipeline_layout(VkDevice, const VkPipelineLayoutCreat
 {
     assert(info->setLayoutCount == 1);
     assert(info->pSetLayouts[0] == fake_handle<VkDescriptorSetLayout>(1));
+    assert(info->pushConstantRangeCount == 1);
+    assert(info->pPushConstantRanges[0].size == sizeof(xray::render::vulkan::PostProcessConstants));
     *layout = fake_handle<VkPipelineLayout>(6);
     ++created_pipeline_layouts;
     return VK_SUCCESS;
@@ -166,12 +182,21 @@ void VKAPI_CALL cmd_draw(VkCommandBuffer, uint32_t vertex_count, uint32_t instan
     ++draw_calls;
 }
 
+void VKAPI_CALL cmd_push_constants(VkCommandBuffer, VkPipelineLayout, VkShaderStageFlags stage,
+    uint32_t offset, uint32_t size, const void* data)
+{
+    assert(stage == VK_SHADER_STAGE_FRAGMENT_BIT && offset == 0);
+    assert(size == sizeof(xray::render::vulkan::PostProcessConstants));
+    assert(static_cast<const xray::render::vulkan::PostProcessConstants*>(data)->effect[0] == 2.f);
+    ++pushed_constants;
+}
+
 xray::render::vulkan::ScreenCopyDispatch make_dispatch()
 {
     return {create_descriptor_set_layout, destroy_descriptor_set_layout, create_descriptor_pool,
         destroy_descriptor_pool, allocate_descriptor_sets, update_descriptor_sets, create_pipeline_layout,
         destroy_pipeline_layout, create_graphics_pipelines, destroy_pipeline, cmd_bind_pipeline,
-        cmd_bind_descriptor_sets, cmd_set_viewport, cmd_set_scissor, cmd_draw};
+        cmd_bind_descriptor_sets, cmd_set_viewport, cmd_set_scissor, cmd_draw, cmd_push_constants};
 }
 }
 
@@ -186,11 +211,17 @@ int main()
         dispatch, error));
     assert(error.empty());
     assert(descriptor_updates == 1);
+    pass.set_color_maps(fake_handle<VkImageView>(15), fake_handle<VkImageView>(16));
+    assert(descriptor_updates == 2);
+    xray::render::vulkan::PostProcessConstants params;
+    params.effect[0] = 2.f;
+    pass.set_constants(params);
 
     const xray::render::vulkan::FrameRecordingContext frame{fake_handle<VkCommandBuffer>(12),
         fake_handle<VkRenderPass>(9), fake_handle<VkFramebuffer>(13), {640, 480}, 0, 0};
     pass.record(frame);
     assert(draw_calls == 1);
+    assert(pushed_constants == 1);
     pass.record({fake_handle<VkCommandBuffer>(12), VK_NULL_HANDLE, VK_NULL_HANDLE, {0, 480}, 0, 0});
     pass.record({fake_handle<VkCommandBuffer>(12), fake_handle<VkRenderPass>(14), VK_NULL_HANDLE, {640, 480}, 0, 0});
     assert(draw_calls == 1);

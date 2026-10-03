@@ -41,6 +41,7 @@ struct FrameDispatch
     PFN_vkCmdEndRenderPass cmd_end_render_pass{};
     PFN_vkCmdClearAttachments cmd_clear_attachments{};
     PFN_vkCmdCopyImageToBuffer cmd_copy_image_to_buffer{};
+    PFN_vkCmdCopyImage cmd_copy_image{};
     PFN_vkCmdPipelineBarrier cmd_pipeline_barrier{};
     PFN_vkEndCommandBuffer end_command_buffer{};
     PFN_vkCreateSemaphore create_semaphore{};
@@ -93,7 +94,7 @@ public:
     bool initialize(VkPhysicalDevice physical_device, VkDevice device, VkSurfaceKHR surface,
         VkQueue queue, uint32_t queue_family, VkExtent2D requested_extent,
         const FrameDispatch& dispatch, std::string& error, bool allow_readback = false,
-        bool use_depth = false, bool preserve_prepass_depth = false);
+        bool use_depth = false, bool preserve_prepass_depth = false, bool postprocess = false);
     // Borrow depth views produced by the offscreen pass. Caller must restore
     // the owned views (empty vector) before destroying the borrowed images.
     bool attach_scene_depth(const std::vector<VkImageView>& views, std::string& error);
@@ -106,12 +107,15 @@ public:
         FrameRecorder recorder = nullptr, void* user_data = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
         FramePrepassRecorder prepass = nullptr, void* prepass_data = nullptr,
-        bool clear_target = false); // Clear the swapchain color target after its render pass begins.
+        bool clear_target = false, FrameRecorder compositor = nullptr,
+        void* compositor_data = nullptr); // Compositor sees the complete scene, HUD and UI.
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }
     VkFormat format() const { return m_format; }
     VkRenderPass render_pass() const { return m_render_pass; }
+    VkRenderPass composite_render_pass() const { return m_composite_pass; }
+    VkImageView postprocess_view(size_t index) const { return m_post_views.at(index); }
     VkFormat depth_format() const { return m_depth_format; }
     VkCommandPool command_pool() const { return m_command_pool; }
     size_t image_count() const { return m_images.size(); }
@@ -122,6 +126,7 @@ private:
     bool create_swapchain(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
         VkExtent2D requested_extent, std::string& error);
     bool create_render_targets(std::string& error);
+    bool create_postprocess_targets(std::string& error);
     bool create_commands(std::string& error);
     bool create_sync(std::string& error);
     void destroy_swapchain_resources();
@@ -140,6 +145,7 @@ private:
     VkPhysicalDeviceMemoryProperties m_memory_properties{};
     bool m_allow_readback = false;
     bool m_preserve_prepass_depth = false;
+    bool m_postprocess = false;
     bool m_scene_depth_attached = false;
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_image_views;
@@ -147,6 +153,11 @@ private:
     std::vector<VkDeviceMemory> m_depth_memories;
     std::vector<VkImageView> m_depth_views;
     std::vector<VkFramebuffer> m_framebuffers;
+    VkRenderPass m_composite_pass = VK_NULL_HANDLE;
+    std::vector<VkImage> m_post_images;
+    std::vector<VkDeviceMemory> m_post_memories;
+    std::vector<VkImageView> m_post_views;
+    std::vector<VkFramebuffer> m_composite_framebuffers;
     std::vector<VkCommandBuffer> m_commands;
     std::vector<VkSemaphore> m_render_finished;
     std::array<VkSemaphore, FramesInFlight> m_image_available{};

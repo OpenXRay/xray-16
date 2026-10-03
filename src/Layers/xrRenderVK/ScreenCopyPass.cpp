@@ -47,6 +47,7 @@ bool load_screen_copy_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_devi
     XRAY_LOAD_DEVICE(cmd_set_viewport, "vkCmdSetViewport");
     XRAY_LOAD_DEVICE(cmd_set_scissor, "vkCmdSetScissor");
     XRAY_LOAD_DEVICE(cmd_draw, "vkCmdDraw");
+    XRAY_LOAD_DEVICE(cmd_push_constants, "vkCmdPushConstants");
 #undef XRAY_LOAD_DEVICE
 
     if (!complete(dispatch))
@@ -79,10 +80,13 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     m_device = device;
     m_render_pass = render_pass;
     m_vk = dispatch;
+    m_source_view = source_view;
 
     const VkDescriptorSetLayoutBinding bindings[] = {
         {0, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-        {1, VK_DESCRIPTOR_TYPE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
+        {1, VK_DESCRIPTOR_TYPE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {2, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {3, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
     };
     VkDescriptorSetLayoutCreateInfo descriptor_layout_info{};
     descriptor_layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -97,7 +101,7 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     }
 
     const VkDescriptorPoolSize pool_sizes[] = {
-        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 3},
         {VK_DESCRIPTOR_TYPE_SAMPLER, 1}
     };
     VkDescriptorPoolCreateInfo pool_info{};
@@ -129,7 +133,7 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     VkDescriptorImageInfo sampler_info{};
     sampler_info.sampler = sampler;
-    VkWriteDescriptorSet writes[2]{};
+    VkWriteDescriptorSet writes[4]{};
     writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[0].dstSet = m_descriptor_set;
     writes[0].dstBinding = 0;
@@ -142,6 +146,15 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     writes[1].descriptorCount = 1;
     writes[1].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
     writes[1].pImageInfo = &sampler_info;
+    for (uint32_t i = 2; i != 4; ++i)
+    {
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = m_descriptor_set;
+        writes[i].dstBinding = i;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        writes[i].pImageInfo = &image_info;
+    }
     m_vk.update_descriptor_sets(m_device, static_cast<uint32_t>(sizeof(writes) / sizeof(writes[0])), writes,
         0, nullptr);
 
@@ -149,6 +162,9 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipeline_layout_info.setLayoutCount = 1;
     pipeline_layout_info.pSetLayouts = &m_descriptor_layout;
+    const VkPushConstantRange constants{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PostProcessConstants)};
+    pipeline_layout_info.pushConstantRangeCount = 1;
+    pipeline_layout_info.pPushConstantRanges = &constants;
     if (m_vk.create_pipeline_layout(m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
     {
         error = "vkCreatePipelineLayout failed for screen-copy pass";
@@ -228,6 +244,26 @@ bool ScreenCopyPass::initialize(VkDevice device, VkRenderPass render_pass, VkIma
     return true;
 }
 
+void ScreenCopyPass::set_color_maps(VkImageView first, VkImageView second)
+{
+    if (!m_descriptor_set || !m_vk.update_descriptor_sets) return;
+    VkDescriptorImageInfo images[2]{};
+    images[0].imageView = first ? first : m_source_view;
+    images[1].imageView = second ? second : m_source_view;
+    images[0].imageLayout = images[1].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    VkWriteDescriptorSet writes[2]{};
+    for (uint32_t i = 0; i < 2; ++i)
+    {
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = m_descriptor_set;
+        writes[i].dstBinding = i + 2;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        writes[i].pImageInfo = &images[i];
+    }
+    m_vk.update_descriptor_sets(m_device, 2, writes, 0, nullptr);
+}
+
 void ScreenCopyPass::record(const FrameRecordingContext& frame) const
 {
     if (!frame.command_buffer || frame.render_pass != m_render_pass || !frame.extent.width ||
@@ -240,6 +276,9 @@ void ScreenCopyPass::record(const FrameRecordingContext& frame) const
     m_vk.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
     m_vk.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
         0, 1, &m_descriptor_set, 0, nullptr);
+    if (m_vk.cmd_push_constants)
+        m_vk.cmd_push_constants(frame.command_buffer, m_pipeline_layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+            0, sizeof(m_constants), &m_constants);
     m_vk.cmd_set_viewport(frame.command_buffer, 0, 1, &viewport);
     m_vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
     m_vk.cmd_draw(frame.command_buffer, 3, 1, 0, 0);
@@ -269,5 +308,6 @@ void ScreenCopyPass::destroy()
     m_descriptor_pool = VK_NULL_HANDLE;
     m_descriptor_set = VK_NULL_HANDLE;
     m_descriptor_layout = VK_NULL_HANDLE;
+    m_source_view = VK_NULL_HANDLE;
 }
 }

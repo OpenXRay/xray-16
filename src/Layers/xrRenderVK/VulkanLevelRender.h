@@ -7,6 +7,7 @@
 #include "VulkanFramePhaseState.h"
 #include "VulkanGameLighting.h"
 #include "VulkanRenderContextState.h"
+#include "ScreenCopyPass.h"
 #include "xrEngine/Render.h"
 
 #include <memory>
@@ -184,6 +185,8 @@ private:
     bool assets_dirty_{};
     u32 frame_draw_calls_{}, frame_triangles_{};
     float gamma_{1.f}, brightness_{1.f}, contrast_{1.f}, gray_{};
+    PostProcessConstants postprocess_{};
+    std::string color_map_a_, color_map_b_;
     struct ImGuiTexture { VkDescriptorSet descriptor{}; VkExtent2D extent{}; };
     std::unordered_map<std::string, ImGuiTexture> imgui_textures_;
     struct ScreenshotRequest { ScreenshotMode mode; std::string name; };

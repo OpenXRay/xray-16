@@ -25,7 +25,20 @@ struct ScreenCopyDispatch
     PFN_vkCmdSetViewport cmd_set_viewport{};
     PFN_vkCmdSetScissor cmd_set_scissor{};
     PFN_vkCmdDraw cmd_draw{};
+    PFN_vkCmdPushConstants cmd_push_constants{};
 };
+
+struct PostProcessConstants
+{
+    float grade[4]{1.f, 1.f, 1.f, 0.f};
+    float tint[4]{1.f, 1.f, 1.f, 0.f};
+    float add[4]{};
+    float gray_weights[4]{.333f, .333f, .333f, 0.f};
+    float effect[4]{}; // blur, horizontal duality, vertical duality, grayscale
+    float noise[4]{}; // intensity, grain, fps, elapsed time
+    float color_map[4]{}; // influence, interpolation
+};
+static_assert(sizeof(PostProcessConstants) <= 128);
 
 bool load_screen_copy_dispatch(VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc,
     ScreenCopyDispatch& dispatch, std::string& error);
@@ -44,6 +57,8 @@ public:
         VkSampler sampler, VkShaderModule vertex_shader, VkShaderModule fragment_shader,
         const ScreenCopyDispatch& dispatch, std::string& error);
     void record(const FrameRecordingContext& frame) const;
+    void set_constants(const PostProcessConstants& constants) { m_constants = constants; }
+    void set_color_maps(VkImageView first, VkImageView second);
     static void record_callback(const FrameRecordingContext& frame, void* user_data);
     void destroy();
 
@@ -54,6 +69,8 @@ private:
     VkDescriptorSetLayout m_descriptor_layout = VK_NULL_HANDLE;
     VkDescriptorPool m_descriptor_pool = VK_NULL_HANDLE;
     VkDescriptorSet m_descriptor_set = VK_NULL_HANDLE;
+    VkImageView m_source_view = VK_NULL_HANDLE;
+    PostProcessConstants m_constants{};
     VkPipelineLayout m_pipeline_layout = VK_NULL_HANDLE;
     VkPipeline m_pipeline = VK_NULL_HANDLE;
 };

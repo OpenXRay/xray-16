@@ -5,6 +5,7 @@
 #include "VulkanThunderboltRender.h"
 #include "SceneShaders.h"
 #include "ShaderModule.h"
+#include "PostProcessShaders.h"
 
 #include <algorithm>
 #include <cmath>
@@ -22,12 +23,8 @@ template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const
 bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::string& error)
 {
     destroy();
-    readback_enabled_ = window_.initialize(window, extent, true, error, true, true);
-    if (!readback_enabled_)
-    {
-        // Some surfaces lack TRANSFER_SRC. Rendering still works on those devices.
-        if (!window_.initialize(window, extent, false, error, true, true)) return false;
-    }
+    readback_enabled_ = window_.initialize(window, extent, true, error, true, true, true);
+    if (!readback_enabled_) return false;
     const VkDevice device = window_.device();
     const auto get = window_.device_proc();
     const auto& physical = window_.physical();
@@ -122,7 +119,8 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                 scene_dispatch, error, true) ||
             !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory,
                 physical.features.textureCompressionBC, texture_dispatch_,
-                create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error)) goto failed;
+                 create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
+             !create_postprocess(error)) goto failed;
     }
     ui_.configure(device, physical.memory, buffer_upload_.buffer, ui_pass_);
     error.clear();
@@ -136,6 +134,86 @@ void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
+}
+
+bool VulkanGameDevice::create_postprocess(std::string& error)
+{
+    postprocess_passes_.clear();
+    auto& frame = window_.frame();
+    const auto device = window_.device();
+    const auto get = window_.device_proc();
+    ScreenCopyDispatch dispatch;
+    ShaderModuleDispatch modules{proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
+        proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
+    ShaderModule vertex, fragment;
+    if (!load_screen_copy_dispatch(device, get, dispatch, error) || !dispatch.cmd_push_constants ||
+        !vertex.initialize(device, modules, postprocess_shaders::Vertex,
+            sizeof(postprocess_shaders::Vertex), error) ||
+        !fragment.initialize(device, modules, postprocess_shaders::Fragment,
+            sizeof(postprocess_shaders::Fragment), error))
+    {
+        if (error.empty()) error = "Vulkan postprocess requires push constants";
+        return false;
+    }
+    for (size_t i = 0; i < frame.image_count(); ++i)
+    {
+        auto pass = std::make_unique<ScreenCopyPass>();
+        if (!pass->initialize(device, frame.composite_render_pass(), frame.postprocess_view(i),
+                textures_.sampler(), vertex.handle(), fragment.handle(), dispatch, error))
+        {
+            postprocess_passes_.clear();
+            return false;
+        }
+        pass->set_color_maps(color_map_views_[0], color_map_views_[1]);
+        postprocess_passes_.push_back(std::move(pass));
+    }
+    return true;
+}
+
+void VulkanGameDevice::set_postprocess(const PostProcessConstants& params,
+    std::string first, std::string second)
+{
+    postprocess_params_ = params;
+    color_map_names_[0] = std::move(first);
+    color_map_names_[1] = std::move(second);
+}
+
+bool VulkanGameDevice::refresh_color_maps(std::string& error)
+{
+    if (color_map_names_[0] == active_map_names_[0] &&
+        color_map_names_[1] == active_map_names_[1]) return true;
+    // Descriptor writes and texture eviction must wait for previous submissions.
+    if (!window_.frame().wait_idle())
+    {
+        error = "could not wait for previous frames before changing postprocess color maps";
+        return false;
+    }
+    VkImageView replacements[2]{};
+    for (size_t i = 0; i < 2; ++i)
+        if (!color_map_names_[i].empty() &&
+            !textures_.environment(color_map_names_[i], replacements[i], error))
+        {
+            for (auto view : replacements) if (view) textures_.release_environment(view);
+            return false;
+        }
+    if (!textures_.finish_uploads())
+    {
+        for (auto view : replacements) if (view) textures_.release_environment(view);
+        error = "could not upload Vulkan postprocess color maps";
+        return false;
+    }
+    for (auto& pass : postprocess_passes_)
+        pass->set_color_maps(replacements[0], replacements[1]);
+    for (auto view : color_map_views_) if (view) textures_.release_environment(view);
+    std::copy_n(replacements, 2, color_map_views_);
+    std::copy_n(color_map_names_, 2, active_map_names_);
+    return true;
+}
+
+void VulkanGameDevice::record_postprocess(const FrameRecordingContext& frame, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    owner.postprocess_passes_[frame.image_index]->record(frame);
 }
 
 void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
@@ -456,6 +534,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     current_level_ = &level;
     ui_error_.clear();
     model_error_.clear();
+    if (!refresh_color_maps(error)) return false;
+    for (auto& pass : postprocess_passes_) pass->set_constants(postprocess_params_);
     const float weather_blend = weather_lighting_.light.color[3];
     weather_lighting_.light = light;
     weather_lighting_.light.color[3] = weather_blend;
@@ -479,7 +559,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             record_transparent, this,
             scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target,
             render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_,
-            screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this))
+            screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this,
+            record_postprocess, this))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
@@ -535,6 +616,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
 
     const bool replace_surface = recreate_surface || window_.frame().surface_lost();
     targets_.release_lighting(deferred_);
+    postprocess_passes_.clear();
     if (!window_.frame().release_swapchain())
     {
         error = "could not release Vulkan framebuffers before scene depth";
@@ -561,6 +643,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     ui_pass_.rebind_render_pass(frame.render_pass());
     if (!targets_.bind_lighting(deferred_, error))
         return false;
+    if (!create_postprocess(error)) return false;
 
     reset_required_ = false;
     error.clear();
@@ -603,6 +686,11 @@ void VulkanGameDevice::destroy()
     level_draws_.clear();
     current_level_ = nullptr;
     scene_visibility_ = false;
+    postprocess_passes_.clear();
+    for (auto view : color_map_views_) if (view) textures_.release_environment(view);
+    color_map_views_[0] = color_map_views_[1] = VK_NULL_HANDLE;
+    active_map_names_[0].clear();
+    active_map_names_[1].clear();
     textures_.destroy();
     targets_.release_lighting(deferred_);
     if (window_.device()) window_.frame().release_swapchain();

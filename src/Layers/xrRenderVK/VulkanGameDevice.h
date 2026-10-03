@@ -8,6 +8,7 @@
 #include "VulkanWindowDevice.h"
 #include "GpuModel.h"
 #include "VulkanFontRender.h"
+#include "ScreenCopyPass.h"
 
 #include <array>
 #include <memory>
@@ -30,6 +31,7 @@ public:
     void queue_thunderbolt(VulkanThunderboltRender& bolt);
     void request_screenshot() { screenshot_requested_ = true; }
     bool take_screenshot(std::vector<uint8_t>& pixels, VkExtent2D& extent, VkFormat& format);
+    void set_postprocess(const PostProcessConstants& params, std::string first, std::string second);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error,
         bool render_world = true, bool clear_target = false);
@@ -79,6 +81,9 @@ private:
     static void record_transparent(const FrameRecordingContext& frame, void* user);
     static void record_level_visuals(const FrameRecordingContext& frame, void* user);
     static void record_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user);
+    static void record_postprocess(const FrameRecordingContext& frame, void* user);
+    bool create_postprocess(std::string& error);
+    bool refresh_color_maps(std::string& error);
     struct LevelDraw
     {
         uint32_t index{};
@@ -116,6 +121,11 @@ private:
     GameTextureFactory textures_;
     VulkanUIRender ui_;
     DeferredFrame frame_;
+    std::vector<std::unique_ptr<ScreenCopyPass>> postprocess_passes_;
+    PostProcessConstants postprocess_params_{};
+    std::string color_map_names_[2];
+    std::string active_map_names_[2];
+    VkImageView color_map_views_[2]{};
     bool ui_recorded_{true};
     std::string ui_error_;
     std::vector<ModelDraw> model_draws_;

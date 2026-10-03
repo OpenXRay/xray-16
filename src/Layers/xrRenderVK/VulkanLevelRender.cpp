@@ -271,6 +271,29 @@ void VulkanLevelRender::save_screenshot()
 void VulkanLevelRender::SetPostProcessParams(const SPPInfo& ppi)
 {
     gray_ = std::clamp(ppi.gray, 0.f, 1.f);
+    postprocess_.effect[0] = std::max(ppi.blur, 0.f);
+    postprocess_.effect[1] = ppi.duality.h;
+    postprocess_.effect[2] = ppi.duality.v;
+    postprocess_.effect[3] = gray_;
+    postprocess_.noise[0] = std::clamp(ppi.noise.intensity, 0.f, 1.f);
+    postprocess_.noise[1] = std::max(ppi.noise.grain, 1.f);
+    postprocess_.noise[2] = std::max(ppi.noise.fps, .01f);
+    postprocess_.tint[0] = ppi.color_base.r * 2.f;
+    postprocess_.tint[1] = ppi.color_base.g * 2.f;
+    postprocess_.tint[2] = ppi.color_base.b * 2.f;
+    postprocess_.add[0] = ppi.color_add.r * 2.f;
+    postprocess_.add[1] = ppi.color_add.g * 2.f;
+    postprocess_.add[2] = ppi.color_add.b * 2.f;
+    postprocess_.gray_weights[0] = ppi.color_gray.r;
+    postprocess_.gray_weights[1] = ppi.color_gray.g;
+    postprocess_.gray_weights[2] = ppi.color_gray.b;
+    postprocess_.color_map[0] = std::clamp(ppi.cm_influence, 0.f, 1.f);
+    postprocess_.color_map[1] = std::clamp(ppi.cm_interpolate, 0.f, 1.f);
+    color_map_a_ = postprocess_.color_map[0] > 0.f && ppi.cm_tex1.size() ?
+        ppi.cm_tex1.c_str() : "";
+    color_map_b_ = !color_map_a_.empty() && ppi.cm_tex2.size() ?
+        ppi.cm_tex2.c_str() : color_map_a_;
+    if (color_map_a_.empty()) postprocess_.color_map[0] = 0.f;
 }
 void VulkanLevelRender::setGamma(float value) { gamma_ = std::clamp(value, .01f, 4.f); }
 void VulkanLevelRender::setBrightness(float value) { brightness_ = std::clamp(value, 0.f, 4.f); }
@@ -834,10 +857,11 @@ void VulkanLevelRender::End()
 
     const DeferredEnvironment environment = current_environment();
     DeferredLight light = make_environment_deferred_light(environment);
-    light.grade[0] = gamma_;
-    light.grade[1] = brightness_;
-    light.grade[2] = contrast_;
-    light.grade[3] = gray_;
+    postprocess_.grade[0] = gamma_;
+    postprocess_.grade[1] = brightness_;
+    postprocess_.grade[2] = contrast_;
+    postprocess_.noise[3] = Device.fTimeGlobal;
+    game_device_->set_postprocess(postprocess_, color_map_a_, color_map_b_);
     FrameStatus status = FrameStatus::Presented;
     std::string error;
     const bool clear_target = frame_clear_target_;
