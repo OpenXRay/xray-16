@@ -28,7 +28,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 }
 
-void CDetailManager::hw_Render(CBackend& cmd_list)
+void CDetailManager::hw_Render(CBackend& cmd_list, const Fsphere* bounds)
 {
     ZoneScoped;
     using namespace detail_manager;
@@ -71,7 +71,7 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     // RCache.set_c			(&*hwc_wind,	dir1); //
     // wind-dir
     // hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir1, 1, 0);
+    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir1, 1, 0, bounds);
 
     // Wave1
     // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
@@ -80,18 +80,18 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     // RCache.set_c			(&*hwc_wind,	dir2); //
     // wind-dir
     // hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 2, 0);
+    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 2, 0, bounds);
 
     // Still
     consts.set(scale, scale, scale, 1.f);
     // RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
     // RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
     // hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
+    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1, bounds);
 }
 
 void CDetailManager::hw_Render_dump(CBackend& cmd_list,
-    const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
+    const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id, const Fsphere* bounds)
 {
     ZoneScoped;
 
@@ -120,8 +120,12 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     for (u32 O = 0; O < objects.size(); O++)
     {
         CDetail& Object = *objects[O];
-        xr_vector<SlotItemVec*>& vis = list[O];
-        if (!vis.empty())
+        xr_vector<VisibleItems>& vis = list[O];
+        const bool hasVisible = std::any_of(vis.begin(), vis.end(), [bounds](const VisibleItems& visible)
+        {
+            return visible.intersects(bounds);
+        });
+        if (hasVisible)
         {
             for (u32 iPass = 0; iPass < Object.shader->E[lod_id]->passes.size(); ++iPass)
             {
@@ -153,9 +157,12 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
 
                 u32 dwBatch = 0;
 
-                for (SlotItemVec* items : vis)
+                for (const VisibleItems& visible : vis)
                 {
-                    for (SlotItem* item : *items)
+                    if (!visible.intersects(bounds))
+                        continue;
+
+                    for (SlotItem* item : *visible.items)
                     {
                         SlotItem& Instance = *item;
                         u32 base = dwBatch * 4;
