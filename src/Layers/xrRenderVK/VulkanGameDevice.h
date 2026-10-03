@@ -37,6 +37,7 @@ public:
         bool render_world = true, bool clear_target = false);
     bool recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface = false);
     bool prepare_for_reset(std::string& error);
+    bool reload_game_shaders(std::string& error);
     bool wait_idle() { return window_.frame().wait_idle();
     }
 

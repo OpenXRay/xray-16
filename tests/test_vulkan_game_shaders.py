@@ -3,7 +3,11 @@
 import json
 from pathlib import Path
 import struct
+import tempfile
 import unittest
+from zipfile import ZipFile
+
+from tools.check_vulkan_shader_assets import check_apk
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +78,21 @@ class GameShaderVariantsTest(unittest.TestCase):
             self.assertIn(252, opcodes)  # OpKill
         blended = {op for op, _ in instructions(SHADERS / "vk/object_blended.ps.spv")}
         self.assertNotIn(252, blended)
+
+    def test_apk_contains_every_game_pipeline_asset(self):
+        variants = json.loads(MANIFEST.read_text())["variants"]
+        with tempfile.TemporaryDirectory() as directory:
+            apk = Path(directory) / "game.apk"
+            with ZipFile(apk, "w") as archive:
+                archive.writestr("lib/armeabi-v7a/libmain.so", b"test native library")
+                for variant in variants:
+                    archive.write(SHADERS / variant["output"],
+                                  "assets/gamedata/shaders/" + variant["output"])
+            self.assertEqual(check_apk(apk, MANIFEST), [])
+            with ZipFile(apk, "w") as archive:
+                archive.writestr("lib/armeabi-v7a/libmain.so", b"test native library")
+            self.assertIn("missing assets/gamedata/shaders/vk/level_opaque.vs.spv",
+                          check_apk(apk, MANIFEST))
 
 
 if __name__ == "__main__":

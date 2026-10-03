@@ -137,11 +137,16 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size()) return false;
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
+        const char* vertex = transparent ? "vk\\object_blended.vs" :
+            mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
+        const char* fragment = transparent ? "vk\\object_blended.ps" :
+            mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
+        const bool named = pass.has_game_pipeline(vertex, fragment);
         if (phase == GeometryPhase::Transparent ? transparent : !transparent)
             return transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, mvp, mesh.material) :
+                mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr) :
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    mesh.index_count, mvp, mesh.material, mesh.mode);
+                    mesh.index_count, mvp, mesh.material, mesh.mode, 0, named ? vertex : nullptr, named ? fragment : nullptr);
         return true;
     }
     if (visual.mesh >= 0)
@@ -153,11 +158,20 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool selected = phase == GeometryPhase::Transparent ? transparent :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
+        const char* vertex = transparent ? "vk\\object_blended.vs" :
+            mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
+            (&mesh != &base) ? "vk\\progressive_opaque.vs" :
+            (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
+        const char* fragment = transparent ? "vk\\object_blended.ps" :
+            mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
+        const bool named = pass.has_game_pipeline(vertex, fragment);
         if (selected && !(transparent ?
                 pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, window.offset) :
+                    window.index_count, mvp, mesh.material, window.offset,
+                    named ? vertex : nullptr, named ? fragment : nullptr) :
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, mesh.mode, window.offset))) return false;
+                    window.index_count, mvp, mesh.material, mesh.mode, window.offset,
+                    named ? vertex : nullptr, named ? fragment : nullptr))) return false;
     }
     for (uint32_t child : visual.children)
         if (!record_visual(child, frame, pass, mvp, phase, lod)) return false;

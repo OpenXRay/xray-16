@@ -124,6 +124,7 @@ int main()
         assert(decode_model_geometry(visual, geometry, error));
         assert(geometry.type == 3 && geometry.children.size() == 1);
         const auto& child = geometry.children[0];
+        assert(child.skin_weights == links);
         assert(child.vertices.size() == 3 && child.indices.size() == 3);
         assert(child.vertices[2].position[0] == 2 && child.vertices[2].uv[1] == 0.75f);
         float total = 0;

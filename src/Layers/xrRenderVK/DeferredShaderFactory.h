@@ -12,5 +12,8 @@ public:
     bool create(VkDevice device, const ShaderModuleDispatch& shader_dispatch,
         const ScenePassDispatch& pass_dispatch, VkRenderPass geometry_pass,
         VkRenderPass light_pass, DeferredPass& pass, std::string& error);
+    // The caller waits for submitted frames before swapping pipelines.
+    bool reload_game_pipelines(VkDevice device, const ShaderModuleDispatch& shader_dispatch,
+        DeferredPass& pass, std::string& error);
 };
 }

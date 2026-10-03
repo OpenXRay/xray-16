@@ -133,6 +133,13 @@ void VulkanLevelRender::OnAssetsChanged()
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader reload needs idle GPU frames");
     compiled_shaders_.clear();
+    if (game_device_)
+    {
+        std::string shader_error;
+        if (!game_device_->reload_game_shaders(shader_error))
+            Msg("! [renderer-vulkan] keeping previous game pipelines after reload failure: %s",
+                shader_error.c_str());
+    }
     if (g_pGamePersistent && game_device_)
     {
         auto& environment = g_pGamePersistent->Environment();
@@ -460,6 +467,8 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
     requested_drawable_ = drawable_width > 0 && drawable_height > 0 ?
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
     bind_level_device(*resources);
+    Msg("[renderer-vulkan] gameplay device initialized: Vulkan SDL window, %ux%u",
+        width, height);
     context_state_.device_created();
     R_ASSERT2(device_resource_state_.device_created(),
         "Vulkan renderer device resource state was not empty at creation");

@@ -137,6 +137,10 @@ chmod +x "$project_dir/gradlew"
 )
 
 apk="$project_dir/app/build/outputs/apk/debug/app-debug.apk"
+python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
+    --shader-root "$asset_root/gamedata/shaders" \
+    --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
+    --apk "$apk"
 mkdir -p "$repo_dir/build"
 port_version=$(sed -n '1p' "$project_dir/android-version.txt")
 port_version_code=$(sed -n '2p' "$project_dir/android-version.txt")

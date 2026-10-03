@@ -26,8 +26,8 @@ import org.libsdl.app.SDLActivity;
 /**
  * SDL entry point for the Android renderer bring-up APK.
  *
- * The default mode creates a real GLES 3.1 context and runs a native shader
- * smoke test without bundling proprietary game data. Java-side lifecycle and
+ * The launcher selects auto, GLES or Vulkan for the game; the separate smoke
+ * mode runs native renderer probes without proprietary game data. Java-side lifecycle and
  * uncaught-exception records are written to app-specific external storage so
  * a phone test remains diagnosable without root access.
  */
@@ -39,7 +39,7 @@ public final class XRayActivity extends SDLActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Apply orientation before SDL creates its SurfaceView/EGL surface.
+        // Apply orientation before SDL creates its SurfaceView.
         // Doing it after super.onCreate leaves the first drawable portrait
         // and forces a destructive surface recreation during native startup.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -184,7 +184,9 @@ public final class XRayActivity extends SDLActivity {
         }
 
         if (!rendererSmoke) {
-            args.add(OptionCatalog.value(OptionCatalog.RENDERER_ARGS, rendererMode, 0));
+            String rendererArg = OptionCatalog.value(OptionCatalog.RENDERER_ARGS, rendererMode, 0);
+            args.add(rendererArg);
+            writeDiagnostic("native gameplay renderer request=" + rendererArg);
 
             args.add("-android-render-width");
             args.add(Integer.toString(Math.max(320, renderWidth)));

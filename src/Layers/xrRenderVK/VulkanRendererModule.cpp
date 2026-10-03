@@ -46,11 +46,41 @@ public:
             ObtainSupportedModes();
         if (!loader_available)
             return false;
-        // The shared game shader resource manager still dispatches through
-        // GLES RImplementation. Enabling selection before its Vulkan pipeline
-        // is wired would initialize GL shader resources in a Vulkan window.
-        Log("! [renderer-vulkan] gameplay shader resource pipeline is not ready");
-        return false;
+        // The Vulkan game path owns its model/material resources and does not
+        // instantiate the GLES CResourceManager. Check the VFS assets before
+        // selecting a Vulkan SDL window; an incomplete install may use GLES
+        // in auto mode, while an explicit request will report the failure.
+        constexpr pcstr required[]{
+            "vk\\level_opaque.vs", "vk\\level_opaque.ps",
+            "vk\\object_opaque.vs", "vk\\object_opaque.ps",
+            "vk\\level_cutout.vs", "vk\\level_cutout.ps",
+            "vk\\object_cutout.vs", "vk\\object_cutout.ps",
+            "vk\\object_blended.vs", "vk\\object_blended.ps",
+            "vk\\object_double_sided.vs", "vk\\object_double_sided.ps",
+            "vk\\tree_opaque.vs", "vk\\progressive_opaque.vs",
+            "vk\\skinned_1.vs", "vk\\skinned_2.vs",
+            "vk\\skinned_3.vs", "vk\\skinned_4.vs", "vk\\hud_skinned_4.vs"
+        };
+        for (pcstr name : required)
+        {
+            string_path path;
+            if (!FS.exist(path, "$game_shaders$", name, ".spv"))
+            {
+                Msg("! [renderer-vulkan] missing gameplay shader: %s.spv", name);
+                return false;
+            }
+            IReader* reader = FS.r_open(path);
+            const size_t length = xr_strlen(name);
+            const uint32_t stage = length >= 3 && name[length - 2] == 'v' ? 0u : 4u;
+            const bool valid = reader && has_spirv_entry(reader->pointer(), reader->length(), stage, "main");
+            if (reader) FS.r_close(reader);
+            if (!valid)
+            {
+                Msg("! [renderer-vulkan] invalid gameplay shader stage/entry: %s.spv", name);
+                return false;
+            }
+        }
+        return true;
     }
 
     void SetupEnv(pcstr mode) override

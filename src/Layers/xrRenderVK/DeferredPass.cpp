@@ -1,4 +1,5 @@
 #include "DeferredPass.h"
+#include "ModelGeometry.h"
 
 #include <algorithm>
 #include <cmath>
@@ -10,7 +11,7 @@ namespace
 {
 bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkShaderModule vertex, VkShaderModule fragment, bool geometry_input, bool gbuffer,
-    bool transparent, bool hud,
+    bool transparent, bool hud, bool skinned,
     const ScenePassDispatch& vk, VkPipeline& pipeline)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
@@ -21,16 +22,18 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     stages[1].module = fragment;
     stages[1].pName = "main";
-    const VkVertexInputBindingDescription binding{0, sizeof(LevelVertex), VK_VERTEX_INPUT_RATE_VERTEX};
+    const VkVertexInputBindingDescription binding{0, skinned ? sizeof(ModelVertex) : sizeof(LevelVertex), VK_VERTEX_INPUT_RATE_VERTEX};
     const VkVertexInputAttributeDescription attributes[]{
-        {0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(LevelVertex, position)},
+        {0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
         {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(LevelVertex, normal)},
-        {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, uv)}
+        {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, uv)},
+        {3, 0, VK_FORMAT_R16G16B16A16_UINT, offsetof(ModelVertex, bones)},
+        {4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(ModelVertex, weights)}
     };
     VkPipelineVertexInputStateCreateInfo inputs{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     inputs.vertexBindingDescriptionCount = geometry_input ? 1 : 0;
     inputs.pVertexBindingDescriptions = geometry_input ? &binding : nullptr;
-    inputs.vertexAttributeDescriptionCount = geometry_input ? 3 : 0;
+    inputs.vertexAttributeDescriptionCount = geometry_input ? (skinned ? 5 : 3) : 0;
     inputs.pVertexAttributeDescriptions = geometry_input ? attributes : nullptr;
     VkPipelineInputAssemblyStateCreateInfo assembly{VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
     assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -222,11 +225,18 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
     };
+    const VkDescriptorSetLayoutBinding pose_binding{
+        0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
     VkDescriptorSetLayoutCreateInfo descriptor{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
     descriptor.bindingCount = 1;
     descriptor.pBindings = bindings;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &material_layout_) != VK_SUCCESS)
         goto failed;
+    descriptor.bindingCount = 1;
+    descriptor.pBindings = &pose_binding;
+    if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &pose_layout_) != VK_SUCCESS)
+        goto failed;
+    descriptor.pBindings = bindings;
     descriptor.bindingCount = 3;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &gbuffer_layout_) != VK_SUCCESS)
         goto failed;
@@ -234,12 +244,15 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &weather_set_layout_) != VK_SUCCESS)
         goto failed;
     {
-        const VkDescriptorPoolSize size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048};
+        const VkDescriptorPoolSize sizes[]{
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048},
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 512}
+        };
         VkDescriptorPoolCreateInfo pool{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
         pool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool.maxSets = 512;
-        pool.poolSizeCount = 1;
-        pool.pPoolSizes = &size;
+        pool.poolSizeCount = 2;
+        pool.pPoolSizes = sizes;
         if (vk_.create_descriptor_pool(device, &pool, nullptr, &pool_) != VK_SUCCESS) goto failed;
     }
     {
@@ -251,6 +264,12 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         layout.pPushConstantRanges = &camera;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &geometry_layout_) != VK_SUCCESS)
             goto failed;
+        const VkDescriptorSetLayout skinned_sets[]{material_layout_, pose_layout_};
+        layout.setLayoutCount = 2;
+        layout.pSetLayouts = skinned_sets;
+        if (vk_.create_pipeline_layout(device, &layout, nullptr, &skinned_layout_) != VK_SUCCESS)
+            goto failed;
+        layout.setLayoutCount = 1;
         layout.pSetLayouts = &gbuffer_layout_;
         layout.pPushConstantRanges = &light;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &light_layout_) != VK_SUCCESS)
@@ -264,17 +283,17 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             goto failed;
     }
     if (!make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
-            geometry_fragment, true, true, false, false, vk_, geometry_) ||
+            geometry_fragment, true, true, false, false, false, vk_, geometry_) ||
         !make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
-            alpha_test_fragment, true, true, false, false, vk_, alpha_test_) ||
+            alpha_test_fragment, true, true, false, false, false, vk_, alpha_test_) ||
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
-            transparent_fragment, true, false, true, false, vk_, transparent_) ||
+            transparent_fragment, true, false, true, false, false, vk_, transparent_) ||
         !make_pipeline(device, light_pass, geometry_layout_, geometry_vertex,
-            transparent_fragment, true, false, false, true, vk_, hud_) ||
+            transparent_fragment, true, false, false, true, false, vk_, hud_) ||
         !make_pipeline(device, light_pass, light_layout_, light_vertex,
-            light_fragment, false, false, false, false, vk_, lighting_) ||
+            light_fragment, false, false, false, false, false, vk_, lighting_) ||
         !make_pipeline(device, light_pass, weather_layout_, light_vertex,
-            weather_fragment, false, false, false, false, vk_, weather_pipeline_)) goto failed;
+            weather_fragment, false, false, false, false, false, vk_, weather_pipeline_)) goto failed;
     error.clear();
     return true;
 failed:
@@ -323,6 +342,147 @@ bool DeferredPass::allocate(VkDescriptorSetLayout layout, VkImageView first, VkI
 bool DeferredPass::material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error)
 {
     return allocate(material_layout_, albedo, VK_NULL_HANDLE, sampler, set, error);
+}
+
+const DeferredPass::GamePipeline* DeferredPass::game_pipeline(const char* vertex_name, const char* fragment_name) const
+{
+    if (!vertex_name || !fragment_name || !*vertex_name || !*fragment_name) return nullptr;
+    std::string key(vertex_name);
+    key.push_back('\0');
+    key += fragment_name;
+    const auto found = game_pipelines_.find(key);
+    return found == game_pipelines_.end() ? nullptr : &found->second;
+}
+
+bool DeferredPass::has_game_pipeline(const std::string& vertex_name, const std::string& fragment_name) const
+{
+    return game_pipeline(vertex_name.c_str(), fragment_name.c_str()) != nullptr;
+}
+
+void DeferredPass::abort_game_pipeline_reload()
+{
+    if (device_ && vk_.destroy_pipeline)
+        for (const auto& [name, pipeline] : pending_game_pipelines_)
+            if (pipeline.handle) vk_.destroy_pipeline(device_, pipeline.handle, nullptr);
+    pending_game_pipelines_.clear();
+    reloading_game_pipelines_ = false;
+}
+
+void DeferredPass::begin_game_pipeline_reload()
+{
+    abort_game_pipeline_reload();
+    reloading_game_pipelines_ = true;
+}
+
+void DeferredPass::commit_game_pipeline_reload()
+{
+    if (!reloading_game_pipelines_) return;
+    if (device_ && vk_.destroy_pipeline)
+        for (const auto& [name, pipeline] : game_pipelines_)
+            if (pipeline.handle) vk_.destroy_pipeline(device_, pipeline.handle, nullptr);
+    game_pipelines_ = std::move(pending_game_pipelines_);
+    pending_game_pipelines_.clear();
+    reloading_game_pipelines_ = false;
+}
+
+bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
+    VkShaderModule vertex, VkShaderModule fragment, SurfaceMode mode, bool hud, std::string& error,
+    bool skinned)
+{
+    if (!device_ || vertex_name.empty() || fragment_name.empty() || !vertex || !fragment ||
+        (hud && mode == SurfaceMode::AlphaTest))
+    {
+        error = "invalid Vulkan game shader pair or pass state: " + vertex_name + " / " + fragment_name;
+        return false;
+    }
+    std::string key = vertex_name;
+    key.push_back('\0');
+    key += fragment_name;
+    auto& registry = reloading_game_pipelines_ ? pending_game_pipelines_ : game_pipelines_;
+    const auto existing = registry.find(key);
+    if (existing != registry.end())
+    {
+        if (existing->second.mode != mode || existing->second.hud != hud || existing->second.skinned != skinned)
+        {
+            error = "Vulkan game shader pair requested with incompatible pass state: " + vertex_name + " / " + fragment_name;
+            return false;
+        }
+        error.clear();
+        return true;
+    }
+    VkPipeline pipeline{};
+    const bool transparent = mode == SurfaceMode::Transparent;
+    if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
+            skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
+            !transparent && !hud, transparent, hud, skinned, vk_, pipeline))
+    {
+        error = "could not create Vulkan game pipeline: " + vertex_name + " / " + fragment_name;
+        return false;
+    }
+    registry.emplace(std::move(key), GamePipeline{pipeline, mode, hud, skinned});
+    error.clear();
+    return true;
+}
+
+bool DeferredPass::pose_descriptor(VkBuffer pose, VkDeviceSize bytes, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    if (!device_ || !pose_layout_ || !pool_ || !pose || !bytes)
+    {
+        error = "invalid Vulkan skeletal pose buffer";
+        return false;
+    }
+    VkDescriptorSetAllocateInfo allocate{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    allocate.descriptorPool = pool_;
+    allocate.descriptorSetCount = 1;
+    allocate.pSetLayouts = &pose_layout_;
+    if (vk_.allocate_descriptor_sets(device_, &allocate, &result) != VK_SUCCESS)
+    {
+        error = "Vulkan skeletal pose descriptor pool is exhausted";
+        return false;
+    }
+    const VkDescriptorBufferInfo buffer{pose, 0, bytes};
+    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+    write.dstSet = result;
+    write.dstBinding = 0;
+    write.descriptorCount = 1;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    write.pBufferInfo = &buffer;
+    vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+    error.clear();
+    return true;
+}
+
+void DeferredPass::release_pose_descriptor(VkDescriptorSet& set)
+{
+    if (device_ && pool_ && set && vk_.free_descriptor_sets)
+        vk_.free_descriptor_sets(device_, pool_, 1, &set);
+    set = VK_NULL_HANDLE;
+}
+
+bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+    uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
+    VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
+    const char* vertex_name, const char* fragment_name) const
+{
+    const auto* pair = game_pipeline(vertex_name, fragment_name);
+    if (!pair || !pair->skinned || pair->mode != mode || pair->hud != hud ||
+        frame.render_pass != (hud || mode == SurfaceMode::Transparent ? light_pass_ : geometry_pass_) ||
+        !frame.command_buffer || !frame.extent.width || !frame.extent.height ||
+        !vertices || !indices || !index_count || !material_set || !pose_set) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pair->handle);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    const VkDescriptorSet sets[]{material_set, pose_set};
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        skinned_layout_, 0, 2, sets, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
+    return true;
 }
 
 void DeferredPass::update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler)
@@ -396,10 +556,16 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    SurfaceMode mode, uint32_t first_index) const
+    SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name) const
 {
     if (mode == SurfaceMode::Transparent) return false;
-    const VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
+    VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
+    if (vertex_name || fragment_name)
+    {
+        const auto* pair = game_pipeline(vertex_name, fragment_name);
+        if (!pair || pair->mode != mode || pair->hud || pair->skinned) return false;
+        pipeline = pair->handle;
+    }
     if (!pipeline || frame.render_pass != geometry_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
@@ -419,12 +585,19 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
 
 bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    uint32_t first_index) const
+    uint32_t first_index, const char* vertex_name, const char* fragment_name) const
 {
-    if (!transparent_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
+    VkPipeline pipeline = transparent_;
+    if (vertex_name || fragment_name)
+    {
+        const auto* pair = game_pipeline(vertex_name, fragment_name);
+        if (!pair || pair->mode != SurfaceMode::Transparent || pair->hud || pair->skinned) return false;
+        pipeline = pair->handle;
+    }
+    if (!pipeline || frame.render_pass != light_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
-    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, transparent_);
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     viewport_scissor(frame, vk_);
     const VkDeviceSize offset = 0;
     vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
@@ -440,12 +613,19 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
 
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    uint32_t first_index) const
+    uint32_t first_index, const char* vertex_name, const char* fragment_name) const
 {
-    if (!hud_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
+    VkPipeline pipeline = hud_;
+    if (vertex_name || fragment_name)
+    {
+        const auto* pair = game_pipeline(vertex_name, fragment_name);
+        if (!pair || !pair->hud || pair->skinned) return false;
+        pipeline = pair->handle;
+    }
+    if (!pipeline || frame.render_pass != light_pass_ || !frame.command_buffer ||
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
-    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hud_);
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     viewport_scissor(frame, vk_);
     const VkDeviceSize offset = 0;
     vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
@@ -484,8 +664,11 @@ bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescrip
 
 void DeferredPass::destroy()
 {
+    abort_game_pipeline_reload();
     if (device_ && vk_.destroy_pipeline)
     {
+        for (const auto& [name, pipeline] : game_pipelines_)
+            if (pipeline.handle) vk_.destroy_pipeline(device_, pipeline.handle, nullptr);
         if (geometry_) vk_.destroy_pipeline(device_, geometry_, nullptr);
         if (alpha_test_) vk_.destroy_pipeline(device_, alpha_test_, nullptr);
         if (transparent_) vk_.destroy_pipeline(device_, transparent_, nullptr);
@@ -493,9 +676,11 @@ void DeferredPass::destroy()
         if (lighting_) vk_.destroy_pipeline(device_, lighting_, nullptr);
         if (weather_pipeline_) vk_.destroy_pipeline(device_, weather_pipeline_, nullptr);
     }
+    game_pipelines_.clear();
     if (device_ && vk_.destroy_pipeline_layout)
     {
         if (geometry_layout_) vk_.destroy_pipeline_layout(device_, geometry_layout_, nullptr);
+        if (skinned_layout_) vk_.destroy_pipeline_layout(device_, skinned_layout_, nullptr);
         if (light_layout_) vk_.destroy_pipeline_layout(device_, light_layout_, nullptr);
         if (weather_layout_) vk_.destroy_pipeline_layout(device_, weather_layout_, nullptr);
     }
@@ -504,14 +689,15 @@ void DeferredPass::destroy()
     if (device_ && vk_.destroy_descriptor_set_layout)
     {
         if (material_layout_) vk_.destroy_descriptor_set_layout(device_, material_layout_, nullptr);
+        if (pose_layout_) vk_.destroy_descriptor_set_layout(device_, pose_layout_, nullptr);
         if (gbuffer_layout_) vk_.destroy_descriptor_set_layout(device_, gbuffer_layout_, nullptr);
         if (weather_set_layout_) vk_.destroy_descriptor_set_layout(device_, weather_set_layout_, nullptr);
     }
     device_ = VK_NULL_HANDLE;
     geometry_pass_ = light_pass_ = VK_NULL_HANDLE;
     geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = weather_pipeline_ = VK_NULL_HANDLE;
-    geometry_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
-    material_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
+    geometry_layout_ = skinned_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
+    material_layout_ = pose_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     vk_ = {};
 }

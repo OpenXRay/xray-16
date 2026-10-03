@@ -130,6 +130,22 @@ failed:
     return false;
 }
 
+bool VulkanGameDevice::reload_game_shaders(std::string& error)
+{
+    const VkDevice device = window_.device();
+    if (!device || !window_.frame().wait_idle())
+    {
+        error = "Vulkan shader reload needs an idle gameplay device";
+        return false;
+    }
+    const auto get = window_.device_proc();
+    const ShaderModuleDispatch shaders{
+        proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
+        proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
+    DeferredShaderFactory factory;
+    return factory.reload_game_pipelines(device, shaders, deferred_, error);
+}
+
 void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);

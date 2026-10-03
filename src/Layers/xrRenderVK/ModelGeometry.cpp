@@ -119,6 +119,7 @@ bool mesh(const VisualRecord& source, ModelGeometry& out, std::string& error)
         error = "unsupported OGF mesh vertex encoding";
         return false;
     }
+    out.skin_weights = static_cast<uint8_t>(links);
     const size_t stride = plain ? 32 : links == 1 ? 60 : links == 2 ? 64 : links == 3 ? 70 : 76;
     if (size_t(count) * stride != vertices.size - 8)
     {

@@ -54,11 +54,20 @@ private:
         DeferredPass& pass, std::string& error);
     struct Mesh
     {
+        struct PoseInstance
+        {
+            std::array<BufferResource, FrameContext::FramesInFlight> buffers;
+            std::array<VkDescriptorSet, FrameContext::FramesInFlight> descriptors{};
+        };
         ModelGeometry geometry;
+        BufferResource skinned_vertices;
         std::array<BufferResource, FrameContext::FramesInFlight> vertices;
         std::unordered_map<const IKinematics*, std::array<BufferResource, FrameContext::FramesInFlight>> instance_vertices;
+        std::unordered_map<const IKinematics*, PoseInstance> poses;
         BufferResource indices;
         VkDescriptorSet material{};
+        bool gpu_skinning{};
+        uint16_t max_bone_index{};
         size_t fast_index = SIZE_MAX;
         bool fast_variant = false;
     };
