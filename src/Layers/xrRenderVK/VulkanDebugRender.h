@@ -18,6 +18,7 @@ class VulkanDebugRender final : public IDebugRender
 public:
     explicit VulkanDebugRender(VulkanGameDevice& device) : device_(device) { world_.identity(); }
     ~VulkanDebugRender() override;
+    void OnDeviceDestroy();
     void Render() override;
     void add_lines(const Fvector* vertices, const u32& vertex_count,
         const u16* pairs, const u32& pair_count, const u32& color) override;

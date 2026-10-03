@@ -1,6 +1,11 @@
 #include "xrEngine/stdafx.h"
 #include "Include/xrRender/xrRender.h"
 #include "VulkanProbe.h"
+#include "VulkanLevelRender.h"
+#include "VulkanGameDevice.h"
+#include "VulkanRenderFactory.h"
+#include "VulkanDrawUtils.h"
+#include "VulkanDebugRender.h"
 
 namespace xray::render::vulkan
 {
@@ -12,6 +17,13 @@ class VulkanRendererModule final : public RendererModule
     bool probe_attempted{};
     bool loader_available{};
     std::string probe_error;
+    VulkanGameDevice device;
+    VulkanLevelRender renderer{device};
+    VulkanRenderFactory factory{device};
+    VulkanDrawUtils draw_utils{device};
+#ifdef DEBUG
+    VulkanDebugRender debug_render{device};
+#endif
 
 public:
     const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() override
@@ -34,20 +46,38 @@ public:
             ObtainSupportedModes();
         if (!loader_available)
             return false;
-        // The device, swapchain, shader and texture building blocks live in
-        // this target, but an IRender implementation and its companion factory,
-        // UI and device renderers do not exist yet. Never bind GL objects to a
-        // mode advertised as Vulkan, even when the Vulkan probe passes.
-        Log("! [renderer-vulkan] gameplay pipeline unavailable (world/UI/device renderers missing)");
+        // The shared game shader resource manager still dispatches through
+        // GLES RImplementation. Enabling selection before its Vulkan pipeline
+        // is wired would initialize GL shader resources in a Vulkan window.
+        Log("! [renderer-vulkan] gameplay shader resource pipeline is not ready");
         return false;
     }
 
-    void SetupEnv(pcstr) override
+    void SetupEnv(pcstr mode) override
     {
-        R_ASSERT2(false, "Vulkan gameplay pipeline is not implemented");
+        R_ASSERT2(mode && xr_strcmp(mode, "renderer_vulkan") == 0,
+            "Vulkan module received another renderer mode");
+        R_ASSERT2(!GEnv.Render || GEnv.Render == &renderer,
+            "Another renderer is still bound to GEnv");
+        GEnv.Render = &renderer;
+        GEnv.RenderFactory = &factory;
+        GEnv.UIRender = &device.ui();
+        GEnv.DU = &draw_utils;
+#ifdef DEBUG
+        GEnv.DRender = &debug_render;
+#endif
     }
 
-    void ClearEnv() override {}
+    void ClearEnv() override
+    {
+        if (GEnv.Render != &renderer) return;
+        renderer.Destroy();
+        GEnv.DRender = nullptr;
+        GEnv.DU = nullptr;
+        GEnv.UIRender = nullptr;
+        GEnv.RenderFactory = nullptr;
+        GEnv.Render = nullptr;
+    }
 };
 VulkanRendererModule module;
 }

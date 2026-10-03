@@ -7,6 +7,9 @@
 
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "Include/xrRender/xrRender.h"
+#endif
 
 struct SoundProcessor final : public pureFrame
 {
@@ -40,7 +43,10 @@ void CheckAndSetupRenderer()
 #if defined(XR_PLATFORM_ANDROID)
     if (strstr(Core.Params, "-renderer-vulkan"))
         Console->Execute("renderer renderer_vulkan");
-    else if (strstr(Core.Params, "-renderer-gles") || strstr(Core.Params, "-renderer-auto"))
+    else if (strstr(Core.Params, "-renderer-auto"))
+        Console->Execute(xray::render::vulkan::GetRendererModule()->CheckGameRequirements() ?
+            "renderer renderer_vulkan" : "renderer renderer_gles");
+    else if (strstr(Core.Params, "-renderer-gles"))
         Console->Execute("renderer renderer_gles");
     else
 #endif

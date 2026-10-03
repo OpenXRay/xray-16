@@ -1,0 +1,22 @@
+[[vk::binding(0, 0)]] Texture2D<float4> diffuse : register(t0);
+[[vk::binding(1, 0)]] SamplerState diffuse_sampler : register(s1);
+
+struct Fragment
+{
+    [[vk::location(0)]] float3 normal : TEXCOORD0;
+    [[vk::location(1)]] float2 uv : TEXCOORD1;
+};
+
+struct GBuffer
+{
+    [[vk::location(0)]] float4 albedo : SV_Target0;
+    [[vk::location(1)]] float4 normal : SV_Target1;
+};
+
+GBuffer main(Fragment fragment)
+{
+    GBuffer output;
+    output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
+    return output;
+}

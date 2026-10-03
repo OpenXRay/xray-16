@@ -189,6 +189,22 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_link_libraries(vulkan_particle_visual_test PRIVATE xrRenderVK xrParticles xrEngine xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_particle_visual COMMAND vulkan_particle_visual_test)
 
+    add_executable(vulkan_renderer_module_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_renderer_module.cpp"
+    )
+    target_include_directories(vulkan_renderer_module_test PRIVATE
+        "${XRAY_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>
+    )
+    target_compile_definitions(vulkan_renderer_module_test PRIVATE DEBUG)
+    target_compile_options(vulkan_renderer_module_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
+    )
+    target_link_libraries(vulkan_renderer_module_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    add_test(NAME vulkan_renderer_module COMMAND vulkan_renderer_module_test)
+
     add_executable(vulkan_shader_module_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_shader_module.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ShaderModule.cpp"

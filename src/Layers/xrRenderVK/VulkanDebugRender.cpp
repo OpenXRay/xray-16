@@ -10,6 +10,11 @@ namespace xray::render::vulkan
 {
 VulkanDebugRender::~VulkanDebugRender()
 {
+    OnDeviceDestroy();
+}
+
+void VulkanDebugRender::OnDeviceDestroy()
+{
     for (unsigned i = 0; i < shaders_.size(); ++i)
         DestroyDebugShader(static_cast<dbgShaderHandle>(i));
 }

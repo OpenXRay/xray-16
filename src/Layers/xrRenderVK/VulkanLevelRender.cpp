@@ -7,6 +7,8 @@
 #include "EngineParticleSource.h"
 #include "VulkanVisual.h"
 #include "VulkanUIShader.h"
+#include "VulkanDrawUtils.h"
+#include "VulkanDebugRender.h"
 #include "VulkanWallMarkArray.h"
 #include "WallmarkGeometry.h"
 #include "xrEngine/IGame_Level.h"
@@ -35,6 +37,8 @@
 namespace xray::render::vulkan
 {
 static_assert(!std::is_abstract_v<VulkanLevelRender>, "Vulkan IRender implementation must be complete");
+VulkanLevelRender::VulkanLevelRender() = default;
+VulkanLevelRender::VulkanLevelRender(VulkanGameDevice& device) : external_game_device_(&device) {}
 void VulkanLevelRender::create()
 {
     m_skinning = -1;
@@ -425,15 +429,16 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
     }
 
     Destroy();
-    auto device = std::make_unique<VulkanGameDevice>();
+    auto device = external_game_device_ ? nullptr : std::make_unique<VulkanGameDevice>();
+    auto* resources = external_game_device_ ? external_game_device_ : device.get();
     std::string error;
-    if (!device->initialize(window, {width, height}, error))
+    if (!resources->initialize(window, {width, height}, error))
     {
         xrDebug::Fatal(DEBUG_INFO, "Vulkan device creation failed: %s", error.c_str());
         return;
     }
 
-    const VkExtent2D extent = device->window().frame().extent();
+    const VkExtent2D extent = resources->window().frame().extent();
     if (!extent.width || !extent.height)
     {
         xrDebug::Fatal(DEBUG_INFO, "Vulkan swapchain has an empty extent");
@@ -450,7 +455,7 @@ void VulkanLevelRender::Create(SDL_Window* window, u32& width, u32& height,
     SDL_Vulkan_GetDrawableSize(window, &drawable_width, &drawable_height);
     requested_drawable_ = drawable_width > 0 && drawable_height > 0 ?
         VkExtent2D{static_cast<uint32_t>(drawable_width), static_cast<uint32_t>(drawable_height)} : extent;
-    bind_level_device(*owned_game_device_);
+    bind_level_device(*resources);
     context_state_.device_created();
     R_ASSERT2(device_resource_state_.device_created(),
         "Vulkan renderer device resource state was not empty at creation");
@@ -508,6 +513,8 @@ void VulkanLevelRender::Destroy()
         owned_game_device_->destroy();
         owned_game_device_.reset();
     }
+    else if (external_game_device_)
+        external_game_device_->destroy();
 }
 
 void VulkanLevelRender::Reset(SDL_Window* window, u32& width, u32& height,
@@ -666,20 +673,28 @@ void VulkanLevelRender::OnDeviceCreate(pcstr)
         return;
 
     game_device_->ui().CreateUIGeom();
+    if (auto* utils = dynamic_cast<VulkanDrawUtils*>(GEnv.DU))
+        utils->OnDeviceCreate();
     R_ASSERT2(device_resource_state_.device_resources_created(),
         "Vulkan renderer device resources were created out of order");
 }
 
 void VulkanLevelRender::OnDeviceDestroy(bool)
 {
+    if (device_ && wait_idle_)
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan UI teardown requires idle GPU frames");
+    if (auto* utils = dynamic_cast<VulkanDrawUtils*>(GEnv.DU))
+        utils->OnDeviceDestroy();
+#ifdef DEBUG
+    if (auto* debug = dynamic_cast<VulkanDebugRender*>(GEnv.DRender))
+        debug->OnDeviceDestroy();
+#endif
     if (game_device_ && textures_)
         for (const auto& [name, texture] : imgui_textures_)
             textures_->release_ui(texture.descriptor, game_device_->ui_pass());
     imgui_textures_.clear();
     screenshot_.reset();
     destroy_all_models();
-    if (device_ && wait_idle_)
-        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan shader teardown requires idle GPU frames");
     compiled_shaders_.clear();
     if (!game_device_)
     {

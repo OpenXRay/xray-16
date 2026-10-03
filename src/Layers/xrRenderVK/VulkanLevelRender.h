@@ -30,6 +30,8 @@ struct ParticleCatalog;
 class VulkanLevelRender : public IRender
 {
 public:
+    VulkanLevelRender();
+    explicit VulkanLevelRender(VulkanGameDevice& device);
     ~VulkanLevelRender() override;
     void bind_level_device(VulkanGameDevice& resources);
     std::unique_ptr<VulkanUIShader> create_ui_shader();
@@ -161,6 +163,7 @@ private:
     SDL_Window* window_{};
     VkExtent2D requested_drawable_{};
     std::unique_ptr<VulkanGameDevice> owned_game_device_;
+    VulkanGameDevice* external_game_device_{};
     std::vector<VulkanLight*> lights_;
     std::vector<VulkanGlow*> glows_;
     std::vector<VulkanObjectSpecific*> object_specifics_;

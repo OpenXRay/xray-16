@@ -75,28 +75,39 @@ def _manifest(path, output_dir):
     return variants
 
 
-def _compile(variant, dxc, temporary):
+def _compile(variant, dxc, temporary, compiler="dxc"):
     source = variant["source"]
-    command = [dxc, "-spirv", "-fspv-target-env=vulkan1.0", "-Zpr",
-               "-T", f"{variant['stage']}_6_0", "-E", variant["entry"],
-               "-Fo", str(temporary), str(source)]
-    for directory in [source.parent, *variant["includes"]]:
-        command += ["-I", str(directory)]
-    for definition in variant["defines"]:
-        command += ["-D", definition]
+    if compiler == "glslc":
+        stage = {"vs": "vertex", "ps": "fragment", "cs": "compute",
+                 "gs": "geometry", "hs": "tesscontrol", "ds": "tesseval"}[variant["stage"]]
+        command = [dxc, "-x", "hlsl", f"-fshader-stage={stage}",
+                   f"-fentry-point={variant['entry']}", "--target-env=vulkan1.0",
+                   "-o", str(temporary), str(source)]
+        for directory in [source.parent, *variant["includes"]]:
+            command += ["-I", str(directory)]
+        for definition in variant["defines"]:
+            command += [f"-D{definition}"]
+    else:
+        command = [dxc, "-spirv", "-fspv-target-env=vulkan1.0", "-Zpr",
+                   "-T", f"{variant['stage']}_6_0", "-E", variant["entry"],
+                   "-Fo", str(temporary), str(source)]
+        for directory in [source.parent, *variant["includes"]]:
+            command += ["-I", str(directory)]
+        for definition in variant["defines"]:
+            command += ["-D", definition]
     try:
         result = subprocess.run(command, check=False, capture_output=True, text=True)
     except FileNotFoundError:
-        print(f"DXC executable not found: {dxc}", file=sys.stderr)
+        print(f"Shader compiler not found: {dxc}", file=sys.stderr)
         return 1
     if result.returncode:
-        print(f"DXC failed for {source} [{variant['stage']}, "
+        print(f"Shader compilation failed for {source} [{variant['stage']}, "
               f"{', '.join(variant['defines']) or 'default'}] (exit {result.returncode}):\n"
               f"{result.stdout}{result.stderr}", file=sys.stderr)
         return result.returncode
     data = temporary.read_bytes()
     if not _valid_spirv(data, variant["stage"], variant["entry"]):
-        print(f"DXC produced invalid SPIR-V or missing {variant['stage']} entry "
+        print(f"Compiler produced invalid SPIR-V or missing {variant['stage']} entry "
               f"'{variant['entry']}' for {source}", file=sys.stderr)
         return 1
     return 0
@@ -105,6 +116,7 @@ def _compile(variant, dxc, temporary):
 def compile_shader(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dxc", default=os.environ.get("DXC", "dxc"))
+    parser.add_argument("--compiler", choices=("dxc", "glslc"), default="dxc")
     parser.add_argument("--source", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--stage", choices=STAGES)
@@ -114,6 +126,8 @@ def compile_shader(argv=None):
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args(argv)
+    if args.compiler == "glslc" and args.dxc == "dxc":
+        args.dxc = "glslc"
     if args.manifest:
         if not args.output_dir or any((args.source, args.output, args.stage, args.entry,
                                        args.include, args.define)):
@@ -141,7 +155,7 @@ def compile_shader(argv=None):
             with tempfile.NamedTemporaryFile(dir=output.parent, suffix=".spv", delete=False) as tmp:
                 temporary = Path(tmp.name)
             pending.append((temporary, output))
-            status = _compile(variant, args.dxc, temporary)
+            status = _compile(variant, args.dxc, temporary, args.compiler)
             if status:
                 return status
         for temporary, output in pending:

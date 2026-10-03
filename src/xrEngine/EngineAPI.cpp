@@ -68,7 +68,7 @@ void CEngineAPI::SelectRenderer()
 
     // A request for Vulkan must never become a successful GLES game launch.
     if (!selectedRenderer && xr_strcmp(selected_mode, "renderer_vulkan") == 0)
-        R_ASSERT2(false, "Vulkan gameplay renderer is not ready: world, UI, and resource pipelines must be implemented before starting a game");
+        R_ASSERT2(false, "Vulkan gameplay renderer is unavailable: inspect the Vulkan probe and shader resource diagnostics");
 
     // Renderer is either fully unsupported (hardware)
     // or we don't comply with it's requirements (e.g. shaders missing)
@@ -119,6 +119,8 @@ void CEngineAPI::Destroy()
     if (gameModule)
         gameModule->finalize();
 
+    if (selectedRenderer)
+        selectedRenderer->ClearEnv();
     selectedRenderer = nullptr;
 
     pCreate = nullptr;
