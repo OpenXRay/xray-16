@@ -374,15 +374,15 @@ void CDetailManager::UpdateVisibleM()
                         continue;
                     if (!sp.r_items[0].empty())
                     {
-                        m_visibles[0][sp.id].push_back(&sp.r_items[0]);
+                        m_visibles[0][sp.id].push_back({ &sp.r_items[0], &S.vis.sphere });
                     }
                     if (!sp.r_items[1].empty())
                     {
-                        m_visibles[1][sp.id].push_back(&sp.r_items[1]);
+                        m_visibles[1][sp.id].push_back({ &sp.r_items[1], &S.vis.sphere });
                     }
                     if (!sp.r_items[2].empty())
                     {
-                        m_visibles[2][sp.id].push_back(&sp.r_items[2]);
+                        m_visibles[2][sp.id].push_back({ &sp.r_items[2], &S.vis.sphere });
                     }
                 }
             }
@@ -396,7 +396,7 @@ bool CDetailManager::UseVS() const
     return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
 }
 
-void CDetailManager::Render(CBackend& cmd_list)
+void CDetailManager::Render(CBackend& cmd_list, const Fsphere* bounds)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)
@@ -422,9 +422,9 @@ void CDetailManager::Render(CBackend& cmd_list)
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
     if (UseVS())
-        hw_Render(cmd_list);
+        hw_Render(cmd_list, bounds);
     else
-        soft_Render();
+        soft_Render(bounds);
     cmd_list.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
