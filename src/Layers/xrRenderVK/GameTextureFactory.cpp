@@ -404,42 +404,86 @@ void GameTextureFactory::invalidate_unused()
     retire_unused();
 }
 
-void GameTextureFactory::reload_assets()
+bool GameTextureFactory::reload_assets(std::string& error,
+    const std::function<void()>& before_rebind, const std::function<void()>& after_rebind)
 {
-    if (!device_) return;
-    R_ASSERT2(wait_idle_(device_) == VK_SUCCESS && finish_uploads(),
-        "Vulkan asset reload needs idle frames and completed uploads");
+    if (!device_) { error = "Vulkan asset reload needs a device"; return false; }
+    if (wait_idle_(device_) != VK_SUCCESS || !finish_uploads())
+    { error = "Vulkan asset reload needs idle frames and completed uploads"; return false; }
+    struct Staged
+    {
+        Asset* asset{};
+        UploadedTexture texture;
+        VkExtent3D extent{};
+    };
+    std::vector<Staged> staged;
+    auto discard = [&]
+    {
+        if (!finish_uploads())
+            R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan reload staging needs an idle device");
+        for (auto& item : staged)
+        {
+            states_.forget_image(item.texture.image);
+            destroy_texture(device_, dispatch_, item.texture);
+        }
+    };
     for (auto& [path, asset] : assets_)
     {
-        if (path[0] == '#' || asset.environment_refs) continue;
+        if (path[0] == '#') continue;
         IReader* source = FS.r_open(path.c_str());
-        if (!source) continue;
+        if (!source)
+        { error = "cannot reopen texture during asset reload: " + path; discard(); return false; }
         UploadedTexture replacement;
         VkExtent3D extent{};
-        std::string error;
         const bool loaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
             source->pointer(), source->length(), bc_supported_, replacement, pending_, states_,
             error, &extent);
         FS.r_close(source);
-        if (!loaded || !finish_uploads())
+        if (!loaded)
         {
-            Msg("! [renderer-vulkan] texture reload %s: %s", path.c_str(), error.c_str());
-            continue;
+            error = "texture reload " + path + ": " + error;
+            discard();
+            return false;
         }
+        staged.push_back({&asset, replacement, extent});
+    }
+    if (!finish_uploads())
+    { error = "texture reload uploads failed"; discard(); return false; }
+    // Keep environment entries alive while their old view leases are dropped.
+    // The callback clears the weather descriptor before any old view is freed.
+    std::vector<Asset*> environment_assets;
+    if (before_rebind)
+    {
+        for (auto& [path, asset] : assets_)
+            if (asset.environment_refs)
+            { ++asset.environment_refs; environment_assets.push_back(&asset); }
+        before_rebind();
+    }
+    for (auto& item : staged)
+    {
+        Asset& asset = *item.asset;
         if (asset.material_set && asset.material_pass)
-            asset.material_pass->update_material(asset.material_set, replacement.view, sampler_);
+            asset.material_pass->update_material(asset.material_set, item.texture.view, sampler_);
         if (asset.ui_set && asset.ui_pass)
-            asset.ui_pass->update_ui_texture_set(asset.ui_set, replacement.view, sampler_);
+            asset.ui_pass->update_ui_texture_set(asset.ui_set, item.texture.view, sampler_);
         states_.forget_image(asset.texture.image);
         destroy_texture(device_, dispatch_, asset.texture);
-        asset.texture = replacement;
-        asset.extent = {extent.width, extent.height};
-        asset.bytes = uint64_t(extent.width) * extent.height * 4;
+        asset.texture = item.texture;
+        asset.extent = {item.extent.width, item.extent.height};
+        asset.bytes = uint64_t(item.extent.width) * item.extent.height * 4;
     }
     for (auto& [name, pair] : lightmapped_)
         pair.pass->update_lightmapped_material(pair.set, pair.diffuse->texture.view,
             pair.lightmap->texture.view, sampler_);
+    if (after_rebind) after_rebind();
+    for (auto* asset : environment_assets)
+    {
+        R_ASSERT2(asset->environment_refs, "Vulkan weather reload lost its staging lease");
+        --asset->environment_refs;
+    }
     retire_unused();
+    error.clear();
+    return true;
 }
 
 uint64_t GameTextureFactory::resident_bytes() const

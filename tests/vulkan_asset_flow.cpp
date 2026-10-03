@@ -222,6 +222,26 @@ int main()
         GpuLevel gpu;
         assert(gpu.load(reader, device, queue, pool_handle, memory, upload_dispatch(), textures, pass, error));
         assert(gpu.visual_count() == 1 && gpu.model_count() == 1 && textures.finish_uploads());
+        if (profile == LevelGameProfile::SoC)
+        {
+            const auto resident = textures.resident_count();
+            const auto live_images = images.size();
+            VkImageView weather{};
+            assert(textures.environment("fixture", weather, error));
+            const VkImageView original_weather = weather;
+            unsigned callbacks = 0;
+            const auto before = [&] { ++callbacks; textures.release_environment(weather); weather = VK_NULL_HANDLE; };
+            const auto after = [&] { ++callbacks; assert(textures.environment("fixture", weather, error)); };
+            save(directory / "fixture.dds", Bytes{1, 2, 3, 4});
+            assert(!textures.reload_assets(error, before, after));
+            assert(callbacks == 0 && weather == original_weather);
+            assert(textures.resident_count() == resident && images.size() == live_images);
+            save(directory / "fixture.dds", Bytes(dds.begin(), dds.end()));
+            assert(textures.reload_assets(error, before, after) && error.empty());
+            assert(callbacks == 2 && weather && weather != original_weather);
+            assert(textures.resident_count() == resident && images.size() == live_images);
+            textures.release_environment(weather);
+        }
         const auto before = draws;
         assert(gpu.record(frame, pass, mvp) && draws == before + 1);
         // A missing VB chunk must leave the uploaded scene available.

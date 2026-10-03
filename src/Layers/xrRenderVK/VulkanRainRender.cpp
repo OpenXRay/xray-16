@@ -14,6 +14,7 @@ namespace xray::render::vulkan
 {
 VulkanRainRender::~VulkanRainRender()
 {
+    device_.discard_rain(this);
     R_ASSERT2(device_.wait_idle(), "Vulkan rain buffers require idle GPU frames on destruction");
     if (material_) device_.textures().release_material(material_, device_.deferred());
 }

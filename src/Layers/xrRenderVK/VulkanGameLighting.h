@@ -59,6 +59,11 @@ public:
     void set_texture(pcstr name) override { texture_ = name ? name : ""; }
     void set_color(const Fcolor& color) override;
     void set_color(float r, float g, float b) override;
+    bool active() const { return active_; }
+    const std::array<float, 3>& position() const { return position_; }
+    const std::array<float, 4>& color() const { return color_; }
+    const std::string& texture() const { return texture_; }
+    float radius() const { return radius_; }
 
 private:
     std::array<float, 3> position_{};

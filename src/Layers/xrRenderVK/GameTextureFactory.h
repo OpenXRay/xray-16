@@ -4,6 +4,7 @@
 #include "EngineTextureSource.h"
 
 #include <unordered_map>
+#include <functional>
 
 namespace xray::render::vulkan
 {
@@ -46,7 +47,8 @@ public:
     bool finish_uploads();
     void retire_unused();
     void invalidate_unused();
-    void reload_assets();
+    bool reload_assets(std::string& error, const std::function<void()>& before_rebind = {},
+        const std::function<void()>& after_rebind = {});
     uint64_t resident_bytes() const;
     size_t resident_count() const { return assets_.size(); }
     void destroy();

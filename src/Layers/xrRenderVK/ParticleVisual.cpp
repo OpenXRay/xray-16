@@ -293,8 +293,13 @@ bool VulkanParticleGroup::initialize(VkDevice device, const VkPhysicalDeviceMemo
 
 void VulkanParticleGroup::OnDeviceDestroy()
 {
+    // Triggered children may have been created after initialize(). Release
+    // them before the catalog/pass leases are detached; a later initialize()
+    // must start with only the definition's persistent effects.
+    for (auto& item : triggered_) item.effect->set_events({});
+    triggered_.clear();
+    pending_.clear();
     for (auto& effect : effects_) effect->OnDeviceDestroy();
-    for (auto& item : triggered_) item.effect->OnDeviceDestroy();
     textures_ = nullptr;
     pass_ = nullptr;
     device_ = VK_NULL_HANDLE;

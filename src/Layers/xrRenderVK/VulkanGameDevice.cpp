@@ -521,6 +521,28 @@ void VulkanGameDevice::begin_frame()
     weather_set_ = VK_NULL_HANDLE;
 }
 
+VkDescriptorSet VulkanGameDevice::glow_texture(const std::string& name)
+{
+    if (name.empty()) return VK_NULL_HANDLE;
+    const auto found = glow_textures_.find(name);
+    if (found != glow_textures_.end()) return found->second;
+    VkDescriptorSet set = VK_NULL_HANDLE;
+    std::string error;
+    if (!textures_.ui(name, ui_pass_, set, error))
+    { Msg("! [renderer-vulkan] glow texture '%s': %s", name.c_str(), error.c_str()); return VK_NULL_HANDLE; }
+    glow_textures_.emplace(name, set);
+    return set;
+}
+
+void VulkanGameDevice::release_level_glows()
+{
+    if (glow_textures_.empty()) return;
+    R_ASSERT2(wait_idle(), "Vulkan glow descriptors require idle GPU frames");
+    for (const auto& [name, set] : glow_textures_)
+        textures_.release_ui(set, ui_pass_);
+    glow_textures_.clear();
+}
+
 void VulkanGameDevice::queue_weather(VkDescriptorSet set, const WeatherLighting& lighting)
 {
     weather_set_ = set;
@@ -535,6 +557,17 @@ void VulkanGameDevice::queue_rain(VulkanRainRender& rain)
 void VulkanGameDevice::queue_thunderbolt(VulkanThunderboltRender& bolt)
 {
     thunderbolt_draws_.push_back(&bolt);
+}
+
+void VulkanGameDevice::discard_rain(const VulkanRainRender* rain)
+{
+    rain_draws_.erase(std::remove(rain_draws_.begin(), rain_draws_.end(), rain), rain_draws_.end());
+}
+
+void VulkanGameDevice::discard_thunderbolt(const VulkanThunderboltRender* bolt)
+{
+    thunderbolt_draws_.erase(std::remove(thunderbolt_draws_.begin(), thunderbolt_draws_.end(), bolt),
+        thunderbolt_draws_.end());
 }
 
 void VulkanGameDevice::record_readback(VkCommandBuffer command, VkImage image,
@@ -893,6 +926,7 @@ void VulkanGameDevice::destroy()
     active_map_names_[1].clear();
     targets_.release_lighting(deferred_);
     deferred_.release_water_sets();
+    release_level_glows();
     textures_.destroy();
     if (window_.device()) window_.frame().release_swapchain();
     targets_.destroy();

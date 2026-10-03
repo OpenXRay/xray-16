@@ -14,6 +14,7 @@
 
 #include <array>
 #include <memory>
+#include <unordered_map>
 
 namespace xray::render::vulkan
 {
@@ -30,8 +31,12 @@ public:
     void begin_frame();
     void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
     void queue_lights(const std::vector<VulkanLightSnapshot>& lights) { light_snapshots_ = lights; }
+    VkDescriptorSet glow_texture(const std::string& name);
+    void release_level_glows();
     void queue_rain(VulkanRainRender& rain);
     void queue_thunderbolt(VulkanThunderboltRender& bolt);
+    void discard_rain(const VulkanRainRender* rain);
+    void discard_thunderbolt(const VulkanThunderboltRender* bolt);
     void request_screenshot() { screenshot_requested_ = true; }
     bool take_screenshot(std::vector<uint8_t>& pixels, VkExtent2D& extent, VkFormat& format);
     void set_postprocess(const PostProcessConstants& params, std::string first, std::string second);
@@ -155,6 +160,7 @@ private:
     GameShaderResources shader_resources_;
     ScenePass ui_pass_;
     GameTextureFactory textures_;
+    std::unordered_map<std::string, VkDescriptorSet> glow_textures_;
     VulkanUIRender ui_;
     DeferredFrame frame_;
     std::vector<std::unique_ptr<ScreenCopyPass>> postprocess_passes_;

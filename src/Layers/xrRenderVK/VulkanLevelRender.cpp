@@ -142,9 +142,6 @@ void VulkanLevelRender::OnAssetsChanged()
     if (g_pGamePersistent && game_device_)
     {
         auto& environment = g_pGamePersistent->Environment();
-        // Clear descriptors before releasing their image views. The weather
-        // mixer binds the new views on the next environment update.
-        environment.m_pRender->Clear();
         const auto visit = [](CEnvironment::EnvsMap& presets, bool create)
         {
             for (auto& [name, descriptors] : presets)
@@ -155,13 +152,31 @@ void VulkanLevelRender::OnAssetsChanged()
                     else descriptor->on_device_destroy();
                 }
         };
-        visit(environment.WeatherCycles, false);
-        visit(environment.WeatherFXs, false);
-        if (textures_) textures_->reload_assets();
-        visit(environment.WeatherCycles, true);
-        visit(environment.WeatherFXs, true);
+        if (textures_)
+        {
+            std::string error;
+            const auto before = [&]
+            {
+                // Old weather descriptors must be retired before old image views.
+                environment.m_pRender->Clear();
+                visit(environment.WeatherCycles, false);
+                visit(environment.WeatherFXs, false);
+            };
+            const auto after = [&]
+            {
+                visit(environment.WeatherCycles, true);
+                visit(environment.WeatherFXs, true);
+            };
+            if (!textures_->reload_assets(error, before, after))
+                Msg("! [renderer-vulkan] keeping previous textures after reload failure: %s", error.c_str());
+        }
     }
-    else if (textures_) textures_->reload_assets();
+    else if (textures_)
+    {
+        std::string error;
+        if (!textures_->reload_assets(error))
+            Msg("! [renderer-vulkan] keeping previous textures after reload failure: %s", error.c_str());
+    }
     models_Clear(false);
     particle_catalog_.reset();
 }
@@ -821,6 +836,31 @@ void VulkanLevelRender::Render()
         environment.RenderFlares();
         if (environment.eff_Thunderbolt) environment.eff_Thunderbolt->Render();
     }
+    for (const VulkanGlow* glow : glows_)
+    {
+        if (!glow || !glow->active() || glow->radius() <= EPS_L) continue;
+        const VkDescriptorSet texture = game_device_->glow_texture(glow->texture());
+        if (!texture) continue;
+        const auto& location = glow->position();
+        Fvector center, right, up;
+        center.set(location[0], location[1], location[2]);
+        right.mul(Device.vCameraRight, glow->radius());
+        up.mul(Device.vCameraTop, glow->radius());
+        const auto& tint = glow->color();
+        const u32 packed = color_rgba_f(tint[0], tint[1], tint[2], tint[3]);
+        auto& ui = game_device_->ui();
+        ui.SetTextureDescriptor(texture);
+        ui.CacheSetXformWorld(Fidentity);
+        ui.CacheSetCullMode(IUIRender::cmNONE);
+        ui.StartPrimitive(4, IUIRender::ptTriStrip, IUIRender::pttLIT);
+        const float uv[4][2]{{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+        const Fvector corners[4]{
+            Fvector().add(center, right).sub(up), Fvector().add(center, right).add(up),
+            Fvector().sub(center, right).sub(up), Fvector().sub(center, right).add(up)};
+        for (size_t i = 0; i < 4; ++i)
+            ui.PushPoint(corners[i].x, corners[i].y, corners[i].z, packed, uv[i][0], uv[i][1]);
+        ui.FlushPrimitive();
+    }
     R_ASSERT2(frame_phase_.render(), "Vulkan renderer world rendering is out of order");
 }
 
@@ -961,7 +1001,10 @@ void VulkanLevelRender::level_Unload()
     if (device_ && wait_idle_)
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan queue did not become idle before level unload");
     if (game_device_)
+    {
         game_device_->discard_scene_draws();
+        game_device_->release_level_glows();
+    }
     wallmarks_.clear();
     models_Clear(true);
     model_bases_.clear();

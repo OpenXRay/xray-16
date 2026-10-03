@@ -36,6 +36,7 @@ class VulkanThunderboltRender final : public IThunderboltRender
 {
 public:
     explicit VulkanThunderboltRender(VulkanGameDevice& device) : device_(device) {}
+    ~VulkanThunderboltRender() override;
     void Copy(IThunderboltRender&) override {}
     void Render(CEffect_Thunderbolt& owner) override;
     bool record(const FrameRecordingContext& frame, std::string& error);

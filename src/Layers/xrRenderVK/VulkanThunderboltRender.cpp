@@ -11,6 +11,12 @@
 
 namespace xray::render::vulkan
 {
+VulkanThunderboltRender::~VulkanThunderboltRender()
+{
+    device_.discard_thunderbolt(this);
+    R_ASSERT2(device_.wait_idle(), "Vulkan lightning buffers require idle GPU frames on destruction");
+}
+
 namespace
 {
 struct Cursor
