@@ -3,6 +3,8 @@
 #include "DeferredShaders.h"
 #include "WeatherShaders.h"
 #include "ShadowShaders.h"
+#include "LocalLightShaders.h"
+#include "WaterShaders.h"
 #include "VulkanGameShaders.h"
 
 namespace xray::render::vulkan
@@ -33,10 +35,12 @@ void configure_engine_shader_resources(VkDevice device, const ShaderModuleDispat
 
 bool DeferredShaderFactory::create(VkDevice device, const ShaderModuleDispatch &shader_dispatch, const ScenePassDispatch &pass_dispatch,
                                    VkRenderPass geometry_pass, VkRenderPass light_pass, DeferredPass &pass, GameShaderResources &resources, std::string &error,
-                                   VkRenderPass shadow_pass)
+                                   VkRenderPass shadow_pass, VkRenderPass local_shadow_pass)
 {
     ShaderModule vertex, fragment, alpha_test_fragment, transparent_fragment, light_vertex, light_fragment, weather_fragment;
     ShaderModule shadow_vertex, shadow_opaque, shadow_cutout;
+    ShaderModule local_light;
+    ShaderModule water;
     if (!vertex.initialize(device, shader_dispatch, deferred_shaders::GBufferVertex, sizeof(deferred_shaders::GBufferVertex), error) ||
         !fragment.initialize(device, shader_dispatch, deferred_shaders::GBufferFragment, sizeof(deferred_shaders::GBufferFragment), error) ||
         !alpha_test_fragment.initialize(device, shader_dispatch, game_shaders::CutoutFragment, sizeof(game_shaders::CutoutFragment), error) ||
@@ -46,11 +50,16 @@ bool DeferredShaderFactory::create(VkDevice device, const ShaderModuleDispatch &
         !weather_fragment.initialize(device, shader_dispatch, weather_shaders::Fragment, sizeof(weather_shaders::Fragment), error) ||
         (shadow_pass && (!shadow_vertex.initialize(device, shader_dispatch, shadow_shaders::Vertex, sizeof(shadow_shaders::Vertex), error) ||
             !shadow_opaque.initialize(device, shader_dispatch, shadow_shaders::Opaque, sizeof(shadow_shaders::Opaque), error) ||
-            !shadow_cutout.initialize(device, shader_dispatch, shadow_shaders::Cutout, sizeof(shadow_shaders::Cutout), error))))
+            !shadow_cutout.initialize(device, shader_dispatch, shadow_shaders::Cutout, sizeof(shadow_shaders::Cutout), error))) ||
+        (local_shadow_pass && !local_light.initialize(device, shader_dispatch,
+            local_light_shaders::Fragment, sizeof(local_light_shaders::Fragment), error)) ||
+        !water.initialize(device, shader_dispatch, water_shaders::Fragment,
+            sizeof(water_shaders::Fragment), error))
         return false;
     if (!pass.initialize(device, geometry_pass, light_pass, vertex.handle(), fragment.handle(), alpha_test_fragment.handle(), transparent_fragment.handle(),
                          light_vertex.handle(), light_fragment.handle(), weather_fragment.handle(), pass_dispatch, error,
-                         shadow_pass, shadow_vertex.handle(), shadow_opaque.handle(), shadow_cutout.handle()))
+                         shadow_pass, shadow_vertex.handle(), shadow_opaque.handle(), shadow_cutout.handle(),
+                         local_shadow_pass, local_light.handle(), water.handle()))
         return false;
     return reload_game_pipelines(device, shader_dispatch, pass, resources, error);
 }

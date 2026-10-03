@@ -13,7 +13,8 @@ namespace
 bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkShaderModule vertex, VkShaderModule fragment, bool geometry_input, bool gbuffer,
     bool transparent, bool hud, bool skinned,
-    const ScenePassDispatch& vk, VkPipeline& pipeline, bool shadow = false)
+    const ScenePassDispatch& vk, VkPipeline& pipeline, bool shadow = false,
+    bool additive = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -54,7 +55,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // The present pass has its own cleared depth attachment. HUD geometry
     // draws after world lighting, so depth testing here orders HUD surfaces
     // against one another without occluding the HUD with world geometry.
-    depth.depthTestEnable = (gbuffer || hud || transparent || shadow) ? VK_TRUE : VK_FALSE;
+    depth.depthTestEnable = (gbuffer || hud || transparent || shadow) && !additive ? VK_TRUE : VK_FALSE;
     depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
@@ -69,6 +70,13 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        if (additive)
+        {
+            attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
+            attachment.blendEnable = VK_TRUE;
+            attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        }
     }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     blend.attachmentCount = shadow ? 0 : gbuffer ? 2 : 1;
@@ -202,7 +210,9 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     VkShaderModule weather_fragment,
     const ScenePassDispatch& dispatch, std::string& error,
     VkRenderPass shadow_pass, VkShaderModule shadow_vertex,
-    VkShaderModule shadow_opaque, VkShaderModule shadow_cutout)
+    VkShaderModule shadow_opaque, VkShaderModule shadow_cutout,
+    VkRenderPass local_shadow_pass, VkShaderModule local_light_fragment,
+    VkShaderModule water_fragment)
 {
     destroy();
     if (!device || !geometry_pass || !light_pass || !geometry_vertex || !geometry_fragment ||
@@ -225,6 +235,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     geometry_pass_ = geometry_pass;
     light_pass_ = light_pass;
     shadow_pass_ = shadow_pass;
+    local_shadow_pass_ = local_shadow_pass;
     vk_ = dispatch;
     const VkDescriptorSetLayoutBinding bindings[]{
         {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
@@ -236,6 +247,14 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     const VkDescriptorSetLayoutBinding pose_binding{
         0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
+    const VkDescriptorSetLayoutBinding local_bindings[]{
+        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+    const VkDescriptorSetLayoutBinding water_bindings[]{
+        {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     VkDescriptorSetLayoutCreateInfo descriptor{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
     descriptor.bindingCount = 2;
     descriptor.pBindings = bindings;
@@ -254,15 +273,23 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     descriptor.bindingCount = 4;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &weather_set_layout_) != VK_SUCCESS)
         goto failed;
+    descriptor.pBindings = local_bindings;
+    descriptor.bindingCount = 2;
+    if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &local_set_layout_) != VK_SUCCESS)
+        goto failed;
+    descriptor.pBindings = water_bindings;
+    descriptor.bindingCount = 4;
+    if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &water_set_layout_) != VK_SUCCESS)
+        goto failed;
     {
         const VkDescriptorPoolSize sizes[]{
-            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048},
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4096},
             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 512},
-            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 64}
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 256}
         };
         VkDescriptorPoolCreateInfo pool{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
         pool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool.maxSets = 512;
+        pool.maxSets = 1024;
         pool.poolSizeCount = 3;
         pool.pPoolSizes = sizes;
         if (vk_.create_descriptor_pool(device, &pool, nullptr, &pool_) != VK_SUCCESS) goto failed;
@@ -293,6 +320,21 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         layout.pPushConstantRanges = &weather_range;
         if (vk_.create_pipeline_layout(device, &layout, nullptr, &weather_layout_) != VK_SUCCESS)
             goto failed;
+        const VkDescriptorSetLayout local_sets[]{gbuffer_layout_, local_set_layout_};
+        layout.pSetLayouts = local_sets;
+        layout.pushConstantRangeCount = 0;
+        layout.pPushConstantRanges = nullptr;
+        if (vk_.create_pipeline_layout(device, &layout, nullptr, &local_light_layout_) != VK_SUCCESS)
+            goto failed;
+        const VkDescriptorSetLayout water_sets[]{material_layout_, water_set_layout_};
+        const VkPushConstantRange water_ranges[]{
+            {VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(float) * 16},
+            {VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(float) * 16, sizeof(float) * 4}};
+        layout.pSetLayouts = water_sets;
+        layout.pushConstantRangeCount = 2;
+        layout.pPushConstantRanges = water_ranges;
+        if (vk_.create_pipeline_layout(device, &layout, nullptr, &water_layout_) != VK_SUCCESS)
+            goto failed;
     }
     if (!make_pipeline(device, geometry_pass, geometry_layout_, geometry_vertex,
             geometry_fragment, true, true, false, false, false, vk_, geometry_) ||
@@ -311,6 +353,12 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             shadow_opaque, true, false, false, false, false, vk_, shadow_opaque_, true) ||
         !make_pipeline(device, shadow_pass, geometry_layout_, shadow_vertex,
             shadow_cutout, true, false, false, false, false, vk_, shadow_cutout_, true))) goto failed;
+    if (local_shadow_pass && (!shadow_pass || !local_light_fragment ||
+        !make_pipeline(device, light_pass, local_light_layout_, light_vertex,
+            local_light_fragment, false, false, false, false, false, vk_, local_light_pipeline_,
+            false, true))) goto failed;
+    if (water_fragment && !make_pipeline(device, light_pass, water_layout_, geometry_vertex,
+        water_fragment, true, false, true, false, false, vk_, water_pipeline_)) goto failed;
     error.clear();
     return true;
 failed:
@@ -608,6 +656,89 @@ void DeferredPass::bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSamp
     vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
 }
 
+bool DeferredPass::local_light_set(VkImageView shadow_array, VkSampler sampler,
+    VkBuffer uniform, VkDeviceSize offset, VkDeviceSize range,
+    VkDescriptorSet& set, std::string& error)
+{
+    set = VK_NULL_HANDLE;
+    if (!pool_ || !shadow_array || !sampler || !uniform || !range)
+    { error = "local light needs shadow array and uniform buffer"; return false; }
+    VkDescriptorSetAllocateInfo allocation{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    allocation.descriptorPool = pool_;
+    allocation.descriptorSetCount = 1;
+    allocation.pSetLayouts = &local_set_layout_;
+    if (vk_.allocate_descriptor_sets(device_, &allocation, &set) != VK_SUCCESS)
+    { error = "local light descriptor pool exhausted"; return false; }
+    const VkDescriptorImageInfo image{sampler, shadow_array,
+        VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL};
+    const VkDescriptorBufferInfo buffer{uniform, offset, range};
+    VkWriteDescriptorSet writes[2]{};
+    for (auto& write : writes)
+    {
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstSet = set;
+        write.descriptorCount = 1;
+    }
+    writes[0].dstBinding = 0;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    writes[0].pImageInfo = &image;
+    writes[1].dstBinding = 1;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].pBufferInfo = &buffer;
+    vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
+    error.clear();
+    return true;
+}
+
+bool DeferredPass::water_set(uint32_t image_index, VkImageView refraction,
+    VkImageView reflection, VkImageView depth, VkSampler sampler,
+    VkBuffer scene_uniform, std::string& error)
+{
+    if (!pool_ || !refraction || !reflection || !depth || !sampler ||
+        !scene_uniform || image_index >= 16)
+    { error = "water needs reflection, refraction and opaque depth"; return false; }
+    if (water_sets_.size() <= image_index) water_sets_.resize(image_index + 1);
+    if (water_sets_[image_index])
+        release_gbuffer(water_sets_[image_index]);
+    VkDescriptorSetAllocateInfo allocation{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
+    allocation.descriptorPool = pool_;
+    allocation.descriptorSetCount = 1;
+    allocation.pSetLayouts = &water_set_layout_;
+    VkDescriptorSet& set = water_sets_[image_index];
+    if (vk_.allocate_descriptor_sets(device_, &allocation, &set) != VK_SUCCESS)
+    { error = "water descriptor pool exhausted"; return false; }
+    const VkImageView views[]{refraction, reflection, depth};
+    VkDescriptorImageInfo images[3]{};
+    VkWriteDescriptorSet writes[4]{};
+    for (uint32_t i = 0; i < 3; ++i)
+    {
+        images[i] = {sampler, views[i], i == 2 ? VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL :
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].pImageInfo = &images[i];
+    }
+    const VkDescriptorBufferInfo buffer{scene_uniform, 0, sizeof(float) * 36};
+    writes[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[3].dstSet = set;
+    writes[3].dstBinding = 3;
+    writes[3].descriptorCount = 1;
+    writes[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[3].pBufferInfo = &buffer;
+    vk_.update_descriptor_sets(device_, 4, writes, 0, nullptr);
+    error.clear();
+    return true;
+}
+
+void DeferredPass::release_water_sets()
+{
+    for (auto& set : water_sets_) release_gbuffer(set);
+    water_sets_.clear();
+}
+
 bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
     VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
@@ -685,7 +816,8 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
     bool alpha_test, uint32_t first_index) const
 {
     const VkPipeline pipeline = alpha_test ? shadow_cutout_ : shadow_opaque_;
-    if (!pipeline || !frame.command_buffer || frame.render_pass != shadow_pass_ ||
+    if (!pipeline || !frame.command_buffer ||
+        (frame.render_pass != shadow_pass_ && frame.render_pass != local_shadow_pass_) ||
         !vertices || !indices || !material || !index_count) return false;
     vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     viewport_scissor(frame, vk_);
@@ -780,9 +912,51 @@ bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescrip
     return true;
 }
 
+bool DeferredPass::record_local_light(const FrameRecordingContext& frame,
+    VkDescriptorSet gbuffer_set, VkDescriptorSet local_set) const
+{
+    if (!local_light_pipeline_ || frame.render_pass != light_pass_ ||
+        !frame.command_buffer || !gbuffer_set || !local_set) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, local_light_pipeline_);
+    viewport_scissor(frame, vk_);
+    const VkDescriptorSet sets[]{gbuffer_set, local_set};
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        local_light_layout_, 0, 2, sets, 0, nullptr);
+    vk_.cmd_draw(frame.command_buffer, 3, 1, 0, 0);
+    ++draw_calls_; ++triangles_;
+    return true;
+}
+
+bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer vertices,
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16],
+    VkDescriptorSet material, uint32_t first_index, float time, float opacity) const
+{
+    if (!water_pipeline_ || frame.render_pass != light_pass_ || !frame.command_buffer ||
+        frame.image_index >= water_sets_.size() || !water_sets_[frame.image_index] ||
+        !vertices || !indices || !index_count || !material ||
+        !frame.extent.width || !frame.extent.height) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, water_pipeline_);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    const VkDescriptorSet sets[]{material, water_sets_[frame.image_index]};
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        water_layout_, 0, 2, sets, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, water_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    const float params[]{time, 1.f / frame.extent.width, 1.f / frame.extent.height, opacity};
+    vk_.cmd_push_constants(frame.command_buffer, water_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        sizeof(mvp), sizeof(params), params);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
+    return true;
+}
+
 void DeferredPass::destroy()
 {
     game_pipeline_request_ = {};
+    release_water_sets();
     abort_game_pipeline_reload();
     if (device_ && vk_.destroy_pipeline)
     {
@@ -796,6 +970,8 @@ void DeferredPass::destroy()
         if (weather_pipeline_) vk_.destroy_pipeline(device_, weather_pipeline_, nullptr);
         if (shadow_opaque_) vk_.destroy_pipeline(device_, shadow_opaque_, nullptr);
         if (shadow_cutout_) vk_.destroy_pipeline(device_, shadow_cutout_, nullptr);
+        if (local_light_pipeline_) vk_.destroy_pipeline(device_, local_light_pipeline_, nullptr);
+        if (water_pipeline_) vk_.destroy_pipeline(device_, water_pipeline_, nullptr);
     }
     game_pipelines_.clear();
     if (device_ && vk_.destroy_pipeline_layout)
@@ -804,6 +980,8 @@ void DeferredPass::destroy()
         if (skinned_layout_) vk_.destroy_pipeline_layout(device_, skinned_layout_, nullptr);
         if (light_layout_) vk_.destroy_pipeline_layout(device_, light_layout_, nullptr);
         if (weather_layout_) vk_.destroy_pipeline_layout(device_, weather_layout_, nullptr);
+        if (local_light_layout_) vk_.destroy_pipeline_layout(device_, local_light_layout_, nullptr);
+        if (water_layout_) vk_.destroy_pipeline_layout(device_, water_layout_, nullptr);
     }
     if (device_ && vk_.destroy_descriptor_pool && pool_)
         vk_.destroy_descriptor_pool(device_, pool_, nullptr);
@@ -813,13 +991,21 @@ void DeferredPass::destroy()
         if (pose_layout_) vk_.destroy_descriptor_set_layout(device_, pose_layout_, nullptr);
         if (gbuffer_layout_) vk_.destroy_descriptor_set_layout(device_, gbuffer_layout_, nullptr);
         if (weather_set_layout_) vk_.destroy_descriptor_set_layout(device_, weather_set_layout_, nullptr);
+        if (local_set_layout_) vk_.destroy_descriptor_set_layout(device_, local_set_layout_, nullptr);
+        if (water_set_layout_) vk_.destroy_descriptor_set_layout(device_, water_set_layout_, nullptr);
     }
     device_ = VK_NULL_HANDLE;
-    geometry_pass_ = light_pass_ = shadow_pass_ = VK_NULL_HANDLE;
+    geometry_pass_ = light_pass_ = shadow_pass_ = local_shadow_pass_ = VK_NULL_HANDLE;
     geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = weather_pipeline_ = VK_NULL_HANDLE;
     shadow_opaque_ = shadow_cutout_ = VK_NULL_HANDLE;
+    local_light_pipeline_ = VK_NULL_HANDLE;
+    water_pipeline_ = VK_NULL_HANDLE;
     geometry_layout_ = skinned_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
+    local_light_layout_ = VK_NULL_HANDLE;
+    water_layout_ = VK_NULL_HANDLE;
     material_layout_ = pose_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
+    local_set_layout_ = VK_NULL_HANDLE;
+    water_set_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     vk_ = {};
 }

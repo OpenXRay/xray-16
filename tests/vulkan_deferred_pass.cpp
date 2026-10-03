@@ -33,7 +33,22 @@ float expected_mvp[16]{};
 VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkPipelineLayout* output)
 {
-    assert((info->setLayoutCount == 1 || info->setLayoutCount == 2) && info->pushConstantRangeCount == 1);
+    assert(info->setLayoutCount == 1 || info->setLayoutCount == 2);
+    if (!info->pushConstantRangeCount)
+    {
+        assert(info->setLayoutCount == 2);
+        *output = handle<VkPipelineLayout>(45);
+        return VK_SUCCESS;
+    }
+    if (info->pushConstantRangeCount == 2)
+    {
+        assert(info->setLayoutCount == 2 &&
+            info->pPushConstantRanges[0].size == sizeof(expected_mvp) &&
+            info->pPushConstantRanges[1].offset == sizeof(expected_mvp));
+        *output = handle<VkPipelineLayout>(46);
+        return VK_SUCCESS;
+    }
+    assert(info->pushConstantRangeCount == 1);
     const auto& range = info->pPushConstantRanges[0];
     if (range.stageFlags == VK_SHADER_STAGE_VERTEX_BIT)
     {
@@ -180,8 +195,8 @@ void VKAPI_PTR destroy_descriptor_layout(VkDevice, VkDescriptorSetLayout, const 
 VkResult VKAPI_PTR create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorPool* output)
 {
-    assert(info->maxSets == 512 && info->poolSizeCount == 3 &&
-        info->pPoolSizes[0].descriptorCount == 2048 &&
+    assert(info->maxSets == 1024 && info->poolSizeCount == 3 &&
+        info->pPoolSizes[0].descriptorCount == 4096 &&
         info->pPoolSizes[1].type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER &&
         info->pPoolSizes[2].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     *output = handle<VkDescriptorPool>(33);

@@ -18,6 +18,31 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
             context.shadow_uniform_.sun_view_projection);
         context.shadows_->end(frame.command_buffer);
     }
+    if (context.local_shadows_ && context.render_world_ && context.local_lights_ &&
+        !context.local_lights_->empty())
+    {
+        context.recorded_ &= context.local_shadows_->initialize_layers(frame);
+        for (uint32_t i = 0; i < context.local_lights_->size(); ++i)
+        {
+            const LocalLightUniform& light = (*context.local_lights_)[i];
+            std::string error;
+            if (!context.local_shadows_->write_light(frame.image_index, i, light, error))
+            { context.recorded_ = false; break; }
+            if (light.shadow_params[2] < .5f) continue;
+            const uint32_t slot = uint32_t(light.shadow_params[0]) / LocalShadowFaces;
+            const uint32_t faces = light.color_type[3] >= .5f ? 1 : LocalShadowFaces;
+            for (uint32_t face = 0; face < faces; ++face)
+            {
+                FrameRecordingContext shadow_frame;
+                if (!context.local_shadows_->begin_face(frame, slot, face, shadow_frame))
+                { context.recorded_ = false; break; }
+                context.recorded_ &= context.level_->record_sun_shadow(shadow_frame,
+                    *context.pass_, light.shadow_matrices[face]);
+                context.local_shadows_->end(frame.command_buffer);
+            }
+            if (!context.recorded_) break;
+        }
+    }
     FrameRecordingContext geometry_frame;
     if (!context.targets_->begin(frame, geometry_frame))
     {
@@ -45,6 +70,23 @@ void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data
     context.recorded_ &= context.pass_->record_lighting(frame,
         context.targets_->lighting_set(frame.image_index), context.light_,
         context.weather_set_, context.weather_set_ ? &context.weather_ : nullptr);
+    if (context.render_world_ && context.local_lighting_)
+        context.local_lighting_(frame, context.local_data_);
+    if (!context.water_) overlay(frame, user_data);
+}
+
+void DeferredFrame::capture(VkCommandBuffer command, VkImage image,
+    uint32_t index, void* user_data)
+{
+    auto& context = *static_cast<DeferredFrame*>(user_data);
+    std::string error;
+    context.recorded_ &= context.water_->write_uniform(index, context.water_uniform_, error) &&
+        context.water_->capture(command, image, index);
+}
+
+void DeferredFrame::overlay(const FrameRecordingContext& frame, void* user_data)
+{
+    auto& context = *static_cast<DeferredFrame*>(user_data);
     if (context.render_world_)
     {
         if (context.transparent_) context.transparent_(frame, context.transparent_data_);
@@ -72,11 +114,20 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     VkDescriptorSet weather_set, const WeatherLighting* weather,
     FrameReadbackRecorder readback, void* readback_data,
     FrameRecorder compositor, void* compositor_data,
-    SunShadowTargets* shadows, const SunShadowUniform* shadow_uniform)
+    SunShadowTargets* shadows, const SunShadowUniform* shadow_uniform,
+    LocalShadowTargets* local_shadows, const std::vector<LocalLightUniform>* local_lights,
+    FrameRecorder local_lighting, void* local_data,
+    WaterTargets* water, const WaterSceneUniform* water_uniform)
 {
     targets_ = &targets;
     shadows_ = shadows;
     if (shadow_uniform) shadow_uniform_ = *shadow_uniform;
+    local_shadows_ = local_shadows;
+    local_lights_ = local_lights;
+    local_lighting_ = local_lighting;
+    local_data_ = local_data;
+    water_ = water;
+    if (water_uniform) water_uniform_ = *water_uniform;
     frame_ = &frame;
     level_ = &level;
     pass_ = &pass;
@@ -101,7 +152,8 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     const VkClearColorValue clear{{0, 0, 0, 1}};
     if (!frame.render_frame(clear, status, error, lighting, this,
             readback, readback_data, geometry, this, clear_target,
-            compositor_, compositor_data_)) return false;
+            compositor_, compositor_data_,
+            water_ ? capture : nullptr, this, water_ ? overlay : nullptr, this)) return false;
     if (!recorded_)
     {
         error = "Vulkan deferred level command recording failed";

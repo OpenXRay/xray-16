@@ -71,7 +71,10 @@ public:
         VkRenderPass shadow_pass = VK_NULL_HANDLE,
         VkShaderModule shadow_vertex = VK_NULL_HANDLE,
         VkShaderModule shadow_opaque = VK_NULL_HANDLE,
-        VkShaderModule shadow_cutout = VK_NULL_HANDLE);
+        VkShaderModule shadow_cutout = VK_NULL_HANDLE,
+        VkRenderPass local_shadow_pass = VK_NULL_HANDLE,
+        VkShaderModule local_light_fragment = VK_NULL_HANDLE,
+        VkShaderModule water_fragment = VK_NULL_HANDLE);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
     bool lightmapped_material(VkImageView albedo, VkImageView lightmap,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
@@ -109,16 +112,22 @@ public:
         VkDescriptorSet& set, std::string& error);
     void bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSampler sampler,
         VkBuffer uniform);
+    bool local_light_set(VkImageView shadow_array, VkSampler sampler, VkBuffer uniform,
+        VkDeviceSize offset, VkDeviceSize range, VkDescriptorSet& set, std::string& error);
+    bool water_set(uint32_t image_index, VkImageView refraction, VkImageView reflection,
+        VkImageView depth, VkSampler sampler, VkBuffer scene_uniform, std::string& error);
+    void release_water_sets();
     bool weather_set(VkImageView sky_a, VkImageView sky_b,
         VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
     void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass,
-        VkRenderPass shadow_pass = VK_NULL_HANDLE)
+        VkRenderPass shadow_pass = VK_NULL_HANDLE, VkRenderPass local_shadow_pass = VK_NULL_HANDLE)
     {
         geometry_pass_ = geometry_pass;
         light_pass_ = light_pass;
         if (shadow_pass) shadow_pass_ = shadow_pass;
+        if (local_shadow_pass) local_shadow_pass_ = local_shadow_pass;
     }
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
@@ -138,6 +147,11 @@ public:
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr) const;
+    bool record_local_light(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
+        VkDescriptorSet local_set) const;
+    bool record_water(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
+        uint32_t first_index, float time, float opacity = .72f) const;
     void destroy();
     void reset_draw_statistics() { draw_calls_ = triangles_ = 0; }
     uint32_t draw_calls() const { return draw_calls_; }
@@ -149,13 +163,14 @@ private:
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
     VkDevice device_{};
-    VkRenderPass geometry_pass_{}, light_pass_{}, shadow_pass_{};
-    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{};
+    VkRenderPass geometry_pass_{}, light_pass_{}, shadow_pass_{}, local_shadow_pass_{};
+    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{};
     std::unordered_map<std::string, GamePipeline> game_pipelines_;
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;
     bool reloading_game_pipelines_{};
-    VkPipelineLayout geometry_layout_{}, skinned_layout_{}, light_layout_{}, weather_layout_{};
-    VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{};
+    VkPipelineLayout geometry_layout_{}, skinned_layout_{}, light_layout_{}, weather_layout_{}, local_light_layout_{}, water_layout_{};
+    VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{}, local_set_layout_{}, water_set_layout_{};
+    std::vector<VkDescriptorSet> water_sets_;
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
     GamePipelineRequest game_pipeline_request_;

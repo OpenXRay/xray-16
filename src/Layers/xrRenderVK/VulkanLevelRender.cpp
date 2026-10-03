@@ -766,6 +766,7 @@ void VulkanLevelRender::Calculate()
     light_snapshots.reserve(lights_.size());
     for (const VulkanLight* light : lights_)
         if (light) light_snapshots.push_back(light->snapshot());
+    game_device_->queue_lights(light_snapshots);
     for (VulkanObjectSpecific* object : object_specifics_)
         if (object)
             object->update(environment.ambient_color, environment.hemi_color,

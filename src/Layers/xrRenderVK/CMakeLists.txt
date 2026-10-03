@@ -41,6 +41,12 @@ target_sources(xrRenderVK PRIVATE
     GBufferTargets.h
     SunShadowTargets.cpp
     SunShadowTargets.h
+    LocalShadowTargets.cpp
+    LocalShadowTargets.h
+    LocalLightShaders.h
+    WaterTargets.cpp
+    WaterTargets.h
+    WaterShaders.h
     ShadowShaders.h
     GpuLevel.cpp
     GpuLevel.h

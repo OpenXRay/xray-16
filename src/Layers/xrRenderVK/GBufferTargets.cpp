@@ -259,6 +259,11 @@ VkImageView GBufferTargets::depth_view(uint32_t index) const
     return index < targets_.size() ? targets_[index].depth.view : VK_NULL_HANDLE;
 }
 
+VkImageView GBufferTargets::sampled_depth_view(uint32_t index) const
+{
+    return index < targets_.size() ? targets_[index].sampled_depth.view : VK_NULL_HANDLE;
+}
+
 void GBufferTargets::destroy()
 {
     if (device_)

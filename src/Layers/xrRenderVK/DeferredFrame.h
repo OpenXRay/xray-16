@@ -3,6 +3,8 @@
 #include "GBufferTargets.h"
 #include "GpuLevel.h"
 #include "SunShadowTargets.h"
+#include "LocalShadowTargets.h"
+#include "WaterTargets.h"
 
 namespace xray::render::vulkan
 {
@@ -24,14 +26,26 @@ public:
         const WeatherLighting* weather = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
         FrameRecorder compositor = nullptr, void* compositor_data = nullptr,
-        SunShadowTargets* shadows = nullptr, const SunShadowUniform* shadow_uniform = nullptr);
+        SunShadowTargets* shadows = nullptr, const SunShadowUniform* shadow_uniform = nullptr,
+        LocalShadowTargets* local_shadows = nullptr,
+        const std::vector<LocalLightUniform>* local_lights = nullptr,
+        FrameRecorder local_lighting = nullptr, void* local_data = nullptr,
+        WaterTargets* water = nullptr, const WaterSceneUniform* water_uniform = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
     static void lighting(const FrameRecordingContext& frame, void* user_data);
+    static void overlay(const FrameRecordingContext& frame, void* user_data);
+    static void capture(VkCommandBuffer command, VkImage image, uint32_t index, void* user_data);
     GBufferTargets* targets_{};
     SunShadowTargets* shadows_{};
     SunShadowUniform shadow_uniform_{};
+    LocalShadowTargets* local_shadows_{};
+    const std::vector<LocalLightUniform>* local_lights_{};
+    FrameRecorder local_lighting_{};
+    void* local_data_{};
+    WaterTargets* water_{};
+    WaterSceneUniform water_uniform_{};
     FrameContext* frame_{};
     const GpuLevel* level_{};
     const DeferredPass* pass_{};

@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 
 namespace xray::render::vulkan
 {
@@ -95,18 +96,27 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
         if (!sun_shadows_.initialize(device, frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
                 physical.memory, frame_dispatch_, buffer_upload_.buffer,
                 create_sampler, destroy_sampler, error)) goto failed;
+        if (!local_shadows_.initialize(device, frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
+                physical.memory, frame_dispatch_, buffer_upload_.buffer,
+                create_sampler, destroy_sampler, error,
+                physical.properties.limits.minUniformBufferOffsetAlignment)) goto failed;
+        local_sets_.resize(frame.image_count());
         {
             std::vector<VkImageView> depth_views;
             for (uint32_t i = 0; i < frame.image_count(); ++i)
                 depth_views.push_back(targets_.depth_view(i));
             if (!window_.frame().attach_scene_depth(depth_views, error)) goto failed;
         }
+        if (!window_.frame().enable_interpass(error) ||
+            !water_targets_.initialize(physical.handle, device, frame.format(), frame.extent(),
+                static_cast<uint32_t>(frame.image_count()), physical.memory,
+                frame_dispatch_, buffer_upload_.buffer, error)) goto failed;
         const ShaderModuleDispatch shaders{proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
                                            proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
         configure_engine_shader_resources(device, shaders, shader_resources_);
         DeferredShaderFactory deferred_factory;
         if (!deferred_factory.create(device, shaders, scene_dispatch, targets_.render_pass(), frame.render_pass(), deferred_, shader_resources_, error,
-                sun_shadows_.render_pass()) ||
+                sun_shadows_.render_pass(), local_shadows_.render_pass()) ||
             !targets_.bind_lighting(deferred_, error))
             goto failed;
         targets_.bind_sun_shadow(deferred_, sun_shadows_);
@@ -121,6 +131,9 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                                   create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
             !create_postprocess(error))
             goto failed;
+        for (uint32_t i = 0; i < frame.image_count(); ++i)
+            if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
+                    targets_.sampled_depth_view(i), textures_.sampler(), water_targets_.uniform(i), error)) goto failed;
     }
     deferred_.set_game_pipeline_request([this](const std::string &vs, const std::string &ps, SurfaceMode mode, bool hud, bool skinned, std::string &reason) {
         return request_shader_pair(vs, ps, mode, hud, skinned, reason);
@@ -398,6 +411,24 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         }
 }
 
+void VulkanGameDevice::record_local_lights(const FrameRecordingContext& frame, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    if (frame.image_index >= owner.local_sets_.size())
+    { owner.local_lights_recorded_ = false; return; }
+    for (uint32_t i = 0; i < owner.local_uniforms_.size(); ++i)
+    {
+        VkDescriptorSet& set = owner.local_sets_[frame.image_index][i];
+        if (!set && !owner.deferred_.local_light_set(owner.local_shadows_.view(frame.image_index),
+                owner.local_shadows_.sampler(), owner.local_shadows_.uniform(frame.image_index),
+                VkDeviceSize(i) * owner.local_shadows_.uniform_stride(), sizeof(LocalLightUniform),
+                set, owner.model_error_))
+        { owner.local_lights_recorded_ = false; return; }
+        if (!owner.deferred_.record_local_light(frame, owner.targets_.lighting_set(frame.image_index), set))
+        { owner.local_lights_recorded_ = false; return; }
+    }
+}
+
 void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
@@ -485,6 +516,7 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
 void VulkanGameDevice::begin_frame()
 {
     discard_scene_draws();
+    light_snapshots_.clear();
     ui_.reset_frame();
     weather_set_ = VK_NULL_HANDLE;
 }
@@ -555,6 +587,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
 {
     ui_recorded_ = true;
     models_recorded_ = true;
+    local_lights_recorded_ = true;
     level_recorded_ = true;
     current_level_ = &level;
     std::copy(std::begin(mvp), std::end(mvp), scene_mvp_.begin());
@@ -581,11 +614,18 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         }
     }
     SunShadowUniform sun_uniform{};
+    WaterSceneUniform water_uniform{};
     {
         Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
         std::memcpy(&camera, mvp, sizeof(camera));
         inverse.invert(camera);
         std::memcpy(sun_uniform.inverse_view_projection, &inverse, sizeof(inverse));
+        std::memcpy(water_uniform.view_projection, &camera, sizeof(camera));
+        std::memcpy(water_uniform.inverse_view_projection, &inverse, sizeof(inverse));
+        water_uniform.camera_position[0] = Device.vCameraPosition.x;
+        water_uniform.camera_position[1] = Device.vCameraPosition.y;
+        water_uniform.camera_position[2] = Device.vCameraPosition.z;
+        water_uniform.camera_position[3] = 1.f;
         Fvector direction;
         direction.set(light.direction_ambient[0], light.direction_ambient[1],
             light.direction_ambient[2]);
@@ -601,13 +641,96 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         sun_vp.mul(sun_projection, sun_view);
         std::memcpy(sun_uniform.sun_view_projection, &sun_vp, sizeof(sun_vp));
     }
+    local_uniforms_.clear();
+    if (render_world)
+    {
+        Fmatrix camera, inverse;
+        std::memcpy(&camera, mvp, sizeof(camera));
+        inverse.invert(camera);
+        uint32_t shadow_slot = 0;
+        std::vector<const VulkanLightSnapshot*> nearby;
+        nearby.reserve(light_snapshots_.size());
+        for (const auto& snapshot : light_snapshots_)
+            if (snapshot.active && std::isfinite(snapshot.range) && snapshot.range > .1f &&
+                (snapshot.type == VulkanLightType::Point ||
+                    snapshot.type == VulkanLightType::Spot ||
+                    snapshot.type == VulkanLightType::OmniPart) &&
+                std::all_of(snapshot.position.begin(), snapshot.position.end(),
+                    [](float value) { return std::isfinite(value); }))
+                nearby.push_back(&snapshot);
+        const auto distance = [](const VulkanLightSnapshot* snapshot)
+        {
+            const float dx = snapshot->position[0] - Device.vCameraPosition.x;
+            const float dy = snapshot->position[1] - Device.vCameraPosition.y;
+            const float dz = snapshot->position[2] - Device.vCameraPosition.z;
+            return dx * dx + dy * dy + dz * dz;
+        };
+        std::stable_sort(nearby.begin(), nearby.end(), [&](const auto* a, const auto* b)
+        { return distance(a) < distance(b); });
+        for (const VulkanLightSnapshot* snapshot : nearby)
+        {
+            if (local_uniforms_.size() >= LocalLightCapacity) break;
+            const auto& light_snapshot = *snapshot;
+            LocalLightUniform local{};
+            std::memcpy(local.inverse_view_projection, &inverse, sizeof(inverse));
+            const auto& position = light_snapshot.position;
+            local.position_range[0] = position[0];
+            local.position_range[1] = position[1];
+            local.position_range[2] = position[2];
+            local.position_range[3] = std::clamp(light_snapshot.range, .2f, 1000.f);
+            for (uint32_t axis = 0; axis < 3; ++axis)
+            {
+                local.direction_cone[axis] = light_snapshot.direction[axis];
+                local.color_type[axis] = std::isfinite(light_snapshot.color[axis]) ?
+                    std::max(0.f, light_snapshot.color[axis]) : 0.f;
+            }
+            const bool spot = light_snapshot.type == VulkanLightType::Spot;
+            local.color_type[3] = spot ? 1.f : 0.f;
+            const float cone = std::clamp(light_snapshot.cone, .15f, 3.f);
+            local.direction_cone[3] = std::cos(cone * .5f);
+            const bool cast = light_snapshot.shadow && shadow_slot < LocalShadowSlots;
+            local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
+            local.shadow_params[1] = .002f;
+            local.shadow_params[2] = cast ? 1.f : 0.f;
+            if (cast)
+            {
+                const float directions[6][3]{{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
+                const float ups[6][3]{{0,-1,0},{0,-1,0},{0,0,1},{0,0,-1},{0,-1,0},{0,-1,0}};
+                const uint32_t faces = spot ? 1 : LocalShadowFaces;
+                for (uint32_t face = 0; face < faces; ++face)
+                {
+                    Fvector origin, direction, up;
+                    origin.set(position[0], position[1], position[2]);
+                    direction.set(directions[face][0], directions[face][1], directions[face][2]);
+                    up.set(ups[face][0], ups[face][1], ups[face][2]);
+                    if (spot)
+                    {
+                        direction.set(light_snapshot.direction[0], light_snapshot.direction[1],
+                            light_snapshot.direction[2]).normalize_safe();
+                        up.set(0.f, std::abs(direction.y) > .95f ? 0.f : 1.f,
+                            std::abs(direction.y) > .95f ? 1.f : 0.f);
+                    }
+                    Fmatrix view, projection, vp;
+                    view.build_camera_dir(origin, direction, up);
+                    projection.build_projection(spot ? cone : 1.57079632679f,
+                        1.f, .1f, local.position_range[3]);
+                    vp.mul(projection, view);
+                    std::memcpy(local.shadow_matrices[face], &vp, sizeof(vp));
+                }
+                ++shadow_slot;
+            }
+            local_uniforms_.push_back(local);
+        }
+    }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
             scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target,
             render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_,
             screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this,
-            record_postprocess, this, &sun_shadows_, &sun_uniform))
+            record_postprocess, this, &sun_shadows_, &sun_uniform,
+            &local_shadows_, &local_uniforms_, record_local_lights, this,
+            render_world && level.has_water() ? &water_targets_ : nullptr, &water_uniform))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
@@ -640,6 +763,11 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         error = model_error_;
         return false;
     }
+    if (!local_lights_recorded_)
+    {
+        error = model_error_.empty() ? "Vulkan local light recording failed" : model_error_;
+        return false;
+    }
     if (!ui_recorded_)
     {
         error = ui_error_;
@@ -663,6 +791,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
 
     const bool replace_surface = recreate_surface || window_.frame().surface_lost();
     targets_.release_lighting(deferred_);
+    deferred_.release_water_sets();
     postprocess_passes_.clear();
     if (!window_.frame().release_swapchain())
     {
@@ -670,6 +799,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
         return false;
     }
     targets_.destroy();
+    water_targets_.destroy();
     if (!(replace_surface ? window_.recreate_surface(extent, error) :
               window_.recreate_frame(extent, error)))
         return false;
@@ -684,17 +814,35 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     if (!sun_shadows_.initialize(window_.device(), frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
             physical.memory, frame_dispatch_, buffer_upload_.buffer,
             create_sampler_, destroy_sampler_, error)) return false;
+    for (auto& image : local_sets_)
+        for (auto& set : image) deferred_.release_gbuffer(set);
+    local_sets_.clear();
+    local_shadows_.destroy();
+    if (!local_shadows_.initialize(window_.device(), frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
+            physical.memory, frame_dispatch_, buffer_upload_.buffer,
+            create_sampler_, destroy_sampler_, error,
+            physical.properties.limits.minUniformBufferOffsetAlignment)) return false;
+    local_sets_.resize(frame.image_count());
     {
         std::vector<VkImageView> depth_views;
         for (uint32_t i = 0; i < frame.image_count(); ++i)
             depth_views.push_back(targets_.depth_view(i));
         if (!frame.attach_scene_depth(depth_views, error)) return false;
     }
-    deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass(), sun_shadows_.render_pass());
+    if (!frame.enable_interpass(error) ||
+        !water_targets_.initialize(physical.handle, window_.device(), frame.format(), frame.extent(),
+            static_cast<uint32_t>(frame.image_count()), physical.memory, frame_dispatch_,
+            buffer_upload_.buffer, error))
+        return false;
+    deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass(),
+        sun_shadows_.render_pass(), local_shadows_.render_pass());
     ui_pass_.rebind_render_pass(frame.render_pass());
     if (!targets_.bind_lighting(deferred_, error))
         return false;
     targets_.bind_sun_shadow(deferred_, sun_shadows_);
+    for (uint32_t i = 0; i < frame.image_count(); ++i)
+        if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
+                targets_.sampled_depth_view(i), textures_.sampler(), water_targets_.uniform(i), error)) return false;
     if (!create_postprocess(error)) return false;
 
     reset_required_ = false;
@@ -743,10 +891,16 @@ void VulkanGameDevice::destroy()
     color_map_views_[0] = color_map_views_[1] = VK_NULL_HANDLE;
     active_map_names_[0].clear();
     active_map_names_[1].clear();
-    textures_.destroy();
     targets_.release_lighting(deferred_);
+    deferred_.release_water_sets();
+    textures_.destroy();
     if (window_.device()) window_.frame().release_swapchain();
     targets_.destroy();
+    water_targets_.destroy();
+    for (auto& image : local_sets_)
+        for (auto& set : image) deferred_.release_gbuffer(set);
+    local_sets_.clear();
+    local_shadows_.destroy();
     sun_shadows_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();

@@ -37,6 +37,7 @@ public:
         const DeferredPass& pass, const float (&mvp)[16], float lod = 1.f) const;
     size_t model_count() const { return meshes_.size(); }
     size_t visual_count() const { return visuals_.size(); }
+    bool has_water() const { return has_water_; }
     uint64_t revision() const { return revision_; }
     IRenderVisual* get_visual(size_t index) const;
     int find_visual_index(const IRenderVisual* visual) const;
@@ -60,6 +61,8 @@ private:
         VkDescriptorSet material{};
         SurfaceMode mode{SurfaceMode::Opaque};
         bool lightmapped{};
+        bool water{};
+        bool glass{};
         std::unique_ptr<Mesh> fast;
     };
     VkDevice device_{};
@@ -85,5 +88,6 @@ private:
     std::vector<std::unique_ptr<VulkanVisual>> visual_objects_;
     std::unordered_map<const IRenderVisual*, uint32_t> visual_indices_;
     uint64_t revision_{};
+    bool has_water_{};
 };
 }

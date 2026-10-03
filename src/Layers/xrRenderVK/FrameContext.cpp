@@ -435,7 +435,8 @@ bool FrameContext::create_render_targets(std::string& error)
     attachments[1].format = m_depth_format;
     attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
     attachments[1].loadOp = m_preserve_prepass_depth ? VK_ATTACHMENT_LOAD_OP_LOAD : VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[1].storeOp = m_preserve_prepass_depth ?
+        VK_ATTACHMENT_STORE_OP_STORE : VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[1].initialLayout = m_preserve_prepass_depth ?
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -750,6 +751,53 @@ bool FrameContext::attach_scene_depth(const std::vector<VkImageView>& views, std
     return true;
 }
 
+bool FrameContext::enable_interpass(std::string& error)
+{
+    if (m_overlay_pass) return true;
+    if (!m_device || !m_render_pass || !m_allow_readback || !m_scene_depth_attached ||
+        m_depth_format == VK_FORMAT_UNDEFINED)
+    { error = "water interpass requires a readable color target and scene depth"; return false; }
+    VkAttachmentDescription attachments[2]{};
+    attachments[0].format = m_format;
+    attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    attachments[0].finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    attachments[1].format = m_depth_format;
+    attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[1].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    const VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+    const VkAttachmentReference depth{1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &color;
+    subpass.pDepthStencilAttachment = &depth;
+    const VkSubpassDependency dependency{
+        VK_SUBPASS_EXTERNAL, 0,
+        VK_PIPELINE_STAGE_TRANSFER_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+        VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+            VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+        VK_DEPENDENCY_BY_REGION_BIT};
+    VkRenderPassCreateInfo info{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
+    info.attachmentCount = 2;
+    info.pAttachments = attachments;
+    info.subpassCount = 1;
+    info.pSubpasses = &subpass;
+    info.dependencyCount = 1;
+    info.pDependencies = &dependency;
+    if (m_vk.create_render_pass(m_device, &info, nullptr, &m_overlay_pass) != VK_SUCCESS)
+    { error = "cannot create Vulkan water overlay pass"; return false; }
+    error.clear();
+    return true;
+}
+
 void FrameContext::clear_depth(VkCommandBuffer command) const
 {
     VkClearAttachment attachment{};
@@ -822,7 +870,9 @@ bool FrameContext::create_sync(std::string& error)
 bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& status, std::string& error,
     FrameRecorder recorder, void* user_data, FrameReadbackRecorder readback, void* readback_data,
     FramePrepassRecorder prepass, void* prepass_data, bool clear_target,
-    FrameRecorder compositor, void* compositor_data)
+    FrameRecorder compositor, void* compositor_data,
+    FrameInterpassRecorder interpass, void* interpass_data,
+    FrameRecorder overlay, void* overlay_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -835,6 +885,8 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         error = "Vulkan swapchain has no attached scene depth";
         return false;
     }
+    if ((interpass || overlay) && (!m_overlay_pass || !interpass || !overlay))
+    { error = "water overlay pass requires capture and overlay recorders"; return false; }
 
     VkFence frame_fence = m_frame_fences[m_current_frame];
     const VkResult fence_wait = m_vk.wait_for_fences(m_device, 1, &frame_fence, VK_TRUE, UINT64_MAX);
@@ -935,6 +987,16 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         recorder(frame, user_data);
     }
     m_vk.cmd_end_render_pass(command);
+    if (interpass)
+    {
+        interpass(command, m_images[image_index], image_index, interpass_data);
+        render_info.renderPass = m_overlay_pass;
+        m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+        const FrameRecordingContext overlay_frame{command, m_render_pass,
+            m_framebuffers[image_index], m_extent, image_index, m_current_frame};
+        overlay(overlay_frame, overlay_data);
+        m_vk.cmd_end_render_pass(command);
+    }
     if (m_postprocess)
     {
         if (!compositor)
@@ -1116,6 +1178,7 @@ void FrameContext::destroy_swapchain_resources()
     for (VkDeviceMemory memory : m_post_memories)
         if (memory) m_vk.free_memory(m_device, memory, nullptr);
     if (m_composite_pass) m_vk.destroy_render_pass(m_device, m_composite_pass, nullptr);
+    if (m_overlay_pass) m_vk.destroy_render_pass(m_device, m_overlay_pass, nullptr);
     for (VkImageView view : m_image_views)
         if (view) m_vk.destroy_image_view(m_device, view, nullptr);
     for (VkImageView view : m_depth_views)
@@ -1134,6 +1197,7 @@ void FrameContext::destroy_swapchain_resources()
     if (m_swapchain) m_vk.destroy_swapchain(m_device, m_swapchain, nullptr);
     m_swapchain = VK_NULL_HANDLE;
     m_render_pass = VK_NULL_HANDLE;
+    m_overlay_pass = VK_NULL_HANDLE;
     m_composite_pass = VK_NULL_HANDLE;
     m_extent = {};
     m_images.clear();

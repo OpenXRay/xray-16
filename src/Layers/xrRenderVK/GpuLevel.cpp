@@ -34,6 +34,13 @@ std::string lightmap_texture(const std::string& textures)
         [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
     return lower.find("lmap") != std::string::npos ? name : std::string{};
 }
+bool named_surface(const LevelMaterial& material, const char* marker)
+{
+    std::string name = material.shader + " " + material.textures;
+    std::transform(name.begin(), name.end(), name.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    return material.mode == SurfaceMode::Transparent && name.find(marker) != std::string::npos;
+}
 }
 GpuLevel::~GpuLevel() { destroy(); }
 
@@ -89,6 +96,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
         const std::string shader = std::string("vk\\") + family;
         mesh.lightmapped = !lightmap.empty();
+        mesh.water = named_surface(material, "water") || named_surface(material, "glass");
+        mesh.glass = named_surface(material, "glass");
+        prepared.has_water_ |= mesh.water;
         if (!pass.request_game_pipeline(shader + ".vs", shader + ".ps", mode, false, false, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader pair: " + error;
@@ -154,6 +164,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     pass_ = prepared.pass_;
     pending_ = std::move(prepared.pending_);
     meshes_ = std::move(prepared.meshes_);
+    has_water_ = prepared.has_water_;
     details_ = std::move(prepared.details_);
     detail_meshes_ = std::move(prepared.detail_meshes_);
     visuals_ = std::move(prepared.visuals_);
@@ -205,13 +216,19 @@ bool GpuLevel::record_sun_shadow(const FrameRecordingContext& frame, const Defer
         Fvector4 world, clip;
         world.set(visual.bounds[6], visual.bounds[7], visual.bounds[8], 1.f);
         transform.transform(clip, world);
-        const float expansion[3]{
-            radius * std::sqrt(transform._11 * transform._11 + transform._21 * transform._21 + transform._31 * transform._31),
-            radius * std::sqrt(transform._12 * transform._12 + transform._22 * transform._22 + transform._32 * transform._32),
-            radius * std::sqrt(transform._13 * transform._13 + transform._23 * transform._23 + transform._33 * transform._33)};
-        return clip.x >= -clip.w - expansion[0] && clip.x <= clip.w + expansion[0] &&
-            clip.y >= -clip.w - expansion[1] && clip.y <= clip.w + expansion[1] &&
-            clip.z >= -expansion[2] && clip.z <= clip.w + expansion[2];
+        const auto extent = [radius](float x, float y, float z)
+        { return radius * std::sqrt(x * x + y * y + z * z); };
+        return clip.x + clip.w >= -extent(transform._11 + transform._14,
+                transform._21 + transform._24, transform._31 + transform._34) &&
+            clip.w - clip.x >= -extent(transform._14 - transform._11,
+                transform._24 - transform._21, transform._34 - transform._31) &&
+            clip.y + clip.w >= -extent(transform._12 + transform._14,
+                transform._22 + transform._24, transform._32 + transform._34) &&
+            clip.w - clip.y >= -extent(transform._14 - transform._12,
+                transform._24 - transform._22, transform._34 - transform._32) &&
+            clip.z >= -extent(transform._13, transform._23, transform._33) &&
+            clip.w - clip.z >= -extent(transform._14 - transform._13,
+                transform._24 - transform._23, transform._34 - transform._33);
     };
     const auto draw = [&](const auto& self, uint32_t index) -> bool
     {
@@ -380,7 +397,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool named = pass.require_game_pipeline(vertex, fragment, mesh.mode, false, false, shader_error);
         if (!named) { Msg("! Vulkan level: %s", shader_error.c_str()); return false; }
         if (phase == GeometryPhase::Transparent ? transparent : !transparent)
-            return transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
+            return mesh.water && transparent ? pass.record_water(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                mesh.index_count, mvp, mesh.material, 0, Device.fTimeGlobal, mesh.glass ? -.35f : .72f) :
+                transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr) :
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     mesh.index_count, mvp, mesh.material, mesh.mode, 0, named ? vertex : nullptr, named ? fragment : nullptr);
@@ -407,6 +426,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool named = pass.require_game_pipeline(vertex, fragment, mesh.mode, false, false, shader_error);
         if (!named) { Msg("! Vulkan level: %s", shader_error.c_str()); return false; }
         if (selected && !(transparent ?
+                mesh.water ? pass.record_water(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                    window.index_count, mvp, mesh.material, window.offset, Device.fTimeGlobal,
+                    mesh.glass ? -.35f : .72f) :
                 pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr) :
@@ -524,6 +546,7 @@ void GpuLevel::destroy()
         for (const Mesh& mesh : detail_meshes_)
             textures_->release_material(mesh.material, *pass_);
     meshes_.clear();
+    has_water_ = false;
     detail_meshes_.clear();
     details_ = {};
     detail_cache_.clear();

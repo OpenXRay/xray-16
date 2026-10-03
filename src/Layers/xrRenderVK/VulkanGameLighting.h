@@ -16,7 +16,7 @@ public:
     void set_type(LT type) override;
     void set_active(bool active) override { state_.active = active; }
     bool get_active() override { return state_.active; }
-    void set_shadow(bool value) override { shadow_ = value; }
+    void set_shadow(bool value) override { state_.shadow = value; }
     void set_volumetric(bool value) override { volumetric_ = value; }
     void set_volumetric_quality(float value) override { volumetric_quality_ = value; }
     void set_volumetric_intensity(float value) override { volumetric_intensity_ = value; }
@@ -43,7 +43,6 @@ private:
     float volumetric_quality_{1.f};
     float volumetric_intensity_{1.f};
     float volumetric_distance_{1.f};
-    bool shadow_{};
     bool volumetric_{};
     bool indirect_{};
     bool hud_mode_{};

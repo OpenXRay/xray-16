@@ -9,6 +9,8 @@
 #include "GpuModel.h"
 #include "VulkanFontRender.h"
 #include "ScreenCopyPass.h"
+#include "LocalShadowTargets.h"
+#include "WaterTargets.h"
 
 #include <array>
 #include <memory>
@@ -27,6 +29,7 @@ public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     void begin_frame();
     void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
+    void queue_lights(const std::vector<VulkanLightSnapshot>& lights) { light_snapshots_ = lights; }
     void queue_rain(VulkanRainRender& rain);
     void queue_thunderbolt(VulkanThunderboltRender& bolt);
     void request_screenshot() { screenshot_requested_ = true; }
@@ -103,6 +106,7 @@ private:
     static void record_hud(const FrameRecordingContext& frame, void* user);
     static void record_models(const FrameRecordingContext& frame, void* user);
     static void record_transparent(const FrameRecordingContext& frame, void* user);
+    static void record_local_lights(const FrameRecordingContext& frame, void* user);
     static void record_level_visuals(const FrameRecordingContext& frame, void* user);
     static void record_readback(VkCommandBuffer command, VkImage image, VkExtent2D extent, void* user);
     static void record_postprocess(const FrameRecordingContext& frame, void* user);
@@ -140,7 +144,13 @@ private:
     TextureUploadDispatch texture_dispatch_{};
     BufferUploadDispatch buffer_upload_{};
     GBufferTargets targets_;
+    WaterTargets water_targets_;
     SunShadowTargets sun_shadows_;
+    LocalShadowTargets local_shadows_;
+    std::vector<std::array<VkDescriptorSet, LocalLightCapacity>> local_sets_;
+    std::vector<VulkanLightSnapshot> light_snapshots_;
+    std::vector<LocalLightUniform> local_uniforms_;
+    bool local_lights_recorded_{true};
     DeferredPass deferred_;
     GameShaderResources shader_resources_;
     ScenePass ui_pass_;

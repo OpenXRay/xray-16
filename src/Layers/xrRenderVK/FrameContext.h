@@ -77,6 +77,8 @@ using FrameReadbackRecorder = void (*)(VkCommandBuffer command, VkImage image, V
 // Records offscreen work before the swapchain render pass. render_pass and
 // framebuffer are null; the callback owns any pass it begins and ends.
 using FramePrepassRecorder = void (*)(const FrameRecordingContext& frame, void* user_data);
+using FrameInterpassRecorder = void (*)(VkCommandBuffer command, VkImage image,
+    uint32_t image_index, void* user_data);
 
 bool load_frame_dispatch(VkInstance instance, PFN_vkGetInstanceProcAddr get_instance_proc,
     VkDevice device, PFN_vkGetDeviceProcAddr get_device_proc, FrameDispatch& dispatch, std::string& error);
@@ -98,6 +100,7 @@ public:
     // Borrow depth views produced by the offscreen pass. Caller must restore
     // the owned views (empty vector) before destroying the borrowed images.
     bool attach_scene_depth(const std::vector<VkImageView>& views, std::string& error);
+    bool enable_interpass(std::string& error);
     void clear_depth(VkCommandBuffer command) const;
     bool recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
         VkExtent2D requested_extent, std::string& error);
@@ -108,7 +111,9 @@ public:
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
         FramePrepassRecorder prepass = nullptr, void* prepass_data = nullptr,
         bool clear_target = false, FrameRecorder compositor = nullptr,
-        void* compositor_data = nullptr); // Compositor sees the complete scene, HUD and UI.
+        void* compositor_data = nullptr,
+        FrameInterpassRecorder interpass = nullptr, void* interpass_data = nullptr,
+        FrameRecorder overlay = nullptr, void* overlay_data = nullptr);
     void destroy();
 
     VkExtent2D extent() const { return m_extent; }
@@ -137,6 +142,7 @@ private:
     FrameDispatch m_vk{};
     VkSwapchainKHR m_swapchain = VK_NULL_HANDLE;
     VkRenderPass m_render_pass = VK_NULL_HANDLE;
+    VkRenderPass m_overlay_pass = VK_NULL_HANDLE;
     VkCommandPool m_command_pool = VK_NULL_HANDLE;
     VkExtent2D m_extent{};
     VkFormat m_format = VK_FORMAT_UNDEFINED;

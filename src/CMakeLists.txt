@@ -149,6 +149,38 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
     add_test(NAME vulkan_fog_parameters COMMAND vulkan_fog_parameters_test)
 
+    add_executable(vulkan_local_shadow_targets_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_local_shadow_targets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/LocalShadowTargets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/BufferResource.cpp")
+    target_include_directories(vulkan_local_shadow_targets_test PRIVATE
+        "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    target_compile_options(vulkan_local_shadow_targets_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_local_shadow_targets COMMAND vulkan_local_shadow_targets_test)
+
+    add_executable(vulkan_water_targets_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_water_targets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/WaterTargets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/BufferResource.cpp")
+    target_include_directories(vulkan_water_targets_test PRIVATE
+        "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    target_compile_options(vulkan_water_targets_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_water_targets COMMAND vulkan_water_targets_test)
+
+    add_executable(vulkan_water_local_pipeline_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_water_local_pipeline.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp")
+    target_include_directories(vulkan_water_local_pipeline_test PRIVATE
+        "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    target_compile_options(vulkan_water_local_pipeline_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_water_local_pipeline COMMAND vulkan_water_local_pipeline_test)
+
     add_executable(vulkan_visual_catalog_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_visual_catalog.cpp"
     )

@@ -19,6 +19,7 @@ struct VulkanLightSnapshot
 {
     VulkanLightType type{VulkanLightType::Point};
     bool active{};
+    bool shadow{};
     std::array<float, 3> position{};
     std::array<float, 3> direction{0.f, -1.f, 0.f};
     std::array<float, 3> color{1.f, 1.f, 1.f};

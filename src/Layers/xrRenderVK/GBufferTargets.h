@@ -29,6 +29,7 @@ public:
     VkDescriptorSet lighting_set(uint32_t image_index) const;
     // Valid after the geometry pass; the image is stored in read-only depth layout.
     VkImageView depth_view(uint32_t image_index) const;
+    VkImageView sampled_depth_view(uint32_t image_index) const;
     VkRenderPass render_pass() const { return pass_; }
     void destroy();
 
