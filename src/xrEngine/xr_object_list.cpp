@@ -214,6 +214,9 @@ void CObjectList::clear_crow_vec(Objects& o)
 void CObjectList::Update(bool bForce)
 {
     ZoneScoped;
+#if defined(XR_PLATFORM_ANDROID)
+    const u64 updateStart = CPU::QPC();
+#endif
 
     if (statsFrame != Device.dwFrame)
     {
@@ -348,6 +351,29 @@ void CObjectList::Update(bool bForce)
         }
         destroy_queue.clear();
     }
+#if defined(XR_PLATFORM_ANDROID)
+    // The existing frame trace groups all engine work under "update".
+    // Measure the object list separately so a CPU optimization can be
+    // checked against real gameplay rather than a renderer-only benchmark.
+    static u64 updateTotal = 0;
+    static u64 updateMaximum = 0;
+    static u32 updateSamples = 0;
+    static u32 lastReport = 0;
+    const u64 elapsed = CPU::QPC() - updateStart;
+    updateTotal += elapsed;
+    updateMaximum = std::max(updateMaximum, elapsed);
+    ++updateSamples;
+    if (Device.dwTimeContinual - lastReport >= 5000 && CPU::qpc_freq)
+    {
+        const double tickToMs = 1000.0 / CPU::qpc_freq;
+        Msg("[update-trace] objects=%.2fms max=%.2fms samples=%u crows=%u active=%u total=%u",
+            tickToMs * updateTotal / updateSamples, tickToMs * updateMaximum,
+            updateSamples, stats.Crows, stats.Active, stats.Total);
+        updateTotal = updateMaximum = 0;
+        updateSamples = 0;
+        lastReport = Device.dwTimeContinual;
+    }
+#endif
 }
 
 void CObjectList::net_Register(IGameObject* O)

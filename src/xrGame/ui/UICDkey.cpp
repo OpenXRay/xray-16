@@ -231,6 +231,16 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 {
     string256 new_name{};
 
+    // Android exposes the POSIX passwd structure, but some fields (notably
+    // pw_gecos) may legitimately be null.  The old code passed such a field
+    // directly to strcpy(), which made engine startup crash before the first
+    // frame was rendered.  Always leave the destination in a valid state and
+    // copy only a non-null, bounded source string.
+    if (!name || name_size == 0)
+        return;
+
+    name[0] = 0;
+
 #if defined(XR_PLATFORM_WINDOWS)
     if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
         name[0] = 0;
@@ -239,12 +249,19 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
     struct passwd* pw = getpwuid(uid);
     if (pw)
     {
-        strcpy(name, pw->pw_gecos);
-        char* pos = strchr(name, ','); // pw_gecos return string
-        if (NULL != pos)
-            *pos = 0;
-        if (0 == name[0])
-            strcpy(name, pw->pw_name);
+        pcstr source = nullptr;
+        if (pw->pw_gecos && pw->pw_gecos[0])
+            source = pw->pw_gecos;
+        else if (pw->pw_name && pw->pw_name[0])
+            source = pw->pw_name;
+
+        if (source)
+        {
+            xr_strcpy(name, name_size, source);
+            char* pos = strchr(name, ','); // pw_gecos return string
+            if (pos)
+                *pos = 0;
+        }
     }
 #else
 #   error Select or add implementation for your platform

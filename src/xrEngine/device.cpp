@@ -267,7 +267,20 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
+#if defined(XR_PLATFORM_ANDROID)
+    const u64 profileFrequency = SDL_GetPerformanceFrequency();
+    const auto elapsedMilliseconds = [profileFrequency](u64 start, u64 end)
+    {
+        return profileFrequency ? 1000.f * static_cast<float>(end - start) / profileFrequency : 0.f;
+    };
+    u64 sectionStart = SDL_GetPerformanceCounter();
+#endif
+
     FrameMove();
+
+#if defined(XR_PLATFORM_ANDROID)
+    stats.fFrameMoveReal = elapsedMilliseconds(sectionStart, SDL_GetPerformanceCounter());
+#endif
 
     OnCameraUpdated();
 
@@ -280,9 +293,20 @@ void CRenderDevice::ProcessFrame()
         seqFrameMT.Process();
     });
 
+#if defined(XR_PLATFORM_ANDROID)
+    sectionStart = SDL_GetPerformanceCounter();
+#endif
     DoRender();
+#if defined(XR_PLATFORM_ANDROID)
+    stats.fRenderReal = elapsedMilliseconds(sectionStart, SDL_GetPerformanceCounter());
+    sectionStart = SDL_GetPerformanceCounter();
+#endif
 
     TaskScheduler->Wait(processSeqParallel);
+
+#if defined(XR_PLATFORM_ANDROID)
+    stats.fParallelWaitReal = elapsedMilliseconds(sectionStart, SDL_GetPerformanceCounter());
+#endif
 
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
     const u64 frameTime = frameEndTime - frameStartTime;

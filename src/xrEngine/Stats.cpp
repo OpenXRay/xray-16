@@ -154,7 +154,7 @@ void CStats::Show()
     if (psDeviceFlags.test(rsShowFPS))
     {
         const auto fps = u32(Device.GetStats().fFPS);
-        fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
+        fpsFont->Out(Device.dwWidth * 0.5f, 5, "FPS: %3d", fps);
         fpsFont->OnRender();
     }
     if (psDeviceFlags.test(rsShowFPSGraph))
@@ -183,7 +183,8 @@ void CStats::OnDeviceCreate()
         statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
         fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         fpsFont->SetHeightI(0.025f);
-        fpsFont->SetColor(color_rgba(250, 250, 15, 180));
+        fpsFont->SetColor(color_rgba(255, 32, 32, 255));
+        fpsFont->SetAligment(CGameFont::alCenter);
 
         fpsGraph = xr_make_unique<CStatGraph>(false);
         fpsGraph->SetStyle(CStatGraph::EStyle::stBarLine);

@@ -1,0 +1,29 @@
+{
+  "variants": [
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_opaque.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_opaque.ps.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_lightmap.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_lightmap.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/object_opaque.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/object_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_cutout.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_ALPHA_TEST=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_lightmap_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_lightmap_cutout.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_ALPHA_TEST=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/object_cutout.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/object_cutout.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_ALPHA_TEST=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/object_blended.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/object_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_SKINNED=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/hud_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/object_double_sided.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/object_double_sided.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_DOUBLE_SIDED=1"] },
+    { "source": "skinned.vs", "stage": "vs", "output": "vk/skinned_1.vs.spv", "define": ["SKIN_WEIGHTS=1"] },
+    { "source": "skinned.vs", "stage": "vs", "output": "vk/skinned_2.vs.spv", "define": ["SKIN_WEIGHTS=2"] },
+    { "source": "skinned.vs", "stage": "vs", "output": "vk/skinned_3.vs.spv", "define": ["SKIN_WEIGHTS=3"] },
+    { "source": "skinned.vs", "stage": "vs", "output": "vk/skinned_4.vs.spv", "define": ["SKIN_WEIGHTS=4"] },
+    { "source": "skinned.vs", "stage": "vs", "output": "vk/hud_skinned_4.vs.spv", "define": ["SKIN_WEIGHTS=4", "VK_HUD=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/tree_opaque.vs.spv", "define": ["VK_TREE=1", "LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/progressive_opaque.vs.spv", "define": ["VK_PROGRESSIVE=1", "LEVEL_GEOMETRY=1"] }
+  ]
+}

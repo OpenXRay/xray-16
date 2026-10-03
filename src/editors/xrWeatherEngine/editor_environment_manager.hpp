@@ -141,6 +141,7 @@ private:
 private:
     mutable shader_ids_type m_shader_ids;
     mutable particle_ids_type m_particle_ids;
+    mutable xr_vector<shared_str> m_particle_names;
     mutable light_animator_ids_type m_light_animator_ids;
 
 private:

@@ -24,13 +24,22 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     PassSET_Blend(bABlend, abSRC, abDST, aTest, aRef);
     PassSET_LightFog(FALSE, bFog);
 
+    LPCSTR effectivePs = _ps;
+#if defined(XR_PLATFORM_ANDROID) && defined(USE_OGL)
+    // Legacy R2 shadow passes use "null" as a depth-only pixel shader. GLES
+    // monolithic programs still require a fragment stage on affected Adreno
+    // drivers, so use the existing no-op fragment shader for this path too.
+    if (0 == xr_stricmp(_ps, "null"))
+        effectivePs = "dumb";
+#endif
+
     // Create shaders
 #if defined(USE_OGL)
-    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, "null", "null", "null");
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, effectivePs, "null", "null", "null");
     if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
 #endif
     {
-        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        dest.ps = RImplementation.Resources->_CreatePS(effectivePs);
         ctable.merge(&dest.ps->constants);
         u32 flags = 0;
 #if defined(USE_DX11)

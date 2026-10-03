@@ -28,3 +28,6 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/Vulkan-Headers"]
+	path = Externals/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git

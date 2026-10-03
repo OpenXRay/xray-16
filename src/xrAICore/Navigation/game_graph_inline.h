@@ -22,7 +22,7 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
     {
         u8* temp = (u8*)(m_nodes + header().vertex_count());
         temp += header().edge_count() * sizeof(CGameGraph::CEdge);
-        m_cross_tables = (u32*)(((CLevelPoint*)temp) + header().death_point_count());
+        m_cross_tables = temp + sizeof(CLevelPoint) * header().death_point_count();
         m_current_level_cross_table = nullptr;
     }
 }
@@ -93,23 +93,23 @@ IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iter
         vertex(_GRAPH_ID(vertex_id))->edge_count();
 }
 
-IC const CGameGraph::_GRAPH_ID& CGameGraph::value(u32 const /*vertex_id*/, const_iterator& i) const
+IC CGameGraph::_GRAPH_ID CGameGraph::value(u32 const /*vertex_id*/, const_iterator& i) const
 {
     return (i->vertex_id());
 }
 
-IC const float& CGameGraph::edge_weight(const_iterator i) const { return (i->distance()); }
+IC float CGameGraph::edge_weight(const_iterator i) const { return (i->distance()); }
 IC const CGameGraph::CGameVertex* CGameGraph::vertex(u32 const vertex_id) const { return (m_nodes + vertex_id); }
-IC const u8& CGameGraph::CHeader::version() const { return (m_version); }
+IC u8 CGameGraph::CHeader::version() const { return (m_version); }
 IC GameGraph::_LEVEL_ID GameGraph::CHeader::level_count() const
 {
     VERIFY(m_levels.size() < (u32(1) << (8 * sizeof(GameGraph::_LEVEL_ID))));
     return ((GameGraph::_LEVEL_ID)m_levels.size());
 }
 
-IC const GameGraph::_GRAPH_ID& GameGraph::CHeader::vertex_count() const { return (m_vertex_count); }
-IC const u32& GameGraph::CHeader::edge_count() const { return (m_edge_count); }
-IC const u32& GameGraph::CHeader::death_point_count() const { return (m_death_point_count); }
+IC GameGraph::_GRAPH_ID GameGraph::CHeader::vertex_count() const { return (m_vertex_count); }
+IC u32 GameGraph::CHeader::edge_count() const { return (m_edge_count); }
+IC u32 GameGraph::CHeader::death_point_count() const { return (m_death_point_count); }
 IC const GameGraph::LEVEL_MAP& GameGraph::CHeader::levels() const { return (m_levels); }
 
 IC bool GameGraph::CHeader::level_exist(const _LEVEL_ID& id) const
@@ -161,17 +161,77 @@ IC const GameGraph::SLevel* GameGraph::CHeader::level(LPCSTR level_name, bool) c
 }
 
 IC const xrGUID& CGameGraph::CHeader::guid() const { return (m_guid); }
-IC const Fvector& GameGraph::CGameVertex::level_point() const { return (tLocalPoint); }
-IC const Fvector& GameGraph::CGameVertex::game_point() const { return (tGlobalPoint); }
-IC GameGraph::_LEVEL_ID GameGraph::CGameVertex::level_id() const { return (tLevelID); }
-IC u32 GameGraph::CGameVertex::level_vertex_id() const { return (tNodeID); }
+IC Fvector GameGraph::CGameVertex::level_point() const
+{
+    Fvector value;
+    CopyMemory(&value, &tLocalPoint, sizeof(value));
+    return value;
+}
+IC Fvector GameGraph::CGameVertex::game_point() const
+{
+    Fvector value;
+    CopyMemory(&value, &tGlobalPoint, sizeof(value));
+    return value;
+}
+IC GameGraph::_LEVEL_ID GameGraph::CGameVertex::level_id() const
+{
+    u32 packedLevelAndNode;
+    CopyMemory(&packedLevelAndNode, reinterpret_cast<const u8*>(this) + sizeof(Fvector) * 2,
+        sizeof(packedLevelAndNode));
+    return static_cast<_LEVEL_ID>(packedLevelAndNode & 0xff);
+}
+IC u32 GameGraph::CGameVertex::level_vertex_id() const
+{
+    u32 packedLevelAndNode;
+    CopyMemory(&packedLevelAndNode, reinterpret_cast<const u8*>(this) + sizeof(Fvector) * 2,
+        sizeof(packedLevelAndNode));
+    return packedLevelAndNode >> 8;
+}
 IC const u8* GameGraph::CGameVertex::vertex_type() const { return (tVertexTypes); }
 IC const u8& GameGraph::CGameVertex::edge_count() const { return (tNeighbourCount); }
 IC const u8& GameGraph::CGameVertex::death_point_count() const { return (tDeathPointCount); }
-IC const u32& GameGraph::CGameVertex::edge_offset() const { return (dwEdgeOffset); }
-IC const u32& GameGraph::CGameVertex::death_point_offset() const { return (dwPointOffset); }
-IC const GameGraph::_GRAPH_ID& GameGraph::CEdge::vertex_id() const { return (m_vertex_id); }
-IC const float& GameGraph::CEdge::distance() const { return (m_path_distance); }
+IC u32 GameGraph::CGameVertex::edge_offset() const
+{
+    u32 value;
+    CopyMemory(&value, &dwEdgeOffset, sizeof(value));
+    return value;
+}
+IC u32 GameGraph::CGameVertex::death_point_offset() const
+{
+    u32 value;
+    CopyMemory(&value, &dwPointOffset, sizeof(value));
+    return value;
+}
+IC GameGraph::_GRAPH_ID GameGraph::CEdge::vertex_id() const
+{
+    _GRAPH_ID value;
+    CopyMemory(&value, &m_vertex_id, sizeof(value));
+    return value;
+}
+IC float GameGraph::CEdge::distance() const
+{
+    float value;
+    CopyMemory(&value, &m_path_distance, sizeof(value));
+    return value;
+}
+IC Fvector GameGraph::CLevelPoint::level_point() const
+{
+    Fvector value;
+    CopyMemory(&value, &tPoint, sizeof(value));
+    return value;
+}
+IC u32 GameGraph::CLevelPoint::level_vertex_id() const
+{
+    u32 value;
+    CopyMemory(&value, &tNodeID, sizeof(value));
+    return value;
+}
+IC float GameGraph::CLevelPoint::distance() const
+{
+    float value;
+    CopyMemory(&value, &fDistance, sizeof(value));
+    return value;
+}
 IC void CGameGraph::begin_spawn(u32 const vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const
 {
     const CGameVertex* object = vertex(vertex_id);
@@ -256,18 +316,23 @@ IC void CGameGraph::set_current_level(u32 const level_id)
     xr_delete(m_current_level_cross_table);
     if (header().version() >= XRAI_VERSION_PRIQUEL)
     {
-        u32* current_cross_table = m_cross_tables;
+        u8* current_cross_table = m_cross_tables;
         GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
         GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
         for (; I != E; ++I)
         {
             if (level_id != (*I).first)
             {
-                current_cross_table = (u32*)((u8*)current_cross_table + *current_cross_table);
+                u32 tableSize;
+                CopyMemory(&tableSize, current_cross_table, sizeof(tableSize));
+                current_cross_table += tableSize;
                 continue;
             }
 
-            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(current_cross_table + 1, *current_cross_table);
+            u32 tableSize;
+            CopyMemory(&tableSize, current_cross_table, sizeof(tableSize));
+            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(
+                current_cross_table + sizeof(tableSize), tableSize);
             break;
         }
     }
@@ -312,12 +377,13 @@ IC void CGameGraph::save(IWriter& stream)
     stream.w(buffer, header().death_point_count() * sizeof(CLevelPoint));
     buffer += header().death_point_count() * sizeof(CLevelPoint);
 
-    VERIFY((u8*)m_cross_tables == buffer);
+    VERIFY(m_cross_tables == buffer);
     GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
     GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
     for (; I != E; ++I)
     {
-        u32 size = *(u32*)buffer;
+        u32 size;
+        CopyMemory(&size, buffer, sizeof(size));
         stream.w(buffer, size);
         buffer += size;
     }

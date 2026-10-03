@@ -61,12 +61,27 @@ IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
 {
     R_ASSERT(type == D3D_QUERY_OCCLUSION);
     glGenQueries(1, pQuery);
-    return S_OK;
+    return *pQuery ? S_OK : E_FAIL;
 }
 
 IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
 {
-    if (DataSize == sizeof(GLint64))
+    if (!query)
+        return E_FAIL;
+#if defined(XR_PLATFORM_ANDROID)
+    if (!glIsQuery(query))
+        return E_FAIL;
+#endif
+    if (GLAD_GL_ES_VERSION_3_0)
+    {
+        VERIFY(DataSize == sizeof(GLuint));
+        GLuint available = GL_FALSE;
+        CHK_GL(glGetQueryObjectuiv(query, GL_QUERY_RESULT_AVAILABLE, &available));
+        if (!available)
+            return S_FALSE;
+        CHK_GL(glGetQueryObjectuiv(query, GL_QUERY_RESULT, static_cast<GLuint*>(pData)));
+    }
+    else if (DataSize == sizeof(GLint64))
         CHK_GL(glGetQueryObjecti64v(query, GL_QUERY_RESULT, (GLint64*)pData));
     else
         CHK_GL(glGetQueryObjectiv(query, GL_QUERY_RESULT, (GLint*)pData));
@@ -75,13 +90,27 @@ IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
 
 IC HRESULT BeginQuery(GLuint query)
 {
-    CHK_GL(glBeginQuery(GL_SAMPLES_PASSED, query));
+    const GLenum target = GLAD_GL_ES_VERSION_3_0 ? GL_ANY_SAMPLES_PASSED : GL_SAMPLES_PASSED;
+    GLint active = 0;
+    glGetQueryiv(target, GL_CURRENT_QUERY, &active);
+    if (active != 0)
+        return E_FAIL;
+    CHK_GL(glBeginQuery(target, query));
+#if defined(XR_PLATFORM_ANDROID)
+    if (!glIsQuery(query))
+        return E_FAIL;
+#endif
     return S_OK;
 }
 
 IC HRESULT EndQuery(GLuint query)
 {
-    CHK_GL(glEndQuery(GL_SAMPLES_PASSED));
+    const GLenum target = GLAD_GL_ES_VERSION_3_0 ? GL_ANY_SAMPLES_PASSED : GL_SAMPLES_PASSED;
+    GLint active = 0;
+    glGetQueryiv(target, GL_CURRENT_QUERY, &active);
+    if (active != static_cast<GLint>(query))
+        return E_FAIL;
+    CHK_GL(glEndQuery(target));
     return S_OK;
 }
 

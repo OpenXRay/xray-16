@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#if defined(XR_PLATFORM_ANDROID)
+#include <SDL_main.h>
+#endif
+
 #include "xrEngine/x_ray.h"
 #include "xrGame/xrGame.h"
 #include "Include/xrRender/xrRender.h"
@@ -21,12 +25,15 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
-std::array<RendererModule*, 2> s_render_modules =
+std::array<RendererModule*, 3> s_render_modules =
 {
 #ifdef XR_PLATFORM_WINDOWS
     xray::render::render_r4::GetRendererModule(),
 #endif
     xray::render::render_gl::GetRendererModule(),
+#ifdef XR_PLATFORM_ANDROID
+    xray::render::vulkan::GetRendererModule(),
+#endif
 };
 
 struct tracy_raii
@@ -46,7 +53,14 @@ struct tracy_raii
 int entry_point(pcstr commandLine)
 {
     tracy_raii raii;
-    auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
+    commandLine = commandLine ? commandLine : "";
+#if defined(XR_PLATFORM_ANDROID)
+    android_install_crash_handler();
+    android_engine_log_early("[android] native entry point entered");
+#endif
+    // Renderer smoke is deliberately independent from proprietary game data:
+    // it exercises the Android window/context/shader path only.
+    auto* game = strstr(commandLine, "-nogame") || strstr(commandLine, "-renderer-smoke") ? nullptr : &xrGame;
 
     CApplication app{ commandLine, game, s_render_modules };
 
@@ -126,6 +140,13 @@ int main(int argc, char *argv[])
     // this executes if f() throws std::string or int or any other unrelated type
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    // SDL runs main() on a Java-owned native thread. Returning from that
+    // thread leaves the dedicated :engine process (and its other threads)
+    // alive after the engine has shut down. The launcher is a separate
+    // process, so terminate this process once all engine destructors ran.
+    _exit(result);
+#endif
     return result;
 }
 #endif

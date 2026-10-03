@@ -27,6 +27,7 @@ public:
     pstr m_Add;
     pstr m_DefExt;
     pstr m_FilterCaption;
+    pstr m_Overlay;
     Flags32 m_Flags;
 
 public:
@@ -35,6 +36,7 @@ public:
     pcstr _update(string_path& dest, pcstr src) const;
     void _set(pcstr add);
     void _set_root(pcstr root);
+    void _set_overlay(pcstr root, pcstr add = nullptr);
 
     void rescan_path_cb();
 };

@@ -24,12 +24,17 @@ namespace render_gl
 {
 class dxRainRender;
 }
+namespace vulkan
+{
+class VulkanRainRender;
+}
 } // namespace xray::render
 
 class ENGINE_API CEffect_Rain
 {
     friend class xray::render::render_r4::dxRainRender;
     friend class xray::render::render_gl::dxRainRender;
+    friend class xray::render::vulkan::VulkanRainRender;
 
 private:
     struct Item

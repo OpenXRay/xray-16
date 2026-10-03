@@ -20,6 +20,7 @@
 #include "xrAICore/Navigation/graph_engine.h"
 #include "xrServer.h"
 #include "alife_human_brain.h"
+#include "xrEngine/IGame_Persistent.h"
 
 using namespace ALife;
 
@@ -28,6 +29,7 @@ void CALifeSurgeManager::spawn_new_spawns()
 {
     xr_vector<ALife::_SPAWN_ID>::const_iterator I = m_temp_spawns.begin();
     xr_vector<ALife::_SPAWN_ID>::const_iterator E = m_temp_spawns.end();
+    u32 created = 0;
     for (; I != E; ++I)
     {
         CSE_ALifeDynamicObject *object,
@@ -40,6 +42,14 @@ void CALifeSurgeManager::spawn_new_spawns()
         timer.Start();
 #endif
         create(object, spawn, *I);
+        ++created;
+#if defined(XR_PLATFORM_ANDROID)
+        // ALife creation can take minutes on ARMv7. Redraw the active loading
+        // surface periodically so Android does not present a frozen frame
+        // while the synchronous object registration pass is still running.
+        if ((created & 31u) == 0)
+            g_pGamePersistent->LoadDraw();
+#endif
 #ifdef DEBUG
         if (psAI_Flags.test(aiALife))
             Msg("LSS : SURGE : SPAWN : [%s],[%s], level %s, time %f ms", spawn->s_name.c_str(), spawn->name_replace(),

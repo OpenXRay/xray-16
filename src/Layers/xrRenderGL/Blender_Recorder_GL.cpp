@@ -65,13 +65,30 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     PassSET_Blend(bABlend, abSRC, abDST, aTest, aRef);
     PassSET_LightFog(FALSE, bFog);
 
+    // A desktop GL depth-only pass can be linked without a fragment stage,
+    // but the GLES monolithic-program path used by Android/Adreno cannot.
+    // Historically the GL blenders passed "null" for shadow-map pixel
+    // shaders.  That produced hundreds of failed programs and left invalid
+    // passes in the resource cache, which were later dereferenced while a
+    // new game was finishing its load.  Use the existing no-op fragment
+    // shader; color writes remain disabled by the blender.
+    LPCSTR effectivePs = _ps;
+#if defined(XR_PLATFORM_ANDROID)
+    // Some Adreno drivers report separate-shader support while the engine
+    // still selects its monolithic path for individual cached passes. Do not
+    // key correctness to that runtime flag: GLES always gets a fragment
+    // stage for a legacy depth-only pass.
+    if (0 == xr_stricmp(_ps, "null"))
+        effectivePs = "dumb";
+#endif
+
     // Create shaders
 #if defined(USE_OGL)
-    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, "null", "null");
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, effectivePs, _gs, "null", "null");
     if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
 #endif
     {
-        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        dest.ps = RImplementation.Resources->_CreatePS(effectivePs);
         dest.vs = RImplementation.Resources->_CreateVS(_vs);
         dest.gs = RImplementation.Resources->_CreateGS(_gs);
         ctable.merge(&dest.ps->constants);
@@ -79,7 +96,8 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
         ctable.merge(&dest.gs->constants);
     }
 #if defined(USE_OGL)
-    RImplementation.Resources->_LinkPP(dest);
+    const bool linked = RImplementation.Resources->_LinkPP(dest);
+    R_ASSERT3(linked, "Failed to link OpenGL shader pass", dest.pp->cName.c_str());
     ctable.merge(&dest.pp->constants);
 #endif
 

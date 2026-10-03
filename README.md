@@ -25,6 +25,25 @@ Installation instructions are on the [How to install and play](https://github.co
 Shadow of Chernobyl is **not supported** yet. (see [#392](https://github.com/OpenXRay/xray-16/issues/392)) <br>
 Legends of the Zone/Enhanced Edition is not supported and won't ever be likely. (see [#1865](https://github.com/OpenXRay/xray-16/issues/1865))
 
+## Experimental Android port in this fork
+
+This fork has an experimental Android launcher and engine port. It is not an
+upstream OpenXRay release target, and the repository's CI does not produce an
+Android APK. Build it locally using [the Android build guide](android/README.md).
+
+| Item | Current state |
+|---|---|
+| Game profile | Call of Pripyat is the intended target; SoC/CS launcher entries only pass the existing command-line flags |
+| Android | API 26 or newer |
+| CPU ABI | `armeabi-v7a` only; the device OS must support 32-bit applications |
+| Gameplay renderer | OpenGL ES 3.1, with at least four draw buffers and four color attachments |
+| Vulkan | Separate gameplay module and no-game probe; hardware gameplay validation and shader compatibility remain pending |
+| Game data | Not included; use a legally obtained PC installation in shared storage |
+
+The selected installation keeps the usual `_appdata_` layout for settings,
+saves, screenshots and logs. The launcher does not rewrite the installation's
+archives, textures, shaders or `fsgame.ltx`.
+
 ## Main differences from the original X-Ray
 - Support for 64-bit.
 - Improved performance, better FPS.

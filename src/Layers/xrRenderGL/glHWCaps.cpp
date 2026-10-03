@@ -28,7 +28,12 @@ void CHWCaps::Update()
     geometry.dwRegisters = cnt;
     geometry.dwInstructions = 256;
     geometry.dwClipPlanes = _min(6, 15);
-    geometry.bVTF = (GLAD_GL_VERSION_3_0 || GLAD_GL_ARB_texture_float) && !strstr(Core.Params, "-novtf");
+    const pcstr commandLine = Core.Params ? Core.Params : "";
+#if defined(XR_PLATFORM_ANDROID)
+    geometry.bVTF = GLAD_GL_ES_VERSION_3_0 && !strstr(commandLine, "-novtf");
+#else
+    geometry.bVTF = (GLAD_GL_VERSION_3_0 || GLAD_GL_ARB_texture_float) && !strstr(commandLine, "-novtf");
+#endif
 
     // ***************** PIXEL processing
     raster_major = 4;
@@ -38,7 +43,17 @@ void CHWCaps::Update()
     raster.dwStages = 15; // Previuos value is 16, but it's out of bounds
     raster.bNonPow2 = TRUE;
     raster.bCubemap = TRUE;
+#if defined(XR_PLATFORM_ANDROID)
+    GLint maxDrawBuffers = 0;
+    GLint maxColorAttachments = 0;
+    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxDrawBuffers);
+    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
+    raster.dwMRT_count = static_cast<u32>(_min(4, _min(maxDrawBuffers, maxColorAttachments)));
+    Msg("* GLES framebuffer caps: draw buffers=[%d] color attachments=[%d] selected MRT=[%u]",
+        maxDrawBuffers, maxColorAttachments, raster.dwMRT_count);
+#else
     raster.dwMRT_count = 4;
+#endif
     // raster.b_MRT_mixdepth		= FALSE;
     raster.b_MRT_mixdepth = TRUE;
     raster.dwInstructions = 256;

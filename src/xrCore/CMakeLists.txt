@@ -137,16 +137,18 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+if(WIN32)
+    target_sources_grouped(
+        TARGET xrCore
+        NAME "Debug core\\DxErr"
+        FILES
+        Debug/dxerr.cpp
+        Debug/dxerr.h
+        Debug/DXGetErrorDescription.inl
+        Debug/DXGetErrorString.inl
+        Debug/DXTrace.inl
+    )
+endif()
 
 target_sources_grouped(
     TARGET xrCore
@@ -452,9 +454,11 @@ target_include_directories(xrCore
     "${XRAY_SOURCE_DIR}/Externals/mimalloc/include"
 )
 
+find_package(Threads REQUIRED)
+
 target_link_libraries(xrCore
     PUBLIC
-    $<$<NOT:$<PLATFORM_ID:Android>>:pthread>
+    Threads::Threads
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     SDL2::SDL2
 
@@ -470,6 +474,10 @@ if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL 
         PRIVATE
         dl
     )
+endif()
+
+if(WIN32)
+    target_link_libraries(xrCore PRIVATE FaultRep)
 endif()
 
 target_compile_definitions(xrCore

@@ -61,7 +61,6 @@ u32 R_occlusion::occq_begin(u32& ID)
         pool.emplace(pool.begin(), std::move(q));
     }
 
-    RImplementation.BasicStats.OcclusionQueries++;
     if (!fids.empty())
     {
         ID = fids.back();
@@ -74,7 +73,23 @@ u32 R_occlusion::occq_begin(u32& ID)
         used.emplace_back(std::move(pool.back()));
     }
     pool.pop_back();
-    CHK_DX(BeginQuery(used[ID].Q));
+    if (FAILED(BeginQuery(used[ID].Q)))
+    {
+#if defined(USE_OGL)
+        if (used[ID].Q && !glIsQuery(used[ID].Q))
+        {
+            ReleaseQuery(used[ID].Q);
+            used[ID].Q = 0;
+        }
+#endif
+        if (used[ID].Q)
+            pool.emplace_back(std::move(used[ID]));
+        used[ID].Q = 0;
+        fids.emplace_back(ID);
+        ID = iInvalidHandle;
+        return 0;
+    }
+    RImplementation.BasicStats.OcclusionQueries++;
 
     return used[ID].order;
 }
@@ -101,6 +116,13 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     RImplementation.BasicStats.Wait.Begin();
     while ((hr = GetData(used[ID].Q, &fragments, sizeof(fragments))) == S_FALSE)
     {
+#if defined(USE_OGL)
+        if (GLAD_GL_ES_VERSION_3_0)
+        {
+            fragments = static_cast<occq_result>(-1);
+            break;
+        }
+#endif
         if (!SwitchToThread())
             Sleep(ps_r2_wait_sleep);
 
@@ -110,6 +132,8 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
             break;
         }
     }
+    if (FAILED(hr))
+        fragments = static_cast<occq_result>(-1);
     RImplementation.BasicStats.Wait.End();
 
     if (0 == fragments)
@@ -117,7 +141,19 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 
     // insert into pool (sorting in decreasing order)
     Query& Q = used[ID];
-    if (pool.empty())
+    if (FAILED(hr))
+    {
+        ReleaseQuery(Q.Q);
+#if defined(XR_PLATFORM_ANDROID)
+        static u32 lastInvalidQueryReport = 0;
+        if (Device.dwTimeContinual - lastInvalidQueryReport >= 5000)
+        {
+            Msg("! [render-query] retired invalid occlusion query; result treated as visible");
+            lastInvalidQueryReport = Device.dwTimeContinual;
+        }
+#endif
+    }
+    else if (pool.empty())
         pool.emplace_back(Q);
     else
     {

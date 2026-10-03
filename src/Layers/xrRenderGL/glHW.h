@@ -2,6 +2,9 @@
 
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
+#if defined(XR_PLATFORM_ANDROID)
+#include "glFrameProfiler.h"
+#endif
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -15,6 +18,7 @@ public:
 
     void CreateDevice(SDL_Window* sdlWnd);
     void DestroyDevice();
+    bool IsReady() const { return m_context != nullptr; }
 
     void Reset();
 
@@ -61,6 +65,11 @@ public:
     pcstr OpenGLVersionString;
     pcstr ShadingVersion;
     bool ComputeShadersSupported;
+
+#if defined(XR_PLATFORM_ANDROID)
+    GlFrameProfiler frameProfiler;
+    bool m_surfaceNeedsReset{};
+#endif
 };
 
 extern ECORE_API CHW HW;

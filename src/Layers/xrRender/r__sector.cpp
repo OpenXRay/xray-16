@@ -15,6 +15,7 @@ namespace xray::render::RENDER_NAMESPACE
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CPortal::CPortal()
+    : marker(0xffffffff), bDualRender(FALSE)
 {
 #ifdef DEBUG
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);

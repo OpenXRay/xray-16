@@ -1,0 +1,180 @@
+#include "BufferResource.h"
+
+#include <cstring>
+#include <limits>
+#include <utility>
+
+namespace xray::render::vulkan
+{
+namespace
+{
+uint32_t find_memory_type(uint32_t type_bits, VkMemoryPropertyFlags required,
+    const VkPhysicalDeviceMemoryProperties& properties)
+{
+    for (uint32_t index = 0; index < properties.memoryTypeCount; ++index)
+        if ((type_bits & (1u << index)) &&
+            (properties.memoryTypes[index].propertyFlags & required) == required)
+            return index;
+    return UINT32_MAX;
+}
+
+bool complete(const BufferResourceDispatch& vk)
+{
+    return vk.create_buffer && vk.destroy_buffer && vk.get_buffer_memory_requirements &&
+        vk.allocate_memory && vk.free_memory && vk.bind_buffer_memory && vk.map_memory && vk.unmap_memory;
+}
+}
+
+BufferResource::~BufferResource()
+{
+    destroy();
+}
+
+BufferResource::BufferResource(BufferResource&& other) noexcept
+{
+    *this = std::move(other);
+}
+
+BufferResource& BufferResource::operator=(BufferResource&& other) noexcept
+{
+    if (this != &other)
+    {
+        destroy();
+        m_device = other.m_device;
+        m_buffer = other.m_buffer;
+        m_memory = other.m_memory;
+        m_size = other.m_size;
+        m_mapped = other.m_mapped;
+        m_vk = other.m_vk;
+        other.m_device = VK_NULL_HANDLE;
+        other.m_buffer = VK_NULL_HANDLE;
+        other.m_memory = VK_NULL_HANDLE;
+        other.m_size = 0;
+        other.m_mapped = nullptr;
+        other.m_vk = {};
+    }
+    return *this;
+}
+
+bool BufferResource::initialize(VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage,
+    VkMemoryPropertyFlags required_memory_properties,
+    const VkPhysicalDeviceMemoryProperties& memory_properties,
+    const BufferResourceDispatch& dispatch, std::string& error)
+{
+    destroy();
+    if (!device || !size || !usage || !complete(dispatch))
+    {
+        error = "Vulkan buffer resource requires a device, size, usage and complete procedures";
+        return false;
+    }
+
+    VkBufferCreateInfo buffer_info{};
+    buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    buffer_info.size = size;
+    buffer_info.usage = usage;
+    buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    VkBuffer buffer = VK_NULL_HANDLE;
+    if (dispatch.create_buffer(device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
+    {
+        error = "vkCreateBuffer failed";
+        return false;
+    }
+
+    VkMemoryRequirements requirements{};
+    dispatch.get_buffer_memory_requirements(device, buffer, &requirements);
+    const VkMemoryPropertyFlags memory_flags = required_memory_properties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+        ? required_memory_properties | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        : required_memory_properties;
+    const uint32_t memory_type = find_memory_type(requirements.memoryTypeBits,
+        memory_flags, memory_properties);
+    if (memory_type == UINT32_MAX)
+    {
+        dispatch.destroy_buffer(device, buffer, nullptr);
+        error = "no Vulkan memory type satisfies the buffer requirements";
+        return false;
+    }
+
+    VkMemoryAllocateInfo allocate_info{};
+    allocate_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocate_info.allocationSize = requirements.size;
+    allocate_info.memoryTypeIndex = memory_type;
+    VkDeviceMemory memory = VK_NULL_HANDLE;
+    if (dispatch.allocate_memory(device, &allocate_info, nullptr, &memory) != VK_SUCCESS)
+    {
+        dispatch.destroy_buffer(device, buffer, nullptr);
+        error = "vkAllocateMemory failed for buffer resource";
+        return false;
+    }
+
+    if (dispatch.bind_buffer_memory(device, buffer, memory, 0) != VK_SUCCESS)
+    {
+        dispatch.free_memory(device, memory, nullptr);
+        dispatch.destroy_buffer(device, buffer, nullptr);
+        error = "vkBindBufferMemory failed for buffer resource";
+        return false;
+    }
+
+    void* mapped = nullptr;
+    if (required_memory_properties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+    {
+        if (dispatch.map_memory(device, memory, 0, VK_WHOLE_SIZE, 0, &mapped) != VK_SUCCESS || !mapped)
+        {
+            dispatch.destroy_buffer(device, buffer, nullptr);
+            dispatch.free_memory(device, memory, nullptr);
+            error = "vkMapMemory failed for host-visible buffer resource";
+            return false;
+        }
+    }
+
+    m_device = device;
+    m_buffer = buffer;
+    m_memory = memory;
+    m_size = size;
+    m_mapped = mapped;
+    m_vk = dispatch;
+    error.clear();
+    return true;
+}
+
+bool BufferResource::write(VkDeviceSize offset, const void* data, size_t size, std::string& error)
+{
+    if (!m_buffer || !m_mapped || !data || !size || offset > m_size || size > m_size - offset ||
+        offset > std::numeric_limits<size_t>::max())
+    {
+        error = "buffer write requires mapped storage and a non-empty in-range data span";
+        return false;
+    }
+    std::memcpy(static_cast<unsigned char*>(m_mapped) + offset, data, size);
+    error.clear();
+    return true;
+}
+
+bool BufferResource::read(VkDeviceSize offset, void* data, size_t size, std::string& error) const
+{
+    if (!m_buffer || !m_mapped || !data || !size || offset > m_size || size > m_size - offset ||
+        offset > std::numeric_limits<size_t>::max())
+    {
+        error = "buffer read requires mapped storage and a non-empty in-range data span";
+        return false;
+    }
+    std::memcpy(data, static_cast<const unsigned char*>(m_mapped) + offset, size);
+    error.clear();
+    return true;
+}
+
+void BufferResource::destroy()
+{
+    if (m_device && m_memory && m_mapped && m_vk.unmap_memory)
+        m_vk.unmap_memory(m_device, m_memory);
+    if (m_device && m_buffer && m_vk.destroy_buffer)
+        m_vk.destroy_buffer(m_device, m_buffer, nullptr);
+    if (m_device && m_memory && m_vk.free_memory)
+        m_vk.free_memory(m_device, m_memory, nullptr);
+    m_device = VK_NULL_HANDLE;
+    m_buffer = VK_NULL_HANDLE;
+    m_memory = VK_NULL_HANDLE;
+    m_size = 0;
+    m_mapped = nullptr;
+    m_vk = {};
+}
+}

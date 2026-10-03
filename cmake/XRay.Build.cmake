@@ -27,7 +27,8 @@ add_compile_definitions(
 # Link-time optimization
 include(CheckIPOSupported)
 check_ipo_supported(RESULT LTO_IS_SUPPORTED)
-if (LTO_IS_SUPPORTED)
+option(XRAY_ENABLE_LTO "Enable link-time optimization" ON)
+if (XRAY_ENABLE_LTO AND LTO_IS_SUPPORTED)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASEMASTERGOLD ON)
 endif()

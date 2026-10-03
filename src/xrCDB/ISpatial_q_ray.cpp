@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "RayQuerySimd.h"
 #include "ISpatial.h"
 #include "xrCore/_fbox.h"
 #include "xrCore/Threading/Lock.hpp"
@@ -7,6 +8,8 @@
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+// The slab test uses SSE min/max operand ordering to filter 0 * infinity.
+#define SSE2NEON_PRECISE_MINMAX 1
 #include "sse2neon/sse2neon.h"
 #elif defined(XR_ARCHITECTURE_RISCV)
 #include "sse2rvv/sse2rvv.h"
@@ -14,13 +17,15 @@
 #error Add your platform here
 #endif
 
+#include "RayAabbSimd.h"
+
 extern Fvector c_spatial_offset[8];
 
 namespace Spatial
 {
 struct alignas(16) vec_t : public Fvector3
 {
-    float pad;
+    float pad = 0;
 };
 // static vec_t	vec_c	( float _x, float _y, float _z)	{ vec_t v; v.x=_x;v.y=_y;v.z=_z;v.pad=0; return v; }
 
@@ -138,77 +143,10 @@ ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
     return false;
 }
 
-// turn those verbose intrinsics into something readable.
-#define loadps(mem) _mm_load_ps((const float* const)(mem))
-#define storess(ss, mem) _mm_store_ss((float* const)(mem), (ss))
-#define minss _mm_min_ss
-#define maxss _mm_max_ss
-#define minps _mm_min_ps
-#define maxps _mm_max_ps
-#define mulps _mm_mul_ps
-#define subps _mm_sub_ps
-#define rotatelps(ps) _mm_shuffle_ps((ps), (ps), 0x39) // a,b,c,d -> b,c,d,a
-#define muxhps(low, high) _mm_movehl_ps((low), (high)) // low{a,b,c,d}|high{e,f,g,h} = {c,d,g,h}
-
-static constexpr auto flt_plus_inf = std::numeric_limits<float>::infinity();
-alignas(16) static constexpr float ps_cst_plus_inf[4] = { flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf },
-                                   ps_cst_minus_inf[4] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
-
 ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 {
-    // you may already have those values hanging around somewhere
-    const __m128 plus_inf = loadps(ps_cst_plus_inf), minus_inf = loadps(ps_cst_minus_inf);
-
-    // use whatever's appropriate to load.
-    const __m128 box_min = loadps(&box.min), box_max = loadps(&box.max), pos = loadps(&ray.pos),
-                 inv_dir = loadps(&ray.inv_dir);
-
-    // use a div if inverted directions aren't available
-    const __m128 l1 = mulps(subps(box_min, pos), inv_dir);
-    const __m128 l2 = mulps(subps(box_max, pos), inv_dir);
-
-    // the order we use for those min/max is vital to filter out
-    // NaNs that happens when an inv_dir is +/- inf and
-    // (box_min - pos) is 0. inf * 0 = NaN
-    const __m128 filtered_l1a = minps(l1, plus_inf);
-    const __m128 filtered_l2a = minps(l2, plus_inf);
-
-    const __m128 filtered_l1b = maxps(l1, minus_inf);
-    const __m128 filtered_l2b = maxps(l2, minus_inf);
-
-    // now that we're back on our feet, test those slabs.
-    __m128 lmax = maxps(filtered_l1a, filtered_l2a);
-    __m128 lmin = minps(filtered_l1b, filtered_l2b);
-
-    // unfold back. try to hide the latency of the shufps & co.
-    const __m128 lmax0 = rotatelps(lmax);
-    const __m128 lmin0 = rotatelps(lmin);
-    lmax = minss(lmax, lmax0);
-    lmin = maxss(lmin, lmin0);
-
-    const __m128 lmax1 = muxhps(lmax, lmax);
-    const __m128 lmin1 = muxhps(lmin, lmin);
-    lmax = minss(lmax, lmax1);
-    lmin = maxss(lmin, lmin1);
-
-    const bool ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
-
-    storess(lmin, &dist);
-    // storess	(lmax, &rs.t_far);
-
-    return ret;
+    return CDB::ray_aabb_simd(&box.min.x, &box.max.x, &ray.pos.x, &ray.inv_dir.x, dist);
 }
-
-#undef loadps
-#undef storess
-#undef minss
-#undef maxss
-#undef minps
-#undef maxps
-#undef mulps
-#undef subps
-#undef rotatelps
-#undef muxhps
 
 template <bool b_use_sse, bool b_first, bool b_nearest>
 class alignas(16) ray_walker
@@ -358,7 +296,7 @@ void ISpatial_DB::q_ray(
     Stats.Query.Begin();
     q_result = &R;
     q_result->clear();
-    if (CPU::HasSSE)
+    if (CDB::use_simd_ray_query(CPU::HasSSE))
     {
         if (_o & O_ONLYFIRST)
         {

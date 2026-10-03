@@ -6,6 +6,9 @@
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/IGame_Persistent.h"
+#endif
 
 #include "FLOD.h"
 #include "LightTrack.h"
@@ -702,6 +705,9 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
 
 void R_dsgraph_structure::unload()
 {
+#if defined(XR_PLATFORM_ANDROID)
+    sector_audit = {};
+#endif
     for (auto* sector : Sectors)
         xr_delete(sector);
     Sectors.clear();
@@ -830,7 +836,7 @@ void R_dsgraph_structure::build_subspace()
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
             ISpatial* spatial = lstRenderables[o_it];
-            if (o.is_main_pass)
+            if (o.is_main_pass && (spatial->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR))
             {
                 const auto& entity_pos = spatial->spatial_sector_point();
                 const auto sector_id = detect_sector(entity_pos);
@@ -839,7 +845,9 @@ void R_dsgraph_structure::build_subspace()
             const auto& data = spatial->GetSpatialData();
             const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+            {
                 continue; // disassociated from S/P structure
+            }
             auto* sector = Sectors[sector_id];
 
             if (collect_lights && (type & STYPE_LIGHTSOURCE))
@@ -859,7 +867,9 @@ void R_dsgraph_structure::build_subspace()
             }
 
             if (PortalTraverser.i_marker != sector->r_marker)
+            {
                 continue; // inactive (untouched) sector
+            }
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 const CFrustum& view = sector->r_frustums[v_it];
@@ -885,7 +895,9 @@ void R_dsgraph_structure::build_subspace()
                         v_orig.hom_frame = v_copy.hom_frame;
                         v_orig.hom_tested = v_copy.hom_tested;
                         if (!bVisible)
+                        {
                             break; // exit loop on frustums
+                        }
 
                         // update light-vis for selected entity
                         if (o_it == uID_LTRACK && renderable->renderable_ROS())
@@ -923,8 +935,11 @@ void R_dsgraph_structure::build_subspace()
                     IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
                     if (viewEntity == nullptr)
                         break;
-                    const auto& entity_pos = viewEntity->spatial_sector_point();
-                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    if (viewEntity->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+                    {
+                        const auto& entity_pos = viewEntity->spatial_sector_point();
+                        viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    }
                     const auto sector_id = viewEntity->GetSpatialData().sector_id;
                     if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                         break; // disassociated from S/P structure

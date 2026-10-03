@@ -45,7 +45,10 @@ private:
     _GRAPH_ID m_current_level_some_vertex_id;
 
 private:
-    u32* m_cross_tables{};
+    // Points into packed game.graph data and is only guaranteed to be byte
+    // aligned. Read table sizes with CopyMemory instead of dereferencing a
+    // u32 pointer on strict-alignment architectures such as ARMv7.
+    u8* m_cross_tables{};
     CGameLevelCrossTable* m_current_level_cross_table{};
 
     inline void Initialize(IReader& stream, bool own);
@@ -69,8 +72,8 @@ public:
     IC bool valid_vertex_id(u32 vertex_id) const;
     IC void begin(u32 vertex_id, const_iterator& start, const_iterator& end) const;
     IC void begin_spawn(u32 vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const;
-    IC const _GRAPH_ID& value(u32 vertex_id, const_iterator& i) const;
-    IC const float& edge_weight(const_iterator i) const;
+    IC _GRAPH_ID value(u32 vertex_id, const_iterator& i) const;
+    IC float edge_weight(const_iterator i) const;
     IC const CGameVertex* vertex(u32 vertex_id) const;
     IC void set_invalid_vertex(_GRAPH_ID& vertex_id) const;
     IC _GRAPH_ID vertex_id(const CGameVertex* vertex) const;

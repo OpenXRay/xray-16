@@ -1,0 +1,103 @@
+[[vk::binding(0, 0)]] Texture2D<float4> diffuse : register(t0);
+[[vk::binding(1, 0)]] SamplerState diffuse_sampler : register(s1);
+#if defined(VK_LIGHTMAP)
+[[vk::binding(1, 0)]] Texture2D<float4> lightmap : register(t1);
+#endif
+
+struct Fragment
+{
+#if defined(VK_TRANSPARENT) && !defined(VK_UNLIT)
+    float4 position : SV_Position;
+#endif
+    [[vk::location(0)]] float3 normal : TEXCOORD0;
+    [[vk::location(1)]] float2 uv : TEXCOORD1;
+#if defined(LEVEL_GEOMETRY)
+    [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
+    [[vk::location(3)]] float4 baked : COLOR0;
+#endif
+};
+
+#if defined(VK_ALPHA_TEST)
+static const float alpha_threshold = 0.5;
+#endif
+
+#if defined(VK_TRANSPARENT)
+#if !defined(VK_UNLIT)
+struct LocalLight
+{
+    float4 position_range;
+    float4 direction_cone;
+    float4 color_type;
+};
+#if defined(VK_SKINNED)
+[[vk::binding(0, 2)]]
+#else
+[[vk::binding(0, 1)]]
+#endif
+cbuffer ForwardLighting
+{
+    float4x4 inverse_view_projection;
+    float4 sun_direction_ambient;
+    float4 sun_color_count;
+    float4 viewport;
+    LocalLight local_lights[16];
+};
+#endif
+float4 main(Fragment fragment) : SV_Target0
+{
+    float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_UNLIT)
+    return texel;
+#else
+    float3 normal = normalize(fragment.normal);
+    float3 illumination = sun_direction_ambient.w + sun_color_count.rgb *
+        max(dot(normal, normalize(-sun_direction_ambient.xyz)), 0.0);
+    float2 uv = fragment.position.xy * viewport.xy;
+    float4 world_clip = mul(inverse_view_projection,
+        float4(uv * 2.0 - 1.0, fragment.position.z, 1.0));
+    float3 world = world_clip.xyz / max(abs(world_clip.w), 1e-6) * sign(world_clip.w);
+    for (int i = 0; i < min(int(sun_color_count.w), 16); ++i)
+    {
+        float3 delta = world - local_lights[i].position_range.xyz;
+        float distance = length(delta);
+        float range = max(local_lights[i].position_range.w, 0.01);
+        if (distance >= range || distance < 1e-5) continue;
+        float3 ray = delta / distance;
+        float attenuation = pow(max(1.0 - distance / range, 0.0), 2.0);
+        if (local_lights[i].color_type.w > 0.5)
+            attenuation *= smoothstep(local_lights[i].direction_cone.w,
+                min(1.0, local_lights[i].direction_cone.w + 0.05),
+                dot(ray, normalize(local_lights[i].direction_cone.xyz)));
+        illumination += local_lights[i].color_type.rgb * attenuation *
+            max(dot(normal, -ray), 0.0);
+    }
+    return float4(texel.rgb * illumination, texel.a);
+#endif
+}
+#else
+struct GBuffer
+{
+    [[vk::location(0)]] float4 albedo : SV_Target0;
+    [[vk::location(1)]] float4 normal : SV_Target1;
+};
+
+GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
+{
+    GBuffer output;
+    output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(LEVEL_GEOMETRY)
+    output.albedo.rgb *= fragment.baked.rgb;
+#endif
+#if defined(VK_LIGHTMAP)
+    output.albedo.rgb *= lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb;
+#endif
+#if defined(VK_ALPHA_TEST)
+    clip(output.albedo.a - alpha_threshold);
+#endif
+#if defined(VK_DOUBLE_SIDED)
+    if (!front_face) fragment.normal = -fragment.normal;
+#endif
+    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
+    return output;
+}
+#endif

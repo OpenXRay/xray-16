@@ -55,6 +55,16 @@ IC u32 CGameLevelCrossTable::CHeader::level_vertex_count() const { return (dwNod
 IC u32 CGameLevelCrossTable::CHeader::game_vertex_count() const { return (dwGraphPointCount); }
 IC const xrGUID& CGameLevelCrossTable::CHeader::level_guid() const { return (m_level_guid); }
 IC const xrGUID& CGameLevelCrossTable::CHeader::game_guid() const { return (m_game_guid); }
-IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const { return (tGraphIndex); }
-IC float CGameLevelCrossTable::CCell::distance() const { return (fDistance); }
+IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const
+{
+    GameGraph::_GRAPH_ID value;
+    CopyMemory(&value, &tGraphIndex, sizeof(value));
+    return value;
+}
+IC float CGameLevelCrossTable::CCell::distance() const
+{
+    float value;
+    CopyMemory(&value, &fDistance, sizeof(value));
+    return value;
+}
 IC const CGameLevelCrossTable::CHeader& CGameLevelCrossTable::header() const { return (m_tCrossTableHeader); }

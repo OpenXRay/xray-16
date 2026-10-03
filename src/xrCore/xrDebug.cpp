@@ -17,8 +17,8 @@
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
 
-#   define USE_BUG_TRAP
-#   ifdef USE_BUG_TRAP
+#   if __has_include("BugTrap.h")
+#       define USE_BUG_TRAP
 #       include "BugTrap.h"
 #   endif
 
@@ -558,8 +558,10 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         msgRes = ShowMessage(fatalError, msg);
     }
 
+#ifdef USE_BUG_TRAP
     BT_SetUserMessage(fatalError);
     BT_SaveSnapshotEx(exPtrs, nullptr);
+#endif
 
     const auto reportRes = ReportFault(exPtrs, 0);
     if (msgRes != AssertionResult::abort ||
