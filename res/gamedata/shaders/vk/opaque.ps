@@ -1,10 +1,17 @@
 [[vk::binding(0, 0)]] Texture2D<float4> diffuse : register(t0);
 [[vk::binding(1, 0)]] SamplerState diffuse_sampler : register(s1);
+#if defined(VK_LIGHTMAP)
+[[vk::binding(1, 0)]] Texture2D<float4> lightmap : register(t1);
+#endif
 
 struct Fragment
 {
     [[vk::location(0)]] float3 normal : TEXCOORD0;
     [[vk::location(1)]] float2 uv : TEXCOORD1;
+#if defined(LEVEL_GEOMETRY)
+    [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
+    [[vk::location(3)]] float4 baked : COLOR0;
+#endif
 };
 
 #if defined(VK_ALPHA_TEST)
@@ -27,6 +34,12 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(LEVEL_GEOMETRY)
+    output.albedo.rgb *= fragment.baked.rgb;
+#endif
+#if defined(VK_LIGHTMAP)
+    output.albedo.rgb *= lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb;
+#endif
 #if defined(VK_ALPHA_TEST)
     clip(output.albedo.a - alpha_threshold);
 #endif

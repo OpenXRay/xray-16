@@ -4,6 +4,7 @@
 #include "ModelGeometry.h"
 #include "SkeletonMotions.h"
 #include "VisualCatalog.h"
+#include "DetailAssets.h"
 
 class IReader;
 
@@ -13,6 +14,7 @@ namespace xray::render::vulkan
 // Returns false without changing result when geometry cannot be represented.
 bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error);
 bool load_engine_level_visibility(IReader &level, LevelModelData &result, std::string &error);
+bool load_engine_detail_assets(DetailAssets& result, std::string& error);
 bool load_engine_visual_catalog(IReader &level, std::vector<VisualRecord> &result, std::string &error);
 bool load_engine_model_visual(const char *name, VisualRecord &result, std::string &error);
 bool load_engine_model_reader(IReader &reader, const char *name, VisualRecord &result, std::string &error);

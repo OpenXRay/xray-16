@@ -785,6 +785,7 @@ void VulkanLevelRender::Calculate()
     if (!level_.visible_sector_roots(camera_sector, view_projection_matrix,
             camera_position, visible_roots))
         level_.all_level_roots(visible_roots);
+    level_.prepare_details(camera_position);
 
     float view_projection[16];
     static_assert(sizeof(Fmatrix) == sizeof(view_projection));

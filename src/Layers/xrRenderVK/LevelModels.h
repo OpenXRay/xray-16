@@ -49,11 +49,14 @@ struct LevelVertex
     float position[3]{};
     float normal[3]{};
     float uv[2]{};
+    float lightmap_uv[2]{};
+    float baked[4]{1.f, 1.f, 1.f, 1.f};
 };
 
 struct LevelModel
 {
     uint16_t material{};
+    bool lightmap_uv{};
     std::vector<LevelVertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<SlideWindow> windows;

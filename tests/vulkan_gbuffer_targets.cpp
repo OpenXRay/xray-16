@@ -13,8 +13,8 @@ VkResult VKAPI_PTR create_image(VkDevice, const VkImageCreateInfo* info,
 {
     if (info->format == VK_FORMAT_D24_UNORM_S8_UINT)
     {
-        assert((info->usage & (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)) ==
-            (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT));
+        assert(info->usage == (VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT) ||
+            info->usage == (VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT));
         ++depth_images;
     }
     else
@@ -85,6 +85,19 @@ void VKAPI_PTR begin(VkCommandBuffer, const VkRenderPassBeginInfo* info, VkSubpa
     ++begun;
 }
 void VKAPI_PTR end(VkCommandBuffer) { ++ended; }
+void VKAPI_PTR barrier(VkCommandBuffer, VkPipelineStageFlags, VkPipelineStageFlags,
+    VkDependencyFlags, uint32_t, const VkMemoryBarrier*, uint32_t, const VkBufferMemoryBarrier*,
+    uint32_t count, const VkImageMemoryBarrier* images)
+{
+    assert(count == 2 && images[0].image && images[1].image);
+}
+void VKAPI_PTR copy(VkCommandBuffer, VkImage, VkImageLayout source,
+    VkImage, VkImageLayout destination, uint32_t count, const VkImageCopy* region)
+{
+    assert(source == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL &&
+        destination == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && count == 1 &&
+        region->srcSubresource.aspectMask == VK_IMAGE_ASPECT_DEPTH_BIT);
+}
 }
 
 int main()
@@ -105,6 +118,8 @@ int main()
     dispatch.destroy_render_pass = destroy_pass;
     dispatch.cmd_begin_render_pass = begin;
     dispatch.cmd_end_render_pass = end;
+    dispatch.cmd_pipeline_barrier = barrier;
+    dispatch.cmd_copy_image = copy;
     VkPhysicalDeviceMemoryProperties memory{};
     memory.memoryTypeCount = 1;
     memory.memoryTypes[0].propertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -119,15 +134,16 @@ int main()
     assert(targets.initialize(reinterpret_cast<VkPhysicalDevice>(uintptr_t(1)),
         reinterpret_cast<VkDevice>(uintptr_t(2)), {640, 480}, 2, VK_FORMAT_D24_UNORM_S8_UINT,
         memory, dispatch, create_sampler, destroy_sampler, error));
-    assert(images == 6 && depth_images == 2 && image_views == 6 && framebuffers == 2 && passes == 1 && samplers == 1);
+    assert(images == 8 && depth_images == 4 && image_views == 8 && framebuffers == 2 && passes == 1 && samplers == 1);
     assert(targets.depth_view(0) && targets.depth_view(1) && !targets.depth_view(2));
     FrameRecordingContext frame{reinterpret_cast<VkCommandBuffer>(uintptr_t(3)),
         VK_NULL_HANDLE, VK_NULL_HANDLE, {640, 480}, 1, 0};
     FrameRecordingContext geometry;
     assert(targets.begin(frame, geometry) && geometry.render_pass == targets.render_pass());
     targets.end(frame.command_buffer);
+    assert(targets.copy_depth(frame));
     assert(begun == 1 && ended == 1);
     assert(!targets.begin({frame.command_buffer, VK_NULL_HANDLE, VK_NULL_HANDLE, {640, 480}, 2, 0}, geometry));
     targets.destroy();
-    assert(!images && depth_images == 2 && !image_views && !framebuffers && !passes && !samplers);
+    assert(!images && depth_images == 4 && !image_views && !framebuffers && !passes && !samplers);
 }

@@ -13,7 +13,7 @@ namespace
 bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkShaderModule vertex, VkShaderModule fragment, bool geometry_input, bool gbuffer,
     bool transparent, bool hud, bool skinned,
-    const ScenePassDispatch& vk, VkPipeline& pipeline)
+    const ScenePassDispatch& vk, VkPipeline& pipeline, bool shadow = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -29,13 +29,16 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(LevelVertex, normal)},
         {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, uv)},
         {3, 0, VK_FORMAT_R16G16B16A16_UINT, offsetof(ModelVertex, bones)},
-        {4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(ModelVertex, weights)}
+        {4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(ModelVertex, weights)},
+        {5, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, lightmap_uv)},
+        {6, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(LevelVertex, baked)}
     };
+    const VkVertexInputAttributeDescription static_attributes[]{attributes[0], attributes[1], attributes[2], attributes[5], attributes[6]};
     VkPipelineVertexInputStateCreateInfo inputs{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     inputs.vertexBindingDescriptionCount = geometry_input ? 1 : 0;
     inputs.pVertexBindingDescriptions = geometry_input ? &binding : nullptr;
-    inputs.vertexAttributeDescriptionCount = geometry_input ? (skinned ? 5 : 3) : 0;
-    inputs.pVertexAttributeDescriptions = geometry_input ? attributes : nullptr;
+    inputs.vertexAttributeDescriptionCount = geometry_input ? 5 : 0;
+    inputs.pVertexAttributeDescriptions = geometry_input ? (skinned ? attributes : static_attributes) : nullptr;
     VkPipelineInputAssemblyStateCreateInfo assembly{VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
     assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     VkPipelineViewportStateCreateInfo viewport{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
@@ -51,8 +54,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // The present pass has its own cleared depth attachment. HUD geometry
     // draws after world lighting, so depth testing here orders HUD surfaces
     // against one another without occluding the HUD with world geometry.
-    depth.depthTestEnable = (gbuffer || hud || transparent) ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = ((gbuffer && !transparent) || hud) ? VK_TRUE : VK_FALSE;
+    depth.depthTestEnable = (gbuffer || hud || transparent || shadow) ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
@@ -68,7 +71,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         attachment.alphaBlendOp = VK_BLEND_OP_ADD;
     }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
-    blend.attachmentCount = gbuffer ? 2 : 1;
+    blend.attachmentCount = shadow ? 0 : gbuffer ? 2 : 1;
     blend.pAttachments = attachments;
     const VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
@@ -197,7 +200,9 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     VkShaderModule alpha_test_fragment, VkShaderModule transparent_fragment,
     VkShaderModule light_vertex, VkShaderModule light_fragment,
     VkShaderModule weather_fragment,
-    const ScenePassDispatch& dispatch, std::string& error)
+    const ScenePassDispatch& dispatch, std::string& error,
+    VkRenderPass shadow_pass, VkShaderModule shadow_vertex,
+    VkShaderModule shadow_opaque, VkShaderModule shadow_cutout)
 {
     destroy();
     if (!device || !geometry_pass || !light_pass || !geometry_vertex || !geometry_fragment ||
@@ -219,6 +224,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     device_ = device;
     geometry_pass_ = geometry_pass;
     light_pass_ = light_pass;
+    shadow_pass_ = shadow_pass;
     vk_ = dispatch;
     const VkDescriptorSetLayoutBinding bindings[]{
         {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
@@ -226,10 +232,12 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
     };
+    const VkDescriptorSetLayoutBinding gbuffer_bindings[]{bindings[0], bindings[1], bindings[2], bindings[3],
+        {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     const VkDescriptorSetLayoutBinding pose_binding{
         0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
     VkDescriptorSetLayoutCreateInfo descriptor{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-    descriptor.bindingCount = 1;
+    descriptor.bindingCount = 2;
     descriptor.pBindings = bindings;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &material_layout_) != VK_SUCCESS)
         goto failed;
@@ -238,21 +246,24 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &pose_layout_) != VK_SUCCESS)
         goto failed;
     descriptor.pBindings = bindings;
-    descriptor.bindingCount = 3;
+    descriptor.pBindings = gbuffer_bindings;
+    descriptor.bindingCount = 5;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &gbuffer_layout_) != VK_SUCCESS)
         goto failed;
+    descriptor.pBindings = bindings;
     descriptor.bindingCount = 4;
     if (vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &weather_set_layout_) != VK_SUCCESS)
         goto failed;
     {
         const VkDescriptorPoolSize sizes[]{
             {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2048},
-            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 512}
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 512},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 64}
         };
         VkDescriptorPoolCreateInfo pool{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
         pool.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool.maxSets = 512;
-        pool.poolSizeCount = 2;
+        pool.poolSizeCount = 3;
         pool.pPoolSizes = sizes;
         if (vk_.create_descriptor_pool(device, &pool, nullptr, &pool_) != VK_SUCCESS) goto failed;
     }
@@ -295,6 +306,11 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             light_fragment, false, false, false, false, false, vk_, lighting_) ||
         !make_pipeline(device, light_pass, weather_layout_, light_vertex,
             weather_fragment, false, false, false, false, false, vk_, weather_pipeline_)) goto failed;
+    if (shadow_pass && (!shadow_vertex || !shadow_opaque || !shadow_cutout ||
+        !make_pipeline(device, shadow_pass, geometry_layout_, shadow_vertex,
+            shadow_opaque, true, false, false, false, false, vk_, shadow_opaque_, true) ||
+        !make_pipeline(device, shadow_pass, geometry_layout_, shadow_vertex,
+            shadow_cutout, true, false, false, false, false, vk_, shadow_cutout_, true))) goto failed;
     error.clear();
     return true;
 failed:
@@ -343,6 +359,17 @@ bool DeferredPass::allocate(VkDescriptorSetLayout layout, VkImageView first, VkI
 bool DeferredPass::material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error)
 {
     return allocate(material_layout_, albedo, VK_NULL_HANDLE, sampler, set, error);
+}
+
+bool DeferredPass::lightmapped_material(VkImageView albedo, VkImageView lightmap,
+    VkSampler sampler, VkDescriptorSet& set, std::string& error)
+{
+    if (!albedo || !lightmap)
+    {
+        error = "lightmapped material needs both textures";
+        return false;
+    }
+    return allocate(material_layout_, albedo, lightmap, sampler, set, error);
 }
 
 const DeferredPass::GamePipeline* DeferredPass::game_pipeline(const char* vertex_name, const char* fragment_name) const
@@ -523,6 +550,27 @@ void DeferredPass::update_material(VkDescriptorSet set, VkImageView view, VkSamp
     vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
 }
 
+void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
+    VkImageView lightmap, VkSampler sampler)
+{
+    if (!device_ || !set || !albedo || !lightmap) return;
+    const VkDescriptorImageInfo images[]{
+        {sampler, albedo, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+        {sampler, lightmap, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}
+    };
+    VkWriteDescriptorSet writes[2]{};
+    for (uint32_t i = 0; i < 2; ++i)
+    {
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].pImageInfo = &images[i];
+    }
+    vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
+}
+
 bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
@@ -536,6 +584,28 @@ bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView d
     write.pImageInfo = &image;
     vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
     return true;
+}
+
+void DeferredPass::bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSampler sampler,
+    VkBuffer uniform)
+{
+    if (!set || !view || !sampler || !uniform) return;
+    const VkDescriptorImageInfo image{sampler, view, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL};
+    const VkDescriptorBufferInfo buffer{uniform, 0, sizeof(float) * 36};
+    VkWriteDescriptorSet writes[2]{};
+    for (auto& write : writes)
+    {
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstSet = set;
+        write.descriptorCount = 1;
+    }
+    writes[0].dstBinding = 3;
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    writes[0].pImageInfo = &image;
+    writes[1].dstBinding = 4;
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writes[1].pBufferInfo = &buffer;
+    vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
 }
 
 bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
@@ -603,6 +673,27 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
+    return true;
+}
+
+bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices,
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
+    bool alpha_test, uint32_t first_index) const
+{
+    const VkPipeline pipeline = alpha_test ? shadow_cutout_ : shadow_opaque_;
+    if (!pipeline || !frame.command_buffer || frame.render_pass != shadow_pass_ ||
+        !vertices || !indices || !material || !index_count) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        geometry_layout_, 0, 1, &material, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
@@ -703,6 +794,8 @@ void DeferredPass::destroy()
         if (hud_) vk_.destroy_pipeline(device_, hud_, nullptr);
         if (lighting_) vk_.destroy_pipeline(device_, lighting_, nullptr);
         if (weather_pipeline_) vk_.destroy_pipeline(device_, weather_pipeline_, nullptr);
+        if (shadow_opaque_) vk_.destroy_pipeline(device_, shadow_opaque_, nullptr);
+        if (shadow_cutout_) vk_.destroy_pipeline(device_, shadow_cutout_, nullptr);
     }
     game_pipelines_.clear();
     if (device_ && vk_.destroy_pipeline_layout)
@@ -722,8 +815,9 @@ void DeferredPass::destroy()
         if (weather_set_layout_) vk_.destroy_descriptor_set_layout(device_, weather_set_layout_, nullptr);
     }
     device_ = VK_NULL_HANDLE;
-    geometry_pass_ = light_pass_ = VK_NULL_HANDLE;
+    geometry_pass_ = light_pass_ = shadow_pass_ = VK_NULL_HANDLE;
     geometry_ = alpha_test_ = transparent_ = hud_ = lighting_ = weather_pipeline_ = VK_NULL_HANDLE;
+    shadow_opaque_ = shadow_cutout_ = VK_NULL_HANDLE;
     geometry_layout_ = skinned_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
     material_layout_ = pose_layout_ = gbuffer_layout_ = weather_set_layout_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;

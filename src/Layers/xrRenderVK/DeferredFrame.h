@@ -2,6 +2,7 @@
 
 #include "GBufferTargets.h"
 #include "GpuLevel.h"
+#include "SunShadowTargets.h"
 
 namespace xray::render::vulkan
 {
@@ -22,12 +23,15 @@ public:
         VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr,
         FrameReadbackRecorder readback = nullptr, void* readback_data = nullptr,
-        FrameRecorder compositor = nullptr, void* compositor_data = nullptr);
+        FrameRecorder compositor = nullptr, void* compositor_data = nullptr,
+        SunShadowTargets* shadows = nullptr, const SunShadowUniform* shadow_uniform = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);
     static void lighting(const FrameRecordingContext& frame, void* user_data);
     GBufferTargets* targets_{};
+    SunShadowTargets* shadows_{};
+    SunShadowUniform shadow_uniform_{};
     FrameContext* frame_{};
     const GpuLevel* level_{};
     const DeferredPass* pass_{};

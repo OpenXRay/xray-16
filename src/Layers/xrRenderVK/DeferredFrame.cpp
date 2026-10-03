@@ -8,6 +8,16 @@ namespace xray::render::vulkan
 void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data)
 {
     auto& context = *static_cast<DeferredFrame*>(user_data);
+    if (context.shadows_ && context.render_world_)
+    {
+        FrameRecordingContext shadow_frame;
+        std::string error;
+        if (!context.shadows_->begin(frame, context.shadow_uniform_, shadow_frame, error))
+        { context.recorded_ = false; return; }
+        context.recorded_ &= context.level_->record_sun_shadow(shadow_frame, *context.pass_,
+            context.shadow_uniform_.sun_view_projection);
+        context.shadows_->end(frame.command_buffer);
+    }
     FrameRecordingContext geometry_frame;
     if (!context.targets_->begin(frame, geometry_frame))
     {
@@ -26,6 +36,7 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
         if (context.models_) context.models_(geometry_frame, context.models_data_);
     }
     context.targets_->end(frame.command_buffer);
+    context.recorded_ &= context.targets_->copy_depth(frame);
 }
 
 void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data)
@@ -60,9 +71,12 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     FrameRecorder level_visuals, void* level_data, bool render_world, bool clear_target,
     VkDescriptorSet weather_set, const WeatherLighting* weather,
     FrameReadbackRecorder readback, void* readback_data,
-    FrameRecorder compositor, void* compositor_data)
+    FrameRecorder compositor, void* compositor_data,
+    SunShadowTargets* shadows, const SunShadowUniform* shadow_uniform)
 {
     targets_ = &targets;
+    shadows_ = shadows;
+    if (shadow_uniform) shadow_uniform_ = *shadow_uniform;
     frame_ = &frame;
     level_ = &level;
     pass_ = &pass;

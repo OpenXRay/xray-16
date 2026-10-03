@@ -67,7 +67,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     if (pipeline_count < 2)
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
-        assert(info->pVertexInputState->vertexAttributeDescriptionCount == 3);
+        assert(info->pVertexInputState->vertexAttributeDescriptionCount == 5);
         const auto* attributes = info->pVertexInputState->pVertexAttributeDescriptions;
         assert(attributes[0].format == VK_FORMAT_R32G32B32_SFLOAT &&
             attributes[0].offset == offsetof(LevelVertex, position));
@@ -75,6 +75,8 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
             attributes[1].offset == offsetof(LevelVertex, normal));
         assert(attributes[2].format == VK_FORMAT_R32G32_SFLOAT &&
             attributes[2].offset == offsetof(LevelVertex, uv));
+        assert(attributes[3].location == 5 && attributes[3].offset == offsetof(LevelVertex, lightmap_uv));
+        assert(attributes[4].location == 6 && attributes[4].offset == offsetof(LevelVertex, baked));
         assert(info->pColorBlendState->attachmentCount == 2);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
         assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
@@ -101,7 +103,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     else
     {
         const bool skinned = pipeline_count == 8 || (pipeline_count >= 13 && pipeline_count <= 16);
-        assert(info->pVertexInputState->vertexAttributeDescriptionCount == (skinned ? 5u : 3u));
+        assert(info->pVertexInputState->vertexAttributeDescriptionCount == 5u);
         if (skinned)
         {
             assert(info->layout == skinned_layout);
@@ -162,11 +164,14 @@ void VKAPI_PTR draw(VkCommandBuffer, uint32_t, uint32_t, uint32_t, uint32_t) {}
 VkResult VKAPI_PTR create_descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* output)
 {
-    assert(info->bindingCount >= 1 && info->bindingCount <= 4);
+    assert(info->bindingCount >= 1 && info->bindingCount <= 5);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
         info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
     if (info->bindingCount >= 2)
         assert(info->pBindings[1].binding == 1);
+    if (info->bindingCount == 5)
+        assert(info->pBindings[4].binding == 4 &&
+            info->pBindings[4].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     *output = handle<VkDescriptorSetLayout>(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ?
         39 : 30 + info->bindingCount);
     return VK_SUCCESS;
@@ -175,9 +180,10 @@ void VKAPI_PTR destroy_descriptor_layout(VkDevice, VkDescriptorSetLayout, const 
 VkResult VKAPI_PTR create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorPool* output)
 {
-    assert(info->maxSets == 512 && info->poolSizeCount == 2 &&
+    assert(info->maxSets == 512 && info->poolSizeCount == 3 &&
         info->pPoolSizes[0].descriptorCount == 2048 &&
-        info->pPoolSizes[1].type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
+        info->pPoolSizes[1].type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER &&
+        info->pPoolSizes[2].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     *output = handle<VkDescriptorPool>(33);
     return VK_SUCCESS;
 }
@@ -205,6 +211,7 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
+        writes[0].dstBinding == 3 ||
         (writes[0].dstBinding == 2 &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL));
     if (count == 4)

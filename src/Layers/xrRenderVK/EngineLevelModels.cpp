@@ -13,6 +13,54 @@
 
 namespace xray::render::vulkan
 {
+bool load_engine_detail_assets(DetailAssets& result, std::string& error)
+{
+    if (!FS.exist("$level$", "level.details"))
+    {
+        result = {};
+        error.clear();
+        return true;
+    }
+    IReader* file = FS.r_open("$level$", "level.details");
+    if (!file)
+    {
+        error = "cannot open level.details";
+        return false;
+    }
+    IReader* header = file->open_chunk(0);
+    IReader* models = file->open_chunk(1);
+    IReader* slots = file->open_chunk(2);
+    bool valid = header && models && slots && header->length() == 24;
+    std::vector<LevelBytes> objects;
+    std::vector<IReader*> object_readers;
+    if (valid)
+    {
+        const uint8_t* h = static_cast<const uint8_t*>(header->pointer());
+        const uint32_t count = uint32_t(h[4]) | uint32_t(h[5]) << 8 | uint32_t(h[6]) << 16 | uint32_t(h[7]) << 24;
+        valid = count <= 64;
+        for (uint32_t id = 0; valid && id < count; ++id)
+        {
+            IReader* object = models->open_chunk(id);
+            if (!object) { valid = false; break; }
+            // The decoder needs stable payloads until every object has been
+            // checked; retain the readers rather than borrowing closed chunks.
+            objects.push_back({static_cast<const uint8_t*>(object->pointer()), object->length()});
+            object_readers.push_back(object);
+        }
+    }
+    if (!valid)
+        error = "invalid level.details chunk table";
+    else
+        valid = decode_detail_assets({static_cast<const uint8_t*>(header->pointer()), header->length()},
+            objects, {static_cast<const uint8_t*>(slots->pointer()), slots->length()}, result, error);
+    for (IReader* reader : object_readers) reader->close();
+    if (header) header->close();
+    if (models) models->close();
+    if (slots) slots->close();
+    FS.r_close(file);
+    if (!valid) error = "level.details: " + error;
+    return valid;
+}
 namespace
 {
 void append_chunk(std::vector<uint8_t> &bytes, uint32_t id, const uint8_t *data, size_t size);

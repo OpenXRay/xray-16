@@ -133,6 +133,22 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_link_libraries(vulkan_level_models_test PRIVATE xrRenderVK xrCDB xrCore)
     add_test(NAME vulkan_level_models COMMAND vulkan_level_models_test)
 
+    add_executable(vulkan_detail_assets_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_detail_assets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DetailAssets.cpp")
+    target_include_directories(vulkan_detail_assets_test PRIVATE "${XRAY_SOURCE_DIR}")
+    target_compile_options(vulkan_detail_assets_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_detail_assets COMMAND vulkan_detail_assets_test)
+
+    add_executable(vulkan_fog_parameters_test "${XRAY_SOURCE_DIR}/tests/vulkan_fog_parameters.cpp")
+    target_include_directories(vulkan_fog_parameters_test PRIVATE "${XRAY_SOURCE_DIR}")
+    target_compile_options(vulkan_fog_parameters_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_fog_parameters COMMAND vulkan_fog_parameters_test)
+
     add_executable(vulkan_visual_catalog_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_visual_catalog.cpp"
     )

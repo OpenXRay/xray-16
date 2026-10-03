@@ -14,6 +14,8 @@ target_sources(xrRenderVK PRIVATE
     BufferUpload.h
     DdsTexture.cpp
     DdsTexture.h
+    DetailAssets.cpp
+    DetailAssets.h
     DeferredPass.cpp
     DeferredPass.h
     DeferredFrame.cpp
@@ -37,6 +39,9 @@ target_sources(xrRenderVK PRIVATE
     GameTextureFactory.h
     GBufferTargets.cpp
     GBufferTargets.h
+    SunShadowTargets.cpp
+    SunShadowTargets.h
+    ShadowShaders.h
     GpuLevel.cpp
     GpuLevel.h
     GpuModel.cpp

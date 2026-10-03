@@ -1,4 +1,5 @@
 #include "GBufferTargets.h"
+#include "SunShadowTargets.h"
 
 namespace xray::render::vulkan
 {
@@ -72,6 +73,7 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
         !dispatch.create_framebuffer || !dispatch.destroy_framebuffer ||
         !dispatch.create_render_pass || !dispatch.destroy_render_pass ||
         !dispatch.cmd_begin_render_pass || !dispatch.cmd_end_render_pass ||
+        !dispatch.cmd_pipeline_barrier || !dispatch.cmd_copy_image ||
         !create_sampler || !destroy_sampler)
     {
         error = "G-buffer targets need a device, formats and complete image procedures";
@@ -124,8 +126,10 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
                 VK_IMAGE_ASPECT_COLOR_BIT, target.albedo, error) ||
             !create_attachment(color, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_IMAGE_ASPECT_COLOR_BIT, target.normal, error) ||
-            !create_attachment(depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                VK_IMAGE_ASPECT_DEPTH_BIT, target.depth, error))
+            !create_attachment(depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+                VK_IMAGE_ASPECT_DEPTH_BIT, target.depth, error) ||
+            !create_attachment(depth_format, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+                VK_IMAGE_ASPECT_DEPTH_BIT, target.sampled_depth, error))
         {
             destroy();
             return false;
@@ -158,9 +162,15 @@ bool GBufferTargets::bind_lighting(DeferredPass& deferred, std::string& error)
     }
     for (auto& target : targets_)
         if (!target.lighting && !deferred.gbuffer(target.albedo.view,
-                target.normal.view, target.depth.view, sampler_, target.lighting, error)) return false;
+                target.normal.view, target.sampled_depth.view, sampler_, target.lighting, error)) return false;
     error.clear();
     return true;
+}
+
+void GBufferTargets::bind_sun_shadow(DeferredPass& deferred, const SunShadowTargets& shadow)
+{
+    for (uint32_t i = 0; i < targets_.size(); ++i)
+        deferred.bind_sun_shadow(targets_[i].lighting, shadow.view(i), shadow.sampler(), shadow.uniform(i));
 }
 
 void GBufferTargets::release_lighting(DeferredPass& deferred)
@@ -194,6 +204,51 @@ void GBufferTargets::end(VkCommandBuffer command) const
     if (command && pass_) vk_.cmd_end_render_pass(command);
 }
 
+bool GBufferTargets::copy_depth(const FrameRecordingContext& frame) const
+{
+    if (!frame.command_buffer || frame.image_index >= targets_.size()) return false;
+    const Target& target = targets_[frame.image_index];
+    VkImageMemoryBarrier barriers[2]{};
+    for (VkImageMemoryBarrier& barrier : barriers)
+    {
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.srcQueueFamilyIndex = barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        barrier.subresourceRange.levelCount = barrier.subresourceRange.layerCount = 1;
+    }
+    barriers[0].image = target.depth.image;
+    barriers[0].oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    barriers[0].newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barriers[0].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    barriers[0].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    barriers[1].image = target.sampled_depth.image;
+    barriers[1].oldLayout = VK_IMAGE_LAYOUT_UNDEFINED; // Discard the previous frame's copy.
+    barriers[1].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barriers[1].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    vk_.cmd_pipeline_barrier(frame.command_buffer,
+        VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0, 0, nullptr, 0, nullptr, 2, barriers);
+    VkImageCopy region{};
+    region.srcSubresource.aspectMask = region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    region.srcSubresource.layerCount = region.dstSubresource.layerCount = 1;
+    region.extent = {extent_.width, extent_.height, 1};
+    vk_.cmd_copy_image(frame.command_buffer, target.depth.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        target.sampled_depth.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+    barriers[0].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barriers[0].newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    barriers[0].srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    barriers[0].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+    barriers[1].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barriers[1].newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    barriers[1].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barriers[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    vk_.cmd_pipeline_barrier(frame.command_buffer,
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        0, 0, nullptr, 0, nullptr, 2, barriers);
+    return true;
+}
+
 VkDescriptorSet GBufferTargets::lighting_set(uint32_t index) const
 {
     return index < targets_.size() ? targets_[index].lighting : VK_NULL_HANDLE;
@@ -211,7 +266,7 @@ void GBufferTargets::destroy()
         for (auto& target : targets_)
         {
             if (target.framebuffer) vk_.destroy_framebuffer(device_, target.framebuffer, nullptr);
-            for (Attachment* attachment : {&target.albedo, &target.normal, &target.depth})
+            for (Attachment* attachment : {&target.albedo, &target.normal, &target.depth, &target.sampled_depth})
             {
                 if (attachment->view) vk_.destroy_image_view(device_, attachment->view, nullptr);
                 if (attachment->image) vk_.destroy_image(device_, attachment->image, nullptr);

@@ -4,6 +4,7 @@
 
 namespace xray::render::vulkan
 {
+class SunShadowTargets;
 // Offscreen target triplets are indexed by the acquired swapchain image, so
 // their reuse follows FrameContext's image fences. Destroy after GPU idle and
 // before destroying the device, command pool or DeferredPass descriptor pool.
@@ -20,9 +21,11 @@ public:
         const FrameDispatch& dispatch, PFN_vkCreateSampler create_sampler,
         PFN_vkDestroySampler destroy_sampler, std::string& error);
     bool bind_lighting(DeferredPass& pass, std::string& error);
+    void bind_sun_shadow(DeferredPass& pass, const SunShadowTargets& shadow);
     void release_lighting(DeferredPass& pass);
     bool begin(const FrameRecordingContext& frame, FrameRecordingContext& geometry_frame) const;
     void end(VkCommandBuffer command) const;
+    bool copy_depth(const FrameRecordingContext& frame) const;
     VkDescriptorSet lighting_set(uint32_t image_index) const;
     // Valid after the geometry pass; the image is stored in read-only depth layout.
     VkImageView depth_view(uint32_t image_index) const;
@@ -38,7 +41,7 @@ private:
     };
     struct Target
     {
-        Attachment albedo, normal, depth;
+        Attachment albedo, normal, depth, sampled_depth;
         VkFramebuffer framebuffer{};
         VkDescriptorSet lighting{};
     };

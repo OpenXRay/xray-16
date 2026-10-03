@@ -123,6 +123,75 @@ bool GameTextureFactory::material(const std::string& texture_list, DeferredPass&
     return true;
 }
 
+bool GameTextureFactory::lightmapped_material(const std::string& diffuse_name,
+    const std::string& lightmap_name, DeferredPass& pass, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    const auto trim = [](std::string text)
+    {
+        const size_t first = text.find_first_not_of(" \t");
+        if (first == std::string::npos) return std::string{};
+        const size_t last = text.find_last_not_of(" \t");
+        return text.substr(first, last - first + 1);
+    };
+    Asset* diffuse = nullptr;
+    Asset* lightmap = nullptr;
+    if (!load(trim(diffuse_name), diffuse, error) || !load(trim(lightmap_name), lightmap, error))
+        return false;
+    const auto diffuse_it = std::find_if(assets_.begin(), assets_.end(),
+        [diffuse](const auto& entry) { return &entry.second == diffuse; });
+    const auto lightmap_it = std::find_if(assets_.begin(), assets_.end(),
+        [lightmap](const auto& entry) { return &entry.second == lightmap; });
+    R_ASSERT(diffuse_it != assets_.end() && lightmap_it != assets_.end());
+    std::string key = diffuse_it->first;
+    key.push_back('\0');
+    key += lightmap_it->first;
+    auto found = lightmapped_.find(key);
+    if (found == lightmapped_.end())
+    {
+        VkDescriptorSet descriptor{};
+        if (!pass.lightmapped_material(diffuse->texture.view, lightmap->texture.view,
+                sampler_, descriptor, error)) return false;
+        LightmappedMaterial pair;
+        pair.set = descriptor;
+        pair.diffuse = diffuse;
+        pair.lightmap = lightmap;
+        pair.pass = &pass;
+        pair.diffuse_path = diffuse_it->first;
+        pair.lightmap_path = lightmap_it->first;
+        found = lightmapped_.emplace(std::move(key), std::move(pair)).first;
+        ++diffuse->lightmap_refs;
+        if (diffuse != lightmap) ++lightmap->lightmap_refs;
+    }
+    R_ASSERT2(found->second.pass == &pass, "Vulkan lightmap belongs to another pass");
+    ++found->second.refs;
+    result = found->second.set;
+    error.clear();
+    return true;
+}
+
+void GameTextureFactory::release_lightmapped_material(VkDescriptorSet set, DeferredPass& pass)
+{
+    if (!set) return;
+    for (auto it = lightmapped_.begin(); it != lightmapped_.end(); ++it)
+    {
+        auto& pair = it->second;
+        if (pair.set != set) continue;
+        R_ASSERT2(pair.pass == &pass && pair.refs, "unknown Vulkan lightmap lease");
+        if (--pair.refs) return;
+        R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan lightmap retirement requires idle GPU frames");
+        pass.release_gbuffer(pair.set);
+        --pair.diffuse->lightmap_refs;
+        if (pair.diffuse != pair.lightmap) --pair.lightmap->lightmap_refs;
+        const std::string diffuse_path = pair.diffuse_path, lightmap_path = pair.lightmap_path;
+        lightmapped_.erase(it);
+        evict_if_unused(diffuse_path);
+        if (lightmap_path != diffuse_path) evict_if_unused(lightmap_path);
+        return;
+    }
+    R_ASSERT2(false, "unknown Vulkan lightmap descriptor");
+}
+
 bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     VkDescriptorSet& result, std::string& error, VkExtent2D* extent)
 {
@@ -186,7 +255,7 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
 void GameTextureFactory::evict_if_unused(const std::string& name)
 {
     auto it = assets_.find(name);
-    if (it == assets_.end() || it->second.material_refs || it->second.ui_refs ||
+    if (it == assets_.end() || it->second.material_refs || it->second.lightmap_refs || it->second.ui_refs ||
         it->second.environment_refs)
         return;
     R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
@@ -282,6 +351,8 @@ void GameTextureFactory::destroy()
         R_ASSERT2(wait_idle_(device_) == VK_SUCCESS,
             "Vulkan device did not become idle before texture factory shutdown");
         wait_for_uploads(device_, pool_, dispatch_, pending_);
+        for (auto& [name, pair] : lightmapped_)
+            if (pair.set && pair.pass) pair.pass->release_gbuffer(pair.set);
         for (auto& [name, asset] : assets_)
         {
             if (asset.material_set && asset.material_pass)
@@ -294,6 +365,7 @@ void GameTextureFactory::destroy()
         if (sampler_ && destroy_sampler_) destroy_sampler_(device_, sampler_, nullptr);
     }
     assets_.clear();
+    lightmapped_.clear();
     transient_id_ = 0;
     pending_.clear();
     states_ = {};
@@ -317,7 +389,7 @@ void GameTextureFactory::retire_unused()
     R_ASSERT2(wait_idle_(device_) == VK_SUCCESS, "Vulkan texture retirement requires idle frames");
     for (auto it = assets_.begin(); it != assets_.end();)
     {
-        if (it->second.material_refs || it->second.ui_refs || it->second.environment_refs)
+        if (it->second.material_refs || it->second.lightmap_refs || it->second.ui_refs || it->second.environment_refs)
         { ++it; continue; }
         auto name = it->first;
         ++it;
@@ -364,6 +436,9 @@ void GameTextureFactory::reload_assets()
         asset.extent = {extent.width, extent.height};
         asset.bytes = uint64_t(extent.width) * extent.height * 4;
     }
+    for (auto& [name, pair] : lightmapped_)
+        pair.pass->update_lightmapped_material(pair.set, pair.diffuse->texture.view,
+            pair.lightmap->texture.view, sampler_);
     retire_unused();
 }
 

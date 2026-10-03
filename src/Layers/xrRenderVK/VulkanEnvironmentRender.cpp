@@ -4,6 +4,7 @@
 #include "VulkanGameDevice.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/device.h"
+#include "FogParameters.h"
 
 #include <cstring>
 
@@ -141,6 +142,9 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
     lighting_.ray_dx[0] = dx.x - base.x; lighting_.ray_dx[1] = dx.y - base.y; lighting_.ray_dx[2] = dx.z - base.z;
     lighting_.ray_dy[0] = dy.x - base.x; lighting_.ray_dy[1] = dy.y - base.y; lighting_.ray_dy[2] = dy.z - base.z;
     const auto& current = env.CurrentEnv;
+    const float fog_color[]{current.fog_color.x, current.fog_color.y, current.fog_color.z};
+    set_weather_fog(lighting_.ray_base, lighting_.ray_dx, lighting_.ray_dy,
+        fog_color, current.fog_near, current.fog_far, current.far_plane);
     lighting_.light.color[3] = blend_;
     lighting_.sky_color[0] = current.sky_color.x;
     lighting_.sky_color[1] = current.sky_color.y;

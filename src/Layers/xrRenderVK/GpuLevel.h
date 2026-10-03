@@ -44,6 +44,11 @@ public:
     bool visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
         const Fvector& camera_position, std::vector<uint32_t>& roots) const;
     void all_level_roots(std::vector<uint32_t>& roots) const;
+    void prepare_details(const Fvector& camera_position);
+    bool record_details(const FrameRecordingContext& frame, const DeferredPass& pass,
+        const float (&mvp)[16]) const;
+    bool record_sun_shadow(const FrameRecordingContext& frame, const DeferredPass& pass,
+        const float (&sun_mvp)[16]) const;
     void destroy();
 
 private:
@@ -54,6 +59,7 @@ private:
         std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
         SurfaceMode mode{SurfaceMode::Opaque};
+        bool lightmapped{};
         std::unique_ptr<Mesh> fast;
     };
     VkDevice device_{};
@@ -63,6 +69,15 @@ private:
     DeferredPass* pass_{};
     std::vector<PendingBufferUpload> pending_;
     std::vector<Mesh> meshes_;
+    struct DetailPlacement
+    {
+        uint8_t model{};
+        float x{}, y{}, z{}, yaw{}, scale{};
+    };
+    DetailAssets details_;
+    std::vector<Mesh> detail_meshes_;
+    std::unordered_map<size_t, std::vector<DetailPlacement>> detail_cache_;
+    std::vector<DetailPlacement> visible_details_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint32_t> roots_;
     std::vector<LevelSector> sectors_;

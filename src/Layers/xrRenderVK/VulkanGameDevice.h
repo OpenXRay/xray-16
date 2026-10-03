@@ -140,6 +140,7 @@ private:
     TextureUploadDispatch texture_dispatch_{};
     BufferUploadDispatch buffer_upload_{};
     GBufferTargets targets_;
+    SunShadowTargets sun_shadows_;
     DeferredPass deferred_;
     GameShaderResources shader_resources_;
     ScenePass ui_pass_;
@@ -159,6 +160,7 @@ private:
     std::vector<VulkanThunderboltRender*> thunderbolt_draws_;
     std::vector<LevelDraw> level_draws_;
     const GpuLevel* current_level_{};
+    std::array<float, 16> scene_mvp_{};
     bool scene_visibility_{};
     bool level_recorded_{true};
     bool models_recorded_{true};

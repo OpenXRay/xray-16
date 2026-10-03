@@ -135,6 +135,7 @@ bool chunk(LevelBytes bytes, uint32_t id, LevelBytes& out)
 struct VertexBuffer
 {
     std::vector<LevelVertex> vertices;
+    bool lightmap_uv{};
 };
 
 bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
@@ -145,8 +146,8 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
     buffers.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
-        int position = -1, normal = -1, uv = -1, tangent = -1, binormal = -1;
-        uint8_t normal_type = 0, uv_type = 0;
+        int position = -1, normal = -1, uv = -1, uv1 = -1, color = -1, tangent = -1, binormal = -1;
+        uint8_t normal_type = 0, uv_type = 0, uv1_type = 0;
         size_t stride = 0;
         bool ended = false;
         // D3DVERTEXELEMENT9: stream u16, offset u16, type, method, usage, index.
@@ -183,6 +184,13 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
                 uv = static_cast<int>(offset);
                 uv_type = type;
             }
+            if (usage == 5 && index == 1 && (type == 1 || type == 6 || type == 7))
+            {
+                uv1 = static_cast<int>(offset);
+                uv1_type = type;
+            }
+            if (usage == 10 && index == 0 && type == 4)
+                color = static_cast<int>(offset);
             if (usage == 6 && index == 0 && type == 4)
                 tangent = static_cast<int>(offset);
             if (usage == 7 && index == 0 && type == 4)
@@ -195,6 +203,7 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
         if (!c.take(stride * vertex_count, data))
             return false;
         VertexBuffer buffer;
+        buffer.lightmap_uv = uv1 >= 0;
         buffer.vertices.reserve(vertex_count);
         for (uint32_t v = 0; v < vertex_count; ++v)
         {
@@ -219,6 +228,23 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
                     const float fraction = extra >= 0 && uv_type == 6 ? float(source[extra + 3]) * (1.f / 255.f) : 0.f;
                     vertex.uv[axis] = (float(primary) + fraction) * (32.f / 32768.f);
                 }
+            if (uv1 >= 0)
+            {
+                if (uv1_type == 1)
+                    std::memcpy(vertex.lightmap_uv, source + uv1, sizeof(vertex.lightmap_uv));
+                else
+                    for (int axis = 0; axis < 2; ++axis)
+                    {
+                        const auto encoded = int16_t(uint16_t(source[uv1 + axis * 2]) |
+                            uint16_t(source[uv1 + axis * 2 + 1]) << 8);
+                        vertex.lightmap_uv[axis] = float(encoded) * (32.f / 32768.f);
+                    }
+            }
+            if (color >= 0)
+            {
+                for (unsigned channel = 0; channel < 4; ++channel)
+                    vertex.baked[channel] = float(source[color + (channel == 0 ? 2 : channel == 2 ? 0 : channel)]) / 255.f;
+            }
             for (float coordinate : vertex.position)
                 if (!std::isfinite(coordinate))
                     return false;
@@ -226,6 +252,9 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
                 if (!std::isfinite(coordinate))
                     return false;
             for (float coordinate : vertex.uv)
+                if (!std::isfinite(coordinate))
+                    return false;
+            for (float coordinate : vertex.lightmap_uv)
                 if (!std::isfinite(coordinate))
                     return false;
             buffer.vertices.push_back(vertex);
@@ -374,6 +403,7 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         ibase > indices[ib].size() || icount > indices[ib].size() - ibase) return false;
     LevelModel model;
     model.material = material;
+    model.lightmap_uv = vertices[vb].lightmap_uv;
     model.vertices.assign(vertices[vb].vertices.begin() + vbase,
         vertices[vb].vertices.begin() + vbase + vcount);
     model.indices.reserve(icount);

@@ -28,9 +28,9 @@ static void f32(Bytes& data, float value)
     u32(data, bits);
 }
 
-static void decl(Bytes& data, uint16_t offset, uint8_t type, uint8_t usage)
+static void decl(Bytes& data, uint16_t offset, uint8_t type, uint8_t usage, uint8_t index = 0)
 {
-    data.insert(data.end(), {0, 0, uint8_t(offset), uint8_t(offset >> 8), type, 0, usage, 0});
+    data.insert(data.end(), {0, 0, uint8_t(offset), uint8_t(offset >> 8), type, 0, usage, index});
 }
 
 static void part(Bytes& data, uint32_t id, const Bytes& value)
@@ -129,6 +129,22 @@ int main()
     assert(result.materials[0].textures == "concrete");
     assert(result.models[0].vertices.size() == 3 && result.models[0].vertices[2].position[0] == 2);
     assert(result.models[0].indices[2] == 2);
+    Bytes lit_vb;
+    u32(lit_vb, 1);
+    decl(lit_vb, 0, 2, 0); decl(lit_vb, 12, 2, 3);
+    decl(lit_vb, 24, 1, 5); decl(lit_vb, 32, 1, 5, 1);
+    decl(lit_vb, 40, 4, 10);
+    lit_vb.insert(lit_vb.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
+    u32(lit_vb, 3);
+    for (int i = 0; i < 3; ++i)
+    {
+        for (float value : {float(i), 0.f, 0.f, 0.f, 1.f, 0.f,
+                0.f, 0.f, .25f, .75f}) f32(lit_vb, value);
+        u32(lit_vb, 0xff4080c0u);
+    }
+    assert(load_level_models(input(shaders), input(lit_vb), input(ib), input(visuals), result, error));
+    assert(result.models[0].lightmap_uv && result.models[0].vertices[1].lightmap_uv[1] == .75f);
+    assert(result.models[0].vertices[0].baked[0] > .24f && result.models[0].vertices[0].baked[2] > .74f);
     assert(result.visuals.size() == 1 && result.roots.size() == 1 && result.roots[0] == 0);
     VisualRecord standalone;
     assert(parse_ogf_visual(input(visual), standalone, error));

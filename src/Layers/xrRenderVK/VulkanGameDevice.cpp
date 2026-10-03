@@ -92,6 +92,9 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
         if (!targets_.initialize(physical.handle, device, frame.extent(),
                 static_cast<uint32_t>(frame.image_count()), frame.depth_format(),
                 physical.memory, frame_dispatch_, create_sampler, destroy_sampler, error)) goto failed;
+        if (!sun_shadows_.initialize(device, frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
+                physical.memory, frame_dispatch_, buffer_upload_.buffer,
+                create_sampler, destroy_sampler, error)) goto failed;
         {
             std::vector<VkImageView> depth_views;
             for (uint32_t i = 0; i < frame.image_count(); ++i)
@@ -102,9 +105,11 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                                            proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
         configure_engine_shader_resources(device, shaders, shader_resources_);
         DeferredShaderFactory deferred_factory;
-        if (!deferred_factory.create(device, shaders, scene_dispatch, targets_.render_pass(), frame.render_pass(), deferred_, shader_resources_, error) ||
+        if (!deferred_factory.create(device, shaders, scene_dispatch, targets_.render_pass(), frame.render_pass(), deferred_, shader_resources_, error,
+                sun_shadows_.render_pass()) ||
             !targets_.bind_lighting(deferred_, error))
             goto failed;
+        targets_.bind_sun_shadow(deferred_, sun_shadows_);
         ShaderModule scene_vertex, scene_fragment, ui_vertex, ui_fragment;
         if (!scene_vertex.initialize(device, shaders, scene_shaders::SceneVertex, sizeof(scene_shaders::SceneVertex), error) ||
             !scene_fragment.initialize(device, shaders, scene_shaders::SceneFragment, sizeof(scene_shaders::SceneFragment), error) ||
@@ -312,6 +317,10 @@ void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, 
             return;
         }
     }
+    float mvp[16];
+    std::copy(owner.scene_mvp_.begin(), owner.scene_mvp_.end(), mvp);
+    if (!owner.current_level_->record_details(frame, owner.deferred_, mvp))
+        owner.level_recorded_ = false;
 }
 
 void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, void* user)
@@ -548,6 +557,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     models_recorded_ = true;
     level_recorded_ = true;
     current_level_ = &level;
+    std::copy(std::begin(mvp), std::end(mvp), scene_mvp_.begin());
     ui_error_.clear();
     model_error_.clear();
     if (!refresh_color_maps(error)) return false;
@@ -570,13 +580,34 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
                     buffer_upload_.buffer, error)) return false;
         }
     }
+    SunShadowUniform sun_uniform{};
+    {
+        Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
+        std::memcpy(&camera, mvp, sizeof(camera));
+        inverse.invert(camera);
+        std::memcpy(sun_uniform.inverse_view_projection, &inverse, sizeof(inverse));
+        Fvector direction;
+        direction.set(light.direction_ambient[0], light.direction_ambient[1],
+            light.direction_ambient[2]);
+        if (direction.square_magnitude() < 0.0001f) direction.set(0.f, -1.f, 0.f);
+        direction.normalize_safe();
+        Fvector up;
+        up.set(0.f, 1.f, 0.f);
+        if (std::abs(direction.y) > .95f) up.set(0.f, 0.f, 1.f);
+        Fvector origin;
+        origin.mad(Device.vCameraPosition, direction, -140.f);
+        sun_view.build_camera_dir(origin, direction, up);
+        sun_projection.build_projection_ortho(180.f, 180.f, 1.f, 320.f);
+        sun_vp.mul(sun_projection, sun_view);
+        std::memcpy(sun_uniform.sun_view_projection, &sun_vp, sizeof(sun_vp));
+    }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
             scene_visibility_ ? record_level_visuals : nullptr, this, render_world, clear_target,
             render_world ? weather_set_ : VK_NULL_HANDLE, &weather_lighting_,
             screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this,
-            record_postprocess, this))
+            record_postprocess, this, &sun_shadows_, &sun_uniform))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
@@ -649,16 +680,21 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
             static_cast<uint32_t>(frame.image_count()), frame.depth_format(), physical.memory,
             frame_dispatch_, create_sampler_, destroy_sampler_, error))
         return false;
+    sun_shadows_.destroy();
+    if (!sun_shadows_.initialize(window_.device(), frame.depth_format(), static_cast<uint32_t>(frame.image_count()),
+            physical.memory, frame_dispatch_, buffer_upload_.buffer,
+            create_sampler_, destroy_sampler_, error)) return false;
     {
         std::vector<VkImageView> depth_views;
         for (uint32_t i = 0; i < frame.image_count(); ++i)
             depth_views.push_back(targets_.depth_view(i));
         if (!frame.attach_scene_depth(depth_views, error)) return false;
     }
-    deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass());
+    deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass(), sun_shadows_.render_pass());
     ui_pass_.rebind_render_pass(frame.render_pass());
     if (!targets_.bind_lighting(deferred_, error))
         return false;
+    targets_.bind_sun_shadow(deferred_, sun_shadows_);
     if (!create_postprocess(error)) return false;
 
     reset_required_ = false;
@@ -711,6 +747,7 @@ void VulkanGameDevice::destroy()
     targets_.release_lighting(deferred_);
     if (window_.device()) window_.frame().release_swapchain();
     targets_.destroy();
+    sun_shadows_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();
     shader_resources_.destroy();

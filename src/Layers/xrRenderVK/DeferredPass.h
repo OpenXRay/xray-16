@@ -67,8 +67,14 @@ public:
         VkShaderModule alpha_test_fragment, VkShaderModule transparent_fragment,
         VkShaderModule light_vertex, VkShaderModule light_fragment,
         VkShaderModule weather_fragment,
-        const ScenePassDispatch& dispatch, std::string& error);
+        const ScenePassDispatch& dispatch, std::string& error,
+        VkRenderPass shadow_pass = VK_NULL_HANDLE,
+        VkShaderModule shadow_vertex = VK_NULL_HANDLE,
+        VkShaderModule shadow_opaque = VK_NULL_HANDLE,
+        VkShaderModule shadow_cutout = VK_NULL_HANDLE);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
+    bool lightmapped_material(VkImageView albedo, VkImageView lightmap,
+        VkSampler sampler, VkDescriptorSet& set, std::string& error);
     // A named SVS/SPS pair from the game's precompiled Vulkan shader set.
     // Unknown names and incompatible pass state fail before a draw is recorded.
     bool create_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, VkShaderModule vertex, VkShaderModule fragment,
@@ -97,21 +103,30 @@ public:
         VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
         const char* vertex_name, const char* fragment_name) const;
     void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
+    void update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
+        VkImageView lightmap, VkSampler sampler);
     bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
+    void bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSampler sampler,
+        VkBuffer uniform);
     bool weather_set(VkImageView sky_a, VkImageView sky_b,
         VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
-    void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass)
+    void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass,
+        VkRenderPass shadow_pass = VK_NULL_HANDLE)
     {
         geometry_pass_ = geometry_pass;
         light_pass_ = light_pass;
+        if (shadow_pass) shadow_pass_ = shadow_pass;
     }
     bool record_geometry(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         SurfaceMode mode = SurfaceMode::Opaque, uint32_t first_index = 0,
         const char* vertex_name = nullptr, const char* fragment_name = nullptr) const;
+    bool record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
+        bool alpha_test, uint32_t first_index = 0) const;
     bool record_hud(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0, const char* vertex_name = nullptr,
@@ -134,8 +149,8 @@ private:
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
     VkDevice device_{};
-    VkRenderPass geometry_pass_{}, light_pass_{};
-    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{};
+    VkRenderPass geometry_pass_{}, light_pass_{}, shadow_pass_{};
+    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{};
     std::unordered_map<std::string, GamePipeline> game_pipelines_;
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;
     bool reloading_game_pipelines_{};
