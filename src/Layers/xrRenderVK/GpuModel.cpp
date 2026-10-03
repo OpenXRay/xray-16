@@ -27,14 +27,25 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             return false;
         }
         meshes_.emplace_back();
-        auto& mesh = meshes_.back();
+        auto &mesh = meshes_.back();
         mesh.geometry = std::move(decoded);
-        if (!textures.material(texture, pass, mesh.material, error) ||
-            !upload_buffer(device, queue, pool, memory, upload,
-                mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
-                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
-            return false;
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
+        const bool double_sided = mesh.geometry.shader.find("double_sided") != std::string::npos || mesh.geometry.shader.find("two_sided") != std::string::npos;
+        const char *family = mesh.geometry.mode == SurfaceMode::Transparent ? "object_blended"
+                             : mesh.geometry.mode == SurfaceMode::AlphaTest ? "object_cutout"
+                             : double_sided && !animated                    ? "object_double_sided"
+                                                                            : "object_opaque";
+        const std::string shader = std::string("vk\\") + family;
+        const std::string vertex = animated ? "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs" : shader + ".vs";
+        if (!pass.request_game_pipeline(vertex, shader + ".ps", mesh.geometry.mode, false, animated, error))
+        {
+            error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
+            return false;
+        }
+        if (!textures.material(texture, pass, mesh.material, error) ||
+            !upload_buffer(device, queue, pool, memory, upload, mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
+                           VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
+            return false;
         if (animated && mesh.geometry.skin_weights >= 1 && mesh.geometry.skin_weights <= 4)
         {
             const std::string vertex = "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs";

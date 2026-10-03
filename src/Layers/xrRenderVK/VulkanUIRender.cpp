@@ -10,19 +10,26 @@
 
 namespace xray::render::vulkan
 {
-void VulkanUIRender::configure(VkDevice device, const VkPhysicalDeviceMemoryProperties& memory,
-    const BufferResourceDispatch& dispatch, const ScenePass& pass)
+void VulkanUIRender::configure(VkDevice device, const VkPhysicalDeviceMemoryProperties &memory, const BufferResourceDispatch &dispatch, const ScenePass &pass,
+                               UiDescriptorLeases leases)
 {
     DestroyUIGeom();
     device_ = device;
     memory_ = memory;
     dispatch_ = dispatch;
     pass_ = &pass;
+    R_ASSERT2(bool(leases.retain) == bool(leases.release), "Vulkan UI descriptor lease callbacks are incomplete");
+    leases_ = std::move(leases);
 }
 
 void VulkanUIRender::reset_frame()
 {
     R_ASSERT2(primitive_ == ptNone, "Vulkan UI primitive was not flushed");
+    // CPU batches can outlive their shader/video producer in the same frame.
+    // The factory's final release waits for submitted frames before retirement.
+    if (leases_.release)
+        for (const auto &batch : batches_)
+            leases_.release(batch.texture);
     vertices_.clear();
     world_positions_.clear();
     visible_.clear();
@@ -218,10 +225,13 @@ void VulkanUIRender::FlushPrimitive()
     else if (primitive_ == ptLineStrip)
         for (uint32_t i = 0; i + 1 < count; ++i) add_line(first_vertex_ + i, first_vertex_ + i + 1);
     else
-        for (uint32_t i = 0; i + 1 < count; i += 2) add_line(first_vertex_ + i, first_vertex_ + i + 1);
+        for (uint32_t i = 0; i + 1 < count; i += 2)
+            add_line(first_vertex_ + i, first_vertex_ + i + 1);
     if (indices_.size() != first_index)
-        batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index,
-            texture_, scissor_, has_scissor_, float(alpha_ref_) / 255.0f});
+    {
+        R_ASSERT2(!leases_.retain || leases_.retain(texture_), "Vulkan UI batch references an unleased texture");
+        batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index, texture_, scissor_, has_scissor_, float(alpha_ref_) / 255.0f});
+    }
     primitive_ = ptNone;
     world_positions_.resize(vertices_.size());
     visible_.resize(vertices_.size(), 1);
@@ -276,8 +286,9 @@ void VulkanUIRender::append_imgui(ImDrawData* data)
                 R_ASSERT2(vertex < first_vertex + size_t(list->VtxBuffer.Size), "invalid ImGui vertex offset");
                 indices_.push_back(static_cast<uint32_t>(vertex));
             }
-            batches_.push_back({begin, command.ElemCount, descriptor,
-                {{x, y}, {static_cast<uint32_t>(right - x), static_cast<uint32_t>(bottom - y)}}, true, 0.f});
+            R_ASSERT2(!leases_.retain || leases_.retain(descriptor), "Vulkan ImGui references an unleased texture");
+            batches_.push_back(
+                {begin, command.ElemCount, descriptor, {{x, y}, {static_cast<uint32_t>(right - x), static_cast<uint32_t>(bottom - y)}}, true, 0.f});
         }
     }
 }
@@ -289,4 +300,4 @@ LPCSTR VulkanUIRender::UpdateShaderName(LPCSTR texture, LPCSTR shader)
 }
 void VulkanUIRender::CacheSetXformWorld(const Fmatrix& matrix) { world_ = matrix; }
 void VulkanUIRender::CacheSetCullMode(CullMode mode) { cull_ = mode; }
-}
+} // namespace xray::render::vulkan

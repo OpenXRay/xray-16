@@ -619,8 +619,10 @@ bool Run(std::string& reason)
             load_device_proc<PFN_vkCreateShaderModule>(device, get_device_proc, "vkCreateShaderModule"),
             load_device_proc<PFN_vkDestroyShaderModule>(device, get_device_proc, "vkDestroyShaderModule")};
         xray::render::vulkan::DeferredShaderFactory factory;
-        if (!factory.create(device, shader_dispatch, deferred_dispatch, deferred_targets.render_pass(),
-                frame_context.render_pass(), deferred_pass, deferred_error) ||
+        xray::render::vulkan::GameShaderResources resources;
+        xray::render::vulkan::configure_engine_shader_resources(device, shader_dispatch, resources);
+        if (!factory.create(device, shader_dispatch, deferred_dispatch, deferred_targets.render_pass(), frame_context.render_pass(), deferred_pass, resources,
+                            deferred_error) ||
             !deferred_targets.bind_lighting(deferred_pass, deferred_error))
             return fail(deferred_error);
         VkDescriptorSet material = VK_NULL_HANDLE;

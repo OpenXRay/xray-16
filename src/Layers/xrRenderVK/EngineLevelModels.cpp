@@ -4,22 +4,127 @@
 #include "Common/LevelStructure.hpp"
 #include "xrCore/FMesh.hpp"
 #include "xrCore/stream_reader.h"
+#include "xrCore/lzhuf.h"
+#include "xrEngine/defines.h"
 
 #include <algorithm>
 #include <memory>
+#include <unordered_set>
 
 namespace xray::render::vulkan
 {
-bool load_engine_visual_catalog(IReader& level, std::vector<VisualRecord>& result, std::string& error)
+namespace
 {
-    IReader* visuals = level.open_chunk(fsL_VISUALS);
+void append_chunk(std::vector<uint8_t> &bytes, uint32_t id, const uint8_t *data, size_t size);
+bool normalize_chunks(IReader &reader, bool table, std::vector<uint8_t> &output, std::string &error, unsigned depth)
+{
+    if (depth > 64 || reader.length() > 64 * 1024 * 1024)
+    {
+        error = "OGF chunk nesting or size limit exceeded";
+        return false;
+    }
+    reader.rewind();
+    std::unordered_set<u32> seen;
+    std::vector<uint8_t> normalized;
+    while (!reader.eof())
+    {
+        if (reader.elapsed() < 8)
+        {
+            error = "truncated OGF chunk header";
+            return false;
+        }
+        const u32 encoded = reader.r_u32(), size = reader.r_u32();
+        const u32 id = encoded & ~CFS_CompressMark;
+        const size_t end = reader.tell() + size;
+        if (size > reader.elapsed() || !seen.insert(id).second || ((encoded & CFS_CompressMark) && size < 4))
+        {
+            error = "invalid OGF chunk id=" + std::to_string(id);
+            return false;
+        }
+        if (!size)
+        {
+            append_chunk(normalized, id, nullptr, 0);
+            continue;
+        }
+        std::vector<uint8_t> unpacked;
+        auto *body_data = static_cast<uint8_t *>(reader.pointer());
+        size_t body_size = size;
+        if (encoded & CFS_CompressMark)
+        {
+            const uint32_t decoded_size =
+                uint32_t(body_data[0]) | (uint32_t(body_data[1]) << 8) | (uint32_t(body_data[2]) << 16) | (uint32_t(body_data[3]) << 24);
+            if (!decoded_size || decoded_size > 64 * 1024 * 1024)
+            {
+                error = "invalid compressed OGF size id=" + std::to_string(id);
+                return false;
+            }
+            uint8_t *decoded = nullptr;
+            size_t length = 0;
+            // Use the engine codec, but check its result before constructing
+            // a reader. IReader::open_chunk assumes decompression succeeds.
+            const bool valid = _decompressLZ(&decoded, &length, body_data, size, 64 * 1024 * 1024);
+            if (!valid || !decoded || length != decoded_size)
+            {
+                xr_free(decoded);
+                error = "cannot decompress OGF chunk id=" + std::to_string(id);
+                return false;
+            }
+            unpacked.assign(decoded, decoded + length);
+            xr_free(decoded);
+            body_data = unpacked.data();
+            body_size = unpacked.size();
+        }
+        IReader body(body_data, body_size);
+        std::vector<uint8_t> nested;
+        const bool recursive = table || id == OGF_CHILDREN || id == OGF_FASTPATH;
+        const bool loaded = !recursive || normalize_chunks(body, !table && id == OGF_CHILDREN, nested, error, depth + 1);
+        if (loaded)
+            append_chunk(normalized, id, recursive ? nested.data() : body_data, recursive ? nested.size() : body_size);
+        if (!loaded)
+        {
+            error = "chunk id=" + std::to_string(id) + " / " + error;
+            return false;
+        }
+        reader.seek(end);
+    }
+    output = std::move(normalized);
+    return true;
+}
+LevelGameProfile game_profile()
+{
+    return ShadowOfChernobylMode ? LevelGameProfile::SoC : ClearSkyMode ? LevelGameProfile::CS : LevelGameProfile::CoP;
+}
+} // namespace
+
+bool normalize_engine_visual_chunks(IReader &reader, bool table, std::vector<uint8_t> &result, std::string &error)
+{
+    const size_t position = reader.tell();
+    const bool loaded = normalize_chunks(reader, table, result, error, 0);
+    reader.seek(position);
+    if (loaded)
+        error.clear();
+    return loaded;
+}
+
+bool load_engine_model_reader(IReader &reader, const char *name, VisualRecord &result, std::string &error)
+{
+    std::vector<uint8_t> bytes;
+    if (normalize_engine_visual_chunks(reader, false, bytes, error) && parse_ogf_visual({bytes.data(), bytes.size()}, result, error))
+        return true;
+    error = std::string(name && *name ? name : "<reader>.ogf") + " / OGF decode: " + error;
+    return false;
+}
+
+bool load_engine_visual_catalog(IReader &level, std::vector<VisualRecord> &result, std::string &error)
+{
+    IReader *visuals = level.open_chunk(fsL_VISUALS);
     if (!visuals)
     {
         error = "level has no OGF visual table";
         return false;
     }
-    const bool loaded = parse_level_visuals(
-        {static_cast<const uint8_t*>(visuals->pointer()), visuals->length()}, result, error);
+    std::vector<uint8_t> bytes;
+    const bool loaded = normalize_engine_visual_chunks(*visuals, true, bytes, error) && parse_level_visuals({bytes.data(), bytes.size()}, result, error);
     visuals->close();
     return loaded;
 }
@@ -47,8 +152,7 @@ bool load_engine_model_visual(const char* name, VisualRecord& result, std::strin
         error = std::string("model cannot be opened: ") + path;
         return false;
     }
-    const bool loaded = parse_ogf_visual(
-        {static_cast<const uint8_t*>(reader->pointer()), reader->length()}, result, error);
+    const bool loaded = load_engine_model_reader(*reader, filename, result, error);
     FS.r_close(reader);
     return loaded;
 }
@@ -59,11 +163,15 @@ bool load_engine_model_geometry(const char* name, IReader* source,
     VisualRecord visual;
     if (source)
     {
-        if (!parse_ogf_visual({static_cast<const uint8_t*>(source->pointer()),
-                source->length()}, visual, error)) return false;
+        if (!load_engine_model_reader(*source, name, visual, error))
+            return false;
     }
-    else if (!load_engine_model_visual(name, visual, error)) return false;
-    return decode_engine_model_geometry(visual, result, error);
+    else if (!load_engine_model_visual(name, visual, error))
+        return false;
+    if (decode_engine_model_geometry(visual, result, error))
+        return true;
+    error = std::string(name && *name ? name : "<reader>.ogf") + " / " + error;
+    return false;
 }
 
 namespace
@@ -129,10 +237,11 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
 
 void append_chunk(std::vector<uint8_t>& bytes, uint32_t id, const uint8_t* data, size_t size)
 {
-    for (uint32_t value : { id, static_cast<uint32_t>(size) })
+    for (uint32_t value : {id, static_cast<uint32_t>(size)})
         for (unsigned i = 0; i < 4; ++i)
             bytes.push_back(static_cast<uint8_t>(value >> (8 * i)));
-    bytes.insert(bytes.end(), data, data + size);
+    if (size)
+        bytes.insert(bytes.end(), data, data + size);
 }
 } // namespace
 
@@ -271,16 +380,26 @@ bool load_engine_motion_files(const std::string& pattern, std::vector<MotionFile
     return true;
 }
 
-bool load_engine_level_models(IReader& level, LevelModelData& result, std::string& error)
+bool load_engine_level_models(IReader &level, LevelModelData &result, std::string &error)
 {
     error.clear();
-    IReader* shaders = level.open_chunk(fsL_SHADERS);
-    IReader* visuals = level.open_chunk(fsL_VISUALS);
+    const auto profile = game_profile();
+    IReader *header = level.open_chunk(fsL_HEADER);
+    const bool valid =
+        validate_level_header(profile, header ? LevelBytes{static_cast<const uint8_t *>(header->pointer()), header->length()} : LevelBytes{}, error);
+    if (header)
+        header->close();
+    if (!valid)
+        return false;
+    IReader *shaders = level.open_chunk(fsL_SHADERS);
+    IReader *visuals = level.open_chunk(fsL_VISUALS);
     if (!shaders || !visuals)
     {
-        error = "level is missing shader or visual chunks";
-        if (shaders) shaders->close();
-        if (visuals) visuals->close();
+        error = std::string(level_profile_name(profile)) + " $level$/level / shader/visual table: missing chunk";
+        if (shaders)
+            shaders->close();
+        if (visuals)
+            visuals->close();
         return false;
     }
     CStreamReader* geometry = FS.rs_open("$level$", "level.geom");
@@ -288,10 +407,10 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
     {
         shaders->close();
         visuals->close();
-        error = "level.geom is missing";
+        error = std::string(level_profile_name(profile)) + " $level$/level.geom / VFS open: missing resource";
         return false;
     }
-    CStreamReader* vb = geometry->open_chunk(fsL_VB);
+    CStreamReader *vb = geometry->open_chunk(fsL_VB);
     CStreamReader* ib = geometry->open_chunk(fsL_IB);
     CStreamReader* swi = geometry->open_chunk(fsL_SWIS);
     if (!vb || !ib)
@@ -330,12 +449,13 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
                 fast_ib->close();
             FS.r_close(fast);
         }
-        if (error.empty())
-            load_level_models({ static_cast<const uint8_t*>(shaders->pointer()), shaders->length() }, { vb_bytes.data(), vb_bytes.size() },
-                { ib_bytes.data(), ib_bytes.size() }, { static_cast<const uint8_t*>(visuals->pointer()), visuals->length() }, result, error,
-                fast_vb_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_vb_bytes.data(), fast_vb_bytes.size() },
-                fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{ fast_ib_bytes.data(), fast_ib_bytes.size() },
-                {swi_bytes.data(), swi_bytes.size()});
+        std::vector<uint8_t> visual_bytes;
+        if (error.empty() && normalize_engine_visual_chunks(*visuals, true, visual_bytes, error))
+            load_level_models({static_cast<const uint8_t *>(shaders->pointer()), shaders->length()}, {vb_bytes.data(), vb_bytes.size()},
+                              {ib_bytes.data(), ib_bytes.size()}, {visual_bytes.data(), visual_bytes.size()}, result, error,
+                              fast_vb_bytes.empty() ? LevelBytes{} : LevelBytes{fast_vb_bytes.data(), fast_vb_bytes.size()},
+                              fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{fast_ib_bytes.data(), fast_ib_bytes.size()},
+                              {swi_bytes.data(), swi_bytes.size()});
     }
     if (vb) vb->close();
     if (ib) ib->close();
@@ -343,6 +463,8 @@ bool load_engine_level_models(IReader& level, LevelModelData& result, std::strin
     FS.r_close(geometry);
     shaders->close();
     visuals->close();
+    if (!error.empty())
+        error = std::string(level_profile_name(profile)) + " $level$/level[.geom/.geomX] / resource decode: " + error;
     return error.empty();
 }
 
@@ -365,4 +487,4 @@ bool load_engine_level_visibility(IReader& level, LevelModelData& result, std::s
     sectors_chunk->close();
     return parsed;
 }
-}
+} // namespace xray::render::vulkan

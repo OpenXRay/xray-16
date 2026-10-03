@@ -32,6 +32,9 @@ add_subdirectory(xrSound)
 if (XRAY_BUILD_VULKAN_TESTS)
     add_executable(android_renderer_choice_test "${XRAY_SOURCE_DIR}/tests/android_renderer_choice.cpp")
     target_include_directories(android_renderer_choice_test PRIVATE "${XRAY_SOURCE_DIR}")
+    target_compile_options(android_renderer_choice_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
     add_test(NAME android_renderer_choice COMMAND android_renderer_choice_test)
     function(xray_add_vulkan_state_test target source)
         add_executable(${target} "${XRAY_SOURCE_DIR}/${source}")
@@ -84,6 +87,8 @@ if (XRAY_BUILD_VULKAN_TESTS)
     add_executable(vulkan_deferred_pass_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_deferred_pass.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/GameShaderResources.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ShaderModule.cpp"
     )
     target_include_directories(vulkan_deferred_pass_test PRIVATE
         "${XRAY_SOURCE_DIR}"
@@ -207,6 +212,24 @@ if (XRAY_BUILD_VULKAN_TESTS)
     )
     target_link_libraries(vulkan_renderer_module_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_renderer_module COMMAND vulkan_renderer_module_test)
+    add_executable(vulkan_ui_flow_test "${XRAY_SOURCE_DIR}/tests/vulkan_ui_flow.cpp")
+    target_include_directories(vulkan_ui_flow_test PRIVATE "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>)
+    target_compile_definitions(vulkan_ui_flow_test PRIVATE DEBUG)
+    target_compile_options(vulkan_ui_flow_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    target_link_libraries(vulkan_ui_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    add_test(NAME vulkan_ui_flow COMMAND vulkan_ui_flow_test)
+    add_executable(vulkan_asset_flow_test "${XRAY_SOURCE_DIR}/tests/vulkan_asset_flow.cpp")
+    target_include_directories(vulkan_asset_flow_test PRIVATE "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/src"
+        $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>)
+    target_compile_definitions(vulkan_asset_flow_test PRIVATE DEBUG)
+    target_compile_options(vulkan_asset_flow_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    target_link_libraries(vulkan_asset_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    add_test(NAME vulkan_asset_flow COMMAND vulkan_asset_flow_test)
 
     add_executable(vulkan_shader_module_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_shader_module.cpp"

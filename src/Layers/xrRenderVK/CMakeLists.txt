@@ -22,6 +22,8 @@ target_sources(xrRenderVK PRIVATE
     VulkanGameShaders.h
     DeferredShaderFactory.cpp
     DeferredShaderFactory.h
+    GameShaderResources.cpp
+    GameShaderResources.h
     DeferredShaders.h
     WeatherShaders.h
     smoke/weather.frag

@@ -75,9 +75,55 @@ int main()
     part(visual, 21, container);
     Bytes visuals;
     part(visuals, 0, visual);
-    auto input = [](const Bytes& bytes) { return LevelBytes{bytes.data(), bytes.size()}; };
+    auto input = [](const Bytes &bytes) { return LevelBytes{bytes.data(), bytes.size()}; };
     LevelModelData result;
     std::string error;
+    // Game profiles enter the same R2 decoder. Exercise float (SoC) and
+    // packed (CS/CoP) declarations, material names and atomic failures.
+    const Bytes level_header{14, 0, 1, 0};
+    for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
+    {
+        Bytes profile_vb = vb;
+        if (profile != LevelGameProfile::SoC)
+        {
+            profile_vb.clear();
+            u32(profile_vb, 1);
+            decl(profile_vb, 0, 2, 0);
+            decl(profile_vb, 12, 4, 3);
+            decl(profile_vb, 16, 4, 6);
+            decl(profile_vb, 20, 4, 7);
+            decl(profile_vb, 24, 6, 5);
+            profile_vb.insert(profile_vb.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
+            u32(profile_vb, 3);
+            for (unsigned v = 0; v < 3; ++v)
+            {
+                f32(profile_vb, float(v));
+                f32(profile_vb, 0);
+                f32(profile_vb, 0);
+                u32(profile_vb, 0x008080ff);
+                u32(profile_vb, 0x7f000000);
+                u32(profile_vb, 0x3f000000);
+                u16(profile_vb, 1024);
+                u16(profile_vb, uint16_t(-1024));
+            }
+        }
+        assert(load_game_level_models(profile, input(level_header), input(shaders), input(profile_vb), input(ib), input(visuals), result, error));
+        assert(result.models.size() == 1 && result.materials[0].textures == "concrete");
+        if (profile != LevelGameProfile::SoC)
+        {
+            assert(result.models[0].vertices[0].uv[0] > 1.f);
+            assert(result.models[0].vertices[0].uv[1] < -0.999f);
+        }
+        auto truncated = profile_vb;
+        truncated.pop_back();
+        assert(!load_game_level_models(profile, input(level_header), input(shaders), input(truncated), input(ib), input(visuals), result, error));
+        assert(error.find(level_profile_name(profile)) != std::string::npos && error.find("level.geom") != std::string::npos);
+        assert(result.models.size() == 1);
+        assert(!load_game_level_models(profile, input(Bytes{13, 0, 1, 0}), input(shaders), input(profile_vb), input(ib), input(visuals), result, error));
+        assert(error.find("header") != std::string::npos);
+        assert(!load_game_level_models(profile, input(level_header), {}, input(profile_vb), input(ib), input(visuals), result, error));
+        assert(error.find("shader") != std::string::npos);
+    }
     assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     assert(error.empty() && result.materials.size() == 1 && result.models.size() == 1);
     assert(result.materials[0].textures == "concrete");

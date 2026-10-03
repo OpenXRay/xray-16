@@ -5,6 +5,7 @@
 #include "ScenePass.h"
 #include <string>
 #include <unordered_map>
+#include <functional>
 
 namespace xray::render::vulkan
 {
@@ -70,12 +71,22 @@ public:
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
     // A named SVS/SPS pair from the game's precompiled Vulkan shader set.
     // Unknown names and incompatible pass state fail before a draw is recorded.
-    bool create_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
-        VkShaderModule vertex, VkShaderModule fragment, SurfaceMode mode, bool hud,
-        std::string& error, bool skinned = false);
-    bool has_game_pipeline(const std::string& vertex_name, const std::string& fragment_name) const;
-    bool require_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
-        SurfaceMode mode, bool hud, bool skinned, std::string& error) const;
+    bool create_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, VkShaderModule vertex, VkShaderModule fragment,
+                              SurfaceMode mode, bool hud, std::string &error, bool skinned = false);
+    bool has_game_pipeline(const std::string &vertex_name, const std::string &fragment_name) const;
+    using GamePipelineRequest = std::function<bool(const std::string &, const std::string &, SurfaceMode, bool, bool, std::string &)>;
+    void set_game_pipeline_request(GamePipelineRequest request)
+    {
+        game_pipeline_request_ = std::move(request);
+    }
+    bool request_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, SurfaceMode mode, bool hud, bool skinned, std::string &error)
+    {
+        if (game_pipeline_request_)
+            return game_pipeline_request_(vertex_name, fragment_name, mode, hud, skinned, error);
+        return require_game_pipeline(vertex_name, fragment_name, mode, hud, skinned, error);
+    }
+    bool require_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, SurfaceMode mode, bool hud, bool skinned,
+                               std::string &error) const;
     void begin_game_pipeline_reload();
     void commit_game_pipeline_reload();
     void abort_game_pipeline_reload();
@@ -132,6 +143,7 @@ private:
     VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{};
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
+    GamePipelineRequest game_pipeline_request_;
     mutable uint32_t draw_calls_{}, triangles_{};
 };
-}
+} // namespace xray::render::vulkan

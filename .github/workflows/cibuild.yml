@@ -166,12 +166,13 @@ jobs:
         cmake --build build/windows-vulkan --config Debug
         --target vulkan_skeleton_bones_test vulkan_skeleton_motions_test vulkan_level_models_test
         vulkan_model_geometry_test vulkan_kinematics_test vulkan_slide_windows_test
+        vulkan_asset_flow_test vulkan_ui_flow_test vulkan_renderer_module_test android_renderer_choice_test
         --parallel 4
 
     - name: Run focused Vulkan model tests
       run: >-
         ctest --test-dir build/windows-vulkan -C Debug --output-on-failure
-        -R "^(vulkan_skeleton_bones_test|vulkan_skeleton_motions_test|vulkan_level_models|vulkan_model_geometry|vulkan_kinematics|vulkan_slide_windows_test)$"
+        -R "^(vulkan_skeleton_bones_test|vulkan_skeleton_motions_test|vulkan_level_models|vulkan_model_geometry|vulkan_kinematics|vulkan_slide_windows_test|vulkan_asset_flow|vulkan_ui_flow|vulkan_renderer_module|android_renderer_choice)$"
 
 
   nightly-release:

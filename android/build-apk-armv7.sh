@@ -141,6 +141,9 @@ python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
     --shader-root "$asset_root/gamedata/shaders" \
     --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
     --apk "$apk"
+python3 "$repo_dir/tools/check_android_vulkan_route.py" \
+    --repo "$repo_dir" --sdl-root "$sdl_dir" --native-lib "$native_lib" \
+    --readelf "$ndk_dir/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" --apk "$apk"
 mkdir -p "$repo_dir/build"
 port_version=$(sed -n '1p' "$project_dir/android-version.txt")
 port_version_code=$(sed -n '2p' "$project_dir/android-version.txt")

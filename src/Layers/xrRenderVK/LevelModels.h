@@ -28,6 +28,15 @@ struct LevelBytes
     size_t size{};
 };
 
+enum class LevelGameProfile : uint8_t
+{
+    SoC,
+    CS,
+    CoP
+};
+const char *level_profile_name(LevelGameProfile profile);
+bool validate_level_header(LevelGameProfile profile, LevelBytes header, std::string &error);
+
 struct LevelMaterial
 {
     std::string shader;
@@ -90,12 +99,15 @@ struct LevelModelData
 
 // A missing/unsupported format fails the entire load. This ensures that a
 // partially rendered level cannot accidentally be advertised as playable.
-bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
-    LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {});
+bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData &result, std::string &error,
+                       LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {});
+bool load_game_level_models(LevelGameProfile profile, LevelBytes header, LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers,
+                            LevelBytes visuals, LevelModelData &result, std::string &error, LevelBytes fast_vertex_buffers = {},
+                            LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {});
 // Resolve a standalone visual's GCONTAINER against level.geom, using the
 // same bounds and index validation as the level visual table.
-bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error,
-    LevelBytes tree_windows = {});
+bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord &visual, LevelModel &result, std::string &error,
+                          LevelBytes tree_windows = {});
 bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
     LevelModelData& result, std::string& error);
 }

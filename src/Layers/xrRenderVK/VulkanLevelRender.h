@@ -131,50 +131,47 @@ protected:
     const GpuLevel& gpu_level() const { return level_; }
 
 private:
-    std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord& record,
-        const std::string& inherited_texture, const std::string& cache_name,
-        std::string& error, bool skeletal_child = false);
-    std::unique_ptr<VulkanModelVisual> load_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error);
-    VulkanModelVisual* get_model_base(pcstr name, IReader* data, const std::string& cache_name, std::string& error);
-    void destroy_all_models();
-    void create_wallmark(ModelGeometry&& geometry, const Fvector& center,
-        IKinematics* skeleton = nullptr, const Fmatrix* transform = nullptr);
-    Fmatrix current_view_projection() const;
-    GpuLevel level_;
-    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanModelVisual>> models_;
-    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanParticleEffect>> particle_effects_;
-    std::unordered_map<IRenderVisual*, std::unique_ptr<VulkanParticleGroup>> particle_groups_;
-    std::shared_ptr<const ParticleCatalog> particle_catalog_;
-    std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
-    std::unordered_map<std::string, std::unique_ptr<VulkanModelVisual>> model_bases_;
-    std::unordered_map<std::string, std::weak_ptr<GpuModel>> model_gpu_cache_;
-    ShaderModuleCache compiled_shaders_;
-    VulkanCameraState camera_state_;
-    VulkanRenderContextState context_state_;
-    VkDevice device_{};
-    VkQueue queue_{};
-    VkCommandPool pool_{};
-    VkPhysicalDeviceMemoryProperties memory_{};
-    BufferUploadDispatch upload_{};
-    GameTextureFactory* textures_{};
-    DeferredPass* pass_{};
-    PFN_vkDeviceWaitIdle wait_idle_{};
-    VulkanGameDevice* game_device_{};
-    SDL_Window* window_{};
-    VkExtent2D requested_drawable_{};
-    std::unique_ptr<VulkanGameDevice> owned_game_device_;
-    VulkanGameDevice* external_game_device_{};
-    std::vector<VulkanLight*> lights_;
-    std::vector<VulkanGlow*> glows_;
-    std::vector<VulkanObjectSpecific*> object_specifics_;
-    struct Wallmark
-    {
-        std::unique_ptr<GpuModel> model;
-        IKinematics* skeleton{};
-        const Fmatrix* transform{};
-        Fvector center{};
-        float expires{};
-    };
+  std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord &record, const std::string &inherited_texture, const std::string &cache_name,
+                                                       std::string &error, bool skeletal_child = false);
+  std::unique_ptr<VulkanModelVisual> load_model_base(pcstr name, IReader *data, const std::string &cache_name, std::string &error, bool skeletal_child = false);
+  VulkanModelVisual *get_model_base(pcstr name, IReader *data, const std::string &cache_name, std::string &error, bool skeletal_child = false);
+  void destroy_all_models();
+  void create_wallmark(ModelGeometry &&geometry, const Fvector &center, IKinematics *skeleton = nullptr, const Fmatrix *transform = nullptr);
+  Fmatrix current_view_projection() const;
+  GpuLevel level_;
+  std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanModelVisual>> models_;
+  std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleEffect>> particle_effects_;
+  std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleGroup>> particle_groups_;
+  std::shared_ptr<const ParticleCatalog> particle_catalog_;
+  std::unordered_multimap<std::string, std::unique_ptr<VulkanModelVisual>> model_pool_;
+  std::unordered_map<std::string, std::unique_ptr<VulkanModelVisual>> model_bases_;
+  std::unordered_map<std::string, std::weak_ptr<GpuModel>> model_gpu_cache_;
+  VulkanCameraState camera_state_;
+  VulkanRenderContextState context_state_;
+  VkDevice device_{};
+  VkQueue queue_{};
+  VkCommandPool pool_{};
+  VkPhysicalDeviceMemoryProperties memory_{};
+  BufferUploadDispatch upload_{};
+  GameTextureFactory *textures_{};
+  DeferredPass *pass_{};
+  PFN_vkDeviceWaitIdle wait_idle_{};
+  VulkanGameDevice *game_device_{};
+  SDL_Window *window_{};
+  VkExtent2D requested_drawable_{};
+  std::unique_ptr<VulkanGameDevice> owned_game_device_;
+  VulkanGameDevice *external_game_device_{};
+  std::vector<VulkanLight *> lights_;
+  std::vector<VulkanGlow *> glows_;
+  std::vector<VulkanObjectSpecific *> object_specifics_;
+  struct Wallmark
+  {
+      std::unique_ptr<GpuModel> model;
+      IKinematics *skeleton{};
+      const Fmatrix *transform{};
+      Fvector center{};
+      float expires{};
+  };
     std::vector<Wallmark> wallmarks_;
     VulkanDeviceResourceState device_resource_state_;
     bool reset_in_progress_{};

@@ -98,31 +98,31 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                 depth_views.push_back(targets_.depth_view(i));
             if (!window_.frame().attach_scene_depth(depth_views, error)) goto failed;
         }
-        const ShaderModuleDispatch shaders{
-            proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
-            proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
+        const ShaderModuleDispatch shaders{proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
+                                           proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
+        configure_engine_shader_resources(device, shaders, shader_resources_);
         DeferredShaderFactory deferred_factory;
-        if (!deferred_factory.create(device, shaders, scene_dispatch, targets_.render_pass(),
-                frame.render_pass(), deferred_, error) ||
-            !targets_.bind_lighting(deferred_, error)) goto failed;
+        if (!deferred_factory.create(device, shaders, scene_dispatch, targets_.render_pass(), frame.render_pass(), deferred_, shader_resources_, error) ||
+            !targets_.bind_lighting(deferred_, error))
+            goto failed;
         ShaderModule scene_vertex, scene_fragment, ui_vertex, ui_fragment;
-        if (!scene_vertex.initialize(device, shaders, scene_shaders::SceneVertex,
-                sizeof(scene_shaders::SceneVertex), error) ||
-            !scene_fragment.initialize(device, shaders, scene_shaders::SceneFragment,
-                sizeof(scene_shaders::SceneFragment), error) ||
-            !ui_vertex.initialize(device, shaders, scene_shaders::UiVertex,
-                sizeof(scene_shaders::UiVertex), error) ||
-            !ui_fragment.initialize(device, shaders, scene_shaders::UiFragment,
-                sizeof(scene_shaders::UiFragment), error) ||
-            !ui_pass_.initialize(device, frame.render_pass(), scene_vertex.handle(),
-                scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(),
-                scene_dispatch, error, true) ||
-            !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory,
-                physical.features.textureCompressionBC, texture_dispatch_,
-                 create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
-             !create_postprocess(error)) goto failed;
+        if (!scene_vertex.initialize(device, shaders, scene_shaders::SceneVertex, sizeof(scene_shaders::SceneVertex), error) ||
+            !scene_fragment.initialize(device, shaders, scene_shaders::SceneFragment, sizeof(scene_shaders::SceneFragment), error) ||
+            !ui_vertex.initialize(device, shaders, scene_shaders::UiVertex, sizeof(scene_shaders::UiVertex), error) ||
+            !ui_fragment.initialize(device, shaders, scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment), error) ||
+            !ui_pass_.initialize(device, frame.render_pass(), scene_vertex.handle(), scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(),
+                                 scene_dispatch, error, true) ||
+            !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory, physical.features.textureCompressionBC, texture_dispatch_,
+                                  create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
+            !create_postprocess(error))
+            goto failed;
     }
-    ui_.configure(device, physical.memory, buffer_upload_.buffer, ui_pass_);
+    deferred_.set_game_pipeline_request([this](const std::string &vs, const std::string &ps, SurfaceMode mode, bool hud, bool skinned, std::string &reason) {
+        return request_shader_pair(vs, ps, mode, hud, skinned, reason);
+    });
+    ui_.configure(
+        device, physical.memory, buffer_upload_.buffer, ui_pass_,
+        {[this](VkDescriptorSet set) { return textures_.retain_ui(set, ui_pass_); }, [this](VkDescriptorSet set) { textures_.release_ui(set, ui_pass_); }});
     error.clear();
     return true;
 failed:
@@ -139,14 +139,14 @@ bool VulkanGameDevice::reload_game_shaders(std::string& error)
         return false;
     }
     const auto get = window_.device_proc();
-    const ShaderModuleDispatch shaders{
-        proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
-        proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
+    const ShaderModuleDispatch shaders{proc<PFN_vkCreateShaderModule>(device, get, "vkCreateShaderModule"),
+                                       proc<PFN_vkDestroyShaderModule>(device, get, "vkDestroyShaderModule")};
     DeferredShaderFactory factory;
-    return factory.reload_game_pipelines(device, shaders, deferred_, error);
+    shader_resources_.clear();
+    return factory.reload_game_pipelines(device, shaders, deferred_, shader_resources_, error);
 }
 
-void VulkanGameDevice::record_ui(const FrameRecordingContext& frame, void* user)
+void VulkanGameDevice::record_ui(const FrameRecordingContext &frame, void *user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
     owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
@@ -713,6 +713,7 @@ void VulkanGameDevice::destroy()
     targets_.destroy();
     ui_pass_.destroy();
     deferred_.destroy();
+    shader_resources_.destroy();
     window_.destroy();
     frame_dispatch_ = {};
     texture_dispatch_ = {};

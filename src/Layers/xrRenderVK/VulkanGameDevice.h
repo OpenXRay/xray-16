@@ -68,11 +68,34 @@ public:
     {
         return std::make_unique<VulkanFontRender>(*this);
     }
-    GameTextureFactory& textures() { return textures_; }
-    DeferredPass& deferred() { return deferred_; }
-    ScenePass& ui_pass() { return ui_pass_; }
-    VulkanWindowDevice& window() { return window_; }
-    const BufferUploadDispatch& buffer_upload() const { return buffer_upload_; }
+    GameTextureFactory &textures()
+    {
+        return textures_;
+    }
+    DeferredPass &deferred()
+    {
+        return deferred_;
+    }
+    GameShaderResources &shader_resources()
+    {
+        return shader_resources_;
+    }
+    bool request_shader_pair(const std::string &svs, const std::string &sps, SurfaceMode mode, bool hud, bool skinned, std::string &error)
+    {
+        return shader_resources_.pipeline(deferred_, svs, sps, mode, hud, skinned, error);
+    }
+    ScenePass &ui_pass()
+    {
+        return ui_pass_;
+    }
+    VulkanWindowDevice &window()
+    {
+        return window_;
+    }
+    const BufferUploadDispatch &buffer_upload() const
+    {
+        return buffer_upload_;
+    }
     PFN_vkDeviceWaitIdle device_wait_idle_proc() const { return frame_dispatch_.device_wait_idle; }
 
 private:
@@ -118,6 +141,7 @@ private:
     BufferUploadDispatch buffer_upload_{};
     GBufferTargets targets_;
     DeferredPass deferred_;
+    GameShaderResources shader_resources_;
     ScenePass ui_pass_;
     GameTextureFactory textures_;
     VulkanUIRender ui_;

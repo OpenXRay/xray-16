@@ -137,9 +137,26 @@ bool mesh(const VisualRecord& source, ModelGeometry& out, std::string& error)
                 v.position[j] = f32(p + j * 4);
                 v.normal[j] = f32(p + 12 + j * 4);
             }
-            v.uv[0] = f32(p + 24); v.uv[1] = f32(p + 28);
-            for (float component : v.position) if (!std::isfinite(component))
-            { error = "OGF static vertex is not finite"; return false; }
+            v.uv[0] = f32(p + 24);
+            v.uv[1] = f32(p + 28);
+            for (float component : v.position)
+                if (!std::isfinite(component))
+                {
+                    error = "OGF static vertex is not finite";
+                    return false;
+                }
+            for (float component : v.normal)
+                if (!std::isfinite(component))
+                {
+                    error = "OGF static normal is not finite";
+                    return false;
+                }
+            for (float component : v.uv)
+                if (!std::isfinite(component))
+                {
+                    error = "OGF static UV is not finite";
+                    return false;
+                }
         }
         else if (!vertex(vertices.data + 8 + i * stride, links, out.vertices[i]))
         {
@@ -190,10 +207,14 @@ bool decode(const VisualRecord& source, ModelGeometry& out, std::string& error, 
         return false;
     }
     out.children.reserve(source.embedded_children.size());
-    for (const auto& child : source.embedded_children)
+    for (const auto &child : source.embedded_children)
     {
         out.children.emplace_back();
-        if (!decode(child, out.children.back(), error, depth + 1)) return false;
+        if (!decode(child, out.children.back(), error, depth + 1))
+        {
+            error = "child id=" + std::to_string(out.children.size() - 1) + " type=" + std::to_string(child.type) + " / " + error;
+            return false;
+        }
     }
     if ((source.type == 3 || source.type == 10) && out.children.empty())
     {
@@ -204,11 +225,14 @@ bool decode(const VisualRecord& source, ModelGeometry& out, std::string& error, 
 }
 }
 
-bool decode_model_geometry(const VisualRecord& source, ModelGeometry& result,
-    std::string& error)
+bool decode_model_geometry(const VisualRecord &source, ModelGeometry &result, std::string &error)
 {
     ModelGeometry prepared;
-    if (!decode(source, prepared, error, 0)) return false;
+    if (!decode(source, prepared, error, 0))
+    {
+        error = "OGF type=" + std::to_string(source.type) + " shader_id=" + std::to_string(source.shader_id) + " decode: " + error;
+        return false;
+    }
     result = std::move(prepared);
     error.clear();
     return true;

@@ -49,13 +49,19 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             error = "invalid or empty Vulkan level model";
             return false;
         }
+        const auto mode = models.materials[model.material].mode;
+        const char *family = mode == SurfaceMode::Transparent ? "object_blended" : mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
+        const std::string shader = std::string("vk\\") + family;
+        if (!pass.request_game_pipeline(shader + ".vs", shader + ".ps", mode, false, false, error))
+        {
+            error = "level / material id=" + std::to_string(model.material) + " shader pair: " + error;
+            return false;
+        }
         if (!textures.material(models.materials[model.material].textures, pass, mesh.material, error) ||
-            !upload_buffer(device, queue, pool, memory, upload,
-                model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices, prepared.pending_, error) ||
-            !upload_buffer(device, queue, pool, memory, upload,
-                model.indices.data(), model.indices.size() * sizeof(uint32_t),
-                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, prepared.pending_, error))
+            !upload_buffer(device, queue, pool, memory, upload, model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
+                           VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices, prepared.pending_, error) ||
+            !upload_buffer(device, queue, pool, memory, upload, model.indices.data(), model.indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                           mesh.indices, prepared.pending_, error))
             return false;
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
         mesh.windows = model.windows;

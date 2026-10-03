@@ -55,7 +55,7 @@ void CEngineAPI::SelectRenderer()
 
 #if defined(XR_PLATFORM_ANDROID)
     // A rejected console token must not silently leave the previous GLES mode selected.
-    const bool explicit_vulkan = strstr(Core.Params, "-renderer-vulkan") != nullptr;
+    const bool explicit_vulkan = xray::render::has_renderer_option(Core.Params, "-renderer-vulkan");
 #endif
 
     // User has some renderer selected, find it

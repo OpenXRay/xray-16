@@ -1,6 +1,7 @@
 #include "VisualCatalog.h"
 
 #include <cstring>
+#include <cmath>
 #include <functional>
 
 namespace xray::render::vulkan
@@ -60,6 +61,11 @@ bool parse_visual(LevelBytes bytes, VisualRecord& result, unsigned depth)
                 visual.type = body.data[1];
                 visual.shader_id = uint16_t(body.data[2]) | (uint16_t(body.data[3]) << 8);
                 std::memcpy(visual.bounds.data(), body.data + 4, sizeof(float) * 10);
+                for (float value : visual.bounds)
+                    if (!std::isfinite(value))
+                        return false;
+                if (visual.bounds[9] < 0)
+                    return false;
             }
             else if (id == texture_id)
             {
@@ -105,7 +111,16 @@ bool parse_ogf_visual(LevelBytes bytes, VisualRecord& result, std::string& error
 {
     if (!parse_visual(bytes, result, 0))
     {
-        error = "invalid OGF visual record";
+        uint32_t type = UINT32_MAX, shader = UINT32_MAX;
+        each_chunk(bytes, [&](uint32_t id, LevelBytes body) {
+            if (id == header_id && body.size >= 4)
+            {
+                type = body.data[1];
+                shader = uint16_t(body.data[2]) | (uint16_t(body.data[3]) << 8);
+            }
+            return true;
+        });
+        error = "invalid OGF visual record type=" + std::to_string(type) + " shader_id=" + std::to_string(shader);
         return false;
     }
     error.clear();
@@ -116,16 +131,17 @@ bool parse_level_visuals(LevelBytes bytes, std::vector<VisualRecord>& result, st
 {
     std::vector<VisualRecord> records;
     uint32_t expected = 0;
-    if (!each_chunk(bytes, [&](uint32_t id, LevelBytes body)
-        {
-            if (id != expected++ || expected > max_visuals) return false;
+    if (!each_chunk(bytes, [&](uint32_t id, LevelBytes body) {
+            if (id != expected++ || expected > max_visuals)
+                return false;
             VisualRecord record;
-            if (!parse_visual(body, record, 0)) return false;
+            if (!parse_visual(body, record, 0))
+                return false;
             records.push_back(std::move(record));
             return true;
         }))
     {
-        error = "invalid level visual table";
+        error = "invalid level visual table id=" + std::to_string(expected ? expected - 1 : 0);
         return false;
     }
     std::vector<uint8_t> visiting(records.size());

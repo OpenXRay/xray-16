@@ -691,6 +691,7 @@ bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescrip
 
 void DeferredPass::destroy()
 {
+    game_pipeline_request_ = {};
     abort_game_pipeline_reload();
     if (device_ && vk_.destroy_pipeline)
     {

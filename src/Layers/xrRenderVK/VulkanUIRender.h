@@ -6,21 +6,27 @@
 
 #include <array>
 #include <vector>
+#include <functional>
 struct ImDrawData;
 
 namespace xray::render::vulkan
 {
 class VulkanUIShader;
+struct UiDescriptorLeases
+{
+    std::function<bool(VkDescriptorSet)> retain;
+    std::function<void(VkDescriptorSet)> release;
+};
 // Accumulates engine UI primitives on the CPU and records Vulkan indexed
 // draws when FrameContext reaches the swapchain render pass.
 class VulkanUIRender final : public IUIRender
 {
-public:
-    void configure(VkDevice device, const VkPhysicalDeviceMemoryProperties& memory,
-        const BufferResourceDispatch& dispatch, const ScenePass& pass);
+  public:
+    void configure(VkDevice device, const VkPhysicalDeviceMemoryProperties &memory, const BufferResourceDispatch &dispatch, const ScenePass &pass,
+                   UiDescriptorLeases leases = {});
     void setup_states();
     void reset_frame();
-    bool record(const FrameRecordingContext& frame, std::string& error);
+    bool record(const FrameRecordingContext &frame, std::string &error);
     void append_imgui(ImDrawData* data);
     VulkanUIShader* current_shader() const { return shader_; }
     uint32_t draw_calls() const { return static_cast<uint32_t>(batches_.size()); }
@@ -60,7 +66,8 @@ private:
     VkDevice device_{};
     VkPhysicalDeviceMemoryProperties memory_{};
     BufferResourceDispatch dispatch_{};
-    const ScenePass* pass_{};
+    const ScenePass *pass_{};
+    UiDescriptorLeases leases_;
     std::array<FrameBuffers, FrameContext::FramesInFlight> frames_{};
     std::vector<UiVertex> vertices_;
     std::vector<Fvector> world_positions_;
@@ -78,4 +85,4 @@ private:
     CullMode cull_{cmNONE};
     Fmatrix world_{};
 };
-}
+} // namespace xray::render::vulkan

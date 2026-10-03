@@ -42,11 +42,10 @@ void CheckAndSetupRenderer()
     }
 
 #if defined(XR_PLATFORM_ANDROID)
-    const bool wants_vulkan = strstr(Core.Params, "-renderer-vulkan") || strstr(Core.Params, "-renderer-auto");
-    const auto choice = xray::render::choose_android_renderer(Core.Params,
-        wants_vulkan && xray::render::vulkan::GetRendererModule()->CheckGameRequirements());
+    const bool wants_vulkan = xray::render::android_renderer_needs_vulkan_probe(Core.Params);
+    const auto choice = xray::render::choose_android_renderer(Core.Params, wants_vulkan && xray::render::vulkan::GetRendererModule()->CheckGameRequirements());
     R_ASSERT2(choice != xray::render::AndroidRendererChoice::VulkanUnavailable,
-        "Explicit Vulkan renderer unavailable: inspect the Vulkan probe and shader resource diagnostics");
+              "Explicit Vulkan renderer unavailable: inspect the Vulkan probe and shader resource diagnostics");
     if (choice == xray::render::AndroidRendererChoice::Vulkan)
         Console->Execute("renderer renderer_vulkan");
     else if (choice == xray::render::AndroidRendererChoice::GLES)

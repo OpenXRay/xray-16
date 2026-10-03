@@ -1,5 +1,6 @@
 #include "src/Layers/xrRenderVK/DeferredPass.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
+#include "src/Layers/xrRenderVK/GameShaderResources.h"
 
 #include <cassert>
 #include <cstddef>
@@ -434,7 +435,52 @@ int main()
             SurfaceMode::Opaque, false, error, true));
         assert(deferred.has_game_pipeline(vertex, "vk\\object_opaque.ps"));
     }
-    assert(deferred.create_game_pipeline("vk\\hud_skinned_4.vs", "vk\\object_blended.ps",
-        handle<VkShaderModule>(70), handle<VkShaderModule>(71),
-        SurfaceMode::Opaque, true, error, true));
+    assert(deferred.create_game_pipeline("vk\\hud_skinned_4.vs", "vk\\object_blended.ps", handle<VkShaderModule>(70), handle<VkShaderModule>(71),
+                                         SurfaceMode::Opaque, true, error, true));
+
+    uint32_t module_creates = 0, module_destroys = 0, source_reads = 0;
+    static uint32_t *creates;
+    static uint32_t *destroys;
+    creates = &module_creates;
+    destroys = &module_destroys;
+    GameShaderResources resources;
+    deferred.set_game_pipeline_request([&](const std::string &vs, const std::string &ps, SurfaceMode mode, bool hud, bool skinned, std::string &reason) {
+        return resources.pipeline(deferred, vs, ps, mode, hud, skinned, reason);
+    });
+    ShaderModuleDispatch modules{+[](VkDevice, const VkShaderModuleCreateInfo *, const VkAllocationCallbacks *, VkShaderModule *out) {
+                                     *out = handle<VkShaderModule>(72 + (*creates)++);
+                                     return VK_SUCCESS;
+                                 },
+                                 +[](VkDevice, VkShaderModule, const VkAllocationCallbacks *) { ++*destroys; }};
+    resources.configure(handle<VkDevice>(2), modules, [&](const std::string &name, std::vector<uint8_t> &bytes, std::string &reason) {
+        ++source_reads;
+        if (name != "legacy\\deffer_base.vs.spv" && name != "legacy\\deffer_base.ps.spv")
+        {
+            reason = "missing precompiled SPIR-V: " + name;
+            return false;
+        }
+        const uint32_t code[]{0x07230203, 0x00010000, 0, 2, 0, 0x0005000f, name.find(".vs.") != std::string::npos ? 0u : 4u, 1, 0x6e69616d, 0};
+        bytes.assign(reinterpret_cast<const uint8_t *>(code), reinterpret_cast<const uint8_t *>(code) + sizeof(code));
+        return true;
+    });
+    GameShaderResource *svs = nullptr;
+    assert(resources.shader("legacy/deffer_base", GameShaderStage::Vertex, "main", 0, svs, error));
+    assert(svs && svs->stage == GameShaderStage::Vertex && svs->module.handle() == handle<VkShaderModule>(72));
+    assert(deferred.request_game_pipeline("legacy/deffer_base", "legacy/deffer_base.ps", SurfaceMode::Opaque, false, false, error));
+    assert(pipeline_count == 18 && module_creates == 2 && source_reads == 2);
+    assert(resources.pipeline(deferred, "legacy\\deffer_base.vs.spv", "legacy/deffer_base", SurfaceMode::Opaque, false, false, error));
+    assert(pipeline_count == 18 && module_creates == 2 && source_reads == 2);
+    assert(deferred.require_game_pipeline("legacy\\deffer_base.vs", "legacy\\deffer_base.ps", SurfaceMode::Opaque, false, false, error));
+    assert(!deferred.request_game_pipeline("unknown", "legacy/deffer_base", SurfaceMode::Opaque, false, false, error) &&
+           error.find("unknown.vs") != std::string::npos);
+    assert(!resources.pipeline(deferred, "legacy/deffer_base.ps", "legacy/deffer_base", SurfaceMode::Opaque, false, false, error) &&
+           error.find("stage mismatch") != std::string::npos);
+    assert(!resources.pipeline(deferred, "legacy/deffer_base", "legacy/deffer_base", SurfaceMode::AlphaTest, false, false, error) &&
+           error.find("incompatible") != std::string::npos);
+    assert(!resources.shader("legacy/deffer_base", GameShaderStage::Vertex, "main", 1, svs, error));
+    assert(!svs && error.find("parameters") != std::string::npos);
+    assert(!resources.shader("../escape", GameShaderStage::Vertex, "main", 0, svs, error));
+    resources.clear();
+    assert(module_destroys == 2 && resources.size() == 0);
+    resources.destroy();
 }

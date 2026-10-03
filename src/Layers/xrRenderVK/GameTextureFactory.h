@@ -37,8 +37,9 @@ public:
     VkSampler sampler() const { return sampler_; }
     // Release only after the consumer has stopped recording the descriptor.
     // The last release waits for submitted frames before freeing GPU objects.
-    void release_material(VkDescriptorSet set, DeferredPass& pass);
-    void release_ui(VkDescriptorSet set, ScenePass& pass);
+    void release_material(VkDescriptorSet set, DeferredPass &pass);
+    void release_ui(VkDescriptorSet set, ScenePass &pass);
+    bool retain_ui(VkDescriptorSet set, ScenePass &pass);
     bool finish_uploads();
     void retire_unused();
     void invalidate_unused();

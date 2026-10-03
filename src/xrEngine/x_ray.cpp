@@ -24,6 +24,7 @@
 #include "Layers/xrRenderGL/glHW.h"
 #undef RENDER_NAMESPACE
 #include "android_vulkan_smoke.h"
+#include "AndroidRendererChoice.h"
 #endif
 
 #include "IGame_Persistent.h"
@@ -910,7 +911,11 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         shortcuts.Disable();
 #endif
 
+#if defined(XR_PLATFORM_ANDROID)
+    if (xray::render::android_native_splash_allowed(commandLine))
+#else
     if (!strstr(commandLine, "-nosplash"))
+#endif
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
         ShowSplash(topmost);

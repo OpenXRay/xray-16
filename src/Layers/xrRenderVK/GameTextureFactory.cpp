@@ -242,9 +242,23 @@ void GameTextureFactory::release_material(VkDescriptorSet set, DeferredPass& pas
     R_ASSERT2(false, "unknown Vulkan material descriptor");
 }
 
-void GameTextureFactory::release_ui(VkDescriptorSet set, ScenePass& pass)
+bool GameTextureFactory::retain_ui(VkDescriptorSet set, ScenePass &pass)
 {
-    if (!set) return;
+    if (!set)
+        return false;
+    for (auto &[name, asset] : assets_)
+        if (asset.ui_set == set && asset.ui_refs && asset.ui_pass == &pass)
+        {
+            ++asset.ui_refs;
+            return true;
+        }
+    return false;
+}
+
+void GameTextureFactory::release_ui(VkDescriptorSet set, ScenePass &pass)
+{
+    if (!set)
+        return;
     for (auto& [name, asset] : assets_)
     {
         if (asset.ui_set != set) continue;
