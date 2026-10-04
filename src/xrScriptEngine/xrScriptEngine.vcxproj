@@ -43,6 +43,7 @@
     <ClInclude Include="script_profiler.hpp" />
     <ClInclude Include="script_profiler_portions.hpp" />
     <ClInclude Include="script_process.hpp" />
+    <ClInclude Include="script_snapshot_iterator.hpp" />
     <ClInclude Include="script_space.hpp" />
     <ClInclude Include="script_space_forward.hpp" />
     <ClInclude Include="script_stack_tracker.hpp" />

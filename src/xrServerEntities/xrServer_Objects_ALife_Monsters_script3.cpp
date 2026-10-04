@@ -10,6 +10,7 @@
 
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/script_snapshot_iterator.hpp"
 
 void CSE_ALifeCreatureActor::script_register(lua_State* luaState)
 {
@@ -85,7 +86,7 @@ void CSE_ALifeOnlineOfflineGroup::script_register(lua_State* luaState)
             .def("register_member", &CSE_ALifeOnlineOfflineGroup::register_member)
             .def("unregister_member", &CSE_ALifeOnlineOfflineGroup::unregister_member)
             .def("commander_id", &CSE_ALifeOnlineOfflineGroup::commander_id)
-            .def("squad_members", &CSE_ALifeOnlineOfflineGroup::squad_members, return_stl_iterator())
+            .def("squad_members", &CSE_ALifeOnlineOfflineGroup::squad_members, return_snapshot_iterator())
             .def("npc_count", &CSE_ALifeOnlineOfflineGroup::npc_count)
             .def("add_location_type", &CSE_ALifeOnlineOfflineGroup::add_location_type)
             .def("clear_location_types", &CSE_ALifeOnlineOfflineGroup::clear_location_types)
