@@ -82,8 +82,6 @@
     <ClInclude Include="..\xrServerEntities\script_token_list.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_value.h" />
-    <ClInclude Include="..\xrServerEntities\script_value_container.h" />
-    <ClInclude Include="..\xrServerEntities\script_value_container_impl.h" />
     <ClInclude Include="..\xrServerEntities\script_value_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_value_wrapper.h" />
     <ClInclude Include="..\xrServerEntities\script_value_wrapper_inline.h" />

@@ -2209,9 +2209,6 @@
     <Filter Include="Core\Server\ServerEntities\scripts">
       <UniqueIdentifier>{680ffaa3-1f14-47a9-a263-58e2f92d6da1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Server\ServerEntities\scripts\script_value_container">
-      <UniqueIdentifier>{74aee90d-4f0c-4bf8-80f0-df89e02371ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Server\ServerEntities\scripts\script_value">
       <UniqueIdentifier>{d25084c1-8225-43b0-ac51-d3bded007961}</UniqueIdentifier>
     </Filter>
@@ -5654,12 +5651,6 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters.h">
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_value_container.h">
-      <Filter>Core\Server\ServerEntities\scripts\script_value_container</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_value_container_impl.h">
-      <Filter>Core\Server\ServerEntities\scripts\script_value_container</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\xrServer_Objects_Alife_Smartcovers.h">
       <Filter>Core\Server\ServerEntities\objects_alife_smartcover</Filter>

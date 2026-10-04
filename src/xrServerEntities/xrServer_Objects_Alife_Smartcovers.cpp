@@ -15,7 +15,6 @@
 
 #ifndef MASTER_GOLD
 #include "ai_space.h"
-#include "script_value_container_impl.h"
 #include "xrScriptEngine/script_engine.hpp"
 
 extern SFillPropData fp_data;
@@ -155,7 +154,7 @@ void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)
 
 void CSE_SmartCover::OnChangeLoopholes(PropValue* sender)
 {
-    CScriptValueContainer::assign();
+    assign_script_values();
     m_need_to_reparse_loopholes = true;
 }
 

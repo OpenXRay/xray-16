@@ -10,7 +10,6 @@
 #include "script_properties_list_helper.h"
 #include "xrServerEntities/script_token_list.h"
 #include "xrServerEntities/xrServer_Object_Base.h"
-#include "xrServerEntities/script_value_container_impl.h"
 #include "script_value_wrapper.h"
 
 static CSE_Abstract* owner(const luabind::object& object)
@@ -26,7 +25,7 @@ struct CWrapHelper
     static T* wrap_value(const luabind::object& object, pcstr name)
     {
         auto* value = xr_new<CScriptValueWrapper<T>>(object, name);
-        owner(object)->add(value);
+        owner(object)->add_script_value(value);
         return value->value();
     }
 };
@@ -51,7 +50,7 @@ template <typename T>
 static auto* wrap_value(const luabind::object& object, luabind::object table, pcstr name)
 {
     CScriptValueWrapper<T>* value = xr_new<CScriptValueWrapper<T>>(table, name);
-    owner(object)->add(value);
+    owner(object)->add_script_value(value);
     return value->value();
 }
 

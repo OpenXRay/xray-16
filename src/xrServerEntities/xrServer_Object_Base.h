@@ -10,7 +10,6 @@
 
 #include "xrServer_Objects_Abstract.h"
 #include "Common/object_interfaces.h"
-#include "script_value_container.h"
 #include "alife_space.h"
 #include "xrCore/client_id.h"
 #include "xrCore/clsid.h"
@@ -35,6 +34,8 @@ class CSE_ALifeSmartZone;
 class CSE_ALifeOnlineOfflineGroup;
 class CSE_ALifeItemPDA;
 
+class CScriptValue;
+
 #pragma warning(push)
 #pragma warning(disable : 4005)
 
@@ -53,11 +54,10 @@ private:
     DECLARE_SCRIPT_REGISTER_FUNCTION();
 };
 
-class CSE_Abstract : public IServerEntity, public CPureServerObject, public CScriptValueContainer
+class CSE_Abstract : public IServerEntity, public CPureServerObject
 {
     using inherited1 = IServerEntity;
     using inherited2 = CPureServerObject;
-    using inherited3 = CScriptValueContainer;
 
 public:
     enum ESpawnFlags
@@ -185,6 +185,18 @@ public:
     virtual CSE_ALifeSmartZone* cast_smart_zone() { return nullptr; }
     virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return nullptr; }
     virtual CSE_ALifeItemPDA* cast_item_pda() { return nullptr; }
+
+#ifndef MASTER_GOLD
+private:
+    xr_vector<CScriptValue*> m_script_values;
+
+public:
+    void add_script_value(CScriptValue* value);
+    void assign_script_values() const;
+    void clear_script_values();
+#else
+    void add_script_value(CScriptValue*) {}
+#endif
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION(CPureServerObject);

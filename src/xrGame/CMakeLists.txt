@@ -2421,8 +2421,6 @@ target_sources(xrGame PRIVATE
     ../xrServerEntities/script_token_list_script.cpp
     ../xrServerEntities/script_value.h
     ../xrServerEntities/script_value_inline.h
-    ../xrServerEntities/script_value_container.h
-    ../xrServerEntities/script_value_container_impl.h
     ../xrServerEntities/script_value_wrapper.h
     ../xrServerEntities/script_value_wrapper_inline.h
     ../xrServerEntities/ShapeData.h

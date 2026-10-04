@@ -10,7 +10,7 @@
 #include "xrServer_Objects.h"
 #include "xrMessages.h"
 #include "game_base_space.h"
-#include "script_value_container_impl.h"
+#include "script_value.h"
 #include "clsid_game.h"
 #include "xrCore/xr_token.h"
 
@@ -135,6 +135,7 @@ CSE_Abstract::~CSE_Abstract()
 {
     xr_free(s_name_replace);
     xr_delete(m_ini_file);
+    clear_script_values();
 }
 
 CSE_Visual* CSE_Abstract::visual() { return (nullptr); }
@@ -199,7 +200,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
 //	tNetPacket.w_u64			(m_min_spawn_interval);
 //	tNetPacket.w_u64			(m_max_spawn_interval);
 
-    CScriptValueContainer::assign();
+    assign_script_values();
 
     // write specific data
     u32 position = tNetPacket.w_tell();
@@ -381,9 +382,33 @@ void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)
 
 void CSE_Abstract::FillProp(LPCSTR pref, PropItemVec& items)
 {
-    CScriptValueContainer::assign();
-    CScriptValueContainer::clear();
+    assign_script_values();
+    clear_script_values();
     FillProps(pref, items);
+}
+
+void CSE_Abstract::add_script_value(CScriptValue* new_value)
+{
+    const auto I = std::find_if(m_script_values.begin(), m_script_values.end(), [new_value](const CScriptValue* value)
+    {
+        return 0 == xr_strcmp(value->name(), new_value->name());
+    });
+
+    if (I != m_script_values.end())
+        return;
+
+    m_script_values.emplace_back(new_value);
+}
+
+void CSE_Abstract::assign_script_values() const
+{
+    for (const auto& value : m_script_values)
+        value->assign();
+}
+
+void CSE_Abstract::clear_script_values()
+{
+    delete_data(m_script_values);
 }
 #endif // #ifndef MASTER_GOLD
 
