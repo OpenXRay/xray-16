@@ -152,11 +152,9 @@ void CScriptEngine::print_stack(lua_State* L)
     if (L == nullptr)
         L = lua();
 
-    if (lua_isstring(L, -1))
-    {
-        pcstr err = lua_tostring(L, -1);
-        script_log(LuaMessageType::Error, "%s", err);
-    }
+    // Frames are logged as errors, and an error line prints the stack, so the frames must not print it again.
+    const bool isNested = logReenterability;
+    logReenterability = true;
 
     lua_Debug l_tDebugInfo;
     for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); i++)
@@ -194,6 +192,8 @@ void CScriptEngine::print_stack(lua_State* L)
         }
         // -Giperion
     }
+
+    logReenterability = isNested;
 }
 
 void CScriptEngine::log_value(lua_State* L, pcstr name, int depth)
@@ -528,13 +528,14 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
         Msg("%sSCRIPT ERROR: %s\n", logHeader, caErrorText);
     }
 
+    // Error handlers call this with the error message on top of the stack.
+    const pcstr S = lua_gettop(L) > 0 && lua_isstring(L, -1) ? lua_tostring(L, -1) : nullptr;
+
     if (errorCode)
-        print_error(L, errorCode);
+        print_error(L, errorCode, S);
 
-    if (!lua_isstring(L, -1))
+    if (!S)
         return false;
-
-    const auto S = lua_tostring(L, -1);
 
     if (!xr_strcmp(S, "cannot resume dead coroutine"))
     {
@@ -563,33 +564,40 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
     return true;
 }
 
-void CScriptEngine::print_error(lua_State* L, int iErrorCode)
+void CScriptEngine::print_error(lua_State* L, int iErrorCode, pcstr message)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
 
+    pcstr header = nullptr;
+
     switch (iErrorCode)
     {
     case LUA_ERRRUN:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT RUNTIME ERROR");
+        header = "SCRIPT RUNTIME ERROR";
         break;
     case LUA_ERRMEM:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (memory allocation)");
+        header = "SCRIPT ERROR (memory allocation)";
         break;
     case LUA_ERRERR:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running the error handler function)");
+        header = "SCRIPT ERROR (while running the error handler function)";
         break;
     case LUA_ERRFILE:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running file)");
+        header = "SCRIPT ERROR (while running file)";
         break;
     case LUA_ERRSYNTAX:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT SYNTAX ERROR");
+        header = "SCRIPT SYNTAX ERROR";
         break;
     case LUA_YIELD:
         scriptEngine->script_log(LuaMessageType::Info, "Thread is yielded");
-        break;
+        return;
     default: NODEFAULT;
     }
+
+    if (message)
+        scriptEngine->script_log(LuaMessageType::Error, "%s: %s", header, message);
+    else
+        scriptEngine->script_log(LuaMessageType::Error, "%s", header);
 }
 
 void CScriptEngine::flush_log()
