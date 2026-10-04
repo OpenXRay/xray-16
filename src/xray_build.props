@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>
         DEBUG;
         MIXED;
-        TRACY_ENABLE;
+        TRACY_NO_ENABLE;
         TRACY_NO_FRAME_IMAGE;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
