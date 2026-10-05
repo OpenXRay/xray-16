@@ -19,7 +19,7 @@ RWTexture2D<float4> g_OutBaseColor;
 RWTexture2D<float4> g_OutColor;
 RWTexture2D<float2> g_OutMotion;
 RWTexture2D<float> g_OutVisDepth;
-RWTexture2D<float2> g_OutMaterial;
+RWTexture2D<float4> g_OutMaterial;
 
 cbuffer MaterialResolveParams
 {
@@ -200,7 +200,9 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_OutNormal[p] = float4(s.N, roughnessOut);
     g_OutBaseColor[p] = float4(s.albedo, s.metallic);
     g_OutColor[p] = float4(s.emissive, s.ao);
-    g_OutMaterial[p] = PackGBufferMaterial(s.shadingClass, s.transmission);
+    float3 geometricNormal = FaceToward(normalize(cross(wp1 - wp0, wp2 - wp0)), eye_position - InterpolateBary3(bd, wp0, wp1, wp2));
+    g_OutMaterial[p] = hud ? PackGBufferMaterial(s.shadingClass, s.transmission)
+        : PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

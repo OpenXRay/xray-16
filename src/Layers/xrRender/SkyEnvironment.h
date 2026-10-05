@@ -54,6 +54,7 @@ public:
     framegraph::VirtualResourceHandle irradiance;
     framegraph::VirtualResourceHandle specular;
     framegraph::VirtualResourceHandle dfg;
+    framegraph::VirtualResourceHandle probes;
     nvrhi::ITexture* texture = nullptr;
     u64 revision = 0;
     bool sourceReady = false;

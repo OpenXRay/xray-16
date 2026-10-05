@@ -71,6 +71,7 @@ public:
     framegraph::VirtualResourceHandle skyIrradiance;
     framegraph::VirtualResourceHandle skySpecular;
     framegraph::VirtualResourceHandle skyDFG;
+    framegraph::VirtualResourceHandle skyProbes;
     LocalShadowOutput localShadow;
     RenderDevice* device = nullptr;
     DeferredLightPassState* state = nullptr;

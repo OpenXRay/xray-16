@@ -28,6 +28,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "Layers/xrRender/FGDetailManager.h"
+#include "Layers/xrRender/RayTracing/SkyVisibilityGrid.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 #include "Layers/xrRender/Light_DB.h"
 #include "Layers/xrRender/ModelPool.h"
@@ -179,6 +180,8 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             }
 
             gpuCulling->BakeClusterDAG(ranges, cachePath, geomStamp);
+            if (m_skyVisibility)
+                m_skyVisibility->BeginLevel(g_pGameLevel->ObjectSpace.GetBoundingVolume(), geomStamp);
         }
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
@@ -373,6 +376,8 @@ void FrameGraphRenderer::level_Unload()
     }
     if (m_worldCache)
         m_worldCache->Invalidate();
+    if (m_skyVisibility)
+        m_skyVisibility->EndLevel();
     if (m_skyEnvironment)
         m_skyEnvironment->Invalidate();
     if (m_detailManager)

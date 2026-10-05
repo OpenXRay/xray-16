@@ -262,6 +262,7 @@ static nvrhi::rt::GeometryDesc RTTriangles(nvrhi::IBuffer* vertices,
 
 static constexpr u32 RT_MASK_WORLD = 0x01;
 static constexpr u32 RT_MASK_HUD = 0x02;
+static constexpr u32 RT_MASK_STATIC = 0x04;
 
 static nvrhi::rt::InstanceDesc RTInstance(nvrhi::rt::IAccelStruct* blas,
     u32 firstBatch, const RTBatchTransform& transform, bool opaque, u32 mask, bool cullDisable = false)
@@ -1007,7 +1008,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
             return;
         }
         geometry->instances.push_back(
-            RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), opaque, RT_MASK_WORLD));
+            RTInstance(shared.handle, firstBatch, RTBatchTransformOf(Fidentity), opaque, RT_MASK_WORLD | RT_MASK_STATIC));
         geometry->instanceBatches.push_back(-1);
         geometry->builds.push_back(std::move(shared));
     };
@@ -1048,7 +1049,7 @@ void RTAccelStructManager::PrepareStatic(GPUCullingManager* gpu)
                 buildIndex = found->second;
             const u32 batchIndex = u32(geometry->batches.size());
             geometry->instances.push_back(RTInstance(geometry->builds[buildIndex].handle,
-                batchIndex, RTBatchTransformOf(Fidentity), batchOpaque, RT_MASK_WORLD));
+                batchIndex, RTBatchTransformOf(Fidentity), batchOpaque, RT_MASK_WORLD | RT_MASK_STATIC));
             geometry->instanceBatches.push_back(s32(batchIndex));
             geometry->batches.push_back({ materials[i], startIndex, baseVertex, indexCount });
             geometry->batchSources.push_back({ arrayIndex, i });

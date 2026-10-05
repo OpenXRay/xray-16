@@ -46,6 +46,7 @@ namespace xray::render::fg {
     class RTAccelStructManager;
     class WorldRadianceCache;
     class SkyEnvironment;
+    class SkyVisibilityGrid;
     class light;
     namespace PS {
         class CParticleEffect;
@@ -453,6 +454,7 @@ private:
     xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
     xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
     xr_unique_ptr<fg::SkyEnvironment> m_skyEnvironment;
+    xr_unique_ptr<fg::SkyVisibilityGrid> m_skyVisibility;
     bool m_skyLightingReady = false;
     fg::LightingFrameState m_lightingState;
     fg::PostProcessEffects m_postProcess;
@@ -510,6 +512,7 @@ private:
 
     void SetupFrameGraphPasses();
     void PrepareLightingMode(u32 width, u32 height);
+    bool RasterRayTracingFeaturesEnabled() const;
 
     void CollectVisibleGeometry();
 

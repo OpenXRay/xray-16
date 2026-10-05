@@ -31,6 +31,7 @@ static const float RT_RAY_DISTANCE = 10000.0;
 static const float RT_RAY_ORIGIN_OFFSET = 0.005;
 #define RT_RAY_MASK_WORLD 0x01u
 #define RT_RAY_MASK_HUD 0x02u
+#define RT_RAY_MASK_STATIC 0x04u
 
 struct RTSceneParams
 {
