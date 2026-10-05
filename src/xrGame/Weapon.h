@@ -50,7 +50,7 @@ public:
     virtual void shedule_Update(u32 dt);
 
     void renderable_Render(u32 context_id, IRenderable* root) override;
-    void render_hud_mode() override;
+    void PostUpdateCL(bool bUpdateCL_disabled) override;
     bool need_renderable() override;
 
     virtual void render_item_ui();
@@ -304,6 +304,7 @@ public:
     }
 
     virtual const Fvector& get_CurrentFirePoint() { return get_LastFP(); }
+    virtual const Fvector& get_CurrentFireDirection() { return get_LastFD(); }
     virtual const Fvector& get_CurrentFirePoint2() { return get_LastFP2(); }
     virtual const Fmatrix& get_ParticlesXFORM()
     {

@@ -66,8 +66,8 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
         {
             uint i = g_VisibleLightIndices[iter];
             GPULightData ld = g_Lights[i];
-            float3 lightPos = ld.positionAndInvRangeSq.xyz;
-            float range = ld.colorAndRange.w;
+            float3 lightPos = LightInfluenceCenter(ld);
+            float range = LightInfluenceRadius(ld);
 
             float4 clipPos = mul(m_VP, float4(lightPos, 1.0));
             float lightDepth = clipPos.w;

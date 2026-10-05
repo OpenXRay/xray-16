@@ -5,7 +5,7 @@
 
 cbuffer LocalShadowHudParams : register(b5)
 {
-    uint4 g_HudSlots[4];
+    uint4 g_HudSlots[16];
     uint g_HudEntryCount;
     uint g_HudViewCount;
     uint2 g_HudPad;

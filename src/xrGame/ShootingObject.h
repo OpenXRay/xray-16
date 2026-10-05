@@ -20,7 +20,6 @@ extern const Fvector zero_vel;
 
 class CShootingObject : public IAnticheatDumpable
 {
-    Lock render_lock{};
 protected:
     CShootingObject();
     virtual ~CShootingObject();
@@ -104,30 +103,36 @@ public:
     SilencerKoeffs cur_silencer_koef;
 
 protected:
-    Fcolor light_base_color;
-    float light_base_range;
-    Fcolor light_build_color;
-    float light_build_range;
+    Fcolor light_base_color{};
+    float light_base_range{};
+    Fcolor light_build_color{};
+    float light_build_range{};
     ref_light light_render;
-    float light_var_color;
-    float light_var_range;
-    float light_lifetime;
-    u32 light_frame;
-    float light_time;
+    float light_offset{ 0.03f };
+    float light_length{ 0.12f };
+    float light_radius{ 0.04f };
+    float light_var_color{};
+    float light_var_range{};
+    float light_lifetime{};
+    u32 light_frame{ u32(-1) };
+    u32 light_update_frame{ u32(-1) };
+    float light_time{ -1.f };
     //включение подсветки во время выстрела
-    bool m_bLightShotEnabled;
+    bool m_bLightShotEnabled{};
 
 protected:
     void Light_Create();
     void Light_Destroy();
+    void Light_Reset();
 
     void Light_Start();
-    void Light_Render(const Fvector& P);
+    void Light_Publish(const Fvector& P, const Fvector& D);
+
+    IC bool IsLightLive() const { return light_render && light_time > 0.f; }
 
     virtual void LoadLights(LPCSTR section, LPCSTR prefix);
-    virtual void RenderLight();
-    virtual void UpdateLight();
-    virtual void StopLight();
+    void UpdateLight();
+    void StopLight();
     virtual bool IsHudModeNow() = 0;
     //////////////////////////////////////////////////////////////////////////
     // партикловая система
@@ -135,6 +140,7 @@ protected:
 protected:
     //функции родительского объекта
     virtual const Fvector& get_CurrentFirePoint() = 0;
+    virtual const Fvector& get_CurrentFireDirection() = 0;
     virtual const Fmatrix& get_ParticlesXFORM() = 0;
     virtual void ForceUpdateFireParticles(){};
 

@@ -51,6 +51,7 @@ public:
         SPOT = 2,
         OMNIPART = 3,
         REFLECTED = 4,
+        AREA = 5,
     };
 
 public:
@@ -68,6 +69,7 @@ public:
     virtual void set_cone(float angle) = 0;
     virtual void set_range(float R) = 0;
     virtual void set_virtual_size(float R) = 0;
+    virtual void set_area(float length, float radius) = 0;
     virtual void set_texture(pcstr name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;

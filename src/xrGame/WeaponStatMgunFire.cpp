@@ -9,6 +9,7 @@
 #include "Weapon.h"
 
 const Fvector& CWeaponStatMgun::get_CurrentFirePoint() { return m_fire_pos; }
+const Fvector& CWeaponStatMgun::get_CurrentFireDirection() { return m_fire_dir; }
 const Fmatrix& CWeaponStatMgun::get_ParticlesXFORM() { return m_fire_bone_xform; }
 void CWeaponStatMgun::FireStart()
 {
@@ -32,7 +33,6 @@ void CWeaponStatMgun::UpdateFire()
     fShotTimeCounter -= Device.fTimeDelta;
 
     inheritedShooting::UpdateFlameParticles();
-    inheritedShooting::UpdateLight();
 
     if (m_overheat_enabled)
     {
@@ -112,8 +112,7 @@ void CWeaponStatMgun::OnShot()
 
     StartShotParticles();
 
-    if (m_bLightShotEnabled)
-        Light_Start();
+    Light_Start();
 
     StartFlameParticles();
     StartSmokeParticles(m_fire_pos, zero_vel);

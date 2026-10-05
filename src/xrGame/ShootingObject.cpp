@@ -27,8 +27,12 @@ CShootingObject::CShootingObject()
 
     reinit();
 }
-CShootingObject::~CShootingObject(void) {}
-void CShootingObject::reinit() { m_pFlameParticles = NULL; }
+CShootingObject::~CShootingObject(void) { Light_Destroy(); }
+void CShootingObject::reinit()
+{
+    m_pFlameParticles = NULL;
+    Light_Reset();
+}
 void CShootingObject::Load(LPCSTR section)
 {
     if (pSettings->line_exist(section, "light_disabled"))
@@ -65,15 +69,28 @@ void CShootingObject::Load(LPCSTR section)
 
 void CShootingObject::Light_Create()
 {
-    // lights
+    Light_Destroy();
+
     light_render = GEnv.Render->light_create();
+    light_render->set_type(IRender_Light::AREA);
     if (GEnv.Render->GenerationIsR2OrHigher())
         light_render->set_shadow(true);
     else
         light_render->set_shadow(false);
 }
 
-void CShootingObject::Light_Destroy() { light_render.destroy(); }
+void CShootingObject::Light_Reset()
+{
+    light_frame = u32(-1);
+    light_update_frame = u32(-1);
+    StopLight();
+}
+
+void CShootingObject::Light_Destroy()
+{
+    Light_Reset();
+    light_render.destroy();
+}
 void CShootingObject::LoadFireParams(LPCSTR section)
 {
     string32 buffer;
@@ -141,24 +158,31 @@ void CShootingObject::LoadFireParams(LPCSTR section)
 
 void CShootingObject::LoadLights(LPCSTR section, LPCSTR prefix)
 {
+    Light_Reset();
+
+    if (!m_bLightShotEnabled)
+        return;
+
     string256 full_name;
-    // light
-    if (m_bLightShotEnabled)
-    {
-        Fvector clr = pSettings->r_fvector3(section, strconcat(sizeof(full_name), full_name, prefix, "light_color"));
-        light_base_color.set(clr.x, clr.y, clr.z, 1);
-        light_base_range = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_range"));
-        light_var_color =
-            pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_var_color"));
-        light_var_range =
-            pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_var_range"));
-        light_lifetime = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_time"));
-        light_time = -1.f;
-    }
+    Fvector clr = pSettings->r_fvector3(section, strconcat(sizeof(full_name), full_name, prefix, "light_color"));
+    light_base_color.set(clr.x, clr.y, clr.z, 1);
+    light_base_range = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_range"));
+    light_var_color = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_var_color"));
+    light_var_range = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_var_range"));
+    light_lifetime = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "light_time"));
+    light_offset = pSettings->read_if_exists<float>(
+        section, strconcat(sizeof(full_name), full_name, prefix, "light_offset"), 0.03f);
+    light_length = pSettings->read_if_exists<float>(
+        section, strconcat(sizeof(full_name), full_name, prefix, "light_length"), 0.12f);
+    light_radius = pSettings->read_if_exists<float>(
+        section, strconcat(sizeof(full_name), full_name, prefix, "light_radius"), 0.04f);
 }
 
 void CShootingObject::Light_Start()
 {
+    if (!m_bLightShotEnabled)
+        return;
+
     if (!light_render)
         Light_Create();
 
@@ -173,13 +197,24 @@ void CShootingObject::Light_Start()
     }
 }
 
-void CShootingObject::Light_Render(const Fvector& P)
+void CShootingObject::Light_Publish(const Fvector& P, const Fvector& D)
 {
-    ScopeLock lock{ &render_lock };
     float light_scale = light_time / light_lifetime;
     R_ASSERT(light_render);
 
-    light_render->set_position(P);
+    Fvector dir;
+    const float dirMagnitude = D.magnitude();
+    if (_valid(dirMagnitude) && dirMagnitude > EPS_S)
+        dir.div(D, dirMagnitude);
+    else
+        dir.set(0.f, 0.f, 1.f);
+
+    Fvector lightPos;
+    lightPos.mad(P, dir, light_offset);
+
+    light_render->set_area(light_length, light_radius);
+    light_render->set_rotation(dir, Fvector().set(0.f, 1.f, 0.f));
+    light_render->set_position(lightPos);
     light_render->set_color(
         light_build_color.r * light_scale, light_build_color.g * light_scale, light_build_color.b * light_scale);
     light_render->set_range(light_build_range * light_scale);
@@ -389,27 +424,31 @@ void CShootingObject::UpdateFlameParticles()
 //подсветка от выстрела
 void CShootingObject::UpdateLight()
 {
-    if (light_render && light_time > 0)
+    if (!IsLightLive())
+        return;
+
+    if (light_update_frame != Device.dwFrame)
     {
-        light_time -= Device.fTimeDelta;
-        if (light_time <= 0)
-            StopLight();
+        light_update_frame = Device.dwFrame;
+        if (light_frame != Device.dwFrame)
+            light_time -= Device.fTimeDelta;
     }
+
+    if (light_time <= 0.f)
+    {
+        StopLight();
+        return;
+    }
+
+    Light_Publish(get_CurrentFirePoint(), get_CurrentFireDirection());
 }
 
 void CShootingObject::StopLight()
 {
+    light_time = -1.f;
     if (light_render)
     {
         light_render->set_active(false);
-    }
-}
-
-void CShootingObject::RenderLight()
-{
-    if (light_render && light_time > 0)
-    {
-        Light_Render(get_CurrentFirePoint());
     }
 }
 

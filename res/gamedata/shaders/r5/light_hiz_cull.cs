@@ -27,11 +27,11 @@ void main(uint3 dtid : SV_DispatchThreadID)
         return;
 
     GPULightData ld = g_Lights[lightIdx];
-    float3 lightPos = ld.positionAndInvRangeSq.xyz;
-    float range = ld.colorAndRange.w;
+    float3 lightPos = LightInfluenceCenter(ld);
+    float range = LightInfluenceRadius(ld);
 
     float3 toLight = lightPos - cb_cameraPos.xyz;
-    if (ld.spotParamsAndType.w == 0.0 || dot(toLight, toLight) <= range * range)
+    if (!LightHasShadow(ld) || dot(toLight, toLight) <= range * range)
     {
         uint idx;
         g_VisibleLightCount.InterlockedAdd(0, 1, idx);

@@ -2706,7 +2706,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         auto* L = static_cast<light*>(spatial->dcast_Light());
         if (!L || !L->flags.bActive || L->spatial.collect_stamp == collectStamp)
             return;
-        if (L->flags.type != IRender_Light::POINT && L->flags.type != IRender_Light::SPOT)
+        if (L->flags.type != IRender_Light::POINT && L->flags.type != IRender_Light::SPOT && L->flags.type != IRender_Light::AREA)
             return;
         if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
             return;
@@ -2784,7 +2784,13 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         for (const light* L : collectedLights) {
             if (!L->flags.bShadow)
                 continue;
-            g_pGamePersistent->SpatialSpace.q_sphere(localCasters, 0, STYPE_RENDERABLE, L->position, L->range);
+            Fvector casterCenter = L->position;
+            float casterRadius = L->range;
+            if (L->flags.type == IRender_Light::AREA) {
+                casterCenter.mad(L->position, L->direction, L->area_length * 0.5f);
+                casterRadius += L->area_length * 0.5f + L->area_radius;
+            }
+            g_pGamePersistent->SpatialSpace.q_sphere(localCasters, 0, STYPE_RENDERABLE, casterCenter, casterRadius);
             for (ISpatial* spatial : localCasters)
                 if (submitCaster(spatial))
                     ++m_localShadowCasters;
