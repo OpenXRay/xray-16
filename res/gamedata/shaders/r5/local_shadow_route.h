@@ -24,4 +24,10 @@ LocalRoute LocalRouteTile(uint slot, float3 worldPos)
     return LocalRouteRect(t.viewProj, t.rect.xyz, LOCAL_SHADOW_ATLAS, worldPos);
 }
 
+LocalRoute LocalRouteHud(uint slot, float3 worldPos)
+{
+    LocalShadowView t = g_LocalShadowTiles[slot];
+    return LocalRouteRect(t.hudViewProj, t.hud.yzw, LOCAL_SHADOW_HUD_ATLAS, worldPos);
+}
+
 #endif
