@@ -1416,6 +1416,7 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.receiverTiles = nullptr;
     state.staticAtlas = state.dynAtlas = state.hudAtlas = nullptr;
     state.hudViews = 0;
+    std::fill_n(state.hudOwners, kLocalHudViewsMax, nullptr);
     std::fill_n(state.owners, kLocalTileCount, nullptr);
     std::fill_n(state.nodeOfSlot, kLocalTileCount, u16(0));
     state.atlas.Reset();
@@ -1803,24 +1804,65 @@ static bool ViewTouchesSphere(const LocalShadowViewGPU& rec, const Fvector4& sph
     return true;
 }
 
-static bool AllocHudRect(LocalShadowState& state, u32 pageSlot, Fvector4& outRect)
+static bool AllocHudRect(LocalShadowState& state, const light* owner, u32 face, u32 pageSlot, Fvector4& outRect)
 {
-    if (state.hudViews >= kLocalHudViewsMax)
+    u32 tile = kLocalHudViewsMax;
+    for (u32 i = 0; i < kLocalHudViewsMax; ++i) {
+        if (state.hudOwners[i] == owner && state.hudFaces[i] == face) {
+            tile = i;
+            break;
+        }
+        if (!state.hudOwners[i] && tile == kLocalHudViewsMax)
+            tile = i;
+    }
+    if (tile == kLocalHudViewsMax || state.hudViews >= kLocalHudViewsMax)
         return false;
-    const u32 node = state.hudAlloc.Alloc(LocalAtlasAllocator::LevelOf(kLocalHudTileSize));
-    if (node == ~0u)
-        return false;
-    u32 x = 0, y = 0, size = 1;
-    state.hudAlloc.Rect(node, x, y, size);
-    outRect.set(0.0f, float(x), float(y), float(size));
+    state.hudOwners[tile] = owner;
+    state.hudFaces[tile] = face;
+    constexpr u32 columns = kLocalShadowAtlas / kLocalHudTileSize;
+    static_assert(kLocalHudViewsMax <= columns * columns);
+    outRect.set(0.0f, float((tile % columns) * kLocalHudTileSize),
+        float((tile / columns) * kLocalHudTileSize), float(kLocalHudTileSize));
     state.hudSlots[state.hudViews++] = pageSlot;
     return true;
+}
+
+static bool UseHudCube(const LocalShadowState& state, const light* owner,
+    const LocalShadowViewGPU& rec, const Fvector4& sphere)
+{
+    if (rec.meta[2] == 0u)
+        return false;
+    bool wasCube = false;
+    for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
+        if (state.hudOwners[tile] == owner && state.hudFaces[tile] != 0u)
+            wasCube = true;
+    const float dx = sphere.x - rec.lightPos.x;
+    const float dy = sphere.y - rec.lightPos.y;
+    const float dz = sphere.z - rec.lightPos.z;
+    const float threshold = (wasCube ? 3.0f : 2.0f) * sphere.w + 0.01f;
+    return dx * dx + dy * dy + dz * dz <= threshold * threshold;
 }
 
 static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* hudSphere)
 {
     state.hudViews = 0;
-    state.hudAlloc.Reset();
+    bool retained[kLocalHudViewsMax] = {};
+    for (u32 page = 0; hudSphere && page < state.activePages; ++page) {
+        const LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
+        for (u32 cand = 0; cand < current.candCount; ++cand) {
+            const u32 slot = current.candList[cand][0];
+            const LocalShadowViewGPU& rec = current.request[slot];
+            if (rec.meta[3] != 0u || !ViewTouchesSphere(rec, *hudSphere, rec.meta[2] == 0u))
+                continue;
+            const u32 faces = UseHudCube(state, current.owners[slot], rec, *hudSphere) ? 6u : 1u;
+            for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
+                if (state.hudOwners[tile] == current.owners[slot] && state.hudFaces[tile] < faces)
+                    retained[tile] = true;
+        }
+    }
+    for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
+        if (!retained[tile])
+            state.hudOwners[tile] = nullptr;
     for (u32 page = 0; page < state.activePages; ++page) {
         LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
         for (u32 cand = 0; cand < current.candCount; ++cand) {
@@ -1835,6 +1877,14 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* h
             if (!hudSphere || !ViewTouchesSphere(rec, *hudSphere, !point))
                 continue;
             const light* L = current.owners[slot];
+            const bool cube = UseHudCube(state, L, rec, *hudSphere);
+            const u32 hudFaces = cube ? 6u : 1u;
+            u32 available = 0;
+            for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
+                if (!state.hudOwners[tile] || state.hudOwners[tile] == L)
+                    ++available;
+            if (available < hudFaces)
+                continue;
             const float flags = 1.0f;
             Fvector center;
             center.set(hudSphere->x, hudSphere->y, hudSphere->z);
@@ -1844,9 +1894,9 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* h
             toCenter.sub(center, lightPos);
             const float dist = toCenter.magnitude();
             const float r = hudSphere->w;
-            if (dist > r + 0.01f) {
+            if (!cube && dist > r + 0.01f) {
                 Fvector4 rect;
-                if (!AllocHudRect(state, page * kLocalTileCount + slot, rect))
+                if (!AllocHudRect(state, L, 0, page * kLocalTileCount + slot, rect))
                     continue;
                 rect.x = flags;
                 Fvector dir;
@@ -1870,7 +1920,7 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* h
                 for (u32 f = 0; f < faces; ++f) {
                     LocalShadowViewGPU& face = current.request[slot + f];
                     Fvector4 rect;
-                    if (!AllocHudRect(state, page * kLocalTileCount + slot + f, rect))
+                    if (!AllocHudRect(state, L, f, page * kLocalTileCount + slot + f, rect))
                         break;
                     rect.x = flags;
                     Fvector dir, up, right;

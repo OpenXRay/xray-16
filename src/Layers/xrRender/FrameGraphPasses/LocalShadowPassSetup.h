@@ -150,7 +150,8 @@ struct LocalShadowState {
     bool staticAtlasFirst = true;
     bool dynAtlasFirst = true;
     nvrhi::TextureHandle hudAtlas;
-    LocalAtlasAllocator hudAlloc;
+    const light* hudOwners[kLocalHudViewsMax] = {};
+    u32 hudFaces[kLocalHudViewsMax] = {};
     u32 hudViews = 0;
     u32 hudSlots[kLocalHudViewsMax] = {};
     nvrhi::GraphicsPipelineHandle hudPagePipeline;
