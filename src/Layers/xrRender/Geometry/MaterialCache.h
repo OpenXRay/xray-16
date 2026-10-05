@@ -342,6 +342,8 @@ public:
 
     u32 PreRegisterTerrainMaterial(dxRender_Visual* visual);
 
+    u32 AcquireLightmapTexture(const shared_str& name);
+
     void FinalizePendingTerrainMaterials();
 
     void FinalizePendingMaterials();

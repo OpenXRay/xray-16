@@ -23,6 +23,7 @@ struct PS_INPUT
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
     float fade : TEXCOORD6;
+    float skyVisibility : TEXCOORD7;
 };
 
 struct PS_OUTPUT
@@ -93,7 +94,7 @@ PS_OUTPUT main(PS_INPUT input)
     float ao = surface.ao;
 
     bool forwardOnly = (mat.flags & MAT_FLAG_ALPHA_BLEND) != 0;
-    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, -1.0, forwardOnly);
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, -1.0, forwardOnly, input.skyVisibility);
     output.color = float4(fwd.color.rgb + surface.emissive, forwardOnly ? diffuseSample.a : fwd.color.a);
     output.normal = fwd.normal;
     output.baseColor = fwd.baseColor;

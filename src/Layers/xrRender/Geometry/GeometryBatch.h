@@ -70,6 +70,9 @@ struct GeometryBatch {
     // Terrain uses bindless_terrain.ps with 4-layer detail blending
     bool isTerrain = false;
     u32 terrainMaterialID = UINT32_MAX;  // Index into g_TerrainMaterials for terrain rendering
+    float hemiScale = 0.0f;
+    float hemiBias = 1.0f;
+    u32 lightmapTexture = UINT32_MAX;
 
     // SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
     // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera

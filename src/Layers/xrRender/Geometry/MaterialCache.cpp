@@ -261,6 +261,11 @@ u32 MaterialCache::AcquireAlbedoTexture(const char* name)
     return AcquireMaterialTexture("ed" DELIMITER "ed_not_existing_texture", fg::TextureColorSpace::Srgb);
 }
 
+u32 MaterialCache::AcquireLightmapTexture(const shared_str& name)
+{
+    return AcquireMaterialTexture(name.c_str(), fg::TextureColorSpace::Linear);
+}
+
 void MaterialCache::ReleaseMaterialTextures()
 {
     if (m_textureBackend && !m_bindlessTextureIndices.empty())

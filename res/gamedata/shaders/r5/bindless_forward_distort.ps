@@ -12,6 +12,7 @@ struct PS_INPUT
     float3 bitangent : TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
     float fade : TEXCOORD6;
+    float skyVisibility : TEXCOORD7;
 };
 
 float4 main(PS_INPUT input) : SV_Target0

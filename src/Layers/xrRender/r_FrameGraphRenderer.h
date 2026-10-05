@@ -84,6 +84,7 @@ class MaterialCache;
 struct CompiledLevelShader {
     shared_str shaderName;
     shared_str textureName;
+    shared_str lightmapName;
     MaterialSystem::MaterialInfo materialInfo;
 };
 
@@ -161,7 +162,7 @@ private:
     void WarmGameplayPipelines();
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
-    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
+    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName, const char* lightmapName);
     u32 GetVertexStride(u32 vertexFormatID);
 
     class DeveloperMaterialRecord

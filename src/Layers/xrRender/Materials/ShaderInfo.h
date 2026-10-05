@@ -45,7 +45,7 @@ struct MaterialPSO;
 
 namespace xray::render::shader_info
 {
-bool GetCompiledShaderNames(int shaderID, shared_str& outShaderName, shared_str& outTextureName);
+bool GetCompiledShaderNames(int shaderID, shared_str& outShaderName, shared_str& outTextureName, shared_str& outLightmapName);
 }
 
 namespace xray::render::fg

@@ -321,6 +321,7 @@ int   ps_r_sky_probe_budget    = 16384;
 int   ps_r_sky_probe_max       = 8388608;
 float ps_r_sky_probe_ray_distance = 1000.0f;
 float ps_r_sky_probe_backface  = 0.25f;
+int   ps_r_sky_static_probes   = 0;
 float ps_r_vsm_base            = 24.0f;
 int   ps_r_vsm_mark_half       = 1;
 float ps_r_vsm_bias            = 0.0003f;
@@ -1106,6 +1107,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r_sky_probe_max", &ps_r_sky_probe_max, 65536, 33554432);
     CMD4(CCC_Float, "r_sky_probe_ray_distance", &ps_r_sky_probe_ray_distance, 10.0f, 10000.0f);
     CMD4(CCC_Float, "r_sky_probe_backface", &ps_r_sky_probe_backface, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_sky_static_probes", &ps_r_sky_static_probes, 0, 1);
     CMD1(CCC_SkyProbeRebake, "r_sky_probe_rebake");
     CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
     CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);

@@ -577,7 +577,7 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device, FRAME_GLOBALS_CB_VERSIONS);
     auto staticGlobalsData = passes::BuildStaticGlobals();
     staticGlobalsData.sky_ibl.set(ps_r_sky_ibl != 0 && m_skyLightingReady ? 1.0f : 0.0f,
-        float(fg::SkyEnvironment::kSpecularLevels - 1), 0.0f, 0.0f);
+        float(fg::SkyEnvironment::kSpecularLevels - 1), ps_r_sky_static_probes != 0 ? 1.0f : 0.0f, 0.0f);
     if (m_skyVisibility && m_skyVisibility->GetBuffer())
     {
         const auto& layout = m_skyVisibility->GetLayout();
@@ -2330,6 +2330,13 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isShadowOnly = m_collectShadowOnly;
     batch.isStatic = isStatic;
+    if (isStatic && !batch.isSkinned) {
+        const bool tree = visualType == MT_TREE_ST || visualType == MT_TREE_PM;
+        batch.hemiScale = tree ? static_cast<FTreeVisual*>(visual)->GetHemiScale() : 1.0f;
+        batch.hemiBias = tree ? static_cast<FTreeVisual*>(visual)->GetHemiBias() : 0.0f;
+        if (!tree && m_materialCache && visual->lightmapName.size())
+            batch.lightmapTexture = m_materialCache->AcquireLightmapTexture(visual->lightmapName);
+    }
     if (batch.isSkinned) {
         if (visualType == MT_SKELETON_GEOMDEF_ST) {
             batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;

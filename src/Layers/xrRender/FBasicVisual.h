@@ -77,6 +77,7 @@ public:
     // FrameGraph: deferred shader compilation (store names, compile on-demand)
     shared_str shaderName;   // e.g., "models\\model"
     shared_str textureName;  // e.g., "wood\\wood1"
+    shared_str lightmapName;
 
     // DX12: Index into CRender::CompiledLevelShaders for precompiled PSO lookup
     u32 shader_id{UINT32_MAX};

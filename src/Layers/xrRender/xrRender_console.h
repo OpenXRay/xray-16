@@ -269,6 +269,7 @@ extern ECORE_API int   ps_r_sky_probe_budget;
 extern ECORE_API int   ps_r_sky_probe_max;
 extern ECORE_API float ps_r_sky_probe_ray_distance;
 extern ECORE_API float ps_r_sky_probe_backface;
+extern ECORE_API int   ps_r_sky_static_probes;
 extern ECORE_API float ps_r_vsm_base;
 extern ECORE_API int   ps_r_vsm_mark_half;
 extern ECORE_API float ps_r_vsm_bias;
