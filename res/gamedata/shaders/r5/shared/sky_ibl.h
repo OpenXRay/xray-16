@@ -3,10 +3,19 @@
 
 #include "shared/sky_visibility.h"
 
+#ifdef SKY_PROBE_DIAGNOSTICS
+#include "shared/sky_visibility_debug_data.h"
+#endif
+
 StructuredBuffer<float4> g_SkyIrradiance : register(t46);
 TextureCube<float4> g_SkySpecular : register(t47);
 Texture2D<float4> g_SkyDFG : register(t48);
 StructuredBuffer<SkyProbeRecord> g_SkyProbes : register(t49);
+
+#define SKY_PROBE_RAY_MASK_STATIC 0x04u
+#ifdef SKY_PROBE_RAY_QUERY
+RaytracingAccelerationStructure g_SkyProbeTLAS : register(t50);
+#endif
 
 struct SkyProbeVisibility
 {
@@ -44,6 +53,13 @@ struct SkyProbeCorner
     float3 c1;
     float3 position;
     bool valid;
+#ifdef SKY_PROBE_DIAGNOSTICS
+    float trilinearWeight;
+    float facingWeight;
+    float preCubicWeight;
+    uint sampleState;
+    float4 moment;
+#endif
 };
 
 float3 SkyProbeViewOffset(float3 worldPos, float3 V)
@@ -54,6 +70,11 @@ float3 SkyProbeViewOffset(float3 worldPos, float3 V)
 float3 SkyProbeBiasedPosition(float3 worldPos, float3 N, float3 V)
 {
     return worldPos + N * (0.06 * sky_probe_origin.w) + SkyProbeViewOffset(worldPos, V);
+}
+
+float3 SkyProbeRayOrigin(float3 worldPos, float3 N, float3 V)
+{
+    return worldPos + N * max(0.05, 0.004 * length(eye_position - worldPos)) + SkyProbeViewOffset(worldPos, V);
 }
 
 SkyProbeCorner SkyProbeEvaluateCorner(float3 worldPos, float3 N, float3 biased, uint corner)
@@ -69,17 +90,33 @@ SkyProbeCorner SkyProbeEvaluateCorner(float3 worldPos, float3 N, float3 biased, 
     float3 trilinear = lerp(1.0 - f, f, float3(offset));
     result.index = uint(cell.x) + uint(dims.x) * (uint(cell.y) + uint(dims.y) * uint(cell.z));
     float trilinearWeight = trilinear.x * trilinear.y * trilinear.z;
+#ifdef SKY_PROBE_DIAGNOSTICS
+    result.trilinearWeight = trilinearWeight;
+    result.sampleState = 1u;
+#endif
     if (trilinearWeight <= 0.0)
         return result;
     SkyProbeRecord record = g_SkyProbes[result.index];
     SkyVisibilityUnpack(record.visibility.xy, result.c0, result.c1);
+#ifdef SKY_PROBE_DIAGNOSTICS
+    result.sampleState = SkyVisibilityBaked(result.c0) ? 3u : 2u;
+#endif
     if (!SkyVisibilityValid(result.c0))
         return result;
     result.position = sky_probe_origin.xyz + float3(cell) * spacing + SkyProbeUnpackOffset(record.visibility.z, spacing);
     float3 toProbe = result.position - worldPos;
     float facing = dot(toProbe, N) / max(length(toProbe), 1e-4) * 0.5 + 0.5;
+#ifdef SKY_PROBE_DIAGNOSTICS
+    result.facingWeight = facing * facing + 0.05;
+    result.visibility = SkyProbeChebyshevDetailed(record, result.position, biased, spacing, result.moment);
+#else
     result.visibility = SkyProbeChebyshev(record, result.position, biased, spacing);
+#endif
     float weight = max((facing * facing + 0.05) * max(result.visibility, SKY_PROBE_VISIBILITY_FLOOR), 1e-6);
+#ifdef SKY_PROBE_DIAGNOSTICS
+    result.preCubicWeight = weight;
+    result.sampleState = 4u;
+#endif
     if (weight < 0.2)
         weight *= weight * weight * 25.0;
     result.weight = weight * trilinearWeight;

@@ -511,6 +511,8 @@ void FrameGraphRenderer::Render() {
                     passes::ShutdownRTEnvironmentSampling();
                     passes::ShutdownWorldCache();
                     passes::ShutdownSkyVisibility();
+                    if (m_skyVisibility)
+                        m_skyVisibility->ResetDebugSnapshots();
                     if (m_skyEnvironment)
                         m_skyEnvironment->InvalidatePipelines();
                     m_lightingState.ResetRecovery();
@@ -652,6 +654,8 @@ void FrameGraphRenderer::Render() {
 
 void FrameGraphRenderer::RenderStatsOverlay()
 {
+    if (m_skyVisibility)
+        m_skyVisibility->DrawDebugInspector();
     if (m_statsOverlay && (psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0))
     {
         xray::profiler::RenderStats stats;
@@ -1145,7 +1149,10 @@ bool FrameGraphRenderer::RasterRayTracingFeaturesEnabled() const
     if (!m_skyVisibility || !m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend ||
         !GEnv.Backend->SupportsSubmissionLeases())
         return false;
-    return m_skyVisibility->NeedsScene();
+    if (m_skyVisibility->NeedsScene())
+        return true;
+    return ps_r_sky_probe_debug == 3 &&
+        m_skyVisibility->GetState() != fg::SkyVisibilityState::Empty;
 }
 
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
@@ -1889,6 +1896,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
             skyFrame, m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
     }
+    passes::SkyVisibilityInspection skyInspection;
+    if (m_skyVisibility)
+    {
+        skyInspection = passes::setupSkyVisibilityInspectPass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility,
+            skyFrame.probes, opaqueOutputs.depth, opaqueOutputs.normal, opaqueOutputs.material, litOutputs.albedo,
+            m_lightingState.scheduled == fg::LightingMode::Raster ?
+                &m_blackboard->get_or_add<passes::DeferredLightPassState>() : nullptr, &m_lightingState);
+    }
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
     {
         m_gpuCullingManager->SetupDebugVisualizationPass(*m_framegraph, m_hizPyramid, litOutputs.albedo, depthBuffer, hizOutput.width, hizOutput.height,
@@ -2036,6 +2051,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         resourceManager ? resourceManager->GetTextureManager() : nullptr, Device.fTimeDelta);
 
     auto interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
+    if (m_skyVisibility)
+        interfaceLayer = passes::setupSkyVisibilityDebugPass(*m_framegraph, m_device, *m_skyVisibility, skyFrame.probes,
+            interfaceLayer, transparentOutputs.depth, skyInspection, width, height);
     interfaceLayer = passes::setupUIPass(*m_framegraph, interfaceLayer, width, height);
     interfaceLayer = passes::setupFontPass(*m_framegraph, interfaceLayer);
     interfaceLayer = passes::setupCursorPass(*m_framegraph, interfaceLayer, width, height);

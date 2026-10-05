@@ -1,0 +1,159 @@
+#define SM_6_0
+#include "common.h"
+#include "shared/sky_visibility_debug_data.h"
+
+Texture2D<float> g_Depth : register(t0);
+StructuredBuffer<uint4> g_SkyProbeInspection : register(t51);
+
+cbuffer SkyVisibilityDebugParams : register(b5)
+{
+    float4 g_SkyGridOrigin;
+    uint4 g_SkyGridDims;
+    float g_SkyDebugRadius, g_SkyDebugRange, g_SkyDebugPad0, g_SkyDebugPad1;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+bool SkyInspectProject(float3 position, out float2 pixel)
+{
+    float4 clip = mul(m_VP, float4(position, 1.0));
+    pixel = 0.0;
+    if (clip.w <= 1e-5)
+        return false;
+    float2 ndc = clip.xy / clip.w;
+    pixel = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5) * screen_res.xy;
+    return true;
+}
+
+bool SkyInspectLine(float2 pixel, float3 start, float3 end, bool dashed)
+{
+    float2 a;
+    float2 b;
+    if (!SkyInspectProject(start, a) || !SkyInspectProject(end, b))
+        return false;
+    float2 delta = b - a;
+    float lengthSquared = dot(delta, delta);
+    if (lengthSquared < 1.0)
+        return false;
+    float t = saturate(dot(pixel - a, delta) / lengthSquared);
+    if (length(pixel - (a + delta * t)) > 0.8)
+        return false;
+    return !dashed || frac(t * sqrt(lengthSquared) / 10.0) < 0.45;
+}
+
+uint SkyInspectCornerRow(uint corner)
+{
+    return SKY_PROBE_DEBUG_HEADER_ROWS + corner * SKY_PROBE_DEBUG_CORNER_ROWS;
+}
+
+float3 SkyInspectCornerPosition(uint corner)
+{
+    return asfloat(g_SkyProbeInspection[SkyInspectCornerRow(corner) + SKY_PROBE_DEBUG_ROW_POSITION]).xyz;
+}
+
+float3 SkyInspectCornerColor(uint corner)
+{
+    uint row = SkyInspectCornerRow(corner);
+    uint state = g_SkyProbeInspection[row].y;
+    if (state == 1u)
+        return float3(0.35, 0.35, 0.35);
+    if (state == 2u)
+        return float3(0.1, 0.25, 0.9);
+    if (state != 4u)
+        return float3(0.9, 0.1, 0.1);
+    if (asfloat(g_SkyProbeInspection[row + SKY_PROBE_DEBUG_ROW_WEIGHTS]).z < SKY_PROBE_VISIBILITY_FLOOR)
+        return float3(1.0, 0.55, 0.0);
+    float weight = asfloat(g_SkyProbeInspection[row + SKY_PROBE_DEBUG_ROW_CONTRIBUTION]).x;
+    return float3(1.0, 0.0, 1.0) * (0.35 + 0.65 * weight);
+}
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    uint4 metadata = g_SkyProbeInspection[0];
+    uint surfaceState = metadata.w;
+    if (metadata.x != SKY_PROBE_DEBUG_VERSION || (surfaceState != 2u && surfaceState != 4u))
+        discard;
+    float2 pixel = input.position.xy;
+    float3 surface = asfloat(g_SkyProbeInspection[5]).xyz;
+    float3 biased = asfloat(g_SkyProbeInspection[10]).xyz;
+    float3 origin = asfloat(g_SkyProbeInspection[11]).xyz;
+    float2 marker;
+    if (SkyInspectProject(surface, marker))
+    {
+        float2 d = abs(pixel - marker);
+        if (max(d.x, d.y) <= 4.0 && min(d.x, d.y) <= 0.8)
+            return float4(1.0, 1.0, 1.0, 1.0);
+    }
+    if (SkyInspectProject(biased, marker))
+    {
+        float2 d = abs(pixel - marker);
+        if (abs(d.x + d.y - 5.0) <= 0.8)
+            return float4(1.0, 0.9, 0.0, 1.0);
+    }
+    if (SkyInspectProject(origin, marker))
+    {
+        float2 d = abs(pixel - marker);
+        if (abs(max(d.x, d.y) - 6.0) <= 0.8)
+            return float4(0.0, 0.9, 1.0, 1.0);
+    }
+    if (SkyInspectLine(pixel, surface, origin, false))
+        return float4(0.0, 0.7, 0.8, 1.0);
+    if (SkyInspectLine(pixel, surface, biased, false))
+        return float4(0.8, 0.7, 0.0, 1.0);
+
+    float3 viewRay = float3(pos_decompression_params.zw * pixel - pos_decompression_params.xy, 1.0);
+    float3 rayDirection = normalize(viewDirToWorld(viewRay));
+    float depth = g_Depth.Load(int3(int2(pixel), 0));
+    float sceneDistance = depth > 0.0 ? length(reconstruct_world_pos(pixel, depth) - eye_position) : 1e30;
+    float radius = clamp(g_SkyDebugRadius, 0.02, 0.12);
+    float nearest = 1e30;
+    uint selected = 0xFFFFFFFFu;
+    [unroll]
+    for (uint corner = 0u; corner < 8u; ++corner)
+    {
+        float3 center = SkyInspectCornerPosition(corner);
+        float3 offset = eye_position - center;
+        float b = dot(offset, rayDirection);
+        float h = b * b - (dot(offset, offset) - radius * radius);
+        if (h >= 0.0)
+        {
+            float distance = -b - sqrt(h);
+            if (distance > 0.0 && distance < nearest)
+            {
+                nearest = distance;
+                selected = corner;
+            }
+        }
+    }
+    if (selected != 0xFFFFFFFFu)
+    {
+        bool hidden = nearest > sceneDistance;
+        if (!hidden || ((uint(pixel.x) + uint(pixel.y)) & 7u) < 3u)
+        {
+            float3 color = SkyInspectCornerColor(selected);
+            float3 center = SkyInspectCornerPosition(selected);
+            float3 normal = normalize(eye_position + rayDirection * nearest - center);
+            uint row = SkyInspectCornerRow(selected);
+            uint flags = g_SkyProbeInspection[row + 1u].y;
+            uint state = g_SkyProbeInspection[row].y;
+            if (state != 2u && (flags & SKY_PROBE_FLAG_RELOCATED) != 0u && dot(normal, -rayDirection) < 0.35)
+                color = float3(0.1, 0.9, 0.9);
+            return float4(color * (hidden ? 0.6 : 1.0), 1.0);
+        }
+    }
+    [unroll]
+    for (uint corner = 0u; corner < 8u; ++corner)
+    {
+        if (g_SkyProbeInspection[SkyInspectCornerRow(corner)].y != 4u)
+            continue;
+        float3 center = SkyInspectCornerPosition(corner);
+        if (SkyInspectLine(pixel, origin, center, true))
+            return float4(SkyInspectCornerColor(corner) * 0.65, 1.0);
+    }
+    discard;
+    return float4(0.0, 0.0, 0.0, 0.0);
+}

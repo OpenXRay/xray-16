@@ -28,7 +28,9 @@ namespace xray::render::fg::passes {
 constexpr u32 kLightTileSize = 8;
 constexpr u32 kLightTileClasses = 4;
 
-struct DeferredLightPassState {
+class DeferredLightPassState
+{
+public:
     nvrhi::ComputePipelineHandle classifyPipeline;
     nvrhi::BindingLayoutHandle classifyLayout;
     nvrhi::ShaderHandle classifyShader;
@@ -37,6 +39,8 @@ struct DeferredLightPassState {
     nvrhi::ShaderHandle tileShaders[kLightTileClasses];
     bool initialized = false;
     bool failed = false;
+    u32 skyVisibilityRecordedFrame = UINT32_MAX;
+    u32 skyVisibilityRecordedStatus = 0;
 
     nvrhi::BufferHandle tileListBuffer;
     nvrhi::BufferHandle tileArgsBuffer;
