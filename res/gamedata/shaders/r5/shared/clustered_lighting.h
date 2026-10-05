@@ -117,7 +117,6 @@ float3 EvaluateClusteredLights(
     float roughness,
     float2 screenPos,
     float linearDepth,
-    bool hudReceiver,
     uint diffuseMode,
     uint shadingClass = SHADING_CLASS_STANDARD,
     float3 sssColor = 0.0)
@@ -152,7 +151,7 @@ float3 EvaluateClusteredLights(
         float2 shadow = float2(1.0, 0.0);
         uint shadowSlot = LocalShadowSlot(light, worldPos);
         if (shadowSlot != 0xFFFFFFFFu)
-            shadow = LocalShadow(shadowSlot, worldPos, N, hudReceiver);
+            shadow = LocalShadow(shadowSlot, worldPos, N);
 
         float3 lc = lightColor * atten;
         if (foliage)

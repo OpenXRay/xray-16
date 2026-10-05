@@ -378,7 +378,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
-                data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
             }
             if (clusterLights.active) {
                 data.clusterLightData = passBuilder.read(clusterLights.lightData, ResourceState::ShaderResource);
@@ -453,8 +452,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::IBuffer* localTiles = nullptr;
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
-            nvrhi::ITexture* localHud = nullptr;
-            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn, localHud);
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
             nvrhi::ITexture* sunMaskTex = ResolveSunMask(fg, data.sunMask, nvDevice);
             nvrhi::IBuffer* skyIrradiance = data.skyIrradiance.is_valid() ? fg.GetPhysicalBuffer(data.skyIrradiance) : nullptr;
             nvrhi::ITexture* skySpecular = data.skySpecular.is_valid() ? fg.GetPhysicalTexture(data.skySpecular) : nullptr;
@@ -473,7 +471,6 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 bsb.BufferSRV("g_LocalShadowTiles", localTiles);
                 bsb.Texture("g_LocalShadowStatic", localStatic);
                 bsb.Texture("g_LocalShadowDyn", localDyn);
-                bsb.Texture("g_LocalShadowHud", localHud);
                 bsb.Texture("g_SunShadowMask", sunMaskTex);
                 bsb.BufferSRV("g_SkyIrradiance", skyIrradiance);
                 bsb.Texture("g_SkySpecular", skySpecular);

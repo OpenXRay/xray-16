@@ -68,7 +68,6 @@ public:
     framegraph::VirtualResourceHandle localTiles;
     framegraph::VirtualResourceHandle localStatic;
     framegraph::VirtualResourceHandle localDyn;
-    framegraph::VirtualResourceHandle localHud;
     framegraph::VirtualResourceHandle clusterLightData;
     framegraph::VirtualResourceHandle clusterGrid;
     framegraph::VirtualResourceHandle clusterLightIndexList;
