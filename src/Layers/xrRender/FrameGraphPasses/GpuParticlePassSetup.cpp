@@ -18,13 +18,12 @@ namespace xray::render::fg::passes {
 using namespace framegraph;
 
 struct GpuParticleDrawParams {
-    Fmatrix hudWarp;
     Fvector4 cameraTop;
     Fvector4 cameraRight;
     u32 drawBucket;
     u32 padding[3];
 };
-static_assert(sizeof(GpuParticleDrawParams) == 112);
+static_assert(sizeof(GpuParticleDrawParams) == 48);
 static_assert(sizeof(nvrhi::DrawIndirectArguments) == 16);
 
 struct GpuParticlePassData {
@@ -164,7 +163,6 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     auto* drawConstants = cache.GetOrCreateVolatileCB("GpuParticle", "DrawParams", sizeof(GpuParticleDrawParams), data.device, 128);
     GpuParticleDrawParams params = {};
-    params.hudWarp = HudFovWarp();
     params.cameraTop.set(Device.vCameraTop.x, Device.vCameraTop.y, Device.vCameraTop.z, 0.0f);
     params.cameraRight.set(Device.vCameraRight.x, Device.vCameraRight.y, Device.vCameraRight.z, 0.0f);
     auto bind = [&](const ExtractedReflection& pixel, nvrhi::IBindingLayout* layout, bool softParticles) {

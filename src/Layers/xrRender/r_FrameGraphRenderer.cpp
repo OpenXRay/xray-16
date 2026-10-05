@@ -1219,15 +1219,10 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
             if (batch.isSkinned && batch.visual && batch.indexCount)
                 worldSkinned.push_back(batch);
         }
-        const Fmatrix hudFov = passes::HudFovWarp();
         for (const auto& batch : m_hudBatches)
         {
             if (batch.isSkinned && batch.visual && batch.indexCount)
-            {
-                auto adjusted = batch;
-                adjusted.worldMatrix.mul(hudFov, batch.worldMatrix);
-                hudSkinned.push_back(std::move(adjusted));
-            }
+                hudSkinned.push_back(batch);
         }
         if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned))
             m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
@@ -2943,9 +2938,9 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                     hudSphere = s;
                 hudValid = true;
             }
-            passes::HudShadowFit hudFit;
+            Fvector4 hudFit;
             if (hudValid)
-                hudFit = passes::BuildHudShadowFit(hudSphere);
+                hudFit = passes::HudShadowSphere(hudSphere);
             passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale, hudValid ? &hudFit : nullptr);
             slots = &localShadowState.slotOfLight;
             if (m_gpuCullingManager) {

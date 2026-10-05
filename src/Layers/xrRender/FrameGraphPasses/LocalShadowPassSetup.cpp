@@ -1036,13 +1036,12 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
 }
 
 struct LocalShadowHudParams {
-    Fmatrix warp;
     u32 slots[kLocalHudViewsMax];
     u32 entryCount;
     u32 viewCount;
     u32 pad[2];
 };
-static_assert(sizeof(LocalShadowHudParams) == 144, "LocalShadowHudParams is shader-visible");
+static_assert(sizeof(LocalShadowHudParams) == 80, "LocalShadowHudParams is shader-visible");
 
 struct LocalShadowHudData {
     VirtualResourceHandle atlas;
@@ -1166,7 +1165,6 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
         data.gpuProfiler->BeginPass(cmdList, "Local Shadow.Hud");
 
     LocalShadowHudParams hp = {};
-    hp.warp = HudFovWarp();
     std::copy_n(state.hudSlots, kLocalHudViewsMax, hp.slots);
     hp.entryCount = count;
     hp.viewCount = state.hudViews;
@@ -1819,7 +1817,7 @@ static bool AllocHudRect(LocalShadowState& state, u32 pageSlot, Fvector4& outRec
     return true;
 }
 
-static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFit* fit)
+static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* hudSphere)
 {
     state.hudViews = 0;
     state.hudAlloc.Reset();
@@ -1834,19 +1832,18 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFi
             const u32 faces = point ? 6u : 1u;
             for (u32 f = 0; f < faces; ++f)
                 current.request[slot + f].hud.set(0.0f, 0.0f, 0.0f, 0.0f);
-            if (!fit || !ViewTouchesSphere(rec, fit->trueSphere, !point))
+            if (!hudSphere || !ViewTouchesSphere(rec, *hudSphere, !point))
                 continue;
             const light* L = current.owners[slot];
             const float flags = float(kLocalHudCasters | (L->flags.bCastHudToWorld ? kLocalHudToWorld : 0u));
             Fvector center;
-            center.set(fit->shownSphere.x, fit->shownSphere.y, fit->shownSphere.z);
+            center.set(hudSphere->x, hudSphere->y, hudSphere->z);
             Fvector lightPos;
             lightPos.set(rec.lightPos.x, rec.lightPos.y, rec.lightPos.z);
-            fit->warp.transform_tiny(lightPos);
             Fvector toCenter;
             toCenter.sub(center, lightPos);
             const float dist = toCenter.magnitude();
-            const float r = fit->shownSphere.w;
+            const float r = hudSphere->w;
             if (dist > r + 0.01f) {
                 Fvector4 rect;
                 if (!AllocHudRect(state, page * kLocalTileCount + slot, rect))
@@ -1881,8 +1878,6 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const HudShadowFi
                         dir = kFaceDir[f];
                     } else {
                         SpotBasis(L, dir, up);
-                        fit->warp.transform_dir(dir);
-                        dir.normalize_safe();
                     }
                     Fvector::generate_orthonormal_basis_normalized(dir, up, right);
                     const float tanHalf = 0.5f * face.zparams.z * face.rect.z;
@@ -1903,7 +1898,7 @@ void SelectLocalShadowLights(
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
     float projScale,
-    const HudShadowFit* hudFit)
+    const Fvector4* hudSphere)
 {
     xr_vector<ShadowCandidate> spots, points;
     for (u32 i = 0; i < lights.size(); ++i) {
@@ -1958,7 +1953,7 @@ void SelectLocalShadowLights(
     state.activePages = page;
     state.pooledSpots = u32(spots.size());
     state.pooledPoints = u32(points.size());
-    SelectLocalShadowHudViews(state, hudFit);
+    SelectLocalShadowHudViews(state, hudSphere);
 }
 
 static void SetupLocalShadowPageBin(

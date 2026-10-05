@@ -206,10 +206,14 @@ float3 reconstruct_world_pos(float2 svPosXY, float depth)
 	float2 uv = svPosXY * screen_res.zw;
 	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
 	clip.y = -clip.y;
-	if (depth >= 0.9)
+	bool hud = depth >= 0.9;
+	if (hud)
 		clip.z = (depth - 0.9) * 10.0;
 	float4 world = mul(m_InvVP, clip);
-	return world.xyz / world.w;
+	float3 worldPos = world.xyz / world.w;
+	if (hud)
+		worldPos = mul(m_HudUnwarp, float4(worldPos, 1.0)).xyz;
+	return worldPos;
 }
 
 f_forward output_forward_color(float3 albedo, float3 normal, float3 worldPos, float metallic, float roughness)

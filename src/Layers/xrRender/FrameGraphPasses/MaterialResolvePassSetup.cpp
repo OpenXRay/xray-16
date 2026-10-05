@@ -43,6 +43,7 @@ struct MaterialResolvePassData {
 struct alignas(16) MaterialResolveParams {
     Fmatrix prevView;
     Fmatrix prevProj;
+    Fmatrix prevHudWarp;
     u32 skinnedEntryBase;
     u32 motionValid;
     u32 entryLimit;
@@ -229,6 +230,7 @@ MaterialResolveOutput setupMaterialResolvePass(
             MaterialResolveParams params = {};
             params.prevView = data.prevView;
             params.prevProj = data.prevProj;
+            params.prevHudWarp = HudFovWarp(data.prevView);
             params.skinnedEntryBase = skinned ? gpuCulling->GetClusterRefCapacity() : 0xFFFFFFFFu;
             params.motionValid = data.motionValid ? 1u : 0u;
             params.entryLimit = data.entryLimit;

@@ -25,6 +25,7 @@ cbuffer MaterialResolveParams
 {
     float4x4 g_PrevView;
     float4x4 g_PrevProj;
+    float4x4 g_PrevHudWarp;
     uint g_SkinnedEntryBase;
     uint g_MotionValid;
     uint g_EntryLimit;
@@ -33,21 +34,18 @@ cbuffer MaterialResolveParams
 
 float4 ProjectEntry(float3 worldPos, bool hud)
 {
+    float4 p = float4(worldPos, 1.0);
     if (hud)
-    {
-        float4 viewPos = mul(m_V, float4(worldPos, 1.0));
-        viewPos.xy /= hud_fov;
-        return mul(m_P, viewPos);
-    }
-    return mul(m_VP, float4(worldPos, 1.0));
+        p = mul(m_HudWarp, p);
+    return mul(m_VP, p);
 }
 
 float4 ProjectPrevEntry(float3 worldPos, bool hud)
 {
-    float4 viewPos = mul(g_PrevView, float4(worldPos, 1.0));
+    float4 p = float4(worldPos, 1.0);
     if (hud)
-        viewPos.xy /= hud_fov;
-    return mul(g_PrevProj, viewPos);
+        p = mul(g_PrevHudWarp, p);
+    return mul(g_PrevProj, mul(g_PrevView, p));
 }
 
 [numthreads(8, 8, 1)]
@@ -184,14 +182,6 @@ void main(uint3 dtid : SV_DispatchThreadID)
     if (s.shadingClass == SHADING_CLASS_FOLIAGE)
         s.N = FoliageViewerNormal(s.N, wp1 - wp0, wp2 - wp0, eye_position - InterpolateBary3(bd, wp0, wp1, wp2));
 
-    if (hud)
-    {
-        float3x3 view3 = float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz);
-        float3 nv = mul(view3, s.N);
-        nv.xy *= hud_fov;
-        s.N = normalize(mul(nv, view3));
-    }
-
     float roughnessOut = s.roughness;
     if (skinned)
     {
@@ -228,8 +218,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
         g_OutMaterial[p] = PackGBufferMaterialBakedSky(s.shadingClass, s.transmission, skyVisibility);
     }
     else
-        g_OutMaterial[p] = hud ? PackGBufferMaterial(s.shadingClass, s.transmission)
-            : PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
+        g_OutMaterial[p] = PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

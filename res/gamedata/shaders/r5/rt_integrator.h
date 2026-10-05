@@ -19,7 +19,7 @@ struct RTIntegratorSettings
     float coneSpread;
     bool trackDiagnostics;
     bool trackSegmentMetrics;
-    bool allowHudFirstRay;
+    uint firstRayMask;
     uint cacheBounce;
     uint cacheLife;
     bool cacheInsert;
@@ -36,7 +36,7 @@ RTIntegratorSettings RTIntegratorDefaultSettings()
     settings.coneSpread = 0.0;
     settings.trackDiagnostics = false;
     settings.trackSegmentMetrics = false;
-    settings.allowHudFirstRay = false;
+    settings.firstRayMask = RT_RAY_MASK_WORLD;
     settings.cacheBounce = RT_INTEGRATOR_NO_CACHE;
     settings.cacheLife = 0u;
     settings.cacheInsert = false;
@@ -409,8 +409,7 @@ uint RTIntegratorTraceStage(inout RTIntegratorState s, RTSceneParams scene, inou
     out RTSceneTrace trace, out float3 hitPosition)
 {
     s.result.pathLength = s.bounces;
-    uint rayMask = (s.settings.allowHudFirstRay && !s.firstRayTraced)
-        ? (RT_RAY_MASK_WORLD | RT_RAY_MASK_HUD) : RT_RAY_MASK_WORLD;
+    uint rayMask = s.firstRayTraced ? RT_RAY_MASK_WORLD : s.settings.firstRayMask;
     s.firstRayTraced = true;
     trace = RTTraceRay(scene, s.origin, s.direction, s.remainingReach, false, rng,
         s.coneWidth, s.coneSpread, s.previousPosition, s.previousPdf, s.previousDelta, rayMask);

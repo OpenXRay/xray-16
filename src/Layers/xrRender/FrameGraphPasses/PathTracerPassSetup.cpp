@@ -278,7 +278,8 @@ static void ApplyCameraSettings(StaticGlobals& target, const PathTracerData& dat
     target.pos_decompression_params2 = live.pos_decompression_params2;
     target.screen_res = live.screen_res;
     target.parallax = live.parallax;
-    target.hud_fov = live.hud_fov;
+    target.m_HudWarp = HudFovWarp(data.cameraView);
+    target.m_HudUnwarp = HudFovUnwarp(data.cameraView);
     target.pbr_diffuse_mode = live.pbr_diffuse_mode;
     target.dev_param_1 = live.dev_param_1;
     target.dev_param_2 = live.dev_param_2;
@@ -856,6 +857,7 @@ PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, R
         cbData.cameraPos_pad = history.parameters.cameraPos_pad;
         cbData.cameraConeSpread = history.parameters.cameraConeSpread;
     }
+    cbData.hudUnwarp = HudFovUnwarp(state.pending.cameraView);
 
     state.pending.parameters = cbData;
     state.pending.sky = skyUsed;

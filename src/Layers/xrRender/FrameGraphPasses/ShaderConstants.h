@@ -102,7 +102,7 @@ struct alignas(16) StaticGlobals {
     Fvector3 L_sun_color;
     float pbr_diffuse_mode;
     Fvector3 L_sun_dir_w;
-    float hud_fov;
+    float padding2;
     Fvector4 L_hemi_color;
 
     Fvector3 eye_position;
@@ -135,8 +135,15 @@ struct alignas(16) StaticGlobals {
     Fvector4 sky_ibl;
     Fvector4 sky_probe_origin;
     Fvector4 sky_probe_dims;
+
+    Fmatrix m_HudWarp;
+    Fmatrix m_HudUnwarp;
 };
-static_assert(sizeof(StaticGlobals) == 944, "StaticGlobals must be 944 bytes");
+static_assert(sizeof(StaticGlobals) == 1072, "StaticGlobals must be 1072 bytes");
+Fmatrix HudFovWarp(const Fmatrix& view);
+Fmatrix HudFovUnwarp(const Fmatrix& view);
+Fmatrix HudFovWarp();
+Fmatrix HudFovUnwarp();
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -188,9 +195,10 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
         1.0f / (float)Device.dwHeight       // w = 1/height
     );
 
-    // Clear padding to avoid uninitialized memory warnings
-    cb.hud_fov = psHUD_FOV;
+    cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
+    cb.m_HudWarp = HudFovWarp();
+    cb.m_HudUnwarp = HudFovUnwarp();
 
     // ═══════════════════════════════════════════════════════
     //  FORWARD+ EXTENSIONS (Phase 1.3)
@@ -262,15 +270,9 @@ inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
 void GetSunLightData(SunLightData& outSun);
 const Fvector& SunDirVisual();
 void ResetSunDirVisual();
-Fmatrix HudFovWarp();
 constexpr float kHudBoundsMargin = 0.05f;
 void MergeBoundingSphere(Fvector4& acc, const Fvector4& b);
-struct HudShadowFit {
-    Fvector4 trueSphere;
-    Fvector4 shownSphere;
-    Fmatrix warp;
-};
-HudShadowFit BuildHudShadowFit(const Fvector4& trueSphere);
+Fvector4 HudShadowSphere(const Fvector4& sphere);
 
 inline StaticGlobals BuildStaticGlobals() {
     StaticGlobals sg = {};

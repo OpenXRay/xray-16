@@ -468,6 +468,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.detailPbrIndex = scene->detailPbrIndex;
     rawCB.detailBumpIndex = scene->detailBumpIndex;
     rawCB.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
+    rawCB.hudUnwarp = HudFovUnwarp(view);
 
     WorldCachePassInputs cacheInputs;
     cacheInputs.accelMgr = accelMgr;

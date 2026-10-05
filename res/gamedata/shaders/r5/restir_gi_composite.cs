@@ -6,6 +6,7 @@ cbuffer CompositeParams {
     float2 g_ScreenSize;
     float g_GIIntensity;
     uint g_DiffuseMode;
+    float4x4 g_HudUnwarp;
 };
 
 Texture2D<float4> t_DirectLighting;
@@ -43,10 +44,13 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     if (IsReservoirValid(r) && r.W > 0) {
         float2 giUV = (float2(pixel) + 0.5) / g_ScreenSize;
         float4 giClip = float4(giUV.x * 2.0 - 1.0, 1.0 - giUV.y * 2.0, depth, 1.0);
-        if (depth >= 0.9)
+        bool hud = depth >= 0.9;
+        if (hud)
             giClip.z = (depth - 0.9) * 10.0;
         float4 giWorld = mul(g_InvViewProj, giClip);
         float3 worldPos = giWorld.xyz / giWorld.w;
+        if (hud)
+            worldPos = mul(g_HudUnwarp, float4(worldPos, 1.0)).xyz;
 
         MaterialSurface primary = GBufferMaterialSurface(normalData, t_BaseColor.Load(int3(pixel, 0)), t_Material.Load(int3(pixel, 0)));
         float3 V = RTSafeNormalize(g_CameraPos.xyz - worldPos, primary.N);

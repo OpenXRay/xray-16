@@ -5,7 +5,6 @@
 
 cbuffer LocalShadowHudParams : register(b5)
 {
-    float4x4 g_HudWarp;
     uint4 g_HudSlots[4];
     uint g_HudEntryCount;
     uint g_HudViewCount;
@@ -61,7 +60,7 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     uint vertexByte = (e.firstVertex + index) * 48u;
     uint4 w0 = g_SkinnedVB.Load4(vertexByte);
     uint4 w1 = g_SkinnedVB.Load4(vertexByte + 16u);
-    float3 worldPos = mul(g_HudWarp, float4(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z), 1.0)).xyz;
+    float3 worldPos = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
     float2 texcoord = float2(asfloat(w1.z), asfloat(w1.w));
 
     LocalRoute r = LocalRouteHud(slot, worldPos);

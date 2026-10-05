@@ -40,7 +40,7 @@ cbuffer	static_globals : register(b2)
 	float3		L_sun_color;
 	float		pbr_diffuse_mode;
 	float3		L_sun_dir_w;
-	float		hud_fov;
+	float		_pad_sun_dir;
 	float4		L_hemi_color;
 
 	float3 		eye_position;
@@ -73,6 +73,9 @@ cbuffer	static_globals : register(b2)
 	float4		sky_ibl;
 	float4		sky_probe_origin;
 	float4		sky_probe_dims;
+
+	float4x4	m_HudWarp;
+	float4x4	m_HudUnwarp;
 };
 
 /*

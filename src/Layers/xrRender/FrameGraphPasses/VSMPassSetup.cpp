@@ -1067,8 +1067,10 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
         cmdList->setBufferState(state.dynStats, nvrhi::ResourceStates::UnorderedAccess);
     }
 
+    auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     BindingSetBuilder bsb(*markRefl, nvDevice, "VSM.Mark");
-    bsb.ConstantBuffer("VsmParams", vsmCB)
+    bsb.ConstantBuffer("static_globals", staticGlobals)
+       .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmMarkParams", markCB)
        .Texture("g_Depth", depth)
        .BufferUAV("g_Needed", state.needed);
@@ -2059,14 +2061,11 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& 
     if (!vsRefl || !atRefl)
         return;
 
-    const HudShadowFit fit = BuildHudShadowFit(gc.GetSkinnedHudBounds());
-    const Fmatrix& warp = fit.warp;
-    const float r = fit.shownSphere.w;
+    const Fvector4 fit = HudShadowSphere(gc.GetSkinnedHudBounds());
+    const float r = fit.w;
     Fvector center;
-    center.set(fit.shownSphere.x, fit.shownSphere.y, fit.shownSphere.z);
-    Fvector sunDir = state.sunDir;
-    warp.transform_dir(sunDir);
-    sunDir.normalize_safe();
+    center.set(fit.x, fit.y, fit.z);
+    const Fvector sunDir = state.sunDir;
     Fvector eye;
     eye.mad(center, sunDir, -(r + kHudBoundsMargin));
     const float depthRange = 2.0f * (r + kHudBoundsMargin);
@@ -2076,11 +2075,9 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& 
     state.hudViewProj.mul(proj, view);
     state.hudTexelWorld = 2.0f * r / float(kVSMHudMapSize);
     state.hudDepthRange = depthRange;
-    Fmatrix viewWarp;
-    viewWarp.mul(view, warp);
 
     VsmHudParams hp = {};
-    hp.viewProj.mul(proj, viewWarp);
+    hp.viewProj = state.hudViewProj;
     auto hudCB = cache.GetOrCreateVolatileCB("VSM", "HudParams", sizeof(VsmHudParams), data.device);
     cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
 
@@ -2178,8 +2175,10 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     cmdList->writeBuffer(resolveCB, &rp, sizeof(rp));
 
     cmdList->setBufferState(state.dynPageTable, nvrhi::ResourceStates::NonPixelShaderResource);
+    auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.Resolve");
-    bsb.ConstantBuffer("VsmParams", vsmCB)
+    bsb.ConstantBuffer("static_globals", staticGlobals)
+       .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmResolveParams", resolveCB)
        .Texture("g_Depth", depth)
        .Texture("g_Atlas", atlas)
@@ -2237,8 +2236,10 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
     auto debugCB = cache.GetOrCreateVolatileCB("VSM", "DebugParams", sizeof(VsmDebugParams), data.device);
     cmdList->writeBuffer(debugCB, &dp, sizeof(dp));
 
+    auto* staticGlobals = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
     BindingSetBuilder bsb(*refl, nvDevice, "VSM.DebugView");
-    bsb.ConstantBuffer("VsmParams", vsmCB)
+    bsb.ConstantBuffer("static_globals", staticGlobals)
+       .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmDebugParams", debugCB)
        .Texture("g_Depth", depth)
        .BufferSRV("g_Needed", state.needed)

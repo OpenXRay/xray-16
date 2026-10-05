@@ -25,10 +25,14 @@ float3 RTGIReconstructWorldPos(uint2 pixel, float depth)
 {
     float2 uv = (float2(pixel) + 0.5) / float2(g_ScreenWidth, g_ScreenHeight);
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, depth, 1.0);
-    if (depth >= 0.9)
+    bool hud = depth >= 0.9;
+    if (hud)
         clip.z = (depth - 0.9) * 10.0;
     float4 world = mul(g_InvViewProj, clip);
-    return world.xyz / world.w;
+    float3 position = world.xyz / world.w;
+    if (hud)
+        position = mul(g_HudUnwarp, float4(position, 1.0)).xyz;
+    return position;
 }
 
 struct RTGIPrimarySurface
@@ -136,7 +140,7 @@ RTIntegratorSettings RTGIBuildRawSettings(RTGIPrimarySurface primary)
     settings.coneSpread = primary.coneSpread;
     settings.trackDiagnostics = false;
     settings.trackSegmentMetrics = true;
-    settings.allowHudFirstRay = false;
+    settings.firstRayMask = RT_RAY_MASK_WORLD;
     return settings;
 }
 

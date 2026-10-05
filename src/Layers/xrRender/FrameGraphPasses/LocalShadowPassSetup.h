@@ -23,8 +23,6 @@ namespace xray::profiler {
 
 namespace xray::render::fg::passes {
 
-struct HudShadowFit;
-
 constexpr u32 kLocalShadowAtlas = 4096;
 constexpr u32 kLocalAtlasLevels = 6;
 constexpr u32 kLocalAtlasNodes = 1365;
@@ -222,7 +220,7 @@ void SelectLocalShadowLights(
     const xr_vector<const light*>& lights,
     const Fvector& camPos,
     float projScale,
-    const HudShadowFit* hudFit);
+    const Fvector4* hudSphere);
 
 void setupLocalShadowBinPasses(
     framegraph::FrameGraph& fg,
