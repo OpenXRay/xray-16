@@ -71,6 +71,8 @@ cbuffer	static_globals : register(b2)
 	float4		foliage_params;
 	float4		foliage_params2;
 	float4		sky_ibl;
+	float4		sky_probe_origin;
+	float4		sky_probe_dims;
 };
 
 /*

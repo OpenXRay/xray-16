@@ -4,14 +4,58 @@
 #define SHADING_CLASS_STANDARD 0u
 #define SHADING_CLASS_FOLIAGE  1u
 
-float2 PackGBufferMaterial(uint shadingClass, float transmission)
+#define GBUFFER_GEOMETRIC_NORMAL_FLAG 128u
+#define GBUFFER_SHADING_CLASS_MASK 63u
+
+float2 GBufferOctSignNotZero(float2 v)
 {
-    return float2(float(shadingClass) * (1.0 / 255.0), saturate(transmission));
+    return float2(v.x >= 0.0 ? 1.0 : -1.0, v.y >= 0.0 ? 1.0 : -1.0);
+}
+
+float2 GBufferOctEncode(float3 n)
+{
+    float2 p = n.xy / (abs(n.x) + abs(n.y) + abs(n.z));
+    if (n.z < 0.0)
+        p = (1.0 - abs(p.yx)) * GBufferOctSignNotZero(p);
+    return p * 0.5 + 0.5;
+}
+
+float3 GBufferOctDecode(float2 e)
+{
+    e = e * 2.0 - 1.0;
+    float3 v = float3(e.x, e.y, 1.0 - abs(e.x) - abs(e.y));
+    if (v.z < 0.0)
+        v.xy = (1.0 - abs(v.yx)) * GBufferOctSignNotZero(v.xy);
+    return normalize(v);
+}
+
+float4 PackGBufferMaterial(uint shadingClass, float transmission, float3 geometricNormal)
+{
+    return float4(float(shadingClass | GBUFFER_GEOMETRIC_NORMAL_FLAG) * (1.0 / 255.0), saturate(transmission),
+        GBufferOctEncode(geometricNormal));
+}
+
+float4 PackGBufferMaterial(uint shadingClass, float transmission)
+{
+    return float4(float(shadingClass) * (1.0 / 255.0), saturate(transmission), 0.0, 0.0);
 }
 
 uint GBufferShadingClass(float2 material)
 {
-    return uint(material.x * 255.0 + 0.5);
+    return uint(material.x * 255.0 + 0.5) & GBUFFER_SHADING_CLASS_MASK;
+}
+
+uint GBufferShadingClass(float4 material)
+{
+    return GBufferShadingClass(material.xy);
+}
+
+float3 GBufferGeometricNormal(float4 material, float3 fallback)
+{
+    if ((uint(material.x * 255.0 + 0.5) & GBUFFER_GEOMETRIC_NORMAL_FLAG) == 0u)
+        return fallback;
+    float3 n = GBufferOctDecode(material.zw);
+    return dot(n, fallback) < 0.0 ? fallback : n;
 }
 
 float3 FaceToward(float3 n, float3 dir)

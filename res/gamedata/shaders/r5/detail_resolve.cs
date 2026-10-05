@@ -64,7 +64,7 @@ RWTexture2D<float4> g_OutBaseColor;
 RWTexture2D<float4> g_OutColor;
 RWTexture2D<float2> g_OutMotion;
 RWTexture2D<float> g_OutVisDepth;
-RWTexture2D<float2> g_OutMaterial;
+RWTexture2D<float4> g_OutMaterial;
 
 float2 PrevMotion(float3 prevWorld, float2 uvPix)
 {
@@ -178,7 +178,8 @@ void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, metallic);
     g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
-    g_OutMaterial[p] = PackGBufferMaterial(sway ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD, transmission);
+    float3 geometricNormal = FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2));
+    g_OutMaterial[p] = PackGBufferMaterial(sway ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD, transmission, geometricNormal);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }
@@ -291,7 +292,8 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_OutNormal[p] = float4(N, roughness);
     g_OutBaseColor[p] = float4(albedo, 0.0);
     g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
-    g_OutMaterial[p] = PackGBufferMaterial(SHADING_CLASS_FOLIAGE, transmission);
+    float3 geometricNormal = FaceToward(normalize(cross(v1.pos - v0.pos, v2.pos - v0.pos)), eye_position - worldPos);
+    g_OutMaterial[p] = PackGBufferMaterial(SHADING_CLASS_FOLIAGE, transmission, geometricNormal);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

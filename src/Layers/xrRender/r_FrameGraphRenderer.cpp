@@ -76,6 +76,7 @@
 #include "FrameGraphPasses/PathTracerPassSetup.h"
 #include "FrameGraphPasses/RTEnvironmentSamplingPassSetup.h"
 #include "FrameGraphPasses/SkyEnvironmentPassSetup.h"
+#include "FrameGraphPasses/SkyVisibilityPassSetup.h"
 #include "Layers/xrRender/fgRainRender.h"
 #include "Layers/xrRender/fgThunderboltRender.h"
 #include "Layers/xrRender/fgLensFlareRender.h"
@@ -87,6 +88,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "RayTracing/RTAccelStructManager.h"
 #include "RayTracing/WorldRadianceCache.h"
+#include "RayTracing/SkyVisibilityGrid.h"
 #include "SkyEnvironment.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/PassResourceCache.h"
@@ -288,6 +290,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_rtAccelMgr = xr_make_unique<fg::RTAccelStructManager>();
     m_worldCache = xr_make_unique<fg::WorldRadianceCache>();
     m_skyEnvironment = xr_make_unique<fg::SkyEnvironment>();
+    m_skyVisibility = xr_make_unique<fg::SkyVisibilityGrid>();
     m_smokeTrailManager = xr_make_unique<fg::passes::SmokeTrailManager>();
 
 
@@ -305,6 +308,7 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_rtAccelMgr->Initialize(device);
     m_worldCache->Initialize(device);
     m_skyEnvironment->Initialize(device);
+    m_skyVisibility->Initialize(device);
     m_smokeTrailManager->Initialize(device);
 
     // Create RenderContext for execution
@@ -408,6 +412,12 @@ void FrameGraphRenderer::Shutdown() {
         m_skyEnvironment = nullptr;
     }
 
+    if (m_skyVisibility)
+    {
+        m_skyVisibility->Shutdown();
+        m_skyVisibility = nullptr;
+    }
+
     if (m_rtAccelMgr) {
         m_rtAccelMgr->Shutdown();
         m_rtAccelMgr = nullptr;
@@ -423,6 +433,7 @@ void FrameGraphRenderer::Shutdown() {
     passes::ShutdownPathTracer();
     passes::ShutdownRTEnvironmentSampling();
     passes::ShutdownWorldCache();
+    passes::ShutdownSkyVisibility();
     m_mainView.Shutdown();
 
     m_framegraph = nullptr;
@@ -499,6 +510,7 @@ void FrameGraphRenderer::Render() {
                     passes::ShutdownPathTracer();
                     passes::ShutdownRTEnvironmentSampling();
                     passes::ShutdownWorldCache();
+                    passes::ShutdownSkyVisibility();
                     if (m_skyEnvironment)
                         m_skyEnvironment->InvalidatePipelines();
                     m_lightingState.ResetRecovery();
@@ -566,6 +578,12 @@ void FrameGraphRenderer::Render() {
     auto staticGlobalsData = passes::BuildStaticGlobals();
     staticGlobalsData.sky_ibl.set(ps_r_sky_ibl != 0 && m_skyLightingReady ? 1.0f : 0.0f,
         float(fg::SkyEnvironment::kSpecularLevels - 1), 0.0f, 0.0f);
+    if (m_skyVisibility && m_skyVisibility->GetBuffer())
+    {
+        const auto& layout = m_skyVisibility->GetLayout();
+        staticGlobalsData.sky_probe_origin.set(layout.origin.x, layout.origin.y, layout.origin.z, layout.spacing);
+        staticGlobalsData.sky_probe_dims.set(float(layout.dims[0]), float(layout.dims[1]), float(layout.dims[2]), 1.0f);
+    }
 
     {
         const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
@@ -1122,6 +1140,14 @@ u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
     return m_rtRayAdmittedSkinned;
 }
 
+bool FrameGraphRenderer::RasterRayTracingFeaturesEnabled() const
+{
+    if (!m_skyVisibility || !m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend ||
+        !GEnv.Backend->SupportsSubmissionLeases())
+        return false;
+    return m_skyVisibility->NeedsScene();
+}
+
 void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
 {
     const auto previousMode = m_lightingState.effective;
@@ -1140,11 +1166,22 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
         passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
     if (m_rtAccelMgr)
         m_rtAccelMgr->RetireScenes();
-    if (m_lightingState.effective == fg::LightingMode::Raster)
-        return;
-    if (m_lightingState.effective == fg::LightingMode::RadianceCascades)
+    if (m_skyVisibility)
     {
-        m_lightingState.Fail(fg::LightingFallback::PipelineUnavailable);
+        if (passes::ConsumeSkyVisibilityRebake())
+            m_skyVisibility->RequestRebake();
+        m_skyVisibility->Update();
+    }
+    if (m_lightingState.effective == fg::LightingMode::Raster ||
+        m_lightingState.effective == fg::LightingMode::RadianceCascades)
+    {
+        if (m_lightingState.effective == fg::LightingMode::RadianceCascades)
+            m_lightingState.Fail(fg::LightingFallback::PipelineUnavailable);
+        if (RasterRayTracingFeaturesEnabled() && !m_rtAccelMgr->IsReady())
+        {
+            const xr_vector<GeometryBatch> noSkinned;
+            m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), noSkinned, noSkinned);
+        }
         return;
     }
     if (!m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
@@ -1742,8 +1779,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
     auto opaqueOutputs = detailOutputs;
-    const fg::SkyEnvironmentFrame skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
+    fg::SkyEnvironmentFrame skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
     m_skyLightingReady = skyFrame.lightingReady;
+    if (m_skyVisibility)
+        skyFrame.probes = passes::setupSkyVisibilityBakePass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility);
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), m_worldCache.get(), detailOutputs, clusterLightOut,

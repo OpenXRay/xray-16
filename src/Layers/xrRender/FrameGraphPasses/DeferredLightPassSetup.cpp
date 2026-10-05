@@ -236,6 +236,8 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 data.skySpecular = passBuilder.read(sky.specular, ResourceState::ShaderResource);
             if (sky.dfg.is_valid())
                 data.skyDFG = passBuilder.read(sky.dfg, ResourceState::ShaderResource);
+            if (sky.probes.is_valid())
+                data.skyProbes = passBuilder.read(sky.probes, ResourceState::ShaderResource);
         },
         [](const DeferredLightPassData& data, const FrameGraph& fg, fg::RenderContext* ctx)
         {
@@ -275,6 +277,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
             nvrhi::IBuffer* skyIrradiance = data.skyIrradiance.is_valid() ? fg.GetPhysicalBuffer(data.skyIrradiance) : nullptr;
             nvrhi::ITexture* skySpecular = data.skySpecular.is_valid() ? fg.GetPhysicalTexture(data.skySpecular) : nullptr;
             nvrhi::ITexture* skyDFG = data.skyDFG.is_valid() ? fg.GetPhysicalTexture(data.skyDFG) : nullptr;
+            nvrhi::IBuffer* skyProbes = data.skyProbes.is_valid() ? fg.GetPhysicalBuffer(data.skyProbes) : nullptr;
 
             const u32 argsInit[kLightTileClasses * 3] = { 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 };
             cmdList->writeBuffer(state.tileArgsBuffer, argsInit, sizeof(argsInit));
@@ -335,6 +338,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 bsb.BufferSRV("g_SkyIrradiance", skyIrradiance);
                 bsb.Texture("g_SkySpecular", skySpecular);
                 bsb.Texture("g_SkyDFG", skyDFG);
+                bsb.BufferSRV("g_SkyProbes", skyProbes);
                 if (cls & kTileClassLights)
                 {
                     bsb.BufferSRV("g_LightData", clm.GetLightDataBuffer());

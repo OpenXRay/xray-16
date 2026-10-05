@@ -133,8 +133,10 @@ struct alignas(16) StaticGlobals {
     Fvector4 foliage_params;
     Fvector4 foliage_params2;
     Fvector4 sky_ibl;
+    Fvector4 sky_probe_origin;
+    Fvector4 sky_probe_dims;
 };
-static_assert(sizeof(StaticGlobals) == 912, "StaticGlobals must be 912 bytes");
+static_assert(sizeof(StaticGlobals) == 944, "StaticGlobals must be 944 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -220,6 +222,8 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.foliage_params.set(ps_r_foliage_sss_blade, ps_r_foliage_sss_tuft, ps_r_foliage_sss_tree, ps_r_foliage_sss_ambient);
     cb.foliage_params2.set(ps_r_foliage_sss_forward, 0.f, 0.f, 0.f);
     cb.sky_ibl.set(0.f, 0.f, 0.f, 0.f);
+    cb.sky_probe_origin.set(0.f, 0.f, 0.f, 0.f);
+    cb.sky_probe_dims.set(0.f, 0.f, 0.f, 0.f);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

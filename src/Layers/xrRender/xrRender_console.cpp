@@ -22,6 +22,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/FrameGraphPasses/SkyVisibilityPassSetup.h"
 #include "Layers/xrRender/Shaders/SlangCompilerTest.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 #endif
@@ -314,6 +315,12 @@ float ps_r_vis_sw_px           = 64.0f;
 float ps_r_vis_sw_near         = 0.5f;
 int   ps_r_vis_sw_grass        = 1;
 int   ps_r_vsm_debug           = 0;
+float ps_r_sky_probe_spacing   = 3.0f;
+int   ps_r_sky_probe_rays      = 128;
+int   ps_r_sky_probe_budget    = 16384;
+int   ps_r_sky_probe_max       = 8388608;
+float ps_r_sky_probe_ray_distance = 1000.0f;
+float ps_r_sky_probe_backface  = 0.25f;
 float ps_r_vsm_base            = 24.0f;
 int   ps_r_vsm_mark_half       = 1;
 float ps_r_vsm_bias            = 0.0003f;
@@ -479,6 +486,13 @@ class CCC_ModelPoolStat : public IConsole_Command
 public:
     CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/) { g_pModelPool->dump(); }
+};
+
+class CCC_SkyProbeRebake : public IConsole_Command
+{
+public:
+    CCC_SkyProbeRebake(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/) { xray::render::fg::passes::RequestSkyVisibilityRebake(); }
 };
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -1086,6 +1100,13 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_vis_sw_near", &ps_r_vis_sw_near, 0.0f, 10.0f);
     CMD4(CCC_Integer, "r_vis_sw_grass", &ps_r_vis_sw_grass, 0, 1);
     CMD4(CCC_Integer, "r_vsm_debug", &ps_r_vsm_debug, 0, 5);
+    CMD4(CCC_Float, "r_sky_probe_spacing", &ps_r_sky_probe_spacing, 0.5f, 16.0f);
+    CMD4(CCC_Integer, "r_sky_probe_rays", &ps_r_sky_probe_rays, 16, 1024);
+    CMD4(CCC_Integer, "r_sky_probe_budget", &ps_r_sky_probe_budget, 256, 1048576);
+    CMD4(CCC_Integer, "r_sky_probe_max", &ps_r_sky_probe_max, 65536, 33554432);
+    CMD4(CCC_Float, "r_sky_probe_ray_distance", &ps_r_sky_probe_ray_distance, 10.0f, 10000.0f);
+    CMD4(CCC_Float, "r_sky_probe_backface", &ps_r_sky_probe_backface, 0.0f, 1.0f);
+    CMD1(CCC_SkyProbeRebake, "r_sky_probe_rebake");
     CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
     CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);
     CMD4(CCC_Float, "r_vsm_bias", &ps_r_vsm_bias, 0.0f, 0.02f);

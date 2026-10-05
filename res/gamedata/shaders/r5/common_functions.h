@@ -233,7 +233,8 @@ float3 shade_pbr(
 	uint shadingClass = SHADING_CLASS_STANDARD,
 	float transmission = 0.0,
 	bool includeAmbient = true,
-	float sunThickness = 0.0)
+	float sunThickness = 0.0,
+	float3 skyNormal = float3(0.0, 0.0, 0.0))
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
@@ -244,6 +245,7 @@ float3 shade_pbr(
 		sun = SunShadow(worldPos, svPosition);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
+	SkyProbeVisibility skyVisibility = SkyProbeSample(worldPos, dot(skyNormal, skyNormal) > 0.25 ? skyNormal : N, V);
 	float3 sssColor = foliage ? albedo * foliage_sss.rgb * transmission * (1.0 - F_Schlick(saturate(dot(N, V)), DIELECTRIC_F0)) : 0.0;
 	float3 finalColor;
 	if (foliage)
@@ -252,8 +254,9 @@ float3 shade_pbr(
 		float3 sunLight = PBRDirectLighting(albedo, N, V, L, L_sun_color, 0.0, roughness, 1u) * sun.x
 			+ FoliageTransmission(N, V, L, foliage_params2.x) * sunTransmit * sssColor * L_sun_color;
 		float3 ambient = SkyLightingEnabled()
-			? SkyAmbient(albedo, N, V, 0.0, roughness, ao)
-				+ albedo * SkyIrradiance(-N) * ao * foliage_sss.rgb * (transmission * foliage_params.w)
+			? SkyAmbient(albedo, N, V, 0.0, roughness, ao, skyVisibility)
+				+ albedo * SkyIrradiance(-N) * SkyProbeVisibilityToward(skyVisibility, -N) * ao * foliage_sss.rgb
+					* (transmission * foliage_params.w)
 			: PBRAmbient(albedo, N, V, 0.0, roughness, ao, ambientColor)
 				+ albedo * ambientColor * ao * foliage_sss.rgb * (transmission * foliage_params.w);
 		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
@@ -266,7 +269,7 @@ float3 shade_pbr(
 			metallic, roughness, (uint)pbr_diffuse_mode
 		) * sun.x;
 		float3 ambient = SkyLightingEnabled()
-			? SkyAmbient(albedo, N, V, metallic, roughness, ao)
+			? SkyAmbient(albedo, N, V, metallic, roughness, ao, skyVisibility)
 			: PBRAmbient(albedo, N, V, metallic, roughness, ao, ambientColor);
 		finalColor = sunLight + (includeAmbient ? ambient : 0.0);
 	}

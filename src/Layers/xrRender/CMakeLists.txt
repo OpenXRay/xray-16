@@ -151,12 +151,16 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/ReSTIRGIPassSetup.cpp
     FrameGraphPasses/WorldCachePassSetup.h
     FrameGraphPasses/WorldCachePassSetup.cpp
+    FrameGraphPasses/SkyVisibilityPassSetup.h
+    FrameGraphPasses/SkyVisibilityPassSetup.cpp
     FrameGraphPasses/ClusterLightPassSetup.cpp
 
     RayTracing/RTAccelStructManager.h
     RayTracing/RTAccelStructManager.cpp
     RayTracing/WorldRadianceCache.h
     RayTracing/WorldRadianceCache.cpp
+    RayTracing/SkyVisibilityGrid.h
+    RayTracing/SkyVisibilityGrid.cpp
 
     SkyEnvironment.h
     SkyEnvironment.cpp

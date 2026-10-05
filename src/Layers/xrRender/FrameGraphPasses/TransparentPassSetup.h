@@ -68,6 +68,7 @@ struct TransparentPassData {
     framegraph::VirtualResourceHandle skyIrradiance;
     framegraph::VirtualResourceHandle skySpecular;
     framegraph::VirtualResourceHandle skyDFG;
+    framegraph::VirtualResourceHandle skyProbes;
     LocalShadowOutput localShadow;
     framegraph::VirtualResourceHandle depth;
     framegraph::VirtualResourceHandle color;

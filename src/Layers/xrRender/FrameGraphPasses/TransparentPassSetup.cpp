@@ -391,6 +391,8 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 data.skySpecular = passBuilder.read(sky.specular, ResourceState::ShaderResource);
             if (sky.dfg.is_valid())
                 data.skyDFG = passBuilder.read(sky.dfg, ResourceState::ShaderResource);
+            if (sky.probes.is_valid())
+                data.skyProbes = passBuilder.read(sky.probes, ResourceState::ShaderResource);
         },
 
         [](const TransparentPassData& data,
@@ -457,6 +459,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
             nvrhi::IBuffer* skyIrradiance = data.skyIrradiance.is_valid() ? fg.GetPhysicalBuffer(data.skyIrradiance) : nullptr;
             nvrhi::ITexture* skySpecular = data.skySpecular.is_valid() ? fg.GetPhysicalTexture(data.skySpecular) : nullptr;
             nvrhi::ITexture* skyDFG = data.skyDFG.is_valid() ? fg.GetPhysicalTexture(data.skyDFG) : nullptr;
+            nvrhi::IBuffer* skyProbes = data.skyProbes.is_valid() ? fg.GetPhysicalBuffer(data.skyProbes) : nullptr;
 
             auto makeColorBindings = [&](nvrhi::IBuffer* instanceBuffer, const char* name) -> nvrhi::IBindingSet* {
                 framegraph::BindingSetBuilder bsb(*vsReflection, *psReflection, nvDevice, name);
@@ -475,6 +478,7 @@ framegraph::DefaultOutputLayout setupTransparentPass(
                 bsb.BufferSRV("g_SkyIrradiance", skyIrradiance);
                 bsb.Texture("g_SkySpecular", skySpecular);
                 bsb.Texture("g_SkyDFG", skyDFG);
+                bsb.BufferSRV("g_SkyProbes", skyProbes);
                 auto set = cache.GetOrCreateBindingSet(bsb.Build(), data.passState->layout, nvDevice);
                 R_ASSERT2(set, "Transparent binding set creation failed");
                 return set;
