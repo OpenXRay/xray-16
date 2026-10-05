@@ -2,6 +2,7 @@
 
 #include "xrCore/xrCore.h"
 #include <nvrhi/nvrhi.h>
+#include "SkyVisibilityDebug.h"
 
 namespace xray::render::fg
 {
@@ -30,6 +31,55 @@ enum class SkyVisibilityState : u8
     Ready
 };
 
+enum class SkyProbeDebugStatus : u8
+{
+    Unavailable,
+    NoData,
+    Live,
+    Frozen,
+    Pending,
+    Invalid,
+    Error
+};
+
+class SkyProbeDebugReportContext
+{
+public:
+    SkyVisibilityLayout layout;
+    SkyVisibilityState gridState = SkyVisibilityState::Empty;
+    u32 bakeNext = 0;
+    u32 currentFrame = 0;
+    u32 readbackFrame = 0;
+    u32 captureIndex = 0;
+    u32 readbackCount = 0;
+    u32 cacheVersion = 0;
+    u32 probeBytes = 0;
+    bool frozen = false;
+    bool explicitCapture = false;
+    xr_string statusText;
+    xr_string cachePath;
+    xr_string backendName;
+    u64 geometryStamp = 0;
+    xr_string issues;
+    xr_string warnings;
+};
+
+class SkyProbeDebugReport
+{
+public:
+    static xr_string Build(const SkyProbeDebugSnapshot& packet, const SkyProbeDebugReportContext& context);
+    static void Validate(const SkyProbeDebugSnapshot& packet, const SkyVisibilityLayout& layout, xr_string& issues,
+        xr_string& warnings);
+    static const char* SurfaceStatusName(u32 status);
+    static const char* CornerStateName(u32 state);
+    static const char* RayStatusName(u32 status);
+    static char RayStatusLetter(u32 status);
+    static const char* RayLabel(u32 ray);
+    static const char* SceneStatusName(u32 status);
+    static const char* GridStateName(SkyVisibilityState state);
+    static const char* StatusName(SkyProbeDebugStatus status);
+};
+
 class SkyVisibilityGrid
 {
 public:
@@ -50,6 +100,17 @@ public:
     nvrhi::IBuffer* GetBuffer() const;
     SkyVisibilityState GetState() const;
 
+    bool PrepareDebugSnapshot();
+    bool NeedsDebugSnapshot() const;
+    bool HasDebugSnapshot() const;
+    nvrhi::IBuffer* GetDebugBuffer() const;
+    nvrhi::IBuffer* GetDebugReadbackBuffer() const;
+    void RecordDebugSnapshot(nvrhi::ICommandList* commandList);
+    void ReportDebugFailure(const char* reason);
+    void RequestDebugCapture();
+    void ResetDebugSnapshots();
+    void DrawDebugInspector();
+
 private:
     SkyVisibilityLayout BuildLayout() const;
     bool Allocate(const SkyVisibilityLayout& layout);
@@ -58,6 +119,17 @@ private:
     void SaveCache(const void* data, u64 bytes) const;
     void PollReadback();
     void ReleaseReadback();
+    void ConsumeDebugControls();
+    void PollDebugReadback();
+    void ReleaseDebugReadback();
+    void ExportDebugCapture();
+    void FailDebugCapture(const char* reason);
+    SkyProbeDebugStatus GetDebugStatus() const;
+    SkyProbeDebugReportContext BuildDebugContext(bool explicitCapture) const;
+    void DrawDebugSurface(const SkyProbeDebugSnapshot& packet);
+    void DrawDebugCorners(const SkyProbeDebugSnapshot& packet);
+    void DrawDebugLabels(const SkyProbeDebugSnapshot& packet) const;
+    void DrawDebugLegend() const;
 
     RenderDevice* m_device = nullptr;
     SkyVisibilityLayout m_layout;
@@ -75,5 +147,29 @@ private:
     bool m_clearPending = false;
     bool m_rebakeRequested = false;
     bool m_levelActive = false;
+
+    nvrhi::BufferHandle m_debugBuffer;
+    nvrhi::BufferHandle m_debugReadback;
+    SkyProbeDebugSnapshot m_debugPacket;
+    xr_string m_debugError;
+    xr_string m_debugIssues;
+    xr_string m_debugWarnings;
+    xr_string m_debugExportStatus;
+    xr_string m_debugReport;
+    u64 m_debugLease = 0;
+    u32 m_debugRecordFrame = 0;
+    u32 m_debugRequestFrame = 0;
+    u32 m_debugReadbackFrame = 0;
+    u32 m_debugReadbackCount = 0;
+    u32 m_debugCaptureCount = 0;
+    u32 m_debugFailures = 0;
+    bool m_debugGpuValid = false;
+    bool m_debugDecoded = false;
+    bool m_debugDesync = false;
+    bool m_debugFailed = false;
+    bool m_debugAllocFailed = false;
+    bool m_debugPendingCapture = false;
+    bool m_debugCaptureRequested = false;
+    bool m_debugShowRaw = false;
 };
 }

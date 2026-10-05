@@ -190,6 +190,11 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
     VirtualResourceHandle sunMask, const LocalShadowOutput& localShadow, const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky,
     xray::profiler::GPUProfiler* gpuProfiler, DeferredLightPassState* state, LightingFrameState* lighting)
 {
+    if (state)
+    {
+        state->skyVisibilityRecordedFrame = Device.dwFrame;
+        state->skyVisibilityRecordedStatus = 0;
+    }
     if (!state || !inputs.albedo.is_valid() || !inputs.depth.is_valid() || !inputs.normal.is_valid() || !inputs.baseColor.is_valid() || !inputs.material.is_valid())
         return inputs;
 
@@ -199,8 +204,8 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
 
     auto& passData = fg.addCallbackPass<DeferredLightPassData>(
         "Deferred Light",
-        [&, width, height, sunMask, localShadow, clusterLights, sky, state, gpuProfiler, lighting](FrameGraph& builder, PassHandle passHandle,
-            DeferredLightPassData& data)
+        [&, width, height, sunMask, localShadow, clusterLights, sky, state, gpuProfiler, lighting](FrameGraph& builder,
+            PassHandle passHandle, DeferredLightPassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.device = device;
@@ -318,6 +323,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                     data.gpuProfiler->EndPass(cmdList, "Deferred Light.Classify");
             }
 
+            u32 recordedClasses = 0;
             for (u32 cls = 0; cls < kLightTileClasses; ++cls)
             {
                 auto* refl = shaderLoader->GetCachedReflection(kTileShaderNames[cls], ".cs");
@@ -365,9 +371,11 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 cs.indirectParams = state.tileArgsBuffer;
                 cmdList->setComputeState(cs);
                 cmdList->dispatchIndirect(cls * kTileArgsStride);
+                recordedClasses |= 1u << cls;
                 if (data.gpuProfiler)
                     data.gpuProfiler->EndPass(cmdList, kTileProfilerNames[cls]);
             }
+            state.skyVisibilityRecordedStatus = recordedClasses == (1u << kLightTileClasses) - 1u ? 1u : 2u;
 
             ScheduleTileStats(state, cmdList, nvDevice);
         });
