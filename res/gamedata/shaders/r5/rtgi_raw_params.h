@@ -14,6 +14,7 @@ cbuffer RTGIRawParams : register(b5)
     uint g_RawPad3; float g_SunAngularRadius, g_CameraConeSpread; uint g_ClusterLights;
     uint g_DetailMeshBatchStart, g_StaticDetailBatchStart, g_DetailPbrIndex, g_DetailBumpIndex;
     uint g_LightRays, g_RawPad0, g_RawPad1, g_RawPad2;
+    float4x4 g_HudUnwarp;
 };
 
 #endif

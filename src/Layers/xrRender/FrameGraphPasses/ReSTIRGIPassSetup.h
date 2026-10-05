@@ -126,9 +126,10 @@ public:
     u32 pad0;
     u32 pad1;
     u32 pad2;
+    Fmatrix hudUnwarp;
 };
 
-static_assert(sizeof(RTGIRawCB) == 224);
+static_assert(sizeof(RTGIRawCB) == 288);
 
 class RTGICompositeParams
 {

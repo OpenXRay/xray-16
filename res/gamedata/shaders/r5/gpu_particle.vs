@@ -10,7 +10,6 @@ StructuredBuffer<uint> g_BucketOffsets : register(t5);
 
 cbuffer GpuParticleDrawParams : register(b5)
 {
-    float4x4 g_HudWarp;
     float4 g_CameraTop;
     float4 g_CameraRight;
     uint g_DrawBucket;
@@ -108,8 +107,10 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     uint corner = corners[vertexID % 6u];
     float2 uv = float2((corner & 2u) != 0u ? 1.0 : 0.0, (corner & 1u) != 0u ? 0.0 : 1.0);
     position += horizontal * (uv.x * 2.0 - 1.0) + vertical * (1.0 - uv.y * 2.0);
-    if ((emitter.flags & GPU_PAPI_HUD) != 0u)
-        position = mul(g_HudWarp, float4(position, 1.0)).xyz;
+    bool hud = (emitter.flags & GPU_PAPI_HUD) != 0u;
+    float4 shownPos = float4(position, 1.0);
+    if (hud)
+        shownPos = mul(m_HudWarp, shownPos);
 
     if ((program.flags & (1u << 10u)) != 0u)
     {
@@ -119,8 +120,8 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     }
 
     VS_OUTPUT output;
-    output.hpos = mul(m_VP, float4(position, 1.0));
-    if ((emitter.flags & GPU_PAPI_HUD) != 0u)
+    output.hpos = mul(m_VP, shownPos);
+    if (hud)
         output.hpos.z = 0.9 * output.hpos.w + 0.1 * output.hpos.z;
     output.texcoord = uv;
     output.color = float4((particle.color >> 16u) & 255u, (particle.color >> 8u) & 255u,

@@ -25,6 +25,7 @@ cbuffer ReSTIRGIParams
     uint g_MaxNullEvents;
     uint g_ReSTIRPad0;
     float g_SunAngularRadius;
+    float4x4 g_HudUnwarp;
 };
 
 Texture2D<float> t_Depth;
@@ -41,10 +42,14 @@ float3 ReconstructWorldPos(float2 pixel, float depth)
 {
     float2 uv = (pixel + 0.5) / g_ScreenSize;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, depth, 1.0);
-    if (depth >= 0.9)
+    bool hud = depth >= 0.9;
+    if (hud)
         clip.z = (depth - 0.9) * 10.0;
     float4 world = mul(g_InvViewProj, clip);
-    return world.xyz / world.w;
+    float3 position = world.xyz / world.w;
+    if (hud)
+        position = mul(g_HudUnwarp, float4(position, 1.0)).xyz;
+    return position;
 }
 
 [numthreads(8, 8, 1)]

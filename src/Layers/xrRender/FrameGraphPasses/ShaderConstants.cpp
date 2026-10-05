@@ -31,19 +31,39 @@ void ResetSunDirVisual()
     s_sunDirVisualInit = false;
 }
 
-Fmatrix HudFovWarp()
+static Fmatrix HudFovViewScale(const Fmatrix& view, float scaleXY)
 {
     Fmatrix invView;
-    invView.invert(Device.mView);
+    invView.invert(view);
     Fmatrix scale;
     scale.identity();
-    scale._11 = 1.0f / psHUD_FOV;
-    scale._22 = 1.0f / psHUD_FOV;
+    scale._11 = scaleXY;
+    scale._22 = scaleXY;
     Fmatrix scaledView;
-    scaledView.mul(scale, Device.mView);
+    scaledView.mul(scale, view);
     Fmatrix warp;
     warp.mul(invView, scaledView);
     return warp;
+}
+
+Fmatrix HudFovWarp(const Fmatrix& view)
+{
+    return HudFovViewScale(view, 1.0f / psHUD_FOV);
+}
+
+Fmatrix HudFovUnwarp(const Fmatrix& view)
+{
+    return HudFovViewScale(view, psHUD_FOV);
+}
+
+Fmatrix HudFovWarp()
+{
+    return HudFovWarp(Device.mView);
+}
+
+Fmatrix HudFovUnwarp()
+{
+    return HudFovUnwarp(Device.mView);
 }
 
 void MergeBoundingSphere(Fvector4& acc, const Fvector4& b)
@@ -66,17 +86,10 @@ void MergeBoundingSphere(Fvector4& acc, const Fvector4& b)
     acc.set(c0.x, c0.y, c0.z, r);
 }
 
-HudShadowFit BuildHudShadowFit(const Fvector4& trueSphere)
+Fvector4 HudShadowSphere(const Fvector4& sphere)
 {
-    HudShadowFit fit;
-    fit.warp = HudFovWarp();
-    fit.trueSphere = trueSphere;
-    fit.trueSphere.w = std::max(trueSphere.w, 0.05f) + kHudBoundsMargin;
-    Fvector center;
-    center.set(trueSphere.x, trueSphere.y, trueSphere.z);
-    fit.warp.transform_tiny(center);
-    const float stretch = std::max(1.0f / psHUD_FOV, 1.0f);
-    fit.shownSphere.set(center.x, center.y, center.z, std::max(trueSphere.w, 0.05f) * stretch + kHudBoundsMargin);
+    Fvector4 fit = sphere;
+    fit.w = std::max(sphere.w, 0.05f) + kHudBoundsMargin;
     return fit;
 }
 

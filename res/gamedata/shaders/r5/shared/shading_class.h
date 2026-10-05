@@ -42,11 +42,6 @@ float4 PackGBufferMaterialBakedSky(uint shadingClass, float transmission, float 
         1.0 - saturate(skyVisibility), 0.0);
 }
 
-float4 PackGBufferMaterial(uint shadingClass, float transmission)
-{
-    return float4(float(shadingClass) * (1.0 / 255.0), saturate(transmission), 0.0, 0.0);
-}
-
 uint GBufferShadingClass(float2 material)
 {
     return uint(material.x * 255.0 + 0.5) & GBUFFER_SHADING_CLASS_MASK;

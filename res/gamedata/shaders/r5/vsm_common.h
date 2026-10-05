@@ -59,10 +59,14 @@ int vsmSelect(float2 lxy, float4 level[VSM_LEVELS], out float2 uv, out int2 page
 
 float3 vsmReconstructPos(float4x4 invViewProj, float4 clip)
 {
-    if (clip.z >= 0.9)
+    bool hud = clip.z >= 0.9;
+    if (hud)
         clip.z = (clip.z - 0.9) * 10.0;
     float4 world = mul(invViewProj, clip);
-    return world.xyz / world.w;
+    float3 worldPos = world.xyz / world.w;
+    if (hud)
+        worldPos = mul(m_HudUnwarp, float4(worldPos, 1.0)).xyz;
+    return worldPos;
 }
 
 #endif

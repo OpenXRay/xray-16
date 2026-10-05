@@ -46,9 +46,7 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     float3 position = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
     if ((e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u)
     {
-        float4 viewPos = mul(m_V, float4(position, 1.0));
-        viewPos.xy /= hud_fov;
-        float4 clip = mul(m_P, viewPos);
+        float4 clip = mul(m_VP, mul(m_HudWarp, float4(position, 1.0)));
         clip.z = 0.9 * clip.w + 0.1 * clip.z;
         output.position = clip;
     }

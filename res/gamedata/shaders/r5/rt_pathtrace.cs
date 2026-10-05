@@ -36,6 +36,7 @@ cbuffer PathTracerParams
     uint g_PathPad0;
     uint g_PathPad1;
     uint g_PathPad2;
+    float4x4 g_HudUnwarp;
 };
 
 RWTexture2D<float4> g_Accumulation;
@@ -108,7 +109,16 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     settings.coneSpread = g_CameraConeSpread;
     settings.trackDiagnostics = true;
     settings.trackSegmentMetrics = false;
-    settings.allowHudFirstRay = true;
+    settings.firstRayMask = RT_RAY_MASK_WORLD;
+
+    float3 hudDirection = normalize(mul((float3x3)g_HudUnwarp, direction));
+    RTSceneTrace hudProbe = RTTraceRay(scene, origin, hudDirection, max(scene.rayDistance, 0.0), false, rng,
+        0.0, g_CameraConeSpread, origin, 0.0, false, RT_RAY_MASK_HUD);
+    if (hudProbe.hit)
+    {
+        direction = hudDirection;
+        settings.firstRayMask = RT_RAY_MASK_HUD;
+    }
     RTIntegratorResult result = RTIntegratorRunCamera(scene, settings, origin, direction, rng);
 
     float3 diagnostic = PTDiagnosticOutput(result);
