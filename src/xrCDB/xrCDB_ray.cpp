@@ -3,6 +3,9 @@
 
 #include "xrCore/_fbox.h"
 #include "xrCDB.h"
+#if defined(XRAY_COLLISION_EMBREE)
+#include "EmbreeModelQueries.h"
+#endif
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
@@ -437,6 +440,14 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_star
 {
     ZoneScoped;
     m_def->syncronize();
+
+#if defined(XRAY_COLLISION_EMBREE)
+    if (ShouldUseEmbreeRayQueries(ray_mode))
+    {
+        QueryEmbreeModel(m_def, *this, ray_mode, r_start, r_dir, r_range);
+        return;
+    }
+#endif
 
     // Get nodes
     const AABBNoLeafTree* T = (const AABBNoLeafTree*)m_def->tree->GetTree();

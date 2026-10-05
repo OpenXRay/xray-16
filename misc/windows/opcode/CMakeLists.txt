@@ -1,14 +1,16 @@
 cmake_minimum_required(VERSION 3.23)
 project(OpenXRayOpcode13Checks LANGUAGES CXX C)
 
-# Build only OPCODE/xrCDB and their checks, importing unchanged native engine
-# dependencies. This avoids another complete engine/SDK build for the update.
+# Build xrCDB and its checks against the matching OPCODE 1.3 runtime pair,
+# importing unchanged native engine dependencies.
 if (NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "This project requires MSVC x64.")
 endif()
 get_filename_component(XRAY_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(XRAY_NATIVE_BUILD_ROOT "${XRAY_SOURCE_DIR}" CACHE PATH "Matching native engine checkout")
 set(XRAY_NATIVE_CONFIGURATION Release CACHE STRING "Native engine configuration")
+set(XRAY_OPCODE13_IMPLIB "" CACHE FILEPATH "Matching optimized OPCODE 1.3 import library")
+set(XRAY_OPCODE13_DLL "" CACHE FILEPATH "Matching optimized OPCODE 1.3 runtime DLL")
 set(CMAKE_CONFIGURATION_TYPES "${XRAY_NATIVE_CONFIGURATION}" CACHE STRING "Configuration" FORCE)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,6 +45,11 @@ foreach(name xrCore xrAPI xrEngine)
 endforeach()
 add_library(xrMiscMath STATIC IMPORTED GLOBAL)
 set_target_properties(xrMiscMath PROPERTIES IMPORTED_LOCATION "${native_lib}/xrMiscMath.lib")
-add_subdirectory("${XRAY_SOURCE_DIR}/Externals/OPCODE" opcode)
+if (NOT EXISTS "${XRAY_OPCODE13_IMPLIB}" OR NOT EXISTS "${XRAY_OPCODE13_DLL}")
+    message(FATAL_ERROR "Set XRAY_OPCODE13_IMPLIB and XRAY_OPCODE13_DLL to the optimized OPCODE 1.3 runtime pair.")
+endif()
+add_library(xrOPCODE SHARED IMPORTED GLOBAL)
+set_target_properties(xrOPCODE PROPERTIES IMPORTED_IMPLIB "${XRAY_OPCODE13_IMPLIB}"
+    IMPORTED_LOCATION "${XRAY_OPCODE13_DLL}")
 add_subdirectory("${XRAY_SOURCE_DIR}/src/xrCDB" cdb)
 target_link_libraries(xrCDB PRIVATE xrEngine)

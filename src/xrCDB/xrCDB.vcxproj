@@ -23,10 +23,16 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(XRAY_COLLISION_EMBREE)'=='true'">$(XRAY_EMBREE_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="$(Configuration.Contains('Master Gold'))">OPCODE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>_USRDLL;XRCDB_EXPORTS;BAN_OPCODE_AUTOLINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(XRAY_COLLISION_EMBREE)'=='true'">XRAY_COLLISION_EMBREE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel Condition="'$(Platform)'=='x64'">Precise</FloatingPointModel>
     </ClCompile>
+    <Link Condition="'$(XRAY_COLLISION_EMBREE)'=='true'">
+      <AdditionalLibraryDirectories>$(XRAY_EMBREE_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>embree4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Frustum.cpp" />
@@ -55,6 +61,7 @@
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
+    <ClCompile Include="EmbreeModelQueries.cpp" Condition="'$(XRAY_COLLISION_EMBREE)'=='true'" />
     <ClCompile Include="xrXRC.cpp" />
     <ClCompile Include="xr_area.cpp" />
     <ClCompile Include="xr_area_query.cpp" />
@@ -66,6 +73,7 @@
     <ClInclude Include="ISpatial.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrCDB.h" />
+    <ClInclude Include="EmbreeModelQueries.h" Condition="'$(XRAY_COLLISION_EMBREE)'=='true'" />
     <ClInclude Include="ModelTree.h" />
     <ClInclude Include="xrXRC.h" />
     <ClInclude Include="xr_area.h" />

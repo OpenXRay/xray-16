@@ -5,6 +5,9 @@
 
 #include "xrCDB.h"
 #include "xrCore/Threading/Lock.hpp"
+#if defined(XRAY_COLLISION_EMBREE)
+#include "EmbreeModelQueries.h"
+#endif
 
 
 
@@ -24,6 +27,9 @@ MODEL::MODEL() :
 MODEL::~MODEL()
 {
     syncronize(); // maybe model still in building
+#if defined(XRAY_COLLISION_EMBREE)
+    ReleaseEmbreeModel(this);
+#endif
     status = S_INIT;
     xr_delete(tree);
     xr_free(tris);
@@ -78,6 +84,10 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
 {
     ZoneScoped;
 
+#if defined(XRAY_COLLISION_EMBREE)
+    ReleaseEmbreeModel(this);
+#endif
+
     xr_free(verts);
     xr_free(tris);
     xr_delete(tree);
@@ -105,6 +115,9 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
 
 void MODEL::load_geom(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt)
 {
+#if defined(XRAY_COLLISION_EMBREE)
+    ReleaseEmbreeModel(this);
+#endif
     xr_free(verts);
     xr_free(tris);
 
@@ -234,6 +247,9 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
         return false;
     }
 
+#if defined(XRAY_COLLISION_EMBREE)
+    ReleaseEmbreeModel(this);
+#endif
     xr_free(verts);
     xr_free(tris);
     xr_delete(tree);

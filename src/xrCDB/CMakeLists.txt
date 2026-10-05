@@ -1,5 +1,7 @@
 add_library(xrCDB)
 
+option(XRAY_COLLISION_EMBREE "Enable Embree static ray-query routing" OFF)
+
 target_sources_grouped(
     TARGET xrCDB
     NAME "engine"
@@ -37,6 +39,17 @@ target_sources_grouped(
     xrCDB_frustum.cpp
     xrCDB_ray.cpp
 )
+
+if (XRAY_COLLISION_EMBREE)
+    if (NOT XRAY_EMBREE_ROOT)
+        message(FATAL_ERROR "Set XRAY_EMBREE_ROOT to the Embree SDK root")
+    endif()
+    target_sources_grouped(TARGET xrCDB NAME "Embree" FILES EmbreeModelQueries.cpp EmbreeModelQueries.h)
+    target_include_directories(xrCDB PRIVATE "${XRAY_EMBREE_ROOT}/include")
+    target_link_directories(xrCDB PRIVATE "${XRAY_EMBREE_ROOT}/lib")
+    target_link_libraries(xrCDB PRIVATE embree4)
+    target_compile_definitions(xrCDB PRIVATE XRAY_COLLISION_EMBREE=1)
+endif()
 
 target_include_directories(xrCDB
     PRIVATE
