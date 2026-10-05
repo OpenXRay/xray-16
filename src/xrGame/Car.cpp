@@ -230,6 +230,8 @@ void CCar::net_Destroy()
     {
         pKinematics->LL_GetBoneInstance(m_bone_steer).reset_callback();
     }
+    if (m_car_weapon)
+        m_car_weapon->net_Destroy();
     CScriptEntity::net_Destroy();
     inherited::net_Destroy();
     CExplosive::net_Destroy();
@@ -476,11 +478,11 @@ void CCar::VisualUpdate(float fov)
     m_lights.Update();
 }
 
-void CCar::renderable_Render(u32 context_id, IRenderable* root)
+void CCar::PostUpdateCL(bool bUpdateCL_disabled)
 {
-    inherited::renderable_Render(context_id, root);
+    inherited::PostUpdateCL(bUpdateCL_disabled);
     if (m_car_weapon)
-        m_car_weapon->Render_internal();
+        m_car_weapon->PostUpdateCL();
 }
 
 void CCar::net_Export(NET_Packet& P)

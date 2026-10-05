@@ -42,8 +42,9 @@ constexpr u32 kLocalPairCapAT = 1u << 17;
 constexpr u32 kLocalPairCapDynOpaque = 1u << 16;
 constexpr u32 kLocalPairCapDynAT = 1u << 15;
 constexpr u32 kLocalPairCapSkinned = 1u << 16;
-constexpr u32 kLocalHudViewsMax = 16;
+constexpr u32 kLocalHudViewsMax = 64;
 constexpr u32 kLocalHudTileSize = 1024;
+constexpr u32 kLocalHudAreaTileSize = 512;
 
 struct LocalShadowViewGPU {
     Fmatrix viewProj;
@@ -83,6 +84,25 @@ private:
     void ListPush(u32 node);
     void ListRemove(u32 node);
     u32 Take(u32 level);
+};
+
+struct LocalShadowState;
+
+struct LocalShadowHudWant {
+    LocalShadowState* page;
+    u32 pageIndex;
+    u32 slot;
+    const light* owner;
+    u32 group;
+    u32 faces;
+    u32 level;
+    bool fitted;
+    bool admitted;
+};
+
+struct LocalShadowAreaProxy {
+    const light* proxy;
+    const light* parent;
 };
 
 struct LocalShadowState {
@@ -152,8 +172,14 @@ struct LocalShadowState {
     nvrhi::TextureHandle hudAtlas;
     const light* hudOwners[kLocalHudViewsMax] = {};
     u32 hudFaces[kLocalHudViewsMax] = {};
+    u16 hudNodes[kLocalHudViewsMax] = {};
+    LocalAtlasAllocator hudAlloc;
     u32 hudViews = 0;
     u32 hudSlots[kLocalHudViewsMax] = {};
+    xr_vector<LocalShadowHudWant> hudWants;
+    xr_vector<const light*> hudAreaGroups;
+    xr_vector<LocalShadowAreaProxy> areaProxies;
+    xr_vector<const light*> largePointGroups;
     nvrhi::GraphicsPipelineHandle hudPagePipeline;
     nvrhi::BindingLayoutHandle hudPageLayout;
     nvrhi::ShaderHandle hudPageVS;

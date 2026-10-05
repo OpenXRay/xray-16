@@ -167,7 +167,7 @@ u32 ClusteredLightManager::ResolveSpotTexture(const light* L)
     return GetOrLoadSpotTexture(L->spot_texture_name);
 }
 
-GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture) const
+GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture, bool withAreaShadows) const
 {
     GPULightData gpu;
 
@@ -180,6 +180,10 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
     gpu.colorAndRange.set(color.x * lod, color.y * lod, color.z * lod, range);
 
     std::memset(&gpu.spotVP, 0, sizeof(gpu.spotVP));
+    gpu.areaRightAndRadius.set(0.0f, 0.0f, 0.0f, 0.0f);
+    gpu.areaLength.set(0.0f, 0.0f, 0.0f, 0.0f);
+    std::memset(gpu.areaShadowSlots0, 0, sizeof(gpu.areaShadowSlots0));
+    std::memset(gpu.areaShadowSlots1, 0, sizeof(gpu.areaShadowSlots1));
 
     const u32 lightType = L->flags.type;
     const bool isSpot = (lightType == IRender_Light::SPOT || lightType == IRender_Light::OMNIPART);
@@ -239,6 +243,21 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
             gpu.spotVP.mul(spotProj, spotView);
         }
     }
+    else if (lightType == IRender_Light::AREA)
+    {
+        gpu.directionAndSpotScale.set(L->direction.x, L->direction.y, L->direction.z, 0.0f);
+        gpu.spotParamsAndType.set(0.0f, 2.0f, 0.0f, float(shadowSlot));
+        gpu.areaRightAndRadius.set(L->right.x, L->right.y, L->right.z, L->area_radius);
+        gpu.areaLength.set(L->area_length, 0.0f, 0.0f, 0.0f);
+        if (withAreaShadows)
+        {
+            for (u32 i = 0; i < 4; ++i)
+            {
+                gpu.areaShadowSlots0[i] = L->area_shadow_slots[i];
+                gpu.areaShadowSlots1[i] = L->area_shadow_slots[4 + i];
+            }
+        }
+    }
     else
     {
         gpu.directionAndSpotScale.set(0.0f, -1.0f, 0.0f, 0.0f);
@@ -252,7 +271,7 @@ void ClusteredLightManager::CollectLight(const light* L)
 {
     EnsureLightCapacity(m_numLights + 1u);
 
-    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L)));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L), false));
     m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }
@@ -276,7 +295,8 @@ void ClusteredLightManager::CollectLightsParallel(const xr_vector<const light*>&
     xr_parallel_for(TaskRange<u32>(0, count), [&](const TaskRange<u32>& range) {
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
-            m_lightsCPU[i] = BuildGPULightData(lights[i], i < shadowSlots.size() ? shadowSlots[i] : 0u, m_spotTextureScratch[i]);
+            const bool hasSlots = i < shadowSlots.size();
+            m_lightsCPU[i] = BuildGPULightData(lights[i], hasSlots ? shadowSlots[i] : 0u, m_spotTextureScratch[i], hasSlots);
             m_lightIDs[i] = lights[i]->GetLightID();
         }
     });
@@ -300,7 +320,7 @@ void ClusteredLightManager::AddLight(const light* L, u32 type)
 {
     EnsureLightCapacity(m_numLights + 1u);
 
-    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L)));
+    m_lightsCPU.push_back(BuildGPULightData(L, 0, ResolveSpotTexture(L), false));
     m_lightIDs.push_back(L->GetLightID());
     m_numLights++;
 }
@@ -371,6 +391,8 @@ u64 ClusteredLightManager::GetTransportSignature() const
     {
         auto transport = m_lightsCPU[index];
         transport.spotParamsAndType.w = 0.0f;
+        std::memset(transport.areaShadowSlots0, 0, sizeof(transport.areaShadowSlots0));
+        std::memset(transport.areaShadowSlots1, 0, sizeof(transport.areaShadowSlots1));
         u64 lightSignature = 14695981039346656037ull;
         const auto append = [&](const void* data, size_t size)
         {

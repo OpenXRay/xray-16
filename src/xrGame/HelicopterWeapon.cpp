@@ -68,7 +68,6 @@ void CHelicopter::MGunUpdateFire()
         no_fire_time = -1;
 
     CShootingObject::UpdateFlameParticles();
-    CShootingObject::UpdateLight();
 
     if (!IsWorking())
     {
@@ -146,8 +145,7 @@ void CHelicopter::OnShot()
     FireBullet(fire_pos, fire_dir, fireDispersionBase, m_CurrentAmmo, ID(), ID(), OnServer(), ::Random.randI(0, 30));
 
     StartShotParticles();
-    if (m_bLightShotEnabled)
-        Light_Start();
+    Light_Start();
 
     StartFlameParticles();
     StartSmokeParticles(fire_pos, zero_vel);
@@ -254,7 +252,7 @@ void CHelicopter::UpdateWeapons()
     MGunUpdateFire();
 }
 
-void CHelicopter::UpdateMGunDir()
+void CHelicopter::UpdateMGunFirePose()
 {
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     m_fire_bone_xform = K->LL_GetTransform(m_fire_bone);
@@ -266,6 +264,26 @@ void CHelicopter::UpdateMGunDir()
     m_fire_bone_xform.transform_dir(m_fire_dir);
 
     m_fire_dir.sub(m_enemy.destEnemyPos, m_fire_pos).normalize_safe();
+}
+
+void CHelicopter::PostUpdateCL(bool bUpdateCL_disabled)
+{
+    inherited::PostUpdateCL(bUpdateCL_disabled);
+
+    if (IsLightLive())
+    {
+        smart_cast<IKinematics*>(Visual())->CalculateBones();
+        UpdateMGunFirePose();
+    }
+
+    UpdateLight();
+}
+
+void CHelicopter::UpdateMGunDir()
+{
+    UpdateMGunFirePose();
+
+    IKinematics* K = smart_cast<IKinematics*>(Visual());
 
     m_left_rocket_bone_xform = K->LL_GetTransform(m_left_rocket_bone);
     m_left_rocket_bone_xform.mulA_43(XFORM());
@@ -347,3 +365,4 @@ void CHelicopter::startRocket(u16 idx)
 
 const Fmatrix& CHelicopter::get_ParticlesXFORM() { return m_fire_bone_xform; }
 const Fvector& CHelicopter::get_CurrentFirePoint() { return m_fire_pos; }
+const Fvector& CHelicopter::get_CurrentFireDirection() { return m_fire_dir; }

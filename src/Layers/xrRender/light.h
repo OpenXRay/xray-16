@@ -9,6 +9,10 @@
 
 namespace xray::render::fg
 {
+inline constexpr u32 kCapsuleLightSamples = 8;
+inline constexpr float kCapsuleLightMinRadius = 0.001f;
+inline constexpr float kCapsuleShadowNearClip = 0.001f;
+
 class light : public IRender_Light, public SpatialBase
 {
 public:
@@ -27,6 +31,11 @@ public:
     Fvector right;
     float range;
     float virtual_size;
+    float area_length;
+    float area_radius;
+    bool area_shadow_sample;
+    mutable u32 area_shadow_slots[kCapsuleLightSamples];
+    mutable light* area_shadow_samples[kCapsuleLightSamples];
     float cone;
     Fcolor color;
     shared_str spot_texture_name;
@@ -93,10 +102,7 @@ public:
 #endif //	(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 public:
-    void set_type(LT type) override
-    {
-        flags.type = type;
-    }
+    void set_type(LT type) override;
 
     void set_active(bool b) override;
 
@@ -122,6 +128,11 @@ public:
     void set_range(float R) override;
 
     void set_virtual_size(float R) override { virtual_size = R; }
+
+    void set_area(float length, float radius) override;
+
+    void area_surface_sample(float u, float v, Fvector& P, Fvector& N) const;
+    void UpdateAreaShadowSamples() const;
 
     void set_color(const Fcolor& C) override
     {
@@ -159,6 +170,7 @@ public:
 
 private:
     static u64 AllocateLightID();
+    void orthonormalize_area_basis(const Fvector& D, const Fvector& R);
 
     u64 m_lightID;
 };

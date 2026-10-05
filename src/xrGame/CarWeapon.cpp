@@ -101,7 +101,6 @@ void CCarWeapon::UpdateFire()
     fShotTimeCounter -= Device.fTimeDelta;
 
     inheritedShooting::UpdateFlameParticles();
-    inheritedShooting::UpdateLight();
 
     if (m_bAutoFire)
     {
@@ -126,7 +125,24 @@ void CCarWeapon::UpdateFire()
     }
 }
 
-void CCarWeapon::Render_internal() { RenderLight(); }
+void CCarWeapon::PostUpdateCL()
+{
+    if (IsLightLive())
+    {
+        smart_cast<IKinematics*>(m_object->Visual())->CalculateBones();
+        UpdateFirePose();
+    }
+
+    UpdateLight();
+}
+
+void CCarWeapon::net_Destroy()
+{
+    m_bActive = false;
+    FireEnd();
+    Light_Destroy();
+}
+
 void CCarWeapon::SetBoneCallbacks()
 {
     //	m_object->PPhysicsShell()->EnabledCallbacks(FALSE);
@@ -147,7 +163,7 @@ void CCarWeapon::ResetBoneCallbacks()
     //	m_object->PPhysicsShell()->EnabledCallbacks(TRUE);
 }
 
-void CCarWeapon::UpdateBarrelDir()
+void CCarWeapon::UpdateFirePose()
 {
     IKinematics* K = smart_cast<IKinematics*>(m_object->Visual());
     m_fire_bone_xform = K->LL_GetTransform(m_fire_bone);
@@ -159,6 +175,11 @@ void CCarWeapon::UpdateBarrelDir()
     m_fire_bone_xform.transform_dir(m_fire_dir);
     m_fire_norm.set(0, 1, 0);
     m_fire_bone_xform.transform_dir(m_fire_norm);
+}
+
+void CCarWeapon::UpdateBarrelDir()
+{
+    UpdateFirePose();
 
     m_allow_fire = true;
     Fmatrix XFi;
@@ -202,6 +223,7 @@ float CCarWeapon::FireDirDiff()
 }
 
 const Fvector& CCarWeapon::get_CurrentFirePoint() { return m_fire_pos; }
+const Fvector& CCarWeapon::get_CurrentFireDirection() { return m_fire_dir; }
 const Fmatrix& CCarWeapon::get_ParticlesXFORM() { return m_fire_bone_xform; }
 void CCarWeapon::FireStart() { inheritedShooting::FireStart(); }
 void CCarWeapon::FireEnd()
@@ -217,8 +239,7 @@ void CCarWeapon::OnShot()
 
     StartShotParticles();
 
-    if (m_bLightShotEnabled)
-        Light_Start();
+    Light_Start();
 
     StartFlameParticles();
     StartSmokeParticles(m_fire_pos, zero_vel);

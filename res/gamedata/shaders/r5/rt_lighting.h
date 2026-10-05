@@ -380,12 +380,26 @@ RTLightList RTResolveLightList(RTSceneParams scene, float3 position, bool primar
 }
 
 RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
-    float3 geoNormal, float3 V, bool continuation, uint lightIndex)
+    float3 geoNormal, float3 V, bool continuation, uint lightIndex, inout uint rng)
 {
     GPULightData light = g_LightData[lightIndex];
     float3 L;
     float distance;
-    float attenuation = PunctualLightAttenuation(light, position, L, distance);
+    float attenuation;
+    if (IsCapsuleLight(light))
+    {
+        float2 surfaceSample;
+        surfaceSample.x = rand_float(rng);
+        surfaceSample.y = rand_float(rng);
+        float3 samplePosition;
+        float3 sampleNormal;
+        SampleCapsuleLight(light, surfaceSample, samplePosition, sampleNormal);
+        attenuation = CapsuleLightAttenuation(light, position, samplePosition, sampleNormal, L, distance);
+    }
+    else
+    {
+        attenuation = PunctualLightAttenuation(light, position, L, distance);
+    }
     if (!(attenuation > 0.0) || distance > scene.rayDistance)
     {
         RTLightCandidate none = (RTLightCandidate)0;
@@ -397,14 +411,14 @@ RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surf
 
 void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
-    inout RTDirectTerms result, bool primary = false)
+    inout uint rng, inout RTDirectTerms result, bool primary = false)
 {
     RTLightList list = RTResolveLightList(scene, position, primary);
     for (uint i = 0u; i < list.count; ++i)
     {
         uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
         RTTraceLightCandidate(scene, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
-            lightIndex), 1.0, coneWidth, coneSpread, result);
+            lightIndex, rng), 1.0, coneWidth, coneSpread, result);
     }
 }
 
@@ -490,7 +504,7 @@ RTDirectTerms RTDirectLightingResampled(RTSceneParams scene, MaterialSurface sur
     {
         uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
         RTLightReservoirAdd(reservoir, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
-            lightIndex), rng);
+            lightIndex, rng), rng);
     }
     RTLightReservoirResolve(scene, reservoir, coneWidth, coneSpread, result);
     RTDirectLightingSanitize(result);
@@ -508,7 +522,7 @@ RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface
     RTDirectLightingSun(scene, surface, position, geoNormal, V, coneWidth, coneSpread, continuation,
         rng, result);
     RTDirectLightingLocalLights(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
-        continuation, result, primary);
+        continuation, rng, result, primary);
     RTDirectLightingEnvironment(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
         continuation, rng, result);
     RTDirectLightingEmissive(scene, surface, position, geoNormal, V, coneWidth, coneSpread,

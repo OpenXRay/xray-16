@@ -144,6 +144,7 @@ void CWeaponStatMgun::net_Destroy()
             p_overheat->Stop(false);
         CParticlesObject::Destroy(p_overheat);
     }
+    inheritedShooting::Light_Destroy();
     inheritedPH::net_Destroy();
     processing_deactivate();
 }
@@ -191,7 +192,7 @@ void CWeaponStatMgun::Hit(SHit* pHDS)
         inheritedPH::Hit(pHDS);
 }
 
-void CWeaponStatMgun::UpdateBarrelDir()
+void CWeaponStatMgun::UpdateFirePose()
 {
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     m_fire_bone_xform = K->LL_GetTransform(m_fire_bone);
@@ -201,6 +202,11 @@ void CWeaponStatMgun::UpdateBarrelDir()
     m_fire_bone_xform.transform_tiny(m_fire_pos);
     m_fire_dir.set(0, 0, 1);
     m_fire_bone_xform.transform_dir(m_fire_dir);
+}
+
+void CWeaponStatMgun::UpdateBarrelDir()
+{
+    UpdateFirePose();
 
     m_allow_fire = true;
     Fmatrix XFi;
@@ -263,11 +269,17 @@ void CWeaponStatMgun::cam_Update(float dt, float fov)
     Level().Cameras().UpdateFromCamera(Camera());
 }
 
-void CWeaponStatMgun::renderable_Render(u32 context_id, IRenderable* root)
+void CWeaponStatMgun::PostUpdateCL(bool bUpdateCL_disabled)
 {
-    inheritedPH::renderable_Render(context_id, root);
+    inheritedPH::PostUpdateCL(bUpdateCL_disabled);
 
-    RenderLight();
+    if (IsLightLive())
+    {
+        smart_cast<IKinematics*>(Visual())->CalculateBones();
+        UpdateFirePose();
+    }
+
+    UpdateLight();
 }
 
 void CWeaponStatMgun::SetDesiredDir(float h, float p) { m_destEnemyDir.setHP(h, p); }

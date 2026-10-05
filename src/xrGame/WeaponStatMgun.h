@@ -72,8 +72,10 @@ private:
 	CParticlesObject* p_overheat{};
 
 protected:
+    void UpdateFirePose();
     void UpdateBarrelDir();
     virtual const Fvector& get_CurrentFirePoint();
+    virtual const Fvector& get_CurrentFireDirection();
     virtual const Fmatrix& get_ParticlesXFORM();
 
     virtual void FireStart();
@@ -106,7 +108,7 @@ public:
     virtual CInventory* GetInventory() { return NULL; };
     virtual void cam_Update(float dt, float fov = 90.0f);
 
-    void renderable_Render(u32 context_id, IRenderable* root) override;
+    void PostUpdateCL(bool bUpdateCL_disabled) override;
 
     virtual bool attach_Actor(CGameObject* actor);
     virtual void detach_Actor();

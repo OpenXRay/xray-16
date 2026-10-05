@@ -18,8 +18,12 @@ struct GPULightData {
     Fvector4 directionAndSpotScale;
     Fvector4 spotParamsAndType;
     Fmatrix  spotVP;
+    Fvector4 areaRightAndRadius;
+    Fvector4 areaLength;
+    u32      areaShadowSlots0[4];
+    u32      areaShadowSlots1[4];
 };
-static_assert(sizeof(GPULightData) == 128, "GPULightData must be 128 bytes");
+static_assert(sizeof(GPULightData) == 192, "GPULightData must be 192 bytes");
 
 struct alignas(16) ClusterCB {
     Fvector4 gridDims;
@@ -95,7 +99,7 @@ public:
 private:
     void EnsureLightCapacity(u32 count);
     void AddLight(const light* L, u32 type);
-    GPULightData BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture) const;
+    GPULightData BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture, bool withAreaShadows) const;
     u32 GetOrLoadSpotTexture(const shared_str& name);
     u32 ResolveSpotTexture(const light* L);
 

@@ -7,9 +7,48 @@ struct GPULightData {
     float4 directionAndSpotScale;
     float4 spotParamsAndType;
     float4x4 spotVP;
+    float4 areaRightAndRadius;
+    float4 areaLength;
+    uint4 areaShadowSlots0;
+    uint4 areaShadowSlots1;
 };
 
 #include "shared/local_shadow.h"
+
+#define CAPSULE_LIGHT_SAMPLES 8u
+#define CAPSULE_LIGHT_SAMPLE_WEIGHT 0.125f
+
+bool IsSpotLight(GPULightData light)
+{
+    return light.spotParamsAndType.y > 0.5f && light.spotParamsAndType.y < 1.5f;
+}
+
+bool IsCapsuleLight(GPULightData light)
+{
+    return light.spotParamsAndType.y > 1.5f;
+}
+
+float3 LightInfluenceCenter(GPULightData light)
+{
+    float3 center = light.positionAndInvRangeSq.xyz;
+    if (IsCapsuleLight(light))
+        center += light.directionAndSpotScale.xyz * (0.5f * light.areaLength.x);
+    return center;
+}
+
+float LightInfluenceRadius(GPULightData light)
+{
+    float radius = light.colorAndRange.w;
+    if (IsCapsuleLight(light))
+        radius += 0.5f * light.areaLength.x + light.areaRightAndRadius.w;
+    return radius;
+}
+
+bool LightHasShadow(GPULightData light)
+{
+    return light.spotParamsAndType.w != 0.0f
+        || any(light.areaShadowSlots0) || any(light.areaShadowSlots1);
+}
 
 uint LocalShadowSlot(GPULightData light, float3 worldPos)
 {
@@ -17,6 +56,37 @@ uint LocalShadowSlot(GPULightData light, float3 worldPos)
     if (slot1 == 0u)
         return 0xFFFFFFFFu;
     return LocalShadowCachedSlot(slot1 - 1u, light.spotParamsAndType.y < 0.5f, worldPos);
+}
+
+uint CapsuleShadowSlot(GPULightData light, uint sampleIndex, float3 worldPos)
+{
+    uint slot1 = sampleIndex < 4u ? light.areaShadowSlots0[sampleIndex] : light.areaShadowSlots1[sampleIndex - 4u];
+    if (slot1 == 0u)
+        return 0xFFFFFFFFu;
+    return LocalShadowCachedSlot(slot1 - 1u, true, worldPos);
+}
+
+float2 CapsuleLightRasterSample(uint sampleIndex)
+{
+    return float2((float(sampleIndex) + 0.5f) * 0.125f, frac(float(sampleIndex) * 0.61803398875f));
+}
+
+void SampleCapsuleLight(GPULightData light, float2 u, out float3 position, out float3 normal)
+{
+    float3 start = light.positionAndInvRangeSq.xyz;
+    float3 axis = light.directionAndSpotScale.xyz;
+    float3 right = light.areaRightAndRadius.xyz;
+    float radius = light.areaRightAndRadius.w;
+    float capsuleLength = light.areaLength.x;
+    float3 up = cross(axis, right);
+
+    float h = u.x * (capsuleLength + 2.0f * radius) - radius;
+    float a = h < 0.0f ? h / radius : (h > capsuleLength ? (h - capsuleLength) / radius : 0.0f);
+    float radial = sqrt(max(0.0f, 1.0f - a * a));
+    float phi = 6.28318530718f * u.y;
+
+    normal = axis * a + (right * cos(phi) + up * sin(phi)) * radial;
+    position = start + axis * clamp(h, 0.0f, capsuleLength) + radius * normal;
 }
 
 // Point light distance attenuation (smooth window function)
@@ -31,6 +101,17 @@ float SpotLightAttenuation(float3 toLight, float3 spotDir, float scale, float of
 {
     float cosAngle = dot(normalize(-toLight), spotDir);
     return saturate(cosAngle * scale + offset);
+}
+
+float CapsuleLightAttenuation(GPULightData light, float3 worldPos, float3 samplePosition, float3 sampleNormal, out float3 L, out float dist)
+{
+    float3 toSample = samplePosition - worldPos;
+    float distSq = max(dot(toSample, toSample), 1e-6f);
+    float invDist = rsqrt(distSq);
+    dist = distSq * invDist;
+    L = toSample * invDist;
+    float cosEmitter = max(dot(sampleNormal, -L), 0.0f);
+    return 4.0f * cosEmitter / distSq * PointLightAttenuation(distSq, light.positionAndInvRangeSq.w);
 }
 
 #ifdef CLUSTERED_LIGHTING_FORWARD
@@ -48,7 +129,7 @@ float PunctualLightAttenuation(GPULightData light, float3 worldPos, out float3 L
     L = distSq > 1e-12f ? toLight * rsqrt(distSq) : float3(0.0f, 1.0f, 0.0f);
 
     float atten = PointLightAttenuation(distSq, light.positionAndInvRangeSq.w);
-    if (light.spotParamsAndType.y > 0.5f)
+    if (IsSpotLight(light))
     {
         uint texIdx = asuint(light.spotParamsAndType.z);
         if (texIdx != 0u)
@@ -108,6 +189,54 @@ float LinearizeDepth(float ndcDepth, float zNear, float zFar)
 #ifdef CLUSTERED_LIGHTING_FORWARD
 #include "shared/pbr_brdf.h"
 
+float3 EvaluateCapsuleLight(
+    GPULightData light,
+    float3 worldPos,
+    float3 N,
+    float3 V,
+    float3 albedo,
+    float metallic,
+    float roughness,
+    uint diffuseMode,
+    bool foliage,
+    float3 sssColor)
+{
+    float3 lightColor = light.colorAndRange.xyz;
+    float3 total = 0;
+    for (uint s = 0; s < CAPSULE_LIGHT_SAMPLES; ++s)
+    {
+        float3 samplePosition;
+        float3 sampleNormal;
+        SampleCapsuleLight(light, CapsuleLightRasterSample(s), samplePosition, sampleNormal);
+
+        float3 L;
+        float dist;
+        float atten = CapsuleLightAttenuation(light, worldPos, samplePosition, sampleNormal, L, dist) * CAPSULE_LIGHT_SAMPLE_WEIGHT;
+        if (atten <= 0.0001f)
+            continue;
+        if (!foliage && dot(N, L) <= 0.0f)
+            continue;
+
+        float2 shadow = float2(1.0, 0.0);
+        uint shadowSlot = CapsuleShadowSlot(light, s, worldPos);
+        if (shadowSlot != 0xFFFFFFFFu)
+            shadow = LocalShadow(shadowSlot, worldPos, N);
+
+        float3 lc = lightColor * atten;
+        if (foliage)
+        {
+            float transmit = shadow.x + (1.0 - shadow.x) * FoliageTransmittance(shadow.y, foliage_sss.w);
+            total += PBRDirectLighting(albedo, N, V, L, lc * shadow.x, 0.0, roughness, 1u)
+                + FoliageTransmission(N, V, L, foliage_params2.x) * transmit * sssColor * lc;
+        }
+        else if (shadow.x > 0.001f)
+        {
+            total += PBRDirectLighting(albedo, N, V, L, lc * shadow.x, metallic, roughness, diffuseMode);
+        }
+    }
+    return total;
+}
+
 float3 EvaluateClusteredLights(
     float3 worldPos,
     float3 N,
@@ -139,6 +268,12 @@ float3 EvaluateClusteredLights(
         if (lightOffset != 0xFFFFFFFFu)
             lightIdx = g_LightIndexList[lightOffset + i];
         GPULightData light = g_LightData[lightIdx];
+
+        if (IsCapsuleLight(light))
+        {
+            totalLight += EvaluateCapsuleLight(light, worldPos, N, V, albedo, metallic, roughness, diffuseMode, foliage, sssColor);
+            continue;
+        }
         float3 lightColor = light.colorAndRange.xyz;
 
         float3 L;

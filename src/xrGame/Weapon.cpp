@@ -608,7 +608,6 @@ void CWeapon::net_Destroy()
     //удалить объекты партиклов
     StopFlameParticles();
     StopFlameParticles2();
-    StopLight();
     Light_Destroy();
 
     while (m_magazine.size())
@@ -861,8 +860,6 @@ void CWeapon::UpdateCL()
 {
     inherited::UpdateCL();
     UpdateHUDAddonsVisibility();
-    //подсветка от выстрела
-    UpdateLight();
 
     //нарисовать партиклы
     UpdateFlameParticles();
@@ -922,6 +919,18 @@ void CWeapon::UpdateCL()
         }
     }
 }
+
+void CWeapon::PostUpdateCL(bool bUpdateCL_disabled)
+{
+    inherited::PostUpdateCL(bUpdateCL_disabled);
+
+    if (!IsLightLive())
+        return;
+
+    dwFP_Frame = u32(-1);
+    UpdateLight();
+}
+
 void CWeapon::EnableActorNVisnAfterZoom()
 {
     CActor* pA = smart_cast<CActor*>(H_Parent());
@@ -945,10 +954,6 @@ void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
     ScopeLock lock{ &render_lock };
 
     UpdateXForm();
-
-    //нарисовать подсветку
-
-    RenderLight();
 
     //если мы в режиме снайперки, то сам HUD рисовать не надо
     if (IsZoomed() && !IsRotatingToZoom() && ZoomTexture())
@@ -1930,7 +1935,6 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
         return 1;
 }
 
-void CWeapon::render_hud_mode() { RenderLight(); }
 bool CWeapon::MovingAnimAllowedNow() { return !IsZoomed(); }
 bool CWeapon::IsHudModeNow() { return (HudItemData() != nullptr); }
 void CWeapon::ZoomInc()

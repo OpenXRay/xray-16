@@ -1041,7 +1041,7 @@ struct LocalShadowHudParams {
     u32 viewCount;
     u32 pad[2];
 };
-static_assert(sizeof(LocalShadowHudParams) == 80, "LocalShadowHudParams is shader-visible");
+static_assert(sizeof(LocalShadowHudParams) == 272, "LocalShadowHudParams is shader-visible");
 
 struct LocalShadowHudData {
     VirtualResourceHandle atlas;
@@ -1417,6 +1417,9 @@ void ResetLocalShadowPool(LocalShadowState& state)
     state.staticAtlas = state.dynAtlas = state.hudAtlas = nullptr;
     state.hudViews = 0;
     std::fill_n(state.hudOwners, kLocalHudViewsMax, nullptr);
+    std::fill_n(state.hudFaces, kLocalHudViewsMax, 0u);
+    std::fill_n(state.hudNodes, kLocalHudViewsMax, u16(0));
+    state.hudAlloc.Reset();
     std::fill_n(state.owners, kLocalTileCount, nullptr);
     std::fill_n(state.nodeOfSlot, kLocalTileCount, u16(0));
     state.atlas.Reset();
@@ -1491,7 +1494,9 @@ void SuspendLocalShadows(LocalShadowState& state)
 namespace {
 struct ShadowCandidate {
     const light* source;
+    const light* parent;
     u32 lightIndex;
+    u32 sampleIndex;
     float desiredSize;
 };
 
@@ -1804,27 +1809,66 @@ static bool ViewTouchesSphere(const LocalShadowViewGPU& rec, const Fvector4& sph
     return true;
 }
 
-static bool AllocHudRect(LocalShadowState& state, const light* owner, u32 face, u32 pageSlot, Fvector4& outRect)
+static u32 FindHudTile(const LocalShadowState& state, const light* owner, u32 face)
 {
-    u32 tile = kLocalHudViewsMax;
-    for (u32 i = 0; i < kLocalHudViewsMax; ++i) {
-        if (state.hudOwners[i] == owner && state.hudFaces[i] == face) {
-            tile = i;
-            break;
+    for (u32 i = 0; i < kLocalHudViewsMax; ++i)
+        if (state.hudOwners[i] == owner && state.hudFaces[i] == face)
+            return i;
+    return kLocalHudViewsMax;
+}
+
+static void ReleaseHudTile(LocalShadowState& state, u32 tile)
+{
+    state.hudAlloc.Free(state.hudNodes[tile]);
+    state.hudOwners[tile] = nullptr;
+    state.hudFaces[tile] = 0u;
+    state.hudNodes[tile] = 0;
+}
+
+static bool ReserveHudGroup(LocalShadowState& state, const xr_vector<LocalShadowHudWant>& wants, u32 begin, u32 end)
+{
+    u32 added[kLocalHudViewsMax];
+    u32 addedCount = 0;
+    bool ok = true;
+    for (u32 w = begin; ok && w < end; ++w) {
+        for (u32 f = 0; ok && f < wants[w].faces; ++f) {
+            if (FindHudTile(state, wants[w].owner, f) != kLocalHudViewsMax)
+                continue;
+            u32 tile = kLocalHudViewsMax;
+            for (u32 i = 0; i < kLocalHudViewsMax; ++i) {
+                if (!state.hudOwners[i]) {
+                    tile = i;
+                    break;
+                }
+            }
+            if (tile == kLocalHudViewsMax) {
+                ok = false;
+                break;
+            }
+            const u32 node = state.hudAlloc.Alloc(wants[w].level);
+            if (node == ~0u) {
+                ok = false;
+                break;
+            }
+            state.hudOwners[tile] = wants[w].owner;
+            state.hudFaces[tile] = f;
+            state.hudNodes[tile] = u16(node);
+            added[addedCount++] = tile;
         }
-        if (!state.hudOwners[i] && tile == kLocalHudViewsMax)
-            tile = i;
     }
-    if (tile == kLocalHudViewsMax || state.hudViews >= kLocalHudViewsMax)
-        return false;
-    state.hudOwners[tile] = owner;
-    state.hudFaces[tile] = face;
-    constexpr u32 columns = kLocalShadowAtlas / kLocalHudTileSize;
-    static_assert(kLocalHudViewsMax <= columns * columns);
-    outRect.set(0.0f, float((tile % columns) * kLocalHudTileSize),
-        float((tile / columns) * kLocalHudTileSize), float(kLocalHudTileSize));
-    state.hudSlots[state.hudViews++] = pageSlot;
-    return true;
+    if (!ok)
+        while (addedCount)
+            ReleaseHudTile(state, added[--addedCount]);
+    return ok;
+}
+
+static float HudTileRect(const LocalShadowState& state, const light* owner, u32 face, Fvector4& outRect)
+{
+    const u32 tile = FindHudTile(state, owner, face);
+    u32 x = 0, y = 0, size = 1;
+    state.hudAlloc.Rect(state.hudNodes[tile], x, y, size);
+    outRect.set(1.0f, float(x), float(y), float(size));
+    return float(size);
 }
 
 static bool UseHudCube(const LocalShadowState& state, const light* owner,
@@ -1846,98 +1890,147 @@ static bool UseHudCube(const LocalShadowState& state, const light* owner,
 static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* hudSphere)
 {
     state.hudViews = 0;
-    bool retained[kLocalHudViewsMax] = {};
-    for (u32 page = 0; hudSphere && page < state.activePages; ++page) {
-        const LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
-        for (u32 cand = 0; cand < current.candCount; ++cand) {
-            const u32 slot = current.candList[cand][0];
-            const LocalShadowViewGPU& rec = current.request[slot];
-            if (rec.meta[3] != 0u || !ViewTouchesSphere(rec, *hudSphere, rec.meta[2] == 0u))
-                continue;
-            const u32 faces = UseHudCube(state, current.owners[slot], rec, *hudSphere) ? 6u : 1u;
-            for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
-                if (state.hudOwners[tile] == current.owners[slot] && state.hudFaces[tile] < faces)
-                    retained[tile] = true;
-        }
-    }
-    for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
-        if (!retained[tile])
-            state.hudOwners[tile] = nullptr;
+    xr_vector<LocalShadowHudWant>& wants = state.hudWants;
+    xr_vector<const light*>& areaGroups = state.hudAreaGroups;
+    wants.clear();
+    areaGroups.clear();
     for (u32 page = 0; page < state.activePages; ++page) {
         LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
         for (u32 cand = 0; cand < current.candCount; ++cand) {
             const u32 slot = current.candList[cand][0];
-            LocalShadowViewGPU& rec = current.request[slot];
+            const LocalShadowViewGPU& rec = current.request[slot];
             if (rec.meta[3] != 0u)
                 continue;
             const bool point = rec.meta[2] != 0u;
-            const u32 faces = point ? 6u : 1u;
-            for (u32 f = 0; f < faces; ++f)
+            const u32 recordFaces = point ? 6u : 1u;
+            for (u32 f = 0; f < recordFaces; ++f)
                 current.request[slot + f].hud.set(0.0f, 0.0f, 0.0f, 0.0f);
             if (!hudSphere || !ViewTouchesSphere(rec, *hudSphere, !point))
                 continue;
             const light* L = current.owners[slot];
             const bool cube = UseHudCube(state, L, rec, *hudSphere);
-            const u32 hudFaces = cube ? 6u : 1u;
-            u32 available = 0;
-            for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile)
-                if (!state.hudOwners[tile] || state.hudOwners[tile] == L)
-                    ++available;
-            if (available < hudFaces)
-                continue;
-            const float flags = 1.0f;
-            Fvector center;
-            center.set(hudSphere->x, hudSphere->y, hudSphere->z);
-            Fvector lightPos;
-            lightPos.set(rec.lightPos.x, rec.lightPos.y, rec.lightPos.z);
+            const float dx = hudSphere->x - rec.lightPos.x;
+            const float dy = hudSphere->y - rec.lightPos.y;
+            const float dz = hudSphere->z - rec.lightPos.z;
+            const float dist = _sqrt(dx * dx + dy * dy + dz * dz);
+            LocalShadowHudWant want = {};
+            want.page = &current;
+            want.pageIndex = page;
+            want.slot = slot;
+            want.owner = L;
+            want.fitted = !cube && dist > hudSphere->w + 0.01f;
+            want.faces = want.fitted ? 1u : recordFaces;
+            want.level = LocalAtlasAllocator::LevelOf(L->area_shadow_sample ? kLocalHudAreaTileSize : kLocalHudTileSize);
+            const light* areaParent = nullptr;
+            for (const LocalShadowAreaProxy& entry : state.areaProxies) {
+                if (entry.proxy == L) {
+                    areaParent = entry.parent;
+                    break;
+                }
+            }
+            if (areaParent) {
+                auto group = std::find(areaGroups.begin(), areaGroups.end(), areaParent);
+                if (group == areaGroups.end())
+                    group = areaGroups.insert(areaGroups.end(), areaParent);
+                want.group = u32(group - areaGroups.begin());
+            } else {
+                want.group = 0x10000u + u32(wants.size());
+            }
+            wants.push_back(want);
+        }
+    }
+    std::sort(wants.begin(), wants.end(), [](const LocalShadowHudWant& a, const LocalShadowHudWant& b) {
+        if (a.group != b.group)
+            return a.group < b.group;
+        if (a.pageIndex != b.pageIndex)
+            return a.pageIndex < b.pageIndex;
+        return a.slot < b.slot;
+    });
+
+    for (u32 tile = 0; tile < kLocalHudViewsMax; ++tile) {
+        if (!state.hudOwners[tile])
+            continue;
+        bool keep = false;
+        for (const LocalShadowHudWant& want : wants) {
+            if (want.owner == state.hudOwners[tile] && state.hudFaces[tile] < want.faces
+                && state.hudAlloc.nodeLevel[state.hudNodes[tile]] == want.level) {
+                keep = true;
+                break;
+            }
+        }
+        if (!keep)
+            ReleaseHudTile(state, tile);
+    }
+
+    for (u32 begin = 0; begin < wants.size();) {
+        u32 end = begin + 1;
+        while (end < wants.size() && wants[end].group == wants[begin].group)
+            ++end;
+        const bool ok = ReserveHudGroup(state, wants, begin, end);
+        for (u32 w = begin; w < end; ++w)
+            wants[w].admitted = ok;
+        begin = end;
+    }
+
+    for (const LocalShadowHudWant& want : wants) {
+        if (!want.admitted)
+            continue;
+        LocalShadowState& current = *want.page;
+        const light* L = want.owner;
+        const bool point = current.request[want.slot].meta[2] != 0u;
+        const u32 recordFaces = point ? 6u : 1u;
+        const Fvector4 lightPosW = current.request[want.slot].lightPos;
+        const float nearBase = current.request[want.slot].zparams.x;
+        const float farBase = current.request[want.slot].zparams.y;
+        Fvector lightPos;
+        lightPos.set(lightPosW.x, lightPosW.y, lightPosW.z);
+        Fvector center;
+        center.set(hudSphere->x, hudSphere->y, hudSphere->z);
+        if (want.fitted) {
+            Fvector4 rect;
+            const float tileSize = HudTileRect(state, L, 0, rect);
             Fvector toCenter;
             toCenter.sub(center, lightPos);
             const float dist = toCenter.magnitude();
             const float r = hudSphere->w;
-            if (!cube && dist > r + 0.01f) {
+            Fvector dir;
+            dir.div(toCenter, dist);
+            Fvector up, right;
+            Fvector::generate_orthonormal_basis_normalized(dir, up, right);
+            const float halfFov = asinf(std::min(r / dist, 0.999f)) + deg2rad(1.0f);
+            const float nearZ = std::max(std::max(dist - r, 0.001f), nearBase);
+            const float farZ = std::max(farBase, dist + r);
+            Fmatrix view, proj, vp;
+            view.build_camera_dir(lightPos, dir, up);
+            proj.build_projection(2.0f * halfFov, 1.f, nearZ, farZ);
+            vp.mul(proj, view);
+            for (u32 f = 0; f < recordFaces; ++f) {
+                LocalShadowViewGPU& face = current.request[want.slot + f];
+                face.hud = rect;
+                face.hudZ.set(nearZ, farZ, 2.0f * tanf(halfFov) / tileSize, ps_r_local_shadow_hud_bias);
+                face.hudViewProj = vp;
+            }
+            state.hudSlots[state.hudViews++] = want.pageIndex * kLocalTileCount + want.slot;
+        } else {
+            for (u32 f = 0; f < want.faces; ++f) {
+                LocalShadowViewGPU& face = current.request[want.slot + f];
                 Fvector4 rect;
-                if (!AllocHudRect(state, L, 0, page * kLocalTileCount + slot, rect))
-                    continue;
-                rect.x = flags;
-                Fvector dir;
-                dir.div(toCenter, dist);
-                Fvector up, right;
+                const float tileSize = HudTileRect(state, L, f, rect);
+                Fvector dir, up, right;
+                if (point) {
+                    dir = kFaceDir[f];
+                } else {
+                    SpotBasis(L, dir, up);
+                }
                 Fvector::generate_orthonormal_basis_normalized(dir, up, right);
-                const float halfFov = asinf(std::min(r / dist, 0.999f)) + deg2rad(1.0f);
-                const float nearZ = std::max(std::max(dist - r, 0.001f), rec.zparams.x);
-                const float farZ = std::max(rec.zparams.y, dist + r);
-                Fmatrix view, proj, vp;
+                const float tanHalf = 0.5f * face.zparams.z * face.rect.z;
+                Fmatrix view, proj;
                 view.build_camera_dir(lightPos, dir, up);
-                proj.build_projection(2.0f * halfFov, 1.f, nearZ, farZ);
-                vp.mul(proj, view);
-                for (u32 f = 0; f < faces; ++f) {
-                    LocalShadowViewGPU& face = current.request[slot + f];
-                    face.hud = rect;
-                    face.hudZ.set(nearZ, farZ, 2.0f * tanf(halfFov) / float(kLocalHudTileSize), ps_r_local_shadow_hud_bias);
-                    face.hudViewProj = vp;
-                }
-            } else {
-                for (u32 f = 0; f < faces; ++f) {
-                    LocalShadowViewGPU& face = current.request[slot + f];
-                    Fvector4 rect;
-                    if (!AllocHudRect(state, L, f, page * kLocalTileCount + slot + f, rect))
-                        break;
-                    rect.x = flags;
-                    Fvector dir, up, right;
-                    if (point) {
-                        dir = kFaceDir[f];
-                    } else {
-                        SpotBasis(L, dir, up);
-                    }
-                    Fvector::generate_orthonormal_basis_normalized(dir, up, right);
-                    const float tanHalf = 0.5f * face.zparams.z * face.rect.z;
-                    Fmatrix view, proj;
-                    view.build_camera_dir(lightPos, dir, up);
-                    proj.build_projection(2.0f * atanf(tanHalf), 1.f, face.zparams.x, face.zparams.y);
-                    face.hud = rect;
-                    face.hudZ.set(face.zparams.x, face.zparams.y, 2.0f * tanHalf / float(kLocalHudTileSize), ps_r_local_shadow_hud_bias);
-                    face.hudViewProj.mul(proj, view);
-                }
+                proj.build_projection(2.0f * atanf(tanHalf), 1.f, face.zparams.x, face.zparams.y);
+                face.hud = rect;
+                face.hudZ.set(face.zparams.x, face.zparams.y, 2.0f * tanHalf / tileSize, ps_r_local_shadow_hud_bias);
+                face.hudViewProj.mul(proj, view);
+                state.hudSlots[state.hudViews++] = want.pageIndex * kLocalTileCount + want.slot + f;
             }
         }
     }
@@ -1951,19 +2044,39 @@ void SelectLocalShadowLights(
     const Fvector4* hudSphere)
 {
     xr_vector<ShadowCandidate> spots, points;
+    state.areaProxies.clear();
+    auto addCandidate = [&](const light* source, const light* parent, u32 lightIndex, u32 sampleIndex, bool point) {
+        const float dist = camPos.distance_to(source->position);
+        const float radius = dist <= source->range ? 1e9f : projScale * source->range / std::max(dist, 1e-3f);
+        float desired = 2.0f * radius * ps_r_local_shadow_texel_ratio;
+        if (dist - source->range > ps_r_local_shadow_range || radius < ps_r_local_shadow_min_px)
+            desired = 0.0f;
+        (point ? points : spots).push_back({ source, parent, lightIndex, sampleIndex, desired });
+    };
     for (u32 i = 0; i < lights.size(); ++i) {
         const light* L = lights[i];
-        if (!L || !L->flags.bActive || !L->flags.bShadow)
+        if (!L)
+            continue;
+        if (L->flags.type == IRender_Light::AREA) {
+            std::fill_n(L->area_shadow_slots, kCapsuleLightSamples, 0u);
+            if (!L->flags.bActive || !L->flags.bShadow)
+                continue;
+            L->UpdateAreaShadowSamples();
+            for (u32 s = 0; s < kCapsuleLightSamples; ++s) {
+                const light* proxy = L->area_shadow_samples[s];
+                if (!proxy)
+                    continue;
+                state.areaProxies.push_back({ proxy, L });
+                addCandidate(proxy, L, i, s, true);
+            }
+            continue;
+        }
+        if (!L->flags.bActive || !L->flags.bShadow)
             continue;
         const bool point = L->flags.type == IRender_Light::POINT;
         if (!point && L->flags.type != IRender_Light::SPOT)
             continue;
-        const float dist = camPos.distance_to(L->position);
-        const float radius = dist <= L->range ? 1e9f : projScale * L->range / std::max(dist, 1e-3f);
-        float desired = 2.0f * radius * ps_r_local_shadow_texel_ratio;
-        if (dist - L->range > ps_r_local_shadow_range || radius < ps_r_local_shadow_min_px)
-            desired = 0.0f;
-        (point ? points : spots).push_back({ L, i, desired });
+        addCandidate(L, L, i, ~0u, point);
     }
     auto nearest = [&](const ShadowCandidate& a, const ShadowCandidate& b) {
         const float da = camPos.distance_to_sqr(a.source->position);
@@ -1976,8 +2089,18 @@ void SelectLocalShadowLights(
     // Every remaining eligible light still gets a complete minimum-resolution map.
     for (u32 i = u32(std::max(0, ps_r_local_shadow_spots)); i < spots.size(); ++i)
         spots[i].desiredSize = 0.0f;
-    for (u32 i = u32(std::max(0, ps_r_local_shadow_points)); i < points.size(); ++i)
-        points[i].desiredSize = 0.0f;
+    xr_vector<const light*>& largePointGroups = state.largePointGroups;
+    largePointGroups.clear();
+    const u32 largePointLimit = u32(std::max(0, ps_r_local_shadow_points));
+    for (ShadowCandidate& candidate : points) {
+        auto group = std::find(largePointGroups.begin(), largePointGroups.end(), candidate.parent);
+        if (group == largePointGroups.end() && largePointGroups.size() < largePointLimit) {
+            largePointGroups.push_back(candidate.parent);
+            group = largePointGroups.end() - 1;
+        }
+        if (group == largePointGroups.end())
+            candidate.desiredSize = 0.0f;
+    }
 
     xr_vector<u32> slots(lights.size(), 0u);
     u32 si = 0, pi = 0, page = 0;
@@ -1993,8 +2116,13 @@ void SelectLocalShadowLights(
         LocalShadowState& current = page == 0 ? state : *state.overflowPages[page - 1];
         current.atlasLayer = page;
         SelectLocalShadowPage(current, batch);
-        for (u32 i = 0; i < batch.size(); ++i)
-            slots[batch[i].lightIndex] = page * kLocalTileCount + current.slotOfLight[i];
+        for (u32 i = 0; i < batch.size(); ++i) {
+            const u32 slot = page * kLocalTileCount + current.slotOfLight[i];
+            if (batch[i].sampleIndex == ~0u)
+                slots[batch[i].lightIndex] = slot;
+            else
+                batch[i].parent->area_shadow_slots[batch[i].sampleIndex] = slot;
+        }
         ++page;
     }
     for (u32 p = page; p <= state.overflowPages.size(); ++p)
