@@ -26,6 +26,7 @@ struct VS_OUTPUT
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
     float fade : TEXCOORD6;
+    float skyVisibility : TEXCOORD7;
 };
 
 struct InstanceData
@@ -33,7 +34,8 @@ struct InstanceData
     float4x4 world;
     uint materialID;
     uint flags;
-    float pad0, pad1;
+    float hemiScale;
+    float hemiBias;
 };
 
 StructuredBuffer<InstanceData> g_InstanceData : register(t14);
@@ -83,6 +85,8 @@ VS_OUTPUT main(VS_INPUT input)
         fade = variant.fadeScale * (fadeMode == VARIANT_FADE_EDGE ? 1.0 - facing : facing);
     }
     output.fade = fade;
+    output.skyVisibility = (instanceData.flags & 8u) != 0u && sky_ibl.z < 0.5
+        ? saturate(input.normal.a * instanceData.hemiScale + instanceData.hemiBias) : -1.0;
 
     return output;
 }

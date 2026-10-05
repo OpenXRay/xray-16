@@ -22,6 +22,8 @@ shared_str c_c_sun;
 FTreeVisual::FTreeVisual(void) {}
 FTreeVisual::~FTreeVisual(void) {}
 void FTreeVisual::Release() { dxRender_Visual::Release(); }
+float FTreeVisual::GetHemiScale() const { return c_scale.hemi; }
+float FTreeVisual::GetHemiBias() const { return c_bias.hemi; }
 void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 {
     dxRender_Visual::Load(N, data, dwFlags);

@@ -196,7 +196,8 @@ float3 shade_pbr(
 	float transmission = 0.0,
 	bool includeAmbient = true,
 	float sunThickness = 0.0,
-	float3 skyNormal = float3(0.0, 0.0, 0.0))
+	float3 skyNormal = float3(0.0, 0.0, 0.0),
+	float bakedSkyVisibility = -1.0)
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
@@ -207,7 +208,11 @@ float3 shade_pbr(
 		sun = SunShadow(worldPos, svPosition);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
-	SkyProbeVisibility skyVisibility = SkyProbeSample(worldPos, dot(skyNormal, skyNormal) > 0.25 ? skyNormal : N, V);
+	SkyProbeVisibility skyVisibility;
+	if (bakedSkyVisibility >= 0.0)
+		skyVisibility = SkyVisibilityUniform(bakedSkyVisibility);
+	else
+		skyVisibility = SkyProbeSample(worldPos, dot(skyNormal, skyNormal) > 0.25 ? skyNormal : N, V);
 	float3 sssColor = foliage ? albedo * foliage_sss.rgb * transmission * (1.0 - F_Schlick(saturate(dot(N, V)), DIELECTRIC_F0)) : 0.0;
 	float3 finalColor;
 	if (foliage)
@@ -258,7 +263,8 @@ f_forward output_forward_pbr(
 	float ao,
 	float4 svPosition = float4(0, 0, 0, 0),
 	float sunVis = -1.0,
-	bool forwardOnly = false)
+	bool forwardOnly = false,
+	float skyVisibility = -1.0)
 {
 	f_forward res;
 	float3 N = normalize(worldNormal);
@@ -269,7 +275,7 @@ f_forward output_forward_pbr(
 		res.color = float4(0, 0, 0, ao);
 		return res;
 	}
-	res.color = float4(shade_pbr(albedo, N, worldPos, metallic, roughness, ao, svPosition, sunVis), 1.0);
+	res.color = float4(shade_pbr(albedo, N, worldPos, metallic, roughness, ao, svPosition, sunVis, SHADING_CLASS_STANDARD, 0.0, true, 0.0, float3(0.0, 0.0, 0.0), skyVisibility), 1.0);
 	return res;
 }
 

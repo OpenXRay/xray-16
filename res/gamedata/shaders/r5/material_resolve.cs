@@ -83,6 +83,10 @@ void main(uint3 dtid : SV_DispatchThreadID)
     MegaVertex v2;
     float3 wp0, wp1, wp2;
     float3 pp0, pp1, pp2;
+    float3 hemiCorners = float3(1.0, 1.0, 1.0);
+    float2 lightmapCorners[3] = { float2(0.0, 0.0), float2(0.0, 0.0), float2(0.0, 0.0) };
+    bool bakedHemi = false;
+    uint lightmapTexture = INVALID_TEXTURE_INDEX;
     if (skinned)
     {
         uint ib = e.ibFirst + tri * 3u;
@@ -114,9 +118,19 @@ void main(uint3 dtid : SV_DispatchThreadID)
         if (tri >= geo.triangleCount)
             return;
         uint3 corners = ClusterPayloadTriangle(geo, tri);
-        ClusterVertex c0 = ClusterLoadVertex(geo, corners.x);
-        ClusterVertex c1 = ClusterLoadVertex(geo, corners.y);
-        ClusterVertex c2 = ClusterLoadVertex(geo, corners.z);
+        uint3 slots = uint3(ClusterPayloadSlot(geo, corners.x), ClusterPayloadSlot(geo, corners.y), ClusterPayloadSlot(geo, corners.z));
+        ClusterVertex c0 = ClusterLoadVertexSlot(geo, slots.x);
+        ClusterVertex c1 = ClusterLoadVertexSlot(geo, slots.y);
+        ClusterVertex c2 = ClusterLoadVertexSlot(geo, slots.z);
+        hemiCorners = float3(c0.hemi, c1.hemi, c2.hemi);
+        bakedHemi = geo.vertexFormat == CLUSTER_VERTEX_PACKED_BASIS;
+        if (view.lightmapTexture != INVALID_TEXTURE_INDEX && (geo.attributeMask & CLUSTER_PAGE_ATTR_UV1) != 0u)
+        {
+            lightmapTexture = view.lightmapTexture;
+            lightmapCorners[0] = ClusterLoadUV1Slot(geo, slots.x);
+            lightmapCorners[1] = ClusterLoadUV1Slot(geo, slots.y);
+            lightmapCorners[2] = ClusterLoadUV1Slot(geo, slots.z);
+        }
         v0.position = c0.position; v0.normal = c0.normal; v0.tangent = c0.tangent; v0.binormal = c0.binormal; v0.uv = c0.uv;
         v1.position = c1.position; v1.normal = c1.normal; v1.tangent = c1.tangent; v1.binormal = c1.binormal; v1.uv = c1.uv;
         v2.position = c2.position; v2.normal = c2.normal; v2.tangent = c2.tangent; v2.binormal = c2.binormal; v2.uv = c2.uv;
@@ -201,8 +215,21 @@ void main(uint3 dtid : SV_DispatchThreadID)
     g_OutBaseColor[p] = float4(s.albedo, s.metallic);
     g_OutColor[p] = float4(s.emissive, s.ao);
     float3 geometricNormal = FaceToward(normalize(cross(wp1 - wp0, wp2 - wp0)), eye_position - InterpolateBary3(bd, wp0, wp1, wp2));
-    g_OutMaterial[p] = hud ? PackGBufferMaterial(s.shadingClass, s.transmission)
-        : PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
+    if (!dynamic && !hud && sky_ibl.z < 0.5 && (lightmapTexture != INVALID_TEXTURE_INDEX || bakedHemi))
+    {
+        float skyVisibility;
+        if (lightmapTexture != INVALID_TEXTURE_INDEX)
+        {
+            float2 lightmapUV = InterpolateBary2(bd, lightmapCorners[0], lightmapCorners[1], lightmapCorners[2]);
+            skyVisibility = GetBindlessTexture(lightmapTexture).SampleLevel(smp_rtlinear, lightmapUV, 0).a;
+        }
+        else
+            skyVisibility = dot(bd.m_lambda, hemiCorners) * view.hemiScale + view.hemiBias;
+        g_OutMaterial[p] = PackGBufferMaterialBakedSky(s.shadingClass, s.transmission, skyVisibility);
+    }
+    else
+        g_OutMaterial[p] = hud ? PackGBufferMaterial(s.shadingClass, s.transmission)
+            : PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

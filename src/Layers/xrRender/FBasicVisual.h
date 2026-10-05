@@ -74,6 +74,7 @@ public:
 
     shared_str shaderName;
     shared_str textureName;
+    shared_str lightmapName;
 
     u32 shader_id{UINT32_MAX};
 

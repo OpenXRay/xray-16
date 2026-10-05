@@ -52,6 +52,9 @@ struct GeometryBatch {
 
     bool isTerrain = false;
     u32 terrainMaterialID = UINT32_MAX;
+    float hemiScale = 0.0f;
+    float hemiBias = 1.0f;
+    u32 lightmapTexture = UINT32_MAX;
 
     float ssa = 0.0f;
 

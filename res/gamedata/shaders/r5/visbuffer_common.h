@@ -27,7 +27,8 @@ struct InstanceData
     float4x4 world;
     uint materialID;
     uint flags;
-    float pad0, pad1;
+    float hemiScale;
+    float hemiBias;
 };
 
 #define CLUSTER_ENTRY_FLAG_AT 1u

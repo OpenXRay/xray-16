@@ -123,9 +123,20 @@ void FrameGraphRenderer::level_Load(IReader* fs)
             if (pstr comma = strchr(firstTexture, ','))
                 *comma = 0;
 
-            if (true) {
-                CompileLevelShader(i, n_sh, firstTexture);
+            string256 lightmapTexture = "";
+            if (pcstr second = strchr(n_tlist, ','))
+            {
+                if (pcstr third = strchr(second + 1, ','))
+                {
+                    xr_strcpy(lightmapTexture, third + 1);
+                    if (pstr comma = strchr(lightmapTexture, ','))
+                        *comma = 0;
+                    if (strncmp(lightmapTexture, "lmap", 4) != 0)
+                        lightmapTexture[0] = 0;
+                }
             }
+
+            CompileLevelShader(i, n_sh, firstTexture, lightmapTexture);
         }
         chunk->close();
     }
@@ -325,13 +336,14 @@ void FrameGraphRenderer::WarmGameplayPipelines()
         timer.GetElapsed_sec() * 1000.f);
 }
 
-void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName)
+void FrameGraphRenderer::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName, const char* lightmapName)
 {
     ZoneScopedN("Compile Level Shader");
 
     auto& compiled = m_CompiledLevelShaders[shaderID];
     compiled.shaderName = shaderName;
     compiled.textureName = textureName;
+    compiled.lightmapName = lightmapName;
 
     compiled.materialInfo = MaterialSystem::Instance().GetMaterialInfo(shaderName);
 

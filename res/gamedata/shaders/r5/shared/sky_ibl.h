@@ -122,6 +122,16 @@ SkyProbeVisibility SkyProbeSample(float3 worldPos, float3 N, float3 V)
     return result;
 }
 
+SkyProbeVisibility SkyVisibilityUniform(float visibility)
+{
+    SkyProbeVisibility result;
+    result.c0 = saturate(visibility) / SKY_VISIBILITY_SH_Y0;
+    result.c1 = 0.0;
+    result.confidence = 1.0;
+    result.valid = true;
+    return result;
+}
+
 float SkyProbeVisibilityToward(SkyProbeVisibility visibility, float3 direction)
 {
     return visibility.valid ? SkyVisibilityCosine(visibility.c0, visibility.c1, direction) : 1.0;

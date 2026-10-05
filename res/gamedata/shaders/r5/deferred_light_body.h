@@ -50,7 +50,7 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
     float3 shadingN = normalize(n.xyz);
     float3 geometricN = GBufferGeometricNormal(m, shadingN);
     float3 lit = c.rgb + shade_pbr(bc.rgb, shadingN, worldPos, bc.a, abs(n.w), c.a, float4(pixel, depth, 1.0), sunVis,
-        GBufferShadingClass(m), m.y, true, 0.0, geometricN);
+        GBufferShadingClass(m), m.y, true, 0.0, geometricN, GBufferSkyVisibility(m));
 #if TILE_SUN_MIXED
     if (dev_param_3.y > 0.5)
         lit = SunShadowDebugColor(lit, worldPos);

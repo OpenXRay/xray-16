@@ -52,6 +52,7 @@ struct ClusterVertex
     float3 tangent;
     float3 binormal;
     float2 uv;
+    float hemi;
 };
 
 uint ClusterAlign4(uint value)
@@ -128,12 +129,14 @@ ClusterVertex ClusterLoadVertexSlot(ClusterGeoView view, uint slot)
     {
         v.normal = float3(asfloat(w0.w), asfloat(w1.x), asfloat(w1.y));
         ClusterDeriveBasis(v.normal, v.tangent, v.binormal);
+        v.hemi = 1.0;
     }
     else
     {
         v.normal = UnpackD3DColorDir(w0.w);
         v.tangent = UnpackD3DColorDir(w1.x);
         v.binormal = UnpackD3DColorDir(w1.y);
+        v.hemi = float(w0.w >> 24u) * (1.0 / 255.0);
     }
     v.uv = float2(asfloat(w1.z), asfloat(w1.w));
     return v;

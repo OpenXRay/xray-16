@@ -81,7 +81,7 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
     else if (hdr.shader_id)
     {
-        xray::render::shader_info::GetCompiledShaderNames(hdr.shader_id, shaderName, textureName);
+        xray::render::shader_info::GetCompiledShaderNames(hdr.shader_id, shaderName, textureName, lightmapName);
     }
 
 // desc
@@ -97,6 +97,7 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
     PCOPY(Type);
     PCOPY(shaderName);
     PCOPY(textureName);
+    PCOPY(lightmapName);
     PCOPY(vis);
 
     static u32 copyCount = 0;

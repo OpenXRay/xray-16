@@ -26,6 +26,8 @@ public:
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
+    float GetHemiScale() const;
+    float GetHemiBias() const;
 
     FTreeVisual(void);
     virtual ~FTreeVisual(void);

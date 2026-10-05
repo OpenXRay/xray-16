@@ -72,6 +72,9 @@ struct ClusterRefView
     float4x4 world;
     float4x4 prevWorld;
     uint historyValid;
+    float hemiScale;
+    float hemiBias;
+    uint lightmapTexture;
 };
 
 ClusterRefView LoadClusterRefView(uint refIdx)
@@ -83,6 +86,9 @@ ClusterRefView LoadClusterRefView(uint refIdx)
     view.world = inst.world;
     view.prevWorld = inst.historyValid != 0u ? inst.prevWorld : inst.world;
     view.historyValid = inst.historyValid;
+    view.hemiScale = inst.hemiScale;
+    view.hemiBias = inst.hemiBias;
+    view.lightmapTexture = inst.lightmapTexture;
     return view;
 }
 

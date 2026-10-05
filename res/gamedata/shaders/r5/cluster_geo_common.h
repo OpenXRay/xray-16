@@ -47,9 +47,9 @@ struct GeoInstance
     uint firstPage;
     uint historyValid;
     float prevScaleBound;
-    uint pad0;
-    uint pad1;
-    uint pad2;
+    float hemiScale;
+    float hemiBias;
+    uint lightmapTexture;
 };
 
 struct ClusterAssetMember

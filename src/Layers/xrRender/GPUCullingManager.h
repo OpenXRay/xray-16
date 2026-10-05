@@ -54,6 +54,7 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_NO_RESOLVE = 0x1,
     GPU_OBJECT_SHADOW_ONLY = 0x2,
     GPU_OBJECT_SKINNED_FORWARD = 0x4,
+    GPU_OBJECT_BAKED_HEMI = 0x8,
 };
 
 struct TransparentDrawRange {
@@ -118,9 +119,9 @@ public:
     u32 firstPage;
     u32 historyValid;
     float prevScaleBound;
-    u32 pad0;
-    u32 pad1;
-    u32 pad2;
+    float hemiScale;
+    float hemiBias;
+    u32 lightmapTexture;
 };
 static_assert(sizeof(GPUGeoInstance) == 176, "GPUGeoInstance is shader-visible");
 
@@ -190,7 +191,8 @@ struct GPUInstanceData {
     Fmatrix world;
     u32 materialID;
     u32 flags;
-    float pad0, pad1;
+    float hemiScale;
+    float hemiBias;
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
 
@@ -764,6 +766,7 @@ private:
     xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
     xr_vector<u32> m_staticMaterialIDData;
     xr_vector<GPUInstanceData> m_staticInstanceData;
+    xr_vector<u32> m_staticLightmapData;
     xr_vector<u32> m_staticBatchVertexCounts;
     xr_vector<GeometryInstanceKey> m_staticInstanceIdentities;
 
@@ -774,6 +777,7 @@ private:
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
+    xr_vector<u32> m_terrainLightmapData;
     xr_vector<ClusterMeshKey> m_terrainBatchKeys;
     xr_vector<GeometryInstanceKey> m_terrainInstanceIdentities;
     bool m_terrainDataCached = false;

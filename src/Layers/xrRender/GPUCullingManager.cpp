@@ -623,6 +623,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         m_staticBatchVertexCounts.reserve(totalBatches);
         m_staticBatchKeys.clear();
         m_staticBatchKeys.reserve(totalBatches);
+        m_staticLightmapData.clear();
+        m_staticLightmapData.reserve(totalBatches);
     }
 
     m_dynamicObjectFlags.clear();
@@ -647,6 +649,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         m_terrainInstanceIdentities.reserve(totalBatches / 4);
         m_terrainBatchKeys.clear();
         m_terrainBatchKeys.reserve(totalBatches / 4);
+        m_terrainLightmapData.clear();
+        m_terrainLightmapData.reserve(totalBatches / 4);
     }
 
     m_transparentDrawArgsData.clear();
@@ -659,7 +663,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
     m_rtRayOnlyDynamicCount = 0;
 
     auto batchFlags = [](const GeometryBatch& batch) -> u32 {
-        return MaterialObjectFlags(batch.bindlessMaterialID) | (batch.isShadowOnly ? GPU_OBJECT_SHADOW_ONLY : 0u);
+        return MaterialObjectFlags(batch.bindlessMaterialID) | (batch.isShadowOnly ? GPU_OBJECT_SHADOW_ONLY : 0u)
+            | (batch.isStatic && !batch.isSkinned ? GPU_OBJECT_BAKED_HEMI : 0u);
     };
 
     auto batchKey = [](const GeometryBatch& batch) {
@@ -682,8 +687,8 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
         inst.world = batch.worldMatrix;
         inst.materialID = materialID;
         inst.flags = flags;
-        inst.pad0 = 0.0f;
-        inst.pad1 = 0.0f;
+        inst.hemiScale = batch.hemiScale;
+        inst.hemiBias = batch.hemiBias;
         instanceData.push_back(inst);
     };
 
@@ -717,6 +722,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
                 m_terrainInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
                     batch.visualLifetimeID, batch.geometrySubset });
                 m_terrainBatchKeys.push_back(batchKey(batch));
+                m_terrainLightmapData.push_back(batch.lightmapTexture);
                 continue;
             }
 
@@ -734,6 +740,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
                 batch.visualLifetimeID, batch.geometrySubset });
             m_staticBatchVertexCounts.push_back(batch.megaBufferAlloc.valid ? batch.megaBufferAlloc.vertexCount : 0);
             m_staticBatchKeys.push_back(batchKey(batch));
+            m_staticLightmapData.push_back(batch.lightmapTexture);
         }
         ++m_staticBuildCount;
     }
@@ -761,6 +768,7 @@ void GPUCullingManager::PrepareSceneGeometry(const GeometryCollector* geometry)
             m_terrainInstanceIdentities.push_back(GeometryInstanceKey{ batch.renderableLifetimeID,
                 batch.visualLifetimeID, batch.geometrySubset });
             m_terrainBatchKeys.push_back(batchKey(batch));
+            m_terrainLightmapData.push_back(batch.lightmapTexture);
             continue;
         }
 
@@ -954,6 +962,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_staticInstanceIdentities.clear();
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
+    m_staticLightmapData.clear();
 
     m_terrainDataCached = false;
     m_terrainDrawArgsData.clear();
@@ -961,6 +970,7 @@ void GPUCullingManager::InvalidateStaticCullingData()
     m_terrainInstanceData.clear();
     m_terrainInstanceIdentities.clear();
     m_terrainBatchKeys.clear();
+    m_terrainLightmapData.clear();
     m_terrainObjectCount = 0;
 
     m_clusterSet = {};
@@ -1289,8 +1299,8 @@ void GPUCullingManager::PrepareSkinnedGeometry(const GeometryCollector* geometry
                     inst.world.identity();
                     inst.materialID = batch.bindlessMaterialID;
                     inst.flags = GPU_OBJECT_SKINNED_FORWARD;
-                    inst.pad0 = 0.0f;
-                    inst.pad1 = 0.0f;
+                    inst.hemiScale = 0.0f;
+                    inst.hemiBias = 1.0f;
                     m_skinnedForwardInstanceData.push_back(inst);
                     m_skinnedForwardKeys.push_back(TransparentKeyForMaterial(batch.bindlessMaterialID));
                     m_skinnedForwardSort.push_back(batch.ssa);
@@ -2583,6 +2593,7 @@ void GPUCullingManager::UnloadLevel()
     m_staticMaterialIDData.clear();
     m_staticBatchVertexCounts.clear();
     m_staticBatchKeys.clear();
+    m_staticLightmapData.clear();
     m_staticInstanceIdentities.clear();
     m_dynamicObjectFlags.clear();
     m_dynamicMaterialIDData.clear();
@@ -2602,6 +2613,7 @@ void GPUCullingManager::UnloadLevel()
     m_terrainInstanceData.clear();
     m_terrainInstanceIdentities.clear();
     m_terrainBatchKeys.clear();
+    m_terrainLightmapData.clear();
     m_terrainObjectCount = 0;
 
     m_transparentDrawArgsData.clear();
@@ -2696,6 +2708,7 @@ void GPUCullingManager::AppendForwardGeometry(const MeshAllocation& allocation, 
         {
             R_ASSERT(source.floatNormals);
             destination.normal = source.floatNormals[i];
+            destination.vertex.normal |= 0xFF000000u;
         }
         else
             destination.normal = bindless::VertexConverter::UnpackNormal(destination.vertex.normal);
@@ -3268,7 +3281,8 @@ void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* ge
         return am.clusterCount > 0 && (meta[am.firstCluster].flags & CLUSTER_META_FLAG_TERRAIN) != 0;
     };
 
-    auto emitInstance = [&](u32 assetMember, const Fmatrix& world, u32 materialID, u32 extraFlags) {
+    auto emitInstance = [&](u32 assetMember, const Fmatrix& world, u32 materialID, u32 extraFlags,
+        float hemiScale, float hemiBias, u32 lightmapTexture) {
         const GPUClusterAssetMember& am = members[assetMember];
         if (am.clusterCount == 0)
             return false;
@@ -3289,9 +3303,9 @@ void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* ge
         inst.firstPage = am.firstPage;
         inst.historyValid = 0;
         inst.prevScaleBound = scaleBound;
-        inst.pad0 = 0;
-        inst.pad1 = 0;
-        inst.pad2 = 0;
+        inst.hemiScale = hemiScale;
+        inst.hemiBias = hemiBias;
+        inst.lightmapTexture = lightmapTexture;
 
         refTotal += am.clusterCount;
         nodeTotal += am.nodeCount;
@@ -3335,7 +3349,10 @@ void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* ge
             ++shadowOnlyBatches;
         }
 
-        if (emitInstance(bindBatch(key), m_staticInstanceData[i].world, m_staticMaterialIDData[i], extraFlags))
+        const GPUInstanceData& source = m_staticInstanceData[i];
+        const u32 lightmapTexture = i < m_staticLightmapData.size() ? m_staticLightmapData[i] : UINT32_MAX;
+        if (emitInstance(bindBatch(key), source.world, m_staticMaterialIDData[i], extraFlags,
+                source.hemiScale, source.hemiBias, lightmapTexture))
             ++clusteredBatches;
     }
 
@@ -3357,7 +3374,7 @@ void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* ge
             key.vertexCount = batch.megaBufferAlloc.vertexCount;
             key.indexCount = batch.megaBufferAlloc.indexCount;
             if (emitInstance(bindBatch(key), batch.worldMatrix, batch.bindlessMaterialID,
-                    GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT))
+                    GPU_CLUSTER_ENTRY_SHADOW_ONLY | GPU_CLUSTER_ENTRY_AT, 0.0f, 1.0f, UINT32_MAX))
                 ++transparentShadowBatches;
         }
     }
@@ -3374,7 +3391,10 @@ void GPUCullingManager::BuildStaticGeometryInstances(const GeometryCollector* ge
             continue;
         }
 
-        if (emitInstance(bindBatch(key), m_terrainInstanceData[i].world, m_terrainMaterialIDData[i], 0u))
+        const GPUInstanceData& source = m_terrainInstanceData[i];
+        const u32 lightmapTexture = i < m_terrainLightmapData.size() ? m_terrainLightmapData[i] : UINT32_MAX;
+        if (emitInstance(bindBatch(key), source.world, m_terrainMaterialIDData[i], 0u,
+                source.hemiScale, source.hemiBias, lightmapTexture))
             ++clusteredTerrain;
     }
 
@@ -3460,9 +3480,9 @@ void GPUCullingManager::BuildDynamicGeometryInstances(const GeometryCollector* g
             inst.firstPage = am.firstPage;
             inst.historyValid = historyValid;
             inst.prevScaleBound = historyValid ? ConservativeScaleBound(prevWorld) : inst.scaleBound;
-            inst.pad0 = 0;
-            inst.pad1 = 0;
-            inst.pad2 = 0;
+            inst.hemiScale = 0.0f;
+            inst.hemiBias = 1.0f;
+            inst.lightmapTexture = UINT32_MAX;
 
             refTotal += am.clusterCount;
             nodeTotal += am.nodeCount;

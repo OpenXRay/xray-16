@@ -5,6 +5,7 @@
 #define SHADING_CLASS_FOLIAGE  1u
 
 #define GBUFFER_GEOMETRIC_NORMAL_FLAG 128u
+#define GBUFFER_BAKED_SKY_FLAG 64u
 #define GBUFFER_SHADING_CLASS_MASK 63u
 
 float2 GBufferOctSignNotZero(float2 v)
@@ -35,6 +36,12 @@ float4 PackGBufferMaterial(uint shadingClass, float transmission, float3 geometr
         GBufferOctEncode(geometricNormal));
 }
 
+float4 PackGBufferMaterialBakedSky(uint shadingClass, float transmission, float skyVisibility)
+{
+    return float4(float(shadingClass | GBUFFER_BAKED_SKY_FLAG) * (1.0 / 255.0), saturate(transmission),
+        1.0 - saturate(skyVisibility), 0.0);
+}
+
 float4 PackGBufferMaterial(uint shadingClass, float transmission)
 {
     return float4(float(shadingClass) * (1.0 / 255.0), saturate(transmission), 0.0, 0.0);
@@ -56,6 +63,13 @@ float3 GBufferGeometricNormal(float4 material, float3 fallback)
         return fallback;
     float3 n = GBufferOctDecode(material.zw);
     return dot(n, fallback) < 0.0 ? fallback : n;
+}
+
+float GBufferSkyVisibility(float4 material)
+{
+    if ((uint(material.x * 255.0 + 0.5) & GBUFFER_BAKED_SKY_FLAG) == 0u)
+        return -1.0;
+    return 1.0 - material.z;
 }
 
 float3 FaceToward(float3 n, float3 dir)
