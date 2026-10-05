@@ -851,6 +851,7 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.localShadowPoints = localShadow.pooledPoints;
             stats.localShadowPages = localShadow.activePages;
             stats.localShadowExtraCasters = m_localShadowCasters;
+            stats.localShadowHudViews = localShadow.hudViews;
             for (u32 i = 0; i < localShadow.activePages; ++i) {
                 const auto& page = i == 0 ? localShadow : *localShadow.overflowPages[i - 1];
                 stats.localShadowAccepted += page.statAccepted;
@@ -1881,7 +1882,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     if (rasterShadowWork && m_blackboard && m_gpuCullingManager)
-        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, localCfg,
+        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
             &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
 
     auto litOutputs = opaqueOutputs;
@@ -2924,7 +2925,23 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         if (m_blackboard) {
             auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
             const float projScale = 0.5f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
-            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale);
+            Fvector4 hudSphere;
+            bool hudValid = false;
+            for (const auto& b : m_hudBatches) {
+                if (!b.isSkinned)
+                    continue;
+                Fvector4 s;
+                s.set(b.worldBoundsCenter.x, b.worldBoundsCenter.y, b.worldBoundsCenter.z, b.worldBoundsRadius);
+                if (hudValid)
+                    passes::MergeBoundingSphere(hudSphere, s);
+                else
+                    hudSphere = s;
+                hudValid = true;
+            }
+            Fvector4 hudFit;
+            if (hudValid)
+                hudFit = passes::HudShadowSphere(hudSphere);
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale, hudValid ? &hudFit : nullptr);
             slots = &localShadowState.slotOfLight;
             if (m_gpuCullingManager) {
                 auto registerLocalDemand = [&](const passes::LocalShadowState& page) {

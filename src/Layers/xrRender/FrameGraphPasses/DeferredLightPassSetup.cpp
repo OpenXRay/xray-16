@@ -227,6 +227,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                 data.localTiles = passBuilder.read(localShadow.tiles, ResourceState::ShaderResource);
                 data.localStatic = passBuilder.read(localShadow.staticAtlas, ResourceState::ShaderResource);
                 data.localDyn = passBuilder.read(localShadow.dynAtlas, ResourceState::ShaderResource);
+                data.localHud = passBuilder.read(localShadow.hudAtlas, ResourceState::ShaderResource);
             }
             if (clusterLights.active)
             {
@@ -273,7 +274,8 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
             nvrhi::IBuffer* localTiles = nullptr;
             nvrhi::ITexture* localStatic = nullptr;
             nvrhi::ITexture* localDyn = nullptr;
-            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn);
+            nvrhi::ITexture* localHud = nullptr;
+            ResolveLocalShadowBindings(fg, data.localShadow, nvDevice, localTiles, localStatic, localDyn, localHud);
             nvrhi::IBindingSet* bindlessTable = nullptr;
             if (auto* backend = data.device->GetBackend())
                 bindlessTable = backend->GetBindlessDescriptorTable();
@@ -351,6 +353,7 @@ DefaultOutputLayout setupDeferredLightPass(FrameGraph& fg, fg::RenderDevice* dev
                     bsb.BufferSRV("g_LocalShadowTiles", localTiles);
                     bsb.Texture("g_LocalShadowStatic", localStatic);
                     bsb.Texture("g_LocalShadowDyn", localDyn);
+                    bsb.Texture("g_LocalShadowHud", localHud);
                 }
                 if (cls & kTileClassSunMixed)
                     bsb.Texture("g_SunShadowMask", sunMask);
