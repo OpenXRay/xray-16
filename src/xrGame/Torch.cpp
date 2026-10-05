@@ -315,7 +315,6 @@ void CTorch::UpdateCL()
         if (actor)
             smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
         const bool firstEye = actor && actor->active_cam() == eacFirstEye;
-        light_render->set_cast_hud_to_world(firstEye);
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE) ||
             GameID() != eGameIDSingle)
