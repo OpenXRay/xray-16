@@ -17,6 +17,8 @@ two model warning calls routed to the existing Opcode_Log hook. Engine-facing
 changes are kept in xrCDB, rather than changing the library's algorithms.
 The native project suppresses C5033 for the vendor's ignored legacy `register`
 keywords when compiling in C++20 mode.
+The obsolete Apple macros redefining `bool`, `true`, and `false` were removed
+to preserve C++ types across vendor and engine headers.
 Two imported whitespace issues were corrected without changing statements.
 
 The existing `Externals/OPCODE` project path builds this implementation. X-Ray
