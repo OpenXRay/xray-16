@@ -27,6 +27,8 @@ MODEL::MODEL() :
 MODEL::~MODEL()
 {
     syncronize(); // maybe model still in building
+    if (buildThread.joinable())
+        buildThread.join();
 #if defined(XRAY_COLLISION_EMBREE)
     ReleaseEmbreeModel(this);
 #endif
@@ -54,6 +56,9 @@ void MODEL::build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc, vo
     R_ASSERT(S_INIT == status);
     R_ASSERT((Vcnt >= 4) && (Tcnt >= 2));
 
+    if (buildThread.joinable())
+        buildThread.join();
+
     _initialize_cpu_thread();
 
     if (!strstr(Core.Params, "-mt_cdb"))
@@ -63,7 +68,7 @@ void MODEL::build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc, vo
     }
     else
     {
-        Threading::SpawnThread("CDB-construction", [this, V, Vcnt, T, Tcnt, bc, bcp]
+        buildThread = Threading::RunThread("CDB-construction", [this, V, Vcnt, T, Tcnt, bc, bcp]
         {
             ScopeLock lock{ pcs };
             build_internal(V, Vcnt, T, Tcnt, bc, bcp);

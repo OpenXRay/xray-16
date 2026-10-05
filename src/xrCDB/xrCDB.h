@@ -1,5 +1,8 @@
 #pragma once
 
+#include <atomic>
+#include <thread>
+
 #include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
 #include "Common/Noncopyable.hpp"
 #include "xrCore/math_constants.h"
@@ -77,7 +80,8 @@ class XRCDB_API MODEL : Noncopyable
 private:
     Lock* pcs;
     ModelTree* tree{};
-    volatile u32 status{ S_INIT }; // 0=ready, 1=init, 2=building
+    std::atomic<u32> status{ S_INIT }; // 0=ready, 1=init, 2=building
+    std::thread buildThread;
     u32 model_crc32{};
 
     // tris
