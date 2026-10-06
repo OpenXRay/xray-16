@@ -6,7 +6,8 @@
 
 #define GBUFFER_GEOMETRIC_NORMAL_FLAG 128u
 #define GBUFFER_BAKED_SKY_FLAG 64u
-#define GBUFFER_SHADING_CLASS_MASK 63u
+#define GBUFFER_HUD_FLAG 32u
+#define GBUFFER_SHADING_CLASS_MASK 31u
 
 float2 GBufferOctSignNotZero(float2 v)
 {
@@ -30,16 +31,21 @@ float3 GBufferOctDecode(float2 e)
     return normalize(v);
 }
 
-float4 PackGBufferMaterial(uint shadingClass, float transmission, float3 geometricNormal)
+float4 PackGBufferMaterial(uint shadingClass, float transmission, float3 geometricNormal, bool hud = false)
 {
-    return float4(float(shadingClass | GBUFFER_GEOMETRIC_NORMAL_FLAG) * (1.0 / 255.0), saturate(transmission),
-        GBufferOctEncode(geometricNormal));
+    uint flags = shadingClass | GBUFFER_GEOMETRIC_NORMAL_FLAG | (hud ? GBUFFER_HUD_FLAG : 0u);
+    return float4(float(flags) * (1.0 / 255.0), saturate(transmission), GBufferOctEncode(geometricNormal));
 }
 
-float4 PackGBufferMaterialBakedSky(uint shadingClass, float transmission, float skyVisibility)
+float4 PackGBufferMaterialBakedSky(uint shadingClass, float transmission, float skyVisibility, bool hud = false)
 {
-    return float4(float(shadingClass | GBUFFER_BAKED_SKY_FLAG) * (1.0 / 255.0), saturate(transmission),
-        1.0 - saturate(skyVisibility), 0.0);
+    uint flags = shadingClass | GBUFFER_BAKED_SKY_FLAG | (hud ? GBUFFER_HUD_FLAG : 0u);
+    return float4(float(flags) * (1.0 / 255.0), saturate(transmission), 1.0 - saturate(skyVisibility), 0.0);
+}
+
+bool GBufferIsHud(float4 material)
+{
+    return (uint(material.x * 255.0 + 0.5) & GBUFFER_HUD_FLAG) != 0u;
 }
 
 uint GBufferShadingClass(float2 material)

@@ -181,6 +181,7 @@ void CTorch::Switch(bool light_on)
     }
 
     m_switched_on = light_on;
+    light_render->set_hud_spotlight(light_on && pActor && pActor == Level().CurrentViewEntity() && pActor->HUDview());
     if (can_use_dynamic_lights())
     {
         light_render->set_active(light_on);
@@ -302,6 +303,9 @@ void CTorch::OnH_B_Independent(bool just_before_destroy)
 void CTorch::UpdateCL()
 {
     inherited::UpdateCL();
+    CActor* actor = smart_cast<CActor*>(H_Parent());
+    const bool firstEye = actor && actor == Level().CurrentViewEntity() && actor->HUDview();
+    light_render->set_hud_spotlight(m_switched_on && firstEye);
 
     if (!m_switched_on)
         return;
@@ -311,10 +315,8 @@ void CTorch::UpdateCL()
 
     if (H_Parent())
     {
-        CActor* actor = smart_cast<CActor*>(H_Parent());
         if (actor)
             smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
-        const bool firstEye = actor && actor->active_cam() == eacFirstEye;
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE) ||
             GameID() != eGameIDSingle)

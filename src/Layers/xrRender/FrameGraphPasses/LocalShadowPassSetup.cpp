@@ -1040,8 +1040,9 @@ struct LocalShadowHudParams {
     u32 entryCount;
     u32 viewCount;
     u32 pad[2];
+    Fmatrix hudWarp;
 };
-static_assert(sizeof(LocalShadowHudParams) == 272, "LocalShadowHudParams is shader-visible");
+static_assert(sizeof(LocalShadowHudParams) == 336, "LocalShadowHudParams is shader-visible");
 
 struct LocalShadowHudData {
     VirtualResourceHandle atlas;
@@ -1168,6 +1169,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
     std::copy_n(state.hudSlots, kLocalHudViewsMax, hp.slots);
     hp.entryCount = count;
     hp.viewCount = state.hudViews;
+    hp.hudWarp = state.hudWarp;
     auto hudCB = cache.GetOrCreateVolatileCB("LocalShadow", "HudParams", sizeof(LocalShadowHudParams), data.device);
     cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
 
@@ -1751,6 +1753,7 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
             LocalShadowViewGPU rec = {};
             FillRecord(rec, vp, state.atlas, plan.nodes[f], nearZ, farZ, tanf(fov * 0.5f), L->position, shadowRange);
             rec.shape.y = float(state.atlasLayer);
+            rec.shape.z = (!point && L->flags.type == IRender_Light::SPOT && L->hud_spotlight) ? 1.0f : 0.0f;
             const auto& previous = state.request[slot];
             // Exact transform/rectangle comparison includes virtual size and roll.
             // The baseline is a requested revision that is rendered this frame;
@@ -1895,9 +1898,24 @@ static bool UseHudCube(const LocalShadowState& state, const light* owner,
     return dx * dx + dy * dy + dz * dz <= threshold * threshold;
 }
 
+static Fvector4 WarpHudSphere(const Fmatrix& warp, const Fvector4& sphere)
+{
+    Fvector center;
+    center.set(sphere.x, sphere.y, sphere.z);
+    warp.transform_tiny(center);
+    Fvector4 out;
+    out.set(center.x, center.y, center.z, sphere.w * std::max(1.0f, 1.0f / psHUD_FOV));
+    return out;
+}
+
 static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* hudSphere)
 {
     state.hudViews = 0;
+    state.hudWarp = HudFovWarp();
+    Fvector4 warpedSphere;
+    warpedSphere.set(0.0f, 0.0f, 0.0f, 0.0f);
+    if (hudSphere)
+        warpedSphere = WarpHudSphere(state.hudWarp, *hudSphere);
     xr_vector<LocalShadowHudWant>& wants = state.hudWants;
     xr_vector<const light*>& areaGroups = state.hudAreaGroups;
     wants.clear();
@@ -1913,20 +1931,22 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* h
             const u32 recordFaces = point ? 6u : 1u;
             for (u32 f = 0; f < recordFaces; ++f)
                 current.request[slot + f].hud.set(0.0f, 0.0f, 0.0f, 0.0f);
-            if (!hudSphere || !ViewTouchesSphere(rec, *hudSphere, !point))
+            const bool hudSpot = rec.shape.z > 0.5f;
+            const Fvector4* sphere = hudSphere ? (hudSpot ? &warpedSphere : hudSphere) : nullptr;
+            if (!sphere || !ViewTouchesSphere(rec, *sphere, !point))
                 continue;
             const light* L = current.owners[slot];
-            const bool cube = UseHudCube(state, L, rec, *hudSphere);
-            const float dx = hudSphere->x - rec.lightPos.x;
-            const float dy = hudSphere->y - rec.lightPos.y;
-            const float dz = hudSphere->z - rec.lightPos.z;
+            const bool cube = UseHudCube(state, L, rec, *sphere);
+            const float dx = sphere->x - rec.lightPos.x;
+            const float dy = sphere->y - rec.lightPos.y;
+            const float dz = sphere->z - rec.lightPos.z;
             const float dist = _sqrt(dx * dx + dy * dy + dz * dz);
             LocalShadowHudWant want = {};
             want.page = &current;
             want.pageIndex = page;
             want.slot = slot;
             want.owner = L;
-            want.fitted = !cube && dist > hudSphere->w + 0.01f;
+            want.fitted = !cube && dist > sphere->w + 0.01f;
             want.faces = want.fitted ? 1u : recordFaces;
             want.level = LocalAtlasAllocator::LevelOf(L->area_shadow_sample ? kLocalHudAreaTileSize : kLocalHudTileSize);
             const light* areaParent = nullptr;
@@ -1992,15 +2012,16 @@ static void SelectLocalShadowHudViews(LocalShadowState& state, const Fvector4* h
         const float farBase = current.request[want.slot].zparams.y;
         Fvector lightPos;
         lightPos.set(lightPosW.x, lightPosW.y, lightPosW.z);
+        const Fvector4& sphere = current.request[want.slot].shape.z > 0.5f ? warpedSphere : *hudSphere;
         Fvector center;
-        center.set(hudSphere->x, hudSphere->y, hudSphere->z);
+        center.set(sphere.x, sphere.y, sphere.z);
         if (want.fitted) {
             Fvector4 rect;
             const float tileSize = HudTileRect(state, L, 0, rect);
             Fvector toCenter;
             toCenter.sub(center, lightPos);
             const float dist = toCenter.magnitude();
-            const float r = hudSphere->w;
+            const float r = sphere.w;
             Fvector dir;
             dir.div(toCenter, dist);
             Fvector up, right;

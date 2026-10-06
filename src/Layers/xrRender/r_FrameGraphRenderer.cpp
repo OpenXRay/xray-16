@@ -1844,7 +1844,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
                     coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
                     passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
-                    auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
+                    auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, materialBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
                         vsmCfg, vsmDyn, width, height, &vsmState, m_gpuProfiler.get());
                     vsmMaskHandle = vsmOut.mask;
                     vsmPassesActive = vsmOut.active;
@@ -1876,7 +1876,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
         passes::setupVSMAtlasPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmCfg, vsmDyn, &vsmState, m_gpuProfiler.get());
         framegraph::VirtualResourceHandle vsmDebugView;
-        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
+        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, materialBuffer, width, height, &vsmState, m_gpuProfiler.get(), &vsmDebugView);
         if (vsmDebugView.is_valid())
             m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
     }

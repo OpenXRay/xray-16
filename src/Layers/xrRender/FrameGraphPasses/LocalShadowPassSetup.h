@@ -177,6 +177,7 @@ struct LocalShadowState {
     LocalAtlasAllocator hudAlloc;
     u32 hudViews = 0;
     u32 hudSlots[kLocalHudViewsMax] = {};
+    Fmatrix hudWarp = {};
     xr_vector<LocalShadowHudWant> hudWants;
     xr_vector<const light*> hudAreaGroups;
     xr_vector<LocalShadowAreaProxy> areaProxies;

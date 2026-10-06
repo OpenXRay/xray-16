@@ -823,7 +823,7 @@ const char* SkyProbeDebugReport::SurfaceStatusName(u32 status)
     {
     case 0: return "no grid";
     case 1: return "background or invalid depth";
-    case 2: return "HUD depth (labelled, still sampled)";
+    case 2: return "HUD surface (labelled, still sampled)";
     case 3: return "invalid surface data (non-finite P/N/depth)";
     case 4: return "valid opaque world";
     default: return "unknown";
@@ -942,7 +942,7 @@ void SkyProbeDebugReport::Validate(const SkyProbeDebugSnapshot& packet, const Sk
     if (packet.scene[2] == 0)
         AppendF(warnings, "diagnostic ray-query pipeline/TLAS is unavailable: reference rays R0-R5 were not traced; production moment visibility is unaffected\n");
     if (packet.metadata[3] == 2)
-        AppendF(warnings, "surface is HUD depth: labelled only, still sampled like deferred lighting\n");
+        AppendF(warnings, "surface is HUD: labelled only, still sampled like deferred lighting\n");
     if (packet.selection[2] == 0 || packet.selection[3] == 0)
         AppendF(issues, "selection extent is zero (%u x %u)\n", packet.selection[2], packet.selection[3]);
     else if (packet.selection[0] >= packet.selection[2] || packet.selection[1] >= packet.selection[3])

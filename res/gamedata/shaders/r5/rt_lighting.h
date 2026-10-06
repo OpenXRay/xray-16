@@ -24,6 +24,9 @@ StructuredBuffer<float> g_EnvironmentCDF : register(t27);
 float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
     float coneWidth, float coneSpread, out bool exhausted);
 
+float3 RTTraceVisibilityMasked(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
+    uint rayMask, float coneWidth, float coneSpread, out bool exhausted);
+
 float RTPowerHeuristic(float pdf, float otherPdf)
 {
     if (!(pdf > 0.0))
@@ -233,6 +236,10 @@ struct RTLightCandidate
     float3 direction;
     float distance;
     bool valid;
+    bool hudShadow;
+    float3 hudOrigin;
+    float3 hudDirection;
+    float hudDistance;
 };
 
 RTLightCandidate RTEvaluateLightCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
@@ -274,6 +281,13 @@ void RTTraceLightCandidate(RTSceneParams scene, RTLightCandidate candidate, floa
     float3 visibility = RTTraceVisibility(scene, candidate.origin, candidate.direction, candidate.distance,
         coneWidth, coneSpread, exhausted);
     result.invalid = result.invalid || exhausted;
+    if (candidate.hudShadow && any(visibility > 0.0))
+    {
+        bool hudExhausted;
+        visibility *= RTTraceVisibilityMasked(scene, candidate.hudOrigin, candidate.hudDirection,
+            candidate.hudDistance, RT_RAY_MASK_HUD, coneWidth, coneSpread, hudExhausted);
+        result.invalid = result.invalid || hudExhausted;
+    }
     result.diffuse += candidate.diffuse * (visibility * scale);
     result.specular += candidate.specular * (visibility * scale);
 }
@@ -379,13 +393,19 @@ RTLightList RTResolveLightList(RTSceneParams scene, float3 position, bool primar
     return list;
 }
 
+float3 RTHudReceiverNormal(float3 N)
+{
+    return RTSafeNormalize(mul(N, (float3x3)m_HudUnwarp), N);
+}
+
 RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surface, float3 position,
-    float3 geoNormal, float3 V, bool continuation, uint lightIndex, inout uint rng)
+    float3 geoNormal, float3 V, bool continuation, uint lightIndex, inout uint rng, bool hudReceiver)
 {
     GPULightData light = g_LightData[lightIndex];
     float3 L;
     float distance;
     float attenuation;
+    bool hudSpot = IsHudSpotLight(light);
     if (IsCapsuleLight(light))
     {
         float2 surfaceSample;
@@ -398,6 +418,13 @@ RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surf
     }
     else
     {
+        if (hudSpot && hudReceiver)
+        {
+            position = mul(m_HudWarp, float4(position, 1.0)).xyz;
+            geoNormal = RTHudReceiverNormal(geoNormal);
+            surface.N = RTHudReceiverNormal(surface.N);
+            V = RTSafeNormalize(eye_position - position, surface.N);
+        }
         attenuation = PunctualLightAttenuation(light, position, L, distance);
     }
     if (!(attenuation > 0.0) || distance > scene.rayDistance)
@@ -405,20 +432,32 @@ RTLightCandidate RTLocalLightCandidate(RTSceneParams scene, MaterialSurface surf
         RTLightCandidate none = (RTLightCandidate)0;
         return none;
     }
-    return RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, L, light.colorAndRange.xyz * attenuation,
-        1.0, distance, true, continuation);
+    RTLightCandidate candidate = RTEvaluateLightCandidate(scene, surface, position, geoNormal, V, L,
+        light.colorAndRange.xyz * attenuation, 1.0, distance, true, continuation);
+    if (candidate.valid && hudSpot)
+    {
+        float3 rawOrigin = mul(m_HudUnwarp, float4(candidate.origin, 1.0)).xyz;
+        float3 rawEnd = mul(m_HudUnwarp, float4(candidate.origin + candidate.direction * candidate.distance, 1.0)).xyz;
+        float3 rawSegment = rawEnd - rawOrigin;
+        float rawDistance = length(rawSegment);
+        candidate.hudShadow = rawDistance > 0.0;
+        candidate.hudOrigin = rawOrigin;
+        candidate.hudDirection = rawSegment / max(rawDistance, 1e-20);
+        candidate.hudDistance = rawDistance;
+    }
+    return candidate;
 }
 
 void RTDirectLightingLocalLights(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation,
-    inout uint rng, inout RTDirectTerms result, bool primary = false)
+    inout uint rng, inout RTDirectTerms result, bool primary = false, bool hudReceiver = false)
 {
     RTLightList list = RTResolveLightList(scene, position, primary);
     for (uint i = 0u; i < list.count; ++i)
     {
         uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
         RTTraceLightCandidate(scene, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
-            lightIndex, rng), 1.0, coneWidth, coneSpread, result);
+            lightIndex, rng, hudReceiver), 1.0, coneWidth, coneSpread, result);
     }
 }
 
@@ -488,7 +527,7 @@ void RTDirectLightingSanitize(inout RTDirectTerms result)
 
 RTDirectTerms RTDirectLightingResampled(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng,
-    bool primary)
+    bool primary, bool hudReceiver)
 {
     RTDirectTerms result = (RTDirectTerms)0;
     RTLightReservoir reservoir = RTLightReservoirBegin();
@@ -504,7 +543,7 @@ RTDirectTerms RTDirectLightingResampled(RTSceneParams scene, MaterialSurface sur
     {
         uint lightIndex = list.indexed ? g_LightIndexList[list.offset + i] : i;
         RTLightReservoirAdd(reservoir, RTLocalLightCandidate(scene, surface, position, geoNormal, V, continuation,
-            lightIndex, rng), rng);
+            lightIndex, rng, hudReceiver), rng);
     }
     RTLightReservoirResolve(scene, reservoir, coneWidth, coneSpread, result);
     RTDirectLightingSanitize(result);
@@ -513,16 +552,16 @@ RTDirectTerms RTDirectLightingResampled(RTSceneParams scene, MaterialSurface sur
 
 RTDirectTerms RTDirectLightingTerms(RTSceneParams scene, MaterialSurface surface, float3 position,
     float3 geoNormal, float3 V, float coneWidth, float coneSpread, bool continuation, inout uint rng,
-    bool primary = false)
+    bool primary = false, bool hudReceiver = false)
 {
     if (scene.lightRays != 0u)
         return RTDirectLightingResampled(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
-            continuation, rng, primary);
+            continuation, rng, primary, hudReceiver);
     RTDirectTerms result = (RTDirectTerms)0;
     RTDirectLightingSun(scene, surface, position, geoNormal, V, coneWidth, coneSpread, continuation,
         rng, result);
     RTDirectLightingLocalLights(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
-        continuation, rng, result, primary);
+        continuation, rng, result, primary, hudReceiver);
     RTDirectLightingEnvironment(scene, surface, position, geoNormal, V, coneWidth, coneSpread,
         continuation, rng, result);
     RTDirectLightingEmissive(scene, surface, position, geoNormal, V, coneWidth, coneSpread,

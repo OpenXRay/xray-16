@@ -56,7 +56,7 @@ float3 RTGITemporalWorldPos(float2 pixelCenter, float depth, float4x4 invViewPro
 float3 RTGITemporalHudViewPos(float2 pixelCenter, float depth, float4x4 invProj)
 {
     float2 uv = pixelCenter * float2(g_InvScreenWidth, g_InvScreenHeight);
-    float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, saturate((depth - RTGI_RECON_HUD_DEPTH) * 10.0), 1.0);
+    float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, depth, 1.0);
     float4 view = mul(invProj, clip);
     float3 position = view.xyz / view.w;
     position.xy *= g_HudFov;
@@ -90,10 +90,10 @@ void RTGITemporalTap(inout RTGITemporalHistory history, int2 tap, float weight, 
     float prevDepth = t_PrevDepth.Load(int3(tap, 0));
     float4 prevNormalData = t_PrevNormal.Load(int3(tap, 0));
     float4 prevDiffuse = t_PrevHistoryDiffuse.Load(int3(tap, 0));
-    bool prevHud = prevDepth >= RTGI_RECON_HUD_DEPTH;
+    bool prevHud = RTGIReconHistoryHud(prevDiffuse.a);
     if (!isfinite(prevDepth) || prevDepth <= 0.0 || prevHud != hud ||
         !all(isfinite(prevNormalData.xyz)) || dot(prevNormalData.xyz, prevNormalData.xyz) < 0.25 ||
-        !all(isfinite(prevDiffuse)) || !(prevDiffuse.a > 0.0))
+        !all(isfinite(prevDiffuse)) || prevDiffuse.a == 0.0)
     {
         history.reason = RTGI_RECON_REJECT_GEOMETRY;
         return;
@@ -122,7 +122,7 @@ void RTGITemporalTap(inout RTGITemporalHistory history, int2 tap, float weight, 
     history.specular += prevSpecular.rgb * weight;
     history.moments += prevMoments * weight;
     history.fast += prevFast * weight;
-    history.diffuseLength += prevDiffuse.a * weight;
+    history.diffuseLength += RTGIReconHistoryLength(prevDiffuse.a) * weight;
     history.specularLength += prevSpecular.a * weight;
     history.weight += weight;
 }
@@ -247,7 +247,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         fast = currentFast;
     float diffuseVariance = max(moments.y - moments.x * moments.x, 0.0);
 
-    u_HistoryDiffuse[pixel] = float4(diffuse, diffuseLength);
+    u_HistoryDiffuse[pixel] = float4(diffuse, RTGIReconPackHistoryLength(diffuseLength, hud));
     u_HistorySpecular[pixel] = float4(specular, specularLength);
     u_Moments[pixel] = moments;
     u_Fast[pixel] = fast;

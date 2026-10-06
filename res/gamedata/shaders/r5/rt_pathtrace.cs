@@ -111,13 +111,21 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     settings.trackSegmentMetrics = false;
     settings.firstRayMask = RT_RAY_MASK_WORLD;
 
-    float3 hudDirection = normalize(mul((float3x3)g_HudUnwarp, direction));
+    float3 hudAxis = mul((float3x3)g_HudUnwarp, direction);
+    float hudAxisLength = length(hudAxis);
+    float3 hudDirection = hudAxis / max(hudAxisLength, 1e-20);
     RTSceneTrace hudProbe = RTTraceRay(scene, origin, hudDirection, max(scene.rayDistance, 0.0), false, rng,
         0.0, g_CameraConeSpread, origin, 0.0, false, RT_RAY_MASK_HUD);
     if (hudProbe.hit)
     {
-        direction = hudDirection;
-        settings.firstRayMask = RT_RAY_MASK_HUD;
+        float displayedHudDistance = hudProbe.t / max(hudAxisLength, 1e-20);
+        RTSceneTrace worldProbe = RTTraceRay(scene, origin, direction, displayedHudDistance, false, rng,
+            0.0, g_CameraConeSpread, origin, 0.0, false, RT_RAY_MASK_WORLD);
+        if (!worldProbe.hit)
+        {
+            direction = hudDirection;
+            settings.firstRayMask = RT_RAY_MASK_HUD;
+        }
     }
     RTIntegratorResult result = RTIntegratorRunCamera(scene, settings, origin, direction, rng);
 

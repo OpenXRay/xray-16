@@ -24,6 +24,7 @@ using namespace bindless;
 struct DecalPassData {
     VirtualResourceHandle depth;
     VirtualResourceHandle normal;
+    VirtualResourceHandle material;
     VirtualResourceHandle baseColor;
     fg::RenderDevice* device;
     decals::DecalManager* decalMgr;
@@ -119,6 +120,7 @@ DefaultOutputLayout setupDecalPass(
             data.height = height;
             data.depth = passBuilder.read(inputs.depth, ResourceState::DepthStencilRead);
             data.normal = passBuilder.read(inputs.normal, ResourceState::ShaderResource);
+            data.material = passBuilder.read(inputs.material, ResourceState::ShaderResource);
             data.baseColor = passBuilder.readWrite(inputs.baseColor, ResourceState::RenderTarget);
         },
 
@@ -128,8 +130,9 @@ DefaultOutputLayout setupDecalPass(
 
             auto* depthTex = fg.GetPhysicalTexture(data.depth);
             auto* normalTex = fg.GetPhysicalTexture(data.normal);
+            auto* materialTex = fg.GetPhysicalTexture(data.material);
             auto* baseColorTex = fg.GetPhysicalTexture(data.baseColor);
-            if (!depthTex || !normalTex || !baseColorTex)
+            if (!depthTex || !normalTex || !materialTex || !baseColorTex)
                 return;
 
             data.decalMgr->Upload(ctx);
@@ -160,6 +163,7 @@ DefaultOutputLayout setupDecalPass(
             bsb.BufferSRV("g_Decals", data.decalMgr->GetDecalBuffer());
             bsb.Texture("g_Depth", depthTex);
             bsb.Texture("g_Normal", normalTex);
+            bsb.Texture("g_Material", materialTex);
             bsb.BufferSRV("g_Materials", materialBuffer);
 
             auto bindingSet = cache.GetOrCreateBindingSet(

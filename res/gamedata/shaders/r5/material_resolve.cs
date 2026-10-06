@@ -215,10 +215,10 @@ void main(uint3 dtid : SV_DispatchThreadID)
         }
         else
             skyVisibility = dot(bd.m_lambda, hemiCorners) * view.hemiScale + view.hemiBias;
-        g_OutMaterial[p] = PackGBufferMaterialBakedSky(s.shadingClass, s.transmission, skyVisibility);
+        g_OutMaterial[p] = PackGBufferMaterialBakedSky(s.shadingClass, s.transmission, skyVisibility, hud);
     }
     else
-        g_OutMaterial[p] = PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal);
+        g_OutMaterial[p] = PackGBufferMaterial(s.shadingClass, s.transmission, geometricNormal, hud);
     g_OutMotion[p] = motion;
     g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
 }

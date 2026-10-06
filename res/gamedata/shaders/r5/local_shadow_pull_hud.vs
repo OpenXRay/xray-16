@@ -9,6 +9,7 @@ cbuffer LocalShadowHudParams : register(b5)
     uint g_HudEntryCount;
     uint g_HudViewCount;
     uint2 g_HudPad;
+    float4x4 g_HudWarp;
 };
 
 StructuredBuffer<uint> g_HudEntries : register(t15);
@@ -62,6 +63,9 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     uint4 w1 = g_SkinnedVB.Load4(vertexByte + 16u);
     float3 worldPos = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
     float2 texcoord = float2(asfloat(w1.z), asfloat(w1.w));
+
+    if (g_LocalShadowTiles[slot].shape.z > 0.5)
+        worldPos = mul(g_HudWarp, float4(worldPos, 1.0)).xyz;
 
     LocalRoute r = LocalRouteHud(slot, worldPos);
     output.position = r.position;

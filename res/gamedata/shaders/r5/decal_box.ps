@@ -15,6 +15,7 @@ struct GPUDecalData
 StructuredBuffer<GPUDecalData> g_Decals : register(t3);
 Texture2D<float> g_Depth : register(t24);
 Texture2D<float4> g_Normal : register(t25);
+Texture2D<float4> g_Material : register(t26);
 
 struct VS_OUTPUT
 {
@@ -29,7 +30,7 @@ float4 main(VS_OUTPUT input) : SV_Target0
     int2 pixelCoord = int2(input.position.xy);
 
     float depth = g_Depth.Load(int3(pixelCoord, 0));
-    if (depth <= 0.0 || depth >= 0.9)
+    if (depth <= 0.0 || GBufferIsHud(g_Material.Load(int3(pixelCoord, 0))))
         discard;
 
     float4 surface = g_Normal.Load(int3(pixelCoord, 0));

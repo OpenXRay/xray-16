@@ -565,21 +565,6 @@ void CParticleEffect::Render(float, bool)
             RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
             if (dwCount)
             {
-#ifndef _EDITOR
-                Fmatrix Pold = Device.mProject;
-                Fmatrix FTold = Device.mFullTransform;
-                if (GetHudMode())
-                {
-                    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-                        g_pGamePersistent->Environment().CurrentEnv.far_plane);
-
-                    Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    RCache.set_xform_project(Device.mProject);
-                    RImplementation.rmNear();
-                    ApplyTexgen(Device.mFullTransform);
-                }
-#endif
-
                 RCache.set_xform_world(Fidentity);
                 RCache.set_Geometry(geom);
 
@@ -588,16 +573,6 @@ void CParticleEffect::Render(float, bool)
                         CULL_NONE);
                 RCache.Render(nvrhi::PrimitiveType::TriangleList, dwOffset, 0, dwCount, 0, dwCount / 2);
                 RCache.set_CullMode(CULL_CCW);
-#ifndef _EDITOR
-                if (GetHudMode())
-                {
-                    RImplementation.rmNormal();
-                    Device.mProject = Pold;
-                    Device.mFullTransform = FTold;
-                    RCache.set_xform_project(Device.mProject);
-                    ApplyTexgen(Device.mFullTransform);
-                }
-#endif
             }
         }
     }

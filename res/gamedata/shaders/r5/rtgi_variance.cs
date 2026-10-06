@@ -34,7 +34,7 @@ RTGIVarianceSample RTGIVarianceLoad(int2 pixel)
     result.moments = t_Moments.Load(int3(pixel, 0));
     result.normalRoughness = t_NormalRoughness.Load(int3(pixel, 0));
     float4 surfaceData = t_SurfaceData.Load(int3(pixel, 0));
-    result.valid = result.diffuse.a > 0.0 && all(isfinite(result.diffuse)) && all(isfinite(result.specular)) &&
+    result.valid = result.diffuse.a != 0.0 && all(isfinite(result.diffuse)) && all(isfinite(result.specular)) &&
         all(isfinite(result.moments)) && all(isfinite(result.normalRoughness)) && all(isfinite(surfaceData)) &&
         dot(result.normalRoughness.xyz, result.normalRoughness.xyz) >= 0.25;
     result.guide = RTGIReconDepthGuide(surfaceData, result.valid);
@@ -65,7 +65,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    float diffuseLength = max(center.diffuse.a, 1.0);
+    float diffuseLength = max(RTGIReconHistoryLength(center.diffuse.a), 1.0);
     float specularLength = max(center.specular.a, 1.0);
     float4 outDiffuse = float4(center.diffuse.rgb, max(center.moments.y - center.moments.x * center.moments.x, 0.0));
     float4 outSpecular = float4(center.specular.rgb, max(center.moments.w - center.moments.z * center.moments.z, 0.0));

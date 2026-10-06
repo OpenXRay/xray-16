@@ -201,14 +201,11 @@ float3 worldNormalToView(float3 N)
 	return normalize(mul(float3x3(m_V[0].xyz, m_V[1].xyz, m_V[2].xyz), N));
 }
 
-float3 reconstruct_world_pos(float2 svPosXY, float depth)
+float3 reconstruct_world_pos(float2 svPosXY, float depth, bool hud = false)
 {
 	float2 uv = svPosXY * screen_res.zw;
 	float4 clip = float4(uv * 2.0 - 1.0, depth, 1.0);
 	clip.y = -clip.y;
-	bool hud = depth >= 0.9;
-	if (hud)
-		clip.z = (depth - 0.9) * 10.0;
 	float4 world = mul(m_InvVP, clip);
 	float3 worldPos = world.xyz / world.w;
 	if (hud)
@@ -239,7 +236,8 @@ float3 shade_pbr(
 	bool includeAmbient = true,
 	float sunThickness = 0.0,
 	float3 skyNormal = float3(0.0, 0.0, 0.0),
-	float bakedSkyVisibility = -1.0)
+	float bakedSkyVisibility = -1.0,
+	bool hudReceiver = false)
 {
 	float3 V = normalize(eye_position - worldPos);
 	float3 L = normalize(-L_sun_dir_w);
@@ -247,7 +245,7 @@ float3 shade_pbr(
 
 	float2 sun = float2(sunVis, sunThickness);
 	if (sunVis < 0.0)
-		sun = SunShadow(worldPos, svPosition);
+		sun = SunShadow(worldPos, svPosition, hudReceiver);
 
 	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * L_hemi_color.w;
 	SkyProbeVisibility skyVisibility;
@@ -289,7 +287,7 @@ float3 shade_pbr(
 		float linearDepth = mul(m_V, float4(worldPos, 1.0)).z;
 		finalColor += EvaluateClusteredLights(
 			worldPos, N, V, albedo, metallic, roughness,
-			svPosition.xy, linearDepth, svPosition.z >= 0.9, (uint)pbr_diffuse_mode, shadingClass, sssColor);
+			svPosition.xy, linearDepth, hudReceiver, (uint)pbr_diffuse_mode, shadingClass, sssColor);
 	}
 #endif
 

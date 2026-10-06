@@ -71,7 +71,8 @@ float2 LocalShadow(uint slot, float3 wp, float3 N, bool hudReceiver)
     LocalShadowView t = g_LocalShadowTiles[slot];
     if (t.zparams.w != 1.0)
         return float2(1.0, 0.0);
-    float2 hud = hudReceiver && t.hud.x > 0.5 ? LocalShadowHudLayer(t, wp, N) : float2(1.0, 0.0);
+    bool hudSpot = t.shape.z > 0.5;
+    float2 hud = (hudReceiver || hudSpot) && t.hud.x > 0.5 ? LocalShadowHudLayer(t, wp, N) : float2(1.0, 0.0);
     float4 c0 = mul(t.viewProj, float4(wp, 1.0));
     if (c0.w <= t.zparams.x)
         return hud;

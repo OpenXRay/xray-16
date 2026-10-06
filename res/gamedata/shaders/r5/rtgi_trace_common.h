@@ -8,7 +8,7 @@
 Texture2D<float> t_Depth : register(t14);
 Texture2D<float4> t_Normal : register(t15);
 Texture2D<float4> t_BaseColor : register(t16);
-Texture2D<float2> t_Material : register(t17);
+Texture2D<float4> t_Material : register(t17);
 Texture2D<float4> t_SourceColor : register(t28);
 Texture2D<float2> t_MotionVectors : register(t29);
 
@@ -21,13 +21,10 @@ RWTexture2D<float4> u_PathData : register(u5);
 RWTexture2D<float4> u_SurfaceData : register(u6);
 RWTexture2D<float2> u_Motion : register(u7);
 
-float3 RTGIReconstructWorldPos(uint2 pixel, float depth)
+float3 RTGIReconstructWorldPos(uint2 pixel, float depth, bool hud)
 {
     float2 uv = (float2(pixel) + 0.5) / float2(g_ScreenWidth, g_ScreenHeight);
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, depth, 1.0);
-    bool hud = depth >= 0.9;
-    if (hud)
-        clip.z = (depth - 0.9) * 10.0;
     float4 world = mul(g_InvViewProj, clip);
     float3 position = world.xyz / world.w;
     if (hud)
@@ -45,6 +42,7 @@ struct RTGIPrimarySurface
     float coneWidth;
     float coneSpread;
     float depth;
+    bool hud;
     bool motionValid;
     float2 motion;
     float3 sourceColor;
@@ -56,7 +54,7 @@ RTGIPrimarySurface RTGIDecodePrimary(uint2 pixel)
     float depth = t_Depth.Load(int3(pixel, 0));
     float4 normalData = t_Normal.Load(int3(pixel, 0));
     float4 baseColorData = t_BaseColor.Load(int3(pixel, 0));
-    float2 materialData = t_Material.Load(int3(pixel, 0));
+    float4 materialData = t_Material.Load(int3(pixel, 0));
     float3 sourceColor = t_SourceColor.Load(int3(pixel, 0)).rgb;
     float2 motion = t_MotionVectors.Load(int3(pixel, 0));
     bool primaryInputsFinite = isfinite(depth) && all(isfinite(normalData)) &&
@@ -83,10 +81,12 @@ RTGIPrimarySurface RTGIDecodePrimary(uint2 pixel)
 
     bool validPrimary = primaryInputsFinite && depth > 0.0 &&
         dot(normalData.xyz, normalData.xyz) >= 0.25 && g_RayDistance > 0.0;
+    bool hud = validPrimary && GBufferIsHud(materialData);
+    primary.hud = hud;
     float3 worldPos = 0.0;
     if (validPrimary)
     {
-        worldPos = RTGIReconstructWorldPos(pixel, depth);
+        worldPos = RTGIReconstructWorldPos(pixel, depth, hud);
         validPrimary = all(isfinite(worldPos));
     }
     primary.valid = validPrimary;
@@ -94,12 +94,12 @@ RTGIPrimarySurface RTGIDecodePrimary(uint2 pixel)
         return primary;
 
     primary.worldPos = worldPos;
-    MaterialSurface surface = GBufferMaterialSurface(normalData, baseColorData, materialData);
+    MaterialSurface surface = GBufferMaterialSurface(normalData, baseColorData, materialData.xy);
     primary.surface = surface;
     float3 V = RTSafeNormalize(g_CameraPos.xyz - worldPos, surface.N);
     primary.V = V;
-    float3 worldRight = RTGIReconstructWorldPos(pixel + uint2(1u, 0u), depth);
-    float3 worldUp = RTGIReconstructWorldPos(pixel + uint2(0u, 1u), depth);
+    float3 worldRight = RTGIReconstructWorldPos(pixel + uint2(1u, 0u), depth, hud);
+    float3 worldUp = RTGIReconstructWorldPos(pixel + uint2(0u, 1u), depth, hud);
     float linearDistance = length(g_CameraPos.xyz - worldPos);
     primary.linearDistance = linearDistance;
     float coneWidth = max(length(worldRight - worldPos), length(worldUp - worldPos));
@@ -209,7 +209,7 @@ void RTGIWriteRawOutputs(uint2 pixel, RTGIPrimarySurface primary, RTGIAccumulati
         normalRoughness = float4(primary.surface.N, abs(primary.surface.roughness));
         albedoMetallic = float4(primary.surface.albedo, primary.surface.metallic);
         surfaceData = float4(primary.linearDistance, primary.depth, primary.motionValid ? 3.0 : 1.0,
-            primary.depth >= 0.9 ? 1.0 : 0.0);
+            primary.hud ? 1.0 : 0.0);
     }
 
     if (!all(isfinite(rawDiffuse)))

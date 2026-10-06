@@ -29,7 +29,7 @@ uint4 RTGITracePixel(uint2 pixel)
     {
         RTGIAccumulation debug = (RTGIAccumulation)0;
         debug.validCount = RTGISampleCount();
-        if (primary.depth < 0.9)
+        if (!primary.hud)
         {
             uint rng = RTGISampleRng(pixel, 0u);
             RTWorldCacheLookup lookup = RTWorldCacheQuery(primary.worldPos, primary.surface.N, g_WorldCacheLifetime,
@@ -59,7 +59,7 @@ uint4 RTGITracePixel(uint2 pixel)
     {
         uint rng = RTGISampleRng(pixel, sample);
         RTIntegratorResult path = RTIntegratorRunPrimary(scene, settings, primary.surface, primary.worldPos,
-            primary.surface.N, primary.V, rng);
+            primary.surface.N, primary.V, rng, primary.hud);
         RTGIAccumulateSample(accumulation, path, g_GIIntensity);
         cacheEvents += path.cacheEvents;
     }

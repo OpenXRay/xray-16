@@ -44,16 +44,10 @@ VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
     uint2 uvw = g_SkinnedVB.Load2(vertexByte + 24u);
 
     float3 position = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
+    float4 world = float4(position, 1.0);
     if ((e.flags & CLUSTER_ENTRY_FLAG_HUD) != 0u)
-    {
-        float4 clip = mul(m_VP, mul(m_HudWarp, float4(position, 1.0)));
-        clip.z = 0.9 * clip.w + 0.1 * clip.z;
-        output.position = clip;
-    }
-    else
-    {
-        output.position = mul(m_VP, float4(position, 1.0));
-    }
+        world = mul(m_HudWarp, world);
+    output.position = mul(m_VP, world);
     output.texcoord = float2(asfloat(uvw.x), asfloat(uvw.y));
     output.materialID = e.materialID;
     output.drawID = 0u;

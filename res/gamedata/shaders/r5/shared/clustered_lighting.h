@@ -23,6 +23,11 @@ bool IsSpotLight(GPULightData light)
     return light.spotParamsAndType.y > 0.5f && light.spotParamsAndType.y < 1.5f;
 }
 
+bool IsHudSpotLight(GPULightData light)
+{
+    return IsSpotLight(light) && light.areaLength.y > 0.5f;
+}
+
 bool IsCapsuleLight(GPULightData light)
 {
     return light.spotParamsAndType.y > 1.5f;
@@ -278,28 +283,38 @@ float3 EvaluateClusteredLights(
         }
         float3 lightColor = light.colorAndRange.xyz;
 
+        float3 lightPos = worldPos;
+        float3 lightN = N;
+        float3 lightV = V;
+        if (hudReceiver && IsHudSpotLight(light))
+        {
+            lightPos = mul(m_HudWarp, float4(worldPos, 1.0)).xyz;
+            lightN = normalize(mul(N, float3x3(m_HudUnwarp[0].xyz, m_HudUnwarp[1].xyz, m_HudUnwarp[2].xyz)));
+            lightV = normalize(eye_position - lightPos);
+        }
+
         float3 L;
         float dist;
-        float atten = PunctualLightAttenuation(light, worldPos, L, dist);
+        float atten = PunctualLightAttenuation(light, lightPos, L, dist);
 
         if (atten <= 0.001f)
             continue;
 
         float2 shadow = float2(1.0, 0.0);
-        uint shadowSlot = LocalShadowSlot(light, worldPos);
+        uint shadowSlot = LocalShadowSlot(light, lightPos);
         if (shadowSlot != 0xFFFFFFFFu)
-            shadow = LocalShadow(shadowSlot, worldPos, N, hudReceiver);
+            shadow = LocalShadow(shadowSlot, lightPos, lightN, hudReceiver);
 
         float3 lc = lightColor * atten;
         if (foliage)
         {
             float transmit = shadow.x + (1.0 - shadow.x) * FoliageTransmittance(shadow.y, foliage_sss.w);
-            totalLight += PBRDirectLighting(albedo, N, V, L, lc * shadow.x, 0.0, roughness, 1u)
-                + FoliageTransmission(N, V, L, foliage_params2.x) * transmit * sssColor * lc;
+            totalLight += PBRDirectLighting(albedo, lightN, lightV, L, lc * shadow.x, 0.0, roughness, 1u)
+                + FoliageTransmission(lightN, lightV, L, foliage_params2.x) * transmit * sssColor * lc;
         }
         else if (shadow.x > 0.001f)
         {
-            totalLight += PBRDirectLighting(albedo, N, V, L, lc * shadow.x, metallic, roughness, diffuseMode);
+            totalLight += PBRDirectLighting(albedo, lightN, lightV, L, lc * shadow.x, metallic, roughness, diffuseMode);
         }
     }
     return totalLight;

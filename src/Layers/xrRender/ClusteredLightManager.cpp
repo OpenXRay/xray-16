@@ -201,6 +201,10 @@ GPULightData ClusteredLightManager::BuildGPULightData(const light* L, u32 shadow
 
         float texIdxBits;
         std::memcpy(&texIdxBits, &texIdx, sizeof(float));
+
+        if (lightType == IRender_Light::SPOT && L->hud_spotlight)
+            gpu.areaLength.y = 1.0f;
+
         gpu.spotParamsAndType.set(offset, 1.0f, texIdxBits, float(shadowSlot));
 
         if (texIdx != 0)
