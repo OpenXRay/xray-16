@@ -77,7 +77,8 @@ void CEffect_Rain::Born(Item& dest, float radius)
     dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max);
 
     float height = max_distance;
-    RenewItem(dest, height, RayPick(dest.P, dest.D, height, collide::rqtBoth));
+    const bool hit = RayPick(dest.P, dest.D, height, collide::rqtBoth);
+    RenewItem(dest, height, hit);
 }
 
 bool CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt)

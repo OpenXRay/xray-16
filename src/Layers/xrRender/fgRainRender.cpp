@@ -194,7 +194,11 @@ void FGRainRender::Render(CEffect_Rain& owner)
         if (wlen > radius_wrap_sqr)
         {
             wlen = _sqrt(wlen);
-            if ((one.P.y - vEye.y) < kSinkOffset) { one.invalidate(); }
+            if ((one.P.y - vEye.y) < kSinkOffset)
+            {
+                one.invalidate();
+                continue;
+            }
             else
             {
                 Fvector inv_dir, src_p;
@@ -207,12 +211,20 @@ void FGRainRender::Render(CEffect_Rain& owner)
                     float height = kMaxDistance;
                     if (owner.RayPick(src_p, one.D, height, collide::rqtBoth))
                     {
-                        if (_sqr(height) <= dist_sqr) one.invalidate();
+                        if (_sqr(height) <= dist_sqr)
+                        {
+                            one.invalidate();
+                            continue;
+                        }
                         else owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE);
                     }
                     else owner.RenewItem(one, kMaxDistance - _sqrt(dist_sqr), FALSE);
                 }
-                else one.invalidate();
+                else
+                {
+                    one.invalidate();
+                    continue;
+                }
             }
         }
 
