@@ -33,7 +33,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     // Get caps
     GLint max_width, max_height;
-#ifdef XR_PLATFORM_APPLE
+#if defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_WEB) // GLES 3.0 has no GL_MAX_FRAMEBUFFER_WIDTH either
     // https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_offscreen/opengl_offscreen.html
     CHK_GL(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_width));
     max_height = max_width;
@@ -50,6 +50,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     RImplementation.Resources->Evict();
 
     target = (SampleCount > 1) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+    const texture_upload_unit uploadUnit(target);
     glGenTextures(1, &pRT);
     CHK_GL(glBindTexture(target, pRT));
     if (SampleCount > 1)
@@ -60,6 +61,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     pTexture = RImplementation.Resources->_CreateTexture(Name);
     pTexture->surface_set(target, pRT);
+    pTexture->size_set(w, h);
 
     // OpenGL doesn't differentiate between color and depth targets
     pZRT = pRT;
@@ -88,19 +90,39 @@ void CRT::reset_end()
 void CRT::resolve_into(CRT& destination) const
 {
     glReadBuffer(GL_COLOR_ATTACHMENT0);
+#ifndef XR_PLATFORM_WEB // glDrawBuffers below covers it; glDrawBuffer does not exist in GLES
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
+#endif
 
     constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     RCache.set_RT(pRT, 0);
     RCache.set_RT(destination.pRT, 1);
 
+#ifdef XR_PLATFORM_WEB
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+#else
     [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+#endif
     CHK_GL(glDrawBuffers(std::size(buffers), buffers));
 
     CHK_GL(glBlitFramebuffer(0, 0, dwWidth, dwHeight, 0, 0, destination.dwWidth, destination.dwHeight,
         GL_COLOR_BUFFER_BIT, GL_NEAREST));
 }
+
+#ifdef XR_PLATFORM_WEB
+void CRT::copy_into(CRT& destination) const
+{
+    RCache.set_RT(pRT, 0);
+    RCache.set_RT(0, 1);
+    RCache.set_RT(0, 2);
+    CHK_GL(glReadBuffer(GL_COLOR_ATTACHMENT0));
+
+    const texture_upload_unit uploadUnit(GL_TEXTURE_2D);
+    CHK_GL(glBindTexture(GL_TEXTURE_2D, destination.pRT));
+    CHK_GL(glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, dwWidth, dwHeight));
+}
+#endif
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {

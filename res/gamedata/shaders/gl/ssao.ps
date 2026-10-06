@@ -194,7 +194,7 @@ for (int rad=0; rad < RINGS; rad++)
 		//float3	tap_pos	= s_position.Sample(smp_nofilter,tap);
 		float3	tap_pos	= gbd.P;
 #else // SSAO_OPT_DATA
-		float	z	= textureLod(s_half_depth,tap,0).r;
+		float	z	= textureLod(s_half_depth,tap, 0.0 ).r;
 		float3	tap_pos	= uv_to_eye(tap, z);
 #endif // SSAO_OPT_DATA
 		float3 	direct 	= tap_pos-P.xyz;
@@ -205,12 +205,12 @@ for (int rad=0; rad < RINGS; rad++)
 		float 	infl 	= saturate(dot( direct, N.xyz));
 		float 	occ_factor = saturate(dist);
 //		float	range_att = 1/(occ_factor+0.1);
-		float	range_att = saturate(1-dist*0.5);
+		float	range_att = saturate(1.0-dist*0.5);
 		{
 //			occ += lerp( 1, occ_factor, infl);
 //			num_dir += 1;		
 
-			occ += (infl+0.01)*lerp( 1, occ_factor, infl)*range_att;
+			occ += (infl+0.01)*lerp( 1.0, occ_factor, infl)*range_att;
 			num_dir += (infl+0.01)*range_att;
 
 //			occ += (infl+0.1)*lerp( 1, occ_factor, infl)*range_att;
@@ -226,7 +226,6 @@ for (int rad=0; rad < RINGS; rad++)
 /**/
 
 //	occ = lerp(1, occ, saturate(point_depth/1.5));
-
 	occ = saturate(occ);
 //	occ = Contrast(occ,2);
 //	occ = occ*1.5 - 0.5;
@@ -236,12 +235,12 @@ for (int rad=0; rad < RINGS; rad++)
 #if SSAO_QUALITY==1
 	occ = (occ+0.3)/(1+0.3);
 #else	//	SSAO_QUALITY==1
-	occ = (occ+0.2)/(1+0.2);
+	occ = (occ+0.2)/(1.0+0.2);
 #endif	//	SSAO_QUALITY==1
 //	occ = 1;
 
 	float WeaponAttenuation = smoothstep( 0.8, 0.9, length( P.xyz ));
-	occ = lerp( 1, occ, WeaponAttenuation );
+	occ = lerp( 1.0, occ, WeaponAttenuation );
 
 	return occ;
 }

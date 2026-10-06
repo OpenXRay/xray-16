@@ -27,7 +27,7 @@ float3	GetNVNMap(float2 tc, float time)
 	water.xyz *= 6.0;
 
 //	water.y = sqrt(1-water.x*water.x-water.z*water.z);
-	water.y = 0;
+	water.y = 0.0;
 
 	return water.xyz;
 }
@@ -44,7 +44,7 @@ float3	GetWaterNMap(float2 tc)
 
 	water.xyz *= 0.3;
 
-	water.y = 0;
+	water.y = 0.0;
 
 	return water.xyz;
 }
@@ -100,15 +100,15 @@ float4 _main ( float2 tc, float2 tcJ )
 	//	Apply distance falloff
 	//float	fAtten = 1 - smoothstep( 10, 30, length( _P.xyz ));
 	// Using fixed fallof factors according to float16 depth coordinate precision.
-	float	fAtten = 1 - smoothstep( 5, 20, _P.z );
+	float	fAtten = 1.0 - smoothstep( 5.0, 20.0, _P.z );
 	s	*= fAtten*fAtten;
 
 	//	Apply rain density
 	s	*= RainDensity.x;
 
 	float fIsUp = -dot( Ldynamic_dir.xyz, _N.xyz );
-	s *= saturate(fIsUp*10+(10*0.5)+0.5);
-	fIsUp = max(0, fIsUp);
+	s *= saturate(fIsUp*10.0+(10.0*0.5)+0.5);
+	fIsUp = max(0.0, fIsUp);
 
 	float fIsX = WorldN.x;
 	float fIsZ = WorldN.z;
@@ -117,11 +117,11 @@ float4 _main ( float2 tc, float2 tcJ )
 //	float3 waterFallX = GetWaterNMap( float2(WorldP.x, WorldP.y-timers.x), 0.5 );
 //	float3 waterFallZ = GetWaterNMap( float2(WorldP.z, WorldP.y-timers.x), 0.5 );
 
-	float3 tc1 = WorldP / 2;
+	float3 tc1 = WorldP / 2.0;
 
-	float fAngleFactor = 1 - fIsUp;
+	float fAngleFactor = 1.0 - fIsUp;
 
-	fAngleFactor = 0.1*ceil(10*fAngleFactor);
+	fAngleFactor = 0.1*ceil(10.0*fAngleFactor);
 
 	//	Just slow down effect.
 //	fAngleFactor *= 0.25;

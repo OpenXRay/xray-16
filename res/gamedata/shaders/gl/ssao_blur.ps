@@ -50,8 +50,8 @@ float ssao_blur_ps(int2 centerTC, int iSample)
 #endif
 	 
 		float fDepth  = sampleData.g;
-		float fDiff	  = 8*abs(fDepth-centerDepth)/min(fDepth,centerDepth);
-	 	float fWeight = saturate(1-fDiff);
+		float fDiff	  = 8.0*abs(fDepth-centerDepth)/min(fDepth,centerDepth);
+	 	float fWeight = saturate(1.0-fDiff);
 
 		fOcclusion += sampleData.r * fWeight;
 

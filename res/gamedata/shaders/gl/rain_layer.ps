@@ -40,7 +40,7 @@ float4 _main ( float2 tc, float2 tcJ )
 
 	tc1 = frac(tc1);
 
-	float4 water = textureLod( s_water, tc1, 0 );
+	float4 water = textureLod( s_water, tc1, 0.0 );
 
 //	water.xy = tc1;
 //	water.z = 0.0;

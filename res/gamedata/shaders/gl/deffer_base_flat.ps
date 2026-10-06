@@ -10,7 +10,7 @@ f_deffer _main( p_flat I )
   float3 D	= tbase		(I.tcdh).rgb;	// IN:  rgb.a
 
 #ifdef	USE_TDETAIL
-	D.rgb	= 2*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
+	D.rgb	= 2.0*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
 #endif
 
 	// hemi,sun,material

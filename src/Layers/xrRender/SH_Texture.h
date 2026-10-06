@@ -80,6 +80,11 @@ public:
 #elif defined(USE_OGL)
     void surface_set(GLenum target, GLuint surf);
     [[nodiscard]] GLuint surface_get() const;
+    void size_set(u32 width, u32 height)
+    {
+        m_loaded_width = width;
+        m_loaded_height = height;
+    }
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -145,6 +150,9 @@ private:
     }
 
     void desc_update();
+#if defined(USE_OGL)
+    u32 m_loaded_width{}, m_loaded_height{}; // recorded at creation, WebGL cannot query texture levels
+#endif
 #if defined(USE_DX11)
     void Apply(CBackend& cmd_list, u32 dwStage) const;
     D3D_USAGE GetUsage();

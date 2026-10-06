@@ -46,7 +46,7 @@ float4 _main ( v2p I, uint iSample )
 
 	// ----- attenuate
 	float rsqr	= dot( I.lightToPos, I.lightToPos); // distance 2 light (squared)
-  	float  att 	= saturate( 1 - rsqr * Ldynamic_pos.w ); // q-linear attenuate
+  	float  att 	= saturate( 1.0 - rsqr * Ldynamic_pos.w ); // q-linear attenuate
 	//float  att 	= saturate( 1 - (rsqr * Ldynamic_pos.w)*(rsqr * Ldynamic_pos.w) ); // q-linear attenuate
   	//float  att 	= 10.0*(1.0/(1.0+0.1*rsqr));
 	//float  att 	= 1.0/rsqr;

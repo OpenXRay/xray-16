@@ -41,7 +41,7 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 #define lerp        mix
 #define frac        fract
 #define saturate(a) clamp(a, 0.0, 1.0)
-#define clip(x)		if (x < 0) discard
+#define clip(x)		if (x < 0.0) discard
 #define tex2D		texture
 #define tex2Dproj	textureProj
 #define tex2Dlod(s,t)	textureLod(s,t.xy,t.w)

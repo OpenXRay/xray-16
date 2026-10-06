@@ -13,7 +13,7 @@ v2p _main ( float3 P )
 	v2p 		o;
 	float4	vPos;
 	vPos.xyz 	= lerp( vMinBounds, vMaxBounds, P);	//	Position in camera space
-	vPos.w 		= 1;
+	vPos.w 		= 1.0;
 	o.hpos 		= mul			(m_P, vPos);		// xform, input in camera coordinates
 
 	o.lightToPos = vPos.xyz - Ldynamic_pos.xyz;

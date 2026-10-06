@@ -12,6 +12,12 @@ namespace xray::render::RENDER_NAMESPACE
 int rsDVB_Size = 4096; //Fixed: (bytes_need<=mSize) && vl_Count
 int rsDIB_Size = 512;
 
+#ifdef XR_PLATFORM_WEB
+constexpr bool DiscardOnEveryLock = true;
+#else
+constexpr bool DiscardOnEveryLock = false;
+#endif
+
 void _VertexStream::Create()
 {
     ZoneScoped;
@@ -52,7 +58,7 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
 
     // Check if there is need to flush and perform lock
     bool bFlush = false;
-    if ((vl_Count + vl_mPosition) >= vl_mSize)
+    if (DiscardOnEveryLock || (vl_Count + vl_mPosition) >= vl_mSize)
     {
         // FLUSH-LOCK
         mPosition = 0;
@@ -80,7 +86,11 @@ void _VertexStream::Unlock(u32 Count, u32 Stride)
 #endif
     mPosition += Count * Stride;
 
+#ifdef XR_PLATFORM_WEB
+    pVB.Unmap(Count * Stride);
+#else
     pVB.Unmap();
+#endif
 }
 
 void _VertexStream::reset_begin()
@@ -145,7 +155,11 @@ void _IndexStream::Unlock(u32 RealCount)
 {
     PGO(Msg("PGO:IB_UNLOCK:%d", RealCount));
     mPosition += RealCount;
+#ifdef XR_PLATFORM_WEB
+    pIB.Unmap(RealCount * sizeof(u16));
+#else
     pIB.Unmap();
+#endif
 }
 
 void _IndexStream::reset_begin()

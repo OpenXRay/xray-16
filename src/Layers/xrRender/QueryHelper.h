@@ -64,6 +64,27 @@ IC HRESULT CreateQuery(GLuint* pQuery, D3D_QUERY type)
     return S_OK;
 }
 
+#ifdef XR_PLATFORM_WEB
+constexpr GLenum OCCLUSION_QUERY_TARGET = GL_ANY_SAMPLES_PASSED_CONSERVATIVE;
+
+IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
+{
+    GLuint available = 0;
+    CHK_GL(glGetQueryObjectuiv(query, GL_QUERY_RESULT_AVAILABLE, &available));
+    if (!available)
+        return S_FALSE;
+
+    GLuint anySamplesPassed = 0;
+    CHK_GL(glGetQueryObjectuiv(query, GL_QUERY_RESULT, &anySamplesPassed));
+    if (DataSize == sizeof(GLint64))
+        *(GLint64*)pData = anySamplesPassed ? std::numeric_limits<GLint64>::max() : 0;
+    else
+        *(GLint*)pData = anySamplesPassed ? std::numeric_limits<GLint>::max() : 0;
+    return S_OK;
+}
+#else
+constexpr GLenum OCCLUSION_QUERY_TARGET = GL_SAMPLES_PASSED;
+
 IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
 {
     if (DataSize == sizeof(GLint64))
@@ -72,16 +93,17 @@ IC HRESULT GetData(GLuint query, void* pData, u32 DataSize)
         CHK_GL(glGetQueryObjectiv(query, GL_QUERY_RESULT, (GLint*)pData));
     return S_OK;
 }
+#endif
 
 IC HRESULT BeginQuery(GLuint query)
 {
-    CHK_GL(glBeginQuery(GL_SAMPLES_PASSED, query));
+    CHK_GL(glBeginQuery(OCCLUSION_QUERY_TARGET, query));
     return S_OK;
 }
 
 IC HRESULT EndQuery(GLuint query)
 {
-    CHK_GL(glEndQuery(GL_SAMPLES_PASSED));
+    CHK_GL(glEndQuery(OCCLUSION_QUERY_TARGET));
     return S_OK;
 }
 
