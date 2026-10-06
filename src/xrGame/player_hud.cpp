@@ -189,6 +189,14 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
         VERIFY(_valid(fd.vLastFP2));
     }
 
+    if (m_measures.m_prop_flags.test(hud_item_measures::e_light_point))
+    {
+        Fmatrix& light_mat = m_model->LL_GetTransform(m_measures.m_light_bone);
+        light_mat.transform_tiny(fd.vLastLP, m_measures.m_light_point_offset);
+        m_item_transform.transform_tiny(fd.vLastLP);
+        VERIFY(_valid(fd.vLastLP));
+    }
+
     if (m_measures.m_prop_flags.test(hud_item_measures::e_shell_point))
     {
         Fmatrix& fire_mat = m_model->LL_GetTransform(m_measures.m_shell_bone);
@@ -249,6 +257,23 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     else
         m_fire_point2_offset = {};
 
+    const bool explicit_light = pSettings->line_exist(sect_name, "light_bone");
+    if (explicit_light)
+    {
+        m_light_bone = K->LL_BoneID(pSettings->r_string(sect_name, "light_bone"));
+        m_light_point_offset = pSettings->read_if_exists<Fvector3>(sect_name, "light_point", m_fire_point_offset);
+    }
+    else if (m_prop_flags.test(e_fire_point))
+    {
+        m_light_bone = m_fire_bone;
+        m_light_point_offset = pSettings->read_if_exists<Fvector3>(sect_name, "light_point", m_fire_point_offset);
+    }
+    else
+        m_light_point_offset = {};
+    m_prop_flags.set(e_light_point, explicit_light || m_prop_flags.test(e_fire_point));
+    if (m_prop_flags.test(e_light_point) && !pSettings->line_exist(sect_name, "light_point"))
+        m_light_point_offset.x = -0.05f;
+
     m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
     if (m_prop_flags.test(e_shell_point))
     {
@@ -275,6 +300,8 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     R_ASSERT2(pSettings->line_exist(sect_name, "fire_point") == pSettings->line_exist(sect_name, "fire_bone"),
         sect_name.c_str());
     R_ASSERT2(pSettings->line_exist(sect_name, "fire_point2") == pSettings->line_exist(sect_name, "fire_bone2"),
+        sect_name.c_str());
+    R_ASSERT2(!pSettings->line_exist(sect_name, "light_point") || m_prop_flags.test(e_light_point),
         sect_name.c_str());
     R_ASSERT2(pSettings->line_exist(sect_name, "shell_point") == pSettings->line_exist(sect_name, "shell_bone"),
         sect_name.c_str());
@@ -306,6 +333,21 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
         m_fire_point_offset = pSettings->r_fvector3(sect_name, "fire_point");
         m_fire_point2_offset = pSettings->read_if_exists<Fvector3>(sect_name, "fire_point2", m_fire_point_offset);
 
+        const bool explicit_light_bone = pSettings->line_exist(sect_name, "light_bone");
+        m_light_bone = m_fire_bone;
+        if (explicit_light_bone)
+        {
+            cpcstr light_bone = pSettings->r_string(sect_name, "light_bone");
+            m_light_bone = K->LL_BoneID(light_bone);
+            if (m_light_bone >= K->LL_BoneCount())
+                xrDebug::Fatal(DEBUG_INFO, "There is no '%s' bone for weapon '%s'.", light_bone, sect_name.c_str());
+        }
+        m_light_point_offset = pSettings->read_if_exists<Fvector3>(sect_name, "light_point", m_fire_point_offset);
+        if (!pSettings->line_exist(sect_name, "light_point"))
+            m_light_point_offset.x = -0.05f;
+
+        m_prop_flags.set(e_fire_point | e_fire_point2 | e_light_point | e_shell_point, true);
+
         if (pSettings->line_exist(owner->object().cNameSect(), "shell_particles"))
             m_shell_point_offset = pSettings->r_fvector3(sect_name, "shell_point");
         else
@@ -335,12 +377,16 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
     }
     else
     {
+        m_prop_flags.set(e_fire_point | e_fire_point2 | e_light_point | e_shell_point, false);
+
         m_fire_bone  = BI_NONE;
         m_fire_bone2 = BI_NONE;
+        m_light_bone = BI_NONE;
         m_shell_bone = BI_NONE;
 
         m_fire_point_offset  = {};
         m_fire_point2_offset = {};
+        m_light_point_offset = {};
         m_shell_point_offset = {};
     }
 

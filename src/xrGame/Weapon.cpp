@@ -225,10 +225,12 @@ void CWeapon::UpdateFireDependencies_internal()
             Fmatrix& parent = XFORM();
             Fvector& fp = vLoadedFirePoint;
             Fvector& fp2 = vLoadedFirePoint2;
+            Fvector& lp = vLoadedLightPoint;
             Fvector& sp = vLoadedShellPoint;
 
             parent.transform_tiny(m_current_firedeps.vLastFP, fp);
             parent.transform_tiny(m_current_firedeps.vLastFP2, fp2);
+            parent.transform_tiny(m_current_firedeps.vLastLP, lp);
             parent.transform_tiny(m_current_firedeps.vLastSP, sp);
 
             m_current_firedeps.vLastFD.set(0.f, 0.f, 1.f);
@@ -433,6 +435,9 @@ void CWeapon::Load(LPCSTR section)
 
     vLoadedFirePoint = pSettings->r_fvector3(section, "fire_point");
     vLoadedFirePoint2 = pSettings->read_if_exists<Fvector3>(section, "fire_point2", vLoadedFirePoint);
+    vLoadedLightPoint = pSettings->read_if_exists<Fvector3>(section, "light_point", vLoadedFirePoint);
+    if (!pSettings->line_exist(section, "light_point"))
+        vLoadedLightPoint.x = -0.05f;
 
     // hands
     eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));

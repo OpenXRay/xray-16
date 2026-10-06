@@ -40,7 +40,8 @@ struct hud_item_measures
         e_fire_point = (1 << 0),
         e_fire_point2 = (1 << 1),
         e_shell_point = (1 << 2),
-        e_16x9_mode_now = (1 << 3)
+        e_16x9_mode_now = (1 << 3),
+        e_light_point = (1 << 4)
     };
 
     Fvector m_hands_offset[2][3]{}; // pos,rot/ normal,aim,GL
@@ -49,10 +50,12 @@ struct hud_item_measures
 
     Fvector m_fire_point_offset{};
     Fvector m_fire_point2_offset{};
+    Fvector m_light_point_offset{};
     Fvector m_shell_point_offset{};
 
     u16 m_fire_bone;
     u16 m_fire_bone2;
+    u16 m_light_bone;
     u16 m_shell_bone;
     Flags8 m_prop_flags;
 

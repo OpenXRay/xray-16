@@ -48,6 +48,7 @@ void CHudTuner::ResetToDefaultValues()
         curr_measures.m_item_attach[1] = zero;
         curr_measures.m_fire_point_offset = zero;
         curr_measures.m_fire_point2_offset = zero;
+        curr_measures.m_light_point_offset = zero;
         curr_measures.m_shell_point_offset = zero;
     }
 
@@ -140,6 +141,7 @@ void CHudTuner::on_tool_frame()
             ImGui::DragFloat3(hud_adj_modes[ITEM_ROT], (float*)&new_measures.m_item_attach[1], _delta_rot, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[FIRE_POINT], (float*)&new_measures.m_fire_point_offset, _delta_pos, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[FIRE_POINT_2], (float*)&new_measures.m_fire_point2_offset, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[LIGHT_POINT], (float*)&new_measures.m_light_point_offset, _delta_pos, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[SHELL_POINT], (float*)&new_measures.m_shell_point_offset, _delta_pos, 0.f, 0.f, "%.7f");
 
             UpdateValues();
@@ -178,6 +180,13 @@ void CHudTuner::on_tool_frame()
                     ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "fire_point = %f,%f,%f\n", new_measures.m_fire_point2_offset.x, new_measures.m_fire_point2_offset.y, new_measures.m_fire_point2_offset.z);
                     ImGui::LogText("%s", selectable);
+                    if (new_measures.m_prop_flags.test(hud_item_measures::e_light_point) && new_measures.m_light_bone < current_hud_item->m_model->LL_BoneCount())
+                    {
+                        xr_sprintf(selectable, "light_bone = %s\n", current_hud_item->m_model->LL_BoneName_dbg(new_measures.m_light_bone));
+                        ImGui::LogText("%s", selectable);
+                        xr_sprintf(selectable, "light_point = %f,%f,%f\n", new_measures.m_light_point_offset.x, new_measures.m_light_point_offset.y, new_measures.m_light_point_offset.z);
+                        ImGui::LogText("%s", selectable);
+                    }
                     xr_sprintf(selectable, "shell_point = %f,%f,%f\n", new_measures.m_shell_point_offset.x, new_measures.m_shell_point_offset.y, new_measures.m_shell_point_offset.z);
                     ImGui::LogText("%s", selectable);
                     ImGui::LogFinish();
@@ -201,6 +210,8 @@ void CHudTuner::on_tool_frame()
                     ImGui::TableNextColumn();
                     if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; }
                     ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Light Point", draw_lp)) { draw_lp = !draw_lp; }
+                    ImGui::TableNextColumn();
                     if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; }
                     ImGui::TableNextColumn();
                     if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; }
@@ -221,6 +232,14 @@ void CHudTuner::on_tool_frame()
                 {
                     Fvector point;
                     point.set(fd.vLastFP2);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    render.draw_aabb(point, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                }
+
+                if (draw_lp)
+                {
+                    Fvector point;
+                    point.set(fd.vLastLP);
                     current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
                     render.draw_aabb(point, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
                 }

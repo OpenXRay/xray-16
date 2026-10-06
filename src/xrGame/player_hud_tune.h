@@ -27,6 +27,7 @@ private:
         ITEM_ROT,
         FIRE_POINT,
         FIRE_POINT_2,
+        LIGHT_POINT,
         SHELL_POINT,
     };
     enum hud_item_idx
@@ -51,12 +52,14 @@ private:
         { ITEM_ROT, "Item Rotation" },
         { FIRE_POINT, "Fire Point" },
         { FIRE_POINT_2, "Fire Point 2" },
+        { LIGHT_POINT, "Light Point" },
         { SHELL_POINT, "Shell Point" },
     };
 
     bool paused{};
     bool draw_fp{};
     bool draw_fp2{};
+    bool draw_lp{};
     bool draw_fd{};
     bool draw_fd2{};
     bool draw_sp{};
