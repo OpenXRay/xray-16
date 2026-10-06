@@ -1515,10 +1515,13 @@ u32 TileSize(const ShadowCandidate& candidate, u32 current)
 {
     const bool point = candidate.source->flags.type == IRender_Light::POINT;
     const u32 lo = point ? kLocalPointFaceMin : kLocalSpotTileMin;
-    const u32 hi = point ? kLocalPointFaceMax : kLocalSpotTileMax;
+    const u32 hi = candidate.sampleIndex != ~0u ? kLocalAreaFaceMax
+        : point ? kLocalPointFaceMax : kLocalSpotTileMax;
     u32 size = lo;
     while (size < hi && float(size) < candidate.desiredSize)
         size <<= 1;
+    if (current > hi)
+        return size;
     if (current && size > current && candidate.desiredSize < float(current) * 1.25f)
         return current;
     if (current && size < current && candidate.desiredSize > float(current) * 0.4f)
@@ -2097,11 +2100,17 @@ void SelectLocalShadowLights(
     xr_vector<const light*>& largePointGroups = state.largePointGroups;
     largePointGroups.clear();
     const u32 largePointLimit = u32(std::max(0, ps_r_local_shadow_points));
+    constexpr u32 pointTexels = kLocalPointFaceMax * kLocalPointFaceMax;
+    constexpr u32 areaTexels = kCapsuleLightSamples * kLocalAreaFaceMax * kLocalAreaFaceMax;
+    constexpr u32 areaPointCost = (areaTexels + pointTexels - 1u) / pointTexels;
+    u32 largePointUsed = 0;
     for (ShadowCandidate& candidate : points) {
         auto group = std::find(largePointGroups.begin(), largePointGroups.end(), candidate.parent);
-        if (group == largePointGroups.end() && largePointGroups.size() < largePointLimit) {
+        const u32 groupCost = candidate.sampleIndex != ~0u ? areaPointCost : 1u;
+        if (group == largePointGroups.end() && groupCost <= largePointLimit - largePointUsed) {
             largePointGroups.push_back(candidate.parent);
             group = largePointGroups.end() - 1;
+            largePointUsed += groupCost;
         }
         if (group == largePointGroups.end())
             candidate.desiredSize = 0.0f;
