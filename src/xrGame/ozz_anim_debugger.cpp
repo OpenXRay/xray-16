@@ -2,6 +2,7 @@
 #include "ozz_anim_debugger.h"
 #include "player_hud.h"
 #include "ik/HudIKController.h"
+#include "ik/HudWeaponCollision.h"
 
 #include "xrEngine/device.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -353,7 +354,7 @@ bool COzzAnimDebugger::DrawHudIKNoController(IKinematicsAnimated* kin)
     const HudTargetKind kind = ClassifyHudTarget(kin, slot);
 
     if (kind == HudTargetKind::SeparateItem && slot != 0)
-        ImGui::TextWrapped("This is the secondary weapon in slot %d and has no IK controller. Gun-led IK follows the primary weapon (slot 0) and arm authoring uses the shared hands controller.", slot);
+        ImGui::TextWrapped("This is the secondary weapon in slot %d and has no IK controller. Gun-led IK and weapon collision follow the primary weapon (slot 0) only, and arm authoring uses the shared hands controller.", slot);
     else if (kind == HudTargetKind::SeparateItem)
         ImGui::TextWrapped("The shared hands controller is not available for this primary weapon right now. Select [hands] to retry arm authoring.");
     else
@@ -440,7 +441,7 @@ void COzzAnimDebugger::DrawHudIKPanel()
 
     ctrl->RequestSnapshot();
 
-    ImGui::TextWrapped("Animation-follow IK activates automatically on equip once both arm chains (l_upperarm/l_forearm/l_hand and r_upperarm/r_forearm/r_hand, or the bip01_ equivalents) and a gun reference are valid. Use Activate to retry manually and Release to turn it off until the next equip. It keeps the animated hand motion and moves both hands by the gun displacement every frame. Independent arm targets remain available. Collision, VR input and automatic reload release are not implemented.");
+    ImGui::TextWrapped("Animation-follow IK activates automatically on equip once both arm chains (l_upperarm/l_forearm/l_hand and r_upperarm/r_forearm/r_hand, or the bip01_ equivalents) and a gun reference are valid. Use Activate to retry manually and Release to turn it off until the next equip. It keeps the animated hand motion and moves both hands by the gun displacement every frame. Independent arm targets remain available. VR input and automatic reload release are not implemented.");
     ImGui::TextDisabled("Automatic activation: %s", ctrl->GetAutoStatus());
 
     int slot = -1;
@@ -454,6 +455,8 @@ void COzzAnimDebugger::DrawHudIKPanel()
     ImGui::BeginDisabled(!gunSupported);
     DrawHudIKGunEditor(*ctrl, externalLayout);
     ImGui::EndDisabled();
+
+    DrawHudWeaponCollision(kind, slot);
 
     ImGui::SeparatorText("Model-space diagnostic plot");
     DrawHudIKPlot(*ctrl);
@@ -1055,6 +1058,186 @@ void COzzAnimDebugger::DrawHudIKGunDiagnostics(const CHudIKController& ctrl)
     row("Target gun (planned)", state.target.c);
     row("Resolved gun", state.resolved.c);
     row("Delta (target vs raw)", state.delta.c);
+
+    ImGui::EndTable();
+}
+
+bool COzzAnimDebugger::IsFiniteVector(const Fvector& v)
+{
+    return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
+}
+
+void COzzAnimDebugger::DrawHudWeaponCollision(HudTargetKind kind, int slot)
+{
+    ImGui::SeparatorText("Primary weapon collision (slot 0, static level)");
+
+    const bool primaryScope = kind == HudTargetKind::Hands ||
+        ((kind == HudTargetKind::SeparateItem || kind == HudTargetKind::MonolithicItem) && slot == 0);
+    if (!primaryScope)
+    {
+        ImGui::TextDisabled("Weapon collision applies to the primary weapon (slot 0) only. Select [hands] or the primary weapon to edit it.");
+        return;
+    }
+
+    if (!g_player_hud)
+        return;
+
+    ImGui::PushID("weapon_collision");
+
+    ImGui::TextWrapped("Scope: the primary weapon (slot 0) against static level geometry only. It keeps the original animation probe untouched. The collision correction becomes a translation of the gun target and the arms follow through gun IK. It does not change bullet aim or fire direction.");
+
+    if (!g_player_hud->attached_item(0))
+        ImGui::TextDisabled("No weapon is equipped in primary slot 0; values below are stale or unavailable.");
+
+    CHudWeaponCollision& collision = g_player_hud->weapon_collision();
+    DrawHudWeaponCollisionSettings(collision);
+    DrawHudWeaponCollisionState(collision);
+
+    ImGui::PopID();
+}
+
+void COzzAnimDebugger::DrawHudWeaponCollisionSettings(CHudWeaponCollision& collision)
+{
+    const CHudWeaponCollision::Settings defaults;
+    CHudWeaponCollision::Settings settings = collision.GetSettings();
+
+    auto sanitize = [](float value, float fallback, float lo, float hi)
+    {
+        return std::isfinite(value) ? std::clamp(value, lo, hi) : fallback;
+    };
+
+    settings.radius = sanitize(settings.radius, defaults.radius, 0.005f, 0.15f);
+    settings.forwardOffset = sanitize(settings.forwardOffset, defaults.forwardOffset, 0.f, 0.3f);
+    settings.maxPush = sanitize(settings.maxPush, defaults.maxPush, 0.f, 1.f);
+
+    bool changed = false;
+    changed |= ImGui::Checkbox("Collision enabled", &settings.enabled);
+    changed |= ImGui::SliderFloat("Sphere radius (m)", &settings.radius, 0.005f, 0.15f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    changed |= ImGui::SliderFloat("Projection ahead of muzzle (m)", &settings.forwardOffset, 0.f, 0.3f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    changed |= ImGui::SliderFloat("Max push (m)", &settings.maxPush, 0.f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+
+    if (ImGui::Button("Reset collision defaults"))
+    {
+        settings = defaults;
+        changed = true;
+    }
+
+    if (changed)
+    {
+        settings.radius = sanitize(settings.radius, defaults.radius, 0.005f, 0.15f);
+        settings.forwardOffset = sanitize(settings.forwardOffset, defaults.forwardOffset, 0.f, 0.3f);
+        settings.maxPush = sanitize(settings.maxPush, defaults.maxPush, 0.f, 1.f);
+        collision.SetSettings(settings);
+    }
+}
+
+void COzzAnimDebugger::DrawHudWeaponCollisionState(const CHudWeaponCollision& collision)
+{
+    const CHudWeaponCollision::Settings& settings = collision.GetSettings();
+    const CHudWeaponCollision::State& state = collision.GetState();
+    const u32 age = Device.dwFrame >= state.frame ? Device.dwFrame - state.frame : 0;
+    const ImVec4 okColor(0.4f, 1.f, 0.4f, 1.f);
+    const ImVec4 warnColor(1.f, 0.7f, 0.3f, 1.f);
+    const ImVec4 offColor(0.6f, 0.6f, 0.6f, 1.f);
+
+    pcstr status = state.status ? state.status : "inactive";
+    const bool statusInactive = strcmp(status, "inactive") == 0 || strcmp(status, "disabled") == 0;
+    const bool noMuzzle = !state.original.valid && !state.requested.valid && !state.resolved.valid;
+    const bool allValid = state.original.valid && state.requested.valid && state.resolved.valid;
+
+    ImVec4 color = warnColor;
+    if (statusInactive || !settings.enabled)
+        color = offColor;
+    else if (strcmp(status, "clear") == 0 && allValid && !state.hit && !state.clamped)
+        color = okColor;
+    ImGui::TextColored(color, "Collision status: %s", status);
+
+    if (strcmp(status, "inactive") == 0 && noMuzzle)
+        ImGui::TextDisabled("Collision frame: none evaluated");
+    else if (settings.enabled && age > 2)
+        ImGui::TextColored(warnColor, "Collision frame %u (stale, age %u)", state.frame, age);
+    else
+        ImGui::Text("Collision frame %u (age %u)", state.frame, age);
+
+    ImGui::Text("Candidate triangles: %u", state.candidates);
+    ImGui::Text("Hit: %s / push clamped: %s", state.hit ? "yes" : "no", state.clamped ? "yes" : "no");
+
+    if (state.hit)
+    {
+        if (state.triangle >= 0)
+            ImGui::Text("Contact triangle: %d", static_cast<int>(state.triangle));
+        else
+            ImGui::TextDisabled("Contact triangle: unavailable");
+
+        if (IsFiniteVector(state.contact))
+            ImGui::Text("Contact (world m): %.3f %.3f %.3f", state.contact.x, state.contact.y, state.contact.z);
+        else
+            ImGui::TextDisabled("Contact: unavailable");
+
+        if (IsFiniteVector(state.normal))
+            ImGui::Text("Normal (world): %.3f %.3f %.3f", state.normal.x, state.normal.y, state.normal.z);
+        else
+            ImGui::TextDisabled("Normal: unavailable");
+
+        if (std::isfinite(state.penetration))
+            ImGui::Text("Penetration depth: %.4f m", state.penetration);
+        else
+            ImGui::TextDisabled("Penetration depth: unavailable");
+
+        if (IsFiniteVector(state.correction))
+            ImGui::Text("Correction (world m): %.4f %.4f %.4f (|%.4f|)", state.correction.x, state.correction.y, state.correction.z,
+                state.correction.magnitude());
+        else
+            ImGui::TextDisabled("Correction: unavailable");
+    }
+    else
+    {
+        ImGui::TextDisabled("Contact, normal, penetration, correction and triangle: unavailable (no hit)");
+    }
+
+    ImGui::TextDisabled("Positions, sphere centers and corrections are perceived world meters; fire directions and normals are world unit vectors. Nothing here is HUD model space or drawn in the model-space plot.");
+
+    if (!ImGui::BeginTable("##hud_weapon_collision_muzzle", 4,
+            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+        return;
+
+    ImGui::TableSetupColumn("Muzzle (world)");
+    ImGui::TableSetupColumn("Fire point");
+    ImGui::TableSetupColumn("Fire direction");
+    ImGui::TableSetupColumn("Sphere center");
+    ImGui::TableHeadersRow();
+
+    auto cell = [](bool valid, const Fvector& v)
+    {
+        if (!valid)
+        {
+            ImGui::TextDisabled("unavailable");
+            return;
+        }
+        if (!IsFiniteVector(v))
+        {
+            ImGui::TextDisabled("non-finite");
+            return;
+        }
+        ImGui::Text("%.3f %.3f %.3f", v.x, v.y, v.z);
+    };
+
+    auto row = [&cell](pcstr label, const CHudWeaponCollision::Muzzle& muzzle)
+    {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextUnformatted(label);
+        ImGui::TableSetColumnIndex(1);
+        cell(muzzle.valid, muzzle.firePoint);
+        ImGui::TableSetColumnIndex(2);
+        cell(muzzle.valid, muzzle.direction);
+        ImGui::TableSetColumnIndex(3);
+        cell(muzzle.valid, muzzle.sphereCenter);
+    };
+
+    row("Original (no IK)", state.original);
+    row("Requested (authored IK, no collision)", state.requested);
+    row("Resolved (final IK + collision)", state.resolved);
 
     ImGui::EndTable();
 }

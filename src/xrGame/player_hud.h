@@ -2,6 +2,7 @@
 #include "firedeps.h"
 
 #include "Include/xrRender/Kinematics.h"
+#include "ik/HudWeaponCollision.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "actor_defs.h"
 
@@ -159,12 +160,21 @@ public:
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd) const;
     IKinematicsAnimated* get_hands_model() const { return m_model; }
     CHudIKController* hud_ik(IKinematicsAnimated* model);
+    CHudWeaponCollision& weapon_collision();
 
 private:
     void load_ancors();
     void update_inertion(Fmatrix& trans) const;
     void configure_external_gun(const attachable_hud_item* primary);
     void update_additional(Fmatrix& trans) const;
+    void update_weapon_collision(attachable_hud_item* primary);
+    CHudIKController* collision_controller(attachable_hud_item* primary, bool& external) const;
+    bool collision_muzzle(attachable_hud_item* primary, CHudIKController* controller, bool external, bool raw,
+        CHudWeaponCollision::Muzzle& muzzle) const;
+    bool collision_to_controller(const Fvector& correction, const Fmatrix& controller_to_hud, Fvector& offset) const;
+    void recalculate_collision_pose(attachable_hud_item* primary, bool external);
+    void clear_collision_offsets();
+    void request_collision_snapshot(attachable_hud_item* primary);
     bool inertion_allowed() const;
 
 private:
@@ -176,6 +186,7 @@ private:
     IKinematicsAnimated* m_model{};
     xr_vector<u16> m_ancors;
     CHudIKController* m_hands_ik{};
+    CHudWeaponCollision m_weapon_collision;
     attachable_hud_item* m_attached_items[2]{};
     xr_unordered_map<shared_str, attachable_hud_item*> m_pool;
 };

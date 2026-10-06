@@ -63,6 +63,7 @@ public:
         Fmatrix target{};
         Fmatrix resolved{};
         Fmatrix delta{};
+        Fvector collision{};
         u32 frame = 0;
     };
 
@@ -100,6 +101,10 @@ public:
     void ReleaseTwoHand();
     bool CaptureGunTarget(TargetSpace space);
     void TransformGunDirection(Fvector& direction) const;
+    void SetCollisionOffset(const Fvector& offset);
+    void ClearCollisionOffset();
+    const Fvector& GetCollisionOffset() const;
+    bool GetRawBoneTransform(u16 bone, Fmatrix& transform) const;
     void RequestSnapshot();
     pcstr GetAutoStatus() const;
 
@@ -179,7 +184,7 @@ private:
     void ClearState(u16 arm, pcstr status);
     void EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pending& pending);
     void EvaluateGun(bool enabled, bool referenced, GunPlan& plan);
-    bool BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status) const;
+    bool BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status, bool collision = false) const;
     bool ComputeGunRaw(u16 bone, Fmatrix& raw, pcstr& status) const;
     bool ValidateArmChains(pcstr& status) const;
     void CommitTwoHand(const ArmSettings (&arms)[2], const GunSettings& gun);
@@ -228,6 +233,7 @@ private:
     u32 m_poseFrame = 0;
     bool m_snapshotRequested = false;
     bool m_applying = false;
+    Fvector m_collisionOffset{};
     AutoState m_autoState = AutoState::Idle;
     bool m_autoReady = false;
     u32 m_autoRetryFrame = 0;

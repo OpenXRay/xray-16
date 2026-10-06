@@ -2089,6 +2089,8 @@ target_sources(xrGame PRIVATE
     CdkeyDecode/cdkeydecode.h
     ik/HudIKController.cpp
     ik/HudIKController.h
+    ik/HudWeaponCollision.cpp
+    ik/HudWeaponCollision.h
     ik/IKDebugDraw.cpp
     ik/IKDebugDraw.h
     ik/IKLimb.cpp
