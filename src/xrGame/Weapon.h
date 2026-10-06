@@ -263,6 +263,7 @@ public:
     //загружаемые параметры
     Fvector vLoadedFirePoint;
     Fvector vLoadedFirePoint2;
+    Fvector vLoadedLightPoint;
 
 private:
     firedeps m_current_firedeps;
@@ -292,6 +293,11 @@ public:
         UpdateFireDependencies();
         return m_current_firedeps.vLastFP2;
     }
+    IC const Fvector& get_LastLP()
+    {
+        UpdateFireDependencies();
+        return m_current_firedeps.vLastLP;
+    }
     IC const Fvector& get_LastFD()
     {
         UpdateFireDependencies();
@@ -306,6 +312,7 @@ public:
     virtual const Fvector& get_CurrentFirePoint() { return get_LastFP(); }
     virtual const Fvector& get_CurrentFireDirection() { return get_LastFD(); }
     virtual const Fvector& get_CurrentFirePoint2() { return get_LastFP2(); }
+    virtual const Fvector& get_CurrentLightPoint() { return get_LastLP(); }
     virtual const Fmatrix& get_ParticlesXFORM()
     {
         UpdateFireDependencies();

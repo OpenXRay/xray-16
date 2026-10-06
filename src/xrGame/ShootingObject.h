@@ -140,6 +140,7 @@ protected:
 protected:
     //функции родительского объекта
     virtual const Fvector& get_CurrentFirePoint() = 0;
+    virtual const Fvector& get_CurrentLightPoint() { return get_CurrentFirePoint(); }
     virtual const Fvector& get_CurrentFireDirection() = 0;
     virtual const Fmatrix& get_ParticlesXFORM() = 0;
     virtual void ForceUpdateFireParticles(){};

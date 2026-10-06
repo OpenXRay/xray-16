@@ -440,7 +440,7 @@ void CShootingObject::UpdateLight()
         return;
     }
 
-    Light_Publish(get_CurrentFirePoint(), get_CurrentFireDirection());
+    Light_Publish(get_CurrentLightPoint(), get_CurrentFireDirection());
 }
 
 void CShootingObject::StopLight()
