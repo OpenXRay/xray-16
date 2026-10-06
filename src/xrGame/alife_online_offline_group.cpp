@@ -37,7 +37,7 @@ CSE_ALifeDynamicObject* CSE_ALifeOnlineOfflineGroup::tpfGetBestDetector() { retu
 bool CSE_ALifeOnlineOfflineGroup::need_update(CSE_ALifeDynamicObject* object) { return true; }
 void CSE_ALifeOnlineOfflineGroup::update()
 {
-    if (m_bOnline)
+    if (m_bOnline && !m_members.empty())
     {
         MEMBER* commander = (*m_members.begin()).second;
         o_Position = commander->o_Position;
@@ -146,7 +146,7 @@ CSE_ALifeOnlineOfflineGroup::MEMBER* CSE_ALifeOnlineOfflineGroup::member(ALife::
 
 bool CSE_ALifeOnlineOfflineGroup::synchronize_location()
 {
-    if (m_bOnline)
+    if (m_bOnline && !m_members.empty())
     {
         MEMBER* member = (*m_members.begin()).second;
         o_Position = member->o_Position;
