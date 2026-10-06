@@ -12,7 +12,8 @@ public:
         Animated,
         Model,
         Bone,
-        Gun
+        Gun,
+        GunAnimated
     };
 
     class ArmSettings
@@ -95,12 +96,22 @@ public:
     void ClearExternalGun();
     bool GetExternalGunTransform(Fmatrix& pose) const;
     bool CaptureTwoHand();
+    bool ActivateTwoHand();
     void ReleaseTwoHand();
     bool CaptureGunTarget(TargetSpace space);
     void TransformGunDirection(Fvector& direction) const;
     void RequestSnapshot();
+    pcstr GetAutoStatus() const;
 
 private:
+    enum class AutoState : u32
+    {
+        Idle,
+        Pending,
+        Active,
+        Cancelled
+    };
+
     class CallbackLink
     {
     public:
@@ -169,6 +180,9 @@ private:
     void EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pending& pending);
     void EvaluateGun(bool enabled, bool referenced, GunPlan& plan);
     bool BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status) const;
+    bool ComputeGunRaw(u16 bone, Fmatrix& raw, pcstr& status) const;
+    bool ValidateArmChains(pcstr& status) const;
+    void CommitTwoHand(const ArmSettings (&arms)[2], const GunSettings& gun);
     bool ComputeExternalRaw(Fmatrix& raw, pcstr& status) const;
     void ResetExternal();
     bool ValidateGun(u16 bone, pcstr& status) const;
@@ -180,6 +194,15 @@ private:
     bool IsAncestorOrSelf(u16 bone, u16 ancestor) const;
     void ApplyArm(u16 arm, const Pending& pending);
     void ApplyGun(const GunPlan& plan);
+    bool ActivateFromPose(pcstr& status);
+    void ArmAuto();
+    void RearmAuto();
+    void CancelAuto();
+    void RefreshAuto();
+    bool AutoPrerequisites(pcstr& status) const;
+    bool IsAutoDue() const;
+    void RecordAutoFailure(pcstr status);
+    void AttemptAuto();
     bool IsPoseFresh() const;
 
     static xr_vector<CallbackLink*> s_links;
@@ -205,4 +228,8 @@ private:
     u32 m_poseFrame = 0;
     bool m_snapshotRequested = false;
     bool m_applying = false;
+    AutoState m_autoState = AutoState::Idle;
+    bool m_autoReady = false;
+    u32 m_autoRetryFrame = 0;
+    pcstr m_autoStatus = "idle";
 };
