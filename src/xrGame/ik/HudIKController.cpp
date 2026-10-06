@@ -349,6 +349,7 @@ void CHudIKController::Bind(IKinematics* skeleton)
     m_gunCaptureStatus = "inactive";
     ClearGunState("disabled");
     ResetExternal();
+    ClearCollisionOffset();
     m_pose.clear();
     m_poseValid = false;
     m_snapshotRequested = false;
@@ -387,6 +388,7 @@ void CHudIKController::Unbind()
     m_lightBone = BI_NONE;
     ClearGunState("inactive");
     ResetExternal();
+    ClearCollisionOffset();
     m_pose.clear();
     m_poseValid = false;
     m_snapshotRequested = false;
@@ -502,6 +504,7 @@ void CHudIKController::ResetAll()
     m_gunCaptureStatus = "inactive";
     ClearGunState("disabled");
     ResetExternal();
+    ClearCollisionOffset();
     ArmAuto();
     if (!m_applying)
     {
@@ -732,6 +735,10 @@ void CHudIKController::OnCalculated()
     }
     bool enabled[2] = {m_settings[0].enabled, m_settings[1].enabled};
     bool gunEnabled = m_gun.enabled;
+    if (!gunEnabled)
+    {
+        ClearCollisionOffset();
+    }
     const bool autoDue = IsAutoDue();
     if (!enabled[0] && !enabled[1] && !gunEnabled && !m_snapshotRequested && !autoDue)
     {
@@ -1454,7 +1461,7 @@ bool CHudIKController::ComputeGunRaw(u16 bone, Fmatrix& raw, pcstr& status) cons
     return true;
 }
 
-bool CHudIKController::BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status) const
+bool CHudIKController::BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status, bool collision) const
 {
     plan = GunPlan();
     status = "inactive";
@@ -1495,6 +1502,10 @@ bool CHudIKController::BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr&
     else
     {
         target.set(offset);
+    }
+    if (collision && active)
+    {
+        target.c.add(m_collisionOffset);
     }
     if (!_valid(target) || !IsRigid(target))
     {
@@ -1543,7 +1554,7 @@ void CHudIKController::EvaluateGun(bool enabled, bool referenced, GunPlan& plan)
 
     pcstr status = "inactive";
     GunPlan built;
-    if (!BuildGunPlan(bone, enabled, built, status))
+    if (!BuildGunPlan(bone, enabled, built, status, true))
     {
         m_gunState.status = status;
         return;
@@ -1554,6 +1565,10 @@ void CHudIKController::EvaluateGun(bool enabled, bool referenced, GunPlan& plan)
     m_gunState.target = built.target;
     m_gunState.resolved = built.target;
     m_gunState.delta = built.delta;
+    if (enabled)
+    {
+        m_gunState.collision = m_collisionOffset;
+    }
     m_gunState.status = enabled ? "ok" : "preview";
     plan = built;
 }
@@ -1588,6 +1603,7 @@ void CHudIKController::SetGun(const GunSettings& settings)
     if (!m_gun.enabled)
     {
         m_externalPublished = false;
+        ClearCollisionOffset();
     }
     ClearGunState(m_gun.enabled ? "pending" : "disabled");
     if (m_gun.enabled)
@@ -1624,6 +1640,7 @@ void CHudIKController::SetGunBones(u16 fireBone, u16 lightBone)
     m_fireBone = fire;
     m_lightBone = light;
     m_gun = GunSettings();
+    ClearCollisionOffset();
     m_externalPublished = false;
     m_gunCaptureStatus = "inactive";
     ClearGunState("disabled");
@@ -1880,6 +1897,7 @@ void CHudIKController::ReleaseTwoHand()
         return;
     }
     CancelAuto();
+    ClearCollisionOffset();
     for (u16 arm = 0; arm < 2; ++arm)
     {
         if (m_settings[arm].enabled)
@@ -1910,6 +1928,40 @@ void CHudIKController::TransformGunDirection(Fvector& direction) const
         rotated.normalize();
         direction = rotated;
     }
+}
+
+void CHudIKController::SetCollisionOffset(const Fvector& offset)
+{
+    if (!m_skeleton || !_valid(offset))
+    {
+        m_collisionOffset = Fvector();
+        return;
+    }
+    m_collisionOffset = offset;
+}
+
+void CHudIKController::ClearCollisionOffset()
+{
+    m_collisionOffset = Fvector();
+}
+
+const Fvector& CHudIKController::GetCollisionOffset() const
+{
+    return m_collisionOffset;
+}
+
+bool CHudIKController::GetRawBoneTransform(u16 bone, Fmatrix& transform) const
+{
+    if (!m_skeleton || !m_poseValid || m_poseFrame != Device.dwFrame || bone >= m_pose.size())
+    {
+        return false;
+    }
+    if (!_valid(m_pose[bone]))
+    {
+        return false;
+    }
+    transform = m_pose[bone];
+    return true;
 }
 
 void CHudIKController::ResetExternal()
@@ -1947,6 +1999,7 @@ void CHudIKController::SetExternalGun(u16 anchorBone, const Fmatrix& attachOffse
     m_externalOffset = attachOffset;
     m_externalPublished = false;
     m_poseValid = false;
+    ClearCollisionOffset();
     if (wasExternal)
     {
         ClearGunState(m_gun.enabled ? "pending" : "disabled");
@@ -1978,6 +2031,7 @@ void CHudIKController::ClearExternalGun()
     }
     ResetExternal();
     m_poseValid = false;
+    ClearCollisionOffset();
     if (!m_skeleton)
     {
         return;

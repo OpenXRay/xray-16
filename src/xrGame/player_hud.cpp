@@ -12,6 +12,12 @@
 
 player_hud* g_player_hud = nullptr;
 extern ENGINE_API shared_str current_player_hud_sect;
+extern ENGINE_API float psHUD_FOV;
+
+namespace
+{
+constexpr float CollisionMinCorrectionSq = 1e-10f;
+}
 
 // --#SM+# Begin--
 constexpr float PITCH_OFFSET_R    = 0.0f;   // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
@@ -643,6 +649,7 @@ void player_hud::load(const shared_str& player_hud_sect)
     if (!m_hands_ik)
         m_hands_ik = xr_new<CHudIKController>();
     m_hands_ik->Bind(m_model->dcast_PKinematics());
+    m_weapon_collision.Reset();
     // Msg("hands visual changed to [%s] [%s] [%s]", model_name.c_str(), b_reload ? "R" : "", m_attached_items[0] ? "Y" : "");
 
     if (!b_reload)
@@ -748,6 +755,9 @@ u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float sp
 
 void player_hud::update(const Fmatrix& cam_trans)
 {
+    clear_collision_offsets();
+    m_weapon_collision.Reset();
+
     Fmatrix trans = cam_trans;
     if (psHUD_Flags.test(HUD_LEFT_HANDED))
     {
@@ -775,6 +785,7 @@ void player_hud::update(const Fmatrix& cam_trans)
     {
         m_transform = trans;
         configure_external_gun(nullptr);
+        request_collision_snapshot(item0);
     }
     else
     {
@@ -797,6 +808,7 @@ void player_hud::update(const Fmatrix& cam_trans)
         m_transform.mul(trans, m_attach_offset);
 
         configure_external_gun(item0);
+        request_collision_snapshot(item0);
 
         m_model->UpdateTracks();
         m_model->dcast_PKinematics()->CalculateBones_Invalidate();
@@ -808,6 +820,8 @@ void player_hud::update(const Fmatrix& cam_trans)
 
     if (item1)
         item1->update(true);
+
+    update_weapon_collision(item0);
 }
 
 u32 player_hud::anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel)
@@ -968,6 +982,8 @@ void player_hud::attach_item(CHudItem* item)
     {
         if (m_hands_ik)
             m_hands_ik->ResetAll();
+        if (item_idx == 0)
+            m_weapon_collision.Reset();
         if (m_attached_items[item_idx])
         {
             m_attached_items[item_idx]->reset_hud_ik();
@@ -994,6 +1010,8 @@ void player_hud::detach_item_idx(u16 idx)
 
     if (m_hands_ik)
         m_hands_ik->ResetAll();
+    if (idx == 0)
+        m_weapon_collision.Reset();
 
     m_attached_items[idx]->reset_hud_ik();
     m_attached_items[idx]->m_parent_hud_item->on_b_hud_detach();
@@ -1052,6 +1070,7 @@ void player_hud::detach_all_items()
 {
     if (m_hands_ik)
         m_hands_ik->ResetAll();
+    m_weapon_collision.Reset();
 
     for (attachable_hud_item*& item : m_attached_items)
     {
@@ -1103,6 +1122,235 @@ CHudIKController* player_hud::hud_ik(IKinematicsAnimated* model)
             return m_hands_ik;
     }
     return nullptr;
+}
+
+CHudWeaponCollision& player_hud::weapon_collision()
+{
+    return m_weapon_collision;
+}
+
+void player_hud::clear_collision_offsets()
+{
+    if (m_hands_ik)
+        m_hands_ik->ClearCollisionOffset();
+
+    for (attachable_hud_item* item : m_attached_items)
+    {
+        if (item && item->m_hud_ik)
+            item->m_hud_ik->ClearCollisionOffset();
+    }
+}
+
+CHudIKController* player_hud::collision_controller(attachable_hud_item* primary, bool& external) const
+{
+    external = false;
+    if (!primary || !primary->m_parent_hud_item || !primary->m_model)
+        return nullptr;
+
+    const hud_item_measures& measures = primary->m_measures;
+    if (!measures.m_prop_flags.test(hud_item_measures::e_fire_point))
+        return nullptr;
+
+    if (measures.m_fire_bone >= primary->m_model->LL_BoneCount())
+        return nullptr;
+
+    if (primary->m_monolithic)
+    {
+        CHudIKController* controller = primary->m_hud_ik;
+        return controller && controller->Skeleton() == primary->m_model ? controller : nullptr;
+    }
+
+    const attachable_hud_item* secondary = m_attached_items[1];
+    if (secondary && secondary->m_monolithic)
+        return nullptr;
+
+    IKinematics* hands = m_model ? m_model->dcast_PKinematics() : nullptr;
+    if (!hands || !m_hands_ik || m_hands_ik->Skeleton() != hands || !m_hands_ik->HasExternalGun())
+        return nullptr;
+
+    external = true;
+    return m_hands_ik;
+}
+
+void player_hud::request_collision_snapshot(attachable_hud_item* primary)
+{
+    bool external = false;
+    if (CHudIKController* controller = collision_controller(primary, external))
+        controller->RequestSnapshot();
+}
+
+bool player_hud::collision_muzzle(attachable_hud_item* primary, CHudIKController* controller, bool external, bool raw,
+    CHudWeaponCollision::Muzzle& muzzle) const
+{
+    muzzle = CHudWeaponCollision::Muzzle();
+    if (!primary || !controller || !primary->m_parent_hud_item || !primary->m_model)
+        return false;
+
+    const hud_item_measures& measures = primary->m_measures;
+    const u16 fire_bone = measures.m_fire_bone;
+    if (fire_bone >= primary->m_model->LL_BoneCount())
+        return false;
+
+    Fvector point{};
+    Fvector direction{};
+    direction.set(0.f, 0.f, 1.f);
+    Fmatrix root;
+
+    if (external)
+    {
+        if (raw)
+        {
+            const CHudIKController::GunState& state = controller->GetGunState();
+            if (!state.valid || state.frame != Device.dwFrame)
+                return false;
+            root.mul(m_transform, state.animated);
+        }
+        else
+        {
+            root = primary->m_item_transform;
+        }
+        primary->m_model->LL_GetTransform(fire_bone).transform_tiny(point, measures.m_fire_point_offset);
+    }
+    else
+    {
+        Fmatrix bone;
+        if (raw)
+        {
+            if (!controller->GetRawBoneTransform(fire_bone, bone))
+                return false;
+        }
+        else
+        {
+            bone = primary->m_model->LL_GetTransform(fire_bone);
+            controller->TransformGunDirection(direction);
+        }
+        bone.transform_tiny(point, measures.m_fire_point_offset);
+        root = primary->m_item_transform;
+    }
+
+    if (!_valid(root) || !_valid(point) || !_valid(direction))
+        return false;
+
+    root.transform_tiny(point);
+    root.transform_dir(direction);
+    if (!_valid(point) || !_valid(direction))
+        return false;
+
+    CHudItem* owner = primary->m_parent_hud_item;
+    owner->TransformPosFromWorldToHud(point);
+    owner->TransformDirFromWorldToHud(direction);
+
+    const float length_sq = direction.square_magnitude();
+    if (!_valid(point) || !_valid(direction) || !_valid(length_sq) || length_sq <= EPS * EPS)
+        return false;
+
+    direction.normalize();
+    muzzle.valid = true;
+    muzzle.firePoint = point;
+    muzzle.direction = direction;
+    return true;
+}
+
+bool player_hud::collision_to_controller(const Fvector& correction, const Fmatrix& controller_to_hud, Fvector& offset) const
+{
+    if (!_valid(correction) || !_valid(Device.mView) || !_valid(controller_to_hud))
+        return false;
+
+    Fvector view{};
+    Device.mView.transform_dir(view, correction);
+    view.x *= psHUD_FOV;
+    view.y *= psHUD_FOV;
+
+    Fmatrix inverse_view;
+    if (!inverse_view.invert_b(Device.mView))
+        return false;
+
+    Fvector hud{};
+    inverse_view.transform_dir(hud, view);
+
+    Fmatrix inverse_root;
+    if (!inverse_root.invert_b(controller_to_hud))
+        return false;
+
+    inverse_root.transform_dir(offset, hud);
+    return _valid(offset);
+}
+
+void player_hud::recalculate_collision_pose(attachable_hud_item* primary, bool external)
+{
+    if (external)
+    {
+        IKinematics* hands = m_model ? m_model->dcast_PKinematics() : nullptr;
+        if (!hands)
+            return;
+
+        hands->CalculateBones_Invalidate();
+        hands->CalculateBones(TRUE);
+        for (attachable_hud_item* item : m_attached_items)
+        {
+            if (item && !item->m_monolithic)
+                calc_transform(item->m_attach_place_idx, item->m_attach_offset, item->m_item_transform);
+        }
+        return;
+    }
+
+    primary->m_model->CalculateBones_Invalidate();
+    primary->m_model->CalculateBones(TRUE);
+}
+
+void player_hud::update_weapon_collision(attachable_hud_item* primary)
+{
+    bool external = false;
+    CHudIKController* controller = collision_controller(primary, external);
+    if (!controller)
+        return;
+
+    const Fvector camera = Device.vCameraPosition;
+    const CHudWeaponCollision::Muzzle none{};
+    if (!_valid(psHUD_FOV) || psHUD_FOV <= EPS)
+    {
+        m_weapon_collision.Solve(camera, none, none, false);
+        return;
+    }
+
+    CHudWeaponCollision::Muzzle requested;
+    const bool requested_valid = collision_muzzle(primary, controller, external, false, requested);
+
+    const bool gun_enabled = controller->GetGun().enabled;
+    const CHudIKController::GunState& first_state = controller->GetGunState();
+    const bool snapshot = first_state.valid && first_state.frame == Device.dwFrame;
+
+    CHudWeaponCollision::Muzzle original;
+    bool original_valid = requested_valid && collision_muzzle(primary, controller, external, true, original);
+
+    const bool can_apply = requested_valid && original_valid && gun_enabled && snapshot;
+    m_weapon_collision.Solve(camera, original_valid ? original : none, requested_valid ? requested : none, can_apply);
+
+    CHudWeaponCollision::Muzzle resolved = requested;
+    const CHudWeaponCollision::State& result = m_weapon_collision.GetState();
+    if (can_apply && result.frame == Device.dwFrame && _valid(result.correction) &&
+        result.correction.square_magnitude() > CollisionMinCorrectionSq)
+    {
+        const Fmatrix& controller_to_hud = external ? m_transform : primary->m_item_transform;
+        Fvector offset{};
+        if (collision_to_controller(result.correction, controller_to_hud, offset) &&
+            offset.square_magnitude() > CollisionMinCorrectionSq)
+        {
+            controller->SetCollisionOffset(offset);
+            recalculate_collision_pose(primary, external);
+
+            const CHudIKController::GunState& second_state = controller->GetGunState();
+            if (!second_state.valid || !second_state.applied || second_state.frame != Device.dwFrame ||
+                second_state.collision.square_magnitude() <= CollisionMinCorrectionSq)
+            {
+                controller->ClearCollisionOffset();
+            }
+
+            CHudWeaponCollision::Muzzle actual;
+            resolved = collision_muzzle(primary, controller, external, false, actual) ? actual : none;
+        }
+    }
+    m_weapon_collision.SetResolved(resolved);
 }
 
 void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const

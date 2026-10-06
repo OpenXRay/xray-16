@@ -3,6 +3,7 @@
 #include "xrEngine/editor_base.h"
 
 class CHudIKController;
+class CHudWeaponCollision;
 class IKinematics;
 
 class COzzAnimDebugger final : public xray::editor::ide_tool
@@ -42,6 +43,10 @@ private:
     bool DrawHudIKGunUnavailable(IKinematicsAnimated* kin);
     bool DrawHudIKNoController(IKinematicsAnimated* kin);
     static pcstr EquippedWeaponSection(int& slot);
+    void DrawHudWeaponCollision(HudTargetKind kind, int slot);
+    void DrawHudWeaponCollisionSettings(CHudWeaponCollision& collision);
+    void DrawHudWeaponCollisionState(const CHudWeaponCollision& collision);
+    static bool IsFiniteVector(const Fvector& v);
     void DrawHudIKPlot(const CHudIKController& ctrl);
     void DrawHudIKDiagnostics(const CHudIKController& ctrl);
     void DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm);
