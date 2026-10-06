@@ -30,6 +30,7 @@ constexpr u32 kLocalSpotTileMax = 1024;
 constexpr u32 kLocalSpotTileMin = 256;
 constexpr u32 kLocalPointFaceMax = 512;
 constexpr u32 kLocalPointFaceMin = 128;
+constexpr u32 kLocalAreaFaceMax = 256;
 constexpr u32 kLocalSpotSlotsMax = 64;
 constexpr u32 kLocalPointLightsMax = 40;
 constexpr u32 kLocalTileCount = 256;
