@@ -2,6 +2,9 @@
 
 #include "xrEngine/editor_base.h"
 
+class CHudIKController;
+class IKinematics;
+
 class COzzAnimDebugger final : public xray::editor::ide_tool
 {
 public:
@@ -24,6 +27,13 @@ private:
 
     IKinematicsAnimated* SelectedKin() const;
 
+    void DrawHudIKPanel();
+    void DrawHudIKPlot(const CHudIKController& ctrl);
+    void DrawHudIKDiagnostics(const CHudIKController& ctrl);
+    void DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm);
+    bool DrawBonePicker(pcstr label, IKinematics* kin, u16& bone);
+    void CopyHudIKArmSettings(const CHudIKController& ctrl, u16 arm) const;
+
     xr_vector<TargetEntry> m_hudTargets;
     xr_vector<TargetEntry> m_worldTargets;
 
@@ -36,4 +46,16 @@ private:
     bool m_play_on_all = false;
     char m_target_filter[128] = {};
     char m_motion_filter[128] = {};
+
+    int  m_ikArm = 0;
+    int  m_ikPlane = 1;
+    bool m_ikFit = true;
+    float m_ikScale = 300.f;
+    float m_ikCenter[2] = {};
+    bool m_ikShowAnimated = true;
+    bool m_ikShowResolved = true;
+    bool m_ikShowDesired = true;
+    char m_ikBoneFilter[64] = {};
+    xr_string m_ikMessage;
+    IKinematicsAnimated* m_lastSelectedKin = nullptr;
 };
