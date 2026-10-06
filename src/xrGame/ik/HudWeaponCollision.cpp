@@ -25,8 +25,19 @@ constexpr float TimeTieEpsilon = 1e-6f;
 constexpr float DirectionEpsilon = 1e-8f;
 constexpr float AbsoluteAreaEpsilon = 1e-12f;
 constexpr float MinConditioning = .01f;
-constexpr u32 MaxContacts = 4;
+constexpr u32 MaxFrameGap = 4;
+constexpr float MaxFrameDelta = .25f;
+constexpr float MaxCameraJump = 1.5f;
+constexpr float SettleTargetSq = 1e-10f;
+constexpr float SettleDistanceSq = 1e-8f;
+constexpr float SettleVelocitySq = 1e-6f;
+constexpr float SafetyEpsilon = 1e-5f;
+constexpr float MaxAnticipation = .1f;
+constexpr float MinResponseSeconds = .01f;
+constexpr float MaxContactSeconds = 1.f;
+constexpr float MaxReleaseSeconds = 2.f;
 constexpr u32 MaxAdvance = 24;
+constexpr float VelocityEpsilon = 1e-6f;
 
 bool IsPassable(u32 index)
 {
@@ -54,6 +65,24 @@ _vector3<double> Cross(const _vector3<double>& a, const _vector3<double>& b)
     _vector3<double> result;
     result.set(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
     return result;
+}
+
+void RemoveInward(Fvector& velocity, const Fvector& normal)
+{
+    const float along = velocity.dotproduct(normal);
+    if (along < 0.f)
+    {
+        velocity.mad(velocity, normal, -along);
+    }
+}
+
+void RemoveOutward(Fvector& velocity, const Fvector& direction)
+{
+    const float along = velocity.dotproduct(direction);
+    if (along > 0.f)
+    {
+        velocity.mad(velocity, direction, -along);
+    }
 }
 }
 
@@ -180,23 +209,33 @@ CHudWeaponCollision::Settings CHudWeaponCollision::Sanitize(const Settings& inpu
     const Settings defaults;
     Settings output;
     output.enabled = input.enabled;
+    output.easing = input.easing;
     output.radius = _valid(input.radius) ? std::clamp(input.radius, MinRadius, MaxRadius) : defaults.radius;
     output.forwardOffset =
         _valid(input.forwardOffset) ? std::clamp(input.forwardOffset, 0.f, MaxForwardOffset) : defaults.forwardOffset;
     output.maxPush = _valid(input.maxPush) ? std::clamp(input.maxPush, 0.f, MaxPushLimit) : defaults.maxPush;
+    output.anticipation =
+        _valid(input.anticipation) ? std::clamp(input.anticipation, 0.f, MaxAnticipation) : defaults.anticipation;
+    output.contactSeconds = _valid(input.contactSeconds) ?
+        std::clamp(input.contactSeconds, MinResponseSeconds, MaxContactSeconds) :
+        defaults.contactSeconds;
+    output.releaseSeconds = _valid(input.releaseSeconds) ?
+        std::clamp(input.releaseSeconds, MinResponseSeconds, MaxReleaseSeconds) :
+        defaults.releaseSeconds;
     return output;
 }
 
 void CHudWeaponCollision::SetSettings(const Settings& settings)
 {
     const Settings sanitized = Sanitize(settings);
-    if (sanitized.enabled == m_settings.enabled && sanitized.radius == m_settings.radius &&
-        sanitized.forwardOffset == m_settings.forwardOffset && sanitized.maxPush == m_settings.maxPush)
+    if (sanitized.enabled == m_settings.enabled && sanitized.easing == m_settings.easing &&
+        sanitized.radius == m_settings.radius && sanitized.forwardOffset == m_settings.forwardOffset &&
+        sanitized.maxPush == m_settings.maxPush && sanitized.anticipation == m_settings.anticipation &&
+        sanitized.contactSeconds == m_settings.contactSeconds && sanitized.releaseSeconds == m_settings.releaseSeconds)
     {
         return;
     }
     m_settings = sanitized;
-    m_solved = false;
 }
 
 const CHudWeaponCollision::State& CHudWeaponCollision::GetState() const
@@ -204,11 +243,29 @@ const CHudWeaponCollision::State& CHudWeaponCollision::GetState() const
     return m_state;
 }
 
+void CHudWeaponCollision::BeginUpdate()
+{
+    m_state = State{};
+    m_xrc.r_clear();
+}
+
+void CHudWeaponCollision::ResetSmoothing()
+{
+    m_smoothValid = false;
+    m_restarted = false;
+    m_smoothFrame = 0;
+    m_frameDelta = 0.f;
+    m_startPosition = Fvector();
+    m_startVelocity = Fvector();
+    m_position = Fvector();
+    m_velocity = Fvector();
+    m_lastCamera = Fvector();
+}
+
 void CHudWeaponCollision::Reset()
 {
     m_state = State{};
-    m_solved = false;
-    m_solvedFrame = 0;
+    ResetSmoothing();
     m_xrc.r_clear();
 }
 
@@ -237,11 +294,10 @@ void CHudWeaponCollision::SetResolved(const Muzzle& resolved)
 }
 
 bool CHudWeaponCollision::FindContact(const CDB::MODEL& model, const Fvector& camera, const Fvector& target,
-    Contact& contact, u32& candidates)
+    float radius, Contact& contact, u32& candidates)
 {
     contact = Contact{};
 
-    const float radius = m_settings.radius;
     Fvector motion;
     motion.sub(target, camera);
     const float motionLength = motion.magnitude();
@@ -364,24 +420,172 @@ bool CHudWeaponCollision::FindContact(const CDB::MODEL& model, const Fvector& ca
     return contact.found;
 }
 
-void CHudWeaponCollision::Solve(const Fvector& camera, const Muzzle& original, const Muzzle& requested, bool canApply)
+bool CHudWeaponCollision::Resolve(const CDB::MODEL& model, const Fvector& camera, const Fvector& desired,
+    const Fvector& start, float radius, Resolution& resolution)
 {
-    if (m_solved && m_solvedFrame == Device.dwFrame)
+    resolution = Resolution{};
+    resolution.target = start;
+    for (u32 pass = 0; pass <= MaxContacts; ++pass)
+    {
+        Contact contact;
+        if (!FindContact(model, camera, resolution.target, radius, contact, m_state.candidates))
+        {
+            break;
+        }
+        if (pass == MaxContacts)
+        {
+            resolution.unresolved = true;
+            break;
+        }
+        if (!resolution.hit)
+        {
+            resolution.hit = true;
+            resolution.triangle = contact.triangle;
+            resolution.contact = contact.point;
+            resolution.normal = contact.normal;
+        }
+        resolution.penetration = std::max(resolution.penetration, contact.penetration);
+        resolution.normals[resolution.normalCount++] = contact.normal;
+        resolution.target.mad(resolution.target, contact.normal, contact.push);
+
+        Fvector correction;
+        correction.sub(resolution.target, desired);
+        const float length = correction.magnitude();
+        if (!_valid(length))
+        {
+            return false;
+        }
+        if (length > m_settings.maxPush)
+        {
+            correction.mul(m_settings.maxPush / length);
+            resolution.target.add(desired, correction);
+            resolution.clamped = true;
+            break;
+        }
+    }
+    return _valid(resolution.target);
+}
+
+void CHudWeaponCollision::PrepareSmoothing(const Fvector& camera, const Fvector& target)
+{
+    const u32 frame = Device.dwFrame;
+    Fvector jump;
+    jump.sub(camera, m_lastCamera);
+    const bool jumped = m_smoothValid && (!_valid(jump) || jump.square_magnitude() > MaxCameraJump * MaxCameraJump);
+    if (m_smoothValid && frame == m_smoothFrame && !jumped)
+    {
+        m_lastCamera = camera;
+        return;
+    }
+
+    bool restart = !m_smoothValid || jumped || frame < m_smoothFrame || frame - m_smoothFrame > MaxFrameGap;
+    float delta = 0.f;
+    if (!restart)
+    {
+        delta = Device.fTimeDelta;
+        if (!_valid(delta) || delta < 0.f)
+        {
+            delta = 0.f;
+        }
+        if (delta > MaxFrameDelta || !_valid(m_position) || !_valid(m_velocity))
+        {
+            restart = true;
+        }
+    }
+
+    if (restart)
+    {
+        m_startPosition = target;
+        m_startVelocity = Fvector();
+        m_frameDelta = 0.f;
+    }
+    else
+    {
+        m_startPosition = m_position;
+        m_startVelocity = m_velocity;
+        m_frameDelta = delta;
+    }
+    m_restarted = restart;
+    m_smoothValid = true;
+    m_smoothFrame = frame;
+    m_lastCamera = camera;
+}
+
+void CHudWeaponCollision::Integrate(const Fvector& target, Fvector& position, Fvector& velocity) const
+{
+    position = m_startPosition;
+    velocity = m_startVelocity;
+    const float delta = m_frameDelta;
+    if (!(delta > 0.f))
     {
         return;
     }
-    m_solved = true;
-    m_solvedFrame = Device.dwFrame;
 
+    const bool targetZero = target.square_magnitude() <= SettleTargetSq;
+    Fvector toTarget;
+    toTarget.sub(target, m_startPosition);
+    const bool engaging = !targetZero && target.dotproduct(toTarget) >= 0.f;
+    const float seconds = engaging ? m_settings.contactSeconds : m_settings.releaseSeconds;
+    const float omega = 2.f / seconds;
+
+    Fvector offset;
+    offset.sub(m_startPosition, target);
+    Fvector carry;
+    carry.mad(m_startVelocity, offset, omega);
+    const float decay = std::exp(-omega * delta);
+
+    Fvector next;
+    next.mad(offset, carry, delta);
+    next.mul(decay);
+    Fvector rate;
+    rate.mad(m_startVelocity, carry, -omega * delta);
+    rate.mul(decay);
+
+    const float startSq = offset.square_magnitude();
+    const float nextSq = next.square_magnitude();
+    if (next.dotproduct(offset) < 0.f)
+    {
+        next = Fvector();
+        rate = Fvector();
+    }
+    else if (!engaging && nextSq > startSq)
+    {
+        Fvector direction;
+        direction.mul(next, 1.f / std::sqrt(nextSq));
+        next.mul(std::sqrt(startSq / nextSq));
+        RemoveOutward(rate, direction);
+    }
+
+    position.add(target, next);
+    velocity = rate;
+    if (!engaging && targetZero && position.square_magnitude() <= SettleDistanceSq &&
+        velocity.square_magnitude() <= SettleVelocitySq)
+    {
+        position = Fvector();
+        velocity = Fvector();
+    }
+}
+
+void CHudWeaponCollision::Solve(const Fvector& camera, const Muzzle& original, const Muzzle& requested, bool canApply)
+{
     m_state = State{};
     m_state.frame = Device.dwFrame;
 
     const bool originalValid = BuildMuzzle(original, m_state.original);
     const bool requestedValid = BuildMuzzle(requested, m_state.requested);
 
+    auto fail = [this]()
+    {
+        m_state = State{};
+        m_state.frame = Device.dwFrame;
+        m_state.status = "invalid";
+        ResetSmoothing();
+    };
+
     if (!m_settings.enabled)
     {
         m_state.status = "disabled";
+        ResetSmoothing();
         return;
     }
 
@@ -390,12 +594,14 @@ void CHudWeaponCollision::Solve(const Fvector& camera, const Muzzle& original, c
         model->get_verts_count() == 0)
     {
         m_state.status = "invalid";
+        ResetSmoothing();
         return;
     }
 
     if (!canApply)
     {
         m_state.status = "no_ik";
+        ResetSmoothing();
         return;
     }
 
@@ -406,60 +612,150 @@ void CHudWeaponCollision::Solve(const Fvector& camera, const Muzzle& original, c
     if (!_valid(range) || range > MaxQueryDistance)
     {
         m_state.status = "out_of_range";
+        ResetSmoothing();
         return;
     }
 
-    Fvector target = desired;
-    bool clamped = false;
-    bool unresolved = false;
-    for (u32 pass = 0; pass <= MaxContacts; ++pass)
-    {
-        Contact contact;
-        if (!FindContact(*model, camera, target, contact, m_state.candidates))
-        {
-            break;
-        }
-        if (pass == MaxContacts)
-        {
-            unresolved = true;
-            break;
-        }
-        if (!m_state.hit)
-        {
-            m_state.hit = true;
-            m_state.triangle = contact.triangle;
-            m_state.contact = contact.point;
-            m_state.normal = contact.normal;
-        }
-        m_state.penetration = std::max(m_state.penetration, contact.penetration);
-        target.mad(target, contact.normal, contact.push);
+    const float radius = m_settings.radius;
+    const bool easing = m_settings.easing;
+    const float anticipation = easing ? m_settings.anticipation : 0.f;
 
-        Fvector correction;
-        correction.sub(target, desired);
-        const float length = correction.magnitude();
-        if (!_valid(length))
+    Resolution hard;
+    Resolution ahead;
+    bool resolved = Resolve(*model, camera, desired, desired, radius, hard);
+    if (resolved)
+    {
+        if (anticipation > 0.f)
         {
-            m_state = State{};
-            m_state.frame = Device.dwFrame;
-            m_state.status = "invalid";
-            return;
+            resolved = Resolve(*model, camera, desired, desired, radius + anticipation, ahead);
         }
+        else
+        {
+            ahead = hard;
+        }
+    }
+    if (!resolved)
+    {
+        fail();
+        return;
+    }
+
+    Fvector hardCorrection;
+    hardCorrection.sub(hard.target, desired);
+    Fvector target;
+    target.sub(ahead.target, desired);
+
+    Fvector position = target;
+    Fvector velocity{};
+    bool springClamped = false;
+    if (easing)
+    {
+        PrepareSmoothing(camera, target);
+        Integrate(target, position, velocity);
+        if (!_valid(position) || !_valid(velocity))
+        {
+            m_smoothValid = false;
+            PrepareSmoothing(camera, target);
+            position = m_startPosition;
+            velocity = m_startVelocity;
+        }
+        const float length = position.magnitude();
         if (length > m_settings.maxPush)
         {
-            correction.mul(m_settings.maxPush / length);
-            target.add(desired, correction);
-            clamped = true;
-            break;
+            Fvector direction;
+            direction.mul(position, 1.f / length);
+            position.mul(m_settings.maxPush / length);
+            RemoveOutward(velocity, direction);
+            springClamped = true;
+        }
+    }
+    else
+    {
+        ResetSmoothing();
+    }
+
+    Fvector candidate;
+    candidate.add(desired, position);
+    Resolution safe;
+    if (!Resolve(*model, camera, desired, candidate, radius, safe))
+    {
+        fail();
+        return;
+    }
+
+    Fvector applied;
+    applied.sub(safe.target, desired);
+    Fvector push;
+    push.sub(applied, position);
+    const float pushLength = push.magnitude();
+    if (!_valid(applied) || !_valid(pushLength))
+    {
+        fail();
+        return;
+    }
+    const bool safetyApplied = pushLength > SafetyEpsilon;
+    if (safetyApplied)
+    {
+        Fvector limit{};
+        const float length = applied.magnitude();
+        const bool limited = safe.clamped && length > 0.f;
+        if (limited)
+        {
+            limit.mul(applied, 1.f / length);
+        }
+        bool violated = true;
+        for (u32 pass = 0; pass < MaxContacts && violated; ++pass)
+        {
+            for (u32 index = 0; index < safe.normalCount; ++index)
+            {
+                RemoveInward(velocity, safe.normals[index]);
+            }
+            if (limited)
+            {
+                RemoveOutward(velocity, limit);
+            }
+            violated = limited && velocity.dotproduct(limit) > VelocityEpsilon;
+            for (u32 index = 0; index < safe.normalCount && !violated; ++index)
+            {
+                violated = velocity.dotproduct(safe.normals[index]) < -VelocityEpsilon;
+            }
+        }
+        if (violated)
+        {
+            velocity = Fvector();
         }
     }
 
-    m_state.correction.sub(target, desired);
-    m_state.clamped = clamped || unresolved;
-    if (!m_state.hit)
+    if (easing)
     {
-        m_state.status = "clear";
+        m_position = applied;
+        m_velocity = velocity;
     }
-    else if (unresolved)
+
+    const bool unresolved = hard.unresolved || safe.unresolved;
+    const bool clamped = hard.clamped || safe.clamped || springClamped || unresolved || ahead.clamped || ahead.unresolved;
+    const Resolution& source = hard.hit ? hard : (safe.hit ? safe : ahead);
+
+    m_state.hit = hard.hit || safe.hit;
+    if (source.hit)
+    {
+        m_state.triangle = source.triangle;
+        m_state.contact = source.contact;
+        m_state.normal = source.normal;
+    }
+    m_state.penetration = hard.penetration;
+    m_state.anticipated = anticipation > 0.f && ahead.hit;
+    m_state.hardCorrection = hardCorrection;
+    m_state.targetCorrection = easing ? target : hardCorrection;
+    m_state.correction = applied;
+    m_state.velocity = velocity;
+    m_state.safety = safetyApplied;
+    m_state.safetyPush = safetyApplied ? pushLength : 0.f;
+    m_state.deltaTime = easing ? m_frameDelta : 0.f;
+    m_state.restarted = easing && m_restarted;
+    m_state.clamped = clamped;
+
+    if (unresolved)
     {
         m_state.status = "unresolved";
     }
@@ -467,8 +763,20 @@ void CHudWeaponCollision::Solve(const Fvector& camera, const Muzzle& original, c
     {
         m_state.status = "clamped";
     }
-    else
+    else if (m_state.hit)
     {
         m_state.status = "contact";
+    }
+    else if (m_state.anticipated)
+    {
+        m_state.status = "anticipating";
+    }
+    else if (applied.square_magnitude() > SettleTargetSq)
+    {
+        m_state.status = "releasing";
+    }
+    else
+    {
+        m_state.status = "clear";
     }
 }
