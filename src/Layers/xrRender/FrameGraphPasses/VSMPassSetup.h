@@ -199,6 +199,7 @@ struct VSMState {
     u32 resolveCount = 0;
     bool maskReady = false;
     Fmatrix prevViewProj;
+    Fmatrix prevHudRasterViewProj;
     Fvector prevCamPos;
     nvrhi::BufferHandle binStats;
     nvrhi::BufferHandle binArgs;
