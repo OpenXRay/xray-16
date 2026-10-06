@@ -1724,8 +1724,13 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
         const u32 faces = point ? 6u : 1u;
         const u32 serial = plan.newOwner ? ++state.nextSerial : state.request[base].meta[1];
         state.slotOfLight.push_back(base + 1u);
-        const float farZ = std::max(L->range + EPS_S, 0.002f);
-        const float nearZ = clampr(L->virtual_size, 0.001f, farZ * 0.5f);
+        const float lightFarZ = std::max(L->range + EPS_S, 0.002f);
+        const float previousRange = plan.newOwner ? 0.0f : state.request[base].lightPos.w;
+        const float range = std::max(L->range, 0.002f);
+        const float shadowRange = range <= previousRange && range >= previousRange * 0.5f
+            ? previousRange : range * 1.125f;
+        const float farZ = shadowRange + EPS_S;
+        const float nearZ = clampr(L->virtual_size, 0.001f, lightFarZ * 0.5f);
         const float fov = point ? PI_DIV_2 + deg2rad(11.5f) : L->cone + deg2rad(3.5f);
         for (u32 f = 0; f < faces; ++f) {
             const u32 slot = base + f;
@@ -1741,7 +1746,7 @@ void SelectLocalShadowPage(LocalShadowState& state, const xr_vector<ShadowCandid
             proj.build_projection(fov, 1.f, nearZ, farZ);
             vp.mul(proj, view);
             LocalShadowViewGPU rec = {};
-            FillRecord(rec, vp, state.atlas, plan.nodes[f], nearZ, farZ, tanf(fov * 0.5f), L->position, L->range);
+            FillRecord(rec, vp, state.atlas, plan.nodes[f], nearZ, farZ, tanf(fov * 0.5f), L->position, shadowRange);
             rec.shape.y = float(state.atlasLayer);
             const auto& previous = state.request[slot];
             // Exact transform/rectangle comparison includes virtual size and roll.
