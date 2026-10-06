@@ -136,6 +136,7 @@ struct VsmDynArgsParams {
 struct VsmResolveParams {
     Fmatrix invViewProj;
     Fmatrix prevViewProj;
+    Fmatrix prevHudRasterViewProj;
     Fvector4 prevCamPos;
     Fvector4 curCamPos;
     Fvector4 screen;
@@ -2161,6 +2162,8 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     rp.hudViewProj = state.hudViewProj;
     rp.hudParams.set(hudOn ? 1.0f / float(kVSMHudMapSize) : 0.0f, ps_r_vsm_hud_bias, state.hudTexelWorld, 1.0f / std::max(state.hudDepthRange, 1e-3f));
     rp.prevViewProj = state.prevViewProj;
+    if (histOK)
+        rp.prevHudRasterViewProj = state.prevHudRasterViewProj;
     const bool dynOn = state.dynActive && state.dynRendered;
     rp.prevCamPos.set(state.prevCamPos.x, state.prevCamPos.y, state.prevCamPos.z, dynOn ? float(std::max(ps_r_vsm_debug_dyn, 0)) : 0.0f);
     rp.curCamPos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, ps_r_vsm_ta_blend_dyn);
@@ -2201,6 +2204,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
 
     state.prevViewProj = Device.mFullTransform;
+    state.prevHudRasterViewProj.mul(Device.mFullTransform, HudFovWarp());
     state.prevCamPos = Device.vCameraPosition;
     if (state.resolveCount < 0xFFFF)
         state.resolveCount++;

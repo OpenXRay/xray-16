@@ -7,6 +7,7 @@ cbuffer VsmResolveParams
 {
     float4x4 g_InvViewProj;
     float4x4 g_PrevViewProj;
+    float4x4 g_PrevHudRasterViewProj;
     float4 g_PrevCamPos;
     float4 g_CurCamPos;
     float4 g_Screen;
@@ -500,7 +501,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     float motionPx = 0.0;
     if (g_Params.z > 0.5)
     {
-        float4 pc = mul(g_PrevViewProj, float4(wp, 1.0));
+        float4 pc = hud ? mul(g_PrevHudRasterViewProj, float4(wp, 1.0))
+                        : mul(g_PrevViewProj, float4(wp, 1.0));
         if (pc.w > 0.0)
         {
             float2 puv = (pc.xy / pc.w) * float2(0.5, -0.5) + 0.5;
