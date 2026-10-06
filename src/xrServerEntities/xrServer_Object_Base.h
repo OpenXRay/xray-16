@@ -196,6 +196,8 @@ public:
     void clear_script_values();
 #else
     void add_script_value(CScriptValue*) {}
+    void assign_script_values() const {}
+    void clear_script_values() {}
 #endif
 
 private:
