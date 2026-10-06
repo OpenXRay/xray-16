@@ -66,12 +66,12 @@ float2 LocalShadowHudLayer(LocalShadowView t, float3 wp, float3 N)
     return float2(lit * (1.0 / 9.0), thickCnt > 0.5 ? thickSum / thickCnt : 0.0);
 }
 
-float2 LocalShadow(uint slot, float3 wp, float3 N)
+float2 LocalShadow(uint slot, float3 wp, float3 N, bool hudReceiver)
 {
     LocalShadowView t = g_LocalShadowTiles[slot];
     if (t.zparams.w != 1.0)
         return float2(1.0, 0.0);
-    float2 hud = t.hud.x > 0.5 ? LocalShadowHudLayer(t, wp, N) : float2(1.0, 0.0);
+    float2 hud = hudReceiver && t.hud.x > 0.5 ? LocalShadowHudLayer(t, wp, N) : float2(1.0, 0.0);
     float4 c0 = mul(t.viewProj, float4(wp, 1.0));
     if (c0.w <= t.zparams.x)
         return hud;
@@ -117,7 +117,7 @@ uint LocalShadowCachedSlot(uint baseSlot, bool pointLight, float3 worldPos)
     return 0xFFFFFFFFu;
 }
 
-float2 LocalShadow(uint slot, float3 wp, float3 N)
+float2 LocalShadow(uint slot, float3 wp, float3 N, bool hudReceiver)
 {
     return float2(1.0, 0.0);
 }

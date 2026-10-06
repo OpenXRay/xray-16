@@ -197,6 +197,7 @@ float3 EvaluateCapsuleLight(
     float3 albedo,
     float metallic,
     float roughness,
+    bool hudReceiver,
     uint diffuseMode,
     bool foliage,
     float3 sssColor)
@@ -220,7 +221,7 @@ float3 EvaluateCapsuleLight(
         float2 shadow = float2(1.0, 0.0);
         uint shadowSlot = CapsuleShadowSlot(light, s, worldPos);
         if (shadowSlot != 0xFFFFFFFFu)
-            shadow = LocalShadow(shadowSlot, worldPos, N);
+            shadow = LocalShadow(shadowSlot, worldPos, N, hudReceiver);
 
         float3 lc = lightColor * atten;
         if (foliage)
@@ -246,6 +247,7 @@ float3 EvaluateClusteredLights(
     float roughness,
     float2 screenPos,
     float linearDepth,
+    bool hudReceiver,
     uint diffuseMode,
     uint shadingClass = SHADING_CLASS_STANDARD,
     float3 sssColor = 0.0)
@@ -271,7 +273,7 @@ float3 EvaluateClusteredLights(
 
         if (IsCapsuleLight(light))
         {
-            totalLight += EvaluateCapsuleLight(light, worldPos, N, V, albedo, metallic, roughness, diffuseMode, foliage, sssColor);
+            totalLight += EvaluateCapsuleLight(light, worldPos, N, V, albedo, metallic, roughness, hudReceiver, diffuseMode, foliage, sssColor);
             continue;
         }
         float3 lightColor = light.colorAndRange.xyz;
@@ -286,7 +288,7 @@ float3 EvaluateClusteredLights(
         float2 shadow = float2(1.0, 0.0);
         uint shadowSlot = LocalShadowSlot(light, worldPos);
         if (shadowSlot != 0xFFFFFFFFu)
-            shadow = LocalShadow(shadowSlot, worldPos, N);
+            shadow = LocalShadow(shadowSlot, worldPos, N, hudReceiver);
 
         float3 lc = lightColor * atten;
         if (foliage)
