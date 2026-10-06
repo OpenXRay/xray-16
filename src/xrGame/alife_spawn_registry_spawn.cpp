@@ -118,7 +118,9 @@ void CALifeSpawnRegistry::fill_new_spawns(
     if (vertex->edges().empty())
     {
         //		vertex->data()->object().m_spawn_count++;
-        spawns.push_back(vertex->data()->object().m_tSpawnID);
+        const ALife::_SPAWN_ID sid = vertex->data()->object().m_tSpawnID;
+        if (sid != ALife::_SPAWN_ID(-1))
+            spawns.push_back(sid);
         return;
     }
 
