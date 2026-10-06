@@ -140,6 +140,46 @@ float Distance(const Fvector& a, const Fvector& b)
 {
     return a.distance_to(b);
 }
+
+bool SameVector(const Fvector& a, const Fvector& b)
+{
+    return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+bool SameGun(const CHudIKController::GunSettings& a, const CHudIKController::GunSettings& b)
+{
+    return a.enabled == b.enabled && a.bone == b.bone && a.space == b.space && SameVector(a.position, b.position) &&
+        SameVector(a.rotation, b.rotation);
+}
+
+bool SameMatrix(const Fmatrix& a, const Fmatrix& b)
+{
+    for (u32 row = 0; row < 4; ++row)
+    {
+        for (u32 column = 0; column < 4; ++column)
+        {
+            if (a.m[row][column] != b.m[row][column])
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool ToDegrees(const Fmatrix& matrix, Fvector& position, Fvector& rotation)
+{
+    Fvector hpb;
+    matrix.getHPB(hpb);
+    hpb.mul(180.f / PI);
+    if (!_valid(matrix.c) || !_valid(hpb))
+    {
+        return false;
+    }
+    position = matrix.c;
+    rotation = hpb;
+    return true;
+}
 }
 
 xr_vector<CHudIKController::CallbackLink*> CHudIKController::s_links;
@@ -150,6 +190,7 @@ CHudIKController::CHudIKController()
     {
         m_state[arm].status = "inactive";
     }
+    ResetExternal();
 }
 
 CHudIKController::~CHudIKController()
@@ -171,6 +212,10 @@ void CHudIKController::Bind(IKinematics* skeleton)
         m_calibration[arm].valid = false;
         ClearState(arm, "disabled");
     }
+    m_gun = GunSettings();
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    ResetExternal();
     m_pose.clear();
     m_poseValid = false;
     m_snapshotRequested = false;
@@ -201,6 +246,13 @@ void CHudIKController::Unbind()
         m_calibration[arm].valid = false;
         ClearState(arm, "inactive");
     }
+    m_gun = GunSettings();
+    m_gunCaptureStatus = "inactive";
+    m_gunLeadCapable = false;
+    m_fireBone = BI_NONE;
+    m_lightBone = BI_NONE;
+    ClearGunState("inactive");
+    ResetExternal();
     m_pose.clear();
     m_poseValid = false;
     m_snapshotRequested = false;
@@ -290,6 +342,10 @@ void CHudIKController::ResetAll()
         m_calibration[arm].valid = false;
         ClearState(arm, "disabled");
     }
+    m_gun = GunSettings();
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    ResetExternal();
     if (!m_applying)
     {
         m_skeleton->CalculateBones_Invalidate();
@@ -330,6 +386,23 @@ bool CHudIKController::CaptureTarget(u16 arm, TargetSpace space, u16 targetBone)
     case TargetSpace::Model:
         offset.set(wrist);
         break;
+    case TargetSpace::Gun:
+    {
+        GunPlan plan;
+        pcstr gunStatus = "inactive";
+        const u16 gunBone = m_externalGun ? u16(BI_NONE) : (m_gun.bone != BI_NONE ? m_gun.bone : ResolveGunBone());
+        if (!BuildGunPlan(gunBone, m_gun.enabled, plan, gunStatus))
+        {
+            return false;
+        }
+        Fmatrix gunInverse;
+        if (!gunInverse.invert_b(m_gun.enabled ? plan.target : plan.raw))
+        {
+            return false;
+        }
+        offset.mul_43(gunInverse, wrist);
+        break;
+    }
     case TargetSpace::Bone:
     {
         if (targetBone >= count || !m_skeleton->LL_GetBoneVisible(targetBone))
@@ -498,8 +571,12 @@ void CHudIKController::OnCalculated()
         return;
     }
     const bool enabled[2] = {m_settings[0].enabled, m_settings[1].enabled};
-    if (!enabled[0] && !enabled[1] && !m_snapshotRequested)
+    const bool gunEnabled = m_gun.enabled;
+    const bool gunReferenced = (enabled[0] && m_settings[0].space == TargetSpace::Gun) ||
+        (enabled[1] && m_settings[1].space == TargetSpace::Gun);
+    if (!enabled[0] && !enabled[1] && !gunEnabled && !m_snapshotRequested)
     {
+        m_externalPublished = false;
         return;
     }
     const bool preview = m_snapshotRequested;
@@ -507,6 +584,7 @@ void CHudIKController::OnCalculated()
 
     if (!CapturePose())
     {
+        m_externalPublished = false;
         for (u16 arm = 0; arm < 2; ++arm)
         {
             if (enabled[arm] || preview)
@@ -514,7 +592,21 @@ void CHudIKController::OnCalculated()
                 ClearState(arm, "no_skeleton");
             }
         }
+        if (gunEnabled || preview)
+        {
+            ClearGunState("no_skeleton");
+        }
         return;
+    }
+
+    GunPlan gun;
+    if (gunEnabled || gunReferenced || preview)
+    {
+        EvaluateGun(gunEnabled, gunReferenced, gun);
+    }
+    else
+    {
+        m_externalPublished = false;
     }
 
     Pending pending[2];
@@ -522,7 +614,7 @@ void CHudIKController::OnCalculated()
     {
         if (enabled[arm] || preview)
         {
-            EvaluateArm(arm, enabled[arm], pending[arm]);
+            EvaluateArm(arm, enabled[arm], gun, pending[arm]);
         }
     }
 
@@ -548,6 +640,19 @@ void CHudIKController::OnCalculated()
         {
             ApplyArm(arm, pending[arm]);
         }
+    }
+
+    if (gun.active)
+    {
+        ApplyGun(gun);
+    }
+    if (gun.valid && gun.external && !gun.active)
+    {
+        m_gunState.resolved.mul_43(m_skeleton->LL_GetTransform(m_externalAnchor), m_externalOffset);
+    }
+    if (gun.valid && !gun.external && gun.bone < m_skeleton->LL_BoneCount())
+    {
+        m_gunState.resolved = m_skeleton->LL_GetTransform(gun.bone);
     }
 }
 
@@ -637,7 +742,7 @@ bool CHudIKController::ArmsOverlap(u16 a, u16 b) const
     return false;
 }
 
-void CHudIKController::EvaluateArm(u16 arm, bool enabled, Pending& pending)
+void CHudIKController::EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pending& pending)
 {
     pending = Pending();
     pending.evaluated = true;
@@ -710,6 +815,14 @@ void CHudIKController::EvaluateArm(u16 arm, bool enabled, Pending& pending)
     case TargetSpace::Model:
         reference.identity();
         break;
+    case TargetSpace::Gun:
+        if (!gun.valid)
+        {
+            state.status = "gun_unavailable";
+            return;
+        }
+        reference.set(gun.active ? gun.target : gun.raw);
+        break;
     case TargetSpace::Bone:
         if (settings.targetBone >= count)
         {
@@ -726,7 +839,21 @@ void CHudIKController::EvaluateArm(u16 arm, bool enabled, Pending& pending)
             state.status = "non_rigid_target";
             return;
         }
-        reference.set(m_pose[settings.targetBone]);
+        if (gun.active && !gun.external && IsAncestorOrSelf(settings.targetBone, gun.bone))
+        {
+            if (settings.targetBone == gun.bone)
+            {
+                reference.set(gun.target);
+            }
+            else
+            {
+                reference.mul_43(gun.delta, m_pose[settings.targetBone]);
+            }
+        }
+        else
+        {
+            reference.set(m_pose[settings.targetBone]);
+        }
         break;
     default:
         state.status = "invalid_settings";
@@ -885,4 +1012,731 @@ void CHudIKController::ApplyArm(u16 arm, const Pending& pending)
         CBoneInstance& instance = m_skeleton->LL_GetBoneInstance(calibration.bones[j]);
         instance.set_callback(saved[j].type, saved[j].callback, saved[j].param, saved[j].overwrite);
     }
+}
+
+void CHudIKController::ApplyGun(const GunPlan& plan)
+{
+    if (plan.external)
+    {
+        m_externalPose = plan.target;
+        m_externalPublished = true;
+        m_gunState.applied = true;
+        return;
+    }
+
+    BoneOverride data;
+    data.transform = plan.target;
+    SavedCallback saved;
+    CBoneInstance& instance = m_skeleton->LL_GetBoneInstance(plan.bone);
+    saved.callback = instance.callback();
+    saved.param = instance.callback_param();
+    saved.overwrite = instance.callback_overwrite();
+    saved.type = instance.callback_type();
+    instance.set_callback(bctCustom, &CHudIKController::OverrideCallback, &data, TRUE);
+
+    Fmatrix identity;
+    identity.identity();
+    const u16 parentId = m_skeleton->GetBoneData(plan.bone).GetParentID();
+    Fmatrix* parent = parentId == BI_NONE ? &identity : &m_skeleton->LL_GetTransform(parentId);
+
+    m_applying = true;
+    m_skeleton->Bone_Calculate(&m_skeleton->LL_GetData(plan.bone), parent);
+    m_applying = false;
+
+    CBoneInstance& restored = m_skeleton->LL_GetBoneInstance(plan.bone);
+    restored.set_callback(saved.type, saved.callback, saved.param, saved.overwrite);
+    m_gunState.applied = true;
+}
+
+void CHudIKController::ClearGunState(pcstr status)
+{
+    m_gunState = GunState();
+    m_gunState.status = status;
+}
+
+bool CHudIKController::IsArmBone(u16 bone) const
+{
+    const u16 count = m_skeleton->LL_BoneCount();
+    for (u16 arm = 0; arm < 2; ++arm)
+    {
+        for (u16 j = 0; j < 3; ++j)
+        {
+            const u16 armBone = m_settings[arm].bones[j];
+            if (armBone < count && IsAncestorOrSelf(armBone, bone))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+u16 CHudIKController::SuggestGunBone() const
+{
+    if (!m_skeleton || m_externalGun)
+    {
+        return BI_NONE;
+    }
+    const u16 count = m_skeleton->LL_BoneCount();
+    if (m_fireBone >= count || IsArmBone(m_fireBone))
+    {
+        return BI_NONE;
+    }
+    u16 candidate = m_fireBone;
+    for (u16 steps = 0; steps < count; ++steps)
+    {
+        const u16 parent = m_skeleton->GetBoneData(candidate).GetParentID();
+        if (parent == BI_NONE || parent >= count || IsArmBone(parent))
+        {
+            break;
+        }
+        candidate = parent;
+    }
+    return candidate;
+}
+
+bool CHudIKController::SupportsGunLead() const
+{
+    return m_skeleton && (m_gunLeadCapable || m_externalGun);
+}
+
+bool CHudIKController::HasGunBoneHint() const
+{
+    return m_skeleton && m_fireBone < m_skeleton->LL_BoneCount();
+}
+
+void CHudIKController::SetGunLeadCapable(bool capable)
+{
+    if (m_gunLeadCapable == capable)
+    {
+        return;
+    }
+    m_gunLeadCapable = capable;
+    if (capable || !m_skeleton)
+    {
+        return;
+    }
+    const bool hadGun = m_gun.enabled || m_gun.bone != BI_NONE;
+    m_gun = GunSettings();
+    m_externalPublished = false;
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    if (hadGun && !m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+u16 CHudIKController::ResolveGunBone() const
+{
+    if (m_externalGun)
+    {
+        return BI_NONE;
+    }
+    return m_gun.bone != BI_NONE ? m_gun.bone : SuggestGunBone();
+}
+
+bool CHudIKController::ValidateGun(u16 bone, pcstr& status) const
+{
+    if (!m_skeleton)
+    {
+        status = "no_skeleton";
+        return false;
+    }
+    const u16 count = u16(m_pose.size());
+    if (!SupportsGunLead())
+    {
+        status = "unsupported";
+        return false;
+    }
+    if (bone >= count || bone >= m_skeleton->LL_BoneCount())
+    {
+        status = "missing_bone";
+        return false;
+    }
+    const bool hasFire = m_fireBone != BI_NONE;
+    const bool hasLight = hasFire && m_lightBone != BI_NONE;
+    if ((hasFire && m_fireBone >= count) || (hasLight && m_lightBone >= count))
+    {
+        status = "missing_bone";
+        return false;
+    }
+    if (IsArmBone(bone))
+    {
+        status = "gun_contains_arm";
+        return false;
+    }
+    if (hasFire && !IsAncestorOrSelf(m_fireBone, bone))
+    {
+        status = "fire_bone_outside";
+        return false;
+    }
+    if (hasLight && !IsAncestorOrSelf(m_lightBone, bone))
+    {
+        status = "light_bone_outside";
+        return false;
+    }
+    if (!m_skeleton->LL_GetBoneVisible(bone) || (hasFire && !m_skeleton->LL_GetBoneVisible(m_fireBone)) ||
+        (hasLight && !m_skeleton->LL_GetBoneVisible(m_lightBone)))
+    {
+        status = "hidden_bone";
+        return false;
+    }
+    CBoneInstance& instance = m_skeleton->LL_GetBoneInstance(bone);
+    if (instance.callback() || instance.callback_overwrite())
+    {
+        status = "bone_callback_conflict";
+        return false;
+    }
+    if (!IsRigid(m_pose[bone]))
+    {
+        status = "non_rigid_bone";
+        return false;
+    }
+    return true;
+}
+
+bool CHudIKController::ComputeExternalRaw(Fmatrix& raw, pcstr& status) const
+{
+    if (!m_skeleton)
+    {
+        status = "no_skeleton";
+        return false;
+    }
+    if (!m_externalGun)
+    {
+        status = "unsupported";
+        return false;
+    }
+    const u16 count = u16(m_pose.size());
+    if (m_externalAnchor >= count || m_externalAnchor >= m_skeleton->LL_BoneCount())
+    {
+        status = "missing_bone";
+        return false;
+    }
+    if (!m_skeleton->LL_GetBoneVisible(m_externalAnchor))
+    {
+        status = "hidden_bone";
+        return false;
+    }
+    if (!IsRigid(m_pose[m_externalAnchor]))
+    {
+        status = "non_rigid_bone";
+        return false;
+    }
+    if (!IsRigid(m_externalOffset))
+    {
+        status = "non_rigid_offset";
+        return false;
+    }
+    Fmatrix result;
+    result.mul_43(m_pose[m_externalAnchor], m_externalOffset);
+    if (!IsRigid(result))
+    {
+        status = "non_rigid_bone";
+        return false;
+    }
+    raw = result;
+    return true;
+}
+
+bool CHudIKController::BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status) const
+{
+    plan = GunPlan();
+    status = "inactive";
+    if (!_valid(m_gun.position) || !_valid(m_gun.rotation))
+    {
+        status = "invalid_settings";
+        return false;
+    }
+    if (m_gun.space != TargetSpace::Animated && m_gun.space != TargetSpace::Model)
+    {
+        status = "invalid_space";
+        return false;
+    }
+
+    Fmatrix raw;
+    if (m_externalGun)
+    {
+        if (!ComputeExternalRaw(raw, status))
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (!ValidateGun(bone, status))
+        {
+            return false;
+        }
+        raw.set(m_pose[bone]);
+    }
+
+    Fmatrix inverse;
+    if (!inverse.invert_b(raw))
+    {
+        status = "singular_transform";
+        return false;
+    }
+
+    Fvector radians = m_gun.rotation;
+    radians.mul(PI / 180.f);
+    Fmatrix offset;
+    offset.setHPB(radians.x, radians.y, radians.z);
+    offset.translate_over(m_gun.position);
+    Fmatrix target;
+    if (m_gun.space == TargetSpace::Animated)
+    {
+        target.mul_43(raw, offset);
+    }
+    else
+    {
+        target.set(offset);
+    }
+    if (!_valid(target) || !IsRigid(target))
+    {
+        status = "invalid_settings";
+        return false;
+    }
+
+    Fmatrix delta;
+    delta.mul_43(target, inverse);
+    if (!_valid(delta))
+    {
+        status = "invalid_settings";
+        return false;
+    }
+
+    plan.valid = true;
+    plan.active = active;
+    plan.external = m_externalGun;
+    plan.bone = m_externalGun ? u16(BI_NONE) : bone;
+    plan.raw = raw;
+    plan.target = target;
+    plan.delta = delta;
+    return true;
+}
+
+void CHudIKController::EvaluateGun(bool enabled, bool referenced, GunPlan& plan)
+{
+    plan = GunPlan();
+    m_externalPublished = false;
+    u16 bone = BI_NONE;
+    if (!m_externalGun)
+    {
+        bone = m_gun.bone;
+        if (!enabled && bone == BI_NONE)
+        {
+            if (!referenced)
+            {
+                ClearGunState("disabled");
+                return;
+            }
+            bone = ResolveGunBone();
+        }
+    }
+    ClearGunState("inactive");
+    m_gunState.frame = Device.dwFrame;
+
+    pcstr status = "inactive";
+    GunPlan built;
+    if (!BuildGunPlan(bone, enabled, built, status))
+    {
+        m_gunState.status = status;
+        return;
+    }
+
+    m_gunState.valid = true;
+    m_gunState.animated = built.raw;
+    m_gunState.target = built.target;
+    m_gunState.resolved = built.target;
+    m_gunState.delta = built.delta;
+    m_gunState.status = enabled ? "ok" : "preview";
+    plan = built;
+}
+
+const CHudIKController::GunSettings& CHudIKController::GetGun() const
+{
+    return m_gun;
+}
+
+const CHudIKController::GunState& CHudIKController::GetGunState() const
+{
+    return m_gunState;
+}
+
+void CHudIKController::SetGun(const GunSettings& settings)
+{
+    if (!m_skeleton || !SupportsGunLead())
+    {
+        return;
+    }
+    GunSettings next = settings;
+    if (m_externalGun)
+    {
+        next.bone = BI_NONE;
+    }
+    if (SameGun(m_gun, next))
+    {
+        return;
+    }
+    m_gun = next;
+    if (!m_gun.enabled)
+    {
+        m_externalPublished = false;
+    }
+    ClearGunState(m_gun.enabled ? "pending" : "disabled");
+    if (m_gun.enabled)
+    {
+        EnsureCallback();
+    }
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+void CHudIKController::SetGunBones(u16 fireBone, u16 lightBone)
+{
+    if (!m_skeleton)
+    {
+        return;
+    }
+    const u16 count = m_skeleton->LL_BoneCount();
+    const u16 fire = fireBone < count ? fireBone : BI_NONE;
+    const u16 light = fire != BI_NONE && lightBone < count ? lightBone : BI_NONE;
+    if (fire == m_fireBone && light == m_lightBone)
+    {
+        return;
+    }
+    m_fireBone = fire;
+    m_lightBone = light;
+    m_gun = GunSettings();
+    m_externalPublished = false;
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+pcstr CHudIKController::GetGunCaptureStatus() const
+{
+    return m_gunCaptureStatus;
+}
+
+bool CHudIKController::CaptureGunTarget(TargetSpace space)
+{
+    if (!m_skeleton || (space != TargetSpace::Animated && space != TargetSpace::Model))
+    {
+        m_gunCaptureStatus = m_skeleton ? "invalid_space" : "no_skeleton";
+        return false;
+    }
+    if (!IsPoseFresh())
+    {
+        RequestSnapshot();
+        m_gunCaptureStatus = "stale_pose";
+        return false;
+    }
+    const u16 bone = ResolveGunBone();
+    pcstr status = "inactive";
+    Fmatrix raw;
+    if (m_externalGun)
+    {
+        if (!ComputeExternalRaw(raw, status))
+        {
+            m_gunCaptureStatus = status;
+            return false;
+        }
+    }
+    else
+    {
+        if (!ValidateGun(bone, status))
+        {
+            m_gunCaptureStatus = status;
+            return false;
+        }
+        raw.set(m_pose[bone]);
+    }
+
+    Fvector position{};
+    Fvector rotation{};
+    if (space == TargetSpace::Model)
+    {
+        if (!ToDegrees(raw, position, rotation))
+        {
+            m_gunCaptureStatus = "invalid_settings";
+            return false;
+        }
+    }
+
+    GunSettings updated = m_gun;
+    updated.bone = bone;
+    updated.space = space;
+    updated.position = position;
+    updated.rotation = rotation;
+    SetGun(updated);
+    m_gunCaptureStatus = "ok";
+    return true;
+}
+
+bool CHudIKController::CaptureTwoHand()
+{
+    if (!m_skeleton)
+    {
+        m_gunCaptureStatus = "no_skeleton";
+        return false;
+    }
+    if (!IsPoseFresh())
+    {
+        RequestSnapshot();
+        m_gunCaptureStatus = "stale_pose";
+        return false;
+    }
+    const u16 count = u16(m_pose.size());
+    const bool external = m_externalGun;
+    const u16 bone = external ? u16(BI_NONE) : ResolveGunBone();
+    pcstr status = "inactive";
+    Fmatrix reference;
+    if (external)
+    {
+        if (!ComputeExternalRaw(reference, status))
+        {
+            m_gunCaptureStatus = status;
+            return false;
+        }
+    }
+    else
+    {
+        if (!ValidateGun(bone, status))
+        {
+            m_gunCaptureStatus = status;
+            return false;
+        }
+        reference.set(m_pose[bone]);
+    }
+    Fmatrix inverse;
+    if (!inverse.invert_b(reference))
+    {
+        m_gunCaptureStatus = "singular_transform";
+        return false;
+    }
+
+    ArmSettings updated[2];
+    for (u16 arm = 0; arm < 2; ++arm)
+    {
+        const ArmSettings& settings = m_settings[arm];
+        for (u16 j = 0; j < 3; ++j)
+        {
+            if (settings.bones[j] >= count)
+            {
+                m_gunCaptureStatus = "missing_bones";
+                return false;
+            }
+            if (!m_skeleton->LL_GetBoneVisible(settings.bones[j]))
+            {
+                m_gunCaptureStatus = "hidden_bone";
+                return false;
+            }
+            if (!IsRigid(m_pose[settings.bones[j]]))
+            {
+                m_gunCaptureStatus = "non_rigid_bone";
+                return false;
+            }
+            CBoneInstance& instance = m_skeleton->LL_GetBoneInstance(settings.bones[j]);
+            if (instance.callback() || instance.callback_overwrite())
+            {
+                m_gunCaptureStatus = "bone_callback_conflict";
+                return false;
+            }
+        }
+        const u16 b0 = settings.bones[0];
+        const u16 b1 = settings.bones[1];
+        const u16 wristId = settings.bones[2];
+        if (b0 == b1 || b1 == wristId || b0 == wristId ||
+            m_skeleton->GetBoneData(b1).GetParentID() != b0 ||
+            m_skeleton->GetBoneData(wristId).GetParentID() != b1)
+        {
+            m_gunCaptureStatus = "not_direct_chain";
+            return false;
+        }
+        Fmatrix offset;
+        offset.mul_43(inverse, m_pose[wristId]);
+        Fvector position;
+        Fvector rotation;
+        if (!ToDegrees(offset, position, rotation))
+        {
+            m_gunCaptureStatus = "invalid_settings";
+            return false;
+        }
+        updated[arm] = settings;
+        updated[arm].enabled = true;
+        updated[arm].space = external ? TargetSpace::Gun : TargetSpace::Bone;
+        updated[arm].targetBone = external ? u16(BI_NONE) : bone;
+        updated[arm].position = position;
+        updated[arm].rotation = rotation;
+        updated[arm].weight = 1.f;
+    }
+    if (ArmsOverlap(0, 1))
+    {
+        m_gunCaptureStatus = "arm_overlap";
+        return false;
+    }
+
+    for (u16 arm = 0; arm < 2; ++arm)
+    {
+        if (!m_settings[arm].enabled)
+        {
+            m_state[arm].solved = false;
+            m_state[arm].status = "pending";
+        }
+        m_settings[arm] = updated[arm];
+    }
+
+    GunSettings gun;
+    gun.enabled = true;
+    gun.bone = bone;
+    gun.space = TargetSpace::Animated;
+    SetGun(gun);
+    m_state[0].solved = false;
+    m_state[1].solved = false;
+    EnsureCallback();
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+    m_gunCaptureStatus = "ok";
+    return true;
+}
+
+void CHudIKController::ReleaseTwoHand()
+{
+    if (!m_skeleton)
+    {
+        return;
+    }
+    for (u16 arm = 0; arm < 2; ++arm)
+    {
+        if (m_settings[arm].enabled)
+        {
+            m_settings[arm].enabled = false;
+            ClearState(arm, "disabled");
+        }
+    }
+    GunSettings gun = m_gun;
+    gun.enabled = false;
+    SetGun(gun);
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+void CHudIKController::TransformGunDirection(Fvector& direction) const
+{
+    if (m_externalGun || !m_gunState.valid || !m_gunState.applied || m_gunState.frame != Device.dwFrame)
+    {
+        return;
+    }
+    Fvector rotated;
+    m_gunState.delta.transform_dir(rotated, direction);
+    if (_valid(rotated) && rotated.square_magnitude() > EPS * EPS)
+    {
+        rotated.normalize();
+        direction = rotated;
+    }
+}
+
+void CHudIKController::ResetExternal()
+{
+    m_externalGun = false;
+    m_externalAnchor = BI_NONE;
+    m_externalOffset.identity();
+    m_externalPublished = false;
+    m_externalPose.identity();
+}
+
+bool CHudIKController::HasExternalGun() const
+{
+    return m_skeleton && m_externalGun;
+}
+
+void CHudIKController::SetExternalGun(u16 anchorBone, const Fmatrix& attachOffset)
+{
+    if (!m_skeleton)
+    {
+        return;
+    }
+    if (anchorBone >= m_skeleton->LL_BoneCount() || !_valid(attachOffset))
+    {
+        ClearExternalGun();
+        return;
+    }
+    if (m_externalGun && m_externalAnchor == anchorBone && SameMatrix(m_externalOffset, attachOffset))
+    {
+        return;
+    }
+    const bool wasExternal = m_externalGun;
+    m_externalGun = true;
+    m_externalAnchor = anchorBone;
+    m_externalOffset = attachOffset;
+    m_externalPublished = false;
+    m_poseValid = false;
+    if (wasExternal)
+    {
+        ClearGunState(m_gun.enabled ? "pending" : "disabled");
+        if (!m_applying)
+        {
+            m_skeleton->CalculateBones_Invalidate();
+        }
+        return;
+    }
+    m_gun = GunSettings();
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+void CHudIKController::ClearExternalGun()
+{
+    if (!m_externalGun)
+    {
+        return;
+    }
+    ResetExternal();
+    m_poseValid = false;
+    if (!m_skeleton)
+    {
+        return;
+    }
+    m_gun = GunSettings();
+    m_gunCaptureStatus = "inactive";
+    ClearGunState("disabled");
+    for (u16 arm = 0; arm < 2; ++arm)
+    {
+        if (m_settings[arm].space == TargetSpace::Gun)
+        {
+            ApplyDefaults(arm);
+            m_calibration[arm].valid = false;
+            ClearState(arm, "disabled");
+        }
+    }
+    if (!m_applying)
+    {
+        m_skeleton->CalculateBones_Invalidate();
+    }
+}
+
+bool CHudIKController::GetExternalGunTransform(Fmatrix& pose) const
+{
+    if (!m_skeleton || !m_externalGun || !m_externalPublished || !_valid(m_externalPose))
+    {
+        return false;
+    }
+    pose = m_externalPose;
+    return true;
 }

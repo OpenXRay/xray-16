@@ -130,15 +130,7 @@ void attachable_hud_item::update(bool bForce)
     if (!bForce && m_upd_firedeps_frame == Device.dwFrame)
         return;
 
-    const bool is_16x9 = UICore::is_widescreen();
-
-    if (m_measures.m_prop_flags.test(hud_item_measures::e_16x9_mode_now) != is_16x9)
-    {
-        reload_measures();
-    }
-
-    if (GamePersistent().GetHudTuner().is_active())
-        m_measures.update(m_attach_offset);
+    refresh_measures();
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
     m_upd_firedeps_frame = Device.dwFrame;
@@ -149,6 +141,19 @@ void attachable_hud_item::update(bool bForce)
         ka->dcast_PKinematics()->CalculateBones_Invalidate();
         ka->dcast_PKinematics()->CalculateBones(TRUE);
     }
+}
+
+void attachable_hud_item::refresh_measures()
+{
+    const bool is_16x9 = UICore::is_widescreen();
+
+    if (m_measures.m_prop_flags.test(hud_item_measures::e_16x9_mode_now) != is_16x9)
+    {
+        reload_measures();
+    }
+
+    if (GamePersistent().GetHudTuner().is_active())
+        m_measures.update(m_attach_offset);
 }
 
 void attachable_hud_item::update_hud_additional(Fmatrix& trans) const
@@ -170,6 +175,8 @@ void attachable_hud_item::setup_firedeps(firedeps& fd)
         m_item_transform.transform_tiny(fd.vLastFP);
 
         fd.vLastFD.set(0.f, 0.f, 1.f);
+        if (m_hud_ik)
+            m_hud_ik->TransformGunDirection(fd.vLastFD);
         m_item_transform.transform_dir(fd.vLastFD);
         VERIFY(_valid(fd.vLastFD));
         VERIFY(_valid(fd.vLastFD));
@@ -452,6 +459,7 @@ attachable_hud_item::attachable_hud_item(player_hud* parent, const shared_str& s
     {
         m_hud_ik = xr_new<CHudIKController>();
         m_hud_ik->Bind(m_model);
+        m_hud_ik->SetGunLeadCapable(true);
     }
 
     m_attach_place_idx = pSettings->read_if_exists<u16>(m_sect_name, "attach_place_idx", 0);
@@ -469,7 +477,16 @@ attachable_hud_item::attachable_hud_item(player_hud* parent, const shared_str& s
 void attachable_hud_item::reload_measures()
 {
     if (m_monolithic)
+    {
         m_attach_offset = m_measures.load_monolithic(m_sect_name, m_model, m_parent_hud_item);
+        if (m_hud_ik)
+        {
+            const bool has_fire = m_measures.m_prop_flags.test(hud_item_measures::e_fire_point);
+            const bool has_light = m_measures.m_prop_flags.test(hud_item_measures::e_light_point);
+            m_hud_ik->SetGunBones(has_fire ? m_measures.m_fire_bone : BI_NONE,
+                has_light ? m_measures.m_light_bone : BI_NONE);
+        }
+    }
     else
         m_attach_offset = m_measures.load(m_sect_name, m_model);
 }
@@ -747,9 +764,18 @@ void player_hud::update(const Fmatrix& cam_trans)
     attachable_hud_item* item0 = m_attached_items[0];
     attachable_hud_item* item1 = m_attached_items[1];
 
+    if (item0)
+        item0->refresh_measures();
+
+    if (item1)
+        item1->refresh_measures();
+
     const bool monolithic = item0 && item0->m_monolithic || item1 && item1->m_monolithic;
     if (!m_model || monolithic)
+    {
         m_transform = trans;
+        configure_external_gun(nullptr);
+    }
     else
     {
         Fvector ypr{};
@@ -769,6 +795,8 @@ void player_hud::update(const Fmatrix& cam_trans)
 
         m_attach_offset.translate_over(tmp);
         m_transform.mul(trans, m_attach_offset);
+
+        configure_external_gun(item0);
 
         m_model->UpdateTracks();
         m_model->dcast_PKinematics()->CalculateBones_Invalidate();
@@ -1033,6 +1061,25 @@ void player_hud::detach_all_items()
     }
 }
 
+void player_hud::configure_external_gun(const attachable_hud_item* primary)
+{
+    if (!m_hands_ik)
+        return;
+
+    IKinematics* hands = m_model ? m_model->dcast_PKinematics() : nullptr;
+    if (primary && !primary->m_monolithic && primary->m_attach_place_idx == 0 && hands && hands == m_hands_ik->Skeleton() &&
+        !m_ancors.empty())
+    {
+        const u16 anchor = m_ancors[0];
+        if (anchor != BI_NONE && anchor < hands->LL_BoneCount())
+        {
+            m_hands_ik->SetExternalGun(anchor, primary->m_attach_offset);
+            return;
+        }
+    }
+    m_hands_ik->ClearExternalGun();
+}
+
 CHudIKController* player_hud::hud_ik(IKinematicsAnimated* model)
 {
     if (!model)
@@ -1043,11 +1090,17 @@ CHudIKController* player_hud::hud_ik(IKinematicsAnimated* model)
 
     for (attachable_hud_item* item : m_attached_items)
     {
-        if (!item || !item->m_monolithic || !item->m_hud_ik || !item->m_model)
+        if (!item || !item->m_model || (item->m_monolithic && !item->m_hud_ik))
             continue;
 
-        if (item->m_model->dcast_PKinematicsAnimated() == model)
+        if (item->m_model->dcast_PKinematicsAnimated() != model)
+            continue;
+
+        if (item->m_monolithic)
             return item->m_hud_ik;
+
+        if (item == m_attached_items[0] && m_hands_ik && m_hands_ik->Skeleton())
+            return m_hands_ik;
     }
     return nullptr;
 }
@@ -1057,6 +1110,13 @@ void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmat
     const attachable_hud_item* item = m_attached_items[attach_slot_idx];
     if (item && !item->m_monolithic)
     {
+        Fmatrix external_pose;
+        if (attach_slot_idx == 0 && m_hands_ik && m_hands_ik->GetExternalGunTransform(external_pose))
+        {
+            result.mul(m_transform, external_pose);
+            return;
+        }
+
         IKinematics* k = smart_cast<IKinematics*>(m_model);
         const Fmatrix ancor_m = k->LL_GetTransform(m_ancors[attach_slot_idx]);
         result.mul(m_transform, ancor_m);

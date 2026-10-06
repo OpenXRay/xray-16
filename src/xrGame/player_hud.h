@@ -100,6 +100,7 @@ struct attachable_hud_item
     ~attachable_hud_item();
 
     void reload_measures();
+    void refresh_measures();
 
     void update(bool bForce);
     void update_hud_additional(Fmatrix& trans) const;
@@ -162,6 +163,7 @@ public:
 private:
     void load_ancors();
     void update_inertion(Fmatrix& trans) const;
+    void configure_external_gun(const attachable_hud_item* primary);
     void update_additional(Fmatrix& trans) const;
     bool inertion_allowed() const;
 
