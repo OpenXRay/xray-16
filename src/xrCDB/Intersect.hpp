@@ -490,7 +490,8 @@ IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, F
 //---------------------------------------------------------------------------}
 
 //----------------------------------------------------------------------------
-IC float MgcSqrDistance(const Fvector& rkPoint, const Fvector& orig, const Fvector& e0, const Fvector& e1)
+IC float MgcSqrDistance(const Fvector& rkPoint, const Fvector& orig, const Fvector& e0, const Fvector& e1,
+    Fvector* closestPoint = nullptr)
 {
     Fvector kDiff;
     kDiff.sub(orig, rkPoint);
@@ -716,6 +717,13 @@ IC float MgcSqrDistance(const Fvector& rkPoint, const Fvector& orig, const Fvect
                 }
             }
         }
+    }
+
+    if (closestPoint)
+    {
+        closestPoint->x = orig.x + fS * e0.x + fT * e1.x;
+        closestPoint->y = orig.y + fS * e0.y + fT * e1.y;
+        closestPoint->z = orig.z + fS * e0.z + fT * e1.z;
     }
 
     return _abs(fSqrDist);

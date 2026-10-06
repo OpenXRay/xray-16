@@ -8,6 +8,8 @@
 #include "CustomMonster.h"
 
 #include "Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/DrawUtils.h"
+#include "xrAnimation/OzzPose.h"
 
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/IActivationShape.h"
@@ -35,10 +37,11 @@
 // const float default_hinge_friction = 5.f;//gray_wolf comment
 #ifdef DEBUG
 #include "PHDebug.h"
-extern BOOL death_anim_debug;
 #endif // DEBUG
 
 #include "xrEngine/device.h"
+#include "xrEngine/IGame_Level.h"
+#include "xrEngine/IGame_Persistent.h"
 
 #define USE_SMART_HITS
 #define USE_IK
@@ -58,6 +61,7 @@ IC bool is_imotion(interactive_motion* im) { return im && im->is_enabled(); }
 
 CCharacterPhysicsSupport::~CCharacterPhysicsSupport()
 {
+    Device.seqFrame.Remove(this);
     set_collision_hit_callback(0);
     if (m_flags.test(fl_skeleton_in_shell))
     {
@@ -100,8 +104,18 @@ CCharacterPhysicsSupport::CCharacterPhysicsSupport(EType atype, CEntityAlive* ae
     }
 };
 
+void CCharacterPhysicsSupport::ClearPoseBase()
+{
+    if (auto* visual = m_EntityAlife.Visual())
+    {
+        if (IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(visual))
+            KA->LL_ClearPoseBase();
+    }
+}
+
 void CCharacterPhysicsSupport::SetRemoved()
 {
+    ClearPoseBase();
     m_eState = esRemoved;
     if (m_flags.test(fl_skeleton_in_shell))
     {
@@ -199,6 +213,7 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
     CInifile* ini = m_EntityAlife.spawn_ini();
     if (ini && ini->section_exist("physics") && ini->line_exist("physics", "controller_can_be_moved_by_player"))
         m_PhysicMovementControl->SetActorMovable(!!ini->r_bool("physics", "controller_can_be_moved_by_player"));
+    Device.seqFrame.Add(this, REG_PRIORITY_LOW);
 }
 
 bool CCharacterPhysicsSupport::CollisionCorrectObjPos()
@@ -301,6 +316,8 @@ void CCharacterPhysicsSupport::SpawnCharacterCreate()
 void CCharacterPhysicsSupport::destroy_imotion() { destroy(m_interactive_motion); }
 void CCharacterPhysicsSupport::in_NetDestroy()
 {
+    Device.seqFrame.Remove(this);
+    ClearPoseBase();
     destroy(m_interactive_motion);
     m_PhysicMovementControl->DestroyCharacter();
 
@@ -401,10 +418,8 @@ bool is_similar(const Fmatrix& m0, const Fmatrix& m1, float param)
 
 void CCharacterPhysicsSupport::KillHit(SHit& H)
 {
-#ifdef DEBUG
     if (death_anim_debug)
         Msg("death anim: kill hit  ");
-#endif
     VERIFY(m_EntityAlife.Visual());
     VERIFY(m_EntityAlife.Visual()->dcast_PKinematics());
 
@@ -452,13 +467,11 @@ void CCharacterPhysicsSupport::KillHit(SHit& H)
 
     if (!is_imotion(m_interactive_motion))
     {
-#ifdef DEBUG
         if (death_anim_debug)
         {
             Msg("death anim: kill hit use free ragdoll ");
             Msg("death anim: fatal impulse: %f, ", H.impulse);
         }
-#endif
 
         EndActivateFreeShell(H.who, start, death_position, velocity);
         m_flags.set(fl_block_hit, TRUE);
@@ -504,13 +517,11 @@ void CCharacterPhysicsSupport::in_Hit(SHit& H, bool is_killing)
     }
     else
     {
-#ifdef DEBUG
         if (is_killing && death_anim_debug && !is_imotion(m_interactive_motion))
         {
             Msg("death anim: applied fatal impulse dir: (%f,%f,%f), value: (%f) ", H.dir.x, H.dir.y, H.dir.z,
                 H.impulse);
         }
-#endif
         m_pPhysicsShell->applyHit(H.bone_space_position(), H.direction(), H.phys_impulse(), H.bone(), H.type());
     }
 }
@@ -524,30 +535,142 @@ IC void CCharacterPhysicsSupport::UpdateDeathAnims()
             m_interactive_motion)) //! m_flags.test(fl_use_death_motion)//!b_death_anim_on&&m_pPhysicsShell->isFullActive()
     {
         DestroyIKController();
-        smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual())->PlayCycle("death_init");
+        IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual());
+        if (m_interactive_motion)
+        {
+            IKinematics* K = smart_cast<IKinematics*>(m_EntityAlife.Visual());
+            K->CalculateBones(TRUE);
+            XRay::Animation::PoseCaptureResult capture;
+            const bool captured = KA->LL_CapturePoseBase(1.f, death_anim_debug ? &capture : nullptr);
+            if (death_anim_debug)
+            {
+                if (captured)
+                    Msg("death anim: captured ragdoll fallback pose for [%s]", m_EntityAlife.cName().c_str());
+                else
+                {
+                    pcstr boneName = capture.bone < K->LL_BoneCount()
+                        ? K->LL_GetData(capture.bone).name.c_str() : "none";
+                    Msg("! death anim: pose capture rejected for [%s], reason=%s, bone=%s (%u), value=%g, limit=%g; "
+                        "using animation fallback", m_EntityAlife.cName().c_str(), capture.reason, boneName,
+                        u32(capture.bone), capture.value, capture.limit);
+                }
+            }
+        }
+        KA->PlayCycle("death_init");
         m_flags.set(fl_death_anim_on, TRUE);
     }
 }
-#ifdef DEBUG
-void DBG_PhysBones(IGameObject& O);
-void DBG_DrawBones(IGameObject& O);
-void DBG_DrawBind(IGameObject& O);
 BOOL dbg_draw_character_bones = false;
 BOOL dbg_draw_character_physics = false;
+#ifdef DEBUG
+void DBG_PhysBones(IGameObject& O);
+void DBG_DrawBind(IGameObject& O);
 BOOL dbg_draw_character_binds = false;
 BOOL dbg_draw_character_physics_pones = false;
 
-void dbg_draw_geoms(xr_vector<CODEGeom*>& m_weapon_geoms)
-{
-    xr_vector<CODEGeom *>::iterator ii = m_weapon_geoms.begin(), ee = m_weapon_geoms.end();
-    for (; ii != ee; ++ii)
-    {
-        CODEGeom* g = (*ii);
+#endif
 
-        g->dbg_draw(0.01f, color_xrgb(0, 255, 100), Flags32());
+void CCharacterPhysicsSupport::OnFrame()
+{
+    if ((!dbg_draw_character_bones && !dbg_draw_character_physics) || m_eState == esRemoved ||
+        GEnv.DU == nullptr || GEnv.isDedicatedServer || !Device.b_is_Ready || !Device.b_is_Active ||
+        g_pGameLevel == nullptr || !g_pGameLevel->bReady ||
+        (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive()))
+        return;
+    if (m_EntityAlife.getDestroy() || !m_EntityAlife.Visual() || !_valid(mXFORM) ||
+        mXFORM.c.distance_to_sqr(Device.vCameraPosition) > 100.f * 100.f)
+        return;
+
+    if (dbg_draw_character_bones)
+    {
+        if (IKinematics* K = smart_cast<IKinematics*>(m_EntityAlife.Visual()))
+            DrawDebugBones(*K);
+        for (const CODEGeom* geometry : m_weapon_geoms)
+        {
+            if (geometry)
+                DrawDebugGeometry(*geometry, color_xrgb(0, 255, 100));
+        }
+    }
+
+    if (dbg_draw_character_physics && m_pPhysicsShell && m_pPhysicsShell->isFullActive())
+    {
+        for (u16 elementIndex = 0; elementIndex < m_pPhysicsShell->get_ElementsNumber(); ++elementIndex)
+        {
+            const CPhysicsElement* element = m_pPhysicsShell->get_ElementByStoreOrder(elementIndex);
+            for (u16 geometryIndex = 0; geometryIndex < element->numberOfGeoms(); ++geometryIndex)
+            {
+                const IPhysicsGeometry* geometry = element->geometry(geometryIndex);
+                if (geometry)
+                    DrawDebugGeometry(*geometry, color_xrgb(255, 64, 64));
+            }
+        }
     }
 }
-#endif
+
+void CCharacterPhysicsSupport::DrawDebugBones(IKinematics& kinematics) const
+{
+    const u16 count = kinematics.LL_BoneCount();
+    for (u16 bone = 0; bone < count; ++bone)
+    {
+        if (!kinematics.LL_GetBoneVisible(bone))
+            continue;
+        Fmatrix transform;
+        transform.mul_43(mXFORM, kinematics.LL_GetTransform(bone));
+        if (!_valid(transform))
+            continue;
+        DrawDebugAxes(transform, 0.1f);
+
+        const u16 parent = kinematics.GetBoneData(bone).GetParentID();
+        if (parent < count && kinematics.LL_GetBoneVisible(parent))
+        {
+            Fvector parentPosition;
+            mXFORM.transform_tiny(parentPosition, kinematics.LL_GetTransform(parent).c);
+            if (_valid(parentPosition))
+                GEnv.DU->DrawLine(transform.c, parentPosition, color_xrgb(255, 255, 0));
+        }
+    }
+    DrawDebugAxes(mXFORM, 0.5f);
+    GEnv.DU->DrawCross(mXFORM.c, 0.1f, color_xrgb(255, 125, 125));
+}
+
+void CCharacterPhysicsSupport::DrawDebugGeometry(const IPhysicsGeometry& geometry, u32 color) const
+{
+    Fmatrix transform;
+    Fvector size;
+    geometry.get_Box(transform, size);
+    if (!_valid(transform) || !_valid(size) || size.x <= 0.f || size.y <= 0.f || size.z <= 0.f)
+        return;
+
+    size.mul(0.5f);
+    Fvector corners[8];
+    for (u32 corner = 0; corner < 8; ++corner)
+    {
+        corners[corner].set((corner & 1) ? size.x : -size.x,
+            (corner & 2) ? size.y : -size.y, (corner & 4) ? size.z : -size.z);
+        transform.transform_tiny(corners[corner]);
+        if (!_valid(corners[corner]))
+            return;
+    }
+    for (u32 corner = 0; corner < 8; ++corner)
+    {
+        for (u32 axis = 1; axis < 8; axis <<= 1)
+        {
+            if (!(corner & axis))
+                GEnv.DU->DrawLine(corners[corner], corners[corner | axis], color);
+        }
+    }
+}
+
+void CCharacterPhysicsSupport::DrawDebugAxes(const Fmatrix& transform, float size) const
+{
+    Fvector end;
+    end.mad(transform.c, transform.i, size);
+    GEnv.DU->DrawLine(transform.c, end, color_xrgb(255, 0, 0));
+    end.mad(transform.c, transform.j, size);
+    GEnv.DU->DrawLine(transform.c, end, color_xrgb(0, 255, 0));
+    end.mad(transform.c, transform.k, size);
+    GEnv.DU->DrawLine(transform.c, end, color_xrgb(0, 0, 255));
+}
 
 void CCharacterPhysicsSupport::in_UpdateCL()
 {
@@ -556,20 +679,12 @@ void CCharacterPhysicsSupport::in_UpdateCL()
         return;
     }
 #ifdef DEBUG
-    if (dbg_draw_character_bones)
-        dbg_draw_geoms(m_weapon_geoms);
-
-    if (dbg_draw_character_bones)
-        DBG_DrawBones(m_EntityAlife);
-
     if (dbg_draw_character_binds)
         DBG_DrawBind(m_EntityAlife);
 
     if (dbg_draw_character_physics_pones)
         DBG_PhysBones(m_EntityAlife);
 
-    if (dbg_draw_character_physics && m_pPhysicsShell)
-        m_pPhysicsShell->dbg_draw_geometry(0.2f, color_argb(100, 255, 0, 0));
 #endif
     update_animation_collision();
     m_character_shell_control.CalculateTimeDelta();
@@ -654,7 +769,8 @@ void CCharacterPhysicsSupport::CreateSkeleton(CPhysicsShell*& pShell)
     pShell->Build();
 
 #ifdef DEBUG
-    Msg("shell for %s[%d] created in %f ms", m_EntityAlife.cName().c_str(), m_EntityAlife.ID(), t.GetElapsed_sec() * 1000.f);
+    if (death_anim_debug)
+        Msg("shell for %s[%d] created in %f ms", m_EntityAlife.cName().c_str(), m_EntityAlife.ID(), t.GetElapsed_sec() * 1000.f);
 #endif
 }
 
@@ -1151,7 +1267,6 @@ void CCharacterPhysicsSupport::EndActivateFreeShell(
     Fvector v = velocity;
     m_character_shell_control.apply_start_velocity_factor(who, v);
 
-#ifdef DEBUG
     if (death_anim_debug)
     {
         Msg("death anim: ragdoll velocity picked from char controller =(%f,%f,%f), velocity applied to ragdoll "
@@ -1159,7 +1274,6 @@ void CCharacterPhysicsSupport::EndActivateFreeShell(
             " ",
             velocity.x, velocity.y, velocity.z, v.x, v.y, v.z);
     }
-#endif
 
     m_pPhysicsShell->set_LinearVel(v);
     // actualize
@@ -1192,6 +1306,7 @@ void CCharacterPhysicsSupport::EndActivateFreeShell(
 
 void CCharacterPhysicsSupport::in_ChangeVisual()
 {
+    ClearPoseBase();
     IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual());
     if (m_ik_controller)
     {

@@ -657,8 +657,6 @@ target_sources(xrGame PRIVATE
     ik_calculate_data.h
     ik_calculate_state.h
     ik_collide_data.h
-    ik_dbg_matrix.cpp
-    ik_dbg_matrix.h
     ik_foot_collider.cpp
     ik_foot_collider.h
     IKFoot.cpp
@@ -2089,24 +2087,14 @@ target_sources(xrGame PRIVATE
     CdkeyDecode/base32.h
     CdkeyDecode/cdkeydecode.c
     CdkeyDecode/cdkeydecode.h
-    ik/aint.cxx
-    ik/aint.h
-    ik/Dof7control.cpp
-    ik/Dof7control.h
-    ik/eqn.cxx
-    ik/eqn.h
-    ik/eulersolver.cxx
-    ik/eulersolver.h
+    ik/HudIKController.cpp
+    ik/HudIKController.h
+    ik/HudWeaponCollision.cpp
+    ik/HudWeaponCollision.h
+    ik/IKDebugDraw.cpp
+    ik/IKDebugDraw.h
     ik/IKLimb.cpp
     ik/IKLimb.h
-    ik/jtlimits.cxx
-    ik/jtlimits.h
-    ik/limb.cxx
-    ik/limb.h
-    ik/math3d.cpp
-    ik/math3d.h
-    ik/mathTrig.cpp
-    ik/mathTrig.h
     ui/ArtefactDetectorUI.cpp
     ui/ArtefactDetectorUI.h
     #ui/CExtraContentFilter.cpp
@@ -2501,6 +2489,7 @@ target_link_libraries(xrGame
     xrCDB
     xrPhysics
     xrNetServer
+    xrAnimation
     $<$<PLATFORM_ID:Windows>:xray_ansel>
 )
 

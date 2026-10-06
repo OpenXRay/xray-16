@@ -11,9 +11,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "animation_utils.h"
 #include "xrCore/xr_token.h"
-#ifdef DEBUG
 extern const xr_token motion_dirs[];
-#endif
 
 Fvector& global_hit_position(Fvector& gp, CEntityAlive& ea, const SHit& H)
 {
@@ -74,7 +72,6 @@ bool is_bone_head(IKinematics& K, u16 bone)
 void type_motion_diagnostic(
     LPCSTR message, type_motion::edirection dr, const CEntityAlive& ea, const SHit& H, const MotionID& m)
 {
-#ifdef DEBUG
 
     if (!death_anim_debug)
         return;
@@ -90,12 +87,11 @@ void type_motion_diagnostic(
     }
     LPCSTR motion_name = "not_set";
     if (m.valid())
-        motion_name = KA->LL_MotionDefName_dbg(m).first;
+        motion_name = KA->LL_MotionsSlot(m.slot).clips[m.idx].name.c_str();
 
     Msg("death anims: %s, dir: %s, motion: %s,  obj: %s, model: %s, bone: %s ", message, motion_dirs[dr].name,
         motion_name, ea.cName().c_str(), ea.cNameVisual().c_str(), bone_name);
 
-#endif
 }
 
 // 1.	Инерционное движение вперед от попадания в голову

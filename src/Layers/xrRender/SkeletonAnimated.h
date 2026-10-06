@@ -71,6 +71,10 @@ public:
     virtual void OnCalculateBones();
     void LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
         const BonePoseQuery& query) override;
+    void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) override;
+    bool LL_CapturePoseBase(float weight, XRay::Animation::PoseCaptureResult* result = nullptr) override;
+    bool LL_SetPoseBaseWeight(float weight) override;
+    void LL_ClearPoseBase() override;
 
 public:
 #ifdef _EDITOR
@@ -85,6 +89,7 @@ protected:
     std::shared_ptr<const XRay::Animation::OzzModelAnimations> m_animations;
     XRay::Animation::OzzPose m_pose;
     bool m_poseDirty = true;
+    bool m_includePoseBase = true;
     const CPartition* m_Partition{};
 
     IBlendDestroyCallback* m_blend_destroy_callback{};

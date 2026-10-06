@@ -1,3 +1,4 @@
+#include "StdAfx.h"
 #include "pch_script.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
@@ -45,6 +46,9 @@
 #include "Torch.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
+#include "ik/IKDebugDraw.h"
+#include "death_anims.h"
+#include "CharacterPhysicsSupport.h"
 
 #include "xrGameSpy/GameSpy_Full.h"
 
@@ -138,7 +142,6 @@ float debug_on_frame_gather_stats_frequency = 0.f;
 #ifdef DEBUG
 extern pstr dbg_stalker_death_anim;
 extern BOOL b_death_anim_velocity;
-extern BOOL death_anim_debug;
 extern BOOL dbg_imotion_draw_skeleton;
 extern BOOL dbg_imotion_draw_velocity;
 extern BOOL dbg_imotion_collide_debug;
@@ -2329,6 +2332,12 @@ void CCC_RegisterCommands()
     CMD1(CCC_PHFps, "ph_frequency");
     CMD1(CCC_PHIterations, "ph_iterations");
 
+    CMD3(CCC_Mask, "ik_dbg_solver", &ps_ik_debug, ikDebugSolver);
+    CMD3(CCC_Mask, "ik_dbg_targets", &ps_ik_debug, ikDebugTargets);
+    CMD3(CCC_Mask, "ik_dbg_chains", &ps_ik_debug, ikDebugChains);
+    CMD4(CCC_Float, "ik_dbg_distance", &ps_ik_debug_distance, 1.f, 500.f);
+    CMD4(CCC_Float, "ik_dbg_size", &ps_ik_debug_size, 0.005f, 0.5f);
+
 #ifdef DEBUG
     CMD1(CCC_PHGravity, "ph_gravity");
     CMD4(CCC_FloatBlock, "ph_timefactor", &phTimefactor, 0.000001f, 1000.f);
@@ -2372,6 +2381,9 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "g_cursor_intensity_step", &psCursorIntensityStep, 0.f, 10.f);
 
     CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
+    CMD4(CCC_Integer, "death_anim_debug", &death_anim_debug, FALSE, TRUE);
+    CMD4(CCC_Integer, "dbg_draw_character_bones", &dbg_draw_character_bones, FALSE, TRUE);
+    CMD4(CCC_Integer, "dbg_draw_character_physics", &dbg_draw_character_physics, FALSE, TRUE);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");
@@ -2418,7 +2430,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "dbg_ph_ik", &ph_dbg_draw_mask, phDbgIK);
     CMD3(CCC_Mask, "dbg_ph_ik_off", &ph_dbg_draw_mask1, phDbgIKOff);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_goal", &ph_dbg_draw_mask, phDbgDrawIKGoal);
-    CMD3(CCC_Mask, "dbg_ph_ik_limits", &ph_dbg_draw_mask, phDbgIKLimits);
     CMD3(CCC_Mask, "dbg_ph_character_control", &ph_dbg_draw_mask, phDbgCharacterControl);
     CMD3(CCC_Mask, "dbg_draw_ph_ray_motions", &ph_dbg_draw_mask, phDbgDrawRayMotions);
     CMD4(CCC_Float, "dbg_ph_vel_collid_damage_to_display", &dbg_vel_collid_damage_to_display, 0.f, 1000.f);
@@ -2427,19 +2438,14 @@ void CCC_RegisterCommands()
     CMD1(CCC_DbgPhTrackObj, "dbg_track_obj");
     CMD3(CCC_Mask, "dbg_ph_actor_restriction", &ph_dbg_draw_mask1, ph_m1_DbgActorRestriction);
     CMD3(CCC_Mask, "dbg_draw_ph_hit_anims", &ph_dbg_draw_mask1, phDbgHitAnims);
-    CMD3(CCC_Mask, "dbg_draw_ph_ik_limits", &ph_dbg_draw_mask1, phDbgDrawIKLimits);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_predict", &ph_dbg_draw_mask1, phDbgDrawIKPredict);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_collision", &ph_dbg_draw_mask1, phDbgDrawIKCollision);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_shift_object", &ph_dbg_draw_mask1, phDbgDrawIKSHiftObject);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_blending", &ph_dbg_draw_mask1, phDbgDrawIKBlending);
     CMD1(CCC_DBGDrawCashedClear, "dbg_ph_cashed_clear");
-    extern BOOL dbg_draw_character_bones;
-    extern BOOL dbg_draw_character_physics;
     extern BOOL dbg_draw_character_binds;
     extern BOOL dbg_draw_character_physics_pones;
     extern BOOL ik_cam_shift;
-    CMD4(CCC_Integer, "dbg_draw_character_bones", &dbg_draw_character_bones, FALSE, TRUE);
-    CMD4(CCC_Integer, "dbg_draw_character_physics", &dbg_draw_character_physics, FALSE, TRUE);
     CMD4(CCC_Integer, "dbg_draw_character_binds", &dbg_draw_character_binds, FALSE, TRUE);
     CMD4(CCC_Integer, "dbg_draw_character_physics_pones", &dbg_draw_character_physics_pones, FALSE, TRUE);
 
@@ -2548,7 +2554,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_Crash, "crash");
     CMD1(CCC_DumpObjects, "dump_all_objects");
     CMD3(CCC_String, "stalker_death_anim", dbg_stalker_death_anim, 32);
-    CMD4(CCC_Integer, "death_anim_debug", &death_anim_debug, FALSE, TRUE);
     CMD4(CCC_Integer, "death_anim_velocity", &b_death_anim_velocity, FALSE, TRUE);
     CMD4(CCC_Integer, "dbg_imotion_draw_velocity", &dbg_imotion_draw_velocity, FALSE, TRUE);
     CMD4(CCC_Integer, "dbg_imotion_collide_debug", &dbg_imotion_collide_debug, FALSE, TRUE);

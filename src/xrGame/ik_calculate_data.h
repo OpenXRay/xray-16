@@ -5,7 +5,6 @@
 class CIKLimb;
 struct SCalculateData
 {
-    float const* m_angles{};
     CIKLimb* m_limb{};
     Fmatrix const* m_obj{};
 
@@ -25,8 +24,3 @@ public:
     IC Fmatrix& goal(Fmatrix& g) const;
 };
 
-//#define IK_DBG_STATE_SEQUENCE
-#ifdef IK_DBG_STATE_SEQUENCE
-extern u32 sdbg_state_sequence_number;
-#include "ik_dbg_matrix.h"
-#endif

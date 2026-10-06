@@ -3,12 +3,13 @@
 #include "ik/IKLimb.h"
 #include "pose_extrapolation.h"
 #include "ik_object_shift.h"
+#include "xrEngine/pure.h"
 class IKinematicsAnimated;
 class CGameObject;
 class CBlend;
 struct SIKCrlCalcData;
 
-class CIKLimbsController
+class CIKLimbsController final : public pureFrame
 {
 private:
     static const u16 max_size = 4;
@@ -21,6 +22,7 @@ public:
 public:
     void PlayLegs(CBlend* b);
     void Update();
+    void OnFrame() override;
     float Shift() { return _object_shift.shift(); }
 private:
     void Calculate();
