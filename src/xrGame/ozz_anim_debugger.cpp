@@ -440,7 +440,8 @@ void COzzAnimDebugger::DrawHudIKPanel()
 
     ctrl->RequestSnapshot();
 
-    ImGui::TextWrapped("Capture both grips, then move or rotate the gun target to drive both hands. Independent arm targets remain available. Collision, VR input and automatic reload release are not implemented.");
+    ImGui::TextWrapped("Animation-follow IK activates automatically on equip once both arm chains (l_upperarm/l_forearm/l_hand and r_upperarm/r_forearm/r_hand, or the bip01_ equivalents) and a gun reference are valid. Use Activate to retry manually and Release to turn it off until the next equip. It keeps the animated hand motion and moves both hands by the gun displacement every frame. Independent arm targets remain available. Collision, VR input and automatic reload release are not implemented.");
+    ImGui::TextDisabled("Automatic activation: %s", ctrl->GetAutoStatus());
 
     int slot = -1;
     const HudTargetKind kind = ClassifyHudTarget(kin, slot);
@@ -528,11 +529,12 @@ void COzzAnimDebugger::DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm)
         return;
 
     const pcstr armName = arm ? "right" : "left";
-    const pcstr spaceLabels[4] = {
+    const pcstr spaceLabels[5] = {
         "Animated (offset from animated wrist)",
         "Model (hands/controller model space)",
         "Bone (offset from current target bone)",
-        "Gun (equipped weapon-relative grip)",
+        "Fixed gun-relative grip (advanced)",
+        "Animated + gun displacement",
     };
 
     CHudIKController::ArmSettings settings = ctrl.GetArm(arm);
@@ -549,7 +551,7 @@ void COzzAnimDebugger::DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm)
     changed |= DrawBonePicker("Hand (wrist) bone", skeleton, settings.bones[2]);
 
     int space = static_cast<int>(settings.space);
-    if (ImGui::Combo("Target space", &space, spaceLabels, 4))
+    if (ImGui::Combo("Target space", &space, spaceLabels, 5))
     {
         settings.space = static_cast<CHudIKController::TargetSpace>(space);
         changed = true;
@@ -571,7 +573,16 @@ void COzzAnimDebugger::DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm)
         else
             ImGui::TextColored(ImVec4(1.f, 0.75f, 0.3f, 1.f), "Gun space needs an equipped lead gun. Capture is disabled until one is available.");
     }
-    ImGui::TextDisabled("Changing the space keeps the numbers; use capture to preserve the current animated wrist.");
+    else if (settings.space == CHudIKController::TargetSpace::GunAnimated)
+    {
+        ImGui::TextDisabled("Every frame the current animated wrist and elbow are moved by the gun displacement (gun target vs raw animated gun); the offsets below are applied on top. With zero offsets and no displacement the original animation is left untouched. No target bone is needed.");
+        if (!ctrl.SupportsGunLead() || !ctrl.GetGun().enabled)
+            ImGui::TextDisabled("The gun target is off or unavailable, so this arm plays its unchanged animation.");
+    }
+    if (settings.space == CHudIKController::TargetSpace::GunAnimated)
+        ImGui::TextDisabled("Changing the space keeps the numbers; use the reset below to remove the authored wrist offset.");
+    else
+        ImGui::TextDisabled("Changing the space keeps the numbers; use capture to preserve the current animated wrist.");
     if (settings.space == CHudIKController::TargetSpace::Bone && ctrl.SupportsGunLead() && ctrl.GetGun().enabled &&
         settings.targetBone != BI_NONE && settings.targetBone == ctrl.GetGun().bone)
         ImGui::TextDisabled("Target bone is the lead gun: the offset follows the planned gun-led target, not the solved pose.");
@@ -600,17 +611,33 @@ void COzzAnimDebugger::DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm)
     else if (settings.space == CHudIKController::TargetSpace::Bone)
         spaceLabel = "Bone";
     else if (settings.space == CHudIKController::TargetSpace::Gun)
-        spaceLabel = "Gun";
+        spaceLabel = "Fixed gun grip";
+    else if (settings.space == CHudIKController::TargetSpace::GunAnimated)
+        spaceLabel = "Animated + gun displacement";
+    const bool followSpace = settings.space == CHudIKController::TargetSpace::GunAnimated;
     char captureLabel[96];
-    xr_sprintf(captureLabel, sizeof(captureLabel), "Capture animated wrist (%s space)", spaceLabel);
+    if (followSpace)
+        xr_sprintf(captureLabel, sizeof(captureLabel), "%s", "Reset wrist offset (animation-follow)");
+    else
+        xr_sprintf(captureLabel, sizeof(captureLabel), "Capture animated wrist (%s space)", spaceLabel);
     if (ImGui::Button(captureLabel))
     {
         const bool ok = ctrl.CaptureTarget(arm, settings.space, settings.targetBone);
         string256 msg;
-        pcstr failure = settings.space == CHudIKController::TargetSpace::Gun ?
-            "Capture failed for %s arm: no fresh animated wrist or equipped gun available." :
-            "Capture failed for %s arm: no fresh animated wrist or target bone available.";
-        xr_sprintf(msg, sizeof(msg), ok ? "Captured %s animated wrist into the target." : failure, armName);
+        if (followSpace)
+        {
+            xr_sprintf(msg, sizeof(msg),
+                ok ? "Reset %s arm wrist offset to zero; the animated wrist follows the gun displacement every frame without freezing a pose." :
+                     "Reset failed for %s arm: no fresh animated wrist available.",
+                armName);
+        }
+        else
+        {
+            pcstr failure = settings.space == CHudIKController::TargetSpace::Gun ?
+                "Capture failed for %s arm: no fresh animated wrist or equipped gun available." :
+                "Capture failed for %s arm: no fresh animated wrist or target bone available.";
+            xr_sprintf(msg, sizeof(msg), ok ? "Captured %s animated wrist into the target." : failure, armName);
+        }
         m_ikMessage = msg;
     }
     ImGui::EndDisabled();
@@ -641,6 +668,8 @@ void COzzAnimDebugger::CopyHudIKArmSettings(const CHudIKController& ctrl, u16 ar
         spaceName = "bone";
     else if (settings.space == CHudIKController::TargetSpace::Gun)
         spaceName = "gun";
+    else if (settings.space == CHudIKController::TargetSpace::GunAnimated)
+        spaceName = "gun_animated";
 
     const auto& vec = m_selectedIsHud ? m_hudTargets : m_worldTargets;
     pcstr skeletonLabel = "";
@@ -671,6 +700,10 @@ void COzzAnimDebugger::CopyHudIKArmSettings(const CHudIKController& ctrl, u16 ar
         {
             xr_sprintf(line, sizeof(line), "target_reference=gun bone %s\n", boneName(ctrl.GetGun().bone));
         }
+    }
+    else if (settings.space == CHudIKController::TargetSpace::GunAnimated)
+    {
+        xr_sprintf(line, sizeof(line), "target_reference=%s\n", "current animated wrist moved by gun displacement every frame");
     }
     else
     {
@@ -813,7 +846,7 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
     }
     else
     {
-        ImGui::TextWrapped("Select the whole weapon branch root, not a hand, an arm bone or a common root shared with the arms. The gun may be a descendant of a hand but must not be an ancestor of, or the same bone as, any bone in either arm chain. Capture records both wrist grips relative to the gun bone; the gun target then drives both hands.");
+        ImGui::TextWrapped("Select the whole weapon branch root, not a hand, an arm bone or a common root shared with the arms. The gun may be a descendant of a hand but must not be an ancestor of, or the same bone as, any bone in either arm chain. Activation keeps both animated wrists and moves both hands by the gun target displacement.");
 
         if (supported && !ctrl.HasGunBoneHint())
             ImGui::TextColored(warnColor, "This weapon skeleton has no fire-point bone hint, so automatic gun bone suggestion is unavailable. You can still pick the weapon branch root manually.");
@@ -840,7 +873,7 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
                 settings.bone = suggested;
                 ctrl.SetGun(settings);
                 string256 msg;
-                xr_sprintf(msg, sizeof(msg), "Suggested gun bone: %s. Verify it is the whole weapon branch before capturing.",
+                xr_sprintf(msg, sizeof(msg), "Suggested gun bone: %s. Verify it is the whole weapon branch before activating.",
                     HudIKBoneName(skeleton, suggested));
                 m_ikGunMessage = msg;
             }
@@ -853,7 +886,7 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
         if (supported && !boneValid && canCapture)
             ImGui::Text("Automatic weapon branch: %s", HudIKBoneName(skeleton, automaticBone));
         else if (supported && !boneValid)
-            ImGui::TextColored(warnColor, "Pick a gun bone to enable capture.");
+            ImGui::TextColored(warnColor, "Pick a gun bone to enable activation and capture.");
         else if (supported && GunBoneConflictsWithArms(ctrl, settings.bone))
             ImGui::TextColored(warnColor, "This gun bone is an ancestor of, or equal to, a bone in an arm chain. Pick the weapon branch itself.");
     }
@@ -868,23 +901,28 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
         ImGui::TextColored(warnColor, "An arm chain is not fully mapped. Assign upper arm, forearm and hand bones for both arms in Arm authoring.");
 
     ImGui::BeginDisabled(!canCapture);
-    if (ImGui::Button("Capture grips + activate both hands") && supported)
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.5f, 0.2f, 1.f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.62f, 0.28f, 1.f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.12f, 0.42f, 0.17f, 1.f));
+    const bool activatePressed = ImGui::Button("Activate animation-follow IK");
+    ImGui::PopStyleColor(3);
+    if (activatePressed && supported)
     {
-        const bool ok = ctrl.CaptureTwoHand();
+        const bool ok = ctrl.ActivateTwoHand();
         settings = ctrl.GetGun();
         if (ok)
         {
-            string256 msg;
+            string1024 msg;
             if (externalLayout)
             {
                 xr_sprintf(msg, sizeof(msg),
-                    "Captured both wrist grips relative to the equipped weapon origin (slot %d: %s). Both arms enabled at weight 1 in Gun space and the gun target enabled with a zero Animated offset.",
+                    "Animation-follow IK active for the equipped weapon origin (slot %d: %s). Both arms are enabled at weight 1 in 'Animated + gun displacement' space with zero offsets and the gun target is enabled. Every frame both animated wrists and elbows move by the gun displacement, so the animated hand motion is preserved; nothing is captured or frozen.",
                     weaponSlot, weaponSection ? weaponSection : "<none>");
             }
             else
             {
                 xr_sprintf(msg, sizeof(msg),
-                    "Captured both wrist grips relative to %s. Both arms enabled at weight 1 in Gun space and the gun target enabled with a zero Animated offset.",
+                    "Animation-follow IK active for gun bone %s. Both arms are enabled at weight 1 in 'Animated + gun displacement' space with zero offsets and the gun target is enabled. Every frame both animated wrists and elbows move by the gun displacement, so the animated hand motion is preserved; nothing is captured or frozen.",
                     HudIKBoneName(skeleton, settings.bone));
             }
             m_ikGunMessage = msg;
@@ -892,9 +930,9 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
         else
         {
             if (externalLayout)
-                m_ikGunMessage = "Two-hand capture failed and no settings were changed. Map both arm chains (upper arm, forearm, hand), keep a weapon equipped in slot 0 and wait for a fresh animated pose.";
+                m_ikGunMessage = "Animation-follow activation failed and no settings were changed. Map both arm chains (upper arm, forearm, hand), keep a weapon equipped in slot 0 and wait for a fresh animated pose.";
             else
-                m_ikGunMessage = "Two-hand capture failed and no settings were changed. Map both arm chains (upper arm, forearm, hand), wait for a fresh animated pose, and check that the gun bone is the whole weapon branch and not an ancestor of or equal to either arm chain.";
+                m_ikGunMessage = "Animation-follow activation failed and no settings were changed. Map both arm chains (upper arm, forearm, hand), wait for a fresh animated pose, and check that the gun bone is the whole weapon branch and not an ancestor of or equal to either arm chain.";
             m_ikGunMessage += " Reason: ";
             m_ikGunMessage += ctrl.GetGunCaptureStatus();
         }
@@ -916,7 +954,7 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
     changed |= ImGui::Checkbox("Gun target override only", &settings.enabled);
     ImGui::EndDisabled();
     ImGui::SameLine();
-    ImGui::TextDisabled("(does not enable the hands; use capture / release above)");
+    ImGui::TextDisabled("(does not enable the hands; use Activate / release above)");
 
     const pcstr externalSpaceLabels[2] = {
         "Animated (offset from raw animated weapon origin)",
@@ -983,11 +1021,14 @@ void COzzAnimDebugger::DrawHudIKGunDiagnostics(const CHudIKController& ctrl)
     const u32 age = Device.dwFrame >= state.frame ? Device.dwFrame - state.frame : 0;
 
     ImVec4 color(0.6f, 0.6f, 0.6f, 1.f);
+    const bool gunPassthrough = state.status && strcmp(state.status, "animation_passthrough") == 0;
     if (gun.enabled)
-        color = state.applied ? ImVec4(0.4f, 1.f, 0.4f, 1.f) : ImVec4(1.f, 0.7f, 0.3f, 1.f);
+        color = (state.applied || gunPassthrough) ? ImVec4(0.4f, 1.f, 0.4f, 1.f) : ImVec4(1.f, 0.7f, 0.3f, 1.f);
     ImGui::TextColored(color, "Gun status: %s", state.status ? state.status : "?");
     ImGui::SameLine();
     ImGui::Text("valid %s / applied %s", state.valid ? "yes" : "no", state.applied ? "yes" : "no");
+    if (gunPassthrough)
+        ImGui::TextColored(ImVec4(0.4f, 1.f, 0.4f, 1.f), "No gun displacement; native animation preserved.");
     if (gun.enabled && age > 2)
         ImGui::TextColored(ImVec4(1.f, 0.7f, 0.3f, 1.f), "Gun frame %u (stale, age %u)", state.frame, age);
     else
@@ -1045,7 +1086,10 @@ void COzzAnimDebugger::DrawHudIKDiagnostics(const CHudIKController& ctrl)
         ImGui::TableSetColumnIndex(a + 1);
         ImVec4 color(0.6f, 0.6f, 0.6f, 1.f);
         if (ctrl.GetArm(a).enabled)
-            color = s.solved ? ImVec4(0.4f, 1.f, 0.4f, 1.f) : ImVec4(1.f, 0.7f, 0.3f, 1.f);
+        {
+            const bool passthrough = s.status && strcmp(s.status, "animation_passthrough") == 0;
+            color = (s.solved || passthrough) ? ImVec4(0.4f, 1.f, 0.4f, 1.f) : ImVec4(1.f, 0.7f, 0.3f, 1.f);
+        }
         ImGui::TextColored(color, "%s", s.status ? s.status : "?");
     }
 
@@ -1109,6 +1153,13 @@ void COzzAnimDebugger::DrawHudIKDiagnostics(const CHudIKController& ctrl)
     }
 
     ImGui::EndTable();
+
+    for (u16 a = 0; a < 2; ++a)
+    {
+        const CHudIKController::ArmState& s = ctrl.GetState(a);
+        if (ctrl.GetArm(a).enabled && s.status && strcmp(s.status, "animation_passthrough") == 0)
+            ImGui::TextColored(ImVec4(0.4f, 1.f, 0.4f, 1.f), "%s arm: no procedural displacement; native animation preserved (IK intentionally skipped, solved stays no).", a ? "Right" : "Left");
+    }
 }
 
 void COzzAnimDebugger::DrawHudIKPlot(const CHudIKController& ctrl)
@@ -1418,6 +1469,6 @@ void COzzAnimDebugger::DrawHudIKPlot(const CHudIKController& ctrl)
     ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.f, 1.f), "Solver output: thick solid chain, filled joints (left cyan, right orange)");
     ImGui::TextColored(ImVec4(0.6f, 0.7f, 0.8f, 1.f), "Animated input: thin faded chain, hollow joints");
     ImGui::TextColored(ImVec4(1.f, 0.92f, 0.4f, 1.f), "Desired inputs: diamond with RGB axes = wrist target, yellow square = elbow hint, red line = endpoint error");
-    ImGui::TextColored(ImVec4(0.9f, 0.4f, 1.f, 1.f), "Gun point: magenta crosshair circle = G target (weapon point the grips follow), faded circle = G anim (raw animated gun or equipped weapon origin)");
+    ImGui::TextColored(ImVec4(0.9f, 0.4f, 1.f, 1.f), "Gun point: magenta crosshair circle = G target (planned gun pose), faded circle = G anim (raw animated gun or equipped weapon origin); in animation-follow space each animated wrist and elbow moves by the G anim to G target displacement");
     ImGui::TextDisabled("Orthographic model-space diagnostic of the selected skeleton, not a viewport gizmo or world projection. Drag pans, wheel zooms, double-click fits. Resolved output only draws for enabled arms.");
 }
