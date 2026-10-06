@@ -4,7 +4,6 @@
 static const float RTGI_RECON_FACTOR_FLOOR = 0.001;
 static const float RTGI_RECON_DIELECTRIC_F0 = 0.04;
 static const float RTGI_RECON_STORAGE_LIMIT = 32768.0;
-static const float RTGI_RECON_HUD_DEPTH = 0.9;
 static const float RTGI_RECON_FAST_ALPHA = 0.25;
 static const float RTGI_RECON_CHANGE_SIGMA = 2.0;
 static const float RTGI_RECON_CHANGE_EPSILON = 0.02;
@@ -49,6 +48,21 @@ float3 RTGIReconSanitize(float3 value)
     if (!all(isfinite(value)))
         return 0.0;
     return clamp(value, 0.0, RTGI_RECON_STORAGE_LIMIT);
+}
+
+float RTGIReconPackHistoryLength(float length, bool hud)
+{
+    return hud ? -length : length;
+}
+
+float RTGIReconHistoryLength(float packedLength)
+{
+    return abs(packedLength);
+}
+
+bool RTGIReconHistoryHud(float packedLength)
+{
+    return packedLength < 0.0;
 }
 
 float RTGIReconDepthGuide(float4 surfaceData, bool valid)

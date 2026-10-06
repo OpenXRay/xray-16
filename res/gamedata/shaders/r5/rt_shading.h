@@ -341,8 +341,8 @@ RTSceneTrace RTTraceRay(RTSceneParams scene, float3 origin, float3 direction, fl
     return trace;
 }
 
-float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
-    float coneWidth, float coneSpread, out bool exhausted)
+float3 RTTraceVisibilityMasked(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
+    uint rayMask, float coneWidth, float coneSpread, out bool exhausted)
 {
     exhausted = false;
     if (!(maxDistance > 0.001))
@@ -354,7 +354,7 @@ float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, f
     ray.TMin = 0.001;
     ray.TMax = maxDistance;
     RayQuery<RAY_FLAG_SKIP_PROCEDURAL_PRIMITIVES | RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH> q;
-    q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, RT_RAY_MASK_WORLD, ray);
+    q.TraceRayInline(g_SceneTLAS, RAY_FLAG_NONE, rayMask, ray);
     float3 transmittance = 1.0;
     uint candidates = 0u;
     uint nullEvents = 0u;
@@ -404,6 +404,13 @@ float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, f
     if (q.CommittedStatus() == COMMITTED_TRIANGLE_HIT)
         return 0.0;
     return transmittance;
+}
+
+float3 RTTraceVisibility(RTSceneParams scene, float3 origin, float3 direction, float maxDistance,
+    float coneWidth, float coneSpread, out bool exhausted)
+{
+    return RTTraceVisibilityMasked(scene, origin, direction, maxDistance, RT_RAY_MASK_WORLD, coneWidth,
+        coneSpread, exhausted);
 }
 
 #endif

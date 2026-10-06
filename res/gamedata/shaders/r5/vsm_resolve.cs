@@ -20,6 +20,7 @@ cbuffer VsmResolveParams
 };
 
 Texture2D<float> g_Depth;
+Texture2D<float4> g_Material;
 Texture2D<float> g_Atlas;
 StructuredBuffer<uint> g_PageTable;
 Texture2D<float4> g_History;
@@ -80,11 +81,11 @@ bool reconWorldAt(int2 p, bool hud, out float3 wp)
     wp = float3(0.0, 0.0, 0.0);
     p = clamp(p, int2(0, 0), int2(g_Screen.xy) - int2(1, 1));
     float zndc = g_Depth.Load(int3(p, 0));
-    if (zndc <= 0.0 || (zndc >= 0.9) != hud)
+    if (zndc <= 0.0 || GBufferIsHud(g_Material.Load(int3(p, 0))) != hud)
         return false;
     float2 uv = (float2(p) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    wp = vsmReconstructPos(g_InvViewProj, clip);
+    wp = vsmReconstructPos(g_InvViewProj, clip, hud);
     return true;
 }
 
@@ -448,8 +449,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     float2 uv = (float2(px) + 0.5) * g_Screen.zw;
     float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-    float3 wp = vsmReconstructPos(g_InvViewProj, clip);
-    bool hud = zndc >= 0.9;
+    bool hud = GBufferIsHud(g_Material.Load(int3(px, 0)));
+    float3 wp = vsmReconstructPos(g_InvViewProj, clip, hud);
 
     float tanT = 0.0;
     float3 nrm = float3(0.0, 0.0, 0.0);

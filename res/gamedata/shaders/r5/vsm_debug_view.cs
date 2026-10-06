@@ -12,6 +12,7 @@ cbuffer VsmDebugParams
 };
 
 Texture2D<float> g_Depth;
+Texture2D<float4> g_Material;
 StructuredBuffer<uint> g_Needed;
 StructuredBuffer<uint> g_PageTable;
 StructuredBuffer<uint> g_SlotDirty;
@@ -55,7 +56,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     {
         float2 uv = (float2(px) + 0.5) * g_Screen.zw;
         float4 clip = float4(uv.x * 2.0 - 1.0, 1.0 - 2.0 * uv.y, zndc, 1.0);
-        float3 wp = vsmReconstructPos(g_InvViewProj, clip);
+        float3 wp = vsmReconstructPos(g_InvViewProj, clip, GBufferIsHud(g_Material.Load(int3(px, 0))));
         float3 lp = mul(vsm_view, float4(wp, 1.0)).xyz;
 
         float2 luv;

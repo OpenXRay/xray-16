@@ -121,12 +121,10 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 
     VS_OUTPUT output;
     output.hpos = mul(m_VP, shownPos);
-    if (hud)
-        output.hpos.z = 0.9 * output.hpos.w + 0.1 * output.hpos.z;
     output.texcoord = uv;
     output.color = float4((particle.color >> 16u) & 255u, (particle.color >> 8u) & 255u,
         particle.color & 255u, (particle.color >> 24u) & 255u) / 255.0;
-    output.worldPos = position;
+    output.worldPos = shownPos.xyz;
     output.normal = normalize(eye_position - position);
     output.materialID = program.materialID;
     output.drawBucket = drawBucket;

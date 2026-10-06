@@ -440,46 +440,19 @@ void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 extern ENGINE_API float psHUD_FOV;
 void CHudItem::TransformPosFromWorldToHud(Fvector& worldPos)
 {
-    CActor* actor = smart_cast<CActor*>(object().H_Parent());
-
-    Fmatrix mView;
-    mView.set(Device.mView);
-    if (GetHUDmode() && actor)
-    {
-        Fmatrix trans;
-        actor->Cameras().hud_camera_Matrix(trans);
-        mView.build_camera_dir(trans.c, trans.k, trans.j);
-    }
-
-    const float fov_scale =
-        tanf(deg2rad(Device.fFOV) * 0.5f) / tanf(deg2rad(psHUD_FOV * Device.fFOV) * 0.5f);
-
+    Fmatrix mView = Device.mView;
     mView.transform_tiny(worldPos);
-    worldPos.x *= fov_scale;
-    worldPos.y *= fov_scale;
-    worldPos.z += VIEWPORT_NEAR - HUD_VIEWPORT_NEAR;
+    worldPos.x /= psHUD_FOV;
+    worldPos.y /= psHUD_FOV;
     Fmatrix().set(mView).invert().transform_tiny(worldPos);
 }
 
 void CHudItem::TransformDirFromWorldToHud(Fvector& worldDir)
 {
-    CActor* actor = smart_cast<CActor*>(object().H_Parent());
-
-    Fmatrix mView;
-    mView.set(Device.mView);
-    if (GetHUDmode() && actor)
-    {
-        Fmatrix trans;
-        actor->Cameras().hud_camera_Matrix(trans);
-        mView.build_camera_dir(trans.c, trans.k, trans.j);
-    }
-
-    const float fov_scale =
-        tanf(deg2rad(Device.fFOV) * 0.5f) / tanf(deg2rad(psHUD_FOV * Device.fFOV) * 0.5f);
-
+    Fmatrix mView = Device.mView;
     mView.transform_dir(worldDir);
-    worldDir.x *= fov_scale;
-    worldDir.y *= fov_scale;
+    worldDir.x /= psHUD_FOV;
+    worldDir.y /= psHUD_FOV;
     Fmatrix().set(mView).invert().transform_dir(worldDir);
 }
 

@@ -36,8 +36,7 @@ PS_OUTPUT main(PS_INPUT input)
 
 #ifndef GPU_PARTICLE_SET
     float sceneDepth = g_SceneDepth.Load(int3((int2)input.hpos.xy, 0));
-    bool hud = input.drawBucket >= 6u;
-    if (input.drawBucket % 6u != 0u && sceneDepth > 0.0 && (!hud || sceneDepth >= 0.9)) {
+    if (input.drawBucket % 6u != 0u && sceneDepth > 0.0) {
         float3 sceneWP = reconstruct_world_pos(input.hpos.xy, sceneDepth);
         float3 viewDir = camera_direction.xyz;
         float sceneViewZ = dot(sceneWP - eye_position, viewDir);

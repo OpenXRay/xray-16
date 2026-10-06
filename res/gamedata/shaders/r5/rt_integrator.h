@@ -92,6 +92,7 @@ struct RTIntegratorState
     bool firstRayTraced;
     bool firstSurfaceRecorded;
     bool pendingFirstSegment;
+    bool hudSurface;
 };
 
 RTIntegratorState RTIntegratorBegin(RTSceneParams scene, RTIntegratorSettings settings)
@@ -118,6 +119,7 @@ RTIntegratorState RTIntegratorBegin(RTSceneParams scene, RTIntegratorSettings se
     s.firstRayTraced = false;
     s.firstSurfaceRecorded = false;
     s.pendingFirstSegment = settings.trackSegmentMetrics;
+    s.hudSurface = false;
     return s;
 }
 
@@ -175,6 +177,7 @@ struct RTIntegratorLightingContext
     float3 geoNormal;
     float coneWidth;
     float coneSpread;
+    bool hud;
 };
 
 void RTIntegratorLightingResolve(RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
@@ -187,6 +190,7 @@ void RTIntegratorLightingResolve(RTIntegratorState s, RTHitSurface hit, RTHitGeo
     lighting.geoNormal = geometry.geoNormal;
     lighting.coneWidth = s.coneWidth;
     lighting.coneSpread = s.coneSpread;
+    lighting.hud = s.hudSurface;
 }
 
 bool RTIntegratorLightingBegin(inout RTIntegratorState s, RTHitSurface hit, RTHitGeometry geometry,
@@ -231,7 +235,7 @@ bool RTIntegratorLightingStage(inout RTIntegratorState s, RTSceneParams scene, R
 
     RTDirectTerms direct = RTDirectLightingTerms(scene, lighting.surface, lighting.position,
         lighting.geoNormal, lighting.V, lighting.coneWidth, lighting.coneSpread, true, rng,
-        s.bounces == 0u && s.settings.pixelPrimary);
+        s.bounces == 0u && s.settings.pixelPrimary, lighting.hud);
     RTIntegratorLightingApply(s, direct);
     return true;
 }
@@ -414,6 +418,7 @@ uint RTIntegratorTraceStage(inout RTIntegratorState s, RTSceneParams scene, inou
     trace = RTTraceRay(scene, s.origin, s.direction, s.remainingReach, false, rng,
         s.coneWidth, s.coneSpread, s.previousPosition, s.previousPdf, s.previousDelta, rayMask);
     s.result.invalid = s.result.invalid || trace.exhausted;
+    s.hudSurface = trace.hit && rayMask == RT_RAY_MASK_HUD;
     bool skipSources = s.settings.indirectOnly && s.bounces == 0u;
     if (!skipSources)
         RTIntegratorAddSource(s, trace.emissive);
@@ -512,9 +517,11 @@ RTIntegratorResult RTIntegratorRunCamera(RTSceneParams scene, RTIntegratorSettin
 }
 
 RTIntegratorResult RTIntegratorRunPrimary(RTSceneParams scene, RTIntegratorSettings settings,
-    MaterialSurface primary, float3 position, float3 normal, float3 V, inout uint rng)
+    MaterialSurface primary, float3 position, float3 normal, float3 V, inout uint rng,
+    bool hudReceiver = false)
 {
     RTIntegratorState s = RTIntegratorBegin(scene, settings);
+    s.hudSurface = hudReceiver;
     s.origin = position;
     s.direction = -V;
     s.previousPosition = position;

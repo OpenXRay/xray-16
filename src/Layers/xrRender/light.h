@@ -34,6 +34,7 @@ public:
     float area_length;
     float area_radius;
     bool area_shadow_sample;
+    bool hud_spotlight;
     mutable u32 area_shadow_slots[kCapsuleLightSamples];
     mutable light* area_shadow_samples[kCapsuleLightSamples];
     float cone;
@@ -149,6 +150,7 @@ public:
     void set_hud_mode(bool b) override { flags.bHudMode = b; }
     [[nodiscard]]
     bool get_hud_mode() override { return flags.bHudMode; }
+    void set_hud_spotlight(bool b) override { hud_spotlight = b; }
 
     void spatial_move() override;
     Fvector spatial_sector_point() override;

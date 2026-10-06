@@ -154,6 +154,7 @@ struct VsmHudParams {
 
 struct VSMResolveData {
     VirtualResourceHandle depth;
+    VirtualResourceHandle material;
     VirtualResourceHandle atlas;
     VirtualResourceHandle mask;
     VirtualResourceHandle dynAtlas;
@@ -179,6 +180,7 @@ struct VsmDebugParams {
 
 struct VSMMarkData {
     VirtualResourceHandle depth;
+    VirtualResourceHandle material;
     VirtualResourceHandle order;
     VirtualResourceHandle needed;
     VirtualResourceHandle geometryDirty;
@@ -230,6 +232,7 @@ struct VSMAtlasData {
 
 struct VSMDebugData {
     VirtualResourceHandle depth;
+    VirtualResourceHandle material;
     VirtualResourceHandle dirtyList;
     VirtualResourceHandle mask;
     VirtualResourceHandle output;
@@ -997,7 +1000,8 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
-    if (!cmdList || !nvDevice || !depth)
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(data.material);
+    if (!cmdList || !nvDevice || !depth || !material)
         return;
     if (!EnsurePipelines(data.device, state))
         return;
@@ -1074,6 +1078,7 @@ void ExecuteMark(fg::RenderContext* ctx, const FrameGraph& fg, const VSMMarkData
        .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmMarkParams", markCB)
        .Texture("g_Depth", depth)
+       .Texture("g_Material", material)
        .BufferUAV("g_Needed", state.needed);
     auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.markLayout, nvDevice);
     if (!bindingSet)
@@ -2130,9 +2135,10 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(data.material);
     nvrhi::ITexture* atlas = fg.GetPhysicalTexture(data.atlas);
     nvrhi::ITexture* mask = fg.GetPhysicalTexture(data.mask);
-    if (!cmdList || !nvDevice || !depth || !atlas || !mask || !state.resolvePipeline)
+    if (!cmdList || !nvDevice || !depth || !material || !atlas || !mask || !state.resolvePipeline)
         return;
     nvrhi::ITexture* atlasDyn = data.dynAtlas.is_valid() ? fg.GetPhysicalTexture(data.dynAtlas) : nullptr;
     if (!atlasDyn)
@@ -2184,6 +2190,7 @@ void ExecuteResolve(fg::RenderContext* ctx, const FrameGraph& fg, const VSMResol
        .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmResolveParams", resolveCB)
        .Texture("g_Depth", depth)
+       .Texture("g_Material", material)
        .Texture("g_Atlas", atlas)
        .BufferSRV("g_PageTable", fg.GetPhysicalBuffer(data.cache.pageTable))
        .Texture("g_History", state.mask[prev])
@@ -2217,9 +2224,10 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(data.depth);
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(data.material);
     nvrhi::ITexture* output = fg.GetPhysicalTexture(data.output);
     nvrhi::ITexture* mask = data.mask.is_valid() ? fg.GetPhysicalTexture(data.mask) : nullptr;
-    if (!cmdList || !nvDevice || !depth || !output || !state.debugPipeline)
+    if (!cmdList || !nvDevice || !depth || !material || !output || !state.debugPipeline)
         return;
     if (!mask)
         mask = GetPassResourceCache().GetDummyShadowMap2D(nvDevice);
@@ -2246,6 +2254,7 @@ void ExecuteDebugView(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDeb
        .ConstantBuffer("VsmParams", vsmCB)
        .ConstantBuffer("VsmDebugParams", debugCB)
        .Texture("g_Depth", depth)
+       .Texture("g_Material", material)
        .BufferSRV("g_Needed", state.needed)
        .BufferSRV("g_PageTable", fg.GetPhysicalBuffer(data.cache.pageTable))
        .BufferSRV("g_SlotDirty", fg.GetPhysicalBuffer(data.cache.slotDirty))
@@ -2428,6 +2437,7 @@ VSMOutput setupVSMPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
+    framegraph::VirtualResourceHandle material,
     framegraph::VirtualResourceHandle orderAfter,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
     const VSMDrawConfig& config,
@@ -2461,7 +2471,7 @@ VSMOutput setupVSMPasses(
             InvalidateVSMCache(*state);
         }
     }
-    if (!state || !device || !depth.is_valid() || width == 0 || height == 0)
+    if (!state || !device || !depth.is_valid() || !material.is_valid() || width == 0 || height == 0)
         return out;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
@@ -2581,8 +2591,8 @@ VSMOutput setupVSMPasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
+            data.material = passBuilder.read(material, ResourceState::ShaderResource);
             if (orderAfter.is_valid())
                 data.order = passBuilder.read(orderAfter, ResourceState::ShaderResource);
             data.needed = passBuilder.write(neededHandle, ResourceState::UnorderedAccess);
@@ -2831,6 +2841,7 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle depth,
+    framegraph::VirtualResourceHandle material,
     u32 width,
     u32 height,
     VSMState* state,
@@ -2839,7 +2850,7 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
 {
     if (outDebugView)
         *outDebugView = VirtualResourceHandle{};
-    if (!state || !device || !state->active || !depth.is_valid() || !state->fgAtlas.is_valid())
+    if (!state || !device || !state->active || !depth.is_valid() || !material.is_valid() || !state->fgAtlas.is_valid())
         return VirtualResourceHandle{};
 
     state->maskSlot = (state->maskSlot + 1) % 2;
@@ -2872,8 +2883,8 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             data.height = height;
             data.gpuProfiler = gpuProfiler;
             RenderPassBuilder passBuilder(builder, passHandle);
-            passBuilder.asyncCompute();
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
+            data.material = passBuilder.read(material, ResourceState::ShaderResource);
             data.atlas = passBuilder.read(state->fgAtlas, ResourceState::ShaderResource);
             data.cache = state->fgCache;
             passBuilder.read(data.cache.pageTable, ResourceState::ShaderResource);
@@ -2920,6 +2931,7 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
                 data.height = height;
                 RenderPassBuilder passBuilder(builder, passHandle);
                 data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
+                data.material = passBuilder.read(material, ResourceState::ShaderResource);
                 data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
                 data.cache = state->fgCache;
                 passBuilder.read(state->fgNeeded, ResourceState::ShaderResource);

@@ -128,7 +128,8 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
         return;
     }
 
-    float3 position = reconstruct_world_pos(float2(pixel) + 0.5, depth);
+    bool hud = GBufferIsHud(material);
+    float3 position = reconstruct_world_pos(float2(pixel) + 0.5, depth, hud);
     float3 shadingNormal = normalize(normal.xyz);
     float3 geometricNormal = GBufferGeometricNormal(material, shadingNormal);
     snapshot.surface = float4(position, depth);
@@ -146,7 +147,7 @@ void main(uint3 dispatchID : SV_DispatchThreadID)
     float3 reflection = normalize(lerp(reflect(-view, shadingNormal), shadingNormal, roughness * roughness));
     float3 gridPosition = (biased - sky_probe_origin.xyz) / sky_probe_origin.w;
     bool gridClamped = any(gridPosition < 0.0) || any(gridPosition > sky_probe_dims.xyz - 1.0);
-    snapshot.metadata.w = depth >= 0.9 ? 2u : 4u;
+    snapshot.metadata.w = hud ? 2u : 4u;
     snapshot.shadingNormal = float4(shadingNormal, roughness);
     snapshot.geometricNormal = float4(geometricNormal, dot(geometricNormal, view));
     snapshot.view = float4(view, length(eye_position - position));

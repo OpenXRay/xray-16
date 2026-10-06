@@ -41,7 +41,8 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
     float4 m = g_GBufferMaterial[p];
     float4 c = g_SceneColor[p];
     float2 pixel = float2(p) + 0.5;
-    float3 worldPos = reconstruct_world_pos(pixel, depth);
+    bool hudReceiver = GBufferIsHud(m);
+    float3 worldPos = reconstruct_world_pos(pixel, depth, hudReceiver);
 #if TILE_SUN_MIXED
     float sunVis = -1.0;
 #else
@@ -50,10 +51,10 @@ void main(uint3 gid : SV_GroupID, uint3 gtid : SV_GroupThreadID)
     float3 shadingN = normalize(n.xyz);
     float3 geometricN = GBufferGeometricNormal(m, shadingN);
     float3 lit = c.rgb + shade_pbr(bc.rgb, shadingN, worldPos, bc.a, abs(n.w), c.a, float4(pixel, depth, 1.0), sunVis,
-        GBufferShadingClass(m), m.y, true, 0.0, geometricN, GBufferSkyVisibility(m));
+        GBufferShadingClass(m), m.y, true, 0.0, geometricN, GBufferSkyVisibility(m), hudReceiver);
 #if TILE_SUN_MIXED
     if (dev_param_3.y > 0.5)
-        lit = SunShadowDebugColor(lit, worldPos);
+        lit = SunShadowDebugColor(lit, worldPos, hudReceiver);
 #endif
     g_SceneColor[p] = float4(lit, 1.0);
 }
