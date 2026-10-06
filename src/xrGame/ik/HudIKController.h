@@ -11,7 +11,8 @@ public:
     {
         Animated,
         Model,
-        Bone
+        Bone,
+        Gun
     };
 
     class ArmSettings
@@ -41,6 +42,29 @@ public:
         u32 frame = 0;
     };
 
+    class GunSettings
+    {
+    public:
+        bool enabled = false;
+        u16 bone = BI_NONE;
+        TargetSpace space = TargetSpace::Animated;
+        Fvector position{};
+        Fvector rotation{};
+    };
+
+    class GunState
+    {
+    public:
+        bool valid = false;
+        bool applied = false;
+        pcstr status = "inactive";
+        Fmatrix animated{};
+        Fmatrix target{};
+        Fmatrix resolved{};
+        Fmatrix delta{};
+        u32 frame = 0;
+    };
+
     CHudIKController();
     ~CHudIKController();
     CHudIKController(const CHudIKController&) = delete;
@@ -56,6 +80,24 @@ public:
     void ResetArm(u16 arm);
     void ResetAll();
     bool CaptureTarget(u16 arm, TargetSpace space, u16 targetBone = BI_NONE);
+
+    const GunSettings& GetGun() const;
+    void SetGun(const GunSettings& settings);
+    const GunState& GetGunState() const;
+    pcstr GetGunCaptureStatus() const;
+    bool SupportsGunLead() const;
+    bool HasGunBoneHint() const;
+    void SetGunLeadCapable(bool capable);
+    u16 SuggestGunBone() const;
+    void SetGunBones(u16 fireBone, u16 lightBone);
+    bool HasExternalGun() const;
+    void SetExternalGun(u16 anchorBone, const Fmatrix& attachOffset);
+    void ClearExternalGun();
+    bool GetExternalGunTransform(Fmatrix& pose) const;
+    bool CaptureTwoHand();
+    void ReleaseTwoHand();
+    bool CaptureGunTarget(TargetSpace space);
+    void TransformGunDirection(Fvector& direction) const;
     void RequestSnapshot();
 
 private:
@@ -88,6 +130,18 @@ private:
         Fmatrix resolved[3]{};
     };
 
+    class GunPlan
+    {
+    public:
+        bool valid = false;
+        bool active = false;
+        bool external = false;
+        u16 bone = BI_NONE;
+        Fmatrix raw{};
+        Fmatrix target{};
+        Fmatrix delta{};
+    };
+
     class SavedCallback
     {
     public:
@@ -112,11 +166,20 @@ private:
     bool CapturePose();
     void ApplyDefaults(u16 arm);
     void ClearState(u16 arm, pcstr status);
-    void EvaluateArm(u16 arm, bool enabled, Pending& pending);
+    void EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pending& pending);
+    void EvaluateGun(bool enabled, bool referenced, GunPlan& plan);
+    bool BuildGunPlan(u16 bone, bool active, GunPlan& plan, pcstr& status) const;
+    bool ComputeExternalRaw(Fmatrix& raw, pcstr& status) const;
+    void ResetExternal();
+    bool ValidateGun(u16 bone, pcstr& status) const;
+    u16 ResolveGunBone() const;
+    bool IsArmBone(u16 bone) const;
+    void ClearGunState(pcstr status);
     bool Calibrate(u16 arm, pcstr& status);
     bool ArmsOverlap(u16 a, u16 b) const;
     bool IsAncestorOrSelf(u16 bone, u16 ancestor) const;
     void ApplyArm(u16 arm, const Pending& pending);
+    void ApplyGun(const GunPlan& plan);
     bool IsPoseFresh() const;
 
     static xr_vector<CallbackLink*> s_links;
@@ -125,6 +188,17 @@ private:
     CallbackLink* m_link = nullptr;
     ArmSettings m_settings[2];
     ArmState m_state[2];
+    GunSettings m_gun;
+    GunState m_gunState;
+    pcstr m_gunCaptureStatus = "inactive";
+    u16 m_fireBone = BI_NONE;
+    u16 m_lightBone = BI_NONE;
+    bool m_gunLeadCapable = false;
+    bool m_externalGun = false;
+    u16 m_externalAnchor = BI_NONE;
+    Fmatrix m_externalOffset{};
+    bool m_externalPublished = false;
+    Fmatrix m_externalPose{};
     Calibration m_calibration[2];
     xr_vector<Fmatrix> m_pose;
     bool m_poseValid = false;

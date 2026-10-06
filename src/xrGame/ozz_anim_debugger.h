@@ -28,10 +28,31 @@ private:
     IKinematicsAnimated* SelectedKin() const;
 
     void DrawHudIKPanel();
+    enum class HudTargetKind : u32
+    {
+        Unknown,
+        Hands,
+        MonolithicItem,
+        SeparateItem
+    };
+
+    static HudTargetKind ClassifyHudTarget(IKinematicsAnimated* kin, int& slot);
+    bool SelectHudTarget(IKinematicsAnimated* kin);
+    void DrawHudIKTargetHeader(IKinematicsAnimated* kin);
+    bool DrawHudIKGunUnavailable(IKinematicsAnimated* kin);
+    bool DrawHudIKNoController(IKinematicsAnimated* kin);
+    static pcstr EquippedWeaponSection(int& slot);
     void DrawHudIKPlot(const CHudIKController& ctrl);
     void DrawHudIKDiagnostics(const CHudIKController& ctrl);
     void DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm);
     bool DrawBonePicker(pcstr label, IKinematics* kin, u16& bone);
+    void DrawHudIKGunEditor(CHudIKController& ctrl, bool externalLayout);
+    void DrawHudIKGunDiagnostics(const CHudIKController& ctrl);
+    void CopyHudIKGunSettings(const CHudIKController& ctrl) const;
+    xr_string BuildHudIKGunText(const CHudIKController& ctrl) const;
+    static pcstr HudIKBoneName(IKinematics* skeleton, u16 bone);
+    static bool IsBoneAncestorOrSelf(IKinematics* skeleton, u16 bone, u16 ancestor);
+    static bool GunBoneConflictsWithArms(const CHudIKController& ctrl, u16 gunBone);
     void CopyHudIKArmSettings(const CHudIKController& ctrl, u16 arm) const;
 
     xr_vector<TargetEntry> m_hudTargets;
@@ -57,5 +78,6 @@ private:
     bool m_ikShowDesired = true;
     char m_ikBoneFilter[64] = {};
     xr_string m_ikMessage;
+    xr_string m_ikGunMessage;
     IKinematicsAnimated* m_lastSelectedKin = nullptr;
 };
