@@ -8,6 +8,7 @@
 #include "ActorEffector.h"
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
 #include "GamePersistent.h"
+#include "ik/HudIKController.h"
 
 player_hud* g_player_hud = nullptr;
 extern ENGINE_API shared_str current_player_hud_sect;
@@ -421,6 +422,11 @@ void hud_item_measures::update(Fmatrix& attach_offset)
 
 attachable_hud_item::~attachable_hud_item()
 {
+    if (m_hud_ik)
+    {
+        m_hud_ik->Unbind();
+        xr_delete(m_hud_ik);
+    }
     IRenderVisual* v = m_model->dcast_RenderVisual();
     GEnv.Render->model_Delete(v);
 }
@@ -442,6 +448,11 @@ attachable_hud_item::attachable_hud_item(player_hud* parent, const shared_str& s
     R_ASSERT3(!m_visual_name.empty(), "Missing 'item_visual' from weapon hud section.", m_sect_name.c_str());
 
     m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(m_visual_name.c_str()));
+    if (m_monolithic && m_model)
+    {
+        m_hud_ik = xr_new<CHudIKController>();
+        m_hud_ik->Bind(m_model);
+    }
 
     m_attach_place_idx = pSettings->read_if_exists<u16>(m_sect_name, "attach_place_idx", 0);
 
@@ -461,6 +472,12 @@ void attachable_hud_item::reload_measures()
         m_attach_offset = m_measures.load_monolithic(m_sect_name, m_model, m_parent_hud_item);
     else
         m_attach_offset = m_measures.load(m_sect_name, m_model);
+}
+
+void attachable_hud_item::reset_hud_ik()
+{
+    if (m_hud_ik)
+        m_hud_ik->ResetAll();
 }
 
 u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, const CMotionDef*& md, u8& rnd_idx)
@@ -550,10 +567,17 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
 player_hud::~player_hud()
 {
+    if (m_hands_ik)
+    {
+        m_hands_ik->Unbind();
+        xr_delete(m_hands_ik);
+    }
+
     if (m_model)
     {
         IRenderVisual* v = m_model->dcast_RenderVisual();
         GEnv.Render->model_Delete(v);
+        m_model = nullptr;
     }
 
     for (auto& [name, item] : m_pool)
@@ -571,11 +595,6 @@ void player_hud::load(const shared_str& player_hud_sect)
     m_sect_name = player_hud_sect;
 
     const bool b_reload = m_model != nullptr;
-    if (m_model)
-    {
-        IRenderVisual* v = m_model->dcast_RenderVisual();
-        GEnv.Render->model_Delete(v);
-    }
 
     if (!pSettings->section_exist(m_sect_name))
     {
@@ -591,9 +610,22 @@ void player_hud::load(const shared_str& player_hud_sect)
         return;
     }
 
+    if (m_model)
+    {
+        if (m_hands_ik)
+            m_hands_ik->Unbind();
+        IRenderVisual* v = m_model->dcast_RenderVisual();
+        GEnv.Render->model_Delete(v);
+        m_model = nullptr;
+    }
+    m_ancors.clear();
+
     const shared_str& model_name = pSettings->r_string(m_sect_name, "visual");
     m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str()));
     load_ancors();
+    if (!m_hands_ik)
+        m_hands_ik = xr_new<CHudIKController>();
+    m_hands_ik->Bind(m_model->dcast_PKinematics());
     // Msg("hands visual changed to [%s] [%s] [%s]", model_name.c_str(), b_reload ? "R" : "", m_attached_items[0] ? "Y" : "");
 
     if (!b_reload)
@@ -906,10 +938,16 @@ void player_hud::attach_item(CHudItem* item)
 
     if (m_attached_items[item_idx] != pi || pi->m_parent_hud_item != item)
     {
+        if (m_hands_ik)
+            m_hands_ik->ResetAll();
         if (m_attached_items[item_idx])
+        {
+            m_attached_items[item_idx]->reset_hud_ik();
             m_attached_items[item_idx]->m_parent_hud_item->on_b_hud_detach();
+        }
 
         m_attached_items[item_idx] = pi;
+        pi->reset_hud_ik();
         pi->m_parent_hud_item = item;
         pi->reload_measures();
 
@@ -926,6 +964,10 @@ void player_hud::detach_item_idx(u16 idx)
     if (nullptr == attached_item(idx))
         return;
 
+    if (m_hands_ik)
+        m_hands_ik->ResetAll();
+
+    m_attached_items[idx]->reset_hud_ik();
     m_attached_items[idx]->m_parent_hud_item->on_b_hud_detach();
 
     m_attached_items[idx]->m_parent_hud_item = nullptr;
@@ -976,6 +1018,38 @@ void player_hud::detach_item(CHudItem* item)
     {
         detach_item_idx(item_idx);
     }
+}
+
+void player_hud::detach_all_items()
+{
+    if (m_hands_ik)
+        m_hands_ik->ResetAll();
+
+    for (attachable_hud_item*& item : m_attached_items)
+    {
+        if (item)
+            item->reset_hud_ik();
+        item = nullptr;
+    }
+}
+
+CHudIKController* player_hud::hud_ik(IKinematicsAnimated* model)
+{
+    if (!model)
+        return nullptr;
+
+    if (model == m_model)
+        return m_hands_ik && m_hands_ik->Skeleton() ? m_hands_ik : nullptr;
+
+    for (attachable_hud_item* item : m_attached_items)
+    {
+        if (!item || !item->m_monolithic || !item->m_hud_ik || !item->m_model)
+            continue;
+
+        if (item->m_model->dcast_PKinematicsAnimated() == model)
+            return item->m_hud_ik;
+    }
+    return nullptr;
 }
 
 void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const

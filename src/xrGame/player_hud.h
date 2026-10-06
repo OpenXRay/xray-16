@@ -8,6 +8,7 @@
 class player_hud;
 class CHudItem;
 class CMotionDef;
+class CHudIKController;
 
 struct motion_descr
 {
@@ -123,6 +124,9 @@ struct attachable_hud_item
     u32 m_upd_firedeps_frame{ u32(-1) };
     void tune(Ivector values);
     u32 anim_play(const shared_str& anim_name, BOOL bMixIn, const CMotionDef*& md, u8& rnd);
+    void reset_hud_ik();
+
+    CHudIKController* m_hud_ik{};
 };
 
 class player_hud
@@ -145,11 +149,7 @@ public:
     attachable_hud_item* attached_item(u16 item_idx) { return m_attached_items[item_idx]; };
     void detach_item_idx(u16 idx);
     void detach_item(CHudItem* item);
-    void detach_all_items()
-    {
-        m_attached_items[0] = NULL;
-        m_attached_items[1] = NULL;
-    };
+    void detach_all_items();
 
     void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const;
     void tune(Ivector values);
@@ -157,6 +157,7 @@ public:
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd) const;
     IKinematicsAnimated* get_hands_model() const { return m_model; }
+    CHudIKController* hud_ik(IKinematicsAnimated* model);
 
 private:
     void load_ancors();
@@ -172,6 +173,7 @@ private:
     Fmatrix m_transform{ Fidentity };
     IKinematicsAnimated* m_model{};
     xr_vector<u16> m_ancors;
+    CHudIKController* m_hands_ik{};
     attachable_hud_item* m_attached_items[2]{};
     xr_unordered_map<shared_str, attachable_hud_item*> m_pool;
 };
