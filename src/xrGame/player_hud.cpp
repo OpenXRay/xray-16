@@ -649,7 +649,7 @@ void player_hud::load(const shared_str& player_hud_sect)
     if (!m_hands_ik)
         m_hands_ik = xr_new<CHudIKController>();
     m_hands_ik->Bind(m_model->dcast_PKinematics());
-    m_weapon_collision.Reset();
+    reset_weapon_collision();
     // Msg("hands visual changed to [%s] [%s] [%s]", model_name.c_str(), b_reload ? "R" : "", m_attached_items[0] ? "Y" : "");
 
     if (!b_reload)
@@ -756,7 +756,7 @@ u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float sp
 void player_hud::update(const Fmatrix& cam_trans)
 {
     clear_collision_offsets();
-    m_weapon_collision.Reset();
+    m_weapon_collision.BeginUpdate();
 
     Fmatrix trans = cam_trans;
     if (psHUD_Flags.test(HUD_LEFT_HANDED))
@@ -983,7 +983,7 @@ void player_hud::attach_item(CHudItem* item)
         if (m_hands_ik)
             m_hands_ik->ResetAll();
         if (item_idx == 0)
-            m_weapon_collision.Reset();
+            reset_weapon_collision();
         if (m_attached_items[item_idx])
         {
             m_attached_items[item_idx]->reset_hud_ik();
@@ -1011,7 +1011,7 @@ void player_hud::detach_item_idx(u16 idx)
     if (m_hands_ik)
         m_hands_ik->ResetAll();
     if (idx == 0)
-        m_weapon_collision.Reset();
+        reset_weapon_collision();
 
     m_attached_items[idx]->reset_hud_ik();
     m_attached_items[idx]->m_parent_hud_item->on_b_hud_detach();
@@ -1070,7 +1070,7 @@ void player_hud::detach_all_items()
 {
     if (m_hands_ik)
         m_hands_ik->ResetAll();
-    m_weapon_collision.Reset();
+    reset_weapon_collision();
 
     for (attachable_hud_item*& item : m_attached_items)
     {
@@ -1127,6 +1127,15 @@ CHudIKController* player_hud::hud_ik(IKinematicsAnimated* model)
 CHudWeaponCollision& player_hud::weapon_collision()
 {
     return m_weapon_collision;
+}
+
+void player_hud::reset_weapon_collision()
+{
+    m_weapon_collision.Reset();
+    m_collision_item = nullptr;
+    m_collision_controller = nullptr;
+    m_collision_owner = nullptr;
+    m_collision_external = false;
 }
 
 void player_hud::clear_collision_offsets()
@@ -1303,7 +1312,21 @@ void player_hud::update_weapon_collision(attachable_hud_item* primary)
     bool external = false;
     CHudIKController* controller = collision_controller(primary, external);
     if (!controller)
+    {
+        reset_weapon_collision();
         return;
+    }
+
+    CHudItem* owner = primary->m_parent_hud_item;
+    if (primary != m_collision_item || controller != m_collision_controller || owner != m_collision_owner ||
+        external != m_collision_external)
+    {
+        reset_weapon_collision();
+        m_collision_item = primary;
+        m_collision_controller = controller;
+        m_collision_owner = owner;
+        m_collision_external = external;
+    }
 
     const Fvector camera = Device.vCameraPosition;
     const CHudWeaponCollision::Muzzle none{};

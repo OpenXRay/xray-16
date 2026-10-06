@@ -578,7 +578,7 @@ void COzzAnimDebugger::DrawHudIKArmEditor(CHudIKController& ctrl, u16 arm)
     }
     else if (settings.space == CHudIKController::TargetSpace::GunAnimated)
     {
-        ImGui::TextDisabled("Every frame the current animated wrist and elbow are moved by the gun displacement (gun target vs raw animated gun); the offsets below are applied on top. With zero offsets and no displacement the original animation is left untouched. No target bone is needed.");
+        ImGui::TextDisabled("Wrist follows the gun; elbow bend follows the animation.");
         if (!ctrl.SupportsGunLead() || !ctrl.GetGun().enabled)
             ImGui::TextDisabled("The gun target is off or unavailable, so this arm plays its unchanged animation.");
     }
@@ -919,13 +919,13 @@ void COzzAnimDebugger::DrawHudIKGunEditor(CHudIKController& ctrl, bool externalL
             if (externalLayout)
             {
                 xr_sprintf(msg, sizeof(msg),
-                    "Animation-follow IK active for the equipped weapon origin (slot %d: %s). Both arms are enabled at weight 1 in 'Animated + gun displacement' space with zero offsets and the gun target is enabled. Every frame both animated wrists and elbows move by the gun displacement, so the animated hand motion is preserved; nothing is captured or frozen.",
+                    "Animation-follow IK active for slot %d: %s. Both arms enabled, weight 1, zero offsets.",
                     weaponSlot, weaponSection ? weaponSection : "<none>");
             }
             else
             {
                 xr_sprintf(msg, sizeof(msg),
-                    "Animation-follow IK active for gun bone %s. Both arms are enabled at weight 1 in 'Animated + gun displacement' space with zero offsets and the gun target is enabled. Every frame both animated wrists and elbows move by the gun displacement, so the animated hand motion is preserved; nothing is captured or frozen.",
+                    "Animation-follow IK active for gun bone %s. Both arms enabled, weight 1, zero offsets.",
                     HudIKBoneName(skeleton, settings.bone));
             }
             m_ikGunMessage = msg;
@@ -1106,15 +1106,27 @@ void COzzAnimDebugger::DrawHudWeaponCollisionSettings(CHudWeaponCollision& colli
         return std::isfinite(value) ? std::clamp(value, lo, hi) : fallback;
     };
 
-    settings.radius = sanitize(settings.radius, defaults.radius, 0.005f, 0.15f);
-    settings.forwardOffset = sanitize(settings.forwardOffset, defaults.forwardOffset, 0.f, 0.3f);
-    settings.maxPush = sanitize(settings.maxPush, defaults.maxPush, 0.f, 1.f);
+    auto clampAll = [&]()
+    {
+        settings.radius = sanitize(settings.radius, defaults.radius, 0.005f, 0.15f);
+        settings.forwardOffset = sanitize(settings.forwardOffset, defaults.forwardOffset, 0.f, 0.3f);
+        settings.maxPush = sanitize(settings.maxPush, defaults.maxPush, 0.f, 1.f);
+        settings.anticipation = sanitize(settings.anticipation, defaults.anticipation, 0.f, 0.1f);
+        settings.contactSeconds = sanitize(settings.contactSeconds, defaults.contactSeconds, 0.01f, 1.f);
+        settings.releaseSeconds = sanitize(settings.releaseSeconds, defaults.releaseSeconds, 0.01f, 2.f);
+    };
+    clampAll();
 
     bool changed = false;
     changed |= ImGui::Checkbox("Collision enabled", &settings.enabled);
+    changed |= ImGui::Checkbox("Easing enabled (off = hard instant push)", &settings.easing);
     changed |= ImGui::SliderFloat("Sphere radius (m)", &settings.radius, 0.005f, 0.15f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
     changed |= ImGui::SliderFloat("Projection ahead of muzzle (m)", &settings.forwardOffset, 0.f, 0.3f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
     changed |= ImGui::SliderFloat("Max push (m)", &settings.maxPush, 0.f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    changed |= ImGui::SliderFloat("Anticipation margin (m)", &settings.anticipation, 0.f, 0.1f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    changed |= ImGui::SliderFloat("Contact response (s)", &settings.contactSeconds, 0.01f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    changed |= ImGui::SliderFloat("Release response (s)", &settings.releaseSeconds, 0.01f, 2.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::TextDisabled("Anticipation starts the push earlier and adds that much wall clearance while in contact. Contact/release seconds are critically damped response constants, not exact completion deadlines.");
 
     if (ImGui::Button("Reset collision defaults"))
     {
@@ -1124,9 +1136,7 @@ void COzzAnimDebugger::DrawHudWeaponCollisionSettings(CHudWeaponCollision& colli
 
     if (changed)
     {
-        settings.radius = sanitize(settings.radius, defaults.radius, 0.005f, 0.15f);
-        settings.forwardOffset = sanitize(settings.forwardOffset, defaults.forwardOffset, 0.f, 0.3f);
-        settings.maxPush = sanitize(settings.maxPush, defaults.maxPush, 0.f, 1.f);
+        clampAll();
         collision.SetSettings(settings);
     }
 }
@@ -1160,9 +1170,10 @@ void COzzAnimDebugger::DrawHudWeaponCollisionState(const CHudWeaponCollision& co
         ImGui::Text("Collision frame %u (age %u)", state.frame, age);
 
     ImGui::Text("Candidate triangles: %u", state.candidates);
-    ImGui::Text("Hit: %s / push clamped: %s", state.hit ? "yes" : "no", state.clamped ? "yes" : "no");
+    ImGui::Text("Hit: %s / push clamped: %s / anticipating: %s", state.hit ? "yes" : "no", state.clamped ? "yes" : "no",
+        state.anticipated ? "yes" : "no");
 
-    if (state.hit)
+    if (state.hit || state.anticipated)
     {
         if (state.triangle >= 0)
             ImGui::Text("Contact triangle: %d", static_cast<int>(state.triangle));
@@ -1183,16 +1194,44 @@ void COzzAnimDebugger::DrawHudWeaponCollisionState(const CHudWeaponCollision& co
             ImGui::Text("Penetration depth: %.4f m", state.penetration);
         else
             ImGui::TextDisabled("Penetration depth: unavailable");
-
-        if (IsFiniteVector(state.correction))
-            ImGui::Text("Correction (world m): %.4f %.4f %.4f (|%.4f|)", state.correction.x, state.correction.y, state.correction.z,
-                state.correction.magnitude());
-        else
-            ImGui::TextDisabled("Correction: unavailable");
     }
     else
     {
-        ImGui::TextDisabled("Contact, normal, penetration, correction and triangle: unavailable (no hit)");
+        ImGui::TextDisabled("Contact, normal, penetration and triangle: unavailable (no hit)");
+    }
+
+    if (state.requested.valid && IsFiniteVector(state.hardCorrection) && IsFiniteVector(state.targetCorrection) &&
+        IsFiniteVector(state.correction) && IsFiniteVector(state.velocity))
+    {
+        ImGui::Text("Hard desired (world m): |%.4f|  (%.4f %.4f %.4f)", state.hardCorrection.magnitude(),
+            state.hardCorrection.x, state.hardCorrection.y, state.hardCorrection.z);
+        ImGui::Text("Eased target (anticipation): |%.4f|  (%.4f %.4f %.4f)", state.targetCorrection.magnitude(),
+            state.targetCorrection.x, state.targetCorrection.y, state.targetCorrection.z);
+        ImGui::Text("Solver output (safety-projected): |%.4f|  (%.4f %.4f %.4f)", state.correction.magnitude(),
+            state.correction.x, state.correction.y, state.correction.z);
+        ImGui::Text("Spring velocity: |%.4f| m/s / frame dt %.4f s%s", state.velocity.magnitude(), state.deltaTime,
+            state.restarted ? " / restarted" : "");
+        if (state.safety)
+            ImGui::TextColored(warnColor, "Safety override: pushed %.4f m beyond eased candidate", state.safetyPush);
+        else
+            ImGui::TextDisabled("Safety override: none");
+    }
+    else
+    {
+        ImGui::TextDisabled("Hard / eased / solver correction: unavailable");
+    }
+
+    if (state.requested.valid && state.resolved.valid && IsFiniteVector(state.requested.sphereCenter) &&
+        IsFiniteVector(state.resolved.sphereCenter))
+    {
+        Fvector actual;
+        actual.sub(state.resolved.sphereCenter, state.requested.sphereCenter);
+        ImGui::Text("Actual pose displacement (world m): |%.4f|  (%.4f %.4f %.4f)", actual.magnitude(),
+            actual.x, actual.y, actual.z);
+    }
+    else
+    {
+        ImGui::TextDisabled("Actual pose displacement: unavailable");
     }
 
     ImGui::TextDisabled("Positions, sphere centers and corrections are perceived world meters; fire directions and normals are world unit vectors. Nothing here is HUD model space or drawn in the model-space plot.");
@@ -1648,10 +1687,4 @@ void COzzAnimDebugger::DrawHudIKPlot(const CHudIKController& ctrl)
 
     dl->PopClipRect();
     dl->AddRect(p0, p1, IM_COL32(90, 95, 110, 255));
-
-    ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.f, 1.f), "Solver output: thick solid chain, filled joints (left cyan, right orange)");
-    ImGui::TextColored(ImVec4(0.6f, 0.7f, 0.8f, 1.f), "Animated input: thin faded chain, hollow joints");
-    ImGui::TextColored(ImVec4(1.f, 0.92f, 0.4f, 1.f), "Desired inputs: diamond with RGB axes = wrist target, yellow square = elbow hint, red line = endpoint error");
-    ImGui::TextColored(ImVec4(0.9f, 0.4f, 1.f, 1.f), "Gun point: magenta crosshair circle = G target (planned gun pose), faded circle = G anim (raw animated gun or equipped weapon origin); in animation-follow space each animated wrist and elbow moves by the G anim to G target displacement");
-    ImGui::TextDisabled("Orthographic model-space diagnostic of the selected skeleton, not a viewport gizmo or world projection. Drag pans, wheel zooms, double-click fits. Resolved output only draws for enabled arms.");
 }

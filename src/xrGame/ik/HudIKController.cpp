@@ -16,6 +16,10 @@ constexpr float IdentityTolerance = 1e-5f;
 constexpr float ZeroPositionTolerance = 1e-6f;
 constexpr float ZeroRotationTolerance = 1e-4f;
 constexpr u32 AutoRetryFrames = 10;
+constexpr float BendReferenceFraction = 0.02f;
+constexpr float BendAxisTolerance = 1e-6f;
+constexpr float BendOppositeTolerance = 1e-3f;
+constexpr float HingeSideTolerance = 1e-2f;
 constexpr pcstr DefaultBoneNames[2][2][3] = {
     {
         {"l_upperarm", "l_forearm", "l_hand"},
@@ -298,6 +302,104 @@ void ResolveDefaultBones(IKinematics* skeleton, u16 (&result)[2][3])
             result[arm][j] = resolved[choice][arm][j];
         }
     }
+}
+
+Fvector TransportBendHint(const Fvector& shoulder, const Fvector& animatedElbow, const Fvector& animatedWrist,
+    const Fvector& target, const Fvector& hingeAxis, float limbLength, const Fvector& offset)
+{
+    Fvector fallback;
+    fallback.add(animatedElbow, offset);
+
+    Fvector from;
+    Fvector to;
+    from.sub(animatedWrist, shoulder);
+    to.sub(target, shoulder);
+    const float fromLength = from.magnitude();
+    const float toLength = to.magnitude();
+    if (!_valid(fromLength) || !_valid(toLength) || fromLength <= EPS || toLength <= EPS)
+    {
+        return fallback;
+    }
+    from.mul(1.f / fromLength);
+    to.mul(1.f / toLength);
+
+    Fvector bend;
+    bend.sub(animatedElbow, shoulder);
+    const float along = bend.dotproduct(from);
+    bend.mad(from, -along);
+    float bendLength = bend.magnitude();
+    if (!_valid(bendLength))
+    {
+        return fallback;
+    }
+    const float referenceLength = BendReferenceFraction * limbLength;
+    Fvector side;
+    float effectiveLength = bendLength;
+    if (bendLength < referenceLength)
+    {
+        Fvector hingeSide;
+        hingeSide.crossproduct(from, hingeAxis);
+        const float hingeLength = hingeSide.magnitude();
+        if (_valid(hingeLength) && hingeLength > HingeSideTolerance)
+        {
+            hingeSide.mul(1.f / hingeLength);
+            float weight = bendLength / referenceLength;
+            weight = weight * weight * (3.f - 2.f * weight);
+            side = hingeSide;
+            if (bendLength > EPS)
+            {
+                Fvector chordSide = bend;
+                chordSide.mul(1.f / bendLength);
+                Fvector turn;
+                turn.crossproduct(hingeSide, chordSide);
+                const float turnCosine = hingeSide.dotproduct(chordSide);
+                const float turnSine = turn.dotproduct(from);
+                float angle = PI;
+                if (turnCosine >= 0.f || _abs(turnSine) > BendOppositeTolerance)
+                {
+                    angle = std::atan2(turnSine, turnCosine);
+                }
+                angle *= weight;
+                Fvector swing;
+                swing.crossproduct(from, hingeSide);
+                side.mul(std::cos(angle));
+                side.mad(swing, std::sin(angle));
+            }
+            effectiveLength = referenceLength;
+        }
+    }
+    if (effectiveLength == bendLength)
+    {
+        if (bendLength <= EPS)
+        {
+            return fallback;
+        }
+        side = bend;
+        side.mul(1.f / bendLength);
+    }
+    bendLength = effectiveLength;
+
+    const float cosine = std::clamp(from.dotproduct(to), -1.f, 1.f);
+    Fvector axis;
+    axis.crossproduct(from, to);
+    const float sine = axis.magnitude();
+    const float axisTolerance = cosine < 0.f ? BendOppositeTolerance : BendAxisTolerance;
+    Fvector rotated = side;
+    if (_valid(sine) && sine > axisTolerance)
+    {
+        axis.mul(1.f / sine);
+        Fvector swing;
+        swing.crossproduct(axis, side);
+        rotated.mul(cosine);
+        rotated.mad(swing, sine);
+        rotated.mad(axis, axis.dotproduct(side) * (1.f - cosine));
+    }
+
+    Fvector hint;
+    hint.mad(shoulder, to, along);
+    hint.mad(rotated, bendLength);
+    hint.add(offset);
+    return _valid(hint) ? hint : fallback;
 }
 
 bool IsTransientFailure(pcstr status)
@@ -1051,12 +1153,7 @@ void CHudIKController::EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pe
         state.status = "invalid_settings";
         return;
     }
-    Fvector elbowBase = m_pose[b1].c;
-    if (settings.space == TargetSpace::GunAnimated)
-    {
-        followDelta.transform_tiny(elbowBase, m_pose[b1].c);
-    }
-    state.elbow.add(elbowBase, settings.elbowOffset);
+    state.elbow.add(m_pose[b1].c, settings.elbowOffset);
     for (u16 j = 0; j < 3; ++j)
     {
         state.animated[j] = m_pose[ids[j]];
@@ -1103,6 +1200,15 @@ void CHudIKController::EvaluateArm(u16 arm, bool enabled, const GunPlan& gun, Pe
     start.c = m_pose[b0].c;
 
     Fmatrix rotations[3];
+    if (settings.space == TargetSpace::GunAnimated)
+    {
+        Fvector hingeAxis;
+        Fmatrix hingeBase;
+        hingeBase.mul_43(m_pose[b0], calibration.bind[1]);
+        hingeBase.transform_dir(hingeAxis, calibration.hingeFrame.j);
+        state.elbow = TransportBendHint(start.c, m_pose[b1].c, m_pose[b2].c, state.target.c, hingeAxis,
+            calibration.solver.Length(), settings.elbowOffset);
+    }
     const Solver::Result result = calibration.solver.Solve(start, state.target, state.elbow, rotations);
     if (result.failure != Solver::Failure::None)
     {

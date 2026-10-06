@@ -174,6 +174,7 @@ private:
     bool collision_to_controller(const Fvector& correction, const Fmatrix& controller_to_hud, Fvector& offset) const;
     void recalculate_collision_pose(attachable_hud_item* primary, bool external);
     void clear_collision_offsets();
+    void reset_weapon_collision();
     void request_collision_snapshot(attachable_hud_item* primary);
     bool inertion_allowed() const;
 
@@ -187,6 +188,10 @@ private:
     xr_vector<u16> m_ancors;
     CHudIKController* m_hands_ik{};
     CHudWeaponCollision m_weapon_collision;
+    attachable_hud_item* m_collision_item{};
+    CHudIKController* m_collision_controller{};
+    CHudItem* m_collision_owner{};
+    bool m_collision_external{};
     attachable_hud_item* m_attached_items[2]{};
     xr_unordered_map<shared_str, attachable_hud_item*> m_pool;
 };
