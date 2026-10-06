@@ -135,12 +135,18 @@ void CMovementManager::process_game_path()
 
         u32 dest_level_vertex_id = ai().game_graph().vertex(game_path().intermediate_vertex_id())->level_vertex_id();
 
+        if (!ai().level_graph().valid_vertex_id(dest_level_vertex_id))
+            break;
+
         if (!accessible(dest_level_vertex_id))
         {
             Fvector dest_pos;
             dest_level_vertex_id =
                 restrictions().accessible_nearest(ai().level_graph().vertex_position(dest_level_vertex_id), dest_pos);
         }
+
+        if (!ai().level_graph().valid_vertex_id(dest_level_vertex_id))
+            break;
 
         Fvector temp =
             ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()**/);
