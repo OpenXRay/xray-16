@@ -160,6 +160,11 @@ int main()
     assert(copied_animated->PlayCycle("idle", FALSE, nullptr, nullptr, 0));
     animated->LL_UpdateTracks(1.f / 30.f, true, false);
     copied_animated->LL_UpdateTracks(0.01f, true, false);
+    SKeyTable root_keys;
+    animated->LL_BuldBoneMatrixDequatize(&pose->LL_GetData(0), 1, root_keys);
+    assert(root_keys.chanel_blend_conts[0] == 1);
+    assert(root_keys.blends[0][0] == animated->LL_PartBlend(0, 0));
+    assert(root_keys.keys[0][0].T.x > 0.f);
     pose->CalculateBones(TRUE);
     copied->CalculateBones(TRUE);
     assert(pose->LL_GetTransform(1).c.x > copied->LL_GetTransform(1).c.x);

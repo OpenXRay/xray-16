@@ -893,8 +893,36 @@ void VulkanKinematics::LL_IterateBlends(IterateBlendsCallback& callback)
 void VulkanKinematics::LL_BuldBoneMatrixDequatize(const CBoneData* bone, u8 mask, SKeyTable& keys)
 {
     if (!bone || !(mask & 1)) return;
+    // The animation movement controller locates its control blend by pointer
+    // in this table. A key sampled from the aggregate playback has no blend
+    // identity and makes the controller fall back to the current bone pose,
+    // which can move an actor between animation and world coordinates.
+    const u16 id = bone->GetSelfID();
+    for (const auto& blend : blends_)
+    {
+        if (blend->blend_state() == CBlend::eFREE_SLOT || blend->channel != 0 ||
+            !valid_motion(blend->motionID) || keys.chanel_blend_conts[0] >= MAX_BLENDED)
+            continue;
+        const auto& slot = data_->motions[blend->motionID.slot];
+        const auto& definition = slot.definitions[blend->motionID.idx];
+        if (blend->bone_or_part != BI_NONE)
+        {
+            if (blend->bone_or_part >= slot.partitions.size()) continue;
+            const auto& part = slot.partitions[blend->bone_or_part];
+            if (std::find(part.begin(), part.end(), id) == part.end()) continue;
+        }
+        MotionKey sampled;
+        if (!sample_motion_key(slot.clips[definition.motion], id, blend->timeCurrent, sampled)) continue;
+        const int index = keys.chanel_blend_conts[0]++;
+        CKey& out = keys.keys[0][index];
+        out.Q.x = sampled.rotation[0]; out.Q.y = sampled.rotation[1];
+        out.Q.z = sampled.rotation[2]; out.Q.w = sampled.rotation[3];
+        out.T.set(sampled.translation[0], sampled.translation[1], sampled.translation[2]);
+        keys.blends[0][index] = blend.get();
+    }
+    if (keys.chanel_blend_conts[0]) return;
     MotionKey key;
-    if (!playback_.sample(bone->GetSelfID(), key)) return;
+    if (!playback_.sample(id, key)) return;
     CKey& out = keys.keys[0][0];
     out.Q.x = key.rotation[0]; out.Q.y = key.rotation[1];
     out.Q.z = key.rotation[2]; out.Q.w = key.rotation[3];

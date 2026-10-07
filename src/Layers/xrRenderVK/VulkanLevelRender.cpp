@@ -42,10 +42,23 @@
 #include <unordered_set>
 #include <vector>
 
+extern ENGINE_API float psHUD_FOV;
+
 namespace xray::render::vulkan
 {
 namespace
 {
+Fmatrix hud_view_projection()
+{
+    Fmatrix projection, combined;
+    const float far_plane = g_pGamePersistent ?
+        g_pGamePersistent->Environment().CurrentEnv.far_plane : 500.f;
+    projection.build_projection(deg2rad(psHUD_FOV * Device.fFOV),
+        Device.fASPECT, HUD_VIEWPORT_NEAR, far_plane);
+    combined.mul(projection, Device.mView);
+    return combined;
+}
+
 bool retirement_idle(VkDevice device, PFN_vkDeviceWaitIdle wait)
 {
     const VkResult result = wait(device);
@@ -1607,14 +1620,14 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     R_ASSERT2(game_device_, "Vulkan level visuals require a bound gameplay device");
     if (particle_effects_.count(visual) || particle_groups_.count(visual))
     {
-        const Fmatrix view_projection = current_view_projection();
+        const bool hud = root && root->renderable_HUD();
+        const Fmatrix view_projection = hud ? hud_view_projection() : current_view_projection();
         Fvector camera_position;
         if (camera_state_.has_camera_position())
             camera_position.set(camera_state_.camera_position()[0], camera_state_.camera_position()[1],
                 camera_state_.camera_position()[2]);
         else camera_position.set(Device.vCameraPosition);
         const Fvector center = visual->getVisData().sphere.P;
-        const bool hud = root && root->renderable_HUD();
         float transform[16];
         std::memcpy(transform, &view_projection, sizeof(transform));
         game_device_->queue_particle(visual, transform, Device.vCameraRight, Device.vCameraTop,
@@ -1631,7 +1644,8 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             break;
         }
     R_ASSERT2(visual_index >= 0 || model, "Vulkan scene submission received a visual outside this renderer");
-    const Fmatrix view_projection = current_view_projection();
+    const bool hud = root && root->renderable_HUD();
+    const Fmatrix view_projection = hud ? hud_view_projection() : current_view_projection();
     Fmatrix mvp;
     mvp.mul(view_projection, world);
     Fvector center = model ? model->visibility().sphere.P :
@@ -1642,7 +1656,6 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     static_assert(sizeof(Fmatrix) == 16 * sizeof(float));
     float transform[16];
     std::memcpy(transform, &mvp, sizeof(transform));
-    const bool hud = root && root->renderable_HUD();
     Fvector camera_position;
     if (camera_state_.has_camera_position())
         camera_position.set(camera_state_.camera_position()[0], camera_state_.camera_position()[1],
