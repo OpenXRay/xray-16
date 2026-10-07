@@ -298,6 +298,7 @@ void VulkanKinematics::reset_instance_state()
     playback_.reset();
     blends_.clear();
     last_motion_frame_ = UINT32_MAX;
+    last_bones_frame_ = UINT32_MAX;
     root_ = data_->root;
     visible_ = instances_.size() == 64 ? ~u64(0) : (u64(1) << instances_.size()) - 1;
     update_ = nullptr;
@@ -573,10 +574,13 @@ void VulkanKinematics::LL_ClearAdditionalTransform(u16 id)
 void VulkanKinematics::CalculateBones(BOOL force)
 {
     if (playback_.active_count()) UpdateTracks();
-    if (!dirty_ && !force) return;
+    // Bone callbacks also animate doors and other rigid objects without a
+    // playing motion. As in CKinematics, run them once each rendered frame.
+    if (!dirty_ && !force && last_bones_frame_ == Device.dwFrame) return;
     Fmatrix identity = Fidentity;
     Bone_Calculate(data_->bones[root_], &identity);
     dirty_ = false;
+    last_bones_frame_ = Device.dwFrame;
     Fbox box;
     box.invalidate();
     bool has_visible = false;

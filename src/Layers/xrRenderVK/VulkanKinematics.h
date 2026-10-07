@@ -134,6 +134,7 @@ private:
     IBlendDestroyCallback* blend_destroy_{};
     IUpdateTracksCallback* tracks_update_{};
     u32 last_motion_frame_{UINT32_MAX};
+    u32 last_bones_frame_{UINT32_MAX};
     float channel_factors_[4]{1.f, 1.f, 1.f, 1.f};
     u16 root_ = BI_NONE;
     u64 visible_{};
