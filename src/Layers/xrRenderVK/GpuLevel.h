@@ -105,6 +105,7 @@ private:
     // Each frame slot is reused only after FrameContext has waited on its fence.
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;
     std::vector<LevelVisual> visuals_;
+    std::vector<uint8_t> visual_phases_; // opaque/cutout bit 1, transparent bit 2
     std::vector<uint32_t> roots_;
     std::vector<LevelSector> sectors_;
     std::vector<LevelPortal> portals_;

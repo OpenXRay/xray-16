@@ -300,6 +300,26 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     details_ = std::move(prepared.details_);
     detail_meshes_ = std::move(prepared.detail_meshes_);
     visuals_ = std::move(prepared.visuals_);
+    visual_phases_.assign(visuals_.size(), 0);
+    std::vector<uint8_t> phase_state(visuals_.size(), 0);
+    const auto phases = [&](const auto& self, size_t index) -> uint8_t
+    {
+        if (index >= visuals_.size()) return 3;
+        if (phase_state[index] == 2) return visual_phases_[index];
+        if (phase_state[index] == 1) return 3; // malformed cycle: never omit a pass
+        phase_state[index] = 1;
+        const LevelVisual& visual = visuals_[index];
+        uint8_t mask = 0;
+        if (visual.mesh >= 0 && size_t(visual.mesh) < meshes_.size())
+            mask |= meshes_[visual.mesh].mode == SurfaceMode::Transparent ? 2 : 1;
+        for (int32_t facet : visual.lod_facets)
+            if (facet >= 0 && size_t(facet) < meshes_.size())
+                mask |= meshes_[facet].mode == SurfaceMode::Transparent ? 2 : 1;
+        for (uint32_t child : visual.children) mask |= self(self, child);
+        phase_state[index] = 2;
+        return visual_phases_[index] = mask;
+    };
+    for (size_t index = 0; index < visuals_.size(); ++index) phases(phases, index);
     roots_ = std::move(prepared.roots_);
     sectors_ = std::move(prepared.sectors_);
     portals_ = std::move(prepared.portals_);
@@ -584,6 +604,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     bool cull_static) const
 {
     if (index >= visuals_.size()) return false;
+    if (index < visual_phases_.size() &&
+        !(visual_phases_[index] & (phase == GeometryPhase::Transparent ? 2 : 1)))
+        return true;
     const LevelVisual& visual = visuals_[index];
     // Hierarchy bounds in older level archives are not guaranteed to enclose
     // every child. Cull leaf meshes, but always descend into child visuals.
@@ -591,7 +614,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     {
         static std::atomic<uint64_t> culled{0};
         const uint64_t count = ++culled;
-        if (count <= 4 || count % 16384 == 0)
+        if (count <= 4 || count % 1048576 == 0)
             Msg("[renderer-vulkan] level.frustum culled=%llu last-visual=%zu phase=%d",
                 static_cast<unsigned long long>(count), index, static_cast<int>(phase));
         return true;
@@ -819,6 +842,7 @@ void GpuLevel::destroy()
     visible_details_.clear();
     for (auto& buffers : detail_batches_) buffers.clear();
     visuals_.clear();
+    visual_phases_.clear();
     roots_.clear();
     sectors_.clear();
     portals_.clear();
