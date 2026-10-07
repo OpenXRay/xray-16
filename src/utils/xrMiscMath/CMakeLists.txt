@@ -13,6 +13,7 @@ target_sources(xrMiscMath PRIVATE
 target_include_directories(xrMiscMath
     PRIVATE
     "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/Externals"
 )
 
 set_target_properties(xrMiscMath PROPERTIES

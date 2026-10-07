@@ -54,6 +54,7 @@ setfenv(1, this) ";
 
 static const char* file_header = nullptr;
 
+#if !defined(XR_PLATFORM_ANDROID) || !XRAY_USE_LUAJIT
 static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
 {
     (void)ud;
@@ -65,6 +66,7 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
     }
     return xr_realloc(ptr, nsize);
 }
+#endif
 
 static void* __cdecl luabind_allocator(void* context, const void* pointer, size_t const size)
 {
@@ -129,12 +131,21 @@ void CScriptEngine::reinit()
         lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
+#if defined(XR_PLATFORM_ANDROID) && XRAY_USE_LUAJIT
+    // Android's system allocator can return tagged pointers. LuaJIT GC64
+    // requires its GC objects below bit 47, so use its mmap-backed allocator.
+    m_virtual_machine = luaL_newstate();
+#else
     m_virtual_machine = lua_newstate(lua_alloc, nullptr);
+#endif
     if (!m_virtual_machine)
     {
         Log("! ERROR : Cannot initialize script virtual machine!");
         return;
     }
+#if defined(XR_PLATFORM_ANDROID) && XRAY_USE_LUAJIT
+    Msg("[android] LuaJIT VM initialized with internal allocator");
+#endif
     RegisterState(m_virtual_machine, this);
     if (strstr(Core.Params, "-_g"))
         file_header = file_header_new;
@@ -864,6 +875,7 @@ void CScriptEngine::init(export_func exporter, bool loadGlobalNamespace)
     ZoneScoped;
 
     reinit();
+    R_ASSERT2(m_virtual_machine, "Lua virtual machine could not be initialized");
     luabind::open(lua());
 
     // Workarounds to preserve backwards compatibility with game scripts

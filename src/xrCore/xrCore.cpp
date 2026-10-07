@@ -436,9 +436,9 @@ void SDLLogOutput(void* /*userdata*/, int category, SDL_LogPriority priority, co
     }
 
     static constexpr pcstr format = "%c [sdl][%s][%s]: %s";
-    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
-    pstr buf = (pstr)xr_alloca(size);
-
-    xr_sprintf(buf, size, format, mark, from, type, message);
+    const int size = std::snprintf(nullptr, 0, format, mark, from, type, message);
+    if (size < 0) return;
+    pstr buf = (pstr)xr_alloca(static_cast<size_t>(size) + 1);
+    std::snprintf(buf, static_cast<size_t>(size) + 1, format, mark, from, type, message);
     Log(buf);
 }

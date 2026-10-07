@@ -83,6 +83,8 @@ private:
 
 public:
     xrDebug() = delete;
+    // Android's early crash log stays writable after the normal logger stops.
+    static void SetAssertionLogSink(void (*sink)(const char*)) noexcept;
     static void Initialize(pcstr commandLine);
     static void Finalize();
     static void OnThreadSpawn();

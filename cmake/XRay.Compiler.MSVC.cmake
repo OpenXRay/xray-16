@@ -15,7 +15,7 @@ add_compile_options($<$<NOT:$<CONFIG:ReleaseMasterGold>>:/EHsc>)
 add_compile_definitions($<$<CONFIG:ReleaseMasterGold>:_HAS_EXCEPTIONS=0>)
 
 # Enable debug information for all configurations
-add_compile_options(/Zi)
+add_compile_options(/Zi /FS)
 
 # Enable SSE2 for 32-bit build
 # (on x64 it's always enabled and produces error if try to to enable it)

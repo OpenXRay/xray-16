@@ -5,7 +5,11 @@ kit_root=${XRAY_ANDROID_KIT_ROOT:?XRAY_ANDROID_KIT_ROOT must point to the extrac
 
 export ANDROID_NDK_HOME="$kit_root/toolchain/android-ndk-r30"
 export ANDROID_SDK_ROOT="$kit_root/toolchain/android-sdk"
-export ANDROID_DEPS_PREFIX="$kit_root/toolchain/android-deps-armv7"
+export ANDROID_DEPS_PREFIX="${ANDROID_DEPS_PREFIX:-$kit_root/toolchain/android-deps-armv7}"
+export ANDROID_DEPS_PREFIX_ARMV7="${ANDROID_DEPS_PREFIX_ARMV7:-$kit_root/toolchain/android-deps-armv7}"
+if [ -d "$kit_root/toolchain/android-deps-arm64" ]; then
+    export ANDROID_DEPS_PREFIX_ARM64="${ANDROID_DEPS_PREFIX_ARM64:-$kit_root/toolchain/android-deps-arm64}"
+fi
 export SDL2_ANDROID_HOME="$kit_root/toolchain/SDL"
 export GRADLE_BIN="$kit_root/toolchain/gradle-8.1.1/bin/gradle"
 if [ -d "$kit_root/toolchain/gradle-user-home/caches/modules-2" ]; then

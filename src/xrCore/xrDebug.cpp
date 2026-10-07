@@ -17,8 +17,8 @@
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
 
-#   define USE_BUG_TRAP
-#   ifdef USE_BUG_TRAP
+#   if __has_include("BugTrap.h")
+#       define USE_BUG_TRAP
 #       include "BugTrap.h"
 #   endif
 
@@ -230,10 +230,35 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     return Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
+#if defined(XR_PLATFORM_ANDROID)
+namespace { void (*g_android_assertion_log_sink)(const char*) = nullptr; }
+#endif
+
+void xrDebug::SetAssertionLogSink(void (*sink)(const char*)) noexcept
+{
+#if defined(XR_PLATFORM_ANDROID)
+    g_android_assertion_log_sink = sink;
+#else
+    (void)sink;
+#endif
+}
+
 AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
     ScopeLock lock(&failLock);
+
+#if defined(XR_PLATFORM_ANDROID)
+    // The engine's buffered logger can lose the final assertion on SIGTRAP.
+    // Write it to the already-open session log before the error dialog path.
+    char assertion[1024];
+    snprintf(assertion, sizeof(assertion),
+        "[android-assert] file='%.180s' line=%d function='%.120s' expression='%.180s' description='%.240s' arg1='%.100s' arg2='%.100s'",
+        loc.File ? loc.File : "", loc.Line, loc.Function ? loc.Function : "",
+        expr ? expr : "", desc ? desc : "", arg1 ? arg1 : "", arg2 ? arg2 : "");
+    if (g_android_assertion_log_sink)
+        g_android_assertion_log_sink(assertion);
+#endif
 
     if (windowHandler)
         windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
@@ -558,8 +583,10 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         msgRes = ShowMessage(fatalError, msg);
     }
 
+#ifdef USE_BUG_TRAP
     BT_SetUserMessage(fatalError);
     BT_SaveSnapshotEx(exPtrs, nullptr);
+#endif
 
     const auto reportRes = ReportFault(exPtrs, 0);
     if (msgRes != AssertionResult::abort ||

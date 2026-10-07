@@ -1,6 +1,16 @@
 #include "stdafx.h"
 
 #include <SDL.h>
+#include <algorithm>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <new>
+#if defined(XR_PLATFORM_ANDROID)
+#include <dlfcn.h>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
@@ -21,7 +31,8 @@
 #endif
 
 // On other platforms these options are controlled by CMake
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS) && !defined(USE_PURE_ALLOC) && \
+    !defined(USE_XR_ALIGNED_MALLOC) && !defined(USE_MIMALLOC)
 #   ifdef _DEBUG
 #       define USE_PURE_ALLOC
 #   else
@@ -288,14 +299,59 @@ XRCORE_API pstr xr_strdup(pcstr string)
 #endif
 }
 
+namespace
+{
+#if defined(XR_PLATFORM_ANDROID)
+void report_new_failure(size_t size, size_t alignment, void* caller) noexcept
+{
+    const char* path = std::getenv("OPENXRAY_ENGINE_LOG");
+    if (!path || !*path) return;
+    Dl_info module{};
+    const bool resolved = caller && dladdr(caller, &module) && module.dli_fbase;
+    char line[240];
+    const int length = std::snprintf(line, sizeof(line),
+        "[android-oom] operator new failed size=%zu alignment=%zu caller=%p module=%s offset=0x%zx\n",
+        size, alignment, caller, resolved && module.dli_fname ? module.dli_fname : "unknown",
+        resolved ? size_t(reinterpret_cast<uintptr_t>(caller) - reinterpret_cast<uintptr_t>(module.dli_fbase)) : 0);
+    if (length <= 0) return;
+    const int fd = open(path, O_WRONLY | O_APPEND | O_CLOEXEC);
+    if (fd >= 0)
+    {
+        write(fd, line, std::min(size_t(length), sizeof(line) - 1));
+        close(fd);
+    }
+}
+#endif
+[[nodiscard]] void* checked_new(void* ptr, size_t size, size_t alignment, void* caller)
+{
+    if (ptr) return ptr;
+#if defined(XR_PLATFORM_ANDROID)
+    report_new_failure(size, alignment, caller);
+#else
+    (void)size; (void)alignment; (void)caller;
+#endif
+#if defined(__cpp_exceptions)
+    throw std::bad_alloc{};
+#else
+    std::abort();
+#endif
+}
+}
+
+#if defined(XR_PLATFORM_ANDROID)
+#define XR_NEW_CALLER __builtin_return_address(0)
+#else
+#define XR_NEW_CALLER nullptr
+#endif
+
 [[nodiscard]] void* operator new(size_t size)
 {
-    return Memory.mem_alloc(size);
+    return checked_new(Memory.mem_alloc(size ? size : 1), size, 0, XR_NEW_CALLER);
 }
 
 [[nodiscard]] void* operator new[](size_t size)
 {
-    return Memory.mem_alloc(size);
+    return checked_new(Memory.mem_alloc(size ? size : 1), size, 0, XR_NEW_CALLER);
 }
 
 [[nodiscard]] void* operator new(size_t size, const std::nothrow_t&) noexcept
@@ -310,12 +366,14 @@ XRCORE_API pstr xr_strdup(pcstr string)
 
 [[nodiscard]] void* operator new(size_t size, std::align_val_t alignment)
 {
-    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
+    return checked_new(Memory.mem_alloc(size ? size : 1, static_cast<size_t>(alignment)),
+        size, static_cast<size_t>(alignment), XR_NEW_CALLER);
 }
 
 [[nodiscard]] void* operator new[](size_t size, std::align_val_t alignment)
 {
-    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
+    return checked_new(Memory.mem_alloc(size ? size : 1, static_cast<size_t>(alignment)),
+        size, static_cast<size_t>(alignment), XR_NEW_CALLER);
 }
 
 [[nodiscard]] void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
@@ -327,6 +385,8 @@ XRCORE_API pstr xr_strdup(pcstr string)
 {
     return Memory.mem_alloc(size, static_cast<size_t>(alignment));
 }
+
+#undef XR_NEW_CALLER
 
 void operator delete(void* ptr) noexcept
 {
