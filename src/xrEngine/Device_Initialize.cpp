@@ -70,11 +70,16 @@ void CRenderDevice::Initialize()
         xr_strcpy(Core.ApplicationTitle, title);
         SetSDLSettings(title);
 
-        m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
+        SDL_DisplayMode display{};
+        R_ASSERT3(SDL_GetCurrentDisplayMode(0, &display) == 0 && display.w > 0 && display.h > 0,
+            "Unable to query the current display size", SDL_GetError());
+        m_sdlWnd = SDL_CreateWindow(title, 0, 0, display.w, display.h, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
 
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
+#if !defined(XR_PLATFORM_ANDROID)
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
+#endif
         xrDebug::SetWindowHandler(this);
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
 

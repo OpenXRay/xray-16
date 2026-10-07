@@ -142,7 +142,8 @@ public:
         D3D9,
         D3D10,
         D3D11,
-        OpenGL
+        OpenGL,
+        Vulkan
     };
 
     enum ScreenshotMode : u32
@@ -384,6 +385,10 @@ public:
 
     //	Device state
     virtual DeviceState GetDeviceState() = 0;
+    // Mobile platforms may discard the native window surface while keeping
+    // the engine and renderer alive. Backends can quiesce GPU work on pause
+    // and rebuild surface-dependent resources when the app returns.
+    virtual void OnAppLifecycleChanged(bool) {}
     virtual bool GetForceGPU_REF() = 0;
     virtual u32 GetCacheStatCalls() = 0;
     virtual u32 GetCacheStatPolys() = 0;

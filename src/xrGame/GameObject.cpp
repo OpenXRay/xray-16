@@ -126,8 +126,10 @@ void CGameObject::cNameVisual_set(shared_str N)
     if (N.c_str() && N[0])
     {
         IRenderVisual* old_v = renderable.visual;
+        IRenderVisual* new_v = GEnv.Render->model_Create(N.c_str());
+        R_ASSERT3(new_v, "Could not create object visual", N.c_str());
         NameVisual = N;
-        renderable.visual = GEnv.Render->model_Create(N.c_str());
+        renderable.visual = new_v;
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
         /*

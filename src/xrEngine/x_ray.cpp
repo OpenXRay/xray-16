@@ -24,6 +24,7 @@
 #include "Layers/xrRenderGL/glHW.h"
 #undef RENDER_NAMESPACE
 #include "android_vulkan_smoke.h"
+#include "AndroidRendererChoice.h"
 #endif
 
 #include "IGame_Persistent.h"
@@ -52,6 +53,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/ucontext.h>
 #include <unistd.h>
 #endif
@@ -241,6 +243,9 @@ volatile sig_atomic_t g_android_crash_in_progress = 0;
 uintptr_t g_android_module_base = 0;
 char g_android_load_context[2][192]{};
 volatile sig_atomic_t g_android_load_context_slot = 0;
+pcstr volatile g_android_vulkan_stage = "none";
+constexpr int g_android_crash_signals[] = {SIGABRT, SIGBUS, SIGFPE, SIGILL, SIGSEGV, SIGTRAP, SIGSYS};
+struct sigaction g_android_previous_crash_actions[sizeof(g_android_crash_signals) / sizeof(int)]{};
 
 void android_write_raw(int fd, const char* data, size_t size)
 {
@@ -354,6 +359,7 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
     uintptr_t program_counter = 0;
     uintptr_t stack_pointer = 0;
     uintptr_t link_register = 0;
+    uintptr_t argument_registers[4]{};
     if (raw_context)
     {
         const auto* context = static_cast<const ucontext_t*>(raw_context);
@@ -361,6 +367,10 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
         program_counter = context->uc_mcontext.arm_pc;
         stack_pointer = context->uc_mcontext.arm_sp;
         link_register = context->uc_mcontext.arm_lr;
+        argument_registers[0] = context->uc_mcontext.arm_r0;
+        argument_registers[1] = context->uc_mcontext.arm_r1;
+        argument_registers[2] = context->uc_mcontext.arm_r2;
+        argument_registers[3] = context->uc_mcontext.arm_r3;
 #elif defined(__aarch64__)
         program_counter = context->uc_mcontext.pc;
         stack_pointer = context->uc_mcontext.sp;
@@ -368,7 +378,7 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
 #endif
     }
 
-    char message[512];
+    char message[768];
     char* destination = message;
     char* const end = message + sizeof(message) - 1;
     destination = android_append_text(destination, end, "[android-crash] native ");
@@ -386,6 +396,13 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
     destination = android_append_hex(destination, end, stack_pointer);
     destination = android_append_text(destination, end, " lr=");
     destination = android_append_hex(destination, end, link_register);
+    for (unsigned index = 0; index < 4; ++index)
+    {
+        destination = android_append_text(destination, end, " r");
+        destination = android_append_decimal(destination, end, index);
+        destination = android_append_text(destination, end, "=");
+        destination = android_append_hex(destination, end, argument_registers[index]);
+    }
 
     // Crashes during the first gameplay frame are commonly inside a renderer
     // shared object rather than the module that installed this handler. Ask
@@ -410,12 +427,16 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
     }
     if (g_android_module_base != 0)
     {
-        if (program_counter >= g_android_module_base)
+        if (program_counter >= g_android_module_base &&
+            crashModule.dli_fbase == reinterpret_cast<void*>(g_android_module_base))
         {
             destination = android_append_text(destination, end, " pc-libmain=");
             destination = android_append_hex(destination, end, program_counter - g_android_module_base);
         }
-        if (link_register >= g_android_module_base)
+        Dl_info linkModule{};
+        if (link_register >= g_android_module_base &&
+            dladdr(reinterpret_cast<const void*>(link_register), &linkModule) != 0 &&
+            linkModule.dli_fbase == reinterpret_cast<void*>(g_android_module_base))
         {
             destination = android_append_text(destination, end, " lr-libmain=");
             destination = android_append_hex(destination, end, link_register - g_android_module_base);
@@ -425,6 +446,9 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
     destination = android_append_text(destination, end,
         g_android_load_context[g_android_load_context_slot ? 1 : 0]);
     destination = android_append_text(destination, end, "'");
+    destination = android_append_text(destination, end, " vk-stage='");
+    destination = android_append_text(destination, end, g_android_vulkan_stage);
+    destination = android_append_text(destination, end, "'");
     destination = android_append_text(destination, end,
         "; full Android tombstone/backtrace is in logcat\n");
     *destination = '\0';
@@ -432,11 +456,26 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
     for (size_t i = 0; i < g_android_crash_log.count; ++i)
         android_write_raw(g_android_crash_log.fds[i], message, static_cast<size_t>(destination - message));
 
-    struct sigaction default_action{};
-    sigemptyset(&default_action.sa_mask);
-    default_action.sa_handler = SIG_DFL;
-    sigaction(signal, &default_action, nullptr);
-    kill(getpid(), signal);
+    // Restore Android's debuggerd handler. For a hardware fault, returning
+    // retries the faulting instruction on this thread, retaining its original
+    // si_addr and registers for the system tombstone. kill(getpid(), signal)
+    // targets an arbitrary thread while the current signal is blocked; the
+    // subsequent _exit(128 + signal) hid our crashes from ApplicationExitInfo.
+    for (size_t i = 0; i < sizeof(g_android_crash_signals) / sizeof(int); ++i)
+        if (g_android_crash_signals[i] == signal)
+        {
+            sigaction(signal, &g_android_previous_crash_actions[i], nullptr);
+            break;
+        }
+    if (info && info->si_code > 0)
+        return;
+
+    // Explicitly raised signals do not reoccur when the handler returns.
+    sigset_t unblock;
+    sigemptyset(&unblock);
+    sigaddset(&unblock, signal);
+    sigprocmask(SIG_UNBLOCK, &unblock, nullptr);
+    syscall(SYS_tgkill, getpid(), syscall(SYS_gettid), signal);
     _exit(128 + signal);
 }
 
@@ -448,6 +487,7 @@ void android_open_early_crash_logs()
 
 void android_install_crash_handler()
 {
+    xrDebug::SetAssertionLogSink(android_write_early_to_logs);
     if (!g_android_crash_log.installed)
     {
         android_open_early_crash_logs();
@@ -471,14 +511,17 @@ void android_install_crash_handler()
         android_write_early_to_logs("[android] native crash handler installed");
     }
 
-    static constexpr int signals[] = { SIGABRT, SIGBUS, SIGFPE, SIGILL, SIGSEGV, SIGTRAP, SIGSYS };
-    for (int signal : signals)
+    for (size_t i = 0; i < sizeof(g_android_crash_signals) / sizeof(int); ++i)
     {
+        const int signal = g_android_crash_signals[i];
         struct sigaction action{};
         sigemptyset(&action.sa_mask);
         action.sa_sigaction = android_native_crash_handler;
         action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-        sigaction(signal, &action, nullptr);
+        struct sigaction previous{};
+        if (sigaction(signal, &action, &previous) == 0 &&
+            previous.sa_sigaction != android_native_crash_handler)
+            g_android_previous_crash_actions[i] = previous;
     }
 }
 
@@ -502,6 +545,11 @@ void android_set_load_context(pcstr context)
     }
     destination[index] = '\0';
     g_android_load_context_slot = nextSlot;
+}
+
+void android_set_vulkan_stage(pcstr stage)
+{
+    g_android_vulkan_stage = stage ? stage : "none";
 }
 
 struct android_engine_log_state
@@ -573,7 +621,7 @@ void shutdown_android_engine_log()
 
 void show_renderer_smoke_status(bool success, bool vulkan_probe)
 {
-    SDL_AndroidShowToast(success ? (vulkan_probe ? "OpenXRay: Vulkan render pass passed" : "OpenXRay: GLES renderer passed") :
+    SDL_AndroidShowToast(success ? (vulkan_probe ? "OpenXRay: Vulkan triangle and pixel passed" : "OpenXRay: GLES renderer passed") :
         "OpenXRay: engine load failed; see android.log", 1, -1, 0, 0);
 }
 
@@ -651,8 +699,14 @@ bool initialize_renderer_smoke(renderer_smoke_state& state)
     u32 window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
     xray::render::render_gl::HW.SetPrimaryAttributes(window_flags);
 
+    SDL_DisplayMode display{};
+    if (SDL_GetCurrentDisplayMode(0, &display) != 0 || display.w <= 0 || display.h <= 0)
+    {
+        Msg("! [renderer-smoke] could not query the current display size: %s", SDL_GetError());
+        return false;
+    }
     state.window = SDL_CreateWindow("OpenXRay GLES renderer smoke", SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, 960, 540, window_flags);
+        SDL_WINDOWPOS_CENTERED, display.w, display.h, window_flags);
     if (!state.window)
     {
         Msg("! [renderer-smoke] SDL_CreateWindow failed: %s", SDL_GetError());
@@ -809,7 +863,7 @@ void destroy_renderer_smoke(renderer_smoke_state& state)
 }
 #endif
 
-CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules)
+CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 3>& modules)
 {
     commandLine = commandLine ? commandLine : "";
     m_headless_smoke = commandLine && strstr(commandLine, "-headless-smoke");
@@ -886,6 +940,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         if (m_renderer_vulkan_smoke)
         {
             std::string reason;
+            if (commandLine && strstr(commandLine, "-vk_validation"))
+                SDL_setenv("XRAY_VK_VALIDATION", "1", 1);
             state->vulkan_probe = true;
             state->passed = AndroidVulkanSmoke::Run(reason);
             state->initialized = true;
@@ -910,7 +966,11 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         shortcuts.Disable();
 #endif
 
+#if defined(XR_PLATFORM_ANDROID)
+    if (xray::render::android_native_splash_allowed(commandLine))
+#else
     if (!strstr(commandLine, "-nosplash"))
+#endif
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
         ShowSplash(topmost);
@@ -954,14 +1014,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
 #if defined(XR_PLATFORM_ANDROID)
-    if (strstr(commandLine, "-renderer-vulkan"))
-    {
-        std::string vulkanReason;
-        const bool vulkanReady = AndroidVulkanSmoke::Run(vulkanReason);
-        Msg("[renderer-vulkan] gameplay selection probe: %s; %s",
-            vulkanReady ? "PASS" : "FAILED", vulkanReason.c_str());
-        Msg("[renderer-vulkan] xrRenderVK gameplay pipeline is not complete; GLES fallback will be used");
-    }
+    // The Vulkan smoke test is a separate no-game mode. A game request goes
+    // through renderer selection and cannot turn into an implicit GLES launch.
 #endif
 
     InitSettings();
@@ -1206,6 +1260,9 @@ int CApplication::Run()
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;
+        bool hasAppLifecycleChange = false;
+        bool appIsActive = true;
+        bool appWentToBackground = false;
 
 #if defined(XR_PLATFORM_ANDROID)
         // SDLActivity reports process/task lifecycle with SDL_APP_* events,
@@ -1223,13 +1280,21 @@ int CApplication::Run()
             case SDL_APP_DIDENTERBACKGROUND:
                 canCallActivate = true;
                 shouldActivate = false;
+                hasAppLifecycleChange = true;
+                appIsActive = false;
+                appWentToBackground = true;
                 break;
             case SDL_APP_WILLENTERFOREGROUND:
             case SDL_APP_DIDENTERFOREGROUND:
                 canCallActivate = true;
                 shouldActivate = true;
+                hasAppLifecycleChange = true;
+                appIsActive = true;
                 break;
             case SDL_APP_TERMINATING:
+#if defined(XR_PLATFORM_ANDROID)
+                Msg("[android-lifecycle] SDL_APP_TERMINATING frame=%u", Device.dwFrame);
+#endif
                 Engine.Event.Defer("KERNEL:disconnect");
                 Engine.Event.Defer("KERNEL:quit");
                 break;
@@ -1289,6 +1354,13 @@ int CApplication::Run()
         } // for (int i = 0; i < count; ++i)
 
         // Workaround for screen blinking when there's too much timeouts
+        if (hasAppLifecycleChange && GEnv.Render)
+        {
+            if (appWentToBackground)
+                GEnv.Render->OnAppLifecycleChanged(false);
+            GEnv.Render->OnAppLifecycleChanged(appIsActive);
+        }
+
         if (canCallActivate)
         {
             Device.OnWindowActivate(Device.m_sdlWnd, shouldActivate);
@@ -1299,6 +1371,10 @@ int CApplication::Run()
         UpdateDiscordStatus();
         FrameMarkEnd(FRAME_MARK_APPLICATION_RUN);
     } // while (!SDL_QuitRequested())
+
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-lifecycle] main loop ended frame=%u; SDL quit requested", Device.dwFrame);
+#endif
 
     Device.Shutdown();
 

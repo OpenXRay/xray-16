@@ -218,6 +218,15 @@ void CInput::MouseUpdate()
 
         case SDL_MOUSEBUTTONDOWN:
         {
+#if defined(XR_PLATFORM_ANDROID)
+            // Touch sends motion and a click together. Move the UI cursor
+            // before dispatching the click so its hit test uses this touch.
+            if (offs[0] || offs[1])
+            {
+                cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
+                offs[0] = offs[1] = 0;
+            }
+#endif
             const auto idx = RemapIdx[event.button.button - 1];
             mouseState[idx] = true;
             cbStack.back()->IR_OnMousePress(IdxToKey[idx]);
@@ -835,8 +844,13 @@ void CInput::TouchUpdate()
         { kQUIT, SDL_SCANCODE_ESCAPE },
     };
 
-    const u32 requested = AndroidTouchControlMask();
+    // A complete tap can happen while Vulkan is recording a slow frame.
+    // Keep its down edge for one input frame even if Java already sent up.
+    const u32 requested = AndroidTouchControlMask() | AndroidTouchPressMask();
     const u32 changed = requested ^ touchControlState;
+    if (changed & ((u32(1) << 4) | (u32(1) << 7)))
+        Msg("[android-input] menu controls requested=%02x changed=%02x receiver=%p",
+            requested, changed, cbStack.back());
     if (requested || changed)
         SetCurrentInputType(KeyboardMouse);
 

@@ -90,6 +90,29 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
         m_wnd->SetWndSize(wnd_size);
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    // The video rect is expressed in UI coordinates, whose X and Y pixel
+    // scales differ on wide phone screens. Fit the decoded image using both
+    // scales so that intro clips keep their native proportions.
+    if (strstr(Core.Params, "-renderer-vulkan"))
+    {
+        const Frect source = m_wnd->GetUIStaticItem().GetTextureRect();
+        if (source.width() > 0 && source.height() > 0 && Device.dwWidth && Device.dwHeight)
+        {
+            const float source_aspect = source.width() / source.height();
+            const float screen_aspect = float(Device.dwWidth) / float(Device.dwHeight);
+            Fvector2 fitted{float(UI_BASE_WIDTH), float(UI_BASE_HEIGHT)};
+            if (source_aspect > screen_aspect)
+                fitted.y *= screen_aspect / source_aspect;
+            else
+                fitted.x *= source_aspect / screen_aspect;
+            m_wnd->SetWndPos({UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f});
+            m_wnd->SetAlignment(waCenter);
+            m_wnd->SetWndSize(fitted);
+        }
+    }
+#endif
+
     cpcstr snd_name = xml->Read("sound", 0, "");
 
     if (snd_name && snd_name[0])

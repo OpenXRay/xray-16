@@ -26,6 +26,11 @@ public:
         obj_data = &obj_data_self;
     }
 
+    IC void reset_object_data()
+    {
+        obj_data = &obj_data_self;
+    }
+
     IC void clear()
     {
         sphere.P.set(0, 0, 0);

@@ -6,8 +6,8 @@
 
 namespace AndroidVulkanSmoke
 {
-// Records and submits a Vulkan color render pass to an Android swapchain.
-// This is an independent renderer smoke path, not a gameplay renderer.
+// Draws and reads back a Vulkan triangle without game assets in smoke mode.
+// This is an independent diagnostic path, not a gameplay renderer.
 bool Run(std::string& reason);
 }
 

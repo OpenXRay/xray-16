@@ -71,6 +71,10 @@ void CRenderDevice::RenderEnd(void)
     {
         GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
+        if (dwPrecacheFrame == dwPrecacheTotal - 1 || dwPrecacheFrame % 10 == 0)
+            Msg("[load-trace] precache.frame remaining=%u/%u frame=%u loading=%d sound-muted=%d",
+                dwPrecacheFrame, dwPrecacheTotal, dwFrame,
+                load_screen_renderer.IsActive() ? 1 : 0, dwPrecacheFrame ? 1 : 0);
         if (!dwPrecacheFrame)
         {
             GEnv.Render->updateGamma();
@@ -80,6 +84,7 @@ void CRenderDevice::RenderEnd(void)
                 precache_light.destroy();
             }
             GEnv.Sound->set_master_volume(1.f);
+            Msg("[load-trace] precache.sound restored frame=%u", dwFrame);
             GEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
@@ -115,6 +120,8 @@ void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
         amount = 0;
 
     dwPrecacheFrame = dwPrecacheTotal = amount;
+    Msg("[load-trace] precache.start frames=%u wait-input=%d loading-already-active=%d frame=%u",
+        amount, wait_user_input ? 1 : 0, load_screen_renderer.IsActive() ? 1 : 0, dwFrame);
     if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
     {
         precache_light = GEnv.Render->light_create();
@@ -385,6 +392,15 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
             if (window == m_sdlWnd)
             {
                 UpdateWindowRects();
+#if defined(XR_PLATFORM_ANDROID)
+                if (strstr(Core.Params, "-renderer-vulkan"))
+                {
+                    // Android SDL reports logical window changes independently
+                    // of its Vulkan drawable. The renderer detects actual
+                    // drawable changes in GetDeviceState().
+                    break;
+                }
+#endif
 
                 if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
                     static_cast<int>(psDeviceMode.Height) == event.window.data2)
@@ -408,6 +424,9 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
             if (window == m_sdlWnd)
             {
+#if defined(XR_PLATFORM_ANDROID)
+                Msg("[android-lifecycle] gameplay window close requested frame=%u", dwFrame);
+#endif
                 Engine.Event.Defer("KERNEL:disconnect");
                 Engine.Event.Defer("KERNEL:quit");
             }
@@ -448,7 +467,13 @@ void CRenderDevice::Run()
 void CRenderDevice::Shutdown()
 {
     ZoneScoped;
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-lifecycle] device shutdown begin frame=%u", dwFrame);
+#endif
     seqAppEnd.Process();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-lifecycle] device shutdown end frame=%u", dwFrame);
+#endif
 }
 
 u32 app_inactive_time = 0;
@@ -689,6 +714,7 @@ void CRenderDevice::script_register(lua_State* luaState)
 
 void CLoadScreenRenderer::Start(bool b_user_input)
 {
+    Msg("[load-trace] loading-screen.start wait-input=%d frame=%u", b_user_input ? 1 : 0, Device.dwFrame);
     Device.seqFrame.Add(this, 0);
     Device.seqRender.Add(this, 0);
     m_registered = true;
@@ -702,6 +728,8 @@ void CLoadScreenRenderer::Stop()
 {
     if (!m_registered)
         return;
+    Msg("[load-trace] loading-screen.stop wait-input=%d precache=%u frame=%u",
+        m_need_user_input ? 1 : 0, Device.dwPrecacheFrame, Device.dwFrame);
     Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
 
@@ -719,5 +747,10 @@ void CLoadScreenRenderer::OnFrame()
 
 void CLoadScreenRenderer::OnRender()
 {
+    if ((Device.dwPrecacheFrame &&
+            (Device.dwPrecacheFrame == Device.dwPrecacheTotal - 1 || Device.dwPrecacheFrame % 10 == 0)) ||
+        (!Device.dwPrecacheFrame && Device.dwFrame % 60 == 0))
+        Msg("[load-trace] loading-screen.draw precache=%u frame=%u wait-input=%d",
+            Device.dwPrecacheFrame, Device.dwFrame, m_need_user_input ? 1 : 0);
     g_pGamePersistent->load_draw_internal();
 }

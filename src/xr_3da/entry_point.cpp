@@ -25,12 +25,15 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
-std::array<RendererModule*, 2> s_render_modules =
+std::array<RendererModule*, 3> s_render_modules =
 {
 #ifdef XR_PLATFORM_WINDOWS
     xray::render::render_r4::GetRendererModule(),
 #endif
     xray::render::render_gl::GetRendererModule(),
+#ifdef XR_PLATFORM_ANDROID
+    xray::render::vulkan::GetRendererModule(),
+#endif
 };
 
 struct tracy_raii
@@ -61,7 +64,29 @@ int entry_point(pcstr commandLine)
 
     CApplication app{ commandLine, game, s_render_modules };
 
+#if defined(XR_PLATFORM_ANDROID)
+    try
+    {
+        return app.Run();
+    }
+    catch (const std::bad_alloc&)
+    {
+        // A failed allocation during level loading can make normal teardown
+        // fail before main() gets a chance to report the original exception.
+        android_engine_log_early("[android] unhandled std::bad_alloc in engine loop; process exiting");
+        _exit(EXIT_FAILURE);
+    }
+    catch (const std::exception& error)
+    {
+        char diagnostic[512];
+        snprintf(diagnostic, sizeof(diagnostic),
+            "[android] unhandled engine exception: %.420s; process exiting", error.what());
+        android_engine_log_early(diagnostic);
+        _exit(EXIT_FAILURE);
+    }
+#else
     return app.Run();
+#endif
 }
 
 #if defined(XR_PLATFORM_WINDOWS)

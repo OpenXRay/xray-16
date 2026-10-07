@@ -5,6 +5,7 @@ import android.system.Os;
 import android.util.AtomicFile;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,6 +18,10 @@ final class SessionLogs {
 
     private static AtomicFile pointer(Context context) {
         return new AtomicFile(new File(context.getFilesDir(), "last-engine-log.txt"));
+    }
+
+    static File pending(Context context) {
+        return new File(context.getFilesDir(), "launcher-pending.log");
     }
 
     static final class Session {
@@ -37,11 +42,22 @@ final class SessionLogs {
         File activity = new File(root, "activity_" + id + ".log");
         if (!engine.createNewFile() || !activity.createNewFile())
             throw new IOException("Unable to create unique log session in " + root);
+        File preflight = pending(context);
+        if (preflight.isFile()) {
+            try (FileInputStream input = new FileInputStream(preflight);
+                 FileOutputStream output = new FileOutputStream(activity, true)) {
+                byte[] bytes = new byte[8192];
+                int count;
+                while ((count = input.read(bytes)) != -1) output.write(bytes, 0, count);
+            }
+            if (!preflight.delete()) throw new IOException("Cannot clear launcher preflight log: " + preflight);
+        }
         AtomicFile pointer = pointer(context);
         FileOutputStream output = null;
         try {
             output = pointer.startWrite();
-            output.write((engine.getAbsolutePath() + "\n" + activity.getAbsolutePath()).getBytes(StandardCharsets.UTF_8));
+            output.write((engine.getAbsolutePath() + "\n" + activity.getAbsolutePath() + "\n"
+                    + System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
             pointer.finishWrite(output);
         } catch (IOException error) {
             if (output != null) pointer.failWrite(output);
@@ -68,10 +84,21 @@ final class SessionLogs {
         try {
             String path = new String(pointer(context).readFully(), StandardCharsets.UTF_8);
             String[] paths = path.split("\\n", -1);
-            if (paths.length != 2 || !new File(paths[0]).isFile() || !new File(paths[1]).isFile()) return new File[0];
-            return new File[] {new File(paths[0]), new File(paths[1])};
+            if (paths.length < 2 || !new File(paths[0]).isFile() || !new File(paths[1]).isFile()) return new File[0];
+            return new File[] {new File(paths[0]), new File(paths[1]),
+                    new File(paths[0] + ".native-exit.txt"),
+                    new File(paths[0] + ".native-tombstone.pb")};
         } catch (IOException error) {
             return new File[0];
+        }
+    }
+
+    static long latestStartTime(Context context) {
+        try {
+            String[] paths = new String(pointer(context).readFully(), StandardCharsets.UTF_8).split("\\n", -1);
+            return paths.length >= 3 ? Long.parseLong(paths[2]) : 0;
+        } catch (IOException | NumberFormatException error) {
+            return 0;
         }
     }
 }

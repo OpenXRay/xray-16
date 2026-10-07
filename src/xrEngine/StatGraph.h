@@ -12,6 +12,10 @@ namespace render_r4
 {
 class dxStatGraphRender;
 }
+namespace vulkan
+{
+class VulkanStatGraphRender;
+}
 namespace render_gl
 {
 class dxStatGraphRender;
@@ -23,6 +27,7 @@ class ENGINE_API CStatGraph : public pureRender
 {
     friend class xray::render::render_r4::dxStatGraphRender;
     friend class xray::render::render_gl::dxStatGraphRender;
+    friend class xray::render::vulkan::VulkanStatGraphRender;
 
 public:
     enum EStyle

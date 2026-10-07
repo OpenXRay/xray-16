@@ -196,11 +196,22 @@ void CPhysicObject::RunStartupAnim(CSE_Abstract* D)
             R_ASSERT(visual);
             R_ASSERT2(visual->startup_animation.c_str(), "no startup animation");
 
-            VERIFY2((!!PKinematicsAnimated->LL_MotionID(visual->startup_animation.c_str()).valid()),
-                (make_string(" animation %s not faund ", visual->startup_animation.c_str()) +
-                    dbg_object_base_dump_string(this))
-                    .c_str());
-            m_anim_blend = m_anim_script_callback.play_cycle(PKinematicsAnimated, visual->startup_animation);
+            const MotionID startup_motion = PKinematicsAnimated->LL_MotionID(visual->startup_animation.c_str());
+#if defined(XR_PLATFORM_ANDROID)
+            if (strstr(Core.Params, "-renderer-vulkan") && !startup_motion.valid())
+            {
+                Msg("! [renderer-vulkan] startup animation missing object='%s' model='%s' motion='%s'; keeping bind pose",
+                    cName().c_str(), cNameVisual().c_str(), visual->startup_animation.c_str());
+            }
+            else
+#endif
+            {
+                VERIFY2(startup_motion.valid(),
+                    (make_string(" animation %s not faund ", visual->startup_animation.c_str()) +
+                        dbg_object_base_dump_string(this))
+                        .c_str());
+                m_anim_blend = m_anim_script_callback.play_cycle(PKinematicsAnimated, visual->startup_animation);
+            }
         }
         smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();
         smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);

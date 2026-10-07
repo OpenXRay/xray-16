@@ -13,6 +13,7 @@ namespace
 {
 constexpr int TouchControlCount = 8;
 std::atomic<std::uint32_t> g_touchControls{};
+std::atomic<std::uint32_t> g_touchPresses{};
 
 Uint32 touch_window_id()
 {
@@ -28,6 +29,11 @@ std::uint32_t AndroidTouchControlMask() noexcept
     return g_touchControls.load(std::memory_order_acquire);
 }
 
+std::uint32_t AndroidTouchPressMask() noexcept
+{
+    return g_touchPresses.exchange(0, std::memory_order_acq_rel);
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_org_openxray_app_XRayActivity_nativeSetTouchControl(
     JNIEnv*, jclass, jint control, jboolean pressed)
@@ -37,7 +43,10 @@ Java_org_openxray_app_XRayActivity_nativeSetTouchControl(
 
     const std::uint32_t bit = std::uint32_t(1) << control;
     if (pressed)
+    {
+        g_touchPresses.fetch_or(bit, std::memory_order_release);
         g_touchControls.fetch_or(bit, std::memory_order_release);
+    }
     else
         g_touchControls.fetch_and(~bit, std::memory_order_release);
 }

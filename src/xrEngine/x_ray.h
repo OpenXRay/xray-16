@@ -21,6 +21,8 @@ class Core;
 void android_install_crash_handler();
 void android_engine_log_early(pcstr message);
 void android_set_load_context(pcstr context);
+// Static stage name for the Vulkan call in progress; safe to read from the crash handler.
+void android_set_vulkan_stage(pcstr stage);
 #endif
 
 // definition
@@ -55,7 +57,7 @@ private:
 
 public:
     // Other
-    CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules);
+    CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 3>& modules);
     ~CApplication();
 
     int Run();
