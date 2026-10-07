@@ -156,6 +156,7 @@ private:
     std::vector<std::array<VkDescriptorSet, LocalLightCapacity>> local_sets_;
     std::vector<VulkanLightSnapshot> light_snapshots_;
     std::vector<LocalLightUniform> local_uniforms_;
+    std::vector<VkRect2D> local_scissors_;
     std::vector<BufferResource> forward_buffers_;
     ForwardLightUniform forward_lighting_{};
     bool local_lights_recorded_{true};

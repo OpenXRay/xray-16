@@ -19,6 +19,54 @@ template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const
 {
     return reinterpret_cast<T>(get(device, name));
 }
+
+// The light shader draws a screen triangle. Restrict it to the projection of
+// its range sphere so distant lamps do not shade millions of unrelated pixels.
+// A cube encloses the sphere; if it crosses the near plane, use the whole
+// viewport rather than risk clipping the visible part of the light.
+VkRect2D light_scissor(const Fmatrix& view_projection, const VulkanLightSnapshot& light,
+    VkExtent2D extent)
+{
+    const VkRect2D full{{0, 0}, extent};
+    if (!extent.width || !extent.height) return {};
+    Fvector4 clips[8];
+    uint32_t index = 0;
+    for (int x : {-1, 1}) for (int y : {-1, 1}) for (int z : {-1, 1})
+    {
+        Fvector4 world;
+        world.set(light.position[0] + x * light.range,
+            light.position[1] + y * light.range,
+            light.position[2] + z * light.range, 1.f);
+        view_projection.transform(clips[index++], world);
+    }
+    const auto outside = [&](auto plane)
+    {
+        return std::all_of(std::begin(clips), std::end(clips),
+            [&](const Fvector4& clip) { return plane(clip); });
+    };
+    if (outside([](const Fvector4& c) { return c.x < -c.w; }) ||
+        outside([](const Fvector4& c) { return c.x > c.w; }) ||
+        outside([](const Fvector4& c) { return c.y < -c.w; }) ||
+        outside([](const Fvector4& c) { return c.y > c.w; }) ||
+        outside([](const Fvector4& c) { return c.z < 0.f; }) ||
+        outside([](const Fvector4& c) { return c.z > c.w; })) return {};
+    float min_x = 1.f, min_y = 1.f, max_x = 0.f, max_y = 0.f;
+    for (const auto& clip : clips)
+    {
+        if (!std::isfinite(clip.w) || clip.w <= 1e-5f) return full;
+        const float nx = clip.x / clip.w, ny = clip.y / clip.w;
+        if (!std::isfinite(nx) || !std::isfinite(ny)) return full;
+        min_x = std::min(min_x, .5f * (nx + 1.f));
+        max_x = std::max(max_x, .5f * (nx + 1.f));
+        min_y = std::min(min_y, .5f * (1.f - ny));
+        max_y = std::max(max_y, .5f * (1.f - ny));
+    }
+    const auto left = uint32_t(std::floor(std::clamp(min_x, 0.f, 1.f) * extent.width));
+    const auto top = uint32_t(std::floor(std::clamp(min_y, 0.f, 1.f) * extent.height));
+    const auto right = uint32_t(std::ceil(std::clamp(max_x, 0.f, 1.f) * extent.width));
+    const auto bottom = uint32_t(std::ceil(std::clamp(max_y, 0.f, 1.f) * extent.height));
+    return {{int32_t(left), int32_t(top)}, {right - left, bottom - top}};
+}
 }
 
 bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::string& error)
@@ -479,7 +527,8 @@ void VulkanGameDevice::record_local_lights(const FrameRecordingContext& frame, v
                 VkDeviceSize(i) * owner.local_shadows_.uniform_stride(), sizeof(LocalLightUniform),
                 set, owner.model_error_))
         { owner.local_lights_recorded_ = false; return; }
-        if (!owner.deferred_.record_local_light(frame, owner.targets_.lighting_set(frame.image_index), set))
+        if (!owner.deferred_.record_local_light(frame, owner.targets_.lighting_set(frame.image_index),
+                set, owner.local_scissors_[i]))
         { owner.local_lights_recorded_ = false; return; }
     }
 }
@@ -741,6 +790,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         std::memcpy(sun_uniform.sun_view_projection, &sun_vp, sizeof(sun_vp));
     }
     local_uniforms_.clear();
+    local_scissors_.clear();
     if (render_world)
     {
         Fmatrix camera, inverse;
@@ -766,10 +816,13 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         };
         std::stable_sort(nearby.begin(), nearby.end(), [&](const auto* a, const auto* b)
         { return distance(a) < distance(b); });
+        const VkExtent2D extent = window_.frame().extent();
         for (const VulkanLightSnapshot* snapshot : nearby)
         {
             if (local_uniforms_.size() >= LocalLightCapacity) break;
             const auto& light_snapshot = *snapshot;
+            const VkRect2D scissor = light_scissor(camera, light_snapshot, extent);
+            if (!scissor.extent.width || !scissor.extent.height) continue;
             LocalLightUniform local{};
             std::memcpy(local.inverse_view_projection, &inverse, sizeof(inverse));
             const auto& position = light_snapshot.position;
@@ -787,7 +840,18 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             local.color_type[3] = spot ? 1.f : 0.f;
             const float cone = std::clamp(light_snapshot.cone, .15f, 3.f);
             local.direction_cone[3] = std::cos(cone * .5f);
-            const bool cast = light_snapshot.shadow && shadow_slot < LocalShadowSlots;
+#if defined(XR_PLATFORM_ANDROID)
+            // A point light replays the level six times. On mobile, only one
+            // prominent shadowed local light is affordable; other lights
+            // still illuminate their projected area without a shadow map.
+            const uint32_t shadow_budget = 1;
+#else
+            const uint32_t shadow_budget = LocalShadowSlots;
+#endif
+            const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
+            const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
+            const bool cast = light_snapshot.shadow && shadow_slot < shadow_budget &&
+                pixels * 20 >= screen_pixels;
             local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
             local.shadow_params[1] = .002f;
             local.shadow_params[2] = cast ? 1.f : 0.f;
@@ -819,6 +883,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
                 ++shadow_slot;
             }
             local_uniforms_.push_back(local);
+            local_scissors_.push_back(scissor);
         }
     }
     std::copy_n(light.direction_ambient, 4, forward_lighting_.sun_direction_ambient);

@@ -156,7 +156,7 @@ public:
         const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr) const;
     bool record_local_light(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
-        VkDescriptorSet local_set) const;
+        VkDescriptorSet local_set, const VkRect2D& scissor) const;
     bool record_water(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
         uint32_t first_index, float time, float opacity = .72f) const;

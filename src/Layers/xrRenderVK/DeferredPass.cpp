@@ -1008,12 +1008,13 @@ bool DeferredPass::record_lighting(const FrameRecordingContext& frame, VkDescrip
 }
 
 bool DeferredPass::record_local_light(const FrameRecordingContext& frame,
-    VkDescriptorSet gbuffer_set, VkDescriptorSet local_set) const
+    VkDescriptorSet gbuffer_set, VkDescriptorSet local_set, const VkRect2D& scissor) const
 {
     if (!local_light_pipeline_ || frame.render_pass != light_pass_ ||
         !frame.command_buffer || !gbuffer_set || !local_set) return false;
     vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, local_light_pipeline_);
     viewport_scissor(frame, vk_);
+    vk_.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
     const VkDescriptorSet sets[]{gbuffer_set, local_set};
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         local_light_layout_, 0, 2, sets, 0, nullptr);
