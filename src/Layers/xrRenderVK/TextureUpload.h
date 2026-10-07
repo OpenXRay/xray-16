@@ -34,6 +34,9 @@ struct TextureUploadDispatch
     PFN_vkDestroyFence destroy_fence{};
     PFN_vkGetFenceStatus get_fence_status{};
     PFN_vkWaitForFences wait_for_fences{};
+    // Some Adreno drivers fault when recording the post-copy memory barrier.
+    // A completed upload fence provides the transfer-to-sampling dependency.
+    bool fence_after_copy = false;
 };
 
 struct UploadedTexture
@@ -51,6 +54,7 @@ struct PendingTextureUpload
     VkDeviceMemory staging_memory = VK_NULL_HANDLE;
     VkCommandBuffer command = VK_NULL_HANDLE;
     VkFence fence = VK_NULL_HANDLE;
+    VkDeviceSize staging_bytes = 0;
 };
 
 bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,

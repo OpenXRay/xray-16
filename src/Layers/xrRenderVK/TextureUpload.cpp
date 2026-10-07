@@ -1,4 +1,11 @@
 #include "TextureUpload.h"
+#include "Common/Platform.hpp"
+#if defined(XR_PLATFORM_ANDROID)
+// This translation unit does not include the engine precompiled header.
+// Keep the crash breadcrumbs available without pulling in engine globals.
+extern void android_set_load_context(const char* context);
+extern void android_set_vulkan_stage(const char* stage);
+#endif
 
 #include <cstring>
 
@@ -56,7 +63,36 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
         return false;
     }
 
+    // Each outstanding copy owns host-visible staging memory and a command
+    // buffer. A level can request hundreds of DDS files before the GPU retires
+    // them; bound both the number of submissions and their total staging size.
+    constexpr size_t max_pending_uploads = 8;
+    constexpr VkDeviceSize max_pending_bytes = 32u * 1024u * 1024u;
+    VkDeviceSize pending_bytes = 0;
+    for (const auto& entry : pending_uploads)
+        pending_bytes += entry.staging_bytes;
+    const VkDeviceSize next_bytes = source.pixels.size();
+    while (!pending_uploads.empty() &&
+        (pending_uploads.size() >= max_pending_uploads ||
+            next_bytes > max_pending_bytes || pending_bytes > max_pending_bytes - next_bytes))
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        android_set_load_context("vulkan texture: waiting for staging memory");
+#endif
+        PendingTextureUpload& oldest = pending_uploads.front();
+        const VkResult waited = vk.wait_for_fences(device, 1, &oldest.fence, VK_TRUE, UINT64_MAX);
+        if (waited != VK_SUCCESS)
+        {
+            error = "Vulkan texture upload fence wait failed: " + std::to_string(waited);
+            return false;
+        }
+        pending_bytes -= oldest.staging_bytes;
+        release_upload(device, pool, vk, oldest);
+        pending_uploads.erase(pending_uploads.begin());
+    }
+
     PendingTextureUpload upload;
+    upload.staging_bytes = next_bytes;
     auto cleanup = [&]
     {
         release_upload(device, pool, vk, upload);
@@ -142,7 +178,10 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     if (vk.begin_command_buffer(upload.command, &begin) != VK_SUCCESS)
         return fail("Vulkan upload command recording failed");
     const ImageStateDispatch image_state_dispatch{vk.cmd_pipeline_barrier};
-    if (!image_states.transition(upload.command, result.image, ImageUse::TransferDestination,
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_load_context("vulkan texture: undefined -> general for transfer");
+#endif
+    if (!image_states.transition(upload.command, result.image, ImageUse::TransferDestinationGeneral,
             image_state_dispatch, error))
     {
         cleanup();
@@ -150,18 +189,31 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
         destroy_texture(device, vk, result);
         return false;
     }
-    vk.cmd_copy_buffer_to_image(upload.command, upload.staging, result.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+    vk.cmd_copy_buffer_to_image(upload.command, upload.staging, result.image, VK_IMAGE_LAYOUT_GENERAL,
         static_cast<uint32_t>(source.copies.size()), source.copies.data());
-    if (!image_states.transition(upload.command, result.image, ImageUse::Sampled,
-            image_state_dispatch, error))
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_vulkan_stage("texture transfer write to shader read");
+    android_set_load_context("vulkan texture: transfer write -> shader read in general layout");
+#endif
+    // Keep immutable game textures in GENERAL. The affected Adreno driver
+    // faults here even for a memory-only barrier. Wait for the submission's
+    // fence before exposing its image view on that driver: fence signal/wait
+    // makes transfer writes visible to later queue submissions. Other drivers
+    // retain the asynchronous upload and explicit memory barrier.
+    if (!vk.fence_after_copy)
     {
-        cleanup();
-        image_states.forget_image(result.image);
-        destroy_texture(device, vk, result);
-        return false;
+        VkMemoryBarrier ready{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+        ready.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        ready.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        vk.cmd_pipeline_barrier(upload.command, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 1, &ready, 0, nullptr, 0, nullptr);
     }
-    if (vk.end_command_buffer(upload.command) != VK_SUCCESS)
-        return fail("Vulkan upload command finalization failed");
+    const VkResult ended = vk.end_command_buffer(upload.command);
+    if (ended != VK_SUCCESS)
+    {
+        const std::string reason = "Vulkan upload command finalization failed: " + std::to_string(ended);
+        return fail(reason.c_str());
+    }
 
     VkImageViewCreateInfo view_info{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
     view_info.image = result.image;
@@ -187,8 +239,40 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     VkSubmitInfo submit{VK_STRUCTURE_TYPE_SUBMIT_INFO};
     submit.commandBufferCount = 1;
     submit.pCommandBuffers = &upload.command;
+#if defined(XR_PLATFORM_ANDROID)
+    android_set_vulkan_stage("texture upload queue submit");
+    android_set_load_context("vulkan texture: queue submit");
+#endif
     if (vk.queue_submit(queue, 1, &submit, upload.fence) != VK_SUCCESS)
         return fail("Vulkan texture upload submission failed");
+    if (vk.fence_after_copy)
+    {
+#if defined(XR_PLATFORM_ANDROID)
+        android_set_vulkan_stage("texture upload fence wait");
+        android_set_load_context("vulkan texture: waiting for copy fence");
+#endif
+        const VkResult waited = vk.wait_for_fences(device, 1, &upload.fence, VK_TRUE, UINT64_MAX);
+        if (waited != VK_SUCCESS)
+        {
+            error = "Vulkan texture copy fence wait failed: " + std::to_string(waited);
+            // A device-lost fence is terminal; otherwise retain the submitted
+            // staging resources until the device is torn down.
+            if (waited == VK_ERROR_DEVICE_LOST)
+                cleanup();
+            else
+            {
+                pending_uploads.push_back(upload);
+                upload = {};
+            }
+            image_states.forget_image(result.image);
+            if (waited == VK_ERROR_DEVICE_LOST)
+                destroy_texture(device, vk, result);
+            return false;
+        }
+        release_upload(device, pool, vk, upload);
+        error.clear();
+        return true;
+    }
     pending_uploads.push_back(upload);
     upload = {};
     error.clear();
@@ -214,12 +298,17 @@ void collect_completed_uploads(VkDevice device, VkCommandPool pool, const Textur
 bool wait_for_uploads(VkDevice device, VkCommandPool pool, const TextureUploadDispatch& vk,
     std::vector<PendingTextureUpload>& pending_uploads)
 {
+    bool device_lost = false;
     for (const auto& upload : pending_uploads)
-        if (vk.wait_for_fences(device, 1, &upload.fence, VK_TRUE, UINT64_MAX) != VK_SUCCESS)
+    {
+        const VkResult result = vk.wait_for_fences(device, 1, &upload.fence, VK_TRUE, UINT64_MAX);
+        if (result == VK_ERROR_DEVICE_LOST) device_lost = true;
+        else if (result != VK_SUCCESS)
             return false;
+    }
     for (auto& upload : pending_uploads)
         release_upload(device, pool, vk, upload);
     pending_uploads.clear();
-    return true;
+    return !device_lost;
 }
 }

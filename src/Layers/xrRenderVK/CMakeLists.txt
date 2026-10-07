@@ -1,16 +1,150 @@
 add_library(xrRenderVK STATIC)
 
 target_sources(xrRenderVK PRIVATE
+    VulkanRendererModule.cpp
+    VulkanProbe.cpp
+    VulkanProbe.h
+    SlidingWindows.cpp
+    SlidingWindows.h
+    SpecialVisuals.cpp
+    SpecialVisuals.h
+    BufferResource.cpp
+    BufferResource.h
+    BufferUpload.cpp
+    BufferUpload.h
     DdsTexture.cpp
     DdsTexture.h
+    DetailAssets.cpp
+    DetailAssets.h
+    DeferredPass.cpp
+    DeferredPass.h
+    DeferredFrame.cpp
+    DeferredFrame.h
+    ForwardLighting.h
+    DeferredAlphaTestShaders.h
+    VulkanGameShaders.h
+    DeferredShaderFactory.cpp
+    DeferredShaderFactory.h
+    GameShaderResources.cpp
+    GameShaderResources.h
+    ShaderMaterialLibrary.cpp
+    ShaderMaterialLibrary.h
+    DeferredShaders.h
+    WeatherShaders.h
+    smoke/weather.frag
+    EngineTextureSource.cpp
+    EngineTextureSource.h
+    EngineLevelModels.cpp
+    EngineLevelModels.h
     FrameContext.cpp
     FrameContext.h
+    GameTextureFactory.cpp
+    GameTextureFactory.h
+    GBufferTargets.cpp
+    GBufferTargets.h
+    SunShadowTargets.cpp
+    SunShadowTargets.h
+    LocalShadowTargets.cpp
+    LocalShadowTargets.h
+    LocalLightShaders.h
+    WaterTargets.cpp
+    WaterTargets.h
+    WaterShaders.h
+    ShadowShaders.h
+    GpuLevel.cpp
+    GpuLevel.h
+    GpuModel.cpp
+    GpuModel.h
     ImageStateTracker.cpp
     ImageStateTracker.h
+    LevelModels.cpp
+    LevelModels.h
+    LevelVisibility.cpp
+    LevelVisibility.h
+    ModelGeometry.cpp
+    ModelGeometry.h
+    SkeletonBones.cpp
+    SkeletonBones.h
+    SkeletonMotions.cpp
+    SkeletonMotions.h
+    MotionPlayback.cpp
+    MotionPlayback.h
+    ParticleCatalog.cpp
+    ParticleCatalog.h
+    ParticleVisual.cpp
+    ParticleVisual.h
+    VulkanKinematics.cpp
+    VulkanKinematics.h
+    ScreenCopyPass.cpp
+    ScreenCopyPass.h
+    PostProcessShaders.h
+    smoke/postprocess.frag
+    ScenePass.cpp
+    ScenePass.h
+    ShaderModule.cpp
+    ShaderModule.h
+    SmokeShaders.h
+    SmokeTrianglePass.cpp
+    SmokeTrianglePass.h
     TextureUpload.cpp
     TextureUpload.h
     VulkanHardware.cpp
     VulkanHardware.h
+    VulkanWindowDevice.cpp
+    VulkanWindowDevice.h
+    VisualCatalog.cpp
+    VisualCatalog.h
+    VulkanVisual.cpp
+    VulkanVisual.h
+    VulkanModelVisual.h
+    VulkanUIShader.cpp
+    VulkanUIShader.h
+    VulkanRenderFactory.cpp
+    VulkanRenderFactory.h
+    VulkanImGuiRender.cpp
+    VulkanImGuiRender.h
+    VulkanVideoTexture.cpp
+    VulkanVideoTexture.h
+    VulkanUISequenceVideoItem.cpp
+    VulkanUISequenceVideoItem.h
+    VulkanFontRender.cpp
+    VulkanFontRender.h
+    VulkanStatGraphRender.cpp
+    VulkanStatGraphRender.h
+    VulkanWallMarkArray.cpp
+    VulkanWallMarkArray.h
+    VulkanEnvDescriptorRender.cpp
+    VulkanEnvDescriptorRender.h
+    VulkanEnvironmentRender.cpp
+    VulkanEnvironmentRender.h
+    VulkanRainRender.cpp
+    VulkanRainRender.h
+    VulkanLensFlareRender.cpp
+    VulkanLensFlareRender.h
+    VulkanThunderboltRender.cpp
+    VulkanThunderboltRender.h
+    VulkanDrawUtils.cpp
+    VulkanDrawUtils.h
+    VulkanDebugRender.cpp
+    VulkanDebugRender.h
+    EngineParticleSource.cpp
+    EngineParticleSource.h
+    WallmarkGeometry.cpp
+    WallmarkGeometry.h
+    VulkanLevelRender.cpp
+    VulkanLevelRender.h
+    VulkanCameraState.h
+    VulkanDeviceResourceState.h
+    VulkanFramePhaseState.h
+    VulkanRenderContextState.h
+    VulkanGameLighting.cpp
+    VulkanGameLighting.h
+    VulkanGameLightingMath.cpp
+    VulkanGameLightingMath.h
+    VulkanUIRender.cpp
+    VulkanUIRender.h
+    VulkanGameDevice.cpp
+    VulkanGameDevice.h
 )
 
 include("${CMAKE_SOURCE_DIR}/cmake/XRay.Gli.cmake")
@@ -20,10 +154,19 @@ target_include_directories(xrRenderVK
     PUBLIC
     "${CMAKE_SOURCE_DIR}/Externals/Vulkan-Headers/include"
     PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/Externals"
+    "${CMAKE_SOURCE_DIR}/Externals/luabind"
+    "${CMAKE_SOURCE_DIR}/Externals/tracy/public"
+    "${CMAKE_SOURCE_DIR}/Externals/imgui"
     "${XRAY_GLI_INCLUDE_DIR}"
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
 )
 
+target_link_libraries(xrRenderVK PRIVATE SDL2::SDL2 xrCDB)
+
 set_target_properties(xrRenderVK PROPERTIES
     PREFIX ""
+    UNITY_BUILD OFF
 )

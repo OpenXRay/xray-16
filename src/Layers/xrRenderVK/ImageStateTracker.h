@@ -12,6 +12,7 @@ enum class ImageUse
     Undefined,
     TransferSource,
     TransferDestination,
+    TransferDestinationGeneral,
     Sampled,
     ColorAttachment,
     DepthStencilAttachment,

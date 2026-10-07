@@ -151,10 +151,9 @@ manager::particle_ids_type const& manager::particle_ids() const
         return (m_particle_ids);
 
     auto const& library = m_pRender->particles_systems_library();
-    PS::CPGDef const* const* i = library.particles_group_begin();
-    PS::CPGDef const* const* e = library.particles_group_end();
-    for (; i != e; library.particles_group_next(i))
-        m_particle_ids.push_back(library.particles_group_id(**i).c_str());
+    library.particles_group_ids(m_particle_names);
+    for (const auto& id : m_particle_names)
+        m_particle_ids.push_back(id.c_str());
 
     std::sort(m_particle_ids.begin(), m_particle_ids.end(), detail::logical_string_predicate());
     return (m_particle_ids);

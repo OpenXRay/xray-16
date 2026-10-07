@@ -31,9 +31,11 @@ ImageUseInfo describe(ImageUse use)
         return {VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
     case ImageUse::TransferDestination:
         return {VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
+    case ImageUse::TransferDestinationGeneral:
+        return {VK_IMAGE_LAYOUT_GENERAL, VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
     case ImageUse::Sampled:
         return {VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_SHADER_READ_BIT,
-            VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT};
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT};
     case ImageUse::ColorAttachment:
         return {VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
             VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
@@ -55,6 +57,7 @@ bool valid_use(ImageUse use)
     case ImageUse::Undefined:
     case ImageUse::TransferSource:
     case ImageUse::TransferDestination:
+    case ImageUse::TransferDestinationGeneral:
     case ImageUse::Sampled:
     case ImageUse::ColorAttachment:
     case ImageUse::DepthStencilAttachment:
