@@ -840,9 +840,10 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             [](const ModelDraw& draw) { return draw.skeleton != nullptr; });
         const auto linked = std::count_if(level_draws_.begin(), level_draws_.end(),
             [](const LevelDraw& draw) { return draw.instance != nullptr; });
-        Msg("[renderer-vulkan] scene.submit frame=%u level=%zu linked=%zu models=%zu animated=%zu particles=%zu rain=%zu weather=%d",
+        Msg("[renderer-vulkan] scene.submit frame=%u level=%zu linked=%zu models=%zu animated=%zu particles=%zu rain=%zu weather=%d lights=%zu local-lights=%zu",
             Device.dwFrame, level_draws_.size(), linked, model_draws_.size(), animated,
-            particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE);
+            particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE,
+            light_snapshots_.size(), local_uniforms_.size());
     }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
