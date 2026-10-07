@@ -98,7 +98,14 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;
 #endif
+    // The level lightmap already contains baked illumination. Mark it in the
+    // otherwise unused normal alpha channel so the deferred ambient/sun pass
+    // does not darken that light a second time. Local lights remain additive.
+#if defined(VK_LIGHTMAP)
+    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 0.0);
+#else
     output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
+#endif
     return output;
 }
 #endif

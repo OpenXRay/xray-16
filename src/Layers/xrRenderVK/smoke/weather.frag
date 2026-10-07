@@ -50,10 +50,12 @@ void main()
     {
         float depth = texture(depth_buffer, texcoord).r;
         vec4 albedo = texture(albedo_buffer, texcoord);
-        vec3 normal = normalize(texture(normal_buffer, texcoord).rgb * 2.0 - 1.0);
+        vec4 encoded_normal = texture(normal_buffer, texcoord);
+        vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
-        vec3 lit = albedo.rgb * (weather.direction_ambient.w +
-            diffuse * sun_visibility(depth) * weather.light_color.rgb);
+        vec3 lit = encoded_normal.a < 0.5 ? albedo.rgb :
+            albedo.rgb * (weather.direction_ambient.w +
+                diffuse * sun_visibility(depth) * weather.light_color.rgb);
         vec2 fog_rg = unpackHalf2x16(floatBitsToUint(weather.ray_base.w));
         vec2 fog_b_near = unpackHalf2x16(floatBitsToUint(weather.ray_dx.w));
         vec2 fog_far_projection = unpackHalf2x16(floatBitsToUint(weather.ray_dy.w));
