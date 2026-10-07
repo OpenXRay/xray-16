@@ -455,6 +455,45 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
             model.fast = std::make_shared<LevelModel>(std::move(fast_models.front()));
         }
     }
+    // The level header's sphere is occasionally stale (notably on tree and
+    // terrain leaves). A stale sphere makes frustum rejection hide geometry
+    // that is still in view. Derive a conservative sphere from the decoded
+    // world-space vertices only when the header cannot enclose them.
+    if (!model.vertices.empty())
+    {
+        auto& bounds = nodes[node_index].bounds;
+        bool outside = false;
+        const double radius = bounds[9];
+        for (const auto& vertex : model.vertices)
+        {
+            const double dx = double(vertex.position[0]) - bounds[6];
+            const double dy = double(vertex.position[1]) - bounds[7];
+            const double dz = double(vertex.position[2]) - bounds[8];
+            if (dx * dx + dy * dy + dz * dz > (radius + .01) * (radius + .01))
+            { outside = true; break; }
+        }
+        if (outside)
+        {
+            float minimum[3]{INFINITY, INFINITY, INFINITY};
+            float maximum[3]{-INFINITY, -INFINITY, -INFINITY};
+            for (const auto& vertex : model.vertices)
+                for (int axis = 0; axis < 3; ++axis)
+                {
+                    minimum[axis] = std::min(minimum[axis], vertex.position[axis]);
+                    maximum[axis] = std::max(maximum[axis], vertex.position[axis]);
+                }
+            double extent_squared = 0;
+            for (int axis = 0; axis < 3; ++axis)
+            {
+                bounds[axis] = minimum[axis];
+                bounds[axis + 3] = maximum[axis];
+                bounds[axis + 6] = minimum[axis] * .5f + maximum[axis] * .5f;
+                const double half = (double(maximum[axis]) - minimum[axis]) * .5;
+                extent_squared += half * half;
+            }
+            bounds[9] = static_cast<float>(std::sqrt(extent_squared)) + .01f;
+        }
+    }
     nodes[node_index].mesh = static_cast<int32_t>(models.size());
     models.push_back(std::move(model));
     return true;

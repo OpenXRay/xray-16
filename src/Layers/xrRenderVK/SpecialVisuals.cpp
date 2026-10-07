@@ -106,8 +106,11 @@ bool transform_tree_vertices(LevelBytes definition, LevelModel& model, std::stri
         const std::array<float, 3> normal{vertex.normal[0], vertex.normal[1], vertex.normal[2]};
         for (size_t axis = 0; axis < 3; ++axis)
         {
-            vertex.position[axis] = (matrix[axis] * source[0] + matrix[4 + axis] * source[1] +
-                matrix[8 + axis] * source[2]) / 2048.f + matrix[12 + axis];
+            // OGF_TREEDEF2 is the same transform passed directly to the GLES
+            // tree shader. Only tree texture coordinates use the 1/2048
+            // quantization factor; dividing positions collapses whole trees.
+            vertex.position[axis] = matrix[axis] * source[0] + matrix[4 + axis] * source[1] +
+                matrix[8 + axis] * source[2] + matrix[12 + axis];
             if (!std::isfinite(vertex.position[axis]))
             { error = "nonfinite transformed OGF tree"; return false; }
             vertex.normal[axis] = matrix[axis] * normal[0] + matrix[4 + axis] * normal[1] +

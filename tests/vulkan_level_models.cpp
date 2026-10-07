@@ -365,7 +365,7 @@ int main()
     // selects windows from level.geom's fsL_SWIS table.
     Bytes tree_def, tree_visual, tree_visuals, tree_table, tree_ref;
     for (int i = 0; i < 16; ++i)
-        f32(tree_def, i == 0 || i == 5 || i == 10 || i == 15 ? 2048.f :
+        f32(tree_def, i == 0 || i == 5 || i == 10 || i == 15 ? 1.f :
             i == 12 ? 3.f : 0.f);
     tree_def.insert(tree_def.end(), 40, 0);
     header[1] = 7;
@@ -373,6 +373,7 @@ int main()
     part(tree_visual, 12, tree_def); part(tree_visuals, 0, tree_visual);
     assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals), result, error));
     assert(result.models[0].vertices[1].position[0] == 4.f);
+    assert(result.visuals[0].bounds[9] >= 1.f);
     header[1] = 11;
     tree_visual.clear(); tree_visuals.clear();
     part(tree_visual, 1, header); part(tree_visual, 21, container);
