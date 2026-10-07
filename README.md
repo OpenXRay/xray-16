@@ -37,7 +37,7 @@ Android APK. Build it locally using [the Android build guide](android/README.md)
 | Android | API 26 or newer |
 | CPU ABI | `armeabi-v7a` only; the device OS must support 32-bit applications |
 | Gameplay renderer | OpenGL ES 3.1, with at least four draw buffers and four color attachments |
-| Vulkan | Device/swapchain/render-pass and texture-upload probe only; gameplay falls back to OpenGL ES |
+| Vulkan | Separate gameplay module and no-game probe; hardware gameplay validation and shader compatibility remain pending |
 | Game data | Not included; use a legally obtained PC installation in shared storage |
 
 The selected installation keeps the usual `_appdata_` layout for settings,

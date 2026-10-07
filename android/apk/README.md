@@ -46,20 +46,33 @@ textures or shader sources.
 
 ## Renderer choices
 
-- **Auto** and **OpenGL ES** both run the GLES gameplay backend.
-- **Vulkan** runs the Vulkan surface/device/swapchain/render-pass probe, then
-  deliberately starts gameplay with GLES. It is not a Vulkan gameplay backend.
+- **Auto** probes Vulkan gameplay requirements and selects Vulkan when they pass;
+  otherwise it selects OpenGL ES.
+- **OpenGL ES** explicitly selects the GLES gameplay backend.
+- **Vulkan** explicitly selects the separate Vulkan gameplay module. An
+  unavailable Vulkan device or missing shader asset produces a launch error.
+  Game compatibility and Android hardware behavior still need validation.
 - **GLES smoke test** creates the real SDL/EGL context, compiles a minimal GLES
   shader and verifies pixel readback without loading game data.
-- **Vulkan smoke test** clears and presents one Vulkan frame and exercises the
-  current DDS upload path when a suitable game texture is available.
+- **Vulkan smoke test** draws a triangle through a Vulkan graphics pipeline,
+  reads back its center pixel, and presents three frames without game files.
+  The separate gameplay selection probe can also upload an engine DDS.
 
 A smoke-test pass is limited to those operations. It does not validate level
 loading, all shaders or sustained gameplay.
 
+Debug Vulkan validation can be requested with engine argument `-vk_validation`
+or environment `XRAY_VK_VALIDATION=1`. `android/build-apk-armv7.sh` can include
+an ARMv7 `libVkLayer_khronos_validation.so` supplied by the Android Vulkan SDK
+through `XRAY_ANDROID_VALIDATION_LAYER_ARMV7`. The layer is optional: when it is
+unavailable the renderer logs that fact and continues without validation.
+When available, synchronization validation is enabled if its instance extension
+is supported. VUID messages go to SDL logging and the app private preference
+directory `OpenXRay/validation/vulkan-vuid.log`.
+
 Graphics presets and internal render resolution are applied after `user.ltx`
 has been read. `Auto` graphics maps to `Low`. `Auto` resolution keeps the
-display aspect ratio and caps the internal width at 1280 pixels.
+display aspect ratio and defaults to half of the current display dimensions.
 
 ## Process and lifecycle controls
 
@@ -77,8 +90,15 @@ Each launch creates separate Android session logs under the selected game's
 ```text
 android_<timestamp>_<pid>_<id>.log
 activity_<timestamp>_<pid>_<id>.log
+android_<timestamp>_<pid>_<id>.log.native-exit.txt
+android_<timestamp>_<pid>_<id>.log.native-tombstone.pb
 ```
 
+The last two files appear when available. **Save Android crash reports** is
+enabled by default. On Android 11 and later, returning to the launcher
+stores the engine's exit information in the same log directory. On Android 12
+and later, a native crash also stores Android's protobuf tombstone if the
+system provides it. Sharing diagnostics includes these saved files once.
 The diagnostics tab reads a bounded tail of the latest session. **Clear**
 removes Android diagnostic files only while the engine is stopped; it does not
 remove saves, screenshots, `user.ltx` or game resources.
