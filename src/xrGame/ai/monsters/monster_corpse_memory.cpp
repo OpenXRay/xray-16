@@ -39,6 +39,8 @@ void CMonsterCorpseMemory::update()
 
 void CMonsterCorpseMemory::add_corpse(const CEntityAlive* corpse)
 {
+    if (!corpse)
+        return;
     if (const_cast<CEntityAlive*>(corpse)->is_locked_corpse())
         return;
     SMonsterCorpse corpse_info;
