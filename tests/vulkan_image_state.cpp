@@ -54,7 +54,7 @@ int main()
     assert(states.transition(fake_command, fake_image, ImageUse::Sampled, dispatch, error));
     assert(barrier_calls == 2);
     assert(source_stage == VK_PIPELINE_STAGE_TRANSFER_BIT);
-    assert(destination_stage == (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT));
+    assert(destination_stage == VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
     assert(last_barriers.size() == 1);
     assert(last_barriers[0].oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     assert(last_barriers[0].newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -136,6 +136,17 @@ int main()
         }
     }
     assert(found_depth_transition && found_stencil_transition);
+
+    const auto general_image = reinterpret_cast<VkImage>(static_cast<uintptr_t>(6));
+    assert(states.register_image(general_image, range, ImageUse::Undefined, error));
+    assert(states.transition(fake_command, general_image, ImageUse::TransferDestinationGeneral,
+        dispatch, error));
+    assert(last_barriers.size() == 1);
+    assert(last_barriers[0].oldLayout == VK_IMAGE_LAYOUT_UNDEFINED);
+    assert(last_barriers[0].newLayout == VK_IMAGE_LAYOUT_GENERAL);
+    assert(last_barriers[0].dstAccessMask == VK_ACCESS_TRANSFER_WRITE_BIT);
+    assert(last_barriers[0].subresourceRange.levelCount == range.levelCount);
+    assert(last_barriers[0].subresourceRange.layerCount == range.layerCount);
 
     const auto unknown_image = reinterpret_cast<VkImage>(static_cast<uintptr_t>(3));
     assert(!states.transition(fake_command, unknown_image, ImageUse::Sampled, dispatch, error));
