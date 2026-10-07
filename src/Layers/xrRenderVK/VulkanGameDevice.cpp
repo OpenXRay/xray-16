@@ -716,7 +716,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     {
         Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
         std::memcpy(&camera, mvp, sizeof(camera));
-        inverse.invert(camera);
+        inverse.invert_44(camera);
         std::memcpy(sun_uniform.inverse_view_projection, &inverse, sizeof(inverse));
         std::memcpy(water_uniform.view_projection, &camera, sizeof(camera));
         std::memcpy(water_uniform.inverse_view_projection, &inverse, sizeof(inverse));
@@ -745,7 +745,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     {
         Fmatrix camera, inverse;
         std::memcpy(&camera, mvp, sizeof(camera));
-        inverse.invert(camera);
+        inverse.invert_44(camera);
         uint32_t shadow_slot = 0;
         std::vector<const VulkanLightSnapshot*> nearby;
         nearby.reserve(light_snapshots_.size());

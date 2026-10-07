@@ -125,7 +125,9 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
         }
     }
     Fmatrix inverse;
-    inverse.invert(Device.mFullTransform);
+    // The full view-projection contains perspective; Fmatrix::invert only
+    // handles affine 4x3 transforms and corrupts reconstructed sky rays.
+    inverse.invert_44(Device.mFullTransform);
     const auto ray = [&inverse](float x, float y)
     {
         Fvector4 near_clip, far_clip, near_world, far_world;
@@ -158,7 +160,7 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
     lighting_.clouds_color[0] = current.clouds_color.x;
     lighting_.clouds_color[1] = current.clouds_color.y;
     lighting_.clouds_color[2] = current.clouds_color.z;
-    lighting_.clouds_color[3] = 0.f;
+    lighting_.clouds_color[3] = current.clouds_color.w;
     if (Device.dwFrame % 300 == 0)
         Msg("[renderer-vulkan] weather.frame frame=%u sky=(%.3f,%.3f,%.3f) cloud-alpha=%.3f ambient=%.3f sky-a=%d sky-b=%d",
             Device.dwFrame, lighting_.sky_color[0], lighting_.sky_color[1],
