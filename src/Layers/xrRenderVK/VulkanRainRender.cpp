@@ -94,8 +94,10 @@ void VulkanRainRender::Render(CEffect_Rain& owner)
             item.invalidate();
             continue;
         }
-        if (item.dwTime_Hit == item.dwTime_Life && item.Phit.y > eye.y &&
-            item.P.y >= item.Phit.y) continue;
+        // A roof above the camera occludes this drop for its entire life.
+        // After a large frame step the simulated position can pass below the
+        // roof before the next draw; drawing it then makes rain appear indoors.
+        if (item.dwTime_Hit == item.dwTime_Life && item.Phit.y > eye.y) continue;
         Fvector tail;
         tail.mad(item.P, item.D, -5.f * (.5f + .5f * density));
         Fvector view, right;

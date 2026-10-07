@@ -898,8 +898,13 @@ void VulkanKinematics::LL_BuldBoneMatrixDequatize(const CBoneData* bone, u8 mask
     // identity and makes the controller fall back to the current bone pose,
     // which can move an actor between animation and world coordinates.
     const u16 id = bone->GetSelfID();
-    for (const auto& blend : blends_)
+    // SKeyTable has only 16 entries per channel while the Vulkan playback
+    // pool can hold many more. The movement controller's controlling cycle is
+    // normally the most recently started one; keep those first so its key is
+    // still available when older falloff blends fill the pool.
+    for (auto it = blends_.rbegin(); it != blends_.rend(); ++it)
     {
+        const auto& blend = *it;
         if (blend->blend_state() == CBlend::eFREE_SLOT || blend->channel != 0 ||
             !valid_motion(blend->motionID) || keys.chanel_blend_conts[0] >= MAX_BLENDED)
             continue;
