@@ -237,7 +237,10 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
                     {
                         const auto encoded = int16_t(uint16_t(source[uv1 + axis * 2]) |
                             uint16_t(source[uv1 + axis * 2 + 1]) << 8);
-                        vertex.lightmap_uv[axis] = float(encoded) * (32.f / 32768.f);
+                        // The packed base UV has a 32x texture repeat; the
+                        // secondary lightmap UV is an atlas coordinate. GLES
+                        // unpack_tc_lmap uses exactly 1/32768 here.
+                        vertex.lightmap_uv[axis] = float(encoded) * (1.f / 32768.f);
                     }
             }
             if (color >= 0)

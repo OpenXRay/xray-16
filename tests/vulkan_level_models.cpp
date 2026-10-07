@@ -145,6 +145,22 @@ int main()
     assert(load_level_models(input(shaders), input(lit_vb), input(ib), input(visuals), result, error));
     assert(result.models[0].lightmap_uv && result.models[0].vertices[1].lightmap_uv[1] == .75f);
     assert(result.models[0].vertices[0].baked[0] > .24f && result.models[0].vertices[0].baked[2] > .74f);
+    Bytes packed_lit_vb;
+    u32(packed_lit_vb, 1);
+    decl(packed_lit_vb, 0, 2, 0); decl(packed_lit_vb, 12, 2, 3);
+    decl(packed_lit_vb, 24, 1, 5); decl(packed_lit_vb, 32, 6, 5, 1);
+    packed_lit_vb.insert(packed_lit_vb.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
+    u32(packed_lit_vb, 3);
+    for (int i = 0; i < 3; ++i)
+    {
+        for (float value : {float(i), 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f})
+            f32(packed_lit_vb, value);
+        u16(packed_lit_vb, 16384);
+        u16(packed_lit_vb, 8192);
+    }
+    assert(load_level_models(input(shaders), input(packed_lit_vb), input(ib), input(visuals), result, error));
+    assert(result.models[0].vertices[0].lightmap_uv[0] == .5f);
+    assert(result.models[0].vertices[0].lightmap_uv[1] == .25f);
     assert(result.visuals.size() == 1 && result.roots.size() == 1 && result.roots[0] == 0);
     VisualRecord standalone;
     assert(parse_ogf_visual(input(visual), standalone, error));
