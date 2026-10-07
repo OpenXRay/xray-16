@@ -10,6 +10,8 @@
 #endif
 #include "xrEngine/IGame_Level.h"
 #include "xrCDB/xr_area.h"
+#include "xrCDB/Intersect.hpp"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 #include <algorithm>
 #include <atomic>
@@ -131,6 +133,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             visibility_error.c_str());
     GpuLevel prepared;
     prepared.device_ = device;
+    prepared.memory_ = memory;
     prepared.pool_ = pool;
     prepared.upload_ = upload;
     prepared.textures_ = &textures;
@@ -286,6 +289,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     // the same queue as the first draw and preserve staging until retired.
     destroy();
     device_ = prepared.device_;
+    memory_ = prepared.memory_;
     pool_ = prepared.pool_;
     upload_ = prepared.upload_;
     textures_ = prepared.textures_;
@@ -406,6 +410,7 @@ void GpuLevel::prepare_details(const Fvector& camera)
     const int cx = static_cast<int>(std::floor(camera.x / 2.f)) + details_.offset_x;
     const int cz = static_cast<int>(std::floor(camera.z / 2.f)) + details_.offset_z;
     const int radius = static_cast<int>(max_distance / 2.f) + 1;
+    CDB::COLLIDER collider;
     for (int z = std::max(0, cz - radius); z <= std::min(int(details_.height) - 1, cz + radius); ++z)
         for (int x = std::max(0, cx - radius); x <= std::min(int(details_.width) - 1, cx + radius); ++x)
         {
@@ -421,6 +426,16 @@ void GpuLevel::prepare_details(const Fvector& camera)
             if (found == detail_cache_.end())
             {
                 std::vector<DetailPlacement> placements;
+                // Query the slot once, then test its triangles for every
+                // placement. A ray query per blade causes long frame stalls
+                // whenever a new group of cells enters the camera radius.
+                Fvector box_center, box_half;
+                box_center.set(slot_x + 1.f, cell.ground + cell.height * .5f, slot_z + 1.f);
+                box_half.set(1.f, cell.height * .5f + 5.f, 1.f);
+                collider.box_query(CDB::OPT_FULL_TEST,
+                    g_pGameLevel->ObjectSpace.GetStaticModel(), box_center, box_half);
+                const auto* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
+                const auto* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
                 for (unsigned rz = 0; rz < 4; ++rz)
                     for (unsigned rx = 0; rx < 4; ++rx)
                     {
@@ -450,12 +465,29 @@ void GpuLevel::prepare_details(const Fvector& camera)
                             cell.ground + cell.height + 5.f,
                             slot_z + (float(rz) + .5f + jz * .5f) * .5f);
                         down.set(0.f, -1.f, 0.f);
-                        collide::rq_result hit{};
-                        if (!g_pGameLevel->ObjectSpace.RayPick(origin, down,
-                                cell.height + 10.f, collide::rqtStatic, hit, nullptr)) continue;
+                        // Match the GLES decompressor: ignore passable faces
+                        // and intersect only triangles belonging to this slot.
+                        float ground = cell.ground - 5.f;
+                        for (const auto& hit : *collider.r_get())
+                        {
+                            const auto& triangle = tris[hit.id];
+                            const auto* material = GMLib.GetMaterialByIdx(triangle.material);
+                            if (!material || material->Flags.test(SGameMtl::flPassable)) continue;
+                            Fvector points[3]{verts[triangle.verts[0]],
+                                verts[triangle.verts[1]], verts[triangle.verts[2]]};
+                            float u, v, range;
+                            if (CDB::TestRayTri(origin, down, points, u, v, range, TRUE) &&
+                                range >= 0.f && range <= cell.height + 10.f)
+                            {
+                                const float height = origin.y - range;
+                                if (height >= cell.ground && height <= cell.ground + cell.height + .1f)
+                                    ground = std::max(ground, height);
+                            }
+                        }
+                        if (ground < cell.ground) continue;
                         const DetailPrototype& prototype = details_.prototypes[cell.ids[model]];
                         const float t = float((seed >> 24) & 255u) / 255.f;
-                        placements.push_back({cell.ids[model], origin.x, origin.y - hit.range, origin.z,
+                        placements.push_back({cell.ids[model], origin.x, ground, origin.z,
                             float(seed & 65535u) * (6.2831853f / 65536.f),
                             prototype.min_scale + t * (prototype.max_scale - prototype.min_scale)});
                     }
@@ -479,28 +511,68 @@ void GpuLevel::prepare_details(const Fvector& camera)
 bool GpuLevel::record_details(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16]) const
 {
-    Fmatrix view;
-    static_assert(sizeof(view) == sizeof(float) * 16);
-    std::memcpy(&view, mvp, sizeof(view));
+    if (frame.frame_index >= detail_batches_.size()) return false;
+    struct Geometry { std::vector<LevelVertex> vertices; std::vector<uint32_t> indices; };
+    std::vector<Geometry> grouped(details_.prototypes.size());
     for (const DetailPlacement& placement : visible_details_)
     {
         if (placement.model >= detail_meshes_.size()) return false;
-        // prepare_details limits distance only. Skip individual grass meshes
-        // outside the view before creating a command and allocating its uniform.
         if (!visible_sphere(mvp, placement.x, placement.y, placement.z, 6.f)) continue;
-        const Mesh& mesh = detail_meshes_[placement.model];
-        Fmatrix rotation, scale, world, transform;
+        const DetailPrototype& prototype = details_.prototypes[placement.model];
+        Geometry& batch = grouped[placement.model];
+        if (batch.vertices.size() > UINT32_MAX - prototype.vertices.size()) return false;
+        const uint32_t first = static_cast<uint32_t>(batch.vertices.size());
+        Fmatrix rotation, scale, world;
         Fvector position;
         position.set(placement.x, placement.y, placement.z);
         rotation.rotateY(placement.yaw);
         rotation.translate_over(position);
         scale.scale(placement.scale, placement.scale, placement.scale);
         world.mul_43(rotation, scale);
-        transform.mul(view, world);
-        float matrix[16];
-        std::memcpy(matrix, &transform, sizeof(matrix));
-        if (!pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, matrix, mesh.material, SurfaceMode::AlphaTest, 0,
+        for (const LevelVertex& original : prototype.vertices)
+        {
+            LevelVertex vertex = original;
+            Fvector local, transformed, normal;
+            local.set(original.position[0], original.position[1], original.position[2]);
+            world.transform_tiny(transformed, local);
+            local.set(original.normal[0], original.normal[1], original.normal[2]);
+            rotation.transform_dir(normal, local);
+            normal.normalize_safe();
+            std::copy_n(&transformed.x, 3, vertex.position);
+            std::copy_n(&normal.x, 3, vertex.normal);
+            batch.vertices.push_back(vertex);
+        }
+        for (uint32_t index : prototype.indices) batch.indices.push_back(first + index);
+    }
+    auto& buffers = detail_batches_[frame.frame_index];
+    if (buffers.size() != grouped.size()) buffers.resize(grouped.size());
+    const auto write_buffer = [this](BufferResource& buffer, const void* data,
+        size_t bytes, VkBufferUsageFlags usage, std::string& error)
+    {
+        if (buffer.size() < bytes && !buffer.initialize(device_,
+                std::max<VkDeviceSize>(bytes, buffer.size() ? buffer.size() * 2 : 4096),
+                usage, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                memory_, upload_.buffer, error)) return false;
+        return buffer.write(0, data, bytes, error);
+    };
+    for (size_t model = 0; model < grouped.size(); ++model)
+    {
+        const Geometry& batch = grouped[model];
+        if (batch.indices.empty()) continue;
+        DetailBatch& buffer = buffers[model];
+        std::string error;
+        if (!write_buffer(buffer.vertices, batch.vertices.data(),
+                batch.vertices.size() * sizeof(LevelVertex), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, error) ||
+            !write_buffer(buffer.indices, batch.indices.data(),
+                batch.indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_INDEX_BUFFER_BIT, error))
+        {
+            Msg("! [renderer-vulkan] detail batch upload: %s", error.c_str());
+            return false;
+        }
+        const Mesh& mesh = detail_meshes_[model];
+        if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
+                static_cast<uint32_t>(batch.indices.size()), mvp, mesh.material,
+                SurfaceMode::AlphaTest, 0,
                 "vk\\level_cutout.vs", "vk\\level_cutout.ps",
                 float(mesh.alpha_ref) / 255.f)) return false;
     }
@@ -745,6 +817,7 @@ void GpuLevel::destroy()
     details_ = {};
     detail_cache_.clear();
     visible_details_.clear();
+    for (auto& buffers : detail_batches_) buffers.clear();
     visuals_.clear();
     roots_.clear();
     sectors_.clear();

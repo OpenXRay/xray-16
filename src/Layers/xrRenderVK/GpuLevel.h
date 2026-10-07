@@ -5,6 +5,7 @@
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
 #include "xrCore/_matrix.h"
+#include <array>
 #include <memory>
 #include <unordered_map>
 
@@ -80,7 +81,12 @@ private:
         bool glass{};
         std::unique_ptr<Mesh> fast;
     };
+    struct DetailBatch
+    {
+        BufferResource vertices, indices;
+    };
     VkDevice device_{};
+    VkPhysicalDeviceMemoryProperties memory_{};
     VkCommandPool pool_{};
     BufferUploadDispatch upload_{};
     GameTextureFactory* textures_{};
@@ -96,6 +102,8 @@ private:
     std::vector<Mesh> detail_meshes_;
     std::unordered_map<size_t, std::vector<DetailPlacement>> detail_cache_;
     std::vector<DetailPlacement> visible_details_;
+    // Each frame slot is reused only after FrameContext has waited on its fence.
+    mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint32_t> roots_;
     std::vector<LevelSector> sectors_;
