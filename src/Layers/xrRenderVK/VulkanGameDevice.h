@@ -146,6 +146,10 @@ private:
         bool hud{};
     };
     VulkanWindowDevice window_;
+#if defined(XR_PLATFORM_ANDROID)
+    SDL_Window* scaled_android_window_{};
+    VkExtent2D requested_android_extent_{};
+#endif
     FrameDispatch frame_dispatch_{};
     TextureUploadDispatch texture_dispatch_{};
     BufferUploadDispatch buffer_upload_{};

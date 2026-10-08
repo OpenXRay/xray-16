@@ -737,7 +737,34 @@ CBlend* VulkanKinematics::create_blend(u16 part, MotionID id, bool fx, bool mixi
     // controller, which dereferences its controlling cycle during creation.
     auto free = std::find_if(blends_.begin(), blends_.end(), [](const auto& blend)
     { return blend->blend_state() == CBlend::eFREE_SLOT; });
-    if (free == blends_.end() && blends_.size() >= MAX_BLENDED_POOL) return nullptr;
+    if (free == blends_.end() && blends_.size() >= MAX_BLENDED_POOL)
+    {
+        // A new cycle must be able to replace an old one even if the pool
+        // filled before this frame's track update retired fading cycles.
+        // Notify the movement controller before recycling its CBlend slot.
+        free = std::find_if(blends_.begin(), blends_.end(), [](const auto& old)
+        {
+            return old->blend_state() == CBlend::eFalloff &&
+                old->blendAmount <= EPS;
+        });
+        if (free == blends_.end() && !fx)
+            free = std::find_if(blends_.begin(), blends_.end(), [&](const auto& old)
+            {
+                return old->blend_state() == CBlend::eFalloff &&
+                    old->channel == channel && old->bone_or_part == part;
+            });
+        if (free != blends_.end())
+        {
+            if (blend_destroy_) blend_destroy_->BlendDestroy(**free);
+            (*free)->set_free_state();
+        }
+        else
+        {
+            Msg("! [renderer-vulkan] animation blend pool exhausted part=%u channel=%u motion=%u",
+                part, channel, id.val);
+            return nullptr;
+        }
+    }
     auto blend = free == blends_.end() ? std::make_unique<CBlend>() : nullptr;
     CBlend* result = free == blends_.end() ? blend.get() : free->get();
     result->motionID = id;
@@ -805,7 +832,8 @@ CBlend* VulkanKinematics::LL_PlayCycle(u16 part, MotionID id, BOOL mixing, float
     {
         CBlend* result = nullptr;
         for (u16 index = 0; index < data_->motions[0].partitions.size(); ++index)
-            result = LL_PlayCycle(index, id, mixing, accrue, falloff, speed, noloop, callback, param, channel);
+            if (CBlend* cycle = LL_PlayCycle(index, id, mixing, accrue, falloff, speed,
+                    noloop, callback, param, channel)) result = cycle;
         return result;
     }
     return create_blend(part, id, false, mixing, accrue, falloff, speed, 1.f,

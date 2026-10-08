@@ -10,6 +10,10 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#if defined(XR_PLATFORM_ANDROID)
+#include <SDL_syswm.h>
+#include <android/native_window.h>
+#endif
 
 namespace xray::render::vulkan
 {
@@ -19,6 +23,27 @@ template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const
 {
     return reinterpret_cast<T>(get(device, name));
 }
+
+#if defined(XR_PLATFORM_ANDROID)
+bool set_android_buffer_extent(SDL_Window* window, VkExtent2D extent, std::string& error)
+{
+    SDL_SysWMinfo info{};
+    SDL_VERSION(&info.version);
+    if (!window || !SDL_GetWindowWMInfo(window, &info) ||
+        info.subsystem != SDL_SYSWM_ANDROID || !info.info.android.window)
+    {
+        error = "Android Vulkan window has no native surface";
+        return false;
+    }
+    if (ANativeWindow_setBuffersGeometry(info.info.android.window,
+            static_cast<int32_t>(extent.width), static_cast<int32_t>(extent.height), 0) != 0)
+    {
+        error = "could not set Android Vulkan buffer resolution";
+        return false;
+    }
+    return true;
+}
+#endif
 
 // The light shader draws a screen triangle. Restrict it to the projection of
 // its range sphere so distant lamps do not shade millions of unrelated pixels.
@@ -72,12 +97,29 @@ VkRect2D light_scissor(const Fmatrix& view_projection, const VulkanLightSnapshot
 bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::string& error)
 {
     destroy();
+#if defined(XR_PLATFORM_ANDROID)
+    if (!extent.width || !extent.height ||
+        !set_android_buffer_extent(window, extent, error)) return false;
+    scaled_android_window_ = window;
+    requested_android_extent_ = extent;
+#endif
     readback_enabled_ = window_.initialize(window, extent, true, error, true, true, true);
-    if (!readback_enabled_) return false;
+    if (!readback_enabled_)
+    {
+        destroy();
+        return false;
+    }
     const VkDevice device = window_.device();
     const auto get = window_.device_proc();
     const auto& physical = window_.physical();
     const auto& frame = window_.frame();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[renderer-vulkan] internal resolution requested=%ux%u swapchain=%ux%u",
+        extent.width, extent.height,
+        frame.extent().width, frame.extent().height);
+    if (frame.extent().width != extent.width || frame.extent().height != extent.height)
+        Msg("! [renderer-vulkan] Android surface did not adopt the requested buffer resolution");
+#endif
     Msg("[renderer-vulkan] device.gpu name='%s' driver=0x%x api=%u.%u push-constant-limit=%u",
         physical.properties.deviceName, physical.properties.driverVersion,
         VK_VERSION_MAJOR(physical.properties.apiVersion), VK_VERSION_MINOR(physical.properties.apiVersion),
@@ -995,12 +1037,22 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     }
     targets_.destroy();
     water_targets_.destroy();
+#if defined(XR_PLATFORM_ANDROID)
+    if (!set_android_buffer_extent(scaled_android_window_, requested_android_extent_, error))
+        return false;
+    extent = requested_android_extent_;
+#endif
     if (!(replace_surface ? window_.recreate_surface(extent, error) :
               window_.recreate_frame(extent, error)))
         return false;
 
     auto& frame = window_.frame();
     const auto& physical = window_.physical();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[renderer-vulkan] internal resolution reset requested=%ux%u swapchain=%ux%u",
+        requested_android_extent_.width, requested_android_extent_.height,
+        frame.extent().width, frame.extent().height);
+#endif
     if (!targets_.initialize(physical.handle, window_.device(), frame.extent(),
             static_cast<uint32_t>(frame.image_count()), frame.depth_format(), physical.memory,
             frame_dispatch_, create_sampler_, destroy_sampler_, error))
@@ -1106,6 +1158,16 @@ void VulkanGameDevice::destroy()
     shader_resources_.destroy();
     Msg("[renderer-vulkan] teardown window begin");
     window_.destroy();
+#if defined(XR_PLATFORM_ANDROID)
+    if (scaled_android_window_)
+    {
+        std::string ignored;
+        if (!set_android_buffer_extent(scaled_android_window_, {}, ignored))
+            Msg("! [renderer-vulkan] restore Android buffer geometry: %s", ignored.c_str());
+        scaled_android_window_ = nullptr;
+        requested_android_extent_ = {};
+    }
+#endif
     Msg("[renderer-vulkan] teardown window end");
     frame_dispatch_ = {};
     texture_dispatch_ = {};
