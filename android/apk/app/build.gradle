@@ -10,6 +10,7 @@ if (portVersion.size() != 2 || !(portVersion[0] ==~ /\d+\.\d+\.\d+/) || !(portVe
 android {
     namespace 'org.openxray.app'
     compileSdk 36
+    buildToolsVersion '36.0.0'
 
     defaultConfig {
         applicationId 'org.openxray.stalker'
