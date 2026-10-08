@@ -183,7 +183,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 }
 
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
-    std::string& error, int* alpha_ref, int* blend_mode) const
+    std::string& error, int* alpha_ref, int* blend_mode, bool particle_pipeline) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -202,7 +202,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     // The screen-set ADD modes still need their own pipeline. Particle
     // pipelines below can reproduce ADD and ALPHA-ADD exactly.
-    if (material.class_name == "S_SET   " &&
+    if (material.class_name == "S_SET   " && !particle_pipeline &&
         (material.blending == 2 || material.blending == 5))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     mode = it->second.mode;
