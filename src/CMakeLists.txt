@@ -234,7 +234,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
-    target_link_libraries(vulkan_model_geometry_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_model_geometry_test PRIVATE xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_model_geometry COMMAND vulkan_model_geometry_test)
 
     add_executable(vulkan_kinematics_test
@@ -250,7 +250,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
-    target_link_libraries(vulkan_kinematics_test PRIVATE xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_kinematics_test PRIVATE xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_kinematics COMMAND vulkan_kinematics_test)
 
     add_executable(vulkan_particle_visual_test
@@ -266,7 +266,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
-    target_link_libraries(vulkan_particle_visual_test PRIVATE xrRenderVK xrParticles xrEngine xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_particle_visual_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_particle_visual COMMAND vulkan_particle_visual_test)
 
     add_executable(vulkan_renderer_module_test
@@ -282,7 +282,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
-    target_link_libraries(vulkan_renderer_module_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_renderer_module_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_renderer_module COMMAND vulkan_renderer_module_test)
     add_executable(vulkan_ui_flow_test "${XRAY_SOURCE_DIR}/tests/vulkan_ui_flow.cpp")
     target_include_directories(vulkan_ui_flow_test PRIVATE "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/src"
@@ -291,7 +291,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_compile_options(vulkan_ui_flow_test PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
-    target_link_libraries(vulkan_ui_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_ui_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_ui_flow COMMAND vulkan_ui_flow_test)
     add_executable(vulkan_asset_flow_test "${XRAY_SOURCE_DIR}/tests/vulkan_asset_flow.cpp")
     target_include_directories(vulkan_asset_flow_test PRIVATE "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/src"
@@ -300,14 +300,14 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_compile_options(vulkan_asset_flow_test PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
-    target_link_libraries(vulkan_asset_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore)
+    target_link_libraries(vulkan_asset_flow_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     add_test(NAME vulkan_asset_flow COMMAND vulkan_asset_flow_test)
 
     if (NOT ANDROID AND UNIX)
         add_executable(vulkan_validation_host_test "${XRAY_SOURCE_DIR}/tests/vulkan_validation_host.cpp")
         target_include_directories(vulkan_validation_host_test PRIVATE "${XRAY_SOURCE_DIR}"
             $<TARGET_PROPERTY:xrRenderVK,INCLUDE_DIRECTORIES>)
-        target_link_libraries(vulkan_validation_host_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore SDL2::SDL2)
+        target_link_libraries(vulkan_validation_host_test PRIVATE xrRenderVK xrParticles xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem SDL2::SDL2)
         # Requires an X11/Wayland Vulkan surface and an installed validation layer.
         # Invoke explicitly under xvfb-run when those are available.
     endif()
