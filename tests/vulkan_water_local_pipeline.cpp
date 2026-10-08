@@ -21,7 +21,7 @@ int main()
     assert(pass.material(image, sampler, material, error));
     assert(pass.local_light_set(image, sampler, vk_mock::handle<VkBuffer>(20),
         1024, 512, local, error));
-    assert(pass.water_set(0, image, image, image, sampler,
+    assert(pass.water_set(0, image, image, image, sampler, sampler,
         vk_mock::handle<VkBuffer>(20), error));
     VkDescriptorSet gbuffer{};
     assert(pass.gbuffer(image, image, image, sampler, gbuffer, error));
@@ -36,7 +36,7 @@ int main()
     assert(pass.record_sun_shadow(shadow, vertices, indices, 6, mvp, material, true));
     FrameRecordingContext frame{shadow.command_buffer, vk_mock::handle<VkRenderPass>(3),
         VK_NULL_HANDLE, {640,480}, 0, 0};
-    assert(pass.record_local_light(frame, gbuffer, local));
+    assert(pass.record_local_light(frame, gbuffer, local, {{0, 0}, {640, 480}}));
     assert(pass.record_water(frame, vertices, indices, 6, mvp, material, 0, 2.f));
     assert(vk_mock::draws == 2);
     pass.release_water_sets();

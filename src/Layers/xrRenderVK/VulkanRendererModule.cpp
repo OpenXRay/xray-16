@@ -122,8 +122,15 @@ public:
         GEnv.Render = nullptr;
     }
 };
-VulkanRendererModule module;
 }
 
-RendererModule* GetRendererModule() { return &module; }
+RendererModule* GetRendererModule()
+{
+    // xrCore's logging lock can be destroyed before global renderer objects.
+    // The engine explicitly calls ClearEnv during renderer shutdown; keep the
+    // module alive until process exit instead of running its destructor after
+    // xrCore's static teardown and logging through an invalid lock.
+    static auto* module = new VulkanRendererModule;
+    return module;
+}
 }

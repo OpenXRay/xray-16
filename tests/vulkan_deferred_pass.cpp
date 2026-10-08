@@ -50,9 +50,10 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     }
     assert(info->pushConstantRangeCount == 1);
     const auto& range = info->pPushConstantRanges[0];
-    if (range.stageFlags == VK_SHADER_STAGE_VERTEX_BIT)
+    if (range.stageFlags & VK_SHADER_STAGE_VERTEX_BIT)
     {
-        assert(range.size == sizeof(expected_mvp));
+        assert(range.stageFlags == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
+        assert(range.size == sizeof(expected_mvp) + sizeof(float));
         *output = info->setLayoutCount == 3 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
@@ -152,7 +153,7 @@ void VKAPI_PTR bind_vertices(VkCommandBuffer, uint32_t, uint32_t, const VkBuffer
 void VKAPI_PTR bind_indices(VkCommandBuffer, VkBuffer value, VkDeviceSize, VkIndexType type)
 { assert(value == handle<VkBuffer>(21) && type == VK_INDEX_TYPE_UINT32); }
 void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShaderStageFlags stage,
-    uint32_t, uint32_t size, const void* data)
+    uint32_t offset, uint32_t size, const void* data)
 {
     if (layout == weather_layout)
     {
@@ -160,8 +161,13 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         weather_push = true;
         return;
     }
-    assert((layout == geometry_layout || layout == skinned_layout) &&
-        stage == VK_SHADER_STAGE_VERTEX_BIT && size == sizeof(expected_mvp));
+    assert(layout == geometry_layout || layout == skinned_layout);
+    if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
+    {
+        assert(offset == sizeof(expected_mvp) && size == sizeof(float));
+        return;
+    }
+    assert(stage == VK_SHADER_STAGE_VERTEX_BIT && offset == 0 && size == sizeof(expected_mvp));
     assert(std::memcmp(data, expected_mvp, sizeof(expected_mvp)) == 0);
 }
 void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
@@ -196,8 +202,8 @@ void VKAPI_PTR destroy_descriptor_layout(VkDevice, VkDescriptorSetLayout, const 
 VkResult VKAPI_PTR create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorPool* output)
 {
-    assert(info->maxSets == 1024 && info->poolSizeCount == 3 &&
-        info->pPoolSizes[0].descriptorCount == 4096 &&
+    assert(info->maxSets == 8192 && info->poolSizeCount == 3 &&
+        info->pPoolSizes[0].descriptorCount == 32768 &&
         info->pPoolSizes[1].type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER &&
         info->pPoolSizes[2].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     *output = handle<VkDescriptorPool>(33);
@@ -233,8 +239,9 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
-        writes[0].dstBinding == 3 ||
-        (writes[0].dstBinding == 2 &&
+        (writes[0].dstBinding == 0 &&
+            writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_GENERAL) ||
+        ((writes[0].dstBinding == 0 || writes[0].dstBinding == 3) &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL));
     if (count == 4)
     {

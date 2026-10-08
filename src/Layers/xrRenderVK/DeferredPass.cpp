@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
+#include <cstring>
 
 namespace xray::render::vulkan
 {

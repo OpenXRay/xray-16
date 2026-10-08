@@ -72,12 +72,17 @@ int main()
     particle_set.insert(particle_set.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(particle_set, 0); write32(particle_set, 0);
     chunk(list, 42, particle_set); // Modded archives may leave gaps in chunk IDs.
+    Bytes screen_alpha = record("S_SET   ", "hud\\alpha", false, 64);
+    write32(screen_alpha, 7);
+    screen_alpha.insert(screen_alpha.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(screen_alpha, 1); write32(screen_alpha, 0);
+    chunk(list, 43, screen_alpha);
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 11);
+    assert(library.load(reader, error) && library.size() == 12);
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
@@ -91,8 +96,10 @@ int main()
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);
     int alpha_ref = -1;
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);
-    assert(library.resolve("effects\\wallmarkblend", mode, error) && mode == SurfaceMode::Transparent);
+    assert(!library.resolve("effects\\wallmarkblend", mode, error) &&
+        error.find("blending=6") != std::string::npos && error.find("id=7") != std::string::npos);
     assert(library.resolve("hud\\opaque", mode, error) && mode == SurfaceMode::Opaque);
+    assert(library.resolve("hud\\alpha", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("effects\\additive", mode, error) &&
         error.find("blending=2") != std::string::npos && error.find("id=9") != std::string::npos);
     assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&

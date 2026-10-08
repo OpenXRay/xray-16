@@ -38,7 +38,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
     add_test(NAME android_renderer_choice COMMAND android_renderer_choice_test)
     function(xray_add_vulkan_state_test target source)
         add_executable(${target} "${XRAY_SOURCE_DIR}/${source}")
-        target_include_directories(${target} PRIVATE "${XRAY_SOURCE_DIR}")
+        target_include_directories(${target} PRIVATE "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/src")
         target_compile_definitions(${target} PRIVATE DEBUG)
         target_compile_options(${target} PRIVATE
             $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
