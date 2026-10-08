@@ -726,14 +726,20 @@ CBlend* VulkanKinematics::create_blend(u16 part, MotionID id, bool fx, bool mixi
     float accrue, float falloff, float speed, float power, bool noloop,
     PlayCallback callback, LPVOID param, u8 channel)
 {
-    if (!valid_motion(id) || channel >= 4 || !std::isfinite(power) || power < 0.f ||
-        blends_.size() >= MAX_BLENDED_POOL) return nullptr;
+    if (!valid_motion(id) || channel >= 4 || !std::isfinite(power) || power < 0.f)
+        return nullptr;
     const auto& definition = data_->motions[id.slot].definitions[id.idx];
     if (bool(definition.flags & 1) != fx) return nullptr;
     if (!fx && part != BI_NONE && part >= data_->motions[0].partitions.size()) return nullptr;
     if (fx && part == BI_NONE) part = root_;
-    auto blend = std::make_unique<CBlend>();
-    CBlend* result = blend.get();
+    // The original renderer keeps a fixed pool and reuses eFREE_SLOT blends.
+    // Growing this vector forever eventually returns null to the movement
+    // controller, which dereferences its controlling cycle during creation.
+    auto free = std::find_if(blends_.begin(), blends_.end(), [](const auto& blend)
+    { return blend->blend_state() == CBlend::eFREE_SLOT; });
+    if (free == blends_.end() && blends_.size() >= MAX_BLENDED_POOL) return nullptr;
+    auto blend = free == blends_.end() ? std::make_unique<CBlend>() : nullptr;
+    CBlend* result = free == blends_.end() ? blend.get() : free->get();
     result->motionID = id;
     result->bone_or_part = part;
     result->channel = channel;
@@ -755,12 +761,12 @@ CBlend* VulkanKinematics::create_blend(u16 part, MotionID id, bool fx, bool mixi
     MotionPlayback::Handle handle{id.slot, id.idx};
     if (!playback_.play(handle, fx, mixing, power,
             [callback, result] { if (callback) callback(result); }, accrue, falloff, speed, noloop, channel, part))
-        return nullptr;
+    { result->set_free_state(); return nullptr; }
     if (!fx && !mixing)
         for (auto& old : blends_)
             if (old->blend_state() != CBlend::eFREE_SLOT && old->channel == channel &&
                 old->bone_or_part == part) old->set_falloff_state();
-    blends_.push_back(std::move(blend));
+    if (blend) blends_.push_back(std::move(blend));
     dirty_ = true;
     return result;
 }
@@ -847,7 +853,11 @@ void VulkanKinematics::LL_UpdateTracks(float dt, bool, bool leave_blends)
     for (auto& blend : blends_)
     {
         if (blend->blend_state() == CBlend::eFREE_SLOT) continue;
-        blend->timeCurrent = std::min(blend->timeCurrent + dt * blend->speed, blend->timeTotal);
+        const float next = blend->timeCurrent + dt * blend->speed;
+        if (!blend->stop_at_end && blend->timeTotal > 0.f)
+            blend->timeCurrent = std::fmod(next, blend->timeTotal);
+        else
+            blend->timeCurrent = std::min(next, blend->timeTotal);
         if (blend->blend_state() == CBlend::eFalloff)
             blend->blendAmount = std::max(0.f, blend->blendAmount - dt * blend->blendFalloff * blend->blendPower);
         else
