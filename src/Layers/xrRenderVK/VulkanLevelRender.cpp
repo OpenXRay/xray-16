@@ -771,6 +771,24 @@ void VulkanLevelRender::OnDeviceCreate(pcstr shader_archive)
             shader_archive ? shader_archive : "<null>", shader_error.empty() ? "missing archive" : shader_error.c_str());
         return;
     }
+    // The VFS may have opened this virtual path from a .db/.xdb archive.
+    // An explicit diagnostic switch exports the exact selected file (including
+    // loose mod overrides) without teaching the renderer any archive format.
+    if (std::strstr(Core.Params, "-vk_export_shaders_xr"))
+    {
+        string_path exported;
+        FS.update_path(exported, "$app_data_root$", "vulkan-shaders.xr");
+        IWriter* output = FS.w_open(exported);
+        if (output)
+        {
+            output->w(shader_file->pointer(), shader_file->length());
+            FS.w_close(output);
+            Msg("[renderer-vulkan] shaders.xr exported file='%s' bytes=%zu",
+                exported, shader_file->length());
+        }
+        else
+            Msg("! [renderer-vulkan] could not export shaders.xr to '%s'", exported);
+    }
     FS.r_close(shader_file);
     Msg("[renderer-vulkan] materials.ready shaders.xr blender-count=%zu", textures_->blender_count());
 
