@@ -308,6 +308,19 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
+      - name: Patch manifest repo and branch
+        env:
+          SOURCE_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          esc() { printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'; }
+          sed -i \
+              -e "s|url: https://github.com/OpenXRay/xray-16.git|url: https://github.com/$(esc "$SOURCE_REPO").git|" \
+              -e "s|branch: dev$|branch: $(esc "$SOURCE_BRANCH")|" \
+              misc/flatpak/manifest.yml
+          grep -F "url:"    misc/flatpak/manifest.yml
+          grep -F "branch:" misc/flatpak/manifest.yml
+
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: io.github.OpenXRay.xray-16-${{ matrix.platform.arch }}-${{ github.run_number }}.flatpak
