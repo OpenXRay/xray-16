@@ -88,7 +88,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     pass_ = &pass;
     if ((def_->flags & 1u) == 0) return true; // Non-sprite actions still simulate.
     SurfaceMode surface{};
-    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, nullptr, &blend_mode_))
+    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, nullptr, &blend_mode_, true))
     {
         error = "particle '" + def_->name + "': " + error;
         release_gpu();
