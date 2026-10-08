@@ -52,6 +52,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     version = uint16_t(bytes[172]) | uint16_t(bytes[173]) << 8;
     Cursor cursor{bytes, size, 176};
     bool blend = false, strict = false;
+    bool has_blending = false;
     blending = -1;
     alpha_ref = -1;
     while (cursor.offset < cursor.size)
@@ -82,17 +83,46 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         }
         if (!cursor.skip(length)) { error = "truncated blender property in '" + name + "'"; return false; }
         if ((type == 7 || type == 8) && property == "Blending")
+        {
             blending = static_cast<int>(le32(bytes + start));
+            has_blending = true;
+            const uint32_t count = le32(bytes + start + 4);
+            if (count)
+            {
+                bool selected = false;
+                const size_t item_size = type == 7 ? 68 : 8;
+                const size_t header_size = type == 7 ? 8 : 12;
+                for (uint32_t i = 0; i < count; ++i)
+                    selected |= le32(bytes + start + header_size + size_t(i) * item_size) ==
+                        static_cast<uint32_t>(blending);
+                if (!selected)
+                { error = "invalid Blending token selection in '" + name + "'"; return false; }
+            }
+        }
         if (type == 6 && property == "Strict sorting") strict = le32(bytes + start) != 0;
         if (type == 6 && (property == "Alpha-blend" || property == "Alpha-Blend" || property == "Use alpha-channel"))
             blend = le32(bytes + start) != 0;
-        if (type == 4 && property == "Alpha ref") alpha_ref = static_cast<int32_t>(le32(bytes + start));
+        if (type == 4 && property == "Alpha ref")
+        {
+            alpha_ref = static_cast<int32_t>(le32(bytes + start));
+            if (alpha_ref < 0 || alpha_ref > 255)
+            { error = "invalid Alpha ref in '" + name + "'"; return false; }
+        }
     }
     const std::string& cls = cls_name;
     supported = cls == "LM      " || cls == "LM_AREF " || cls == "V       " || cls == "V_AREF  " ||
         cls == "D_TREE  " || cls == "D_STILL " || cls == "MODEL   " || cls == "MODELEbB" ||
         cls == "PARTICLE" || cls == "LmBmmD  " || cls == "LaEmB   " ||
         cls == "LmEbB   " || cls == "BmmD    " || cls == "BmmDold " || cls == "S_SET   ";
+    // A known class with a newer serialized layout is just as unsafe as an
+    // unknown class: its properties may have different pass semantics.
+    const uint16_t max_version = cls == "S_SET   " ? 4 :
+        cls == "BmmD    " || cls == "BmmDold " ? 3 :
+        cls == "MODEL   " ? 2 :
+        cls == "PARTICLE" || cls == "D_STILL " || cls == "LaEmB   " ? 0 : 1;
+    supported &= version <= max_version;
+    if ((cls == "PARTICLE" || cls == "S_SET   ") && !has_blending)
+    { error = "missing Blending property in '" + name + "'"; return false; }
     if ((cls == "PARTICLE" && blending != 0) || strict || (cls == "S_SET   " && blending != 0) ||
         ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODEL   " ||
             cls == "MODELEbB" || cls == "D_TREE  ") && blend))
@@ -135,7 +165,9 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
-            error = "shaders.xr blender id=" + std::to_string(id) + ": " + error;
+            error = "shaders.xr blender id=" + std::to_string(id) +
+                " class='" + cls + "' version=" + std::to_string(version) +
+                " shader='" + name + "': " + error;
             record->close();
             clear();
             return false;
@@ -155,7 +187,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
-    { error = "shader '" + shader + "' not found in shaders.xr"; return false; }
+    { error = "shaders.xr shader='" + shader + "' not found"; return false; }
     const auto& material = it->second;
     const std::string context = "shaders.xr blender id=" + std::to_string(material.id) +
         " class='" + material.class_name + "' version=" + std::to_string(material.version) +
