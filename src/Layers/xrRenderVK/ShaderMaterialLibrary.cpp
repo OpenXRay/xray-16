@@ -40,7 +40,7 @@ std::string lower(std::string value)
 
 bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     SurfaceMode& mode, bool& supported, std::string& cls_name,
-    uint16_t& version, int& alpha_ref, int& blending, std::string& screen_issue,
+    uint16_t& version, int& alpha_ref, int& blending, uint32_t& screen_flags,
     std::string& error)
 {
     // CBlender_DESC is pack(4): CLASS_ID[8], cName[128], cComputer[32],
@@ -56,7 +56,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     bool has_blending = false;
     blending = -1;
     alpha_ref = -1;
-    screen_issue.clear();
+    screen_flags = 0;
     while (cursor.offset < cursor.size)
     {
         uint32_t type;
@@ -102,12 +102,15 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
             }
         }
         if (type == 6 && property == "Strict sorting") strict = le32(bytes + start) != 0;
-        if (type == 6 &&
-            ((property == "Texture clamp" && !le32(bytes + start)) ||
-             ((property == "Z-test" || property == "Z-write" ||
-               property == "Lighting" || property == "Fog") && le32(bytes + start))) &&
-            screen_issue.empty())
-            screen_issue = property;
+        if (type == 6)
+        {
+            const bool enabled = le32(bytes + start) != 0;
+            if (property == "Texture clamp" && !enabled) screen_flags |= 1;
+            if (property == "Z-test" && enabled) screen_flags |= 2;
+            if (property == "Z-write" && enabled) screen_flags |= 4;
+            if (property == "Lighting" && enabled) screen_flags |= 8;
+            if (property == "Fog" && enabled) screen_flags |= 16;
+        }
         if (type == 6 && (property == "Alpha-blend" || property == "Alpha-Blend" || property == "Use alpha-channel"))
             blend = le32(bytes + start) != 0;
         if (type == 4 && property == "Alpha ref")
@@ -168,10 +171,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         bool supported = false;
         uint16_t version = 0;
         int alpha_ref = -1, blending = -1;
-        std::string screen_issue;
+        uint32_t screen_flags = 0;
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
-                name, mode, supported, cls, version, alpha_ref, blending, screen_issue, error) || name.empty() ||
-            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_issue}).second)
+                name, mode, supported, cls, version, alpha_ref, blending, screen_flags, error) || name.empty() ||
+            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_flags}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -206,9 +209,17 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     { error = "unsupported " + context; return false; }
     if (screen_pipeline && material.class_name != "S_SET   ")
     { error = "unsupported screen class in " + context; return false; }
-    if (material.class_name == "S_SET   " && !material.screen_issue.empty())
+    // World decals and tracers use S_SET too. Their Z-test=1/Z-write=0
+    // matches the forward transparent pass, whereas the UI pass has no
+    // depth attachment. Keep rejecting properties the selected pass cannot
+    // honor rather than treating every S_SET as an overlay.
+    const bool scene_depth_test = !screen_pipeline && material.mode == SurfaceMode::Transparent;
+    const uint32_t unsupported_flags = material.screen_flags & ~(scene_depth_test ? 2u : 0u);
+    if (material.class_name == "S_SET   " && unsupported_flags)
     {
-        error = "unsupported screen property='" + material.screen_issue + "' in " + context;
+        const char* property = unsupported_flags & 1 ? "Texture clamp" : unsupported_flags & 2 ? "Z-test" :
+            unsupported_flags & 4 ? "Z-write" : unsupported_flags & 8 ? "Lighting" : "Fog";
+        error = "unsupported screen property='" + std::string(property) + "' in " + context;
         return false;
     }
     // The scene pipeline currently implements only source-alpha blending.

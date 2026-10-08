@@ -162,8 +162,23 @@ int main()
     chunk(depth_file, 2, depth_list);
     IReader depth_reader(depth_file.data(), depth_file.size());
     assert(library.load(depth_reader, error));
-    assert(!library.resolve("mod\\depth_ui", mode, error, nullptr, &blend_mode, true) &&
+    assert(library.resolve("mod\\depth_ui", mode, error, nullptr, &blend_mode, true) &&
+        mode == SurfaceMode::Transparent);
+    assert(!library.resolve("mod\\depth_ui", mode, error, nullptr, &blend_mode, false, true) &&
         error.find("Z-test") != std::string::npos && error.find("id=48") != std::string::npos);
+    Bytes depth_write = record("S_SET   ", "mod\\depth_write", false);
+    write32(depth_write, 7);
+    depth_write.insert(depth_write.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(depth_write, 1); write32(depth_write, 0);
+    property(depth_write, 6, "Z-test", 1);
+    property(depth_write, 6, "Z-write", 1);
+    Bytes depth_write_list, depth_write_file;
+    chunk(depth_write_list, 50, depth_write);
+    chunk(depth_write_file, 2, depth_write_list);
+    IReader depth_write_reader(depth_write_file.data(), depth_write_file.size());
+    assert(library.load(depth_write_reader, error));
+    assert(!library.resolve("mod\\depth_write", mode, error, nullptr, &blend_mode, true) &&
+        error.find("Z-write") != std::string::npos);
     Bytes screen_wrap = record("S_SET   ", "mod\\wrap_ui", false);
     write32(screen_wrap, 7);
     screen_wrap.insert(screen_wrap.end(), blend_name, blend_name + std::strlen(blend_name) + 1);

@@ -31,7 +31,7 @@ private:
         uint16_t version{};
         int alpha_ref{-1};
         int blending{-1};
-        std::string screen_issue;
+        uint32_t screen_flags{};
     };
     std::unordered_map<std::string, Entry> entries_;
 };
