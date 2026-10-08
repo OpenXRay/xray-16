@@ -85,15 +85,20 @@ function load_dialog:InitControls()
 
 	ctrl					= xml:Init3tButton("form:btn_load",	self.form)
 	self:Register			(ctrl, "button_load")
+	self.btn_load			= ctrl
 
 	ctrl = xml:Init3tButton	("form:btn_delete",	self.form)
 	self:Register			(ctrl, "button_del")
+	self.btn_del			= ctrl
 
 	ctrl = xml:Init3tButton	("form:btn_cancel",	self.form)
 	self:Register			(ctrl, "button_back")
+	self.btn_back			= ctrl
 
 	self.message_box		= CUIMessageBoxEx()
 	self:Register			(self.message_box,"message_box")
+
+	self.btn_load:Enable(false)
 end
 
 function load_dialog:InitCallBacks()
@@ -196,6 +201,8 @@ function load_dialog:OnListItemClicked()
 		self.picture:InitTexture						("ui\\ui_noise")
 		self.picture:SetTextureRect(Frect():set(r.x1,r.y1,r.x2,r.y2))
 
+		self.btn_load:Enable(false)
+
 		return
 	end
 	local item_text				= item.fn:GetText()
@@ -208,6 +215,12 @@ function load_dialog:OnListItemClicked()
 		return
 	end
 
+	if valid_saved_game(item_text) then
+		self.btn_load:Enable(true)
+	else
+		self.btn_load:Enable(false)
+	end
+
 	local r = self.picture:GetTextureRect()
 	if file_exist(item_text .. ".dds") then
 		self.picture:InitTexture(item_text)
@@ -218,7 +231,9 @@ function load_dialog:OnListItemClicked()
 end
 
 function load_dialog:OnListItemDbClicked()
-	self:OnButton_load_clicked()
+	if self.btn_load:IsEnabled() then
+		self:OnButton_load_clicked()
+	end
 end
 
 function load_dialog:OnMsgYes()
@@ -235,6 +250,7 @@ function load_dialog:OnMsgYes()
 
 		self.list_box:RemoveItem(item)
 
+		self.btn_load:Enable(false)
 		self:OnListItemClicked()
 	elseif self.msgbox_id == 2 then
 		self:load_game_internal()
@@ -328,7 +344,9 @@ function load_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
 		return true
 	else
 		if bind == key_bindings.kENTER and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-			self:OnButton_load_clicked()
+			if self.btn_load:IsEnabled() then
+				self:OnButton_load_clicked()
+			end
 			return true
 		end
 	end
