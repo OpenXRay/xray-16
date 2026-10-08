@@ -114,6 +114,9 @@ int main()
     assert(library.resolve("hud\\alpha", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("effects\\additive", mode, error) &&
         error.find("blending=2") != std::string::npos && error.find("id=9") != std::string::npos);
+    int screen_particle_blend = -1;
+    assert(library.resolve("effects\\additive", mode, error, nullptr,
+        &screen_particle_blend, true) && mode == SurfaceMode::Transparent && screen_particle_blend == 2);
     assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&
         mode == SurfaceMode::AlphaTest && alpha_ref == 200);
     int blend_mode = -1;
