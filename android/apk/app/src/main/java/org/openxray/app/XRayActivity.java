@@ -230,6 +230,8 @@ public final class XRayActivity extends SDLActivity {
         // it opt-in through additional arguments for targeted diagnosis.
         if (vulkanRendererSmoke)
             args.add("-vk_validation");
+        if (BuildConfig.EXPORT_SHADERS_XR && !rendererSmoke)
+            args.add("-vk_export_shaders_xr");
 
         if (!gamepadEnabled)
             args.add("-no_gamepad");

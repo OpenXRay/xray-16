@@ -3,6 +3,7 @@ plugins {
 }
 
 def portVersion = rootProject.file('android-version.txt').readLines('UTF-8')
+def exportShadersXr = providers.gradleProperty('xrayExportShadersXr').map { it.toBoolean() }.orElse(false).get()
 if (portVersion.size() != 2 || !(portVersion[0] ==~ /\d+\.\d+\.\d+/) || !(portVersion[1] ==~ /\d+/)) {
     throw new GradleException('Invalid Android version file')
 }
@@ -18,6 +19,7 @@ android {
         targetSdk 36
         versionCode portVersion[1].toInteger()
         versionName portVersion[0]
+        buildConfigField 'boolean', 'EXPORT_SHADERS_XR', exportShadersXr.toString()
 
         ndk {
             abiFilters 'armeabi-v7a'

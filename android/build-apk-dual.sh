@@ -360,7 +360,7 @@ printf '%s\n' "$output_apk"
 
 manifest="$build_dir/build-manifest.txt"
 {
-    echo "repo_commit=$(git -C "$repo_dir" rev-parse HEAD)"
+    echo "repo_commit=${XRAY_SOURCE_COMMIT:-$(git -C "$repo_dir" rev-parse HEAD)}"
     echo "version=$port_version"
     echo "version_code=$port_version_code"
     echo "ndk=$ndk_dir"
