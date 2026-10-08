@@ -1421,7 +1421,9 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::create_model_tree(const Vi
             ModelGeometry geometry;
             geometry.type = 0;
             geometry.texture = texture;
-            geometry.mode = classify_surface_material(record.shader, texture);
+            geometry.shader = !record.shader.empty() ? record.shader :
+                !record.embedded_children.empty() ? record.embedded_children.front().shader : std::string{};
+            geometry.mode = classify_surface_material(geometry.shader, texture);
             geometry.indices = std::move(facets.meshes[face].indices);
             for (const LevelVertex& vertex : facets.meshes[face].vertices)
             {
