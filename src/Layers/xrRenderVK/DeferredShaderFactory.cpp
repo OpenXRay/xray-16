@@ -97,7 +97,7 @@ bool DeferredShaderFactory::reload_game_pipelines(VkDevice device, const ShaderM
             return false;
         }
     }
-    for (const char* mode : {"blended", "additive", "alpha_add"})
+    for (const char* mode : {"set", "blended", "additive", "alpha_add", "multiply", "multiply_2x"})
         for (bool hud : {false, true})
         {
             const std::string vertex_name = "vk\\level_opaque.vs";

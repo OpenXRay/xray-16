@@ -19,7 +19,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     bool transparent, bool hud, bool skinned,
     const ScenePassDispatch& vk, VkPipeline& pipeline, std::string& error,
     const char* label, bool shadow = false, bool additive = false,
-    bool alpha_additive = false)
+    bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
+    bool particle_set = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -69,7 +70,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // against one another without occluding the HUD with world geometry.
     depth.depthTestEnable = (gbuffer || hud || transparent || shadow) &&
         (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow) ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow || particle_set) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
@@ -96,6 +97,14 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
             attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
             attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
         }
+        if (multiply || multiply_2x)
+        {
+            attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
+            attachment.blendEnable = VK_TRUE;
+            attachment.srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
+            attachment.dstColorBlendFactor = multiply_2x ? VK_BLEND_FACTOR_SRC_COLOR : VK_BLEND_FACTOR_ZERO;
+        }
+        if (particle_set) attachment.blendEnable = VK_FALSE;
     }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     blend.attachmentCount = shadow ? 0 : gbuffer ? 2 : 1;
@@ -563,10 +572,17 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name.find("_additive.ps") != std::string::npos;
     const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_alpha_add.ps") != std::string::npos;
+    const bool particle_multiply = fragment_name.find("particle_") != std::string::npos &&
+        fragment_name.find("_multiply.ps") != std::string::npos;
+    const bool particle_multiply_2x = fragment_name.find("particle_") != std::string::npos &&
+        fragment_name.find("_multiply_2x.ps") != std::string::npos;
+    const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
+        fragment_name.find("_set.ps") != std::string::npos;
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
-            "game shader pair", false, particle_additive, particle_alpha_add))
+            "game shader pair", false, particle_additive, particle_alpha_add,
+            particle_multiply, particle_multiply_2x, particle_set))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;
@@ -932,7 +948,8 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
 
 bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    uint32_t first_index, const char* vertex_name, const char* fragment_name, const char** failure) const
+    uint32_t first_index, const char* vertex_name, const char* fragment_name,
+    const char** failure, float alpha_ref) const
 {
     const auto reject = [failure](const char* reason)
     {
@@ -969,6 +986,10 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (fragment_name && std::strstr(fragment_name, "particle_") &&
+        std::strstr(fragment_name, "_set.ps"))
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (vertex_name || fragment_name)
     {
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -981,7 +1002,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
 
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    uint32_t first_index, const char* vertex_name, const char* fragment_name) const
+    uint32_t first_index, const char* vertex_name, const char* fragment_name, float alpha_ref) const
 {
     VkPipeline pipeline = hud_;
     if (vertex_name || fragment_name)
@@ -1002,6 +1023,10 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (fragment_name && std::strstr(fragment_name, "particle_") &&
+        std::strstr(fragment_name, "_set.ps"))
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;

@@ -23,6 +23,9 @@ struct Fragment
 #endif
 
 #if defined(VK_TRANSPARENT)
+#if defined(VK_PARTICLE_SET)
+[[vk::push_constant]] cbuffer ParticleCutout { float4x4 mvp; float alpha_threshold; };
+#endif
 #if !defined(VK_UNLIT)
 struct LocalLight
 {
@@ -49,7 +52,11 @@ float4 main(Fragment fragment) : SV_Target0
     float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
 #if defined(VK_UNLIT)
 #if defined(VK_PARTICLE)
-    return texel * fragment.baked;
+    float4 color = texel * fragment.baked;
+#if defined(VK_PARTICLE_SET)
+    clip(color.a - alpha_threshold);
+#endif
+    return color;
 #else
     return texel;
 #endif

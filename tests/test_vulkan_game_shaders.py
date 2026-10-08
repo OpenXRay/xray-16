@@ -84,6 +84,12 @@ class GameShaderVariantsTest(unittest.TestCase):
             self.assertIn(64, offsets)  # The material cutoff follows the MVP.
         blended = {op for op, _ in instructions(SHADERS / "vk/object_blended.ps.spv")}
         self.assertNotIn(252, blended)
+        for name in ("particle_world_set", "particle_hud_set"):
+            code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
+            self.assertIn(252, {op for op, _ in code})
+            offsets = {args[3] for op, args in code
+                       if op == 72 and len(args) >= 4 and args[2] == 35}
+            self.assertIn(64, offsets)
 
     def test_forward_transparent_layouts(self):
         for name, expected_set in (("object_blended", 1), ("skinned_blended", 2)):

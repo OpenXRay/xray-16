@@ -88,7 +88,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     pass_ = &pass;
     if ((def_->flags & 1u) == 0) return true; // Non-sprite actions still simulate.
     SurfaceMode surface{};
-    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, nullptr, &blend_mode_, true))
+    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, &alpha_ref_, &blend_mode_, true))
     {
         error = "particle '" + def_->name + "': " + error;
         release_gpu();
@@ -269,7 +269,9 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     std::string shader = def_->shader;
     std::transform(shader.begin(), shader.end(), shader.begin(),
         [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-    const char* mode = blend_mode_ == 5 ? "alpha_add" : blend_mode_ == 2 ? "additive" :
+    const char* mode = blend_mode_ == 0 ? "set" :
+        blend_mode_ == 5 ? "alpha_add" : blend_mode_ == 4 ? "multiply_2x" :
+        blend_mode_ == 3 ? "multiply" : blend_mode_ == 2 ? "additive" :
         blend_mode_ == -1 && shader.find("alpha_add") != std::string::npos ? "alpha_add" :
         blend_mode_ == -1 && (shader.find("\\add") != std::string::npos ||
             shader.find("\\xadd") != std::string::npos) ?
@@ -278,9 +280,9 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         (hud ? "hud_" : "world_") + mode + ".ps";
     constexpr const char* vertex = "vk\\level_opaque.vs";
     return hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment.c_str()) :
+            count * 6, mvp, material_, 0, vertex, fragment.c_str(), float(alpha_ref_) / 255.f) :
         pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment.c_str());
+            count * 6, mvp, material_, 0, vertex, fragment.c_str(), nullptr, float(alpha_ref_) / 255.f);
 }
 
 VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog,

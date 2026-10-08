@@ -89,12 +89,22 @@ int main()
     particle_alpha_add.insert(particle_alpha_add.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(particle_alpha_add, 5); write32(particle_alpha_add, 0);
     chunk(list, 45, particle_alpha_add);
+    Bytes particle_multiply = record("PARTICLE", "effects\\multiply", false, 32);
+    write32(particle_multiply, 7);
+    particle_multiply.insert(particle_multiply.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(particle_multiply, 3); write32(particle_multiply, 0);
+    chunk(list, 46, particle_multiply);
+    Bytes screen_multiply_2x = record("S_SET   ", "effects\\screen_multiply_2x", false, 32);
+    write32(screen_multiply_2x, 7);
+    screen_multiply_2x.insert(screen_multiply_2x.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(screen_multiply_2x, 4); write32(screen_multiply_2x, 0);
+    chunk(list, 47, screen_multiply_2x);
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 14);
+    assert(library.load(reader, error) && library.size() == 16);
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
@@ -124,6 +134,14 @@ int main()
         mode == SurfaceMode::Transparent && blend_mode == 2);
     assert(library.resolve("effects\\flash_alpha_add", mode, error, nullptr, &blend_mode) &&
         mode == SurfaceMode::Transparent && blend_mode == 5);
+    assert(!library.resolve("effects\\multiply", mode, error) &&
+        error.find("blending=3") != std::string::npos);
+    assert(library.resolve("effects\\multiply", mode, error, nullptr, &blend_mode, true) &&
+        mode == SurfaceMode::Transparent && blend_mode == 3);
+    assert(!library.resolve("effects\\screen_multiply_2x", mode, error) &&
+        error.find("blending=4") != std::string::npos);
+    assert(library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
+        mode == SurfaceMode::Transparent && blend_mode == 4);
     Bytes newer = record("LM_AREF ", "mod\\future", false);
     newer[172] = 42;
     Bytes future_list, future_file;

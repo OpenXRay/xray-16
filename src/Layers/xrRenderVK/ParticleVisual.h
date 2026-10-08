@@ -69,6 +69,7 @@ private:
     VkDescriptorSet material_{};
     std::string material_name_;
     int blend_mode_{-1};
+    int alpha_ref_{128};
     std::function<void(bool, PAPI::Particle&)> events_;
     struct Buffers
     {
