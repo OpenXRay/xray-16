@@ -86,26 +86,17 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
-    // Static vertex color contains precomputed lighting terms on many X-Ray
-    // levels, not a diffuse tint. Deferred lighting applies ambient and sun
-    // later; multiplying those terms into albedo makes terrain nearly black.
-#if defined(VK_LIGHTMAP)
-    output.albedo.rgb *= lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb;
-#endif
+    // X-Ray's deferred flat shader stores diffuse in the G-buffer and keeps
+    // the lightmap separate (its alpha is static sun occlusion). Multiplying
+    // the lightmap into diffuse here also attenuates every local light and
+    // makes baked level geometry almost black indoors.
 #if defined(VK_ALPHA_TEST)
     clip(output.albedo.a - alpha_threshold);
 #endif
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;
 #endif
-    // The level lightmap already contains baked illumination. Mark it in the
-    // otherwise unused normal alpha channel so the deferred ambient/sun pass
-    // does not darken that light a second time. Local lights remain additive.
-#if defined(VK_LIGHTMAP)
-    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 0.0);
-#else
     output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
-#endif
     return output;
 }
 #endif
