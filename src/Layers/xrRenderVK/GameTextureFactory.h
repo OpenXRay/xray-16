@@ -57,9 +57,9 @@ public:
     size_t blender_count() const { return materials_.size(); }
     bool surface_mode(const std::string& shader, const std::string& texture,
         SurfaceMode& mode, std::string& error, int* alpha_ref = nullptr,
-        int* blend_mode = nullptr) const
+        int* blend_mode = nullptr, bool particle_pipeline = false) const
     {
-        if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode);
+        if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode, particle_pipeline);
         // Standalone mock-GPU tests have no game archive; gameplay loads the
         // shaders.xr library at OnDeviceCreate before any level or OGF.
         mode = classify_surface_material(shader, texture);
