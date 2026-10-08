@@ -80,6 +80,10 @@ void VulkanRainRender::Render(CEffect_Rain& owner)
         owner.items.push_back(item);
     }
     const Fvector eye = Device.vCameraPosition;
+    Fvector up;
+    up.set(0.f, 1.f, 0.f);
+    float roof_distance = source_height;
+    const bool sheltered = owner.RayPick(eye, up, roof_distance, collide::rqtBoth);
     for (size_t i = 0; i < count; ++i)
     {
         auto& item = owner.items[i];
@@ -97,7 +101,7 @@ void VulkanRainRender::Render(CEffect_Rain& owner)
         // A roof above the camera occludes this drop for its entire life.
         // After a large frame step the simulated position can pass below the
         // roof before the next draw; drawing it then makes rain appear indoors.
-        if (item.dwTime_Hit == item.dwTime_Life && item.Phit.y > eye.y) continue;
+        if (sheltered || (item.dwTime_Hit == item.dwTime_Life && item.Phit.y > eye.y)) continue;
         Fvector tail;
         tail.mad(item.P, item.D, -5.f * (.5f + .5f * density));
         Fvector view, right;
@@ -122,7 +126,7 @@ void VulkanRainRender::Render(CEffect_Rain& owner)
             a.set(center.x, center.y + .01f, center.z - size);
             b.set(center.x, center.y + .01f, center.z + size);
             right.set(1.f, 0.f, 0.f);
-            quad(a, b, right, size);
+            if (!sheltered) quad(a, b, right, size);
         }
         particle = next;
     }

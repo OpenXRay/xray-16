@@ -14,7 +14,10 @@ void DeferredFrame::geometry(const FrameRecordingContext& frame, void* user_data
         std::string error;
         if (!context.shadows_->begin(frame, context.shadow_uniform_, shadow_frame, error))
         { context.recorded_ = false; return; }
-        if (context.render_world_)
+        // Keep the depth image cleared and shader-readable, but do not
+        // traverse the whole scene for a black sun (rainy/cloudy weather).
+        if (context.render_world_ && (context.light_.color[0] > 1e-4f ||
+                context.light_.color[1] > 1e-4f || context.light_.color[2] > 1e-4f))
             context.recorded_ &= context.level_->record_sun_shadow(shadow_frame, *context.pass_,
                 context.shadow_uniform_.sun_view_projection);
         context.shadows_->end(frame.command_buffer);
