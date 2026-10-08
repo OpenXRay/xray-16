@@ -97,6 +97,10 @@ asset_root="$project_dir/app/src/main/assets"
 remove_path "$asset_root"
 mkdir -p "$asset_root/gamedata"
 cp "$repo_dir/res/fsgame.ltx" "$asset_root/fsgame.ltx"
+glslc_bin=${GLSLC_BIN:-glslc}
+python3 "$repo_dir/tools/compile_vulkan_shader.py" --compiler glslc --dxc "$glslc_bin" \
+    --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
+    --output-dir "$repo_dir/res/gamedata/shaders"
 cp -R "$repo_dir/res/gamedata/." "$asset_root/gamedata/"
 python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
     --shader-root "$asset_root/gamedata/shaders" \
