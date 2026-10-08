@@ -17,6 +17,7 @@ public:
     bool resolve(const std::string& shader, SurfaceMode& mode, std::string& error,
         int* alpha_ref = nullptr, int* blend_mode = nullptr,
         bool particle_pipeline = false, bool screen_pipeline = false) const;
+    bool contains(const std::string& shader) const;
     size_t size() const { return entries_.size(); }
     void clear() { entries_.clear(); }
 

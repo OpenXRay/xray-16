@@ -236,4 +236,9 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     return true;
 }
 
+bool ShaderMaterialLibrary::contains(const std::string& shader) const
+{
+    return entries_.find(lower(shader)) != entries_.end();
+}
+
 }

@@ -105,6 +105,8 @@ int main()
     ShaderMaterialLibrary library;
     std::string error;
     assert(library.load(reader, error) && library.size() == 16);
+    assert(library.contains("HUD/ALPHA"));
+    assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);

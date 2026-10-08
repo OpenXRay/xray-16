@@ -55,6 +55,7 @@ public:
     bool load_blender_library(IReader& file, std::string& error)
     { return materials_.load(file, error); }
     size_t blender_count() const { return materials_.size(); }
+    bool has_blender(const std::string& shader) const { return materials_.contains(shader); }
     bool surface_mode(const std::string& shader, const std::string& texture,
         SurfaceMode& mode, std::string& error, int* alpha_ref = nullptr,
         int* blend_mode = nullptr, bool particle_pipeline = false,

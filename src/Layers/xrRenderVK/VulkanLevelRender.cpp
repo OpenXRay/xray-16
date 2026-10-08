@@ -781,6 +781,9 @@ void VulkanLevelRender::OnDeviceCreate(pcstr shader_archive)
         IWriter* output = FS.w_open(exported);
         if (output)
         {
+            // load_blender_library uses open_chunk(), which changes the
+            // reader cursor. pointer() points at that cursor, not at byte 0.
+            shader_file->seek(0);
             output->w(shader_file->pointer(), shader_file->length());
             FS.w_close(output);
             Msg("[renderer-vulkan] shaders.xr exported file='%s' bytes=%zu",

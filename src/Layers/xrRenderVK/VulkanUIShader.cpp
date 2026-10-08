@@ -49,7 +49,9 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
     destroy();
     shader_ = shader ? shader : "";
     texture_ = texture ? texture : "";
-    if (!shader_.empty() && textures_->blender_count())
+    // Some engine-provided UI shaders (fonts, movies) have no shaders.xr
+    // blender entry. They still need their real texture/video descriptor.
+    if (!shader_.empty() && textures_->has_blender(shader_))
     {
         SurfaceMode surface{};
         std::string error;
