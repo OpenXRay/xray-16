@@ -747,6 +747,12 @@ public:
             return;
         }
 
+        if (!CSavedGameWrapper::is_compatible_saved_game(saved_game))
+        {
+            Msg("! Cannot load saved game %s, level not found in current game graph (incompatible save)", saved_game);
+            return;
+        }
+
         if (!valid_saved_game_name(saved_game))
         {
             Msg("! Cannot load saved game %s, invalid file name", saved_game);

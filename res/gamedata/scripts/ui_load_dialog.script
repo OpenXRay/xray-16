@@ -215,7 +215,7 @@ function load_dialog:OnListItemClicked()
 		return
 	end
 
-	if valid_saved_game(item_text) then
+	if is_compatible_saved_game(item_text) then
 		self.btn_load:Enable(true)
 	else
 		self.btn_load:Enable(false)
@@ -294,7 +294,7 @@ function load_dialog:OnButton_load_clicked()
 
 	local fname		= item.fn:GetText()
 
-	if ( not valid_saved_game(fname) ) then
+	if ( not is_compatible_saved_game(fname) ) then
 		self.msgbox_id						= 0
 		self.message_box:InitMessageBox		("message_box_invalid_saved_game")
 		self.message_box:ShowDialog(true)

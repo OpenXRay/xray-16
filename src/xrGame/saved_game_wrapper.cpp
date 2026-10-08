@@ -62,6 +62,15 @@ bool CSavedGameWrapper::valid_saved_game(LPCSTR saved_game_name)
     return (result);
 }
 
+bool CSavedGameWrapper::is_compatible_saved_game(LPCSTR saved_game_name)
+{
+    if (!saved_game_exist(saved_game_name))
+        return false;
+
+    CSavedGameWrapper wrapper(saved_game_name);
+    return wrapper.level_id() != _LEVEL_ID(-1);
+}
+
 CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
 {
     string_path file_name;

@@ -225,6 +225,13 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
         return false;
     }
 
+    if (!CSavedGameWrapper::is_compatible_saved_game(save_name))
+    {
+        Msg("! Saved game '%s' is incompatible with current game installation (level not found in game graph)", save_name);
+        xr_strcpy(m_save_name, saveBackup);
+        return false;
+    }
+
     string512 temp;
     strconcat(temp, StringTable().translate("st_loading_saved_game").c_str(),
         " \"", save_name, gameSaveExtension, "\"");

@@ -29,6 +29,7 @@ public:
     static bool saved_game_exist(LPCSTR saved_game_name);
     static bool valid_saved_game(IReader& stream);
     static bool valid_saved_game(LPCSTR saved_game_name);
+    static bool is_compatible_saved_game(LPCSTR saved_game_name);
     inline const _TIME_ID& game_time() const;
     inline const _LEVEL_ID& level_id() const;
     inline LPCSTR level_name() const;
