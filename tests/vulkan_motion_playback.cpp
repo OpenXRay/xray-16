@@ -64,4 +64,13 @@ int main()
     overridden.stop_cycles(1);
     overridden.advance(0.2f);
     assert(overridden.active_count() == 0);
+    // Replacing a mixed cycle must retire the old one. This previously kept
+    // every cycle alive until the animation pool was full in long sessions.
+    MotionPlayback cycling(slots);
+    for (int i = 0; i < 400; ++i)
+    {
+        assert(cycling.play(cycle, false, true));
+        cycling.advance(0.2f);
+        assert(cycling.active_count() <= 2);
+    }
 }

@@ -762,11 +762,37 @@ CBlend* VulkanKinematics::create_blend(u16 part, MotionID id, bool fx, bool mixi
     if (!playback_.play(handle, fx, mixing, power,
             [callback, result] { if (callback) callback(result); }, accrue, falloff, speed, noloop, channel, part))
     { result->set_free_state(); return nullptr; }
-    if (!fx && !mixing)
+    // Match CKinematicsAnimated::LL_PlayCycle: each replacement fades the
+    // previous cycles in this part/channel, or closes them immediately.
+    // Leaving mixed cycles in eAccrue filled even the reusable blend pool.
+    if (!fx)
         for (auto& old : blends_)
             if (old->blend_state() != CBlend::eFREE_SLOT && old->channel == channel &&
-                old->bone_or_part == part) old->set_falloff_state();
+                old->bone_or_part == part && old.get() != result &&
+                valid_motion(old->motionID) &&
+                !(data_->motions[old->motionID.slot].definitions[old->motionID.idx].flags & 1))
+            {
+                if (!mixing || falloff <= 0.f)
+                {
+                    if (blend_destroy_) blend_destroy_->BlendDestroy(*old);
+                    old->set_free_state();
+                }
+                else
+                {
+                    old->blendFalloff = falloff;
+                    old->stop_at_end_callback = false;
+                    old->set_falloff_state();
+                }
+            }
     if (blend) blends_.push_back(std::move(blend));
+    else
+    {
+        // Newest cycles must come first when the 16 root-motion key slots are
+        // filled. Moving the owning pointer keeps CBlend* identities stable.
+        auto reused = std::move(*free);
+        blends_.erase(free);
+        blends_.push_back(std::move(reused));
+    }
     dirty_ = true;
     return result;
 }
@@ -859,7 +885,8 @@ void VulkanKinematics::LL_UpdateTracks(float dt, bool, bool leave_blends)
         else
             blend->timeCurrent = std::min(next, blend->timeTotal);
         if (blend->blend_state() == CBlend::eFalloff)
-            blend->blendAmount = std::max(0.f, blend->blendAmount - dt * blend->blendFalloff * blend->blendPower);
+            blend->blendAmount = std::max(0.f, blend->blendAmount -
+                dt * blend->blendFalloff * blend->blendPower * blend->speed);
         else
             blend->blendAmount = std::min(blend->blendPower, blend->blendAmount + dt * blend->blendAccrue * blend->blendPower);
         if (blend->timeCurrent >= blend->timeTotal && blend->stop_at_end)

@@ -109,12 +109,14 @@ bool MotionPlayback::play(Handle handle, bool fx, bool mixing, float power, Fini
     if (bool(def.flags & 1) != fx || def.motion >= slot.clips.size()) return false;
     const uint16_t part = part_override == UINT16_MAX ? def.bone_or_part : part_override;
     if (!fx && part != UINT16_MAX && part >= slot.partitions.size()) return false;
+    const float replacement_falloff = falloff >= 0.f ? falloff : def.parameters[3];
     if (!fx)
         for (auto& prior : active_)
             if (!prior.fx && prior.channel == channel &&
                 prior.part == part)
             {
-                if (!mixing) prior.weight = 0.f;
+                if (!mixing || replacement_falloff <= 0.f) prior.weight = 0.f;
+                else prior.falloff = replacement_falloff;
                 prior.stopping = true;
             }
     Active state;

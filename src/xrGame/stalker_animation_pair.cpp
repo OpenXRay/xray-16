@@ -71,9 +71,17 @@ void CStalkerAnimationPair::play_global_animation(IKinematicsAnimated* skeleton_
             if (blend && !m_blend)
                 m_blend = blend;
 
-            if (use_animation_movement_control || this->use_animation_movement_control(skeleton_animated, animation()))
+            if (blend && (use_animation_movement_control ||
+                    this->use_animation_movement_control(skeleton_animated, animation())))
             {
                 m_object->create_anim_mov_ctrl(blend, m_target_matrix, local_animation);
+            }
+            else if (!blend)
+            {
+                static u32 rejected_cycles = 0;
+                if (++rejected_cycles <= 4 || (rejected_cycles & (rejected_cycles - 1)) == 0)
+                    Msg("! [animation] movement cycle rejected occurrence=%u part=%u motion=%u",
+                        rejected_cycles, i, animation().val);
             }
             else
             {
