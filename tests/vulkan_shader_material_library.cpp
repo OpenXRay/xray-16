@@ -20,7 +20,9 @@ static Bytes record(const char* cls, const char* name, bool blend, uint32_t alph
     Bytes result(176, 0);
     for (size_t i = 0; i < 8; ++i) result[i] = static_cast<uint8_t>(cls[7 - i]);
     std::memcpy(result.data() + 8, name, std::strlen(name));
-    result[172] = 1;
+    result[172] = std::strcmp(cls, "PARTICLE") == 0 ||
+        std::strcmp(cls, "D_STILL ") == 0 ? 0 :
+        std::strcmp(cls, "S_SET   ") == 0 ? 4 : 1;
     property(result, 0, "General", 0); result.resize(result.size() - 4);
     write32(result, 4); result.insert(result.end(), {'P','r','i','o','r','i','t','y',0});
     write32(result, 1); write32(result, 0); write32(result, 3);
@@ -119,6 +121,41 @@ int main()
         mode == SurfaceMode::Transparent && blend_mode == 2);
     assert(library.resolve("effects\\flash_alpha_add", mode, error, nullptr, &blend_mode) &&
         mode == SurfaceMode::Transparent && blend_mode == 5);
+    Bytes newer = record("LM_AREF ", "mod\\future", false);
+    newer[172] = 42;
+    Bytes future_list, future_file;
+    chunk(future_list, 19, newer);
+    chunk(future_file, 2, future_list);
+    IReader future(future_file.data(), future_file.size());
+    assert(library.load(future, error));
+    assert(!library.resolve("mod\\future", mode, error) &&
+        error.find("id=19") != std::string::npos &&
+        error.find("version=42") != std::string::npos);
+    Bytes invalid_alpha = record("LM_AREF ", "mod\\bad_aref", false, 256);
+    Bytes alpha_list, alpha_file;
+    chunk(alpha_list, 20, invalid_alpha);
+    chunk(alpha_file, 2, alpha_list);
+    IReader bad_alpha(alpha_file.data(), alpha_file.size());
+    assert(!library.load(bad_alpha, error) && error.find("Alpha ref") != std::string::npos &&
+        error.find("id=20") != std::string::npos);
+    Bytes missing_blending = record("PARTICLE", "mod\\missing_blend", false);
+    Bytes missing_list, missing_file;
+    chunk(missing_list, 21, missing_blending);
+    chunk(missing_file, 2, missing_list);
+    IReader missing(missing_file.data(), missing_file.size());
+    assert(!library.load(missing, error) && error.find("Blending") != std::string::npos &&
+        error.find("id=21") != std::string::npos);
+    Bytes invalid_token = record("S_SET   ", "mod\\bad_token", false);
+    write32(invalid_token, 7);
+    invalid_token.insert(invalid_token.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(invalid_token, 2); write32(invalid_token, 1);
+    write32(invalid_token, 1); invalid_token.resize(invalid_token.size() + 64);
+    Bytes token_list, token_file;
+    chunk(token_list, 22, invalid_token);
+    chunk(token_file, 2, token_list);
+    IReader bad_token(token_file.data(), token_file.size());
+    assert(!library.load(bad_token, error) && error.find("Blending token") != std::string::npos &&
+        error.find("id=22") != std::string::npos);
     Bytes malformed, broken;
     chunk(broken, 0, Bytes(5, 0));
     chunk(malformed, 2, broken);
