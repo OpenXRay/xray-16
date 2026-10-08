@@ -1309,6 +1309,17 @@ void CGameObject::OnChangeVisual()
 bool CGameObject::shedule_Needed() { return (!getDestroy()); }
 void CGameObject::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation)
 {
+    // A renderer can reject a cycle when its blend pool is exhausted or the
+    // requested motion is unavailable. Never hand a null controlling blend to
+    // animation_movement_controller, which samples it during construction.
+    if (!b)
+    {
+        static u32 rejected_movement_blends = 0;
+        if (++rejected_movement_blends <= 4 ||
+            (rejected_movement_blends & (rejected_movement_blends - 1)) == 0)
+            Msg("! [animation] movement controller skipped null blend occurrence=%u", rejected_movement_blends);
+        return;
+    }
     if (animation_movement_controlled())
     {
         m_anim_mov_ctrl->NewBlend(b, start_pose ? *start_pose : XFORM(), local_animation);

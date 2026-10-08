@@ -389,12 +389,18 @@ bool wallmark_geometry(const Fvector (&triangle)[3], const Fvector& point,
     if (clipped.empty()) return false;
     result = {};
     result.texture = texture;
+    // Runtime wallmarks do not come from an OGF and therefore have no OGF
+    // shader name. Resolve their actual blender from shaders.xr explicitly.
+    result.shader = "effects\\wallmark";
     result.mode = SurfaceMode::Transparent;
     for (const auto& vertex : clipped)
     {
         ModelVertex model;
-        Fvector offset;
-        offset.sub(Device.vCameraPosition, point).normalize_safe();
+        Fvector offset = normal;
+        Fvector to_camera;
+        to_camera.sub(Device.vCameraPosition, point);
+        if (offset.dotproduct(to_camera) < 0.f)
+            offset.invert();
         for (size_t axis = 0; axis < 3; ++axis)
         {
             const float component = axis == 0 ? offset.x : axis == 1 ? offset.y : offset.z;

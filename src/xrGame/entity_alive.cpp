@@ -710,6 +710,7 @@ Fvector CEntityAlive::predict_position(const float& time_to_check) const { retur
 Fvector CEntityAlive::target_position() const { return (Position()); }
 void CEntityAlive::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation)
 {
+    if (!b) return;
     bool b_animation_movement_controlled = animation_movement_controlled();
     inherited::create_anim_mov_ctrl(b, start_pose, local_animation);
     CCharacterPhysicsSupport* cs = character_physics_support();
