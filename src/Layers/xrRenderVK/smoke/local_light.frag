@@ -33,11 +33,11 @@ float visibility(vec3 world, vec3 delta)
     float layer = light.shadow_params.x + float(face);
     vec2 step_uv = 1.0 / vec2(textureSize(shadow_array, 0).xy);
     float lit = 0.0;
-    for (int y = -1; y <= 1; ++y)
-        for (int x = -1; x <= 1; ++x)
+    for (int y = 0; y < 2; ++y)
+        for (int x = 0; x < 2; ++x)
             lit += projected.z - light.shadow_params.y <=
-                texture(shadow_array, vec3(uv + vec2(x, y) * step_uv, layer)).r ? 1.0 : 0.0;
-    return lit / 9.0;
+                texture(shadow_array, vec3(uv + (vec2(x, y) - 0.5) * step_uv, layer)).r ? 1.0 : 0.0;
+    return lit * 0.25;
 }
 
 void main()

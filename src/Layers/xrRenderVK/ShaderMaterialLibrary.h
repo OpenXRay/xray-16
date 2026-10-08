@@ -15,7 +15,7 @@ class ShaderMaterialLibrary
 public:
     bool load(IReader& file, std::string& error);
     bool resolve(const std::string& shader, SurfaceMode& mode, std::string& error,
-        int* alpha_ref = nullptr) const;
+        int* alpha_ref = nullptr, int* blend_mode = nullptr) const;
     size_t size() const { return entries_.size(); }
     void clear() { entries_.clear(); }
 

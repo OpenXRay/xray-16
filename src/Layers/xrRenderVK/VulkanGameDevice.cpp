@@ -932,6 +932,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         }
     }
     std::copy_n(light.direction_ambient, 4, forward_lighting_.sun_direction_ambient);
+    forward_lighting_.sun_direction_ambient[3] += light.grade[3];
     std::copy_n(light.color, 3, forward_lighting_.sun_color_count);
     const uint32_t forward_count = std::min<size_t>(local_uniforms_.size(), ForwardLightCapacity);
     forward_lighting_.sun_color_count[3] = static_cast<float>(forward_count);

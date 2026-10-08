@@ -68,6 +68,7 @@ private:
     DeferredPass* pass_{};
     VkDescriptorSet material_{};
     std::string material_name_;
+    int blend_mode_{-1};
     std::function<void(bool, PAPI::Particle&)> events_;
     struct Buffers
     {

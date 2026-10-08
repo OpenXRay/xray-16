@@ -168,12 +168,15 @@ DeferredLight make_environment_deferred_light(const DeferredEnvironment& environ
             0.7152f * safe_nonnegative(color[1]) +
             0.0722f * safe_nonnegative(color[2]);
     };
-    const float ambient = luminance(environment.ambient_color) +
-        0.25f * luminance(environment.hemi_color);
+    // The static hemisphere channel already records visibility. Keep its
+    // weather intensity separate from ambient so indoor lightmaps can supply
+    // the actual indirect contribution instead of multiplying a small ambient.
+    const float ambient = luminance(environment.ambient_color);
     return {{direction[0], direction[1], direction[2], ambient},
         {safe_nonnegative(environment.sun_color[0]),
             safe_nonnegative(environment.sun_color[1]),
-            safe_nonnegative(environment.sun_color[2]), 0.f}};
+            safe_nonnegative(environment.sun_color[2]), 0.f},
+        {1.f, 1.f, 1.f, luminance(environment.hemi_color)}};
 }
 
 bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,

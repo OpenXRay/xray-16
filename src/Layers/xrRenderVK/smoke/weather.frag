@@ -38,10 +38,11 @@ float sun_visibility(float depth)
         coord.z <= 0.0 || coord.z >= 1.0) return 1.0;
     vec2 texel = 1.0 / vec2(textureSize(sun_shadow, 0));
     float lit = 0.0;
-    for (int y = -1; y <= 1; ++y)
-        for (int x = -1; x <= 1; ++x)
-            lit += coord.z - shadow.options.x <= texture(sun_shadow, uv + vec2(x, y) * texel).r ? 1.0 : 0.0;
-    return lit / 9.0;
+    for (int y = 0; y < 2; ++y)
+        for (int x = 0; x < 2; ++x)
+            lit += coord.z - shadow.options.x <=
+                texture(sun_shadow, uv + (vec2(x, y) - 0.5) * texel).r ? 1.0 : 0.0;
+    return lit * 0.25;
 }
 
 void main()
@@ -54,8 +55,8 @@ void main()
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
         bool static_lightmap = encoded_normal.a < 0.875;
-        float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 0.0;
-        float indirect = weather.direction_ambient.w * (1.0 + 1.2 * hemisphere);
+        float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 1.0;
+        float indirect = weather.direction_ambient.w + weather.grade.w * hemisphere;
         vec3 sunlight = vec3(0.0);
         // Most rainy frames have no sun. Avoid nine depth fetches per pixel
         // when the result would be multiplied by black anyway.
@@ -78,7 +79,7 @@ void main()
         lit = mix(lit, vec3(fog_rg, fog_b_near.x), fog);
         lit = (lit - 0.5) * weather.grade.z + 0.5;
         lit = pow(max(lit * weather.grade.y, 0.0), vec3(1.0 / max(weather.grade.x, 0.01)));
-        pixel_color = vec4(mix(lit, vec3(dot(lit, vec3(0.299, 0.587, 0.114))), weather.grade.w), albedo.a);
+        pixel_color = vec4(lit, albedo.a);
         return;
     }
 
@@ -96,5 +97,5 @@ void main()
     vec3 lit = mix(sky, cloud.rgb * weather.clouds_color.rgb, alpha);
     lit = (lit - 0.5) * weather.grade.z + 0.5;
     lit = pow(max(lit * weather.grade.y, 0.0), vec3(1.0 / max(weather.grade.x, 0.01)));
-    pixel_color = vec4(mix(lit, vec3(dot(lit, vec3(0.299, 0.587, 0.114))), weather.grade.w), 1.0);
+    pixel_color = vec4(lit, 1.0);
 }

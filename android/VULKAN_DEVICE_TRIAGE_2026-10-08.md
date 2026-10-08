@@ -13,3 +13,26 @@ Evidence: APK 0.9.121 (versionCode 135), Adreno 710, Android 16, 1084×488 reque
 | Diagnostic triangle | `android_vulkan_smoke.cpp` smoke pass; SDL window/swapchain sizing; shader assets; gameplay renderer selection; launcher overlay | The multicolored triangle is the intentional independent Vulkan capability test, not a rendered game frame. The game images separately show the gameplay renderer. |
 
 Plan status at PR #6: 1–101 marked complete as code and host checks. 102 remains partially complete (per-material alpha reference works; multipass and variant audit remains), and 103 remains partially complete (ARM64 native/APK checks passed; Debug/Release for both ABIs and the full host gate remain).
+
+## Follow-up after the latest device report
+
+The player confirms that indoor rain and floating grass are resolved. Low FPS,
+NPCs below the floor, dark rooms with lighting artifacts, malformed muzzle
+flashes, and ground artifacts remain. The report does not include a matching
+APK commit, frame capture, or fresh CPU/GPU timings, so code changes below are
+candidate fixes and not device acceptance.
+
+| Symptom | Five sites reviewed | Most likely source and current action |
+| --- | --- | --- |
+| FPS regression | Android buffer extent and swapchain size in `VulkanGameDevice.cpp`; detail batching and upload in `GpuLevel.cpp`; per-light screen scissor in `VulkanGameDevice.cpp`; local shadow replay budget there; PCF in `smoke/deferred.frag`, `weather.frag`, and `local_light.frag` | The prior device log measured GPU p95 at 117 ms and a swapchain six times the requested pixel count. The buffer-size fix predates this report and needs its new log. The shadow shaders still performed nine depth reads per shaded pixel; they now use a four-tap filter. Compare swapchain extent and CPU/GPU p95 with the same save and view before attributing the regression to either path. |
+| NPC below terrain | Movement blend creation in `GameObject.cpp`; blend retirement and root key selection in `VulkanKinematics.cpp`; root sampling in `animation_movement_controller.cpp`; model skinning in `GpuModel.cpp`; world transform submission in `VulkanLevelRender.cpp` | The root controller's missing-key fallback used the *current* bone matrix as motion-local translation and multiplied it by the starting world transform. It now returns identity, preventing that coordinate-space duplication. Existing pool retirement remains. Compare NPC physics position with rendered bounds on device to distinguish a collision failure from a visual displacement. |
+| Dark scene / indoor light artifacts | Environment color conversion in `DeferredPass.cpp`; static hemisphere channels in `opaque.ps`; deferred/weather light equations; local-light selection and shadow maps in `VulkanGameDevice.cpp`; final color grading in `postprocess.frag` | The light equation scaled the small ambient term by the static hemisphere coefficient instead of adding the independent weather hemisphere light. It now keeps the two intensities separate for level geometry and includes both for forward objects. Local shadow projection and lightmap variants still need image comparison; this change does not prove the artifact is gone. |
+| Muzzle flash | Particle definition in `ParticleCatalog.cpp`; `shaders.xr` blender parsing in `ShaderMaterialLibrary.cpp`; fragment variant selection in `ParticleVisual.cpp`; blend factors in `DeferredPass.cpp`; HUD depth/order in `VulkanGameDevice.cpp` | Selecting ADD from a shader-name substring can miss a muzzle material with an arbitrary blender name. Particle ADD and ALPHA-ADD now use the parsed `Blending` token (2 and 5), while unknown modes remain diagnostic errors. An actual effect capture is needed; particle SET and multiplicative passes remain part of #102. |
+| Ground artifacts | Static triangle decoding in `LevelModels.cpp`; wallmark clipping in `WallmarkGeometry.cpp`; wallmark offset/material in `VulkanLevelRender.cpp`; sun depth bias in `DeferredPass.cpp`; depth comparison/filter in the deferred/weather shaders | The recorded missing wallmark blender was fixed before this report, so it no longer explains every artifact. Sun-shadow self-shadowing or a different material/triangle is the leading unverified candidate. The four-tap filter changes shadow sampling, but no ground-specific fix can be claimed without a frame and matching log. |
+
+The current checkout compiled the ARM64 `xrRenderVK` archive and the movement
+controller translation unit. Nine Python shader tests pass after correcting the
+single-attachment particle expectation and refreshing the cutout SPIR-V with
+the pinned kit compiler. A full APK build was interrupted at 359/1972 native
+steps with less than 170 MiB of workspace capacity left. This is not a #103
+build result; neither an APK nor a new device result exists for these changes.

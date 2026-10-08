@@ -151,7 +151,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 }
 
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
-    std::string& error, int* alpha_ref) const
+    std::string& error, int* alpha_ref, int* blend_mode) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -165,11 +165,18 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // The scene pipeline currently implements only source-alpha blending.
     // ADD/MUL and legacy multi-render-target modes must not silently render as BLEND.
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
-        material.blending != 0 && material.blending != 1)
+        material.blending != 0 && material.blending != 1 &&
+        material.blending != 2 && material.blending != 5)
+    { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
+    // The screen-set ADD modes still need their own pipeline. Particle
+    // pipelines below can reproduce ADD and ALPHA-ADD exactly.
+    if (material.class_name == "S_SET   " &&
+        (material.blending == 2 || material.blending == 5))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     mode = it->second.mode;
     if (alpha_ref) *alpha_ref = it->second.alpha_ref >= 0 ?
         std::clamp(it->second.alpha_ref, 0, 255) : 128;
+    if (blend_mode) *blend_mode = material.blending;
     error.clear();
     return true;
 }

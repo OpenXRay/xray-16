@@ -14,7 +14,7 @@ struct DeferredLight
 {
     float direction_ambient[4];
     float color[4];
-    float grade[4]{1.f, 1.f, 1.f, 0.f}; // gamma, brightness, contrast, grayscale
+    float grade[4]{1.f, 1.f, 1.f, 0.f}; // gamma, brightness, contrast, hemisphere intensity
 };
 
 struct WeatherLighting

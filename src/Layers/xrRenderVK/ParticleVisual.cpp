@@ -87,6 +87,13 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     textures_ = &textures;
     pass_ = &pass;
     if ((def_->flags & 1u) == 0) return true; // Non-sprite actions still simulate.
+    SurfaceMode surface{};
+    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, nullptr, &blend_mode_))
+    {
+        error = "particle '" + def_->name + "': " + error;
+        release_gpu();
+        return false;
+    }
     if (!textures.material(def_->texture, pass, material_, error))
     {
         release_gpu();
@@ -262,8 +269,10 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     std::string shader = def_->shader;
     std::transform(shader.begin(), shader.end(), shader.begin(),
         [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-    const char* mode = shader.find("alpha_add") != std::string::npos ? "alpha_add" :
-        shader.find("\\add") != std::string::npos || shader.find("\\xadd") != std::string::npos ?
+    const char* mode = blend_mode_ == 5 ? "alpha_add" : blend_mode_ == 2 ? "additive" :
+        blend_mode_ == -1 && shader.find("alpha_add") != std::string::npos ? "alpha_add" :
+        blend_mode_ == -1 && (shader.find("\\add") != std::string::npos ||
+            shader.find("\\xadd") != std::string::npos) ?
             "additive" : "blended";
     const std::string fragment = std::string("vk\\particle_") +
         (hud ? "hud_" : "world_") + mode + ".ps";

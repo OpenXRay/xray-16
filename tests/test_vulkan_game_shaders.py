@@ -63,7 +63,7 @@ class GameShaderVariantsTest(unittest.TestCase):
                 if name.endswith(".ps.spv"):
                     self.assertIn(0, output_locations)
                     self.assertIn(0, bindings.values())
-                    if "blended" in name:
+                    if "blended" in name or "particle_" in name or "alpha_add" in name:
                         # The present pass has one color attachment, unlike the G-buffer.
                         self.assertEqual(output_locations, {0})
                     else:

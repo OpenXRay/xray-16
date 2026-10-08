@@ -77,12 +77,22 @@ int main()
     screen_alpha.insert(screen_alpha.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_alpha, 1); write32(screen_alpha, 0);
     chunk(list, 43, screen_alpha);
+    Bytes particle_add = record("PARTICLE", "effects\\flash_add", false, 32);
+    write32(particle_add, 7);
+    particle_add.insert(particle_add.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(particle_add, 2); write32(particle_add, 0);
+    chunk(list, 44, particle_add);
+    Bytes particle_alpha_add = record("PARTICLE", "effects\\flash_alpha_add", false, 32);
+    write32(particle_alpha_add, 7);
+    particle_alpha_add.insert(particle_alpha_add.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(particle_alpha_add, 5); write32(particle_alpha_add, 0);
+    chunk(list, 45, particle_alpha_add);
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 12);
+    assert(library.load(reader, error) && library.size() == 14);
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
@@ -104,6 +114,11 @@ int main()
         error.find("blending=2") != std::string::npos && error.find("id=9") != std::string::npos);
     assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&
         mode == SurfaceMode::AlphaTest && alpha_ref == 200);
+    int blend_mode = -1;
+    assert(library.resolve("effects\\flash_add", mode, error, nullptr, &blend_mode) &&
+        mode == SurfaceMode::Transparent && blend_mode == 2);
+    assert(library.resolve("effects\\flash_alpha_add", mode, error, nullptr, &blend_mode) &&
+        mode == SurfaceMode::Transparent && blend_mode == 5);
     Bytes malformed, broken;
     chunk(broken, 0, Bytes(5, 0));
     chunk(malformed, 2, broken);

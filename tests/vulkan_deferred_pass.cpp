@@ -317,7 +317,8 @@ int main()
     assert(environment_light.direction_ambient[2] == 0.f);
     assert(environment_light.color[0] == 0.3f && environment_light.color[1] == 0.6f &&
         environment_light.color[2] == 0.9f);
-    assert(environment_light.direction_ambient[3] > 0.29f && environment_light.direction_ambient[3] < 0.31f);
+    assert(environment_light.direction_ambient[3] > 0.19f && environment_light.direction_ambient[3] < 0.21f);
+    assert(environment_light.grade[3] > 0.39f && environment_light.grade[3] < 0.41f);
     environment.sun_direction[0] = environment.sun_direction[1] = environment.sun_direction[2] = 0.f;
     environment.sun_color[0] = -1.f;
     environment.ambient_color[0] = std::numeric_limits<float>::quiet_NaN();
