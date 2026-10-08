@@ -999,7 +999,10 @@ void VulkanLevelRender::End()
         "Vulkan renderer End requires a begun frame");
     R_ASSERT2(frame_phase_.can_end(),
         "Vulkan renderer End was reached before the calculated world was rendered");
-    const bool render_world = frame_phase_.world_rendered();
+    // Loading overlays need the whole frame; a narrow gap at their bottom
+    // otherwise exposes the already rendered level before user input.
+    const bool loading = load_screen_renderer.IsActive();
+    const bool render_world = frame_phase_.world_rendered() && !loading;
     R_ASSERT2(frame_phase_.end(), "Vulkan renderer frame end is out of order");
 
     float mvp[16];
@@ -1027,7 +1030,7 @@ void VulkanLevelRender::End()
     game_device_->set_postprocess(postprocess_, color_map_a_, color_map_b_);
     FrameStatus status = FrameStatus::Presented;
     std::string error;
-    const bool clear_target = frame_clear_target_;
+    const bool clear_target = frame_clear_target_ || loading;
     frame_clear_target_ = false;
     const auto cpu_begin = std::chrono::steady_clock::now();
     static std::string last_render_error;
