@@ -81,6 +81,8 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
+#elif defined(XR_PLATFORM_ANDROID)
+#include "Common/PlatformAndroid.inl"
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_HAIKU)
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_BSD)

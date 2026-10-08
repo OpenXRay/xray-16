@@ -22,7 +22,8 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
 void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
 
 #ifdef USE_OGL
-void SetGLVertexPointer(SDeclaration* decl);
+bool UseVertexAttribBinding();
+void SetGLVertexPointer(SDeclaration* decl, size_t vertex_offset = 0);
 #endif
 
 namespace BufferUtils

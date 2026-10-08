@@ -50,12 +50,42 @@ IC void CBackend::set_ZB(GLuint ZB)
     }
 }
 
+struct ScopedColorTargetClear
+{
+    CBackend& backend;
+    GLuint previous_target;
+    GLint previous_draw_buffers[3]{};
+    GLboolean previous_color_mask[4]{};
+
+    ScopedColorTargetClear(CBackend& backend, GLuint target)
+        : backend(backend), previous_target(backend.get_RT())
+    {
+        for (GLuint i = 0; i < 3; ++i)
+            glGetIntegerv(GL_DRAW_BUFFER0 + i, &previous_draw_buffers[i]);
+        glGetBooleanv(GL_COLOR_WRITEMASK, previous_color_mask);
+        backend.set_RT(target);
+        const GLenum clear_buffer = GL_COLOR_ATTACHMENT0;
+        CHK_GL(glDrawBuffers(1, &clear_buffer));
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    }
+
+    ~ScopedColorTargetClear()
+    {
+        backend.set_RT(previous_target);
+        const GLenum draw_buffers[3] = {
+            static_cast<GLenum>(previous_draw_buffers[0]),
+            static_cast<GLenum>(previous_draw_buffers[1]),
+            static_cast<GLenum>(previous_draw_buffers[2])
+        };
+        CHK_GL(glDrawBuffers(3, draw_buffers));
+        glColorMask(previous_color_mask[0], previous_color_mask[1],
+            previous_color_mask[2], previous_color_mask[3]);
+    }
+};
+
 IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
 {
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    ScopedColorTargetClear clear(*this, rt);
     glClearColor(color.r, color.g, color.b, color.a);
 
     CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
@@ -67,10 +97,13 @@ IC void CBackend::ClearZB(GLuint zb, float depth)
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
 
+    GLboolean previous_depth_mask = GL_TRUE;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &previous_depth_mask);
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
 
     CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
+    glDepthMask(previous_depth_mask);
 }
 
 IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
@@ -79,6 +112,10 @@ IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
 
+    GLboolean previous_depth_mask = GL_TRUE;
+    GLint previous_stencil_mask = 0;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &previous_depth_mask);
+    glGetIntegerv(GL_STENCIL_WRITEMASK, &previous_stencil_mask);
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
 
@@ -86,12 +123,16 @@ IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
     glClearStencil(stencil);
 
     CHK_GL(glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+    glDepthMask(previous_depth_mask);
+    glStencilMask(static_cast<GLuint>(previous_stencil_mask));
 }
 
 IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects)
 {
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+    ScopedColorTargetClear clear(*this, rt);
+    const GLboolean scissor_was_enabled = glIsEnabled(GL_SCISSOR_TEST);
+    GLint previous_scissor[4]{};
+    glGetIntegerv(GL_SCISSOR_BOX, previous_scissor);
 
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
@@ -105,13 +146,14 @@ IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, c
         CHK_GL(glScissor(rects->left, bottom, rects->width(), rects->height()));
 
         // Clear the color buffer without affecting the global state
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         glClearColor(color.r, color.g, color.b, color.a);
 
         CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
     }
 
-    CHK_GL(glDisable(GL_SCISSOR_TEST));
+    CHK_GL(glScissor(previous_scissor[0], previous_scissor[1], previous_scissor[2], previous_scissor[3]));
+    if (!scissor_was_enabled)
+        CHK_GL(glDisable(GL_SCISSOR_TEST));
 
     return true;
 }
@@ -121,6 +163,11 @@ IC bool CBackend::ClearZBRect(GLuint zb, float depth, size_t numRects, const Ire
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
 
+    const GLboolean scissor_was_enabled = glIsEnabled(GL_SCISSOR_TEST);
+    GLint previous_scissor[4]{};
+    GLboolean previous_depth_mask = GL_TRUE;
+    glGetIntegerv(GL_SCISSOR_BOX, previous_scissor);
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &previous_depth_mask);
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
     for (size_t i = 0; i < numRects; ++i, ++rects)
@@ -138,7 +185,10 @@ IC bool CBackend::ClearZBRect(GLuint zb, float depth, size_t numRects, const Ire
         CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
     }
 
-    CHK_GL(glDisable(GL_SCISSOR_TEST));
+    CHK_GL(glScissor(previous_scissor[0], previous_scissor[1], previous_scissor[2], previous_scissor[3]));
+    if (!scissor_was_enabled)
+        CHK_GL(glDisable(GL_SCISSOR_TEST));
+    glDepthMask(previous_depth_mask);
 
     return true;
 }
@@ -153,6 +203,13 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
 #endif
         decl = _decl;
         CHK_GL(glBindVertexArray(_decl->dcl));
+
+        // Attribute pointers are VAO state when the ES3 fallback path is in
+        // use.  Force set_Vertices to rebind the current buffer after every
+        // declaration change; otherwise a cached VB leaves the new VAO with
+        // enabled attributes but no vertex format.
+        vb = 0;
+        vb_stride = 0;
 
         // Clear cached index buffer
         ib = 0;
@@ -248,7 +305,7 @@ ICF void CBackend::set_Vertices(GLuint _vb, u32 _vb_stride)
         vb = _vb;
         vb_stride = _vb_stride;
 
-        if (GLAD_GL_ARB_vertex_attrib_binding)
+        if (UseVertexAttribBinding())
         {
             CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
         }
@@ -326,7 +383,39 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     stat.render.verts += countV;
     stat.render.polys += PC;
     constants.flush();
-    CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV));
+    if (glDrawElementsBaseVertex)
+    {
+        CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT,
+            (void*)(startI * sizeof(GLushort)), baseV));
+        return;
+    }
+
+    // OpenGL ES 3.0 has indexed drawing but does not require the desktop
+    // glDrawElementsBaseVertex entry point.  Emulate BaseVertex by moving the
+    // vertex stream's attribute pointers for this draw and restore them right
+    // away so subsequent non-indexed draws keep their original base.
+    const size_t vertex_offset = size_t(baseV) * vb_stride;
+    if (UseVertexAttribBinding())
+    {
+        CHK_GL(glBindVertexBuffer(0, vb, vertex_offset, vb_stride));
+    }
+    else
+    {
+        CHK_GL(glBindBuffer(GL_ARRAY_BUFFER, vb));
+        SetGLVertexPointer(decl, vertex_offset);
+    }
+
+    CHK_GL(glDrawElements(Topology, iIndexCount, GL_UNSIGNED_SHORT,
+        (void*)(startI * sizeof(GLushort))));
+
+    if (UseVertexAttribBinding())
+    {
+        CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
+    }
+    else
+    {
+        SetGLVertexPointer(decl);
+    }
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
 
@@ -455,7 +544,13 @@ ICF void CBackend::set_FillMode(u32 _mode)
     if (fill_mode != _mode)
     {
         fill_mode = _mode;
+#if !defined(XR_PLATFORM_ANDROID)
         glPolygonMode(GL_FRONT_AND_BACK, glStateUtils::ConvertFillMode(_mode));
+#else
+        // Polygon rasterization modes are not part of OpenGL ES.  The Android
+        // path always uses filled triangles.
+        (void)_mode;
+#endif
     }
 }
 

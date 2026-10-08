@@ -7,6 +7,10 @@
 
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "Include/xrRender/xrRender.h"
+#include "AndroidRendererChoice.h"
+#endif
 
 struct SoundProcessor final : public pureFrame
 {
@@ -37,6 +41,17 @@ void CheckAndSetupRenderer()
         return;
     }
 
+#if defined(XR_PLATFORM_ANDROID)
+    const bool wants_vulkan = xray::render::android_renderer_needs_vulkan_probe(Core.Params);
+    const auto choice = xray::render::choose_android_renderer(Core.Params, wants_vulkan && xray::render::vulkan::GetRendererModule()->CheckGameRequirements());
+    R_ASSERT2(choice != xray::render::AndroidRendererChoice::VulkanUnavailable,
+              "Explicit Vulkan renderer unavailable: inspect the Vulkan probe and shader resource diagnostics");
+    if (choice == xray::render::AndroidRendererChoice::Vulkan)
+        Console->Execute("renderer renderer_vulkan");
+    else if (choice == xray::render::AndroidRendererChoice::GLES)
+        Console->Execute("renderer renderer_gles");
+    else
+#endif
     if (strstr(Core.Params, "-rgl"))
         Console->Execute("renderer renderer_rgl");
     else if (strstr(Core.Params, "-r4"))
@@ -61,7 +76,7 @@ void CheckAndSetupRenderer()
 
 extern void msCreate(pcstr name);
 
-void CEngine::Initialize(GameModule* game, const std::array<RendererModule*, 2>& modules)
+void CEngine::Initialize(GameModule* game, const std::array<RendererModule*, 3>& modules)
 {
     ZoneScoped;
 #ifdef DEBUG
@@ -101,6 +116,9 @@ void CEngine::OnEvent(EVENT E, u64 P1, u64 P2)
 {
     if (E == eQuit)
     {
+#if defined(XR_PLATFORM_ANDROID)
+        Msg("[android-lifecycle] KERNEL:quit handled frame=%u", Device.dwFrame);
+#endif
         if (pInput != nullptr)
             pInput->GrabInput(false);
 

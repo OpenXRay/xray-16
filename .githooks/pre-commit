@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+root=$(git rev-parse --show-toplevel)
+if [ -f "$root/android/update-version.py" ]; then
+    python3 "$root/android/update-version.py" --pending
+    git -C "$root" add android/PORT_VERSION
+fi

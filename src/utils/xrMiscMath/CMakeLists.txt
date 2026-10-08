@@ -13,10 +13,11 @@ target_sources(xrMiscMath PRIVATE
 target_include_directories(xrMiscMath
     PRIVATE
     "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/Externals"
 )
 
 set_target_properties(xrMiscMath PROPERTIES
-    POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
+    POSITION_INDEPENDENT_CODE ${XRAY_STATIC_PIC}
 )
 
 target_precompile_headers(xrMiscMath

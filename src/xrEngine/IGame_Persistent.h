@@ -96,6 +96,9 @@ private:
     int load_stage{};
     int max_load_stage{};
     CTimer phase_timer;
+    CTimer load_total_timer;
+    CTimer load_stage_timer;
+    shared_str load_stage_name;
 
     bool loaded{};
 

@@ -8,6 +8,9 @@
 #include "Common/object_broker.h"
 #include "GamePersistent.h"
 #include "xrServer.h"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/x_ray.h"
+#endif
 
 game_sv_Single::game_sv_Single()
 {
@@ -341,6 +344,18 @@ void game_sv_Single::restart_simulator(LPCSTR saved_game_name)
     g_pGamePersistent->LoadBegin();
     m_alife_simulator = xr_new<CALifeSimulator>(&server(), &options);
     g_pGamePersistent->LoadTitle("st_client_synchronising");
-    Device.PreCache(60, true);
+#if defined(XR_PLATFORM_ANDROID)
+    if (strstr(Core.Params, "-android-lazy-textures"))
+    {
+        Msg("[load-trace] simulator restart Android visible-set precache frames=60 mem=%uK",
+            Memory.mem_usage() / 1024);
+        android_set_load_context("simulator restart visible-set precache scheduled");
+        Device.PreCache(60, true);
+    }
+    else
+#endif
+    {
+        Device.PreCache(60, true);
+    }
     g_pGamePersistent->LoadEnd();
 }

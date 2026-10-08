@@ -123,6 +123,12 @@
 	<string id="spa">
 		<text>Spanish</text>
 	</string>
+	<string id="renderer_gles">
+		<text>OpenGL ES</text>
+	</string>
+	<string id="renderer_vulkan">
+		<text>Vulkan (experimental GLES fallback)</text>
+	</string>
 	<string id="ukr">
 		<text>Ukrainian</text>
 	</string>

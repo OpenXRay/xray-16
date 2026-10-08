@@ -3,6 +3,8 @@
 #include "xrEngine/Environment.h"
 #include "FVF.h"
 
+#include <cmath>
+
 namespace xray::render::RENDER_NAMESPACE
 {
 CPortalTraverser::CPortalTraverser() { i_marker = 0xffffffff; }
@@ -35,6 +37,7 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     scissor.set(0, 0, 1, 1);
     scissor.depth = 0;
     traverse_sector(i_start, F, scissor);
+
 
     if (options & VQ_SCISSOR)
     {
@@ -183,9 +186,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         else
         {
             pSector = PORTAL->getSectorBack(i_vBase);
-            if (pSector == sector)
-                continue;
-            if (pSector == i_start)
+            if (pSector == sector || pSector == i_start)
                 continue;
         }
 
@@ -231,6 +232,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
             Fbox2 bb;
             bb.invalidate();
             float depth = flt_max;
+            bool projection_valid = true;
             sPoly& p = *P;
             for (u32 vit = 0; vit < p.size(); vit++)
             {
@@ -242,7 +244,18 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
                 t.y = v.x * M._12 + v.y * M._22 + v.z * M._32 + M._42;
                 t.z = v.x * M._13 + v.y * M._23 + v.z * M._33 + M._43;
                 t.w = v.x * M._14 + v.y * M._24 + v.z * M._34 + M._44;
+                if (!std::isfinite(t.w) || t.w <= EPS)
+                {
+                    projection_valid = false;
+                    break;
+                }
                 t.mul(1.f / t.w);
+
+                if (!std::isfinite(t.x) || !std::isfinite(t.y) || !std::isfinite(t.z))
+                {
+                    projection_valid = false;
+                    break;
+                }
 
                 if (t.x < bb.min.x)
                     bb.min.x = t.x;
@@ -257,7 +270,11 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
             }
             // Msg  ("bb(%s): (%f,%f)-(%f,%f), d=%f", PORTAL->bDualRender?"true":"false",bb.min.x, bb.min.y, bb.max.x,
             // bb.max.y,depth);
-            if (depth < EPS)
+            if (!projection_valid)
+            {
+                scissor = R_scissor;
+            }
+            else if (depth < EPS)
             {
                 scissor = R_scissor;
 
@@ -296,9 +313,7 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
                 // Cull by HOM (faster algo)
                 if ((i_options & CPortalTraverser::VQ_HOM) &&
                     !RImplementation.HOM.visible(scissor, depth))
-                {
                     continue;
-                }
             }
         }
         else

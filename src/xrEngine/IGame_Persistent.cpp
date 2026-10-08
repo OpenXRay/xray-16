@@ -7,6 +7,9 @@
 #include "PerformanceAlert.hpp"
 #include "StringTable/StringTable.h"
 #include "xrScriptEngine/script_engine.hpp"
+#if defined(XR_PLATFORM_ANDROID)
+#include "x_ray.h"
+#endif
 
 #ifndef _EDITOR
 #include "Environment.h"
@@ -426,7 +429,11 @@ void IGame_Persistent::LoadBegin()
     {
         loaded = false;
         phase_timer.Start();
+        load_total_timer.Start();
+        load_stage_timer.Start();
+        load_stage_name = "initialization";
         load_stage = 0;
+        Msg("[load-trace] load-begin mem=%uK", Memory.mem_usage() / 1024);
     }
 }
 
@@ -435,6 +442,12 @@ void IGame_Persistent::LoadEnd()
     ll_dwReference--;
     if (0 == ll_dwReference)
     {
+        Msg("[load-trace] stage-end index=%d name='%s' elapsed=%llu ms total=%llu ms mem=%uK",
+            load_stage, load_stage_name.c_str(),
+            static_cast<unsigned long long>(load_stage_timer.GetElapsed_ms()),
+            static_cast<unsigned long long>(load_total_timer.GetElapsed_ms()), Memory.mem_usage() / 1024);
+        Msg("[load-trace] load-end stages=%d total=%llu ms mem=%uK", load_stage,
+            static_cast<unsigned long long>(load_total_timer.GetElapsed_ms()), Memory.mem_usage() / 1024);
         Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         Console->Execute("stat_memory");
@@ -445,6 +458,8 @@ void IGame_Persistent::LoadEnd()
 void IGame_Persistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map_name)
 {
     ZoneScoped;
+
+    load_stage_name = ls_title ? ls_title : change_tip ? "change-tip" : "untitled";
 
     if (ls_title)
     {
@@ -500,17 +515,33 @@ void IGame_Persistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map
 void IGame_Persistent::LoadStage(bool draw /*= true*/)
 {
     VERIFY(ll_dwReference);
+    if (GameType() == 1 && !xr_strcmp(m_game_params.m_alife, "alife"))
+        max_load_stage = 18;
+    else
+        max_load_stage = 14;
+
+    if (load_stage > 0)
+    {
+        Msg("[load-trace] stage-end index=%d elapsed=%llu ms total=%llu ms mem=%uK",
+            load_stage - 1, static_cast<unsigned long long>(load_stage_timer.GetElapsed_ms()),
+            static_cast<unsigned long long>(load_total_timer.GetElapsed_ms()), Memory.mem_usage() / 1024);
+    }
+    load_stage_timer.Start();
+    Msg("[load-trace] stage-begin index=%d name='%s' total=%llu ms mem=%uK", load_stage,
+        load_stage_name.c_str(), static_cast<unsigned long long>(load_total_timer.GetElapsed_ms()),
+        Memory.mem_usage() / 1024);
+#if defined(XR_PLATFORM_ANDROID)
+    string256 androidLoadContext;
+    xr_sprintf(androidLoadContext, "load-stage %d/%d %s", load_stage, max_load_stage,
+        load_stage_name.c_str());
+    android_set_load_context(androidLoadContext);
+#endif
     if (!load_screen_renderer.IsActive())
     {
         Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         phase_timer.Start();
     }
-
-    if (GameType() == 1 && !xr_strcmp(m_game_params.m_alife, "alife"))
-        max_load_stage = 18;
-    else
-        max_load_stage = 14;
 
     m_pLoadingScreen->Show(true);
     m_pLoadingScreen->Update(load_stage, max_load_stage);

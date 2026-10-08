@@ -97,7 +97,7 @@ public:
     dxRender_Visual* root() { return m_root; }
     void setup(const level_sector_data_t& data, const xr_vector<CPortal*>& portals);
 
-    CSector() { m_root = nullptr; }
+    CSector() : m_root(nullptr), r_marker(0xffffffff) {}
     virtual ~CSector() = default;
 };
 
@@ -121,7 +121,6 @@ public:
     CSector* i_start; // input:	starting point
     xr_vector<CSector*> r_sectors; // result
     xr_vector<std::pair<CPortal*, float>> f_portals; //
-
 public:
     CPortalTraverser();
     void traverse(IRender_Sector* start, CFrustum& F, Fvector& vBase, Fmatrix& mXFORM, u32 options);

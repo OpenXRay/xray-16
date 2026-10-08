@@ -2,34 +2,55 @@
 
 #include "ResourceManager.h"
 
+#if defined(XR_PLATFORM_ANDROID)
+#include <android/log.h>
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
-    GLint length;
+    GLint length = 0;
     GLchar *errors = nullptr, *sources = nullptr;
 
     if (program)
     {
         CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
+        if (length > 0)
+        {
+            errors = xr_alloc<GLchar>(length + 1);
+            GLsizei written = 0;
+            CHK_GL(glGetProgramInfoLog(program, length, &written, errors));
+            errors[std::min<GLsizei>(written, length)] = '\0';
+        }
     }
     else if (shader)
     {
         CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
+        if (length > 0)
+        {
+            errors = xr_alloc<GLchar>(length + 1);
+            GLsizei written = 0;
+            CHK_GL(glGetShaderInfoLog(shader, length, &written, errors));
+            errors[std::min<GLsizei>(written, length)] = '\0';
+        }
 
         CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length));
-        sources = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderSource(shader, length, nullptr, sources));
+        if (length > 0)
+        {
+            sources = xr_alloc<GLchar>(length + 1);
+            GLsizei written = 0;
+            CHK_GL(glGetShaderSource(shader, length, &written, sources));
+            sources[std::min<GLsizei>(written, length)] = '\0';
+        }
     }
 
     Log("! shader compilation failed:", filename);
     if (errors)
         Log("! error: ", errors);
+    else
+        Log("! driver returned an empty shader error log");
 
     if (sources)
     {
@@ -37,8 +58,30 @@ static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
         Log(sources);
         Log("Shader source end.");
     }
+#if defined(XR_PLATFORM_ANDROID)
+    __android_log_print(ANDROID_LOG_ERROR, "OpenXRay",
+        "Shader compilation failed: %s\n%s", filename,
+        errors ? errors : "driver returned an empty shader error log");
+#endif
     xr_free(errors);
     xr_free(sources);
+}
+
+static void bind_fragment_outputs(GLuint program)
+{
+#if !defined(XR_PLATFORM_ANDROID)
+    // Desktop GLSL allows the engine to bind named fragment outputs before
+    // linking.  OpenGL ES has no core glBindFragDataLocation entry point;
+    // the similarly named EXT function belongs to dual-source blending and
+    // is not a portable MRT binding path.  Android shaders receive explicit
+    // layout(location=...) qualifiers in the source compatibility layer.
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+#else
+    UNUSED(program);
+#endif
 }
 
 template<GLenum type>
@@ -70,10 +113,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
         CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
     CHK_GL(glAttachShader(program, shader));
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
-    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
-    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    bind_fragment_outputs(program);
     CHK_GL(glLinkProgram(program));
     CHK_GL(glDetachShader(program, shader));
     CHK_GL(glDeleteShader(shader));
@@ -99,10 +139,7 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
-    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
-    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    bind_fragment_outputs(program);
 
     CHK_GL(glProgramBinary(program, *format, buffer, size));
     CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
@@ -118,6 +155,13 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
 
 static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint gs)
 {
+    if (!vs || !ps)
+    {
+        Msg("! [shader-trace] refusing incomplete monolithic pass '%s': vs=%u ps=%u gs=%u",
+            name, vs, ps, gs);
+        return 0;
+    }
+
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
     if (glObjectLabel)
@@ -130,10 +174,7 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
     CHK_GL(glAttachShader(program, vs));
     if (gs)
         CHK_GL(glAttachShader(program, gs));
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
-    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
-    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
-    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    bind_fragment_outputs(program);
     CHK_GL(glLinkProgram(program));
     CHK_GL(glDetachShader(program, ps));
     CHK_GL(glDetachShader(program, vs));
@@ -153,6 +194,13 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
 
 static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
 {
+    if (!vs || !ps)
+    {
+        Msg("! [shader-trace] refusing incomplete pipeline '%s': vs=%u ps=%u gs=%u",
+            name, vs, ps, gs);
+        return 0;
+    }
+
     GLuint pp;
     CHK_GL(glGenProgramPipelines(1, &pp));
     R_ASSERT(pp);
@@ -160,6 +208,21 @@ static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
     CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT,   vs));
     CHK_GL(glUseProgramStages(pp, GL_GEOMETRY_SHADER_BIT, gs));
     CHK_GL(glValidateProgramPipeline(pp));
+
+    GLint status = GL_FALSE;
+    CHK_GL(glGetProgramPipelineiv(pp, GL_VALIDATE_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        GLint length = 0;
+        CHK_GL(glGetProgramPipelineiv(pp, GL_INFO_LOG_LENGTH, &length));
+        xr_vector<GLchar> errors(length > 0 ? length + 1 : 1, '\0');
+        if (length > 0)
+            CHK_GL(glGetProgramPipelineInfoLog(pp, length, nullptr, errors.data()));
+        Msg("! [shader-trace] pipeline validation failed '%s': vs=%u ps=%u gs=%u; %s",
+            name, vs, ps, gs, length > 0 ? errors.data() : "driver returned an empty pipeline log");
+        CHK_GL(glDeleteProgramPipelines(1, &pp));
+        return 0;
+    }
     return pp;
 }
 #endif
@@ -697,7 +760,16 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 #endif
 
         // Compile
-        HRESULT const _hr = RImplementation.shader_compile(name, file, c_entry, c_target, flags, (void*&)sh);
+#if defined(XR_PLATFORM_ANDROID)
+        // The GLES source translator scopes compatibility rewrites to the
+        // physical shader path. Resource names may carry option suffixes,
+        // while shName is the unmodified game/mod file that was opened.
+        const pcstr compileName = shName;
+#else
+        const pcstr compileName = name;
+#endif
+        HRESULT const _hr = RImplementation.shader_compile(
+            compileName, file, c_entry, c_target, flags, (void*&)sh);
 
         FS.r_close(file);
 
@@ -706,7 +778,13 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
         if (FAILED(_hr) && fallback)
             goto fallback;
 
+#if defined(XR_PLATFORM_ANDROID)
+        if (FAILED(_hr))
+            Log("! Android GLES shader resource failed: ", name);
+        CHECK_OR_EXIT(!FAILED(_hr), "OpenXRay GLES shader compilation/linking failed.\n\nSee android.log for the shader name and driver diagnostics.");
+#else
         CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
+#endif
 
         return sh;
     }

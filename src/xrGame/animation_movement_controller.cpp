@@ -175,7 +175,20 @@ static void get_animation_root_position(Fmatrix& pos, IKinematics* K, IKinematic
         if (keys.blends[0][i] == control_blend)
             key = &keys.keys[0][i];
     }
-    VERIFY(key);
+    // Some modded motions have no root-channel key for the active blend.
+    // Release builds compile VERIFY out and used to dereference a null key.
+    if (!key)
+    {
+        static u32 missing_root_keys = 0;
+        if (++missing_root_keys <= 4 || (missing_root_keys & (missing_root_keys - 1)) == 0)
+            Msg("! [animation] root motion has no key for active blend occurrence=%u motion=%u channel-blends=%d",
+                missing_root_keys, control_blend->motionID.val, keys.chanel_blend_conts[0]);
+        // This routine returns a motion-local root transform. The current
+        // bone pose may already include the object's placement; multiplying
+        // it by m_startObjXForm again can put the NPC below the level.
+        pos.identity();
+        return;
+    }
 
     float sv_amount = control_blend->blendAmount;
     control_blend->blendAmount = 1.f;

@@ -1,0 +1,1849 @@
+From c7e068348eacadd6d0d9c385c752a6ad94cb178c Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Mon, 21 Sep 2026 11:59:14 +0200
+Subject: [PATCH] fix(android): stabilize ARMv7 gameplay and lifecycle
+
+---
+ android/PORT_AUDIT.md                         |  69 +++++
+ android/PORT_VERSION                          |   2 +-
+ android/README.md                             |   8 +-
+ android/VULKAN_RENDERER_PLAN.md               |  85 ++++++
+ android/apk/README.md                         |   6 +-
+ android/apk/app/build.gradle                  |   4 +-
+ android/apk/app/src/main/AndroidManifest.xml  |   7 +-
+ .../org/openxray/app/LauncherActivity.java    |  40 ++-
+ .../org/openxray/app/TouchControlsView.java   | 242 ++++++++++++++++++
+ .../java/org/openxray/app/XRayActivity.java   |  44 +++-
+ android/apply-patches.sh                      |  18 +-
+ android/build-apk-armv7.sh                    |   9 +-
+ android/build-armv7.sh                        |   7 +-
+ android/build-harness.sh                      |   7 +-
+ android/create-build-kit.sh                   |   4 +-
+ src/Layers/xrRender/D3DXRenderBase.cpp        |   6 +
+ src/Layers/xrRender/ShaderResourceTraits.h    |  29 ++-
+ src/Layers/xrRenderGL/glHW.cpp                |  58 ++++-
+ src/Layers/xrRenderGL/glHW.h                  |   5 +
+ src/Layers/xrRenderPC_GL/rgl_shaders.cpp      |  29 ++-
+ src/xrAICore/Navigation/game_graph.h          |   9 +-
+ src/xrAICore/Navigation/game_graph_inline.h   | 106 ++++++--
+ src/xrAICore/Navigation/game_graph_space.h    |  42 ++-
+ .../game_level_cross_table_inline.h           |  14 +-
+ src/xrEngine/CMakeLists.txt                   |   2 +
+ src/xrEngine/android_touch_controls.cpp       |  83 ++++++
+ src/xrEngine/android_touch_controls.h         |  11 +
+ src/xrEngine/x_ray.cpp                        |  57 +++++
+ src/xrEngine/xr_input.cpp                     |  96 +++++++
+ src/xrEngine/xr_input.h                       |   4 +
+ src/xrGame/alife_update_manager.cpp           |   4 +
+ 31 files changed, 1011 insertions(+), 96 deletions(-)
+ create mode 100644 android/PORT_AUDIT.md
+ create mode 100644 android/VULKAN_RENDERER_PLAN.md
+ create mode 100644 android/apk/app/src/main/java/org/openxray/app/TouchControlsView.java
+ create mode 100644 src/xrEngine/android_touch_controls.cpp
+ create mode 100644 src/xrEngine/android_touch_controls.h
+
+diff --git a/android/PORT_AUDIT.md b/android/PORT_AUDIT.md
+new file mode 100644
+index 000000000..9df855e65
+--- /dev/null
++++ b/android/PORT_AUDIT.md
+@@ -0,0 +1,69 @@
++# Android port audit
++
++This audit covers the Android port through version 0.8.0. The comparison base
++is upstream OpenXRay `dev` at `247d72764`. The Android branch already contains
++the two upstream UI commits that follow the fork's older `origin/dev`, so they
++are not Android-specific replacements.
++
++## Compatibility invariants
++
++- Original game and mod installations are read-only inputs. The launcher and
++  engine must not rewrite `fsgame.ltx`, `user.ltx`, shaders, textures, archives,
++  or other resources in a selected installation.
++- The tracked `res/gamedata` resource tree stays identical to upstream. Android
++  compatibility is implemented in engine code and in-memory conversion only.
++- Disk formats used by the three PC games remain unchanged. ARM fixes copy
++  unaligned packed values instead of changing serialized layouts.
++- Hardware selection is capability-based. There are no GPU model, vendor, or
++  driver-version allowlists in the Android renderer.
++- Platform code is guarded by `XR_PLATFORM_ANDROID`; desktop behavior is not
++  silently replaced.
++
++## Result
++
++No tracked upstream file was deleted by the port, and `res/` has no difference
++from upstream. The audit found no unexplained feature removal to restore.
++
++The retained changes fall into these categories:
++
++| Area | Reason retained | Resource impact |
++|---|---|---|
++| ARMv7 build and dependency fixes | Required to compile the existing engine and LuaJIT with the NDK | None |
++| Android filesystem bootstrap | Mounts the user-selected PC installation without copying or rewriting it | Read-only |
++| SDL Activity and diagnostics | Owns the native surface, lifecycle, logs, orientation, and process isolation | None |
++| GLES context and framebuffer presentation | Adapts SDL's EGL framebuffer to the existing deferred renderer | None |
++| Texture upload compatibility | Decodes unsupported desktop compression in memory when required | Source DDS files unchanged |
++| Shader compatibility | Transforms the in-memory compiler input; original and mod shader files are not edited | Source files unchanged |
++| Touch input | Emits normal engine keyboard/mouse actions and is optional | No UI asset copies |
++
++## Findings addressed in 0.8.0
++
++- Reattach intents explicitly select game mode instead of inheriting the old
++  renderer-smoke default.
++- The engine Activity is landscape before SDL creates its first surface.
++- Background/foreground events now reach the engine, and the GLES context is
++  rebound to SDL's recreated EGL surface before presentation resumes.
++- `game.graph` and embedded cross-table records are treated as packed disk
++  data. Multi-byte values are copied out before use, preventing ARMv7
++  `SIGBUS/BUS_ADRALN` without changing the PC file format.
++- GLES startup checks the reported ES version, draw-buffer count, and color
++  attachment count. Unsupported devices receive an explicit error instead of
++  a vendor-specific workaround.
++- Shader compiler logs are length-bounded and NUL-terminated; future failures
++  no longer appear as corrupted binary text.
++- Build scripts derive archive versions from `PORT_VERSION` and discover a
++  reusable build kit instead of requiring a hard-coded historical version.
++
++## Remaining renderer debt
++
++`AndroidGlslCompatRules.inl` is an engine-side bridge for strict GLSL ES
++compilers. It preserves resources on disk, but exact source-line rewrites are
++not a sufficiently general contract for arbitrary graphics mods. It is kept
++for the working GLES path until a source compiler with type-aware HLSL-to-SPIR-V
++translation replaces it. New fixes must prefer capability checks and general
++syntax/interface normalization; new GPU-model rules or asset patches are not
++acceptable.
++
++The Vulkan work and its acceptance gates are documented in
++`VULKAN_RENDERER_PLAN.md`. A renderer is not considered implemented merely
++because a stub module, Vulkan instance, or clear-screen test exists.
+diff --git a/android/PORT_VERSION b/android/PORT_VERSION
+index faef31a43..a3df0a695 100644
+--- a/android/PORT_VERSION
++++ b/android/PORT_VERSION
+@@ -1 +1 @@
+-0.7.0
++0.8.0
+diff --git a/android/README.md b/android/README.md
+index 881f6c920..c837b6e1a 100644
+--- a/android/README.md
++++ b/android/README.md
+@@ -17,7 +17,7 @@ patches), loads a prepared build kit when `XRAY_ANDROID_KIT_ROOT` is set, and
+ then builds either the APK or the native target:
+ 
+ ```sh
+-XRAY_ANDROID_KIT_ROOT=/path/to/openxray-android-build-kit-v0.7.0 \
++XRAY_ANDROID_KIT_ROOT=/path/to/openxray-android-build-kit-v0.8.0 \
+ ./android/build-harness.sh --apk
+ ```
+ 
+@@ -54,7 +54,7 @@ being copied into that checkout first. Keep the extracted harness outside the
+ source tree and pass the source path explicitly:
+ 
+ ```sh
+-/path/to/openxray-android-build-harness-v0.7.0/android/apply-patches.sh \
++/path/to/openxray-android-build-harness-v0.8.0/android/apply-patches.sh \
+   /path/to/clean/xray-16
+ ```
+ 
+@@ -165,6 +165,10 @@ are statically validated as part of this port. That validation is not a claim
+ that a physical device test has passed; use the generated APK and attach the
+ new engine/activity logs for any remaining GPU- or data-specific issue.
+ 
++The audit of prior port changes is in [PORT_AUDIT.md](PORT_AUDIT.md). The
++cross-platform Vulkan requirements, upstream prototypes that were rejected,
++and implementation gates are in [VULKAN_RENDERER_PLAN.md](VULKAN_RENDERER_PLAN.md).
++
+ The APK displays a Toast after the renderer readback: successful initialization
+ keeps the smoke window open, while failure shows the error, waits briefly and
+ exits. The launcher also shows the current log tail and reports whether the
+diff --git a/android/VULKAN_RENDERER_PLAN.md b/android/VULKAN_RENDERER_PLAN.md
+new file mode 100644
+index 000000000..a3185f333
+--- /dev/null
++++ b/android/VULKAN_RENDERER_PLAN.md
+@@ -0,0 +1,85 @@
++# Portable Vulkan renderer plan
++
++The target is one `xrRenderVK` implementation shared by Android, Linux, and
++Windows. It must consume original PC resources and mod overrides without
++requiring Android-specific shader or asset copies.
++
++## Upstream research
++
++OpenXRay issue [#447](https://github.com/OpenXRay/xray-16/issues/447) defines
++Vulkan as a separate renderer and lists hardware, backend, resource, state, and
++shader work. Its shader requirement is to cross-compile the existing HLSL
++sources. Issue [#258](https://github.com/OpenXRay/xray-16/issues/258) tracks the
++type-aware compiler options.
++
++The old [PR #558](https://github.com/OpenXRay/xray-16/pull/558) was reviewed and
++must not be revived as the implementation: it registers an R5-shaped stub but
++does not create a Vulkan instance, device, swapchain, resources, pipelines, or
++synchronization. The unmerged DX12 [PR #1620](https://github.com/OpenXRay/xray-16/pull/1620)
++is a large Windows/CryEngine-derived backend and is not a portable base.
++
++NVRHI was also evaluated because it is mentioned by OpenXRay maintainers. Its
++current supported targets are Windows and Linux on 64-bit CPUs; it does not
++cover Android or ARMv7. It therefore cannot be the common foundation for this
++port. LLGL supports Vulkan on all three requested platforms, but adopting it
++does not remove the hardest compatibility task: compiling and reflecting the
++existing X-Ray HLSL shader model. The initial design consequently keeps the
++Vulkan backend inside OpenXRay and limits third-party components to focused,
++replaceable libraries such as Vulkan headers/loader, memory allocation, and a
++shader compiler.
++
++## Non-negotiable architecture
++
++1. `xrRenderVK` owns Vulkan objects only. Game and renderer-generation code
++   must not contain Android/Win32/X11 Vulkan branches.
++2. SDL supplies the native window and creates the `VkSurfaceKHR`; all later
++   instance/device/swapchain/resource code is common.
++3. Shaders have one source path. Existing HLSL plus engine defines is compiled
++   to SPIR-V in memory, reflected for bindings, and cached by source, includes,
++   defines, compiler version, and target capabilities. No `shaders/vk` asset
++   fork is allowed.
++4. GPU selection uses queried Vulkan features, formats, limits, and extensions.
++   Unsupported devices receive a precise requirement report. No vendor or
++   model allowlist is allowed.
++5. Surface loss, resize, rotation, pause/resume, and `VK_ERROR_OUT_OF_DATE_KHR`
++   recreate only swapchain-dependent objects. Game state and long-lived GPU
++   resources survive when the device remains valid.
++6. Packed PC resource formats and shader semantics are preserved. Any format
++   expansion or transcoding happens in engine-owned memory.
++
++## Delivery gates
++
++| Gate | Required result |
++|---|---|
++| VK0: platform bootstrap | The same source creates instance, physical/logical device, queues, SDL surface, and swapchain on Android, Linux, and Windows; reports missing features clearly |
++| VK1: shader pipeline | Existing HLSL includes/defines compile to SPIR-V with reflection and deterministic cache invalidation; a mod override follows the same path |
++| VK2: backend primitives | Vertex/index/constant/storage buffers, textures, samplers, render targets, descriptors, graphics/compute pipelines, queries, and barriers pass validation |
++| VK3: renderer integration | UI, static geometry, models, particles, deferred G-buffer, lighting, shadows, post-processing, and video paths render without resource edits |
++| VK4: lifecycle | Repeated pause/resume, focus loss, resize, and swapchain recreation do not freeze, black-screen, leak, or restart the game |
++| VK5: compatibility | Clean PC resources for CoP, CS, and SoC mode plus representative shader/texture mods run from read-only directories on all three platforms |
++| VK6: release | Validation layers are clean in debug builds; release builds include capability diagnostics, reproducible shaders, and cross-platform CI artifacts |
++
++## Minimum-capability policy
++
++The minimum version and feature set must be derived from the first complete
++render pass set, not guessed from a single test triangle. The probe records at
++least API version, queue families, swapchain support, descriptor and attachment
++limits, texture formats/compression, geometry/tessellation support, and shader
++numeric features. Optional effects are enabled by capability; a feature used by
++core resources either has an engine fallback or becomes an explicit launch
++requirement.
++
++## Migration order
++
++- First isolate API-neutral render resource descriptions and shader reflection
++  from the current GL/DX implementation.
++- Add a validation-enabled Vulkan smoke executable that uses the future backend
++  objects, not a parallel sample implementation.
++- Port resource management and the UI/static passes before deferred lighting.
++- Introduce render-pass/resource dependency tracking before the full deferred
++  pipeline so barriers are generated centrally rather than patched per GPU.
++- Keep GLES available during development and remove no working backend.
++
++Version 0.8.0 does not claim gates VK0–VK6 are complete. It fixes the current
++Android engine path and records the implementation boundary so a placeholder
++cannot be mistaken for the requested portable renderer.
+diff --git a/android/apk/README.md b/android/apk/README.md
+index b860c4453..e7a83b883 100644
+--- a/android/apk/README.md
++++ b/android/apk/README.md
+@@ -46,19 +46,19 @@ The launcher does not reject an incomplete folder: missing `fsgame.ltx` or
+ resources are reported by the engine in the log.
+ 
+ The resulting debug APK is
+-`build/openxray-armv7-launcher-v0.7.0-debug.apk`. Proprietary game data is not
++`build/openxray-armv7-launcher-v0.8.0-debug.apk`. Proprietary game data is not
+ bundled. The APK is a device-test candidate: a successful build and offline
+ shader validation do not substitute for running the exact game/mod and GPU.
+ 
+ ## Launcher and diagnostics on a phone
+ 
+-1. Remove the old pre-launcher APK once before installing version 0.7.0. The
++1. Remove the old pre-launcher APK once before installing version 0.8.0. The
+    old package registered `XRayActivity` itself as the launcher, so a pinned
+    old icon can bypass the launcher entirely:
+ 
+    ```sh
+    adb uninstall org.openxray.stalker
+-   adb install -r build/openxray-armv7-launcher-v0.7.0-debug.apk
++   adb install -r build/openxray-armv7-launcher-v0.8.0-debug.apk
+    adb shell am start -n org.openxray.stalker/org.openxray.app.LauncherActivity
+    ```
+ 
+diff --git a/android/apk/app/build.gradle b/android/apk/app/build.gradle
+index f52bf0ffc..3d1dfc335 100644
+--- a/android/apk/app/build.gradle
++++ b/android/apk/app/build.gradle
+@@ -10,8 +10,8 @@ android {
+         applicationId 'org.openxray.stalker'
+         minSdk 26
+         targetSdk 36
+-        versionCode 12
+-        versionName '0.7.0'
++        versionCode 13
++        versionName '0.8.0'
+ 
+         ndk {
+             abiFilters 'armeabi-v7a'
+diff --git a/android/apk/app/src/main/AndroidManifest.xml b/android/apk/app/src/main/AndroidManifest.xml
+index 63691ab03..7ad664bc2 100644
+--- a/android/apk/app/src/main/AndroidManifest.xml
++++ b/android/apk/app/src/main/AndroidManifest.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:versionCode="12"
+-    android:versionName="0.7.0"
++    android:versionCode="13"
++    android:versionName="0.8.0"
+     android:installLocation="auto">
+ 
+     <uses-feature android:glEsVersion="0x00030001" />
+@@ -20,8 +20,9 @@
+             android:name="org.openxray.app.XRayActivity"
+             android:configChanges="layoutDirection|locale|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+             android:exported="false"
+-            android:launchMode="singleTop"
++            android:launchMode="singleTask"
+             android:process=":engine"
++            android:screenOrientation="sensorLandscape"
+             android:theme="@style/EngineTheme" />
+         <activity
+             android:name="org.openxray.app.LauncherActivity"
+diff --git a/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java b/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java
+index 6d9521d2b..cfe5c0b40 100644
+--- a/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java
++++ b/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java
+@@ -62,6 +62,7 @@ public final class LauncherActivity extends Activity {
+     public static final String EXTRA_SPLASH_ENABLED = "org.openxray.extra.SPLASH_ENABLED";
+     public static final String EXTRA_KEEP_SCREEN_ON = "org.openxray.extra.KEEP_SCREEN_ON";
+     public static final String EXTRA_IMMERSIVE = "org.openxray.extra.IMMERSIVE";
++    public static final String EXTRA_TOUCH_CONTROLS = "org.openxray.extra.TOUCH_CONTROLS";
+ 
+     private static final String PREFS = "openxray_launcher";
+     private static final String PREF_GAME_PATH = "game_path";
+@@ -74,6 +75,7 @@ public final class LauncherActivity extends Activity {
+     private static final String PREF_SPLASH = "splash";
+     private static final String PREF_KEEP_SCREEN_ON = "keep_screen_on";
+     private static final String PREF_IMMERSIVE = "immersive";
++    private static final String PREF_TOUCH_CONTROLS = "touch_controls";
+     private static final String PREF_ACTIVE_PAGE = "active_page";
+ 
+     private static final int PAGE_GAME = 0;
+@@ -92,6 +94,7 @@ public final class LauncherActivity extends Activity {
+     private CheckBox splashEnabled;
+     private CheckBox keepScreenOn;
+     private CheckBox immersiveMode;
++    private CheckBox touchControlsEnabled;
+     private TextView accessStatus;
+     private TextView gameInspection;
+     private TextView status;
+@@ -317,6 +320,9 @@ public final class LauncherActivity extends Activity {
+         addSectionTitle(content, "Управление и экран");
+         gamepadEnabled = makeCheckBox("Включить поддержку геймпада",
+                 "Если выключено, движок получает -no_gamepad.");
++        touchControlsEnabled = makeCheckBox("Показывать сенсорное управление",
++                "Экранный стик и кнопки движения, огня, взаимодействия и инвентаря. "
++                        + "Свободная область работает как мышь.");
+         splashEnabled = makeCheckBox("Показывать заставку OpenXRay",
+                 "Не влияет на оригинальные игровые intro-видео.");
+         keepScreenOn = makeCheckBox("Не выключать экран во время игры",
+@@ -324,6 +330,7 @@ public final class LauncherActivity extends Activity {
+         immersiveMode = makeCheckBox("Полноэкранный режим Android",
+                 "Скрывает системные панели; жест от края временно возвращает их.");
+         content.addView(gamepadEnabled, matchWrap());
++        content.addView(touchControlsEnabled, matchWrap());
+         content.addView(splashEnabled, matchWrap());
+         content.addView(keepScreenOn, matchWrap());
+         content.addView(immersiveMode, matchWrap());
+@@ -435,6 +442,7 @@ public final class LauncherActivity extends Activity {
+                 profilePreference(PREF_GAME_PATH_PREFIX, restoredVariant), legacyPath));
+         customArgs.setText(preferences.getString(PREF_CUSTOM_ARGS, ""));
+         gamepadEnabled.setChecked(preferences.getBoolean(PREF_GAMEPAD, false));
++        touchControlsEnabled.setChecked(preferences.getBoolean(PREF_TOUCH_CONTROLS, true));
+         splashEnabled.setChecked(preferences.getBoolean(PREF_SPLASH, false));
+         keepScreenOn.setChecked(preferences.getBoolean(PREF_KEEP_SCREEN_ON, true));
+         immersiveMode.setChecked(preferences.getBoolean(PREF_IMMERSIVE, true));
+@@ -451,6 +459,7 @@ public final class LauncherActivity extends Activity {
+                 .putString(PREF_CUSTOM_ARGS, customArgs.getText().toString())
+                 .putInt(PREF_GAME_VARIANT, activeGameVariant)
+                 .putBoolean(PREF_GAMEPAD, gamepadEnabled.isChecked())
++                .putBoolean(PREF_TOUCH_CONTROLS, touchControlsEnabled.isChecked())
+                 .putBoolean(PREF_SPLASH, splashEnabled.isChecked())
+                 .putBoolean(PREF_KEEP_SCREEN_ON, keepScreenOn.isChecked())
+                 .putBoolean(PREF_IMMERSIVE, immersiveMode.isChecked())
+@@ -617,7 +626,10 @@ public final class LauncherActivity extends Activity {
+ 
+     private void launchEngine(boolean rendererSmoke) {
+         if (!rendererSmoke && isEngineProcessRunning()) {
+-            Intent resume = new Intent(this, XRayActivity.class);
++            // Keep the mode explicit. XRayActivity used to interpret an
++            // absent mode as a renderer smoke test, so a reattach could run
++            // the test path instead of bringing the game surface forward.
++            Intent resume = createEngineIntent(false);
+             resume.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+             setStatus("Возвращаю уже запущенный движок на экран…");
+             startActivity(resume);
+@@ -643,17 +655,8 @@ public final class LauncherActivity extends Activity {
+         engineLaunchTime = SystemClock.elapsedRealtime();
+         engineFailureToastShown = false;
+ 
+-        Intent intent = new Intent(this, XRayActivity.class);
+-        intent.putExtra(EXTRA_RENDERER_SMOKE, rendererSmoke);
+-        intent.putExtra(EXTRA_GAMEPAD_ENABLED, gamepadEnabled.isChecked());
+-        intent.putExtra(EXTRA_SPLASH_ENABLED, splashEnabled.isChecked());
+-        intent.putExtra(EXTRA_KEEP_SCREEN_ON, keepScreenOn.isChecked());
+-        intent.putExtra(EXTRA_IMMERSIVE, immersiveMode.isChecked());
++        Intent intent = createEngineIntent(rendererSmoke);
+         intent.putExtra(EXTRA_ADDITIONAL_ARGS, additionalArgs);
+-        if (!rendererSmoke) {
+-            intent.putExtra(EXTRA_GAME_PATH, selectedPath);
+-            intent.putExtra(EXTRA_GAME_VARIANT, activeGameVariant);
+-        }
+         setStatus(rendererSmoke ? "Запускаю GLES smoke test…" : "Запускаю OpenXRay…");
+         Toast.makeText(this, "OpenXRay: запуск движка…", Toast.LENGTH_SHORT).show();
+         try {
+@@ -664,6 +667,21 @@ public final class LauncherActivity extends Activity {
+         }
+     }
+ 
++    private Intent createEngineIntent(boolean rendererSmoke) {
++        Intent intent = new Intent(this, XRayActivity.class);
++        intent.putExtra(EXTRA_RENDERER_SMOKE, rendererSmoke);
++        intent.putExtra(EXTRA_GAMEPAD_ENABLED, gamepadEnabled.isChecked());
++        intent.putExtra(EXTRA_TOUCH_CONTROLS, touchControlsEnabled.isChecked());
++        intent.putExtra(EXTRA_SPLASH_ENABLED, splashEnabled.isChecked());
++        intent.putExtra(EXTRA_KEEP_SCREEN_ON, keepScreenOn.isChecked());
++        intent.putExtra(EXTRA_IMMERSIVE, immersiveMode.isChecked());
++        if (!rendererSmoke) {
++            intent.putExtra(EXTRA_GAME_PATH, gamePath.getText().toString().trim());
++            intent.putExtra(EXTRA_GAME_VARIANT, activeGameVariant);
++        }
++        return intent;
++    }
++
+     private String[] parseAdditionalArguments(String commandLine) {
+         ArrayList<String> result = new ArrayList<>();
+         StringBuilder token = new StringBuilder();
+diff --git a/android/apk/app/src/main/java/org/openxray/app/TouchControlsView.java b/android/apk/app/src/main/java/org/openxray/app/TouchControlsView.java
+new file mode 100644
+index 000000000..6c6966552
+--- /dev/null
++++ b/android/apk/app/src/main/java/org/openxray/app/TouchControlsView.java
+@@ -0,0 +1,242 @@
++package org.openxray.app;
++
++import android.content.Context;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.Paint;
++import android.graphics.RectF;
++import android.os.SystemClock;
++import android.view.MotionEvent;
++import android.view.View;
++
++/**
++ * Resource-independent Android input overlay.
++ *
++ * The view never edits or depends on game UI assets. It translates touches
++ * into engine actions and relative mouse input, so original PC resources and
++ * modded menus remain usable without Android-specific copies.
++ */
++final class TouchControlsView extends View {
++    static final int CONTROL_FORWARD = 0;
++    static final int CONTROL_BACK = 1;
++    static final int CONTROL_LEFT = 2;
++    static final int CONTROL_RIGHT = 3;
++    static final int CONTROL_INVENTORY = 4;
++    static final int CONTROL_USE = 5;
++    static final int CONTROL_FIRE = 6;
++
++    private static final int NO_POINTER = -1;
++
++    private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final float density;
++
++    private int joystickPointer = NO_POINTER;
++    private int firePointer = NO_POINTER;
++    private int usePointer = NO_POINTER;
++    private int inventoryPointer = NO_POINTER;
++    private int mousePointer = NO_POINTER;
++    private float joystickX;
++    private float joystickY;
++    private float mouseX;
++    private float mouseY;
++    private float mouseDownX;
++    private float mouseDownY;
++    private long mouseDownTime;
++    private int activeMask;
++
++    TouchControlsView(Context context) {
++        super(context);
++        density = getResources().getDisplayMetrics().density;
++        setBackgroundColor(Color.TRANSPARENT);
++        setFocusable(false);
++        setClickable(true);
++
++        fillPaint.setColor(Color.argb(76, 18, 22, 28));
++        strokePaint.setStyle(Paint.Style.STROKE);
++        strokePaint.setStrokeWidth(dp(2));
++        strokePaint.setColor(Color.argb(185, 235, 239, 245));
++        textPaint.setColor(Color.WHITE);
++        textPaint.setTextAlign(Paint.Align.CENTER);
++        textPaint.setTextSize(dp(13));
++        textPaint.setFakeBoldText(true);
++    }
++
++    @Override
++    protected void onDraw(Canvas canvas) {
++        super.onDraw(canvas);
++
++        final float joyRadius = dp(78);
++        final float joyCx = dp(102);
++        final float joyCy = getHeight() - dp(100);
++        drawCircle(canvas, joyCx, joyCy, joyRadius, "");
++
++        float knobX = joyCx;
++        float knobY = joyCy;
++        if (joystickPointer != NO_POINTER) {
++            float dx = joystickX - joyCx;
++            float dy = joystickY - joyCy;
++            float length = (float)Math.hypot(dx, dy);
++            if (length > joyRadius && length > 0) {
++                dx *= joyRadius / length;
++                dy *= joyRadius / length;
++            }
++            knobX += dx;
++            knobY += dy;
++        }
++        drawCircle(canvas, knobX, knobY, dp(31), "");
++
++        RectF fire = fireBounds();
++        drawCircle(canvas, fire.centerX(), fire.centerY(), fire.width() / 2, "ОГОНЬ");
++        RectF use = useBounds();
++        drawCircle(canvas, use.centerX(), use.centerY(), use.width() / 2, "ВЗЯТЬ");
++        RectF inventory = inventoryBounds();
++        drawCircle(canvas, inventory.centerX(), inventory.centerY(), inventory.width() / 2, "ИНВ");
++    }
++
++    @Override
++    public boolean onTouchEvent(MotionEvent event) {
++        final int action = event.getActionMasked();
++        final int index = event.getActionIndex();
++
++        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
++            capturePointer(event.getPointerId(index), event.getX(index), event.getY(index));
++        } else if (action == MotionEvent.ACTION_MOVE) {
++            updatePointers(event);
++        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
++            releasePointer(event.getPointerId(index), event.getX(index), event.getY(index), false);
++        } else if (action == MotionEvent.ACTION_CANCEL) {
++            releaseAllControls();
++        }
++
++        invalidate();
++        return true;
++    }
++
++    void releaseAllControls() {
++        for (int control = CONTROL_FORWARD; control <= CONTROL_FIRE; ++control)
++            setControl(control, false);
++        if (mousePointer != NO_POINTER)
++            XRayActivity.clickTouchMouse(false);
++        joystickPointer = firePointer = usePointer = inventoryPointer = mousePointer = NO_POINTER;
++        invalidate();
++    }
++
++    private void capturePointer(int pointerId, float x, float y) {
++        if (firePointer == NO_POINTER && fireBounds().contains(x, y)) {
++            firePointer = pointerId;
++            setControl(CONTROL_FIRE, true);
++        } else if (usePointer == NO_POINTER && useBounds().contains(x, y)) {
++            usePointer = pointerId;
++            setControl(CONTROL_USE, true);
++        } else if (inventoryPointer == NO_POINTER && inventoryBounds().contains(x, y)) {
++            inventoryPointer = pointerId;
++            setControl(CONTROL_INVENTORY, true);
++        } else if (joystickPointer == NO_POINTER && x < getWidth() * 0.42f && y > getHeight() * 0.42f) {
++            joystickPointer = pointerId;
++            updateJoystick(x, y);
++        } else if (mousePointer == NO_POINTER) {
++            mousePointer = pointerId;
++            mouseX = mouseDownX = x;
++            mouseY = mouseDownY = y;
++            mouseDownTime = SystemClock.uptimeMillis();
++        }
++    }
++
++    private void updatePointers(MotionEvent event) {
++        for (int index = 0; index < event.getPointerCount(); ++index) {
++            int pointerId = event.getPointerId(index);
++            float x = event.getX(index);
++            float y = event.getY(index);
++            if (pointerId == joystickPointer) {
++                updateJoystick(x, y);
++            } else if (pointerId == mousePointer) {
++                XRayActivity.moveTouchMouse(x - mouseX, y - mouseY);
++                mouseX = x;
++                mouseY = y;
++            }
++        }
++    }
++
++    private void releasePointer(int pointerId, float x, float y, boolean cancelled) {
++        if (pointerId == joystickPointer) {
++            joystickPointer = NO_POINTER;
++            setControl(CONTROL_FORWARD, false);
++            setControl(CONTROL_BACK, false);
++            setControl(CONTROL_LEFT, false);
++            setControl(CONTROL_RIGHT, false);
++        } else if (pointerId == firePointer) {
++            firePointer = NO_POINTER;
++            setControl(CONTROL_FIRE, false);
++        } else if (pointerId == usePointer) {
++            usePointer = NO_POINTER;
++            setControl(CONTROL_USE, false);
++        } else if (pointerId == inventoryPointer) {
++            inventoryPointer = NO_POINTER;
++            setControl(CONTROL_INVENTORY, false);
++        } else if (pointerId == mousePointer) {
++            mousePointer = NO_POINTER;
++            float travel = (float)Math.hypot(x - mouseDownX, y - mouseDownY);
++            long duration = SystemClock.uptimeMillis() - mouseDownTime;
++            if (!cancelled && travel <= dp(14) && duration <= 350) {
++                XRayActivity.clickTouchMouse(true);
++                XRayActivity.clickTouchMouse(false);
++            }
++        }
++    }
++
++    private void updateJoystick(float x, float y) {
++        joystickX = x;
++        joystickY = y;
++        float dx = x - dp(102);
++        float dy = y - (getHeight() - dp(100));
++        float deadZone = dp(18);
++        setControl(CONTROL_LEFT, dx < -deadZone);
++        setControl(CONTROL_RIGHT, dx > deadZone);
++        setControl(CONTROL_FORWARD, dy < -deadZone);
++        setControl(CONTROL_BACK, dy > deadZone);
++    }
++
++    private void setControl(int control, boolean pressed) {
++        int bit = 1 << control;
++        boolean wasPressed = (activeMask & bit) != 0;
++        if (wasPressed == pressed)
++            return;
++        if (pressed)
++            activeMask |= bit;
++        else
++            activeMask &= ~bit;
++        XRayActivity.setTouchControl(control, pressed);
++    }
++
++    private RectF fireBounds() {
++        return circleBounds(getWidth() - dp(89), getHeight() - dp(92), dp(55));
++    }
++
++    private RectF useBounds() {
++        return circleBounds(getWidth() - dp(202), getHeight() - dp(151), dp(39));
++    }
++
++    private RectF inventoryBounds() {
++        return circleBounds(getWidth() - dp(207), getHeight() - dp(55), dp(39));
++    }
++
++    private RectF circleBounds(float x, float y, float radius) {
++        return new RectF(x - radius, y - radius, x + radius, y + radius);
++    }
++
++    private void drawCircle(Canvas canvas, float x, float y, float radius, String label) {
++        canvas.drawCircle(x, y, radius, fillPaint);
++        canvas.drawCircle(x, y, radius, strokePaint);
++        if (!label.isEmpty()) {
++            Paint.FontMetrics metrics = textPaint.getFontMetrics();
++            float baseline = y - (metrics.ascent + metrics.descent) / 2;
++            canvas.drawText(label, x, baseline, textPaint);
++        }
++    }
++
++    private float dp(float value) {
++        return value * density;
++    }
++}
+diff --git a/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java b/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java
+index 18c09a257..d23a31dc1 100644
+--- a/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java
++++ b/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java
+@@ -1,11 +1,13 @@
+ package org.openxray.app;
+ 
+ import android.content.Intent;
++import android.content.pm.ActivityInfo;
+ import android.os.Build;
+ import android.os.Bundle;
+ import android.os.Environment;
+ import android.util.Log;
+ import android.view.View;
++import android.view.ViewGroup;
+ import android.view.WindowManager;
+ 
+ import java.io.File;
+@@ -33,9 +35,14 @@ public final class XRayActivity extends SDLActivity {
+     private static final String TAG = "OpenXRay";
+     private File diagnosticsFile;
+     private boolean immersiveMode = true;
++    private TouchControlsView touchControls;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
++        // Apply orientation before SDL creates its SurfaceView/EGL surface.
++        // Doing it after super.onCreate leaves the first drawable portrait
++        // and forces a destructive surface recreation during native startup.
++        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+         if (getIntent().getBooleanExtra(LauncherActivity.EXTRA_KEEP_SCREEN_ON, true))
+             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+         immersiveMode = getIntent().getBooleanExtra(LauncherActivity.EXTRA_IMMERSIVE, true);
+@@ -50,6 +57,11 @@ public final class XRayActivity extends SDLActivity {
+                 + "; abi=" + (Build.SUPPORTED_ABIS.length == 0 ? "unknown" : Build.SUPPORTED_ABIS[0]));
+         try {
+             super.onCreate(savedInstanceState);
++            if (getIntent().getBooleanExtra(LauncherActivity.EXTRA_TOUCH_CONTROLS, true)) {
++                touchControls = new TouchControlsView(this);
++                addContentView(touchControls, new ViewGroup.LayoutParams(
++                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
++            }
+             applyImmersiveMode();
+         } catch (RuntimeException error) {
+             writeDiagnostic("SDL activity startup failed: " + Log.getStackTraceString(error));
+@@ -66,10 +78,23 @@ public final class XRayActivity extends SDLActivity {
+ 
+     @Override
+     protected void onPause() {
++        if (touchControls != null)
++            touchControls.releaseAllControls();
+         writeDiagnostic("activity onPause");
+         super.onPause();
+     }
+ 
++    @Override
++    public void onBackPressed() {
++        // Keep the SDL Activity and its native surface owner alive underneath
++        // the launcher. A subsequent REORDER_TO_FRONT then reattaches to the
++        // same engine instead of constructing another SDL entry point.
++        Intent launcher = new Intent(this, LauncherActivity.class);
++        launcher.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
++        startActivity(launcher);
++        writeDiagnostic("engine activity moved behind launcher");
++    }
++
+     @Override
+     protected void onNewIntent(Intent intent) {
+         super.onNewIntent(intent);
+@@ -77,6 +102,7 @@ public final class XRayActivity extends SDLActivity {
+         // Keep the original launch intent so an Activity recreation cannot
+         // silently lose the selected game root or profile.
+         writeDiagnostic("existing engine activity brought to foreground");
++        applyImmersiveMode();
+     }
+ 
+     @Override
+@@ -94,7 +120,7 @@ public final class XRayActivity extends SDLActivity {
+ 
+     @Override
+     protected String[] getArguments() {
+-        boolean rendererSmoke = getIntent().getBooleanExtra(LauncherActivity.EXTRA_RENDERER_SMOKE, true);
++        boolean rendererSmoke = getIntent().getBooleanExtra(LauncherActivity.EXTRA_RENDERER_SMOKE, false);
+         String selectedPath = getIntent().getStringExtra(LauncherActivity.EXTRA_GAME_PATH);
+         boolean gamepadEnabled = getIntent().getBooleanExtra(LauncherActivity.EXTRA_GAMEPAD_ENABLED, false);
+         boolean splashEnabled = getIntent().getBooleanExtra(LauncherActivity.EXTRA_SPLASH_ENABLED, false);
+@@ -141,6 +167,22 @@ public final class XRayActivity extends SDLActivity {
+         return result;
+     }
+ 
++    static void setTouchControl(int control, boolean pressed) {
++        nativeSetTouchControl(control, pressed);
++    }
++
++    static void moveTouchMouse(float deltaX, float deltaY) {
++        nativeMoveTouchMouse(deltaX, deltaY);
++    }
++
++    static void clickTouchMouse(boolean pressed) {
++        nativeClickTouchMouse(pressed);
++    }
++
++    private static native void nativeSetTouchControl(int control, boolean pressed);
++    private static native void nativeMoveTouchMouse(float deltaX, float deltaY);
++    private static native void nativeClickTouchMouse(boolean pressed);
++
+     private void applyImmersiveMode() {
+         if (!immersiveMode)
+             return;
+diff --git a/android/apply-patches.sh b/android/apply-patches.sh
+index 56f2ce440..90f2e2696 100755
+--- a/android/apply-patches.sh
++++ b/android/apply-patches.sh
+@@ -7,7 +7,10 @@ patch_dir=${XRAY_ANDROID_PATCH_DIR:-"$script_dir/patches"}
+ 
+ patchset_present()
+ {
+-    [ "$(sed -n '1p' "$repo_dir/android/PORT_VERSION" 2>/dev/null || true)" = "0.7.0" ] \
++    expected_version=$(sed -n '1p' "$script_dir/PORT_VERSION" 2>/dev/null || true)
++    target_version=$(sed -n '1p' "$repo_dir/android/PORT_VERSION" 2>/dev/null || true)
++    [ -n "$expected_version" ] \
++        && [ "$target_version" = "$expected_version" ] \
+         && [ -x "$repo_dir/android/prepare-source.sh" ] \
+         && [ -s "$repo_dir/src/Layers/xrRenderPC_GL/AndroidGlslCompatRules.inl" ] \
+         && grep -Fq 'AndroidGlslCompatRules.inl' \
+@@ -22,12 +25,23 @@ patchset_present()
+             "$repo_dir/src/xrCore/xrCore.cpp" \
+         && grep -Fq 'android_native_crash_handler' \
+             "$repo_dir/src/xrEngine/x_ray.cpp" \
++        && grep -Fq 'pc-libmain' "$repo_dir/src/xrEngine/x_ray.cpp" \
++        && grep -Fq 'AndroidTouchControlMask' \
++            "$repo_dir/src/xrEngine/android_touch_controls.cpp" \
++        && grep -Fq 'SCREEN_ORIENTATION_SENSOR_LANDSCAPE' \
++            "$repo_dir/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java" \
++        && grep -Fq 'EXTRA_TOUCH_CONTROLS' \
++            "$repo_dir/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java" \
++        && grep -Fq 'CopyMemory(&tableSize, current_cross_table' \
++            "$repo_dir/src/xrAICore/Navigation/game_graph_inline.h" \
+         && grep -Fq 'LUAJIT_HOST_EXTRA_LDFLAGS' \
+             "$repo_dir/Externals/LuaJIT-proj/CMakeLists.txt" \
+         && grep -Fq 'm_Overlay' "$repo_dir/src/xrCore/LocatorAPI_defs.h" \
+         && grep -Fq 'profilePreference(PREF_GAME_PATH_PREFIX' \
+             "$repo_dir/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java" \
+-        && grep -Fq "versionName '0.7.0'" "$repo_dir/android/apk/app/build.gradle"
++        && grep -Fq "versionName '$expected_version'" "$repo_dir/android/apk/app/build.gradle" \
++        && grep -Fq "android:versionName=\"$expected_version\"" \
++            "$repo_dir/android/apk/app/src/main/AndroidManifest.xml"
+ }
+ 
+ if patchset_present; then
+diff --git a/android/build-apk-armv7.sh b/android/build-apk-armv7.sh
+index c1941ad47..bb7cdbf5b 100755
+--- a/android/build-apk-armv7.sh
++++ b/android/build-apk-armv7.sh
+@@ -6,13 +6,10 @@ repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+ 
+ kit_root=${XRAY_ANDROID_KIT_ROOT:-}
+ if [ -z "$kit_root" ]; then
+-    for candidate in "$repo_dir/.openxray-android-build-kit" \
+-        "$repo_dir/../openxray-android-build-kit-v0.7.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.6.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.5.0"; do
++    for candidate in "$repo_dir"/../openxray-android-build-kit-v* \
++        "$repo_dir/.openxray-android-build-kit"; do
+         if [ -f "$candidate/build-kit-env.sh" ]; then
+             kit_root="$candidate"
+-            break
+         fi
+     done
+ fi
+@@ -94,6 +91,8 @@ cp "$repo_dir/android/apk/app/src/main/java/org/openxray/app/XRayActivity.java"
+     "$project_dir/app/src/main/java/org/openxray/app/XRayActivity.java"
+ cp "$repo_dir/android/apk/app/src/main/java/org/openxray/app/LauncherActivity.java" \
+     "$project_dir/app/src/main/java/org/openxray/app/LauncherActivity.java"
++cp "$repo_dir/android/apk/app/src/main/java/org/openxray/app/TouchControlsView.java" \
++    "$project_dir/app/src/main/java/org/openxray/app/TouchControlsView.java"
+ mkdir -p "$project_dir/app/src/main/res/values"
+ cp "$repo_dir/android/apk/app/src/main/res/values/strings.xml" "$project_dir/app/src/main/res/values/strings.xml"
+ cp "$repo_dir/android/apk/app/src/main/res/values/styles.xml" "$project_dir/app/src/main/res/values/styles.xml"
+diff --git a/android/build-armv7.sh b/android/build-armv7.sh
+index 5f5ec1820..486b2692b 100755
+--- a/android/build-armv7.sh
++++ b/android/build-armv7.sh
+@@ -6,13 +6,10 @@ repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+ 
+ kit_root=${XRAY_ANDROID_KIT_ROOT:-}
+ if [ -z "$kit_root" ]; then
+-    for candidate in "$repo_dir/.openxray-android-build-kit" \
+-        "$repo_dir/../openxray-android-build-kit-v0.7.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.6.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.5.0"; do
++    for candidate in "$repo_dir"/../openxray-android-build-kit-v* \
++        "$repo_dir/.openxray-android-build-kit"; do
+         if [ -f "$candidate/build-kit-env.sh" ]; then
+             kit_root="$candidate"
+-            break
+         fi
+     done
+ fi
+diff --git a/android/build-harness.sh b/android/build-harness.sh
+index efc4895e4..ce18b0e9f 100755
+--- a/android/build-harness.sh
++++ b/android/build-harness.sh
+@@ -6,13 +6,10 @@ repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+ kit_root=${XRAY_ANDROID_KIT_ROOT:-}
+ 
+ if [ -z "$kit_root" ]; then
+-    for candidate in "$repo_dir/.openxray-android-build-kit" \
+-        "$repo_dir/../openxray-android-build-kit-v0.7.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.6.0" \
+-        "$repo_dir/../openxray-android-build-kit-v0.5.0"; do
++    for candidate in "$repo_dir"/../openxray-android-build-kit-v* \
++        "$repo_dir/.openxray-android-build-kit"; do
+         if [ -f "$candidate/build-kit-env.sh" ]; then
+             kit_root="$candidate"
+-            break
+         fi
+     done
+ fi
+diff --git a/android/create-build-kit.sh b/android/create-build-kit.sh
+index 6ad1f2b09..94222d65b 100755
+--- a/android/create-build-kit.sh
++++ b/android/create-build-kit.sh
+@@ -3,9 +3,9 @@ set -eu
+ 
+ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+ repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+-kit_version=${XRAY_ANDROID_KIT_VERSION:-0.7.0}
+-output=${1:-"$repo_dir/build/openxray-android-build-kit-v$kit_version.tar.zst"}
+ port_version=$(sed -n '1p' "$script_dir/PORT_VERSION")
++kit_version=${XRAY_ANDROID_KIT_VERSION:-$port_version}
++output=${1:-"$repo_dir/build/openxray-android-build-kit-v$kit_version.tar.zst"}
+ 
+ ndk_dir=${ANDROID_NDK_HOME:-${ANDROID_NDK_ROOT:-}}
+ sdk_dir=${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}
+diff --git a/src/Layers/xrRender/D3DXRenderBase.cpp b/src/Layers/xrRender/D3DXRenderBase.cpp
+index 78a126af2..9d95545ff 100644
+--- a/src/Layers/xrRender/D3DXRenderBase.cpp
++++ b/src/Layers/xrRender/D3DXRenderBase.cpp
+@@ -208,6 +208,12 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
+ 
+     HW.CreateDevice(hWnd);
+ 
++#if defined(XR_PLATFORM_ANDROID)
++    CHECK_OR_EXIT(HW.IsReady(),
++        "OpenXRay could not initialize a compatible OpenGL ES device.\n\n"
++        "OpenGL ES 3.1 with at least four draw buffers is required.");
++#endif
++
+     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
+ 
+     fWidth_2 = float(dwWidth / 2);
+diff --git a/src/Layers/xrRender/ShaderResourceTraits.h b/src/Layers/xrRender/ShaderResourceTraits.h
+index 63f3d4f13..2541fa898 100644
+--- a/src/Layers/xrRender/ShaderResourceTraits.h
++++ b/src/Layers/xrRender/ShaderResourceTraits.h
+@@ -11,24 +11,39 @@ namespace xray::render::RENDER_NAMESPACE
+ #ifdef USE_OGL
+ static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
+ {
+-    GLint length;
++    GLint length = 0;
+     GLchar *errors = nullptr, *sources = nullptr;
+ 
+     if (program)
+     {
+         CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+-        errors = xr_alloc<GLchar>(length);
+-        CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
++        if (length > 0)
++        {
++            errors = xr_alloc<GLchar>(length + 1);
++            GLsizei written = 0;
++            CHK_GL(glGetProgramInfoLog(program, length, &written, errors));
++            errors[std::min<GLsizei>(written, length)] = '\0';
++        }
+     }
+     else if (shader)
+     {
+         CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
+-        errors = xr_alloc<GLchar>(length);
+-        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
++        if (length > 0)
++        {
++            errors = xr_alloc<GLchar>(length + 1);
++            GLsizei written = 0;
++            CHK_GL(glGetShaderInfoLog(shader, length, &written, errors));
++            errors[std::min<GLsizei>(written, length)] = '\0';
++        }
+ 
+         CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length));
+-        sources = xr_alloc<GLchar>(length);
+-        CHK_GL(glGetShaderSource(shader, length, nullptr, sources));
++        if (length > 0)
++        {
++            sources = xr_alloc<GLchar>(length + 1);
++            GLsizei written = 0;
++            CHK_GL(glGetShaderSource(shader, length, &written, sources));
++            sources[std::min<GLsizei>(written, length)] = '\0';
++        }
+     }
+ 
+     Log("! shader compilation failed:", filename);
+diff --git a/src/Layers/xrRenderGL/glHW.cpp b/src/Layers/xrRenderGL/glHW.cpp
+index d7f421d33..1a9cd43b4 100644
+--- a/src/Layers/xrRenderGL/glHW.cpp
++++ b/src/Layers/xrRenderGL/glHW.cpp
+@@ -55,9 +55,28 @@ CHW::~CHW()
+ void CHW::OnAppActivate()
+ {
+ #if defined(XR_PLATFORM_ANDROID)
+-    // SDLActivity owns the Android activity/window lifecycle. Restoring or
+-    // minimizing an SDL window maps to Android task navigation rather than a
+-    // desktop window operation, so leave the activity state to SDLActivity.
++    // SDL recreates the EGL window surface when the Activity returns to the
++    // foreground. Rebind the existing context to that new surface before the
++    // first frame; otherwise SwapWindow may keep presenting to the abandoned
++    // surface and the user sees a permanent black screen.
++    if (!m_window || !m_context)
++        return;
++
++    if (SDL_GL_MakeCurrent(m_window, m_context) != 0)
++    {
++        Msg("! Android GLES: cannot restore EGL surface: %s", SDL_GetError());
++        m_surfaceNeedsReset = true;
++        return;
++    }
++
++    int drawableWidth = 0;
++    int drawableHeight = 0;
++    SDL_GL_GetDrawableSize(m_window, &drawableWidth, &drawableHeight);
++    m_surfaceNeedsReset = !glIsFramebuffer(pFB) || drawableWidth <= 0 || drawableHeight <= 0 ||
++        drawableWidth != static_cast<int>(Device.dwWidth) || drawableHeight != static_cast<int>(Device.dwHeight);
++    Msg("* Android GLES: foreground surface [%dx%d], reset=[%d]", drawableWidth, drawableHeight,
++        m_surfaceNeedsReset);
++    UpdateVSync();
+     return;
+ #else
+     if (m_window)
+@@ -75,6 +94,7 @@ void CHW::OnAppDeactivate()
+     // launcher/home screen while the native engine kept running. Pausing the
+     // scheduler and audio is handled by the normal app-deactivate sequence;
+     // do not turn that lifecycle event into task navigation.
++    Msg("* Android GLES: window surface moved to background");
+     return;
+ #else
+     if (m_window)
+@@ -176,6 +196,28 @@ void CHW::CreateDevice(SDL_Window* hWnd)
+         GLAD_GL_ES_VERSION_3_1, GLAD_GL_ES_VERSION_3_2, GLAD_GL_EXT_shader_io_blocks, GLAD_GL_OES_shader_io_blocks,
+         GLAD_GL_EXT_clip_cull_distance, GLAD_GL_EXT_gpu_shader5, GLAD_GL_OES_gpu_shader5,
+         GLAD_GL_EXT_shader_implicit_conversions, GLAD_GL_EXT_blend_func_extended);
++
++    GLint maxDrawBuffers = 0;
++    GLint maxColorAttachments = 0;
++    glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxDrawBuffers);
++    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
++    if (!GLAD_GL_ES_VERSION_3_1 || maxDrawBuffers < 4 || maxColorAttachments < 4)
++    {
++        string512 reason;
++        xr_sprintf(reason,
++            "OpenXRay requires OpenGL ES 3.1 and at least 4 draw buffers/color attachments.\n\n"
++            "Device reports: %s; draw buffers=%d; color attachments=%d.",
++            OpenGLVersionString ? OpenGLVersionString : "unknown OpenGL ES version",
++            maxDrawBuffers, maxColorAttachments);
++        Msg("! Android GLES capability check failed: %s", reason);
++        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
++            "OpenXRay: unsupported graphics device", reason, m_window);
++        SDL_GL_DeleteContext(m_context);
++        m_context = nullptr;
++        return;
++    }
++    Msg("* Android GLES capability check passed: ES 3.1+, draw buffers=[%d], color attachments=[%d]",
++        maxDrawBuffers, maxColorAttachments);
+ #endif
+ 
+     ComputeShadersSupported = false; // XXX: Implement compute shaders support
+@@ -208,6 +250,10 @@ void CHW::Reset()
+     pFB = 0;
+     UpdateViews();
+ 
++#if defined(XR_PLATFORM_ANDROID)
++    m_surfaceNeedsReset = false;
++#endif
++
+     UpdateVSync();
+ }
+ 
+@@ -381,7 +427,11 @@ void CHW::Present()
+ 
+ DeviceState CHW::GetDeviceState() const
+ {
+-    //  TODO: OGL: Implement GetDeviceState
++#if defined(XR_PLATFORM_ANDROID)
++    if (m_surfaceNeedsReset)
++        return DeviceState::NeedReset;
++#endif
++    // TODO: OGL: Implement desktop context-loss detection.
+     return DeviceState::Normal;
+ }
+ 
+diff --git a/src/Layers/xrRenderGL/glHW.h b/src/Layers/xrRenderGL/glHW.h
+index c0251c2f5..d70ae4f10 100644
+--- a/src/Layers/xrRenderGL/glHW.h
++++ b/src/Layers/xrRenderGL/glHW.h
+@@ -15,6 +15,7 @@ public:
+ 
+     void CreateDevice(SDL_Window* sdlWnd);
+     void DestroyDevice();
++    bool IsReady() const { return m_context != nullptr; }
+ 
+     void Reset();
+ 
+@@ -61,6 +62,10 @@ public:
+     pcstr OpenGLVersionString;
+     pcstr ShadingVersion;
+     bool ComputeShadersSupported;
++
++#if defined(XR_PLATFORM_ANDROID)
++    bool m_surfaceNeedsReset{};
++#endif
+ };
+ 
+ extern ECORE_API CHW HW;
+diff --git a/src/Layers/xrRenderPC_GL/rgl_shaders.cpp b/src/Layers/xrRenderPC_GL/rgl_shaders.cpp
+index 0a0b8fdc0..b734d81c6 100644
+--- a/src/Layers/xrRenderPC_GL/rgl_shaders.cpp
++++ b/src/Layers/xrRenderPC_GL/rgl_shaders.cpp
+@@ -179,11 +179,11 @@ bool get_android_varying_type(const xr_string& type, xr_string& physicalType, pc
+         width = type.back() - '0';
+     }
+ 
+-    if (width < 1 || width > 3)
++    if (width < 1 || width > 4)
+         return false;
+ 
+     physicalType = family == "float" ? "vec4" : family == "int" ? "ivec4" : "uvec4";
+-    static constexpr cpcstr Swizzles[] = { nullptr, ".x", ".xy", ".xyz" };
++    static constexpr cpcstr Swizzles[] = { nullptr, ".x", ".xy", ".xyz", "" };
+     swizzle = Swizzles[width];
+     return true;
+ }
+@@ -241,7 +241,24 @@ bool normalize_android_stage_varying(xr_string& line, char stage)
+         return false;
+     const size_t open = line.find('(', layoutPosition + 6);
+     const size_t close = open == xr_string::npos ? xr_string::npos : line.find(')', open + 1);
+-    if (close == xr_string::npos || line.find("location", open + 1) > close)
++    const size_t location = line.find("location", open + 1);
++    if (close == xr_string::npos || location > close)
++        return false;
++
++    const size_t equals = line.find('=', location + xr_strlen("location"));
++    if (equals == xr_string::npos || equals > close)
++        return false;
++    xr_string locationKey;
++    for (size_t cursor = equals + 1; cursor < close && line[cursor] != ','; ++cursor)
++    {
++        const char value = line[cursor];
++        if ((value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z') ||
++            (value >= '0' && value <= '9') || value == '_')
++            locationKey += value;
++        else if (!is_glsl_space(value))
++            locationKey += '_';
++    }
++    if (locationKey.empty())
+         return false;
+ 
+     size_t position = close + 1;
+@@ -288,7 +305,11 @@ bool normalize_android_stage_varying(xr_string& line, char stage)
+     if (!get_android_varying_type(type, physicalType, swizzle))
+         return false;
+ 
+-    const xr_string physicalName = xr_string(AndroidVaryingPrefix) + name;
++    // Some mobile linkers still require matching varying identifiers even
++    // when both stages use explicit locations. Derive the physical name from
++    // the location expression (for example TEXCOORD1) so independently named
++    // PC shader inputs/outputs link without any per-resource rename rule.
++    const xr_string physicalName = xr_string(AndroidVaryingPrefix) + locationKey;
+     line.replace(nameBegin, nameEnd - nameBegin, physicalName);
+     line.replace(typeBegin, typeEnd - typeBegin, physicalType);
+     line += "\n#define ";
+diff --git a/src/xrAICore/Navigation/game_graph.h b/src/xrAICore/Navigation/game_graph.h
+index ac196e125..aaaaeb405 100644
+--- a/src/xrAICore/Navigation/game_graph.h
++++ b/src/xrAICore/Navigation/game_graph.h
+@@ -45,7 +45,10 @@ private:
+     _GRAPH_ID m_current_level_some_vertex_id;
+ 
+ private:
+-    u32* m_cross_tables{};
++    // Points into packed game.graph data and is only guaranteed to be byte
++    // aligned. Read table sizes with CopyMemory instead of dereferencing a
++    // u32 pointer on strict-alignment architectures such as ARMv7.
++    u8* m_cross_tables{};
+     CGameLevelCrossTable* m_current_level_cross_table{};
+ 
+     inline void Initialize(IReader& stream, bool own);
+@@ -69,8 +72,8 @@ public:
+     IC bool valid_vertex_id(u32 vertex_id) const;
+     IC void begin(u32 vertex_id, const_iterator& start, const_iterator& end) const;
+     IC void begin_spawn(u32 vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const;
+-    IC const _GRAPH_ID& value(u32 vertex_id, const_iterator& i) const;
+-    IC const float& edge_weight(const_iterator i) const;
++    IC _GRAPH_ID value(u32 vertex_id, const_iterator& i) const;
++    IC float edge_weight(const_iterator i) const;
+     IC const CGameVertex* vertex(u32 vertex_id) const;
+     IC void set_invalid_vertex(_GRAPH_ID& vertex_id) const;
+     IC _GRAPH_ID vertex_id(const CGameVertex* vertex) const;
+diff --git a/src/xrAICore/Navigation/game_graph_inline.h b/src/xrAICore/Navigation/game_graph_inline.h
+index 77781a343..85d9505a8 100644
+--- a/src/xrAICore/Navigation/game_graph_inline.h
++++ b/src/xrAICore/Navigation/game_graph_inline.h
+@@ -22,7 +22,7 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
+     {
+         u8* temp = (u8*)(m_nodes + header().vertex_count());
+         temp += header().edge_count() * sizeof(CGameGraph::CEdge);
+-        m_cross_tables = (u32*)(((CLevelPoint*)temp) + header().death_point_count());
++        m_cross_tables = temp + sizeof(CLevelPoint) * header().death_point_count();
+         m_current_level_cross_table = nullptr;
+     }
+ }
+@@ -93,23 +93,23 @@ IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iter
+         vertex(_GRAPH_ID(vertex_id))->edge_count();
+ }
+ 
+-IC const CGameGraph::_GRAPH_ID& CGameGraph::value(u32 const /*vertex_id*/, const_iterator& i) const
++IC CGameGraph::_GRAPH_ID CGameGraph::value(u32 const /*vertex_id*/, const_iterator& i) const
+ {
+     return (i->vertex_id());
+ }
+ 
+-IC const float& CGameGraph::edge_weight(const_iterator i) const { return (i->distance()); }
++IC float CGameGraph::edge_weight(const_iterator i) const { return (i->distance()); }
+ IC const CGameGraph::CGameVertex* CGameGraph::vertex(u32 const vertex_id) const { return (m_nodes + vertex_id); }
+-IC const u8& CGameGraph::CHeader::version() const { return (m_version); }
++IC u8 CGameGraph::CHeader::version() const { return (m_version); }
+ IC GameGraph::_LEVEL_ID GameGraph::CHeader::level_count() const
+ {
+     VERIFY(m_levels.size() < (u32(1) << (8 * sizeof(GameGraph::_LEVEL_ID))));
+     return ((GameGraph::_LEVEL_ID)m_levels.size());
+ }
+ 
+-IC const GameGraph::_GRAPH_ID& GameGraph::CHeader::vertex_count() const { return (m_vertex_count); }
+-IC const u32& GameGraph::CHeader::edge_count() const { return (m_edge_count); }
+-IC const u32& GameGraph::CHeader::death_point_count() const { return (m_death_point_count); }
++IC GameGraph::_GRAPH_ID GameGraph::CHeader::vertex_count() const { return (m_vertex_count); }
++IC u32 GameGraph::CHeader::edge_count() const { return (m_edge_count); }
++IC u32 GameGraph::CHeader::death_point_count() const { return (m_death_point_count); }
+ IC const GameGraph::LEVEL_MAP& GameGraph::CHeader::levels() const { return (m_levels); }
+ 
+ IC bool GameGraph::CHeader::level_exist(const _LEVEL_ID& id) const
+@@ -161,17 +161,77 @@ IC const GameGraph::SLevel* GameGraph::CHeader::level(LPCSTR level_name, bool) c
+ }
+ 
+ IC const xrGUID& CGameGraph::CHeader::guid() const { return (m_guid); }
+-IC const Fvector& GameGraph::CGameVertex::level_point() const { return (tLocalPoint); }
+-IC const Fvector& GameGraph::CGameVertex::game_point() const { return (tGlobalPoint); }
+-IC GameGraph::_LEVEL_ID GameGraph::CGameVertex::level_id() const { return (tLevelID); }
+-IC u32 GameGraph::CGameVertex::level_vertex_id() const { return (tNodeID); }
++IC Fvector GameGraph::CGameVertex::level_point() const
++{
++    Fvector value;
++    CopyMemory(&value, &tLocalPoint, sizeof(value));
++    return value;
++}
++IC Fvector GameGraph::CGameVertex::game_point() const
++{
++    Fvector value;
++    CopyMemory(&value, &tGlobalPoint, sizeof(value));
++    return value;
++}
++IC GameGraph::_LEVEL_ID GameGraph::CGameVertex::level_id() const
++{
++    u32 packedLevelAndNode;
++    CopyMemory(&packedLevelAndNode, reinterpret_cast<const u8*>(this) + sizeof(Fvector) * 2,
++        sizeof(packedLevelAndNode));
++    return static_cast<_LEVEL_ID>(packedLevelAndNode & 0xff);
++}
++IC u32 GameGraph::CGameVertex::level_vertex_id() const
++{
++    u32 packedLevelAndNode;
++    CopyMemory(&packedLevelAndNode, reinterpret_cast<const u8*>(this) + sizeof(Fvector) * 2,
++        sizeof(packedLevelAndNode));
++    return packedLevelAndNode >> 8;
++}
+ IC const u8* GameGraph::CGameVertex::vertex_type() const { return (tVertexTypes); }
+ IC const u8& GameGraph::CGameVertex::edge_count() const { return (tNeighbourCount); }
+ IC const u8& GameGraph::CGameVertex::death_point_count() const { return (tDeathPointCount); }
+-IC const u32& GameGraph::CGameVertex::edge_offset() const { return (dwEdgeOffset); }
+-IC const u32& GameGraph::CGameVertex::death_point_offset() const { return (dwPointOffset); }
+-IC const GameGraph::_GRAPH_ID& GameGraph::CEdge::vertex_id() const { return (m_vertex_id); }
+-IC const float& GameGraph::CEdge::distance() const { return (m_path_distance); }
++IC u32 GameGraph::CGameVertex::edge_offset() const
++{
++    u32 value;
++    CopyMemory(&value, &dwEdgeOffset, sizeof(value));
++    return value;
++}
++IC u32 GameGraph::CGameVertex::death_point_offset() const
++{
++    u32 value;
++    CopyMemory(&value, &dwPointOffset, sizeof(value));
++    return value;
++}
++IC GameGraph::_GRAPH_ID GameGraph::CEdge::vertex_id() const
++{
++    _GRAPH_ID value;
++    CopyMemory(&value, &m_vertex_id, sizeof(value));
++    return value;
++}
++IC float GameGraph::CEdge::distance() const
++{
++    float value;
++    CopyMemory(&value, &m_path_distance, sizeof(value));
++    return value;
++}
++IC Fvector GameGraph::CLevelPoint::level_point() const
++{
++    Fvector value;
++    CopyMemory(&value, &tPoint, sizeof(value));
++    return value;
++}
++IC u32 GameGraph::CLevelPoint::level_vertex_id() const
++{
++    u32 value;
++    CopyMemory(&value, &tNodeID, sizeof(value));
++    return value;
++}
++IC float GameGraph::CLevelPoint::distance() const
++{
++    float value;
++    CopyMemory(&value, &fDistance, sizeof(value));
++    return value;
++}
+ IC void CGameGraph::begin_spawn(u32 const vertex_id, const_spawn_iterator& start, const_spawn_iterator& end) const
+ {
+     const CGameVertex* object = vertex(vertex_id);
+@@ -256,18 +316,23 @@ IC void CGameGraph::set_current_level(u32 const level_id)
+     xr_delete(m_current_level_cross_table);
+     if (header().version() >= XRAI_VERSION_PRIQUEL)
+     {
+-        u32* current_cross_table = m_cross_tables;
++        u8* current_cross_table = m_cross_tables;
+         GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
+         GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
+         for (; I != E; ++I)
+         {
+             if (level_id != (*I).first)
+             {
+-                current_cross_table = (u32*)((u8*)current_cross_table + *current_cross_table);
++                u32 tableSize;
++                CopyMemory(&tableSize, current_cross_table, sizeof(tableSize));
++                current_cross_table += tableSize;
+                 continue;
+             }
+ 
+-            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(current_cross_table + 1, *current_cross_table);
++            u32 tableSize;
++            CopyMemory(&tableSize, current_cross_table, sizeof(tableSize));
++            m_current_level_cross_table = xr_new<CGameLevelCrossTable>(
++                current_cross_table + sizeof(tableSize), tableSize);
+             break;
+         }
+     }
+@@ -312,12 +377,13 @@ IC void CGameGraph::save(IWriter& stream)
+     stream.w(buffer, header().death_point_count() * sizeof(CLevelPoint));
+     buffer += header().death_point_count() * sizeof(CLevelPoint);
+ 
+-    VERIFY((u8*)m_cross_tables == buffer);
++    VERIFY(m_cross_tables == buffer);
+     GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
+     GameGraph::LEVEL_MAP::const_iterator E = header().levels().end();
+     for (; I != E; ++I)
+     {
+-        u32 size = *(u32*)buffer;
++        u32 size;
++        CopyMemory(&size, buffer, sizeof(size));
+         stream.w(buffer, size);
+         buffer += size;
+     }
+diff --git a/src/xrAICore/Navigation/game_graph_space.h b/src/xrAICore/Navigation/game_graph_space.h
+index 5c6e2091b..9249a0d9c 100644
+--- a/src/xrAICore/Navigation/game_graph_space.h
++++ b/src/xrAICore/Navigation/game_graph_space.h
+@@ -63,8 +63,8 @@ class
+     float m_path_distance;
+ 
+ public:
+-    IC const _GRAPH_ID& vertex_id() const;
+-    IC const float& distance() const;
++    IC _GRAPH_ID vertex_id() const;
++    IC float distance() const;
+ };
+ class CGameVertex
+ {
+@@ -84,17 +84,26 @@ private:
+     u8 tDeathPointCount;
+ 
+ public:
+-    IC const Fvector& level_point() const;
+-    IC const Fvector& game_point() const;
++    IC Fvector level_point() const;
++    IC Fvector game_point() const;
+     IC _LEVEL_ID level_id() const;
+     IC u32 level_vertex_id() const;
+     IC const u8* vertex_type() const;
+     IC const u8& edge_count() const;
+-    IC const u32& edge_offset() const;
++    IC u32 edge_offset() const;
+     IC const u8& death_point_count() const;
+-    IC const u32& death_point_offset() const;
++    IC u32 death_point_offset() const;
+     friend class CGameGraph;
+ };
++
++// CEdge and CGameVertex are views of the original packed game.graph data.
++// Keep their exact disk layout, but never return references to multi-byte
++// fields: mapped chunk starts and packed members are not guaranteed to be
++// naturally aligned on ARM.
++static_assert(sizeof(CEdge) == 6);
++static_assert(sizeof(CGameVertex) == 42);
++#pragma pack(pop)
++
+ class CHeader
+ {
+ #ifdef AI_COMPILER
+@@ -110,11 +119,11 @@ private:
+     LEVEL_MAP m_levels;
+ 
+ public:
+-    IC const u8& version() const;
++    IC u8 version() const;
+     IC _LEVEL_ID level_count() const;
+-    IC const _GRAPH_ID& vertex_count() const;
+-    IC const u32& edge_count() const;
+-    IC const u32& death_point_count() const;
++    IC _GRAPH_ID vertex_count() const;
++    IC u32 edge_count() const;
++    IC u32 death_point_count() const;
+     IC const xrGUID& guid() const;
+     IC const LEVEL_MAP& levels() const;
+     IC bool level_exist(const _LEVEL_ID& id) const;
+@@ -126,8 +135,8 @@ public:
+     IC void save(IWriter* reader);
+     friend class CGameGraph;
+ };
+-#pragma pack(pop)
+ 
++#pragma pack(push, 1)
+ #ifdef AI_COMPILER
+ struct
+ #else
+@@ -140,11 +149,16 @@ class
+     float fDistance;
+ 
+ public:
+-    IC const Fvector& level_point() const { return (tPoint); }
+-    IC u32 level_vertex_id() const { return (tNodeID); }
+-    IC float distance() const { return (fDistance); }
++    IC Fvector level_point() const;
++    IC u32 level_vertex_id() const;
++    IC float distance() const;
+ };
+ 
++// Spawn points are serialized immediately after the packed graph records and
++// therefore inherit their byte alignment. Their on-disk size is unchanged.
++static_assert(sizeof(CLevelPoint) == 20);
++#pragma pack(pop)
++
+ struct STerrainPlace
+ {
+     svector<_LOCATION_ID, LOCATION_TYPE_COUNT> tMask;
+diff --git a/src/xrAICore/Navigation/game_level_cross_table_inline.h b/src/xrAICore/Navigation/game_level_cross_table_inline.h
+index 4252bee4a..48853a37b 100644
+--- a/src/xrAICore/Navigation/game_level_cross_table_inline.h
++++ b/src/xrAICore/Navigation/game_level_cross_table_inline.h
+@@ -55,6 +55,16 @@ IC u32 CGameLevelCrossTable::CHeader::level_vertex_count() const { return (dwNod
+ IC u32 CGameLevelCrossTable::CHeader::game_vertex_count() const { return (dwGraphPointCount); }
+ IC const xrGUID& CGameLevelCrossTable::CHeader::level_guid() const { return (m_level_guid); }
+ IC const xrGUID& CGameLevelCrossTable::CHeader::game_guid() const { return (m_game_guid); }
+-IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const { return (tGraphIndex); }
+-IC float CGameLevelCrossTable::CCell::distance() const { return (fDistance); }
++IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const
++{
++    GameGraph::_GRAPH_ID value;
++    CopyMemory(&value, &tGraphIndex, sizeof(value));
++    return value;
++}
++IC float CGameLevelCrossTable::CCell::distance() const
++{
++    float value;
++    CopyMemory(&value, &fDistance, sizeof(value));
++    return value;
++}
+ IC const CGameLevelCrossTable::CHeader& CGameLevelCrossTable::header() const { return (m_tCrossTableHeader); }
+diff --git a/src/xrEngine/CMakeLists.txt b/src/xrEngine/CMakeLists.txt
+index b7bc29a6f..b5271907f 100644
+--- a/src/xrEngine/CMakeLists.txt
++++ b/src/xrEngine/CMakeLists.txt
+@@ -227,6 +227,8 @@ target_sources_grouped(
+     defines.cpp
+     defines.h
+     embedded_resources_management.h
++    android_touch_controls.cpp
++    android_touch_controls.h
+     mp_logging.h
+     stdafx.cpp
+     stdafx.h
+diff --git a/src/xrEngine/android_touch_controls.cpp b/src/xrEngine/android_touch_controls.cpp
+new file mode 100644
+index 000000000..7e096d665
+--- /dev/null
++++ b/src/xrEngine/android_touch_controls.cpp
+@@ -0,0 +1,83 @@
++#include "stdafx.h"
++
++#if defined(XR_PLATFORM_ANDROID)
++
++#include "android_touch_controls.h"
++
++#include <SDL.h>
++#include <jni.h>
++
++#include <atomic>
++
++namespace
++{
++constexpr int TouchControlCount = 7;
++std::atomic<std::uint32_t> g_touchControls{};
++
++Uint32 touch_window_id()
++{
++    SDL_Window* window = SDL_GetMouseFocus();
++    if (!window)
++        window = SDL_GetKeyboardFocus();
++    return window ? SDL_GetWindowID(window) : 0;
++}
++}
++
++std::uint32_t AndroidTouchControlMask() noexcept
++{
++    return g_touchControls.load(std::memory_order_acquire);
++}
++
++extern "C" JNIEXPORT void JNICALL
++Java_org_openxray_app_XRayActivity_nativeSetTouchControl(
++    JNIEnv*, jclass, jint control, jboolean pressed)
++{
++    if (control < 0 || control >= TouchControlCount)
++        return;
++
++    const std::uint32_t bit = std::uint32_t(1) << control;
++    if (pressed)
++        g_touchControls.fetch_or(bit, std::memory_order_release);
++    else
++        g_touchControls.fetch_and(~bit, std::memory_order_release);
++}
++
++extern "C" JNIEXPORT void JNICALL
++Java_org_openxray_app_XRayActivity_nativeMoveTouchMouse(
++    JNIEnv*, jclass, jfloat deltaX, jfloat deltaY)
++{
++    SDL_Event event{};
++    event.type = SDL_MOUSEMOTION;
++    event.motion.type = SDL_MOUSEMOTION;
++    event.motion.timestamp = SDL_GetTicks();
++    event.motion.windowID = touch_window_id();
++    event.motion.which = SDL_TOUCH_MOUSEID;
++    event.motion.xrel = static_cast<Sint32>(deltaX);
++    event.motion.yrel = static_cast<Sint32>(deltaY);
++
++    int x = 0;
++    int y = 0;
++    SDL_GetMouseState(&x, &y);
++    event.motion.x = x + event.motion.xrel;
++    event.motion.y = y + event.motion.yrel;
++    SDL_PushEvent(&event);
++}
++
++extern "C" JNIEXPORT void JNICALL
++Java_org_openxray_app_XRayActivity_nativeClickTouchMouse(
++    JNIEnv*, jclass, jboolean pressed)
++{
++    SDL_Event event{};
++    event.type = pressed ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
++    event.button.type = event.type;
++    event.button.timestamp = SDL_GetTicks();
++    event.button.windowID = touch_window_id();
++    event.button.which = SDL_TOUCH_MOUSEID;
++    event.button.button = SDL_BUTTON_LEFT;
++    event.button.state = pressed ? SDL_PRESSED : SDL_RELEASED;
++    event.button.clicks = 1;
++    SDL_GetMouseState(&event.button.x, &event.button.y);
++    SDL_PushEvent(&event);
++}
++
++#endif
+diff --git a/src/xrEngine/android_touch_controls.h b/src/xrEngine/android_touch_controls.h
+new file mode 100644
+index 000000000..c705e8edc
+--- /dev/null
++++ b/src/xrEngine/android_touch_controls.h
+@@ -0,0 +1,11 @@
++#pragma once
++
++#if defined(XR_PLATFORM_ANDROID)
++
++#include <cstdint>
++
++// Read by the native input thread. Java only updates this atomic bit mask;
++// action binding lookup and receiver callbacks stay on the engine thread.
++std::uint32_t AndroidTouchControlMask() noexcept;
++
++#endif
+diff --git a/src/xrEngine/x_ray.cpp b/src/xrEngine/x_ray.cpp
+index 1dd51def9..28954c0f5 100644
+--- a/src/xrEngine/x_ray.cpp
++++ b/src/xrEngine/x_ray.cpp
+@@ -47,6 +47,7 @@
+ #endif
+ 
+ #if defined(XR_PLATFORM_ANDROID)
++#include <dlfcn.h>
+ #include <fcntl.h>
+ #include <signal.h>
+ #include <sys/stat.h>
+@@ -236,6 +237,7 @@ struct android_crash_log_state
+ android_crash_log_state g_android_crash_log;
+ alignas(16) unsigned char g_android_signal_stack[ANDROID_SIGNAL_STACK_SIZE];
+ volatile sig_atomic_t g_android_crash_in_progress = 0;
++uintptr_t g_android_module_base = 0;
+ 
+ void android_write_raw(int fd, const char* data, size_t size)
+ {
+@@ -381,6 +383,19 @@ void android_native_crash_handler(int signal, siginfo_t* info, void* raw_context
+     destination = android_append_hex(destination, end, stack_pointer);
+     destination = android_append_text(destination, end, " lr=");
+     destination = android_append_hex(destination, end, link_register);
++    if (g_android_module_base != 0)
++    {
++        if (program_counter >= g_android_module_base)
++        {
++            destination = android_append_text(destination, end, " pc-libmain=");
++            destination = android_append_hex(destination, end, program_counter - g_android_module_base);
++        }
++        if (link_register >= g_android_module_base)
++        {
++            destination = android_append_text(destination, end, " lr-libmain=");
++            destination = android_append_hex(destination, end, link_register - g_android_module_base);
++        }
++    }
+     destination = android_append_text(destination, end,
+         "; full Android tombstone/backtrace is in logcat\n");
+     *destination = '\0';
+@@ -423,6 +438,16 @@ void android_install_crash_handler()
+     {
+         android_open_early_crash_logs();
+ 
++        // Resolve ASLR once while normal runtime services are available. The
++        // signal handler can then emit symbolizable libmain-relative offsets
++        // using only async-signal-safe formatting and write calls.
++        Dl_info moduleInfo{};
++        if (dladdr(reinterpret_cast<const void*>(&android_install_crash_handler), &moduleInfo) != 0 &&
++            moduleInfo.dli_fbase)
++        {
++            g_android_module_base = reinterpret_cast<uintptr_t>(moduleInfo.dli_fbase);
++        }
++
+         stack_t alternate_stack{};
+         alternate_stack.ss_sp = g_android_signal_stack;
+         alternate_stack.ss_size = sizeof(g_android_signal_stack);
+@@ -1086,6 +1111,38 @@ int CApplication::Run()
+         bool canCallActivate = false;
+         bool shouldActivate = false;
+ 
++#if defined(XR_PLATFORM_ANDROID)
++        // SDLActivity reports process/task lifecycle with SDL_APP_* events,
++        // not reliably with desktop-style window focus events. Consume them
++        // explicitly so rendering and worker threads stop before EGL loses
++        // its window surface and resume only after it is available again.
++        SDL_Event appEvents[8];
++        const int appEventCount = SDL_PeepEvents(appEvents, std::size(appEvents),
++            SDL_GETEVENT, SDL_APP_TERMINATING, SDL_APP_DIDENTERFOREGROUND);
++        for (int i = 0; i < appEventCount; ++i)
++        {
++            switch (appEvents[i].type)
++            {
++            case SDL_APP_WILLENTERBACKGROUND:
++            case SDL_APP_DIDENTERBACKGROUND:
++                canCallActivate = true;
++                shouldActivate = false;
++                break;
++            case SDL_APP_WILLENTERFOREGROUND:
++            case SDL_APP_DIDENTERFOREGROUND:
++                canCallActivate = true;
++                shouldActivate = true;
++                break;
++            case SDL_APP_TERMINATING:
++                Engine.Event.Defer("KERNEL:disconnect");
++                Engine.Event.Defer("KERNEL:quit");
++                break;
++            default:
++                break;
++            }
++        }
++#endif
++
+         SDL_Event events[MAX_WINDOW_EVENTS];
+         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+             SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+diff --git a/src/xrEngine/xr_input.cpp b/src/xrEngine/xr_input.cpp
+index b8caddd9a..b9381586e 100644
+--- a/src/xrEngine/xr_input.cpp
++++ b/src/xrEngine/xr_input.cpp
+@@ -6,6 +6,10 @@
+ #include "GameFont.h"
+ #include "XR_IOConsole.h"
+ #include "xrCore/Text/StringConversion.hpp"
++#if defined(XR_PLATFORM_ANDROID)
++#include "android_touch_controls.h"
++#include "xr_level_controller.h"
++#endif
+ 
+ #include <locale>
+ 
+@@ -773,12 +777,104 @@ void CInput::OnFrame(void)
+         ControllerUpdate();
+         KeyUpdate();
+         MouseUpdate();
++#if defined(XR_PLATFORM_ANDROID)
++        TouchUpdate();
++#endif
+     }
+ 
+     stats.FrameTime.End();
+     stats.FrameEnd();
+ }
+ 
++#if defined(XR_PLATFORM_ANDROID)
++void CInput::TouchUpdate()
++{
++    if (cbStack.empty())
++        return;
++
++    struct touch_binding
++    {
++        EGameActions action;
++        int fallback;
++    };
++    static constexpr touch_binding bindings[] =
++    {
++        { kFWD, SDL_SCANCODE_W },
++        { kBACK, SDL_SCANCODE_S },
++        { kL_STRAFE, SDL_SCANCODE_A },
++        { kR_STRAFE, SDL_SCANCODE_D },
++        { kINVENTORY, SDL_SCANCODE_I },
++        { kUSE, SDL_SCANCODE_F },
++        { kWPN_FIRE, MOUSE_1 },
++    };
++
++    const u32 requested = AndroidTouchControlMask();
++    const u32 changed = requested ^ touchControlState;
++    if (requested || changed)
++        SetCurrentInputType(KeyboardMouse);
++
++    auto press = [this](int key)
++    {
++        if (key >= 0 && key < COUNT_KB_BUTTONS)
++        {
++            keyboardState[key] = true;
++            cbStack.back()->IR_OnKeyboardPress(key);
++        }
++        else if (key > MOUSE_INVALID && key < MOUSE_MAX)
++        {
++            mouseState[key - (MOUSE_INVALID + 1)] = true;
++            cbStack.back()->IR_OnMousePress(key);
++        }
++    };
++    auto release = [this](int key)
++    {
++        if (key >= 0 && key < COUNT_KB_BUTTONS)
++        {
++            keyboardState[key] = false;
++            cbStack.back()->IR_OnKeyboardRelease(key);
++        }
++        else if (key > MOUSE_INVALID && key < MOUSE_MAX)
++        {
++            mouseState[key - (MOUSE_INVALID + 1)] = false;
++            cbStack.back()->IR_OnMouseRelease(key);
++        }
++    };
++    auto hold = [this](int key)
++    {
++        if (key >= 0 && key < COUNT_KB_BUTTONS)
++            cbStack.back()->IR_OnKeyboardHold(key);
++        else if (key > MOUSE_INVALID && key < MOUSE_MAX)
++            cbStack.back()->IR_OnMouseHold(key);
++    };
++
++    for (u32 index = 0; index < std::size(bindings); ++index)
++    {
++        const u32 bit = u32(1) << index;
++        int key = GetActionDik(bindings[index].action, 0);
++        if (key == SDL_SCANCODE_UNKNOWN)
++            key = GetActionDik(bindings[index].action, 1);
++        if (key == SDL_SCANCODE_UNKNOWN)
++            key = bindings[index].fallback;
++
++        if (changed & bit)
++        {
++            if (requested & bit)
++            {
++                press(key);
++                // Match SDL's physical-key path, which emits one hold event
++                // in the same frame as the initial press. Subsequent holds
++                // are generated once by KeyUpdate/MouseUpdate from the state
++                // set above.
++                hold(key);
++            }
++            else
++                release(key);
++        }
++    }
++    touchControlState = requested;
++}
++#endif
++
+ IInputReceiver* CInput::CurrentIR()
+ {
+     if (cbStack.size())
+diff --git a/src/xrEngine/xr_input.h b/src/xrEngine/xr_input.h
+index 1f63228fd..3278bd617 100644
+--- a/src/xrEngine/xr_input.h
++++ b/src/xrEngine/xr_input.h
+@@ -194,6 +194,10 @@ private:
+     void MouseUpdate();
+     void KeyUpdate();
+     void ControllerUpdate();
++#if defined(XR_PLATFORM_ANDROID)
++    void TouchUpdate();
++    u32 touchControlState{};
++#endif
+ 
+     void OpenController(int idx);
+ 
+diff --git a/src/xrGame/alife_update_manager.cpp b/src/xrGame/alife_update_manager.cpp
+index 8012d3882..6e575b6c4 100644
+--- a/src/xrGame/alife_update_manager.cpp
++++ b/src/xrGame/alife_update_manager.cpp
+@@ -224,13 +224,17 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
+     unload();
+     reload(m_section);
+     spawns().load(save_name);
++    Msg("* New game: spawn registry ready; initializing graph registry...");
+     graph().on_load();
++    Msg("* New game: graph registry ready; initializing object IDs...");
+     server().PerformIDgen(0x0000);
+     time_manager().init(m_section);
+     VERIFY(can_register_objects());
+ 
+     can_register_objects(false);
++    Msg("* New game: creating ALife objects...");
+     spawn_new_objects();
++    Msg("* New game: ALife objects created; running registration callbacks...");
+     can_register_objects(true);
+ 
+     CALifeObjectRegistry::OBJECT_REGISTRY::iterator I = objects().objects().begin();
+-- 
+2.51.1
+

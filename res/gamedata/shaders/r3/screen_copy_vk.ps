@@ -1,0 +1,12 @@
+// Matches ScreenCopyPass: set 0 / sampled image 0 / sampler 1.
+[[vk::binding(0, 0)]] Texture2D<float4> source_image : register(t0);
+[[vk::binding(1, 0)]] SamplerState source_sampler : register(s1);
+
+float4 main(float4 position : SV_Position, float2 uv : TEXCOORD0) : SV_Target
+{
+    float4 color = source_image.Sample(source_sampler, uv);
+#if defined(USE_AREF)
+    clip(color.a - 0.5);
+#endif
+    return color;
+}

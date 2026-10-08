@@ -17,7 +17,11 @@ CTexture* dxUIShader::GetBaseTexture() const
     if (!hShader)
         return nullptr;
 
-    const SPass& pass = *hShader->E[0]->passes[0];
+    const ref_selement& element = hShader->E[0];
+    if (!element || element->passes.empty() || !element->passes[0])
+        return nullptr;
+
+    const SPass& pass = *element->passes[0];
     if (!pass.T)
         return nullptr;
 
@@ -25,9 +29,19 @@ CTexture* dxUIShader::GetBaseTexture() const
     if (textures.empty())
         return nullptr;
 
-    const R_constant* sbase = pass.constants->get(baseTexture)._get();
+    const R_constant* sbase = pass.constants ? pass.constants->get(baseTexture)._get() : nullptr;
+    if (!sbase)
+        return textures.front().second._get();
 
-    return textures[sbase ? sbase->samp.index : 0].second._get();
+    const u32 baseTextureStage = sbase->samp.index;
+    for (const auto& [stage, texture] : textures)
+    {
+        if (stage == baseTextureStage)
+            return texture._get();
+    }
+
+    Msg("! UI shader has no texture bound to s_base stage %u", baseTextureStage);
+    return nullptr;
 }
 
 xrImTextureData dxUIShader::GetImGuiTextureId()
@@ -55,7 +69,12 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
         return false;
     }
 
-    res = { float(texture->get_Width()), float(texture->get_Height()) };
-    return true;
+    if (!texture->flags.bLoaded)
+        texture->Load();
+
+    const u32 width = texture->get_Width();
+    const u32 height = texture->get_Height();
+    res = { float(width), float(height) };
+    return width != 0 && height != 0;
 }
 } // namespace xray::render::RENDER_NAMESPACE

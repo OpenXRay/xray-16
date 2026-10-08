@@ -11,7 +11,10 @@ set(XRAY_DEFAULT_BUILD_TYPE ReleaseMasterGold)
 
 get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if (is_multi_config)
-    if (NOT CMAKE_DEFAULT_BUILD_TYPE)
+    # CMAKE_DEFAULT_BUILD_TYPE is supported by Ninja Multi-Config, but Visual
+    # Studio rejects it during generation. Other multi-config builds select
+    # their configuration with --config.
+    if (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config" AND NOT CMAKE_DEFAULT_BUILD_TYPE)
         set(CMAKE_DEFAULT_BUILD_TYPE ${XRAY_DEFAULT_BUILD_TYPE})
     endif()
     if (CMAKE_BUILD_TYPE)

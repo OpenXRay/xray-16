@@ -33,6 +33,13 @@ option(LUAJIT_USE_SYSMALLOC "Use the system provided memory allocator (realloc) 
 option(LUAJIT_USE_VALGRIND "This option is required to run LuaJIT under Valgrind. The Valgrind header files must be installed. You should enable debug information, too." OFF)
 option(LUAJIT_USE_GDBJIT "This is the client for the GDB JIT API. GDB 7.0 or higher is required to make use of it. See lj_gdbjit.c for details. Enabling this causes a non-negligible overhead, even when not running under GDB" OFF)
 
+set(LUAJIT_HOST_C_COMPILER "" CACHE FILEPATH
+    "C compiler for LuaJIT's build-time host tools")
+set(LUAJIT_HOST_EXTRA_LDFLAGS "" CACHE STRING
+    "Extra linker flags for LuaJIT's build-time host tools")
+set(LUAJIT_ARCH_PROBE_COMPILER "" CACHE FILEPATH
+    "GNU-compatible C compiler used to inspect LuaJIT target architecture macros")
+
 option(LUA_USE_APICHECK "Turn on assertions for the Lua/C API to debug problems with lua_* calls. This is rather slow, use only while developing C libraries/embeddings" OFF)
 option(LUA_USE_ASSERT "Turn on assertions for the whole LuaJIT VM. This significantly slows down everything. Use only if you suspect a problem with LuaJIT itself" OFF)
 
@@ -135,10 +142,46 @@ endif()
 
 set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
+if (ANDROID)
+    # CMake adds these flags to normal compile rules, but this architecture
+    # probe invokes the compiler directly. Keep the probe on the Android ABI
+    # instead of inspecting the host compiler target.
+    set(LUAJIT_TARGET_FLAGS
+        "--target=${CMAKE_C_COMPILER_TARGET}"
+        "--sysroot=${CMAKE_SYSROOT}"
+    )
+elseif (MSVC)
+    # The probe compiler is clang.exe, not clang-cl.exe. Give it a GNU-style
+    # target triple instead of passing the MSVC /DWIN32 flags from CMAKE_C_FLAGS.
+    if (CMAKE_GENERATOR_PLATFORM MATCHES "^(Win32|x86|i686)$" OR CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(LUAJIT_TARGET_FLAGS "--target=i686-pc-windows-msvc")
+    elseif (CMAKE_GENERATOR_PLATFORM MATCHES "^(ARM64|arm64|aarch64)$")
+        set(LUAJIT_TARGET_FLAGS "--target=aarch64-pc-windows-msvc")
+    else()
+        set(LUAJIT_TARGET_FLAGS "--target=x86_64-pc-windows-msvc")
+    endif()
+endif()
+
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
+if (LUAJIT_ARCH_PROBE_COMPILER STREQUAL "")
+    set(LUAJIT_ARCH_PROBE_COMPILER "${CMAKE_C_COMPILER}")
+endif()
+
+if (MSVC)
+    if (LUAJIT_ARCH_PROBE_COMPILER STREQUAL "${CMAKE_C_COMPILER}")
+        message(FATAL_ERROR "Set LUAJIT_ARCH_PROBE_COMPILER to a GNU-compatible clang.exe for MSVC builds")
+    endif()
+    # MSVC's /D, /W and /EH flags are not valid arguments to clang.exe.
+    # The target triple supplies the platform and architecture built-ins;
+    # retain only the LuaJIT feature defines needed by the generated headers.
+    set(LUAJIT_ARCH_PROBE_FLAGS ${LUAJIT_TARGET_FLAGS} ${XCFLAGS})
+else()
+    set(LUAJIT_ARCH_PROBE_FLAGS ${LUAJIT_TARGET_FLAGS} ${CCOPTIONS})
+endif()
+
 execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
+    COMMAND "${LUAJIT_ARCH_PROBE_COMPILER}" ${LUAJIT_ARCH_PROBE_FLAGS} -E lj_arch.h -dM
     WORKING_DIRECTORY "${LUAJIT_DIR}"
     OUTPUT_VARIABLE TESTARCH_OUTPUT
     ERROR_VARIABLE TESTARCH_ERROR
@@ -306,8 +349,25 @@ if (TARGET_LJARCH STREQUAL "ppc")
     endif()
 endif()
 
-set(HOST_ACFLAGS "${CMAKE_C_FLAGS} ${CCOPTIONS} ${TARGET_ARCH}")
-set(HOST_ALDFLAGS "${CMAKE_C_FLAGS}")
+# minilua/buildvm run on the build machine. Do not pass Android target flags
+# (for example -mthumb) to these host-only helper projects.
+set(HOST_ACFLAGS "${TARGET_ARCH}")
+set(HOST_ALDFLAGS "")
+
+if (ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4 AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    # LuaJIT's buildvm validates that its host pointer size matches the
+    # target ABI. Build the helper tools as i386 binaries for armeabi-v7a.
+    string(APPEND HOST_ACFLAGS " -m32")
+    string(APPEND HOST_ALDFLAGS " -m32")
+
+    # Some sandboxed Linux environments cannot execute i386 ELF binaries
+    # natively even when multilib compilation is available. Use qemu-i386
+    # when present; on regular Linux hosts the prefix remains empty.
+    find_program(LUAJIT_HOST_EXECUTABLE_PREFIX qemu-i386)
+    if (LUAJIT_HOST_EXECUTABLE_PREFIX MATCHES "-NOTFOUND$")
+        set(LUAJIT_HOST_EXECUTABLE_PREFIX "")
+    endif()
+endif()
 
 string(APPEND TARGET_XCFLAGS " -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
 
@@ -328,6 +388,22 @@ set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 # Generate buildvm arch header
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
 set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(MINILUA_FILE "${MINILUA_BINARY_DIR}/Release/minilua.exe")
+endif()
+
+set(LUAJIT_HOST_CMAKE_ARGS)
+if (LUAJIT_HOST_C_COMPILER)
+    string(JOIN " " LUAJIT_HOST_C_FLAGS_STRING ${HOST_ACFLAGS})
+    string(JOIN " " LUAJIT_HOST_LD_FLAGS_STRING ${HOST_ALDFLAGS})
+    if (LUAJIT_HOST_EXTRA_LDFLAGS)
+        string(APPEND LUAJIT_HOST_LD_FLAGS_STRING " ${LUAJIT_HOST_EXTRA_LDFLAGS}")
+    endif()
+    list(APPEND LUAJIT_HOST_CMAKE_ARGS
+        "-DCMAKE_C_COMPILER=${LUAJIT_HOST_C_COMPILER}"
+        "-DCMAKE_C_FLAGS=-static ${LUAJIT_HOST_C_FLAGS_STRING}"
+        "-DCMAKE_EXE_LINKER_FLAGS=-static ${LUAJIT_HOST_LD_FLAGS_STRING}")
+endif()
 
 add_custom_command(
     OUTPUT "${MINILUA_FILE}"
@@ -342,11 +418,12 @@ add_custom_command(
         -DLUA_USE_POSIX=${LUA_USE_POSIX}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
+        ${LUAJIT_HOST_CMAKE_ARGS}
     COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
 )
 
 add_custom_command(OUTPUT ${BUILDVM_ARCH}
-    COMMAND "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+    COMMAND ${LUAJIT_HOST_EXECUTABLE_PREFIX} "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
     DEPENDS "${MINILUA_FILE}"
 )
 
@@ -361,6 +438,9 @@ set_target_properties(buildvm_arch PROPERTIES
 # Buildvm
 set(BUILDVM_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm")
 set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/buildvm")
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/Release/buildvm.exe")
+endif()
 
 add_custom_command(
     OUTPUT "${BUILDVM_FILE}"
@@ -374,6 +454,7 @@ add_custom_command(
         -DBUILDVM_ARCH=${BUILDVM_ARCH}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
+        ${LUAJIT_HOST_CMAKE_ARGS}
     COMMAND ${CMAKE_COMMAND} --build ${BUILDVM_BINARY_DIR} --config Release --verbose
 )
 
@@ -409,7 +490,7 @@ endif()
 macro(add_buildvm_target target mode)
     add_custom_command(
         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${target}"
-        COMMAND "${BUILDVM_FILE}" ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
+        COMMAND ${LUAJIT_HOST_EXECUTABLE_PREFIX} "${BUILDVM_FILE}" ARGS -m ${mode} -o ${CMAKE_CURRENT_BINARY_DIR}/${target} ${ARGN}
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         DEPENDS buildvm ${ARGN}
     )
@@ -429,7 +510,24 @@ add_buildvm_target("lj_ffdef.h" "ffdef" ${LJLIB_C})
 add_buildvm_target("lj_libdef.h" "libdef" ${LJLIB_C})
 add_buildvm_target("lj_recdef.h" "recdef" ${LJLIB_C})
 add_buildvm_target("lj_folddef.h" "folddef" "${LUAJIT_DIR}/lj_opt_fold.c")
-add_buildvm_target("jit/vmdef.lua" "libvm" ${LJLIB_C})
+# buildvm writes vmdef.lua into this directory without creating it. Generate
+# the directory during configuration so clean parallel builds work on BSD too.
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/jit")
+add_buildvm_target("jit/vmdef.lua" "vmdef" ${LJLIB_C})
+
+# These headers are included by ordinary LuaJIT C sources. Listing them as
+# target sources alone does not make Ninja wait for their custom commands
+# before compiling those C files on a clean parallel build.
+add_custom_target(xrLuaJITGenerated DEPENDS
+    "${LJ_VM_SRC}"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_libdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_recdef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/lj_folddef.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/jit/vmdef.lua"
+)
+add_dependencies(xrLuaJIT xrLuaJITGenerated)
 
 target_sources(xrLuaJIT PRIVATE
     "${LJ_VM_SRC}"

@@ -39,6 +39,12 @@ struct Bonus_Money_Struct
     Bonus_Money_Struct(s32 M, u8 R, u8 K) : Money(M), Reason(R), Kills(K) {}
 };
 
+// Only the plain-data records above have a packed external layout.
+// game_PlayerState is a polymorphic runtime object containing libc++
+// containers and shared_str instances. Packing it makes those members
+// unaligned and causes ARM LDRD/STRD instructions to raise SIGBUS.
+#pragma pack(pop)
+
 struct game_PlayerState
 {
     u8 team;
@@ -123,6 +129,9 @@ private:
     DECLARE_SCRIPT_REGISTER_FUNCTION();
 };
 
+static_assert(alignof(game_PlayerState) >= alignof(void*), "game_PlayerState must keep its runtime members aligned");
+
+#pragma pack(push, 1)
 struct game_TeamState
 {
     int score{};

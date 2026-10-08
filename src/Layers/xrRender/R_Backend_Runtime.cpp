@@ -504,6 +504,23 @@ void CBackend::apply_lmaterial()
 
     CTexture* T = get_ActiveTexture(u32(C->samp.index));
     VERIFY(T);
+    if (!T)
+    {
+        // VERIFY is compiled out in release builds.  A sampler can legally be
+        // left unbound while a partially-created render pass is being warmed
+        // up during level loading; do not turn that transient state into a
+        // null dereference in apply_lmaterial().
+        static u32 unboundWarningCount = 0;
+        if (unboundWarningCount < 8)
+        {
+            Msg("! [render-trace] material sampler is unbound: constant='%s' stage=%u occurrence=%u",
+                C->name.c_str(), static_cast<u32>(C->samp.index), unboundWarningCount + 1);
+            if (unboundWarningCount == 7)
+                Msg("! [render-trace] further unbound material sampler warnings are suppressed");
+        }
+        ++unboundWarningCount;
+        return;
+    }
     float mtl = T->m_material;
 #ifdef DEBUG
     if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))

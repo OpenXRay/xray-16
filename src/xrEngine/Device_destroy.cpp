@@ -11,10 +11,25 @@ void CRenderDevice::Destroy()
     ZoneScoped;
     Log("Destroying Render...");
     b_is_Ready = false;
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] statistics begin");
+#endif
     Statistic->OnDeviceDestroy();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] renderer OnDeviceDestroy begin");
+#endif
     GEnv.Render->OnDeviceDestroy(false);
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] renderer OnDeviceDestroy end");
+#endif
     Memory.mem_compact();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] renderer Destroy begin");
+#endif
     GEnv.Render->Destroy();
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] renderer Destroy end");
+#endif
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();
@@ -26,6 +41,9 @@ void CRenderDevice::Destroy()
     xr_delete(Statistic);
 
     SDL_DestroyWindow(m_sdlWnd);
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[android-teardown] device destroy end");
+#endif
 }
 
 void CRenderDevice::Reset(bool precache /*= true*/)
@@ -45,7 +63,10 @@ void CRenderDevice::Reset(bool precache /*= true*/)
 
     m_imgui_render->OnDeviceResetEnd();
 
-    UpdateWindowProps(); // hack
+#if defined(XR_PLATFORM_ANDROID)
+    if (!strstr(Core.Params, "-renderer-vulkan"))
+#endif
+        UpdateWindowProps(); // The Vulkan reset already supplied drawable dimensions.
 
     SetupStates();
 

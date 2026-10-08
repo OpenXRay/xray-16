@@ -164,7 +164,13 @@ GLint ConvertTextureAddressMode(u32 Mode)
     case D3DTADDRESS_CLAMP:
         return (GLint)GL_CLAMP_TO_EDGE;
     case D3DTADDRESS_BORDER:
+#if defined(XR_PLATFORM_ANDROID)
+        // OpenGL ES 3.0 has no core border-color sampler mode.  Clamp to the
+        // edge and ignore the D3D border color on Android.
+        return (GLint)GL_CLAMP_TO_EDGE;
+#else
         return (GLint)GL_CLAMP_TO_BORDER;
+#endif
         //case D3DTADDRESS_MIRRORONCE:
         //	return ;
     default:

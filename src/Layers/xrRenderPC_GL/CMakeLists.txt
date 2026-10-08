@@ -9,6 +9,7 @@ target_sources(xrRender_GL PRIVATE
     gl_rendertarget_u_set_rt.cpp
     r2_R_sun.cpp
     r2_test_hw.cpp
+    AndroidGlslCompatRules.inl
     rgl_shaders.cpp
     stdafx.cpp
     stdafx.h
@@ -388,6 +389,9 @@ target_sources(xrRender_GL PRIVATE
     ../../../sdk/include/KHR/khrplatform.h
 )
 
+include("${XRAY_SOURCE_DIR}/cmake/XRay.Gli.cmake")
+xray_gli_include_dir(XRAY_GLI_INCLUDE_DIR)
+
 target_include_directories(xrRender_GL
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -398,6 +402,7 @@ target_include_directories(xrRender_GL
     "${XRAY_SOURCE_DIR}/sdk/include"
     "${XRAY_SOURCE_DIR}/sdk/include/DirectXMesh"
     "${XRAY_SOURCE_DIR}/Externals"
+    "${XRAY_GLI_INCLUDE_DIR}"
     "${XRAY_SOURCE_DIR}/Externals/gli"
     "${XRAY_SOURCE_DIR}/Externals/gli/external"
 )
@@ -413,6 +418,10 @@ target_link_libraries(xrRender_GL
     xrScriptEngine
     xrImGui
 )
+
+if (ANDROID)
+    target_link_libraries(xrRender_GL PRIVATE log)
+endif()
 
 target_compile_definitions(xrRender_GL
     PRIVATE

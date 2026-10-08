@@ -53,7 +53,12 @@ void glState::Apply()
             {
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MIN_LOD, 0.f));
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_MAX_LOD, FLT_MAX));
+#if !defined(XR_PLATFORM_ANDROID)
+                // GL_TEXTURE_LOD_BIAS is not a valid sampler-object parameter
+                // in OpenGL ES. Texture LOD is already controlled by the
+                // selected mip view on Android.
                 CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, ps_r__tf_Mipbias));
+#endif
             }
         }
     }
@@ -235,8 +240,14 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
         break;
     case D3DSAMP_BORDERCOLOR: /* D3DCOLOR */
     {
+#if !defined(XR_PLATFORM_ANDROID)
         GLuint color[] = {color_get_R(value), color_get_G(value), color_get_B(value), color_get_A(value)};
         CHK_GL(glSamplerParameterIuiv(m_samplerArray[stage], GL_TEXTURE_BORDER_COLOR, color));
+#else
+        // GLES 3.0 does not expose sampler border colors; the address mode
+        // conversion already maps D3DTADDRESS_BORDER to edge clamping.
+        UNUSED(value);
+#endif
     }
         break;
     case D3DSAMP_MAGFILTER: /* D3DTEXTUREFILTER filter to use for magnification */
@@ -252,10 +263,20 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
             value, currentFilter, true)));
         break;
     case D3DSAMP_MIPMAPLODBIAS: /* float Mipmap LOD bias */
+#if !defined(XR_PLATFORM_ANDROID)
         CHK_GL(glSamplerParameterf(m_samplerArray[stage], GL_TEXTURE_LOD_BIAS, value));
+#else
+        UNUSED(value);
+#endif
         break;
     case D3DSAMP_MAXMIPLEVEL: /* DWORD 0..(n-1) LOD index of largest map to use (0 == largest) */
+#if !defined(XR_PLATFORM_ANDROID)
+        // Base/max mip levels belong to texture objects, not GLES sampler
+        // objects. CTexture configures GL_TEXTURE_MAX_LEVEL during upload.
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));
+#else
+        UNUSED(value);
+#endif
         break;
     case D3DSAMP_MAXANISOTROPY: /* DWORD maximum anisotropy */
         if (GLAD_GL_ARB_texture_filter_anisotropic || GLAD_GL_EXT_texture_filter_anisotropic)

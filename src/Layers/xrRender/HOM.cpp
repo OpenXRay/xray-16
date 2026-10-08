@@ -11,6 +11,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+#include <cstring>
+
 namespace xray::render::RENDER_NAMESPACE
 {
 float psOSSR = .001f;
@@ -84,12 +86,18 @@ void CHOM::Load()
     CDB::Collector CL;
     {
         IReader* S = fs->open_chunk(1);
-        const auto begin = static_cast<HOM_poly*>(S->pointer());
-        const auto end   = static_cast<HOM_poly*>(S->end());
-        for (HOM_poly* poly = begin; poly != end; ++poly)
+        const auto* cursor = static_cast<const u8*>(S->pointer());
+        const auto* end = static_cast<const u8*>(S->end());
+        for (; cursor + sizeof(HOM_poly) <= end; cursor += sizeof(HOM_poly))
         {
-            CL.add_face_packed_D(poly->v1, poly->v2, poly->v3, poly->flags, 0.01f);
+            // Level chunks are byte-packed.  Casting the chunk pointer to a
+            // HOM_poly* performs unaligned 32-bit accesses and can fault on
+            // ARMv7.  Copy to aligned storage before reading its fields.
+            HOM_poly poly;
+            std::memcpy(&poly, cursor, sizeof(poly));
+            CL.add_face_packed_D(poly.v1, poly.v2, poly.v3, poly.flags, 0.01f);
         }
+        R_ASSERT2(cursor == end, "Corrupted level.hom chunk size");
         S->close();
     }
 
@@ -213,10 +221,10 @@ void CHOM::Render_DB(CFrustum& base)
     stats.VisibleTriangleCount = 0;
 
     // Perfrom selection, sorting, culling
-    for (auto &it : *xrc.r_get())
+    for (auto current = it; current != end; ++current)
     {
         // Control skipping
-        occTri& T = m_pTris[it.id];
+        occTri& T = m_pTris[current->id];
         u32 next = _frame + ::Random.randI(3, 10);
 
         // Test for good occluder - should be improved :)
@@ -227,7 +235,7 @@ void CHOM::Render_DB(CFrustum& base)
         }
 
         // Access to triangle vertices
-        CDB::TRI& t = m_pModel->get_tris()[it.id];
+        CDB::TRI& t = m_pModel->get_tris()[current->id];
         Fvector* v = m_pModel->get_verts();
         src.clear();
         dst.clear();

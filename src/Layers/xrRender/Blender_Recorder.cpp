@@ -204,12 +204,17 @@ void CBlender_Compile::PassEnd()
 
 void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullptr*/, pcstr _hs /*= nullptr*/, pcstr _ds /*= nullptr*/)
 {
+    pcstr effectivePs = _ps;
+#if defined(XR_PLATFORM_ANDROID) && defined(USE_OGL)
+    if (_ps && 0 == xr_stricmp(_ps, "null"))
+        effectivePs = "dumb";
+#endif
 #if defined(USE_OGL)
-    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, _hs, _ds);
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, effectivePs, _gs, _hs, _ds);
     if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
 #endif
     {
-        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        dest.ps = RImplementation.Resources->_CreatePS(effectivePs);
         ctable.merge(&dest.ps->constants);
         u32 flags = 0;
 #if defined(USE_DX11)

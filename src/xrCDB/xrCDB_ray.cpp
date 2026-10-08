@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "RayQuerySimd.h"
 #pragma hdrstop // ???
 
 #include "xrCore/_fbox.h"
@@ -7,6 +8,8 @@
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+// The slab test uses SSE min/max operand ordering to filter 0 * infinity.
+#define SSE2NEON_PRECISE_MINMAX 1
 #include "sse2neon/sse2neon.h"
 #elif defined(XR_ARCHITECTURE_RISCV)
 #include "sse2rvv/sse2rvv.h"
@@ -14,13 +17,15 @@
 #error Add your platform here
 #endif
 
+#include "RayAabbSimd.h"
+
 namespace CDB
 {
 using namespace Opcode;
 
 struct alignas(16) vec_t : public Fvector3
 {
-    float pad;
+    float pad = 0;
 };
 // static vec_t	vec_c	( float _x, float _y, float _z)	{ vec_t v; v.x=_x;v.y=_y;v.z=_z;v.pad=0; return v; }
 
@@ -139,77 +144,10 @@ ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
     return false;
 }
 
-// turn those verbose intrinsics into something readable.
-#define loadps(mem) _mm_load_ps((const float* const)(mem))
-#define storess(ss, mem) _mm_store_ss((float* const)(mem), (ss))
-#define minss _mm_min_ss
-#define maxss _mm_max_ss
-#define minps _mm_min_ps
-#define maxps _mm_max_ps
-#define mulps _mm_mul_ps
-#define subps _mm_sub_ps
-#define rotatelps(ps) _mm_shuffle_ps((ps), (ps), 0x39) // a,b,c,d -> b,c,d,a
-#define muxhps(low, high) _mm_movehl_ps((low), (high)) // low{a,b,c,d}|high{e,f,g,h} = {c,d,g,h}
-
-static constexpr float flt_plus_inf = std::numeric_limits<float>::infinity();
-alignas(16) static constexpr float ps_cst_plus_inf[4] = { flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf },
-                                   ps_cst_minus_inf[4] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
-
 ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 {
-    // you may already have those values hanging around somewhere
-    const __m128 plus_inf = loadps(ps_cst_plus_inf), minus_inf = loadps(ps_cst_minus_inf);
-
-    // use whatever's appropriate to load.
-    const __m128 box_min = loadps(&box.min), box_max = loadps(&box.max), pos = loadps(&ray.pos),
-                 inv_dir = loadps(&ray.inv_dir);
-
-    // use a div if inverted directions aren't available
-    const __m128 l1 = mulps(subps(box_min, pos), inv_dir);
-    const __m128 l2 = mulps(subps(box_max, pos), inv_dir);
-
-    // the order we use for those min/max is vital to filter out
-    // NaNs that happens when an inv_dir is +/- inf and
-    // (box_min - pos) is 0. inf * 0 = NaN
-    const __m128 filtered_l1a = minps(l1, plus_inf);
-    const __m128 filtered_l2a = minps(l2, plus_inf);
-
-    const __m128 filtered_l1b = maxps(l1, minus_inf);
-    const __m128 filtered_l2b = maxps(l2, minus_inf);
-
-    // now that we're back on our feet, test those slabs.
-    __m128 lmax = maxps(filtered_l1a, filtered_l2a);
-    __m128 lmin = minps(filtered_l1b, filtered_l2b);
-
-    // unfold back. try to hide the latency of the shufps & co.
-    const __m128 lmax0 = rotatelps(lmax);
-    const __m128 lmin0 = rotatelps(lmin);
-    lmax = minss(lmax, lmax0);
-    lmin = maxss(lmin, lmin0);
-
-    const __m128 lmax1 = muxhps(lmax, lmax);
-    const __m128 lmin1 = muxhps(lmin, lmin);
-    lmax = minss(lmax, lmax1);
-    lmin = maxss(lmin, lmin1);
-
-    const bool ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
-
-    storess(lmin, &dist);
-    // storess	(lmax, &rs.t_far);
-
-    return ret;
+    return CDB::ray_aabb_simd(&box.min.x, &box.max.x, &ray.pos.x, &ray.inv_dir.x, dist);
 }
-
-#undef loadps
-#undef storess
-#undef minss
-#undef maxss
-#undef minps
-#undef maxps
-#undef mulps
-#undef subps
-#undef rotatelps
-#undef muxhps
 
 template <bool bUseSSE, bool bCull, bool bFirst, bool bNearest>
 class alignas(16) ray_collider
@@ -433,6 +371,88 @@ public:
     }
 };
 
+#if defined(XR_PLATFORM_ANDROID)
+bool MODEL::audit_ray_path_step(RayPathAudit& audit, const Fvector& origin, const Fvector& direction,
+    u32 triangle, float referenceRange, u32 frame, u32 query) const
+{
+    syncronize();
+    const auto* nodes = static_cast<const AABBNoLeafTree*>(tree->GetTree())->GetNodes();
+    if (!audit.started)
+    {
+        audit.started = true;
+        audit.path.push_back({nodes, 0});
+    }
+    const auto start = CPU::QPC();
+    const auto budget = std::max(u64(1), CPU::qpc_freq / 1000);
+    for (u32 work = 0; !audit.path.empty() && work < 32768; ++work)
+    {
+        if (work && work % 64 == 0 && CPU::QPC() - start >= budget)
+            return false;
+        auto& entry = audit.path.back();
+        if (entry.child == 2)
+        {
+            audit.path.pop_back();
+            continue;
+        }
+        const bool negative = entry.child++ != 0;
+        const auto* node = entry.node;
+        ++audit.visited;
+        const bool leaf = negative ? node->HasLeaf2() : node->HasLeaf();
+        if (!leaf)
+        {
+            audit.path.push_back({negative ? node->GetNeg() : node->GetPos(), 0});
+            continue;
+        }
+        if ((negative ? node->GetPrimitive2() : node->GetPrimitive()) != triangle)
+            continue;
+
+        ray_collider<false, false, false, true> scalar;
+        scalar._init(nullptr, verts, tris, origin, direction, 500.f);
+        float u = 0, v = 0, range = 0;
+        const bool triangleHit = scalar._tri(tris[triangle].verts, u, v, range);
+        COLLIDER simdResult;
+        ray_collider<true, false, false, true> simd;
+        simd._init(&simdResult, verts, tris, origin, direction, 500.f);
+        simd.ray.pos.pad = simd.ray.inv_dir.pad = simd.ray.fwd_dir.pad = 0;
+        simd._stab(nodes);
+        Msg("[ray-path] frame=%u query=%u target=%u found=1 depth=%zu visited=%u "
+            "float-hit=%d float-range=%.9g reference-range=%.9g simd-id=%d simd-range=%.9g",
+            frame, query, triangle, audit.path.size(), audit.visited, triangleHit, range, referenceRange,
+            simdResult.r_count() ? simdResult.r_begin()->id : -1,
+            simdResult.r_count() ? simdResult.r_begin()->range : 0.f);
+        u32 rejected = 0;
+        for (const auto& ancestor : audit.path)
+        {
+            const auto& box = ancestor.node->mAABB;
+            const Fvector center{box.mCenter.x, box.mCenter.y, box.mCenter.z};
+            const Fvector extent{box.mExtents.x, box.mExtents.y, box.mExtents.z};
+            Fvector point{};
+            float distance = 0;
+            const bool fpuHit = scalar._box_fpu(center, extent, point);
+            const bool simdHit = simd._box_sse(center, extent, distance);
+            const float fpuDistance = fpuHit ? point.distance_to(origin) : -1.f;
+            if (!fpuHit || !simdHit || fpuDistance > referenceRange + EPS_L || distance > referenceRange + EPS_L)
+            {
+                ++rejected;
+                Msg("[ray-path] frame=%u query=%u node=%zu fpu=%d entry=%.9g simd=%d entry=%.9g "
+                    "center=(%.9g,%.9g,%.9g) extent=(%.9g,%.9g,%.9g)",
+                    frame, query, size_t(ancestor.node - nodes), fpuHit, fpuDistance, simdHit, distance,
+                    center.x, center.y, center.z, extent.x, extent.y, extent.z);
+            }
+        }
+        Msg("[ray-path] end frame=%u query=%u rejected-ancestors=%u", frame, query, rejected);
+        audit.path.clear();
+        return true;
+    }
+    if (audit.path.empty())
+    {
+        Msg("[ray-path] frame=%u query=%u target=%u found=0 visited=%u", frame, query, triangle, audit.visited);
+        return true;
+    }
+    return false;
+}
+#endif
+
 void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
     ZoneScoped;
@@ -443,7 +463,7 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_star
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (CPU::HasSSE)
+    if (CDB::use_simd_ray_query(CPU::HasSSE))
     {
         // SSE
         // Binary dispatcher

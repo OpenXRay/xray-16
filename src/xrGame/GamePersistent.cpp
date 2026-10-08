@@ -70,7 +70,15 @@ CGamePersistent::CGamePersistent()
 
     eQuickLoad = Engine.Event.Handler_Attach("Game:QuickLoad", this);
     const Fvector3* DofValue = Console->GetFVectorPtr("r2_dof");
-    SetBaseDof(*DofValue);
+    if (DofValue)
+        SetBaseDof(*DofValue);
+    else
+    {
+        // The Vulkan renderer does not register the legacy R2 depth-of-field
+        // console command. Keep the game's default DOF value available.
+        Msg("[renderer-vulkan] r2_dof console command absent; using default depth of field");
+        SetBaseDof(Fvector3().set(-1.25f, 1.4f, 600.f));
+    }
 }
 
 CGamePersistent::~CGamePersistent()
@@ -426,6 +434,10 @@ void CGamePersistent::update_logo_intro()
 extern int g_keypress_on_start;
 void CGamePersistent::game_loaded()
 {
+    Msg("[load-trace] game-loaded.check precache=%u level-ready=%d keypress=%d wait-input=%d single=%d",
+        Device.dwPrecacheFrame, g_pGameLevel && g_pGameLevel->bReady ? 1 : 0,
+        g_keypress_on_start, load_screen_renderer.NeedsUserInput() ? 1 : 0,
+        m_game_params.m_e_game_type == eGameIDSingle ? 1 : 0);
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
@@ -435,7 +447,9 @@ void CGamePersistent::game_loaded()
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_game_loaded);
-            if (!m_intro->Start("game_loaded"))
+            const bool started = m_intro->Start("game_loaded");
+            Msg("[load-trace] game-loaded.sequencer started=%d", started ? 1 : 0);
+            if (!started)
                 m_intro->Destroy();
         }
     }
@@ -443,6 +457,7 @@ void CGamePersistent::game_loaded()
 
 void CGamePersistent::update_game_loaded()
 {
+    Msg("[load-trace] game-loaded.dismiss frame=%u", Device.dwFrame);
     xr_delete(m_intro);
     load_screen_renderer.Stop();
     start_game_intro();
@@ -450,6 +465,10 @@ void CGamePersistent::update_game_loaded()
 
 void CGamePersistent::start_game_intro()
 {
+    Msg("[load-trace] game-intro.check allowed=%d ready=%d precache=%u new=%d",
+        allow_game_intro() ? 1 : 0, g_pGameLevel && g_pGameLevel->bReady ? 1 : 0,
+        Device.dwPrecacheFrame, m_game_params.m_new_or_load[0] &&
+            xr_stricmp(m_game_params.m_new_or_load, "new") == 0 ? 1 : 0);
     if (!allow_game_intro())
     {
         return;

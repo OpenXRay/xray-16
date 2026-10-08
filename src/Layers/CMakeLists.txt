@@ -5,3 +5,6 @@ if (WIN32)
 endif()
 
 add_subdirectory(xrRenderPC_GL)
+# Compile the SDL-backed Vulkan layer on desktop too so platform WSI code is
+# covered by the normal Windows, Linux and macOS build matrix.
+add_subdirectory(xrRenderVK)

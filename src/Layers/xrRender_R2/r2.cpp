@@ -378,6 +378,13 @@ void CRender::create()
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
 
+#if defined(XR_PLATFORM_ANDROID)
+    Msg("[render-quality] shadow-map=%u advanced-pp=%d water-reflections=%u sun-quality=%u "
+        "sun-shafts=%u ssao=%u texture-lod=%d anisotropy=%d",
+        o.smapsize, o.advancedpp, ps_r_water_reflection, ps_r_sun_quality,
+        ps_r_sun_shafts, ps_r_ssao, psTextureLOD, ps_r__tf_Anisotropic);
+#endif
+
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);

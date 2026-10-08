@@ -13,6 +13,8 @@
 
 #include "UIHelper.h"
 #include "xrUICore/XML/UITextureMaster.h"
+#include "xrEngine/device.h"
+#include "Include/xrRender/UIShader.h"
 
 UILoadingScreen::UILoadingScreen()
     : CUIWindow("UILoadingScreen"),
@@ -74,6 +76,27 @@ void UILoadingScreen::Initialize()
     loadingHeader = UIHelper::CreateStatic(uiXml, "loading_header", this, false);
     loadingTipNumber = UIHelper::CreateStatic(uiXml, "loading_tip_number", this, false);
     loadingTip = UIHelper::CreateStatic(uiXml, "loading_tip", this, false);
+#if defined(XR_PLATFORM_ANDROID)
+    if (strstr(Core.Params, "-renderer-vulkan") && loadingProgress)
+    {
+        auto& foreground = loadingProgress->m_UIProgressItem;
+        auto& background = loadingProgress->m_UIBackgroundItem;
+        Fvector2 foregroundSize{}, backgroundSize{};
+        const bool foregroundReady = foreground.GetShader() &&
+            foreground.GetShader()->GetBaseTextureResolution(foregroundSize);
+        const bool backgroundReady = background.GetShader() &&
+            background.GetShader()->GetBaseTextureResolution(backgroundSize);
+        const Frect& foregroundRect = foreground.GetTextureRect();
+        const Frect& backgroundRect = background.GetTextureRect();
+        Msg("[renderer-vulkan] loading.progress xml=%d ui=(%.1f,%.1f) size=(%.1f,%.1f) front=%d atlas=(%.0f,%.0f) rect=(%.0f,%.0f)-(%.0f,%.0f) back=%d atlas=(%.0f,%.0f) rect=(%.0f,%.0f)-(%.0f,%.0f)",
+            loaded ? 1 : 0, loadingProgress->GetWndPos().x, loadingProgress->GetWndPos().y,
+            loadingProgress->GetWidth(), loadingProgress->GetHeight(), foregroundReady ? 1 : 0,
+            foregroundSize.x, foregroundSize.y, foregroundRect.x1, foregroundRect.y1,
+            foregroundRect.x2, foregroundRect.y2, backgroundReady ? 1 : 0,
+            backgroundSize.x, backgroundSize.y, backgroundRect.x1, backgroundRect.y1,
+            backgroundRect.x2, backgroundRect.y2);
+    }
+#endif
 }
 
 void UILoadingScreen::Update(const int stagesCompleted, const int stagesTotal)
@@ -96,14 +119,74 @@ void UILoadingScreen::Update(const int stagesCompleted, const int stagesTotal)
 void UILoadingScreen::Draw()
 {
     ScopeLock scope(&loadingLock);
+    if (Device.dwPrecacheFrame && Device.dwPrecacheFrame % 10 == 0 && loadingProgress)
+        Msg("[load-trace] ui.loading.draw frame=%u precache=%u progress=%.1f shown=%d logo=%d",
+            Device.dwFrame, Device.dwPrecacheFrame, loadingProgress->GetProgressPos(),
+            IsShown() ? 1 : 0, loadingLogo && loadingLogo->IsShown() ? 1 : 0);
     CUIWindow::Draw();
+#if defined(XR_PLATFORM_ANDROID)
+    if (strstr(Core.Params, "-renderer-vulkan") && loadingProgress)
+    {
+        // The full-screen level artwork may cover progress bars declared
+        // under the background in a game's UI XML. Draw progress last.
+        loadingProgress->Draw();
+    }
+#endif
 }
 
 void UILoadingScreen::SetLevelLogo(const char* name)
 {
     ScopeLock scope(&loadingLock);
 
-    loadingLogo->InitTexture(name);
+    const bool describedTexture = loadingLogo->InitTexture(name);
+#if defined(XR_PLATFORM_ANDROID)
+    if (strstr(Core.Params, "-renderer-vulkan") && Device.dwWidth && Device.dwHeight)
+    {
+        Frect source = loadingLogo->GetUIStaticItem().GetTextureRect();
+        // Raw game textures do not update UIStaticItem's saved texture rect.
+        // Fetch the new texture's extent instead of cropping the previous logo again.
+        if (!describedTexture && loadingLogo->GetShader() && loadingLogo->GetShader()->inited())
+        {
+            Fvector2 extent{};
+            if (loadingLogo->GetShader()->GetBaseTextureResolution(extent))
+                source.set(0.f, 0.f, extent.x, extent.y);
+        }
+        if (source.width() > 0.f && source.height() > 0.f)
+        {
+            const float imageAspect = source.width() / source.height();
+            const float screenAspect = float(Device.dwWidth) / float(Device.dwHeight);
+            Frect crop = source;
+            if (imageAspect > screenAspect)
+            {
+                const float width = source.width() * screenAspect / imageAspect;
+                crop.x1 += (source.width() - width) * .5f;
+                crop.x2 = crop.x1 + width;
+            }
+            else
+            {
+                const float height = source.height() * imageAspect / screenAspect;
+                crop.y1 += (source.height() - height) * .5f;
+                crop.y2 = crop.y1 + height;
+            }
+            loadingLogo->SetTextureRect(crop);
+            loadingLogo->SetWndPos({0.f, 0.f});
+            loadingLogo->SetAlignment(waNone);
+            loadingLogo->SetWndSize({UI_BASE_WIDTH, UI_BASE_HEIGHT});
+            loadingLogo->SetStretchTexture(true);
+            Frect rect;
+            loadingLogo->GetAbsoluteRect(rect);
+            Fvector2 pixelLT, pixelRB;
+            UI().ClientToScreenScaled(pixelLT, rect.x1, rect.y1);
+            UI().ClientToScreenScaled(pixelRB, rect.x2, rect.y2);
+            Msg("[renderer-vulkan] loading.logo '%s' described=%d source=%.0fx%.0f crop=(%.1f,%.1f)-(%.1f,%.1f) screen=%ux%u",
+                name ? name : "<null>", describedTexture ? 1 : 0, source.width(), source.height(), crop.x1, crop.y1, crop.x2, crop.y2,
+                Device.dwWidth, Device.dwHeight);
+            Msg("[renderer-vulkan] loading.bounds ui=(%.1f,%.1f)-(%.1f,%.1f) pixels=(%.1f,%.1f)-(%.1f,%.1f) window=%dx%d",
+                rect.x1, rect.y1, rect.x2, rect.y2, pixelLT.x, pixelLT.y, pixelRB.x, pixelRB.y,
+                Device.m_rcWindowClient.w, Device.m_rcWindowClient.h);
+        }
+    }
+#endif
 }
 
 void UILoadingScreen::SetStageTitle(const char* title)

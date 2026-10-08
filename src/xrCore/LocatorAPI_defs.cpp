@@ -48,6 +48,7 @@ FS_Path::FS_Path(pcstr _Root, pcstr _Add, pcstr _DefExt, pcstr _FilterCaption, u
     m_FilterCaption = _FilterCaption ? xr_fs_strlwr(xr_strdup(_FilterCaption)) : 0;
     m_Add = _Add ? xr_fs_strlwr(xr_strdup(_Add)) : 0;
     m_Root = _Root ? xr_fs_strlwr(xr_strdup(_Root)) : 0;
+    m_Overlay = nullptr;
     m_Flags.assign(flags);
 #ifdef _EDITOR
     // Editor(s)/User(s) wants pathes already created in "real" file system :)
@@ -62,6 +63,7 @@ FS_Path::~FS_Path()
     xr_free(m_Add);
     xr_free(m_DefExt);
     xr_free(m_FilterCaption);
+    xr_free(m_Overlay);
 }
 
 void FS_Path::_set(pcstr add)
@@ -97,6 +99,21 @@ void FS_Path::_set_root(pcstr root)
     m_Path = xr_fs_strlwr(xr_strdup(temp));
 }
 
+void FS_Path::_set_overlay(pcstr root, pcstr add)
+{
+    xr_free(m_Overlay);
+    m_Overlay = nullptr;
+    if (!root || !root[0])
+        return;
+
+    string_path temp;
+    strconcat(sizeof(temp), temp, root, add ? add : "");
+    if (temp[0] && temp[xr_strlen(temp) - 1] != _DELIMITER && temp[xr_strlen(temp) - 1] != '/')
+        xr_strcat(temp, DELIMITER);
+    restore_path_separators(temp);
+    m_Overlay = xr_fs_strlwr(xr_strdup(temp));
+}
+
 pcstr FS_Path::_update(string_path& dest, pcstr src) const
 {
     R_ASSERT(dest);
@@ -112,10 +129,38 @@ pcstr FS_Path::_update(string_path& dest, pcstr src) const
         xr_strcpy(dest, fullPath);
         return dest;
     }
+
+    if (m_Overlay)
+    {
+        strconcat(fullPath, m_Overlay, temp);
+        if (FS.exist(fullPath, FSType::External) || FS.exist(fullPath, FSType::Virtual))
+        {
+            xr_strcpy(dest, fullPath);
+            return dest;
+        }
+    }
 #endif
 
     xr_strlwr(temp);
     strconcat(sizeof(dest), dest, m_Path, temp);
+
+    // The Android engine-data tree is a fallback for renderer-owned files,
+    // not a replacement for the selected game's gamedata.  Preserve PC and
+    // mod overrides even when their on-disk spelling differs in case.
+    if (FS.exist(dest, FSType::External) || FS.exist(dest, FSType::Virtual))
+        return xr_fs_strlwr(dest);
+
+    if (m_Overlay)
+    {
+        string_path overlayPath;
+        strconcat(sizeof(overlayPath), overlayPath, m_Overlay, temp);
+        if (FS.exist(overlayPath, FSType::External) || FS.exist(overlayPath, FSType::Virtual))
+        {
+            xr_strcpy(dest, overlayPath);
+            return dest;
+        }
+    }
+
     return xr_fs_strlwr(dest);
 }
 /*

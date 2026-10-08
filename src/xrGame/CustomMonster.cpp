@@ -1323,6 +1323,7 @@ Fvector CCustomMonster::predict_position(const float& time_to_check) const
 Fvector CCustomMonster::target_position() const { return (movement().target_position()); }
 void CCustomMonster::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool local_animation)
 {
+    if (!b) return;
     bool already_initialized = animation_movement_controlled();
     inherited::create_anim_mov_ctrl(b, start_pose, local_animation);
 

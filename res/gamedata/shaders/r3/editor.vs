@@ -13,6 +13,8 @@ struct v2p
 };
 
 uniform float4 		tfactor;
+// Packed COLOR0 is BGRA in the level vertex stream.
+float4 unpack_D3DCOLOR(float4 color) { return color.bgra; }
 v2p main (vf i)
 {
 	v2p 		o;

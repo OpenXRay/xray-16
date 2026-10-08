@@ -89,8 +89,7 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
     VERIFY(dwWidth  != 0);
     VERIFY(dwHeight != 0);
 
-    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(3, buffers));
 }
 
@@ -160,8 +159,7 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
     VERIFY(dwWidth[cmd_list.context_id]  != 0);
     VERIFY(dwHeight[cmd_list.context_id] != 0);
 
-    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(2, buffers));
 }
 
@@ -186,8 +184,7 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint 
     cmd_list.set_RT(_3, 2);
     cmd_list.set_ZB(zb);
 
-    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(3, buffers));
 }
 } // namespace xray::render::RENDER_NAMESPACE

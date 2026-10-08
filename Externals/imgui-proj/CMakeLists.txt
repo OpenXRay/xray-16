@@ -30,6 +30,13 @@ if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL 
     )
 endif()
 
+if (ANDROID)
+    target_link_libraries(xrImGui
+        PRIVATE
+        GLESv3
+    )
+endif()
+
 target_compile_definitions(xrImGui
     PUBLIC
     IMGUI_DISABLE_OBSOLETE_KEYIO

@@ -7,6 +7,7 @@
 
 #include "EngineAPI.h"
 #include "XR_IOConsole.h"
+#include "AndroidRendererChoice.h"
 
 #include "xrCore/xr_token.h"
 
@@ -52,8 +53,17 @@ void CEngineAPI::SelectRenderer()
 {
     ZoneScoped;
 
+#if defined(XR_PLATFORM_ANDROID)
+    // A rejected console token must not silently leave the previous GLES mode selected.
+    const bool explicit_vulkan = xray::render::has_renderer_option(Core.Params, "-renderer-vulkan");
+#endif
+
     // User has some renderer selected, find it
     pcstr selected_mode = Console->GetString("renderer");
+#if defined(XR_PLATFORM_ANDROID)
+    R_ASSERT2(!explicit_vulkan || xr_strcmp(selected_mode, "renderer_vulkan") == 0,
+        "Explicit Vulkan selection was rejected by the renderer console command");
+#endif
     const auto it = std::find_if(renderModes.begin(), renderModes.end(), [selected_mode](const auto& pair)
     {
         return xr_strcmp(selected_mode, pair.first) == 0;
@@ -65,6 +75,10 @@ void CEngineAPI::SelectRenderer()
         if (it->second->CheckGameRequirements())
             selectedRenderer = it->second;
     }
+
+    // A request for Vulkan must never become a successful GLES game launch.
+    if (!selectedRenderer && xr_strcmp(selected_mode, "renderer_vulkan") == 0)
+        R_ASSERT2(false, "Vulkan gameplay renderer is unavailable: inspect the Vulkan probe and shader resource diagnostics");
 
     // Renderer is either fully unsupported (hardware)
     // or we don't comply with it's requirements (e.g. shaders missing)
@@ -115,6 +129,8 @@ void CEngineAPI::Destroy()
     if (gameModule)
         gameModule->finalize();
 
+    if (selectedRenderer)
+        selectedRenderer->ClearEnv();
     selectedRenderer = nullptr;
 
     pCreate = nullptr;
@@ -123,7 +139,7 @@ void CEngineAPI::Destroy()
     XRC.r_clear_compact();
 }
 
-void CEngineAPI::CreateRendererList(const std::array<RendererModule*, 2>& modules)
+void CEngineAPI::CreateRendererList(const std::array<RendererModule*, 3>& modules)
 {
     if (!VidQualityToken.empty())
         return;

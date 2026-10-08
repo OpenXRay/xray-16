@@ -18,7 +18,34 @@
 #endif // DEBUG
 
 #ifdef PURE_DYNAMIC_CAST
+#if defined(XR_PLATFORM_ANDROID)
+#ifndef XRAY_ANDROID_SMART_CAST_DEFINED
+#define XRAY_ANDROID_SMART_CAST_DEFINED
+// Vulkan visuals keep animation state in a separate object. The renderer's
+// virtual casts bridge that composition; RTTI alone only sees the visual.
+#include <type_traits>
+class IRenderVisual;
+class IKinematics;
+class IKinematicsAnimated;
+template <typename To, typename From>
+To android_smart_cast(From* value)
+{
+    if constexpr (std::is_same_v<To, IKinematics*> &&
+        std::is_convertible_v<From*, IRenderVisual*>)
+        return value ? value->dcast_PKinematics() : nullptr;
+    else if constexpr (std::is_same_v<To, IKinematicsAnimated*> &&
+        std::is_convertible_v<From*, IRenderVisual*>)
+        return value ? value->dcast_PKinematicsAnimated() : nullptr;
+    else
+        return dynamic_cast<To>(value);
+}
+template <typename To, typename From>
+To android_smart_cast(From& value) { return dynamic_cast<To>(value); }
+#endif
+#define smart_cast android_smart_cast
+#else
 #define smart_cast dynamic_cast
+#endif
 #else
 #define TL_FAST_COMPILATION
 #include <loki/Typelist.h>

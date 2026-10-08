@@ -194,6 +194,10 @@ private:
     void MouseUpdate();
     void KeyUpdate();
     void ControllerUpdate();
+#if defined(XR_PLATFORM_ANDROID)
+    void TouchUpdate();
+    u32 touchControlState{};
+#endif
 
     void OpenController(int idx);
 

@@ -277,8 +277,13 @@ void CRenderTarget::phase_combine()
     if (_menu_pp)
         PP_Complex = FALSE;
 
-    // HOLGER - HACK
+    // Android presents the engine FBO explicitly, so it does not need the
+    // historical desktop copy-through-postprocess workaround. Keep every
+    // requested post-effect, but avoid an extra full-resolution target and
+    // fullscreen pass when u_need_PP() says no effect is active.
+#if !defined(XR_PLATFORM_ANDROID)
     PP_Complex = TRUE;
+#endif
 
     // Combine everything + perform AA
     if (RImplementation.o.msaa)

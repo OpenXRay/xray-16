@@ -51,6 +51,7 @@ public:
     //	Device state
     virtual DeviceState GetDeviceState() override;
     virtual bool GetForceGPU_REF() override;
+    virtual u32 GetCacheStatCalls() override;
     virtual u32 GetCacheStatPolys() override;
     virtual void Begin() override;
     virtual void Clear() override;
