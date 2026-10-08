@@ -4,6 +4,7 @@
 #include "xrParticles/psystem.h"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <limits>
 
@@ -244,6 +245,13 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             v.normal[0] = 0.f; v.normal[1] = 1.f; v.normal[2] = 0.f;
             v.uv[0] = u0 + (corner == 0 || corner == 3 ? 0.f : du);
             v.uv[1] = v0 + (corner < 2 ? 0.f : dv);
+            // FVF::LIT sends the simulation's ARGB tint to the particle
+            // shader. Ignoring it turns a translucent muzzle sprite into a
+            // large opaque patch and loses its animated fade-out.
+            v.baked[0] = float((p.color >> 16) & 255) / 255.f;
+            v.baked[1] = float((p.color >> 8) & 255) / 255.f;
+            v.baked[2] = float(p.color & 255) / 255.f;
+            v.baked[3] = float((p.color >> 24) & 255) / 255.f;
         }
         for (u32 j = 0; j < 6; ++j)
             indices[i * 6 + j] = i * 4 + (j == 0 || j == 3 ? 0 :
@@ -251,8 +259,19 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
-    return hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(), count * 6, mvp, material_) :
-        pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(), count * 6, mvp, material_);
+    std::string shader = def_->shader;
+    std::transform(shader.begin(), shader.end(), shader.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    const char* mode = shader.find("alpha_add") != std::string::npos ? "alpha_add" :
+        shader.find("\\add") != std::string::npos || shader.find("\\xadd") != std::string::npos ?
+            "additive" : "blended";
+    const std::string fragment = std::string("vk\\particle_") +
+        (hud ? "hud_" : "world_") + mode + ".ps";
+    constexpr const char* vertex = "vk\\level_opaque.vs";
+    return hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
+            count * 6, mvp, material_, 0, vertex, fragment.c_str()) :
+        pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
+            count * 6, mvp, material_, 0, vertex, fragment.c_str());
 }
 
 VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog,

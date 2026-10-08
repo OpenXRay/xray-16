@@ -97,6 +97,20 @@ bool DeferredShaderFactory::reload_game_pipelines(VkDevice device, const ShaderM
             return false;
         }
     }
+    for (const char* mode : {"blended", "additive", "alpha_add"})
+        for (bool hud : {false, true})
+        {
+            const std::string vertex_name = "vk\\level_opaque.vs";
+            const std::string fragment_name = std::string("vk\\particle_") +
+                (hud ? "hud_" : "world_") + mode + ".ps";
+            if (!resources.pipeline(pass, vertex_name, fragment_name,
+                    hud ? SurfaceMode::Opaque : SurfaceMode::Transparent,
+                    hud, false, error))
+            {
+                pass.abort_game_pipeline_reload();
+                return false;
+            }
+        }
     struct SkinnedFragment { const char* name; SurfaceMode mode; };
     constexpr SkinnedFragment skinned_fragments[]{
         {"object_opaque", SurfaceMode::Opaque},

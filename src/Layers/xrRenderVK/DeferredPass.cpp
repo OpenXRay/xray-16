@@ -17,7 +17,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     VkShaderModule vertex, VkShaderModule fragment, bool geometry_input, bool gbuffer,
     bool transparent, bool hud, bool skinned,
     const ScenePassDispatch& vk, VkPipeline& pipeline, std::string& error,
-    const char* label, bool shadow = false, bool additive = false)
+    const char* label, bool shadow = false, bool additive = false,
+    bool alpha_additive = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -53,13 +54,20 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     raster.cullMode = VK_CULL_MODE_NONE;
     raster.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     raster.lineWidth = 1.0f;
+    // Depth precision on shallow terrain slopes otherwise produces long,
+    // repeating self-shadow bands. Apply bias while writing shadow depth,
+    // in addition to the small receiver bias used by the lighting shader.
+    raster.depthBiasEnable = shadow ? VK_TRUE : VK_FALSE;
+    raster.depthBiasConstantFactor = shadow ? 1.25f : 0.f;
+    raster.depthBiasSlopeFactor = shadow ? 1.5f : 0.f;
     VkPipelineMultisampleStateCreateInfo multi{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
     multi.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     VkPipelineDepthStencilStateCreateInfo depth{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
     // The present pass has its own cleared depth attachment. HUD geometry
     // draws after world lighting, so depth testing here orders HUD surfaces
     // against one another without occluding the HUD with world geometry.
-    depth.depthTestEnable = (gbuffer || hud || transparent || shadow) && !additive ? VK_TRUE : VK_FALSE;
+    depth.depthTestEnable = (gbuffer || hud || transparent || shadow) &&
+        (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
     depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
@@ -79,6 +87,12 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
             attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
             attachment.blendEnable = VK_TRUE;
             attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        }
+        if (alpha_additive)
+        {
+            attachment.blendEnable = VK_TRUE;
+            attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
             attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
         }
     }
@@ -541,9 +555,14 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     }
     VkPipeline pipeline{};
     const bool transparent = mode == SurfaceMode::Transparent;
+    const bool particle_additive = fragment_name.find("particle_") != std::string::npos &&
+        fragment_name.find("_additive.ps") != std::string::npos;
+    const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
+        fragment_name.find("_alpha_add.ps") != std::string::npos;
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
-            !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error, "game shader pair"))
+            !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
+            "game shader pair", false, particle_additive, particle_alpha_add))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;

@@ -850,7 +850,10 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
 #endif
             const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
             const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            const bool cast = light_snapshot.shadow && shadow_slot < shadow_budget &&
+            // A point light would redraw the level six times per frame on the
+            // phone. Keep a single-face spot shadow; point lights still add
+            // their illumination without that prohibitive mobile cost.
+            const bool cast = spot && light_snapshot.shadow && shadow_slot < shadow_budget &&
                 pixels * 20 >= screen_pixels;
             local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
             local.shadow_params[1] = .002f;

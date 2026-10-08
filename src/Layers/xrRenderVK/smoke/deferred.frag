@@ -39,9 +39,13 @@ void main()
     vec4 encoded_normal = texture(normal_buffer, texcoord);
     vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
     float diffuse = max(dot(normal, normalize(-light.direction_ambient.xyz)), 0.0);
-    vec3 lit = encoded_normal.a < 0.5 ? albedo.rgb :
-        albedo.rgb * (light.direction_ambient.w +
-            diffuse * sun_visibility(texture(depth_buffer, texcoord).r) * light.color.rgb);
+    bool static_lightmap = encoded_normal.a < 0.875;
+    float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 0.0;
+    vec3 sunlight = vec3(0.0);
+    if (max(max(light.color.r, light.color.g), light.color.b) > 0.0001)
+        sunlight = diffuse * sun_visibility(texture(depth_buffer, texcoord).r) *
+            light.color.rgb * (static_lightmap ? albedo.a : 1.0);
+    vec3 lit = albedo.rgb * (light.direction_ambient.w * (1.0 + 1.2 * hemisphere) + sunlight);
     lit = (lit - 0.5) * light.grade.z + 0.5;
     lit = pow(max(lit * light.grade.y, 0.0), vec3(1.0 / max(light.grade.x, 0.01)));
     pixel_color = vec4(mix(lit, vec3(dot(lit, vec3(0.299, 0.587, 0.114))), light.grade.w), albedo.a);

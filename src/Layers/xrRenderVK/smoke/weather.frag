@@ -53,9 +53,16 @@ void main()
         vec4 encoded_normal = texture(normal_buffer, texcoord);
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
-        vec3 lit = encoded_normal.a < 0.5 ? albedo.rgb :
-            albedo.rgb * (weather.direction_ambient.w +
-                diffuse * sun_visibility(depth) * weather.light_color.rgb);
+        bool static_lightmap = encoded_normal.a < 0.875;
+        float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 0.0;
+        float indirect = weather.direction_ambient.w * (1.0 + 1.2 * hemisphere);
+        vec3 sunlight = vec3(0.0);
+        // Most rainy frames have no sun. Avoid nine depth fetches per pixel
+        // when the result would be multiplied by black anyway.
+        if (max(max(weather.light_color.r, weather.light_color.g), weather.light_color.b) > 0.0001)
+            sunlight = diffuse * sun_visibility(depth) * weather.light_color.rgb *
+                (static_lightmap ? albedo.a : 1.0);
+        vec3 lit = albedo.rgb * (indirect + sunlight);
         vec2 fog_rg = unpackHalf2x16(floatBitsToUint(weather.ray_base.w));
         vec2 fog_b_near = unpackHalf2x16(floatBitsToUint(weather.ray_dx.w));
         vec2 fog_far_projection = unpackHalf2x16(floatBitsToUint(weather.ray_dy.w));

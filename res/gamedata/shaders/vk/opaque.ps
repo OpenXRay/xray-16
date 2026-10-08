@@ -48,7 +48,11 @@ float4 main(Fragment fragment) : SV_Target0
 {
     float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
 #if defined(VK_UNLIT)
+#if defined(VK_PARTICLE)
+    return texel * fragment.baked;
+#else
     return texel;
+#endif
 #else
     float3 normal = normalize(fragment.normal);
     float3 illumination = sun_direction_ambient.w + sun_color_count.rgb *
@@ -86,17 +90,23 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
-    // X-Ray's deferred flat shader stores diffuse in the G-buffer and keeps
-    // the lightmap separate (its alpha is static sun occlusion). Multiplying
-    // the lightmap into diffuse here also attenuates every local light and
-    // makes baked level geometry almost black indoors.
+    // CoP's s_hemi texture stores hemisphere light in alpha and static sun
+    // occlusion in green (deffer_base_flat.ps/get_hemi/get_sun). Keep diffuse
+    // untouched for local lights. The opaque albedo alpha can carry sun
+    // occlusion after alpha testing, while normal alpha encodes static hemi.
 #if defined(VK_ALPHA_TEST)
     clip(output.albedo.a - alpha_threshold);
 #endif
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;
 #endif
+#if defined(VK_LIGHTMAP)
+    float4 indirect = lightmap.Sample(diffuse_sampler, fragment.lightmap_uv);
+    output.albedo.a = indirect.g;
+    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, indirect.a * 0.75);
+#else
     output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
+#endif
     return output;
 }
 #endif
