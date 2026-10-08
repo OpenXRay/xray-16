@@ -193,7 +193,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
     std::string& error, int* alpha_ref, int* blend_mode,
-    bool particle_pipeline) const
+    bool particle_pipeline, bool screen_pipeline) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -204,6 +204,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         " shader='" + shader + "'";
     if (!material.supported)
     { error = "unsupported " + context; return false; }
+    if (screen_pipeline && material.class_name != "S_SET   ")
+    { error = "unsupported screen class in " + context; return false; }
     if (material.class_name == "S_SET   " && !material.screen_issue.empty())
     {
         error = "unsupported screen property='" + material.screen_issue + "' in " + context;
@@ -214,11 +216,13 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
         material.blending != 0 && material.blending != 1 &&
         material.blending != 2 && material.blending != 3 &&
-        material.blending != 4 && material.blending != 5)
+        material.blending != 4 && material.blending != 5 &&
+        !(screen_pipeline && material.class_name == "S_SET   " &&
+          material.blending >= 6 && material.blending <= 9))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     // Screen-set blending outside particles still needs its own pipeline.
     // The particle path has a pipeline for each of these modes.
-    if (material.class_name == "S_SET   " && !particle_pipeline &&
+    if (material.class_name == "S_SET   " && !particle_pipeline && !screen_pipeline &&
         material.blending >= 2)
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     if (material.class_name == "PARTICLE" && !particle_pipeline &&

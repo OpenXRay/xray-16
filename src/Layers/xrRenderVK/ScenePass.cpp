@@ -19,7 +19,7 @@ bool complete(const ScenePassDispatch& vk)
 
 bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout layout,
     VkShaderModule vertex, VkShaderModule fragment, bool ui, bool use_depth, const ScenePassDispatch& vk,
-    VkPipeline& result)
+    int ui_mode, VkPipeline& result)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -65,9 +65,18 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
     VkPipelineColorBlendAttachmentState attachment{};
     attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    attachment.blendEnable = ui ? VK_TRUE : VK_FALSE;
+    attachment.blendEnable = ui && ui_mode != 0 && ui_mode != 7 ? VK_TRUE : VK_FALSE;
     attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
     attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    if (ui && ui_mode == 2)
+    { attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE; }
+    if (ui && (ui_mode == 3 || ui_mode == 4 || ui_mode == 6))
+    {
+        attachment.srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
+        attachment.dstColorBlendFactor = ui_mode == 3 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR;
+    }
+    if (ui && ui_mode == 5)
+        attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachment.colorBlendOp = VK_BLEND_OP_ADD;
     attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
     attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -179,7 +188,7 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     const VkPushConstantRange scene_range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(SceneConstants)};
     const VkPushConstantRange ui_range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-        0, sizeof(float) * 3};
+        0, sizeof(float) * 4};
     VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
     layout.pushConstantRangeCount = 1;
     layout.pPushConstantRanges = &scene_range;
@@ -194,21 +203,27 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
     layout.pSetLayouts = &m_ui_descriptor_layout;
     if (m_vk.create_pipeline_layout(device, &layout, nullptr, &m_ui_layout) != VK_SUCCESS ||
         !make_pipeline(device, render_pass, m_scene_layout, scene_vertex, scene_fragment,
-            false, use_depth, m_vk, m_scene_pipeline) ||
-        !make_pipeline(device, render_pass, m_ui_layout, ui_vertex, ui_fragment,
-            true, use_depth, m_vk, m_ui_pipeline))
+            false, use_depth, m_vk, 0, m_scene_pipeline))
     {
         error = "could not create Vulkan geometry, lighting or UI pipeline";
         destroy();
         return false;
     }
+    for (int mode = 0; mode < 10; ++mode)
+        if (!make_pipeline(device, render_pass, m_ui_layout, ui_vertex, ui_fragment,
+                true, use_depth, m_vk, mode, m_ui_pipelines[mode]))
+        {
+            error = "could not create Vulkan UI blend pipeline mode=" + std::to_string(mode);
+            destroy();
+            return false;
+        }
     error.clear();
     return true;
 }
 
 bool ScenePass::valid_frame(const FrameRecordingContext& frame) const
 {
-    return m_scene_pipeline && m_ui_pipeline && frame.command_buffer &&
+    return m_scene_pipeline && m_ui_pipelines[1] && frame.command_buffer &&
         (frame.render_pass == m_render_pass || (m_overlay_pass && frame.render_pass == m_overlay_pass)) &&
         frame.extent.width && frame.extent.height;
 }
@@ -238,9 +253,10 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
     const VkRect2D* requested_scissor,
     VkDeviceSize vertex_offset, VkDeviceSize index_offset, float alpha_ref,
-    VkExtent2D logical_extent) const
+    VkExtent2D logical_extent, int blend_mode) const
 {
     if (!valid_frame(frame) || !vertices || !indices || !texture_set || !index_count ||
+        blend_mode < 0 || blend_mode >= 10 || !m_ui_pipelines[blend_mode] ||
         (index_type != VK_INDEX_TYPE_UINT16 && index_type != VK_INDEX_TYPE_UINT32))
         return false;
     if (!logical_extent.width || !logical_extent.height)
@@ -266,8 +282,9 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     const VkViewport viewport{0, 0, static_cast<float>(frame.extent.width),
         static_cast<float>(frame.extent.height), 0, 1};
     const float constants[]{static_cast<float>(logical_extent.width),
-        static_cast<float>(logical_extent.height), std::clamp(alpha_ref, 0.0f, 1.0f)};
-    m_vk.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_ui_pipeline);
+        static_cast<float>(logical_extent.height), std::clamp(alpha_ref, 0.0f, 1.0f),
+        static_cast<float>(blend_mode)};
+    m_vk.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_ui_pipelines[blend_mode]);
     m_vk.cmd_set_viewport(frame.command_buffer, 0, 1, &viewport);
     m_vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
     m_vk.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &vertex_offset);
@@ -333,7 +350,8 @@ void ScenePass::destroy()
 {
     if (m_device && m_vk.destroy_pipeline)
     {
-        if (m_ui_pipeline) m_vk.destroy_pipeline(m_device, m_ui_pipeline, nullptr);
+        for (auto& pipeline : m_ui_pipelines)
+            if (pipeline) m_vk.destroy_pipeline(m_device, pipeline, nullptr);
         if (m_scene_pipeline) m_vk.destroy_pipeline(m_device, m_scene_pipeline, nullptr);
     }
     if (m_device && m_vk.destroy_pipeline_layout)
@@ -349,7 +367,8 @@ void ScenePass::destroy()
     m_render_pass = VK_NULL_HANDLE;
     m_overlay_pass = VK_NULL_HANDLE;
     m_scene_layout = m_ui_layout = VK_NULL_HANDLE;
-    m_scene_pipeline = m_ui_pipeline = VK_NULL_HANDLE;
+    m_scene_pipeline = VK_NULL_HANDLE;
+    for (auto& pipeline : m_ui_pipelines) pipeline = VK_NULL_HANDLE;
     m_ui_descriptor_pool = VK_NULL_HANDLE;
     m_ui_descriptor_layout = VK_NULL_HANDLE;
     m_vk = {};

@@ -46,6 +46,8 @@ void VulkanUIRender::setup_states()
     scissor_ = {};
     has_scissor_ = false;
     alpha_ref_ = 0;
+    blend_mode_ = 1;
+    material_alpha_ref_ = 0;
     cull_ = cmNONE;
     world_.identity();
 }
@@ -80,7 +82,7 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
                 VK_INDEX_TYPE_UINT32, batch.count, batch.texture,
                 batch.has_scissor ? &batch.scissor : nullptr, 0,
                 VkDeviceSize(batch.first_index) * sizeof(uint32_t), batch.alpha_ref,
-                {Device.dwWidth, Device.dwHeight}))
+                {Device.dwWidth, Device.dwHeight}, batch.blend_mode))
         {
             error = "Vulkan UI draw command recording failed";
             return false;
@@ -105,6 +107,8 @@ void VulkanUIRender::DestroyUIGeom()
     shader_ = nullptr;
     has_scissor_ = false;
     alpha_ref_ = 0;
+    blend_mode_ = 1;
+    material_alpha_ref_ = 0;
     cull_ = cmNONE;
 }
 
@@ -116,6 +120,8 @@ void VulkanUIRender::SetShader(IUIShader& shader)
     R_ASSERT2(vk_shader && vk_shader->inited(), "Vulkan UI requires a loaded Vulkan texture shader");
     shader_ = vk_shader;
     texture_ = vk_shader->current_descriptor(Device.dwTimeContinual);
+    blend_mode_ = vk_shader->blend_mode();
+    material_alpha_ref_ = vk_shader->alpha_ref();
 }
 
 void VulkanUIRender::SetTextureDescriptor(VkDescriptorSet descriptor)
@@ -123,6 +129,8 @@ void VulkanUIRender::SetTextureDescriptor(VkDescriptorSet descriptor)
     R_ASSERT2(descriptor, "Vulkan UI requires a valid texture descriptor");
     shader_ = nullptr;
     texture_ = descriptor;
+    blend_mode_ = 1;
+    material_alpha_ref_ = 0;
 }
 
 void VulkanUIRender::SetAlphaRef(int aref) { alpha_ref_ = std::clamp(aref, 0, 255); }
@@ -233,7 +241,12 @@ void VulkanUIRender::FlushPrimitive()
     if (indices_.size() != first_index)
     {
         R_ASSERT2(!leases_.retain || leases_.retain(texture_), "Vulkan UI batch references an unleased texture");
-        batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index, texture_, scissor_, has_scissor_, float(alpha_ref_) / 255.0f});
+        const bool alpha_test = blend_mode_ == 1 || blend_mode_ == 5 ||
+            blend_mode_ == 7 || blend_mode_ == 8 || blend_mode_ == 9;
+        batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index,
+            texture_, scissor_, has_scissor_,
+            alpha_test ? float(std::max(alpha_ref_, blend_mode_ == 7 ? 0 : material_alpha_ref_)) / 255.0f : 0.f,
+            blend_mode_});
     }
     primitive_ = ptNone;
     world_positions_.resize(vertices_.size());
@@ -291,7 +304,7 @@ void VulkanUIRender::append_imgui(ImDrawData* data)
             }
             R_ASSERT2(!leases_.retain || leases_.retain(descriptor), "Vulkan ImGui references an unleased texture");
             batches_.push_back(
-                {begin, command.ElemCount, descriptor, {{x, y}, {static_cast<uint32_t>(right - x), static_cast<uint32_t>(bottom - y)}}, true, 0.f});
+                {begin, command.ElemCount, descriptor, {{x, y}, {static_cast<uint32_t>(right - x), static_cast<uint32_t>(bottom - y)}}, true, 0.f, 1});
         }
     }
 }

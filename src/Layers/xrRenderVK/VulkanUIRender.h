@@ -53,6 +53,7 @@ private:
         VkRect2D scissor{};
         bool has_scissor{};
         float alpha_ref{};
+        int blend_mode{1};
     };
     struct FrameBuffers
     {
@@ -82,6 +83,8 @@ private:
     ePointType point_type_{pttNone};
     uint32_t first_vertex_{}, limit_{};
     int alpha_ref_{};
+    int blend_mode_{1};
+    int material_alpha_ref_{};
     CullMode cull_{cmNONE};
     Fmatrix world_{};
 };

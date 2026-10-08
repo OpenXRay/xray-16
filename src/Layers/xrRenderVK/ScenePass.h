@@ -80,7 +80,7 @@ public:
         VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
         const VkRect2D* scissor = nullptr,
         VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0,
-        float alpha_ref = 0.0f, VkExtent2D logical_extent = {}) const;
+        float alpha_ref = 0.0f, VkExtent2D logical_extent = {}, int blend_mode = 1) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
         std::string& error);
     void update_ui_texture_set(VkDescriptorSet set, VkImageView view, VkSampler sampler);
@@ -97,7 +97,7 @@ private:
     VkPipelineLayout m_scene_layout = VK_NULL_HANDLE;
     VkPipelineLayout m_ui_layout = VK_NULL_HANDLE;
     VkPipeline m_scene_pipeline = VK_NULL_HANDLE;
-    VkPipeline m_ui_pipeline = VK_NULL_HANDLE;
+    VkPipeline m_ui_pipelines[10]{};
     VkDescriptorSetLayout m_ui_descriptor_layout = VK_NULL_HANDLE;
     VkDescriptorPool m_ui_descriptor_pool = VK_NULL_HANDLE;
     ScenePassDispatch m_vk{};

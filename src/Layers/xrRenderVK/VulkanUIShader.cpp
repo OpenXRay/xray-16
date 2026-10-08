@@ -19,6 +19,8 @@ void VulkanUIShader::Copy(IUIShader& source)
     destroy();
     shader_ = other->shader_;
     texture_ = other->texture_;
+    blend_mode_ = other->blend_mode_;
+    alpha_ref_ = other->alpha_ref_;
     video_ = other->video_;
     if (!other->sequence_.empty())
     {
@@ -47,6 +49,19 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
     destroy();
     shader_ = shader ? shader : "";
     texture_ = texture ? texture : "";
+    if (!shader_.empty() && textures_->blender_count())
+    {
+        SurfaceMode surface{};
+        std::string error;
+        if (!textures_->surface_mode(shader_, texture_, surface, error,
+                &alpha_ref_, &blend_mode_, false, true))
+        {
+            Msg("! [renderer-vulkan] UI material shader='%s' texture='%s': %s",
+                shader_.c_str(), texture_.c_str(), error.c_str());
+            use_transparent_fallback();
+            return;
+        }
+    }
     if (texture_.empty()) { use_transparent_fallback(); return; }
     string_path video_path;
     if (FS.exist(video_path, "$game_textures$", texture_.c_str(), ".ogm"))
@@ -151,6 +166,8 @@ void VulkanUIShader::destroy()
     texture_.clear();
     descriptor_ = VK_NULL_HANDLE;
     extent_ = {};
+    blend_mode_ = 1;
+    alpha_ref_ = 0;
 }
 
 bool VulkanUIShader::operator==(const IUIShader& source) const

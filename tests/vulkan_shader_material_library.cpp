@@ -142,6 +142,14 @@ int main()
         error.find("blending=4") != std::string::npos);
     assert(library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
         mode == SurfaceMode::Transparent && blend_mode == 4);
+    for (const auto& name : {"hud\\opaque", "hud\\alpha", "effects\\additive",
+             "effects\\wallmarkblend", "effects\\screen_multiply_2x"})
+    {
+        assert(library.resolve(name, mode, error, &alpha_ref, &blend_mode, false, true));
+        assert(blend_mode >= 0 && blend_mode <= 9);
+    }
+    assert(!library.resolve("trees\\leaf", mode, error, nullptr, nullptr, false, true) &&
+        error.find("screen class") != std::string::npos);
     Bytes screen_depth = record("S_SET   ", "mod\\depth_ui", false);
     write32(screen_depth, 7);
     screen_depth.insert(screen_depth.end(), blend_name, blend_name + std::strlen(blend_name) + 1);

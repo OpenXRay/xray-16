@@ -1,5 +1,5 @@
 #version 450
-layout(push_constant) uniform UiConstants { vec2 framebuffer_size; float alpha_ref; } ui;
+layout(push_constant) uniform UiConstants { vec2 framebuffer_size; float alpha_ref; float blend_mode; } ui;
 layout(location = 0) in vec2 position;
 layout(location = 1) in vec2 uv;
 layout(location = 2) in vec4 color;

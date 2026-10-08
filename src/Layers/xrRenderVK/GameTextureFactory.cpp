@@ -50,6 +50,13 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
         destroy();
         return false;
     }
+    info.addressModeU = info.addressModeV = info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    if (create_sampler(device_, &info, nullptr, &ui_sampler_) != VK_SUCCESS)
+    {
+        error = "could not create UI texture sampler";
+        destroy();
+        return false;
+    }
     error.clear();
     return true;
 }
@@ -219,7 +226,7 @@ bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     result = VK_NULL_HANDLE;
     Asset* asset;
     if (!load(texture_name, asset, error)) return false;
-    if (!asset->ui_set && !pass.create_ui_texture_set(asset->texture.view, sampler_, asset->ui_set, error))
+    if (!asset->ui_set && !pass.create_ui_texture_set(asset->texture.view, ui_sampler_, asset->ui_set, error))
     {
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset](const auto& entry) { return &entry.second == asset; });
@@ -255,7 +262,7 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
     Asset asset;
     if (!upload_texture(device_, queue_, pool_, memory_, dispatch_, pixels,
             asset.texture, pending_, states_, error)) return false;
-    if (!pass.create_ui_texture_set(asset.texture.view, sampler_, asset.ui_set, error))
+    if (!pass.create_ui_texture_set(asset.texture.view, ui_sampler_, asset.ui_set, error))
     {
         R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
             "dynamic UI upload did not finish");
@@ -383,6 +390,7 @@ void GameTextureFactory::destroy()
             destroy_texture(device_, dispatch_, asset.texture);
         }
         if (sampler_ && destroy_sampler_) destroy_sampler_(device_, sampler_, nullptr);
+        if (ui_sampler_ && destroy_sampler_) destroy_sampler_(device_, ui_sampler_, nullptr);
     }
     assets_.clear();
     lightmapped_.clear();
@@ -393,6 +401,7 @@ void GameTextureFactory::destroy()
     queue_ = VK_NULL_HANDLE;
     pool_ = VK_NULL_HANDLE;
     sampler_ = VK_NULL_HANDLE;
+    ui_sampler_ = VK_NULL_HANDLE;
     destroy_sampler_ = nullptr;
     wait_idle_ = nullptr;
     dispatch_ = {};
@@ -485,7 +494,7 @@ bool GameTextureFactory::reload_assets(std::string& error,
         if (asset.material_set && asset.material_pass)
             asset.material_pass->update_material(asset.material_set, item.texture.view, sampler_);
         if (asset.ui_set && asset.ui_pass)
-            asset.ui_pass->update_ui_texture_set(asset.ui_set, item.texture.view, sampler_);
+            asset.ui_pass->update_ui_texture_set(asset.ui_set, item.texture.view, ui_sampler_);
         states_.forget_image(asset.texture.image);
         destroy_texture(device_, dispatch_, asset.texture);
         asset.texture = item.texture;
