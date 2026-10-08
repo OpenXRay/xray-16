@@ -40,7 +40,8 @@ std::string lower(std::string value)
 
 bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     SurfaceMode& mode, bool& supported, std::string& cls_name,
-    uint16_t& version, int& alpha_ref, int& blending, std::string& error)
+    uint16_t& version, int& alpha_ref, int& blending, std::string& screen_issue,
+    std::string& error)
 {
     // CBlender_DESC is pack(4): CLASS_ID[8], cName[128], cComputer[32],
     // cTime[4], version[2], trailing padding[2]. All fields are little endian.
@@ -55,6 +56,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     bool has_blending = false;
     blending = -1;
     alpha_ref = -1;
+    screen_issue.clear();
     while (cursor.offset < cursor.size)
     {
         uint32_t type;
@@ -100,6 +102,12 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
             }
         }
         if (type == 6 && property == "Strict sorting") strict = le32(bytes + start) != 0;
+        if (type == 6 &&
+            ((property == "Texture clamp" && !le32(bytes + start)) ||
+             ((property == "Z-test" || property == "Z-write" ||
+               property == "Lighting" || property == "Fog") && le32(bytes + start))) &&
+            screen_issue.empty())
+            screen_issue = property;
         if (type == 6 && (property == "Alpha-blend" || property == "Alpha-Blend" || property == "Use alpha-channel"))
             blend = le32(bytes + start) != 0;
         if (type == 4 && property == "Alpha ref")
@@ -160,9 +168,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         bool supported = false;
         uint16_t version = 0;
         int alpha_ref = -1, blending = -1;
+        std::string screen_issue;
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
-                name, mode, supported, cls, version, alpha_ref, blending, error) || name.empty() ||
-            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending}).second)
+                name, mode, supported, cls, version, alpha_ref, blending, screen_issue, error) || name.empty() ||
+            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_issue}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -183,7 +192,8 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 }
 
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
-    std::string& error, int* alpha_ref, int* blend_mode, bool particle_pipeline) const
+    std::string& error, int* alpha_ref, int* blend_mode,
+    bool particle_pipeline) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -194,6 +204,11 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         " shader='" + shader + "'";
     if (!material.supported)
     { error = "unsupported " + context; return false; }
+    if (material.class_name == "S_SET   " && !material.screen_issue.empty())
+    {
+        error = "unsupported screen property='" + material.screen_issue + "' in " + context;
+        return false;
+    }
     // The scene pipeline currently implements only source-alpha blending.
     // ADD/MUL and legacy multi-render-target modes must not silently render as BLEND.
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
@@ -216,4 +231,5 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     error.clear();
     return true;
 }
+
 }

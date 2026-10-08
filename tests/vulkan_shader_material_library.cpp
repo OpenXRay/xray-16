@@ -142,6 +142,30 @@ int main()
         error.find("blending=4") != std::string::npos);
     assert(library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
         mode == SurfaceMode::Transparent && blend_mode == 4);
+    Bytes screen_depth = record("S_SET   ", "mod\\depth_ui", false);
+    write32(screen_depth, 7);
+    screen_depth.insert(screen_depth.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(screen_depth, 1); write32(screen_depth, 0);
+    property(screen_depth, 6, "Z-test", 1);
+    Bytes depth_list, depth_file;
+    chunk(depth_list, 48, screen_depth);
+    chunk(depth_file, 2, depth_list);
+    IReader depth_reader(depth_file.data(), depth_file.size());
+    assert(library.load(depth_reader, error));
+    assert(!library.resolve("mod\\depth_ui", mode, error, nullptr, &blend_mode, true) &&
+        error.find("Z-test") != std::string::npos && error.find("id=48") != std::string::npos);
+    Bytes screen_wrap = record("S_SET   ", "mod\\wrap_ui", false);
+    write32(screen_wrap, 7);
+    screen_wrap.insert(screen_wrap.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(screen_wrap, 1); write32(screen_wrap, 0);
+    property(screen_wrap, 6, "Texture clamp", 0);
+    Bytes wrap_list, wrap_file;
+    chunk(wrap_list, 49, screen_wrap);
+    chunk(wrap_file, 2, wrap_list);
+    IReader wrap_reader(wrap_file.data(), wrap_file.size());
+    assert(library.load(wrap_reader, error));
+    assert(!library.resolve("mod\\wrap_ui", mode, error) &&
+        error.find("Texture clamp") != std::string::npos && error.find("id=49") != std::string::npos);
     Bytes newer = record("LM_AREF ", "mod\\future", false);
     newer[172] = 42;
     Bytes future_list, future_file;
