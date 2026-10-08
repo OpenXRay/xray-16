@@ -40,7 +40,7 @@ std::string lower(std::string value)
 
 bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     SurfaceMode& mode, bool& supported, std::string& cls_name,
-    uint16_t& version, int& alpha_ref, std::string& error)
+    uint16_t& version, int& alpha_ref, int& blending, std::string& error)
 {
     // CBlender_DESC is pack(4): CLASS_ID[8], cName[128], cComputer[32],
     // cTime[4], version[2], trailing padding[2]. All fields are little endian.
@@ -52,7 +52,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     version = uint16_t(bytes[172]) | uint16_t(bytes[173]) << 8;
     Cursor cursor{bytes, size, 176};
     bool blend = false, strict = false;
-    int screen_blend = -1;
+    blending = -1;
     alpha_ref = -1;
     while (cursor.offset < cursor.size)
     {
@@ -82,7 +82,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         }
         if (!cursor.skip(length)) { error = "truncated blender property in '" + name + "'"; return false; }
         if ((type == 7 || type == 8) && property == "Blending")
-            screen_blend = static_cast<int>(le32(bytes + start));
+            blending = static_cast<int>(le32(bytes + start));
         if (type == 6 && property == "Strict sorting") strict = le32(bytes + start) != 0;
         if (type == 6 && (property == "Alpha-blend" || property == "Alpha-Blend" || property == "Use alpha-channel"))
             blend = le32(bytes + start) != 0;
@@ -93,11 +93,11 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         cls == "D_TREE  " || cls == "D_STILL " || cls == "MODEL   " || cls == "MODELEbB" ||
         cls == "PARTICLE" || cls == "LmBmmD  " || cls == "LaEmB   " ||
         cls == "LmEbB   " || cls == "BmmD    " || cls == "BmmDold " || cls == "S_SET   ";
-    if (cls == "PARTICLE" || strict || (cls == "S_SET   " && screen_blend != 0) ||
+    if ((cls == "PARTICLE" && blending != 0) || strict || (cls == "S_SET   " && blending != 0) ||
         ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODEL   " ||
             cls == "MODELEbB" || cls == "D_TREE  ") && blend))
         mode = SurfaceMode::Transparent;
-    else if (cls == "LM_AREF " || cls == "V_AREF  " || cls == "D_TREE  " ||
+    else if ((cls == "PARTICLE" && blending == 0) || cls == "LM_AREF " || cls == "V_AREF  " || cls == "D_TREE  " ||
         (cls == "D_STILL " && blend))
         mode = SurfaceMode::AlphaTest;
     else
@@ -109,30 +109,41 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
 bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 {
     clear();
+    error.clear();
     std::unique_ptr<IReader, void(*)(IReader*)> blenders(file.open_chunk(2), [](IReader* p) { if (p) p->close(); });
     if (!blenders) { error = "shaders.xr has no blender chunk"; return false; }
-    for (uint32_t id = 0;; ++id)
+    // open_chunk_iterator trusts chunk lengths. Validate the entire table first
+    // so a damaged mod archive cannot make the iterator step beyond the buffer.
+    Cursor table{static_cast<const uint8_t*>(blenders->pointer()), blenders->length(), 0};
+    while (table.offset < table.size)
     {
-        std::unique_ptr<IReader, void(*)(IReader*)> record(blenders->open_chunk(id), [](IReader* p) { if (p) p->close(); });
-        if (!record) break;
+        uint32_t id, length;
+        if (!table.u32(id) || !table.u32(length) || !table.skip(length))
+        { error = "shaders.xr blender table has a truncated chunk"; return false; }
+    }
+    uint32_t id = 0;
+    for (IReader* record = blenders->open_chunk_iterator(id); record;
+        record = blenders->open_chunk_iterator(id, record))
+    {
         std::string name, cls;
         SurfaceMode mode{};
         bool supported = false;
         uint16_t version = 0;
-        int alpha_ref = -1;
+        int alpha_ref = -1, blending = -1;
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
-                name, mode, supported, cls, version, alpha_ref, error) || name.empty() ||
-            !entries_.emplace(name, Entry{mode, cls, supported, version, alpha_ref}).second)
+                name, mode, supported, cls, version, alpha_ref, blending, error) || name.empty() ||
+            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) + ": " + error;
+            record->close();
             clear();
             return false;
         }
-        Msg("[renderer-vulkan] material.definition id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d supported=%d",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d supported=%d",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
-            alpha_ref, supported ? 1 : 0);
+            alpha_ref, blending, supported ? 1 : 0);
     }
     if (entries_.empty()) { error = "shaders.xr contains no blender definitions"; return false; }
     error.clear();
@@ -145,9 +156,17 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
     { error = "shader '" + shader + "' not found in shaders.xr"; return false; }
-    if (!it->second.supported)
-    { error = "unsupported blender class '" + it->second.class_name + "' version=" +
-        std::to_string(it->second.version) + " for shader '" + shader + "'"; return false; }
+    const auto& material = it->second;
+    const std::string context = "shaders.xr blender id=" + std::to_string(material.id) +
+        " class='" + material.class_name + "' version=" + std::to_string(material.version) +
+        " shader='" + shader + "'";
+    if (!material.supported)
+    { error = "unsupported " + context; return false; }
+    // The scene pipeline currently implements only source-alpha blending.
+    // ADD/MUL and legacy multi-render-target modes must not silently render as BLEND.
+    if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
+        material.blending != 0 && material.blending != 1)
+    { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     mode = it->second.mode;
     if (alpha_ref) *alpha_ref = it->second.alpha_ref >= 0 ?
         std::clamp(it->second.alpha_ref, 0, 255) : 128;

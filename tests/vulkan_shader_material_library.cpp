@@ -62,12 +62,22 @@ int main()
     screen_set.insert(screen_set.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_set, 0); write32(screen_set, 0);
     chunk(list, 8, screen_set);
+    Bytes additive = record("S_SET   ", "effects\\additive", false, 32);
+    write32(additive, 7);
+    additive.insert(additive.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(additive, 2); write32(additive, 0);
+    chunk(list, 9, additive);
+    Bytes particle_set = record("PARTICLE", "effects\\sprite_set", false, 200);
+    write32(particle_set, 7);
+    particle_set.insert(particle_set.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(particle_set, 0); write32(particle_set, 0);
+    chunk(list, 42, particle_set); // Modded archives may leave gaps in chunk IDs.
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 9);
+    assert(library.load(reader, error) && library.size() == 11);
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
@@ -76,15 +86,43 @@ int main()
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
     assert(!library.resolve("unknown", mode, error) && error.find("unknown") != std::string::npos);
     assert(!library.resolve("mod\\unrecognized", mode, error) &&
+        error.find("shaders.xr blender id=5") != std::string::npos &&
         error.find("CUSTOM") != std::string::npos && error.find("version=17") != std::string::npos);
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);
     int alpha_ref = -1;
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);
     assert(library.resolve("effects\\wallmarkblend", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("hud\\opaque", mode, error) && mode == SurfaceMode::Opaque);
+    assert(!library.resolve("effects\\additive", mode, error) &&
+        error.find("blending=2") != std::string::npos && error.find("id=9") != std::string::npos);
+    assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&
+        mode == SurfaceMode::AlphaTest && alpha_ref == 200);
     Bytes malformed, broken;
     chunk(broken, 0, Bytes(5, 0));
     chunk(malformed, 2, broken);
     IReader truncated(malformed.data(), malformed.size());
     assert(!library.load(truncated, error));
+    assert(error.find("shaders.xr blender id=0") != std::string::npos);
+    Bytes wrong_property = record("LM      ", "invalid\\property", false);
+    write32(wrong_property, 99);
+    wrong_property.insert(wrong_property.end(), {'M','o','d',0});
+    Bytes invalid_list, invalid_file;
+    chunk(invalid_list, 0, wrong_property);
+    chunk(invalid_file, 2, invalid_list);
+    IReader unknown_property(invalid_file.data(), invalid_file.size());
+    assert(!library.load(unknown_property, error));
+    assert(error.find("type=99") != std::string::npos &&
+        error.find("invalid\\property") != std::string::npos);
+    Bytes duplicate_list, duplicate_file;
+    chunk(duplicate_list, 0, record("LM      ", "duplicate", false));
+    chunk(duplicate_list, 1, record("LM      ", "DUPLICATE", false));
+    chunk(duplicate_file, 2, duplicate_list);
+    IReader duplicate(duplicate_file.data(), duplicate_file.size());
+    assert(!library.load(duplicate, error) && error.find("blender id=1") != std::string::npos);
+    Bytes oversized_file;
+    Bytes oversized_list;
+    write32(oversized_list, 7); write32(oversized_list, 9999);
+    chunk(oversized_file, 2, oversized_list);
+    IReader oversized(oversized_file.data(), oversized_file.size());
+    assert(!library.load(oversized, error) && error.find("truncated chunk") != std::string::npos);
 }

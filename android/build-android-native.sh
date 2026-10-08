@@ -133,11 +133,14 @@ cmake --build "$build_dir" --target xr_3da
 if [ "${CMAKE_GENERATOR:-Ninja}" = Ninja ]; then
     # A completed link can still leave an archive older than newly compiled
     # objects. Do not package that stale native library as a successful APK.
-    dry_run=$(ninja -C "$build_dir" -n xr_3da)
+    # Use the Ninja executable selected by CMake. The SDK may prepend an
+    # older Ninja to PATH, which rewrites the build log and makes every
+    # object look dirty after an otherwise successful link.
+    dry_run=$(cmake --build "$build_dir" --target xr_3da -- -n)
     if ! printf '%s\n' "$dry_run" | grep -q 'ninja: no work to do.'; then
         echo "Native dependency graph was still dirty after linking; rebuilding" >&2
         cmake --build "$build_dir" --target xr_3da
-        dry_run=$(ninja -C "$build_dir" -n xr_3da)
+        dry_run=$(cmake --build "$build_dir" --target xr_3da -- -n)
         if ! printf '%s\n' "$dry_run" | grep -q 'ninja: no work to do.'; then
             echo "Native dependency graph remains dirty; refusing to package a stale APK" >&2
             exit 1

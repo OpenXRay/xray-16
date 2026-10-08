@@ -22,11 +22,13 @@ public:
 private:
     struct Entry
     {
+        uint32_t id{};
         SurfaceMode mode{};
         std::string class_name;
         bool supported{};
         uint16_t version{};
         int alpha_ref{-1};
+        int blending{-1};
     };
     std::unordered_map<std::string, Entry> entries_;
 };
