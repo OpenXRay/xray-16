@@ -147,6 +147,9 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()
 {
+    for (auto& collection : collections)
+        xr_delete(collection);
+
     collections.clear();
 
     CInifile::Destroy(m_thunderbolt_collections_config);
