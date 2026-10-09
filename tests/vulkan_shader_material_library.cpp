@@ -99,12 +99,18 @@ int main()
     screen_multiply_2x.insert(screen_multiply_2x.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_multiply_2x, 4); write32(screen_multiply_2x, 0);
     chunk(list, 47, screen_multiply_2x);
+    Bytes wallmark_mult = record("S_SET   ", "effects\\wallmarkmult", false, 0);
+    write32(wallmark_mult, 7);
+    wallmark_mult.insert(wallmark_mult.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(wallmark_mult, 6); write32(wallmark_mult, 0);
+    property(wallmark_mult, 6, "Z-test", 1);
+    chunk(list, 51, wallmark_mult);
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 16);
+    assert(library.load(reader, error) && library.size() == 17);
     assert(library.contains("HUD/ALPHA"));
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
@@ -144,6 +150,12 @@ int main()
         error.find("blending=4") != std::string::npos);
     assert(library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
         mode == SurfaceMode::Transparent && blend_mode == 4);
+    assert(library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode) &&
+        mode == SurfaceMode::Transparent && blend_mode == 6);
+    assert(!library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode, true) &&
+        error.find("blending=6") != std::string::npos);
+    assert(!library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode, false, true) &&
+        error.find("Z-test") != std::string::npos);
     for (const auto& name : {"hud\\opaque", "hud\\alpha", "effects\\additive",
              "effects\\wallmarkblend", "effects\\screen_multiply_2x"})
     {

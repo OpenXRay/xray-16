@@ -576,13 +576,14 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name.find("_multiply.ps") != std::string::npos;
     const bool particle_multiply_2x = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_multiply_2x.ps") != std::string::npos;
+    const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps";
     const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_set.ps") != std::string::npos;
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
             "game shader pair", false, particle_additive, particle_alpha_add,
-            particle_multiply, particle_multiply_2x, particle_set))
+            particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;

@@ -76,6 +76,7 @@ private:
         VkDescriptorSet material{};
         SurfaceMode mode{SurfaceMode::Opaque};
         int alpha_ref{128};
+        bool wallmark_multiply{};
         bool lightmapped{};
         bool water{};
         bool glass{};

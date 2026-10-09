@@ -120,6 +120,27 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     if (!load_engine_level_models(level, models, error)) return false;
     Msg("[renderer-vulkan] level.geometry decoded models=%zu materials=%zu visuals=%zu",
         models.models.size(), models.materials.size(), models.visuals.size());
+    // The export build audits every material before the first GPU upload.
+    // One unsupported blender must not hide the rest of the level's material
+    // requirements in the next device log.
+    if (std::strstr(Core.Params, "-vk_export_shaders_xr"))
+    {
+        size_t unsupported = 0;
+        for (size_t id = 0; id < models.materials.size(); ++id)
+        {
+            const auto& material = models.materials[id];
+            SurfaceMode mode{};
+            std::string issue;
+            if (!textures.surface_mode(material.shader, material.textures, mode, issue))
+            {
+                ++unsupported;
+                Msg("! [renderer-vulkan] level.material.audit id=%zu shader='%s' textures='%s': %s",
+                    id, material.shader.c_str(), material.textures.c_str(), issue.c_str());
+            }
+        }
+        Msg("[renderer-vulkan] level.material.audit total=%zu unsupported=%zu",
+            models.materials.size(), unsupported);
+    }
     DetailAssets details;
     Msg("[renderer-vulkan] level.details decoding");
     if (!load_engine_detail_assets(details, error)) return false;
@@ -181,7 +202,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         const auto& material = models.materials[model.material];
         SurfaceMode mode;
-        if (!textures.surface_mode(material.shader, material.textures, mode, error, &mesh.alpha_ref))
+        int blend_mode = -1;
+        if (!textures.surface_mode(material.shader, material.textures, mode, error, &mesh.alpha_ref, &blend_mode))
         {
             error = "level material id=" + std::to_string(model.material) + " (" +
                 material.shader + "/" + material.textures + "): " + error;
@@ -193,6 +215,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             error = "level lightmap material has no TEXCOORD1: " + material.textures;
             return false;
         }
+        mesh.wallmark_multiply = blend_mode == 6;
         const char *family = mode == SurfaceMode::Transparent ? "object_blended" :
             !lightmap.empty() ? mode == SurfaceMode::AlphaTest ? "level_lightmap_cutout" : "level_lightmap" :
             mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
@@ -201,7 +224,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.water = named_surface(material, mode, "water") || named_surface(material, mode, "glass");
         mesh.glass = named_surface(material, mode, "glass");
         prepared.has_water_ |= mesh.water;
-        if (!pass.request_game_pipeline(shader + ".vs", shader + ".ps", mode, false, false, error))
+        const std::string vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : shader + ".vs";
+        const std::string fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : shader + ".ps";
+        if (!pass.request_game_pipeline(vertex, fragment, mode, false, false, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader pair: " + error;
             return false;
@@ -640,10 +665,10 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent) return true;
-        const char* vertex = mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
-        const char* fragment = mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         std::string shader_error;
@@ -683,12 +708,12 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        const char* vertex = mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
             (&mesh != &base) ? "vk\\progressive_opaque.vs" :
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
-        const char* fragment = mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         if (selected)

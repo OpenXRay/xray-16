@@ -51,7 +51,13 @@ float4 main(Fragment fragment) : SV_Target0
 {
     float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
 #if defined(VK_UNLIT)
-#if defined(VK_PARTICLE)
+#if defined(VK_WALLMARK_MULT)
+    // The legacy wallmark blender uses stub_default_ma: vertex alpha
+    // interpolates toward vertex color before destination-color blending.
+    texel.rgb = lerp(texel.rgb, fragment.baked.rgb, fragment.baked.a);
+    texel.a *= fragment.baked.a;
+    return texel;
+#elif defined(VK_PARTICLE)
     float4 color = texel * fragment.baked;
 #if defined(VK_PARTICLE_SET)
     clip(color.a - alpha_threshold);

@@ -222,19 +222,21 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         error = "unsupported screen property='" + std::string(property) + "' in " + context;
         return false;
     }
-    // The scene pipeline currently implements only source-alpha blending.
-    // ADD/MUL and legacy multi-render-target modes must not silently render as BLEND.
+    // Scene geometry has a separate multiply-2x wallmark pipeline. Other
+    // S_SET blend modes must not silently render as source-alpha blending.
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
         material.blending != 0 && material.blending != 1 &&
         material.blending != 2 && material.blending != 3 &&
         material.blending != 4 && material.blending != 5 &&
+        !(material.class_name == "S_SET   " && !screen_pipeline && !particle_pipeline &&
+          material.blending == 6) &&
         !(screen_pipeline && material.class_name == "S_SET   " &&
           material.blending >= 6 && material.blending <= 9))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     // Screen-set blending outside particles still needs its own pipeline.
     // The particle path has a pipeline for each of these modes.
     if (material.class_name == "S_SET   " && !particle_pipeline && !screen_pipeline &&
-        material.blending >= 2)
+        material.blending >= 2 && material.blending != 6)
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     if (material.class_name == "PARTICLE" && !particle_pipeline &&
         (material.blending == 3 || material.blending == 4))
