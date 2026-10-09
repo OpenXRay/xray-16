@@ -105,12 +105,14 @@ int main()
     write32(wallmark_mult, 6); write32(wallmark_mult, 0);
     property(wallmark_mult, 6, "Z-test", 1);
     chunk(list, 51, wallmark_mult);
+    chunk(list, 52, record("MODEL   ", "models\\fur", true, 32));
+    chunk(list, 53, record("MODEL   ", "models\\glass", true, 4));
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 17);
+    assert(library.load(reader, error) && library.size() == 19);
     assert(library.contains("HUD/ALPHA"));
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
@@ -118,6 +120,8 @@ int main()
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("trees\\leaf", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("trees\\blended", mode, error) && mode == SurfaceMode::AlphaTest);
+    assert(library.resolve("models\\fur", mode, error) && mode == SurfaceMode::AlphaTest);
+    assert(library.resolve("models\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
     assert(!library.resolve("unknown", mode, error) && error.find("unknown") != std::string::npos);
     assert(!library.resolve("mod\\unrecognized", mode, error) &&

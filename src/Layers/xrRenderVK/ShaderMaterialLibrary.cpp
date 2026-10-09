@@ -137,12 +137,15 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     // Deferred D_TREE alpha blending selects the base_aref shader and writes
     // depth. Treating its leaves as forward transparency makes the canopy
     // see-through and prevents it from occluding distant lights.
+    // CBlender_deffer_model only uses forward alpha blending when AREF < 16;
+    // higher thresholds use the depth-writing deferred base_aref pass.
+    const bool model_cutout = cls == "MODEL   " && blend && alpha_ref >= 16;
     if ((cls == "PARTICLE" && blending != 0) || strict || (cls == "S_SET   " && blending != 0) ||
-        ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODEL   " ||
-            cls == "MODELEbB") && blend))
+        ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODELEbB") && blend) ||
+        (cls == "MODEL   " && blend && !model_cutout))
         mode = SurfaceMode::Transparent;
     else if ((cls == "PARTICLE" && blending == 0) || cls == "LM_AREF " || cls == "V_AREF  " || cls == "D_TREE  " ||
-        (cls == "D_STILL " && blend))
+        (cls == "D_STILL " && blend) || model_cutout)
         mode = SurfaceMode::AlphaTest;
     else
         mode = SurfaceMode::Opaque;
