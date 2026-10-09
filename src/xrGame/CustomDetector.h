@@ -42,6 +42,12 @@ public:
     xr_map<K*, ITEM_INFO> m_ItemInfos;
 
 protected:
+    bool feel_touch_contact(IGameObject* O) override
+    {
+        const auto it = m_TypesMap.find(O->cNameSect());
+        return it != m_TypesMap.end();
+    }
+
     void feel_touch_new(IGameObject* O) override
     {
         K* pK = smart_cast<K*>(O);
@@ -62,6 +68,13 @@ protected:
     }
 
 public:
+    void feel_touch_update(Fvector& pos, const float radius) override
+    {
+        if (m_TypesMap.empty())
+            return; // everything would be rejected anyway
+        Feel::Touch::feel_touch_update(pos, radius);
+    }
+
     void destroy()
     {
         for (auto& [_, item_type] : m_TypesMap)

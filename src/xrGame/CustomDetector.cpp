@@ -378,8 +378,7 @@ void CCustomDetector::UpdateNightVisionMode(bool on)
 
 bool CZoneList::feel_touch_contact(IGameObject* O)
 {
-    const auto it = m_TypesMap.find(O->cNameSect());
-    if (it == m_TypesMap.end())
+    if (!CDetectList::feel_touch_contact(O))
         return false;
 
     CCustomZone* zone = smart_cast<CCustomZone*>(O);
@@ -435,8 +434,7 @@ void CZoneList::scan(const Fvector detector_position, const IGameObject* parent)
 
 bool CAfList::feel_touch_contact(IGameObject* O)
 {
-    const auto it = m_TypesMap.find(O->cNameSect());
-    if (it == m_TypesMap.end())
+    if (!CDetectList::feel_touch_contact(O))
         return false;
 
     const auto artefact = smart_cast<CArtefact*>(O);
