@@ -5,6 +5,8 @@
 #include "StateManager/dx11SamplerStateCache.h"
 #include "dx11TextureUtils.h"
 
+#include <dxgidebug.h>
+
 #include <SDL_syswm.h>
 
 namespace xray::render::RENDER_NAMESPACE
@@ -81,6 +83,17 @@ void CHW::DestroyD3D()
 
     _SHOW_REF("refCount:m_pFactory", m_pFactory);
     _RELEASE(m_pFactory);
+
+#ifdef DEBUG
+    const auto dxgiGetDebugInterface1 = static_cast<decltype(&DXGIGetDebugInterface1)>(hDXGI->GetProcAddress("DXGIGetDebugInterface1"));
+
+    IDXGIDebug1* pDxgiDebug = nullptr;
+    if (dxgiGetDebugInterface1 && SUCCEEDED(dxgiGetDebugInterface1(0, IID_PPV_ARGS(&pDxgiDebug))))
+    {
+        pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+        _RELEASE(pDxgiDebug);
+    }
+#endif
 
     // Manually close and unload additional DLLs
     // To make it work with DXVK, etc.
