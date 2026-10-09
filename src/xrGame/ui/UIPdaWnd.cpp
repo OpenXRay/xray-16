@@ -223,6 +223,12 @@ void CUIPdaWnd::Show(bool status)
     {
         InventoryUtilities::SendInfoToActor("ui_pda");
 
+        if (pUILogsWnd)
+        {
+            m_logs_work_delegate = fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork);
+            Device.seqParallel.push_back(m_logs_work_delegate);
+        }
+
         if (!m_sActiveSection.empty())
             SetActiveSubdialog(m_sActiveSection);
         else
@@ -243,6 +249,9 @@ void CUIPdaWnd::Show(bool status)
         }
         g_btnHint->Discard();
         g_statHint->Discard();
+
+        if (pUILogsWnd)
+            Device.remove_from_seq_parallel(m_logs_work_delegate);
     }
 }
 
@@ -263,8 +272,6 @@ void CUIPdaWnd::Update()
         }
         m_clock->SetText(time.c_str());
     }
-    if (pUILogsWnd)
-        Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
 }
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)

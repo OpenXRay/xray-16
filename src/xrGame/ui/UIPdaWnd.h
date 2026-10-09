@@ -40,6 +40,7 @@ protected:
     shared_str m_sActiveSection;
 
     UIHint* m_hint_wnd;
+    fastdelegate::FastDelegate0<> m_logs_work_delegate;
 
 public:
     // Поддиалоги PDA
