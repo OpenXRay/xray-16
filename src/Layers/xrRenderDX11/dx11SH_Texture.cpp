@@ -506,6 +506,8 @@ void CTexture::Unload()
     {
         for (u32 I = 0; I < seqDATA.size(); I++)
         {
+            if (m_pSRView == m_seqSRView[I] && m_seqSRView[I])
+                m_pSRView = nullptr;
             _RELEASE(seqDATA[I]);
             _RELEASE(m_seqSRView[I]);
         }
@@ -515,12 +517,16 @@ void CTexture::Unload()
     }
 
     _RELEASE(pSurface);
+    if (m_pSRView == srv_all && srv_all)
+        m_pSRView = nullptr;
     _RELEASE(srv_all);
     for (auto& srv : srv_per_slice)
     {
+        if (m_pSRView == srv&& srv)
+            m_pSRView = nullptr;
         _RELEASE(srv);
     }
-
+    _RELEASE(m_pSRView);
 
     xr_delete(pAVI);
     xr_delete(pTheora);
