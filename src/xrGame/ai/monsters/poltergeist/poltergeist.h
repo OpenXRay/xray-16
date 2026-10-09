@@ -22,12 +22,12 @@ class CPoltergeist : public CBaseMonster, public CTelekinesis, public CEnergyHol
     float m_height;
     bool m_disable_hide;
 
-    SMotionVel invisible_vel;
+    SMotionVel invisible_vel{ 0.1f, 0.1f };
 
-    CPolterSpecialAbility* m_flame;
-    CPolterSpecialAbility* m_tele;
+    CPolterSpecialAbility* m_flame{};
+    CPolterSpecialAbility* m_tele{};
 
-    bool m_actor_ignore;
+    bool m_actor_ignore{};
 
     TTime m_last_detection_time;
     Fvector m_last_actor_pos;

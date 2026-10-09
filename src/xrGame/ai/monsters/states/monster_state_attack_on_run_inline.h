@@ -450,14 +450,13 @@ void ATTACK_ON_RUN_STATE::update_attack()
     }
     else if (!m_is_jumping && !this->object->anim().has_override_animation() && m_phaze == go_close)
     {
-        ENEMIES_MAP const& memory = this->object->EnemyMemory.get_memory();
+        const auto& memory = this->object->EnemyMemory.get_memory();
         CEntityAlive const* const main_enemy = this->object->EnemyMan.get_enemy();
         m_enemy_to_attack = main_enemy;
 
         bool can_attack = false;
-        for (ENEMIES_MAP::const_iterator it = memory.begin(); it != memory.end(); ++it)
+        for (const auto& [enemy, _] : memory)
         {
-            CEntityAlive const* const enemy = it->first;
             Fvector const enemy_pos = enemy == main_enemy ? m_predicted_enemy_pos : enemy->Position();
 
 #ifdef DEBUG_STATE

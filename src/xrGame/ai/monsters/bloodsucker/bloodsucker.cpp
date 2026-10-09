@@ -73,7 +73,7 @@ void CAI_Bloodsucker::Load(LPCSTR section)
     com_man().add_ability(ControlCom::eControlRotationJump);
     com_man().add_ability(ControlCom::eControlJump);
 
-    invisible_vel.set(0.1f, 0.1f);
+    invisible_vel = { 0.1f, 0.1f };
 
     EnemyMemory.init_external(this, 40000);
 
@@ -204,8 +204,11 @@ void CAI_Bloodsucker::Load(LPCSTR section)
 #endif
 
     // load other misc stuff
-    invisible_vel.set(pSettings->r_float(section, "Velocity_Invisible_Linear"),
-        pSettings->r_float(section, "Velocity_Invisible_Angular"));
+    invisible_vel =
+    {
+        .linear  = pSettings->r_float(section, "Velocity_Invisible_Linear"),
+        .angular = pSettings->r_float(section, "Velocity_Invisible_Angular")
+    };
     movement().detail().add_velocity(MonsterMovement::eVelocityParameterInvisible,
         CDetailPathManager::STravelParams(invisible_vel.linear, invisible_vel.angular));
 

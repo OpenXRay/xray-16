@@ -25,12 +25,6 @@ void SetActorVisibility(u16 who, float value);
 CPoltergeist::CPoltergeist()
 {
     StateMan = xr_new<CStateManagerPoltergeist>(this);
-
-    invisible_vel.set(0.1f, 0.1f);
-
-    m_flame = 0;
-    m_tele = 0;
-    m_actor_ignore = false;
 }
 
 CPoltergeist::~CPoltergeist()
@@ -49,8 +43,11 @@ void CPoltergeist::Load(LPCSTR section)
     anim().accel_load(section);
     anim().accel_chain_add(eAnimWalkFwd, eAnimRun);
 
-    invisible_vel.set(pSettings->r_float(section, "Velocity_Invisible_Linear"),
-        pSettings->r_float(section, "Velocity_Invisible_Angular"));
+    invisible_vel =
+    {
+        .linear  = pSettings->r_float(section, "Velocity_Invisible_Linear"),
+        .angular = pSettings->r_float(section, "Velocity_Invisible_Angular")
+    };
     movement().detail().add_velocity(MonsterMovement::eVelocityParameterInvisible,
         CDetailPathManager::STravelParams(invisible_vel.linear, invisible_vel.angular));
 

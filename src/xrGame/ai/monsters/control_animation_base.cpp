@@ -147,7 +147,7 @@ float CControlAnimationBase::get_animation_hit_time(EMotionAnim anim, u32 index)
         return error_default_return_value;
     }
 
-    for (AA_VECTOR::const_iterator it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
+    for (auto it = m_attack_anims.cbegin(); it != m_attack_anims.cend(); ++it)
     {
         if (it->motion == motion)
         {

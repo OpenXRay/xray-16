@@ -23,7 +23,7 @@ protected:
     // Acceleration
     struct
     {
-        VELOCITY_CHAIN_VEC chain;
+        xr_vector<SEQ_VECTOR> chain;
 
         bool active;
         bool enable_braking; // не использовать при торможении

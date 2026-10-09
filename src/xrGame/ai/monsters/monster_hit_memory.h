@@ -8,10 +8,15 @@ class CMonsterHitMemory
     CBaseMonster* monster{};
     TTime time_memory{ 10000 };
 
-    MONSTER_HIT_VECTOR m_hits;
+    xr_vector<SMonsterHit> m_hits;
 
 public:
-    void init_external(CBaseMonster* M, TTime mem_time);
+    void init_external(CBaseMonster* M, const TTime mem_time)
+    {
+        monster = M;
+        time_memory = mem_time;
+    }
+
     void update();
 
     [[nodiscard]] bool is_hit() const { return !m_hits.empty(); }
@@ -21,7 +26,7 @@ public:
     auto get_num_hits() const { return m_hits.size(); }
     void add_hit(IGameObject* who, EHitSide side);
 
-    Fvector get_last_hit_dir();
+    Fvector get_last_hit_dir() const;
     TTime get_last_hit_time() const;
     IGameObject* get_last_hit_object() const;
     Fvector get_last_hit_position() const;

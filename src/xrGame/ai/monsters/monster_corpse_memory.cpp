@@ -6,19 +6,6 @@
 #include "item_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 
-CMonsterCorpseMemory::CMonsterCorpseMemory()
-{
-    monster = 0;
-    time_memory = 10000;
-}
-
-CMonsterCorpseMemory::~CMonsterCorpseMemory() {}
-void CMonsterCorpseMemory::init_external(CBaseMonster* M, TTime mem_time)
-{
-    monster = M;
-    time_memory = mem_time;
-}
-
 void CMonsterCorpseMemory::update()
 {
     for (xr_vector<const CGameObject*>::const_iterator I = monster->memory().item().objects().begin();
@@ -42,12 +29,13 @@ void CMonsterCorpseMemory::add_corpse(const CEntityAlive* corpse)
     R_ASSERT1_CURE(corpse, { return; });
     if (const_cast<CEntityAlive*>(corpse)->is_locked_corpse())
         return;
-    SMonsterCorpse corpse_info;
-    corpse_info.position = corpse->Position();
-    corpse_info.vertex = corpse->ai_location().level_vertex_id();
-    corpse_info.time = Device.dwTimeGlobal;
-    CORPSE_MAP_IT it = m_objects.find(corpse);
-    if (it != m_objects.end())
+    SMonsterCorpse corpse_info
+    {
+        .position = corpse->Position(),
+        .vertex = corpse->ai_location().level_vertex_id(),
+        .time = Device.dwTimeGlobal,
+    };
+    if (const auto it = m_objects.find(corpse); it != m_objects.end())
     {
         // обновить данные о враге
         it->second = corpse_info;
@@ -61,7 +49,7 @@ void CMonsterCorpseMemory::add_corpse(const CEntityAlive* corpse)
 
 bool CMonsterCorpseMemory::is_valid_corpse(const CEntityAlive* corpse)
 {
-    CORPSE_MAP_IT it = m_objects.find(corpse);
+    const auto it = m_objects.find(corpse);
     return it != m_objects.end();
 }
 
@@ -94,35 +82,33 @@ void CMonsterCorpseMemory::remove_non_actual()
 
 const CEntityAlive* CMonsterCorpseMemory::get_corpse()
 {
-    CORPSE_MAP_IT it = find_best_corpse();
-    if (it != m_objects.end())
+    if (const auto it = find_best_corpse(); it != m_objects.end())
     {
         if (const_cast<CEntityAlive*>(it->first)->is_locked_corpse())
-            return (0);
+            return nullptr;
 
         return it->first;
     }
-    return (0);
+    return nullptr;
 }
 
 SMonsterCorpse CMonsterCorpseMemory::get_corpse_info()
 {
-    SMonsterCorpse ret_val;
-    ret_val.time = 0;
+    SMonsterCorpse ret_val{};
 
-    CORPSE_MAP_IT it = find_best_corpse();
+    const auto it = find_best_corpse();
     if (it != m_objects.end())
         ret_val = it->second;
 
     return ret_val;
 }
 
-CORPSE_MAP_IT CMonsterCorpseMemory::find_best_corpse()
+CMonsterCorpseMemory::CORPSE_MAP_IT CMonsterCorpseMemory::find_best_corpse()
 {
-    CORPSE_MAP_IT it = m_objects.end();
+    auto it = m_objects.end();
     float min_dist = flt_max;
 
-    for (CORPSE_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+    for (auto I = m_objects.begin(); I != m_objects.end(); ++I)
     {
         if (I->second.position.distance_to(monster->Position()) < min_dist)
         {
@@ -134,11 +120,11 @@ CORPSE_MAP_IT CMonsterCorpseMemory::find_best_corpse()
     return it;
 }
 
-void CMonsterCorpseMemory::remove_links(IGameObject* O)
+void CMonsterCorpseMemory::remove_links(const IGameObject* O)
 {
-    for (CORPSE_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+    for (auto I = m_objects.begin(); I != m_objects.end(); ++I)
     {
-        if ((*I).first == O)
+        if (I->first == O)
         {
             m_objects.erase(I);
             break;

@@ -1,29 +1,37 @@
 #pragma once
+
 #include "ai_monster_defs.h"
 
 class CBaseMonster;
 
 class CMonsterCorpseMemory
 {
-    CBaseMonster* monster;
-    TTime time_memory;
+    CBaseMonster* monster{};
+    TTime time_memory{ 10000 };
+
+    using CORPSE_MAP = xr_map<const CEntityAlive*, SMonsterCorpse>;
+    using CORPSE_MAP_IT = CORPSE_MAP::iterator;
 
     CORPSE_MAP m_objects;
 
 public:
-    CMonsterCorpseMemory();
-    ~CMonsterCorpseMemory();
+    CMonsterCorpseMemory() = default;
 
-    void init_external(CBaseMonster* M, TTime mem_time);
+    void init_external(CBaseMonster* M, const TTime mem_time)
+    {
+        monster = M;
+        time_memory = mem_time;
+    }
+
     void update();
 
     // -----------------------------------------------------
     const CEntityAlive* get_corpse();
 
     SMonsterCorpse get_corpse_info();
-    u32 get_corpse_count() { return m_objects.size(); }
+    auto get_corpse_count() const { return m_objects.size(); }
     void clear() { m_objects.clear(); }
-    void remove_links(IGameObject* O);
+    void remove_links(const IGameObject* O);
 
     void add_corpse(const CEntityAlive* corpse);
     bool is_valid_corpse(const CEntityAlive* corpse);

@@ -12,19 +12,6 @@
 #include "Actor.h"
 #include "actor_memory.h"
 
-CMonsterEnemyMemory::CMonsterEnemyMemory()
-{
-    monster = 0;
-    time_memory = 15000;
-}
-
-CMonsterEnemyMemory::~CMonsterEnemyMemory() {}
-void CMonsterEnemyMemory::init_external(CBaseMonster* M, TTime mem_time)
-{
-    monster = M;
-    time_memory = mem_time;
-}
-
 extern CActor* g_actor;
 
 void CMonsterEnemyMemory::update()
@@ -127,15 +114,16 @@ void CMonsterEnemyMemory::update()
 
 void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
 {
-    SMonsterEnemy enemy_info;
-    enemy_info.position = enemy->Position();
-    enemy_info.vertex = enemy->ai_location().level_vertex_id();
-    enemy_info.time = Device.dwTimeGlobal;
-    enemy_info.danger = 0.f;
+    SMonsterEnemy enemy_info
+    {
+        .position = enemy->Position(),
+        .vertex = enemy->ai_location().level_vertex_id(),
+        .time = Device.dwTimeGlobal,
+        .danger = 0.f,
+    };
 
     // XXX: review
-    ENEMIES_MAP_IT it = m_objects.find(enemy);
-    if (it != m_objects.end())
+    if (const auto it = m_objects.find(enemy); it != m_objects.end())
     {
         // обновить данные о враге
         it->second = enemy_info;
@@ -149,14 +137,15 @@ void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
 
 void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy, const Fvector& pos, u32 vertex, u32 time)
 {
-    SMonsterEnemy enemy_info;
-    enemy_info.position = pos;
-    enemy_info.vertex = vertex;
-    enemy_info.time = time;
-    enemy_info.danger = 0.f;
+    SMonsterEnemy enemy_info
+    {
+        .position = pos,
+        .vertex = vertex,
+        .time = time,
+        .danger = 0.f,
+    };
 
-    ENEMIES_MAP_IT it = m_objects.find(enemy);
-    if (it != m_objects.end())
+    if (const auto it = m_objects.find(enemy); it != m_objects.end())
     {
         // обновить данные о враге
         if (it->second.time < enemy_info.time)
@@ -208,13 +197,13 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
     return ret_val;
 }
 
-ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
+CMonsterEnemyMemory::ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 {
-    ENEMIES_MAP_IT it = m_objects.end();
+    auto it = m_objects.end();
     float max_value = 0.f;
 
     // find best at home first
-    for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+    for (auto I = m_objects.begin(); I != m_objects.end(); ++I)
     {
         if (!monster->Home->at_home(I->second.position))
             continue;
@@ -230,7 +219,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
     {
         // find any
         max_value = 0.f;
-        for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+        for (auto I = m_objects.begin(); I != m_objects.end(); ++I)
         {
             if (I->second.danger > max_value)
             {
@@ -243,14 +232,14 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
     return it;
 }
 
-void CMonsterEnemyMemory::remove_links(IGameObject* O)
+void CMonsterEnemyMemory::remove_links(const IGameObject* O)
 {
     if (monster)
         monster->EnemyMan.remove_links(O);
 
-    for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+    for (auto I = m_objects.begin(); I != m_objects.end(); ++I)
     {
-        if ((*I).first == O)
+        if (I->first == O)
         {
             m_objects.erase(I);
             break;

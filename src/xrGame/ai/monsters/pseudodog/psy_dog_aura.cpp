@@ -67,11 +67,9 @@ void CPsyDogAura::update_schedule()
     m_time_phantom_saw_actor = 0;
 
     // check memory of actor and check memory of phantoms
-    CVisualMemoryManager::VISIBLES::const_iterator I = m_actor->memory().visual().objects().begin();
-    CVisualMemoryManager::VISIBLES::const_iterator E = m_actor->memory().visual().objects().end();
-    for (; I != E; ++I)
+    for (const auto& memory_object : m_actor->memory().visual().objects())
     {
-        const CGameObject* obj = (*I).m_object;
+        const CGameObject* obj = memory_object.m_object;
         if (smart_cast<const CPsyDogPhantom*>(obj))
         {
             if (m_actor->memory().visual().visible_now(obj))
@@ -80,20 +78,17 @@ void CPsyDogAura::update_schedule()
     }
 
     // check memory and enemy manager of phantoms whether they see actor
-    xr_vector<CPsyDogPhantom*>::iterator it = m_object->m_storage.begin();
-    for (; it != m_object->m_storage.end(); ++it)
+    for (CPsyDogPhantom* phantom : m_object->m_storage)
     {
-        if ((*it)->EnemyMan.get_enemy() == m_actor)
+        if (phantom->EnemyMan.get_enemy() == m_actor)
             m_time_phantom_saw_actor = time();
         else
         {
-            ENEMIES_MAP::const_iterator I = (*it)->EnemyMemory.get_memory().begin();
-            ENEMIES_MAP::const_iterator E = (*it)->EnemyMemory.get_memory().end();
-            for (; I != E; ++I)
+            for (const auto& [pEnemy, enemyDescr] : phantom->EnemyMemory.get_memory())
             {
-                if (I->first == m_actor)
+                if (pEnemy == m_actor)
                 {
-                    m_time_phantom_saw_actor = _max(m_time_phantom_saw_actor, I->second.time);
+                    m_time_phantom_saw_actor = _max(m_time_phantom_saw_actor, enemyDescr.time);
                 }
             }
         }
@@ -110,7 +105,7 @@ void CPsyDogAura::update_schedule()
         if (!need_be_active)
         {
             m_effector->switch_off();
-            m_effector = 0;
+            m_effector = nullptr;
         }
     }
     else
@@ -129,6 +124,6 @@ void CPsyDogAura::on_death()
     if (active())
     {
         m_effector->switch_off();
-        m_effector = 0;
+        m_effector = nullptr;
     }
 }

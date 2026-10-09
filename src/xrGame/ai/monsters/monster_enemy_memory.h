@@ -6,25 +6,32 @@ class CBaseMonster;
 
 class CMonsterEnemyMemory
 {
-    CBaseMonster* monster;
-    TTime time_memory;
+    CBaseMonster* monster{};
+    TTime time_memory{ 15000 };
+
+    using ENEMIES_MAP = xr_map<const CEntityAlive*, SMonsterEnemy>;
+    using ENEMIES_MAP_IT = ENEMIES_MAP::iterator;
 
     ENEMIES_MAP m_objects;
 
 public:
-    CMonsterEnemyMemory();
-    ~CMonsterEnemyMemory();
+    CMonsterEnemyMemory() = default;
 
-    void init_external(CBaseMonster* M, TTime mem_time);
+    void init_external(CBaseMonster* M, const TTime mem_time)
+    {
+        monster = M;
+        time_memory = mem_time;
+    }
+
     void update();
 
     // -----------------------------------------------------
     const CEntityAlive* get_enemy();
     SMonsterEnemy get_enemy_info();
-    u32 get_enemies_count() { return m_objects.size(); }
+    auto get_enemies_count() const { return m_objects.size(); }
     const ENEMIES_MAP& get_memory() { return m_objects; }
     void clear() { m_objects.clear(); }
-    void remove_links(IGameObject* O);
+    void remove_links(const IGameObject* O);
 
     void add_enemy(const CEntityAlive* enemy);
     void add_enemy(const CEntityAlive* enemy, const Fvector& pos, u32 vertex, u32 time);

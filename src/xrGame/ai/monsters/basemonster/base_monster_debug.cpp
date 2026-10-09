@@ -731,14 +731,12 @@ void CBaseMonster::add_debug_info(debug::text_tree& root_s)
     }
 
     int index = 1;
-    for (ENEMIES_MAP::const_iterator i = EnemyMemory.get_memory().begin(), e = EnemyMemory.get_memory().end(); i != e;
-         ++i)
+    for (const auto [enemy, _] : EnemyMemory.get_memory())
     {
-        const CEntityAlive* p_enemy = (*i).first;
-        if (p_enemy != EnemyMan.get_enemy())
+        if (enemy != EnemyMan.get_enemy())
         {
             TextTree& enemy_s = enemies_s.add_line(make_xrstr("Enemy %i", index++));
-            ::detail::add_enemy_debug_info(enemy_s, this, p_enemy);
+            ::detail::add_enemy_debug_info(enemy_s, this, enemy);
         }
     }
 

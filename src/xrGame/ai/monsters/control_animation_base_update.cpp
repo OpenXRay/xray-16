@@ -201,10 +201,8 @@ void CControlAnimationBase::SelectVelocities()
 {
     // получить скорости движения по пути
     bool b_moving = m_object->control().path_builder().is_moving_on_path();
-    SMotionVel path_vel;
-    path_vel.set(0.f, 0.f);
-    SMotionVel anim_vel;
-    anim_vel.set(0.f, 0.f);
+    SMotionVel path_vel{};
+    SMotionVel anim_vel{};
 
     if (b_moving)
     {
@@ -229,14 +227,14 @@ void CControlAnimationBase::SelectVelocities()
 
         const CDetailPathManager::STravelParams& current_velocity =
             m_object->movement().detail().velocity(cur_point_velocity_index);
-        path_vel.set(_abs(current_velocity.linear_velocity), current_velocity.real_angular_velocity);
+        path_vel = { _abs(current_velocity.linear_velocity), current_velocity.real_angular_velocity };
     }
 
     SAnimItem* item_it = m_anim_storage[cur_anim_info().get_motion()];
     VERIFY(item_it);
 
     // получить скорости движения по анимации
-    anim_vel.set(item_it->velocity.velocity.linear, item_it->velocity.velocity.angular_real);
+    anim_vel = { item_it->velocity.velocity.linear, item_it->velocity.velocity.angular_real };
 
     //	// проверить на совпадение
     //	R_ASSERT(fsimilar(path_vel.linear,	anim_vel.linear));

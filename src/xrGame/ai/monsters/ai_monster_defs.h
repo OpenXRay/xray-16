@@ -5,10 +5,9 @@
 
 using TTime = u32;
 
-#define COLOR color_xrgb
-#define COLOR_RED COLOR(255, 0, 0)
-#define COLOR_GREEN COLOR(0, 255, 0)
-#define COLOR_BLUE COLOR(0, 0, 255)
+constexpr auto COLOR_RED   = color_xrgb(255, 0, 0);
+constexpr auto COLOR_GREEN = color_xrgb(0, 255, 0);
+constexpr auto COLOR_BLUE  = color_xrgb(0, 0, 255);
 
 class CBlend;
 
@@ -29,20 +28,6 @@ class CBlend;
 #define ASP_UPPER_STATE (1 << 13)
 #define ASP_MOVE_SMELLING (1 << 14)
 
-#define AA_FLAG_ATTACK_RAT (1 << 0) // аттака крыс?
-#define AA_FLAG_FIRE_ANYWAY (1 << 1) // трассировка не нужна
-
-#define CRITICAL_STAND_TIME 1400
-#define TIME_STAND_RECHECK 2000
-
-#define HIT_SIDE_COUNT 2
-#define HIT_BACK 0
-#define HIT_FRONT 1
-
-#define HIT_HEIGHT_COUNT 2
-#define HIT_LOW 0
-#define HIT_HIGH 1
-
 enum EnemyFlags : u16
 {
     FLAG_ENEMY_DIE                  = 1 << 0,
@@ -59,12 +44,6 @@ enum EnemyFlags : u16
     FLAG_ENEMY_DOESNT_SEE_ME        = 1 << 11,
     FLAG_ENEMY_STATS_NOT_READY      = 1 << 12,
 };
-
-#define SOUND_ATTACK_HIT_MIN_DELAY 1000
-#define MORALE_NORMAL 0.5f
-
-#define STANDART_ATTACK -PI_DIV_6, PI_DIV_6, -PI_DIV_6, PI_DIV_6, 3.5f
-#define SIMPLE_ENEMY_HIT_TEST
 
 // StepSounds
 struct SStepSound
@@ -373,8 +352,6 @@ struct SAAParam
     float dist;
 };
 
-using AA_VECTOR = xr_vector<SAAParam>;
-
 struct SCurrentAnimationInfo
 {
     u8 index;
@@ -427,29 +404,11 @@ struct t_fx_index
 };
 
 using SEQ_VECTOR = xr_vector<EMotionAnim>;
-using VELOCITY_CHAIN_VEC = xr_vector<SEQ_VECTOR>;
-
-struct SVelocity
-{
-    float current;
-    float target;
-
-    void set(float c, float t)
-    {
-        current = c;
-        target = t;
-    }
-};
 
 struct SMotionVel
 {
     float linear;
     float angular;
-    void set(float l, float a)
-    {
-        linear = l;
-        angular = a;
-    }
 };
 
 enum EAccelType : u8
@@ -467,28 +426,7 @@ enum EAccelValue : u8
 // XXX: Replace macro with constexpr function
 #define deg(x) (x * PI / 180)
 
-///////////////////////////////////////////////////////////////////////////////
-// State Management
-#define DO_ONCE_BEGIN(flag) \
-    if (!flag)              \
-    {                       \
-        flag = true;
-#define DO_ONCE_END() }
-
-#define TIME_OUT(a, b) a + b < m_dwCurrentTime
-
-#define DO_IN_TIME_INTERVAL_BEGIN(varLastTime, varTimeInterval) \
-    if (TIME_OUT(varLastTime, varTimeInterval))                 \
-    {                                                           \
-        varLastTime = m_dwCurrentTime;
-#define DO_IN_TIME_INTERVAL_END() }
-///////////////////////////////////////////////////////////////////////////////
-
-#define PATH_NEED_REBUILD() m_object->IsPathEnd(2, 0.5f)
-
-// тип монстра (по количеству ног)
-#define QUADRUPEDAL 4
-#define BIPEDAL 2
+class IGameObject;
 
 struct SMonsterEnemy
 {
@@ -498,20 +436,12 @@ struct SMonsterEnemy
     float danger;
 };
 
-class CEntityAlive;
-
-using ENEMIES_MAP = xr_map<const CEntityAlive *, SMonsterEnemy>;
-using ENEMIES_MAP_IT = ENEMIES_MAP::iterator;
-
 struct SMonsterCorpse
 {
     Fvector position;
     u32 vertex;
     TTime time;
 };
-
-using CORPSE_MAP = xr_map<const CEntityAlive *, SMonsterCorpse>;
-using CORPSE_MAP_IT = CORPSE_MAP::iterator;
 
 struct SMonsterHit
 {
@@ -523,8 +453,6 @@ struct SMonsterHit
     bool operator==(const IGameObject* obj) const { return (object == obj); }
 };
 
-using MONSTER_HIT_VECTOR = xr_vector<SMonsterHit>;
-
 enum EDangerType : u8
 {
     eWeak,
@@ -533,5 +461,3 @@ enum EDangerType : u8
     eVeryStrong,
     eNone
 };
-
-using ANIM_TO_MOTION_MAP = xr_map<MotionID, shared_str>;

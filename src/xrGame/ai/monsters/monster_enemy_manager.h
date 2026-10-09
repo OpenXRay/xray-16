@@ -83,5 +83,5 @@ public:
     void script_enemy();
     void script_enemy(const CEntityAlive& enemy);
 
-    void remove_links(IGameObject* O);
+    void remove_links(const IGameObject* O);
 };
