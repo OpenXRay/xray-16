@@ -2,6 +2,7 @@
 #include "ParticleVisual.h"
 
 #include "xrParticles/psystem.h"
+#include "xrEngine/device.h"
 
 #include <algorithm>
 #include <cctype>
@@ -86,6 +87,11 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     dispatch_ = dispatch;
     textures_ = &textures;
     pass_ = &pass;
+    if (def_->name.find("fire") != std::string::npos ||
+        def_->name.find("camp") != std::string::npos)
+        Msg("[renderer-vulkan] particle.fire definition='%s' flags=0x%x shader='%s' texture='%s' max=%u",
+            def_->name.c_str(), def_->flags, def_->shader.c_str(),
+            def_->texture.c_str(), def_->max_particles);
     if ((def_->flags & 1u) == 0) return true; // Non-sprite actions still simulate.
     SurfaceMode surface{};
     if (!textures.surface_mode(def_->shader, def_->texture, surface, error, &alpha_ref_, &blend_mode_, true))
@@ -184,6 +190,10 @@ void VulkanParticleEffect::OnFrame(u32 dt)
     PAPI::Particle* particles = nullptr;
     u32 count = 0;
     PAPI::ParticleManager()->GetParticles(effect_, particles, count);
+    if ((def_->name.find("fire") != std::string::npos ||
+            def_->name.find("camp") != std::string::npos) && Device.dwFrame % 300 == 0)
+        Msg("[renderer-vulkan] particle.fire draw='%s' count=%u material=%d blend=%d hud=%d",
+            def_->name.c_str(), count, material_ != VK_NULL_HANDLE, blend_mode_, hud_);
     if (deferred_ && count == 0) { deferred_ = false; playing_ = false; }
     if (!count || !particles) { bounds(visibility_, initial_position_); return; }
     visibility_.box.invalidate();

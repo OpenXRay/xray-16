@@ -1044,27 +1044,36 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         string64 preset{};
         if (sscanf(mobilePreset + xr_strlen(mobilePresetOption), "%63s", preset) == 1)
         {
-            string128 command{};
-            xr_sprintf(command, "_preset %s", preset);
-            Msg("[android] applying rendering quality: %s", preset);
-            Console->Execute(command);
-
-            if (0 == xr_stricmp(preset, "Minimum") || 0 == xr_stricmp(preset, "Low") ||
-                0 == xr_stricmp(preset, "Default") || 0 == xr_stricmp(preset, "High") ||
-                0 == xr_stricmp(preset, "Extreme"))
+            // The Vulkan backend has its own sampler and shadow targets.
+            // Desktop R2/R3 console commands are not registered for it;
+            // executing the GLES/desktop script here only produces misleading
+            // unknown-command warnings without changing Vulkan quality.
+            if (strstr(Core.Params, "-renderer-vulkan"))
+                Msg("[android] Vulkan quality preset: %s (world anisotropy; render resolution selected separately)", preset);
+            else
             {
-                if (const char* internal = SDL_AndroidGetInternalStoragePath())
+                string128 command{};
+                xr_sprintf(command, "_preset %s", preset);
+                Msg("[android] applying rendering quality: %s", preset);
+                Console->Execute(command);
+
+                if (0 == xr_stricmp(preset, "Minimum") || 0 == xr_stricmp(preset, "Low") ||
+                    0 == xr_stricmp(preset, "Default") || 0 == xr_stricmp(preset, "High") ||
+                    0 == xr_stricmp(preset, "Extreme"))
                 {
-                    xr_strlwr(preset);
-                    const auto config = std::filesystem::path(internal) / "openxray/engine-gamedata/configs" /
-                        (std::string("quality_") + preset + ".ltx");
-                    if (std::filesystem::is_regular_file(config))
+                    if (const char* internal = SDL_AndroidGetInternalStoragePath())
                     {
-                        Msg("[android] loading rendering settings: %s", config.string().c_str());
-                        Console->ExecuteScript(config.string().c_str());
+                        xr_strlwr(preset);
+                        const auto config = std::filesystem::path(internal) / "openxray/engine-gamedata/configs" /
+                            (std::string("quality_") + preset + ".ltx");
+                        if (std::filesystem::is_regular_file(config))
+                        {
+                            Msg("[android] loading rendering settings: %s", config.string().c_str());
+                            Console->ExecuteScript(config.string().c_str());
+                        }
+                        else
+                            Msg("! [android] rendering settings unavailable: %s", config.string().c_str());
                     }
-                    else
-                        Msg("! [android] rendering settings unavailable: %s", config.string().c_str());
                 }
             }
         }

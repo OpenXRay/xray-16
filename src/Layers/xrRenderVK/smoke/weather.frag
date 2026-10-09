@@ -36,13 +36,20 @@ float sun_visibility(float depth)
     vec2 uv = coord.xy * 0.5 + 0.5;
     if (any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0))) ||
         coord.z <= 0.0 || coord.z >= 1.0) return 1.0;
-    vec2 texel = 1.0 / vec2(textureSize(sun_shadow, 0));
-    float lit = 0.0;
+    ivec2 size = textureSize(sun_shadow, 0);
+    vec2 grid = uv * vec2(size) - 0.5;
+    ivec2 base = ivec2(floor(grid));
+    vec2 weight = fract(grid);
+    float visibility[4];
     for (int y = 0; y < 2; ++y)
         for (int x = 0; x < 2; ++x)
-            lit += coord.z - shadow.options.x <=
-                texture(sun_shadow, uv + (vec2(x, y) - 0.5) * texel).r ? 1.0 : 0.0;
-    return lit * 0.25;
+        {
+            ivec2 pixel = clamp(base + ivec2(x, y), ivec2(0), size - 1);
+            visibility[y * 2 + x] = coord.z - shadow.options.x <=
+                texelFetch(sun_shadow, pixel, 0).r ? 1.0 : 0.0;
+        }
+    return mix(mix(visibility[0], visibility[1], weight.x),
+        mix(visibility[2], visibility[3], weight.x), weight.y);
 }
 
 void main()

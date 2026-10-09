@@ -75,7 +75,7 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
         attachment.srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
         attachment.dstColorBlendFactor = ui_mode == 3 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR;
     }
-    if (ui && ui_mode == 5)
+    if (ui && (ui_mode == 5 || ui_mode == 10))
         attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachment.colorBlendOp = VK_BLEND_OP_ADD;
     attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
@@ -209,7 +209,7 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
         destroy();
         return false;
     }
-    for (int mode = 0; mode < 10; ++mode)
+    for (int mode = 0; mode < 11; ++mode)
         if (!make_pipeline(device, render_pass, m_ui_layout, ui_vertex, ui_fragment,
                 true, use_depth, m_vk, mode, m_ui_pipelines[mode]))
         {
@@ -256,7 +256,7 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     VkExtent2D logical_extent, int blend_mode) const
 {
     if (!valid_frame(frame) || !vertices || !indices || !texture_set || !index_count ||
-        blend_mode < 0 || blend_mode >= 10 || !m_ui_pipelines[blend_mode] ||
+        blend_mode < 0 || blend_mode >= 11 || !m_ui_pipelines[blend_mode] ||
         (index_type != VK_INDEX_TYPE_UINT16 && index_type != VK_INDEX_TYPE_UINT32))
         return false;
     if (!logical_extent.width || !logical_extent.height)

@@ -97,7 +97,7 @@ private:
     VkPipelineLayout m_scene_layout = VK_NULL_HANDLE;
     VkPipelineLayout m_ui_layout = VK_NULL_HANDLE;
     VkPipeline m_scene_pipeline = VK_NULL_HANDLE;
-    VkPipeline m_ui_pipelines[10]{};
+    VkPipeline m_ui_pipelines[11]{};
     VkDescriptorSetLayout m_ui_descriptor_layout = VK_NULL_HANDLE;
     VkDescriptorPool m_ui_descriptor_pool = VK_NULL_HANDLE;
     ScenePassDispatch m_vk{};

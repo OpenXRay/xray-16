@@ -187,6 +187,10 @@ bool create_logical_device(const PhysicalDevice& physical_device, const DeviceDi
     device_info.pQueueCreateInfos = &queue_info;
     device_info.enabledExtensionCount = 1;
     device_info.ppEnabledExtensionNames = extensions;
+    // The world sampler enables this only on GPUs advertising the feature.
+    VkPhysicalDeviceFeatures enabled_features{};
+    enabled_features.samplerAnisotropy = physical_device.features.samplerAnisotropy;
+    device_info.pEnabledFeatures = &enabled_features;
 
     if (vk.create_device(physical_device.handle, &device_info, nullptr, &device) != VK_SUCCESS)
     {

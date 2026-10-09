@@ -87,6 +87,7 @@ private:
     struct DetailBatch
     {
         BufferResource vertices, indices;
+        uint32_t index_count{};
     };
     VkDevice device_{};
     VkPhysicalDeviceMemoryProperties memory_{};
@@ -107,6 +108,7 @@ private:
     std::vector<DetailPlacement> visible_details_;
     // Each frame slot is reused only after FrameContext has waited on its fence.
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;
+    mutable std::array<uint64_t, FrameContext::FramesInFlight> detail_signatures_{};
     std::vector<LevelVisual> visuals_;
     std::vector<uint8_t> visual_phases_; // opaque/cutout bit 1, transparent bit 2
     std::vector<uint32_t> roots_;

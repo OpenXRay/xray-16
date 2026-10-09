@@ -186,6 +186,9 @@ private:
     std::vector<VulkanRainRender*> rain_draws_;
     std::vector<VulkanThunderboltRender*> thunderbolt_draws_;
     std::vector<LevelDraw> level_draws_;
+    // A visual can be submitted through several sector roots. Look up only
+    // submissions for the same visual instead of scanning every draw.
+    std::unordered_multimap<uint32_t, size_t> level_draw_lookup_;
     const GpuLevel* current_level_{};
     std::array<float, 16> scene_mvp_{};
     bool scene_visibility_{};

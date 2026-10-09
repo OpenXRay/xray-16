@@ -18,6 +18,8 @@ bool retirement_idle(VkDevice device, PFN_vkDeviceWaitIdle wait)
 }
 bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory, bool bc_supported,
+    const VkPhysicalDeviceFeatures& features, const VkPhysicalDeviceProperties& properties,
+    float requested_anisotropy,
     const TextureUploadDispatch& dispatch, PFN_vkCreateSampler create_sampler,
     PFN_vkDestroySampler destroy_sampler, PFN_vkDeviceWaitIdle wait_idle,
     std::string& error)
@@ -44,6 +46,12 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
     info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
     info.addressModeU = info.addressModeV = info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     info.maxLod = VK_LOD_CLAMP_NONE;
+    if (features.samplerAnisotropy && properties.limits.maxSamplerAnisotropy > 1.f)
+    {
+        info.anisotropyEnable = VK_TRUE;
+        info.maxAnisotropy = std::clamp(requested_anisotropy, 1.f,
+            properties.limits.maxSamplerAnisotropy);
+    }
     if (create_sampler(device_, &info, nullptr, &sampler_) != VK_SUCCESS)
     {
         error = "could not create game texture sampler";
@@ -51,6 +59,8 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
         return false;
     }
     info.addressModeU = info.addressModeV = info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    info.anisotropyEnable = VK_FALSE;
+    info.maxAnisotropy = 1.f;
     if (create_sampler(device_, &info, nullptr, &ui_sampler_) != VK_SUCCESS)
     {
         error = "could not create UI texture sampler";

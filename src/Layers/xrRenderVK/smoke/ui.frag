@@ -8,7 +8,9 @@ void main()
 {
     vec4 sample_color = texture(color_map, fragment_uv);
     pixel_color = fragment_color * sample_color;
-    if (ui.blend_mode == 6.0)
+    if (ui.blend_mode == 10.0)
+        pixel_color = vec4(1.0, 0.72, 0.12, sample_color.a * fragment_color.a);
+    else if (ui.blend_mode == 6.0)
     {
         pixel_color.rgb = mix(sample_color.rgb, fragment_color.rgb, fragment_color.a);
         pixel_color.a = sample_color.a * fragment_color.a;

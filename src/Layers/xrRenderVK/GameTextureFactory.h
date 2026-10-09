@@ -23,6 +23,8 @@ public:
 
     bool initialize(VkDevice device, VkQueue queue, VkCommandPool pool,
         const VkPhysicalDeviceMemoryProperties& memory, bool bc_supported,
+        const VkPhysicalDeviceFeatures& features, const VkPhysicalDeviceProperties& properties,
+        float requested_anisotropy,
         const TextureUploadDispatch& dispatch, PFN_vkCreateSampler create_sampler,
         PFN_vkDestroySampler destroy_sampler, PFN_vkDeviceWaitIdle wait_idle,
         std::string& error);

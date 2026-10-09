@@ -6,6 +6,7 @@
 #include "SceneShaders.h"
 #include "ShaderModule.h"
 #include "PostProcessShaders.h"
+#include "xrEngine/x_ray.h"
 
 #include <algorithm>
 #include <cmath>
@@ -230,7 +231,13 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
             !ui_fragment.initialize(device, shaders, scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment), error) ||
             !ui_pass_.initialize(device, frame.render_pass(), scene_vertex.handle(), scene_fragment.handle(), ui_vertex.handle(), ui_fragment.handle(),
                                  scene_dispatch, error, true) ||
-            !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory, physical.features.textureCompressionBC, texture_dispatch_,
+            !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory, physical.features.textureCompressionBC,
+                physical.features, physical.properties,
+                strstr(Core.Params, "-android-mobile-preset Minimum") ? 2.f :
+                strstr(Core.Params, "-android-mobile-preset Low") ? 4.f :
+                strstr(Core.Params, "-android-mobile-preset Extreme") ||
+                strstr(Core.Params, "-android-mobile-preset High") ? 16.f : 8.f,
+                texture_dispatch_,
                                   create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
             !create_postprocess(error))
             goto failed;
@@ -433,14 +440,13 @@ void VulkanGameDevice::discard_model_draws(const void* instance)
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16],
     bool hud, float sort_distance, const void* instance, float lod)
 {
-    const auto duplicate = std::find_if(level_draws_.begin(), level_draws_.end(),
-        [index, hud, instance, &mvp](const LevelDraw& draw)
-        {
-            return draw.index == index && draw.hud == hud && draw.instance == instance &&
-                std::equal(draw.mvp.begin(), draw.mvp.end(), mvp);
-        });
-    if (duplicate != level_draws_.end())
-        return;
+    const auto existing = level_draw_lookup_.equal_range(index);
+    for (auto it = existing.first; it != existing.second; ++it)
+    {
+        const LevelDraw& draw = level_draws_[it->second];
+        if (draw.hud == hud && draw.instance == instance &&
+            std::equal(draw.mvp.begin(), draw.mvp.end(), mvp)) return;
+    }
 
     LevelDraw draw;
     draw.index = index;
@@ -450,6 +456,7 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
     draw.lod = lod;
     draw.hud = hud;
     level_draws_.push_back(draw);
+    level_draw_lookup_.emplace(index, level_draws_.size() - 1);
 }
 
 void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, void* user)
@@ -773,6 +780,7 @@ void VulkanGameDevice::discard_scene_draws()
     rain_draws_.clear();
     thunderbolt_draws_.clear();
     level_draws_.clear();
+    level_draw_lookup_.clear();
     current_level_ = nullptr;
 }
 
@@ -988,6 +996,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         model_draws_.clear();
         particle_draws_.clear();
         level_draws_.clear();
+        level_draw_lookup_.clear();
         current_level_ = nullptr;
         ui_.reset_frame();
         return false;
@@ -1000,6 +1009,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     model_draws_.clear();
     particle_draws_.clear();
     level_draws_.clear();
+    level_draw_lookup_.clear();
     current_level_ = nullptr;
     // A successful submission consumes every CPU-side command, even when an
     // individual recorder reported malformed input after recording began.
@@ -1131,6 +1141,7 @@ bool VulkanGameDevice::prepare_for_reset(std::string& error)
     model_draws_.clear();
     particle_draws_.clear();
     level_draws_.clear();
+    level_draw_lookup_.clear();
     current_level_ = nullptr;
     ui_.setup_states();
     error.clear();
@@ -1149,6 +1160,7 @@ void VulkanGameDevice::destroy()
     model_draws_.clear();
     particle_draws_.clear();
     level_draws_.clear();
+    level_draw_lookup_.clear();
     current_level_ = nullptr;
     scene_visibility_ = false;
     postprocess_passes_.clear();

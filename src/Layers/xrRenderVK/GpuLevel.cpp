@@ -307,8 +307,22 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         prepared.detail_meshes_.emplace_back();
         Mesh& mesh = prepared.detail_meshes_.back();
-        if (!pass.request_game_pipeline("vk\\level_cutout.vs", "vk\\level_cutout.ps",
-                SurfaceMode::AlphaTest, false, false, error) ||
+        if (!textures.surface_mode(prototype.shader, prototype.texture, mesh.mode,
+                error, &mesh.alpha_ref))
+        {
+            error = "level.details / " + prototype.shader + ": " + error;
+            return false;
+        }
+        // Detail geometry is static. Opaque 'details\\set' must not be
+        // subjected to a made-up 128/255 alpha cutout threshold. Until
+        // details have a sorted forward pass, preserve the prior cutout
+        // behavior for modded transparent definitions.
+        if (mesh.mode == SurfaceMode::Transparent)
+            mesh.mode = SurfaceMode::AlphaTest;
+        const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
+        if (!pass.request_game_pipeline(cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
+                cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
+                mesh.mode, false, false, error) ||
             !textures.material(prototype.texture, pass, mesh.material, error) ||
             !upload_geometry(prototype.vertices.data(), prototype.vertices.size() * sizeof(LevelVertex),
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices) ||
@@ -319,7 +333,6 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         mesh.index_count = static_cast<uint32_t>(prototype.indices.size());
-        mesh.mode = SurfaceMode::AlphaTest;
     }
     // The old level may still have been submitted. Its owner must wait for
     // those frames before replacing the level. Uploads within prepared use
@@ -569,6 +582,39 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
     const float (&mvp)[16]) const
 {
     if (frame.frame_index >= detail_batches_.size()) return false;
+    // Geometry is in world space. If the same placements survive frustum
+    // culling, re-use the frame slot's upload even when the camera moves.
+    uint64_t signature = 14695981039346656037ull;
+    for (size_t i = 0; i < visible_details_.size(); ++i)
+    {
+        const DetailPlacement& p = visible_details_[i];
+        if (!visible_sphere(mvp, p.x, p.y, p.z, 6.f)) continue;
+        signature = (signature ^ (uint64_t(i) << 8 | p.model)) * 1099511628211ull;
+        // Include coordinates: the visible list can start at another cell
+        // while retaining the same number and model ordering.
+        uint32_t bits{};
+        std::memcpy(&bits, &p.x, sizeof(bits));
+        signature = (signature ^ bits) * 1099511628211ull;
+        std::memcpy(&bits, &p.z, sizeof(bits));
+        signature = (signature ^ bits) * 1099511628211ull;
+    }
+    auto& buffers = detail_batches_[frame.frame_index];
+    if (detail_signatures_[frame.frame_index] == signature && !buffers.empty())
+    {
+        for (size_t model = 0; model < buffers.size(); ++model)
+        {
+            const DetailBatch& buffer = buffers[model];
+            if (!buffer.index_count) continue;
+            const Mesh& mesh = detail_meshes_[model];
+            const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
+            if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
+                    buffer.index_count, mvp, mesh.material, mesh.mode, 0,
+                    cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
+                    cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
+                    float(mesh.alpha_ref) / 255.f)) return false;
+        }
+        return true;
+    }
     struct Geometry { std::vector<LevelVertex> vertices; std::vector<uint32_t> indices; };
     std::vector<Geometry> grouped(details_.prototypes.size());
     for (const DetailPlacement& placement : visible_details_)
@@ -601,7 +647,6 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
         }
         for (uint32_t index : prototype.indices) batch.indices.push_back(first + index);
     }
-    auto& buffers = detail_batches_[frame.frame_index];
     if (buffers.size() != grouped.size()) buffers.resize(grouped.size());
     const auto write_buffer = [this](BufferResource& buffer, const void* data,
         size_t bytes, VkBufferUsageFlags usage, std::string& error)
@@ -615,6 +660,7 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
     for (size_t model = 0; model < grouped.size(); ++model)
     {
         const Geometry& batch = grouped[model];
+        buffers[model].index_count = 0;
         if (batch.indices.empty()) continue;
         DetailBatch& buffer = buffers[model];
         std::string error;
@@ -626,13 +672,17 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
             Msg("! [renderer-vulkan] detail batch upload: %s", error.c_str());
             return false;
         }
+        buffer.index_count = static_cast<uint32_t>(batch.indices.size());
         const Mesh& mesh = detail_meshes_[model];
+        const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
         if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                 static_cast<uint32_t>(batch.indices.size()), mvp, mesh.material,
-                SurfaceMode::AlphaTest, 0,
-                "vk\\level_cutout.vs", "vk\\level_cutout.ps",
+                mesh.mode, 0,
+                cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
+                cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
                 float(mesh.alpha_ref) / 255.f)) return false;
     }
+    detail_signatures_[frame.frame_index] = signature;
     return true;
 }
 
@@ -880,6 +930,7 @@ void GpuLevel::destroy()
     detail_cache_.clear();
     visible_details_.clear();
     for (auto& buffers : detail_batches_) buffers.clear();
+    detail_signatures_.fill(0);
     visuals_.clear();
     visual_phases_.clear();
     roots_.clear();
