@@ -6,12 +6,12 @@ CUI3tButton::CUI3tButton()
 {
     m_bTextureEnable = false;
     m_bUseTextColor[S_Disabled] = true;
-    m_bUseTextColor[S_Highlighted] = false;
+    m_bUseTextColor[S_Highlighted] = true;
     m_bUseTextColor[S_Touched] = false;
 
     m_dwTextColor[S_Enabled] = 0xFFFFFFFF;
     m_dwTextColor[S_Disabled] = 0xFFAAAAAA;
-    m_dwTextColor[S_Highlighted] = 0xFFFFFFFF;
+    m_dwTextColor[S_Highlighted] = 0xFFFFD87A;
     m_dwTextColor[S_Touched] = 0xFFFFFFFF;
 
     m_background = NULL;
@@ -199,7 +199,7 @@ void CUI3tButton::Update()
                 m_back_frameline->SetCurrentState(S_Touched);
             }
         }
-        else if (m_bCursorOverWindow)
+        else if (m_bCursorOverWindow || UI().Focus().GetFocused() == this)
         {
             if (m_background)
             {
@@ -233,7 +233,7 @@ void CUI3tButton::Update()
     {
         textColor = m_bUseTextColor[S_Touched] ? m_dwTextColor[S_Touched] : m_dwTextColor[S_Enabled];
     }
-    else if (m_bCursorOverWindow)
+    else if (m_bCursorOverWindow || UI().Focus().GetFocused() == this)
     {
         textColor = m_bUseTextColor[S_Highlighted] ? m_dwTextColor[S_Highlighted] : m_dwTextColor[S_Enabled];
     }

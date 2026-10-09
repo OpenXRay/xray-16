@@ -384,13 +384,17 @@ void VulkanGameDevice::record_postprocess(const FrameRecordingContext& frame, vo
 }
 
 void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
-    bool hud, float sort_distance, const void* instance, float lod)
+    bool hud, float sort_distance, const void* instance, float lod, const Fmatrix* world)
 {
     ModelDraw draw;
     draw.model = &model;
     draw.instance = instance;
     draw.skeleton = skeleton;
     std::copy_n(mvp, 16, draw.mvp.data());
+    const Fmatrix& rotation = world ? *world : Fidentity;
+    draw.normal_rows = {rotation.i.x, rotation.j.x, rotation.k.x, 0.f,
+        rotation.i.y, rotation.j.y, rotation.k.y, 0.f,
+        rotation.i.z, rotation.j.z, rotation.k.z, 0.f};
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
     draw.lod = lod;
     draw.hud = hud;
@@ -519,9 +523,11 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             if (model.skeleton ?
                     !model.model->record_animated(frame, owner.deferred_, mvp,
-                        *model.skeleton, owner.model_error_, GeometryPhase::Transparent, model.lod) :
+                        *model.skeleton, owner.model_error_, GeometryPhase::Transparent, model.lod,
+                        model.normal_rows.data()) :
                     !model.model->record(frame, owner.deferred_, mvp,
-                        nullptr, 0, owner.model_error_, GeometryPhase::Transparent, model.lod))
+                        nullptr, 0, owner.model_error_, GeometryPhase::Transparent, model.lod,
+                        nullptr, model.normal_rows.data()))
             {
                 owner.models_recorded_ = false;
                 return;
@@ -616,9 +622,11 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             const bool recorded = model.skeleton ?
                 model.model->record_animated(frame, owner.deferred_, mvp,
-                    *model.skeleton, owner.model_error_, GeometryPhase::Hud, model.lod) :
+                    *model.skeleton, owner.model_error_, GeometryPhase::Hud, model.lod,
+                    model.normal_rows.data()) :
                 model.model->record(frame, owner.deferred_, mvp,
-                    nullptr, 0, owner.model_error_, GeometryPhase::Hud, model.lod);
+                    nullptr, 0, owner.model_error_, GeometryPhase::Hud, model.lod,
+                    nullptr, model.normal_rows.data());
             if (!recorded)
             {
                 owner.models_recorded_ = false;
@@ -651,9 +659,11 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
         std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
         if (draw.skeleton ?
                 !draw.model->record_animated(frame, owner.deferred_, mvp,
-                    *draw.skeleton, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod) :
+                    *draw.skeleton, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod,
+                    draw.normal_rows.data()) :
                 !draw.model->record(frame, owner.deferred_, mvp,
-                    nullptr, 0, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod))
+                    nullptr, 0, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest, draw.lod,
+                    nullptr, draw.normal_rows.data()))
         {
             owner.models_recorded_ = false;
             return;

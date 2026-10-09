@@ -325,10 +325,13 @@ bool CLevel::net_start_client6()
             // pre-cache. This touches only resources visible in the level,
             // unlike ResourcesDeferredUpload(), and prevents hundreds of DDS
             // decodes from blocking the first interactive gameplay frames.
-            Msg("[load-trace] client6 Android visible-set precache begin frames=60 mem=%uK",
+            Msg("[load-trace] client6 Android visible-set precache begin frames=120 mem=%uK",
                 Memory.mem_usage() / 1024);
             android_set_load_context("client6 visible-set precache scheduled");
-            Device.PreCache(60, true);
+            // Sweep the camera in smaller steps while the loading screen is
+            // still present. First-bound DDS textures and OGF models otherwise
+            // hitch when the player first walks into those view directions.
+            Device.PreCache(120, true);
         }
         else
 #endif

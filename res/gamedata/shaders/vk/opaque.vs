@@ -1,5 +1,10 @@
 // Level and object geometry share the Vulkan G-buffer vertex layout.
-[[vk::push_constant]] cbuffer Camera { float4x4 mvp; };
+[[vk::push_constant]] cbuffer Camera {
+    float4x4 mvp;
+    float alpha_threshold;
+    float3 padding;
+    float4 normal_rows[3];
+};
 
 struct Vertex
 {
@@ -29,7 +34,12 @@ Fragment main(Vertex vertex)
     fragment.position = mul(mvp, float4(vertex.position, 1.0));
     // X-Ray's projection is Y-up; a positive-height Vulkan viewport is Y-down.
     fragment.position.y = -fragment.position.y;
+#if defined(LEVEL_GEOMETRY)
     fragment.normal = vertex.normal;
+#else
+    fragment.normal = normalize(float3(dot(normal_rows[0].xyz, vertex.normal),
+        dot(normal_rows[1].xyz, vertex.normal), dot(normal_rows[2].xyz, vertex.normal)));
+#endif
     fragment.uv = vertex.uv;
 #if defined(LEVEL_GEOMETRY)
     fragment.lightmap_uv = vertex.lightmap_uv;

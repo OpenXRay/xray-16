@@ -3,7 +3,12 @@
 #ifndef SKIN_WEIGHTS
 #error SKIN_WEIGHTS must be in the range 1..4
 #endif
-[[vk::push_constant]] cbuffer Camera { float4x4 mvp; };
+[[vk::push_constant]] cbuffer Camera {
+    float4x4 mvp;
+    float alpha_threshold;
+    float3 padding;
+    float4 normal_rows[3];
+};
 [[vk::binding(0, 1)]] StructuredBuffer<float4x4> pose : register(t0, space1);
 
 struct Vertex
@@ -43,7 +48,8 @@ Fragment main(Vertex vertex)
     Fragment fragment;
     fragment.position = mul(mvp, position);
     fragment.position.y = -fragment.position.y;
-    fragment.normal = normalize(normal);
+    fragment.normal = normalize(float3(dot(normal_rows[0].xyz, normal),
+        dot(normal_rows[1].xyz, normal), dot(normal_rows[2].xyz, normal)));
     fragment.uv = vertex.uv;
     return fragment;
 }

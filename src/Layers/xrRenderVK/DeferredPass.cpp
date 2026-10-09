@@ -351,7 +351,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         // Cutout fragment shaders read a per-material alpha threshold after
         // the camera matrix. Vulkan guarantees at least 128 push-constant bytes.
         const VkPushConstantRange camera{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0, sizeof(float) * 17};
+            0, sizeof(float) * 32};
         const VkPushConstantRange light{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(DeferredLight)};
         VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
         layout.pushConstantRangeCount = 1;
@@ -635,7 +635,8 @@ void DeferredPass::release_pose_descriptor(VkDescriptorSet& set)
 bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
-    const char* vertex_name, const char* fragment_name, float alpha_ref) const
+    const char* vertex_name, const char* fragment_name, float alpha_ref,
+    const float* normal_rows) const
 {
     const auto* pair = game_pipeline(vertex_name, fragment_name);
     if (!pair || !pair->skinned || pair->mode != mode || pair->hud != hud ||
@@ -653,6 +654,9 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
         skinned_layout_, 0, 2, sets, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (normal_rows)
+        vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+            80, sizeof(float) * 12, normal_rows);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -895,7 +899,7 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    float alpha_ref) const
+    float alpha_ref, const float* normal_rows) const
 {
     if (mode == SurfaceMode::Transparent) return false;
     VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
@@ -917,6 +921,9 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (normal_rows)
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+            80, sizeof(float) * 12, normal_rows);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -953,7 +960,7 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
 bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    const char** failure, float alpha_ref) const
+    const char** failure, float alpha_ref, const float* normal_rows) const
 {
     const auto reject = [failure](const char* reason)
     {
@@ -990,6 +997,9 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (normal_rows)
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+            80, sizeof(float) * 12, normal_rows);
     if (fragment_name && std::strstr(fragment_name, "particle_") &&
         std::strstr(fragment_name, "_set.ps"))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -1006,7 +1016,8 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
 
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
-    uint32_t first_index, const char* vertex_name, const char* fragment_name, float alpha_ref) const
+    uint32_t first_index, const char* vertex_name, const char* fragment_name, float alpha_ref,
+    const float* normal_rows) const
 {
     VkPipeline pipeline = hud_;
     if (vertex_name || fragment_name)
@@ -1027,6 +1038,9 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
+    if (normal_rows)
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+            80, sizeof(float) * 12, normal_rows);
     if (fragment_name && std::strstr(fragment_name, "particle_") &&
         std::strstr(fragment_name, "_set.ps"))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,

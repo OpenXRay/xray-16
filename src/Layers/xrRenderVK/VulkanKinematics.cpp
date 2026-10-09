@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <functional>
 
 namespace xray::render::vulkan
 {
@@ -341,7 +342,11 @@ void VulkanKinematics::Bone_Calculate(CBoneData* bone, Fmatrix* parent)
             else instance.mTransform.mul_43(*parent, bone->bind_transform);
             for (const auto& offset : offsets_)
                 if (offset.m_bone_id == bone->GetSelfID())
+                {
+                    const Fvector original = instance.mTransform.c;
                     instance.mTransform.mulB_43(offset.m_transform);
+                    instance.mTransform.c.add(original, offset.m_transform.c);
+                }
             if (instance.callback())
                 instance.callback()(&instance);
         }
@@ -351,10 +356,50 @@ void VulkanKinematics::Bone_Calculate(CBoneData* bone, Fmatrix* parent)
         Bone_Calculate(child, &instance.mTransform);
 }
 
-void VulkanKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8, bool)
+void VulkanKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8, bool ignore_callbacks)
 {
-    CalculateBones();
-    pos = LL_GetTransform(id);
+    R_ASSERT2(id < instances_.size(), "invalid Vulkan animation bone ID");
+    // IK asks for the unmodified animation goal while it is changing the
+    // current bone transforms. Returning LL_GetTransform feeds the previous
+    // foot correction back into the next step and can sink walking actors.
+    UpdateTracks();
+    std::function<Fmatrix(u16)> bone_pose = [&](u16 bone_id) -> Fmatrix
+    {
+        const auto* bone = data_->bones[bone_id];
+        const u16 parent_id = bone->GetParentID();
+        const Fmatrix parent = parent_id == BI_NONE ? Fidentity : bone_pose(parent_id);
+        CBoneInstance instance = instances_[bone_id];
+        if (!ignore_callbacks && instance.callback_overwrite())
+        {
+            if (instance.callback()) instance.callback()(&instance);
+        }
+        else
+        {
+            MotionKey key;
+            if (playback_.sample(bone_id, key))
+            {
+                Fquaternion rotation;
+                rotation.x = key.rotation[0]; rotation.y = key.rotation[1];
+                rotation.z = key.rotation[2]; rotation.w = key.rotation[3];
+                Fvector translation;
+                translation.set(key.translation[0], key.translation[1], key.translation[2]);
+                Fmatrix local;
+                local.mk_xform(rotation, translation);
+                instance.mTransform.mul_43(parent, local);
+            }
+            else instance.mTransform.mul_43(parent, bone->bind_transform);
+            for (const auto& offset : offsets_)
+                if (offset.m_bone_id == bone_id)
+                {
+                    const Fvector original = instance.mTransform.c;
+                    instance.mTransform.mulB_43(offset.m_transform);
+                    instance.mTransform.c.add(original, offset.m_transform.c);
+                }
+            if (!ignore_callbacks && instance.callback()) instance.callback()(&instance);
+        }
+        return instance.mTransform;
+    };
+    pos = bone_pose(id);
 }
 
 bool VulkanKinematics::PickBone(const Fmatrix& parent, pick_result& result, float range, const Fvector& start, const Fvector& direction, u16 id)

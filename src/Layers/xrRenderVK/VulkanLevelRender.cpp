@@ -1062,7 +1062,8 @@ void VulkanLevelRender::End()
             float matrix[16];
             std::memcpy(matrix, &transform, sizeof(matrix));
             game_device_->queue_model(*mark.model, mark.skeleton, matrix, false,
-                distance_squared(mark.center, Device.vCameraPosition), mark.model.get());
+                distance_squared(mark.center, Device.vCameraPosition), mark.model.get(), 1.f,
+                mark.transform);
         }
 
     const DeferredEnvironment environment = current_environment();
@@ -1739,12 +1740,12 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
                     {center.x - camera_position.x, center.y - camera_position.y,
                         center.z - camera_position.z});
                 game_device_->queue_model(node.lod_gpu(facet), skeleton,
-                    transform, hud, sort_distance, model_owner, lod);
+                    transform, hud, sort_distance, model_owner, lod, &world);
                 return;
             }
             if (node.has_gpu())
                 game_device_->queue_model(node.gpu(), skeleton,
-                    transform, hud, sort_distance, model_owner, lod);
+                    transform, hud, sort_distance, model_owner, lod, &world);
             for (const auto& child : node.children()) submit(*child, skeleton);
             if (!node.linked().empty())
             {

@@ -162,7 +162,7 @@ bool GpuModel::load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue q
 }
 
 bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
-    GeometryPhase phase, float lod, const IKinematics* instance)
+    GeometryPhase phase, float lod, const IKinematics* instance, const float* normal_rows)
 {
     if (!device_ || frame.frame_index >= FrameContext::FramesInFlight)
     {
@@ -234,7 +234,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, descriptor,
                     hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
-                    vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f))
+                    vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f, normal_rows))
             {
                 error = "Vulkan skeletal shader pair or render pass is unavailable: " +
                     vertex_name + " / " + fragment_name;
@@ -254,7 +254,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     return false;
             }
             if (!pass.record_hud(frame, vertex_buffer->handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, window.offset))
+                    window.index_count, mvp, mesh.material, window.offset,
+                    nullptr, nullptr, 0.f, normal_rows))
             {
                 if (error.empty()) error = "Vulkan HUD model geometry recording failed";
                 return false;
@@ -286,10 +287,11 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                 return false;
         }
         if (!(transparent ? pass.record_transparent(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp,
-                                mesh.material, window.offset, named ? vertex : nullptr, named ? fragment : nullptr) :
+                                mesh.material, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
+                                nullptr, 0.f, normal_rows) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                float(mesh.alpha_ref) / 255.f)))
+                                float(mesh.alpha_ref) / 255.f, normal_rows)))
         {
             error = "Vulkan model geometry recording failed";
             return false;
@@ -301,7 +303,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
 
 bool GpuModel::record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16], IKinematics& skeleton, std::string& error,
-    GeometryPhase phase, float lod)
+    GeometryPhase phase, float lod, const float* normal_rows)
 {
     static_assert(sizeof(Fmatrix) == 16 * sizeof(float));
     skeleton.CalculateBones();
@@ -316,7 +318,7 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
         std::memcpy(pose.data() + bone * 16,
             &skeleton.LL_GetBoneInstance(static_cast<u16>(bone)).mRenderTransform,
             16 * sizeof(float));
-    return record(frame, pass, mvp, pose.data(), count, error, phase, lod, &skeleton);
+    return record(frame, pass, mvp, pose.data(), count, error, phase, lod, &skeleton, normal_rows);
 }
 
 void GpuModel::release_instance(const IKinematics* skeleton)
