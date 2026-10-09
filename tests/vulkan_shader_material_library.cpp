@@ -117,7 +117,7 @@ int main()
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("trees\\leaf", mode, error) && mode == SurfaceMode::AlphaTest);
-    assert(library.resolve("trees\\blended", mode, error) && mode == SurfaceMode::Transparent);
+    assert(library.resolve("trees\\blended", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
     assert(!library.resolve("unknown", mode, error) && error.find("unknown") != std::string::npos);
     assert(!library.resolve("mod\\unrecognized", mode, error) &&

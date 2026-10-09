@@ -962,11 +962,28 @@ void VulkanLevelRender::Render()
     for (const VulkanGlow* glow : glows_)
     {
         if (!glow || !glow->active() || glow->radius() <= EPS_L) continue;
-        const VkDescriptorSet texture = game_device_->glow_texture(glow->texture());
-        if (!texture) continue;
         const auto& location = glow->position();
         Fvector center, right, up;
         center.set(location[0], location[1], location[2]);
+        const auto direction = Fvector().sub(center, Device.vCameraPosition);
+        const float distance = direction.magnitude();
+        if (std::isfinite(distance) && distance > glow->radius())
+        {
+            auto& cached = glow_visibility_[glow];
+            if (cached.first == 0 || Device.dwFrame - cached.first >= 8)
+            {
+                collide::rq_result hit;
+                Fvector ray;
+                ray.div(direction, distance);
+                cached.second = !g_pGameLevel->ObjectSpace.RayPick(Device.vCameraPosition,
+                    ray, distance - std::min(glow->radius() * 0.25f, 0.25f),
+                    collide::rqtStatic, hit, nullptr);
+                cached.first = Device.dwFrame;
+            }
+            if (!cached.second) continue;
+        }
+        const VkDescriptorSet texture = game_device_->glow_texture(glow->texture());
+        if (!texture) continue;
         right.mul(Device.vCameraRight, glow->radius());
         up.mul(Device.vCameraTop, glow->radius());
         const auto& tint = glow->color();
@@ -1191,6 +1208,7 @@ void VulkanLevelRender::level_Unload()
         game_device_->release_level_glows();
     }
     wallmarks_.clear();
+    glow_visibility_.clear();
     models_Clear(true);
     model_bases_.clear();
     model_gpu_cache_.clear();
@@ -1890,6 +1908,7 @@ void VulkanLevelRender::glow_destroy(IRender_Glow* glow)
 {
     // Like lights, glows are xr_resources and call back from their base
     // destructor. Avoid accessing the object during that callback.
+    glow_visibility_.erase(static_cast<VulkanGlow*>(glow));
     glows_.erase(std::remove_if(glows_.begin(), glows_.end(),
         [glow](const VulkanGlow* candidate) { return static_cast<const IRender_Glow*>(candidate) == glow; }),
         glows_.end());

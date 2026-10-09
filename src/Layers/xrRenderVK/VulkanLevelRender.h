@@ -166,6 +166,9 @@ private:
   VulkanGameDevice *external_game_device_{};
   std::vector<VulkanLight *> lights_;
   std::vector<VulkanGlow *> glows_;
+  // World glows use screen-space UI quads. Cache static-geometry visibility
+  // briefly so they do not shine through walls without a ray test per frame.
+  std::unordered_map<const VulkanGlow*, std::pair<u32, bool>> glow_visibility_;
   std::vector<VulkanObjectSpecific *> object_specifics_;
   struct Wallmark
   {

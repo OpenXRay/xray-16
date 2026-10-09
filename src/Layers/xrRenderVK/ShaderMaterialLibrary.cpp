@@ -134,9 +134,12 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     supported &= version <= max_version;
     if ((cls == "PARTICLE" || cls == "S_SET   ") && !has_blending)
     { error = "missing Blending property in '" + name + "'"; return false; }
+    // Deferred D_TREE alpha blending selects the base_aref shader and writes
+    // depth. Treating its leaves as forward transparency makes the canopy
+    // see-through and prevents it from occluding distant lights.
     if ((cls == "PARTICLE" && blending != 0) || strict || (cls == "S_SET   " && blending != 0) ||
         ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODEL   " ||
-            cls == "MODELEbB" || cls == "D_TREE  ") && blend))
+            cls == "MODELEbB") && blend))
         mode = SurfaceMode::Transparent;
     else if ((cls == "PARTICLE" && blending == 0) || cls == "LM_AREF " || cls == "V_AREF  " || cls == "D_TREE  " ||
         (cls == "D_STILL " && blend))
