@@ -199,6 +199,7 @@ void CPHWorld::Destroy()
     dJointGroupEmpty(ContactGroup);
     dJointGroupDestroy(ContactGroup);
     ContactFeedBacks.clear();
+    ClearContactBodyEffectors();
     ContactEffectors.clear();
     dCloseODE();
     dCylinderClassUser = -1;
@@ -399,7 +400,7 @@ void CPHWorld::Step()
 #endif
     dJointGroupEmpty(ContactGroup); // this is to be called after PhDataUpdate!!!-the order is critical!!!
     ContactFeedBacks.empty();
-    ContactEffectors.empty();
+    ClearContactBodyEffectors();
 
     if (physics_step_time_callback)
     {
@@ -434,7 +435,7 @@ void CPHWorld::StepTouch()
     }
     dJointGroupEmpty(ContactGroup);
     ContactFeedBacks.empty();
-    ContactEffectors.empty();
+    ClearContactBodyEffectors();
 }
 
 u32 CPHWorld::CalcNumSteps(u32 dTime)
