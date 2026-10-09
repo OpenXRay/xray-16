@@ -154,6 +154,7 @@ python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
     --shader-root "$asset_root/gamedata/shaders" \
     --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json"
 cp "$repo_dir"/android/apk/quality_*.ltx "$asset_root/gamedata/configs/"
+python3 "$repo_dir/tools/write_android_engine_bundle_marker.py" "$asset_root/gamedata"
 if [ -d "$asset_root/gamedata/gamedata" ]; then
     echo "APK asset staging unexpectedly nested gamedata inside itself" >&2
     exit 1
@@ -241,6 +242,11 @@ python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
     --shader-root "$asset_root/gamedata/shaders" \
     --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
     --apk "$apk"
+if ! unzip -p "$apk" assets/gamedata/openxray-bundle.sha256 | \
+    cmp - "$asset_root/gamedata/openxray-bundle.sha256"; then
+    echo "Gradle packaged stale engine gamedata fingerprint" >&2
+    exit 1
+fi
 if [ "$arm64_only" != ON ]; then
     python3 "$repo_dir/tools/check_android_vulkan_route.py" \
         --repo "$repo_dir" --sdl-root "$sdl_dir" --native-lib "$native_lib" \

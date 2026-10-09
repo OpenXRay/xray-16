@@ -1231,9 +1231,26 @@ public final class LauncherActivity extends Activity {
         File privateRoot = new File(getFilesDir(), "openxray");
         File destination = new File(privateRoot, "engine-gamedata");
         File marker = new File(privateRoot, "engine-data.version");
-        String desiredVersion = Integer.toString(BuildConfig.VERSION_CODE);
+        // VERSION_CODE remains the same across diagnostic APKs. The bundled
+        // shaders can change between builds, so use the payload's fingerprint.
+        String desiredVersion;
+        try (InputStream input = getAssets().open("gamedata/openxray-bundle.sha256")) {
+            byte[] bytes = new byte[65];
+            int length = 0;
+            while (length < bytes.length) {
+                int count = input.read(bytes, length, bytes.length - length);
+                if (count < 0)
+                    break;
+                length += count;
+            }
+            desiredVersion = new String(bytes, 0, length, StandardCharsets.US_ASCII);
+            if (length != 64 || !desiredVersion.matches("[0-9a-f]{64}") || input.read() != -1)
+                throw new IOException("invalid bundled engine data fingerprint");
+        }
 
-        if (desiredVersion.equals(readSmallTextFile(marker)) && isCompleteEngineData(destination)) {
+        if (desiredVersion.equals(readSmallTextFile(marker))
+                && desiredVersion.equals(readSmallTextFile(new File(destination, "openxray-bundle.sha256")))
+                && isCompleteEngineData(destination)) {
             writeLauncherLog("[launcher] OpenXRay engine data is current: " + destination.getAbsolutePath());
             return true;
         }
