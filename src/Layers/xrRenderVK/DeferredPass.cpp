@@ -20,7 +20,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     const ScenePassDispatch& vk, VkPipeline& pipeline, std::string& error,
     const char* label, bool shadow = false, bool additive = false,
     bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
-    bool particle_set = false, bool water_depth_write = false)
+    bool particle_set = false, bool water_depth_write = false, bool wallmark = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -59,9 +59,9 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // Depth precision on shallow terrain slopes otherwise produces long,
     // repeating self-shadow bands. Apply bias while writing shadow depth,
     // in addition to the small receiver bias used by the lighting shader.
-    raster.depthBiasEnable = shadow ? VK_TRUE : VK_FALSE;
-    raster.depthBiasConstantFactor = shadow ? 1.25f : 0.f;
-    raster.depthBiasSlopeFactor = shadow ? 1.5f : 0.f;
+    raster.depthBiasEnable = shadow || wallmark ? VK_TRUE : VK_FALSE;
+    raster.depthBiasConstantFactor = shadow ? 1.25f : wallmark ? -1.f : 0.f;
+    raster.depthBiasSlopeFactor = shadow ? 1.5f : wallmark ? -1.f : 0.f;
     VkPipelineMultisampleStateCreateInfo multi{VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
     multi.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     VkPipelineDepthStencilStateCreateInfo depth{VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
@@ -72,7 +72,9 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
     depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow || particle_set ||
         water_depth_write) ? VK_TRUE : VK_FALSE;
-    depth.depthCompareOp = VK_COMPARE_OP_LESS;
+    // Decal polygons lie on top of the level surface. Strict LESS rejects
+    // coplanar pixels and makes papers/wallmarks blink as the view moves.
+    depth.depthCompareOp = wallmark ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
     {
@@ -586,7 +588,8 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
             "game shader pair", false, particle_additive, particle_alpha_add || glow_alpha_add,
-            particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set))
+            particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set,
+            false, wallmark_multiply_2x))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;

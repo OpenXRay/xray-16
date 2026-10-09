@@ -21,6 +21,9 @@ struct VulkanKinematics::Data
     u16 root = BI_NONE;
     std::unique_ptr<CInifile> user_data;
     std::vector<ModelGeometry> meshes;
+    // OGF meshes can contain more than 65535 faces. The legacy CBoneData
+    // index is u16; Vulkan picking and enumeration need the full face index.
+    std::vector<std::vector<std::vector<uint32_t>>> child_faces;
     std::vector<MotionSlot> motions;
     // Legacy motion objects back the low-level IKinematicsAnimated queries.
     // Destroy handles before their private container (reverse field order).
@@ -248,25 +251,29 @@ bool VulkanKinematics::attach_geometry(const ModelGeometry& geometry, std::strin
         error = "Vulkan skeleton has no skinned child geometry";
         return false;
     }
-    for (auto* bone : data_->bones)
-        bone->child_faces.resize(meshes.size());
+    data_->child_faces.resize(data_->bones.size());
+    for (size_t bone = 0; bone < data_->bones.size(); ++bone)
+    {
+        data_->child_faces[bone].resize(meshes.size());
+        data_->bones[bone]->child_faces.resize(meshes.size());
+    }
     for (size_t child = 0; child < meshes.size(); ++child)
     {
         const auto& mesh = meshes[child];
         if (mesh.type != 4 && mesh.type != 5)
             continue;
-        if (mesh.indices.size() / 3 > UINT16_MAX)
-        {
-            error = "Vulkan skeletal child exceeds the bone face index range";
-            for (auto* bone : data_->bones)
-                bone->child_faces.clear();
-            return false;
-        }
         for (size_t face = 0; face < mesh.indices.size() / 3; ++face)
         {
             u64 mask = 0;
             for (size_t corner = 0; corner < 3; ++corner)
             {
+                if (mesh.indices[face * 3 + corner] >= mesh.vertices.size())
+                {
+                    error = "Vulkan skeletal child references an unknown vertex";
+                    data_->child_faces.clear();
+                    for (auto* bone : data_->bones) bone->child_faces.clear();
+                    return false;
+                }
                 const auto& vertex = mesh.vertices[mesh.indices[face * 3 + corner]];
                 for (size_t link = 0; link < 4; ++link)
                     if (vertex.weights[link] > 0.f)
@@ -274,6 +281,7 @@ bool VulkanKinematics::attach_geometry(const ModelGeometry& geometry, std::strin
                         if (vertex.bones[link] >= data_->bones.size())
                         {
                             error = "Vulkan skeletal child references an unknown bone";
+                            data_->child_faces.clear();
                             for (auto* bone : data_->bones)
                                 bone->child_faces.clear();
                             return false;
@@ -283,7 +291,11 @@ bool VulkanKinematics::attach_geometry(const ModelGeometry& geometry, std::strin
             }
             for (size_t bone = 0; bone < data_->bones.size(); ++bone)
                 if (mask & (u64(1) << bone))
-                    data_->bones[bone]->child_faces[child].push_back(static_cast<u16>(face));
+                {
+                    data_->child_faces[bone][child].push_back(static_cast<uint32_t>(face));
+                    if (face <= UINT16_MAX)
+                        data_->bones[bone]->child_faces[child].push_back(static_cast<u16>(face));
+                }
         }
     }
     data_->meshes = std::move(meshes);
@@ -425,7 +437,7 @@ bool VulkanKinematics::PickBone(const Fmatrix& parent, pick_result& result, floa
         std::string error;
         if (!skin_model_mesh(mesh, pose.data(), instances_.size(), vertices, error))
             continue;
-        for (u16 face : data_->bones[id]->child_faces[child])
+        for (uint32_t face : data_->child_faces[id][child])
         {
             Fvector tri[3];
             for (size_t corner = 0; corner < 3; ++corner)
@@ -478,7 +490,7 @@ void VulkanKinematics::EnumBoneVertices(SEnumVerticesCallback& callback, u16 id)
         std::vector<LevelVertex> vertices;
         std::string error;
         if (!skin_model_mesh(mesh, pose.data(), instances_.size(), vertices, error)) continue;
-        for (u16 face : data_->bones[id]->child_faces[child])
+        for (uint32_t face : data_->child_faces[id][child])
             for (size_t corner = 0; corner < 3; ++corner)
             {
                 const auto& vertex = vertices[mesh.indices[size_t(face) * 3 + corner]];
@@ -561,7 +573,7 @@ int VulkanKinematics::LL_GetBoneGroups(xr_vector<xr_vector<u16>>& groups)
     groups.resize(data_->meshes.size());
     for (size_t child = 0; child < groups.size(); ++child)
         for (u16 id = 0; id < data_->bones.size(); ++id)
-            if (!data_->bones[id]->child_faces[child].empty())
+            if (!data_->child_faces[id][child].empty())
                 groups[child].push_back(id);
     return static_cast<int>(groups.size());
 }

@@ -858,6 +858,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     }
     local_uniforms_.clear();
     local_scissors_.clear();
+    size_t local_candidates = 0;
     if (render_world)
     {
         Fmatrix camera, inverse;
@@ -883,6 +884,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         };
         std::stable_sort(nearby.begin(), nearby.end(), [&](const auto* a, const auto* b)
         { return distance(a) < distance(b); });
+        local_candidates = nearby.size();
         const VkExtent2D extent = window_.frame().extent();
         for (const VulkanLightSnapshot* snapshot : nearby)
         {
@@ -972,6 +974,20 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     }
     if (render_world && Device.dwFrame % 300 == 0)
     {
+        float total_energy = 0.f, strongest = 0.f;
+        uint32_t spots = 0, shadowed = 0;
+        for (const auto& selected : local_uniforms_)
+        {
+            const float energy = .2126f * selected.color_type[0] +
+                .7152f * selected.color_type[1] + .0722f * selected.color_type[2];
+            total_energy += energy;
+            strongest = std::max(strongest, energy);
+            spots += selected.color_type[3] >= .5f;
+            shadowed += selected.shadow_params[2] >= .5f;
+        }
+        Msg("[renderer-vulkan] light.selection frame=%u candidates=%zu visible=%zu spots=%u shadowed=%u energy=%.3f strongest=%.3f ambient=%.3f hemi=%.3f",
+            Device.dwFrame, local_candidates, local_uniforms_.size(), spots, shadowed,
+            total_energy, strongest, light.direction_ambient[3], light.grade[3]);
         const auto animated = std::count_if(model_draws_.begin(), model_draws_.end(),
             [](const ModelDraw& draw) { return draw.skeleton != nullptr; });
         const auto linked = std::count_if(level_draws_.begin(), level_draws_.end(),
