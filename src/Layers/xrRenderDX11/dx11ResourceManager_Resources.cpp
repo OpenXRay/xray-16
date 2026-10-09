@@ -174,6 +174,7 @@ dx11ConstantBuffer* CResourceManager::_CreateConstantBuffer(u32 context_id, ID3D
         }
     }
 
+    pTempBuffer->m_context_id = context_id;
     pTempBuffer->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     v_constant_buffer[context_id].emplace_back(pTempBuffer);
     return pTempBuffer;
@@ -186,7 +187,8 @@ void CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx11ConstantB
     if (reclaim(v_constant_buffer[context_id], pBuffer))
         return;
 #ifndef MASTER_GOLD
-    Msg("! ERROR: Failed to find compiled constant buffer");
+    Msg("! ERROR: Failed to find compiled constant buffer '%s' in context [%u]",
+        pBuffer->GetBufferName(), context_id);
 #endif
 }
 

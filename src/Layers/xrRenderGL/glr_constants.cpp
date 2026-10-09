@@ -33,6 +33,10 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     GLint uniformCount;
     CHK_GL(glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount));
 
+#ifdef XR_PLATFORM_WEB
+    u16 samplerStage = 0;
+#endif
+
     for (GLint i = 0; i < uniformCount; i++)
     {
         GLint size;
@@ -120,7 +124,11 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 C->handler = &binder_sampler;
                 R_constant_load& L = C->samp;
                 if (destination & RC_dest_all)
+#ifdef XR_PLATFORM_WEB
+                    L.index = samplerStage;
+#else
                     L.index = r_index;
+#endif
                 else
                     L.index = u16(r_index + ((destination & RC_dest_pixel) ? 0 : CTexture::rstVertex));
                 L.cls = RC_sampler;
@@ -133,11 +141,18 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 R_ASSERT(C->type == RC_sampler);
                 R_ASSERT(C->handler == &binder_sampler);
                 R_constant_load& L = C->samp;
+#ifdef XR_PLATFORM_WEB
+                R_ASSERT((destination & RC_dest_all) || L.index == r_index);
+#else
                 R_ASSERT(L.index == r_index);
+#endif
                 R_ASSERT(L.cls == RC_sampler);
                 R_ASSERT(L.location == r_location);
                 R_ASSERT(L.program == program);
             }
+#ifdef XR_PLATFORM_WEB
+            ++samplerStage;
+#endif
         }
             bSkip = TRUE;
             break;

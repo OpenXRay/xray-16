@@ -38,6 +38,10 @@ BOOL xrRender_test_hw()
 {
     ZoneScoped;
 
+#ifdef XR_PLATFORM_WEB
+    return TRUE;
+#endif
+
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (windowTest.successful())

@@ -24,7 +24,7 @@ Texture2D s_occ;
 //#define SSAO_QUALITY 4
 //#endif
 
-#if SSAO_QUALITY <=3
+#if !defined(SSAO_QUALITY) || SSAO_QUALITY <= 3
 #include "ssao.ps"
 //#ifdef SM_5
 //#undef SM_5
@@ -50,7 +50,7 @@ Texture2D s_occ;
 #define SSAO_QUALITY 3
 #endif
 #define USE_HDAO_CODE
-#if SSAO_QUALITY <=3
+#if !defined(SSAO_QUALITY) || SSAO_QUALITY <= 3
 #define  g_f2RTSize ( pos_decompression_params2.xy )
 //#define  g_f2RTSize float2( 1280.0, 1024.0 )
 #ifdef GBUFFER_OPTIMIZATION

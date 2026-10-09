@@ -73,6 +73,18 @@ void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iO
         // transfer matrices
         ref_constant array = cmd_list.get_c(s_bones_array_const);
         u32 count = RMS_bonecount;
+#ifdef XR_PLATFORM_WEB
+        static thread_local xr_vector<Fvector4> rows;
+        rows.resize(count * 3);
+        for (u32 mid = 0; mid < count; mid++)
+        {
+            Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
+            rows[mid * 3 + 0].set(M._11, M._21, M._31, M._41);
+            rows[mid * 3 + 1].set(M._12, M._22, M._32, M._42);
+            rows[mid * 3 + 2].set(M._13, M._23, M._33, M._43);
+        }
+        cmd_list.set_ca(&*array, 0, rows.data(), count * 3);
+#else
         for (u32 mid = 0; mid < count; mid++)
         {
             Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
@@ -81,6 +93,7 @@ void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iO
             cmd_list.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
             cmd_list.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
         }
+#endif
 
         // render
         cmd_list.set_Geometry(hGeom);

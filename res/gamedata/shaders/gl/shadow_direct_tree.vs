@@ -36,7 +36,7 @@ v2p_shadow_direct _main ( v_shadow_direct I )
 #ifdef	USE_AREF
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
 #else	//	USE_AREF
-	float 	frac 	= 0;
+	float 	frac 	= 0.0;
 #endif	//	USE_AREF
 			result	= calc_xz_wave	(wind.xz*inten, frac);
 #endif	//	USE_TREEWAVE

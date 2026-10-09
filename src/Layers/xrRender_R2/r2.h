@@ -424,7 +424,7 @@ public:
 #if defined(USE_DX11)
     ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
 #elif defined(USE_OGL)
-    GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
+    GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc, u32& ret_width, u32& ret_height);
 #else
 #   error No graphics API selected or enabled!
 #endif

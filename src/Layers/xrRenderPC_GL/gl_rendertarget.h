@@ -62,6 +62,9 @@ public:
     ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+#ifdef XR_PLATFORM_WEB
+    ref_rt rt_Forward; // 32bit		(r,g,b,a)				// scene copy the forward pass draws into
+#endif
     //	Igor: for volumetric lights
     ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)

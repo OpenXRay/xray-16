@@ -5,11 +5,19 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+#ifdef XR_PLATFORM_WEB
+enum
+{
+    LOCKFLAGS_FLUSH  = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
+    LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT,
+};
+#else
 enum
 {
     LOCKFLAGS_FLUSH  = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
     LOCKFLAGS_APPEND = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT, // TODO: Implement buffer object appending using glBufferSubData
 };
+#endif
 
 u32 GetFVFVertexSize(u32 FVF)
 {
@@ -32,6 +40,10 @@ static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, u32 dataSize, bo
     const GLenum target = bIndexBuffer ? GL_ELEMENT_ARRAY_BUFFER : GL_ARRAY_BUFFER;
 
     glGenBuffers(1, pBuffer);
+#ifdef XR_PLATFORM_WEB
+    if (bIndexBuffer)
+        BindVertexArray(0);
+#endif
     glBindBuffer(target, *pBuffer);
     CHK_GL(glBufferData(target, dataSize, pData, usage));
     return S_OK;
@@ -153,14 +165,14 @@ void IterVertexDeclaration(const VertexElement* dxdecl, F&& callback)
     }
 }
 
-void SetVertexDeclaration(const VertexElement* dxdecl)
+void SetVertexDeclaration(const VertexElement* dxdecl, u32 baseOffset)
 {
     auto stride = GetDeclVertexSize(dxdecl, 0);
     IterVertexDeclaration(dxdecl,
     [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/)
     {
         CHK_GL(glVertexAttribPointer(
-            location, size, type, normalized, stride, (void*)offset));
+            location, size, type, normalized, stride, (void*)(offset + baseOffset)));
     });
 }
 
@@ -179,10 +191,93 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
     });
 }
 
-void SetGLVertexPointer(SDeclaration* decl)
+void SetGLVertexPointer(SDeclaration* decl, u32 baseOffset)
 {
-    SetVertexDeclaration(decl->dcl_code.data());
+    SetVertexDeclaration(decl->dcl_code.data(), baseOffset);
 }
+
+#ifdef XR_PLATFORM_WEB
+namespace
+{
+struct VertexArrayKey
+{
+    const SDeclaration* decl;
+    GLuint vb;
+    GLuint ib;
+    u32 stride;
+    u32 baseVertex;
+
+    bool operator==(const VertexArrayKey& other) const = default;
+};
+
+struct VertexArrayKeyHash
+{
+    size_t operator()(const VertexArrayKey& key) const
+    {
+        size_t hash = std::hash<const void*>()(key.decl);
+        for (const u32 value : { key.vb, key.ib, key.stride, key.baseVertex })
+            hash = hash * 31 + value;
+        return hash;
+    }
+};
+
+xr_unordered_map<VertexArrayKey, GLuint, VertexArrayKeyHash> vertexArrays;
+xr_vector<GLuint> streamVertexBuffers;
+
+template <typename Predicate>
+void ForgetVertexArraysIf(Predicate&& shouldForget)
+{
+    for (auto it = vertexArrays.begin(); it != vertexArrays.end();)
+    {
+        if (shouldForget(it->first))
+        {
+            if (g_boundVertexArray == it->second)
+                g_boundVertexArray = 0;
+            glDeleteVertexArrays(1, &it->second);
+            it = vertexArrays.erase(it);
+        }
+        else
+            ++it;
+    }
+}
+} // namespace
+
+GLuint GetVertexArray(SDeclaration* decl, u32 baseVertex)
+{
+    const VertexArrayKey key{ decl, decl->bound_vb, decl->bound_ib, decl->bound_stride, baseVertex };
+    const auto [it, created] = vertexArrays.try_emplace(key, 0);
+    if (!created)
+        return it->second;
+
+    glGenVertexArrays(1, &it->second);
+    glBindVertexArray(it->second);
+    g_boundVertexArray = it->second;
+    glBindBuffer(GL_ARRAY_BUFFER, key.vb);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, key.ib);
+    IterVertexDeclaration(decl->dcl_code.data(),
+    [](GLuint location, GLint, GLenum, GLboolean, intptr_t, GLuint)
+    {
+        CHK_GL(glEnableVertexAttribArray(location));
+    });
+    SetVertexDeclaration(decl->dcl_code.data(), baseVertex * key.stride);
+    return it->second;
+}
+
+bool IsStreamVertexBuffer(GLuint buffer)
+{
+    return std::find(streamVertexBuffers.begin(), streamVertexBuffers.end(), buffer) != streamVertexBuffers.end();
+}
+
+void ForgetVertexArrays(GLuint buffer)
+{
+    ForgetVertexArraysIf([buffer](const VertexArrayKey& key) { return key.vb == buffer || key.ib == buffer; });
+}
+
+void ForgetVertexArrays(const SDeclaration* decl)
+{
+    ForgetVertexArraysIf([decl](const VertexArrayKey& key) { return key.decl == decl; });
+}
+#endif
 
 //-----------------------------------------------------------------------------
 VertexStagingBuffer::~VertexStagingBuffer()
@@ -249,6 +344,9 @@ void VertexStagingBuffer::Destroy()
 
     if (m_DeviceBuffer)
     {
+#ifdef XR_PLATFORM_WEB
+        ForgetVertexArrays(m_DeviceBuffer);
+#endif
         glDeleteBuffers(1, &m_DeviceBuffer);
         m_DeviceBuffer = 0;
     }
@@ -341,6 +439,9 @@ void IndexStagingBuffer::Destroy()
 
     if (m_DeviceBuffer)
     {
+#ifdef XR_PLATFORM_WEB
+        ForgetVertexArrays(m_DeviceBuffer);
+#endif
         glDeleteBuffers(1, &m_DeviceBuffer);
         m_DeviceBuffer = 0;
     }
@@ -363,8 +464,13 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
         return 0;
 
     GLint bufferSize;
+#ifdef XR_PLATFORM_WEB
+    glBindBuffer(GL_COPY_READ_BUFFER, m_DeviceBuffer);
+    CHK_GL(glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+#else
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
     CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize));
+#endif
     return bufferSize;
 }
 
@@ -377,6 +483,10 @@ VertexStreamBuffer::~VertexStreamBuffer()
 void VertexStreamBuffer::Create(size_t size)
 {
     CreateVertexBuffer(&m_DeviceBuffer, nullptr, size, true);
+#ifdef XR_PLATFORM_WEB
+    streamVertexBuffers.push_back(m_DeviceBuffer);
+    m_HostBuffer.resize(size);
+#endif
     AddRef();
 }
 
@@ -385,10 +495,39 @@ void VertexStreamBuffer::Destroy()
     if (m_DeviceBuffer == 0)
         return;
 
+#ifdef XR_PLATFORM_WEB
+    ForgetVertexArrays(m_DeviceBuffer);
+    streamVertexBuffers.erase(std::find(streamVertexBuffers.begin(), streamVertexBuffers.end(), m_DeviceBuffer));
+#endif
     glDeleteBuffers(1, &m_DeviceBuffer);
     m_DeviceBuffer = 0;
 }
 
+#ifdef XR_PLATFORM_WEB
+void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+    VERIFY(offset == 0 && size <= m_HostBuffer.size());
+    UNUSED(flush);
+    m_MappedOffset = offset;
+    m_MappedSize = size;
+    return m_HostBuffer.data() + offset;
+}
+
+void VertexStreamBuffer::Unmap()
+{
+    Unmap(m_MappedSize);
+}
+
+void VertexStreamBuffer::Unmap(size_t writtenSize)
+{
+    VERIFY(m_DeviceBuffer && writtenSize <= m_MappedSize);
+    if (writtenSize == 0)
+        return;
+    glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
+    CHK_GL(glBufferData(GL_ARRAY_BUFFER, writtenSize, m_HostBuffer.data() + m_MappedOffset, GL_STREAM_DRAW));
+}
+#else
 void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
 {
     VERIFY(m_DeviceBuffer);
@@ -411,6 +550,7 @@ void VertexStreamBuffer::Unmap()
     glBindBuffer(GL_ARRAY_BUFFER, m_DeviceBuffer);
     CHK_GL(glUnmapBuffer(GL_ARRAY_BUFFER));
 }
+#endif
 
 bool VertexStreamBuffer::IsValid() const
 {
@@ -426,6 +566,9 @@ IndexStreamBuffer::~IndexStreamBuffer()
 void IndexStreamBuffer::Create(size_t size)
 {
     CreateIndexBuffer(&m_DeviceBuffer, nullptr, size, true);
+#ifdef XR_PLATFORM_WEB
+    m_HostBuffer.resize(size);
+#endif
     AddRef();
 }
 
@@ -434,19 +577,57 @@ void IndexStreamBuffer::Destroy()
     if (m_DeviceBuffer == 0)
         return;
 
+#ifdef XR_PLATFORM_WEB
+    ForgetVertexArrays(m_DeviceBuffer);
+#endif
     glDeleteBuffers(1, &m_DeviceBuffer);
     m_DeviceBuffer = 0;
 }
 
+#ifdef XR_PLATFORM_WEB
+constexpr GLenum INDEX_UPLOAD_TARGET = GL_COPY_WRITE_BUFFER;
+#else
+constexpr GLenum INDEX_UPLOAD_TARGET = GL_ELEMENT_ARRAY_BUFFER;
+#endif
+
+#ifdef XR_PLATFORM_WEB
 void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
 {
     VERIFY(m_DeviceBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
+    VERIFY(offset + size <= m_HostBuffer.size());
+    if (flush)
+    {
+        glBindBuffer(INDEX_UPLOAD_TARGET, m_DeviceBuffer);
+        CHK_GL(glBufferData(INDEX_UPLOAD_TARGET, m_HostBuffer.size(), nullptr, GL_DYNAMIC_DRAW));
+    }
+    m_MappedOffset = offset;
+    m_MappedSize = size;
+    return m_HostBuffer.data() + offset;
+}
+
+void IndexStreamBuffer::Unmap()
+{
+    Unmap(m_MappedSize);
+}
+
+void IndexStreamBuffer::Unmap(size_t writtenSize)
+{
+    VERIFY(m_DeviceBuffer && writtenSize <= m_MappedSize);
+    if (writtenSize == 0)
+        return;
+    glBindBuffer(INDEX_UPLOAD_TARGET, m_DeviceBuffer);
+    CHK_GL(glBufferSubData(INDEX_UPLOAD_TARGET, m_MappedOffset, writtenSize, m_HostBuffer.data() + m_MappedOffset));
+}
+#else
+void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+{
+    VERIFY(m_DeviceBuffer);
+    glBindBuffer(INDEX_UPLOAD_TARGET, m_DeviceBuffer);
 
     void *pData = nullptr;
     const auto flags = flush ? LOCKFLAGS_FLUSH : LOCKFLAGS_APPEND;
     CHK_GL(pData = (void*)glMapBufferRange(
-        GL_ELEMENT_ARRAY_BUFFER,
+        INDEX_UPLOAD_TARGET,
         offset,
         size,
         flags));
@@ -457,9 +638,10 @@ void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
 void IndexStreamBuffer::Unmap()
 {
     VERIFY(m_DeviceBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_DeviceBuffer);
-    CHK_GL(glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
+    glBindBuffer(INDEX_UPLOAD_TARGET, m_DeviceBuffer);
+    CHK_GL(glUnmapBuffer(INDEX_UPLOAD_TARGET));
 }
+#endif
 
 bool IndexStreamBuffer::IsValid() const
 {

@@ -146,6 +146,29 @@ private:
 #   endif
 #endif // DEBUG
 
+#ifdef XR_PLATFORM_WEB
+    static inline u32 stencil_enable = u32(-1);
+    static inline u32 stencil_func = u32(-1);
+    static inline u32 stencil_ref = u32(-1);
+    static inline u32 stencil_mask = u32(-1);
+    static inline u32 stencil_writemask = u32(-1);
+    static inline u32 stencil_fail = u32(-1);
+    static inline u32 stencil_pass = u32(-1);
+    static inline u32 stencil_zfail = u32(-1);
+    static inline u32 colorwrite_mask = u32(-1);
+    static inline u32 fill_mode = u32(-1);
+    static inline u32 cull_mode = u32(-1);
+    static inline u32 z_enable = u32(-1);
+    static inline u32 z_func = u32(-1);
+    static inline u32 depth_write_mask = u32(-1);
+    static inline u32 blend_enable = u32(-1);
+    static inline u32 blend_src = u32(-1);
+    static inline u32 blend_dst = u32(-1);
+    static inline u32 blend_src_alpha = u32(-1);
+    static inline u32 blend_dst_alpha = u32(-1);
+    static inline u32 blend_op = u32(-1);
+    static inline u32 blend_op_alpha = u32(-1);
+#else
     u32 stencil_enable;
     u32 stencil_func;
     u32 stencil_ref;
@@ -159,6 +182,7 @@ private:
     u32 cull_mode;
     u32 z_enable;
     u32 z_func;
+#endif
     u32 alpha_ref;
 
     // Lists
@@ -171,6 +195,9 @@ private:
     //CTexture* textures_vs[5]; // dmap + 4 vs
     CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures]; // 4 vs
     CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
+#ifdef XR_PLATFORM_WEB
+    static inline u32 occupied_texture_units = u32(-1);
+#endif
 #if defined(USE_DX11)
     CTexture* textures_hs[CTexture::mtMaxHullShaderTextures]; // 4 vs
     CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures]; // 4 vs
@@ -411,6 +438,10 @@ public:
 #endif
 
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
+#ifdef USE_OGL
+    ICF void SetBaseVertex(u32 baseV);
+    ICF void DrawIndexedBaseVertex(GLenum topology, u32 indexCount, u32 startI, u32 baseV);
+#endif
     ICF void set_Indices(IndexBufferHandle _ib);
     ICF void set_Geometry(SGeometry* _geom);
     ICF void set_Geometry(ref_geom& _geom) { set_Geometry(&*_geom); }
@@ -419,6 +450,10 @@ public:
                         u32 _zfail = D3DSTENCILOP_KEEP);
     IC void set_Z(u32 _enable);
     IC void set_ZFunc(u32 _func);
+#ifdef XR_PLATFORM_WEB
+    IC void set_DepthWrite(u32 _enable);
+    IC void set_Blend(u32 _enable, u32 _src, u32 _dst, u32 _srcAlpha, u32 _dstAlpha, u32 _op, u32 _opAlpha);
+#endif
     IC void set_AlphaRef(u32 _value);
     IC void set_ColorWriteEnable(
         u32 _mask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE |

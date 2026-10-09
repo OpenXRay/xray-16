@@ -39,7 +39,7 @@ float4 plight_local( float m, float3 pnt, float3 normal, float3 light_position, 
   	float3 L 	= -normalize	(float3(L2P));					// vector2light
   	float3 H		= normalize	(L+V);						// float-angle-vector
 		rsqr	= dot		(L2P,L2P);					// distance 2 light (squared)
-  	float  att 	= saturate	(1 - rsqr*light_range_rsq);			// q-linear attenuate
+  	float  att 	= saturate	(1.0 - rsqr*light_range_rsq);			// q-linear attenuate
 	float4 light	= tex3D		(s_material, float3( dot(L,N), dot(H,N), m ) ).xxxy; 	// sample material
   	return att*light;
 }

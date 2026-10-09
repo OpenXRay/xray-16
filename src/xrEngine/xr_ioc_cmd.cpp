@@ -12,6 +12,8 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
+#include "xrCDB/ISpatial.h"
+
 xr_vector<xr_token> VidQualityToken;
 
 extern xr_vector<xr_token> vid_monitor_token;
@@ -758,6 +760,7 @@ void CCC_Register()
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
+    CMD4(CCC_Float, "r__sector_update_distance", &ps_r__sector_update_distance, 0.f, 20.f);
 
     CMD1(CCC_Editor, "rs_editor");
 

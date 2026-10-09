@@ -11,6 +11,10 @@
 
 #include "xrCDB.h"
 
+// Distance in meters an object may drift from the point where its sector was last detected before the cached
+// sector is invalidated. Exposed as the "r__sector_update_distance" console command; 0 re-detects on any move.
+XRCDB_API extern float ps_r__sector_update_distance;
+
 #pragma pack(push, 4)
 
 //////////////////////////////////////////////////////////////////////////
@@ -137,6 +141,8 @@ public:
     SpatialData spatial;
 
 private:
+    // Point at which the sector was last (re)detected.
+    Fvector last_sector_point{};
     void spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id);
 
 public:

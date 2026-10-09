@@ -33,9 +33,11 @@ void main()
 	v2p_fDensity	= O.fDensity;
 //	v2p_tNoise		= O.tNoise;
 	gl_Position		= O.hpos;
+#ifndef GL_ES // GLSL ES 3.00 has no clip distances
 	for (int i=0; i<3; ++i)
 	{
 		gl_ClipDistance[i] = O.clip0[i];
 		gl_ClipDistance[i+3] = O.clip1[i];
 	}
+#endif
 }

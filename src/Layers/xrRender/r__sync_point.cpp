@@ -17,6 +17,10 @@ bool R_sync_point::Wait(u32 /*wait_sleep*/, u64 timeout)
     ZoneScoped;
     CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
 
+#ifdef XR_PLATFORM_WEB
+    return true; // WebGL cannot block on a fence; End() still deletes it
+#endif
+
     const auto status = glClientWaitSync((GLsync)q_sync_point[q_sync_count],
         GL_SYNC_FLUSH_COMMANDS_BIT, timeout * 1000 * 1000);
 
