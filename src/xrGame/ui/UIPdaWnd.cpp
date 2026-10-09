@@ -51,6 +51,9 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
 
 CUIPdaWnd::~CUIPdaWnd()
 {
+    if (pUILogsWnd)
+        Device.remove_from_seq_parallel(m_logs_work_delegate);
+
     if (pUIMapWnd)
         delete_data(pUIMapWnd);
     if (pUITaskWnd)
