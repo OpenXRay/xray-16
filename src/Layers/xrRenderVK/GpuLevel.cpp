@@ -129,9 +129,13 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         for (size_t id = 0; id < models.materials.size(); ++id)
         {
             const auto& material = models.materials[id];
+            if (material.shader.empty() && material.textures.empty()) continue; // Reserved table slot.
             SurfaceMode mode{};
             std::string issue;
-            if (!textures.surface_mode(material.shader, material.textures, mode, issue))
+            const bool water = named_surface(material, SurfaceMode::Transparent, "water") ||
+                named_surface(material, SurfaceMode::Transparent, "glass");
+            if (!textures.surface_mode(material.shader, material.textures, mode, issue,
+                    nullptr, nullptr, false, false, true, water))
             {
                 ++unsupported;
                 Msg("! [renderer-vulkan] level.material.audit id=%zu shader='%s' textures='%s': %s",
@@ -203,7 +207,11 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const auto& material = models.materials[model.material];
         SurfaceMode mode;
         int blend_mode = -1;
-        if (!textures.surface_mode(material.shader, material.textures, mode, error, &mesh.alpha_ref, &blend_mode))
+        uint32_t material_flags = 0;
+        const bool water = named_surface(material, SurfaceMode::Transparent, "water") ||
+            named_surface(material, SurfaceMode::Transparent, "glass");
+        if (!textures.surface_mode(material.shader, material.textures, mode, error, &mesh.alpha_ref,
+                &blend_mode, false, false, true, water, &material_flags))
         {
             error = "level material id=" + std::to_string(model.material) + " (" +
                 material.shader + "/" + material.textures + "): " + error;
@@ -216,6 +224,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         mesh.wallmark_multiply = blend_mode == 6;
+        mesh.glow_alpha_add = blend_mode == 5;
+        mesh.fog = (material_flags & 16u) != 0;
         const char *family = mode == SurfaceMode::Transparent ? "object_blended" :
             !lightmap.empty() ? mode == SurfaceMode::AlphaTest ? "level_lightmap_cutout" : "level_lightmap" :
             mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
@@ -224,8 +234,10 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.water = named_surface(material, mode, "water") || named_surface(material, mode, "glass");
         mesh.glass = named_surface(material, mode, "glass");
         prepared.has_water_ |= mesh.water;
-        const std::string vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : shader + ".vs";
-        const std::string fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : shader + ".ps";
+        const std::string vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ?
+            "vk\\level_opaque.vs" : shader + ".vs";
+        const std::string fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : shader + ".ps";
         if (!pass.request_game_pipeline(vertex, fragment, mode, false, false, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader pair: " + error;
@@ -665,10 +677,11 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent) return true;
-        const char* vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
-        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         std::string shader_error;
@@ -708,12 +721,13 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        const char* vertex = mesh.wallmark_multiply ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
             (&mesh != &base) ? "vk\\progressive_opaque.vs" :
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
-        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         if (selected)

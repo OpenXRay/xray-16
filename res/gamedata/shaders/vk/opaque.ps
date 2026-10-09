@@ -44,6 +44,8 @@ cbuffer ForwardLighting
     float4 sun_direction_ambient;
     float4 sun_color_count;
     float4 viewport;
+    float4 fog_color_start;
+    float4 fog_end_camera;
     LocalLight local_lights[16];
 };
 #endif
@@ -57,6 +59,8 @@ float4 main(Fragment fragment) : SV_Target0
     texel.rgb = lerp(texel.rgb, fragment.baked.rgb, fragment.baked.a);
     texel.a *= fragment.baked.a;
     return texel;
+#elif defined(VK_GLOW)
+    return texel * fragment.baked;
 #elif defined(VK_PARTICLE)
     float4 color = texel * fragment.baked;
 #if defined(VK_PARTICLE_SET)
@@ -89,7 +93,14 @@ float4 main(Fragment fragment) : SV_Target0
         illumination += local_lights[i].color_type.rgb * attenuation *
             max(dot(normal, -ray), 0.0);
     }
-    return float4(texel.rgb * illumination, texel.a);
+    float3 lit = texel.rgb * illumination;
+#if defined(VK_FOG)
+    float distance_to_camera = length(world - fog_end_camera.yzw);
+    float fog = saturate((distance_to_camera - fog_color_start.w) /
+        max(fog_end_camera.x - fog_color_start.w, 0.01));
+    lit = lerp(lit, fog_color_start.rgb, fog);
+#endif
+    return float4(lit, texel.a);
 #endif
 }
 #else

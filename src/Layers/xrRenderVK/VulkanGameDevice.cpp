@@ -691,10 +691,14 @@ void VulkanGameDevice::release_level_glows()
     glow_textures_.clear();
 }
 
-void VulkanGameDevice::queue_weather(VkDescriptorSet set, const WeatherLighting& lighting)
+void VulkanGameDevice::queue_weather(VkDescriptorSet set, const WeatherLighting& lighting,
+    const float (&fog_color)[3], float fog_near, float fog_far)
 {
     weather_set_ = set;
     weather_lighting_ = lighting;
+    std::copy_n(fog_color, 3, forward_lighting_.fog_color_start);
+    forward_lighting_.fog_color_start[3] = fog_near;
+    forward_lighting_.fog_end_camera[0] = fog_far;
 }
 
 void VulkanGameDevice::queue_rain(VulkanRainRender& rain)
@@ -812,6 +816,9 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         std::memcpy(water_uniform.view_projection, &camera, sizeof(camera));
         std::memcpy(water_uniform.inverse_view_projection, &inverse, sizeof(inverse));
         std::memcpy(forward_lighting_.inverse_view_projection, &inverse, sizeof(inverse));
+        forward_lighting_.fog_end_camera[1] = Device.vCameraPosition.x;
+        forward_lighting_.fog_end_camera[2] = Device.vCameraPosition.y;
+        forward_lighting_.fog_end_camera[3] = Device.vCameraPosition.z;
         water_uniform.camera_position[0] = Device.vCameraPosition.x;
         water_uniform.camera_position[1] = Device.vCameraPosition.y;
         water_uniform.camera_position[2] = Device.vCameraPosition.z;

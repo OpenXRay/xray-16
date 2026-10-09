@@ -15,6 +15,8 @@
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_blended.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/wallmark_multiply_2x.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_WALLMARK_MULT=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/glow_alpha_add.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_GLOW=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_fog.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_FOG=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_SKINNED=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/hud_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/particle_world_set.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_PARTICLE=1", "VK_PARTICLE_SET=1"] },

@@ -59,15 +59,17 @@ public:
     bool surface_mode(const std::string& shader, const std::string& texture,
         SurfaceMode& mode, std::string& error, int* alpha_ref = nullptr,
         int* blend_mode = nullptr, bool particle_pipeline = false,
-        bool screen_pipeline = false) const
+        bool screen_pipeline = false, bool level_pipeline = false,
+        bool water_pipeline = false, uint32_t* material_flags = nullptr) const
     {
         if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode,
-            particle_pipeline, screen_pipeline);
+            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags);
         // Standalone mock-GPU tests have no game archive; gameplay loads the
         // shaders.xr library at OnDeviceCreate before any level or OGF.
         mode = classify_surface_material(shader, texture);
         if (alpha_ref) *alpha_ref = 128;
         if (blend_mode) *blend_mode = -1;
+        if (material_flags) *material_flags = 0;
         error.clear();
         return true;
     }

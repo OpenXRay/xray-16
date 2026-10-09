@@ -196,7 +196,8 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
     std::string& error, int* alpha_ref, int* blend_mode,
-    bool particle_pipeline, bool screen_pipeline) const
+    bool particle_pipeline, bool screen_pipeline, bool level_pipeline,
+    bool water_pipeline, uint32_t* material_flags) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -214,7 +215,10 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // depth attachment. Keep rejecting properties the selected pass cannot
     // honor rather than treating every S_SET as an overlay.
     const bool scene_depth_test = !screen_pipeline && material.mode == SurfaceMode::Transparent;
-    const uint32_t unsupported_flags = material.screen_flags & ~(scene_depth_test ? 2u : 0u);
+    const uint32_t supported_flags = screen_pipeline ? 0u :
+        1u | (scene_depth_test ? 2u : 0u) |
+        (level_pipeline ? 16u : 0u) | (water_pipeline ? 12u : 0u);
+    const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;
     if (material.class_name == "S_SET   " && unsupported_flags)
     {
         const char* property = unsupported_flags & 1 ? "Texture clamp" : unsupported_flags & 2 ? "Z-test" :
@@ -236,7 +240,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // Screen-set blending outside particles still needs its own pipeline.
     // The particle path has a pipeline for each of these modes.
     if (material.class_name == "S_SET   " && !particle_pipeline && !screen_pipeline &&
-        material.blending >= 2 && material.blending != 6)
+        material.blending >= 2 && material.blending != 6 &&
+        !(level_pipeline && material.blending == 5))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     if (material.class_name == "PARTICLE" && !particle_pipeline &&
         (material.blending == 3 || material.blending == 4))
@@ -245,6 +250,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     if (alpha_ref) *alpha_ref = it->second.alpha_ref >= 0 ?
         std::clamp(it->second.alpha_ref, 0, 255) : 128;
     if (blend_mode) *blend_mode = material.blending;
+    if (material_flags) *material_flags = material.screen_flags;
     error.clear();
     return true;
 }

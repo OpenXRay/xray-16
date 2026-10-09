@@ -29,7 +29,8 @@ class VulkanGameDevice
 public:
     bool initialize(SDL_Window* window, VkExtent2D extent, std::string& error);
     void begin_frame();
-    void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting);
+    void queue_weather(VkDescriptorSet set, const WeatherLighting& lighting,
+        const float (&fog_color)[3], float fog_near, float fog_far);
     void queue_lights(const std::vector<VulkanLightSnapshot>& lights) { light_snapshots_ = lights; }
     VkDescriptorSet glow_texture(const std::string& name);
     void release_level_glows();

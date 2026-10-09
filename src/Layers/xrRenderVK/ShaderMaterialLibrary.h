@@ -16,7 +16,9 @@ public:
     bool load(IReader& file, std::string& error);
     bool resolve(const std::string& shader, SurfaceMode& mode, std::string& error,
         int* alpha_ref = nullptr, int* blend_mode = nullptr,
-        bool particle_pipeline = false, bool screen_pipeline = false) const;
+        bool particle_pipeline = false, bool screen_pipeline = false,
+        bool level_pipeline = false, bool water_pipeline = false,
+        uint32_t* material_flags = nullptr) const;
     bool contains(const std::string& shader) const;
     size_t size() const { return entries_.size(); }
     void clear() { entries_.clear(); }

@@ -20,7 +20,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     const ScenePassDispatch& vk, VkPipeline& pipeline, std::string& error,
     const char* label, bool shadow = false, bool additive = false,
     bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
-    bool particle_set = false)
+    bool particle_set = false, bool water_depth_write = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -70,7 +70,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // against one another without occluding the HUD with world geometry.
     depth.depthTestEnable = (gbuffer || hud || transparent || shadow) &&
         (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow || particle_set) ? VK_TRUE : VK_FALSE;
+    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow || particle_set ||
+        water_depth_write) ? VK_TRUE : VK_FALSE;
     depth.depthCompareOp = VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
@@ -409,7 +410,8 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
             local_light_fragment, false, false, false, false, false, vk_, local_light_pipeline_,
             error, "local light", false, true))) goto failed;
     if (water_fragment && !make_pipeline(device, light_pass, water_layout_, geometry_vertex,
-        water_fragment, true, false, true, false, false, vk_, water_pipeline_, error, "water")) goto failed;
+        water_fragment, true, false, true, false, false, vk_, water_pipeline_, error, "water",
+        false, false, false, false, false, false, true)) goto failed;
     error.clear();
     return true;
 failed:
@@ -572,6 +574,7 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name.find("_additive.ps") != std::string::npos;
     const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_alpha_add.ps") != std::string::npos;
+    const bool glow_alpha_add = fragment_name == "vk\\glow_alpha_add.ps";
     const bool particle_multiply = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_multiply.ps") != std::string::npos;
     const bool particle_multiply_2x = fragment_name.find("particle_") != std::string::npos &&
@@ -582,7 +585,7 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
-            "game shader pair", false, particle_additive, particle_alpha_add,
+            "game shader pair", false, particle_additive, particle_alpha_add || glow_alpha_add,
             particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set))
     {
         error += ": " + vertex_name + " / " + fragment_name;

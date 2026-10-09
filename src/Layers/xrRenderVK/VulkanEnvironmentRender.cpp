@@ -167,13 +167,15 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
             lighting_.sky_color[2], current.clouds_color.w,
             lighting_.light.direction_ambient[3], sky_a_ != VK_NULL_HANDLE,
             sky_b_ != VK_NULL_HANDLE);
-    device_.queue_weather(weather_set_, lighting_);
+    device_.queue_weather(weather_set_, lighting_, fog_color, current.fog_near, current.fog_far);
 }
 
 void VulkanEnvironmentRender::RenderClouds(CEnvironment& env)
 {
     if (!weather_set_) return;
     lighting_.clouds_color[3] = env.CurrentEnv.clouds_color.w;
-    device_.queue_weather(weather_set_, lighting_);
+    const auto& current = env.CurrentEnv;
+    const float fog_color[]{current.fog_color.x, current.fog_color.y, current.fog_color.z};
+    device_.queue_weather(weather_set_, lighting_, fog_color, current.fog_near, current.fog_far);
 }
 }

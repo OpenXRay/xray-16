@@ -201,8 +201,47 @@ int main()
     chunk(wrap_file, 2, wrap_list);
     IReader wrap_reader(wrap_file.data(), wrap_file.size());
     assert(library.load(wrap_reader, error));
-    assert(!library.resolve("mod\\wrap_ui", mode, error) &&
+    assert(library.resolve("mod\\wrap_ui", mode, error)); // Scene sampler repeats.
+    assert(!library.resolve("mod\\wrap_ui", mode, error, nullptr, nullptr, false, true) &&
         error.find("Texture clamp") != std::string::npos && error.find("id=49") != std::string::npos);
+    Bytes water = record("S_SET   ", "effects\\water", false, 0);
+    write32(water, 7); water.insert(water.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(water, 0); write32(water, 0);
+    property(water, 6, "Strict sorting", 1);
+    property(water, 6, "Texture clamp", 0);
+    property(water, 6, "Z-test", 1);
+    property(water, 6, "Z-write", 1);
+    property(water, 6, "Lighting", 1);
+    Bytes lod = record("S_SET   ", "details\\lod", false, 16);
+    write32(lod, 7); lod.insert(lod.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(lod, 1); write32(lod, 0);
+    property(lod, 6, "Texture clamp", 0);
+    property(lod, 6, "Z-test", 1);
+    property(lod, 6, "Fog", 1);
+    Bytes glow = record("S_SET   ", "effects\\glow", false, 0);
+    write32(glow, 7); glow.insert(glow.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(glow, 5); write32(glow, 0);
+    property(glow, 6, "Z-test", 1);
+    Bytes level_list, level_file;
+    chunk(level_list, 52, water); chunk(level_list, 25, lod); chunk(level_list, 36, glow);
+    chunk(level_file, 2, level_list);
+    IReader level_reader(level_file.data(), level_file.size());
+    assert(library.load(level_reader, error));
+    uint32_t flags = 0;
+    assert(!library.resolve("effects\\water", mode, error, nullptr, nullptr, false, false, true) &&
+        error.find("Z-write") != std::string::npos);
+    assert(library.resolve("effects\\water", mode, error, nullptr, &blend_mode,
+        false, false, true, true, &flags) && mode == SurfaceMode::Transparent &&
+        blend_mode == 0 && (flags & 15u) == 15u);
+    assert(!library.resolve("details\\lod", mode, error, nullptr, nullptr, false, false, false) &&
+        error.find("Fog") != std::string::npos);
+    assert(library.resolve("details\\lod", mode, error, nullptr, &blend_mode,
+        false, false, true, false, &flags) && mode == SurfaceMode::Transparent &&
+        blend_mode == 1 && (flags & 16u));
+    assert(!library.resolve("effects\\glow", mode, error) &&
+        error.find("blending=5") != std::string::npos);
+    assert(library.resolve("effects\\glow", mode, error, nullptr, &blend_mode,
+        false, false, true) && mode == SurfaceMode::Transparent && blend_mode == 5);
     Bytes newer = record("LM_AREF ", "mod\\future", false);
     newer[172] = 42;
     Bytes future_list, future_file;
