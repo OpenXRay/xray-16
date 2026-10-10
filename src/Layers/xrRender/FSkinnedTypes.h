@@ -44,7 +44,7 @@ inline void q_tc(s16& dst, float val)
 }
 
 #ifdef _DEBUG
-float errN(Fvector3 v, u8* qv)
+inline float errN(Fvector3 v, u8* qv)
 {
     Fvector3 uv;
     uv.set(float(qv[0]), float(qv[1]), float(qv[2])).div(255.f).mul(2.f).sub(1.f);
