@@ -121,6 +121,7 @@ void BindingSetBuilder::InvalidateReflectionCache()
 BindingSetBuilder::BindingSetBuilder(const ExtractedReflection& reflection, nvrhi::IDevice* device,
     const char* debugLabel)
     : m_lists(&GetOrBuildReflectedLists(&reflection, nullptr, device, debugLabel))
+    , m_device(device)
 {
     AcquireBindingStorage();
 }
@@ -131,8 +132,14 @@ BindingSetBuilder::BindingSetBuilder(
     nvrhi::IDevice* device,
     const char* debugLabel)
     : m_lists(&GetOrBuildReflectedLists(&vsReflection, &psReflection, device, debugLabel))
+    , m_device(device)
 {
     AcquireBindingStorage();
+}
+
+nvrhi::IBuffer* BindingSetBuilder::BufferOrDummy(nvrhi::IBuffer* buffer, bool uav) const
+{
+    return buffer ? buffer : GetPassResourceCache().GetDummyBuffer(m_device, uav);
 }
 
 BindingSetBuilder::~BindingSetBuilder()
@@ -206,9 +213,9 @@ BindingSetBuilder& BindingSetBuilder::BufferSRV(const char* name, nvrhi::IBuffer
         for (const auto& r : m_lists->srvs) {
             if (NameMatches(r.name, name)) {
                 if (r.layoutType == nvrhi::ResourceType::RawBuffer_SRV)
-                    m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_SRV(slot, buffer));
+                    m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_SRV(slot, BufferOrDummy(buffer, false)));
                 else
-                    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(slot, buffer));
+                    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(slot, BufferOrDummy(buffer, false)));
                 break;
             }
         }
@@ -223,9 +230,9 @@ BindingSetBuilder& BindingSetBuilder::BufferUAV(const char* name, nvrhi::IBuffer
         for (const auto& r : m_lists->uavs) {
             if (NameMatches(r.name, name)) {
                 if (r.layoutType == nvrhi::ResourceType::RawBuffer_UAV)
-                    m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_UAV(slot, buffer));
+                    m_desc.bindings.push_back(nvrhi::BindingSetItem::RawBuffer_UAV(slot, BufferOrDummy(buffer, true)));
                 else
-                    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_UAV(slot, buffer));
+                    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_UAV(slot, BufferOrDummy(buffer, true)));
                 break;
             }
         }
@@ -265,13 +272,13 @@ BindingSetBuilder& BindingSetBuilder::TextureUAVSlot(u32 slot, nvrhi::ITexture* 
 
 BindingSetBuilder& BindingSetBuilder::BufferSRVSlot(u32 slot, nvrhi::IBuffer* buffer)
 {
-    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(slot, buffer));
+    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_SRV(slot, BufferOrDummy(buffer, false)));
     return *this;
 }
 
 BindingSetBuilder& BindingSetBuilder::BufferUAVSlot(u32 slot, nvrhi::IBuffer* buffer)
 {
-    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_UAV(slot, buffer));
+    m_desc.bindings.push_back(nvrhi::BindingSetItem::StructuredBuffer_UAV(slot, BufferOrDummy(buffer, true)));
     return *this;
 }
 

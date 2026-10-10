@@ -41,6 +41,13 @@ public:
     nvrhi::ICommandList* Get() const { return m_cmdList; }
     operator nvrhi::ICommandList*() const { return m_cmdList; }
 
+    void RestoreState(nvrhi::ITexture* texture) const {
+        const nvrhi::TextureDesc& desc = texture->getDesc();
+        m_cmdList->setTextureState(texture, nvrhi::AllSubresources,
+            desc.keepInitialState ? desc.initialState : nvrhi::ResourceStates::ShaderResource);
+        m_cmdList->commitBarriers();
+    }
+
 private:
     nvrhi::ICommandList* m_cmdList = nullptr;
     std::unique_lock<std::mutex> m_lock;
@@ -160,6 +167,7 @@ TextureHandle RenderDevice::CreateTexture(
 
         ScopedUpload upload(m_backend, GetNativeDevice());
         upload.Get()->writeTexture(nvrhiTexture, 0, 0, initialData, rowPitch, depthPitch);
+        upload.RestoreState(nvrhiTexture);
     }
 
     TextureHandle handle = AllocateTextureHandle();
@@ -293,6 +301,7 @@ void RenderDevice::UploadTextureSlices(
         upload.Get()->writeTexture(texture, slice.arraySlice, slice.mipLevel,
                              slice.data, slice.rowPitch, slice.slicePitch);
     }
+    upload.RestoreState(texture);
 }
 
 void RenderDevice::UploadTextureDataToNVRHI(
@@ -329,6 +338,7 @@ void RenderDevice::UploadTextureDataToNVRHI(
 
     ScopedUpload upload(m_backend, GetNativeDevice());
     upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
+    upload.RestoreState(texture);
 }
 
 void RenderDevice::UploadTextureDataToNVRHI(
@@ -349,6 +359,7 @@ void RenderDevice::UploadTextureDataToNVRHI(
 
     ScopedUpload upload(m_backend, GetNativeDevice());
     upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
+    upload.RestoreState(texture);
 }
 
 BufferHandle RenderDevice::CreateBuffer(

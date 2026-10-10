@@ -63,11 +63,13 @@ public:
 
 private:
     const ReflectedLists* m_lists;
+    nvrhi::IDevice* m_device;
 
     nvrhi::BindingSetDesc m_desc;
     bool m_samplersAdded = false;
 
     void AcquireBindingStorage();
+    nvrhi::IBuffer* BufferOrDummy(nvrhi::IBuffer* buffer, bool uav) const;
 
     int FindSRVSlot(const char* name) const;
     int FindUAVSlot(const char* name) const;

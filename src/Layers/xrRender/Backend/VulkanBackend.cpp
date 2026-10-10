@@ -627,6 +627,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
     vulkan12Features.timelineSemaphore = VK_TRUE;
+    vulkan12Features.shaderFloat16 = VK_TRUE;
+    vulkan12Features.shaderBufferInt64Atomics = VK_TRUE;
 
     VkPhysicalDeviceSynchronization2Features sync2Features = {};
     sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
@@ -663,6 +665,8 @@ bool VulkanBackend::CreateLogicalDevice() {
     features2.features.multiViewport = VK_TRUE;
     features2.features.shaderClipDistance = VK_TRUE;
     features2.features.textureCompressionBC = VK_TRUE;
+    features2.features.shaderInt16 = VK_TRUE;
+    features2.features.shaderInt64 = VK_TRUE;
 
     {
         VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
@@ -697,6 +701,8 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMP12(descriptorBindingSampledImageUpdateAfterBind);
         CLAMP12(descriptorBindingStorageBufferUpdateAfterBind);
         CLAMP12(timelineSemaphore);
+        CLAMP12(shaderFloat16);
+        CLAMP12(shaderBufferInt64Atomics);
 #undef CLAMP12
 #define CLAMPF(F) do { if (features2.features.F && !sup2.features.F) { Msg("! [VulkanBackend] feature unsupported: " #F); features2.features.F = VK_FALSE; } } while(0)
         CLAMPF(samplerAnisotropy);
@@ -708,6 +714,8 @@ bool VulkanBackend::CreateLogicalDevice() {
         CLAMPF(multiViewport);
         CLAMPF(shaderClipDistance);
         CLAMPF(textureCompressionBC);
+        CLAMPF(shaderInt16);
+        CLAMPF(shaderInt64);
 #undef CLAMPF
         if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
             Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
