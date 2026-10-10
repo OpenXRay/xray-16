@@ -61,7 +61,7 @@ To configure and build as separate steps:
 | `bin/<arch>/<Config>/` | Everything you run: `xr_3da`, the engine shared libraries and, on Windows, the SDK DLLs. | Overwritten in place on every build. |
 | `cmake_builds/<preset>/artifacts/` | Packages from `cpack --preset`. | Overwritten by each `cpack` run. |
 
-`<arch>` is `x64` or `x86` on Windows and the processor name elsewhere (`arm64`, `x86_64`, `i686`, ...).
+`<arch>` is `x64` on Windows and the processor name elsewhere (`arm64`, `x86_64`, ...).
 `<Config>` is `Debug`, `Mixed`, `Release` or `ReleaseMasterGold`.
 
 The output folder depends only on architecture and configuration, not on the preset or build tree.
@@ -169,4 +169,4 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=ReleaseMasterGold
 cmake --build build
 ```
 
-On Windows, also pass `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.ClangCL.cmake` (add `-DCMAKE_SYSTEM_PROCESSOR=X86` for 32-bit). MSVC `cl.exe` is not supported.
+On Windows, also pass `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.ClangCL.cmake`. MSVC `cl.exe` is not supported.
