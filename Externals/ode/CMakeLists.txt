@@ -94,6 +94,7 @@ target_compile_definitions(xrODE
 set_target_properties(xrODE PROPERTIES
     PREFIX ""
     UNITY_BUILD OFF
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
 
 if (BUILD_SHARED_LIBS)

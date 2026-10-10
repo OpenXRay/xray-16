@@ -235,7 +235,7 @@ jobs:
             install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sccache sdl3 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
           }
         - { name: OpenBSD, os: openbsd, os-version: '7.8',  arch: x86_64,
-            install-cmd: "sudo pkg_add cmake git python%3 sccache lzo2 jpeg openal libogg libtheora libvorbis",
+            install-cmd: "sudo pkg_add cmake git python%3 sccache lzo2 jpeg openal libogg libtheora libvorbis && sudo usermod -L staff runner",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
             install-cmd: "sudo pkgin -y install cmake git-base python313 sccache lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
@@ -277,7 +277,7 @@ jobs:
         environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
-        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON --log-level VERBOSE
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCMAKE_C_FLAGS_DEBUG=-g1 -DCMAKE_CXX_FLAGS_DEBUG=-g1 --log-level VERBOSE
 
     - name: Run CMake Build
       uses: cross-platform-actions/action@v0.32.0
@@ -290,7 +290,7 @@ jobs:
         environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
-        run: s=0; cmake --build build --config ${{ matrix.Configuration }} --parallel 4 -- -k || s=$?; sccache --show-stats; exit $s
+        run: ulimit -Sd "$(ulimit -Hd)" || true; echo "class=$(id -c 2>/dev/null || echo n/a) datasize soft=$(ulimit -Sd) hard=$(ulimit -Hd)"; s=0; cmake --build build --config ${{ matrix.Configuration }} --parallel 4 -- -k || s=$?; sccache --show-stats; exit $s
 
   flatpak:
     name: Flatpak ${{ matrix.platform.arch }}
