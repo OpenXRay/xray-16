@@ -85,7 +85,7 @@ execute_process(
 add_library(xrLuaJIT)
 
 # Compiler options
-if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+if (MSVC)
     set(CCOPT "${CMAKE_C_FLAGS} /O2 -D_CRT_SECURE_NO_DEPRECATE")
 else()
     set(CCOPT "${CMAKE_C_FLAGS} -O3")
@@ -151,28 +151,44 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
-if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-    set(_lj_dump_macros /clang:-dM)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    set(TESTARCH_OUTPUT
+        "#define LJ_LE 1"
+        "#define LJ_HASJIT 1"
+        "#define LJ_HASFFI 1"
+        "#define LJ_ARCH_HASFPU 1"
+        "#define LJ_ABI_SOFTFP 0"
+        "#define LJ_ARCH_BITS 64")
+    if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
+        list(APPEND TESTARCH_OUTPUT "#define LJ_TARGET_ARM64 1")
+    else()
+        list(APPEND TESTARCH_OUTPUT "#define LJ_TARGET_X64 1" "#define LJ_FR2 1")
+    endif()
+    string(REPLACE ";" "\n" TESTARCH_OUTPUT "${TESTARCH_OUTPUT}")
 else()
-    set(_lj_dump_macros -dM)
-endif()
+    if (MSVC)
+        set(_lj_dump_macros /clang:-dM)
+    else()
+        set(_lj_dump_macros -dM)
+    endif()
 
-execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h ${_lj_dump_macros}
-    WORKING_DIRECTORY "${LUAJIT_DIR}"
-    OUTPUT_VARIABLE TESTARCH_OUTPUT
-    ERROR_VARIABLE TESTARCH_ERROR
-)
+    execute_process(
+        COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h ${_lj_dump_macros}
+        WORKING_DIRECTORY "${LUAJIT_DIR}"
+        OUTPUT_VARIABLE TESTARCH_OUTPUT
+        ERROR_VARIABLE TESTARCH_ERROR
+    )
 
-if(NOT "${TESTARCH_ERROR}" STREQUAL "")
-    message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    if(NOT "${TESTARCH_ERROR}" STREQUAL "")
+        message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    endif()
 endif()
 
 if ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X64")
     set(TARGET_LJARCH "x64")
 elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X86")
     set(TARGET_LJARCH "x86")
-    if (NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    if (NOT MSVC)
         string(APPEND TARGET_XCFLAGS " -march=i686 -msse -msse2 -mfpmath=sse")
     endif()
 elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_ARM64")
@@ -209,7 +225,7 @@ string(APPEND TARGET_ARCH "-DLUAJIT_TARGET=LUAJIT_ARCH_${TARGET_LJARCH}")
 if (WIN32)
     #string(APPEND TARGET_STRIP "--strip-unneeded")
 
-    if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    if (MSVC)
         if (BUILD_SHARED_LIBS)
             target_compile_definitions(xrLuaJIT PRIVATE LUA_BUILD_AS_DLL)
         endif()
@@ -335,7 +351,7 @@ if (TARGET_LJARCH STREQUAL "ppc")
 endif()
 
 set(HOST_ACFLAGS "${CMAKE_C_FLAGS} ${CCOPTIONS} ${TARGET_ARCH}")
-if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+if (MSVC)
     set(HOST_ALDFLAGS "")
 else()
     set(HOST_ALDFLAGS "${CMAKE_C_FLAGS}")
