@@ -286,6 +286,8 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
             {slang::CompilerOptionValueKind::Int, 2, 0}};
         sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanBindShiftAll,
             {slang::CompilerOptionValueKind::Int, 3, 256}};
+        sessionOptions[sessionOptionCount++] = {slang::CompilerOptionName::VulkanUseEntryPointName,
+            {slang::CompilerOptionValueKind::Int, 1, 0}};
     }
 
     sessionDesc.compilerOptionEntries = sessionOptions;

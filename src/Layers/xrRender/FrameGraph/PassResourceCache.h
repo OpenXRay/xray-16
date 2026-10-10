@@ -51,6 +51,7 @@ public:
     nvrhi::ISampler* GetShadowCmpSampler(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap(nvrhi::IDevice* device);
     nvrhi::ITexture* GetDummyShadowMap2D(nvrhi::IDevice* device);
+    nvrhi::IBuffer* GetDummyBuffer(nvrhi::IDevice* device, bool uav);
 
     nvrhi::ISampler* GetSamplerByName(const char* smpName, nvrhi::IDevice* device);
 
@@ -198,6 +199,8 @@ private:
     nvrhi::SamplerHandle m_commonShadowCmp;
     nvrhi::TextureHandle m_dummyShadowMap;
     nvrhi::TextureHandle m_dummyShadowMap2D;
+    nvrhi::BufferHandle m_dummySRVBuffer;
+    nvrhi::BufferHandle m_dummyUAVBuffer;
 
     Stats m_stats;
 

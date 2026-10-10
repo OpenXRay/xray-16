@@ -135,6 +135,7 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap(nvrhi::IDevice* device) {
         desc.height = 1;
         desc.arraySize = 3;
         desc.format = nvrhi::Format::D32;
+        desc.isRenderTarget = true;
         desc.debugName = "DummyShadowMap";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
@@ -150,6 +151,7 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
         desc.width = 1;
         desc.height = 1;
         desc.format = nvrhi::Format::D32;
+        desc.isRenderTarget = true;
         desc.debugName = "DummyShadowMap2D";
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
@@ -157,6 +159,23 @@ nvrhi::ITexture* PassResourceCache::GetDummyShadowMap2D(nvrhi::IDevice* device) 
         m_dummyShadowMap2D = device->createTexture(desc);
     }
     return m_dummyShadowMap2D;
+}
+
+nvrhi::IBuffer* PassResourceCache::GetDummyBuffer(nvrhi::IDevice* device, bool uav) {
+    nvrhi::BufferHandle& buffer = uav ? m_dummyUAVBuffer : m_dummySRVBuffer;
+    if (!buffer) {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 256;
+        desc.structStride = 16;
+        desc.canHaveUAVs = uav;
+        desc.canHaveRawViews = true;
+        desc.debugName = uav ? "DummyUAVBuffer" : "DummySRVBuffer";
+        desc.initialState = uav ? nvrhi::ResourceStates::UnorderedAccess : nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        buffer = device->createBuffer(desc);
+        R_ASSERT(buffer);
+    }
+    return buffer;
 }
 
 nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi::IDevice* device)
@@ -530,6 +549,8 @@ void PassResourceCache::Clear() {
     m_commonShadowCmp = nullptr;
     m_dummyShadowMap = nullptr;
     m_dummyShadowMap2D = nullptr;
+    m_dummySRVBuffer = nullptr;
+    m_dummyUAVBuffer = nullptr;
 
     Msg("* [PassResourceCache] Cleared all caches");
 }

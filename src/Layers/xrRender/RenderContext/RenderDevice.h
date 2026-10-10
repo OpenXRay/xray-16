@@ -3,6 +3,7 @@
 #include "ResourceHandle.h"
 #include "PipelineState.h"
 #include <nvrhi/nvrhi.h>
+#include <mutex>
 
 // Forward declarations
 class IRenderBackend;

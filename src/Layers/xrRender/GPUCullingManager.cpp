@@ -2897,7 +2897,7 @@ nvrhi::BufferHandle CreateRTSourceBuffer(nvrhi::IDevice* device, const char* nam
     desc.structStride = stride;
     desc.canHaveRawViews = true;
     desc.isIndexBuffer = indexBuffer;
-    desc.isAccelStructBuildInput = true;
+    desc.isAccelStructBuildInput = device->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct);
     desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
     desc.keepInitialState = true;
     return device->createBuffer(desc);
