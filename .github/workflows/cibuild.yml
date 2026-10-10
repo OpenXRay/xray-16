@@ -204,7 +204,7 @@ jobs:
       id: make-appimage
       run: |
           DESTDIR=AppDir cmake --install build --prefix /usr
-          ${{ matrix.platform.linuxdeploy }} --appdir AppDir --output appimage --executable AppDir/usr/bin/xr_3da --desktop-file AppDir/usr/share/applications/openxray_cop.desktop --desktop-file AppDir/usr/share/applications/openxray_cs.desktop --desktop-file AppDir/usr/share/applications/openxray_soc.desktop --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cop.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cs.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_soc.png
+          LD_LIBRARY_PATH="$PWD/AppDir/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ${{ matrix.platform.linuxdeploy }} --appdir AppDir --output appimage --executable AppDir/usr/bin/xr_3da --desktop-file AppDir/usr/share/applications/openxray_cop.desktop --desktop-file AppDir/usr/share/applications/openxray_cs.desktop --desktop-file AppDir/usr/share/applications/openxray_soc.desktop --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cop.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cs.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_soc.png
           mkdir -p build/artifacts
           mv *.AppImage build/artifacts/openxray-${{ matrix.configuration }}-${{ matrix.platform.arch }}.AppImage
           file build/artifacts/openxray*.*
@@ -221,8 +221,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      CFLAGS: "-w"
-      CXXFLAGS: "-w"
+      CFLAGS: "-w -gz"
+      CXXFLAGS: "-w -gz"
       SCCACHE_GHA_ENABLED: "true"
       VM_ENV: CFLAGS CXXFLAGS SCCACHE_GHA_ENABLED ACTIONS_CACHE_SERVICE_V2 ACTIONS_RESULTS_URL ACTIONS_RUNTIME_TOKEN
     strategy:

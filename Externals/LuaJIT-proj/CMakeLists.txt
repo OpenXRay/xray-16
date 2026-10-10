@@ -87,6 +87,9 @@ add_library(xrLuaJIT)
 # Compiler options
 if (MSVC)
     set(CCOPT "${CMAKE_C_FLAGS} /O2 -D_CRT_SECURE_NO_DEPRECATE")
+    foreach(_luajit_flags_var CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_MIXED)
+        string(REGEX REPLACE "/RTC[1csu]*" "" ${_luajit_flags_var} "${${_luajit_flags_var}}")
+    endforeach()
 else()
     set(CCOPT "${CMAKE_C_FLAGS} -O3")
 

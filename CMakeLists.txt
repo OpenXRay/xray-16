@@ -31,7 +31,6 @@ option(XRAY_USE_AI_PBR   "Enable AI PBR texture converter (requires ONNX Runtime
 
 include(XRay.Build)
 include(XRay.Windows.Externals)
-include(XRay.Packaging)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -46,3 +45,5 @@ endblock()
 add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
+
+include(XRay.Packaging)

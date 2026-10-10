@@ -5,7 +5,7 @@
 
 #include <atomic>
 
-#if defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_LINUX)
+#if (defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_LINUX)) && __has_include(<execinfo.h>)
 #define XR_MEMSTATS_BACKTRACE 1
 #include <cstring>
 #include <cstdio>

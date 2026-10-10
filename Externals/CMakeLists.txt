@@ -95,6 +95,12 @@ set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "Disable slang-replay tool")
 set(SLANG_ENABLE_SLANG_PROXY OFF CACHE BOOL "Disable slang.dll forwarding proxy (needs dumpbin)")
 set(SLANG_ENABLE_PREBUILT_BINARIES OFF CACHE BOOL "Build from source")
 add_subdirectory(slang)
+foreach(_xray_dll_tgt miniz ozz_base ozz_animation ozz_animation_offline)
+    set_target_properties(${_xray_dll_tgt} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${XRAY_COMPILE_OUTPUT_FOLDER}")
+    foreach(_xray_cfg DEBUG RELEASE MINSIZEREL RELWITHDEBINFO)
+        set_property(TARGET ${_xray_dll_tgt} PROPERTY RUNTIME_OUTPUT_DIRECTORY_${_xray_cfg})
+    endforeach()
+endforeach()
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang-rich-diagnostics.cpp
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang
     PROPERTIES COMPILE_OPTIONS

@@ -479,6 +479,7 @@ target_link_libraries(xrCore
     $<$<AND:$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>,$<NOT:$<PLATFORM_ID:Windows>>>:mimalloc>
     $<$<PLATFORM_ID:Windows>:xray_mimalloc>
     $<$<PLATFORM_ID:Windows>:xray_bugtrap>
+    $<$<PLATFORM_ID:Windows>:xrAPI>
     $<$<PLATFORM_ID:Windows>:faultrep>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
     LZO::LZO
