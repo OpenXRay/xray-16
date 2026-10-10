@@ -30,13 +30,6 @@ jobs:
       with:
         arch: ${{ matrix.arch == 'win32' && 'amd64_x86' || 'amd64' }}
 
-    - name: Install Vulkan SDK
-      uses: jakoch/install-vulkan-sdk-action@v1
-      with:
-        vulkan_version: ${{ matrix.arch == 'win32' && '1.4.304.0' || '' }}
-        optional_components: ${{ matrix.arch == 'win32' && 'com.lunarg.vulkan.32bit' || '' }}
-        cache: true
-
     - name: Configure and build
       run: cmake --workflow --preset ${{ matrix.arch }}-${{ matrix.configuration }}
 
@@ -113,7 +106,7 @@ jobs:
         branch: 'latest-stable'
         packages: >-
           build-base cmake git mold python3 linux-headers sdl2-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
-          openssl-dev vulkan-loader-dev vulkan-headers
+          openssl-dev
           libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxscrnsaver-dev libxtst-dev libxkbcommon-dev
           wayland-dev wayland-protocols libdecor-dev mesa-dev libdrm-dev eudev-dev dbus-dev alsa-lib-dev pulseaudio-dev pipewire-dev
 
@@ -124,7 +117,7 @@ jobs:
           sudo apt-get update -qq
           pkgs=(
               libsdl2-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev
-              libssl-dev libvulkan-dev
+              libssl-dev
               libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev
               libwayland-dev libdecor-0-dev libdrm-dev libgbm-dev libgl-dev libgles-dev libegl-dev
               libdbus-1-dev libudev-dev libasound2-dev libpulse-dev libpipewire-0.3-dev
@@ -144,7 +137,7 @@ jobs:
       if: ${{ matrix.platform.name == 'Fedora' }}
       run: >-
         dnf install -y git gcc gcc-c++ rpmdevtools cmake python3 SDL2-devel lzo-devel libjpeg-turbo-devel openal-soft-devel libogg-devel libtheora-devel libvorbis-devel
-        openssl-devel vulkan-devel zlib-ng-compat-static
+        openssl-devel zlib-ng-compat-static
         libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXfixes-devel libXi-devel libXScrnSaver-devel libXtst-devel libxkbcommon-devel
         wayland-devel wayland-protocols-devel libdecor-devel libdrm-devel mesa-libgbm-devel mesa-libGL-devel mesa-libGLES-devel mesa-libEGL-devel
         dbus-devel systemd-devel alsa-lib-devel pulseaudio-libs-devel pipewire-devel
@@ -241,10 +234,10 @@ jobs:
         # FreeBSD package repositories may be ahead of the VM image; tell pkg to
         # ignore the OS version mismatch so packages still install.
         - { name: FreeBSD, os: freebsd, os-version: '14.3', arch: x86_64,
-            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis vulkan-loader vulkan-headers libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
+            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
           }
         - { name: OpenBSD, os: openbsd, os-version: '7.6',  arch: x86_64,
-            install-cmd: "sudo pkg_add cmake git python%3 SDL2 lzo2 jpeg openal libogg libtheora libvorbis vulkan-loader",
+            install-cmd: "sudo pkg_add cmake git python%3 SDL2 lzo2 jpeg openal libogg libtheora libvorbis",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
             install-cmd: "sudo pkgin -y install cmake git-base python313 SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
