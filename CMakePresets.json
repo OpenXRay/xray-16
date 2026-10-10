@@ -58,13 +58,13 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
-      },
-      "toolchainFile": "${sourceDir}/cmake/toolchains/Windows.ClangCL.cmake"
+      }
     },
     {
       "name": "win64",
       "hidden": true,
       "inherits": "windows",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Windows.ClangCL.cmake",
       "cacheVariables": {
         "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
@@ -74,6 +74,23 @@
             "Windows"
           ],
           "intelliSenseMode": "windows-clang-x64"
+        }
+      }
+    },
+    {
+      "name": "win64-msvc",
+      "hidden": true,
+      "inherits": "windows",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Windows.MSVC.cmake",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ],
+          "intelliSenseMode": "windows-msvc-x64"
         }
       }
     },
@@ -140,6 +157,38 @@
         "win64",
         "config-rmg"
       ]
+    },
+    {
+      "name": "win64-msvc-debug",
+      "displayName": "x64 MSVC Debug",
+      "inherits": [
+        "win64-msvc",
+        "config-debug"
+      ]
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "displayName": "x64 MSVC Mixed",
+      "inherits": [
+        "win64-msvc",
+        "config-mixed"
+      ]
+    },
+    {
+      "name": "win64-msvc-release",
+      "displayName": "x64 MSVC Release",
+      "inherits": [
+        "win64-msvc",
+        "config-release"
+      ]
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "displayName": "x64 MSVC ReleaseMasterGold",
+      "inherits": [
+        "win64-msvc",
+        "config-rmg"
+      ]
     }
   ],
   "buildPresets": [
@@ -174,6 +223,22 @@
     {
       "name": "win64-rmg",
       "configurePreset": "win64-rmg"
+    },
+    {
+      "name": "win64-msvc-debug",
+      "configurePreset": "win64-msvc-debug"
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "configurePreset": "win64-msvc-mixed"
+    },
+    {
+      "name": "win64-msvc-release",
+      "configurePreset": "win64-msvc-release"
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "configurePreset": "win64-msvc-rmg"
     }
   ],
   "packagePresets": [
@@ -220,6 +285,26 @@
     {
       "name": "win64-rmg",
       "configurePreset": "win64-rmg",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-debug",
+      "configurePreset": "win64-msvc-debug",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "configurePreset": "win64-msvc-mixed",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-release",
+      "configurePreset": "win64-msvc-release",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "configurePreset": "win64-msvc-rmg",
       "inherits": "package-base"
     }
   ],
@@ -325,6 +410,58 @@
         {
           "type": "build",
           "name": "win64-rmg"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-debug"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-debug"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-mixed"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-mixed"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-release"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-release"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-rmg"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-rmg"
         }
       ]
     }
