@@ -100,6 +100,9 @@ else()
 endif()
 
 string(REPLACE " " ";" CCOPT "${CCOPT}")
+if (CMAKE_C_COMPILER_TARGET)
+    list(APPEND CCOPT "--target=${CMAKE_C_COMPILER_TARGET}")
+endif()
 
 add_compile_options(
     #-Wdeclaration-after-statement
@@ -368,6 +371,11 @@ else()
     set(_luajit_host_exe "")
 endif()
 set(MINILUA_FILE "${MINILUA_BINARY_DIR}${_luajit_host_subdir}/minilua${_luajit_host_exe}")
+if (CMAKE_TOOLCHAIN_FILE)
+    set(_luajit_host_toolchain_args
+        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+        "-DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 
 add_custom_command(
     OUTPUT "${MINILUA_FILE}"
@@ -377,6 +385,7 @@ add_custom_command(
         -S${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
         -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        ${_luajit_host_toolchain_args}
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
         -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
         -DCMAKE_BUILD_TYPE=Release
@@ -412,6 +421,7 @@ add_custom_command(
         -S${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/buildvm
         -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        ${_luajit_host_toolchain_args}
         -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
         -DCMAKE_BUILD_TYPE=Release
         -DLUAJIT_DIR=${LUAJIT_DIR}

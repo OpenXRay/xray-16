@@ -65,3 +65,6 @@
 	path = Externals/ozz-animation
 	url = https://github.com/yohjimane/ozz-animation.git
 	branch = yohji/feat/ozz-animation
+[submodule "Externals/WindowsToolchain"]
+	path = Externals/WindowsToolchain
+	url = https://github.com/MarkSchofield/WindowsToolchain.git
