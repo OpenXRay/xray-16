@@ -32,6 +32,7 @@ set(SDL_INSTALL             OFF CACHE BOOL "Disable SDL3 install rules")
 set(SDL_DISABLE_INSTALL     ON  CACHE BOOL "Disable SDL3 install rules")
 set(SDL_DISABLE_INSTALL_DOCS ON CACHE BOOL "Disable SDL3 docs install")
 add_subdirectory(SDL)
+set_target_properties(SDL3-static PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(luabind)
 add_subdirectory(xrLuaFix)
