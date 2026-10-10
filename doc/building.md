@@ -9,7 +9,6 @@ You build the engine the same way on every platform: with CMake presets and the 
 |---|---|---|---|
 | Linux, macOS, BSD | `unix-debug`, `unix-mixed`, `unix-release`, `unix-rmg` | system default (GCC/Clang/AppleClang) | host |
 | Windows | `win64-debug`, `win64-mixed`, `win64-release`, `win64-rmg` | clang-cl + lld-link | x64 |
-| Windows | `win32-debug`, `win32-mixed`, `win32-release`, `win32-rmg` | clang-cl + lld-link | x86 |
 
 Presets that don't match your host OS are disabled. `rmg` is ReleaseMasterGold, the shipping configuration.
 `mixed` gives you debug checks with optimized code.
@@ -41,7 +40,7 @@ git submodule update --init --recursive
 cmake --workflow --preset unix-rmg
 ```
 
-The workflow configures the build tree if needed, then builds everything. On Windows, use `win64-rmg` or `win32-rmg`.
+The workflow configures the build tree if needed, then builds everything. On Windows, use `win64-rmg`.
 
 To configure and build as separate steps:
 
@@ -133,11 +132,7 @@ When something goes wrong, check `_appdata_/logs/openxray_<username>.log` first.
 
 ## 32-bit builds
 
-| Platform | 32-bit support |
-|---|---|
-| Windows | `win32-*` presets. The toolchain file targets `i686-pc-windows-msvc` and links against `sdk/libraries/x86`. |
-| Linux | Build natively on a 32-bit userland, for example i386 Alpine or a Debian i386 chroot, with the `unix-*` presets. |
-| macOS | Not possible: macOS no longer runs 32-bit code. |
+Not supported. NVRHI only builds for 64-bit targets.
 
 ## IDEs
 

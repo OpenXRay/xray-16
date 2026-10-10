@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [debug, mixed, release, rmg]
-        arch: [win64, win32]
+        arch: [win64]
     steps:
     - uses: actions/checkout@main
       with:
