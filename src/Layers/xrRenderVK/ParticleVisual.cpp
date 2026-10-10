@@ -381,14 +381,21 @@ void VulkanParticleGroup::OnFrame(u32 dt)
         const auto& item = def_->effects[i];
         if ((item.flags & enabled) && !deferred_)
         {
-            if (!effect.IsPlaying() && time_ <= item.begin && next >= item.begin)
+            // The legacy group chooses either the start or stop transition
+            // based on the state at the beginning of this frame. A short
+            // effect may cross both boundaries in one update; stopping it
+            // immediately prevents its first particles from ever appearing.
+            if (effect.IsPlaying())
+            {
+                if (time_ <= item.end && next >= item.end)
+                    effect.Stop(item.flags & deferred_stop);
+            }
+            else if (time_ <= item.begin && next >= item.begin)
             {
                 effect.Play();
                 if ((item.flags & (1u << 1)) && !item.on_play.empty())
                     pending_.push_back({item.on_play, initial_position_, {0.f, 0.f, 0.f}});
             }
-            if (effect.IsPlaying() && time_ <= item.end && next >= item.end)
-                effect.Stop(item.flags & deferred_stop);
         }
         effect.OnFrame(dt);
     }

@@ -64,14 +64,6 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
             return;
         }
     }
-    // The CoP main-menu magnifier and its additive highlight share atlas
-    // artwork with the rest of the menu. Tint only these two shader uses;
-    // the original atlas RGB contains coloured effects, not the selection
-    // colour that the player expects from the active menu item.
-    if (xr_stricmp(texture_.c_str(), "ui\\ui_magnifier2") == 0 ||
-        (xr_stricmp(texture_.c_str(), "ui\\ui_mainMenu2") == 0 &&
-            xr_stricmp(shader_.c_str(), "hud\\add-alpha") == 0))
-        blend_mode_ = 10;
     if (texture_.empty()) { use_transparent_fallback(); return; }
     string_path video_path;
     if (FS.exist(video_path, "$game_textures$", texture_.c_str(), ".ogm"))

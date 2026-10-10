@@ -8,14 +8,7 @@ void main()
 {
     vec4 sample_color = texture(color_map, fragment_uv);
     pixel_color = fragment_color * sample_color;
-    if (ui.blend_mode == 10.0)
-    {
-        // The magnifier artwork carries its glow in RGB. Its alpha can be
-        // transparent even where the selection is visible in the original.
-        float glow = max(max(sample_color.r, sample_color.g), sample_color.b);
-        pixel_color = vec4(1.0, 0.72, 0.12, glow * fragment_color.a);
-    }
-    else if (ui.blend_mode == 6.0)
+    if (ui.blend_mode == 6.0)
     {
         pixel_color.rgb = mix(sample_color.rgb, fragment_color.rgb, fragment_color.a);
         pixel_color.a = sample_color.a * fragment_color.a;

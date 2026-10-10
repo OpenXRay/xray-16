@@ -21,8 +21,9 @@ int main()
     const std::vector<VulkanLightSnapshot> point_lights{point};
     const VulkanObjectLighting lit = evaluate_object_lighting(origin, ambient, hemi, sun,
         VulkanTraceAll, point_lights);
-    assert(lit.luminocity > 0.52f && lit.luminocity < 0.53f);
-    assert(lit.hemi_luminocity > 0.32f && lit.hemi_luminocity < 0.34f);
+    // The original local-light attenuation is 1 - (distance / range)^2.
+    assert(lit.luminocity > 0.77f && lit.luminocity < 0.78f);
+    assert(lit.hemi_luminocity > 0.57f && lit.hemi_luminocity < 0.58f);
     assert(lit.hemi_cube[4] > lit.hemi_cube[5]);
 
     point.active = false;

@@ -55,8 +55,8 @@ VulkanObjectLighting evaluate_object_lighting(const std::array<float, 3>& positi
                 continue;
             const float inverse_distance = distance > 1e-6f ? 1.f / distance : 0.f;
             for (float& component : to_light) component *= inverse_distance;
-            float attenuation = 1.f - distance / light.range;
-            attenuation *= attenuation;
+            const float normalized_distance = distance / light.range;
+            float attenuation = 1.f - normalized_distance * normalized_distance;
             if (light.type == VulkanLightType::Spot)
             {
                 if (!finite3(light.direction))

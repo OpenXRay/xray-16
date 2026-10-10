@@ -53,7 +53,8 @@ void main()
     if (distance >= range || distance <= 1e-5) { pixel_color = vec4(0.0); return; }
     vec3 normal = normalize(texture(normal_buffer, texcoord).rgb * 2.0 - 1.0);
     float diffuse = max(dot(normal, -delta / distance), 0.0);
-    float attenuation = pow(max(1.0 - distance / range, 0.0), 2.0);
+    float normalized_distance = distance / range;
+    float attenuation = max(1.0 - normalized_distance * normalized_distance, 0.0);
     if (light.color_type.w >= 0.5)
         attenuation *= smoothstep(light.direction_cone.w, min(1.0, light.direction_cone.w + 0.05),
             dot(normalize(delta), normalize(light.direction_cone.xyz)));

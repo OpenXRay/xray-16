@@ -85,7 +85,8 @@ float4 main(Fragment fragment) : SV_Target0
         float range = max(local_lights[i].position_range.w, 0.01);
         if (distance >= range || distance < 1e-5) continue;
         float3 ray = delta / distance;
-        float attenuation = pow(max(1.0 - distance / range, 0.0), 2.0);
+        float normalized_distance = distance / range;
+        float attenuation = max(1.0 - normalized_distance * normalized_distance, 0.0);
         if (local_lights[i].color_type.w > 0.5)
             attenuation *= smoothstep(local_lights[i].direction_cone.w,
                 min(1.0, local_lights[i].direction_cone.w + 0.05),

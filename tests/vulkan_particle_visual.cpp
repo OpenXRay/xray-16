@@ -42,4 +42,13 @@ int main()
         assert(!instance.IsPlaying() && !instance.effects()[0]->IsPlaying() &&
             !instance.effects()[1]->IsPlaying());
     }
+    // A group whose start and end both lie in one update must emit once,
+    // matching the legacy particle group's state transition ordering.
+    ParticleGroupDef short_group;
+    short_group.name = "short_flame";
+    short_group.effects.push_back({"smoke", "", "", "", 0.f, .01f, 4u});
+    VulkanParticleGroup short_effect(catalog, short_group);
+    short_effect.Play();
+    short_effect.OnFrame(40);
+    assert(short_effect.effects()[0]->IsPlaying());
 }

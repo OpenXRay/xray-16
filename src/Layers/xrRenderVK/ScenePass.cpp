@@ -75,7 +75,7 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
         attachment.srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
         attachment.dstColorBlendFactor = ui_mode == 3 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR;
     }
-    if (ui && (ui_mode == 5 || ui_mode == 10))
+    if (ui && ui_mode == 5)
         attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachment.colorBlendOp = VK_BLEND_OP_ADD;
     attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
