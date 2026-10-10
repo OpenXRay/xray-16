@@ -238,8 +238,8 @@ jobs:
             install-cmd: "sudo pkg_add cmake git python%3 sccache lzo2 jpeg openal libogg libtheora libvorbis && sudo usermod -L staff runner",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
-            install-cmd: "sudo pkgin -y install cmake git-base python313 sccache lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
-            cmake-flags: "-DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON",
+            install-cmd: "sudo pkgin -y install cmake git-base python313 sccache gcc14 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+            cmake-flags: "-DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON -DCMAKE_C_COMPILER=/usr/pkg/gcc14/bin/gcc -DCMAKE_CXX_COMPILER=/usr/pkg/gcc14/bin/g++ -DCMAKE_EXE_LINKER_FLAGS=-Wl,-R/usr/pkg/gcc14/lib -DCMAKE_SHARED_LINKER_FLAGS=-Wl,-R/usr/pkg/gcc14/lib -DCMAKE_MODULE_LINKER_FLAGS=-Wl,-R/usr/pkg/gcc14/lib",
           }
         #- { name: Haiku,  os: haiku,  os-version: 'r1beta5',  arch: x86_64,
         #    install-cmd: "sudo pkgman install -y cmake libsdl2_devel lzo_devel libjpeg_turbo_devel openal_devel libogg_devel libtheora_devel libvorbis_devel",
