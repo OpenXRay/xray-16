@@ -178,9 +178,19 @@ endif()
 
 add_compile_options(
     $<$<AND:$<CONFIG:Release,ReleaseMasterGold>,$<CXX_COMPILER_ID:Clang,AppleClang>>:-gline-tables-only>
-    $<$<CONFIG:Release,ReleaseMasterGold>:-ffunction-sections>
-    $<$<CONFIG:Release,ReleaseMasterGold>:-fdata-sections>
 )
+
+if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    add_compile_options(
+        $<$<CONFIG:Release,ReleaseMasterGold>:/Gy>
+        $<$<CONFIG:Release,ReleaseMasterGold>:/Gw>
+    )
+else()
+    add_compile_options(
+        $<$<CONFIG:Release,ReleaseMasterGold>:-ffunction-sections>
+        $<$<CONFIG:Release,ReleaseMasterGold>:-fdata-sections>
+    )
+endif()
 
 if (APPLE)
     add_link_options($<$<CONFIG:Release,ReleaseMasterGold>:-Wl,-dead_strip>)
