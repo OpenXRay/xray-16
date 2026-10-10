@@ -15,6 +15,7 @@ set(ozz_build_samples       OFF CACHE BOOL "ozz: skip samples")
 set(ozz_build_howtos        OFF CACHE BOOL "ozz: skip howtos")
 set(ozz_build_tests         OFF CACHE BOOL "ozz: skip tests")
 set(ozz_build_postfix       OFF CACHE BOOL "ozz: no per-config postfix")
+set(ozz_build_msvc_rt_dll   ON  CACHE BOOL "ozz: use the DLL CRT like the rest of the engine")
 add_subdirectory(ozz-animation EXCLUDE_FROM_ALL)
 foreach(_ozz_tgt ozz_base ozz_animation ozz_animation_offline)
     target_compile_options(${_ozz_tgt} PRIVATE ${XRAY_DISABLE_WARNINGS})
@@ -88,7 +89,7 @@ add_subdirectory(slang)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang-rich-diagnostics.cpp
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang
     PROPERTIES COMPILE_OPTIONS
-        "$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>"
+        "$<$<NOT:$<AND:$<CONFIG:Debug,Mixed>,$<CXX_COMPILER_ID:MSVC>>>:$<IF:$<CXX_COMPILER_ID:MSVC>,/O1;/Os,$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>>>"
 )
 
 if(MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -118,7 +119,7 @@ if(NOT NVRHI_BUILD_SHARED)
         endif()
     endforeach()
 endif()
-if (TARGET rtxmu AND NOT CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+if (TARGET rtxmu AND NOT MSVC)
     target_compile_options(rtxmu PRIVATE "SHELL:-include string")
 endif()
 
