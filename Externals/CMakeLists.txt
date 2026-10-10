@@ -63,8 +63,6 @@ if (APPLE)
     add_subdirectory(MoltenVK)
 endif()
 
-find_package(Vulkan)
-
 # Slang shader compiler
 set(SLANG_ENABLE_CUDA OFF CACHE BOOL "Disable CUDA support")
 set(SLANG_ENABLE_OPTIX OFF CACHE BOOL "Disable OptiX support")
