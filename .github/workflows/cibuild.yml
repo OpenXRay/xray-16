@@ -25,11 +25,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set up MSVC environment
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: ${{ matrix.arch == 'win32' && 'amd64_x86' || 'amd64' }}
-
     - name: Configure and build
       run: cmake --workflow --preset ${{ matrix.arch }}-${{ matrix.configuration }}
 
