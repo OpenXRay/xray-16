@@ -21,12 +21,16 @@ On every platform you need CMake 3.25 or newer, Ninja, a C++20 compiler and the 
 | Platform | Install |
 |---|---|
 | Windows | Visual Studio 2022+ or Build Tools with the *Desktop development with C++* workload, which includes the MSVC x64/x86 libraries, the Windows SDK, CMake and Ninja. For `clang-cl`, either add the *C++ Clang Compiler for Windows* component or `winget install LLVM.LLVM`. Libraries are bundled in `sdk/`. |
-| macOS | `xcode-select --install`, then with [Homebrew](https://brew.sh): `brew install cmake ninja sdl2 lzo libogg libvorbis theora openssl@3`. Also install Apple's [Metal Shader Converter](https://developer.apple.com/metal/shader-converter/) package (it installs into `/usr/local`); the native Metal renderer needs it. |
+| macOS | `xcode-select --install`, then with [Homebrew](https://brew.sh): `brew install cmake ninja sdl3 lzo libogg libvorbis theora openssl@3`. Also install Apple's [Metal Shader Converter](https://developer.apple.com/metal/shader-converter/) package (it installs into `/usr/local`); the native Metal renderer needs it. |
 | Debian/Ubuntu | `sudo apt install cmake ninja-build g++ libssl-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev` |
 | Other Linux/BSD | The same libraries. For exact package names, see the CI job for your platform in `.github/workflows/cibuild.yml`. |
 
 On Windows, the presets use a toolchain file (`cmake/toolchains/Windows.ClangCL.cmake` or `cmake/toolchains/Windows.MSVC.cmake`) that locates Visual Studio, the Windows SDK
 and the compiler (`clang-cl` from Visual Studio's bundled LLVM or `C:\Program Files\LLVM`, or MSVC `cl`) through `vswhere`. Builds work the same from any shell; no developer prompt or `PATH` setup is needed.
+
+SDL3 comes from your package manager when an SDL3 3.4 or newer package is installed (Homebrew `sdl3`, Fedora `SDL3-devel`, Alpine `sdl3-dev`, FreeBSD `sdl3`).
+Otherwise, for example on Windows or Ubuntu 24.04, the build compiles the `Externals/SDL` submodule, which needs the X11/Wayland development packages on Linux and BSD.
+Pass `-DXRAY_USE_SYSTEM_SDL3=OFF` to always use the submodule.
 
 Clone with submodules. After every branch switch or pull, run the submodule update again, because the third-party code in `Externals/` is pinned per commit:
 

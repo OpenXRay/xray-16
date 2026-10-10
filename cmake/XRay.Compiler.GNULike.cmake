@@ -260,7 +260,7 @@ set(XRAY_ENABLE_WARNINGS
     $<$<CONFIG:ReleaseMasterGold>:-Wno-sign-compare>
     $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-variable>
     $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-function>
-    $<$<CONFIG:ReleaseMasterGold>:-Wno-c++11-narrowing>
+    $<$<CXX_COMPILER_ID:Clang,AppleClang>:-Wno-c++11-narrowing>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
 )
