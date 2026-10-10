@@ -49,6 +49,9 @@ else()
     set(NVRHI_WITH_DX11 OFF CACHE BOOL "No D3D11 off-Windows")
     set(NVRHI_WITH_DX12 OFF CACHE BOOL "No D3D12 off-Windows")
     set(NVRHI_WITH_VULKAN ON CACHE BOOL "Enable Vulkan backend")
+    if (APPLE)
+        set(NVRHI_WITH_METAL3 ON CACHE BOOL "Enable native Metal 3 backend")
+    endif()
 endif()
 set(NVRHI_WITH_VALIDATION ON CACHE BOOL "Enable validation layer for development")
 set(NVRHI_INSTALL OFF CACHE BOOL "Disable NVRHI install rules")
@@ -78,15 +81,11 @@ set(SLANG_ENABLE_TESTS OFF CACHE BOOL "Disable Slang tests")
 set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "Disable Slang examples")
 set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "Disable slang-replay tool")
 set(SLANG_ENABLE_PREBUILT_BINARIES OFF CACHE BOOL "Build from source")
-# Enable parallel compilation for MSVC
-if(MSVC)
-    add_compile_options(/MP)
-endif()
 add_subdirectory(slang)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang-rich-diagnostics.cpp
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang
     PROPERTIES COMPILE_OPTIONS
-        "$<$<NOT:$<AND:$<CONFIG:Debug,Mixed>,$<CXX_COMPILER_ID:MSVC>>>:$<IF:$<CXX_COMPILER_ID:MSVC>,/O1;/Os,$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>>>"
+        "$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>"
 )
 
 if(APPLE AND NVRHI_WITH_METAL3)
@@ -97,7 +96,7 @@ if(APPLE AND NVRHI_WITH_METAL3)
         set(NVRHI_METAL_DXC_STUB_INCLUDE_DIR "${XRAY_DXC_SOURCE_DIR}/external/DirectX-Headers/include/wsl/stubs")
     endif()
     if(TARGET copy-dxcompiler)
-        set(NVRHI_METAL_DXC_LIBRARY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
+        set(NVRHI_METAL_DXC_LIBRARY "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
     endif()
 endif()
 add_subdirectory(nvrhi)

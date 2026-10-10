@@ -13,12 +13,6 @@ target_sources(xr_3da PRIVATE
     stalker_soc.ico
 )
 
-set_property(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    PROPERTY
-    VS_STARTUP_PROJECT xr_3da
-)
-
 target_include_directories(xr_3da
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
@@ -38,15 +32,15 @@ if(APPLE AND NVRHI_WITH_METAL3)
     add_dependencies(xr_3da copy-dxcompiler copy-dxil)
     add_custom_command(TARGET xr_3da POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
-            "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
+            "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
+            "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
             "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
             "$<TARGET_FILE_DIR:xr_3da>"
         VERBATIM
     )
     install(FILES
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
+        "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
+        "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
         "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
         DESTINATION "${CMAKE_INSTALL_BINDIR}"
     )
@@ -56,9 +50,9 @@ if (WIN32)
     target_link_options(xr_3da PRIVATE "LINKER:/ERRORLIMIT:0")
     add_custom_command(TARGET xr_3da POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${XRAY_SDK_DIR}/binaries/x64/AnselSDK64.dll"
-            "${XRAY_SDK_DIR}/binaries/x64/BugTrap.dll"
-            "${XRAY_SDK_DIR}/binaries/x64/discord_game_sdk.dll"
+            "${XRAY_SDK_BIN_DIR}/${XRAY_ANSEL_NAME}.dll"
+            "${XRAY_SDK_BIN_DIR}/BugTrap.dll"
+            "${XRAY_SDK_BIN_DIR}/discord_game_sdk.dll"
             "$<TARGET_FILE_DIR:xr_3da>"
         VERBATIM
     )

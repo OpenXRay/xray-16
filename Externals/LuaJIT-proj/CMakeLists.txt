@@ -10,53 +10,6 @@ project(xrLuaJIT C CXX ASM)
 
 set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
-if (MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang" AND WIN32)
-    get_filename_component(_lj_root "${LUAJIT_DIR}" DIRECTORY)
-    set(_lj_msvc_workdir "${CMAKE_CURRENT_BINARY_DIR}/msvcbuild")
-    set(_lj_msvc_srcdir "${_lj_msvc_workdir}/src")
-    set(_lj_msvc_lib "${_lj_msvc_srcdir}/lua51.lib")
-    set(_lj_msvc_dll "${_lj_msvc_srcdir}/lua51.dll")
-    set(_lj_msvc_args "")
-    if (NOT BUILD_SHARED_LIBS)
-        set(_lj_msvc_args "static")
-        set(_lj_msvc_outputs "${_lj_msvc_lib}")
-    else()
-        set(_lj_msvc_outputs "${_lj_msvc_lib}" "${_lj_msvc_dll}")
-    endif()
-
-    add_custom_command(
-        OUTPUT ${_lj_msvc_outputs}
-        COMMAND ${CMAKE_COMMAND} -E rm -rf "${_lj_msvc_workdir}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${_lj_root}" "${_lj_msvc_workdir}"
-        COMMAND ${CMAKE_COMMAND} -E chdir "${_lj_msvc_srcdir}" cmd.exe /c msvcbuild.bat ${_lj_msvc_args}
-        DEPENDS "${LUAJIT_DIR}/lj_arch.h" "${LUAJIT_DIR}/msvcbuild.bat"
-        VERBATIM
-    )
-    add_custom_target(xrLuaJIT_msvcbuild DEPENDS ${_lj_msvc_outputs})
-
-    if (BUILD_SHARED_LIBS)
-        add_library(xrLuaJIT SHARED IMPORTED GLOBAL)
-        set_target_properties(xrLuaJIT PROPERTIES
-            IMPORTED_LOCATION "${_lj_msvc_dll}"
-            IMPORTED_IMPLIB "${_lj_msvc_lib}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_DIR}"
-        )
-        add_custom_command(TARGET xrLuaJIT_msvcbuild POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${_lj_msvc_dll}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lua51.dll"
-            VERBATIM
-        )
-    else()
-        add_library(xrLuaJIT STATIC IMPORTED GLOBAL)
-        set_target_properties(xrLuaJIT PROPERTIES
-            IMPORTED_LOCATION "${_lj_msvc_lib}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_DIR}"
-        )
-    endif()
-    add_dependencies(xrLuaJIT xrLuaJIT_msvcbuild)
-    return()
-endif()
-
 set(MAJVER 2)
 set(MINVER 0)
 set(RELVER 5)
@@ -132,17 +85,19 @@ execute_process(
 add_library(xrLuaJIT)
 
 # Compiler options
-set(CCOPT_OPT_LEVEL "-O3")
-
-set(CCOPT "${CMAKE_C_FLAGS} ${CCOPT_OPT_LEVEL}")
-
-if (XRAY_USE_ASAN)
-    set(CCOPT "${CCOPT} -fno-stack-protector")
+if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    set(CCOPT "${CMAKE_C_FLAGS} /O2 -D_CRT_SECURE_NO_DEPRECATE")
 else()
-    set(CCOPT "${CCOPT} -fomit-frame-pointer -fno-stack-protector")
-endif()
+    set(CCOPT "${CMAKE_C_FLAGS} -O3")
 
-set(CCOPT "${CCOPT} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
+    if (XRAY_USE_ASAN)
+        set(CCOPT "${CCOPT} -fno-stack-protector")
+    else()
+        set(CCOPT "${CCOPT} -fomit-frame-pointer -fno-stack-protector")
+    endif()
+
+    set(CCOPT "${CCOPT} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
+endif()
 
 string(REPLACE " " ";" CCOPT "${CCOPT}")
 
@@ -193,55 +148,30 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
-if (MSVC AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
-    set(_lj_common
-        "#define LJ_LE 1"
-        "#define LJ_HASJIT 1"
-        "#define LJ_HASFFI 1"
-        "#define LJ_ARCH_HASFPU 1"
-        "#define LJ_ABI_SOFTFP 0")
-    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-        if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
-            list(APPEND _lj_common
-                "#define LJ_TARGET_ARM64 1"
-                "#define LJ_ARCH_BITS 64")
-        else()
-            list(APPEND _lj_common
-                "#define LJ_TARGET_X64 1"
-                "#define LJ_ARCH_BITS 64"
-                "#define LJ_FR2 1")
-        endif()
-    else()
-        if (CMAKE_SYSTEM_PROCESSOR MATCHES "ARM|arm")
-            list(APPEND _lj_common
-                "#define LJ_TARGET_ARM 1"
-                "#define LJ_ARCH_BITS 32")
-        else()
-            list(APPEND _lj_common
-                "#define LJ_TARGET_X86 1"
-                "#define LJ_ARCH_BITS 32")
-        endif()
-    endif()
-    string(REPLACE ";" "\n" TESTARCH_OUTPUT "${_lj_common}")
-    set(TESTARCH_ERROR "")
+if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    set(_lj_dump_macros /clang:-dM)
 else()
-    execute_process(
-        COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
-        WORKING_DIRECTORY "${LUAJIT_DIR}"
-        OUTPUT_VARIABLE TESTARCH_OUTPUT
-        ERROR_VARIABLE TESTARCH_ERROR
-    )
+    set(_lj_dump_macros -dM)
+endif()
 
-    if(NOT "${TESTARCH_ERROR}" STREQUAL "")
-        message("TESTARCH_ERROR=${TESTARCH_ERROR}")
-    endif()
+execute_process(
+    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h ${_lj_dump_macros}
+    WORKING_DIRECTORY "${LUAJIT_DIR}"
+    OUTPUT_VARIABLE TESTARCH_OUTPUT
+    ERROR_VARIABLE TESTARCH_ERROR
+)
+
+if(NOT "${TESTARCH_ERROR}" STREQUAL "")
+    message("TESTARCH_ERROR=${TESTARCH_ERROR}")
 endif()
 
 if ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X64")
     set(TARGET_LJARCH "x64")
 elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X86")
     set(TARGET_LJARCH "x86")
-    string(APPEND TARGET_XCFLAGS " -march=i686 -msse -msse2 -mfpmath=sse")
+    if (NOT CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        string(APPEND TARGET_XCFLAGS " -march=i686 -msse -msse2 -mfpmath=sse")
+    endif()
 elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_ARM64")
     set(TARGET_LJARCH "arm64")
     if ("${TESTARCH_OUTPUT}" MATCHES "__AARCH64EB__")
@@ -276,10 +206,16 @@ string(APPEND TARGET_ARCH "-DLUAJIT_TARGET=LUAJIT_ARCH_${TARGET_LJARCH}")
 if (WIN32)
     #string(APPEND TARGET_STRIP "--strip-unneeded")
 
-    target_link_options(xrLuaJIT
-        PRIVATE
-        " -shared -Wl,--out-implib,libluajit-${ABIVER}.dll.a"
-    )
+    if (CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        if (BUILD_SHARED_LIBS)
+            target_compile_definitions(xrLuaJIT PRIVATE LUA_BUILD_AS_DLL)
+        endif()
+    else()
+        target_link_options(xrLuaJIT
+            PRIVATE
+            " -shared -Wl,--out-implib,libluajit-${ABIVER}.dll.a"
+        )
+    endif()
 
     if (LUAJIT_BUILD_STATIC_LIB)
         string(APPEND HOST_XCFLAGS " -DLUA_BUILD_AS_DLL")

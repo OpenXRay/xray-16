@@ -78,9 +78,9 @@ Take a look at our [Issues](https://github.com/openxray/xray-16/issues) page:
 * See issues labeled as [good first issue](https://github.com/OpenXRay/xray-16/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Good+first+issue%22) to get familiar with the engine code in practice.
 * You may also want to look at issues labeled as [help wanted](https://github.com/OpenXRay/xray-16/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Help+wanted%22). Some of them are difficult ones, though.
 
-Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki):
-* [Build instructions for Windows](https://github.com/OpenXRay/xray-16/wiki/[EN]-How-to-build-and-setup-on-Windows).
-* [Build instructions for Linux and other platforms](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux-and-MacOS).
+Build instructions for all platforms: [doc/building.md](doc/building.md).
+
+Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki) for game setup and other documentation.
 
 The `dev` branch is the default and base branch for the project. It is used for development, and all pull requests should go there. But be aware that this branch sometimes may be broken, and we can only rarely do force pushes to this branch.
 
@@ -93,13 +93,13 @@ Framegraph transients are allocated at their first live pass and returned to the
 Build the configuration you intend to launch explicitly:
 
 ```sh
-./cmake-build -c releasemastergold xr_3da
-python3 misc/tests/run_framegraph_resources.py --build-dir cmake_builds/releasemastergold
+cmake --build --preset unix-rmg --target xr_3da
+python3 misc/tests/run_framegraph_resources.py --build-dir cmake_builds/unix-rmg
 ```
 
-The regression runner uses a real Vulkan device with `VK_EXT_headless_surface`, NVRHI validation and temporary test executables. It verifies texture-budget accounting, pool eviction, empty static-build completion, GPU readback across reused and overlapping transient lifetimes, culled passes, callback-free lifetime boundaries, reset accounting and invalid-access rejection. It does not require installed game assets. For a Release build, use `-c release` and `--build-dir cmake_builds/release`.
+The regression runner uses a real Vulkan device with `VK_EXT_headless_surface`, NVRHI validation and temporary test executables. It verifies texture-budget accounting, pool eviction, empty static-build completion, GPU readback across reused and overlapping transient lifetimes, culled passes, callback-free lifetime boundaries, reset accounting and invalid-access rejection. It does not require installed game assets. For a Release build, use `--preset unix-release` and `--build-dir cmake_builds/unix-release`; on Windows, use the matching `win64-*` preset.
 
-Without `-c`, `cmake-build` selects the most recently modified build directory. A launch symlink pointing at another configuration will still run that other executable.
+A launch symlink pointing at another configuration will still run that other executable.
 
 ### Funding
 [![Sponsors](https://img.shields.io/github/sponsors/openxray?color=brightgreen&label=Sponsors)](https://github.com/sponsors/OpenXRay) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg?label=Financial%20contributors)](https://opencollective.com/openxray)

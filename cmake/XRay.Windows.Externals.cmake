@@ -5,8 +5,12 @@ if (NOT WIN32)
 endif()
 
 set(XRAY_SDK_DIR "${CMAKE_SOURCE_DIR}/sdk")
-set(XRAY_SDK_LIB_DIR "${XRAY_SDK_DIR}/libraries/x64")
+set(XRAY_SDK_LIB_DIR "${XRAY_SDK_DIR}/libraries/${XRAY_ARCH}")
+set(XRAY_SDK_BIN_DIR "${XRAY_SDK_DIR}/binaries/${XRAY_ARCH}")
 set(XRAY_SDK_INC_DIR "${XRAY_SDK_DIR}/include")
+math(EXPR _xray_pointer_bits "${CMAKE_SIZEOF_VOID_P} * 8")
+set(XRAY_ANSEL_NAME "AnselSDK${_xray_pointer_bits}")
+unset(_xray_pointer_bits)
 
 include_directories(
     "${XRAY_SDK_INC_DIR}"
@@ -56,7 +60,7 @@ set(JPEG_FOUND TRUE CACHE BOOL "libjpeg provided via sdk/" FORCE)
 
 add_library(xray_ansel UNKNOWN IMPORTED GLOBAL)
 set_target_properties(xray_ansel PROPERTIES
-    IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/AnselSDK64.lib"
+    IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/${XRAY_ANSEL_NAME}.lib"
     INTERFACE_INCLUDE_DIRECTORIES "${XRAY_SDK_INC_DIR}"
 )
 
@@ -84,12 +88,4 @@ add_library(xray_bugtrap STATIC IMPORTED GLOBAL)
 set_target_properties(xray_bugtrap PROPERTIES
     IMPORTED_LOCATION "${XRAY_SDK_LIB_DIR}/BugTrap.lib"
     INTERFACE_INCLUDE_DIRECTORIES "${XRAY_SDK_INC_DIR}"
-)
-
-set(SDL2_DIR "${CMAKE_SOURCE_DIR}/src/packages/sdl2.nuget.2.32.4/build/native")
-add_library(SDL2::SDL2 SHARED IMPORTED GLOBAL)
-set_target_properties(SDL2::SDL2 PROPERTIES
-    IMPORTED_LOCATION "${SDL2_DIR}/bin/x64/SDL2.dll"
-    IMPORTED_IMPLIB "${SDL2_DIR}/lib/x64/SDL2.lib"
-    INTERFACE_INCLUDE_DIRECTORIES "${SDL2_DIR}/include"
 )
