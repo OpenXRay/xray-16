@@ -34,14 +34,10 @@ public:
     void AddGiveInfo(LPCSTR str);
     void AddDisableInfo(LPCSTR str);
     void SetScriptText(LPCSTR str) { m_sScriptTextFunc = str; }
-    LPCSTR GetScriptText(LPCSTR str_to_translate, const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2,
-        LPCSTR dialog_id, LPCSTR phrase_id);
+    pcstr GetScriptText(cpcstr str_to_translate, const CGameObject* pSpeakerGO1, const CGameObject* pSpeakerGO2,
+        cpcstr dialog_id, cpcstr phrase_id) const;
 
 protected:
-    //загрузка содержания последовательности тагов в контейнер строк
-    template <class T>
-    void LoadSequence(CUIXml* ui_xml, XML_NODE phrase_node, LPCSTR tag, T& str_vector);
-
     //манипуляции с информацией во время вызовов Precondition и Action
     virtual bool CheckInfo(const CInventoryOwner* pOwner) const;
     virtual void TransferInfo(const CInventoryOwner* pOwner) const;
@@ -60,8 +56,8 @@ protected:
 
     //список скриптовых предикатов, выполнение, которых необходимо
     //для того чтоб фраза стала доступной
-
     PRECONDITION_VECTOR m_Preconditions;
+
     //проверка наличия/отсутствия информации
     INFO_VECTOR m_HasInfo;
     INFO_VECTOR m_DontHasInfo;
