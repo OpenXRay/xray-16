@@ -161,7 +161,7 @@ block()
     add_compile_definitions(_USE_STD_VECTOR_ALGORITHMS=0)
 
     if(MSVC)
-        set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> /fo <OBJECT> <SOURCE>")
+        set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> /fo<OBJECT> <SOURCE>")
     endif()
 
     add_subdirectory(protobuf)
