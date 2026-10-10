@@ -61,6 +61,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # XXX: Remove -fdelayed-template-parsing
     add_compile_options(
         -fdelayed-template-parsing
+        -Wno-delayed-template-parsing-in-cxx20
         -Wno-unused-command-line-argument
         -Wno-inconsistent-missing-override
     )
@@ -71,7 +72,7 @@ add_compile_options(-fno-strict-aliasing)
 if (WIN32)
     add_compile_definitions(WIN32 _WINDOWS)
     if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-        add_compile_options(/bigobj)
+        add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/bigobj>)
     endif()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         if (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
@@ -254,7 +255,6 @@ set(XRAY_ENABLE_WARNINGS
     $<$<CONFIG:ReleaseMasterGold>:-Wno-sign-compare>
     $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-variable>
     $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-function>
-    $<$<CONFIG:ReleaseMasterGold>:-Wno-delayed-template-parsing-in-cxx20>
     $<$<CONFIG:ReleaseMasterGold>:-Wno-c++11-narrowing>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
