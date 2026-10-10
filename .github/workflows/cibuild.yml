@@ -11,10 +11,12 @@ jobs:
   windows:
     name: Windows ${{ matrix.configuration }} (${{ matrix.compiler.name }})
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     defaults:
       run:
         shell: bash
+    env:
+      SCCACHE_GHA_ENABLED: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -27,8 +29,18 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Configure and build
-      run: cmake --workflow --preset ${{ matrix.compiler.preset }}-${{ matrix.configuration }}
+    - name: Set up sccache
+      uses: mozilla-actions/sccache-action@v0.0.11
+
+    - name: Configure
+      run: cmake --preset ${{ matrix.compiler.preset }}-${{ matrix.configuration }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.compiler.preset }}-${{ matrix.configuration }} -- -k 0
+
+    - name: Show sccache stats
+      if: ${{ always() }}
+      run: sccache --show-stats || true
 
     - name: Package
       id: package
@@ -68,6 +80,7 @@ jobs:
       CFLAGS: "-w"
       CXXFLAGS: "-w"
       HOMEBREW_NO_AUTO_UPDATE: 1
+      SCCACHE_GHA_ENABLED: "true"
 
     strategy:
       fail-fast: false
@@ -101,7 +114,7 @@ jobs:
         arch: ${{ matrix.platform.arch }}
         branch: 'latest-stable'
         packages: >-
-          build-base cmake git mold python3 linux-headers sdl3-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+          build-base cmake git mold python3 linux-headers sccache sdl3-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
           openssl-dev
           libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxscrnsaver-dev libxtst-dev libxkbcommon-dev
           wayland-dev wayland-protocols libdecor-dev mesa-dev libdrm-dev eudev-dev dbus-dev alsa-lib-dev pulseaudio-dev pipewire-dev
@@ -127,7 +140,7 @@ jobs:
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
-          brew install ccache cmake dylibbundler ninja sdl3 lzo libogg libvorbis theora openal-soft jpeg-turbo
+          brew install cmake dylibbundler ninja sdl3 lzo libogg libvorbis theora openal-soft jpeg-turbo
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
@@ -154,32 +167,19 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Configure ccache
-      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
-      run: |
-        echo "CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
-        mkdir -p "$HOME/.ccache"
-
-    - name: Restore ccache
-      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
-      uses: actions/cache@main
-      with:
-        path: ~/.ccache
-        key: ccache-${{ runner.os }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/**/CMakeLists.txt', 'Externals/**/CMakeLists.txt') }}
-        restore-keys: |
-          ccache-${{ runner.os }}-${{ matrix.platform.arch }}-${{ matrix.configuration }}-
-          ccache-${{ runner.os }}-${{ matrix.platform.arch }}-
+    - name: Set up sccache
+      uses: mozilla-actions/sccache-action@v0.0.11
 
     - name: Run CMake
       run: cmake ${{ matrix.platform.generator && format('-G {0}', matrix.platform.generator) || '' }} -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }} --log-level VERBOSE
 
     - name: Run CMake Build
       id: cmake-build
-      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }} -- ${{ matrix.platform.generator == 'Ninja' && '-k 0' || '-k' }}
 
-    - name: Show ccache stats
-      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
-      run: ccache -s || true
+    - name: Show sccache stats
+      if: ${{ always() }}
+      run: sccache --show-stats || true
 
     - name: Make macOS app bundle
       if: ${{ startsWith(matrix.platform.name, 'macOS') && matrix.configuration == 'Release' && steps.cmake-build.outcome == 'success' }}
@@ -219,10 +219,12 @@ jobs:
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 120
     env:
       CFLAGS: "-w"
       CXXFLAGS: "-w"
+      SCCACHE_GHA_ENABLED: "true"
+      VM_ENV: CFLAGS CXXFLAGS SCCACHE_GHA_ENABLED ACTIONS_CACHE_SERVICE_V2 ACTIONS_RESULTS_URL ACTIONS_RUNTIME_TOKEN
     strategy:
       fail-fast: false
       matrix:
@@ -230,13 +232,13 @@ jobs:
         # FreeBSD package repositories may be ahead of the VM image; tell pkg to
         # ignore the OS version mismatch so packages still install.
         - { name: FreeBSD, os: freebsd, os-version: '14.3', arch: x86_64,
-            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sdl3 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
+            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sccache sdl3 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
           }
-        - { name: OpenBSD, os: openbsd, os-version: '7.6',  arch: x86_64,
-            install-cmd: "sudo pkg_add cmake git python%3 lzo2 jpeg openal libogg libtheora libvorbis",
+        - { name: OpenBSD, os: openbsd, os-version: '7.8',  arch: x86_64,
+            install-cmd: "sudo pkg_add cmake git python%3 sccache lzo2 jpeg openal libogg libtheora libvorbis",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
-            install-cmd: "sudo pkgin -y install cmake git-base python313 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+            install-cmd: "sudo pkgin -y install cmake git-base python313 sccache lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
           }
         #- { name: Haiku,  os: haiku,  os-version: 'r1beta5',  arch: x86_64,
         #    install-cmd: "sudo pkgman install -y cmake libsdl2_devel lzo_devel libjpeg_turbo_devel openal_devel libogg_devel libtheora_devel libvorbis_devel",
@@ -248,6 +250,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Set up sccache
+      uses: mozilla-actions/sccache-action@v0.0.11
+
     - name: Setup ${{ matrix.platform.name }} and packages
       uses: cross-platform-actions/action@v0.32.0
       with:
@@ -256,7 +261,7 @@ jobs:
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
         memory: 13G
-        environment_variables: CFLAGS CXXFLAGS
+        environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: runner-to-vm
         run: ${{ matrix.platform.install-cmd }}
@@ -269,7 +274,7 @@ jobs:
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
         memory: 13G
-        environment_variables: CFLAGS CXXFLAGS
+        environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON --log-level VERBOSE
@@ -282,10 +287,10 @@ jobs:
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
         memory: 13G
-        environment_variables: CFLAGS CXXFLAGS
+        environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
-        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4
+        run: s=0; cmake --build build --config ${{ matrix.Configuration }} --parallel 4 -- -k || s=$?; sccache --show-stats; exit $s
 
   flatpak:
     name: Flatpak ${{ matrix.platform.arch }}
