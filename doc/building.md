@@ -20,15 +20,13 @@ On every platform you need CMake 3.25 or newer, Ninja, a C++20 compiler and the 
 
 | Platform | Install |
 |---|---|
-| Windows | Visual Studio 2022+ or Build Tools with the *Desktop development with C++* workload, which includes the MSVC x64/x86 libraries, the Windows SDK, CMake and Ninja. Also `winget install LLVM.LLVM`; let the installer add LLVM to `PATH` so `clang-cl` is found. Libraries are bundled in `sdk/`. |
+| Windows | Visual Studio 2022+ or Build Tools with the *Desktop development with C++* workload, which includes the MSVC x64/x86 libraries, the Windows SDK, CMake and Ninja. For `clang-cl`, either add the *C++ Clang Compiler for Windows* component or `winget install LLVM.LLVM`. Libraries are bundled in `sdk/`. |
 | macOS | `xcode-select --install`, then with [Homebrew](https://brew.sh): `brew install cmake ninja sdl2 lzo libogg libvorbis theora openssl@3`. Also install Apple's [Metal Shader Converter](https://developer.apple.com/metal/shader-converter/) package (it installs into `/usr/local`); the native Metal renderer needs it. |
 | Debian/Ubuntu | `sudo apt install cmake ninja-build g++ libssl-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev` |
 | Other Linux/BSD | The same libraries. For exact package names, see the CI job for your platform in `.github/workflows/cibuild.yml`. |
 
-On Windows, run every command in a shell that has the MSVC environment set up for the target architecture:
-*Developer PowerShell for VS* for x64, or *x64_x86 Cross Tools Command Prompt for VS* for x86.
-You can also call `Launch-VsDevShell.ps1 -Arch amd64|x86 -HostArch amd64` yourself.
-Visual Studio's Open Folder mode sets this environment up automatically.
+On Windows, the presets use `cmake/toolchains/Windows.ClangCL.cmake`, which locates Visual Studio, the Windows SDK and `clang-cl`
+(Visual Studio's bundled LLVM or `C:\Program Files\LLVM`) through `vswhere`. Builds work the same from any shell; no developer prompt or `PATH` setup is needed.
 
 Clone with submodules. After every branch switch or pull, run the submodule update again, because the third-party code in `Externals/` is pinned per commit:
 
@@ -137,7 +135,7 @@ When something goes wrong, check `_appdata_/logs/openxray_<username>.log` first.
 
 | Platform | 32-bit support |
 |---|---|
-| Windows | `win32-*` presets. clang-cl targets x86 with `-m32` and links against `sdk/libraries/x86`. |
+| Windows | `win32-*` presets. The toolchain file targets `i686-pc-windows-msvc` and links against `sdk/libraries/x86`. |
 | Linux | Build natively on a 32-bit userland, for example i386 Alpine or a Debian i386 chroot, with the `unix-*` presets. |
 | macOS | Not possible: macOS no longer runs 32-bit code. |
 
@@ -145,7 +143,7 @@ When something goes wrong, check `_appdata_/logs/openxray_<username>.log` first.
 
 | IDE | Setup |
 |---|---|
-| Visual Studio | *File → Open → Folder*, then pick a preset from the toolbar. VS sets up the MSVC environment for the preset's architecture. No solution files are generated. |
+| Visual Studio | *File → Open → Folder*, then pick a preset from the toolbar. No solution files are generated. |
 | VS Code | Install the CMake Tools extension and pick a configure preset. |
 | CLion | Enable the presets under *Settings → Build, Execution, Deployment → CMake*. |
 
@@ -176,4 +174,4 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=ReleaseMasterGold
 cmake --build build
 ```
 
-On Windows, also pass `-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl`. MSVC `cl.exe` is not supported.
+On Windows, also pass `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.ClangCL.cmake` (add `-DCMAKE_SYSTEM_PROCESSOR=X86` for 32-bit). MSVC `cl.exe` is not supported.
