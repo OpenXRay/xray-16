@@ -469,9 +469,13 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
         map_point_path.clear();
 
         VERIFY(Actor());
-        GraphEngineSpace::CGameVertexParams params(Actor()->locations().vertex_types(), flt_max);
-        bool res = ai().graph_engine().search(
-            ai().game_graph(), Actor()->ai_location().game_vertex_id(), dest_graph_id, &map_point_path, params);
+        bool res = false;
+        if (g_actor)
+        {
+            GraphEngineSpace::CGameVertexParams params(Actor()->locations().vertex_types(), flt_max);
+            res = ai().graph_engine().search(ai().game_graph(), Actor()->ai_location().game_vertex_id(),
+                dest_graph_id, &map_point_path, params);
+        }
 
         if (res)
         {
