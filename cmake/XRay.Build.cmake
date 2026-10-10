@@ -86,10 +86,12 @@ if (LTO_IS_SUPPORTED)
 endif()
 
 # Main compiler settings
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|LCC|Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    include(XRay.Compiler.MSVC)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|LCC|Clang")
     include(XRay.Compiler.GNULike)
 else()
-    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}. Windows builds require clang-cl, see doc/building.md.")
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}.")
 endif()
 
 # https://gitlab.kitware.com/cmake/cmake/-/issues/25650

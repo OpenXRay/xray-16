@@ -9,6 +9,7 @@ You build the engine the same way on every platform: with CMake presets and the 
 |---|---|---|---|
 | Linux, macOS, BSD | `unix-debug`, `unix-mixed`, `unix-release`, `unix-rmg` | system default (GCC/Clang/AppleClang) | host |
 | Windows | `win64-debug`, `win64-mixed`, `win64-release`, `win64-rmg` | clang-cl + lld-link | x64 |
+| Windows | `win64-msvc-debug`, `win64-msvc-mixed`, `win64-msvc-release`, `win64-msvc-rmg` | MSVC `cl` + `link` | x64 |
 
 Presets that don't match your host OS are disabled. `rmg` is ReleaseMasterGold, the shipping configuration.
 `mixed` gives you debug checks with optimized code.
@@ -24,8 +25,8 @@ On every platform you need CMake 3.25 or newer, Ninja, a C++20 compiler and the 
 | Debian/Ubuntu | `sudo apt install cmake ninja-build g++ libssl-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev` |
 | Other Linux/BSD | The same libraries. For exact package names, see the CI job for your platform in `.github/workflows/cibuild.yml`. |
 
-On Windows, the presets use `cmake/toolchains/Windows.ClangCL.cmake`, which locates Visual Studio, the Windows SDK and `clang-cl`
-(Visual Studio's bundled LLVM or `C:\Program Files\LLVM`) through `vswhere`. Builds work the same from any shell; no developer prompt or `PATH` setup is needed.
+On Windows, the presets use a toolchain file (`cmake/toolchains/Windows.ClangCL.cmake` or `cmake/toolchains/Windows.MSVC.cmake`) that locates Visual Studio, the Windows SDK
+and the compiler (`clang-cl` from Visual Studio's bundled LLVM or `C:\Program Files\LLVM`, or MSVC `cl`) through `vswhere`. Builds work the same from any shell; no developer prompt or `PATH` setup is needed.
 
 Clone with submodules. After every branch switch or pull, run the submodule update again, because the third-party code in `Externals/` is pinned per commit:
 
@@ -40,7 +41,7 @@ git submodule update --init --recursive
 cmake --workflow --preset unix-rmg
 ```
 
-The workflow configures the build tree if needed, then builds everything. On Windows, use `win64-rmg`.
+The workflow configures the build tree if needed, then builds everything. On Windows, use `win64-rmg` (clang-cl) or `win64-msvc-rmg` (MSVC).
 
 To configure and build as separate steps:
 
@@ -169,4 +170,4 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=ReleaseMasterGold
 cmake --build build
 ```
 
-On Windows, also pass `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.ClangCL.cmake`. MSVC `cl.exe` is not supported.
+On Windows, also pass `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.ClangCL.cmake` or `-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/Windows.MSVC.cmake`.
