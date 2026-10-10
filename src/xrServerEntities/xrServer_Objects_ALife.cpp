@@ -135,7 +135,14 @@ void SFillPropData::load()
     // level names/ids
     VERIFY(level_ids.empty());
     for (int k = 0; Ini->r_line("levels", k, &N, &V); ++k)
+    {
+        if (!Ini->line_exist(N, "caption"))
+        {
+            Msg("! Section[%s] in game.ltx[%s] is missing 'caption' line", N, Ini->fname());
+            continue;
+        }
         level_ids.push_back(Ini->r_string_wb(N, "caption"));
+    }
 
     // story names
     {
