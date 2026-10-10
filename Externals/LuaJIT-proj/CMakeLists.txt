@@ -646,7 +646,7 @@ target_link_libraries(xrLuaJIT
 
 target_compile_options(xrLuaJIT
     PRIVATE
-    -Wno-comment
+    $<$<NOT:$<C_COMPILER_ID:MSVC>>:-Wno-comment>
 )
 
 set_target_properties(xrLuaJIT PROPERTIES

@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.23)
 
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+endif()
+set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,Mixed>:Embedded>")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(PreProjectInit)
 
