@@ -33,7 +33,8 @@ jobs:
     - name: Install Vulkan SDK
       uses: jakoch/install-vulkan-sdk-action@v1
       with:
-        optional_components: com.lunarg.vulkan.32bit
+        vulkan_version: ${{ matrix.arch == 'win32' && '1.4.304.0' || '' }}
+        optional_components: ${{ matrix.arch == 'win32' && 'com.lunarg.vulkan.32bit' || '' }}
         cache: true
 
     - name: Configure and build
@@ -240,13 +241,13 @@ jobs:
         # FreeBSD package repositories may be ahead of the VM image; tell pkg to
         # ignore the OS version mismatch so packages still install.
         - { name: FreeBSD, os: freebsd, os-version: '14.3', arch: x86_64,
-            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake python3 sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis vulkan-loader vulkan-headers libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
+            install-cmd: "sudo env IGNORE_OSVERSION=yes pkg update && sudo env IGNORE_OSVERSION=yes pkg install -y cmake git python3 sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis vulkan-loader vulkan-headers libX11 libXext libXrandr libXcursor libXfixes libXi libXScrnSaver libXtst libxkbcommon wayland wayland-protocols evdev-proto libdrm mesa-libs pkgconf"
           }
         - { name: OpenBSD, os: openbsd, os-version: '7.6',  arch: x86_64,
-            install-cmd: "sudo pkg_add cmake python%3 SDL2 lzo2 jpeg openal libogg libtheora libvorbis vulkan-loader",
+            install-cmd: "sudo pkg_add cmake git python%3 SDL2 lzo2 jpeg openal libogg libtheora libvorbis vulkan-loader",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
-            install-cmd: "sudo pkgin -y install cmake python313 SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+            install-cmd: "sudo pkgin -y install cmake git-base python313 SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
           }
         #- { name: Haiku,  os: haiku,  os-version: 'r1beta5',  arch: x86_64,
         #    install-cmd: "sudo pkgman install -y cmake libsdl2_devel lzo_devel libjpeg_turbo_devel openal_devel libogg_devel libtheora_devel libvorbis_devel",
