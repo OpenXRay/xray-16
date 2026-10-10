@@ -3,7 +3,7 @@
 #include <thread>
 #include <SDL3/SDL.h>
 
-#if (defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_X86)) && (defined(_MSC_VER) || defined(__clang__))
+#if (defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_X86)) && defined(_MSC_VER)
 #   include <intrin.h>
 #endif
 
@@ -19,7 +19,7 @@ namespace
         {
 #if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_X86)
             int leaf1[4]{}, leaf7[4]{};
-#   if defined(_MSC_VER) || defined(__clang__)
+#   if defined(_MSC_VER)
             __cpuidex(leaf1, 1, 0);
             __cpuidex(leaf7, 7, 0);
 #   else
