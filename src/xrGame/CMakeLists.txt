@@ -2486,6 +2486,7 @@ target_link_libraries(xrGame
     xrSound
     xrScriptEngine
     xrGameSpy
+    $<$<PLATFORM_ID:Windows>:GameSpy-oxr>
     xrCDB
     xrPhysics
     xrNetServer
