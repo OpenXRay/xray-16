@@ -201,19 +201,20 @@ void CGameObject::setVisible(bool _visible)
 
 void CGameObject::Center(Fvector& C) const
 {
-    VERIFY2(renderable.visual, cName().c_str());
+    R_ASSERT2_CURE(renderable.visual, cName().c_str(), { return; });
     renderable.xform.transform_tiny(C, renderable.visual->getVisData().sphere.P);
 }
 
 float CGameObject::Radius() const
 {
-    VERIFY2(renderable.visual, cName().c_str());
+    R_ASSERT2_CURE(renderable.visual, cName().c_str(), { return 0.0f; });
     return renderable.visual->getVisData().sphere.R;
 }
 
 const Fbox& CGameObject::BoundingBox() const
 {
-    VERIFY2(renderable.visual, cName().c_str());
+    static constexpr Fbox NULL_BOX{};
+    R_ASSERT2_CURE(renderable.visual, cName().c_str(), { return NULL_BOX; });
     return renderable.visual->getVisData().box;
 }
 
@@ -810,11 +811,14 @@ void CGameObject::setup_parent_ai_locations(bool assign_position)
 
 u32 CGameObject::new_level_vertex_id() const
 {
-    Fvector center;
+    const auto position = Position();
+    // Center() might be a no-op if there's no visual,
+    // so always initialize it with good defaults.
+    Fvector center = position;
     Center(center);
-    center.x = Position().x;
-    center.z = Position().z;
-    return (ai().level_graph().vertex(ai_location().level_vertex_id(), center));
+    center.x = position.x;
+    center.z = position.z;
+    return ai().level_graph().vertex(ai_location().level_vertex_id(), center);
 }
 
 void CGameObject::update_ai_locations(bool decrement_reference)
