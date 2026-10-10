@@ -159,9 +159,10 @@ block()
     # falls back to plain header-only std::rotate etc. Slight perf hit
     # in protobuf/GNS internal loops, not hot paths.
     add_compile_definitions(_USE_STD_VECTOR_ALGORITHMS=0)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
     if(MSVC)
-        set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> /fo<OBJECT> <SOURCE>")
+        set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> /fo <OBJECT> <SOURCE>")
     endif()
 
     add_subdirectory(protobuf)
