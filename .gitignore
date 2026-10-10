@@ -1,7 +1,6 @@
-# exclude all dot files except .git, appveyor and travis files
+# exclude all dot files except .git, .editorconfig and .vscode
 .*
 !.git*
-!.appveyor*
 !.editorconfig
 !.vscode
 
@@ -9,6 +8,7 @@
 [Bb]in/
 [Bb]uild*/
 cmake_builds/
+CMakeUserPresets.json
 
 # User-specific files
 *.user

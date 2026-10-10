@@ -383,7 +383,7 @@ if(APPLE AND NVRHI_WITH_METAL3)
     if(NOT TARGET copy-dxcompiler OR NOT TARGET copy-dxil)
         message(FATAL_ERROR "Native Metal shaders require Slang's DXC runtime targets.")
     endif()
-    set(XRAY_METAL_DXC_LIBRARY "${CMAKE_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
+    set(XRAY_METAL_DXC_LIBRARY "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
     set(XRAY_METAL_TOOLCHAIN_HEADER "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/MetalShaderToolchain.h")
     add_custom_command(
         OUTPUT "${XRAY_METAL_TOOLCHAIN_HEADER}"
@@ -427,8 +427,6 @@ target_include_directories(xrRender
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
     "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
     "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK"
-    "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
-    "${CMAKE_SOURCE_DIR}/src/packages/directxmath.2024.10.15.1/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
     "${CMAKE_SOURCE_DIR}/Externals/slang/include"
     "${CMAKE_SOURCE_DIR}/Externals/DirectX-Headers/include"

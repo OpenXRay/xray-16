@@ -9,7 +9,7 @@ on:
 
 jobs:
   windows:
-    name: Windows ${{ matrix.configuration }} ${{ matrix.arch }} (vs-sln)
+    name: Windows ${{ matrix.arch }}-${{ matrix.configuration }} (clang-cl)
     runs-on: windows-latest
     timeout-minutes: 30
     defaults:
@@ -18,34 +18,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        configuration: [Debug, Mixed, Release, ReleaseMasterGold]
-        arch: [x64, x86]
+        configuration: [debug, mixed, release, rmg]
+        arch: [win64, win32]
     steps:
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
-    - name: Configure (cmake-initial-configure)
-      run: ./cmake-initial-configure ${{ matrix.configuration }} --vs --arch ${{ matrix.arch }}
+    - name: Set up MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.arch == 'win32' && 'amd64_x86' || 'amd64' }}
 
-    - name: Build (cmake-build)
-      run: ./cmake-build
+    - name: Configure and build
+      run: cmake --workflow --preset ${{ matrix.arch }}-${{ matrix.configuration }}
 
     - name: Package
       id: package
-      run: |
-        cfg_lc=$(echo "${{ matrix.configuration }}" | tr '[:upper:]' '[:lower:]')
-        suffix=""
-        [[ "${{ matrix.arch }}" == "x86" ]] && suffix="_x86"
-        cd "cmake_builds/vs_${cfg_lc}${suffix}"
-        cpack -B artifacts -C "${{ matrix.configuration }}" -DCPACK_THREADS=4
+      run: cpack --preset ${{ matrix.arch }}-${{ matrix.configuration }}
 
     - name: Upload OpenXRay artifact
       if: steps.package.outcome == 'success'
       uses: actions/upload-artifact@main
       with:
-        name: Windows ${{ matrix.configuration }} ${{ matrix.arch }} (vs-sln github-${{ github.run_number }})
-        path: cmake_builds/vs_*/artifacts/openxray*.*
+        name: Windows ${{ matrix.arch }}-${{ matrix.configuration }} (clang-cl github-${{ github.run_number }})
+        path: cmake_builds/*/artifacts/openxray*.*
 
     - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
@@ -58,7 +55,7 @@ jobs:
       if: ${{ steps.update-latest-nightly-tag.outcome == 'success' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release upload --clobber latest-nightly cmake_builds/vs_*/artifacts/openxray*.*
+      run: gh release upload --clobber latest-nightly cmake_builds/*/artifacts/openxray*.*
 
   cmake:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})
@@ -82,8 +79,6 @@ jobs:
         # cc is always set for the correct naming of the job.
         # Both cc and cxx should be set if we want to change the compiler.
         # You may also want to set XRAY_LINKER when changing the compiler.
-        #- { name: Windows,   os: windows-latest,   arch: x64,     cc: cl, }
-        #- { name: Windows,   os: windows-latest,   arch: x86,     cc: cl, }
         - { name: Ubuntu,    os: ubuntu-latest,    arch: amd64,   cc: gcc, }
         - { name: Ubuntu,    os: ubuntu-latest,    arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
         - { name: Ubuntu,    os: ubuntu-24.04-arm, arch: arm64,   cc: gcc }
@@ -97,8 +92,8 @@ jobs:
         # macOS images have tighter concurrency limits; keep the matrix minimal.
         # Pin the deployment target so newer runner images don't pass an unsupported
         # system version (e.g. 25.4.0) down to AppleClang/LuaJIT architecture detection.
-        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, generator: Ninja, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
-        - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, generator: Ninja, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP" }
+        - { name: macOS,          os: macos-latest,    arch: arm64,  cc: clang, threads: 3, generator: Ninja, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP -DNVRHI_WITH_METAL3=OFF" }
+        - { name: macOS Intel,    os: macos-15-intel,  arch: x86_64, cc: clang, generator: Ninja, flags: "-DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 -DCPACK_GENERATOR=ZIP -DNVRHI_WITH_METAL3=OFF" }
 
         configuration: [Debug, Mixed, Release, ReleaseMasterGold]
 
