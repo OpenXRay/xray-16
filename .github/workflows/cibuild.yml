@@ -9,7 +9,7 @@ on:
 
 jobs:
   windows:
-    name: Windows ${{ matrix.arch }}-${{ matrix.configuration }} (clang-cl)
+    name: Windows ${{ matrix.configuration }} (${{ matrix.compiler.name }})
     runs-on: windows-latest
     timeout-minutes: 30
     defaults:
@@ -19,29 +19,31 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [debug, mixed, release, rmg]
-        arch: [win64]
+        compiler:
+          - { name: clang-cl, preset: win64 }
+          - { name: msvc,     preset: win64-msvc }
     steps:
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
     - name: Configure and build
-      run: cmake --workflow --preset ${{ matrix.arch }}-${{ matrix.configuration }}
+      run: cmake --workflow --preset ${{ matrix.compiler.preset }}-${{ matrix.configuration }}
 
     - name: Package
       id: package
-      run: cpack --preset ${{ matrix.arch }}-${{ matrix.configuration }}
+      run: cpack --preset ${{ matrix.compiler.preset }}-${{ matrix.configuration }}
 
     - name: Upload OpenXRay artifact
       if: steps.package.outcome == 'success'
       uses: actions/upload-artifact@main
       with:
-        name: Windows ${{ matrix.arch }}-${{ matrix.configuration }} (clang-cl github-${{ github.run_number }})
+        name: Windows ${{ matrix.configuration }} (${{ matrix.compiler.name }} github-${{ github.run_number }})
         path: cmake_builds/*/artifacts/openxray*.*
 
     - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
-      if: github.ref_name == 'dev'
+      if: github.ref_name == 'dev' && matrix.compiler.name == 'msvc'
       id: update-latest-nightly-tag
       with:
         ref: latest-nightly
