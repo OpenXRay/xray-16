@@ -450,6 +450,7 @@ target_include_directories(xrEngine
 target_link_libraries(xrEngine
     PUBLIC
     xrMiscMath
+    xrScriptEngine
 
     PRIVATE
     xrAPI
@@ -458,7 +459,6 @@ target_link_libraries(xrEngine
     xrMaterialSystem
     xrCore
     xrSound
-    xrScriptEngine
     xrNetServer
     xrImGui
     OpenAL::OpenAL
