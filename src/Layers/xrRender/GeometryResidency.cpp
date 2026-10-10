@@ -1859,7 +1859,7 @@ void GeometryResidencyManager::ReserveRuntimeArena(Arena& arena, u64 bytes, bool
         FATAL_F("[GeoResidency] pinned runtime geometry needs %llu arena bytes beyond the shader address range",
             (unsigned long long)minimum);
 
-    const u64 headroom = std::min(std::max(deficit, arena.bytes / 8ull), GEOMETRY_ARENA_HEADROOM_MAX);
+    const u64 headroom = std::min(std::max(deficit, arena.bytes / 8), GEOMETRY_ARENA_HEADROOM_MAX);
     const u64 target = AlignBytes(std::min(minimum + headroom, GEOMETRY_ARENA_MAX_BYTES));
     const u32 added = BlocksFor(target) - arena.blockCount;
 
