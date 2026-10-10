@@ -4,7 +4,7 @@
 #include "xrCore/_fbox.h"
 #include "xrCDB.h"
 
-#include <bit>
+#include <cstring>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
@@ -39,7 +39,12 @@ struct alignas(16) ray_t
     vec_t fwd_dir;
 };
 
-ICF u32 uf(const float& x) { return std::bit_cast<u32>(x); }
+ICF u32 uf(const float& x)
+{
+    u32 r;
+    std::memcpy(&r, &x, sizeof(r));
+    return r;
+}
 ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
 {
     Fvector MaxT;
