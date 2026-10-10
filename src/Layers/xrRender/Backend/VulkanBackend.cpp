@@ -80,6 +80,15 @@ static bool FindSurfaceFormat(const xr_vector<VkSurfaceFormatKHR>& formats, VkFo
     return false;
 }
 
+static PFN_vkGetInstanceProcAddr LoadVulkanEntryPoint()
+{
+#if defined(__APPLE__)
+    return vkGetInstanceProcAddr;
+#else
+    return reinterpret_cast<PFN_vkGetInstanceProcAddr>(SDL_Vulkan_GetVkGetInstanceProcAddr());
+#endif
+}
+
 VulkanBackend::VulkanBackend() = default;
 
 VulkanBackend::~VulkanBackend() {
@@ -103,7 +112,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     if (!CreateInstance(window, enableValidation)) { Shutdown(); return false; }
     Msg("* [VulkanBackend] Instance created, m_instance=%p", m_instance);
 
-    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Instance(m_instance));
     Msg("* [VulkanBackend] Dispatcher instance-init done, vkCreateDevice=%p vkCreateSemaphore=%p",
         VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateDevice, VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore);
 
@@ -112,7 +121,7 @@ bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool e
     if (!CreateLogicalDevice()) { Shutdown(); return false; }
     Msg("* [VulkanBackend] Device created, m_device=%p", m_device);
 
-    VULKAN_HPP_DEFAULT_DISPATCHER.init(m_instance, vkGetInstanceProcAddr, m_device, vkGetDeviceProcAddr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Device(m_device));
     Msg("* [VulkanBackend] Dispatcher device-init done, vkCreateSemaphore=%p vkDestroySemaphore=%p vkCreateCommandPool=%p",
         VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore,
         VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore,
@@ -288,22 +297,22 @@ void VulkanBackend::Shutdown() {
     DestroySwapChain();
 
     if (m_device) {
-        vkDestroyDevice(m_device, nullptr);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyDevice(m_device, nullptr);
         m_device = VK_NULL_HANDLE;
     }
     if (m_surface) {
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         m_surface = VK_NULL_HANDLE;
     }
     if (m_debugMessenger) {
         auto destroyFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)
-            vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
         if (destroyFunc)
             destroyFunc(m_instance, m_debugMessenger, nullptr);
         m_debugMessenger = VK_NULL_HANDLE;
     }
     if (m_instance) {
-        vkDestroyInstance(m_instance, nullptr);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyInstance(m_instance, nullptr);
         m_instance = VK_NULL_HANDLE;
     }
 
@@ -359,6 +368,13 @@ void VulkanBackend::SavePipelineCache() {
 }
 
 bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
+    const PFN_vkGetInstanceProcAddr getInstanceProcAddr = LoadVulkanEntryPoint();
+    if (!getInstanceProcAddr) {
+        Msg("! [VulkanBackend] Vulkan loader unavailable: %s", SDL_GetError());
+        return false;
+    }
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(getInstanceProcAddr);
+
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "OpenXRay";
@@ -377,9 +393,9 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
     u32 availableExtensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
     xr_vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
     m_swapchainColorSpaceEnabled = false;
     for (const VkExtensionProperties& available : availableExtensions)
     {
@@ -402,7 +418,7 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
     createInfo.enabledLayerCount = static_cast<u32>(layers.size());
     createInfo.ppEnabledLayerNames = layers.data();
 
-    VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateInstance(&createInfo, nullptr, &m_instance);
     if (result != VK_SUCCESS) {
         Msg("! [VulkanBackend] vkCreateInstance failed: %d", result);
         return false;
@@ -410,7 +426,7 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
 
     if (enableValidation) {
         auto createFunc = (PFN_vkCreateDebugUtilsMessengerEXT)
-            vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
         if (createFunc) {
             VkDebugUtilsMessengerCreateInfoEXT debugInfo = {};
             debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -433,18 +449,18 @@ bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
 
 bool VulkanBackend::SelectPhysicalDevice() {
     u32 deviceCount = 0;
-    vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
     if (deviceCount == 0) {
         Msg("! [VulkanBackend] No Vulkan-capable GPUs found");
         return false;
     }
 
     xr_vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
 
     for (auto& dev : devices) {
         VkPhysicalDeviceProperties props;
-        vkGetPhysicalDeviceProperties(dev, &props);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(dev, &props);
 
         if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
             m_physicalDevice = dev;
@@ -457,7 +473,7 @@ bool VulkanBackend::SelectPhysicalDevice() {
 
     m_physicalDevice = devices[0];
     VkPhysicalDeviceProperties props;
-    vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
     m_capabilities.id_vendor = props.vendorID;
     m_capabilities.id_device = props.deviceID;
     Msg("* [VulkanBackend] Using GPU (fallback): %s", props.deviceName);
@@ -474,15 +490,15 @@ bool VulkanBackend::CreateSurface(SDL_Window* window) {
 
 bool VulkanBackend::CreateLogicalDevice() {
     u32 queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, nullptr);
     xr_vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
 
     m_graphicsQueueFamily = UINT32_MAX;
     m_computeQueueFamily = UINT32_MAX;
     for (u32 i = 0; i < queueFamilyCount; i++) {
         VkBool32 presentSupport = VK_FALSE;
-        vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, i, m_surface, &presentSupport);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, i, m_surface, &presentSupport);
 
         if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport) {
             m_graphicsQueueFamily = i;
@@ -553,9 +569,9 @@ bool VulkanBackend::CreateLogicalDevice() {
     VkPhysicalDeviceMeshShaderFeaturesEXT meshFeatures = {};
     meshFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT;
     u32 extensionCount = 0;
-    if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS) {
+    if (VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS) {
         xr_vector<VkExtensionProperties> extensions(extensionCount);
-        if (vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data()) == VK_SUCCESS) {
+        if (VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data()) == VK_SUCCESS) {
             for (const auto& extension : extensions)
             {
                 if (strcmp(extension.extensionName, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0)
@@ -576,14 +592,14 @@ bool VulkanBackend::CreateLogicalDevice() {
                 VkPhysicalDeviceFeatures2 supportedFeatures = {};
                 supportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
                 supportedFeatures.pNext = &supportedMeshFeatures;
-                vkGetPhysicalDeviceFeatures2(m_physicalDevice, &supportedFeatures);
+                VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(m_physicalDevice, &supportedFeatures);
 
                 VkPhysicalDeviceMeshShaderPropertiesEXT meshProperties = {};
                 meshProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT;
                 VkPhysicalDeviceProperties2 properties = {};
                 properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
                 properties.pNext = &meshProperties;
-                vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
+                VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
 
                 const u64 vertexGranularity = std::max(1u, meshProperties.meshOutputPerVertexGranularity);
                 const u64 primitiveGranularity = std::max(1u, meshProperties.meshOutputPerPrimitiveGranularity);
@@ -684,7 +700,7 @@ bool VulkanBackend::CreateLogicalDevice() {
         VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
         sup2.pNext = &sup12;
         sup12.pNext = &sup11;
-        vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
         if (!sup12.shaderStorageBufferArrayNonUniformIndexing)
         {
             Msg("! [VulkanBackend] Non-uniform storage-buffer indexing is required for chunked instance geometry");
@@ -765,7 +781,7 @@ bool VulkanBackend::CreateLogicalDevice() {
     deviceCreateInfo.enabledExtensionCount = static_cast<u32>(m_deviceExtensions.size());
     deviceCreateInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
 
-    VkResult result = vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
     if (result != VK_SUCCESS) {
         Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
         return false;
@@ -775,11 +791,11 @@ bool VulkanBackend::CreateLogicalDevice() {
     m_capabilities.meshShaders = meshFeatures.meshShader == VK_TRUE;
     m_capabilities.meshShaderMaxGroups = meshShaderMaxGroups;
 
-    vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
 
     if (m_computeQueueFamily != UINT32_MAX) {
         u32 computeQueueIndex = useGraphicsFamilyForCompute ? 1 : 0;
-        vkGetDeviceQueue(m_device, m_computeQueueFamily, computeQueueIndex, &m_computeQueue);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceQueue(m_device, m_computeQueueFamily, computeQueueIndex, &m_computeQueue);
         const char* kind = useGraphicsFamilyForCompute ? "shared family"
             : (queueFamilies[m_computeQueueFamily].queueFlags & VK_QUEUE_GRAPHICS_BIT) ? "general-purpose family"
             : "dedicated";
@@ -795,12 +811,12 @@ bool VulkanBackend::CreateLogicalDevice() {
 
 bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     VkSurfaceCapabilitiesKHR surfaceCaps;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCaps);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCaps);
 
     u32 formatCount = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
     xr_vector<VkSurfaceFormatKHR> formats(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
 
     VkSurfaceFormatKHR surfaceFormat = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
     const bool hdr = m_hdrOutput && m_swapchainColorSpaceEnabled
@@ -815,9 +831,9 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     m_hdrActive = hdr;
 
     u32 presentModeCount = 0;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
     xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
 
     const bool wantVSync = m_requestedVSync;
     VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -863,15 +879,15 @@ bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
     swapchainInfo.clipped = VK_TRUE;
     swapchainInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    VkResult result = vkCreateSwapchainKHR(m_device, &swapchainInfo, nullptr, &m_swapchain);
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSwapchainKHR(m_device, &swapchainInfo, nullptr, &m_swapchain);
     if (result != VK_SUCCESS) {
         Msg("! [VulkanBackend] vkCreateSwapchainKHR failed: %d", result);
         return false;
     }
 
-    vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, nullptr);
     m_swapchainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, m_swapchainImages.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, m_swapchainImages.data());
     m_maxAcquiredImageCount = imageCount - surfaceCaps.minImageCount + 1;
 
     m_backBufferWidth = extent.width;
@@ -890,7 +906,7 @@ void VulkanBackend::DestroySwapChain() {
     m_swapchainImages.clear();
 
     if (m_swapchain) {
-        vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
         m_swapchain = VK_NULL_HANDLE;
     }
 }
@@ -926,13 +942,13 @@ void VulkanBackend::CreateSyncObjects() {
     semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
-        vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
         m_frameSubmissionIDs[i] = 0;
         m_frameSubmissionPending[i] = false;
     }
     m_renderFinished.resize(m_swapchainImages.size(), VK_NULL_HANDLE);
     for (auto& semaphore : m_renderFinished)
-        vkCreateSemaphore(m_device, &semInfo, nullptr, &semaphore);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore(m_device, &semInfo, nullptr, &semaphore);
     m_acquiredImageCount = 0;
 }
 
@@ -941,7 +957,7 @@ void VulkanBackend::DestroySyncObjects() {
         return;
     for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
         if (m_imageAvailable[i]) {
-            vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
             m_imageAvailable[i] = VK_NULL_HANDLE;
         }
         m_frameSubmissionIDs[i] = 0;
@@ -949,7 +965,7 @@ void VulkanBackend::DestroySyncObjects() {
     }
     for (VkSemaphore semaphore : m_renderFinished) {
         if (semaphore)
-            vkDestroySemaphore(m_device, semaphore, nullptr);
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore(m_device, semaphore, nullptr);
     }
     m_renderFinished.clear();
     m_acquiredImageCount = 0;
@@ -974,10 +990,10 @@ void VulkanBackend::QueryCapabilities() {
     Msg("* [VulkanBackend] Ray tracing (path tracer / RTGI): %s", m_capabilities.rayTracing ? "ENABLED" : "DISABLED");
 
     VkPhysicalDeviceProperties props;
-    vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
 
     VkPhysicalDeviceFeatures features;
-    vkGetPhysicalDeviceFeatures(m_physicalDevice, &features);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures(m_physicalDevice, &features);
 
     m_capabilities.geometry.dwRegisters = 256;
     m_capabilities.geometry.dwInstructions = 65535;
@@ -1052,7 +1068,7 @@ void VulkanBackend::Present(bool vsync) {
     presentInfo.pSwapchains = &m_swapchain;
     presentInfo.pImageIndices = &m_currentImageIndex;
 
-    VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
         m_swapchainNeedsReset.store(true, std::memory_order_release);
         Msg("* [VulkanBackend] Swapchain out of date, resize needed");
@@ -1077,9 +1093,9 @@ bool VulkanBackend::SurfaceSupportsHDR() const {
     if (!m_swapchainColorSpaceEnabled || !m_physicalDevice || !m_surface)
         return false;
     u32 formatCount = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
     xr_vector<VkSurfaceFormatKHR> formats(formatCount);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
     VkSurfaceFormatKHR selected = {};
     return FindSurfaceFormat(formats, VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT, false, selected);
 }
@@ -1152,7 +1168,7 @@ void VulkanBackend::BeginFrame() {
         waitInfo.semaphoreCount = 1;
         waitInfo.pSemaphores = &semaphore;
         waitInfo.pValues = &frameSubmissionID;
-        const VkResult result = vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
+        const VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
         R_ASSERT2(result == VK_SUCCESS, "Vulkan frame completion wait failed");
         StoreMaxUs(m_stGpuWaitUs, usSince(t0));
     }
@@ -1167,7 +1183,7 @@ void VulkanBackend::BeginFrame() {
         {
             ZoneScopedN("VK::AcquireImage");
             const auto t0 = Clock::now();
-            result = vkAcquireNextImageKHR(
+            result = VULKAN_HPP_DEFAULT_DISPATCHER.vkAcquireNextImageKHR(
                 m_device, m_swapchain, UINT64_MAX,
                 m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
                 &m_currentImageIndex);
@@ -1329,7 +1345,7 @@ void VulkanBackend::SubmitThreadMain() {
             presentInfo.pSwapchains = &m_swapchain;
             presentInfo.pImageIndices = &job.imageIndex;
 
-            VkResult result = vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+            VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
             if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
                 m_swapchainNeedsReset.store(true, std::memory_order_release);
                 Msg("* [VulkanBackend] Swapchain out of date, resize needed");
@@ -1398,7 +1414,7 @@ void VulkanBackend::WaitForIdle() {
     if (m_nvrhiDevice)
         m_nvrhiDevice->waitForIdle();
     if (m_device)
-        vkDeviceWaitIdle(m_device);
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDeviceWaitIdle(m_device);
 }
 
 void VulkanBackend::RunGarbageCollection()
@@ -1596,7 +1612,7 @@ IRenderBackend::MemoryBudget VulkanBackend::GetMemoryBudget() const
     if (!m_physicalDevice)
         return result;
     VkPhysicalDeviceProperties properties = {};
-    vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
     result.bufferRangeBytes = properties.limits.maxStorageBufferRange;
     const bool hasBudget = std::any_of(m_deviceExtensions.begin(), m_deviceExtensions.end(), [](const char* name)
     {
@@ -1607,7 +1623,7 @@ IRenderBackend::MemoryBudget VulkanBackend::GetMemoryBudget() const
     VkPhysicalDeviceMemoryProperties2 memory = {};
     memory.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
     memory.pNext = hasBudget ? &budget : nullptr;
-    vkGetPhysicalDeviceMemoryProperties2(m_physicalDevice, &memory);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties2(m_physicalDevice, &memory);
     for (u32 i = 0; i < memory.memoryProperties.memoryHeapCount; ++i)
     {
         if ((memory.memoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == 0)

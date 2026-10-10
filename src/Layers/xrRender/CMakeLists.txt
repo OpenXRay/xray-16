@@ -435,9 +435,8 @@ target_include_directories(xrRender
 if (APPLE)
     set(XRAY_VULKAN_LIBS MoltenVK Vulkan::Headers)
 else()
-    find_package(Vulkan REQUIRED)
-    target_include_directories(xrRender PRIVATE ${Vulkan_INCLUDE_DIRS})
-    set(XRAY_VULKAN_LIBS ${Vulkan_LIBRARIES})
+    set(XRAY_VULKAN_LIBS Vulkan::Headers)
+    target_compile_definitions(xrRender PRIVATE VK_NO_PROTOTYPES)
 endif()
 
 target_link_libraries(xrRender
