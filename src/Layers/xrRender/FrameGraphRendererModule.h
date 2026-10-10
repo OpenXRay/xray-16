@@ -5,5 +5,5 @@
 
 namespace xray::render::fg
 {
-XRRENDER_R4_API RendererModule* GetFrameGraphRendererModule();
+RendererModule* GetFrameGraphRendererModule();
 }

@@ -239,6 +239,7 @@ jobs:
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
             install-cmd: "sudo pkgin -y install cmake git-base python313 sccache lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+            cmake-flags: "-DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON",
           }
         #- { name: Haiku,  os: haiku,  os-version: 'r1beta5',  arch: x86_64,
         #    install-cmd: "sudo pkgman install -y cmake libsdl2_devel lzo_devel libjpeg_turbo_devel openal_devel libogg_devel libtheora_devel libvorbis_devel",
@@ -277,7 +278,7 @@ jobs:
         environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
-        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCMAKE_C_FLAGS_DEBUG=-g1 -DCMAKE_CXX_FLAGS_DEBUG=-g1 --log-level VERBOSE
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCMAKE_C_FLAGS_DEBUG=-g1 -DCMAKE_CXX_FLAGS_DEBUG=-g1 ${{ matrix.platform.cmake-flags }} --log-level VERBOSE
 
     - name: Run CMake Build
       uses: cross-platform-actions/action@v0.32.0
@@ -290,7 +291,7 @@ jobs:
         environment_variables: ${{ env.VM_ENV }}
         shutdown_vm: false
         sync_files: false
-        run: ulimit -Sd "$(ulimit -Hd)" || true; echo "class=$(id -c 2>/dev/null || echo n/a) datasize soft=$(ulimit -Sd) hard=$(ulimit -Hd)"; s=0; cmake --build build --config ${{ matrix.Configuration }} --parallel 4 -- -k || s=$?; sccache --show-stats; exit $s
+        run: ulimit -Sd "$(ulimit -Hd)" || true; echo "class=$(id -c 2>/dev/null || echo n/a) datasize soft=$(ulimit -Sd) hard=$(ulimit -Hd)"; df -h .; sccache --start-server || true; s=0; cmake --build build --config ${{ matrix.Configuration }} --parallel 4 -- -k || s=$?; sccache --show-stats; df -h .; exit $s
 
   flatpak:
     name: Flatpak ${{ matrix.platform.arch }}
