@@ -1433,7 +1433,7 @@ bool DrawPages(fg::RenderContext* ctx, const FrameGraph& graph, const VSMAtlasDa
     if (!vsRefl || !psRefl || !atRefl)
         return false;
 
-    
+
     auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
@@ -1872,7 +1872,7 @@ void ExecuteDynAtlas(fg::RenderContext* ctx, const FrameGraph& fg, const VSMDynA
     auto vsmCB = VsmParamsCB(cmdList, data.device, state);
     auto* backend = data.device->GetBackend();
     nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
-    
+
 
     {
         GPUCullingManager& gc = *cfg.gpuCulling;
@@ -2087,7 +2087,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const VSMHudData& 
     auto hudCB = cache.GetOrCreateVolatileCB("VSM", "HudParams", sizeof(VsmHudParams), data.device);
     cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
 
-    
+
     cmdList->setBufferState(hudEntries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(preVB, nvrhi::ResourceStates::ShaderResource);

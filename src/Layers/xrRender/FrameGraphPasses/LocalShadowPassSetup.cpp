@@ -731,7 +731,7 @@ bool BeginAtlasPass(fg::RenderContext* ctx, const LocalShadowConfig& cfg, LocalS
     if (!clearVsRefl || !clearPsRefl)
         return false;
 
-    
+
     auto srv = [&](nvrhi::IBuffer* b) {
         if (b)
             cmdList->setBufferState(b, nvrhi::ResourceStates::ShaderResource);
@@ -830,7 +830,7 @@ void ExecuteStatic(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShad
         return;
     }
 
-    
+
     bool complete = true;
     auto drawStream = [&](u32 stream, nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingLayout* layout,
                           const ExtractedReflection& ps, nvrhi::IBuffer* instanceBuffer, bool withBindless, const char* label) {
@@ -950,7 +950,7 @@ void ExecuteDyn(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowD
         return;
     }
 
-    
+
     GPUCullingManager& gpuCulling = *cfg.gpuCulling;
     bool complete = true;
 
@@ -1173,7 +1173,7 @@ void ExecuteHud(fg::RenderContext* ctx, const FrameGraph& fg, const LocalShadowH
     auto hudCB = cache.GetOrCreateVolatileCB("LocalShadow", "HudParams", sizeof(LocalShadowHudParams), data.device);
     cmdList->writeBuffer(hudCB, &hp, sizeof(hp));
 
-    
+
     cmdList->setBufferState(hudEntries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(entries, nvrhi::ResourceStates::ShaderResource);
     cmdList->setBufferState(preVB, nvrhi::ResourceStates::ShaderResource);

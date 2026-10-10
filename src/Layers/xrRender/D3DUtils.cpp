@@ -697,7 +697,7 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
             pv->p.add(offs);
             pv->color = clr_w;
         }
-    
+
         g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, g_du_l_scratch.data(), identboxwirecount / 2);
     }
     if (bSolid)
@@ -712,7 +712,7 @@ void CDrawUtilities::DrawBox(const Fvector& offs, const Fvector& Size, BOOL bSol
             pv->p.add(offs);
             pv->color = clr_s;
         }
-    
+
         g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), DU_BOX_NUMFACES);
     }
 }
@@ -787,7 +787,7 @@ void CDrawUtilities::DD_DrawFace_begin(BOOL bWire)
 }
 void CDrawUtilities::DD_DrawFace_flush(BOOL try_again)
 {
-    
+
     if (m_DD_wire)
     g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, g_du_l_scratch.data(), u32(m_DD_pv - m_DD_pv_start) / 3);
     if (m_DD_wire)
