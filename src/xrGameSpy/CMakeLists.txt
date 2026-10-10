@@ -52,6 +52,8 @@ target_link_libraries(xrGameSpy
     xrCore
     xrMiscMath
     GameSpy-oxr
+    $<$<PLATFORM_ID:Windows>:ws2_32>
+    $<$<PLATFORM_ID:Windows>:advapi32>
 )
 
 target_compile_definitions(xrGameSpy
