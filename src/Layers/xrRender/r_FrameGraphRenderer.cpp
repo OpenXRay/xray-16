@@ -319,10 +319,10 @@ bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
     m_particleEditor = xr_make_unique<fg::ParticleEditor>();
-    
+
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
     m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
-    
+
     Msg("* [FrameGraphRenderer] Profiler initialized");
 
     {
@@ -459,7 +459,7 @@ void FrameGraphRenderer::Render() {
     }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
-    
+
     Lights.Update();
 
     if (m_device && m_device->GetFGResourceManager()) {
@@ -548,7 +548,7 @@ void FrameGraphRenderer::Render() {
     m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
     m_framegraph->SetRenderContext(m_renderContext.get());
     m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
-    
+
     m_framegraph->SetAsyncComputeBackend(GEnv.Backend && GEnv.Backend->HasAsyncCompute() ? GEnv.Backend : nullptr);
 
     {
@@ -2174,7 +2174,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         return false;
 
     ZoneScopedN("ProcessVisualGeometry");
-    
+
     IRender_Mesh* meshVisual = nullptr;
     switch (visual->getType()) {
         case MT_NORMAL:
@@ -3011,7 +3011,7 @@ void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix
     if (!visual) {
         return;
     }
-    
+
     bool isHUD = (root && root->renderable_HUD());
     if (isHUD && m_collectShadowOnly)
         return;
