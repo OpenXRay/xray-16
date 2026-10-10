@@ -79,7 +79,6 @@ jobs:
         - { name: Ubuntu,    os: ubuntu-24.04-arm, arch: arm64,   cc: gcc }
         #- { name: Ubuntu,    os: ubuntu-latest,    arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine,    os: ubuntu-latest,    arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
-        - { name: Alpine,    os: ubuntu-latest,    arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Fedora,    os: ubuntu-latest,    arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,     os: ubuntu-latest,    arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
         - { name: AppImage,  os: ubuntu-latest,    arch: amd64,   cc: gcc,   flags: "-DBUILD_SHARED_LIBS=OFF", linuxdeploy: linuxdeploy-x86_64.AppImage }
