@@ -101,6 +101,9 @@ if(APPLE AND NVRHI_WITH_METAL3)
     endif()
 endif()
 add_subdirectory(nvrhi)
+if (TARGET rtxmu AND NOT CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    target_compile_options(rtxmu PRIVATE "SHELL:-include string")
+endif()
 
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})
