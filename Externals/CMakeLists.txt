@@ -77,6 +77,7 @@ set(SLANG_ENABLE_TESTS OFF CACHE BOOL "Disable Slang tests")
 set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "Disable Slang examples")
 set(SLANG_ENABLE_SLANG_RHI OFF CACHE BOOL "Disable slang-rhi (only used by Slang tests and examples)")
 set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "Disable slang-replay tool")
+set(SLANG_ENABLE_SLANG_PROXY OFF CACHE BOOL "Disable slang.dll forwarding proxy (needs dumpbin)")
 set(SLANG_ENABLE_PREBUILT_BINARIES OFF CACHE BOOL "Build from source")
 add_subdirectory(slang)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang-rich-diagnostics.cpp
@@ -84,6 +85,14 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/slang/source/slang/slang
     PROPERTIES COMPILE_OPTIONS
         "$<IF:$<CXX_COMPILER_ID:GNU>,-Os,-Oz>"
 )
+
+if(MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    foreach(spirv_target SPIRV-Tools-static SPIRV-Tools-shared SPIRV-Tools-opt SPIRV-Tools-link SPIRV-Tools-lint SPIRV-Tools-diff SPIRV-Tools-reduce)
+        if(TARGET ${spirv_target})
+            target_compile_options(${spirv_target} PRIVATE -Wno-error)
+        endif()
+    endforeach()
+endif()
 
 if(APPLE AND NVRHI_WITH_METAL3)
     FetchContent_GetProperties(dxc_source SOURCE_DIR XRAY_DXC_SOURCE_DIR)
@@ -138,6 +147,10 @@ block()
     # falls back to plain header-only std::rotate etc. Slight perf hit
     # in protobuf/GNS internal loops, not hot paths.
     add_compile_definitions(_USE_STD_VECTOR_ALGORITHMS=0)
+
+    if(MSVC)
+        set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> /fo <OBJECT> <SOURCE>")
+    endif()
 
     add_subdirectory(protobuf)
 
