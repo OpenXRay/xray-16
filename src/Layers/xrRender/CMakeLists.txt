@@ -450,6 +450,7 @@ target_link_libraries(xrRender
     xrAPI
     xrAnimation
     xrMiscMath
+    xrImGui
     nvrhi
     ${XRAY_VULKAN_LIBS}
     slang
