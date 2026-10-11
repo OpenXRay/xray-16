@@ -684,6 +684,25 @@ static bool FramebufferReferences(const nvrhi::FramebufferDesc& desc, const nvrh
         desc.shadingRateAttachment.texture == texture;
 }
 
+void PassResourceCache::InvalidateBindingSetsReferencing(const nvrhi::IResource* resource) {
+    for (auto it = m_bindingSets.begin(); it != m_bindingSets.end();) {
+        const nvrhi::BindingSetDesc* desc = it->second ? it->second->getDesc() : nullptr;
+        bool references = false;
+        if (desc) {
+            for (const auto& binding : desc->bindings) {
+                if (binding.resourceHandle == resource) {
+                    references = true;
+                    break;
+                }
+            }
+        }
+        if (references)
+            it = m_bindingSets.erase(it);
+        else
+            ++it;
+    }
+}
+
 void PassResourceCache::InvalidateTexture(const nvrhi::ITexture* texture) {
     if (!texture)
         return;
@@ -695,22 +714,12 @@ void PassResourceCache::InvalidateTexture(const nvrhi::ITexture* texture) {
             ++it;
     }
 
-    for (auto it = m_bindingSets.begin(); it != m_bindingSets.end();) {
-        const nvrhi::BindingSetDesc* desc = it->second ? it->second->getDesc() : nullptr;
-        bool references = false;
-        if (desc) {
-            for (const auto& binding : desc->bindings) {
-                if (binding.resourceHandle == static_cast<const nvrhi::IResource*>(texture)) {
-                    references = true;
-                    break;
-                }
-            }
-        }
-        if (references)
-            it = m_bindingSets.erase(it);
-        else
-            ++it;
-    }
+    InvalidateBindingSetsReferencing(texture);
+}
+
+void PassResourceCache::InvalidateBuffer(const nvrhi::IBuffer* buffer) {
+    if (buffer)
+        InvalidateBindingSetsReferencing(buffer);
 }
 
 void PassResourceCache::ResetStats() {

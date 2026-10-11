@@ -85,6 +85,7 @@ public:
     void ClearBindingSets();
     void ClearFramebufferDependent();
     void InvalidateTexture(const nvrhi::ITexture* texture);
+    void InvalidateBuffer(const nvrhi::IBuffer* buffer);
 
     struct Stats {
         u32 samplerHits = 0;
@@ -115,6 +116,8 @@ private:
 
     PassResourceCache(const PassResourceCache&) = delete;
     PassResourceCache& operator=(const PassResourceCache&) = delete;
+
+    void InvalidateBindingSetsReferencing(const nvrhi::IResource* resource);
 
     struct InputLayoutEntry {
         nvrhi::ShaderHandle vertexShader;

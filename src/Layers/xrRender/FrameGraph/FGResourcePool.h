@@ -6,40 +6,19 @@ namespace xray::render::framegraph {
 
 class FGResourcePool {
 public:
-    FGResourcePool(resources::FGResourceManager* resourceManager);
+    explicit FGResourcePool(resources::FGResourceManager* resourceManager);
     ~FGResourcePool();
 
     resources::TextureHandle AllocateTexture(const resources::TextureDesc& desc);
-
-    resources::TextureHandle AllocatePersistentTexture(const resources::TextureDesc& desc);
-
     void FreeTexture(resources::TextureHandle handle);
 
     resources::BufferHandle AllocateBuffer(const resources::BufferDesc& desc);
     void FreeBuffer(resources::BufferHandle handle);
 
-    void SetAliasingEnabled(bool enabled) { m_aliasingEnabled = enabled; }
-    bool IsAliasingEnabled() const { return m_aliasingEnabled; }
-
     void Reset();
-
     void Tick();
 
-    struct Statistics {
-        u32 texturesAllocated = 0;
-        u32 texturesAliased = 0;
-        u32 texturesActive = 0;
-
-        u64 memoryAllocated = 0;
-        u64 memorySaved = 0;
-    };
-
-    Statistics GetStatistics() const { return m_stats; }
-    void PrintStatistics() const;
-
 private:
-    resources::FGResourceManager* m_resourceManager;
-
     struct PooledTexture {
         resources::TextureHandle handle;
         resources::TextureDesc desc;
@@ -47,18 +26,22 @@ private:
         u32 lastUsedFrame = 0;
     };
 
+    struct PooledBuffer {
+        resources::BufferHandle handle;
+        resources::BufferDesc desc;
+        bool inUse = false;
+        u32 lastUsedFrame = 0;
+    };
+
+    static bool AreTexturesCompatible(const resources::TextureDesc& a, const resources::TextureDesc& b);
+    static bool AreBuffersCompatible(const resources::BufferDesc& a, const resources::BufferDesc& b);
+
+    resources::FGResourceManager* m_resourceManager;
     xr_vector<PooledTexture> m_texturePool;
-
-    resources::TextureHandle FindCompatibleTexture(const resources::TextureDesc& desc);
-
-    bool AreTexturesCompatible(const resources::TextureDesc& a, const resources::TextureDesc& b) const;
-
-    bool m_aliasingEnabled = true;
+    xr_vector<PooledBuffer> m_bufferPool;
     u32 m_currentFrame = 0;
 
     static constexpr u32 kEvictAfterFrames = 4;
-
-    mutable Statistics m_stats;
 };
 
 }
