@@ -484,7 +484,8 @@ target_precompile_headers(xrEngine
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrEngine LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrEngine
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

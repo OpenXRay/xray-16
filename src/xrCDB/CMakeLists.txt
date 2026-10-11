@@ -66,7 +66,8 @@ target_precompile_headers(xrCDB
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrCDB LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrCDB
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

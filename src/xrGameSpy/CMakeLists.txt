@@ -72,7 +72,8 @@ target_precompile_headers(xrGameSpy
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrGameSpy LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrGameSpy
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

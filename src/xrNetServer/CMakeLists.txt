@@ -53,7 +53,8 @@ target_precompile_headers(xrNetServer
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrNetServer LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrNetServer
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

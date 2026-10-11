@@ -61,5 +61,8 @@ target_compile_definitions(xrAnimation PRIVATE XRANIMATION_EXPORTS)
 target_precompile_headers(xrAnimation PRIVATE stdafx.h)
 
 if(BUILD_SHARED_LIBS)
-    install(TARGETS xrAnimation LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+    install(TARGETS xrAnimation
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
 endif()

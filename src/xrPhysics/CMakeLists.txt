@@ -433,7 +433,8 @@ target_precompile_headers(xrPhysics
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrPhysics LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrPhysics
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

@@ -120,7 +120,8 @@ target_precompile_headers(xrScriptEngine
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrScriptEngine LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrScriptEngine
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()
