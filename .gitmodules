@@ -30,11 +30,11 @@
 	url = https://github.com/pattonkan/sse2rvv.git
 [submodule "Externals/nvrhi"]
 	path = Externals/nvrhi
-	url = git@github.com:yohjimane/NVRHI.git
+	url = https://github.com/yohjimane/NVRHI.git
 	branch = main
 [submodule "Externals/slang"]
 	path = Externals/slang
-	url = git@github.com:yohjimane/slang.git
+	url = https://github.com/yohjimane/slang.git
 	branch = master
 [submodule "Externals/DirectX-Headers"]
 	path = Externals/DirectX-Headers
