@@ -535,8 +535,8 @@ if (XRAY_BUILD_TASK_TESTS)
     target_include_directories(xrCoreTaskTests
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${CMAKE_SOURCE_DIR}/src"
-        "${CMAKE_SOURCE_DIR}/Externals"
+        "${XRAY_SOURCE_DIR}/src"
+        "${XRAY_SOURCE_DIR}/Externals"
     )
     target_link_libraries(xrCoreTaskTests PRIVATE xrCore)
 endif()

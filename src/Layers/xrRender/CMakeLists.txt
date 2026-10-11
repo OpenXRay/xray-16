@@ -422,14 +422,14 @@ set_source_files_properties(
 target_include_directories(xrRender
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/sdk/include"
-    "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
-    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
-    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK"
-    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
-    "${CMAKE_SOURCE_DIR}/Externals/slang/include"
-    "${CMAKE_SOURCE_DIR}/Externals/DirectX-Headers/include"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/sdk/include"
+    "${XRAY_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${XRAY_SOURCE_DIR}/sdk/include/nvapi"
+    "${XRAY_SOURCE_DIR}/Externals/AGS_SDK"
+    "${XRAY_SOURCE_DIR}/Externals/nvrhi/include"
+    "${XRAY_SOURCE_DIR}/Externals/slang/include"
+    "${XRAY_SOURCE_DIR}/Externals/DirectX-Headers/include"
 )
 
 if (APPLE)
@@ -480,7 +480,7 @@ target_compile_definitions(xrRender
 )
 
 if(XRAY_USE_AI_PBR)
-    set(XRAY_ONNXRUNTIME_ROOT "${CMAKE_SOURCE_DIR}/Externals/onnxruntime" CACHE PATH "ONNX Runtime root directory")
+    set(XRAY_ONNXRUNTIME_ROOT "${XRAY_SOURCE_DIR}/Externals/onnxruntime" CACHE PATH "ONNX Runtime root directory")
 
     find_path(XRAY_ONNXRUNTIME_INCLUDE_DIR onnxruntime_cxx_api.h
         HINTS

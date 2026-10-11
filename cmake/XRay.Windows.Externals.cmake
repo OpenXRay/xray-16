@@ -4,7 +4,7 @@ if (NOT WIN32)
     return()
 endif()
 
-set(XRAY_SDK_DIR "${CMAKE_SOURCE_DIR}/sdk")
+set(XRAY_SDK_DIR "${XRAY_SOURCE_DIR}/sdk")
 set(XRAY_SDK_LIB_DIR "${XRAY_SDK_DIR}/libraries/${XRAY_ARCH}")
 set(XRAY_SDK_BIN_DIR "${XRAY_SDK_DIR}/binaries/${XRAY_ARCH}")
 set(XRAY_SDK_INC_DIR "${XRAY_SDK_DIR}/include")
@@ -15,7 +15,7 @@ unset(_xray_pointer_bits)
 include_directories(
     "${XRAY_SDK_INC_DIR}"
     "${XRAY_SDK_INC_DIR}/AL"
-    "${CMAKE_SOURCE_DIR}/Externals"
+    "${XRAY_SOURCE_DIR}/Externals"
 )
 
 add_library(OpenAL::OpenAL STATIC IMPORTED GLOBAL)
