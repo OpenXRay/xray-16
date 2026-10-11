@@ -3,6 +3,8 @@
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include "ClusterDrawConfig.h"
+#include "ViewFrame.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render {
@@ -41,21 +43,13 @@ MaterialResolveOutput setupMaterialResolvePass(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle visId,
-    framegraph::VirtualResourceHandle depth,
-    framegraph::VirtualResourceHandle color,
-    framegraph::VirtualResourceHandle normal,
-    framegraph::VirtualResourceHandle baseColor,
-    framegraph::VirtualResourceHandle material,
+    const framegraph::DefaultOutputLayout& gbuffer,
     framegraph::VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
-    const Fmatrix& prevView,
-    const Fmatrix& prevProj,
-    bool motionValid,
+    const ViewFrame& view,
     u32 entryLimit,
-    u32 width,
-    u32 height,
     MaterialResolvePassState* state);
 
 }

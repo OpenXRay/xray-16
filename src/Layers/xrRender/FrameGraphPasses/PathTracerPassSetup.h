@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RayTracing/RTAccelStructManager.h"
 #include "Layers/xrRender/SkyEnvironment.h"
 #include "ClusterLightPassSetup.h"
+#include "ViewFrame.h"
 #include <memory>
 
 namespace xray::render::framegraph
@@ -214,8 +215,7 @@ PathTracerSnapshotReuse EvaluatePathTracerSnapshotReuse(RenderDevice* device, RT
     PathTracerPassState& state, bool freezeRequested);
 PathTracerOutput setupPathTracerPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     framegraph::VirtualResourceHandle sceneColorIn, const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky,
-    LightingFrameState& lighting, const PathTracerConfig& config, const Fmatrix& view, const Fmatrix& project,
-    const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height, PathTracerPassState& state);
+    LightingFrameState& lighting, const PathTracerConfig& config, const ViewFrame& viewFrame, PathTracerPassState& state);
 
 void DiscardPathTracerSnapshot(PathTracerPassState& state);
 void ShutdownPathTracer();

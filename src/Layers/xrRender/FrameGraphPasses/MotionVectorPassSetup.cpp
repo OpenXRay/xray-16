@@ -54,12 +54,14 @@ MotionVectorOutput setupMotionVectorPass(
     VirtualResourceHandle visId,
     VirtualResourceHandle visDepth,
     VirtualResourceHandle motionVectors,
-    const Fmatrix& invViewProj,
-    const Fmatrix& prevViewProj,
-    bool motionValid,
-    u32 width, u32 height,
+    const ViewFrame& view,
     MotionVectorPassState& state)
 {
+    const Fmatrix& invViewProj = view.invViewProj;
+    const Fmatrix& prevViewProj = view.prevViewProj;
+    const bool motionValid = view.hasPrevFrameData;
+    const u32 width = view.width;
+    const u32 height = view.height;
     InitializeResources(device, state);
 
     if (!state.pipeline)

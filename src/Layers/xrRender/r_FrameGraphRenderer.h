@@ -511,7 +511,14 @@ private:
 
     void SetupFrame();
 
+    struct FrameSetup;
     void SetupFrameGraphPasses();
+    void SetupGeometryStage(FrameSetup& frame);
+    void SetupSurfaceStage(FrameSetup& frame);
+    void SetupLightingStage(FrameSetup& frame);
+    void SetupForwardStage(FrameSetup& frame);
+    void SetupPostStage(FrameSetup& frame);
+    void SetupInspectorStage(FrameSetup& frame);
     void PrepareLightingMode(u32 width, u32 height);
     bool RasterRayTracingFeaturesEnabled() const;
 

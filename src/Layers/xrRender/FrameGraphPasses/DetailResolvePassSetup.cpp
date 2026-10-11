@@ -111,14 +111,15 @@ MaterialResolveOutput setupDetailResolvePass(
     const MaterialResolveOutput& inputs,
     fg::FGDetailManager* detailManager,
     const DetailPassResources& details,
-    const Fmatrix& prevView,
-    const Fmatrix& prevProj,
-    bool motionValid,
-    float prevTime,
-    u32 width,
-    u32 height,
+    const ViewFrame& view,
     DetailResolvePassState* state)
 {
+    const Fmatrix prevView = view.prevView;
+    const Fmatrix prevProj = view.prevProject;
+    const bool motionValid = view.hasPrevFrameData;
+    const float prevTime = view.prevDetailTime;
+    const u32 width = view.width;
+    const u32 height = view.height;
     auto& passData = fg.addCallbackPass<DetailResolvePassData>(
         "Detail Resolve",
         [&, visId, depth, inputs, detailManager, prevView, prevProj, motionValid, prevTime, width, height, state](FrameGraph& builder, PassHandle passHandle, DetailResolvePassData& data) {

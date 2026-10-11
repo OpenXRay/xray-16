@@ -1,6 +1,7 @@
 #pragma once
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "ViewFrame.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::fg { class RenderDevice; }
@@ -27,10 +28,7 @@ MotionVectorOutput setupMotionVectorPass(
     framegraph::VirtualResourceHandle visId,
     framegraph::VirtualResourceHandle visDepth,
     framegraph::VirtualResourceHandle motionVectors,
-    const Fmatrix& invViewProj,
-    const Fmatrix& prevViewProj,
-    bool motionValid,
-    u32 width, u32 height,
+    const ViewFrame& view,
     MotionVectorPassState& state);
 
 }

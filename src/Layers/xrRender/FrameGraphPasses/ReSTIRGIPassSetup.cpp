@@ -326,11 +326,19 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
 ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr,
     WorldRadianceCache* worldCache, const DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, VirtualResourceHandle prevNormals, VirtualResourceHandle prevDepth,
-    VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
-    const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
-    const Fvector& cameraPos, float giIntensity, u32 width,
-    u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting)
+    VirtualResourceHandle motionVectors, const ViewFrame& viewFrame, float giIntensity, ReSTIRGIPassState& state,
+    LightingFrameState& lighting)
 {
+    const Fmatrix& invViewProj = viewFrame.invViewProj;
+    const Fmatrix& prevViewProj = viewFrame.prevViewProj;
+    const Fmatrix& view = viewFrame.view;
+    const Fmatrix& prevView = viewFrame.prevView;
+    const Fmatrix& project = viewFrame.project;
+    const Fmatrix& prevProject = viewFrame.prevProject;
+    const Fvector& cameraPos = viewFrame.cameraPos;
+    const u32 width = viewFrame.width;
+    const u32 height = viewFrame.height;
+    const bool hasPrevFrameData = viewFrame.hasPrevFrameData;
     const auto depth = inputs.depth;
     const auto normal = inputs.normal;
     const auto baseColor = inputs.baseColor;
@@ -444,7 +452,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     rawCB.screenWidth = (float)width;
     rawCB.screenHeight = (float)height;
     rawCB.giIntensity = giIntensity;
-    rawCB.frameIndex = Device.dwFrame;
+    rawCB.frameIndex = viewFrame.frameIndex;
     rawCB.identityStaticCount = batchCounts.identityStatic;
     rawCB.terrainBatchCount = batchCounts.terrain;
     rawCB.skinnedBatchStart =
@@ -481,7 +489,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     cacheInputs.sky = sky.cube;
     cacheInputs.sceneConstants = rawCB;
     cacheInputs.cameraPos = cameraPos;
-    cacheInputs.frame = Device.dwFrame;
+    cacheInputs.frame = viewFrame.frameIndex;
     const auto worldCacheOutput = setupWorldCachePass(fg, device, cacheInputs);
     if (!worldCache || !worldCache->IsAllocated() || !worldCacheOutput.constantBuffer)
     {
@@ -819,7 +827,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         temporalCB.maxHistory = maxHistory;
         temporalCB.planeTolerance = 0.02f;
         temporalCB.normalTolerance = 0.9f;
-        temporalCB.frameIndex = Device.dwFrame;
+        temporalCB.frameIndex = viewFrame.frameIndex;
         temporalCB.hudFov = psHUD_FOV > 0.0f ? psHUD_FOV : 1.0f;
         const auto prevDepthInput = historyValid ? prevDepth : depth;
         const auto prevNormalInput = historyValid ? prevNormals : normal;

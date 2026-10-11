@@ -37,12 +37,7 @@ MaterialResolveOutput setupDetailResolvePass(
     const MaterialResolveOutput& inputs,
     fg::FGDetailManager* detailManager,
     const DetailPassResources& details,
-    const Fmatrix& prevView,
-    const Fmatrix& prevProj,
-    bool motionValid,
-    float prevTime,
-    u32 width,
-    u32 height,
+    const ViewFrame& view,
     DetailResolvePassState* state);
 
 }

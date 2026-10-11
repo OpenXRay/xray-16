@@ -7,6 +7,7 @@
 #include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/SkyEnvironment.h"
 #include "ClusterLightPassSetup.h"
+#include "ViewFrame.h"
 
 namespace xray::render::framegraph
 {
@@ -310,9 +311,8 @@ LightingFallback EnsureReSTIRGIResources(RenderDevice* device, ReSTIRGIPassState
 ReSTIRGIOutput setupReSTIRGIPass(framegraph::FrameGraph& fg, RenderDevice* device, RTAccelStructManager* accelMgr,
     WorldRadianceCache* worldCache, const framegraph::DefaultOutputLayout& inputs,
     const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, framegraph::VirtualResourceHandle prevNormals,
-    framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const Fmatrix& invViewProj, const Fmatrix& prevViewProj,
-    const Fmatrix& view, const Fmatrix& prevView, const Fmatrix& project, const Fmatrix& prevProject,
-    const Fvector& cameraPos, float giIntensity, u32 width, u32 height, ReSTIRGIPassState& state, bool hasPrevFrameData, LightingFrameState& lighting);
+    framegraph::VirtualResourceHandle prevDepth, framegraph::VirtualResourceHandle motionVectors, const ViewFrame& viewFrame,
+    float giIntensity, ReSTIRGIPassState& state, LightingFrameState& lighting);
 
 void ShutdownReSTIRGI(ReSTIRGIPassState& state);
 }

@@ -672,9 +672,14 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
 
 PathTracerOutput setupPathTracerPass(FrameGraph& fg, fg::RenderDevice* device, RTAccelStructManager* accelMgr, VirtualResourceHandle sceneColorIn,
     const ClusterLightOutput& clusterLights, const SkyEnvironmentFrame& sky, LightingFrameState& lighting, const PathTracerConfig& config,
-    const Fmatrix& view, const Fmatrix& project, const Fmatrix& invViewProj, const Fvector& cameraPos, u32 width, u32 height,
-    PathTracerPassState& state)
+    const ViewFrame& viewFrame, PathTracerPassState& state)
 {
+    const Fmatrix& view = viewFrame.view;
+    const Fmatrix& project = viewFrame.project;
+    const Fmatrix& invViewProj = viewFrame.invViewProj;
+    const Fvector& cameraPos = viewFrame.cameraPos;
+    const u32 width = viewFrame.width;
+    const u32 height = viewFrame.height;
     state.pending.valid = false;
     state.pending.capturedSnapshot = false;
     state.pending.snapshot.reset();

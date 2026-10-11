@@ -145,6 +145,7 @@ target_sources(xrRender PRIVATE
     FrameGraphPasses/RTEnvironmentSamplingPassSetup.cpp
     FrameGraphPasses/SkyEnvironmentPassSetup.h
     FrameGraphPasses/SkyEnvironmentPassSetup.cpp
+    FrameGraphPasses/ViewFrame.h
     FrameGraphPasses/MotionVectorPassSetup.h
     FrameGraphPasses/MotionVectorPassSetup.cpp
     FrameGraphPasses/ReSTIRGIPassSetup.h

@@ -104,23 +104,25 @@ MaterialResolveOutput setupMaterialResolvePass(
     FrameGraph& fg,
     fg::RenderDevice* device,
     VirtualResourceHandle visId,
-    VirtualResourceHandle depth,
-    VirtualResourceHandle color,
-    VirtualResourceHandle normal,
-    VirtualResourceHandle baseColor,
-    VirtualResourceHandle material,
+    const DefaultOutputLayout& gbuffer,
     VirtualResourceHandle skinnedDrawArgs,
     const ClusterDrawConfig& config,
     GPUCullingManager* gpuCulling,
     nvrhi::IBuffer* splatBuffer,
-    const Fmatrix& prevView,
-    const Fmatrix& prevProj,
-    bool motionValid,
+    const ViewFrame& view,
     u32 entryLimit,
-    u32 width,
-    u32 height,
     MaterialResolvePassState* state)
 {
+    const VirtualResourceHandle depth = gbuffer.depth;
+    const VirtualResourceHandle color = gbuffer.albedo;
+    const VirtualResourceHandle normal = gbuffer.normal;
+    const VirtualResourceHandle baseColor = gbuffer.baseColor;
+    const VirtualResourceHandle material = gbuffer.material;
+    const Fmatrix prevView = view.prevView;
+    const Fmatrix prevProj = view.prevProject;
+    const bool motionValid = view.hasPrevFrameData;
+    const u32 width = view.width;
+    const u32 height = view.height;
     ResourceDesc motionDesc;
     motionDesc.type = ResourceDesc::Type::Texture2D;
     motionDesc.debugName = "rt_MotionVectors";

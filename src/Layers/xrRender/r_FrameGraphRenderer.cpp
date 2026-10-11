@@ -1200,12 +1200,95 @@ void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
     m_lightingState.poseRevision = m_rtAccelMgr->GetPoseRevision();
 }
 
+struct FrameGraphRenderer::FrameSetup
+{
+    struct Features
+    {
+        bool drawDetails = false;
+        bool drawParticles = false;
+        bool swGrass = false;
+        bool visDebug = false;
+        bool bloom = false;
+        bool rayHistoryRequired = false;
+        bool motionVectorsRequired = false;
+        bool rasterShadowWork = false;
+        bool rasterDrawPasses = true;
+    };
+
+    passes::ViewFrame view;
+    Features features;
+    framegraph::VirtualResourceHandle backbufferHandle;
+    framegraph::VirtualResourceHandle depthBuffer;
+    framegraph::VirtualResourceHandle normalBuffer;
+    framegraph::VirtualResourceHandle baseColorBuffer;
+    framegraph::VirtualResourceHandle materialBuffer;
+    framegraph::VirtualResourceHandle prevNormalsHandle;
+    framegraph::VirtualResourceHandle prevDepthHandle;
+    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
+    framegraph::VirtualResourceHandle visIdBuffer;
+    framegraph::VirtualResourceHandle skyColorHandle;
+    framegraph::VirtualResourceHandle vsmMaskHandle;
+    framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle interfaceLayer;
+    fg::GeometryFrameResources geometryResources;
+    passes::ClusterDrawConfig clusterConfig;
+    passes::DetailPassResources detailResources;
+    passes::HiZPyramidOutput hizOutput;
+    passes::ClusterLightOutput clusterLightOut;
+    passes::TransparentPassConfig transparentConfig;
+    passes::MotionVectorOutput motionOutput;
+    passes::LocalShadowOutput localShadowOut;
+    passes::SkyVisibilityInspection skyInspection;
+    passes::BloomOutput bloom;
+    fg::SkyEnvironmentFrame skyFrame;
+    framegraph::DefaultOutputLayout detailOutputs;
+    framegraph::DefaultOutputLayout opaqueOutputs;
+    framegraph::DefaultOutputLayout litOutputs;
+    framegraph::DefaultOutputLayout transparentOutputs;
+    framegraph::DefaultOutputLayout smokeOutputs;
+    u32 grassEntryBase = 0;
+    bool grassIds = false;
+    bool visActive = false;
+};
+
 void FrameGraphRenderer::SetupFrameGraphPasses() {
-    const u32 width = Device.dwWidth;
-    const u32 height = Device.dwHeight;
+    FrameSetup frame;
+    passes::ViewFrame& view = frame.view;
+    view.view = Device.mView;
+    view.project = Device.mProject;
+    view.viewProj = Device.mFullTransform;
+    view.invViewProj = Device.mInvFullTransform;
+    view.prevView = m_mainView.prevView;
+    view.prevProject = m_mainView.prevProject;
+    view.prevViewProj = m_mainView.prevViewProj;
+    view.cameraPos = Device.vCameraPosition;
+    view.prevDetailTime = m_mainView.prevDetailTime;
+    view.frameIndex = Device.dwFrame;
+    view.width = Device.dwWidth;
+    view.height = Device.dwHeight;
+    view.hasPrevFrameData = m_mainView.hasPrevFrameData;
+
+    auto& features = frame.features;
+    features.drawDetails = psDeviceFlags.is(rsDrawDetails);
+    features.drawParticles = psDeviceFlags.test(rsDrawParticles);
+    features.swGrass = ps_r_vis_sw_grass && features.drawDetails;
+    features.visDebug = ps_r_vis_debug != 0;
+    features.bloom = m_sceneCollected && ps_r_bloom_intensity > 0.0f;
+
+    SetupGeometryStage(frame);
+    SetupSurfaceStage(frame);
+    SetupLightingStage(frame);
+    SetupForwardStage(frame);
+    SetupPostStage(frame);
+    SetupInspectorStage(frame);
+}
+
+void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
 
     nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
-    framegraph::VirtualResourceHandle backbufferHandle;
+    auto& backbufferHandle = frame.backbufferHandle;
 
     if (backbufferTexture) {
         framegraph::ResourceDesc backbufferDesc;
@@ -1250,7 +1333,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     depthDesc.isImported = true;
     depthDesc.isTransient = false;
 
-    framegraph::VirtualResourceHandle depthBuffer = m_framegraph->ImportTexture("rt_Depth", m_sceneDepth, depthDesc);
+    auto& depthBuffer = frame.depthBuffer;
+    depthBuffer = m_framegraph->ImportTexture("rt_Depth", m_sceneDepth, depthDesc);
 
     auto& gpuParticles = GetGpuParticleManager();
     auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
@@ -1295,7 +1379,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     normalImportDesc.isUAV = true;
     normalImportDesc.isTransient = true;
     normalImportDesc.debugName = "rt_Normal";
-    framegraph::VirtualResourceHandle normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalImportDesc);
+    auto& normalBuffer = frame.normalBuffer;
+    normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalImportDesc);
 
     framegraph::ResourceDesc baseColorDesc;
     baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -1306,15 +1391,17 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     baseColorDesc.isRenderTarget = true;
     baseColorDesc.allowUAV = true;
     baseColorDesc.isTransient = true;
-    framegraph::VirtualResourceHandle baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
+    auto& baseColorBuffer = frame.baseColorBuffer;
+    baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
 
     framegraph::ResourceDesc materialDesc = baseColorDesc;
     materialDesc.debugName = "rt_Material";
     materialDesc.format = framegraph::kSceneMaterialFormat;
-    framegraph::VirtualResourceHandle materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
+    auto& materialBuffer = frame.materialBuffer;
+    materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
 
-    const auto prevNormalsHandle = m_mainView.ImportPreviousNormals(*m_framegraph);
-    const auto prevDepthHandle = m_mainView.ImportPreviousDepth(*m_framegraph);
+    frame.prevNormalsHandle = m_mainView.ImportPreviousNormals(*m_framegraph);
+    frame.prevDepthHandle = m_mainView.ImportPreviousDepth(*m_framegraph);
 
     const u32 hizWidth = std::max(1u, width / 2);
     const u32 hizHeight = std::max(1u, height / 2);
@@ -1355,8 +1442,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         prevHiZHandle = m_framegraph->ImportTexture("rt_PrevHiZ", m_hizHistory[readIdx], hizImportDesc("rt_PrevHiZ"));
 
     framegraph::VirtualResourceHandle clusterArgsHandle;
-    fg::GeometryFrameResources geometryResources;
-    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
+    auto& geometryResources = frame.geometryResources;
+    auto& skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
     bool cullActive = false;
     bool swRasterReady = false;
 
@@ -1396,20 +1483,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             swRasterReady = ps_r_vis_sw && nvDevice->queryFeatureSupport(nvrhi::Feature::BufferInt64Atomics)
                 && m_gpuCullingManager->AreMegaBuffersReady()
                 && passes::EnsureSwRasterResources(m_device, visState, width, height);
-            const float pxScale = Device.mProject._22 * float(height) * 0.5f;
+            const float pxScale = frame.view.project._22 * float(height) * 0.5f;
             m_gpuCullingManager->SetClusterSwCull(swRasterReady ? ps_r_vis_sw_px * 0.5f / pxScale : 0.0f, ps_r_vis_sw_near);
             m_gpuCullingManager->PrepareSceneGeometry(m_geometryCollector.get());
             m_gpuCullingManager->PrepareSkinnedGeometry(m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
             geometryResources = m_gpuCullingManager->ImportGeometryResources(*m_framegraph);
             m_gpuCullingManager->SetupGeometryPreparePass(*m_framegraph, m_geometryCollector.get(), geometryResources);
             m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get(),
-                prevHiZHandle, m_mainView.prevViewProj, hizWidth, hizHeight, hizMipLevels, geometryResources);
+                prevHiZHandle, frame.view.prevViewProj, hizWidth, hizHeight, hizMipLevels, geometryResources);
             clusterArgsHandle = geometryResources.drawArgs;
             cullActive = geometryResources.valid && clusterArgsHandle.is_valid();
         }
     }
     gpuParticles.SetupSimulationPasses(*m_framegraph, nvDevice);
-    passes::ClusterDrawConfig clusterConfig;
+    auto& clusterConfig = frame.clusterConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled() && geometryResources.valid) {
         clusterConfig.geometry = geometryResources;
         clusterConfig.visibleEntries = geometryResources.visibleEntries;
@@ -1438,11 +1525,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const u32 clusterEntryCapacity = m_gpuCullingManager ? m_gpuCullingManager->GetClusterRefCapacity() : 0u;
     const bool clusterIdsFit = m_gpuCullingManager
         && passes::VisIdRangeFits(clusterEntryCapacity, m_gpuCullingManager->GetSkinnedEntryCapacity());
-    const u32 grassEntryBase = clusterIdsFit ? clusterEntryCapacity + m_gpuCullingManager->GetSkinnedEntryCapacity() : 0u;
-    passes::DetailPassResources detailResources;
+    auto& grassEntryBase = frame.grassEntryBase;
+    grassEntryBase = clusterIdsFit ? clusterEntryCapacity + m_gpuCullingManager->GetSkinnedEntryCapacity() : 0u;
+    auto& detailResources = frame.detailResources;
     if (m_detailManager && m_gpuCullingManager)
     {
-        const bool enabled = psDeviceFlags.is(rsDrawDetails);
+        const bool enabled = frame.features.drawDetails;
         R_ASSERT2(!enabled || clusterIdsFit, "[FrameGraph] rigid and skinned entries exhaust the visibility identifier range");
         const bool rayCoverageRequested = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
             m_rtAccelMgr && m_rtAccelMgr->IsSupported() &&
@@ -1452,13 +1540,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         detailResources = passes::setupDetailCullPass(
             *m_framegraph, m_device, m_detailManager.get(),
             prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
-            hizWidth, hizHeight, hizMipLevels, m_mainView.prevViewProj,
+            hizWidth, hizHeight, hizMipLevels, frame.view.prevViewProj,
             m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
     }
-    const bool grassIds = detailResources.HasSource();
+    auto& grassIds = frame.grassIds;
+    grassIds = detailResources.HasSource();
 
     bool swGrass = false;
-    if (swVisHandle.is_valid() && grassIds && ps_r_vis_sw_grass && psDeviceFlags.is(rsDrawDetails)) {
+    if (swVisHandle.is_valid() && grassIds && frame.features.swGrass) {
         auto grassVis = passes::setupSwGrassPass(*m_framegraph, m_device, detailResources, swVisHandle, m_detailManager.get(),
             width, height, &m_blackboard->get_or_add<passes::VisibilityPassState>());
         if (grassVis.is_valid()) {
@@ -1469,7 +1558,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     const bool visibilityGeometry = clusterConfig.IsValid() || clusterConfig.TerrainValid()
         || skinnedDrawArgsBuffer.is_valid() || grassIds;
-    framegraph::VirtualResourceHandle visIdBuffer;
+    auto& visIdBuffer = frame.visIdBuffer;
     if (cullActive && clusterConfig.UseCompactGeometry() && visibilityGeometry && clusterIdsFit) {
         auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
         auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
@@ -1501,7 +1590,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             visIdBuffer = visOut.visId;
         }
     }
-    const bool visActive = visIdBuffer.is_valid();
+    auto& visActive = frame.visActive;
+    visActive = visIdBuffer.is_valid();
     if (!visActive) {
         if (cullActive && clusterConfig.UseCompactGeometry() && visibilityGeometry) {
             const auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
@@ -1521,7 +1611,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         }
     }
 
-    passes::HiZPyramidOutput hizOutput;
+    auto& hizOutput = frame.hizOutput;
     hizOutput.pyramid = framegraph::VirtualResourceHandle();
     hizOutput.mipLevels = 0;
     hizOutput.width = hizWidth;
@@ -1579,6 +1669,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             visIdBuffer = retestOut.visId;
         }
     }
+}
+
+void FrameGraphRenderer::SetupSurfaceStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const auto depthBuffer = frame.depthBuffer;
+    auto& normalBuffer = frame.normalBuffer;
+    auto& baseColorBuffer = frame.baseColorBuffer;
+    auto& materialBuffer = frame.materialBuffer;
+    const auto visIdBuffer = frame.visIdBuffer;
+    const bool visActive = frame.visActive;
+    const bool grassIds = frame.grassIds;
+    const auto& hizOutput = frame.hizOutput;
+    const auto& detailResources = frame.detailResources;
+    const auto& geometryResources = frame.geometryResources;
 
     PrepareLightingMode(width, height);
 
@@ -1591,7 +1696,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     colorDesc.allowUAV = true;
     colorDesc.debugName = "rt_SceneColor";
 
-    auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
+    auto& skyColorHandle = frame.skyColorHandle;
+    skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
 
     FGEnvironmentRender* fgEnv = nullptr;
     if (g_pGamePersistent)
@@ -1616,7 +1722,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
 
     auto& clmSetup = fg::ClusteredLightManager::Instance();
-    passes::ClusterLightOutput clusterLightOut;
+    auto& clusterLightOut = frame.clusterLightOut;
     if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
         clusterLightOut = passes::setupClusterLightPass(
             *m_framegraph,
@@ -1629,7 +1735,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             hizOutput.width,
             hizOutput.height,
             hizOutput.mipLevels,
-            Device.mFullTransform,
+            frame.view.viewProj,
             hizOutput.pyramid.is_valid()
         );
     }
@@ -1637,25 +1743,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     framegraph::VirtualResourceHandle visMotionHandle;
     framegraph::VirtualResourceHandle visDepthHandle;
     if (visActive) {
+        framegraph::DefaultOutputLayout resolveInputs;
+        resolveInputs.albedo = sunOutput;
+        resolveInputs.normal = normalBuffer;
+        resolveInputs.baseColor = baseColorBuffer;
+        resolveInputs.material = materialBuffer;
+        resolveInputs.depth = depthBuffer;
         auto resolved = passes::setupMaterialResolvePass(
             *m_framegraph,
             m_device,
             visIdBuffer,
-            depthBuffer,
-            sunOutput,
-            normalBuffer,
-            baseColorBuffer,
-            materialBuffer,
-            skinnedDrawArgsBuffer,
-            clusterConfig,
+            resolveInputs,
+            frame.skinnedDrawArgsBuffer,
+            frame.clusterConfig,
             m_gpuCullingManager.get(),
             m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
-            m_mainView.prevView,
-            m_mainView.prevProject,
-            m_mainView.hasPrevFrameData,
-            grassIds ? grassEntryBase : 0xFFFFFFFFu,
-            width,
-            height,
+            frame.view,
+            grassIds ? frame.grassEntryBase : 0xFFFFFFFFu,
             &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
         );
         if (grassIds && passes::EnsureDetailResolveResources(m_device, m_blackboard->get_or_add<passes::DetailResolvePassState>(), detailResources)) {
@@ -1667,12 +1771,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 resolved,
                 m_detailManager.get(),
                 detailResources,
-                m_mainView.prevView,
-                m_mainView.prevProject,
-                m_mainView.hasPrevFrameData,
-                m_mainView.prevDetailTime,
-                width,
-                height,
+                frame.view,
                 &m_blackboard->get_or_add<passes::DetailResolvePassState>()
             );
         }
@@ -1691,7 +1790,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     gbufferOutputs.material = materialBuffer;
     gbufferOutputs.depth = depthBuffer;
 
-    passes::TransparentPassConfig transparentConfig;
+    auto& transparentConfig = frame.transparentConfig;
     transparentConfig.geometry = geometryResources;
     transparentConfig.lighting = &m_lightingState;
     if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0)
@@ -1704,7 +1803,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         transparentConfig.skinned = true;
     }
 
-    auto detailOutputs = gbufferOutputs;
+    auto& detailOutputs = frame.detailOutputs;
+    detailOutputs = gbufferOutputs;
 
     if (m_decalManager) {
         m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
@@ -1725,28 +1825,47 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_blackboard->get_or_add<passes::TransparentPassState>()
     );
 
-    const bool rayHistoryRequired = m_lightingState.effective == fg::LightingMode::RTGI;
-    const bool motionVectorsRequired = rayHistoryRequired || ps_r_vis_debug != 0;
+    frame.features.rayHistoryRequired = m_lightingState.effective == fg::LightingMode::RTGI;
+    frame.features.motionVectorsRequired = frame.features.rayHistoryRequired || frame.features.visDebug;
+    const bool motionVectorsRequired = frame.features.motionVectorsRequired;
 
-    passes::MotionVectorOutput motionOutput;
+    auto& motionOutput = frame.motionOutput;
     if (motionVectorsRequired)
         motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
-            visMotionHandle, Device.mInvFullTransform, m_mainView.prevViewProj, m_mainView.hasPrevFrameData, width, height, m_blackboard->get_or_add<passes::MotionVectorPassState>());
+            visMotionHandle, frame.view, m_blackboard->get_or_add<passes::MotionVectorPassState>());
 
     if (motionVectorsRequired)
         m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
 
-    auto opaqueOutputs = detailOutputs;
-    fg::SkyEnvironmentFrame skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
+    frame.opaqueOutputs = detailOutputs;
+    auto& skyFrame = frame.skyFrame;
+    skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
     m_skyLightingReady = skyFrame.lightingReady;
     if (m_skyVisibility)
         skyFrame.probes = passes::setupSkyVisibilityBakePass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility);
+}
+
+void FrameGraphRenderer::SetupLightingStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    const auto& detailOutputs = frame.detailOutputs;
+    auto& opaqueOutputs = frame.opaqueOutputs;
+    const auto& clusterLightOut = frame.clusterLightOut;
+    const auto& skyFrame = frame.skyFrame;
+    const auto& transparentConfig = frame.transparentConfig;
+    const auto& hizOutput = frame.hizOutput;
+    const auto& geometryResources = frame.geometryResources;
+    const auto depthBuffer = frame.depthBuffer;
+    const auto materialBuffer = frame.materialBuffer;
+    const auto skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
+    const bool visActive = frame.visActive;
+
     if (m_lightingState.effective == fg::LightingMode::RTGI)
     {
         const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), m_worldCache.get(), detailOutputs, clusterLightOut,
-            skyFrame, prevNormalsHandle, prevDepthHandle, motionOutput.motionVectors, Device.mInvFullTransform, m_mainView.prevViewProj,
-            Device.mView, m_mainView.prevView, Device.mProject, m_mainView.prevProject, Device.vCameraPosition,
-            ps_r_rt_gi_intensity, width, height, m_mainView.rtgi, m_mainView.hasPrevFrameData, m_lightingState);
+            skyFrame, frame.prevNormalsHandle, frame.prevDepthHandle, frame.motionOutput.motionVectors, frame.view,
+            ps_r_rt_gi_intensity, m_mainView.rtgi, m_lightingState);
         opaqueOutputs.albedo = rtgiOutput.sceneColor;
     }
     else if (m_lightingState.effective == fg::LightingMode::ReferencePT)
@@ -1761,7 +1880,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
         ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
         const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, skyFrame, m_lightingState, ptConfig,
-            Device.mView, Device.mProject, Device.mInvFullTransform, Device.vCameraPosition, width, height, m_mainView.pathTracer);
+            frame.view, m_mainView.pathTracer);
         opaqueOutputs.albedo = ptOutput.composited;
     }
 
@@ -1770,10 +1889,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const bool shadowDebugRequested = ps_r_vsm_debug != 0 || ps_r_vsm_debug_dyn != 0 || ps_r_local_shadow_debug != 0;
     const bool shadowReceiversActive = m_lightingState.scheduled == fg::LightingMode::Raster
         || (m_lightingState.scheduled == fg::LightingMode::RTGI && ForwardGeometryShadesWithShadows(transparentConfig));
-    const bool rasterShadowWork = shadowDebugRequested || shadowReceiversActive;
-    const bool rasterDrawPasses = m_lightingState.scheduled != fg::LightingMode::ReferencePT;
+    frame.features.rasterShadowWork = shadowDebugRequested || shadowReceiversActive;
+    frame.features.rasterDrawPasses = m_lightingState.scheduled != fg::LightingMode::ReferencePT;
+    const bool rasterShadowWork = frame.features.rasterShadowWork;
 
-    framegraph::VirtualResourceHandle vsmMaskHandle;
+    auto& vsmMaskHandle = frame.vsmMaskHandle;
     bool vsmPassesActive = false;
     passes::VSMDrawConfig vsmCfg;
     passes::VSMDynConfig vsmDyn;
@@ -1790,7 +1910,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             vsmState.active = false;
             if (vsmReady)
             {
-                passes::VSMBeginFrame(vsmState, Device.vCameraPosition, passes::SunDirVisual());
+                passes::VSMBeginFrame(vsmState, frame.view.cameraPos, passes::SunDirVisual());
                 vsmCfg.geometryResources = geometryResources;
                 vsmCfg.refCount = m_gpuCullingManager->GetClusterRefCount();
                 vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
@@ -1812,7 +1932,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     passes::LocalShadowConfig localCfg;
     passes::LocalShadowFrame localFrame;
-    passes::LocalShadowOutput localShadowOut;
+    auto& localShadowOut = frame.localShadowOut;
     if (m_blackboard && m_gpuCullingManager)
     {
         if (rasterShadowWork)
@@ -1843,13 +1963,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
             &m_blackboard->get_or_add<passes::LocalShadowState>(), localFrame, m_gpuProfiler.get());
 
-    auto litOutputs = opaqueOutputs;
+    auto& litOutputs = frame.litOutputs;
+    litOutputs = opaqueOutputs;
     if (m_lightingState.scheduled == fg::LightingMode::Raster)
     {
         litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
             skyFrame, m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
     }
-    passes::SkyVisibilityInspection skyInspection;
+    auto& skyInspection = frame.skyInspection;
     if (m_skyVisibility)
     {
         skyInspection = passes::setupSkyVisibilityInspectPass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility,
@@ -1860,10 +1981,29 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
     {
         litOutputs.albedo = m_gpuCullingManager->SetupDebugVisualizationPass(*m_framegraph, m_hizPyramid, litOutputs.albedo, depthBuffer,
-            hizOutput.width, hizOutput.height, hizOutput.mipLevels, Device.mFullTransform, &m_worldParticleBatches);
+            hizOutput.width, hizOutput.height, hizOutput.mipLevels, frame.view.viewProj, &m_worldParticleBatches);
     }
+}
 
-    auto transparentOutputs = litOutputs;
+void FrameGraphRenderer::SetupForwardStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const bool rasterDrawPasses = frame.features.rasterDrawPasses;
+    const auto& litOutputs = frame.litOutputs;
+    const auto& transparentConfig = frame.transparentConfig;
+    const auto& localShadowOut = frame.localShadowOut;
+    const auto& clusterLightOut = frame.clusterLightOut;
+    const auto& skyFrame = frame.skyFrame;
+    const auto vsmMaskHandle = frame.vsmMaskHandle;
+    const auto skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
+    const auto visIdBuffer = frame.visIdBuffer;
+    const auto& motionOutput = frame.motionOutput;
+    const auto& geometryResources = frame.geometryResources;
+    auto& gpuParticles = GetGpuParticleManager();
+    auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
+
+    auto& transparentOutputs = frame.transparentOutputs;
+    transparentOutputs = litOutputs;
     if (rasterDrawPasses)
     {
         transparentOutputs = passes::setupTransparentPass(
@@ -1881,20 +2021,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    if (ps_r_vis_debug && visIdBuffer.is_valid()) {
+    if (frame.features.visDebug && visIdBuffer.is_valid()) {
         auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, motionOutput.motionVectors, width, height, u32(ps_r_vis_debug), &m_blackboard->get_or_add<passes::VisibilityPassState>());
         if (visDebug.is_valid())
             m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
     }
 
     auto particleLayout = transparentOutputs;
-    if (psDeviceFlags.test(rsDrawParticles) && rasterDrawPasses) {
+    if (frame.features.drawParticles && rasterDrawPasses) {
         particleLayout = passes::setupGpuParticlePass(
             *m_framegraph, m_device, gpuParticles.GetDrawResources(), geometryResources.materials,
             transparentOutputs, width, height, gpuParticleState, &m_lightingState);
     }
 
-    auto smokeOutputs = particleLayout;
+    auto& smokeOutputs = frame.smokeOutputs;
+    smokeOutputs = particleLayout;
     if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
     {
         smokeOutputs = passes::setupSmokeTrailPass(
@@ -1910,7 +2051,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    auto sceneColor = smokeOutputs.albedo;
+    auto& sceneColor = frame.sceneColor;
+    sceneColor = smokeOutputs.albedo;
 
     if (smokeOutputs.distortion.is_valid() && rasterDrawPasses) {
         sceneColor = passes::setupDistortionApplyPass(
@@ -1974,13 +2116,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     }
 
     sceneColor = passes::setupLightingFailurePass(*m_framegraph, sceneColor, m_lightingState);
+}
+
+void FrameGraphRenderer::SetupPostStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const auto sceneColor = frame.sceneColor;
+    const auto backbufferHandle = frame.backbufferHandle;
+    const auto& skyFrame = frame.skyFrame;
+    const auto& skyInspection = frame.skyInspection;
+    const auto& smokeOutputs = frame.smokeOutputs;
 
     auto& displayState = m_blackboard->get_or_add<passes::DisplayPassState>();
     const auto exposure = passes::setupExposurePasses(*m_framegraph, m_device, sceneColor, width, height,
         m_sceneCollected, displayState);
 
-    passes::BloomOutput bloom;
-    if (m_sceneCollected && ps_r_bloom_intensity > 0.0f)
+    auto& bloom = frame.bloom;
+    if (frame.features.bloom)
         bloom = passes::setupBloomPass(*m_framegraph, m_device, sceneColor, exposure, width, height,
             m_blackboard->get_or_add<passes::BloomPassState>());
 
@@ -1988,7 +2140,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const fg::PostProcessFrame postProcess = m_postProcess.Prepare(
         resourceManager ? resourceManager->GetTextureManager() : nullptr, Device.fTimeDelta);
 
-    auto interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
+    auto& interfaceLayer = frame.interfaceLayer;
+    interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
     if (m_skyVisibility)
         interfaceLayer = passes::setupSkyVisibilityDebugPass(*m_framegraph, m_device, *m_skyVisibility, skyFrame.probes,
             interfaceLayer, smokeOutputs.depth, skyInspection, width, height);
@@ -2003,6 +2156,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (backbufferHandle.is_valid())
         passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, bloom, interfaceLayer,
             backbufferHandle, width, height, GetDisplayCalibration(), postProcess, outputMode, displayState, &m_lightingState);
+}
+
+void FrameGraphRenderer::SetupInspectorStage(FrameSetup& frame) {
+    const auto& transparentOutputs = frame.transparentOutputs;
+    const auto& motionOutput = frame.motionOutput;
+    const auto& bloom = frame.bloom;
+    const auto skyColorHandle = frame.skyColorHandle;
+    const auto depthBuffer = frame.depthBuffer;
+    const auto interfaceLayer = frame.interfaceLayer;
+    const auto baseColorBuffer = frame.baseColorBuffer;
+    const auto materialBuffer = frame.materialBuffer;
+    const auto prevDepthHandle = frame.prevDepthHandle;
+    const auto prevNormalsHandle = frame.prevNormalsHandle;
+    const auto sceneColor = frame.sceneColor;
 
     m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
     m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
