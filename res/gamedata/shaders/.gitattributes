@@ -1,6 +1,3 @@
-# X-Ray blending template
-*.s text diff linguist-language=Lua
-
 # Just an additional fix: unset binary attribute
 *.ps -binary
 
@@ -11,11 +8,3 @@ r*/*.gs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-d
 r*/*.cs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
 r*/*.hs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
 r*/*.ds text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
-
-# OpenGL renderer uses the same extensions
-gl/*.ps text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
-gl/*.vs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
-gl/*.gs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
-gl/*.cs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
-gl/*.hs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
-gl/*.ds text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
