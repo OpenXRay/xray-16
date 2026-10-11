@@ -14,6 +14,10 @@ finish-args:
 modules:
   - name: OpenXRay
     buildsystem: cmake
+    builddir: true
+    build-options:
+      build-args:
+        - --share=network
     sources:
       - type: git
         url: https://github.com/OpenXRay/xray-16.git
