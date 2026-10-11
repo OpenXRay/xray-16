@@ -28,8 +28,6 @@ target_sources(xrRender PRIVATE
     FrameGraph/FGPass.h
     FrameGraph/FrameGraph.h
     FrameGraph/FrameGraph.cpp
-    FrameGraph/FGTest.h
-    FrameGraph/FGTest.cpp
     FrameGraph/ShaderLoader.h
     FrameGraph/ShaderLoader.cpp
     FrameGraph/ShaderCache.h

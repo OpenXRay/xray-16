@@ -18,7 +18,6 @@
 
 
 #if RENDER == R_R4
-#include "Layers/xrRender/FrameGraph/FGTest.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
