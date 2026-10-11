@@ -3604,9 +3604,6 @@ void FrameGraphRenderer::create()
 
     if (!g_pModelPool)
         g_pModelPool = xr_new<CModelPool>();
-
-    m_PSLibrary.OnCreate();
-    m_HWOCC.occq_create(occq_size);
 }
 
 void FrameGraphRenderer::destroy()
@@ -3614,9 +3611,6 @@ void FrameGraphRenderer::destroy()
     QuadIB.Release();
     Index.Destroy();
     Vertex.Destroy();
-
-    m_HWOCC.occq_destroy();
-    m_PSLibrary.OnDestroy();
 
     if (g_pModelPool)
     {
