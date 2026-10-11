@@ -428,9 +428,6 @@ private:
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 
-    nvrhi::TextureHandle m_hizHistory[2];
-    u32 m_hizHistoryWidth = 0;
-    u32 m_hizHistoryHeight = 0;
     nvrhi::TextureHandle m_sceneDepth;
     fg::RenderView m_mainView;
 

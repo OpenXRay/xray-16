@@ -1280,60 +1280,117 @@ void FrameGraph::Devirtualize(ResourceNode& resource) {
                 resource.nvrhiTexture = m_resourceManager->GetTextureManager()->GetNVRHITexture(resource.resourceTexture);
         }
 
-        if (!resource.resourceTexture.IsValid()) {
-            nvrhi::TextureDesc nvrhiDesc;
-            nvrhiDesc.width = resource.desc.width;
-            nvrhiDesc.height = resource.desc.height;
-            nvrhiDesc.depth = resource.desc.depth;
-            nvrhiDesc.arraySize = resource.desc.arraySize;
-            nvrhiDesc.mipLevels = resource.desc.mipLevels;
-            nvrhiDesc.sampleCount = resource.desc.sampleCount;
-            nvrhiDesc.format = resource.desc.format;
-            nvrhiDesc.debugName = resource.desc.debugName.c_str();
-            nvrhiDesc.keepInitialState = true;
-
-            switch (resource.desc.type) {
-                case ResourceDesc::Type::Texture2D:
-                    nvrhiDesc.dimension = resource.desc.sampleCount > 1
-                        ? nvrhi::TextureDimension::Texture2DMS : nvrhi::TextureDimension::Texture2D;
-                    break;
-                case ResourceDesc::Type::Texture3D:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
-                    break;
-                case ResourceDesc::Type::TextureCube:
-                    nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
-                    break;
-                case ResourceDesc::Type::Texture2DArray:
-                    nvrhiDesc.dimension = resource.desc.sampleCount > 1
-                        ? nvrhi::TextureDimension::Texture2DMSArray : nvrhi::TextureDimension::Texture2DArray;
-                    break;
-                default:
-                    NODEFAULT;
-            }
-
-            nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
-            nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-            nvrhiDesc.isShaderResource = true;
-            if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
-                nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
-                nvrhiDesc.useClearValue = true;
-                nvrhiDesc.clearValue = nvrhi::Color(0.0f);
-            } else if (resource.desc.isDepthStencil) {
-                nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
-                nvrhiDesc.isRenderTarget = true;
-                nvrhiDesc.isTypeless = true;
-                nvrhiDesc.useClearValue = true;
-                nvrhiDesc.clearValue = nvrhi::Color(0.0f);
-            } else {
-                nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            }
-            resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);
-        }
+        if (!resource.resourceTexture.IsValid())
+            resource.nvrhiTexture = CreateNativeTexture(resource.desc, resource.desc.debugName.c_str());
     }
 
     resource.isAllocated = resource.nvrhiTexture || resource.nvrhiBuffer;
     R_ASSERT3(resource.isAllocated, "Failed to allocate framegraph resource", resource.desc.debugName.c_str());
     m_stats.totalMemoryAllocated += resource.memorySize;
+}
+
+nvrhi::TextureHandle FrameGraph::CreateNativeTexture(const ResourceDesc& desc, const char* debugName) const {
+    nvrhi::TextureDesc nvrhiDesc;
+    nvrhiDesc.width = desc.width;
+    nvrhiDesc.height = desc.height;
+    nvrhiDesc.depth = desc.depth;
+    nvrhiDesc.arraySize = desc.arraySize;
+    nvrhiDesc.mipLevels = desc.mipLevels;
+    nvrhiDesc.sampleCount = desc.sampleCount;
+    nvrhiDesc.format = desc.format;
+    nvrhiDesc.debugName = debugName;
+    nvrhiDesc.keepInitialState = true;
+
+    switch (desc.type) {
+        case ResourceDesc::Type::Texture2D:
+            nvrhiDesc.dimension = desc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMS : nvrhi::TextureDimension::Texture2D;
+            break;
+        case ResourceDesc::Type::Texture3D:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+            break;
+        case ResourceDesc::Type::TextureCube:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+            break;
+        case ResourceDesc::Type::Texture2DArray:
+            nvrhiDesc.dimension = desc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMSArray : nvrhi::TextureDimension::Texture2DArray;
+            break;
+        default:
+            NODEFAULT;
+    }
+
+    nvrhiDesc.isRenderTarget = desc.isRenderTarget;
+    nvrhiDesc.isUAV = desc.isUAV || desc.allowUAV;
+    nvrhiDesc.isShaderResource = true;
+    if (desc.isRenderTarget && !desc.isDepthStencil) {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+    } else if (desc.isDepthStencil) {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
+        nvrhiDesc.isRenderTarget = true;
+        nvrhiDesc.isTypeless = true;
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+    } else {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    }
+    return m_device->createTexture(nvrhiDesc);
+}
+
+namespace {
+
+bool HistoryDescsMatch(const ResourceDesc& a, const ResourceDesc& b)
+{
+    return a.type == b.type && a.width == b.width && a.height == b.height && a.depth == b.depth &&
+        a.arraySize == b.arraySize && a.mipLevels == b.mipLevels && a.sampleCount == b.sampleCount &&
+        a.format == b.format && a.isRenderTarget == b.isRenderTarget && a.isDepthStencil == b.isDepthStencil &&
+        (a.isUAV || a.allowUAV) == (b.isUAV || b.allowUAV);
+}
+
+}
+
+FrameGraph::HistoryTexture FrameGraph::ImportHistoryTexture(const char* name, const ResourceDesc& desc) {
+    R_ASSERT2(!m_compiled, "Cannot import history after compile");
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer && desc.type != ResourceDesc::Type::AccelerationStructure,
+        "framegraph history requires a texture");
+
+    HistorySlot& slot = m_history[shared_str(name)];
+    if (!slot.textures[0] || !HistoryDescsMatch(slot.desc, desc)) {
+        slot.desc = desc;
+        slot.desc.isImported = true;
+        slot.desc.isTransient = false;
+        string128 textureName;
+        for (u32 i = 0; i < 2; ++i) {
+            xr_sprintf(textureName, "%s_%c", name, 'A' + i);
+            slot.textures[i] = CreateNativeTexture(slot.desc, textureName);
+            R_ASSERT3(slot.textures[i], "Failed to allocate framegraph history texture", name);
+        }
+        slot.current = 0;
+        slot.generation = m_generation;
+        slot.previousValid = false;
+    } else if (slot.generation != m_generation) {
+        slot.previousValid = slot.generation + 1 == m_generation;
+        slot.current ^= 1u;
+        slot.generation = m_generation;
+    }
+
+    HistoryTexture result;
+    ResourceDesc importDesc = slot.desc;
+    importDesc.debugName = name;
+    result.current = ImportTexture(name, slot.textures[slot.current], importDesc);
+    string128 previousName;
+    xr_sprintf(previousName, "%s_Prev", name);
+    importDesc.debugName = previousName;
+    result.previous = ImportTexture(previousName, slot.textures[slot.current ^ 1u], importDesc);
+    result.previousValid = slot.previousValid;
+    return result;
+}
+
+nvrhi::ITexture* FrameGraph::GetHistoryTexture(const char* name) const {
+    const auto it = m_history.find(shared_str(name));
+    return it != m_history.end() ? it->second.textures[it->second.current].Get() : nullptr;
 }
 
 void FrameGraph::InsertResourceBarriers() {

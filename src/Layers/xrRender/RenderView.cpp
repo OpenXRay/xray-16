@@ -2,7 +2,6 @@
 #include "RenderView.h"
 #include "FrameGraph/FrameGraph.h"
 #include "FrameGraph/RenderPassBuilder.h"
-#include "RenderContext/RenderDevice.h"
 #include "RenderContext/RenderContext.h"
 #include "xrEngine/IRenderBackend.h"
 
@@ -98,13 +97,9 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
             prevViewProj = previous->viewProj;
             prevCameraPos = previous->cameraPos;
             prevDetailTime = previous->detailTime;
-            prevFrameWidth = previous->width;
-            prevFrameHeight = previous->height;
             hasPrevFrameData = previous->surfacesRecorded;
             hasPrevHiZ = previous->hizRecorded;
             rtgi.historyValid = previous->rtgiHistoryRecorded;
-            if (previous->surfacesRecorded || previous->hizRecorded)
-                writeIndex = 1 - previous->guideIndex;
         }
     }
     m_recording = std::make_shared<RenderViewFrame>();
@@ -118,7 +113,6 @@ void RenderView::BeginFrame(IRenderBackend* backend, u32 frameIndex, u32 width, 
     m_recording->epoch = m_epoch;
     m_recording->width = width;
     m_recording->height = height;
-    m_recording->guideIndex = writeIndex;
     pathTracer.pending.valid = false;
 }
 
@@ -176,18 +170,6 @@ void RenderView::FinishRecording(const LightingFrameState& lighting, nvrhi::ITex
     frame.textures.push_back(rtgi.pathData);
     frame.textures.push_back(rtgi.surfaceData);
     frame.textures.push_back(rtgi.motion);
-    for (u32 i = 0; i < 2; ++i)
-    {
-        frame.textures.push_back(rtgi.reconstruction.historyDiffuse[i]);
-        frame.textures.push_back(rtgi.reconstruction.historySpecular[i]);
-        frame.textures.push_back(rtgi.reconstruction.moments[i]);
-        frame.textures.push_back(rtgi.reconstruction.fast[i]);
-    }
-    for (u32 i = 0; i < 2; ++i)
-    {
-        frame.textures.push_back(m_depth[i]);
-        frame.textures.push_back(m_normals[i]);
-    }
     m_frames.push_back(std::move(m_recording));
 }
 
@@ -205,69 +187,18 @@ void RenderView::Shutdown()
     m_frames.clear();
     m_recording.reset();
     m_backend = nullptr;
-    for (u32 i = 0; i < 2; ++i)
-    {
-        m_depth[i] = nullptr;
-        m_normals[i] = nullptr;
-    }
     passes::ShutdownReSTIRGI(rtgi);
     pathTracer = {};
     InvalidateHistory();
 }
 
-void RenderView::CaptureSurfaceHistory(framegraph::FrameGraph& graph, RenderDevice* device,
-    framegraph::VirtualResourceHandle depth, framegraph::VirtualResourceHandle normal)
+void RenderView::CaptureSurfaceHistory(framegraph::FrameGraph& graph,
+    framegraph::VirtualResourceHandle depth, framegraph::VirtualResourceHandle normal,
+    framegraph::VirtualResourceHandle historyDepth, framegraph::VirtualResourceHandle historyNormal)
 {
     using namespace framegraph;
-    if (!m_recording || !depth.is_valid() || !normal.is_valid())
+    if (!m_recording || !depth.is_valid() || !normal.is_valid() || !historyDepth.is_valid() || !historyNormal.is_valid())
         return;
-    const auto& sourceDepth = graph.GetResourceDesc(depth);
-    const auto& sourceNormal = graph.GetResourceDesc(normal);
-    if (sourceDepth.width != sourceNormal.width || sourceDepth.height != sourceNormal.height ||
-        sourceDepth.sampleCount != 1 || sourceNormal.sampleCount != 1)
-        return;
-    auto matches = [](nvrhi::ITexture* texture, const ResourceDesc& source)
-    {
-        if (!texture)
-            return false;
-        const auto& desc = texture->getDesc();
-        return desc.width == source.width && desc.height == source.height && desc.format == source.format;
-    };
-    if (!matches(m_depth[0], sourceDepth) || !matches(m_depth[1], sourceDepth) ||
-        !matches(m_normals[0], sourceNormal) || !matches(m_normals[1], sourceNormal))
-    {
-        nvrhi::TextureDesc desc;
-        desc.width = sourceDepth.width;
-        desc.height = sourceDepth.height;
-        desc.format = sourceDepth.format;
-        desc.isShaderResource = true;
-        desc.isRenderTarget = true;
-        desc.isTypeless = true;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
-        desc.keepInitialState = true;
-        for (u32 i = 0; i < 2; ++i)
-        {
-            desc.debugName = i ? "ViewDepth_B" : "ViewDepth_A";
-            m_depth[i] = device->GetNVRHIDevice()->createTexture(desc);
-        }
-        desc.format = sourceNormal.format;
-        desc.isTypeless = false;
-        for (u32 i = 0; i < 2; ++i)
-        {
-            desc.debugName = i ? "ViewNormals_B" : "ViewNormals_A";
-            m_normals[i] = device->GetNVRHIDevice()->createTexture(desc);
-        }
-    }
-    if (!m_depth[writeIndex] || !m_normals[writeIndex])
-        return;
-    ResourceDesc depthDesc = sourceDepth;
-    depthDesc.isTransient = false;
-    ResourceDesc normalDesc = sourceNormal;
-    normalDesc.isTransient = false;
-    normalDesc.isUAV = false;
-    normalDesc.allowUAV = false;
-    const auto historyDepth = graph.ImportTexture("rt_HistoryDepth", m_depth[writeIndex], depthDesc);
-    const auto historyNormal = graph.ImportTexture("rt_HistoryNormals", m_normals[writeIndex], normalDesc);
     graph.addCallbackPass<ViewSurfaceHistoryData>("Opaque Surface History",
         [&](FrameGraph& builder, PassHandle pass, ViewSurfaceHistoryData& data)
         {
@@ -292,31 +223,5 @@ void RenderView::CaptureSurfaceHistory(framegraph::FrameGraph& graph, RenderDevi
             cmd->copyTexture(historyNormalTexture, nvrhi::TextureSlice(), normalTexture, nvrhi::TextureSlice());
             data.frame->surfacesRecorded = true;
         });
-}
-
-framegraph::VirtualResourceHandle RenderView::ImportPreviousDepth(framegraph::FrameGraph& graph) const
-{
-    if (!hasPrevFrameData || !m_depth[1 - writeIndex])
-        return {};
-    framegraph::ResourceDesc desc;
-    desc.width = prevFrameWidth;
-    desc.height = prevFrameHeight;
-    desc.format = m_depth[1 - writeIndex]->getDesc().format;
-    desc.isDepthStencil = true;
-    desc.isTransient = false;
-    return graph.ImportTexture("rt_PrevDepth", m_depth[1 - writeIndex], desc);
-}
-
-framegraph::VirtualResourceHandle RenderView::ImportPreviousNormals(framegraph::FrameGraph& graph) const
-{
-    if (!hasPrevFrameData || !m_normals[1 - writeIndex])
-        return {};
-    framegraph::ResourceDesc desc;
-    desc.width = prevFrameWidth;
-    desc.height = prevFrameHeight;
-    desc.format = m_normals[1 - writeIndex]->getDesc().format;
-    desc.isRenderTarget = true;
-    desc.isTransient = false;
-    return graph.ImportTexture("rt_PrevNormals", m_normals[1 - writeIndex], desc);
 }
 }

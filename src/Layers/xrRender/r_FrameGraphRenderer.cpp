@@ -438,8 +438,6 @@ void FrameGraphRenderer::Shutdown() {
         m_blackboard.reset();
     }
 
-    m_hizHistory[0] = nullptr;
-    m_hizHistory[1] = nullptr;
     m_sceneDepth = nullptr;
     m_inspectorPreview = nullptr;
     old_QuadIB = nullptr;
@@ -602,7 +600,7 @@ void FrameGraphRenderer::Render() {
     }
 
     const auto* hizState = m_blackboard->try_get<passes::HiZBuildPassState>();
-    m_mainView.FinishRecording(m_lightingState, m_hizHistory[m_mainView.writeIndex],
+    m_mainView.FinishRecording(m_lightingState, m_framegraph->GetHistoryTexture("rt_HiZ"),
         m_hizPyramid.is_valid() && hizState && hizState->recorded);
 
     if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
@@ -1224,6 +1222,8 @@ struct FrameGraphRenderer::FrameSetup
     framegraph::VirtualResourceHandle materialBuffer;
     framegraph::VirtualResourceHandle prevNormalsHandle;
     framegraph::VirtualResourceHandle prevDepthHandle;
+    framegraph::VirtualResourceHandle surfaceHistoryDepth;
+    framegraph::VirtualResourceHandle surfaceHistoryNormal;
     framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
     framegraph::VirtualResourceHandle visIdBuffer;
     framegraph::VirtualResourceHandle skyColorHandle;
@@ -1306,8 +1306,6 @@ void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
     }
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-    const u32 writeIdx = m_mainView.writeIndex;
-    const u32 readIdx = 1 - writeIdx;
     if (!m_sceneDepth || m_sceneDepth->getDesc().width != width || m_sceneDepth->getDesc().height != height) {
         nvrhi::TextureDesc desc;
         desc.width = width;
@@ -1335,6 +1333,10 @@ void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
 
     auto& depthBuffer = frame.depthBuffer;
     depthBuffer = m_framegraph->ImportTexture("rt_Depth", m_sceneDepth, depthDesc);
+    const auto depthHistory = m_framegraph->ImportHistoryTexture("rt_SurfaceDepth", depthDesc);
+    frame.surfaceHistoryDepth = depthHistory.current;
+    if (m_mainView.hasPrevFrameData && depthHistory.previousValid)
+        frame.prevDepthHandle = depthHistory.previous;
 
     auto& gpuParticles = GetGpuParticleManager();
     auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
@@ -1370,17 +1372,22 @@ void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
     }
 
 
-    framegraph::ResourceDesc normalImportDesc;
-    normalImportDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    normalImportDesc.width = width;
-    normalImportDesc.height = height;
-    normalImportDesc.format = framegraph::kSceneNormalFormat;
-    normalImportDesc.isRenderTarget = true;
-    normalImportDesc.isUAV = true;
-    normalImportDesc.isTransient = true;
-    normalImportDesc.debugName = "rt_Normal";
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.width = width;
+    normalDesc.height = height;
+    normalDesc.format = framegraph::kSceneNormalFormat;
+    normalDesc.isRenderTarget = true;
+    normalDesc.isUAV = true;
+    normalDesc.isTransient = true;
+    normalDesc.debugName = "rt_Normal";
     auto& normalBuffer = frame.normalBuffer;
-    normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalImportDesc);
+    normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
+    normalDesc.isUAV = false;
+    const auto normalHistory = m_framegraph->ImportHistoryTexture("rt_SurfaceNormal", normalDesc);
+    frame.surfaceHistoryNormal = normalHistory.current;
+    if (m_mainView.hasPrevFrameData && normalHistory.previousValid)
+        frame.prevNormalsHandle = normalHistory.previous;
 
     framegraph::ResourceDesc baseColorDesc;
     baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -1400,46 +1407,21 @@ void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
     auto& materialBuffer = frame.materialBuffer;
     materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
 
-    frame.prevNormalsHandle = m_mainView.ImportPreviousNormals(*m_framegraph);
-    frame.prevDepthHandle = m_mainView.ImportPreviousDepth(*m_framegraph);
 
     const u32 hizWidth = std::max(1u, width / 2);
     const u32 hizHeight = std::max(1u, height / 2);
     const u32 hizMipLevels = passes::CalculateHiZMipLevels(hizWidth, hizHeight);
-    if (!m_hizHistory[0] || m_hizHistoryWidth != hizWidth || m_hizHistoryHeight != hizHeight) {
-        nvrhi::TextureDesc desc;
-        desc.width = hizWidth;
-        desc.height = hizHeight;
-        desc.mipLevels = hizMipLevels;
-        desc.format = nvrhi::Format::R32_FLOAT;
-        desc.isShaderResource = true;
-        desc.isUAV = true;
-        desc.initialState = nvrhi::ResourceStates::NonPixelShaderResource;
-        desc.keepInitialState = true;
-        for (int i = 0; i < 2; i++) {
-            desc.debugName = (i == 0) ? "HiZ_A" : "HiZ_B";
-            m_hizHistory[i] = nvDevice->createTexture(desc);
-        }
-        m_hizHistoryWidth = hizWidth;
-        m_hizHistoryHeight = hizHeight;
-        m_mainView.hasPrevHiZ = false;
-    }
-    auto hizImportDesc = [&](const char* name) {
-        framegraph::ResourceDesc desc;
-        desc.type = framegraph::ResourceDesc::Type::Texture2D;
-        desc.debugName = name;
-        desc.width = hizWidth;
-        desc.height = hizHeight;
-        desc.mipLevels = hizMipLevels;
-        desc.format = nvrhi::Format::R32_FLOAT;
-        desc.isUAV = true;
-        desc.isImported = true;
-        desc.isTransient = false;
-        return desc;
-    };
+    framegraph::ResourceDesc hizDesc;
+    hizDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    hizDesc.width = hizWidth;
+    hizDesc.height = hizHeight;
+    hizDesc.mipLevels = hizMipLevels;
+    hizDesc.format = nvrhi::Format::R32_FLOAT;
+    hizDesc.isUAV = true;
+    const auto hizHistory = m_framegraph->ImportHistoryTexture("rt_HiZ", hizDesc);
     framegraph::VirtualResourceHandle prevHiZHandle;
-    if (m_mainView.hasPrevHiZ && m_hizHistory[readIdx])
-        prevHiZHandle = m_framegraph->ImportTexture("rt_PrevHiZ", m_hizHistory[readIdx], hizImportDesc("rt_PrevHiZ"));
+    if (m_mainView.hasPrevHiZ && hizHistory.previousValid)
+        prevHiZHandle = hizHistory.previous;
 
     framegraph::VirtualResourceHandle clusterArgsHandle;
     auto& geometryResources = frame.geometryResources;
@@ -1625,7 +1607,7 @@ void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
             width,
             height,
             m_blackboard->get_or_add<passes::HiZBuildPassState>(),
-            m_framegraph->ImportTexture("rt_HiZPyramid", m_hizHistory[writeIdx], hizImportDesc("rt_HiZPyramid"))
+            hizHistory.current
         );
     }
 
@@ -1835,7 +1817,8 @@ void FrameGraphRenderer::SetupSurfaceStage(FrameSetup& frame) {
             visMotionHandle, frame.view, m_blackboard->get_or_add<passes::MotionVectorPassState>());
 
     if (motionVectorsRequired)
-        m_mainView.CaptureSurfaceHistory(*m_framegraph, m_device, detailOutputs.depth, detailOutputs.normal);
+        m_mainView.CaptureSurfaceHistory(*m_framegraph, detailOutputs.depth, detailOutputs.normal,
+            frame.surfaceHistoryDepth, frame.surfaceHistoryNormal);
 
     frame.opaqueOutputs = detailOutputs;
     auto& skyFrame = frame.skyFrame;

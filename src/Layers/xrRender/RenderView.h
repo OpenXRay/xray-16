@@ -23,7 +23,6 @@ public:
     u32 epoch = 0;
     u32 width = 0;
     u32 height = 0;
-    u32 guideIndex = 0;
     u64 lease = 0;
     bool surfacesRecorded = false;
     bool hizRecorded = false;
@@ -58,10 +57,9 @@ public:
     void FinishRecording(const LightingFrameState& lighting, nvrhi::ITexture* hiz, bool hizRecorded);
     void InvalidateHistory();
     void Shutdown();
-    void CaptureSurfaceHistory(framegraph::FrameGraph& graph, RenderDevice* device,
-        framegraph::VirtualResourceHandle depth, framegraph::VirtualResourceHandle normal);
-    framegraph::VirtualResourceHandle ImportPreviousDepth(framegraph::FrameGraph& graph) const;
-    framegraph::VirtualResourceHandle ImportPreviousNormals(framegraph::FrameGraph& graph) const;
+    void CaptureSurfaceHistory(framegraph::FrameGraph& graph,
+        framegraph::VirtualResourceHandle depth, framegraph::VirtualResourceHandle normal,
+        framegraph::VirtualResourceHandle historyDepth, framegraph::VirtualResourceHandle historyNormal);
 
     u32 phase{};
     u32 portal_traverse_flags{};
@@ -84,9 +82,6 @@ public:
     Fmatrix prevViewProj = Fidentity;
     Fvector prevCameraPos = {};
     float prevDetailTime = 0.0f;
-    u32 prevFrameWidth = 0;
-    u32 prevFrameHeight = 0;
-    u32 writeIndex = 0;
     bool hasPrevFrameData = false;
     bool hasPrevHiZ = false;
     passes::ReSTIRGIPassState rtgi;
@@ -95,8 +90,6 @@ public:
 private:
     IRenderBackend* m_backend = nullptr;
     u32 m_epoch = 0;
-    nvrhi::TextureHandle m_depth[2];
-    nvrhi::TextureHandle m_normals[2];
     std::shared_ptr<RenderViewFrame> m_recording;
     xr_vector<std::shared_ptr<RenderViewFrame>> m_frames;
 };

@@ -181,13 +181,6 @@ static void EnsureRawTextures(nvrhi::IDevice* nvDevice, ReSTIRGIPassState& state
 
 static void ReleaseReconstructionResources(RTGIReconstructionState& recon)
 {
-    for (u32 i = 0; i < 2; ++i)
-    {
-        recon.historyDiffuse[i] = nullptr;
-        recon.historySpecular[i] = nullptr;
-        recon.moments[i] = nullptr;
-        recon.fast[i] = nullptr;
-    }
     recon.width = 0;
     recon.height = 0;
     recon.recorded = false;
@@ -262,43 +255,12 @@ static LightingFallback EnsureReconstructionResources(RenderDevice* device, ReST
         createFilterPipeline("rtgi_atrous", "RTGI_Atrous", recon.atrousLayout, recon.atrousPipeline);
     }
 
-    bool texturesMatch = recon.width == width && recon.height == height;
-    for (u32 i = 0; i < 2 && texturesMatch; ++i)
-        texturesMatch = recon.historyDiffuse[i] && recon.historySpecular[i] && recon.moments[i] && recon.fast[i];
-    if (texturesMatch)
-        return LightingFallback::None;
-
-    const auto create = [nvDevice, width, height](const char* name, nvrhi::Format format)
+    if (recon.width != width || recon.height != height)
     {
-        nvrhi::TextureDesc desc;
-        desc.debugName = name;
-        desc.width = width;
-        desc.height = height;
-        desc.format = format;
-        desc.isUAV = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
-        return nvDevice->createTexture(desc);
-    };
-    ReleaseReconstructionResources(recon);
-    state.historyValid = false;
-    recon.historyIndex = 0;
-    bool created = true;
-    for (u32 i = 0; i < 2; ++i)
-    {
-        recon.historyDiffuse[i] = create(i ? "RTGI_HistoryDiffuse_B" : "RTGI_HistoryDiffuse_A", nvrhi::Format::RGBA16_FLOAT);
-        recon.historySpecular[i] = create(i ? "RTGI_HistorySpecular_B" : "RTGI_HistorySpecular_A", nvrhi::Format::RGBA16_FLOAT);
-        recon.moments[i] = create(i ? "RTGI_HistoryMoments_B" : "RTGI_HistoryMoments_A", nvrhi::Format::RGBA16_FLOAT);
-        recon.fast[i] = create(i ? "RTGI_HistoryFast_B" : "RTGI_HistoryFast_A", nvrhi::Format::RG16_FLOAT);
-        created = created && recon.historyDiffuse[i] && recon.historySpecular[i] && recon.moments[i] && recon.fast[i];
+        state.historyValid = false;
+        recon.width = width;
+        recon.height = height;
     }
-    if (!created)
-    {
-        ReleaseReconstructionResources(recon);
-        return LightingFallback::ResourcesUnavailable;
-    }
-    recon.width = width;
-    recon.height = height;
     return LightingFallback::None;
 }
 
@@ -763,18 +725,30 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     VirtualResourceHandle fgPrevHistorySpecular;
     VirtualResourceHandle fgPrevMoments;
     VirtualResourceHandle fgPrevFast;
+    bool historyPreviousValid = false;
     if (reconstructionReady)
     {
-        const u32 writeIndex = recon.historyIndex & 1u;
-        const u32 readIndex = writeIndex ^ 1u;
-        fgHistoryDiffuse = importRaw("rtgi_HistoryDiffuse", recon.historyDiffuse[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgHistorySpecular = importRaw("rtgi_HistorySpecular", recon.historySpecular[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgMoments = importRaw("rtgi_HistoryMoments", recon.moments[writeIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgFast = importRaw("rtgi_HistoryFast", recon.fast[writeIndex].Get(), nvrhi::Format::RG16_FLOAT);
-        fgPrevHistoryDiffuse = importRaw("rtgi_PrevHistoryDiffuse", recon.historyDiffuse[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgPrevHistorySpecular = importRaw("rtgi_PrevHistorySpecular", recon.historySpecular[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgPrevMoments = importRaw("rtgi_PrevHistoryMoments", recon.moments[readIndex].Get(), nvrhi::Format::RGBA16_FLOAT);
-        fgPrevFast = importRaw("rtgi_PrevHistoryFast", recon.fast[readIndex].Get(), nvrhi::Format::RG16_FLOAT);
+        ResourceDesc historyDesc;
+        historyDesc.type = ResourceDesc::Type::Texture2D;
+        historyDesc.width = width;
+        historyDesc.height = height;
+        historyDesc.isUAV = true;
+        historyDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        const auto historyDiffuse = fg.ImportHistoryTexture("rtgi_HistoryDiffuse", historyDesc);
+        const auto historySpecular = fg.ImportHistoryTexture("rtgi_HistorySpecular", historyDesc);
+        const auto historyMoments = fg.ImportHistoryTexture("rtgi_HistoryMoments", historyDesc);
+        historyDesc.format = nvrhi::Format::RG16_FLOAT;
+        const auto historyFast = fg.ImportHistoryTexture("rtgi_HistoryFast", historyDesc);
+        fgHistoryDiffuse = historyDiffuse.current;
+        fgHistorySpecular = historySpecular.current;
+        fgMoments = historyMoments.current;
+        fgFast = historyFast.current;
+        fgPrevHistoryDiffuse = historyDiffuse.previous;
+        fgPrevHistorySpecular = historySpecular.previous;
+        fgPrevMoments = historyMoments.previous;
+        fgPrevFast = historyFast.previous;
+        historyPreviousValid = historyDiffuse.previousValid && historySpecular.previousValid &&
+            historyMoments.previousValid && historyFast.previousValid;
         ResourceDesc reconDesc;
         reconDesc.type = ResourceDesc::Type::Texture2D;
         reconDesc.debugName = "rt_GI_Reconstruction";
@@ -802,7 +776,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
 
     if (reconstructionReady)
     {
-        const bool historyValid = state.historyValid && worldCacheHistoryCompatible && hasPrevFrameData &&
+        const bool historyValid = state.historyValid && historyPreviousValid && worldCacheHistoryCompatible && hasPrevFrameData &&
             validInput(prevDepth) && validInput(prevNormals);
         RTGITemporalCB temporalCB = {};
         temporalCB.invViewProj = invViewProj;
@@ -941,7 +915,6 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 cmdList->setComputeState(cs);
                 cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
                 recon.recorded = true;
-                recon.historyIndex ^= 1u;
                 data.lighting->reconstructionActive = true;
                 data.lighting->historyUsed = data.cbData.historyValid != 0;
             });

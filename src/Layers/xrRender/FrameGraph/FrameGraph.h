@@ -46,6 +46,15 @@ public:
     VirtualResourceHandle ImportAccelerationStructure(
         const char* name, nvrhi::rt::IAccelStruct* physicalAccelerationStructure);
 
+    struct HistoryTexture {
+        VirtualResourceHandle current;
+        VirtualResourceHandle previous;
+        bool previousValid = false;
+    };
+
+    HistoryTexture ImportHistoryTexture(const char* name, const ResourceDesc& desc);
+    nvrhi::ITexture* GetHistoryTexture(const char* name) const;
+
     PassHandle AddPass(const char* name);
 
     void PassRead(PassHandle pass, VirtualResourceHandle resource,
@@ -179,6 +188,16 @@ private:
     xr_vector<PassNode> m_passPool;
     FrameArena m_frameArena;
 
+    struct HistorySlot {
+        ResourceDesc desc;
+        nvrhi::TextureHandle textures[2];
+        u32 current = 0;
+        u32 generation = 0;
+        bool previousValid = false;
+    };
+
+    xr_map<shared_str, HistorySlot> m_history;
+
     struct ReaderLink {
         PassNode* pass;
         u32 next;
@@ -218,6 +237,7 @@ private:
     void AssignSegments();
     void Devirtualize(ResourceNode& resource);
     void Destroy(ResourceNode& resource);
+    nvrhi::TextureHandle CreateNativeTexture(const ResourceDesc& desc, const char* debugName) const;
     void InsertResourceBarriers();
 
     void ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList);

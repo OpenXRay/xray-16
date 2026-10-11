@@ -27,13 +27,8 @@ public:
     nvrhi::BindingLayoutHandle atrousLayout;
     nvrhi::IBuffer* cb = nullptr;
     nvrhi::IBuffer* filterCB = nullptr;
-    nvrhi::TextureHandle historyDiffuse[2];
-    nvrhi::TextureHandle historySpecular[2];
-    nvrhi::TextureHandle moments[2];
-    nvrhi::TextureHandle fast[2];
     u32 width = 0;
     u32 height = 0;
-    u32 historyIndex = 0;
     u32 filterIterationsRecorded = 0;
     LightingFallback readiness = LightingFallback::ResourcesUnavailable;
     LightingFallback status = LightingFallback::ResourcesUnavailable;
