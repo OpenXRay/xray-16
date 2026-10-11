@@ -33,11 +33,9 @@ public:
 
 public:
     typedef xr_vector<CGraphPointInfo> GRAPH_REGISTRY;
-    typedef xr_vector<GameGraph::_GRAPH_ID> TERRAIN_REGISTRY;
 
 protected:
     GRAPH_REGISTRY m_objects;
-    TERRAIN_REGISTRY m_terrain[GameGraph::LOCATION_TYPE_COUNT][GameGraph::LOCATION_COUNT];
     CALifeLevelRegistry* m_level;
     CSE_ALifeCreatureActor* m_actor;
     float m_process_time;

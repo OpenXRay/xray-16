@@ -22,16 +22,6 @@ CALifeGraphRegistry::CALifeGraphRegistry()
 CALifeGraphRegistry::~CALifeGraphRegistry() { xr_delete(m_level); }
 void CALifeGraphRegistry::on_load()
 {
-    for (int i = 0; i < GameGraph::LOCATION_TYPE_COUNT; ++i)
-    {
-        {
-            for (int j = 0; j < GameGraph::LOCATION_COUNT; ++j)
-                m_terrain[i][j].clear();
-        }
-        for (GameGraph::_GRAPH_ID j = 0; j < (GameGraph::_GRAPH_ID)ai().game_graph().header().vertex_count(); ++j)
-            m_terrain[i][ai().game_graph().vertex(j)->vertex_type()[i]].push_back(j);
-    }
-
     m_objects.resize(ai().game_graph().header().vertex_count());
 
     {
