@@ -1,6 +1,9 @@
 #include "StdAfx.h"
 
 #include "PHWorld.h"
+#ifdef XRAY_USE_JOLT_PHYSICS
+#include "JoltDynamicsWorld.h"
+#endif
 #include "tri-colliderknoopc/dTriList.h"
 #include "PhysicsCommon.h"
 
@@ -156,6 +159,11 @@ dVector3 center			=	{level_center.x,0.f,level_center.z};
 // phWorld->contactp.min_depth =0.f;
 
 #endif
+#ifdef XRAY_USE_JOLT_PHYSICS
+    m_dynamics = xr_new<JoltDynamicsWorld>();
+    m_isolated_dynamics = xr_new<JoltDynamicsWorld>();
+    Msg("* Physics dynamics backend: Jolt (legacy contact/joint bridge)");
+#endif
     ContactGroup = dJointGroupCreate(0);
     dWorldSetGravity(phWorld, 0, -Gravity(), 0); //-2.f*9.81f
     Mesh.Create(0, phWorld);
@@ -186,6 +194,10 @@ void CPHWorld::Destroy()
 {
     ZoneScoped;
 
+#ifdef XRAY_USE_JOLT_PHYSICS
+    xr_delete(m_isolated_dynamics);
+    xr_delete(m_dynamics);
+#endif
     r_spatial.clear();
     xr_delete(m_commander);
     Mesh.Destroy();
@@ -206,6 +218,15 @@ void CPHWorld::Destroy()
     Device.RemoveSeqFrame(this);
     b_exist = false;
 }
+#ifdef XRAY_USE_JOLT_PHYSICS
+void CPHWorld::StepIsland(CPHIsland& island, float step)
+{
+    // Activation and camera collision advance only the requested island.
+    CPHIsland* islands[] = { &island };
+    m_isolated_dynamics->Step(islands, step, phIterations);
+}
+#endif
+
 void CPHWorld::SetGravity(float g)
 {
     m_gravity = g;
@@ -339,6 +360,9 @@ void CPHWorld::Step()
 #endif
     //////////////////////////////////////////////////////////////////////
     m_commander->update_threadsafety();
+#ifdef XRAY_USE_JOLT_PHYSICS
+    xr_vector<CPHIsland*> active_islands;
+#endif
     //////////////////////////////////////////////////////////////////////
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
@@ -359,13 +383,27 @@ void CPHWorld::Step()
 #ifdef DEBUG
         debug_output().DBG_ObjBeforeStep(obj);
 #endif
+#ifdef XRAY_USE_JOLT_PHYSICS
+        if (obj->Island().IsActive())
+            active_islands.push_back(&obj->Island());
+#else
         obj->IslandStep(fixed_step);
+#endif
 
 #ifdef DEBUG
+#ifndef XRAY_USE_JOLT_PHYSICS
         debug_output().DBG_ObjAfterStep(obj);
+#endif
 #endif
     }
 
+#ifdef XRAY_USE_JOLT_PHYSICS
+    m_dynamics->Step(active_islands, fixed_step, phIterations);
+#ifdef DEBUG
+    for (auto* obj : m_objects)
+        debug_output().DBG_ObjAfterStep(obj);
+#endif
+#endif
     stats.Core.End();
 
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
