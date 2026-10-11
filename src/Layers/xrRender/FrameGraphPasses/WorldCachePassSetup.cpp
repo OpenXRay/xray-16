@@ -113,7 +113,7 @@ static LightingFallback LoadWorldCachePipelines(RenderDevice* device)
         auto result = shaderLoader->LoadComputeShader(shader);
         if (!result.handle || !result.reflection)
             return LightingFallback::ShaderUnavailable;
-        layout = cache.GetOrCreateBindingLayoutFromReflection(name, *result.reflection, nvDevice);
+        layout = cache.GetOrCreateBindingLayoutFromReflection(*result.reflection, nvDevice);
         if (!layout)
             return LightingFallback::PipelineUnavailable;
         nvrhi::ComputePipelineDesc desc;

@@ -173,9 +173,9 @@ void InitializeTransparentResources(fg::RenderDevice* device, TransparentPassSta
     state.wallmarkPS = wallmarkResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass", *vsResult.reflection, *psResult.reflection, nvDevice);
-    state.distortLayout = cache.GetOrCreateBindingLayoutFromReflection("TransparentPass_Distort", *vsResult.reflection, *distortResult.reflection, nvDevice);
-    state.wallmarkLayout = cache.GetOrCreateBindingLayoutFromReflection("StaticWallmarkPass", *vsResult.reflection, *wallmarkResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
+    state.distortLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *distortResult.reflection, nvDevice);
+    state.wallmarkLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *wallmarkResult.reflection, nvDevice);
     if (!state.layout || !state.distortLayout || !state.wallmarkLayout)
         return;
 

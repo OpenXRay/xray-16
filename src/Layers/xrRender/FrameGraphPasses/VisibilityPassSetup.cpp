@@ -134,10 +134,8 @@ bool ensureMeshVisibilityResources(fg::RenderDevice* device, VisibilityPassState
 
     auto& cache = GetPassResourceCache();
     const auto visibility = nvrhi::ShaderType::Mesh | nvrhi::ShaderType::Pixel;
-    auto layout = cache.GetOrCreateBindingLayout("VisibilityRaster_Mesh",
-        BindingLayoutBuilder::Build(*msResult.reflection, *atRefl, visibility), nvDevice);
-    auto terrainLayout = cache.GetOrCreateBindingLayout("VisibilityRaster_MeshTerrain",
-        BindingLayoutBuilder::Build(*msResult.reflection, *fadeRefl, visibility), nvDevice);
+    auto layout = cache.GetOrCreateBindingLayout(BindingLayoutBuilder::Build(*msResult.reflection, *atRefl, visibility), nvDevice);
+    auto terrainLayout = cache.GetOrCreateBindingLayout(BindingLayoutBuilder::Build(*msResult.reflection, *fadeRefl, visibility), nvDevice);
     if (!layout || !terrainLayout) {
         state.meshFailed = true;
         return false;
@@ -209,8 +207,8 @@ bool ensureSwResources(fg::RenderDevice* device, VisibilityPassState& state, u32
         }
         state.swShader = csResult.handle;
         state.swResolvePS = psResult.handle;
-        state.swLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Sw", *csResult.reflection, nvDevice);
-        state.swResolveLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_SwResolve", *vsResult.reflection, *psResult.reflection, nvDevice);
+        state.swLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
+        state.swResolveLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
         if (!state.swLayout || !state.swResolveLayout) {
             state.swFailed = true;
             return false;
@@ -326,8 +324,8 @@ bool ensureDetailVisibilityResources(fg::RenderDevice* device, VisibilityPassSta
     state.bladeVS = vs.handle;
     state.bladePS = ps.handle;
     state.pulledPS = pulled.handle;
-    state.bladeLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Blades", *vs.reflection, *ps.reflection, nvDevice);
-    state.pulledLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Pulled", *vs.reflection, *pulled.reflection, nvDevice);
+    state.bladeLayout = cache.GetOrCreateBindingLayoutFromReflection(*vs.reflection, *ps.reflection, nvDevice);
+    state.pulledLayout = cache.GetOrCreateBindingLayoutFromReflection(*vs.reflection, *pulled.reflection, nvDevice);
     if (!state.bladeLayout || !state.pulledLayout)
         return false;
     nvrhi::FramebufferInfoEx framebuffer;
@@ -368,7 +366,7 @@ bool ensureSwGrassResources(fg::RenderDevice* device, VisibilityPassState& state
     }
     auto& cache = GetPassResourceCache();
     state.swGrassShader = csResult.handle;
-    state.swGrassLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_SwGrass", *csResult.reflection, nvDevice);
+    state.swGrassLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     nvrhi::ComputePipelineDesc desc;
     desc.CS = state.swGrassShader;
     desc.bindingLayouts = { state.swGrassLayout, device->GetBackend()->GetBindlessLayout(), source.bindingLayout };
@@ -766,9 +764,9 @@ bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& st
     state.psFade = fadeResult.handle;
 
     auto& cache = GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Cluster", *vsResult.reflection, *atResult.reflection, nvDevice);
-    state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_ClusterTerrain", *vsResult.reflection, *fadeResult.reflection, nvDevice);
-    state.skinnedLayout = cache.GetOrCreateBindingLayoutFromReflection("VisibilityRaster_Skinned", *skinnedVsResult.reflection, *atResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *atResult.reflection, nvDevice);
+    state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *fadeResult.reflection, nvDevice);
+    state.skinnedLayout = cache.GetOrCreateBindingLayoutFromReflection(*skinnedVsResult.reflection, *atResult.reflection, nvDevice);
     if (!state.layout || !state.terrainLayout || !state.skinnedLayout) {
         Msg("! [VisibilityRaster] Failed to create binding layouts");
         state.failed = true;
@@ -1027,7 +1025,7 @@ VirtualResourceHandle setupVisDebugViewPass(
         }
         state->debugShader = csResult.handle;
         auto& cache = GetPassResourceCache();
-        state->debugLayout = cache.GetOrCreateBindingLayoutFromReflection("VisDebugView", *csResult.reflection, nvDevice);
+        state->debugLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
         nvrhi::ComputePipelineDesc pipeDesc;
         pipeDesc.CS = state->debugShader;
         pipeDesc.bindingLayouts = { state->debugLayout };

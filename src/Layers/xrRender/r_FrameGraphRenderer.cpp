@@ -2093,7 +2093,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                             auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("debug_preview");
                             if (!csResult.handle) return;
 
-                            s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DebugPreview", *csResult.reflection, nvDevice);
+                            s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
 
                             nvrhi::ComputePipelineDesc pipeDesc;
                             pipeDesc.CS = csResult.handle;

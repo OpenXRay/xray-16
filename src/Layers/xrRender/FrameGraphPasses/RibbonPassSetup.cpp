@@ -147,7 +147,7 @@ void InitializeRibbonResources(fg::RenderDevice* device, const nvrhi::Framebuffe
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("RibbonPass", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.VS = state.vs;

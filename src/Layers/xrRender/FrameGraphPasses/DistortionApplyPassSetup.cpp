@@ -45,8 +45,7 @@ void InitializeDistortionApplyPass(nvrhi::IDevice* device, DistortionApplyPassSt
 
     auto& cache = GetPassResourceCache();
 
-    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DistortionApply", *vsResult.reflection, *psResult.reflection, device);
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, device);
 
     if (state.bindingLayout) {
         nvrhi::GraphicsPipelineDesc pipeDesc;

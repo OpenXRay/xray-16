@@ -4,6 +4,7 @@
 #include "ShaderCache.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IGame_Persistent.h"
+#include <cstring>
 
 namespace xray::render::framegraph {
 
@@ -33,23 +34,94 @@ u64 PassResourceCache::HashPointer(const void* ptr) {
     return static_cast<u64>(reinterpret_cast<uintptr_t>(ptr));
 }
 
+namespace {
+
+u64 HashValue(u64 hash, u64 value) {
+    return PassResourceCache::HashCombine(hash, value);
+}
+
+u64 HashFloat(u64 hash, float value) {
+    u32 bits;
+    std::memcpy(&bits, &value, sizeof(bits));
+    return HashValue(hash, bits);
+}
+
+u64 HashPtr(u64 hash, const void* ptr) {
+    return HashValue(hash, PassResourceCache::HashPointer(ptr));
+}
+
+u64 HashSamplerDesc(const nvrhi::SamplerDesc& d) {
+    u64 h = 0;
+    h = HashFloat(h, d.borderColor.r);
+    h = HashFloat(h, d.borderColor.g);
+    h = HashFloat(h, d.borderColor.b);
+    h = HashFloat(h, d.borderColor.a);
+    h = HashFloat(h, d.maxAnisotropy);
+    h = HashFloat(h, d.mipBias);
+    h = HashValue(h, u64(d.minFilter) | u64(d.magFilter) << 1 | u64(d.mipFilter) << 2);
+    h = HashValue(h, u64(d.addressU));
+    h = HashValue(h, u64(d.addressV));
+    h = HashValue(h, u64(d.addressW));
+    return HashValue(h, u64(d.reductionType));
+}
+
+bool SamplerDescsEqual(const nvrhi::SamplerDesc& a, const nvrhi::SamplerDesc& b) {
+    return a.borderColor == b.borderColor && a.maxAnisotropy == b.maxAnisotropy && a.mipBias == b.mipBias &&
+        a.minFilter == b.minFilter && a.magFilter == b.magFilter && a.mipFilter == b.mipFilter &&
+        a.addressU == b.addressU && a.addressV == b.addressV && a.addressW == b.addressW &&
+        a.reductionType == b.reductionType;
+}
+
+u64 HashBindingLayoutDesc(const nvrhi::BindingLayoutDesc& d) {
+    u64 h = HashValue(0, u64(d.visibility));
+    h = HashValue(h, d.registerSpace);
+    h = HashValue(h, u64(d.registerSpaceIsDescriptorSet));
+    for (const auto& item : d.bindings) {
+        h = HashValue(h, item.slot);
+        h = HashValue(h, u64(item.type));
+        h = HashValue(h, item.size);
+    }
+    h = HashValue(h, d.bindingOffsets.shaderResource);
+    h = HashValue(h, d.bindingOffsets.sampler);
+    h = HashValue(h, d.bindingOffsets.constantBuffer);
+    return HashValue(h, d.bindingOffsets.unorderedAccess);
+}
+
+bool BindingLayoutDescsEqual(const nvrhi::BindingLayoutDesc& a, const nvrhi::BindingLayoutDesc& b) {
+    return a.visibility == b.visibility && a.registerSpace == b.registerSpace &&
+        a.registerSpaceIsDescriptorSet == b.registerSpaceIsDescriptorSet && a.bindings == b.bindings &&
+        a.bindingOffsets.shaderResource == b.bindingOffsets.shaderResource &&
+        a.bindingOffsets.sampler == b.bindingOffsets.sampler &&
+        a.bindingOffsets.constantBuffer == b.bindingOffsets.constantBuffer &&
+        a.bindingOffsets.unorderedAccess == b.bindingOffsets.unorderedAccess;
+}
+
+template <typename Map, typename Equal>
+typename Map::mapped_type FindCached(Map& map, u64 key, Equal&& equal) {
+    const auto range = map.equal_range(key);
+    for (auto it = range.first; it != range.second; ++it)
+        if (it->second && equal(it->second))
+            return it->second;
+    return nullptr;
+}
+
+}
+
 nvrhi::SamplerHandle PassResourceCache::GetOrCreateSampler(
-    const char* passName,
     const nvrhi::SamplerDesc& desc,
     nvrhi::IDevice* device)
 {
-    u64 key = HashString(passName);
-
-    auto it = m_samplers.find(key);
-    if (it != m_samplers.end()) {
+    const u64 key = HashSamplerDesc(desc);
+    if (nvrhi::SamplerHandle cached = FindCached(m_samplers, key,
+            [&](const nvrhi::SamplerHandle& s) { return SamplerDescsEqual(s->getDesc(), desc); })) {
         m_stats.samplerHits++;
-        return it->second;
+        return cached;
     }
 
     m_stats.samplerMisses++;
     nvrhi::SamplerHandle sampler = device->createSampler(desc);
     if (sampler) {
-        m_samplers[key] = sampler;
+        m_samplers.emplace(key, sampler);
     }
     return sampler;
 }
@@ -175,75 +247,159 @@ nvrhi::ISampler* PassResourceCache::GetSamplerByName(const char* smpName, nvrhi:
 }
 
 nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayout(
-    const char* passName,
     const nvrhi::BindingLayoutDesc& desc,
     nvrhi::IDevice* device)
 {
-    u64 key = HashString(passName);
-
-    auto it = m_bindingLayouts.find(key);
-    if (it != m_bindingLayouts.end()) {
+    const u64 key = HashBindingLayoutDesc(desc);
+    if (nvrhi::BindingLayoutHandle cached = FindCached(m_bindingLayouts, key,
+            [&](const nvrhi::BindingLayoutHandle& l) {
+                const nvrhi::BindingLayoutDesc* existing = l->getDesc();
+                return existing && BindingLayoutDescsEqual(*existing, desc);
+            })) {
         m_stats.layoutHits++;
-        return it->second;
+        return cached;
     }
 
     m_stats.layoutMisses++;
     nvrhi::BindingLayoutHandle layout = device->createBindingLayout(desc);
     if (layout) {
-        m_bindingLayouts[key] = layout;
+        m_bindingLayouts.emplace(key, layout);
     }
     return layout;
 }
 
 nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayoutFromReflection(
-    const char* passName,
     const ExtractedReflection& csReflection,
     nvrhi::IDevice* device)
 {
-    auto desc = BindingLayoutBuilder::Build(csReflection, nvrhi::ShaderType::Compute);
-    return GetOrCreateBindingLayout(passName, desc, device);
+    return GetOrCreateBindingLayout(BindingLayoutBuilder::Build(csReflection, nvrhi::ShaderType::Compute), device);
 }
 
 nvrhi::BindingLayoutHandle PassResourceCache::GetOrCreateBindingLayoutFromReflection(
-    const char* passName,
     const ExtractedReflection& vsReflection,
     const ExtractedReflection& psReflection,
     nvrhi::IDevice* device)
 {
-    auto desc = BindingLayoutBuilder::Build(vsReflection, psReflection);
-    return GetOrCreateBindingLayout(passName, desc, device);
+    return GetOrCreateBindingLayout(BindingLayoutBuilder::Build(vsReflection, psReflection), device);
 }
 
-static u64 HashGraphicsPipelineKey(const char* passName,
-    const nvrhi::GraphicsPipelineDesc& desc,
-    const nvrhi::FramebufferInfo& fbInfo)
+namespace {
+
+u64 HashBindingLayouts(u64 h, const nvrhi::BindingLayoutVector& layouts) {
+    h = HashValue(h, layouts.size());
+    for (const auto& layout : layouts)
+        h = HashPtr(h, layout.Get());
+    return h;
+}
+
+bool BindingLayoutsEqual(const nvrhi::BindingLayoutVector& a, const nvrhi::BindingLayoutVector& b) {
+    if (a.size() != b.size())
+        return false;
+    for (size_t i = 0; i < a.size(); ++i)
+        if (a[i] != b[i])
+            return false;
+    return true;
+}
+
+u64 HashRasterState(u64 h, const nvrhi::RasterState& r) {
+    h = HashValue(h, u64(r.fillMode));
+    h = HashValue(h, u64(r.cullMode));
+    h = HashValue(h, u64(r.frontCounterClockwise) | u64(r.depthClipEnable) << 1 | u64(r.scissorEnable) << 2 |
+        u64(r.multisampleEnable) << 3 | u64(r.antialiasedLineEnable) << 4 |
+        u64(r.programmableSamplePositionsEnable) << 5 | u64(r.conservativeRasterEnable) << 6 |
+        u64(r.quadFillEnable) << 7);
+    h = HashValue(h, u64(u32(r.depthBias)));
+    h = HashFloat(h, r.depthBiasClamp);
+    h = HashFloat(h, r.slopeScaledDepthBias);
+    h = HashValue(h, r.forcedSampleCount);
+    for (size_t i = 0; i < sizeof(r.samplePositionsX); ++i)
+        h = HashValue(h, u64(u8(r.samplePositionsX[i])) | u64(u8(r.samplePositionsY[i])) << 8);
+    return h;
+}
+
+bool RasterStatesEqual(const nvrhi::RasterState& a, const nvrhi::RasterState& b) {
+    return a.fillMode == b.fillMode && a.cullMode == b.cullMode &&
+        a.frontCounterClockwise == b.frontCounterClockwise && a.depthClipEnable == b.depthClipEnable &&
+        a.scissorEnable == b.scissorEnable && a.multisampleEnable == b.multisampleEnable &&
+        a.antialiasedLineEnable == b.antialiasedLineEnable && a.depthBias == b.depthBias &&
+        a.depthBiasClamp == b.depthBiasClamp && a.slopeScaledDepthBias == b.slopeScaledDepthBias &&
+        a.forcedSampleCount == b.forcedSampleCount &&
+        a.programmableSamplePositionsEnable == b.programmableSamplePositionsEnable &&
+        a.conservativeRasterEnable == b.conservativeRasterEnable && a.quadFillEnable == b.quadFillEnable &&
+        std::memcmp(a.samplePositionsX, b.samplePositionsX, sizeof(a.samplePositionsX)) == 0 &&
+        std::memcmp(a.samplePositionsY, b.samplePositionsY, sizeof(a.samplePositionsY)) == 0;
+}
+
+u64 HashStencilOp(u64 h, const nvrhi::DepthStencilState::StencilOpDesc& s) {
+    return HashValue(h, u64(s.failOp) | u64(s.depthFailOp) << 8 | u64(s.passOp) << 16 | u64(s.stencilFunc) << 24);
+}
+
+bool StencilOpsEqual(const nvrhi::DepthStencilState::StencilOpDesc& a, const nvrhi::DepthStencilState::StencilOpDesc& b) {
+    return a.failOp == b.failOp && a.depthFailOp == b.depthFailOp && a.passOp == b.passOp &&
+        a.stencilFunc == b.stencilFunc;
+}
+
+u64 HashDepthStencilState(u64 h, const nvrhi::DepthStencilState& d) {
+    h = HashValue(h, u64(d.depthTestEnable) | u64(d.depthWriteEnable) << 1 | u64(d.stencilEnable) << 2 |
+        u64(d.dynamicStencilRef) << 3);
+    h = HashValue(h, u64(d.depthFunc));
+    h = HashValue(h, u64(d.stencilReadMask) | u64(d.stencilWriteMask) << 8 | u64(d.stencilRefValue) << 16);
+    h = HashStencilOp(h, d.frontFaceStencil);
+    return HashStencilOp(h, d.backFaceStencil);
+}
+
+bool DepthStencilStatesEqual(const nvrhi::DepthStencilState& a, const nvrhi::DepthStencilState& b) {
+    return a.depthTestEnable == b.depthTestEnable && a.depthWriteEnable == b.depthWriteEnable &&
+        a.depthFunc == b.depthFunc && a.stencilEnable == b.stencilEnable &&
+        a.stencilReadMask == b.stencilReadMask && a.stencilWriteMask == b.stencilWriteMask &&
+        a.stencilRefValue == b.stencilRefValue && a.dynamicStencilRef == b.dynamicStencilRef &&
+        StencilOpsEqual(a.frontFaceStencil, b.frontFaceStencil) &&
+        StencilOpsEqual(a.backFaceStencil, b.backFaceStencil);
+}
+
+u64 HashGraphicsPipeline(const nvrhi::GraphicsPipelineDesc& desc, const nvrhi::FramebufferInfo& fbInfo) {
+    u64 h = HashValue(0, u64(desc.primType));
+    h = HashValue(h, desc.patchControlPoints);
+    h = HashPtr(h, desc.inputLayout.Get());
+    h = HashPtr(h, desc.VS.Get());
+    h = HashPtr(h, desc.HS.Get());
+    h = HashPtr(h, desc.DS.Get());
+    h = HashPtr(h, desc.GS.Get());
+    h = HashPtr(h, desc.PS.Get());
+    h = HashValue(h, std::hash<nvrhi::BlendState>()(desc.renderState.blendState));
+    h = HashDepthStencilState(h, desc.renderState.depthStencilState);
+    h = HashRasterState(h, desc.renderState.rasterState);
+    const auto& sps = desc.renderState.singlePassStereo;
+    h = HashValue(h, u64(sps.enabled) | u64(sps.independentViewportMask) << 1 | u64(sps.renderTargetIndexOffset) << 8);
+    h = HashValue(h, std::hash<nvrhi::VariableRateShadingState>()(desc.shadingRateState));
+    h = HashBindingLayouts(h, desc.bindingLayouts);
+    return HashValue(h, std::hash<nvrhi::FramebufferInfo>()(fbInfo));
+}
+
+bool GraphicsPipelinesEqual(const nvrhi::IGraphicsPipeline& pipeline,
+    const nvrhi::GraphicsPipelineDesc& desc, const nvrhi::FramebufferInfo& fbInfo)
 {
-    u64 hash = PassResourceCache::HashString(passName);
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.VS.Get()));
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.PS.Get()));
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.GS.Get()));
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.HS.Get()));
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.DS.Get()));
-    hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(desc.inputLayout.Get()));
-    hash = PassResourceCache::HashCombine(hash, u64(desc.primType));
-    for (const auto& layout : desc.bindingLayouts)
-        hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(layout.Get()));
-    for (const auto& fmt : fbInfo.colorFormats)
-        hash = PassResourceCache::HashCombine(hash, u64(fmt));
-    hash = PassResourceCache::HashCombine(hash, u64(fbInfo.depthFormat));
-    hash = PassResourceCache::HashCombine(hash, u64(fbInfo.sampleCount));
-    const auto& rs = desc.renderState;
-    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthTestEnable));
-    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthWriteEnable));
-    hash = PassResourceCache::HashCombine(hash, u64(rs.depthStencilState.depthFunc));
-    hash = PassResourceCache::HashCombine(hash, u64(rs.rasterState.cullMode));
-    hash = PassResourceCache::HashCombine(hash, u64(rs.rasterState.frontCounterClockwise));
-    const auto& bt = rs.blendState.targets[0];
-    hash = PassResourceCache::HashCombine(hash, u64(bt.blendEnable));
-    hash = PassResourceCache::HashCombine(hash, u64(bt.srcBlend));
-    hash = PassResourceCache::HashCombine(hash, u64(bt.destBlend));
-    hash = PassResourceCache::HashCombine(hash, u64(bt.blendOp));
-    return hash;
+    const nvrhi::GraphicsPipelineDesc& a = pipeline.getDesc();
+    return a.primType == desc.primType && a.patchControlPoints == desc.patchControlPoints &&
+        a.inputLayout == desc.inputLayout && a.VS == desc.VS && a.HS == desc.HS && a.DS == desc.DS &&
+        a.GS == desc.GS && a.PS == desc.PS &&
+        a.renderState.blendState == desc.renderState.blendState &&
+        DepthStencilStatesEqual(a.renderState.depthStencilState, desc.renderState.depthStencilState) &&
+        RasterStatesEqual(a.renderState.rasterState, desc.renderState.rasterState) &&
+        a.renderState.singlePassStereo == desc.renderState.singlePassStereo &&
+        a.shadingRateState == desc.shadingRateState &&
+        BindingLayoutsEqual(a.bindingLayouts, desc.bindingLayouts) &&
+        pipeline.getFramebufferInfo() == fbInfo;
+}
+
+u64 HashComputePipeline(const nvrhi::ComputePipelineDesc& desc) {
+    return HashBindingLayouts(HashPtr(0, desc.CS.Get()), desc.bindingLayouts);
+}
+
+bool ComputePipelinesEqual(const nvrhi::ComputePipelineDesc& a, const nvrhi::ComputePipelineDesc& b) {
+    return a.CS == b.CS && BindingLayoutsEqual(a.bindingLayouts, b.bindingLayouts);
+}
+
 }
 
 void PassResourceCache::ReportPipelineCreation(const char* kind, const char* name, float milliseconds)
@@ -254,50 +410,48 @@ void PassResourceCache::ReportPipelineCreation(const char* kind, const char* nam
 }
 
 nvrhi::GraphicsPipelineHandle PassResourceCache::GetOrCreatePipeline(
-    const char* passName,
+    const char* debugName,
     const nvrhi::GraphicsPipelineDesc& desc,
     const nvrhi::FramebufferInfo& fbInfo,
     nvrhi::IDevice* device)
 {
-    u64 key = HashGraphicsPipelineKey(passName, desc, fbInfo);
-
-    auto it = m_graphicsPipelines.find(key);
-    if (it != m_graphicsPipelines.end()) {
+    const u64 key = HashGraphicsPipeline(desc, fbInfo);
+    if (nvrhi::GraphicsPipelineHandle cached = FindCached(m_graphicsPipelines, key,
+            [&](const nvrhi::GraphicsPipelineHandle& p) { return GraphicsPipelinesEqual(*p, desc, fbInfo); })) {
         m_stats.pipelineHits++;
-        return it->second;
+        return cached;
     }
 
     m_stats.pipelineMisses++;
     CTimer timer;
     timer.Start();
     nvrhi::GraphicsPipelineHandle pipeline = device->createGraphicsPipeline(desc, fbInfo);
-    ReportPipelineCreation("graphics", passName, timer.GetElapsed_sec() * 1000.f);
+    ReportPipelineCreation("graphics", debugName, timer.GetElapsed_sec() * 1000.f);
     if (pipeline) {
-        m_graphicsPipelines[key] = pipeline;
+        m_graphicsPipelines.emplace(key, pipeline);
     }
     return pipeline;
 }
 
 nvrhi::ComputePipelineHandle PassResourceCache::GetOrCreateComputePipeline(
-    const char* passName,
+    const char* debugName,
     const nvrhi::ComputePipelineDesc& desc,
     nvrhi::IDevice* device)
 {
-    u64 key = HashString(passName);
-
-    auto it = m_computePipelines.find(key);
-    if (it != m_computePipelines.end()) {
+    const u64 key = HashComputePipeline(desc);
+    if (nvrhi::ComputePipelineHandle cached = FindCached(m_computePipelines, key,
+            [&](const nvrhi::ComputePipelineHandle& p) { return ComputePipelinesEqual(p->getDesc(), desc); })) {
         m_stats.computePipelineHits++;
-        return it->second;
+        return cached;
     }
 
     m_stats.computePipelineMisses++;
     CTimer timer;
     timer.Start();
     nvrhi::ComputePipelineHandle pipeline = device->createComputePipeline(desc);
-    ReportPipelineCreation("compute", passName, timer.GetElapsed_sec() * 1000.f);
+    ReportPipelineCreation("compute", debugName, timer.GetElapsed_sec() * 1000.f);
     if (pipeline) {
-        m_computePipelines[key] = pipeline;
+        m_computePipelines.emplace(key, pipeline);
     }
     return pipeline;
 }
@@ -363,24 +517,46 @@ nvrhi::FramebufferHandle PassResourceCache::GetOrCreateFramebuffer(
 }
 
 nvrhi::InputLayoutHandle PassResourceCache::GetOrCreateInputLayout(
-    const char* passName,
     const nvrhi::VertexAttributeDesc* attrs,
     u32 attrCount,
     nvrhi::IShader* vertexShader,
     nvrhi::IDevice* device)
 {
-    u64 key = HashCombine(HashString(passName), HashPointer(vertexShader));
+    u64 key = HashPtr(attrCount, vertexShader);
+    for (u32 i = 0; i < attrCount; ++i) {
+        const auto& a = attrs[i];
+        key = HashValue(key, HashString(a.name.c_str()));
+        key = HashValue(key, u64(a.format));
+        key = HashValue(key, a.arraySize);
+        key = HashValue(key, a.bufferIndex);
+        key = HashValue(key, a.offset);
+        key = HashValue(key, a.elementStride);
+        key = HashValue(key, u64(a.isInstanced));
+    }
 
-    auto it = m_inputLayouts.find(key);
-    if (it != m_inputLayouts.end()) {
-        m_stats.inputLayoutHits++;
-        return it->second;
+    const auto range = m_inputLayouts.equal_range(key);
+    for (auto it = range.first; it != range.second; ++it) {
+        const InputLayoutEntry& entry = it->second;
+        if (entry.vertexShader != vertexShader || entry.layout->getNumAttributes() != attrCount)
+            continue;
+        bool equal = true;
+        for (u32 i = 0; i < attrCount && equal; ++i) {
+            const nvrhi::VertexAttributeDesc& a = *entry.layout->getAttributeDesc(i);
+            const nvrhi::VertexAttributeDesc& b = attrs[i];
+            equal = a.name == b.name && a.format == b.format && a.arraySize == b.arraySize &&
+                a.bufferIndex == b.bufferIndex && a.offset == b.offset &&
+                a.elementStride == b.elementStride && a.isInstanced == b.isInstanced;
+        }
+        if (equal) {
+            m_stats.inputLayoutHits++;
+            return entry.layout;
+        }
     }
 
     m_stats.inputLayoutMisses++;
     nvrhi::InputLayoutHandle layout = device->createInputLayout(attrs, attrCount, vertexShader);
     if (layout) {
-        m_inputLayouts[key] = layout;
+        m_inputLayouts.emplace(key, InputLayoutEntry{ vertexShader, layout });
     }
     return layout;
 }
@@ -444,36 +620,26 @@ nvrhi::IBuffer* PassResourceCache::GetOrCreateVolatileCB(
     return nullptr;
 }
 
-static u64 HashBindingSetDesc(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout) {
-    u64 hash = PassResourceCache::HashPointer(layout);
-    for (const auto& item : desc.bindings) {
-        hash = PassResourceCache::HashCombine(hash, PassResourceCache::HashPointer(item.resourceHandle));
-        hash = PassResourceCache::HashCombine(hash, u64(item.slot));
-        hash = PassResourceCache::HashCombine(hash, u64(item.type));
-        hash = PassResourceCache::HashCombine(hash, u64(item.format));
-        hash = PassResourceCache::HashCombine(hash, u64(item.dimension));
-        hash = PassResourceCache::HashCombine(hash, item.rawData[0]);
-        hash = PassResourceCache::HashCombine(hash, item.rawData[1]);
-    }
-    return hash;
-}
-
 nvrhi::BindingSetHandle PassResourceCache::GetOrCreateBindingSet(
     const nvrhi::BindingSetDesc& desc,
     nvrhi::IBindingLayout* layout,
     nvrhi::IDevice* device)
 {
-    u64 key = HashBindingSetDesc(desc, layout);
-    auto it = m_bindingSets.find(key);
-    if (it != m_bindingSets.end()) {
+    const u64 key = HashValue(HashPtr(u64(desc.trackLiveness), layout), std::hash<nvrhi::BindingSetDesc>()(desc));
+    if (nvrhi::BindingSetHandle cached = FindCached(m_bindingSets, key,
+            [&](const nvrhi::BindingSetHandle& s) {
+                const nvrhi::BindingSetDesc* existing = s->getDesc();
+                return s->getLayout() == layout && existing && existing->trackLiveness == desc.trackLiveness &&
+                    *existing == desc;
+            })) {
         m_stats.bindingSetHits++;
-        return it->second;
+        return cached;
     }
 
     m_stats.bindingSetMisses++;
     nvrhi::BindingSetHandle bindingSet = device->createBindingSet(desc, layout);
     if (bindingSet)
-        m_bindingSets[key] = bindingSet;
+        m_bindingSets.emplace(key, bindingSet);
     return bindingSet;
 }
 

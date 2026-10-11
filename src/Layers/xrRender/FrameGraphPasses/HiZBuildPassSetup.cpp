@@ -50,7 +50,7 @@ void InitializeHiZResources(fg::RenderDevice* device, u32 width, u32 height, HiZ
         auto& cache = framegraph::GetPassResourceCache();
 
         if (state.computeEnabled) {
-            state.layout = cache.GetOrCreateBindingLayoutFromReflection("HiZBuildPass", *csResult.reflection, nvDevice);
+            state.layout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
 
             if (state.layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;

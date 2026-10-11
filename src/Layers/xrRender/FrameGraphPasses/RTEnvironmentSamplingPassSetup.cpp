@@ -47,7 +47,7 @@ static bool LoadEnvironmentSamplingPipeline(nvrhi::IDevice* nvDevice)
 
     if (!s_envLayout)
     {
-        s_envLayout = cache.GetOrCreateBindingLayoutFromReflection("RTEnvironmentSampling", *reflection, nvDevice);
+        s_envLayout = cache.GetOrCreateBindingLayoutFromReflection(*reflection, nvDevice);
         if (!s_envLayout)
         {
             Msg("! [EnvironmentSampling] Failed to create the binding layout");

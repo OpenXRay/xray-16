@@ -368,22 +368,22 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
     state.pageATPS = pageATPsResult.handle;
 
     auto& cache = GetPassResourceCache();
-    state.markLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMMark", *markResult.reflection, nvDevice);
-    state.residLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResid", *residResult.reflection, nvDevice);
-    state.debugLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDebugView", *debugResult.reflection, nvDevice);
-    state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMClear", *clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
-    state.binPrepLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinPrep", *binPrepResult.reflection, nvDevice);
-    state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinCount", *binCountResult.reflection, nvDevice);
-    state.binReserveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBinReserve", *binReserveResult.reflection, nvDevice);
-    state.binLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMBin", *binResult.reflection, nvDevice);
-    state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMArgs", *argsResult.reflection, nvDevice);
-    state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
-    state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
-    state.resolveLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMResolve", *resolveResult.reflection, nvDevice);
-    state.allocLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMAlloc", *allocResult.reflection, nvDevice);
-    state.dynBinLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynBin", *dynBinResult.reflection, nvDevice);
-    state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynArgs", *dynArgsResult.reflection, nvDevice);
-    state.touchLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynTouch", *touchResult.reflection, nvDevice);
+    state.markLayout = cache.GetOrCreateBindingLayoutFromReflection(*markResult.reflection, nvDevice);
+    state.residLayout = cache.GetOrCreateBindingLayoutFromReflection(*residResult.reflection, nvDevice);
+    state.debugLayout = cache.GetOrCreateBindingLayoutFromReflection(*debugResult.reflection, nvDevice);
+    state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection(*clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
+    state.binPrepLayout = cache.GetOrCreateBindingLayoutFromReflection(*binPrepResult.reflection, nvDevice);
+    state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection(*binCountResult.reflection, nvDevice);
+    state.binReserveLayout = cache.GetOrCreateBindingLayoutFromReflection(*binReserveResult.reflection, nvDevice);
+    state.binLayout = cache.GetOrCreateBindingLayoutFromReflection(*binResult.reflection, nvDevice);
+    state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection(*argsResult.reflection, nvDevice);
+    state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection(*pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
+    state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection(*pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
+    state.resolveLayout = cache.GetOrCreateBindingLayoutFromReflection(*resolveResult.reflection, nvDevice);
+    state.allocLayout = cache.GetOrCreateBindingLayoutFromReflection(*allocResult.reflection, nvDevice);
+    state.dynBinLayout = cache.GetOrCreateBindingLayoutFromReflection(*dynBinResult.reflection, nvDevice);
+    state.dynArgsLayout = cache.GetOrCreateBindingLayoutFromReflection(*dynArgsResult.reflection, nvDevice);
+    state.touchLayout = cache.GetOrCreateBindingLayoutFromReflection(*touchResult.reflection, nvDevice);
     if (!state.markLayout || !state.residLayout || !state.debugLayout || !state.clearLayout
         || !state.binPrepLayout || !state.binCountLayout || !state.binReserveLayout || !state.binLayout || !state.argsLayout || !state.pageLayout || !state.pageATLayout || !state.resolveLayout
         || !state.allocLayout || !state.dynBinLayout || !state.dynArgsLayout || !state.touchLayout
@@ -494,11 +494,8 @@ bool EnsurePipelines(fg::RenderDevice* device, VSMState& state)
         desc.renderState.rasterState.depthBiasClamp = 0.0f;
         return desc;
     };
-    string128 name;
-    xr_sprintf(name, "VSMPage_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
-    state.pagePipeline = cache.GetOrCreatePipeline(name, makePageDesc(state.pagePS, state.pageLayout, false), fbInfo, nvDevice);
-    xr_sprintf(name, "VSMPageAT_b%.2f_s%.2f", state.rasterBias, state.rasterSlope);
-    state.pageATPipeline = cache.GetOrCreatePipeline(name, makePageDesc(state.pageATPS, state.pageATLayout, true), fbInfo, nvDevice);
+    state.pagePipeline = cache.GetOrCreatePipeline("VSMPage", makePageDesc(state.pagePS, state.pageLayout, false), fbInfo, nvDevice);
+    state.pageATPipeline = cache.GetOrCreatePipeline("VSMPageAT", makePageDesc(state.pageATPS, state.pageATLayout, true), fbInfo, nvDevice);
 
     if (!state.markPipeline || !state.residPipeline || !state.debugPipeline || !state.clearPipeline
         || !state.binPrepPipeline || !state.binCountPipeline || !state.binReservePipeline
@@ -1597,9 +1594,9 @@ bool EnsureDynPagePipelines(fg::RenderDevice* device, VSMState& state)
         state.dynPipelinesFailed = true;
         return false;
     }
-    state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPage", *dynVsRefl, *psRefl, nvDevice);
-    state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynPageAT", *dynVsRefl, *atRefl, nvDevice);
-    state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMDynSkinPage", *skinVsRefl, *atRefl, nvDevice);
+    state.dynPageLayout = cache.GetOrCreateBindingLayoutFromReflection(*dynVsRefl, *psRefl, nvDevice);
+    state.dynPageATLayout = cache.GetOrCreateBindingLayoutFromReflection(*dynVsRefl, *atRefl, nvDevice);
+    state.dynSkinPageLayout = cache.GetOrCreateBindingLayoutFromReflection(*skinVsRefl, *atRefl, nvDevice);
     if (!state.dynPageLayout || !state.dynPageATLayout || !state.dynSkinPageLayout) {
         state.dynPipelinesFailed = true;
         return false;
@@ -2001,7 +1998,7 @@ bool EnsureHudPipeline(fg::RenderDevice* device, VSMState& state)
         state.hudPipelineFailed = true;
         return false;
     }
-    state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection("VSMHud", *vsRefl, *atRefl, nvDevice);
+    state.hudLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsRefl, *atRefl, nvDevice);
     if (!state.hudLayout) {
         state.hudPipelineFailed = true;
         return false;

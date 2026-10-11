@@ -80,7 +80,7 @@ bool EnsureDetailResolveResources(fg::RenderDevice* device, DetailResolvePassSta
     state.shader = csResult.handle;
 
     auto& cache = GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("DetailResolve", *csResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     if (!state.layout) {
         Msg("! [DetailResolve] Failed to create binding layout");
         state.failed = true;

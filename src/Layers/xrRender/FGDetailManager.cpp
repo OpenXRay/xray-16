@@ -1103,7 +1103,7 @@ bool FGDetailManager::CreatePerlin4DPipeline(nvrhi::IDevice* device)
         return false;
     }
 
-    perlin4dBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailPerlin4D", *refl, device);
+    perlin4dBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*refl, device);
     if (!perlin4dBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create Perlin4D binding layout");
@@ -1243,7 +1243,7 @@ bool FGDetailManager::CreateInteractionPipeline(nvrhi::IDevice* device)
         return false;
     }
 
-    interactionBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("DetailInteraction", *refl, device);
+    interactionBindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*refl, device);
     if (!interactionBindingLayout)
     {
         Msg("! [FGDetailManager] Failed to create interaction binding layout");
@@ -1475,7 +1475,7 @@ bool FGDetailManager::CreateComputePipeline(fg::RenderDevice* renderDevice)
         return false;
     auto* device = renderDevice->GetNVRHIDevice();
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    const auto create = [&](const char* name, const char* suffix, const char* key,
+    const auto create = [&](const char* name, const char* suffix,
         const nvrhi::ShaderHandle& shader, nvrhi::BindingLayoutHandle& layout,
         nvrhi::ComputePipelineHandle& pipeline, bool chunks)
     {
@@ -1484,7 +1484,7 @@ bool FGDetailManager::CreateComputePipeline(fg::RenderDevice* renderDevice)
         auto* reflection = shaderLoader->GetCachedReflection(name, suffix);
         if (!reflection)
             return false;
-        layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(key, *reflection, device);
+        layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*reflection, device);
         if (!layout)
             return false;
         nvrhi::ComputePipelineDesc desc;
@@ -1500,12 +1500,12 @@ bool FGDetailManager::CreateComputePipeline(fg::RenderDevice* renderDevice)
             m_cullSourceLayout = generatedInstances->bindingLayout;
         return bool(pipeline);
     };
-    if (!create("detail_cell_cull", ".cs", "DetailSlotCull", slotCullComputeShader, slotCullBindingLayout, slotCullPipeline, false) ||
-        !create("detail_work_args", ".cs:main_slots", "DetailSlotArgs", slotArgsComputeShader, slotArgsBindingLayout, slotArgsPipeline, false) ||
-        !create("detail_work_args", ".cs", "DetailVisibilityArgs", visibilityArgsComputeShader, visibilityArgsBindingLayout, visibilityArgsPipeline, false))
+    if (!create("detail_cell_cull", ".cs", slotCullComputeShader, slotCullBindingLayout, slotCullPipeline, false) ||
+        !create("detail_work_args", ".cs:main_slots", slotArgsComputeShader, slotArgsBindingLayout, slotArgsPipeline, false) ||
+        !create("detail_work_args", ".cs", visibilityArgsComputeShader, visibilityArgsBindingLayout, visibilityArgsPipeline, false))
         return false;
     if (generatedInstances && !generatedInstances->chunks.empty())
-        return create("detail_cull", ".cs", "DetailCull", cullComputeShader, computeBindingLayout, computePipeline, true);
+        return create("detail_cull", ".cs", cullComputeShader, computeBindingLayout, computePipeline, true);
     return true;
 }
 
@@ -1525,8 +1525,7 @@ bool FGDetailManager::CreateInstanceGenPipeline(fg::RenderDevice* renderDevice)
         auto* reflection = shaderLoader->GetCachedReflection(count ? "detail_instance_count" : "detail_instance_gen", ".cs");
         if (!reflection)
             return false;
-        layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
-            count ? "DetailInstanceCount" : "DetailInstanceEmit", *reflection, device);
+        layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*reflection, device);
         if (!layout)
             return false;
         nvrhi::ComputePipelineDesc desc;

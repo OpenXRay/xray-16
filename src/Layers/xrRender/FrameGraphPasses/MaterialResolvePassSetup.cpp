@@ -75,7 +75,7 @@ bool EnsureMaterialResolveResources(fg::RenderDevice* device, MaterialResolvePas
     state.shader = csResult.handle;
 
     auto& cache = GetPassResourceCache();
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("MaterialResolve", *csResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     if (!state.layout) {
         Msg("! [MaterialResolve] Failed to create binding layout");
         state.failed = true;

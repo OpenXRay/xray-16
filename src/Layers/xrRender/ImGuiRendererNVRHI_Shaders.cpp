@@ -87,9 +87,9 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     auto& cache = framegraph::GetPassResourceCache();
 
     if (vsRefl && psRefl)
-        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("ImGui", *vsRefl, *psRefl, m_device);
+        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsRefl, *psRefl, m_device);
     else if (psRefl)
-        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection("ImGui", *psRefl, m_device);
+        m_bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*psRefl, m_device);
     else
         Msg("! ImGui shader reflection not available");
 

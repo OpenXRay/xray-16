@@ -146,8 +146,7 @@ static bool LoadBakePipeline(RenderDevice* device)
     auto result = shaderLoader->LoadComputeShader(s_bakeShader);
     if (!result.handle || !result.reflection)
         return false;
-    s_bakeLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection("SkyVisibility_Bake",
-        *result.reflection, nvDevice);
+    s_bakeLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*result.reflection, nvDevice);
     if (!s_bakeLayout)
         return false;
     nvrhi::ComputePipelineDesc desc;
@@ -171,7 +170,7 @@ static bool LoadDebugPipeline(RenderDevice* device, u32 variant)
     if (!vs.handle || !ps.handle || !vs.reflection || !ps.reflection)
         return false;
     auto& cache = GetPassResourceCache();
-    s_debugLayout[variant] = cache.GetOrCreateBindingLayoutFromReflection(s_debugCacheNames[variant], *vs.reflection,
+    s_debugLayout[variant] = cache.GetOrCreateBindingLayoutFromReflection(*vs.reflection,
         *ps.reflection, nvDevice);
     if (!s_debugLayout[variant])
         return false;
@@ -202,8 +201,7 @@ static bool LoadInspectPipeline(RenderDevice* device, u32 variant)
     auto shader = shaderLoader->LoadComputeShader(s_inspectShaders[variant]);
     if (!shader.handle || !shader.reflection)
         return false;
-    s_inspectLayout[variant] = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
-        s_inspectCacheNames[variant], *shader.reflection, nvDevice);
+    s_inspectLayout[variant] = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*shader.reflection, nvDevice);
     if (!s_inspectLayout[variant])
         return false;
     nvrhi::ComputePipelineDesc desc;

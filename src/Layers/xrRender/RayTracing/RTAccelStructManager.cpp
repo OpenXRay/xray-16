@@ -1220,7 +1220,7 @@ bool RTAccelStructManager::InitSkinningPipeline()
     desc.isVolatile = true;
     desc.maxVersions = RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
     s_skinCB = m_device->CreateBuffer(desc);
-    s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection("RTSkinning", *shader.reflection, device);
+    s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, device);
     if (!s_skinLayout || !s_skinCB.IsValid() || !m_device->GetNativeBuffer(s_skinCB))
         return false;
     nvrhi::ComputePipelineDesc pipeline;
@@ -1557,7 +1557,7 @@ bool RTAccelStructManager::InitGrassPipeline(const FGDetailManager::InstanceGene
         desc.maxVersions = RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         s_grassCB = m_device->CreateBuffer(desc);
     }
-    s_grassLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGrass", *shader.reflection, device);
+    s_grassLayout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, device);
     if (!s_grassLayout || !s_grassCB.IsValid() || !m_device->GetNativeBuffer(s_grassCB))
         return false;
     nvrhi::ComputePipelineDesc pipeline;
@@ -1589,7 +1589,7 @@ bool RTAccelStructManager::InitBillboardPipeline(const FGDetailManager::Instance
         desc.maxVersions = RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
         s_billboardCB = m_device->CreateBuffer(desc);
     }
-    s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection("RTBillboard", *shader.reflection, device);
+    s_billboardLayout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, device);
     if (!s_billboardLayout || !s_billboardCB.IsValid() || !m_device->GetNativeBuffer(s_billboardCB))
         return false;
     nvrhi::ComputePipelineDesc pipeline;

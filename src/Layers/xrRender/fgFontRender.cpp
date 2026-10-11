@@ -57,7 +57,7 @@ void FGFontRender::InitResources()
         nvrhi::VertexAttributeDesc().setName("COLOR")   .setFormat(nvrhi::Format::RGBA8_UNORM) .setOffset(16).setElementStride(sizeof(Vertex)),
         nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT)  .setOffset(20).setElementStride(sizeof(Vertex)),
     };
-    m_inputLayout = framegraph::GetPassResourceCache().GetOrCreateInputLayout("FGFont", vertexAttrs, 3, m_vs, m_device);
+    m_inputLayout = framegraph::GetPassResourceCache().GetOrCreateInputLayout(vertexAttrs, 3, m_vs, m_device);
     R_ASSERT2(m_inputLayout, "FGFontRender: createInputLayout failed");
 
     nvrhi::BufferDesc cbDesc;
@@ -82,7 +82,7 @@ void FGFontRender::InitResources()
         nvrhi::BindingLayoutItem::Texture_SRV(0),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
-    m_bindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayout("FGFont", bindingLayoutDesc, m_device);
+    m_bindingLayout = framegraph::GetPassResourceCache().GetOrCreateBindingLayout(bindingLayoutDesc, m_device);
     R_ASSERT2(m_bindingLayout, "FGFontRender: createBindingLayout failed");
 
     xr_vector<u16> quadIndices;

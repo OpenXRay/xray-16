@@ -82,7 +82,7 @@ static LightingFallback InitializeResources(RenderDevice* device)
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllFilters(true);
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-    s_sampler = cache.GetOrCreateSampler("PathTracer", samplerDesc, nvDevice);
+    s_sampler = cache.GetOrCreateSampler(samplerDesc, nvDevice);
     CreatePlaceholderBuffer(nvDevice);
     if (!s_cb || !s_sampler || !s_ptPlaceholderBuffer)
     {
@@ -90,7 +90,7 @@ static LightingFallback InitializeResources(RenderDevice* device)
         return s_readiness;
     }
 
-    s_layout = cache.GetOrCreateBindingLayoutFromReflection("PathTracer", *csResult.reflection, nvDevice);
+    s_layout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     if (!s_layout)
         return s_readiness = LightingFallback::PipelineUnavailable;
     nvrhi::ComputePipelineDesc pipeDesc;

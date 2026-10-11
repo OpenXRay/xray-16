@@ -43,8 +43,8 @@ bool EnsureBloomPipelines(fg::RenderDevice* device, BloomPassState& state)
     }
 
     auto& cache = GetPassResourceCache();
-    state.downsampleLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomDownsample", *downsampleShader.reflection, nvDevice);
-    state.upsampleLayout = cache.GetOrCreateBindingLayoutFromReflection("BloomUpsample", *upsampleShader.reflection, nvDevice);
+    state.downsampleLayout = cache.GetOrCreateBindingLayoutFromReflection(*downsampleShader.reflection, nvDevice);
+    state.upsampleLayout = cache.GetOrCreateBindingLayoutFromReflection(*upsampleShader.reflection, nvDevice);
     if (state.downsampleLayout && state.upsampleLayout)
     {
         nvrhi::ComputePipelineDesc downsampleDesc;

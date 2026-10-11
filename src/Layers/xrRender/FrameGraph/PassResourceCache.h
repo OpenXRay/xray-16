@@ -13,7 +13,6 @@ public:
     static PassResourceCache& Instance();
 
     nvrhi::SamplerHandle GetOrCreateSampler(
-        const char* passName,
         const nvrhi::SamplerDesc& desc,
         nvrhi::IDevice* device);
 
@@ -29,29 +28,26 @@ public:
     nvrhi::ISampler* GetSamplerByName(const char* smpName, nvrhi::IDevice* device);
 
     nvrhi::BindingLayoutHandle GetOrCreateBindingLayout(
-        const char* passName,
         const nvrhi::BindingLayoutDesc& desc,
         nvrhi::IDevice* device);
 
     nvrhi::BindingLayoutHandle GetOrCreateBindingLayoutFromReflection(
-        const char* passName,
         const ExtractedReflection& csReflection,
         nvrhi::IDevice* device);
 
     nvrhi::BindingLayoutHandle GetOrCreateBindingLayoutFromReflection(
-        const char* passName,
         const ExtractedReflection& vsReflection,
         const ExtractedReflection& psReflection,
         nvrhi::IDevice* device);
 
     nvrhi::GraphicsPipelineHandle GetOrCreatePipeline(
-        const char* passName,
+        const char* debugName,
         const nvrhi::GraphicsPipelineDesc& desc,
         const nvrhi::FramebufferInfo& fbInfo,
         nvrhi::IDevice* device);
 
     nvrhi::ComputePipelineHandle GetOrCreateComputePipeline(
-        const char* passName,
+        const char* debugName,
         const nvrhi::ComputePipelineDesc& desc,
         nvrhi::IDevice* device);
 
@@ -60,7 +56,6 @@ public:
         nvrhi::IDevice* device);
 
     nvrhi::InputLayoutHandle GetOrCreateInputLayout(
-        const char* passName,
         const nvrhi::VertexAttributeDesc* attrs,
         u32 attrCount,
         nvrhi::IShader* vertexShader,
@@ -121,15 +116,20 @@ private:
     PassResourceCache(const PassResourceCache&) = delete;
     PassResourceCache& operator=(const PassResourceCache&) = delete;
 
-    xr_map<u64, nvrhi::SamplerHandle> m_samplers;
-    xr_map<u64, nvrhi::BindingLayoutHandle> m_bindingLayouts;
-    xr_map<u64, nvrhi::GraphicsPipelineHandle> m_graphicsPipelines;
-    xr_map<u64, nvrhi::ComputePipelineHandle> m_computePipelines;
+    struct InputLayoutEntry {
+        nvrhi::ShaderHandle vertexShader;
+        nvrhi::InputLayoutHandle layout;
+    };
+
+    xr_multimap<u64, nvrhi::SamplerHandle> m_samplers;
+    xr_multimap<u64, nvrhi::BindingLayoutHandle> m_bindingLayouts;
+    xr_multimap<u64, nvrhi::GraphicsPipelineHandle> m_graphicsPipelines;
+    xr_multimap<u64, nvrhi::ComputePipelineHandle> m_computePipelines;
     xr_multimap<u64, nvrhi::FramebufferHandle> m_framebuffers;
-    xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
+    xr_multimap<u64, InputLayoutEntry> m_inputLayouts;
     xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
     xr_map<u64, fg::BufferHandle> m_volatileCBs;
-    xr_map<u64, nvrhi::BindingSetHandle> m_bindingSets;
+    xr_multimap<u64, nvrhi::BindingSetHandle> m_bindingSets;
 
     nvrhi::SamplerHandle m_commonAnisoWrap;
     nvrhi::SamplerHandle m_commonLinearWrap;

@@ -26,7 +26,7 @@ static void InitializeResources(fg::RenderDevice* device, MotionVectorPassState&
     auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("motion_vector_fill");
     if (!csResult.handle) return;
 
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("MotionVector", *csResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
 
     nvrhi::ComputePipelineDesc pipeDesc;
     pipeDesc.CS = csResult.handle;

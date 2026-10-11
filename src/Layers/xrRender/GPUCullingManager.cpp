@@ -1419,7 +1419,7 @@ bool GPUCullingManager::EnsurePreskinPipeline(nvrhi::IDevice* nvDevice)
     }
 
     auto& cache = framegraph::GetPassResourceCache();
-    m_preskinLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_SkinnedPreskin", *csResult.reflection, nvDevice);
+    m_preskinLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     if (!m_preskinLayout) {
         m_preskinFailed = true;
         return false;
@@ -2168,7 +2168,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
     {
         auto& cache = framegraph::GetPassResourceCache();
         auto* debugCsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("particle_cull_debug", ".cs");
-        m_debugComputeLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugCompute", *debugCsRefl, nvDevice);
+        m_debugComputeLayout = cache.GetOrCreateBindingLayoutFromReflection(*debugCsRefl, nvDevice);
         if (!m_debugComputeLayout) {
             Msg("! [GPUCulling] Failed to create debug compute binding layout");
             return;
@@ -2189,7 +2189,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
         auto& cache = framegraph::GetPassResourceCache();
         auto* debugVsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cull_debug", ".vs");
         auto* debugPsRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cull_debug", ".ps");
-        m_debugGraphicsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_DebugGraphics", *debugVsRefl, *debugPsRefl, nvDevice);
+        m_debugGraphicsLayout = cache.GetOrCreateBindingLayoutFromReflection(*debugVsRefl, *debugPsRefl, nvDevice);
         if (!m_debugGraphicsLayout) {
             Msg("! [GPUCulling] Failed to create debug graphics binding layout");
             return;
@@ -3964,11 +3964,11 @@ bool GPUCullingManager::EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice)
     if (!instanceRefl || !nodeRefl || !leafRefl || !queueRefl || !argsRefl)
         return false;
 
-    m_clusterInstanceLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterInstance", *instanceRefl, nvDevice);
-    m_clusterNodeLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterNode", *nodeRefl, nvDevice);
-    m_clusterLeafLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterLeaf", *leafRefl, nvDevice);
-    m_clusterQueueArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterQueueArgs", *queueRefl, nvDevice);
-    m_clusterArgsLayout = cache.GetOrCreateBindingLayoutFromReflection("GPUCull_ClusterArgs", *argsRefl, nvDevice);
+    m_clusterInstanceLayout = cache.GetOrCreateBindingLayoutFromReflection(*instanceRefl, nvDevice);
+    m_clusterNodeLayout = cache.GetOrCreateBindingLayoutFromReflection(*nodeRefl, nvDevice);
+    m_clusterLeafLayout = cache.GetOrCreateBindingLayoutFromReflection(*leafRefl, nvDevice);
+    m_clusterQueueArgsLayout = cache.GetOrCreateBindingLayoutFromReflection(*queueRefl, nvDevice);
+    m_clusterArgsLayout = cache.GetOrCreateBindingLayoutFromReflection(*argsRefl, nvDevice);
     if (!m_clusterInstanceLayout || !m_clusterNodeLayout || !m_clusterLeafLayout
         || !m_clusterQueueArgsLayout || !m_clusterArgsLayout)
         return false;

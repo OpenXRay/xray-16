@@ -76,9 +76,9 @@ static void CreateGpuParticlePipelines(fg::RenderDevice* renderDevice, nvrhi::Fr
     state.distortReflection = loader->GetCachedReflection("bindless_particle_distort", ".ps");
     VERIFY(state.vertexReflection && state.setReflection && state.pixelReflection && state.distortReflection);
     auto& cache = GetPassResourceCache();
-    auto setLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Set", *vertex.reflection, *set.reflection, device);
-    auto layout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle", *vertex.reflection, *pixel.reflection, device);
-    auto distortLayout = cache.GetOrCreateBindingLayoutFromReflection("GpuParticle.Distort", *vertex.reflection, *distort.reflection, device);
+    auto setLayout = cache.GetOrCreateBindingLayoutFromReflection(*vertex.reflection, *set.reflection, device);
+    auto layout = cache.GetOrCreateBindingLayoutFromReflection(*vertex.reflection, *pixel.reflection, device);
+    auto distortLayout = cache.GetOrCreateBindingLayoutFromReflection(*vertex.reflection, *distort.reflection, device);
     auto* backend = renderDevice->GetBackend();
     VERIFY(backend && backend->GetBindlessLayout());
     nvrhi::GraphicsPipelineDesc pipeline;

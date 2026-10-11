@@ -187,7 +187,7 @@ void InitializeTrailResources(fg::RenderDevice* device, const nvrhi::Framebuffer
     samplerDesc.setMaxAnisotropy(8.0f);
     state.sampler = nvDevice->createSampler(samplerDesc);
 
-    state.layout = cache.GetOrCreateBindingLayoutFromReflection("TrailPass", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.VS = state.vs;

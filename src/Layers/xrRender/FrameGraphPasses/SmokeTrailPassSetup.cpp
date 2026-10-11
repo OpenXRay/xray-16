@@ -44,7 +44,7 @@ static void InitSmokeComputePipelines(fg::RenderDevice* device, SmokeTrailPassSt
     state.compactCS = compactResult.handle;
 
     {
-        state.emitLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Emit", *emitResult.reflection, nvDevice);
+        state.emitLayout = cache.GetOrCreateBindingLayoutFromReflection(*emitResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
         p.CS = emitResult.handle;
@@ -53,7 +53,7 @@ static void InitSmokeComputePipelines(fg::RenderDevice* device, SmokeTrailPassSt
     }
 
     {
-        state.simLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Simulate", *simResult.reflection, nvDevice);
+        state.simLayout = cache.GetOrCreateBindingLayoutFromReflection(*simResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
         p.CS = simResult.handle;
@@ -62,7 +62,7 @@ static void InitSmokeComputePipelines(fg::RenderDevice* device, SmokeTrailPassSt
     }
 
     {
-        state.compactLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Compact", *compactResult.reflection, nvDevice);
+        state.compactLayout = cache.GetOrCreateBindingLayoutFromReflection(*compactResult.reflection, nvDevice);
 
         nvrhi::ComputePipelineDesc p;
         p.CS = compactResult.handle;
@@ -114,7 +114,7 @@ static void InitSmokeDrawPipeline(
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
     auto& cache = GetPassResourceCache();
 
-    state.drawLayout = cache.GetOrCreateBindingLayoutFromReflection("SmokeTrail_Draw", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.drawLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::FramebufferInfo fbInfo;
     fbInfo.colorFormats.push_back(nvrhi::Format::RGBA16_FLOAT);

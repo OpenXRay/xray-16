@@ -330,15 +330,15 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     state.pageATPS = pageATPsResult.handle;
 
     auto& cache = GetPassResourceCache();
-    state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowBinCount", *countResult.reflection, nvDevice);
-    state.binReserveLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowBinReserve", *reserveResult.reflection, nvDevice);
-    state.binEmitLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowBinEmit", *emitResult.reflection, nvDevice);
-    state.binDynLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowBinDyn", *binResult.reflection, nvDevice);
-    state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowArgs", *argsResult.reflection, nvDevice);
-    state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowClear", *clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
-    state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowPage", *pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
-    state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowPageAT", *pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
-    state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowSkinPage", *skinVsResult.reflection, *pageATPsResult.reflection, nvDevice);
+    state.binCountLayout = cache.GetOrCreateBindingLayoutFromReflection(*countResult.reflection, nvDevice);
+    state.binReserveLayout = cache.GetOrCreateBindingLayoutFromReflection(*reserveResult.reflection, nvDevice);
+    state.binEmitLayout = cache.GetOrCreateBindingLayoutFromReflection(*emitResult.reflection, nvDevice);
+    state.binDynLayout = cache.GetOrCreateBindingLayoutFromReflection(*binResult.reflection, nvDevice);
+    state.argsLayout = cache.GetOrCreateBindingLayoutFromReflection(*argsResult.reflection, nvDevice);
+    state.clearLayout = cache.GetOrCreateBindingLayoutFromReflection(*clearVsResult.reflection, *clearPsResult.reflection, nvDevice);
+    state.pageLayout = cache.GetOrCreateBindingLayoutFromReflection(*pageVsResult.reflection, *pagePsResult.reflection, nvDevice);
+    state.pageATLayout = cache.GetOrCreateBindingLayoutFromReflection(*pageVsResult.reflection, *pageATPsResult.reflection, nvDevice);
+    state.skinPageLayout = cache.GetOrCreateBindingLayoutFromReflection(*skinVsResult.reflection, *pageATPsResult.reflection, nvDevice);
     if (!state.binCountLayout || !state.binReserveLayout || !state.binEmitLayout || !state.binDynLayout
         || !state.argsLayout || !state.clearLayout || !state.pageLayout || !state.pageATLayout || !state.skinPageLayout) {
         state.pipelinesFailed = true;
@@ -1092,7 +1092,7 @@ bool EnsureHudPipeline(fg::RenderDevice* device, LocalShadowState& state)
         state.hudPipelineFailed = true;
         return false;
     }
-    state.hudPageLayout = cache.GetOrCreateBindingLayoutFromReflection("LocalShadowHudPage", *vsRefl, *atRefl, nvDevice);
+    state.hudPageLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsRefl, *atRefl, nvDevice);
     if (!state.hudPageLayout) {
         state.hudPipelineFailed = true;
         return false;

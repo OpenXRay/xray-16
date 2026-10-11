@@ -123,7 +123,7 @@ static void InitializeResources(RenderDevice* device, ReSTIRGIPassState& state)
         auto result = shaderLoader->LoadComputeShader(shader);
         if (!result.handle || !result.reflection)
             return LightingFallback::ShaderUnavailable;
-        layout = cache.GetOrCreateBindingLayoutFromReflection(name, *result.reflection, nvDevice);
+        layout = cache.GetOrCreateBindingLayoutFromReflection(*result.reflection, nvDevice);
         if (!layout)
             return LightingFallback::PipelineUnavailable;
         nvrhi::ComputePipelineDesc desc;
@@ -213,7 +213,7 @@ static LightingFallback EnsureReconstructionResources(RenderDevice* device, ReST
             recon.readiness = LightingFallback::ShaderUnavailable;
             return recon.readiness;
         }
-        recon.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection("RTGI_Temporal", *result.reflection, nvDevice);
+        recon.temporalLayout = cache.GetOrCreateBindingLayoutFromReflection(*result.reflection, nvDevice);
         if (!recon.temporalLayout)
         {
             recon.readiness = LightingFallback::PipelineUnavailable;
@@ -245,7 +245,7 @@ static LightingFallback EnsureReconstructionResources(RenderDevice* device, ReST
                 recon.filterReadiness = LightingFallback::ShaderUnavailable;
                 return;
             }
-            layout = cache.GetOrCreateBindingLayoutFromReflection(name, *result.reflection, nvDevice);
+            layout = cache.GetOrCreateBindingLayoutFromReflection(*result.reflection, nvDevice);
             if (!layout)
             {
                 recon.filterReadiness = LightingFallback::PipelineUnavailable;

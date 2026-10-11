@@ -57,8 +57,7 @@ static void InitializeDecalResources(fg::RenderDevice* device, const nvrhi::Fram
     posAttr.elementStride = sizeof(Fvector);
     state.inputLayout = nvDevice->createInputLayout(&posAttr, 1, state.vs);
 
-    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "Decal", *vsResult.reflection, *psResult.reflection, nvDevice);
+    state.bindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
 
     nvrhi::GraphicsPipelineDesc pipeDesc;
     pipeDesc.setVertexShader(state.vs);

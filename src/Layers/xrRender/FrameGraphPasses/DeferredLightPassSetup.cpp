@@ -61,7 +61,7 @@ bool LoadComputePass(fg::RenderDevice* device, const char* shaderName, const cha
         return false;
     }
     outShader = csResult.handle;
-    outLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(cacheName, *csResult.reflection, nvDevice);
+    outLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
     if (!outLayout) {
         Msg("! [DeferredLight] Failed to create binding layout for %s", shaderName);
         return false;

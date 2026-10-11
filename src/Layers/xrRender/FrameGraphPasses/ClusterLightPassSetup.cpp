@@ -50,8 +50,7 @@ static void InitAssignPipeline(nvrhi::IDevice* nvDevice, ClusterLightPassState& 
         return;
     }
 
-    state.assignLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
-        "ClusterLightAssign", *csRefl, nvDevice);
+    state.assignLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*csRefl, nvDevice);
     if (!state.assignLayout)
         return;
 
@@ -89,8 +88,7 @@ static void InitCullPipeline(nvrhi::IDevice* nvDevice, ClusterLightPassState& st
         return;
     }
 
-    state.cullLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(
-        "ClusterLightCull", *csRefl, nvDevice);
+    state.cullLayout = GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*csRefl, nvDevice);
     if (!state.cullLayout)
         return;
 

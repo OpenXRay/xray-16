@@ -285,7 +285,7 @@ bool SkyEnvironment::EnsurePipelines()
         if (shader.handle && shader.reflection)
         {
             stage.shader = shaderName;
-            stage.layout = cache.GetOrCreateBindingLayoutFromReflection(shaderName, *shader.reflection, nvDevice);
+            stage.layout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, nvDevice);
             if (stage.layout)
             {
                 nvrhi::ComputePipelineDesc desc;

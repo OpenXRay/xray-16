@@ -144,8 +144,8 @@ bool EnsureExposurePipelines(fg::RenderDevice* device, DisplayPassState& state)
     }
 
     auto& cache = GetPassResourceCache();
-    state.histogramLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposureHistogram", *histogramShader.reflection, nvDevice);
-    state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection("ExposureAdapt", *adaptShader.reflection, nvDevice);
+    state.histogramLayout = cache.GetOrCreateBindingLayoutFromReflection(*histogramShader.reflection, nvDevice);
+    state.adaptLayout = cache.GetOrCreateBindingLayoutFromReflection(*adaptShader.reflection, nvDevice);
     if (state.histogramLayout && state.adaptLayout)
     {
         nvrhi::ComputePipelineDesc histogramDesc;
@@ -192,8 +192,7 @@ bool EnsureOutputPipeline(fg::RenderDevice* device, nvrhi::Format outputFormat, 
     }
 
     auto& cache = GetPassResourceCache();
-    state.outputLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "DisplayOutput", *vertexShader.reflection, *pixelShader.reflection, nvDevice);
+    state.outputLayout = cache.GetOrCreateBindingLayoutFromReflection(*vertexShader.reflection, *pixelShader.reflection, nvDevice);
     if (!state.outputLayout)
         return false;
 

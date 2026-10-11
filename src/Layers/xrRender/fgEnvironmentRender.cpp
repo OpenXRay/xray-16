@@ -202,8 +202,7 @@ void FGEnvironmentRender::InitSkyResources()
     m_skyPS = psResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
-    m_skyBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "FGEnv_Sky", *vsResult.reflection, *psResult.reflection, m_device);
+    m_skyBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, m_device);
     R_ASSERT2(m_skyBindingLayout, "FGEnv: createBindingLayout failed");
 
     nvrhi::VertexAttributeDesc vertexAttribs[] = {
@@ -224,7 +223,7 @@ void FGEnvironmentRender::InitSkyResources()
             .setOffset(offsetof(passes::SkyVertex, texcoord0))
             .setElementStride(sizeof(passes::SkyVertex)),
     };
-    m_skyInputLayout = cache.GetOrCreateInputLayout("FGEnv_Sky", vertexAttribs, 3, m_skyVS, m_device);
+    m_skyInputLayout = cache.GetOrCreateInputLayout(vertexAttribs, 3, m_skyVS, m_device);
 
     nvrhi::RenderState renderState;
     renderState.blendState.targets[0].setBlendEnable(false);
@@ -384,8 +383,7 @@ void FGEnvironmentRender::InitSunResources()
     m_sunPS = psResult.handle;
 
     auto& cache = framegraph::GetPassResourceCache();
-    m_sunBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(
-        "FGEnv_Sun", *vsResult.reflection, *psResult.reflection, m_device);
+    m_sunBindingLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, m_device);
     R_ASSERT(m_sunBindingLayout);
 
     nvrhi::VertexAttributeDesc attribs[] = {
@@ -405,7 +403,7 @@ void FGEnvironmentRender::InitSunResources()
             .setOffset(offsetof(passes::SunVertex, u))
             .setElementStride(sizeof(passes::SunVertex)),
     };
-    m_sunInputLayout = cache.GetOrCreateInputLayout("FGEnv_Sun", attribs, std::size(attribs), m_sunVS, m_device);
+    m_sunInputLayout = cache.GetOrCreateInputLayout(attribs, std::size(attribs), m_sunVS, m_device);
 
     nvrhi::RenderState renderState;
     renderState.blendState.targets[0].setBlendEnable(true);

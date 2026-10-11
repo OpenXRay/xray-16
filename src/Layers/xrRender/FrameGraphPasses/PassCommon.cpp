@@ -25,7 +25,7 @@ void RecordGeometryShadowDraw(nvrhi::ICommandList* cmd, nvrhi::IDevice* device,
     {
         auto shader = loader->LoadComputeShader("geometry_shadow_accept", entry);
         R_ASSERT(shader.handle && shader.reflection);
-        auto layout = cache.GetOrCreateBindingLayoutFromReflection(entry, *shader.reflection, device);
+        auto layout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, device);
         R_ASSERT(layout);
         nvrhi::ComputePipelineDesc desc;
         desc.CS = shader.handle;
