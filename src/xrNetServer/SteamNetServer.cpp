@@ -191,10 +191,12 @@ void SteamNetServer::PollIncomingMessages()
             && m_ping->sign1 == 0x12071980
             && m_ping->sign2 == 0x26111975)
 		{
-			// ping - save server time and reply
-			m_ping->dwTime_Server = TimerAsync(device_timer);
-			ClientID ID; ID.set(m_sender);
-			BaseServer::SendTo_Buf(ID, m_data, m_size, net_flags(FALSE, FALSE, TRUE, TRUE));
+			if (m_size == sizeof(MSYS_PING))
+			{
+				m_ping->dwTime_Server = TimerAsync(device_timer);
+				ClientID ID; ID.set(m_sender);
+				BaseServer::SendTo_Buf(ID, m_data, m_size, net_flags(FALSE, FALSE, TRUE, TRUE));
+			}
 		}
 		else if (m_size == sizeof(MSYS_CLIENT_DATA) && m_ping->sign1 == 0x02281488 && m_ping->sign2 == 0x01488228)
 		{ // client data message
