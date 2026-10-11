@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PHShell.h"
+#include <cfloat> // Для FLT_MAX
 
 class CPHSplitedShell : public CPHShell
 {
@@ -11,7 +12,6 @@ protected:
     virtual void get_spatial_params();
     virtual void DisableObject();
 
-private:
 public:
-    CPHSplitedShell() { m_max_AABBradius = dInfinity; }
+    CPHSplitedShell() { m_max_AABBradius = FLT_MAX; }
 };
