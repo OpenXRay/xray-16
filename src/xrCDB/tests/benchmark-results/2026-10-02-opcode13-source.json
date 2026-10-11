@@ -1,0 +1,792 @@
+{
+    "revision":  "01faa139995f6afdc66addb48065f053d38f397e",
+    "verified_git_blob_hashes":  true,
+    "files":  [
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceAABB.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "0c5b8d1406e7048fabf0892c75b29f71b8fac1aa",
+                      "size":  16239,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/0c5b8d1406e7048fabf0892c75b29f71b8fac1aa"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceAABB.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "f71d7e9efded54884f4c20ca7d25cd8733868ff1",
+                      "size":  25072,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/f71d7e9efded54884f4c20ca7d25cd8733868ff1"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceAxes.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "842b55e0218be32201d776eb90faf105a3616cf5",
+                      "size":  1466,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/842b55e0218be32201d776eb90faf105a3616cf5"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceBoundingSphere.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "945d38cf89591df3b1dfe50d16ba59808c1b1f19",
+                      "size":  6918,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/945d38cf89591df3b1dfe50d16ba59808c1b1f19"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceContainer.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8a4a57022394c8babc5b154c1406dd0bef1cc988",
+                      "size":  13978,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8a4a57022394c8babc5b154c1406dd0bef1cc988"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceContainer.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d726c2a29aab490ab23aef2d77ca8430fbf2af51",
+                      "size":  9537,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d726c2a29aab490ab23aef2d77ca8430fbf2af51"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceFPU.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "e38a1de3f1d2be083cef597360cb2cfa13264f16",
+                      "size":  9423,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/e38a1de3f1d2be083cef597360cb2cfa13264f16"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceHPoint.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "707c07d83c4c67583cffb859a66c24375d62f70b",
+                      "size":  3947,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/707c07d83c4c67583cffb859a66c24375d62f70b"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceHPoint.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8ecce40fe2dcdfce74242b0019338180192ae7a5",
+                      "size":  7407,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8ecce40fe2dcdfce74242b0019338180192ae7a5"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceIndexedTriangle.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "5cbe6b922ba4beb7272a8d9e47ef54e6447c7a00",
+                      "size":  24204,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/5cbe6b922ba4beb7272a8d9e47ef54e6447c7a00"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceIndexedTriangle.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "7ceccef8fc4a6c3be694ba2a30bfbfc59539f647",
+                      "size":  3265,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/7ceccef8fc4a6c3be694ba2a30bfbfc59539f647"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceLSS.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "bd260c1e599d7f4ec8274c33fa76d59f5af72fae",
+                      "size":  3953,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/bd260c1e599d7f4ec8274c33fa76d59f5af72fae"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceMatrix3x3.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "af56d3e5c88a0e4c5d44cf4f7171ca2d57159c31",
+                      "size":  1843,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/af56d3e5c88a0e4c5d44cf4f7171ca2d57159c31"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceMatrix3x3.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "76747f9a52fed2a956d88d34f131c9e60847ed9c",
+                      "size":  20500,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/76747f9a52fed2a956d88d34f131c9e60847ed9c"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceMatrix4x4.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "a43f8c44030880b03ae2243d14b8ac3bac40406f",
+                      "size":  9187,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/a43f8c44030880b03ae2243d14b8ac3bac40406f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceMatrix4x4.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "0a2f0820cf130bfdf26ceef88f513045ec85ba56",
+                      "size":  21253,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/0a2f0820cf130bfdf26ceef88f513045ec85ba56"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceMemoryMacros.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "65691d210a5211a9ac0372e0444d7f56643be7f0",
+                      "size":  4052,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/65691d210a5211a9ac0372e0444d7f56643be7f0"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceOBB.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d080f940a96b6b075146d081ce189eaee0c01145",
+                      "size":  12493,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d080f940a96b6b075146d081ce189eaee0c01145"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceOBB.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d6cf43e061ea713ad5ed159cf426abab11141ea7",
+                      "size":  9728,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d6cf43e061ea713ad5ed159cf426abab11141ea7"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePairs.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "2c09b929752f835cd4505f6be5efb3387f5fa8c0",
+                      "size":  1787,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/2c09b929752f835cd4505f6be5efb3387f5fa8c0"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePlane.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "394b31bf8247b7e3ef35a3f85b413d09ba9190f0",
+                      "size":  2036,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/394b31bf8247b7e3ef35a3f85b413d09ba9190f0"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePlane.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "4d470814159f7d588ac82e11d1ec7bc68a71e4ef",
+                      "size":  4982,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/4d470814159f7d588ac82e11d1ec7bc68a71e4ef"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePoint.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "e715055b8a832d4d3719ac27bb88d0d3ada3eebd",
+                      "size":  7428,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/e715055b8a832d4d3719ac27bb88d0d3ada3eebd"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePoint.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "dd8d28ece8ebdd96625e711cc25370d1f0935f43",
+                      "size":  19633,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/dd8d28ece8ebdd96625e711cc25370d1f0935f43"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IcePreprocessor.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "b2da6299bc732ad35c255463770c91fc34fb37fe",
+                      "size":  3627,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/b2da6299bc732ad35c255463770c91fc34fb37fe"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRandom.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "256c9e244134dee0e03d1129eef14423fc866d03",
+                      "size":  1116,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/256c9e244134dee0e03d1129eef14423fc866d03"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRandom.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "4337bfad7c712c6dd9f8e9dc10727e718c8719ee",
+                      "size":  1576,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/4337bfad7c712c6dd9f8e9dc10727e718c8719ee"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRay.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "6cf0330bc507db8afcd80f3b2dc43a064d745548",
+                      "size":  2496,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/6cf0330bc507db8afcd80f3b2dc43a064d745548"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRay.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "0268287672deff43d1be43ebe8eab60c92086c1e",
+                      "size":  4688,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/0268287672deff43d1be43ebe8eab60c92086c1e"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRevisitedRadix.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "3e351da941da9f754cf53af30c7a99dc4533e5d4",
+                      "size":  22018,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/3e351da941da9f754cf53af30c7a99dc4533e5d4"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceRevisitedRadix.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "3bdfc2214c30fd29d2816902180988d04faa446f",
+                      "size":  2586,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/3bdfc2214c30fd29d2816902180988d04faa446f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceSegment.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "cd9ceb758cb55231125bcbc4e2e4d594d870fc87",
+                      "size":  1928,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/cd9ceb758cb55231125bcbc4e2e4d594d870fc87"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceSegment.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8d66322689b983a85a349be220190f53dd964f5f",
+                      "size":  2626,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8d66322689b983a85a349be220190f53dd964f5f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceTriList.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "b2b6ecf6425a6474cd13b93afcd15d55cf24d5eb",
+                      "size":  2211,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/b2b6ecf6425a6474cd13b93afcd15d55cf24d5eb"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceTriangle.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "191b863e5c5302fe8acf84559db6cf62ed871fd1",
+                      "size":  12387,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/191b863e5c5302fe8acf84559db6cf62ed871fd1"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceTriangle.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "a984db835a3b7c2f33ddeec02564e09b41e7090f",
+                      "size":  2484,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/a984db835a3b7c2f33ddeec02564e09b41e7090f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceTypes.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "a2a7458d5f950d2d244650ac7ae33be6fd6364ce",
+                      "size":  7756,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/a2a7458d5f950d2d244650ac7ae33be6fd6364ce"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceUtils.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "29b6c57d762bd83d8f89ee5091b12096a19418a7",
+                      "size":  1777,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/29b6c57d762bd83d8f89ee5091b12096a19418a7"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Ice/IceUtils.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "10cecdfbc29c7a1e39da2926481b1b12d1e28260",
+                      "size":  10912,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/10cecdfbc29c7a1e39da2926481b1b12d1e28260"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_AABBCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "2fa36e5e7fcffbcc074a5c71f37373b30957d0a4",
+                      "size":  26018,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/2fa36e5e7fcffbcc074a5c71f37373b30957d0a4"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_AABBCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8c378c5784937e649ff4dfa701d5a4a1a333e541",
+                      "size":  4413,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8c378c5784937e649ff4dfa701d5a4a1a333e541"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_AABBTree.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "7c6f758f0a03ddee02e2febe7dfaa100a2c328b5",
+                      "size":  22568,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/7c6f758f0a03ddee02e2febe7dfaa100a2c328b5"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_AABBTree.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "19d0c11fb5a5fe5db0032c06b7c2bdd96af7c802",
+                      "size":  8211,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/19d0c11fb5a5fe5db0032c06b7c2bdd96af7c802"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_BaseModel.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "9520d9ef3f63dca76847d344819639f3414fd518",
+                      "size":  6233,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/9520d9ef3f63dca76847d344819639f3414fd518"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_BaseModel.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "c6072dbd5b4a8eddee2a4b28421e41ce8e9c84f3",
+                      "size":  10540,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/c6072dbd5b4a8eddee2a4b28421e41ce8e9c84f3"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_BoxBoxOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8e9a71d8375b050d4b69bc6655fd76710fde857c",
+                      "size":  8187,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8e9a71d8375b050d4b69bc6655fd76710fde857c"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_BoxPruning.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "4f5fe8de4f871ed17d02a5c559a28c7f0a974f10",
+                      "size":  13536,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/4f5fe8de4f871ed17d02a5c559a28c7f0a974f10"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_BoxPruning.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "5d0e20cb5e5105668a4d84f823c5fdb6e376919c",
+                      "size":  1986,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/5d0e20cb5e5105668a4d84f823c5fdb6e376919c"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Collider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "f41fc362c9aab9259ee0809676096a3bff42eae7",
+                      "size":  2829,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/f41fc362c9aab9259ee0809676096a3bff42eae7"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Collider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d718e0298f081943db1d5c2bd073d6002715ea20",
+                      "size":  10397,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d718e0298f081943db1d5c2bd073d6002715ea20"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Common.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "5b9a9c8021436ed9ba9327aa51da1601a6ae029c",
+                      "size":  2730,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/5b9a9c8021436ed9ba9327aa51da1601a6ae029c"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Common.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "1928f15c7b11ce66a6009af80b8cc3c9ea82cbca",
+                      "size":  4816,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/1928f15c7b11ce66a6009af80b8cc3c9ea82cbca"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_HybridModel.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "30f941aa050f9b3211a1d3f58826252498e8abba",
+                      "size":  16507,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/30f941aa050f9b3211a1d3f58826252498e8abba"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_HybridModel.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "c7eb59d4a0e07c6d70a26276719d569f9f6ed515",
+                      "size":  6239,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/c7eb59d4a0e07c6d70a26276719d569f9f6ed515"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_IceHook.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "1d50b8accc6d25a0483cf9af476308f237402259",
+                      "size":  1820,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/1d50b8accc6d25a0483cf9af476308f237402259"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_LSSAABBOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "562a667f2e6d347e077f5bd186c3df0c0a330858",
+                      "size":  16731,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/562a667f2e6d347e077f5bd186c3df0c0a330858"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_LSSCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "69f1a3f9ecef6cdd0ab90c181954ae5abbaf02e8",
+                      "size":  27467,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/69f1a3f9ecef6cdd0ab90c181954ae5abbaf02e8"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_LSSCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "e30d3ebc69516d5289e77aa47c07dfc625b8474b",
+                      "size":  5096,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/e30d3ebc69516d5289e77aa47c07dfc625b8474b"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_LSSTriOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "7fb595af7045f4596b696adc72009509170cb41b",
+                      "size":  21667,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/7fb595af7045f4596b696adc72009509170cb41b"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_MeshInterface.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "e7c9b1ac5869c33c4292a9e1c7829a417c375acc",
+                      "size":  14794,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/e7c9b1ac5869c33c4292a9e1c7829a417c375acc"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_MeshInterface.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d006a858672ace6b9afc04523438ae645471506d",
+                      "size":  19660,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d006a858672ace6b9afc04523438ae645471506d"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Model.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "2fd0da4b39b48da9947ea136ad21ff5aa7f810cb",
+                      "size":  8620,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/2fd0da4b39b48da9947ea136ad21ff5aa7f810cb"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Model.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "c8b5c4224d1c968d75d254737cd8779d6a77617a",
+                      "size":  3628,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/c8b5c4224d1c968d75d254737cd8779d6a77617a"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_OBBCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "ddc50ba63f0880fa2740437852705a70042d4190",
+                      "size":  30012,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/ddc50ba63f0880fa2740437852705a70042d4190"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_OBBCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "35d9710e7ea12a04e97eb31368dab58188902798",
+                      "size":  7025,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/35d9710e7ea12a04e97eb31368dab58188902798"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_OptimizedTree.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "9de5c7411b889e80dda912eac34a4cc1d755871a",
+                      "size":  32690,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/9de5c7411b889e80dda912eac34a4cc1d755871a"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_OptimizedTree.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "81d45ffd093679302df8805a5db000707fed32eb",
+                      "size":  9880,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/81d45ffd093679302df8805a5db000707fed32eb"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Picking.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "3b537741333f8002aad8083277b8e2b9eb53c8c3",
+                      "size":  5293,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/3b537741333f8002aad8083277b8e2b9eb53c8c3"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Picking.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "d22fa38ac814c9ef6accbad70f35c805def84afe",
+                      "size":  2092,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/d22fa38ac814c9ef6accbad70f35c805def84afe"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_PlanesAABBOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "34ae5de05d1824697b4d0057d141452cc511a36f",
+                      "size":  2725,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/34ae5de05d1824697b4d0057d141452cc511a36f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_PlanesCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "b83fd5c00a9190f5ebeaead4e09d9f7195f729ce",
+                      "size":  26375,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/b83fd5c00a9190f5ebeaead4e09d9f7195f729ce"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_PlanesCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "e62ed53b1ea24f8c8b4face6f2ab449b2ca705e4",
+                      "size":  6003,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/e62ed53b1ea24f8c8b4face6f2ab449b2ca705e4"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_PlanesTriOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "70223ffe29f72c34a2f7b926ea46e510d90bcdba",
+                      "size":  1492,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/70223ffe29f72c34a2f7b926ea46e510d90bcdba"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_RayAABBOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "fcf33230b0e27e2839142d92c63b7518f04ab26a",
+                      "size":  4573,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/fcf33230b0e27e2839142d92c63b7518f04ab26a"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_RayCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "050a15a8fe81c05d1402ff77d297a5a97c8985c8",
+                      "size":  31125,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/050a15a8fe81c05d1402ff77d297a5a97c8985c8"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_RayCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "a2b706113267b8b373b0aa55c9b7c5750cbb5e4d",
+                      "size":  12707,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/a2b706113267b8b373b0aa55c9b7c5750cbb5e4d"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_RayTriOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "4e8c5b281b4173b45cdcccd63f8b981a691e39c2",
+                      "size":  3852,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/4e8c5b281b4173b45cdcccd63f8b981a691e39c2"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_Settings.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "dfb5a1d16afae0ebec19e4974d4a05edac07b6c2",
+                      "size":  3539,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/dfb5a1d16afae0ebec19e4974d4a05edac07b6c2"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SphereAABBOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "2600820a675592ac06d31b65951eebef86fe9d11",
+                      "size":  2462,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/2600820a675592ac06d31b65951eebef86fe9d11"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SphereCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "ef46e9e3cc2e859f24bf23b1283f12aaceb71c88",
+                      "size":  28841,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/ef46e9e3cc2e859f24bf23b1283f12aaceb71c88"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SphereCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "7e254c670c094e603f1e867a5c9eef33af693d30",
+                      "size":  5012,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/7e254c670c094e603f1e867a5c9eef33af693d30"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SphereTriOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "22ede26d83165bf0645d34a4bc731a70397e324d",
+                      "size":  4680,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/22ede26d83165bf0645d34a4bc731a70397e324d"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SweepAndPrune.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "b328da2ad76c5251795cd4b1a498633b7c585f2c",
+                      "size":  17280,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/b328da2ad76c5251795cd4b1a498633b7c585f2c"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_SweepAndPrune.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "48a3cd77939e8627c6dee73a83b31ea15108fd3e",
+                      "size":  3642,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/48a3cd77939e8627c6dee73a83b31ea15108fd3e"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TreeBuilders.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "9983babb4f4e326116a95fe041c88b0948b5ed55",
+                      "size":  11972,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/9983babb4f4e326116a95fe041c88b0948b5ed55"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TreeBuilders.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "41906d35977f59295c6d6b1ff88959c15e0245c2",
+                      "size":  9024,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/41906d35977f59295c6d6b1ff88959c15e0245c2"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TreeCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "b8e07a05512b92cf85a0880b3154def71669cf1f",
+                      "size":  39856,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/b8e07a05512b92cf85a0880b3154def71669cf1f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TreeCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "ed270f4bb7e4d0b204d4f882c14de5f0a23d5842",
+                      "size":  14317,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/ed270f4bb7e4d0b204d4f882c14de5f0a23d5842"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TriBoxOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "5d164db1338858cafa002c3201276638cf5d7d66",
+                      "size":  11692,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/5d164db1338858cafa002c3201276638cf5d7d66"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TriTriOverlap.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "6e198d0ba338570e3a6b9be5b9ab8cc243be5e88",
+                      "size":  8560,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/6e198d0ba338570e3a6b9be5b9ab8cc243be5e88"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_TriTriOverlapGilvan.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "8ba8d8136998f3f5307605cbcc213b6be50d6519",
+                      "size":  5668,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/8ba8d8136998f3f5307605cbcc213b6be50d6519"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_VolumeCollider.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "00afbd2ab73d152ae02db7c9f9c0d84d6f34fcab",
+                      "size":  4715,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/00afbd2ab73d152ae02db7c9f9c0d84d6f34fcab"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/OPC_VolumeCollider.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "90398e5386b13813c75cde2c9e9b439e013340b6",
+                      "size":  7276,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/90398e5386b13813c75cde2c9e9b439e013340b6"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Opcode.cpp",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "c3b3ec7419058906b4a120512490f4635ed1f8ac",
+                      "size":  2718,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/c3b3ec7419058906b4a120512490f4635ed1f8ac"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/Opcode.h",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "3b267bd98310127ae37403ff25f9d1cbd5dc8d1f",
+                      "size":  3738,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/3b267bd98310127ae37403ff25f9d1cbd5dc8d1f"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/ReadMe.txt",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "bb82eb72e9326ffa65e956468ffc5fd33dc6dc0d",
+                      "size":  8588,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/bb82eb72e9326ffa65e956468ffc5fd33dc6dc0d"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/TemporalCoherence.txt",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "fb8593188de86e04e715704a70320074bac11dac",
+                      "size":  1265,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/fb8593188de86e04e715704a70320074bac11dac"
+                  },
+                  {
+                      "path":  "ogsr_engine/xrCDB/OpCoDe/scales TODO.txt",
+                      "mode":  "100644",
+                      "type":  "blob",
+                      "sha":  "900cf1df0f95b5d060351b89d6c667601d297125",
+                      "size":  9027,
+                      "url":  "https://api.github.com/repos/OGSR/OGSR-Engine/git/blobs/900cf1df0f95b5d060351b89d6c667601d297125"
+                  }
+              ],
+    "subdirectory":  "ogsr_engine/xrCDB/OpCoDe/",
+    "repository":  "OGSR/OGSR-Engine"
+}
