@@ -82,6 +82,7 @@ private:
 struct ResourceNode {
     ResourceDesc desc;
     VirtualResourceHandle handle;
+    u32 version = 0;
 
     PassNode* lastWriter = nullptr;
     u32 readersHead = INVALID_INDEX;

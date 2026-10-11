@@ -705,8 +705,7 @@ void GpuParticleManager::SetupSimulationPasses(framegraph::FrameGraph& graph,nvr
         desc.isTransient = false;
         desc.debugName = name;
         auto resource = graph.ImportBuffer(name,buffer,desc);
-        graph.PassReadWrite(pass,resource,desc.isUAV ? framegraph::ResourceState::UnorderedAccess : framegraph::ResourceState::ShaderResource);
-        return resource;
+        return graph.PassReadWrite(pass,resource,desc.isUAV ? framegraph::ResourceState::UnorderedAccess : framegraph::ResourceState::ShaderResource);
     };
     auto& draw = m_impl->draw;
     draw.particleResource = import("gpu_papi_particles",draw.particles);

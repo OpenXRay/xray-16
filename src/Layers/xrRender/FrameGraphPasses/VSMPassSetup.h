@@ -178,20 +178,9 @@ struct VSMState {
     Fmatrix hudViewProj;
     float hudTexelWorld = 0.0f;
     float hudDepthRange = 1.0f;
-    framegraph::VirtualResourceHandle fgHudMap;
     u32 dynCasters = 0;
     u32 dynInstances = 0;
     u32 dynMaxPages = 0;
-    framegraph::VirtualResourceHandle fgNeeded;
-    framegraph::VirtualResourceHandle fgDirtyList;
-    framegraph::VirtualResourceHandle fgGeometryDirty;
-    VSMCacheResources fgCache;
-    framegraph::VirtualResourceHandle fgDrawClear;
-    framegraph::VirtualResourceHandle fgPageArgs[kVSMStreamCount];
-    framegraph::VirtualResourceHandle fgAtlas;
-    framegraph::VirtualResourceHandle fgDynAtlas;
-    framegraph::VirtualResourceHandle fgDynTable;
-    framegraph::VirtualResourceHandle fgDynArgs;
     nvrhi::TextureHandle mask[2];
     u32 maskWidth = 0;
     u32 maskHeight = 0;
@@ -312,6 +301,20 @@ struct VSMOutput {
     bool active = false;
 };
 
+struct VSMFrame {
+    framegraph::VirtualResourceHandle needed;
+    framegraph::VirtualResourceHandle dirtyList;
+    framegraph::VirtualResourceHandle geometryDirty;
+    VSMCacheResources cache;
+    framegraph::VirtualResourceHandle drawClear;
+    framegraph::VirtualResourceHandle pageArgs[kVSMStreamCount];
+    framegraph::VirtualResourceHandle atlas;
+    framegraph::VirtualResourceHandle dynAtlas;
+    framegraph::VirtualResourceHandle dynTable;
+    framegraph::VirtualResourceHandle dynArgs;
+    framegraph::VirtualResourceHandle hudMap;
+};
+
 void InvalidateVSMCache(VSMState& state);
 void SuspendVSM(nvrhi::IDevice* device, VSMState& state);
 bool VSMLoadScreenFrozen();
@@ -333,6 +336,7 @@ VSMOutput setupVSMPasses(
     u32 width,
     u32 height,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler);
 
 void setupVSMAtlasPasses(
@@ -342,6 +346,7 @@ void setupVSMAtlasPasses(
     const VSMDrawConfig& config,
     const VSMDynConfig& dynConfig,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler);
 
 framegraph::VirtualResourceHandle setupVSMResolvePasses(
@@ -352,6 +357,7 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
     u32 width,
     u32 height,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler,
     framegraph::VirtualResourceHandle* outDebugView);
 

@@ -433,7 +433,7 @@ public:
     void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
     RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
 
-    void SetupDebugVisualizationPass(
+    framegraph::VirtualResourceHandle SetupDebugVisualizationPass(
         framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
         framegraph::VirtualResourceHandle colorTarget,

@@ -2442,22 +2442,12 @@ VSMOutput setupVSMPasses(
     u32 width,
     u32 height,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
     VSMOutput out;
+    frame = VSMFrame();
     if (state) {
-        state->fgNeeded = framegraph::VirtualResourceHandle();
-        state->fgDirtyList = framegraph::VirtualResourceHandle();
-        state->fgDrawClear = framegraph::VirtualResourceHandle();
-        state->fgGeometryDirty = framegraph::VirtualResourceHandle();
-        state->fgCache = {};
-        for (u32 i = 0; i < kVSMStreamCount; ++i)
-            state->fgPageArgs[i] = framegraph::VirtualResourceHandle();
-        state->fgAtlas = framegraph::VirtualResourceHandle();
-        state->fgDynAtlas = framegraph::VirtualResourceHandle();
-        state->fgDynTable = framegraph::VirtualResourceHandle();
-        state->fgDynArgs = framegraph::VirtualResourceHandle();
-        state->fgHudMap = framegraph::VirtualResourceHandle();
         state->dynActive = false;
         state->binRecorded = false;
         state->dynRendered = false;
@@ -2661,13 +2651,13 @@ VSMOutput setupVSMPasses(
         });
 
     out.active = true;
-    state->fgNeeded = markData.needed;
-    state->fgDirtyList = binData.dirtyList;
-    state->fgDrawClear = binData.drawClear;
-    state->fgGeometryDirty = binData.geometryDirty;
-    state->fgCache = binData.cache;
+    frame.needed = markData.needed;
+    frame.dirtyList = binData.dirtyList;
+    frame.drawClear = binData.drawClear;
+    frame.geometryDirty = binData.geometryDirty;
+    frame.cache = binData.cache;
     for (u32 i = 0; i < kVSMStreamCount; ++i)
-        state->fgPageArgs[i] = binData.pageArgs[i];
+        frame.pageArgs[i] = binData.pageArgs[i];
 
     const bool dyn = dynConfig.gpuCulling && state->dynAtlas && state->dynPageTable && state->dynClearArgs
         && (dynConfig.gpuCulling->GetDynamicClusterRefCount() > 0 || dynConfig.gpuCulling->GetSkinnedEntryCount() > 0);
@@ -2713,8 +2703,8 @@ VSMOutput setupVSMPasses(
             ExecuteDynBin(ctx, fg, data);
         });
 
-    state->fgDynTable = allocData.dynTable;
-    state->fgDynArgs = dynBinData.dynArgs;
+    frame.dynTable = allocData.dynTable;
+    frame.dynArgs = dynBinData.dynArgs;
     state->dynActive = true;
     return out;
 }
@@ -2726,9 +2716,10 @@ void setupVSMAtlasPasses(
     const VSMDrawConfig& config,
     const VSMDynConfig& dynConfig,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    if (!state || !device || !state->active || !state->fgDirtyList.is_valid())
+    if (!state || !device || !state->active || !frame.dirtyList.is_valid())
         return;
 
     ResourceDesc atlasDesc;
@@ -2752,23 +2743,23 @@ void setupVSMAtlasPasses(
             RenderPassBuilder passBuilder(builder, passHandle);
             DeclareGeometryReads(passBuilder, config.geometryResources);
             data.atlas = passBuilder.write(atlasHandle, ResourceState::DepthStencilWrite);
-            data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
-            data.drawClear = passBuilder.read(state->fgDrawClear, ResourceState::IndirectArgument);
-            data.geometryDirty = passBuilder.readWrite(state->fgGeometryDirty, ResourceState::UnorderedAccess);
-            data.cache = state->fgCache;
+            data.dirtyList = passBuilder.read(frame.dirtyList, ResourceState::ShaderResource);
+            data.drawClear = passBuilder.read(frame.drawClear, ResourceState::IndirectArgument);
+            data.geometryDirty = passBuilder.readWrite(frame.geometryDirty, ResourceState::UnorderedAccess);
+            data.cache = frame.cache;
             data.cache.pageTable = passBuilder.readWrite(data.cache.pageTable, ResourceState::UnorderedAccess);
             passBuilder.read(data.cache.pageList, ResourceState::ShaderResource);
             for (u32 i = 0; i < kVSMStreamCount; ++i)
-                data.pageArgs[i] = passBuilder.read(state->fgPageArgs[i], ResourceState::IndirectArgument);
+                data.pageArgs[i] = passBuilder.read(frame.pageArgs[i], ResourceState::IndirectArgument);
         },
         [](const VSMAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteAtlas(ctx, fg, data);
         });
 
     fg.GetRTRegistry().RegisterRT("rt_VSMAtlas", atlasData.atlas);
-    state->fgAtlas = atlasData.atlas;
-    state->fgGeometryDirty = atlasData.geometryDirty;
-    state->fgCache = atlasData.cache;
+    frame.atlas = atlasData.atlas;
+    frame.geometryDirty = atlasData.geometryDirty;
+    frame.cache = atlasData.cache;
 
     if (!state->dynActive)
         return;
@@ -2794,14 +2785,14 @@ void setupVSMAtlasPasses(
             RenderPassBuilder passBuilder(builder, passHandle);
             DeclareGeometryReads(passBuilder, dynConfig.geometryResources);
             data.dynAtlas = passBuilder.write(dynAtlasHandle, ResourceState::DepthStencilWrite);
-            data.dynArgs = passBuilder.read(state->fgDynArgs, ResourceState::IndirectArgument);
+            data.dynArgs = passBuilder.read(frame.dynArgs, ResourceState::IndirectArgument);
         },
         [](const VSMDynAtlasData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteDynAtlas(ctx, fg, data);
         });
 
     fg.GetRTRegistry().RegisterRT("rt_VSMAtlasDyn", dynAtlasData.dynAtlas);
-    state->fgDynAtlas = dynAtlasData.dynAtlas;
+    frame.dynAtlas = dynAtlasData.dynAtlas;
 
     ResourceDesc hudDesc;
     hudDesc.type = ResourceDesc::Type::Texture2D;
@@ -2831,7 +2822,7 @@ void setupVSMAtlasPasses(
             ExecuteHud(ctx, fg, data);
         });
     fg.GetRTRegistry().RegisterRT("rt_VSMHud", hudData.hudMap);
-    state->fgHudMap = hudData.hudMap;
+    frame.hudMap = hudData.hudMap;
 }
 
 framegraph::VirtualResourceHandle setupVSMResolvePasses(
@@ -2842,12 +2833,13 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
     u32 width,
     u32 height,
     VSMState* state,
+    VSMFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler,
     framegraph::VirtualResourceHandle* outDebugView)
 {
     if (outDebugView)
         *outDebugView = VirtualResourceHandle{};
-    if (!state || !device || !state->active || !depth.is_valid() || !material.is_valid() || !state->fgAtlas.is_valid())
+    if (!state || !device || !state->active || !depth.is_valid() || !material.is_valid() || !frame.atlas.is_valid())
         return VirtualResourceHandle{};
 
     state->maskSlot = (state->maskSlot + 1) % 2;
@@ -2882,8 +2874,8 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             RenderPassBuilder passBuilder(builder, passHandle);
             data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
             data.material = passBuilder.read(material, ResourceState::ShaderResource);
-            data.atlas = passBuilder.read(state->fgAtlas, ResourceState::ShaderResource);
-            data.cache = state->fgCache;
+            data.atlas = passBuilder.read(frame.atlas, ResourceState::ShaderResource);
+            data.cache = frame.cache;
             passBuilder.read(data.cache.pageTable, ResourceState::ShaderResource);
             passBuilder.read(data.cache.slotPivot, ResourceState::ShaderResource);
             passBuilder.read(data.cache.slotSun, ResourceState::ShaderResource);
@@ -2892,14 +2884,14 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
             if (state->cachedDemandEnabled)
             {
                 passBuilder.read(data.cache.physTile, ResourceState::CopySource);
-                data.geometryDirty = passBuilder.read(state->fgGeometryDirty, ResourceState::CopySource);
+                data.geometryDirty = passBuilder.read(frame.geometryDirty, ResourceState::CopySource);
             }
             if (state->dynActive) {
-                data.dynAtlas = passBuilder.read(state->fgDynAtlas, ResourceState::ShaderResource);
-                data.dynTable = passBuilder.read(state->fgDynTable, ResourceState::ShaderResource);
+                data.dynAtlas = passBuilder.read(frame.dynAtlas, ResourceState::ShaderResource);
+                data.dynTable = passBuilder.read(frame.dynTable, ResourceState::ShaderResource);
             }
-            if (state->fgHudMap.is_valid())
-                data.hudMap = passBuilder.read(state->fgHudMap, ResourceState::ShaderResource);
+            if (frame.hudMap.is_valid())
+                data.hudMap = passBuilder.read(frame.hudMap, ResourceState::ShaderResource);
             data.mask = passBuilder.write(maskHandle, ResourceState::UnorderedAccess);
         },
         [](const VSMResolveData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
@@ -2929,9 +2921,9 @@ framegraph::VirtualResourceHandle setupVSMResolvePasses(
                 RenderPassBuilder passBuilder(builder, passHandle);
                 data.depth = passBuilder.read(depth, ResourceState::ShaderResource);
                 data.material = passBuilder.read(material, ResourceState::ShaderResource);
-                data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
-                data.cache = state->fgCache;
-                passBuilder.read(state->fgNeeded, ResourceState::ShaderResource);
+                data.dirtyList = passBuilder.read(frame.dirtyList, ResourceState::ShaderResource);
+                data.cache = frame.cache;
+                passBuilder.read(frame.needed, ResourceState::ShaderResource);
                 passBuilder.read(data.cache.pageTable, ResourceState::ShaderResource);
                 passBuilder.read(data.cache.slotDirty, ResourceState::ShaderResource);
                 data.mask = passBuilder.read(resolveData.mask, ResourceState::ShaderResource);

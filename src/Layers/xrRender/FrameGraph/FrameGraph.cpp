@@ -91,7 +91,7 @@ VirtualResourceHandle FrameGraph::CanonicalizeImport(const void* physical, const
         "framegraph import describes one physical resource with contradictory descriptors",
         desc.debugName.c_str());
     MergeImportHints(node.desc, desc);
-    return node.handle;
+    return CurrentHandle(node);
 }
 
 VirtualResourceHandle FrameGraph::ImportTexture(
@@ -189,31 +189,48 @@ PassHandle FrameGraph::AddPass(const char* name) {
     return handle;
 }
 
-void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
-    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
-    PassNode* passNode = GetPassNode(pass);
-    R_ASSERT(passNode != nullptr);
-    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
+VirtualResourceHandle FrameGraph::CurrentHandle(const ResourceNode& node) {
+    VirtualResourceHandle handle = node.handle;
+    handle.version = node.version;
+    return handle;
+}
 
+VirtualResourceHandle FrameGraph::GetLatestVersion(VirtualResourceHandle handle) const {
+    const ResourceNode* node = GetResourceNode(handle);
+    return node ? CurrentHandle(*node) : VirtualResourceHandle();
+}
+
+ResourceNode& FrameGraph::DeclareAccess(PassNode*& passNode, PassHandle pass, VirtualResourceHandle resource) {
+    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
+    passNode = GetPassNode(pass);
+    R_ASSERT(passNode != nullptr);
+    ResourceNode* node = GetResourceNode(resource);
+    R_ASSERT3(node != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
+    VERIFY4(resource.version == node->version, "framegraph pass declares a stale resource version",
+        passNode->name.c_str(), node->desc.debugName.c_str());
+    return *node;
+}
+
+void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    DeclareAccess(passNode, pass, resource);
     passNode->Read(resource, state);
 }
 
-void FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
-    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
-    PassNode* passNode = GetPassNode(pass);
-    R_ASSERT(passNode != nullptr);
-    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
-
+VirtualResourceHandle FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    ResourceNode& node = DeclareAccess(passNode, pass, resource);
     passNode->Write(resource, state);
+    ++node.version;
+    return CurrentHandle(node);
 }
 
-void FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
-    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
-    PassNode* passNode = GetPassNode(pass);
-    R_ASSERT(passNode != nullptr);
-    R_ASSERT3(GetResourceNode(resource) != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
-
+VirtualResourceHandle FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    ResourceNode& node = DeclareAccess(passNode, pass, resource);
     passNode->ReadWrite(resource, state);
+    ++node.version;
+    return CurrentHandle(node);
 }
 
 void FrameGraph::SetPassCallbackPtr(PassHandle pass, IPassCallback* callback) {

@@ -51,11 +51,13 @@ public:
     void PassRead(PassHandle pass, VirtualResourceHandle resource,
                  ResourceState state = ResourceState::ShaderResource);
 
-    void PassWrite(PassHandle pass, VirtualResourceHandle resource,
+    [[nodiscard]] VirtualResourceHandle PassWrite(PassHandle pass, VirtualResourceHandle resource,
                   ResourceState state = ResourceState::RenderTarget);
 
-    void PassReadWrite(PassHandle pass, VirtualResourceHandle resource,
+    [[nodiscard]] VirtualResourceHandle PassReadWrite(PassHandle pass, VirtualResourceHandle resource,
                       ResourceState state = ResourceState::UnorderedAccess);
+
+    VirtualResourceHandle GetLatestVersion(VirtualResourceHandle handle) const;
 
     void SetPassCallbackPtr(PassHandle pass, IPassCallback* callback);
 
@@ -224,6 +226,8 @@ private:
 
     ResourceNode* GetResourceNode(VirtualResourceHandle handle);
     const ResourceNode* GetResourceNode(VirtualResourceHandle handle) const;
+    static VirtualResourceHandle CurrentHandle(const ResourceNode& node);
+    ResourceNode& DeclareAccess(PassNode*& passNode, PassHandle pass, VirtualResourceHandle resource);
 
     bool PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const;
 

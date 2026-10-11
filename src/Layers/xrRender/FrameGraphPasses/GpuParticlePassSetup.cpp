@@ -237,24 +237,21 @@ static void DrawGpuParticles(const GpuParticlePassData& data, const FrameGraph& 
     }
 }
 
-GpuParticlePassOutputs setupGpuParticlePass(
+DefaultOutputLayout setupGpuParticlePass(
     FrameGraph& graph,
     fg::RenderDevice* device,
     const GpuParticleDrawResources& resources,
     VirtualResourceHandle materials,
-    VirtualResourceHandle color,
-    VirtualResourceHandle depth,
-    VirtualResourceHandle normal,
-    VirtualResourceHandle baseColor,
-    VirtualResourceHandle distortion,
+    const DefaultOutputLayout& inputs,
     u32 width,
     u32 height,
     GpuParticlePassState& state,
     const LightingFrameState* lighting)
 {
     if (resources.particleCapacity == 0 || resources.drawBucketMask == 0)
-        return { color, distortion };
-    VERIFY(device && color.is_valid() && depth.is_valid() && normal.is_valid() && baseColor.is_valid());
+        return inputs;
+    const VirtualResourceHandle depth = inputs.depth;
+    VERIFY(device && inputs.albedo.is_valid() && depth.is_valid() && inputs.normal.is_valid() && inputs.baseColor.is_valid());
     VERIFY(resources.particleResource.is_valid() && resources.emitterResource.is_valid() && resources.programResource.is_valid());
     VERIFY(resources.indexResource.is_valid() && resources.argsResource.is_valid() && resources.bucketResource.is_valid());
     const bool writesDepth = (resources.drawBucketMask & gpuParticleSetMask) != 0;
@@ -267,17 +264,17 @@ GpuParticlePassOutputs setupGpuParticlePass(
             depthDesc.debugName = "GpuParticle.SceneDepth";
             depthDesc.isImported = false;
             depthDesc.isTransient = true;
-            sceneDepth = graph.CreateTexture("GpuParticle.SceneDepth", depthDesc);
+            const VirtualResourceHandle copy = graph.CreateTexture("GpuParticle.SceneDepth", depthDesc);
             struct DepthCopyData { VirtualResourceHandle source, destination; };
-            graph.addCallbackPass<DepthCopyData>("GpuParticle.DepthCopy",
+            sceneDepth = graph.addCallbackPass<DepthCopyData>("GpuParticle.DepthCopy",
                 [&](FrameGraph& builder, PassHandle handle, DepthCopyData& data) {
                     RenderPassBuilder pass(builder, handle);
                     data.source = pass.read(depth, ResourceState::CopySource);
-                    data.destination = pass.write(sceneDepth, ResourceState::CopyDest);
+                    data.destination = pass.write(copy, ResourceState::CopyDest);
                 },
                 [](const DepthCopyData& data, const FrameGraph& graph, fg::RenderContext* context) {
                     context->CopyTexture(graph.GetPhysicalTexture(data.destination), graph.GetPhysicalTexture(data.source));
-                });
+                }).destination;
         }
     }
     auto& passData = graph.addCallbackPass<GpuParticlePassData>("GpuParticles",
@@ -296,13 +293,13 @@ GpuParticlePassOutputs setupGpuParticlePass(
             pass.read(resources.indexResource);
             pass.read(resources.bucketResource);
             pass.read(resources.argsResource, ResourceState::IndirectArgument);
-            data.color = color;
-            data.normal = normal;
-            data.baseColor = baseColor;
+            data.color = inputs.albedo;
+            data.normal = inputs.normal;
+            data.baseColor = inputs.baseColor;
             if (resources.drawBucketMask & gpuParticleColorMask) {
-                pass.readWrite(color, ResourceState::RenderTarget);
-                pass.readWrite(normal, ResourceState::RenderTarget);
-                pass.readWrite(baseColor, ResourceState::RenderTarget);
+                data.color = pass.readWrite(inputs.albedo, ResourceState::RenderTarget);
+                data.normal = pass.readWrite(inputs.normal, ResourceState::RenderTarget);
+                data.baseColor = pass.readWrite(inputs.baseColor, ResourceState::RenderTarget);
             }
             if (writesDepth)
                 data.depth = pass.readWrite(depth, ResourceState::DepthStencilWrite);
@@ -312,9 +309,9 @@ GpuParticlePassOutputs setupGpuParticlePass(
             data.sceneDepth = sceneDepth;
             if (softParticles && writesDepth)
                 pass.read(sceneDepth);
-            data.clearDistortion = !distortion.is_valid();
-            if (distortion.is_valid())
-                data.distortion = pass.readWrite(distortion, ResourceState::RenderTarget);
+            data.clearDistortion = !inputs.distortion.is_valid();
+            if (inputs.distortion.is_valid())
+                data.distortion = pass.readWrite(inputs.distortion, ResourceState::RenderTarget);
             else {
                 ResourceDesc desc;
                 desc.width = width;
@@ -327,7 +324,13 @@ GpuParticlePassOutputs setupGpuParticlePass(
             }
             InitializeGpuParticlePipelines(builder, data);
         }, DrawGpuParticles);
-    return { passData.color, passData.distortion };
+    DefaultOutputLayout outputs = inputs;
+    outputs.albedo = passData.color;
+    outputs.normal = passData.normal;
+    outputs.baseColor = passData.baseColor;
+    outputs.depth = passData.depth;
+    outputs.distortion = passData.distortion;
+    return outputs;
 }
 
 }

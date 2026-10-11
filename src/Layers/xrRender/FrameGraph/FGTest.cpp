@@ -27,7 +27,7 @@ void TestSimpleTriangle(fg::RenderDevice* renderDevice, fg::RenderContext* conte
     auto backbufferHandle = fg.ImportTexture("Backbuffer", backbuffer, backbufferDesc);
 
     auto clearPass = fg.AddPass("Clear");
-    fg.PassWrite(clearPass, backbufferHandle, ResourceState::RenderTarget);
+    backbufferHandle = fg.PassWrite(clearPass, backbufferHandle, ResourceState::RenderTarget);
     fg.SetPassCallback(clearPass, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 
@@ -47,7 +47,7 @@ void TestSimpleTriangle(fg::RenderDevice* renderDevice, fg::RenderContext* conte
 
     auto trianglePass = fg.AddPass("RenderTriangle");
     fg.PassRead(trianglePass, backbufferHandle, ResourceState::RenderTarget);
-    fg.PassWrite(trianglePass, backbufferHandle, ResourceState::RenderTarget);
+    backbufferHandle = fg.PassWrite(trianglePass, backbufferHandle, ResourceState::RenderTarget);
     fg.SetPassCallback(trianglePass, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 
@@ -134,21 +134,21 @@ void TestResourceAliasing(fg::RenderDevice* renderDevice, fg::RenderContext* con
 
     auto pass1 = fg.AddPass("HorizontalBlur");
     fg.PassRead(pass1, backbufferHandle, ResourceState::ShaderResource);
-    fg.PassWrite(pass1, temp1, ResourceState::UnorderedAccess);
+    temp1 = fg.PassWrite(pass1, temp1, ResourceState::UnorderedAccess);
     fg.SetPassCallback(pass1, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 1: Horizontal Blur (compute shader would go here)");
     });
 
     auto pass2 = fg.AddPass("VerticalBlur");
     fg.PassRead(pass2, temp1, ResourceState::ShaderResource);
-    fg.PassWrite(pass2, temp2, ResourceState::UnorderedAccess);
+    temp2 = fg.PassWrite(pass2, temp2, ResourceState::UnorderedAccess);
     fg.SetPassCallback(pass2, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 2: Vertical Blur");
     });
 
     auto pass3 = fg.AddPass("BloomThreshold");
     fg.PassRead(pass3, temp2, ResourceState::ShaderResource);
-    fg.PassWrite(pass3, temp3, ResourceState::UnorderedAccess);
+    temp3 = fg.PassWrite(pass3, temp3, ResourceState::UnorderedAccess);
     fg.SetPassCallback(pass3, [](fg::RenderContext& ctx, const FrameGraph& fg) {
         Msg("  ~ Pass 3: Bloom Threshold");
     });
@@ -156,7 +156,7 @@ void TestResourceAliasing(fg::RenderDevice* renderDevice, fg::RenderContext* con
     auto pass4 = fg.AddPass("Composite");
     fg.PassRead(pass4, temp3, ResourceState::ShaderResource);
     fg.PassRead(pass4, backbufferHandle, ResourceState::RenderTarget);
-    fg.PassWrite(pass4, backbufferHandle, ResourceState::RenderTarget);
+    backbufferHandle = fg.PassWrite(pass4, backbufferHandle, ResourceState::RenderTarget);
     fg.SetPassCallback(pass4, [backbufferHandle](fg::RenderContext& ctx, const FrameGraph& fg) {
         nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
 

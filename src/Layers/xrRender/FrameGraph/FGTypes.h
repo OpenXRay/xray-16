@@ -12,10 +12,11 @@ namespace xray::render::framegraph {
     struct VirtualResourceHandle {
         u32 index = INVALID_INDEX;
         u32 generation = 0;
+        u32 version = 0;
 
         bool is_valid() const { return index != INVALID_INDEX; }
         bool operator==(const VirtualResourceHandle& other) const {
-            return index == other.index && generation == other.generation;
+            return index == other.index && generation == other.generation && version == other.version;
         }
         bool operator!=(const VirtualResourceHandle& other) const { return !(*this == other); }
     };

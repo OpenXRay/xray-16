@@ -55,6 +55,25 @@ void DetailPassResources::Read(RenderPassBuilder& builder, bool drawIndirect, bo
         builder.read(swDispatch, ResourceState::IndirectArgument);
 }
 
+void DetailPassResources::Refresh(const FrameGraph& fg)
+{
+    const auto latest = [&](VirtualResourceHandle& handle)
+    {
+        if (handle.is_valid())
+            handle = fg.GetLatestVersion(handle);
+    };
+    for (auto& handle : sourceChunks)
+        latest(handle);
+    for (auto* group : { &visible[0], &drawArgs[0] })
+        for (u32 i = 0; i < FGDetailManager::VIS_KIND_COUNT; ++i)
+            latest(group[i]);
+    for (auto* group : { &prepared[0], &indices[0] })
+        for (u32 i = 0; i < FGDetailManager::LOD_COUNT; ++i)
+            latest(group[i]);
+    for (auto* handle : { &models, &pulled, &packets, &swDispatch, &perlin, &interaction[0], &interaction[1], &tints })
+        latest(*handle);
+}
+
 DetailPassResources setupDetailCullPass(
     FrameGraph& fg,
     fg::RenderDevice* device,
@@ -151,16 +170,17 @@ DetailPassResources setupDetailCullPass(
             data.detailState = detailState;
             if (prevHiZ.is_valid())
                 data.hiZPyramid = passBuilder.read(prevHiZ, ResourceState::ShaderResource);
-            for (auto handle : result.visible)
-                passBuilder.write(handle, ResourceState::UnorderedAccess);
-            for (auto handle : result.drawArgs)
-                passBuilder.write(handle, ResourceState::UnorderedAccess);
-            for (auto handle : result.prepared)
-                passBuilder.write(handle, ResourceState::UnorderedAccess);
-            for (auto handle : { result.packets, result.swDispatch, importBuffer(frame.visibleSlots),
-                importBuffer(frame.visibleSlotCount), importBuffer(frame.slotDispatch), importBuffer(frame.workStatus) })
-                passBuilder.write(handle, ResourceState::UnorderedAccess);
-            passBuilder.write(importBuffer(frame.readback), ResourceState::CopyDest);
+            for (auto& handle : result.visible)
+                handle = passBuilder.write(handle, ResourceState::UnorderedAccess);
+            for (auto& handle : result.drawArgs)
+                handle = passBuilder.write(handle, ResourceState::UnorderedAccess);
+            for (auto& handle : result.prepared)
+                handle = passBuilder.write(handle, ResourceState::UnorderedAccess);
+            result.packets = passBuilder.write(result.packets, ResourceState::UnorderedAccess);
+            result.swDispatch = passBuilder.write(result.swDispatch, ResourceState::UnorderedAccess);
+            for (auto buffer : { frame.visibleSlots, frame.visibleSlotCount, frame.slotDispatch, frame.workStatus })
+                (void)passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+            (void)passBuilder.write(importBuffer(frame.readback), ResourceState::CopyDest);
             for (auto handle : result.sourceChunks)
                 passBuilder.read(handle, ResourceState::ShaderResource);
             if (result.HasSource())
@@ -170,24 +190,24 @@ DetailPassResources setupDetailCullPass(
                 passBuilder.read(result.pulled, ResourceState::ShaderResource);
             }
             if (!detailManager->bladeIndicesUploaded)
-                for (auto handle : result.indices)
-                    passBuilder.write(handle, ResourceState::CopyDest);
+                for (auto& handle : result.indices)
+                    handle = passBuilder.write(handle, ResourceState::CopyDest);
             const bool upload = detailState && !detailState->detailDataUploaded;
             for (auto buffer : { detailManager->slotDataBuffer, detailManager->detailModelsBuffer, detailManager->pulledVertexBuffer })
             {
                 const auto handle = importBuffer(buffer);
                 if (upload)
-                    passBuilder.write(handle, ResourceState::CopyDest);
+                    (void)passBuilder.write(handle, ResourceState::CopyDest);
                 else
                     passBuilder.read(handle, ResourceState::ShaderResource);
             }
             if (result.tints.is_valid())
-                passBuilder.write(result.tints, ResourceState::CopyDest);
+                result.tints = passBuilder.write(result.tints, ResourceState::CopyDest);
             if (result.perlin.is_valid())
-                passBuilder.readWrite(result.perlin, ResourceState::UnorderedAccess);
-            for (auto handle : result.interaction)
+                result.perlin = passBuilder.readWrite(result.perlin, ResourceState::UnorderedAccess);
+            for (auto& handle : result.interaction)
                 if (handle.is_valid())
-                    passBuilder.readWrite(handle, ResourceState::UnorderedAccess);
+                    handle = passBuilder.readWrite(handle, ResourceState::UnorderedAccess);
             if (data.generation)
             {
                 const auto& work = *data.generation;
@@ -195,8 +215,8 @@ DetailPassResources setupDetailCullPass(
                     passBuilder.read(importTexture(detailManager->heightmapTexture), ResourceState::ShaderResource);
                 if (work.stage == FGDetailManager::GenerationWork::Stage::CountReady)
                 {
-                    passBuilder.write(importBuffer(work.counts), ResourceState::UnorderedAccess);
-                    passBuilder.write(importBuffer(work.countReadback), ResourceState::CopyDest);
+                    (void)passBuilder.write(importBuffer(work.counts), ResourceState::UnorderedAccess);
+                    (void)passBuilder.write(importBuffer(work.countReadback), ResourceState::CopyDest);
                 }
                 else if (work.stage == FGDetailManager::GenerationWork::Stage::EmitReady)
                 {
@@ -204,16 +224,16 @@ DetailPassResources setupDetailCullPass(
                     {
                         const auto handle = importBuffer(buffer);
                         if (work.nextChunk == 0)
-                            passBuilder.write(handle, ResourceState::CopyDest);
+                            (void)passBuilder.write(handle, ResourceState::CopyDest);
                         else
                             passBuilder.read(handle, ResourceState::ShaderResource);
                     }
-                    passBuilder.readWrite(importBuffer(work.localCounters), ResourceState::UnorderedAccess);
-                    passBuilder.readWrite(importBuffer(work.status), ResourceState::UnorderedAccess);
-                    passBuilder.write(importBuffer(work.statusReadback), ResourceState::CopyDest);
+                    (void)passBuilder.readWrite(importBuffer(work.localCounters), ResourceState::UnorderedAccess);
+                    (void)passBuilder.readWrite(importBuffer(work.status), ResourceState::UnorderedAccess);
+                    (void)passBuilder.write(importBuffer(work.statusReadback), ResourceState::CopyDest);
                     const u32 end = std::min(u32(work.source->chunks.size()), work.nextChunk + fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS);
                     for (u32 i = work.nextChunk; i < end; ++i)
-                        passBuilder.write(importBuffer(work.source->chunks[i].buffer), ResourceState::UnorderedAccess);
+                        (void)passBuilder.write(importBuffer(work.source->chunks[i].buffer), ResourceState::UnorderedAccess);
                 }
             }
             const auto ray = detailManager->rayVisibilityFrame;
@@ -221,14 +241,14 @@ DetailPassResources setupDetailCullPass(
             {
                 data.rayFrame = ray;
                 for (auto buffer : ray->visible)
-                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                    (void)passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
                 for (auto buffer : ray->drawArgs)
-                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                    (void)passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
                 for (auto buffer : ray->prepared)
-                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                    (void)passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
                 for (auto buffer : { ray->visibleSlots, ray->visibleSlotCount, ray->slotDispatch, ray->packets, ray->swDispatch, ray->workStatus })
-                    passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
-                passBuilder.write(importBuffer(ray->readback), ResourceState::CopyDest);
+                    (void)passBuilder.write(importBuffer(buffer), ResourceState::UnorderedAccess);
+                (void)passBuilder.write(importBuffer(ray->readback), ResourceState::CopyDest);
                 for (u32 chunk : ray->visibleChunks)
                     passBuilder.read(importBuffer(ray->source->chunks[chunk].buffer), ResourceState::ShaderResource);
                 for (auto buffer : { ray->source->slots, ray->source->models, ray->source->pulledVertices })
@@ -287,6 +307,7 @@ DetailPassResources setupDetailCullPass(
                 dm->ScheduleStatsReadback(cmdList, nvDevice, *data.rayFrame);
             }
         });
+    result.Refresh(fg);
     return result;
 }
 

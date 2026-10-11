@@ -1764,78 +1764,35 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupGeometryPreparePass(
         [&](FrameGraph& builder, PassHandle passHandle, GeometryPreparePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.manager = this;
-            if (resources.instances.is_valid())
-                data.instances = passBuilder.write(resources.instances, ResourceState::CopyDest);
-            if (resources.clusterRefs.is_valid())
-                data.clusterRefs = passBuilder.write(resources.clusterRefs, ResourceState::CopyDest);
-            if (resources.megaVertices.is_valid())
-                data.megaVertices = passBuilder.write(resources.megaVertices, ResourceState::CopyDest);
-            if (resources.megaIndices.is_valid())
-                data.megaIndices = passBuilder.write(resources.megaIndices, ResourceState::CopyDest);
-            if (resources.megaCopySourceVertices.is_valid())
-                passBuilder.read(resources.megaCopySourceVertices, ResourceState::CopySource);
-            if (resources.megaCopySourceIndices.is_valid())
-                passBuilder.read(resources.megaCopySourceIndices, ResourceState::CopySource);
-            if (resources.rtCopySourceVertices.is_valid())
-                passBuilder.read(resources.rtCopySourceVertices, ResourceState::CopySource);
-            if (resources.rtCopySourceIndices.is_valid())
-                passBuilder.read(resources.rtCopySourceIndices, ResourceState::CopySource);
-            if (resources.clusterMeta.is_valid())
-                passBuilder.write(resources.clusterMeta, ResourceState::CopyDest);
-            if (resources.assetMembers.is_valid())
-                passBuilder.write(resources.assetMembers, ResourceState::CopyDest);
-            if (resources.assetNodes.is_valid())
-                passBuilder.write(resources.assetNodes, ResourceState::CopyDest);
-            if (resources.clusterPages.is_valid())
-                passBuilder.write(resources.clusterPages, ResourceState::CopyDest);
-            if (resources.clusterPayload.is_valid())
-                passBuilder.write(resources.clusterPayload, ResourceState::CopyDest);
-            if (resources.clusterVertices.is_valid())
-                passBuilder.write(resources.clusterVertices, ResourceState::CopyDest);
-            if (resources.clusterGroups.is_valid())
-                passBuilder.write(resources.clusterGroups, ResourceState::CopyDest);
-            if (resources.rtVertices.is_valid())
-                passBuilder.write(resources.rtVertices, ResourceState::CopyDest);
-            if (resources.rtIndices.is_valid())
-                passBuilder.write(resources.rtIndices, ResourceState::CopyDest);
-            if (resources.groupResidency.is_valid())
-                passBuilder.write(resources.groupResidency, ResourceState::CopyDest);
-            if (resources.shadowCuts.is_valid())
-                passBuilder.write(resources.shadowCuts, ResourceState::CopyDest);
-            for (const auto handle : { resources.arenaCopySourceVertices, resources.arenaCopySourcePayload })
+            const auto writeIf = [&](VirtualResourceHandle& handle)
+            {
+                if (handle.is_valid())
+                    handle = passBuilder.write(handle, ResourceState::CopyDest);
+            };
+            const auto readIf = [&](VirtualResourceHandle handle)
             {
                 if (handle.is_valid())
                     passBuilder.read(handle, ResourceState::CopySource);
-            }
-            if (resources.shadowBvhNodes.is_valid())
-                passBuilder.write(resources.shadowBvhNodes, ResourceState::CopyDest);
-            if (resources.shadowBvhIndices.is_valid())
-                passBuilder.write(resources.shadowBvhIndices, ResourceState::CopyDest);
-            if (resources.counts.is_valid())
-                passBuilder.write(resources.counts, ResourceState::CopyDest);
-            if (resources.drawArgs.is_valid())
-                passBuilder.write(resources.drawArgs, ResourceState::CopyDest);
-            if (resources.terrainArgs.is_valid())
-                passBuilder.write(resources.terrainArgs, ResourceState::CopyDest);
-            if (resources.swArgs.is_valid())
-                passBuilder.write(resources.swArgs, ResourceState::CopyDest);
-            if (resources.retestDrawArgs.is_valid())
-                passBuilder.write(resources.retestDrawArgs, ResourceState::CopyDest);
-            if (resources.retestTerrainArgs.is_valid())
-                passBuilder.write(resources.retestTerrainArgs, ResourceState::CopyDest);
-            if (resources.retestSwArgs.is_valid())
-                passBuilder.write(resources.retestSwArgs, ResourceState::CopyDest);
-            if (resources.retestDispatchArgs.is_valid())
-                passBuilder.write(resources.retestDispatchArgs, ResourceState::CopyDest);
-            if (resources.queueArgs.is_valid())
-                passBuilder.write(resources.queueArgs, ResourceState::CopyDest);
-            for (const auto handle : { resources.materials, resources.terrainMaterials,
-                resources.variants, resources.variantTextures, resources.forwardArgs, resources.forwardInstances,
-                resources.forwardDrawIndices })
-            {
-                if (handle.is_valid())
-                    passBuilder.write(handle, ResourceState::CopyDest);
-            }
+            };
+            for (auto* handle : { &resources.instances, &resources.clusterRefs, &resources.megaVertices, &resources.megaIndices })
+                writeIf(*handle);
+            data.instances = resources.instances;
+            data.clusterRefs = resources.clusterRefs;
+            data.megaVertices = resources.megaVertices;
+            data.megaIndices = resources.megaIndices;
+            for (auto handle : { resources.megaCopySourceVertices, resources.megaCopySourceIndices,
+                resources.rtCopySourceVertices, resources.rtCopySourceIndices,
+                resources.arenaCopySourceVertices, resources.arenaCopySourcePayload })
+                readIf(handle);
+            for (auto* handle : { &resources.clusterMeta, &resources.assetMembers, &resources.assetNodes,
+                &resources.clusterPages, &resources.clusterPayload, &resources.clusterVertices, &resources.clusterGroups,
+                &resources.rtVertices, &resources.rtIndices, &resources.groupResidency, &resources.shadowCuts,
+                &resources.shadowBvhNodes, &resources.shadowBvhIndices, &resources.counts, &resources.drawArgs,
+                &resources.terrainArgs, &resources.swArgs, &resources.retestDrawArgs, &resources.retestTerrainArgs,
+                &resources.retestSwArgs, &resources.retestDispatchArgs, &resources.queueArgs, &resources.materials,
+                &resources.terrainMaterials, &resources.variants, &resources.variantTextures, &resources.forwardArgs,
+                &resources.forwardInstances, &resources.forwardDrawIndices })
+                writeIf(*handle);
         },
         [](const GeometryPreparePassData& data, const FrameGraph&, fg::RenderContext* ctx) {
             GPUCullingManager* mgr = data.manager;
@@ -1892,23 +1849,17 @@ void GPUCullingManager::SetupCullingPass(
             passBuilder.read(resources.assetNodes, ResourceState::ShaderResource);
             passBuilder.read(resources.clusterRefs, ResourceState::ShaderResource);
             passBuilder.read(resources.instances, ResourceState::ShaderResource);
-            passBuilder.readWrite(resources.counts, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.visibleEntries, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.fades, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.terrainVisibleEntries, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.terrainFades, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.swEntries, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.candidates, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.queueArgs, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.nodeQueueA, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.nodeQueueB, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.deferredNodes, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.deferredInstances, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.leafQueue, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.drawArgs, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.terrainArgs, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.swArgs, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestDispatchArgs, ResourceState::UnorderedAccess);
+            const auto writeAll = [&](std::initializer_list<VirtualResourceHandle*> handles, bool read)
+            {
+                for (auto* handle : handles)
+                    *handle = read ? passBuilder.readWrite(*handle, ResourceState::UnorderedAccess)
+                                   : passBuilder.write(*handle, ResourceState::UnorderedAccess);
+            };
+            writeAll({ &resources.counts, &resources.queueArgs, &resources.nodeQueueA, &resources.nodeQueueB,
+                &resources.deferredNodes, &resources.deferredInstances, &resources.leafQueue }, true);
+            writeAll({ &resources.visibleEntries, &resources.fades, &resources.terrainVisibleEntries,
+                &resources.terrainFades, &resources.swEntries, &resources.candidates, &resources.drawArgs,
+                &resources.terrainArgs, &resources.swArgs, &resources.retestDispatchArgs }, false);
             if (prevHiZ.is_valid())
                 data.prevHiZ = passBuilder.read(prevHiZ, ResourceState::ShaderResource);
         },
@@ -1951,23 +1902,19 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupClusterRetestPass(
             passBuilder.read(resources.assetNodes, ResourceState::ShaderResource);
             passBuilder.read(resources.clusterRefs, ResourceState::ShaderResource);
             passBuilder.read(resources.instances, ResourceState::ShaderResource);
-            passBuilder.readWrite(resources.counts, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.candidates, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestVisibleEntries, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestFades, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestTerrainVisibleEntries, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestTerrainFades, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestSwEntries, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.queueArgs, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.nodeQueueA, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.nodeQueueB, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.deferredNodes, ResourceState::UnorderedAccess);
             passBuilder.read(resources.deferredInstances, ResourceState::ShaderResource);
-            passBuilder.readWrite(resources.leafQueue, ResourceState::UnorderedAccess);
-            passBuilder.readWrite(resources.retestDispatchArgs, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestTerrainArgs, ResourceState::UnorderedAccess);
-            passBuilder.write(resources.retestSwArgs, ResourceState::UnorderedAccess);
-            data.args = passBuilder.write(resources.retestDrawArgs, ResourceState::UnorderedAccess);
+            const auto writeAll = [&](std::initializer_list<VirtualResourceHandle*> handles, bool read)
+            {
+                for (auto* handle : handles)
+                    *handle = read ? passBuilder.readWrite(*handle, ResourceState::UnorderedAccess)
+                                   : passBuilder.write(*handle, ResourceState::UnorderedAccess);
+            };
+            writeAll({ &resources.counts, &resources.candidates, &resources.queueArgs, &resources.nodeQueueA,
+                &resources.nodeQueueB, &resources.deferredNodes, &resources.leafQueue, &resources.retestDispatchArgs }, true);
+            writeAll({ &resources.retestVisibleEntries, &resources.retestFades, &resources.retestTerrainVisibleEntries,
+                &resources.retestTerrainFades, &resources.retestSwEntries, &resources.retestTerrainArgs,
+                &resources.retestSwArgs, &resources.retestDrawArgs }, false);
+            data.args = resources.retestDrawArgs;
         },
         [](const ClusterRetestPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             nvrhi::ITexture* hiz = fg.GetPhysicalTexture(data.hiz);
@@ -2044,50 +1991,48 @@ framegraph::VirtualResourceHandle GPUCullingManager::SetupSkinnedUploadPass(
 
     auto& passData = fg.addCallbackPass<SkinnedUploadPassData>(
         "Skinned Upload",
-        [&, overlayMgr, previousVertices, hudEntries, chunks, bones, sourceIndices, splats, forwardArgs, forwardInstances](FrameGraph& builder,
+        [&, overlayMgr, previousVertices, chunks](FrameGraph& builder,
             PassHandle passHandle, SkinnedUploadPassData& data)
         {
             RenderPassBuilder passBuilder(builder, passHandle);
             data.manager = this;
             data.overlayMgr = overlayMgr;
-            if (bones.is_valid())
-                passBuilder.readWrite(bones, ResourceState::ShaderResource);
+            const auto update = [&](VirtualResourceHandle handle, ResourceState state, bool read)
+            {
+                if (!handle.is_valid())
+                    return handle;
+                handle = builder.GetLatestVersion(handle);
+                return read ? passBuilder.readWrite(handle, state) : passBuilder.write(handle, state);
+            };
+            resources.boneMatrices = update(resources.boneMatrices, ResourceState::ShaderResource, true);
             for (u32 f = SkinnedGeometryPools::FIRST_FORMAT; f < SkinnedGeometryPools::FORMAT_COUNT; ++f)
             {
-                if (sourceVertices[f].is_valid())
-                    passBuilder.readWrite(sourceVertices[f], ResourceState::ShaderResource);
-                if (sourceFormatIndices[f].is_valid())
-                    passBuilder.readWrite(sourceFormatIndices[f], ResourceState::ShaderResource);
+                (void)update(sourceVertices[f], ResourceState::ShaderResource, true);
+                (void)update(sourceFormatIndices[f], ResourceState::ShaderResource, true);
             }
-            if (sourceIndices.is_valid())
-                passBuilder.readWrite(sourceIndices, ResourceState::ShaderResource);
+            resources.skinnedIndices = update(resources.skinnedIndices, ResourceState::ShaderResource, true);
 
             if (!m_skinnedPrepared)
                 return;
 
-            data.entries = passBuilder.write(resources.skinnedEntries, ResourceState::CopyDest);
-            if (resources.skinnedRecords.is_valid())
-                passBuilder.readWrite(resources.skinnedRecords, ResourceState::ShaderResource);
-            if (resources.deformedVertices.is_valid())
-                passBuilder.write(resources.deformedVertices, ResourceState::UnorderedAccess);
+            resources.skinnedEntries = update(resources.skinnedEntries, ResourceState::CopyDest, false);
+            data.entries = resources.skinnedEntries;
+            resources.skinnedRecords = update(resources.skinnedRecords, ResourceState::ShaderResource, true);
+            resources.deformedVertices = update(resources.deformedVertices, ResourceState::UnorderedAccess, false);
             if (previousVertices.is_valid())
-                passBuilder.read(previousVertices, ResourceState::ShaderResource);
-            if (hudEntries.is_valid())
-                passBuilder.write(hudEntries, ResourceState::CopyDest);
-            if (chunks.is_valid())
-                passBuilder.readWrite(chunks, ResourceState::ShaderResource);
-            if (splats.is_valid())
-                passBuilder.readWrite(splats, ResourceState::ShaderResource);
-            if (forwardArgs.is_valid())
-                passBuilder.write(forwardArgs, ResourceState::CopyDest);
-            if (forwardInstances.is_valid())
-                passBuilder.write(forwardInstances, ResourceState::CopyDest);
+                passBuilder.read(builder.GetLatestVersion(previousVertices), ResourceState::ShaderResource);
+            resources.skinnedHudEntries = update(resources.skinnedHudEntries, ResourceState::CopyDest, false);
+            (void)update(chunks, ResourceState::ShaderResource, true);
+            resources.paintSplats = update(resources.paintSplats, ResourceState::ShaderResource, true);
+            resources.skinnedForwardArgs = update(resources.skinnedForwardArgs, ResourceState::CopyDest, false);
+            resources.skinnedForwardInstances = update(resources.skinnedForwardInstances, ResourceState::CopyDest, false);
         },
         [](const SkinnedUploadPassData& data, const FrameGraph&, fg::RenderContext* ctx)
         {
             data.manager->UploadSkinnedObjects(ctx, data.overlayMgr);
         });
 
+    resources.previousDeformedVertices = fg.GetLatestVersion(resources.previousDeformedVertices);
     return passData.entries;
 }
 
@@ -2229,7 +2174,7 @@ void GPUCullingManager::CreateDebugResources(fg::RenderDevice* device)
     Msg("* [GPUCulling] Debug visualization resources created");
 }
 
-void GPUCullingManager::SetupDebugVisualizationPass(
+framegraph::VirtualResourceHandle GPUCullingManager::SetupDebugVisualizationPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hizPyramid,
     framegraph::VirtualResourceHandle colorTarget,
@@ -2244,7 +2189,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
     const u32 particleCount = particleBatches ? std::min(static_cast<u32>(particleBatches->size()), m_maxParticles) : 0;
     if (!IsDebugEnabled() || particleCount == 0)
-        return;
+        return colorTarget;
 
     struct DebugPassData {
         VirtualResourceHandle hizPyramid;
@@ -2260,7 +2205,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
         Fmatrix prevViewProj;
     };
 
-    fg.addCallbackPass<DebugPassData>(
+    auto& passData = fg.addCallbackPass<DebugPassData>(
         "GPU Culling Debug",
 
         [&, hizWidth, hizHeight, hizMipLevels, particleCount, particleBatches, prevViewProj](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
@@ -2275,7 +2220,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             data.prevViewProj = prevViewProj;
 
             data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
-            data.colorTarget = passBuilder.write(colorTarget, ResourceState::RenderTarget);
+            data.colorTarget = passBuilder.readWrite(colorTarget, ResourceState::RenderTarget);
             data.depthTarget = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
         },
 
@@ -2406,6 +2351,7 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::UnorderedAccess);
         }
     );
+    return passData.colorTarget;
 }
 
 void GPUCullingManager::CreateParticleResources(fg::RenderDevice* device)

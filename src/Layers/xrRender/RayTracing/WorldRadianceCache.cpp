@@ -262,39 +262,39 @@ WorldRadianceCacheResources WorldRadianceCache::Use(framegraph::FrameGraph& grap
     switch (access)
     {
     case WorldRadianceCacheAccess::Maintain:
-        builder.readWrite(resources.checksum, state);
-        builder.readWrite(resources.life, state);
-        builder.readWrite(resources.radiance, state);
-        builder.readWrite(resources.position, state);
-        builder.readWrite(resources.normal, state);
-        builder.readWrite(resources.stats, state);
+        resources.checksum = builder.readWrite(resources.checksum, state);
+        resources.life = builder.readWrite(resources.life, state);
+        resources.radiance = builder.readWrite(resources.radiance, state);
+        resources.position = builder.readWrite(resources.position, state);
+        resources.normal = builder.readWrite(resources.normal, state);
+        resources.stats = builder.readWrite(resources.stats, state);
         break;
     case WorldRadianceCacheAccess::Select:
         builder.read(resources.life, state);
         builder.read(resources.radiance, state);
-        builder.readWrite(resources.stats, state);
-        builder.write(resources.updateList, state);
-        builder.readWrite(resources.updateArgs, state);
+        resources.stats = builder.readWrite(resources.stats, state);
+        resources.updateList = builder.write(resources.updateList, state);
+        resources.updateArgs = builder.readWrite(resources.updateArgs, state);
         break;
     case WorldRadianceCacheAccess::Update:
         builder.read(resources.checksum, state);
-        builder.readWrite(resources.life, state);
-        builder.readWrite(resources.radiance, state);
-        builder.write(resources.snapshot, framegraph::ResourceState::CopyDest);
+        resources.life = builder.readWrite(resources.life, state);
+        resources.radiance = builder.readWrite(resources.radiance, state);
+        resources.snapshot = builder.write(resources.snapshot, framegraph::ResourceState::CopyDest);
         builder.read(resources.snapshot, framegraph::ResourceState::ShaderResource);
-        builder.readWrite(resources.position, state);
-        builder.readWrite(resources.normal, state);
-        builder.readWrite(resources.stats, state);
+        resources.position = builder.readWrite(resources.position, state);
+        resources.normal = builder.readWrite(resources.normal, state);
+        resources.stats = builder.readWrite(resources.stats, state);
         builder.read(resources.updateList, framegraph::ResourceState::ShaderResource);
         builder.read(resources.updateArgs, framegraph::ResourceState::IndirectArgument);
         break;
     case WorldRadianceCacheAccess::Query:
-        builder.readWrite(resources.checksum, state);
-        builder.readWrite(resources.life, state);
+        resources.checksum = builder.readWrite(resources.checksum, state);
+        resources.life = builder.readWrite(resources.life, state);
         builder.read(resources.radiance, framegraph::ResourceState::ShaderResource);
-        builder.readWrite(resources.position, state);
-        builder.readWrite(resources.normal, state);
-        builder.readWrite(resources.stats, state);
+        resources.position = builder.readWrite(resources.position, state);
+        resources.normal = builder.readWrite(resources.normal, state);
+        resources.stats = builder.readWrite(resources.stats, state);
         break;
     }
     return resources;

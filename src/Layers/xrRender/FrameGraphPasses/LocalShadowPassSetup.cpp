@@ -2159,24 +2159,20 @@ void SelectLocalShadowLights(
     SelectLocalShadowHudViews(state, hudSphere);
 }
 
-static void SetupLocalShadowPageBin(
+static LocalShadowPageFrame SetupLocalShadowPageBin(
     FrameGraph& fg, fg::RenderDevice* device, VirtualResourceHandle orderAfter,
     const LocalShadowConfig& config, LocalShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
-    state->fgTiles = VirtualResourceHandle();
-    state->fgArgs = VirtualResourceHandle();
-    state->fgClearArgs = VirtualResourceHandle();
-    state->fgDirtyList = VirtualResourceHandle();
-    state->fgGeometryDirty = VirtualResourceHandle();
-    state->fgRefreshDyn = VirtualResourceHandle();
+    LocalShadowPageFrame page;
+    page.state = state;
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
-        return;
+        return page;
     R_ASSERT2(EnsureResources(nvDevice, *state), "Cannot allocate a complete local shadow page");
     ProcessLocalShadowStats(*state, nvDevice);
     if (state->pooledSpots == 0 && state->pooledPoints == 0)
-        return;
+        return page;
 
     auto bufferDesc = [](const char* name, u64 bytes, u32 stride, bool uav) {
         ResourceDesc d;
@@ -2227,23 +2223,25 @@ static void SetupLocalShadowPageBin(
         [](const LocalShadowBinData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteBin(ctx, fg, data);
         });
-    state->fgTiles = binData.tiles;
-    state->fgArgs = binData.args;
-    state->fgClearArgs = binData.clearArgs;
-    state->fgDirtyList = binData.dirtyList;
-    state->fgGeometryDirty = binData.geometryDirty;
-    state->fgRefreshDyn = binData.refreshDyn;
+    page.tiles = binData.tiles;
+    page.args = binData.args;
+    page.clearArgs = binData.clearArgs;
+    page.dirtyList = binData.dirtyList;
+    page.geometryDirty = binData.geometryDirty;
+    page.refreshDyn = binData.refreshDyn;
+    return page;
 }
 
 static LocalShadowOutput SetupLocalShadowPage(
     FrameGraph& fg, fg::RenderDevice* device,
-    const LocalShadowConfig& config, LocalShadowState* state,
+    const LocalShadowConfig& config, LocalShadowPageFrame& page,
     xray::profiler::GPUProfiler* gpuProfiler,
     VirtualResourceHandle staticHandle, VirtualResourceHandle dynHandle)
 {
+    LocalShadowState* state = page.state;
     LocalShadowOutput out;
     out.state = state;
-    if (!state->fgTiles.is_valid())
+    if (!page.tiles.is_valid())
         return out;
     auto& staticData = fg.addCallbackPass<LocalShadowStaticData>(
         "Local Shadow Static",
@@ -2255,17 +2253,17 @@ static LocalShadowOutput SetupLocalShadowPage(
             RenderPassBuilder passBuilder(builder, passHandle);
             DeclareGeometryReads(passBuilder, config.geometryResources);
             data.atlas = passBuilder.write(staticHandle, ResourceState::DepthStencilWrite);
-            data.tiles = passBuilder.readWrite(state->fgTiles, ResourceState::UnorderedAccess);
-            data.args = passBuilder.write(state->fgArgs, ResourceState::IndirectArgument);
-            data.clearArgs = passBuilder.read(state->fgClearArgs, ResourceState::IndirectArgument);
-            data.dirtyList = passBuilder.read(state->fgDirtyList, ResourceState::ShaderResource);
-            data.geometryDirty = passBuilder.readWrite(state->fgGeometryDirty, ResourceState::UnorderedAccess);
+            data.tiles = passBuilder.readWrite(page.tiles, ResourceState::UnorderedAccess);
+            data.args = passBuilder.write(page.args, ResourceState::IndirectArgument);
+            data.clearArgs = passBuilder.read(page.clearArgs, ResourceState::IndirectArgument);
+            data.dirtyList = passBuilder.read(page.dirtyList, ResourceState::ShaderResource);
+            data.geometryDirty = passBuilder.readWrite(page.geometryDirty, ResourceState::UnorderedAccess);
         },
         [](const LocalShadowStaticData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteStatic(ctx, fg, data);
         });
-    state->fgGeometryDirty = staticData.geometryDirty;
-    state->fgTiles = staticData.tiles;
+    page.geometryDirty = staticData.geometryDirty;
+    page.tiles = staticData.tiles;
 
     auto& dynData = fg.addCallbackPass<LocalShadowDynData>(
         "Local Shadow Dyn",
@@ -2277,10 +2275,10 @@ static LocalShadowOutput SetupLocalShadowPage(
             RenderPassBuilder passBuilder(builder, passHandle);
             DeclareGeometryReads(passBuilder, config.geometryResources);
             data.atlas = passBuilder.write(dynHandle, ResourceState::DepthStencilWrite);
-            data.tiles = passBuilder.read(state->fgTiles, ResourceState::ShaderResource);
+            data.tiles = passBuilder.read(page.tiles, ResourceState::ShaderResource);
             data.args = passBuilder.write(staticData.args, ResourceState::IndirectArgument);
-            data.clearArgs = passBuilder.read(state->fgClearArgs, ResourceState::IndirectArgument);
-            data.refreshDyn = passBuilder.read(state->fgRefreshDyn, ResourceState::ShaderResource);
+            data.clearArgs = passBuilder.read(page.clearArgs, ResourceState::IndirectArgument);
+            data.refreshDyn = passBuilder.read(page.refreshDyn, ResourceState::ShaderResource);
         },
         [](const LocalShadowDynData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
             ExecuteDyn(ctx, fg, data);
@@ -2295,25 +2293,29 @@ static LocalShadowOutput SetupLocalShadowPage(
     return out;
 }
 
-void setupLocalShadowBinPasses(
+LocalShadowFrame setupLocalShadowBinPasses(
     FrameGraph& fg, fg::RenderDevice* device, VirtualResourceHandle orderAfter,
     const LocalShadowConfig& config, LocalShadowState* state,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
+    LocalShadowFrame frame;
     if (!state || !device || state->activePages == 0)
-        return;
+        return frame;
     for (u32 i = 0; i < state->activePages; ++i)
-        SetupLocalShadowPageBin(fg, device, orderAfter, config, i == 0 ? state : state->overflowPages[i - 1].get(), gpuProfiler);
+        frame.pages.push_back(SetupLocalShadowPageBin(fg, device, orderAfter, config,
+            i == 0 ? state : state->overflowPages[i - 1].get(), gpuProfiler));
+    return frame;
 }
 
 LocalShadowOutput setupLocalShadowPasses(
     FrameGraph& fg, fg::RenderDevice* device, VirtualResourceHandle orderAfter,
-    const LocalShadowConfig& config, LocalShadowState* state,
+    const LocalShadowConfig& config, LocalShadowState* state, LocalShadowFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler)
 {
     LocalShadowOutput out;
-    if (!state || !device || state->activePages == 0 || !state->fgTiles.is_valid())
+    if (!state || !device || frame.pages.empty() || !frame.pages[0].tiles.is_valid())
         return out;
+    R_ASSERT(frame.pages.size() == state->activePages);
     auto* nvDevice = device->GetNVRHIDevice();
     if (!nvDevice)
         return out;
@@ -2333,11 +2335,10 @@ LocalShadowOutput setupLocalShadowPasses(
     auto staticHandle = fg.ImportTexture("rt_LocalShadowStatic", state->staticAtlas, textureDesc("rt_LocalShadowStatic"));
     auto dynHandle = fg.ImportTexture("rt_LocalShadowDyn", state->dynAtlas, textureDesc("rt_LocalShadowDyn"));
     xr_vector<VirtualResourceHandle> pageTiles;
-    for (u32 i = 0; i < state->activePages; ++i) {
-        auto& page = i == 0 ? *state : *state->overflowPages[i - 1];
-        page.staticAtlas = state->staticAtlas;
-        page.dynAtlas = state->dynAtlas;
-        auto rendered = SetupLocalShadowPage(fg, device, config, &page, gpuProfiler, staticHandle, dynHandle);
+    for (auto& page : frame.pages) {
+        page.state->staticAtlas = state->staticAtlas;
+        page.state->dynAtlas = state->dynAtlas;
+        auto rendered = SetupLocalShadowPage(fg, device, config, page, gpuProfiler, staticHandle, dynHandle);
         R_ASSERT(rendered.active);
         staticHandle = rendered.staticAtlas;
         dynHandle = rendered.dynAtlas;

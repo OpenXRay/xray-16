@@ -209,12 +209,20 @@ struct LocalShadowState {
     nvrhi::ShaderHandle skinPageVS;
     bool pipelinesFailed = false;
     bool resourcesFailed = false;
-    framegraph::VirtualResourceHandle fgTiles;
-    framegraph::VirtualResourceHandle fgArgs;
-    framegraph::VirtualResourceHandle fgClearArgs;
-    framegraph::VirtualResourceHandle fgDirtyList;
-    framegraph::VirtualResourceHandle fgGeometryDirty;
-    framegraph::VirtualResourceHandle fgRefreshDyn;
+};
+
+struct LocalShadowPageFrame {
+    LocalShadowState* state = nullptr;
+    framegraph::VirtualResourceHandle tiles;
+    framegraph::VirtualResourceHandle args;
+    framegraph::VirtualResourceHandle clearArgs;
+    framegraph::VirtualResourceHandle dirtyList;
+    framegraph::VirtualResourceHandle geometryDirty;
+    framegraph::VirtualResourceHandle refreshDyn;
+};
+
+struct LocalShadowFrame {
+    xr_vector<LocalShadowPageFrame> pages;
 };
 
 struct LocalShadowConfig {
@@ -248,7 +256,7 @@ void SelectLocalShadowLights(
     float projScale,
     const Fvector4* hudSphere);
 
-void setupLocalShadowBinPasses(
+LocalShadowFrame setupLocalShadowBinPasses(
     framegraph::FrameGraph& fg,
     fg::RenderDevice* device,
     framegraph::VirtualResourceHandle orderAfter,
@@ -262,6 +270,7 @@ LocalShadowOutput setupLocalShadowPasses(
     framegraph::VirtualResourceHandle orderAfter,
     const LocalShadowConfig& config,
     LocalShadowState* state,
+    LocalShadowFrame& frame,
     xray::profiler::GPUProfiler* gpuProfiler);
 
 void ResolveLocalShadowBindings(

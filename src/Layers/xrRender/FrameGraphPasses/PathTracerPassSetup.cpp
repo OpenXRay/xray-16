@@ -607,13 +607,13 @@ static bool BuildReferenceSnapshot(FrameGraph& fg, RenderDevice* device, RTAccel
             data.lightDataSource = lightDataSource;
             data.lightDataTarget = lightDataClone.Get();
             passBuilder.read(lightDataSourceHandle, ResourceState::CopySource);
-            passBuilder.write(lightTargetHandle, ResourceState::CopyDest);
+            (void)passBuilder.write(lightTargetHandle, ResourceState::CopyDest);
             for (u32 i = 0; i < u32(textureSources.size()); ++i)
             {
                 data.textureSources.push_back(textureSources[i]);
                 data.textureTargets.push_back(textureTargets[i]);
                 passBuilder.read(sourceHandles[i], ResourceState::CopySource);
-                passBuilder.write(targetHandles[i], ResourceState::CopyDest);
+                (void)passBuilder.write(targetHandles[i], ResourceState::CopyDest);
             }
             passBuilder.sideEffects();
         },

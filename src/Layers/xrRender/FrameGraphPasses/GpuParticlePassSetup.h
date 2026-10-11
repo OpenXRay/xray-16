@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
 #include "Layers/xrRender/LightingMode.h"
 #include "ParticlePassSetup.h"
 #include <nvrhi/nvrhi.h>
@@ -35,23 +35,14 @@ struct GpuParticlePassState {
     const framegraph::ExtractedReflection* distortReflection = nullptr;
 };
 
-struct GpuParticlePassOutputs {
-    framegraph::VirtualResourceHandle color;
-    framegraph::VirtualResourceHandle distortion;
-};
-
 void WarmGpuParticlePipelines(fg::RenderDevice* device, GpuParticlePassState& state);
 
-GpuParticlePassOutputs setupGpuParticlePass(
+framegraph::DefaultOutputLayout setupGpuParticlePass(
     framegraph::FrameGraph& graph,
     fg::RenderDevice* device,
     const GpuParticleDrawResources& resources,
     framegraph::VirtualResourceHandle materials,
-    framegraph::VirtualResourceHandle color,
-    framegraph::VirtualResourceHandle depth,
-    framegraph::VirtualResourceHandle normal,
-    framegraph::VirtualResourceHandle baseColor,
-    framegraph::VirtualResourceHandle distortion,
+    const framegraph::DefaultOutputLayout& inputs,
     u32 width,
     u32 height,
     GpuParticlePassState& state,

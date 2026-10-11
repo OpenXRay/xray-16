@@ -42,6 +42,7 @@ public:
 
     bool HasSource() const;
     void Read(framegraph::RenderPassBuilder& builder, bool drawIndirect, bool swIndirect) const;
+    void Refresh(const framegraph::FrameGraph& fg);
 };
 
 DetailPassResources setupDetailCullPass(

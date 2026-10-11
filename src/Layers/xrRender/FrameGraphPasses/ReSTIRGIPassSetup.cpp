@@ -508,14 +508,14 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         return fg.ImportTexture(name, texture, desc);
     };
 
-    const auto fgRawDiffuse = importRaw("rtgi_RawDiffuse", state.rawDiffuse.Get(), nvrhi::Format::RGBA32_FLOAT);
-    const auto fgRawSpecular = importRaw("rtgi_RawSpecular", state.rawSpecular.Get(), nvrhi::Format::RGBA32_FLOAT);
-    const auto fgEmission = importRaw("rtgi_Emission", state.emission.Get(), nvrhi::Format::RGBA16_FLOAT);
-    const auto fgNormalRoughness = importRaw("rtgi_NormalRoughness", state.normalRoughness.Get(), nvrhi::Format::RGBA16_FLOAT);
-    const auto fgAlbedoMetallic = importRaw("rtgi_AlbedoMetallic", state.albedoMetallic.Get(), nvrhi::Format::RGBA16_FLOAT);
-    const auto fgPathData = importRaw("rtgi_PathData", state.pathData.Get(), nvrhi::Format::RGBA32_FLOAT);
-    const auto fgSurfaceData = importRaw("rtgi_SurfaceData", state.surfaceData.Get(), nvrhi::Format::RGBA32_FLOAT);
-    const auto fgOutMotion = importRaw("rtgi_Motion", state.motion.Get(), nvrhi::Format::RG16_FLOAT);
+    auto fgRawDiffuse = importRaw("rtgi_RawDiffuse", state.rawDiffuse.Get(), nvrhi::Format::RGBA32_FLOAT);
+    auto fgRawSpecular = importRaw("rtgi_RawSpecular", state.rawSpecular.Get(), nvrhi::Format::RGBA32_FLOAT);
+    auto fgEmission = importRaw("rtgi_Emission", state.emission.Get(), nvrhi::Format::RGBA16_FLOAT);
+    auto fgNormalRoughness = importRaw("rtgi_NormalRoughness", state.normalRoughness.Get(), nvrhi::Format::RGBA16_FLOAT);
+    auto fgAlbedoMetallic = importRaw("rtgi_AlbedoMetallic", state.albedoMetallic.Get(), nvrhi::Format::RGBA16_FLOAT);
+    auto fgPathData = importRaw("rtgi_PathData", state.pathData.Get(), nvrhi::Format::RGBA32_FLOAT);
+    auto fgSurfaceData = importRaw("rtgi_SurfaceData", state.surfaceData.Get(), nvrhi::Format::RGBA32_FLOAT);
+    auto fgOutMotion = importRaw("rtgi_Motion", state.motion.Get(), nvrhi::Format::RG16_FLOAT);
 
     if (!fgRawDiffuse.is_valid() || !fgRawSpecular.is_valid() || !fgEmission.is_valid() ||
         !fgNormalRoughness.is_valid() || !fgAlbedoMetallic.is_valid() || !fgPathData.is_valid() ||
@@ -534,7 +534,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
     fg.GetRTRegistry().RegisterRT("rt_GI_SurfaceData", fgSurfaceData);
     fg.GetRTRegistry().RegisterRT("rt_GI_Motion", fgOutMotion);
 
-    fg.addCallbackPass<RTGITracePassData>(
+    auto& traceData = fg.addCallbackPass<RTGITracePassData>(
         "RTGI Raw Transport",
         [&](FrameGraph& builder, PassHandle passHandle, RTGITracePassData& data)
         {
@@ -724,6 +724,14 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             if (worldCacheActive)
                 data.worldCacheOwner->ScheduleStatsReadback(cmdList, worldCacheBuffers.stats, true);
         });
+    fgRawDiffuse = traceData.rawDiffuse;
+    fgRawSpecular = traceData.rawSpecular;
+    fgEmission = traceData.emission;
+    fgNormalRoughness = traceData.normalRoughness;
+    fgAlbedoMetallic = traceData.albedoMetallic;
+    fgPathData = traceData.pathData;
+    fgSurfaceData = traceData.surfaceData;
+    fgOutMotion = traceData.outMotion;
 
     auto& recon = state.reconstruction;
     recon.recorded = false;
@@ -816,7 +824,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         const auto prevDepthInput = historyValid ? prevDepth : depth;
         const auto prevNormalInput = historyValid ? prevNormals : normal;
 
-        fg.addCallbackPass<RTGITemporalPassData>(
+        auto& temporalData = fg.addCallbackPass<RTGITemporalPassData>(
             "RTGI Temporal Reconstruction",
             [&](FrameGraph& builder, PassHandle passHandle, RTGITemporalPassData& data)
             {
@@ -929,6 +937,11 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 data.lighting->reconstructionActive = true;
                 data.lighting->historyUsed = data.cbData.historyValid != 0;
             });
+        fgHistoryDiffuse = temporalData.historyDiffuse;
+        fgHistorySpecular = temporalData.historySpecular;
+        fgMoments = temporalData.moments;
+        fgFast = temporalData.fast;
+        fgReconstruction = temporalData.reconstruction;
     }
 
     recon.varianceRecorded = false;
@@ -992,7 +1005,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
         filterCB.phiColor = 10.0f;
         filterCB.phiNormal = 128.0f;
 
-        fg.addCallbackPass<RTGIVariancePassData>(
+        auto& varianceData = fg.addCallbackPass<RTGIVariancePassData>(
             "RTGI Variance Estimate",
             [&](FrameGraph& builder, PassHandle passHandle, RTGIVariancePassData& data)
             {
@@ -1070,6 +1083,9 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                 cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
                 recon.varianceRecorded = true;
             });
+        fgVarianceDiffuse = varianceData.diffuse;
+        fgVarianceSpecular = varianceData.specular;
+        fgDepthGuide = varianceData.depthGuide;
 
         static constexpr const char* s_rtgiAtrousNames[6] =
         {
@@ -1091,7 +1107,7 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
             RTGIFilterCB iterationCB = filterCB;
             iterationCB.stepSize = 1u << iteration;
             iterationCB.iteration = iteration;
-            fg.addCallbackPass<RTGIAtrousPassData>(
+            auto& atrousData = fg.addCallbackPass<RTGIAtrousPassData>(
                 s_rtgiAtrousNames[iteration],
                 [&](FrameGraph& builder, PassHandle passHandle, RTGIAtrousPassData& data)
                 {
@@ -1170,8 +1186,10 @@ ReSTIRGIOutput setupReSTIRGIPass(FrameGraph& fg, fg::RenderDevice* device, RTAcc
                         data.lighting->reconstructionSpatialActive = true;
                     }
                 });
-            currentDiffuse = outDiffuse;
-            currentSpecular = outSpecular;
+            fgFilterDiffuse[iteration & 1u] = atrousData.outDiffuse;
+            fgFilterSpecular[iteration & 1u] = atrousData.outSpecular;
+            currentDiffuse = atrousData.outDiffuse;
+            currentSpecular = atrousData.outSpecular;
         }
         fgFilteredDiffuse = currentDiffuse;
         fgFilteredSpecular = currentSpecular;

@@ -2350,7 +2350,7 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
     using namespace framegraph;
     const bool full = scope == RTBuildScope::Full;
     const auto scene = m_scene;
-    const auto resources = ImportScene(graph, *scene);
+    auto resources = ImportScene(graph, *scene);
     graph.addCallbackPass<RTBuildPassData>("RT Source and Pose",
         [&](FrameGraph& builder, PassHandle pass, RTBuildPassData& data)
         {
@@ -2362,12 +2362,12 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
             data.scope = scope;
             if (full)
             {
-                pb.write(resources.batchInfo, ResourceState::CopyDest);
-                pb.write(resources.materials, ResourceState::CopyDest);
-                pb.write(resources.terrainMaterials, ResourceState::CopyDest);
-                pb.write(resources.variants, ResourceState::CopyDest);
-                pb.write(resources.emissiveTriangles, ResourceState::CopyDest);
-                pb.write(resources.emissiveBatchOffsets, ResourceState::CopyDest);
+                resources.batchInfo = pb.write(resources.batchInfo, ResourceState::CopyDest);
+                resources.materials = pb.write(resources.materials, ResourceState::CopyDest);
+                resources.terrainMaterials = pb.write(resources.terrainMaterials, ResourceState::CopyDest);
+                resources.variants = pb.write(resources.variants, ResourceState::CopyDest);
+                resources.emissiveTriangles = pb.write(resources.emissiveTriangles, ResourceState::CopyDest);
+                resources.emissiveBatchOffsets = pb.write(resources.emissiveBatchOffsets, ResourceState::CopyDest);
                 data.sourceMaterials = pb.read(ImportRTBuffer(builder, "bindless_materials",
                     scene->sourceMaterials), ResourceState::CopySource);
                 data.sourceTerrainMaterials = pb.read(ImportRTBuffer(builder, "terrain_materials",
@@ -2375,13 +2375,13 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
                 data.sourceVariants = pb.read(ImportRTBuffer(builder, "bindless_variants",
                     scene->sourceVariants), ResourceState::CopySource);
             }
-            pb.write(resources.grassMaterials, ResourceState::CopyDest);
-            pb.write(resources.batchTransforms, ResourceState::CopyDest);
+            resources.grassMaterials = pb.write(resources.grassMaterials, ResourceState::CopyDest);
+            resources.batchTransforms = pb.write(resources.batchTransforms, ResourceState::CopyDest);
             if (scene->counts.skinned)
             {
-                pb.write(resources.skinnedVertices, ResourceState::UnorderedAccess);
+                resources.skinnedVertices = pb.write(resources.skinnedVertices, ResourceState::UnorderedAccess);
                 if (full || scene->skinTopology->uploadPending)
-                    pb.write(resources.skinnedIndices, ResourceState::CopyDest);
+                    resources.skinnedIndices = pb.write(resources.skinnedIndices, ResourceState::CopyDest);
                 data.bones = pb.read(ImportRTBuffer(builder, "skinned_bone_matrices", scene->bones),
                     ResourceState::ShaderResource);
                 data.skinSources.clear();
@@ -2395,8 +2395,8 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
             }
             if (scene->counts.grass)
             {
-                pb.write(resources.grassVertices, ResourceState::UnorderedAccess);
-                pb.write(resources.grassIndices, ResourceState::UnorderedAccess);
+                resources.grassVertices = pb.write(resources.grassVertices, ResourceState::UnorderedAccess);
+                resources.grassIndices = pb.write(resources.grassIndices, ResourceState::UnorderedAccess);
                 const auto& frame = *scene->grassFrame;
                 for (u32 chunk : frame.visibleChunks)
                 {
@@ -2521,9 +2521,9 @@ void RTAccelStructManager::RegisterBuildPasses(framegraph::FrameGraph& graph, FG
             data.resources = resources;
             data.scope = scope;
             if (scene->tlasUpdate)
-                pb.readWrite(resources.tlas, ResourceState::AccelStructWrite);
+                resources.tlas = pb.readWrite(resources.tlas, ResourceState::AccelStructWrite);
             else
-                pb.write(resources.tlas, ResourceState::AccelStructWrite);
+                resources.tlas = pb.write(resources.tlas, ResourceState::AccelStructWrite);
             auto input = [&](const RTGeometryBuild& build)
             {
                 if (build.handle)

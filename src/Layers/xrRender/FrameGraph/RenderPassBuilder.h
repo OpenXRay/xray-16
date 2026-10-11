@@ -22,26 +22,22 @@ public:
         return resource;
     }
 
-    VirtualResourceHandle write(VirtualResourceHandle resource,
+    [[nodiscard]] VirtualResourceHandle write(VirtualResourceHandle resource,
                                 ResourceState state = ResourceState::RenderTarget)
     {
-        m_frameGraph.PassWrite(m_passHandle, resource, state);
-        return resource;
+        return m_frameGraph.PassWrite(m_passHandle, resource, state);
     }
 
-    VirtualResourceHandle readWrite(VirtualResourceHandle resource,
+    [[nodiscard]] VirtualResourceHandle readWrite(VirtualResourceHandle resource,
                                     ResourceState state = ResourceState::UnorderedAccess)
     {
-        m_frameGraph.PassReadWrite(m_passHandle, resource, state);
-        return resource;
+        return m_frameGraph.PassReadWrite(m_passHandle, resource, state);
     }
 
     VirtualResourceHandle createTexture(const char* name, const ResourceDesc& desc)
     {
-        VirtualResourceHandle handle = m_frameGraph.CreateTexture(name, desc);
-        m_frameGraph.PassWrite(m_passHandle, handle,
+        return m_frameGraph.PassWrite(m_passHandle, m_frameGraph.CreateTexture(name, desc),
             desc.isDepthStencil ? ResourceState::DepthStencilWrite : ResourceState::RenderTarget);
-        return handle;
     }
 
     VirtualResourceHandle createTexture2D(
@@ -91,9 +87,7 @@ public:
 
     VirtualResourceHandle createBuffer(const char* name, const ResourceDesc& desc)
     {
-        VirtualResourceHandle handle = m_frameGraph.CreateBuffer(name, desc);
-        m_frameGraph.PassWrite(m_passHandle, handle, ResourceState::UnorderedAccess);
-        return handle;
+        return m_frameGraph.PassWrite(m_passHandle, m_frameGraph.CreateBuffer(name, desc), ResourceState::UnorderedAccess);
     }
 
     void asyncCompute() {

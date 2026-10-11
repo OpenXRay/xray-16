@@ -482,6 +482,7 @@ DefaultOutputLayout setupSmokeTrailPass(
 
     DefaultOutputLayout output = inputs;
     output.albedo = passData.outputColor;
+    output.depth = passData.depth;
     return output;
 }
 

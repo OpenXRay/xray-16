@@ -103,9 +103,9 @@ VirtualResourceHandle setupDistortionApplyPass(
             data.sceneInput = passBuilder.read(sceneColor, ResourceState::ShaderResource);
             data.distortionInput = passBuilder.read(distortionRT, ResourceState::ShaderResource);
             data.depthInput = passBuilder.read(depth, ResourceState::ShaderResource);
-            data.output = passBuilder.write(outputHandle, ResourceState::RenderTarget);
             data.copySource = passBuilder.read(sceneColor, ResourceState::CopySource);
             data.copyDest = passBuilder.write(outputHandle, ResourceState::CopyDest);
+            data.output = passBuilder.write(data.copyDest, ResourceState::RenderTarget);
         },
 
         [](const DistortionApplyData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
