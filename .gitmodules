@@ -9,12 +9,6 @@
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/OpenXRay/GameSpy.git
-[submodule "Externals/AGS_SDK"]
-	path = Externals/AGS_SDK
-	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
-[submodule "Externals/gli"]
-	path = Externals/gli
-	url = https://github.com/g-truc/gli.git
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
@@ -45,9 +39,6 @@
 [submodule "Externals/SDL"]
 	path = Externals/SDL
 	url = https://github.com/libsdl-org/SDL.git
-[submodule "Externals/entt"]
-	path = Externals/entt
-	url = https://github.com/skypjack/entt.git
 [submodule "Externals/MoltenVK"]
 	path = Externals/MoltenVK
 	url = https://github.com/KhronosGroup/MoltenVK.git
