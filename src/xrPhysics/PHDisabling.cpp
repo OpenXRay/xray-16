@@ -1,13 +1,14 @@
 #include "StdAfx.h"
 #include "PHDisabling.h"
+#include "xrPhysicsCore/BodyState.h"
 #include "PhysicsCommon.h"
 #include "Physics.h"
-#include "MathUtilsOde.h"
 #ifdef DEBUG
 #include "debug_output.h"
 #endif
 
 extern CPHWorld* ph_world;
+
 SDisableVector::SDisableVector() { Init(); }
 void SDisableVector::Reset() { sum.set(0.f, 0.f, 0.f); }
 void SDisableVector::Init()
@@ -34,6 +35,7 @@ float SDisableVector::UpdatePrevious(const Fvector& new_vector)
 }
 
 float SDisableVector::SumMagnitude() { return sum.magnitude(); }
+
 SDisableUpdateState::SDisableUpdateState() { Reset(); }
 void SDisableUpdateState::Reset()
 {
@@ -48,83 +50,73 @@ SDisableUpdateState& SDisableUpdateState::operator&=(SDisableUpdateState& lstate
     return *this;
 }
 
-CBaseDisableData::CBaseDisableData() : m_disabled(false), m_last_frame_updated(u16(-1))
+CBaseDisableData::CBaseDisableData()
 {
-    m_frames = worldDisablingParams.objects_params.L2frames;
-    Reinit();
+    m_disabled = false;
+    m_count = 0;
+    m_frames = 0;
+    m_last_frame_updated = u16(-1);
 }
 
-void CBaseDisableData::Reinit()
-{
-    m_count = m_frames;
-    if (ph_world)
-        m_count = m_count + ph_world->disable_count;
-    m_stateL1.Reset();
-    m_stateL2.Reset();
-}
 void CBaseDisableData::Disabling()
 {
-    VERIFY(ph_world);
-    if (ph_world->IsFreezed())
-        return;
-    if (m_last_frame_updated == ph_world->StepsShortCnt())
-        return;
-    m_last_frame_updated = ph_world->StepsShortCnt();
-    dBodyID body = get_body();
-    m_count--;
-
+    if (!BeginDisabling()) return;
     UpdateL1();
+    Fvector force, torque;
+    GetPhysicsCore()->GetBodyForce(get_body(), force);
+    GetPhysicsCore()->GetBodyTorque(get_body(), torque);
+    EndDisabling(force, torque);
+}
 
+bool CBaseDisableData::BeginDisabling()
+{
+    if (!ph_world || ph_world->IsFreezed() || m_last_frame_updated == ph_world->StepsShortCnt())
+        return false;
+    m_last_frame_updated = ph_world->StepsShortCnt();
+    VERIFY(m_frames > 0);
+    if (m_count == 0) m_count = m_frames;
+    --m_count;
+    return true;
+}
+
+void CBaseDisableData::EndDisabling(const Fvector& force, const Fvector& torque)
+{
     CheckState(m_stateL1);
-
-    if (m_count == 0) // ph_world->disable_count==dis_frames//m_count==m_frames
+    if (m_count == 0)
     {
         UpdateL2();
         CheckState(m_stateL2);
         m_count = m_frames;
     }
-    const dReal* force = dBodyGetForce(body);
-    const dReal* torqu = dBodyGetTorque(body);
-    if (dDOT(force, force) > 0.f || dDOT(torqu, torqu) > 0.f)
-        m_disabled = false;
-    if (dBodyIsEnabled(body))
-    {
-        ReEnable();
-        if (!m_disabled && (ph_world->disable_count != m_count % worldDisablingParams.objects_params.L2frames))
-        {
-            m_count = m_frames + ph_world->disable_count;
-        }
-    }
-    if (m_disabled)
-        Disable(); // dBodyDisable(body);
+    if (force.square_magnitude() > 0 || torque.square_magnitude() > 0) m_disabled = false;
+    // Jolt wakes connected bodies together. CPHShell applies this decision to
+    // all of its elements at once instead of cycling individual bodies asleep.
 }
 
-void CPHDisablingBase::Reinit()
+void CBaseDisableData::Reinit()
 {
-    m_mean_velocity.Init();
-    m_mean_acceleration.Init();
-    CBaseDisableData::Reinit();
-    bool disable = !dBodyIsEnabled(get_body());
-    m_stateL1.disable = disable;
-    m_stateL1.enable = !disable;
-    m_stateL2.disable = disable;
-    m_stateL2.enable = !disable;
+    m_stateL1.Reset();
+    m_stateL2.Reset();
+    m_count = m_frames;
+    if (ph_world) m_count += ph_world->disable_count;
+    m_disabled = false;
+    m_last_frame_updated = u16(-1);
 }
+
 void CPHDisablingBase::UpdateValues(const Fvector& new_pos, const Fvector& new_vel)
 {
     if (m_count < m_frames)
     {
-        float velocity_param = m_mean_velocity.Update(new_pos);
-        float acceleration_param = m_mean_acceleration.Update(new_vel);
-        CheckState(m_stateL1, velocity_param * m_frames, acceleration_param * m_frames);
+        CheckState(m_stateL1, m_mean_velocity.Update(new_pos) * m_frames,
+            m_mean_acceleration.Update(new_vel) * m_frames);
     }
     else
     {
-        float velocity_param = m_mean_velocity.UpdatePrevious(new_pos);
-        float acceleration_param = m_mean_acceleration.UpdatePrevious(new_vel);
-        CheckState(m_stateL1, velocity_param * m_frames, acceleration_param * m_frames);
+        CheckState(m_stateL1, m_mean_velocity.UpdatePrevious(new_pos) * m_frames,
+            m_mean_acceleration.UpdatePrevious(new_vel) * m_frames);
     }
 }
+
 void CPHDisablingBase::UpdateL2()
 {
     m_stateL2.Reset();
@@ -137,31 +129,41 @@ void CPHDisablingBase::UpdateL2()
     m_mean_acceleration.Reset();
 }
 
-void CPHDisablingBase::set_DisableParams(const SOneDDOParams& params) { m_params = params; }
-CPHDisablingTranslational::CPHDisablingTranslational() { m_params = worldDisablingParams.objects_params.translational; }
-void CPHDisablingTranslational::Reinit()
+void CPHDisablingBase::set_DisableParams(const SOneDDOParams& params)
 {
-    CPHDisablingBase::Reinit();
-    dBodyID body = get_body();
-    const dReal* position = dBodyGetPosition(body);
-    const dReal* velocity = dBodyGetLinearVel(body);
-    m_mean_velocity.UpdatePrevious(*(Fvector*)position);
-    m_mean_acceleration.UpdatePrevious(*(Fvector*)velocity);
+    m_params = params;
+    m_mean_velocity.Reset();
+    m_mean_acceleration.Reset();
 }
+
+void CPHDisablingBase::Reinit()
+{
+    CBaseDisableData::Reinit();
+    m_mean_velocity.Init();
+    m_mean_acceleration.Init();
+}
+
+CPHDisablingTranslational::CPHDisablingTranslational()
+{
+    m_params = worldDisablingParams.objects_params.translational;
+    m_frames = worldDisablingParams.objects_params.L2frames;
+}
+
+void CPHDisablingTranslational::Reinit() { CPHDisablingBase::Reinit(); }
+
 void CPHDisablingTranslational::UpdateL1()
 {
     m_stateL1.Reset();
-    dBodyID body = get_body();
-    const dReal* position = dBodyGetPosition(body);
-    const dReal* velocity = dBodyGetLinearVel(body);
-#if 0
-	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_velocity.sum), color_xrgb( 255, 0, 0 )   );
-	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_acceleration.sum), color_xrgb( 0, 0, 255 )  );
-#endif
-    CPHDisablingBase::UpdateValues(*(Fvector*)position, *(Fvector*)velocity);
-    // float			velocity_param		=	m_mean_velocity		.Update(* (Fvector*) position)		;
-    // float			acceleration_param	=	m_mean_acceleration	.Update(* (Fvector*) velocity)		;
-    // CheckState						(m_stateL1,velocity_param*m_frames,acceleration_param*m_frames) ;
+    CharacterVirtualHandle body = get_body();
+    if (body == INVALID_CHARACTER_VIRTUAL_HANDLE) return;
+
+    Fmatrix transform;
+    GetPhysicsCore()->GetBodyTransform(body, transform);
+
+    Fvector velocity;
+    GetPhysicsCore()->GetBodyLinearVelocity(body, velocity);
+
+    CPHDisablingBase::UpdateValues(transform.c, velocity);
 }
 
 void CPHDisablingTranslational::set_DisableParams(const SAllDDOParams& params)
@@ -170,32 +172,31 @@ void CPHDisablingTranslational::set_DisableParams(const SAllDDOParams& params)
     m_frames = params.L2frames;
 }
 
-CPHDisablingRotational::CPHDisablingRotational() { m_params = worldDisablingParams.objects_params.rotational; }
-void CPHDisablingRotational::Reinit()
+CPHDisablingRotational::CPHDisablingRotational()
 {
-    CPHDisablingBase::Reinit();
-    dBodyID body = get_body();
-    const dReal* rotation = dBodyGetRotation(body);
-    const dReal* velocity = dBodyGetAngularVel(body);
-    Fvector vrotation;
-    vrotation.set(rotation[9], rotation[2], rotation[4]);
-    m_mean_velocity.UpdatePrevious(vrotation);
-    m_mean_acceleration.UpdatePrevious(*(Fvector*)velocity);
+    m_params = worldDisablingParams.objects_params.rotational;
+    m_frames = worldDisablingParams.objects_params.L2frames;
 }
+
+void CPHDisablingRotational::Reinit() { CPHDisablingBase::Reinit(); }
+
 void CPHDisablingRotational::UpdateL1()
 {
     m_stateL1.Reset();
-    dBodyID body = get_body();
-    const dReal* rotation = dBodyGetRotation(body);
-    const dReal* velocity = dBodyGetAngularVel(body);
+    CharacterVirtualHandle body = get_body();
+    if (body == INVALID_CHARACTER_VIRTUAL_HANDLE) return;
+
+    Fmatrix transform;
+    GetPhysicsCore()->GetBodyTransform(body, transform);
+
+    Fvector angular_velocity;
+    GetPhysicsCore()->GetBodyAngularVelocity(body, angular_velocity);
+
+    // Магия X-Ray: замена ODEшных индексов вращения (9, 2, 4) на компоненты Fmatrix (k.y, i.z, j.x)
     Fvector vrotation;
-    vrotation.set(rotation[9], rotation[2], rotation[4]);
+    vrotation.set(transform.k.y, transform.i.z, transform.j.x);
 
-    CPHDisablingBase::UpdateValues(vrotation, *(Fvector*)velocity);
-    // float			velocity_param		=	m_mean_velocity		.Update	(			 vrotation	)	;
-    // float			acceleration_param	=	m_mean_acceleration	.Update	(* (Fvector*) velocity	)	;
-
-    // CheckState									(m_stateL1,velocity_param,acceleration_param)		;
+    CPHDisablingBase::UpdateValues(vrotation, angular_velocity);
 }
 
 void CPHDisablingRotational::set_DisableParams(const SAllDDOParams& params)
@@ -209,6 +210,21 @@ void CPHDisablingFull::Reinit()
     CPHDisablingRotational::Reinit();
     CPHDisablingTranslational::Reinit();
 }
+
+void CPHDisablingFull::Disabling(const NativeBodyState& state)
+{
+    if (!BeginDisabling()) return;
+    m_stateL1.Reset();
+    Fvector rotation;
+    rotation.set(state.transform.k.y, state.transform.i.z, state.transform.j.x);
+    CPHDisablingRotational::UpdateValues(rotation, state.angular_velocity);
+    auto rotational = m_stateL1;
+    m_stateL1.Reset();
+    CPHDisablingTranslational::UpdateValues(state.transform.c, state.linear_velocity);
+    m_stateL1 &= rotational;
+    EndDisabling(state.force, state.torque);
+}
+
 void CPHDisablingFull::UpdateL1()
 {
     SDisableUpdateState state;

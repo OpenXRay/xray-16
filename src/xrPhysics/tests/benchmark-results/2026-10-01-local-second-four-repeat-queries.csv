@@ -1,0 +1,7 @@
+"runtime","workload","runs","median_us_per_query","min_run_us_per_query","max_run_us_per_query","model_reported_bytes"
+"BaselineNative4","nearest_ray","3","0.960888671875","0.9515869140625","0.9721435546875","96089734"
+"BaselineNative4","any_ray","3","0.6307861328125","0.6215087890625","0.6395751953125","96089734"
+"BaselineNative4","full_box","3","0.8865478515625","0.884326171875","0.895068359375","96089734"
+"CandidateNative4","nearest_ray","3","0.886181640625","0.8785400390625","0.906201171875","96089734"
+"CandidateNative4","any_ray","3","0.5911376953125","0.5894287109375","0.59326171875","96089734"
+"CandidateNative4","full_box","3","0.8881591796875","0.879150390625","0.8992431640625","96089734"

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "IElevatorState.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
+
 class CPHCharacter;
-struct dContact;
 struct SGameMtl;
 class IClimableObject;
+class CPhysicsGeom;
 
 class CElevatorState : public IElevatorState
 {
@@ -46,7 +48,7 @@ private:
     void NewState();
 
     void PhDataUpdate(float step);
-    void InitContact(dContact* c, bool& do_collide, u16 /*material_idx_1*/, u16 /*material_2*/);
+    void InitContact(bool& do_collide, bool bo1, float depth, CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom, u16 material_idx_1, u16 material_2);
     void SwitchState(Estate new_state);
     bool StateSwitchInertion(Estate new_state);
     void UpdateStNone();
