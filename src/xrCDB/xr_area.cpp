@@ -181,7 +181,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
         // Load OPCODE tree
         Static.deserialize_tree(cacheStream);
     }
-    else if (use_cache && FS.exist(file_name) && Static.deserialize(file_name, skip_crc32_check, deserialize_callback))
+    else if (use_cache && Static.deserialize(file_name, skip_crc32_check, deserialize_callback))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded ObjectSpace cache (%s)...", file_name);

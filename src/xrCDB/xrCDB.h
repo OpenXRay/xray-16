@@ -1,10 +1,12 @@
 #pragma once
 
-#include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
+#include <atomic>
+#include <thread>
 #include "Common/Noncopyable.hpp"
-#include "xrCore/math_constants.h"
-#include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h"
+#include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
+#include "xrCore/_vector3d.h"
+#include "xrCore/math_constants.h"
 
 #ifdef XRAY_STATIC_BUILD
 #   define XRCDB_API
@@ -18,11 +20,6 @@
 
 // forward declarations
 class CFrustum;
-namespace Opcode
-{
-class OPCODE_Model;
-class AABBNoLeafNode;
-};
 
 struct Fbox3;
 using Fbox = Fbox3;
@@ -31,6 +28,7 @@ class Lock;
 #pragma pack(push, 8)
 namespace CDB
 {
+class ModelTree;
 // Triangle
 class TRI //*** 16 bytes total (was 32 :)
 {
@@ -76,8 +74,9 @@ class XRCDB_API MODEL : Noncopyable
 
 private:
     Lock* pcs;
-    Opcode::OPCODE_Model* tree{};
-    volatile u32 status{ S_INIT }; // 0=ready, 1=init, 2=building
+    ModelTree* tree{};
+    std::atomic<u32> status{ S_INIT };
+    std::thread buildThread;
     u32 model_crc32{};
 
     // tris
