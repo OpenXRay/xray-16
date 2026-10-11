@@ -197,7 +197,7 @@ public:
     virtual nvrhi::IBindingLayout* GetBindlessLayout() const { return nullptr; }
     virtual nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const { return nullptr; }
 
-    virtual void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {}
+    virtual void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) {}
 
     virtual void BeginDebugEvent(pcstr name) {}
     virtual void EndDebugEvent() {}

@@ -310,7 +310,7 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
     {
         if (GEnv.Backend)
         {
-            GEnv.Backend->UploadBufferData(buffer, pData, dataSize);
+            GEnv.Backend->UploadBufferData(buffer, pData, dataSize, 0);
         }
         else
         {

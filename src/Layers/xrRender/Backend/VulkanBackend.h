@@ -57,7 +57,7 @@ public:
     void ReleaseSubmissionLease(u64 lease) override { m_completion.ReleaseLease(lease); }
     u32 GetPendingSubmissionCount() const override { return m_completion.PendingTicketCount(); }
 
-    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
+    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) override;
 
     nvrhi::ITexture* GetBackBuffer() override;
     u32 GetCurrentBackBufferIndex() const override { return m_currentImageIndex; }

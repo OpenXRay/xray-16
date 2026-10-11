@@ -23,7 +23,7 @@ void VariantBuffer::Initialize(fg::RenderDevice* device)
     }
     m_data.assign(MAX_SHADER_VARIANTS, VariantData{ 0.0f, VARIANT_FLAG_FOG, 0u, 1.0f });
     if (GEnv.Backend)
-        GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_SHADER_VARIANTS * sizeof(VariantData));
+        GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_SHADER_VARIANTS * sizeof(VariantData), 0);
 }
 
 void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
@@ -76,7 +76,7 @@ void VariantBuffer::Rebuild(const ShaderVariantRegistry& registry)
         m_data.swap(next);
         ++m_revision;
         if (GEnv.Backend)
-            GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_SHADER_VARIANTS * sizeof(VariantData));
+            GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_SHADER_VARIANTS * sizeof(VariantData), 0);
     }
     m_dirtyRangeStart = UINT32_MAX;
     m_dirtyRangeEnd = 0;

@@ -28,7 +28,7 @@ public:
     nvrhi::ICommandList* CreateCommandList() override;
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
-    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
+    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) override;
 
     bool SupportsSubmissionLeases() const override { return true; }
     u64 OpenSubmissionLease() override;

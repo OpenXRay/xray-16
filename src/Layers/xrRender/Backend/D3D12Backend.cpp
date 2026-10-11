@@ -699,15 +699,15 @@ void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
     }
 }
 
-void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
+void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) {
     if (!buffer || !data || size == 0)
         return;
 
     if (m_inFrame) {
-        m_commandList->writeBuffer(buffer, data, size);
+        m_commandList->writeBuffer(buffer, data, size, offset);
     } else {
         m_uploadCommandList->open();
-        m_uploadCommandList->writeBuffer(buffer, data, size);
+        m_uploadCommandList->writeBuffer(buffer, data, size, offset);
         m_uploadCommandList->close();
         const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
         if (!m_nvrhiDevice->executeCommandList(m_uploadCommandList))

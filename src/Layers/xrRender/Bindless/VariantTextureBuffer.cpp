@@ -30,7 +30,7 @@ void VariantTextureBuffer::Initialize(fg::RenderDevice* device)
     m_uploadCount = MAX_MATERIALS;
 
     if (GEnv.Backend)
-        GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_MATERIALS * sizeof(VariantTextureData));
+        GEnv.Backend->UploadBufferData(m_buffer, m_data.data(), MAX_MATERIALS * sizeof(VariantTextureData), 0);
 
     Msg("* [VariantTexture] Buffer initialized (max: %u materials, %u KB)",
         MAX_MATERIALS, (MAX_MATERIALS * sizeof(VariantTextureData)) / 1024);

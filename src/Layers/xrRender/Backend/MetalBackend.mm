@@ -821,13 +821,13 @@ bool MetalBackend::GetQueueTimings(QueueTimings& out) const {
     return true;
 }
 
-void MetalBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
+void MetalBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) {
     @autoreleasepool {
         Impl& impl = *m_impl;
         if (!impl.initialized || impl.state.load() == DeviceState::Lost || !buffer || !data || !size)
             return;
         if (impl.inFrame) {
-            impl.currentGraphics->writeBuffer(buffer, data, size);
+            impl.currentGraphics->writeBuffer(buffer, data, size, offset);
             return;
         }
         std::lock_guard<std::mutex> lock(impl.queueMutex);
@@ -840,7 +840,7 @@ void MetalBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, si
         impl.uploads->open();
         if (impl.state.load() == DeviceState::Lost)
             return;
-        impl.uploads->writeBuffer(buffer, data, size);
+        impl.uploads->writeBuffer(buffer, data, size, offset);
         impl.uploads->close();
         if (impl.state.load() == DeviceState::Lost)
             return;

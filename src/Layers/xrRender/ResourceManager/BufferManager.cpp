@@ -87,7 +87,7 @@ BufferHandle BufferManager::CreateBuffer(
     }
 
     if (initialData && GEnv.Backend) {
-        GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, initialData, desc.size);
+        GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, initialData, desc.size, 0);
     }
 
     m_stats.buffersTotal++;
@@ -108,17 +108,10 @@ void BufferManager::UpdateBuffer(
     BufferMetadata& meta = m_buffers[handle.index];
 
     if (GEnv.Backend) {
-        if (GEnv.Backend->IsInFrame()) {
+        if (GEnv.Backend->IsInFrame())
             GEnv.Backend->GetCommandList()->writeBuffer(meta.nvrhiBuffer, data, size, offset);
-        } else {
-            if (offset == 0) {
-                GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, data, size);
-            } else {
-                nvrhi::ICommandList* cmdList = GEnv.Backend->GetCommandList();
-                Msg("! [BufferManager] WARNING: Offset update outside frame - using immediate upload");
-                GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, data, size);
-            }
-        }
+        else
+            GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, data, size, offset);
     }
 
     meta.lastAccessTime = 0.0f;

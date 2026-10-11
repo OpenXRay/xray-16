@@ -211,7 +211,7 @@ struct CollisionBuffer
         const T* data = values.empty() ? &empty : values.data();
         const size_t bytes = std::max(size_t(1), values.size()) * sizeof(T);
         Reserve<T>(device, name, values.size(), bindingVersion);
-        GEnv.Backend->UploadBufferData(buffer, data, bytes);
+        GEnv.Backend->UploadBufferData(buffer, data, bytes, 0);
         dirty.clear();
     }
 };
