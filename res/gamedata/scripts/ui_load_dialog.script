@@ -27,6 +27,7 @@ function load_dialog:__finalize()
 end
 
 function load_dialog:FillList()
+	self.button_load:Enable(false)
 	self.list_box:RemoveAll()
 	local f		= getFS()
 	local flist = f:file_list_open_ex("$game_saves$",bit_or(FS.FS_ListFiles,FS.FS_RootOnly),"*"..saved_game_extension)
@@ -84,7 +85,9 @@ function load_dialog:InitControls()
 	self:Register			(self.list_box, "list_window")
 
 	ctrl					= xml:Init3tButton("form:btn_load",	self.form)
-	self:Register			(ctrl, "button_load")
+	self.button_load		= ctrl
+	self.button_load:Enable(false)
+	self:Register			(self.button_load, "button_load")
 
 	ctrl = xml:Init3tButton	("form:btn_delete",	self.form)
 	self:Register			(ctrl, "button_del")
@@ -103,7 +106,7 @@ function load_dialog:InitCallBacks()
 	self:AddCallback("message_box",		ui_events.MESSAGE_BOX_YES_CLICKED,    self.OnMsgYes,				self)
 	self:AddCallback("message_box",		ui_events.MESSAGE_BOX_OK_CLICKED,	  self.OnMsgYes,				self)
 
-	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, 			  self.OnListItemClicked,		self)
+	self:AddCallback("list_window", ui_events.LIST_ITEM_SELECT, 			  self.OnListItemClicked,		self)
 	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		  self.OnListItemDbClicked,		self)
 
 
@@ -184,11 +187,15 @@ function file_data(fname)
 end
 
 function load_dialog:OnListItemClicked()
-	if self.list_box:GetSize()==0 then return end
+	if self.list_box:GetSize()==0 then
+		self.button_load:Enable(false)
+		return
+	end
 
 	local item			= self.list_box:GetSelectedItem()
 
 	if item == nil then
+		self.button_load:Enable(false)
 		self.file_caption:SetText	("")
 		self.file_data:SetText		("")
 
@@ -204,9 +211,11 @@ function load_dialog:OnListItemClicked()
 	self.file_data:SetText		(file_data(item_text))
 
 	if file_exist(item_text .. saved_game_extension) ~= true then
+		self.button_load:Enable(false)
 		self.list_box:RemoveItem(item)
 		return
 	end
+	self.button_load:Enable(valid_saved_game(item_text))
 
 	local r = self.picture:GetTextureRect()
 	if file_exist(item_text .. ".dds") then
@@ -255,6 +264,13 @@ function load_dialog:load_game_internal()
 	local item  = self.list_box:GetItemByIndex(index)
 
 	local fname = item.fn:GetText()
+
+	if ( not valid_saved_game(fname) ) then
+		self.msgbox_id						= 0
+		self.message_box:InitMessageBox		("message_box_invalid_saved_game")
+		self.message_box:ShowDialog(true)
+		return
+	end
 
 	if (alife() == nil) then
 		console:execute	("disconnect")
