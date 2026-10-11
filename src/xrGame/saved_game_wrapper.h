@@ -21,6 +21,7 @@ private:
     _TIME_ID m_game_time;
     _LEVEL_ID m_level_id;
     shared_str m_level_name;
+    bool m_is_compatible{};
     float m_actor_health;
 
 public:
@@ -32,6 +33,7 @@ public:
     inline const _TIME_ID& game_time() const;
     inline const _LEVEL_ID& level_id() const;
     inline LPCSTR level_name() const;
+    inline bool is_compatible() const;
     inline const float& actor_health() const;
 
 private:

@@ -26,6 +26,7 @@ void CSavedGameWrapper::script_register(lua_State* luaState)
             })
             .def("level_id", &CSavedGameWrapper::level_id)
             .def("level_name", &CSavedGameWrapper::level_name)
+            .def("is_compatible", &CSavedGameWrapper::is_compatible)
             .def("actor_health", &CSavedGameWrapper::actor_health),
 
         def("valid_saved_game", (bool (*)(pcstr))(&CSavedGameWrapper::valid_saved_game))

@@ -175,7 +175,10 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
             CGameGraph graph(*chunk);
             m_level_id = graph.vertex(object->m_tGraphID)->level_id();
             if (graph.header().level_exist(m_level_id))
+            {
                 m_level_name = graph.header().level(m_level_id).name();
+                m_is_compatible = true;
+            }
             else
                 m_level_name = StringTable().translate("ui_st_error");
         }

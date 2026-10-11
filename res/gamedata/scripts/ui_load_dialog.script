@@ -41,6 +41,8 @@ function load_dialog:FillList()
 		--menu_item =  ..
 		self:AddItemToList(file_name, date_time)
 	end
+
+	self:UpdateActionButtons()
 end
 
 function load_dialog:InitControls()
@@ -84,12 +86,15 @@ function load_dialog:InitControls()
 	self:Register			(self.list_box, "list_window")
 
 	ctrl					= xml:Init3tButton("form:btn_load",	self.form)
+	self.button_load		= ctrl
 	self:Register			(ctrl, "button_load")
 
 	ctrl = xml:Init3tButton	("form:btn_delete",	self.form)
+	self.button_del			= ctrl
 	self:Register			(ctrl, "button_del")
 
 	ctrl = xml:Init3tButton	("form:btn_cancel",	self.form)
+	self.button_back		= ctrl
 	self:Register			(ctrl, "button_back")
 
 	self.message_box		= CUIMessageBoxEx()
@@ -104,6 +109,7 @@ function load_dialog:InitCallBacks()
 	self:AddCallback("message_box",		ui_events.MESSAGE_BOX_OK_CLICKED,	  self.OnMsgYes,				self)
 
 	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, 			  self.OnListItemClicked,		self)
+	self:AddCallback("list_window", ui_events.LIST_ITEM_SELECT,			  self.OnListItemSelected,		self)
 	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		  self.OnListItemDbClicked,		self)
 
 
@@ -177,18 +183,51 @@ function file_data(fname)
 		--string.format("[%d/%d/%d %d]",m,d,h,min,y)
 		local health = string.format("\\n%s %d%s", game.translate_string("st_ui_health_sensor"),sg:actor_health()*100,"%")
 
-		return game.translate_string("st_level") .. ": " .. game.translate_string(sg:level_name()) .. "\\n" .. game.translate_string("ui_inv_time")..": " .. date_time .. health
+		return game.translate_string("st_level") .. ": " .. game.translate_string(sg:level_name()) .. "\\n" .. game.translate_string("ui_inv_time")..": " .. date_time .. health, sg:is_compatible()
 	else
-		return "no file data"
+		return "no file data", false
 	end
 end
 
+function is_compatible_saved_game(fname)
+	if not valid_saved_game(fname) then
+		return false
+	end
+
+	local sg = CSavedGameWrapper(fname)
+	return sg:is_compatible()
+end
+
+function load_dialog:UpdateActionButtons(compatible)
+	local item = self.list_box:GetSelectedItem()
+
+	if item ~= nil then
+		if compatible == nil then
+			compatible = is_compatible_saved_game(item.fn:GetText())
+		end
+	else
+		compatible = true
+	end
+
+	self.button_load:Enable(compatible)
+	self.button_del:Enable(true)
+	self.button_back:Enable(compatible)
+end
+
+function load_dialog:OnListItemSelected()
+	self:UpdateActionButtons()
+end
+
 function load_dialog:OnListItemClicked()
-	if self.list_box:GetSize()==0 then return end
+	if self.list_box:GetSize()==0 then
+		self:UpdateActionButtons()
+		return
+	end
 
 	local item			= self.list_box:GetSelectedItem()
 
 	if item == nil then
+		self:UpdateActionButtons()
 		self.file_caption:SetText	("")
 		self.file_data:SetText		("")
 
@@ -201,10 +240,13 @@ function load_dialog:OnListItemClicked()
 	local item_text				= item.fn:GetText()
 	self.file_caption:SetText	(item_text)
 	self.file_caption:SetEllipsis(true)
-	self.file_data:SetText		(file_data(item_text))
+	local data, compatible = file_data(item_text)
+	self.file_data:SetText(data)
+	self:UpdateActionButtons(compatible)
 
 	if file_exist(item_text .. saved_game_extension) ~= true then
 		self.list_box:RemoveItem(item)
+		self:UpdateActionButtons()
 		return
 	end
 
@@ -256,6 +298,8 @@ function load_dialog:load_game_internal()
 
 	local fname = item.fn:GetText()
 
+	if not is_compatible_saved_game(fname) then return end
+
 	if (alife() == nil) then
 		console:execute	("disconnect")
 		console:execute	("start server(" .. fname .. "/single/alife/load) client(localhost)")
@@ -284,6 +328,8 @@ function load_dialog:OnButton_load_clicked()
 		self.message_box:ShowDialog(true)
 		return
 	end
+
+	if not is_compatible_saved_game(fname) then return end
 
 	if (alife() == nil) then
 		self:load_game_internal				()
