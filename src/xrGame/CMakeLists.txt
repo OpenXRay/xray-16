@@ -2474,7 +2474,6 @@ target_include_directories(xrGame
     "${XRAY_SOURCE_DIR}/src"
     "${XRAY_SOURCE_DIR}/src/xrServerEntities"
     "${XRAY_SOURCE_DIR}/Externals/GameSpy/src"
-    "${XRAY_SOURCE_DIR}/Externals/ode/include"
     "${XRAY_SOURCE_DIR}/Externals/OpenAutomate/inc"
     "${XRAY_SOURCE_DIR}/sdk/include"
 )

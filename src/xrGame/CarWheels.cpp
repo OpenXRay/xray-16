@@ -17,24 +17,29 @@ CCar::SWheel::SWheelCollisionParams::SWheelCollisionParams()
     mu_factor = 1;
 }
 IC void CCar::SWheel::applywheelCollisionParams(
-    const dxGeomUserData* ud, bool& do_colide, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+    IPhysicsShellHolder* ud, bool& do_colide,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    if (ud && ud->object_callbacks && ud->object_callbacks->HasCallback(WheellCollisionCallback))
-    {
-        SWheelCollisionParams& cp = *((SWheelCollisionParams*)(ud->callback_data));
-        dSurfaceParameters& sp = c.surface;
-        sp.mu *= cp.mu_factor;
-        MulSprDmp(sp.soft_cfm, sp.soft_cfm, cp.spring_factor, cp.damping_factor);
+    if (my_geom && my_geom->object_callbacks && my_geom->object_callbacks->HasCallback(WheellCollisionCallback) &&
+        my_geom->callback_data && my_geom->contact_response) {
+        const auto& parameters = *static_cast<const SWheelCollisionParams*>(my_geom->callback_data);
+        my_geom->contact_response->friction_scale *= parameters.mu_factor;
     }
 }
 
 void CCar::SWheel::WheellCollisionCallback(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    dxGeomUserData* ud1 = PHRetrieveGeomUserData(c.geom.g1);
-    dxGeomUserData* ud2 = PHRetrieveGeomUserData(c.geom.g2);
-    applywheelCollisionParams(ud1, do_colide, c, material_1, material_2);
-    applywheelCollisionParams(ud2, do_colide, c, material_1, material_2);
+    IPhysicsShellHolder* ud1 = my_geom ? (IPhysicsShellHolder*)my_geom->get_callback_data() : nullptr;
+    IPhysicsShellHolder* ud2 = oposite_geom ? (IPhysicsShellHolder*)oposite_geom->get_callback_data() : nullptr;
+
+    applywheelCollisionParams(ud1, do_colide, my_geom, oposite_geom, contact_normal, contact_pos, material_1, material_2);
+    applywheelCollisionParams(ud2, do_colide, oposite_geom, my_geom, contact_normal, contact_pos, material_1, material_2);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +67,7 @@ void CCar::SWheel::Init()
     R_ASSERT2(j, "No wheel joint was set for a wheel");
     joint = j;
     joint->SetBackRef(&joint);
+    joint->SetJointSDfactors(collision_params.spring_factor, collision_params.damping_factor);
 
     // R_ASSERT2(dJointGetType(joint->GetDJoint())==dJointTypeHinge2,"No wheel join was set for a wheel, only
     // wheel-joint valid!!!");

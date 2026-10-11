@@ -67,23 +67,19 @@ void imotion_position::interactive_motion_diagnostic(LPCSTR message)
 CPhysicsShellHolder* collide_obj = 0;
 #endif
 
-static void get_depth(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+static void get_depth(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
     using namespace ::detail::imotion_position;
 
-    save_max(depth, c.geom.depth);
 #ifdef DEBUG
-    if (depth != c.geom.depth)
-        return;
-    dxGeomUserData* ud = 0;
-    if (bo1)
-        ud = PHRetrieveGeomUserData(c.geom.g2);
+    if (oposite_geom)
+        collide_obj = static_cast<CPhysicsShellHolder*>(oposite_geom->get_callback_data());
     else
-        ud = PHRetrieveGeomUserData(c.geom.g1);
-    if (ud)
-        collide_obj = static_cast<CPhysicsShellHolder*>(ud->ph_ref_object);
-    else
-        collide_obj = 0;
+        collide_obj = nullptr;
 #endif
 }
 static std::string collide_diag()
