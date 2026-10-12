@@ -36,6 +36,9 @@ public:
     bool terrain_material(const std::string& diffuse, const std::string& lightmap,
         const TerrainMaterialTextures& terrain, DeferredPass& pass,
         VkDescriptorSet& result, std::string& error);
+    bool detail_material(const std::string& diffuse, const std::string& lightmap,
+        const std::string& detail, DeferredPass& pass,
+        VkDescriptorSet& result, std::string& error);
     void release_terrain_material(VkDescriptorSet set, DeferredPass& pass);
     float terrain_detail_scale(const std::string& diffuse) const;
     bool ui(const std::string& texture_name, ScenePass& pass,
@@ -68,10 +71,11 @@ public:
         int* blend_mode = nullptr, bool particle_pipeline = false,
         bool screen_pipeline = false, bool level_pipeline = false,
         bool water_pipeline = false, uint32_t* material_flags = nullptr,
-        TerrainMaterialTextures* terrain = nullptr) const
+        TerrainMaterialTextures* terrain = nullptr,
+        MaterialDefinition* definition = nullptr) const
     {
         if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode,
-            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain);
+            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain, definition);
         mode = SurfaceMode::Unresolved;
         error = "shaders.xr material library is not loaded for shader='" + shader +
             "' texture='" + texture + "'";

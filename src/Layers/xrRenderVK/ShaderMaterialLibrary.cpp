@@ -211,7 +211,8 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 name, mode, supported, cls, version, alpha_ref, blending, screen_flags,
                 terrain, properties, error) || name.empty() ||
             !entries_.emplace(name, MaterialDefinition{id, name, cls, version, mode, supported,
-                {}, alpha_ref, blending, screen_flags, terrain, std::move(properties)}).second)
+                {}, alpha_ref, blending, screen_flags, MaterialDefinition::Role::Standard,
+                terrain, {}, std::move(properties)}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -222,6 +223,16 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             return false;
         }
         auto& definition = entries_.at(name);
+        const bool strict_sorting = std::any_of(definition.properties.begin(), definition.properties.end(),
+            [](const BlenderProperty& property)
+            { return property.name == "Strict sorting" && property.type == 6 &&
+                property.data.size() == 4 && le32(property.data.data()) != 0; });
+        // The game's water S_SET variant declares depth-tested, depth-writing,
+        // lit and sorted transparent geometry. Its role comes from serialized
+        // state, so a mod can rename the shader and texture without rerouting.
+        if (cls == "S_SET   " && blending == 0 && strict_sorting &&
+            (screen_flags & 14u) == 14u)
+            definition.role = MaterialDefinition::Role::Water;
         // These blenders sample the second environment texture in their
         // Compile path. The current Vulkan descriptor has only the base
         // texture; pretending they are supported drops reflection outright.
@@ -239,9 +250,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             definition.unsupported_reason = "Environment map / constant / multiply pass";
         }
         // Older BmmD records carry one detail texture in the Detail map
-        // scope. The four-channel terrain path consumes R2-R/G/B/A, but does
-        // not bind this extra slot. Preserve the parsed property and refuse
-        // the unsupported variant instead of rendering only its base texture.
+        // scope. Keep its exact slot separate from the four-channel terrain.
         if (cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ")
         {
             if (!terrain.enabled)
@@ -262,16 +271,29 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 const std::string detail(reinterpret_cast<const char*>(property.data.data()));
                 if (!detail.empty() && lower(detail) != "$null")
                 {
-                    definition.pipeline_supported = false;
-                    definition.unsupported_reason = "Detail map / Name (single detail texture)";
+                    definition.detail_texture = lower(detail);
+                    if (terrain.enabled)
+                    {
+                        definition.pipeline_supported = false;
+                        definition.unsupported_reason = "Detail map / Name alongside R2-R/G/B/A";
+                    }
+                    else if (supported)
+                    {
+                        definition.pipeline_supported = true;
+                        definition.unsupported_reason.clear();
+                    }
                 }
                 break;
             }
         }
-        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d terrain=%d supported=%d",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' properties=%zu supported=%d reason='%s'",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
-            alpha_ref, blending, terrain.enabled ? 1 : 0, definition.pipeline_supported ? 1 : 0);
+            alpha_ref, blending, definition.screen_flags,
+            definition.role == MaterialDefinition::Role::Water ? "water" : "standard",
+            terrain.enabled ? 1 : 0, definition.detail_texture.c_str(),
+            definition.properties.size(), definition.pipeline_supported ? 1 : 0,
+            definition.unsupported_reason.c_str());
     }
     if (entries_.empty()) { error = "shaders.xr contains no blender definitions"; return false; }
     error.clear();
@@ -303,7 +325,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     const bool scene_depth_test = !screen_pipeline && material.mode == SurfaceMode::Transparent;
     const uint32_t supported_flags = screen_pipeline ? 0u :
         1u | (scene_depth_test ? 2u : 0u) |
-        (level_pipeline ? 16u : 0u) | (water_pipeline ? 12u : 0u);
+        (level_pipeline ? 16u : 0u) |
+        ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u);
     const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;
     if (material.class_name == "S_SET   " && unsupported_flags)
     {

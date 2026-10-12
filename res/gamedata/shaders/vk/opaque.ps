@@ -3,12 +3,17 @@
 #if defined(VK_LIGHTMAP)
 [[vk::binding(1, 0)]] Texture2D<float4> lightmap : register(t1);
 #endif
-#if defined(VK_TERRAIN)
+#if defined(VK_TERRAIN) || defined(VK_DETAIL)
 [[vk::push_constant]] cbuffer TerrainParams {
     float4x4 terrain_camera;
     float terrain_alpha_threshold;
     float terrain_scale;
 };
+#endif
+#if defined(VK_DETAIL)
+[[vk::binding(2, 0)]] Texture2D<float4> single_detail : register(t2);
+#endif
+#if defined(VK_TERRAIN)
 [[vk::binding(2, 0)]] Texture2D<float4> terrain_mask : register(t2);
 [[vk::binding(3, 0)]] Texture2D<float4> terrain_red : register(t3);
 [[vk::binding(4, 0)]] Texture2D<float4> terrain_green : register(t4);
@@ -136,6 +141,9 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
         terrain_blue.Sample(diffuse_sampler, detail_uv).rgb * weights.b +
         terrain_alpha.Sample(diffuse_sampler, detail_uv).rgb * weights.a;
     output.albedo.rgb *= 2.0 * details;
+#endif
+#if defined(VK_DETAIL)
+    output.albedo.rgb *= 2.0 * single_detail.Sample(diffuse_sampler, fragment.uv * terrain_scale).rgb;
 #endif
     // CoP's s_hemi texture stores hemisphere light in alpha and static sun
     // occlusion in green (deffer_base_flat.ps/get_hemi/get_sun). Keep diffuse

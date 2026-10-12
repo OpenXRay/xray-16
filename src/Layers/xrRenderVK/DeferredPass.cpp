@@ -968,7 +968,8 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    if (fragment_name && std::strstr(fragment_name, "level_terrain.ps"))
+    if (fragment_name && (std::strstr(fragment_name, "level_terrain.ps") ||
+            std::strstr(fragment_name, "level_detail.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);

@@ -280,6 +280,48 @@ bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
     return true;
 }
 
+bool GameTextureFactory::detail_material(const std::string& diffuse_name,
+    const std::string& lightmap_name, const std::string& detail_name,
+    DeferredPass& pass, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    TerrainMaterial item;
+    const std::array<std::string, 7> names{
+        trim_texture_name(diffuse_name), trim_texture_name(lightmap_name),
+        trim_texture_name(detail_name), trim_texture_name(detail_name),
+        trim_texture_name(detail_name), trim_texture_name(detail_name),
+        trim_texture_name(detail_name)};
+    std::string key = "single-detail";
+    key.push_back('\0');
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+        if (!load(names[i], item.assets[i], error)) return false;
+        const auto it = std::find_if(assets_.begin(), assets_.end(),
+            [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
+        R_ASSERT(it != assets_.end());
+        item.paths[i] = it->first;
+        key += it->first;
+        key.push_back('\0');
+    }
+    auto found = terrain_.find(key);
+    if (found == terrain_.end())
+    {
+        std::array<VkImageView, 7> views{};
+        for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
+        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        item.pass = &pass;
+        for (size_t i = 0; i < item.assets.size(); ++i)
+            if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
+                ++item.assets[i]->lightmap_refs;
+        found = terrain_.emplace(std::move(key), std::move(item)).first;
+    }
+    R_ASSERT2(found->second.pass == &pass, "Vulkan detail belongs to another pass");
+    ++found->second.refs;
+    result = found->second.set;
+    error.clear();
+    return true;
+}
+
 void GameTextureFactory::release_terrain_material(VkDescriptorSet set, DeferredPass& pass)
 {
     if (!set) return;

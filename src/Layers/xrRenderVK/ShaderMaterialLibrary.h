@@ -26,6 +26,7 @@ struct BlenderProperty
 };
 struct MaterialDefinition
 {
+    enum class Role { Standard, Water };
     uint32_t id{};
     std::string shader, class_name;
     uint16_t version{};
@@ -34,7 +35,9 @@ struct MaterialDefinition
     std::string unsupported_reason;
     int alpha_ref{-1}, blending{-1};
     uint32_t screen_flags{};
+    Role role{Role::Standard};
     TerrainMaterialTextures terrain;
+    std::string detail_texture;
     std::vector<BlenderProperty> properties;
 };
 // Reads the blender class and saved properties from the engine's shaders.xr.

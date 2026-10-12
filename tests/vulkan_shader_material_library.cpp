@@ -175,12 +175,12 @@ int main()
         error.find("id=54") != std::string::npos &&
         error.find("Environment map") != std::string::npos);
     const MaterialDefinition* parsed_detail = library.find("mod\\plain_stone");
-    assert(parsed_detail && !parsed_detail->pipeline_supported &&
+    assert(parsed_detail && parsed_detail->pipeline_supported &&
         parsed_detail->properties.back().scope == "Detail map" &&
+        parsed_detail->detail_texture == "mod\\unusual_detail" &&
         std::strcmp(reinterpret_cast<const char*>(parsed_detail->properties.back().data.data()),
             "mod\\unusual_detail") == 0);
-    assert(!library.resolve("mod\\plain_stone", mode, error) &&
-        error.find("id=55") != std::string::npos && error.find("single detail texture") != std::string::npos);
+    assert(library.resolve("mod\\plain_stone", mode, error) && mode == SurfaceMode::Opaque);
     assert(!library.resolve("mod\\glowing_wall", mode, error) &&
         error.find("id=56") != std::string::npos && error.find("constant / multiply pass") != std::string::npos);
     assert(!library.resolve("mod\\legacy_ground", mode, error) &&
@@ -285,7 +285,7 @@ int main()
     assert(library.resolve("mod\\wrap_ui", mode, error)); // Scene sampler repeats.
     assert(!library.resolve("mod\\wrap_ui", mode, error, nullptr, nullptr, false, true) &&
         error.find("Texture clamp") != std::string::npos && error.find("id=49") != std::string::npos);
-    Bytes water = record("S_SET   ", "effects\\water", false, 0);
+    Bytes water = record("S_SET   ", "mod\\arbitrary_liquid", false, 0);
     write32(water, 7); water.insert(water.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(water, 0); write32(water, 0);
     property(water, 6, "Strict sorting", 1);
@@ -305,15 +305,23 @@ int main()
     property(glow, 6, "Z-test", 1);
     Bytes level_list, level_file;
     chunk(level_list, 52, water); chunk(level_list, 25, lod); chunk(level_list, 36, glow);
+    Bytes misleading = record("S_SET   ", "water\\ordinary_overlay", false, 0);
+    write32(misleading, 7); misleading.insert(misleading.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(misleading, 1); write32(misleading, 0);
+    chunk(level_list, 37, misleading);
     chunk(level_file, 2, level_list);
     IReader level_reader(level_file.data(), level_file.size());
     assert(library.load(level_reader, error));
     uint32_t flags = 0;
-    assert(!library.resolve("effects\\water", mode, error, nullptr, nullptr, false, false, true) &&
-        error.find("Z-write") != std::string::npos);
-    assert(library.resolve("effects\\water", mode, error, nullptr, &blend_mode,
-        false, false, true, true, &flags) && mode == SurfaceMode::Transparent &&
-        blend_mode == 0 && (flags & 15u) == 15u);
+    MaterialDefinition water_definition;
+    assert(library.resolve("mod\\arbitrary_liquid", mode, error, nullptr, &blend_mode,
+        false, false, true, false, &flags, nullptr, &water_definition) &&
+        mode == SurfaceMode::Transparent && blend_mode == 0 &&
+        (flags & 15u) == 15u && water_definition.role == MaterialDefinition::Role::Water);
+    MaterialDefinition ordinary_definition;
+    assert(library.resolve("water\\ordinary_overlay", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &ordinary_definition) &&
+        ordinary_definition.role == MaterialDefinition::Role::Standard);
     assert(!library.resolve("details\\lod", mode, error, nullptr, nullptr, false, false, false) &&
         error.find("Fog") != std::string::npos);
     assert(library.resolve("details\\lod", mode, error, nullptr, &blend_mode,

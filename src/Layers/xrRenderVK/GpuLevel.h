@@ -83,6 +83,7 @@ private:
         bool fog{};
         bool lightmapped{};
         bool terrain{};
+        bool single_detail{};
         float terrain_scale{1.f};
         bool water{};
         bool glass{};
