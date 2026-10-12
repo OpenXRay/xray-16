@@ -31,6 +31,11 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
         P.r_u16(id);
         IGameObject* itm = Level().Objects.net_Find(id);
         VERIFY(itm);
+        if (!itm)
+        {
+            Msg("! GE_OWNERSHIP_TAKE: Object not found. object_id = [%d]", id);
+            break;
+        }
         m_items.push_back(id);
         itm->H_SetParent(this);
         itm->setVisible(FALSE);
@@ -60,6 +65,11 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
         it = std::find(m_items.begin(), m_items.end(), id);
         VERIFY(it != m_items.end());
         m_items.erase(it);
+        if (!itm)
+        {
+            Msg("! GE_OWNERSHIP_REJECT: Object not found. object_id = [%d]", id);
+            break;
+        }
 
         bool just_before_destroy = !P.r_eof() && P.r_u8();
         bool dont_create_shell = (type == GE_TRADE_SELL) || just_before_destroy;
@@ -108,6 +118,11 @@ void CInventoryBox::AddAvailableItems(TIItemContainer& items_container) const
     {
         PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(*it));
         VERIFY(itm);
+        if (!itm)
+        {
+            Msg("! CInventoryBox::AddAvailableItems: Object not found. object_id = [%d]", *it);
+            continue;
+        }
         items_container.push_back(itm);
     }
 }

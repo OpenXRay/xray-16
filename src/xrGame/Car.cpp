@@ -1634,6 +1634,11 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
     {
         P.r_u16(id);
         IGameObject* O = Level().Objects.net_Find(id);
+        if (!O)
+        {
+            Msg("! GE_OWNERSHIP_TAKE: Object not found. object_id = [%d]", id);
+            break;
+        }
         if (GetInventory()->CanTakeItem(smart_cast<CInventoryItem*>(O)))
         {
             O->H_SetParent(this);
@@ -1654,6 +1659,11 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
     {
         P.r_u16(id);
         IGameObject* O = Level().Objects.net_Find(id);
+        if (!O)
+        {
+            Msg("! GE_OWNERSHIP_REJECT: Object not found. object_id = [%d]", id);
+            break;
+        }
 
         bool just_before_destroy = !P.r_eof() && P.r_u8();
         O->SetTmpPreDestroy(just_before_destroy);
