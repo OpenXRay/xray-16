@@ -17,6 +17,13 @@ bool retirement_idle(VkDevice device, PFN_vkDeviceWaitIdle wait)
     const VkResult result = wait(device);
     return result == VK_SUCCESS || result == VK_ERROR_DEVICE_LOST;
 }
+std::string trim_texture_name(const std::string& name)
+{
+    const size_t first = name.find_first_not_of(" \t");
+    if (first == std::string::npos) return {};
+    const size_t last = name.find_last_not_of(" \t");
+    return name.substr(first, last - first + 1);
+}
 }
 bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory, bool bc_supported,
@@ -239,8 +246,9 @@ bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
     result = VK_NULL_HANDLE;
     if (!channels.enabled) { error = "terrain channels are missing"; return false; }
     TerrainMaterial item;
-    const std::array<std::string, 7> names{diffuse_name, lightmap_name,
-        diffuse_name + "_mask", channels.detail[0], channels.detail[1],
+    const std::string diffuse = trim_texture_name(diffuse_name);
+    const std::array<std::string, 7> names{diffuse, trim_texture_name(lightmap_name),
+        diffuse + "_mask", channels.detail[0], channels.detail[1],
         channels.detail[2], channels.detail[3]};
     std::string key;
     for (size_t i = 0; i < names.size(); ++i)
@@ -299,19 +307,20 @@ float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
     // Same THM_CHUNK_DETAIL_EXT as STextureParams::Load. FS resolves archived
     // game data and loose mod overrides without requiring an extracted game.
     string_path path;
-    const bool found = FS.exist(path, "$level$", diffuse.c_str(), ".thm") ||
-        FS.exist(path, "$game_textures$", diffuse.c_str(), ".thm");
+    const std::string name = trim_texture_name(diffuse);
+    const bool found = FS.exist(path, "$level$", name.c_str(), ".thm") ||
+        FS.exist(path, "$game_textures$", name.c_str(), ".thm");
     if (!found) return 1.f;
     IReader* reader = FS.r_open(path);
     if (!reader) return 1.f;
     float scale = 1.f;
-    if (reader->find_chunk(0x0815))
+    const size_t chunk_size = std::min(reader->find_chunk(0x0815), reader->elapsed());
+    if (chunk_size)
     {
         const auto* bytes = static_cast<const char*>(reader->pointer());
-        const size_t remaining = reader->elapsed();
-        const auto* end = std::memchr(bytes, 0, remaining);
+        const auto* end = std::memchr(bytes, 0, chunk_size);
         if (end && static_cast<size_t>(static_cast<const char*>(end) - bytes) +
-                1 + sizeof(float) <= remaining)
+                1 + sizeof(float) <= chunk_size)
         {
             float value;
             std::memcpy(&value, static_cast<const char*>(end) + 1, sizeof(value));
