@@ -10,15 +10,15 @@ Vulkan — отдельный игровой рендерер рядом с Open
 
 ### Сборочная проверка 2026-10-12
 
-Код в PR: `f5f50e15e314f026b9007127d157205b17b921b1` (дерево `70f8c14191007a5f3e665195fe191311a643abbe`). APK собран из тех же исходников; генератор пересобирает Vulkan SPIR-V при упаковке.
+Код в PR: `044bbebc3ffa819ff108d28824530814f6841f5b` (дерево `5b0f395c402bfc9631472a660126f11524dfd336`). APK собран из тех же исходников; генератор пересобирает Vulkan SPIR-V при упаковке.
 
 | Артефакт | SHA-256 |
 | --- | --- |
-| ARMv7 Debug `libmain.so` | `5eb9357ef5ed8c04014cc3ec696881d48fc75adae56c0334980d54aeae2a7fd4` |
-| ARM64 Debug `libmain.so` | `345c00bd28a099a369c06285582f744dae19b42dba181627cf7fbe3f7abed0ae` |
-| ARMv7 ReleaseMasterGold `libmain.so` | `defa63297015001b45d41c4e1b72ffb1b253cef5e164c782430d6661707a2b2e` |
-| ARM64 ReleaseMasterGold `libmain.so` | `005809a5fc6e89b5166199c82a65f3ebfa13869b7722279b99f5318a958b035b` |
-| Универсальный `openxray-universal-launcher-v0.9.132-debug.apk` | `5c6d5a62368813d3b58bb9c49a2b5e763d777e25518bfc14bf6001b79f0b645f` |
+| ARMv7 Debug `libmain.so` | `9fdb2bac60f288bde12a6e693734b0e7d712874605797dcebfb18f194c82460a` |
+| ARM64 Debug `libmain.so` | `1c0a9c825befb35e4a3fb33a755bc13a71fed1190e4be962ab21c048967ae853` |
+| ARMv7 ReleaseMasterGold `libmain.so` | `87ca5679f3da26d38d1e23c2af12b8dc51d3c4e2a1ff45396062478404491ddf` |
+| ARM64 ReleaseMasterGold `libmain.so` | `d860307b55b20b4ccc59b9ce65f061724052c23241bf1c9ebaae5e44f9d3c612` |
+| Универсальный `openxray-universal-launcher-v0.9.132-debug.apk` | `9854e37ec4b90f04140e844e085f3a6e5072174b9f40384d29669eb7168e2fc3` |
 
 ## Выполненный код (1–101)
 
