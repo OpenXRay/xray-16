@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include <array>
 
 namespace xray::render::vulkan
 {
@@ -79,6 +80,8 @@ public:
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
     bool lightmapped_material(VkImageView albedo, VkImageView lightmap,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
+    bool terrain_material(const std::array<VkImageView, 7>& views,
+        VkSampler sampler, VkDescriptorSet& set, std::string& error);
     // A named SVS/SPS pair from the game's precompiled Vulkan shader set.
     // Unknown names and incompatible pass state fail before a draw is recorded.
     bool create_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, VkShaderModule vertex, VkShaderModule fragment,
@@ -110,6 +113,8 @@ public:
     void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     void update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
         VkImageView lightmap, VkSampler sampler);
+    void update_terrain_material(VkDescriptorSet set, const std::array<VkImageView, 7>& views,
+        VkSampler sampler);
     bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSampler sampler,
@@ -139,7 +144,8 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         SurfaceMode mode = SurfaceMode::Opaque, uint32_t first_index = 0,
         const char* vertex_name = nullptr, const char* fragment_name = nullptr,
-        float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr) const;
+        float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr,
+        float terrain_scale = 1.f) const;
     bool record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
         bool alpha_test, uint32_t first_index = 0,

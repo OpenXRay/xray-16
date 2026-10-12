@@ -315,8 +315,14 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     VkDescriptorSetLayoutCreateInfo descriptor{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
-    descriptor.bindingCount = 2;
-    descriptor.pBindings = bindings;
+    const VkDescriptorSetLayoutBinding material_bindings[]{bindings[0], bindings[1],
+        {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+    descriptor.bindingCount = 7;
+    descriptor.pBindings = material_bindings;
     VK_STEP("vkCreateDescriptorSetLayout(material)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &material_layout_));
     descriptor.bindingCount = 1;
     descriptor.pBindings = &pose_binding;
@@ -476,6 +482,19 @@ bool DeferredPass::lightmapped_material(VkImageView albedo, VkImageView lightmap
         return false;
     }
     return allocate(material_layout_, albedo, lightmap, sampler, set, error);
+}
+
+bool DeferredPass::terrain_material(const std::array<VkImageView, 7>& views,
+    VkSampler sampler, VkDescriptorSet& set, std::string& error)
+{
+    if (std::any_of(views.begin(), views.end(), [](VkImageView view) { return !view; }))
+    {
+        error = "terrain material needs all seven textures";
+        return false;
+    }
+    if (!allocate(material_layout_, views[0], views[1], sampler, set, error)) return false;
+    update_terrain_material(set, views, sampler);
+    return true;
 }
 
 const DeferredPass::GamePipeline* DeferredPass::game_pipeline(const char* vertex_name, const char* fragment_name) const
@@ -706,6 +725,25 @@ void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView 
     vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
 }
 
+void DeferredPass::update_terrain_material(VkDescriptorSet set,
+    const std::array<VkImageView, 7>& views, VkSampler sampler)
+{
+    if (!device_ || !set) return;
+    std::array<VkDescriptorImageInfo, 7> images{};
+    std::array<VkWriteDescriptorSet, 7> writes{};
+    for (uint32_t i = 0; i < views.size(); ++i)
+    {
+        images[i] = {sampler, views[i], VK_IMAGE_LAYOUT_GENERAL};
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].pImageInfo = &images[i];
+    }
+    vk_.update_descriptor_sets(device_, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
+}
+
 bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
@@ -902,7 +940,7 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    float alpha_ref, const float* normal_rows) const
+    float alpha_ref, const float* normal_rows, float terrain_scale) const
 {
     if (mode == SurfaceMode::Transparent) return false;
     VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
@@ -930,6 +968,9 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
+    if (fragment_name && std::strstr(fragment_name, "level_terrain.ps"))
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;

@@ -80,6 +80,8 @@ private:
         bool glow_alpha_add{};
         bool fog{};
         bool lightmapped{};
+        bool terrain{};
+        float terrain_scale{1.f};
         bool water{};
         bool glass{};
         std::unique_ptr<Mesh> fast;

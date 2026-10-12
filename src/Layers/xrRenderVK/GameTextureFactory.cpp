@@ -5,6 +5,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <cstring>
 
 namespace xray::render::vulkan
 {
@@ -230,6 +232,96 @@ void GameTextureFactory::release_lightmapped_material(VkDescriptorSet set, Defer
     R_ASSERT2(false, "unknown Vulkan lightmap descriptor");
 }
 
+bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
+    const std::string& lightmap_name, const TerrainMaterialTextures& channels,
+    DeferredPass& pass, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    if (!channels.enabled) { error = "terrain channels are missing"; return false; }
+    TerrainMaterial item;
+    const std::array<std::string, 7> names{diffuse_name, lightmap_name,
+        diffuse_name + "_mask", channels.detail[0], channels.detail[1],
+        channels.detail[2], channels.detail[3]};
+    std::string key;
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+        if (!load(names[i], item.assets[i], error)) return false;
+        const auto it = std::find_if(assets_.begin(), assets_.end(),
+            [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
+        R_ASSERT(it != assets_.end());
+        item.paths[i] = it->first;
+        key += it->first;
+        key.push_back('\0');
+    }
+    auto found = terrain_.find(key);
+    if (found == terrain_.end())
+    {
+        std::array<VkImageView, 7> views{};
+        for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
+        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        item.pass = &pass;
+        for (size_t i = 0; i < item.assets.size(); ++i)
+            if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
+                ++item.assets[i]->lightmap_refs;
+        found = terrain_.emplace(std::move(key), std::move(item)).first;
+    }
+    R_ASSERT2(found->second.pass == &pass, "Vulkan terrain belongs to another pass");
+    ++found->second.refs;
+    result = found->second.set;
+    error.clear();
+    return true;
+}
+
+void GameTextureFactory::release_terrain_material(VkDescriptorSet set, DeferredPass& pass)
+{
+    if (!set) return;
+    for (auto it = terrain_.begin(); it != terrain_.end(); ++it)
+    {
+        auto& item = it->second;
+        if (item.set != set) continue;
+        R_ASSERT2(item.pass == &pass && item.refs, "unknown Vulkan terrain lease");
+        if (--item.refs) return;
+        R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan terrain retirement requires idle GPU frames");
+        pass.release_gbuffer(set);
+        for (size_t i = 0; i < item.assets.size(); ++i)
+            if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
+                --item.assets[i]->lightmap_refs;
+        const auto paths = item.paths;
+        terrain_.erase(it);
+        for (const auto& path : paths) evict_if_unused(path);
+        return;
+    }
+    R_ASSERT2(false, "unknown Vulkan terrain descriptor");
+}
+
+float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
+{
+    // Same THM_CHUNK_DETAIL_EXT as STextureParams::Load. FS resolves archived
+    // game data and loose mod overrides without requiring an extracted game.
+    string_path path;
+    const bool found = FS.exist(path, "$level$", diffuse.c_str(), ".thm") ||
+        FS.exist(path, "$game_textures$", diffuse.c_str(), ".thm");
+    if (!found) return 1.f;
+    IReader* reader = FS.r_open(path);
+    if (!reader) return 1.f;
+    float scale = 1.f;
+    if (reader->find_chunk(0x0815))
+    {
+        const auto* bytes = static_cast<const char*>(reader->pointer());
+        const size_t remaining = reader->elapsed();
+        const auto* end = std::memchr(bytes, 0, remaining);
+        if (end && static_cast<size_t>(static_cast<const char*>(end) - bytes) +
+                1 + sizeof(float) <= remaining)
+        {
+            float value;
+            std::memcpy(&value, static_cast<const char*>(end) + 1, sizeof(value));
+            if (std::isfinite(value) && value > 0.f) scale = value;
+        }
+    }
+    FS.r_close(reader);
+    return scale;
+}
+
 bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     VkDescriptorSet& result, std::string& error, VkExtent2D* extent)
 {
@@ -390,6 +482,8 @@ void GameTextureFactory::destroy()
         wait_for_uploads(device_, pool_, dispatch_, pending_);
         for (auto& [name, pair] : lightmapped_)
             if (pair.set && pair.pass) pair.pass->release_gbuffer(pair.set);
+        for (auto& [name, item] : terrain_)
+            if (item.set && item.pass) item.pass->release_gbuffer(item.set);
         for (auto& [name, asset] : assets_)
         {
             if (asset.material_set && asset.material_pass)
@@ -404,6 +498,7 @@ void GameTextureFactory::destroy()
     }
     assets_.clear();
     lightmapped_.clear();
+    terrain_.clear();
     transient_id_ = 0;
     pending_.clear();
     states_ = {};
@@ -514,6 +609,12 @@ bool GameTextureFactory::reload_assets(std::string& error,
     for (auto& [name, pair] : lightmapped_)
         pair.pass->update_lightmapped_material(pair.set, pair.diffuse->texture.view,
             pair.lightmap->texture.view, sampler_);
+    for (auto& [name, item] : terrain_)
+    {
+        std::array<VkImageView, 7> views{};
+        for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
+        item.pass->update_terrain_material(item.set, views, sampler_);
+    }
     if (after_rebind) after_rebind();
     for (auto* asset : environment_assets)
     {

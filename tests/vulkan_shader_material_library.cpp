@@ -79,6 +79,16 @@ int main()
     screen_alpha.insert(screen_alpha.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_alpha, 1); write32(screen_alpha, 0);
     chunk(list, 43, screen_alpha);
+    Bytes terrain = record("BmmDold ", "levels\\modded_ground", false);
+    for (const char* property_name : {"R2-R", "R2-G", "R2-B", "R2-A"})
+    {
+        write32(terrain, 3);
+        terrain.insert(terrain.end(), property_name, property_name + std::strlen(property_name) + 1);
+        const size_t start = terrain.size();
+        terrain.resize(start + 64);
+        std::memcpy(terrain.data() + start, "detail\\modded", 13);
+    }
+    chunk(list, 51, terrain);
     Bytes particle_add = record("PARTICLE", "effects\\flash_add", false, 32);
     write32(particle_add, 7);
     particle_add.insert(particle_add.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
@@ -112,7 +122,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 19);
+    assert(library.load(reader, error) && library.size() == 20);
     assert(library.contains("HUD/ALPHA"));
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
@@ -130,8 +140,9 @@ int main()
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);
     int alpha_ref = -1;
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);
-    assert(!library.resolve("effects\\wallmarkblend", mode, error) &&
-        error.find("blending=6") != std::string::npos && error.find("id=7") != std::string::npos);
+    int wallmark_blend = -1;
+    assert(library.resolve("effects\\wallmarkblend", mode, error, nullptr, &wallmark_blend,
+        false, false, true) && mode == SurfaceMode::Transparent && wallmark_blend == 6);
     assert(library.resolve("hud\\opaque", mode, error) && mode == SurfaceMode::Opaque);
     assert(library.resolve("hud\\alpha", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("effects\\additive", mode, error) &&
@@ -142,6 +153,24 @@ int main()
     assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&
         mode == SurfaceMode::AlphaTest && alpha_ref == 200);
     int blend_mode = -1;
+    TerrainMaterialTextures terrain_textures;
+    assert(library.resolve("levels\\modded_ground", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, &terrain_textures));
+    assert(terrain_textures.enabled && terrain_textures.detail[0] == "detail\\modded" &&
+        terrain_textures.detail[3] == "detail\\modded");
+    Bytes missing_terrain = record("BmmDold ", "levels\\incomplete", false);
+    write32(missing_terrain, 3);
+    missing_terrain.insert(missing_terrain.end(), {'R','2','-','R',0});
+    missing_terrain.resize(missing_terrain.size() + 64);
+    std::memcpy(missing_terrain.data() + missing_terrain.size() - 64, "detail\\red", 11);
+    Bytes missing_terrain_list, missing_terrain_file;
+    chunk(missing_terrain_list, 62, missing_terrain);
+    chunk(missing_terrain_file, 2, missing_terrain_list);
+    IReader missing_terrain_reader(missing_terrain_file.data(), missing_terrain_file.size());
+    ShaderMaterialLibrary incomplete_library;
+    assert(!incomplete_library.load(missing_terrain_reader, error) &&
+        error.find("id=62") != std::string::npos &&
+        error.find("R2-R/G/B/A") != std::string::npos);
     assert(library.resolve("effects\\flash_add", mode, error, nullptr, &blend_mode) &&
         mode == SurfaceMode::Transparent && blend_mode == 2);
     assert(library.resolve("effects\\flash_alpha_add", mode, error, nullptr, &blend_mode) &&

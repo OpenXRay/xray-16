@@ -33,6 +33,11 @@ public:
     bool lightmapped_material(const std::string& diffuse, const std::string& lightmap,
         DeferredPass& pass, VkDescriptorSet& result, std::string& error);
     void release_lightmapped_material(VkDescriptorSet set, DeferredPass& pass);
+    bool terrain_material(const std::string& diffuse, const std::string& lightmap,
+        const TerrainMaterialTextures& terrain, DeferredPass& pass,
+        VkDescriptorSet& result, std::string& error);
+    void release_terrain_material(VkDescriptorSet set, DeferredPass& pass);
+    float terrain_detail_scale(const std::string& diffuse) const;
     bool ui(const std::string& texture_name, ScenePass& pass,
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
     bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
@@ -62,10 +67,12 @@ public:
         SurfaceMode& mode, std::string& error, int* alpha_ref = nullptr,
         int* blend_mode = nullptr, bool particle_pipeline = false,
         bool screen_pipeline = false, bool level_pipeline = false,
-        bool water_pipeline = false, uint32_t* material_flags = nullptr) const
+        bool water_pipeline = false, uint32_t* material_flags = nullptr,
+        TerrainMaterialTextures* terrain = nullptr) const
     {
         if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode,
-            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags);
+            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain);
+        if (terrain) *terrain = {};
         // Standalone mock-GPU tests have no game archive; gameplay loads the
         // shaders.xr library at OnDeviceCreate before any level or OGF.
         mode = classify_surface_material(shader, texture);
@@ -101,6 +108,14 @@ private:
         std::string diffuse_path, lightmap_path;
         size_t refs{};
     };
+    struct TerrainMaterial
+    {
+        VkDescriptorSet set{};
+        std::array<Asset*, 7> assets{};
+        std::array<std::string, 7> paths{};
+        DeferredPass* pass{};
+        size_t refs{};
+    };
     bool load(const std::string& name, Asset*& asset, std::string& error);
     void evict_if_unused(const std::string& name);
     VkDevice device_{};
@@ -117,6 +132,7 @@ private:
     std::vector<PendingTextureUpload> pending_;
     std::unordered_map<std::string, Asset> assets_;
     std::unordered_map<std::string, LightmappedMaterial> lightmapped_;
+    std::unordered_map<std::string, TerrainMaterial> terrain_;
     uint64_t transient_id_{};
     ShaderMaterialLibrary materials_;
 };

@@ -208,16 +208,22 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         SurfaceMode mode;
         int blend_mode = -1;
         uint32_t material_flags = 0;
+        TerrainMaterialTextures terrain;
         const bool water = named_surface(material, SurfaceMode::Transparent, "water") ||
             named_surface(material, SurfaceMode::Transparent, "glass");
         if (!textures.surface_mode(material.shader, material.textures, mode, error, &mesh.alpha_ref,
-                &blend_mode, false, false, true, water, &material_flags))
+                &blend_mode, false, false, true, water, &material_flags, &terrain))
         {
             error = "level material id=" + std::to_string(model.material) + " (" +
                 material.shader + "/" + material.textures + "): " + error;
             return false;
         }
         const std::string lightmap = mode == SurfaceMode::Transparent ? std::string{} : lightmap_texture(material.textures);
+        if (terrain.enabled && lightmap.empty())
+        {
+            error = "terrain material requires a lightmap: " + material.textures;
+            return false;
+        }
         if (!lightmap.empty() && !model.lightmap_uv)
         {
             error = "level lightmap material has no TEXCOORD1: " + material.textures;
@@ -227,10 +233,12 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.glow_alpha_add = blend_mode == 5;
         mesh.fog = (material_flags & 16u) != 0;
         const char *family = mode == SurfaceMode::Transparent ? "object_blended" :
+            terrain.enabled ? "level_terrain" :
             !lightmap.empty() ? mode == SurfaceMode::AlphaTest ? "level_lightmap_cutout" : "level_lightmap" :
             mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
         const std::string shader = std::string("vk\\") + family;
         mesh.lightmapped = !lightmap.empty();
+        mesh.terrain = terrain.enabled;
         mesh.water = named_surface(material, mode, "water") || named_surface(material, mode, "glass");
         mesh.glass = named_surface(material, mode, "glass");
         prepared.has_water_ |= mesh.water;
@@ -245,7 +253,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         const size_t comma = material.textures.find(',');
         const std::string diffuse = material.textures.substr(0, comma);
-        if (!(lightmap.empty() ? textures.material(material.textures, pass, mesh.material, error) :
+        if (mesh.terrain) mesh.terrain_scale = textures.terrain_detail_scale(diffuse);
+        if (!(mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
+                lightmap.empty() ? textures.material(material.textures, pass, mesh.material, error) :
                 textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error)) ||
             !upload_geometry(model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices) ||
@@ -727,11 +737,11 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent) return true;
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         std::string shader_error;
@@ -756,7 +766,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material, mesh.mode, 0,
                 named ? vertex : nullptr, named ? fragment : nullptr,
-                float(mesh.alpha_ref) / 255.f);
+                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale);
         if (!recorded) report_visual_record_failure(index, mesh_index, phase,
             mesh.water, mesh.index_count, lod, failure);
         return recorded;
@@ -771,13 +781,13 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
             (&mesh != &base) ? "vk\\progressive_opaque.vs" :
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         if (selected)
@@ -807,7 +817,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, mesh.mode, window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
-                    float(mesh.alpha_ref) / 255.f)))
+                    float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale)))
             {
                 report_visual_record_failure(index, visual.mesh, phase, mesh.water, window.index_count, lod, failure);
                 return false;
@@ -912,11 +922,13 @@ void GpuLevel::destroy()
     if (textures_ && pass_)
         for (const Mesh& mesh : meshes_)
         {
-            if (mesh.lightmapped) textures_->release_lightmapped_material(mesh.material, *pass_);
+            if (mesh.terrain) textures_->release_terrain_material(mesh.material, *pass_);
+            else if (mesh.lightmapped) textures_->release_lightmapped_material(mesh.material, *pass_);
             else textures_->release_material(mesh.material, *pass_);
             if (mesh.fast)
             {
-                if (mesh.fast->lightmapped) textures_->release_lightmapped_material(mesh.fast->material, *pass_);
+                if (mesh.fast->terrain) textures_->release_terrain_material(mesh.fast->material, *pass_);
+                else if (mesh.fast->lightmapped) textures_->release_lightmapped_material(mesh.fast->material, *pass_);
                 else textures_->release_material(mesh.fast->material, *pass_);
             }
         }

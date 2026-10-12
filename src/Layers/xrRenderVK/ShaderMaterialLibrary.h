@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LevelModels.h"
+#include <array>
 #include <string>
 #include <unordered_map>
 
@@ -8,6 +9,11 @@ class IReader;
 
 namespace xray::render::vulkan
 {
+struct TerrainMaterialTextures
+{
+    std::array<std::string, 4> detail;
+    bool enabled{};
+};
 // Reads the blender class and saved properties from the engine's shaders.xr.
 // This is deliberately independent of the GLES resource manager.
 class ShaderMaterialLibrary
@@ -18,7 +24,7 @@ public:
         int* alpha_ref = nullptr, int* blend_mode = nullptr,
         bool particle_pipeline = false, bool screen_pipeline = false,
         bool level_pipeline = false, bool water_pipeline = false,
-        uint32_t* material_flags = nullptr) const;
+        uint32_t* material_flags = nullptr, TerrainMaterialTextures* terrain = nullptr) const;
     bool contains(const std::string& shader) const;
     size_t size() const { return entries_.size(); }
     void clear() { entries_.clear(); }
@@ -34,6 +40,7 @@ private:
         int alpha_ref{-1};
         int blending{-1};
         uint32_t screen_flags{};
+        TerrainMaterialTextures terrain;
     };
     std::unordered_map<std::string, Entry> entries_;
 };

@@ -4,6 +4,8 @@
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_opaque.ps.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_lightmap.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_lightmap.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_terrain.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_terrain.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_TERRAIN=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_opaque.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },

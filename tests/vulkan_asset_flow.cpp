@@ -172,7 +172,10 @@ int main()
                                          handle<VkShaderModule>(6), SurfaceMode::Opaque, true, error, true));
     }
     GameTextureFactory textures;
-    assert(textures.initialize(device, queue, pool_handle, memory, false, texture_dispatch(), sampler, destroy_sampler, idle, error));
+    VkPhysicalDeviceFeatures features{};
+    VkPhysicalDeviceProperties properties{};
+    assert(textures.initialize(device, queue, pool_handle, memory, false,
+        features, properties, 1.0f, texture_dispatch(), sampler, destroy_sampler, idle, error));
     FrameRecordingContext frame{handle<VkCommandBuffer>(12), rp, handle<VkFramebuffer>(13), {960, 540}, 0, 0};
     float mvp[16]{};
     mvp[0] = mvp[5] = mvp[10] = mvp[15] = 1;

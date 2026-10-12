@@ -3,6 +3,18 @@
 #if defined(VK_LIGHTMAP)
 [[vk::binding(1, 0)]] Texture2D<float4> lightmap : register(t1);
 #endif
+#if defined(VK_TERRAIN)
+[[vk::push_constant]] cbuffer TerrainParams {
+    float4x4 terrain_camera;
+    float terrain_alpha_threshold;
+    float terrain_scale;
+};
+[[vk::binding(2, 0)]] Texture2D<float4> terrain_mask : register(t2);
+[[vk::binding(3, 0)]] Texture2D<float4> terrain_red : register(t3);
+[[vk::binding(4, 0)]] Texture2D<float4> terrain_green : register(t4);
+[[vk::binding(5, 0)]] Texture2D<float4> terrain_blue : register(t5);
+[[vk::binding(6, 0)]] Texture2D<float4> terrain_alpha : register(t6);
+#endif
 
 struct Fragment
 {
@@ -115,6 +127,16 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_TERRAIN)
+    float4 weights = terrain_mask.Sample(diffuse_sampler, fragment.uv);
+    weights /= max(dot(weights, float4(1.0, 1.0, 1.0, 1.0)), 1e-6);
+    float2 detail_uv = fragment.uv * terrain_scale;
+    float3 details = terrain_red.Sample(diffuse_sampler, detail_uv).rgb * weights.r +
+        terrain_green.Sample(diffuse_sampler, detail_uv).rgb * weights.g +
+        terrain_blue.Sample(diffuse_sampler, detail_uv).rgb * weights.b +
+        terrain_alpha.Sample(diffuse_sampler, detail_uv).rgb * weights.a;
+    output.albedo.rgb *= 2.0 * details;
+#endif
     // CoP's s_hemi texture stores hemisphere light in alpha and static sun
     // occlusion in green (deffer_base_flat.ps/get_hemi/get_sun). Keep diffuse
     // untouched for local lights. The opaque albedo alpha can carry sun

@@ -100,7 +100,7 @@ void VKAPI_PTR bind_indices(VkCommandBuffer, VkBuffer b, VkDeviceSize, VkIndexTy
 }
 void VKAPI_PTR push(VkCommandBuffer, VkPipelineLayout, VkShaderStageFlags, uint32_t, uint32_t size, const void *data)
 {
-    assert(size == 12 && data);
+    assert((size == 12 || size == 16) && data);
 }
 void VKAPI_PTR draw(VkCommandBuffer, uint32_t count, uint32_t instances, uint32_t, int32_t, uint32_t)
 {

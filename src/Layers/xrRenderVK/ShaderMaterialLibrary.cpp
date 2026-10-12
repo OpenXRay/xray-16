@@ -41,7 +41,7 @@ std::string lower(std::string value)
 bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     SurfaceMode& mode, bool& supported, std::string& cls_name,
     uint16_t& version, int& alpha_ref, int& blending, uint32_t& screen_flags,
-    std::string& error)
+    TerrainMaterialTextures& terrain, std::string& error)
 {
     // CBlender_DESC is pack(4): CLASS_ID[8], cName[128], cComputer[32],
     // cTime[4], version[2], trailing padding[2]. All fields are little endian.
@@ -57,6 +57,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     blending = -1;
     alpha_ref = -1;
     screen_flags = 0;
+    terrain = {};
     while (cursor.offset < cursor.size)
     {
         uint32_t type;
@@ -84,6 +85,17 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         default: error = "unknown shaders.xr property type=" + std::to_string(type) + " in '" + name + "'"; return false;
         }
         if (!cursor.skip(length)) { error = "truncated blender property in '" + name + "'"; return false; }
+        if (cls_name == "BmmDold " || cls_name == "LmBmmD  ")
+        {
+            constexpr const char* channels[]{"R2-R", "R2-G", "R2-B", "R2-A"};
+            for (size_t channel = 0; channel < 4; ++channel)
+                if (property == channels[channel])
+                {
+                    if (type != 3 || !std::memchr(bytes + start, 0, length))
+                    { error = "invalid terrain texture property='" + property + "'"; return false; }
+                    terrain.detail[channel] = lower(reinterpret_cast<const char*>(bytes + start));
+                }
+        }
         if ((type == 7 || type == 8) && property == "Blending")
         {
             blending = static_cast<int>(le32(bytes + start));
@@ -132,6 +144,16 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         cls == "MODEL   " ? 2 :
         cls == "PARTICLE" || cls == "D_STILL " || cls == "LaEmB   " ? 0 : 1;
     supported &= version <= max_version;
+    if (cls == "BmmDold " || cls == "LmBmmD  ")
+    {
+        const bool any = std::any_of(terrain.detail.begin(), terrain.detail.end(),
+            [](const std::string& texture) { return !texture.empty(); });
+        const bool all = std::all_of(terrain.detail.begin(), terrain.detail.end(),
+            [](const std::string& texture) { return !texture.empty() && texture != "$null"; });
+        if (any && !all)
+        { error = "incomplete terrain R2-R/G/B/A texture set in '" + name + "'"; return false; }
+        terrain.enabled = all;
+    }
     if ((cls == "PARTICLE" || cls == "S_SET   ") && !has_blending)
     { error = "missing Blending property in '" + name + "'"; return false; }
     // Deferred D_TREE alpha blending selects the base_aref shader and writes
@@ -178,9 +200,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         uint16_t version = 0;
         int alpha_ref = -1, blending = -1;
         uint32_t screen_flags = 0;
+        TerrainMaterialTextures terrain;
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
-                name, mode, supported, cls, version, alpha_ref, blending, screen_flags, error) || name.empty() ||
-            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_flags}).second)
+                name, mode, supported, cls, version, alpha_ref, blending, screen_flags, terrain, error) || name.empty() ||
+            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_flags, terrain}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -190,10 +213,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             clear();
             return false;
         }
-        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d supported=%d",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d terrain=%d supported=%d",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
-            alpha_ref, blending, supported ? 1 : 0);
+            alpha_ref, blending, terrain.enabled ? 1 : 0, supported ? 1 : 0);
     }
     if (entries_.empty()) { error = "shaders.xr contains no blender definitions"; return false; }
     error.clear();
@@ -203,7 +226,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
     std::string& error, int* alpha_ref, int* blend_mode,
     bool particle_pipeline, bool screen_pipeline, bool level_pipeline,
-    bool water_pipeline, uint32_t* material_flags) const
+    bool water_pipeline, uint32_t* material_flags, TerrainMaterialTextures* terrain) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -257,6 +280,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         std::clamp(it->second.alpha_ref, 0, 255) : 128;
     if (blend_mode) *blend_mode = material.blending;
     if (material_flags) *material_flags = material.screen_flags;
+    if (terrain) *terrain = material.terrain;
     error.clear();
     return true;
 }

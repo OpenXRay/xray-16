@@ -53,7 +53,7 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     if (range.stageFlags & VK_SHADER_STAGE_VERTEX_BIT)
     {
         assert(range.stageFlags == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
-        assert(range.size == sizeof(expected_mvp) + sizeof(float));
+        assert(range.size == sizeof(float) * 32);
         *output = info->setLayoutCount == 3 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
@@ -185,7 +185,7 @@ void VKAPI_PTR draw(VkCommandBuffer, uint32_t, uint32_t, uint32_t, uint32_t) {}
 VkResult VKAPI_PTR create_descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* output)
 {
-    assert(info->bindingCount >= 1 && info->bindingCount <= 5);
+    assert(info->bindingCount >= 1 && info->bindingCount <= 7);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
         info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
         info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
