@@ -53,27 +53,6 @@ bool load_game_level_models(LevelGameProfile profile, LevelBytes header, LevelBy
     return false;
 }
 
-SurfaceMode classify_surface_material(const std::string &shader, const std::string &texture)
-{
-    std::string name;
-    name.reserve(shader.size() + texture.size() + 1);
-    for (unsigned char ch : shader) name.push_back(static_cast<char>(std::tolower(ch)));
-    name.push_back(' ');
-    for (unsigned char ch : texture) name.push_back(static_cast<char>(std::tolower(ch)));
-
-    // Blend modes take precedence when names contain both an alpha marker and
-    // a blend marker (for example a transparent foliage texture).
-    for (const char* marker : {"transparent", "translucent", "_blend", "blend_",
-             "glass", "water", "flare", "glow", "particle"})
-        if (name.find(marker) != std::string::npos)
-            return SurfaceMode::Transparent;
-    for (const char* marker : {"alpha_test", "alphatest", "aref",
-             "cutout", "foliage", "leaves", "leaf", "grass", "tree"})
-        if (name.find(marker) != std::string::npos)
-            return SurfaceMode::AlphaTest;
-    return SurfaceMode::Opaque;
-}
-
 namespace
 {
 constexpr uint32_t ogf_header = 1, ogf_vertices = 3, ogf_indices = 4, ogf_swi = 6, ogf_children = 9, ogf_links = 10,
@@ -309,7 +288,9 @@ bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
         {
             material.shader = name.substr(0, slash);
             material.textures = name.substr(slash + 1);
-            material.mode = classify_surface_material(material.shader, material.textures);
+            // The blender library is loaded after the level's geometry. Keep
+            // the mode unresolved until ShaderMaterialLibrary selects a pass.
+            material.mode = SurfaceMode::Unresolved;
         }
         materials.push_back(std::move(material));
     }

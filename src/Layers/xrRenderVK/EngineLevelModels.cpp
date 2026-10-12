@@ -266,7 +266,7 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
     converted.type = visual.type;
     converted.shader = visual.shader;
     converted.texture = visual.texture;
-    converted.mode = classify_surface_material(converted.shader, converted.texture);
+    converted.mode = SurfaceMode::Unresolved;
     converted.indices = std::move(model.indices);
     converted.windows = std::move(model.windows);
     converted.vertices.reserve(model.vertices.size());

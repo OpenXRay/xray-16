@@ -555,6 +555,17 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             }
         }
     }
+    if (owner.current_level_)
+    {
+        float mvp[16];
+        std::copy(owner.scene_mvp_.begin(), owner.scene_mvp_.end(), mvp);
+        if (!owner.current_level_->record_transparent_details(frame, owner.deferred_, mvp))
+        {
+            owner.level_recorded_ = false;
+            owner.level_error_ = "Vulkan transparent level detail recording failed";
+            return;
+        }
+    }
     for (VulkanRainRender* rain : owner.rain_draws_)
         if (rain && !rain->record(frame, owner.model_error_))
         {

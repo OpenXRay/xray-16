@@ -72,15 +72,10 @@ public:
     {
         if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode,
             particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain);
-        if (terrain) *terrain = {};
-        // Standalone mock-GPU tests have no game archive; gameplay loads the
-        // shaders.xr library at OnDeviceCreate before any level or OGF.
-        mode = classify_surface_material(shader, texture);
-        if (alpha_ref) *alpha_ref = 128;
-        if (blend_mode) *blend_mode = -1;
-        if (material_flags) *material_flags = 0;
-        error.clear();
-        return true;
+        mode = SurfaceMode::Unresolved;
+        error = "shaders.xr material library is not loaded for shader='" + shader +
+            "' texture='" + texture + "'";
+        return false;
     }
     void destroy();
 

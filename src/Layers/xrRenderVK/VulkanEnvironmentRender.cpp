@@ -8,13 +8,44 @@
 
 #include <cstring>
 
+// The Vulkan backend has no legacy particle renderer. The game-facing
+// library interface nevertheless requires CPGDef storage and stable names.
+namespace xray::render::RENDER_NAMESPACE::PS
+{
+CPGDef::CPGDef() : m_fTimeLimit(0.f) { m_Flags.zero(); }
+CPGDef::~CPGDef()
+{
+    for (auto* effect : m_Effects) xr_delete(effect);
+}
+}
+
 namespace xray::render::vulkan
 {
-shared_str const& VulkanEnvironmentRender::Library::particles_group_id(particles_systems::PS::CPGDef const&) const
+VulkanEnvironmentRender::Library::~Library() = default;
+
+particles_systems::PS::CPGDef const* const*
+VulkanEnvironmentRender::Library::particles_group_begin() const
 {
-    static const shared_str empty;
-    R_ASSERT2(false, "Vulkan particle definitions use particles_group_ids");
-    return empty;
+    return pointers_.empty() ? nullptr : pointers_.data();
+}
+
+particles_systems::PS::CPGDef const* const*
+VulkanEnvironmentRender::Library::particles_group_end() const
+{
+    return pointers_.empty() ? nullptr : pointers_.data() + pointers_.size();
+}
+
+void VulkanEnvironmentRender::Library::particles_group_next(
+    particles_systems::PS::CPGDef const* const*& iterator) const
+{
+    if (iterator && iterator >= particles_group_begin() && iterator < particles_group_end())
+        ++iterator;
+}
+
+shared_str const& VulkanEnvironmentRender::Library::particles_group_id(
+    particles_systems::PS::CPGDef const& group) const
+{
+    return group.m_Name;
 }
 
 void VulkanEnvironmentRender::Library::particles_group_ids(xr_vector<shared_str>& ids) const
@@ -43,12 +74,37 @@ void VulkanEnvironmentRender::Library::load()
     }
     if (!error.empty())
         Msg("! [renderer-vulkan] environment particle library: %s", error.c_str());
-    for (const auto& group : catalog_.groups) ids_.emplace_back(group.name.c_str());
+    definitions_.reserve(catalog_.groups.size());
+    pointers_.reserve(catalog_.groups.size());
+    for (const auto& group : catalog_.groups)
+    {
+        auto def = std::make_unique<particles_systems::PS::CPGDef>();
+        def->m_Name = group.name.c_str();
+        def->m_Flags.assign(group.flags);
+        def->m_fTimeLimit = group.time_limit;
+        for (const auto& item : group.effects)
+        {
+            auto* effect = xr_new<particles_systems::PS::CPGDef::SEffect>();
+            effect->m_Flags.assign(item.flags);
+            effect->m_EffectName = item.effect.c_str();
+            effect->m_OnPlayChildName = item.on_play.c_str();
+            effect->m_OnBirthChildName = item.on_birth.c_str();
+            effect->m_OnDeadChildName = item.on_dead.c_str();
+            effect->m_Time0 = item.begin;
+            effect->m_Time1 = item.end;
+            def->m_Effects.push_back(effect);
+        }
+        ids_.push_back(def->m_Name);
+        pointers_.push_back(def.get());
+        definitions_.push_back(std::move(def));
+    }
 }
 
 void VulkanEnvironmentRender::Library::clear()
 {
     catalog_ = {};
+    pointers_.clear();
+    definitions_.clear();
     ids_.clear();
 }
 

@@ -63,6 +63,8 @@ public:
     void prepare_details(const Fvector& camera_position);
     bool record_details(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16]) const;
+    bool record_transparent_details(const FrameRecordingContext& frame, const DeferredPass& pass,
+        const float (&mvp)[16]) const;
     bool record_sun_shadow(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&sun_mvp)[16]) const;
     void destroy();
@@ -111,6 +113,7 @@ private:
     // Each frame slot is reused only after FrameContext has waited on its fence.
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;
     mutable std::array<uint64_t, FrameContext::FramesInFlight> detail_signatures_{};
+    mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> transparent_detail_batches_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint8_t> visual_phases_; // opaque/cutout bit 1, transparent bit 2
     std::vector<uint32_t> roots_;

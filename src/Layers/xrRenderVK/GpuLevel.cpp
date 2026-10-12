@@ -323,14 +323,11 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             error = "level.details / " + prototype.shader + ": " + error;
             return false;
         }
-        // Detail geometry is static. Opaque 'details\\set' must not be
-        // subjected to a made-up 128/255 alpha cutout threshold. Until
-        // details have a sorted forward pass, preserve the prior cutout
-        // behavior for modded transparent definitions.
-        if (mesh.mode == SurfaceMode::Transparent)
-            mesh.mode = SurfaceMode::AlphaTest;
         const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
-        if (!pass.request_game_pipeline(cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
+        const bool transparent = mesh.mode == SurfaceMode::Transparent;
+        if (!pass.request_game_pipeline(transparent ? "vk\\object_blended.vs" :
+                cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
+                transparent ? "vk\\object_blended.ps" :
                 cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
                 mesh.mode, false, false, error) ||
             !textures.material(prototype.texture, pass, mesh.material, error) ||
@@ -616,6 +613,7 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
             const DetailBatch& buffer = buffers[model];
             if (!buffer.index_count) continue;
             const Mesh& mesh = detail_meshes_[model];
+            if (mesh.mode == SurfaceMode::Transparent) continue;
             const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
             if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                     buffer.index_count, mvp, mesh.material, mesh.mode, 0,
@@ -630,6 +628,7 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
     for (const DetailPlacement& placement : visible_details_)
     {
         if (placement.model >= detail_meshes_.size()) return false;
+        if (detail_meshes_[placement.model].mode == SurfaceMode::Transparent) continue;
         if (!visible_sphere(mvp, placement.x, placement.y, placement.z, 6.f)) continue;
         const DetailPrototype& prototype = details_.prototypes[placement.model];
         Geometry& batch = grouped[placement.model];
@@ -693,6 +692,102 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
                 float(mesh.alpha_ref) / 255.f)) return false;
     }
     detail_signatures_[frame.frame_index] = signature;
+    return true;
+}
+
+bool GpuLevel::record_transparent_details(const FrameRecordingContext& frame,
+    const DeferredPass& pass, const float (&mvp)[16]) const
+{
+    if (frame.frame_index >= transparent_detail_batches_.size()) return false;
+    std::vector<const DetailPlacement*> sorted;
+    sorted.reserve(visible_details_.size());
+    for (const DetailPlacement& placement : visible_details_)
+    {
+        if (placement.model >= detail_meshes_.size()) return false;
+        if (detail_meshes_[placement.model].mode == SurfaceMode::Transparent &&
+            visible_sphere(mvp, placement.x, placement.y, placement.z, 6.f))
+            sorted.push_back(&placement);
+    }
+    const auto distance = [](const DetailPlacement* placement)
+    {
+        const float dx = placement->x - Device.vCameraPosition.x;
+        const float dy = placement->y - Device.vCameraPosition.y;
+        const float dz = placement->z - Device.vCameraPosition.z;
+        return dx * dx + dy * dy + dz * dz;
+    };
+    std::stable_sort(sorted.begin(), sorted.end(), [&](const auto* a, const auto* b)
+        { return distance(a) > distance(b); });
+    if (sorted.empty()) return true;
+
+    std::vector<LevelVertex> vertices;
+    std::vector<uint32_t> indices;
+    struct Draw { uint8_t model; uint32_t first, count; };
+    std::vector<Draw> draws;
+    for (const DetailPlacement* placement : sorted)
+    {
+        const DetailPrototype& prototype = details_.prototypes[placement->model];
+        if (vertices.size() > UINT32_MAX - prototype.vertices.size() ||
+            indices.size() > UINT32_MAX - prototype.indices.size()) return false;
+        if (draws.empty() || draws.back().model != placement->model)
+            draws.push_back({placement->model, static_cast<uint32_t>(indices.size()), 0});
+        const uint32_t first = static_cast<uint32_t>(vertices.size());
+        Fmatrix rotation, scale, world;
+        Fvector position;
+        position.set(placement->x, placement->y, placement->z);
+        rotation.rotateY(placement->yaw);
+        rotation.translate_over(position);
+        scale.scale(placement->scale, placement->scale, placement->scale);
+        world.mul_43(rotation, scale);
+        for (const LevelVertex& original : prototype.vertices)
+        {
+            LevelVertex vertex = original;
+            Fvector local, transformed, normal;
+            local.set(original.position[0], original.position[1], original.position[2]);
+            world.transform_tiny(transformed, local);
+            local.set(original.normal[0], original.normal[1], original.normal[2]);
+            rotation.transform_dir(normal, local);
+            normal.normalize_safe();
+            std::copy_n(&transformed.x, 3, vertex.position);
+            std::copy_n(&normal.x, 3, vertex.normal);
+            vertices.push_back(vertex);
+        }
+        for (uint32_t index : prototype.indices) indices.push_back(first + index);
+        draws.back().count += static_cast<uint32_t>(prototype.indices.size());
+    }
+    auto& batches = transparent_detail_batches_[frame.frame_index];
+    if (batches.empty()) batches.resize(1);
+    auto& batch = batches[0];
+    const auto write = [this](BufferResource& buffer, const void* data,
+        size_t bytes, VkBufferUsageFlags usage, std::string& error)
+    {
+        if (buffer.size() < bytes && !buffer.initialize(device_,
+                std::max<VkDeviceSize>(bytes, buffer.size() ? buffer.size() * 2 : 4096),
+                usage, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                memory_, upload_.buffer, error)) return false;
+        return buffer.write(0, data, bytes, error);
+    };
+    std::string error;
+    if (!write(batch.vertices, vertices.data(), vertices.size() * sizeof(LevelVertex),
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, error) ||
+        !write(batch.indices, indices.data(), indices.size() * sizeof(uint32_t),
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT, error))
+    {
+        Msg("! [renderer-vulkan] transparent detail upload: %s", error.c_str());
+        return false;
+    }
+    for (const Draw& draw : draws)
+    {
+        const char* failure = nullptr;
+        if (!pass.record_transparent(frame, batch.vertices.handle(), batch.indices.handle(),
+                draw.count, mvp, detail_meshes_[draw.model].material, draw.first,
+                "vk\\object_blended.vs", "vk\\object_blended.ps", &failure))
+        {
+            Msg("! [renderer-vulkan] transparent detail shader='%s' texture='%s': %s",
+                details_.prototypes[draw.model].shader.c_str(),
+                details_.prototypes[draw.model].texture.c_str(), failure ? failure : "unknown");
+            return false;
+        }
+    }
     return true;
 }
 
@@ -942,6 +1037,7 @@ void GpuLevel::destroy()
     detail_cache_.clear();
     visible_details_.clear();
     for (auto& buffers : detail_batches_) buffers.clear();
+    for (auto& buffers : transparent_detail_batches_) buffers.clear();
     detail_signatures_.fill(0);
     visuals_.clear();
     visual_phases_.clear();

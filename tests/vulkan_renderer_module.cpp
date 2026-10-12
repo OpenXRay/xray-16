@@ -5,6 +5,8 @@
 #include "src/Layers/xrRenderVK/VulkanUIRender.h"
 #include "src/Layers/xrRenderVK/VulkanDrawUtils.h"
 #include "src/Layers/xrRenderVK/VulkanDebugRender.h"
+#include "src/Layers/xrRenderVK/VulkanEnvironmentRender.h"
+#include "Include/xrRender/RenderFactory.h"
 
 #include <cassert>
 
@@ -22,6 +24,13 @@ int main()
         module->SetupEnv("renderer_vulkan");
         assert(dynamic_cast<xray::render::vulkan::VulkanLevelRender*>(GEnv.Render));
         assert(dynamic_cast<xray::render::vulkan::VulkanRenderFactory *>(GEnv.RenderFactory));
+        auto* environment = GEnv.RenderFactory->CreateEnvironmentRender();
+        auto& groups = environment->particles_systems_library();
+        assert(groups.particles_group_begin() == groups.particles_group_end());
+        xr_vector<shared_str> ids;
+        groups.particles_group_ids(ids);
+        assert(ids.empty());
+        GEnv.RenderFactory->DestroyEnvironmentRender(environment);
         assert(dynamic_cast<xray::render::vulkan::VulkanDrawUtils *>(GEnv.DU));
         assert(dynamic_cast<xray::render::vulkan::VulkanUIRender *>(GEnv.UIRender));
         u32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE;

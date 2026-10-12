@@ -4,6 +4,7 @@
 #include <array>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class IReader;
 
@@ -13,6 +14,28 @@ struct TerrainMaterialTextures
 {
     std::array<std::string, 4> detail;
     bool enabled{};
+};
+// A property retains its serialized type and value, including token tables.
+// Scope distinguishes the two "Name"/"Transform" slots of terrain and
+// environment blenders. A parsed definition is not necessarily renderable.
+struct BlenderProperty
+{
+    std::string scope, name;
+    uint32_t type{};
+    std::vector<uint8_t> data;
+};
+struct MaterialDefinition
+{
+    uint32_t id{};
+    std::string shader, class_name;
+    uint16_t version{};
+    SurfaceMode mode{SurfaceMode::Unresolved};
+    bool pipeline_supported{};
+    std::string unsupported_reason;
+    int alpha_ref{-1}, blending{-1};
+    uint32_t screen_flags{};
+    TerrainMaterialTextures terrain;
+    std::vector<BlenderProperty> properties;
 };
 // Reads the blender class and saved properties from the engine's shaders.xr.
 // This is deliberately independent of the GLES resource manager.
@@ -24,24 +47,14 @@ public:
         int* alpha_ref = nullptr, int* blend_mode = nullptr,
         bool particle_pipeline = false, bool screen_pipeline = false,
         bool level_pipeline = false, bool water_pipeline = false,
-        uint32_t* material_flags = nullptr, TerrainMaterialTextures* terrain = nullptr) const;
+        uint32_t* material_flags = nullptr, TerrainMaterialTextures* terrain = nullptr,
+        MaterialDefinition* definition = nullptr) const;
+    const MaterialDefinition* find(const std::string& shader) const;
     bool contains(const std::string& shader) const;
     size_t size() const { return entries_.size(); }
     void clear() { entries_.clear(); }
 
 private:
-    struct Entry
-    {
-        uint32_t id{};
-        SurfaceMode mode{};
-        std::string class_name;
-        bool supported{};
-        uint16_t version{};
-        int alpha_ref{-1};
-        int blending{-1};
-        uint32_t screen_flags{};
-        TerrainMaterialTextures terrain;
-    };
-    std::unordered_map<std::string, Entry> entries_;
+    std::unordered_map<std::string, MaterialDefinition> entries_;
 };
 }

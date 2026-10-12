@@ -117,12 +117,28 @@ int main()
     chunk(list, 51, wallmark_mult);
     chunk(list, 52, record("MODEL   ", "models\\fur", true, 32));
     chunk(list, 53, record("MODEL   ", "models\\glass", true, 4));
+    Bytes reflection = record("LmEbB   ", "mod\\arbitrary_reflection", false);
+    write32(reflection, 0);
+    const char env_scope[] = "Environment map";
+    reflection.insert(reflection.end(), env_scope, env_scope + sizeof(env_scope));
+    write32(reflection, 3);
+    reflection.insert(reflection.end(), {'N','a','m','e',0});
+    const size_t env_value = reflection.size();
+    reflection.resize(env_value + 64);
+    std::memcpy(reflection.data() + env_value, "mod\\cube", 9);
+    chunk(list, 54, reflection);
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 20);
+    assert(library.load(reader, error) && library.size() == 21);
+    const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
+    assert(parsed && parsed->properties.size() >= 2);
+    const BlenderProperty& second_name = parsed->properties.back();
+    assert(second_name.scope == "Environment map" && second_name.name == "Name" &&
+        second_name.type == 3 && second_name.data.size() == 64 &&
+        std::strcmp(reinterpret_cast<const char*>(second_name.data.data()), "mod\\cube") == 0);
     assert(library.contains("HUD/ALPHA"));
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
@@ -137,6 +153,9 @@ int main()
     assert(!library.resolve("mod\\unrecognized", mode, error) &&
         error.find("shaders.xr blender id=5") != std::string::npos &&
         error.find("CUSTOM") != std::string::npos && error.find("version=17") != std::string::npos);
+    assert(!library.resolve("mod\\arbitrary_reflection", mode, error) &&
+        error.find("id=54") != std::string::npos &&
+        error.find("Environment map") != std::string::npos);
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);
     int alpha_ref = -1;
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);

@@ -176,6 +176,19 @@ int main()
     VkPhysicalDeviceProperties properties{};
     assert(textures.initialize(device, queue, pool_handle, memory, false,
         features, properties, 1.0f, texture_dispatch(), sampler, destroy_sampler, idle, error));
+    // The mock uses an actual serialized blender definition. Runtime loading
+    // must never infer alpha/depth behavior from a texture or shader name.
+    {
+        Bytes blender(176, 0), records, library;
+        const char cls[] = "LM      ";
+        for (size_t i = 0; i < 8; ++i) blender[i] = cls[7 - i];
+        std::memcpy(blender.data() + 8, "default", 8);
+        blender[172] = 1;
+        chunk(records, 0, blender);
+        chunk(library, 2, records);
+        IReader reader(library.data(), library.size());
+        assert(textures.load_blender_library(reader, error));
+    }
     FrameRecordingContext frame{handle<VkCommandBuffer>(12), rp, handle<VkFramebuffer>(13), {960, 540}, 0, 0};
     float mvp[16]{};
     mvp[0] = mvp[5] = mvp[10] = mvp[15] = 1;

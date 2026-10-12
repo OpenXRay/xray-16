@@ -41,7 +41,7 @@ std::string lower(std::string value)
 bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     SurfaceMode& mode, bool& supported, std::string& cls_name,
     uint16_t& version, int& alpha_ref, int& blending, uint32_t& screen_flags,
-    TerrainMaterialTextures& terrain, std::string& error)
+    TerrainMaterialTextures& terrain, std::vector<BlenderProperty>& properties, std::string& error)
 {
     // CBlender_DESC is pack(4): CLASS_ID[8], cName[128], cComputer[32],
     // cTime[4], version[2], trailing padding[2]. All fields are little endian.
@@ -58,6 +58,8 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     alpha_ref = -1;
     screen_flags = 0;
     terrain = {};
+    properties.clear();
+    std::string scope;
     while (cursor.offset < cursor.size)
     {
         uint32_t type;
@@ -85,6 +87,9 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         default: error = "unknown shaders.xr property type=" + std::to_string(type) + " in '" + name + "'"; return false;
         }
         if (!cursor.skip(length)) { error = "truncated blender property in '" + name + "'"; return false; }
+        if (type == 0) scope = property;
+        properties.push_back({scope, property, type,
+            std::vector<uint8_t>(bytes + start, bytes + start + length)});
         if (cls_name == "BmmDold " || cls_name == "LmBmmD  ")
         {
             constexpr const char* channels[]{"R2-R", "R2-G", "R2-B", "R2-A"};
@@ -201,9 +206,12 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         int alpha_ref = -1, blending = -1;
         uint32_t screen_flags = 0;
         TerrainMaterialTextures terrain;
+        std::vector<BlenderProperty> properties;
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
-                name, mode, supported, cls, version, alpha_ref, blending, screen_flags, terrain, error) || name.empty() ||
-            !entries_.emplace(name, Entry{id, mode, cls, supported, version, alpha_ref, blending, screen_flags, terrain}).second)
+                name, mode, supported, cls, version, alpha_ref, blending, screen_flags,
+                terrain, properties, error) || name.empty() ||
+            !entries_.emplace(name, MaterialDefinition{id, name, cls, version, mode, supported,
+                {}, alpha_ref, blending, screen_flags, terrain, std::move(properties)}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -213,10 +221,19 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             clear();
             return false;
         }
+        auto& definition = entries_.at(name);
+        // These blenders sample the second environment texture in their
+        // Compile path. The current Vulkan descriptor has only the base
+        // texture; pretending they are supported drops reflection outright.
+        if (cls == "LmEbB   " || cls == "MODELEbB")
+        {
+            definition.pipeline_supported = false;
+            definition.unsupported_reason = "Environment map / second texture pass";
+        }
         Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d terrain=%d supported=%d",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
-            alpha_ref, blending, terrain.enabled ? 1 : 0, supported ? 1 : 0);
+            alpha_ref, blending, terrain.enabled ? 1 : 0, definition.pipeline_supported ? 1 : 0);
     }
     if (entries_.empty()) { error = "shaders.xr contains no blender definitions"; return false; }
     error.clear();
@@ -226,7 +243,8 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode,
     std::string& error, int* alpha_ref, int* blend_mode,
     bool particle_pipeline, bool screen_pipeline, bool level_pipeline,
-    bool water_pipeline, uint32_t* material_flags, TerrainMaterialTextures* terrain) const
+    bool water_pipeline, uint32_t* material_flags, TerrainMaterialTextures* terrain,
+    MaterialDefinition* definition) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -235,8 +253,9 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     const std::string context = "shaders.xr blender id=" + std::to_string(material.id) +
         " class='" + material.class_name + "' version=" + std::to_string(material.version) +
         " shader='" + shader + "'";
-    if (!material.supported)
-    { error = "unsupported " + context; return false; }
+    if (!material.pipeline_supported)
+    { error = "unsupported " + context + (material.unsupported_reason.empty() ? "" :
+        " property='" + material.unsupported_reason + "'"); return false; }
     if (screen_pipeline && material.class_name != "S_SET   ")
     { error = "unsupported screen class in " + context; return false; }
     // World decals and tracers use S_SET too. Their Z-test=1/Z-write=0
@@ -281,6 +300,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     if (blend_mode) *blend_mode = material.blending;
     if (material_flags) *material_flags = material.screen_flags;
     if (terrain) *terrain = material.terrain;
+    if (definition) *definition = material;
     error.clear();
     return true;
 }
@@ -288,6 +308,12 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
 bool ShaderMaterialLibrary::contains(const std::string& shader) const
 {
     return entries_.find(lower(shader)) != entries_.end();
+}
+
+const MaterialDefinition* ShaderMaterialLibrary::find(const std::string& shader) const
+{
+    const auto it = entries_.find(lower(shader));
+    return it == entries_.end() ? nullptr : &it->second;
 }
 
 }
