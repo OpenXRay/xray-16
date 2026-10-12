@@ -88,6 +88,7 @@ private:
         size_t fast_index = SIZE_MAX;
         bool fast_variant = false;
         bool environment{};
+        bool tree_surface{};
     };
     bool add_meshes(ModelGeometry&& geometry, const std::string& inherited_texture,
         VkDevice device, VkQueue queue, VkCommandPool pool,

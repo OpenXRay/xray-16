@@ -16,6 +16,12 @@ class ScenePass;
 class GameTextureFactory
 {
 public:
+    struct DetailMetadata
+    {
+        std::string texture;
+        float scale{1.f};
+        bool diffuse{}, normal{};
+    };
     ~GameTextureFactory() { destroy(); }
     GameTextureFactory() = default;
     GameTextureFactory(const GameTextureFactory&) = delete;
@@ -29,7 +35,7 @@ public:
         PFN_vkDestroySampler destroy_sampler, PFN_vkDeviceWaitIdle wait_idle,
         std::string& error);
     bool material(const std::string& texture_list, DeferredPass& pass,
-        VkDescriptorSet& result, std::string& error);
+        VkDescriptorSet& result, std::string& error, bool clamp = false);
     bool lightmapped_material(const std::string& diffuse, const std::string& lightmap,
         DeferredPass& pass, VkDescriptorSet& result, std::string& error);
     void release_lightmapped_material(VkDescriptorSet set, DeferredPass& pass);
@@ -44,6 +50,11 @@ public:
         VkDescriptorSet& result, std::string& error);
     void release_terrain_material(VkDescriptorSet set, DeferredPass& pass);
     float terrain_detail_scale(const std::string& diffuse) const;
+    bool texture_detail_metadata(const std::string& diffuse, DetailMetadata& detail,
+        std::string& error) const;
+    static bool decode_detail_metadata(const uint8_t* params, size_t params_size,
+        const uint8_t* extension, size_t extension_size,
+        DetailMetadata& detail, std::string& error);
     bool ui(const std::string& texture_name, ScenePass& pass,
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
     bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
@@ -91,11 +102,13 @@ private:
     {
         UploadedTexture texture;
         VkDescriptorSet material_set{};
+        VkDescriptorSet clamp_material_set{};
         VkDescriptorSet ui_set{};
         VkExtent2D extent{};
         bool cube{};
         uint64_t bytes{};
         size_t material_refs{};
+        size_t clamp_material_refs{};
         size_t lightmap_refs{};
         size_t ui_refs{};
         size_t environment_refs{};

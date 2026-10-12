@@ -981,7 +981,8 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (fragment_name && (std::strstr(fragment_name, "level_terrain.ps") ||
-            std::strstr(fragment_name, "level_detail.ps")))
+            std::strstr(fragment_name, "level_detail.ps") ||
+            std::strstr(fragment_name, "level_detail_unlit.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     if (fragment_name && (std::strstr(fragment_name, "level_environment.ps") ||

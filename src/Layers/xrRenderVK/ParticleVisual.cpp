@@ -94,13 +94,17 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
             def_->texture.c_str(), def_->max_particles);
     if ((def_->flags & 1u) == 0) return true; // Non-sprite actions still simulate.
     SurfaceMode surface{};
-    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, &alpha_ref_, &blend_mode_, true))
+    MaterialDefinition definition;
+    if (!textures.surface_mode(def_->shader, def_->texture, surface, error, &alpha_ref_, &blend_mode_,
+            true, false, false, false, nullptr, nullptr, &definition))
     {
         error = "particle '" + def_->name + "': " + error;
         release_gpu();
         return false;
     }
-    if (!textures.material(def_->texture, pass, material_, error))
+    if (!textures.material(def_->texture, pass, material_, error,
+            (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
+            !(definition.screen_flags & 1u)))
     {
         release_gpu();
         return false;
@@ -276,16 +280,10 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
-    std::string shader = def_->shader;
-    std::transform(shader.begin(), shader.end(), shader.begin(),
-        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     const char* mode = blend_mode_ == 0 ? "set" :
         blend_mode_ == 5 ? "alpha_add" : blend_mode_ == 4 ? "multiply_2x" :
         blend_mode_ == 3 ? "multiply" : blend_mode_ == 2 ? "additive" :
-        blend_mode_ == -1 && shader.find("alpha_add") != std::string::npos ? "alpha_add" :
-        blend_mode_ == -1 && (shader.find("\\add") != std::string::npos ||
-            shader.find("\\xadd") != std::string::npos) ?
-            "additive" : "blended";
+        "blended";
     const std::string fragment = std::string("vk\\particle_") +
         (hud ? "hud_" : "world_") + mode + ".ps";
     constexpr const char* vertex = "vk\\level_opaque.vs";

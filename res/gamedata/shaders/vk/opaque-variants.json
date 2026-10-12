@@ -21,6 +21,8 @@
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_opaque.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_detail_unlit.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_detail_unlit.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_DETAIL=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_cutout.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_ALPHA_TEST=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_lightmap_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_lightmap_cutout.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_ALPHA_TEST=1"] },

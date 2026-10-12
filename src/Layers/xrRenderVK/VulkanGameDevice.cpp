@@ -498,6 +498,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         bool model{};
         size_t index{};
         bool particle{};
+        bool detail{};
     };
     std::vector<DrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
@@ -506,6 +507,20 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         if (!owner.model_draws_[i].hud) draws.push_back({owner.model_draws_[i].sort_distance, true, i});
     for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
         if (!owner.particle_draws_[i].hud) draws.push_back({owner.particle_draws_[i].sort_distance, false, i, true});
+    if (owner.current_level_)
+    {
+        float mvp[16];
+        std::copy(owner.scene_mvp_.begin(), owner.scene_mvp_.end(), mvp);
+        std::vector<float> detail_distances;
+        if (!owner.current_level_->prepare_transparent_details(frame, mvp, detail_distances))
+        {
+            owner.level_recorded_ = false;
+            owner.level_error_ = "Vulkan transparent level detail preparation failed";
+            return;
+        }
+        for (size_t i = 0; i < detail_distances.size(); ++i)
+            draws.push_back({detail_distances[i], false, i, false, true});
+    }
     std::stable_sort(draws.begin(), draws.end(), [](const DrawRef& left, const DrawRef& right)
     {
         return left.distance > right.distance;
@@ -513,7 +528,18 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
     for (const DrawRef& draw : draws)
     {
         float mvp[16];
-        if (draw.particle)
+        if (draw.detail)
+        {
+            std::copy(owner.scene_mvp_.begin(), owner.scene_mvp_.end(), mvp);
+            if (!owner.current_level_->record_transparent_detail(draw.index, frame,
+                    owner.deferred_, mvp))
+            {
+                owner.level_recorded_ = false;
+                owner.level_error_ = "Vulkan transparent level detail recording failed";
+                return;
+            }
+        }
+        else if (draw.particle)
         {
             auto& particle = owner.particle_draws_[draw.index];
             std::copy(particle.mvp.begin(), particle.mvp.end(), mvp);
@@ -553,17 +579,6 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
                     std::to_string(level.index) + " failed (lod=" + std::to_string(level.lod) + ")";
                 return;
             }
-        }
-    }
-    if (owner.current_level_)
-    {
-        float mvp[16];
-        std::copy(owner.scene_mvp_.begin(), owner.scene_mvp_.end(), mvp);
-        if (!owner.current_level_->record_transparent_details(frame, owner.deferred_, mvp))
-        {
-            owner.level_recorded_ = false;
-            owner.level_error_ = "Vulkan transparent level detail recording failed";
-            return;
         }
     }
     for (VulkanRainRender* rain : owner.rain_draws_)

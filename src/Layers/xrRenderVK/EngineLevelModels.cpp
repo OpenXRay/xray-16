@@ -334,7 +334,8 @@ bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& res
             auto fast_geometry = std::make_shared<ModelGeometry>();
             if (!decode_container_geometry(variant, "level.geomX", *fast_geometry, error))
             {
-                Msg("! [renderer-vulkan] standalone model fast geometry unavailable: %s; using regular geometry", error.c_str());
+                Msg("! [renderer-vulkan] OGF visual type=%u shader='%s' file=level.geomX fast geometry unavailable: %s; fallback=embedded/level.geom regular geometry",
+                    visual.type, visual.shader.c_str(), error.c_str());
                 error.clear();
             }
             else

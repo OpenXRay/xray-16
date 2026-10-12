@@ -172,10 +172,35 @@ int main()
                                          handle<VkShaderModule>(6), SurfaceMode::Opaque, true, error, true));
     }
     GameTextureFactory textures;
+    {
+        Bytes params(8, 0), extension{'m','o','d','\\','d','e','t','a','i','l',0};
+        params[6] = 0x80; // flDiffuseDetail (bit 23)
+        putfloat(extension, 2.5f);
+        GameTextureFactory::DetailMetadata metadata;
+        assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), extension.size(), metadata, error));
+        assert(metadata.diffuse && !metadata.normal && metadata.texture == "mod\\detail" &&
+            metadata.scale == 2.5f);
+        params[7] = 0x04; // flBumpDetail (bit 26)
+        assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), extension.size(), metadata, error) && metadata.normal);
+        assert(!GameTextureFactory::decode_detail_metadata(params.data(), 7,
+            extension.data(), extension.size(), metadata, error) &&
+            error.find("TEXTUREPARAM") != std::string::npos);
+        assert(!GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), 10, metadata, error) &&
+            error.find("DETAIL_EXT") != std::string::npos);
+    }
     VkPhysicalDeviceFeatures features{};
     VkPhysicalDeviceProperties properties{};
     assert(textures.initialize(device, queue, pool_handle, memory, false,
         features, properties, 1.0f, texture_dispatch(), sampler, destroy_sampler, idle, error));
+    VkDescriptorSet wrap_set{}, clamp_set{};
+    assert(textures.material("fixture", pass, wrap_set, error) &&
+        textures.material("fixture", pass, clamp_set, error, true));
+    assert(wrap_set && clamp_set && wrap_set != clamp_set);
+    textures.release_material(wrap_set, pass);
+    textures.release_material(clamp_set, pass);
     // The mock uses an actual serialized blender definition. Runtime loading
     // must never infer alpha/depth behavior from a texture or shader name.
     {

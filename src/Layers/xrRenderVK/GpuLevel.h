@@ -63,8 +63,10 @@ public:
     void prepare_details(const Fvector& camera_position);
     bool record_details(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16]) const;
-    bool record_transparent_details(const FrameRecordingContext& frame, const DeferredPass& pass,
-        const float (&mvp)[16]) const;
+    bool prepare_transparent_details(const FrameRecordingContext& frame,
+        const float (&mvp)[16], std::vector<float>& sort_distances) const;
+    bool record_transparent_detail(size_t draw_index, const FrameRecordingContext& frame,
+        const DeferredPass& pass, const float (&mvp)[16]) const;
     bool record_sun_shadow(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&sun_mvp)[16]) const;
     void destroy();
@@ -119,6 +121,8 @@ private:
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;
     mutable std::array<uint64_t, FrameContext::FramesInFlight> detail_signatures_{};
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> transparent_detail_batches_;
+    struct TransparentDetailDraw { uint8_t model; uint32_t first, count; };
+    mutable std::array<std::vector<TransparentDetailDraw>, FrameContext::FramesInFlight> transparent_detail_draws_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint8_t> visual_phases_; // opaque/cutout bit 1, transparent bit 2
     std::vector<uint32_t> roots_;

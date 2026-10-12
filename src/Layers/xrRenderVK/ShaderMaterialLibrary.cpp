@@ -347,6 +347,88 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 break;
             }
         }
+        // Preserve every serialized property, but only advertise a renderable
+        // material when all non-default properties have an implemented path.
+        // Modded shaders.xr can add properties without changing the class ID.
+        for (const BlenderProperty& property : definition.properties)
+        {
+            if (!definition.pipeline_supported) break;
+            const auto& name = property.name;
+            const auto& scope = property.scope;
+            if (property.type == 0)
+            {
+                if (name != "General" && name != "Base Texture" &&
+                    name != "Detail map" && name != "Environment map")
+                {
+                    definition.pipeline_supported = false;
+                    definition.unsupported_reason = name + " (unknown property scope)";
+                }
+                continue;
+            }
+            const bool common = (scope == "General" &&
+                (name == "Priority" || name == "Strict sorting")) ||
+                (scope == "Base Texture" && (name == "Name" || name == "Transform"));
+            const bool known = common ||
+                name == "Alpha ref" || name == "Alpha-blend" || name == "Alpha-Blend" ||
+                name == "Use alpha-channel" || name == "Object LOD" ||
+                name == "Tessellation" || name == "Blending" ||
+                name == "Texture clamp" || name == "Z-test" || name == "Z-write" ||
+                name == "Lighting" || name == "Fog" ||
+                ((scope == "Environment map" || scope == "Detail map") &&
+                    (name == "Name" || name == "Transform" || name == "Constant" ||
+                     name == "R2-R" || name == "R2-G" || name == "R2-B" || name == "R2-A"));
+            const std::string path = scope + " / " + name;
+            const auto reject = [&](const char* reason)
+            {
+                definition.pipeline_supported = false;
+                definition.unsupported_reason = path + " (" + reason + ")";
+            };
+            if (!known) { reject("unknown material semantics"); break; }
+            const bool boolean = name == "Strict sorting" || name == "Alpha-blend" ||
+                name == "Alpha-Blend" || name == "Use alpha-channel" ||
+                name == "Object LOD" || name == "Texture clamp" ||
+                name == "Z-test" || name == "Z-write" || name == "Lighting" || name == "Fog";
+            const bool string_slot = name == "Name" || name == "Transform" ||
+                name == "Constant" || name == "R2-R" || name == "R2-G" ||
+                name == "R2-B" || name == "R2-A";
+            if ((boolean && (property.type != 6 || property.data.size() != 4)) ||
+                (name == "Priority" && (property.type != 4 || property.data.size() != 12)) ||
+                (name == "Alpha ref" && (property.type != 4 || property.data.size() != 12)) ||
+                ((name == "Tessellation" || name == "Blending") &&
+                    property.type != 7 && property.type != 8) ||
+                (string_slot && ((name == "Transform" ? property.type != 1 :
+                    name == "Constant" ? property.type != 2 : property.type != 3) ||
+                    property.data.size() != 64 ||
+                    !std::memchr(property.data.data(), 0, property.data.size()))))
+            { reject("invalid property type or value"); break; }
+            const bool detail_class = cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ";
+            const bool environment_class = cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ";
+            if ((scope == "Detail map" && !detail_class) ||
+                (scope == "Environment map" && !environment_class) ||
+                (name == "Object LOD" && cls != "D_TREE  ") ||
+                (name == "Use alpha-channel" && cls != "MODEL   ") ||
+                (name == "Blending" && cls != "S_SET   " && cls != "PARTICLE") ||
+                ((name == "Z-test" || name == "Z-write" || name == "Lighting" || name == "Fog") &&
+                    cls != "S_SET   "))
+            { reject("property does not belong to this blender class"); break; }
+            if (name == "Priority" && property.type == 4 && property.data.size() == 12 &&
+                le32(property.data.data()) != 1)
+                reject("render priority is not implemented");
+            if (name == "Tessellation" && (property.type == 7 || property.type == 8) &&
+                property.data.size() >= 4 && le32(property.data.data()) != 0)
+                reject("tessellation variant is not implemented");
+            if (name == "Object LOD" && property.type == 6 && property.data.size() == 4 &&
+                le32(property.data.data()) != 0)
+                reject("tree_s shader variant is not implemented");
+            if (name == "Transform" && (scope == "Base Texture" || scope == "Detail map") &&
+                property.type == 1 && property.data[0] &&
+                std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$null") != 0)
+                reject("named texture matrix is not implemented");
+            if (name == "Name" && scope == "Base Texture" &&
+                property.type == 3 && property.data[0] &&
+                std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$base0") != 0)
+                reject("base texture selector is not implemented");
+        }
         Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' passes=%u properties=%zu supported=%d reason='%s'",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
@@ -398,6 +480,19 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         error = "unsupported screen property='" + std::string(property) + "' in " + context;
         return false;
     }
+    if (material.class_name == "S_SET   " && level_pipeline &&
+        !(material.screen_flags & 2u))
+    {
+        error = "unsupported world property='Z-test=0' in " + context;
+        return false;
+    }
+    if (material.class_name == "S_SET   " && level_pipeline &&
+        material.mode != SurfaceMode::Transparent &&
+        !(material.screen_flags & 4u))
+    {
+        error = "unsupported world property='Z-write=0' in " + context;
+        return false;
+    }
     // Scene geometry has a separate multiply-2x wallmark pipeline. Other
     // S_SET blend modes must not silently render as source-alpha blending.
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
@@ -419,7 +514,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         (material.blending == 3 || material.blending == 4))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     mode = it->second.mode;
-    if (alpha_ref) *alpha_ref = it->second.alpha_ref >= 0 ?
+    if (alpha_ref) *alpha_ref = material.class_name == "PARTICLE" && material.blending == 0 ? 200 :
+        it->second.alpha_ref >= 0 ?
         std::clamp(it->second.alpha_ref, 0, 255) : 128;
     if (blend_mode) *blend_mode = material.blending;
     if (material_flags) *material_flags = material.screen_flags;

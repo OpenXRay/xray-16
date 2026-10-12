@@ -45,11 +45,13 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         mesh.environment = definition.class_name == "MODELEbB" &&
             mesh.geometry.mode == SurfaceMode::Transparent;
-        const bool double_sided = mesh.geometry.shader.find("double_sided") != std::string::npos || mesh.geometry.shader.find("two_sided") != std::string::npos;
+        // Tree surfaces are two-sided by blender contract. A user-controlled
+        // shader name must never select a different raster/shader variant.
+        mesh.tree_surface = definition.class_name == "D_TREE  ";
         const char *family = mesh.environment ? "object_environment" :
                              mesh.geometry.mode == SurfaceMode::Transparent ? "object_blended"
                              : mesh.geometry.mode == SurfaceMode::AlphaTest ? "object_cutout"
-                             : double_sided && !animated                    ? "object_double_sided"
+                             : mesh.tree_surface && !animated               ? "object_double_sided"
                                                                             : "object_opaque";
         const std::string shader = std::string("vk\\") + family;
         const std::string vertex = animated ? "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs" : shader + ".vs";
@@ -63,7 +65,9 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         }
         if (!(mesh.environment ? textures.environment_material(texture, {},
                 definition.environment_texture, true, pass, mesh.material, error) :
-                textures.material(texture, pass, mesh.material, error)) ||
+                textures.material(texture, pass, mesh.material, error,
+                    (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
+                    !(definition.screen_flags & 1u))) ||
             !upload_buffer(device, queue, pool, memory, upload, mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
             return false;
@@ -279,16 +283,14 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent)
             continue;
-        const bool double_sided = mesh.geometry.shader.find("double_sided") != std::string::npos ||
-            mesh.geometry.shader.find("two_sided") != std::string::npos;
         const char* vertex = mesh.environment ? "vk\\object_environment.vs" :
             transparent ? "vk\\object_blended.vs" :
             mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.vs" :
-            double_sided ? "vk\\object_double_sided.vs" : "vk\\object_opaque.vs";
+            mesh.tree_surface ? "vk\\object_double_sided.vs" : "vk\\object_opaque.vs";
         const char* fragment = mesh.environment ? "vk\\object_environment.ps" :
             transparent ? "vk\\object_blended.ps" :
             mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" :
-            double_sided ? "vk\\object_double_sided.ps" : "vk\\object_opaque.ps";
+            mesh.tree_surface ? "vk\\object_double_sided.ps" : "vk\\object_opaque.ps";
         // Both the immutable static buffer and CPU-skinned frame buffers use
         // LevelVertex; pose-buffer variants use a separate GPU layout.
         const bool named = pass.require_game_pipeline(vertex, fragment, mesh.geometry.mode, false, false, error);

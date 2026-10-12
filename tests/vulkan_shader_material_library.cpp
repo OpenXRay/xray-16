@@ -67,6 +67,7 @@ int main()
     const char* blend_name = "Blending";
     screen_blend.insert(screen_blend.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_blend, 6); write32(screen_blend, 0);
+    property(screen_blend, 6, "Z-test", 1);
     chunk(list, 7, screen_blend);
     Bytes screen_set = record("S_SET   ", "hud\\opaque", false, 0);
     write32(screen_set, 7);
@@ -78,7 +79,7 @@ int main()
     additive.insert(additive.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(additive, 2); write32(additive, 0);
     chunk(list, 9, additive);
-    Bytes particle_set = record("PARTICLE", "effects\\sprite_set", false, 200);
+    Bytes particle_set = record("PARTICLE", "effects\\sprite_set", false, 42);
     write32(particle_set, 7);
     particle_set.insert(particle_set.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(particle_set, 0); write32(particle_set, 0);
@@ -89,6 +90,8 @@ int main()
     write32(screen_alpha, 1); write32(screen_alpha, 0);
     chunk(list, 43, screen_alpha);
     Bytes terrain = record("BmmDold ", "levels\\modded_ground", false);
+    write32(terrain, 0);
+    terrain.insert(terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
     for (const char* property_name : {"R2-R", "R2-G", "R2-B", "R2-A"})
     {
         write32(terrain, 3);
@@ -292,11 +295,13 @@ int main()
     assert(!library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode, false, true) &&
         error.find("Z-test") != std::string::npos);
     for (const auto& name : {"hud\\opaque", "hud\\alpha", "effects\\additive",
-             "effects\\wallmarkblend", "effects\\screen_multiply_2x"})
+             "effects\\screen_multiply_2x"})
     {
         assert(library.resolve(name, mode, error, &alpha_ref, &blend_mode, false, true));
         assert(blend_mode >= 0 && blend_mode <= 9);
     }
+    assert(!library.resolve("effects\\wallmarkblend", mode, error, nullptr, nullptr,
+        false, true) && error.find("Z-test") != std::string::npos);
     assert(!library.resolve("trees\\leaf", mode, error, nullptr, nullptr, false, true) &&
         error.find("screen class") != std::string::npos);
     Bytes screen_depth = record("S_SET   ", "mod\\depth_ui", false);
@@ -342,6 +347,8 @@ int main()
     Bytes water = record("S_SET   ", "mod\\arbitrary_liquid", false, 0);
     write32(water, 7); water.insert(water.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(water, 0); write32(water, 0);
+    write32(water, 0);
+    water.insert(water.end(), {'G','e','n','e','r','a','l',0});
     property(water, 6, "Strict sorting", 1);
     property(water, 6, "Texture clamp", 0);
     property(water, 6, "Z-test", 1);
@@ -373,8 +380,10 @@ int main()
         mode == SurfaceMode::Transparent && blend_mode == 0 &&
         (flags & 15u) == 15u && water_definition.role == MaterialDefinition::Role::Water);
     MaterialDefinition ordinary_definition;
+    assert(!library.resolve("water\\ordinary_overlay", mode, error, nullptr, nullptr,
+        false, false, true) && error.find("Z-test=0") != std::string::npos);
     assert(library.resolve("water\\ordinary_overlay", mode, error, nullptr, nullptr,
-        false, false, true, false, nullptr, nullptr, &ordinary_definition) &&
+        false, true, false, false, nullptr, nullptr, &ordinary_definition) &&
         ordinary_definition.role == MaterialDefinition::Role::Standard);
     assert(!library.resolve("details\\lod", mode, error, nullptr, nullptr, false, false, false) &&
         error.find("Fog") != std::string::npos);
@@ -436,6 +445,50 @@ int main()
     assert(!library.load(unknown_property, error));
     assert(error.find("type=99") != std::string::npos &&
         error.find("invalid\\property") != std::string::npos);
+    // Unknown properties and named matrices must not acquire the default
+    // pipeline solely because the serialized class and version are familiar.
+    const auto rejected_semantics = [&](Bytes source, uint32_t id,
+        const char* shader_name, const char* expected)
+    {
+        Bytes records, file;
+        chunk(records, id, source);
+        chunk(file, 2, records);
+        IReader reader(file.data(), file.size());
+        ShaderMaterialLibrary tested;
+        assert(tested.load(reader, error));
+        assert(!tested.resolve(shader_name, mode, error));
+        assert(error.find("id=" + std::to_string(id)) != std::string::npos);
+        assert(error.find(expected) != std::string::npos);
+    };
+    Bytes unknown_semantics = record("LM      ", "mod\\opaque_by_name", false);
+    property(unknown_semantics, 6, "Mystery lighting", 1);
+    rejected_semantics(unknown_semantics, 70, "mod\\opaque_by_name", "Mystery lighting");
+    Bytes base_matrix = record("LM      ", "mod\\double_sided", false);
+    write32(base_matrix, 1);
+    base_matrix.insert(base_matrix.end(), {'T','r','a','n','s','f','o','r','m',0});
+    const size_t matrix_value = base_matrix.size();
+    base_matrix.resize(matrix_value + 64);
+    std::memcpy(base_matrix.data() + matrix_value, "spin", 5);
+    rejected_semantics(base_matrix, 71, "mod\\double_sided", "named texture matrix");
+    Bytes priority = record("LM      ", "mod\\priority", false);
+    write32(priority, 0);
+    priority.insert(priority.end(), {'G','e','n','e','r','a','l',0});
+    write32(priority, 4);
+    priority.insert(priority.end(), {'P','r','i','o','r','i','t','y',0});
+    write32(priority, 3); write32(priority, 0); write32(priority, 3);
+    rejected_semantics(priority, 72, "mod\\priority", "render priority");
+    Bytes renamed = record("LM_AREF ", "mod\\ordinary_surface", false);
+    Bytes deceptive = record("LM_AREF ", "water\\double_sided_alpha_add", false);
+    Bytes rename_records, rename_file;
+    chunk(rename_records, 73, renamed);
+    chunk(rename_records, 74, deceptive);
+    chunk(rename_file, 2, rename_records);
+    IReader renamed_reader(rename_file.data(), rename_file.size());
+    assert(library.load(renamed_reader, error));
+    SurfaceMode a{}, b{};
+    assert(library.resolve("mod\\ordinary_surface", a, error));
+    assert(library.resolve("water\\double_sided_alpha_add", b, error));
+    assert(a == b && a == SurfaceMode::AlphaTest);
     Bytes duplicate_list, duplicate_file;
     chunk(duplicate_list, 0, record("LM      ", "duplicate", false));
     chunk(duplicate_list, 1, record("LM      ", "DUPLICATE", false));

@@ -145,7 +145,7 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
 }
 
 bool GameTextureFactory::material(const std::string& texture_list, DeferredPass& pass,
-    VkDescriptorSet& result, std::string& error)
+    VkDescriptorSet& result, std::string& error, bool clamp)
 {
     result = VK_NULL_HANDLE;
     const size_t comma = texture_list.find(',');
@@ -156,7 +156,8 @@ bool GameTextureFactory::material(const std::string& texture_list, DeferredPass&
     if (first != std::string::npos) diffuse.erase(0, first);
     Asset* asset;
     if (!load(diffuse, asset, error)) return false;
-    if (!asset->material_set && !pass.material(asset->texture.view, sampler_, asset->material_set, error))
+    VkDescriptorSet& set = clamp ? asset->clamp_material_set : asset->material_set;
+    if (!set && !pass.material(asset->texture.view, clamp ? ui_sampler_ : sampler_, set, error))
     {
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset](const auto& entry) { return &entry.second == asset; });
@@ -166,8 +167,8 @@ bool GameTextureFactory::material(const std::string& texture_list, DeferredPass&
     R_ASSERT2(!asset->material_pass || asset->material_pass == &pass,
         "Vulkan material descriptor belongs to a different pass");
     asset->material_pass = &pass;
-    ++asset->material_refs;
-    result = asset->material_set;
+    ++(clamp ? asset->clamp_material_refs : asset->material_refs);
+    result = set;
     error.clear();
     return true;
 }
@@ -424,6 +425,65 @@ float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
     return scale;
 }
 
+bool GameTextureFactory::texture_detail_metadata(const std::string& diffuse,
+    DetailMetadata& detail, std::string& error) const
+{
+    detail = {};
+    const std::string name = trim_texture_name(diffuse);
+    string_path path;
+    if (!FS.exist(path, "$level$", name.c_str(), ".thm") &&
+        !FS.exist(path, "$game_textures$", name.c_str(), ".thm"))
+    { error.clear(); return true; } // Metadata is optional for implicit detail.
+    IReader* reader = FS.r_open(path);
+    if (!reader)
+    { error = std::string(path) + " / texture THM cannot be opened"; return false; }
+    const size_t parameter_size = reader->find_chunk(0x0812);
+    const auto* params = parameter_size && reader->elapsed() >= 0 ?
+        static_cast<const uint8_t*>(reader->pointer()) : nullptr;
+    const size_t bounded_params = params ? std::min(parameter_size,
+        static_cast<size_t>(reader->elapsed())) : 0;
+    const size_t extension_size = reader->find_chunk(0x0815);
+    const auto* extension = extension_size && reader->elapsed() >= 0 ?
+        static_cast<const uint8_t*>(reader->pointer()) : nullptr;
+    const size_t bounded_extension = extension ? std::min(extension_size,
+        static_cast<size_t>(reader->elapsed())) : 0;
+    const bool valid = decode_detail_metadata(params, bounded_params,
+        extension, bounded_extension, detail, error);
+    FS.r_close(reader);
+    if (!valid) { error = std::string(path) + " / " + error; return false; }
+    error.clear();
+    return true;
+}
+
+bool GameTextureFactory::decode_detail_metadata(const uint8_t* params, size_t params_size,
+    const uint8_t* extension, size_t extension_size,
+    DetailMetadata& detail, std::string& error)
+{
+    detail = {};
+    if (!params || params_size < 8)
+    { error = "THM_CHUNK_TEXTUREPARAM is missing or truncated"; return false; }
+    constexpr uint32_t diffuse_detail = 1u << 23, bump_detail = 1u << 26;
+    const uint32_t flags = uint32_t(params[4]) | uint32_t(params[5]) << 8 |
+        uint32_t(params[6]) << 16 | uint32_t(params[7]) << 24;
+    detail.diffuse = (flags & diffuse_detail) != 0;
+    detail.normal = (flags & bump_detail) != 0;
+    if (extension && extension_size)
+    {
+        const auto* bytes = reinterpret_cast<const char*>(extension);
+        const auto* end = static_cast<const char*>(std::memchr(bytes, 0, extension_size));
+        if (!end || extension_size - (end - bytes) - 1 < sizeof(float))
+        { error = "THM_CHUNK_DETAIL_EXT is truncated"; return false; }
+        detail.texture.assign(bytes, end);
+        std::memcpy(&detail.scale, end + 1, sizeof(float));
+        if (!std::isfinite(detail.scale) || detail.scale <= 0.f)
+        { error = "THM_CHUNK_DETAIL_EXT has invalid scale"; return false; }
+    }
+    if ((detail.diffuse || detail.normal) && detail.texture.empty())
+    { error = "detail flags require THM_CHUNK_DETAIL_EXT / texture name"; return false; }
+    error.clear();
+    return true;
+}
+
 bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     VkDescriptorSet& result, std::string& error, VkExtent2D* extent)
 {
@@ -487,7 +547,8 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
 void GameTextureFactory::evict_if_unused(const std::string& name)
 {
     auto it = assets_.find(name);
-    if (it == assets_.end() || it->second.material_refs || it->second.lightmap_refs || it->second.ui_refs ||
+    if (it == assets_.end() || it->second.material_refs || it->second.clamp_material_refs ||
+        it->second.lightmap_refs || it->second.ui_refs ||
         it->second.environment_refs)
         return;
     R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
@@ -529,14 +590,18 @@ void GameTextureFactory::release_material(VkDescriptorSet set, DeferredPass& pas
     if (!set) return;
     for (auto& [name, asset] : assets_)
     {
-        if (asset.material_set != set) continue;
-        R_ASSERT2(asset.material_refs && asset.material_pass == &pass,
+        const bool clamp = asset.clamp_material_set == set;
+        if (asset.material_set != set && !clamp) continue;
+        size_t& refs = clamp ? asset.clamp_material_refs : asset.material_refs;
+        R_ASSERT2(refs && asset.material_pass == &pass,
             "Vulkan material descriptor is not leased by this pass");
-        if (--asset.material_refs) return;
+        if (--refs) return;
         R_ASSERT2(retirement_idle(device_, wait_idle_),
             "Vulkan device did not become idle before material release");
-        pass.release_gbuffer(asset.material_set);
-        asset.material_pass = nullptr;
+        pass.release_gbuffer(set);
+        if (clamp) asset.clamp_material_set = VK_NULL_HANDLE;
+        else asset.material_set = VK_NULL_HANDLE;
+        if (!asset.material_set && !asset.clamp_material_set) asset.material_pass = nullptr;
         evict_if_unused(name);
         return;
     }
@@ -590,6 +655,8 @@ void GameTextureFactory::destroy()
         {
             if (asset.material_set && asset.material_pass)
                 asset.material_pass->release_gbuffer(asset.material_set);
+            if (asset.clamp_material_set && asset.material_pass)
+                asset.material_pass->release_gbuffer(asset.clamp_material_set);
             if (asset.ui_set && asset.ui_pass)
                 asset.ui_pass->release_ui_texture_set(asset.ui_set);
             states_.forget_image(asset.texture.image);
@@ -625,7 +692,8 @@ void GameTextureFactory::retire_unused()
     R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan texture retirement requires idle frames");
     for (auto it = assets_.begin(); it != assets_.end();)
     {
-        if (it->second.material_refs || it->second.lightmap_refs || it->second.ui_refs || it->second.environment_refs)
+        if (it->second.material_refs || it->second.clamp_material_refs ||
+            it->second.lightmap_refs || it->second.ui_refs || it->second.environment_refs)
         { ++it; continue; }
         auto name = it->first;
         ++it;
@@ -700,6 +768,8 @@ bool GameTextureFactory::reload_assets(std::string& error,
         Asset& asset = *item.asset;
         if (asset.material_set && asset.material_pass)
             asset.material_pass->update_material(asset.material_set, item.texture.view, sampler_);
+        if (asset.clamp_material_set && asset.material_pass)
+            asset.material_pass->update_material(asset.clamp_material_set, item.texture.view, ui_sampler_);
         if (asset.ui_set && asset.ui_pass)
             asset.ui_pass->update_ui_texture_set(asset.ui_set, item.texture.view, ui_sampler_);
         states_.forget_image(asset.texture.image);

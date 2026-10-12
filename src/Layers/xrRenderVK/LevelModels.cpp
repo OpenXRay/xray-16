@@ -29,9 +29,16 @@ bool validate_level_header(LevelGameProfile profile, LevelBytes header, std::str
     // All three shipped R2 level formats use hdrLEVEL v14. The profile is
     // selected by the game, never inferred from a vertex declaration.
     const bool known = profile == LevelGameProfile::SoC || profile == LevelGameProfile::CS || profile == LevelGameProfile::CoP;
-    if (!known || !header.data || header.size != 4 || header.data[0] != 14 || header.data[1] != 0 || header.data[2] > 2 || header.data[3] != 0)
+    if (!known || !header.data || header.size != 4)
     {
-        error = std::string(level_profile_name(profile)) + " level / header: unsupported version or quality";
+        error = std::string(level_profile_name(profile)) + " level / header: invalid or truncated header";
+        return false;
+    }
+    if (header.data[0] != 14 || header.data[1] != 0 || header.data[2] > 2 || header.data[3] != 0)
+    {
+        error = std::string(level_profile_name(profile)) + " level / header: unsupported version=" +
+            std::to_string(unsigned(header.data[0]) | unsigned(header.data[1]) << 8) +
+            " quality=" + std::to_string(header.data[2]);
         return false;
     }
     error.clear();
@@ -502,7 +509,8 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer> &vertices, c
     for (size_t i = 0; i < records.size(); ++i)
         if (!decode_visual(records[i], vertices, indices, material_count, loaded.models, loaded.visuals, i, 0, fast_vertices, fast_indices, tree_windows))
         {
-            error = "unsupported or invalid level OGF visual id=" + std::to_string(i);
+            error = "level OGF visual id=" + std::to_string(i) +
+                " (unsupported type, layout, material ID or invalid geometry)";
             return false;
         }
     std::vector<uint8_t> state(loaded.visuals.size()), referenced(loaded.visuals.size());
