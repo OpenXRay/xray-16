@@ -314,7 +314,8 @@ float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
     IReader* reader = FS.r_open(path);
     if (!reader) return 1.f;
     float scale = 1.f;
-    const size_t chunk_size = std::min(reader->find_chunk(0x0815), reader->elapsed());
+    const size_t chunk_size = std::min(reader->find_chunk(0x0815),
+        static_cast<size_t>(std::max<intptr_t>(0, reader->elapsed())));
     if (chunk_size)
     {
         const auto* bytes = static_cast<const char*>(reader->pointer());
