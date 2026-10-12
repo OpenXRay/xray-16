@@ -7,6 +7,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
 jobs:
   windows:
     name: Windows ${{ matrix.configuration }} (${{ matrix.compiler.name }})
@@ -185,7 +188,7 @@ jobs:
       id: make-appimage
       run: |
           DESTDIR=AppDir cmake --install build --prefix /usr
-          LD_LIBRARY_PATH="$PWD/AppDir/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ${{ matrix.platform.linuxdeploy }} --appdir AppDir --output appimage --executable AppDir/usr/bin/xr_3da --desktop-file AppDir/usr/share/applications/openxray_cop.desktop --desktop-file AppDir/usr/share/applications/openxray_cs.desktop --desktop-file AppDir/usr/share/applications/openxray_soc.desktop --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cop.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cs.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_soc.png
+          LD_LIBRARY_PATH="$PWD/AppDir/usr/lib:$PWD/AppDir/usr/lib/$(gcc -print-multiarch)${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ${{ matrix.platform.linuxdeploy }} --appdir AppDir --output appimage --executable AppDir/usr/bin/xr_3da --desktop-file AppDir/usr/share/applications/openxray_cop.desktop --desktop-file AppDir/usr/share/applications/openxray_cs.desktop --desktop-file AppDir/usr/share/applications/openxray_soc.desktop --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cop.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_cs.png --icon-file AppDir/usr/share/icons/hicolor/64x64/apps/openxray_soc.png
           mkdir -p build/artifacts
           mv *.AppImage build/artifacts/openxray-${{ matrix.configuration }}-${{ matrix.platform.arch }}.AppImage
           file build/artifacts/openxray*.*
@@ -204,7 +207,7 @@ jobs:
     env:
       CFLAGS: "-w -gz"
       CXXFLAGS: "-w -gz"
-      VM_ENV: CFLAGS CXXFLAGS
+      VM_ENV: CFLAGS CXXFLAGS GITHUB_TOKEN
     strategy:
       fail-fast: false
       matrix:

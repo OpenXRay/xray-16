@@ -27,20 +27,24 @@ target_link_libraries(xr_3da
     xrRender
 )
 
+add_custom_command(TARGET xr_3da POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+        ${XRAY_SLANG_RUNTIME_FILES}
+        "$<TARGET_FILE_DIR:xr_3da>"
+    VERBATIM
+)
+
 if(APPLE AND NVRHI_WITH_METAL3)
     target_compile_definitions(xr_3da PRIVATE XRAY_USE_METAL)
-    add_dependencies(xr_3da copy-dxcompiler copy-dxil)
     add_custom_command(TARGET xr_3da POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
-            "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
             "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
             "$<TARGET_FILE_DIR:xr_3da>"
         VERBATIM
     )
     install(FILES
-        "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib"
-        "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxil.dylib"
+        "${XRAY_SLANG_ROOT}/lib/libdxcompiler.dylib"
+        "${XRAY_SLANG_ROOT}/lib/libdxil.dylib"
         "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
         DESTINATION "${CMAKE_INSTALL_BINDIR}"
     )
@@ -55,13 +59,6 @@ if (WIN32)
         "${XRAY_SDK_BIN_DIR}/OpenAL32.dll"
         "${XRAY_SDK_BIN_DIR}/soft_oal.dll"
     )
-    if (TARGET copy-dxcompiler AND TARGET copy-dxil)
-        add_dependencies(xr_3da copy-dxcompiler copy-dxil)
-        list(APPEND XRAY_WINDOWS_RUNTIME_DLLS
-            "${slang_BINARY_DIR}/$<CONFIG>/bin/dxcompiler.dll"
-            "${slang_BINARY_DIR}/$<CONFIG>/bin/dxil.dll"
-        )
-    endif()
     add_custom_command(TARGET xr_3da POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             ${XRAY_WINDOWS_RUNTIME_DLLS}

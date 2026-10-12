@@ -26,10 +26,6 @@
 	path = Externals/nvrhi
 	url = https://github.com/OpenXRay/NVRHI.git
 	branch = xray
-[submodule "Externals/slang"]
-	path = Externals/slang
-	url = https://github.com/OpenXRay/slang.git
-	branch = xray
 [submodule "Externals/DirectX-Headers"]
 	path = Externals/DirectX-Headers
 	url = https://github.com/microsoft/DirectX-Headers.git

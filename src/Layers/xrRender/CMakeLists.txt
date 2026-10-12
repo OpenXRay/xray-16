@@ -379,10 +379,7 @@ if(APPLE AND NVRHI_WITH_METAL3)
         SKIP_UNITY_BUILD_INCLUSION ON
     )
     target_compile_definitions(xrRender PRIVATE XRAY_USE_METAL)
-    if(NOT TARGET copy-dxcompiler OR NOT TARGET copy-dxil)
-        message(FATAL_ERROR "Native Metal shaders require Slang's DXC runtime targets.")
-    endif()
-    set(XRAY_METAL_DXC_LIBRARY "${slang_BINARY_DIR}/$<CONFIG>/lib/libdxcompiler.dylib")
+    set(XRAY_METAL_DXC_LIBRARY "${XRAY_SLANG_ROOT}/lib/libdxcompiler.dylib")
     set(XRAY_METAL_TOOLCHAIN_HEADER "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/MetalShaderToolchain.h")
     add_custom_command(
         OUTPUT "${XRAY_METAL_TOOLCHAIN_HEADER}"
@@ -391,7 +388,7 @@ if(APPLE AND NVRHI_WITH_METAL3)
             "-DDXC_LIBRARY=${XRAY_METAL_DXC_LIBRARY}"
             "-DOUTPUT=${XRAY_METAL_TOOLCHAIN_HEADER}"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/Shaders/MetalShaderToolchain.cmake"
-        DEPENDS copy-dxcompiler "${XRAY_METAL_DXC_LIBRARY}"
+        DEPENDS "${XRAY_METAL_DXC_LIBRARY}"
             "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
             Shaders/MetalShaderToolchain.cmake
         VERBATIM
@@ -424,7 +421,6 @@ target_include_directories(xrRender
     "${XRAY_SOURCE_DIR}/src"
     "${XRAY_SOURCE_DIR}/sdk/include"
     "${XRAY_SOURCE_DIR}/Externals/nvrhi/include"
-    "${XRAY_SOURCE_DIR}/Externals/slang/include"
     "${XRAY_SOURCE_DIR}/Externals/DirectX-Headers/include"
 )
 
@@ -451,12 +447,6 @@ target_link_libraries(xrRender
     ${XRAY_VULKAN_LIBS}
     slang
 )
-
-foreach(slang_runtime_module slang-glslang slang-glsl-module)
-    if(TARGET ${slang_runtime_module})
-        add_dependencies(xrRender ${slang_runtime_module})
-    endif()
-endforeach()
 
 if(NOT NVRHI_BUILD_SHARED)
     target_link_libraries(xrRender PRIVATE nvrhi_vk)
