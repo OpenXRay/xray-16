@@ -15,6 +15,15 @@ static void chunk(Bytes& bytes, uint32_t id, const Bytes& payload)
 { write32(bytes, id); write32(bytes, static_cast<uint32_t>(payload.size())); bytes.insert(bytes.end(), payload.begin(), payload.end()); }
 static void property(Bytes& bytes, uint32_t id, const char* name, uint32_t value)
 { write32(bytes, id); bytes.insert(bytes.end(), name, name + std::strlen(name) + 1); write32(bytes, value); }
+static void texture_property(Bytes& bytes, const char* name, const char* value)
+{
+    write32(bytes, 3);
+    bytes.insert(bytes.end(), name, name + std::strlen(name) + 1);
+    const size_t offset = bytes.size();
+    bytes.resize(offset + 64);
+    assert(std::strlen(value) < 64);
+    std::memcpy(bytes.data() + offset, value, std::strlen(value));
+}
 static Bytes record(const char* cls, const char* name, bool blend, uint32_t alpha_ref = 128)
 {
     Bytes result(176, 0);
@@ -127,12 +136,21 @@ int main()
     reflection.resize(env_value + 64);
     std::memcpy(reflection.data() + env_value, "mod\\cube", 9);
     chunk(list, 54, reflection);
+    Bytes single_detail = record("BmmDold ", "mod\\plain_stone", false);
+    write32(single_detail, 0);
+    const char detail_scope[] = "Detail map";
+    single_detail.insert(single_detail.end(), detail_scope, detail_scope + sizeof(detail_scope));
+    texture_property(single_detail, "Name", "mod\\unusual_detail");
+    chunk(list, 55, single_detail);
+    Bytes environment_constant = record("LaEmB   ", "mod\\glowing_wall", false);
+    chunk(list, 56, environment_constant);
+    chunk(list, 57, record("BmmDold ", "mod\\legacy_ground", false));
     Bytes file;
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 21);
+    assert(library.load(reader, error) && library.size() == 24);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -156,6 +174,17 @@ int main()
     assert(!library.resolve("mod\\arbitrary_reflection", mode, error) &&
         error.find("id=54") != std::string::npos &&
         error.find("Environment map") != std::string::npos);
+    const MaterialDefinition* parsed_detail = library.find("mod\\plain_stone");
+    assert(parsed_detail && !parsed_detail->pipeline_supported &&
+        parsed_detail->properties.back().scope == "Detail map" &&
+        std::strcmp(reinterpret_cast<const char*>(parsed_detail->properties.back().data.data()),
+            "mod\\unusual_detail") == 0);
+    assert(!library.resolve("mod\\plain_stone", mode, error) &&
+        error.find("id=55") != std::string::npos && error.find("single detail texture") != std::string::npos);
+    assert(!library.resolve("mod\\glowing_wall", mode, error) &&
+        error.find("id=56") != std::string::npos && error.find("constant / multiply pass") != std::string::npos);
+    assert(!library.resolve("mod\\legacy_ground", mode, error) &&
+        error.find("id=57") != std::string::npos && error.find("single detail variant") != std::string::npos);
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);
     int alpha_ref = -1;
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);

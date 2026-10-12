@@ -230,6 +230,44 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             definition.pipeline_supported = false;
             definition.unsupported_reason = "Environment map / second texture pass";
         }
+        // LaEmB uses the environment texture and (for some variants) a
+        // separate constant and multiply pass. A base-only descriptor cannot
+        // reproduce even its single-pass variant.
+        if (cls == "LaEmB   ")
+        {
+            definition.pipeline_supported = false;
+            definition.unsupported_reason = "Environment map / constant / multiply pass";
+        }
+        // Older BmmD records carry one detail texture in the Detail map
+        // scope. The four-channel terrain path consumes R2-R/G/B/A, but does
+        // not bind this extra slot. Preserve the parsed property and refuse
+        // the unsupported variant instead of rendering only its base texture.
+        if (cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ")
+        {
+            if (!terrain.enabled)
+            {
+                definition.pipeline_supported = false;
+                definition.unsupported_reason = "Detail map / R2-R/G/B/A (single detail variant has no Vulkan pipeline)";
+            }
+            for (const BlenderProperty& property : definition.properties)
+            {
+                if (property.scope != "Detail map" || property.name != "Name") continue;
+                if (property.type != 3 || property.data.empty() ||
+                    !std::memchr(property.data.data(), 0, property.data.size()))
+                {
+                    definition.pipeline_supported = false;
+                    definition.unsupported_reason = "Detail map / Name (invalid texture slot)";
+                    break;
+                }
+                const std::string detail(reinterpret_cast<const char*>(property.data.data()));
+                if (!detail.empty() && lower(detail) != "$null")
+                {
+                    definition.pipeline_supported = false;
+                    definition.unsupported_reason = "Detail map / Name (single detail texture)";
+                }
+                break;
+            }
+        }
         Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d terrain=%d supported=%d",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
