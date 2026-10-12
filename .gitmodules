@@ -24,12 +24,12 @@
 	url = https://github.com/pattonkan/sse2rvv.git
 [submodule "Externals/nvrhi"]
 	path = Externals/nvrhi
-	url = https://github.com/yohjimane/NVRHI.git
-	branch = main
+	url = https://github.com/OpenXRay/NVRHI.git
+	branch = xray
 [submodule "Externals/slang"]
 	path = Externals/slang
-	url = https://github.com/yohjimane/slang.git
-	branch = master
+	url = https://github.com/OpenXRay/slang.git
+	branch = xray
 [submodule "Externals/DirectX-Headers"]
 	path = Externals/DirectX-Headers
 	url = https://github.com/microsoft/DirectX-Headers.git
@@ -48,8 +48,7 @@
 	url = https://github.com/richgel999/bc7enc_rdo.git
 [submodule "Externals/ozz-animation"]
 	path = Externals/ozz-animation
-	url = https://github.com/yohjimane/ozz-animation.git
-	branch = yohji/feat/ozz-animation
+	url = https://github.com/guillaumeblanc/ozz-animation.git
 [submodule "Externals/WindowsToolchain"]
 	path = Externals/WindowsToolchain
 	url = https://github.com/MarkSchofield/WindowsToolchain.git
