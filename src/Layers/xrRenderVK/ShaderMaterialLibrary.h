@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LevelModels.h"
+#include "xrEngine/WaveForm.h"
 #include <array>
 #include <string>
 #include <unordered_map>
@@ -38,6 +39,9 @@ struct MaterialDefinition
     Role role{Role::Standard};
     TerrainMaterialTextures terrain;
     std::string detail_texture;
+    std::string environment_texture, environment_transform, environment_constant;
+    std::array<WaveForm, 4> constant_waveforms{};
+    bool has_environment_constant{};
     std::vector<BlenderProperty> properties;
 };
 // Reads the blender class and saved properties from the engine's shaders.xr.

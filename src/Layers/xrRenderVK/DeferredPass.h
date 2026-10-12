@@ -145,7 +145,8 @@ public:
         SurfaceMode mode = SurfaceMode::Opaque, uint32_t first_index = 0,
         const char* vertex_name = nullptr, const char* fragment_name = nullptr,
         float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr,
-        float terrain_scale = 1.f) const;
+        float terrain_scale = 1.f, const float* environment_camera = nullptr,
+        const float* environment_factor = nullptr) const;
     bool record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
         bool alpha_test, uint32_t first_index = 0,

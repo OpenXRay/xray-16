@@ -20,6 +20,19 @@
 [[vk::binding(5, 0)]] Texture2D<float4> terrain_blue : register(t5);
 [[vk::binding(6, 0)]] Texture2D<float4> terrain_alpha : register(t6);
 #endif
+#if defined(VK_ENV_CUBE)
+[[vk::binding(2, 0)]] TextureCube<float4> environment_cube : register(t2);
+#endif
+#if defined(VK_LAEMB_BASE)
+[[vk::binding(2, 0)]] Texture2D<float4> environment_2d : register(t2);
+#endif
+#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT) || defined(VK_LAEMB_BASE)
+[[vk::push_constant]] cbuffer EnvironmentParams {
+    float4x4 environment_mvp;
+    float4 environment_camera;
+    float4 environment_factor;
+};
+#endif
 
 struct Fragment
 {
@@ -31,6 +44,9 @@ struct Fragment
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
     [[vk::location(3)]] float4 baked : COLOR0;
+#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
+    [[vk::location(4)]] float3 world_position : TEXCOORD4;
+#endif
 #endif
 };
 
@@ -111,6 +127,13 @@ float4 main(Fragment fragment) : SV_Target0
         illumination += local_lights[i].color_type.rgb * attenuation *
             max(dot(normal, -ray), 0.0);
     }
+#if defined(VK_ENV_CUBE)
+    float3 reflection = reflect(normalize(world - fog_end_camera.yzw), normal);
+    texel.rgb = lerp(environment_cube.Sample(diffuse_sampler, reflection).rgb, texel.rgb, texel.a);
+#if defined(VK_LIGHTMAP)
+    illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
+#endif
+#endif
     float3 lit = texel.rgb * illumination;
 #if defined(VK_FOG)
     float distance_to_camera = length(world - fog_end_camera.yzw);
@@ -132,6 +155,17 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_ENV_CUBE)
+    float3 reflected = reflect(normalize(fragment.world_position - environment_camera.xyz),
+        normalize(fragment.normal));
+    output.albedo.rgb = lerp(environment_cube.Sample(diffuse_sampler, reflected).rgb,
+        output.albedo.rgb, output.albedo.a);
+#endif
+#if defined(VK_LAEMB_BASE)
+    float3 env = environment_2d.Sample(diffuse_sampler, fragment.uv).rgb;
+    output.albedo.rgb = saturate(lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb +
+        env * environment_factor.rgb);
+#endif
 #if defined(VK_TERRAIN)
     float4 weights = terrain_mask.Sample(diffuse_sampler, fragment.uv);
     weights /= max(dot(weights, float4(1.0, 1.0, 1.0, 1.0)), 1e-6);

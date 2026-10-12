@@ -532,9 +532,11 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer> &vertices, c
 }
 
 bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData& result, std::string& error,
-    LevelBytes fast_vertex_buffers, LevelBytes fast_index_buffers, LevelBytes tree_windows, bool* skipped_fast_geometry)
+    LevelBytes fast_vertex_buffers, LevelBytes fast_index_buffers, LevelBytes tree_windows,
+    bool* skipped_fast_geometry, std::string* fast_fallback_reason)
 {
     if (skipped_fast_geometry) *skipped_fast_geometry = false;
+    if (fast_fallback_reason) fast_fallback_reason->clear();
     LevelModelData loaded;
     std::vector<VertexBuffer> vertices;
     std::vector<std::vector<uint16_t>> indices;
@@ -550,10 +552,18 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
         error = "invalid level index buffers";
     else
     {
-        if (has_fast && (!fast_vertex_buffers.data || !fast_index_buffers.data ||
-            !read_vertices(fast_vertex_buffers, fast_vertices) || !read_indices(fast_index_buffers, fast_indices)))
+        const bool valid_fast_vertices = !has_fast ||
+            (fast_vertex_buffers.data && read_vertices(fast_vertex_buffers, fast_vertices));
+        const bool valid_fast_indices = !has_fast ||
+            (fast_index_buffers.data && read_indices(fast_index_buffers, fast_indices));
+        if (has_fast && (!valid_fast_vertices || !valid_fast_indices))
         {
             if (skipped_fast_geometry) *skipped_fast_geometry = true;
+            if (fast_fallback_reason)
+                *fast_fallback_reason = !fast_vertex_buffers.data ? "missing vertex chunk" :
+                    !fast_index_buffers.data ? "missing index chunk" :
+                    !valid_fast_vertices ? "unsupported or invalid vertex declaration" :
+                    "invalid index buffer";
             has_fast = false;
             fast_vertices.clear();
             fast_indices.clear();

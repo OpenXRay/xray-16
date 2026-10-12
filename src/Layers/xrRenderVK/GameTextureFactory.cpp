@@ -124,8 +124,9 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     }
     UploadedTexture texture;
     VkExtent3D extent{};
+    bool cube = false;
     const bool uploaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
-        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent);
+        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent, &cube);
     FS.r_close(reader);
     if (!uploaded)
     {
@@ -136,6 +137,7 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     auto inserted = assets_.emplace(key, Asset{}).first;
     inserted->second.texture = texture;
     inserted->second.extent = {extent.width, extent.height};
+    inserted->second.cube = cube;
     // Conservative RGBA-equivalent residency estimate for DDS mip chains.
     inserted->second.bytes = uint64_t(extent.width) * extent.height * 4;
     asset = &inserted->second;
@@ -316,6 +318,54 @@ bool GameTextureFactory::detail_material(const std::string& diffuse_name,
         found = terrain_.emplace(std::move(key), std::move(item)).first;
     }
     R_ASSERT2(found->second.pass == &pass, "Vulkan detail belongs to another pass");
+    ++found->second.refs;
+    result = found->second.set;
+    error.clear();
+    return true;
+}
+
+bool GameTextureFactory::environment_material(const std::string& diffuse_name,
+    const std::string& lightmap_name, const std::string& environment_name, bool cube,
+    DeferredPass& pass, VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    TerrainMaterial item;
+    const std::string diffuse = trim_texture_name(diffuse_name);
+    const std::string lightmap = lightmap_name.empty() ? diffuse : trim_texture_name(lightmap_name);
+    const std::string environment = trim_texture_name(environment_name);
+    const std::array<std::string, 7> names{
+        diffuse, lightmap, environment, environment, environment, environment, environment};
+    std::string key = "environment";
+    key.push_back('\0');
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+        if (!load(names[i], item.assets[i], error)) return false;
+        const auto it = std::find_if(assets_.begin(), assets_.end(),
+            [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
+        R_ASSERT(it != assets_.end());
+        item.paths[i] = it->first;
+        key += it->first;
+        key.push_back('\0');
+    }
+    if (item.assets[2]->cube != cube)
+    {
+        error = "environment texture '" + environment_name +
+            (cube ? "' must be a cubemap DDS" : "' must be a 2D DDS");
+        return false;
+    }
+    auto found = terrain_.find(key);
+    if (found == terrain_.end())
+    {
+        std::array<VkImageView, 7> views{};
+        for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
+        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        item.pass = &pass;
+        for (size_t i = 0; i < item.assets.size(); ++i)
+            if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
+                ++item.assets[i]->lightmap_refs;
+        found = terrain_.emplace(std::move(key), std::move(item)).first;
+    }
+    R_ASSERT2(found->second.pass == &pass, "Vulkan environment material belongs to another pass");
     ++found->second.refs;
     result = found->second.set;
     error.clear();

@@ -84,6 +84,10 @@ private:
         bool lightmapped{};
         bool terrain{};
         bool single_detail{};
+        bool environment{};
+        bool laemb{};
+        bool environment_constant{};
+        std::array<WaveForm, 4> constant_waveforms{};
         float terrain_scale{1.f};
         bool water{};
         bool glass{};

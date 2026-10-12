@@ -143,14 +143,54 @@ int main()
     texture_property(single_detail, "Name", "mod\\unusual_detail");
     chunk(list, 55, single_detail);
     Bytes environment_constant = record("LaEmB   ", "mod\\glowing_wall", false);
+    environment_constant[172] = 0;
+    write32(environment_constant, 0);
+    environment_constant.insert(environment_constant.end(), env_scope, env_scope + sizeof(env_scope));
+    texture_property(environment_constant, "Name", "mod\\glow_map");
+    write32(environment_constant, 2);
+    environment_constant.insert(environment_constant.end(), {'C','o','n','s','t','a','n','t',0});
+    const size_t constant_value = environment_constant.size();
+    environment_constant.resize(constant_value + 64);
+    std::memcpy(environment_constant.data() + constant_value, "pulse", 5);
     chunk(list, 56, environment_constant);
     chunk(list, 57, record("BmmDold ", "mod\\legacy_ground", false));
+    Bytes model_environment = record("MODELEbB", "mod\\reflective_npc", true);
+    write32(model_environment, 0);
+    model_environment.insert(model_environment.end(), env_scope, env_scope + sizeof(env_scope));
+    texture_property(model_environment, "Name", "mod\\npc_cube");
+    chunk(list, 58, model_environment);
+    Bytes missing_environment = record("LaEmB   ", "mod\\missing_env", false);
+    missing_environment[172] = 0;
+    chunk(list, 59, missing_environment);
+    Bytes reflection_blended = record("LmEbB   ", "mod\\blended_reflection", true);
+    write32(reflection_blended, 0);
+    reflection_blended.insert(reflection_blended.end(), env_scope, env_scope + sizeof(env_scope));
+    texture_property(reflection_blended, "Name", "mod\\other_cube");
+    chunk(list, 60, reflection_blended);
+    Bytes model_opaque = record("MODELEbB", "mod\\plain_npc", false);
+    chunk(list, 61, model_opaque);
+    Bytes environment_plain = record("LaEmB   ", "mod\\plain_glow", false);
+    environment_plain[172] = 0;
+    write32(environment_plain, 0);
+    environment_plain.insert(environment_plain.end(), env_scope, env_scope + sizeof(env_scope));
+    texture_property(environment_plain, "Name", "mod\\glow_plain");
+    chunk(list, 63, environment_plain);
     Bytes file;
+    Bytes constants;
+    constants.insert(constants.end(), {'p', 'u', 'l', 's', 'e', 0});
+    for (unsigned channel = 0; channel < 4; ++channel)
+    {
+        WaveForm wave;
+        wave.arg[0] = .25f * float(channel + 1);
+        const auto* bytes = reinterpret_cast<const uint8_t*>(&wave);
+        constants.insert(constants.end(), bytes, bytes + sizeof(wave));
+    }
+    chunk(file, 0, constants);
     chunk(file, 2, list);
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 24);
+    assert(library.load(reader, error) && library.size() == 29);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -171,9 +211,10 @@ int main()
     assert(!library.resolve("mod\\unrecognized", mode, error) &&
         error.find("shaders.xr blender id=5") != std::string::npos &&
         error.find("CUSTOM") != std::string::npos && error.find("version=17") != std::string::npos);
-    assert(!library.resolve("mod\\arbitrary_reflection", mode, error) &&
-        error.find("id=54") != std::string::npos &&
-        error.find("Environment map") != std::string::npos);
+    MaterialDefinition reflection_definition;
+    assert(library.resolve("mod\\arbitrary_reflection", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &reflection_definition) &&
+        reflection_definition.environment_texture == "mod\\cube");
     const MaterialDefinition* parsed_detail = library.find("mod\\plain_stone");
     assert(parsed_detail && parsed_detail->pipeline_supported &&
         parsed_detail->properties.back().scope == "Detail map" &&
@@ -181,8 +222,21 @@ int main()
         std::strcmp(reinterpret_cast<const char*>(parsed_detail->properties.back().data.data()),
             "mod\\unusual_detail") == 0);
     assert(library.resolve("mod\\plain_stone", mode, error) && mode == SurfaceMode::Opaque);
-    assert(!library.resolve("mod\\glowing_wall", mode, error) &&
-        error.find("id=56") != std::string::npos && error.find("constant / multiply pass") != std::string::npos);
+    MaterialDefinition constant_definition;
+    assert(library.resolve("mod\\glowing_wall", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &constant_definition) &&
+        constant_definition.has_environment_constant &&
+        constant_definition.environment_texture == "mod\\glow_map" &&
+        constant_definition.constant_waveforms[0].Calculate(0.f) == .25f);
+    assert(library.resolve("mod\\reflective_npc", mode, error) && mode == SurfaceMode::Transparent);
+    assert(library.resolve("mod\\blended_reflection", mode, error) && mode == SurfaceMode::Transparent);
+    assert(library.resolve("mod\\plain_npc", mode, error) && mode == SurfaceMode::Opaque);
+    assert(library.resolve("mod\\plain_glow", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &constant_definition) &&
+        mode == SurfaceMode::Opaque && !constant_definition.has_environment_constant &&
+        constant_definition.environment_texture == "mod\\glow_plain");
+    assert(!library.resolve("mod\\missing_env", mode, error) &&
+        error.find("id=59") != std::string::npos && error.find("Environment map / Name") != std::string::npos);
     assert(!library.resolve("mod\\legacy_ground", mode, error) &&
         error.find("id=57") != std::string::npos && error.find("single detail variant") != std::string::npos);
     assert(library.resolve("mod\\cutout", mode, error) && mode == SurfaceMode::AlphaTest);

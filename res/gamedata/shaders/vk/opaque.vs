@@ -25,6 +25,9 @@ struct Fragment
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
     [[vk::location(3)]] float4 baked : COLOR0;
+#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
+    [[vk::location(4)]] float3 world_position : TEXCOORD4;
+#endif
 #endif
 };
 
@@ -44,6 +47,9 @@ Fragment main(Vertex vertex)
 #if defined(LEVEL_GEOMETRY)
     fragment.lightmap_uv = vertex.lightmap_uv;
     fragment.baked = vertex.baked;
+#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
+    fragment.world_position = vertex.position;
+#endif
 #endif
     return fragment;
 }

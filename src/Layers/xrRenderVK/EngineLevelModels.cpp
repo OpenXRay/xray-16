@@ -505,13 +505,16 @@ bool load_engine_level_models(IReader &level, LevelModelData &result, std::strin
         if (error.empty() && normalize_engine_visual_chunks(*visuals, true, visual_bytes, error))
         {
             bool skipped_fast_geometry = false;
+            std::string fast_fallback_reason;
             load_level_models({static_cast<const uint8_t *>(shaders->pointer()), shaders->length()}, {vb_bytes.data(), vb_bytes.size()},
                               {ib_bytes.data(), ib_bytes.size()}, {visual_bytes.data(), visual_bytes.size()}, result, error,
                               fast_vb_bytes.empty() ? LevelBytes{} : LevelBytes{fast_vb_bytes.data(), fast_vb_bytes.size()},
                               fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{fast_ib_bytes.data(), fast_ib_bytes.size()},
-                              {swi_bytes.data(), swi_bytes.size()}, &skipped_fast_geometry);
+                              {swi_bytes.data(), swi_bytes.size()}, &skipped_fast_geometry,
+                              &fast_fallback_reason);
             if (skipped_fast_geometry)
-                Msg("! [renderer-vulkan] level.geomX buffers are incompatible; using regular level.geom for progressive visuals");
+                Msg("! [renderer-vulkan] profile=%s resource=$level$/level.geomX fallback=level.geom reason='%s'",
+                    level_profile_name(profile), fast_fallback_reason.c_str());
             Msg("[renderer-vulkan] level.decode complete models=%zu visuals=%zu error='%s'",
                 result.models.size(), result.visuals.size(), error.c_str());
         }

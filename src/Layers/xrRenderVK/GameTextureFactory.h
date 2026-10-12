@@ -39,6 +39,9 @@ public:
     bool detail_material(const std::string& diffuse, const std::string& lightmap,
         const std::string& detail, DeferredPass& pass,
         VkDescriptorSet& result, std::string& error);
+    bool environment_material(const std::string& diffuse, const std::string& lightmap,
+        const std::string& environment, bool cube, DeferredPass& pass,
+        VkDescriptorSet& result, std::string& error);
     void release_terrain_material(VkDescriptorSet set, DeferredPass& pass);
     float terrain_detail_scale(const std::string& diffuse) const;
     bool ui(const std::string& texture_name, ScenePass& pass,
@@ -90,6 +93,7 @@ private:
         VkDescriptorSet material_set{};
         VkDescriptorSet ui_set{};
         VkExtent2D extent{};
+        bool cube{};
         uint64_t bytes{};
         size_t material_refs{};
         size_t lightmap_refs{};

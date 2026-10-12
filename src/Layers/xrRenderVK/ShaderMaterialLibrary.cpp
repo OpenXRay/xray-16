@@ -6,6 +6,8 @@
 #include <cctype>
 #include <cstring>
 #include <memory>
+#include <unordered_map>
+#include <cmath>
 
 namespace xray::render::vulkan
 {
@@ -168,7 +170,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
     // higher thresholds use the depth-writing deferred base_aref pass.
     const bool model_cutout = cls == "MODEL   " && blend && alpha_ref >= 16;
     if ((cls == "PARTICLE" && blending != 0) || strict || (cls == "S_SET   " && blending != 0) ||
-        ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODELEbB") && blend) ||
+        ((cls == "LM_AREF " || cls == "V_AREF  " || cls == "MODELEbB" || cls == "LmEbB   ") && blend) ||
         (cls == "MODEL   " && blend && !model_cutout))
         mode = SurfaceMode::Transparent;
     else if ((cls == "PARTICLE" && blending == 0) || cls == "LM_AREF " || cls == "V_AREF  " || cls == "D_TREE  " ||
@@ -184,6 +186,31 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
 {
     clear();
     error.clear();
+    std::unordered_map<std::string, std::array<WaveForm, 4>> constants;
+    std::unique_ptr<IReader, void(*)(IReader*)> constants_chunk(file.open_chunk(0),
+        [](IReader* p) { if (p) p->close(); });
+    if (constants_chunk)
+    {
+        Cursor cursor{static_cast<const uint8_t*>(constants_chunk->pointer()), constants_chunk->length(), 0};
+        while (cursor.offset < cursor.size)
+        {
+            std::string name;
+            if (!cursor.string(name) || name.empty() || cursor.size - cursor.offset < sizeof(WaveForm) * 4)
+            { error = "shaders.xr constant table is truncated"; return false; }
+            std::array<WaveForm, 4> waveforms;
+            std::memcpy(waveforms.data(), cursor.bytes + cursor.offset, sizeof(WaveForm) * 4);
+            cursor.offset += sizeof(WaveForm) * 4;
+            for (const WaveForm& wave : waveforms)
+            {
+                if (wave.F > WaveForm::fINVSAWTOOTH ||
+                    std::any_of(std::begin(wave.arg), std::end(wave.arg),
+                        [](float value) { return !std::isfinite(value); }))
+                { error = "shaders.xr constant='" + name + "' has invalid waveform"; return false; }
+            }
+            if (!constants.emplace(lower(name), waveforms).second)
+            { error = "shaders.xr duplicate constant='" + name + "'"; return false; }
+        }
+    }
     std::unique_ptr<IReader, void(*)(IReader*)> blenders(file.open_chunk(2), [](IReader* p) { if (p) p->close(); });
     if (!blenders) { error = "shaders.xr has no blender chunk"; return false; }
     // open_chunk_iterator trusts chunk lengths. Validate the entire table first
@@ -212,7 +239,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 terrain, properties, error) || name.empty() ||
             !entries_.emplace(name, MaterialDefinition{id, name, cls, version, mode, supported,
                 {}, alpha_ref, blending, screen_flags, MaterialDefinition::Role::Standard,
-                terrain, {}, std::move(properties)}).second)
+                terrain, {}, {}, {}, {}, {}, false, std::move(properties)}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -233,21 +260,55 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         if (cls == "S_SET   " && blending == 0 && strict_sorting &&
             (screen_flags & 14u) == 14u)
             definition.role = MaterialDefinition::Role::Water;
-        // These blenders sample the second environment texture in their
-        // Compile path. The current Vulkan descriptor has only the base
-        // texture; pretending they are supported drops reflection outright.
-        if (cls == "LmEbB   " || cls == "MODELEbB")
+        if (cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ")
         {
-            definition.pipeline_supported = false;
-            definition.unsupported_reason = "Environment map / second texture pass";
-        }
-        // LaEmB uses the environment texture and (for some variants) a
-        // separate constant and multiply pass. A base-only descriptor cannot
-        // reproduce even its single-pass variant.
-        if (cls == "LaEmB   ")
-        {
-            definition.pipeline_supported = false;
-            definition.unsupported_reason = "Environment map / constant / multiply pass";
+            for (const BlenderProperty& property : definition.properties)
+            {
+                if (property.scope != "Environment map" ||
+                    (property.name != "Name" && property.name != "Transform" && property.name != "Constant")) continue;
+                const uint32_t expected_type = property.name == "Transform" ? 1u :
+                    property.name == "Constant" ? 2u : 3u;
+                if (property.type != expected_type ||
+                    property.data.empty() || !std::memchr(property.data.data(), 0, property.data.size()))
+                {
+                    definition.pipeline_supported = false;
+                    definition.unsupported_reason = "Environment map / " + property.name + " (invalid property)";
+                    break;
+                }
+                const std::string value = lower(reinterpret_cast<const char*>(property.data.data()));
+                if (property.name == "Name") definition.environment_texture = value;
+                if (property.name == "Transform") definition.environment_transform = value;
+                if (property.name == "Constant") definition.environment_constant = value;
+            }
+            const bool needs_environment = cls != "MODELEbB" || mode == SurfaceMode::Transparent;
+            if (definition.pipeline_supported && needs_environment &&
+                (definition.environment_texture.empty() || definition.environment_texture == "$null"))
+            {
+                definition.pipeline_supported = false;
+                definition.unsupported_reason = "Environment map / Name (required texture)";
+            }
+            if (definition.pipeline_supported && needs_environment &&
+                !definition.environment_transform.empty() && definition.environment_transform != "$null")
+            {
+                definition.pipeline_supported = false;
+                definition.unsupported_reason = "Environment map / Transform (animated matrix not implemented)";
+            }
+            if (definition.pipeline_supported && cls == "LaEmB   " &&
+                !definition.environment_constant.empty() && definition.environment_constant != "$null")
+            {
+                const auto constant = constants.find(definition.environment_constant);
+                if (constant == constants.end())
+                {
+                    definition.pipeline_supported = false;
+                    definition.unsupported_reason = "Environment map / Constant '" +
+                        definition.environment_constant + "' (missing shaders.xr constant)";
+                }
+                else
+                {
+                    definition.constant_waveforms = constant->second;
+                    definition.has_environment_constant = true;
+                }
+            }
         }
         // Older BmmD records carry one detail texture in the Detail map
         // scope. Keep its exact slot separate from the four-channel terrain.
@@ -286,12 +347,14 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 break;
             }
         }
-        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' properties=%zu supported=%d reason='%s'",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' passes=%u properties=%zu supported=%d reason='%s'",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
             alpha_ref, blending, definition.screen_flags,
             definition.role == MaterialDefinition::Role::Water ? "water" : "standard",
             terrain.enabled ? 1 : 0, definition.detail_texture.c_str(),
+            definition.environment_texture.c_str(), definition.environment_transform.c_str(),
+            definition.environment_constant.c_str(), cls == "LaEmB   " ? 2u : 1u,
             definition.properties.size(), definition.pipeline_supported ? 1 : 0,
             definition.unsupported_reason.c_str());
     }

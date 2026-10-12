@@ -80,7 +80,22 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* output)
 {
     assert(count == 1 && info->stageCount == 2);
-    if (pipeline_count < 2)
+    if (info->pStages[1].module == handle<VkShaderModule>(91))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(10));
+        assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
+        assert(info->pDepthStencilState->depthWriteEnable == VK_FALSE);
+        assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS_OR_EQUAL);
+        assert(info->pColorBlendState->attachmentCount == 2);
+        const auto* attachments = info->pColorBlendState->pAttachments;
+        assert(attachments[0].blendEnable == VK_TRUE);
+        assert(attachments[0].srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR);
+        assert(attachments[0].dstColorBlendFactor == VK_BLEND_FACTOR_SRC_COLOR);
+        assert(attachments[0].colorWriteMask == (VK_COLOR_COMPONENT_R_BIT |
+            VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT));
+        assert(attachments[1].colorWriteMask == 0);
+    }
+    else if (pipeline_count < 2)
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
         assert(info->pVertexInputState->vertexAttributeDescriptionCount == 5);
@@ -522,4 +537,6 @@ int main()
     resources.clear();
     assert(module_destroys == 2 && resources.size() == 0);
     resources.destroy();
+    assert(deferred.create_game_pipeline("vk\\level_laemb_base.vs", "vk\\level_laemb_multiply.ps",
+        handle<VkShaderModule>(90), handle<VkShaderModule>(91), SurfaceMode::Opaque, false, error));
 }

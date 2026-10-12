@@ -103,7 +103,8 @@ struct LevelModelData
 // can be omitted, leaving the full quality level.geom models available.
 bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers, LevelBytes visuals, LevelModelData &result, std::string &error,
                        LevelBytes fast_vertex_buffers = {}, LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {},
-                       bool* skipped_fast_geometry = nullptr);
+                       bool* skipped_fast_geometry = nullptr,
+                       std::string* fast_fallback_reason = nullptr);
 bool load_game_level_models(LevelGameProfile profile, LevelBytes header, LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes index_buffers,
                             LevelBytes visuals, LevelModelData &result, std::string &error, LevelBytes fast_vertex_buffers = {},
                             LevelBytes fast_index_buffers = {}, LevelBytes tree_windows = {});

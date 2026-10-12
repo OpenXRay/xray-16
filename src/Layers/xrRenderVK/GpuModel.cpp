@@ -29,28 +29,41 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         meshes_.emplace_back();
         auto &mesh = meshes_.back();
         mesh.geometry = std::move(decoded);
+        MaterialDefinition definition;
         if (!textures.surface_mode(mesh.geometry.shader, texture, mesh.geometry.mode, error,
-                &mesh.alpha_ref))
+                &mesh.alpha_ref, nullptr, false, false, false, false, nullptr, nullptr, &definition))
         {
             error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;
             return false;
         }
+        if (definition.class_name == "LmEbB   " || definition.class_name == "LaEmB   ")
+        {
+            error = "OGF shader='" + mesh.geometry.shader + "' class='" +
+                definition.class_name + "' requires level lightmap geometry";
+            return false;
+        }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
+        mesh.environment = definition.class_name == "MODELEbB" &&
+            mesh.geometry.mode == SurfaceMode::Transparent;
         const bool double_sided = mesh.geometry.shader.find("double_sided") != std::string::npos || mesh.geometry.shader.find("two_sided") != std::string::npos;
-        const char *family = mesh.geometry.mode == SurfaceMode::Transparent ? "object_blended"
+        const char *family = mesh.environment ? "object_environment" :
+                             mesh.geometry.mode == SurfaceMode::Transparent ? "object_blended"
                              : mesh.geometry.mode == SurfaceMode::AlphaTest ? "object_cutout"
                              : double_sided && !animated                    ? "object_double_sided"
                                                                             : "object_opaque";
         const std::string shader = std::string("vk\\") + family;
         const std::string vertex = animated ? "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs" : shader + ".vs";
-        const std::string fragment = animated && mesh.geometry.mode == SurfaceMode::Transparent ?
+        const std::string fragment = animated && mesh.environment ? "vk\\skinned_environment.ps" :
+            animated && mesh.geometry.mode == SurfaceMode::Transparent ?
             "vk\\skinned_blended.ps" : shader + ".ps";
         if (!pass.request_game_pipeline(vertex, fragment, mesh.geometry.mode, false, animated, error))
         {
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
             return false;
         }
-        if (!textures.material(texture, pass, mesh.material, error) ||
+        if (!(mesh.environment ? textures.environment_material(texture, {},
+                definition.environment_texture, true, pass, mesh.material, error) :
+                textures.material(texture, pass, mesh.material, error)) ||
             !upload_buffer(device, queue, pool, memory, upload, mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
             return false;
@@ -229,6 +242,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                 std::to_string(mesh.geometry.skin_weights) + ".vs" :
                 "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs";
             const char* fragment_name = hud ? "vk\\hud_blended.ps" :
+                mesh.environment ? "vk\\skinned_environment.ps" :
                 transparent ? "vk\\skinned_blended.ps" :
                 mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" : "vk\\object_opaque.ps";
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
@@ -267,10 +281,12 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             continue;
         const bool double_sided = mesh.geometry.shader.find("double_sided") != std::string::npos ||
             mesh.geometry.shader.find("two_sided") != std::string::npos;
-        const char* vertex = transparent ? "vk\\object_blended.vs" :
+        const char* vertex = mesh.environment ? "vk\\object_environment.vs" :
+            transparent ? "vk\\object_blended.vs" :
             mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.vs" :
             double_sided ? "vk\\object_double_sided.vs" : "vk\\object_opaque.vs";
-        const char* fragment = transparent ? "vk\\object_blended.ps" :
+        const char* fragment = mesh.environment ? "vk\\object_environment.ps" :
+            transparent ? "vk\\object_blended.ps" :
             mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" :
             double_sided ? "vk\\object_double_sided.ps" : "vk\\object_opaque.ps";
         // Both the immutable static buffer and CPU-skinned frame buffers use
@@ -345,7 +361,8 @@ void GpuModel::destroy()
             for (auto& [instance, pose] : mesh.poses)
                 for (auto& descriptor : pose.descriptors)
                     pass_->release_pose_descriptor(descriptor);
-            textures_->release_material(mesh.material, *pass_);
+            if (mesh.environment) textures_->release_terrain_material(mesh.material, *pass_);
+            else textures_->release_material(mesh.material, *pass_);
         }
     meshes_.clear();
     pending_.clear();

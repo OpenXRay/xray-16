@@ -74,13 +74,15 @@ int main()
     auto input = [](const Bytes &bytes) { return LevelBytes{bytes.data(), bytes.size()}; };
     LevelModelData result;
     std::string error;
-    // Game profiles enter the same R2 decoder. Exercise float (SoC) and
-    // packed (CS/CoP) declarations, material names and atomic failures.
+    // Every game profile may carry either declaration in a modded archive.
+    // Keep the format decision tied to the bytes rather than the game name.
     const Bytes level_header{14, 0, 1, 0};
     for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
     {
+      for (const bool use_packed : {false, true})
+      {
         Bytes profile_vb = vb;
-        if (profile != LevelGameProfile::SoC)
+        if (use_packed)
         {
             profile_vb.clear();
             u32(profile_vb, 1);
@@ -105,7 +107,7 @@ int main()
         }
         assert(load_game_level_models(profile, input(level_header), input(shaders), input(profile_vb), input(ib), input(visuals), result, error));
         assert(result.models.size() == 1 && result.materials[0].textures == "concrete");
-        if (profile != LevelGameProfile::SoC)
+        if (use_packed)
         {
             assert(result.models[0].vertices[0].uv[0] > 1.f);
             assert(result.models[0].vertices[0].uv[1] < -0.999f);
@@ -119,6 +121,7 @@ int main()
         assert(error.find("header") != std::string::npos);
         assert(!load_game_level_models(profile, input(level_header), {}, input(profile_vb), input(ib), input(visuals), result, error));
         assert(error.find("shader") != std::string::npos);
+      }
     }
     assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     assert(error.empty() && result.materials.size() == 1 && result.models.size() == 1);
@@ -273,9 +276,19 @@ int main()
     Bytes incompatible_fast_vb = vb;
     incompatible_fast_vb[0] = 0xff; // The normal geometry remains usable.
     bool skipped_fast_geometry = false;
+    std::string fallback_reason;
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
-        result, error, input(incompatible_fast_vb), input(progressive_ib), {}, &skipped_fast_geometry));
+        result, error, input(incompatible_fast_vb), input(progressive_ib), {},
+        &skipped_fast_geometry, &fallback_reason));
     assert(skipped_fast_geometry && result.models.size() == 1 && !result.models[0].fast && result.models[0].indices.size() == 6);
+    assert(fallback_reason == "unsupported or invalid vertex declaration");
+    Bytes invalid_fast_ib = progressive_ib;
+    invalid_fast_ib.pop_back();
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
+        result, error, input(vb), input(invalid_fast_ib), {}, &skipped_fast_geometry,
+        &fallback_reason));
+    assert(skipped_fast_geometry && fallback_reason == "invalid index buffer" &&
+        !result.models[0].fast);
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
         result, error, input(vb), input(progressive_ib)));
     fast_chunks.pop_back(); // Corrupt fast SWI: fail rather than draw a partial model.

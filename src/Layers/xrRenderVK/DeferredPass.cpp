@@ -20,7 +20,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     const ScenePassDispatch& vk, VkPipeline& pipeline, std::string& error,
     const char* label, bool shadow = false, bool additive = false,
     bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
-    bool particle_set = false, bool water_depth_write = false, bool wallmark = false)
+    bool particle_set = false, bool water_depth_write = false, bool wallmark = false,
+    bool legacy_multiply = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -70,11 +71,11 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // against one another without occluding the HUD with world geometry.
     depth.depthTestEnable = (gbuffer || hud || transparent || shadow) &&
         (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = ((gbuffer && !transparent) || hud || shadow || particle_set ||
+    depth.depthWriteEnable = !legacy_multiply && ((gbuffer && !transparent) || hud || shadow || particle_set ||
         water_depth_write) ? VK_TRUE : VK_FALSE;
     // Decal polygons lie on top of the level surface. Strict LESS rejects
     // coplanar pixels and makes papers/wallmarks blink as the view moves.
-    depth.depthCompareOp = wallmark ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_LESS;
+    depth.depthCompareOp = wallmark || legacy_multiply ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_LESS;
     VkPipelineColorBlendAttachmentState attachments[2]{};
     for (auto& attachment : attachments)
     {
@@ -108,6 +109,15 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
             attachment.dstColorBlendFactor = multiply_2x ? VK_BLEND_FACTOR_SRC_COLOR : VK_BLEND_FACTOR_ZERO;
         }
         if (particle_set) attachment.blendEnable = VK_FALSE;
+    }
+    if (legacy_multiply)
+    {
+        attachments[0].blendEnable = VK_TRUE;
+        attachments[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT;
+        attachments[0].srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
+        attachments[0].dstColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+        attachments[1].colorWriteMask = 0;
+        attachments[1].blendEnable = VK_FALSE;
     }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     blend.attachmentCount = shadow ? 0 : gbuffer ? 2 : 1;
@@ -603,12 +613,13 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps";
     const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_set.ps") != std::string::npos;
+    const bool legacy_multiply = fragment_name == "vk\\level_laemb_multiply.ps";
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
             "game shader pair", false, particle_additive, particle_alpha_add || glow_alpha_add,
             particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set,
-            false, wallmark_multiply_2x))
+            false, wallmark_multiply_2x, legacy_multiply))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;
@@ -940,7 +951,8 @@ void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    float alpha_ref, const float* normal_rows, float terrain_scale) const
+    float alpha_ref, const float* normal_rows, float terrain_scale,
+    const float* environment_camera, const float* environment_factor) const
 {
     if (mode == SurfaceMode::Transparent) return false;
     VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
@@ -972,6 +984,16 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
             std::strstr(fragment_name, "level_detail.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
+    if (fragment_name && (std::strstr(fragment_name, "level_environment.ps") ||
+            std::strstr(fragment_name, "level_laemb_base.ps")))
+    {
+        const float zero_camera[4]{};
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            64, sizeof(zero_camera), environment_camera ? environment_camera : zero_camera);
+        if (environment_factor)
+            vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+                80, sizeof(float) * 4, environment_factor);
+    }
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
