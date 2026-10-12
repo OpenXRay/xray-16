@@ -7,10 +7,6 @@
 #include <utility>
 #include <vector>
 
-#if defined(__APPLE__)
-#include <pthread/qos.h>
-#endif
-
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>
 #include <nvrhi/vulkan.h>
@@ -82,11 +78,7 @@ static bool FindSurfaceFormat(const xr_vector<VkSurfaceFormatKHR>& formats, VkFo
 
 static PFN_vkGetInstanceProcAddr LoadVulkanEntryPoint()
 {
-#if defined(__APPLE__)
-    return vkGetInstanceProcAddr;
-#else
     return reinterpret_cast<PFN_vkGetInstanceProcAddr>(SDL_Vulkan_GetVkGetInstanceProcAddr());
-#endif
 }
 
 VulkanBackend::VulkanBackend() = default;
@@ -555,9 +547,6 @@ bool VulkanBackend::CreateLogicalDevice() {
         VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
         VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
     };
-#if defined(XR_PLATFORM_APPLE)
-    m_deviceExtensions.push_back("VK_KHR_portability_subset");
-#endif
 
     m_bufferDeviceAddressEnabled = false;
     bool accelerationStructureExtension = false;
@@ -1279,10 +1268,6 @@ void VulkanBackend::EndFrame() {
 }
 
 void VulkanBackend::SubmitThreadMain() {
-#if defined(__APPLE__)
-    pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
-#endif
-
     using Clock = std::chrono::steady_clock;
     auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
         return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());

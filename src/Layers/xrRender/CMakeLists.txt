@@ -212,8 +212,6 @@ target_sources(xrRender PRIVATE
     Backend/BindlessTextureRegistry.cpp
     GeometryResidency.h
     GeometryResidency.cpp
-    Backend/VulkanBackend.h
-    Backend/VulkanBackend.cpp
 
     Animation.cpp
     ClusteredLightManager.cpp
@@ -366,6 +364,18 @@ if(WIN32)
     )
 endif()
 
+if(NOT APPLE)
+    target_sources(xrRender PRIVATE
+        Backend/VulkanBackend.h
+        Backend/VulkanBackend.cpp
+    )
+    target_compile_definitions(xrRender PRIVATE VK_NO_PROTOTYPES)
+    target_link_libraries(xrRender PRIVATE Vulkan::Headers)
+    if(NOT NVRHI_BUILD_SHARED)
+        target_link_libraries(xrRender PRIVATE nvrhi_vk)
+    endif()
+endif()
+
 if(APPLE AND NVRHI_WITH_METAL3)
     target_sources(xrRender PRIVATE
         Backend/MetalBackend.h
@@ -398,10 +408,14 @@ if(APPLE AND NVRHI_WITH_METAL3)
     find_library(XRAY_METAL_FRAMEWORK Metal REQUIRED)
     find_library(XRAY_FOUNDATION_FRAMEWORK Foundation REQUIRED)
     find_library(XRAY_QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
+    find_library(XRAY_COREGRAPHICS_FRAMEWORK CoreGraphics REQUIRED)
+    find_library(XRAY_APPKIT_FRAMEWORK AppKit REQUIRED)
     target_link_libraries(xrRender PRIVATE
         ${XRAY_METAL_FRAMEWORK}
         ${XRAY_FOUNDATION_FRAMEWORK}
         ${XRAY_QUARTZCORE_FRAMEWORK}
+        ${XRAY_COREGRAPHICS_FRAMEWORK}
+        ${XRAY_APPKIT_FRAMEWORK}
     )
     if(NOT NVRHI_BUILD_SHARED)
         target_link_libraries(xrRender PRIVATE nvrhi_metal3)
@@ -424,13 +438,6 @@ target_include_directories(xrRender
     "${XRAY_SOURCE_DIR}/Externals/DirectX-Headers/include"
 )
 
-if (APPLE)
-    set(XRAY_VULKAN_LIBS MoltenVK Vulkan::Headers)
-else()
-    set(XRAY_VULKAN_LIBS Vulkan::Headers)
-    target_compile_definitions(xrRender PRIVATE VK_NO_PROTOTYPES)
-endif()
-
 target_link_libraries(xrRender
     PRIVATE
     xrCore
@@ -444,15 +451,11 @@ target_link_libraries(xrRender
     xrMiscMath
     xrImGui
     nvrhi
-    ${XRAY_VULKAN_LIBS}
     slang
 )
 
-if(NOT NVRHI_BUILD_SHARED)
-    target_link_libraries(xrRender PRIVATE nvrhi_vk)
-    if(WIN32)
-        target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12)
-    endif()
+if(WIN32 AND NOT NVRHI_BUILD_SHARED)
+    target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12)
 endif()
 
 if(WIN32)

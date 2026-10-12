@@ -14,7 +14,9 @@
 
 using namespace xray::render::fg;
 
+#if !defined(XR_PLATFORM_APPLE)
 IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation);
+#endif
 
 IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, bool enableValidation)
 {
@@ -27,6 +29,7 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
 
     if (ps_fg_render_mode == FG_RENDER_VULKAN)
     {
+#if !defined(XR_PLATFORM_APPLE)
         backend = CreateVulkanBackend(hWnd, dwWidth, dwHeight, enableValidation);
         if (!backend)
         {
@@ -34,6 +37,10 @@ IRenderBackend* FGRenderHost::CreateBackend(SDL_Window* hWnd, u32& dwWidth, u32&
             return nullptr;
         }
         Msg("* [FGRenderHost] Vulkan backend initialized successfully");
+#else
+        FATAL("Vulkan backend not available on this platform");
+        return nullptr;
+#endif
     }
     else if (ps_fg_render_mode == FG_RENDER_METAL)
     {
