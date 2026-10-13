@@ -672,11 +672,7 @@ void CScriptEngine::lua_error(lua_State* L)
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 
-#if !XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_tostring(L, -1));
-#else
-    throw lua_tostring(L, -1);
-#endif
 }
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
