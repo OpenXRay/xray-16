@@ -522,14 +522,8 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
 
-    if (caErrorText)
-    {
-        const auto [logHeader, luaLogHeader] = get_message_headers(LuaMessageType::Error);
-        Msg("%sSCRIPT ERROR: %s\n", logHeader, caErrorText);
-    }
-
     // Error handlers call this with the error message on top of the stack.
-    const pcstr S = lua_gettop(L) > 0 && lua_isstring(L, -1) ? lua_tostring(L, -1) : nullptr;
+    const pcstr S = lua_gettop(L) > 0 && lua_isstring(L, -1) ? lua_tostring(L, -1) : caErrorText;
 
     if (errorCode)
         print_error(L, errorCode, S);
@@ -662,7 +656,7 @@ void CScriptEngine::unload()
 
 int CScriptEngine::lua_panic(lua_State* L)
 {
-    print_output(L, "", LUA_ERRRUN, "PANIC");
+    print_output(L, "", LUA_ERRRUN, "PANIC!");
     FATAL("Lua panic");
     return 0;
 }
@@ -672,7 +666,10 @@ void CScriptEngine::lua_error(lua_State* L)
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_tostring(L, -1));
+    const auto err = lua_gettop(L) > 0 && lua_isstring(L, -1) ? lua_tostring(L, -1) : "see log for details";
+
+    static bool ignoreAlways;
+    xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", err);
 }
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
@@ -684,7 +681,7 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
 
     if (xrDebug::WouldShowErrorMessage())
     {
-        const auto err = lua_tostring(L, -1);
+        const auto err = lua_gettop(L) > 0 && lua_isstring(L, -1) ? lua_tostring(L, -1) : "see call stack for details";
 
         static bool ignoreAlways;
         const auto result = xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", err);
@@ -699,10 +696,12 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
 #if !XRAY_EXCEPTIONS
 void CScriptEngine::lua_cast_failed(lua_State* L, const luabind::type_id& info)
 {
-    string128 buf;
+    string1024 buf;
     xr_sprintf(buf, "cannot cast lua value to %s", info.name());
     print_output(L, "", LUA_ERRRUN, buf);
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name());
+
+    static bool ignoreAlways;
+    xrDebug::Fail(ignoreAlways, DEBUG_INFO, "LUA error", "cannot cast lua value", info.name());
 }
 #endif
 

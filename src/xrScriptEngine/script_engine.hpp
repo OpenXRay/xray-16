@@ -46,11 +46,6 @@ enum class LuaMessageType : u32
     Info = 0,
     Error = 1,
     Message = 2,
-    HookCall = 3,
-    HookReturn = 4,
-    HookLine = 5,
-    HookCount = 6,
-    HookTailReturn = u32(-1),
 };
 
 extern XRSCRIPTENGINE_API Flags32 g_LuaDebug;
@@ -112,21 +107,6 @@ protected:
 
         case LuaMessageType::Message:
             return { "[LUA] ", "[MESSAGE]     " };
-
-        case LuaMessageType::HookCall:
-            return { "[LUA][HOOK_CALL] ", "[CALL]        " };
-
-        case LuaMessageType::HookReturn:
-            return { "[LUA][HOOK_RETURN] ", "[RETURN]      " };
-
-        case LuaMessageType::HookLine:
-            return { "[LUA][HOOK_LINE] ", "[LINE]        " };
-
-        case LuaMessageType::HookCount:
-            return { "[LUA][HOOK_COUNT] ", "[COUNT]       " };
-
-        case LuaMessageType::HookTailReturn:
-            return { "[LUA][HOOK_TAIL_RETURN] ", "[TAIL_RETURN] " };
 
         default:
             NODEFAULT;
