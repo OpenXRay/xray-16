@@ -357,26 +357,50 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             const auto& scope = property.scope;
             if (property.type == 0)
             {
+                const bool detail_class = cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ";
+                const bool environment_class = cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ";
                 if (name != "General" && name != "Base Texture" &&
-                    name != "Detail map" && name != "Environment map")
+                    !(name == "Detail map" && detail_class) &&
+                    !(name == "Environment map" && environment_class))
                 {
                     definition.pipeline_supported = false;
-                    definition.unsupported_reason = name + " (unknown property scope)";
+                    definition.unsupported_reason = name + " (scope does not belong to blender class)";
                 }
                 continue;
             }
             const bool common = (scope == "General" &&
                 (name == "Priority" || name == "Strict sorting")) ||
                 (scope == "Base Texture" && (name == "Name" || name == "Transform"));
+            const bool detail_class = cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ";
+            const bool environment_class = cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ";
+            const bool screen_class = cls == "S_SET   ";
+            const bool particle_class = cls == "PARTICLE";
+            // Properties follow the Save() schema of the concrete blender,
+            // not just a shared spelling. An accepted but unused property
+            // would falsely advertise a material as renderable.
             const bool known = common ||
-                name == "Alpha ref" || name == "Alpha-blend" || name == "Alpha-Blend" ||
-                name == "Use alpha-channel" || name == "Object LOD" ||
-                name == "Tessellation" || name == "Blending" ||
-                name == "Texture clamp" || name == "Z-test" || name == "Z-write" ||
-                name == "Lighting" || name == "Fog" ||
-                ((scope == "Environment map" || scope == "Detail map") &&
-                    (name == "Name" || name == "Transform" || name == "Constant" ||
-                     name == "R2-R" || name == "R2-G" || name == "R2-B" || name == "R2-A"));
+                (scope == "Base Texture" && (
+                    (name == "Alpha ref" && (cls == "LM_AREF " || cls == "V_AREF  " ||
+                        (cls == "MODEL   " && version >= 1) || screen_class || particle_class)) ||
+                    (name == "Alpha-blend" && ((cls == "LM_AREF " && version >= 1) ||
+                        (cls == "V_AREF  " && version >= 1) ||
+                        cls == "D_TREE  " || cls == "D_STILL ")) ||
+                    (name == "Use alpha-channel" && cls == "MODEL   " && version >= 1) ||
+                    (name == "Object LOD" && cls == "D_TREE  " && version >= 1) ||
+                    (name == "Tessellation" && ((cls == "LM      " || cls == "V       ") &&
+                        version >= 1 || cls == "MODEL   " && version >= 2)) ||
+                    (name == "Blending" && (screen_class || particle_class)) ||
+                    (name == "Texture clamp" && (screen_class || particle_class)) ||
+                    ((name == "Z-test" || name == "Z-write" || name == "Lighting" ||
+                        name == "Fog") && screen_class))) ||
+                (scope == "Detail map" && detail_class &&
+                    (name == "Name" || name == "Transform" ||
+                     (version >= 3 && (name == "R2-R" || name == "R2-G" ||
+                        name == "R2-B" || name == "R2-A")))) ||
+                (scope == "Environment map" && environment_class &&
+                    (name == "Name" || name == "Transform" ||
+                     (name == "Constant" && cls == "LaEmB   ") ||
+                     (name == "Alpha-Blend" && cls != "LaEmB   " && version >= 1)));
             const std::string path = scope + " / " + name;
             const auto reject = [&](const char* reason)
             {
@@ -401,16 +425,6 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                     property.data.size() != 64 ||
                     !std::memchr(property.data.data(), 0, property.data.size()))))
             { reject("invalid property type or value"); break; }
-            const bool detail_class = cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ";
-            const bool environment_class = cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ";
-            if ((scope == "Detail map" && !detail_class) ||
-                (scope == "Environment map" && !environment_class) ||
-                (name == "Object LOD" && cls != "D_TREE  ") ||
-                (name == "Use alpha-channel" && cls != "MODEL   ") ||
-                (name == "Blending" && cls != "S_SET   " && cls != "PARTICLE") ||
-                ((name == "Z-test" || name == "Z-write" || name == "Lighting" || name == "Fog") &&
-                    cls != "S_SET   "))
-            { reject("property does not belong to this blender class"); break; }
             if (name == "Priority" && property.type == 4 && property.data.size() == 12 &&
                 le32(property.data.data()) != 1)
                 reject("render priority is not implemented");

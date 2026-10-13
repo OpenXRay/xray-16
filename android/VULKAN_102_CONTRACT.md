@@ -8,6 +8,33 @@ base/detail matrix, tessellation selection or tree_s selection fails with the
 blender ID, class, version and shader name. A parsed definition alone is not
 proof that a level, model, particle or UI pipeline can render it.
 
+## Serialized property schema
+
+All known classes retain `General/Priority` (default 1), `General/Strict sorting`
+(default false), and `Base Texture/Name` and `Transform` (default `$base0`
+and `$null`). A non-default priority or named base matrix is rejected by the
+current game pipeline. The following are the additional properties read by
+the original class `Save`/`Load` methods. A property introduced by a newer
+version is rejected if inserted into an older record, even if its value is 0.
+
+| Class | Accepted versions | Additional serialized properties and defaults |
+| --- | --- | --- |
+| `LM`, `V` | 0–1 | `Tessellation` since v1, token 0 (no tessellation) |
+| `LM_AREF`, `V_AREF` | 0–1 | `Alpha ref` 32; `Alpha-blend` false since v1 |
+| `MODEL` | 0–2 | `Use alpha-channel` false and `Alpha ref` 32 since v1; `Tessellation` token 0 since v2 |
+| `D_TREE` | 0–1 | `Alpha-blend` false; `Object LOD` false since v1 |
+| `D_STILL` | 0 | `Alpha-blend` false |
+| `BmmDold`, `BmmD`, `LmBmmD` | up to 3, 3, 1 respectively | `Detail map/Name` and `Transform` (`$null`); terrain `R2-R/G/B/A` slots in v3 |
+| `LmEbB`, `MODELEbB` | 0–1 | `Environment map/Name`, `Transform` (`$null`); `Alpha-Blend` false since v1 |
+| `LaEmB` | 0 | `Environment map/Name`, `Transform`, `Constant` (`$null`) |
+| `PARTICLE` | 0 | `Blending` token 0, `Texture clamp` true, `Alpha ref` 32 |
+| `S_SET` | 0–4 | `Blending` token 0, `Texture clamp` true (omitted by v2 `Load`), `Alpha ref` 32; `Z-test`, `Z-write`, `Lighting`, `Fog` false |
+
+The parser retains raw values and scopes for every property. The Vulkan
+consumer rejects nonzero tessellation and Object LOD, unsupported scene flag
+combinations, and unknown class properties with the exact class, version,
+shader and property path. Synthetic records test these rejection boundaries.
+
 ## Material slots and passes
 
 | Blender family | Game path and texture roles | Game pass and limitations |

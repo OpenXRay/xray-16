@@ -43,10 +43,26 @@ static Bytes record(const char* cls, const char* name, bool blend, uint32_t alph
         result.insert(result.end(), prop, prop + std::strlen(prop) + 1);
         result.resize(result.size() + 64);
     }
-    write32(result, 4); const char* alpha = "Alpha ref";
-    result.insert(result.end(), alpha, alpha + std::strlen(alpha) + 1);
-    write32(result, alpha_ref); write32(result, 0); write32(result, 255);
-    property(result, 6, "Alpha-blend", blend ? 1 : 0);
+    const bool aref = std::strcmp(cls, "LM_AREF ") == 0 ||
+        std::strcmp(cls, "V_AREF  ") == 0 || std::strcmp(cls, "MODEL   ") == 0 ||
+        std::strcmp(cls, "S_SET   ") == 0 || std::strcmp(cls, "PARTICLE") == 0;
+    if (aref)
+    {
+        write32(result, 4); const char* alpha = "Alpha ref";
+        result.insert(result.end(), alpha, alpha + std::strlen(alpha) + 1);
+        write32(result, alpha_ref); write32(result, 0); write32(result, 255);
+    }
+    if (std::strcmp(cls, "LM_AREF ") == 0 || std::strcmp(cls, "V_AREF  ") == 0 ||
+        std::strcmp(cls, "D_TREE  ") == 0 || std::strcmp(cls, "D_STILL ") == 0)
+        property(result, 6, "Alpha-blend", blend ? 1 : 0);
+    if (std::strcmp(cls, "MODEL   ") == 0)
+        property(result, 6, "Use alpha-channel", blend ? 1 : 0);
+    if (std::strcmp(cls, "LmEbB   ") == 0 || std::strcmp(cls, "MODELEbB") == 0)
+    {
+        write32(result, 0);
+        result.insert(result.end(), {'E','n','v','i','r','o','n','m','e','n','t',' ','m','a','p',0});
+        property(result, 6, "Alpha-Blend", blend ? 1 : 0);
+    }
     return result;
 }
 
@@ -90,6 +106,7 @@ int main()
     write32(screen_alpha, 1); write32(screen_alpha, 0);
     chunk(list, 43, screen_alpha);
     Bytes terrain = record("BmmDold ", "levels\\modded_ground", false);
+    terrain[172] = 3;
     write32(terrain, 0);
     terrain.insert(terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
     for (const char* property_name : {"R2-R", "R2-G", "R2-B", "R2-A"})
@@ -264,6 +281,7 @@ int main()
     assert(terrain_textures.enabled && terrain_textures.detail[0] == "detail\\modded" &&
         terrain_textures.detail[3] == "detail\\modded");
     Bytes missing_terrain = record("BmmDold ", "levels\\incomplete", false);
+    missing_terrain[172] = 3;
     write32(missing_terrain, 3);
     missing_terrain.insert(missing_terrain.end(), {'R','2','-','R',0});
     missing_terrain.resize(missing_terrain.size() + 64);
@@ -350,6 +368,8 @@ int main()
     write32(water, 0);
     water.insert(water.end(), {'G','e','n','e','r','a','l',0});
     property(water, 6, "Strict sorting", 1);
+    write32(water, 0);
+    water.insert(water.end(), {'B','a','s','e',' ','T','e','x','t','u','r','e',0});
     property(water, 6, "Texture clamp", 0);
     property(water, 6, "Z-test", 1);
     property(water, 6, "Z-write", 1);
@@ -463,6 +483,34 @@ int main()
     Bytes unknown_semantics = record("LM      ", "mod\\opaque_by_name", false);
     property(unknown_semantics, 6, "Mystery lighting", 1);
     rejected_semantics(unknown_semantics, 70, "mod\\opaque_by_name", "Mystery lighting");
+    Bytes false_aref = record("LM      ", "mod\\false_aref", false);
+    write32(false_aref, 4);
+    false_aref.insert(false_aref.end(), {'A','l','p','h','a',' ','r','e','f',0});
+    write32(false_aref, 32); write32(false_aref, 0); write32(false_aref, 255);
+    rejected_semantics(false_aref, 75, "mod\\false_aref", "Alpha ref");
+    Bytes foreign_scope = record("LM      ", "mod\\false_scope", false);
+    write32(foreign_scope, 0);
+    foreign_scope.insert(foreign_scope.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    rejected_semantics(foreign_scope, 80, "mod\\false_scope", "Detail map");
+    Bytes false_clamp = record("LM_AREF ", "mod\\false_clamp", false);
+    property(false_clamp, 6, "Texture clamp", 1);
+    rejected_semantics(false_clamp, 76, "mod\\false_clamp", "Texture clamp");
+    Bytes false_environment = record("LmEbB   ", "mod\\false_constant", false);
+    texture_property(false_environment, "Name", "mod\\cube");
+    write32(false_environment, 2);
+    false_environment.insert(false_environment.end(), {'C','o','n','s','t','a','n','t',0});
+    false_environment.resize(false_environment.size() + 64);
+    rejected_semantics(false_environment, 77, "mod\\false_constant", "Constant");
+    Bytes old_aref = record("LM_AREF ", "mod\\old_aref", false);
+    old_aref[172] = 0;
+    rejected_semantics(old_aref, 78, "mod\\old_aref", "Alpha-blend");
+    Bytes old_terrain = record("BmmDold ", "mod\\old_terrain", false);
+    old_terrain[172] = 2;
+    write32(old_terrain, 0);
+    old_terrain.insert(old_terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(old_terrain, channel, "mod\\sand");
+    rejected_semantics(old_terrain, 79, "mod\\old_terrain", "R2-R");
     Bytes base_matrix = record("LM      ", "mod\\double_sided", false);
     write32(base_matrix, 1);
     base_matrix.insert(base_matrix.end(), {'T','r','a','n','s','f','o','r','m',0});
