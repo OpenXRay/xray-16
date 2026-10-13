@@ -18,6 +18,11 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
+CUIZoneMap::CUIZoneMap() : CUIWindow("CUIZoneMap")
+{
+    AttachChild(&m_clipFrame);
+}
+
 void CUIZoneMap::Init(bool motionIconAttached, CUIXml& maingameXml)
 {
     ZoneScoped;
@@ -25,15 +30,16 @@ void CUIZoneMap::Init(bool motionIconAttached, CUIXml& maingameXml)
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "zone_map.xml");
 
-    CUIXmlInit::InitStatic(uiXml, "minimap:background", 0, &m_background);
-    CUIXmlInit::InitStatic(uiXml, "minimap:level_frame", 0, &m_clipFrame);
-    CUIXmlInit::InitStatic(uiXml, "minimap:center", 0, &m_center);
+    auto* background = UIHelper::CreateStatic(uiXml, "minimap:background", this);
 
-    m_clock_wnd = UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background, false);
+    CUIXmlInit::InitStatic(uiXml, "minimap:background", 0, background);
+    CUIXmlInit::InitStatic(uiXml, "minimap:level_frame", 0, &m_clipFrame);
+
+    m_clock_wnd = UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", background, false);
 
     if (IsGameTypeSingle())
     {
-        m_pointerDistanceText = UIHelper::CreateStatic(uiXml, "minimap:background:dist_text", &m_background, false);
+        m_pointerDistanceText = UIHelper::CreateStatic(uiXml, "minimap:background:dist_text", background, false);
     }
 
     m_activeMap = xr_new<CUIMiniMap>();
@@ -43,13 +49,11 @@ void CUIZoneMap::Init(bool motionIconAttached, CUIXml& maingameXml)
 
     m_activeMap->SetRounded(motionIconAttached);
 
-    CUIXmlInit::InitStatic(uiXml, "minimap:compass", 0, &m_compass);
-    m_background.AttachChild(&m_compass);
+    m_compass = UIHelper::CreateStatic(uiXml, "minimap:compass", background, false);
 
-    m_clipFrame.AttachChild(&m_center);
+    auto* center = UIHelper::CreateStatic(uiXml, "minimap:center", &m_clipFrame);
 
     m_Counter_text.SetText("");
-    visible = true;
 
     Fvector2 temp;
     const float k = UI().get_current_kx();
@@ -67,63 +71,53 @@ void CUIZoneMap::Init(bool motionIconAttached, CUIXml& maingameXml)
 
     if (motionIconAttached)
     {
-        m_background.SetHeight(m_background.GetHeight() * UI_BASE_HEIGHT);
-        m_background.SetWidth(m_background.GetHeight() * k);
+        background->SetHeight(background->GetHeight() * UI_BASE_HEIGHT);
+        background->SetWidth(background->GetHeight() * k);
 
         m_clipFrame.GetWndRect().getcenter(temp);
-        m_background.SetWndPos(temp);
+        background->SetWndPos(temp);
     }
 
     temp = m_clipFrame.GetWndSize();
-    m_center.SetWndPos(temp.div(2.0f));
+    center->SetWndPos(temp.div(2.0f));
 
     if (motionIconAttached)
     {
-        temp = m_compass.GetWndPos();
-        temp.mul(m_background.GetWndSize());
-        m_compass.SetWndPos(temp);
+        temp = m_compass->GetWndPos();
+        temp.mul(background->GetWndSize());
+        m_compass->SetWndPos(temp);
     }
 
     if (m_clock_wnd && motionIconAttached)
     {
         temp = m_clock_wnd->GetWndPos();
-        temp.mul(m_background.GetWndSize());
+        temp.mul(background->GetWndSize());
         m_clock_wnd->SetWndPos(temp);
     }
 
     if (IsGameTypeSingle())
     {
-        if (CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter, false))
+        auto* counter = UIHelper::CreateStatic(uiXml, "minimap:static_counter", background, false);
+        if (counter)
         {
-            m_background.AttachChild(&m_Counter);
             CUIXmlInit::InitStatic(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
-            m_Counter.AttachChild(&m_Counter_text);
+            counter->AttachChild(&m_Counter_text);
         }
         else // SOC
         {
-            m_Counter.Show(false);
             if (CUIXmlInit::InitStatic(maingameXml, "static_pda_online", 0, &m_Counter_text, false))
-                m_background.AttachChild(&m_Counter_text);
+                background->AttachChild(&m_Counter_text);
             else
                 m_Counter_text.Show(false);
         }
 
         if (motionIconAttached)
         {
-            temp = m_Counter.GetWndPos();
-            temp.mul(m_background.GetWndSize());
-            m_Counter.SetWndPos(temp);
+            temp = counter->GetWndPos();
+            temp.mul(background->GetWndSize());
+            counter->SetWndPos(temp);
         }
     }
-}
-
-void CUIZoneMap::Render()
-{
-    if (!visible)
-        return;
-
-    m_clipFrame.Draw();
-    m_background.Draw();
 }
 
 void CUIZoneMap::Update(const CActor* actor)
@@ -154,16 +148,24 @@ void CUIZoneMap::Update(const CActor* actor)
     }
 }
 
-void CUIZoneMap::SetHeading(float angle)
+void CUIZoneMap::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+
+#endif
+}
+
+void CUIZoneMap::SetHeading(const float angle) const
 {
     m_activeMap->SetHeading(angle);
-    m_compass.SetHeading(angle);
+    if (m_compass)
+        m_compass->SetHeading(angle);
 };
 
 void CUIZoneMap::UpdateRadar(Fvector pos)
 {
-    m_clipFrame.Update();
-    m_background.Update();
     m_activeMap->SetActivePoint(pos);
 
     if (m_pointerDistanceText)

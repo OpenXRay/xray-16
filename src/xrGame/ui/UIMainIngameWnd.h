@@ -54,9 +54,6 @@ public:
 
     CUIArtefactPanel* UIArtefactPanel{};
 
-    [[nodiscard]]
-    bool IsZoneMapShown() const;
-    void ShowZoneMap(bool status);
     void DrawZoneMap() const;
     void UpdateZoneMap(const CActor* actor);
     void UpdateMotionIcon(const CActor* actor);

@@ -123,8 +123,6 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         default: NODEFAULT; break;
         }
 
-        CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(false);
-
         m_currMenuMode = mode;
         switch (mode)
         {
@@ -196,7 +194,8 @@ void CUIActorMenu::ShowDialog(bool bDoHideIndicators)
 
 void CUIActorMenu::Draw()
 {
-    CurrentGameUI()->UIMainIngameWnd->DrawZoneMap();
+    if (m_currMenuMode == mmInventory)
+        CurrentGameUI()->UIMainIngameWnd->DrawZoneMap();
     CurrentGameUI()->UIMainIngameWnd->DrawMainIndicatorsForInventory(smart_cast<CActor*>(m_pActorInvOwner));
 
     inherited::Draw();

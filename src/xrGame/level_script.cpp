@@ -756,18 +756,6 @@ void CLevel::script_register(lua_State* luaState)
         {
             g_fov = fov;
         }),
-        def("show_minimap", +[]
-        {
-            CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(true);
-        }),
-        def("hide_minimap", +[]
-        {
-            CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(false);
-        }),
-        def("minimap_shown", +[]
-        {
-            return CurrentGameUI()->UIMainIngameWnd->IsZoneMapShown();
-        }),
 
         //Alundaio: Extend level namespace exports
         def("send", &g_send) , //allow the ability to send netpacket to level

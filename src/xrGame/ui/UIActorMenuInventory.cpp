@@ -56,9 +56,6 @@ void CUIActorMenu::InitInventoryMode()
     ShowIfExist(m_clock_value, true);
 
     InitInventoryContents(m_pLists[eInventoryBagList]);
-
-    VERIFY(CurrentGameUI());
-    CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(true);
 }
 
 void CUIActorMenu::DeInitInventoryMode()

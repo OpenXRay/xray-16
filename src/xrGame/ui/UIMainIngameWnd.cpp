@@ -55,14 +55,17 @@ using namespace InventoryUtilities;
 static constexpr pcstr MAININGAME_XML = "maingame.xml";
 
 CUIMainIngameWnd::CUIMainIngameWnd()
-    : CUIWindow(CUIMainIngameWnd::GetDebugType()), UIZoneMap(xr_new<CUIZoneMap>()) {}
+    : CUIWindow(CUIMainIngameWnd::GetDebugType()), UIZoneMap(xr_new<CUIZoneMap>())
+{
+    AttachChild(UIZoneMap);
+    UIZoneMap->SetAutoDelete(true);
+}
 
 extern CUIProgressShape* g_MissileForceShape;
 
 CUIMainIngameWnd::~CUIMainIngameWnd()
 {
     DestroyFlashingIcons();
-    xr_delete(UIZoneMap);
     HUD_SOUND_ITEM::DestroySound(m_contactSnd);
     xr_delete(g_MissileForceShape);
     xr_delete(UIWeaponJammedIcon);
@@ -82,6 +85,23 @@ void CUIMainIngameWnd::Init()
         SetWndSize({ UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
     Enable(false);
+
+    UIMotionIcon = xr_new<CUIMotionIcon>();
+    UIMotionIcon->SetAutoDelete(true);
+    const bool attachedToMinimap = UIMotionIcon->Init();
+
+    //индикаторы
+    UIZoneMap->Init(attachedToMinimap, uiXml);
+
+    if (attachedToMinimap)
+    {
+        UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
+        UIMotionIcon->AttachToMinimap(UIZoneMap->MapFrame().GetWndRect());
+    }
+    else
+    {
+        AttachChild(UIMotionIcon);
+    }
 
     //	AttachChild					(&UIStaticHealth);	xml_init.InitStatic			(uiXml, "static_health", 0,
     //&UIStaticHealth);
@@ -206,23 +226,6 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    UIMotionIcon = xr_new<CUIMotionIcon>();
-    UIMotionIcon->SetAutoDelete(true);
-    const bool attachedToMinimap = UIMotionIcon->Init();
-
-    //индикаторы
-    UIZoneMap->Init(attachedToMinimap, uiXml);
-
-    if (attachedToMinimap)
-    {
-        UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
-        UIMotionIcon->AttachToMinimap(UIZoneMap->MapFrame().GetWndRect());
-    }
-    else
-    {
-        AttachChild(UIMotionIcon);
-    }
-
     if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
     {
         UIArtefactPanel = xr_new<CUIArtefactPanel>();
@@ -263,10 +266,7 @@ void CUIMainIngameWnd::Draw()
 {
     ZoneScoped;
 
-    UIZoneMap->visible = true;
-    UIZoneMap->Render();
-
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor || !actor->g_Alive())
         return;
 
@@ -628,19 +628,9 @@ void CUIMainIngameWnd::reset_ui()
     }
 }
 
-bool CUIMainIngameWnd::IsZoneMapShown() const
-{
-    return UIZoneMap->visible;
-}
-
-void CUIMainIngameWnd::ShowZoneMap(bool status)
-{
-    UIZoneMap->visible = status;
-}
-
 void CUIMainIngameWnd::DrawZoneMap() const
 {
-    UIZoneMap->Render();
+    UIZoneMap->Draw();
 }
 
 void CUIMainIngameWnd::UpdateZoneMap(const CActor* actor)
