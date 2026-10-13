@@ -97,6 +97,7 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
     }
 
     {
+        GEnv.ScriptEngine->SwitchTestingMode(true);
         R_ASSERT2(reader.find_chunk(OBJECT_CHUNK_DATA), "Can't find chunk OBJECT_CHUNK_DATA!");
         [[maybe_unused]] u32 count = reader.r_u32();
         VERIFY(count > 0);
@@ -104,6 +105,7 @@ CSavedGameWrapper::CSavedGameWrapper(LPCSTR saved_game_name)
         VERIFY(object->ID == 0);
         CSE_ALifeCreatureActor* actor = smart_cast<CSE_ALifeCreatureActor*>(object);
         VERIFY(actor);
+        GEnv.ScriptEngine->SwitchTestingMode(false);
 
         m_actor_health = actor->get_health();
 
