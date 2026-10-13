@@ -23,6 +23,7 @@ uint32_t pipeline_count{}, draw_count{}, descriptor_updates{}, descriptor_frees{
 uint32_t pipeline_destroys{};
 uint32_t expected_first_index{};
 bool weather_bind{}, weather_push{};
+bool cutout_alpha_push{}, cutout_scale_push{};
 VkPipeline bound_pipeline{};
 VkPipelineLayout geometry_layout{}, skinned_layout{}, lighting_layout{}, weather_layout{};
 VkDescriptorSet updated_material{};
@@ -80,7 +81,16 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* output)
 {
     assert(count == 1 && info->stageCount == 2);
-    if (info->pStages[1].module == handle<VkShaderModule>(91))
+    if (info->pStages[1].module == handle<VkShaderModule>(95))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(10));
+        assert(info->layout == geometry_layout);
+        assert(info->pDepthStencilState->depthTestEnable == VK_TRUE &&
+            info->pDepthStencilState->depthWriteEnable == VK_TRUE);
+        assert(info->pColorBlendState->attachmentCount == 2 &&
+            info->pColorBlendState->pAttachments[0].blendEnable == VK_FALSE);
+    }
+    else if (info->pStages[1].module == handle<VkShaderModule>(91))
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
@@ -179,7 +189,17 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(layout == geometry_layout || layout == skinned_layout);
     if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
     {
-        assert(offset == sizeof(expected_mvp) && size == sizeof(float));
+        assert((offset == sizeof(expected_mvp) || offset == sizeof(expected_mvp) + sizeof(float)) &&
+            size == sizeof(float));
+        if (bound_pipeline == handle<VkPipeline>(119))
+        {
+            float value;
+            std::memcpy(&value, data, sizeof(value));
+            if (offset == sizeof(expected_mvp))
+            { assert(std::abs(value - .4f) < 1e-6f); cutout_alpha_push = true; }
+            else
+            { assert(std::abs(value - 2.5f) < 1e-6f); cutout_scale_push = true; }
+        }
         return;
     }
     assert(stage == VK_SHADER_STAGE_VERTEX_BIT && offset == 0 && size == sizeof(expected_mvp));
@@ -190,7 +210,7 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
 {
     assert(count == 6 && instances == 1);
     assert(first_index == expected_first_index);
-    constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103};
+    constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -240,7 +260,7 @@ VkResult VKAPI_PTR free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescr
 void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
-    assert(count == 1 || count == 2 || count == 4);
+    assert(count == 1 || count == 2 || count == 4 || count == 7);
     if (writes[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER)
     {
         assert(count == 1 && writes[0].pBufferInfo->buffer == handle<VkBuffer>(23));
@@ -263,6 +283,10 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
         for (uint32_t i = 0; i < count; ++i)
             assert(writes[i].dstBinding == i && writes[i].pImageInfo->imageView == handle<VkImageView>(60 + i));
     }
+    if (count == 7)
+        for (uint32_t i = 0; i < count; ++i)
+            assert(writes[i].dstBinding == i &&
+                writes[i].pImageInfo->imageView == handle<VkImageView>(101 + i));
     updated_albedo = writes[0].pImageInfo->imageView;
     updated_sampler = writes[0].pImageInfo->sampler;
     ++descriptor_updates;
@@ -539,4 +563,16 @@ int main()
     resources.destroy();
     assert(deferred.create_game_pipeline("vk\\level_laemb_base.vs", "vk\\level_laemb_multiply.ps",
         handle<VkShaderModule>(90), handle<VkShaderModule>(91), SurfaceMode::Opaque, false, error));
+    assert(deferred.create_game_pipeline("vk\\level_detail_cutout.vs", "vk\\level_detail_cutout.ps",
+        handle<VkShaderModule>(94), handle<VkShaderModule>(95), SurfaceMode::AlphaTest, false, error));
+    assert(pipeline_count == 20);
+    std::array<VkImageView, 7> views{};
+    for (size_t i = 0; i < views.size(); ++i) views[i] = handle<VkImageView>(101 + i);
+    VkDescriptorSet detail{};
+    assert(deferred.terrain_material(views, sampler, detail, error));
+    assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, SurfaceMode::AlphaTest, 3,
+        "vk\\level_detail_cutout.vs", "vk\\level_detail_cutout.ps", .4f, nullptr, 2.5f));
+    assert(cutout_alpha_push && cutout_scale_push);
+    deferred.release_gbuffer(detail);
 }

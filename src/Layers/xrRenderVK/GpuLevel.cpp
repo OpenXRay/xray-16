@@ -233,6 +233,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         std::string detail_texture = definition.detail_texture;
         GameTextureFactory::DetailMetadata metadata;
         const bool implicit_detail = definition.class_name == "LM      " ||
+            definition.class_name == "LM_AREF " ||
             definition.class_name == "V       ";
         if ((implicit_detail || terrain.enabled || !detail_texture.empty()) &&
             !textures.texture_detail_metadata(diffuse, metadata, error))
@@ -256,10 +257,16 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 " shader='" + material.shader + "' requires lightmap texture slot 1: " + material.textures;
             return false;
         }
-        if (!detail_texture.empty() && mode != SurfaceMode::Opaque)
+        if (!detail_texture.empty() && mode == SurfaceMode::Transparent)
         {
             error = "level material id=" + std::to_string(model.material) +
-                " shader='" + material.shader + "': single detail pass requires opaque mode";
+                " shader='" + material.shader + "': transparent single detail forward pass is not implemented";
+            return false;
+        }
+        if (!detail_texture.empty() && mode == SurfaceMode::AlphaTest && lightmap.empty())
+        {
+            error = "level material id=" + std::to_string(model.material) +
+                " shader='" + material.shader + "': cutout detail requires lightmap texture slot 1";
             return false;
         }
         if (!lightmap.empty() && !model.lightmap_uv)
@@ -277,7 +284,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const char *family = mode == SurfaceMode::Transparent ?
                 mesh.environment ? "level_environment_blended" : "object_blended" :
             terrain.enabled ? "level_terrain" :
-            !detail_texture.empty() ? lightmap.empty() ? "level_detail_unlit" : "level_detail" :
+            !detail_texture.empty() ? mode == SurfaceMode::AlphaTest ? "level_detail_cutout" :
+                lightmap.empty() ? "level_detail_unlit" : "level_detail" :
             mesh.laemb ? "level_laemb_base" :
             mesh.environment ? "level_environment" :
             !lightmap.empty() ? mode == SurfaceMode::AlphaTest ? "level_lightmap_cutout" : "level_lightmap" :
@@ -895,11 +903,11 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent) return true;
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         std::string shader_error;
@@ -953,13 +961,13 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
             (&mesh != &base) ? "vk\\progressive_opaque.vs" :
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         if (selected)

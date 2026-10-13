@@ -289,6 +289,17 @@ int main()
         }
         const auto before = draws;
         assert(gpu.record(frame, pass, mvp) && draws == before + 1);
+        // A mod may supply an incomplete optional geomX. Keep the valid
+        // primary geometry for each profile and report the fallback at VFS load.
+        Bytes partial_fast;
+        chunk(partial_fast, 9, vb);
+        save(directory / "level.geomX", partial_fast);
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+        LevelModelData fallback;
+        assert(load_engine_level_models(reader, fallback, error) &&
+            fallback.models.size() == 1 && fallback.models[0].indices.size() == 3);
+        std::filesystem::remove(directory / "level.geomX");
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
         // A missing VB chunk must leave the uploaded scene available.
         Bytes missing;
         chunk(missing, 10, ib);

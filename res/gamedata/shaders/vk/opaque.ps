@@ -50,7 +50,7 @@ struct Fragment
 #endif
 };
 
-#if defined(VK_ALPHA_TEST)
+#if defined(VK_ALPHA_TEST) && !defined(VK_DETAIL)
 // The first 64 bytes are the camera matrix used by the vertex stage.
 [[vk::push_constant]] cbuffer MaterialCutout { float4x4 mvp; float alpha_threshold; };
 #endif
@@ -184,7 +184,11 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
     // untouched for local lights. The opaque albedo alpha can carry sun
     // occlusion after alpha testing, while normal alpha encodes static hemi.
 #if defined(VK_ALPHA_TEST)
+#if defined(VK_DETAIL)
+    clip(output.albedo.a - terrain_alpha_threshold);
+#else
     clip(output.albedo.a - alpha_threshold);
+#endif
 #endif
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;

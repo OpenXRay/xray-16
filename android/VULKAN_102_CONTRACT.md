@@ -12,7 +12,7 @@ proof that a level, model, particle or UI pipeline can render it.
 
 | Blender family | Game path and texture roles | Game pass and limitations |
 | --- | --- | --- |
-| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Opaque LM/V can use `.thm` diffuse detail and its scale. | G-buffer opaque/cutout. Bump detail and alpha-tested implicit detail need a separate variant; reject their requests. |
+| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Opaque LM/V and cutout LM_AREF can use `.thm` diffuse detail and its scale. | G-buffer opaque/cutout. Bump detail and transparent detail still require separate forward/normal variants; reject their requests. |
 | `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
 | `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. Normal/bump/gloss terrain stages are not represented by this path and need further work. |
 | `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; model forward only when blender selects blending. Named environment matrix rejected. |

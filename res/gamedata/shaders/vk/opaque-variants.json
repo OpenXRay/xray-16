@@ -8,6 +8,8 @@
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_terrain.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_TERRAIN=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_detail.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_detail.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_DETAIL=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_detail_cutout.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_detail_cutout.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_DETAIL=1", "VK_ALPHA_TEST=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_environment.vs.spv", "define": ["LEVEL_GEOMETRY=1", "VK_ENV_CUBE=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_environment.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_LIGHTMAP=1", "VK_ENV_CUBE=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_environment_blended.vs.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1"] },
