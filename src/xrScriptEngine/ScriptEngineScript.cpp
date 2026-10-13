@@ -37,7 +37,7 @@ void ErrorLog(pcstr caMessage)
 
 void FlushLogs()
 {
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     FlushLog();
     GEnv.ScriptEngine->flush_log();
 #endif
