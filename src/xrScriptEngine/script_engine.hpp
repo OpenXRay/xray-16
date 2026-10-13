@@ -154,16 +154,6 @@ public:
     luabind::object name_space(LPCSTR namespace_name);
 
     template<typename... Args>
-    int error_log(cpcstr format, Args... args)
-    {
-        string4096 log;
-        const int result = xr_sprintf(log, format, std::forward<Args>(args)...);
-        constexpr cpcstr header = "! [LUA][ERROR] ";
-        Log(header, log);
-        return result;
-    }
-
-    template<typename... Args>
     int script_log(LuaMessageType message, cpcstr format, Args... args)
     {
         int result = 0;

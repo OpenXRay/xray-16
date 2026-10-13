@@ -24,17 +24,6 @@ void LuaLog(pcstr caMessage)
 #endif
 }
 
-void ErrorLog(pcstr caMessage)
-{
-    GEnv.ScriptEngine->error_log("%s", caMessage);
-    GEnv.ScriptEngine->print_stack();
-#if defined(USE_DEBUGGER)
-    if (GEnv.ScriptEngine->debugger())
-        GEnv.ScriptEngine->debugger()->Write(caMessage);
-#endif
-    R_ASSERT2(0, caMessage);
-}
-
 void FlushLogs()
 {
 #ifndef MASTER_GOLD
@@ -54,7 +43,14 @@ void CScriptEngine::script_register(lua_State* luaState)
         {
             Msg("%s", message);
         }),
-        def("error_log", &ErrorLog),
+        def("error_log", +[](lua_State* L, pcstr caMessage)
+        {
+            // Do not remove caMessage
+            UNUSED(caMessage);
+            // caMessage is already on the Lua stack,
+            // so our error handlers will read it.
+            ::lua_error(L);
+        }),
         def("flush", &FlushLogs),
         def("flush1", +[] // X-Ray Extensions
         {
