@@ -323,6 +323,8 @@ public:
 
     auto GetAfDetectRadius() const { return m_fAfVisRadius; }
 
+    const auto& GetZonesList() const { return m_zones; }
+
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
     void TurnDetectorInternal(bool on);

@@ -584,14 +584,18 @@ void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
     if (m_fake_indicators_update)
         return;
 
+    const auto* detector = smart_cast<CCustomDetector*>(actor->inventory().ItemFromSlot(DETECTOR_SLOT));
+    const auto* detector_zones = detector ? detector->GetZonesList().zone_cur_power : nullptr;
+
     for (int i = 0; i < ALife::infl_max_count - 1; ++i)
     {
         ALife::EInfluenceType type = static_cast<ALife::EInfluenceType>(i);
-        UpdateIndicatorType(actor, type);
+        const auto hit_power = std::max(hud_zones_list.zone_cur_power[type], detector_zones ? detector_zones[type] : 0.0f);
+        UpdateIndicatorType(actor, type, hit_power);
     }
 }
 
-void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float power /*= 0.0f*/)
+void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float hit_power)
 {
     pcstr base_texture{};
     switch (type)
@@ -609,7 +613,6 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
         return;
     }
 
-    const float hit_power = m_fake_indicators_update ? power : hud_zones_list.zone_cur_power[type];
     ALife::EHitType hit_type = g_tfInfluenceType2HitType(type);
 
     CCustomOutfit* outfit = actor->GetOutfit();

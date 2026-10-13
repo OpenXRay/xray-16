@@ -90,7 +90,7 @@ public:
 
     void UpdateZones();
     void UpdateIndicators(CActor* actor);
-    void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float power = 0.0f);
+    void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type, float hit_power);
 
     [[nodiscard]]
     float get_zone_cur_power(const ALife::EHitType hit_type) const

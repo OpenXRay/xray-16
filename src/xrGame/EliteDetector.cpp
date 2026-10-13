@@ -44,6 +44,7 @@ void CEliteDetector::Scan()
         }
     }
 
+    m_zones.scan(detector_pos, this);
     for (const auto& [zone, _] : m_zones.m_ItemInfos)
     {
         ui().RegisterItemToDraw(zone->Position(), zone->cNameSect());
