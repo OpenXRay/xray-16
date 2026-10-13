@@ -478,8 +478,19 @@ bool GameTextureFactory::texture_detail_metadata(const std::string& diffuse,
         static_cast<const uint8_t*>(reader->pointer()) : nullptr;
     const size_t bounded_extension = extension ? std::min(extension_size,
         static_cast<size_t>(reader->elapsed())) : 0;
+    const auto bounded_chunk = [reader](uint32_t id, size_t& length) -> const uint8_t*
+    {
+        const size_t size = reader->find_chunk(id);
+        if (!size || reader->elapsed() < 0) { length = 0; return nullptr; }
+        length = std::min(size, static_cast<size_t>(reader->elapsed()));
+        return static_cast<const uint8_t*>(reader->pointer());
+    };
+    MetadataExtras extras;
+    extras.bump = bounded_chunk(0x0817, extras.bump_size);
+    extras.material = bounded_chunk(0x0816, extras.material_size);
+    extras.external_normal = bounded_chunk(0x0818, extras.external_normal_size);
     const bool valid = decode_detail_metadata(params, bounded_params,
-        extension, bounded_extension, detail, error);
+        extension, bounded_extension, detail, error, extras);
     FS.r_close(reader);
     if (!valid) { error = std::string(path) + " / " + error; return false; }
     error.clear();
@@ -488,7 +499,7 @@ bool GameTextureFactory::texture_detail_metadata(const std::string& diffuse,
 
 bool GameTextureFactory::decode_detail_metadata(const uint8_t* params, size_t params_size,
     const uint8_t* extension, size_t extension_size,
-    DetailMetadata& detail, std::string& error)
+    DetailMetadata& detail, std::string& error, const MetadataExtras& extras)
 {
     detail = {};
     if (!params || params_size < 8)
@@ -511,6 +522,42 @@ bool GameTextureFactory::decode_detail_metadata(const uint8_t* params, size_t pa
     }
     if ((detail.diffuse || detail.normal) && detail.texture.empty())
     { error = "detail flags require THM_CHUNK_DETAIL_EXT / texture name"; return false; }
+    const auto bounded_name = [&error](const uint8_t* bytes, size_t length,
+        std::string& out, const char* chunk) -> bool
+    {
+        const auto* end = bytes ? static_cast<const uint8_t*>(std::memchr(bytes, 0, length)) : nullptr;
+        if (!end)
+        { error = std::string(chunk) + " has an unterminated texture name"; return false; }
+        out.assign(reinterpret_cast<const char*>(bytes), reinterpret_cast<const char*>(end));
+        return true;
+    };
+    const auto read32 = [](const uint8_t* bytes) -> uint32_t
+    { return uint32_t(bytes[0]) | uint32_t(bytes[1]) << 8 | uint32_t(bytes[2]) << 16 | uint32_t(bytes[3]) << 24; };
+    if (extras.bump)
+    {
+        if (extras.bump_size < 9)
+        { error = "THM_CHUNK_BUMP is truncated"; return false; }
+        std::memcpy(&detail.bump_height, extras.bump, sizeof(float));
+        detail.bump_mode = read32(extras.bump + 4);
+        if (!std::isfinite(detail.bump_height) || detail.bump_mode < 1 || detail.bump_mode > 3)
+        { error = "THM_CHUNK_BUMP has invalid height or mode"; return false; }
+        if (!bounded_name(extras.bump + 8, extras.bump_size - 8,
+                detail.bump_texture, "THM_CHUNK_BUMP")) return false;
+        if (detail.bump_mode >= 2 && detail.bump_texture.empty())
+        { error = "THM_CHUNK_BUMP mode requires a texture name"; return false; }
+    }
+    if (extras.material)
+    {
+        if (extras.material_size < 8)
+        { error = "THM_CHUNK_MATERIAL is truncated"; return false; }
+        detail.material = read32(extras.material);
+        std::memcpy(&detail.material_weight, extras.material + 4, sizeof(float));
+        if (detail.material > 3 || !std::isfinite(detail.material_weight))
+        { error = "THM_CHUNK_MATERIAL has invalid material or weight"; return false; }
+    }
+    if (extras.external_normal && !bounded_name(extras.external_normal,
+            extras.external_normal_size, detail.external_normal_texture,
+            "THM_CHUNK_EXT_NORMALMAP")) return false;
     error.clear();
     return true;
 }

@@ -173,6 +173,14 @@ if (XRAY_BUILD_VULKAN_TESTS)
     target_link_libraries(vulkan_shader_material_library_test PRIVATE xrRenderVK xrEngine xrScriptEngine xrCDB xrCore)
     add_test(NAME vulkan_shader_material_library COMMAND vulkan_shader_material_library_test)
 
+    add_executable(vulkan_level_pass_graph_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_level_pass_graph.cpp")
+    target_include_directories(vulkan_level_pass_graph_test PRIVATE "${XRAY_SOURCE_DIR}")
+    target_compile_options(vulkan_level_pass_graph_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_level_pass_graph COMMAND vulkan_level_pass_graph_test)
+
     add_executable(vulkan_detail_assets_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_detail_assets.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DetailAssets.cpp")

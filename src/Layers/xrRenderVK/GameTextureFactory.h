@@ -21,6 +21,18 @@ public:
         std::string texture;
         float scale{1.f};
         bool diffuse{}, normal{};
+        std::string bump_texture, external_normal_texture;
+        uint32_t bump_mode{1}, material{1};
+        float bump_height{.05f}, material_weight{};
+    };
+    struct MetadataExtras
+    {
+        const uint8_t* bump{};
+        size_t bump_size{};
+        const uint8_t* material{};
+        size_t material_size{};
+        const uint8_t* external_normal{};
+        size_t external_normal_size{};
     };
     ~GameTextureFactory() { destroy(); }
     GameTextureFactory() = default;
@@ -54,7 +66,14 @@ public:
         std::string& error) const;
     static bool decode_detail_metadata(const uint8_t* params, size_t params_size,
         const uint8_t* extension, size_t extension_size,
-        DetailMetadata& detail, std::string& error);
+        DetailMetadata& detail, std::string& error)
+    {
+        return decode_detail_metadata(params, params_size, extension, extension_size,
+            detail, error, MetadataExtras{});
+    }
+    static bool decode_detail_metadata(const uint8_t* params, size_t params_size,
+        const uint8_t* extension, size_t extension_size,
+        DetailMetadata& detail, std::string& error, const MetadataExtras& extras);
     bool ui(const std::string& texture_name, ScenePass& pass,
         VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
     bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,

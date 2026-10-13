@@ -56,6 +56,13 @@ Base, lightmap, mask and detail slots require 2D DDS; the environment slot
 requires a cube for `LmEbB`/`MODELEbB` and 2D for `LaEmB`. Errors name the
 role, slot number and offending resource.
 
+`LevelPassGraph` selects the level shader pair, texture-role mask, attachment,
+blend and depth state once per mesh. Its second `LaEmB` node reads the color
+written by the first draw in the same ordered geometry render pass. The graph
+is used for pipeline requests and both regular and LOD visual recording; it
+does not yet represent model, particle, HUD and UI passes. The exact remaining
+context and real-archive test gates are in `VULKAN_102_MATRIX_SCOPE.md`.
+
 ## Geometry claims (SoC, CS, CoP)
 
 | Profile selected by game | Header | Level geometry | OGF and shader dependency |

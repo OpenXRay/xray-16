@@ -4,6 +4,7 @@
 #include "DeferredPass.h"
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
+#include "LevelPassGraph.h"
 #include "xrCore/_matrix.h"
 #include <array>
 #include <memory>
@@ -93,6 +94,7 @@ private:
         bool environment{};
         bool laemb{};
         bool environment_constant{};
+        LevelPassGraph pass_graph;
         std::array<WaveForm, 4> constant_waveforms{};
         float terrain_scale{1.f};
         bool water{};

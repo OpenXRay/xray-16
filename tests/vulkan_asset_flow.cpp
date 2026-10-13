@@ -190,6 +190,28 @@ int main()
         assert(!GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
             extension.data(), 10, metadata, error) &&
             error.find("DETAIL_EXT") != std::string::npos);
+        Bytes bump;
+        putfloat(bump, .08f);
+        bump.insert(bump.end(), {2, 0, 0, 0, 'm', 'o', 'd', '\\', 'n', 'o', 'r', 'm', 'a', 'l', 0});
+        Bytes material{2, 0, 0, 0};
+        putfloat(material, .4f);
+        Bytes normal{'m', 'o', 'd', '\\', 'e', 'x', 't', 0};
+        GameTextureFactory::MetadataExtras extras{bump.data(), bump.size(),
+            material.data(), material.size(), normal.data(), normal.size()};
+        assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), extension.size(), metadata, error, extras));
+        assert(metadata.bump_mode == 2 && metadata.bump_texture == "mod\\normal" &&
+            metadata.external_normal_texture == "mod\\ext" && metadata.material == 2 &&
+            metadata.material_weight > .39f && metadata.material_weight < .41f);
+        extras.bump_size = 8;
+        assert(!GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), extension.size(), metadata, error, extras) &&
+            error.find("BUMP") != std::string::npos);
+        extras.bump_size = bump.size();
+        extras.external_normal_size = normal.size() - 1;
+        assert(!GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            extension.data(), extension.size(), metadata, error, extras) &&
+            error.find("NORMALMAP") != std::string::npos);
     }
     VkPhysicalDeviceFeatures features{};
     VkPhysicalDeviceProperties properties{};
