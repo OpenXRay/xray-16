@@ -10,7 +10,7 @@
 
 const u32 time_help_sound_remember = 10000;
 
-TSoundDangerValue tagSoundElement::ConvertSoundType(ESoundTypes stype)
+TSoundDangerValue SoundElem::ConvertSoundType(ESoundTypes stype)
 {
     if (((stype & SOUND_TYPE_WEAPON) != SOUND_TYPE_WEAPON) && ((stype & SOUND_TYPE_MONSTER) != SOUND_TYPE_MONSTER) &&
         ((stype & SOUND_TYPE_WORLD) != SOUND_TYPE_WORLD))
@@ -34,18 +34,9 @@ TSoundDangerValue tagSoundElement::ConvertSoundType(ESoundTypes stype)
     return NONE_DANGEROUS_SOUND;
 }
 
-CMonsterSoundMemory::CMonsterSoundMemory() : time_memory(0), monster(nullptr)
+CMonsterSoundMemory::CMonsterSoundMemory()
 {
     Sounds.reserve(20);
-    m_time_help_sound = 0;
-    m_help_node = u32(-1);
-}
-
-CMonsterSoundMemory::~CMonsterSoundMemory() {}
-void CMonsterSoundMemory::init_external(CBaseMonster* M, TTime mem_time)
-{
-    monster = M;
-    time_memory = mem_time;
 }
 
 void CMonsterSoundMemory::HearSound(const SoundElem& s)
@@ -54,40 +45,36 @@ void CMonsterSoundMemory::HearSound(const SoundElem& s)
         return;
     if (DOOR_OPENING <= s.type)
         return;
-    if ((s.type == MONSTER_WALKING) && !s.who)
+    if (s.type == MONSTER_WALKING && !s.who)
         return;
 
     // поиск в массиве звука
-    xr_vector<SoundElem>::iterator it;
-
     bool b_sound_replaced = false;
-    for (it = Sounds.begin(); Sounds.end() != it; ++it)
+    for (auto& sound : Sounds)
     {
-        if ((s.who == it->who) && (it->type == s.type))
+        if (s.who == sound.who && sound.type == s.type)
         {
-            if (s.time >= it->time)
+            if (s.time >= sound.time)
             {
-                *it = s;
+                sound = s;
                 b_sound_replaced = true;
             }
         }
     }
 
     if (!b_sound_replaced)
-        Sounds.push_back(s);
+        Sounds.emplace_back(s);
 }
 
 void CMonsterSoundMemory::HearSound(const IGameObject* who, int eType, const Fvector& Position, float power, TTime time)
 {
-    SoundElem s;
-    s.SetConvert(who, eType, Position, power, time);
+    SoundElem s{ who, eType, Position, power, time };
     s.CalcValue(time, monster->Position());
-
     HearSound(s);
 }
 
 // Lain: added
-void CMonsterSoundMemory::GetFirstSound(SoundElem& s, bool& bDangerous)
+void CMonsterSoundMemory::GetFirstSound(SoundElem& s, bool& bDangerous) const
 {
     VERIFY(!Sounds.empty());
     s = *Sounds.begin();
@@ -114,8 +101,8 @@ SoundElem& CMonsterSoundMemory::GetSound()
 {
     VERIFY(!Sounds.empty());
 
-    xr_vector<SoundElem>::iterator it = std::max_element(Sounds.begin(), Sounds.end());
-    return (*it);
+    const auto it = std::max_element(Sounds.begin(), Sounds.end());
+    return *it;
 }
 
 struct pred_remove_nonactual_sounds
@@ -123,7 +110,7 @@ struct pred_remove_nonactual_sounds
     TTime new_time;
 
     pred_remove_nonactual_sounds(TTime time) { new_time = time; }
-    bool operator()(const SoundElem& x)
+    bool operator()(const SoundElem& x) const
     {
         // удалить звуки от объектов, перешедших в оффлайн
         if (x.who && x.who->getDestroy())
@@ -153,58 +140,54 @@ void CMonsterSoundMemory::UpdateHearing()
         Sounds.end());
 
     // пересчитать value
-    for (xr_vector<SoundElem>::iterator I = Sounds.begin(); I != Sounds.end(); ++I)
-        I->CalcValue(Device.dwTimeGlobal, monster->Position());
+    for (auto& sound : Sounds)
+        sound.CalcValue(Device.dwTimeGlobal, monster->Position());
 
     // update help sound
     if (m_time_help_sound + time_help_sound_remember < time())
         m_time_help_sound = 0;
 }
 
-bool CMonsterSoundMemory::is_loud_sound(float val)
+bool CMonsterSoundMemory::is_loud_sound(const float val) const
 {
-    for (u32 i = 0; i < Sounds.size(); i++)
-        if (Sounds[i].power > val)
+    for (auto& sound : Sounds)
+    {
+        if (sound.power > val)
             return true;
-
+    }
     return false;
 }
 
-bool CMonsterSoundMemory::get_sound_from_object(const IGameObject* obj, SoundElem& value)
+bool CMonsterSoundMemory::get_sound_from_object(const IGameObject* obj, SoundElem& value) const
 {
-    for (u32 i = 0; i < Sounds.size(); i++)
-        if (Sounds[i].who == obj)
+    for (const auto& sound : Sounds)
+    {
+        if (sound.who == obj)
         {
-            value = Sounds[i];
+            value = sound;
             return true;
         }
-
+    }
     return false;
 }
 
-struct pred_remove_relcase
+void CMonsterSoundMemory::remove_links(const IGameObject* O)
 {
-    IGameObject* obj;
-    pred_remove_relcase(IGameObject* o) { obj = o; }
-    bool operator()(const SoundElem& x) const
+    // удаление устаревших звуков
+    const auto it = std::remove_if(Sounds.begin(), Sounds.end(), [O](const SoundElem& x)
     {
-        if (x.who == obj)
+        if (x.who == O)
             return true;
 
         return false;
-    }
-};
-
-void CMonsterSoundMemory::remove_links(IGameObject* O)
-{
-    // удаление устаревших звуков
-    Sounds.erase(std::remove_if(Sounds.begin(), Sounds.end(), pred_remove_relcase(O)), Sounds.end());
+    });
+    Sounds.erase(it, Sounds.end());
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Help Sounds
 //////////////////////////////////////////////////////////////////////////
-bool CMonsterSoundMemory::hear_help_sound()
+bool CMonsterSoundMemory::hear_help_sound() const
 {
     if ((m_time_help_sound == 0) || (m_time_help_sound + time_help_sound_remember < time()))
         return false;
