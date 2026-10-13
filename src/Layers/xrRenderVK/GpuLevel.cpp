@@ -234,8 +234,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             definition.class_name == "LM_AREF " ||
             definition.class_name == "V       " ||
             definition.class_name == "V_AREF  ";
-        if ((implicit_detail || terrain.enabled || !detail_texture.empty()) &&
-            !textures.texture_detail_metadata(diffuse, metadata, error))
+        if (!textures.texture_detail_metadata(diffuse, metadata, error))
         {
             error = "level material id=" + std::to_string(model.material) +
                 " shader='" + material.shader + "': " + error;
@@ -244,11 +243,18 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         if (implicit_detail && metadata.diffuse) detail_texture = metadata.texture;
         if (mode == SurfaceMode::Transparent && detail_texture.empty() &&
             definition.class_name != "LmEbB   ") lightmap.clear();
-        if ((implicit_detail || terrain.enabled || !detail_texture.empty()) && metadata.normal)
+        if (metadata.normal || metadata.bump_mode >= 2 ||
+            !metadata.external_normal_texture.empty() ||
+            metadata.material != 1 || metadata.material_weight != 0.f)
         {
             error = "level material id=" + std::to_string(model.material) +
                 " shader='" + material.shader + "' texture='" + diffuse +
-                "': .thm bump-detail/normal variant is not implemented";
+                "': unsupported .thm surface roles: bump='" + metadata.bump_texture +
+                "' detail-normal=" + (metadata.normal ? "1" : "0") +
+                " external-normal='" + metadata.external_normal_texture +
+                "' material=" + std::to_string(metadata.material) +
+                " weight=" + std::to_string(metadata.material_weight) +
+                " (normal/gloss/material channels are not present in the G-buffer)";
             return false;
         }
         if ((terrain.enabled || !definition.detail_texture.empty() ||
@@ -284,7 +290,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             definition.role == MaterialDefinition::Role::Water;
         mesh.glass = false;
         prepared.has_water_ |= mesh.water;
-        if (!build_level_pass_graph({mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
+        if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
                 mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog},
                 mesh.pass_graph, error))
         {

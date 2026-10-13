@@ -48,22 +48,31 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 "opaque environment pass has no Vulkan model pipeline";
             return false;
         }
+        GameTextureFactory::DetailMetadata metadata;
+        if (!textures.texture_detail_metadata(texture, metadata, error))
+        {
+            error = "OGF texture='" + texture + "': " + error;
+            return false;
+        }
+        if (metadata.normal || metadata.bump_mode >= 2 || !metadata.external_normal_texture.empty() ||
+            metadata.material != 1 || metadata.material_weight != 0.f)
+        {
+            error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture +
+                "': unsupported .thm bump/normal/gloss surface roles (G-buffer channels unavailable)";
+            return false;
+        }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         mesh.environment = definition.class_name == "MODELEbB" &&
             mesh.geometry.mode == SurfaceMode::Transparent;
         // Tree surfaces are two-sided by blender contract. A user-controlled
         // shader name must never select a different raster/shader variant.
         mesh.tree_surface = definition.class_name == "D_TREE  ";
-        const char *family = mesh.environment ? "object_environment" :
-                             mesh.geometry.mode == SurfaceMode::Transparent ? "object_blended"
-                             : mesh.geometry.mode == SurfaceMode::AlphaTest ? "object_cutout"
-                             : mesh.tree_surface && !animated               ? "object_double_sided"
-                                                                            : "object_opaque";
-        const std::string shader = std::string("vk\\") + family;
-        const std::string vertex = animated ? "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs" : shader + ".vs";
-        const std::string fragment = animated && mesh.environment ? "vk\\skinned_environment.ps" :
-            animated && mesh.geometry.mode == SurfaceMode::Transparent ?
-            "vk\\skinned_blended.ps" : shader + ".ps";
+        if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, false,
+                animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights},
+                mesh.pass_graph, error)) return false;
+        const auto& node = mesh.pass_graph.passes[0];
+        const std::string& vertex = node.vertex;
+        const std::string& fragment = node.fragment;
         if (!pass.request_game_pipeline(vertex, fragment, mesh.geometry.mode, false, animated, error))
         {
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
@@ -248,13 +257,13 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             if (!descriptor && !pass_->pose_descriptor(pose_buffer.handle(), pose_buffer.size(), descriptor, error))
                 return false;
             if (!pose_buffer.write(0, pose, pose_bytes, error)) return false;
-            const std::string vertex_name = hud ? "vk\\hud_skinned_" +
-                std::to_string(mesh.geometry.skin_weights) + ".vs" :
-                "vk\\skinned_" + std::to_string(mesh.geometry.skin_weights) + ".vs";
-            const char* fragment_name = hud ? "vk\\hud_blended.ps" :
-                mesh.environment ? "vk\\skinned_environment.ps" :
-                transparent ? "vk\\skinned_blended.ps" :
-                mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" : "vk\\object_opaque.ps";
+            RenderPassGraph hud_graph;
+            if (hud && !build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
+                    true, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights},
+                    hud_graph, error)) return false;
+            const auto& node = hud ? hud_graph.passes[0] : mesh.pass_graph.passes[0];
+            const std::string& vertex_name = node.vertex;
+            const char* fragment_name = node.fragment.c_str();
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, descriptor,
                     hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
@@ -268,6 +277,9 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         if (phase == GeometryPhase::Hud)
         {
+            RenderPassGraph hud_graph;
+            if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
+                    false, mesh.environment, mesh.tree_surface}, hud_graph, error)) return false;
             BufferResource* vertex_buffer = &mesh.vertices[0];
             if (skinned)
             {
@@ -279,7 +291,9 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             }
             if (!pass.record_hud(frame, vertex_buffer->handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, window.offset,
-                    nullptr, nullptr, 0.f, normal_rows))
+                    hud_graph.passes[0].vertex.empty() ? nullptr : hud_graph.passes[0].vertex.c_str(),
+                    hud_graph.passes[0].fragment.empty() ? nullptr : hud_graph.passes[0].fragment.c_str(),
+                    0.f, normal_rows))
             {
                 if (error.empty()) error = "Vulkan HUD model geometry recording failed";
                 return false;
@@ -289,14 +303,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent)
             continue;
-        const char* vertex = mesh.environment ? "vk\\object_environment.vs" :
-            transparent ? "vk\\object_blended.vs" :
-            mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.vs" :
-            mesh.tree_surface ? "vk\\object_double_sided.vs" : "vk\\object_opaque.vs";
-        const char* fragment = mesh.environment ? "vk\\object_environment.ps" :
-            transparent ? "vk\\object_blended.ps" :
-            mesh.geometry.mode == SurfaceMode::AlphaTest ? "vk\\object_cutout.ps" :
-            mesh.tree_surface ? "vk\\object_double_sided.ps" : "vk\\object_opaque.ps";
+        const char* vertex = mesh.pass_graph.passes[0].vertex.c_str();
+        const char* fragment = mesh.pass_graph.passes[0].fragment.c_str();
         // Both the immutable static buffer and CPU-skinned frame buffers use
         // LevelVertex; pose-buffer variants use a separate GPU layout.
         const bool named = pass.require_game_pipeline(vertex, fragment, mesh.geometry.mode, false, false, error);

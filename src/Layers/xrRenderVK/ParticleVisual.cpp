@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "ParticleVisual.h"
+#include "LevelPassGraph.h"
 
 #include "xrParticles/psystem.h"
 #include "xrEngine/device.h"
@@ -101,6 +102,19 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
         error = "particle '" + def_->name + "': " + error;
         release_gpu();
         return false;
+    }
+    for (bool hud : {false, true})
+    {
+        RenderPassGraph graph;
+        if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
+                hud, false, false, false, 0, blend_mode_}, graph, error) ||
+            !pass.request_game_pipeline(graph.passes[0].vertex, graph.passes[0].fragment,
+                hud ? SurfaceMode::Opaque : SurfaceMode::Transparent, hud, false, error))
+        {
+            error = "particle '" + def_->name + "' pass=" + (hud ? "HUD" : "world") + ": " + error;
+            release_gpu();
+            return false;
+        }
     }
     if (!textures.material(def_->texture, pass, material_, error,
             (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
@@ -280,17 +294,16 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
-    const char* mode = blend_mode_ == 0 ? "set" :
-        blend_mode_ == 5 ? "alpha_add" : blend_mode_ == 4 ? "multiply_2x" :
-        blend_mode_ == 3 ? "multiply" : blend_mode_ == 2 ? "additive" :
-        "blended";
-    const std::string fragment = std::string("vk\\particle_") +
-        (hud ? "hud_" : "world_") + mode + ".ps";
-    constexpr const char* vertex = "vk\\level_opaque.vs";
+    RenderPassGraph graph;
+    if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
+            hud, false, false, false, 0, blend_mode_}, graph, error)) return false;
+    const auto& node = graph.passes[0];
+    const char* vertex = node.vertex.c_str();
+    const char* fragment = node.fragment.c_str();
     return hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment.c_str(), float(alpha_ref_) / 255.f) :
+            count * 6, mvp, material_, 0, vertex, fragment, float(alpha_ref_) / 255.f) :
         pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment.c_str(), nullptr, float(alpha_ref_) / 255.f);
+            count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f);
 }
 
 VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog,

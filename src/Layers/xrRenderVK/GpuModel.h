@@ -4,6 +4,7 @@
 #include "DeferredPass.h"
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
+#include "LevelPassGraph.h"
 
 #include <array>
 #include <unordered_map>
@@ -89,6 +90,7 @@ private:
         bool fast_variant = false;
         bool environment{};
         bool tree_surface{};
+        RenderPassGraph pass_graph;
     };
     bool add_meshes(ModelGeometry&& geometry, const std::string& inherited_texture,
         VkDevice device, VkQueue queue, VkCommandPool pool,

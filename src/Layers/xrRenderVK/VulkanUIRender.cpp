@@ -1,6 +1,7 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanUIRender.h"
 #include "VulkanUIShader.h"
+#include "LevelPassGraph.h"
 #include "xrEngine/device.h"
 #include "imgui.h"
 
@@ -78,7 +79,12 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
         !buffers.vertices.write(0, vertices_.data(), vertex_bytes, error) ||
         !buffers.indices.write(0, indices_.data(), index_bytes, error)) return false;
     for (const Batch& batch : batches_)
-        if (!pass_->record_ui(frame, buffers.vertices.handle(), buffers.indices.handle(),
+    {
+        RenderPassGraph graph;
+        if (!build_render_pass_graph({RenderConsumer::Ui, SurfaceMode::Transparent,
+                false, false, false, false, 0, batch.blend_mode}, graph, error)) return false;
+        if (graph.passes[0].target != LevelPassTarget::Ui ||
+            !pass_->record_ui(frame, buffers.vertices.handle(), buffers.indices.handle(),
                 VK_INDEX_TYPE_UINT32, batch.count, batch.texture,
                 batch.has_scissor ? &batch.scissor : nullptr, 0,
                 VkDeviceSize(batch.first_index) * sizeof(uint32_t), batch.alpha_ref,
@@ -87,6 +93,7 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
             error = "Vulkan UI draw command recording failed";
             return false;
         }
+    }
     error.clear();
     return true;
 }

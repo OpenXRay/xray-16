@@ -11,7 +11,7 @@ with blender ID, class, version and material name.
 | `BmmDold`, `LmBmmD` four channel | Base, lightmap, mask, R2-R/G/B/A | Level terrain | Opaque |
 | `BmmDold`, `BmmD`, `LmBmmD` single detail | Base, lightmap, `Detail map / Name` | Level detail with THM scale | Opaque |
 | `LmEbB` | Base, lightmap, `Environment map / Name` cubemap | Level reflection | Opaque or blended |
-| `MODELEbB` | Base, cubemap when blended | OGF static or skinned reflection; opaque deferred base | Opaque or blended |
+| `MODELEbB` | Base, cubemap when blended | OGF static or skinned reflection; opaque variant currently rejected | Blended supported; opaque pending |
 | `LaEmB` | Base, lightmap, 2D environment, optional named constant | Level lightmap plus environment, then multiply 2x base | Opaque |
 | `S_SET`, `PARTICLE` | Base, context-dependent | Scene, screen, HUD or particle blend selection | Serialized blend token and supported flags |
 
