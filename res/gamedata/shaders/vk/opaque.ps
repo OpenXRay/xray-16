@@ -120,8 +120,9 @@ float4 main(Fragment fragment) : SV_Target0
 {
     float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
 #if defined(VK_DETAIL)
-    texel.rgb *= 2.0 * single_detail.Sample(diffuse_sampler,
-        fragment.uv * terrain_scale).rgb;
+    if (surface_modes.y < 0.5 || surface_modes.y > 1.5)
+        texel.rgb *= 2.0 * single_detail.Sample(diffuse_sampler,
+            fragment.uv * terrain_scale).rgb;
 #endif
 #if defined(VK_UNLIT)
 #if defined(VK_WALLMARK_MULT)
