@@ -70,17 +70,6 @@ bool visible_sphere(const float (&mvp)[16], const LevelVisual& visual)
         visual.bounds[8], visual.bounds[9]);
 }
 
-void report_visual_record_failure(size_t visual, int32_t mesh, GeometryPhase phase,
-    bool water, uint32_t indices, float lod, const char* reason = nullptr)
-{
-    static std::atomic<uint32_t> occurrence{0};
-    const uint32_t count = ++occurrence;
-    if (count <= 4 || (count & (count - 1)) == 0)
-        Msg("! [renderer-vulkan] level draw failure occurrence=%u visual=%zu mesh=%d phase=%d water=%d indices=%u lod=%.3f reason=%s",
-            count, visual, mesh, static_cast<int>(phase), water ? 1 : 0, indices, lod,
-            reason ? reason : "unknown");
-}
-
 std::string lightmap_texture(const std::string& textures, const MaterialDefinition& definition)
 {
     const std::string& cls = definition.class_name;
@@ -99,6 +88,20 @@ std::string lightmap_texture(const std::string& textures, const MaterialDefiniti
 }
 }
 GpuLevel::~GpuLevel() { destroy(); }
+
+void GpuLevel::report_visual_record_failure(size_t visual, int32_t mesh, GeometryPhase phase,
+    bool water, uint32_t indices, float lod, const char* reason) const
+{
+    const std::string cause = reason ? reason : "unknown";
+    const std::string key = std::to_string(visual) + "/" + std::to_string(mesh) + "/" +
+        std::to_string(static_cast<int>(phase)) + "/" + cause;
+    if (++draw_failures_[key] != 1) return;
+    const Mesh* resource = mesh >= 0 && size_t(mesh) < meshes_.size() ? &meshes_[mesh] : nullptr;
+    const std::string material_id = resource ? std::to_string(resource->material_id) : "unknown";
+    Msg("! [renderer-vulkan] file=level.geom visual=%zu material=%s shader='%s' mesh=%d phase=%d water=%d indices=%u lod=%.3f reason=%s (repeats summarized on unload)",
+        visual, material_id.c_str(), resource ? resource->shader.c_str() : "unknown",
+        mesh, static_cast<int>(phase), water ? 1 : 0, indices, lod, cause.c_str());
+}
 
 bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPool pool,
     const VkPhysicalDeviceMemoryProperties& memory, const BufferUploadDispatch& upload,
@@ -196,6 +199,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         const auto& material = models.materials[model.material];
+        mesh.material_id = model.material;
+        mesh.shader = material.shader;
         SurfaceMode mode;
         int blend_mode = -1;
         uint32_t material_flags = 0;
@@ -1100,6 +1105,11 @@ void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const
 
 void GpuLevel::destroy()
 {
+    for (const auto& [key, count] : draw_failures_)
+        if (count > 1)
+            Msg("! [renderer-vulkan] file=level.geom repeated draw failure key='%s' occurrences=%llu",
+                key.c_str(), static_cast<unsigned long long>(count));
+    draw_failures_.clear();
     ++revision_;
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
     visual_indices_.clear();

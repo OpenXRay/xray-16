@@ -72,12 +72,16 @@ public:
     void destroy();
 
 private:
+    void report_visual_record_failure(size_t visual, int32_t mesh, GeometryPhase phase,
+        bool water, uint32_t indices, float lod, const char* reason) const;
     struct Mesh
     {
         BufferResource vertices, indices;
         uint32_t index_count{};
         std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
+        uint32_t material_id{};
+        std::string shader;
         SurfaceMode mode{SurfaceMode::Opaque};
         int alpha_ref{128};
         bool wallmark_multiply{};
@@ -132,5 +136,6 @@ private:
     std::unordered_map<const IRenderVisual*, uint32_t> visual_indices_;
     uint64_t revision_{};
     bool has_water_{};
+    mutable std::unordered_map<std::string, uint64_t> draw_failures_;
 };
 }

@@ -28,7 +28,9 @@ public:
     particles_systems::library_interface const& particles_systems_library() override
     { return particles_; }
 
-private:
+public:
+    // The game-facing library can also be exercised with a decoded catalog
+    // without creating a Vulkan device or mounting a game archive.
     class Library final : public particles_systems::library_interface
     {
     public:
@@ -39,13 +41,16 @@ private:
         shared_str const& particles_group_id(particles_systems::PS::CPGDef const&) const override;
         void particles_group_ids(xr_vector<shared_str>& ids) const override;
         void load();
+        void assign(ParticleCatalog catalog);
         void clear();
     private:
         ParticleCatalog catalog_;
         xr_vector<shared_str> ids_;
         std::vector<std::unique_ptr<particles_systems::PS::CPGDef>> definitions_;
         std::vector<particles_systems::PS::CPGDef const*> pointers_;
-    } particles_;
+    };
+private:
+    Library particles_;
     VulkanGameDevice& device_;
     VkImageView sky_a_{}, sky_b_{}, environment_a_{}, environment_b_{}, clouds_a_{}, clouds_b_{};
     VkDescriptorSet weather_set_{};

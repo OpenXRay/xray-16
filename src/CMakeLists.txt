@@ -114,6 +114,16 @@ if (XRAY_BUILD_VULKAN_TESTS)
     )
     add_test(NAME vulkan_deferred_pass COMMAND vulkan_deferred_pass_test)
 
+    add_executable(vulkan_scene_pass_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_scene_pass.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ScenePass.cpp")
+    target_include_directories(vulkan_scene_pass_test PRIVATE
+        "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    target_compile_options(vulkan_scene_pass_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_scene_pass COMMAND vulkan_scene_pass_test)
+
     add_executable(vulkan_level_visibility_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_level_visibility.cpp"
     )

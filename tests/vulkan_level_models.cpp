@@ -290,6 +290,14 @@ int main()
     assert(skipped_fast_geometry && fallback_reason == "invalid index buffer" &&
         !result.models[0].fast);
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
+        result, error, input(vb), {}, {}, &skipped_fast_geometry, &fallback_reason));
+    assert(skipped_fast_geometry && fallback_reason == "missing index chunk" &&
+        result.models[0].indices.size() == 6 && !result.models[0].fast);
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
+        result, error, {}, input(progressive_ib), {}, &skipped_fast_geometry, &fallback_reason));
+    assert(skipped_fast_geometry && fallback_reason == "missing vertex chunk" &&
+        result.models[0].indices.size() == 6 && !result.models[0].fast);
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
         result, error, input(vb), input(progressive_ib)));
     fast_chunks.pop_back(); // Corrupt fast SWI: fail rather than draw a partial model.
     fast_visual = progressive_visual;

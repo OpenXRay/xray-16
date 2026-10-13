@@ -18,6 +18,33 @@ RendererModule* GetRendererModule();
 int main()
 {
     Core.Initialize("vulkan_renderer_module_test", nullptr, false);
+    {
+        xray::render::vulkan::VulkanEnvironmentRender::Library groups;
+        assert(groups.particles_group_begin() == groups.particles_group_end());
+        xray::render::vulkan::ParticleCatalog catalog;
+        catalog.groups.push_back({"mod\\arbitrary_one", 0, 1.f, {}});
+        catalog.groups.push_back({"mod\\arbitrary_two", 0, 2.f, {}});
+        groups.assign(std::move(catalog));
+        auto cursor = groups.particles_group_begin();
+        assert(cursor && cursor != groups.particles_group_end());
+        assert(groups.particles_group_id(**cursor) == "mod\\arbitrary_one");
+        groups.particles_group_next(cursor);
+        assert(cursor != groups.particles_group_end());
+        assert(groups.particles_group_id(**cursor) == "mod\\arbitrary_two");
+        groups.particles_group_next(cursor);
+        assert(cursor == groups.particles_group_end());
+        xr_vector<shared_str> ids;
+        groups.particles_group_ids(ids);
+        assert(ids.size() == 2 && ids[0] == "mod\\arbitrary_one" && ids[1] == "mod\\arbitrary_two");
+        xray::render::vulkan::ParticleCatalog replacement;
+        replacement.groups.push_back({"mod\\replacement", 0, 3.f, {}});
+        groups.assign(std::move(replacement));
+        ids.clear();
+        groups.particles_group_ids(ids);
+        assert(ids.size() == 1 && ids[0] == "mod\\replacement");
+        groups.clear();
+        assert(groups.particles_group_begin() == groups.particles_group_end());
+    }
     auto* module = xray::render::vulkan::GetRendererModule();
     for (int i = 0; i < 2; ++i)
     {

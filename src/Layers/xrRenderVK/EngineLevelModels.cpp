@@ -483,6 +483,7 @@ bool load_engine_level_models(IReader &level, LevelModelData &result, std::strin
         }
         CStreamReader* fast = FS.rs_open("$level$", "level.geomX");
         xr_vector<uint8_t> fast_vb_bytes, fast_ib_bytes;
+        bool missing_fast_chunks = false;
         if (fast)
         {
             CStreamReader* fast_vb = fast->open_chunk(fsL_VB);
@@ -495,7 +496,7 @@ bool load_engine_level_models(IReader &level, LevelModelData &result, std::strin
                 fast_ib->r(fast_ib_bytes.data(), fast_ib_bytes.size());
             }
             else
-                error = "level.geomX is missing vertex or index chunks";
+                missing_fast_chunks = true;
             if (fast_vb)
                 fast_vb->close();
             if (fast_ib)
@@ -516,6 +517,9 @@ bool load_engine_level_models(IReader &level, LevelModelData &result, std::strin
             if (skipped_fast_geometry)
                 Msg("! [renderer-vulkan] profile=%s resource=$level$/level.geomX fallback=level.geom reason='%s'",
                     level_profile_name(profile), fast_fallback_reason.c_str());
+            else if (missing_fast_chunks && error.empty())
+                Msg("! [renderer-vulkan] profile=%s resource=$level$/level.geomX fallback=level.geom reason='missing vertex and/or index chunk'",
+                    level_profile_name(profile));
             Msg("[renderer-vulkan] level.decode complete models=%zu visuals=%zu error='%s'",
                 result.models.size(), result.visuals.size(), error.c_str());
         }

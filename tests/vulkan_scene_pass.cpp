@@ -32,18 +32,28 @@ void VKAPI_CALL destroy_layout(VkDevice, VkPipelineLayout, const VkAllocationCal
 VkResult VKAPI_CALL create_pipeline(VkDevice, VkPipelineCache, uint32_t,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* pipeline)
 {
-    const bool ui = pipelines % 11 != 0;
-    const int mode = static_cast<int>(pipelines % 11) - 1;
+    const bool ui = pipelines % 12 != 0;
+    const int mode = static_cast<int>(pipelines % 12) - 1;
     ++pipelines;
     assert(info->stageCount == 2 && info->pVertexInputState->vertexAttributeDescriptionCount == 3);
     assert(info->pVertexInputState->pVertexBindingDescriptions[0].stride ==
         (ui ? sizeof(xray::render::vulkan::UiVertex) : sizeof(xray::render::vulkan::SceneVertex)));
     assert(info->pColorBlendState->pAttachments[0].blendEnable ==
         (ui && mode != 0 && mode != 7 ? VK_TRUE : VK_FALSE));
-    if (ui && mode == 2)
-        assert(info->pColorBlendState->pAttachments[0].dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
-    if (ui && (mode == 3 || mode == 4 || mode == 6))
-        assert(info->pColorBlendState->pAttachments[0].srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR);
+    if (ui)
+    {
+        const auto& attachment = info->pColorBlendState->pAttachments[0];
+        const VkBlendFactor source = mode == 2 ? VK_BLEND_FACTOR_ONE :
+            mode == 3 || mode == 4 || mode == 6 ? VK_BLEND_FACTOR_DST_COLOR :
+            VK_BLEND_FACTOR_SRC_ALPHA;
+        const VkBlendFactor destination = mode == 2 || mode == 5 ? VK_BLEND_FACTOR_ONE :
+            mode == 3 ? VK_BLEND_FACTOR_ZERO :
+            mode == 4 || mode == 6 ? VK_BLEND_FACTOR_SRC_COLOR :
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        assert(attachment.srcColorBlendFactor == source &&
+            attachment.dstColorBlendFactor == destination &&
+            attachment.colorBlendOp == VK_BLEND_OP_ADD);
+    }
     if (info->pDepthStencilState)
         assert(info->pDepthStencilState->depthTestEnable == (ui ? VK_FALSE : VK_TRUE));
     assert(info->pVertexInputState->pVertexAttributeDescriptions[2].format ==
@@ -158,9 +168,9 @@ int main()
     pass.release_ui_texture_set(texture);
     assert(texture == VK_NULL_HANDLE && descriptor_frees == 2 && descriptor_updates == 2);
     pass.destroy();
-    assert(destroyed_pipelines == 11 && destroyed_layouts == 2);
+    assert(destroyed_pipelines == 12 && destroyed_layouts == 2);
     ui_result = VK_ERROR_INITIALIZATION_FAILED;
     assert(!pass.initialize(device, render_pass, handle<VkShaderModule>(3), handle<VkShaderModule>(4),
         handle<VkShaderModule>(5), handle<VkShaderModule>(6), dispatch, error));
-    assert(destroyed_pipelines == 12 && destroyed_layouts == 4);
+    assert(destroyed_pipelines == 13 && destroyed_layouts == 4);
 }

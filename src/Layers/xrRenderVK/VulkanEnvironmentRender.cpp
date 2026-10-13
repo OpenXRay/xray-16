@@ -74,6 +74,13 @@ void VulkanEnvironmentRender::Library::load()
     }
     if (!error.empty())
         Msg("! [renderer-vulkan] environment particle library: %s", error.c_str());
+    assign(std::move(catalog_));
+}
+
+void VulkanEnvironmentRender::Library::assign(ParticleCatalog catalog)
+{
+    clear();
+    catalog_ = std::move(catalog);
     definitions_.reserve(catalog_.groups.size());
     pointers_.reserve(catalog_.groups.size());
     for (const auto& group : catalog_.groups)
