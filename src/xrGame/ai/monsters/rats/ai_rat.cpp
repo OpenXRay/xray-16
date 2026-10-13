@@ -47,8 +47,6 @@ CAI_Rat::~CAI_Rat() { delete_data(m_state_manager); }
 void CAI_Rat::init()
 {
     m_tAction = eRatActionNone;
-    m_hit_direction.set(0, 0, 1);
-    m_hit_time = 0;
     m_tpCurrentGlobalAnimation.invalidate();
     m_tpCurrentGlobalBlend = 0;
     m_bActionStarted = false;

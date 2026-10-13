@@ -204,9 +204,6 @@ protected:
     u32 m_dwStartAttackTime;
     float m_fAttackSpeed;
     // HIT
-    u32 m_hit_time;
-    Fvector m_hit_direction;
-    Fvector m_tHitPosition;
     float m_fHitPower;
     u32 m_dwHitInterval;
     // HIT PHYS
