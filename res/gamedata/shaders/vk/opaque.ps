@@ -89,7 +89,7 @@ float3 surface_normal(float3 geometric, float3 position, float2 uv, float3 tange
 }
 float3 unpack_bump(float4 main_map, float4 auxiliary)
 {
-    return normalize((main_map.wzy + auxiliary.xyz - 1.0) * 2.0 - 1.0);
+    return normalize(main_map.wzy + auxiliary.xyz - 1.0);
 }
 
 #if defined(VK_TRANSPARENT)
@@ -272,7 +272,7 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
     output.albedo.rgb *= 2.0 * details;
     if (surface_factors.w > 0.0)
     {
-        float3 terrain_normal = float3(0.0, 0.0, 1.0);
+        float3 terrain_normal = float3(0.0, 0.0, 0.0);
         if (uint(surface_factors.w) & 1u)
         {
             float4 bump = terrain_bump_red.Sample(diffuse_sampler, detail_uv);
