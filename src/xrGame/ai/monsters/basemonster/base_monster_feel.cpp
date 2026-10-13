@@ -256,9 +256,12 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, IGameObject* who,
     if (!g_Alive())
         return;
 
-    feel_sound_new(who, SOUND_TYPE_WEAPON_SHOOTING, 0, who->Position(), 1.f);
-    if (g_Alive())
-        sound().play(MonsterSound::eMonsterSoundTakeDamage);
+    if (who)
+        feel_sound_new(who, SOUND_TYPE_WEAPON_SHOOTING, 0, who->Position(), 1.f);
+    else // someone got despawned, so feel bullet hit at our position (XXX: not sure if SOUND_TYPE_WEAPON_BULLET_HIT is a good choice)
+        feel_sound_new(who, SOUND_TYPE_WEAPON_BULLET_HIT, 0, Position(), 1.f);
+
+    sound().play(MonsterSound::eMonsterSoundTakeDamage);
 
     if (element < 0)
         return;
@@ -283,8 +286,11 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, IGameObject* who,
 
     Morale.on_hit();
 
-    callback(GameObject::eHit)(
-        lua_game_object(), amount, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element);
+    CScriptGameObject* script_who = nullptr;
+    if (const auto* game_object_who = smart_cast<const CGameObject*>(who))
+        script_who = game_object_who->lua_game_object();
+
+    callback(GameObject::eHit)(lua_game_object(), amount, vLocalDir, script_who, element);
 
     // если нейтрал - добавить как врага
     CEntityAlive* obj = smart_cast<CEntityAlive*>(who);
