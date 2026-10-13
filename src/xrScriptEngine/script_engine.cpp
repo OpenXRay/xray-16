@@ -663,6 +663,12 @@ int CScriptEngine::lua_panic(lua_State* L)
 
 void CScriptEngine::lua_error(lua_State* L)
 {
+    CScriptEngine* script_engine = GetInstance(L);
+    VERIFY(script_engine);
+    script_engine->m_number_of_errors++;
+    if (script_engine->m_in_testing_mode)
+        return;
+
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 
@@ -674,6 +680,12 @@ void CScriptEngine::lua_error(lua_State* L)
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
+    CScriptEngine* script_engine = GetInstance(L);
+    VERIFY(script_engine);
+    script_engine->m_number_of_errors++;
+    if (script_engine->m_in_testing_mode)
+        return LUA_ERRRUN;
+
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 
@@ -1217,4 +1229,12 @@ void CScriptEngine::DestroyScriptThread(const CScriptThread* thread)
 bool CScriptEngine::is_editor()
 {
     return m_is_editor;
+}
+
+u32 CScriptEngine::SwitchTestingMode(const bool testing_enabled)
+{
+    m_in_testing_mode = testing_enabled;
+    const u32 num = m_number_of_errors;
+    m_number_of_errors = 0;
+    return num;
 }

@@ -73,6 +73,9 @@ private:
     size_t scriptBufferSize = 0;
     bool m_is_editor;
 
+    bool m_in_testing_mode{};
+    u32 m_number_of_errors{};
+
 protected:
     CScriptProcessStorage m_script_processes;
     int m_stack_level;
@@ -214,6 +217,12 @@ public:
     // This function is called from CScriptThread destructor
     void DestroyScriptThread(const CScriptThread* thread);
     bool is_editor();
+
+    [[nodiscard]]
+    bool IsInTestingMode() const { return m_in_testing_mode; }
+    [[nodiscard]]
+    u32 GetNumberOfErrors() const { return m_number_of_errors; }
+    u32 SwitchTestingMode(bool testing_enabled);
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION();
