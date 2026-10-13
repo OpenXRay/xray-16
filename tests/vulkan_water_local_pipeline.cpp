@@ -24,7 +24,7 @@ int main()
     assert(pass.water_set(0, image, image, image, sampler, sampler,
         vk_mock::handle<VkBuffer>(20), error));
     VkDescriptorSet gbuffer{};
-    assert(pass.gbuffer(image, image, image, sampler, gbuffer, error));
+    assert(pass.gbuffer(image, image, image, image, sampler, gbuffer, error));
     const VkBuffer vertices = vk_mock::handle<VkBuffer>(21);
     const VkBuffer indices = vk_mock::handle<VkBuffer>(22);
     vk_mock::buffers[vertices] = 1024;

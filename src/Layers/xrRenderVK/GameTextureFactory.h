@@ -60,6 +60,9 @@ public:
     bool environment_material(const std::string& diffuse, const std::string& lightmap,
         const std::string& environment, bool cube, DeferredPass& pass,
         VkDescriptorSet& result, std::string& error);
+    bool surface_material(const std::array<std::string, 20>& names,
+        const SurfaceParameters& parameters, DeferredPass& pass,
+        VkDescriptorSet& result, std::string& error);
     void release_terrain_material(VkDescriptorSet set, DeferredPass& pass);
     float terrain_detail_scale(const std::string& diffuse) const;
     bool texture_detail_metadata(const std::string& diffuse, DetailMetadata& detail,
@@ -146,8 +149,9 @@ private:
     struct TerrainMaterial
     {
         VkDescriptorSet set{};
-        std::array<Asset*, 7> assets{};
-        std::array<std::string, 7> paths{};
+        std::array<Asset*, 20> assets{};
+        std::array<std::string, 20> paths{};
+        size_t count{7};
         DeferredPass* pass{};
         size_t refs{};
     };

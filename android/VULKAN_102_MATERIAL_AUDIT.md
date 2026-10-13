@@ -15,12 +15,15 @@ version, shader and property.
 
 `LM`/`V` diffuse detail, `LM_AREF`/`V_AREF` cutout detail,
 transparent diffuse detail, single explicit BmmD detail, four-channel terrain,
-and environment bindings have Vulkan paths. Bump/normal/gloss/emissive roles, named texture matrices and
+and environment bindings have Vulkan paths. Bump/normal/gloss/emissive roles have descriptor, graph and shader paths; named texture matrices and
 the complete context-specific `S_SET`/`PARTICLE` matrix still need work. The
 `LaEmB` base and multiply-2x stages execute in order, but the general
 blender pass graph and all original element combinations are unverified.
 An opaque `MODELEbB` OGF reports its missing environment pipeline instead of
-rendering with the ordinary diffuse model shader.
+rendering with the ordinary diffuse model shader. The surface path loads base/detail/terrain
+bump pairs and external normal DDS, writes a third G-buffer color attachment, and reads
+gloss/material/emission in sun and local lighting. Host shader and descriptor tests pass;
+real archive and device image checks remain.
 
 Surface selection uses serialized blender semantics. The water role uses
 saved state, and `Unresolved` is retained until the library supplies a mode;

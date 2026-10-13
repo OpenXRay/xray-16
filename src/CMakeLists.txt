@@ -219,6 +219,17 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
     add_test(NAME vulkan_water_targets COMMAND vulkan_water_targets_test)
 
+    add_executable(vulkan_gbuffer_targets_test
+        "${XRAY_SOURCE_DIR}/tests/vulkan_gbuffer_targets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/GBufferTargets.cpp"
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp")
+    target_include_directories(vulkan_gbuffer_targets_test PRIVATE
+        "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+    target_compile_options(vulkan_gbuffer_targets_test PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>)
+    add_test(NAME vulkan_gbuffer_targets COMMAND vulkan_gbuffer_targets_test)
+
     add_executable(vulkan_water_local_pipeline_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_water_local_pipeline.cpp"
         "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp")

@@ -54,21 +54,21 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             error = "OGF texture='" + texture + "': " + error;
             return false;
         }
-        if (metadata.normal || metadata.bump_mode >= 2 || !metadata.external_normal_texture.empty() ||
-            metadata.material != 1 || metadata.material_weight != 0.f)
-        {
-            error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture +
-                "': unsupported .thm bump/normal/gloss surface roles (G-buffer channels unavailable)";
-            return false;
-        }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         mesh.environment = definition.class_name == "MODELEbB" &&
             mesh.geometry.mode == SurfaceMode::Transparent;
         // Tree surfaces are two-sided by blender contract. A user-controlled
         // shader name must never select a different raster/shader variant.
         mesh.tree_surface = definition.class_name == "D_TREE  ";
+        const bool surface_roles = metadata.normal || metadata.bump_mode >= 2 ||
+            !metadata.external_normal_texture.empty() || metadata.material != 1 ||
+            metadata.material_weight != 0.f;
+        mesh.surface = surface_roles;
+        const uint16_t roles = mesh.surface ?
+            ((metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
+                (metadata.normal || !metadata.external_normal_texture.empty() ? NormalRole : 0u)) : 0u;
         if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, false,
-                animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights},
+                animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights, 1, roles},
                 mesh.pass_graph, error)) return false;
         const auto& node = mesh.pass_graph.passes[0];
         const std::string& vertex = node.vertex;
@@ -78,7 +78,35 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
             return false;
         }
-        if (!(mesh.environment ? textures.environment_material(texture, {},
+        mesh.detail_scale = metadata.scale;
+        bool surface_ready = false;
+        if (mesh.surface)
+        {
+            std::array<std::string, 20> names;
+            names.fill(texture);
+            if (mesh.environment) names[2] = definition.environment_texture;
+            if (metadata.bump_mode >= 2)
+            { names[7] = metadata.bump_texture; names[8] = metadata.bump_texture + "#"; }
+            if (!metadata.external_normal_texture.empty()) names[15] = metadata.external_normal_texture;
+            SurfaceParameters surface;
+            surface.bump_mode = metadata.bump_mode >= 2 ? float(metadata.bump_mode) : 0.f;
+            surface.external_normal = !metadata.external_normal_texture.empty() ? 1.f : 0.f;
+            surface.material = float(metadata.material);
+            surface.material_weight = metadata.material_weight;
+            surface.bump_height = metadata.bump_height;
+            if (mesh.environment) surface.terrain_bump = metadata.scale;
+            if (metadata.normal)
+            {
+                GameTextureFactory::DetailMetadata detail_metadata;
+                if (!textures.texture_detail_metadata(metadata.texture, detail_metadata, error)) return false;
+                names[mesh.environment ? 3 : 2] = metadata.texture;
+                names[9] = detail_metadata.bump_mode >= 2 ? detail_metadata.bump_texture : metadata.texture + "_bump";
+                names[10] = names[9] + "#";
+                surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
+            }
+            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error);
+        }
+        if (!(mesh.surface ? surface_ready : mesh.environment ? textures.environment_material(texture, {},
                 definition.environment_texture, true, pass, mesh.material, error) :
                 textures.material(texture, pass, mesh.material, error,
                     (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
@@ -323,7 +351,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                                 nullptr, 0.f, normal_rows) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                float(mesh.alpha_ref) / 255.f, normal_rows)))
+                                float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale)))
         {
             error = "Vulkan model geometry recording failed";
             return false;
@@ -377,7 +405,7 @@ void GpuModel::destroy()
             for (auto& [instance, pose] : mesh.poses)
                 for (auto& descriptor : pose.descriptors)
                     pass_->release_pose_descriptor(descriptor);
-            if (mesh.environment) textures_->release_terrain_material(mesh.material, *pass_);
+            if (mesh.environment || mesh.surface) textures_->release_terrain_material(mesh.material, *pass_);
             else textures_->release_material(mesh.material, *pass_);
         }
     meshes_.clear();

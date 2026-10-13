@@ -3,15 +3,37 @@
 #if defined(VK_LIGHTMAP)
 [[vk::binding(1, 0)]] Texture2D<float4> lightmap : register(t1);
 #endif
-#if defined(VK_TERRAIN) || defined(VK_DETAIL)
-[[vk::push_constant]] cbuffer TerrainParams {
-    float4x4 terrain_camera;
+#if (!defined(VK_ENV_CUBE) && !defined(VK_LAEMB_BASE)) || defined(VK_TRANSPARENT)
+[[vk::push_constant]] cbuffer MaterialParams {
+    float4x4 material_camera;
     float terrain_alpha_threshold;
     float terrain_scale;
+    float2 material_padding;
+    float4 surface_modes; // bump mode, detail normal, external normal, material class
+    float4 surface_factors; // material weight, height scale, emission, terrain bump mask
 };
 #endif
+[[vk::binding(7, 0)]] Texture2D<float4> base_bump : register(t7);
+[[vk::binding(8, 0)]] Texture2D<float4> base_bump_aux : register(t8);
+[[vk::binding(9, 0)]] Texture2D<float4> detail_bump : register(t9);
+[[vk::binding(10, 0)]] Texture2D<float4> detail_bump_aux : register(t10);
+[[vk::binding(11, 0)]] Texture2D<float4> terrain_bump_red : register(t11);
+[[vk::binding(12, 0)]] Texture2D<float4> terrain_bump_green : register(t12);
+[[vk::binding(13, 0)]] Texture2D<float4> terrain_bump_blue : register(t13);
+[[vk::binding(14, 0)]] Texture2D<float4> terrain_bump_alpha : register(t14);
+[[vk::binding(15, 0)]] Texture2D<float4> external_normal : register(t15);
+[[vk::binding(16, 0)]] Texture2D<float4> terrain_aux_red : register(t16);
+[[vk::binding(17, 0)]] Texture2D<float4> terrain_aux_green : register(t17);
+[[vk::binding(18, 0)]] Texture2D<float4> terrain_aux_blue : register(t18);
+[[vk::binding(19, 0)]] Texture2D<float4> terrain_aux_alpha : register(t19);
 #if defined(VK_DETAIL)
 [[vk::binding(2, 0)]] Texture2D<float4> single_detail : register(t2);
+#endif
+#if !defined(VK_DETAIL) && !defined(VK_TERRAIN) && !defined(VK_ENV_CUBE) && !defined(VK_LAEMB_BASE)
+[[vk::binding(2, 0)]] Texture2D<float4> surface_detail : register(t2);
+#endif
+#if defined(VK_ENV_CUBE) || defined(VK_LAEMB_BASE)
+[[vk::binding(3, 0)]] Texture2D<float4> surface_detail : register(t3);
 #endif
 #if defined(VK_TERRAIN)
 [[vk::binding(2, 0)]] Texture2D<float4> terrain_mask : register(t2);
@@ -31,6 +53,8 @@
     float4x4 environment_mvp;
     float4 environment_camera;
     float4 environment_factor;
+    float4 surface_modes;
+    float4 surface_factors;
 };
 #endif
 
@@ -44,21 +68,31 @@ struct Fragment
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
     [[vk::location(3)]] float4 baked : COLOR0;
-#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
+#endif
     [[vk::location(4)]] float3 world_position : TEXCOORD4;
-#endif
-#endif
 };
 
-#if defined(VK_ALPHA_TEST) && !defined(VK_DETAIL)
-// The first 64 bytes are the camera matrix used by the vertex stage.
-[[vk::push_constant]] cbuffer MaterialCutout { float4x4 mvp; float alpha_threshold; };
-#endif
+
+float3 surface_normal(float3 geometric, float3 position, float2 uv, float3 tangent_normal)
+{
+    // Reconstruct the tangent frame from geometry derivatives. This works for
+    // static, skinned and terrain vertices without requiring mesh tangents.
+    float3 dpdx = ddx(position), dpdy = ddy(position);
+    float2 dudx = ddx(uv), dudy = ddy(uv);
+    float3 tangent = dpdx * dudy.y - dpdy * dudx.y;
+    tangent = normalize(tangent - geometric * dot(geometric, tangent));
+    float handedness = dot(cross(dpdx, dpdy), geometric) *
+        (dudx.x * dudy.y - dudx.y * dudy.x) < 0.0 ? -1.0 : 1.0;
+    return normalize(tangent * tangent_normal.x +
+        cross(geometric, tangent) * handedness * tangent_normal.y +
+        geometric * tangent_normal.z);
+}
+float3 unpack_bump(float4 main_map, float4 auxiliary)
+{
+    return normalize((main_map.wzy + auxiliary.xyz - 1.0) * 2.0 - 1.0);
+}
 
 #if defined(VK_TRANSPARENT)
-#if defined(VK_PARTICLE_SET)
-[[vk::push_constant]] cbuffer ParticleCutout { float4x4 mvp; float alpha_threshold; };
-#endif
 #if !defined(VK_UNLIT)
 struct LocalLight
 {
@@ -101,7 +135,7 @@ float4 main(Fragment fragment) : SV_Target0
 #elif defined(VK_PARTICLE)
     float4 color = texel * fragment.baked;
 #if defined(VK_PARTICLE_SET)
-    clip(color.a - alpha_threshold);
+    clip(color.a - terrain_alpha_threshold);
 #endif
     return color;
 #else
@@ -109,6 +143,32 @@ float4 main(Fragment fragment) : SV_Target0
 #endif
 #else
     float3 normal = normalize(fragment.normal);
+    float gloss = 0.0;
+    if (surface_modes.x >= 2.0 || surface_modes.y > 0.5 || surface_modes.z > 0.5)
+    {
+        float3 tangent_normal = float3(0.0, 0.0, 1.0);
+        if (surface_modes.x >= 2.0)
+        {
+            float4 bump = base_bump.Sample(diffuse_sampler, fragment.uv);
+            tangent_normal = unpack_bump(bump, base_bump_aux.Sample(diffuse_sampler, fragment.uv));
+            gloss = bump.x * bump.x;
+        }
+        if (surface_modes.z > 0.5)
+            tangent_normal = normalize(external_normal.Sample(diffuse_sampler, fragment.uv).xyz * 2.0 - 1.0);
+        if (surface_modes.y > 0.5)
+        {
+            float2 detail_uv = fragment.uv * terrain_scale;
+#if !defined(VK_DETAIL)
+            if (surface_modes.y > 1.5)
+                texel.rgb *= surface_detail.Sample(diffuse_sampler, detail_uv).rgb * 2.0;
+#endif
+            float4 detail_map = detail_bump.Sample(diffuse_sampler, detail_uv);
+            tangent_normal = normalize(tangent_normal + unpack_bump(detail_map,
+                detail_bump_aux.Sample(diffuse_sampler, detail_uv)) - float3(0.0, 0.0, 1.0));
+            gloss = max(gloss, detail_map.x * detail_map.x);
+        }
+        normal = surface_normal(normal, fragment.world_position, fragment.uv, tangent_normal);
+    }
     float3 illumination = sun_direction_ambient.w + sun_color_count.rgb *
         max(dot(normal, normalize(-sun_direction_ambient.xyz)), 0.0);
     float2 uv = fragment.position.xy * viewport.xy;
@@ -142,6 +202,15 @@ float4 main(Fragment fragment) : SV_Target0
     illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
 #endif
     float3 lit = texel.rgb * illumination;
+    if (gloss > 0.0)
+    {
+        float3 view_ray = normalize(fog_end_camera.yzw - world);
+        float3 half_ray = normalize(view_ray - normalize(sun_direction_ambient.xyz));
+        lit += pow(max(dot(normal, half_ray), 0.0), lerp(4.0, 64.0, gloss)) *
+            gloss * lerp(0.04, 0.2, saturate((surface_modes.w + surface_factors.x) / 3.0)) *
+            sun_color_count.rgb;
+    }
+    lit += texel.rgb * saturate(surface_factors.z);
 #if defined(VK_FOG)
     float distance_to_camera = length(world - fog_end_camera.yzw);
     float fog = saturate((distance_to_camera - fog_color_start.w) /
@@ -156,12 +225,31 @@ struct GBuffer
 {
     [[vk::location(0)]] float4 albedo : SV_Target0;
     [[vk::location(1)]] float4 normal : SV_Target1;
+    [[vk::location(2)]] float4 surface : SV_Target2;
 };
+
 
 GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+    // R=gloss, G=material category/3, B=emission, A=height.
+    // Flat materials explicitly write zero instead of inheriting stale data.
+    output.surface = float4(0.0, 0.0, 0.0, 0.0);
+    output.surface.g = saturate((surface_modes.w + surface_factors.x) / 3.0);
+    output.surface.b = saturate(surface_factors.z);
+    float3 mapped_normal = float3(0.0, 0.0, 1.0);
+    float gloss = surface_modes.y > 0.5 ? 1.0 : 0.0;
+    if (surface_modes.x >= 2.0)
+    {
+        float4 bump = base_bump.Sample(diffuse_sampler, fragment.uv);
+        float4 auxiliary = base_bump_aux.Sample(diffuse_sampler, fragment.uv);
+        mapped_normal = unpack_bump(bump, auxiliary);
+        gloss = bump.x * bump.x;
+        output.surface.a = auxiliary.z * surface_factors.y;
+    }
+    if (surface_modes.z > 0.5)
+        mapped_normal = normalize(external_normal.Sample(diffuse_sampler, fragment.uv).xyz * 2.0 - 1.0);
 #if defined(VK_ENV_CUBE)
     float3 reflected = reflect(normalize(fragment.world_position - environment_camera.xyz),
         normalize(fragment.normal));
@@ -182,9 +270,72 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
         terrain_blue.Sample(diffuse_sampler, detail_uv).rgb * weights.b +
         terrain_alpha.Sample(diffuse_sampler, detail_uv).rgb * weights.a;
     output.albedo.rgb *= 2.0 * details;
+    if (surface_factors.w > 0.0)
+    {
+        float3 terrain_normal = float3(0.0, 0.0, 1.0);
+        if (uint(surface_factors.w) & 1u)
+        {
+            float4 bump = terrain_bump_red.Sample(diffuse_sampler, detail_uv);
+            float4 aux = terrain_aux_red.Sample(diffuse_sampler, detail_uv);
+            terrain_normal += weights.r * unpack_bump(bump, aux);
+            gloss += weights.r * bump.x * bump.x;
+            output.surface.a += weights.r * aux.z * surface_factors.y;
+        }
+        if (uint(surface_factors.w) & 2u)
+        {
+            float4 bump = terrain_bump_green.Sample(diffuse_sampler, detail_uv);
+            float4 aux = terrain_aux_green.Sample(diffuse_sampler, detail_uv);
+            terrain_normal += weights.g * unpack_bump(bump, aux);
+            gloss += weights.g * bump.x * bump.x;
+            output.surface.a += weights.g * aux.z * surface_factors.y;
+        }
+        if (uint(surface_factors.w) & 4u)
+        {
+            float4 bump = terrain_bump_blue.Sample(diffuse_sampler, detail_uv);
+            float4 aux = terrain_aux_blue.Sample(diffuse_sampler, detail_uv);
+            terrain_normal += weights.b * unpack_bump(bump, aux);
+            gloss += weights.b * bump.x * bump.x;
+            output.surface.a += weights.b * aux.z * surface_factors.y;
+        }
+        if (uint(surface_factors.w) & 8u)
+        {
+            float4 bump = terrain_bump_alpha.Sample(diffuse_sampler, detail_uv);
+            float4 aux = terrain_aux_alpha.Sample(diffuse_sampler, detail_uv);
+            terrain_normal += weights.a * unpack_bump(bump, aux);
+            gloss += weights.a * bump.x * bump.x;
+            output.surface.a += weights.a * aux.z * surface_factors.y;
+        }
+        mapped_normal = normalize(mapped_normal + terrain_normal - float3(0.0, 0.0, 1.0));
+    }
 #endif
 #if defined(VK_DETAIL)
-    output.albedo.rgb *= 2.0 * single_detail.Sample(diffuse_sampler, fragment.uv * terrain_scale).rgb;
+    float4 detail_sample = single_detail.Sample(diffuse_sampler, fragment.uv * terrain_scale);
+    if (surface_modes.y < 0.5 || surface_modes.y > 1.5)
+        output.albedo.rgb *= 2.0 * detail_sample.rgb;
+    if (surface_modes.y > 0.5)
+    {
+        float4 detail_map = detail_bump.Sample(diffuse_sampler, fragment.uv * terrain_scale);
+        float4 detail_aux = detail_bump_aux.Sample(diffuse_sampler, fragment.uv * terrain_scale);
+        mapped_normal = normalize(mapped_normal + unpack_bump(detail_map, detail_aux) - float3(0.0, 0.0, 1.0));
+        gloss *= detail_map.x * 2.0;
+    }
+    else gloss *= detail_sample.a * 2.0;
+#endif
+#if !defined(VK_DETAIL) && !defined(VK_TERRAIN)
+    if (surface_modes.y > 0.5)
+    {
+#if defined(VK_ENV_CUBE) || defined(VK_LAEMB_BASE)
+        float2 detail_uv = fragment.uv * max(surface_factors.w, 1.0);
+#else
+        float2 detail_uv = fragment.uv * terrain_scale;
+#endif
+        if (surface_modes.y > 1.5)
+            output.albedo.rgb *= 2.0 * surface_detail.Sample(diffuse_sampler, detail_uv).rgb;
+        float4 detail_map = detail_bump.Sample(diffuse_sampler, detail_uv);
+        float4 detail_aux = detail_bump_aux.Sample(diffuse_sampler, detail_uv);
+        mapped_normal = normalize(mapped_normal + unpack_bump(detail_map, detail_aux) - float3(0.0, 0.0, 1.0));
+        gloss *= detail_map.x * 2.0;
+    }
 #endif
     // CoP's s_hemi texture stores hemisphere light in alpha and static sun
     // occlusion in green (deffer_base_flat.ps/get_hemi/get_sun). Keep diffuse
@@ -194,12 +345,16 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 #if defined(VK_DETAIL)
     clip(output.albedo.a - terrain_alpha_threshold);
 #else
-    clip(output.albedo.a - alpha_threshold);
+    clip(output.albedo.a - terrain_alpha_threshold);
 #endif
 #endif
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;
 #endif
+    output.surface.r = saturate(gloss);
+    if (surface_modes.x >= 2.0 || surface_modes.y > 0.5 || surface_modes.z > 0.5 || surface_factors.w > 0.0)
+        fragment.normal = surface_normal(normalize(fragment.normal), fragment.world_position,
+            fragment.uv, mapped_normal);
 #if defined(VK_LIGHTMAP)
     float4 indirect = lightmap.Sample(diffuse_sampler, fragment.lightmap_uv);
     output.albedo.a = indirect.g;

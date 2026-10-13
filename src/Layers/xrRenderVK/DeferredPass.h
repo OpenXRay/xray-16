@@ -35,6 +35,14 @@ struct DeferredEnvironment
     float hemi_color[3]{};
 };
 
+// Per-draw surface contract. The fragment push constants occupy bytes 80..111;
+// vertex normal rows use the same offsets in the independent vertex stage.
+struct SurfaceParameters
+{
+    float bump_mode{}, detail_normal{}, external_normal{}, material{1.f};
+    float material_weight{}, bump_height{.05f}, emissive{}, terrain_bump{};
+};
+
 enum class GeometryPhase
 {
     OpaqueAndAlphaTest,
@@ -48,7 +56,7 @@ DeferredLight make_environment_deferred_light(const DeferredEnvironment& environ
 // support color attachment and sampling; depth must support attachment and
 // sampling because the render pass preserves it in a read-only layout.
 bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
-    VkFormat normal_format, VkFormat depth_format, const FrameDispatch& vk,
+    VkFormat normal_format, VkFormat surface_format, VkFormat depth_format, const FrameDispatch& vk,
     VkRenderPass& result, std::string& error);
 
 // Geometry pass expects two color attachments (RGBA albedo, encoded normal)
@@ -82,6 +90,10 @@ public:
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
     bool terrain_material(const std::array<VkImageView, 7>& views,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
+    void update_surface_textures(VkDescriptorSet set, const std::array<VkImageView, 13>& views,
+        VkSampler sampler);
+    void set_surface_parameters(VkDescriptorSet set, const SurfaceParameters& parameters)
+    { surface_parameters_[set] = parameters; }
     // A named SVS/SPS pair from the game's precompiled Vulkan shader set.
     // Unknown names and incompatible pass state fail before a draw is recorded.
     bool create_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, VkShaderModule vertex, VkShaderModule fragment,
@@ -115,7 +127,8 @@ public:
         VkImageView lightmap, VkSampler sampler);
     void update_terrain_material(VkDescriptorSet set, const std::array<VkImageView, 7>& views,
         VkSampler sampler);
-    bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
+    bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth,
+        VkImageView surface, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSampler sampler,
         VkBuffer uniform);
@@ -180,12 +193,15 @@ private:
     const GamePipeline* game_pipeline(const char* vertex_name, const char* fragment_name) const;
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);
+    void push_surface(const FrameRecordingContext& frame, VkPipelineLayout layout,
+        VkDescriptorSet material, uint32_t offset = 80) const;
     VkDevice device_{};
     VkRenderPass geometry_pass_{}, light_pass_{}, shadow_pass_{}, local_shadow_pass_{}, overlay_pass_{};
     bool lighting_compatible(const FrameRecordingContext& frame) const
     { return frame.render_pass == light_pass_ || (overlay_pass_ && frame.render_pass == overlay_pass_); }
     VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{};
     std::unordered_map<std::string, GamePipeline> game_pipelines_;
+    std::unordered_map<VkDescriptorSet, SurfaceParameters> surface_parameters_;
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;
     bool reloading_game_pipelines_{};
     VkPipelineLayout geometry_layout_{}, skinned_layout_{}, light_layout_{}, weather_layout_{}, local_light_layout_{}, water_layout_{};

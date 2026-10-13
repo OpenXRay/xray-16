@@ -90,6 +90,7 @@ private:
         bool fog{};
         bool lightmapped{};
         bool terrain{};
+        bool surface{};
         bool single_detail{};
         bool environment{};
         bool laemb{};

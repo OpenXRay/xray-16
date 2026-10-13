@@ -39,9 +39,9 @@ shader and property path. Synthetic records test these rejection boundaries.
 
 | Blender family | Game path and texture roles | Game pass and limitations |
 | --- | --- | --- |
-| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal remains unsupported and fails with the `.thm` resource. |
+| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal uses the THM DDS pair and surface descriptor slots. |
 | `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
-| `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. Normal/bump/gloss terrain stages are not represented by this path and need further work. |
+| `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
 | `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; model forward only when blender selects blending. Opaque `MODELEbB` is rejected because its G-buffer reflection variant is absent. Named environment matrix rejected. |
 | `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |
 | `PARTICLE` | Base, clamp/wrap sampler by property. | Modes 0–5: set, alpha, add, multiply, multiply-2x, alpha-add. Mode 0 uses original fixed alpha reference 200. |
@@ -58,10 +58,24 @@ role, slot number and offending resource.
 
 `LevelPassGraph` selects the level shader pair, texture-role mask, attachment,
 blend and depth state once per mesh. Its second `LaEmB` node reads the color
-written by the first draw in the same ordered geometry render pass. The graph
-is used for pipeline requests and both regular and LOD visual recording; it
-does not yet represent model, particle, HUD and UI passes. The exact remaining
+written by the first draw in the same ordered geometry render pass. The same graph type is used by level, model, particle, HUD and UI consumers;
+level and model nodes also carry the surface role mask. The exact remaining
 context and real-archive test gates are in `VULKAN_102_MATRIX_SCOPE.md`.
+
+## Surface descriptor and G-buffer contract
+
+Material set 0 binds base/lightmap/detail or environment at 0–6, base bump and
+bump# at 7–8, detail bump and bump# at 9–10, terrain R/G/B/A bump at 11–14,
+external normal at 15, and terrain bump# at 16–19. An unused role receives the
+base DDS; hot reload rebinds every slot. The fragment push constants at 80–111
+carry bump mode, detail/external normal flags, material class and weight, height
+scale, emission, and terrain mask. Opaque environment variants use 96–127.
+
+The third RGBA8 color attachment stores `(gloss, material/3, emission, height)`.
+Its normal partner stores the mapped normal; sun and local lighting sample both.
+Forward lighting applies the same normal and gloss data. Additive glow passes
+still use their original forward blend. Host tests cover descriptors, pass graph,
+attachment layout and HLSL compilation; rendered reference images remain open.
 
 ## Geometry claims (SoC, CS, CoP)
 
@@ -96,7 +110,6 @@ Host tests cover serialized properties, sparse blender IDs, naming invariance,
 negative cases, level layouts, sliding windows, shader assets, forward detail scale and selected
 pipeline states. The forward transparent queue now interleaves individual
 detail placements with models and particles by camera distance, uploading one
-buffer per frame slot. Blending of intersecting triangles, lighting, full
-terrain normal/gloss, shadows and performance still require image checks on
-the target device. A successful parser or pipeline mock cannot establish
+buffer per frame slot. Blending of intersecting triangles, terrain normal/gloss parity, shadows and
+performance still require image checks on the target device. A successful parser or pipeline mock cannot establish
 pixel correctness on Adreno.

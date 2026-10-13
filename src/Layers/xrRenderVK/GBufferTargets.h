@@ -43,7 +43,7 @@ private:
     };
     struct Target
     {
-        Attachment albedo, normal, depth, sampled_depth;
+        Attachment albedo, normal, surface, depth, sampled_depth;
         VkFramebuffer framebuffer{};
         VkDescriptorSet lighting{};
     };

@@ -76,7 +76,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // Decal polygons lie on top of the level surface. Strict LESS rejects
     // coplanar pixels and makes papers/wallmarks blink as the view moves.
     depth.depthCompareOp = wallmark || legacy_multiply ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_LESS;
-    VkPipelineColorBlendAttachmentState attachments[2]{};
+    VkPipelineColorBlendAttachmentState attachments[3]{};
     for (auto& attachment : attachments)
     {
         attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
@@ -118,9 +118,11 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         attachments[0].dstColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
         attachments[1].colorWriteMask = 0;
         attachments[1].blendEnable = VK_FALSE;
+        attachments[2].colorWriteMask = 0;
+        attachments[2].blendEnable = VK_FALSE;
     }
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
-    blend.attachmentCount = shadow ? 0 : gbuffer ? 2 : 1;
+    blend.attachmentCount = shadow ? 0 : gbuffer ? 3 : 1;
     blend.pAttachments = attachments;
     const VkDynamicState states[]{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
@@ -202,20 +204,22 @@ DeferredLight make_environment_deferred_light(const DeferredEnvironment& environ
 }
 
 bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
-    VkFormat normal_format, VkFormat depth_format, const FrameDispatch& vk,
+    VkFormat normal_format, VkFormat surface_format, VkFormat depth_format, const FrameDispatch& vk,
     VkRenderPass& result, std::string& error)
 {
     result = VK_NULL_HANDLE;
     if (!device || !vk.create_render_pass || albedo_format == VK_FORMAT_UNDEFINED ||
-        normal_format == VK_FORMAT_UNDEFINED || depth_format == VK_FORMAT_UNDEFINED)
+        normal_format == VK_FORMAT_UNDEFINED || surface_format == VK_FORMAT_UNDEFINED ||
+        depth_format == VK_FORMAT_UNDEFINED)
     {
         error = "G-buffer requires color and depth formats and vkCreateRenderPass";
         return false;
     }
-    VkAttachmentDescription attachments[3]{};
-    for (unsigned i = 0; i < 3; ++i)
+    VkAttachmentDescription attachments[4]{};
+    for (unsigned i = 0; i < 4; ++i)
     {
-        attachments[i].format = i == 0 ? albedo_format : i == 1 ? normal_format : depth_format;
+        attachments[i].format = i == 0 ? albedo_format : i == 1 ? normal_format :
+            i == 2 ? surface_format : depth_format;
         attachments[i].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         // Keep depth alongside albedo and normals so later deferred passes can
@@ -224,15 +228,16 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
         attachments[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[i].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachments[i].finalLayout = i < 2 ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL :
+        attachments[i].finalLayout = i < 3 ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL :
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
     }
     const VkAttachmentReference color[]{{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
-        {1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL}};
-    const VkAttachmentReference depth{2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+        {1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
+        {2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL}};
+    const VkAttachmentReference depth{3, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
     VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 2;
+    subpass.colorAttachmentCount = 3;
     subpass.pColorAttachments = color;
     subpass.pDepthStencilAttachment = &depth;
     const VkSubpassDependency dependencies[]{
@@ -247,7 +252,7 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
             VK_ACCESS_SHADER_READ_BIT, VK_DEPENDENCY_BY_REGION_BIT}
     };
     VkRenderPassCreateInfo info{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
-    info.attachmentCount = 3;
+    info.attachmentCount = 4;
     info.pAttachments = attachments;
     info.subpassCount = 1;
     info.pSubpasses = &subpass;
@@ -311,7 +316,8 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}
     };
     const VkDescriptorSetLayoutBinding gbuffer_bindings[]{bindings[0], bindings[1], bindings[2], bindings[3],
-        {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+        {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     const VkDescriptorSetLayoutBinding pose_binding{
         0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
     const VkDescriptorSetLayoutBinding forward_binding{
@@ -330,15 +336,28 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         {3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
-        {6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
-    descriptor.bindingCount = 7;
+        {6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {11, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {12, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {14, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {15, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {16, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {17, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {18, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {19, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+    descriptor.bindingCount = 20;
     descriptor.pBindings = material_bindings;
     VK_STEP("vkCreateDescriptorSetLayout(material)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &material_layout_));
     descriptor.bindingCount = 1;
     descriptor.pBindings = &pose_binding;
     VK_STEP("vkCreateDescriptorSetLayout(pose)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &pose_layout_));
     descriptor.pBindings = gbuffer_bindings;
-    descriptor.bindingCount = 5;
+    descriptor.bindingCount = 6;
     VK_STEP("vkCreateDescriptorSetLayout(gbuffer)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &gbuffer_layout_));
     descriptor.pBindings = bindings;
     descriptor.bindingCount = 4;
@@ -354,7 +373,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     VK_STEP("vkCreateDescriptorSetLayout(forward)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &forward_layout_));
     {
         const VkDescriptorPoolSize sizes[]{
-            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 32768},
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 163840},
             {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 4096},
             {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4096}
         };
@@ -474,6 +493,16 @@ bool DeferredPass::allocate(VkDescriptorSetLayout layout, VkImageView first, VkI
         writes[i].pImageInfo = &images[i];
     }
     vk_.update_descriptor_sets(device_, second ? 2 : 1, writes, 0, nullptr);
+    if (layout == material_layout_)
+    {
+        std::array<VkImageView, 7> base{};
+        base.fill(first);
+        if (second) base[1] = second;
+        update_terrain_material(set, base, sampler);
+        std::array<VkImageView, 13> fallback{};
+        fallback.fill(first);
+        update_surface_textures(set, fallback, sampler);
+    }
     error.clear();
     return true;
 }
@@ -505,6 +534,35 @@ bool DeferredPass::terrain_material(const std::array<VkImageView, 7>& views,
     if (!allocate(material_layout_, views[0], views[1], sampler, set, error)) return false;
     update_terrain_material(set, views, sampler);
     return true;
+}
+
+void DeferredPass::push_surface(const FrameRecordingContext& frame,
+    VkPipelineLayout layout, VkDescriptorSet material, uint32_t offset) const
+{
+    const auto found = surface_parameters_.find(material);
+    const SurfaceParameters empty{};
+    const auto& parameters = found == surface_parameters_.end() ? empty : found->second;
+    vk_.cmd_push_constants(frame.command_buffer, layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+        offset, sizeof(parameters), &parameters);
+}
+
+void DeferredPass::update_surface_textures(VkDescriptorSet set,
+    const std::array<VkImageView, 13>& views, VkSampler sampler)
+{
+    if (!device_ || !set) return;
+    std::array<VkDescriptorImageInfo, 13> images{};
+    std::array<VkWriteDescriptorSet, 13> writes{};
+    for (uint32_t i = 0; i < views.size(); ++i)
+    {
+        images[i] = {sampler, views[i], VK_IMAGE_LAYOUT_GENERAL};
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i + 7;
+        writes[i].descriptorCount = 1;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].pImageInfo = &images[i];
+    }
+    vk_.update_descriptor_sets(device_, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }
 
 const DeferredPass::GamePipeline* DeferredPass::game_pipeline(const char* vertex_name, const char* fragment_name) const
@@ -690,6 +748,10 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     if (normal_rows)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
+    push_surface(frame, skinned_layout_, material_set);
+    const float unit_scale = 1.f;
+    vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        68, sizeof(unit_scale), &unit_scale);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -713,6 +775,12 @@ void DeferredPass::update_material(VkDescriptorSet set, VkImageView view, VkSamp
     write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     write.pImageInfo = &image;
     vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+    std::array<VkImageView, 7> base{};
+    base.fill(view);
+    update_terrain_material(set, base, sampler);
+    std::array<VkImageView, 13> fallback{};
+    fallback.fill(view);
+    update_surface_textures(set, fallback, sampler);
 }
 
 void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
@@ -734,6 +802,13 @@ void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView 
         writes[i].pImageInfo = &images[i];
     }
     vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
+    std::array<VkImageView, 7> base{};
+    base.fill(albedo);
+    base[1] = lightmap;
+    update_terrain_material(set, base, sampler);
+    std::array<VkImageView, 13> fallback{};
+    fallback.fill(albedo);
+    update_surface_textures(set, fallback, sampler);
 }
 
 void DeferredPass::update_terrain_material(VkDescriptorSet set,
@@ -755,18 +830,25 @@ void DeferredPass::update_terrain_material(VkDescriptorSet set,
     vk_.update_descriptor_sets(device_, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 }
 
-bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth, VkSampler sampler,
+bool DeferredPass::gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth,
+    VkImageView surface, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
-    if (!depth || !allocate(gbuffer_layout_, albedo, normal, sampler, set, error)) return false;
-    const VkDescriptorImageInfo image{sampler, depth, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-    VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    write.dstSet = set;
-    write.dstBinding = 2;
-    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    write.descriptorCount = 1;
-    write.pImageInfo = &image;
-    vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
+    if (!depth || !surface || !allocate(gbuffer_layout_, albedo, normal, sampler, set, error)) return false;
+    const VkDescriptorImageInfo images[]{
+        {sampler, depth, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+        {sampler, surface, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL}};
+    VkWriteDescriptorSet writes[2]{};
+    for (uint32_t i = 0; i < 2; ++i)
+    {
+        writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        writes[i].dstSet = set;
+        writes[i].dstBinding = i == 0 ? 2 : 5;
+        writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        writes[i].descriptorCount = 1;
+        writes[i].pImageInfo = &images[i];
+    }
+    vk_.update_descriptor_sets(device_, 2, writes, 0, nullptr);
     return true;
 }
 
@@ -943,6 +1025,7 @@ bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
 
 void DeferredPass::release_gbuffer(VkDescriptorSet& set)
 {
+    surface_parameters_.erase(set);
     if (device_ && pool_ && set && vk_.free_descriptor_sets)
         vk_.free_descriptor_sets(device_, pool_, 1, &set);
     set = VK_NULL_HANDLE;
@@ -977,14 +1060,14 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     if (normal_rows)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
+    const bool environment_variant = fragment_name &&
+        (std::strstr(fragment_name, "level_environment.ps") ||
+            std::strstr(fragment_name, "level_laemb_base.ps"));
+    push_surface(frame, geometry_layout_, material_set, environment_variant ? 96 : 80);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    if (fragment_name && (std::strstr(fragment_name, "level_terrain.ps") ||
-            std::strstr(fragment_name, "level_detail.ps") ||
-            std::strstr(fragment_name, "level_detail_cutout.ps") ||
-            std::strstr(fragment_name, "level_detail_unlit_cutout.ps") ||
-            std::strstr(fragment_name, "level_detail_unlit.ps")))
+    if (!environment_variant)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     if (fragment_name && (std::strstr(fragment_name, "level_environment.ps") ||
@@ -1070,6 +1153,10 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     if (normal_rows)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
+    push_surface(frame, geometry_layout_, material_set);
+    const float unit_detail_scale = 1.f;
+    vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        68, sizeof(unit_detail_scale), &unit_detail_scale);
     if (fragment_name && std::strstr(fragment_name, "particle_") &&
         std::strstr(fragment_name, "_set.ps"))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -1211,6 +1298,7 @@ void DeferredPass::destroy()
         if (water_pipeline_) vk_.destroy_pipeline(device_, water_pipeline_, nullptr);
     }
     game_pipelines_.clear();
+    surface_parameters_.clear();
     if (device_ && vk_.destroy_pipeline_layout)
     {
         if (geometry_layout_) vk_.destroy_pipeline_layout(device_, geometry_layout_, nullptr);

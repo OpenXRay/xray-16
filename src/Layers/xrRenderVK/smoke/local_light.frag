@@ -2,6 +2,7 @@
 layout(set = 0, binding = 0) uniform sampler2D albedo_buffer;
 layout(set = 0, binding = 1) uniform sampler2D normal_buffer;
 layout(set = 0, binding = 2) uniform sampler2D depth_buffer;
+layout(set = 0, binding = 5) uniform sampler2D surface_buffer;
 layout(set = 1, binding = 0) uniform sampler2DArray shadow_array;
 layout(set = 1, binding = 1, std140) uniform LocalLight {
     mat4 inverse_view_projection;
@@ -52,13 +53,23 @@ void main()
     float range = max(light.position_range.w, 0.01);
     if (distance >= range || distance <= 1e-5) { pixel_color = vec4(0.0); return; }
     vec3 normal = normalize(texture(normal_buffer, texcoord).rgb * 2.0 - 1.0);
+    vec4 surface = texture(surface_buffer, texcoord);
     float diffuse = max(dot(normal, -delta / distance), 0.0);
     float normalized_distance = distance / range;
     float attenuation = max(1.0 - normalized_distance * normalized_distance, 0.0);
     if (light.color_type.w >= 0.5)
         attenuation *= smoothstep(light.direction_cone.w, min(1.0, light.direction_cone.w + 0.05),
             dot(normalize(delta), normalize(light.direction_cone.xyz)));
-    vec3 color = texture(albedo_buffer, texcoord).rgb * light.color_type.rgb *
-        diffuse * attenuation * visibility(world, delta);
+    vec3 color = texture(albedo_buffer, texcoord).rgb * light.color_type.rgb * diffuse;
+    if (surface.r > 0.0)
+    {
+        vec4 near_clip = light.inverse_view_projection *
+            vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, 0.0, 1.0);
+        vec3 view_ray = normalize(near_clip.xyz / near_clip.w - world);
+        float specular = pow(max(dot(normal, normalize(view_ray - delta / distance)), 0.0),
+            mix(4.0, 64.0, surface.r));
+        color += specular * surface.r * mix(0.04, 0.2, surface.g) * light.color_type.rgb;
+    }
+    color *= attenuation * visibility(world, delta);
     pixel_color = vec4(color, 0.0);
 }

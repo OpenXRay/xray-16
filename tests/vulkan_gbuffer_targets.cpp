@@ -58,7 +58,7 @@ void VKAPI_PTR formats(VkPhysicalDevice, VkFormat format, VkFormatProperties* ou
 VkResult VKAPI_PTR create_framebuffer(VkDevice, const VkFramebufferCreateInfo* info,
     const VkAllocationCallbacks*, VkFramebuffer* output)
 {
-    assert(info->attachmentCount == 3 && info->width == 640);
+    assert(info->attachmentCount == 4 && info->width == 640);
     *output = reinterpret_cast<VkFramebuffer>(uintptr_t(++framebuffers));
     return VK_SUCCESS;
 }
@@ -66,7 +66,7 @@ void VKAPI_PTR destroy_framebuffer(VkDevice, VkFramebuffer, const VkAllocationCa
 VkResult VKAPI_PTR create_pass(VkDevice, const VkRenderPassCreateInfo* info,
     const VkAllocationCallbacks*, VkRenderPass* output)
 {
-    assert(info->attachmentCount == 3);
+    assert(info->attachmentCount == 4);
     *output = reinterpret_cast<VkRenderPass>(uintptr_t(++passes));
     return VK_SUCCESS;
 }
@@ -81,7 +81,7 @@ VkResult VKAPI_PTR create_sampler(VkDevice, const VkSamplerCreateInfo* info,
 void VKAPI_PTR destroy_sampler(VkDevice, VkSampler, const VkAllocationCallbacks*) { --samplers; }
 void VKAPI_PTR begin(VkCommandBuffer, const VkRenderPassBeginInfo* info, VkSubpassContents)
 {
-    assert(info->clearValueCount == 3 && info->framebuffer);
+    assert(info->clearValueCount == 4 && info->framebuffer);
     ++begun;
 }
 void VKAPI_PTR end(VkCommandBuffer) { ++ended; }
@@ -134,7 +134,7 @@ int main()
     assert(targets.initialize(reinterpret_cast<VkPhysicalDevice>(uintptr_t(1)),
         reinterpret_cast<VkDevice>(uintptr_t(2)), {640, 480}, 2, VK_FORMAT_D24_UNORM_S8_UINT,
         memory, dispatch, create_sampler, destroy_sampler, error));
-    assert(images == 8 && depth_images == 4 && image_views == 8 && framebuffers == 2 && passes == 1 && samplers == 1);
+    assert(images == 10 && depth_images == 4 && image_views == 10 && framebuffers == 2 && passes == 1 && samplers == 1);
     assert(targets.depth_view(0) && targets.depth_view(1) && !targets.depth_view(2));
     FrameRecordingContext frame{reinterpret_cast<VkCommandBuffer>(uintptr_t(3)),
         VK_NULL_HANDLE, VK_NULL_HANDLE, {640, 480}, 1, 0};

@@ -22,12 +22,10 @@ struct Fragment
     float4 position : SV_Position;
     [[vk::location(0)]] float3 normal : TEXCOORD0;
     [[vk::location(1)]] float2 uv : TEXCOORD1;
+    [[vk::location(4)]] float3 world_position : TEXCOORD4;
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
     [[vk::location(3)]] float4 baked : COLOR0;
-#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
-    [[vk::location(4)]] float3 world_position : TEXCOORD4;
-#endif
 #endif
 };
 
@@ -44,12 +42,14 @@ Fragment main(Vertex vertex)
         dot(normal_rows[1].xyz, vertex.normal), dot(normal_rows[2].xyz, vertex.normal)));
 #endif
     fragment.uv = vertex.uv;
+    fragment.world_position = vertex.position;
+#if !defined(LEVEL_GEOMETRY)
+    fragment.world_position = float3(dot(normal_rows[0].xyz, vertex.position),
+        dot(normal_rows[1].xyz, vertex.position), dot(normal_rows[2].xyz, vertex.position));
+#endif
 #if defined(LEVEL_GEOMETRY)
     fragment.lightmap_uv = vertex.lightmap_uv;
     fragment.baked = vertex.baked;
-#if defined(VK_ENV_CUBE) && !defined(VK_TRANSPARENT)
-    fragment.world_position = vertex.position;
-#endif
 #endif
     return fragment;
 }

@@ -89,6 +89,8 @@ private:
         size_t fast_index = SIZE_MAX;
         bool fast_variant = false;
         bool environment{};
+        bool surface{};
+        float detail_scale{1.f};
         bool tree_surface{};
         RenderPassGraph pass_graph;
     };

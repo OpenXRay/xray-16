@@ -25,6 +25,7 @@ struct Fragment
     float4 position : SV_Position;
     [[vk::location(0)]] float3 normal : TEXCOORD0;
     [[vk::location(1)]] float2 uv : TEXCOORD1;
+    [[vk::location(4)]] float3 world_position : TEXCOORD4;
 };
 
 Fragment main(Vertex vertex)
@@ -51,5 +52,7 @@ Fragment main(Vertex vertex)
     fragment.normal = normalize(float3(dot(normal_rows[0].xyz, normal),
         dot(normal_rows[1].xyz, normal), dot(normal_rows[2].xyz, normal)));
     fragment.uv = vertex.uv;
+    fragment.world_position = float3(dot(normal_rows[0].xyz, position.xyz),
+        dot(normal_rows[1].xyz, position.xyz), dot(normal_rows[2].xyz, position.xyz));
     return fragment;
 }

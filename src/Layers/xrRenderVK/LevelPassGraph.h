@@ -82,6 +82,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     }
     auto& node = graph.passes[0];
     node.textures = BaseRole | input.surface_roles;
+    if (input.consumer == RenderConsumer::Particle &&
+        (input.blend_mode == 2 || input.blend_mode == 5)) node.textures |= EmissiveRole;
     node.target = input.consumer == RenderConsumer::Ui ? LevelPassTarget::Ui :
         input.hud ? LevelPassTarget::Hud :
         input.mode == SurfaceMode::Transparent || input.consumer == RenderConsumer::Particle ?
@@ -137,6 +139,7 @@ struct LevelPassSelection
     SurfaceMode mode{SurfaceMode::Unresolved};
     bool lightmapped{}, terrain{}, detail{}, environment{}, laemb{};
     bool wallmark_multiply{}, glow_alpha_add{}, fog{};
+    uint16_t surface_roles{};
 };
 
 inline bool build_level_pass_graph(const LevelPassSelection& input,
@@ -165,7 +168,9 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     if (input.lightmapped) first.textures |= LightmapRole;
     if (input.detail) first.textures |= DetailRole;
     if (input.environment) first.textures |= EnvironmentRole;
+    if (input.glow_alpha_add) first.textures |= EmissiveRole;
     if (input.terrain) first.textures |= MaskRole | TerrainRRole | TerrainGRole | TerrainBRole | TerrainARole;
+    first.textures |= input.surface_roles;
     const char* family = input.wallmark_multiply || input.glow_alpha_add || input.fog ? "level_opaque" :
         transparent ? input.detail ? "level_detail_blended" :
             input.environment ? "level_environment_blended" : "object_blended" :

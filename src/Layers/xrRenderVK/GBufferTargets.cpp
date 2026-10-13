@@ -103,7 +103,7 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
     memory_ = memory;
     vk_ = dispatch;
     destroy_sampler_ = destroy_sampler;
-    if (!create_gbuffer_render_pass(device, color, color, depth_format, vk_, pass_, error))
+    if (!create_gbuffer_render_pass(device, color, color, color, depth_format, vk_, pass_, error))
     {
         destroy();
         return false;
@@ -126,6 +126,8 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
                 VK_IMAGE_ASPECT_COLOR_BIT, target.albedo, error) ||
             !create_attachment(color, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_IMAGE_ASPECT_COLOR_BIT, target.normal, error) ||
+            !create_attachment(color, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                VK_IMAGE_ASPECT_COLOR_BIT, target.surface, error) ||
             !create_attachment(depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
                 VK_IMAGE_ASPECT_DEPTH_BIT, target.depth, error) ||
             !create_attachment(depth_format, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
@@ -134,10 +136,11 @@ bool GBufferTargets::initialize(VkPhysicalDevice physical_device, VkDevice devic
             destroy();
             return false;
         }
-        const VkImageView views[]{target.albedo.view, target.normal.view, target.depth.view};
+        const VkImageView views[]{target.albedo.view, target.normal.view,
+            target.surface.view, target.depth.view};
         VkFramebufferCreateInfo framebuffer{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
         framebuffer.renderPass = pass_;
-        framebuffer.attachmentCount = 3;
+        framebuffer.attachmentCount = 4;
         framebuffer.pAttachments = views;
         framebuffer.width = extent.width;
         framebuffer.height = extent.height;
@@ -162,7 +165,8 @@ bool GBufferTargets::bind_lighting(DeferredPass& deferred, std::string& error)
     }
     for (auto& target : targets_)
         if (!target.lighting && !deferred.gbuffer(target.albedo.view,
-                target.normal.view, target.sampled_depth.view, sampler_, target.lighting, error)) return false;
+                target.normal.view, target.sampled_depth.view, target.surface.view,
+                sampler_, target.lighting, error)) return false;
     error.clear();
     return true;
 }
@@ -183,15 +187,16 @@ bool GBufferTargets::begin(const FrameRecordingContext& frame, FrameRecordingCon
 {
     if (!pass_ || !frame.command_buffer || frame.image_index >= targets_.size() ||
         frame.extent.width != extent_.width || frame.extent.height != extent_.height) return false;
-    VkClearValue clear[3]{};
+    VkClearValue clear[4]{};
     clear[0].color = {{0, 0, 0, 0}};
     clear[1].color = {{0.5f, 0.5f, 1.0f, 0}};
-    clear[2].depthStencil = {1.0f, 0};
+    clear[2].color = {{0, 0, 0, 0}};
+    clear[3].depthStencil = {1.0f, 0};
     VkRenderPassBeginInfo info{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
     info.renderPass = pass_;
     info.framebuffer = targets_[frame.image_index].framebuffer;
     info.renderArea.extent = extent_;
-    info.clearValueCount = 3;
+    info.clearValueCount = 4;
     info.pClearValues = clear;
     vk_.cmd_begin_render_pass(frame.command_buffer, &info, VK_SUBPASS_CONTENTS_INLINE);
     geometry_frame = {frame.command_buffer, pass_, info.framebuffer,
@@ -271,7 +276,8 @@ void GBufferTargets::destroy()
         for (auto& target : targets_)
         {
             if (target.framebuffer) vk_.destroy_framebuffer(device_, target.framebuffer, nullptr);
-            for (Attachment* attachment : {&target.albedo, &target.normal, &target.depth, &target.sampled_depth})
+            for (Attachment* attachment : {&target.albedo, &target.normal, &target.surface,
+                    &target.depth, &target.sampled_depth})
             {
                 if (attachment->view) vk_.destroy_image_view(device_, attachment->view, nullptr);
                 if (attachment->image) vk_.destroy_image(device_, attachment->image, nullptr);

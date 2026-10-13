@@ -24,6 +24,8 @@ uint32_t pipeline_destroys{};
 uint32_t expected_first_index{};
 bool weather_bind{}, weather_push{};
 bool cutout_alpha_push{}, cutout_scale_push{}, forward_detail_scale_push{};
+SurfaceParameters expected_surface{};
+bool surface_push{};
 VkPipeline bound_pipeline{};
 VkPipelineLayout geometry_layout{}, skinned_layout{}, lighting_layout{}, weather_layout{};
 VkDescriptorSet updated_material{};
@@ -88,7 +90,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(info->layout == geometry_layout);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE &&
             info->pDepthStencilState->depthWriteEnable == VK_TRUE);
-        assert(info->pColorBlendState->attachmentCount == 2 &&
+        assert(info->pColorBlendState->attachmentCount == 3 &&
             info->pColorBlendState->pAttachments[0].blendEnable == VK_FALSE);
     }
     else if (info->pStages[1].module == handle<VkShaderModule>(97) ||
@@ -110,7 +112,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
         assert(info->pDepthStencilState->depthWriteEnable == VK_FALSE);
         assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS_OR_EQUAL);
-        assert(info->pColorBlendState->attachmentCount == 2);
+        assert(info->pColorBlendState->attachmentCount == 3);
         const auto* attachments = info->pColorBlendState->pAttachments;
         assert(attachments[0].blendEnable == VK_TRUE);
         assert(attachments[0].srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR);
@@ -118,6 +120,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(attachments[0].colorWriteMask == (VK_COLOR_COMPONENT_R_BIT |
             VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT));
         assert(attachments[1].colorWriteMask == 0);
+        assert(attachments[2].colorWriteMask == 0);
     }
     else if (pipeline_count < 2)
     {
@@ -132,7 +135,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
             attributes[2].offset == offsetof(LevelVertex, uv));
         assert(attributes[3].location == 5 && attributes[3].offset == offsetof(LevelVertex, lightmap_uv));
         assert(attributes[4].location == 6 && attributes[4].offset == offsetof(LevelVertex, baked));
-        assert(info->pColorBlendState->attachmentCount == 2);
+        assert(info->pColorBlendState->attachmentCount == 3);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
         assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
         assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
@@ -203,6 +206,13 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(layout == geometry_layout || layout == skinned_layout);
     if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
     {
+        if (offset == 80)
+        {
+            assert(size == sizeof(SurfaceParameters) &&
+                std::memcmp(data, &expected_surface, sizeof(expected_surface)) == 0);
+            surface_push = true;
+            return;
+        }
         assert((offset == sizeof(expected_mvp) || offset == sizeof(expected_mvp) + sizeof(float)) &&
             size == sizeof(float));
         if (bound_pipeline == handle<VkPipeline>(119) ||
@@ -221,8 +231,8 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         {
             float value;
             std::memcpy(&value, data, sizeof(value));
-            assert(std::abs(value - 1.75f) < 1e-6f);
-            forward_detail_scale_push = true;
+            assert(std::abs(value - 1.75f) < 1e-6f || std::abs(value - 1.f) < 1e-6f);
+            if (std::abs(value - 1.75f) < 1e-6f) forward_detail_scale_push = true;
         }
         return;
     }
@@ -244,7 +254,7 @@ void VKAPI_PTR draw(VkCommandBuffer, uint32_t, uint32_t, uint32_t, uint32_t) {}
 VkResult VKAPI_PTR create_descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* output)
 {
-    assert(info->bindingCount >= 1 && info->bindingCount <= 7);
+    assert(info->bindingCount >= 1 && info->bindingCount <= 20);
     assert(info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
         info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER ||
         info->pBindings[0].descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
@@ -262,7 +272,7 @@ VkResult VKAPI_PTR create_pool(VkDevice, const VkDescriptorPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorPool* output)
 {
     assert(info->maxSets == 8192 && info->poolSizeCount == 3 &&
-        info->pPoolSizes[0].descriptorCount == 32768 &&
+        info->pPoolSizes[0].descriptorCount == 163840 &&
         info->pPoolSizes[1].type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER &&
         info->pPoolSizes[2].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     *output = handle<VkDescriptorPool>(33);
@@ -284,7 +294,7 @@ VkResult VKAPI_PTR free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescr
 void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
-    assert(count == 1 || count == 2 || count == 4 || count == 7);
+    assert(count == 1 || count == 2 || count == 4 || count == 7 || count == 13);
     if (writes[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER)
     {
         assert(count == 1 && writes[0].pBufferInfo->buffer == handle<VkBuffer>(23));
@@ -298,7 +308,7 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
-        (writes[0].dstBinding == 0 &&
+        ((writes[0].dstBinding == 0 || writes[0].dstBinding >= 7) &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_GENERAL) ||
         ((writes[0].dstBinding == 0 || writes[0].dstBinding == 3) &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL));
@@ -309,8 +319,10 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     }
     if (count == 7)
         for (uint32_t i = 0; i < count; ++i)
-            assert(writes[i].dstBinding == i &&
-                writes[i].pImageInfo->imageView == handle<VkImageView>(101 + i));
+            assert(writes[i].dstBinding == i);
+    if (count == 13)
+        for (uint32_t i = 0; i < count; ++i)
+            assert(writes[i].dstBinding == i + 7);
     updated_albedo = writes[0].pImageInfo->imageView;
     updated_sampler = writes[0].pImageInfo->sampler;
     ++descriptor_updates;
@@ -336,21 +348,23 @@ void VKAPI_PTR bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout 
 static VkResult VKAPI_PTR create_render_pass(VkDevice, const VkRenderPassCreateInfo* info,
     const VkAllocationCallbacks*, VkRenderPass* result)
 {
-    assert(info->attachmentCount == 3 && info->subpassCount == 1);
+    assert(info->attachmentCount == 4 && info->subpassCount == 1);
     assert(info->pAttachments[0].format == VK_FORMAT_R8G8B8A8_UNORM);
     assert(info->pAttachments[1].format == VK_FORMAT_R8G8B8A8_UNORM);
-    assert(info->pAttachments[2].format == VK_FORMAT_D24_UNORM_S8_UINT);
+    assert(info->pAttachments[2].format == VK_FORMAT_R8G8B8A8_UNORM);
+    assert(info->pAttachments[3].format == VK_FORMAT_D24_UNORM_S8_UINT);
     assert(info->pAttachments[0].loadOp == VK_ATTACHMENT_LOAD_OP_CLEAR);
     assert(info->pAttachments[1].loadOp == VK_ATTACHMENT_LOAD_OP_CLEAR);
     assert(info->pAttachments[2].loadOp == VK_ATTACHMENT_LOAD_OP_CLEAR);
-    assert(info->pSubpasses[0].colorAttachmentCount == 2);
-    assert(info->pSubpasses[0].pDepthStencilAttachment->attachment == 2);
+    assert(info->pSubpasses[0].colorAttachmentCount == 3);
+    assert(info->pSubpasses[0].pDepthStencilAttachment->attachment == 3);
     assert(info->pAttachments[0].finalLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     assert(info->pAttachments[1].finalLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     assert(info->pAttachments[0].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
     assert(info->pAttachments[1].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
     assert(info->pAttachments[2].storeOp == VK_ATTACHMENT_STORE_OP_STORE);
-    assert(info->pAttachments[2].finalLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+    assert(info->pAttachments[2].finalLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    assert(info->pAttachments[3].finalLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
     assert(info->dependencyCount == 2);
     assert(info->pDependencies[1].dstAccessMask & VK_ACCESS_SHADER_READ_BIT);
     assert(info->pDependencies[1].srcAccessMask & VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
@@ -393,10 +407,12 @@ int main()
     std::string error;
     FrameDispatch dispatch{};
     assert(!create_gbuffer_render_pass(VK_NULL_HANDLE, VK_FORMAT_R8G8B8A8_UNORM,
-        VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_D24_UNORM_S8_UINT, dispatch, result, error));
+        VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
+        VK_FORMAT_D24_UNORM_S8_UINT, dispatch, result, error));
     dispatch.create_render_pass = create_render_pass;
     assert(create_gbuffer_render_pass(reinterpret_cast<VkDevice>(uintptr_t(2)),
         VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
+        VK_FORMAT_R8G8B8A8_UNORM,
         VK_FORMAT_D24_UNORM_S8_UINT, dispatch, result, error));
     assert(result && error.empty());
 
@@ -453,8 +469,13 @@ int main()
     const auto albedo = handle<VkImageView>(50);
     const auto sampler = handle<VkSampler>(51);
     assert(deferred.material(albedo, sampler, material, error));
-    assert(material == updated_material && descriptor_updates == 1 &&
+    assert(material == updated_material && descriptor_updates == 3 &&
         updated_albedo == albedo && updated_sampler == sampler);
+    expected_surface.bump_mode = 3.f;
+    expected_surface.detail_normal = 2.f;
+    expected_surface.material = 2.f;
+    expected_surface.material_weight = .35f;
+    deferred.set_surface_parameters(material, expected_surface);
 
     FrameRecordingContext geometry_frame{handle<VkCommandBuffer>(17),
         handle<VkRenderPass>(10), handle<VkFramebuffer>(18), {640, 480}, 0, 0};
@@ -462,6 +483,7 @@ int main()
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
         handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Opaque));
     assert(bound_pipeline == handle<VkPipeline>(100));
+    assert(surface_push);
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, material, SurfaceMode::Opaque, 0,
         "vk\\level_opaque.vs", "vk\\level_opaque.ps"));
@@ -499,7 +521,7 @@ int main()
     assert(draw_count == 7);
     VkDescriptorSet gbuffer{}, weather_set{};
     assert(deferred.gbuffer(albedo, handle<VkImageView>(52), handle<VkImageView>(53),
-        sampler, gbuffer, error));
+        handle<VkImageView>(54), sampler, gbuffer, error));
     assert(deferred.weather_set(handle<VkImageView>(60), handle<VkImageView>(61),
         handle<VkImageView>(62), handle<VkImageView>(63), sampler, weather_set, error));
     WeatherLighting weather{};
@@ -594,6 +616,7 @@ int main()
     for (size_t i = 0; i < views.size(); ++i) views[i] = handle<VkImageView>(101 + i);
     VkDescriptorSet detail{};
     assert(deferred.terrain_material(views, sampler, detail, error));
+    expected_surface = {};
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, SurfaceMode::AlphaTest, 3,
         "vk\\level_detail_cutout.vs", "vk\\level_detail_cutout.ps", .4f, nullptr, 2.5f));

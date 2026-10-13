@@ -16,6 +16,10 @@ int main()
     assert(graph.count == 1);
     assert(graph.passes[0].fragment == "vk\\level_lightmap.ps");
     assert(graph.passes[0].textures == (BaseRole | LightmapRole));
+    base.surface_roles = BumpRole | BumpAuxRole | NormalRole | GlossRole | EmissiveRole;
+    assert(build_level_pass_graph(base, graph, error));
+    assert((graph.passes[0].textures & base.surface_roles) == base.surface_roles);
+    base.surface_roles = 0;
     assert(graph.passes[0].depth_test && graph.passes[0].depth_write);
 
     base.detail = true;
@@ -89,6 +93,7 @@ int main()
     assert(build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
         true, false, false, false, 0, 5}, common, error));
     assert(common.passes[0].fragment == "vk\\particle_hud_alpha_add.ps");
+    assert(common.passes[0].textures & EmissiveRole);
     assert(common.passes[0].target == LevelPassTarget::Hud);
     assert(build_render_pass_graph({RenderConsumer::Ui, SurfaceMode::Transparent}, common, error));
     assert(common.passes[0].target == LevelPassTarget::Ui);
@@ -129,4 +134,12 @@ int main()
         false, false, false, false, 0, 10}, common, error));
     assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
         false, false, false, false, 0, 1, BumpAuxRole}, common, error));
+    for (SurfaceMode mode : {SurfaceMode::Opaque, SurfaceMode::AlphaTest, SurfaceMode::Transparent})
+        for (uint16_t roles : {uint16_t(BumpRole | BumpAuxRole | GlossRole),
+                uint16_t(NormalRole | GlossRole), uint16_t(EmissiveRole)})
+        {
+            assert(build_render_pass_graph({RenderConsumer::Model, mode,
+                false, false, false, false, 0, 1, roles}, common, error));
+            assert((common.passes[0].textures & roles) == roles);
+        }
 }

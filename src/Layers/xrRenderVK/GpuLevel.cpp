@@ -240,23 +240,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 " shader='" + material.shader + "': " + error;
             return false;
         }
-        if (implicit_detail && metadata.diffuse) detail_texture = metadata.texture;
+        if (implicit_detail && (metadata.diffuse || metadata.normal)) detail_texture = metadata.texture;
         if (mode == SurfaceMode::Transparent && detail_texture.empty() &&
             definition.class_name != "LmEbB   ") lightmap.clear();
-        if (metadata.normal || metadata.bump_mode >= 2 ||
-            !metadata.external_normal_texture.empty() ||
-            metadata.material != 1 || metadata.material_weight != 0.f)
-        {
-            error = "level material id=" + std::to_string(model.material) +
-                " shader='" + material.shader + "' texture='" + diffuse +
-                "': unsupported .thm surface roles: bump='" + metadata.bump_texture +
-                "' detail-normal=" + (metadata.normal ? "1" : "0") +
-                " external-normal='" + metadata.external_normal_texture +
-                "' material=" + std::to_string(metadata.material) +
-                " weight=" + std::to_string(metadata.material_weight) +
-                " (normal/gloss/material channels are not present in the G-buffer)";
-            return false;
-        }
         if ((terrain.enabled || !definition.detail_texture.empty() ||
                 definition.class_name == "LmEbB   " || definition.class_name == "LaEmB   ") && lightmap.empty())
         {
@@ -290,8 +276,10 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             definition.role == MaterialDefinition::Role::Water;
         mesh.glass = false;
         prepared.has_water_ |= mesh.water;
+        const uint16_t roles = (metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
+            (!metadata.external_normal_texture.empty() || metadata.normal ? NormalRole : 0u);
         if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
-                mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog},
+                mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles},
                 mesh.pass_graph, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader='" +
@@ -310,7 +298,60 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         if (mesh.terrain) mesh.terrain_scale = metadata.scale;
         if (mesh.single_detail) mesh.terrain_scale = metadata.scale;
-        const bool material_ready = mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
+        const bool surface_roles = metadata.bump_mode >= 2 || metadata.normal ||
+            !metadata.external_normal_texture.empty() || metadata.material != 1 ||
+            metadata.material_weight != 0.f || mesh.terrain;
+        mesh.surface = surface_roles;
+        bool surface_ready = false;
+        if (surface_roles)
+        {
+            std::array<std::string, 20> names;
+            names.fill(diffuse);
+            names[1] = lightmap.empty() ? diffuse : lightmap;
+            if (mesh.environment) names[2] = definition.environment_texture;
+            if (mesh.terrain)
+            {
+                names[2] = diffuse + "_mask";
+                for (size_t channel = 0; channel < 4; ++channel)
+                {
+                    names[3 + channel] = terrain.detail[channel];
+                    GameTextureFactory::DetailMetadata channel_metadata;
+                    if (!textures.texture_detail_metadata(terrain.detail[channel], channel_metadata, error)) return false;
+                    if (channel_metadata.bump_mode >= 2)
+                        { names[11 + channel] = channel_metadata.bump_texture;
+                          names[16 + channel] = channel_metadata.bump_texture + "#"; }
+                }
+            }
+            if (mesh.single_detail)
+            {
+                for (size_t slot = 2; slot <= 6; ++slot) names[slot] = detail_texture;
+            }
+            if (metadata.bump_mode >= 2)
+            { names[7] = metadata.bump_texture; names[8] = metadata.bump_texture + "#"; }
+            if (!metadata.external_normal_texture.empty()) names[15] = metadata.external_normal_texture;
+            SurfaceParameters surface;
+            surface.bump_mode = float(metadata.bump_mode >= 2 ? metadata.bump_mode : 0);
+            surface.external_normal = !metadata.external_normal_texture.empty() ? 1.f : 0.f;
+            surface.material = float(metadata.material);
+            surface.material_weight = metadata.material_weight;
+            surface.bump_height = metadata.bump_height;
+            if (mesh.environment) surface.terrain_bump = metadata.scale;
+            for (size_t channel = 0; channel < 4 && mesh.terrain; ++channel)
+                if (names[11 + channel] != diffuse) surface.terrain_bump += float(1u << channel);
+            if (metadata.normal && (mesh.single_detail || mesh.environment))
+            {
+                GameTextureFactory::DetailMetadata detail_metadata;
+                const std::string normal_detail = mesh.environment ? metadata.texture : detail_texture;
+                if (!textures.texture_detail_metadata(normal_detail, detail_metadata, error)) return false;
+                if (mesh.environment) names[3] = normal_detail;
+                names[9] = detail_metadata.bump_mode >= 2 ? detail_metadata.bump_texture : normal_detail + "_bump";
+                names[10] = names[9] + "#";
+                surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
+            }
+            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error);
+        }
+        const bool material_ready = surface_roles ? surface_ready :
+                mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
                 mesh.single_detail ? textures.detail_material(diffuse, lightmap.empty() ? diffuse : lightmap, detail_texture,
                     pass, mesh.material, error) :
                 mesh.environment ? textures.environment_material(diffuse, lightmap,
@@ -1126,12 +1167,12 @@ void GpuLevel::destroy()
     if (textures_ && pass_)
         for (const Mesh& mesh : meshes_)
         {
-            if (mesh.terrain || mesh.single_detail || mesh.environment) textures_->release_terrain_material(mesh.material, *pass_);
+            if (mesh.surface || mesh.terrain || mesh.single_detail || mesh.environment) textures_->release_terrain_material(mesh.material, *pass_);
             else if (mesh.lightmapped) textures_->release_lightmapped_material(mesh.material, *pass_);
             else textures_->release_material(mesh.material, *pass_);
             if (mesh.fast)
             {
-                if (mesh.fast->terrain || mesh.fast->single_detail || mesh.fast->environment) textures_->release_terrain_material(mesh.fast->material, *pass_);
+                if (mesh.fast->surface || mesh.fast->terrain || mesh.fast->single_detail || mesh.fast->environment) textures_->release_terrain_material(mesh.fast->material, *pass_);
                 else if (mesh.fast->lightmapped) textures_->release_lightmapped_material(mesh.fast->material, *pass_);
                 else textures_->release_material(mesh.fast->material, *pass_);
             }

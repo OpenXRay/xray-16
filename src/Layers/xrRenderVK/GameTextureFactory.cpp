@@ -289,7 +289,7 @@ bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
         if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
         item.pass = &pass;
-        for (size_t i = 0; i < item.assets.size(); ++i)
+        for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
                 ++item.assets[i]->lightmap_refs;
         found = terrain_.emplace(std::move(key), std::move(item)).first;
@@ -338,7 +338,7 @@ bool GameTextureFactory::detail_material(const std::string& diffuse_name,
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
         if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
         item.pass = &pass;
-        for (size_t i = 0; i < item.assets.size(); ++i)
+        for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
                 ++item.assets[i]->lightmap_refs;
         found = terrain_.emplace(std::move(key), std::move(item)).first;
@@ -360,7 +360,7 @@ bool GameTextureFactory::environment_material(const std::string& diffuse_name,
     const std::string lightmap = lightmap_name.empty() ? diffuse : trim_texture_name(lightmap_name);
     const std::string environment = trim_texture_name(environment_name);
     const std::array<std::string, 7> names{
-        diffuse, lightmap, environment, environment, environment, environment, environment};
+        diffuse, lightmap, environment, diffuse, diffuse, diffuse, diffuse};
     std::string key = "environment";
     key.push_back('\0');
     for (size_t i = 0; i < names.size(); ++i)
@@ -392,7 +392,7 @@ bool GameTextureFactory::environment_material(const std::string& diffuse_name,
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
         if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
         item.pass = &pass;
-        for (size_t i = 0; i < item.assets.size(); ++i)
+        for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
                 ++item.assets[i]->lightmap_refs;
         found = terrain_.emplace(std::move(key), std::move(item)).first;
@@ -415,15 +415,63 @@ void GameTextureFactory::release_terrain_material(VkDescriptorSet set, DeferredP
         if (--item.refs) return;
         R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan terrain retirement requires idle GPU frames");
         pass.release_gbuffer(set);
-        for (size_t i = 0; i < item.assets.size(); ++i)
+        for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
                 --item.assets[i]->lightmap_refs;
         const auto paths = item.paths;
         terrain_.erase(it);
-        for (const auto& path : paths) evict_if_unused(path);
+        for (const auto& path : paths) if (!path.empty()) evict_if_unused(path);
         return;
     }
     R_ASSERT2(false, "unknown Vulkan terrain descriptor");
+}
+
+bool GameTextureFactory::surface_material(const std::array<std::string, 20>& names,
+    const SurfaceParameters& parameters, DeferredPass& pass,
+    VkDescriptorSet& result, std::string& error)
+{
+    result = VK_NULL_HANDLE;
+    TerrainMaterial item;
+    item.count = names.size();
+    std::string key = "surface";
+    key.push_back('\0');
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+        const std::string name = trim_texture_name(names[i].empty() ? names[0] : names[i]);
+        if (!load(name, item.assets[i], error))
+        { error = "surface slot " + std::to_string(i) + " ('" + name + "'): " + error; return false; }
+        if (item.assets[i]->cube && i != 2)
+        { error = "surface slot " + std::to_string(i) + " requires 2D DDS: " + name; return false; }
+        const auto it = std::find_if(assets_.begin(), assets_.end(),
+            [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
+        R_ASSERT(it != assets_.end());
+        item.paths[i] = it->first;
+        key += it->first;
+        key.push_back('\0');
+    }
+    // Surface data belongs to a descriptor and may differ for the same DDS.
+    key.append(reinterpret_cast<const char*>(&parameters), sizeof(parameters));
+    auto found = terrain_.find(key);
+    if (found == terrain_.end())
+    {
+        std::array<VkImageView, 7> first{};
+        std::array<VkImageView, 13> extra{};
+        for (size_t i = 0; i < first.size(); ++i) first[i] = item.assets[i]->texture.view;
+        for (size_t i = 0; i < extra.size(); ++i) extra[i] = item.assets[i + 7]->texture.view;
+        if (!pass.terrain_material(first, sampler_, item.set, error)) return false;
+        pass.update_surface_textures(item.set, extra, sampler_);
+        pass.set_surface_parameters(item.set, parameters);
+        item.pass = &pass;
+        for (size_t i = 0; i < item.count; ++i)
+            if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
+                ++item.assets[i]->lightmap_refs;
+        found = terrain_.emplace(std::move(key), std::move(item)).first;
+    }
+    R_ASSERT2(found->second.pass == &pass, "Vulkan surface belongs to another pass");
+    ++found->second.refs;
+    result = found->second.set;
+    error.clear();
+    return true;
 }
 
 float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
@@ -864,6 +912,18 @@ bool GameTextureFactory::reload_assets(std::string& error,
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
         item.pass->update_terrain_material(item.set, views, sampler_);
+        if (item.count == 20)
+        {
+            std::array<VkImageView, 13> extra{};
+            for (size_t i = 0; i < extra.size(); ++i) extra[i] = item.assets[i + 7]->texture.view;
+            item.pass->update_surface_textures(item.set, extra, sampler_);
+        }
+        else
+        {
+            std::array<VkImageView, 13> fallback{};
+            fallback.fill(item.assets[0]->texture.view);
+            item.pass->update_surface_textures(item.set, fallback, sampler_);
+        }
     }
     if (after_rebind) after_rebind();
     for (auto* asset : environment_assets)
