@@ -546,10 +546,16 @@ void CLevel::OnFrame()
 #endif
     }
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
-    if (!GEnv.isDedicatedServer)
-        GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
-    m_ph_commander->update();
-    m_ph_commander_scripts->update();
+    {
+        ZoneScopedN("Level::ScriptUpdate");
+        if (!GEnv.isDedicatedServer)
+            GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
+    }
+    {
+        ZoneScopedN("Level::PhCommander");
+        m_ph_commander->update();
+        m_ph_commander_scripts->update();
+    }
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
     stats.BulletManagerCommit.End();
@@ -644,9 +650,6 @@ void CLevel::OnRender()
 
     GEnv.Render->AfterWorldRender(); //--#SM+#-- +SecondVP+
     WorldRendered(true);
-
-    if (!Device.IsAnselActive)
-        HUD().RenderUI();
 
 #ifdef DEBUG
     physics_world()->OnRender();
@@ -1061,6 +1064,11 @@ bool CLevel::IsClient()
     if (Server)
         return false;
     return true;
+}
+
+bool CLevel::IsDeveloperLevel() const
+{
+    return false;
 }
 
 void CLevel::OnAlifeSimulatorUnLoaded()

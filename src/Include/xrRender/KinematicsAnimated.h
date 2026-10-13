@@ -7,11 +7,15 @@
 #include "Layers/xrRender/KinematicAnimatedDefs.h"
 #include "Layers/xrRender/KinematicsAddBoneTransform.hpp" //--#SM+#--
 
+namespace XRay::Animation
+{
+class PoseCaptureResult;
+}
+
 class IKinematics;
 class CBlend;
 class CKinematicsAnimated;
 class CBoneInstanceAnimated;
-struct CKey;
 class CInifile;
 class IKinematicsAnimated;
 class IRenderVisual;
@@ -24,12 +28,14 @@ struct IUpdateTracksCallback
     virtual bool operator()(float dt, IKinematicsAnimated& k) = 0;
 };
 
-struct SKeyTable
+struct BonePoseQuery
 {
-    CKey keys[MAX_CHANNELS][MAX_BLENDED]; // all keys
-    CBlend* blends[MAX_CHANNELS][MAX_BLENDED]; // blend pointers
-    int chanel_blend_conts[MAX_CHANNELS]; // channel counts
-    SKeyTable() { std::fill_n(chanel_blend_conts, MAX_CHANNELS, 0); }
+    u8 channels = u8(-1);
+    const CBlend* blend = nullptr;
+    bool isolated = false;
+    const float* time = nullptr;
+    const Fquaternion* rotation = nullptr;
+    const Fvector* translation = nullptr;
 };
 
 class XR_NOVTABLE IKinematicsAnimated
@@ -51,17 +57,14 @@ public:
     virtual void LL_IterateBlends(IterateBlendsCallback& callback) = 0;
 
     virtual u16 LL_MotionsSlotCount() = 0;
-    virtual const shared_motions& LL_MotionsSlot(u16 idx) = 0;
-
-    //IC CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
-    //IC CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
-    //IC CMotion* LL_GetMotion(MotionID id, u16 bone_id) {return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
-    virtual CMotionDef* LL_GetMotionDef(MotionID id) = 0;
-    virtual CMotion* LL_GetRootMotion(MotionID id) = 0;
-    virtual CMotion* LL_GetMotion(MotionID id, u16 bone_id) = 0;
-    // interface for procedural animations :)
-    virtual void LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 channel_mask, SKeyTable& keys) = 0;
-    virtual void LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* parent, const SKeyTable& keys) = 0;
+    virtual const MotionLibraryMetadata& LL_MotionsSlot(u16 idx) = 0;
+    virtual const CMotionDef* LL_GetMotionDef(MotionID id) = 0;
+    virtual float LL_MotionDuration(MotionID id) = 0;
+    virtual void LL_EvaluateBonePose(Fmatrix& result, u16 bone, const Fmatrix& parent,
+        const BonePoseQuery& query) = 0;
+    virtual bool LL_CapturePoseBase(float weight, XRay::Animation::PoseCaptureResult* result = nullptr) = 0;
+    virtual bool LL_SetPoseBaseWeight(float weight) = 0;
+    virtual void LL_ClearPoseBase() = 0;
 
     virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) = 0; //--#SM+#--
     virtual void LL_ClearAdditionalTransform(u16 bone_id) = 0; //--#SM+#--
@@ -117,6 +120,8 @@ public:
     virtual IKinematics* dcast_PKinematics() = 0;
 
     virtual float get_animation_length(MotionID motion_ID) = 0;
+
+    virtual void EnumerateCycleNames(xr_vector<shared_str>& outNames) const {}
     //#ifdef DEBUG
     //virtual const BlendSVec& blend_cycle(const u32& bone_part_id) const = 0;
     //#endif

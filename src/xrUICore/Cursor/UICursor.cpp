@@ -10,8 +10,18 @@ void CUICursor::InitInternal()
 {
     m_static = xr_new<CUIStatic>("ui_ani_cursor");
     m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
+
+    Fvector2 texSize;
+    if (m_static->GetStaticItem()->hShader) {
+        m_static->GetStaticItem()->hShader->GetBaseTextureResolution(texSize);
+    }
+
+    if (texSize.x <= 0.0f || texSize.y <= 0.0f) {
+        texSize.set(40.0f, 40.0f);
+    }
+
     Frect rect;
-    rect.set(0.0f, 0.0f, 40.0f, 40.0f);
+    rect.set(0.0f, 0.0f, texSize.x, texSize.y);
     m_static->SetTextureRect(rect);
     Fvector2 sz;
     sz.set(rect.rb);
@@ -25,18 +35,14 @@ void CUICursor::InitInternal()
 
 void CUICursor::OnDeviceReset()
 {
-    correction.x = UI_BASE_WIDTH  / (float)Device.m_rcWindowClient.w;
-    correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
+    correction.x = UI_BASE_WIDTH  / (float)Device.dwWidth;
+    correction.y = UI_BASE_HEIGHT / (float)Device.dwHeight;
 
     SDL_Rect display;
-    if (0 == SDL_GetDisplayBounds(0, &display))
-    {
-        const u32 screen_size_x = display.w - display.x;
-        const u32 screen_size_y = display.h - display.y;
-        m_bound_to_system_cursor = screen_size_y >= Device.dwHeight && screen_size_x >= Device.dwWidth;
-    }
-    if (m_bound_to_system_cursor) // sanity
-        Device.UpdateWindowRects();
+    int windowWidth = 0, windowHeight = 0;
+    m_bound_to_system_cursor = SDL_GetWindowSize(Device.m_sdlWnd, &windowWidth, &windowHeight) &&
+        SDL_GetDisplayBounds(SDL_GetDisplayForWindow(Device.m_sdlWnd), &display) &&
+        windowWidth > 0 && windowHeight > 0 && windowWidth <= display.w && windowHeight <= display.h;
 }
 
 void CUICursor::OnUIReset()
@@ -48,21 +54,21 @@ void CUICursor::OnUIReset()
 CUICursor::CUICursor()
 {
     InitInternal();
-    Device.seqRender.Add(this, -3 /*2*/);
 }
 //--------------------------------------------------------------------
 CUICursor::~CUICursor()
 {
     xr_delete(m_static);
-    Device.seqRender.Remove(this);
 }
 
 //--------------------------------------------------------------------
 u32 last_render_frame = 0;
 void CUICursor::OnRender()
 {
-    g_btnHint->OnRender();
-    g_statHint->OnRender();
+    if (g_btnHint)
+        g_btnHint->OnRender();
+    if (g_statHint)
+        g_statHint->OnRender();
 
     if (!IsVisible())
         return;

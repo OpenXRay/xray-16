@@ -7,13 +7,12 @@
 #include "Common/LevelStructure.hpp"
 #include "xrEngine/xr_object.h"
 #include "FBasicVisual.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 #include "xrEngine/IGame_Persistent.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CPortal::CPortal()
 {
 #ifdef DEBUG
@@ -55,14 +54,8 @@ void CPortal::OnRender()
         for (u32 k = 0; k < poly.size(); ++k)
             V[k * 3].set(vCenter, portalColor);
 
-        RCache.set_xform_world(Fidentity);
         // draw solid
-        RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-        RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
-            float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif
-        RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*V.begin(), V.size() / 3);
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, &*V.begin(), V.size() / 3);
 
         // draw wire
         V.resize(poly.size()+1); // SkyLoader: change vertex array for wire
@@ -70,21 +63,10 @@ void CPortal::OnRender()
             V[k].set(poly[k], portalColor);
         V.back().set(poly[0], portalColor);
 
-        if (bDebug)
-            RImplementation.rmNear(RCache);
-        else
-            Device.SetNearer(TRUE);
+        Device.SetNearer(TRUE);
 
-        RCache.set_Shader(RImplementation.m_WireShader);
-#ifndef USE_DX9 // when we don't have FFP support
-        RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
-            float(color_get_B(portalColor)) / 255.f, float(color_get_A(portalColor)) / 255.f);
-#endif
-        RCache.dbg_Draw(D3DPT_LINESTRIP, &*V.begin(), V.size() - 1);
-        if (bDebug)
-            RImplementation.rmNormal(RCache);
-        else
-            Device.SetNearer(FALSE);
+        g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineStrip, &*V.begin(), V.size() - 1);
+        Device.SetNearer(FALSE);
     }
 }
 #endif
@@ -107,7 +89,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     poly.assign(V, vcnt);
     pFace = face;
     pBack = back;
-    marker = 0xffffffff;
 
     Fvector N, T;
     N.set(0, 0, 0);
@@ -133,23 +114,11 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     */
 }
 
-void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &portals)
+void CSector::setup(const level_sector_data_t& data)
 {
-    // Assign portal polygons
-    const auto num_portals = data.portals_id.size();
-    m_portals.resize(num_portals);
-    for (u32 idx = 0; idx < num_portals; ++idx)
-    {
-        const auto ID = data.portals_id[idx];
-        m_portals[idx] = portals[ID];
-    }
-
     if (GEnv.isDedicatedServer)
         m_root = nullptr;
     else
-    {
-        // Assign visual
-        m_root = static_cast<dxRender_Visual*>(RImplementation.getVisual(data.root_id));
-    }
+        m_root = BufferPool.getVisual(data.root_id);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -1,0 +1,1478 @@
+#include "stdafx.h"
+#include "FrameGraph.h"
+#include "../RenderContext/RenderDevice.h"
+#include "../Profiler/GPUProfiler.h"
+#include "xrEngine/IRenderBackend.h"
+
+namespace xray::render::framegraph {
+
+FrameGraph::FrameGraph(fg::RenderDevice* renderDevice)
+    : m_renderDevice(renderDevice)
+    , m_device(renderDevice->GetNVRHIDevice())
+    , m_resourceManager(renderDevice->GetFGResourceManager())
+{
+    VERIFY(renderDevice != nullptr);
+    VERIFY(m_device != nullptr);
+
+    if (m_resourceManager) {
+        m_resourcePool = xr_make_unique<FGResourcePool>(m_resourceManager);
+    }
+
+    m_resources.reserve(256);
+    m_passes.reserve(128);
+    m_sortedPasses.reserve(128);
+    m_compileReaderLinks.reserve(512);
+}
+
+FrameGraph::~FrameGraph() {
+    Reset();
+
+    Msg("* [FrameGraph] Destroyed");
+};
+
+VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const ResourceDesc& desc) {
+    R_ASSERT2(!m_compiled, "Cannot create resources after compile");
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer
+        && desc.type != ResourceDesc::Type::AccelerationStructure, "CreateTexture requires a texture");
+
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
+
+    return node.handle;
+}
+
+VirtualResourceHandle FrameGraph::CreateBuffer(const char* name, const ResourceDesc& desc) {
+    R_ASSERT2(!m_compiled, "Cannot create resources after compile");
+    R_ASSERT2(desc.type == ResourceDesc::Type::Buffer, "Use CreateTexture for textures");
+
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
+
+    return node.handle;
+}
+
+namespace {
+
+bool ImportDescCompatible(const ResourceDesc& a, const ResourceDesc& b)
+{
+    if (a.type != b.type)
+        return false;
+    if (a.type == ResourceDesc::Type::Buffer)
+        return a.bufferSize == b.bufferSize && a.structStride == b.structStride;
+    if (a.type == ResourceDesc::Type::AccelerationStructure)
+        return a.accelerationStructureSize == b.accelerationStructureSize
+            && a.isTopLevelAccelerationStructure == b.isTopLevelAccelerationStructure;
+    return a.width == b.width && a.height == b.height && a.depth == b.depth
+        && a.arraySize == b.arraySize && a.mipLevels == b.mipLevels
+        && a.format == b.format && a.sampleCount == b.sampleCount;
+}
+
+void MergeImportHints(ResourceDesc& dst, const ResourceDesc& src)
+{
+    dst.isRenderTarget |= src.isRenderTarget;
+    dst.isDepthStencil |= src.isDepthStencil;
+    dst.isUAV |= src.isUAV;
+    dst.allowUAV |= src.allowUAV;
+    dst.isIndirectArgs |= src.isIndirectArgs;
+}
+
+}
+
+VirtualResourceHandle FrameGraph::CanonicalizeImport(const void* physical, const ResourceDesc& desc)
+{
+    auto it = m_importedLookup.find(physical);
+    if (it == m_importedLookup.end())
+        return VirtualResourceHandle();
+
+    ResourceNode& node = m_resources[it->second];
+    R_ASSERT3(ImportDescCompatible(node.desc, desc),
+        "framegraph import describes one physical resource with contradictory descriptors",
+        desc.debugName.c_str());
+    MergeImportHints(node.desc, desc);
+    return CurrentHandle(node);
+}
+
+VirtualResourceHandle FrameGraph::ImportTexture(
+    const char* name,
+    nvrhi::ITexture* physicalTexture,
+    const ResourceDesc& desc
+) {
+    R_ASSERT2(!m_compiled, "Cannot import resources after compile");
+    R_ASSERT(physicalTexture != nullptr);
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer
+        && desc.type != ResourceDesc::Type::AccelerationStructure, "ImportTexture requires a texture");
+
+    if (VirtualResourceHandle existing = CanonicalizeImport(physicalTexture, desc); existing.is_valid())
+        return existing;
+
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
+    node.nvrhiTexture = physicalTexture;
+    node.isAllocated = true;
+    node.isPersistent = true;
+    node.desc.isImported = true;
+    m_importedLookup.emplace(static_cast<const void*>(physicalTexture), node.handle.index);
+
+    return node.handle;
+}
+
+VirtualResourceHandle FrameGraph::ImportBuffer(
+    const char* name,
+    nvrhi::IBuffer* physicalBuffer,
+    const ResourceDesc& desc
+) {
+    R_ASSERT2(!m_compiled, "Cannot import resources after compile");
+    R_ASSERT(physicalBuffer != nullptr);
+    R_ASSERT2(desc.type == ResourceDesc::Type::Buffer, "Use ImportTexture for textures");
+
+    if (VirtualResourceHandle existing = CanonicalizeImport(physicalBuffer, desc); existing.is_valid())
+        return existing;
+
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
+    node.nvrhiBuffer = physicalBuffer;
+    node.isAllocated = true;
+    node.isPersistent = true;
+    node.desc.isImported = true;
+    m_importedLookup.emplace(static_cast<const void*>(physicalBuffer), node.handle.index);
+
+    return node.handle;
+}
+
+VirtualResourceHandle FrameGraph::ImportAccelerationStructure(
+    const char* name, nvrhi::rt::IAccelStruct* physicalAccelerationStructure)
+{
+    R_ASSERT2(!m_compiled, "Cannot import resources after compile");
+    R_ASSERT(physicalAccelerationStructure != nullptr);
+
+    ResourceDesc desc;
+    desc.type = ResourceDesc::Type::AccelerationStructure;
+    desc.isImported = true;
+    desc.isTransient = false;
+    desc.debugName = name;
+    desc.isTopLevelAccelerationStructure = physicalAccelerationStructure->getDesc().isTopLevel;
+    desc.accelerationStructureSize =
+        m_device->getAccelStructMemoryRequirements(physicalAccelerationStructure).size;
+    if (VirtualResourceHandle existing = CanonicalizeImport(physicalAccelerationStructure, desc);
+        existing.is_valid())
+        return existing;
+
+    ResourceNode& node = m_resources.emplace_back(desc);
+    node.handle.index = static_cast<u32>(m_resources.size() - 1);
+    node.handle.generation = m_generation;
+    node.nvrhiAccelStruct = physicalAccelerationStructure;
+    node.isAllocated = true;
+    node.isPersistent = true;
+    m_importedLookup.emplace(static_cast<const void*>(physicalAccelerationStructure), node.handle.index);
+    return node.handle;
+}
+
+PassHandle FrameGraph::AddPass(const char* name) {
+    R_ASSERT2(!m_compiled, "Cannot add passes after compile");
+
+    PassHandle handle;
+    handle.index = static_cast<u32>(m_passes.size());
+
+    if (!m_passPool.empty()) {
+        m_passes.push_back(std::move(m_passPool.back()));
+        m_passPool.pop_back();
+        m_passes.back().Recycle(name);
+    } else {
+        m_passes.emplace_back(name);
+    }
+    m_passes.back().handle = handle;
+
+    return handle;
+}
+
+VirtualResourceHandle FrameGraph::CurrentHandle(const ResourceNode& node) {
+    VirtualResourceHandle handle = node.handle;
+    handle.version = node.version;
+    return handle;
+}
+
+VirtualResourceHandle FrameGraph::GetLatestVersion(VirtualResourceHandle handle) const {
+    const ResourceNode* node = GetResourceNode(handle);
+    return node ? CurrentHandle(*node) : VirtualResourceHandle();
+}
+
+ResourceNode& FrameGraph::DeclareAccess(PassNode*& passNode, PassHandle pass, VirtualResourceHandle resource) {
+    R_ASSERT2(!m_compiled, "Cannot declare resources after compile");
+    passNode = GetPassNode(pass);
+    R_ASSERT(passNode != nullptr);
+    ResourceNode* node = GetResourceNode(resource);
+    R_ASSERT3(node != nullptr, "framegraph pass declares an invalid resource", passNode->name.c_str());
+    VERIFY4(resource.version == node->version, "framegraph pass declares a stale resource version",
+        passNode->name.c_str(), node->desc.debugName.c_str());
+    return *node;
+}
+
+void FrameGraph::PassRead(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    DeclareAccess(passNode, pass, resource);
+    passNode->Read(resource, state);
+}
+
+VirtualResourceHandle FrameGraph::PassWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    ResourceNode& node = DeclareAccess(passNode, pass, resource);
+    passNode->Write(resource, state);
+    ++node.version;
+    return CurrentHandle(node);
+}
+
+VirtualResourceHandle FrameGraph::PassReadWrite(PassHandle pass, VirtualResourceHandle resource, ResourceState state) {
+    PassNode* passNode;
+    ResourceNode& node = DeclareAccess(passNode, pass, resource);
+    passNode->ReadWrite(resource, state);
+    ++node.version;
+    return CurrentHandle(node);
+}
+
+void FrameGraph::SetPassCallbackPtr(PassHandle pass, IPassCallback* callback) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->executeCallback = callback;
+}
+
+void FrameGraph::SetPassAsyncCompute(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->queue = PassQueue::Compute;
+}
+
+void FrameGraph::SetPassHasSideEffects(PassHandle pass) {
+    PassNode* passNode = GetPassNode(pass);
+    VERIFY(passNode != nullptr);
+
+    passNode->hasSideEffects = true;
+}
+
+void FrameGraph::SetPresentTarget(VirtualResourceHandle handle) {
+    R_ASSERT2(!m_compiled, "Cannot set present target after compile");
+
+    const ResourceNode* node = GetResourceNode(handle);
+    R_ASSERT(node != nullptr);
+    R_ASSERT(node->desc.isImported && node->nvrhiTexture);
+
+    m_presentTarget = handle;
+}
+
+void FrameGraph::Compile() {
+    ZoneScoped;
+
+    R_ASSERT2(!m_compiled, "Already compiled");
+
+    {
+        ZoneScopedN("Compile::BuildDependencyGraph");
+        BuildDependencyGraph();
+    }
+
+    KeepDepthReadersOnGraphicsQueue();
+    ValidateAsyncPasses();
+
+    {
+        ZoneScopedN("Compile::OrderPasses");
+        m_sortedPasses.clear();
+        m_sortedPasses.reserve(m_passes.size());
+        for (auto& pass : m_passes) {
+            pass.executionOrder = pass.handle.index;
+            m_sortedPasses.push_back(&pass);
+        }
+    }
+
+    {
+        ZoneScopedN("Compile::CullUnusedPasses");
+        CullUnusedPasses();
+    }
+
+    {
+        ZoneScopedN("Compile::ResolveUsage");
+        ResolveUsage();
+    }
+
+    {
+        ZoneScopedN("Compile::ComputeResourceLifetimes");
+        ComputeResourceLifetimes();
+    }
+
+    {
+        ZoneScopedN("Compile::BuildLifetimeLists");
+        BuildLifetimeLists();
+    }
+
+    {
+        ZoneScopedN("Compile::AssignSegments");
+        AssignSegments();
+    }
+
+    m_compiled = true;
+    m_stats.numPasses = static_cast<u32>(m_passes.size());
+    m_stats.numResources = static_cast<u32>(m_resources.size());
+}
+
+void FrameGraph::ExecutePass(PassNode* pass, nvrhi::ICommandList* cmdList) {
+    cmdList->beginMarker(pass->name.c_str());
+
+    xray::profiler::CPUZoneScope _zonePass(
+        xray::profiler::CPUProfiler::Instance().RegisterDynamicZone(pass->name.c_str()));
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->BeginPass(cmdList, pass->name.c_str(), pass->queue == PassQueue::Compute);
+
+    bool accelerationBarriers = false;
+    for (const ResourceAccess& access : pass->resourceAccesses)
+    {
+        const ResourceNode* resource = GetResourceNode(access.resource);
+        if (resource->desc.type == ResourceDesc::Type::AccelerationStructure)
+        {
+            cmdList->setAccelStructState(resource->nvrhiAccelStruct, ConvertToNVRHIState(access.state));
+            accelerationBarriers = true;
+        }
+        else if (access.state == ResourceState::AccelStructBuildInput)
+        {
+            cmdList->setBufferState(resource->nvrhiBuffer, nvrhi::ResourceStates::AccelStructBuildInput);
+            accelerationBarriers = true;
+        }
+    }
+    if (accelerationBarriers)
+        cmdList->commitBarriers();
+
+    m_currentPass = pass;
+    (*pass->executeCallback)(*m_context, *this);
+    m_currentPass = nullptr;
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
+
+    cmdList->endMarker();
+}
+
+void FrameGraph::BeginSegment() {
+    if (!m_segmentBeginCallback)
+        return;
+    m_currentPass = nullptr;
+    (*m_segmentBeginCallback)(*m_context, *this);
+}
+
+bool FrameGraph::IsAsyncComputeActive() const {
+    return m_backend != nullptr && m_backend->HasAsyncCompute() && m_backend->IsInFrame();
+}
+
+void FrameGraph::Execute() {
+    ZoneScoped;
+
+    R_ASSERT2(m_compiled, "Must compile before execute");
+    R_ASSERT2(m_context != nullptr, "RenderContext required for execution");
+    R_ASSERT2(m_renderDevice != nullptr, "RenderDevice required for execution");
+    R_ASSERT(m_context->GetCommandList() != nullptr);
+
+    const bool async = IsAsyncComputeActive();
+    const u32 prevGraphicsToken = async ? m_backend->LastGraphicsToken() : 0;
+    const u32 prevComputeToken = async ? m_backend->LastComputeToken() : 0;
+
+    u32 finalGraphicsSegment = INVALID_INDEX;
+    for (u32 i = static_cast<u32>(m_sortedPasses.size()); i > 0; --i) {
+        const PassNode* pass = m_sortedPasses[i - 1];
+        if (m_segments[pass->segment].queue == PassQueue::Graphics) {
+            finalGraphicsSegment = pass->segment;
+            break;
+        }
+    }
+
+    bool firstGraphicsSegment = true;
+    bool firstComputeSegment = true;
+    nvrhi::ICommandList* computeCmdList = nullptr;
+    u32 waitTokens[MAX_SEGMENT_WAITS + 1];
+
+    for (u32 i = 0; i < m_sortedPasses.size(); ++i) {
+        PassNode* pass = m_sortedPasses[i];
+        Segment& segment = m_segments[pass->segment];
+
+        if (segment.queue == PassQueue::Compute) {
+            if (segment.firstPass == i) {
+                computeCmdList = m_backend->AcquireComputeCommandList();
+                computeCmdList->open();
+                m_context->SetCommandList(computeCmdList);
+                BeginSegment();
+            }
+
+            R_ASSERT(pass->devirtualize.empty() && pass->destroy.empty());
+            if (pass->executeCallback)
+                ExecutePass(pass, computeCmdList);
+
+            if (segment.lastPass == i) {
+                computeCmdList->close();
+                u32 numWaits = 0;
+                for (u32 w = 0; w < segment.numWaits; ++w)
+                    waitTokens[numWaits++] = m_segments[segment.waits[w]].token;
+                if (firstComputeSegment && prevGraphicsToken)
+                    waitTokens[numWaits++] = prevGraphicsToken;
+                firstComputeSegment = false;
+                segment.token = m_backend->SubmitCompute(computeCmdList, waitTokens, numWaits);
+                computeCmdList = nullptr;
+                m_context->SetCommandList(m_backend->GetCommandList());
+            }
+            continue;
+        }
+
+        if (segment.firstPass == i) {
+            if (async) {
+                for (u32 w = 0; w < segment.numWaits; ++w)
+                    m_backend->AddGraphicsWait(m_segments[segment.waits[w]].token);
+                if (firstGraphicsSegment && prevComputeToken)
+                    m_backend->AddGraphicsWait(prevComputeToken);
+            }
+            firstGraphicsSegment = false;
+            BeginSegment();
+        }
+
+        for (ResourceNode* resource : pass->devirtualize)
+            Devirtualize(*resource);
+
+        if (pass->executeCallback)
+            ExecutePass(pass, m_context->GetCommandList());
+
+        for (ResourceNode* resource : pass->destroy)
+            Destroy(*resource);
+
+        if (async && segment.lastPass == i && (pass->segment != finalGraphicsSegment || pass->forkAfter)) {
+            segment.token = m_backend->SplitGraphics();
+            m_context->SetCommandList(m_backend->GetCommandList());
+        }
+    }
+
+    nvrhi::ICommandList* graphicsCmdList = m_context->GetCommandList();
+
+    if (m_presentTarget.is_valid()) {
+        ResourceNode* target = GetResourceNode(m_presentTarget);
+        R_ASSERT(target != nullptr && target->nvrhiTexture);
+
+        graphicsCmdList->setTextureState(
+            target->nvrhiTexture.Get(),
+            nvrhi::AllSubresources,
+            nvrhi::ResourceStates::Present
+        );
+    }
+
+    graphicsCmdList->commitBarriers();
+}
+
+nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
+    const ResourceNode* node = GetResourceNode(handle);
+    if (!node)
+        return nullptr;
+
+    R_ASSERT3(node->isAllocated && node->nvrhiTexture,
+        "framegraph texture accessed outside its lifetime", node->desc.debugName.c_str());
+
+#ifdef DEBUG
+    if (m_currentPass) {
+        VERIFY4(PassDeclaresResource(*m_currentPass, handle),
+            "framegraph pass fetched a texture it never declared",
+            m_currentPass->name.c_str(),
+            node->desc.debugName.c_str());
+    }
+#endif
+
+    return node->nvrhiTexture;
+}
+
+nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) const {
+    const ResourceNode* node = GetResourceNode(handle);
+    if (!node)
+        return nullptr;
+
+    R_ASSERT3(node->isAllocated && node->nvrhiBuffer,
+        "framegraph buffer accessed outside its lifetime", node->desc.debugName.c_str());
+
+#ifdef DEBUG
+    if (m_currentPass) {
+        VERIFY4(PassDeclaresResource(*m_currentPass, handle),
+            "framegraph pass fetched a buffer it never declared",
+            m_currentPass->name.c_str(),
+            node->desc.debugName.c_str());
+    }
+#endif
+
+    return node->nvrhiBuffer;
+}
+
+nvrhi::rt::IAccelStruct* FrameGraph::GetPhysicalAccelerationStructure(VirtualResourceHandle handle) const
+{
+    const ResourceNode* node = GetResourceNode(handle);
+    if (!node)
+        return nullptr;
+
+    R_ASSERT3(node->desc.type == ResourceDesc::Type::AccelerationStructure
+            && node->isAllocated && node->nvrhiAccelStruct,
+        "framegraph acceleration structure accessed outside its lifetime", node->desc.debugName.c_str());
+#ifdef DEBUG
+    if (m_currentPass)
+    {
+        VERIFY4(PassDeclaresResource(*m_currentPass, handle),
+            "framegraph pass fetched an acceleration structure it never declared",
+            m_currentPass->name.c_str(), node->desc.debugName.c_str());
+    }
+#endif
+    return node->nvrhiAccelStruct;
+}
+
+const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) const {
+    const ResourceNode* node = GetResourceNode(handle);
+    R_ASSERT(node != nullptr);
+    return node->desc;
+}
+
+void FrameGraph::ResetForNextFrame() {
+    ZoneScopedN("FG::ResetForNextFrame");
+
+    for (auto& resource : m_resources) {
+        if (!resource.desc.isImported)
+            Destroy(resource);
+    }
+    if (m_resourcePool)
+        m_resourcePool->Tick();
+
+    m_compileReaderLinks.clear();
+    m_compilePassWorklist.clear();
+
+    for (auto& pass : m_passes)
+        m_passPool.push_back(std::move(pass));
+    m_passes.clear();
+    m_resources.clear();
+    m_importedLookup.clear();
+    m_sortedPasses.clear();
+    m_segments.clear();
+    m_segmentBeginCallback = nullptr;
+    m_compiled = false;
+    m_presentTarget = VirtualResourceHandle();
+    m_currentPass = nullptr;
+    if (++m_generation == 0)
+        m_generation = 1;
+
+    m_rtRegistry.Clear();
+
+    m_stats = Statistics();
+
+    m_frameArena.Reset();
+}
+
+void FrameGraph::Reset() {
+    for (auto& resource : m_resources) {
+        if (!resource.desc.isImported)
+            Destroy(resource);
+    }
+    if (m_resourcePool)
+        m_resourcePool->Reset();
+
+    m_compileReaderLinks.clear();
+    m_compilePassWorklist.clear();
+
+    m_resources.clear();
+    m_importedLookup.clear();
+    m_passes.clear();
+    m_passPool.clear();
+    m_sortedPasses.clear();
+    m_segments.clear();
+    m_segmentBeginCallback = nullptr;
+    m_rtRegistry.Clear();
+    m_compiled = false;
+    m_presentTarget = VirtualResourceHandle();
+    m_currentPass = nullptr;
+    if (++m_generation == 0)
+        m_generation = 1;
+    m_frameArena.Reset();
+
+    m_stats.numPasses = 0;
+    m_stats.numResources = 0;
+    m_stats.numCulledPasses = 0;
+    m_stats.numCulledResources = 0;
+    m_stats.compileTimeMs = 0.0f;
+    m_stats.totalMemoryAllocated = 0;
+    m_stats.executeTimeMs = 0.0f;
+    m_stats.totalGPUTimeMs = 0.0f;
+    m_stats.passTimings.clear();
+}
+
+void FrameGraph::ExportVisualization(const char* htmlPath) const {
+    Msg("~ [FrameGraph] ExportVisualization not yet implemented");
+}
+
+void FrameGraph::PrintStatistics() const {
+    Msg("========================================");
+    Msg("  FrameGraph Statistics");
+    Msg("========================================");
+
+    Msg("Passes:");
+    Msg("  Total: %u", m_stats.numPasses);
+    Msg("  Executed: %u", m_stats.numPasses - m_stats.numCulledPasses);
+    Msg("  Culled: %u", m_stats.numCulledPasses);
+
+    Msg("Resources:");
+    Msg("  Total: %u", m_stats.numResources);
+    Msg("  Allocated: %u", m_stats.numResources - m_stats.numCulledResources);
+    Msg("  Culled: %u", m_stats.numCulledResources);
+
+    if (m_stats.totalMemoryAllocated > 0) {
+        Msg("Memory:");
+        Msg("  Total allocated: %.2f MB", m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
+    }
+
+    Msg("Timing:");
+    Msg("  Compile: %.2f ms", m_stats.compileTimeMs);
+    Msg("  Execute (CPU): %.2f ms", m_stats.executeTimeMs);
+    if (m_stats.totalGPUTimeMs > 0.0f) {
+        Msg("  Execute (GPU): %.2f ms", m_stats.totalGPUTimeMs);
+    }
+
+    if (!m_stats.passTimings.empty()) {
+        Msg("Pass Timings:");
+
+        xr_vector<std::pair<shared_str, float>> sorted;
+        for (const auto& pair : m_stats.passTimings) {
+            sorted.push_back(pair);
+        }
+        std::sort(sorted.begin(), sorted.end(),
+            [](const auto& a, const auto& b) { return a.second > b.second; });
+
+        for (const auto& pair : sorted) {
+            float percent = (m_stats.totalGPUTimeMs > 0.0f)
+                ? (100.0f * pair.second / m_stats.totalGPUTimeMs)
+                : 0.0f;
+            Msg("  %-30s: %6.2f ms (%4.1f%%)",
+                pair.first.c_str(),
+                pair.second,
+                percent);
+        }
+    }
+
+    Msg("========================================");
+}
+
+void FrameGraph::PrintExecutionOrder() const {
+    Msg("========================================");
+    Msg("  FrameGraph Execution Order");
+    Msg("========================================");
+
+    for (u32 i = 0; i < m_sortedPasses.size(); i++) {
+        const PassNode* pass = m_sortedPasses[i];
+
+        const Segment* segment = pass->segment != INVALID_INDEX ? &m_segments[pass->segment] : nullptr;
+        Msg("[%2u] %-30s (%u deps) [%s segment %u, %u waits]",
+            i,
+            pass->name.c_str(),
+            static_cast<u32>(pass->dependsOn.size()),
+            segment && segment->queue == PassQueue::Compute ? "compute" : "graphics",
+            pass->segment,
+            segment ? segment->numWaits : 0u);
+
+        if (!pass->resourceAccesses.empty()) {
+            for (const auto& access : pass->resourceAccesses) {
+                const ResourceNode* resource = GetResourceNode(access.resource);
+                const char* accessType = "?";
+
+                if (access.IsWrite()) {
+                    accessType = access.IsRead() ? "R/W" : "W";
+                } else {
+                    accessType = "R";
+                }
+
+                Msg("     [%s] %s (%s)",
+                    accessType,
+                    resource->desc.debugName.c_str(),
+                    ResourceStateToString(access.state));
+            }
+        }
+    }
+
+    Msg("========================================");
+}
+
+bool FrameGraph::ValidateGraph() const {
+    bool valid = true;
+
+    for (const auto& pass : m_passes) {
+        if (pass.culled) continue;
+
+        if (!pass.executeCallback) {
+            valid = false;
+        }
+    }
+
+    for (const auto& pass : m_passes) {
+        if (pass.culled) continue;
+
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) {
+                valid = false;
+                continue;
+            }
+
+            if (!resource->isAllocated && !resource->desc.isImported) {
+                valid = false;
+            }
+        }
+    }
+
+    for (const auto& resource : m_resources) {
+        if (resource.desc.isImported) {
+            if (resource.desc.type == ResourceDesc::Type::Buffer) {
+                if (!resource.nvrhiBuffer) {
+                    valid = false;
+                }
+            }
+            else if (resource.desc.type == ResourceDesc::Type::AccelerationStructure)
+            {
+                if (!resource.nvrhiAccelStruct)
+                    valid = false;
+            }
+            else {
+                if (!resource.nvrhiTexture) {
+                    valid = false;
+                }
+            }
+        }
+    }
+
+    if (!valid) {
+        Msg("! [FrameGraph] Validation FAILED");
+    }
+
+    return valid;
+}
+
+ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) {
+    if (!handle.is_valid())
+        return nullptr;
+    R_ASSERT2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.index < m_resources.size(), "framegraph resource handle is out of bounds");
+    return &m_resources[handle.index];
+}
+
+const ResourceNode* FrameGraph::GetResourceNode(VirtualResourceHandle handle) const {
+    if (!handle.is_valid())
+        return nullptr;
+    R_ASSERT2(handle.generation == m_generation, "stale framegraph resource handle");
+    R_ASSERT2(handle.index < m_resources.size(), "framegraph resource handle is out of bounds");
+    return &m_resources[handle.index];
+}
+
+bool FrameGraph::PassDeclaresResource(const PassNode& pass, VirtualResourceHandle handle) const {
+    for (const auto& access : pass.resourceAccesses) {
+        if (access.resource.index == handle.index)
+            return true;
+    }
+    return false;
+}
+
+PassNode* FrameGraph::GetPassNode(PassHandle handle) {
+    if (!handle.is_valid() || handle.index >= m_passes.size()) {
+        return nullptr;
+    }
+    return &m_passes[handle.index];
+}
+
+const PassNode* FrameGraph::GetPassNode(PassHandle handle) const {
+    if (!handle.is_valid() || handle.index >= m_passes.size()) {
+        return nullptr;
+    }
+    return &m_passes[handle.index];
+}
+
+void FrameGraph::BuildDependencyGraph() {
+    for (auto& pass : m_passes) {
+        pass.dependsOn.clear();
+    }
+
+    for (auto& resource : m_resources) {
+        resource.lastWriter = nullptr;
+        resource.readersHead = INVALID_INDEX;
+    }
+
+    auto& readerLinks = m_compileReaderLinks;
+    readerLinks.clear();
+
+    auto addEdge = [](PassNode& pass, PassNode* producer, EdgeKind kind) {
+        if (producer == &pass)
+            return;
+        if (PassDependency* existing = pass.FindDependency(producer)) {
+            if (kind == EdgeKind::ReadAfterWrite)
+                existing->kind = EdgeKind::ReadAfterWrite;
+            return;
+        }
+        pass.dependsOn.push_back(PassDependency{producer, kind});
+    };
+
+    for (auto& pass : m_passes) {
+        for (const auto& access : pass.resourceAccesses) {
+            if (!access.IsRead()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
+            if (resource->lastWriter)
+                addEdge(pass, resource->lastWriter, EdgeKind::ReadAfterWrite);
+        }
+
+        for (const auto& access : pass.resourceAccesses) {
+            if (!access.IsWrite()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
+            if (resource->lastWriter)
+                addEdge(pass, resource->lastWriter, EdgeKind::WriteAfterWrite);
+
+            for (u32 link = resource->readersHead; link != INVALID_INDEX; link = readerLinks[link].next)
+                addEdge(pass, readerLinks[link].pass, EdgeKind::WriteAfterRead);
+            resource->readersHead = INVALID_INDEX;
+        }
+
+        for (const auto& access : pass.resourceAccesses) {
+            ResourceNode* resource = GetResourceNode(access.resource);
+            VERIFY(resource != nullptr);
+            if (access.IsRead()) {
+                readerLinks.push_back(ReaderLink{&pass, resource->readersHead});
+                resource->readersHead = static_cast<u32>(readerLinks.size() - 1);
+            }
+            if (access.IsWrite())
+                resource->lastWriter = &pass;
+        }
+    }
+}
+
+void FrameGraph::KeepDepthReadersOnGraphicsQueue() {
+    if (m_renderDevice->GetNVRHIDevice()->getGraphicsAPI() != nvrhi::GraphicsAPI::D3D12)
+        return;
+
+    for (auto& pass : m_passes) {
+        if (pass.queue != PassQueue::Compute)
+            continue;
+
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            if (resource && resource->desc.type != ResourceDesc::Type::Buffer
+                && resource->desc.type != ResourceDesc::Type::AccelerationStructure
+                && (resource->desc.isDepthStencil || nvrhi::getFormatInfo(resource->desc.format).hasDepth)) {
+                pass.queue = PassQueue::Graphics;
+                break;
+            }
+        }
+    }
+}
+
+void FrameGraph::ValidateAsyncPasses() {
+    for (const auto& pass : m_passes) {
+        if (pass.queue != PassQueue::Compute)
+            continue;
+
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            R_ASSERT4(resource != nullptr && resource->desc.isImported,
+                "async framegraph pass touches a resource that is not imported",
+                pass.name.c_str(),
+                resource ? resource->desc.debugName.c_str() : "<invalid handle>");
+            R_ASSERT4(access.state != ResourceState::RenderTarget
+                    && access.state != ResourceState::DepthStencilWrite
+                    && access.state != ResourceState::DepthStencilRead
+                    && access.state != ResourceState::DepthStencilReadShaderResource
+                    && access.state != ResourceState::Present,
+                "async framegraph pass requests a graphics-only resource state",
+                pass.name.c_str(),
+                resource->desc.debugName.c_str());
+        }
+    }
+}
+
+void FrameGraph::AssignSegments() {
+    m_segments.clear();
+
+    const bool async = IsAsyncComputeActive();
+    auto queueOf = [async](const PassNode* pass) {
+        return async ? pass->queue : PassQueue::Graphics;
+    };
+
+    for (PassNode* pass : m_sortedPasses) {
+        pass->segment = INVALID_INDEX;
+        pass->forkAfter = false;
+    }
+
+    if (async) {
+        for (PassNode* pass : m_sortedPasses) {
+            for (const auto& dep : pass->dependsOn) {
+                if (!dep.pass->culled && queueOf(dep.pass) != queueOf(pass))
+                    dep.pass->forkAfter = true;
+            }
+        }
+    }
+
+    u32 open[2] = { INVALID_INDEX, INVALID_INDEX };
+
+    for (u32 i = 0; i < m_sortedPasses.size(); ++i) {
+        PassNode* pass = m_sortedPasses[i];
+        const PassQueue queue = queueOf(pass);
+        const u32 q = static_cast<u32>(queue);
+
+        u32 waits[MAX_SEGMENT_WAITS];
+        u32 numWaits = 0;
+        for (const auto& dep : pass->dependsOn) {
+            if (dep.pass->culled || queueOf(dep.pass) == queue)
+                continue;
+            const u32 producer = dep.pass->segment;
+            R_ASSERT(producer != INVALID_INDEX);
+            bool known = false;
+            for (u32 w = 0; w < numWaits; ++w)
+                known |= waits[w] == producer;
+            if (known)
+                continue;
+            R_ASSERT2(numWaits < MAX_SEGMENT_WAITS, "framegraph pass has too many cross-queue producers");
+            waits[numWaits++] = producer;
+        }
+
+        if (queue == PassQueue::Graphics)
+            open[static_cast<u32>(PassQueue::Compute)] = INVALID_INDEX;
+
+        if (open[q] != INVALID_INDEX) {
+            const Segment& current = m_segments[open[q]];
+            for (u32 w = 0; w < numWaits && open[q] != INVALID_INDEX; ++w) {
+                bool known = false;
+                for (u32 s = 0; s < current.numWaits; ++s)
+                    known |= current.waits[s] == waits[w];
+                if (!known)
+                    open[q] = INVALID_INDEX;
+            }
+        }
+
+        if (open[q] == INVALID_INDEX) {
+            open[q] = static_cast<u32>(m_segments.size());
+            Segment& created = m_segments.emplace_back();
+            created.queue = queue;
+            created.firstPass = i;
+            created.numWaits = numWaits;
+            for (u32 w = 0; w < numWaits; ++w)
+                created.waits[w] = waits[w];
+        }
+
+        Segment& segment = m_segments[open[q]];
+        segment.lastPass = i;
+        pass->segment = open[q];
+
+        if (pass->forkAfter)
+            open[q] = INVALID_INDEX;
+    }
+}
+
+void FrameGraph::CullUnusedPasses() {
+    for (auto& pass : m_passes) {
+        pass.culled = true;
+    }
+
+    auto& queue = m_compilePassWorklist;
+    queue.clear();
+
+    for (auto& pass : m_passes) {
+        if (pass.hasSideEffects) {
+            queue.push_back(&pass);
+            continue;
+        }
+        for (const auto& access : pass.resourceAccesses) {
+            if (access.IsWrite()) {
+                const ResourceNode* resource = GetResourceNode(access.resource);
+                if (resource && (resource->desc.isImported || resource->isPersistent)) {
+                    queue.push_back(&pass);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (queue.empty()) {
+        for (auto& pass : m_passes) {
+            pass.culled = false;
+        }
+        return;
+    }
+
+    while (!queue.empty()) {
+        PassNode* current = queue.back();
+        queue.pop_back();
+
+        if (current->culled) {
+            current->culled = false;
+
+            for (const auto& dependency : current->dependsOn) {
+                if (dependency.kind == EdgeKind::ReadAfterWrite && dependency.pass->culled) {
+                    queue.push_back(dependency.pass);
+                }
+            }
+        }
+    }
+
+    u32 culledCount = 0;
+    for (const auto& pass : m_passes) {
+        if (pass.culled) {
+            culledCount++;
+        }
+    }
+
+    auto it = std::remove_if(m_sortedPasses.begin(), m_sortedPasses.end(),
+        [](const PassNode* pass) { return pass->culled; });
+    m_sortedPasses.erase(it, m_sortedPasses.end());
+
+    m_stats.numCulledPasses = culledCount;
+}
+
+void FrameGraph::ResolveUsage() {
+    for (const PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+
+        for (const auto& access : pass->resourceAccesses) {
+            ResourceNode* resource = GetResourceNode(access.resource);
+            R_ASSERT(resource != nullptr);
+
+            const bool isBuffer = resource->desc.type == ResourceDesc::Type::Buffer;
+            const bool isAccelerationStructure = resource->desc.type == ResourceDesc::Type::AccelerationStructure;
+            const bool accelerationState = access.state == ResourceState::AccelStructRead
+                || access.state == ResourceState::AccelStructWrite
+                || access.state == ResourceState::AccelStructBuildBlas;
+            R_ASSERT4(isAccelerationStructure == accelerationState,
+                "framegraph acceleration structure access has an incompatible resource type or state",
+                pass->name.c_str(), resource->desc.debugName.c_str());
+            if (isAccelerationStructure)
+            {
+                R_ASSERT4(resource->desc.isImported && resource->nvrhiAccelStruct,
+                    "framegraph acceleration structures must be prepared and imported",
+                    pass->name.c_str(), resource->desc.debugName.c_str());
+                R_ASSERT4((access.state == ResourceState::AccelStructWrite) == access.IsWrite(),
+                    "framegraph acceleration structure build output requires a write access",
+                    pass->name.c_str(), resource->desc.debugName.c_str());
+                R_ASSERT4(access.state != ResourceState::AccelStructBuildBlas
+                        || !resource->desc.isTopLevelAccelerationStructure,
+                    "framegraph TLAS build input requires a bottom-level acceleration structure",
+                    pass->name.c_str(), resource->desc.debugName.c_str());
+                continue;
+            }
+            if (access.state == ResourceState::AccelStructBuildInput)
+            {
+                R_ASSERT4(isBuffer && resource->desc.isImported && access.IsRead(),
+                    "framegraph acceleration structure build inputs must be prepared imported buffers",
+                    pass->name.c_str(), resource->desc.debugName.c_str());
+            }
+
+            if (resource->desc.isImported) {
+                const auto* textureDesc = resource->nvrhiTexture ? &resource->nvrhiTexture->getDesc() : nullptr;
+                const auto* bufferDesc = resource->nvrhiBuffer ? &resource->nvrhiBuffer->getDesc() : nullptr;
+                bool satisfied = true;
+                switch (access.state) {
+                    case ResourceState::UnorderedAccess:
+                        satisfied = isBuffer
+                            ? bufferDesc && bufferDesc->canHaveUAVs
+                            : textureDesc && textureDesc->isUAV;
+                        break;
+                    case ResourceState::RenderTarget:
+                        satisfied = !isBuffer && textureDesc && textureDesc->isRenderTarget
+                            && !nvrhi::getFormatInfo(textureDesc->format).hasDepth
+                            && !nvrhi::getFormatInfo(textureDesc->format).hasStencil;
+                        break;
+                    case ResourceState::DepthStencilWrite:
+                    case ResourceState::DepthStencilRead:
+                        satisfied = !isBuffer && textureDesc && textureDesc->isRenderTarget
+                            && (nvrhi::getFormatInfo(textureDesc->format).hasDepth
+                                || nvrhi::getFormatInfo(textureDesc->format).hasStencil);
+                        break;
+                    case ResourceState::IndirectArgument:
+                        satisfied = isBuffer && bufferDesc && bufferDesc->isDrawIndirectArgs;
+                        break;
+                    case ResourceState::VertexBuffer:
+                        satisfied = isBuffer && bufferDesc && bufferDesc->isVertexBuffer;
+                        break;
+                    case ResourceState::IndexBuffer:
+                        satisfied = isBuffer && bufferDesc && bufferDesc->isIndexBuffer;
+                        break;
+                    case ResourceState::AccelStructBuildInput:
+                        satisfied = bufferDesc && bufferDesc->isAccelStructBuildInput;
+                        break;
+                    default:
+                        break;
+                }
+                R_ASSERT4(satisfied,
+                    "framegraph pass requests a state the imported resource was not created for",
+                    pass->name.c_str(),
+                    resource->desc.debugName.c_str());
+                continue;
+            }
+
+            switch (access.state) {
+                case ResourceState::UnorderedAccess:
+                    if (isBuffer)
+                        resource->desc.allowUAV = true;
+                    else
+                        resource->desc.isUAV = true;
+                    break;
+                case ResourceState::RenderTarget:
+                    resource->desc.isRenderTarget = true;
+                    break;
+                case ResourceState::DepthStencilWrite:
+                case ResourceState::DepthStencilRead:
+                case ResourceState::DepthStencilReadShaderResource:
+                    resource->desc.isDepthStencil = true;
+                    break;
+                case ResourceState::IndirectArgument:
+                    resource->desc.isIndirectArgs = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+void FrameGraph::ComputeResourceLifetimes() {
+    for (auto& resource : m_resources) {
+        resource.firstUsedPass = INVALID_INDEX;
+        resource.lastUsedPass = INVALID_INDEX;
+        resource.refCount = 0;
+    }
+
+    u32 nonCulledPasses = 0;
+    for (const PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+        nonCulledPasses++;
+
+        u32 passIndex = pass->executionOrder;
+
+        for (const auto& access : pass->resourceAccesses) {
+            if (!access.resource.is_valid()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) continue;
+
+            if (resource->firstUsedPass == INVALID_INDEX) {
+                resource->firstUsedPass = passIndex;
+            }
+
+            resource->lastUsedPass = passIndex;
+
+            resource->refCount++;
+        }
+    }
+
+    u32 unusedCount = 0;
+    for (const auto& resource : m_resources) {
+        if (resource.firstUsedPass == INVALID_INDEX) {
+            unusedCount++;
+        }
+    }
+
+    m_stats.numCulledResources = unusedCount;
+}
+
+void FrameGraph::BuildLifetimeLists() {
+    for (auto& pass : m_passes) {
+        pass.devirtualize.clear();
+        pass.destroy.clear();
+    }
+
+    for (auto& resource : m_resources) {
+        if (resource.desc.isImported || resource.firstUsedPass == INVALID_INDEX)
+            continue;
+
+        R_ASSERT(resource.firstUsedPass < m_passes.size());
+        R_ASSERT(resource.lastUsedPass < m_passes.size());
+        PassNode& first = m_passes[resource.firstUsedPass];
+        PassNode& last = m_passes[resource.lastUsedPass];
+        R_ASSERT(!first.culled && !last.culled);
+        R_ASSERT(first.queue != PassQueue::Compute && last.queue != PassQueue::Compute);
+        first.devirtualize.push_back(&resource);
+        last.destroy.push_back(&resource);
+    }
+}
+
+void FrameGraph::Destroy(ResourceNode& resource) {
+    R_ASSERT(!resource.desc.isImported);
+    if (resource.resourceTexture.IsValid()) {
+        m_resourcePool->FreeTexture(resource.resourceTexture);
+        resource.resourceTexture = {};
+    }
+    if (resource.resourceBuffer.IsValid()) {
+        m_resourcePool->FreeBuffer(resource.resourceBuffer);
+        resource.resourceBuffer = {};
+    }
+    resource.nvrhiTexture = nullptr;
+    resource.nvrhiBuffer = nullptr;
+    resource.nvrhiAccelStruct = nullptr;
+    resource.isAllocated = false;
+}
+
+void FrameGraph::Devirtualize(ResourceNode& resource) {
+    R_ASSERT(!resource.desc.isImported && !resource.isAllocated);
+    R_ASSERT2(resource.desc.type != ResourceDesc::Type::AccelerationStructure,
+        "framegraph acceleration structures must be prepared and imported");
+
+    if (resource.desc.type == ResourceDesc::Type::Buffer) {
+        if (m_resourcePool) {
+            resources::BufferDesc rmBufferDesc;
+            rmBufferDesc.type = resources::BufferType::Structured;
+            rmBufferDesc.usage = resources::BufferUsage::Static;
+            rmBufferDesc.size = resource.desc.bufferSize;
+            rmBufferDesc.stride = resource.desc.structStride;
+            rmBufferDesc.gpuWrite = resource.desc.allowUAV;
+            rmBufferDesc.indirectArgs = resource.desc.isIndirectArgs;
+            rmBufferDesc.cpuAccess = false;
+            rmBufferDesc.debugName = resource.desc.debugName;
+
+            resource.resourceBuffer = m_resourcePool->AllocateBuffer(rmBufferDesc);
+            if (resource.resourceBuffer.IsValid())
+                resource.nvrhiBuffer = m_resourceManager->GetBufferManager()->GetNVRHIBuffer(resource.resourceBuffer);
+        }
+
+        if (!resource.resourceBuffer.IsValid()) {
+            nvrhi::BufferDesc nvrhiDesc;
+            nvrhiDesc.byteSize = resource.desc.bufferSize;
+            nvrhiDesc.structStride = resource.desc.structStride;
+            nvrhiDesc.debugName = resource.desc.debugName.c_str();
+            nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+            nvrhiDesc.keepInitialState = true;
+            nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
+            nvrhiDesc.isDrawIndirectArgs = resource.desc.isIndirectArgs;
+            resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
+        }
+    } else {
+        if (m_resourcePool) {
+            resources::TextureDesc rmTexDesc;
+            rmTexDesc.width = resource.desc.width;
+            rmTexDesc.height = resource.desc.height;
+            rmTexDesc.depth = resource.desc.depth;
+            rmTexDesc.arraySize = resource.desc.arraySize;
+            rmTexDesc.mipLevels = resource.desc.mipLevels;
+            rmTexDesc.sampleCount = resource.desc.sampleCount;
+            rmTexDesc.format = resource.desc.format;
+            rmTexDesc.debugName = resource.desc.debugName;
+
+            switch (resource.desc.type) {
+                case ResourceDesc::Type::Texture2D:
+                    rmTexDesc.type = resources::TextureDesc::Texture2D;
+                    break;
+                case ResourceDesc::Type::Texture3D:
+                    rmTexDesc.type = resources::TextureDesc::Texture3D;
+                    break;
+                case ResourceDesc::Type::TextureCube:
+                    rmTexDesc.type = resources::TextureDesc::TextureCube;
+                    break;
+                case ResourceDesc::Type::Texture2DArray:
+                    rmTexDesc.type = resources::TextureDesc::Texture2DArray;
+                    break;
+                default:
+                    NODEFAULT;
+            }
+
+            rmTexDesc.isRenderTarget = resource.desc.isRenderTarget;
+            rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
+            rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+            resource.resourceTexture = m_resourcePool->AllocateTexture(rmTexDesc);
+            if (resource.resourceTexture.IsValid())
+                resource.nvrhiTexture = m_resourceManager->GetTextureManager()->GetNVRHITexture(resource.resourceTexture);
+        }
+
+        if (!resource.resourceTexture.IsValid())
+            resource.nvrhiTexture = CreateNativeTexture(resource.desc, resource.desc.debugName.c_str());
+    }
+
+    resource.isAllocated = resource.nvrhiTexture || resource.nvrhiBuffer;
+    R_ASSERT3(resource.isAllocated, "Failed to allocate framegraph resource", resource.desc.debugName.c_str());
+    m_stats.totalMemoryAllocated += resource.memorySize;
+}
+
+nvrhi::TextureHandle FrameGraph::CreateNativeTexture(const ResourceDesc& desc, const char* debugName) const {
+    nvrhi::TextureDesc nvrhiDesc;
+    nvrhiDesc.width = desc.width;
+    nvrhiDesc.height = desc.height;
+    nvrhiDesc.depth = desc.depth;
+    nvrhiDesc.arraySize = desc.arraySize;
+    nvrhiDesc.mipLevels = desc.mipLevels;
+    nvrhiDesc.sampleCount = desc.sampleCount;
+    nvrhiDesc.format = desc.format;
+    nvrhiDesc.debugName = debugName;
+    nvrhiDesc.keepInitialState = true;
+
+    switch (desc.type) {
+        case ResourceDesc::Type::Texture2D:
+            nvrhiDesc.dimension = desc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMS : nvrhi::TextureDimension::Texture2D;
+            break;
+        case ResourceDesc::Type::Texture3D:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+            break;
+        case ResourceDesc::Type::TextureCube:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+            break;
+        case ResourceDesc::Type::Texture2DArray:
+            nvrhiDesc.dimension = desc.sampleCount > 1
+                ? nvrhi::TextureDimension::Texture2DMSArray : nvrhi::TextureDimension::Texture2DArray;
+            break;
+        default:
+            NODEFAULT;
+    }
+
+    nvrhiDesc.isRenderTarget = desc.isRenderTarget;
+    nvrhiDesc.isUAV = desc.isUAV || desc.allowUAV;
+    nvrhiDesc.isShaderResource = true;
+    if (desc.isRenderTarget && !desc.isDepthStencil) {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+    } else if (desc.isDepthStencil) {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::DepthWrite;
+        nvrhiDesc.isRenderTarget = true;
+        nvrhiDesc.isTypeless = true;
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f);
+    } else {
+        nvrhiDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    }
+    return m_device->createTexture(nvrhiDesc);
+}
+
+namespace {
+
+bool HistoryDescsMatch(const ResourceDesc& a, const ResourceDesc& b)
+{
+    return a.type == b.type && a.width == b.width && a.height == b.height && a.depth == b.depth &&
+        a.arraySize == b.arraySize && a.mipLevels == b.mipLevels && a.sampleCount == b.sampleCount &&
+        a.format == b.format && a.isRenderTarget == b.isRenderTarget && a.isDepthStencil == b.isDepthStencil &&
+        (a.isUAV || a.allowUAV) == (b.isUAV || b.allowUAV);
+}
+
+}
+
+FrameGraph::HistoryTexture FrameGraph::ImportHistoryTexture(const char* name, const ResourceDesc& desc) {
+    R_ASSERT2(!m_compiled, "Cannot import history after compile");
+    R_ASSERT2(desc.type != ResourceDesc::Type::Buffer && desc.type != ResourceDesc::Type::AccelerationStructure,
+        "framegraph history requires a texture");
+
+    HistorySlot& slot = m_history[shared_str(name)];
+    if (!slot.textures[0] || !HistoryDescsMatch(slot.desc, desc)) {
+        slot.desc = desc;
+        slot.desc.isImported = true;
+        slot.desc.isTransient = false;
+        string128 textureName;
+        for (u32 i = 0; i < 2; ++i) {
+            xr_sprintf(textureName, "%s_%c", name, 'A' + i);
+            slot.textures[i] = CreateNativeTexture(slot.desc, textureName);
+            R_ASSERT3(slot.textures[i], "Failed to allocate framegraph history texture", name);
+        }
+        slot.current = 0;
+        slot.generation = m_generation;
+        slot.previousValid = false;
+    } else if (slot.generation != m_generation) {
+        slot.previousValid = slot.generation + 1 == m_generation;
+        slot.current ^= 1u;
+        slot.generation = m_generation;
+    }
+
+    HistoryTexture result;
+    ResourceDesc importDesc = slot.desc;
+    importDesc.debugName = name;
+    result.current = ImportTexture(name, slot.textures[slot.current], importDesc);
+    string128 previousName;
+    xr_sprintf(previousName, "%s_Prev", name);
+    importDesc.debugName = previousName;
+    result.previous = ImportTexture(previousName, slot.textures[slot.current ^ 1u], importDesc);
+    result.previousValid = slot.previousValid;
+    return result;
+}
+
+nvrhi::ITexture* FrameGraph::GetHistoryTexture(const char* name) const {
+    const auto it = m_history.find(shared_str(name));
+    return it != m_history.end() ? it->second.textures[it->second.current].Get() : nullptr;
+}
+
+void FrameGraph::InsertResourceBarriers() {
+    xr_map<u32, ResourceState> currentStates;
+
+    for (auto& resource : m_resources) {
+        currentStates[resource.handle.index] = ResourceState::Undefined;
+        resource.currentState = ResourceState::Undefined;
+    }
+
+    u32 totalBarriers = 0;
+
+    for (PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+
+        pass->barriersBeforePass.clear();
+
+        for (const auto& access : pass->resourceAccesses) {
+            if (!access.resource.is_valid()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) continue;
+
+            ResourceState currentState = currentStates[access.resource.index];
+            ResourceState requiredState = access.state;
+
+            if (currentState != requiredState && currentState != ResourceState::Undefined) {
+                pass->barriersBeforePass.push_back(
+                    ResourceBarrier(access.resource, currentState, requiredState)
+                );
+                totalBarriers++;
+            }
+
+            if (access.IsWrite()) {
+                currentStates[access.resource.index] = requiredState;
+                resource->currentState = requiredState;
+            }
+        }
+    }
+}
+
+nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {
+    switch (state) {
+        case ResourceState::Undefined:
+            return nvrhi::ResourceStates::Common;
+        case ResourceState::RenderTarget:
+            return nvrhi::ResourceStates::RenderTarget;
+        case ResourceState::DepthStencilWrite:
+            return nvrhi::ResourceStates::DepthWrite;
+        case ResourceState::DepthStencilRead:
+            return nvrhi::ResourceStates::DepthRead;
+        case ResourceState::DepthStencilReadShaderResource:
+            return nvrhi::ResourceStates::DepthRead | nvrhi::ResourceStates::ShaderResource;
+        case ResourceState::ShaderResource:
+            return nvrhi::ResourceStates::ShaderResource;
+        case ResourceState::UnorderedAccess:
+            return nvrhi::ResourceStates::UnorderedAccess;
+        case ResourceState::IndirectArgument:
+            return nvrhi::ResourceStates::IndirectArgument;
+        case ResourceState::VertexBuffer:
+            return nvrhi::ResourceStates::VertexBuffer;
+        case ResourceState::IndexBuffer:
+            return nvrhi::ResourceStates::IndexBuffer;
+        case ResourceState::CopySource:
+            return nvrhi::ResourceStates::CopySource;
+        case ResourceState::CopyDest:
+            return nvrhi::ResourceStates::CopyDest;
+        case ResourceState::Present:
+            return nvrhi::ResourceStates::Present;
+        case ResourceState::Common:
+            return nvrhi::ResourceStates::Common;
+        case ResourceState::AccelStructRead:
+            return nvrhi::ResourceStates::AccelStructRead;
+        case ResourceState::AccelStructWrite:
+            return nvrhi::ResourceStates::AccelStructWrite;
+        case ResourceState::AccelStructBuildInput:
+            return nvrhi::ResourceStates::AccelStructBuildInput;
+        case ResourceState::AccelStructBuildBlas:
+            return nvrhi::ResourceStates::AccelStructBuildBlas;
+        default:
+            return nvrhi::ResourceStates::Common;
+    }
+}
+
+}

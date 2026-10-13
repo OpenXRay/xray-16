@@ -1,0 +1,92 @@
+
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct VS_INPUT
+{
+    float4 position  : POSITION;
+    float4 normal    : NORMAL;
+    float4 tangent   : TANGENT;
+    float4 binormal  : BINORMAL;
+    float2 texcoord  : TEXCOORD0;
+    float2 texcoord1 : TEXCOORD1;
+    float4 color     : COLOR0;
+    uint drawIndex   : DRAWINDEX;
+    float3 exactNormal : EXACTNORMAL;
+};
+
+struct VS_OUTPUT
+{
+    precise float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal   : TEXCOORD2;
+    float3 tangent  : TEXCOORD3;
+    float3 bitangent: TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float fade : TEXCOORD6;
+    float skyVisibility : TEXCOORD7;
+};
+
+struct InstanceData
+{
+    float4x4 world;
+    uint materialID;
+    uint flags;
+    float hemiScale;
+    float hemiBias;
+};
+
+StructuredBuffer<InstanceData> g_InstanceData : register(t14);
+
+float3 UnpackNormal(float4 packed)
+{
+    return packed.rgb * 2.0 - 1.0;
+}
+
+VS_OUTPUT main(VS_INPUT input)
+{
+    VS_OUTPUT output;
+
+    InstanceData instanceData = g_InstanceData[input.drawIndex];
+    float4x4 worldMatrix = instanceData.world;
+    uint materialID = instanceData.materialID;
+
+    float3 normalUnpacked = (instanceData.flags & 4u) != 0u
+        ? UnpackNormal(input.normal) : input.exactNormal;
+    float3 tangentUnpacked = UnpackNormal(input.tangent);
+    float3 binormalUnpacked = UnpackNormal(input.binormal);
+
+    float4 worldPos = mul(worldMatrix, float4(input.position.xyz, 1.0));
+    output.worldPos = worldPos.xyz;
+    float3 clipPos = worldPos.xyz;
+    if (g_Materials[materialID].flags & MAT_FLAG_ALPHA_BLEND)
+        clipPos += (eye_position - clipPos) * 0.002;
+    output.position = mul(m_VP, float4(clipPos, 1.0));
+
+    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
+    output.normal = normalize(mul(worldMatrix3x3, normalUnpacked));
+    output.tangent = normalize(mul(worldMatrix3x3, tangentUnpacked));
+    output.bitangent = normalize(mul(worldMatrix3x3, binormalUnpacked));
+
+    output.texcoord = input.texcoord;
+
+    output.materialID = materialID;
+
+    VariantData variant = g_Variants[g_Materials[materialID].shaderVariant];
+    uint fadeMode = VariantFadeMode(variant);
+    float fade = 1.0;
+    if (fadeMode != VARIANT_FADE_NONE)
+    {
+        float3 dirV = normalize(mul(m_V, float4(worldPos.xyz, 1.0)).xyz);
+        float3 normV = normalize(mul((float3x3)m_V, output.normal));
+        float facing = abs(dot(dirV, normV));
+        fade = variant.fadeScale * (fadeMode == VARIANT_FADE_EDGE ? 1.0 - facing : facing);
+    }
+    output.fade = fade;
+    output.skyVisibility = (instanceData.flags & 8u) != 0u && sky_ibl.z < 0.5
+        ? saturate(input.normal.a * instanceData.hemiScale + instanceData.hemiBias) : -1.0;
+
+    return output;
+}

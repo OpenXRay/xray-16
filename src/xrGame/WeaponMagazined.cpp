@@ -620,6 +620,13 @@ void CWeaponMagazined::state_MagEmpty(float dt) {}
 void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
+    if (GEnv.Render && GEnv.Render->IsEnabled() && IsGameTypeSingle())
+    {
+        auto* actor = smart_cast<CActor*>(H_Parent());
+        if (actor && actor->inventory().ActiveItem() == this)
+            GEnv.Render->NotifySmokeShot();
+    }
+
     // Sound
     //Alundaio: LAYERED_SND_SHOOT
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);

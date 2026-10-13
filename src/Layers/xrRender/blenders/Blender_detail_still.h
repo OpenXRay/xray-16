@@ -1,14 +1,11 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_Detail_Still : public IBlender
 {
+public:
     xrP_BOOL oBlend;
-
-private:
-    void CompileFFP(CBlender_Compile& C) const;
-    void CompileProgrammable(CBlender_Compile& C) const;
 
 public:
     CBlender_Detail_Still();
@@ -17,7 +14,5 @@ public:
     LPCSTR getComment() override;
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

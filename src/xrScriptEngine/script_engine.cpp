@@ -730,7 +730,10 @@ void CScriptEngine::setup_callbacks()
         luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
 
-        luabind::set_pcall_callback([](lua_State* L) { lua_pushcfunction(L, CScriptEngine::lua_pcall_failed); });
+        luabind::set_pcall_callback([](lua_State* L)
+        {
+            xray::script_engine::push_persistent_cfunction<CScriptEngine::lua_pcall_failed>(L);
+        });
     }
 #if !XRAY_EXCEPTIONS
     luabind::set_cast_failed_callback(CScriptEngine::lua_cast_failed);
@@ -931,8 +934,6 @@ void CScriptEngine::init(export_func exporter, bool loadGlobalNamespace)
 #endif
 
     luaopen_xrluafix(lua());
-
-    tracy::LuaRegister(lua());
 
     // Game scripts doesn't call randomize but use random
     // So, we should randomize in the engine.

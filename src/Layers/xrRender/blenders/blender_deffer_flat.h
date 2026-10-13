@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_deffer_flat : public IBlender
 {
@@ -11,7 +11,6 @@ public:
     virtual BOOL canUseSteepParallax() { return TRUE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
-    virtual void Compile(CBlender_Compile& C);
 
     CBlender_deffer_flat();
     virtual ~CBlender_deffer_flat();
@@ -19,4 +18,4 @@ public:
 private:
     xrP_TOKEN oTessellation;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

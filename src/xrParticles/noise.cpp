@@ -41,46 +41,57 @@ static float g[B + B + 2][3];
 //--------------------------------------------------------------------
 void noise3Init()
 {
-    int i, j, k;
-    float v[3], s;
-    int rnd;
+    static const bool initialized = [] {
+        int i, j, k;
+        float v[3], s;
+        int rnd;
 
-    srand(1);
+        srand(1);
 
-    for (i = 0; i < B; i++)
-    {
-        do
+        for (i = 0; i < B; i++)
         {
-            for (j = 0; j < 3; j++)
+            do
             {
-                rnd = rand();
-                v[j] = float((rnd % (B + B)) - B) / B;
+                for (j = 0; j < 3; j++)
+                {
+                    rnd = rand();
+                    v[j] = float((rnd % (B + B)) - B) / B;
+                }
+                s = DOT(v, v);
             }
-            s = DOT(v, v);
+            while (s > 1.0);
+            s = _sqrt(s);
+            for (j = 0; j < 3; j++)
+                g[i][j] = v[j] / s;
         }
-        while (s > 1.0);
-        s = _sqrt(s);
-        for (j = 0; j < 3; j++)
-            g[i][j] = v[j] / s;
-    }
 
-    for (i = 0; i < B; i++)
-        p[i] = i;
+        for (i = 0; i < B; i++)
+            p[i] = i;
 
-    for (i = B; i > 0; i -= 2)
-    {
-        rnd = rand();
-        k = p[i];
-        p[i] = p[(j = rnd % B)];
-        p[j] = k;
-    }
+        for (i = B; i > 0; i -= 2)
+        {
+            rnd = rand();
+            k = p[i];
+            p[i] = p[(j = rnd % B)];
+            p[j] = k;
+        }
 
-    for (i = 0; i < B + 2; i++)
-    {
-        p[B + i] = p[i];
-        for (j = 0; j < 3; j++)
-            g[B + i][j] = g[i][j];
-    }
+        for (i = 0; i < B + 2; i++)
+        {
+            p[B + i] = p[i];
+            for (j = 0; j < 3; j++)
+                g[B + i][j] = g[i][j];
+        }
+        return true;
+    }();
+    (void)initialized;
+}
+
+void PAPI::GetNoise3Tables(int* permutation, float* gradients)
+{
+    noise3Init();
+    std::memcpy(permutation, p, sizeof(p));
+    std::memcpy(gradients, g, sizeof(g));
 }
 
 //--------------------------------------------------------------------

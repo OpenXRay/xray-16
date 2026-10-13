@@ -19,25 +19,10 @@
 
 void CEnvironment::RenderSky()
 {
-#ifndef _EDITOR
-    if (0 == g_pGameLevel)
-        return;
-#endif
-
-    m_pRender->RenderSky(*this);
 }
 
 void CEnvironment::RenderClouds()
 {
-#ifndef _EDITOR
-    if (0 == g_pGameLevel)
-        return;
-#endif
-    // draw clouds
-    if (fis_zero(CurrentEnv.clouds_color.w, EPS_L))
-        return;
-
-    m_pRender->RenderClouds(*this);
 }
 
 void CEnvironment::RenderFlares()
@@ -63,8 +48,6 @@ void CEnvironment::RenderLast()
 
 void CEnvironment::OnDeviceCreate()
 {
-    m_pRender->OnDeviceCreate();
-
     // weathers
     for (auto& cycle : WeatherCycles)
     {
@@ -85,8 +68,6 @@ void CEnvironment::OnDeviceCreate()
 
 void CEnvironment::OnDeviceDestroy()
 {
-    m_pRender->OnDeviceDestroy();
-
     // weathers
     for (auto& cycle : WeatherCycles)
     {

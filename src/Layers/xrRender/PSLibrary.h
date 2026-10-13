@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/particles_systems_library_interface.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace PS
 {
@@ -30,6 +30,7 @@ public:
 
 public:
     bool Load(LPCSTR nm);
+    bool Load(IReader& reader);
     bool Save(LPCSTR nm);
 
     bool Load2();
@@ -66,6 +67,8 @@ public:
     virtual shared_str const& particles_group_id(PS::CPGDef const& particles_group) const;
 };
 
+extern ECORE_API CPSLibrary* g_pPSLibrary;
+
 #define PS_LIB_SIGN "PS_LIB"
 
 #define PS_VERSION 0x0001
@@ -74,4 +77,4 @@ public:
 #define PS_CHUNK_FIRSTGEN 0x0002
 #define PS_CHUNK_SECONDGEN 0x0003
 #define PS_CHUNK_THIRDGEN 0x0004
-} // namespace xray::render::RENDER_NAMESPACE
+}

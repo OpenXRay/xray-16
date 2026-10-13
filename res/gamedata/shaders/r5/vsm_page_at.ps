@@ -1,0 +1,25 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+#include "material_coverage.h"
+#include "common_dither.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#endif
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+    MaterialData mat = g_Materials[input.materialID];
+    if (!MaterialHasAlphaCoverage(mat))
+        return;
+    float alpha = MaterialRasterShadowAlpha(mat, input.texcoord);
+    clip(MaterialAlphaTestClip(mat, alpha));
+    clip(MaterialAlphaBlendClip(mat, alpha, Bayer4x4Threshold(uint2(input.position.xy))));
+}

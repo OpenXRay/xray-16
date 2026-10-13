@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #pragma hdrstop
-#include "ResourceManager.h"
-#include "R_DStreams.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/R_DStreams.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -11,12 +11,6 @@ namespace xray::render::RENDER_NAMESPACE
 
 int rsDVB_Size = 4096; //Fixed: (bytes_need<=mSize) && vl_Count
 int rsDIB_Size = 512;
-
-#ifdef XR_PLATFORM_WEB
-constexpr bool DiscardOnEveryLock = true;
-#else
-constexpr bool DiscardOnEveryLock = false;
-#endif
 
 void _VertexStream::Create()
 {
@@ -36,13 +30,13 @@ void _VertexStream::Create()
 void _VertexStream::Destroy()
 {
     pVB.Release();
+    old_pVB = nullptr;
     _clear();
 }
 
 void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
 {
 #ifdef DEBUG
-    PGO(Msg("PGO:VB_LOCK:%d", vl_Count));
     VERIFY(0 == dbg_lock);
     dbg_lock++;
 #endif
@@ -58,7 +52,7 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
 
     // Check if there is need to flush and perform lock
     bool bFlush = false;
-    if (DiscardOnEveryLock || (vl_Count + vl_mPosition) >= vl_mSize)
+    if ((vl_Count + vl_mPosition) >= vl_mSize)
     {
         // FLUSH-LOCK
         mPosition = 0;
@@ -80,17 +74,12 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
 void _VertexStream::Unlock(u32 Count, u32 Stride)
 {
 #ifdef DEBUG
-    PGO(Msg("PGO:VB_UNLOCK:%d", Count));
     VERIFY(1 == dbg_lock);
     dbg_lock--;
 #endif
     mPosition += Count * Stride;
 
-#ifdef XR_PLATFORM_WEB
-    pVB.Unmap(Count * Stride);
-#else
     pVB.Unmap();
-#endif
 }
 
 void _VertexStream::reset_begin()
@@ -122,12 +111,12 @@ void _IndexStream::Create()
 void _IndexStream::Destroy()
 {
     pIB.Release();
+    old_pIB = nullptr;
     _clear();
 }
 
 u16* _IndexStream::Lock(u32 Count, u32& vOffset)
 {
-    PGO(Msg("PGO:IB_LOCK:%d", Count));
     vOffset = 0;
 
     // Ensure there is enough space in the VB for this data
@@ -153,13 +142,8 @@ u16* _IndexStream::Lock(u32 Count, u32& vOffset)
 
 void _IndexStream::Unlock(u32 RealCount)
 {
-    PGO(Msg("PGO:IB_UNLOCK:%d", RealCount));
     mPosition += RealCount;
-#ifdef XR_PLATFORM_WEB
-    pIB.Unmap(RealCount * sizeof(u16));
-#else
     pIB.Unmap();
-#endif
 }
 
 void _IndexStream::reset_begin()
@@ -172,4 +156,4 @@ void _IndexStream::reset_end()
     Create();
     //old_pIB = NULL;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

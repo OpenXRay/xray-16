@@ -1,0 +1,141 @@
+#pragma once
+
+#include <nvrhi/nvrhi.h>
+#include <array>
+#include "xrCore/xrCore.h"
+#include "Layers/xrRender/ResourceManager/ResourceHandle.h"
+
+namespace xray::render::fg { class RenderDevice; }
+
+namespace xray::render::fg
+{
+class light;
+class light_Package;
+
+struct GPULightData {
+    Fvector4 positionAndInvRangeSq;
+    Fvector4 colorAndRange;
+    Fvector4 directionAndSpotScale;
+    Fvector4 spotParamsAndType;
+    Fmatrix  spotVP;
+    Fvector4 areaRightAndRadius;
+    Fvector4 areaLength;
+    u32      areaShadowSlots0[4];
+    u32      areaShadowSlots1[4];
+};
+static_assert(sizeof(GPULightData) == 192, "GPULightData must be 192 bytes");
+
+struct alignas(16) ClusterCB {
+    Fvector4 gridDims;
+    Fvector4 screenSize;
+    Fvector4 depthParams;
+    Fvector4 pad;
+};
+static_assert(sizeof(ClusterCB) == 64, "ClusterCB must be 64 bytes");
+
+struct alignas(16) LightHiZCullCB {
+    Fmatrix  prevViewProj;
+    Fmatrix  curViewProj;
+    Fvector4 cameraPos;
+    u32      numLights;
+    u32      hizWidth;
+    u32      hizHeight;
+    u32      hizMipLevels;
+};
+static_assert(sizeof(LightHiZCullCB) == 160, "LightHiZCullCB must be 160 bytes");
+
+static constexpr u32 CLUSTER_TILE_SIZE = 64;
+static constexpr u32 CLUSTER_NUM_SLICES = 24;
+static constexpr u32 INITIAL_LIGHT_CAPACITY = 1024;
+static constexpr u32 MAX_LIGHT_INDICES = 1024 * 1024;
+static constexpr u64 INVALID_LIGHT_ID = 0;
+static constexpr u32 INVALID_LIGHT_INDEX = UINT32_MAX;
+
+class ClusteredLightManager {
+public:
+    static ClusteredLightManager& Instance();
+
+    void Initialize(fg::RenderDevice* device);
+    void Shutdown();
+    void ReleaseSpotTextures();
+    void BeginFrame(bool rayTracingLighting = false);
+    void CollectLight(const light* L);
+    void CollectLightsParallel(const xr_vector<const light*>& lights, const xr_vector<u32>& shadowSlots);
+    void BuildLightBuffer(const light_Package& package);
+    void Upload(nvrhi::ICommandList* cmdList);
+    void UploadAllVisible(nvrhi::ICommandList* cmdList);
+
+    nvrhi::IBuffer* GetLightDataBuffer() const { return m_lightDataBuffer; }
+    nvrhi::IBuffer* GetClusterGridBuffer() const { return m_clusterGridBuffer; }
+    nvrhi::IBuffer* GetLightIndexListBuffer() const { return m_lightIndexListBuffer; }
+    nvrhi::IBuffer* GetLightIndexCounterBuffer() const { return m_lightIndexCounterBuffer; }
+    nvrhi::IBuffer* GetVisibleLightIndicesBuffer() const { return m_visibleLightIndicesBuffer; }
+    nvrhi::IBuffer* GetVisibleLightCountBuffer() const { return m_visibleLightCountBuffer; }
+
+    u32 GetLightCount() const { return m_numLights; }
+    u32 GetPointCount() const { return m_numPoint; }
+    u32 GetSpotCount() const { return m_numSpot; }
+    u32 GetOmniCount() const { return m_numOmni; }
+    u32 GetTilesX() const { return m_tilesX; }
+    u32 GetTilesY() const { return m_tilesY; }
+    u64 GetTransportSignature() const;
+
+    u64 GetLightID(u32 index) const;
+    u32 FindLightIndex(u64 id) const;
+    const xr_vector<u64>& GetLightIDs() const { return m_lightIDs; }
+    const xr_vector<GPULightData>& GetLightDataCPU() const { return m_lightsCPU; }
+    const xr_map<shared_str, u32>& GetSpotTextureIndices() const { return m_spotTextureCache; }
+
+    ClusterCB BuildClusterCB(u32 screenWidth, u32 screenHeight, float zNear, float zFar) const;
+
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
+    void ProcessStatsReadback();
+    u32 GetVisibleLightCount() const { return m_visibleLightCountCPU; }
+    const xr_vector<const light*>& GetCulledLights() const { return m_culledLights; }
+    bool HasVisibilityStats() const { return m_statsScheduled >= STATS_READBACK_SLOTS; }
+
+    bool IsReady() const { return m_lightDataBuffer != nullptr; }
+
+private:
+    void EnsureLightCapacity(u32 count);
+    void AddLight(const light* L, u32 type);
+    GPULightData BuildGPULightData(const light* L, u32 shadowSlot, u32 spotTexture, bool withAreaShadows) const;
+    u32 GetOrLoadSpotTexture(const shared_str& name);
+    u32 ResolveSpotTexture(const light* L);
+
+    nvrhi::DeviceHandle m_device;
+
+    xr_vector<GPULightData> m_lightsCPU;
+    xr_vector<u64> m_lightIDs;
+    xr_vector<u32> m_identityIndices;
+    u32 m_lightCapacity = 0;
+    bool m_rayTracingLighting = false;
+    xr_map<shared_str, u32> m_spotTextureCache;
+    xr_vector<resources::TextureHandle> m_spotTextureHandles;
+    xr_vector<u32> m_spotTextureIndices;
+    xr_vector<u32> m_spotTextureScratch;
+    u32 m_numLights = 0;
+    u32 m_numPoint = 0;
+    u32 m_numSpot = 0;
+    u32 m_numOmni = 0;
+
+    nvrhi::BufferHandle m_lightDataBuffer;
+    nvrhi::BufferHandle m_clusterGridBuffer;
+    nvrhi::BufferHandle m_lightIndexListBuffer;
+    nvrhi::BufferHandle m_lightIndexCounterBuffer;
+    nvrhi::BufferHandle m_visibleLightIndicesBuffer;
+    nvrhi::BufferHandle m_visibleLightCountBuffer;
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
+    u32 m_statsWriteSlot = 0;
+    u32 m_statsScheduled = 0;
+    u32 m_visibleLightCountCPU = 0;
+    xr_vector<const light*> m_lightsThisFrame;
+    xr_vector<const light*> m_lightSnapshots[STATS_READBACK_SLOTS];
+    xr_vector<const light*> m_culledLights;
+
+    u32 m_tilesX = 0;
+    u32 m_tilesY = 0;
+};
+
+}

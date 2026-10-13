@@ -1,0 +1,3714 @@
+#include "stdafx.h"
+#include "r_FrameGraphRenderer.h"
+#include "xrEngine/IRenderable.h"
+#include "Layers/xrRender/DetailModel.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "xrCore/FMesh.hpp"
+#include "FHierrarhyVisual.h"
+#include "SkeletonAnimated.h"
+#include "FVisual.h"
+#include "FProgressive.h"
+#include "FSkinned.h"
+#include "FLOD.h"
+#include "FTreeVisual.h"
+#include "ParticleGroup.h"
+#include "ParticleEffect.h"
+#include "ParticleEffectDef.h"
+#include "GpuParticleManager.h"
+#include "ParticleEditor/ParticleEditor.h"
+#include "Shader.h"
+#include "r__scene.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
+#include "Layers/xrRender/fgUIRender.h"
+#include "xrEngine/CustomHUD.h"
+#include "ImGuiRendererNVRHI.h"
+#include "xrEngine/device.h"
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
+#include <imgui.h>
+
+#include "FrameGraphPasses/DebugDrawPassSetup.h"
+#include "FGDebugDraw.h"
+#include "FrameGraphPasses/HiZBuildPassSetup.h"
+#include "FrameGraphPasses/VisibilityPassSetup.h"
+#include "FrameGraphPasses/MaterialResolvePassSetup.h"
+#include "GPUCullingManager.h"
+#include "FGDetailManager.h"
+#include "FrameGraphPasses/DetailCullPassSetup.h"
+#include "FrameGraphPasses/DetailResolvePassSetup.h"
+#include "FrameGraphPasses/TransparentPassSetup.h"
+#include "FrameGraphPasses/DeferredLightPassSetup.h"
+#include "Bindless/MaterialBuffer.h"
+#include "Bindless/TerrainMaterialBuffer.h"
+#include "Bindless/VariantTextureBuffer.h"
+#include "Bindless/VariantBuffer.h"
+#include "FrameGraphPasses/SkyPassSetup.h"
+#include "FrameGraphPasses/SunPassSetup.h"
+#include "FrameGraphPasses/ParticlePassSetup.h"
+#include "FrameGraphPasses/GpuParticlePassSetup.h"
+#include "FrameGraphPasses/DistortionApplyPassSetup.h"
+#include "FrameGraphPasses/DecalPassSetup.h"
+#include "Decals/DecalManager.h"
+#include "Decals/OverlayManager.h"
+#include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/FontPassSetup.h"
+#include "FrameGraphPasses/DisplayPassSetup.h"
+#include "FrameGraphPasses/BloomPassSetup.h"
+#include "FrameGraphPasses/SmokeTrailPassSetup.h"
+#include "FrameGraphPasses/ClusterLightPassSetup.h"
+#include "ClusteredLightManager.h"
+#include "light.h"
+#include "FrameGraphPasses/MotionVectorPassSetup.h"
+#include "FrameGraphPasses/ReSTIRGIPassSetup.h"
+#include "FrameGraphPasses/WorldCachePassSetup.h"
+#include "FrameGraphPasses/RibbonPassSetup.h"
+#include "FrameGraphPasses/TrailPassSetup.h"
+#include "Layers/xrRender/FrameGraph/Blackboard.h"
+#include "FrameGraphPasses/ImGuiPassSetup.h"
+#include "FrameGraphPasses/RainPassSetup.h"
+#include "FrameGraphPasses/ThunderboltPassSetup.h"
+#include "FrameGraphPasses/LensFlarePassSetup.h"
+#include "FrameGraphPasses/PathTracerPassSetup.h"
+#include "FrameGraphPasses/RTEnvironmentSamplingPassSetup.h"
+#include "FrameGraphPasses/SkyEnvironmentPassSetup.h"
+#include "FrameGraphPasses/SkyVisibilityPassSetup.h"
+#include "Layers/xrRender/fgRainRender.h"
+#include "Layers/xrRender/fgThunderboltRender.h"
+#include "Layers/xrRender/fgLensFlareRender.h"
+#include "Layers/xrRender/fgEnvironmentRender.h"
+#include "xrEngine/Environment.h"
+#include "xrEngine/Rain.h"
+#include "xrEngine/thunderbolt.h"
+#include "xrEngine/xr_efflensflare.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "RayTracing/RTAccelStructManager.h"
+#include "RayTracing/WorldRadianceCache.h"
+#include "RayTracing/SkyVisibilityGrid.h"
+#include "SkyEnvironment.h"
+#include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "FrameGraphPasses/ShaderConstants.h"
+#include "FrameGraphPasses/VSMPassSetup.h"
+
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrParticles/psystem.h"
+#include "Layers/xrRender/blenders/Blender_Particle.h"
+
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/Light_DB.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/fgUIShader.h"
+#include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/Decals/fgWallMarkArray.h"
+#include "Layers/xrRender/Decals/MeshPicker.h"
+#include "xrEngine/IGameFont.hpp"
+#include "xrEngine/IPerformanceAlert.hpp"
+#include "xrCore/PostProcess/PPInfo.hpp"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
+
+namespace xray::render::fg { xray::render::FrameGraphRenderer RImplementation; }
+
+namespace xray::render
+{
+static constexpr u32 FRAME_GLOBALS_CB_VERSIONS = 128;
+
+fg::IRender_DetailModel* FrameGraphRenderer::model_CreateDM(IReader* F)
+{
+    fg::CDetail* D = xr_new<fg::CDetail>();
+    D->Load(F);
+    return D;
+}
+
+void FrameGraphRenderer::model_Delete(fg::IRender_DetailModel*& F)
+{
+    if (F)
+    {
+        fg::CDetail* D = (fg::CDetail*)F;
+        D->Unload();
+        xr_delete(D);
+        F = nullptr;
+    }
+}
+
+void FrameGraphRenderer::CreateQuadIB()
+{
+    constexpr auto triCount = 4 * 1024;
+    constexpr auto idxCount = triCount * 2 * 3;
+    constexpr auto idxSize = idxCount * sizeof(u16);
+
+    QuadIB.Create(idxSize, false, false);
+
+    u16* Indices = static_cast<u16*>(QuadIB.Map());
+    int Cnt = 0;
+    int ICnt = 0;
+    for (int i = 0; i < triCount; i++)
+    {
+        Indices[ICnt++] = u16(Cnt + 0);
+        Indices[ICnt++] = u16(Cnt + 1);
+        Indices[ICnt++] = u16(Cnt + 2);
+        Indices[ICnt++] = u16(Cnt + 3);
+        Indices[ICnt++] = u16(Cnt + 2);
+        Indices[ICnt++] = u16(Cnt + 1);
+        Cnt += 4;
+    }
+    QuadIB.Unmap(true);
+}
+}
+namespace xray::render { void InitializeImGuiRenderer(fg::RenderDevice* renderDevice); void ShutdownImGuiRenderer(); }
+
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_rt_gi_restir;
+extern ENGINE_API float ps_r_rt_gi_intensity;
+extern ENGINE_API int ps_r_rt_gi_bounces;
+extern ENGINE_API int ps_r_rt_light_rays;
+extern ENGINE_API int ps_r_rt_gi_samples;
+extern ENGINE_API float ps_r_rt_gi_ray_distance;
+extern ENGINE_API float ps_r_rt_scene_radius;
+extern ENGINE_API float ps_r_rt_grass_radius;
+extern ENGINE_API int ps_profile_dump;
+extern ENGINE_API int ps_r_path_tracer_bounces;
+extern ENGINE_API int ps_r_path_tracer_debug;
+extern ENGINE_API int ps_r_path_tracer_freeze;
+extern ENGINE_API int ps_r_path_tracer_samples;
+extern ENGINE_API int ps_r_rt_max_null_events;
+extern ENGINE_API float ps_r_rt_sun_radius;
+
+namespace xray::render {
+
+using namespace fg;
+
+static void ApplyRTLightingSettings(fg::LightingFrameState& lighting)
+{
+    lighting.reuseRequested = ps_r_rt_gi_restir != 0;
+    lighting.reuseAvailable = false;
+    lighting.reuseReservoirs = false;
+    lighting.rtgiBounces = static_cast<u32>(std::clamp(ps_r_rt_gi_bounces, 1, 16));
+    lighting.rtgiSamples = static_cast<u32>(std::clamp(ps_r_rt_gi_samples, 1, 8));
+    lighting.rtgiRayDistance = std::clamp(ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
+    lighting.raySceneRadius = std::clamp(ps_r_rt_scene_radius, 1.0f, 10000.0f);
+    lighting.rayGrassRadius = std::clamp(ps_r_rt_grass_radius, 0.0f, 256.0f);
+    lighting.reconstructionRequested = ps_r_rt_gi_reconstruct != 0;
+    lighting.reconstructionSpatialRequested = ps_r_rt_gi_reconstruct >= 2;
+    lighting.reconstructionHistory = static_cast<u32>(std::clamp(ps_r_rt_gi_history, 1, 64));
+    lighting.reconstructionFilterPasses = static_cast<u32>(std::clamp(ps_r_rt_gi_filter_passes, 1, 6));
+}
+
+static u8 QueryParticleBlendMode(LPCSTR shaderName)
+{
+    u32 id = 0;
+    if (!shader_info::GetParticleBlendIndex(shaderName, id))
+        return passes::PARTICLE_BLEND_BLEND;
+    return (id < passes::PARTICLE_BLEND_COUNT) ? (u8)id : passes::PARTICLE_BLEND_BLEND;
+}
+
+static bool RangesShadeWithShadows(const xr_vector<TransparentDrawRange>* ranges)
+{
+    if (!ranges)
+        return false;
+    for (const auto& range : *ranges)
+    {
+        if (range.count == 0)
+            continue;
+        if (range.key & (TRANSPARENT_KEY_WMARK | TRANSPARENT_KEY_NO_COLOR | TRANSPARENT_KEY_UNLIT))
+            continue;
+        return true;
+    }
+    return false;
+}
+
+static bool ForwardGeometryShadesWithShadows(const passes::TransparentPassConfig& config)
+{
+    if (config.HasRigid() && RangesShadeWithShadows(config.ranges))
+        return true;
+    return config.skinned && config.gpuCulling && config.gpuCulling->GetSkinnedForwardCount() > 0
+        && RangesShadeWithShadows(&config.gpuCulling->GetSkinnedForwardRanges());
+}
+
+namespace fg {
+    extern xray::render::FrameGraphRenderer RImplementation;
+}
+
+FrameGraphRenderer::FrameGraphRenderer() {
+    // Msg("* [FrameGraphRenderer] Created");
+}
+
+FrameGraphRenderer::~FrameGraphRenderer() {
+    Shutdown();
+}
+
+bool FrameGraphRenderer::Initialize(fg::RenderDevice* device) {
+    VERIFY(device != nullptr);
+    m_device = device;
+    m_lightingState.ResetRecovery();
+
+    Msg("* [FrameGraphRenderer] Initializing...");
+
+    m_shaderLoader = xr_new<framegraph::ShaderLoader>(device->GetSlangCompiler());
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Vulkan)
+        m_shaderLoader->SetTarget(SlangCompiler::Target::SPIRV);
+    else if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::Metal)
+        m_shaderLoader->SetTarget(SlangCompiler::Target::Metal);
+    else
+        m_shaderLoader->SetTarget(SlangCompiler::Target::DXIL);
+    Msg("* [FrameGraphRenderer] ShaderLoader initialized (target: %s)",
+        SlangCompiler::GetTargetName(m_shaderLoader->GetTarget()));
+
+    m_framegraph = xr_make_unique<framegraph::FrameGraph>(device);
+    m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_geometryVCBPool.get()
+    );
+    m_uiVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_uiMaterialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_uiVCBPool.get()
+    );
+    m_uiRender = xr_make_unique<fg::FGUIRender>();
+    m_geometryCollector = xr_make_unique<GeometryCollector>();
+    g_geometryCollector = m_geometryCollector.get();
+
+
+    m_gpuCullingManager = xr_make_unique<fg::GPUCullingManager>();
+    m_detailManager = xr_make_unique<fg::FGDetailManager>();
+    m_decalManager = xr_make_unique<fg::decals::DecalManager>();
+    m_overlayManager = xr_make_unique<fg::decals::OverlayManager>();
+    m_rtAccelMgr = xr_make_unique<fg::RTAccelStructManager>();
+    m_worldCache = xr_make_unique<fg::WorldRadianceCache>();
+    m_skyEnvironment = xr_make_unique<fg::SkyEnvironment>();
+    m_skyVisibility = xr_make_unique<fg::SkyVisibilityGrid>();
+    m_smokeTrailManager = xr_make_unique<fg::passes::SmokeTrailManager>();
+
+
+    bindless::MaterialBuffer::Instance().Initialize(m_device);
+    bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
+    bindless::VariantTextureBuffer::Instance().Initialize(m_device);
+    bindless::VariantBuffer::Instance().Initialize(m_device);
+    bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
+    fg::ClusteredLightManager::Instance().Initialize(m_device);
+    Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
+
+    m_uiRender->Initialize(device, m_uiMaterialCache.get());
+    m_decalManager->Initialize(device);
+    m_overlayManager->Initialize(device);
+    m_rtAccelMgr->Initialize(device);
+    m_worldCache->Initialize(device);
+    m_skyEnvironment->Initialize(device);
+    m_skyVisibility->Initialize(device);
+    m_smokeTrailManager->Initialize(device);
+
+    m_renderContext.reset(device->CreateContext());
+    if (!m_renderContext)
+    {
+        Msg("! [FrameGraphRenderer] Failed to create RenderContext");
+        return false;
+    }
+
+    m_blackboard = xr_make_unique<framegraph::Blackboard>();
+    m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
+    m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    m_particleEditor = xr_make_unique<fg::ParticleEditor>();
+
+    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
+    m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
+
+    Msg("* [FrameGraphRenderer] Profiler initialized");
+
+    {
+        nvrhi::TextureDesc previewDesc;
+        previewDesc.debugName = "InspectorPreview";
+        previewDesc.width = 512;
+        previewDesc.height = 512;
+        previewDesc.format = nvrhi::Format::RGBA16_FLOAT;
+        previewDesc.isUAV = true;
+        previewDesc.isRenderTarget = false;
+        previewDesc.keepInitialState = true;
+        previewDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        m_inspectorPreview = device->GetNVRHIDevice()->createTexture(previewDesc);
+    }
+
+    m_PSLibrary.OnCreate();
+    m_HWOCC.occq_create(occq_size);
+
+    Msg("* [FrameGraphRenderer] initialized");
+
+    return true;
+}
+
+void FrameGraphRenderer::Shutdown() {
+    if (!m_device) return;
+    m_lightingState.ResetRecovery();
+
+    Msg("* [FrameGraphRenderer] Shutting down");
+    if (auto* backend = m_device->GetBackend())
+        backend->WaitForIdle();
+    if (auto* resourceManager = m_device->GetFGResourceManager())
+        m_postProcess.ReleaseTextures(resourceManager->GetTextureManager());
+
+    m_particleEditor = nullptr;
+    GetGpuParticleManager().Reset();
+    m_HWOCC.occq_destroy();
+    m_PSLibrary.OnDestroy();
+
+    if (m_shaderLoader) {
+        xr_delete(m_shaderLoader);
+        Msg("* [FrameGraphRenderer] ShaderLoader destroyed");
+    }
+
+    g_geometryCollector = nullptr;
+    m_statsOverlay = nullptr;
+    if (m_gpuProfiler) {
+        m_gpuProfiler->Shutdown();
+        m_gpuProfiler = nullptr;
+    }
+
+    m_inspectorPreview = nullptr;
+    m_renderContext = nullptr;
+    m_geometryCollector = nullptr;
+    m_geometryVCBPool = nullptr;
+    m_materialCache = nullptr;
+    m_uiRender = nullptr;
+    m_uiMaterialCache = nullptr;
+    m_uiVCBPool = nullptr;
+    if (m_gpuCullingManager) {
+        m_gpuCullingManager->InvalidateStaticCullingData();
+        m_gpuCullingManager = nullptr;
+    }
+    m_detailManager = nullptr;
+
+    if (m_decalManager) {
+        m_decalManager->Shutdown();
+        m_decalManager = nullptr;
+    }
+
+    if (m_overlayManager) {
+        m_overlayManager->Shutdown();
+        m_overlayManager = nullptr;
+    }
+
+    if (m_worldCache) {
+        m_worldCache->Shutdown();
+        m_worldCache = nullptr;
+    }
+
+    if (m_skyEnvironment)
+    {
+        m_skyEnvironment->Shutdown();
+        m_skyEnvironment = nullptr;
+    }
+
+    if (m_skyVisibility)
+    {
+        m_skyVisibility->Shutdown();
+        m_skyVisibility = nullptr;
+    }
+
+    if (m_rtAccelMgr) {
+        m_rtAccelMgr->Shutdown();
+        m_rtAccelMgr = nullptr;
+    }
+
+    if (m_smokeTrailManager) {
+        m_smokeTrailManager->Shutdown();
+        m_smokeTrailManager = nullptr;
+    }
+
+    fg::ClusteredLightManager::Instance().Shutdown();
+
+    passes::ShutdownPathTracer();
+    passes::ShutdownRTEnvironmentSampling();
+    passes::ShutdownWorldCache();
+    passes::ShutdownSkyVisibility();
+    m_mainView.Shutdown();
+
+    m_framegraph = nullptr;
+
+    if (m_blackboard) {
+        m_blackboard.reset();
+    }
+
+    m_sceneDepth = nullptr;
+    m_inspectorPreview = nullptr;
+    old_QuadIB = nullptr;
+}
+
+void FrameGraphRenderer::Render() {
+    ZoneScopedN("FrameGraphRenderer::Render");
+
+    if (!m_enabled) return;
+
+    VERIFY(m_framegraph != nullptr);
+
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
+        m_gpuProfiler->FrameStart(xray::profiler::GetCPUProfiler().IsSamplingFrame());
+    }
+
+    auto frameStart = std::chrono::high_resolution_clock::now();
+
+    Lights.Update();
+
+    if (m_device && m_device->GetFGResourceManager()) {
+        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
+    }
+
+    {
+        ZoneScopedN("FG::SetupFrame");
+        SetupFrame();
+    }
+
+    m_framegraph->ResetForNextFrame();
+
+    if (ps_fg_hot_reload_shaders)
+    {
+        static u32 frameCounter = 0;
+        if (++frameCounter >= 60)
+        {
+            frameCounter = 0;
+            if (GEnv.Render->GetShaderLoader() && GEnv.Render->GetShaderLoader()->CheckForChangedFiles())
+            {
+                Msg("* Shader hot-reload detected, validating changed shaders...");
+                if (!GEnv.Render->GetShaderLoader()->ValidateChangedFiles())
+                {
+                    Msg("! Shader hot-reload skipped: validation failed, keeping current shaders");
+                }
+                else
+                {
+                    Msg("* Hot-reloading shaders...");
+
+                    m_device->GetNVRHIDevice()->waitForIdle();
+
+                    GEnv.Render->GetShaderLoader()->ReloadChangedShaders();
+                    framegraph::GetPassResourceCache().Clear();
+                    framegraph::BindingSetBuilder::InvalidateReflectionCache();
+                    passes::ShutdownPathTracer();
+                    passes::ShutdownRTEnvironmentSampling();
+                    passes::ShutdownWorldCache();
+                    passes::ShutdownSkyVisibility();
+                    if (m_skyVisibility)
+                        m_skyVisibility->ResetDebugSnapshots();
+                    if (m_skyEnvironment)
+                        m_skyEnvironment->InvalidatePipelines();
+                    m_lightingState.ResetRecovery();
+                    m_mainView.InvalidateHistory();
+                    passes::ShutdownReSTIRGI(m_mainView.rtgi);
+
+                    if (m_blackboard)
+                    {
+                        m_blackboard->clear();
+                    }
+
+                    if (m_detailManager)
+                        m_detailManager->InvalidateShadersAndPipelines();
+
+                    if (m_gpuCullingManager)
+                        m_gpuCullingManager->InvalidateShadersAndPipelines();
+
+                    if (m_rtAccelMgr)
+                        fg::RTAccelStructManager::InvalidateShaderPipelines();
+
+                    fg::ImGuiRendererNVRHI* imguiReload = GEnv.Render->GetImGuiRendererNVRHI();
+                    if (imguiReload)
+                        imguiReload->InvalidateShadersAndPipeline();
+
+                    if (g_pGamePersistent) {
+                        auto* fgEnv = dynamic_cast<fg::FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
+                        if (fgEnv)
+                            fgEnv->InvalidateShadersAndPipelines();
+                    }
+
+                    Msg("* Shader hot-reload complete");
+                }
+            }
+        }
+    }
+
+    m_mainView.BeginFrame(GEnv.Backend, Device.dwFrame, Device.dwWidth, Device.dwHeight,
+        Device.mView, Device.mProject, Device.mFullTransform, Device.vCameraPosition,
+        Device.vCameraDirection, Device.fTimeGlobal);
+    {
+        ZoneScopedN("FG::SetupPasses");
+        SetupFrameGraphPasses();
+    }
+
+    m_renderContext->SetCommandList(GEnv.Backend->GetCommandList());
+    m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
+
+    m_framegraph->SetAsyncComputeBackend(GEnv.Backend && GEnv.Backend->HasAsyncCompute() ? GEnv.Backend : nullptr);
+
+    {
+        ZoneScopedN("FG::Compile");
+        m_framegraph->Compile();
+    }
+
+    auto& cache = framegraph::GetPassResourceCache();
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(passes::StaticGlobals), m_device, FRAME_GLOBALS_CB_VERSIONS);
+    auto staticGlobalsData = passes::BuildStaticGlobals();
+    staticGlobalsData.sky_ibl.set(ps_r_sky_ibl != 0 && m_skyLightingReady ? 1.0f : 0.0f,
+        float(fg::SkyEnvironment::kSpecularLevels - 1), ps_r_sky_static_probes != 0 ? 1.0f : 0.0f, 0.0f);
+    if (m_skyVisibility && m_skyVisibility->GetBuffer())
+    {
+        const auto& layout = m_skyVisibility->GetLayout();
+        staticGlobalsData.sky_probe_origin.set(layout.origin.x, layout.origin.y, layout.origin.z, layout.spacing);
+        staticGlobalsData.sky_probe_dims.set(float(layout.dims[0]), float(layout.dims[1]), float(layout.dims[2]), 1.0f);
+    }
+
+    {
+        const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
+        if (vsm.maskReady)
+            staticGlobalsData.cascade_splits.x = 2.0f;
+    }
+
+    auto& clm = fg::ClusteredLightManager::Instance();
+    if (clm.IsReady() && clm.GetLightCount() > 0) {
+        float zNear = VIEWPORT_NEAR;
+        float zFar = g_pGamePersistent->Environment().CurrentEnv.far_plane;
+        auto ccb = clm.BuildClusterCB(Device.dwWidth, Device.dwHeight, zNear, zFar);
+        staticGlobalsData.cluster_params.set(ccb.gridDims.x, ccb.gridDims.y, ccb.gridDims.z, ccb.gridDims.w);
+        staticGlobalsData.cluster_scales.set(ccb.depthParams.x, ccb.depthParams.y, ccb.depthParams.z, ccb.depthParams.w);
+    }
+
+    auto dynamicTransformsCB = cache.GetOrCreateVolatileCB("Frame", "DynamicTransforms",
+        sizeof(passes::DynamicTransforms), m_device, FRAME_GLOBALS_CB_VERSIONS);
+    passes::DynamicTransforms dynamicTransformsData = {};
+    passes::FillDynamicTransforms(dynamicTransformsData);
+
+    m_framegraph->SetSegmentBeginCallback(
+        [staticGlobalsCB, staticGlobalsData, dynamicTransformsCB, dynamicTransformsData](fg::RenderContext& ctx, const framegraph::FrameGraph&) {
+            nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+            cmdList->writeBuffer(staticGlobalsCB, &staticGlobalsData, sizeof(staticGlobalsData));
+            cmdList->writeBuffer(dynamicTransformsCB, &dynamicTransformsData, sizeof(dynamicTransformsData));
+        });
+
+    m_mainView.BeginRecording();
+    {
+        ZoneScopedN("FG::Execute");
+        m_framegraph->Execute();
+    }
+
+    const auto* hizState = m_blackboard->try_get<passes::HiZBuildPassState>();
+    m_mainView.FinishRecording(m_lightingState, m_framegraph->GetHistoryTexture("rt_HiZ"),
+        m_hizPyramid.is_valid() && hizState && hizState->recorded);
+
+    if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
+    {
+        m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
+    }
+
+
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->FrameEnd();
+    }
+
+    auto frameEnd = std::chrono::high_resolution_clock::now();
+    m_stats.totalFrameMs = std::chrono::duration<float, std::milli>(
+        frameEnd - frameStart
+    ).count();
+
+    m_stats.gbufferMs = 0.0f;
+    m_stats.lightingMs = 0.0f;
+    m_stats.numDrawCalls = 0;
+    m_stats.numTriangles = 0;
+}
+
+void FrameGraphRenderer::RenderStatsOverlay()
+{
+    if (m_skyVisibility)
+        m_skyVisibility->DrawDebugInspector();
+    if (m_statsOverlay && (psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0))
+    {
+        xray::profiler::RenderStats stats;
+        stats.Reset();
+        stats.lighting = m_lightingState;
+        stats.pathTracerSamples = m_mainView.pathTracer.history.samples;
+        const auto& ptPending = m_mainView.pathTracer.pending;
+        const auto& ptRecorded = ptPending.valid ? ptPending.parameters : m_mainView.pathTracer.history.parameters;
+        const auto& ptSnapshot = m_mainView.pathTracer.snapshotStats;
+        stats.pathTracerBounces = ptRecorded.maxBounces;
+        stats.pathTracerDiffuseMode = ptRecorded.diffuseMode;
+        stats.pathTracerDiagnosticMode = ptRecorded.diagnosticMode;
+        stats.pathTracerMaxNullEvents = ptRecorded.maxNullEvents;
+        stats.pathTracerMaxSamples = ptRecorded.maxSamples;
+        stats.pathTracerSunAngularRadius = ptRecorded.sunAngularRadius;
+        stats.pathTracerFreezeRequested = ptSnapshot.freezeRequested;
+        stats.pathTracerFrozen = ptSnapshot.frozen;
+        stats.pathTracerCapturePending = ptSnapshot.capturePending;
+        stats.pathTracerSnapshotValid = ptSnapshot.valid;
+        stats.pathTracerSnapshotFallback = ptSnapshot.fallback;
+        stats.pathTracerCdfActive = ptSnapshot.cdfActive;
+        stats.pathTracerLightCount = ptSnapshot.frozen ? ptSnapshot.lightCount : ptRecorded.lightCount;
+        stats.pathTracerEmissiveCount = ptSnapshot.frozen ? ptSnapshot.emissiveCount : ptRecorded.emissiveCount;
+        stats.pathTracerCapturedTextures = ptSnapshot.capturedTextures;
+        stats.pathTracerCapturedTextureBytes = ptSnapshot.capturedTextureBytes;
+        stats.pathTracerRetainedSceneBytes = ptSnapshot.retainedSceneBytes;
+        stats.pathTracerFrozenSceneRevision = ptSnapshot.sceneRevision;
+        stats.pathTracerFrozenTextureRevision = ptSnapshot.textureRevision;
+        stats.pathTracerLightingSignature = ptSnapshot.lightingSignature;
+
+        if (m_geometryCollector)
+        {
+            auto accumulate = [&stats](const xr_vector<GeometryBatch>& batches)
+            {
+                stats.totalBatches += static_cast<u32>(batches.size());
+
+                for (const auto& batch : batches)
+                {
+                    u32 triangles = batch.indexCount / 3;
+                    stats.totalTriangles += triangles;
+
+                    if (batch.isSkinned)
+                    {
+                        stats.skinnedBatches++;
+                        stats.skinnedTriangles += triangles;
+                    }
+                    else if (batch.isTerrain)
+                    {
+                        stats.terrainBatches++;
+                        stats.terrainTriangles += triangles;
+                    }
+                    else if (batch.isStatic)
+                    {
+                        stats.staticBatches++;
+                        stats.staticTriangles += triangles;
+                    }
+                    else
+                    {
+                        stats.dynamicBatches++;
+                        stats.dynamicTriangles += triangles;
+                    }
+                }
+            };
+
+            accumulate(m_geometryCollector->GetStaticBatches());
+            accumulate(m_geometryCollector->GetBatches());
+        }
+
+        stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
+
+        if (m_gpuCullingManager)
+        {
+            const auto& cullStats = m_gpuCullingManager->GetCullingStats();
+
+            stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
+            stats.megaBufferIndices = m_gpuCullingManager->GetTotalIndexCount();
+
+            stats.clusterEntries = m_gpuCullingManager->GetClusterRefCount();
+            stats.clusterVisible = cullStats.clusterVisible;
+            stats.clusterTerrainEntries = m_gpuCullingManager->GetClusterTerrainRefCount();
+            stats.clusterTerrainVisible = cullStats.clusterTerrainVisible;
+            stats.clusterStaticEntries = m_gpuCullingManager->GetClusterStaticRefCount();
+            stats.clusterOcclusionCandidates = cullStats.clusterCandidates;
+            stats.clusterOcclusionRecovered = cullStats.clusterRetestVisible;
+            stats.residualStatic = m_gpuCullingManager->GetStaticResidualCount();
+            stats.residualTerrain = m_gpuCullingManager->GetTerrainResidualCount();
+            stats.residualDynamic = m_gpuCullingManager->GetDynamicResidualCount();
+            stats.residualTransparent = m_gpuCullingManager->GetTransparentResidualCount();
+            stats.clusterTrianglesDrawn = cullStats.clusterTrianglesDrawn;
+            stats.clusterTerrainTrianglesDrawn = cullStats.clusterTerrainTrianglesDrawn;
+            stats.clusterInstanceVisits = cullStats.clusterInstanceVisits;
+            stats.clusterNodeVisits = cullStats.clusterNodeVisits;
+            stats.clusterLeafVisits = cullStats.clusterLeafVisits;
+            stats.clusterDeferredInstances = cullStats.clusterDeferredInstances;
+            stats.clusterDeferredNodes = cullStats.clusterDeferredNodes;
+            stats.clusterOverflow = cullStats.clusterOverflow;
+            const auto memory = m_gpuCullingManager->GetGeometryMemoryStats();
+            const auto& payload = m_gpuCullingManager->GetClusterDAG().PayloadStats();
+            stats.geometrySharedBytes = memory.sharedMetadataBytes;
+            stats.geometryInstanceBytes = memory.instanceTableBytes;
+            stats.geometryPayloadBytes = memory.payloadBytes;
+            stats.geometryVertexBytes = memory.vertexBytes;
+            stats.geometryRetainedBytes = memory.retainedSourceBytes;
+            stats.geometryForwardDrawBytes = memory.forwardDrawBytes;
+            stats.geometryRetiringSourceBytes = memory.retiringSourceBytes;
+            stats.geometrySourceStagingBytes = memory.sourceStagingBytes;
+            stats.geometryHostSourceBytes = memory.hostSourceBytes;
+            stats.geometryForwardUploadLeases = memory.forwardUploadLeases;
+            stats.geometryPageVertexSlots = payload.pageVertexSlots;
+            stats.geometryUniqueVertices = payload.distinctSourceVertices;
+            stats.geometryClusterVertexReferences = payload.clusterVertexReferences;
+            stats.geometryPages = payload.pages;
+            stats.geometryReclusterSplits = payload.reclusterSplits;
+            stats.geometryMaxClusterVertices = payload.maxClusterVertices;
+            stats.geometryMaxClusterTriangles = payload.maxClusterTriangles;
+            const auto& residency = m_gpuCullingManager->GetResidency().Stats();
+            stats.geometryResidencyArenaBytes = residency.vertexArenaBytes + residency.payloadArenaBytes;
+            stats.geometryResidencyUsedBytes = residency.vertexUsedBytes + residency.payloadUsedBytes;
+            stats.geometryResidencyPinnedBytes = residency.pinnedVertexBytes + residency.pinnedPayloadBytes;
+            stats.geometryResidencyStagingBytes = residency.stagingBytes;
+            stats.geometryRetiringArenaBytes = residency.retiringArenaBytes;
+            stats.geometryPageBudgetMiB = residency.pageBudgetMiB;
+            stats.geometryPagingRequested = residency.pagingRequested;
+            stats.geometryPolicyPending = m_gpuCullingManager->GetResidency().IsActive()
+                && (residency.pagingRequested != (ps_r_geo_paging != 0)
+                    || residency.pageBudgetMiB != u32(std::max(8, ps_r_geo_page_budget)));
+            stats.geometryPagingDetails = ps_r_geo_page_stats != 0;
+            stats.geometryResidentGroups = residency.residentGroups;
+            stats.geometryPinnedGroups = residency.pinnedGroups;
+            stats.geometryDesiredGroups = residency.desiredGroups;
+            stats.geometryActivatingGroups = residency.activatingGroups;
+            stats.geometryBlockedGroups = residency.blockedGroups;
+            stats.geometryResidentPages = residency.residentPages;
+            stats.geometryPinnedPages = residency.pinnedPages;
+            stats.geometryReadingPages = residency.readingPages;
+            stats.geometryUploadingPages = residency.uploadingPages;
+            stats.geometryRetiringPages = residency.retiringPages;
+            stats.geometryUploadsRecorded = residency.uploadsRecorded;
+            stats.geometryUploadKiB = residency.uploadKiB;
+            stats.geometryReadsIssued = residency.readsIssued;
+            stats.geometryReadsFailed = residency.readsFailed;
+            stats.geometryUploadsDiscarded = residency.uploadsDiscarded;
+            stats.geometryAllocationDeferrals = residency.allocationDeferrals;
+            stats.geometryBudgetDeferrals = residency.budgetDeferrals;
+            stats.geometryEvictions = residency.evictions;
+            stats.geometryLiveSnapshots = residency.liveSnapshots;
+            stats.geometryFailedSnapshots = residency.failedSnapshots;
+            stats.geometryCutRevision = residency.cutRevision;
+            stats.geometryStreaming = residency.streaming;
+        }
+        if (m_rtAccelMgr)
+        {
+            const auto rt = m_rtAccelMgr->GetMemoryStats(m_gpuCullingManager.get());
+            stats.geometryRTSourceBytes = rt.sourceBytes;
+            stats.geometryRTGenerationBytes = rt.generationBytes;
+            stats.geometryRTAccelerationBytes = rt.accelerationBytes;
+            stats.geometryRTAccelerationKnown = rt.accelerationBytesKnown;
+            stats.geometryRTGenerations = rt.generations;
+            stats.geometryRTLeases = rt.pendingLeases;
+            stats.geometryRTCompactable = rt.compactableStructures;
+            stats.geometryRTCompacted = rt.compactedStructures;
+            stats.geometryRTSkinStructures = rt.skinStructures;
+            stats.geometryRTSkinJobs = rt.skinJobs;
+            stats.geometryRTSkinDispatches = rt.skinJobsSkinned;
+        }
+
+        if (m_blackboard)
+        {
+            const auto& vsm = m_blackboard->get_or_add<passes::VSMState>();
+            stats.geometryShadowHostBytes = vsm.cachedTiles.capacity() * sizeof(passes::VSMCachedTile)
+                + sizeof(vsm.readback);
+            for (const auto& slot : vsm.readback)
+            {
+                if (slot.buffer)
+                    stats.geometryShadowSnapshotBytes += slot.buffer->getDesc().byteSize;
+            }
+            stats.vsmActive = vsm.active;
+            stats.vsmSunMoving = vsm.sunMoving;
+            stats.vsmPages = vsm.markPages;
+            stats.vsmDirtyPages = vsm.dirtyPages;
+            stats.vsmWrongPages = vsm.wrongPages;
+            stats.vsmBinDraws = vsm.binDraws;
+            stats.vsmBinInstances = vsm.binInstances;
+            stats.vsmBinMaxVisited = vsm.binMaxVisited;
+            stats.vsmBinLodCulled = vsm.binLodCulled;
+            stats.vsmBinDrops = vsm.binDrops;
+            for (u32 L = 0; L < passes::kVSMLevels; ++L)
+                stats.vsmLevelPages[L] = vsm.levelPages[L];
+
+            const auto& localShadow = m_blackboard->get_or_add<passes::LocalShadowState>();
+            stats.localShadowSpots = localShadow.pooledSpots;
+            stats.localShadowPoints = localShadow.pooledPoints;
+            stats.localShadowPages = localShadow.activePages;
+            stats.localShadowExtraCasters = m_localShadowCasters;
+            stats.localShadowHudViews = localShadow.hudViews;
+            for (u32 i = 0; i < localShadow.activePages; ++i) {
+                const auto& page = i == 0 ? localShadow : *localShadow.overflowPages[i - 1];
+                stats.localShadowAccepted += page.statAccepted;
+                stats.localShadowDyn += page.statDynRefresh;
+                stats.localShadowPairs += page.statPairs + page.statDynPairs + page.statSkinnedPairs;
+                stats.localShadowDrops += page.statDrops;
+                stats.localShadowDynDrops += page.statDynDrops;
+                stats.localShadowAtlas += page.statAtlasPercent;
+                stats.localShadowOverflow += page.statOverflowViews;
+                stats.localShadowBatches += page.statCasterBatches;
+            }
+            stats.localShadowAtlas /= std::max(1u, localShadow.activePages);
+        }
+
+        {
+            auto& clmStats = fg::ClusteredLightManager::Instance();
+            stats.lightsClustered = clmStats.GetLightCount();
+            stats.lightsPoint = clmStats.GetPointCount();
+            stats.lightsSpot = clmStats.GetSpotCount();
+            stats.lightsOmni = clmStats.GetOmniCount();
+            stats.lightsHiZVisible = clmStats.HasVisibilityStats() ? clmStats.GetVisibleLightCount() : stats.lightsClustered;
+            stats.lightsFrustum = m_lightsFrustum;
+            stats.lightsTouching = m_lightsTouching;
+            stats.lightsInvalidSector = m_lightsInvalidSector;
+            stats.lightsLodCulled = m_lightsLodCulled;
+            stats.lightsHomCulled = m_lightsHomCulled;
+        }
+
+        {
+            const auto& dl = m_blackboard->get_or_add<passes::DeferredLightPassState>();
+            stats.lightTilesTotal = dl.maxTiles;
+            for (u32 i = 0; i < passes::kLightTileClasses; ++i)
+                stats.lightTiles[i] = dl.tileCounts[i];
+        }
+
+        if (m_detailManager)
+        {
+            stats.detailSlots = m_detailManager->slot_count;
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+                stats.detailTrisPerBlade[lod] = fg::FGDetailManager::LOD_TRIANGLES[lod];
+
+            const auto& cullStats = m_detailManager->GetCullingStats();
+            stats.detailVisibleSlots = cullStats.visibleSlotsCount;
+            stats.detailVisibleLOD0 = cullStats.visibleLOD0Count;
+            stats.detailVisibleLOD1 = cullStats.visibleLOD1Count;
+            stats.detailVisibleLOD2 = cullStats.visibleLOD2Count;
+            stats.detailVisibleDecals = cullStats.visibleDecalCount;
+            stats.detailVisibleMeshes = cullStats.visibleBillboardCount;
+            stats.detailPackets = cullStats.packetCount;
+            stats.detailOverflow = cullStats.overflowFlags;
+            stats.detailGeneratedInstances = m_detailManager->totalGeneratedInstances;
+            const auto& memory = m_detailManager->instanceMemoryStats;
+            stats.detailSourceBytes = memory.residentBytes;
+            stats.detailActiveSourceBytes = memory.activeBytes;
+            stats.detailFrameBytes = memory.frameBytes;
+            stats.detailPendingBytes = memory.pendingBytes;
+            stats.detailBudgetBytes = memory.device.budgetBytes;
+            stats.detailUsageBytes = memory.device.usageBytes;
+            stats.detailUsageKnown = memory.device.usageKnown;
+            stats.detailResidentChunks = memory.residentChunks;
+            stats.detailGenerations = memory.generations;
+            stats.detailFrames = memory.frames;
+            if (const auto& source = m_detailManager->generatedInstances)
+            {
+                stats.detailSourceId = source->id;
+                stats.detailSourceChunks = u32(source->chunks.size());
+            }
+            if (const auto frame = m_detailManager->GetCompletedVisibilityFrame())
+            {
+                stats.detailVisibilityFrame = frame->id;
+                stats.detailVisibilitySource = frame->source ? frame->source->id : 0;
+                stats.detailVisibilityInstances = frame->source ? frame->source->instanceCount : 0;
+                stats.detailPacketCapacity = passes::kVisIdEntryLimit - frame->entryBase;
+                for (u32 kind = 0; kind < FGDetailManager::VIS_KIND_COUNT; ++kind)
+                    stats.detailVisibleCapacity[kind] = frame->visibleCapacity[kind];
+            }
+            if (const auto& work = m_detailManager->generationWork)
+            {
+                stats.detailGenerationStage = u32(work->stage) + 1;
+                stats.detailGenerationChunks = work->nextChunk;
+                stats.detailGenerationChunkCount = work->source ? u32(work->source->chunks.size()) : 0;
+            }
+        }
+
+        if (m_framegraph) {
+            const auto& arenaStats = m_framegraph->GetFrameArenaStats();
+            stats.fgArenaUsed = arenaStats.lastUsed;
+            stats.fgArenaPeak = arenaStats.peak;
+            stats.fgArenaCapacity = arenaStats.capacity;
+            stats.fgArenaFallbacks = arenaStats.lastFallbackAllocs;
+        }
+
+        m_statsOverlay->SetRenderStats(stats);
+        m_statsOverlay->SetInspectorPreview(m_inspectorPreview ? m_inspectorPreview.Get() : nullptr);
+
+        if (m_overlayManager)
+        {
+            xr_vector<xray::profiler::StatsOverlay::WallmarkObjectData> wmData;
+            for (const auto& [obj, data] : m_overlayManager->GetDebugObjects())
+            {
+                xray::profiler::StatsOverlay::WallmarkObjectData od;
+                od.objKey = obj;
+
+                xr_map<xr_string, int> groupIndex;
+                xr_map<xr_string, nvrhi::ITexture*> texCache;
+                auto resolveTexture = [&](const xr_string& texName) -> nvrhi::ITexture*
+                {
+                    if (!m_materialCache || texName.empty())
+                        return nullptr;
+
+                    auto it = texCache.find(texName);
+                    if (it != texCache.end())
+                        return it->second;
+
+                    nvrhi::ITexture* tex = m_materialCache->GetNVRHITextureByName(texName.c_str());
+                    texCache[texName] = tex;
+                    return tex;
+                };
+
+                for (u32 i = 0; i < (u32)data.splats.size(); i++)
+                {
+                    const auto& gpu   = data.splats[i];
+                    const auto& dbg   = data.splatDebug[i];
+                    const xr_string& targetTexName = dbg.targetTextureName;
+
+                    auto git = groupIndex.find(targetTexName);
+                    if (git == groupIndex.end())
+                    {
+                        xray::profiler::StatsOverlay::WallmarkTexGroup g;
+                        g.texName = targetTexName;
+                        g.diffuseTex = resolveTexture(targetTexName);
+                        groupIndex[targetTexName] = (int)od.groups.size();
+                        od.groups.push_back(std::move(g));
+                        git = groupIndex.find(targetTexName);
+                    }
+
+                    nvrhi::ITexture* stampTex = resolveTexture(dbg.wallmarkTextureName);
+                    u32 mode = (u32)(gpu.evolution.w + 0.5f);
+                    od.groups[git->second].splats.push_back(
+                        { dbg.uv.x, dbg.uv.y, gpu.uvRadius,
+                          gpu.color.x, gpu.color.y, gpu.color.z, gpu.color.w,
+                          mode, gpu.evolution.z,
+                          stampTex });
+                }
+
+                wmData.push_back(std::move(od));
+            }
+            m_statsOverlay->SetWallmarkData(std::move(wmData));
+        }
+
+        if (ps_profile_dump > 0)
+            m_statsOverlay->WriteProfileDump(static_cast<u32>(ps_profile_dump));
+        if (psDeviceFlags.test(rsStatistic))
+        {
+            m_statsOverlay->SetVisible(true);
+            m_statsOverlay->Render();
+        }
+    }
+}
+
+void FrameGraphRenderer::SetupFrame() {
+    const bool collectScene = g_pGamePersistent && g_pGameLevel && g_pGameLevel->bReady
+        && !g_pGamePersistent->IsLoadingScreenShown() && g_pGamePersistent->SpatialSpace.m_root;
+    m_sceneCollected = collectScene;
+
+    if (m_gpuCullingManager) {
+        {
+            ZoneScopedN("Readback::CullStats");
+            m_gpuCullingManager->ProcessStatsReadback();
+        }
+        m_gpuCullingManager->BeginSkinnedFrame();
+        m_gpuCullingManager->BeginGeometryResidencyFrame();
+    }
+
+    if (m_detailManager && m_device) {
+        ZoneScopedN("Readback::DetailStats");
+        m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
+    }
+
+    if (psDeviceFlags.test(rsStatistic) || ps_r_local_shadow_debug != 0) {
+        ZoneScopedN("Readback::LightStats");
+        fg::ClusteredLightManager::Instance().ProcessStatsReadback();
+    }
+    if (psDeviceFlags.test(rsStatistic)) {
+        passes::ProcessDeferredLightStats(m_blackboard->get_or_add<passes::DeferredLightPassState>(), m_device->GetNVRHIDevice());
+    }
+
+    m_lstRenderables.clear();
+    m_lstShadowCasters.clear();
+    m_shadowCasterRegion.valid = false;
+    m_lightsFrustum = m_lightsTouching = m_lightsInvalidSector = 0;
+    m_lightsLodCulled = m_lightsHomCulled = m_localShadowCasters = 0;
+    m_rtRayAdmitted = 0;
+    m_rtRayAdmittedSkinned = 0;
+
+    if (collectScene)
+    {
+        {
+            ZoneScopedN("SetupFrame::FrustumQuery");
+
+            CFrustum view_frustum;
+            view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+            u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+            u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+
+            g_pGamePersistent->SpatialSpace.q_frustum(
+                m_lstRenderables,
+                spatial_traverse_flags,
+                spatial_types,
+                view_frustum
+            );
+
+            {
+                m_shadowCasterRegion = BuildShadowCasterRegion();
+                if (m_shadowCasterRegion.valid) {
+                    g_pGamePersistent->SpatialSpace.q_box(
+                        m_lstShadowCasters,
+                        0,
+                        STYPE_RENDERABLE,
+                        m_shadowCasterRegion.worldCenter,
+                        m_shadowCasterRegion.worldHalf
+                    );
+                }
+            }
+        }
+    }
+
+    {
+        ZoneScopedN("SetupFrame::CollectorBegin");
+        m_geometryCollector->BeginFrame();
+        m_hudBatches.clear();
+        m_worldParticleBatches.clear();
+        m_hudParticleBatches.clear();
+
+        const bool rayTracingLighting = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
+            m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
+        fg::ClusteredLightManager::Instance().BeginFrame(rayTracingLighting);
+    }
+
+    if (collectScene) {
+        ZoneScopedN("SetupFrame::CollectVisibleGeometry");
+        CollectVisibleGeometry();
+    } else if (m_blackboard) {
+        if (auto* shadows = m_blackboard->try_get<passes::LocalShadowState>()) {
+            shadows->activePages = shadows->candCount = 0;
+            shadows->pooledSpots = shadows->pooledPoints = 0;
+            shadows->slotOfLight.clear();
+        }
+    }
+
+    {
+        ZoneScopedN("SetupFrame::CollectorEnd");
+        m_geometryCollector->EndFrame();
+    }
+}
+
+framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
+    const char* name,
+    u32 width,
+    u32 height,
+    nvrhi::Format format,
+    bool isDepthStencil)
+{
+    framegraph::ResourceDesc desc;
+    desc.type = framegraph::ResourceDesc::Type::Texture2D;
+    desc.width = width;
+    desc.height = height;
+    desc.format = format;
+    desc.isRenderTarget = !isDepthStencil;
+    desc.isDepthStencil = isDepthStencil;
+    desc.isTransient = true;
+    desc.debugName = name;
+
+    return m_framegraph->CreateTexture(name, desc);
+}
+
+u32 FrameGraphRenderer::GetRTRayAdmittedCount() const
+{
+    return m_rtRayAdmitted;
+}
+
+u32 FrameGraphRenderer::GetRTRayAdmittedSkinnedCount() const
+{
+    return m_rtRayAdmittedSkinned;
+}
+
+bool FrameGraphRenderer::RasterRayTracingFeaturesEnabled() const
+{
+    if (!m_skyVisibility || !m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend ||
+        !GEnv.Backend->SupportsSubmissionLeases())
+        return false;
+    if (m_skyVisibility->NeedsScene())
+        return true;
+    return ps_r_sky_probe_debug == 3 &&
+        m_skyVisibility->GetState() != fg::SkyVisibilityState::Empty;
+}
+
+void FrameGraphRenderer::PrepareLightingMode(u32 width, u32 height)
+{
+    const auto previousMode = m_lightingState.effective;
+    m_lightingState.Begin(fg::LightingModeFromSetting(ps_r_rt_gi));
+    ApplyRTLightingSettings(m_lightingState);
+    m_lightingState.rayGrassEnabled = m_detailManager && m_detailManager->IsRayTracingCoverageEnabled();
+    m_lightingState.rayGrassPending = m_detailManager && m_detailManager->IsRayTracingCoveragePending();
+    m_lightingState.previousSurfacesValid = m_mainView.hasPrevFrameData;
+    if (previousMode != m_lightingState.effective)
+    {
+        m_mainView.rtgi.historyValid = false;
+        m_mainView.pathTracer.history.valid = false;
+        m_mainView.pathTracer.history.samples = 0;
+    }
+    if (m_lightingState.requested != fg::LightingMode::ReferencePT || ps_r_path_tracer_freeze == 0)
+        passes::DiscardPathTracerSnapshot(m_mainView.pathTracer);
+    if (m_rtAccelMgr)
+        m_rtAccelMgr->RetireScenes();
+    if (m_skyVisibility)
+    {
+        if (passes::ConsumeSkyVisibilityRebake())
+            m_skyVisibility->RequestRebake();
+        m_skyVisibility->Update();
+    }
+    if (m_lightingState.effective == fg::LightingMode::Raster ||
+        m_lightingState.effective == fg::LightingMode::RadianceCascades)
+    {
+        if (m_lightingState.effective == fg::LightingMode::RadianceCascades)
+            m_lightingState.Fail(fg::LightingFallback::PipelineUnavailable);
+        if (RasterRayTracingFeaturesEnabled() && !m_rtAccelMgr->IsReady())
+        {
+            const xr_vector<GeometryBatch> noSkinned;
+            m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), noSkinned, noSkinned);
+        }
+        return;
+    }
+    if (!m_rtAccelMgr || !m_rtAccelMgr->IsSupported() || !GEnv.Backend || !GEnv.Backend->SupportsSubmissionLeases())
+    {
+        m_lightingState.Fail(fg::LightingFallback::Unsupported);
+        return;
+    }
+
+    const auto readiness = m_lightingState.effective == fg::LightingMode::ReferencePT ?
+        passes::EnsurePathTracerResources(m_device, width, height, m_mainView.pathTracer) :
+        passes::EnsureReSTIRGIResources(m_device, m_mainView.rtgi, width, height, m_lightingState.reuseRequested);
+    if (readiness != fg::LightingFallback::None)
+    {
+        m_lightingState.Fail(readiness);
+        return;
+    }
+
+    const bool frozenSnapshotReusable = m_lightingState.effective == fg::LightingMode::ReferencePT &&
+        passes::EvaluatePathTracerSnapshotReuse(m_device, m_rtAccelMgr.get(), m_mainView.pathTracer,
+            ps_r_path_tracer_freeze != 0).reusable;
+
+    if (!frozenSnapshotReusable)
+    {
+        xr_vector<GeometryBatch> worldSkinned;
+        xr_vector<GeometryBatch> hudSkinned;
+        for (const auto& batch : m_geometryCollector->GetBatches())
+        {
+            if (batch.isSkinned && batch.visual && batch.indexCount)
+                worldSkinned.push_back(batch);
+        }
+        for (const auto& batch : m_hudBatches)
+        {
+            if (batch.isSkinned && batch.visual && batch.indexCount)
+                hudSkinned.push_back(batch);
+        }
+        if (!m_rtAccelMgr->SetupBuildPass(*m_framegraph, m_gpuCullingManager.get(), m_detailManager.get(), worldSkinned, hudSkinned))
+            m_lightingState.Fail(fg::LightingFallback::SceneUnavailable);
+    }
+    m_lightingState.sceneRevision = m_rtAccelMgr->GetSceneRevision();
+    m_lightingState.poseRevision = m_rtAccelMgr->GetPoseRevision();
+}
+
+struct FrameGraphRenderer::FrameSetup
+{
+    struct Features
+    {
+        bool drawDetails = false;
+        bool drawParticles = false;
+        bool swGrass = false;
+        bool visDebug = false;
+        bool bloom = false;
+        bool rayHistoryRequired = false;
+        bool motionVectorsRequired = false;
+        bool rasterShadowWork = false;
+        bool rasterDrawPasses = true;
+    };
+
+    passes::ViewFrame view;
+    Features features;
+    framegraph::VirtualResourceHandle backbufferHandle;
+    framegraph::VirtualResourceHandle depthBuffer;
+    framegraph::VirtualResourceHandle normalBuffer;
+    framegraph::VirtualResourceHandle baseColorBuffer;
+    framegraph::VirtualResourceHandle materialBuffer;
+    framegraph::VirtualResourceHandle prevNormalsHandle;
+    framegraph::VirtualResourceHandle prevDepthHandle;
+    framegraph::VirtualResourceHandle surfaceHistoryDepth;
+    framegraph::VirtualResourceHandle surfaceHistoryNormal;
+    framegraph::VirtualResourceHandle skinnedDrawArgsBuffer;
+    framegraph::VirtualResourceHandle visIdBuffer;
+    framegraph::VirtualResourceHandle skyColorHandle;
+    framegraph::VirtualResourceHandle vsmMaskHandle;
+    framegraph::VirtualResourceHandle sceneColor;
+    framegraph::VirtualResourceHandle interfaceLayer;
+    fg::GeometryFrameResources geometryResources;
+    passes::ClusterDrawConfig clusterConfig;
+    passes::DetailPassResources detailResources;
+    passes::HiZPyramidOutput hizOutput;
+    passes::ClusterLightOutput clusterLightOut;
+    passes::TransparentPassConfig transparentConfig;
+    passes::MotionVectorOutput motionOutput;
+    passes::LocalShadowOutput localShadowOut;
+    passes::SkyVisibilityInspection skyInspection;
+    passes::BloomOutput bloom;
+    fg::SkyEnvironmentFrame skyFrame;
+    framegraph::DefaultOutputLayout detailOutputs;
+    framegraph::DefaultOutputLayout opaqueOutputs;
+    framegraph::DefaultOutputLayout litOutputs;
+    framegraph::DefaultOutputLayout transparentOutputs;
+    framegraph::DefaultOutputLayout smokeOutputs;
+    u32 grassEntryBase = 0;
+    bool grassIds = false;
+    bool visActive = false;
+};
+
+void FrameGraphRenderer::SetupFrameGraphPasses() {
+    FrameSetup frame;
+    passes::ViewFrame& view = frame.view;
+    view.view = Device.mView;
+    view.project = Device.mProject;
+    view.viewProj = Device.mFullTransform;
+    view.invViewProj = Device.mInvFullTransform;
+    view.prevView = m_mainView.prevView;
+    view.prevProject = m_mainView.prevProject;
+    view.prevViewProj = m_mainView.prevViewProj;
+    view.cameraPos = Device.vCameraPosition;
+    view.prevDetailTime = m_mainView.prevDetailTime;
+    view.frameIndex = Device.dwFrame;
+    view.width = Device.dwWidth;
+    view.height = Device.dwHeight;
+    view.hasPrevFrameData = m_mainView.hasPrevFrameData;
+
+    auto& features = frame.features;
+    features.drawDetails = psDeviceFlags.is(rsDrawDetails);
+    features.drawParticles = psDeviceFlags.test(rsDrawParticles);
+    features.swGrass = ps_r_vis_sw_grass && features.drawDetails;
+    features.visDebug = ps_r_vis_debug != 0;
+    features.bloom = m_sceneCollected && ps_r_bloom_intensity > 0.0f;
+
+    SetupGeometryStage(frame);
+    SetupSurfaceStage(frame);
+    SetupLightingStage(frame);
+    SetupForwardStage(frame);
+    SetupPostStage(frame);
+    SetupInspectorStage(frame);
+}
+
+void FrameGraphRenderer::SetupGeometryStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+
+    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
+    auto& backbufferHandle = frame.backbufferHandle;
+
+    if (backbufferTexture) {
+        framegraph::ResourceDesc backbufferDesc;
+        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        backbufferDesc.width = width;
+        backbufferDesc.height = height;
+        backbufferDesc.format = backbufferTexture->getDesc().format;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isImported = true;
+        backbufferDesc.isTransient = false;
+        backbufferDesc.debugName = "Backbuffer";
+
+        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+        m_framegraph->SetPresentTarget(backbufferHandle);
+    }
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!m_sceneDepth || m_sceneDepth->getDesc().width != width || m_sceneDepth->getDesc().height != height) {
+        nvrhi::TextureDesc desc;
+        desc.width = width;
+        desc.height = height;
+        desc.format = framegraph::kSceneDepthFormat;
+        desc.isShaderResource = true;
+        desc.isRenderTarget = true;
+        desc.isTypeless = true;
+        desc.useClearValue = true;
+        desc.clearValue = nvrhi::Color(0.0f);
+        desc.initialState = nvrhi::ResourceStates::DepthWrite;
+        desc.keepInitialState = true;
+        desc.debugName = "rt_Depth";
+        m_sceneDepth = nvDevice->createTexture(desc);
+    }
+    framegraph::ResourceDesc depthDesc;
+    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    depthDesc.debugName = "rt_Depth";
+    depthDesc.width = width;
+    depthDesc.height = height;
+    depthDesc.format = framegraph::kSceneDepthFormat;
+    depthDesc.isDepthStencil = true;
+    depthDesc.isImported = true;
+    depthDesc.isTransient = false;
+
+    auto& depthBuffer = frame.depthBuffer;
+    depthBuffer = m_framegraph->ImportTexture("rt_Depth", m_sceneDepth, depthDesc);
+    const auto depthHistory = m_framegraph->ImportHistoryTexture("rt_SurfaceDepth", depthDesc);
+    frame.surfaceHistoryDepth = depthHistory.current;
+    if (m_mainView.hasPrevFrameData && depthHistory.previousValid)
+        frame.prevDepthHandle = depthHistory.previous;
+
+    auto& gpuParticles = GetGpuParticleManager();
+    auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
+    const u32 materialEpoch = m_materialCache ? m_materialCache->GetVisualMaterialEpoch() : 0;
+    if (gpuParticleState.materialCache != m_materialCache.get() || gpuParticleState.materialEpoch != materialEpoch) {
+        gpuParticleState.materialCache = m_materialCache.get();
+        gpuParticleState.materialEpoch = materialEpoch;
+        gpuParticleState.registeredPrograms = 0;
+    }
+    const auto& particleDefinitions = gpuParticles.GetDefinitions();
+    for (u32 program = gpuParticleState.registeredPrograms; program < particleDefinitions.size(); ++program) {
+        const auto* definition = particleDefinitions[program];
+        if (!definition) {
+            gpuParticleState.registeredPrograms = program + 1;
+            continue;
+        }
+        sh_list textures;
+        Resources->_ParseList(textures, definition->m_TextureName.c_str());
+        const bool distortion = strstr(definition->m_ShaderName.c_str(), "distort") != nullptr;
+        const u32 material = m_materialCache && definition->m_TextureName.size() && !textures.empty()
+            ? m_materialCache->PreRegisterParticleMaterial(textures[0], distortion) : 0;
+        if (material == UINT32_MAX)
+            break;
+        const auto variant = distortion ? passes::ParticleShaderVariant::Distort : passes::ParticleShaderVariant::Standard;
+        gpuParticles.SetProgramMaterial(program, material,
+            QueryParticleBlendMode(definition->m_ShaderName.c_str()), static_cast<u32>(variant));
+        gpuParticleState.registeredPrograms = program + 1;
+    }
+    if (m_materialCache)
+    {
+        m_materialCache->FinalizePendingMaterials();
+        m_materialCache->FinalizePendingTerrainMaterials();
+    }
+
+
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.width = width;
+    normalDesc.height = height;
+    normalDesc.format = framegraph::kSceneNormalFormat;
+    normalDesc.isRenderTarget = true;
+    normalDesc.isUAV = true;
+    normalDesc.isTransient = true;
+    normalDesc.debugName = "rt_Normal";
+    auto& normalBuffer = frame.normalBuffer;
+    normalBuffer = m_framegraph->CreateTexture("rt_Normal", normalDesc);
+    normalDesc.isUAV = false;
+    const auto normalHistory = m_framegraph->ImportHistoryTexture("rt_SurfaceNormal", normalDesc);
+    frame.surfaceHistoryNormal = normalHistory.current;
+    if (m_mainView.hasPrevFrameData && normalHistory.previousValid)
+        frame.prevNormalsHandle = normalHistory.previous;
+
+    framegraph::ResourceDesc baseColorDesc;
+    baseColorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    baseColorDesc.debugName = "rt_BaseColor";
+    baseColorDesc.width = width;
+    baseColorDesc.height = height;
+    baseColorDesc.format = framegraph::kSceneBaseColorFormat;
+    baseColorDesc.isRenderTarget = true;
+    baseColorDesc.allowUAV = true;
+    baseColorDesc.isTransient = true;
+    auto& baseColorBuffer = frame.baseColorBuffer;
+    baseColorBuffer = m_framegraph->CreateTexture("rt_BaseColor", baseColorDesc);
+
+    framegraph::ResourceDesc materialDesc = baseColorDesc;
+    materialDesc.debugName = "rt_Material";
+    materialDesc.format = framegraph::kSceneMaterialFormat;
+    auto& materialBuffer = frame.materialBuffer;
+    materialBuffer = m_framegraph->CreateTexture("rt_Material", materialDesc);
+
+
+    const u32 hizWidth = std::max(1u, width / 2);
+    const u32 hizHeight = std::max(1u, height / 2);
+    const u32 hizMipLevels = passes::CalculateHiZMipLevels(hizWidth, hizHeight);
+    framegraph::ResourceDesc hizDesc;
+    hizDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    hizDesc.width = hizWidth;
+    hizDesc.height = hizHeight;
+    hizDesc.mipLevels = hizMipLevels;
+    hizDesc.format = nvrhi::Format::R32_FLOAT;
+    hizDesc.isUAV = true;
+    const auto hizHistory = m_framegraph->ImportHistoryTexture("rt_HiZ", hizDesc);
+    framegraph::VirtualResourceHandle prevHiZHandle;
+    if (m_mainView.hasPrevHiZ && hizHistory.previousValid)
+        prevHiZHandle = hizHistory.previous;
+
+    framegraph::VirtualResourceHandle clusterArgsHandle;
+    auto& geometryResources = frame.geometryResources;
+    auto& skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
+    bool cullActive = false;
+    bool swRasterReady = false;
+
+    if (m_gpuCullingManager) {
+        m_gpuCullingManager->Initialize(m_device);
+
+        if (m_detailManager && (!m_detailManager->instanceGenPipeline || !m_detailManager->slotCullPipeline)) {
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            m_detailManager->LoadCullComputeShader(shaderLoader);
+            m_detailManager->LoadInstanceGenShader(shaderLoader);
+
+            m_detailManager->CreateComputePipeline(m_device);
+            m_detailManager->CreateInstanceGenPipeline(m_device);
+
+            if (!m_detailManager->perlin4dTexture) {
+                m_detailManager->CreatePerlin4DTexture(m_device->GetNVRHIDevice());
+            }
+            m_detailManager->LoadPerlin4DComputeShader(shaderLoader);
+            if (m_detailManager->perlin4dComputeShader) {
+                m_detailManager->CreatePerlin4DPipeline(m_device->GetNVRHIDevice());
+            }
+
+            if (!m_detailManager->interactionTexture[0]) {
+                m_detailManager->CreateInteractionResources(m_device->GetNVRHIDevice());
+            }
+            m_detailManager->LoadInteractionComputeShader(shaderLoader);
+            if (m_detailManager->interactionComputeShader) {
+                m_detailManager->CreateInteractionPipeline(m_device->GetNVRHIDevice());
+            }
+        }
+
+        if (m_rtAccelMgr && m_rtAccelMgr->IsSupported())
+            m_gpuCullingManager->SetRTAccelStructManager(m_rtAccelMgr.get());
+
+        if (m_gpuCullingManager->IsEnabled()) {
+            auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
+            swRasterReady = ps_r_vis_sw && nvDevice->queryFeatureSupport(nvrhi::Feature::BufferInt64Atomics)
+                && m_gpuCullingManager->AreMegaBuffersReady()
+                && passes::EnsureSwRasterResources(m_device, visState, width, height);
+            const float pxScale = frame.view.project._22 * float(height) * 0.5f;
+            m_gpuCullingManager->SetClusterSwCull(swRasterReady ? ps_r_vis_sw_px * 0.5f / pxScale : 0.0f, ps_r_vis_sw_near);
+            m_gpuCullingManager->PrepareSceneGeometry(m_geometryCollector.get());
+            m_gpuCullingManager->PrepareSkinnedGeometry(m_geometryCollector.get(), &m_hudBatches, m_overlayManager.get());
+            geometryResources = m_gpuCullingManager->ImportGeometryResources(*m_framegraph);
+            m_gpuCullingManager->SetupGeometryPreparePass(*m_framegraph, m_geometryCollector.get(), geometryResources);
+            m_gpuCullingManager->SetupCullingPass(*m_framegraph, m_geometryCollector.get(),
+                prevHiZHandle, frame.view.prevViewProj, hizWidth, hizHeight, hizMipLevels, geometryResources);
+            clusterArgsHandle = geometryResources.drawArgs;
+            cullActive = geometryResources.valid && clusterArgsHandle.is_valid();
+        }
+    }
+    gpuParticles.SetupSimulationPasses(*m_framegraph, nvDevice);
+    auto& clusterConfig = frame.clusterConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled() && geometryResources.valid) {
+        clusterConfig.geometry = geometryResources;
+        clusterConfig.visibleEntries = geometryResources.visibleEntries;
+        clusterConfig.fades = geometryResources.fades;
+        clusterConfig.args = geometryResources.drawArgs;
+        clusterConfig.terrainVisibleEntries = geometryResources.terrainVisibleEntries;
+        clusterConfig.terrainFades = geometryResources.terrainFades;
+        clusterConfig.terrainArgs = geometryResources.terrainArgs;
+        clusterConfig.swEntries = geometryResources.swEntries;
+        clusterConfig.swArgs = geometryResources.swArgs;
+        clusterConfig.refCount = m_gpuCullingManager->GetClusterCullRefCount();
+        clusterConfig.staticRefCount = m_gpuCullingManager->GetClusterStaticRefCount()
+            + m_gpuCullingManager->GetDynamicClusterRefCount();
+        clusterConfig.terrainRefCount = m_gpuCullingManager->GetClusterTerrainRefCount();
+    }
+
+    framegraph::VirtualResourceHandle swVisHandle;
+    if (cullActive && swRasterReady)
+        swVisHandle = passes::setupSwRasterPass(*m_framegraph, m_device, clusterConfig, width, height,
+            &m_blackboard->get_or_add<passes::VisibilityPassState>(), framegraph::VirtualResourceHandle());
+
+    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedEnabled())
+        skinnedDrawArgsBuffer = m_gpuCullingManager->SetupSkinnedUploadPass(*m_framegraph, m_overlayManager.get(), geometryResources);
+    clusterConfig.geometry = geometryResources;
+
+    const u32 clusterEntryCapacity = m_gpuCullingManager ? m_gpuCullingManager->GetClusterRefCapacity() : 0u;
+    const bool clusterIdsFit = m_gpuCullingManager
+        && passes::VisIdRangeFits(clusterEntryCapacity, m_gpuCullingManager->GetSkinnedEntryCapacity());
+    auto& grassEntryBase = frame.grassEntryBase;
+    grassEntryBase = clusterIdsFit ? clusterEntryCapacity + m_gpuCullingManager->GetSkinnedEntryCapacity() : 0u;
+    auto& detailResources = frame.detailResources;
+    if (m_detailManager && m_gpuCullingManager)
+    {
+        const bool enabled = frame.features.drawDetails;
+        R_ASSERT2(!enabled || clusterIdsFit, "[FrameGraph] rigid and skinned entries exhaust the visibility identifier range");
+        const bool rayCoverageRequested = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
+            m_rtAccelMgr && m_rtAccelMgr->IsSupported() &&
+            GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
+        m_detailManager->SetRayTracingCoverage(rayCoverageRequested, ps_r_rt_grass_radius);
+        m_detailManager->PrepareFrame(m_device->GetNVRHIDevice(), grassEntryBase, enabled);
+        detailResources = passes::setupDetailCullPass(
+            *m_framegraph, m_device, m_detailManager.get(),
+            prevHiZHandle, m_gpuCullingManager->GetDummyHiZ(),
+            hizWidth, hizHeight, hizMipLevels, frame.view.prevViewProj,
+            m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DetailPassState>());
+    }
+    auto& grassIds = frame.grassIds;
+    grassIds = detailResources.HasSource();
+
+    bool swGrass = false;
+    if (swVisHandle.is_valid() && grassIds && frame.features.swGrass) {
+        auto grassVis = passes::setupSwGrassPass(*m_framegraph, m_device, detailResources, swVisHandle, m_detailManager.get(),
+            width, height, &m_blackboard->get_or_add<passes::VisibilityPassState>());
+        if (grassVis.is_valid()) {
+            swVisHandle = grassVis;
+            swGrass = true;
+        }
+    }
+
+    const bool visibilityGeometry = clusterConfig.IsValid() || clusterConfig.TerrainValid()
+        || skinnedDrawArgsBuffer.is_valid() || grassIds;
+    auto& visIdBuffer = frame.visIdBuffer;
+    if (cullActive && clusterConfig.UseCompactGeometry() && visibilityGeometry && clusterIdsFit) {
+        auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
+        auto& resolveState = m_blackboard->get_or_add<passes::MaterialResolvePassState>();
+        if (passes::EnsureVisibilityResources(m_device, visState) && passes::EnsureMaterialResolveResources(m_device, resolveState)) {
+            framegraph::ResourceDesc visDesc;
+            visDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            visDesc.debugName = "rt_VisID";
+            visDesc.width = width;
+            visDesc.height = height;
+            visDesc.format = nvrhi::Format::R32_UINT;
+            visDesc.isRenderTarget = true;
+            visDesc.isTransient = true;
+            auto visOut = passes::setupVisibilityPass(
+                *m_framegraph,
+                m_device,
+                depthBuffer,
+                m_framegraph->CreateTexture("rt_VisID", visDesc),
+                skinnedDrawArgsBuffer,
+                swVisHandle,
+                clusterConfig,
+                m_gpuCullingManager.get(),
+                grassIds ? m_detailManager.get() : nullptr,
+                detailResources,
+                &visState,
+                false,
+                swGrass
+            );
+            depthBuffer = visOut.depth;
+            visIdBuffer = visOut.visId;
+        }
+    }
+    auto& visActive = frame.visActive;
+    visActive = visIdBuffer.is_valid();
+    if (!visActive) {
+        if (cullActive && clusterConfig.UseCompactGeometry() && visibilityGeometry) {
+            const auto& visState = m_blackboard->get_or_add<passes::VisibilityPassState>();
+            const char* reason = !clusterIdsFit
+                ? "cluster entry capacity exceeds the visibility identifier space"
+                : (visState.failed ? "cluster visibility raster pipelines failed to initialize"
+                                   : "material resolve pipeline failed to initialize");
+            FATAL_F("[FrameGraph] opaque visibility path unavailable for %u cluster references (capacity %u, limit %u): %s",
+                m_gpuCullingManager->GetClusterRefCount(), clusterEntryCapacity, passes::kVisIdEntryLimit, reason);
+        }
+        static bool s_warned = false;
+        if (!s_warned) {
+            Msg("! [FrameGraph] visibility raster inactive (cull %d, compact %d, clusters %u), no opaque cluster geometry is submitted",
+                cullActive ? 1 : 0, clusterConfig.UseCompactGeometry() ? 1 : 0,
+                m_gpuCullingManager ? m_gpuCullingManager->GetClusterRefCount() : 0u);
+            s_warned = true;
+        }
+    }
+
+    auto& hizOutput = frame.hizOutput;
+    hizOutput.pyramid = framegraph::VirtualResourceHandle();
+    hizOutput.mipLevels = 0;
+    hizOutput.width = hizWidth;
+    hizOutput.height = hizHeight;
+
+    if (visActive) {
+        hizOutput = passes::setupHiZBuildPass(
+            *m_framegraph,
+            m_device,
+            depthBuffer,
+            width,
+            height,
+            m_blackboard->get_or_add<passes::HiZBuildPassState>(),
+            hizHistory.current
+        );
+    }
+
+    m_hizPyramid = hizOutput.pyramid;
+    if (m_hizPyramid.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_HiZ", m_hizPyramid);
+
+    if (visActive && hizOutput.pyramid.is_valid()) {
+        framegraph::VirtualResourceHandle retestArgsHandle = m_gpuCullingManager->SetupClusterRetestPass(
+            *m_framegraph, hizOutput.pyramid, hizOutput.width, hizOutput.height, hizOutput.mipLevels, geometryResources);
+        clusterConfig.geometry = geometryResources;
+        if (retestArgsHandle.is_valid()) {
+            passes::ClusterDrawConfig retestConfig = clusterConfig;
+            retestConfig.visibleEntries = geometryResources.retestVisibleEntries;
+            retestConfig.fades = geometryResources.retestFades;
+            retestConfig.args = geometryResources.retestDrawArgs;
+            retestConfig.terrainVisibleEntries = geometryResources.retestTerrainVisibleEntries;
+            retestConfig.terrainFades = geometryResources.retestTerrainFades;
+            retestConfig.terrainArgs = geometryResources.retestTerrainArgs;
+            retestConfig.swEntries = geometryResources.retestSwEntries;
+            retestConfig.swArgs = geometryResources.retestSwArgs;
+            framegraph::VirtualResourceHandle swRetestHandle;
+            if (swVisHandle.is_valid())
+                swRetestHandle = passes::setupSwRasterPass(*m_framegraph, m_device, retestConfig, width, height,
+                    &m_blackboard->get_or_add<passes::VisibilityPassState>(), swVisHandle);
+            auto retestOut = passes::setupVisibilityPass(
+                *m_framegraph,
+                m_device,
+                depthBuffer,
+                visIdBuffer,
+                framegraph::VirtualResourceHandle(),
+                swRetestHandle,
+                retestConfig,
+                m_gpuCullingManager.get(),
+                nullptr,
+                passes::DetailPassResources(),
+                &m_blackboard->get_or_add<passes::VisibilityPassState>(),
+                true
+            );
+            depthBuffer = retestOut.depth;
+            visIdBuffer = retestOut.visId;
+        }
+    }
+}
+
+void FrameGraphRenderer::SetupSurfaceStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const auto depthBuffer = frame.depthBuffer;
+    auto& normalBuffer = frame.normalBuffer;
+    auto& baseColorBuffer = frame.baseColorBuffer;
+    auto& materialBuffer = frame.materialBuffer;
+    const auto visIdBuffer = frame.visIdBuffer;
+    const bool visActive = frame.visActive;
+    const bool grassIds = frame.grassIds;
+    const auto& hizOutput = frame.hizOutput;
+    const auto& detailResources = frame.detailResources;
+    const auto& geometryResources = frame.geometryResources;
+
+    PrepareLightingMode(width, height);
+
+    framegraph::ResourceDesc colorDesc;
+    colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    colorDesc.width = width;
+    colorDesc.height = height;
+    colorDesc.format = framegraph::kSceneColorFormat;
+    colorDesc.isRenderTarget = true;
+    colorDesc.allowUAV = true;
+    colorDesc.debugName = "rt_SceneColor";
+
+    auto& skyColorHandle = frame.skyColorHandle;
+    skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
+
+    FGEnvironmentRender* fgEnv = nullptr;
+    if (g_pGamePersistent)
+        fgEnv = dynamic_cast<FGEnvironmentRender*>(&*g_pGamePersistent->Environment().m_pRender);
+
+    auto skyOutput = passes::setupSkyPass(
+        *m_framegraph,
+        skyColorHandle,
+        depthBuffer,
+        fgEnv,
+        width,
+        height
+    );
+
+    auto sunOutput = passes::setupSunPass(
+        *m_framegraph,
+        skyOutput,
+        fgEnv,
+        width,
+        height
+    );
+
+
+    auto& clmSetup = fg::ClusteredLightManager::Instance();
+    auto& clusterLightOut = frame.clusterLightOut;
+    if (clmSetup.IsReady() && clmSetup.GetLightCount() > 0) {
+        clusterLightOut = passes::setupClusterLightPass(
+            *m_framegraph,
+            m_device,
+            &clmSetup,
+            width,
+            height,
+            &m_blackboard->get_or_add<passes::ClusterLightPassState>(),
+            hizOutput.pyramid,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels,
+            frame.view.viewProj,
+            hizOutput.pyramid.is_valid()
+        );
+    }
+
+    framegraph::VirtualResourceHandle visMotionHandle;
+    framegraph::VirtualResourceHandle visDepthHandle;
+    if (visActive) {
+        framegraph::DefaultOutputLayout resolveInputs;
+        resolveInputs.albedo = sunOutput;
+        resolveInputs.normal = normalBuffer;
+        resolveInputs.baseColor = baseColorBuffer;
+        resolveInputs.material = materialBuffer;
+        resolveInputs.depth = depthBuffer;
+        auto resolved = passes::setupMaterialResolvePass(
+            *m_framegraph,
+            m_device,
+            visIdBuffer,
+            resolveInputs,
+            frame.skinnedDrawArgsBuffer,
+            frame.clusterConfig,
+            m_gpuCullingManager.get(),
+            m_overlayManager ? m_overlayManager->GetSplatBuffer() : nullptr,
+            frame.view,
+            grassIds ? frame.grassEntryBase : 0xFFFFFFFFu,
+            &m_blackboard->get_or_add<passes::MaterialResolvePassState>()
+        );
+        if (grassIds && passes::EnsureDetailResolveResources(m_device, m_blackboard->get_or_add<passes::DetailResolvePassState>(), detailResources)) {
+            resolved = passes::setupDetailResolvePass(
+                *m_framegraph,
+                m_device,
+                visIdBuffer,
+                depthBuffer,
+                resolved,
+                m_detailManager.get(),
+                detailResources,
+                frame.view,
+                &m_blackboard->get_or_add<passes::DetailResolvePassState>()
+            );
+        }
+        sunOutput = resolved.color;
+        normalBuffer = resolved.normal;
+        baseColorBuffer = resolved.baseColor;
+        materialBuffer = resolved.material;
+        visMotionHandle = resolved.motionVectors;
+        visDepthHandle = resolved.visDepth;
+    }
+
+    framegraph::DefaultOutputLayout gbufferOutputs;
+    gbufferOutputs.albedo = sunOutput;
+    gbufferOutputs.normal = normalBuffer;
+    gbufferOutputs.baseColor = baseColorBuffer;
+    gbufferOutputs.material = materialBuffer;
+    gbufferOutputs.depth = depthBuffer;
+
+    auto& transparentConfig = frame.transparentConfig;
+    transparentConfig.geometry = geometryResources;
+    transparentConfig.lighting = &m_lightingState;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetTransparentObjectCount() > 0)
+    {
+        transparentConfig.objectCount = m_gpuCullingManager->GetTransparentObjectCount();
+        transparentConfig.ranges = &m_gpuCullingManager->GetTransparentRanges();
+    }
+    if (m_gpuCullingManager && m_gpuCullingManager->GetSkinnedForwardCount() > 0) {
+        transparentConfig.gpuCulling = m_gpuCullingManager.get();
+        transparentConfig.skinned = true;
+    }
+
+    auto& detailOutputs = frame.detailOutputs;
+    detailOutputs = gbufferOutputs;
+
+    if (m_decalManager) {
+        m_decalManager->Update(Device.fTimeDelta, Device.fTimeGlobal);
+        if (m_decalManager->GetActiveCount() > 0) {
+            detailOutputs = passes::setupDecalPass(
+                *m_framegraph, m_device,
+                detailOutputs, m_decalManager.get(),
+                width, height,
+                m_blackboard->get_or_add<passes::DecalPassState>()
+            );
+        }
+    }
+
+    detailOutputs = passes::setupStaticWallmarkPass(
+        *m_framegraph, m_device,
+        detailOutputs, transparentConfig,
+        width, height,
+        m_blackboard->get_or_add<passes::TransparentPassState>()
+    );
+
+    frame.features.rayHistoryRequired = m_lightingState.effective == fg::LightingMode::RTGI;
+    frame.features.motionVectorsRequired = frame.features.rayHistoryRequired || frame.features.visDebug;
+    const bool motionVectorsRequired = frame.features.motionVectorsRequired;
+
+    auto& motionOutput = frame.motionOutput;
+    if (motionVectorsRequired)
+        motionOutput = passes::setupMotionVectorPass(*m_framegraph, m_device, detailOutputs.depth, visIdBuffer, visDepthHandle,
+            visMotionHandle, frame.view, m_blackboard->get_or_add<passes::MotionVectorPassState>());
+
+    if (motionVectorsRequired)
+        m_mainView.CaptureSurfaceHistory(*m_framegraph, detailOutputs.depth, detailOutputs.normal,
+            frame.surfaceHistoryDepth, frame.surfaceHistoryNormal);
+
+    frame.opaqueOutputs = detailOutputs;
+    auto& skyFrame = frame.skyFrame;
+    skyFrame = passes::setupSkyEnvironmentPass(*m_framegraph, *m_skyEnvironment);
+    m_skyLightingReady = skyFrame.lightingReady;
+    if (m_skyVisibility)
+        skyFrame.probes = passes::setupSkyVisibilityBakePass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility);
+}
+
+void FrameGraphRenderer::SetupLightingStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    const auto& detailOutputs = frame.detailOutputs;
+    auto& opaqueOutputs = frame.opaqueOutputs;
+    const auto& clusterLightOut = frame.clusterLightOut;
+    const auto& skyFrame = frame.skyFrame;
+    const auto& transparentConfig = frame.transparentConfig;
+    const auto& hizOutput = frame.hizOutput;
+    const auto& geometryResources = frame.geometryResources;
+    const auto depthBuffer = frame.depthBuffer;
+    const auto materialBuffer = frame.materialBuffer;
+    const auto skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
+    const bool visActive = frame.visActive;
+
+    if (m_lightingState.effective == fg::LightingMode::RTGI)
+    {
+        const auto rtgiOutput = passes::setupReSTIRGIPass(*m_framegraph, m_device, m_rtAccelMgr.get(), m_worldCache.get(), detailOutputs, clusterLightOut,
+            skyFrame, frame.prevNormalsHandle, frame.prevDepthHandle, frame.motionOutput.motionVectors, frame.view,
+            ps_r_rt_gi_intensity, m_mainView.rtgi, m_lightingState);
+        opaqueOutputs.albedo = rtgiOutput.sceneColor;
+    }
+    else if (m_lightingState.effective == fg::LightingMode::ReferencePT)
+    {
+        passes::PathTracerConfig ptConfig;
+        ptConfig.maxBounces = static_cast<u32>(ps_r_path_tracer_bounces);
+        ptConfig.diffuseMode = static_cast<u32>(ps_fg_pbr_diffuse_mode);
+        ptConfig.diagnosticMode = static_cast<u32>(ps_r_path_tracer_debug);
+        ptConfig.maxNullEvents = static_cast<u32>(ps_r_rt_max_null_events);
+        ptConfig.maxSamples = static_cast<u32>(ps_r_path_tracer_samples);
+        ptConfig.lightRays = static_cast<u32>(std::clamp(ps_r_rt_light_rays, 0, 2));
+        ptConfig.sunAngularRadius = deg2rad(ps_r_rt_sun_radius);
+        ptConfig.freezeScene = ps_r_path_tracer_freeze != 0;
+        const auto ptOutput = passes::setupPathTracerPass(*m_framegraph, m_device, m_rtAccelMgr.get(), detailOutputs.albedo, clusterLightOut, skyFrame, m_lightingState, ptConfig,
+            frame.view, m_mainView.pathTracer);
+        opaqueOutputs.albedo = ptOutput.composited;
+    }
+
+    m_lightingState.ScheduleOpaqueLighting();
+
+    const bool shadowDebugRequested = ps_r_vsm_debug != 0 || ps_r_vsm_debug_dyn != 0 || ps_r_local_shadow_debug != 0;
+    const bool shadowReceiversActive = m_lightingState.scheduled == fg::LightingMode::Raster
+        || (m_lightingState.scheduled == fg::LightingMode::RTGI && ForwardGeometryShadesWithShadows(transparentConfig));
+    frame.features.rasterShadowWork = shadowDebugRequested || shadowReceiversActive;
+    frame.features.rasterDrawPasses = m_lightingState.scheduled != fg::LightingMode::ReferencePT;
+    const bool rasterShadowWork = frame.features.rasterShadowWork;
+
+    auto& vsmMaskHandle = frame.vsmMaskHandle;
+    bool vsmPassesActive = false;
+    passes::VSMDrawConfig vsmCfg;
+    passes::VSMDynConfig vsmDyn;
+    passes::VSMFrame vsmFrame;
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        const bool vsmReady = visActive && hizOutput.pyramid.is_valid();
+        if (!rasterShadowWork)
+        {
+            passes::SuspendVSM(nvDevice, vsmState);
+        }
+        else
+        {
+            vsmState.active = false;
+            if (vsmReady)
+            {
+                passes::VSMBeginFrame(vsmState, frame.view.cameraPos, passes::SunDirVisual());
+                vsmCfg.geometryResources = geometryResources;
+                vsmCfg.refCount = m_gpuCullingManager->GetClusterRefCount();
+                vsmCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+                vsmCfg.residencyStreaming = m_gpuCullingManager->GetResidency().IsStreaming();
+                vsmDyn.gpuCulling = m_gpuCullingManager.get();
+                vsmDyn.geometryResources = geometryResources;
+                const float coarseExtent = vsmState.params.level[passes::kVSMLevels - 1].z;
+                if (m_gpuCullingManager->GetShadowPairCapacity(coarseExtent / float(passes::kVSMPagesAxis),
+                    coarseExtent / float(passes::kVSMVirtualRes) * std::max(0.1f, ps_r_vsm_cluster_lod),
+                    passes::kVSMPagesAxis, vsmCfg.minimumPairCapacity)) {
+                    auto vsmOut = passes::setupVSMPasses(*m_framegraph, m_device, depthBuffer, materialBuffer, hizOutput.pyramid, skinnedDrawArgsBuffer,
+                        vsmCfg, vsmDyn, width, height, &vsmState, vsmFrame, m_gpuProfiler.get());
+                    vsmMaskHandle = vsmOut.mask;
+                    vsmPassesActive = vsmOut.active;
+                }
+            }
+        }
+    }
+
+    passes::LocalShadowConfig localCfg;
+    passes::LocalShadowFrame localFrame;
+    auto& localShadowOut = frame.localShadowOut;
+    if (m_blackboard && m_gpuCullingManager)
+    {
+        if (rasterShadowWork)
+        {
+            localCfg.gpuCulling = m_gpuCullingManager.get();
+            localCfg.geometryResources = geometryResources;
+            localCfg.bvhNodeCount = m_gpuCullingManager->GetShadowBvhNodeCount();
+            localFrame = passes::setupLocalShadowBinPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+                &m_blackboard->get_or_add<passes::LocalShadowState>(), m_gpuProfiler.get());
+        }
+        else
+        {
+            passes::SuspendLocalShadows(m_blackboard->get_or_add<passes::LocalShadowState>());
+        }
+    }
+
+    if (vsmPassesActive)
+    {
+        auto& vsmState = m_blackboard->get_or_add<passes::VSMState>();
+        passes::setupVSMAtlasPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, vsmCfg, vsmDyn, &vsmState, vsmFrame, m_gpuProfiler.get());
+        framegraph::VirtualResourceHandle vsmDebugView;
+        vsmMaskHandle = passes::setupVSMResolvePasses(*m_framegraph, m_device, depthBuffer, materialBuffer, width, height, &vsmState, vsmFrame, m_gpuProfiler.get(), &vsmDebugView);
+        if (vsmDebugView.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VSMDebug", vsmDebugView);
+    }
+
+    if (rasterShadowWork && m_blackboard && m_gpuCullingManager)
+        localShadowOut = passes::setupLocalShadowPasses(*m_framegraph, m_device, skinnedDrawArgsBuffer, localCfg,
+            &m_blackboard->get_or_add<passes::LocalShadowState>(), localFrame, m_gpuProfiler.get());
+
+    auto& litOutputs = frame.litOutputs;
+    litOutputs = opaqueOutputs;
+    if (m_lightingState.scheduled == fg::LightingMode::Raster)
+    {
+        litOutputs = passes::setupDeferredLightPass(*m_framegraph, m_device, opaqueOutputs, width, height, vsmMaskHandle, localShadowOut, clusterLightOut,
+            skyFrame, m_gpuProfiler.get(), &m_blackboard->get_or_add<passes::DeferredLightPassState>(), &m_lightingState);
+    }
+    auto& skyInspection = frame.skyInspection;
+    if (m_skyVisibility)
+    {
+        skyInspection = passes::setupSkyVisibilityInspectPass(*m_framegraph, m_device, m_rtAccelMgr.get(), *m_skyVisibility,
+            skyFrame.probes, opaqueOutputs.depth, opaqueOutputs.normal, opaqueOutputs.material, litOutputs.albedo,
+            m_lightingState.scheduled == fg::LightingMode::Raster ?
+                &m_blackboard->get_or_add<passes::DeferredLightPassState>() : nullptr, &m_lightingState);
+    }
+    if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid())
+    {
+        litOutputs.albedo = m_gpuCullingManager->SetupDebugVisualizationPass(*m_framegraph, m_hizPyramid, litOutputs.albedo, depthBuffer,
+            hizOutput.width, hizOutput.height, hizOutput.mipLevels, frame.view.viewProj, &m_worldParticleBatches);
+    }
+}
+
+void FrameGraphRenderer::SetupForwardStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const bool rasterDrawPasses = frame.features.rasterDrawPasses;
+    const auto& litOutputs = frame.litOutputs;
+    const auto& transparentConfig = frame.transparentConfig;
+    const auto& localShadowOut = frame.localShadowOut;
+    const auto& clusterLightOut = frame.clusterLightOut;
+    const auto& skyFrame = frame.skyFrame;
+    const auto vsmMaskHandle = frame.vsmMaskHandle;
+    const auto skinnedDrawArgsBuffer = frame.skinnedDrawArgsBuffer;
+    const auto visIdBuffer = frame.visIdBuffer;
+    const auto& motionOutput = frame.motionOutput;
+    const auto& geometryResources = frame.geometryResources;
+    auto& gpuParticles = GetGpuParticleManager();
+    auto& gpuParticleState = m_blackboard->get_or_add<passes::GpuParticlePassState>();
+
+    auto& transparentOutputs = frame.transparentOutputs;
+    transparentOutputs = litOutputs;
+    if (rasterDrawPasses)
+    {
+        transparentOutputs = passes::setupTransparentPass(
+            *m_framegraph,
+            m_device,
+            litOutputs,
+            transparentConfig,
+            localShadowOut,
+            clusterLightOut,
+            skyFrame,
+            vsmMaskHandle,
+            skinnedDrawArgsBuffer,
+            width, height,
+            m_blackboard->get_or_add<passes::TransparentPassState>()
+        );
+    }
+
+    if (frame.features.visDebug && visIdBuffer.is_valid()) {
+        auto visDebug = passes::setupVisDebugViewPass(*m_framegraph, m_device, visIdBuffer, motionOutput.motionVectors, width, height, u32(ps_r_vis_debug), &m_blackboard->get_or_add<passes::VisibilityPassState>());
+        if (visDebug.is_valid())
+            m_framegraph->GetRTRegistry().RegisterRT("rt_VisDebug", visDebug);
+    }
+
+    auto particleLayout = transparentOutputs;
+    if (frame.features.drawParticles && rasterDrawPasses) {
+        particleLayout = passes::setupGpuParticlePass(
+            *m_framegraph, m_device, gpuParticles.GetDrawResources(), geometryResources.materials,
+            transparentOutputs, width, height, gpuParticleState, &m_lightingState);
+    }
+
+    auto& smokeOutputs = frame.smokeOutputs;
+    smokeOutputs = particleLayout;
+    if (m_smokeTrailManager && m_smokeTrailManager->IsReady())
+    {
+        smokeOutputs = passes::setupSmokeTrailPass(
+            *m_framegraph,
+            m_device,
+            particleLayout,
+            m_smokeTrailManager.get(),
+            width,
+            height,
+            m_blackboard->get_or_add<passes::SmokeTrailPassState>(),
+            &m_lightingState,
+            m_detailManager ? m_detailManager->perlin4dTexture.Get() : nullptr
+        );
+    }
+
+    auto& sceneColor = frame.sceneColor;
+    sceneColor = smokeOutputs.albedo;
+
+    if (smokeOutputs.distortion.is_valid() && rasterDrawPasses) {
+        sceneColor = passes::setupDistortionApplyPass(
+            *m_framegraph, m_device, sceneColor, smokeOutputs.distortion,
+            smokeOutputs.depth, width, height,
+            m_blackboard->get_or_add<passes::DistortionApplyPassState>(), &m_lightingState);
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Rain)
+    {
+        auto* effRain = g_pGamePersistent->Environment().eff_Rain;
+        effRain->Render();
+        if (auto* fgRain = dynamic_cast<FGRainRender*>(effRain->GetRenderer()))
+        {
+            if (fgRain->HasWork() && rasterDrawPasses)
+            {
+                sceneColor = passes::setupRainPass(
+                    *m_framegraph,
+                    sceneColor,
+                    smokeOutputs.depth,
+                    fgRain,
+                    &m_lightingState);
+            }
+        }
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_Thunderbolt)
+    {
+        auto* effTB = g_pGamePersistent->Environment().eff_Thunderbolt;
+        effTB->Render();
+        if (auto* fgTB = dynamic_cast<FGThunderboltRender*>(effTB->GetRenderer()))
+        {
+            if (fgTB->HasWork() && rasterDrawPasses)
+            {
+                sceneColor = passes::setupThunderboltPass(
+                    *m_framegraph,
+                    sceneColor,
+                    smokeOutputs.depth,
+                    fgTB,
+                    &m_lightingState);
+            }
+        }
+    }
+
+    if (g_pGamePersistent && g_pGamePersistent->Environment().eff_LensFlare)
+    {
+        auto* effLF = g_pGamePersistent->Environment().eff_LensFlare;
+        effLF->Render(true, true, true);
+        if (auto* fgLF = dynamic_cast<FGLensFlareRender*>(effLF->GetRenderer()))
+        {
+            if (fgLF->HasWork() && rasterDrawPasses)
+            {
+                sceneColor = passes::setupLensFlarePass(
+                    *m_framegraph,
+                    sceneColor,
+                    smokeOutputs.depth,
+                    fgLF,
+                    &m_lightingState);
+            }
+        }
+    }
+
+    sceneColor = passes::setupLightingFailurePass(*m_framegraph, sceneColor, m_lightingState);
+}
+
+void FrameGraphRenderer::SetupPostStage(FrameSetup& frame) {
+    const u32 width = frame.view.width;
+    const u32 height = frame.view.height;
+    const auto sceneColor = frame.sceneColor;
+    const auto backbufferHandle = frame.backbufferHandle;
+    const auto& skyFrame = frame.skyFrame;
+    const auto& skyInspection = frame.skyInspection;
+    const auto& smokeOutputs = frame.smokeOutputs;
+
+    auto& displayState = m_blackboard->get_or_add<passes::DisplayPassState>();
+    const auto exposure = passes::setupExposurePasses(*m_framegraph, m_device, sceneColor, width, height,
+        m_sceneCollected, displayState);
+
+    auto& bloom = frame.bloom;
+    if (frame.features.bloom)
+        bloom = passes::setupBloomPass(*m_framegraph, m_device, sceneColor, exposure, width, height,
+            m_blackboard->get_or_add<passes::BloomPassState>());
+
+    auto* resourceManager = m_device ? m_device->GetFGResourceManager() : nullptr;
+    const fg::PostProcessFrame postProcess = m_postProcess.Prepare(
+        resourceManager ? resourceManager->GetTextureManager() : nullptr, Device.fTimeDelta);
+
+    auto& interfaceLayer = frame.interfaceLayer;
+    interfaceLayer = passes::setupInterfaceLayer(*m_framegraph, width, height);
+    if (m_skyVisibility)
+        interfaceLayer = passes::setupSkyVisibilityDebugPass(*m_framegraph, m_device, *m_skyVisibility, skyFrame.probes,
+            interfaceLayer, smokeOutputs.depth, skyInspection, width, height);
+    interfaceLayer = passes::setupUIPass(*m_framegraph, interfaceLayer, width, height);
+    interfaceLayer = passes::setupFontPass(*m_framegraph, interfaceLayer);
+    interfaceLayer = passes::setupCursorPass(*m_framegraph, interfaceLayer, width, height);
+    interfaceLayer = passes::setupDebugDrawPass(*m_framegraph, interfaceLayer, width, height);
+    if (backbufferHandle.is_valid())
+        interfaceLayer = passes::setupImGuiPass(*m_framegraph, interfaceLayer, GEnv.Render->GetImGuiRendererNVRHI(), width, height);
+
+    const IRenderBackend::DisplayOutput outputMode = GEnv.Backend ? GEnv.Backend->GetDisplayOutput() : IRenderBackend::DisplayOutput();
+    if (backbufferHandle.is_valid())
+        passes::setupDisplayOutputPass(*m_framegraph, m_device, sceneColor, exposure, bloom, interfaceLayer,
+            backbufferHandle, width, height, GetDisplayCalibration(), postProcess, outputMode, displayState, &m_lightingState);
+}
+
+void FrameGraphRenderer::SetupInspectorStage(FrameSetup& frame) {
+    const auto& transparentOutputs = frame.transparentOutputs;
+    const auto& motionOutput = frame.motionOutput;
+    const auto& bloom = frame.bloom;
+    const auto skyColorHandle = frame.skyColorHandle;
+    const auto depthBuffer = frame.depthBuffer;
+    const auto interfaceLayer = frame.interfaceLayer;
+    const auto baseColorBuffer = frame.baseColorBuffer;
+    const auto materialBuffer = frame.materialBuffer;
+    const auto prevDepthHandle = frame.prevDepthHandle;
+    const auto prevNormalsHandle = frame.prevNormalsHandle;
+    const auto sceneColor = frame.sceneColor;
+
+    m_framegraph->GetRTRegistry().RegisterRT("rt_SceneColor", skyColorHandle);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Depth", depthBuffer);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Normal", transparentOutputs.normal);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Interface", interfaceLayer);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_BaseColor", baseColorBuffer);
+    m_framegraph->GetRTRegistry().RegisterRT("rt_Material", materialBuffer);
+    if (motionOutput.motionVectors.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_MotionVectors", motionOutput.motionVectors);
+    if (prevDepthHandle.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevDepth", prevDepthHandle);
+    if (prevNormalsHandle.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_PrevNormals", prevNormalsHandle);
+    if (m_lightingState.effective == fg::LightingMode::RTGI)
+        m_framegraph->GetRTRegistry().RegisterRT("rt_RTGI_SceneColor", sceneColor);
+    if (bloom.texture.is_valid())
+        m_framegraph->GetRTRegistry().RegisterRT("rt_Bloom", bloom.texture);
+
+    if (m_statsOverlay && psDeviceFlags.test(rsStatistic) && m_inspectorPreview)
+    {
+        auto rtNames = m_framegraph->GetRTRegistry().GetAllNames();
+        xr_vector<u8> rtIsDepth;
+        rtIsDepth.reserve(rtNames.size());
+        for (const auto& name : rtNames) {
+            auto handle = m_framegraph->GetRTRegistry().TryGetRT(name.c_str());
+            const bool depth = handle.is_valid()
+                && nvrhi::getFormatInfo(m_framegraph->GetResourceDesc(handle).format).hasDepth;
+            rtIsDepth.push_back(depth ? 1 : 0);
+        }
+        m_statsOverlay->SetInspectorRTList(rtNames, rtIsDepth);
+
+        auto selectedName = m_statsOverlay->GetSelectedRTName();
+        if (selectedName.size() > 0)
+        {
+            auto selectedHandle = m_framegraph->GetLatestVersion(m_framegraph->GetRTRegistry().TryGetRT(selectedName.c_str()));
+            if (selectedHandle.is_valid())
+            {
+                framegraph::ResourceDesc previewDesc;
+                previewDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+                previewDesc.width = 512;
+                previewDesc.height = 512;
+                previewDesc.format = nvrhi::Format::RGBA16_FLOAT;
+                previewDesc.isUAV = true;
+                previewDesc.isImported = true;
+                previewDesc.debugName = "debug_preview";
+                auto previewHandle = m_framegraph->ImportTexture(
+                    "debug_preview", m_inspectorPreview.Get(), previewDesc);
+
+                struct DebugPreviewData {
+                    framegraph::VirtualResourceHandle source;
+                    framegraph::VirtualResourceHandle dest;
+                    fg::RenderDevice* device;
+                    u32 sourceW, sourceH;
+                    int channelMode;
+                    int mipLevel;
+                };
+
+                auto& previewData = m_framegraph->addCallbackPass<DebugPreviewData>(
+                    "Debug Preview",
+                    [&, selectedHandle, previewHandle](framegraph::FrameGraph& builder, framegraph::PassHandle pass, DebugPreviewData& data) {
+                        data.device = m_device;
+                        data.channelMode = m_statsOverlay ? m_statsOverlay->GetChannelMode() : 0;
+                        data.mipLevel = m_statsOverlay ? m_statsOverlay->GetSelectedMipLevel() : 0;
+                        data.source = selectedHandle;
+                        data.dest = previewHandle;
+                        auto& srcDesc = builder.GetResourceDesc(selectedHandle);
+                        data.sourceW = std::max(1u, srcDesc.width >> data.mipLevel);
+                        data.sourceH = std::max(1u, srcDesc.height >> data.mipLevel);
+                        if (m_statsOverlay) {
+                            m_statsOverlay->SetSelectedRTMipCount(srcDesc.mipLevels);
+                            m_statsOverlay->SetSelectedRTSize(srcDesc.width, srcDesc.height);
+                        }
+                        builder.PassRead(pass, selectedHandle, framegraph::ResourceState::ShaderResource);
+                        data.dest = builder.PassWrite(pass, previewHandle, framegraph::ResourceState::UnorderedAccess);
+                    },
+                    [](const DebugPreviewData& data, const framegraph::FrameGraph& fg, fg::RenderContext* ctx) {
+                        static nvrhi::ComputePipelineHandle s_pipeline;
+                        static nvrhi::BindingLayoutHandle s_layout;
+                        static nvrhi::BufferHandle s_cb;
+                        static bool s_init = false;
+
+                        nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+
+                        if (!s_init) {
+                            auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("debug_preview");
+                            if (!csResult.handle) return;
+
+                            s_layout = framegraph::GetPassResourceCache().GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
+
+                            nvrhi::ComputePipelineDesc pipeDesc;
+                            pipeDesc.CS = csResult.handle;
+                            pipeDesc.bindingLayouts = { s_layout };
+                            s_pipeline = nvDevice->createComputePipeline(pipeDesc);
+
+                            nvrhi::BufferDesc cbDesc;
+                            cbDesc.debugName = "DebugPreviewCB";
+                            cbDesc.byteSize = 32;
+                            cbDesc.isConstantBuffer = true;
+                            cbDesc.isVolatile = true;
+                            cbDesc.maxVersions = fg::RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+                            cbDesc.keepInitialState = true;
+                            cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+                            s_cb = nvDevice->createBuffer(cbDesc);
+
+                            s_init = true;
+                        }
+
+                        if (!s_pipeline) return;
+
+                        nvrhi::ITexture* srcTex = fg.GetPhysicalTexture(data.source);
+                        nvrhi::ITexture* dstTex = fg.GetPhysicalTexture(data.dest);
+                        if (!srcTex || !dstTex) return;
+
+                        struct {
+                            u32 outputW, outputH;
+                            u32 sourceW, sourceH;
+                            u32 mode;
+                            u32 mipLevel;
+                            float projA;
+                            float projB;
+                        } cb;
+                        cb.outputW = 512; cb.outputH = 512;
+                        cb.sourceW = data.sourceW; cb.sourceH = data.sourceH;
+                        cb.mode = (u32)data.channelMode;
+                        cb.mipLevel = (u32)data.mipLevel;
+                        cb.projA = Device.mProject._33;
+                        cb.projB = Device.mProject._43;
+
+                        nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+                        cmdList->writeBuffer(s_cb, &cb, sizeof(cb));
+
+                        auto* debugRefl = GEnv.Render->GetShaderLoader()->GetCachedReflection("debug_preview", ".cs");
+                        framegraph::BindingSetBuilder bsb(*debugRefl, nvDevice, "FGRenderer.Debug");
+                        bsb.ConstantBuffer("DebugPreviewParams", s_cb)
+                           .Texture("t_source", srcTex)
+                           .TextureUAV("u_output", dstTex);
+                        auto bindings = nvDevice->createBindingSet(bsb.Build(), s_layout);
+                        if (!bindings) return;
+
+                        ctx->SetComputePipeline(s_pipeline.Get());
+                        ctx->SetComputeBindingSet(0, bindings.Get());
+                        ctx->Dispatch((512 + 7) / 8, (512 + 7) / 8, 1);
+                    }
+                );
+            }
+        }
+    }
+}
+
+void FrameGraphRenderer::PrintStats() const {
+    Msg("═══════════════════════════════════════");
+    Msg("  FrameGraph Renderer Statistics");
+    Msg("═══════════════════════════════════════");
+    Msg("  Total frame: %.2f ms (%.1f FPS)",
+        m_stats.totalFrameMs,
+        1000.0f / m_stats.totalFrameMs);
+    Msg("  G-Buffer: %.2f ms", m_stats.gbufferMs);
+    Msg("  Lighting: %.2f ms", m_stats.lightingMs);
+    Msg("  Draw calls: %u", m_stats.numDrawCalls);
+    Msg("  Triangles: %u", m_stats.numTriangles);
+    Msg("═══════════════════════════════════════");
+}
+
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
+    if (!visual)
+        return false;
+
+    ZoneScopedN("ProcessVisualGeometry");
+
+    IRender_Mesh* meshVisual = nullptr;
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+            meshVisual = static_cast<FTreeVisual*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            if (m_collectShadowOnly)
+                return false;
+            return ProcessParticleGeometry(visual, worldTransform, renderable, false);
+        default:
+            return false;
+    }
+
+    if (!meshVisual)
+        return false;
+
+
+    GeometryBatch batch;
+
+    u32 visualType = visual->getType();
+    bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+
+    if (isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_PM) {
+            const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+            if (swi.sw && swi.count > 0) {
+                const FSlideWindow& sw = swi.sw[0];
+                batch.indexCount = sw.num_tris * 3;
+                batch.startIndex = sw.offset;
+            } else {
+                batch.indexCount = meshVisual->iCount;
+                batch.startIndex = 0;
+            }
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = 0;
+        }
+        batch.baseVertex = 0;
+    } else if (visualType == MT_PROGRESSIVE) {
+        const FSlideWindowItem& swi = static_cast<FProgressive*>(visual)->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            const FSlideWindow& sw = swi.sw[0];
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
+    } else if (visualType == MT_TREE_PM) {
+        const FSlideWindowItem* pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
+        if (pSWI && pSWI->sw && pSWI->count > 0) {
+            const FSlideWindow& sw = pSWI->sw[0];
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
+    } else {
+        batch.indexCount = meshVisual->iCount;
+        batch.startIndex = meshVisual->iBase;
+        batch.baseVertex = meshVisual->vBase;
+    }
+    batch.vertexCount = meshVisual->vCount;
+    batch.worldMatrix = worldTransform;
+    batch.visual = visual;
+    if (visual->shaderName.size()) {
+        const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName);
+        batch.isTransparent = materialInfo.transparent;
+        batch.isAlphaTested = materialInfo.alphaTest;
+    }
+    batch.renderable = renderable;
+    batch.visualLifetimeID = visual->lifetimeID;
+    batch.renderableLifetimeID = renderable ? renderable->GetRenderData().lifetimeSerial : 0ull;
+    batch.geometrySubset = 0u;
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isShadowOnly = m_collectShadowOnly;
+    batch.isStatic = isStatic;
+    if (isStatic && !batch.isSkinned) {
+        const bool tree = visualType == MT_TREE_ST || visualType == MT_TREE_PM;
+        batch.hemiScale = tree ? static_cast<FTreeVisual*>(visual)->GetHemiScale() : 1.0f;
+        batch.hemiBias = tree ? static_cast<FTreeVisual*>(visual)->GetHemiBias() : 0.0f;
+        if (!tree && m_materialCache && visual->lightmapName.size())
+            batch.lightmapTexture = m_materialCache->AcquireLightmapTexture(visual->lightmapName);
+    }
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+        if (m_gpuCullingManager && meshVisual->p_rm_Vertices && meshVisual->p_rm_Indices) {
+            u32 fmt = fg::SkinnedFormatFromRenderMode(batch.skinningRenderMode, meshVisual->vStride);
+            if (m_gpuCullingManager->GetSkinnedPools().Register(
+                    meshVisual->p_rm_Vertices, meshVisual->p_rm_Indices,
+                    meshVisual->vCount, meshVisual->vStride, meshVisual->iCount, fmt)) {
+                batch.skinnedPoolFormat = fmt;
+                batch.skinnedPoolBaseVertex = (s32)meshVisual->p_rm_Vertices->skinned_pool_base_vertex;
+                batch.skinnedPoolFirstIndex = meshVisual->p_rm_Vertices->skinned_pool_first_index + batch.startIndex;
+            }
+        }
+    }
+    if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
+        batch.worldBoundsCenter = visual->vis.sphere.P;
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    } else {
+        worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    }
+
+    float distSQ = Device.vCameraPosition.distance_to_sqr(batch.worldBoundsCenter) + EPS;
+    batch.ssa = batch.worldBoundsRadius / distSQ;
+
+    if (m_materialCache) {
+        if (m_materialCache->IsTerrainMaterial(visual)) {
+            batch.isTerrain = true;
+            batch.terrainMaterialID = m_materialCache->PreRegisterTerrainMaterial(visual);
+        } else {
+            batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+        }
+    }
+
+    if (m_gpuCullingManager) {
+        batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
+            meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+            meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
+            meshVisual->useAlternativeGeom
+        );
+
+        if (!batch.megaBufferAlloc.valid && !batch.isSkinned
+            && meshVisual->p_rm_Vertices && meshVisual->p_rm_Indices && batch.indexCount >= 3
+            && meshVisual->rm_geom._get() && meshVisual->rm_geom->dcl._get()
+            && !meshVisual->rm_geom->dcl->dcl_code.empty()) {
+            const u32 stride = meshVisual->vStride ? meshVisual->vStride : meshVisual->rm_geom.stride();
+            fg::GeometrySourceKey source;
+            source.vertexSource = meshVisual->p_rm_Vertices->source_token;
+            source.indexSource = meshVisual->p_rm_Indices->source_token;
+            source.vertexBase = meshVisual->vBase;
+            source.vertexCount = meshVisual->vCount;
+            source.indexBase = batch.startIndex;
+            source.indexCount = batch.indexCount;
+            source.flags = batch.isAlphaTested ? fg::CLUSTER_RANGE_FLAG_AT : 0u;
+            if (batch.isTransparent)
+            {
+                source.flags |= fg::GEOMETRY_SOURCE_FORWARD;
+                if (fg::GPUCullingManager::MaterialCastsShadow(batch.bindlessMaterialID))
+                    source.flags |= fg::GEOMETRY_SOURCE_SHADOW | fg::CLUSTER_RANGE_FLAG_AT;
+            }
+            source.vertexStride = stride;
+            source.vertexFormat = bindless::BuildSourceVertexLayout(
+                meshVisual->rm_geom->dcl->dcl_code.data(), stride).Signature();
+
+            if (source.vertexSource == 0 || source.indexSource == 0 || stride == 0
+                || source.vertexFormat == 0)
+                FATAL_F("[FrameGraph] unsupported opaque source layout: stride=%u, declaration=%u elements",
+                    stride, u32(meshVisual->rm_geom->dcl->dcl_code.size()));
+            {
+                if (const fg::MeshAllocation* cached = m_gpuCullingManager->FindRuntimeGeometry(source)) {
+                    batch.megaBufferAlloc = *cached;
+                } else {
+                    const u64 vertexBytes = (u64(source.vertexBase) + source.vertexCount) * u64(stride);
+                    const u64 indexBytes = (u64(source.indexBase) + source.indexCount) * sizeof(u16);
+                    if (vertexBytes > meshVisual->p_rm_Vertices->GetSystemMemoryUsage()
+                        || indexBytes > meshVisual->p_rm_Indices->GetSystemMemoryUsage())
+                        FATAL_F("[FrameGraph] runtime geometry source range v=%u+%u i=%u+%u exceeds its retained staging allocation",
+                            source.vertexBase, source.vertexCount, source.indexBase, source.indexCount);
+                    const void* vdata = meshVisual->p_rm_Vertices->Map(0, 0, true);
+                    const void* idata = vdata ? meshVisual->p_rm_Indices->Map(0, 0, true) : nullptr;
+                    if (!vdata || !idata)
+                        FATAL("[FrameGraph] opaque source data is unavailable for cooking");
+                    if (idata) {
+                        batch.megaBufferAlloc = m_gpuCullingManager->RegisterRuntimeGeometry(source,
+                            static_cast<const u8*>(vdata) + size_t(source.vertexBase) * stride,
+                            stride, meshVisual->rm_geom->dcl->dcl_code.data(),
+                            static_cast<const u16*>(idata));
+                    }
+                    if (idata)
+                        meshVisual->p_rm_Indices->Unmap();
+                    if (vdata)
+                        meshVisual->p_rm_Vertices->Unmap();
+                }
+            }
+        }
+        if (!batch.isSkinned && !batch.isTransparent && batch.indexCount > 0 && !batch.megaBufferAlloc.valid)
+            FATAL("[FrameGraph] opaque geometry has no registered raster source");
+
+        static int s_allocDebug = 0;
+        if (s_allocDebug < 10 && !batch.megaBufferAlloc.valid) {
+            Msg("! [MegaBuffer] Invalid alloc: vbPool=%u, vBase=%u, vCount=%u, ibPool=%u, iBase=%u, iCount=%u, alt=%d",
+                meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+                meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
+                meshVisual->useAlternativeGeom ? 1 : 0);
+            s_allocDebug++;
+        }
+    }
+    if (batch.megaBufferAlloc.valid || batch.skinnedPoolFormat != UINT32_MAX)
+    {
+        auto discard = [&](auto* buffer)
+        {
+            if (buffer && buffer->GetBufferHandle())
+            {
+                Resources->DiscardGeometryBuffer(buffer->GetBufferHandle());
+                buffer->DiscardDeviceBuffer();
+            }
+        };
+        discard(meshVisual->p_rm_Vertices);
+        discard(meshVisual->p_rm_Indices);
+    }
+
+    m_geometryCollector->Submit(batch);
+    return true;
+}
+
+bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
+    if (!visual)
+        return false;
+
+    IRender_Mesh* meshVisual = nullptr;
+
+    switch (visual->getType()) {
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            return ProcessParticleGeometry(visual, worldTransform, renderable, true);
+        default:
+            return false;
+    }
+
+    if (!meshVisual)
+        return false;
+
+    if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return false;
+
+
+    GeometryBatch batch;
+    batch.indexCount = meshVisual->iCount;
+    batch.startIndex = meshVisual->iBase;
+    batch.baseVertex = meshVisual->vBase;
+    if (visual->getType() == MT_SKELETON_GEOMDEF_PM) {
+        const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            batch.indexCount = swi.sw[0].num_tris * 3;
+            batch.startIndex = swi.sw[0].offset;
+        }
+    }
+    batch.worldMatrix = worldTransform;
+    batch.visual = visual;
+    if (visual->shaderName.size()) {
+        const auto& materialInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName);
+        batch.isTransparent = materialInfo.transparent;
+        batch.isAlphaTested = materialInfo.alphaTest;
+    }
+    batch.renderable = renderable;
+    batch.visualLifetimeID = visual->lifetimeID;
+    batch.renderableLifetimeID = renderable ? renderable->GetRenderData().lifetimeSerial : 0ull;
+    batch.geometrySubset = 1u;
+
+    u32 visualType = visual->getType();
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.vertexCount = meshVisual->vCount;
+
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+        if (m_gpuCullingManager && meshVisual->p_rm_Vertices && meshVisual->p_rm_Indices) {
+            u32 fmt = fg::SkinnedFormatFromRenderMode(batch.skinningRenderMode, meshVisual->vStride);
+            if (m_gpuCullingManager->GetSkinnedPools().Register(
+                    meshVisual->p_rm_Vertices, meshVisual->p_rm_Indices,
+                    meshVisual->vCount, meshVisual->vStride, meshVisual->iCount, fmt)) {
+                batch.skinnedPoolFormat = fmt;
+                batch.skinnedPoolBaseVertex = (s32)meshVisual->p_rm_Vertices->skinned_pool_base_vertex;
+                batch.skinnedPoolFirstIndex = meshVisual->p_rm_Vertices->skinned_pool_first_index + batch.startIndex;
+            }
+        }
+    }
+    if (batch.skinnedPoolFormat != UINT32_MAX)
+    {
+        auto discard = [&](auto* buffer)
+        {
+            if (buffer && buffer->GetBufferHandle())
+            {
+                Resources->DiscardGeometryBuffer(buffer->GetBufferHandle());
+                buffer->DiscardDeviceBuffer();
+            }
+        };
+        discard(meshVisual->p_rm_Vertices);
+        discard(meshVisual->p_rm_Indices);
+    }
+    worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
+    batch.worldBoundsRadius = visual->vis.sphere.R;
+
+    if (m_materialCache) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+    }
+
+    m_hudBatches.push_back(batch);
+    return true;
+}
+
+
+void FrameGraphRenderer::ProcessSingleParticleEffect(
+    fg::PS::CParticleEffect* pEffect,
+    const Fmatrix& worldTransform,
+    IRenderable* renderable,
+    bool isHUD)
+{
+    if (!pEffect)
+        return;
+
+    const bool hud = isHUD || pEffect->GetHudMode();
+    GetGpuParticleManager().SetHudMode(pEffect->GetGpuHandle(), hud);
+    passes::ParticleBatch batch;
+    batch.visual = pEffect;
+    if (pEffect->m_RT_Flags.is(fg::PS::CParticleEffect::flRT_XFORM))
+        batch.worldMatrix = pEffect->m_XFORM;
+    else
+        batch.worldMatrix.identity();
+    batch.isHUDMode = hud;
+    batch.particleCount = pEffect->ParticlesCount();
+    if (hud)
+        m_hudParticleBatches.push_back(batch);
+    else
+        m_worldParticleBatches.push_back(batch);
+}
+
+bool FrameGraphRenderer::ProcessParticleGeometry(
+    dxRender_Visual* visual,
+    const Fmatrix& worldTransform,
+    IRenderable* renderable,
+    bool isHUD)
+{
+    if (!visual)
+        return false;
+
+    u32 vType = visual->getType();
+
+    if (vType == MT_PARTICLE_EFFECT) {
+        auto* pEffect = static_cast<fg::PS::CParticleEffect*>(visual);
+        ProcessSingleParticleEffect(pEffect, worldTransform, renderable, isHUD);
+        return true;
+    }
+
+    if (vType == MT_PARTICLE_GROUP) {
+        auto* pGroup = static_cast<fg::PS::CParticleGroup*>(visual);
+        for (auto& item : pGroup->items) {
+            if (item._effect) {
+                auto* childEffect = static_cast<fg::PS::CParticleEffect*>(item._effect);
+                ProcessSingleParticleEffect(childEffect, worldTransform, renderable, isHUD);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+template <typename F>
+static void ForEachLeafVisual(dxRender_Visual* pVisual, F&& fn) {
+    if (!pVisual)
+        return;
+
+    switch (pVisual->Type) {
+        case MT_HIERRARHY: {
+            FHierrarhyVisual* pV = static_cast<FHierrarhyVisual*>(pVisual);
+            for (auto& child : pV->children) {
+                ForEachLeafVisual(child, fn);
+            }
+            break;
+        }
+        case MT_LOD: {
+            FLOD* pV = static_cast<FLOD*>(pVisual);
+            for (auto& child : pV->children) {
+                ForEachLeafVisual(child, fn);
+            }
+            break;
+        }
+        case MT_SKELETON_ANIM:
+        case MT_SKELETON_RIGID: {
+            CKinematics* pV = static_cast<CKinematics*>(pVisual);
+            pV->CalculateBones(TRUE);
+
+            for (auto& child : pV->children) {
+                ForEachLeafVisual(child, fn);
+            }
+
+            break;
+        }
+        case MT_SKELETON_GEOMDEF_PM:
+        case MT_SKELETON_GEOMDEF_ST: {
+            fn(pVisual);
+            break;
+        }
+        case MT_PROGRESSIVE: {
+            fn(pVisual);
+            break;
+        }
+        case MT_PARTICLE_GROUP: {
+            PS::CParticleGroup* pG = static_cast<PS::CParticleGroup*>(pVisual);
+            for (auto& item : pG->items) {
+                if (item._effect)
+                    ForEachLeafVisual(item._effect, fn);
+            }
+            break;
+        }
+        case MT_PARTICLE_EFFECT:
+            fn(pVisual);
+            break;
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+        case MT_NORMAL:
+        default: {
+            fn(pVisual);
+            break;
+        }
+    }
+}
+
+void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
+    ForEachLeafVisual(pVisual, [&outLeafs](dxRender_Visual* leaf) { outLeafs.push_back(leaf); });
+}
+
+void FrameGraphRenderer::CollectVisibleGeometry() {
+    if (!g_pGamePersistent)
+        return;
+
+    const auto& sectors = scene_info::GetSceneSectors();
+
+    if (!m_geometryCollector->IsStaticBuildComplete() && !sectors.empty()) {
+        Msg("* [GeomCache] Building static geometry cache from %zu sectors...", sectors.size());
+
+        xr_vector<dxRender_Visual*> staticVisuals;
+        xr_set<dxRender_Visual*> uniqueVisuals;
+
+        for (CSector* sector : sectors) {
+            if (sector && sector->root()) {
+                ExtractStaticLeafVisuals(sector->root(), staticVisuals);
+            }
+        }
+
+        for (dxRender_Visual* v : staticVisuals) {
+            uniqueVisuals.insert(v);
+        }
+
+        for (dxRender_Visual* visual : uniqueVisuals) {
+            Fmatrix xform = Fidentity;
+
+            switch (visual->getType()) {
+                case MT_TREE_ST:
+                case MT_TREE_PM: {
+                    FTreeVisual* treeVisual = static_cast<FTreeVisual*>(visual);
+                    xform = treeVisual->xform;
+                    break;
+                }
+                default:
+                    xform = Fidentity;
+                    break;
+            }
+
+            ProcessVisualGeometry(visual, xform, nullptr, true);
+        }
+
+        m_geometryCollector->EndStaticBuild();
+
+        Msg("* [GeomCache] Cached %zu static batches from %zu unique visuals (total sectors: %zu)",
+            m_geometryCollector->GetStaticBatches().size(), uniqueVisuals.size(), sectors.size());
+    }
+
+    u32 submittedDynamic = 0;
+    u32 notRenderable = 0;
+
+    const u32 collectStamp = ++m_collectGeneration;
+    xr_vector<const light*>& collectedLights = m_collectedLights;
+    collectedLights.clear();
+
+    {
+        ZoneScopedN("CollectVisibleGeometry::Renderables");
+        for (ISpatial* spatial : m_lstRenderables)
+        {
+            if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+                continue;
+            spatial->GetSpatialData().collect_stamp = collectStamp;
+
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable) {
+                notRenderable++;
+                continue;
+            }
+
+            renderable->renderable_Render(0, renderable);
+            submittedDynamic++;
+        }
+    }
+
+    xr_vector<const light*>& culledLights = m_culledLights;
+    culledLights.clear();
+    const bool debugLights = ps_r_local_shadow_debug != 0;
+    const bool rayTracingLighting = fg::LightingModeUsesRays(fg::LightingModeFromSetting(ps_r_rt_gi)) &&
+        m_rtAccelMgr && m_rtAccelMgr->IsSupported() && GEnv.Backend && GEnv.Backend->SupportsSubmissionLeases();
+    auto cullLight = [&](const light* L) {
+        if (debugLights)
+            culledLights.push_back(L);
+    };
+    auto collectLight = [&](ISpatial* spatial, bool touchesCamera) {
+        auto* L = static_cast<light*>(spatial->dcast_Light());
+        if (!L || !L->flags.bActive || L->spatial.collect_stamp == collectStamp)
+            return;
+        if (L->flags.type != IRender_Light::POINT && L->flags.type != IRender_Light::SPOT && L->flags.type != IRender_Light::AREA)
+            return;
+        if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
+            return;
+        if (L->GetSpatialData().type & STYPEFLAG_INVALIDSECTOR)
+            L->spatial_updatesector(fg::Scene.detect_sector(L->position));
+        if (L->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID) {
+            ++m_lightsInvalidSector;
+            cullLight(L);
+            return;
+        }
+        if (o.noshadows)
+            L->flags.bShadow = false;
+        if (!touchesCamera && !rayTracingLighting) {
+            if (L->get_LOD() <= EPS_L) {
+                ++m_lightsLodCulled;
+                cullLight(L);
+                return;
+            }
+            if (!m_HOM.visible(L->get_homdata())) {
+                ++m_lightsHomCulled;
+                cullLight(L);
+                return;
+            }
+        } else if (touchesCamera) {
+            ++m_lightsTouching;
+        }
+        L->spatial.collect_stamp = collectStamp;
+        collectedLights.push_back(L);
+    };
+
+    xr_vector<ISpatial*>& touchingLights = m_touchingLights;
+    g_pGamePersistent->SpatialSpace.q_sphere(touchingLights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
+    for (ISpatial* spatial : touchingLights)
+        collectLight(spatial, true);
+
+    for (ISpatial* spatial : m_lstRenderables)
+    {
+        if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE) {
+            ++m_lightsFrustum;
+            collectLight(spatial, false);
+        }
+    }
+
+    if (rayTracingLighting)
+    {
+        auto& space = g_pGamePersistent->SpatialSpace;
+        Fvector extent;
+        extent.set(space.m_bounds * 2.0f, space.m_bounds * 2.0f, space.m_bounds * 2.0f);
+        space.q_box(touchingLights, 0, STYPE_LIGHTSOURCE, space.m_center, extent);
+        for (ISpatial* spatial : touchingLights)
+            collectLight(spatial, false);
+    }
+
+    {
+        ZoneScopedN("CollectVisibleGeometry::ShadowCasters");
+        const ShadowCasterRegion& region = m_shadowCasterRegion;
+        m_collectShadowOnly = true;
+        auto submitCaster = [&](ISpatial* spatial) {
+            SpatialData& sd = spatial->GetSpatialData();
+            if (sd.collect_stamp == collectStamp)
+                return false;
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable || renderable->renderable_HUD())
+                return false;
+            sd.collect_stamp = collectStamp;
+            renderable->renderable_Render(0, nullptr);
+            return true;
+        };
+        for (ISpatial* spatial : m_lstShadowCasters) {
+            if (!ShadowCasterMayReachView(region, spatial->GetSpatialData().sphere))
+                continue;
+            submitCaster(spatial);
+        }
+        xr_vector<ISpatial*>& localCasters = m_localCasters;
+        for (const light* L : collectedLights) {
+            if (!L->flags.bShadow)
+                continue;
+            Fvector casterCenter = L->position;
+            float casterRadius = L->range;
+            if (L->flags.type == IRender_Light::AREA) {
+                casterCenter.mad(L->position, L->direction, L->area_length * 0.5f);
+                casterRadius += L->area_length * 0.5f + L->area_radius;
+            }
+            g_pGamePersistent->SpatialSpace.q_sphere(localCasters, 0, STYPE_RENDERABLE, casterCenter, casterRadius);
+            for (ISpatial* spatial : localCasters)
+                if (submitCaster(spatial))
+                    ++m_localShadowCasters;
+        }
+        m_collectShadowOnly = false;
+    }
+
+    if (rayTracingLighting && ps_r_rt_scene_radius > 0.0f)
+    {
+        ZoneScopedN("CollectVisibleGeometry::RayAdmission");
+        const float radius = ps_r_rt_scene_radius;
+        Fvector extent;
+        extent.set(radius, radius, radius);
+        xr_vector<ISpatial*>& candidates = m_rtCandidates;
+        g_pGamePersistent->SpatialSpace.q_box(candidates, 0, STYPE_RENDERABLE, Device.vCameraPosition, extent);
+        m_collectShadowOnly = true;
+        for (ISpatial* spatial : candidates)
+        {
+            SpatialData& sd = spatial->GetSpatialData();
+            if (sd.type & STYPE_LIGHTSOURCE)
+                continue;
+            if (sd.collect_stamp == collectStamp)
+                continue;
+            IRenderable* renderable = spatial->dcast_Renderable();
+            if (!renderable || renderable->renderable_HUD())
+                continue;
+            const float reach = radius + sd.sphere.R;
+            if (Device.vCameraPosition.distance_to_sqr(sd.sphere.P) > reach * reach)
+                continue;
+            sd.collect_stamp = collectStamp;
+            const size_t before = m_geometryCollector->GetBatches().size();
+            renderable->renderable_Render(0, nullptr);
+            const auto& batches = m_geometryCollector->GetBatches();
+            if (batches.size() > before)
+                ++m_rtRayAdmitted;
+            for (size_t i = before; i < batches.size(); ++i)
+                if (batches[i].isSkinned)
+                    ++m_rtRayAdmittedSkinned;
+        }
+        m_collectShadowOnly = false;
+    }
+
+    if (g_pGameLevel && g_pGameLevel->pHUD)
+        g_pGameLevel->pHUD->Render_Last(0);
+
+    {
+        static const xr_vector<u32> noSlots;
+        const xr_vector<u32>* slots = &noSlots;
+        if (m_blackboard) {
+            auto& localShadowState = m_blackboard->get_or_add<passes::LocalShadowState>();
+            const float projScale = 0.5f * float(Device.dwHeight) / tanf(deg2rad(Device.fFOV) * 0.5f);
+            Fvector4 hudSphere;
+            bool hudValid = false;
+            for (const auto& b : m_hudBatches) {
+                if (!b.isSkinned)
+                    continue;
+                Fvector4 s;
+                s.set(b.worldBoundsCenter.x, b.worldBoundsCenter.y, b.worldBoundsCenter.z, b.worldBoundsRadius);
+                if (hudValid)
+                    passes::MergeBoundingSphere(hudSphere, s);
+                else
+                    hudSphere = s;
+                hudValid = true;
+            }
+            Fvector4 hudFit;
+            if (hudValid)
+                hudFit = passes::HudShadowSphere(hudSphere);
+            passes::SelectLocalShadowLights(localShadowState, collectedLights, Device.vCameraPosition, projScale, hudValid ? &hudFit : nullptr);
+            slots = &localShadowState.slotOfLight;
+            if (m_gpuCullingManager) {
+                auto registerLocalDemand = [&](const passes::LocalShadowState& page) {
+                    for (u32 i = 0; i < page.candCount; ++i) {
+                        const u32 slot = page.candList[i][0];
+                        if (slot >= passes::kLocalTileCount)
+                            continue;
+                        const passes::LocalShadowViewGPU& view = page.request[slot];
+                        fg::GeometryDemandView demand;
+                        demand.valid = true;
+                        demand.boundsCenter.set(view.lightPos.x, view.lightPos.y, view.lightPos.z);
+                        demand.boundsRadius = view.lightPos.w;
+                        demand.errorBound = view.zparams.x * view.zparams.z;
+                        demand.planeCount = 5;
+                        std::copy_n(view.planes, demand.planeCount, demand.planes);
+                        m_gpuCullingManager->AddShadowGeometryDemand(demand);
+                    }
+                };
+                registerLocalDemand(localShadowState);
+                for (u32 p = 0; p + 1 < localShadowState.activePages; ++p) {
+                    if (p < localShadowState.overflowPages.size() && localShadowState.overflowPages[p])
+                        registerLocalDemand(*localShadowState.overflowPages[p]);
+                }
+            }
+        }
+        if (!collectedLights.empty())
+            fg::ClusteredLightManager::Instance().CollectLightsParallel(collectedLights, *slots);
+    }
+
+    if (ps_r_local_shadow_debug != 0) {
+        xr_set<const light*> gpuCulled;
+        for (const light* L : fg::ClusteredLightManager::Instance().GetCulledLights())
+            if (std::find(collectedLights.begin(), collectedLights.end(), L) != collectedLights.end())
+                gpuCulled.insert(L);
+        auto debugLights = collectedLights;
+        debugLights.insert(debugLights.end(), culledLights.begin(), culledLights.end());
+        std::sort(debugLights.begin(), debugLights.end(), [](const light* a, const light* b) {
+            return Device.vCameraPosition.distance_to_sqr(a->position) > Device.vCameraPosition.distance_to_sqr(b->position);
+        });
+        const u32 red = bgr2rgb(color_rgba(255, 40, 40, 0));
+        for (const light* L : debugLights) {
+            const bool culled = gpuCulled.count(L) || L->spatial.collect_stamp != collectStamp;
+            if (!culled && L->flags.type != IRender_Light::POINT)
+                continue;
+            const u32 rgb = culled ? red : bgr2rgb(L->flags.bShadow ? color_rgba(40, 210, 255, 0) : color_rgba(255, 170, 40, 0));
+            fg::g_debug_draw.DrawSphere(L->position, L->range, rgb | color_rgba(0, 0, 0, culled ? 40 : 14), rgb | color_rgba(0, 0, 0, culled ? 230 : 170));
+        }
+    }
+}
+
+FrameGraphRenderer::ShadowCasterRegion FrameGraphRenderer::BuildShadowCasterRegion() const
+{
+    ShadowCasterRegion region;
+    region.sunView = passes::VSMSunView(passes::SunDirVisual());
+
+    const float extent = passes::VSMReceiverExtent();
+    const float reach = extent * 0.7072f;
+    const Fvector& cam = Device.vCameraPosition;
+    const Fvector& camDir = Device.vCameraDirection;
+
+    Fvector camL;
+    region.sunView.transform_tiny(camL, cam);
+    region.minXY.set(camL.x, camL.y);
+    region.maxXY.set(camL.x, camL.y);
+    region.minZ = camL.z;
+    region.maxZ = camL.z;
+
+    for (u32 i = 0; i < 4; ++i) {
+        const float nx = (i & 1u) ? 1.0f : -1.0f;
+        const float ny = (i & 2u) ? 1.0f : -1.0f;
+        Fvector4 clip;
+        clip.set(nx, ny, 1.0f, 1.0f);
+        Fvector4 world;
+        Device.mInvFullTransform.transform(world, clip);
+        if (_abs(world.w) < 1e-9f)
+            return region;
+        Fvector nearPt;
+        nearPt.set(world.x / world.w, world.y / world.w, world.z / world.w);
+        Fvector dir;
+        dir.sub(nearPt, cam);
+        const float along = dir.dotproduct(camDir);
+        if (along <= 1e-6f)
+            return region;
+        dir.mul(reach / along);
+        Fvector farPt;
+        farPt.add(cam, dir);
+        Fvector farL;
+        region.sunView.transform_tiny(farL, farPt);
+        region.minXY.x = std::min(region.minXY.x, farL.x);
+        region.minXY.y = std::min(region.minXY.y, farL.y);
+        region.maxXY.x = std::max(region.maxXY.x, farL.x);
+        region.maxXY.y = std::max(region.maxXY.y, farL.y);
+        region.minZ = std::min(region.minZ, farL.z);
+        region.maxZ = std::max(region.maxZ, farL.z);
+    }
+
+    const float half = 0.5f * extent;
+    region.minXY.x = std::max(region.minXY.x, camL.x - half);
+    region.minXY.y = std::max(region.minXY.y, camL.y - half);
+    region.maxXY.x = std::min(region.maxXY.x, camL.x + half);
+    region.maxXY.y = std::min(region.maxXY.y, camL.y + half);
+    region.minZ -= half;
+    region.valid = region.minXY.x <= region.maxXY.x && region.minXY.y <= region.maxXY.y;
+    if (!region.valid)
+        return region;
+
+    Fmatrix sunToWorld;
+    sunToWorld.invert(region.sunView);
+    Fvector worldMin;
+    Fvector worldMax;
+    worldMin.set(flt_max, flt_max, flt_max);
+    worldMax.set(-flt_max, -flt_max, -flt_max);
+    for (u32 i = 0; i < 8; ++i) {
+        Fvector cornerL;
+        cornerL.set((i & 1u) ? region.maxXY.x : region.minXY.x,
+                    (i & 2u) ? region.maxXY.y : region.minXY.y,
+                    (i & 4u) ? region.maxZ : region.minZ);
+        Fvector cornerW;
+        sunToWorld.transform_tiny(cornerW, cornerL);
+        worldMin.min(cornerW);
+        worldMax.max(cornerW);
+    }
+    region.worldCenter.add(worldMin, worldMax);
+    region.worldCenter.mul(0.5f);
+    region.worldHalf.sub(worldMax, worldMin);
+    region.worldHalf.mul(0.5f);
+    return region;
+}
+
+bool FrameGraphRenderer::ShadowCasterMayReachView(const ShadowCasterRegion& region, const Fsphere& bounds)
+{
+    if (!region.valid)
+        return true;
+    Fvector c;
+    region.sunView.transform_tiny(c, bounds.P);
+    const float r = bounds.R;
+    if (c.x + r < region.minXY.x || c.x - r > region.maxXY.x)
+        return false;
+    if (c.y + r < region.minXY.y || c.y - r > region.maxXY.y)
+        return false;
+    return c.z - r <= region.maxZ && c.z + r >= region.minZ;
+}
+
+void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
+    if (!V) {
+        return;
+    }
+
+    dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(V);
+    if (!visual) {
+        return;
+    }
+
+    bool isHUD = (root && root->renderable_HUD());
+    if (isHUD && m_collectShadowOnly)
+        return;
+
+    ForEachLeafVisual(visual, [&](dxRender_Visual* leafVisual) {
+        if (isHUD) {
+            ProcessHudGeometry(leafVisual, xform, root);
+        } else {
+            ProcessVisualGeometry(leafVisual, xform, root);
+        }
+    });
+}
+
+void FrameGraphRenderer::UpdateSmokeTrail(
+    const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode)
+{
+    if (!m_smokeTrailManager || !m_smokeTrailManager->IsReady())
+        return;
+
+    Fvector correctedPos = muzzlePos;
+    Fvector correctedDir = muzzleDir;
+
+    if (isHUDMode)
+    {
+        const Fmatrix hudMat = passes::HudFovWarp();
+        hudMat.transform_tiny(correctedPos);
+        hudMat.transform_dir(correctedDir);
+        correctedDir.normalize_safe();
+    }
+
+    m_smokeTrailManager->Update(dt, correctedPos, correctedDir);
+}
+
+void FrameGraphRenderer::NotifySmokeShot()
+{
+}
+
+namespace
+{
+class CGlow : public IRender_Glow
+{
+public:
+    bool bActive{ false };
+    void set_active(bool b) override { bActive = b; }
+    bool get_active() override { return bActive; }
+    void set_position(const Fvector&) override {}
+    void set_direction(const Fvector&) override {}
+    void set_radius(float) override {}
+    void set_texture(LPCSTR) override {}
+    void set_color(const Fcolor&) override {}
+    void set_color(float, float, float) override {}
+};
+
+float EstimateSplatUVRadius(const fg::decals::MeshPickResult& pickResult, float worldRadius)
+{
+    const float du1 = pickResult.triUV[1].x - pickResult.triUV[0].x;
+    const float dv1 = pickResult.triUV[1].y - pickResult.triUV[0].y;
+    const float du2 = pickResult.triUV[2].x - pickResult.triUV[0].x;
+    const float dv2 = pickResult.triUV[2].y - pickResult.triUV[0].y;
+
+    const float det = du1 * dv2 - dv1 * du2;
+    if (_abs(det) > EPS_S)
+    {
+        const float invDet = 1.f / det;
+
+        Fvector dpdu;
+        dpdu.set(
+            (pickResult.triWorldEdge1.x * dv2 - pickResult.triWorldEdge2.x * dv1) * invDet,
+            (pickResult.triWorldEdge1.y * dv2 - pickResult.triWorldEdge2.y * dv1) * invDet,
+            (pickResult.triWorldEdge1.z * dv2 - pickResult.triWorldEdge2.z * dv1) * invDet);
+
+        Fvector dpdv;
+        dpdv.set(
+            (pickResult.triWorldEdge2.x * du1 - pickResult.triWorldEdge1.x * du2) * invDet,
+            (pickResult.triWorldEdge2.y * du1 - pickResult.triWorldEdge1.y * du2) * invDet,
+            (pickResult.triWorldEdge2.z * du1 - pickResult.triWorldEdge1.z * du2) * invDet);
+
+        const float worldPerUV = 0.5f * (dpdu.magnitude() + dpdv.magnitude());
+        if (worldPerUV > EPS_S)
+            return _max(worldRadius / worldPerUV, 1e-4f);
+    }
+
+    const float worldEdge = _max(pickResult.triWorldEdge1.magnitude(), pickResult.triWorldEdge2.magnitude());
+    const float uvEdge1 = _sqrt(_sqr(du1) + _sqr(dv1));
+    const float uvEdge2 = _sqrt(_sqr(du2) + _sqr(dv2));
+    const float uvEdge = _max(uvEdge1, uvEdge2);
+    if (worldEdge > EPS_S && uvEdge > EPS_S)
+        return _max(worldRadius * (uvEdge / worldEdge), 1e-4f);
+
+    return 0.02f;
+}
+}
+
+IRender_ObjectSpecific* FrameGraphRenderer::ros_create(IRenderable*) { return xr_new<CROS_impl>(); }
+void FrameGraphRenderer::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
+
+IRender_Light* FrameGraphRenderer::light_create() { return Lights.Create(); }
+IRender_Glow*  FrameGraphRenderer::glow_create()  { return xr_new<CGlow>(); }
+
+IRenderVisual* FrameGraphRenderer::model_Create(pcstr name, IReader* data)        { return g_pModelPool->Create(name, data); }
+IRenderVisual* FrameGraphRenderer::model_CreateChild(pcstr name, IReader* data)   { return g_pModelPool->CreateChild(name, data); }
+IRenderVisual* FrameGraphRenderer::model_Duplicate(IRenderVisual* V)              { return g_pModelPool->Instance_Duplicate((fg::dxRender_Visual*)V); }
+
+void FrameGraphRenderer::model_Delete(IRenderVisual*& V, bool bDiscard)
+{
+    auto* pVisual = (fg::dxRender_Visual*)V;
+    g_pModelPool->Delete(pVisual, bDiscard);
+    V = nullptr;
+}
+
+IRenderVisual* FrameGraphRenderer::model_CreateParticles(pcstr name)
+{
+    fg::PS::CPEDef* SE = m_PSLibrary.FindPED(name);
+    if (SE)
+        return g_pModelPool->CreatePE(SE);
+
+    fg::PS::CPGDef* SG = m_PSLibrary.FindPGD(name);
+    R_ASSERT3(SG, "Particle effect or group doesn't exist", name);
+    return g_pModelPool->CreatePG(SG);
+}
+
+void FrameGraphRenderer::model_Logging(bool bEnable) { g_pModelPool->Logging(bEnable); }
+void FrameGraphRenderer::models_Prefetch()           { g_pModelPool->Prefetch(); }
+void FrameGraphRenderer::models_Clear(bool b)        { g_pModelPool->ClearPool(b); }
+
+bool FrameGraphRenderer::occ_visible(vis_data& V) { return m_HOM.visible(V); }
+bool FrameGraphRenderer::occ_visible(Fbox& B)     { return m_HOM.visible(B); }
+bool FrameGraphRenderer::occ_visible(sPoly& P)    { return m_HOM.visible(P); }
+
+IRenderVisual* FrameGraphRenderer::getVisual(int id) { return fg::BufferPool.getVisual(id); }
+
+void FrameGraphRenderer::add_Visual(u32, IRenderable* root, IRenderVisual* V, Fmatrix& m)
+{
+    if (IsEnabled())
+        add_Visual(root, V, m);
+}
+
+void FrameGraphRenderer::add_StaticWallmark(const wm_shader&, const Fvector&, float, CDB::TRI*, Fvector*)
+{
+}
+
+void FrameGraphRenderer::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
+{
+    if (!T || T->suppress_wm || !V || s <= EPS_L)
+        return;
+    auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+    u32 matID = fgArray->GenerateBindlessMaterialID();
+    if (matID == UINT32_MAX)
+        return;
+    Fvector N;
+    N.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
+    float decalSize = s * 2.0f;
+    GetDecalManager()->AddStaticDecal(P, N, decalSize, matID);
+}
+
+void FrameGraphRenderer::clear_static_wallmarks()
+{
+    if (m_decalManager)
+        m_decalManager->Clear();
+}
+
+void FrameGraphRenderer::add_SkeletonWallmark(
+    const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size)
+{
+    if (!xf || !obj || size <= EPS_L)
+        return;
+
+    dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(obj->dcast_RenderVisual());
+    if (!visual)
+        return;
+    if (visual->Type != MT_SKELETON_ANIM && visual->Type != MT_SKELETON_RIGID)
+        return;
+    CKinematics* K = static_cast<CKinematics*>(visual);
+
+    float distSq = xf->c.distance_to_sqr(Device.vCameraPosition);
+    if (distSq > _sqr(50.f))
+        return;
+
+    const u32 splatMode = ps_r4_skeleton_wallmark_mode > 0
+        ? fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD
+        : fg::decals::SPLAT_MODE_DECAL;
+
+    shared_str wallmarkTexture;
+    u32 matID = UINT32_MAX;
+    if (splatMode == fg::decals::SPLAT_MODE_DECAL)
+    {
+        if (!pArray)
+            return;
+        auto* fgArray = static_cast<fg::decals::fgWallMarkArray*>(pArray);
+        matID = fgArray->GenerateBindlessMaterialID(&wallmarkTexture);
+        if (matID == UINT32_MAX)
+            return;
+    }
+    float decalSize = size * 2.0f;
+    fg::decals::MeshPickResult entryPick;
+    if (fg::decals::PickMeshDirect(K, *xf, start, dir, 100.f, entryPick))
+    {
+        auto* overlayMgr = GetOverlayManager();
+        float worldRadius = decalSize * 0.5f;
+        Fvector bloodColor = { 0.4f, 0.02f, 0.02f };
+        const float lifetime = splatMode == fg::decals::SPLAT_MODE_PROCEDURAL_BLOOD ? 18.f : 12.f;
+
+        auto queueSplat = [&](const fg::decals::MeshPickResult& pick)
+        {
+            const float uvRadius = EstimateSplatUVRadius(pick, worldRadius);
+            overlayMgr->AddSplat(K, pick.triVerts,
+                                  pick.baryU, pick.baryV,
+                                  worldRadius, bloodColor, 0.8f,
+                                  pick.uv, uvRadius, matID,
+                                  splatMode, lifetime,
+                                  pick.hitTextureName.c_str(),
+                                  wallmarkTexture.c_str());
+        };
+
+        queueSplat(entryPick);
+
+        Fvector shotDir = dir;
+        shotDir.normalize_safe();
+        const float entryAdvance = entryPick.dist + 0.01f;
+        const float remaining = 100.f - entryAdvance;
+        if (remaining > 0.01f)
+        {
+            Fvector exitStart;
+            exitStart.mad(start, shotDir, entryAdvance);
+
+            fg::decals::MeshPickResult exitPick;
+            if (fg::decals::PickMeshDirect(K, *xf, exitStart, shotDir, remaining, exitPick))
+            {
+                const float minSeparation = _max(0.02f, worldRadius * 0.25f);
+                if (entryPick.worldPos.distance_to(exitPick.worldPos) > minSeparation)
+                    queueSplat(exitPick);
+            }
+        }
+    }
+}
+
+CompiledLevelShader* FrameGraphRenderer::getCompiledShader(int id)
+{
+    if (id < 0 || id >= int(m_CompiledLevelShaders.size()))
+        return nullptr;
+    return &m_CompiledLevelShaders[id];
+}
+
+void FrameGraphRenderer::Calculate() {}
+
+void FrameGraphRenderer::OnFrame()
+{
+    ZoneScoped;
+    g_pModelPool->DeleteQueue();
+    if (m_particleEditor)
+        m_particleEditor->Update(Device.dwTimeDelta);
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
+        return;
+}
+
+void FrameGraphRenderer::OnCameraUpdated()
+{
+    ZoneScoped;
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+}
+
+namespace
+{
+IReader* fg_open_shader(pcstr shader)
+{
+    string_path sname;
+    strconcat(sname, "r5\\", shader);
+    return FS.r_open("$game_shaders$", sname);
+}
+
+bool ssao_hdao_cs_shaders_exist()
+{
+    IReader* hdao_cs      = fg_open_shader("ssao_hdao.cs");
+    IReader* hdao_cs_msaa = fg_open_shader("ssao_hdao_msaa.cs");
+    const bool exist      = hdao_cs && hdao_cs_msaa;
+    FS.r_close(hdao_cs);
+    FS.r_close(hdao_cs_msaa);
+    return exist;
+}
+}
+
+void FrameGraphRenderer::create()
+{
+    ZoneScoped;
+
+    Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345679);
+
+    m_skinning = -1;
+    m_MSAASample = -1;
+
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    o.mrt = (caps.raster.dwMRT_count >= 3);
+    o.mrtmixdepth = (caps.raster.b_MRT_mixdepth);
+    o.nullrt = false;
+
+    o.HW_smap_FETCH4 = FALSE;
+    o.HW_smap = true;
+    o.HW_smap_PCF = o.HW_smap;
+    if (o.HW_smap)
+    {
+        if (caps.id_vendor == 0x1002)
+            o.HW_smap_FORMAT = nvrhi::Format::D32;
+        else
+            o.HW_smap_FORMAT = nvrhi::Format::D24S8;
+    }
+
+    o.fp16_filter = true;
+    o.fp16_blend = true;
+
+    if (strstr(Core.Params, "-r4xx"))
+    {
+        o.mrtmixdepth = FALSE;
+        o.HW_smap = FALSE;
+        o.HW_smap_PCF = FALSE;
+        o.fp16_filter = FALSE;
+        o.fp16_blend = FALSE;
+    }
+
+    if (o.mrtmixdepth)        o.albedo_wo = FALSE;
+    else if (o.fp16_blend)    o.albedo_wo = FALSE;
+    else                      o.albedo_wo = TRUE;
+
+    o.nvstencil = FALSE;
+    o.nvdbt = false;
+    o.ffp = false;
+
+    if      (strstr(Core.Params, "-smap1024")) o.smapsize = 1024;
+    else if (strstr(Core.Params, "-smap1536")) o.smapsize = 1536;
+    else if (strstr(Core.Params, "-smap2048")) o.smapsize = 2048;
+    else if (strstr(Core.Params, "-smap2560")) o.smapsize = 2560;
+    else if (strstr(Core.Params, "-smap3072")) o.smapsize = 3072;
+    else if (strstr(Core.Params, "-smap4096")) o.smapsize = 4096;
+    else if (strstr(Core.Params, "-smap8192")) o.smapsize = 8192;
+    else                                       o.smapsize = ps_r2_smapsize;
+
+    cpcstr g = strstr(Core.Params, "-gloss ");
+    o.forcegloss = g ? TRUE : FALSE;
+    if (g) o.forcegloss_v = float(atoi(g + xr_strlen("-gloss "))) / 255.f;
+
+    o.bug = (strstr(Core.Params, "-bug")) ? TRUE : FALSE;
+    o.sunfilter = (strstr(Core.Params, "-sunfilter")) ? TRUE : FALSE;
+    o.sunstatic = ps_r2_sun_static;
+    o.advancedpp = ps_r2_advanced_pp;
+    o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
+    o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
+    o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
+    o.noshadows = (strstr(Core.Params, "-noshadows")) ? TRUE : FALSE;
+    o.Tshadows = (strstr(Core.Params, "-tsh")) ? TRUE : FALSE;
+    o.oldshadowcascades = ps_r2_ls_flags_ext.test(R2FLAGEXT_SUN_OLD);
+    o.mblur = (strstr(Core.Params, "-mblur")) ? TRUE : FALSE;
+    o.distortion_enabled = (strstr(Core.Params, "-nodistort")) ? FALSE : TRUE;
+    o.distortion = o.distortion_enabled;
+    o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
+    o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
+
+    o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
+    o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
+    o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
+    o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
+    o.ssao_ultra = ssao_hdao_cs_shaders_exist();
+    o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
+    o.hbao_vectorized = (o.ssao_hbao && caps.id_vendor == 0x1002);
+
+    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+
+    o.msaa = !!ps_r3_msaa;
+    o.msaa_samples = (1 << ps_r3_msaa);
+    o.msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
+    o.msaa_opt = (o.msaa_opt && o.msaa) || o.msaa;
+    o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.msaa_hybrid &= !o.msaa_opt && o.msaa;
+
+    o.msaa_alphatest = 0;
+    if (o.msaa)
+    {
+        if (o.msaa_opt || o.msaa_hybrid)
+        {
+            if (ps_r3_msaa_atest == 1) o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_1_ATOC;
+            else if (ps_r3_msaa_atest == 2) o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_1_NATIVE;
+        }
+        else if (ps_r3_msaa_atest)
+            o.msaa_alphatest = FrameGraphRenderer::MSAA_ATEST_DX10_0_ATOC;
+    }
+
+    o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    o.minmax_sm = ps_r3_minmax_sm;
+    o.minmax_sm_screenarea_threshold = 1600 * 1200;
+
+    o.tessellation = ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+    o.support_rt_arrays = true;
+
+    if (o.minmax_sm == FrameGraphRenderer::MMSM_AUTODETECT)
+    {
+        o.minmax_sm = FrameGraphRenderer::MMSM_OFF;
+        if (caps.id_vendor == 0x1002)
+        {
+            if (ps_r_sun_quality >= 3) o.minmax_sm = FrameGraphRenderer::MMSM_AUTO;
+            else if (ps_r_sun_shafts >= 2)
+            {
+                o.minmax_sm = FrameGraphRenderer::MMSM_AUTODETECT;
+                o.minmax_sm_screenarea_threshold = 1600 * 1200;
+            }
+        }
+        if (caps.id_vendor == 0x10DE)
+        {
+            if (ps_r_sun_shafts >= 2)
+            {
+                o.minmax_sm = FrameGraphRenderer::MMSM_AUTODETECT;
+                o.minmax_sm_screenarea_threshold = 1280 * 1024;
+            }
+        }
+    }
+
+    if (!GEnv.Backend || !GEnv.Backend->IsInitialized())
+        return;
+
+    auto* renderDevice = xr_new<fg::RenderDevice>();
+    if (!renderDevice->InitializeFromBackend(GEnv.Backend))
+    {
+        Msg("! RenderDevice initialization failed");
+        xr_delete(renderDevice);
+        return;
+    }
+    m_device = renderDevice;
+
+    if (!Initialize(m_device))
+    {
+        Msg("! FrameGraphRenderer initialization failed");
+        return;
+    }
+    GEnv.Render = this;
+
+    Vertex.Create();
+    Index.Create();
+    CreateQuadIB();
+
+    InitializeImGuiRenderer(m_device);
+    GEnv.UIRender = GetUIRender();
+
+    MaterialSystem::Instance().Initialize(m_device->GetFGResourceManager(), GetShaderLoader());
+
+    SetEnabled(true);
+
+    if (!g_pModelPool)
+        g_pModelPool = xr_new<CModelPool>();
+}
+
+void FrameGraphRenderer::destroy()
+{
+    QuadIB.Release();
+    Index.Destroy();
+    Vertex.Destroy();
+
+    if (g_pModelPool)
+    {
+        xr_delete(g_pModelPool);
+        g_pModelPool = nullptr;
+    }
+
+    MaterialSystem::Instance().Shutdown();
+
+    ShutdownImGuiRenderer();
+
+    Shutdown();
+
+    if (m_device)
+    {
+        m_device->Shutdown();
+        xr_delete(m_device);
+        m_device = nullptr;
+    }
+
+    Device.seqFrame.Remove(this);
+}
+
+void FrameGraphRenderer::reset_begin()
+{
+    ZoneScoped;
+    m_lightingState.ResetRecovery();
+    m_mainView.InvalidateHistory();
+    if (Resources)
+        Resources->reset_begin();
+
+    m_Lights_LastFrame.clear();
+    m_HWOCC.occq_destroy();
+}
+
+void FrameGraphRenderer::reset_end()
+{
+    ZoneScoped;
+    m_HWOCC.occq_create(occq_size);
+
+    m_bFirstFrameAfterReset = true;
+}
+
+void FrameGraphRenderer::OnBackBufferResizing(u32, u32)
+{
+    ZoneScoped;
+    m_lightingState.ResetRecovery();
+    m_mainView.InvalidateHistory();
+    framegraph::GetPassResourceCache().ClearFramebufferDependent();
+    if (m_materialCache)
+        m_materialCache->InvalidateFramebufferDependent();
+    if (m_uiMaterialCache)
+        m_uiMaterialCache->InvalidateFramebufferDependent();
+    ReRegisterDeveloperMaterials();
+}
+
+void FrameGraphRenderer::OnBackBufferResized(u32, u32)
+{
+    ZoneScoped;
+    m_bFirstFrameAfterReset = true;
+}
+
+void FrameGraphRenderer::SetPostProcessParams(const SPPInfo& ppi)
+{
+    m_postProcess.SetParams(ppi);
+}
+
+void FrameGraphRenderer::Screenshot(IRender::ScreenshotMode mode, pcstr name)
+{
+    UNUSED(mode);
+    UNUSED(name);
+    Msg("! Screenshot not yet implemented for FrameGraph renderer");
+}
+
+void FrameGraphRenderer::RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type)
+{
+}
+
+void FrameGraphRenderer::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
+{
+    FGRenderBase::DumpStatistics(font, alert);
+    m_Stats.FrameEnd();
+    font.OutNext("Lights:");
+    font.OutNext("- total:      %u", m_Stats.l_total);
+    font.OutNext("- visible:    %u", m_Stats.l_visible);
+    font.OutNext("- shadowed:   %u", m_Stats.l_shadowed);
+    font.OutNext("- unshadowed: %u", m_Stats.l_unshadowed);
+    font.OutNext("Shadow maps:");
+    font.OutNext("- used:       %d", m_Stats.s_used);
+    font.OutNext("- merged:     %d", m_Stats.s_merged - m_Stats.s_used);
+    font.OutNext("- finalclip:  %d", m_Stats.s_finalclip);
+    u32 ict = m_Stats.ic_total + m_Stats.ic_culled;
+    font.OutNext("ICULL:        %03.1f", 100.f * f32(m_Stats.ic_culled) / f32(ict ? ict : 1));
+    font.OutNext("- visible:    %u", m_Stats.ic_total);
+    font.OutNext("- culled:     %u", m_Stats.ic_culled);
+    m_Stats.FrameStart();
+    m_HOM.DumpStatistics(font, alert);
+    fg::Scene.Sectors_xrc.DumpStatistics(font, alert);
+}
+
+}

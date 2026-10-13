@@ -1,0 +1,209 @@
+#pragma once
+
+#include "xrEngine/Engine.h"
+
+enum class DeviceState
+{
+    Normal = 0,
+    Lost,
+    NeedReset
+};
+
+namespace nvrhi {
+    class IDevice;
+    class ITexture;
+    class IBuffer;
+    class ICommandList;
+    class IBindingLayout;
+    class IDescriptorTable;
+    struct CommandListParameters;
+    template<class T> class RefCountPtr;
+    using CommandListHandle = RefCountPtr<ICommandList>;
+}
+
+struct SDL_Window;
+
+class ENGINE_API IRenderBackend
+{
+public:
+    virtual ~IRenderBackend();
+
+    enum class API : u8 {
+        D3D11,
+        D3D12,
+        Vulkan,
+        Metal
+    };
+
+    virtual API GetAPI() const = 0;
+    virtual pcstr GetAPIName() const = 0;
+    bool IsFrameGraph() const
+    {
+        const auto api = GetAPI();
+        return api == API::D3D12 || api == API::Vulkan || api == API::Metal;
+    }
+
+    virtual bool IsInitialized() const = 0;
+    virtual void Shutdown() = 0;
+    virtual void WaitForIdle() = 0;
+    virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
+    virtual void SavePipelineCache() {}
+
+    class MemoryBudget
+    {
+    public:
+        u64 budgetBytes = 0;
+        u64 usageBytes = 0;
+        u64 bufferRangeBytes = 0;
+        bool usageKnown = false;
+    };
+
+    virtual MemoryBudget GetMemoryBudget() const;
+
+    virtual nvrhi::IDevice* GetDevice() const = 0;
+    virtual nvrhi::ICommandList* GetCommandList() const = 0;
+
+    virtual nvrhi::ICommandList* CreateCommandList() { return nullptr; }
+
+    virtual bool HasAsyncCompute() const { return false; }
+    virtual nvrhi::ICommandList* AcquireComputeCommandList() { return nullptr; }
+    virtual u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) { return 0; }
+    virtual void AddGraphicsWait(u32 token) {}
+    virtual u32 SplitGraphics() { return 0; }
+    virtual u32 LastGraphicsToken() const { return 0; }
+    virtual u32 LastComputeToken() const { return 0; }
+
+    virtual void ExecuteCommandList(nvrhi::ICommandList* commandList) {}
+    virtual void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {}
+
+    enum class SubmissionLeaseState : u8 {
+        Unknown,
+        Open,
+        Pending,
+        Complete,
+        Failed
+    };
+
+    virtual bool SupportsSubmissionLeases() const { return false; }
+    virtual u64 OpenSubmissionLease() { return 0; }
+    virtual void CloseSubmissionLease(u64 lease) {}
+    virtual SubmissionLeaseState PollSubmissionLease(u64 lease) { return SubmissionLeaseState::Unknown; }
+    virtual bool IsSubmissionLeaseSubmitted(u64 lease) const;
+    virtual void ReleaseSubmissionLease(u64 lease) {}
+    virtual u32 GetPendingSubmissionCount() const { return 0; }
+
+    virtual nvrhi::ITexture* GetBackBuffer() = 0;
+    virtual u32 GetCurrentBackBufferIndex() const { return 0; }
+    virtual u32 GetBackBufferCount() const { return 1; }
+    virtual void Present(bool vsync) = 0;
+    virtual std::pair<u32, u32> GetBackBufferSize() const = 0;
+    virtual void ResizeSwapChain(u32 width, u32 height) {}
+
+    class DisplayOutput
+    {
+    public:
+        bool hdr = false;
+        float sdrWhiteLevel = 1.0f;
+        float headroom = 1.0f;
+    };
+
+    virtual bool SetHDROutput(bool enabled);
+    virtual DisplayOutput GetDisplayOutput() const;
+
+    virtual void BeginFrame() = 0;
+    virtual void EndFrame() = 0;
+    virtual bool IsInFrame() const { return false; }
+
+    struct SubmitThreadTimings {
+        u64 jobLatencyUs;
+        u64 queueLockUs;
+        u64 semWaitUs;
+        u64 encodeUs;
+        u64 presentLockUs;
+        u64 presentUs;
+        u64 gcUs;
+        u64 slotWaitUs;
+        u64 capacityWaitUs;
+        u64 gpuWaitUs;
+        u64 acquireUs;
+    };
+    virtual bool GetSubmitThreadTimings(SubmitThreadTimings& out) const { return false; }
+
+    struct QueueTimings {
+        u64 graphicsUs;
+        u64 computeUs;
+        u64 overlapUs;
+        u64 spanUs;
+    };
+    virtual bool GetQueueTimings(QueueTimings& out) const { return false; }
+
+    struct Capabilities {
+        bool bindlessTextures = false;
+        bool meshShaders = false;
+        u32 meshShaderMaxGroups = 0;
+        bool rayTracing = false;
+        bool rayTracingUpdates = false;
+        bool rayTracingCompaction = false;
+        bool variableRateShading = false;
+        u32 maxBindlessResources = 0;
+        u32 shaderModel = 50;
+
+        struct {
+            u32 dwRegisters = 256;
+            u32 dwInstructions = 65535;
+            u32 dwClipPlanes = 6;
+            u32 dwVertexCache = 24;
+            bool bVTF = true;
+        } geometry;
+
+        struct {
+            u32 dwRegisters = 256;
+            u32 dwInstructions = 65535;
+            u32 dwStages = 16;
+            u32 dwMRT_count = 8;
+            bool b_MRT_mixdepth = true;
+        } raster;
+
+        u16 raster_major = 5;
+        u16 raster_minor = 0;
+        pcstr raster_profile = "ps_5_0";
+        u16 geometry_major = 5;
+        u16 geometry_minor = 0;
+        pcstr geometry_profile = "vs_5_0";
+        u32 iGPUNum = 1;
+
+        u32 id_vendor = 0;
+        u32 id_device = 0;
+
+        bool hasStencil = true;
+        bool hasScissor = true;
+        bool hasFixedPipeline = false;
+        bool useCombinedSamplers = true;
+        bool bForceGPU_REF = false;
+
+        u32 SceneMode = 0;
+    };
+    virtual const Capabilities& GetCapabilities() const = 0;
+
+    virtual Capabilities& GetMutableCapabilities() = 0;
+
+    virtual void UpdateCapabilities() {}
+
+    virtual u32 RegisterBindlessTexture(nvrhi::ITexture* texture) { return UINT32_MAX; }
+    virtual void UnregisterBindlessTexture(u32 index) {}
+    virtual nvrhi::ITexture* GetBindlessTexture(u32 index);
+    virtual bool RetainBindlessTextures(const u32* indices, u32 count);
+    virtual void ReleaseBindlessTextures(const u32* indices, u32 count);
+    virtual nvrhi::IBindingLayout* GetBindlessLayout() const { return nullptr; }
+    virtual nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const { return nullptr; }
+
+    virtual void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) {}
+
+    virtual void BeginDebugEvent(pcstr name) {}
+    virtual void EndDebugEvent() {}
+    virtual void SetMarker(pcstr name) {}
+
+protected:
+    static bool IsWindowHDREnabled(SDL_Window* window);
+    static DisplayOutput QueryWindowDisplayOutput(SDL_Window* window, bool hdrActive);
+};

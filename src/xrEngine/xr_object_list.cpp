@@ -6,7 +6,9 @@
 #include "xr_object_list.h"
 
 #include "xr_object.h"
+#include "xrCore/MemoryStats.h"
 #include "xrCore/net_utils.h"
+#include "GrassInteractionCollector.h"
 
 #include "CustomHUD.h"
 #include "GameFont.h"
@@ -141,9 +143,21 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     // Msg ("[%d][0x%08x]IAmNotACrowAnyMore (CObjectList::SingleUpdate)", Device.dwFrame, dynamic_cast<void*>(O));
 
-    O->UpdateCL();
+    if (xray::memstats::ObjectClassProfiling())
+    {
+        xray::memstats::ScopedNamed _memCls(xray::memstats::Table::ObjectClass, O->cNameSect().c_str());
+        O->UpdateCL();
+    }
+    else
+        O->UpdateCL();
 
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", O->cName().c_str());
+
+    if (!O->H_Parent() && O->cast_entity())
+    {
+        g_GrassInteractionCollector.AddEntity(O);
+    }
+
 #if 0 // ndef DEBUG
     __try
     {
@@ -214,6 +228,8 @@ void CObjectList::clear_crow_vec(Objects& o)
 void CObjectList::Update(bool bForce)
 {
     ZoneScoped;
+
+    g_GrassInteractionCollector.BeginFrame();
 
     if (statsFrame != Device.dwFrame)
     {

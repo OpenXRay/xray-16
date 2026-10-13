@@ -158,8 +158,6 @@ void CHUDManager::RenderUI()
         HitMarker.Render();
         if (pUIGame)
             pUIGame->Render();
-
-        UI().RenderFont();
     }
 
     m_pHUDTarget->Render();

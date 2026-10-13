@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/r__scene.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void light::gi_generate()
 {
@@ -13,7 +15,7 @@ void light::gi_generate()
     CRandom random;
     random.seed(0x12071980);
 
-    xrXRC& xrc = RImplementation.Sectors_xrc;
+    xrXRC& xrc = Scene.Sectors_xrc;
     const CDB::MODEL* model = g_pGameLevel->ObjectSpace.GetStaticModel();
     const CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     const Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
@@ -26,7 +28,8 @@ void light::gi_generate()
         Fvector dir, idir;
         switch (flags.type)
         {
-        case IRender_Light::POINT: dir.random_dir(random); break;
+        case IRender_Light::POINT:
+        case IRender_Light::AREA: dir.random_dir(random); break;
         case IRender_Light::SPOT: dir.random_dir(direction, cone, random); break;
         case IRender_Light::OMNIPART: dir.random_dir(direction, cone, random); break;
         }
@@ -82,4 +85,4 @@ void light::gi_generate()
             light.E *= scale_E;
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

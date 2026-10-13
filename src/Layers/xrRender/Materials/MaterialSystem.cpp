@@ -1,0 +1,288 @@
+#include "stdafx.h"
+#include "MaterialSystem.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/ShaderVariant/ShaderVariantRegistry.h"
+#include "Layers/xrRender/Bindless/BindlessTypes.h"
+#include "Layers/xrRender/Bindless/VariantBuffer.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
+
+using namespace xray::render::resources;
+using namespace xray::render::framegraph;
+
+namespace xray::render
+{
+
+MaterialSystem& GetMaterialSystemInstance()
+{
+    static MaterialSystem instance;
+    return instance;
+}
+
+MaterialSystem& MaterialSystem::Instance()
+{
+    return GetMaterialSystemInstance();
+}
+
+u32 MaterialSystem::MaterialInfo::GetMaterialFlags() const
+{
+    using namespace fg::bindless;
+
+    u32 flags = 0;
+    if (alphaTest)
+        flags |= MAT_FLAG_ALPHA_TEST;
+    if (transparent)
+        flags |= MAT_FLAG_ALPHA_BLEND;
+    if (foliage)
+        flags |= MAT_FLAG_FOLIAGE;
+    if (water)
+        flags |= MAT_FLAG_WATER;
+    if (emissive > 0.0f)
+        flags |= MAT_FLAG_EMISSIVE;
+    return flags;
+}
+
+float MaterialSystem::MaterialInfo::GetAlphaReference() const
+{
+    return alphaTest ? float(alphaRef) / 255.0f : 0.5f;
+}
+
+bool MaterialSystem::TextureSet::IsValid() const
+{
+    return albedo.IsValid();
+}
+
+void MaterialSystem::Initialize(resources::FGResourceManager* fgResourceManager, framegraph::ShaderLoader* shaderLoader)
+{
+    if (m_initialized)
+    {
+        Msg("! [MaterialSystem] Already initialized");
+        return;
+    }
+
+    m_fgResourceManager = fgResourceManager;
+    m_shaderLoader = shaderLoader;
+
+    m_defaultMaterialInfo = MaterialInfo{};
+    m_emptyTextureSet = TextureSet{};
+
+    ShaderVariantRegistry::Instance().Initialize();
+    fg::bindless::VariantBuffer::Instance().Rebuild(ShaderVariantRegistry::Instance());
+
+    m_initialized = true;
+    Msg("* [MaterialSystem] Initialized");
+}
+
+void MaterialSystem::Shutdown()
+{
+    if (!m_initialized)
+        return;
+
+    ShaderVariantRegistry::Instance().Shutdown();
+    ClearCaches();
+
+    m_fgResourceManager = nullptr;
+    m_shaderLoader = nullptr;
+    m_initialized = false;
+
+    Msg("* [MaterialSystem] Shutdown");
+}
+
+const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* shaderName, const char* textureName)
+{
+    if (!shaderName || !shaderName[0])
+        return m_defaultMaterialInfo;
+
+    return GetMaterialInfo(shared_str(shaderName));
+}
+
+const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const shared_str& shaderNameStr, const shared_str& textureName)
+{
+    if (shaderNameStr.size() == 0)
+        return m_defaultMaterialInfo;
+
+    auto it = m_materialCache.find(shaderNameStr);
+    if (it != m_materialCache.end())
+        return it->second;
+
+    const char* shaderName = shaderNameStr.c_str();
+    const shared_str& key = shaderNameStr;
+
+    MaterialInfo info = GetDefaultMaterialInfo();
+    info.water = strstr(shaderName, "water") != nullptr;
+
+    using BlendMode = shader_info::ShaderBlendMode;
+    shader_info::ShaderBlendInfo blendInfo;
+    if (shader_info::GetShaderBlendInfo(shaderName, blendInfo))
+    {
+        switch (blendInfo.mode)
+        {
+        case BlendMode::Opaque:
+            info.alphaTest = false;
+            info.alphaRef = 0;
+            info.transparent = false;
+            break;
+        case BlendMode::AlphaTest:
+            info.alphaTest = true;
+            info.alphaRef = blendInfo.alphaRef;
+            info.transparent = false;
+            break;
+        case BlendMode::AlphaBlend:
+        case BlendMode::Additive:
+        case BlendMode::Multiply:
+        case BlendMode::Multiply2X:
+            info.alphaTest = false;
+            info.alphaRef = 0;
+            info.transparent = true;
+            break;
+        }
+        if (blendInfo.strictB2F)
+            info.transparent = true;
+        info.foliage = blendInfo.foliage;
+        m_stats.materialsFromBlender++;
+    }
+
+    auto& registry = ShaderVariantRegistry::Instance();
+    u32 variantIdx = registry.GetVariantIndex(shaderName);
+    if (variantIdx > 0)
+    {
+        const auto* variant = registry.GetVariantByIndex(variantIdx);
+        info.shaderVariant = variantIdx;
+        if (variant->transparent)
+            info.transparent = true;
+        if (variant->emissive)
+            info.emissive = variant->emissiveIntensity;
+        if (!variant->passes.empty() && variant->passes[0].hasAlphaTestOverride)
+        {
+            info.alphaTest = true;
+            info.alphaRef = variant->passes[0].alphaTestRef;
+        }
+    }
+
+    m_materialCache[key] = info;
+    return m_materialCache[key];
+}
+
+MaterialSystem::MaterialInfo MaterialSystem::GetDefaultMaterialInfo() const
+{
+    MaterialInfo info{};
+    info.priority = 1;
+    info.roughness = 0.5f;
+    info.aoScale = 1.0f;
+    return info;
+}
+
+void MaterialSystem::PreloadMaterialTextures(const char* textureName)
+{
+    if (!textureName || !textureName[0])
+        return;
+
+    if (!m_fgResourceManager)
+    {
+        Msg("! [MaterialSystem] Cannot preload textures - FGResourceManager not set");
+        return;
+    }
+
+    shared_str key(textureName);
+    if (m_textureCache.contains(key))
+        return;
+
+    TextureManager* texMgr = m_fgResourceManager->GetTextureManager();
+    if (!texMgr)
+    {
+        Msg("! [MaterialSystem] TextureManager not available");
+        return;
+    }
+
+    TextureSet set;
+
+    xr_string albedoPath = GetAlbedoPath(textureName);
+    set.albedo = texMgr->LoadTexture(
+        albedoPath.c_str(),
+        fg::TextureColorSpace::Srgb,
+        TexturePriority::High
+    );
+
+    xr_string normalPath = GetNormalPath(textureName);
+    set.normal = texMgr->LoadTexture(
+        normalPath.c_str(),
+        TexturePriority::Medium
+    );
+
+    xr_string pbrPath = GetPBRPath(textureName);
+    set.pbr = texMgr->LoadTexture(
+        pbrPath.c_str(),
+        TexturePriority::Medium
+    );
+
+    m_textureCache[key] = set;
+    m_stats.textureSetsCached++;
+}
+
+const MaterialSystem::TextureSet& MaterialSystem::GetTextures(const char* textureName) const
+{
+    if (!textureName || !textureName[0])
+        return m_emptyTextureSet;
+
+    shared_str key(textureName);
+    auto it = m_textureCache.find(key);
+    if (it != m_textureCache.end())
+        return it->second;
+
+    return m_emptyTextureSet;
+}
+
+bool MaterialSystem::HasTextures(const char* textureName) const
+{
+    if (!textureName || !textureName[0])
+        return false;
+
+    shared_str key(textureName);
+    return m_textureCache.contains(key);
+}
+
+void MaterialSystem::ClearCaches()
+{
+    m_materialCache.clear();
+    m_textureCache.clear();
+
+    m_stats = Stats{};
+
+    Msg("* [MaterialSystem] Caches cleared");
+}
+
+MaterialSystem::Stats MaterialSystem::GetStats() const
+{
+    m_stats.materialsCached = static_cast<u32>(m_materialCache.size());
+    m_stats.textureSetsCached = static_cast<u32>(m_textureCache.size());
+    return m_stats;
+}
+
+xr_string MaterialSystem::GetAlbedoPath(const char* textureName) const
+{
+    return textureName;
+}
+
+xr_string MaterialSystem::GetNormalPath(const char* textureName) const
+{
+    xr_string path = textureName;
+    path += "_bump";
+    return path;
+}
+
+xr_string MaterialSystem::GetPBRPath(const char* textureName) const
+{
+    xr_string path = textureName;
+    path += "_pbr";
+    return path;
+}
+
+xr_string MaterialSystem::GetDetailPath(const char* textureName) const
+{
+    xr_string path = textureName;
+    path += "_detail";
+    return path;
+}
+
+}

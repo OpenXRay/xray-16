@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_BmmD : public IBlender
 {
@@ -11,10 +11,6 @@ class CBlender_BmmD : public IBlender
     string64 oB_Name; //. задел на будущее
     string64 oA_Name; //. задел на будущее
 
-private:
-    void CompileFFP(CBlender_Compile& C) const;
-    void CompileProgrammable(CBlender_Compile& C) const;
-
 public:
     LPCSTR getComment() override;
     BOOL canBeDetailed() override;
@@ -23,9 +19,12 @@ public:
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
 
-    void Compile(CBlender_Compile& C) override;
+    const char* GetDetailR() const { return oR_Name; }
+    const char* GetDetailG() const { return oG_Name; }
+    const char* GetDetailB() const { return oB_Name; }
+    const char* GetDetailA() const { return oA_Name; }
 
     CBlender_BmmD();
     ~CBlender_BmmD() override = default;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

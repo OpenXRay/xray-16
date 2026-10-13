@@ -1,0 +1,1098 @@
+#include "stdafx.h"
+#include "VisibilityPassSetup.h"
+#include "ShaderConstants.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
+#include "Layers/xrRender/FrameGraph/BindingSetBuilder.h"
+#include "Layers/xrRender/FrameGraph/BindingLayoutBuilder.h"
+#include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/Backend/D3D12Backend.h"
+#include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/FGDetailManager.h"
+#include "../../../../res/gamedata/shaders/r5/shared/detail_alpha.h"
+#include "Layers/xrRender/xrRender_console.h"
+
+namespace xray::render::fg::passes {
+
+using namespace framegraph;
+
+namespace {
+
+struct VisibilityPassData {
+    const FrameGraph* graph = nullptr;
+    VirtualResourceHandle depth;
+    VirtualResourceHandle visId;
+    VirtualResourceHandle drawArgsBuffer;
+    VirtualResourceHandle skinnedDrawArgs;
+    std::shared_ptr<const FGDetailManager::VisibilityFrame> detailFrame;
+    VirtualResourceHandle swVis;
+    fg::RenderDevice* device = nullptr;
+    GPUCullingManager* gpuCulling = nullptr;
+    FGDetailManager* detailManager = nullptr;
+    VisibilityPassState* state = nullptr;
+    ClusterDrawConfig config;
+    bool retest = false;
+    bool swGrass = false;
+};
+
+struct SwRasterPassData {
+    VirtualResourceHandle visBuffer;
+    VirtualResourceHandle drawArgsBuffer;
+    fg::RenderDevice* device = nullptr;
+    VisibilityPassState* state = nullptr;
+    ClusterDrawConfig config;
+    const FrameGraph* graph = nullptr;
+    u32 width = 0;
+    u32 height = 0;
+    bool retest = false;
+};
+
+struct alignas(16) SwRasterParams {
+    u32 width;
+    u32 height;
+    u32 pad0;
+    u32 pad1;
+};
+
+struct SwGrassPassData {
+    VirtualResourceHandle visBuffer;
+    std::shared_ptr<const FGDetailManager::VisibilityFrame> detailFrame;
+    fg::RenderDevice* device = nullptr;
+    VisibilityPassState* state = nullptr;
+    FGDetailManager* detailManager = nullptr;
+    u32 width = 0;
+    u32 height = 0;
+};
+
+struct alignas(16) DetailSwParams {
+    u32 entryBase;
+    u32 lod;
+    u32 segments;
+    u32 preparedCapacity;
+    u32 width;
+    u32 height;
+    u32 pad0;
+    u32 pad1;
+};
+
+struct alignas(16) SkinnedVisParams {
+    u32 entryBase;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
+};
+
+struct alignas(16) DetailVisParams {
+    u32 entryBase;
+    u32 kind;
+    u32 segments;
+    float alphaRef;
+    u32 preparedCapacity;
+    u32 pad[3];
+};
+
+struct VisDebugViewData {
+    VirtualResourceHandle visId;
+    VirtualResourceHandle motion;
+    VirtualResourceHandle view;
+    fg::RenderDevice* device = nullptr;
+    VisibilityPassState* state = nullptr;
+    u32 width = 0;
+    u32 height = 0;
+    u32 mode = 1;
+};
+
+struct alignas(16) VisDebugParams {
+    u32 mode;
+    u32 pad0;
+    u32 pad1;
+    u32 pad2;
+};
+
+bool ensureMeshVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state)
+{
+    if (state.meshPipeline && state.meshTerrainPipeline)
+        return true;
+    if (state.meshFailed)
+        return false;
+
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto msResult = shaderLoader->LoadMeshShader("cluster_vis", "main");
+    auto atResult = shaderLoader->LoadPixelShader("cluster_vis_at_ms", "main");
+    auto fadeResult = shaderLoader->LoadPixelShader("cluster_vis_fade_ms", "main");
+    if (!msResult.handle || !msResult.reflection || !atResult.handle || !atResult.reflection
+        || !fadeResult.handle || !fadeResult.reflection) {
+        state.meshFailed = true;
+        return false;
+    }
+    auto* atRefl = atResult.reflection;
+    auto* fadeRefl = fadeResult.reflection;
+
+    auto& cache = GetPassResourceCache();
+    const auto visibility = nvrhi::ShaderType::Mesh | nvrhi::ShaderType::Pixel;
+    auto layout = cache.GetOrCreateBindingLayout(BindingLayoutBuilder::Build(*msResult.reflection, *atRefl, visibility), nvDevice);
+    auto terrainLayout = cache.GetOrCreateBindingLayout(BindingLayoutBuilder::Build(*msResult.reflection, *fadeRefl, visibility), nvDevice);
+    if (!layout || !terrainLayout) {
+        state.meshFailed = true;
+        return false;
+    }
+
+    auto* bindlessLayout = device->GetBackend()->GetBindlessLayout();
+    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* bindingLayout) {
+        nvrhi::MeshletPipelineDesc desc;
+        desc.MS = msResult.handle;
+        desc.PS = pixelShader;
+        desc.renderState = state.pipeline->getDesc().renderState;
+        desc.bindingLayouts = { bindingLayout };
+        if (bindlessLayout)
+            desc.addBindingLayout(bindlessLayout);
+        return desc;
+    };
+    const auto& fbInfo = state.pipeline->getFramebufferInfo();
+    auto pipeline = nvDevice->createMeshletPipeline(makeDesc(atResult.handle, layout), fbInfo);
+    auto terrainPipeline = nvDevice->createMeshletPipeline(makeDesc(fadeResult.handle, terrainLayout), fbInfo);
+    if (!pipeline || !terrainPipeline) {
+        state.meshFailed = true;
+        return false;
+    }
+
+    state.meshShader = msResult.handle;
+    state.meshPsAlphaTest = atResult.handle;
+    state.meshPsFade = fadeResult.handle;
+    state.meshLayout = layout;
+    state.meshTerrainLayout = terrainLayout;
+    state.meshPipeline = pipeline;
+    state.meshTerrainPipeline = terrainPipeline;
+    return true;
+}
+
+int selectMeshVisibility(fg::RenderDevice* device, const ClusterDrawConfig& config, VisibilityPassState& state)
+{
+    if (!ps_r_mesh_shaders)
+        return 0;
+    auto* backend = device->GetBackend();
+    if (!backend || !backend->GetCapabilities().meshShaders
+        || !device->GetNVRHIDevice()->queryFeatureSupport(nvrhi::Feature::Meshlets))
+        return 1;
+
+    const u64 maxGroups = backend->GetCapabilities().meshShaderMaxGroups;
+    auto fits = [maxGroups](u32 entries) {
+        const u64 groups = u64(entries);
+        return ((groups + 255) / 256) * 256 <= maxGroups;
+    };
+    if (!fits(config.refCount))
+        return 2;
+    return ensureMeshVisibilityResources(device, state) ? 4 : 3;
+}
+
+bool ensureSwResources(fg::RenderDevice* device, VisibilityPassState& state, u32 width, u32 height)
+{
+    if (state.swFailed)
+        return false;
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto& cache = GetPassResourceCache();
+    if (!state.swPipeline) {
+        auto csResult = shaderLoader->LoadComputeShader("cluster_sw_raster", "main");
+        auto vsResult = shaderLoader->LoadVertexShader("fullscreen");
+        auto psResult = shaderLoader->LoadPixelShader("cluster_sw_resolve", "main");
+        if (!csResult.handle || !csResult.reflection || !vsResult.handle || !vsResult.reflection || !psResult.handle || !psResult.reflection) {
+            Msg("! [VisibilityRaster] Failed to load software raster shaders");
+            state.swFailed = true;
+            return false;
+        }
+        state.swShader = csResult.handle;
+        state.swResolvePS = psResult.handle;
+        state.swLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
+        state.swResolveLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *psResult.reflection, nvDevice);
+        if (!state.swLayout || !state.swResolveLayout) {
+            state.swFailed = true;
+            return false;
+        }
+        nvrhi::ComputePipelineDesc csDesc;
+        csDesc.CS = state.swShader;
+        csDesc.bindingLayouts = { state.swLayout };
+        state.swPipeline = nvDevice->createComputePipeline(csDesc);
+
+        nvrhi::GraphicsPipelineDesc desc;
+        desc.VS = vsResult.handle;
+        desc.PS = state.swResolvePS;
+        desc.bindingLayouts = { state.swResolveLayout };
+        desc.primType = nvrhi::PrimitiveType::TriangleList;
+        desc.renderState.depthStencilState.depthTestEnable = true;
+        desc.renderState.depthStencilState.depthWriteEnable = true;
+        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+        nvrhi::FramebufferInfoEx fbInfo;
+        fbInfo.colorFormats.push_back(nvrhi::Format::R32_UINT);
+        fbInfo.depthFormat = nvrhi::Format::D32;
+        state.swResolvePipeline = cache.GetOrCreatePipeline("VisibilityRaster_SwResolve", desc, fbInfo, nvDevice);
+        if (!state.swPipeline || !state.swResolvePipeline) {
+            Msg("! [VisibilityRaster] Failed to create software raster pipelines");
+            state.swFailed = true;
+            return false;
+        }
+        Msg("* [VisibilityRaster] Software cluster raster initialized");
+    }
+    if (!state.swVisBuffer || state.swWidth != width || state.swHeight != height) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "VisibilityRaster_SwVis";
+        desc.byteSize = u64(width) * height * sizeof(u64);
+        desc.structStride = sizeof(u64);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+        state.swVisBuffer = nvDevice->createBuffer(desc);
+        state.swWidth = width;
+        state.swHeight = height;
+        if (!state.swVisBuffer) {
+            state.swFailed = true;
+            return false;
+        }
+    }
+    return true;
+}
+
+void renderSwRaster(fg::RenderContext* ctx, const SwRasterPassData& data)
+{
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    VisibilityPassState& state = *data.state;
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("cluster_sw_raster", ".cs");
+    if (!cmdList || !refl || !state.swPipeline || !state.swVisBuffer)
+        return;
+
+    if (!data.retest)
+        cmdList->clearBufferUInt(state.swVisBuffer, 0);
+
+    auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "SwRasterParams", sizeof(SwRasterParams), data.device, 16);
+    SwRasterParams params = {};
+    params.width = data.width;
+    params.height = data.height;
+    cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+
+    const ClusterDrawBuffers buffers = data.config.Resolve(*data.graph, ClusterDrawUse::Software);
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(buffers.swArgsBuffer,
+        nvrhi::ResourceStates::IndirectArgument | nvrhi::ResourceStates::NonPixelShaderResource);
+    cmdList->setBufferState(buffers.swEntryBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+
+    BindingSetBuilder bsb(*refl, nvDevice, "VisibilityRaster.Sw");
+    bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+    bsb.ConstantBuffer("SwRasterParams", paramsCB);
+    bsb.BufferSRV("g_ClusterRefs", buffers.clusterRefs);
+    bsb.BufferSRV("g_ClusterMeta", buffers.clusterMeta);
+    bsb.BufferSRV("g_GeoInstances", buffers.instances);
+    bsb.BufferSRV("g_SwEntries", buffers.swEntryBuffer);
+    bsb.BufferSRV("g_ClusterPayload", buffers.clusterPayload);
+    bsb.BufferSRV("g_ClusterVertices", buffers.clusterVertices);
+    bsb.BufferSRV("g_ClusterPages", buffers.clusterPages);
+    bsb.BufferSRV("g_SwDispatchArgs", buffers.swArgsBuffer);
+    bsb.BufferUAV("g_VisBuffer", state.swVisBuffer);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.swLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::ComputeState cs;
+    cs.pipeline = state.swPipeline;
+    cs.bindings = { bindingSet };
+    cs.indirectParams = buffers.swArgsBuffer;
+    cmdList->setComputeState(cs);
+    cmdList->dispatchIndirect(0);
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+}
+
+bool ensureDetailVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state,
+    const FGDetailManager::InstanceGeneration& source)
+{
+    if (state.bladePipeline && state.pulledPipeline && state.detailSourceLayout == source.bindingLayout)
+        return true;
+    auto* nvDevice = device->GetNVRHIDevice();
+    auto* loader = GEnv.Render->GetShaderLoader();
+    auto vs = loader->LoadVertexShader("detail_vis", "main");
+    auto ps = loader->LoadPixelShader("detail_vis", "main");
+    auto pulled = loader->LoadPixelShader("detail_vis_at", "main");
+    if (!vs.handle || !vs.reflection || !ps.handle || !ps.reflection || !pulled.handle || !pulled.reflection)
+        return false;
+    auto& cache = GetPassResourceCache();
+    state.bladeVS = vs.handle;
+    state.bladePS = ps.handle;
+    state.pulledPS = pulled.handle;
+    state.bladeLayout = cache.GetOrCreateBindingLayoutFromReflection(*vs.reflection, *ps.reflection, nvDevice);
+    state.pulledLayout = cache.GetOrCreateBindingLayoutFromReflection(*vs.reflection, *pulled.reflection, nvDevice);
+    if (!state.bladeLayout || !state.pulledLayout)
+        return false;
+    nvrhi::FramebufferInfoEx framebuffer;
+    framebuffer.colorFormats.push_back(nvrhi::Format::R32_UINT);
+    framebuffer.depthFormat = nvrhi::Format::D32;
+    nvrhi::GraphicsPipelineDesc desc;
+    desc.VS = state.bladeVS;
+    desc.PS = state.bladePS;
+    desc.bindingLayouts = { state.bladeLayout, device->GetBackend()->GetBindlessLayout(), source.bindingLayout };
+    desc.primType = nvrhi::PrimitiveType::TriangleList;
+    desc.renderState.depthStencilState.depthTestEnable = true;
+    desc.renderState.depthStencilState.depthWriteEnable = true;
+    desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+    desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+    state.bladePipeline = nvDevice->createGraphicsPipeline(desc, framebuffer);
+    desc.PS = state.pulledPS;
+    desc.bindingLayouts[0] = state.pulledLayout;
+    state.pulledPipeline = nvDevice->createGraphicsPipeline(desc, framebuffer);
+    if (!state.bladePipeline || !state.pulledPipeline)
+        return false;
+    state.detailSourceLayout = source.bindingLayout;
+    return true;
+}
+
+bool ensureSwGrassResources(fg::RenderDevice* device, VisibilityPassState& state,
+    const FGDetailManager::InstanceGeneration& source)
+{
+    if (state.swGrassPipeline && state.swGrassSourceLayout == source.bindingLayout)
+        return true;
+    if (state.swGrassFailed)
+        return false;
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto csResult = GEnv.Render->GetShaderLoader()->LoadComputeShader("detail_sw_raster", "main");
+    if (!csResult.handle || !csResult.reflection) {
+        Msg("! [VisibilityRaster] Failed to load detail_sw_raster");
+        state.swGrassFailed = true;
+        return false;
+    }
+    auto& cache = GetPassResourceCache();
+    state.swGrassShader = csResult.handle;
+    state.swGrassLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
+    nvrhi::ComputePipelineDesc desc;
+    desc.CS = state.swGrassShader;
+    desc.bindingLayouts = { state.swGrassLayout, device->GetBackend()->GetBindlessLayout(), source.bindingLayout };
+    state.swGrassPipeline = state.swGrassLayout ? nvDevice->createComputePipeline(desc) : nullptr;
+    if (!state.swGrassPipeline) {
+        Msg("! [VisibilityRaster] Failed to create software grass pipeline");
+        state.swGrassFailed = true;
+        return false;
+    }
+    state.swGrassSourceLayout = source.bindingLayout;
+    Msg("* [VisibilityRaster] Software grass raster initialized");
+    return true;
+}
+
+void renderSwGrass(fg::RenderContext* ctx, const SwGrassPassData& data)
+{
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    VisibilityPassState& state = *data.state;
+    FGDetailManager* dm = data.detailManager;
+    const auto& frame = *data.detailFrame;
+    nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+    auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("detail_sw_raster", ".cs");
+    if (!cmdList || !refl || !state.swGrassPipeline || !state.swVisBuffer)
+        return;
+
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), data.device);
+    auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), data.device);
+    FGDetailManager::DetailFrameConstants frameConstants;
+    dm->FillFrameConstants(frameConstants);
+    cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
+    auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailSwParams", sizeof(DetailSwParams), data.device, 16);
+
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(frame.swDispatch, nvrhi::ResourceStates::IndirectArgument);
+
+    for (u32 lod = 1; lod < FGDetailManager::LOD_COUNT; ++lod) {
+        DetailSwParams params = {};
+        params.entryBase = frame.entryBase;
+        params.lod = lod;
+        params.segments = FGDetailManager::LOD_SEGMENTS[lod];
+        params.preparedCapacity = frame.preparedCapacity[lod];
+        params.width = data.width;
+        params.height = data.height;
+        cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
+        cmdList->setBufferState(frame.drawArgs[lod], nvrhi::ResourceStates::NonPixelShaderResource);
+        BindingSetBuilder bsb(*refl, nvDevice, "VisibilityRaster.SwGrass");
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
+        bsb.ConstantBuffer("DetailSwParams", paramsCB);
+        bsb.BufferSRV("visible_indices", frame.visible[lod]);
+        bsb.BufferSRV("g_DetailPackets", frame.packets);
+        bsb.BufferSRV("prepared_blades", frame.prepared[lod]);
+        bsb.BufferSRV("g_DrawArgs", frame.drawArgs[lod]);
+        bsb.Texture("g_Perlin4D", dm->perlin4dTexture);
+        bsb.Texture("g_Interaction", dm->interactionTexture[dm->interactionCurrent]);
+        bsb.BufferUAV("g_VisBuffer", state.swVisBuffer);
+        auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.swGrassLayout, nvDevice);
+        if (!bindingSet)
+            continue;
+        nvrhi::ComputeState cs;
+        cs.pipeline = state.swGrassPipeline;
+        cs.bindings = { bindingSet, data.device->GetBackend()->GetBindlessDescriptorTable(), frame.source->descriptorTable };
+        cs.indirectParams = frame.swDispatch;
+        cmdList->setComputeState(cs);
+        cmdList->dispatchIndirect((lod - 1) * 16);
+        cmdList->setBufferState(frame.drawArgs[lod], nvrhi::ResourceStates::IndirectArgument);
+    }
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::NonPixelShaderResource);
+}
+
+void drawSwResolve(fg::RenderContext* ctx, fg::RenderDevice* device, nvrhi::IFramebuffer* framebuffer,
+    const nvrhi::Viewport& viewport, const nvrhi::Rect& scissor, VisibilityPassState& state)
+{
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    auto* vsRefl = shaderLoader->GetCachedReflection("fullscreen", ".vs");
+    auto* psRefl = shaderLoader->GetCachedReflection("cluster_sw_resolve", ".ps");
+    if (!vsRefl || !psRefl || !state.swResolvePipeline || !state.swVisBuffer)
+        return;
+
+    auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "SwRasterParams", sizeof(SwRasterParams), device, 16);
+    SwRasterParams params = {};
+    params.width = state.swWidth;
+    params.height = state.swHeight;
+    cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
+    cmdList->setBufferState(state.swVisBuffer, nvrhi::ResourceStates::ShaderResource);
+    BindingSetBuilder bsb(*vsRefl, *psRefl, nvDevice, "VisibilityRaster.SwResolve");
+    bsb.ConstantBuffer("SwRasterParams", paramsCB);
+    bsb.BufferSRV("g_VisBuffer", state.swVisBuffer);
+    auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.swResolveLayout, nvDevice);
+    if (!bindingSet)
+        return;
+
+    nvrhi::GraphicsState gs;
+    gs.pipeline = state.swResolvePipeline;
+    gs.framebuffer = framebuffer;
+    gs.bindings = { bindingSet };
+    gs.viewport.addViewport(viewport);
+    gs.viewport.addScissorRect(scissor);
+    cmdList->setGraphicsState(gs);
+    cmdList->draw(nvrhi::DrawArguments().setVertexCount(3));
+}
+
+void renderVisibilityRaster(
+    fg::RenderContext* ctx,
+    fg::RenderDevice* device,
+    const FrameGraph& graph,
+    nvrhi::ITexture* depthRT,
+    nvrhi::ITexture* visRT,
+    const ClusterDrawConfig& config,
+    GPUCullingManager* gpuCulling,
+    FGDetailManager* detailManager,
+    const FGDetailManager::VisibilityFrame* detailFrame,
+    VisibilityPassState& state,
+    bool retest,
+    bool swMerge,
+    bool swGrass,
+    xray::profiler::GPUProfiler* gpuProfiler)
+{
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    auto scope = [&](const char* rasterLabel, const char* retestLabel, auto&& body) {
+        const char* label = retest ? retestLabel : rasterLabel;
+        if (gpuProfiler) gpuProfiler->BeginPass(cmdList, label);
+        body();
+        if (gpuProfiler) gpuProfiler->EndPass(cmdList, label);
+    };
+    if (!retest) {
+        cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 0.0f, false, 0);
+        cmdList->clearTextureUInt(visRT, nvrhi::AllSubresources, 0);
+    }
+
+    if (!config.UseCompactGeometry())
+        return;
+
+    const ClusterDrawBuffers buffers = config.Resolve(graph, ClusterDrawUse::Raster);
+    if (!buffers.clusterPayload || !buffers.clusterVertices || !buffers.clusterPages)
+        return;
+
+    auto* matBuffer = graph.GetPhysicalBuffer(config.geometry.materials);
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto& cache = GetPassResourceCache();
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.addColorAttachment(visRT);
+    fbDesc.setDepthAttachment(depthRT);
+    auto framebuffer = cache.GetOrCreateFramebuffer(fbDesc, nvDevice);
+    if (!framebuffer)
+        return;
+
+    auto staticGlobalsCB = cache.GetOrCreateVolatileCB("Frame", "StaticGlobals", sizeof(StaticGlobals), device);
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    const int meshMode = selectMeshVisibility(device, config, state);
+    const bool useMesh = meshMode == 4;
+    if (!retest && state.meshMode != meshMode) {
+        const char* modes[] = {
+            "vertex draws (r_mesh_shaders 0)",
+            "vertex draws (mesh shaders unsupported)",
+            "vertex draws (mesh dispatch capacity exceeded)",
+            "vertex draws (mesh pipeline creation failed)",
+            "mesh dispatch (one group per cluster, indexed unique vertices)"
+        };
+        Msg("* [VisibilityRaster] %s", modes[meshMode]);
+        state.meshMode = meshMode;
+    }
+    auto* vsRefl = shaderLoader->GetCachedReflection("cluster_vis", useMesh ? ".ms" : ".vs");
+    auto* atRefl = shaderLoader->GetCachedReflection(useMesh ? "cluster_vis_at_ms" : "cluster_vis_at", ".ps");
+    auto* fadeRefl = shaderLoader->GetCachedReflection(useMesh ? "cluster_vis_fade_ms" : "cluster_vis_fade", ".ps");
+    if (!vsRefl || !atRefl || !fadeRefl)
+        return;
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
+
+    const auto& rtDesc = depthRT->getDesc();
+    nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
+    nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
+
+    if (swMerge)
+        scope("Visibility Raster.SwResolve", "Visibility Retest.SwResolve", [&] { drawSwResolve(ctx, device, framebuffer, viewport, scissor, state); });
+    auto draw = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IBindingSet* bindingSet, nvrhi::IBuffer* args,
+        nvrhi::IBuffer* indices = nullptr, nvrhi::IBindingSet* sourceTable = nullptr) {
+        nvrhi::GraphicsState gs;
+        gs.pipeline = pipeline;
+        gs.framebuffer = framebuffer;
+        gs.bindings = { bindingSet };
+        if (bindlessTable)
+            gs.addBindingSet(bindlessTable);
+        if (sourceTable)
+            gs.addBindingSet(sourceTable);
+        gs.indirectParams = args;
+        gs.viewport.addViewport(viewport);
+        gs.viewport.addScissorRect(scissor);
+        if (indices)
+            gs.indexBuffer = nvrhi::IndexBufferBinding().setBuffer(indices).setFormat(nvrhi::Format::R16_UINT);
+        cmdList->setGraphicsState(gs);
+        if (indices)
+            cmdList->drawIndexedIndirect(0, 1);
+        else
+            cmdList->drawIndirect(0, 1);
+    };
+
+    auto drawCluster = [&](nvrhi::IGraphicsPipeline* pipeline, nvrhi::IMeshletPipeline* meshPipeline,
+        nvrhi::IBindingSet* bindingSet, nvrhi::IBuffer* args) {
+        if (!useMesh) {
+            draw(pipeline, bindingSet, args);
+            return;
+        }
+        cmdList->setBufferState(args, nvrhi::ResourceStates::IndirectArgument | nvrhi::ResourceStates::NonPixelShaderResource);
+        cmdList->commitBarriers();
+        nvrhi::MeshletState ms;
+        ms.pipeline = meshPipeline;
+        ms.framebuffer = framebuffer;
+        ms.bindings = { bindingSet };
+        if (bindlessTable)
+            ms.addBindingSet(bindlessTable);
+        ms.indirectParams = args;
+        ms.viewport.addViewport(viewport);
+        ms.viewport.addScissorRect(scissor);
+        cmdList->setMeshletState(ms);
+        cmdList->dispatchMeshIndirect(16, 1);
+    };
+
+    if (config.IsValid()) scope("Visibility Raster.Clusters", "Visibility Retest.Clusters", [&] {
+        BindingSetBuilder bsb(*vsRefl, *atRefl, nvDevice, "VisibilityRaster.Cluster");
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        bsb.BufferSRV("g_Materials", matBuffer);
+        bsb.BufferSRV("g_ClusterRefs", buffers.clusterRefs);
+        bsb.BufferSRV("g_ClusterMeta", buffers.clusterMeta);
+        bsb.BufferSRV("g_GeoInstances", buffers.instances);
+        bsb.BufferSRV("g_VisibleEntries", buffers.visibleEntryBuffer);
+        bsb.BufferSRV("g_ClusterPayload", buffers.clusterPayload);
+        bsb.BufferSRV("g_ClusterVertices", buffers.clusterVertices);
+        bsb.BufferSRV("g_ClusterPages", buffers.clusterPages);
+        bsb.BufferSRV("g_DrawFades", buffers.fadeBuffer);
+        if (useMesh)
+            bsb.BufferSRV("g_ClusterArgs", buffers.argsBuffer);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshLayout : state.layout, nvDevice))
+            drawCluster(state.pipeline, state.meshPipeline, bindingSet, buffers.argsBuffer);
+    });
+
+    if (config.TerrainValid()) scope("Visibility Raster.Terrain", "Visibility Retest.Terrain", [&] {
+        BindingSetBuilder bsb(*vsRefl, *fadeRefl, nvDevice, "VisibilityRaster.ClusterTerrain");
+        bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+        bsb.BufferSRV("g_ClusterRefs", buffers.clusterRefs);
+        bsb.BufferSRV("g_ClusterMeta", buffers.clusterMeta);
+        bsb.BufferSRV("g_GeoInstances", buffers.instances);
+        bsb.BufferSRV("g_VisibleEntries", buffers.terrainVisibleEntryBuffer);
+        bsb.BufferSRV("g_ClusterPayload", buffers.clusterPayload);
+        bsb.BufferSRV("g_ClusterVertices", buffers.clusterVertices);
+        bsb.BufferSRV("g_ClusterPages", buffers.clusterPages);
+        bsb.BufferSRV("g_DrawFades", buffers.terrainFadeBuffer);
+        if (useMesh)
+            bsb.BufferSRV("g_ClusterArgs", buffers.terrainArgsBuffer);
+        if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), useMesh ? state.meshTerrainLayout : state.terrainLayout, nvDevice))
+            drawCluster(state.terrainPipeline, state.meshTerrainPipeline, bindingSet, buffers.terrainArgsBuffer);
+    });
+
+    const u32 skinnedEntries = (gpuCulling && !retest) ? gpuCulling->GetSkinnedVisibleEntryCount() : 0u;
+    if (skinnedEntries > 0 && state.skinnedPipeline) scope("Visibility Raster.Skinned", "Visibility Retest.Skinned", [&] {
+        auto* skinnedVsRefl = shaderLoader->GetCachedReflection("cluster_vis_skinned", ".vs");
+        nvrhi::IBuffer* preVB = graph.GetPhysicalBuffer(config.geometry.deformedVertices);
+        nvrhi::IBuffer* skinnedIB = graph.GetPhysicalBuffer(config.geometry.skinnedIndices);
+        nvrhi::IBuffer* entries = graph.GetPhysicalBuffer(config.geometry.skinnedEntries);
+        if (skinnedVsRefl && preVB && skinnedIB && entries) {
+            auto paramsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "SkinnedVisParams", sizeof(SkinnedVisParams), device, 16);
+            SkinnedVisParams params = {};
+            params.entryBase = gpuCulling->GetClusterRefCapacity();
+            cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+
+            BindingSetBuilder bsb(*skinnedVsRefl, *atRefl, nvDevice, "VisibilityRaster.Skinned");
+            bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+            bsb.ConstantBuffer("SkinnedVisParams", paramsCB);
+            bsb.BufferSRV("g_Materials", matBuffer);
+            bsb.BufferSRV("g_SkinnedEntries", entries);
+            bsb.BufferSRV("g_SkinnedVB", preVB);
+            bsb.BufferSRV("g_SkinnedIB", skinnedIB);
+            bsb.BufferSRV("g_DrawFades", graph.GetPhysicalBuffer(config.geometry.neutralFades));
+            if (auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), state.skinnedLayout, nvDevice)) {
+                nvrhi::GraphicsState gs;
+                gs.pipeline = state.skinnedPipeline;
+                gs.framebuffer = framebuffer;
+                gs.bindings = { bindingSet };
+                if (bindlessTable)
+                    gs.addBindingSet(bindlessTable);
+                gs.viewport.addViewport(viewport);
+                gs.viewport.addScissorRect(scissor);
+                cmdList->setGraphicsState(gs);
+                cmdList->draw(nvrhi::DrawArguments().setVertexCount(GPUCullingManager::SKINNED_ENTRY_INDICES).setInstanceCount(skinnedEntries));
+            }
+        }
+    });
+
+    if (!retest && detailManager && detailFrame && state.bladePipeline) scope("Visibility Raster.Grass", "Visibility Retest.Grass", [&] {
+        const auto& frame = *detailFrame;
+        const auto& source = *frame.source;
+        auto* bladeVsRefl = shaderLoader->GetCachedReflection("detail_vis", ".vs");
+        auto* bladePsRefl = shaderLoader->GetCachedReflection("detail_vis", ".ps");
+        auto* pulledPsRefl = shaderLoader->GetCachedReflection("detail_vis_at", ".ps");
+        if (bladeVsRefl && bladePsRefl) {
+            auto detailGlobalsCB = cache.GetOrCreateVolatileCB("Detail", "DetailGlobals", sizeof(FGDetailManager::DetailFrameConstants), device);
+            FGDetailManager::DetailFrameConstants frameConstants;
+            detailManager->FillFrameConstants(frameConstants);
+            cmdList->writeBuffer(detailGlobalsCB, &frameConstants, sizeof(frameConstants));
+            auto visParamsCB = cache.GetOrCreateVolatileCB("VisibilityRaster", "DetailVisParams", sizeof(DetailVisParams), device, 64);
+
+            auto drawKind = [&](const auto& psRefl, nvrhi::IBindingLayout* layout, nvrhi::IGraphicsPipeline* pipeline, const char* name,
+                                u32 kind, u32 segments, float alphaRef, nvrhi::IBuffer* list, nvrhi::IBuffer* args, nvrhi::IBuffer* indices, nvrhi::IBuffer* prepared) {
+                DetailVisParams params = {};
+                params.entryBase = frame.entryBase;
+                params.kind = kind;
+                params.segments = segments;
+                params.alphaRef = alphaRef;
+                params.preparedCapacity = kind < FGDetailManager::LOD_COUNT ? frame.preparedCapacity[kind] : 0u;
+                cmdList->writeBuffer(visParamsCB, &params, sizeof(params));
+
+                BindingSetBuilder bsb(*bladeVsRefl, psRefl, nvDevice, name);
+                bsb.ConstantBuffer("static_globals", staticGlobalsCB);
+                bsb.ConstantBuffer("DetailGlobals", detailGlobalsCB);
+                bsb.ConstantBuffer("DetailVisParams", visParamsCB);
+                bsb.BufferSRV("visible_indices", list);
+                bsb.BufferSRV("detail_models", source.models);
+                bsb.BufferSRV("pulled_vertices", source.pulledVertices);
+                bsb.BufferSRV("g_DetailPackets", frame.packets);
+                bsb.BufferSRV("prepared_blades", prepared ? prepared : frame.prepared[0].Get());
+                bsb.Texture("g_Perlin4D", detailManager->perlin4dTexture);
+                bsb.Texture("g_Interaction", detailManager->interactionTexture[detailManager->interactionCurrent]);
+                auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), layout, nvDevice);
+                if (bindingSet)
+                {
+                    draw(pipeline, bindingSet, args, indices, source.descriptorTable);
+                }
+            };
+
+            for (u32 lod = 0; lod < (swGrass ? 1u : FGDetailManager::LOD_COUNT); ++lod) {
+                drawKind(*bladePsRefl, state.bladeLayout, state.bladePipeline, "VisibilityRaster.Blades",
+                         lod, FGDetailManager::LOD_SEGMENTS[lod], 0.0f,
+                         frame.visible[lod], frame.drawArgs[lod], detailManager->bladeIndexBuffer[lod].Get(),
+                         frame.prepared[lod].Get());
+            }
+
+            if (pulledPsRefl && state.pulledPipeline && source.maxPulledIndexCount > 0) {
+                drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Meshes",
+                         FGDetailManager::VIS_KIND_MESH, 0, DETAIL_PULLED_CARD_ALPHA_REF,
+                         frame.visible[FGDetailManager::VIS_KIND_MESH], frame.drawArgs[FGDetailManager::VIS_KIND_MESH], nullptr, nullptr);
+                drawKind(*pulledPsRefl, state.pulledLayout, state.pulledPipeline, "VisibilityRaster.Patches",
+                         FGDetailManager::VIS_KIND_DECAL, 0, DETAIL_STATIC_PATCH_ALPHA_REF,
+                         frame.visible[FGDetailManager::VIS_KIND_DECAL], frame.drawArgs[FGDetailManager::VIS_KIND_DECAL], nullptr, nullptr);
+            }
+        }
+    });
+}
+
+}
+
+bool EnsureSwRasterResources(fg::RenderDevice* device, VisibilityPassState& state, u32 width, u32 height)
+{
+    if (!device || width == 0 || height == 0)
+        return false;
+    return ensureSwResources(device, state, width, height);
+}
+
+bool EnsureVisibilityResources(fg::RenderDevice* device, VisibilityPassState& state)
+{
+    if (state.initialized)
+        return true;
+    if (state.failed)
+        return false;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+    auto* shaderLoader = GEnv.Render->GetShaderLoader();
+    if (!nvDevice || !shaderLoader) {
+        state.failed = true;
+        return false;
+    }
+
+    auto vsResult = shaderLoader->LoadVertexShader("cluster_vis", "main");
+    auto skinnedVsResult = shaderLoader->LoadVertexShader("cluster_vis_skinned", "main");
+    auto atResult = shaderLoader->LoadPixelShader("cluster_vis_at", "main");
+    auto fadeResult = shaderLoader->LoadPixelShader("cluster_vis_fade", "main");
+    if (!vsResult.handle || !vsResult.reflection || !skinnedVsResult.handle || !skinnedVsResult.reflection
+        || !atResult.handle || !atResult.reflection || !fadeResult.handle || !fadeResult.reflection) {
+        Msg("! [VisibilityRaster] Failed to load cluster visibility shaders");
+        state.failed = true;
+        return false;
+    }
+    state.vs = vsResult.handle;
+    state.skinnedVS = skinnedVsResult.handle;
+    state.psAlphaTest = atResult.handle;
+    state.psFade = fadeResult.handle;
+
+    auto& cache = GetPassResourceCache();
+    state.layout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *atResult.reflection, nvDevice);
+    state.terrainLayout = cache.GetOrCreateBindingLayoutFromReflection(*vsResult.reflection, *fadeResult.reflection, nvDevice);
+    state.skinnedLayout = cache.GetOrCreateBindingLayoutFromReflection(*skinnedVsResult.reflection, *atResult.reflection, nvDevice);
+    if (!state.layout || !state.terrainLayout || !state.skinnedLayout) {
+        Msg("! [VisibilityRaster] Failed to create binding layouts");
+        state.failed = true;
+        return false;
+    }
+
+    auto* backend = device->GetBackend();
+    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+    nvrhi::FramebufferInfoEx fbInfo;
+    fbInfo.colorFormats.push_back(nvrhi::Format::R32_UINT);
+    fbInfo.depthFormat = nvrhi::Format::D32;
+
+    auto makeDesc = [&](nvrhi::IShader* pixelShader, nvrhi::IBindingLayout* layout, nvrhi::IShader* vertexShader = nullptr) {
+        nvrhi::GraphicsPipelineDesc desc;
+        desc.VS = vertexShader ? nvrhi::ShaderHandle(vertexShader) : state.vs;
+        desc.PS = pixelShader;
+        desc.inputLayout = nullptr;
+        if (bindlessLayout)
+            desc.bindingLayouts = { layout, bindlessLayout };
+        else
+            desc.bindingLayouts = { layout };
+        desc.primType = nvrhi::PrimitiveType::TriangleList;
+        desc.renderState.depthStencilState.depthTestEnable = true;
+        desc.renderState.depthStencilState.depthWriteEnable = true;
+        desc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::GreaterOrEqual;
+        desc.renderState.rasterState.frontCounterClockwise = false;
+        desc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+        return desc;
+    };
+
+    state.pipeline = cache.GetOrCreatePipeline("VisibilityRaster_Cluster", makeDesc(state.psAlphaTest, state.layout), fbInfo, nvDevice);
+    state.terrainPipeline = cache.GetOrCreatePipeline("VisibilityRaster_ClusterTerrain", makeDesc(state.psFade, state.terrainLayout), fbInfo, nvDevice);
+    state.skinnedPipeline = cache.GetOrCreatePipeline("VisibilityRaster_Skinned", makeDesc(state.psAlphaTest, state.skinnedLayout, state.skinnedVS), fbInfo, nvDevice);
+    if (!state.pipeline || !state.terrainPipeline || !state.skinnedPipeline) {
+        Msg("! [VisibilityRaster] Failed to create pipelines");
+        state.failed = true;
+        return false;
+    }
+
+
+    state.initialized = true;
+    Msg("* [VisibilityRaster] Cluster visibility pipelines initialized");
+    return true;
+}
+
+VirtualResourceHandle setupSwRasterPass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    const ClusterDrawConfig& config,
+    u32 width,
+    u32 height,
+    VisibilityPassState* state,
+    VirtualResourceHandle prevVis)
+{
+    const bool retest = prevVis.is_valid();
+    if (!state || !device || !config.SwValid() || width == 0 || height == 0)
+        return {};
+    if (!ensureSwResources(device, *state, width, height))
+        return {};
+
+    VirtualResourceHandle visHandle = prevVis;
+    if (!retest) {
+        ResourceDesc visDesc;
+        visDesc.type = ResourceDesc::Type::Buffer;
+        visDesc.debugName = "VisibilityRaster_SwVis";
+        visDesc.bufferSize = u64(width) * height * sizeof(u64);
+        visDesc.structStride = sizeof(u64);
+        visDesc.isUAV = true;
+        visDesc.allowUAV = true;
+        visDesc.isImported = true;
+        visDesc.isTransient = false;
+        visHandle = fg.ImportBuffer("vis_sw", state->swVisBuffer, visDesc);
+    }
+
+    auto& passData = fg.addCallbackPass<SwRasterPassData>(
+        retest ? "Visibility SW Retest" : "Visibility SW Raster",
+        [&, visHandle, config, width, height, state, retest](FrameGraph& builder, PassHandle passHandle, SwRasterPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            if (!retest)
+                passBuilder.asyncCompute();
+            data.device = device;
+            data.state = state;
+            data.config = config;
+            data.width = width;
+            data.height = height;
+            data.retest = retest;
+            data.graph = &builder;
+            passBuilder.read(config.geometry.clusterRefs, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.clusterMeta, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.instances, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.clusterPayload, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.clusterVertices, ResourceState::ShaderResource);
+            passBuilder.read(config.geometry.clusterPages, ResourceState::ShaderResource);
+            passBuilder.read(config.swEntries, ResourceState::ShaderResource);
+            data.drawArgsBuffer = passBuilder.read(config.swArgs,
+                ResourceState::IndirectArgument);
+            data.visBuffer = retest
+                ? passBuilder.readWrite(visHandle, ResourceState::UnorderedAccess)
+                : passBuilder.write(visHandle, ResourceState::UnorderedAccess);
+        },
+        [](const SwRasterPassData& data, const FrameGraph&, fg::RenderContext* ctx) {
+            renderSwRaster(ctx, data);
+        });
+    return passData.visBuffer;
+}
+
+VirtualResourceHandle setupSwGrassPass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    const DetailPassResources& details,
+    VirtualResourceHandle prevVis,
+    FGDetailManager* detailManager,
+    u32 width,
+    u32 height,
+    VisibilityPassState* state)
+{
+    if (!state || !device || !detailManager || !details.HasSource() || !prevVis.is_valid() || !state->swVisBuffer)
+        return {};
+    if (!ensureSwGrassResources(device, *state, *details.frame->source))
+        return {};
+
+    auto& passData = fg.addCallbackPass<SwGrassPassData>(
+        "Visibility SW Grass",
+        [&, prevVis, detailManager, width, height, state](FrameGraph& builder, PassHandle passHandle, SwGrassPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            passBuilder.asyncCompute();
+            data.device = device;
+            data.state = state;
+            data.detailManager = detailManager;
+            data.detailFrame = details.frame;
+            data.width = width;
+            data.height = height;
+            details.Read(passBuilder, false, true);
+            data.visBuffer = passBuilder.readWrite(prevVis, ResourceState::UnorderedAccess);
+        },
+        [](const SwGrassPassData& data, const FrameGraph&, fg::RenderContext* ctx) {
+            renderSwGrass(ctx, data);
+        });
+    return passData.visBuffer;
+}
+
+VisibilityPassOutput setupVisibilityPass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    VirtualResourceHandle depthTarget,
+    VirtualResourceHandle visIdTarget,
+    VirtualResourceHandle skinnedDrawArgs,
+    VirtualResourceHandle swVis,
+    const ClusterDrawConfig& config,
+    GPUCullingManager* gpuCulling,
+    FGDetailManager* detailManager,
+    const DetailPassResources& details,
+    VisibilityPassState* state,
+    bool retest,
+    bool swGrass)
+{
+    if (!retest && details.HasSource())
+        R_ASSERT2(ensureDetailVisibilityResources(device, *state, *details.frame->source),
+            "[DetailManager] source-compatible visibility pipelines unavailable");
+    auto& passData = fg.addCallbackPass<VisibilityPassData>(
+        retest ? "Visibility Retest" : "Visibility Raster",
+        [&, depthTarget, visIdTarget, skinnedDrawArgs, swVis, config, gpuCulling, detailManager, state, retest, swGrass](FrameGraph& builder, PassHandle passHandle, VisibilityPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.device = device;
+            data.gpuCulling = gpuCulling;
+            data.detailManager = detailManager;
+            data.detailFrame = !retest && details.HasSource() ? details.frame : nullptr;
+            data.state = state;
+            data.config = config;
+            data.swGrass = swGrass;
+            data.retest = retest;
+            data.graph = &builder;
+            if (config.geometry.materials.is_valid())
+                passBuilder.read(config.geometry.materials, ResourceState::ShaderResource);
+            if (config.HasGeometry()) {
+                passBuilder.read(config.geometry.clusterRefs, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterMeta, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.instances, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterPayload, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterVertices, ResourceState::ShaderResource);
+                passBuilder.read(config.geometry.clusterPages, ResourceState::ShaderResource);
+                if (config.IsValid()) {
+                    passBuilder.read(config.visibleEntries, ResourceState::ShaderResource);
+                    passBuilder.read(config.fades, ResourceState::ShaderResource);
+                }
+                if (config.TerrainValid()) {
+                    passBuilder.read(config.terrainVisibleEntries, ResourceState::ShaderResource);
+                    passBuilder.read(config.terrainFades, ResourceState::ShaderResource);
+                    passBuilder.read(config.terrainArgs, ResourceState::IndirectArgument);
+                }
+            }
+            if (data.detailFrame)
+                details.Read(passBuilder, true, false);
+            if (retest) {
+                data.depth = passBuilder.readWrite(depthTarget, ResourceState::DepthStencilWrite);
+                data.visId = passBuilder.readWrite(visIdTarget, ResourceState::RenderTarget);
+            } else {
+                data.depth = passBuilder.write(depthTarget, ResourceState::DepthStencilWrite);
+                data.visId = passBuilder.write(visIdTarget, ResourceState::RenderTarget);
+            }
+            if (config.IsValid())
+                data.drawArgsBuffer = passBuilder.read(config.args, ResourceState::IndirectArgument);
+            if (skinnedDrawArgs.is_valid())
+                data.skinnedDrawArgs = passBuilder.read(skinnedDrawArgs, ResourceState::ShaderResource);
+            if (!retest)
+            {
+                for (const auto handle : { config.geometry.skinnedEntries, config.geometry.deformedVertices,
+                    config.geometry.skinnedIndices, config.geometry.neutralFades })
+                {
+                    if (handle.is_valid())
+                        passBuilder.read(handle, ResourceState::ShaderResource);
+                }
+            }
+            if (swVis.is_valid())
+                data.swVis = passBuilder.read(swVis, ResourceState::ShaderResource);
+        },
+        [](const VisibilityPassData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            auto* depthRT = fg.GetPhysicalTexture(data.depth);
+            auto* visRT = fg.GetPhysicalTexture(data.visId);
+            if (!depthRT || !visRT || !ctx->GetCommandList())
+                return;
+            renderVisibilityRaster(ctx, data.device, fg, depthRT, visRT, data.config,
+                data.skinnedDrawArgs.is_valid() ? data.gpuCulling : nullptr,
+                data.detailFrame ? data.detailManager : nullptr, data.detailFrame.get(), *data.state, data.retest,
+                data.swVis.is_valid(), data.swGrass, fg.GetGPUProfiler());
+        });
+
+    VisibilityPassOutput out;
+    out.depth = passData.depth;
+    out.visId = passData.visId;
+    return out;
+}
+
+VirtualResourceHandle setupVisDebugViewPass(
+    FrameGraph& fg,
+    fg::RenderDevice* device,
+    VirtualResourceHandle visId,
+    VirtualResourceHandle motion,
+    u32 width,
+    u32 height,
+    u32 mode,
+    VisibilityPassState* state)
+{
+    if (!state || state->debugFailed || !visId.is_valid() || !motion.is_valid())
+        return {};
+
+    if (!state->debugPipeline) {
+        nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+        auto* shaderLoader = GEnv.Render->GetShaderLoader();
+        auto csResult = shaderLoader->LoadComputeShader("vis_debug_view", "main");
+        if (!csResult.handle || !csResult.reflection) {
+            Msg("! [VisibilityRaster] Failed to load vis_debug_view");
+            state->debugFailed = true;
+            return {};
+        }
+        state->debugShader = csResult.handle;
+        auto& cache = GetPassResourceCache();
+        state->debugLayout = cache.GetOrCreateBindingLayoutFromReflection(*csResult.reflection, nvDevice);
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = state->debugShader;
+        pipeDesc.bindingLayouts = { state->debugLayout };
+        state->debugPipeline = state->debugLayout ? cache.GetOrCreateComputePipeline("VisDebugView", pipeDesc, nvDevice) : nullptr;
+        if (!state->debugPipeline) {
+            state->debugFailed = true;
+            return {};
+        }
+    }
+
+    ResourceDesc viewDesc;
+    viewDesc.type = ResourceDesc::Type::Texture2D;
+    viewDesc.width = width;
+    viewDesc.height = height;
+    viewDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    viewDesc.isUAV = true;
+    viewDesc.allowUAV = true;
+    viewDesc.isTransient = true;
+    viewDesc.debugName = "rt_VisDebug";
+    VirtualResourceHandle viewHandle = fg.CreateTexture("rt_VisDebug", viewDesc);
+
+    auto& passData = fg.addCallbackPass<VisDebugViewData>(
+        "Vis Debug View",
+        [&, visId, motion, viewHandle, width, height, mode, state](FrameGraph& builder, PassHandle passHandle, VisDebugViewData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+            data.device = device;
+            data.state = state;
+            data.width = width;
+            data.height = height;
+            data.mode = mode;
+            data.visId = passBuilder.read(visId, ResourceState::ShaderResource);
+            data.motion = passBuilder.read(motion, ResourceState::ShaderResource);
+            data.view = passBuilder.write(viewHandle, ResourceState::UnorderedAccess);
+        },
+        [](const VisDebugViewData& data, const FrameGraph& fg, fg::RenderContext* ctx) {
+            auto* visRT = fg.GetPhysicalTexture(data.visId);
+            auto* motionRT = fg.GetPhysicalTexture(data.motion);
+            auto* viewRT = fg.GetPhysicalTexture(data.view);
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (!visRT || !motionRT || !viewRT || !cmdList)
+                return;
+            nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
+            auto& cache = GetPassResourceCache();
+            auto* refl = GEnv.Render->GetShaderLoader()->GetCachedReflection("vis_debug_view", ".cs");
+            if (!refl)
+                return;
+            auto paramsCB = cache.GetOrCreateVolatileCB("VisDebugView", "VisDebugParams", sizeof(VisDebugParams), data.device, 16);
+            VisDebugParams params = {};
+            params.mode = data.mode;
+            cmdList->writeBuffer(paramsCB, &params, sizeof(params));
+            BindingSetBuilder bsb(*refl, nvDevice, "VisDebugView");
+            bsb.ConstantBuffer("VisDebugParams", paramsCB);
+            bsb.Texture("g_VisID", visRT);
+            bsb.Texture("g_Motion", motionRT);
+            bsb.TextureUAV("g_VisDebug", viewRT);
+            auto bindingSet = cache.GetOrCreateBindingSet(bsb.Build(), data.state->debugLayout, nvDevice);
+            if (!bindingSet)
+                return;
+            nvrhi::ComputeState cs;
+            cs.pipeline = data.state->debugPipeline;
+            cs.bindings = { bindingSet };
+            cmdList->setComputeState(cs);
+            cmdList->dispatch((data.width + 7) / 8, (data.height + 7) / 8, 1);
+            cmdList->setTextureState(viewRT, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+        });
+
+    return passData.view;
+}
+
+}

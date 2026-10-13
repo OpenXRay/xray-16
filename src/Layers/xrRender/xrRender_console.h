@@ -2,7 +2,7 @@
 
 extern ENGINE_API int ps_r__Supersample;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
@@ -45,12 +45,16 @@ extern ECORE_API float ps_r__Detail_l_ambient;
 extern ECORE_API float ps_r__Detail_l_aniso;
 extern ECORE_API float ps_r__Detail_density;
 extern ECORE_API float ps_r__Detail_height;
+extern int ps_r__detail_gpu;
+extern float ps_current_detail_height;
+extern float ps_current_detail_density;
 
 extern ECORE_API float ps_r__Tree_SBC; // scale bias correct
 
 extern ECORE_API float ps_r__WallmarkTTL;
 extern ECORE_API float ps_r__WallmarkSHIFT;
 extern ECORE_API float ps_r__WallmarkSHIFT_V;
+extern ECORE_API int ps_r_gpu_particle_debug_collision;
 
 extern ECORE_API float ps_r__GLOD_ssa_start;
 extern ECORE_API float ps_r__GLOD_ssa_end;
@@ -107,15 +111,6 @@ extern ECORE_API Flags32 ps_r2_ls_flags_ext;
 extern ECORE_API float ps_r2_df_parallax_h; // r2-only
 extern ECORE_API float ps_r2_df_parallax_range; // r2-only
 extern ECORE_API float ps_r2_gmaterial; // r2-only
-extern ECORE_API float ps_r2_tonemap_middlegray; // r2-only
-extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
-extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
-extern ECORE_API float ps_r2_tonemap_amount; // r2-only
-extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear
-extern ECORE_API float ps_r2_ls_bloom_threshold; // r2-only
-extern ECORE_API float ps_r2_ls_bloom_speed; // r2-only
 extern ECORE_API float ps_r2_ls_dsm_kernel; // r2-only
 extern ECORE_API float ps_r2_ls_psm_kernel; // r2-only
 extern ECORE_API float ps_r2_ls_ssm_kernel; // r2-only
@@ -161,16 +156,22 @@ extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
+extern ECORE_API int ps_r4_debug_gpu_culling;
+extern ECORE_API int ps_r4_skeleton_wallmark_mode;
+
+enum { FG_RENDER_DX12 = 0, FG_RENDER_VULKAN = 1, FG_RENDER_METAL = 2 };
+extern ECORE_API u32 ps_fg_render_mode;
+extern ECORE_API int ps_fg_hot_reload_shaders;
+extern ECORE_API int ps_fg_retina;
+
 enum
 {
     R2FLAG_SUN = (1 << 0),
     R2FLAG_SUN_FOCUS = (1 << 1),
     R2FLAG_SUN_TSM = (1 << 2),
     R2FLAG_SUN_DETAILS = (1 << 3),
-    R2FLAG_TONEMAP = (1 << 4),
     R2FLAG_AA = (1 << 5),
     R2FLAG_GI = (1 << 6),
-    R2FLAG_FASTBLOOM = (1 << 7),
     R2FLAG_GLOBALMATERIAL = (1 << 8),
     R2FLAG_ZFILL = (1 << 9),
     R2FLAG_R1LIGHTS = (1 << 10),
@@ -224,6 +225,99 @@ enum
     R3FLAGEXT_SSR_JITTER = (1 << 11),
 };
 
+extern ECORE_API int   ps_r_cluster_tris;
+extern ECORE_API int   ps_r_cluster_merge;
+extern ECORE_API int   ps_r_cluster_cache;
+extern ECORE_API int   ps_r_cluster_debug;
+extern ECORE_API float ps_r_cluster_lod;
+extern ECORE_API float ps_r_cluster_fade;
+extern ECORE_API int   ps_r_geo_paging;
+extern ECORE_API int   ps_r_geo_page_budget;
+extern ECORE_API int   ps_r_geo_page_reads;
+extern ECORE_API int   ps_r_geo_page_upload;
+extern ECORE_API int   ps_r_geo_page_stats;
+extern ECORE_API float ps_r_ssa_px;
+
+extern ECORE_API int   ps_r_sun_shadow_debug;
+extern ECORE_API u32   ps_r_tonemap;
+extern ECORE_API int   ps_r_exposure_auto;
+extern ECORE_API float ps_r_exposure_compensation;
+extern ECORE_API float ps_r_exposure_min_ev;
+extern ECORE_API float ps_r_exposure_max_ev;
+extern ECORE_API float ps_r_exposure_speed_up;
+extern ECORE_API float ps_r_exposure_speed_down;
+extern ECORE_API float ps_r_bloom_intensity;
+extern ECORE_API int   ps_r_hdr_output;
+extern ECORE_API float ps_r_hdr_paper_white;
+extern ECORE_API float ps_r_hdr_peak;
+extern ECORE_API float ps_r_sky_energy;
+extern ECORE_API float ps_r_sky_ground_albedo;
+extern ECORE_API int   ps_r_sky_ibl;
+extern ECORE_API int   ps_r_vis_debug;
+extern ECORE_API int   ps_r_mesh_shaders;
+extern ECORE_API int   ps_r_vis_sw;
+extern ECORE_API float ps_r_vis_sw_px;
+extern ECORE_API float ps_r_vis_sw_near;
+extern ECORE_API int   ps_r_vis_sw_grass;
+extern ECORE_API int   ps_r_vsm_debug;
+extern ECORE_API float ps_r_sky_probe_spacing;
+extern ECORE_API int   ps_r_sky_probe_rays;
+extern ECORE_API int   ps_r_sky_probe_budget;
+extern ECORE_API int   ps_r_sky_probe_max;
+extern ECORE_API float ps_r_sky_probe_ray_distance;
+extern ECORE_API float ps_r_sky_probe_backface;
+extern ECORE_API int   ps_r_sky_static_probes;
+extern ECORE_API int   ps_r_sky_probe_debug;
+extern ECORE_API int   ps_r_sky_probe_capture;
+extern ECORE_API int   ps_r_sky_probe_debug_freeze;
+extern ECORE_API float ps_r_sky_probe_debug_range;
+extern ECORE_API float ps_r_sky_probe_debug_radius;
+extern ECORE_API float ps_r_vsm_base;
+extern ECORE_API int   ps_r_vsm_mark_half;
+extern ECORE_API float ps_r_vsm_bias;
+extern ECORE_API float ps_r_vsm_bias_dyn;
+extern ECORE_API float ps_r_vsm_bias_min;
+extern ECORE_API int   ps_r_vsm_soft;
+extern ECORE_API int   ps_r_vsm_soft_search;
+extern ECORE_API float ps_r_vsm_soft_angle;
+extern ECORE_API float ps_r_vsm_soft_range;
+extern ECORE_API float ps_r_vsm_soft_clamp;
+extern ECORE_API int   ps_r_vsm_cache;
+extern ECORE_API int   ps_r_vsm_refresh_budget;
+extern ECORE_API float ps_r_vsm_cluster_lod;
+extern ECORE_API float ps_r_vsm_raster_bias;
+extern ECORE_API float ps_r_vsm_raster_slope;
+extern ECORE_API int   ps_r_vsm_at;
+extern ECORE_API int   ps_r_vsm_temporal;
+extern ECORE_API float ps_r_vsm_ta_blend;
+extern ECORE_API float ps_r_vsm_ta_clamp;
+extern ECORE_API float ps_r_vsm_ta_motion;
+extern ECORE_API float ps_r_vsm_ta_motion_floor;
+extern ECORE_API float ps_r_vsm_ta_carry;
+extern ECORE_API int   ps_r_vsm_dirty_budget;
+extern ECORE_API float ps_r_vsm_ta_blend_dyn;
+extern ECORE_API int   ps_r_vsm_debug_dyn;
+extern ECORE_API int   ps_r_vsm_load_freeze;
+extern ECORE_API int   ps_r_vsm_hud;
+extern ECORE_API float ps_r_vsm_hud_bias;
+
+extern ECORE_API int   ps_r_local_shadow_spots;
+extern ECORE_API int   ps_r_local_shadow_points;
+extern ECORE_API float ps_r_local_shadow_bias;
+extern ECORE_API float ps_r_local_shadow_hud_bias;
+extern ECORE_API int   ps_r_local_shadow_debug;
+extern ECORE_API int   ps_r_local_shadow_pairs_budget;
+extern ECORE_API float ps_r_local_shadow_range;
+extern ECORE_API float ps_r_local_shadow_min_px;
+extern ECORE_API float ps_r_local_shadow_texel_ratio;
+
+extern ECORE_API int   ps_r_smoke_trail_enabled;
+extern ECORE_API float ps_r_smoke_max_emit_rate;
+extern ECORE_API float ps_r_smoke_point_lifetime;
+extern ECORE_API float ps_r_smoke_max_width;
+extern ECORE_API float ps_r_smoke_gravity;
+extern ECORE_API float ps_r_smoke_buoyancy;
+extern ECORE_API float ps_r_smoke_turbulence;
+
 extern void xrRender_initconsole();
-extern BOOL xrRender_test_hw();
-} // namespace xray::render::RENDER_NAMESPACE
+}

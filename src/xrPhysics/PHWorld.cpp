@@ -519,7 +519,7 @@ void CPHWorld::AddUpdateObject(CPHUpdateObject* object)
     m_update_objects.push_back(object);
 }
 
-void CPHWorld::RemoveUpdateObject(PH_UPDATE_OBJECT_I i) { m_update_objects.erase(i); }
+void CPHWorld::RemoveUpdateObject(CPHUpdateObject* object) { m_update_objects.erase(PH_UPDATE_OBJECT_I(object)); }
 void CPHWorld::RemoveObject(PH_OBJECT_I i) { m_objects.erase((i)); };
 void CPHWorld::AddFreezedObject(CPHObject* obj) { m_freezed_objects.push_back(obj); }
 void CPHWorld::RemoveFreezedObject(PH_OBJECT_I i) { m_freezed_objects.erase(i); }

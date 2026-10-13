@@ -2,11 +2,31 @@ include_guard()
 
 if (APPLE)
     if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        if ($ENV{MACOSX_DEPLOYMENT_TARGET})
+        if (DEFINED ENV{MACOSX_DEPLOYMENT_TARGET} AND NOT "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
             set(CMAKE_OSX_DEPLOYMENT_TARGET $ENV{MACOSX_DEPLOYMENT_TARGET})
         else()
-            message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to your system's version: ${CMAKE_SYSTEM_VERSION}")
-            set(CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_SYSTEM_VERSION})
+            execute_process(
+                COMMAND sw_vers -productVersion
+                OUTPUT_VARIABLE XRAY_MACOS_PRODUCT_VERSION
+                RESULT_VARIABLE XRAY_SW_VERS_RESULT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
+            )
+
+            if (XRAY_SW_VERS_RESULT STREQUAL "0" AND XRAY_MACOS_PRODUCT_VERSION MATCHES "^([0-9]+)")
+                set(CMAKE_OSX_DEPLOYMENT_TARGET "${CMAKE_MATCH_1}.0")
+                message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to macOS ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+            elseif (CMAKE_SYSTEM_VERSION MATCHES "^([0-9]+)")
+                set(XRAY_DARWIN_VERSION_MAJOR "${CMAKE_MATCH_1}")
+                if (XRAY_DARWIN_VERSION_MAJOR GREATER_EQUAL 20)
+                    math(EXPR XRAY_MACOS_VERSION_MAJOR "${XRAY_DARWIN_VERSION_MAJOR} - 9")
+                    set(CMAKE_OSX_DEPLOYMENT_TARGET "${XRAY_MACOS_VERSION_MAJOR}.0")
+                    message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to macOS ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+                else()
+                    message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to 10.15")
+                    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+                endif()
+            endif()
         endif()
     endif()
     message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
@@ -28,8 +48,13 @@ set(CMAKE_MACOSX_RPATH TRUE)
 
 find_program(CCACHE_FOUND ccache)
 if (CCACHE_FOUND)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    get_property(_xray_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
+    foreach(_xray_lang C CXX OBJC OBJCXX)
+        if (_xray_lang IN_LIST _xray_languages AND NOT CMAKE_${_xray_lang}_COMPILER_LAUNCHER)
+            set(CMAKE_${_xray_lang}_COMPILER_LAUNCHER "${CCACHE_FOUND}")
+        endif()
+    endforeach()
+    unset(_xray_languages)
     set(ENV{CCACHE_SLOPPINESS} pch_defines,time_macros)
 endif ()
 
@@ -41,12 +66,29 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # XXX: Remove -fdelayed-template-parsing
     add_compile_options(
         -fdelayed-template-parsing
+        -Wno-delayed-template-parsing-in-cxx20
         -Wno-unused-command-line-argument
         -Wno-inconsistent-missing-override
     )
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
+add_compile_options(-fno-strict-aliasing)
+
+if (WIN32)
+    add_compile_definitions(WIN32 _WINDOWS)
+    if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/bigobj>)
+    endif()
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        if (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+            add_link_options(LINKER:/LARGEADDRESSAWARE)
+        else()
+            add_link_options(LINKER:--large-address-aware)
+        endif()
+    endif()
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB AND NOT WIN32)
     if (NOT XRAY_CXX_LIB)
         include(CheckCXXCompilerFlag)
         CHECK_CXX_COMPILER_FLAG("-stdlib=libc++" LIBCPP_AVAILABLE)
@@ -80,7 +122,7 @@ endif()
 add_compile_options(-Wno-attributes)
 if (APPLE)
     add_compile_options(-Wl,-undefined,error)
-else()
+elseif (NOT WIN32)
     add_compile_options(-Wl,--no-undefined)
 endif()
 
@@ -140,8 +182,29 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-Og)
 endif()
 
+add_compile_options(
+    $<$<AND:$<CONFIG:Release,ReleaseMasterGold>,$<CXX_COMPILER_ID:Clang,AppleClang>>:-gline-tables-only>
+)
+
+if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    add_compile_options(
+        $<$<CONFIG:Release,ReleaseMasterGold>:/Gy>
+        $<$<CONFIG:Release,ReleaseMasterGold>:/Gw>
+    )
+else()
+    add_compile_options(
+        $<$<CONFIG:Release,ReleaseMasterGold>:-ffunction-sections>
+        $<$<CONFIG:Release,ReleaseMasterGold>:-fdata-sections>
+    )
+endif()
+
+if (APPLE)
+    add_link_options($<$<CONFIG:Release,ReleaseMasterGold>:-Wl,-dead_strip>)
+elseif (NOT WIN32)
+    add_link_options($<$<CONFIG:Release,ReleaseMasterGold>:-Wl,--gc-sections>)
+endif()
+
 if (NOT WIN32)
-    find_package(SDL2 2.0.18 REQUIRED)
     find_package(OpenAL REQUIRED)
     find_package(JPEG)
     find_package(Ogg REQUIRED)
@@ -185,16 +248,26 @@ set(XRAY_ENABLE_WARNINGS
     -Wno-unused-parameter
     -Wno-switch
     -Wno-trigraphs
-    #-Wno-padded
-    #-Wno-c++98-compat
-    #-Wno-c++98-compat-pedantic
-    #-Wno-c++11-compat
-    #-Wno-c++11-compat-pedantic
-    #-Wno-c++14-compat
-    #-Wno-c++14-compat-pedantic
-    #-Wno-newline-eof
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-deprecated-declarations>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-microsoft-include>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-missing-field-initializers>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-missing-braces>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-overloaded-virtual>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unnecessary-virtual-specifier>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-but-set-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-private-field>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-const-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-sign-compare>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-variable>
+    $<$<CONFIG:ReleaseMasterGold>:-Wno-unused-function>
+    $<$<CXX_COMPILER_ID:Clang,AppleClang>:-Wno-c++11-narrowing>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
+)
+
+add_compile_definitions(
+    $<$<CONFIG:ReleaseMasterGold>:_CRT_SECURE_NO_WARNINGS>
+    $<$<CONFIG:ReleaseMasterGold>:_CRT_NONSTDC_NO_WARNINGS>
 )
 
 set(XRAY_DISABLE_WARNINGS "-w")

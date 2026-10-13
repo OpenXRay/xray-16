@@ -290,7 +290,7 @@ void CSpaceRestrictor::OnRender()
         res.transform(v_res, shift);
 
         // check if the object in sight
-        if (v_res.z < 0 || v_res.w < 0)
+        if (v_res.z > 1 || v_res.w < 0)
             return;
         if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
             return;

@@ -5,9 +5,8 @@
 #pragma once
 
 #include "xrEngine/Properties.h"
-#include "Blender_Recorder.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 #pragma pack(push, 4)
 class ECORE_API CBlender_DESC
@@ -33,8 +32,6 @@ public:
 
 class ECORE_API IBlender : public CPropertyBase
 {
-    friend class CBlender_Compile;
-
 protected:
     CBlender_DESC description;
     xrP_Integer oPriority;
@@ -57,13 +54,16 @@ public:
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual BOOL canUseSteepParallax() { return FALSE; }
+
+    virtual int getAREF() { return 0; }
+    virtual bool getBlend() { return false; }
+    bool IsStrictSorting() const { return oStrictSorting.value; }
+
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
-
-    virtual void Compile(CBlender_Compile& C);
 
     IBlender();
     virtual ~IBlender();
 };
 #pragma pack(pop)
-} // namespace xray::render::RENDER_NAMESPACE
+}

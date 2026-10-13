@@ -6,12 +6,13 @@
 
 #include "xrCore/Threading/ParallelFor.hpp"
 
-#include "HOM.h"
-#include "occRasterizer.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/occRasterizer.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 float psOSSR = .001f;
 
@@ -273,36 +274,30 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-Task& CHOM::DispatchMTRender()
+ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& maxz, const Fmatrix& X, float _x, float _y, float _z)
 {
-    return TaskManager::AddTask([this]
-    {
-        ZoneScoped;
-        CFrustum ViewBase;
-        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-        Enable();
-        Render(ViewBase);
-    });
-}
-
-ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)
-{
-    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
-    if (z < EPS)
+    const float w = _x * X._14 + _y * X._24 + _z * X._34 + X._44;
+    if (w < EPS)
         return TRUE;
-    const float iw = 1.f / (_x * X._14 + _y * X._24 + _z * X._34 + X._44);
+    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
+    if (z > w - EPS)
+        return TRUE;
+    const float iw = 1.f / w;
     min.x = max.x = (_x * X._11 + _y * X._21 + _z * X._31 + X._41) * iw;
     min.y = max.y = (_x * X._12 + _y * X._22 + _z * X._32 + X._42) * iw;
-    minz = 0.f + z * iw;
+    maxz = 0.f + z * iw;
     return FALSE;
 }
 
-ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)
+ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& maxz, const Fmatrix& X, float _x, float _y, float _z)
 {
-    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
-    if (z < EPS)
+    const float w = _x * X._14 + _y * X._24 + _z * X._34 + X._44;
+    if (w < EPS)
         return TRUE;
-    const float iw = 1.f / (_x * X._14 + _y * X._24 + _z * X._34 + X._44);
+    const float z = _x * X._13 + _y * X._23 + _z * X._33 + X._43;
+    if (z > w - EPS)
+        return TRUE;
+    const float iw = 1.f / w;
     float t = (_x * X._11 + _y * X._21 + _z * X._31 + X._41) * iw;
     if (t < min.x)
         min.x = t;
@@ -314,8 +309,8 @@ ICF BOOL xform_b1(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, f
     else if (t > max.y)
         max.y = t;
     t = 0.f + z * iw;
-    if (t < minz)
-        minz = t;
+    if (t > maxz)
+        maxz = t;
     return FALSE;
 }
 
@@ -452,40 +447,16 @@ void CHOM::OnRender()
                 line[it * 6 + 4].set(*(verts + T->verts[2]), 0xFFFFFFFF);
                 line[it * 6 + 5].set(*(verts + T->verts[0]), 0xFFFFFFFF);
             }
-            RCache.set_xform_world(Fidentity);
             // draw solid
             Device.SetNearer(TRUE);
-            RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-            RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
-                float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
-#endif
-            RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::TriangleList, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             // draw wire
-            if (bDebug)
-            {
-                RImplementation.rmNear(RCache);
-            }
-            else
-            {
-                Device.SetNearer(TRUE);
-            }
-            RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9 // when we don't have FFP support
-            RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif
-            RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
-            if (bDebug)
-            {
-                RImplementation.rmNormal(RCache);
-            }
-            else
-            {
-                Device.SetNearer(FALSE);
-            }
+            Device.SetNearer(TRUE);
+            g_debug_draw.AddPrimitive(nvrhi::PrimitiveType::LineList, &*line.begin(), line.size() / 2);
+            Device.SetNearer(FALSE);
         }
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

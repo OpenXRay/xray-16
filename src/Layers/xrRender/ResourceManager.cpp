@@ -8,11 +8,21 @@
 #include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
-#include "tss.h"
-#include "Blender.h"
-#include "Blender_Recorder.h"
+#include "Layers/xrRender/Blender.h"
 
-namespace xray::render::RENDER_NAMESPACE
+#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRender/blenders/blender_deffer_aref.h"
+#include "Layers/xrRender/blenders/blender_deffer_model.h"
+#include "Layers/xrRender/blenders/Blender_Vertex_aref.h"
+#include "Layers/xrRender/blenders/Blender_default_aref.h"
+#include "Layers/xrRender/blenders/Blender_tree.h"
+#include "Layers/xrRender/blenders/Blender_detail_still.h"
+#include "Layers/xrRender/blenders/Blender_Model.h"
+#include "Layers/xrRender/blenders/Blender_Model_EbB.h"
+#include "Layers/xrRender/blenders/Blender_Screen_SET.h"
+#include "Layers/xrRender/blenders/Blender_Particle.h"
+
+namespace xray::render::fg
 {
 //	Already defined in Texture.cpp
 void fix_texture_name(pstr fn);
@@ -29,22 +39,6 @@ void fix_texture_name(LPSTR fn)
 }
 */
 
-//--------------------------------------------------------------------------------------------------------------
-IBlender* CResourceManager::_GetBlender(LPCSTR Name)
-{
-    R_ASSERT(Name && Name[0]);
-
-    pstr N = pstr(Name);
-    map_Blender::iterator I = m_blenders.find(N);
-
-    if (I == m_blenders.end())
-    {
-        Msg("! Shader '%s' not found in library.", Name);
-        return nullptr;
-    }
-
-    return I->second;
-}
 
 IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 {
@@ -57,6 +51,111 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
         return nullptr;
     else
         return I->second;
+}
+
+static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
+{
+    using BlendMode = CResourceManager::BlendMode;
+    switch (tokenID)
+    {
+    case 0: return BlendMode::Opaque;
+    case 1: return BlendMode::AlphaBlend;
+    case 2: return BlendMode::Additive;
+    case 3: return BlendMode::Multiply;
+    case 4: return BlendMode::Multiply2X;
+    case 5: return BlendMode::Additive;
+    case 6: return BlendMode::Multiply2X;
+    default: return BlendMode::AlphaBlend;
+    }
+}
+
+bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties& outProps)
+{
+    IBlender* B = _FindBlender(shaderName);
+    if (!B)
+        return false;
+
+    const CLASS_ID cls = B->getDescription().CLS;
+    outProps = {};
+    outProps.strictB2F = B->IsStrictSorting();
+
+    if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
+    {
+        auto* b = (cls == B_DEFAULT_AREF)
+            ? static_cast<CBlender_deffer_aref*>(B)
+            : reinterpret_cast<CBlender_deffer_aref*>(static_cast<CBlender_Vertex_aref*>(B));
+        outProps.alphaRef = b->oAREF.value;
+        if (b->oBlend.value)
+            outProps.blendMode = BlendMode::AlphaBlend;
+        else if (b->oAREF.value > 0)
+            outProps.blendMode = BlendMode::AlphaTest;
+        else
+            outProps.blendMode = BlendMode::Opaque;
+        outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
+        return true;
+    }
+    if (cls == B_TREE)
+    {
+        auto* b = static_cast<CBlender_Tree*>(B);
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaTest : BlendMode::Opaque;
+        outProps.alphaRef = b->oBlend.value ? 200 : 0;
+        outProps.writesDepth = true;
+        outProps.foliage = b->oBlend.value;
+        return true;
+    }
+    if (cls == B_DETAIL)
+    {
+        auto* b = static_cast<CBlender_Detail_Still*>(B);
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaBlend : BlendMode::AlphaTest;
+        outProps.alphaRef = 200;
+        outProps.writesDepth = !b->oBlend.value;
+        return true;
+    }
+    if (cls == B_MODEL)
+    {
+        auto* b = static_cast<CBlender_deffer_model*>(B);
+        if (b->oBlend.value && b->oAREF.value < 16)
+            outProps.blendMode = BlendMode::AlphaBlend;
+        else if (b->oBlend.value)
+            outProps.blendMode = BlendMode::AlphaTest;
+        else
+            outProps.blendMode = BlendMode::Opaque;
+        outProps.alphaRef = b->oBlend.value ? b->oAREF.value : 0;
+        outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
+        return true;
+    }
+    if (cls == B_MODEL_EbB)
+    {
+        auto* b = static_cast<CBlender_Model_EbB*>(B);
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaBlend : BlendMode::Opaque;
+        outProps.writesDepth = !b->oBlend.value;
+        return true;
+    }
+    if (cls == B_SCREEN_SET)
+    {
+        auto* b = static_cast<CBlender_Screen_SET*>(B);
+        outProps.blendMode = TokenToBlendMode(b->oBlend.IDselected);
+        outProps.alphaRef = b->oAREF.value;
+        outProps.writesDepth = (outProps.blendMode == BlendMode::Opaque);
+        return true;
+    }
+    if (cls == B_PARTICLE)
+    {
+        auto* b = static_cast<CBlender_Particle*>(B);
+        outProps.blendMode = TokenToBlendMode(b->oBlend.IDselected);
+        outProps.alphaRef = b->oAREF.value;
+        outProps.writesDepth = false;
+        return true;
+    }
+    if (cls == B_DEFAULT || cls == B_VERT || cls == B_LmBmmD || cls == B_LmEbB
+        || cls == B_B || cls == B_BmmD || cls == B_EDITOR_WIRE || cls == B_EDITOR_SEL)
+    {
+        outProps.blendMode = BlendMode::Opaque;
+        outProps.writesDepth = true;
+        return true;
+    }
+
+    return false;
 }
 
 void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
@@ -118,136 +217,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     }
 }
 
-ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
-{
-    if (S.passes.empty())
-        return nullptr;
 
-    // Search equal in shaders array
-    for (ShaderElement* elem : v_elements)
-        if (S.equal(*elem))
-            return elem;
-
-    // Create _new_ entry
-    ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
-    N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    return N;
-}
-
-void CResourceManager::_DeleteElement(const ShaderElement* S)
-{
-    if (0 == (S->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_elements, S))
-        return;
-    Msg("! ERROR: Failed to find compiled 'shader-element'");
-}
-
-Shader* CResourceManager::_cpp_Create(
-    IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    CBlender_Compile C;
-    Shader S;
-
-    //.
-    // if (strstr(s_shader,"transparent"))	__asm int 3;
-
-    // Access to template
-    C.BT = B;
-    C.bFFP = RImplementation.o.ffp;
-    C.bDetail = FALSE;
-#ifdef _EDITOR
-    if (!C.BT)
-    {
-        ELog.Msg(mtError, "Can't find shader '%s'", s_shader);
-        return 0;
-    }
-    C.bFFP = true;
-#else
-    UNUSED(s_shader);
-#endif
-
-    // Parse names
-    _ParseList(C.L_textures, s_textures);
-    _ParseList(C.L_constants, s_constants);
-    _ParseList(C.L_matrices, s_matrices);
-
-    // Compile element	(LOD0 - HQ)
-    {
-        C.iElement = SE_R1_NORMAL_HQ;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_HQ] = _CreateElement(std::move(E));
-    }
-
-    // Compile element	(LOD1)
-    {
-        C.iElement = SE_R1_NORMAL_LQ;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_NORMAL_LQ] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LPOINT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LPOINT] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LSPOT;
-        C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LSPOT] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = SE_R1_LMODELS;
-        C.bDetail = TRUE; //.$$$ HACK :)
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[SE_R1_LMODELS] = _CreateElement(std::move(E));
-    }
-
-    // Compile element
-    {
-        C.iElement = 5;
-        C.bDetail = FALSE;
-        ShaderElement E;
-        C._cpp_Compile(&E);
-        S.E[5] = _CreateElement(std::move(E));
-    }
-
-    // Search equal in shaders array
-    for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it]))
-            return v_shaders[it];
-
-    // Create _new_ entry
-    Shader* N = v_shaders.emplace_back(xr_new<Shader>(std::move(S)));
-    N->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    return N;
-}
-
-Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    if (!GEnv.isDedicatedServer)
-    {
-        IBlender* pBlender = _GetBlender(s_shader ? s_shader : "null");
-        if (!pBlender)
-            return nullptr;
-        return _cpp_Create(pBlender, s_shader, s_textures, s_constants, s_matrices);
-    }
-    return nullptr;
-}
 
 IReader* open_shader(pcstr shader)
 {
@@ -304,56 +274,6 @@ void CResourceManager::CompatibilityCheck()
     }
 }
 
-Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    if (GEnv.isDedicatedServer)
-        return nullptr;
-
-    return _cpp_Create(B, s_shader, s_textures, s_constants, s_matrices);
-}
-
-Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
-{
-    if (!GEnv.isDedicatedServer)
-    {
-#if defined(USE_DX9)
-        const bool useCppBlender = RImplementation.o.ffp && _GetBlender(s_shader);
-        if (!useCppBlender && _lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-#else // TODO: DX11: When all shaders are ready switch to common path
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-        {
-            Shader* pShader = _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-            if (pShader)
-                return pShader;
-            else
-            {
-                if (_lua_HasShader("stub_default"))
-                    return _lua_Create("stub_default", s_textures);
-                else
-                {
-                    FATAL("Can't find stub_default.s");
-                    return 0;
-                }
-            }
-        }
-#endif
-    }
-    return nullptr;
-}
-
-void CResourceManager::Delete(const Shader* S)
-{
-    if (0 == (S->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_shaders, S))
-        return;
-    Msg("! ERROR: Failed to find complete shader");
-}
-
 void CResourceManager::DeferredUpload()
 {
     if (!Device.b_is_Ready)
@@ -362,7 +282,8 @@ void CResourceManager::DeferredUpload()
     ZoneScoped;
 
 #if defined(USE_DX11)
-    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
+    for (auto& texture : m_textures)
+        texture.second->Load();
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Load();
@@ -377,15 +298,13 @@ void CResourceManager::DeferredUnload()
         return;
 
     ZoneScoped;
+    UnloadTextures();
+}
 
-#if defined(USE_DX11)
-    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
+void CResourceManager::UnloadTextures()
+{
     for (auto& texture : m_textures)
         texture.second->Unload();
-#else
-#   error No graphics API selected or enabled!
-#endif
 }
 
 #ifdef _EDITOR
@@ -476,4 +395,4 @@ BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup
         return FALSE;
     }
 }*/
-} // namespace xray::render::RENDER_NAMESPACE
+}

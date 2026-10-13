@@ -1,13 +1,10 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_Editor_Selection : public IBlender
 {
     string64 oT_Factor;
-
-private:
-    void CompileForEditor(CBlender_Compile& C);
 
 public:
     CBlender_Editor_Selection();
@@ -18,7 +15,5 @@ public:
 
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

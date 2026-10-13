@@ -1,0 +1,299 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+#include "detail_visibility_common.h"
+#include "detail_source_common.h"
+#include "detail_pulled_common.h"
+#include "detail_blade_material.h"
+
+cbuffer DetailGlobals
+{
+    float4 consts;
+    float4 wave;
+    float4 dir2D;
+    float4 dir2D_2;
+    float4x4 g_detail_VP;
+    float4 detail_params;
+    float4 g_wind_direction;
+    float grass_wind_displacement;
+    float grass_interaction_displacement;
+    float grass_interaction_max_angle;
+    float grass_blade_width;
+    float4 grass_color_tip;
+    float4 grass_color_base;
+    float grass_color_variation;
+    float grass_blade_height;
+    uint buildDetailsIndex;
+    uint buildDetailsPbrIndex;
+    float4 interaction_window;
+    float4 interaction_window_prev;
+    uint buildDetailsBumpIndex;
+};
+
+cbuffer DetailResolveParams
+{
+    float4x4 g_PrevView;
+    float4x4 g_PrevProj;
+    uint g_EntryBase;
+    uint g_MotionValid;
+    float g_PrevTime;
+    uint g_VeinIndex;
+    uint4 g_Segments;
+    uint g_InteractionDebug;
+    uint3 g_PreparedCapacity;
+};
+
+Texture3D g_Perlin4D;
+Texture2D g_Interaction;
+Texture2D g_InteractionPrev;
+Texture2D<uint> g_VisID;
+Texture2D<float> g_Depth;
+StructuredBuffer<uint2> g_VisibleLod0;
+StructuredBuffer<uint2> g_VisibleLod1;
+StructuredBuffer<uint2> g_VisibleLod2;
+StructuredBuffer<GrassObjectTint> grass_object_tints;
+StructuredBuffer<uint2> g_VisibleMesh;
+StructuredBuffer<uint2> g_VisibleDecal;
+StructuredBuffer<DetailModelGPU> detail_models;
+StructuredBuffer<PulledVertex> pulled_vertices;
+StructuredBuffer<PreparedBlade> g_PreparedLod0;
+StructuredBuffer<PreparedBlade> g_PreparedLod1;
+StructuredBuffer<PreparedBlade> g_PreparedLod2;
+RWTexture2D<float4> g_OutNormal;
+RWTexture2D<float4> g_OutBaseColor;
+RWTexture2D<float4> g_OutColor;
+RWTexture2D<float2> g_OutMotion;
+RWTexture2D<float> g_OutVisDepth;
+RWTexture2D<float4> g_OutMaterial;
+
+float2 PrevMotion(float3 prevWorld, float2 uvPix)
+{
+    float4 prevClip = mul(g_PrevProj, mul(g_PrevView, float4(prevWorld, 1.0)));
+    if (prevClip.w <= 0.0)
+        return float2(0.0, 0.0);
+    float2 prevNdc = prevClip.xy / prevClip.w;
+    return float2(prevNdc.x, -prevNdc.y) * 0.5 + 0.5 - uvPix;
+}
+
+float3x3 CardTangentFrame(float3 e1, float3 e2, float2 d1, float2 d2, float3 N)
+{
+    float handedness = sign(d1.x * d2.y - d2.x * d1.y);
+    float3 T = (e1 * d2.y - e2 * d1.y) * handedness;
+    float3 B = (e2 * d1.x - e1 * d2.x) * handedness;
+    T -= N * dot(N, T);
+    float tl = length(T);
+    T = (tl > 1e-8) ? (T / tl) : 0.0;
+    B -= N * dot(N, B) + T * dot(T, B);
+    float bl = length(B);
+    B = (bl > 1e-8) ? (B / bl) : 0.0;
+    return float3x3(T, B, N);
+}
+
+void ResolvePulled(uint2 p, uint kind, uint slot, uint tri, float2 uvPix, float2 pixelNdc)
+{
+    uint2 src = (kind == DETAIL_KIND_MESH) ? g_VisibleMesh[slot] : g_VisibleDecal[slot];
+    DetailInstance raw = LoadDetailInstance(src);
+    PulledInstance inst = DecodePulled(raw);
+    DetailModelGPU mdl = detail_models[inst.objectId];
+    if (tri >= mdl.pulledIndexCount / 3u)
+        return;
+    uint base = mdl.pulledVertexBase + tri * 3u;
+    PulledVertex pv0 = pulled_vertices[base];
+    PulledVertex pv1 = pulled_vertices[base + 1u];
+    PulledVertex pv2 = pulled_vertices[base + 2u];
+    bool sway = (kind == DETAIL_KIND_MESH);
+
+    float3 h = float3(PulledHeightFactor(pv0, mdl), PulledHeightFactor(pv1, mdl), PulledHeightFactor(pv2, mdl));
+    float3 b0 = PulledWorldPos(inst, pv0);
+    float3 b1 = PulledWorldPos(inst, pv1);
+    float3 b2 = PulledWorldPos(inst, pv2);
+    float3 w0 = b0;
+    float3 w1 = b1;
+    float3 w2 = b2;
+    float2 inter = float2(0.0, 0.0);
+    if (sway)
+    {
+        inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, inst.pos.xz, interaction_window);
+        w0 = PulledDeform(inst, b0, h.x, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        w1 = PulledDeform(inst, b1, h.y, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        w2 = PulledDeform(inst, b2, h.z, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    }
+
+    float4 c0 = mul(m_VP, float4(w0, 1.0));
+    float4 c1 = mul(m_VP, float4(w1, 1.0));
+    float4 c2 = mul(m_VP, float4(w2, 1.0));
+    BarycentricDeriv bd = CalcFullBary(c0, c1, c2, pixelNdc, screen_res.xy);
+
+    float2 uv0 = float2(pv0.u, pv0.v);
+    float2 uv1 = float2(pv1.u, pv1.v);
+    float2 uv2 = float2(pv2.u, pv2.v);
+    float2 uv = InterpolateBary2(bd, uv0, uv1, uv2);
+    float2 uvDdx = InterpolateBaryDdx2(bd, uv0, uv1, uv2);
+    float2 uvDdy = InterpolateBaryDdy2(bd, uv0, uv1, uv2);
+    float heightParam = dot(bd.m_lambda, h);
+    float3 N = sway ? FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2)) : float3(0.0, 1.0, 0.0);
+
+    float4 texel = GetBindlessTexture(buildDetailsIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+    float3 albedo = texel.rgb;
+    float gloss = 0.0;
+    float variance = 0.0;
+    if (buildDetailsBumpIndex != 0u)
+    {
+        BumpSample bump = DecodeBump(GetBindlessTexture(buildDetailsBumpIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy));
+        N = normalize(mul(bump.normal, CardTangentFrame(w1 - w0, w2 - w0, uv1 - uv0, uv2 - uv0, N)));
+        gloss = bump.gloss;
+        variance = bump.variance;
+    }
+    float metallic = 0.0;
+    float roughness = 1.0 - gloss;
+    float ao = sway ? lerp(0.5, 1.0, saturate(heightParam)) : 1.0;
+    if (buildDetailsPbrIndex != 0u)
+    {
+        float4 pbr = GetBindlessTexture(buildDetailsPbrIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+        metallic = pbr.r;
+        roughness = pbr.g;
+        ao = pbr.b;
+    }
+    roughness = RoughnessWithVariance(roughness, variance);
+    if (sway && g_InteractionDebug != 0u)
+        albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
+
+    float2 motion = float2(0.0, 0.0);
+    if (g_MotionValid != 0u)
+    {
+        float3 p0 = b0;
+        float3 p1 = b1;
+        float3 p2 = b2;
+        if (sway)
+        {
+            float2 interPrev = SampleGrassInteraction(g_InteractionPrev, smp_rtlinear, inst.pos.xz, interaction_window_prev);
+            p0 = PulledDeform(inst, b0, h.x, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+            p1 = PulledDeform(inst, b1, h.y, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+            p2 = PulledDeform(inst, b2, h.z, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        }
+        motion = PrevMotion(InterpolateBary3(bd, p0, p1, p2), uvPix);
+    }
+
+    float transmission = sway ? foliage_params.y : 0.0;
+    g_OutNormal[p] = float4(N, roughness);
+    g_OutBaseColor[p] = float4(albedo, metallic);
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    float3 geometricNormal = FaceToward(PulledFaceNormal(w0, w1, w2), eye_position - InterpolateBary3(bd, w0, w1, w2));
+    g_OutMaterial[p] = PackGBufferMaterial(sway ? SHADING_CLASS_FOLIAGE : SHADING_CLASS_STANDARD, transmission, geometricNormal);
+    g_OutMotion[p] = motion;
+    g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
+}
+
+[numthreads(8, 8, 1)]
+void main(uint3 dtid : SV_DispatchThreadID)
+{
+    uint width, height;
+    g_VisID.GetDimensions(width, height);
+    uint2 p = dtid.xy;
+    if (p.x >= width || p.y >= height)
+        return;
+
+    uint id = g_VisID[p];
+    if (!VisIDValid(id))
+        return;
+    uint entryIdx = UnpackVisEntry(id);
+    if (entryIdx < g_EntryBase)
+        return;
+    uint rel = entryIdx - g_EntryBase;
+    uint kind, slot, tri;
+    if (!DecodeDetailVisibility(rel, UnpackVisTri(id), kind, slot, tri))
+        return;
+
+    float2 uvPix = (float2(p) + 0.5) * screen_res.zw;
+    float2 pixelNdc = float2(uvPix.x * 2.0 - 1.0, 1.0 - uvPix.y * 2.0);
+
+    if (kind >= DETAIL_KIND_MESH)
+    {
+        ResolvePulled(p, kind, slot, tri, uvPix, pixelNdc);
+        return;
+    }
+
+    uint lod = kind;
+    uint2 src = (lod == 0u) ? g_VisibleLod0[slot] : ((lod == 1u) ? g_VisibleLod1[slot] : g_VisibleLod2[slot]);
+    uint segments = (lod == 0u) ? g_Segments.x : ((lod == 1u) ? g_Segments.y : g_Segments.z);
+
+    DetailInstance raw = LoadDetailInstance(src);
+    BladeInstance b;
+    BladeBend w;
+    float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, raw.pos.xz, interaction_window);
+    if (slot < g_PreparedCapacity[lod])
+    {
+        PreparedBlade p = (lod == 0u) ? g_PreparedLod0[slot] : ((lod == 1u) ? g_PreparedLod1[slot] : g_PreparedLod2[slot]);
+        b = BladeFromPrepared(p, raw);
+        w = BendFromPrepared(p, g_wind_direction.xy);
+    }
+    else
+    {
+        b = DecodeBlade(raw, g_Perlin4D, smp_linear, grass_blade_height);
+        w = EvalBladeBend(b, wave.w, g_wind_direction.xy, grass_wind_displacement, inter, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+    }
+
+    uint lv0 = BladeTriangleVertex(tri, 0u, segments);
+    uint lv1 = BladeTriangleVertex(tri, 1u, segments);
+    uint lv2 = BladeTriangleVertex(tri, 2u, segments);
+    BladeVertex v0 = EvalBladeVertex(b, w, lv0, segments, wave.w, grass_blade_width, g_Perlin4D, smp_linear);
+    BladeVertex v1 = EvalBladeVertex(b, w, lv1, segments, wave.w, grass_blade_width, g_Perlin4D, smp_linear);
+    BladeVertex v2 = EvalBladeVertex(b, w, lv2, segments, wave.w, grass_blade_width, g_Perlin4D, smp_linear);
+
+    float4 c0 = mul(m_VP, float4(v0.pos, 1.0));
+    float4 c1 = mul(m_VP, float4(v1.pos, 1.0));
+    float4 c2 = mul(m_VP, float4(v2.pos, 1.0));
+    BarycentricDeriv bd = CalcFullBary(c0, c1, c2, pixelNdc, screen_res.xy);
+
+    float2 uv = InterpolateBary2(bd, v0.uv, v1.uv, v2.uv);
+    float2 uvDdx = InterpolateBaryDdx2(bd, v0.uv, v1.uv, v2.uv);
+    float2 uvDdy = InterpolateBaryDdy2(bd, v0.uv, v1.uv, v2.uv);
+    float t = dot(bd.m_lambda, float3(v0.t, v1.t, v2.t));
+    float3 worldPos = InterpolateBary3(bd, v0.pos, v1.pos, v2.pos);
+    float3 rn1 = InterpolateBary3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1);
+    float3 rn2 = InterpolateBary3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2);
+
+    float widthPercent = uv.x;
+    float3 Nu = BladeWidthNormal(rn1, rn2, widthPercent);
+    float invLen = BladeWidthNormalScale(Nu);
+    float3 dNdx = BladeWidthNormalDerivative(InterpolateBaryDdx3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdx3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), rn1, rn2, widthPercent, uvDdx.x);
+    float3 dNdy = BladeWidthNormalDerivative(InterpolateBaryDdy3(bd, v0.rotatedNormal1, v1.rotatedNormal1, v2.rotatedNormal1), InterpolateBaryDdy3(bd, v0.rotatedNormal2, v1.rotatedNormal2, v2.rotatedNormal2), rn1, rn2, widthPercent, uvDdy.x);
+    float variance = BladeNormalVariance(dNdx, dNdy, invLen);
+    float3 N = FoliageViewerNormal(Nu * invLen, v1.pos - v0.pos, v2.pos - v0.pos, eye_position - worldPos);
+
+    float4 veinDetail = BLADE_NEUTRAL_VEIN;
+    if (g_VeinIndex != 0u)
+        veinDetail = GetBindlessTexture(g_VeinIndex).SampleGrad(smp_linear, uv, uvDdx, uvDdy);
+    float veinValue = veinDetail.a;
+
+    GrassObjectTint tint = grass_object_tints[b.objectId];
+    float3 albedo = BladeBaseAlbedo(grass_color_base.rgb, grass_color_tip.rgb, float3(tint.r, tint.g, tint.b), grass_color_variation, b.bladeHash, t);
+    albedo = BladeVeinAlbedo(albedo, veinDetail, veinValue);
+    albedo = BladeDistanceFade(albedo, grass_color_base.rgb, grass_color_tip.rgb, worldPos);
+
+    float roughness = BladeRoughness(t, veinValue, variance);
+    float ao = BladeAmbientOcclusion(t, widthPercent, veinValue);
+
+    if (g_InteractionDebug != 0u)
+        albedo = lerp(albedo, float3(1.0, 0.0, 0.0), saturate(length(inter) * 4.0));
+
+    float2 motion = float2(0.0, 0.0);
+    if (g_MotionValid != 0u)
+    {
+        float2 interPrev = SampleGrassInteraction(g_InteractionPrev, smp_rtlinear, b.pos.xz, interaction_window_prev);
+        BladeBend wPrev = EvalBladeBend(b, g_PrevTime, g_wind_direction.xy, grass_wind_displacement, interPrev, grass_interaction_displacement, grass_interaction_max_angle, g_Perlin4D, smp_linear);
+        BladeVertex p0 = EvalBladeVertex(b, wPrev, lv0, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
+        BladeVertex p1 = EvalBladeVertex(b, wPrev, lv1, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
+        BladeVertex p2 = EvalBladeVertex(b, wPrev, lv2, segments, g_PrevTime, grass_blade_width, g_Perlin4D, smp_linear);
+        motion = PrevMotion(InterpolateBary3(bd, p0.pos, p1.pos, p2.pos), uvPix);
+    }
+
+    float transmission = foliage_params.x;
+    g_OutNormal[p] = float4(N, roughness);
+    g_OutBaseColor[p] = float4(albedo, 0.0);
+    g_OutColor[p] = float4(0.0, 0.0, 0.0, ao);
+    float3 geometricNormal = FaceToward(normalize(cross(v1.pos - v0.pos, v2.pos - v0.pos)), eye_position - worldPos);
+    g_OutMaterial[p] = PackGBufferMaterial(SHADING_CLASS_FOLIAGE, transmission, geometricNormal);
+    g_OutMotion[p] = motion;
+    g_OutVisDepth[p] = g_Depth.Load(int3(p, 0));
+}

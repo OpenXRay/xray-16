@@ -317,12 +317,6 @@ inline ImGuiKey xr_key_to_imgui_key(int key)
     case SDL_SCANCODE_RALT:                  return ImGuiKey_RightAlt;
     case SDL_SCANCODE_RGUI:                  return ImGuiKey_RightSuper;
     //case SDL_SCANCODE_MODE:                  return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIONEXT:             return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOPREV:             return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOSTOP:             return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOPLAY:             return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOMUTE:             return ImGuiKey_;
-    //case SDL_SCANCODE_MEDIASELECT:           return ImGuiKey_;
     //case SDL_SCANCODE_WWW:                   return ImGuiKey_;
     //case SDL_SCANCODE_MAIL:                  return ImGuiKey_;
     //case SDL_SCANCODE_CALCULATOR:            return ImGuiKey_;
@@ -340,12 +334,9 @@ inline ImGuiKey xr_key_to_imgui_key(int key)
     //case SDL_SCANCODE_KBDILLUMTOGGLE:        return ImGuiKey_;
     //case SDL_SCANCODE_KBDILLUMDOWN:          return ImGuiKey_;
     //case SDL_SCANCODE_KBDILLUMUP:            return ImGuiKey_;
-    //case SDL_SCANCODE_EJECT:                 return ImGuiKey_;
     //case SDL_SCANCODE_SLEEP:                 return ImGuiKey_;
     //case SDL_SCANCODE_APP1:                  return ImGuiKey_;
     //case SDL_SCANCODE_APP2:                  return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOREWIND:           return ImGuiKey_;
-    //case SDL_SCANCODE_AUDIOFASTFORWARD:      return ImGuiKey_;
     //case SDL_SCANCODE_SOFTLEFT:              return ImGuiKey_;
     //case SDL_SCANCODE_SOFTRIGHT:             return ImGuiKey_;
     //case SDL_SCANCODE_CALL:                  return ImGuiKey_;

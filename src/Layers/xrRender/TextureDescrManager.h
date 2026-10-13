@@ -5,10 +5,8 @@
 #include "ETextureParams.h"
 #include "xrCommon/xr_unordered_map.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
-class cl_dt_scaler;
-
 class CTextureDescrMngr
 {
     struct texture_assoc
@@ -27,6 +25,12 @@ class CTextureDescrMngr
         shared_str m_bump_name;
         float m_material;
         bool m_use_steep_parallax;
+
+        shared_str m_metallic_name;
+        shared_str m_roughness_name;
+        shared_str m_ao_name;
+        shared_str m_parallax_name;
+        shared_str m_pbr_name;
     };
     struct texture_desc
     {
@@ -36,10 +40,10 @@ class CTextureDescrMngr
     };
 
     using map_TD = xr_unordered_map<shared_str, texture_desc>;
-    using map_CS = xr_unordered_map<shared_str, cl_dt_scaler*>;
+    using map_DS = xr_unordered_map<shared_str, float>;
 
     map_TD m_texture_details;
-    map_CS m_detail_scalers;
+    map_DS m_detail_scalers;
 
     void LoadTHM(pcstr initial, bool listTHM);
     void LoadLTX(pcstr initial, bool listTHM);
@@ -53,7 +57,17 @@ public:
     shared_str GetBumpName(const shared_str& tex_name) const;
     float GetMaterial(const shared_str& tex_name) const;
     void GetTextureUsage(const shared_str& tex_name, bool& bDiffuse, bool& bBump) const;
-    BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const;
+    BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res) const;
     BOOL UseSteepParallax(const shared_str& tex_name) const;
+
+    float GetDetailScale(const shared_str& tex_name) const;
+
+    shared_str GetMetallicName(const shared_str& tex_name) const;
+    shared_str GetRoughnessName(const shared_str& tex_name) const;
+    shared_str GetAOName(const shared_str& tex_name) const;
+    shared_str GetParallaxName(const shared_str& tex_name) const;
+    shared_str GetPBRName(const shared_str& tex_name) const;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+
+extern ECORE_API CTextureDescrMngr TextureDescr;
+}

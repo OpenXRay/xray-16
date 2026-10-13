@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "script_lua_helper.hpp"
 #include "script_debugger.hpp"
+#include "script_engine.hpp"
 
 CDbgLuaHelper* CDbgLuaHelper::m_pThis = nullptr;
 lua_State* CDbgLuaHelper::L = nullptr;
@@ -29,7 +30,10 @@ int CDbgLuaHelper::PrepareLua(lua_State* l)
 
 void CDbgLuaHelper::PrepareLuaBind()
 {
-    luabind::set_pcall_callback([](lua_State* L) { lua_pushcfunction(L, CDbgLuaHelper::hookLuaBind); });
+    luabind::set_pcall_callback([](lua_State* L)
+    {
+        xray::script_engine::push_persistent_cfunction<CDbgLuaHelper::hookLuaBind>(L);
+    });
 
 #if !XRAY_EXCEPTIONS
     luabind::set_error_callback(errormessageLuaBind);

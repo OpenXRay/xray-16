@@ -2,12 +2,14 @@
 #include "firedeps.h"
 
 #include "Include/xrRender/Kinematics.h"
+#include "ik/HudWeaponCollision.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "actor_defs.h"
 
 class player_hud;
 class CHudItem;
 class CMotionDef;
+class CHudIKController;
 
 struct motion_descr
 {
@@ -40,7 +42,8 @@ struct hud_item_measures
         e_fire_point = (1 << 0),
         e_fire_point2 = (1 << 1),
         e_shell_point = (1 << 2),
-        e_16x9_mode_now = (1 << 3)
+        e_16x9_mode_now = (1 << 3),
+        e_light_point = (1 << 4)
     };
 
     Fvector m_hands_offset[2][3]{}; // pos,rot/ normal,aim,GL
@@ -49,10 +52,12 @@ struct hud_item_measures
 
     Fvector m_fire_point_offset{};
     Fvector m_fire_point2_offset{};
+    Fvector m_light_point_offset{};
     Fvector m_shell_point_offset{};
 
     u16 m_fire_bone;
     u16 m_fire_bone2;
+    u16 m_light_bone;
     u16 m_shell_bone;
     Flags8 m_prop_flags;
 
@@ -96,6 +101,7 @@ struct attachable_hud_item
     ~attachable_hud_item();
 
     void reload_measures();
+    void refresh_measures();
 
     void update(bool bForce);
     void update_hud_additional(Fmatrix& trans) const;
@@ -120,6 +126,9 @@ struct attachable_hud_item
     u32 m_upd_firedeps_frame{ u32(-1) };
     void tune(Ivector values);
     u32 anim_play(const shared_str& anim_name, BOOL bMixIn, const CMotionDef*& md, u8& rnd);
+    void reset_hud_ik();
+
+    CHudIKController* m_hud_ik{};
 };
 
 class player_hud
@@ -142,22 +151,31 @@ public:
     attachable_hud_item* attached_item(u16 item_idx) { return m_attached_items[item_idx]; };
     void detach_item_idx(u16 idx);
     void detach_item(CHudItem* item);
-    void detach_all_items()
-    {
-        m_attached_items[0] = NULL;
-        m_attached_items[1] = NULL;
-    };
+    void detach_all_items();
 
     void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const;
     void tune(Ivector values);
     u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel) const;
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd) const;
+    IKinematicsAnimated* get_hands_model() const { return m_model; }
+    CHudIKController* hud_ik(IKinematicsAnimated* model);
+    CHudWeaponCollision& weapon_collision();
 
 private:
     void load_ancors();
     void update_inertion(Fmatrix& trans) const;
+    void configure_external_gun(const attachable_hud_item* primary);
     void update_additional(Fmatrix& trans) const;
+    void update_weapon_collision(attachable_hud_item* primary);
+    CHudIKController* collision_controller(attachable_hud_item* primary, bool& external) const;
+    bool collision_muzzle(attachable_hud_item* primary, CHudIKController* controller, bool external, bool raw,
+        CHudWeaponCollision::Muzzle& muzzle) const;
+    bool collision_to_controller(const Fvector& correction, const Fmatrix& controller_to_hud, Fvector& offset) const;
+    void recalculate_collision_pose(attachable_hud_item* primary, bool external);
+    void clear_collision_offsets();
+    void reset_weapon_collision();
+    void request_collision_snapshot(attachable_hud_item* primary);
     bool inertion_allowed() const;
 
 private:
@@ -168,6 +186,12 @@ private:
     Fmatrix m_transform{ Fidentity };
     IKinematicsAnimated* m_model{};
     xr_vector<u16> m_ancors;
+    CHudIKController* m_hands_ik{};
+    CHudWeaponCollision m_weapon_collision;
+    attachable_hud_item* m_collision_item{};
+    CHudIKController* m_collision_controller{};
+    CHudItem* m_collision_owner{};
+    bool m_collision_external{};
     attachable_hud_item* m_attached_items[2]{};
     xr_unordered_map<shared_str, attachable_hud_item*> m_pool;
 };

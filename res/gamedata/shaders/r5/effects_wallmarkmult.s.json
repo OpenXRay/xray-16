@@ -1,0 +1,18 @@
+{
+    "transparent": true,
+    "wmark": true,
+    "castsShadow": false,
+    "fog": false,
+    "sorting": {
+        "priority": 1,
+        "backToFront": false
+    },
+    "blend": {
+        "src": "dstcolor",
+        "dst": "srccolor"
+    },
+    "depth": {
+        "test": true,
+        "write": false
+    }
+}

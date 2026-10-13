@@ -3,10 +3,11 @@
 //////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "xrCore/_fbox2.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Render.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class occTri;
 
@@ -53,8 +54,6 @@ public:
     void Disable();
     void Enable();
 
-    Task& DispatchMTRender();
-
     BOOL visible(vis_data& vis) const;
     BOOL visible(const Fbox3& B) const;
     BOOL visible(const sPoly& P) const;
@@ -68,4 +67,4 @@ public:
     virtual void OnRender();
 #endif
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

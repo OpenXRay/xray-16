@@ -421,7 +421,6 @@ target_link_libraries(xrPhysics
 target_compile_definitions(xrPhysics
     PRIVATE
     XRPHYSICS_EXPORTS
-    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrPhysics PROPERTIES
@@ -434,7 +433,8 @@ target_precompile_headers(xrPhysics
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrPhysics LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrPhysics
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

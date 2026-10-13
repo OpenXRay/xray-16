@@ -463,17 +463,13 @@ keyboard_key keyboards[] =
 
     { "kMODE",                  SDL_SCANCODE_MODE,               "Mode" },
 
-    { "kAUDIONEXT",             SDL_SCANCODE_AUDIONEXT,          "Audio Next" },
-    { "kAUDIOPREV",             SDL_SCANCODE_AUDIOPREV,          "Audio Prev" },
-    { "kAUDIOSTOP",             SDL_SCANCODE_AUDIOSTOP,          "Audio Stop" },
-    { "kAUDIOPLAY",             SDL_SCANCODE_AUDIOPLAY,          "Audio Play" },
-    { "kAUDIOMUTE",             SDL_SCANCODE_AUDIOMUTE,          "Audio Mute" },
+    { "kAUDIONEXT",             SDL_SCANCODE_MEDIA_NEXT_TRACK,          "Audio Next" },
+    { "kAUDIOPREV",             SDL_SCANCODE_MEDIA_PREVIOUS_TRACK,          "Audio Prev" },
+    { "kAUDIOSTOP",             SDL_SCANCODE_MEDIA_STOP,          "Audio Stop" },
+    { "kAUDIOPLAY",             SDL_SCANCODE_MEDIA_PLAY,          "Audio Play" },
+    { "kAUDIOMUTE",             SDL_SCANCODE_MUTE,          "Audio Mute" },
 
-    { "kMEDIASELECT",           SDL_SCANCODE_MEDIASELECT,        "Media Select" },
-    { "kWWW",                   SDL_SCANCODE_WWW,                "WWW" },
-    { "kMAIL",                  SDL_SCANCODE_MAIL,               "Mail" },
-    { "kCALCULATOR",            SDL_SCANCODE_CALCULATOR,         "Calculator" },
-    { "kCOMPUTER",              SDL_SCANCODE_COMPUTER,           "My Computer" },
+    { "kMEDIASELECT",           SDL_SCANCODE_MEDIA_SELECT,        "Media Select" },
 
     { "kNUMPAD_AC_SEARCH",      SDL_SCANCODE_AC_SEARCH,          "AC Search" },
     { "kNUMPAD_AC_HOME",        SDL_SCANCODE_AC_HOME,            "AC Home" },
@@ -483,19 +479,8 @@ keyboard_key keyboards[] =
     { "kNUMPAD_AC_REFRESH",     SDL_SCANCODE_AC_REFRESH,         "AC Refresh" },
     { "kNUMPAD_AC_BOOKMARKS",   SDL_SCANCODE_AC_BOOKMARKS,       "AC Bookmarks" },
 
-    { "kBRIGHTNESSDOWN",        SDL_SCANCODE_BRIGHTNESSDOWN,     "Brightness Down" },
-    { "kBRIGHTNESSUP",          SDL_SCANCODE_BRIGHTNESSUP,       "Brightness Up" },
-    { "kDISPLAYSWITCH",         SDL_SCANCODE_DISPLAYSWITCH,      "Display Switch" },
-
-    { "kKBDILLUMTOGGLE",        SDL_SCANCODE_KBDILLUMTOGGLE,     "Illum Toogle" },
-    { "kKBDILLUMDOWN",          SDL_SCANCODE_KBDILLUMDOWN,       "Illum Down" },
-    { "kKBDILLUMUP",            SDL_SCANCODE_KBDILLUMUP,         "Illum Up" },
-
-    { "kEJECT",                 SDL_SCANCODE_EJECT,              "Eject" },
+    { "kEJECT",                 SDL_SCANCODE_MEDIA_EJECT,              "Eject" },
     { "kSLEEP",                 SDL_SCANCODE_SLEEP,              "Sleep" },
-
-    { "kAPP1",                  SDL_SCANCODE_APP1,               "App 1" },
-    { "kAPP2",                  SDL_SCANCODE_APP2,               "App 2" },
 
     { "mouse1",                 MOUSE_1,                         "Left mouse button" },
     { "mouse2",                 MOUSE_2,                         "Right mouse button" },

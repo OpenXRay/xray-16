@@ -7,6 +7,7 @@
 // ZFar  - always 1.0f
 
 #include "pure.h"
+#include "FramePacer.h"
 
 #include "xrCore/FTimer.h"
 #include "Stats.h"
@@ -23,29 +24,23 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include <SDL.h>
-
-// refs
-class Task;
+#include <SDL3/SDL.h>
 
 constexpr float VIEWPORT_NEAR = 0.2f;
+constexpr float RENDER_VIEWPORT_NEAR = 0.001f;
 constexpr float HUD_VIEWPORT_NEAR = 0.05f;
 
 class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
-    // Main objects used for creating and rendering the 3D scene
-    // Real application window resolution
-    SDL_Rect m_rcWindowBounds{};
-
-    // Real game window resolution
-    SDL_Rect m_rcWindowClient{};
 
 private:
     u32 Timer_MM_Delta{};
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
     CTimer TimerMM;
+    FramePacer m_framePacer;
+    float m_averageFrameTime{ 1.f / 30.f };
 
     void SetupStates();
 
@@ -77,12 +72,12 @@ public:
         if (enabled && !m_bNearer)
         {
             m_bNearer = true;
-            mProject._43 -= EPS_L;
+            mProject._43 += EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
             m_bNearer = false;
-            mProject._43 += EPS_L;
+            mProject._43 -= EPS_L;
         }
         GEnv.Render->SetCacheXform(mView, mProject);
         // R_ASSERT(0);
@@ -154,8 +149,8 @@ public:
     float fFOV{};
     float fASPECT{};
 
-    bool m_allowWindowDrag{}; // For windowed mode
     bool IsAnselActive{};
+    bool m_windowVisible{ true };
 
     CRenderDevice()
     {
@@ -167,6 +162,7 @@ public:
 
 public:
     // Scene control
+    void PaceFrame();
     void ProcessFrame();
 
     void PreCache(u32 amount, bool wait_user_input);
@@ -201,9 +197,8 @@ public:
     void ProcessEvent(const SDL_Event& event);
     void OnWindowActivate(SDL_Window* window, bool activated);
 
-    void UpdateWindowProps();
-    void UpdateWindowRects();
-    void SelectResolution(bool windowed);
+    void UpdateWindowState();
+    void SyncWindowToPsDeviceMode();
 
     void Initialize();
 
@@ -215,9 +210,6 @@ public:
 
     const RenderDeviceStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
-
-    void SetWindowDraggable(bool draggable);
-    bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
     void* GetApplicationWindowHandle() const override;
     SDL_Window* GetApplicationWindow() override;
@@ -276,6 +268,9 @@ public:
     [[nodiscard]]
     auto GetImGuiContext() const { return m_imgui_context; }
 
+    [[nodiscard]]
+    auto GetImGuiInputScale() const { return m_imgui_input_scale; }
+
 public:
     struct ImGuiViewportData
     {
@@ -287,7 +282,9 @@ public:
         ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
         {
             Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
-                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+                (int)size.x, (int)size.y, flags);
+            if (Window)
+                SDL_SetWindowPosition(Window, (int)pos.x, (int)pos.y);
             WindowOwned = true;
         }
 
@@ -304,6 +301,8 @@ private:
     xray::editor::ide m_editor;
 
     ImGuiContext* m_imgui_context{};
+    ImVec2 m_imgui_input_scale{ 1.0f, 1.0f };
+public:
     IImGuiRender* m_imgui_render{};
 
 private:

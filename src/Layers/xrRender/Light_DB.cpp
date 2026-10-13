@@ -6,8 +6,10 @@
 #include "utils/xrLC_Light/R_light.h"
 #include "Light_DB.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
+CLight_DB Lights;
+
 CLight_DB::CLight_DB() : sun(nullptr) {}
 CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)
@@ -100,7 +102,7 @@ void CLight_DB::LoadHemi()
                     R_Light Ldata;
                     chunk->r(&Ldata, sizeof(R_Light));
 
-                    if (Ldata.type == D3DLIGHT_POINT)
+                    if (Ldata.type == LT_POINT)
                     {
                         Fvector tmp_D, tmp_R;
                         tmp_D.set(0, 0, -1); // forward
@@ -159,9 +161,7 @@ void CLight_DB::add_light(light* L)
     if (ps_r1_flags.test(R1FLAG_DLIGHTS))
         RImplementation.L_Dynamic->add(L);
 #else
-    if (RImplementation.o.noshadows)
-        L->flags.bShadow = FALSE;
-    if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
+    if (L->flags.bStatic)
         return;
     L->Export(package);
 #endif
@@ -197,7 +197,7 @@ void CLight_DB::Update()
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
 
-        if (!RImplementation.is_sun_static() && !ShadowOfChernobylMode)
+        if (!ShadowOfChernobylMode)
         {
             // true sunlight direction
             dir.set(E.sun_dir).normalize();
@@ -224,4 +224,4 @@ void CLight_DB::Update()
     // Clear selection
     package.clear();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

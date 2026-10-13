@@ -50,7 +50,7 @@ public:
     virtual void shedule_Update(u32 dt);
 
     void renderable_Render(u32 context_id, IRenderable* root) override;
-    void render_hud_mode() override;
+    void PostUpdateCL(bool bUpdateCL_disabled) override;
     bool need_renderable() override;
 
     virtual void render_item_ui();
@@ -263,6 +263,7 @@ public:
     //загружаемые параметры
     Fvector vLoadedFirePoint;
     Fvector vLoadedFirePoint2;
+    Fvector vLoadedLightPoint;
 
 private:
     firedeps m_current_firedeps;
@@ -292,6 +293,11 @@ public:
         UpdateFireDependencies();
         return m_current_firedeps.vLastFP2;
     }
+    IC const Fvector& get_LastLP()
+    {
+        UpdateFireDependencies();
+        return m_current_firedeps.vLastLP;
+    }
     IC const Fvector& get_LastFD()
     {
         UpdateFireDependencies();
@@ -304,7 +310,9 @@ public:
     }
 
     virtual const Fvector& get_CurrentFirePoint() { return get_LastFP(); }
+    virtual const Fvector& get_CurrentFireDirection() { return get_LastFD(); }
     virtual const Fvector& get_CurrentFirePoint2() { return get_LastFP2(); }
+    virtual const Fvector& get_CurrentLightPoint() { return get_LastLP(); }
     virtual const Fmatrix& get_ParticlesXFORM()
     {
         UpdateFireDependencies();

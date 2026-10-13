@@ -1,29 +1,46 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xrRender_console.h"
+#include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/ModelPool.h"
 #include "xrCore/xr_token.h"
-#include "xrCore/Animation/SkeletonMotions.hpp"
+#include "xrAnimation/OzzMotionLibrary.h"
 
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
 #if RENDER != R_R1
-#include "r__pixel_calculator.h"
+#include "Layers/xrRender/r__pixel_calculator.h"
 #endif
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-#   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
-#   endif // MASTER_GOLD
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
+#if RENDER == R_R4
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/FrameGraphPasses/SkyVisibilityPassSetup.h"
+#include "Layers/xrRender/Shaders/SlangCompilerTest.h"
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
+#endif
 
-namespace xray::render::RENDER_NAMESPACE
+extern ENGINE_API int dm_debug_trails;
+extern ENGINE_API float ps_r3_grass_interaction_displacement;
+extern ENGINE_API float ps_r3_grass_interaction_radius_scale;
+extern ENGINE_API float ps_r3_grass_interaction_frequency;
+extern ENGINE_API float ps_r3_grass_interaction_damping;
+extern ENGINE_API int ps_r3_grass_interaction_debug;
+extern ENGINE_API Fvector3 ps_r_foliage_sss_tint;
+extern ENGINE_API float ps_r_foliage_sss_sigma;
+extern ENGINE_API float ps_r_foliage_sss_blade;
+extern ENGINE_API float ps_r_foliage_sss_tuft;
+extern ENGINE_API float ps_r_foliage_sss_tree;
+extern ENGINE_API float ps_r_foliage_sss_ambient;
+extern ENGINE_API float ps_r_foliage_sss_forward;
+
+namespace xray::render::fg
 {
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] =
@@ -137,6 +154,8 @@ float ps_r__Tree_SBC = 1.5f; // scale bias correct
 float ps_r__WallmarkTTL = 50.f;
 float ps_r__WallmarkSHIFT = 0.0001f;
 float ps_r__WallmarkSHIFT_V = 0.0001f;
+int ps_r4_skeleton_wallmark_mode = 0;
+int ps_r_gpu_particle_debug_collision = 0;
 
 float ps_r__GLOD_ssa_start = 256.f;
 float ps_r__GLOD_ssa_end = 64.f;
@@ -181,7 +200,7 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
     //| R3FLAG_MSAA
     //| R3FLAG_MSAA_OPT
     | R3FLAG_GBUFFER_OPT | R2FLAG_DETAIL_BUMP | R2FLAG_DOF | R2FLAG_SOFT_PARTICLES | R2FLAG_SOFT_WATER |
-    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS}; // r2-only
+    R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_VOLUMETRIC_LIGHTS};
 
 Flags32 ps_r2_ls_flags_ext = {
     /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
@@ -189,18 +208,9 @@ Flags32 ps_r2_ls_flags_ext = {
 
 float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
-float ps_r2_tonemap_middlegray = 1.f; // r2-only
-float ps_r2_tonemap_adaptation = 1.f; // r2-only
-float ps_r2_tonemap_low_lum = 0.0001f; // r2-only
-float ps_r2_tonemap_amount = 0.7f; // r2-only
-float ps_r2_ls_bloom_kernel_g = 3.f; // r2-only
-float ps_r2_ls_bloom_kernel_b = .7f; // r2-only
-float ps_r2_ls_bloom_speed = 100.f; // r2-only
-float ps_r2_ls_bloom_kernel_scale = .7f; // r2-only // gauss
 float ps_r2_ls_dsm_kernel = .7f; // r2-only
 float ps_r2_ls_psm_kernel = .7f; // r2-only
 float ps_r2_ls_ssm_kernel = .7f; // r2-only
-float ps_r2_ls_bloom_threshold = .00001f; // r2-only
 Fvector ps_r2_aa_barier = {.8f, .1f, 0}; // r2-only
 Fvector ps_r2_aa_weight = {.25f, .25f, 0}; // r2-only
 float ps_r2_aa_kernel = .5f; // r2-only
@@ -246,8 +256,127 @@ float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
+int ps_r4_debug_gpu_culling = 0;
+
+#if defined(XR_PLATFORM_WINDOWS)
+u32 ps_fg_render_mode = FG_RENDER_DX12;
+#elif defined(XR_PLATFORM_APPLE)
+u32 ps_fg_render_mode = FG_RENDER_METAL;
+#else
+u32 ps_fg_render_mode = FG_RENDER_VULKAN;
+#endif
+
+int ps_fg_hot_reload_shaders = 0;
+int ps_fg_retina = 1;
+const xr_token fg_render_mode_token[] = {
+    {"dx12", FG_RENDER_DX12},
+#if !defined(XR_PLATFORM_APPLE)
+    {"vulkan", FG_RENDER_VULKAN},
+#endif
+#if defined(XRAY_USE_METAL)
+    {"metal", FG_RENDER_METAL},
+#endif
+    {nullptr, 0}
+};
+
+int   ps_r_cluster_tris  = 256;
+int   ps_r_cluster_merge = 1;
+int   ps_r_cluster_cache = 1;
+int   ps_r_cluster_debug = 0;
+float ps_r_cluster_lod   = 4.0f;
+float ps_r_cluster_fade  = 0.25f;
+int   ps_r_geo_paging      = 1;
+int   ps_r_geo_page_budget = 96;
+int   ps_r_geo_page_reads  = 48;
+int   ps_r_geo_page_upload = 6144;
+int   ps_r_geo_page_stats  = 0;
+float ps_r_ssa_px        = 2.0f;
+
+int   ps_r_sun_shadow_debug    = 0;
+u32   ps_r_tonemap             = 1;
+const xr_token r_tonemap_token[] = {{"none", 0}, {"neutral", 1}, {"agx", 2}, {"aces", 3}, {nullptr, 0}};
+int   ps_r_exposure_auto       = 1;
+float ps_r_exposure_compensation = 0.0f;
+float ps_r_exposure_min_ev     = -2.0f;
+float ps_r_exposure_max_ev     = 1.0f;
+float ps_r_exposure_speed_up   = 1.0f;
+float ps_r_exposure_speed_down = 3.0f;
+float ps_r_bloom_intensity     = 0.04f;
+int   ps_r_hdr_output          = 0;
+float ps_r_hdr_paper_white     = 1.0f;
+float ps_r_hdr_peak            = 0.0f;
+float ps_r_sky_energy          = 1.0f;
+float ps_r_sky_ground_albedo   = 0.25f;
+int   ps_r_sky_ibl             = 1;
+int   ps_r_vis_debug           = 0;
+int   ps_r_mesh_shaders        = 0;
+int   ps_r_vis_sw              = 1;
+float ps_r_vis_sw_px           = 64.0f;
+float ps_r_vis_sw_near         = 0.5f;
+int   ps_r_vis_sw_grass        = 1;
+int   ps_r_vsm_debug           = 0;
+float ps_r_sky_probe_spacing   = 3.0f;
+int   ps_r_sky_probe_rays      = 128;
+int   ps_r_sky_probe_budget    = 16384;
+int   ps_r_sky_probe_max       = 8388608;
+float ps_r_sky_probe_ray_distance = 1000.0f;
+float ps_r_sky_probe_backface  = 0.25f;
+int   ps_r_sky_static_probes   = 0;
+int   ps_r_sky_probe_debug     = 0;
+int   ps_r_sky_probe_capture   = 0;
+int   ps_r_sky_probe_debug_freeze = 0;
+float ps_r_sky_probe_debug_range = 40.0f;
+float ps_r_sky_probe_debug_radius = 0.15f;
+float ps_r_vsm_base            = 24.0f;
+int   ps_r_vsm_mark_half       = 1;
+float ps_r_vsm_bias            = 0.0003f;
+float ps_r_vsm_bias_dyn        = 0.00002f;
+float ps_r_vsm_bias_min        = 0.00003f;
+int   ps_r_vsm_soft            = 8;
+int   ps_r_vsm_soft_search     = 4;
+float ps_r_vsm_soft_angle      = 0.2f;
+float ps_r_vsm_soft_range      = 15.0f;
+float ps_r_vsm_soft_clamp      = 0.28f;
+int   ps_r_vsm_cache           = 1;
+int   ps_r_vsm_refresh_budget  = 16;
+float ps_r_vsm_cluster_lod     = 1.0f;
+float ps_r_vsm_raster_bias     = 0.5f;
+float ps_r_vsm_raster_slope    = 1.5f;
+int   ps_r_vsm_at              = 1;
+int   ps_r_vsm_temporal        = 1;
+float ps_r_vsm_ta_blend        = 0.9f;
+float ps_r_vsm_ta_clamp        = 0.24f;
+float ps_r_vsm_ta_motion       = 6.0f;
+float ps_r_vsm_ta_motion_floor = 0.30f;
+float ps_r_vsm_ta_carry        = 0.98f;
+int   ps_r_vsm_dirty_budget    = 128;
+float ps_r_vsm_ta_blend_dyn    = 0.35f;
+int   ps_r_vsm_debug_dyn       = 0;
+int   ps_r_vsm_load_freeze     = 1;
+int   ps_r_vsm_hud             = 1;
+float ps_r_vsm_hud_bias        = 0.0015f;
+
+int   ps_r_local_shadow_spots  = 16;
+int   ps_r_local_shadow_points = 40;
+float ps_r_local_shadow_bias   = 0.04f;
+float ps_r_local_shadow_hud_bias = 0.002f;
+int   ps_r_local_shadow_debug  = 0;
+int   ps_r_local_shadow_pairs_budget = 65536;
+float ps_r_local_shadow_range  = 100.0f;
+float ps_r_local_shadow_min_px = 12.0f;
+float ps_r_local_shadow_texel_ratio = 1.0f;
+
+int   ps_r_smoke_trail_enabled  = 1;
+float ps_r_smoke_max_emit_rate  = 45.f;
+float ps_r_smoke_point_lifetime = 2.5f;
+float ps_r_smoke_max_width      = 0.04f;
+float ps_r_smoke_gravity        = 0.15f;
+float ps_r_smoke_buoyancy       = 1.0f;
+float ps_r_smoke_turbulence     = 0.8f;
+
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
+int ps_r__detail_gpu = 1;
 
 u32 dm_size = 24;
 u32 dm_cache1_line = 12; //dm_size*2/dm_cache1_count
@@ -305,58 +434,12 @@ public:
 class CCC_tf_Aniso : public CCC_Integer
 {
 public:
-    void apply()
-    {
-#if defined(USE_DX11)
-        if (nullptr == HW.pDevice)
-            return;
-#endif
-        int val = *value;
-        clamp(val, 1, 16);
-#if defined(USE_DX11)
-        SSManager.SetMaxAnisotropy(val);
-#elif defined(USE_OGL)
-        // OGL: don't set aniso here because it will be updated after vid restart
-#else
-#   error No graphics API selected or enabled!
-#endif
-    }
-    CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Integer::Execute(args);
-        apply();
-    }
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Integer::GetStatus(S);
-        apply();
-    }
+    CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16) {}
 };
 class CCC_tf_MipBias : public CCC_Float
 {
 public:
-    void apply()
-    {
-#if defined(USE_DX11)
-        if (nullptr == HW.pDevice)
-            return;
-
-        SSManager.SetMipLODBias(*value);
-#endif
-    }
-
     CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f) {}
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Float::Execute(args);
-        apply();
-    }
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Float::GetStatus(S);
-        apply();
-    }
 };
 class CCC_R2GM : public CCC_Float
 {
@@ -408,7 +491,14 @@ class CCC_ModelPoolStat : public IConsole_Command
 {
 public:
     CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/) { RImplementation.Models->dump(); }
+    virtual void Execute(LPCSTR /*args*/) { g_pModelPool->dump(); }
+};
+
+class CCC_SkyProbeRebake : public IConsole_Command
+{
+public:
+    CCC_SkyProbeRebake(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/) { xray::render::fg::passes::RequestSkyVisibilityRebake(); }
 };
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -496,46 +586,8 @@ public:
 class CCC_memory_stats : public IConsole_Command
 {
 public:
-    CCC_memory_stats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR /*args*/)
-    {
-        // TODO: OGL: Implement memory usage statistics.
-#if defined(USE_DX11)
-        u32 m_base = 0;
-        u32 c_base = 0;
-        u32 m_lmaps = 0;
-        u32 c_lmaps = 0;
-
-        RImplementation.ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
-
-        Msg("memory usage  mb \t \t video    \t managed      \t system \n");
-
-        const float MiB = 1024*1024; // XXX: use it as common enum value (like in X-Ray 2.0)
-        const u32* mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex];
-
-        float vb_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float vb_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float vb_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
-        Msg("vertex buffer      \t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
-
-        float ib_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float ib_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float ib_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
-        Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
-
-        float textures_video = (m_base+m_lmaps)/MiB;
-        Msg("textures          \t \t %f \t %f \t %f ", textures_video, 0.f, 0.f);
-
-        mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
-        float rt_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
-        float rt_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
-        float rt_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
-        Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
-
-        Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + textures_video + rt_video,
-            vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
-#endif // !USE_OGL
-    }
+    CCC_memory_stats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+    virtual void Execute(LPCSTR) {}
 };
 
 class CCC_DumpResources final : public IConsole_Command
@@ -545,7 +597,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        RImplementation.Models->dump();
+        g_pModelPool->dump();
         RImplementation.Resources->Dump(false);
     }
 };
@@ -557,7 +609,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        g_pMotionsContainer->dump();
+        XRay::Animation::DumpOzzAnimationStats();
     }
 };
 
@@ -571,6 +623,25 @@ public:
         RImplementation.Resources->_DumpMemoryUsage();
     }
 };
+
+#if RENDER == R_R4
+class CCC_TestSlangCompiler final : public IConsole_Command
+{
+public:
+    CCC_TestSlangCompiler(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr args) override
+    {
+        Msg("=== [SLANG COMPILER TEST] Running tests ===");
+        bool success = xray::render::SlangCompilerTest::RunTest();
+
+        if (success)
+            Msg("* [SLANG COMPILER TEST] ALL TESTS PASSED");
+        else
+            Msg("! [SLANG COMPILER TEST] SOME TESTS FAILED");
+    }
+};
+#endif
 
 #if RENDER != R_R1
 class CCC_BuildSSA : public IConsole_Command
@@ -707,16 +778,6 @@ public:
 };
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-class CCC_Fog_Reload : public IConsole_Command
-{
-public:
-    CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/) { FluidManager.UpdateProfiles(); }
-};
-#   endif // MASTER_GOLD
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
@@ -749,15 +810,29 @@ void xrRender_initconsole()
     CMD1(CCC_ModelPoolStat, "stat_models");
 #endif // DEBUG
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
+    CMD4(CCC_Integer, "r4_skeleton_wallmark_mode", &ps_r4_skeleton_wallmark_mode, 0, 1);
+    CMD4(CCC_Integer, "r_gpu_particle_debug_collision", &ps_r_gpu_particle_debug_collision, 0, 1);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
 
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
-    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.1f, 0.99f);
-    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
+    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.99f);
+    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 600);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
+    CMD4(CCC_Integer, "r__detail_gpu", &ps_r__detail_gpu, 0, 1);
+    CMD4(CCC_Float, "r3_grass_interaction_strength", &ps_r3_grass_interaction_displacement, 0.f, 3.f);
+    CMD4(CCC_Float, "r3_grass_interaction_radius", &ps_r3_grass_interaction_radius_scale, 0.5f, 3.f);
+    CMD4(CCC_Float, "r3_grass_interaction_frequency", &ps_r3_grass_interaction_frequency, 0.2f, 5.f);
+    CMD4(CCC_Float, "r3_grass_interaction_damping", &ps_r3_grass_interaction_damping, 0.01f, 0.98f);
+    CMD4(CCC_Integer, "r3_grass_interaction_debug", &ps_r3_grass_interaction_debug, 0, 1);
+    CMD4(CCC_Float, "r_foliage_sss_sigma", &ps_r_foliage_sss_sigma, 0.f, 20.f);
+    CMD4(CCC_Float, "r_foliage_sss_blade", &ps_r_foliage_sss_blade, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_tuft", &ps_r_foliage_sss_tuft, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_tree", &ps_r_foliage_sss_tree, 0.f, 1.f);
+    CMD4(CCC_Float, "r_foliage_sss_ambient", &ps_r_foliage_sss_ambient, 0.f, 2.f);
+    CMD4(CCC_Float, "r_foliage_sss_forward", &ps_r_foliage_sss_forward, 0.f, 1.f);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -803,17 +878,6 @@ void xrRender_initconsole()
 
     // R2-specific
     CMD2(CCC_R2GM, "r2em", &ps_r2_gmaterial);
-    CMD3(CCC_Mask, "r2_tonemap", &ps_r2_ls_flags, R2FLAG_TONEMAP);
-    CMD4(CCC_Float, "r2_tonemap_middlegray", &ps_r2_tonemap_middlegray, 0.0f, 2.0f);
-    CMD4(CCC_Float, "r2_tonemap_adaptation", &ps_r2_tonemap_adaptation, 0.01f, 10.0f);
-    CMD4(CCC_Float, "r2_tonemap_lowlum", &ps_r2_tonemap_low_lum, 0.0001f, 1.0f);
-    CMD4(CCC_Float, "r2_tonemap_amount", &ps_r2_tonemap_amount, 0.0000f, 1.0f);
-    CMD4(CCC_Float, "r2_ls_bloom_kernel_scale", &ps_r2_ls_bloom_kernel_scale, 0.5f, 2.f);
-    CMD4(CCC_Float, "r2_ls_bloom_kernel_g", &ps_r2_ls_bloom_kernel_g, 1.f, 7.f);
-    CMD4(CCC_Float, "r2_ls_bloom_kernel_b", &ps_r2_ls_bloom_kernel_b, 0.01f, 1.f);
-    CMD4(CCC_Float, "r2_ls_bloom_threshold", &ps_r2_ls_bloom_threshold, 0.f, 1.f);
-    CMD4(CCC_Float, "r2_ls_bloom_speed", &ps_r2_ls_bloom_speed, 0.f, 100.f);
-    CMD3(CCC_Mask, "r2_ls_bloom_fast", &ps_r2_ls_flags, R2FLAG_FASTBLOOM);
     CMD4(CCC_Float, "r2_ls_dsm_kernel", &ps_r2_ls_dsm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_psm_kernel", &ps_r2_ls_psm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_ssm_kernel", &ps_r2_ls_ssm_kernel, .1f, 3.f);
@@ -894,6 +958,7 @@ void xrRender_initconsole()
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r2_aa_break", &ps_r2_aa_barier, tw_min, tw_max);
+    CMD4(CCC_Vector3, "r_foliage_sss_tint", &ps_r_foliage_sss_tint, tw_min, tw_max);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
@@ -950,11 +1015,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
-#   ifndef MASTER_GOLD
-    CMD1(CCC_Fog_Reload, "r3_fog_reload");
-#   endif
-#endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
     CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
@@ -970,5 +1030,149 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
+
+#if defined(USE_DX11)
+    CMD4(CCC_Integer, "dm_debug_trails", &dm_debug_trails, 0, 1);
+#if RENDER == R_R4
+    CMD1(CCC_TestSlangCompiler, "test_slang_compiler");
+#endif
+
+#if RENDER == R_R4
+    CMD4(CCC_Integer, "r4_use_pbr", &ps_r4_use_pbr, 0, 1);
+    CMD4(CCC_Integer, "fg_pbr_diffuse_mode", &ps_fg_pbr_diffuse_mode, 0, 1);
+    CMD4(CCC_Integer, "r4_debug_gpu_culling", &ps_r4_debug_gpu_culling, 0, 1);
+    CMD4(CCC_Integer, "r_path_tracer_bounces", &ps_r_path_tracer_bounces, 1, 16);
+    CMD4(CCC_Integer, "r_path_tracer_debug", &ps_r_path_tracer_debug, 0, 13);
+    CMD4(CCC_Integer, "r_path_tracer_freeze", &ps_r_path_tracer_freeze, 0, 1);
+    CMD4(CCC_Integer, "r_path_tracer_samples", &ps_r_path_tracer_samples, 0, 16777216);
+    CMD4(CCC_Integer, "r_rt_max_null_events", &ps_r_rt_max_null_events, 1, 4096);
+    CMD4(CCC_Integer, "r_rt_light_rays", &ps_r_rt_light_rays, 0, 2);
+    CMD4(CCC_Float, "r_rt_sun_radius", &ps_r_rt_sun_radius, 0.0f, 5.0f);
+    CMD4(CCC_Integer, "r_rt_gi", &ps_r_rt_gi, 0, 3);
+    CMD4(CCC_Integer, "r_rt_gi_reconstruct", &ps_r_rt_gi_reconstruct, 0, 2);
+    CMD4(CCC_Integer, "r_rt_gi_history", &ps_r_rt_gi_history, 1, 64);
+    CMD4(CCC_Integer, "r_rt_gi_filter_passes", &ps_r_rt_gi_filter_passes, 1, 6);
+    CMD4(CCC_Integer, "r_rt_gi_restir", &ps_r_rt_gi_restir, 0, 1);
+    CMD4(CCC_Float, "r_rt_gi_intensity", &ps_r_rt_gi_intensity, 0.0f, 4.0f);
+    CMD4(CCC_Integer, "r_rt_gi_bounces", &ps_r_rt_gi_bounces, 1, 16);
+    CMD4(CCC_Integer, "r_rt_gi_samples", &ps_r_rt_gi_samples, 1, 8);
+    CMD4(CCC_Float, "r_rt_gi_ray_distance", &ps_r_rt_gi_ray_distance, 1.0f, 10000.0f);
+    CMD4(CCC_Float, "r_rt_scene_radius", &ps_r_rt_scene_radius, 1.0f, 10000.0f);
+    CMD4(CCC_Float, "r_rt_grass_radius", &ps_r_rt_grass_radius, 0.0f, 256.0f);
+    CMD4(CCC_Integer, "r_rt_world_cache", &ps_r_rt_world_cache, 0, 1);
+    CMD4(CCC_Integer, "r_rt_world_cache_bounce", &ps_r_rt_world_cache_bounce, 0, 8);
+    CMD4(CCC_Integer, "r_rt_world_cache_debug", &ps_r_rt_world_cache_debug, 0, 4);
+    CMD4(CCC_Integer, "r_rt_world_cache_size", &ps_r_rt_world_cache_size, 14, 22);
+    CMD4(CCC_Integer, "r_rt_world_cache_lifetime", &ps_r_rt_world_cache_lifetime, 2, 300);
+    CMD4(CCC_Integer, "r_rt_world_cache_updates", &ps_r_rt_world_cache_updates, 1024, 1048576);
+    CMD4(CCC_Integer, "r_rt_world_cache_history", &ps_r_rt_world_cache_history, 1, 256);
+    CMD4(CCC_Float, "r_rt_world_cache_cell", &ps_r_rt_world_cache_cell, 0.05f, 4.0f);
+    CMD4(CCC_Float, "r_rt_world_cache_lod", &ps_r_rt_world_cache_lod, 1.0f, 64.0f);
+
+    CMD4(CCC_Integer, "r_cluster_tris", &ps_r_cluster_tris, 128, 4096);
+    CMD4(CCC_Integer, "r_cluster_merge", &ps_r_cluster_merge, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_cache", &ps_r_cluster_cache, 0, 1);
+    CMD4(CCC_Integer, "r_cluster_debug", &ps_r_cluster_debug, 0, 4);
+    CMD4(CCC_Float, "r_cluster_lod", &ps_r_cluster_lod, 0.05f, 64.0f);
+    CMD4(CCC_Float, "r_cluster_fade", &ps_r_cluster_fade, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_geo_paging", &ps_r_geo_paging, 0, 1);
+    CMD4(CCC_Integer, "r_geo_page_budget", &ps_r_geo_page_budget, 8, 4096);
+    CMD4(CCC_Integer, "r_geo_page_reads", &ps_r_geo_page_reads, 1, 512);
+    CMD4(CCC_Integer, "r_geo_page_upload", &ps_r_geo_page_upload, 256, 131072);
+    CMD4(CCC_Integer, "r_geo_page_stats", &ps_r_geo_page_stats, 0, 1);
+    CMD4(CCC_Float, "r_ssa_px", &ps_r_ssa_px, 0.25f, 16.0f);
+
+    CMD4(CCC_Integer, "r_sun_shadow_debug", &ps_r_sun_shadow_debug, 0, 2);
+    CMD3(CCC_Token, "r_tonemap", &ps_r_tonemap, r_tonemap_token);
+    CMD4(CCC_Integer, "r_exposure_auto", &ps_r_exposure_auto, 0, 1);
+    CMD4(CCC_Float, "r_exposure_compensation", &ps_r_exposure_compensation, -8.0f, 8.0f);
+    CMD4(CCC_Float, "r_exposure_min_ev", &ps_r_exposure_min_ev, -8.0f, 8.0f);
+    CMD4(CCC_Float, "r_exposure_max_ev", &ps_r_exposure_max_ev, -8.0f, 8.0f);
+    CMD4(CCC_Float, "r_exposure_speed_up", &ps_r_exposure_speed_up, 0.05f, 20.0f);
+    CMD4(CCC_Float, "r_exposure_speed_down", &ps_r_exposure_speed_down, 0.05f, 20.0f);
+    CMD4(CCC_Float, "r_bloom_intensity", &ps_r_bloom_intensity, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_hdr_output", &ps_r_hdr_output, 0, 1);
+    CMD4(CCC_Float, "r_hdr_paper_white", &ps_r_hdr_paper_white, 0.25f, 4.0f);
+    CMD4(CCC_Float, "r_hdr_peak", &ps_r_hdr_peak, 0.0f, 64.0f);
+    CMD4(CCC_Float, "r_sky_energy", &ps_r_sky_energy, 0.0f, 128.0f);
+    CMD4(CCC_Float, "r_sky_ground_albedo", &ps_r_sky_ground_albedo, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_sky_ibl", &ps_r_sky_ibl, 0, 1);
+    CMD4(CCC_Integer, "r_vis_debug", &ps_r_vis_debug, 0, 3);
+    CMD4(CCC_Integer, "r_mesh_shaders", &ps_r_mesh_shaders, 0, 1);
+    CMD4(CCC_Integer, "r_vis_sw", &ps_r_vis_sw, 0, 1);
+    CMD4(CCC_Float, "r_vis_sw_px", &ps_r_vis_sw_px, 0.0f, 1024.0f);
+    CMD4(CCC_Float, "r_vis_sw_near", &ps_r_vis_sw_near, 0.0f, 10.0f);
+    CMD4(CCC_Integer, "r_vis_sw_grass", &ps_r_vis_sw_grass, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_debug", &ps_r_vsm_debug, 0, 5);
+    CMD4(CCC_Float, "r_sky_probe_spacing", &ps_r_sky_probe_spacing, 0.5f, 16.0f);
+    CMD4(CCC_Integer, "r_sky_probe_rays", &ps_r_sky_probe_rays, 16, 1024);
+    CMD4(CCC_Integer, "r_sky_probe_budget", &ps_r_sky_probe_budget, 256, 1048576);
+    CMD4(CCC_Integer, "r_sky_probe_max", &ps_r_sky_probe_max, 65536, 33554432);
+    CMD4(CCC_Float, "r_sky_probe_ray_distance", &ps_r_sky_probe_ray_distance, 10.0f, 10000.0f);
+    CMD4(CCC_Float, "r_sky_probe_backface", &ps_r_sky_probe_backface, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_sky_static_probes", &ps_r_sky_static_probes, 0, 1);
+    CMD4(CCC_Integer, "r_sky_probe_debug", &ps_r_sky_probe_debug, 0, 3);
+    CMD4(CCC_Integer, "r_sky_probe_capture", &ps_r_sky_probe_capture, 0, 1);
+    CMD4(CCC_Integer, "r_sky_probe_debug_freeze", &ps_r_sky_probe_debug_freeze, 0, 1);
+    CMD4(CCC_Float, "r_sky_probe_debug_range", &ps_r_sky_probe_debug_range, 4.0f, 500.0f);
+    CMD4(CCC_Float, "r_sky_probe_debug_radius", &ps_r_sky_probe_debug_radius, 0.02f, 0.5f);
+    CMD1(CCC_SkyProbeRebake, "r_sky_probe_rebake");
+    CMD4(CCC_Float, "r_vsm_base", &ps_r_vsm_base, 8.0f, 64.0f);
+    CMD4(CCC_Integer, "r_vsm_mark_half", &ps_r_vsm_mark_half, 0, 1);
+    CMD4(CCC_Float, "r_vsm_bias", &ps_r_vsm_bias, 0.0f, 0.02f);
+    CMD4(CCC_Float, "r_vsm_bias_dyn", &ps_r_vsm_bias_dyn, 0.0f, 0.02f);
+    CMD4(CCC_Float, "r_vsm_bias_min", &ps_r_vsm_bias_min, 0.0f, 0.02f);
+    CMD4(CCC_Integer, "r_vsm_soft", &ps_r_vsm_soft, 0, 32);
+    CMD4(CCC_Integer, "r_vsm_soft_search", &ps_r_vsm_soft_search, 2, 16);
+    CMD4(CCC_Float, "r_vsm_soft_angle", &ps_r_vsm_soft_angle, 0.1f, 8.0f);
+    CMD4(CCC_Float, "r_vsm_soft_range", &ps_r_vsm_soft_range, 2.0f, 80.0f);
+    CMD4(CCC_Float, "r_vsm_soft_clamp", &ps_r_vsm_soft_clamp, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_vsm_cache", &ps_r_vsm_cache, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_refresh_budget", &ps_r_vsm_refresh_budget, 0, 1024);
+    CMD4(CCC_Float, "r_vsm_cluster_lod", &ps_r_vsm_cluster_lod, 0.1f, 16.0f);
+    CMD4(CCC_Float, "r_vsm_raster_bias", &ps_r_vsm_raster_bias, 0.0f, 16.0f);
+    CMD4(CCC_Float, "r_vsm_raster_slope", &ps_r_vsm_raster_slope, 0.0f, 16.0f);
+    CMD4(CCC_Integer, "r_vsm_at", &ps_r_vsm_at, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_temporal", &ps_r_vsm_temporal, 0, 1);
+    CMD4(CCC_Float, "r_vsm_ta_blend", &ps_r_vsm_ta_blend, 0.0f, 0.98f);
+    CMD4(CCC_Float, "r_vsm_ta_clamp", &ps_r_vsm_ta_clamp, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_vsm_ta_motion", &ps_r_vsm_ta_motion, 0.5f, 64.0f);
+    CMD4(CCC_Float, "r_vsm_ta_motion_floor", &ps_r_vsm_ta_motion_floor, 0.0f, 1.0f);
+    CMD4(CCC_Float, "r_vsm_ta_carry", &ps_r_vsm_ta_carry, 0.0f, 1.0f);
+    CMD4(CCC_Integer, "r_vsm_dirty_budget", &ps_r_vsm_dirty_budget, 0, 4096);
+    CMD4(CCC_Float, "r_vsm_ta_blend_dyn", &ps_r_vsm_ta_blend_dyn, 0.0f, 0.98f);
+    CMD4(CCC_Integer, "r_vsm_debug_dyn", &ps_r_vsm_debug_dyn, 0, 3);
+    CMD4(CCC_Integer, "r_vsm_load_freeze", &ps_r_vsm_load_freeze, 0, 1);
+    CMD4(CCC_Integer, "r_vsm_hud", &ps_r_vsm_hud, 0, 1);
+    CMD4(CCC_Float, "r_vsm_hud_bias", &ps_r_vsm_hud_bias, 0.0f, 0.05f);
+
+    CMD4(CCC_Integer, "r_local_shadow_spots", &ps_r_local_shadow_spots, 1, 64);
+    CMD4(CCC_Integer, "r_local_shadow_points", &ps_r_local_shadow_points, 1, 40);
+    CMD4(CCC_Float, "r_local_shadow_bias", &ps_r_local_shadow_bias, 0.0f, 0.5f);
+    CMD4(CCC_Float, "r_local_shadow_hud_bias", &ps_r_local_shadow_hud_bias, 0.0f, 0.05f);
+    CMD4(CCC_Integer, "r_local_shadow_debug", &ps_r_local_shadow_debug, 0, 1);
+    CMD4(CCC_Integer, "r_local_shadow_pairs_budget", &ps_r_local_shadow_pairs_budget, 4096, 1048576);
+    CMD4(CCC_Float, "r_local_shadow_range", &ps_r_local_shadow_range, 10.0f, 500.0f);
+    CMD4(CCC_Float, "r_local_shadow_min_px", &ps_r_local_shadow_min_px, 2.0f, 64.0f);
+    CMD4(CCC_Float, "r_local_shadow_texel_ratio", &ps_r_local_shadow_texel_ratio, 0.25f, 2.0f);
+
+    CMD4(CCC_Integer, "r_smoke_trail",     &ps_r_smoke_trail_enabled, 0, 1);
+    CMD4(CCC_Float,   "r_smoke_emit_rate", &ps_r_smoke_max_emit_rate,  1.0f, 120.0f);
+    CMD4(CCC_Float,   "r_smoke_lifetime",  &ps_r_smoke_point_lifetime, 0.5f, 10.0f);
+    CMD4(CCC_Float,   "r_smoke_width",     &ps_r_smoke_max_width,      0.005f, 0.2f);
+    CMD4(CCC_Float,   "r_smoke_gravity",   &ps_r_smoke_gravity,        0.0f, 2.0f);
+    CMD4(CCC_Float,   "r_smoke_buoyancy",  &ps_r_smoke_buoyancy,       0.0f, 3.0f);
+    CMD4(CCC_Float,   "r_smoke_turbulence",&ps_r_smoke_turbulence,     0.0f, 3.0f);
+
+    CMD4(CCC_Vector4, "dev_param_1", &ps_dev_param_1, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_2", &ps_dev_param_2, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_3", &ps_dev_param_3, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+    CMD4(CCC_Vector4, "dev_param_4", &ps_dev_param_4, Fvector4().set(-1000, -1000, -1000, -1000), Fvector4().set(1000, 1000, 1000, 1000));
+
+    CMD3(CCC_Token, "fg_render_mode", &ps_fg_render_mode, fg_render_mode_token);
+    CMD4(CCC_Integer, "fg_hot_reload_shaders", &ps_fg_hot_reload_shaders, 0, 1);
+    CMD4(CCC_Integer, "fg_retina", &ps_fg_retina, 0, 1);
+#endif
+#endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

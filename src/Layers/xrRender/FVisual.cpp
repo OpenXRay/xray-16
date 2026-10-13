@@ -4,8 +4,9 @@
 #include "xrCore/FMesh.hpp"
 #include "FVisual.h"
 #include "Layers/xrRender/BufferUtils.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -36,27 +37,32 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         vCount = data->r_u32();
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = BufferPool.getVB(ID);
         p_rm_Vertices->AddRef();
 
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = BufferPool.getVB_Format(ID);
         loaded_v = true;
 
+        vbPoolID = ID;
+
         // indices
-        ID = data->r_u32();
+        u32 ibID = data->r_u32();
         iBase = data->r_u32();
         iCount = data->r_u32();
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = BufferPool.getIB(ibID);
         p_rm_Indices->AddRef();
+
+        ibPoolID = ibID;
+        useAlternativeGeom = false;
 #endif
         // check for fast-vertices
 #if RENDER == R_R1
-        if (RImplementation.IsFastGeomSupported() && data->find_chunk(OGF_FASTPATH) && ps_r1_force_geomx)
+        if (BufferPool.fastGeomLoaded && data->find_chunk(OGF_FASTPATH) && ps_r1_force_geomx)
 #else
-        if (RImplementation.IsFastGeomSupported() && data->find_chunk(OGF_FASTPATH))
+        if (BufferPool.fastGeomLoaded && data->find_chunk(OGF_FASTPATH))
 #endif
         {
             destructor<IReader> geomdef(data->open_chunk(OGF_FASTPATH));
@@ -67,28 +73,36 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
             // verts
             VertexElement* fmt = nullptr;
-            ID = def().r_u32();
+            u32 fastVbID = def().r_u32();
             m_fast->vBase = def().r_u32();
             m_fast->vCount = def().r_u32();
 
             VERIFY(nullptr == m_fast->p_rm_Vertices);
-            m_fast->p_rm_Vertices = RImplementation.getVB(ID, true);
+            m_fast->p_rm_Vertices = BufferPool.getVB(fastVbID, true);
             m_fast->p_rm_Vertices->AddRef();
 
-            fmt = RImplementation.getVB_Format(ID, true);
+            fmt = BufferPool.getVB_Format(fastVbID, true);
+
+            m_fast->vbPoolID = fastVbID;
 
             // indices
-            ID = def().r_u32();
+            u32 fastIbID = def().r_u32();
             m_fast->iBase = def().r_u32();
             m_fast->iCount = def().r_u32();
             m_fast->dwPrimitives = m_fast->iCount / 3;
 
             VERIFY(nullptr == m_fast->p_rm_Indices);
-            m_fast->p_rm_Indices = RImplementation.getIB(ID, true);
+            m_fast->p_rm_Indices = BufferPool.getIB(fastIbID, true);
             m_fast->p_rm_Indices->AddRef();
 
+            m_fast->ibPoolID = fastIbID;
+            m_fast->useAlternativeGeom = true;
+
             // geom
-            m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
+            if (m_fast->p_rm_Vertices->IsValid() && m_fast->p_rm_Indices->IsValid())
+                m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
+            else
+                m_fast->rm_geom.create_logical(fmt);
         }
     }
 
@@ -104,10 +118,10 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             vCount = data->r_u32();
 
             VERIFY(nullptr == p_rm_Vertices);
-            p_rm_Vertices = RImplementation.getVB(ID);
+            p_rm_Vertices = BufferPool.getVB(ID);
             p_rm_Vertices->AddRef();
 
-            vFormat = RImplementation.getVB_Format(ID);
+            vFormat = BufferPool.getVB_Format(ID);
 #endif // !_EDITOR
         }
         else
@@ -120,7 +134,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY(nullptr == p_rm_Vertices);
             vStride = GetFVFVertexSize(fvf);
             p_rm_Vertices = xr_new<VertexStagingBuffer>();
-            p_rm_Vertices->Create(vCount * vStride);
+            p_rm_Vertices->Create(size_t(vCount) * vStride, true);
             u8* bytes = static_cast<u8*>(p_rm_Vertices->Map());
             CopyMemory(bytes, data->pointer(), vCount * vStride);
             p_rm_Vertices->Unmap(true); // upload vertex data
@@ -140,7 +154,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             iCount = data->r_u32();
             dwPrimitives = iCount / 3;
             VERIFY(nullptr == p_rm_Indices);
-            p_rm_Indices = RImplementation.getIB(ID);
+            p_rm_Indices = BufferPool.getIB(ID);
             p_rm_Indices->AddRef();
 #endif // !_EDITOR
         }
@@ -162,31 +176,22 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
     if (dwFlags & VLOAD_NOVERTICES)
         return;
+    else if (!p_rm_Vertices->IsValid() || !p_rm_Indices->IsValid())
+    {
+        R_ASSERT(p_rm_Vertices->source_token && p_rm_Indices->source_token);
+        if (fvf)
+        {
+            xr_vector<VertexElement> declaration;
+            R_ASSERT(CreateDeclFromFVF(fvf, declaration));
+            rm_geom.create_logical(declaration.data());
+        }
+        else
+            rm_geom.create_logical(vFormat);
+    }
     else if (fvf)
         rm_geom.create(fvf, *p_rm_Vertices, *p_rm_Indices);
     else
         rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
-}
-
-void Fvisual::Render(CBackend& cmd_list, float, bool use_fast_geo)
-{
-#if RENDER == R_R1
-    if (m_fast && ps_r1_force_geomx)
-#else
-    if (m_fast &&
-        (ps_r1_force_geomx || use_fast_geo && !cmd_list.is_TessEnabled()))
-#endif
-    {
-        cmd_list.set_Geometry(m_fast->rm_geom);
-        cmd_list.Render(D3DPT_TRIANGLELIST, m_fast->vBase, 0, m_fast->vCount, m_fast->iBase, m_fast->dwPrimitives);
-        cmd_list.stat.r.s_static.add(m_fast->vCount);
-    }
-    else
-    {
-        cmd_list.set_Geometry(rm_geom);
-        cmd_list.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
-        cmd_list.stat.r.s_static.add(vCount);
-    }
 }
 
 #define PCOPY(a) a = pFrom->a
@@ -210,6 +215,10 @@ void Fvisual::Copy(dxRender_Visual* pSrc)
     PCOPY(iCount);
     PCOPY(dwPrimitives);
 
+    PCOPY(vbPoolID);
+    PCOPY(ibPoolID);
+    PCOPY(useAlternativeGeom);
+
     PCOPY(m_fast);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

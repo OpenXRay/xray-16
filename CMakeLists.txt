@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.23)
 
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+endif()
+set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,Mixed>:Embedded>")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(PreProjectInit)
 
@@ -16,16 +21,33 @@ project(OpenXRay
 # CMAKE_SOURCE_DIR belongs to the outer application in that configuration.
 set(XRAY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
+if (APPLE)
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+endif()
+
 option(BUILD_SHARED_LIBS "Build shared libraries"     ${BUILD_SHARED_LIBS_DEFAULT_VALUE})
 
 option(XRAY_USE_LUAJIT   "Use LuaJIT"                 ON)
 option(XRAY_USE_ASAN     "Use AddressSanitizer"       OFF)
 option(XRAY_ENABLE_TRACY "Enable tracy profiler"      OFF)
+option(XRAY_USE_AI_PBR   "Enable AI PBR texture converter (requires ONNX Runtime)" OFF)
 
 include(XRay.Build)
-include(XRay.Packaging)
+include(XRay.Windows.Externals)
 
-add_subdirectory(Externals)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_compile_definitions(
+    $<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:XRAY_STATIC_BUILD>
+)
+
+block()
+    set(CMAKE_UNITY_BUILD OFF)
+    add_subdirectory(Externals)
+endblock()
 add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
+
+include(XRay.Packaging)

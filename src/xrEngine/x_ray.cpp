@@ -13,10 +13,16 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrNetServer/NET_AuthCheck.h"
+#include "xrAnimation/OzzMotionLibrary.h"
 
 #include "IGame_Persistent.h"
+#include "DeveloperMode.h"
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
+
+#if defined(XR_PLATFORM_APPLE)
+#include "macos/GameDataResolver.h"
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
@@ -50,6 +56,7 @@ ENGINE_API bool ShadowOfChernobylMode = false;
 ENGINE_API string512 g_sLaunchOnExit_params{};
 ENGINE_API string512 g_sLaunchOnExit_app{};
 ENGINE_API string_path g_sLaunchWorkingFolder{};
+extern ENGINE_API int ps_profile_dump;
 
 namespace
 {
@@ -203,9 +210,8 @@ constexpr pcstr FRAME_MARK_APPLICATION_STARTUP = "Application startup";
 constexpr pcstr FRAME_MARK_APPLICATION_SHUTDOWN = "Application shutdown";
 constexpr pcstr FRAME_MARK_APPLICATION_RUN = "Application run";
 
-CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules)
+CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 1>& modules)
 {
-    TracySetProgramName("OpenXRay");
     Threading::SetCurrentThreadName("Primary thread");
     FrameMarkStart(FRAME_MARK_APPLICATION_STARTUP);
 
@@ -217,8 +223,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         ZoneScopedN("SDL_Init");
         u32 flags = SDL_INIT_VIDEO;
         if (!strstr(commandLine, "-no_gamepad"))
-            flags |= SDL_INIT_GAMECONTROLLER;
-        R_ASSERT3(SDL_Init(flags) == 0, "Unable to initialize SDL", SDL_GetError());
+            flags |= SDL_INIT_GAMEPAD;
+        R_ASSERT3(SDL_Init(flags), "Unable to initialize SDL", SDL_GetError());
     }
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -233,18 +239,6 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         ShowSplash(topmost);
     }
 
-    SDL_StopTextInput(); // It's enabled by default for some reason, we don't want it
-    const auto& inputTask = TaskManager::AddTask([]
-    {
-        const bool captureInput = !strstr(Core.Params, "-i");
-        pInput = xr_new<CInput>(captureInput);
-    });
-
-    const auto& createSoundDevicesList = TaskManager::AddTask([]
-    {
-        Engine.Sound.CreateDevicesList();
-    });
-
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
@@ -253,7 +247,31 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
 
+#if defined(XR_PLATFORM_APPLE)
+    ResolveMacOSGameDataPath(commandLine);
+#endif
+
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
+
+    if (DeveloperMode::Requested())
+    {
+        R_ASSERT2(game && !GEnv.isDedicatedServer,
+            "-dev_level requires the game module and an interactive client");
+        R_ASSERT2(!DeveloperMode::HasOption("-start") && !DeveloperMode::HasOption("-load"),
+            "-dev_level cannot be combined with -start or -load");
+        Msg("[dev_level] event=boot schema=1 scene=dev_material_room mode=single_non_alife diagnostics=engine_log");
+    }
+
+    const auto inputTask = TaskManager::AddTask([]
+    {
+        const bool captureInput = !strstr(Core.Params, "-i");
+        pInput = xr_new<CInput>(captureInput);
+    });
+
+    const auto createSoundDevicesList = TaskManager::AddTask([]
+    {
+        Engine.Sound.CreateDevicesList();
+    });
 
     InitSettings();
     // Adjust player & computer name for Asian
@@ -267,13 +285,16 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
     Device.FillVideoModes();
     TaskScheduler->Wait(inputTask);
     InitConsole();
+    XRay::Animation::PrepareOzzAnimationInventory();
 
     Engine.Initialize(game, modules);
+
+    execUserScript();
+
     Device.Initialize();
 
     Console->OnDeviceInitialize();
 
-    execUserScript();
     InitializeDiscord();
 
     TaskScheduler->Wait(createSoundDevicesList);
@@ -288,7 +309,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         Console->Execute(loadArgs + 1);
 
     // Initialize APP
-    const auto& createLightAnim = TaskScheduler->AddTask([]
+    const auto createLightAnim = TaskScheduler->AddTask([]
     {
         LALib.OnCreate();
     });
@@ -306,6 +327,9 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         g_pGamePersistent->OnAppStart();
     else
         Console->Show();
+
+    if (DeveloperMode::Requested())
+        Console->Execute("start server(dev_material_room/single/developer/new) client(localhost)");
 
     FrameMarkEnd(FRAME_MARK_APPLICATION_STARTUP);
 }
@@ -335,6 +359,7 @@ CApplication::~CApplication()
 
     Device.Destroy();
     Engine.Destroy();
+    XRay::Animation::ShutdownOzzAnimations();
 
 #ifdef USE_DISCORD_INTEGRATION
     discord::Core::Destroy(&m_discord_core);
@@ -366,35 +391,58 @@ CApplication::~CApplication()
 
 int CApplication::Run()
 {
-    HideSplash();
     Device.Run();
+    HideSplash();
 
-    while (!SDL_QuitRequested()) // SDL_PumpEvents is here
+    auto quitRequested = []() {
+        SDL_PumpEvents();
+        return SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_EVENT_QUIT, SDL_EVENT_QUIT) > 0;
+    };
+
+    for (;;)
     {
+        xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic) || ps_profile_dump > 0);
+        xray::profiler::FrameStart();
+
+        {
+            ZoneScopedN("PaceFrame");
+            Device.PaceFrame();
+        }
+
+        bool quit;
+        {
+            ZoneScopedN("PumpEvents");
+            quit = quitRequested();
+        }
+        if (quit)
+        {
+            xray::profiler::FrameEnd();
+            break;
+        }
         FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;
 
         SDL_Event events[MAX_WINDOW_EVENTS];
-        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+        int count;
+        {
+            ZoneScopedN("WindowEvents");
+            count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+                SDL_GETEVENT, SDL_EVENT_WINDOW_FIRST, SDL_EVENT_WINDOW_LAST);
+        }
 
         for (int i = 0; i < count; ++i)
         {
             const SDL_Event event = events[i];
 
+            const auto window = SDL_GetWindowFromID(event.window.windowID);
+
             switch (event.type)
             {
-            case SDL_WINDOWEVENT:
-            {
-                const auto window = SDL_GetWindowFromID(event.window.windowID);
-
-                switch (event.window.event)
-                {
-                case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
-                case SDL_WINDOWEVENT_RESTORED:
-                case SDL_WINDOWEVENT_MAXIMIZED:
+                case SDL_EVENT_WINDOW_SHOWN:
+                case SDL_EVENT_WINDOW_FOCUS_GAINED:
+                case SDL_EVENT_WINDOW_RESTORED:
+                case SDL_EVENT_WINDOW_MAXIMIZED:
                     if (window != Device.m_sdlWnd)
                         Device.OnWindowActivate(window, true);
                     else
@@ -404,9 +452,9 @@ int CApplication::Run()
                     }
                     continue;
 
-                case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_FOCUS_LOST:
-                case SDL_WINDOWEVENT_MINIMIZED:
+                case SDL_EVENT_WINDOW_HIDDEN:
+                case SDL_EVENT_WINDOW_FOCUS_LOST:
+                case SDL_EVENT_WINDOW_MINIMIZED:
                     if (window != Device.m_sdlWnd)
                         Device.OnWindowActivate(window, false);
                     else
@@ -415,9 +463,7 @@ int CApplication::Run()
                         shouldActivate = false;
                     }
                     continue;
-                } // switch (event.window.event)
             }
-            } // switch (event.type)
 
             // Only process event in Device
             // if it wasn't processed in the switch above
@@ -434,7 +480,9 @@ int CApplication::Run()
 
         UpdateDiscordStatus();
         FrameMarkEnd(FRAME_MARK_APPLICATION_RUN);
-    } // while (!SDL_QuitRequested())
+
+        xray::profiler::FrameEnd();
+    }
 
     Device.Shutdown();
 
@@ -460,7 +508,9 @@ void CApplication::ShowSplash(bool topmost)
     if (topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 
-    m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_surface->w, m_surface->h, flags);
+    m_window = SDL_CreateWindow("OpenXRay", m_surface->w, m_surface->h, flags);
+    if (m_window)
+        SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     SDL_ShowWindow(m_window);
 
     m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
@@ -497,7 +547,7 @@ void CApplication::HideSplash()
     SDL_DestroyWindow(m_window);
     m_window = nullptr;
 
-    SDL_FreeSurface(m_surface);
+    SDL_DestroySurface(m_surface);
 }
 
 void CApplication::InitializeDiscord()

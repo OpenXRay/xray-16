@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrEngine/Engine.h"
+#include "xrEngine/IRenderBackend.h"
 #include "xrCDB/Frustum.h"
 #include "xrCDB/ISpatial.h"
 #include "vis_common.h"
@@ -25,6 +26,14 @@ struct Fcolor;
 class IReader;
 class CMemoryWriter;
 
+namespace xray::render::framegraph { class ShaderLoader; }
+namespace xray::render
+{
+    class MaterialCache;
+    class DeveloperScene;
+    namespace fg { class RenderDevice; class ImGuiRendererNVRHI; class FGUIRender; }
+}
+
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;
 #else
@@ -42,6 +51,7 @@ public:
         SPOT = 2,
         OMNIPART = 3,
         REFLECTED = 4,
+        AREA = 5,
     };
 
 public:
@@ -59,11 +69,13 @@ public:
     virtual void set_cone(float angle) = 0;
     virtual void set_range(float R) = 0;
     virtual void set_virtual_size(float R) = 0;
+    virtual void set_area(float length, float radius) = 0;
     virtual void set_texture(pcstr name) = 0;
     virtual void set_color(const Fcolor& C) = 0;
     virtual void set_color(float r, float g, float b) = 0;
     virtual void set_hud_mode(bool b) = 0;
     virtual bool get_hud_mode() = 0;
+    virtual void set_hud_spotlight(bool b) = 0;
     virtual ~IRender_Light();
 };
 struct ENGINE_API resptrcode_light : public resptr_base<IRender_Light>
@@ -119,13 +131,6 @@ struct xrImTextureData
 {
     ImTextureID texture{};
     Fvector2 size{};
-};
-
-enum class DeviceState
-{
-    Normal = 0,
-    Lost,
-    NeedReset
 };
 
 class ENGINE_API IRender
@@ -275,6 +280,9 @@ public:
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
 
+    virtual bool level_LoadDeveloper(const xray::render::DeveloperScene& scene) = 0;
+    virtual void DumpDeveloperSceneDiagnostics() = 0;
+
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
     virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) = 0;
@@ -287,6 +295,8 @@ public:
     virtual IRenderVisual* getVisual(int id) = 0;
 
     virtual xrImTextureData GetImGuiTextureId(pcstr texture_name) = 0;
+
+    virtual xray::render::framegraph::ShaderLoader* GetShaderLoader() const = 0;
 
     // Main
     virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
@@ -337,13 +347,14 @@ public:
     // Main
     virtual void Calculate() = 0;
     virtual void Render() = 0;
-    virtual void RenderMenu() = 0;
 
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
     virtual void SetPostProcessParams(const SPPInfo& ppi) = 0;
+
+    virtual void ConvertLegacyAssetsToPBR() = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}
@@ -353,7 +364,6 @@ public:
     virtual void setGamma(float fGamma) = 0;
     virtual void setBrightness(float fGamma) = 0;
     virtual void setContrast(float fGamma) = 0;
-    virtual void updateGamma() = 0;
 
     //	Destroy
     virtual void OnDeviceDestroy(bool bKeepTextures) = 0;
@@ -396,4 +406,18 @@ public:
 
     virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
+
+    virtual void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) = 0;
+
+    virtual void RenderStatsOverlay() {}
+    virtual void RenderPBRConversionUI() {}
+    virtual void SetEnabled(bool) {}
+    virtual bool IsEnabled() const { return false; }
+    virtual xray::render::fg::RenderDevice* GetRenderDevice() const { return nullptr; }
+    virtual xray::render::fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return nullptr; }
+    virtual xray::render::MaterialCache* GetMaterialCache() const { return nullptr; }
+    virtual xray::render::MaterialCache* GetUIMaterialCache() const { return nullptr; }
+    virtual xray::render::fg::FGUIRender* GetUIRender() const { return nullptr; }
+    virtual void UpdateSmokeTrail(const Fvector&, const Fvector&, float, bool) {}
+    virtual void NotifySmokeShot() {}
 };

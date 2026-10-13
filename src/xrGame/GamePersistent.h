@@ -4,8 +4,8 @@
 
 #include "xrEngine/IGame_Persistent.h"
 #include "player_hud_tune.h"
+#include "ozz_anim_debugger.h"
 
-class Task;
 class CMainMenu;
 class CUICursor;
 class CParticlesObject;
@@ -32,8 +32,10 @@ private:
     bool ambient_effect_wind_on{};
 
     bool m_bPickableDOF{};
+    bool m_devLevel{ false };
 
     AnselManager* ansel{};
+    COzzAnimDebugger m_ozzAnimDebugger;
 
     CUISequencer* m_intro{};
     EVENT eQuickLoad;
@@ -91,11 +93,14 @@ public:
 
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    virtual bool OnRenderPPUI_query();
-    virtual void OnRenderPPUI_main();
-    virtual void OnRenderPPUI_PP();
+    virtual bool OnRenderPPUI_query() override;
+    virtual void OnRenderPPUI_main() override;
+    virtual void OnRenderPPUI_PP() override;
+    virtual void OnRenderInGameUI() override;
+    virtual void OnRenderCursor() override;
+    virtual void OnRenderSequencers() override;
 
-    virtual bool CanBePaused();
+    virtual bool CanBePaused() override;
 
     void SetPickableEffectorDOF(bool bSet);
     void SetEffectorDOF(const Fvector& needed_dof);
@@ -106,7 +111,7 @@ public:
     virtual void OnSectorChanged(IRender_Sector::sector_id_t sector);
     virtual void OnAssetsChanged();
 
-    CHudTuner GetHudTuner() { return m_hudTuner; }
+    const CHudTuner& GetHudTuner() const { return m_hudTuner; }
 };
 
 IC CGamePersistent& GamePersistent() { return *((CGamePersistent*)g_pGamePersistent); }

@@ -18,6 +18,7 @@
 #endif
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
+extern int ps_fps_limit_in_menu;
 
 IGame_Persistent::IGame_Persistent()
 {
@@ -206,7 +207,7 @@ int IGame_Persistent::Level_ID(pcstr name, pcstr ver, bool bSet)
 
     for (CLocatorAPI::archive& A : FS.m_archives)
     {
-        if (!A.hSrcFile)
+        if (!A.is_open())
         {
             cpcstr ln = A.header->r_string("header", "level_name");
             cpcstr lv = A.header->r_string("header", "level_ver");
@@ -400,7 +401,6 @@ void IGame_Persistent::Prefetch()
     GEnv.Render->models_Prefetch();
 
     Log("Loading textures...");
-    GEnv.Render->ResourcesDeferredUpload();
 
     const auto memoryAfter = Memory.mem_usage() - memoryBefore;
 
@@ -425,6 +425,7 @@ void IGame_Persistent::LoadBegin()
     if (1 == ll_dwReference)
     {
         loaded = false;
+        m_loadingFramePacer.Reset();
         phase_timer.Start();
         load_stage = 0;
     }
@@ -522,13 +523,19 @@ void IGame_Persistent::LoadStage(bool draw /*= true*/)
 
 void IGame_Persistent::LoadDraw() const
 {
-    if (loaded)
+    if (loaded || !Device.m_windowVisible)
+        return;
+
+    const u64 nowNs = SDL_GetTicksNS();
+    if (m_loadingFramePacer.GetDelayNs(nowNs, static_cast<u32>(ps_fps_limit_in_menu)) > 0)
         return;
 
     Device.dwFrame += 1;
 
     if (!Device.RenderBegin())
         return;
+
+    m_loadingFramePacer.StartFrame(nowNs);
 
     // XXX: fix dedicated server
     //if (GEnv.isDedicatedServer)
@@ -547,6 +554,11 @@ void IGame_Persistent::load_draw_internal() const
 void IGame_Persistent::ShowLoadingScreen(bool show) const
 {
     m_pLoadingScreen->Show(show);
+}
+
+bool IGame_Persistent::IsLoadingScreenShown() const
+{
+    return m_pLoadingScreen->IsShown();
 }
 
 void IGame_Persistent::OnFrame()

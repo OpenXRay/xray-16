@@ -1,0 +1,55 @@
+#define SM_6_0
+#include "common.h"
+#include "visbuffer_common.h"
+
+cbuffer VsmHudParams : register(b5)
+{
+    float4x4 g_HudViewProj;
+};
+
+StructuredBuffer<uint> g_HudEntries : register(t15);
+StructuredBuffer<ClusterEntry> g_Entries : register(t16);
+ByteAddressBuffer g_SkinnedVB : register(t43);
+ByteAddressBuffer g_SkinnedIB : register(t44);
+
+struct VS_OUTPUT
+{
+    float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#endif
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+VS_OUTPUT main(uint vid : SV_VertexID, uint iid : SV_InstanceID)
+{
+    VS_OUTPUT output;
+#ifdef TARGET_DXIL
+    output.clip = float4(1.0, 1.0, 1.0, 1.0);
+#endif
+
+    ClusterEntry e = g_Entries[g_HudEntries[iid]];
+    if (vid >= e.indexCount)
+    {
+#ifdef TARGET_DXIL
+        output.clip = float4(-1.0, -1.0, -1.0, -1.0);
+#endif
+        output.position = float4(2.0, 2.0, 2.0, 1.0);
+        output.texcoord = float2(0.0, 0.0);
+        output.materialID = 0u;
+        return output;
+    }
+
+    uint local = vid;
+    uint index = g_SkinnedIB.Load((e.ibFirst + local) * 4u);
+    uint vertexByte = (e.firstVertex + index) * 48u;
+    uint4 w0 = g_SkinnedVB.Load4(vertexByte);
+    uint4 w1 = g_SkinnedVB.Load4(vertexByte + 16u);
+    float3 worldPos = float3(asfloat(w0.x), asfloat(w0.y), asfloat(w0.z));
+
+    output.position = mul(g_HudViewProj, float4(worldPos, 1.0));
+    output.texcoord = float2(asfloat(w1.z), asfloat(w1.w));
+    output.materialID = e.materialID;
+    return output;
+}

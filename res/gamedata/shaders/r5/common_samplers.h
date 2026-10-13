@@ -1,0 +1,76 @@
+#ifndef	common_samplers_h_included
+#define	common_samplers_h_included
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Geometry phase / deferring               	//
+
+SamplerState 	smp_nofilter;
+SamplerState 	smp_rtlinear;
+SamplerState 	smp_linear;
+SamplerState 	smp_base;
+
+Texture2D 	s_base;		//	smp_base
+#ifdef USE_MSAA
+Texture2DMS<float4, MSAA_SAMPLES>	s_generic;	//	smp_generic
+#else
+Texture2D   s_generic;
+#endif
+Texture2D 	s_bump;             	//
+Texture2D 	s_bumpX;                //
+Texture2D 	s_detail;               //
+Texture2D 	s_detailBump;           //
+Texture2D 	s_detailBumpX;          //	Error for bump detail
+//Texture2D 	s_bumpD;                //
+Texture2D 	s_hemi;             	//
+
+Texture2D 	s_pbr : register(t4);
+
+Texture2D 	s_mask;             	//
+
+Texture2D 	s_dt_r;                	//
+Texture2D 	s_dt_g;                	//
+Texture2D 	s_dt_b;                	//
+Texture2D 	s_dt_a;                	//
+
+Texture2D 	s_dn_r;                	//
+Texture2D 	s_dn_g;                	//
+Texture2D 	s_dn_b;                	//
+Texture2D 	s_dn_a;                	//
+
+Texture2D 	s_pbr_r;
+Texture2D 	s_pbr_g;
+Texture2D 	s_pbr_b;
+Texture2D 	s_pbr_a;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Lighting/shadowing phase                     //
+
+SamplerState 	smp_material;
+
+//uniform sampler2D       s_depth;                //
+#ifdef USE_MSAA
+Texture2DMS<float4, MSAA_SAMPLES>	s_position;	//	smp_nofilter or Load
+Texture2DMS<float4, MSAA_SAMPLES>	s_normal;	//	smp_nofilter or Load
+#else
+Texture2D	s_position;	//	smp_nofilter or Load
+Texture2D	s_normal;	//	smp_nofilter or Load
+#endif
+Texture2D	s_lmap;		// 2D/???cube projector lightmap
+Texture3D	s_material;	//	smp_material
+//uniform sampler1D       s_attenuate;        	//
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Combine phase                                //
+#ifdef USE_MSAA
+Texture2DMS<float4, MSAA_SAMPLES>	s_diffuse;	// rgb.a = diffuse.gloss
+Texture2DMS<float4, MSAA_SAMPLES>	s_accumulator;      	// rgb.a = diffuse.specular
+#else
+Texture2D	s_diffuse;	// rgb.a = diffuse.gloss
+Texture2D	s_accumulator;      	// rgb.a = diffuse.specular
+#endif
+//uniform sampler2D       s_generic;              //
+Texture2D	s_image;	// used in various post-processing
+
+
+#endif	//	#ifndef	common_samplers_h_included

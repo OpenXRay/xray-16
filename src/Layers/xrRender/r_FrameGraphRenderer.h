@@ -1,0 +1,548 @@
+#pragma once
+
+#include "xrEngine/Render.h"
+#include "Layers/xrRender/FGRenderBase.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "xrCDB/xrXRC.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/r__occlusion.h"
+#include "Layers/xrRender/R_DStreams.h"
+#include "Layers/xrRender/Light_Render_Direct.h"
+#include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/SMAP_Allocator.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/OutputLayout.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/ClusterDAG.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
+#include "Layers/xrRender/Profiler/StatsOverlay.h"
+#include "Layers/xrRender/LightingMode.h"
+#include "Layers/xrRender/RenderView.h"
+#include "Layers/xrRender/PostProcessEffects.h"
+
+struct ImDrawData;
+
+namespace xray::render::fg
+{
+class IRender_DetailModel;
+class ParticleEditor;
+
+struct ShaderMacro
+{
+    const char* Name;
+    const char* Definition;
+};
+}
+
+namespace CDB { class MODEL; }
+class xrXRC;
+
+namespace xray::render::fg {
+    class dxRender_Visual;
+    class RTAccelStructManager;
+    class WorldRadianceCache;
+    class SkyEnvironment;
+    class SkyVisibilityGrid;
+    class light;
+    namespace PS {
+        class CParticleEffect;
+    }
+    namespace decals {
+        class DecalManager;
+        class OverlayManager;
+    }
+}
+
+namespace xray::render::framegraph {
+    class Blackboard;
+    class ShaderLoader;
+}
+
+namespace xray::render::fg::passes {
+    struct ParticleBatch;
+    class SmokeTrailManager;
+}
+
+namespace xray::render::fg {
+    class ImGuiRendererNVRHI;
+}
+
+namespace xray::render {
+using fg::dxRender_Visual;
+
+extern xr_vector<xr_string> g_failedShaders;
+
+class GeometryCollector;
+class MaterialCache;
+
+struct CompiledLevelShader {
+    shared_str shaderName;
+    shared_str textureName;
+    shared_str lightmapName;
+    MaterialSystem::MaterialInfo materialInfo;
+};
+
+namespace fg {
+    class GPUCullingManager;
+    class FGDetailManager;
+    class FGUIRender;
+}
+
+namespace framegraph {
+    class VolatileConstantBufferPool;
+}
+
+class FrameGraphRenderer: public xray::render::fg::FGRenderBase {
+public:
+    enum
+    {
+        MSAA_ATEST_NONE = 0x0,
+        MSAA_ATEST_DX10_0_ATOC = 0x1,
+        MSAA_ATEST_DX10_1_NATIVE = 0x2,
+        MSAA_ATEST_DX10_1_ATOC = 0x3,
+    };
+
+    enum
+    {
+        MMSM_OFF = 0,
+        MMSM_ON,
+        MMSM_AUTO,
+        MMSM_AUTODETECT
+    };
+
+    FrameGraphRenderer();
+    ~FrameGraphRenderer();
+
+    GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
+    IRender::BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
+    bool is_sun_static() override { return false; }
+    u32 get_dx_level() override { return 0x000B0000; }
+
+    void create() override;
+    void destroy() override;
+    void reset_begin() override;
+    void reset_end() override;
+
+protected:
+    void OnBackBufferResizing(u32 oldWidth, u32 oldHeight) override;
+    void OnBackBufferResized(u32 newWidth, u32 newHeight) override;
+
+public:
+
+    void level_Load(IReader* fs) override;
+    void level_Unload() override;
+    bool level_LoadDeveloper(const xray::render::DeveloperScene& scene) override;
+    void DumpDeveloperSceneDiagnostics() override;
+    HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
+
+    fg::IBlender* blender_create(CLASS_ID cls);
+    void blender_destroy(fg::IBlender*& B);
+
+    void addShaderOption(pcstr name, pcstr value);
+    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+
+    CompiledLevelShader* getCompiledShader(int id);
+private:
+    using VertexDeclarator = ::xray::render::fg::VertexDeclarator;
+    void LoadBuffers(CStreamReader* fs, bool alternative);
+    void LoadVisuals(IReader* fs);
+    void CollectClusterBakeRanges(xr_vector<fg::ClusterBakeRange>& ranges);
+    void LoadLights(IReader* fs);
+    void WarmParticles();
+    void WarmGameplayPipelines();
+    void LoadSectors(IReader* fs);
+    void LoadSWIs(CStreamReader* fs);
+    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName, const char* lightmapName);
+    u32 GetVertexStride(u32 vertexFormatID);
+
+    class DeveloperMaterialRecord
+    {
+    public:
+        xr_string key;
+        xr_string shaderName;
+        xr_string textureName;
+        Fvector color = { 1.0f, 1.0f, 1.0f };
+        float metallic = 0.0f;
+        float roughness = 0.5f;
+        float opacity = 1.0f;
+    };
+
+    bool PrepareDeveloperMaterials(const xray::render::DeveloperScene& scene);
+    bool BuildDeveloperGeometry(const xray::render::DeveloperScene& scene, u32 formatID,
+        xr_vector<dxRender_Visual*>& visuals, Fbox& bounds);
+    bool VerifyDeveloperAllocations(const xr_vector<dxRender_Visual*>& visuals, u32& validCount, u32& invalidCount);
+    bool BakeDeveloperClusterDAG(const xray::render::DeveloperScene& scene, u64& sceneStamp, xr_string& cachePath);
+    void DiscardDeveloperStaging(const xr_vector<dxRender_Visual*>& visuals);
+    void SetupDeveloperSun();
+    bool CommitDeveloperSector(const xr_vector<dxRender_Visual*>& visuals);
+    void ReRegisterDeveloperMaterials();
+    void CleanupDeveloperLoad();
+
+    xr_vector<DeveloperMaterialRecord> m_developerMaterials;
+    u32 m_developerMaterialEpoch = 0;
+    u32 m_developerMeshCount = 0;
+    u32 m_developerVertexCount = 0;
+    u32 m_developerIndexCount = 0;
+    bool m_developerSceneLoaded = false;
+public:
+
+    pcstr getShaderPath() override { return "r5\\"; }
+
+    IRenderVisual* getVisual(int id) override;
+
+    void add_Visual(u32, IRenderable* root, IRenderVisual* V, Fmatrix& m) override;
+    void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
+    void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
+    void clear_static_wallmarks() override;
+    void add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start, const Fvector& dir, float size) override;
+
+    IRender_ObjectSpecific* ros_create(IRenderable* parent) override;
+    void ros_destroy(IRender_ObjectSpecific*& p) override;
+    IRender_Light* light_create() override;
+    IRender_Glow* glow_create() override;
+
+    IRenderVisual* model_CreateParticles(pcstr name) override;
+    IRenderVisual* model_Create(pcstr name, IReader* data) override;
+    IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
+    IRenderVisual* model_Duplicate(IRenderVisual* V) override;
+    void model_Delete(IRenderVisual*& V, bool bDiscard) override;
+    fg::IRender_DetailModel* model_CreateDM(IReader* F);
+    void model_Delete(fg::IRender_DetailModel*& F);
+    void model_Logging(bool bEnable) override;
+    void models_Prefetch() override;
+    void models_Clear(bool b_complete) override;
+
+    bool occ_visible(vis_data& V) override;
+    bool occ_visible(Fbox& B) override;
+    bool occ_visible(sPoly& P) override;
+
+    void Calculate() override;
+    void BeforeWorldRender() override {}
+    void AfterWorldRender() override {}
+
+    void OnFrame() override;
+    void OnCameraUpdated() override;
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    void Screenshot(IRender::ScreenshotMode mode, pcstr name) override;
+    void SetPostProcessParams(const SPPInfo&) override;
+    void RequestGrassInteraction(const Fvector&, float, float, uint8_t) override;
+
+    bool Initialize(fg::RenderDevice* device);
+    void Shutdown();
+
+    void Render() override;
+    void RenderStatsOverlay() override;
+    void SetEnabled(bool enabled) override { m_enabled = enabled; }
+    bool IsEnabled() const override { return m_enabled; }
+
+    fg::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
+
+    struct Stats {
+        float totalFrameMs = 0.0f;
+        float gbufferMs = 0.0f;
+        float lightingMs = 0.0f;
+        u32 numDrawCalls = 0;
+        u32 numTriangles = 0;
+    };
+
+    const Stats& GetStats() const { return m_stats; }
+    void PrintStats() const;
+
+    xray::profiler::GPUProfiler* GetGPUProfiler() const { return m_gpuProfiler.get(); }
+    xray::profiler::StatsOverlay* GetStatsOverlay() const { return m_statsOverlay.get(); }
+    void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
+
+    fg::RenderDevice* GetRenderDevice() const override { return m_device; }
+    framegraph::ShaderLoader* GetShaderLoader() const override { return m_shaderLoader; }
+    fg::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const override { return m_imguiRendererNVRHI; }
+    void SetImGuiRendererNVRHI(fg::ImGuiRendererNVRHI* r) { m_imguiRendererNVRHI = r; }
+    MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
+    MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
+    fg::FGUIRender* GetUIRender() const override { return m_uiRender.get(); }
+
+    void UpdateSmokeTrail(const Fvector& muzzlePos, const Fvector& muzzleDir, float dt, bool isHUDMode) override;
+    void NotifySmokeShot() override;
+    fg::passes::SmokeTrailManager* GetSmokeTrailManager() const { return m_smokeTrailManager.get(); }
+
+    fg::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
+
+    fg::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
+
+    u32 GetRTRayAdmittedCount() const;
+    u32 GetRTRayAdmittedSkinnedCount() const;
+
+    fg::decals::DecalManager* GetDecalManager() const { return m_decalManager.get(); }
+    fg::decals::OverlayManager* GetOverlayManager() const { return m_overlayManager.get(); }
+
+public:
+    struct _options
+    {
+        u32 bug : 1;
+
+        u32 ssao_blur_on : 1;
+        u32 ssao_opt_data : 1;
+        u32 ssao_half_data : 1;
+        u32 ssao_hbao : 1;
+        u32 ssao_hdao : 1;
+        u32 ssao_ultra : 1;
+        u32 hbao_vectorized : 1;
+
+        u32 rain_smapsize : 16;
+        u32 smapsize : 16;
+        u32 depth16 : 1;
+        u32 mrt : 1;
+        u32 mrtmixdepth : 1;
+        u32 fp16_filter : 1;
+        u32 fp16_blend : 1;
+        u32 albedo_wo : 1;
+        u32 HW_smap : 1;
+        u32 HW_smap_PCF : 1;
+        u32 HW_smap_FETCH4 : 1;
+
+        nvrhi::Format HW_smap_FORMAT;
+
+        u32 nvstencil : 1;
+        u32 nvdbt : 1;
+
+        u32 nullrt : 1;
+        u32 ffp : 1;
+
+        u32 distortion : 1;
+        u32 distortion_enabled : 1;
+        u32 mblur : 1;
+
+        u32 sunfilter : 1;
+        u32 sunstatic : 1;
+        u32 sjitter : 1;
+        u32 noshadows : 1;
+        u32 Tshadows : 1;
+        u32 oldshadowcascades : 1;
+        u32 disasm : 1;
+        u32 advancedpp : 1;
+        u32 volumetricfog : 1;
+
+        u32 msaa : 1;
+        u32 msaa_hybrid : 1;
+        u32 msaa_opt : 1;
+        u32 gbuffer_opt : 1;
+        u32 dx11_sm4_1 : 1;
+        u32 msaa_alphatest : 2;
+        u32 msaa_samples : 4;
+
+        u32 minmax_sm : 2;
+        u32 minmax_sm_screenarea_threshold;
+
+        u32 tessellation : 1;
+
+        u32 forcegloss : 1;
+        u32 forceskinw : 1;
+
+        u32 mt_calculate : 1;
+        u32 mt_render : 1;
+
+        u32 support_rt_arrays : 1;
+
+        float forcegloss_v;
+    } o;
+
+    struct Statistics
+    {
+        u32 l_total{ 0 };
+        u32 l_visible{ 0 };
+        u32 l_shadowed{ 0 };
+        u32 l_unshadowed{ 0 };
+        s32 s_used{ 0 };
+        s32 s_merged{ 0 };
+        s32 s_finalclip{ 0 };
+        u32 ic_total{ 0 };
+        u32 ic_culled{ 0 };
+
+        void FrameStart()
+        {
+            l_total = 0;
+            l_visible = 0;
+            l_shadowed = 0;
+            l_unshadowed = 0;
+            s_used = 0;
+            s_merged = 0;
+            s_finalclip = 0;
+            ic_total = 0;
+            ic_culled = 0;
+        }
+        void FrameEnd() {}
+    };
+
+    IRender_Sector::sector_id_t m_last_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+    u32 m_uLastLTRACK{ 0 };
+    bool m_bFirstFrameAfterReset{ false };
+    xr_vector<Fbox3> m_main_coarse_structure;
+    fg::CHOM m_HOM;
+    fg::R_occlusion m_HWOCC;
+    Statistics m_Stats;
+    fg::CLight_Compute_XFORM_and_VIS m_LR;
+    xr_vector<fg::light*> m_Lights_LastFrame;
+    fg::SMAP_Allocator m_LP_smap_pool;
+    fg::CPSLibrary m_PSLibrary;
+
+    u32 occq_begin(u32& ID) { return m_HWOCC.occq_begin(ID); }
+    void occq_end(u32& ID) { m_HWOCC.occq_end(ID); }
+    fg::R_occlusion::occq_result occq_get(u32& ID) { return m_HWOCC.occq_get(ID); }
+
+    fg::_VertexStream Vertex;
+    fg::_IndexStream Index;
+    fg::IndexStagingBuffer QuadIB;
+    fg::IndexBufferHandle old_QuadIB;
+    void CreateQuadIB();
+
+    xr_vector<fg::ShaderMacro> m_ShaderOptions;
+
+    xr_vector<CompiledLevelShader> m_CompiledLevelShaders;
+
+private:
+    bool m_enabled = false;
+    fg::RenderDevice* m_device = nullptr;
+    framegraph::ShaderLoader* m_shaderLoader = nullptr;
+    fg::ImGuiRendererNVRHI* m_imguiRendererNVRHI = nullptr;
+
+    xr_unique_ptr<framegraph::Blackboard> m_blackboard;
+
+    xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
+
+    fg::TextureHandle m_native_Position;
+    fg::TextureHandle m_native_Normal;
+    fg::TextureHandle m_native_Albedo;
+    fg::TextureHandle m_native_Depth;
+    fg::TextureHandle m_native_Accumulator;
+    fg::TextureHandle m_native_Generic_0;
+    fg::TextureHandle m_native_Generic_1;
+    fg::TextureHandle m_native_Generic_2;
+
+    fg::TextureHandle m_native_MenuMain;
+    fg::TextureHandle m_native_MenuDistort;
+    fg::TextureHandle m_native_FinalComposite;
+
+    framegraph::VirtualResourceHandle m_hizPyramid;
+
+    nvrhi::TextureHandle m_sceneDepth;
+    fg::RenderView m_mainView;
+
+
+    nvrhi::TextureHandle m_inspectorPreview;
+
+    xr_unique_ptr<GeometryCollector> m_geometryCollector;
+
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    xr_unique_ptr<fg::GPUCullingManager> m_gpuCullingManager;
+
+    xr_unique_ptr<fg::FGDetailManager> m_detailManager;
+
+    xr_unique_ptr<fg::decals::DecalManager> m_decalManager;
+
+    xr_unique_ptr<fg::decals::OverlayManager> m_overlayManager;
+
+    xr_unique_ptr<fg::passes::SmokeTrailManager> m_smokeTrailManager;
+
+    xr_unique_ptr<fg::RTAccelStructManager> m_rtAccelMgr;
+    xr_unique_ptr<fg::WorldRadianceCache> m_worldCache;
+    xr_unique_ptr<fg::SkyEnvironment> m_skyEnvironment;
+    xr_unique_ptr<fg::SkyVisibilityGrid> m_skyVisibility;
+    bool m_skyLightingReady = false;
+    fg::LightingFrameState m_lightingState;
+    fg::PostProcessEffects m_postProcess;
+
+    xr_unique_ptr<fg::FGUIRender> m_uiRender;
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;
+    xr_unique_ptr<MaterialCache> m_uiMaterialCache;
+
+    xr_vector<GeometryBatch> m_hudBatches;
+
+    xr_vector<fg::passes::ParticleBatch> m_worldParticleBatches;
+    xr_vector<fg::passes::ParticleBatch> m_hudParticleBatches;
+
+    xr_unique_ptr<fg::RenderContext> m_renderContext;
+
+    Stats m_stats;
+
+    xr_unique_ptr<xray::profiler::GPUProfiler> m_gpuProfiler;
+    xr_unique_ptr<xray::profiler::StatsOverlay> m_statsOverlay;
+    xr_unique_ptr<fg::ParticleEditor> m_particleEditor;
+
+    xr_vector<ISpatial*> m_lstRenderables;
+    xr_vector<ISpatial*> m_lstShadowCasters;
+    xr_vector<const fg::light*> m_collectedLights;
+    xr_vector<const fg::light*> m_culledLights;
+    xr_vector<ISpatial*> m_touchingLights;
+    xr_vector<ISpatial*> m_localCasters;
+    xr_vector<ISpatial*> m_rtCandidates;
+    u32 m_collectGeneration = 0;
+    u32 m_lightsFrustum = 0;
+    u32 m_lightsTouching = 0;
+    u32 m_lightsInvalidSector = 0;
+    u32 m_lightsLodCulled = 0;
+    u32 m_lightsHomCulled = 0;
+    u32 m_localShadowCasters = 0;
+    u32 m_rtRayAdmitted = 0;
+    u32 m_rtRayAdmittedSkinned = 0;
+    bool m_collectShadowOnly = false;
+    bool m_sceneCollected = false;
+    struct ShadowCasterRegion {
+        Fmatrix sunView;
+        Fvector2 minXY;
+        Fvector2 maxXY;
+        float minZ = 0.0f;
+        float maxZ = 0.0f;
+        Fvector worldCenter;
+        Fvector worldHalf;
+        bool valid = false;
+    };
+    ShadowCasterRegion m_shadowCasterRegion;
+    ShadowCasterRegion BuildShadowCasterRegion() const;
+    static bool ShadowCasterMayReachView(const ShadowCasterRegion& region, const Fsphere& bounds);
+
+    void SetupFrame();
+
+    struct FrameSetup;
+    void SetupFrameGraphPasses();
+    void SetupGeometryStage(FrameSetup& frame);
+    void SetupSurfaceStage(FrameSetup& frame);
+    void SetupLightingStage(FrameSetup& frame);
+    void SetupForwardStage(FrameSetup& frame);
+    void SetupPostStage(FrameSetup& frame);
+    void SetupInspectorStage(FrameSetup& frame);
+    void PrepareLightingMode(u32 width, u32 height);
+    bool RasterRayTracingFeaturesEnabled() const;
+
+    void CollectVisibleGeometry();
+
+    framegraph::VirtualResourceHandle CreateRT(
+        const char* name,
+        u32 width,
+        u32 height,
+        nvrhi::Format format,
+        bool isDepthStencil = false
+    );
+
+    bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isStatic = false);
+    bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
+    bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
+    void ProcessSingleParticleEffect(fg::PS::CParticleEffect* pEffect, const Fmatrix& worldTransform, IRenderable* renderable, bool isHUD);
+    void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
+
+    public:
+
+        void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform);
+};
+
+}
+
+namespace xray::render::fg
+{
+extern xray::render::FrameGraphRenderer RImplementation;
+}

@@ -2,21 +2,15 @@
 
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
+#include "ResourceManager/DDSLoader.h"
 
 #include "xrCore/Threading/ParallelForEach.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
-// eye-params
-float r__dtex_range = 50;
-class cl_dt_scaler : public R_constant_setup
-{
-public:
-    float scale;
+CTextureDescrMngr TextureDescr;
 
-    cl_dt_scaler(float s) : scale(s) {}
-    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
-};
+float r__dtex_range = 50;
 
 void fix_texture_thm_name(pstr fn)
 {
@@ -62,7 +56,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
             lock.Enter();
             texture_desc& desc = m_texture_details[item.first];
-            cl_dt_scaler*& dts = m_detail_scalers[item.first];
+            float& scale = m_detail_scalers[item.first];
             lock.Leave();
 
             if (desc.m_assoc)
@@ -76,10 +70,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             const int res = sscanf(item.second.c_str(), "%[^,],%f", T, &s);
             R_ASSERT4(res == 2, "Bad texture association", item.first.c_str(), fname);
             desc.m_assoc->detail_name = T;
-            if (dts)
-                dts->scale = s;
-            else
-                dts = xr_new<cl_dt_scaler>(s);
+            scale = s;
 
             if (strstr(item.second.c_str(), "usage[diffuse_or_bump]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail | texture_assoc::flBumpDetail);
@@ -171,7 +162,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
         {
             lock.Enter();
             texture_desc& desc = m_texture_details[fn];
-            cl_dt_scaler*& dts = m_detail_scalers[fn];
+            float& scale = m_detail_scalers[fn];
             lock.Leave();
 
             if (tp.detail_name.size() &&
@@ -182,10 +173,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
 
                 desc.m_assoc = xr_new<texture_assoc>();
                 desc.m_assoc->detail_name = tp.detail_name;
-                if (dts)
-                    dts->scale = tp.detail_scale;
-                else
-                    dts = xr_new<cl_dt_scaler>(tp.detail_scale);
+                scale = tp.detail_scale;
 
                 if (tp.flags.is(STextureParams::flDiffuseDetail))
                     desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
@@ -209,6 +197,12 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 desc.m_spec->m_bump_name = tp.bump_name;
                 desc.m_spec->m_use_steep_parallax = true;
             }
+
+            desc.m_spec->m_metallic_name = tp.metallic_name;
+            desc.m_spec->m_roughness_name = tp.roughness_name;
+            desc.m_spec->m_ao_name = tp.ao_name;
+            desc.m_spec->m_parallax_name = tp.parallax_name;
+            desc.m_spec->m_pbr_name = tp.pbr_name;
         }
     };
     if (!listTHM)
@@ -256,10 +250,6 @@ void CTextureDescrMngr::UnLoad()
 CTextureDescrMngr::~CTextureDescrMngr()
 {
     ZoneScoped;
-
-    for (auto& it : m_detail_scalers)
-        xr_delete(it.second);
-
     m_detail_scalers.clear();
 }
 
@@ -273,6 +263,102 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
             return I->second.m_spec->m_bump_name;
         }
     }
+    return "";
+}
+
+static bool TextureFileExists(const char* tex_name)
+{
+    return xray::render::resources::DDSLoader::TextureExists(tex_name);
+}
+
+shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_metallic_name.size())
+        {
+            return I->second.m_spec->m_metallic_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_metallic");
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetRoughnessName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_roughness_name.size())
+        {
+            return I->second.m_spec->m_roughness_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_roughness");
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetAOName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_ao_name.size())
+        {
+            return I->second.m_spec->m_ao_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_ao");
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_parallax_name.size())
+        {
+            return I->second.m_spec->m_parallax_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_parallax");
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetPBRName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_pbr_name.size())
+        {
+            return I->second.m_spec->m_pbr_name;
+        }
+    }
+
+    xr_string base = tex_name.c_str();
+    if (base.size() > 2 && base.substr(base.size() - 2) == "_d")
+        base = base.substr(0, base.size() - 2);
+
+    string256 nm;
+    strconcat(sizeof(nm), nm, base.c_str(), "_pbr");
+    if (TextureFileExists(nm))
+        return nm;
+
     return "";
 }
 
@@ -316,7 +402,7 @@ void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, bool& bDiffu
     }
 }
 
-BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const
+BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
     if (I != m_texture_details.end())
@@ -325,11 +411,18 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
         {
             texture_assoc* TA = I->second.m_assoc;
             res = TA->detail_name.c_str();
-            map_CS::const_iterator It2 = m_detail_scalers.find(tex_name);
-            CS = It2 == m_detail_scalers.end() ? 0 : It2->second;
             return TRUE;
         }
     }
     return FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+
+float CTextureDescrMngr::GetDetailScale(const shared_str& tex_name) const
+{
+    auto it = m_detail_scalers.find(tex_name);
+    if (it != m_detail_scalers.end())
+        return it->second;
+    return 1.0f;
+}
+
+}

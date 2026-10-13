@@ -7,8 +7,12 @@
 
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
+#include "xrEngine/xr_object.h"
+#include "Layers/xrRender/Materials/ShaderInfo.h"
 
-namespace xray::render::RENDER_NAMESPACE
+#include <atomic>
+
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -21,15 +25,26 @@ IRender_Mesh::~IRender_Mesh()
     _RELEASE(p_rm_Indices);
 }
 
+u64 dxRender_Visual::AllocateLifetimeID()
+{
+    static std::atomic<u64> s_counter{1};
+    return s_counter.fetch_add(1, std::memory_order_relaxed);
+}
+
 dxRender_Visual::dxRender_Visual()
 {
     Type = 0;
-    shader = nullptr;
+    lifetimeID = AllocateLifetimeID();
     vis.clear();
 }
 
 dxRender_Visual::~dxRender_Visual() {}
 void dxRender_Visual::Release() {}
+
+void dxRender_Visual::Spawn()
+{
+    lifetimeID = AllocateLifetimeID();
+}
 // CStatTimer						tscreate;
 
 void dxRender_Visual::Load(const char* N, IReader* data, u32)
@@ -45,8 +60,6 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     {
         R_ASSERT2(hdr.format_version == xrOGF_FormatVersion, "Invalid visual version");
         Type = hdr.type;
-        if (hdr.shader_id)
-            shader = RImplementation.getShader(hdr.shader_id);
         vis.box.set(hdr.bb.min, hdr.bb.max);
         vis.sphere.set(hdr.bs.c, hdr.bs.r);
     }
@@ -55,13 +68,20 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         FATAL("Invalid visual");
     }
 
-    // Shader
     if (data->find_chunk(OGF_TEXTURE))
     {
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
-        shader.create(fnS, fnT);
+        xr_strlwr(fnT);
+        xr_strlwr(fnS);
+
+        shaderName = fnS;
+        textureName = fnT;
+    }
+    else if (hdr.shader_id)
+    {
+        xray::render::shader_info::GetCompiledShaderNames(hdr.shader_id, shaderName, textureName, lightmapName);
     }
 
 // desc
@@ -75,8 +95,16 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
 void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 {
     PCOPY(Type);
-    PCOPY(shader);
+    PCOPY(shaderName);
+    PCOPY(textureName);
+    PCOPY(lightmapName);
     PCOPY(vis);
+
+    static u32 copyCount = 0;
+    if (++copyCount <= 5) {
+        Msg("* [Visual::Copy] from=%p to=%p tex='%s' shader='%s'",
+            pFrom, this, pFrom->textureName.c_str(), pFrom->shaderName.c_str());
+    }
 #ifdef _EDITOR
     PCOPY(desc);
 #endif
@@ -84,4 +112,4 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
     PCOPY(dbg_name);
 #endif
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

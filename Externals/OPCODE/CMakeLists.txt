@@ -94,7 +94,8 @@ target_precompile_headers(xrOPCODE
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrOPCODE LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrOPCODE
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

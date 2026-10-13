@@ -2,15 +2,7 @@
 
 #include "Include/xrRender/DrawUtils.h"
 
-#ifdef _EDITOR
-#define DU_DRAW_DIP EDevice.DIP
-#define DU_DRAW_DP EDevice.DP
-#else
-#define DU_DRAW_DIP RCache.dbg_DIP
-#define DU_DRAW_DP RCache.dbg_DP
-#endif
-
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 struct SPrimitiveBuffer
 {
@@ -19,15 +11,13 @@ struct SPrimitiveBuffer
     ref_geom pGeom{};
     u32 v_cnt;
     u32 i_cnt;
-    D3DPRIMITIVETYPE p_type;
+    nvrhi::PrimitiveType p_type;
     u32 p_cnt;
     typedef fastdelegate::FastDelegate0<> TOnRender;
     TOnRender OnRender;
-    void RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
-    void RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 
     void CreateFromData(
-        D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);
+        nvrhi::PrimitiveType _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = nullptr, u32 _i_cnt = 0);
     void Destroy();
     void Render() { OnRender(); }
 };
@@ -89,7 +79,6 @@ public:
     {
         DrawCross(p, sz, sz, sz, sz, sz, sz, clr, bRot45);
     }
-    virtual void DrawEntity(u32 clr, ref_shader s);
     virtual void DrawFlag(
         const Fvector& p, float heading, float height, float sz, float sz_fl, u32 clr, BOOL bDrawEntity);
     virtual void DrawRomboid(const Fvector& p, float radius, u32 clr);
@@ -183,11 +172,11 @@ public:
     virtual void DrawIndexedPrimitive(int prim_type, u32 pc, const Fvector& pos, const Fvector* vb,
         const u32& vb_size, const u32* ib, const u32& ib_size, const u32& clr_argb, float scale = 1.0f){};
     virtual void DrawPrimitiveL(
-        D3DPRIMITIVETYPE pt, u32 pc, Fvector* vertices, int vc, u32 color, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, Fvector* vertices, int vc, u32 color, BOOL bCull, BOOL bCycle);
     virtual void DrawPrimitiveTL(
-        D3DPRIMITIVETYPE pt, u32 pc, FVF::TL* vertices, int vc, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, FVF::TL* vertices, int vc, BOOL bCull, BOOL bCycle);
     virtual void DrawPrimitiveLIT(
-        D3DPRIMITIVETYPE pt, u32 pc, FVF::LIT* vertices, int vc, BOOL bCull, BOOL bCycle);
+        nvrhi::PrimitiveType pt, u32 pc, FVF::LIT* vertices, int vc, BOOL bCull, BOOL bCycle);
 
     virtual void OutText(
         const Fvector& pos, LPCSTR text, u32 color = 0xFF000000, u32 shadow_color = 0xFF909090);
@@ -196,4 +185,4 @@ public:
 };
 extern ECORE_API CDrawUtilities DUImpl;
 //----------------------------------------------------
-} // namespace xray::render::RENDER_NAMESPACE
+}

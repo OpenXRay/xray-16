@@ -9,8 +9,11 @@
 #include "ParticleGroup.h"
 #include "PSLibrary.h"
 #include "ParticleEffect.h"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 using namespace PS;
 
@@ -182,20 +185,28 @@ void CPGDef::Save2(CInifile& ini)
 void CParticleGroup::SItem::Set(dxRender_Visual* e) { _effect = e; }
 void CParticleGroup::SItem::Clear()
 {
+#ifdef _EDITOR
     VisualVec visuals;
     GetVisuals(visuals);
     for (auto& visual : visuals)
-        RImplementation.model_Delete((IRenderVisual*&)visual, false);
+        g_pModelPool->Delete(visual, FALSE);
 
     //	Igor: zero all pointers! Previous code didn't zero _source_ pointers,
     //	just temporary ones.
     _effect = nullptr;
     _children_related.clear();
     _children_free.clear();
+#else
+    if (_effect)
+        g_pModelPool->Delete(_effect, FALSE);
+#endif
 }
+#ifdef _EDITOR
 void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR eff_name, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(eff_name));
+    PS::CPEDef* SE = RImplementation.m_PSLibrary.FindPED(eff_name);
+    R_ASSERT3(SE, "Particle effect doesn't exist", eff_name);
+    CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE));
 
     C->SetHudMode(emitter->GetHudMode());
 
@@ -227,7 +238,9 @@ void CParticleGroup::SItem::StopRelatedChild(u32 idx)
 }
 void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, PAPI::Particle& m)
 {
-    CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(nm));
+    PS::CPEDef* SE2 = RImplementation.m_PSLibrary.FindPED(nm);
+    R_ASSERT3(SE2, "Particle effect doesn't exist", nm);
+    CParticleEffect* C = static_cast<CParticleEffect*>(g_pModelPool->CreatePE(SE2));
     C->SetHudMode(emitter->GetHudMode());
     if (!C->IsLooped())
     {
@@ -257,6 +270,7 @@ void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, 
 #endif
     }
 }
+#endif
 void CParticleGroup::SItem::Play()
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
@@ -270,6 +284,7 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     if (E)
         E->Stop(def_stop);
 
+#ifdef _EDITOR
     for (auto& p : _children_related)
         static_cast<CParticleEffect*>(p)->Stop(def_stop);
     for (auto& p : _children_free)
@@ -279,14 +294,15 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     if (!def_stop)
     {
         for (auto& child : _children_related)
-            RImplementation.model_Delete((IRenderVisual*&)child, false);
+            g_pModelPool->Delete(child, FALSE);
 
         for (auto& child : _children_free)
-            RImplementation.model_Delete((IRenderVisual*&)child, false);
+            g_pModelPool->Delete(child, FALSE);
 
         _children_related.clear();
         _children_free.clear();
     }
+#endif
 }
 bool CParticleGroup::SItem::IsPlaying() const
 {
@@ -303,6 +319,7 @@ void CParticleGroup::SItem::UpdateParent(const Fmatrix& m, const Fvector& veloci
 
 //------------------------------------------------------------------------------
 
+#ifdef _EDITOR
 void OnGroupParticleBirth(void* owner, u32 param, PAPI::Particle& m, u32 idx)
 {
     CParticleGroup* PG = static_cast<CParticleGroup*>(owner);
@@ -422,7 +439,7 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
             else
             {
                 rem_cnt++;
-                RImplementation.model_Delete((IRenderVisual*&)child, false);
+                g_pModelPool->Delete(child, FALSE);
             }
         }
         // remove if stopped
@@ -460,6 +477,38 @@ u32 CParticleGroup::SItem::ParticlesCount()
         p_count += static_cast<CParticleEffect*>(visual)->ParticlesCount();
     return p_count;
 }
+#else
+void CParticleGroup::SItem::OnFrame(u32 u_dt, Fbox& box, bool& bPlaying)
+{
+    auto* effect = static_cast<CParticleEffect*>(_effect);
+    if (!effect)
+        return;
+    effect->OnFrame(u_dt);
+    if (effect->IsPlaying())
+    {
+        bPlaying = true;
+        if (effect->vis.box.is_valid())
+            box.merge(effect->vis.box);
+    }
+}
+
+void CParticleGroup::SItem::OnDeviceCreate()
+{
+    if (_effect)
+        static_cast<CParticleEffect*>(_effect)->OnDeviceCreate();
+}
+
+void CParticleGroup::SItem::OnDeviceDestroy()
+{
+    if (_effect)
+        static_cast<CParticleEffect*>(_effect)->OnDeviceDestroy();
+}
+
+u32 CParticleGroup::SItem::ParticlesCount()
+{
+    return _effect ? static_cast<CParticleEffect*>(_effect)->ParticlesCount() : 0;
+}
+#endif
 
 //------------------------------------------------------------------------------
 // Particle Group part
@@ -512,7 +561,11 @@ void CParticleGroup::OnFrame(u32 u_dt)
         Fbox box;
         box.invalidate();
         for (auto i_it = items.begin(); i_it != items.end(); ++i_it)
+#ifdef _EDITOR
             i_it->OnFrame(u_dt, *m_Def->m_Effects[i_it - items.begin()], box, bPlaying);
+#else
+            i_it->OnFrame(u_dt, box, bPlaying);
+#endif
 
         if (m_RT_Flags.is(flRT_DefferedStop) && !bPlaying)
         {
@@ -535,12 +588,15 @@ void CParticleGroup::OnFrame(u32 u_dt)
 void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
     ScopeLock lock{ &render_lock };
-    m_InitialPosition = m.c;
+    if (bXFORM)
+        m_InitialPosition.set(0.f, 0.f, 0.f);
+    else
+        m_InitialPosition = m.c;
     for (auto& item : items)
         item.UpdateParent(m, velocity, bXFORM);
 }
 
-BOOL CParticleGroup::Compile(CPGDef* def)
+BOOL CParticleGroup::Compile(CPGDef* def, CPSLibrary& library)
 {
     m_Def = def;
 
@@ -555,8 +611,16 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); ++e_it)
         {
-            CParticleEffect* eff = (CParticleEffect*)RImplementation.model_CreatePE((*e_it)->m_EffectName.c_str());
+            PS::CPEDef* SE3 = library.FindPED((*e_it)->m_EffectName.c_str());
+            R_ASSERT3(SE3, "Particle effect doesn't exist", (*e_it)->m_EffectName.c_str());
+            CParticleEffect* eff = (CParticleEffect*)g_pModelPool->CreatePE(SE3);
+#ifdef _EDITOR
             eff->SetBirthDeadCB(OnGroupParticleBirth, OnGroupParticleDead, this, u32(e_it - m_Def->m_Effects.begin()));
+#else
+            const auto& effect = **e_it;
+            eff->ConfigureChildren(effect.m_OnBirthChildName.c_str(), effect.m_OnPlayChildName.c_str(),
+                effect.m_OnDeadChildName.c_str(), effect.m_Flags.get(), library);
+#endif
             items[e_it - def->m_Effects.begin()].Set(eff);
         }
     }
@@ -579,7 +643,7 @@ void CParticleGroup::Stop(BOOL bDefferedStop)
     }
     else
     {
-        m_RT_Flags.set(flRT_Playing, FALSE);
+        m_RT_Flags.set(flRT_Playing | flRT_DefferedStop, FALSE);
     }
     for (auto& item : items)
         item.Stop(bDefferedStop);
@@ -626,4 +690,4 @@ BOOL CParticleGroup::GetHudMode()
     }
     return false;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

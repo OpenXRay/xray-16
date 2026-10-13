@@ -2,7 +2,7 @@
 
 #define CAP_VERSION(a, b) (u32(a) * 10 + u32(b))
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CHWCaps
 {
@@ -44,9 +44,6 @@ public:
 
     u32 iGPUNum;
 
-    // device format
-    D3DFORMAT fTarget;
-    D3DFORMAT fDepth;
     u32 dwRefreshRate;
 
     // caps itself
@@ -67,8 +64,6 @@ public:
     BOOL bScissor; // scissor rect supported
     BOOL bTableFog; //
 
-    // some precalculated values
-    D3DSTENCILOP soDec, soInc; // best stencil OPs for shadows
     u32 dwMaxStencilValue; // maximum value the stencil buffer can hold
 
     bool hasFixedPipeline{};     // device has support for fixed pipeline
@@ -77,4 +72,4 @@ public:
 public:
     void Update(void);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

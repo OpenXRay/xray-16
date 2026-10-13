@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 #elif defined(XR_PLATFORM_POSIX)
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #if defined(XR_PLATFORM_ANDROID)
 #include <dirent.h>
 #else
@@ -486,7 +486,7 @@ void CLocatorAPI::archive::open()
     modif = file_info.st_mtime;
 #elif defined(XR_PLATFORM_POSIX)
     // Open the file
-    if (hSrcFile)
+    if (is_open())
         return;
 
     pstr conv_path = xr_strdup(path.c_str());
@@ -1147,16 +1147,19 @@ const CLocatorAPI::file* CLocatorAPI::GetFileDesc(pcstr path)
 
 FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
 {
-    if ((fsType | FSType::Virtual) == FSType::Virtual)
+    if ((fsType & FSType::Virtual) != FSType{})
     {
         auto it = file_find_it(fn);
         if (it != m_files.end())
             return FileStatus(true, false);
     }
-    if ((fsType | FSType::External) == FSType::External)
+    if ((fsType & FSType::External) != FSType{})
     {
+        string_path conv_fn;
+        xr_strcpy(conv_fn, fn);
+        convert_path_separators(conv_fn);
         struct stat buffer;
-        return FileStatus(stat(fn, &buffer) == 0, true);
+        return FileStatus(stat(conv_fn, &buffer) == 0, true);
     }
     return FileStatus(false, false);
 }

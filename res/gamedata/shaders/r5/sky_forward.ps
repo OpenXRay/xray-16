@@ -1,0 +1,26 @@
+#include "shared/common.h"
+#include "common_samplers.h"
+#include "shared/color_space.h"
+
+struct PS_INPUT {
+    float4 hpos     : SV_POSITION;
+    float4 color    : COLOR0;
+    float3 tc0      : TEXCOORD0;
+    float3 tc1      : TEXCOORD1;
+};
+
+TextureCube s_sky0 : register(t0);
+TextureCube s_sky1 : register(t1);
+
+
+float4 main(PS_INPUT I) : SV_TARGET {
+    float3 sky0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
+    float3 sky1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
+
+    float blendFactor = I.color.a;
+    float3 sky = lerp(sky0, sky1, blendFactor);
+
+    sky *= SrgbToLinear(I.color.rgb);
+
+    return float4(sky, 1.0f);
+}

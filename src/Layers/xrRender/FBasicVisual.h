@@ -8,7 +8,7 @@
 
 class IParticleCustom;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // The class itself
 class CKinematicsAnimated;
@@ -31,6 +31,10 @@ struct IRender_Mesh
     u32 iCount;
     u32 dwPrimitives;
 
+    u32 vbPoolID{UINT32_MAX};
+    u32 ibPoolID{UINT32_MAX};
+    bool useAlternativeGeom{false};
+
     IRender_Mesh()
     {
         p_rm_Vertices   = nullptr;
@@ -41,6 +45,9 @@ struct IRender_Mesh
         iCount          = 0;
         dwPrimitives    = 0;
         rm_geom         = nullptr;
+        vbPoolID        = UINT32_MAX;
+        ibPoolID        = UINT32_MAX;
+        useAlternativeGeom = false;
     }
     virtual ~IRender_Mesh();
 
@@ -64,13 +71,24 @@ public:
     // Common data for rendering
     u32 Type; // visual's type
     vis_data vis; // visibility-data
-    ref_shader shader; // pipe state, shared
 
-    virtual void Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo) {} // LOD - Level Of Detail  [0..1], Ignored
+    shared_str shaderName;
+    shared_str textureName;
+    shared_str lightmapName;
+
+    u32 shader_id{UINT32_MAX};
+
+    u32 bindless_material_id{UINT32_MAX};
+    u32 bindless_material_epoch{0};
+
+    u64 lifetimeID{0};
+
+    static u64 AllocateLifetimeID();
+
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Release(); // Shared memory release
     virtual void Copy(dxRender_Visual* from);
-    virtual void Spawn(){};
+    virtual void Spawn();
     virtual void Depart(){};
 
     //	virtual	CKinematics*		dcast_PKinematics			()				{ return 0;	}
@@ -82,4 +100,4 @@ public:
     dxRender_Visual();
     virtual ~dxRender_Visual();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

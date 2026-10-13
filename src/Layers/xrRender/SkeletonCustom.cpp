@@ -6,6 +6,9 @@
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Intersect.hpp"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/ModelPool.h"
+#include "Layers/xrRender/FGDebugDraw.h"
 
 #ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h"
@@ -13,7 +16,7 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
@@ -63,10 +66,6 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
-#ifndef USE_DX9 // when we don't have FFP support
-    RCache.set_Shader(RImplementation.m_WireShader);
-#endif
-
     CalculateBones();
 
     CBoneData::BoneDebug dbgLines;
@@ -86,12 +85,12 @@ void CKinematics::DebugRender(Fmatrix& XFORM)
         Fvector P1, P2;
         M1.transform_tiny(P1, Z);
         M2.transform_tiny(P2, Z);
-        RCache.dbg_DrawLINE(XFORM, P1, P2, color_xrgb(0, 255, 0));
+        g_debug_draw.DrawLine(XFORM, P1, P2, color_xrgb(0, 255, 0));
 
         Fmatrix M;
         M.mul_43(XFORM, M2);
-        RCache.dbg_DrawOBB(M, H1, color_xrgb(255, 255, 255));
-        RCache.dbg_DrawOBB(M, H2, color_xrgb(255, 255, 255));
+        g_debug_draw.DrawOBB(M, H1, color_xrgb(255, 255, 255));
+        g_debug_draw.DrawOBB(M, H2, color_xrgb(255, 255, 255));
     }
 
     for (u32 b = 0; b < bones->size(); b++)
@@ -104,7 +103,7 @@ void CKinematics::DebugRender(Fmatrix& XFORM)
         X.mul(Mbone, Mbox);
         Fmatrix W;
         W.mul(XFORM, X);
-        RCache.dbg_DrawOBB(W, obb.m_halfsize, color_xrgb(0, 0, 255));
+        g_debug_draw.DrawOBB(W, obb.m_halfsize, color_xrgb(0, 0, 255));
     }
 }
 #endif
@@ -185,7 +184,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             string_path lod_name;
             LD->r_string(lod_name, sizeof(lod_name));
             //.         strconcat       (sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod = (dxRender_Visual*)RImplementation.model_CreateChild(lod_name, nullptr);
+            m_lod = g_pModelPool->CreateChild(lod_name, nullptr);
 
             if (CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod))
             {
@@ -195,11 +194,6 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY3(m_lod, "Cant create LOD model for", N);
             //VERIFY2(m_lod->Type==MT_HIERRARHY || m_lod->Type==MT_PROGRESSIVE ||
             //    m_lod->Type==MT_NORMAL,lod_name.c_str());
-            /*
-                strconcat(name_load, short_name, ":lod:1");
-                m_lod = RImplementation.model_CreateChild(name_load, LD);
-                VERIFY(m_lod->Type==MT_SKELETON_GEOMDEF_PM || m_lod->Type==MT_SKELETON_GEOMDEF_ST);
-            */
         }
         LD->close();
     }
@@ -341,7 +335,21 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
     // reset update frame
     wm_frame = u32(-1);
 
+    BuildTopologicalOrder();
+
     LL_Validate();
+}
+
+void CKinematics::BuildTopologicalOrder()
+{
+    m_bones_topo.clear();
+    m_bones_topo.reserve(bones->size());
+    m_bones_topo.push_back(iRoot);
+    for (u32 i = 0; i < m_bones_topo.size(); i++)
+    {
+        for (CBoneData* child : (*bones)[m_bones_topo[i]]->children)
+            m_bones_topo.push_back(child->GetSelfID());
+    }
 }
 
 IC void iBuildGroups(CBoneData* B, xr_vector<u16>& tgt, u16 id, u16& last_id)
@@ -421,13 +429,14 @@ void CKinematics::Copy(dxRender_Visual* P)
     visimask = pFrom->visimask;
 
     IBoneInstances_Create();
+    BuildTopologicalOrder();
 
     for (u32 i = 0; i < children.size(); i++)
         LL_GetChild(i)->SetParent(this);
 
     CalculateBones_Invalidate();
 
-    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)RImplementation.model_Duplicate(pFrom->m_lod) : 0;
+    m_lod = (pFrom->m_lod) ? g_pModelPool->Instance_Duplicate(pFrom->m_lod) : nullptr;
 }
 
 void CKinematics::CalculateBones_Invalidate()
@@ -633,7 +642,7 @@ bool CKinematics::PickBone(const Fmatrix& parent_xform, IKinematics::pick_result
 }
 
 void CKinematics::AddWallmark(
-    const Fmatrix* parent_xform, const Fvector3& start, const Fvector3& dir, ref_shader shader, float size)
+    const Fmatrix* parent_xform, const Fvector3& start, const Fvector3& dir, float size)
 {
     ZoneScoped;
 
@@ -700,7 +709,7 @@ void CKinematics::AddWallmark(
     for (u32 wm_idx = 0; wm_idx < wallmarks.size(); wm_idx++)
     {
         intrusive_ptr<CSkeletonWallmark>& wm = wallmarks[wm_idx];
-        if (wm->Similar(shader, cp, 0.02f))
+        if (wm->Similar(cp, 0.02f))
         {
             if (wm_idx < wallmarks.size() - 1)
                 wm = wallmarks.back();
@@ -710,7 +719,7 @@ void CKinematics::AddWallmark(
     }
 
     // ok. allocate wallmark
-    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, shader, cp, Device.fTimeGlobal);
+    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, cp, Device.fTimeGlobal);
     wm->m_LocalBounds.set(cp, size * 2.f);
     wm->XFORM()->transform_tiny(wm->m_Bounds.P, cp);
     wm->m_Bounds.R = wm->m_LocalBounds.R;
@@ -750,9 +759,7 @@ void CKinematics::CalculateWallmarks(bool hud)
             float w = (Device.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
             if (w < 1.f)
             {
-                // append wm to WallmarkEngine
-                if (!hud && RImplementation.ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
-                    RImplementation.add_SkeletonWallmark(wm);
+                (void)hud;
             }
             else
             {
@@ -893,4 +900,4 @@ CSkeletonWallmark::~CSkeletonWallmark()
     }
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

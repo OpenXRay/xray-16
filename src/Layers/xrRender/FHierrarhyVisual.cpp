@@ -7,11 +7,13 @@
 
 #include "FHierrarhyVisual.h"
 #include "xrCore/FMesh.hpp"
+#include "Layers/xrRender/r__buffer_pool.h"
+#include "Layers/xrRender/ModelPool.h"
 #ifdef _EDITOR
 #include "Include/xrAPI/xrAPI.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -20,10 +22,10 @@ namespace xray::render::RENDER_NAMESPACE
 FHierrarhyVisual::FHierrarhyVisual() : dxRender_Visual() { bDontDelete = FALSE; }
 FHierrarhyVisual::~FHierrarhyVisual()
 {
-    if (!bDontDelete)
+    if (!bDontDelete && g_pModelPool)
     {
         for (auto& child : children)
-            RImplementation.model_Delete((IRenderVisual*&)child, false);
+            g_pModelPool->Delete(child, FALSE);
     }
     children.clear();
 }
@@ -51,7 +53,7 @@ void FHierrarhyVisual::Load(const char* N, IReader* data, u32 dwFlags)
             THROW;
 #else
             u32 ID = data->r_u32();
-            children[i] = (dxRender_Visual*)RImplementation.getVisual(ID);
+            children[i] = BufferPool.getVisual(ID);
 #endif
         }
         bDontDelete = TRUE;
@@ -67,12 +69,9 @@ void FHierrarhyVisual::Load(const char* N, IReader* data, u32 dwFlags)
                 IReader* O = OBJ->open_chunk(0);
                 for (int count = 1; O; count++)
                 {
-                    string_path name_load, short_name, num;
-                    xr_strcpy(short_name, N);
-                    if (strext(short_name))
-                        *strext(short_name) = 0;
-                    strconcat(sizeof(name_load), name_load, short_name, ":", xr_itoa(count, num, 10));
-                    children.push_back((dxRender_Visual*)RImplementation.model_CreateChild(name_load, O));
+                    string_path name_load, num;
+                    strconcat(sizeof(name_load), name_load, N, ":", xr_itoa(count, num, 10));
+                    children.push_back(g_pModelPool->CreateChild(name_load, O));
                     O->close();
                     O = OBJ->open_chunk(count);
                 }
@@ -97,9 +96,9 @@ void FHierrarhyVisual::Copy(dxRender_Visual* pSrc)
     children.reserve(pFrom->children.size());
     for (u32 i = 0; i < pFrom->children.size(); i++)
     {
-        dxRender_Visual* p = (dxRender_Visual*)RImplementation.model_Duplicate(pFrom->children[i]);
+        dxRender_Visual* p = g_pModelPool->Instance_Duplicate(pFrom->children[i]);
         children.push_back(p);
     }
     bDontDelete = FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

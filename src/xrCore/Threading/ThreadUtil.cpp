@@ -75,9 +75,6 @@ void SetThreadNameImpl(pcstr name)
 void SetCurrentThreadName(cpcstr name)
 {
     SetThreadNameImpl(name);
-#ifdef TRACY_ENABLE
-    tracy::SetThreadName(name);
-#endif
 }
 
 priority_level GetCurrentThreadPriorityLevel()
@@ -148,9 +145,6 @@ void SetCurrentThreadName(cpcstr name)
     {
         Msg("SetCurrentThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
     }
-#ifdef TRACY_ENABLE
-    tracy::SetThreadName(name);
-#endif
 }
 
 priority_level GetCurrentThreadPriorityLevel()

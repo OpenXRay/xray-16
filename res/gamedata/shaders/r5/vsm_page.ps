@@ -1,0 +1,16 @@
+#define SM_6_0
+#include "common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+#ifdef TARGET_DXIL
+    float4 clip : SV_ClipDistance;
+#endif
+    float2 texcoord : TEXCOORD0;
+    nointerpolation uint materialID : TEXCOORD1;
+};
+
+void main(PS_INPUT input)
+{
+}

@@ -1,8 +1,8 @@
+#include "stdafx.h"
 #include "NET_Server.h"
 #include "NET_Common.h"
 #include "NET_Log.h"
 #include "NET_Messages.h"
-#include "stdafx.h" // XXX: why PCH is not on the top of the file???
 #include "xrCore/buffer_vector.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
@@ -562,7 +562,7 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, pcstr reason)
     return true;
 }
 
-bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, u32* pPort)
+bool IPureServer::GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort)
 {
     return true;
 }

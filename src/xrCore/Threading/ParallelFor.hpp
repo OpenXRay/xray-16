@@ -132,29 +132,19 @@ template <typename Range, typename Function>
 class ParallelFor
 {
 public:
-    static decltype(auto) Run(const Range& range, bool wait, const Function& function)
+    static TaskHandle Run(const Range& range, bool wait, const Function& function)
     {
-        auto& task = TaskManager::AddTask(Functor{ range, function });
+        auto task = TaskManager::AddTask(Functor{ range, function });
         if (wait)
-        {
-            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
-                "You should explicitly state that you know this by setting 'wait' param to false.");
-            if (TaskScheduler)
-                TaskScheduler->Wait(task);
-        }
+            TaskScheduler->Wait(task);
         return task;
     }
 
-    static decltype(auto) Run(Task& parent, const Range& range, bool wait, const Function& function)
+    static TaskHandle Run(Task& parent, const Range& range, bool wait, const Function& function)
     {
-        auto& task = TaskManager::AddTask(parent, Functor{ range, function });
+        auto task = TaskManager::AddTask(parent, Functor{ range, function });
         if (wait)
-        {
-            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
-                "You should explicitly state that you know this by setting 'wait' param to false.");
-            if (TaskScheduler)
-                TaskScheduler->Wait(task);
-        }
+            TaskScheduler->Wait(task);
         return task;
     }
 

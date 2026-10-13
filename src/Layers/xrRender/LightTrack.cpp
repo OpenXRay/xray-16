@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "LightTrack.h"
+#include "Layers/xrRender/light.h"
+#include "Layers/xrRender/Light_DB.h"
 #include "Include/xrRender/RenderVisual.h"
 #include "xrEngine/xr_object.h"
 
@@ -15,7 +17,7 @@
 #include "xrEngine/Environment.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -368,7 +370,7 @@ void CROS_impl::update_smooth(IRenderable* O)
 
 void CROS_impl::calc_sun_value(Fvector& position, IGameObject* _object)
 {
-    light* sun = (light*)RImplementation.Lights.sun._get();
+    light* sun = (light*)Lights.sun._get();
 
     if (MODE & IRender_ObjectSpecific::TRACE_SUN)
     {
@@ -531,7 +533,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         }
 
 #if RENDER == R_R1
-        light* sun = (light*)RImplementation.Lights.sun._get();
+        light* sun = (light*)Lights.sun._get();
 
         // Sun
         float E = sun_smooth * sun->color.intensity();
@@ -552,4 +554,4 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         });
     }
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

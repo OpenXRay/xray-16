@@ -19,7 +19,43 @@ xr_vector<xr_token> VidQualityToken;
 extern xr_vector<xr_token> vid_monitor_token;
 extern xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
-const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
+ENGINE_API int dm_debug_trails = 0;
+ENGINE_API int g_debug_utils = 0;
+ENGINE_API bool renderer_allow_override = false;
+ENGINE_API int ps_r4_use_pbr = 0;
+ENGINE_API int ps_fg_pbr_diffuse_mode = 0;
+ENGINE_API int ps_r_path_tracer_bounces = 8;
+ENGINE_API int ps_r_path_tracer_debug = 0;
+ENGINE_API int ps_r_path_tracer_freeze = 0;
+ENGINE_API int ps_r_path_tracer_samples = 0;
+ENGINE_API int ps_r_rt_max_null_events = 256;
+ENGINE_API int ps_r_rt_light_rays = 1;
+ENGINE_API float ps_r_rt_sun_radius = 0.0f;
+ENGINE_API int ps_r_rt_gi = 0;
+ENGINE_API int ps_r_rt_gi_reconstruct = 2;
+ENGINE_API int ps_r_rt_gi_history = 32;
+ENGINE_API int ps_r_rt_gi_filter_passes = 5;
+ENGINE_API int ps_r_rt_gi_restir = 1;
+ENGINE_API float ps_r_rt_gi_intensity = 1.0f;
+ENGINE_API int ps_r_rt_gi_bounces = 2;
+ENGINE_API int ps_r_rt_gi_samples = 1;
+ENGINE_API float ps_r_rt_gi_ray_distance = 10000.0f;
+ENGINE_API float ps_r_rt_scene_radius = 128.0f;
+ENGINE_API float ps_r_rt_grass_radius = 24.0f;
+ENGINE_API int ps_r_rt_world_cache = 0;
+ENGINE_API int ps_r_rt_world_cache_bounce = 1;
+ENGINE_API int ps_r_rt_world_cache_debug = 0;
+ENGINE_API int ps_r_rt_world_cache_size = 18;
+ENGINE_API int ps_r_rt_world_cache_lifetime = 30;
+ENGINE_API int ps_r_rt_world_cache_updates = 32768;
+ENGINE_API int ps_r_rt_world_cache_history = 32;
+ENGINE_API float ps_r_rt_world_cache_cell = 0.25f;
+ENGINE_API float ps_r_rt_world_cache_lod = 8.0f;
+ENGINE_API Fvector4 ps_dev_param_1 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_2 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_3 = {0, 0, 0, 0};
+ENGINE_API Fvector4 ps_dev_param_4 = {0, 0, 0, 0};
+extern int ps_disable_lens_flare;
 
 void IConsole_Command::InvalidSyntax()
 {
@@ -363,18 +399,14 @@ public:
 
     void Execute(pcstr args) override
     {
-        u32 w, h, r = 0;
+        u32 w = 0, h = 0, r = 0;
         const int cnt = sscanf(args, "%ux%u (%uHz)", &w, &h, &r);
         if (cnt >= 2)
         {
             psDeviceMode.Width = w;
             psDeviceMode.Height = h;
-
             if (cnt == 3)
-            {
                 psDeviceMode.RefreshRate = r;
-                m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
-            }
         }
         else
         {
@@ -389,61 +421,37 @@ public:
 
     void GetStatus(TStatus& S) override
     {
-        xr_sprintf(S, "%ux%u (%uHz)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
+        xr_sprintf(S, "%ux%u", psDeviceMode.Width, psDeviceMode.Height);
     }
 
     void Info(TInfo& I) override
     {
-        xr_strcpy(I, sizeof(I), "change screen resolution WxH (RHz)");
+        xr_strcpy(I, sizeof(I), "change screen resolution WxH");
     }
 
-    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    void fill_tips(vecTips& tips, u32) override
     {
         TStatus buf;
-        xr_sprintf(buf, "%ux%u (%dHz) (current)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
+        xr_sprintf(buf, "%ux%u (current)", psDeviceMode.Width, psDeviceMode.Height);
         tips.push_back(buf);
 
         const xr_token* tok = GetToken();
-        while (tok->name)
+        while (tok && tok->name)
         {
             tips.push_back(tok->name);
             tok++;
         }
     }
-
-private:
-    enum { fl_Refresh60hz = 1u << 0u };
-    inline static Flags32 m_Refresh60hz; // for rs_refresh_60hz backwards compatibility
-
-public:
-    class CCC_Refresh60hz final : public CCC_Mask
-    {
-    public:
-        CCC_Refresh60hz(pcstr name) : CCC_Mask(name, &m_Refresh60hz, fl_Refresh60hz)
-        {
-            m_Refresh60hz.set(fl_Refresh60hz, psDeviceMode.RefreshRate == 60);
-        }
-
-        void Execute(pcstr args) override
-        {
-            CCC_Mask::Execute(args);
-            if (GetValue())
-                psDeviceMode.RefreshRate = 60;
-            else
-                psDeviceMode.RefreshRate = 0; // Device will adjust
-        }
-    };
 };
-using CCC_Refresh60hz = CCC_VidMode::CCC_Refresh60hz;
+
 //-----------------------------------------------------------------------
 class CCC_VidWindowMode final : public CCC_Token
 {
     inline static xr_token vid_window_mode_token[] =
     {
         { "st_opt_windowed",                rsWindowed             },
-        { "st_opt_windowed_borderless",     rsWindowedBorderless   },
+        { "st_opt_borderless",              rsFullscreenBorderless },
         { "st_opt_fullscreen",              rsFullscreen           },
-        { "st_opt_fullscreen_borderless",   rsFullscreenBorderless },
         { nullptr,                          -1                     },
     };
 
@@ -475,7 +483,7 @@ public:
             if (GetValue())
                 psDeviceMode.WindowStyle = rsFullscreen;
             else
-                psDeviceMode.WindowStyle = rsWindowedBorderless;
+                psDeviceMode.WindowStyle = rsFullscreenBorderless;
         }
     };
 };
@@ -503,7 +511,6 @@ public:
         GEnv.Render->setGamma(ps_gamma);
         GEnv.Render->setBrightness(ps_brightness);
         GEnv.Render->setContrast(ps_contrast);
-        GEnv.Render->updateGamma();
     }
 };
 
@@ -555,8 +562,6 @@ virtual void Save (IWriter *F) {};
 };
 #endif
 */
-
-ENGINE_API bool renderer_allow_override = false;
 
 class CCC_renderer : public CCC_Token
 {
@@ -718,6 +723,7 @@ ENGINE_API shared_str current_player_hud_sect{};
 
 extern int ps_fps_limit;
 extern int ps_fps_limit_in_menu;
+extern int ps_profile_dump;
 
 void CCC_Register()
 {
@@ -764,17 +770,19 @@ void CCC_Register()
 
     CMD1(CCC_Editor, "rs_editor");
 
-    CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 30, 501);
-    CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 30, 501);
+    CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 0, 1000);
+    CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 0, 1000);
+    CMD4(CCC_Integer, "rs_profile_dump", &ps_profile_dump, 0, 60);
+    if (strstr(Core.Params, "-profile_dump"))
+        ps_profile_dump = 2;
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
     CMD1(CCC_Fullscreen, "rs_fullscreen");
-    CMD1(CCC_Refresh60hz, "rs_refresh_60hz");
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD3(CCC_Mask, "rs_fps", &psDeviceFlags, rsShowFPS);
     CMD3(CCC_Mask, "rs_fps_graph", &psDeviceFlags, rsShowFPSGraph);
-    CMD4(CCC_Float, "rs_vis_distance", &psVisDistance, 0.4f, 1.5f);
+    CMD4(CCC_Float, "rs_vis_distance", &psVisDistance, 0.4f, 15.0f);
 
     CMD3(CCC_Mask, "rs_cam_pos", &psDeviceFlags, rsCameraPos);
 #ifdef DEBUG
@@ -796,10 +804,6 @@ void CCC_Register()
     CMD1(CCC_VidMonitor, "vid_monitor");
     CMD1(CCC_VidMode, "vid_mode");
     CMD1(CCC_VidWindowMode, "vid_window_mode");
-
-#ifdef DEBUG
-    CMD3(CCC_Token, "vid_bpp", &psDeviceMode.BitsPerPixel, vid_bpp_token);
-#endif // DEBUG
 
     CMD1(CCC_VID_Reset, "vid_restart");
 
@@ -884,4 +888,6 @@ void CCC_Register()
 
     extern int ps_disable_lens_flare;
     CMD4(CCC_Integer, "disable_lens_flare", &ps_disable_lens_flare, 0, 1);
+
+    CMD4(CCC_Integer, "g_debug_utils", &g_debug_utils, 0, 1);
 };

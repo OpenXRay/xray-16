@@ -1,0 +1,51 @@
+#include "stdafx.h"
+#include "Profiler.h"
+
+namespace xray::profiler
+{
+
+static std::atomic<bool> g_enabled{true};
+
+void Initialize()
+{
+    Msg("* [Profiler] Initialized");
+}
+
+void Shutdown()
+{
+    Msg("* [Profiler] Shutdown");
+}
+
+void FrameStart()
+{
+    if (!g_enabled)
+        return;
+
+    CPUProfiler::Instance().FrameStart();
+}
+
+void FrameEnd()
+{
+    if (!g_enabled)
+        return;
+
+    CPUProfiler::Instance().FrameEnd();
+}
+
+CPUProfiler& GetCPUProfiler()
+{
+    return CPUProfiler::Instance();
+}
+
+bool IsEnabled()
+{
+    return g_enabled;
+}
+
+void SetEnabled(bool enabled)
+{
+    g_enabled = enabled;
+    CPUProfiler::Instance().SetEnabled(enabled);
+}
+
+}

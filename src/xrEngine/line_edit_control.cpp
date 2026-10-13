@@ -16,7 +16,7 @@
 
 #include "edit_actions.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <locale>
 
@@ -112,7 +112,7 @@ void line_edit_control::update_key_states()
     set_key_state(ks_RCtrl, pInput->iGetAsyncKeyState(SDL_SCANCODE_RCTRL));
     set_key_state(ks_LAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
     set_key_state(ks_RAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT));
-    set_key_state(ks_CapsLock, SDL_GetModState() & KMOD_CAPS);
+    set_key_state(ks_CapsLock, SDL_GetModState() & SDL_KMOD_CAPS);
 }
 
 void line_edit_control::clear_states()
@@ -689,10 +689,7 @@ void line_edit_control::compute_positions()
 void line_edit_control::clamp_cur_pos() { clamp<size_t>(m_cur_pos, 0, xr_strlen(m_edit_str)); }
 void line_edit_control::SwitchKL()
 {
-    cpcstr hint = SDL_GetHint(SDL_HINT_GRAB_KEYBOARD);
-    // if SDL_HINT_GRAB_KEYBOARD is not set to 1 then return;
-    if (!hint || 0 != xr_strcmp("1", hint))
-        return; // System will handle it
+    return;
 #ifdef XR_PLATFORM_WINDOWS
     if (pInput->IsExclusiveMode())
         ActivateKeyboardLayout((HKL)HKL_NEXT, 0);

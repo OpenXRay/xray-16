@@ -12,7 +12,11 @@ AlignConsecutiveAssignments: None
 AlignConsecutiveBitFields: AcrossComments
 AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
-AlignConsecutiveShortCaseStatements: AcrossComments
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignCaseColons: false
 AlignEscapedNewlines: LeftWithLastLine
 AlignOperands: DontAlign
 AlignTrailingComments:
@@ -94,7 +98,7 @@ IndentRequiresClause: false
 IndentWrappedFunctionNames: false
 InsertBraces: false
 InsertNewlineAtEOF: true
-InsertTrailingCommas: false
+InsertTrailingCommas: None
 KeepEmptyLines:
   AtEndOfFile: false
   AtStartOfBlock: false
@@ -117,6 +121,7 @@ PenaltyBreakString: 1000
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 1000000
 PointerAlignment: Left
+QualifierAlignment: Custom
 QualifierOrder: [friend, volatile, inline, static, constexpr, const, restrict, type]
 ReferenceAlignment: Pointer
 ReflowComments: IndentOnly

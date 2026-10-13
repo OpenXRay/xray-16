@@ -1,0 +1,34 @@
+#define SM_6_0
+
+StructuredBuffer<uint64_t> g_VisBuffer : register(t15);
+
+cbuffer SwRasterParams : register(b5)
+{
+    uint g_Width;
+    uint g_Height;
+    uint2 g_SwPad;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float2 texcoord : TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+    uint visID : SV_Target0;
+    float depth : SV_Depth;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    uint2 p = uint2(input.position.xy);
+    uint64_t v = g_VisBuffer[p.y * g_Width + p.x];
+    if (v == 0)
+        discard;
+    PS_OUTPUT o;
+    o.visID = uint(v);
+    o.depth = asfloat(uint(v >> 32));
+    return o;
+}

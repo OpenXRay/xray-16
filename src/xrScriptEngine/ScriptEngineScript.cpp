@@ -36,6 +36,13 @@ void CScriptEngine::script_register(lua_State* luaState)
 {
     using namespace luabind;
 
+#ifdef DEBUG
+    lua_pushboolean(luaState, true);
+#else
+    lua_pushboolean(luaState, false);
+#endif
+    lua_setglobal(luaState, "debug_build");
+
     module(luaState)
     [
         def("log", &LuaLog),

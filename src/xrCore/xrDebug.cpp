@@ -7,7 +7,7 @@
 #include "log.h"
 #include "Threading/ScopeLock.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <csignal>
 
@@ -25,12 +25,15 @@
 #   include "Debug/dxerr.h"
 #endif
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#if defined(XR_PLATFORM_APPLE)
+#   include <sys/sysctl.h>
+#   include <unistd.h>
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
 #   if __has_include(<sys/ptrace.h>)
 #       include <sys/ptrace.h>
 #       define PTRACE_AVAILABLE
 
-#       if defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#       if defined(XR_PLATFORM_BSD)
 #           define PTRACE_TRACEME PT_TRACE_ME
 #           define PTRACE_DETACH PT_DETACH
 #       endif
@@ -83,7 +86,7 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
     {
         SDL_MESSAGEBOX_ERROR,
         windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
-        title, message, SDL_arraysize(buttons), buttons, nullptr
+        title, message, static_cast<int>(std::size(buttons)), buttons, nullptr
     };
 
     int button = -1;
@@ -289,7 +292,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             // we must hide the window
             if (windowHandler && !DebuggerIsPresent())
                 windowHandler->OnFatalError();
-            DEBUG_BREAK;
+                DEBUG_BREAK;
         } // switch (result)
     }
 
@@ -477,6 +480,12 @@ bool xrDebug::DebuggerIsPresent()
 {
 #ifdef XR_PLATFORM_WINDOWS
     return IsDebuggerPresent();
+#elif defined(XR_PLATFORM_APPLE)
+    int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
+    kinfo_proc processInfo{};
+    size_t size = sizeof(processInfo);
+    return sysctl(mib, 4, &processInfo, &size, nullptr, 0) == 0 &&
+        size == sizeof(processInfo) && (processInfo.kp_proc.p_flag & P_TRACED) != 0;
 #elif defined(PTRACE_AVAILABLE)
     if (ptrace(PTRACE_TRACEME, 0, 0, 0) == -1)
         return true;

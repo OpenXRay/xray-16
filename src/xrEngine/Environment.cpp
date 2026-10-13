@@ -18,6 +18,10 @@
 
 #include "xrCore/xrCore.h"
 
+#if defined(USE_DX11) && RENDER == R_R4
+#include "Layers/xrRender/xrRender_console.h"
+#endif
+
 #include "Include/xrRender/EnvironmentRender.h"
 #include "Include/xrRender/LensFlareRender.h"
 #include "Include/xrRender/RainRender.h"
@@ -88,6 +92,8 @@ CEnvironment::~CEnvironment()
     CInifile::Destroy(m_effects_config);
     m_effects_config = nullptr;
 }
+
+bool CEnvironment::IsThunderboltActive() const { return eff_Thunderbolt && eff_Thunderbolt->IsActive(); }
 
 void CEnvironment::Invalidate()
 {
@@ -394,7 +400,6 @@ void CEnvironment::lerp()
     // final lerp
     const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
     CurrentEnv.lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
-    m_pRender->lerp(CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
 }
 
 void CEnvironment::OnFrame()

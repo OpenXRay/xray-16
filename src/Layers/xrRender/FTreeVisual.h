@@ -4,7 +4,7 @@
 
 struct FSlideWindowItem;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class FTreeVisual : public dxRender_Visual, public IRender_Mesh
 {
@@ -19,13 +19,15 @@ private:
 protected:
     _5color c_scale;
     _5color c_bias;
+public:
     Fmatrix xform;
 
 public:
-    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override; // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
+    float GetHemiScale() const;
+    float GetHemiBias() const;
 
     FTreeVisual(void);
     virtual ~FTreeVisual(void);
@@ -39,7 +41,6 @@ public:
     FTreeVisual_ST(void);
     virtual ~FTreeVisual_ST(void);
 
-    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override; // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
@@ -61,10 +62,11 @@ public:
     FTreeVisual_PM(void);
     virtual ~FTreeVisual_PM(void);
 
-    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override; // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
+
+    const FSlideWindowItem* GetSWI() const { return pSWI; }
 
 private:
     FTreeVisual_PM(const FTreeVisual_PM& other);
@@ -73,4 +75,4 @@ private:
 
 const int FTreeVisual_tile = 16;
 const int FTreeVisual_quant = 32768 / FTreeVisual_tile;
-} // namespace xray::render::RENDER_NAMESPACE
+}

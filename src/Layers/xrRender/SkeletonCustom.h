@@ -2,13 +2,15 @@
 
 #include "FHierrarhyVisual.h"
 #include "xrCore/Animation/Bone.hpp"
+#include "xrCore/intrusive_ptr.h"
 #include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/RenderVisual.h"
 
 class CInifile;
 class CBoneData;
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 // consts
 extern Lock UCalc_Mutex;
@@ -31,7 +33,6 @@ class CSkeletonWallmark : public intrusive_base // 4+4+4+12+4+16+16 = 60 + 4 = 6
 #pragma warning(pop)
     CKinematics* m_Parent; // 4
     const Fmatrix* m_XForm; // 4
-    ref_shader m_Shader; // 4
     Fvector3 m_ContactPoint; // 12      model space
     float m_fTimeStart; // 4
 public:
@@ -51,8 +52,8 @@ public:
 public:
     Fsphere m_Bounds; // 16     world space
 public:
-    CSkeletonWallmark(CKinematics* p, const Fmatrix* m, ref_shader s, const Fvector& cp, float ts)
-        : m_Parent(p), m_XForm(m), m_Shader(s), m_ContactPoint(cp), m_fTimeStart(ts)
+    CSkeletonWallmark(CKinematics* p, const Fmatrix* m, const Fvector& cp, float ts)
+        : m_Parent(p), m_XForm(m), m_ContactPoint(cp), m_fTimeStart(ts)
     {
 #ifdef DEBUG
         used_in_render = u32(-1);
@@ -69,15 +70,14 @@ public:
     CKinematics* Parent() { return m_Parent; }
     u32 VCount() { return m_Faces.size() * 3; }
 
-    bool Similar(ref_shader& sh, const Fvector& cp, float eps)
+    bool Similar(const Fvector& cp, float eps)
     {
-        return (m_Shader == sh) && m_ContactPoint.similar(cp, eps);
+        return m_ContactPoint.similar(cp, eps);
     }
 
     float TimeStart() { return m_fTimeStart; }
     const Fmatrix* XFORM() { return m_XForm; }
     const Fvector3& ContactPoint() { return m_ContactPoint; }
-    ref_shader Shader() { return m_Shader; }
 };
 using SkeletonWMVec = xr_vector<intrusive_ptr<CSkeletonWallmark>>;
 
@@ -118,12 +118,13 @@ public:
     void Bone_Calculate(CBoneData* bd, Fmatrix* parent) override;
     void CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
 
-    void BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 channel_mask, bool ignore_callbacks);
     void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) override;
 
     virtual void BuildBoneMatrix(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
     virtual void OnCalculateBones() {}
+    virtual bool PrepareBones() { return false; }
+    virtual void FinishBones() {}
 
     virtual void CalculateBonesAdditionalTransforms(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0)); //--#SM+#--
@@ -131,6 +132,11 @@ public:
     virtual void LL_ClearAdditionalTransform(u16 bone_id = BI_NONE); //--#SM+#--
 public:
     dxRender_Visual* m_lod;
+
+    u32 fg_bone_upload_frame{0};
+    u32 fg_bone_upload_offset{0};
+    u64 fg_bone_pose_signature{0};
+    bool fg_bone_pose_signature_valid{false};
 
 protected:
     SkeletonWMVec wallmarks;
@@ -143,6 +149,8 @@ protected:
     CBoneInstance* bone_instances; // bone instances
     vecBones* bones; // all bones (shared)
     u16 iRoot; // Root bone index
+    xr_vector<u16> m_bones_topo;
+    bool m_subtreeTraversal = false;
 
     // Fast search
     accel* bone_map_N; // bones associations (shared) - sorted by name
@@ -162,6 +170,12 @@ protected:
     virtual void IBoneInstances_Destroy();
     void Visibility_Invalidate() { Update_Visibility = TRUE; }
     void Visibility_Update();
+    void BuildTopologicalOrder();
+    void CalculateHierarchy();
+    void CalculateSubtree(CBoneData* bd, Fmatrix* parent);
+    void BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 channel_mask, bool ignore_callbacks);
+    void RefreshBounds();
+    void RunFinalCallbacks();
 
     void LL_Validate();
 
@@ -171,7 +185,7 @@ public:
 
 public:
     // wallmarks
-    void AddWallmark(const Fmatrix* parent, const Fvector3& start, const Fvector3& dir, ref_shader shader, float size);
+    void AddWallmark(const Fmatrix* parent, const Fvector3& start, const Fvector3& dir, float size);
     void CalculateWallmarks(bool hud);
     void RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*& verts);
     void ClearWallmarks();
@@ -237,6 +251,14 @@ public:
     {
         return LL_GetBoneInstance(bone_id).mRenderTransform;
     } // rendering only
+
+    ICF const Fmatrix* LL_GetBoneTransforms() const
+    {
+        VERIFY(bone_instances);
+        VERIFY(LL_BoneCount() > 0);
+        return &bone_instances[0].mRenderTransform;
+    }
+
     Fobb& LL_GetBox(u16 bone_id) override
     {
         VERIFY(bone_id < LL_BoneCount());
@@ -315,5 +337,12 @@ private:
     bool m_is_original_lod;
 };
 
-IC CKinematics* PCKinematics(dxRender_Visual* V) { return V ? (CKinematics*)V->dcast_PKinematics() : 0; }
-} // namespace xray::render::RENDER_NAMESPACE
+IC CKinematics* PCKinematics(dxRender_Visual* V)
+{
+    if (!V)
+        return nullptr;
+    if (V->Type != MT_SKELETON_ANIM && V->Type != MT_SKELETON_RIGID)
+        return nullptr;
+    return static_cast<CKinematics*>(V);
+}
+}

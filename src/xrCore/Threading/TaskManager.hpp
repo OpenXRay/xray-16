@@ -16,92 +16,80 @@
 #pragma once
 
 #include "Task.hpp"
-#include "Event.hpp"
+#include <condition_variable>
 
 #include <atomic>
 #include <mutex>
+#include <shared_mutex>
+#include <thread>
 
 class TaskWorker;
 
 class XRCORE_API TaskManager final
 {
-private:
     xr_vector<TaskWorker*> workers;
     xr_vector<std::thread> workerThreads;
-    std::mutex workersLock;
-
-    inline static Event newWorkArrived;
-    std::atomic_size_t activeWorkersCount{};
-
+    mutable std::shared_mutex workersLock;
+    const size_t threadCapacity;
+    std::atomic_size_t workerCount{};
+    std::atomic_size_t outstandingTasks{};
     std::atomic_bool shouldPause{};
     std::atomic_bool shouldStop{};
+    mutable std::mutex workMutex;
+    mutable std::condition_variable workChanged;
+    mutable std::atomic_uint64_t workEpoch{};
 
-private:
-    ICN void TaskWorkerStart();
-
+    void TaskWorkerStart();
     [[nodiscard]] Task* TryToSteal() const;
-
-    [[nodiscard]] static Task* AllocateTask() noexcept;
-
+    [[nodiscard]] static Task* AllocateTask();
+    static void RecycleTask(Task* task) noexcept;
+    static void PushTask(Task& task) noexcept;
     static void ExecuteTask(Task& task);
+    void NotifyWork(bool all) const;
 
-    void SetThreadStatus(bool active) noexcept;
+    template <typename Invokable>
+    static TaskHandle Schedule(Invokable&& function, Task* parent)
+    {
+        Task* task = AllocateTask();
+        try
+        {
+            task->Initialize(std::move(function), parent);
+        }
+        catch (...)
+        {
+            RecycleTask(task);
+            throw;
+        }
+        TaskHandle handle(task);
+        PushTask(*task);
+        return handle;
+    }
 
 public:
     TaskManager();
     ~TaskManager();
 
     void SpawnThreads();
-
+    void Shutdown();
     void RegisterThisThreadAsWorker();
     void UnregisterThisThreadAsWorker();
 
-public:
-    // Create a task, but don't run it yet
     template <typename Invokable>
-    [[nodiscard]] static Task& CreateTask(Invokable func)
+    static TaskHandle AddTask(Invokable function)
     {
-        return *new (AllocateTask()) Task(func);
+        return Schedule(std::move(function), nullptr);
     }
 
-    // Create a task as child, but don't run it yet
     template <typename Invokable>
-    [[nodiscard]] static Task& CreateTask(Task& parent, Invokable func)
+    static TaskHandle AddTask(Task& parent, Invokable function)
     {
-        return *new (AllocateTask()) Task(func, &parent);
+        return Schedule(std::move(function), &parent);
     }
 
-    // Run task in parallel
-    static void PushTask(Task& task) noexcept;
-
-    // Run task immediately in this thread
-    static void RunTask(Task& task);
-
-    // Shortcut: create a task and run it immediately
-    template <typename Invokable>
-    static Task& AddTask(Invokable func)
-    {
-        Task& task = CreateTask(func);
-        PushTask(task);
-        return task;
-    }
-
-    // Shortcut: create task and run it immediately
-    template <typename Invokable>
-    static Task& AddTask(Task& parent, Invokable func)
-    {
-        Task& task = CreateTask(parent, func);
-        PushTask(task);
-        return task;
-    }
-
-public:
-    void Wait(const Task& task, bool updateSystemEvents = false) const;
+    void Wait(const TaskHandle& task, bool updateSystemEvents = false) const;
     bool ExecuteOneTask() const;
+    void Pause(bool pause);
 
-    void Pause(bool pause) { shouldPause.store(pause, std::memory_order_release); }
-
-public:
     [[nodiscard]] size_t GetWorkersCount() const noexcept;
     [[nodiscard]] static size_t GetCurrentWorkerID() noexcept;
     void GetStats(size_t& allocated, size_t& pushed, size_t& finished);

@@ -1,0 +1,139 @@
+#pragma once
+
+#include "SubmitTokenRing.h"
+#include "BackendCompletion.h"
+#include "BindlessTextureRegistry.h"
+#include "xrCore/Threading/Task.hpp"
+#include "xrEngine/IRenderBackend.h"
+#include <nvrhi/nvrhi.h>
+
+struct ID3D12Device;
+struct ID3D12CommandQueue;
+struct IDXGISwapChain3;
+struct IDXGIFactory4;
+struct IDXGIAdapter1;
+struct SDL_Window;
+
+class D3D12Backend : public IRenderBackend {
+public:
+    D3D12Backend();
+    ~D3D12Backend() override;
+
+    bool Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation = false);
+    void Shutdown() override;
+
+    API GetAPI() const override { return API::D3D12; }
+    pcstr GetAPIName() const override { return "D3D12"; }
+
+    bool IsInitialized() const override { return m_initialized; }
+    void WaitForIdle() override;
+    DeviceState GetDeviceState() const override;
+    MemoryBudget GetMemoryBudget() const override;
+
+    nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
+    nvrhi::ICommandList* GetCommandList() const override { return m_commandList.Get(); }
+
+    nvrhi::ICommandList* CreateCommandList() override;
+
+    bool HasAsyncCompute() const override { return m_computeCommandList != nullptr; }
+    nvrhi::ICommandList* AcquireComputeCommandList() override;
+    u32 SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) override;
+    void AddGraphicsWait(u32 token) override { m_graphicsWaits.Add(token); }
+    u32 SplitGraphics() override;
+    u32 LastGraphicsToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Graphics)]; }
+    u32 LastComputeToken() const override { return m_tokens.last[u32(nvrhi::CommandQueue::Compute)]; }
+
+    bool SupportsSubmissionLeases() const override { return true; }
+    u64 OpenSubmissionLease() override { return m_completion.OpenLease(); }
+    void CloseSubmissionLease(u64 lease) override { m_completion.CloseLease(lease); }
+    SubmissionLeaseState PollSubmissionLease(u64 lease) override { return m_completion.PollLease(lease); }
+    bool IsSubmissionLeaseSubmitted(u64 lease) const override;
+    void ReleaseSubmissionLease(u64 lease) override { m_completion.ReleaseLease(lease); }
+    u32 GetPendingSubmissionCount() const override { return m_completion.PendingTicketCount(); }
+
+    void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
+    void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
+
+    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) override;
+
+    nvrhi::ITexture* GetBackBuffer() override;
+    u32 GetCurrentBackBufferIndex() const override { return m_currentBackBufferIndex; }
+    u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
+    std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
+    void Present(bool vsync) override;
+    void ResizeSwapChain(u32 width, u32 height) override;
+    bool SetHDROutput(bool enabled) override;
+    DisplayOutput GetDisplayOutput() const override;
+
+    void BeginFrame() override;
+    void EndFrame() override;
+    bool IsInFrame() const override { return m_inFrame; }
+
+    const Capabilities& GetCapabilities() const override { return m_capabilities; }
+    Capabilities& GetMutableCapabilities() override { return m_capabilities; }
+    void UpdateCapabilities() override {}
+
+    u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
+    void UnregisterBindlessTexture(u32 index) override;
+    nvrhi::ITexture* GetBindlessTexture(u32 index) override;
+    bool RetainBindlessTextures(const u32* indices, u32 count) override;
+    void ReleaseBindlessTextures(const u32* indices, u32 count) override;
+    nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindless.GetLayout(); }
+    nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindless.GetTable(); }
+
+    void BeginDebugEvent(pcstr name) override;
+    void EndDebugEvent() override;
+    void SetMarker(pcstr name) override;
+
+    ID3D12Device* GetD3D12Device() const { return m_d3d12Device; }
+    ID3D12CommandQueue* GetD3D12CommandQueue() const { return m_commandQueue; }
+    IDXGISwapChain3* GetSwapChain() const { return m_swapChain; }
+
+private:
+    static constexpr u32 BACK_BUFFER_COUNT = 2;
+    static constexpr u32 MAX_BINDLESS_TEXTURES = 65536;
+
+    bool CreateDXGIFactory(bool enableValidation);
+    bool SelectAdapter();
+    bool CreateDevice();
+    bool CreateCommandQueue();
+    bool CreateSwapChain(HWND hwnd, u32 width, u32 height);
+    void CreateBackBufferTextures();
+    bool ResizeSwapChainBuffers(u32 width, u32 height);
+    bool ApplySwapChainColorSpace();
+    void CreateBindlessResources();
+    void QueryCapabilities();
+
+    IDXGIFactory4* m_dxgiFactory = nullptr;
+    IDXGIAdapter1* m_adapter = nullptr;
+    IDXGISwapChain3* m_swapChain = nullptr;
+
+    ID3D12Device* m_d3d12Device = nullptr;
+    ID3D12CommandQueue* m_commandQueue = nullptr;
+    ID3D12CommandQueue* m_computeQueue = nullptr;
+
+    nvrhi::DeviceHandle m_nvrhiDevice;
+    nvrhi::CommandListHandle m_commandList;
+    nvrhi::CommandListHandle m_computeCommandList;
+    nvrhi::CommandListHandle m_uploadCommandList;
+    nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
+
+    xray::render::backend::BindlessTextureRegistry m_bindless;
+
+    bool m_initialized = false;
+    bool m_inFrame = false;
+    bool m_tearingSupported = false;
+    bool m_hdrOutput = false;
+    SDL_Window* m_window = nullptr;
+    Capabilities m_capabilities;
+    u32 m_backBufferWidth = 0;
+    u32 m_backBufferHeight = 0;
+    u32 m_currentBackBufferIndex = 0;
+
+    TaskHandle m_gcTask;
+    SubmitTokenRing m_tokens;
+    SubmitWaitList m_graphicsWaits;
+    xray::render::backend::SubmissionTracker m_completion;
+
+    u64 SubmitGraphics();
+};

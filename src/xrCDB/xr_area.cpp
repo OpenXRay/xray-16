@@ -138,6 +138,15 @@ void CObjectSpace::Load(IReader* F,
 }
 
 void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
+    CDB::build_callback build_callback)
+{
+    R_ASSERT(CFORM_CURRENT_VERSION == H.version);
+    Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+    Static.syncronize();
+    m_BoundingVolume.set(H.aabb);
+}
+
+void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
     CDB::build_callback build_callback,
     CDB::serialize_callback serialize_callback,
     CDB::deserialize_callback deserialize_callback,

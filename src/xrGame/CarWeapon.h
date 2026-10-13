@@ -16,8 +16,10 @@ protected:
     virtual void FireEnd();
     virtual void UpdateFire();
     virtual void OnShot();
+    void UpdateFirePose();
     void UpdateBarrelDir();
     virtual const Fvector& get_CurrentFirePoint();
+    virtual const Fvector& get_CurrentFireDirection();
     virtual const Fmatrix& get_ParticlesXFORM();
 
     CPhysicsShellHolder* m_object;
@@ -52,7 +54,8 @@ public:
     const Fvector& ViewCameraDir();
     const Fvector& ViewCameraNorm();
 
-    void Render_internal();
+    void PostUpdateCL();
+    void net_Destroy();
 
 private:
     u16 m_rotate_x_bone, m_rotate_y_bone, m_fire_bone, m_camera_bone;

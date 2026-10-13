@@ -94,10 +94,12 @@ target_compile_definitions(xrODE
 set_target_properties(xrODE PROPERTIES
     PREFIX ""
     UNITY_BUILD OFF
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrODE LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrODE
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

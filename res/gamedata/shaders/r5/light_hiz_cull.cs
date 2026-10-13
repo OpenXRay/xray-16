@@ -1,0 +1,56 @@
+#include "common.h"
+#include "cull_utils.h"
+#include "shared/clustered_lighting.h"
+
+cbuffer LightHiZCullParams
+{
+    float4x4 cb_prevViewProj;
+    float4x4 cb_curViewProj;
+    float4 cb_cameraPos;
+    uint cb_numLights;
+    uint cb_hizWidth;
+    uint cb_hizHeight;
+    uint cb_hizMipLevels;
+};
+
+StructuredBuffer<GPULightData> g_Lights;
+Texture2D<float> g_HiZPyramid;
+
+RWStructuredBuffer<uint> g_VisibleLightIndices;
+RWByteAddressBuffer g_VisibleLightCount;
+
+[numthreads(64, 1, 1)]
+void main(uint3 dtid : SV_DispatchThreadID)
+{
+    uint lightIdx = dtid.x;
+    if (lightIdx >= cb_numLights)
+        return;
+
+    GPULightData ld = g_Lights[lightIdx];
+    float3 lightPos = LightInfluenceCenter(ld);
+    float range = LightInfluenceRadius(ld);
+
+    float3 toLight = lightPos - cb_cameraPos.xyz;
+    if (!LightHasShadow(ld) || dot(toLight, toLight) <= range * range)
+    {
+        uint idx;
+        g_VisibleLightCount.InterlockedAdd(0, 1, idx);
+        if (idx < cb_numLights)
+            g_VisibleLightIndices[idx] = lightIdx;
+        return;
+    }
+
+    bool visible = HiZTestSphere(
+        lightPos, range, cb_cameraPos.xyz,
+        cb_prevViewProj,
+        g_HiZPyramid, smp_nofilter,
+        cb_hizWidth, cb_hizHeight, cb_hizMipLevels);
+
+    if (visible)
+    {
+        uint idx;
+        g_VisibleLightCount.InterlockedAdd(0, 1, idx);
+        if (idx < cb_numLights)
+            g_VisibleLightIndices[idx] = lightIdx;
+    }
+}

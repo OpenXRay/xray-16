@@ -4,12 +4,15 @@
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
 #include "Light_Package.h"
-#include "light_smapvis.h"
 #include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
+inline constexpr u32 kCapsuleLightSamples = 8;
+inline constexpr float kCapsuleLightMinRadius = 0.001f;
+inline constexpr float kCapsuleShadowNearClip = 0.001f;
+
 class light : public IRender_Light, public SpatialBase
 {
 public:
@@ -28,8 +31,15 @@ public:
     Fvector right;
     float range;
     float virtual_size;
+    float area_length;
+    float area_radius;
+    bool area_shadow_sample;
+    bool hud_spotlight;
+    mutable u32 area_shadow_slots[kCapsuleLightSamples];
+    mutable light* area_shadow_samples[kCapsuleLightSamples];
     float cone;
     Fcolor color;
+    shared_str spot_texture_name;
 
     vis_data hom;
     u32 frame_render;
@@ -49,18 +59,6 @@ public:
     light* omnipart[6];
     xr_vector<light_indirect> indirect;
     u32 indirect_photons;
-
-    smapvis svis[R__NUM_CONTEXTS]; // used for 6-cubemap faces
-
-    ref_shader s_spot;
-    ref_shader s_point;
-    ref_shader s_volumetric;
-
-#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    ref_shader s_spot_msaa[8];
-    ref_shader s_point_msaa[8];
-    ref_shader s_volumetric_msaa[8];
-#endif //	(RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
     u32 m_xform_frame;
     Fmatrix m_xform;
@@ -105,10 +103,7 @@ public:
 #endif //	(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 public:
-    void set_type(LT type) override
-    {
-        flags.type = type;
-    }
+    void set_type(LT type) override;
 
     void set_active(bool b) override;
 
@@ -135,6 +130,11 @@ public:
 
     void set_virtual_size(float R) override { virtual_size = R; }
 
+    void set_area(float length, float radius) override;
+
+    void area_surface_sample(float u, float v, Fvector& P, Fvector& N) const;
+    void UpdateAreaShadowSamples() const;
+
     void set_color(const Fcolor& C) override
     {
         color.set(C);
@@ -150,26 +150,30 @@ public:
     void set_hud_mode(bool b) override { flags.bHudMode = b; }
     [[nodiscard]]
     bool get_hud_mode() override { return flags.bHudMode; }
+    void set_hud_spotlight(bool b) override { hud_spotlight = b; }
 
     void spatial_move() override;
     Fvector spatial_sector_point() override;
 
     IRender_Light* dcast_Light() override { return this; }
     vis_data& get_homdata();
+    float get_LOD() const;
+    u64 GetLightID() const { return m_lightID; }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     void gi_generate();
     void xform_calc();
-    void vis_prepare(CBackend& cmd_list);
-    void vis_update();
     void Export(light_Package& dest);
     void set_attenuation_params(float a0, float a1, float a2, float fo);
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
-    [[nodiscard]]
-    float get_LOD() const;
-
     light();
     ~light() override;
+
+private:
+    static u64 AllocateLightID();
+    void orthonormalize_area_basis(const Fvector& D, const Fvector& R);
+
+    u64 m_lightID;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

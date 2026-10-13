@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_deffer_model : public IBlender
 {
@@ -14,7 +14,6 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
-    virtual void Compile(CBlender_Compile& C);
 
     CBlender_deffer_model();
     virtual ~CBlender_deffer_model();
@@ -22,4 +21,4 @@ public:
 private:
     xrP_TOKEN oTessellation;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

@@ -9,12 +9,6 @@
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/OpenXRay/GameSpy.git
-[submodule "Externals/AGS_SDK"]
-	path = Externals/AGS_SDK
-	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
-[submodule "Externals/gli"]
-	path = Externals/gli
-	url = https://github.com/g-truc/gli.git
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
@@ -28,3 +22,25 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/nvrhi"]
+	path = Externals/nvrhi
+	url = https://github.com/OpenXRay/NVRHI.git
+	branch = xray
+[submodule "Externals/DirectX-Headers"]
+	path = Externals/DirectX-Headers
+	url = https://github.com/microsoft/DirectX-Headers.git
+[submodule "Externals/meshoptimizer"]
+	path = Externals/meshoptimizer
+	url = https://github.com/zeux/meshoptimizer.git
+[submodule "Externals/SDL"]
+	path = Externals/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "Externals/bc7enc_rdo"]
+	path = Externals/bc7enc_rdo
+	url = https://github.com/richgel999/bc7enc_rdo.git
+[submodule "Externals/ozz-animation"]
+	path = Externals/ozz-animation
+	url = https://github.com/guillaumeblanc/ozz-animation.git
+[submodule "Externals/WindowsToolchain"]
+	path = Externals/WindowsToolchain
+	url = https://github.com/MarkSchofield/WindowsToolchain.git

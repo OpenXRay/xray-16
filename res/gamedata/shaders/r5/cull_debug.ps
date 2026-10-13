@@ -1,0 +1,40 @@
+#define SM_5_0
+#include "common.h"
+#include "cull_debug.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 color    : COLOR0;
+    float2 uv       : TEXCOORD0;
+    float  alpha    : TEXCOORD1;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    float dist = length(input.uv);
+
+    if (dist > 1.0)
+        discard;
+
+    float ringInner = 0.85;
+    float ringOuter = 1.0;
+
+    if (dist < ringInner)
+        discard;
+
+    float ddist = fwidth(dist);
+    float finalAlpha = smoothstep(ringInner - ddist, ringInner + ddist, dist)
+                     * smoothstep(ringOuter + ddist, ringOuter - ddist, dist);
+
+    output.color = float4(input.color, finalAlpha * input.alpha);
+
+    return output;
+}

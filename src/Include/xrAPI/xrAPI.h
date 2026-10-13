@@ -13,11 +13,11 @@
 class IRender;
 class IRenderFactory;
 class IDebugRender;
+class IRenderBackend;
 class CDUInterface;
 struct xr_token;
 class IUIRender;
 class CGameMtlLibrary;
-class CRender;
 class CScriptEngine;
 class AISpaceBase;
 class ISoundManager;
@@ -27,6 +27,7 @@ class XRAPI_API EngineGlobalEnvironment
 {
 public:
     IRender* Render;
+    IRenderBackend* Backend;
     IDebugRender* DRender;
     CDUInterface* DU;
     IUIRender* UIRender;

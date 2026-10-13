@@ -26,7 +26,7 @@ void CStalkerAnimationPair::synchronize(
     if (!blend())
         return;
 
-    CMotionDef* motion0 = skeleton_animated->LL_GetMotionDef(animation());
+    const CMotionDef* motion0 = skeleton_animated->LL_GetMotionDef(animation());
     VERIFY(motion0);
     if (!(motion0->flags & esmSyncPart))
         return;
@@ -34,7 +34,7 @@ void CStalkerAnimationPair::synchronize(
     if (!stalker_animation.blend())
         return;
 
-    CMotionDef* motion1 = skeleton_animated->LL_GetMotionDef(stalker_animation.animation());
+    const CMotionDef* motion1 = skeleton_animated->LL_GetMotionDef(stalker_animation.animation());
     VERIFY(motion1);
     if (!(motion1->flags & esmSyncPart))
         return;
@@ -173,7 +173,7 @@ void CStalkerAnimationPair::play(IKinematicsAnimated* skeleton_animated, PlayCal
 #ifdef DEBUG
     if (psAI_Flags.is(aiAnimation))
     {
-        CMotionDef* motion = skeleton_animated->LL_GetMotionDef(animation());
+        const CMotionDef* motion = skeleton_animated->LL_GetMotionDef(animation());
         VERIFY(motion);
         LPCSTR name = skeleton_animated->LL_MotionDefName_dbg(animation()).first;
         Msg("%6d [%s][%s][%s][%d][%c][%c][%c][%f][%f][%f]", Device.dwTimeGlobal, m_object_name, m_animation_type_name,
@@ -295,7 +295,7 @@ void CStalkerAnimationPair::target_matrix(Fvector const& position, Fvector const
 bool CStalkerAnimationPair::use_animation_movement_control(
     IKinematicsAnimated* skeleton_animated, MotionID const& motion_id) const
 {
-    CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
+    const CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
     VERIFY(motion_def);
     return ((motion_def->flags & esmRootMover) == esmRootMover);
 }

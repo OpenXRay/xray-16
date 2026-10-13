@@ -225,10 +225,12 @@ void CWeapon::UpdateFireDependencies_internal()
             Fmatrix& parent = XFORM();
             Fvector& fp = vLoadedFirePoint;
             Fvector& fp2 = vLoadedFirePoint2;
+            Fvector& lp = vLoadedLightPoint;
             Fvector& sp = vLoadedShellPoint;
 
             parent.transform_tiny(m_current_firedeps.vLastFP, fp);
             parent.transform_tiny(m_current_firedeps.vLastFP2, fp2);
+            parent.transform_tiny(m_current_firedeps.vLastLP, lp);
             parent.transform_tiny(m_current_firedeps.vLastSP, sp);
 
             m_current_firedeps.vLastFD.set(0.f, 0.f, 1.f);
@@ -433,6 +435,9 @@ void CWeapon::Load(LPCSTR section)
 
     vLoadedFirePoint = pSettings->r_fvector3(section, "fire_point");
     vLoadedFirePoint2 = pSettings->read_if_exists<Fvector3>(section, "fire_point2", vLoadedFirePoint);
+    vLoadedLightPoint = pSettings->read_if_exists<Fvector3>(section, "light_point", vLoadedFirePoint);
+    if (!pSettings->line_exist(section, "light_point"))
+        vLoadedLightPoint.x = -0.05f;
 
     // hands
     eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));
@@ -608,7 +613,6 @@ void CWeapon::net_Destroy()
     //удалить объекты партиклов
     StopFlameParticles();
     StopFlameParticles2();
-    StopLight();
     Light_Destroy();
 
     while (m_magazine.size())
@@ -861,8 +865,6 @@ void CWeapon::UpdateCL()
 {
     inherited::UpdateCL();
     UpdateHUDAddonsVisibility();
-    //подсветка от выстрела
-    UpdateLight();
 
     //нарисовать партиклы
     UpdateFlameParticles();
@@ -910,7 +912,29 @@ void CWeapon::UpdateCL()
 
     if (m_zoom_params.m_pVision)
         m_zoom_params.m_pVision->Update();
+
+    if (GEnv.Render && GEnv.Render->IsEnabled() && IsGameTypeSingle())
+    {
+        CActor* pActor = smart_cast<CActor*>(H_Parent());
+        if (pActor && pActor->inventory().ActiveItem() == this)
+        {
+            GEnv.Render->UpdateSmokeTrail(
+                get_LastFP(), get_LastFD(), Device.fTimeDelta, !!GetHUDmode());
+        }
+    }
 }
+
+void CWeapon::PostUpdateCL(bool bUpdateCL_disabled)
+{
+    inherited::PostUpdateCL(bUpdateCL_disabled);
+
+    if (!IsLightLive())
+        return;
+
+    dwFP_Frame = u32(-1);
+    UpdateLight();
+}
+
 void CWeapon::EnableActorNVisnAfterZoom()
 {
     CActor* pA = smart_cast<CActor*>(H_Parent());
@@ -934,10 +958,6 @@ void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
     ScopeLock lock{ &render_lock };
 
     UpdateXForm();
-
-    //нарисовать подсветку
-
-    RenderLight();
 
     //если мы в режиме снайперки, то сам HUD рисовать не надо
     if (IsZoomed() && !IsRotatingToZoom() && ZoomTexture())
@@ -1919,7 +1939,6 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
         return 1;
 }
 
-void CWeapon::render_hud_mode() { RenderLight(); }
 bool CWeapon::MovingAnimAllowedNow() { return !IsZoomed(); }
 bool CWeapon::IsHudModeNow() { return (HudItemData() != nullptr); }
 void CWeapon::ZoomInc()

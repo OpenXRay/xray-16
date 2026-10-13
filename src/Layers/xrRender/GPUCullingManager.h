@@ -1,0 +1,1065 @@
+#pragma once
+
+#include "xrCore/xrCore.h"
+#include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/RenderContext/ResourceHandle.h"
+#include "Layers/xrRender/Bindless/VertexConverter.h"
+#include "Layers/xrRender/Geometry/SkinnedGeometryPools.h"
+#include "Layers/xrRender/ClusterDAG.h"
+#include "Layers/xrRender/ClusterShadowBVH.h"
+#include "Layers/xrRender/GeometryResidency.h"
+
+namespace xray::render::fg::passes {
+    struct ParticleBatch;
+}
+
+namespace xray::render {
+    class GeometryCollector;
+    struct ShaderVariantDesc;
+    struct GeometryBatch;
+    namespace fg {
+        class RenderDevice;
+        class RenderContext;
+    }
+    namespace framegraph {
+        class FrameGraph;
+    }
+}
+
+namespace xray::render::fg {
+    class dxRender_Visual;
+    class CKinematics;
+    class RTAccelStructManager;
+    namespace decals {
+        class OverlayManager;
+    }
+}
+
+namespace xray::render::fg {
+
+struct ClusterCullParamsCB;
+
+struct GPUParticleData {
+    Fvector position;
+    float radius;
+    u32 batchIndex;
+    u32 flags;
+    float pad0, pad1;
+};
+static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes for GPU alignment");
+
+
+enum GPUObjectFlags : u32 {
+    GPU_OBJECT_NO_RESOLVE = 0x1,
+    GPU_OBJECT_SHADOW_ONLY = 0x2,
+    GPU_OBJECT_SKINNED_FORWARD = 0x4,
+    GPU_OBJECT_BAKED_HEMI = 0x8,
+};
+
+struct TransparentDrawRange {
+    u32 key;
+    u32 first;
+    u32 count;
+};
+
+enum TransparentKeyBits : u32 {
+    TRANSPARENT_KEY_DST_SHIFT = 8,
+    TRANSPARENT_KEY_DEPTH_WRITE = 1u << 16,
+    TRANSPARENT_KEY_DISTORT = 1u << 17,
+    TRANSPARENT_KEY_NO_COLOR = 1u << 18,
+    TRANSPARENT_KEY_UNLIT = 1u << 19,
+    TRANSPARENT_KEY_WMARK = 1u << 20,
+};
+
+u32 TransparentKeyForVariant(const ShaderVariantDesc* variant);
+
+struct GPUClusterEntry {
+    Fvector4 sphere;
+    Fvector4 lodSelf;
+    Fvector4 lodParent;
+    u32 indexCount;
+    u32 ibFirst;
+    u32 firstVertex;
+    u32 batchIndex;
+    u32 materialID;
+    u32 flags;
+    float selfError;
+    float parentError;
+    Fvector4 extent;
+    u32 page;
+    u32 payloadOffset;
+    u32 vertexCount;
+    u32 geoPad;
+};
+static_assert(sizeof(GPUClusterEntry) == 112, "GPUClusterEntry must be 112 bytes");
+
+enum GPUClusterEntryFlags : u32 {
+    GPU_CLUSTER_ENTRY_AT      = 0x1,
+    GPU_CLUSTER_ENTRY_PLAIN   = 0x2,
+    GPU_CLUSTER_ENTRY_SHADOW_ONLY = 0x8,
+    GPU_CLUSTER_ENTRY_TERRAIN = 0x4,
+    GPU_CLUSTER_ENTRY_SKINNED = 0x10,
+    GPU_CLUSTER_ENTRY_HUD = 0x20,
+    GPU_CLUSTER_ENTRY_DYNAMIC = 0x40,
+    GPU_CLUSTER_ENTRY_NO_SHADOW = 0x80,
+};
+
+class GPUGeoInstance
+{
+public:
+    Fmatrix world;
+    Fmatrix prevWorld;
+    u32 assetMember;
+    u32 materialID;
+    u32 flags;
+    float scaleBound;
+    u32 firstRef;
+    u32 refCount;
+    u32 firstPage;
+    u32 historyValid;
+    float prevScaleBound;
+    float hemiScale;
+    float hemiBias;
+    u32 lightmapTexture;
+};
+static_assert(sizeof(GPUGeoInstance) == 176, "GPUGeoInstance is shader-visible");
+
+class GeometryInstanceKey
+{
+public:
+    u64 renderable = 0;
+    u64 visual = 0;
+    u32 subset = 0;
+
+    bool operator<(const GeometryInstanceKey& o) const;
+};
+
+enum CullState : u32 {
+    CULL_STATE_VISIBLE           = 0,
+    CULL_STATE_OCCLUDER          = 1,
+    CULL_STATE_CULLED_DISTANCE   = 2,
+    CULL_STATE_CULLED_FRUSTUM    = 3,
+    CULL_STATE_CULLED_OCCLUSION  = 4,
+    CULL_STATE_PARTICLE_VISIBLE  = 5,
+    CULL_STATE_PARTICLE_CULLED   = 6,
+};
+
+struct CullDebugData {
+    Fvector position;
+    float radius;
+    u32 cullState;
+    float objectDepth;
+    float hiZDepth;
+    u32 objectIndex;
+};
+static_assert(sizeof(CullDebugData) == 32, "CullDebugData must be 32 bytes for GPU alignment");
+
+struct IndirectDrawArgs {
+    u32 indexCountPerInstance;
+    u32 instanceCount;
+    u32 startIndexLocation;
+    s32 baseVertexLocation;
+    u32 startInstanceLocation;
+};
+static_assert(sizeof(IndirectDrawArgs) == 20, "IndirectDrawArgs must be 20 bytes");
+
+struct MeshAllocation {
+    u32 vertexOffset;
+    u32 indexOffset;
+    u32 vertexCount;
+    u32 indexCount;
+    bool valid;
+
+    MeshAllocation() : vertexOffset(0), indexOffset(0), vertexCount(0), indexCount(0), valid(false) {}
+};
+
+class ForwardVertex
+{
+public:
+    bindless::UnifiedVertex vertex;
+    Fvector3 normal;
+};
+
+static_assert(sizeof(ForwardVertex) == 60);
+
+constexpr u32 GEOMETRY_SOURCE_FORWARD = 1u << 31;
+constexpr u32 GEOMETRY_SOURCE_SHADOW = 1u << 30;
+constexpr u32 GEOMETRY_SOURCE_POLICY_MASK = GEOMETRY_SOURCE_FORWARD | GEOMETRY_SOURCE_SHADOW;
+
+struct GPUInstanceData {
+    Fmatrix world;
+    u32 materialID;
+    u32 flags;
+    float hemiScale;
+    float hemiBias;
+};
+static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
+
+class GeometrySourceKey
+{
+public:
+    u64 vertexSource = 0;
+    u64 indexSource = 0;
+    u32 vertexBase = 0;
+    u32 vertexCount = 0;
+    u32 indexBase = 0;
+    u32 indexCount = 0;
+    u32 flags = 0;
+    u32 vertexStride = 0;
+    u32 vertexFormat = 0;
+
+    bool operator<(const GeometrySourceKey& o) const;
+};
+
+class GeometryFrameResources
+{
+public:
+    framegraph::VirtualResourceHandle clusterMeta;
+    framegraph::VirtualResourceHandle assetMembers;
+    framegraph::VirtualResourceHandle assetNodes;
+    framegraph::VirtualResourceHandle clusterRefs;
+    framegraph::VirtualResourceHandle instances;
+    framegraph::VirtualResourceHandle counts;
+    framegraph::VirtualResourceHandle clusterPages;
+    framegraph::VirtualResourceHandle clusterPayload;
+    framegraph::VirtualResourceHandle clusterVertices;
+    framegraph::VirtualResourceHandle clusterGroups;
+    framegraph::VirtualResourceHandle rtVertices;
+    framegraph::VirtualResourceHandle rtIndices;
+    framegraph::VirtualResourceHandle rtCopySourceVertices;
+    framegraph::VirtualResourceHandle rtCopySourceIndices;
+    framegraph::VirtualResourceHandle boneMatrices;
+    framegraph::VirtualResourceHandle groupResidency;
+    framegraph::VirtualResourceHandle shadowCuts;
+    framegraph::VirtualResourceHandle arenaCopySourceVertices;
+    framegraph::VirtualResourceHandle arenaCopySourcePayload;
+    framegraph::VirtualResourceHandle megaVertices;
+    framegraph::VirtualResourceHandle megaIndices;
+    framegraph::VirtualResourceHandle megaCopySourceVertices;
+    framegraph::VirtualResourceHandle megaCopySourceIndices;
+    framegraph::VirtualResourceHandle forwardArgs;
+    framegraph::VirtualResourceHandle forwardInstances;
+    framegraph::VirtualResourceHandle forwardDrawIndices;
+    framegraph::VirtualResourceHandle shadowBvhNodes;
+    framegraph::VirtualResourceHandle shadowBvhIndices;
+    framegraph::VirtualResourceHandle visibleEntries;
+    framegraph::VirtualResourceHandle fades;
+    framegraph::VirtualResourceHandle terrainVisibleEntries;
+    framegraph::VirtualResourceHandle terrainFades;
+    framegraph::VirtualResourceHandle swEntries;
+    framegraph::VirtualResourceHandle candidates;
+    framegraph::VirtualResourceHandle retestVisibleEntries;
+    framegraph::VirtualResourceHandle retestFades;
+    framegraph::VirtualResourceHandle retestTerrainVisibleEntries;
+    framegraph::VirtualResourceHandle retestTerrainFades;
+    framegraph::VirtualResourceHandle retestSwEntries;
+    framegraph::VirtualResourceHandle drawArgs;
+    framegraph::VirtualResourceHandle terrainArgs;
+    framegraph::VirtualResourceHandle swArgs;
+    framegraph::VirtualResourceHandle retestDrawArgs;
+    framegraph::VirtualResourceHandle retestTerrainArgs;
+    framegraph::VirtualResourceHandle retestSwArgs;
+    framegraph::VirtualResourceHandle retestDispatchArgs;
+    framegraph::VirtualResourceHandle queueArgs;
+    framegraph::VirtualResourceHandle nodeQueueA;
+    framegraph::VirtualResourceHandle nodeQueueB;
+    framegraph::VirtualResourceHandle deferredNodes;
+    framegraph::VirtualResourceHandle deferredInstances;
+    framegraph::VirtualResourceHandle leafQueue;
+    framegraph::VirtualResourceHandle skinnedEntries;
+    framegraph::VirtualResourceHandle deformedVertices;
+    framegraph::VirtualResourceHandle previousDeformedVertices;
+    framegraph::VirtualResourceHandle skinnedHudEntries;
+    framegraph::VirtualResourceHandle neutralFades;
+    framegraph::VirtualResourceHandle paintSplats;
+    framegraph::VirtualResourceHandle skinnedRecords;
+    framegraph::VirtualResourceHandle skinnedIndices;
+    framegraph::VirtualResourceHandle skinnedForwardArgs;
+    framegraph::VirtualResourceHandle skinnedForwardInstances;
+    framegraph::VirtualResourceHandle materials;
+    framegraph::VirtualResourceHandle terrainMaterials;
+    framegraph::VirtualResourceHandle variants;
+    framegraph::VirtualResourceHandle variantTextures;
+    bool valid = false;
+};
+
+class GeometryFrameBuffers
+{
+public:
+    nvrhi::IBuffer* clusterMeta = nullptr;
+    nvrhi::IBuffer* clusterRefs = nullptr;
+    nvrhi::IBuffer* instances = nullptr;
+    nvrhi::IBuffer* clusterPages = nullptr;
+    nvrhi::IBuffer* clusterPayload = nullptr;
+    nvrhi::IBuffer* clusterVertices = nullptr;
+    nvrhi::IBuffer* clusterGroups = nullptr;
+    nvrhi::IBuffer* groupResidency = nullptr;
+    nvrhi::IBuffer* shadowBvhNodes = nullptr;
+    nvrhi::IBuffer* shadowBvhIndices = nullptr;
+    nvrhi::IBuffer* skinnedEntries = nullptr;
+    nvrhi::IBuffer* deformedVertices = nullptr;
+    nvrhi::IBuffer* skinnedIndices = nullptr;
+    nvrhi::IBuffer* skinnedHudEntries = nullptr;
+    nvrhi::IBuffer* neutralFades = nullptr;
+    nvrhi::IBuffer* materials = nullptr;
+};
+
+class GeometryMemoryStats
+{
+public:
+    u64 sharedMetadataBytes = 0;
+    u64 instanceTableBytes = 0;
+    u64 payloadBytes = 0;
+    u64 vertexBytes = 0;
+    u64 retainedSourceBytes = 0;
+    u64 forwardDrawBytes = 0;
+    u64 retiringSourceBytes = 0;
+    u64 sourceStagingBytes = 0;
+    u64 hostSourceBytes = 0;
+    u32 forwardUploadLeases = 0;
+    u64 residencyArenaBytes = 0;
+    u64 residencyUsedBytes = 0;
+    u64 residencyPinnedBytes = 0;
+    u64 residencyStagingBytes = 0;
+};
+
+GeometryFrameBuffers ResolveGeometryResources(const framegraph::FrameGraph& fg, const GeometryFrameResources& res);
+
+class GPUCullingManager {
+public:
+    GPUCullingManager();
+    ~GPUCullingManager();
+
+    void Initialize(fg::RenderDevice* device);
+
+    void Shutdown();
+
+    void PrepareSceneGeometry(const GeometryCollector* geometry);
+    void UploadSceneObjects(fg::RenderContext* ctx);
+
+    void InvalidateStaticCullingData();
+    void InvalidateShadersAndPipelines();
+
+    GeometryFrameResources ImportGeometryResources(framegraph::FrameGraph& fg);
+
+    framegraph::VirtualResourceHandle SetupGeometryPreparePass(
+        framegraph::FrameGraph& fg,
+        const GeometryCollector* geometry,
+        GeometryFrameResources& resources
+    );
+
+    void SetupCullingPass(
+        framegraph::FrameGraph& fg,
+        const GeometryCollector* geometry,
+        framegraph::VirtualResourceHandle prevHiZ,
+        const Fmatrix& prevViewProj,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        GeometryFrameResources& resources
+    );
+
+    framegraph::VirtualResourceHandle SetupClusterRetestPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        GeometryFrameResources& resources
+    );
+
+    u32 GetStaticObjectCount() const { return m_staticObjectCount; }
+    u32 GetDynamicObjectCount() const { return m_dynamicObjectCount; }
+
+    bool IsEnabled() const { return m_initialized && m_computeEnabled; }
+
+
+    void BeginLevelLoad(u32 estimatedVertices = 1000000, u32 estimatedIndices = 3000000);
+
+    void EndLevelLoad();
+    void UnloadLevel();
+    void RetainForwardGeometry(const MeshAllocation& allocation);
+
+    bool AreMegaBuffersReady() const { return m_megaBuffersReady; }
+    bool IsMegaDataUploaded() const { return m_megaDataUploaded; }
+
+    nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
+    nvrhi::IBuffer* GetRTVertexBuffer() const { return m_rtVertexBuffer.Get(); }
+    nvrhi::IBuffer* GetRTIndexBuffer() const { return m_rtIndexBuffer.Get(); }
+    u32 GetRTVertexCount() const { return m_rtVertexCount; }
+    u32 GetRTIndexCount() const { return m_rtIndexCount; }
+    bool IsRTSourceReady() const;
+    u32 GetRTRuntimeVertexCount() const;
+    static constexpr u32 RT_VERTEX_STRIDE = 40u;
+    u32 GetPreparedSkeletonOffset(CKinematics* skeleton) const;
+    const Fmatrix* GetPreparedSkeletonMatrices(CKinematics* skeleton, u32& count) const;
+    u64 GetPreparedSkeletonPoseSignature(CKinematics* skeleton) const;
+    nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterPageBuffer() const { return m_residency.GetPageTableBuffer(); }
+    nvrhi::IBuffer* GetClusterPayloadBuffer() const { return m_residency.GetPayloadArenaBuffer(); }
+    nvrhi::IBuffer* GetClusterVertexBuffer() const { return m_residency.GetVertexArenaBuffer(); }
+    nvrhi::IBuffer* GetClusterGroupBuffer() const { return m_residency.GetClusterGroupBuffer(); }
+    nvrhi::IBuffer* GetGroupResidencyBuffer() const { return m_residency.GetGroupBitsBuffer(); }
+    GeometryResidencyManager& GetResidency() { return m_residency; }
+    const GeometryResidencyManager& GetResidency() const { return m_residency; }
+    void BeginGeometryResidencyFrame();
+    void EndGeometryResidencyFrame();
+    void AddShadowGeometryDemand(const GeometryDemandView& view);
+    u32 GetGeometryCutRevision() const { return m_residency.CutRevision(); }
+    GeometryMemoryStats GetGeometryMemoryStats() const;
+    u32 GetTotalVertexCount() const { return m_totalVertexCount; }
+    u32 GetTotalIndexCount() const { return m_totalIndexCount; }
+
+    const xr_vector<IndirectDrawArgs>& GetStaticDrawArgsData() const { return m_staticDrawArgsData; }
+    const xr_vector<u32>& GetStaticMaterialIDData() const { return m_staticMaterialIDData; }
+    const xr_vector<u32>& GetStaticBatchVertexCounts() const { return m_staticBatchVertexCounts; }
+    const xr_vector<IndirectDrawArgs>& GetTerrainDrawArgsData() const { return m_terrainDrawArgsData; }
+    const xr_vector<u32>& GetTerrainMaterialIDData() const { return m_terrainMaterialIDData; }
+    const xr_vector<IndirectDrawArgs>& GetTransparentDrawArgsData() const { return m_transparentDrawArgsData; }
+    const xr_vector<u32>& GetTransparentMaterialIDData() const { return m_transparentMaterialIDData; }
+    const xr_vector<GPUInstanceData>& GetStaticInstanceData() const { return m_staticInstanceData; }
+    const xr_vector<GPUInstanceData>& GetTerrainInstanceData() const { return m_terrainInstanceData; }
+    const xr_vector<GPUInstanceData>& GetTransparentInstanceData() const { return m_transparentInstanceData; }
+    const xr_vector<GeometryInstanceKey>& GetStaticInstanceIdentities() const { return m_staticInstanceIdentities; }
+    const xr_vector<GeometryInstanceKey>& GetTerrainInstanceIdentities() const { return m_terrainInstanceIdentities; }
+    const xr_vector<GeometryInstanceKey>& GetTransparentInstanceIdentities() const { return m_transparentInstanceIdentities; }
+    u32 GetStaticBuildCount() const { return m_staticBuildCount; }
+    const xr_vector<GPUInstanceData>& GetDynamicInstanceData() const;
+    const xr_vector<GeometryInstanceKey>& GetDynamicInstanceIdentities() const;
+    const xr_vector<ClusterMeshKey>& GetDynamicMeshKeys() const;
+    u32 GetRTRayOnlyDynamicCount() const;
+
+    void SetRTAccelStructManager(RTAccelStructManager* mgr) { m_rtAccelMgr = mgr; }
+    RTAccelStructManager* GetRTAccelStructManager() const { return m_rtAccelMgr; }
+
+    framegraph::VirtualResourceHandle SetupDebugVisualizationPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        framegraph::VirtualResourceHandle colorTarget,
+        framegraph::VirtualResourceHandle depthTarget,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        const Fmatrix& prevViewProj,
+        const xr_vector<passes::ParticleBatch>* particleBatches = nullptr
+    );
+
+    bool IsDebugEnabled() const;
+
+    u32 GetStaticResidualCount() const;
+    u32 GetTerrainResidualCount() const;
+
+    u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
+
+    u32 GetTransparentObjectCount() const { return m_transparentObjectCount; }
+    u32 GetTransparentResidualCount() const { return m_transparentResidualCount; }
+    const xr_vector<TransparentDrawRange>& GetTransparentRanges() const { return m_transparentRanges; }
+    u32 GetSkinnedForwardCount() const { return m_skinnedForwardCount; }
+    nvrhi::IBuffer* GetSkinnedForwardArgsBuffer() const { return m_skinnedForwardArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetSkinnedForwardInstanceBuffer() const { return m_skinnedForwardInstanceBuffer.Get(); }
+    const xr_vector<TransparentDrawRange>& GetSkinnedForwardRanges() const { return m_skinnedForwardRanges; }
+    u32 GetSkinnedEntryCapacity() const { return m_skinnedEntryCapacity; }
+    u32 GetSkinnedHudEntryCapacity() const { return m_skinnedHudEntryCapacity; }
+    nvrhi::IBuffer* GetSkinnedChunkBuffer() const { return m_skinnedChunkBuffer.Get(); }
+
+    struct CullingStats {
+        u32 clusterVisible = 0;
+        u32 clusterTerrainVisible = 0;
+        u32 clusterTrianglesDrawn = 0;
+        u32 clusterTerrainTrianglesDrawn = 0;
+        u32 clusterCandidates = 0;
+        u32 clusterRetestVisible = 0;
+        u32 clusterInstanceVisits = 0;
+        u32 clusterNodeVisits = 0;
+        u32 clusterLeafVisits = 0;
+        u32 clusterDeferredInstances = 0;
+        u32 clusterDeferredNodes = 0;
+        u32 clusterOverflow = 0;
+    };
+    const CullingStats& GetCullingStats() const { return m_cullingStats; }
+
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
+
+    void PrepareSkinnedGeometry(const GeometryCollector* geometry,
+        const xr_vector<GeometryBatch>* hudBatches, decals::OverlayManager* overlayMgr);
+
+    void UploadSkinnedObjects(fg::RenderContext* ctx, decals::OverlayManager* overlayMgr);
+
+    framegraph::VirtualResourceHandle SetupSkinnedUploadPass(
+        framegraph::FrameGraph& fg,
+        decals::OverlayManager* overlayMgr,
+        GeometryFrameResources& resources
+    );
+
+    u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
+    bool IsSkinnedEnabled() const { return m_initialized && m_skinnedEnabled; }
+    nvrhi::IBuffer* GetSkinnedRecordsBuffer() const { return m_skinnedRecordsBuffer.Get(); }
+    SkinnedGeometryPools& GetSkinnedPools() { return m_skinnedPools; }
+    const SkinnedGeometryPools& GetSkinnedPools() const { return m_skinnedPools; }
+
+    struct SkinnedDrawRecord {
+        Fmatrix world;
+        u32 boneOffset;
+        u32 splatOffset;
+        u32 splatCount;
+        u32 prevFirstVertex;
+        Fvector4 bounds;
+    };
+    static_assert(sizeof(SkinnedDrawRecord) == 96, "SkinnedDrawRecord must be 96 bytes");
+
+    struct SkinnedBucket {
+        struct Batch {
+            const GeometryBatch* source;
+            u32 boneOffset;
+            u32 splatOffset;
+            u32 splatCount;
+        };
+        xr_vector<Batch> kinds[4];
+    };
+
+    struct TransparentDrawScratch {
+        xr_vector<u32> order;
+        xr_vector<IndirectDrawArgs> args;
+        xr_vector<GPUInstanceData> instances;
+        xr_vector<u32> keys;
+        xr_vector<u32> materialIDs;
+        xr_vector<GeometryInstanceKey> identities;
+    };
+
+    struct SkinnedChunk {
+        u32 slot;
+        u32 srcVertex;
+        u32 dstVertex;
+        u32 count;
+    };
+    static constexpr u32 SKINNED_CHUNK_VERTICES = 256;
+
+    nvrhi::IBuffer* GetSkinnedPreVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex].Get(); }
+    nvrhi::IBuffer* GetSkinnedPrevVertexBuffer() const { return m_skinnedPreVB[m_skinnedPreVBIndex ^ 1u].Get(); }
+    nvrhi::IBuffer* GetSkinnedEntryBuffer() const { return m_skinnedEntryBuffer.Get(); }
+    u32 GetSkinnedEntryCount() const { return m_skinnedEntryCount; }
+    u32 GetSkinnedVisibleEntryCount() const { return m_skinnedVisibleEntryCount; }
+    nvrhi::IBuffer* GetSkinnedHudEntryBuffer() const { return m_skinnedHudEntryBuffer.Get(); }
+    u32 GetSkinnedHudEntryCount() const { return m_skinnedHudEntryCount; }
+    const Fvector4& GetSkinnedHudBounds() const { return m_skinnedHudBounds; }
+    static constexpr u32 SKINNED_ENTRY_INDICES = 384;
+    static constexpr u32 SKINNED_ENTRY_CAPACITY = 32768;
+    static constexpr u32 SKINNED_HUD_ENTRY_CAPACITY = 4096;
+    static constexpr u32 kSkinnedEntryLimit = (1u << 25) - 1u;
+
+    void BeginSkinnedFrame();
+
+    u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
+
+    nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
+
+    void ProcessStatsReadback();
+
+    u32 GetClusterCullRefCount() const { return m_clusterSet.refCount + m_clusterSet.dynamicRefCount; }
+    u32 GetDynamicClusterRefCount() const { return m_clusterSet.dynamicRefCount; }
+    u32 GetDynamicResidualCount() const { return m_clusterSet.dynamicResidualCount; }
+    u32 GetClusterRefCapacity() const { return m_clusterSet.refCapacity; }
+    nvrhi::IBuffer* GetClusterRefBuffer() const { return m_clusterSet.refBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterMetaBuffer() const { return m_clusterSet.metaBuffer.Get(); }
+    nvrhi::IBuffer* GetGeoInstanceBuffer() const { return m_clusterSet.instanceBuffer.Get(); }
+    nvrhi::IBuffer* GetAssetMemberBuffer() const { return m_clusterSet.memberBuffer.Get(); }
+    nvrhi::IBuffer* GetAssetNodeBuffer() const { return m_clusterSet.assetNodeBuffer.Get(); }
+    nvrhi::IBuffer* GetShadowBvhNodeBuffer() const { return m_clusterSet.bvhNodeBuffer.Get(); }
+    nvrhi::IBuffer* GetShadowBvhIndexBuffer() const { return m_clusterSet.bvhIndexBuffer.Get(); }
+    u32 GetShadowBvhNodeCount() const { return m_clusterSet.bvhNodeCount; }
+    bool GetShadowPairCapacity(float pageWidth, float errorThreshold, u32 pagesAxis, u32* capacity);
+    nvrhi::IBuffer* GetClusterVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterArgsBuffer() const { return m_clusterArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterFadeBuffer() const { return m_clusterSet.fadeBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterRetestVisibleEntryBuffer() const { return m_clusterSet.visibleEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestFadeBuffer() const { return m_clusterSet.fadeBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestArgsBuffer() const { return m_clusterArgsBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainVisibleEntryBuffer() const { return m_clusterSet.terrainVisibleEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainFadeBuffer() const { return m_clusterSet.terrainFadeBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestTerrainArgsBuffer() const { return m_clusterTerrainArgsBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterSwEntryBuffer() const { return m_clusterSet.swEntryBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterSwArgsBuffer() const { return m_clusterSwArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetClusterRetestSwEntryBuffer() const { return m_clusterSet.swEntryBuffer2.Get(); }
+    nvrhi::IBuffer* GetClusterRetestSwArgsBuffer() const { return m_clusterSwArgsBuffer2.Get(); }
+    void SetClusterSwCull(float swCull, float swNearZ) { m_clusterSwCull = swCull; m_clusterSwNearZ = swNearZ; }
+    u32 GetClusterRefCount() const { return m_clusterSet.refCount; }
+    u32 GetClusterStaticRefCount() const { return m_clusterSet.staticRefCount; }
+    u32 GetClusterTerrainRefCount() const { return m_clusterSet.terrainRefCount; }
+    u32 GetGeoInstanceCount() const { return m_clusterSet.instanceCount + m_clusterSet.dynamicInstanceCount; }
+    nvrhi::IBuffer* GetNeutralFadeBuffer() const { return m_neutralFadeBuffer.Get(); }
+    nvrhi::ITexture* GetDummyHiZ() const { return m_dummyHiZ.Get(); }
+
+private:
+    void CreateBuffers(fg::RenderDevice* device);
+    void CreateDebugResources(fg::RenderDevice* device);
+    void CreateParticleResources(fg::RenderDevice* device);
+    void CreateMegaBuffers();
+
+    void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
+
+    nvrhi::BufferHandle m_transparentInstanceBuffer;
+    nvrhi::BufferHandle m_transparentDrawArgsBuffer;
+    u32 m_staticObjectCount = 0;
+    u32 m_dynamicObjectCount = 0;
+    u32 m_transparentObjectCount = 0;
+    u32 m_transparentResidualCount = 0;
+    u32 m_maxTransparentObjects = 0;
+    bool m_staticUploaded = false;
+
+    struct ClusterCullBuffers {
+        nvrhi::BufferHandle metaBuffer;
+        nvrhi::BufferHandle memberBuffer;
+        nvrhi::BufferHandle assetNodeBuffer;
+        nvrhi::BufferHandle refBuffer;
+        nvrhi::BufferHandle instanceBuffer;
+        nvrhi::BufferHandle countBuffer;
+        nvrhi::BufferHandle visibleEntryBuffer;
+        nvrhi::BufferHandle fadeBuffer;
+        nvrhi::BufferHandle terrainVisibleEntryBuffer;
+        nvrhi::BufferHandle terrainFadeBuffer;
+        nvrhi::BufferHandle candidateBuffer;
+        nvrhi::BufferHandle visibleEntryBuffer2;
+        nvrhi::BufferHandle fadeBuffer2;
+        nvrhi::BufferHandle terrainVisibleEntryBuffer2;
+        nvrhi::BufferHandle terrainFadeBuffer2;
+        nvrhi::BufferHandle swEntryBuffer;
+        nvrhi::BufferHandle swEntryBuffer2;
+        nvrhi::BufferHandle nodeQueue[2];
+        nvrhi::BufferHandle deferredNodeBuffer;
+        nvrhi::BufferHandle deferredInstanceBuffer;
+        nvrhi::BufferHandle nodeSinkBuffer;
+        nvrhi::BufferHandle u32SinkBuffer;
+        nvrhi::BufferHandle leafQueueBuffer;
+        nvrhi::BufferHandle bvhNodeBuffer;
+        nvrhi::BufferHandle bvhIndexBuffer;
+        u32 bvhNodeCount = 0;
+        xr_vector<ClusterShadowCaster> shadowCasters;
+        float shadowCapacityWidth = 0.0f;
+        float shadowCapacityError = 0.0f;
+        u32 shadowCapacityAxis = 0;
+        u32 shadowCapacity[3] = {};
+        bool shadowCapacityValid = false;
+        u32 refCount = 0;
+        u32 staticRefCount = 0;
+        u32 terrainRefCount = 0;
+        u32 dynamicRefCount = 0;
+        u32 instanceCount = 0;
+        u32 dynamicInstanceCount = 0;
+        u32 refCapacity = 0;
+        u32 instanceCapacity = 0;
+        u32 nodeRefCapacity = 0;
+        u32 staticNodeRefs = 0;
+        u32 dynamicNodeRefs = 0;
+        u32 traversalDepth = 0;
+        u32 dynamicResidualCount = 0;
+        u32 residualStaticCount = 0;
+        u32 residualTerrainCount = 0;
+        bool uploaded = false;
+    };
+    ClusterCullBuffers m_clusterSet;
+    ClusterBvh m_shadowBvh;
+    nvrhi::BufferHandle m_clusterArgsBuffer;
+    nvrhi::BufferHandle m_clusterTerrainArgsBuffer;
+    nvrhi::BufferHandle m_clusterArgsBuffer2;
+    nvrhi::BufferHandle m_clusterTerrainArgsBuffer2;
+    nvrhi::BufferHandle m_clusterSwArgsBuffer;
+    nvrhi::BufferHandle m_clusterSwArgsBuffer2;
+    nvrhi::BufferHandle m_clusterRetestDispatchArgs;
+    nvrhi::BufferHandle m_clusterQueueArgsBuffer;
+    float m_clusterSwCull = 0.0f;
+    float m_clusterSwNearZ = 0.0f;
+    static constexpr u32 kClusterCountWords = 20;
+    static constexpr u32 kClusterQueueArgsSlots = 4;
+    static constexpr u32 kClusterTraversalGroup = 64;
+    static constexpr u32 kMaxClusterTraversalDepth = 64;
+    nvrhi::BufferHandle m_neutralFadeBuffer;
+    bool m_neutralFadeZeroed = false;
+    xr_vector<GPUGeoInstance> m_geoInstanceData;
+    xr_vector<u32> m_clusterRefData;
+    xr_vector<ClusterMeshKey> m_staticBatchKeys;
+    xr_vector<GPUGeoInstance> m_dynamicGeoInstanceData;
+    xr_vector<u32> m_dynamicRefData;
+    xr_vector<ClusterMeshKey> m_dynamicBatchKeys;
+    xr_vector<GeometryInstanceKey> m_dynamicInstanceIdentities;
+    class DynamicHistoryEntry
+    {
+    public:
+        Fmatrix world;
+        u32 assetMember;
+    };
+    xr_map<GeometryInstanceKey, DynamicHistoryEntry> m_dynamicHistory[2];
+    u32 m_dynamicHistoryIndex = 0;
+    u32 m_dynamicHistoryFrame = 0;
+    u32 m_geometryHistoryFrame = 0;
+    bool m_staticHistoryValid = false;
+    void BuildDynamicGeometryInstances(const GeometryCollector* geometry);
+    nvrhi::ComputePipelineHandle m_clusterInstancePipeline;
+    nvrhi::BindingLayoutHandle m_clusterInstanceLayout;
+    nvrhi::ComputePipelineHandle m_clusterNodePipeline;
+    nvrhi::BindingLayoutHandle m_clusterNodeLayout;
+    nvrhi::ComputePipelineHandle m_clusterLeafPipeline;
+    nvrhi::BindingLayoutHandle m_clusterLeafLayout;
+    nvrhi::ComputePipelineHandle m_clusterQueueArgsPipeline;
+    nvrhi::BindingLayoutHandle m_clusterQueueArgsLayout;
+    nvrhi::ComputePipelineHandle m_clusterArgsPipeline;
+    nvrhi::BindingLayoutHandle m_clusterArgsLayout;
+    fg::BufferHandle m_clusterCullParamsCB;
+    fg::BufferHandle m_clusterArgsParamsCB;
+    fg::BufferHandle m_clusterQueueParamsCB;
+
+    void BuildStaticGeometryInstances(const GeometryCollector* geometry);
+    bool EnsureGeometryTableBuffers(nvrhi::IDevice* nvDevice);
+    void UploadGeometryTables(nvrhi::ICommandList* cmdList);
+    bool EnsureClusterStreamBuffers(nvrhi::IDevice* nvDevice);
+    bool EnsureClusterCullPipeline(nvrhi::IDevice* nvDevice);
+    void DispatchClusterCull(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* prevHiZ, const Fmatrix& prevViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
+    void DispatchClusterRetest(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
+    void DispatchClusterArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice, u32 countBase, u32 swCountOffset,
+        nvrhi::IBuffer* args, nvrhi::IBuffer* terrainArgs, nvrhi::IBuffer* swArgs, nvrhi::IBuffer* retestDispatchArgs);
+    void DispatchQueueArgs(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        u32 srcCountOffset, u32 resetCountOffset, u32 slot, u32 groupSize);
+    void DispatchClusterTraversal(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, const Fmatrix& hizViewProj, u32 hizWidth, u32 hizHeight, u32 hizMipLevels,
+        bool late);
+    void AccumulateGeometryDemand();
+    void DispatchClusterLeaves(nvrhi::ICommandList* cmdList, nvrhi::IDevice* nvDevice,
+        nvrhi::ITexture* hiz, nvrhi::IBuffer* queue, u32 argsSlot, bool late, bool allowDefer);
+    void FillClusterCullParams(ClusterCullParamsCB& cb, const Fmatrix& hizViewProj,
+        bool useHiZ, u32 hizWidth, u32 hizHeight, u32 hizMipLevels);
+
+    nvrhi::TextureHandle m_dummyHiZ;
+
+    bool m_staticDataCached = false;
+    u32 m_staticBuildCount = 0;
+
+    u32 m_terrainObjectCount = 0;
+    u32 m_maxTerrainObjects = 0;
+
+    nvrhi::BufferHandle m_debugBuffer;
+    fg::BufferHandle m_debugComputeParamsCB;
+    fg::BufferHandle m_debugGraphicsParamsCB;
+
+    nvrhi::ComputePipelineHandle m_particleDebugComputePipeline;
+    nvrhi::BindingLayoutHandle m_debugComputeLayout;
+
+    nvrhi::GraphicsPipelineHandle m_debugGraphicsPipeline;
+    nvrhi::BindingLayoutHandle m_debugGraphicsLayout;
+    nvrhi::InputLayoutHandle m_debugInputLayout;
+
+    nvrhi::BufferHandle m_particleBuffer;
+
+    u32 m_maxParticles = 0;
+    xr_vector<GPUParticleData> m_particleData;
+    fg::RenderDevice* m_device = nullptr;
+    RTAccelStructManager* m_rtAccelMgr = nullptr;
+    u32 m_maxObjects = 0;
+    bool m_initialized = false;
+    bool m_computeEnabled = false;
+
+    xr_vector<u32> m_staticObjectFlags;
+    xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
+    xr_vector<u32> m_staticMaterialIDData;
+    xr_vector<GPUInstanceData> m_staticInstanceData;
+    xr_vector<u32> m_staticLightmapData;
+    xr_vector<u32> m_staticBatchVertexCounts;
+    xr_vector<GeometryInstanceKey> m_staticInstanceIdentities;
+
+    xr_vector<u32> m_dynamicObjectFlags;
+    xr_vector<u32> m_dynamicMaterialIDData;
+    xr_vector<GPUInstanceData> m_dynamicInstanceData;
+
+    xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
+    xr_vector<u32> m_terrainMaterialIDData;
+    xr_vector<GPUInstanceData> m_terrainInstanceData;
+    xr_vector<u32> m_terrainLightmapData;
+    xr_vector<ClusterMeshKey> m_terrainBatchKeys;
+    xr_vector<GeometryInstanceKey> m_terrainInstanceIdentities;
+    bool m_terrainDataCached = false;
+
+    xr_vector<IndirectDrawArgs> m_transparentDrawArgsData;
+    xr_vector<IndirectDrawArgs> m_transparentNativeArgs;
+    xr_vector<u32> m_transparentMaterialIDData;
+    xr_vector<GPUInstanceData> m_transparentInstanceData;
+    xr_vector<GeometryInstanceKey> m_transparentInstanceIdentities;
+    xr_vector<u32> m_transparentKeys;
+    xr_vector<TransparentDrawRange> m_transparentRanges;
+    TransparentDrawScratch m_transparentDrawScratch;
+    nvrhi::BufferHandle m_forwardDrawIndexBuffer;
+    u32 m_forwardDrawIndexCapacity = 0;
+    xr_vector<u32> m_forwardDrawIndices;
+    void EnsureForwardBuffers(nvrhi::IDevice* device);
+
+    nvrhi::BufferHandle m_skinnedRecordsBuffer;
+    u32 m_skinnedObjectCount = 0;
+    u32 m_maxSkinnedObjects = 0;
+    bool m_skinnedEnabled = false;
+
+    xr_vector<SkinnedDrawRecord> m_skinnedRecordsData;
+    xr_vector<SkinnedChunk> m_skinnedChunkData;
+    xr_vector<GPUClusterEntry> m_skinnedEntryData;
+    xr_vector<GPUClusterEntry> m_skinnedShadowEntryData;
+    nvrhi::BufferHandle m_skinnedEntryBuffer;
+    u32 m_skinnedEntryCapacity = 0;
+    u32 m_skinnedEntryCount = 0;
+    u32 m_skinnedVisibleEntryCount = 0;
+    u32 m_skinnedForwardCapacity = 0;
+    xr_vector<IndirectDrawArgs> m_skinnedForwardArgsData;
+    xr_vector<GPUInstanceData> m_skinnedForwardInstanceData;
+    xr_vector<u32> m_skinnedForwardKeys;
+    xr_vector<float> m_skinnedForwardSort;
+    xr_vector<TransparentDrawRange> m_skinnedForwardRanges;
+    nvrhi::BufferHandle m_skinnedForwardArgsBuffer;
+    nvrhi::BufferHandle m_skinnedForwardInstanceBuffer;
+    u32 m_skinnedForwardCount = 0;
+    void EnsureSkinnedForwardBuffers(nvrhi::IDevice* nvDevice);
+    xr_vector<u32> m_skinnedHudEntryData;
+    nvrhi::BufferHandle m_skinnedHudEntryBuffer;
+    u32 m_skinnedHudEntryCapacity = 0;
+    u32 m_skinnedHudEntryCount = 0;
+    bool m_skinnedPreVBRecreated = false;
+    bool m_skinnedPrepared = false;
+    u32 m_skinnedPreparedVertexCount = 0;
+    class SkinnedUploadPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle entries;
+        GPUCullingManager* manager;
+        decals::OverlayManager* overlayMgr;
+    };
+    Fvector4 m_skinnedHudBounds = {};
+    u32 m_skinnedChunkBase[SkinnedGeometryPools::FORMAT_COUNT] = {};
+    u32 m_skinnedChunkCount[SkinnedGeometryPools::FORMAT_COUNT] = {};
+    nvrhi::BufferHandle m_skinnedChunkBuffer;
+    u32 m_skinnedChunkCapacity = 0;
+    nvrhi::BufferHandle m_skinnedPreVB[2];
+    u32 m_skinnedPreVBCapacity = 0;
+    u32 m_skinnedPreVBIndex = 0;
+    class SkinnedHistoryEntry
+    {
+    public:
+        u64 visual;
+        u64 renderable;
+        u32 firstVertex;
+        u32 slot;
+
+        bool SameIdentity(const SkinnedHistoryEntry& o) const;
+        bool operator<(const SkinnedHistoryEntry& o) const;
+    };
+    xr_vector<SkinnedHistoryEntry> m_skinnedHistory[2];
+    u32 m_skinnedHistoryIndex = 0;
+    u32 m_skinnedHistoryFrame = 0;
+    bool EnsurePreskinBuffers(nvrhi::IDevice* nvDevice, u32 vertexTotal);
+    void EnsureSkinnedChunkBuffer(nvrhi::IDevice* nvDevice, u32 chunkTotal);
+    void EnsureSkinnedEntryBuffers(nvrhi::IDevice* nvDevice, u32 entryTotal, u32 hudEntryTotal);
+    nvrhi::ComputePipelineHandle m_preskinPipeline;
+    nvrhi::BindingLayoutHandle m_preskinLayout;
+    struct PreskinBindingSet {
+        nvrhi::IBuffer* resources[8] = {};
+        nvrhi::BindingSetHandle handle;
+    };
+    PreskinBindingSet m_preskinBindingSets[SkinnedGeometryPools::FORMAT_COUNT][2];
+    bool m_preskinFailed = false;
+    bool EnsurePreskinPipeline(nvrhi::IDevice* nvDevice);
+    bool DispatchPreskin(nvrhi::ICommandList* cmdList, decals::OverlayManager* overlayMgr, u32 vertexTotal);
+
+    SkinnedGeometryPools m_skinnedPools;
+    SkinnedBucket m_skinnedBuckets[SkinnedGeometryPools::FORMAT_COUNT];
+
+    static constexpr u32 MAX_TOTAL_BONES = 16384;
+    static constexpr u32 BONE_STRIDE = sizeof(Fmatrix);
+    nvrhi::BufferHandle m_globalBoneBuffer;
+    u32 m_boneUploadFrameId = 0;
+    xr_vector<Fmatrix> m_boneStagingBuffer;
+    u32 m_currentBoneOffset = 0;
+    bool m_boneBufferInitialized = false;
+    u32 m_boneBatchStart = 0;
+
+    void CreateSkinnedBuffers(fg::RenderDevice* device);
+    void EnsureSkinnedCapacity(u32 count);
+    static CKinematics* GetBatchSkeleton(const GeometryBatch& batch);
+    u32 PrepareSkeletonPalette(CKinematics* skeleton);
+    void FlushBoneBatch(nvrhi::ICommandList* cmdList);
+
+    nvrhi::BufferHandle m_megaVertexBuffer;
+    nvrhi::BufferHandle m_megaIndexBuffer;
+
+    xr_vector<bindless::UnifiedVertex> m_megaVertices;
+    xr_vector<u32> m_megaIndices;
+    xr_vector<ForwardVertex> m_forwardVertices;
+    xr_vector<u32> m_forwardIndices;
+    xr_map<ClusterMeshKey, MeshAllocation> m_forwardAllocations;
+    u32 m_forwardVertexBase = 0;
+    u32 m_forwardIndexBase = 0;
+    void AppendForwardGeometry(const MeshAllocation& allocation, const ClusterSourceView& source);
+    class ForwardUpload
+    {
+    public:
+        u64 lease = 0;
+        nvrhi::BufferHandle vertices;
+        nvrhi::BufferHandle indices;
+        nvrhi::BufferHandle drawIndices;
+        nvrhi::BufferHandle copyVertices;
+        nvrhi::BufferHandle copyIndices;
+        xr_vector<ForwardVertex> vertexStaging;
+        xr_vector<u32> indexStaging;
+        xr_vector<u32> drawIndexStaging;
+    };
+    xr_vector<ForwardUpload> m_forwardUploads;
+    void RetireForwardUploads(bool discard);
+    xr_vector<Fvector3> m_megaSourceNormals;
+    bool m_megaSourceNormalsActive = false;
+
+    u32 m_totalVertexCount = 0;
+    u32 m_totalIndexCount = 0;
+    u32 m_maxMegaVertices = 0;
+    u32 m_maxMegaIndices = 0;
+    u32 m_megaVertexCapacity = 0;
+    u32 m_megaIndexCapacity = 0;
+    xr_vector<bindless::UnifiedVertex> m_runtimeVertices;
+    xr_vector<Fvector3> m_runtimeSourceNormals;
+    xr_vector<u32> m_runtimeIndices;
+    nvrhi::BufferHandle m_megaCopySourceVB;
+    nvrhi::BufferHandle m_megaCopySourceIB;
+    u32 m_megaCopyVertexCount = 0;
+    u32 m_megaCopyIndexCount = 0;
+    bool m_geometryTablesDirty = false;
+    xr_map<GeometrySourceKey, MeshAllocation> m_runtimeSourceLookup;
+    bool EnsureMegaCapacity(u32 vertexTotal, u32 indexTotal);
+    void EnsureSourceNormalStorage(u32 vertexTotal);
+    Fvector3* ActivateSourceNormals(u32 firstVertex, u32 vertexCount);
+    bool m_megaBuffersReady = false;
+    bool m_megaDataUploaded = false;
+    bool m_levelLoadInProgress = false;
+
+    ClusterDAG m_clusterDAG;
+
+    struct VBPoolInfo {
+        u32 megaBufferVertexOffset;
+        u32 vertexCount;
+        bindless::SourceVertexLayout layout;
+    };
+
+    struct IBPoolInfo {
+        u32 megaBufferIndexOffset;
+        u32 indexCount;
+    };
+
+    xr_vector<VBPoolInfo> m_vbPools;
+    xr_vector<IBPoolInfo> m_ibPools;
+    xr_vector<VBPoolInfo> m_vbPoolsAlt;
+    xr_vector<IBPoolInfo> m_ibPoolsAlt;
+
+    static constexpr u32 STATS_READBACK_SLOTS = 6;
+    nvrhi::BufferHandle m_statsReadbackBuffers[STATS_READBACK_SLOTS];
+    CullingStats m_cullingStats;
+    u32 m_statsWriteSlot = 0;
+    u32 m_statsScheduled = 0;
+
+public:
+
+    u32 RegisterVBPool(
+        const void* vertices,
+        u32 vertexCount,
+        u32 vertexStride,
+        const VertexElement* decl,
+        bool alternative = false
+    );
+
+    u32 RegisterIBPool(
+        const u16* indices,
+        u32 indexCount,
+        bool alternative = false
+    );
+
+    MeshAllocation RegisterRuntimeGeometry(
+        const GeometrySourceKey& source,
+        const void* vertices,
+        u32 vertexStride,
+        const VertexElement* decl,
+        const u16* indices
+    );
+
+    const MeshAllocation* FindRuntimeGeometry(const GeometrySourceKey& source) const;
+
+    MeshAllocation GetMeshAllocation(
+        u32 vbID, u32 vBase, u32 vCount,
+        u32 ibID, u32 iBase, u32 iCount,
+        bool alternative = false
+    ) const;
+
+    static bool MaterialCastsShadow(u32 materialID);
+
+    void BakeClusterDAG(const xr_vector<ClusterBakeRange>& ranges,
+        const char* cachePath, u64 geomStamp);
+    ClusterDAG& GetClusterDAG() { return m_clusterDAG; }
+private:
+    class GeometryPreparePassData
+    {
+    public:
+        framegraph::VirtualResourceHandle instances;
+        framegraph::VirtualResourceHandle clusterRefs;
+        framegraph::VirtualResourceHandle megaVertices;
+        framegraph::VirtualResourceHandle megaIndices;
+        GPUCullingManager* manager;
+    };
+
+    class GPUCullPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle prevHiZ;
+        GPUCullingManager* manager;
+        Fmatrix prevViewProj;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    class ClusterRetestPassData
+    {
+    public:
+        framegraph::VirtualResourceHandle hiz;
+        framegraph::VirtualResourceHandle args;
+        GPUCullingManager* manager;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    GeometryResidencyManager m_residency;
+    nvrhi::BufferHandle m_rtVertexBuffer;
+    nvrhi::BufferHandle m_rtIndexBuffer;
+    nvrhi::BufferHandle m_rtCopySourceVertexBuffer;
+    nvrhi::BufferHandle m_rtCopySourceIndexBuffer;
+    xr_vector<u8> m_rtVertexStaging;
+    xr_vector<u32> m_rtIndexStaging;
+    xr_vector<u8> m_rtSubmittedVertexStaging;
+    xr_vector<u32> m_rtSubmittedIndexStaging;
+    u32 m_rtVertexCount = 0;
+    u32 m_rtIndexCount = 0;
+    u32 m_rtVertexUploaded = 0;
+    u32 m_rtIndexUploaded = 0;
+    u32 m_rtVertexCapacity = 0;
+    u32 m_rtIndexCapacity = 0;
+    u32 m_rtRuntimeVertexCount = 0;
+    u32 m_rtRayOnlyDynamicCount = 0;
+    bool m_rtSourceUploaded = false;
+    bool m_rtSourceFailed = false;
+    u64 m_rtSourceLease = 0;
+    void RetireRTSourceUpload(bool discard);
+    void CaptureRTSource();
+    void PrepareRTSourceGeneration();
+    void UploadRTSource(nvrhi::ICommandList* cmdList);
+    bool EnsureRTSourceCapacity(u32 vertexCount, u32 indexCount);
+    void AppendRuntimeRTSource(const bindless::UnifiedVertex* vertices, const Fvector3* floatNormals,
+        u32 vertexCount, const u32* indices, u32 indexCount);
+    string_path m_pageStorePath = {};
+};
+
+
+}

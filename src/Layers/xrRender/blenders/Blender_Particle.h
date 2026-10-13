@@ -1,21 +1,18 @@
 #pragma once
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CBlender_Particle : public IBlender
 {
+public:
     xrP_TOKEN oBlend;
     xrP_Integer oAREF;
     xrP_BOOL oClamp;
-
-public:
     CBlender_Particle();
     ~CBlender_Particle() override = default;
 
     LPCSTR getComment() override;
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
-
-    void Compile(CBlender_Compile& C) override;
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

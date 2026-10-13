@@ -2,7 +2,7 @@
 #include "xrCore/FMesh.hpp"
 #include "FLOD.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace flod
 {
@@ -21,16 +21,16 @@ struct _hw
 
 static VertexElement dwDecl[] =
 {
-    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos-0
-    {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1}, // pos-1
-    {0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0}, // nrm-0
-    {0, 36, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 1}, // nrm-1
-    {0, 48, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0}, // factors
-    {0, 52, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    {0, 60, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // uv
-    {0, 68, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2}, // rgbh-0
-    {0, 72, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3}, // rgbh-1
-    D3DDECL_END()
+    {0, 0,  VF_FLOAT3, 0, VS_POSITION, 0},
+    {0, 12, VF_FLOAT3, 0, VS_POSITION, 1},
+    {0, 24, VF_FLOAT3, 0, VS_NORMAL,   0},
+    {0, 36, VF_FLOAT3, 0, VS_NORMAL,   1},
+    {0, 48, VF_COLOR,  0, VS_COLOR,    0},
+    {0, 52, VF_FLOAT2, 0, VS_TEXCOORD, 0},
+    {0, 60, VF_FLOAT2, 0, VS_TEXCOORD, 1},
+    {0, 68, VF_COLOR,  0, VS_COLOR,    1},
+    {0, 72, VF_COLOR,  0, VS_COLOR,    2},
+    XR_VERTEX_ELEMENT_END
 };
 }
 
@@ -60,9 +60,6 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
         facets[f].N.invert();
     }
 
-    // VS
-    geom.create(flod::dwDecl, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
-
     // lod correction
     Fvector3 S;
     vis.box.getradius(S);
@@ -82,41 +79,4 @@ void FLOD::Copy(dxRender_Visual* pFrom)
     lod_factor = F->lod_factor;
     CopyMemory(facets, F->facets, sizeof(facets));
 }
-void FLOD::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
-{
-    /*
-    Fvector				Ldir;
-    Ldir.sub			(vis.sphere.P,Device.vCameraPosition);
-    Ldir.normalize		();
-
-    int					best_id		= 0;
-    float				best_dot	= Ldir.dotproduct(facets[0].N);
-    float				dot;
-
-    dot	= Ldir.dotproduct	(facets[1].N); if (dot>best_dot) { best_id=1; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[2].N); if (dot>best_dot) { best_id=2; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[3].N); if (dot>best_dot) { best_id=3; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[4].N); if (dot>best_dot) { best_id=4; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[5].N); if (dot>best_dot) { best_id=5; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[6].N); if (dot>best_dot) { best_id=6; best_dot=dot; }
-    dot	= Ldir.dotproduct	(facets[7].N); if (dot>best_dot) { best_id=7; best_dot=dot; }
-
-#pragma todo("Smooth transitions")
-#pragma todo("5-coloring")
-
-    // Fill VB
-    _face&		F					= facets[best_id];
-    u32			vOffset				= 0;
-    auto*		V					= (flod::_hw*) RImplementation.Vertex.Lock(4,geom->vb_stride,vOffset);
-    V[0].set	(F.v[0].v,F.N,F.v[0].c_rgb_hemi,F.v[0].t.x,F.v[0].t.y);
-    V[1].set	(F.v[1].v,F.N,F.v[1].c_rgb_hemi,F.v[1].t.x,F.v[1].t.y);
-    V[2].set	(F.v[2].v,F.N,F.v[2].c_rgb_hemi,F.v[2].t.x,F.v[2].t.y);
-    V[3].set	(F.v[3].v,F.N,F.v[3].c_rgb_hemi,F.v[3].t.x,F.v[3].t.y);
-    RImplementation.Vertex.Unlock			(4,geom->vb_stride);
-
-    // Draw IT
-    RCache.set_Geometry		(geom);
-    RCache.Render			(D3DPT_TRIANGLEFAN,vOffset,2);
-    */
 }
-} // namespace xray::render::RENDER_NAMESPACE

@@ -11,9 +11,7 @@
 #include "Level.h"
 #include "CustomZone.h"
 
-#ifdef DEBUG
-extern BOOL death_anim_debug;
-#endif // DEBUG
+#include "death_anims.h"
 
 void character_shell_control::Load(LPCSTR section)
 {
@@ -112,12 +110,10 @@ void character_shell_control::TestForWounded(const Fmatrix& xform, IKinematics* 
     {
         m_was_wounded = true;
     }
-#ifdef DEBUG
     if (death_anim_debug)
     {
         Msg("death anim: test for wounded %s ", m_was_wounded ? "true" : "false");
     }
-#endif
 };
 
 void character_shell_control::CalculateTimeDelta()

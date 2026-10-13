@@ -29,6 +29,39 @@
 #include "xrCore/xr_token.h"
 
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
+extern ENGINE_API int ps_r4_use_pbr;
+extern ENGINE_API int ps_fg_pbr_diffuse_mode;
+extern ENGINE_API int ps_r_path_tracer_bounces;
+extern ENGINE_API int ps_r_path_tracer_debug;
+extern ENGINE_API int ps_r_path_tracer_freeze;
+extern ENGINE_API int ps_r_path_tracer_samples;
+extern ENGINE_API int ps_r_rt_max_null_events;
+extern ENGINE_API int ps_r_rt_light_rays;
+extern ENGINE_API float ps_r_rt_sun_radius;
+extern ENGINE_API int ps_r_rt_gi;
+extern ENGINE_API int ps_r_rt_gi_reconstruct;
+extern ENGINE_API int ps_r_rt_gi_history;
+extern ENGINE_API int ps_r_rt_gi_filter_passes;
+extern ENGINE_API int ps_r_rt_gi_restir;
+extern ENGINE_API float ps_r_rt_gi_intensity;
+extern ENGINE_API int ps_r_rt_gi_bounces;
+extern ENGINE_API int ps_r_rt_gi_samples;
+extern ENGINE_API float ps_r_rt_gi_ray_distance;
+extern ENGINE_API float ps_r_rt_scene_radius;
+extern ENGINE_API float ps_r_rt_grass_radius;
+extern ENGINE_API int ps_r_rt_world_cache;
+extern ENGINE_API int ps_r_rt_world_cache_bounce;
+extern ENGINE_API int ps_r_rt_world_cache_debug;
+extern ENGINE_API int ps_r_rt_world_cache_size;
+extern ENGINE_API int ps_r_rt_world_cache_lifetime;
+extern ENGINE_API int ps_r_rt_world_cache_updates;
+extern ENGINE_API int ps_r_rt_world_cache_history;
+extern ENGINE_API float ps_r_rt_world_cache_cell;
+extern ENGINE_API float ps_r_rt_world_cache_lod;
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
 
 class ENGINE_API IConsole_Command
 {

@@ -1,0 +1,469 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/cmake_builds/${presetName}"
+    },
+    {
+      "name": "config-debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "config-mixed",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Mixed"
+      }
+    },
+    {
+      "name": "config-release",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "config-rmg",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "ReleaseMasterGold"
+      }
+    },
+    {
+      "name": "unix",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "win64",
+      "hidden": true,
+      "inherits": "windows",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Windows.ClangCL.cmake",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ],
+          "intelliSenseMode": "windows-clang-x64"
+        }
+      }
+    },
+    {
+      "name": "win64-msvc",
+      "hidden": true,
+      "inherits": "windows",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Windows.MSVC.cmake",
+      "cacheVariables": {
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ],
+          "intelliSenseMode": "windows-msvc-x64"
+        }
+      }
+    },
+    {
+      "name": "unix-debug",
+      "displayName": "Debug",
+      "inherits": [
+        "unix",
+        "config-debug"
+      ]
+    },
+    {
+      "name": "unix-mixed",
+      "displayName": "Mixed",
+      "inherits": [
+        "unix",
+        "config-mixed"
+      ]
+    },
+    {
+      "name": "unix-release",
+      "displayName": "Release",
+      "inherits": [
+        "unix",
+        "config-release"
+      ]
+    },
+    {
+      "name": "unix-rmg",
+      "displayName": "ReleaseMasterGold",
+      "inherits": [
+        "unix",
+        "config-rmg"
+      ]
+    },
+    {
+      "name": "win64-debug",
+      "displayName": "x64 Debug",
+      "inherits": [
+        "win64",
+        "config-debug"
+      ]
+    },
+    {
+      "name": "win64-mixed",
+      "displayName": "x64 Mixed",
+      "inherits": [
+        "win64",
+        "config-mixed"
+      ]
+    },
+    {
+      "name": "win64-release",
+      "displayName": "x64 Release",
+      "inherits": [
+        "win64",
+        "config-release"
+      ]
+    },
+    {
+      "name": "win64-rmg",
+      "displayName": "x64 ReleaseMasterGold",
+      "inherits": [
+        "win64",
+        "config-rmg"
+      ]
+    },
+    {
+      "name": "win64-msvc-debug",
+      "displayName": "x64 MSVC Debug",
+      "inherits": [
+        "win64-msvc",
+        "config-debug"
+      ]
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "displayName": "x64 MSVC Mixed",
+      "inherits": [
+        "win64-msvc",
+        "config-mixed"
+      ]
+    },
+    {
+      "name": "win64-msvc-release",
+      "displayName": "x64 MSVC Release",
+      "inherits": [
+        "win64-msvc",
+        "config-release"
+      ]
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "displayName": "x64 MSVC ReleaseMasterGold",
+      "inherits": [
+        "win64-msvc",
+        "config-rmg"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "unix-debug",
+      "configurePreset": "unix-debug"
+    },
+    {
+      "name": "unix-mixed",
+      "configurePreset": "unix-mixed"
+    },
+    {
+      "name": "unix-release",
+      "configurePreset": "unix-release"
+    },
+    {
+      "name": "unix-rmg",
+      "configurePreset": "unix-rmg"
+    },
+    {
+      "name": "win64-debug",
+      "configurePreset": "win64-debug"
+    },
+    {
+      "name": "win64-mixed",
+      "configurePreset": "win64-mixed"
+    },
+    {
+      "name": "win64-release",
+      "configurePreset": "win64-release"
+    },
+    {
+      "name": "win64-rmg",
+      "configurePreset": "win64-rmg"
+    },
+    {
+      "name": "win64-msvc-debug",
+      "configurePreset": "win64-msvc-debug"
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "configurePreset": "win64-msvc-mixed"
+    },
+    {
+      "name": "win64-msvc-release",
+      "configurePreset": "win64-msvc-release"
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "configurePreset": "win64-msvc-rmg"
+    }
+  ],
+  "packagePresets": [
+    {
+      "name": "package-base",
+      "hidden": true,
+      "packageDirectory": "${sourceDir}/cmake_builds/${presetName}/artifacts"
+    },
+    {
+      "name": "unix-debug",
+      "configurePreset": "unix-debug",
+      "inherits": "package-base"
+    },
+    {
+      "name": "unix-mixed",
+      "configurePreset": "unix-mixed",
+      "inherits": "package-base"
+    },
+    {
+      "name": "unix-release",
+      "configurePreset": "unix-release",
+      "inherits": "package-base"
+    },
+    {
+      "name": "unix-rmg",
+      "configurePreset": "unix-rmg",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-debug",
+      "configurePreset": "win64-debug",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-mixed",
+      "configurePreset": "win64-mixed",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-release",
+      "configurePreset": "win64-release",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-rmg",
+      "configurePreset": "win64-rmg",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-debug",
+      "configurePreset": "win64-msvc-debug",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "configurePreset": "win64-msvc-mixed",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-release",
+      "configurePreset": "win64-msvc-release",
+      "inherits": "package-base"
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "configurePreset": "win64-msvc-rmg",
+      "inherits": "package-base"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "unix-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "unix-debug"
+        },
+        {
+          "type": "build",
+          "name": "unix-debug"
+        }
+      ]
+    },
+    {
+      "name": "unix-mixed",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "unix-mixed"
+        },
+        {
+          "type": "build",
+          "name": "unix-mixed"
+        }
+      ]
+    },
+    {
+      "name": "unix-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "unix-release"
+        },
+        {
+          "type": "build",
+          "name": "unix-release"
+        }
+      ]
+    },
+    {
+      "name": "unix-rmg",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "unix-rmg"
+        },
+        {
+          "type": "build",
+          "name": "unix-rmg"
+        }
+      ]
+    },
+    {
+      "name": "win64-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-debug"
+        },
+        {
+          "type": "build",
+          "name": "win64-debug"
+        }
+      ]
+    },
+    {
+      "name": "win64-mixed",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-mixed"
+        },
+        {
+          "type": "build",
+          "name": "win64-mixed"
+        }
+      ]
+    },
+    {
+      "name": "win64-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-release"
+        },
+        {
+          "type": "build",
+          "name": "win64-release"
+        }
+      ]
+    },
+    {
+      "name": "win64-rmg",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-rmg"
+        },
+        {
+          "type": "build",
+          "name": "win64-rmg"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-debug",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-debug"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-debug"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-mixed",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-mixed"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-mixed"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-release",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-release"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-release"
+        }
+      ]
+    },
+    {
+      "name": "win64-msvc-rmg",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "win64-msvc-rmg"
+        },
+        {
+          "type": "build",
+          "name": "win64-msvc-rmg"
+        }
+      ]
+    }
+  ]
+}

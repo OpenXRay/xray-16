@@ -12,6 +12,7 @@
 #include "pure.h"
 
 // refs
+class CHUDManager;
 class ENGINE_API CCameraManager;
 class ENGINE_API CCursor;
 class ENGINE_API CCustomHUD;

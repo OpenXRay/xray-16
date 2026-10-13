@@ -134,9 +134,16 @@ void CUIPdaWnd::Init()
         if (!pUIActorInfo->Init())
             xr_delete(pUIActorInfo);
 
-        pUIRankingWnd = xr_new<CUIRankingWnd>();
-        if (!pUIRankingWnd->Init())
-            xr_delete(pUIRankingWnd);
+        if (Level().IsDeveloperLevel())
+        {
+            Msg("[dev_level] event=ui component=campaign_rankings state=disabled reason=non_alife_session");
+        }
+        else
+        {
+            pUIRankingWnd = xr_new<CUIRankingWnd>();
+            if (!pUIRankingWnd->Init())
+                xr_delete(pUIRankingWnd);
+        }
 
         pUILogsWnd = xr_new<CUILogsWnd>();
         if (!pUILogsWnd->Init())

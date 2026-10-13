@@ -1,0 +1,141 @@
+#include "shared/color_space.h"
+#include "shared/tonemap.h"
+
+Texture2D<float4> t_Scene : register(t0);
+Texture2D<float4> t_Interface : register(t1);
+StructuredBuffer<float4> t_Exposure : register(t2);
+Texture2D<float4> t_Bloom : register(t3);
+Texture2D<float4> t_Noise : register(t4);
+Texture2D<float4> t_ColorMap0 : register(t5);
+Texture2D<float4> t_ColorMap1 : register(t6);
+SamplerState smp_rtlinear : register(s0);
+SamplerState smp_linear : register(s1);
+
+cbuffer DisplayOutputParams : register(b0)
+{
+    uint g_Tonemapper;
+    uint g_SceneValid;
+    uint g_FrameIndex;
+    float g_Gamma;
+    float g_Brightness;
+    float g_Contrast;
+    float g_BloomIntensity;
+    uint g_EffectsEnabled;
+    float2 g_InvSceneSize;
+    float2 g_BlurShift;
+    float2 g_DualityShift;
+    float2 g_NoiseOffset;
+    float2 g_NoiseScale;
+    float g_Gray;
+    float g_NoiseIntensity;
+    float3 g_ColorGray;
+    float g_ColorMapInfluence;
+    float3 g_ColorBase;
+    float g_ColorMapInterpolate;
+    float3 g_ColorAdd;
+    float g_BloomNormalization;
+    uint g_OutputHdr;
+    float g_SdrWhiteLevel;
+    float g_DisplayPeak;
+    float g_OutputPad;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float3 ApplyCalibration(float3 encoded, float encodedPeak)
+{
+    float3 curved = pow(clamp(encoded, 0.0, encodedPeak), 1.0 / max(g_Gamma, 0.01));
+    return (1.0 + g_Contrast) * 0.5 * curved + (g_Brightness - g_Contrast) * 0.25;
+}
+
+float InterleavedGradientNoise(float2 pixel)
+{
+    return frac(52.9829189 * frac(dot(pixel, float2(0.06711056, 0.00583715))));
+}
+
+float QuantizationDither(float2 pixel, uint frame)
+{
+    float2 offset = float2(frame % 64u, (frame / 64u) % 64u) * 5.588238;
+    float a = InterleavedGradientNoise(pixel + offset);
+    float b = InterleavedGradientNoise(pixel + offset + float2(113.0, 57.0));
+    return (a + b - 1.0) / 255.0;
+}
+
+float3 SanitizeRadiance(float3 radiance)
+{
+    return all(isfinite(radiance)) ? max(radiance, 0.0) : 0.0;
+}
+
+float3 AddBloom(float3 radiance, float2 uv)
+{
+    if (g_BloomIntensity <= 0.0)
+        return radiance;
+    float3 bloom = SanitizeRadiance(t_Bloom.SampleLevel(smp_rtlinear, uv, 0).rgb) * g_BloomNormalization;
+    return lerp(radiance, bloom, g_BloomIntensity);
+}
+
+float3 EncodeDisplay(float3 radiance)
+{
+    return LinearToSrgb(Tonemap(radiance * t_Exposure[0].x, g_Tonemapper, g_DisplayPeak));
+}
+
+float3 SampleDisplay(float2 uv)
+{
+    float3 radiance = SanitizeRadiance(t_Scene.SampleLevel(smp_rtlinear, uv, 0).rgb);
+    return EncodeDisplay(AddBloom(radiance, uv));
+}
+
+float3 ApplyColorMap(float3 image)
+{
+    float2 coord = float2(dot(image, (1.0 / 3.0).xxx), 0.5);
+    float3 mapped = lerp(
+        t_ColorMap0.SampleLevel(smp_rtlinear, coord, 0).rgb,
+        t_ColorMap1.SampleLevel(smp_rtlinear, coord, 0).rgb,
+        g_ColorMapInterpolate);
+    return lerp(image, mapped, g_ColorMapInfluence);
+}
+
+float3 ApplyEffects(float3 image, float2 position, float encodedPeak)
+{
+    if (g_ColorMapInfluence > 0.0)
+        image = ApplyColorMap(image);
+    image = lerp(image, dot(image, g_ColorGray).xxx, g_Gray);
+    if (g_NoiseIntensity > 0.0)
+    {
+        float3 noise = t_Noise.SampleLevel(smp_linear, g_NoiseOffset + position * g_NoiseScale, 0).rgb;
+        image = lerp(image, image * noise * 2.0, g_NoiseIntensity);
+    }
+    return clamp((image * g_ColorBase + g_ColorAdd) * 2.0, 0.0, encodedPeak);
+}
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    int3 pixel = int3(input.position.xy, 0);
+    float encodedPeak = g_OutputHdr != 0u ? LinearToSrgb(g_DisplayPeak.xxx).x : 1.0;
+    float3 display = 0.0;
+    if (g_SceneValid != 0u)
+    {
+        float2 uv = input.position.xy * g_InvSceneSize;
+        if (g_EffectsEnabled != 0u)
+        {
+            float2 base = uv * (1.0 - g_DualityShift) + g_BlurShift;
+            display = 0.5 * (SampleDisplay(base) + SampleDisplay(base + g_DualityShift));
+            display = ApplyEffects(display, input.position.xy, encodedPeak);
+        }
+        else
+        {
+            display = EncodeDisplay(AddBloom(SanitizeRadiance(t_Scene.Load(pixel).rgb), uv));
+        }
+    }
+    float4 ui = t_Interface.Load(pixel);
+    display = ui.rgb + display * (1.0 - ui.a);
+    display = ApplyCalibration(display, encodedPeak);
+    if (g_OutputHdr != 0u)
+        return float4(SrgbToLinear(clamp(display, 0.0, encodedPeak)) * g_SdrWhiteLevel, 1.0);
+    display += QuantizationDither(input.position.xy, g_FrameIndex);
+    return float4(saturate(display), 1.0);
+}

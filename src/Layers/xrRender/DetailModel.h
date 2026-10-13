@@ -2,13 +2,17 @@
 
 #include "IRenderDetailModel.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class ECORE_API CDetail : public IRender_DetailModel
 {
 private:
     void transfer_indices(u16* iDest, u32 iOffset);
 public:
+    ref_geom hw_Geom;
+    VertexStagingBuffer hw_VB;
+    IndexStagingBuffer hw_IB;
+
     void Load(IReader* S);
     void Optimize();
     virtual void Unload();
@@ -17,4 +21,4 @@ public:
     virtual void transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset, float du, float dv);
     virtual ~CDetail();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

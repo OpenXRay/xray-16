@@ -206,6 +206,15 @@ void CALifeMonsterDetailPathManager::follow_path(const ALife::_TIME_ID& time_del
         m_walked_distance = 0.f;
         object().get_object().m_tNodeID = m_destination.m_level_vertex_id;
         object().get_object().o_Position = m_destination.m_position;
+
+        if (GEnv.Render)
+        {
+            float radius = 0.5f;
+            float strength = 0.6f;
+
+            GEnv.Render->RequestGrassInteraction(m_destination.m_position, radius, strength, 0);
+        }
+
 #ifdef DEBUG
         object().m_fDistanceFromPoint = 0.f;
         object().m_fDistanceToPoint = 0.f;
@@ -248,6 +257,15 @@ void CALifeMonsterDetailPathManager::follow_path(const ALife::_TIME_ID& time_del
 
         object().on_location_change();
         VERIFY(m_path.back() == object().get_object().m_tGraphID);
+
+        if (GEnv.Render)
+        {
+            const Fvector& current_pos = object().get_object().o_Position;
+            float radius = 0.5f;
+            float strength = 0.4f;
+
+            GEnv.Render->RequestGrassInteraction(current_pos, radius, strength, 0);
+        }
     }
 }
 

@@ -1,0 +1,29 @@
+{
+    "transparent": true,
+    "castsShadow": false,
+    "fog": false,
+    "distort": true,
+    "sorting": {
+        "priority": 3,
+        "backToFront": true
+    },
+    "colorMode": "unlit",
+    "vertexFade": {
+        "mode": "edge",
+        "scale": 1.3
+    },
+    "blend": {
+        "src": "srccolor",
+        "dst": "invsrcalpha"
+    },
+    "depth": {
+        "test": true,
+        "write": false
+    },
+    "textures": {
+        "s_distort": "pfx\\pfx_dist_glass"
+    },
+    "alphaTest": {
+        "ref": 0
+    }
+}

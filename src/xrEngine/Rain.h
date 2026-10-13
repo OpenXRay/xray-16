@@ -14,22 +14,14 @@
 // refs
 class ENGINE_API IRender_DetailModel;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace render_r4
-{
-class dxRainRender;
+class FGRainRender;
 }
-namespace render_gl
-{
-class dxRainRender;
-}
-} // namespace xray::render
 
 class ENGINE_API CEffect_Rain
 {
-    friend class xray::render::render_r4::dxRainRender;
-    friend class xray::render::render_gl::dxRainRender;
+    friend class xray::render::fg::FGRainRender;
 
 private:
     struct Item
@@ -94,6 +86,8 @@ public:
 
     void Render();
     void OnFrame();
+
+    IRainRender* GetRenderer() const { return &*m_pRender; }
 };
 
 #endif // RainH

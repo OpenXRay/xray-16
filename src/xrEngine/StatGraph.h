@@ -6,23 +6,15 @@
 #include "Include/xrRender/StatGraphRender.h"
 #include "xrCommon/xr_deque.h"
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace render_r4
-{
-class dxStatGraphRender;
+class FGStatGraphRender;
 }
-namespace render_gl
-{
-class dxStatGraphRender;
-}
-} // namespace xray::render
 
 //---------------------------------------------------------------------------
 class ENGINE_API CStatGraph : public pureRender
 {
-    friend class xray::render::render_r4::dxStatGraphRender;
-    friend class xray::render::render_gl::dxStatGraphRender;
+    friend class xray::render::fg::FGStatGraphRender;
 
 public:
     enum EStyle

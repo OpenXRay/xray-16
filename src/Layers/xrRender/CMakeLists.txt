@@ -1,0 +1,518 @@
+add_library(xrRender STATIC)
+
+target_sources(xrRender PRIVATE
+    stdafx.h
+    stdafx.cpp
+    RenderView.h
+    RenderView.cpp
+    ColorSpace.h
+    ColorSpace.cpp
+    DisplayCalibration.h
+    DisplayCalibration.cpp
+    PostProcessEffects.h
+    PostProcessEffects.cpp
+
+    RenderContext/ResourceHandle.h
+    RenderContext/RCShader.h
+    RenderContext/RCShader.cpp
+    RenderContext/PipelineState.h
+    RenderContext/PipelineState.cpp
+    RenderContext/RenderDevice.h
+    RenderContext/RenderDevice.cpp
+    RenderContext/RenderContext.h
+    RenderContext/RenderContext.cpp
+
+    FrameGraph/FGTypes.h
+    FrameGraph/FGResource.h
+    FrameGraph/FGResource.cpp
+    FrameGraph/FGPass.h
+    FrameGraph/FrameGraph.h
+    FrameGraph/FrameGraph.cpp
+    FrameGraph/ShaderLoader.h
+    FrameGraph/ShaderLoader.cpp
+    FrameGraph/ShaderCache.h
+    FrameGraph/ShaderCache.cpp
+    FrameGraph/VolatileConstantBufferPool.h
+    FrameGraph/VolatileConstantBufferPool.cpp
+    FrameGraph/BindingLayoutBuilder.cpp
+    FrameGraph/BindingSetBuilder.cpp
+    FrameGraph/FGResourcePool.cpp
+    FrameGraph/PassResourceCache.cpp
+    FrameGraph/ShaderReflection.cpp
+
+    ShaderVariant/ShaderVariantRegistry.h
+    ShaderVariant/ShaderVariantRegistry.cpp
+    ShaderVariant/JsonParser.h
+    ShaderVariant/JsonParser.cpp
+
+    Bindless/GPUStructuredBuffer.h
+    Bindless/GPUStructuredBuffer.cpp
+    Bindless/VariantTextureBuffer.h
+    Bindless/VariantTextureBuffer.cpp
+    Bindless/VariantBuffer.cpp
+    Bindless/MaterialBuffer.cpp
+    Bindless/TerrainMaterialBuffer.cpp
+    Bindless/VertexConverter.cpp
+
+    Shaders/SlangCompiler.h
+    Shaders/SlangCompiler.cpp
+    Shaders/SlangCompilerTest.cpp
+    Shaders/SlangVFSAdapter.h
+    Shaders/SlangVFSAdapter.cpp
+    Shaders/SlangReflectionWrapper.cpp
+
+    FrameGraphPasses/ShaderConstants.h
+    FrameGraphPasses/ShaderConstants.cpp
+    FrameGraphPasses/ClusterDrawConfig.h
+    FrameGraphPasses/ClusterDrawConfig.cpp
+    FrameGraphPasses/VisibilityPassSetup.h
+    FrameGraphPasses/VisibilityPassSetup.cpp
+    FrameGraphPasses/MaterialResolvePassSetup.h
+    FrameGraphPasses/MaterialResolvePassSetup.cpp
+    FrameGraphPasses/VSMPassSetup.cpp
+    FrameGraphPasses/HiZBuildPassSetup.h
+    FrameGraphPasses/HiZBuildPassSetup.cpp
+    FrameGraphPasses/ImGuiPassSetup.h
+    FrameGraphPasses/ImGuiPassSetup.cpp
+    FrameGraphPasses/StatGraphPassSetup.h
+    FrameGraphPasses/StatGraphPassSetup.cpp
+    FrameGraphPasses/DebugDrawPassSetup.h
+    FrameGraphPasses/DebugDrawPassSetup.cpp
+    FrameGraphPasses/RainPassSetup.h
+    FrameGraphPasses/RainPassSetup.cpp
+    FrameGraphPasses/ThunderboltPassSetup.h
+    FrameGraphPasses/ThunderboltPassSetup.cpp
+    FrameGraphPasses/LensFlarePassSetup.h
+    FrameGraphPasses/LensFlarePassSetup.cpp
+    fgStatGraphRender.h
+    fgStatGraphRender.cpp
+    fgRainRender.h
+    fgRainRender.cpp
+    fgFontRender.h
+    fgFontRender.cpp
+    FrameGraphPasses/FontPassSetup.h
+    FrameGraphPasses/FontPassSetup.cpp
+    fgThunderboltRender.h
+    fgThunderboltRender.cpp
+    fgLensFlareRender.h
+    fgLensFlareRender.cpp
+    fgFlareRender.h
+    fgFlareRender.cpp
+    fgEnvironmentRender.h
+    fgEnvironmentRender.cpp
+    FrameGraphPasses/ParticlePassSetup.h
+    FrameGraphPasses/GpuParticlePassSetup.h
+    FrameGraphPasses/GpuParticlePassSetup.cpp
+    FrameGraphPasses/RibbonPassSetup.h
+    FrameGraphPasses/RibbonPassSetup.cpp
+    FrameGraphPasses/TrailPassSetup.h
+    FrameGraphPasses/TrailPassSetup.cpp
+    FrameGraphPasses/SmokeTrailManager.h
+    FrameGraphPasses/SmokeTrailManager.cpp
+    FrameGraphPasses/SmokeTrailPassSetup.h
+    FrameGraphPasses/SmokeTrailPassSetup.cpp
+    FrameGraphPasses/DecalPassSetup.h
+    FrameGraphPasses/DecalPassSetup.cpp
+    FrameGraphPasses/DistortionApplyPassSetup.h
+    FrameGraphPasses/DistortionApplyPassSetup.cpp
+    FrameGraphPasses/BloomPassSetup.h
+    FrameGraphPasses/BloomPassSetup.cpp
+    FrameGraphPasses/DisplayPassSetup.h
+    FrameGraphPasses/DisplayPassSetup.cpp
+    FrameGraphPasses/UIPassSetup.h
+    FrameGraphPasses/UIPassSetup.cpp
+    FrameGraphPasses/SkyPassSetup.h
+    FrameGraphPasses/SkyPassSetup.cpp
+    FrameGraphPasses/SunPassSetup.h
+    FrameGraphPasses/SunPassSetup.cpp
+    FrameGraphPasses/DetailCullPassSetup.h
+    FrameGraphPasses/DetailCullPassSetup.cpp
+    FrameGraphPasses/DetailResolvePassSetup.h
+    FrameGraphPasses/DetailResolvePassSetup.cpp
+    FrameGraphPasses/TransparentPassSetup.h
+    FrameGraphPasses/TransparentPassSetup.cpp
+    FrameGraphPasses/DeferredLightPassSetup.h
+    FrameGraphPasses/DeferredLightPassSetup.cpp
+    FrameGraphPasses/LocalShadowPassSetup.h
+    FrameGraphPasses/LocalShadowPassSetup.cpp
+    FrameGraphPasses/PassCommon.h
+    FrameGraphPasses/PassCommon.cpp
+    FrameGraphPasses/PathTracerPassSetup.h
+    FrameGraphPasses/PathTracerPassSetup.cpp
+    FrameGraphPasses/RTEnvironmentSamplingPassSetup.h
+    FrameGraphPasses/RTEnvironmentSamplingPassSetup.cpp
+    FrameGraphPasses/SkyEnvironmentPassSetup.h
+    FrameGraphPasses/SkyEnvironmentPassSetup.cpp
+    FrameGraphPasses/ViewFrame.h
+    FrameGraphPasses/MotionVectorPassSetup.h
+    FrameGraphPasses/MotionVectorPassSetup.cpp
+    FrameGraphPasses/ReSTIRGIPassSetup.h
+    FrameGraphPasses/ReSTIRGIPassSetup.cpp
+    FrameGraphPasses/WorldCachePassSetup.h
+    FrameGraphPasses/WorldCachePassSetup.cpp
+    FrameGraphPasses/SkyVisibilityPassSetup.h
+    FrameGraphPasses/SkyVisibilityPassSetup.cpp
+    FrameGraphPasses/ClusterLightPassSetup.cpp
+
+    RayTracing/RTAccelStructManager.h
+    RayTracing/RTAccelStructManager.cpp
+    RayTracing/WorldRadianceCache.h
+    RayTracing/WorldRadianceCache.cpp
+    RayTracing/SkyVisibilityGrid.h
+    RayTracing/SkyVisibilityGrid.cpp
+
+    SkyEnvironment.h
+    SkyEnvironment.cpp
+
+    FGDetailManager.h
+    FGDetailManager.cpp
+    FGDetailStorage.cpp
+
+    FGDebugDraw.h
+    FGDebugDraw.cpp
+
+    Geometry/GeometryBatch.h
+    Geometry/GeometryBatch.cpp
+    Geometry/SkinnedGeometryPools.h
+    Geometry/SkinnedGeometryPools.cpp
+    Geometry/MaterialCache.cpp
+    Geometry/MaterialCache_Developer.cpp
+
+    UIGeometryBatch.h
+    fgUIRender.h
+    fgUIRender.cpp
+
+    LightingMode.h
+    LightingMode.cpp
+
+    r_FrameGraphRenderer.h
+    r_FrameGraphRenderer.cpp
+    r_FrameGraphRenderer_Developer.cpp
+    DeveloperSceneRenderer.h
+    r_FrameGraphRenderer_Loader.cpp
+    r_FrameGraphRenderer_Shaders.cpp
+    r_FrameGraphRenderer_Blenders.cpp
+    FGRenderHost.h
+    FGRenderHost.cpp
+    FrameGraphRendererModule.h
+    FrameGraphRendererModule.cpp
+
+    ImGuiRendererNVRHI.h
+    ImGuiRendererNVRHI.cpp
+    ImGuiRendererNVRHI_Shaders.cpp
+    ImGuiRendererNVRHI_Render.cpp
+    ImGuiRendererIntegration.cpp
+    fgRenderFactory_ImGui.cpp
+    GlobalRenderDevice.cpp
+
+    Backend/SubmitTokenRing.h
+    Backend/BackendCompletion.h
+    Backend/BackendCompletion.cpp
+    Backend/BindlessTextureRegistry.h
+    Backend/BindlessTextureRegistry.cpp
+    GeometryResidency.h
+    GeometryResidency.cpp
+
+    Animation.cpp
+    ClusteredLightManager.cpp
+    ConstantSystem/FGConstantSystem.cpp
+    FGRenderBase.h
+    FGRenderBase.cpp
+    DetailModel.cpp
+    ETextureParams.cpp
+    FBasicVisual.cpp
+    FHierrarhyVisual.cpp
+    FLOD.cpp
+    FProgressive.cpp
+    ClusterBasis.h
+    ClusterBasis.cpp
+    ClusterDAG.cpp
+    ClusterDeviation.cpp
+    ClusterShadowBVH.cpp
+    FSkinned.cpp
+    FTreeVisual.cpp
+    FVisual.cpp
+    GPUCullingManager.cpp
+    LightTrack.cpp
+    Light_DB.cpp
+    Light_Package.cpp
+    Light_Render_Direct.cpp
+    Light_Render_Direct_ComputeXFS.cpp
+    Materials/MaterialSystem.cpp
+    ModelPool.cpp
+    NvTriStrip.cpp
+    NvTriStripObjects.cpp
+    PBRConverter/PBRConversionUI.cpp
+    PBRConverter/PBRTextureConverter.cpp
+    PSLibrary.cpp
+    GpuParticleManager.h
+    GpuParticleManager.cpp
+    GpuParticleTranslate.h
+    GpuParticleTranslate.cpp
+    GpuParticleCollision.h
+    GpuParticleCollision.cpp
+    ParticleEffect.cpp
+    ParticleEffectDef.cpp
+    ParticleGroup.cpp
+    ParticleEditor/ParticleLibraryDocument.cpp
+    ParticleEditor/ParticleLibraryPreview.cpp
+    ParticleEditor/ParticleEditor.cpp
+    Profiler/GPUProfiler.cpp
+    Profiler/StatsOverlay.cpp
+    ResourceManager/AsyncIO.cpp
+    ResourceManager/BufferManager.cpp
+    ResourceManager/DDSLoader.cpp
+    ResourceManager/FGResourceManager.cpp
+    ResourceManager/NativeRTFactory.cpp
+    ResourceManager/SamplerCache.cpp
+    ResourceManager/TextureManager.cpp
+    SkeletonAnimated.cpp
+    SkeletonCustom.cpp
+    SH_Texture.h
+    SH_Texture.cpp
+    SkeletonRigid.cpp
+    SkeletonX.cpp
+    SkeletonXSkinXW_CPP.cpp
+    SkeletonXSkinXW_SSE.cpp
+    TextureDescrManager.cpp
+    VertexCache.cpp
+    Decals/DecalManager.h
+    Decals/DecalManager.cpp
+    Decals/fgWallMarkArray.h
+    Decals/fgWallMarkArray.cpp
+    Decals/MeshPicker.h
+    Decals/MeshPicker.cpp
+    Decals/OverlayManager.h
+    Decals/OverlayManager.cpp
+    du_box.cpp
+    du_cone.cpp
+    du_cylinder.cpp
+    du_sphere.cpp
+    du_sphere_part.cpp
+    dxParticleCustom.cpp
+    fgRenderFactory.cpp
+    fgUISequenceVideoItem.cpp
+    light.cpp
+    light_gi.cpp
+    r__buffer_pool.cpp
+    r__buffer_pool.h
+    r__hw_compat.h
+    VertexLayout.h
+    r__pixel_calculator.cpp
+    RenderView.h
+    r__scene.cpp
+    r__scene.h
+    r__sector.cpp
+    xrStripify.cpp
+    BufferUtils.cpp
+
+    ../../../Externals/meshoptimizer/src/allocator.cpp
+    ../../../Externals/meshoptimizer/src/clusterizer.cpp
+    ../../../Externals/meshoptimizer/src/indexanalyzer.cpp
+    ../../../Externals/meshoptimizer/src/indexcodec.cpp
+    ../../../Externals/meshoptimizer/src/indexgenerator.cpp
+    ../../../Externals/meshoptimizer/src/overdrawoptimizer.cpp
+    ../../../Externals/meshoptimizer/src/partition.cpp
+    ../../../Externals/meshoptimizer/src/quantization.cpp
+    ../../../Externals/meshoptimizer/src/rasterizer.cpp
+    ../../../Externals/meshoptimizer/src/simplifier.cpp
+    ../../../Externals/meshoptimizer/src/spatialorder.cpp
+    ../../../Externals/meshoptimizer/src/stripifier.cpp
+    ../../../Externals/meshoptimizer/src/vcacheoptimizer.cpp
+    ../../../Externals/meshoptimizer/src/vertexcodec.cpp
+    ../../../Externals/meshoptimizer/src/vertexfilter.cpp
+    ../../../Externals/meshoptimizer/src/vfetchoptimizer.cpp
+    ../../../Externals/bc7enc_rdo/bc7enc.cpp
+    ../../../Externals/bc7enc_rdo/bc7decomp.cpp
+
+    ./Blender.cpp
+    ./ResourceManager.cpp
+    ./ResourceManager_Loader.cpp
+    ./ResourceManager_Reset.cpp
+    ./ResourceManager_Resources.cpp
+    ./Shader.cpp
+    ./SH_Atomic.cpp
+    ./fgUIShader.cpp
+    ./fgThunderboltDescRender.cpp
+    ./fgObjectSpaceRender.cpp
+    D3DUtils.cpp
+    ./HOM.cpp
+    ./occRasterizer.cpp
+    ./occRasterizer_core.cpp
+    ./R_DStreams.cpp
+    ShaderInfo.cpp
+    ./xrRender_console.cpp
+
+    ./blenders/Blender_BmmD_deferred.cpp
+    ./blenders/Blender_Editor_Selection.cpp
+    ./blenders/Blender_Editor_Wire.cpp
+    "./blenders/Blender_Lm(EbB).cpp"
+    ./blenders/Blender_Model_EbB_deferred.cpp
+    ./blenders/Blender_Particle_deferred.cpp
+    ./blenders/Blender_Screen_SET.cpp
+    ./blenders/Blender_detail_still_deferred.cpp
+    ./blenders/Blender_tree_deferred.cpp
+    ./blenders/blender_deffer_aref.cpp
+    ./blenders/blender_deffer_flat.cpp
+    ./blenders/blender_deffer_model.cpp
+
+)
+
+if(WIN32)
+    target_sources(xrRender PRIVATE
+        Backend/D3D12Backend.cpp
+    )
+endif()
+
+if(NOT APPLE)
+    target_sources(xrRender PRIVATE
+        Backend/VulkanBackend.h
+        Backend/VulkanBackend.cpp
+    )
+    target_compile_definitions(xrRender PRIVATE VK_NO_PROTOTYPES)
+    target_link_libraries(xrRender PRIVATE Vulkan::Headers)
+    if(NOT NVRHI_BUILD_SHARED)
+        target_link_libraries(xrRender PRIVATE nvrhi_vk)
+    endif()
+endif()
+
+if(APPLE AND NVRHI_WITH_METAL3)
+    target_sources(xrRender PRIVATE
+        Backend/MetalBackend.h
+        Backend/MetalBackend.mm
+        Backend/MetalPresentation.h
+        Backend/MetalPresentation.cpp
+    )
+    set_source_files_properties(Backend/MetalBackend.mm PROPERTIES
+        COMPILE_OPTIONS "-fobjc-arc"
+        SKIP_PRECOMPILE_HEADERS ON
+        SKIP_UNITY_BUILD_INCLUSION ON
+    )
+    target_compile_definitions(xrRender PRIVATE XRAY_USE_METAL)
+    set(XRAY_METAL_DXC_LIBRARY "${XRAY_SLANG_ROOT}/lib/libdxcompiler.dylib")
+    set(XRAY_METAL_TOOLCHAIN_HEADER "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/MetalShaderToolchain.h")
+    add_custom_command(
+        OUTPUT "${XRAY_METAL_TOOLCHAIN_HEADER}"
+        COMMAND "${CMAKE_COMMAND}"
+            "-DMETAL_CONVERTER=${NVRHI_METAL_IRCONVERTER_LIBRARY}"
+            "-DDXC_LIBRARY=${XRAY_METAL_DXC_LIBRARY}"
+            "-DOUTPUT=${XRAY_METAL_TOOLCHAIN_HEADER}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/Shaders/MetalShaderToolchain.cmake"
+        DEPENDS "${XRAY_METAL_DXC_LIBRARY}"
+            "${NVRHI_METAL_IRCONVERTER_LIBRARY}"
+            Shaders/MetalShaderToolchain.cmake
+        VERBATIM
+    )
+    target_sources(xrRender PRIVATE "${XRAY_METAL_TOOLCHAIN_HEADER}")
+    target_include_directories(xrRender PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>")
+    find_library(XRAY_METAL_FRAMEWORK Metal REQUIRED)
+    find_library(XRAY_FOUNDATION_FRAMEWORK Foundation REQUIRED)
+    find_library(XRAY_QUARTZCORE_FRAMEWORK QuartzCore REQUIRED)
+    find_library(XRAY_COREGRAPHICS_FRAMEWORK CoreGraphics REQUIRED)
+    find_library(XRAY_APPKIT_FRAMEWORK AppKit REQUIRED)
+    target_link_libraries(xrRender PRIVATE
+        ${XRAY_METAL_FRAMEWORK}
+        ${XRAY_FOUNDATION_FRAMEWORK}
+        ${XRAY_QUARTZCORE_FRAMEWORK}
+        ${XRAY_COREGRAPHICS_FRAMEWORK}
+        ${XRAY_APPKIT_FRAMEWORK}
+    )
+    if(NOT NVRHI_BUILD_SHARED)
+        target_link_libraries(xrRender PRIVATE nvrhi_metal3)
+    endif()
+endif()
+set_source_files_properties(
+    ../../../Externals/bc7enc_rdo/bc7enc.cpp
+    ../../../Externals/bc7enc_rdo/bc7decomp.cpp
+    PROPERTIES
+    SKIP_PRECOMPILE_HEADERS ON
+    SKIP_UNITY_BUILD_INCLUSION ON
+)
+
+target_include_directories(xrRender
+    PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${XRAY_SOURCE_DIR}/src"
+    "${XRAY_SOURCE_DIR}/sdk/include"
+    "${XRAY_SOURCE_DIR}/Externals/nvrhi/include"
+    "${XRAY_SOURCE_DIR}/Externals/DirectX-Headers/include"
+)
+
+target_link_libraries(xrRender
+    PRIVATE
+    xrCore
+    xrCDB
+    xrEngine
+    xrMaterialSystem
+    xrUICore
+    xrParticles
+    xrAPI
+    xrAnimation
+    xrMiscMath
+    xrImGui
+    nvrhi
+    slang
+)
+
+if(WIN32 AND NOT NVRHI_BUILD_SHARED)
+    target_link_libraries(xrRender PRIVATE nvrhi_d3d11 nvrhi_d3d12)
+endif()
+
+if(WIN32)
+    target_link_libraries(xrRender PRIVATE d3dcompiler)
+endif()
+
+target_compile_definitions(xrRender
+    PRIVATE
+    USE_DX11
+    USE_NVRHI_IMGUI
+)
+
+if(XRAY_USE_AI_PBR)
+    set(XRAY_ONNXRUNTIME_ROOT "${XRAY_SOURCE_DIR}/Externals/onnxruntime" CACHE PATH "ONNX Runtime root directory")
+
+    find_path(XRAY_ONNXRUNTIME_INCLUDE_DIR onnxruntime_cxx_api.h
+        HINTS
+        "${XRAY_ONNXRUNTIME_ROOT}/include/onnxruntime/core/session"
+        "${XRAY_ONNXRUNTIME_ROOT}/include/onnxruntime"
+        "${XRAY_ONNXRUNTIME_ROOT}/include"
+        "/opt/homebrew/opt/onnxruntime/include/onnxruntime"
+        "/usr/local/opt/onnxruntime/include/onnxruntime"
+    )
+    find_library(XRAY_ONNXRUNTIME_LIBRARY onnxruntime
+        HINTS
+        "${XRAY_ONNXRUNTIME_ROOT}/vs_build/Release"
+        "${XRAY_ONNXRUNTIME_ROOT}/vs_build/RelWithDebInfo"
+        "${XRAY_ONNXRUNTIME_ROOT}/build/Release"
+        "${XRAY_ONNXRUNTIME_ROOT}/lib"
+        "/opt/homebrew/opt/onnxruntime/lib"
+        "/usr/local/opt/onnxruntime/lib"
+    )
+
+    if(NOT XRAY_ONNXRUNTIME_INCLUDE_DIR OR NOT XRAY_ONNXRUNTIME_LIBRARY)
+        message(FATAL_ERROR
+            "XRAY_USE_AI_PBR=ON but ONNX Runtime was not found under ${XRAY_ONNXRUNTIME_ROOT}.\n"
+            "Build Externals/onnxruntime, install onnxruntime (e.g. brew install onnxruntime), "
+            "or point XRAY_ONNXRUNTIME_ROOT at an ONNX Runtime install.")
+    endif()
+
+    message(STATUS "AI PBR converter: ON (onnxruntime: ${XRAY_ONNXRUNTIME_LIBRARY})")
+
+    target_sources(xrRender PRIVATE
+        PBRConverter/ONNXModelRunner.cpp
+    )
+    target_compile_definitions(xrRender PRIVATE USE_AI_PBR)
+    target_include_directories(xrRender PRIVATE "${XRAY_ONNXRUNTIME_INCLUDE_DIR}")
+    target_link_libraries(xrRender PRIVATE "${XRAY_ONNXRUNTIME_LIBRARY}")
+endif()
+
+set_target_properties(xrRender PROPERTIES
+    PREFIX ""
+)
+
+target_precompile_headers(xrRender
+    PRIVATE
+    stdafx.h
+)
+
+set_source_files_properties(RenderView.cpp PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON)

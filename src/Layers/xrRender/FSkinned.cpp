@@ -4,6 +4,7 @@
 #include "FSkinned.h"
 #include "FSkinnedTypes.h"
 #include "SkeletonX.h"
+#include "r__hw_compat.h"
 #include "Layers/xrRender/BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
@@ -20,7 +21,7 @@
 #include "xrCore/dump_string.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 //////////////////////////////////////////////////////////////////////
 // Body Part
@@ -38,21 +39,6 @@ void CSkeletonX_ST::Copy(dxRender_Visual* P)
     _Copy((CSkeletonX*)X);
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX_PM::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
-{
-    int lod_id = inherited1::last_lod;
-    if (LOD >= 0.f)
-    {
-        clamp(LOD, 0.f, 1.f);
-        lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
-        inherited1::last_lod = lod_id;
-    }
-    VERIFY(lod_id >= 0 && lod_id < int(nSWI.count));
-    FSlideWindow& SW = nSWI.sw[lod_id];
-    _Render(cmd_list, rm_geom, SW.num_verts, SW.offset, SW.num_tris);
-}
-void CSkeletonX_ST::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo) { _Render(cmd_list, rm_geom, vCount, 0, dwPrimitives); }
-//////////////////////////////////////////////////////////////////////
 void CSkeletonX_PM::Release() { inherited1::Release(); }
 void CSkeletonX_ST::Release() { inherited1::Release(); }
 //////////////////////////////////////////////////////////////////////
@@ -61,7 +47,7 @@ void CSkeletonX_PM::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    RImplementation.shader_option_skinning(-1);
+    CompatHW::shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -70,7 +56,7 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    RImplementation.shader_option_skinning(-1);
+    CompatHW::shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -126,6 +112,7 @@ void load_hw(Fvisual& V, const TSrc* src)
     V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
 
     TDst* dst = static_cast<TDst*>(V.p_rm_Vertices->Map());
+    TDst* dstStart = dst;
 
     // XXX: install some Ultra HD models pack and test the parallel code
     // For the original game models parallel code is always slower...
@@ -159,8 +146,119 @@ void load_hw(Fvisual& V, const TSrc* src)
             src++;
         }
     }
+
+    if constexpr (std::is_same_v<TDst, vertHW_1W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_1W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ1W vertex data check (stride=%u, count=%u, sizeof=%zu):",
+                V.vStride, V.vCount, sizeof(vertHW_1W<float>));
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bone=%u",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3], verts[i].get_bone());
+            }
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row*36+b) < V.vCount*V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row*36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_2W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_2W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ2W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u) w=%f",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1), verts[i].get_weight());
+            }
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_3W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_3W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ3W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u,%u)",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1), verts[i].get_bone(2));
+            }
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_4W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_4W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ4W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u,%u,%u)",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1),
+                    verts[i].get_bone(2), verts[i].get_bone(3));
+            }
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+
     V.p_rm_Vertices->Unmap(true); // upload vertex data
     V.rm_geom.create(get_decl<TDst>(), *V.p_rm_Vertices, *V.p_rm_Indices);
+
+    static int s_uploadLogCount = 0;
+    if (s_uploadLogCount < 5) {
+        nvrhi::IBuffer* vbPtr = V.p_rm_Vertices->GetBufferHandle().Get();
+        Msg("* [SkinnedUpload] VB=%p stride=%u count=%u size=%u",
+            vbPtr, V.vStride, V.vCount, V.vStride * V.vCount);
+        s_uploadLogCount++;
+    }
 }
 
 void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
@@ -168,8 +266,6 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-        //Msg("skinning: software");
-        V.rm_geom.create(vertRenderFVF, RImplementation.Vertex.Buffer(), *V.p_rm_Indices);
         break;
 
     case RM_SINGLE:
@@ -502,6 +598,156 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
     return result;
 }
 
+template <typename T>
+static void ExportCollisionFaces(const T* vertices, CKinematics* parent, const u16* indices,
+    const CBoneData::FacesVec& faces, xr_vector<Fvector>& triangles,
+    xr_vector<Fvector>& skinnedVertices, xr_vector<u8>& skinnedValid)
+{
+    for (u16 face : faces)
+        for (u32 corner = 0; corner != 3; ++corner)
+        {
+            const u16 index = indices[u32(face) * 3 + corner];
+            if (skinnedVertices.size() <= index)
+            {
+                skinnedVertices.resize(size_t(index) + 1);
+                skinnedValid.resize(size_t(index) + 1, 0);
+            }
+            if (!skinnedValid[index])
+            {
+                get_pos_bones(vertices[index], skinnedVertices[index], parent);
+                skinnedValid[index] = 1;
+            }
+            triangles.push_back(skinnedVertices[index]);
+        }
+}
+
+const CSkeletonX::CollisionTriangles& CSkeletonX::ExportCollisionTriangles(u16 bone)
+{
+    auto* visual = dynamic_cast<Fvisual*>(this);
+    R_ASSERT(visual && Parent && ChildIDX != u16(-1));
+    const auto& faces = Parent->LL_GetData(bone).child_faces[ChildIDX];
+    if (faces.empty())
+    {
+        static const CollisionTriangles empty;
+        return empty;
+    }
+    if (collisionPoseFrame != Device.dwFrame)
+    {
+        collisionPoseFrame = Device.dwFrame;
+        const bool singleBone = RenderMode == RM_SINGLE || RenderMode == RM_SINGLE_HQ;
+        const bool fullPose = !singleBone && BonesUsed.size() == 0;
+        const u32 poseCount = singleBone ? 1u : fullPose ? Parent->LL_BoneCount() : BonesUsed.size();
+        bool changed = collisionPose.size() != poseCount;
+        collisionPose.resize(poseCount);
+        for (u32 index = 0; index != poseCount; ++index)
+        {
+            const u16 id = singleBone ? u16(RMS_boneid) : fullPose ? u16(index) : BonesUsed[index];
+            const Fmatrix& pose = Parent->LL_GetBoneInstance(id).mRenderTransform;
+            if (changed || memcmp(&collisionPose[index], &pose, sizeof(pose)) != 0)
+            {
+                collisionPose[index] = pose;
+                changed = true;
+            }
+        }
+        if (changed)
+        {
+            ++collisionPoseRevision;
+            std::fill(collisionSkinnedValid.begin(), collisionSkinnedValid.end(), 0);
+        }
+    }
+    auto& cached = collisionTriangles[bone];
+    if (cached.revision && cached.poseRevision == collisionPoseRevision
+        && cached.vertices.size() == faces.size() * 3)
+        return cached;
+    static u64 nextRevision = 0;
+    cached.revision = ++nextRevision;
+    cached.poseRevision = collisionPoseRevision;
+    auto& triangles = cached.vertices;
+    triangles.clear();
+    triangles.reserve(faces.size() * 3);
+    if (collisionIndices.empty())
+    {
+        const auto* mapped = static_cast<const u16*>(visual->p_rm_Indices->Map(0, visual->dwPrimitives * 3, true));
+        R_ASSERT(mapped);
+        collisionIndices.assign(mapped, mapped + visual->dwPrimitives * 3);
+        visual->p_rm_Indices->Unmap();
+    }
+    const u16* indices = collisionIndices.data();
+    if (RenderMode == RM_SKINNING_SOFT)
+    {
+        u32 base = visual->iBase;
+        if (auto* progressive = dynamic_cast<CSkeletonX_PM*>(this))
+            base += progressive->GetSWI().sw[0].offset;
+        if (*Vertices1W)
+            ExportCollisionFaces(*Vertices1W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+        else if (*Vertices2W)
+            ExportCollisionFaces(*Vertices2W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+        else if (*Vertices3W)
+            ExportCollisionFaces(*Vertices3W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+        else
+        {
+            R_ASSERT(*Vertices4W);
+            ExportCollisionFaces(*Vertices4W, Parent, indices + base, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+        }
+    }
+    else
+    {
+        if (collisionVertices.empty())
+        {
+            const auto* mapped = static_cast<const u8*>(
+                visual->p_rm_Vertices->Map(visual->vBase, visual->vCount * visual->vStride, true));
+            R_ASSERT(mapped);
+            collisionVertices.assign(mapped, mapped + visual->vCount * visual->vStride);
+            visual->p_rm_Vertices->Unmap();
+        }
+        const void* vertices = collisionVertices.data();
+        switch (RenderMode)
+        {
+        case RM_SINGLE:
+        case RM_SKINNING_1B:
+            ExportCollisionFaces(static_cast<const vertHW_1W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_2B:
+            ExportCollisionFaces(static_cast<const vertHW_2W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_3B:
+            ExportCollisionFaces(static_cast<const vertHW_3W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_4B:
+            ExportCollisionFaces(static_cast<const vertHW_4W<s16>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SINGLE_HQ:
+        case RM_SKINNING_1B_HQ:
+            ExportCollisionFaces(static_cast<const vertHW_1W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_2B_HQ:
+            ExportCollisionFaces(static_cast<const vertHW_2W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_3B_HQ:
+            ExportCollisionFaces(static_cast<const vertHW_3W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        case RM_SKINNING_4B_HQ:
+            ExportCollisionFaces(static_cast<const vertHW_4W<float>*>(vertices), Parent, indices, faces, triangles,
+                collisionSkinnedVertices, collisionSkinnedValid);
+            break;
+        default:
+            NODEFAULT;
+        }
+    }
+    return cached;
+}
+
 BOOL CSkeletonX_ST::PickBone(
     IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id)
 {
@@ -806,4 +1052,4 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
         V->p_rm_Vertices->Unmap();
     V->p_rm_Indices->Unmap();
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

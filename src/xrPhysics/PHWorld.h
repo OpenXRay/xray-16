@@ -103,7 +103,7 @@ public:
     void AddRecentlyDisabled(CPHObject* object);
     void RemoveFromRecentlyDisabled(PH_OBJECT_I i);
     void RemoveObject(PH_OBJECT_I i);
-    void RemoveUpdateObject(PH_UPDATE_OBJECT_I i);
+    void RemoveUpdateObject(CPHUpdateObject* object);
     dGeomID GetMeshGeom() { return Mesh.GetGeom(); }
     IC dGeomID GetMotionRayGeom() { return m_motion_ray; }
     void SetStep(float s);

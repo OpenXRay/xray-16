@@ -8,7 +8,55 @@
 
 #include "editor_helper.h"
 
-#ifndef MASTER_GOLD
+ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;
+ENGINE_API float ps_r3_grass_wind_min = 0.1f;
+ENGINE_API float ps_r3_grass_wind_lerp_rate = 2.0f;
+ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;
+ENGINE_API float ps_r3_grass_interaction_displacement = 1.0f;
+ENGINE_API float ps_r3_grass_interaction_radius_scale = 1.3f;
+ENGINE_API float ps_r3_grass_interaction_frequency = 1.6f;
+ENGINE_API float ps_r3_grass_interaction_damping = 0.22f;
+ENGINE_API float ps_r3_grass_interaction_max_angle = 1.45f;
+ENGINE_API int ps_r3_grass_interaction_debug = 0;
+ENGINE_API u32 ps_r3_grass_wind_octaves = 5;
+
+ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};
+ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};
+ENGINE_API float ps_r3_grass_color_variation = 0.15f;
+ENGINE_API Fvector3 ps_r_foliage_sss_tint = {0.7f, 1.0f, 0.6f};
+ENGINE_API float ps_r_foliage_sss_sigma = 3.0f;
+ENGINE_API float ps_r_foliage_sss_blade = 0.35f;
+ENGINE_API float ps_r_foliage_sss_tuft = 1.0f;
+ENGINE_API float ps_r_foliage_sss_tree = 1.0f;
+ENGINE_API float ps_r_foliage_sss_ambient = 1.0f;
+ENGINE_API float ps_r_foliage_sss_forward = 0.5f;
+
+ENGINE_API Fvector3 ps_r3_grass_object_tints[64] = {
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+};
+ENGINE_API int ps_r3_grass_selected_object = 0;
+
+ENGINE_API float ps_r3_grass_lod_close = 15.0f;
+ENGINE_API float ps_r3_grass_lod_mid = 40.0f;
+
+ENGINE_API float ps_r3_grass_blade_width = 0.05f;
+ENGINE_API float ps_r3_grass_blade_height = 1.0f;
+
 namespace
 {
 bool window_weather_cycle = false;
@@ -53,11 +101,9 @@ bool ConfigStyleSelector(pcstr label, bool& soc_style)
         "(look at the environment color in the mixer category)");
 }
 } // namespace
-#endif
 
 void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     ScopeID scope(this);
@@ -238,12 +284,10 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 
         ImGui::DragFloat("wind velocity", &wind_velocity, 1.0f, 0.0f, 1000.0f);
     }
-#endif
 }
 
 void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     CEnvDescriptor::ed_show_params(env);
@@ -260,12 +304,15 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog near", &fog_near);
         ImGui::DragFloat("fog far", &fog_far);
     }
-#endif
 }
 
 void CEnvironment::on_tool_frame()
 {
-#ifndef MASTER_GOLD
+#ifdef MASTER_GOLD
+    extern int g_debug_utils;
+    if (!g_debug_utils)
+        return;
+#endif
     if (!get_open_state())
         return;
 
@@ -464,9 +511,143 @@ void CEnvironment::on_tool_frame()
                 ImGui::EndTable();
             } // if (ImGui::BeginTable("Environment lerp", 3, flags))
         } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
+
+        if (ImGui::CollapsingHeader("Grass Wind", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            float windDirection = CurrentEnv.wind_direction;
+
+            ImGui::DragFloat("Wind strength multiplier", &ps_r3_grass_wind_multiplier, 0.01f, 0.0f, 5.0f);
+            ItemHelp("Multiplies environment wind strength for grass displacement");
+
+            ImGui::DragFloat("Minimum wind speed", &ps_r3_grass_wind_min, 0.01f, 0.0f, 10.0f);
+            ItemHelp("Minimum wind speed - even in calm weather, grass moves slightly");
+
+            ImGui::DragFloat("Transition speed", &ps_r3_grass_wind_lerp_rate, 0.1f, 0.1f, 10.0f);
+            ItemHelp("How quickly grass wind adapts to environment changes (higher = faster)");
+
+            ImGui::DragFloat("Displacement strength", &ps_r3_grass_wind_displacement, 0.1f, 0.0f, 10.0f);
+            ItemHelp("Vertex displacement strength in world units");
+
+            ImGui::DragFloat("Wind direction", &windDirection, 1.f, -3600.f, 3600.f);
+
+            CurrentEnv.wind_direction = windDirection;
+
+            int octaves = (int)ps_r3_grass_wind_octaves;
+            if (ImGui::SliderInt("FBM quality (octaves)", &octaves, 1, 8))
+                ps_r3_grass_wind_octaves = (u32)octaves;
+            ItemHelp("Number of noise octaves for wind generation (higher = more detail, slower)");
+        }
+
+        if (ImGui::CollapsingHeader("Grass Interaction", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Interaction strength", &ps_r3_grass_interaction_displacement, 0.01f, 0.0f, 3.0f);
+            ItemHelp("Scales the pushed-aside amount before it is mapped to a bend angle (0 = off)");
+
+            ImGui::DragFloat("Footprint radius scale", &ps_r3_grass_interaction_radius_scale, 0.01f, 0.5f, 3.0f);
+            ItemHelp("Multiplies each entity's bounding-box footprint radius");
+
+            ImGui::DragFloat("Spring frequency (Hz)", &ps_r3_grass_interaction_frequency, 0.01f, 0.2f, 5.0f);
+            ItemHelp("Natural frequency of the spring-back after an entity leaves");
+
+            ImGui::DragFloat("Spring damping", &ps_r3_grass_interaction_damping, 0.005f, 0.01f, 0.98f);
+            ItemHelp("Damping ratio: low = several visible swings, high = settles without overshoot");
+
+            float maxAngleDeg = rad2deg(ps_r3_grass_interaction_max_angle);
+            if (ImGui::DragFloat("Flatten angle (deg)", &maxAngleDeg, 0.5f, 30.0f, 89.0f))
+                ps_r3_grass_interaction_max_angle = deg2rad(maxAngleDeg);
+            ItemHelp("Bend angle of grass directly under an entity");
+
+            bool interactionDebug = ps_r3_grass_interaction_debug != 0;
+            if (ImGui::Checkbox("Debug tint (r3_grass_interaction_debug)", &interactionDebug))
+                ps_r3_grass_interaction_debug = interactionDebug ? 1 : 0;
+            ItemHelp("Tints blades and tufts red by the interaction displacement sampled at their base");
+        }
+
+        if (ImGui::CollapsingHeader("Grass Color", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::SeparatorText("Blade Colors");
+
+            ImGui::ColorEdit3("Tip color", reinterpret_cast<float*>(&ps_r3_grass_color_tip));
+            ItemHelp("Color at blade tips - typically brighter, more vibrant");
+
+            ImGui::ColorEdit3("Base color", reinterpret_cast<float*>(&ps_r3_grass_color_base));
+            ItemHelp("Color at blade base - typically darker, more muted");
+
+            ImGui::DragFloat("Color variation", &ps_r3_grass_color_variation, 0.01f, 0.0f, 0.5f);
+            ItemHelp("Per-blade random color variation (0 = uniform, 0.15 = +/-15%)");
+
+            ImGui::SeparatorText("Foliage Subsurface Scattering");
+
+            ImGui::ColorEdit3("SSS tint", reinterpret_cast<float*>(&ps_r_foliage_sss_tint));
+            ItemHelp("Multiplies the albedo of light transmitted through blades, tufts and leaves (r_foliage_sss_tint)");
+
+            ImGui::DragFloat("Extinction (1/m)", &ps_r_foliage_sss_sigma, 0.05f, 0.0f, 20.0f);
+            ItemHelp("How fast transmitted light dies per metre of occluding foliage between the surface and the light, measured in the shadow maps (r_foliage_sss_sigma)");
+
+            ImGui::DragFloat("Blade strength", &ps_r_foliage_sss_blade, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength of procedural grass blades (r_foliage_sss_blade)");
+
+            ImGui::DragFloat("Tuft strength", &ps_r_foliage_sss_tuft, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength of swaying detail tufts (r_foliage_sss_tuft)");
+
+            ImGui::DragFloat("Tree strength", &ps_r_foliage_sss_tree, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Transmission strength of alpha-tested tree and bush leaves (r_foliage_sss_tree)");
+
+            ImGui::DragFloat("Ambient transmission", &ps_r_foliage_sss_ambient, 0.01f, 0.0f, 2.0f);
+            ItemHelp("Extra ambient light reaching foliage through its back side, scaled by the transmission strength (r_foliage_sss_ambient)");
+
+            ImGui::DragFloat("Forward scatter", &ps_r_foliage_sss_forward, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Share of transmitted light that peaks towards the sun seen through the leaf; the rest leaves diffusely (r_foliage_sss_forward)");
+
+            ImGui::SeparatorText("Per-Object Tint");
+
+            ImGui::SliderInt("Object ID", &ps_r3_grass_selected_object, 0, 63);
+            ItemHelp("Select which grass object type (0-63) to edit");
+
+            string128 tintLabel;
+            xr_sprintf(tintLabel, "Tint (Object %d)", ps_r3_grass_selected_object);
+            ImGui::ColorEdit3(tintLabel, reinterpret_cast<float*>(&ps_r3_grass_object_tints[ps_r3_grass_selected_object]));
+            ItemHelp("Color multiplier for this grass type (white = no change)");
+
+            if (ImGui::Button("Reset to white"))
+            {
+                ps_r3_grass_object_tints[ps_r3_grass_selected_object] = {1.0f, 1.0f, 1.0f};
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Reset all tints"))
+            {
+                for (int i = 0; i < 64; i++)
+                    ps_r3_grass_object_tints[i] = {1.0f, 1.0f, 1.0f};
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Grass LOD", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Close LOD distance", &ps_r3_grass_lod_close, 0.5f, 5.0f, 50.0f);
+            ItemHelp("Distance (meters) at which grass switches from 9-segment (high) to 4-segment (medium) detail");
+
+            ImGui::DragFloat("Mid LOD distance", &ps_r3_grass_lod_mid, 1.0f, 20.0f, 100.0f);
+            ItemHelp("Distance (meters) at which grass switches from 4-segment (medium) to 2-segment (low) detail");
+
+            if (ps_r3_grass_lod_close >= ps_r3_grass_lod_mid)
+                ps_r3_grass_lod_close = ps_r3_grass_lod_mid - 1.0f;
+
+            ImGui::Text("LOD0 (9 segments): 0 - %.0fm", ps_r3_grass_lod_close);
+            ImGui::Text("LOD1 (4 segments): %.0fm - %.0fm", ps_r3_grass_lod_close, ps_r3_grass_lod_mid);
+            ImGui::Text("LOD2 (2 segments): %.0fm+", ps_r3_grass_lod_mid);
+        }
+
+        if (ImGui::CollapsingHeader("Grass Geometry", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Blade height", &ps_r3_grass_blade_height, 0.05f, 0.2f, 3.0f, "%.2f");
+            ItemHelp("Height multiplier for grass blades (default 1.0)");
+
+            ImGui::DragFloat("Blade width (m)", &ps_r3_grass_blade_width, 0.005f, 0.01f, 0.2f, "%.3f");
+            ItemHelp("Base width of grass blades in meters (default 0.05 = 5cm)");
+        }
+
     }
     ImGui::End();
-#endif
 }
 
 #ifndef MASTER_GOLD

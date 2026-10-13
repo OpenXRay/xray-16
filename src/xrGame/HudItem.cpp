@@ -440,49 +440,19 @@ void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 extern ENGINE_API float psHUD_FOV;
 void CHudItem::TransformPosFromWorldToHud(Fvector& worldPos)
 {
-    CActor* actor = smart_cast<CActor*>(object().H_Parent());
-
-    Fmatrix mView;
-    mView.set(Device.mView);
-    if (GetHUDmode() && actor)
-    {
-        Fmatrix trans;
-        actor->Cameras().hud_camera_Matrix(trans);
-        mView.build_camera_dir(trans.c, trans.k, trans.j);
-    }
-
-    Fmatrix hud_project;
-    hud_project.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-        g_pGamePersistent->Environment().CurrentEnv.far_plane);
-
+    Fmatrix mView = Device.mView;
     mView.transform_tiny(worldPos);
-    hud_project.transform_tiny(worldPos);
-
-    Fmatrix().set(Device.mProject).invert().transform_tiny(worldPos);
+    worldPos.x /= psHUD_FOV;
+    worldPos.y /= psHUD_FOV;
     Fmatrix().set(mView).invert().transform_tiny(worldPos);
 }
 
 void CHudItem::TransformDirFromWorldToHud(Fvector& worldDir)
 {
-    CActor* actor = smart_cast<CActor*>(object().H_Parent());
-
-    Fmatrix mView;
-    mView.set(Device.mView);
-    if (GetHUDmode() && actor)
-    {
-        Fmatrix trans;
-        actor->Cameras().hud_camera_Matrix(trans);
-        mView.build_camera_dir(trans.c, trans.k, trans.j);
-    }
-
-    Fmatrix hud_project;
-    hud_project.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
-        g_pGamePersistent->Environment().CurrentEnv.far_plane);
-
+    Fmatrix mView = Device.mView;
     mView.transform_dir(worldDir);
-    hud_project.transform_dir(worldDir);
-
-    Fmatrix().set(Device.mProject).invert().transform_dir(worldDir);
+    worldDir.x /= psHUD_FOV;
+    worldDir.y /= psHUD_FOV;
     Fmatrix().set(mView).invert().transform_dir(worldDir);
 }
 

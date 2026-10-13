@@ -12,15 +12,17 @@ using PAVec = xr_vector<ParticleAction*>;
 }
 struct EParticleAction;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 namespace PS
 {
 class CParticleEffect;
 
+#ifdef _EDITOR
 typedef BOOL (*CollisionCallback)(
     CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
+#endif
 
 class PFunction;
 struct SFrame
@@ -75,7 +77,6 @@ public:
     // texture
     shared_str m_ShaderName;
     shared_str m_TextureName;
-    ref_shader m_CachedShader;
     SFrame m_Frame;
     // compiled actions
     CMemoryWriter m_Actions;
@@ -92,8 +93,10 @@ public:
     BOOL SaveActionList(IWriter& F);
     BOOL LoadActionList(IReader& F);
     // execute
+#ifdef _EDITOR
     void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt);
     void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner, CollisionCallback cb) const;
+#endif
 
     CPEDef();
     ~CPEDef();
@@ -158,4 +161,4 @@ public:
 #define PED_CHUNK_EDATA 0x0024
 #define PED_CHUNK_ALIGN_TO_PATH 0x0025
 //---------------------------------------------------------------------------
-} // namespace xray::render::RENDER_NAMESPACE
+}

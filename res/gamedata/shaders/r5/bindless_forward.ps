@@ -1,0 +1,74 @@
+#define SM_6_0
+#define CLUSTERED_LIGHTING_FORWARD
+#define SUN_SHADOW_RECEIVER
+#define LOCAL_SHADOW_RECEIVER
+#include "common.h"
+#include "bindless_common.h"
+#include "material_eval.h"
+#include "material_coverage.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+    float fade : TEXCOORD6;
+    float skyVisibility : TEXCOORD7;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 baseColor : SV_Target2;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    MaterialData mat = g_Materials[input.materialID];
+
+
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+
+    clip(MaterialAlphaTestClip(mat, diffuseSample.a));
+
+    VariantData variant = g_Variants[mat.shaderVariant];
+    uint colorMode = VariantColorMode(variant);
+    if (colorMode != VARIANT_COLOR_LIT)
+    {
+        float fade = saturate(input.fade);
+        if (colorMode == VARIANT_COLOR_UNLIT)
+            output.color = float4(diffuseSample.rgb * fade, diffuseSample.a * fade);
+        else if (colorMode == VARIANT_COLOR_ALPHA_ONLY)
+            output.color = (diffuseSample.a * fade).xxxx;
+        else
+            output.color = float4(diffuseSample.rgb, diffuseSample.a * fade);
+        output.normal = 0.0;
+        output.baseColor = 0.0;
+        return output;
+    }
+
+    MaterialSurface surface = EvalStandardMaterial(mat, diffuseSample.rgb, input.texcoord, ddx(input.texcoord), ddy(input.texcoord), input.normal, input.tangent, input.bitangent);
+    float3 albedo = surface.albedo;
+    float3 N = surface.N;
+    float metallic = surface.metallic;
+    float roughness = surface.roughness;
+    float ao = surface.ao;
+
+    bool forwardOnly = (mat.flags & MAT_FLAG_ALPHA_BLEND) != 0;
+    f_forward fwd = output_forward_pbr(albedo, N, input.worldPos, metallic, roughness, ao, input.position, -1.0, forwardOnly, input.skyVisibility);
+    output.color = float4(fwd.color.rgb + surface.emissive, forwardOnly ? diffuseSample.a : fwd.color.a);
+    output.normal = fwd.normal;
+    output.baseColor = fwd.baseColor;
+
+    if (dev_param_3.y > 0.5 && forwardOnly)
+        output.color.rgb = SunShadowDebugColor(output.color.rgb, input.worldPos);
+
+    return output;
+}

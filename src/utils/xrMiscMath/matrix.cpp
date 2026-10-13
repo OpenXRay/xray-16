@@ -90,55 +90,44 @@ Fmatrix& Fmatrix::identity()
 	return *this;
 }
 
-// Multiply RES = A[4x4]*B[4x4] (WITH projection)
 Fmatrix& Fmatrix::mul(const Fmatrix& A, const Fmatrix& B)
 {
 	VERIFY((this != &A) && (this != &B));
-	m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2] + A.m[3][0] * B.m[0][3];
-	m[0][1] = A.m[0][1] * B.m[0][0] + A.m[1][1] * B.m[0][1] + A.m[2][1] * B.m[0][2] + A.m[3][1] * B.m[0][3];
-	m[0][2] = A.m[0][2] * B.m[0][0] + A.m[1][2] * B.m[0][1] + A.m[2][2] * B.m[0][2] + A.m[3][2] * B.m[0][3];
-	m[0][3] = A.m[0][3] * B.m[0][0] + A.m[1][3] * B.m[0][1] + A.m[2][3] * B.m[0][2] + A.m[3][3] * B.m[0][3];
-
-	m[1][0] = A.m[0][0] * B.m[1][0] + A.m[1][0] * B.m[1][1] + A.m[2][0] * B.m[1][2] + A.m[3][0] * B.m[1][3];
-	m[1][1] = A.m[0][1] * B.m[1][0] + A.m[1][1] * B.m[1][1] + A.m[2][1] * B.m[1][2] + A.m[3][1] * B.m[1][3];
-	m[1][2] = A.m[0][2] * B.m[1][0] + A.m[1][2] * B.m[1][1] + A.m[2][2] * B.m[1][2] + A.m[3][2] * B.m[1][3];
-	m[1][3] = A.m[0][3] * B.m[1][0] + A.m[1][3] * B.m[1][1] + A.m[2][3] * B.m[1][2] + A.m[3][3] * B.m[1][3];
-
-	m[2][0] = A.m[0][0] * B.m[2][0] + A.m[1][0] * B.m[2][1] + A.m[2][0] * B.m[2][2] + A.m[3][0] * B.m[2][3];
-	m[2][1] = A.m[0][1] * B.m[2][0] + A.m[1][1] * B.m[2][1] + A.m[2][1] * B.m[2][2] + A.m[3][1] * B.m[2][3];
-	m[2][2] = A.m[0][2] * B.m[2][0] + A.m[1][2] * B.m[2][1] + A.m[2][2] * B.m[2][2] + A.m[3][2] * B.m[2][3];
-	m[2][3] = A.m[0][3] * B.m[2][0] + A.m[1][3] * B.m[2][1] + A.m[2][3] * B.m[2][2] + A.m[3][3] * B.m[2][3];
-
-	m[3][0] = A.m[0][0] * B.m[3][0] + A.m[1][0] * B.m[3][1] + A.m[2][0] * B.m[3][2] + A.m[3][0] * B.m[3][3];
-	m[3][1] = A.m[0][1] * B.m[3][0] + A.m[1][1] * B.m[3][1] + A.m[2][1] * B.m[3][2] + A.m[3][1] * B.m[3][3];
-	m[3][2] = A.m[0][2] * B.m[3][0] + A.m[1][2] * B.m[3][1] + A.m[2][2] * B.m[3][2] + A.m[3][2] * B.m[3][3];
-	m[3][3] = A.m[0][3] * B.m[3][0] + A.m[1][3] * B.m[3][1] + A.m[2][3] * B.m[3][2] + A.m[3][3] * B.m[3][3];
+	__m128 a0 = _mm_loadu_ps(&A.m[0][0]);
+	__m128 a1 = _mm_loadu_ps(&A.m[1][0]);
+	__m128 a2 = _mm_loadu_ps(&A.m[2][0]);
+	__m128 a3 = _mm_loadu_ps(&A.m[3][0]);
+	for (int i = 0; i < 4; i++)
+	{
+		__m128 r = _mm_mul_ps(a0, _mm_set1_ps(B.m[i][0]));
+		r = _mm_add_ps(r, _mm_mul_ps(a1, _mm_set1_ps(B.m[i][1])));
+		r = _mm_add_ps(r, _mm_mul_ps(a2, _mm_set1_ps(B.m[i][2])));
+		r = _mm_add_ps(r, _mm_mul_ps(a3, _mm_set1_ps(B.m[i][3])));
+		_mm_storeu_ps(&m[i][0], r);
+	}
 	return *this;
 }
 
-// Multiply RES = A[4x3]*B[4x3] (no projection), faster than ordinary multiply
 Fmatrix& Fmatrix::mul_43(const Fmatrix& A, const Fmatrix& B)
 {
 	VERIFY((this != &A) && (this != &B));
-	m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2];
-	m[0][1] = A.m[0][1] * B.m[0][0] + A.m[1][1] * B.m[0][1] + A.m[2][1] * B.m[0][2];
-	m[0][2] = A.m[0][2] * B.m[0][0] + A.m[1][2] * B.m[0][1] + A.m[2][2] * B.m[0][2];
-	m[0][3] = 0;
-
-	m[1][0] = A.m[0][0] * B.m[1][0] + A.m[1][0] * B.m[1][1] + A.m[2][0] * B.m[1][2];
-	m[1][1] = A.m[0][1] * B.m[1][0] + A.m[1][1] * B.m[1][1] + A.m[2][1] * B.m[1][2];
-	m[1][2] = A.m[0][2] * B.m[1][0] + A.m[1][2] * B.m[1][1] + A.m[2][2] * B.m[1][2];
-	m[1][3] = 0;
-
-	m[2][0] = A.m[0][0] * B.m[2][0] + A.m[1][0] * B.m[2][1] + A.m[2][0] * B.m[2][2];
-	m[2][1] = A.m[0][1] * B.m[2][0] + A.m[1][1] * B.m[2][1] + A.m[2][1] * B.m[2][2];
-	m[2][2] = A.m[0][2] * B.m[2][0] + A.m[1][2] * B.m[2][1] + A.m[2][2] * B.m[2][2];
-	m[2][3] = 0;
-
-	m[3][0] = A.m[0][0] * B.m[3][0] + A.m[1][0] * B.m[3][1] + A.m[2][0] * B.m[3][2] + A.m[3][0];
-	m[3][1] = A.m[0][1] * B.m[3][0] + A.m[1][1] * B.m[3][1] + A.m[2][1] * B.m[3][2] + A.m[3][1];
-	m[3][2] = A.m[0][2] * B.m[3][0] + A.m[1][2] * B.m[3][1] + A.m[2][2] * B.m[3][2] + A.m[3][2];
-	m[3][3] = 1;
+	__m128 a0 = _mm_loadu_ps(&A.m[0][0]);
+	__m128 a1 = _mm_loadu_ps(&A.m[1][0]);
+	__m128 a2 = _mm_loadu_ps(&A.m[2][0]);
+	__m128 a3 = _mm_loadu_ps(&A.m[3][0]);
+	for (int i = 0; i < 3; i++)
+	{
+		__m128 r = _mm_mul_ps(a0, _mm_set1_ps(B.m[i][0]));
+		r = _mm_add_ps(r, _mm_mul_ps(a1, _mm_set1_ps(B.m[i][1])));
+		r = _mm_add_ps(r, _mm_mul_ps(a2, _mm_set1_ps(B.m[i][2])));
+		_mm_storeu_ps(&m[i][0], r);
+	}
+	__m128 r = _mm_mul_ps(a0, _mm_set1_ps(B.m[3][0]));
+	r = _mm_add_ps(r, _mm_mul_ps(a1, _mm_set1_ps(B.m[3][1])));
+	r = _mm_add_ps(r, _mm_mul_ps(a2, _mm_set1_ps(B.m[3][2])));
+	r = _mm_add_ps(r, a3);
+	_mm_storeu_ps(&m[3][0], r);
+	m[0][3] = 0; m[1][3] = 0; m[2][3] = 0; m[3][3] = 1;
 	return *this;
 }
 
@@ -262,22 +251,15 @@ Fmatrix& Fmatrix::invert_44(const Fmatrix& a)
 
 Fmatrix& Fmatrix::transpose(const Fmatrix& matSource)
 {
-	_11 = matSource._11;
-	_12 = matSource._21;
-	_13 = matSource._31;
-	_14 = matSource._41;
-	_21 = matSource._12;
-	_22 = matSource._22;
-	_23 = matSource._32;
-	_24 = matSource._42;
-	_31 = matSource._13;
-	_32 = matSource._23;
-	_33 = matSource._33;
-	_34 = matSource._43;
-	_41 = matSource._14;
-	_42 = matSource._24;
-	_43 = matSource._34;
-	_44 = matSource._44;
+	__m128 r0 = _mm_loadu_ps(&matSource.m[0][0]);
+	__m128 r1 = _mm_loadu_ps(&matSource.m[1][0]);
+	__m128 r2 = _mm_loadu_ps(&matSource.m[2][0]);
+	__m128 r3 = _mm_loadu_ps(&matSource.m[3][0]);
+	_MM_TRANSPOSE4_PS(r0, r1, r2, r3);
+	_mm_storeu_ps(&m[0][0], r0);
+	_mm_storeu_ps(&m[1][0], r1);
+	_mm_storeu_ps(&m[2][0], r2);
+	_mm_storeu_ps(&m[3][0], r3);
 	return *this;
 }
 
@@ -381,43 +363,21 @@ Fmatrix& Fmatrix::mapZYX() { i.set(0, 0, 1); _14 = 0; j.set(0, 1, 0); _24 = 0; k
 
 Fmatrix& Fmatrix::mul(const Fmatrix& A, float v)
 {
-	m[0][0] = A.m[0][0] * v;
-	m[0][1] = A.m[0][1] * v;
-	m[0][2] = A.m[0][2] * v;
-	m[0][3] = A.m[0][3] * v;
-	m[1][0] = A.m[1][0] * v;
-	m[1][1] = A.m[1][1] * v;
-	m[1][2] = A.m[1][2] * v;
-	m[1][3] = A.m[1][3] * v;
-	m[2][0] = A.m[2][0] * v;
-	m[2][1] = A.m[2][1] * v;
-	m[2][2] = A.m[2][2] * v;
-	m[2][3] = A.m[2][3] * v;
-	m[3][0] = A.m[3][0] * v;
-	m[3][1] = A.m[3][1] * v;
-	m[3][2] = A.m[3][2] * v;
-	m[3][3] = A.m[3][3] * v;
+	__m128 sv = _mm_set1_ps(v);
+	_mm_storeu_ps(&m[0][0], _mm_mul_ps(_mm_loadu_ps(&A.m[0][0]), sv));
+	_mm_storeu_ps(&m[1][0], _mm_mul_ps(_mm_loadu_ps(&A.m[1][0]), sv));
+	_mm_storeu_ps(&m[2][0], _mm_mul_ps(_mm_loadu_ps(&A.m[2][0]), sv));
+	_mm_storeu_ps(&m[3][0], _mm_mul_ps(_mm_loadu_ps(&A.m[3][0]), sv));
 	return *this;
 }
 
 Fmatrix& Fmatrix::mul(float v)
 {
-	m[0][0] *= v;
-	m[0][1] *= v;
-	m[0][2] *= v;
-	m[0][3] *= v;
-	m[1][0] *= v;
-	m[1][1] *= v;
-	m[1][2] *= v;
-	m[1][3] *= v;
-	m[2][0] *= v;
-	m[2][1] *= v;
-	m[2][2] *= v;
-	m[2][3] *= v;
-	m[3][0] *= v;
-	m[3][1] *= v;
-	m[3][2] *= v;
-	m[3][3] *= v;
+	__m128 sv = _mm_set1_ps(v);
+	_mm_storeu_ps(&m[0][0], _mm_mul_ps(_mm_loadu_ps(&m[0][0]), sv));
+	_mm_storeu_ps(&m[1][0], _mm_mul_ps(_mm_loadu_ps(&m[1][0]), sv));
+	_mm_storeu_ps(&m[2][0], _mm_mul_ps(_mm_loadu_ps(&m[2][0]), sv));
+	_mm_storeu_ps(&m[3][0], _mm_mul_ps(_mm_loadu_ps(&m[3][0]), sv));
 	return *this;
 }
 

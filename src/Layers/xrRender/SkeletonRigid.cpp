@@ -4,58 +4,69 @@
 
 #include "SkeletonCustom.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 extern int psSkeletonUpdate;
 
 #ifdef DEBUG
 void check_kinematics(CKinematics* _k, LPCSTR s);
 #endif
-
 void CKinematics::CalculateBones(BOOL bForceExact)
 {
     ZoneScoped;
 
-    // early out.
-    // check if the info is still relevant
-    // skip all the computations - assume nothing changes in a small period of time :)
-    if (Device.dwTimeGlobal == UCalc_Time)
-        return; // early out for "fast" update
     UCalc_mtlock lock;
+    if (!bForceExact && Device.dwTimeGlobal != UCalc_Time &&
+        Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval))
+        return;
+    if (!bForceExact && Device.dwTimeGlobal == UCalc_Time && !PrepareBones())
+        return;
     OnCalculateBones();
-    if (!bForceExact && (Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
-        return; // early out for "slow" update
+    PrepareBones();
     if (Update_Visibility)
         Visibility_Update();
 
     _DBG_SINGLE_USE_MARKER;
-    // here we have either:
-    //	1:	timeout elapsed
-    //	2:	exact computation required
     UCalc_Time = Device.dwTimeGlobal;
 
-// exact computation
-// Calculate bones
 #ifdef DEBUG
     RImplementation.BasicStats.Animation.Begin();
 #endif
 
-    Bone_Calculate(bones->at(iRoot), &Fidentity);
+    CalculateHierarchy();
+    FinishBones();
 #ifdef DEBUG
     check_kinematics(this, dbg_name.c_str());
     RImplementation.BasicStats.Animation.End();
 #endif
     VERIFY(LL_GetBonesVisible() != 0);
-    // Calculate BOXes/Spheres if needed
+    RefreshBounds();
+    RunFinalCallbacks();
+}
+
+void CKinematics::CalculateHierarchy()
+{
+    ZoneScopedN("Animation::Hierarchy");
+
+    for (u16 id : m_bones_topo)
+    {
+        CBoneData* bd = (*bones)[id];
+        CBoneInstance& bi = bone_instances[id];
+        const Fmatrix* parent = (bd->GetParentID() == BI_NONE)
+            ? &Fidentity : &bone_instances[bd->GetParentID()].mTransform;
+        CLBone(bd, bi, parent, u8(-1));
+    }
+}
+
+void CKinematics::RefreshBounds()
+{
     UCalc_Visibox++;
     if (UCalc_Visibox >= psSkeletonUpdate)
     {
         ZoneScopedN("Skeleton update");
 
-        // mark
         UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
 
-        // the update itself
         Fbox Box;
         Box.invalidate();
         for (u32 b = 0; b < bones->size(); b++)
@@ -98,13 +109,11 @@ void CKinematics::CalculateBones(BOOL bForceExact)
         }
         if (bones->size())
         {
-            // previous frame we have updated box - update sphere
             vis.box.vMin = (Box.vMin);
             vis.box.vMax = (Box.vMax);
             vis.box.getsphere(vis.sphere.P, vis.sphere.R);
         }
 #ifdef DEBUG
-        // Validate
         VERIFY3(_valid(vis.box.vMin) && _valid(vis.box.vMax), "Invalid bones-xform in model", dbg_name.c_str());
         if (vis.sphere.R > 1000.f)
         {
@@ -120,10 +129,15 @@ void CKinematics::CalculateBones(BOOL bForceExact)
         VERIFY3(vis.sphere.R < 1000.f, "Invalid bones-xform in model", dbg_name.c_str());
 #endif
     }
+}
 
-    //
+void CKinematics::RunFinalCallbacks()
+{
     if (Update_Callback)
+    {
+        ZoneScopedN("Animation::FinalCallbacks");
         Update_Callback(this);
+    }
 }
 
 #ifdef DEBUG
@@ -201,8 +215,6 @@ void CKinematics::CalculateBonesAdditionalTransforms(
 
 void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask /*= (1<<0)*/)
 {
-    ZoneScoped;
-
     u16 SelfID = bd->GetSelfID();
 
     if (LL_GetBoneVisible(SelfID))
@@ -232,7 +244,10 @@ void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* 
 
 void CKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 mask_channel, bool ignore_callbacks)
 {
-    ZoneScoped;
+    UCalc_mtlock lock;
+    ZoneScopedN("Animation::PoseQuery");
+
+    PrepareBones();
 
     R_ASSERT(id < LL_BoneCount());
     CBoneInstance bi = LL_GetBoneInstance(id);
@@ -245,20 +260,29 @@ void CKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 mask_channel, bool ig
 
 void CKinematics::Bone_Calculate(CBoneData* bd, Fmatrix* parent)
 {
-    ZoneScoped;
+    UCalc_mtlock lock;
+    const bool nested = m_subtreeTraversal;
+    if (!nested)
+        PrepareBones();
 
+    ZoneScopedN("Animation::Hierarchy");
+
+    m_subtreeTraversal = true;
+    CalculateSubtree(bd, parent);
+    m_subtreeTraversal = nested;
+}
+
+void CKinematics::CalculateSubtree(CBoneData* bd, Fmatrix* parent)
+{
     u16 SelfID = bd->GetSelfID();
     CBoneInstance& BONE_INST = LL_GetBoneInstance(SelfID);
     CLBone(bd, BONE_INST, parent, u8(-1));
-    // Calculate children
     for (xr_vector<CBoneData*>::iterator C = bd->children.begin(); C != bd->children.end(); ++C)
-        Bone_Calculate(*C, &BONE_INST.mTransform);
+        CalculateSubtree(*C, &BONE_INST.mTransform);
 }
 
 void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 mask_channel, bool ignore_callbacks)
 {
-    ZoneScoped;
-
     u16 SelfID = bd->GetSelfID();
     // CBlendInstance& BLEND_INST	= LL_GetBlendInstance(SelfID);
     // CBlendInstance::BlendSVec &Blend = BLEND_INST.blend_vector();
@@ -285,4 +309,4 @@ void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8
     // restore callback
     bi.set_callback(bi.callback_type(), bc, bi.callback_param(), ow);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

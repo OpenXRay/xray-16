@@ -1,0 +1,937 @@
+#include "stdafx.h"
+#include "ShaderReflection.h"
+#include "ShaderCache.h"
+#include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
+#include <slang.h>
+#include <slang-com-ptr.h>
+
+namespace xray::render::framegraph {
+
+namespace {
+
+ShaderConstant::Type DetectConstantType(
+    slang::TypeLayoutReflection* typeLayout,
+    u16& outElementSize,
+    u16& outMatrixStride,
+    u16& outArrayCount)
+{
+    if (!typeLayout) {
+        outElementSize = 0;
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    auto* type = typeLayout->getType();
+    if (!type) {
+        outElementSize = static_cast<u16>(typeLayout->getSize());
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    slang::TypeReflection::Kind kind = type->getKind();
+
+    switch (kind) {
+        case slang::TypeReflection::Kind::Scalar: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Scalar;
+        }
+
+        case slang::TypeReflection::Kind::Vector: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Vector;
+        }
+
+        case slang::TypeReflection::Kind::Matrix: {
+            auto rowCount = type->getRowCount();
+            auto colCount = type->getColumnCount();
+
+            outMatrixStride = static_cast<u16>(typeLayout->getStride(slang::ParameterCategory::Uniform));
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+
+            if (rowCount == 3 && colCount == 4) {
+                return ShaderConstant::Type::Matrix3x4;
+            } else if (rowCount == 4 && colCount == 4) {
+                return ShaderConstant::Type::Matrix4x4;
+            }
+
+            Msg("! [DetectConstantType] Unsupported matrix dimensions: %dx%d",
+                rowCount, colCount);
+            return ShaderConstant::Type::Struct;
+        }
+
+        case slang::TypeReflection::Kind::Array: {
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+
+            outArrayCount = static_cast<u16>(typeLayout->getElementCount());
+            outElementSize = elementTypeLayout ? static_cast<u16>(elementTypeLayout->getSize()) : 0;
+            outMatrixStride = 0;
+
+            if (elementTypeLayout) {
+                auto* elementType = elementTypeLayout->getType();
+                if (elementType && elementType->getKind() == slang::TypeReflection::Kind::Matrix) {
+                    outMatrixStride = static_cast<u16>(elementTypeLayout->getStride(slang::ParameterCategory::Uniform));
+                }
+            }
+
+            return ShaderConstant::Type::Array;
+        }
+
+        default: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Struct;
+        }
+    }
+}
+
+}
+
+nvrhi::Format GetFormatFromSlangType(slang::TypeReflection* type) {
+    if (!type)
+        return nvrhi::Format::UNKNOWN;
+
+    auto scalarType = type->getScalarType();
+    auto kind = type->getKind();
+
+    if (kind == slang::TypeReflection::Kind::Vector) {
+        u32 elementCount = type->getElementCount();
+
+        switch (scalarType) {
+        case slang::TypeReflection::ScalarType::Float32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_FLOAT;
+            case 2: return nvrhi::Format::RG32_FLOAT;
+            case 3: return nvrhi::Format::RGB32_FLOAT;
+            case 4: return nvrhi::Format::RGBA32_FLOAT;
+            }
+            break;
+
+        case slang::TypeReflection::ScalarType::UInt32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_UINT;
+            case 2: return nvrhi::Format::RG32_UINT;
+            case 3: return nvrhi::Format::RGB32_UINT;
+            case 4: return nvrhi::Format::RGBA32_UINT;
+            }
+            break;
+
+        case slang::TypeReflection::ScalarType::Int32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_SINT;
+            case 2: return nvrhi::Format::RG32_SINT;
+            case 3: return nvrhi::Format::RGB32_SINT;
+            case 4: return nvrhi::Format::RGBA32_SINT;
+            }
+            break;
+        }
+    }
+    else if (kind == slang::TypeReflection::Kind::Scalar) {
+        switch (scalarType) {
+        case slang::TypeReflection::ScalarType::Float32: return nvrhi::Format::R32_FLOAT;
+        case slang::TypeReflection::ScalarType::UInt32: return nvrhi::Format::R32_UINT;
+        case slang::TypeReflection::ScalarType::Int32: return nvrhi::Format::R32_SINT;
+        }
+    }
+
+    Msg("! [ShaderReflector] Unsupported Slang type: kind=%d, scalarType=%d",
+        (int)kind, (int)scalarType);
+    return nvrhi::Format::UNKNOWN;
+}
+VertexInputSignature ShaderReflector::AnalyzeVertexShader(
+    slang::ShaderReflection* reflection) {
+
+    VertexInputSignature signature;
+
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for vertex shader");
+        return signature;
+    }
+
+    if (reflection->getEntryPointCount() == 0) {
+        Msg("! [ShaderReflector] No entry points found in vertex shader");
+        return signature;
+    }
+
+    auto* entryPoint = reflection->getEntryPointByIndex(0);
+    if (!entryPoint) {
+        Msg("! [ShaderReflector] Failed to get vertex shader entry point");
+        return signature;
+    }
+
+    u32 paramCount = entryPoint->getParameterCount();
+
+    slang::VariableLayoutReflection* inputParam = nullptr;
+    for (u32 i = 0; i < paramCount; i++) {
+        auto* param = entryPoint->getParameterByIndex(i);
+        if (!param) continue;
+
+        auto* typeLayout = param->getTypeLayout();
+        if (!typeLayout) continue;
+
+        if (typeLayout->getParameterCategory() == slang::ParameterCategory::VaryingInput) {
+            inputParam = param;
+            break;
+        }
+    }
+
+    if (!inputParam) {
+        Msg("  [ShaderReflector] No VaryingInput parameter found in entry point");
+        return signature;
+    }
+
+    auto* inputTypeLayout = inputParam->getTypeLayout();
+    auto* inputType = inputTypeLayout->getType();
+    if (!inputType) {
+        Msg("! [ShaderReflector] Input parameter has no type");
+        return signature;
+    }
+
+    u32 fieldCount = inputType->getFieldCount();
+
+    for (u32 i = 0; i < fieldCount; i++) {
+        auto* field = inputType->getFieldByIndex(i);
+        auto* fieldLayout = inputTypeLayout->getFieldByIndex(i);
+
+        if (!field || !fieldLayout)
+            continue;
+
+        const char* fieldName = field->getName() ? field->getName() : "<unknown>";
+
+        const char* semanticName = fieldLayout->getSemanticName();
+
+        if (!semanticName || semanticName[0] == '\0') {
+            Msg("! [ShaderReflector] Skipping field[%u] '%s' - no semantic name", i, fieldName);
+            continue;
+        }
+
+        u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+        auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+        auto* fieldType = fieldTypeLayout ? fieldTypeLayout->getType() : nullptr;
+        nvrhi::Format format = GetFormatFromSlangType(fieldType);
+
+        VertexInputSignature::InputElement elem;
+        elem.semanticName = semanticName;
+        elem.semanticIndex = semanticIndex;
+        elem.format = format;
+        elem.inputSlot = 0;
+
+        signature.elements.push_back(elem);
+    }
+
+    Msg("  [ShaderReflector] VS input before sort (%u elements):", signature.elements.size());
+    for (u32 i = 0; i < signature.elements.size(); i++) {
+        const auto& e = signature.elements[i];
+        Msg("    [%u] semantic='%s' index=%u format=%d", i, e.semanticName.c_str(), e.semanticIndex, (int)e.format);
+    }
+
+    auto semanticPriority = [](const char* name, u32 idx) -> int {
+        if (xr_strcmp(name, "POSITION") == 0 || xr_strcmp(name, "POSITIONT") == 0) return 0;
+        if (xr_strcmp(name, "NORMAL") == 0) return 100;
+        if (xr_strcmp(name, "TANGENT") == 0) return 200;
+        if (xr_strcmp(name, "BINORMAL") == 0) return 300;
+        if (xr_strcmp(name, "TEXCOORD") == 0) return 400 + idx;
+        if (xr_strcmp(name, "COLOR") == 0) return 500 + idx;
+        return 1000;
+    };
+    std::sort(signature.elements.begin(), signature.elements.end(),
+        [&](const auto& a, const auto& b) {
+            return semanticPriority(a.semanticName.c_str(), a.semanticIndex) <
+                   semanticPriority(b.semanticName.c_str(), b.semanticIndex);
+        });
+
+    Msg("  [ShaderReflector] VS input after sort:");
+    for (u32 i = 0; i < signature.elements.size(); i++) {
+        const auto& e = signature.elements[i];
+        Msg("    [%u] semantic='%s' index=%u format=%d", i, e.semanticName.c_str(), e.semanticIndex, (int)e.format);
+    }
+
+    return signature;
+}
+
+ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(
+    slang::ShaderReflection* reflection) {
+
+    ShaderConstantBuffers result;
+
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for constant buffer analysis");
+        return result;
+    }
+
+    SlangReflectionWrapper wrapper(reflection);
+    auto constantBuffers = wrapper.GetConstantBuffers();
+
+    for (const auto& cb : constantBuffers) {
+        ConstantBufferInfo info;
+        info.name = cb.name;
+        info.slot = cb.slot;
+        info.size = cb.size;
+
+        result.buffers.push_back(info);
+    }
+
+    return result;
+}
+
+UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const char* cbName) {
+
+    if (strstr(cbName, "static_globals") != nullptr) {
+        return UpdateFrequency::Engine;
+    }
+
+    if (strstr(name, "m_VP") != nullptr ||
+        strstr(name, "m_V") != nullptr ||
+        strstr(name, "m_P") != nullptr ||
+        strstr(name, "eye_position") != nullptr ||
+        strstr(name, "eye_direction") != nullptr) {
+        return UpdateFrequency::Pass;
+    }
+
+    if (strstr(name, "m_World") != nullptr ||
+        strstr(name, "m_W") != nullptr ||
+        strstr(name, "m_xform") != nullptr ||
+        strstr(name, "bones") != nullptr ||
+        strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr) {
+        return UpdateFrequency::Instance;
+    }
+
+    if (strstr(name, "dt_params") != nullptr ||
+        strstr(name, "material") != nullptr ||
+        strstr(cbName, "dynamic_transforms") != nullptr) {
+        return UpdateFrequency::Material;
+    }
+
+    return UpdateFrequency::Instance;
+}
+
+ConstantPersistence ShaderReflector::InferConstantPersistence(const char* cbName, UpdateFrequency frequency) {
+
+    if (strstr(cbName, "static_globals") != nullptr ||
+        strstr(cbName, "dynamic_transforms") != nullptr) {
+        return ConstantPersistence::Static;
+    }
+
+    if (strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr ||
+        strstr(cbName, "GlobalParams") != nullptr ||
+        strstr(cbName, "PerInstanceTransforms") != nullptr ||
+        strstr(cbName, "TreeData") != nullptr ||
+        strstr(cbName, "GrassWind") != nullptr) {
+        return ConstantPersistence::Volatile;
+    }
+
+    if (frequency == UpdateFrequency::Engine || frequency == UpdateFrequency::Pass) {
+        return ConstantPersistence::Static;
+    }
+
+    return ConstantPersistence::Volatile;
+}
+
+ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflection* reflection) {
+    ShaderConstantLayout layout;
+
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for constant layout analysis");
+        return layout;
+    }
+
+    layout.constantBuffers = AnalyzeConstantBuffers(reflection);
+
+    SlangReflectionWrapper wrapper(reflection);
+    auto constantBuffers = wrapper.GetConstantBuffers();
+
+    for (u32 cbIdx = 0; cbIdx < constantBuffers.size(); ++cbIdx) {
+        const auto& cbInfo = constantBuffers[cbIdx];
+
+        u32 paramCount = reflection->getParameterCount();
+
+        bool foundMatchingParam = false;
+        for (u32 paramIdx = 0; paramIdx < paramCount; ++paramIdx) {
+            auto* param = reflection->getParameterByIndex(paramIdx);
+            if (!param) {
+                continue;
+            }
+
+            const char* paramName = param->getName();
+
+            auto* typeLayout = param->getTypeLayout();
+            if (!typeLayout) {
+                continue;
+            }
+
+            auto paramCategory = typeLayout->getParameterCategory();
+            if (paramCategory != slang::ParameterCategory::ConstantBuffer) {
+                continue;
+            }
+
+            if (!paramName || xr_strcmp(paramName, cbInfo.name) != 0) {
+                continue;
+            }
+
+            foundMatchingParam = true;
+
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+            if (!elementTypeLayout) {
+                Msg("! [AnalyzeConstantLayout] ERROR: No elementTypeLayout (CB wrapper is empty?)");
+                continue;
+            }
+
+            auto* cbType = elementTypeLayout->getType();
+            if (!cbType) {
+                Msg("! [AnalyzeConstantLayout] ERROR: No cbType from element");
+                continue;
+            }
+
+            auto typeKind = cbType->getKind();
+
+            if (typeKind != slang::TypeReflection::Kind::Struct) {
+                Msg("! [AnalyzeConstantLayout] ERROR: Not a struct type after unwrapping");
+                continue;
+            }
+
+            u32 fieldCount = cbType->getFieldCount();
+
+            for (u32 i = 0; i < fieldCount; ++i) {
+                auto* field = cbType->getFieldByIndex(i);
+                auto* fieldLayout = elementTypeLayout->getFieldByIndex(i);
+
+                if (!field || !fieldLayout) continue;
+
+                const char* fieldName = field->getName();
+                if (!fieldName) continue;
+
+                ShaderConstant constant;
+                constant.name = fieldName;
+                constant.offset = (u32)fieldLayout->getOffset(slang::ParameterCategory::Uniform);
+
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                constant.type = DetectConstantType(
+                    fieldTypeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
+
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : (fieldTypeLayout ? (u32)fieldTypeLayout->getSize() : 0);
+                constant.cbIndex = cbIdx;
+
+                constant.frequency = InferConstantFrequency(fieldName, cbInfo.name);
+
+                constant.persistence = InferConstantPersistence(cbInfo.name, constant.frequency);
+
+                layout.constants.push_back(constant);
+            }
+        }
+
+        if (!foundMatchingParam) {
+            Msg("  [AnalyzeConstantLayout]   WARNING: No matching parameter found for CB '%s'", cbInfo.name);
+        }
+    }
+
+    auto* globalParamsLayout = reflection->getGlobalParamsTypeLayout();
+
+    if (!globalParamsLayout) {
+    } else {
+        auto* globalParamsVar = reflection->getGlobalParamsVarLayout();
+        u32 globalsBindingSlot = 0;
+
+        if (globalParamsVar) {
+            globalsBindingSlot = static_cast<u32>(globalParamsVar->getOffset(slang::ParameterCategory::ConstantBuffer));
+        } else {
+            globalsBindingSlot = 0;
+        }
+
+        u32 fieldCount = static_cast<u32>(globalParamsLayout->getFieldCount());
+
+        if (fieldCount > 0) {
+            ConstantBufferInfo implicitCB;
+            implicitCB.name = "$Globals";
+            implicitCB.slot = globalsBindingSlot;
+            implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+
+            u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
+            u32 extractedConstantCount = 0;
+
+            for (u32 i = 0; i < fieldCount; ++i) {
+                auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
+                if (!fieldLayout) {
+                    continue;
+                }
+
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                if (fieldTypeLayout) {
+                    auto category = fieldTypeLayout->getParameterCategory();
+                    if (category != slang::ParameterCategory::Uniform) {
+                        continue;
+                    }
+                }
+
+                auto* fieldVar = fieldLayout->getVariable();
+                if (!fieldVar) {
+                    continue;
+                }
+
+                const char* fieldName = fieldVar->getName();
+                if (!fieldName) {
+                    continue;
+                }
+
+                ShaderConstant constant;
+                constant.name = fieldName;
+                constant.offset = static_cast<u32>(fieldLayout->getOffset(slang::ParameterCategory::Uniform));
+                constant.cbIndex = cbIndex;
+
+                constant.type = DetectConstantType(
+                    fieldTypeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
+
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : static_cast<u32>(fieldTypeLayout ? fieldTypeLayout->getSize() : 0);
+
+                constant.frequency = InferConstantFrequency(fieldName, "$Globals");
+                constant.persistence = ConstantPersistence::Volatile;
+
+                layout.constants.push_back(constant);
+                extractedConstantCount++;
+            }
+
+            if (extractedConstantCount > 0) {
+                if (implicitCB.size == 0) {
+                    u32 calculatedSize = 0;
+                    for (const auto& constant : layout.constants) {
+                        if (constant.cbIndex == cbIndex) {
+                            u32 constantEnd = constant.offset + constant.size;
+                            calculatedSize = std::max(calculatedSize, constantEnd);
+                        }
+                    }
+
+                    Msg("  [AnalyzeConstantLayout] $Globals size=0 from Slang, calculated %u bytes from %u constants",
+                        calculatedSize, extractedConstantCount);
+                    implicitCB.size = calculatedSize;
+                }
+
+                if (implicitCB.size > 0) {
+                    layout.constantBuffers.buffers.push_back(implicitCB);
+                } else {
+                    Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation");
+                }
+            }
+        } else {
+
+            ConstantBufferInfo implicitCB;
+            implicitCB.name = "$Globals";
+            implicitCB.slot = globalsBindingSlot;
+            implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+
+            u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
+
+            SlangInt paramCount = reflection->getParameterCount();
+
+            u32 looseConstantCount = 0;
+            for (SlangInt i = 0; i < paramCount; ++i) {
+                auto* param = reflection->getParameterByIndex(i);
+                if (!param) continue;
+
+                auto* typeLayout = param->getTypeLayout();
+                if (!typeLayout) continue;
+
+                auto category = typeLayout->getParameterCategory();
+                if (category != slang::ParameterCategory::Uniform) {
+                    continue;
+                }
+
+                const char* paramName = param->getName();
+                if (!paramName) continue;
+
+                ShaderConstant constant;
+                constant.name = paramName;
+                constant.offset = static_cast<u32>(param->getOffset(slang::ParameterCategory::Uniform));
+                constant.cbIndex = cbIndex;
+
+                constant.type = DetectConstantType(
+                    typeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
+
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : static_cast<u32>(typeLayout->getSize());
+
+                constant.frequency = InferConstantFrequency(paramName, "$Globals");
+                constant.persistence = ConstantPersistence::Volatile;
+
+                layout.constants.push_back(constant);
+                looseConstantCount++;
+            }
+
+            if (looseConstantCount > 0) {
+                if (implicitCB.size == 0) {
+                    u32 calculatedSize = 0;
+                    for (const auto& constant : layout.constants) {
+                        if (constant.cbIndex == cbIndex) {
+                            u32 constantEnd = constant.offset + constant.size;
+                            calculatedSize = std::max(calculatedSize, constantEnd);
+                        }
+                    }
+
+                    Msg("  [AnalyzeConstantLayout] $Globals size=0 from Slang (unwrapped), calculated %u bytes from %u constants",
+                        calculatedSize, looseConstantCount);
+                    implicitCB.size = calculatedSize;
+                }
+
+                if (implicitCB.size > 0) {
+                    layout.constantBuffers.buffers.push_back(implicitCB);
+                } else {
+                    Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation (unwrapped path)");
+                }
+            }
+        }
+    }
+
+    return layout;
+}
+
+ShaderRTBindings ShaderReflector::AnalyzeResourceBindings(
+    slang::ShaderReflection* reflection, SlangStage stage) {
+
+    ShaderRTBindings bindings;
+
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection");
+        return bindings;
+    }
+
+    SlangReflectionWrapper wrapper(reflection);
+
+    auto textures = wrapper.GetTextures();
+    for (const auto& tex : textures) {
+        if (tex.space != 0) continue;
+        bindings.inputTextures.emplace_back(tex.name, tex.slot, tex.shape);
+    }
+
+    auto samplers = wrapper.GetSamplers();
+    for (const auto& samp : samplers) {
+        ShaderRTBindings::Sampler sampler;
+        sampler.name = samp.name;
+        sampler.slot = samp.slot;
+        bindings.samplers.push_back(sampler);
+    }
+
+    auto uavs = wrapper.GetUAVs();
+    for (const auto& uav : uavs) {
+        if (uav.space != 0) continue;
+        bindings.uavBindings.emplace_back(uav.name, uav.slot, uav.shape);
+    }
+
+    slang::EntryPointReflection* entryPoint = nullptr;
+    if (reflection->getEntryPointCount() > 0)
+        entryPoint = reflection->getEntryPointByIndex(0);
+
+    slang::VariableLayoutReflection* resultVarLayout = nullptr;
+
+    if (stage == SLANG_STAGE_FRAGMENT && entryPoint)
+    {
+        resultVarLayout = entryPoint->getResultVarLayout();
+        if (resultVarLayout)
+        {
+            auto* typeLayout = resultVarLayout->getTypeLayout();
+            if (typeLayout)
+            {
+                auto* type = typeLayout->getType();
+                if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+                {
+                    u32 fieldCount = type->getFieldCount();
+
+                    for (u32 i = 0; i < fieldCount; i++)
+                    {
+                        auto* field = type->getFieldByIndex(i);
+                        if (!field)
+                            continue;
+
+                        auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                        if (!fieldLayout)
+                            continue;
+
+                        const char* semantic = fieldLayout->getSemanticName();
+                        u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+                        if (semantic)
+                        {
+                            if (xr_strcmp(semantic, "SV_Target") == 0)
+                            {
+                                ShaderRTBindings::OutputRT output;
+                                output.slot = semanticIndex;
+                                bindings.outputRTs.push_back(output);
+                            }
+                            else if (xr_strcmp(semantic, "SV_Depth") == 0)
+                            {
+                                bindings.hasDepthOutput = true;
+                            }
+                        }
+                    }
+                }
+                else if (type)
+                {
+                    const char* semantic = resultVarLayout->getSemanticName();
+                    u32 semanticIndex = resultVarLayout->getSemanticIndex();
+
+                    if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
+                    {
+                        ShaderRTBindings::OutputRT output;
+                        output.slot = semanticIndex;
+                        bindings.outputRTs.push_back(output);
+                    }
+                }
+            }
+        }
+        else
+        {
+            Msg("! [AnalyzeResourceBindings] No result var layout found for pixel shader");
+        }
+    }
+
+
+    if (resultVarLayout)
+    {
+        auto* typeLayout = resultVarLayout->getTypeLayout();
+        auto* type = typeLayout->getType();
+        if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+        {
+            u32 fieldCount = type->getFieldCount();
+            for (u32 i = 0; i < fieldCount; i++)
+            {
+                auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                if (!fieldLayout)
+                    continue;
+
+                const char* semantic = fieldLayout->getSemanticName();
+                if (!semantic || xr_strcmp(semantic, "SV_Target") != 0)
+                    continue;
+
+                u32 slot = fieldLayout->getSemanticIndex();
+
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                auto* fieldType = fieldTypeLayout ? fieldTypeLayout->getType() : nullptr;
+                u32 componentMask = 0;
+                if (fieldType)
+                {
+                    auto kind = fieldType->getKind();
+                    u32 componentCount = 1;
+
+                    if (kind == slang::TypeReflection::Kind::Vector)
+                    {
+                        componentCount = fieldType->getElementCount();
+                    }
+
+                    for (u32 c = 0; c < componentCount && c < 4; c++)
+                    {
+                        componentMask |= (1 << c);
+                    }
+                }
+
+                for (auto& output : bindings.outputRTs)
+                {
+                    if (output.slot == slot)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return bindings;
+}
+
+
+static void FilterReflectionByUsage(ExtractedReflection& result, slang::IComponentType* program,
+    const VulkanBindShifts& vkShifts)
+{
+    Slang::ComPtr<slang::IMetadata> metadata;
+    SlangResult hr = program->getEntryPointMetadata(0, 0, metadata.writeRef(), nullptr);
+    if (SLANG_FAILED(hr) || !metadata)
+    {
+        Msg("! [FilterReflection] getEntryPointMetadata failed: hr=0x%08X metadata=%p", hr, metadata.get());
+        return;
+    }
+
+    auto isUsed = [&](SlangParameterCategory category, u32 slot) -> bool {
+        u32 querySlot = slot;
+        if (vkShifts.HasShifts()) {
+            switch (category) {
+            case SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE: querySlot += vkShifts.shaderResource; break;
+            case SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS: querySlot += vkShifts.unorderedAccess; break;
+            case SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER: querySlot += vkShifts.constantBuffer; break;
+            case SLANG_PARAMETER_CATEGORY_SAMPLER_STATE: querySlot += vkShifts.sampler; break;
+            default: break;
+            }
+        }
+        bool used = false;
+        SlangResult hr = metadata->isParameterLocationUsed(category, 0, querySlot, used);
+        if (SLANG_FAILED(hr))
+            return true;
+        return used;
+    };
+
+    Msg("  [FilterReflection] Before: %u SRVs, %u UAVs, %u samplers, %u CBs",
+        result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
+        result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
+
+    {
+        u32 srUsed = 0, srUnused = 0, dtsUsed = 0, dtsUnused = 0;
+        for (const auto& t : result.rtBindings.inputTextures) {
+            bool uSR = false, uDTS = false;
+            metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, 0, t.slot, uSR);
+            metadata->isParameterLocationUsed(SLANG_PARAMETER_CATEGORY_DESCRIPTOR_TABLE_SLOT, 0, t.slot, uDTS);
+            if (uSR) ++srUsed; else ++srUnused;
+            if (uDTS) ++dtsUsed; else ++dtsUnused;
+        }
+        Msg("  [FilterReflection] Category test: SHADER_RESOURCE %u used/%u unused, DESCRIPTOR_TABLE_SLOT %u used/%u unused",
+            srUsed, srUnused, dtsUsed, dtsUnused);
+    }
+
+    auto& textures = result.rtBindings.inputTextures;
+    textures.erase(std::remove_if(textures.begin(), textures.end(),
+        [&](const auto& t) { return !isUsed(SLANG_PARAMETER_CATEGORY_SHADER_RESOURCE, t.slot); }),
+        textures.end());
+
+    auto& uavs = result.rtBindings.uavBindings;
+    uavs.erase(std::remove_if(uavs.begin(), uavs.end(),
+        [&](const auto& u) { return !isUsed(SLANG_PARAMETER_CATEGORY_UNORDERED_ACCESS, u.slot); }),
+        uavs.end());
+
+    auto& samplers = result.rtBindings.samplers;
+    samplers.erase(std::remove_if(samplers.begin(), samplers.end(),
+        [&](const auto& s) { return !isUsed(SLANG_PARAMETER_CATEGORY_SAMPLER_STATE, s.slot); }),
+        samplers.end());
+
+    auto& cbs = result.constantLayout.constantBuffers.buffers;
+    xr_map<u16, u16> cbIndexRemap;
+    u16 newIndex = 0;
+    for (u16 i = 0; i < static_cast<u16>(cbs.size()); ++i) {
+        bool cbUsed = isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cbs[i].slot);
+        Msg("    CB b%u '%s' -> %s", cbs[i].slot, cbs[i].name.c_str(), cbUsed ? "USED" : "UNUSED");
+        if (cbUsed)
+            cbIndexRemap[i] = newIndex++;
+    }
+
+    auto& constants = result.constantLayout.constants;
+    constants.erase(std::remove_if(constants.begin(), constants.end(),
+        [&](const auto& c) { return cbIndexRemap.find(c.cbIndex) == cbIndexRemap.end(); }),
+        constants.end());
+
+    for (auto& c : constants)
+        c.cbIndex = cbIndexRemap[c.cbIndex];
+
+    cbs.erase(std::remove_if(cbs.begin(), cbs.end(),
+        [&](const auto& cb) { return !isUsed(SLANG_PARAMETER_CATEGORY_CONSTANT_BUFFER, cb.slot); }),
+        cbs.end());
+
+    Msg("  [FilterReflection] After: %u SRVs, %u UAVs, %u samplers, %u CBs",
+        textures.size(), uavs.size(), samplers.size(), cbs.size());
+}
+
+static void UnshiftVulkanBindings(ExtractedReflection& result, const VulkanBindShifts& shifts)
+{
+    for (auto& t : result.rtBindings.inputTextures)
+        t.slot -= shifts.shaderResource;
+    for (auto& u : result.rtBindings.uavBindings)
+        u.slot -= shifts.unorderedAccess;
+    for (auto& s : result.rtBindings.samplers)
+        s.slot -= shifts.sampler;
+    for (auto& cb : result.constantLayout.constantBuffers.buffers)
+        cb.slot -= shifts.constantBuffer;
+}
+
+ExtractedReflection ShaderReflector::ExtractReflection(
+    slang::ShaderReflection* slangReflection,
+    slang::IComponentType* linkedProgram,
+    VulkanBindShifts vkShifts)
+{
+    ExtractedReflection result;
+
+    if (!slangReflection) {
+        Msg("! [ShaderReflector::ExtractReflection] NULL Slang reflection!");
+        return result;
+    }
+
+    SlangStage stage = SLANG_STAGE_NONE;
+    if (slangReflection->getEntryPointCount() > 0) {
+        auto* entryPoint = slangReflection->getEntryPointByIndex(0);
+        if (entryPoint)
+            stage = entryPoint->getStage();
+    }
+
+    if (stage == SLANG_STAGE_VERTEX)
+        result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
+
+    result.rtBindings = AnalyzeResourceBindings(slangReflection, stage);
+    result.constantLayout = AnalyzeConstantLayout(slangReflection);
+
+    if (vkShifts.HasShifts())
+    {
+        Msg("  [Reflection] Before unshift: %u SRVs, %u UAVs, %u samplers, %u CBs",
+            result.rtBindings.inputTextures.size(), result.rtBindings.uavBindings.size(),
+            result.rtBindings.samplers.size(), result.constantLayout.constantBuffers.buffers.size());
+        for (const auto& t : result.rtBindings.inputTextures)
+            Msg("    SRV '%s' slot=%u shape=%d", t.name.c_str(), t.slot, (int)t.shape);
+        for (const auto& u : result.rtBindings.uavBindings)
+            Msg("    UAV '%s' slot=%u shape=%d", u.name.c_str(), u.slot, (int)u.shape);
+        for (const auto& cb : result.constantLayout.constantBuffers.buffers)
+            Msg("    CB '%s' slot=%u", cb.name.c_str(), cb.slot);
+        UnshiftVulkanBindings(result, vkShifts);
+        Msg("  [Reflection] After unshift:");
+        for (const auto& t : result.rtBindings.inputTextures)
+            Msg("    SRV '%s' slot=%u", t.name.c_str(), t.slot);
+        for (const auto& u : result.rtBindings.uavBindings)
+            Msg("    UAV '%s' slot=%u", u.name.c_str(), u.slot);
+        for (const auto& cb : result.constantLayout.constantBuffers.buffers)
+            Msg("    CB '%s' slot=%u", cb.name.c_str(), cb.slot);
+    }
+
+    if (linkedProgram)
+        FilterReflectionByUsage(result, linkedProgram, vkShifts);
+
+    return result;
+}
+
+const VertexInputSignature& ShaderReflector::GetVertexInputSignature(
+    const ExtractedReflection* reflection)
+{
+    static VertexInputSignature empty;
+    return reflection ? reflection->vertexInputSignature : empty;
+}
+
+const ShaderRTBindings& ShaderReflector::GetRTBindings(
+    const ExtractedReflection* reflection)
+{
+    static ShaderRTBindings empty;
+    return reflection ? reflection->rtBindings : empty;
+}
+
+const ShaderConstantBuffers& ShaderReflector::GetConstantBuffers(
+    const ExtractedReflection* reflection)
+{
+    static ShaderConstantBuffers empty;
+    return reflection ? reflection->constantLayout.constantBuffers : empty;
+}
+
+}

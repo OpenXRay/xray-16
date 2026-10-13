@@ -137,16 +137,29 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrCore
+        NAME "Debug core\\DxErr"
+        FILES
+        Debug/dxerr.cpp
+        Debug/dxerr.h
+        Debug/DXGetErrorDescription.inl
+        Debug/DXGetErrorString.inl
+        Debug/DXTrace.inl
+    )
+endif()
+
+target_sources_grouped(
+    TARGET xrCore
+    NAME "Profiler"
+    FILES
+    Profiler/CPUProfiler.cpp
+    Profiler/CPUProfiler.h
+    Profiler/Profiler.cpp
+    Profiler/Profiler.h
+    Profiler/ProfilerTypes.h
+)
 
 target_sources_grouped(
     TARGET xrCore
@@ -339,10 +352,10 @@ target_sources_grouped(
     NAME "Memory"
     FILES
     Memory/xalloc.h
+    MemoryStats.cpp
+    MemoryStats.h
     xrMemory.cpp
     xrMemory.h
-    #Memory/xrMemory_align.cpp
-    #Memory/xrMemory_align.h
 )
 
 target_sources_grouped(
@@ -454,13 +467,20 @@ target_include_directories(xrCore
 
 target_link_libraries(xrCore
     PUBLIC
-    $<$<NOT:$<PLATFORM_ID:Android>>:pthread>
+    $<$<NOT:$<PLATFORM_ID:Windows,Android>>:pthread>
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
-    SDL2::SDL2
+    SDL3::SDL3
+    # _matrix.h (a public xrCore header) includes sse2neon on ARM, so the
+    # include path must propagate to every consumer of xrCore.
+    $<$<OR:$<BOOL:${PROJECT_PLATFORM_ARM}>,$<BOOL:${PROJECT_PLATFORM_ARM64}>>:sse2neon>
 
     PRIVATE
     xrMiscMath
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+    $<$<AND:$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>,$<NOT:$<PLATFORM_ID:Windows>>>:mimalloc>
+    $<$<PLATFORM_ID:Windows>:xray_mimalloc>
+    $<$<PLATFORM_ID:Windows>:xray_bugtrap>
+    $<$<PLATFORM_ID:Windows>:xrAPI>
+    $<$<PLATFORM_ID:Windows>:faultrep>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
     LZO::LZO
 )
@@ -503,7 +523,21 @@ target_precompile_headers(xrCore
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrCore LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrCore
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
+endif()
+
+option(XRAY_BUILD_TASK_TESTS "Build offline scheduler regression executable" OFF)
+
+if (XRAY_BUILD_TASK_TESTS)
+    add_executable(xrCoreTaskTests Threading/TaskTests.cpp)
+    target_include_directories(xrCoreTaskTests
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
+        "${XRAY_SOURCE_DIR}/Externals"
+    )
+    target_link_libraries(xrCoreTaskTests PRIVATE xrCore)
 endif()

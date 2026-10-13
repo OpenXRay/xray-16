@@ -1,0 +1,9 @@
+#pragma once
+
+#include "xrEngine/EngineAPI.h"
+#include "Include/xrRender/xrRender.h"
+
+namespace xray::render::fg
+{
+RendererModule* GetFrameGraphRendererModule();
+}

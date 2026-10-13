@@ -28,7 +28,7 @@ public:
 
     IC const bool& destroy_on_game_load() const { return m_destroy_on_game_load; }
     virtual void PSI_destroy();
-    IC bool PSI_alive() { return m_iLifeTime > 0; }
+    bool PSI_alive();
     IC bool PSI_IsAutomatic() { return m_bAutoRemove; }
     IC void PSI_SetLifeTime(float life_time) { m_iLifeTime = iFloor(life_time * 1000); }
     virtual void Play(bool bHudMode) = 0;

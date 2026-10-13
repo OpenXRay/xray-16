@@ -14,17 +14,10 @@ class ENGINE_API IRender_DetailModel;
 class ENGINE_API CLAItem;
 class ENGINE_API CEnvDescriptorMixer;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace render_r4
-{
-class dxThunderboltRender;
+class FGThunderboltRender;
 }
-namespace render_gl
-{
-class dxThunderboltRender;
-}
-} // namespace xray::render
 
 struct ENGINE_API SThunderboltDesc
 {
@@ -92,8 +85,7 @@ struct ENGINE_API SThunderboltCollection
 //
 class ENGINE_API CEffect_Thunderbolt
 {
-    friend class xray::render::render_r4::dxThunderboltRender;
-    friend class xray::render::render_gl::dxThunderboltRender;
+    friend class xray::render::fg::FGThunderboltRender;
 
 protected:
     xr_vector<SThunderboltCollection*> collections;
@@ -148,6 +140,10 @@ public:
 
     void OnFrame(CEnvDescriptorMixer& currentEnv);
     void Render();
+
+    IThunderboltRender* GetRenderer() const { return &*m_pRender; }
+
+    bool IsActive() const { return state == stWorking; }
 
     SThunderboltCollection* AppendDef(const shared_str& sect);
 

@@ -9,17 +9,10 @@ class ENGINE_API CInifile;
 class ENGINE_API CEnvDescriptorMixer;
 class ENGINE_API CEnvironment;
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace render_r4
-{
-class dxLensFlareRender;
+class FGLensFlareRender;
 }
-namespace render_gl
-{
-class dxLensFlareRender;
-}
-} // namespace xray::render
 
 class ENGINE_API CLensFlareDescriptor
 {
@@ -80,20 +73,7 @@ public:
 
 class ENGINE_API CLensFlare
 {
-    friend class xray::render::render_r4::dxLensFlareRender;
-    friend class xray::render::render_gl::dxLensFlareRender;
-
-public:
-    enum
-    {
-        MAX_RAYS = 5
-    };
-
-private:
-    collide::rq_results r_dest;
-#ifndef _EDITOR
-    collide::ray_cache m_ray_cache[MAX_RAYS];
-#endif
+    friend class xray::render::fg::FGLensFlareRender;
 
 protected:
     float fBlend;
@@ -136,6 +116,8 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
+    ILensFlareRender* GetRenderer() const { return &*m_pRender; }
+
     CLensFlareDescriptor* AppendDef(shared_str sect);
 
     void Invalidate() { m_State = lfsNone; }
@@ -144,4 +126,13 @@ public:
     auto& GetDescriptors() { return m_Palette; }
 
     void save(bool soc_style) const;
+
+    [[nodiscard]]
+    CLensFlareDescriptor* GetCurrent() const { return m_Current; }
+
+    [[nodiscard]]
+    bool ShouldRender() const { return bRender; }
+
+    [[nodiscard]]
+    float GetStateBlend() const { return m_StateBlend; }
 };

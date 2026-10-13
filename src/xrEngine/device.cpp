@@ -1,8 +1,10 @@
 #include "stdafx.h"
 
 #include "Render.h"
+#include "IRenderBackend.h"
 
 #include "xrCore/FS_impl.h"
+#include "xrCore/MemoryStats.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
 #include "XR_IOConsole.h"
@@ -13,7 +15,8 @@
 
 #include "xrScriptEngine/script_space.hpp"
 
-#include <SDL.h>
+
+#include <SDL3/SDL.h>
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -25,6 +28,7 @@ string512 g_sBenchmarkName;
 
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
+ENGINE_API int ps_profile_dump = 0;
 
 bool g_bLoaded = false;
 ref_light precache_light = 0;
@@ -38,24 +42,33 @@ bool CRenderDevice::RenderBegin()
 
     ZoneScoped;
 
-    switch (GEnv.Render->GetDeviceState())
     {
-    case DeviceState::Normal: break;
-    case DeviceState::Lost:
-        // If the device was lost, do not render until we get it back
-        Sleep(33);
-        return false;
+        ZoneScopedN("RenderBegin::DeviceStateCheck");
+        switch (GEnv.Render->GetDeviceState())
+        {
+        case DeviceState::Normal: break;
+        case DeviceState::Lost:
+            // If the device was lost, do not render until we get it back
+            Sleep(33);
+            return false;
 
-    case DeviceState::NeedReset:
-        // Check if the device is ready to be reset
-        Reset();
-        return false;
+        case DeviceState::NeedReset:
+            // Check if the device is ready to be reset
+            Reset();
+            return false;
 
-    default: R_ASSERT(0);
+        default: R_ASSERT(0);
+        }
     }
-    GEnv.Render->Begin();
-    g_bRendering = true;
 
+    {
+        ZoneScopedN("RenderBegin::BackendBegin");
+        GEnv.Render->Begin();
+        if (GEnv.Backend && GEnv.Backend->IsFrameGraph() && !GEnv.Backend->IsInFrame())
+            return false;
+    }
+
+    g_bRendering = true;
     return true;
 }
 
@@ -67,13 +80,14 @@ void CRenderDevice::RenderEnd(void)
         return;
 
     ZoneScoped;
+
     if (dwPrecacheFrame)
     {
+        ZoneScopedN("RenderEnd::Precache");
         GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
         {
-            GEnv.Render->updateGamma();
             if (precache_light)
             {
                 precache_light->set_active(false);
@@ -93,18 +107,25 @@ void CRenderDevice::RenderEnd(void)
             }
         }
     }
+
     // end scene
     g_bRendering = false;
-    GEnv.Render->End();
 
-    vCameraPositionSaved = vCameraPosition;
-    vCameraDirectionSaved = vCameraDirection;
-    vCameraTopSaved = vCameraTop;
-    vCameraRightSaved = vCameraRight;
+    {
+        GEnv.Render->End();
+    }
 
-    mFullTransformSaved = mFullTransform;
-    mViewSaved = mView;
-    mProjectSaved = mProject;
+    {
+        ZoneScopedN("RenderEnd::SaveCameraState");
+        vCameraPositionSaved = vCameraPosition;
+        vCameraDirectionSaved = vCameraDirection;
+        vCameraTopSaved = vCameraTop;
+        vCameraRightSaved = vCameraRight;
+
+        mFullTransformSaved = mFullTransform;
+        mViewSaved = mView;
+        mProjectSaved = mProject;
+    }
 }
 
 void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
@@ -133,23 +154,14 @@ void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
 void CRenderDevice::CalcFrameStats()
 {
     stats.RenderTotal.FrameEnd();
-    do
+    if (stats.RenderTotal.result > EPS_S)
     {
-        // calc FPS & TPS
-        if (fTimeDeltaReal <= EPS_S)
-            break;
-        const float fps = 1.f / fTimeDeltaReal;
-        // if (Engine.External.tune_enabled) vtune.update (fps);
         constexpr float fOne = 0.3f;
         constexpr float fInv = 1.0f - fOne;
-        stats.fFPS = fInv * stats.fFPS + fOne * fps;
-        if (stats.RenderTotal.result > EPS_S)
-        {
-            const u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
-            stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
-            stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
-        }
-    } while (false);
+        const u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
+        stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
+        stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
+    }
     stats.RenderTotal.FrameStart();
 }
 
@@ -235,16 +247,10 @@ void CRenderDevice::DoRender()
     renderTotalReal.Begin();
     if (b_is_Active && RenderBegin())
     {
-        {
-            ZoneScopedN("Render process");
-            seqRender.Process(); // all rendering is done here
-        }
+        GEnv.Render->Render();
 
         CalcFrameStats();
-        Statistic->Show();
 
-        ImGui::Render();
-        m_imgui_render->Render(ImGui::GetDrawData());
         UpdateViewports();
 
         RenderEnd(); // Present goes here
@@ -258,140 +264,168 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
+void CRenderDevice::PaceFrame()
+{
+    const auto windowFlags = m_sdlWnd ? SDL_GetWindowFlags(m_sdlWnd) : 0;
+    const bool hidden = !GEnv.isDedicatedServer && (windowFlags & (SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED));
+
+    if (!b_is_Ready || hidden || !g_loading_events.empty())
+    {
+        m_framePacer.Reset();
+        fTimeDeltaReal = 0.f;
+        return;
+    }
+
+    int fpsCap = ps_fps_limit;
+    if (GEnv.isDedicatedServer)
+        fpsCap = g_svDedicateServerUpdateReate;
+    else if (Paused() || !g_pGameLevel ||
+        (g_pGamePersistent && (g_pGamePersistent->IsMainMenuActive() || !g_pGamePersistent->IsLoaded())))
+        fpsCap = ps_fps_limit_in_menu;
+
+    u64 nowNs = SDL_GetTicksNS();
+    const u64 delayNs = m_framePacer.GetDelayNs(nowNs, static_cast<u32>(fpsCap));
+    if (delayNs > 0)
+    {
+        SDL_DelayPrecise(delayNs);
+        nowNs = SDL_GetTicksNS();
+    }
+    fTimeDeltaReal = static_cast<float>(m_framePacer.StartFrame(nowNs)) * 1e-9f;
+}
+
 void CRenderDevice::ProcessFrame()
 {
-    ZoneScoped;
-
-    if (!BeforeFrame())
-        return;
-
-    const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
-
-    FrameMove();
-
-    OnCameraUpdated();
-
-    const auto& processSeqParallel = TaskScheduler->AddTask([this]
+    do
     {
-        ZoneScopedN("ProcessParallelSequence");
-        for (u32 pit = 0; pit < seqParallel.size(); pit++)
-            seqParallel[pit]();
-        seqParallel.clear();
-        seqFrameMT.Process();
-    });
+        ZoneScoped;
 
-    DoRender();
+        UpdateWindowState();
 
-    TaskScheduler->Wait(processSeqParallel);
+        if (!m_windowVisible)
+        {
+            m_framePacer.Reset();
+            fTimeDeltaReal = 0.f;
+            Sleep(16);
+            break;
+        }
 
-    const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
-    const u64 frameTime = frameEndTime - frameStartTime;
+        if (!BeforeFrame())
+        {
+            break;
+        }
 
-    u32 updateDelta = 1000 / ps_fps_limit;
+        xray::memstats::FrameBegin();
 
-    if (GEnv.isDedicatedServer)
-        updateDelta = 1000 / g_svDedicateServerUpdateReate;
+        FrameMove();
 
-    else if (Paused() || g_pGameLevel == nullptr)
-        updateDelta = 1000 / ps_fps_limit_in_menu;
+        OnCameraUpdated();
 
-    if (frameTime < updateDelta)
-        Sleep(updateDelta - frameTime);
+        const auto processSeqParallel = TaskScheduler->AddTask([this]
+        {
+            ZoneScopedN("ProcessParallelSequence");
+            for (u32 pit = 0; pit < seqParallel.size(); pit++)
+                seqParallel[pit]();
+            seqParallel.clear();
+            seqFrameMT.Process();
+        });
 
-    if (!b_is_Active)
-        Sleep(1);
+        DoRender();
+
+        TaskScheduler->Wait(processSeqParallel);
+
+        if (!b_is_Active)
+            SDL_DelayNS(1'000'000ull);
+
+        const bool recordAlloc = (g_pGameLevel != nullptr) && (dwPrecacheFrame == 0);
+        xray::memstats::FrameEnd(recordAlloc);
+    } while (false);
 }
 
 void CRenderDevice::ProcessEvent(const SDL_Event& event)
 {
     ZoneScoped;
 
+    extern xr_vector<SDL_DisplayID> g_displayIDs;
+    auto IndexFromDisplayID = [](SDL_DisplayID id) -> u32 {
+        for (size_t i = 0; i < g_displayIDs.size(); ++i)
+            if (g_displayIDs[i] == id) return static_cast<u32>(i);
+        return 0;
+    };
+
     switch (event.type)
     {
-    case SDL_DISPLAYEVENT:
-    {
-        switch (event.display.type)
-        {
-        case SDL_DISPLAYEVENT_ORIENTATION:
-        case SDL_DISPLAYEVENT_CONNECTED:
-        case SDL_DISPLAYEVENT_DISCONNECTED:
-            CleanupVideoModes();
-            FillVideoModes();
-            if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
-                Reset();
-            else
-                UpdateWindowProps();
-            break;
-        } // switch (event.display.type)
+    case SDL_EVENT_DISPLAY_ORIENTATION:
+    case SDL_EVENT_DISPLAY_ADDED:
+    case SDL_EVENT_DISPLAY_REMOVED:
+        CleanupVideoModes();
+        FillVideoModes();
         break;
-    }
-    case SDL_WINDOWEVENT:
+
+    case SDL_EVENT_WINDOW_MOVED:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
-        if (!window)
-            break;
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
-        if (!viewport)
-            break;
-
-        switch (event.window.event)
-        {
-        case SDL_WINDOWEVENT_MOVED:
-        {
-            if (window == m_sdlWnd)
-            {
-                UpdateWindowRects();
-            }
-            if (viewport)
-                viewport->PlatformRequestMove = true;
-            break;
-        }
-
-        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
-            psDeviceMode.Monitor = event.window.data1;
-            break;
-
-        case SDL_WINDOWEVENT_RESIZED:
-            if (window == m_sdlWnd)
-                UpdateWindowRects();
-            break;
-
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-        {
-            if (window == m_sdlWnd)
-            {
-                UpdateWindowRects();
-
-                if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
-                    static_cast<int>(psDeviceMode.Height) == event.window.data2)
-                    break; // we don't need to reset device if resolution wasn't really changed
-
-                psDeviceMode.Width = event.window.data1;
-                psDeviceMode.Height = event.window.data2;
-
-                Reset();
-            }
-            if (viewport)
-                viewport->PlatformRequestResize = true;
-
-            break;
-        }
-
-        case SDL_WINDOWEVENT_CLOSE:
-        {
-            if (viewport)
-                viewport->PlatformRequestClose = true;
-
-            if (window == m_sdlWnd)
-            {
-                Engine.Event.Defer("KERNEL:disconnect");
-                Engine.Event.Defer("KERNEL:quit");
-            }
-            break;
-        }
-        } // switch (event.window.event)
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestMove = true;
+        break;
     }
-    } // switch (event.type)
+
+    case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+        psDeviceMode.Monitor = IndexFromDisplayID(static_cast<SDL_DisplayID>(event.window.data1));
+        break;
+
+    case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed)
+            psDeviceMode.WindowStyle = rsFullscreen;
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle != rsWindowed)
+            psDeviceMode.WindowStyle = rsWindowed;
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_RESIZED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (window == m_sdlWnd && psDeviceMode.WindowStyle == rsWindowed &&
+            event.window.data1 > 0 && event.window.data2 > 0)
+        {
+            int windowWidth = 0, windowHeight = 0;
+            if (SDL_GetWindowSize(window, &windowWidth, &windowHeight) && windowWidth > 0 && windowHeight > 0)
+            {
+                psDeviceMode.Width = static_cast<u32>(windowWidth);
+                psDeviceMode.Height = static_cast<u32>(windowHeight);
+            }
+        }
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestResize = true;
+        break;
+    }
+
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window))
+            viewport->PlatformRequestClose = true;
+        if (window == m_sdlWnd)
+        {
+            Engine.Event.Defer("KERNEL:disconnect");
+            Engine.Event.Defer("KERNEL:quit");
+        }
+        break;
+    }
+    }
 
     editor().ProcessEvent(event);
 }
@@ -401,6 +435,7 @@ void CRenderDevice::Run()
     ZoneScoped;
 
     g_bLoaded = false;
+    m_framePacer.Reset();
     Log("Starting engine...");
 
     // Startup timers and calculate timer delta
@@ -415,8 +450,8 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
 
-    SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
-    UpdateWindowProps();
+    SDL_HideWindow(m_sdlWnd);
+    SyncWindowToPsDeviceMode();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
 }
@@ -438,10 +473,16 @@ void CRenderDevice::FrameMove()
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
 
-    fTimeDeltaReal = Timer.GetElapsed_sec();
-    if (!_valid(fTimeDeltaReal))
-        fTimeDeltaReal = EPS_S + EPS_S;
-    Timer.Start(); // previous frame
+    float simulationDelta = Timer.GetElapsed_sec();
+    if (!_valid(simulationDelta))
+        simulationDelta = EPS_S + EPS_S;
+    Timer.Start();
+
+    if (fTimeDeltaReal > 0.f)
+    {
+        m_averageFrameTime = 0.7f * m_averageFrameTime + 0.3f * fTimeDeltaReal;
+        stats.fFPS = 1.f / m_averageFrameTime;
+    }
 
     if (psDeviceFlags.test(rsConstantFPS))
     {
@@ -462,7 +503,7 @@ void CRenderDevice::FrameMove()
             fTimeDelta = 0.0f;
         else
         {
-            fTimeDelta = 0.1f * fTimeDelta + 0.9f * fTimeDeltaReal; // smooth random system activity - worst case ~7% error
+            fTimeDelta = 0.1f * fTimeDelta + 0.9f * simulationDelta;
             clamp(fTimeDelta, EPS_S + EPS_S, .1f); // limit to 10fps minimum
         }
         fTimeGlobal = TimerGlobal.GetElapsed_sec();
@@ -470,7 +511,7 @@ void CRenderDevice::FrameMove()
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
-    ImGui::GetIO().DeltaTime = fTimeDeltaReal;
+    ImGui::GetIO().DeltaTime = fTimeDeltaReal > 0.f ? fTimeDeltaReal : 1.f / 60.f;
 
     m_imgui_render->Frame();
     ImGui::NewFrame();
@@ -488,6 +529,15 @@ void CRenderDevice::FrameMove()
     // seqFrame.Process(rp_Frame);
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
+
+    if (GEnv.Render && g_pGameLevel)
+        GEnv.Render->RenderStatsOverlay();
+
+    if (GEnv.Render)
+        GEnv.Render->RenderPBRConversionUI();
+
+    if (Statistic)
+        Statistic->RenderFPSOverlay();
 
     ImGui::EndFrame();
 }

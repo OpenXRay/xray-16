@@ -1,0 +1,128 @@
+#define SM_6_0
+#include "common.h"
+
+Texture2D<float> g_Depth : register(t0);
+
+cbuffer SkyVisibilityDebugParams : register(b5)
+{
+    float4 g_SkyGridOrigin;
+    uint4 g_SkyGridDims;
+    float g_SkyDebugRadius, g_SkyDebugRange, g_SkyDebugPad0, g_SkyDebugPad1;
+};
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+bool SkyDebugSphere(float3 rayOrigin, float3 rayDirection, float3 center, float radius, out float t)
+{
+    float3 offset = rayOrigin - center;
+    float b = dot(offset, rayDirection);
+    float h = b * b - (dot(offset, offset) - radius * radius);
+    t = 0.0;
+    if (h < 0.0)
+        return false;
+    t = -b - sqrt(h);
+    return t > 0.0;
+}
+
+float3 SkyDebugColor(uint4 probe, float3 normal)
+{
+    float c0;
+    float3 c1;
+    SkyVisibilityUnpack(probe.xy, c0, c1);
+    if (!SkyVisibilityBaked(c0))
+        return float3(0.1, 0.25, 0.9);
+    if (!SkyVisibilityValid(c0))
+        return ((probe.w >> SKY_PROBE_FAIL_SHIFT) & 3u) == SKY_PROBE_FAIL_UNREACHABLE ?
+            float3(0.9, 0.1, 0.1) : float3(1.0, 0.55, 0.0);
+    float visibility = g_SkyGridDims.w == 2u ? SkyVisibilityAverage(c0) : SkyVisibilityCosine(c0, c1, normal);
+    return visibility.xxx;
+}
+
+float4 main(PS_INPUT input) : SV_Target0
+{
+    float3 rayOrigin = eye_position;
+    float3 viewRay = float3(pos_decompression_params.zw * input.position.xy - pos_decompression_params.xy, 1.0);
+    float3 rayDirection = normalize(viewDirToWorld(viewRay));
+    float depth = g_Depth.Load(int3(int2(input.position.xy), 0));
+    float tMax = g_SkyDebugRange;
+    if (depth > 0.0)
+        tMax = min(tMax, length(reconstruct_world_pos(input.position.xy, depth) - rayOrigin));
+
+    float spacing = g_SkyGridOrigin.w;
+    int3 dims = int3(g_SkyGridDims.xyz);
+    float3 local = (rayOrigin - g_SkyGridOrigin.xyz) / spacing + 0.5;
+    int3 cell = int3(floor(local));
+    int3 stepDir = int3(sign(rayDirection));
+    float3 invDir = 1.0 / max(abs(rayDirection), 1e-6);
+    float3 fracLocal = local - float3(cell);
+    float3 next = float3(
+        stepDir.x > 0 ? 1.0 - fracLocal.x : fracLocal.x,
+        stepDir.y > 0 ? 1.0 - fracLocal.y : fracLocal.y,
+        stepDir.z > 0 ? 1.0 - fracLocal.z : fracLocal.z) * invDir * spacing;
+    float3 delta = invDir * spacing;
+
+    float t = 0.0;
+    float bestT = tMax;
+    uint bestIndex = 0xFFFFFFFFu;
+    float3 bestCenter = 0.0;
+    for (uint i = 0u; i < 512u && t < min(tMax, bestT); ++i)
+    {
+        for (uint n = 0u; n < 27u; ++n)
+        {
+            int3 neighbor = cell + int3(int(n % 3u) - 1, int((n / 3u) % 3u) - 1, int(n / 9u) - 1);
+            if (any(neighbor < 0) || any(neighbor >= dims))
+                continue;
+            uint index = uint(neighbor.x) + g_SkyGridDims.x * (uint(neighbor.y) + g_SkyGridDims.y * uint(neighbor.z));
+            uint4 probe = g_SkyProbes[index].visibility;
+            float c0;
+            float3 c1;
+            SkyVisibilityUnpack(probe.xy, c0, c1);
+            float3 center = g_SkyGridOrigin.xyz + float3(neighbor) * spacing;
+            if (SkyVisibilityBaked(c0))
+                center += SkyProbeUnpackOffset(probe.z, spacing);
+            float hitT;
+            if (SkyDebugSphere(rayOrigin, rayDirection, center, g_SkyDebugRadius, hitT) && hitT < bestT)
+            {
+                bestT = hitT;
+                bestIndex = index;
+                bestCenter = center;
+            }
+        }
+        if (next.x < next.y && next.x < next.z)
+        {
+            t = next.x;
+            next.x += delta.x;
+            cell.x += stepDir.x;
+        }
+        else if (next.y < next.z)
+        {
+            t = next.y;
+            next.y += delta.y;
+            cell.y += stepDir.y;
+        }
+        else
+        {
+            t = next.z;
+            next.z += delta.z;
+            cell.z += stepDir.z;
+        }
+    }
+    if (bestIndex != 0xFFFFFFFFu)
+    {
+        uint4 probe = g_SkyProbes[bestIndex].visibility;
+        float c0;
+        float3 c1;
+        SkyVisibilityUnpack(probe.xy, c0, c1);
+        float3 normal = normalize(rayOrigin + rayDirection * bestT - bestCenter);
+        float3 color = SkyDebugColor(probe, normal);
+        if (SkyVisibilityBaked(c0) && (probe.w & SKY_PROBE_FLAG_RELOCATED) != 0u && dot(normal, -rayDirection) < 0.35)
+            color = float3(0.1, 0.9, 0.9);
+        return float4(color, 1.0);
+    }
+    discard;
+    return float4(0.0, 0.0, 0.0, 0.0);
+}

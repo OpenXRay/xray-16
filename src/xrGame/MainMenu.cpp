@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "MainMenu.h"
+#include "Include/xrAPI/xrAPI.h"
 #include "ui/UIDialogWnd.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrEngine/XR_IOConsole.h"
@@ -8,7 +9,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include "xrUICore/Buttons/UIBtnHint.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -365,7 +366,6 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     {
         IWantMyMouseBackScreamed = true;
         pInput->GrabInput(false);
-        Device.SetWindowDraggable(true);
     }
 
     switch (GetBindedAction(dik))
@@ -395,7 +395,6 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
     {
         IWantMyMouseBackScreamed = false;
         pInput->GrabInput(true);
-        Device.SetWindowDraggable(false);
     }
 
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
@@ -466,20 +465,7 @@ void CMainMenu::IR_OnControllerHold(int dik, const ControllerAxisState& state)
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
 
-void CMainMenu::OnRender()
-{
-    ZoneScoped;
-
-    if (m_Flags.test(flGameSaveScreenshot))
-        return;
-
-    GEnv.Render->RenderMenu();
-    if (!OnRenderPPUI_query())
-    {
-        DoRenderDialogs();
-        UI().RenderFont();
-    }
-}
+void CMainMenu::OnRender() {}
 
 void CMainMenu::OnRenderPPUI_main()
 {
@@ -491,10 +477,8 @@ void CMainMenu::OnRenderPPUI_main()
 
     UI().pp_start();
 
-    if (OnRenderPPUI_query())
     {
         DoRenderDialogs();
-        UI().RenderFont();
     }
 
     UI().pp_stop();

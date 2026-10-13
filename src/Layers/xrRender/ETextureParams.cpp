@@ -8,7 +8,7 @@
 #include "xrServerEntities/PropertiesListHelper.h"
 #endif
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 const xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
 
@@ -86,6 +86,21 @@ void STextureParams::Load(IReader& F)
 
     if (F.find_chunk(THM_CHUNK_FADE_DELAY))
         fade_delay = F.r_u8();
+
+    if (F.find_chunk(THM_CHUNK_PBR_METALLIC))
+        F.r_stringZ(metallic_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_ROUGHNESS))
+        F.r_stringZ(roughness_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_AO))
+        F.r_stringZ(ao_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_PARALLAX))
+        F.r_stringZ(parallax_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_PACKED))
+        F.r_stringZ(pbr_name);
 }
 
 void STextureParams::Save(IWriter& F)
@@ -127,6 +142,26 @@ void STextureParams::Save(IWriter& F)
 
     F.open_chunk(THM_CHUNK_FADE_DELAY);
     F.w_u8(fade_delay);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_METALLIC);
+    F.w_stringZ(metallic_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_ROUGHNESS);
+    F.w_stringZ(roughness_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_AO);
+    F.w_stringZ(ao_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_PARALLAX);
+    F.w_stringZ(parallax_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_PACKED);
+    F.w_stringZ(pbr_name);
     F.close_chunk();
 }
 
@@ -419,4 +454,4 @@ u32 STextureParams::MemoryUsage(LPCSTR base_name)
     return mem_usage;
 }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+}

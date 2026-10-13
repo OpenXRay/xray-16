@@ -1,0 +1,58 @@
+#include "stdafx.h"
+#include "FGResourceManager.h"
+
+namespace xray::render::resources {
+
+FGResourceManager::FGResourceManager(xray::render::fg::RenderDevice* device)
+    : m_device(device)
+{
+    VERIFY(m_device);
+
+    Msg("! [FGResourceManager] Creating...");
+
+    m_ioService = xr_make_unique<AsyncIOManager>();
+    m_textureManager = xr_make_unique<TextureManager>(device);
+    m_bufferManager = xr_make_unique<BufferManager>(device);
+    m_samplerCache = xr_make_unique<SamplerCache>(device);
+    m_rtFactory = xr_make_unique<NativeRTFactory>(device, m_textureManager.get());
+
+    Msg("! [FGResourceManager] ✅ Created with Native RT Factory");
+}
+
+FGResourceManager::~FGResourceManager() {
+    Msg("! [FGResourceManager] Destroying...");
+    PrintStatistics();
+    m_rtFactory.reset();
+    m_textureManager.reset();
+    m_bufferManager.reset();
+    m_samplerCache.reset();
+    m_ioService.reset();
+}
+
+void FGResourceManager::Update(float deltaTime) {
+    m_ioService->Pump();
+    m_textureManager->Update(deltaTime);
+}
+
+FGResourceManager::Statistics FGResourceManager::GetStatistics() const {
+    Statistics stats;
+    stats.textures = m_textureManager->GetStatistics();
+    stats.buffers = m_bufferManager->GetStatistics();
+    stats.renderTargets = m_rtFactory->GetStatistics();
+    stats.samplersCached = m_samplerCache->GetCacheSize();
+    stats.io = m_ioService->GetStatistics();
+    return stats;
+}
+
+void FGResourceManager::PrintStatistics() const {
+    Msg("! [FGResourceManager] === Statistics ===");
+    m_textureManager->PrintStatistics();
+    m_bufferManager->PrintStatistics();
+    m_rtFactory->PrintStatistics();
+    m_ioService->PrintStatistics();
+    Msg("!   Samplers cached: %u", m_samplerCache->GetCacheSize());
+    Msg("! [FGResourceManager] Total Memory: %llu MB",
+        GetStatistics().totalMemoryUsed() / (1024 * 1024));
+}
+
+}

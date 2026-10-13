@@ -1,0 +1,23 @@
+{
+    "transparent": true,
+    "castsShadow": false,
+    "fog": false,
+    "distort": true,
+    "sorting": {
+        "priority": 3,
+        "backToFront": false
+    },
+    "colorMode": "alphaOnly",
+    "vertexFade": {
+        "mode": "edge",
+        "scale": 1.0
+    },
+    "blend": {
+        "src": "srcalpha",
+        "dst": "invsrcalpha"
+    },
+    "depth": {
+        "test": true,
+        "write": false
+    }
+}

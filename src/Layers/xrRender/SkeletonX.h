@@ -10,7 +10,7 @@
 
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CKinematics;
 class Fvisual;
@@ -19,11 +19,10 @@ class Fvisual;
 
 class CSkeletonX
 {
-protected:
-    enum
-    {
-        vertRenderFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1
-    };
+public:
+    CKinematics* GetParent() { return Parent; }
+    u16 RenderMode;
+
     enum
     {
         RM_SKINNING_SOFT,
@@ -39,6 +38,19 @@ protected:
         RM_SKINNING_4B_HQ
     };
 
+    struct CollisionTriangles
+    {
+        xr_vector<Fvector> vertices;
+        u64 revision{};
+        u64 poseRevision{};
+    };
+
+protected:
+    enum
+    {
+        vertRenderFVF = FVF::XYZ | FVF::NORMAL | FVF::TEX1
+    };
+
     CKinematics* Parent; // setted up by parent
     ref_smem<vertBoned1W> Vertices1W; // shared
     ref_smem<vertBoned2W> Vertices2W; // shared
@@ -46,7 +58,6 @@ protected:
     ref_smem<vertBoned4W> Vertices4W; // shared
     ref_smem<u16> BonesUsed; // actual bones which have influence on vertices
 
-    u16 RenderMode;
     u16 ChildIDX;
 
     // render-mode specifics
@@ -62,9 +73,16 @@ protected:
         u32 RMS_bonecount; // skinning, maximal bone ID
     };
 
+    xr_vector<u16> collisionIndices;
+    xr_vector<u8> collisionVertices;
+    xr_vector<Fmatrix> collisionPose;
+    xr_map<u16, CollisionTriangles> collisionTriangles;
+    xr_vector<Fvector> collisionSkinnedVertices;
+    xr_vector<u8> collisionSkinnedValid;
+    u64 collisionPoseRevision{};
+    u32 collisionPoseFrame{u32(-1)};
+
     void _Copy(CSkeletonX* V);
-    void _Render_soft(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount);
-    void _Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount);
     void _Load(const char* N, IReader* data, u32& dwVertCount);
 
     virtual void _Load_hw(Fvisual& V, void* data) = 0;
@@ -112,7 +130,18 @@ public:
         IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id) = 0;
     virtual void FillVertices(
         const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size, u16 bone_id) = 0;
+
+    const ref_smem<vertBoned1W>& GetVertices1W() const { return Vertices1W; }
+    const ref_smem<vertBoned2W>& GetVertices2W() const { return Vertices2W; }
+    const ref_smem<vertBoned3W>& GetVertices3W() const { return Vertices3W; }
+    const ref_smem<vertBoned4W>& GetVertices4W() const { return Vertices4W; }
+    const CollisionTriangles& ExportCollisionTriangles(u16 bone);
 };
+
+void get_pos_bones(const vertBoned1W& v, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned2W& vert, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned3W& vert, Fvector& p, CKinematics* Parent);
+void get_pos_bones(const vertBoned4W& vert, Fvector& p, CKinematics* Parent);
 
 template <typename T_vertex, typename T_buffer>
 BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result& r, float dist, const Fvector& S,
@@ -136,4 +165,4 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     }
     return FALSE;
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

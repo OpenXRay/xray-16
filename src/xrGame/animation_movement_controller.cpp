@@ -97,22 +97,15 @@ void animation_movement_controller::deinitialize()
 
 void animation_movement_controller::GetInitalPositionBlenSpeed()
 {
-    float sv_blend_time = m_control_blend->timeCurrent;
-
-    // u16 root = m_pKinematicsC->LL_GetBoneRoot();
     Fmatrix m1;
-    // m_pKinematicsC->Bone_GetAnimPos( m1, root, u8(-1), true );
     animation_root_position(m1);
-    m_control_blend->timeCurrent += Device.fTimeDelta;
-    clamp(m_control_blend->timeCurrent, 0.f, m_control_blend->timeTotal);
+    const float time = clampr(m_control_blend->timeCurrent + Device.fTimeDelta, 0.f, m_control_blend->timeTotal);
     Fmatrix m0;
-    // m_pKinematicsC->Bone_GetAnimPos( m0, root, u8(-1), true );
-    animation_root_position(m0);
+    animation_root_position(m0, &time);
     float l, a;
     get_diff_value(m0, m1, l, a);
     blend_linear_speed = l / Device.fTimeDelta;
     blend_angular_speed = a / Device.fTimeDelta;
-    m_control_blend->timeCurrent = sv_blend_time;
 }
 
 bool animation_movement_controller::IsBlending() const
@@ -159,42 +152,14 @@ void animation_movement_controller::InitalPositionBlending(const Fmatrix& to)
     DBG_previous_position = m_pObjXForm;
 #endif
 }
-static void get_animation_root_position(Fmatrix& pos, IKinematics* K, IKinematicsAnimated* KA, CBlend* control_blend)
+void animation_movement_controller::animation_root_position(Fmatrix& pos, const float* time)
 {
-    VERIFY(KA);
-    VERIFY(K);
-    VERIFY(smart_cast<IKinematics*>(KA) == K);
-
-    SKeyTable keys;
-    KA->LL_BuldBoneMatrixDequatize(&K->LL_GetData(0), u8(1 << 0), keys);
-
-    // find
-    CKey* key = 0;
-    for (int i = 0; i < keys.chanel_blend_conts[0]; ++i)
-    {
-        if (keys.blends[0][i] == control_blend)
-            key = &keys.keys[0][i];
-    }
-    VERIFY(key);
-
-    float sv_amount = control_blend->blendAmount;
-    control_blend->blendAmount = 1.f;
-    keys.blends[0][0] = control_blend;
-    keys.chanel_blend_conts[0] = 1;
-    keys.keys[0][0] = *key;
-
-    for (u32 j = 1; j < MAX_CHANNELS; ++j)
-        keys.chanel_blend_conts[j] = 0;
-
-    CBoneInstance BI = K->LL_GetBoneInstance(0);
-
-    KA->LL_BoneMatrixBuild(BI, &Fidentity, keys);
-    pos.set(BI.mTransform);
-    control_blend->blendAmount = sv_amount;
-}
-void animation_movement_controller::animation_root_position(Fmatrix& pos)
-{
-    get_animation_root_position(pos, m_pKinematicsC, m_pKinematicsA, m_control_blend);
+    BonePoseQuery query;
+    query.channels = 1 << 0;
+    query.blend = m_control_blend;
+    query.isolated = true;
+    query.time = time;
+    m_pKinematicsA->LL_EvaluateBonePose(pos, m_pKinematicsC->LL_GetBoneRoot(), Fidentity, query);
 }
 
 void animation_movement_controller::OnFrame()
@@ -286,8 +251,6 @@ anim: %s anim set: %s",
         B->blendAmount = B->blendPower;
         m_control_blend = B;
     */
-    // CMotion* m_curr = smart_cast<IKinematicsAnimated*>(m_pKinematicsC)->LL_GetRootMotion(m_control_blend->motionID);
-    // CMotion* m_new = smart_cast<IKinematicsAnimated*>(m_pKinematicsC)->LL_GetRootMotion(B->motionID);
     VERIFY(IsActive());
 
 // m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF;
@@ -311,10 +274,9 @@ anim: %s anim set: %s",
     }
     else if (local_animation)
     {
-        float blend_time = m_control_blend->timeCurrent;
-        m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF; //(SAMPLE_SPF+EPS);
+        const float time = m_control_blend->timeTotal - SAMPLE_SPF;
         Fmatrix root;
-        animation_root_position(root);
+        animation_root_position(root, &time);
         m_startObjXForm.mulB_43(root);
 #ifdef DEBUG
         if (dbg_draw_animation_movement_controller)
@@ -324,7 +286,6 @@ anim: %s anim set: %s",
             DBG_ClosedCashedDraw(5000);
         }
 #endif
-        m_control_blend->timeCurrent = blend_time;
     }
 
     m_control_blend = B;
@@ -379,15 +340,11 @@ void animation_movement_controller::SetPosesBlending()
     VERIFY(IsActive());
     float blending_time = percent_blending * m_control_blend->timeTotal;
 
-    float sv_time = m_control_blend->timeCurrent;
-    m_control_blend->timeCurrent = blending_time;
-
     Fmatrix root;
-    animation_root_position(root);
+    animation_root_position(root, &blending_time);
 
     poses_blending blending(m_pObjXForm, Fmatrix().mul_43(m_startObjXForm, root), blending_time);
     m_poses_blending = blending;
-    m_control_blend->timeCurrent = sv_time;
 }
 
 float change_pos_delta = 0.02f;

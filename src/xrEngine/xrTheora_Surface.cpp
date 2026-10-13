@@ -300,7 +300,7 @@ void CTheoraSurface::open_sdl_video()
     VERIFY(m_rgb);
     theora_info& t_info = m_rgb->t_info;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
     {
         msg("Unable to init SDL: %s", SDL_GetError());
         return;

@@ -247,8 +247,6 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    #AnselManager.cpp
-    #AnselManager.h
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -413,6 +411,10 @@ target_sources(xrGame PRIVATE
     DemoPlay_Control.h
     DestroyablePhysicsObject.cpp
     DestroyablePhysicsObject.h
+    DeveloperLevel.cpp
+    DeveloperLevel.h
+    DeveloperRoom.cpp
+    DeveloperRoom.h
     detail_path_builder.h
     detail_path_manager.cpp
     detail_path_manager.h
@@ -655,8 +657,6 @@ target_sources(xrGame PRIVATE
     ik_calculate_data.h
     ik_calculate_state.h
     ik_collide_data.h
-    ik_dbg_matrix.cpp
-    ik_dbg_matrix.h
     ik_foot_collider.cpp
     ik_foot_collider.h
     IKFoot.cpp
@@ -942,6 +942,8 @@ target_sources(xrGame PRIVATE
     player_hud.h
     player_hud_tune.cpp
     player_hud_tune.h
+    ozz_anim_debugger.cpp
+    ozz_anim_debugger.h
     player_name_modifyer.cpp
     player_name_modifyer.h
     pose_extrapolation.cpp
@@ -2085,24 +2087,14 @@ target_sources(xrGame PRIVATE
     CdkeyDecode/base32.h
     CdkeyDecode/cdkeydecode.c
     CdkeyDecode/cdkeydecode.h
-    ik/aint.cxx
-    ik/aint.h
-    ik/Dof7control.cpp
-    ik/Dof7control.h
-    ik/eqn.cxx
-    ik/eqn.h
-    ik/eulersolver.cxx
-    ik/eulersolver.h
+    ik/HudIKController.cpp
+    ik/HudIKController.h
+    ik/HudWeaponCollision.cpp
+    ik/HudWeaponCollision.h
+    ik/IKDebugDraw.cpp
+    ik/IKDebugDraw.h
     ik/IKLimb.cpp
     ik/IKLimb.h
-    ik/jtlimits.cxx
-    ik/jtlimits.h
-    ik/limb.cxx
-    ik/limb.h
-    ik/math3d.cpp
-    ik/math3d.h
-    ik/mathTrig.cpp
-    ik/mathTrig.h
     ui/ArtefactDetectorUI.cpp
     ui/ArtefactDetectorUI.h
     #ui/CExtraContentFilter.cpp
@@ -2492,19 +2484,30 @@ target_link_libraries(xrGame
     xrSound
     xrScriptEngine
     xrGameSpy
+    $<$<PLATFORM_ID:Windows>:GameSpy-oxr>
     xrCDB
     xrPhysics
     xrNetServer
+    xrAnimation
+    $<$<PLATFORM_ID:Windows>:xray_ansel>
 )
 
 target_compile_definitions(xrGame
     PUBLIC
     DECLARE_SPECIALIZATION
-    PURE_DYNAMIC_CAST
 
     PRIVATE
     XRGAME_EXPORTS
 )
+
+# AnselManager wraps NVIDIA's Ansel SDK (Windows-only); GamePersistent
+# already gates every ansel->* call on XR_PLATFORM_WINDOWS.
+if (WIN32)
+    target_sources(xrGame PRIVATE
+        AnselManager.cpp
+        AnselManager.h
+    )
+endif()
 
 # E2K hack: MCST lcc compiler does not support object files greater than 4Gb due to a bug in EDG frontend
 if (CMAKE_CXX_COMPILER_ID MATCHES "LCC")
@@ -2527,7 +2530,8 @@ target_precompile_headers(xrGame
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrGame LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrGame
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

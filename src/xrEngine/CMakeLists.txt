@@ -178,6 +178,9 @@ target_sources_grouped(
     FILES
     IGame_Level.cpp
     IGame_Level.h
+    DeveloperMode.cpp
+    DeveloperMode.h
+    DeveloperScene.h
     IGame_Level_check_textures.cpp
 )
 
@@ -209,6 +212,8 @@ target_sources_grouped(
     xr_object.h
     xr_object_list.cpp
     xr_object_list.h
+    GrassInteractionCollector.cpp
+    GrassInteractionCollector.h
 )
 
 target_sources_grouped(
@@ -305,6 +310,7 @@ target_sources_grouped(
     FILES
     device.cpp
     device.h
+    FramePacer.h
     Device_create.cpp
     Device_destroy.cpp
     Device_imgui.cpp
@@ -331,8 +337,8 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "Render\\Execution & 3D\\Shaders\\Textures"
     FILES
-    #tntQAVI.cpp
-    #tntQAVI.h
+    IRenderBackend.h
+    IRenderBackend.cpp
     xrImage_Resampler.cpp
     xrImage_Resampler.h
     xrTheora_Stream.cpp
@@ -341,14 +347,28 @@ target_sources_grouped(
     xrTheora_Surface.h
 )
 
-#target_sources_grouped(
-#    TARGET xrEngine
-#    NAME "Render\\Execution & 3D\\TextConsole"
-#    FILES
-#    Text_Console.cpp
-#    Text_Console.h
-#    Text_Console_WndProc.cpp
-#)
+# tntQAVI wraps Video-for-Windows (vfw.h / winmm); its only consumers live
+# under xrRenderPC_R4, which is itself WIN32-gated.
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Render\\Execution & 3D\\Shaders\\Textures"
+        FILES
+        tntQAVI.cpp
+        tntQAVI.h
+    )
+endif()
+
+if (WIN32)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Render\\Execution & 3D\\TextConsole"
+        FILES
+        Text_Console.cpp
+        Text_Console.h
+        Text_Console_WndProc.cpp
+    )
+endif()
 
 target_sources_grouped(
     TARGET xrEngine
@@ -407,37 +427,51 @@ target_sources(xrEngine
     TODO.txt
 )
 
+if (APPLE)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Platform\\macOS"
+        FILES
+        macos/GameDataResolver.cpp
+        macos/GameDataResolver.h
+    )
+endif()
+
 target_include_directories(xrEngine
+    PUBLIC
+    "${XRAY_SOURCE_DIR}/Externals/imgui"
+
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${XRAY_SOURCE_DIR}/src"
-    "${XRAY_SOURCE_DIR}/Externals/imgui"
     "${XRAY_SOURCE_DIR}/Externals/OpenAutomate/inc"
 )
 
 target_link_libraries(xrEngine
     PUBLIC
     xrMiscMath
+    xrScriptEngine
 
     PRIVATE
     xrAPI
     xrCDB
+    xrAnimation
     xrMaterialSystem
     xrCore
     xrSound
-    xrScriptEngine
     xrNetServer
     xrImGui
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
-    SDL2::SDL2
+    SDL3::SDL3
+    $<$<PLATFORM_ID:Windows>:DiscordGameSDK>
+    $<$<PLATFORM_ID:Windows>:vfw32>
 )
 
 target_compile_definitions(xrEngine
     PRIVATE
     ENGINE_BUILD
-    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrEngine PROPERTIES
@@ -450,7 +484,8 @@ target_precompile_headers(xrEngine
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrEngine LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrEngine
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

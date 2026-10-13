@@ -3,7 +3,7 @@
 #include "light.h"
 #include "Light_Package.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CLight_DB
 {
@@ -19,9 +19,7 @@ public:
     void add_light(light* L);
 
     void Load(IReader* fs);
-#if RENDER != R_R1
     void LoadHemi();
-#endif
     void Unload();
 
     light* Create();
@@ -30,4 +28,6 @@ public:
     CLight_DB();
     ~CLight_DB();
 };
-} // namespace xray::render::RENDER_NAMESPACE
+
+extern ECORE_API CLight_DB Lights;
+}

@@ -4,6 +4,8 @@
 #include "editor_helper.h"
 #include "XR_IOConsole.h"
 
+extern int g_debug_utils;
+
 namespace xray::editor
 {
 ide_tool::ide_tool()
@@ -103,8 +105,12 @@ void ide::ShowMain()
             }
             ImGui::EndMenu();
         }
-#ifndef MASTER_GOLD
-        if (ImGui::BeginMenu("Tools"))
+#ifdef MASTER_GOLD
+        const bool show_tools = ::g_debug_utils != 0;
+#else
+        const bool show_tools = true;
+#endif
+        if (show_tools && ImGui::BeginMenu("Tools"))
         {
             if (m_tool_added)
             {
@@ -120,7 +126,6 @@ void ide::ShowMain()
             }
             ImGui::EndMenu();
         }
-#endif
         if (ImGui::BeginMenu("About"))
         {
 #ifndef MASTER_GOLD

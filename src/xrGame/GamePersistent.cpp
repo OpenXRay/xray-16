@@ -17,6 +17,7 @@
 #include "ActorEffector.h"
 #include "Actor.h"
 #include "Spectator.h"
+#include "HUDManager.h"
 
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -45,6 +46,8 @@
 #endif // _EDITOR
 
 #include "xrEngine/xr_level_controller.h"
+#include "xrEngine/DeveloperMode.h"
+#include "DeveloperLevel.h"
 
 CGamePersistent::CGamePersistent()
 {
@@ -85,6 +88,11 @@ CGamePersistent::~CGamePersistent()
 
 IGame_Level* CGamePersistent::CreateLevel()
 {
+    if (m_devLevel)
+    {
+        m_devLevel = false;
+        return xr_new<CDeveloperLevel>();
+    }
     return xr_new<CLevel>();
 }
 
@@ -96,6 +104,16 @@ void CGamePersistent::DestroyLevel(IGame_Level*& lvl)
 void CGamePersistent::PreStart(LPCSTR op)
 {
     inherited::PreStart(op);
+
+    m_devLevel = false;
+
+    if (op)
+    {
+        IGame_Persistent::params parsed;
+        parsed.parse_cmd_line(op);
+        m_devLevel = (0 == xr_strcmp(parsed.m_game_or_spawn, "dev_material_room") &&
+            0 == xr_strcmp(parsed.m_game_type, "single") && 0 == xr_strcmp(parsed.m_alife, "developer"));
+    }
 }
 
 extern void clean_game_globals();
@@ -112,7 +130,7 @@ void CGamePersistent::OnAppStart()
 #ifndef XR_PLATFORM_WINDOWS
     init_game_globals();
 #else
-    const auto& initializeGlobals = TaskScheduler->AddTask(init_game_globals);
+    const auto initializeGlobals = TaskScheduler->AddTask(init_game_globals);
 #endif
 
     GEnv.UI = xr_new<UICore>();
@@ -124,6 +142,9 @@ void CGamePersistent::OnAppStart()
         m_pLoadingScreen = xr_new<UILoadingScreen>();
 
     inherited::OnAppStart();
+
+    if (GEnv.Render && !DeveloperMode::Requested())
+        GEnv.Render->ConvertLegacyAssetsToPBR();
 
 #ifdef XR_PLATFORM_WINDOWS
     ansel = xr_new<AnselManager>();
@@ -173,6 +194,13 @@ void CGamePersistent::Disconnect()
 
 void CGamePersistent::OnGameStart()
 {
+    if (g_pGameLevel && Level().IsDeveloperLevel())
+    {
+        Msg("[dev_level] event=start stage=prefetch skipped");
+        UpdateGameType();
+        return;
+    }
+
     inherited::OnGameStart();
     UpdateGameType();
 }
@@ -385,12 +413,18 @@ bool allow_intro()
     if ((0 != strstr(Core.Params, "-nointro")))
         return false;
 
+    if (DeveloperMode::Requested())
+        return false;
+
     return true;
 }
 
 bool allow_game_intro()
 {
-    return !strstr(Core.Params, "-nogameintro");
+    if (strstr(Core.Params, "-nogameintro"))
+        return false;
+
+    return !(g_pGameLevel && Level().IsDeveloperLevel());
 }
 
 void CGamePersistent::start_logo_intro()
@@ -429,6 +463,11 @@ void CGamePersistent::game_loaded()
     if (Device.dwPrecacheFrame <= 2)
     {
         m_intro_event = nullptr;
+        if (g_pGameLevel && Level().IsDeveloperLevel())
+        {
+            load_screen_renderer.Stop();
+            return;
+        }
         if (g_pGameLevel && g_pGameLevel->bReady && g_keypress_on_start &&
             load_screen_renderer.NeedsUserInput() && m_game_params.m_e_game_type == eGameIDSingle)
         {
@@ -770,6 +809,45 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
+
+void CGamePersistent::OnRenderInGameUI()
+{
+    if (g_pGameLevel && g_pGameLevel->pHUD)
+    {
+        CHUDManager* pHUDManager = dynamic_cast<CHUDManager*>(g_pGameLevel->pHUD);
+        if (pHUDManager)
+        {
+            pHUDManager->RenderUI();
+        }
+    }
+
+}
+
+void CGamePersistent::OnRenderCursor()
+{
+    GetUICursor().OnRender();
+}
+
+void CGamePersistent::OnRenderSequencers()
+{
+
+    if (m_intro && m_intro->IsActive())
+    {
+        m_intro->OnRender();
+    }
+
+    extern CUISequencer* g_tutorial;
+    if (g_tutorial && g_tutorial->IsActive())
+    {
+        g_tutorial->OnRender();
+    }
+
+    extern CUISequencer* g_tutorial2;
+    if (g_tutorial2 && g_tutorial2->IsActive())
+    {
+        g_tutorial2->OnRender();
+    }
+}
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)

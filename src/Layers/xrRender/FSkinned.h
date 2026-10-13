@@ -9,7 +9,7 @@
 
 struct SEnumVerticesCallback;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 class CSkeletonX_ext : public CSkeletonX // shared code for SkeletonX derivates
 {
@@ -44,7 +44,6 @@ class CSkeletonX_ST : public Fvisual, public CSkeletonX_ext
 public:
     CSkeletonX_ST() {}
     virtual ~CSkeletonX_ST() {}
-    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override;
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
@@ -68,7 +67,6 @@ class CSkeletonX_PM : public FProgressive, public CSkeletonX_ext
 public:
     CSkeletonX_PM() {}
     virtual ~CSkeletonX_PM() {}
-    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override;
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
@@ -83,4 +81,4 @@ private:
     CSkeletonX_PM(const CSkeletonX_PM& other);
     void operator=(const CSkeletonX_PM& other);
 };
-} // namespace xray::render::RENDER_NAMESPACE
+}

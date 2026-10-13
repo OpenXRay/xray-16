@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "ModelPool.h"
+#include "r_FrameGraphRenderer.h"
 
 #include "xrMaterialSystem/GameMtlLib.h"
 
@@ -30,7 +31,7 @@
 
 extern bool ENGINE_API g_bRendering;
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
@@ -208,8 +209,6 @@ void CModelPool::Destroy()
 
     Models.clear();
 
-    // cleanup motions container
-    g_pMotionsContainer->clean(false);
 }
 
 CModelPool::CModelPool()
@@ -217,13 +216,11 @@ CModelPool::CModelPool()
     bLogging = TRUE;
     bForceDiscard = FALSE;
     bAllowChildrenDuplicate = TRUE;
-    g_pMotionsContainer = xr_new<motions_container>();
 }
 
 CModelPool::~CModelPool()
 {
     Destroy();
-    xr_delete(g_pMotionsContainer);
 }
 
 dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
@@ -293,11 +290,11 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 
 dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
 {
-    string256 low_name;
-    VERIFY(xr_strlen(name) < 256);
+    string_path low_name;
+    VERIFY(xr_strlen(name) < sizeof(low_name));
     xr_strcpy(low_name, name);
     xr_strlwr(low_name);
-    if (strext(low_name))
+    if (!data && strext(low_name))
         *strext(low_name) = 0;
 
     // 1. Search for already loaded model
@@ -451,7 +448,7 @@ dxRender_Visual* CModelPool::CreatePE(PS::CPEDef* source)
 dxRender_Visual* CModelPool::CreatePG(PS::CPGDef* source)
 {
     PS::CParticleGroup* V = (PS::CParticleGroup*)Instance_Create(MT_PARTICLE_GROUP);
-    V->Compile(source);
+    V->Compile(source, RImplementation.m_PSLibrary);
     return V;
 }
 
@@ -476,8 +473,7 @@ void CModelPool::dump()
     int free_cnt = 0;
     for (REGISTRY_IT it = Registry.begin(); it != Registry.end(); ++it)
     {
-        CKinematics* K = PCKinematics((dxRender_Visual*)it->first);
-        VERIFY(K);
+        CKinematics* K = PCKinematics(it->first);
         if (K)
         {
             u32 cur = K->mem_usage(true);
@@ -643,4 +639,5 @@ void CModelPool::RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransf
 }
 void CModelPool::OnDeviceDestroy() { Destroy(); }
 #endif
-} // namespace xray::render::RENDER_NAMESPACE
+
+}

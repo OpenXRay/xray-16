@@ -497,7 +497,7 @@
       <text font="letterica16" color="ui_6">ui_mm_vsync</text>
     </cap_vsync>
     <check_vsync x="162" y="0" width="27" height="21" stretch="1">
-      <options_item entry="rs_v_sync" group="mm_opt_video_adv" depend="vid"/>
+      <options_item entry="rs_v_sync" group="mm_opt_video_adv"/>
     </check_vsync>
 
     <cap_60hz x="17" y="0" width="119" height="21">

@@ -1,0 +1,1635 @@
+#include "stdafx.h"
+#include "VulkanBackend.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+
+#include <filesystem>
+#include <utility>
+#include <vector>
+
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#include <vulkan/vulkan.hpp>
+#include <nvrhi/vulkan.h>
+#include <nvrhi/validation.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
+
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
+
+class NVRHIVulkanMessageCallback : public nvrhi::IMessageCallback {
+public:
+    void message(nvrhi::MessageSeverity severity, const char* messageText) override {
+        switch (severity) {
+        case nvrhi::MessageSeverity::Info:
+            Msg("* [NVRHI-VK] %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Warning:
+            Msg("! [NVRHI-VK] WARNING: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Error:
+            Msg("! [NVRHI-VK] ERROR: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Fatal:
+            Msg("! [NVRHI-VK] FATAL: %s", messageText);
+            R_ASSERT2(false, messageText);
+            break;
+        }
+    }
+};
+
+static NVRHIVulkanMessageCallback s_nvrhiVkMessageCallback;
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    VkDebugUtilsMessageTypeFlagsEXT type,
+    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+    void* userData)
+{
+    if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        Msg("! [Vulkan] ERROR: %s", callbackData->pMessage);
+    else if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        Msg("! [Vulkan] WARNING: %s", callbackData->pMessage);
+    return VK_FALSE;
+}
+
+static bool ContainsExtension(const xr_vector<const char*>& extensions, const char* name)
+{
+    for (const char* extension : extensions)
+    {
+        if (!strcmp(extension, name))
+            return true;
+    }
+    return false;
+}
+
+static bool FindSurfaceFormat(const xr_vector<VkSurfaceFormatKHR>& formats, VkFormat format,
+    VkColorSpaceKHR colorSpace, bool anyColorSpace, VkSurfaceFormatKHR& selected)
+{
+    for (const VkSurfaceFormatKHR& candidate : formats)
+    {
+        if (candidate.format == format && (anyColorSpace || candidate.colorSpace == colorSpace))
+        {
+            selected = candidate;
+            return true;
+        }
+    }
+    return false;
+}
+
+static PFN_vkGetInstanceProcAddr LoadVulkanEntryPoint()
+{
+    return reinterpret_cast<PFN_vkGetInstanceProcAddr>(SDL_Vulkan_GetVkGetInstanceProcAddr());
+}
+
+VulkanBackend::VulkanBackend() = default;
+
+VulkanBackend::~VulkanBackend() {
+    Shutdown();
+}
+
+bool VulkanBackend::Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
+    if (m_initialized) {
+        Msg("! [VulkanBackend] Already initialized");
+        return false;
+    }
+    if (!window) {
+        Msg("! [VulkanBackend] No window provided");
+        return false;
+    }
+
+    Msg("* [VulkanBackend] Initializing...");
+    m_validationEnabled = enableValidation;
+    m_window = window;
+
+    if (!CreateInstance(window, enableValidation)) { Shutdown(); return false; }
+    Msg("* [VulkanBackend] Instance created, m_instance=%p", m_instance);
+
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Instance(m_instance));
+    Msg("* [VulkanBackend] Dispatcher instance-init done, vkCreateDevice=%p vkCreateSemaphore=%p",
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateDevice, VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore);
+
+    if (!CreateSurface(window)) { Shutdown(); return false; }
+    if (!SelectPhysicalDevice()) { Shutdown(); return false; }
+    if (!CreateLogicalDevice()) { Shutdown(); return false; }
+    Msg("* [VulkanBackend] Device created, m_device=%p", m_device);
+
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Device(m_device));
+    Msg("* [VulkanBackend] Dispatcher device-init done, vkCreateSemaphore=%p vkDestroySemaphore=%p vkCreateCommandPool=%p",
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore,
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore,
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateCommandPool);
+
+    m_requestedVSync = psDeviceFlags.test(rsVSync);
+    if (!CreateSwapChain(width, height)) { Shutdown(); return false; }
+
+    Msg("* [VulkanBackend] About to create NVRHI device...");
+    Msg("* [VulkanBackend]   graphicsQueue=%p family=%u", m_graphicsQueue, m_graphicsQueueFamily);
+    Msg("* [VulkanBackend]   computeQueue=%p family=%u", m_computeQueue, m_computeQueueFamily);
+
+    string_path pipelineCacheRelativePath;
+    xr_sprintf(pipelineCacheRelativePath, "shaders_cache_fg%svk%spipelines.vkcache", DELIMITER, DELIMITER);
+    if (FS.exist("$app_data_root$", pipelineCacheRelativePath)) {
+        IReader* reader = FS.r_open("$app_data_root$", pipelineCacheRelativePath);
+        if (reader) {
+            m_pipelineCacheData.resize(reader->length());
+            if (!m_pipelineCacheData.empty())
+                reader->r(m_pipelineCacheData.data(), m_pipelineCacheData.size());
+            FS.r_close(reader);
+        }
+    }
+    if (m_pipelineCacheData.empty())
+        Msg("* [VulkanBackend] Pipeline cache miss (%s), starting empty", pipelineCacheRelativePath);
+    else
+        Msg("* [VulkanBackend] Pipeline cache hit (%s, %u bytes)", pipelineCacheRelativePath, static_cast<u32>(m_pipelineCacheData.size()));
+
+    nvrhi::vulkan::DeviceDesc deviceDesc;
+    deviceDesc.errorCB = &s_nvrhiVkMessageCallback;
+    deviceDesc.instance = m_instance;
+    deviceDesc.physicalDevice = m_physicalDevice;
+    deviceDesc.device = m_device;
+    deviceDesc.graphicsQueue = m_graphicsQueue;
+    deviceDesc.graphicsQueueIndex = static_cast<int>(m_graphicsQueueFamily);
+    if (m_computeQueue) {
+        deviceDesc.computeQueue = m_computeQueue;
+        deviceDesc.computeQueueIndex = static_cast<int>(m_computeQueueFamily);
+    }
+
+    Uint32 sdlExtCount = 0;
+    const char* const* sdlExts = SDL_Vulkan_GetInstanceExtensions(&sdlExtCount);
+    xr_vector<const char*> instanceExts(sdlExts, sdlExts + sdlExtCount);
+    instanceExts.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    if (m_swapchainColorSpaceEnabled && !ContainsExtension(instanceExts, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+        instanceExts.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+    deviceDesc.instanceExtensions = instanceExts.data();
+    deviceDesc.numInstanceExtensions = instanceExts.size();
+
+    deviceDesc.deviceExtensions = m_deviceExtensions.data();
+    deviceDesc.numDeviceExtensions = m_deviceExtensions.size();
+    deviceDesc.bufferDeviceAddressSupported = m_bufferDeviceAddressEnabled;
+    deviceDesc.pipelineCacheData = m_pipelineCacheData.empty() ? nullptr : m_pipelineCacheData.data();
+    deviceDesc.pipelineCacheDataSize = m_pipelineCacheData.size();
+
+    m_nvrhiVulkanDevice = nvrhi::vulkan::createDevice(deviceDesc);
+    if (!m_nvrhiVulkanDevice) {
+        Msg("! [VulkanBackend] Failed to create NVRHI Vulkan device");
+        Shutdown();
+        return false;
+    }
+    m_pipelineCacheData.clear();
+
+    if (!enableValidation) {
+        m_nvrhiDevice = m_nvrhiVulkanDevice;
+    } else {
+        m_nvrhiDevice = nvrhi::validation::createValidationLayer(m_nvrhiVulkanDevice);
+        if (!m_nvrhiDevice) {
+            Msg("! [VulkanBackend] Failed to create NVRHI validation layer");
+            Shutdown();
+            return false;
+        }
+        Msg("* [VulkanBackend] NVRHI validation layer enabled");
+    }
+
+    m_completion.Initialize(m_nvrhiDevice);
+
+    for (auto& pool : m_graphicsPools) {
+        if (!AcquireFromPool(pool, nvrhi::CommandQueue::Graphics)) {
+            Msg("! [VulkanBackend] Failed to create command list");
+            Shutdown();
+            return false;
+        }
+        pool.used = 0;
+    }
+    m_currentGraphics = m_graphicsPools[0].lists[0];
+
+    m_asyncSubmit = strstr(Core.Params, "-async_submit") != nullptr;
+    if (m_asyncSubmit) {
+        m_submitRun = true;
+        m_submitThread = std::thread([this] { SubmitThreadMain(); });
+        Msg("* [VulkanBackend] async submit thread enabled (-async_submit)");
+    }
+
+    nvrhi::CommandListParameters cmdParams;
+    cmdParams.enableImmediateExecution = false;
+    m_uploadCommandList = m_nvrhiDevice->createCommandList(cmdParams);
+    if (!m_uploadCommandList) {
+        Msg("! [VulkanBackend] Failed to create upload command list");
+        Shutdown();
+        return false;
+    }
+
+    if (m_computeQueue) {
+        m_asyncComputeEnabled = true;
+        for (auto& pool : m_computePools) {
+            if (!AcquireFromPool(pool, nvrhi::CommandQueue::Compute))
+                m_asyncComputeEnabled = false;
+            pool.used = 0;
+        }
+        if (m_asyncComputeEnabled) {
+            Msg("* [VulkanBackend] Async compute enabled");
+        } else {
+            for (auto& pool : m_computePools)
+                pool.lists.clear();
+            Msg("! [VulkanBackend] Failed to create compute command list (async compute disabled)");
+        }
+    }
+
+    QueryCapabilities();
+    CreateBackBufferTextures();
+    CreateSyncObjects();
+    CreateBindlessResources();
+
+    m_initialized = true;
+    Msg("* [VulkanBackend] Initialized successfully");
+    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessResources);
+    return true;
+}
+
+void VulkanBackend::Shutdown() {
+    if (!m_initialized && !m_nvrhiDevice)
+        return;
+
+    Msg("* [VulkanBackend] Shutting down...");
+    WaitForIdle();
+    SavePipelineCache();
+
+    if (m_submitThread.joinable()) {
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_submitRun = false;
+        }
+        m_submitCv.notify_one();
+        m_submitThread.join();
+    }
+
+    m_bindless.Shutdown();
+    {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        m_completion.Shutdown();
+    }
+
+    for (auto& bb : m_backBuffers)
+        bb = nullptr;
+    for (auto& pool : m_graphicsPools)
+        pool.lists.clear();
+    for (auto& pool : m_computePools)
+        pool.lists.clear();
+    m_currentGraphics = nullptr;
+    m_uploadCommandList = nullptr;
+
+    m_nvrhiDevice = nullptr;
+    if (m_nvrhiVulkanDevice)
+    {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        m_nvrhiVulkanDevice->waitForIdle();
+        m_nvrhiVulkanDevice->runGarbageCollection();
+    }
+    m_nvrhiVulkanDevice = nullptr;
+
+    DestroySyncObjects();
+    DestroySwapChain();
+
+    if (m_device) {
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyDevice(m_device, nullptr);
+        m_device = VK_NULL_HANDLE;
+    }
+    if (m_surface) {
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+        m_surface = VK_NULL_HANDLE;
+    }
+    if (m_debugMessenger) {
+        auto destroyFunc = (PFN_vkDestroyDebugUtilsMessengerEXT)
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+        if (destroyFunc)
+            destroyFunc(m_instance, m_debugMessenger, nullptr);
+        m_debugMessenger = VK_NULL_HANDLE;
+    }
+    if (m_instance) {
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroyInstance(m_instance, nullptr);
+        m_instance = VK_NULL_HANDLE;
+    }
+
+    m_window = nullptr;
+    m_hdrActive = false;
+    m_initialized = false;
+    m_pipelineCacheData.clear();
+    Msg("* [VulkanBackend] Shutdown complete");
+}
+
+void VulkanBackend::SavePipelineCache() {
+    if (!m_nvrhiVulkanDevice)
+        return;
+    nvrhi::vulkan::IDevice* device = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+    if (!device)
+        return;
+
+    std::vector<uint8_t> data;
+    if (!device->getPipelineCacheData(data) || data.empty()) {
+        Msg("! [VulkanBackend] Failed to read the Vulkan pipeline cache data");
+        return;
+    }
+
+    string_path relativePath;
+    xr_sprintf(relativePath, "shaders_cache_fg%svk%spipelines.vkcache", DELIMITER, DELIMITER);
+    string_path temporaryRelativePath;
+    xr_sprintf(temporaryRelativePath, "%s.tmp", relativePath);
+
+    IWriter* writer = FS.w_open("$app_data_root$", temporaryRelativePath);
+    if (!writer) {
+        Msg("! [VulkanBackend] Failed to open the pipeline cache file: %s", temporaryRelativePath);
+        return;
+    }
+    writer->w(data.data(), data.size());
+    FS.w_close(writer);
+
+    string_path directoryPath;
+    if (!FS.update_path(directoryPath, "$app_data_root$", "shaders_cache_fg" DELIMITER "vk", false)) {
+        Msg("! [VulkanBackend] Failed to resolve the pipeline cache directory");
+        return;
+    }
+    convert_path_separators(directoryPath);
+
+    std::error_code errorCode;
+    const std::filesystem::path directory(directoryPath);
+    std::filesystem::rename(directory / "pipelines.vkcache.tmp", directory / "pipelines.vkcache", errorCode);
+    if (errorCode) {
+        Msg("! [VulkanBackend] Failed to replace the pipeline cache file: %s", errorCode.message().c_str());
+        return;
+    }
+
+    Msg("* [VulkanBackend] Saved the pipeline cache (%u bytes)", static_cast<u32>(data.size()));
+}
+
+bool VulkanBackend::CreateInstance(SDL_Window* window, bool enableValidation) {
+    const PFN_vkGetInstanceProcAddr getInstanceProcAddr = LoadVulkanEntryPoint();
+    if (!getInstanceProcAddr) {
+        Msg("! [VulkanBackend] Vulkan loader unavailable: %s", SDL_GetError());
+        return false;
+    }
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(getInstanceProcAddr);
+
+    VkApplicationInfo appInfo = {};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "OpenXRay";
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = "X-Ray Engine";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_2;
+
+    Uint32 sdlExtCount = 0;
+    const char* const* sdlExts = SDL_Vulkan_GetInstanceExtensions(&sdlExtCount);
+    if (!sdlExts) {
+        Msg("! [VulkanBackend] SDL_Vulkan_GetInstanceExtensions failed: %s", SDL_GetError());
+        return false;
+    }
+    xr_vector<const char*> extensions(sdlExts, sdlExts + sdlExtCount);
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    u32 availableExtensionCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, nullptr);
+    xr_vector<VkExtensionProperties> availableExtensions(availableExtensionCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount, availableExtensions.data());
+    m_swapchainColorSpaceEnabled = false;
+    for (const VkExtensionProperties& available : availableExtensions)
+    {
+        if (!strcmp(available.extensionName, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+            m_swapchainColorSpaceEnabled = true;
+    }
+    if (m_swapchainColorSpaceEnabled && !ContainsExtension(extensions, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+        extensions.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+
+    xr_vector<const char*> layers;
+    if (enableValidation) {
+        layers.push_back("VK_LAYER_KHRONOS_validation");
+    }
+
+    VkInstanceCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledExtensionCount = static_cast<u32>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+    createInfo.enabledLayerCount = static_cast<u32>(layers.size());
+    createInfo.ppEnabledLayerNames = layers.data();
+
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateInstance(&createInfo, nullptr, &m_instance);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateInstance failed: %d", result);
+        return false;
+    }
+
+    if (enableValidation) {
+        auto createFunc = (PFN_vkCreateDebugUtilsMessengerEXT)
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+        if (createFunc) {
+            VkDebugUtilsMessengerCreateInfoEXT debugInfo = {};
+            debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            debugInfo.messageSeverity =
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+            debugInfo.messageType =
+                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugInfo.pfnUserCallback = VulkanDebugCallback;
+            createFunc(m_instance, &debugInfo, nullptr, &m_debugMessenger);
+            Msg("* [VulkanBackend] Validation layer enabled");
+        }
+    }
+
+    Msg("* [VulkanBackend] Vulkan instance created (API 1.2)");
+    return true;
+}
+
+bool VulkanBackend::SelectPhysicalDevice() {
+    u32 deviceCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+    if (deviceCount == 0) {
+        Msg("! [VulkanBackend] No Vulkan-capable GPUs found");
+        return false;
+    }
+
+    xr_vector<VkPhysicalDevice> devices(deviceCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
+
+    for (auto& dev : devices) {
+        VkPhysicalDeviceProperties props;
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(dev, &props);
+
+        if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            m_physicalDevice = dev;
+            m_capabilities.id_vendor = props.vendorID;
+            m_capabilities.id_device = props.deviceID;
+            Msg("* [VulkanBackend] Using GPU: %s", props.deviceName);
+            return true;
+        }
+    }
+
+    m_physicalDevice = devices[0];
+    VkPhysicalDeviceProperties props;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+    m_capabilities.id_vendor = props.vendorID;
+    m_capabilities.id_device = props.deviceID;
+    Msg("* [VulkanBackend] Using GPU (fallback): %s", props.deviceName);
+    return true;
+}
+
+bool VulkanBackend::CreateSurface(SDL_Window* window) {
+    if (!SDL_Vulkan_CreateSurface(window, m_instance, nullptr, &m_surface)) {
+        Msg("! [VulkanBackend] SDL_Vulkan_CreateSurface failed: %s", SDL_GetError());
+        return false;
+    }
+    return true;
+}
+
+bool VulkanBackend::CreateLogicalDevice() {
+    u32 queueFamilyCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, nullptr);
+    xr_vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceQueueFamilyProperties(m_physicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    m_graphicsQueueFamily = UINT32_MAX;
+    m_computeQueueFamily = UINT32_MAX;
+    for (u32 i = 0; i < queueFamilyCount; i++) {
+        VkBool32 presentSupport = VK_FALSE;
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceSupportKHR(m_physicalDevice, i, m_surface, &presentSupport);
+
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport) {
+            m_graphicsQueueFamily = i;
+        }
+
+        if ((queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) &&
+            !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) {
+            m_computeQueueFamily = i;
+        }
+    }
+
+    if (m_graphicsQueueFamily == UINT32_MAX) {
+        Msg("! [VulkanBackend] No graphics+present queue family found");
+        return false;
+    }
+
+    bool useGraphicsFamilyForCompute = false;
+    if (m_computeQueueFamily == UINT32_MAX) {
+        if (queueFamilies[m_graphicsQueueFamily].queueCount >= 2) {
+            m_computeQueueFamily = m_graphicsQueueFamily;
+            useGraphicsFamilyForCompute = true;
+        } else {
+            for (u32 i = 0; i < queueFamilyCount; i++) {
+                if (i != m_graphicsQueueFamily && (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT)) {
+                    m_computeQueueFamily = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    float queuePriorities[2] = { 1.0f, 1.0f };
+
+    xr_vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    VkDeviceQueueCreateInfo graphicsQueueInfo = {};
+    graphicsQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    graphicsQueueInfo.queueFamilyIndex = m_graphicsQueueFamily;
+    graphicsQueueInfo.queueCount = useGraphicsFamilyForCompute ? 2 : 1;
+    graphicsQueueInfo.pQueuePriorities = queuePriorities;
+    queueCreateInfos.push_back(graphicsQueueInfo);
+
+    if (m_computeQueueFamily != UINT32_MAX && !useGraphicsFamilyForCompute) {
+        VkDeviceQueueCreateInfo computeQueueInfo = {};
+        computeQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        computeQueueInfo.queueFamilyIndex = m_computeQueueFamily;
+        computeQueueInfo.queueCount = 1;
+        computeQueueInfo.pQueuePriorities = queuePriorities;
+        queueCreateInfos.push_back(computeQueueInfo);
+    }
+
+    m_deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+        VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
+        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+    };
+
+    m_bufferDeviceAddressEnabled = false;
+    bool accelerationStructureExtension = false;
+    bool rayQueryExtension = false;
+    bool deferredHostOperationsExtension = false;
+    m_capabilities.meshShaders = false;
+    m_capabilities.meshShaderMaxGroups = 0;
+    u32 meshShaderMaxGroups = 0;
+    VkPhysicalDeviceMeshShaderFeaturesEXT meshFeatures = {};
+    meshFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT;
+    u32 extensionCount = 0;
+    if (VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, nullptr) == VK_SUCCESS) {
+        xr_vector<VkExtensionProperties> extensions(extensionCount);
+        if (VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateDeviceExtensionProperties(m_physicalDevice, nullptr, &extensionCount, extensions.data()) == VK_SUCCESS) {
+            for (const auto& extension : extensions)
+            {
+                if (strcmp(extension.extensionName, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0)
+                    m_deviceExtensions.push_back(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME);
+                if (strcmp(extension.extensionName, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) == 0)
+                    accelerationStructureExtension = true;
+                if (strcmp(extension.extensionName, VK_KHR_RAY_QUERY_EXTENSION_NAME) == 0)
+                    rayQueryExtension = true;
+                if (strcmp(extension.extensionName, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) == 0)
+                    deferredHostOperationsExtension = true;
+            }
+            for (u32 i = 0; i < extensionCount; ++i) {
+                if (strcmp(extensions[i].extensionName, VK_EXT_MESH_SHADER_EXTENSION_NAME) != 0)
+                    continue;
+
+                VkPhysicalDeviceMeshShaderFeaturesEXT supportedMeshFeatures = {};
+                supportedMeshFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_EXT;
+                VkPhysicalDeviceFeatures2 supportedFeatures = {};
+                supportedFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+                supportedFeatures.pNext = &supportedMeshFeatures;
+                VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(m_physicalDevice, &supportedFeatures);
+
+                VkPhysicalDeviceMeshShaderPropertiesEXT meshProperties = {};
+                meshProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT;
+                VkPhysicalDeviceProperties2 properties = {};
+                properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+                properties.pNext = &meshProperties;
+                VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties2(m_physicalDevice, &properties);
+
+                const u64 vertexGranularity = std::max(1u, meshProperties.meshOutputPerVertexGranularity);
+                const u64 primitiveGranularity = std::max(1u, meshProperties.meshOutputPerPrimitiveGranularity);
+                const u64 outputVertices = ((192 + vertexGranularity - 1) / vertexGranularity) * vertexGranularity;
+                const u64 outputPrimitives = ((64 + primitiveGranularity - 1) / primitiveGranularity) * primitiveGranularity;
+                const u64 outputBytes = outputVertices * 20 * sizeof(u32) + outputPrimitives * 4 * sizeof(u32);
+                if (supportedMeshFeatures.meshShader &&
+                    meshProperties.maxMeshWorkGroupInvocations >= 64 &&
+                    meshProperties.maxMeshWorkGroupSize[0] >= 64 &&
+                    meshProperties.maxMeshWorkGroupSize[1] >= 1 &&
+                    meshProperties.maxMeshWorkGroupSize[2] >= 1 &&
+                    meshProperties.maxMeshOutputVertices >= 192 &&
+                    meshProperties.maxMeshOutputPrimitives >= 64 &&
+                    meshProperties.maxMeshOutputComponents >= 24 &&
+                    meshProperties.maxMeshOutputMemorySize >= outputBytes &&
+                    meshProperties.maxMeshPayloadAndOutputMemorySize >= outputBytes &&
+                    meshProperties.maxMeshWorkGroupCount[0] >= 256 &&
+                    meshProperties.maxMeshWorkGroupCount[1] >= 1 &&
+                    meshProperties.maxMeshWorkGroupCount[2] >= 1) {
+                    meshShaderMaxGroups = std::min(meshProperties.maxMeshWorkGroupTotalCount,
+                        256u * std::min(meshProperties.maxMeshWorkGroupCount[1], 65535u));
+                    if (meshShaderMaxGroups != 0) {
+                        meshFeatures.meshShader = VK_TRUE;
+                        m_deviceExtensions.push_back(VK_EXT_MESH_SHADER_EXTENSION_NAME);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    VkPhysicalDeviceVulkan12Features vulkan12Features = {};
+    vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    vulkan12Features.drawIndirectCount = VK_TRUE;
+    vulkan12Features.descriptorIndexing = VK_TRUE;
+    vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+    vulkan12Features.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE;
+    vulkan12Features.runtimeDescriptorArray = VK_TRUE;
+    vulkan12Features.descriptorBindingPartiallyBound = VK_TRUE;
+    vulkan12Features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+    vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+    vulkan12Features.timelineSemaphore = VK_TRUE;
+    vulkan12Features.shaderFloat16 = VK_TRUE;
+    vulkan12Features.shaderBufferInt64Atomics = VK_TRUE;
+
+    VkPhysicalDeviceSynchronization2Features sync2Features = {};
+    sync2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES;
+    sync2Features.synchronization2 = VK_TRUE;
+    vulkan12Features.pNext = &sync2Features;
+
+    VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeatures = {};
+    dynamicRenderingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
+    dynamicRenderingFeatures.dynamicRendering = VK_TRUE;
+    sync2Features.pNext = &dynamicRenderingFeatures;
+
+    VkPhysicalDeviceVulkan11Features vulkan11Features = {};
+    vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    vulkan11Features.shaderDrawParameters = VK_TRUE;
+    dynamicRenderingFeatures.pNext = &vulkan11Features;
+    if (meshFeatures.meshShader)
+        vulkan11Features.pNext = &meshFeatures;
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {};
+    accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+    rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+
+    VkPhysicalDeviceFeatures2 features2 = {};
+    features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    features2.pNext = &vulkan12Features;
+    features2.features.samplerAnisotropy = VK_TRUE;
+    features2.features.fillModeNonSolid = VK_TRUE;
+    features2.features.multiDrawIndirect = VK_TRUE;
+    features2.features.drawIndirectFirstInstance = VK_TRUE;
+    features2.features.independentBlend = VK_TRUE;
+    features2.features.shaderStorageImageReadWithoutFormat = VK_TRUE;
+    features2.features.shaderStorageImageWriteWithoutFormat = VK_TRUE;
+    features2.features.multiViewport = VK_TRUE;
+    features2.features.shaderClipDistance = VK_TRUE;
+    features2.features.textureCompressionBC = VK_TRUE;
+    features2.features.shaderInt16 = VK_TRUE;
+    features2.features.shaderInt64 = VK_TRUE;
+
+    {
+        VkPhysicalDeviceVulkan12Features sup12 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+        VkPhysicalDeviceVulkan11Features sup11 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES };
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR supportedAccelerationStructureFeatures = {};
+        supportedAccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+        VkPhysicalDeviceRayQueryFeaturesKHR supportedRayQueryFeatures = {};
+        supportedRayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+        const bool rayTracingExtensions = accelerationStructureExtension && rayQueryExtension && deferredHostOperationsExtension;
+        if (rayTracingExtensions)
+        {
+            sup11.pNext = &supportedAccelerationStructureFeatures;
+            supportedAccelerationStructureFeatures.pNext = &supportedRayQueryFeatures;
+        }
+        VkPhysicalDeviceFeatures2 sup2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+        sup2.pNext = &sup12;
+        sup12.pNext = &sup11;
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(m_physicalDevice, &sup2);
+        if (!sup12.shaderStorageBufferArrayNonUniformIndexing)
+        {
+            Msg("! [VulkanBackend] Non-uniform storage-buffer indexing is required for chunked instance geometry");
+            return false;
+        }
+
+#define CLAMP12(F) do { if (vulkan12Features.F && !sup12.F) { Msg("! [VulkanBackend] vk12 feature unsupported: " #F); vulkan12Features.F = VK_FALSE; } } while(0)
+        CLAMP12(drawIndirectCount);
+        CLAMP12(descriptorIndexing);
+        CLAMP12(shaderSampledImageArrayNonUniformIndexing);
+        CLAMP12(runtimeDescriptorArray);
+        CLAMP12(descriptorBindingPartiallyBound);
+        CLAMP12(descriptorBindingVariableDescriptorCount);
+        CLAMP12(descriptorBindingSampledImageUpdateAfterBind);
+        CLAMP12(descriptorBindingStorageBufferUpdateAfterBind);
+        CLAMP12(timelineSemaphore);
+        CLAMP12(shaderFloat16);
+        CLAMP12(shaderBufferInt64Atomics);
+#undef CLAMP12
+#define CLAMPF(F) do { if (features2.features.F && !sup2.features.F) { Msg("! [VulkanBackend] feature unsupported: " #F); features2.features.F = VK_FALSE; } } while(0)
+        CLAMPF(samplerAnisotropy);
+        CLAMPF(fillModeNonSolid);
+        CLAMPF(multiDrawIndirect);
+        CLAMPF(independentBlend);
+        CLAMPF(shaderStorageImageReadWithoutFormat);
+        CLAMPF(shaderStorageImageWriteWithoutFormat);
+        CLAMPF(multiViewport);
+        CLAMPF(shaderClipDistance);
+        CLAMPF(textureCompressionBC);
+        CLAMPF(shaderInt16);
+        CLAMPF(shaderInt64);
+#undef CLAMPF
+        if (vulkan11Features.shaderDrawParameters && !sup11.shaderDrawParameters) {
+            Msg("! [VulkanBackend] vk11 feature unsupported: shaderDrawParameters");
+            vulkan11Features.shaderDrawParameters = VK_FALSE;
+        }
+        if (rayTracingExtensions && sup12.bufferDeviceAddress &&
+            supportedAccelerationStructureFeatures.accelerationStructure && supportedRayQueryFeatures.rayQuery)
+        {
+            vulkan12Features.bufferDeviceAddress = VK_TRUE;
+            accelerationStructureFeatures.accelerationStructure = VK_TRUE;
+            rayQueryFeatures.rayQuery = VK_TRUE;
+            rayQueryFeatures.pNext = vulkan11Features.pNext;
+            accelerationStructureFeatures.pNext = &rayQueryFeatures;
+            vulkan11Features.pNext = &accelerationStructureFeatures;
+            m_deviceExtensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+            m_deviceExtensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+            m_deviceExtensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+        }
+        else if (!rayTracingExtensions)
+        {
+            Msg("* [VulkanBackend] Ray tracing disabled: required extensions unavailable "
+                "(acceleration structure: %s, ray query: %s, deferred host operations: %s)",
+                accelerationStructureExtension ? "yes" : "no", rayQueryExtension ? "yes" : "no",
+                deferredHostOperationsExtension ? "yes" : "no");
+        }
+        else
+        {
+            Msg("* [VulkanBackend] Ray tracing disabled: required features unavailable "
+                "(buffer device address: %s, acceleration structure: %s, ray query: %s)",
+                sup12.bufferDeviceAddress ? "yes" : "no", supportedAccelerationStructureFeatures.accelerationStructure ? "yes" : "no",
+                supportedRayQueryFeatures.rayQuery ? "yes" : "no");
+        }
+
+        Msg("* [VulkanBackend] vk12.drawIndirectCount = %s (device reports: %s)",
+            vulkan12Features.drawIndirectCount ? "ENABLED" : "DISABLED",
+            sup12.drawIndirectCount ? "supported" : "unsupported");
+        Msg("* [VulkanBackend] shaderClipDistance = %s (device reports: %s)",
+            features2.features.shaderClipDistance ? "ENABLED" : "DISABLED",
+            sup2.features.shaderClipDistance ? "supported" : "unsupported");
+    }
+
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = &features2;
+    deviceCreateInfo.queueCreateInfoCount = static_cast<u32>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<u32>(m_deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = m_deviceExtensions.data();
+
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_device);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateDevice failed: %d", result);
+        return false;
+    }
+
+    m_bufferDeviceAddressEnabled = vulkan12Features.bufferDeviceAddress == VK_TRUE;
+    m_capabilities.meshShaders = meshFeatures.meshShader == VK_TRUE;
+    m_capabilities.meshShaderMaxGroups = meshShaderMaxGroups;
+
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceQueue(m_device, m_graphicsQueueFamily, 0, &m_graphicsQueue);
+
+    if (m_computeQueueFamily != UINT32_MAX) {
+        u32 computeQueueIndex = useGraphicsFamilyForCompute ? 1 : 0;
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetDeviceQueue(m_device, m_computeQueueFamily, computeQueueIndex, &m_computeQueue);
+        const char* kind = useGraphicsFamilyForCompute ? "shared family"
+            : (queueFamilies[m_computeQueueFamily].queueFlags & VK_QUEUE_GRAPHICS_BIT) ? "general-purpose family"
+            : "dedicated";
+        Msg("* [VulkanBackend] Compute queue: family %u, index %u (%s)",
+            m_computeQueueFamily, computeQueueIndex, kind);
+    } else {
+        Msg("* [VulkanBackend] No compute queue available (async compute disabled)");
+    }
+
+    Msg("* [VulkanBackend] Logical device created (graphics family %u)", m_graphicsQueueFamily);
+    return true;
+}
+
+bool VulkanBackend::CreateSwapChain(u32 width, u32 height) {
+    VkSurfaceCapabilitiesKHR surfaceCaps;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_physicalDevice, m_surface, &surfaceCaps);
+
+    u32 formatCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    xr_vector<VkSurfaceFormatKHR> formats(formatCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+
+    VkSurfaceFormatKHR surfaceFormat = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+    const bool hdr = m_hdrOutput && m_swapchainColorSpaceEnabled
+        && FindSurfaceFormat(formats, VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT, false, surfaceFormat);
+    if (!hdr
+        && !FindSurfaceFormat(formats, VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, false, surfaceFormat)
+        && !FindSurfaceFormat(formats, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, false, surfaceFormat)
+        && !FindSurfaceFormat(formats, VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, true, surfaceFormat))
+        FindSurfaceFormat(formats, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, true, surfaceFormat);
+    m_swapchainFormat = surfaceFormat.format;
+    const VkColorSpaceKHR colorSpace = surfaceFormat.colorSpace;
+    m_hdrActive = hdr;
+
+    u32 presentModeCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, nullptr);
+    xr_vector<VkPresentModeKHR> presentModes(presentModeCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfacePresentModesKHR(m_physicalDevice, m_surface, &presentModeCount, presentModes.data());
+
+    const bool wantVSync = m_requestedVSync;
+    VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    if (!wantVSync)
+    {
+        bool hasImmediate = false, hasMailbox = false;
+        for (auto mode : presentModes)
+        {
+            if (mode == VK_PRESENT_MODE_IMMEDIATE_KHR) hasImmediate = true;
+            else if (mode == VK_PRESENT_MODE_MAILBOX_KHR) hasMailbox = true;
+        }
+        if (hasImmediate)      presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        else if (hasMailbox)   presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
+    }
+    Msg("* [VulkanBackend] Present mode: %s (vsync=%s)",
+        presentMode == VK_PRESENT_MODE_IMMEDIATE_KHR ? "IMMEDIATE" :
+        presentMode == VK_PRESENT_MODE_MAILBOX_KHR   ? "MAILBOX"   : "FIFO",
+        wantVSync ? "on" : "off");
+
+    VkExtent2D extent = { width, height };
+    if (surfaceCaps.currentExtent.width != UINT32_MAX)
+        extent = surfaceCaps.currentExtent;
+
+    u32 imageCount = BACK_BUFFER_COUNT;
+    if (imageCount < surfaceCaps.minImageCount)
+        imageCount = surfaceCaps.minImageCount;
+    if (surfaceCaps.maxImageCount > 0 && imageCount > surfaceCaps.maxImageCount)
+        imageCount = surfaceCaps.maxImageCount;
+
+    VkSwapchainCreateInfoKHR swapchainInfo = {};
+    swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.surface = m_surface;
+    swapchainInfo.minImageCount = imageCount;
+    swapchainInfo.imageFormat = m_swapchainFormat;
+    swapchainInfo.imageColorSpace = colorSpace;
+    swapchainInfo.imageExtent = extent;
+    swapchainInfo.imageArrayLayers = 1;
+    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    swapchainInfo.preTransform = surfaceCaps.currentTransform;
+    swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainInfo.presentMode = presentMode;
+    swapchainInfo.clipped = VK_TRUE;
+    swapchainInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSwapchainKHR(m_device, &swapchainInfo, nullptr, &m_swapchain);
+    if (result != VK_SUCCESS) {
+        Msg("! [VulkanBackend] vkCreateSwapchainKHR failed: %d", result);
+        return false;
+    }
+
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, nullptr);
+    m_swapchainImages.resize(imageCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetSwapchainImagesKHR(m_device, m_swapchain, &imageCount, m_swapchainImages.data());
+    m_maxAcquiredImageCount = imageCount - surfaceCaps.minImageCount + 1;
+
+    m_backBufferWidth = extent.width;
+    m_backBufferHeight = extent.height;
+    m_currentImageIndex = 0;
+    m_swapchainVSync = wantVSync;
+    m_swapchainNeedsReset.store(false, std::memory_order_release);
+
+    Msg("* [VulkanBackend] Swapchain created: %ux%u, %u images, format %d, color space %d",
+        extent.width, extent.height, imageCount, m_swapchainFormat, colorSpace);
+    return true;
+}
+
+void VulkanBackend::DestroySwapChain() {
+    m_backBuffers.clear();
+    m_swapchainImages.clear();
+
+    if (m_swapchain) {
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+        m_swapchain = VK_NULL_HANDLE;
+    }
+}
+
+void VulkanBackend::CreateBackBufferTextures() {
+    nvrhi::Format nvFormat = nvrhi::Format::BGRA8_UNORM;
+    if (m_swapchainFormat == VK_FORMAT_R8G8B8A8_UNORM)
+        nvFormat = nvrhi::Format::RGBA8_UNORM;
+    else if (m_swapchainFormat == VK_FORMAT_R16G16B16A16_SFLOAT)
+        nvFormat = nvrhi::Format::RGBA16_FLOAT;
+
+    m_backBuffers.resize(m_swapchainImages.size());
+    for (u32 i = 0; i < m_swapchainImages.size(); i++) {
+        nvrhi::TextureDesc desc;
+        desc.width = m_backBufferWidth;
+        desc.height = m_backBufferHeight;
+        desc.format = nvFormat;
+        desc.isRenderTarget = true;
+        desc.debugName = "BackBuffer";
+        desc.keepInitialState = true;
+        desc.initialState = nvrhi::ResourceStates::Present;
+
+        m_backBuffers[i] = m_nvrhiDevice->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::VK_Image,
+            nvrhi::Object(m_swapchainImages[i]),
+            desc
+        );
+    }
+}
+
+void VulkanBackend::CreateSyncObjects() {
+    VkSemaphoreCreateInfo semInfo = {};
+    semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore(m_device, &semInfo, nullptr, &m_imageAvailable[i]);
+        m_frameSubmissionIDs[i] = 0;
+        m_frameSubmissionPending[i] = false;
+    }
+    m_renderFinished.resize(m_swapchainImages.size(), VK_NULL_HANDLE);
+    for (auto& semaphore : m_renderFinished)
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkCreateSemaphore(m_device, &semInfo, nullptr, &semaphore);
+    m_acquiredImageCount = 0;
+}
+
+void VulkanBackend::DestroySyncObjects() {
+    if (!m_device)
+        return;
+    for (u32 i = 0; i < BACK_BUFFER_COUNT; i++) {
+        if (m_imageAvailable[i]) {
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore(m_device, m_imageAvailable[i], nullptr);
+            m_imageAvailable[i] = VK_NULL_HANDLE;
+        }
+        m_frameSubmissionIDs[i] = 0;
+        m_frameSubmissionPending[i] = false;
+    }
+    for (VkSemaphore semaphore : m_renderFinished) {
+        if (semaphore)
+            VULKAN_HPP_DEFAULT_DISPATCHER.vkDestroySemaphore(m_device, semaphore, nullptr);
+    }
+    m_renderFinished.clear();
+    m_acquiredImageCount = 0;
+    m_inFrame = false;
+    m_presentPending = false;
+}
+
+void VulkanBackend::CreateBindlessResources() {
+    if (!m_bindless.Initialize(m_nvrhiDevice, this, MAX_BINDLESS_TEXTURES))
+        Msg("! [VulkanBackend] Failed to create the bindless texture table");
+}
+
+void VulkanBackend::QueryCapabilities() {
+    m_capabilities.bindlessTextures = true;
+    m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
+    m_capabilities.shaderModel = 60;
+    m_capabilities.rayTracing = m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingAccelStruct) &&
+        m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayQuery);
+    m_capabilities.rayTracingUpdates = m_capabilities.rayTracing;
+    m_capabilities.rayTracingCompaction = m_capabilities.rayTracing &&
+        m_nvrhiDevice->queryFeatureSupport(nvrhi::Feature::RayTracingCompaction);
+    Msg("* [VulkanBackend] Ray tracing (path tracer / RTGI): %s", m_capabilities.rayTracing ? "ENABLED" : "DISABLED");
+
+    VkPhysicalDeviceProperties props;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &props);
+
+    VkPhysicalDeviceFeatures features;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures(m_physicalDevice, &features);
+
+    m_capabilities.geometry.dwRegisters = 256;
+    m_capabilities.geometry.dwInstructions = 65535;
+    m_capabilities.geometry.dwClipPlanes = 6;
+    m_capabilities.geometry.dwVertexCache = 24;
+    m_capabilities.geometry.bVTF = true;
+
+    m_capabilities.raster.dwRegisters = 256;
+    m_capabilities.raster.dwInstructions = 65535;
+    m_capabilities.raster.dwStages = 16;
+    m_capabilities.raster.dwMRT_count = 8;
+    m_capabilities.raster.b_MRT_mixdepth = true;
+
+    m_capabilities.raster_major = 6;
+    m_capabilities.raster_minor = 0;
+    m_capabilities.raster_profile = "ps_6_0";
+    m_capabilities.geometry_major = 6;
+    m_capabilities.geometry_minor = 0;
+    m_capabilities.geometry_profile = "vs_6_0";
+    m_capabilities.iGPUNum = 1;
+
+    m_capabilities.hasStencil = true;
+    m_capabilities.hasScissor = true;
+    m_capabilities.hasFixedPipeline = false;
+    m_capabilities.useCombinedSamplers = false;
+}
+
+u32 VulkanBackend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
+    return m_bindless.Register(texture);
+}
+
+void VulkanBackend::UnregisterBindlessTexture(u32 index)
+{
+    ReleaseBindlessTextures(&index, 1);
+}
+
+nvrhi::ITexture* VulkanBackend::GetBindlessTexture(u32 index)
+{
+    return m_bindless.Get(index);
+}
+
+bool VulkanBackend::RetainBindlessTextures(const u32* indices, u32 count)
+{
+    return m_bindless.Retain(indices, count);
+}
+
+void VulkanBackend::ReleaseBindlessTextures(const u32* indices, u32 count)
+{
+    m_bindless.Release(indices, count, m_inFrame);
+}
+
+nvrhi::ITexture* VulkanBackend::GetBackBuffer() {
+    return m_backBuffers[m_currentImageIndex].Get();
+}
+
+void VulkanBackend::Present(bool vsync) {
+    m_requestedVSync = vsync;
+
+    if (m_asyncSubmit || !m_presentPending)
+        return;
+    m_presentPending = false;
+
+    ZoneScopedN("VulkanBackend::Present");
+
+    std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
+
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &m_renderFinished[m_currentImageIndex];
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &m_swapchain;
+    presentInfo.pImageIndices = &m_currentImageIndex;
+
+    VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        m_swapchainNeedsReset.store(true, std::memory_order_release);
+        Msg("* [VulkanBackend] Swapchain out of date, resize needed");
+    }
+    R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
+        "Vulkan presentation failed");
+
+    m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
+}
+
+void VulkanBackend::ResizeSwapChain(u32 width, u32 height) {
+    WaitForIdle();
+    DestroySyncObjects();
+
+    DestroySwapChain();
+    R_ASSERT2(CreateSwapChain(width, height), "Vulkan swapchain recreation failed");
+    CreateBackBufferTextures();
+    CreateSyncObjects();
+}
+
+bool VulkanBackend::SurfaceSupportsHDR() const {
+    if (!m_swapchainColorSpaceEnabled || !m_physicalDevice || !m_surface)
+        return false;
+    u32 formatCount = 0;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, nullptr);
+    xr_vector<VkSurfaceFormatKHR> formats(formatCount);
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceSurfaceFormatsKHR(m_physicalDevice, m_surface, &formatCount, formats.data());
+    VkSurfaceFormatKHR selected = {};
+    return FindSurfaceFormat(formats, VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT, false, selected);
+}
+
+bool VulkanBackend::SetHDROutput(bool enabled) {
+    if (enabled == m_hdrActive) {
+        m_hdrOutput = enabled;
+        return true;
+    }
+    if (!m_initialized || m_inFrame)
+        return false;
+    if (enabled && (!IsWindowHDREnabled(m_window) || !SurfaceSupportsHDR()))
+        return false;
+    m_hdrOutput = enabled;
+    ResizeSwapChain(m_backBufferWidth, m_backBufferHeight);
+    return m_hdrActive == enabled;
+}
+
+IRenderBackend::DisplayOutput VulkanBackend::GetDisplayOutput() const {
+    return QueryWindowDisplayOutput(m_window, m_hdrActive);
+}
+
+void VulkanBackend::BeginFrame() {
+    ZoneScopedN("VK::BeginFrame");
+    m_completion.DiscardOpenLeases();
+    R_ASSERT2(!m_inFrame, "Vulkan frame recording was abandoned without EndFrame");
+
+    if (m_gcTask) {
+        ZoneScopedN("VK::WaitForGC");
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
+    }
+    m_bindless.BeginFrame();
+
+    using Clock = std::chrono::steady_clock;
+    auto usSince = [](Clock::time_point a) -> u64 {
+        return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - a).count());
+    };
+
+    uint64_t frameSubmissionID;
+    if (m_asyncSubmit) {
+        {
+            ZoneScopedN("VK::WaitSubmitSlot");
+            const auto t0 = Clock::now();
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [&] {
+                return !m_slotInFlight[m_recordSlot] && !m_frameSubmissionPending[m_currentFrameIndex];
+            });
+            frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
+            StoreMaxUs(m_stSlotWaitUs, usSince(t0));
+        }
+        {
+            ZoneScopedN("VK::WaitPresentCapacity");
+            const auto t0 = Clock::now();
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitDoneCv.wait(lk, [&] { return m_acquiredImageCount < m_maxAcquiredImageCount; });
+            StoreMaxUs(m_stCapacityWaitUs, usSince(t0));
+        }
+    } else {
+        frameSubmissionID = m_frameSubmissionIDs[m_currentFrameIndex];
+    }
+
+    if (frameSubmissionID) {
+        ZoneScopedN("VK::WaitFrameGPU");
+        const auto t0 = Clock::now();
+        auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+        const VkSemaphore semaphore = vkDevice->getQueueSemaphore(nvrhi::CommandQueue::Graphics);
+        VkSemaphoreWaitInfo waitInfo = {};
+        waitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_WAIT_INFO;
+        waitInfo.semaphoreCount = 1;
+        waitInfo.pSemaphores = &semaphore;
+        waitInfo.pValues = &frameSubmissionID;
+        const VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkWaitSemaphores(m_device, &waitInfo, UINT64_MAX);
+        R_ASSERT2(result == VK_SUCCESS, "Vulkan frame completion wait failed");
+        StoreMaxUs(m_stGpuWaitUs, usSince(t0));
+    }
+
+    VkResult result;
+    {
+        std::unique_lock<std::mutex> sc(m_swapchainMutex, std::defer_lock);
+        {
+            ZoneScopedN("VK::WaitAcquireLock");
+            sc.lock();
+        }
+        {
+            ZoneScopedN("VK::AcquireImage");
+            const auto t0 = Clock::now();
+            result = VULKAN_HPP_DEFAULT_DISPATCHER.vkAcquireNextImageKHR(
+                m_device, m_swapchain, UINT64_MAX,
+                m_imageAvailable[m_currentFrameIndex], VK_NULL_HANDLE,
+                &m_currentImageIndex);
+            StoreMaxUs(m_stAcquireUs, usSince(t0));
+        }
+    }
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        m_swapchainNeedsReset.store(true, std::memory_order_release);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            Msg("* [VulkanBackend] Swapchain out of date during acquire");
+            return;
+        }
+    }
+    R_ASSERT2(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Vulkan image acquisition failed");
+
+    if (m_asyncSubmit) {
+        std::lock_guard<std::mutex> lk(m_submitMutex);
+        ++m_acquiredImageCount;
+    }
+    m_graphicsPools[m_recordSlot].used = 0;
+    m_computePools[m_recordSlot].used = 0;
+    m_graphicsWaits.Clear();
+    m_frameGraphicsSubmitted = false;
+    m_currentGraphics = AcquireFromPool(m_graphicsPools[m_recordSlot], nvrhi::CommandQueue::Graphics);
+    R_ASSERT2(m_currentGraphics, "Vulkan graphics command list allocation failed");
+    {
+        ZoneScopedN("VK::CommandListOpen");
+        m_currentGraphics->open();
+    }
+    m_inFrame = true;
+}
+
+void VulkanBackend::EndFrame() {
+    ZoneScopedN("VK::EndFrame");
+
+    if (!m_inFrame)
+    {
+        m_completion.DiscardOpenLeases();
+        return;
+    }
+
+    m_inFrame = false;
+
+    {
+        ZoneScopedN("VK::CommandListClose");
+        m_currentGraphics->close();
+    }
+
+    SubmitJob job;
+    job.cl = m_currentGraphics;
+    job.queue = nvrhi::CommandQueue::Graphics;
+    job.token = m_tokens.Issue(nvrhi::CommandQueue::Graphics);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+    job.waits = m_graphicsWaits;
+    job.imageAvailable = m_frameGraphicsSubmitted ? VK_NULL_HANDLE : m_imageAvailable[m_currentFrameIndex];
+    job.renderFinished = m_renderFinished[m_currentImageIndex];
+    job.present = true;
+    job.frameIndex = m_currentFrameIndex;
+    job.imageIndex = m_currentImageIndex;
+    job.slot = m_recordSlot;
+    m_graphicsWaits.Clear();
+    m_frameGraphicsSubmitted = true;
+
+    if (m_asyncSubmit) {
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            job.enqueueTime = std::chrono::steady_clock::now();
+            m_jobs.push_back(std::move(job));
+            m_slotInFlight[m_recordSlot] = true;
+            m_frameSubmissionPending[m_currentFrameIndex] = true;
+        }
+        m_submitCv.notify_one();
+        m_completion.CloseOpenLeases();
+
+        m_recordSlot ^= 1;
+        m_currentFrameIndex = (m_currentFrameIndex + 1) % BACK_BUFFER_COUNT;
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        ZoneScopedN("VK::ExecuteCommandList");
+        m_frameSubmissionIDs[m_currentFrameIndex] = SubmitLocked(job);
+    }
+    m_completion.CloseOpenLeases();
+    m_presentPending = true;
+
+    m_gcTask = TaskScheduler->AddTask([this]
+    {
+        RunGarbageCollection();
+    });
+}
+
+void VulkanBackend::SubmitThreadMain() {
+    using Clock = std::chrono::steady_clock;
+    auto usBetween = [](Clock::time_point a, Clock::time_point b) -> u64 {
+        return static_cast<u64>(std::chrono::duration_cast<std::chrono::microseconds>(b - a).count());
+    };
+    auto storeMax = [this](std::atomic<u64>& slot, u64 value) { StoreMaxUs(slot, value); };
+
+    for (;;) {
+        SubmitJob job;
+        {
+            std::unique_lock<std::mutex> lk(m_submitMutex);
+            m_submitCv.wait(lk, [&] { return !m_jobs.empty() || !m_submitRun; });
+            if (!m_submitRun && m_jobs.empty())
+                return;
+            job = std::move(m_jobs.front());
+            m_jobs.pop_front();
+            m_submitActive = true;
+        }
+        m_submitDoneCv.notify_all();
+
+        const auto tDequeue = Clock::now();
+        storeMax(m_stJobLatencyUs, usBetween(job.enqueueTime, tDequeue));
+
+        u64 instanceID;
+        {
+            std::lock_guard<std::mutex> qk(m_queueMutex);
+            const auto tLocked = Clock::now();
+            storeMax(m_stQueueLockUs, usBetween(tDequeue, tLocked));
+            ZoneScopedN("VK::ExecuteCommandList");
+            instanceID = SubmitLocked(job);
+            storeMax(m_stEncodeUs, usBetween(tLocked, Clock::now()));
+        }
+
+        if (!job.present) {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_submitActive = false;
+            m_submitDoneCv.notify_all();
+            continue;
+        }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_frameSubmissionIDs[job.frameIndex] = instanceID;
+            m_frameSubmissionPending[job.frameIndex] = false;
+            m_slotInFlight[job.slot] = false;
+        }
+        m_submitDoneCv.notify_all();
+
+        {
+            ZoneScopedN("VulkanBackend::Present");
+            const auto tPre = Clock::now();
+            std::scoped_lock sc(m_swapchainMutex, m_queueMutex);
+            const auto tPresentLocked = Clock::now();
+            storeMax(m_stPresentLockUs, usBetween(tPre, tPresentLocked));
+
+            VkPresentInfoKHR presentInfo = {};
+            presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+            presentInfo.waitSemaphoreCount = 1;
+            presentInfo.pWaitSemaphores = &job.renderFinished;
+            presentInfo.swapchainCount = 1;
+            presentInfo.pSwapchains = &m_swapchain;
+            presentInfo.pImageIndices = &job.imageIndex;
+
+            VkResult result = VULKAN_HPP_DEFAULT_DISPATCHER.vkQueuePresentKHR(m_graphicsQueue, &presentInfo);
+            if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+                m_swapchainNeedsReset.store(true, std::memory_order_release);
+                Msg("* [VulkanBackend] Swapchain out of date, resize needed");
+            }
+            R_ASSERT2(result == VK_SUCCESS || result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR,
+                "Vulkan presentation failed");
+            storeMax(m_stPresentUs, usBetween(tPresentLocked, Clock::now()));
+        }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            R_ASSERT2(m_acquiredImageCount > 0, "Vulkan presentation has no acquired image");
+            --m_acquiredImageCount;
+        }
+        m_submitDoneCv.notify_all();
+
+        {
+            ZoneScopedN("SubmitThread::GC");
+            const auto tGc = Clock::now();
+            RunGarbageCollection();
+            storeMax(m_stGcUs, usBetween(tGc, Clock::now()));
+        }
+
+        {
+            std::lock_guard<std::mutex> lk(m_submitMutex);
+            m_submitActive = false;
+        }
+        m_submitDoneCv.notify_all();
+    }
+}
+
+void VulkanBackend::StoreMaxUs(std::atomic<u64>& slot, u64 value) const {
+    u64 current = slot.load(std::memory_order_relaxed);
+    while (current < value && !slot.compare_exchange_weak(current, value, std::memory_order_relaxed)) {}
+}
+
+bool VulkanBackend::GetSubmitThreadTimings(SubmitThreadTimings& out) const {
+    out.jobLatencyUs = m_stJobLatencyUs.exchange(0, std::memory_order_relaxed);
+    out.queueLockUs = m_stQueueLockUs.exchange(0, std::memory_order_relaxed);
+    out.semWaitUs = m_stSemWaitUs.exchange(0, std::memory_order_relaxed);
+    out.encodeUs = m_stEncodeUs.exchange(0, std::memory_order_relaxed);
+    out.presentLockUs = m_stPresentLockUs.exchange(0, std::memory_order_relaxed);
+    out.presentUs = m_stPresentUs.exchange(0, std::memory_order_relaxed);
+    out.gcUs = m_stGcUs.exchange(0, std::memory_order_relaxed);
+    out.slotWaitUs = m_stSlotWaitUs.exchange(0, std::memory_order_relaxed);
+    out.capacityWaitUs = m_stCapacityWaitUs.exchange(0, std::memory_order_relaxed);
+    out.gpuWaitUs = m_stGpuWaitUs.exchange(0, std::memory_order_relaxed);
+    out.acquireUs = m_stAcquireUs.exchange(0, std::memory_order_relaxed);
+    return true;
+}
+
+void VulkanBackend::FlushSubmits() {
+    if (!m_asyncSubmit)
+        return;
+    std::unique_lock<std::mutex> lk(m_submitMutex);
+    m_submitDoneCv.wait(lk, [&] { return m_jobs.empty() && !m_submitActive; });
+}
+
+void VulkanBackend::WaitForIdle() {
+    FlushSubmits();
+    if (m_gcTask) {
+        TaskScheduler->Wait(m_gcTask);
+        m_gcTask.Reset();
+    }
+    std::lock_guard<std::mutex> qk(m_queueMutex);
+    if (m_nvrhiDevice)
+        m_nvrhiDevice->waitForIdle();
+    if (m_device)
+        VULKAN_HPP_DEFAULT_DISPATCHER.vkDeviceWaitIdle(m_device);
+}
+
+void VulkanBackend::RunGarbageCollection()
+{
+    if (!m_nvrhiDevice)
+        return;
+    std::lock_guard<std::mutex> qk(m_queueMutex);
+    m_nvrhiDevice->runGarbageCollection();
+}
+
+IRenderBackend::SubmissionLeaseState VulkanBackend::PollSubmissionLease(u64 lease)
+{
+    const SubmissionLeaseState observed = m_completion.PeekLease(lease);
+    if (observed != SubmissionLeaseState::Pending)
+        return observed;
+
+    std::unique_lock<std::mutex> qk(m_queueMutex, std::try_to_lock);
+    if (!qk.owns_lock())
+        return observed;
+    return m_completion.PollLease(lease);
+}
+
+bool VulkanBackend::IsSubmissionLeaseSubmitted(u64 lease) const
+{
+    return m_completion.IsLeaseSubmitted(lease);
+}
+
+void VulkanBackend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
+    if (m_nvrhiDevice && commandList) {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(commandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("Vulkan rejected a command list submission");
+        }
+        m_completion.ArmTicket(ticket);
+    }
+}
+
+nvrhi::ICommandList* VulkanBackend::AcquireFromPool(CommandListPool& pool, nvrhi::CommandQueue queue) {
+    if (pool.used == pool.lists.size()) {
+        nvrhi::CommandListParameters params;
+        params.enableImmediateExecution = false;
+        params.setQueueType(queue);
+        nvrhi::CommandListHandle commandList = m_nvrhiDevice->createCommandList(params);
+        if (!commandList)
+            return nullptr;
+        pool.lists.push_back(commandList);
+    }
+    return pool.lists[pool.used++];
+}
+
+u64 VulkanBackend::SubmitLocked(const SubmitJob& job) {
+    auto* vkDevice = static_cast<nvrhi::vulkan::IDevice*>(m_nvrhiVulkanDevice.Get());
+    for (u32 i = 0; i < job.waits.count; ++i)
+        m_tokens.WaitFor(m_nvrhiDevice, job.queue, job.waits.tokens[i]);
+    if (job.imageAvailable)
+        vkDevice->queueWaitForSemaphore(job.queue, job.imageAvailable, 0);
+    if (job.renderFinished)
+        vkDevice->queueSignalSemaphore(job.queue, job.renderFinished, 0);
+    const u64 instanceID = m_nvrhiDevice->executeCommandList(job.cl, job.queue);
+    if (!instanceID)
+    {
+        m_completion.CancelTicket(job.completion);
+        FATAL("Vulkan rejected a queued command list submission");
+    }
+    m_tokens.Resolve(job.token, job.queue, instanceID);
+    m_completion.ArmTicket(job.completion);
+    return instanceID;
+}
+
+void VulkanBackend::EnqueueJob(SubmitJob&& job) {
+    {
+        std::lock_guard<std::mutex> lk(m_submitMutex);
+        job.enqueueTime = std::chrono::steady_clock::now();
+        m_jobs.push_back(std::move(job));
+    }
+    m_submitCv.notify_one();
+}
+
+nvrhi::ICommandList* VulkanBackend::AcquireComputeCommandList() {
+    R_ASSERT2(m_inFrame && m_asyncComputeEnabled, "compute command lists are only available inside a frame with async compute");
+    nvrhi::ICommandList* commandList = AcquireFromPool(m_computePools[m_recordSlot], nvrhi::CommandQueue::Compute);
+    R_ASSERT2(commandList, "Vulkan compute command list allocation failed");
+    return commandList;
+}
+
+u32 VulkanBackend::SubmitCompute(nvrhi::ICommandList* commandList, const u32* waitTokens, u32 numWaitTokens) {
+    R_ASSERT2(m_inFrame && m_asyncComputeEnabled && commandList, "SubmitCompute requires an in-frame compute command list");
+    SubmitJob job;
+    job.cl = commandList;
+    job.queue = nvrhi::CommandQueue::Compute;
+    job.token = m_tokens.Issue(nvrhi::CommandQueue::Compute);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Compute);
+    for (u32 i = 0; i < numWaitTokens; ++i)
+        job.waits.Add(waitTokens[i]);
+
+    if (m_asyncSubmit) {
+        EnqueueJob(std::move(job));
+    } else {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        ZoneScopedN("VK::ExecuteComputeCommandList");
+        SubmitLocked(job);
+    }
+    return job.token;
+}
+
+u32 VulkanBackend::SplitGraphics() {
+    R_ASSERT2(m_inFrame, "SplitGraphics requires an open frame");
+    {
+        ZoneScopedN("VK::CommandListClose");
+        m_currentGraphics->close();
+    }
+
+    SubmitJob job;
+    job.cl = m_currentGraphics;
+    job.queue = nvrhi::CommandQueue::Graphics;
+    job.token = m_tokens.Issue(nvrhi::CommandQueue::Graphics);
+    job.completion = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+    job.waits = m_graphicsWaits;
+    job.imageAvailable = m_frameGraphicsSubmitted ? VK_NULL_HANDLE : m_imageAvailable[m_currentFrameIndex];
+    m_graphicsWaits.Clear();
+    m_frameGraphicsSubmitted = true;
+
+    if (m_asyncSubmit) {
+        EnqueueJob(std::move(job));
+    } else {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        ZoneScopedN("VK::ExecuteCommandList");
+        SubmitLocked(job);
+    }
+
+    m_currentGraphics = AcquireFromPool(m_graphicsPools[m_recordSlot], nvrhi::CommandQueue::Graphics);
+    R_ASSERT2(m_currentGraphics, "Vulkan graphics command list allocation failed");
+    {
+        ZoneScopedN("VK::CommandListOpen");
+        m_currentGraphics->open();
+    }
+    return job.token;
+}
+
+void VulkanBackend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
+    if (!m_nvrhiDevice) return;
+    std::lock_guard<std::mutex> qk(m_queueMutex);
+    for (u32 i = 0; i < count; i++) {
+        if (commandLists[i]) {
+            const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+            if (!m_nvrhiDevice->executeCommandList(commandLists[i]))
+            {
+                m_completion.CancelTicket(ticket);
+                FATAL("Vulkan rejected an ordered command list submission");
+            }
+            m_completion.ArmTicket(ticket);
+        }
+    }
+}
+
+void VulkanBackend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size, u64 offset) {
+    if (!buffer || !data || size == 0) return;
+
+    if (m_inFrame) {
+        m_currentGraphics->writeBuffer(buffer, data, size, offset);
+    } else {
+        std::lock_guard<std::mutex> qk(m_queueMutex);
+        m_nvrhiDevice->runGarbageCollection();
+        m_uploadCommandList->open();
+        m_uploadCommandList->writeBuffer(buffer, data, size, offset);
+        m_uploadCommandList->close();
+        const u64 ticket = m_completion.RegisterTicket(nvrhi::CommandQueue::Graphics);
+        if (!m_nvrhiDevice->executeCommandList(m_uploadCommandList))
+        {
+            m_completion.CancelTicket(ticket);
+            FATAL("Vulkan rejected a buffer upload submission");
+        }
+        m_completion.ArmTicket(ticket);
+    }
+}
+
+nvrhi::ICommandList* VulkanBackend::CreateCommandList() {
+    return nullptr;
+}
+
+DeviceState VulkanBackend::GetDeviceState() const {
+    if (!m_initialized || !m_device)
+        return DeviceState::Lost;
+    if (m_swapchainNeedsReset.load(std::memory_order_acquire) || m_requestedVSync != m_swapchainVSync)
+        return DeviceState::NeedReset;
+    return DeviceState::Normal;
+}
+
+IRenderBackend::MemoryBudget VulkanBackend::GetMemoryBudget() const
+{
+    MemoryBudget result;
+    if (!m_physicalDevice)
+        return result;
+    VkPhysicalDeviceProperties properties = {};
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceProperties(m_physicalDevice, &properties);
+    result.bufferRangeBytes = properties.limits.maxStorageBufferRange;
+    const bool hasBudget = std::any_of(m_deviceExtensions.begin(), m_deviceExtensions.end(), [](const char* name)
+    {
+        return strcmp(name, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME) == 0;
+    });
+    VkPhysicalDeviceMemoryBudgetPropertiesEXT budget = {};
+    budget.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
+    VkPhysicalDeviceMemoryProperties2 memory = {};
+    memory.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+    memory.pNext = hasBudget ? &budget : nullptr;
+    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceMemoryProperties2(m_physicalDevice, &memory);
+    for (u32 i = 0; i < memory.memoryProperties.memoryHeapCount; ++i)
+    {
+        if ((memory.memoryProperties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) == 0)
+            continue;
+        result.budgetBytes += hasBudget ? budget.heapBudget[i] : memory.memoryProperties.memoryHeaps[i].size;
+        if (hasBudget)
+            result.usageBytes += budget.heapUsage[i];
+    }
+    result.usageKnown = hasBudget;
+    return result;
+}
+
+void VulkanBackend::BeginDebugEvent(pcstr name) {}
+void VulkanBackend::EndDebugEvent() {}
+void VulkanBackend::SetMarker(pcstr name) {}
+
+IRenderBackend* CreateVulkanBackend(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
+    auto* backend = xr_new<VulkanBackend>();
+    if (backend->Initialize(window, width, height, enableValidation))
+        return backend;
+    Msg("! [VulkanBackend] Initialization failed");
+    xr_delete(backend);
+    return nullptr;
+}

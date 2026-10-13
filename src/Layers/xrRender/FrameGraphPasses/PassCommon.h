@@ -1,0 +1,72 @@
+#pragma once
+
+#include <nvrhi/nvrhi.h>
+#include "xrCore/xrCore.h"
+
+namespace xray::render::fg::passes {
+
+struct LightingConstants {
+    Fvector4 sunDirection;
+    Fvector4 sunColor;
+    Fvector4 ambientColor;
+    Fvector4 cameraPosition;
+    Fvector4 fogParams;
+    Fvector4 fogColor;
+};
+static_assert(sizeof(LightingConstants) == 96, "LightingConstants must be 96 bytes");
+
+inline nvrhi::VertexAttributeDesc* GetUnifiedVertexAttributes(u32& outCount)
+{
+    static nvrhi::VertexAttributeDesc attrs[] = {
+        nvrhi::VertexAttributeDesc()
+            .setName("POSITION").setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setBufferIndex(0).setOffset(0).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM)
+            .setBufferIndex(0).setOffset(12).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM)
+            .setBufferIndex(0).setOffset(16).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM)
+            .setBufferIndex(0).setOffset(20).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT)
+            .setArraySize(2).setBufferIndex(0).setOffset(24).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("COLOR").setFormat(nvrhi::Format::BGRA8_UNORM)
+            .setBufferIndex(0).setOffset(40).setElementStride(48),
+        nvrhi::VertexAttributeDesc()
+            .setName("DRAWINDEX").setFormat(nvrhi::Format::R32_UINT)
+            .setBufferIndex(1).setOffset(0).setElementStride(4).setIsInstanced(true),
+    };
+    outCount = 7;
+    return attrs;
+}
+
+inline void QueryBindingLayoutFromPipeline(
+    nvrhi::IGraphicsPipeline* pipeline,
+    nvrhi::BindingLayoutHandle& outLayout)
+{
+    const auto& desc = pipeline->getDesc();
+    if (!desc.bindingLayouts.empty())
+        outLayout = desc.bindingLayouts[0];
+}
+
+
+LightingConstants FillLightingConstants();
+
+u32 ExtractFrustumPlanes(Fvector4 outPlanes[6]);
+
+enum class ShadowPublication
+{
+    VSM,
+    Local
+};
+
+void RecordGeometryShadowDraw(nvrhi::ICommandList* cmd, nvrhi::IDevice* device,
+    nvrhi::IBuffer* dirtyList, nvrhi::IBuffer* drawArgs, nvrhi::IBuffer* geometryDirty, u32 capacity,
+    ShadowPublication publication, nvrhi::IBuffer* cacheState, nvrhi::IBuffer* pageList,
+    nvrhi::ComputePipelineHandle& pipeline);
+
+}

@@ -45,6 +45,7 @@ void CIKLimbsController::Create(CGameObject* O)
     if (already_has_callbacks)
         std::swap(*(O->visual_callbacks().begin()), *(O->visual_callbacks().end() - 1));
     _pose_extrapolation.init(O->XFORM());
+    Device.seqFrame.Add(this, REG_PRIORITY_LOW);
 }
 
 void CIKLimbsController::LimbSetup()
@@ -316,6 +317,7 @@ void CIKLimbsController::Calculate()
 
 void CIKLimbsController::Destroy(CGameObject* O)
 {
+    Device.seqFrame.Remove(this);
 #ifdef _DEBUG
     CPhysicsShellHolder* Sh = smart_cast<CPhysicsShellHolder*>(O);
     VERIFY(Sh);
@@ -329,6 +331,14 @@ void CIKLimbsController::Destroy(CGameObject* O)
     for (; e != i; ++i)
         i->Destroy();
     _bone_chains.clear();
+}
+
+void CIKLimbsController::OnFrame()
+{
+    for (CIKLimb& limb : _bone_chains)
+    {
+        limb.RenderDebug();
+    }
 }
 
 void CIKLimbsController::IKVisualCallback(IKinematics* K)
@@ -358,7 +368,7 @@ void CIKLimbsController::PlayLegs(CBlend* b)
     anim_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).first;
     anim_set_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).second;
 
-    CMotionDef& MD = *skeleton_animated->LL_GetMotionDef(b->motionID);
+    const CMotionDef& MD = *skeleton_animated->LL_GetMotionDef(b->motionID);
     if (MD.marks.empty() && (MD.flags & esmUseFootSteps))
         Msg("! No foot stseps for animation: animation name: %s, animation set: %s ", anim_name, anim_set_name);
 #endif

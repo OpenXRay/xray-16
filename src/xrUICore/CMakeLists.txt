@@ -142,7 +142,6 @@ target_link_libraries(xrUICore
 target_compile_definitions(xrUICore
     PRIVATE
     XRUICORE_EXPORTS
-    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrUICore PROPERTIES
@@ -155,7 +154,8 @@ target_precompile_headers(xrUICore
 )
 
 if (BUILD_SHARED_LIBS)
-    install(TARGETS xrUICore LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(TARGETS xrUICore
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

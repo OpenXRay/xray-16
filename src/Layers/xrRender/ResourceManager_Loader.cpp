@@ -2,31 +2,16 @@
 #pragma hdrstop
 
 #include "ResourceManager.h"
-#include "Blender.h"
+#include "Layers/xrRender/Blender.h"
+#include "Layers/xrRender/Blender_CLSID.h"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
     if (Device.b_is_Ready)
         return;
-    m_textures_description.UnLoad();
-
-    // Matrices
-    for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); ++m)
-    {
-        R_ASSERT(1 == m->second->ref_count);
-        xr_delete(m->second);
-    }
-    m_matrices.clear();
-
-    // Constants
-    for (map_Constant::iterator c = m_constants.begin(); c != m_constants.end(); ++c)
-    {
-        R_ASSERT(1 == c->second->ref_count);
-        xr_delete(c->second);
-    }
-    m_constants.clear();
+    TextureDescr.UnLoad();
 
     // Release blenders
     for (auto b = m_blenders.begin(); b != m_blenders.end(); ++b)
@@ -41,12 +26,8 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     {
         xr_free((char*&)_t->first);
         xr_free((char*&)_t->second.T);
-        xr_delete(_t->second.cs);
     }
     m_td.clear();
-#ifndef _EDITOR
-    LS_Unload();
-#endif
 }
 
 void CResourceManager::OnDeviceCreate(IReader* F)
@@ -57,39 +38,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     ZoneScoped;
     string256 name;
 
-#ifndef _EDITOR
-    // scripting
-    LS_Load();
-#endif
     IReader* fs = nullptr;
-    // Load constants
-    fs = F->open_chunk(0);
-    if (fs)
-    {
-        ZoneScopedN("Load constants");
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CConstant* C = _CreateConstant(name);
-            C->Load(fs);
-        }
-        fs->close();
-    }
-
-    // Load matrices
-    fs = F->open_chunk(1);
-    if (fs)
-    {
-        ZoneScopedN("Load matrices");
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CMatrix* M = _CreateMatrix(name);
-            M->Load(fs);
-        }
-        fs->close();
-    }
-
     // Load blenders
     fs = F->open_chunk(2);
     if (fs)
@@ -130,7 +79,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         fs->close();
     }
 
-    m_textures_description.Load();
+    TextureDescr.Load();
 }
 
 void CResourceManager::OnDeviceCreate(LPCSTR shName)
@@ -177,4 +126,4 @@ void CResourceManager::StoreNecessaryTextures()
 }
 
 void CResourceManager::DestroyNecessaryTextures() { m_necessary.clear(); }
-} // namespace xray::render::RENDER_NAMESPACE
+}

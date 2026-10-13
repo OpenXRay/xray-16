@@ -13,6 +13,9 @@
 #include "xrCore/cdecl_cast.hpp"
 #include "PerformanceAlert.hpp"
 #include "xrCore/Threading/TaskManager.hpp"
+#include <imgui.h>
+#include <algorithm>
+#include <cmath>
 
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {};
@@ -30,7 +33,6 @@ int g_bShowRedText = 1;
 CStats::CStats()
 {
     statsFont = nullptr;
-    fpsFont = nullptr;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 }
 
@@ -151,27 +153,154 @@ void CStats::Show()
 #endif
     font.OnRender();
 
-    if (psDeviceFlags.test(rsShowFPS))
-    {
-        const auto fps = u32(Device.GetStats().fFPS);
-        fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
-        fpsFont->OnRender();
-    }
-    if (psDeviceFlags.test(rsShowFPSGraph))
-    {
-        const auto fps = Device.GetStats().fFPS;
-        const auto fpsMidThr = 30;
-        const auto fpsMaxThr = 60;
-        fpsGraph->AppendItem(fps, color_xrgb(
-            fps <  fpsMaxThr ? 255 : 0,
-            fps >= fpsMidThr ? 255 : 0,
-            0));
-        fpsGraph->OnRender();
-    }
     gTestTimer0.FrameStart();
     gTestTimer1.FrameStart();
     gTestTimer2.FrameStart();
     gTestTimer3.FrameStart();
+}
+
+void CStats::ResetFPSOverlay()
+{
+    fpsHistoryWrite = 0;
+    fpsHistoryCount = 0;
+    fpsFrameCount = 0;
+    fpsElapsed = 0.0;
+    fpsSampleTime = 0.0;
+    fpsSampleFrames = 0;
+    fpsAverage = 0.f;
+    fpsMinimum = 0.f;
+    fpsMaximum = 0.f;
+}
+
+void CStats::RenderFPSOverlay()
+{
+    if (GEnv.isDedicatedServer || !psDeviceFlags.test(rsShowFPS | rsShowFPSGraph))
+    {
+        if (fpsFrameCount != 0)
+            ResetFPSOverlay();
+        return;
+    }
+
+    const float frameTime = Device.fTimeDeltaReal;
+    const bool validTiming = frameTime > 0.f && std::isfinite(frameTime);
+    if (validTiming)
+    {
+        fpsElapsed += frameTime;
+        ++fpsFrameCount;
+        fpsSampleTime += frameTime;
+        ++fpsSampleFrames;
+        if (fpsSampleTime >= 0.25)
+        {
+            const float fps = static_cast<float>(fpsSampleFrames / fpsSampleTime);
+            fpsMinimum = fpsHistoryCount == 0 ? fps : std::min(fpsMinimum, fps);
+            fpsMaximum = std::max(fpsMaximum, fps);
+            fpsAverage = static_cast<float>(fpsFrameCount / fpsElapsed);
+            fpsHistory[fpsHistoryWrite] = {fpsElapsed, fps};
+            fpsHistoryWrite = (fpsHistoryWrite + 1) % fpsHistorySize;
+            fpsHistoryCount = std::min(fpsHistoryCount + 1, fpsHistorySize);
+            fpsSampleTime = 0.0;
+            fpsSampleFrames = 0;
+        }
+    }
+    else
+    {
+        fpsSampleTime = 0.0;
+        fpsSampleFrames = 0;
+    }
+
+    auto* viewport = ImGui::GetMainViewport();
+    const float fontSize = ImGui::GetFontSize();
+    const float padding = fontSize * 0.75f;
+    const float lineHeight = fontSize * 1.5f;
+    const float width = std::min(fontSize * 29.f, viewport->Size.x - padding * 2.f);
+    const float height = padding * 2.f + lineHeight * 4.f + fontSize * 7.f;
+    if (width <= padding * 2.f + fontSize * 3.f || viewport->Size.y <= padding * 2.f)
+        return;
+
+    const ImVec2 topLeft(viewport->Pos.x + viewport->Size.x - padding - width, viewport->Pos.y + padding);
+    const ImVec2 bottomRight(topLeft.x + width, topLeft.y + height);
+    auto* drawList = ImGui::GetForegroundDrawList(viewport);
+    drawList->PushClipRect(topLeft,
+        ImVec2(bottomRight.x, std::min(bottomRight.y, viewport->Pos.y + viewport->Size.y - padding)), true);
+    drawList->AddRectFilled(topLeft, bottomRight, IM_COL32(15, 18, 24, 225), padding * 0.4f);
+
+    const ImU32 textColor = IM_COL32(230, 234, 240, 255);
+    const ImU32 mutedColor = IM_COL32(145, 155, 172, 255);
+    const ImU32 graphColor = IM_COL32(90, 210, 225, 255);
+    const ImU32 averageColor = IM_COL32(225, 180, 90, 210);
+    const float textX = topLeft.x + padding;
+    const float rightX = bottomRight.x - padding;
+    char text[128];
+    if (fpsHistoryCount != 0 && validTiming)
+    {
+        const float fps = fpsHistory[(fpsHistoryWrite + fpsHistorySize - 1) % fpsHistorySize].fps;
+        xr_sprintf(text, sizeof(text), "%.1f FPS", fps);
+        drawList->AddText(ImVec2(textX, topLeft.y + padding), graphColor, text);
+        xr_sprintf(text, sizeof(text), "%.2f ms", 1000.f / fps);
+        drawList->AddText(ImVec2(rightX - ImGui::CalcTextSize(text).x, topLeft.y + padding), textColor, text);
+    }
+    else
+        drawList->AddText(ImVec2(textX, topLeft.y + padding), mutedColor, "FPS  measuring...");
+
+    if (fpsHistoryCount != 0)
+        xr_sprintf(text, sizeof(text), "AVG %.1f   MIN %.1f   MAX %.1f", fpsAverage, fpsMinimum, fpsMaximum);
+    else
+        xr_sprintf(text, sizeof(text), "AVG --   MIN --   MAX --");
+    drawList->AddText(ImVec2(textX, topLeft.y + padding + lineHeight), textColor, text);
+
+    const ImVec2 plotMin(textX + fontSize * 3.f, topLeft.y + padding + lineHeight * 2.f);
+    const ImVec2 plotMax(rightX, plotMin.y + fontSize * 7.f);
+    const float plotWidth = plotMax.x - plotMin.x;
+    const float plotHeight = plotMax.y - plotMin.y;
+    const float graphMax = std::max(120.f, std::ceil(fpsMaximum / 60.f) * 60.f);
+    drawList->AddRectFilled(plotMin, plotMax, IM_COL32(5, 8, 12, 170));
+    for (int i = 0; i <= 4; ++i)
+    {
+        const float y = plotMax.y - i * plotHeight / 4.f;
+        drawList->AddLine(ImVec2(plotMin.x, y), ImVec2(plotMax.x, y), IM_COL32(115, 130, 150, 45));
+        xr_sprintf(text, sizeof(text), "%.0f", graphMax * i / 4.f);
+        drawList->AddText(ImVec2(plotMin.x - padding * 0.5f - ImGui::CalcTextSize(text).x,
+            y - fontSize * 0.5f), mutedColor, text);
+    }
+    for (int i = 0; i <= 4; ++i)
+    {
+        const float x = plotMin.x + i * plotWidth / 4.f;
+        drawList->AddLine(ImVec2(x, plotMin.y), ImVec2(x, plotMax.y), IM_COL32(115, 130, 150, 35));
+    }
+    drawList->AddText(ImVec2(plotMin.x, plotMax.y + fontSize * 0.3f), mutedColor, "-10 s");
+    drawList->AddText(ImVec2(plotMin.x + plotWidth * 0.5f - ImGui::CalcTextSize("-5 s").x * 0.5f,
+        plotMax.y + fontSize * 0.3f), mutedColor, "-5 s");
+    drawList->AddText(ImVec2(plotMax.x - ImGui::CalcTextSize("now").x, plotMax.y + fontSize * 0.3f), mutedColor, "now");
+
+    if (fpsHistoryCount != 0)
+    {
+        std::array<ImVec2, fpsHistorySize + 1> points;
+        int pointCount = 0;
+        const double startTime = fpsElapsed - 10.0;
+        const u32 oldest = (fpsHistoryWrite + fpsHistorySize - fpsHistoryCount) % fpsHistorySize;
+        for (u32 i = 0; i < fpsHistoryCount; ++i)
+        {
+            if (i + 1 < fpsHistoryCount && fpsHistory[(oldest + i + 1) % fpsHistorySize].time < startTime)
+                continue;
+            const auto& sample = fpsHistory[(oldest + i) % fpsHistorySize];
+            points[pointCount++] = ImVec2(plotMin.x + static_cast<float>((sample.time - startTime) / 10.0) * plotWidth,
+                plotMax.y - sample.fps / graphMax * plotHeight);
+        }
+        points[pointCount] = ImVec2(plotMax.x, points[pointCount - 1].y);
+        ++pointCount;
+        drawList->PushClipRect(plotMin, plotMax, true);
+        for (int i = 1; i < pointCount; ++i)
+            drawList->AddQuadFilled(points[i - 1], points[i],
+                ImVec2(points[i].x, plotMax.y), ImVec2(points[i - 1].x, plotMax.y), IM_COL32(90, 210, 225, 28));
+        const float averageY = plotMax.y - fpsAverage / graphMax * plotHeight;
+        drawList->AddLine(ImVec2(plotMin.x, averageY), ImVec2(plotMax.x, averageY), averageColor);
+        drawList->AddPolyline(points.data(), pointCount, graphColor, ImDrawFlags_None, 1.5f);
+        drawList->AddCircleFilled(points[pointCount - 1], 2.f, graphColor);
+        drawList->PopClipRect();
+    }
+    xr_sprintf(text, sizeof(text), "Session %.1fs   /   250ms samples", fpsElapsed);
+    drawList->AddText(ImVec2(textX, plotMax.y + lineHeight), mutedColor, text);
+    drawList->PopClipRect();
 }
 
 void CStats::OnDeviceCreate()
@@ -181,16 +310,6 @@ void CStats::OnDeviceCreate()
     if (!GEnv.isDedicatedServer)
     {
         statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
-        fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
-        fpsFont->SetHeightI(0.025f);
-        fpsFont->SetColor(color_rgba(250, 250, 15, 180));
-
-        fpsGraph = xr_make_unique<CStatGraph>(false);
-        fpsGraph->SetStyle(CStatGraph::EStyle::stBarLine);
-        fpsGraph->SetRect(Device.dwWidth - 390, 10 - Device.dwHeight, 300, 68, color_xrgb(255, 255, 255) , color_xrgb(50, 50, 50));
-        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 60, color_xrgb(128, 128, 128)); // Max
-        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 30, color_xrgb(70, 70, 70)); // Mid
-        fpsGraph->SetMinMax(0.0f, 100.0f, 500);
     }
 
 #ifdef DEBUG
@@ -209,10 +328,7 @@ void CStats::OnDeviceDestroy()
 {
     SetLogCB(nullptr);
     xr_delete(statsFont);
-    xr_delete(fpsFont);
-    if (fpsGraph)
-        fpsGraph->OnDeviceDestroy();
-    fpsGraph = nullptr;
+    ResetFPSOverlay();
 }
 
 void CStats::FilteredLog(const char* s)

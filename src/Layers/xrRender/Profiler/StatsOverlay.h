@@ -1,0 +1,386 @@
+#pragma once
+
+#include "xrCore/Profiler/ProfilerTypes.h"
+#include "GPUProfiler.h"
+#include "Layers/xrRender/LightingMode.h"
+#include <nvrhi/nvrhi.h>
+
+namespace xray::profiler
+{
+
+const char* PathTracerDiagnosticName(u32 mode);
+
+struct RenderStats
+{
+    u32 totalBatches = 0;
+    u32 staticBatches = 0;
+    u32 dynamicBatches = 0;
+    u32 skinnedBatches = 0;
+    u32 terrainBatches = 0;
+    u32 particleBatches = 0;
+
+    u32 totalTriangles = 0;
+    u32 staticTriangles = 0;
+    u32 dynamicTriangles = 0;
+    u32 skinnedTriangles = 0;
+    u32 terrainTriangles = 0;
+
+    u32 megaBufferVertices = 0;
+    u32 megaBufferIndices = 0;
+
+    u32 particleCullSubmitted = 0;
+    u32 particleCullVisible = 0;
+    u32 particleQuadsSubmitted = 0;
+    u32 particleQuadsVisible = 0;
+
+    u32 clusterEntries = 0;
+    u32 clusterVisible = 0;
+    u32 clusterTerrainEntries = 0;
+    u32 clusterStaticEntries = 0;
+    u32 residualStatic = 0;
+    u32 residualTerrain = 0;
+    u32 residualDynamic = 0;
+    u32 residualTransparent = 0;
+    u32 clusterOcclusionCandidates = 0;
+    u32 clusterOcclusionRecovered = 0;
+    u32 clusterTrianglesDrawn = 0;
+    u32 clusterTerrainTrianglesDrawn = 0;
+    u32 clusterTerrainVisible = 0;
+    u32 clusterInstanceVisits = 0;
+    u32 clusterNodeVisits = 0;
+    u32 clusterLeafVisits = 0;
+    u32 clusterDeferredInstances = 0;
+    u32 clusterDeferredNodes = 0;
+    u32 clusterOverflow = 0;
+    u64 geometrySharedBytes = 0;
+    u64 geometryInstanceBytes = 0;
+    u64 geometryPayloadBytes = 0;
+    u64 geometryVertexBytes = 0;
+    u64 geometryRetainedBytes = 0;
+    u64 geometryForwardDrawBytes = 0;
+    u64 geometryRetiringSourceBytes = 0;
+    u64 geometrySourceStagingBytes = 0;
+    u64 geometryHostSourceBytes = 0;
+    u64 geometryRetiringArenaBytes = 0;
+    u64 geometryShadowSnapshotBytes = 0;
+    u64 geometryShadowHostBytes = 0;
+    u64 geometryRTSourceBytes = 0;
+    u64 geometryRTGenerationBytes = 0;
+    u64 geometryRTAccelerationBytes = 0;
+    u32 geometryForwardUploadLeases = 0;
+    u32 geometryRTGenerations = 0;
+    u32 geometryRTLeases = 0;
+    u32 geometryRTCompactable = 0;
+    u32 geometryRTCompacted = 0;
+    u32 geometryRTSkinStructures = 0;
+    u32 geometryRTSkinJobs = 0;
+    u32 geometryRTSkinDispatches = 0;
+    u32 geometryPageBudgetMiB = 0;
+    bool geometryPagingRequested = false;
+    bool geometryPolicyPending = false;
+    bool geometryPagingDetails = false;
+    bool geometryRTAccelerationKnown = true;
+    u64 geometryResidencyArenaBytes = 0;
+    u64 geometryResidencyUsedBytes = 0;
+    u64 geometryResidencyPinnedBytes = 0;
+    u64 geometryResidencyStagingBytes = 0;
+    u32 geometryResidentGroups = 0;
+    u32 geometryPinnedGroups = 0;
+    u32 geometryDesiredGroups = 0;
+    u32 geometryActivatingGroups = 0;
+    u32 geometryBlockedGroups = 0;
+    u32 geometryResidentPages = 0;
+    u32 geometryPinnedPages = 0;
+    u32 geometryReadingPages = 0;
+    u32 geometryUploadingPages = 0;
+    u32 geometryRetiringPages = 0;
+    u32 geometryUploadsRecorded = 0;
+    u32 geometryUploadKiB = 0;
+    u32 geometryReadsIssued = 0;
+    u32 geometryReadsFailed = 0;
+    u32 geometryUploadsDiscarded = 0;
+    u32 geometryAllocationDeferrals = 0;
+    u32 geometryBudgetDeferrals = 0;
+    u32 geometryEvictions = 0;
+    u32 geometryLiveSnapshots = 0;
+    u32 geometryFailedSnapshots = 0;
+    u32 geometryCutRevision = 0;
+    bool geometryStreaming = false;
+    u64 geometryPageVertexSlots = 0;
+    u64 geometryUniqueVertices = 0;
+    u64 geometryClusterVertexReferences = 0;
+    u32 geometryPages = 0;
+    u32 geometryReclusterSplits = 0;
+    u32 geometryMaxClusterVertices = 0;
+    u32 geometryMaxClusterTriangles = 0;
+
+    bool vsmActive = false;
+    bool vsmSunMoving = false;
+    u32 vsmPages = 0;
+    u32 vsmDirtyPages = 0;
+    u32 vsmWrongPages = 0;
+    u32 vsmBinDraws = 0;
+    u32 vsmBinInstances = 0;
+    u32 vsmBinMaxVisited = 0;
+    u32 vsmBinLodCulled = 0;
+    u32 vsmBinDrops = 0;
+    u32 vsmLevelPages[6] = {0, 0, 0, 0, 0, 0};
+    u32 localShadowSpots = 0;
+    u32 localShadowPoints = 0;
+    u32 localShadowAccepted = 0;
+    u32 localShadowDeferred = 0;
+    u32 localShadowDyn = 0;
+    u32 localShadowPairs = 0;
+    u32 localShadowDrops = 0;
+    u32 localShadowDynDrops = 0;
+    u32 localShadowAtlas = 0;
+    u32 localShadowPages = 0;
+    u32 localShadowOverflow = 0;
+    u32 localShadowHudViews = 0;
+    u32 localShadowBatches = 0;
+    u32 localShadowExtraCasters = 0;
+
+    u32 lightsFrustum = 0;
+    u32 lightsTouching = 0;
+    u32 lightsInvalidSector = 0;
+    u32 lightsLodCulled = 0;
+    u32 lightsHomCulled = 0;
+
+    u32 lightsClustered = 0;
+    u32 lightsHiZVisible = 0;
+    u32 lightsPoint = 0;
+    u32 lightsSpot = 0;
+    u32 lightsOmni = 0;
+    u32 lightTiles[4] = {0, 0, 0, 0};
+    u32 lightTilesTotal = 0;
+
+    u32 detailInstances = 0;
+    u32 detailSlots = 0;
+    u32 detailTrisPerBlade[3] = {0, 0, 0};
+
+    u32 detailVisibleSlots = 0;
+    u32 detailVisibleLOD0 = 0;
+    u32 detailVisibleLOD1 = 0;
+    u32 detailVisibleLOD2 = 0;
+    u32 detailVisibleDecals = 0;
+    u32 detailVisibleMeshes = 0;
+
+    u64 detailGeneratedInstances = 0;
+    u64 detailVisibilityInstances = 0;
+    u32 detailVisibleCapacity[5] = {};
+    u32 detailPackets = 0;
+    u32 detailPacketCapacity = 0;
+    u32 detailOverflow = 0;
+    u64 detailSourceId = 0;
+    u64 detailVisibilityFrame = 0;
+    u64 detailVisibilitySource = 0;
+    u64 detailSourceBytes = 0;
+    u64 detailActiveSourceBytes = 0;
+    u64 detailFrameBytes = 0;
+    u64 detailPendingBytes = 0;
+    u64 detailBudgetBytes = 0;
+    u64 detailUsageBytes = 0;
+    u32 detailSourceChunks = 0;
+    u32 detailResidentChunks = 0;
+    u32 detailGenerations = 0;
+    u32 detailFrames = 0;
+    u32 detailGenerationStage = 0;
+    u32 detailGenerationChunks = 0;
+    u32 detailGenerationChunkCount = 0;
+    bool detailUsageKnown = false;
+
+    u32 fgArenaUsed = 0;
+    u32 fgArenaPeak = 0;
+    u32 fgArenaCapacity = 0;
+    u32 fgArenaFallbacks = 0;
+    render::fg::LightingFrameState lighting;
+    u32 pathTracerSamples = 0;
+    u32 pathTracerBounces = 0;
+    u32 pathTracerDiffuseMode = 0;
+    u32 pathTracerDiagnosticMode = 0;
+    u32 pathTracerMaxNullEvents = 0;
+    u32 pathTracerMaxSamples = 0;
+    float pathTracerSunAngularRadius = 0.0f;
+    bool pathTracerFreezeRequested = false;
+    bool pathTracerFrozen = false;
+    bool pathTracerCapturePending = false;
+    bool pathTracerSnapshotValid = false;
+    bool pathTracerSnapshotFallback = false;
+    bool pathTracerCdfActive = false;
+    u32 pathTracerLightCount = 0;
+    u32 pathTracerEmissiveCount = 0;
+    u32 pathTracerCapturedTextures = 0;
+    u64 pathTracerCapturedTextureBytes = 0;
+    u64 pathTracerRetainedSceneBytes = 0;
+    u64 pathTracerFrozenSceneRevision = 0;
+    u64 pathTracerFrozenTextureRevision = 0;
+    u64 pathTracerLightingSignature = 0;
+
+    void Reset()
+    {
+        lighting = {};
+        pathTracerSamples = 0;
+        pathTracerBounces = pathTracerDiffuseMode = pathTracerDiagnosticMode = 0;
+        pathTracerMaxNullEvents = pathTracerMaxSamples = 0;
+        pathTracerSunAngularRadius = 0.0f;
+        pathTracerFreezeRequested = pathTracerFrozen = pathTracerCapturePending = false;
+        pathTracerSnapshotValid = pathTracerSnapshotFallback = pathTracerCdfActive = false;
+        pathTracerLightCount = pathTracerEmissiveCount = pathTracerCapturedTextures = 0;
+        pathTracerCapturedTextureBytes = pathTracerRetainedSceneBytes = 0;
+        pathTracerFrozenSceneRevision = pathTracerFrozenTextureRevision = pathTracerLightingSignature = 0;
+        totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
+        totalTriangles = staticTriangles = dynamicTriangles = skinnedTriangles = terrainTriangles = 0;
+        megaBufferVertices = megaBufferIndices = 0;
+        particleCullSubmitted = particleCullVisible = particleQuadsSubmitted = particleQuadsVisible = 0;
+        clusterEntries = clusterVisible = clusterTerrainEntries = clusterTerrainVisible = 0;
+        clusterStaticEntries = clusterTrianglesDrawn = clusterTerrainTrianglesDrawn = 0;
+        residualStatic = residualTerrain = residualDynamic = residualTransparent = 0;
+        clusterOcclusionCandidates = clusterOcclusionRecovered = 0;
+        clusterInstanceVisits = clusterNodeVisits = clusterLeafVisits = 0;
+        clusterDeferredInstances = clusterDeferredNodes = clusterOverflow = 0;
+        geometrySharedBytes = geometryInstanceBytes = geometryPayloadBytes = geometryVertexBytes = geometryRetainedBytes = 0;
+        geometryForwardDrawBytes = geometryRetiringSourceBytes = geometrySourceStagingBytes = geometryHostSourceBytes = 0;
+        geometryRetiringArenaBytes = geometryShadowSnapshotBytes = geometryShadowHostBytes = 0;
+        geometryRTSourceBytes = geometryRTGenerationBytes = geometryRTAccelerationBytes = 0;
+        geometryForwardUploadLeases = geometryRTGenerations = geometryRTLeases = geometryPageBudgetMiB = 0;
+        geometryRTCompactable = geometryRTCompacted = 0;
+        geometryRTSkinStructures = geometryRTSkinJobs = geometryRTSkinDispatches = 0;
+        geometryPagingRequested = geometryPolicyPending = geometryPagingDetails = false;
+        geometryRTAccelerationKnown = true;
+        geometryPageVertexSlots = geometryUniqueVertices = geometryClusterVertexReferences = 0;
+        geometryPages = geometryReclusterSplits = geometryMaxClusterVertices = geometryMaxClusterTriangles = 0;
+        geometryResidencyArenaBytes = geometryResidencyUsedBytes = 0;
+        geometryResidencyPinnedBytes = geometryResidencyStagingBytes = 0;
+        geometryResidentGroups = geometryPinnedGroups = geometryDesiredGroups = 0;
+        geometryActivatingGroups = geometryBlockedGroups = 0;
+        geometryResidentPages = geometryPinnedPages = geometryReadingPages = 0;
+        geometryUploadingPages = geometryRetiringPages = geometryUploadsRecorded = geometryUploadKiB = 0;
+        geometryReadsIssued = geometryReadsFailed = geometryUploadsDiscarded = 0;
+        geometryAllocationDeferrals = geometryBudgetDeferrals = geometryEvictions = 0;
+        geometryLiveSnapshots = geometryFailedSnapshots = geometryCutRevision = 0;
+        geometryStreaming = false;
+        vsmActive = vsmSunMoving = false;
+        vsmPages = vsmDirtyPages = vsmWrongPages = 0;
+        vsmBinDraws = vsmBinInstances = vsmBinMaxVisited = vsmBinLodCulled = vsmBinDrops = 0;
+        for (u32 i = 0; i < 6; ++i) vsmLevelPages[i] = 0;
+        localShadowSpots = localShadowPoints = localShadowAccepted = localShadowDeferred = localShadowDyn = 0;
+        localShadowPairs = localShadowDrops = localShadowDynDrops = localShadowAtlas = 0;
+        localShadowPages = localShadowOverflow = localShadowBatches = localShadowExtraCasters = localShadowHudViews = 0;
+        lightsFrustum = lightsTouching = lightsInvalidSector = lightsLodCulled = lightsHomCulled = 0;
+        lightsClustered = lightsHiZVisible = lightsPoint = lightsSpot = lightsOmni = 0;
+        lightTiles[0] = lightTiles[1] = lightTiles[2] = lightTiles[3] = lightTilesTotal = 0;
+        detailInstances = detailSlots = 0;
+        detailTrisPerBlade[0] = detailTrisPerBlade[1] = detailTrisPerBlade[2] = 0;
+        detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
+        detailVisibleDecals = detailVisibleMeshes = detailPackets = detailPacketCapacity = detailOverflow = 0;
+        detailGeneratedInstances = detailVisibilityInstances = detailSourceId = detailVisibilityFrame = detailVisibilitySource = 0;
+        detailSourceBytes = detailActiveSourceBytes = detailFrameBytes = detailPendingBytes = detailBudgetBytes = detailUsageBytes = 0;
+        detailSourceChunks = detailResidentChunks = detailGenerations = detailFrames = 0;
+        detailGenerationStage = detailGenerationChunks = detailGenerationChunkCount = 0;
+        detailUsageKnown = false;
+        for (auto& capacity : detailVisibleCapacity)
+            capacity = 0;
+        fgArenaUsed = fgArenaPeak = fgArenaCapacity = fgArenaFallbacks = 0;
+    }
+};
+
+class StatsOverlay
+{
+public:
+    StatsOverlay();
+    ~StatsOverlay();
+
+    void SetGPUProfiler(GPUProfiler* gpuProfiler) { m_gpuProfiler = gpuProfiler; }
+
+    void SetRenderStats(const RenderStats& stats) { m_renderStats = stats; }
+    const RenderStats& GetRenderStats() const { return m_renderStats; }
+
+    void Render();
+
+    bool IsVisible() const { return m_visible; }
+    void SetVisible(bool visible) { m_visible = visible; }
+    void ToggleVisible() { m_visible = !m_visible; }
+
+    void SetInspectorRTList(const xr_vector<shared_str>& names, const xr_vector<u8>& isDepth) { m_rtNames = names; m_rtIsDepth = isDepth; }
+    void SetInspectorPreview(nvrhi::ITexture* tex) { m_inspectorPreview = tex; }
+    shared_str GetSelectedRTName() const { return m_selectedRTName; }
+    int GetChannelMode() const { return m_channelMode; }
+    void SetSelectedRTMipCount(u32 mips) { m_selectedRTMipCount = mips; }
+    void SetSelectedRTSize(u32 w, u32 h) { m_sourceWidth = w; m_sourceHeight = h; }
+    int GetSelectedMipLevel() const { return m_selectedMipLevel; }
+
+    struct WallmarkSplat {
+        float u, v;
+        float uvRadius;
+        float r, g, b, a;
+        u32 mode = 0;
+        float seed = 0.f;
+        nvrhi::ITexture* stampTex = nullptr;
+    };
+    struct WallmarkTexGroup { nvrhi::ITexture* diffuseTex = nullptr; xr_string texName; xr_vector<WallmarkSplat> splats; };
+    struct WallmarkObjectData { void* objKey = nullptr; xr_vector<WallmarkTexGroup> groups; };
+    void SetWallmarkData(xr_vector<WallmarkObjectData> data) { m_wallmarkData = std::move(data); }
+    void WriteProfileDump(u32 intervalSeconds);
+
+private:
+    class GPUPassNode
+    {
+    public:
+        static constexpr u32 InvalidIndex = static_cast<u32>(-1);
+
+        xr_string name;
+        xr_string label;
+        float timeMs = 0.0f;
+        bool isAsync = false;
+        u32 parent = InvalidIndex;
+        xr_vector<u32> children;
+    };
+
+    void RenderCPUSection();
+    void RenderGPUSection();
+    void RenderGPUPassList(const xr_vector<GPUPassTiming>& passTimings, float totalGPU, bool asyncOnly);
+    void BuildGPUPassTree(const xr_vector<GPUPassTiming>& passTimings, xr_vector<GPUPassNode>& nodes, xr_vector<u32>& roots, bool asyncOnly, bool includeOrphans) const;
+    void RenderGPUPassNode(const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU) const;
+    void AppendGPUPassNode(xr_string& out, const xr_vector<GPUPassNode>& nodes, u32 index, float totalGPU, u32 depth) const;
+    void RenderGeometrySection();
+    void RenderAllocationsSection();
+    void RenderInspectorSection();
+    void RenderWallmarksSection();
+    void RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime);
+
+    static const char* FormatTime(float ms, int slot = -1);
+    static u32 GetTimeColor(float ms, float parentMs);
+    static const char* FormatNumber(u32 value);
+    static const char* FormatBytes(u64 bytes, int slot = -1);
+    static void AppendZoneText(xr_string& out, u32 zoneId, const xr_vector<ZoneData>& zones, int depth);
+    static void CopyZoneTreeToClipboard();
+
+private:
+    GPUProfiler* m_gpuProfiler = nullptr;
+    u32 m_lastDumpTime = 0;
+    RenderStats m_renderStats;
+    bool m_visible = false;
+
+    bool m_cpuExpanded = true;
+    bool m_gpuExpanded = true;
+    bool m_geometryExpanded = true;
+    bool m_allocExpanded = true;
+    bool m_allocObjectClassProfiling = false;
+
+    xr_vector<shared_str> m_rtNames;
+    int m_inspectorSelectedRT = -1;
+    nvrhi::ITexture* m_inspectorPreview = nullptr;
+    int m_channelMode = 0;
+    int m_selectedMipLevel = 0;
+    u32 m_selectedRTMipCount = 1;
+    u32 m_sourceWidth = 0;
+    u32 m_sourceHeight = 0;
+    shared_str m_selectedRTName;
+    xr_vector<u8> m_rtIsDepth;
+
+    xr_vector<WallmarkObjectData> m_wallmarkData;
+    void* m_wallmarkSelectedKey = nullptr;
+    int m_wallmarkSelectedGroup = 0;
+};
+
+}

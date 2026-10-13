@@ -3,6 +3,10 @@
 #include "xrEngine/x_ray.h"
 #include "xrGame/xrGame.h"
 #include "Include/xrRender/xrRender.h"
+#include <cstdio>
+#if defined(XRAY_USE_METAL)
+#include "Layers/xrRender/Backend/MetalPresentation.h"
+#endif
 
 #if !defined(XR_PLATFORM_WINDOWS)
 #include <unistd.h>
@@ -21,31 +25,38 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
-std::array<RendererModule*, 2> s_render_modules =
+std::array<RendererModule*, 1> s_render_modules =
 {
-#ifdef XR_PLATFORM_WINDOWS
-    xray::render::render_r4::GetRendererModule(),
-#endif
-    xray::render::render_gl::GetRendererModule(),
+    xray::render::fg::GetFrameGraphRendererModule(),
 };
 
-struct tracy_raii
+struct profiler_raii
 {
-    ~tracy_raii()
-    {
-#ifdef TRACY_ENABLE
-        tracy::GetProfiler().RequestShutdown();
-        while (!tracy::GetProfiler().HasShutdownFinished())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-#endif
-    }
+    profiler_raii() { xray::profiler::Initialize(); }
+    ~profiler_raii() { xray::profiler::Shutdown(); }
 };
 
 int entry_point(pcstr commandLine)
 {
-    tracy_raii raii;
+    profiler_raii raii;
+    for (pcstr option = commandLine; (option = strstr(option, "-metal")) != nullptr; ++option)
+    {
+        if (option != commandLine && option[-1] != ' ' && option[-1] != '\t')
+            continue;
+        const bool presentation = strncmp(option, "-metal-presentation", 19) == 0
+            && (option[19] == '\0' || option[19] == ' ' || option[19] == '\t');
+        const bool game = option[6] == '\0' || option[6] == ' ' || option[6] == '\t';
+        if (presentation || game)
+        {
+#if defined(XRAY_USE_METAL)
+            if (presentation)
+                return RunMetalPresentation(commandLine);
+#else
+            std::fprintf(stderr, "Native Metal requires an Apple build with NVRHI_WITH_METAL3=ON. Vulkan remains the default.\n");
+            return 1;
+#endif
+        }
+    }
     auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
     CApplication app{ commandLine, game, s_render_modules };

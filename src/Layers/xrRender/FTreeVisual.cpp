@@ -5,9 +5,10 @@
 #include "xrEngine/Environment.h"
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
+#include "Layers/xrRender/r__buffer_pool.h"
 #include "Common/OGF_GContainer_Vertices.hpp"
 
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 shared_str m_xform;
 shared_str m_xform_v;
@@ -21,6 +22,8 @@ shared_str c_c_sun;
 FTreeVisual::FTreeVisual(void) {}
 FTreeVisual::~FTreeVisual(void) {}
 void FTreeVisual::Release() { dxRender_Visual::Release(); }
+float FTreeVisual::GetHemiScale() const { return c_scale.hemi; }
+float FTreeVisual::GetHemiBias() const { return c_bias.hemi; }
 void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 {
     dxRender_Visual::Load(N, data, dwFlags);
@@ -31,25 +34,30 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
     R_ASSERT(data->find_chunk(OGF_GCONTAINER));
     {
         // verts
-        u32 ID = data->r_u32();
+        u32 vbID = data->r_u32();
         vBase = data->r_u32();
         vCount = data->r_u32();
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = BufferPool.getVB_Format(vbID);
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = BufferPool.getVB(vbID);
         p_rm_Vertices->AddRef();
+
+        vbPoolID = vbID;
 
         // indices
         dwPrimitives = 0;
-        ID = data->r_u32();
+        u32 ibID = data->r_u32();
         iBase = data->r_u32();
         iCount = data->r_u32();
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = BufferPool.getIB(ibID);
         p_rm_Indices->AddRef();
+
+        ibPoolID = ibID;
+        useAlternativeGeom = false;
     }
 
     // load tree-def
@@ -134,35 +142,6 @@ struct FTreeVisual_setup
     }
 };
 
-void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
-{
-    static FTreeVisual_setup tvs;
-    if (tvs.dwFrame != Device.dwFrame)
-        tvs.calculate();
-// setup constants
-#if RENDER != R_R1
-    Fmatrix xform_v;
-    xform_v.mul_43(cmd_list.get_xform_view(), xform);
-    cmd_list.tree.set_m_xform_v(xform_v); // matrix
-#endif
-    float s = ps_r__Tree_SBC;
-    cmd_list.tree.set_m_xform(xform); // matrix
-    cmd_list.tree.set_consts(tvs.scale, tvs.scale, 0, 0); // consts/scale
-    cmd_list.tree.set_wave(tvs.wave); // wave
-    cmd_list.tree.set_wind(tvs.wind); // wind
-#if RENDER != R_R1
-    s *= 1.3333f;
-    cmd_list.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
-    cmd_list.tree.set_c_bias(s * c_bias.rgb.x, s * c_bias.rgb.y, s * c_bias.rgb.z, s * c_bias.hemi); // bias
-#else
-    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
-    cmd_list.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
-    cmd_list.tree.set_c_bias(s * c_bias.rgb.x + desc.ambient.x, s * c_bias.rgb.y + desc.ambient.y,
-        s * c_bias.rgb.z + desc.ambient.z, s * c_bias.hemi); // bias
-#endif
-    cmd_list.tree.set_c_sun(s * c_scale.sun, s * c_bias.sun, 0, 0); // sun
-}
-
 #define PCOPY(a) a = pFrom->a
 void FTreeVisual::Copy(dxRender_Visual* pSrc)
 {
@@ -196,13 +175,6 @@ FTreeVisual_ST::FTreeVisual_ST(void) {}
 FTreeVisual_ST::~FTreeVisual_ST(void) {}
 void FTreeVisual_ST::Release() { inherited::Release(); }
 void FTreeVisual_ST::Load(const char* N, IReader* data, u32 dwFlags) { inherited::Load(N, data, dwFlags); }
-void FTreeVisual_ST::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
-{
-    inherited::Render(cmd_list, LOD, use_fast_geo);
-    cmd_list.set_Geometry(rm_geom);
-    cmd_list.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
-    cmd_list.stat.r.s_flora.add(vCount);
-}
 void FTreeVisual_ST::Copy(dxRender_Visual* pSrc) { inherited::Copy(pSrc); }
 //-----------------------------------------------------------------------------------
 // Progressive Tree
@@ -220,23 +192,8 @@ void FTreeVisual_PM::Load(const char* N, IReader* data, u32 dwFlags)
     R_ASSERT(data->find_chunk(OGF_SWICONTAINER));
     {
         u32 ID = data->r_u32();
-        pSWI = RImplementation.getSWI(ID);
+        pSWI = BufferPool.getSWI(ID);
     }
-}
-void FTreeVisual_PM::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
-{
-    inherited::Render(cmd_list, LOD, use_fast_geo);
-    int lod_id = last_lod;
-    if (LOD >= 0.f)
-    {
-        lod_id = iFloor((1.f - LOD) * float(pSWI->count - 1) + 0.5f);
-        last_lod = lod_id;
-    }
-    VERIFY(lod_id >= 0 && lod_id < int(pSWI->count));
-    FSlideWindow& SW = pSWI->sw[lod_id];
-    cmd_list.set_Geometry(rm_geom);
-    cmd_list.Render(D3DPT_TRIANGLELIST, vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris);
-    cmd_list.stat.r.s_flora.add(SW.num_verts);
 }
 void FTreeVisual_PM::Copy(dxRender_Visual* pSrc)
 {
@@ -244,4 +201,4 @@ void FTreeVisual_PM::Copy(dxRender_Visual* pSrc)
     FTreeVisual_PM* pFrom = dynamic_cast<FTreeVisual_PM*>(pSrc);
     PCOPY(pSWI);
 }
-} // namespace xray::render::RENDER_NAMESPACE
+}

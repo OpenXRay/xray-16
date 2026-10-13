@@ -213,6 +213,7 @@ public:
     void MGunUpdateFire();
     virtual void OnShot();
 
+    void UpdateMGunFirePose();
     void UpdateMGunDir();
     void UpdateWeapons();
 
@@ -309,6 +310,7 @@ public:
     virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void UpdateCL();
+    void PostUpdateCL(bool bUpdateCL_disabled) override;
     virtual void shedule_Update(u32 time_delta);
     void MoveStep();
 
@@ -319,6 +321,7 @@ public:
     virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir) { ; }
     virtual const Fmatrix& get_ParticlesXFORM();
     virtual const Fvector& get_CurrentFirePoint();
+    virtual const Fvector& get_CurrentFireDirection();
 
     virtual CGameObject* cast_game_object() { return this; }
     virtual CExplosive* cast_explosive() { return this; }

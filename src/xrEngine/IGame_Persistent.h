@@ -12,6 +12,7 @@
 #include "xrCDB/ISpatial.h"
 
 #include "pure.h"
+#include "FramePacer.h"
 #ifndef _EDITOR
 #include "Environment.h"
 #include "EngineAPI.h"
@@ -96,6 +97,7 @@ private:
     int load_stage{};
     int max_load_stage{};
     CTimer phase_timer;
+    mutable FramePacer m_loadingFramePacer;
 
     bool loaded{};
 
@@ -150,6 +152,9 @@ public:
     virtual bool OnRenderPPUI_query() { return false; }; // should return true if we want to have second function called
     virtual void OnRenderPPUI_main(){};
     virtual void OnRenderPPUI_PP(){};
+    virtual void OnRenderInGameUI(){};
+    virtual void OnRenderCursor(){};
+    virtual void OnRenderSequencers(){};
 
     void OnEvent(EVENT E, u64 P1, u64 P2) override;
 
@@ -181,6 +186,7 @@ public:
 
     void load_draw_internal() const;
     void ShowLoadingScreen(bool show) const;
+    bool IsLoadingScreenShown() const;
 
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);

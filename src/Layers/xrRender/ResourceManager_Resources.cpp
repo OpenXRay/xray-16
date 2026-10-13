@@ -1,8 +1,6 @@
 #include "stdafx.h"
 
-#include <FlexibleVertexFormat.h>
-
-namespace xray::render::RENDER_NAMESPACE
+namespace xray::render::fg
 {
 void fix_texture_name(pstr fn);
 
@@ -29,40 +27,26 @@ void simplify_texture(string_path& fn)
     }
 }
 
-SState* CResourceManager::_CreateState(SimulatorStates& state_code)
+void CResourceManager::_DeleteVS(const SVS*) {}
+void CResourceManager::_DeletePS(const SPS*) {}
+void CResourceManager::_DeleteGS(const SGS*) {}
+void CResourceManager::_DeleteHS(const SHS*) {}
+void CResourceManager::_DeleteDS(const SDS*) {}
+void CResourceManager::_DeleteCS(const SCS*) {}
+
+SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
 {
-    // Search equal state-code
-    for (SState* C : v_states)
+    for (SDeclaration* D : v_declarations)
     {
-        SimulatorStates& base = C->state_code;
-        if (base.equal(state_code))
-            return C;
+        if (dcl_equal(dcl, &D->dcl_code.front()))
+            return D;
     }
 
-    // Create New
-    SState* S = v_states.emplace_back(xr_new<SState>());
-    state_code.record(S->state); // S->state will be assigned here
-    S->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    S->state_code = state_code;
-    return S;
-}
-
-void CResourceManager::_DeleteState(const SState* state)
-{
-    if (0 == (state->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_states, state))
-        return;
-    Msg("! ERROR: Failed to find compiled stateblock");
-}
-
-void CResourceManager::_DeletePass(const SPass* P)
-{
-    if (0 == (P->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_passes, P))
-        return;
-    Msg("! ERROR: Failed to find compiled pass");
+    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
+    u32 dcl_size = GetDeclLength(dcl) + 1;
+    D->dcl_code.assign(dcl, dcl + dcl_size);
+    D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    return D;
 }
 
 void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
@@ -72,64 +56,6 @@ void CResourceManager::_DeleteDecl(const SDeclaration* dcl)
     if (reclaim(v_declarations, dcl))
         return;
     Msg("! ERROR: Failed to find compiled vertex-declarator");
-}
-
-R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
-{
-    if (C.empty())
-        return nullptr;
-
-    for (R_constant_table* table : v_constant_tables)
-        if (table->equal(C))
-            return table;
-
-    R_constant_table* table = v_constant_tables.emplace_back(xr_new<R_constant_table>(C));
-    table->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return table;
-}
-
-void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
-{
-    if (0 == (C->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(v_constant_tables, C))
-        return;
-    Msg("! ERROR: Failed to find compiled constant-table");
-}
-
-CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
-{
-    R_ASSERT(Name && Name[0] && w && h);
-
-    // ***** first pass - search already created RT
-    pstr N = pstr(Name);
-    map_RT::iterator I = m_rtargets.find(N);
-    if (I != m_rtargets.end())
-        return I->second;
-    else
-    {
-        CRT* RT = xr_new<CRT>();
-        RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets.emplace(RT->set_name(Name), RT);
-        if (Device.b_is_Ready)
-            RT->create(Name, w, h, f, sampleCount, slices_num, flags);
-        return RT;
-    }
-}
-
-void CResourceManager::_DeleteRT(const CRT* RT)
-{
-    if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    pstr N = pstr(RT->cName.c_str());
-    map_RT::iterator I = m_rtargets.find(N);
-    if (I != m_rtargets.end())
-    {
-        m_rtargets.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find render-target '%s'", RT->cName.c_str());
 }
 
 //	DX10 cut
@@ -193,10 +119,29 @@ SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferH
     return Geom;
 }
 
+SGeometry* CResourceManager::CreateLogicalGeom(const VertexElement* decl)
+{
+    R_ASSERT(decl);
+    SDeclaration* declaration = _CreateDecl(decl);
+    const u32 stride = GetDeclVertexSize(decl, 0);
+    R_ASSERT(stride != 0);
+    for (SGeometry* geometry : v_geoms)
+    {
+        if (geometry->dcl == declaration && !geometry->vb && !geometry->ib
+            && geometry->vb_stride == stride)
+            return geometry;
+    }
+    SGeometry* geometry = v_geoms.emplace_back(xr_new<SGeometry>());
+    geometry->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    geometry->dcl = declaration;
+    geometry->vb_stride = stride;
+    return geometry;
+}
+
 SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     thread_local xr_vector<VertexElement> decl;
-    [[maybe_unused]] const bool result = ::FVF::CreateDeclFromFVF(FVF, decl);
+    [[maybe_unused]] const bool result = CreateDeclFromFVF(FVF, decl);
     VERIFY(result);
     SGeometry* g = CreateGeom(decl.data(), vb, ib);
     return g;
@@ -209,6 +154,19 @@ void CResourceManager::DeleteGeom(const SGeometry* Geom)
     if (reclaim(v_geoms, Geom))
         return;
     Msg("! ERROR: Failed to find compiled geometry-declaration");
+}
+
+void CResourceManager::DiscardGeometryBuffer(nvrhi::IBuffer* buffer)
+{
+    if (!buffer)
+        return;
+    for (SGeometry* geometry : v_geoms)
+    {
+        if (geometry->vb.Get() == buffer)
+            geometry->vb = nullptr;
+        if (geometry->ib.Get() == buffer)
+            geometry->ib = nullptr;
+    }
 }
 
 void CResourceManager::DBG_VerifyGeoms()
@@ -288,182 +246,4 @@ void CResourceManager::DBG_VerifyTextures()
 }
 #endif
 
-CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
-{
-    R_ASSERT(Name && Name[0]);
-    if (0 == xr_stricmp(Name, "$null"))
-        return nullptr;
-
-    pstr N = pstr(Name);
-    map_Matrix::iterator I = m_matrices.find(N);
-    if (I != m_matrices.end())
-        return I->second;
-    else
-    {
-        CMatrix* M = xr_new<CMatrix>();
-        M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        M->ref_count = 1;
-        m_matrices.emplace(M->set_name(Name), M);
-        return M;
-    }
 }
-
-void CResourceManager::_DeleteMatrix(const CMatrix* M)
-{
-    if (0 == (M->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    pstr N = pstr(M->cName.c_str());
-    map_Matrix::iterator I = m_matrices.find(N);
-    if (I != m_matrices.end())
-    {
-        m_matrices.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find xform-def '%s'", M->cName.c_str());
-}
-
-void CResourceManager::ED_UpdateMatrix(LPCSTR Name, CMatrix* data)
-{
-    CMatrix* M = _CreateMatrix(Name);
-    *M = *data;
-}
-
-CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
-{
-    R_ASSERT(Name && Name[0]);
-    if (0 == xr_stricmp(Name, "$null"))
-        return nullptr;
-
-    pstr N = pstr(Name);
-    map_Constant::iterator I = m_constants.find(N);
-    if (I != m_constants.end())
-        return I->second;
-    else
-    {
-        CConstant* C = xr_new<CConstant>();
-        C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        C->ref_count = 1;
-        m_constants.emplace(C->set_name(Name), C);
-        return C;
-    }
-}
-void CResourceManager::_DeleteConstant(const CConstant* C)
-{
-    if (0 == (C->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    pstr N = pstr(C->cName.c_str());
-    map_Constant::iterator I = m_constants.find(N);
-    if (I != m_constants.end())
-    {
-        m_constants.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find R1-constant-def '%s'", C->cName.c_str());
-}
-
-void CResourceManager::ED_UpdateConstant(LPCSTR Name, CConstant* data)
-{
-    CConstant* C = _CreateConstant(Name);
-    *C = *data;
-}
-
-bool cmp_tl(const std::pair<u32, ref_texture>& _1, const std::pair<u32, ref_texture>& _2)
-{
-    return _1.first < _2.first;
-}
-
-STextureList* CResourceManager::_CreateTextureList(STextureList& L)
-{
-    std::sort(L.begin(), L.end(), cmp_tl);
-    for (STextureList* base : lst_textures)
-    {
-        if (L.equal(*base))
-            return base;
-    }
-
-    STextureList* lst = lst_textures.emplace_back(xr_new<STextureList>(L));
-    lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return lst;
-}
-
-void CResourceManager::_DeleteTextureList(const STextureList* L)
-{
-    if (0 == (L->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(lst_textures, L))
-        return;
-    Msg("! ERROR: Failed to find compiled list of textures");
-}
-
-SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
-{
-    BOOL bEmpty = TRUE;
-    for (const ref_matrix& matrix : L)
-    {
-        if (matrix)
-        {
-            bEmpty = FALSE;
-            break;
-        }
-    }
-
-    if (bEmpty)
-        return nullptr;
-
-    for (SMatrixList* base : lst_matrices)
-    {
-        if (L.equal(*base))
-            return base;
-    }
-
-    SMatrixList* lst = lst_matrices.emplace_back(xr_new<SMatrixList>(L));
-    lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return lst;
-}
-void CResourceManager::_DeleteMatrixList(const SMatrixList* L)
-{
-    if (0 == (L->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(lst_matrices, L))
-        return;
-    Msg("! ERROR: Failed to find compiled list of xform-defs");
-}
-
-SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
-{
-    BOOL bEmpty = TRUE;
-    for (const ref_constant_obsolette& constant : L)
-    {
-        if (constant)
-        {
-            bEmpty = FALSE;
-            break;
-        }
-    }
-
-    if (bEmpty)
-        return nullptr;
-
-    for (SConstantList* base : lst_constants)
-    {
-        if (L.equal(*base))
-            return base;
-    }
-
-    SConstantList* lst = lst_constants.emplace_back(xr_new<SConstantList>(L));
-    lst->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return lst;
-}
-void CResourceManager::_DeleteConstantList(const SConstantList* L)
-{
-    if (0 == (L->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    if (reclaim(lst_constants, L))
-        return;
-    Msg("! ERROR: Failed to find compiled list of r1-constant-defs");
-}
-
-} // namespace xray::render::RENDER_NAMESPACE

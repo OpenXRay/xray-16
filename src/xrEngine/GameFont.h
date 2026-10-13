@@ -7,24 +7,16 @@
 #include "xrCore/xrstring.h"
 #endif
 
-namespace xray::render
+namespace xray::render::fg
 {
-namespace render_r4
-{
-class dxFontRender;
+class FGFontRender;
 }
-namespace render_gl
-{
-class dxFontRender;
-}
-} // namespace xray::render
 
 class IFontRender;
 
 class ENGINE_API CGameFont final : public IGameFont
 {
-    friend class xray::render::render_r4::dxFontRender;
-    friend class xray::render::render_gl::dxFontRender;
+    friend class xray::render::fg::FGFontRender;
 
 private:
     struct String
@@ -36,7 +28,7 @@ private:
         EAligment align;
     };
 
-protected:
+public:
     Fvector2 vHalfPixel;
     Ivector2 vTS;
     EAligment eCurrentAlignment;
@@ -54,7 +46,6 @@ protected:
     Fvector* TCMap{};
     IFontRender* pFontRender;
 
-protected:
     const Fvector& GetCharTC(u16 c) const { return TCMap[c]; }
 
 public:

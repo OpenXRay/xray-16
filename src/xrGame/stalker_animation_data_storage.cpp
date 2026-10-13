@@ -32,7 +32,7 @@ public:
             return (false);
 
         for (u16 i = 0, n = m_object->LL_MotionsSlotCount(); i < n; ++i)
-            if (!(m_object->LL_MotionsSlot(i) == object.first->LL_MotionsSlot(i)))
+            if (&m_object->LL_MotionsSlot(i) != &object.first->LL_MotionsSlot(i))
                 return (false);
 
         return (true);
