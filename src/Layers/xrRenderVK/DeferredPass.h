@@ -160,7 +160,8 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0, const char* vertex_name = nullptr,
         const char* fragment_name = nullptr, const char** failure = nullptr,
-        float alpha_ref = 0.f, const float* normal_rows = nullptr) const;
+        float alpha_ref = 0.f, const float* normal_rows = nullptr,
+        float detail_scale = 1.f) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr) const;

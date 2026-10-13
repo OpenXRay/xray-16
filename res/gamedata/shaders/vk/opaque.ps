@@ -85,6 +85,10 @@ cbuffer ForwardLighting
 float4 main(Fragment fragment) : SV_Target0
 {
     float4 texel = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_DETAIL)
+    texel.rgb *= 2.0 * single_detail.Sample(diffuse_sampler,
+        fragment.uv * terrain_scale).rgb;
+#endif
 #if defined(VK_UNLIT)
 #if defined(VK_WALLMARK_MULT)
     // The legacy wallmark blender uses stub_default_ma: vertex alpha
@@ -133,6 +137,9 @@ float4 main(Fragment fragment) : SV_Target0
 #if defined(VK_LIGHTMAP)
     illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
 #endif
+#endif
+#if defined(VK_LIGHTMAP) && defined(VK_DETAIL)
+    illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
 #endif
     float3 lit = texel.rgb * illumination;
 #if defined(VK_FOG)

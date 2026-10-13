@@ -42,6 +42,12 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
+        if (definition.class_name == "MODELEbB" && mesh.geometry.mode != SurfaceMode::Transparent)
+        {
+            error = "OGF shader='" + mesh.geometry.shader + "' class='MODELEbB' "
+                "opaque environment pass has no Vulkan model pipeline";
+            return false;
+        }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         mesh.environment = definition.class_name == "MODELEbB" &&
             mesh.geometry.mode == SurfaceMode::Transparent;

@@ -113,6 +113,12 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
     add_test(NAME vulkan_deferred_pass COMMAND vulkan_deferred_pass_test)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if (Python3_Interpreter_FOUND)
+        add_test(NAME vulkan_detail_spirv COMMAND "${Python3_EXECUTABLE}"
+            "${XRAY_SOURCE_DIR}/tests/vulkan_detail_spirv.py"
+            "${XRAY_SOURCE_DIR}/res/gamedata/shaders")
+    endif()
 
     add_executable(vulkan_scene_pass_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_scene_pass.cpp"

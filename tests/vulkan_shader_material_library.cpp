@@ -195,6 +195,8 @@ int main()
     environment_plain.insert(environment_plain.end(), env_scope, env_scope + sizeof(env_scope));
     texture_property(environment_plain, "Name", "mod\\glow_plain");
     chunk(list, 63, environment_plain);
+    chunk(list, 64, record("V_AREF  ", "mod\\vertex_cutout_detail", false, 72));
+    chunk(list, 65, record("V_AREF  ", "mod\\vertex_transparent_detail", true, 40));
     Bytes file;
     Bytes constants;
     constants.insert(constants.end(), {'p', 'u', 'l', 's', 'e', 0});
@@ -210,7 +212,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 29);
+    assert(library.load(reader, error) && library.size() == 31);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -227,6 +229,11 @@ int main()
     assert(library.resolve("models\\fur", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("models\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
+    int vertex_alpha_ref = -1;
+    assert(library.resolve("mod\\vertex_cutout_detail", mode, error, &vertex_alpha_ref) &&
+        mode == SurfaceMode::AlphaTest && vertex_alpha_ref == 72);
+    assert(library.resolve("mod\\vertex_transparent_detail", mode, error) &&
+        mode == SurfaceMode::Transparent);
     assert(!library.resolve("unknown", mode, error) && error.find("unknown") != std::string::npos);
     assert(!library.resolve("mod\\unrecognized", mode, error) &&
         error.find("shaders.xr blender id=5") != std::string::npos &&

@@ -39,10 +39,10 @@ shader and property path. Synthetic records test these rejection boundaries.
 
 | Blender family | Game path and texture roles | Game pass and limitations |
 | --- | --- | --- |
-| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Opaque LM/V and cutout LM_AREF can use `.thm` diffuse detail and its scale. | G-buffer opaque/cutout. Bump detail and transparent detail still require separate forward/normal variants; reject their requests. |
+| `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal remains unsupported and fails with the `.thm` resource. |
 | `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
 | `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. Normal/bump/gloss terrain stages are not represented by this path and need further work. |
-| `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; model forward only when blender selects blending. Named environment matrix rejected. |
+| `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; model forward only when blender selects blending. Opaque `MODELEbB` is rejected because its G-buffer reflection variant is absent. Named environment matrix rejected. |
 | `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |
 | `PARTICLE` | Base, clamp/wrap sampler by property. | Modes 0–5: set, alpha, add, multiply, multiply-2x, alpha-add. Mode 0 uses original fixed alpha reference 200. |
 | `S_SET` | Base, clamp/wrap sampler by property. | UI modes 0–9. World depth attachment requires compatible Z-test/write and flags; unsupported combinations report the precise property/mode. |
@@ -52,8 +52,23 @@ sets retain their image views until idle retirement; both wrap and clamp
 descriptors are rebound after texture reload. An absent optional `.thm` keeps
 scale 1 and no implicit detail. A present malformed detail chunk fails with
 its VFS path. An explicit detail name is not replaced by the base texture.
+Base, lightmap, mask and detail slots require 2D DDS; the environment slot
+requires a cube for `LmEbB`/`MODELEbB` and 2D for `LaEmB`. Errors name the
+role, slot number and offending resource.
 
 ## Geometry claims (SoC, CS, CoP)
+
+| Profile selected by game | Header | Level geometry | OGF and shader dependency |
+| --- | --- | --- | --- |
+| SoC | v14, quality 0–2 | 16-bit indices; float3/packed normal and float2/packed UV; optional UV1/color/tangent/binormal | Level static/progressive/tree/LOD; OGF v4; shader entry must resolve by class and properties |
+| CS | v14, quality 0–2 | Same bounded decoder; optional geomX progressive fast geometry | Same OGF decoder; fast geometry may fall back to valid `level.geom` with a reason |
+| CoP | v14, quality 0–2 | Same bounded decoder, including atlas UV1 | Same OGF decoder and material checks; unsupported type/layout names its visual and profile |
+
+Standalone OGF models use embedded static/skinned vertices (1–4 bone links),
+progressive windows and child hierarchies. The renderer does not infer a game
+profile from the geometry. These rows describe the exact implemented decoder
+contract and synthetic coverage, not validation against every real archive
+and blender combination.
 
 The game chooses the profile. The common supported header is level version 14
 with quality 0–2. Level vertex declarations require float3 position,
@@ -71,7 +86,7 @@ correctly; no real SoC/CS/CoP game archives are part of the host fixtures.
 ## Verification boundary
 
 Host tests cover serialized properties, sparse blender IDs, naming invariance,
-negative cases, level layouts, sliding windows, shader assets and selected
+negative cases, level layouts, sliding windows, shader assets, forward detail scale and selected
 pipeline states. The forward transparent queue now interleaves individual
 detail placements with models and particles by camera distance, uploading one
 buffer per frame slot. Blending of intersecting triangles, lighting, full

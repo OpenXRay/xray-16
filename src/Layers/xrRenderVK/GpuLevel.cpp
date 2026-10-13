@@ -225,16 +225,15 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 " shader='" + material.shader + "' class='LaEmB' requires opaque two-pass rendering";
             return false;
         }
-        const std::string lightmap = mode == SurfaceMode::Transparent &&
-            definition.class_name != "LmEbB   " ? std::string{} :
-            lightmap_texture(material.textures, definition);
+        std::string lightmap = lightmap_texture(material.textures, definition);
         const size_t comma = material.textures.find(',');
         const std::string diffuse = material.textures.substr(0, comma);
         std::string detail_texture = definition.detail_texture;
         GameTextureFactory::DetailMetadata metadata;
         const bool implicit_detail = definition.class_name == "LM      " ||
             definition.class_name == "LM_AREF " ||
-            definition.class_name == "V       ";
+            definition.class_name == "V       " ||
+            definition.class_name == "V_AREF  ";
         if ((implicit_detail || terrain.enabled || !detail_texture.empty()) &&
             !textures.texture_detail_metadata(diffuse, metadata, error))
         {
@@ -243,6 +242,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         if (implicit_detail && metadata.diffuse) detail_texture = metadata.texture;
+        if (mode == SurfaceMode::Transparent && detail_texture.empty() &&
+            definition.class_name != "LmEbB   ") lightmap.clear();
         if ((implicit_detail || terrain.enabled || !detail_texture.empty()) && metadata.normal)
         {
             error = "level material id=" + std::to_string(model.material) +
@@ -257,13 +258,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 " shader='" + material.shader + "' requires lightmap texture slot 1: " + material.textures;
             return false;
         }
-        if (!detail_texture.empty() && mode == SurfaceMode::Transparent)
-        {
-            error = "level material id=" + std::to_string(model.material) +
-                " shader='" + material.shader + "': transparent single detail forward pass is not implemented";
-            return false;
-        }
-        if (!detail_texture.empty() && mode == SurfaceMode::AlphaTest && lightmap.empty())
+        if (!detail_texture.empty() && mode == SurfaceMode::AlphaTest && lightmap.empty() &&
+            definition.class_name != "V_AREF  ")
         {
             error = "level material id=" + std::to_string(model.material) +
                 " shader='" + material.shader + "': cutout detail requires lightmap texture slot 1";
@@ -282,6 +278,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.environment_constant = definition.has_environment_constant;
         mesh.constant_waveforms = definition.constant_waveforms;
         const char *family = mode == SurfaceMode::Transparent ?
+                !detail_texture.empty() ? "level_detail_blended" :
                 mesh.environment ? "level_environment_blended" : "object_blended" :
             terrain.enabled ? "level_terrain" :
             !detail_texture.empty() ? mode == SurfaceMode::AlphaTest ? "level_detail_cutout" :
@@ -301,7 +298,11 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const std::string vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ?
             "vk\\level_opaque.vs" : shader + ".vs";
         const std::string fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : shader + ".ps";
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" :
+            mode == SurfaceMode::Transparent && !detail_texture.empty() && lightmap.empty() ?
+                "vk\\level_detail_unlit_blended.ps" :
+            mode == SurfaceMode::AlphaTest && !detail_texture.empty() && lightmap.empty() ?
+                "vk\\level_detail_unlit_cutout.ps" : shader + ".ps";
         if (!pass.request_game_pipeline(vertex, fragment, mode, false, false, error) ||
             (mesh.laemb && !pass.request_game_pipeline("vk\\level_laemb_base.vs",
                 "vk\\level_laemb_multiply.ps", mode, false, false, error)))
@@ -311,19 +312,29 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         if (mesh.terrain) mesh.terrain_scale = metadata.scale;
         if (mesh.single_detail) mesh.terrain_scale = metadata.scale;
-        if (!(mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
+        const bool material_ready = mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
                 mesh.single_detail ? textures.detail_material(diffuse, lightmap.empty() ? diffuse : lightmap, detail_texture,
                     pass, mesh.material, error) :
                 mesh.environment ? textures.environment_material(diffuse, lightmap,
                     definition.environment_texture, !mesh.laemb, pass, mesh.material, error) :
                 lightmap.empty() ? textures.material(material.textures, pass, mesh.material, error,
                     definition.class_name == "S_SET   " && !(material_flags & 1u)) :
-                textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error)) ||
-            !upload_geometry(model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
+                textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error);
+        if (!material_ready)
+        {
+            error = "level material id=" + std::to_string(model.material) + " shader='" +
+                material.shader + "' textures='" + material.textures + "': " + error;
+            return false;
+        }
+        if (!upload_geometry(model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices) ||
             !upload_geometry(model.indices.data(), model.indices.size() * sizeof(uint32_t),
                 VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices))
+        {
+            error = "level material id=" + std::to_string(model.material) +
+                " geometry upload: " + error;
             return false;
+        }
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
         mesh.windows = model.windows;
         mesh.mode = mode;
@@ -903,11 +914,11 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent) return true;
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_detail_blended.vs" : mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::Transparent ? mesh.lightmapped ? "vk\\level_detail_blended.ps" : "vk\\level_detail_unlit_blended.ps" : mesh.mode == SurfaceMode::AlphaTest ? mesh.lightmapped ? "vk\\level_detail_cutout.ps" : "vk\\level_detail_unlit_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         std::string shader_error;
@@ -937,7 +948,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const bool recorded = mesh.water && transparent ? pass.record_water(frame, mesh.vertices.handle(), mesh.indices.handle(),
             mesh.index_count, mvp, mesh.material, 0, Device.fTimeGlobal, mesh.glass ? -.35f : .72f) :
             transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
-            mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr, &failure) :
+            mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr,
+                &failure, 0.f, nullptr, mesh.terrain_scale) :
             pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material, mesh.mode, 0,
                 named ? vertex : nullptr, named ? fragment : nullptr,
@@ -961,13 +973,13 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+        const char* vertex = mesh.wallmark_multiply || mesh.glow_alpha_add || mesh.fog ? "vk\\level_opaque.vs" : mesh.terrain ? "vk\\level_terrain.vs" : mesh.single_detail ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_detail_blended.vs" : mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.vs" : mesh.lightmapped ? "vk\\level_detail.vs" : "vk\\level_detail_unlit.vs" : mesh.laemb ? "vk\\level_laemb_base.vs" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.vs" : "vk\\level_environment.vs" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.vs" : "vk\\level_lightmap.vs" : transparent ? "vk\\object_blended.vs" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.vs" :
             (&mesh != &base) ? "vk\\progressive_opaque.vs" :
             (visual.type == 7 || visual.type == 11) ? "vk\\tree_opaque.vs" : "vk\\level_opaque.vs";
         const char* fragment = mesh.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
-            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_detail_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
+            mesh.glow_alpha_add ? "vk\\glow_alpha_add.ps" : mesh.fog ? "vk\\level_fog.ps" : mesh.terrain ? "vk\\level_terrain.ps" : mesh.single_detail ? mesh.mode == SurfaceMode::Transparent ? mesh.lightmapped ? "vk\\level_detail_blended.ps" : "vk\\level_detail_unlit_blended.ps" : mesh.mode == SurfaceMode::AlphaTest ? mesh.lightmapped ? "vk\\level_detail_cutout.ps" : "vk\\level_detail_unlit_cutout.ps" : mesh.lightmapped ? "vk\\level_detail.ps" : "vk\\level_detail_unlit.ps" : mesh.laemb ? "vk\\level_laemb_base.ps" : mesh.environment ? mesh.mode == SurfaceMode::Transparent ? "vk\\level_environment_blended.ps" : "vk\\level_environment.ps" : mesh.lightmapped ? mesh.mode == SurfaceMode::AlphaTest ?
             "vk\\level_lightmap_cutout.ps" : "vk\\level_lightmap.ps" : transparent ? "vk\\object_blended.ps" :
             mesh.mode == SurfaceMode::AlphaTest ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps";
         if (selected)
@@ -1002,7 +1014,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                     mesh.glass ? -.35f : .72f) :
                 pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, window.offset,
-                    named ? vertex : nullptr, named ? fragment : nullptr, &failure) :
+                    named ? vertex : nullptr, named ? fragment : nullptr,
+                    &failure, 0.f, nullptr, mesh.terrain_scale) :
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, mesh.mode, window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,

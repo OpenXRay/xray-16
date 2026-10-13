@@ -983,6 +983,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     if (fragment_name && (std::strstr(fragment_name, "level_terrain.ps") ||
             std::strstr(fragment_name, "level_detail.ps") ||
             std::strstr(fragment_name, "level_detail_cutout.ps") ||
+            std::strstr(fragment_name, "level_detail_unlit_cutout.ps") ||
             std::strstr(fragment_name, "level_detail_unlit.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
@@ -1029,7 +1030,7 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
 bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    const char** failure, float alpha_ref, const float* normal_rows) const
+    const char** failure, float alpha_ref, const float* normal_rows, float detail_scale) const
 {
     const auto reject = [failure](const char* reason)
     {
@@ -1073,6 +1074,10 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         std::strstr(fragment_name, "_set.ps"))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
+    if (fragment_name && (std::strstr(fragment_name, "level_detail_blended.ps") ||
+            std::strstr(fragment_name, "level_detail_unlit_blended.ps")))
+        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            sizeof(mvp) + sizeof(alpha_ref), sizeof(detail_scale), &detail_scale);
     if (vertex_name || fragment_name)
     {
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,

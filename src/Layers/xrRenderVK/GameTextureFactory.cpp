@@ -156,6 +156,11 @@ bool GameTextureFactory::material(const std::string& texture_list, DeferredPass&
     if (first != std::string::npos) diffuse.erase(0, first);
     Asset* asset;
     if (!load(diffuse, asset, error)) return false;
+    if (asset->cube)
+    {
+        error = "base texture slot 0 requires 2D DDS: " + diffuse;
+        return false;
+    }
     VkDescriptorSet& set = clamp ? asset->clamp_material_set : asset->material_set;
     if (!set && !pass.material(asset->texture.view, clamp ? ui_sampler_ : sampler_, set, error))
     {
@@ -188,6 +193,12 @@ bool GameTextureFactory::lightmapped_material(const std::string& diffuse_name,
     Asset* lightmap = nullptr;
     if (!load(trim(diffuse_name), diffuse, error) || !load(trim(lightmap_name), lightmap, error))
         return false;
+    if (diffuse->cube || lightmap->cube)
+    {
+        error = std::string("lightmapped texture slot ") + (diffuse->cube ? "0 (base): " + diffuse_name :
+            "1 (lightmap): " + lightmap_name) + " requires 2D DDS";
+        return false;
+    }
     const auto diffuse_it = std::find_if(assets_.begin(), assets_.end(),
         [diffuse](const auto& entry) { return &entry.second == diffuse; });
     const auto lightmap_it = std::find_if(assets_.begin(), assets_.end(),
@@ -257,6 +268,13 @@ bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
     for (size_t i = 0; i < names.size(); ++i)
     {
         if (!load(names[i], item.assets[i], error)) return false;
+        if (item.assets[i]->cube)
+        {
+            constexpr const char* roles[]{"base", "lightmap", "mask", "R2-R", "R2-G", "R2-B", "R2-A"};
+            error = "terrain texture slot " + std::to_string(i) + " (" + roles[i] +
+                ") requires 2D DDS: " + names[i];
+            return false;
+        }
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
         R_ASSERT(it != assets_.end());
@@ -299,6 +317,13 @@ bool GameTextureFactory::detail_material(const std::string& diffuse_name,
     for (size_t i = 0; i < names.size(); ++i)
     {
         if (!load(names[i], item.assets[i], error)) return false;
+        if (item.assets[i]->cube)
+        {
+            error = "single detail texture slot " + std::to_string(i) +
+                (i == 0 ? " (base)" : i == 1 ? " (lightmap)" : " (detail)") +
+                " requires 2D DDS: " + names[i];
+            return false;
+        }
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
         R_ASSERT(it != assets_.end());
@@ -341,6 +366,12 @@ bool GameTextureFactory::environment_material(const std::string& diffuse_name,
     for (size_t i = 0; i < names.size(); ++i)
     {
         if (!load(names[i], item.assets[i], error)) return false;
+        if (i < 2 && item.assets[i]->cube)
+        {
+            error = "environment texture slot " + std::to_string(i) +
+                " requires 2D DDS: " + names[i];
+            return false;
+        }
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
         R_ASSERT(it != assets_.end());
