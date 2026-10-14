@@ -78,9 +78,9 @@ public:
         const uint8_t* extension, size_t extension_size,
         DetailMetadata& detail, std::string& error, const MetadataExtras& extras);
     bool ui(const std::string& texture_name, ScenePass& pass,
-        VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr);
+        VkDescriptorSet& result, std::string& error, VkExtent2D* extent = nullptr, bool clamp = true);
     bool ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
-        ScenePass& pass, VkDescriptorSet& result, std::string& error);
+        ScenePass& pass, VkDescriptorSet& result, std::string& error, bool clamp = true);
     // Weather textures are leased independently of material/UI descriptor sets.
     // Cubemaps retain their cube image view for sky sampling.
     bool environment(const std::string& name, VkImageView& view, std::string& error);
@@ -126,6 +126,7 @@ private:
         VkDescriptorSet material_set{};
         VkDescriptorSet clamp_material_set{};
         VkDescriptorSet ui_set{};
+        VkDescriptorSet wrap_ui_set{};
         VkExtent2D extent{};
         bool cube{};
         uint64_t bytes{};
@@ -133,6 +134,7 @@ private:
         size_t clamp_material_refs{};
         size_t lightmap_refs{};
         size_t ui_refs{};
+        size_t wrap_ui_refs{};
         size_t environment_refs{};
         DeferredPass* material_pass{};
         ScenePass* ui_pass{};

@@ -42,6 +42,7 @@ private:
     VkExtent2D extent_{};
     int blend_mode_{1};
     int alpha_ref_{};
+    bool clamp_{true};
     std::shared_ptr<VulkanVideoTexture> video_;
     struct SequenceFrame { VkDescriptorSet descriptor; VkExtent2D extent; };
     std::vector<SequenceFrame> sequence_;

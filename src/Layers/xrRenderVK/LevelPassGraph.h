@@ -108,12 +108,11 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.screen_blend == 5 ? LevelPassBlend::AlphaAdd : LevelPassBlend::Alpha;
         world.textures = BaseRole | (input.screen_blend == 5 ? EmissiveRole : 0);
         world.vertex = input.animated ? "vk\\skinned_" + std::to_string(input.skin_weights) + ".vs" :
-            std::string("vk\\level_opaque.vs");
-        const char* fragments[]{"world_set_set", "world_set_blended", "world_set_additive",
-            "world_set_multiply", "world_set_multiply_2x", "glow_alpha_add",
-            "wallmark_multiply_2x", "world_set_set_2r", "world_set_blend_2r",
-            "world_set_blend_4r"};
-        world.fragment = std::string("vk\\") + fragments[input.screen_blend] + ".ps";
+            std::string("vk\\object_blended.vs");
+        const char* fragments[]{"set", "blended", "additive", "multiply",
+            "multiply_2x", "alpha_add", "wallmark_multiply_2x", "set_2r",
+            "blend_2r", "blend_4r"};
+        world.fragment = std::string("vk\\model_set_") + fragments[input.screen_blend] + ".ps";
         graph.count = 1;
         error.clear();
         return true;

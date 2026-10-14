@@ -143,6 +143,24 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(color.blendEnable && color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
             color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
     }
+    else if (uintptr_t(info->pStages[1].module) >= 117 &&
+        uintptr_t(info->pStages[1].module) <= 126)
+    {
+        const unsigned mode = unsigned(uintptr_t(info->pStages[1].module) - 117);
+        const auto& color = info->pColorBlendState->pAttachments[0];
+        assert(info->renderPass == handle<VkRenderPass>(11) &&
+            info->pColorBlendState->attachmentCount == 1);
+        assert(info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable == (mode == 0));
+        assert(color.blendEnable == (mode != 0 && mode != 7));
+        if (mode == 2) assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_ONE &&
+            color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
+        if (mode == 3 || mode == 4 || mode == 6)
+            assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR &&
+                color.dstColorBlendFactor == (mode == 3 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR));
+        if (mode == 5) assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
+            color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
+    }
     else if (info->pStages[1].module == handle<VkShaderModule>(95) ||
         info->pStages[1].module == handle<VkShaderModule>(101))
     {
@@ -323,7 +341,8 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
     assert(count == 6 && instances == 1);
     assert(first_index == expected_first_index);
     constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119,
-        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133};
+        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
+        134, 135, 136, 137, 138, 139, 140, 141, 142, 143};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -780,14 +799,27 @@ int main()
         SurfaceMode::Transparent, false, error));
     assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, 0, "vk\\level_opaque.vs", "vk\\world_set_set.ps"));
-    assert(deferred.create_game_pipeline("vk\\skinned_2.vs", "vk\\world_set_blended.ps",
+    assert(deferred.create_game_pipeline("vk\\skinned_2.vs", "vk\\model_set_blended.ps",
         handle<VkShaderModule>(115), handle<VkShaderModule>(116),
         SurfaceMode::Transparent, false, error, true));
     world_alpha_push = false;
     assert(deferred.record_skinned(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, pose, SurfaceMode::Transparent, false, 0,
-        "vk\\skinned_2.vs", "vk\\world_set_blended.ps", .25f));
+        "vk\\skinned_2.vs", "vk\\model_set_blended.ps", .25f));
     assert(world_alpha_push);
+    const char* model_fragments[]{"set", "blended", "additive", "multiply",
+        "multiply_2x", "alpha_add", "wallmark_multiply_2x", "set_2r",
+        "blend_2r", "blend_4r"};
+    for (unsigned mode = 0; mode < 10; ++mode)
+    {
+        const std::string fragment = std::string("vk\\model_set_") + model_fragments[mode] + ".ps";
+        assert(deferred.create_game_pipeline("vk\\object_blended.vs", fragment,
+            handle<VkShaderModule>(106), handle<VkShaderModule>(117 + mode),
+            SurfaceMode::Transparent, false, error));
+        assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+            6, expected_mvp, detail, 0, "vk\\object_blended.vs", fragment.c_str(),
+            nullptr, .25f));
+    }
     deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);
     deferred.release_forward_sets();

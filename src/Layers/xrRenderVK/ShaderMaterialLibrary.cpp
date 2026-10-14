@@ -500,7 +500,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         material.blending == 0 && material.role != MaterialDefinition::Role::Water;
     const bool scene_depth_test = !screen_pipeline &&
         (material.mode == SurfaceMode::Transparent || world_set);
-    const uint32_t supported_flags = screen_pipeline ? 0u :
+    // UI has no depth attachment, but wrap addressing is a valid sampler state.
+    const uint32_t supported_flags = screen_pipeline ? 1u :
         1u | (scene_depth_test ? 2u : 0u) |
         (level_pipeline && material.blending == 1 ? 16u : 0u) |
         ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u) |

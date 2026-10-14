@@ -448,8 +448,10 @@ int main()
     const auto* wrapped_state = library.find("mod\\wrap_ui");
     assert(wrapped_state && !wrapped_state->pass.clamp);
     assert(library.resolve("mod\\wrap_ui", mode, error)); // Scene sampler repeats.
-    assert(!library.resolve("mod\\wrap_ui", mode, error, nullptr, nullptr, false, true) &&
-        error.find("Texture clamp") != std::string::npos && error.find("id=49") != std::string::npos);
+    MaterialDefinition ui_wrap_definition;
+    assert(library.resolve("mod\\wrap_ui", mode, error, nullptr, nullptr,
+        false, true, false, false, nullptr, nullptr, &ui_wrap_definition) &&
+        !ui_wrap_definition.pass.clamp && mode == SurfaceMode::Transparent);
     Bytes water = record("S_SET   ", "mod\\arbitrary_liquid", false, 0);
     write32(water, 7); water.insert(water.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(water, 0); write32(water, 0);

@@ -613,12 +613,14 @@ bool GameTextureFactory::decode_detail_metadata(const uint8_t* params, size_t pa
 }
 
 bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
-    VkDescriptorSet& result, std::string& error, VkExtent2D* extent)
+    VkDescriptorSet& result, std::string& error, VkExtent2D* extent, bool clamp)
 {
     result = VK_NULL_HANDLE;
     Asset* asset;
     if (!load(texture_name, asset, error)) return false;
-    if (!asset->ui_set && !pass.create_ui_texture_set(asset->texture.view, ui_sampler_, asset->ui_set, error))
+    VkDescriptorSet& set = clamp ? asset->ui_set : asset->wrap_ui_set;
+    if (!set && !pass.create_ui_texture_set(asset->texture.view,
+            clamp ? ui_sampler_ : sampler_, set, error))
     {
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset](const auto& entry) { return &entry.second == asset; });
@@ -628,15 +630,15 @@ bool GameTextureFactory::ui(const std::string& texture_name, ScenePass& pass,
     R_ASSERT2(!asset->ui_pass || asset->ui_pass == &pass,
         "Vulkan UI descriptor belongs to a different pass");
     asset->ui_pass = &pass;
-    ++asset->ui_refs;
-    result = asset->ui_set;
+    ++(clamp ? asset->ui_refs : asset->wrap_ui_refs);
+    result = set;
     if (extent) *extent = asset->extent;
     error.clear();
     return true;
 }
 
 bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t height,
-    ScenePass& pass, VkDescriptorSet& result, std::string& error)
+    ScenePass& pass, VkDescriptorSet& result, std::string& error, bool clamp)
 {
     result = VK_NULL_HANDLE;
     if (!device_ || !rgba || !width || !height || width > 8192 || height > 8192)
@@ -654,7 +656,8 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
     Asset asset;
     if (!upload_texture(device_, queue_, pool_, memory_, dispatch_, pixels,
             asset.texture, pending_, states_, error)) return false;
-    if (!pass.create_ui_texture_set(asset.texture.view, ui_sampler_, asset.ui_set, error))
+    if (!pass.create_ui_texture_set(asset.texture.view, clamp ? ui_sampler_ : sampler_,
+            clamp ? asset.ui_set : asset.wrap_ui_set, error))
     {
         R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
             "dynamic UI upload did not finish");
@@ -664,9 +667,9 @@ bool GameTextureFactory::ui_pixels(const uint8_t* rgba, uint32_t width, uint32_t
     }
     asset.extent = {width, height};
     asset.bytes = size_t(width) * height * 4;
-    asset.ui_refs = 1;
+    (clamp ? asset.ui_refs : asset.wrap_ui_refs) = 1;
     asset.ui_pass = &pass;
-    result = asset.ui_set;
+    result = clamp ? asset.ui_set : asset.wrap_ui_set;
     assets_.emplace("#dynamic-ui-" + std::to_string(++transient_id_), std::move(asset));
     error.clear();
     return true;
@@ -676,7 +679,7 @@ void GameTextureFactory::evict_if_unused(const std::string& name)
 {
     auto it = assets_.find(name);
     if (it == assets_.end() || it->second.material_refs || it->second.clamp_material_refs ||
-        it->second.lightmap_refs || it->second.ui_refs ||
+        it->second.lightmap_refs || it->second.ui_refs || it->second.wrap_ui_refs ||
         it->second.environment_refs)
         return;
     R_ASSERT2(wait_for_uploads(device_, pool_, dispatch_, pending_),
@@ -741,9 +744,10 @@ bool GameTextureFactory::retain_ui(VkDescriptorSet set, ScenePass &pass)
     if (!set)
         return false;
     for (auto &[name, asset] : assets_)
-        if (asset.ui_set == set && asset.ui_refs && asset.ui_pass == &pass)
+        if (((asset.ui_set == set && asset.ui_refs) ||
+                (asset.wrap_ui_set == set && asset.wrap_ui_refs)) && asset.ui_pass == &pass)
         {
-            ++asset.ui_refs;
+            ++(asset.ui_set == set ? asset.ui_refs : asset.wrap_ui_refs);
             return true;
         }
     return false;
@@ -755,14 +759,16 @@ void GameTextureFactory::release_ui(VkDescriptorSet set, ScenePass &pass)
         return;
     for (auto& [name, asset] : assets_)
     {
-        if (asset.ui_set != set) continue;
-        R_ASSERT2(asset.ui_refs && asset.ui_pass == &pass,
+        const bool clamp = asset.ui_set == set;
+        if (!clamp && asset.wrap_ui_set != set) continue;
+        size_t& refs = clamp ? asset.ui_refs : asset.wrap_ui_refs;
+        R_ASSERT2(refs && asset.ui_pass == &pass,
             "Vulkan UI descriptor is not leased by this pass");
-        if (--asset.ui_refs) return;
+        if (--refs) return;
         R_ASSERT2(retirement_idle(device_, wait_idle_),
             "Vulkan device did not become idle before UI texture release");
-        pass.release_ui_texture_set(asset.ui_set);
-        asset.ui_pass = nullptr;
+        pass.release_ui_texture_set(clamp ? asset.ui_set : asset.wrap_ui_set);
+        if (!asset.ui_set && !asset.wrap_ui_set) asset.ui_pass = nullptr;
         evict_if_unused(name);
         return;
     }
@@ -787,6 +793,8 @@ void GameTextureFactory::destroy()
                 asset.material_pass->release_gbuffer(asset.clamp_material_set);
             if (asset.ui_set && asset.ui_pass)
                 asset.ui_pass->release_ui_texture_set(asset.ui_set);
+            if (asset.wrap_ui_set && asset.ui_pass)
+                asset.ui_pass->release_ui_texture_set(asset.wrap_ui_set);
             states_.forget_image(asset.texture.image);
             destroy_texture(device_, dispatch_, asset.texture);
         }
@@ -821,7 +829,8 @@ void GameTextureFactory::retire_unused()
     for (auto it = assets_.begin(); it != assets_.end();)
     {
         if (it->second.material_refs || it->second.clamp_material_refs ||
-            it->second.lightmap_refs || it->second.ui_refs || it->second.environment_refs)
+            it->second.lightmap_refs || it->second.ui_refs ||
+            it->second.wrap_ui_refs || it->second.environment_refs)
         { ++it; continue; }
         auto name = it->first;
         ++it;
@@ -900,6 +909,8 @@ bool GameTextureFactory::reload_assets(std::string& error,
             asset.material_pass->update_material(asset.clamp_material_set, item.texture.view, ui_sampler_);
         if (asset.ui_set && asset.ui_pass)
             asset.ui_pass->update_ui_texture_set(asset.ui_set, item.texture.view, ui_sampler_);
+        if (asset.wrap_ui_set && asset.ui_pass)
+            asset.ui_pass->update_ui_texture_set(asset.wrap_ui_set, item.texture.view, sampler_);
         states_.forget_image(asset.texture.image);
         destroy_texture(device_, dispatch_, asset.texture);
         asset.texture = item.texture;

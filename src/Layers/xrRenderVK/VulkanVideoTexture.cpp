@@ -20,7 +20,7 @@ bool VulkanVideoTexture::load(const char* path, u32 time, std::string& error)
     { error = "OGM dimensions are invalid"; return false; }
     std::vector<uint8_t> blank(size_t(extent_.width) * extent_.height * 4);
     if (!textures_.ui_pixels(blank.data(), extent_.width, extent_.height,
-            pass_, descriptor_, error)) return false;
+            pass_, descriptor_, error, clamp_)) return false;
     const bool stop_at_end = strstr(path, "intro\\") || strstr(path, "outro\\") ||
         strstr(path, "intro/") || strstr(path, "outro/");
     surface_.Play(!stop_at_end, time);
@@ -53,7 +53,7 @@ void VulkanVideoTexture::update(u32 time)
     VkDescriptorSet replacement{};
     std::string error;
     if (textures_.ui_pixels(rgba.data(), extent_.width, extent_.height,
-            pass_, replacement, error))
+            pass_, replacement, error, clamp_))
     {
         textures_.release_ui(descriptor_, pass_);
         descriptor_ = replacement;

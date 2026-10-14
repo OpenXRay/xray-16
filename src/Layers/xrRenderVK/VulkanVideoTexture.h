@@ -8,8 +8,8 @@ namespace xray::render::vulkan
 class VulkanVideoTexture
 {
 public:
-    VulkanVideoTexture(GameTextureFactory& textures, ScenePass& pass)
-        : textures_(textures), pass_(pass) {}
+    VulkanVideoTexture(GameTextureFactory& textures, ScenePass& pass, bool clamp = true)
+        : textures_(textures), pass_(pass), clamp_(clamp) {}
     ~VulkanVideoTexture();
     bool load(const char* path, u32 time, std::string& error);
     void update(u32 time);
@@ -27,5 +27,6 @@ private:
     VkDescriptorSet descriptor_{};
     VkExtent2D extent_{};
     u32 sync_time_{0xFFFFFFFF};
+    bool clamp_{true};
 };
 }

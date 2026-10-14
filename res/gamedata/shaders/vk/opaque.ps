@@ -128,15 +128,23 @@ float4 main(Fragment fragment) : SV_Target0
 #if defined(VK_WALLMARK_MULT)
     // The legacy wallmark blender uses stub_default_ma: vertex alpha
     // interpolates toward vertex color before destination-color blending.
+#if defined(LEVEL_GEOMETRY)
     texel.rgb = lerp(texel.rgb, fragment.baked.rgb, fragment.baked.a);
     texel.a *= fragment.baked.a;
+#endif
     return texel;
 #elif defined(VK_GLOW)
-    float4 color = texel * fragment.baked;
+    float4 color = texel;
+#if defined(LEVEL_GEOMETRY)
+    color *= fragment.baked;
+#endif
     clip(color.a - terrain_alpha_threshold);
     return color;
 #elif defined(VK_PARTICLE) || defined(VK_WORLD_SET)
-    float4 color = texel * fragment.baked;
+    float4 color = texel;
+#if defined(LEVEL_GEOMETRY)
+    color *= fragment.baked;
+#endif
 #if defined(VK_SCREEN_SCALE_2)
     color.rgb *= 2.0;
 #elif defined(VK_SCREEN_SCALE_4)

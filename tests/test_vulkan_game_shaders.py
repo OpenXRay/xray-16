@@ -64,6 +64,7 @@ class GameShaderVariantsTest(unittest.TestCase):
                     self.assertIn(0, output_locations)
                     self.assertIn(0, bindings.values())
                     if ("blended" in name or "particle_" in name or "world_set_" in name or
+                            "model_set_" in name or
                             "alpha_add" in name or
                             "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
                             name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv")):
@@ -139,6 +140,18 @@ class GameShaderVariantsTest(unittest.TestCase):
         self.assertIn(252, {op for op, _ in fog})  # S_SET BLEND keeps serialized alpha test.
         self.assertNotEqual((SHADERS / "vk/level_fog.ps.spv").read_bytes(),
                             (SHADERS / "vk/world_set_blended.ps.spv").read_bytes())
+
+    def test_model_set_has_no_level_only_fragment_inputs(self):
+        for variant in json.loads(MANIFEST.read_text())["variants"]:
+            if not variant["output"].startswith("vk/model_set_"):
+                continue
+            with self.subTest(name=variant["output"]):
+                code = list(instructions(SHADERS / variant["output"]))
+                locations = {args[0]: args[2] for op, args in code
+                             if op == 71 and len(args) >= 3 and args[1] == 30}
+                inputs = {args[1] for op, args in code
+                          if op == 59 and len(args) >= 3 and args[2] == 1}
+                self.assertFalse({2, 3} & {locations[i] for i in inputs if i in locations})
 
     def test_apk_contains_every_game_pipeline_asset(self):
         variants = json.loads(MANIFEST.read_text())["variants"]

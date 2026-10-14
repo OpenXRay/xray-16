@@ -141,10 +141,9 @@ int main()
     assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Transparent,
         true, true, true, false, 2}, common, error));
     assert(error.find("HUD model environment cube") != std::string::npos);
-    const char* world_model_fragments[]{"world_set_set", "world_set_blended", "world_set_additive",
-        "world_set_multiply", "world_set_multiply_2x", "glow_alpha_add",
-        "wallmark_multiply_2x", "world_set_set_2r", "world_set_blend_2r",
-        "world_set_blend_4r"};
+    const char* world_model_fragments[]{"set", "blended", "additive", "multiply",
+        "multiply_2x", "alpha_add", "wallmark_multiply_2x", "set_2r",
+        "blend_2r", "blend_4r"};
     for (int blend = 0; blend <= 9; ++blend)
     {
         RenderPassSelection model_set{RenderConsumer::Model, SurfaceMode::Transparent};
@@ -152,8 +151,8 @@ int main()
         assert(build_render_pass_graph(model_set, common, error));
         assert(common.count == 1 && common.passes[0].target == LevelPassTarget::Forward &&
             common.passes[0].depth_test && common.passes[0].depth_write == (blend == 0) &&
-            common.passes[0].vertex == "vk\\level_opaque.vs" &&
-            common.passes[0].fragment == std::string("vk\\") + world_model_fragments[blend] + ".ps");
+            common.passes[0].vertex == "vk\\object_blended.vs" &&
+            common.passes[0].fragment == std::string("vk\\model_set_") + world_model_fragments[blend] + ".ps");
         model_set.animated = true;
         model_set.skin_weights = 2;
         assert(build_render_pass_graph(model_set, common, error));

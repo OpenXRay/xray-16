@@ -21,6 +21,7 @@ void VulkanUIShader::Copy(IUIShader& source)
     texture_ = other->texture_;
     blend_mode_ = other->blend_mode_;
     alpha_ref_ = other->alpha_ref_;
+    clamp_ = other->clamp_;
     video_ = other->video_;
     if (!other->sequence_.empty())
     {
@@ -36,7 +37,7 @@ void VulkanUIShader::Copy(IUIShader& source)
     if (other->descriptor_)
     {
         std::string error;
-        if (!textures_->ui(texture_, *pass_, descriptor_, error, &extent_))
+        if (!textures_->ui(texture_, *pass_, descriptor_, error, &extent_, clamp_))
         {
             Msg("! [renderer-vulkan] UI shader copy '%s': %s", texture_.c_str(), error.c_str());
             use_transparent_fallback();
@@ -49,26 +50,30 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
     destroy();
     shader_ = shader ? shader : "";
     texture_ = texture ? texture : "";
+    clamp_ = true;
     // Some engine-provided UI shaders (fonts, movies) have no shaders.xr
     // blender entry. They still need their real texture/video descriptor.
     if (!shader_.empty() && textures_->has_blender(shader_))
     {
         SurfaceMode surface{};
         std::string error;
+        MaterialDefinition material;
         if (!textures_->surface_mode(shader_, texture_, surface, error,
-                &alpha_ref_, &blend_mode_, false, true))
+                &alpha_ref_, &blend_mode_, false, true, false, false,
+                nullptr, nullptr, &material))
         {
             Msg("! [renderer-vulkan] UI material shader='%s' texture='%s': %s",
                 shader_.c_str(), texture_.c_str(), error.c_str());
             use_transparent_fallback();
             return;
         }
+        clamp_ = material.pass.clamp;
     }
     if (texture_.empty()) { use_transparent_fallback(); return; }
     string_path video_path;
     if (FS.exist(video_path, "$game_textures$", texture_.c_str(), ".ogm"))
     {
-        video_ = std::make_shared<VulkanVideoTexture>(*textures_, *pass_);
+        video_ = std::make_shared<VulkanVideoTexture>(*textures_, *pass_, clamp_);
         std::string error;
         if (!video_->load(video_path, Device.dwTimeContinual, error))
         {
@@ -112,7 +117,7 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
             VkDescriptorSet frame = VK_NULL_HANDLE;
             VkExtent2D size{};
             std::string error;
-            if (textures_->ui(line, *pass_, frame, error, &size))
+            if (textures_->ui(line, *pass_, frame, error, &size, clamp_))
                 sequence_.push_back({frame, size});
             else
                 Msg("! [renderer-vulkan] UI sequence '%s' frame='%s': %s", texture_.c_str(), line, error.c_str());
@@ -131,7 +136,7 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
         return;
     }
     std::string error;
-    if (!textures_->ui(texture_, *pass_, descriptor_, error, &extent_))
+    if (!textures_->ui(texture_, *pass_, descriptor_, error, &extent_, clamp_))
     {
         Msg("! [renderer-vulkan] UI texture '%s': %s", texture_.c_str(), error.c_str());
         use_transparent_fallback();
@@ -170,6 +175,7 @@ void VulkanUIShader::destroy()
     extent_ = {};
     blend_mode_ = 1;
     alpha_ref_ = 0;
+    clamp_ = true;
 }
 
 bool VulkanUIShader::operator==(const IUIShader& source) const

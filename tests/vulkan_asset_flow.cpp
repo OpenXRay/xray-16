@@ -257,6 +257,22 @@ int main()
     assert(wrap_set && clamp_set && wrap_set != clamp_set);
     textures.release_material(wrap_set, pass);
     textures.release_material(clamp_set, pass);
+    ScenePass ui_pass;
+    assert(ui_pass.initialize(device, rp, handle<VkShaderModule>(5), handle<VkShaderModule>(6),
+        handle<VkShaderModule>(7), handle<VkShaderModule>(8), scene_dispatch(), error, true));
+    VkDescriptorSet ui_clamp{}, ui_wrap{};
+    assert(textures.ui("fixture", ui_pass, ui_clamp, error) &&
+        textures.ui("fixture", ui_pass, ui_wrap, error, nullptr, false));
+    assert(ui_clamp && ui_wrap && ui_clamp != ui_wrap);
+    assert(sampler_address.at(sampled_by.at(ui_clamp)) == VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
+    assert(sampler_address.at(sampled_by.at(ui_wrap)) == VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    assert(textures.reload_assets(error));
+    assert(sampler_address.at(sampled_by.at(ui_clamp)) == VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
+    assert(sampler_address.at(sampled_by.at(ui_wrap)) == VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    assert(textures.retain_ui(ui_wrap, ui_pass));
+    textures.release_ui(ui_clamp, ui_pass);
+    textures.release_ui(ui_wrap, ui_pass);
+    textures.release_ui(ui_wrap, ui_pass);
     // The mock uses an actual serialized blender definition. Runtime loading
     // must never infer alpha/depth behavior from a texture or shader name.
     {

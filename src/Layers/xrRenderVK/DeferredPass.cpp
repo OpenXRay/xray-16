@@ -660,22 +660,29 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     VkPipeline pipeline{};
     const bool transparent = mode == SurfaceMode::Transparent;
     const bool particle_additive = (fragment_name.find("particle_") != std::string::npos ||
-        fragment_name.find("world_set_") != std::string::npos) &&
+        fragment_name.find("world_set_") != std::string::npos ||
+        fragment_name.find("model_set_") != std::string::npos) &&
         fragment_name.find("_additive.ps") != std::string::npos;
     const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_alpha_add.ps") != std::string::npos;
-    const bool glow_alpha_add = fragment_name == "vk\\glow_alpha_add.ps";
+    const bool glow_alpha_add = fragment_name == "vk\\glow_alpha_add.ps" ||
+        fragment_name == "vk\\model_set_alpha_add.ps";
     const bool particle_multiply = (fragment_name.find("particle_") != std::string::npos ||
-        fragment_name.find("world_set_") != std::string::npos) &&
+        fragment_name.find("world_set_") != std::string::npos ||
+        fragment_name.find("model_set_") != std::string::npos) &&
         fragment_name.find("_multiply.ps") != std::string::npos;
     const bool particle_multiply_2x = (fragment_name.find("particle_") != std::string::npos ||
-        fragment_name.find("world_set_") != std::string::npos) &&
+        fragment_name.find("world_set_") != std::string::npos ||
+        fragment_name.find("model_set_") != std::string::npos) &&
         fragment_name.find("_multiply_2x.ps") != std::string::npos;
-    const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps";
+    const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps" ||
+        fragment_name == "vk\\model_set_wallmark_multiply_2x.ps";
     const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_set.ps") != std::string::npos;
-    const bool world_set_depth_write = fragment_name == "vk\\world_set_set.ps";
-    const bool world_set_replace = fragment_name == "vk\\world_set_set_2r.ps";
+    const bool world_set_depth_write = fragment_name == "vk\\world_set_set.ps" ||
+        fragment_name == "vk\\model_set_set.ps";
+    const bool world_set_replace = fragment_name == "vk\\world_set_set_2r.ps" ||
+        fragment_name == "vk\\model_set_set_2r.ps";
     const bool legacy_multiply = fragment_name == "vk\\level_laemb_multiply.ps";
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
@@ -768,9 +775,14 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
             68, sizeof(detail_scale), &detail_scale);
     if (mode == SurfaceMode::AlphaTest || (fragment_name &&
             (std::strstr(fragment_name, "world_set_blended.ps") ||
+             std::strstr(fragment_name, "model_set_blended.ps") ||
              std::strstr(fragment_name, "world_set_set_2r.ps") ||
+             std::strstr(fragment_name, "model_set_set_2r.ps") ||
              std::strstr(fragment_name, "world_set_blend_2r.ps") ||
+             std::strstr(fragment_name, "model_set_blend_2r.ps") ||
              std::strstr(fragment_name, "world_set_blend_4r.ps") ||
+             std::strstr(fragment_name, "model_set_blend_4r.ps") ||
+             std::strstr(fragment_name, "model_set_alpha_add.ps") ||
              std::strstr(fragment_name, "glow_alpha_add.ps"))))
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -1181,9 +1193,14 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
             std::strstr(fragment_name, "_set.ps")) ||
             std::strstr(fragment_name, "world_set_blended.ps") ||
+            std::strstr(fragment_name, "model_set_blended.ps") ||
             std::strstr(fragment_name, "world_set_set_2r.ps") ||
+            std::strstr(fragment_name, "model_set_set_2r.ps") ||
             std::strstr(fragment_name, "world_set_blend_2r.ps") ||
+            std::strstr(fragment_name, "model_set_blend_2r.ps") ||
             std::strstr(fragment_name, "world_set_blend_4r.ps") ||
+            std::strstr(fragment_name, "model_set_blend_4r.ps") ||
+            std::strstr(fragment_name, "model_set_alpha_add.ps") ||
             std::strstr(fragment_name, "glow_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);

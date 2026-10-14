@@ -22,6 +22,8 @@ std::unordered_map<VkDeviceMemory, std::vector<uint8_t>> allocations;
 std::vector<VkDescriptorSet> bound_textures;
 std::unordered_map<VkImage, VkDeviceSize> images;
 std::unordered_map<VkDescriptorSet, unsigned> refs;
+std::unordered_map<VkSampler, VkSamplerAddressMode> sampler_address;
+std::unordered_map<VkDescriptorSet, VkSampler> sampled_by;
 
 VkResult VKAPI_PTR create_buffer(VkDevice, const VkBufferCreateInfo *info, const VkAllocationCallbacks *, VkBuffer *out)
 {
@@ -134,8 +136,11 @@ VkResult VKAPI_PTR free_descriptor(VkDevice, VkDescriptorPool, uint32_t, const V
     ++descriptor_frees;
     return VK_SUCCESS;
 }
-void VKAPI_PTR update(VkDevice, uint32_t, const VkWriteDescriptorSet *, uint32_t, const VkCopyDescriptorSet *)
+void VKAPI_PTR update(VkDevice, uint32_t count, const VkWriteDescriptorSet *writes, uint32_t, const VkCopyDescriptorSet *)
 {
+    for (uint32_t i = 0; i < count; ++i)
+        if (writes[i].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER && writes[i].pImageInfo)
+            sampled_by[writes[i].dstSet] = writes[i].pImageInfo->sampler;
 }
 void VKAPI_PTR bind_descriptor(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout, uint32_t, uint32_t count, const VkDescriptorSet *set, uint32_t,
                                const uint32_t *)
@@ -229,13 +234,15 @@ VkResult VKAPI_PTR idle(VkDevice)
 {
     return VK_SUCCESS;
 }
-VkResult VKAPI_PTR sampler(VkDevice, const VkSamplerCreateInfo *, const VkAllocationCallbacks *, VkSampler *out)
+VkResult VKAPI_PTR sampler(VkDevice, const VkSamplerCreateInfo *info, const VkAllocationCallbacks *, VkSampler *out)
 {
     *out = handle<VkSampler>(next_handle++);
+    sampler_address[*out] = info->addressModeU;
     return VK_SUCCESS;
 }
-void VKAPI_PTR destroy_sampler(VkDevice, VkSampler, const VkAllocationCallbacks *)
+void VKAPI_PTR destroy_sampler(VkDevice, VkSampler value, const VkAllocationCallbacks *)
 {
+    sampler_address.erase(value);
 }
 void VKAPI_PTR draw_plain(VkCommandBuffer, uint32_t, uint32_t, uint32_t, uint32_t)
 {
