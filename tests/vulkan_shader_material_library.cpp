@@ -204,6 +204,11 @@ int main()
     chunk(list, 60, reflection_blended);
     Bytes model_opaque = record("MODELEbB", "mod\\plain_npc", false);
     chunk(list, 61, model_opaque);
+    Bytes model_opaque_environment = record("MODELEbB", "mod\\reflective_opaque_npc", false);
+    write32(model_opaque_environment, 0);
+    model_opaque_environment.insert(model_opaque_environment.end(), env_scope, env_scope + sizeof(env_scope));
+    texture_property(model_opaque_environment, "Name", "mod\\npc_cube");
+    chunk(list, 84, model_opaque_environment);
     Bytes environment_plain = record("LaEmB   ", "mod\\plain_glow", false);
     environment_plain[172] = 0;
     write32(environment_plain, 0);
@@ -227,7 +232,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 33);
+    assert(library.load(reader, error) && library.size() == 34);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -272,7 +277,12 @@ int main()
         constant_definition.constant_waveforms[0].Calculate(0.f) == .25f);
     assert(library.resolve("mod\\reflective_npc", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("mod\\blended_reflection", mode, error) && mode == SurfaceMode::Transparent);
-    assert(library.resolve("mod\\plain_npc", mode, error) && mode == SurfaceMode::Opaque);
+    assert(!library.resolve("mod\\plain_npc", mode, error) &&
+        error.find("id=61") != std::string::npos &&
+        error.find("opaque MODELEbB G-buffer") != std::string::npos);
+    assert(!library.resolve("mod\\reflective_opaque_npc", mode, error) &&
+        error.find("id=84") != std::string::npos &&
+        error.find("opaque MODELEbB G-buffer") != std::string::npos);
     assert(library.resolve("mod\\plain_glow", mode, error, nullptr, nullptr,
         false, false, true, false, nullptr, nullptr, &constant_definition) &&
         mode == SurfaceMode::Opaque && !constant_definition.has_environment_constant &&

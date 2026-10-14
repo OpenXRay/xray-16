@@ -309,6 +309,11 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                     definition.has_environment_constant = true;
                 }
             }
+            if (definition.pipeline_supported && cls == "MODELEbB" && mode != SurfaceMode::Transparent)
+            {
+                definition.pipeline_supported = false;
+                definition.unsupported_reason = "opaque MODELEbB G-buffer environment pass is not implemented";
+            }
         }
         // Older BmmD records carry one detail texture in the Detail map
         // scope. Keep its exact slot separate from the four-channel terrain.
