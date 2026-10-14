@@ -244,6 +244,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.material = source.material;
             mesh.mode = source.mode;
             mesh.secondary_opaque = source.secondary_opaque;
+            mesh.priority = source.priority;
             mesh.alpha_ref = source.alpha_ref;
             mesh.wallmark_multiply = source.wallmark_multiply;
             mesh.glow_alpha_add = source.glow_alpha_add;
@@ -312,6 +313,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         if (implicit_detail && (metadata.diffuse || metadata.normal)) detail_texture = metadata.texture;
         mesh.secondary_opaque = definition.priority >= 2 &&
             definition.mode == SurfaceMode::Opaque;
+        mesh.priority = definition.priority;
         if (mesh.secondary_opaque && !detail_texture.empty())
         {
             error = "level material id=" + std::to_string(model.material) + " shader='" +
@@ -636,6 +638,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     detail_meshes_ = std::move(prepared.detail_meshes_);
     visuals_ = std::move(prepared.visuals_);
     visual_phases_.assign(visuals_.size(), 0);
+    visual_priorities_.assign(visuals_.size(), 0);
     std::vector<uint8_t> phase_state(visuals_.size(), 0);
     const auto phases = [&](const auto& self, size_t index) -> uint8_t
     {
@@ -650,6 +653,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             const Mesh& mesh = meshes_[visual.mesh];
             mask |= mesh.mode == SurfaceMode::Transparent ? 2 : 1;
             if (mesh.secondary_opaque) mask |= 4;
+            else if (mesh.mode == SurfaceMode::Transparent)
+                visual_priorities_[index] |= uint8_t(1u << mesh.priority);
         }
         for (int32_t facet : visual.lod_facets)
             if (facet >= 0 && size_t(facet) < meshes_.size())
@@ -657,8 +662,15 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 const Mesh& mesh = meshes_[facet];
                 mask |= mesh.mode == SurfaceMode::Transparent ? 2 : 1;
                 if (mesh.secondary_opaque) mask |= 4;
+                else if (mesh.mode == SurfaceMode::Transparent)
+                    visual_priorities_[index] |= uint8_t(1u << mesh.priority);
             }
-        for (uint32_t child : visual.children) mask |= self(self, child);
+        for (uint32_t child : visual.children)
+        {
+            mask |= self(self, child);
+            if (child < visual_priorities_.size())
+                visual_priorities_[index] |= visual_priorities_[child];
+        }
         phase_state[index] = 2;
         return visual_phases_[index] = mask;
     };
@@ -1088,13 +1100,15 @@ bool GpuLevel::record_transparent_detail(size_t draw_index, const FrameRecording
 
 bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     const DeferredPass& pass, const float (&mvp)[16], GeometryPhase phase, float lod,
-    bool cull_static, bool secondary_only) const
+    bool cull_static, bool secondary_only, int priority_filter) const
 {
     if (index >= visuals_.size()) return false;
     if (index < visual_phases_.size() &&
         !(visual_phases_[index] & (secondary_only ? 4 :
             phase == GeometryPhase::Transparent ? 2 : 1)))
         return true;
+    if (phase == GeometryPhase::Transparent && !secondary_only && priority_filter >= 0 &&
+        !has_transparent_priority(index, static_cast<uint8_t>(priority_filter))) return true;
     const LevelVisual& visual = visuals_[index];
     // Hierarchy bounds in older level archives are not guaranteed to enclose
     // every child. Cull leaf meshes, but always descend into child visuals.
@@ -1128,7 +1142,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         if ((phase == GeometryPhase::Transparent) != transparent ||
-            (transparent && mesh.secondary_opaque != secondary_only)) return true;
+            (transparent && (mesh.secondary_opaque != secondary_only ||
+                (!secondary_only && priority_filter >= 0 && mesh.priority != priority_filter)))) return true;
         const auto& first = mesh.pass_graph.passes[0];
         const char* vertex = first.vertex_for_visual(false, visual.type);
         const char* fragment = first.fragment.c_str();
@@ -1183,7 +1198,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         const bool selected = phase == GeometryPhase::Transparent ?
-            transparent && mesh.secondary_opaque == secondary_only :
+            transparent && mesh.secondary_opaque == secondary_only &&
+                (secondary_only || priority_filter < 0 || mesh.priority == priority_filter) :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
@@ -1252,7 +1268,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const float dy = bounds[7] - Device.vCameraPosition.y;
         const float dz = bounds[8] - Device.vCameraPosition.z;
         const float child_lod = lod_for_distance(bounds[9], dx * dx + dy * dy + dz * dz);
-        if (!record_visual(child, frame, pass, mvp, phase, child_lod, cull_static, secondary_only)) return false;
+        if (!record_visual(child, frame, pass, mvp, phase, child_lod, cull_static,
+                secondary_only, priority_filter)) return false;
     }
     return true;
 }
@@ -1374,6 +1391,7 @@ void GpuLevel::destroy()
     detail_signatures_.fill(0);
     visuals_.clear();
     visual_phases_.clear();
+    visual_priorities_.clear();
     roots_.clear();
     sectors_.clear();
     portals_.clear();

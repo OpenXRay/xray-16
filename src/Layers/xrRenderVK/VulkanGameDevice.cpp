@@ -512,7 +512,11 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         }
     std::vector<TransparentDrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
-        if (!owner.level_draws_[i].hud) draws.push_back({owner.level_draws_[i].sort_distance, false, i});
+        if (!owner.level_draws_[i].hud && owner.current_level_)
+            for (uint8_t priority = 1; priority <= 3; ++priority)
+                if (owner.current_level_->has_transparent_priority(owner.level_draws_[i].index, priority))
+                    draws.push_back({owner.level_draws_[i].sort_distance, false, i,
+                        false, false, priority});
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
         if (!owner.model_draws_[i].hud) draws.push_back({owner.model_draws_[i].sort_distance, true, i});
     for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
@@ -593,7 +597,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             std::copy(level.mvp.begin(), level.mvp.end(), mvp);
             if (!owner.current_level_->record_visual(level.index, frame,
                     owner.deferred_, mvp, GeometryPhase::Transparent, level.lod,
-                    level.instance == nullptr))
+                    level.instance == nullptr, false, draw.priority))
             {
                 owner.level_recorded_ = false;
                 owner.level_error_ = "Vulkan transparent level visual " +

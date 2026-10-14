@@ -36,7 +36,8 @@ public:
     bool record_visual(size_t index, const FrameRecordingContext& frame,
         const DeferredPass& pass, const float (&mvp)[16],
         GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f,
-        bool cull_static = true, bool secondary_only = false) const;
+        bool cull_static = true, bool secondary_only = false,
+        int priority_filter = -1) const;
     bool record_hud_visual(size_t index, const FrameRecordingContext& frame,
         const DeferredPass& pass, const float (&mvp)[16], float lod = 1.f) const;
     size_t model_count() const { return meshes_.size(); }
@@ -56,6 +57,9 @@ public:
     size_t visual_count() const { return visuals_.size(); }
     bool has_secondary_priority(size_t index) const
     { return index < visual_phases_.size() && (visual_phases_[index] & 4u) != 0; }
+    bool has_transparent_priority(size_t index, uint8_t priority) const
+    { return index < visual_priorities_.size() && priority < 8 &&
+        (visual_priorities_[index] & (1u << priority)) != 0; }
     bool has_water() const { return has_water_; }
     uint64_t revision() const { return revision_; }
     IRenderVisual* get_visual(size_t index) const;
@@ -93,6 +97,7 @@ private:
         std::string shader;
         SurfaceMode mode{SurfaceMode::Opaque};
         bool secondary_opaque{};
+        uint8_t priority{1};
         int alpha_ref{128};
         bool wallmark_multiply{};
         bool glow_alpha_add{};
@@ -144,6 +149,7 @@ private:
     mutable std::array<std::vector<TransparentDetailDraw>, FrameContext::FramesInFlight> transparent_detail_draws_;
     std::vector<LevelVisual> visuals_;
     std::vector<uint8_t> visual_phases_; // opaque bit 1, forward bit 2, secondary opaque bit 4
+    std::vector<uint8_t> visual_priorities_; // ordinary transparent priority bits 1..3
     std::vector<uint32_t> roots_;
     std::vector<LevelSector> sectors_;
     std::vector<LevelPortal> portals_;
