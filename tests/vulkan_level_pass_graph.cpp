@@ -129,17 +129,39 @@ int main()
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque}, common, error));
     assert(common.passes[0].target == LevelPassTarget::GBuffer);
     assert(common.passes[0].fragment == "vk\\object_opaque.ps");
-    assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
-        false, false, true}, common, error));
-    assert(common.passes[0].fragment == "vk\\object_environment_opaque.ps");
-    assert(common.passes[0].target == LevelPassTarget::GBuffer);
-    assert(common.passes[0].textures & EnvironmentRole);
-    assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
-        false, true, true, false, 2}, common, error));
-    assert(common.passes[0].fragment == "vk\\skinned_environment_opaque.ps");
     assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
+        false, false, true}, common, error));
+    assert(error.find("does not sample environment") != std::string::npos);
+    assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
+        false, true, true, false, 2}, common, error));
+    assert(error.find("does not sample environment") != std::string::npos);
+    assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Transparent,
+        false, true, true, false, 2}, common, error));
+    assert(common.passes[0].fragment == "vk\\skinned_environment.ps");
+    assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Transparent,
         true, true, true, false, 2}, common, error));
     assert(error.find("HUD model environment cube") != std::string::npos);
+    const char* world_model_fragments[]{"world_set_set", "world_set_blended", "world_set_additive",
+        "world_set_multiply", "world_set_multiply_2x", "glow_alpha_add",
+        "wallmark_multiply_2x", "world_set_set_2r", "world_set_blend_2r",
+        "world_set_blend_4r"};
+    for (int blend = 0; blend <= 9; ++blend)
+    {
+        RenderPassSelection model_set{RenderConsumer::Model, SurfaceMode::Transparent};
+        model_set.screen_blend = blend;
+        assert(build_render_pass_graph(model_set, common, error));
+        assert(common.count == 1 && common.passes[0].target == LevelPassTarget::Forward &&
+            common.passes[0].depth_test && common.passes[0].depth_write == (blend == 0) &&
+            common.passes[0].vertex == "vk\\level_opaque.vs" &&
+            common.passes[0].fragment == std::string("vk\\") + world_model_fragments[blend] + ".ps");
+        model_set.animated = true;
+        model_set.skin_weights = 2;
+        assert(build_render_pass_graph(model_set, common, error));
+        assert(common.passes[0].vertex == "vk\\skinned_2.vs");
+        model_set.hud = true;
+        assert(!build_render_pass_graph(model_set, common, error));
+        assert(error.find("HUD OGF S_SET") != std::string::npos);
+    }
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
         false, false, false, false, 0, 1, 0, true}, common, error));
     assert(common.passes[0].fragment == "vk\\object_detail_opaque.ps");

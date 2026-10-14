@@ -93,7 +93,7 @@ float3 unpack_bump(float4 main_map, float4 auxiliary)
 }
 
 #if defined(VK_TRANSPARENT)
-#if !defined(VK_UNLIT)
+#if !defined(VK_UNLIT) || defined(VK_WORLD_SET_FOG)
 struct LocalLight
 {
     float4 position_range;
@@ -144,6 +144,12 @@ float4 main(Fragment fragment) : SV_Target0
 #endif
 #if defined(VK_WORLD_SET_AREF)
     clip(color.a - terrain_alpha_threshold);
+#endif
+#if defined(VK_WORLD_SET_FOG)
+    float distance_to_camera = length(fragment.world_position - fog_end_camera.yzw);
+    float fog = saturate((distance_to_camera - fog_color_start.w) /
+        max(fog_end_camera.x - fog_color_start.w, 0.01));
+    color.rgb = lerp(color.rgb, fog_color_start.rgb, fog);
 #endif
 #if defined(VK_PARTICLE_SET)
     clip(color.a - terrain_alpha_threshold);

@@ -61,6 +61,7 @@ struct RenderPassSelection
     int blend_mode{1};
     uint16_t surface_roles{};
     bool detail{};
+    int screen_blend{-1}; // Serialized S_SET mode when used by an OGF model.
 };
 
 inline bool build_render_pass_graph(const RenderPassSelection& input,
@@ -83,8 +84,40 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
         return reject("animated model skin weights (expected 1..4)");
     if (input.consumer == RenderConsumer::Model && input.detail && input.environment)
         return reject("model diffuse detail with environment cube");
+    if (input.consumer == RenderConsumer::Model && input.environment &&
+        input.mode != SurfaceMode::Transparent)
+        return reject("opaque MODELEbB does not sample environment in original deferred pass");
     if (input.consumer == RenderConsumer::Model && input.hud && input.environment)
         return reject("HUD model environment cube (HUD reflection shader missing)");
+    if (input.consumer == RenderConsumer::Model && input.screen_blend >= 0)
+    {
+        if (input.screen_blend > 9) return reject("OGF S_SET Blending (expected 0..9)");
+        if (input.hud) return reject("HUD OGF S_SET world blend/depth pipeline");
+        if (input.mode != SurfaceMode::Transparent)
+            return reject("OGF S_SET requires world forward pass");
+        if (input.detail || input.environment)
+            return reject("OGF S_SET with detail or environment texture roles");
+        auto& world = graph.passes[0];
+        world.target = LevelPassTarget::Forward;
+        world.depth_test = true;
+        world.depth_write = input.screen_blend == 0;
+        world.blend = input.screen_blend == 0 || input.screen_blend == 7 ? LevelPassBlend::Replace :
+            input.screen_blend == 2 ? LevelPassBlend::Additive :
+            input.screen_blend == 3 ? LevelPassBlend::Multiply :
+            input.screen_blend == 4 || input.screen_blend == 6 ? LevelPassBlend::Multiply2x :
+            input.screen_blend == 5 ? LevelPassBlend::AlphaAdd : LevelPassBlend::Alpha;
+        world.textures = BaseRole | (input.screen_blend == 5 ? EmissiveRole : 0);
+        world.vertex = input.animated ? "vk\\skinned_" + std::to_string(input.skin_weights) + ".vs" :
+            std::string("vk\\level_opaque.vs");
+        const char* fragments[]{"world_set_set", "world_set_blended", "world_set_additive",
+            "world_set_multiply", "world_set_multiply_2x", "glow_alpha_add",
+            "wallmark_multiply_2x", "world_set_set_2r", "world_set_blend_2r",
+            "world_set_blend_4r"};
+        world.fragment = std::string("vk\\") + fragments[input.screen_blend] + ".ps";
+        graph.count = 1;
+        error.clear();
+        return true;
+    }
     auto& node = graph.passes[0];
     node.textures = BaseRole | input.surface_roles;
     if (input.consumer == RenderConsumer::Particle &&
@@ -132,8 +165,7 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.animated ? "vk\\skinned_" + std::to_string(input.skin_weights) + ".vs" :
                 std::string("vk\\") + family + ".vs";
         node.fragment = input.hud ? input.animated ? "vk\\hud_blended.ps" : std::string{} :
-            input.animated && input.environment ? input.mode == SurfaceMode::Transparent ?
-                "vk\\skinned_environment.ps" : "vk\\skinned_environment_opaque.ps" :
+            input.animated && input.environment ? "vk\\skinned_environment.ps" :
             input.animated && input.mode == SurfaceMode::Transparent ? "vk\\skinned_blended.ps" :
                 std::string("vk\\") + family + ".ps";
         if (input.detail && !input.hud && !input.environment)
@@ -145,8 +177,6 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             node.textures |= DetailRole;
         }
         if (input.environment) node.textures |= EnvironmentRole;
-        if (input.environment && !input.animated && input.mode == SurfaceMode::Opaque)
-            node.fragment = "vk\\object_environment_opaque.ps";
     }
     graph.count = 1;
     error.clear();

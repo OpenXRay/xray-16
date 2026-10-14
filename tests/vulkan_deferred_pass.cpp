@@ -133,6 +133,16 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(info->pColorBlendState->attachmentCount == 1 &&
             !info->pColorBlendState->pAttachments[0].blendEnable);
     }
+    else if (info->pStages[1].module == handle<VkShaderModule>(116))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(11) && info->layout == skinned_layout);
+        assert(info->pVertexInputState->pVertexBindingDescriptions[0].stride == sizeof(ModelVertex));
+        assert(info->pDepthStencilState->depthTestEnable &&
+            !info->pDepthStencilState->depthWriteEnable);
+        const auto& color = info->pColorBlendState->pAttachments[0];
+        assert(color.blendEnable && color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
+            color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
+    }
     else if (info->pStages[1].module == handle<VkShaderModule>(95) ||
         info->pStages[1].module == handle<VkShaderModule>(101))
     {
@@ -313,7 +323,7 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
     assert(count == 6 && instances == 1);
     assert(first_index == expected_first_index);
     constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119,
-        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132};
+        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -404,7 +414,7 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     ++descriptor_updates;
 }
 void VKAPI_PTR bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout layout,
-    uint32_t, uint32_t count, const VkDescriptorSet* sets, uint32_t, const uint32_t*)
+    uint32_t first_set, uint32_t count, const VkDescriptorSet* sets, uint32_t, const uint32_t*)
 {
     if (layout == weather_layout)
     {
@@ -414,7 +424,8 @@ void VKAPI_PTR bind_sets(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout 
     }
     if (layout == skinned_layout)
     {
-        assert(count == 2 && sets[0] == updated_material && sets[1]);
+        if (first_set == 2) assert(count == 1 && sets[0]);
+        else assert(first_set == 0 && count == 2 && sets[0] == updated_material && sets[1]);
         return;
     }
     assert(layout == geometry_layout && count == 1 && *sets == updated_material);
@@ -769,6 +780,14 @@ int main()
         SurfaceMode::Transparent, false, error));
     assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, 0, "vk\\level_opaque.vs", "vk\\world_set_set.ps"));
+    assert(deferred.create_game_pipeline("vk\\skinned_2.vs", "vk\\world_set_blended.ps",
+        handle<VkShaderModule>(115), handle<VkShaderModule>(116),
+        SurfaceMode::Transparent, false, error, true));
+    world_alpha_push = false;
+    assert(deferred.record_skinned(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, pose, SurfaceMode::Transparent, false, 0,
+        "vk\\skinned_2.vs", "vk\\world_set_blended.ps", .25f));
+    assert(world_alpha_push);
     deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);
     deferred.release_forward_sets();

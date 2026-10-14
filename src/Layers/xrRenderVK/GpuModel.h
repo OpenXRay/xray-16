@@ -84,6 +84,7 @@ private:
         BufferResource indices;
         VkDescriptorSet material{};
         int alpha_ref{128};
+        int screen_blend{-1};
         bool gpu_skinning{};
         uint16_t max_bone_index{};
         size_t fast_index = SIZE_MAX;

@@ -30,8 +30,11 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         auto &mesh = meshes_.back();
         mesh.geometry = std::move(decoded);
         MaterialDefinition definition;
+        // An OGF can reference the same S_SET definition as level geometry.
+        // Resolve its world flags before choosing a model shader; otherwise a
+        // valid ADD/MUL token silently becomes ordinary alpha blending.
         if (!textures.surface_mode(mesh.geometry.shader, texture, mesh.geometry.mode, error,
-                &mesh.alpha_ref, nullptr, false, false, false, false, nullptr, nullptr, &definition))
+                &mesh.alpha_ref, &mesh.screen_blend, false, false, true, false, nullptr, nullptr, &definition))
         {
             error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;
             return false;
@@ -42,6 +45,19 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
+        if (definition.class_name == "S_SET   " && definition.role == MaterialDefinition::Role::Water)
+        {
+            error = "OGF shader='" + mesh.geometry.shader +
+                "' class='S_SET   ' water pass requires level water geometry";
+            return false;
+        }
+        if (definition.class_name == "S_SET   " && definition.pass.fog)
+        {
+            error = "OGF shader='" + mesh.geometry.shader +
+                "' class='S_SET   ' property='Fog' needs an unlit skinned fog shader";
+            return false;
+        }
+        if (definition.class_name != "S_SET   ") mesh.screen_blend = -1;
         GameTextureFactory::DetailMetadata metadata;
         if (!textures.texture_detail_metadata(texture, metadata, error))
         {
@@ -49,7 +65,10 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             return false;
         }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
-        mesh.environment = definition.class_name == "MODELEbB";
+        // R2's opaque MODELEbB calls uber_deffer("model", "base") and never
+        // samples oT2_Name. Only its blended forward element reads the cube.
+        mesh.environment = definition.class_name == "MODELEbB" &&
+            mesh.geometry.mode == SurfaceMode::Transparent;
         // Tree surfaces are two-sided by blender contract. A user-controlled
         // shader name must never select a different raster/shader variant.
         mesh.tree_surface = definition.class_name == "D_TREE  ";
@@ -72,8 +91,12 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 (metadata.normal || !metadata.external_normal_texture.empty() ? NormalRole : 0u)) : 0u;
         if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, false,
                 animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights, 1, roles,
-                mesh.detail},
-                mesh.pass_graph, error)) return false;
+                mesh.detail, mesh.screen_blend},
+                mesh.pass_graph, error))
+        {
+            error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;
+            return false;
+        }
         const auto& node = mesh.pass_graph.passes[0];
         const std::string& vertex = node.vertex;
         const std::string& fragment = node.fragment;
@@ -295,8 +318,13 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             if (!pose_buffer.write(0, pose, pose_bytes, error)) return false;
             RenderPassGraph hud_graph;
             if (hud && !build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
-                    true, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights},
-                    hud_graph, error)) return false;
+                    true, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights,
+                    1, 0, false, mesh.screen_blend},
+                    hud_graph, error))
+            {
+                error = "OGF HUD shader='" + mesh.geometry.shader + "': " + error;
+                return false;
+            }
             const auto& node = hud ? hud_graph.passes[0] : mesh.pass_graph.passes[0];
             const std::string& vertex_name = node.vertex;
             const char* fragment_name = node.fragment.c_str();
@@ -316,7 +344,12 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         {
             RenderPassGraph hud_graph;
             if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
-                    false, mesh.environment, mesh.tree_surface}, hud_graph, error)) return false;
+                    false, mesh.environment, mesh.tree_surface, 0, 1, 0, false,
+                    mesh.screen_blend}, hud_graph, error))
+            {
+                error = "OGF HUD shader='" + mesh.geometry.shader + "': " + error;
+                return false;
+            }
             BufferResource* vertex_buffer = &mesh.vertices[0];
             if (skinned)
             {
@@ -357,7 +390,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         if (!(transparent ? pass.record_transparent(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp,
                                 mesh.material, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                nullptr, 0.f, normal_rows, mesh.detail_scale) :
+                                nullptr, float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
                                 float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale,

@@ -131,6 +131,14 @@ class GameShaderVariantsTest(unittest.TestCase):
                 self.assertIn(64, offsets)  # Cutoff set by the draw recorder.
         self.assertNotEqual((SHADERS / "vk/world_set_blend_2r.ps.spv").read_bytes(),
                             (SHADERS / "vk/world_set_blend_4r.ps.spv").read_bytes())
+        fog = list(instructions(SHADERS / "vk/level_fog.ps.spv"))
+        decorations = {(args[0], args[1]): args[2] for op, args in fog
+                       if op == 71 and len(args) >= 3}
+        self.assertTrue(any(decorations.get((identifier, 33)) == 0 and set_id == 1
+                            for (identifier, kind), set_id in decorations.items() if kind == 34))
+        self.assertIn(252, {op for op, _ in fog})  # S_SET BLEND keeps serialized alpha test.
+        self.assertNotEqual((SHADERS / "vk/level_fog.ps.spv").read_bytes(),
+                            (SHADERS / "vk/world_set_blended.ps.spv").read_bytes())
 
     def test_apk_contains_every_game_pipeline_asset(self):
         variants = json.loads(MANIFEST.read_text())["variants"]

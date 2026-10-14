@@ -300,9 +300,7 @@ int main()
         constant_definition.constant_waveforms[0].Calculate(0.f) == .25f);
     assert(library.resolve("mod\\reflective_npc", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("mod\\blended_reflection", mode, error) && mode == SurfaceMode::Transparent);
-    assert(!library.resolve("mod\\plain_npc", mode, error) &&
-        error.find("id=61") != std::string::npos &&
-        error.find("Environment map / Name") != std::string::npos);
+    assert(library.resolve("mod\\plain_npc", mode, error) && mode == SurfaceMode::Opaque);
     MaterialDefinition opaque_environment;
     assert(library.resolve("mod\\reflective_opaque_npc", mode, error, nullptr, nullptr,
         false, false, false, false, nullptr, nullptr, &opaque_environment) &&
@@ -476,6 +474,13 @@ int main()
     property(glow, 6, "Z-test", 1);
     Bytes level_list, level_file;
     chunk(level_list, 52, water); chunk(level_list, 25, lod); chunk(level_list, 36, glow);
+    Bytes unsupported_fog = record("S_SET   ", "mod\\fog_add", false, 64);
+    write32(unsupported_fog, 7);
+    unsupported_fog.insert(unsupported_fog.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(unsupported_fog, 5); write32(unsupported_fog, 0);
+    property(unsupported_fog, 6, "Z-test", 1);
+    property(unsupported_fog, 6, "Fog", 1);
+    chunk(level_list, 39, unsupported_fog);
     Bytes misleading = record("S_SET   ", "water\\ordinary_overlay", false, 0);
     write32(misleading, 7); misleading.insert(misleading.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(misleading, 1); write32(misleading, 0);
@@ -509,6 +514,9 @@ int main()
         error.find("blending=5") != std::string::npos);
     assert(library.resolve("effects\\glow", mode, error, nullptr, &blend_mode,
         false, false, true) && mode == SurfaceMode::Transparent && blend_mode == 5);
+    assert(!library.resolve("mod\\fog_add", mode, error, nullptr, nullptr,
+        false, false, true) && error.find("Fog") != std::string::npos &&
+        error.find("id=39") != std::string::npos);
     assert(library.resolve("mod\\scaled_replace", mode, error, &alpha_ref, &blend_mode,
         false, false, true) && mode == SurfaceMode::Transparent && blend_mode == 7 &&
         alpha_ref == 0);

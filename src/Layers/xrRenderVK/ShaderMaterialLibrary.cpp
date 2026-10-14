@@ -295,13 +295,14 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 if (property.name == "Transform") definition.environment_transform = value;
                 if (property.name == "Constant") definition.environment_constant = value;
             }
-            if (definition.pipeline_supported &&
+            const bool uses_environment = cls != "MODELEbB" || mode == SurfaceMode::Transparent;
+            if (definition.pipeline_supported && uses_environment &&
                 (definition.environment_texture.empty() || definition.environment_texture == "$null"))
             {
                 definition.pipeline_supported = false;
                 definition.unsupported_reason = "Environment map / Name (required texture)";
             }
-            if (definition.pipeline_supported &&
+            if (definition.pipeline_supported && uses_environment &&
                 !definition.environment_transform.empty() && definition.environment_transform != "$null")
             {
                 definition.pipeline_supported = false;
@@ -501,8 +502,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         (material.mode == SurfaceMode::Transparent || world_set);
     const uint32_t supported_flags = screen_pipeline ? 0u :
         1u | (scene_depth_test ? 2u : 0u) |
-        (level_pipeline && (material.class_name != "S_SET   " ||
-            material.blending == 1 || material.blending == 5 || material.blending == 6) ? 16u : 0u) |
+        (level_pipeline && material.blending == 1 ? 16u : 0u) |
         ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u) |
         (world_set ? 4u : 0u);
     const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;

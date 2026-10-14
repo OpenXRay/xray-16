@@ -766,7 +766,12 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     else
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             68, sizeof(detail_scale), &detail_scale);
-    if (mode == SurfaceMode::AlphaTest)
+    if (mode == SurfaceMode::AlphaTest || (fragment_name &&
+            (std::strstr(fragment_name, "world_set_blended.ps") ||
+             std::strstr(fragment_name, "world_set_set_2r.ps") ||
+             std::strstr(fragment_name, "world_set_blend_2r.ps") ||
+             std::strstr(fragment_name, "world_set_blend_4r.ps") ||
+             std::strstr(fragment_name, "glow_alpha_add.ps"))))
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (mode == SurfaceMode::Transparent && !hud)

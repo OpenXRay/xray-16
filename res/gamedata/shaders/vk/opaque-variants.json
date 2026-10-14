@@ -57,7 +57,7 @@
     { "source": "opaque.ps", "stage": "ps", "output": "vk/world_set_set_2r.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_WORLD_SET=1", "VK_WORLD_SET_AREF=1", "VK_SCREEN_SCALE_2=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/world_set_blend_2r.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_WORLD_SET=1", "VK_WORLD_SET_AREF=1", "VK_SCREEN_SCALE_2=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/world_set_blend_4r.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_WORLD_SET=1", "VK_WORLD_SET_AREF=1", "VK_SCREEN_SCALE_4=1"] },
-    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_fog.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_FOG=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_fog.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_WORLD_SET=1", "VK_WORLD_SET_AREF=1", "VK_WORLD_SET_FOG=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_SKINNED=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/hud_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/particle_world_set.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_UNLIT=1", "VK_PARTICLE=1", "VK_PARTICLE_SET=1"] },

@@ -45,10 +45,10 @@ the original property bytes remain available for diagnostics.
 | `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal uses the THM DDS pair and surface descriptor slots. |
 | `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
 | `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. The four serialized `R2-*` slots are read for v3 `BmmD` as well as `BmmDold`; four `$null` slots leave the single-detail path available, whereas a partial set is rejected. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
-| `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; blended models use forward, opaque models write the G-buffer through dedicated static/skinned variants. Named environment matrix rejected. |
+| `LmEbB`, `MODELEbB` | `LmEbB` uses base, lightmap and environment cube. Blended `MODELEbB` uses base and environment cube; opaque `MODELEbB` retains the serialized environment fields but the original R2 `uber_deffer("model", "base")` does not sample them. | Blended models use forward reflection; opaque models use the ordinary static/skinned model G-buffer with bump and surface channels. A named environment matrix is rejected only when its forward/reflection pass consumes it. |
 | `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |
 | `PARTICLE` | Base, clamp/wrap sampler by property. | Modes 0–5: set, alpha, add, multiply, multiply-2x, alpha-add. Mode 0 uses original fixed alpha reference 200. |
-| `S_SET` | Base, clamp/wrap sampler by property. | UI modes 0–9. World `SET` uses an unlit depth-writing forward draw; other world forward variants include source alpha, ADD, MUL, MUL_2X, ALPHA-ADD, wallmark MUL_2X and the 2R/4R variants. World geometry requires Z-test and compatible Z-write, lighting and fog; unsupported combinations report the precise property/mode. The original alpha reference is pushed for the applicable forward variants. |
+| `S_SET` | Base, clamp/wrap sampler by property. | UI modes 0–9. World level and OGF models use explicit forward variants for `SET` (depth writing), source alpha, ADD, MUL, MUL_2X, ALPHA-ADD, wallmark MUL_2X and 2R/4R; static and skinned OGF share the original blend/depth state. World geometry requires Z-test and compatible Z-write. World BLEND with Fog uses unlit fog color, while combinations whose flags cannot be honored report their property. OGF water, fog and HUD S_SET contexts are explicitly rejected until their respective shader routes exist. Alpha reference is pushed for the applicable variants; SET 2R uses the original fixed reference 0. |
 
 The descriptor cache includes all texture names and the sampler choice. Active
 sets retain their image views until idle retirement; both wrap and clamp
@@ -57,7 +57,8 @@ scale 1 and no implicit detail. A present malformed detail chunk fails with
 its VFS path. An explicit detail name is not replaced by the base texture.
 Base, lightmap, mask and detail slots require 2D DDS, including when bump and
 normal maps create a surface descriptor; the environment slot requires a cube
-for `LmEbB`/`MODELEbB` and 2D for `LaEmB`. Errors name the
+for `LmEbB` and blended `MODELEbB`, and 2D for `LaEmB`. Opaque `MODELEbB`
+does not request an environment DDS. Errors name the
 role, slot number and offending resource.
 
 `LevelPassGraph` selects the level shader pair, texture-role mask, attachment,
@@ -73,7 +74,7 @@ bump# at 7–8, detail bump and bump# at 9–10, terrain R/G/B/A bump at 11–14
 external normal at 15, and terrain bump# at 16–19. An unused role receives the
 base DDS; hot reload rebinds every slot. The fragment push constants at 80–111
 carry bump mode, detail/external normal flags, material class and weight, height
-scale, emission, and terrain mask. Opaque environment variants use 96–127.
+scale, emission, and terrain mask. Level opaque environment variants use 96–127.
 
 The third RGBA8 color attachment stores `(gloss, material/3, emission, height)`.
 Its normal partner stores the mapped normal; sun and local lighting sample both.
