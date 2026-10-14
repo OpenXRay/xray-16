@@ -20,6 +20,8 @@ with both ABIs can be built by omitting `XRAY_ANDROID_ARM64_ONLY`; Android
 selects the native ABI supported by the device, so a dual-ABI APK is not a
 reliable way to force the 64-bit Vulkan engine. The build kit can include an
 optional `ANDROID_DEPS_PREFIX_ARM64` alongside its ARMv7 prefix.
+An ARM64-only build needs `ANDROID_DEPS_PREFIX_ARM64`; the ARMv7 prefix is
+required only when packaging both ABIs.
 
 ## Supported configuration
 

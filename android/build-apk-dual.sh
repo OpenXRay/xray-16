@@ -43,9 +43,13 @@ if [ -z "$sdk_dir" ] || [ ! -x "$sdk_dir/platform-tools/adb" ]; then
     echo "ANDROID_SDK_ROOT must point to an installed Android SDK" >&2
     exit 2
 fi
-if [ -z "$deps_prefix" ] || [ ! -f "$deps_prefix/lib/cmake/SDL2/SDL2Config.cmake" ] ||
-    [ -z "$deps_prefix64" ] || [ ! -f "$deps_prefix64/lib/cmake/SDL2/SDL2Config.cmake" ]; then
-    echo "Both ANDROID_DEPS_PREFIX_ARMV7 and ANDROID_DEPS_PREFIX_ARM64 are required" >&2
+if [ -z "$deps_prefix64" ] || [ ! -f "$deps_prefix64/lib/cmake/SDL2/SDL2Config.cmake" ]; then
+    echo "ANDROID_DEPS_PREFIX_ARM64 is required" >&2
+    exit 2
+fi
+if [ "$arm64_only" != ON ] &&
+    { [ -z "$deps_prefix" ] || [ ! -f "$deps_prefix/lib/cmake/SDL2/SDL2Config.cmake" ]; }; then
+    echo "ANDROID_DEPS_PREFIX_ARMV7 is required for a dual-ABI APK" >&2
     exit 2
 fi
 if [ -z "$sdl_dir" ] || [ ! -f "$sdl_dir/android-project/gradlew" ]; then
