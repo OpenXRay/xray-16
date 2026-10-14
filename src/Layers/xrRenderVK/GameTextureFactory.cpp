@@ -573,8 +573,12 @@ bool GameTextureFactory::decode_detail_metadata(const uint8_t* params, size_t pa
         if (!std::isfinite(detail.scale) || detail.scale <= 0.f)
         { error = "THM_CHUNK_DETAIL_EXT has invalid scale"; return false; }
     }
-    if ((detail.diffuse || detail.normal) && detail.texture.empty())
-    { error = "detail flags require THM_CHUNK_DETAIL_EXT / texture name"; return false; }
+    // TextureDescrManager creates a detail association only when both the
+    // usage bits and a nonempty detail name are present. Stock THMs can keep
+    // the bits while leaving the name empty (or omitting this older chunk).
+    // Keep decoding the other material channels, but do not request a detail
+    // DDS that the original renderer would never bind.
+    if (detail.texture.empty()) detail.diffuse = detail.normal = false;
     const auto bounded_name = [&error](const uint8_t* bytes, size_t length,
         std::string& out, const char* chunk) -> bool
     {

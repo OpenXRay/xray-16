@@ -205,6 +205,14 @@ int main()
         FS.rescan_path(FS.get_path("$level$")->m_Path, false);
         assert(textures.texture_detail_metadata("arb_42", detail, metadata_error) &&
             detail.diffuse && detail.texture == "base_detail" && detail.scale == 1.25f);
+        Bytes unnamed(8, 0), unnamed_thm;
+        unnamed[6] = 0x80; // diffuse detail bit without DETAIL_EXT
+        unnamed[7] = 0x04; // bump detail bit without DETAIL_EXT
+        chunk(unnamed_thm, 0x0812, unnamed);
+        save(directory / "unnamed_detail.thm", unnamed_thm);
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+        assert(textures.texture_detail_metadata("unnamed_detail", detail, metadata_error) &&
+            !detail.diffuse && !detail.normal && detail.texture.empty() && metadata_error.empty());
     }
     {
         Bytes params(8, 0), extension{'m','o','d','\\','d','e','t','a','i','l',0};
@@ -218,6 +226,18 @@ int main()
         params[7] = 0x04; // flBumpDetail (bit 26)
         assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
             extension.data(), extension.size(), metadata, error) && metadata.normal);
+        // A CoP texture can retain detail bits without a named detail map.
+        // The classic TextureDescrManager simply leaves its detail association
+        // unset; both absent and empty DETAIL_EXT must behave the same here.
+        assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            nullptr, 0, metadata, error) && !metadata.diffuse && !metadata.normal &&
+            metadata.texture.empty() && metadata.scale == 1.f && error.empty());
+        Bytes empty_detail{0};
+        putfloat(empty_detail, 3.f);
+        assert(GameTextureFactory::decode_detail_metadata(params.data(), params.size(),
+            empty_detail.data(), empty_detail.size(), metadata, error) &&
+            !metadata.diffuse && !metadata.normal && metadata.texture.empty() &&
+            metadata.scale == 3.f && error.empty());
         assert(!GameTextureFactory::decode_detail_metadata(params.data(), 7,
             extension.data(), extension.size(), metadata, error) &&
             error.find("TEXTUREPARAM") != std::string::npos);
