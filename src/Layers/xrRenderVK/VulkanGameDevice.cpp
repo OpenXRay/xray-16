@@ -493,6 +493,23 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         !owner.forward_buffers_[frame.image_index].write(0, &owner.forward_lighting_,
             sizeof(owner.forward_lighting_), owner.model_error_))
     { owner.models_recorded_ = false; return; }
+    // R2 draws secondary priority ordinary geometry after combine and before
+    // the sorted forward list. This pass replaces color and writes depth.
+    if (owner.current_level_)
+        for (const auto& level : owner.level_draws_)
+        {
+            if (level.hud || !owner.current_level_->has_secondary_priority(level.index)) continue;
+            float mvp[16];
+            std::copy(level.mvp.begin(), level.mvp.end(), mvp);
+            if (!owner.current_level_->record_visual(level.index, frame, owner.deferred_,
+                    mvp, GeometryPhase::Transparent, level.lod, level.instance == nullptr, true))
+            {
+                owner.level_recorded_ = false;
+                owner.level_error_ = "Vulkan secondary-priority level visual " +
+                    std::to_string(level.index) + " failed";
+                return;
+            }
+        }
     std::vector<TransparentDrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
         if (!owner.level_draws_[i].hud) draws.push_back({owner.level_draws_[i].sort_distance, false, i});

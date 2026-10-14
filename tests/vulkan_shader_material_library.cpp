@@ -848,13 +848,12 @@ int main()
             std::strcmp(reinterpret_cast<const char*>(parsed_matrix->properties.back().data.data()),
                 "spin") == 0);
     }
-    Bytes priority = record("LM      ", "mod\\priority", false);
+    Bytes priority = record("V       ", "mod\\priority", false);
     write32(priority, 0);
     priority.insert(priority.end(), {'G','e','n','e','r','a','l',0});
     write32(priority, 4);
     priority.insert(priority.end(), {'P','r','i','o','r','i','t','y',0});
     write32(priority, 3); write32(priority, 0); write32(priority, 3);
-    rejected_semantics(priority, 72, "mod\\priority", "render priority");
     {
         Bytes records, file;
         chunk(records, 72, priority);
@@ -863,12 +862,25 @@ int main()
         ShaderMaterialLibrary parsed_library;
         assert(parsed_library.load(reader, error));
         const auto* parsed_priority = parsed_library.find("mod\\priority");
-        assert(parsed_priority && !parsed_priority->pipeline_supported &&
+        assert(parsed_priority && parsed_priority->pipeline_supported &&
+            parsed_priority->priority == 3 &&
             parsed_priority->properties.back().scope == "General" &&
             parsed_priority->properties.back().type == 4 &&
             parsed_priority->properties.back().data.size() == 12 &&
             parsed_priority->properties.back().data[0] == 3);
+        SurfaceMode selected{};
+        MaterialDefinition resolved;
+        assert(parsed_library.resolve("mod\\priority", selected, error,
+            nullptr, nullptr, false, false, true, false,
+            nullptr, nullptr, &resolved));
+        assert(selected == SurfaceMode::Opaque && resolved.priority == 3);
+        assert(!parsed_library.resolve("mod\\priority", selected, error,
+            nullptr, nullptr, false, false, false, false,
+            nullptr, nullptr, &resolved, true) &&
+            error.find("Priority=3") != std::string::npos);
     }
+    priority[priority.size() - 12] = 4;
+    rejected_semantics(priority, 72, "mod\\priority", "invalid render priority");
     Bytes renamed = record("LM_AREF ", "mod\\ordinary_surface", false);
     Bytes deceptive = record("LM_AREF ", "water\\double_sided_alpha_add", false);
     Bytes rename_records, rename_file;

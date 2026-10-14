@@ -244,6 +244,16 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         if (implicit_detail && (metadata.diffuse || metadata.normal)) detail_texture = metadata.texture;
+        mesh.secondary_opaque = definition.priority >= 2 &&
+            definition.mode == SurfaceMode::Opaque;
+        if (mesh.secondary_opaque && !detail_texture.empty())
+        {
+            error = "level material id=" + std::to_string(model.material) + " shader='" +
+                material.shader + "' General / Priority=" + std::to_string(definition.priority) +
+                " with a detail map requires a separate forward shader";
+            return false;
+        }
+        if (mesh.secondary_opaque) mode = SurfaceMode::Transparent;
         if (mode == SurfaceMode::Transparent && detail_texture.empty() &&
             definition.class_name != "LmEbB   ") lightmap.clear();
         if ((terrain.enabled || !definition.detail_texture.empty() ||
@@ -281,7 +291,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         prepared.has_water_ |= mesh.water;
         const uint16_t roles = (metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
             (!metadata.external_normal_texture.empty() || metadata.normal ? NormalRole : 0u);
-        if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
+        if (mesh.secondary_opaque)
+            mesh.pass_graph = secondary_opaque_level_graph(roles);
+        else if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
                 mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles,
                 definition.class_name == "S_SET   " ? blend_mode : -1},
                 mesh.pass_graph, error))
@@ -554,10 +566,18 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const LevelVisual& visual = visuals_[index];
         uint8_t mask = 0;
         if (visual.mesh >= 0 && size_t(visual.mesh) < meshes_.size())
-            mask |= meshes_[visual.mesh].mode == SurfaceMode::Transparent ? 2 : 1;
+        {
+            const Mesh& mesh = meshes_[visual.mesh];
+            mask |= mesh.mode == SurfaceMode::Transparent ? 2 : 1;
+            if (mesh.secondary_opaque) mask |= 4;
+        }
         for (int32_t facet : visual.lod_facets)
             if (facet >= 0 && size_t(facet) < meshes_.size())
-                mask |= meshes_[facet].mode == SurfaceMode::Transparent ? 2 : 1;
+            {
+                const Mesh& mesh = meshes_[facet];
+                mask |= mesh.mode == SurfaceMode::Transparent ? 2 : 1;
+                if (mesh.secondary_opaque) mask |= 4;
+            }
         for (uint32_t child : visual.children) mask |= self(self, child);
         phase_state[index] = 2;
         return visual_phases_[index] = mask;
@@ -988,11 +1008,12 @@ bool GpuLevel::record_transparent_detail(size_t draw_index, const FrameRecording
 
 bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     const DeferredPass& pass, const float (&mvp)[16], GeometryPhase phase, float lod,
-    bool cull_static) const
+    bool cull_static, bool secondary_only) const
 {
     if (index >= visuals_.size()) return false;
     if (index < visual_phases_.size() &&
-        !(visual_phases_[index] & (phase == GeometryPhase::Transparent ? 2 : 1)))
+        !(visual_phases_[index] & (secondary_only ? 4 :
+            phase == GeometryPhase::Transparent ? 2 : 1)))
         return true;
     const LevelVisual& visual = visuals_[index];
     // Hierarchy bounds in older level archives are not guaranteed to enclose
@@ -1026,7 +1047,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size()) return false;
         const Mesh& mesh = meshes_[mesh_index];
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
-        if ((phase == GeometryPhase::Transparent) != transparent) return true;
+        if ((phase == GeometryPhase::Transparent) != transparent ||
+            (transparent && mesh.secondary_opaque != secondary_only)) return true;
         const auto& first = mesh.pass_graph.passes[0];
         const char* vertex = first.vertex_for_visual(false, visual.type);
         const char* fragment = first.fragment.c_str();
@@ -1078,7 +1100,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const Mesh& base = meshes_[visual.mesh];
         const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
-        const bool selected = phase == GeometryPhase::Transparent ? transparent :
+        const bool selected = phase == GeometryPhase::Transparent ?
+            transparent && mesh.secondary_opaque == secondary_only :
             phase == GeometryPhase::OpaqueAndAlphaTest && !transparent;
         const char* failure = nullptr;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
@@ -1146,7 +1169,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
         const float dy = bounds[7] - Device.vCameraPosition.y;
         const float dz = bounds[8] - Device.vCameraPosition.z;
         const float child_lod = lod_for_distance(bounds[9], dx * dx + dy * dy + dz * dz);
-        if (!record_visual(child, frame, pass, mvp, phase, child_lod, cull_static)) return false;
+        if (!record_visual(child, frame, pass, mvp, phase, child_lod, cull_static, secondary_only)) return false;
     }
     return true;
 }

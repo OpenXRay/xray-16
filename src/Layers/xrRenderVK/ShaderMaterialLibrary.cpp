@@ -250,6 +250,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             return false;
         }
         auto& definition = entries_.at(name);
+        for (const BlenderProperty& property : definition.properties)
+            if (property.scope == "General" && property.name == "Priority" &&
+                property.type == 4 && property.data.size() == 12)
+                definition.priority = static_cast<uint8_t>(std::min(le32(property.data.data()), 255u));
         const bool strict_sorting = std::any_of(definition.properties.begin(), definition.properties.end(),
             [](const BlenderProperty& property)
             { return property.name == "Strict sorting" && property.type == 6 &&
@@ -441,8 +445,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                     !std::memchr(property.data.data(), 0, property.data.size()))))
             { reject("invalid property type or value"); break; }
             if (name == "Priority" && property.type == 4 && property.data.size() == 12 &&
-                le32(property.data.data()) != 1)
-                reject("render priority is not implemented");
+                (le32(property.data.data()) > 3 ||
+                 le32(property.data.data()) < le32(property.data.data() + 4) ||
+                 le32(property.data.data()) > le32(property.data.data() + 8)))
+                reject("invalid render priority (expected 0..3 within saved bounds)");
             if (name == "Tessellation" && (property.type == 7 || property.type == 8) &&
                 property.data.size() >= 4 && le32(property.data.data()) != 0)
                 reject("tessellation variant is not implemented");
@@ -458,10 +464,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$base0") != 0)
                 reject("base texture selector is not implemented");
         }
-        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' passes=%u properties=%zu supported=%d reason='%s'",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s priority=%u alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' passes=%u properties=%zu supported=%d reason='%s'",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
-            alpha_ref, blending, definition.screen_flags,
+            definition.priority, alpha_ref, blending, definition.screen_flags,
             definition.role == MaterialDefinition::Role::Water ? "water" : "standard",
             terrain.enabled ? 1 : 0, definition.detail_texture.c_str(),
             definition.environment_texture.c_str(), definition.environment_transform.c_str(),
@@ -490,6 +496,16 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     if (!material.pipeline_supported)
     { error = "unsupported " + context + (material.unsupported_reason.empty() ? "" :
         " property='" + material.unsupported_reason + "'"); return false; }
+    if (material.priority != 1 &&
+        !(level_pipeline && !model_pipeline && material.priority >= 2 &&
+          material.priority <= 3 &&
+          (material.mode == SurfaceMode::Transparent ||
+           material.class_name == "V       " && material.mode == SurfaceMode::Opaque)))
+    {
+        error = "unsupported General / Priority=" + std::to_string(material.priority) +
+            " in " + context + " for this render consumer";
+        return false;
+    }
     if (screen_pipeline && material.class_name != "S_SET   ")
     { error = "unsupported screen class in " + context; return false; }
     // World decals and tracers use S_SET too. Their Z-test=1/Z-write=0

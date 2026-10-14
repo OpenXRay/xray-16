@@ -3,7 +3,7 @@
 This records the game-path subset of PDF tasks 1–11. `shaders.xr` is read through
 the engine VFS. Every property keeps its serialized type, scope and bytes in
 `MaterialDefinition`; acceptance depends on its semantics and the consumer's
-context. An unfamiliar property, non-default render priority, non-default
+context. An unfamiliar property, unsupported render priority, non-default
 base/detail matrix, tessellation selection or tree_s selection fails with the
 blender ID, class, version and shader name. A parsed definition alone is not
 proof that a level, model, particle or UI pipeline can render it.
@@ -12,8 +12,10 @@ proof that a level, model, particle or UI pipeline can render it.
 
 All known classes retain `General/Priority` (default 1), `General/Strict sorting`
 (default false), and `Base Texture/Name` and `Transform` (default `$base0`
-and `$null`). A non-default priority or named base matrix is rejected by the
-current game pipeline. The following are the additional properties read by
+and `$null`). Priority 2/3 on an opaque level `V` material uses a secondary
+forward replacement pass; transparent level materials retain their forward
+path. Other non-default priorities and named base matrices are rejected by
+the current game pipeline. The following are the additional properties read by
 the original class `Save`/`Load` methods. A property introduced by a newer
 version is rejected if inserted into an older record, even if its value is 0.
 
@@ -31,7 +33,7 @@ version is rejected if inserted into an older record, even if its value is 0.
 | `S_SET` | 0–4 | `Blending` token 0, `Texture clamp` true (omitted by v2 `Load`), `Alpha ref` 32; `Z-test`, `Z-write`, `Lighting`, `Fog` false |
 
 The parser retains raw values and scopes for every property, including a
-matrix or priority whose execution is not supported yet. This closes the
+matrix or priority whose execution is not supported in a given context. This closes the
 original PDF task 1's description and propagation contract on host: a
 serialized property never becomes an implicit default pipeline merely because
 its class/version is known. Implementing named animated matrices, a different

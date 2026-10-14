@@ -297,6 +297,12 @@ int main()
     // Three overlapping translucent quads stand for a grass detail, an OGF
     // model and a particle. The real forward recorder uses this exact sort;
     // its stable tie rule also keeps repeated frames deterministic.
+    const auto secondary = secondary_opaque_level_graph(NormalRole | GlossRole);
+    assert(validate_level_pass_graph(secondary, error));
+    assert(secondary.count == 1 && secondary.passes[0].target == LevelPassTarget::Forward &&
+        secondary.passes[0].blend == LevelPassBlend::Replace &&
+        secondary.passes[0].depth_test && secondary.passes[0].depth_write &&
+        (secondary.passes[0].textures & (NormalRole | GlossRole)) == (NormalRole | GlossRole));
     std::vector<TransparentDrawRef> overlap = {
         {4.f, false, 0, false, true},
         {16.f, false, 1, false, false},
