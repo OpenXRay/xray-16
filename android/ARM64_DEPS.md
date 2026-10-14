@@ -21,3 +21,11 @@ headers and static library. Theora was configured through Autotools with
 and the cross compiler `aarch64-linux-android26-clang`. OpenAL Soft 1.24.3's
 bundled fmt headers need `-include cstdlib` with NDK r30. Host tools for the
 APK build are JDK 17 and `glslc` in addition to those archived in the kit.
+
+An alternative SDL2 source for an ARM64-only prefix is SDL 2.30.0 at
+`libsdl-org/SDL@859844eae358447be8d66e6da59b6fb3df0ed778`. With NDK r30,
+apply `android/toolchain-patches/SDL-2.30.0-ndk-r30.patch` to that SDL tree
+before building. It replaces the unavailable sensor `ALooper_pollAll` call
+with `ALooper_pollOnce`. Build SDL and the libraries above for `arm64-v8a`,
+Android API 26 and `c++_shared` into one `ANDROID_DEPS_PREFIX_ARM64`. An
+ARM64-only APK does not require an ARMv7 prefix; a dual-ABI APK does.
