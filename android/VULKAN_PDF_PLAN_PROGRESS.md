@@ -6,6 +6,8 @@
 
 Дополнение 14.10.2026: OGF `D_TREE` diffuse detail из `.thm` проходит через отдельный surface descriptor и девять статических/skinned/double-sided SPIR-V вариантов, получает UV scale также в forward и skinned draw; проверки SPIR-V отражают binding 2 и push offset 68. `MODEL` не включает diffuse detail по одной лишь `.thm`, поскольку его исходный Compile не читает `s_detail`. Общий граф теперь выдаёт точные ошибки ролей и режимов, отражает depth write `PARTICLE SET`; UI воспроизводит исходные alpha blend factors. Синтетическое пересечение detail, модели и частицы проверяет общую стабильную сортировку и результат compositing в одном пикселе. Это host-свидетельство, не визуальная приёмка на Android.
 
+После этого дополнения повторно собраны host `xrRenderVK` и ARM64 native `libmain.so`; семь профильных C++-тестов, четыре проверки shader assets и SPIR-V detail прошли. Новый ARM64-only APK 0.9.133 прошёл Gradle assembleDebug, проверку Vulkan route, 16K alignment и подписи. SHA-256 нового APK: `1edb15a732be99d728ae49e6162242ab1e582c4e5cfacba164db8f9c02c9a69e`. Предыдущий SHA выше относится к предшествующей сборке.
+
 | № | Задача PDF | Статус | Выполнено / что осталось по критерию PDF |
 | --- | --- | --- | --- |
 | 1 | Расширить описание материала | Частично | Сохраняются класс, версия, сырой тип/значение/область свойства и вторичные слоты. Схема `Save`/`Load` по классу и версии проверяет чужие и преждевременные свойства/области; отрицательные фикстуры покрывают `Alpha ref`, clamp, environment constant, terrain channels и чужой `Detail map`. Неисполненные priority, matrix, tessellation, tree_s отклоняются; схема записана в `VULKAN_102_CONTRACT.md`. Для полной готовности остаются роли и контексты 2–5. |
