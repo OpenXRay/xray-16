@@ -28,6 +28,7 @@ SurfaceParameters expected_surface{};
 bool surface_push{};
 bool environment_camera_push{}, environment_surface_push{};
 bool world_alpha_push{};
+float expected_world_alpha_ref{.25f};
 bool distinct_surface_images{}, surface_bindings_checked{};
 float expected_environment_camera[4]{2.f, 3.f, 4.f, 1.f};
 VkPipeline bound_pipeline{};
@@ -162,13 +163,13 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
             color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
     }
     else if (uintptr_t(info->pStages[1].module) >= 128 &&
-        uintptr_t(info->pStages[1].module) <= 138)
+        uintptr_t(info->pStages[1].module) <= 147)
     {
         const unsigned module = unsigned(uintptr_t(info->pStages[1].module));
-        const unsigned mode = module == 138 ? 1 : module - 128;
+        const unsigned mode = module >= 138 ? module - 138 : module - 128;
         const auto& color = info->pColorBlendState->pAttachments[0];
         assert(info->renderPass == handle<VkRenderPass>(11) &&
-            info->layout == (module == 138 ? skinned_layout : geometry_layout));
+            info->layout == (module >= 138 ? skinned_layout : geometry_layout));
         assert(info->pDepthStencilState->depthTestEnable &&
             info->pDepthStencilState->depthWriteEnable == (mode == 0));
         assert(color.blendEnable == (mode != 0 && mode != 7));
@@ -326,7 +327,7 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         }
         if (offset == 64 && size == sizeof(float) && uintptr_t(bound_pipeline) >= 128)
         {
-            assert(*static_cast<const float*>(data) == .25f);
+            assert(*static_cast<const float*>(data) == expected_world_alpha_ref);
             world_alpha_push = true;
         }
         if (offset == 80)
@@ -370,7 +371,8 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
     constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
         134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144,
-        145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155};
+        145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155,
+        156, 157, 158, 159, 160, 161, 162, 163, 164, 165};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -862,19 +864,26 @@ int main()
         assert(deferred.create_game_pipeline("vk\\object_blended.vs", fragment,
             handle<VkShaderModule>(106), handle<VkShaderModule>(128 + mode),
             SurfaceMode::Opaque, true, error));
+        expected_world_alpha_ref = mode == 7 ? 0.f : .25f;
         world_alpha_push = false;
         assert(deferred.record_hud(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
-            6, expected_mvp, detail, 0, "vk\\object_blended.vs", fragment.c_str(), .25f));
+            6, expected_mvp, detail, 0, "vk\\object_blended.vs", fragment.c_str(),
+            expected_world_alpha_ref));
         assert(world_alpha_push == (mode == 1 || mode == 5 || mode == 7 || mode == 8 || mode == 9));
     }
-    assert(deferred.create_game_pipeline("vk\\hud_skinned_2.vs", "vk\\hud_model_set_blended.ps",
-        handle<VkShaderModule>(115), handle<VkShaderModule>(138),
-        SurfaceMode::Opaque, true, error, true));
-    world_alpha_push = false;
-    assert(deferred.record_skinned(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
-        6, expected_mvp, detail, pose, SurfaceMode::Opaque, true, 0,
-        "vk\\hud_skinned_2.vs", "vk\\hud_model_set_blended.ps", .25f));
-    assert(world_alpha_push);
+    for (unsigned mode = 0; mode < 10; ++mode)
+    {
+        const std::string fragment = std::string("vk\\hud_model_set_") + model_fragments[mode] + ".ps";
+        assert(deferred.create_game_pipeline("vk\\hud_skinned_2.vs", fragment,
+            handle<VkShaderModule>(115), handle<VkShaderModule>(138 + mode),
+            SurfaceMode::Opaque, true, error, true));
+        expected_world_alpha_ref = mode == 7 ? 0.f : .25f;
+        world_alpha_push = false;
+        assert(deferred.record_skinned(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+            6, expected_mvp, detail, pose, SurfaceMode::Opaque, true, 0,
+            "vk\\hud_skinned_2.vs", fragment.c_str(), expected_world_alpha_ref));
+        assert(world_alpha_push == (mode == 1 || mode == 5 || mode == 7 || mode == 8 || mode == 9));
+    }
     deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);
     deferred.release_forward_sets();
