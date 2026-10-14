@@ -455,12 +455,15 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             // The four-channel BmmD impl pass does not bind oT2_xform: it
             // samples R2-R/G/B/A with its terrain UV. The serialized detail
             // matrix remains relevant to the one-channel detail variant.
-            if (name == "Transform" && (scope == "Base Texture" ||
+            // The programmable S_SET blender binds C.L_textures[0] and
+            // ignores its saved Base Texture Name/Transform. Fixed-function
+            // S_SET uses those fields, but Vulkan never runs that path.
+            if (name == "Transform" && ((scope == "Base Texture" && cls != "S_SET   ") ||
                     (scope == "Detail map" && !terrain.enabled)) &&
                 property.type == 1 && property.data[0] &&
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$null") != 0)
                 reject("named texture matrix is not implemented");
-            if (name == "Name" && scope == "Base Texture" &&
+            if (name == "Name" && scope == "Base Texture" && cls != "S_SET   " &&
                 property.type == 3 && property.data[0] &&
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$base0") != 0)
                 reject("base texture selector is not implemented");

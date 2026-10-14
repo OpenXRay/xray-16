@@ -37,6 +37,19 @@ static void matrix_property(Bytes& bytes, const char* name, const char* value)
     assert(std::strlen(value) < 64);
     std::memcpy(bytes.data() + offset, value, std::strlen(value));
 }
+static void replace_saved_string_property(Bytes& bytes, uint32_t type,
+    const char* name, const char* value)
+{
+    Bytes marker;
+    write32(marker, type);
+    marker.insert(marker.end(), name, name + std::strlen(name) + 1);
+    auto position = std::search(bytes.begin() + 176, bytes.end(), marker.begin(), marker.end());
+    assert(position != bytes.end() && std::strlen(value) < 64);
+    const size_t offset = size_t(position - bytes.begin()) + marker.size();
+    assert(offset + 64 <= bytes.size());
+    std::fill(bytes.begin() + offset, bytes.begin() + offset + 64, 0);
+    std::memcpy(bytes.data() + offset, value, std::strlen(value));
+}
 static Bytes record(const char* cls, const char* name, bool blend, uint32_t alpha_ref = 128)
 {
     Bytes result(176, 0);
@@ -678,6 +691,8 @@ int main()
     assert(!library.resolve("mod\\depth_write", mode, error, nullptr, &blend_mode, true) &&
         error.find("Z-write") != std::string::npos);
     Bytes screen_wrap = record("S_SET   ", "mod\\wrap_ui", false);
+    replace_saved_string_property(screen_wrap, 3, "Name", "ui\\saved_but_unused");
+    replace_saved_string_property(screen_wrap, 1, "Transform", "ui_scroll_unused");
     write32(screen_wrap, 7);
     screen_wrap.insert(screen_wrap.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(screen_wrap, 1); write32(screen_wrap, 0);
@@ -695,6 +710,8 @@ int main()
         false, true, false, false, nullptr, nullptr, &ui_wrap_definition) &&
         !ui_wrap_definition.pass.clamp && mode == SurfaceMode::Transparent);
     Bytes water = record("S_SET   ", "mod\\arbitrary_liquid", false, 0);
+    replace_saved_string_property(water, 3, "Name", "water\\saved_but_unused");
+    replace_saved_string_property(water, 1, "Transform", "water_scroll_unused");
     write32(water, 7); water.insert(water.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(water, 0); write32(water, 0);
     write32(water, 0);
@@ -743,6 +760,12 @@ int main()
         false, false, true, false, &flags, nullptr, &water_definition) &&
         mode == SurfaceMode::Transparent && blend_mode == 0 &&
         (flags & 15u) == 15u && water_definition.role == MaterialDefinition::Role::Water);
+    const auto saved_base_name = std::find_if(water_definition.properties.begin(),
+        water_definition.properties.end(), [](const BlenderProperty& property)
+        { return property.scope == "Base Texture" && property.name == "Name"; });
+    assert(saved_base_name != water_definition.properties.end() &&
+        std::strcmp(reinterpret_cast<const char*>(saved_base_name->data.data()),
+            "water\\saved_but_unused") == 0);
     MaterialDefinition ordinary_definition;
     assert(!library.resolve("water\\ordinary_overlay", mode, error, nullptr, nullptr,
         false, false, true) && error.find("Z-test=0") != std::string::npos);
@@ -877,6 +900,9 @@ int main()
     base_matrix.resize(matrix_value + 64);
     std::memcpy(base_matrix.data() + matrix_value, "spin", 5);
     rejected_semantics(base_matrix, 71, "mod\\double_sided", "named texture matrix");
+    Bytes base_selector = record("LM      ", "mod\\base_selector", false);
+    replace_saved_string_property(base_selector, 3, "Name", "textures\\nondefault");
+    rejected_semantics(base_selector, 112, "mod\\base_selector", "base texture selector");
     {
         Bytes records, file;
         chunk(records, 71, base_matrix);

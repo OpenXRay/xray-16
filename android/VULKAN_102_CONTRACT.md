@@ -15,7 +15,10 @@ All known classes retain `General/Priority` (default 1), `General/Strict sorting
 and `$null`). Priority 2/3 on an opaque level `V` material uses a secondary
 forward replacement pass; transparent level materials retain their forward
 path. Other non-default priorities and named base matrices are rejected by
-the current game pipeline. The following are the additional properties read by
+the current game pipeline when the original programmable blender consumes
+them. Programmable `S_SET` binds `C.L_textures[0]` and ignores its serialized
+`Base Texture/Name` and `Transform`; Vulkan preserves both fields and binds
+the texture supplied by the level, model, particle or UI consumer. The following are the additional properties read by
 the original class `Save`/`Load` methods. A property introduced by a newer
 version is rejected if inserted into an older record, even if its value is 0.
 
