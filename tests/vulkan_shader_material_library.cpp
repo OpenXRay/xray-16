@@ -217,6 +217,22 @@ int main()
     chunk(list, 63, environment_plain);
     chunk(list, 64, record("V_AREF  ", "mod\\vertex_cutout_detail", false, 72));
     chunk(list, 65, record("V_AREF  ", "mod\\vertex_transparent_detail", true, 40));
+    for (uint32_t blend : {2u, 3u, 4u, 7u, 8u, 9u})
+    {
+        const std::string name = "mod\\world_set_" + std::to_string(blend);
+        Bytes world = record("S_SET   ", name.c_str(), false);
+        write32(world, 7); world.insert(world.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+        write32(world, blend); write32(world, 0);
+        property(world, 6, "Z-test", 1);
+        chunk(list, 85 + blend, world);
+    }
+    Bytes world_set = record("S_SET   ", "mod\\world_set_0", false);
+    write32(world_set, 7);
+    world_set.insert(world_set.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(world_set, 0); write32(world_set, 0);
+    property(world_set, 6, "Z-test", 1);
+    property(world_set, 6, "Z-write", 1);
+    chunk(list, 85, world_set);
     Bytes file;
     Bytes constants;
     constants.insert(constants.end(), {'p', 'u', 'l', 's', 'e', 0});
@@ -232,7 +248,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 34);
+    assert(library.load(reader, error) && library.size() == 41);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -240,6 +256,13 @@ int main()
         second_name.type == 3 && second_name.data.size() == 64 &&
         std::strcmp(reinterpret_cast<const char*>(second_name.data.data()), "mod\\cube") == 0);
     assert(library.contains("HUD/ALPHA"));
+    const auto* world_state = library.find("mod\\world_set_2");
+    assert(world_state && world_state->pass.depth_test && !world_state->pass.depth_write &&
+        world_state->pass.clamp && !world_state->pass.lighting && !world_state->pass.fog);
+    const auto* set_state = library.find("mod\\world_set_0");
+    assert(set_state && set_state->pass.depth_test && set_state->pass.depth_write);
+    const auto* reflective_state = library.find("mod\\reflective_opaque_npc");
+    assert(reflective_state && reflective_state->pass.depth_test && reflective_state->pass.depth_write);
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
@@ -279,10 +302,12 @@ int main()
     assert(library.resolve("mod\\blended_reflection", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("mod\\plain_npc", mode, error) &&
         error.find("id=61") != std::string::npos &&
-        error.find("opaque MODELEbB G-buffer") != std::string::npos);
-    assert(!library.resolve("mod\\reflective_opaque_npc", mode, error) &&
-        error.find("id=84") != std::string::npos &&
-        error.find("opaque MODELEbB G-buffer") != std::string::npos);
+        error.find("Environment map / Name") != std::string::npos);
+    MaterialDefinition opaque_environment;
+    assert(library.resolve("mod\\reflective_opaque_npc", mode, error, nullptr, nullptr,
+        false, false, false, false, nullptr, nullptr, &opaque_environment) &&
+        mode == SurfaceMode::Opaque &&
+        opaque_environment.environment_texture == "mod\\npc_cube");
     assert(library.resolve("mod\\plain_glow", mode, error, nullptr, nullptr,
         false, false, true, false, nullptr, nullptr, &constant_definition) &&
         mode == SurfaceMode::Opaque && !constant_definition.has_environment_constant &&
@@ -301,6 +326,15 @@ int main()
     assert(library.resolve("hud\\alpha", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("effects\\additive", mode, error) &&
         error.find("blending=2") != std::string::npos && error.find("id=9") != std::string::npos);
+    assert(library.resolve("mod\\world_set_0", mode, error, nullptr, nullptr,
+        false, false, true) && mode == SurfaceMode::Transparent);
+    for (int blend : {2, 3, 4, 7, 8, 9})
+    {
+        const std::string name = "mod\\world_set_" + std::to_string(blend);
+        int selected = -1;
+        assert(library.resolve(name, mode, error, nullptr, &selected,
+            false, false, true) && mode == SurfaceMode::Transparent && selected == blend);
+    }
     int screen_particle_blend = -1;
     assert(library.resolve("effects\\additive", mode, error, nullptr,
         &screen_particle_blend, true) && mode == SurfaceMode::Transparent && screen_particle_blend == 2);
@@ -413,6 +447,8 @@ int main()
     chunk(wrap_file, 2, wrap_list);
     IReader wrap_reader(wrap_file.data(), wrap_file.size());
     assert(library.load(wrap_reader, error));
+    const auto* wrapped_state = library.find("mod\\wrap_ui");
+    assert(wrapped_state && !wrapped_state->pass.clamp);
     assert(library.resolve("mod\\wrap_ui", mode, error)); // Scene sampler repeats.
     assert(!library.resolve("mod\\wrap_ui", mode, error, nullptr, nullptr, false, true) &&
         error.find("Texture clamp") != std::string::npos && error.find("id=49") != std::string::npos);
@@ -444,6 +480,11 @@ int main()
     write32(misleading, 7); misleading.insert(misleading.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
     write32(misleading, 1); write32(misleading, 0);
     chunk(level_list, 37, misleading);
+    Bytes scaled_replace = record("S_SET   ", "mod\\scaled_replace", false, 173);
+    write32(scaled_replace, 7); scaled_replace.insert(scaled_replace.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+    write32(scaled_replace, 7); write32(scaled_replace, 0);
+    property(scaled_replace, 6, "Z-test", 1);
+    chunk(level_list, 38, scaled_replace);
     chunk(level_file, 2, level_list);
     IReader level_reader(level_file.data(), level_file.size());
     assert(library.load(level_reader, error));
@@ -468,6 +509,9 @@ int main()
         error.find("blending=5") != std::string::npos);
     assert(library.resolve("effects\\glow", mode, error, nullptr, &blend_mode,
         false, false, true) && mode == SurfaceMode::Transparent && blend_mode == 5);
+    assert(library.resolve("mod\\scaled_replace", mode, error, &alpha_ref, &blend_mode,
+        false, false, true) && mode == SurfaceMode::Transparent && blend_mode == 7 &&
+        alpha_ref == 0);
     Bytes newer = record("LM_AREF ", "mod\\future", false);
     newer[172] = 42;
     Bytes future_list, future_file;

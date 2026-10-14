@@ -21,7 +21,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     const char* label, bool shadow = false, bool additive = false,
     bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
     bool particle_set = false, bool water_depth_write = false, bool wallmark = false,
-    bool legacy_multiply = false)
+    bool legacy_multiply = false, bool replace_no_depth = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -108,7 +108,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
             attachment.srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
             attachment.dstColorBlendFactor = multiply_2x ? VK_BLEND_FACTOR_SRC_COLOR : VK_BLEND_FACTOR_ZERO;
         }
-        if (particle_set) attachment.blendEnable = VK_FALSE;
+        if (particle_set || replace_no_depth) attachment.blendEnable = VK_FALSE;
     }
     if (legacy_multiply)
     {
@@ -659,25 +659,31 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     }
     VkPipeline pipeline{};
     const bool transparent = mode == SurfaceMode::Transparent;
-    const bool particle_additive = fragment_name.find("particle_") != std::string::npos &&
+    const bool particle_additive = (fragment_name.find("particle_") != std::string::npos ||
+        fragment_name.find("world_set_") != std::string::npos) &&
         fragment_name.find("_additive.ps") != std::string::npos;
     const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_alpha_add.ps") != std::string::npos;
     const bool glow_alpha_add = fragment_name == "vk\\glow_alpha_add.ps";
-    const bool particle_multiply = fragment_name.find("particle_") != std::string::npos &&
+    const bool particle_multiply = (fragment_name.find("particle_") != std::string::npos ||
+        fragment_name.find("world_set_") != std::string::npos) &&
         fragment_name.find("_multiply.ps") != std::string::npos;
-    const bool particle_multiply_2x = fragment_name.find("particle_") != std::string::npos &&
+    const bool particle_multiply_2x = (fragment_name.find("particle_") != std::string::npos ||
+        fragment_name.find("world_set_") != std::string::npos) &&
         fragment_name.find("_multiply_2x.ps") != std::string::npos;
     const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps";
     const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_set.ps") != std::string::npos;
+    const bool world_set_depth_write = fragment_name == "vk\\world_set_set.ps";
+    const bool world_set_replace = fragment_name == "vk\\world_set_set_2r.ps";
     const bool legacy_multiply = fragment_name == "vk\\level_laemb_multiply.ps";
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
             !transparent && !hud, transparent, hud, skinned, vk_, pipeline, error,
             "game shader pair", false, particle_additive, particle_alpha_add || glow_alpha_add,
-            particle_multiply, particle_multiply_2x || wallmark_multiply_2x, particle_set,
-            false, wallmark_multiply_2x, legacy_multiply))
+            particle_multiply, particle_multiply_2x || wallmark_multiply_2x,
+            particle_set || world_set_depth_write,
+            false, wallmark_multiply_2x, legacy_multiply, world_set_replace))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;
@@ -727,7 +733,7 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
     const char* vertex_name, const char* fragment_name, float alpha_ref,
-    const float* normal_rows, float detail_scale) const
+    const float* normal_rows, float detail_scale, const float* environment_camera) const
 {
     const auto* pair = game_pipeline(vertex_name, fragment_name);
     if (!pair || !pair->skinned || pair->mode != mode || pair->hud != hud ||
@@ -748,9 +754,18 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     if (normal_rows)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
-    push_surface(frame, skinned_layout_, material_set);
-    vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
-        68, sizeof(detail_scale), &detail_scale);
+    const bool opaque_environment = mode == SurfaceMode::Opaque && fragment_name &&
+        std::strstr(fragment_name, "skinned_environment_opaque.ps");
+    push_surface(frame, skinned_layout_, material_set, opaque_environment ? 96 : 80);
+    if (opaque_environment)
+    {
+        const float origin[4]{};
+        vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            64, sizeof(origin), environment_camera ? environment_camera : origin);
+    }
+    else
+        vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            68, sizeof(detail_scale), &detail_scale);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -1061,6 +1076,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
             80, sizeof(float) * 12, normal_rows);
     const bool environment_variant = fragment_name &&
         (std::strstr(fragment_name, "level_environment.ps") ||
+            std::strstr(fragment_name, "object_environment_opaque.ps") ||
             std::strstr(fragment_name, "level_laemb_base.ps"));
     push_surface(frame, geometry_layout_, material_set, environment_variant ? 96 : 80);
     if (mode == SurfaceMode::AlphaTest)
@@ -1070,6 +1086,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     if (fragment_name && (std::strstr(fragment_name, "level_environment.ps") ||
+            std::strstr(fragment_name, "object_environment_opaque.ps") ||
             std::strstr(fragment_name, "level_laemb_base.ps")))
     {
         const float zero_camera[4]{};
@@ -1156,8 +1173,13 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     const float unit_detail_scale = 1.f;
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
         68, sizeof(unit_detail_scale), &unit_detail_scale);
-    if (fragment_name && std::strstr(fragment_name, "particle_") &&
-        std::strstr(fragment_name, "_set.ps"))
+    if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
+            std::strstr(fragment_name, "_set.ps")) ||
+            std::strstr(fragment_name, "world_set_blended.ps") ||
+            std::strstr(fragment_name, "world_set_set_2r.ps") ||
+            std::strstr(fragment_name, "world_set_blend_2r.ps") ||
+            std::strstr(fragment_name, "world_set_blend_4r.ps") ||
+            std::strstr(fragment_name, "glow_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (fragment_name && (std::strstr(fragment_name, "detail_blended.ps") ||

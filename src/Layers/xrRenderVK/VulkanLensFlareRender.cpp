@@ -10,6 +10,24 @@
 
 namespace xray::render::vulkan
 {
+void VulkanLensFlareRender::Copy(ILensFlareRender& source)
+{
+    // CLensFlare owns the flare descriptors. The renderer stores only the
+    // device; individual VulkanFlareRender::Copy calls reacquire texture leases.
+    const auto& other = static_cast<VulkanLensFlareRender&>(source);
+    R_ASSERT2(&other.device_ == &device_, "lens flare renderer belongs to another Vulkan device");
+}
+
+void VulkanLensFlareRender::OnDeviceCreate()
+{
+    // Flare texture leases are created by VulkanFlareRender::CreateShader.
+}
+
+void VulkanLensFlareRender::OnDeviceDestroy()
+{
+    // Flare texture leases are released by VulkanFlareRender::DestroyShader.
+}
+
 void VulkanFlareRender::Copy(IFlareRender& source)
 {
     if (&source == this) return;

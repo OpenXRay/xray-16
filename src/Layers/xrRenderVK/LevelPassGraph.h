@@ -81,11 +81,10 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     if (input.consumer == RenderConsumer::Model && input.animated &&
         (input.skin_weights < 1 || input.skin_weights > 4))
         return reject("animated model skin weights (expected 1..4)");
-    if (input.consumer == RenderConsumer::Model && input.environment &&
-        input.mode != SurfaceMode::Transparent)
-        return reject("opaque model environment pass");
     if (input.consumer == RenderConsumer::Model && input.detail && input.environment)
         return reject("model diffuse detail with environment cube");
+    if (input.consumer == RenderConsumer::Model && input.hud && input.environment)
+        return reject("HUD model environment cube (HUD reflection shader missing)");
     auto& node = graph.passes[0];
     node.textures = BaseRole | input.surface_roles;
     if (input.consumer == RenderConsumer::Particle &&
@@ -133,7 +132,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.animated ? "vk\\skinned_" + std::to_string(input.skin_weights) + ".vs" :
                 std::string("vk\\") + family + ".vs";
         node.fragment = input.hud ? input.animated ? "vk\\hud_blended.ps" : std::string{} :
-            input.animated && input.environment ? "vk\\skinned_environment.ps" :
+            input.animated && input.environment ? input.mode == SurfaceMode::Transparent ?
+                "vk\\skinned_environment.ps" : "vk\\skinned_environment_opaque.ps" :
             input.animated && input.mode == SurfaceMode::Transparent ? "vk\\skinned_blended.ps" :
                 std::string("vk\\") + family + ".ps";
         if (input.detail && !input.hud && !input.environment)
@@ -145,6 +145,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             node.textures |= DetailRole;
         }
         if (input.environment) node.textures |= EnvironmentRole;
+        if (input.environment && !input.animated && input.mode == SurfaceMode::Opaque)
+            node.fragment = "vk\\object_environment_opaque.ps";
     }
     graph.count = 1;
     error.clear();
@@ -157,6 +159,7 @@ struct LevelPassSelection
     bool lightmapped{}, terrain{}, detail{}, environment{}, laemb{};
     bool wallmark_multiply{}, glow_alpha_add{}, fog{};
     uint16_t surface_roles{};
+    int screen_blend{-1};
 };
 
 inline bool build_level_pass_graph(const LevelPassSelection& input,
@@ -166,6 +169,9 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     const auto reject = [&](const char* reason)
     { error = std::string("level pass graph: incompatible ") + reason; return false; };
     if (input.mode == SurfaceMode::Unresolved) return reject("unresolved material mode");
+    if (input.screen_blend > 9) return reject("S_SET Blending (expected 0..9)");
+    if (input.screen_blend == 0 && input.mode != SurfaceMode::Transparent)
+        return reject("S_SET Blending=0 requires depth-writing forward pass");
     if (input.laemb && (input.mode != SurfaceMode::Opaque || !input.lightmapped || !input.environment))
         return reject("LaEmB requires opaque mode, lightmap and environment");
     if (input.terrain && (input.mode != SurfaceMode::Opaque || !input.lightmapped ||
@@ -175,6 +181,11 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     if ((input.wallmark_multiply || input.glow_alpha_add || input.fog) &&
         (input.detail || input.terrain || input.environment))
         return reject("world effect with detail, terrain or environment");
+    if (((input.screen_blend >= 2 && input.screen_blend <= 4) ||
+            input.screen_blend >= 7) &&
+        (input.mode != SurfaceMode::Transparent || input.lightmapped || input.detail ||
+            input.terrain || input.environment || input.fog))
+        return reject("S_SET blending requires unlit transparent world geometry");
     if (input.surface_roles & BumpAuxRole && !(input.surface_roles & BumpRole))
         return reject("BumpAux texture without Bump");
     if (input.surface_roles & GlossRole && !(input.surface_roles & (BumpRole | NormalRole)))
@@ -182,10 +193,13 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     auto& first = graph.passes[0];
     const bool transparent = input.mode == SurfaceMode::Transparent;
     first.target = transparent ? LevelPassTarget::Forward : LevelPassTarget::GBuffer;
-    first.blend = input.wallmark_multiply ? LevelPassBlend::Multiply2x :
+    first.blend = input.screen_blend == 0 || input.screen_blend == 7 ? LevelPassBlend::Replace :
+        input.screen_blend == 2 ? LevelPassBlend::Additive :
+        input.screen_blend == 3 ? LevelPassBlend::Multiply :
+        input.screen_blend == 4 || input.wallmark_multiply ? LevelPassBlend::Multiply2x :
         input.glow_alpha_add ? LevelPassBlend::AlphaAdd :
         transparent ? LevelPassBlend::Alpha : LevelPassBlend::Replace;
-    first.depth_write = !transparent;
+    first.depth_write = !transparent || input.screen_blend == 0;
     first.textures = BaseRole;
     if (input.lightmapped) first.textures |= LightmapRole;
     if (input.detail) first.textures |= DetailRole;
@@ -204,8 +218,18 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
         input.lightmapped ? input.mode == SurfaceMode::AlphaTest ? "level_lightmap_cutout" : "level_lightmap" :
         input.mode == SurfaceMode::AlphaTest ? "level_cutout" : "level_opaque";
     first.vertex = std::string("vk\\") + family + ".vs";
-    first.fragment = input.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
+    if ((input.screen_blend >= 0 && input.screen_blend <= 4) || input.screen_blend >= 7)
+        first.vertex = "vk\\level_opaque.vs";
+    first.fragment = input.screen_blend == 0 ? "vk\\world_set_set.ps" :
+        input.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
         input.glow_alpha_add ? "vk\\glow_alpha_add.ps" : input.fog ? "vk\\level_fog.ps" :
+        input.screen_blend == 1 && !input.fog ? "vk\\world_set_blended.ps" :
+        input.screen_blend == 2 ? "vk\\world_set_additive.ps" :
+        input.screen_blend == 3 ? "vk\\world_set_multiply.ps" :
+        input.screen_blend == 4 ? "vk\\world_set_multiply_2x.ps" :
+        input.screen_blend == 7 ? "vk\\world_set_set_2r.ps" :
+        input.screen_blend == 8 ? "vk\\world_set_blend_2r.ps" :
+        input.screen_blend == 9 ? "vk\\world_set_blend_4r.ps" :
         transparent && input.detail && !input.lightmapped ? "vk\\level_detail_unlit_blended.ps" :
         input.mode == SurfaceMode::AlphaTest && input.detail && !input.lightmapped ?
             "vk\\level_detail_unlit_cutout.ps" : std::string("vk\\") + family + ".ps";

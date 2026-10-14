@@ -26,6 +26,10 @@ bool weather_bind{}, weather_push{};
 bool cutout_alpha_push{}, cutout_scale_push{}, forward_detail_scale_push{};
 SurfaceParameters expected_surface{};
 bool surface_push{};
+bool environment_camera_push{}, environment_surface_push{};
+bool world_alpha_push{};
+bool distinct_surface_images{}, surface_bindings_checked{};
+float expected_environment_camera[4]{2.f, 3.f, 4.f, 1.f};
 VkPipeline bound_pipeline{};
 VkPipelineLayout geometry_layout{}, skinned_layout{}, lighting_layout{}, weather_layout{};
 VkDescriptorSet updated_material{};
@@ -83,7 +87,53 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* output)
 {
     assert(count == 1 && info->stageCount == 2);
-    if (info->pStages[1].module == handle<VkShaderModule>(95) ||
+    if (info->pStages[1].module == handle<VkShaderModule>(103) ||
+        info->pStages[1].module == handle<VkShaderModule>(105))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(10));
+        assert(info->layout == (info->pStages[1].module == handle<VkShaderModule>(105) ?
+            skinned_layout : geometry_layout));
+        assert(info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable);
+        assert(info->pColorBlendState->attachmentCount == 3 &&
+            !info->pColorBlendState->pAttachments[0].blendEnable);
+    }
+    else if (uintptr_t(info->pStages[1].module) >= 107 &&
+        uintptr_t(info->pStages[1].module) <= 109)
+    {
+        assert(info->renderPass == handle<VkRenderPass>(11) && info->layout == geometry_layout);
+        assert(info->pDepthStencilState->depthTestEnable &&
+            !info->pDepthStencilState->depthWriteEnable);
+        const auto& color = info->pColorBlendState->pAttachments[0];
+        assert(info->pColorBlendState->attachmentCount == 1 && color.blendEnable);
+        const auto module = uintptr_t(info->pStages[1].module);
+        assert(color.srcColorBlendFactor == (module == 107 ? VK_BLEND_FACTOR_ONE : VK_BLEND_FACTOR_DST_COLOR));
+        assert(color.dstColorBlendFactor == (module == 107 ? VK_BLEND_FACTOR_ONE :
+            module == 108 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR));
+    }
+    else if (uintptr_t(info->pStages[1].module) >= 110 &&
+        uintptr_t(info->pStages[1].module) <= 113)
+    {
+        assert(info->renderPass == handle<VkRenderPass>(11) && info->layout == geometry_layout);
+        assert(info->pDepthStencilState->depthTestEnable &&
+            !info->pDepthStencilState->depthWriteEnable);
+        const auto& color = info->pColorBlendState->pAttachments[0];
+        assert(info->pColorBlendState->attachmentCount == 1);
+        const bool replace = info->pStages[1].module == handle<VkShaderModule>(110);
+        assert(color.blendEnable == (replace ? VK_FALSE : VK_TRUE));
+        if (!replace)
+            assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
+                color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
+    }
+    else if (info->pStages[1].module == handle<VkShaderModule>(114))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(11) && info->layout == geometry_layout);
+        assert(info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable);
+        assert(info->pColorBlendState->attachmentCount == 1 &&
+            !info->pColorBlendState->pAttachments[0].blendEnable);
+    }
+    else if (info->pStages[1].module == handle<VkShaderModule>(95) ||
         info->pStages[1].module == handle<VkShaderModule>(101))
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
@@ -206,6 +256,24 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(layout == geometry_layout || layout == skinned_layout);
     if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
     {
+        if (offset == 96)
+        {
+            assert(size == sizeof(SurfaceParameters) &&
+                std::memcmp(data, &expected_surface, sizeof(expected_surface)) == 0);
+            environment_surface_push = true;
+            return;
+        }
+        if (offset == 64 && size == sizeof(expected_environment_camera))
+        {
+            assert(std::memcmp(data, expected_environment_camera, size) == 0);
+            environment_camera_push = true;
+            return;
+        }
+        if (offset == 64 && size == sizeof(float) && uintptr_t(bound_pipeline) >= 128)
+        {
+            assert(*static_cast<const float*>(data) == .25f);
+            world_alpha_push = true;
+        }
         if (offset == 80)
         {
             assert(size == sizeof(SurfaceParameters) &&
@@ -244,7 +312,8 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
 {
     assert(count == 6 && instances == 1);
     assert(first_index == expected_first_index);
-    constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119, 120, 121, 122};
+    constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119,
+        120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -321,8 +390,15 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
         for (uint32_t i = 0; i < count; ++i)
             assert(writes[i].dstBinding == i);
     if (count == 13)
+    {
         for (uint32_t i = 0; i < count; ++i)
+        {
             assert(writes[i].dstBinding == i + 7);
+            if (distinct_surface_images)
+                assert(writes[i].pImageInfo->imageView == handle<VkImageView>(201 + i));
+        }
+        if (distinct_surface_images) surface_bindings_checked = true;
+    }
     updated_albedo = writes[0].pImageInfo->imageView;
     updated_sampler = writes[0].pImageInfo->sampler;
     ++descriptor_updates;
@@ -616,6 +692,13 @@ int main()
     for (size_t i = 0; i < views.size(); ++i) views[i] = handle<VkImageView>(101 + i);
     VkDescriptorSet detail{};
     assert(deferred.terrain_material(views, sampler, detail, error));
+    std::array<VkImageView, 13> surface_images{};
+    for (size_t i = 0; i < surface_images.size(); ++i)
+        surface_images[i] = handle<VkImageView>(201 + i);
+    distinct_surface_images = true;
+    deferred.update_surface_textures(detail, surface_images, sampler);
+    assert(surface_bindings_checked);
+    distinct_surface_images = false;
     expected_surface = {};
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, SurfaceMode::AlphaTest, 3,
@@ -640,6 +723,53 @@ int main()
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
         6, expected_mvp, detail, SurfaceMode::AlphaTest, 3,
         "vk\\level_detail_cutout.vs", "vk\\level_detail_unlit_cutout.ps", .4f, nullptr, 2.5f));
+    assert(deferred.create_game_pipeline("vk\\object_environment.vs", "vk\\object_environment_opaque.ps",
+        handle<VkShaderModule>(102), handle<VkShaderModule>(103), SurfaceMode::Opaque, false, error));
+    assert(deferred.create_game_pipeline("vk\\skinned_2.vs", "vk\\skinned_environment_opaque.ps",
+        handle<VkShaderModule>(104), handle<VkShaderModule>(105), SurfaceMode::Opaque, false, error, true));
+    expected_first_index = 0;
+    environment_camera_push = environment_surface_push = false;
+    assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, SurfaceMode::Opaque, 0,
+        "vk\\object_environment.vs", "vk\\object_environment_opaque.ps", 0.f, nullptr, 1.f,
+        expected_environment_camera));
+    assert(environment_camera_push && environment_surface_push);
+    environment_camera_push = environment_surface_push = false;
+    assert(deferred.pose_descriptor(handle<VkBuffer>(23), sizeof(float) * 16, pose, error));
+    assert(deferred.record_skinned(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, pose, SurfaceMode::Opaque, false, 0,
+        "vk\\skinned_2.vs", "vk\\skinned_environment_opaque.ps", 0.f, nullptr, 1.f,
+        expected_environment_camera));
+    assert(environment_camera_push && environment_surface_push);
+    for (unsigned blend = 0; blend < 3; ++blend)
+    {
+        const char* fragment = blend == 0 ? "vk\\world_set_additive.ps" :
+            blend == 1 ? "vk\\world_set_multiply.ps" : "vk\\world_set_multiply_2x.ps";
+        assert(deferred.create_game_pipeline("vk\\level_opaque.vs", fragment,
+            handle<VkShaderModule>(106), handle<VkShaderModule>(107 + blend),
+            SurfaceMode::Transparent, false, error));
+        assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+            6, expected_mvp, detail, 0, "vk\\level_opaque.vs", fragment));
+    }
+    for (unsigned blend = 0; blend < 4; ++blend)
+    {
+        const char* fragment = blend == 0 ? "vk\\world_set_set_2r.ps" :
+            blend == 1 ? "vk\\world_set_blend_2r.ps" :
+            blend == 2 ? "vk\\world_set_blend_4r.ps" : "vk\\world_set_blended.ps";
+        assert(deferred.create_game_pipeline("vk\\level_opaque.vs", fragment,
+            handle<VkShaderModule>(106), handle<VkShaderModule>(110 + blend),
+            SurfaceMode::Transparent, false, error));
+        world_alpha_push = false;
+        assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+            6, expected_mvp, detail, 0, "vk\\level_opaque.vs", fragment, nullptr, .25f));
+        assert(world_alpha_push);
+    }
+    assert(deferred.create_game_pipeline("vk\\level_opaque.vs", "vk\\world_set_set.ps",
+        handle<VkShaderModule>(106), handle<VkShaderModule>(114),
+        SurfaceMode::Transparent, false, error));
+    assert(deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, 0, "vk\\level_opaque.vs", "vk\\world_set_set.ps"));
+    deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);
     deferred.release_forward_sets();
 }

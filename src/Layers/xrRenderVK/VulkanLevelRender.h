@@ -134,6 +134,7 @@ protected:
     const GpuLevel& gpu_level() const { return level_; }
 
 private:
+  void flush_render_failures();
   std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord &record, const std::string &inherited_texture, const std::string &cache_name,
                                                        std::string &error, bool skeletal_child = false);
   std::unique_ptr<VulkanModelVisual> load_model_base(pcstr name, IReader *data, const std::string &cache_name, std::string &error, bool skeletal_child = false);
@@ -142,6 +143,8 @@ private:
   void create_wallmark(ModelGeometry &&geometry, const Fvector &center, IKinematics *skeleton = nullptr, const Fmatrix *transform = nullptr);
   Fmatrix current_view_projection() const;
   GpuLevel level_;
+  std::string last_render_error_;
+  uint32_t repeated_render_errors_{};
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanModelVisual>> models_;
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleEffect>> particle_effects_;
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleGroup>> particle_groups_;

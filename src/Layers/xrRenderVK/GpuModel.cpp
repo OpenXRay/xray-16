@@ -42,12 +42,6 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
-        if (definition.class_name == "MODELEbB" && mesh.geometry.mode != SurfaceMode::Transparent)
-        {
-            error = "OGF shader='" + mesh.geometry.shader + "' class='MODELEbB' "
-                "opaque environment pass has no Vulkan model pipeline";
-            return false;
-        }
         GameTextureFactory::DetailMetadata metadata;
         if (!textures.texture_detail_metadata(texture, metadata, error))
         {
@@ -55,8 +49,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             return false;
         }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
-        mesh.environment = definition.class_name == "MODELEbB" &&
-            mesh.geometry.mode == SurfaceMode::Transparent;
+        mesh.environment = definition.class_name == "MODELEbB";
         // Tree surfaces are two-sided by blender contract. A user-controlled
         // shader name must never select a different raster/shader variant.
         mesh.tree_surface = definition.class_name == "D_TREE  ";
@@ -116,13 +109,14 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 names[10] = names[9] + "#";
                 surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
             }
-            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error);
+            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error,
+                mesh.environment);
         }
         if (!(mesh.surface ? surface_ready : mesh.environment ? textures.environment_material(texture, {},
                 definition.environment_texture, true, pass, mesh.material, error) :
                 textures.material(texture, pass, mesh.material, error,
                     (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
-                    !(definition.screen_flags & 1u))) ||
+                    definition.pass.clamp)) ||
             !upload_buffer(device, queue, pool, memory, upload, mesh.geometry.indices.data(), mesh.geometry.indices.size() * sizeof(uint32_t),
                            VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices, pending_, error))
             return false;
@@ -241,6 +235,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         error = "Vulkan model has no acquired frame";
         return false;
     }
+    const float camera[4]{Device.vCameraPosition.x, Device.vCameraPosition.y,
+        Device.vCameraPosition.z, 1.f};
     for (size_t index = 0; index < meshes_.size(); ++index)
     {
         auto& base = meshes_[index];
@@ -308,7 +304,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     window.index_count, mvp, mesh.material, descriptor,
                     hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
                     vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f,
-                    normal_rows, mesh.detail_scale))
+                    normal_rows, mesh.detail_scale, mesh.environment ? camera : nullptr))
             {
                 error = "Vulkan skeletal shader pair or render pass is unavailable: " +
                     vertex_name + " / " + fragment_name;
@@ -364,7 +360,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                                 nullptr, 0.f, normal_rows, mesh.detail_scale) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale)))
+                                float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale,
+                                mesh.environment ? camera : nullptr)))
         {
             error = "Vulkan model geometry recording failed";
             return false;

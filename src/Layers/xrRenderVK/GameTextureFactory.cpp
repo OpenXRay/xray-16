@@ -428,7 +428,7 @@ void GameTextureFactory::release_terrain_material(VkDescriptorSet set, DeferredP
 
 bool GameTextureFactory::surface_material(const std::array<std::string, 20>& names,
     const SurfaceParameters& parameters, DeferredPass& pass,
-    VkDescriptorSet& result, std::string& error)
+    VkDescriptorSet& result, std::string& error, bool cube_environment)
 {
     result = VK_NULL_HANDLE;
     TerrainMaterial item;
@@ -440,8 +440,10 @@ bool GameTextureFactory::surface_material(const std::array<std::string, 20>& nam
         const std::string name = trim_texture_name(names[i].empty() ? names[0] : names[i]);
         if (!load(name, item.assets[i], error))
         { error = "surface slot " + std::to_string(i) + " ('" + name + "'): " + error; return false; }
-        if (item.assets[i]->cube && i != 2)
-        { error = "surface slot " + std::to_string(i) + " requires 2D DDS: " + name; return false; }
+        if (item.assets[i]->cube != (i == 2 && cube_environment))
+        { error = "surface slot " + std::to_string(i) +
+            (i == 2 && cube_environment ? " requires cube DDS: " : " requires 2D DDS: ") + name;
+          return false; }
         const auto it = std::find_if(assets_.begin(), assets_.end(),
             [asset = item.assets[i]](const auto& entry) { return &entry.second == asset; });
         R_ASSERT(it != assets_.end());

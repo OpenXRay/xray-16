@@ -132,9 +132,19 @@ float4 main(Fragment fragment) : SV_Target0
     texel.a *= fragment.baked.a;
     return texel;
 #elif defined(VK_GLOW)
-    return texel * fragment.baked;
-#elif defined(VK_PARTICLE)
     float4 color = texel * fragment.baked;
+    clip(color.a - terrain_alpha_threshold);
+    return color;
+#elif defined(VK_PARTICLE) || defined(VK_WORLD_SET)
+    float4 color = texel * fragment.baked;
+#if defined(VK_SCREEN_SCALE_2)
+    color.rgb *= 2.0;
+#elif defined(VK_SCREEN_SCALE_4)
+    color.rgb *= 4.0;
+#endif
+#if defined(VK_WORLD_SET_AREF)
+    clip(color.a - terrain_alpha_threshold);
+#endif
 #if defined(VK_PARTICLE_SET)
     clip(color.a - terrain_alpha_threshold);
 #endif

@@ -63,7 +63,8 @@ class GameShaderVariantsTest(unittest.TestCase):
                 if name.endswith(".ps.spv"):
                     self.assertIn(0, output_locations)
                     self.assertIn(0, bindings.values())
-                    if ("blended" in name or "particle_" in name or "alpha_add" in name or
+                    if ("blended" in name or "particle_" in name or "world_set_" in name or
+                            "alpha_add" in name or
                             "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
                             name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv")):
                         # The forward pass has one color attachment.
@@ -103,6 +104,33 @@ class GameShaderVariantsTest(unittest.TestCase):
         hud = list(instructions(SHADERS / "vk/hud_blended.ps.spv"))
         self.assertFalse(any(op == 71 and len(args) >= 3 and args[1] == 34 and args[2] != 0
                              for op, args in hud))
+
+    def test_opaque_model_environment_uses_cube_and_surface_attachment(self):
+        for name in ("object_environment_opaque", "skinned_environment_opaque"):
+            with self.subTest(name=name):
+                code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
+                bindings = {args[2] for op, args in code
+                            if op == 71 and len(args) >= 3 and args[1] == 33}
+                offsets = {args[3] for op, args in code
+                           if op == 72 and len(args) >= 4 and args[2] == 35}
+                locations = {args[2] for op, args in code
+                             if op == 71 and len(args) >= 3 and args[1] == 30}
+                self.assertIn(2, bindings)  # The environment descriptor.
+                self.assertTrue(any(op == 25 and args[2] == 3 for op, args in code))  # Cube image.
+                self.assertTrue({0, 1, 2} <= locations)  # Albedo, normal and surface.
+                self.assertTrue({64, 96, 112} <= offsets)  # Camera and material channels.
+
+    def test_world_set_alpha_reference_and_color_scale(self):
+        for name in ("world_set_blended", "world_set_set_2r", "world_set_blend_2r",
+                     "world_set_blend_4r", "glow_alpha_add"):
+            with self.subTest(name=name):
+                code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
+                self.assertIn(252, {op for op, _ in code})  # Alpha test discards.
+                offsets = {args[3] for op, args in code
+                           if op == 72 and len(args) >= 4 and args[2] == 35}
+                self.assertIn(64, offsets)  # Cutoff set by the draw recorder.
+        self.assertNotEqual((SHADERS / "vk/world_set_blend_2r.ps.spv").read_bytes(),
+                            (SHADERS / "vk/world_set_blend_4r.ps.spv").read_bytes())
 
     def test_apk_contains_every_game_pipeline_asset(self):
         variants = json.loads(MANIFEST.read_text())["variants"]

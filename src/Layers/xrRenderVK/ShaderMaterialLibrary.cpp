@@ -238,7 +238,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 name, mode, supported, cls, version, alpha_ref, blending, screen_flags,
                 terrain, properties, error) || name.empty() ||
             !entries_.emplace(name, MaterialDefinition{id, name, cls, version, mode, supported,
-                {}, alpha_ref, blending, screen_flags, MaterialDefinition::Role::Standard,
+                {}, alpha_ref, blending, screen_flags, {}, MaterialDefinition::Role::Standard,
                 terrain, {}, {}, {}, {}, {}, false, std::move(properties)}).second)
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
@@ -254,6 +254,21 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             [](const BlenderProperty& property)
             { return property.name == "Strict sorting" && property.type == 6 &&
                 property.data.size() == 4 && le32(property.data.data()) != 0; });
+        definition.pass.strict_sorting = strict_sorting;
+        definition.pass.depth_write = mode != SurfaceMode::Transparent;
+        if (cls == "S_SET   ")
+        {
+            definition.pass.depth_test = (screen_flags & 2u) != 0;
+            definition.pass.depth_write = (screen_flags & 4u) != 0;
+            definition.pass.lighting = (screen_flags & 8u) != 0;
+            definition.pass.fog = (screen_flags & 16u) != 0;
+            definition.pass.clamp = (screen_flags & 1u) == 0;
+        }
+        else if (cls == "PARTICLE")
+        {
+            definition.pass.depth_write = blending == 0;
+            definition.pass.clamp = (screen_flags & 1u) == 0;
+        }
         // The game's water S_SET variant declares depth-tested, depth-writing,
         // lit and sorted transparent geometry. Its role comes from serialized
         // state, so a mod can rename the shader and texture without rerouting.
@@ -280,14 +295,13 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 if (property.name == "Transform") definition.environment_transform = value;
                 if (property.name == "Constant") definition.environment_constant = value;
             }
-            const bool needs_environment = cls != "MODELEbB" || mode == SurfaceMode::Transparent;
-            if (definition.pipeline_supported && needs_environment &&
+            if (definition.pipeline_supported &&
                 (definition.environment_texture.empty() || definition.environment_texture == "$null"))
             {
                 definition.pipeline_supported = false;
                 definition.unsupported_reason = "Environment map / Name (required texture)";
             }
-            if (definition.pipeline_supported && needs_environment &&
+            if (definition.pipeline_supported &&
                 !definition.environment_transform.empty() && definition.environment_transform != "$null")
             {
                 definition.pipeline_supported = false;
@@ -308,11 +322,6 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                     definition.constant_waveforms = constant->second;
                     definition.has_environment_constant = true;
                 }
-            }
-            if (definition.pipeline_supported && cls == "MODELEbB" && mode != SurfaceMode::Transparent)
-            {
-                definition.pipeline_supported = false;
-                definition.unsupported_reason = "opaque MODELEbB G-buffer environment pass is not implemented";
             }
         }
         // Older BmmD records carry one detail texture in the Detail map
@@ -486,11 +495,16 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // matches the forward transparent pass, whereas the UI pass has no
     // depth attachment. Keep rejecting properties the selected pass cannot
     // honor rather than treating every S_SET as an overlay.
-    const bool scene_depth_test = !screen_pipeline && material.mode == SurfaceMode::Transparent;
+    const bool world_set = level_pipeline && material.class_name == "S_SET   " &&
+        material.blending == 0 && material.role != MaterialDefinition::Role::Water;
+    const bool scene_depth_test = !screen_pipeline &&
+        (material.mode == SurfaceMode::Transparent || world_set);
     const uint32_t supported_flags = screen_pipeline ? 0u :
         1u | (scene_depth_test ? 2u : 0u) |
-        (level_pipeline ? 16u : 0u) |
-        ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u);
+        (level_pipeline && (material.class_name != "S_SET   " ||
+            material.blending == 1 || material.blending == 5 || material.blending == 6) ? 16u : 0u) |
+        ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u) |
+        (world_set ? 4u : 0u);
     const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;
     if (material.class_name == "S_SET   " && unsupported_flags)
     {
@@ -512,14 +526,20 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         error = "unsupported world property='Z-write=0' in " + context;
         return false;
     }
-    // Scene geometry has a separate multiply-2x wallmark pipeline. Other
-    // S_SET blend modes must not silently render as source-alpha blending.
+    if (world_set && !material.pass.depth_write)
+    {
+        error = "unsupported world property='Z-write=0' with S_SET Blending=0 in " + context;
+        return false;
+    }
+    // Scene geometry has explicit blend variants for additive, multiply,
+    // multiply-2x, alpha-add and wallmark multiply-2x. Other modes must not
+    // silently render as source-alpha blending.
     if ((material.class_name == "S_SET   " || material.class_name == "PARTICLE") &&
         material.blending != 0 && material.blending != 1 &&
         material.blending != 2 && material.blending != 3 &&
         material.blending != 4 && material.blending != 5 &&
         !(material.class_name == "S_SET   " && !screen_pipeline && !particle_pipeline &&
-          material.blending == 6) &&
+          (material.blending == 6 || (level_pipeline && material.blending >= 7 && material.blending <= 9))) &&
         !(screen_pipeline && material.class_name == "S_SET   " &&
           material.blending >= 6 && material.blending <= 9))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
@@ -527,13 +547,19 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // The particle path has a pipeline for each of these modes.
     if (material.class_name == "S_SET   " && !particle_pipeline && !screen_pipeline &&
         material.blending >= 2 && material.blending != 6 &&
-        !(level_pipeline && material.blending == 5))
+        !(level_pipeline && ((material.blending >= 2 && material.blending <= 5) ||
+            (material.blending >= 7 && material.blending <= 9))))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
     if (material.class_name == "PARTICLE" && !particle_pipeline &&
         (material.blending == 3 || material.blending == 4))
     { error = "unsupported blending=" + std::to_string(material.blending) + " in " + context; return false; }
-    mode = it->second.mode;
+    // Unlit world SET writes depth in the forward attachment after combine;
+    // its output must not be lit again as an ordinary G-buffer surface.
+    mode = world_set ? SurfaceMode::Transparent : it->second.mode;
+    // Screen SET's 2R replacement enables alpha test with reference zero in
+    // Compile(), irrespective of its serialized Alpha ref property.
     if (alpha_ref) *alpha_ref = material.class_name == "PARTICLE" && material.blending == 0 ? 200 :
+        material.class_name == "S_SET   " && material.blending == 7 ? 0 :
         it->second.alpha_ref >= 0 ?
         std::clamp(it->second.alpha_ref, 0, 255) : 128;
     if (blend_mode) *blend_mode = material.blending;

@@ -28,6 +28,50 @@ int main()
     assert(error.find("BumpAux texture without Bump") != std::string::npos);
     base.surface_roles = 0;
 
+    // World S_SET uses its own depth-tested forward shaders and blend factors.
+    base = {};
+    base.mode = SurfaceMode::Transparent;
+    base.screen_blend = 0;
+    assert(build_level_pass_graph(base, graph, error));
+    assert(graph.passes[0].vertex == "vk\\level_opaque.vs" &&
+        graph.passes[0].fragment == "vk\\world_set_set.ps" &&
+        graph.passes[0].blend == LevelPassBlend::Replace &&
+        graph.passes[0].depth_test && graph.passes[0].depth_write);
+    base.screen_blend = 1;
+    assert(build_level_pass_graph(base, graph, error));
+    assert(graph.passes[0].vertex == "vk\\level_opaque.vs" &&
+        graph.passes[0].fragment == "vk\\world_set_blended.ps" &&
+        graph.passes[0].blend == LevelPassBlend::Alpha);
+    for (int blend = 2; blend <= 4; ++blend)
+    {
+        base.screen_blend = blend;
+        assert(build_level_pass_graph(base, graph, error));
+        assert(graph.count == 1 && graph.passes[0].vertex == "vk\\level_opaque.vs");
+        assert(graph.passes[0].fragment == (blend == 2 ? "vk\\world_set_additive.ps" :
+            blend == 3 ? "vk\\world_set_multiply.ps" : "vk\\world_set_multiply_2x.ps"));
+        assert(graph.passes[0].blend == (blend == 2 ? LevelPassBlend::Additive :
+            blend == 3 ? LevelPassBlend::Multiply : LevelPassBlend::Multiply2x));
+        assert(graph.passes[0].target == LevelPassTarget::Forward &&
+            graph.passes[0].depth_test && !graph.passes[0].depth_write);
+    }
+    base.fog = true;
+    assert(!build_level_pass_graph(base, graph, error));
+    assert(error.find("S_SET blending") != std::string::npos);
+    base.fog = false;
+    for (int blend = 7; blend <= 9; ++blend)
+    {
+        base.screen_blend = blend;
+        assert(build_level_pass_graph(base, graph, error));
+        assert(graph.passes[0].vertex == "vk\\level_opaque.vs");
+        assert(graph.passes[0].fragment == (blend == 7 ? "vk\\world_set_set_2r.ps" :
+            blend == 8 ? "vk\\world_set_blend_2r.ps" : "vk\\world_set_blend_4r.ps"));
+        assert(graph.passes[0].blend == (blend == 7 ? LevelPassBlend::Replace : LevelPassBlend::Alpha));
+        assert(graph.passes[0].depth_test && !graph.passes[0].depth_write);
+    }
+    base = {};
+    base.mode = SurfaceMode::Opaque;
+    base.lightmapped = true;
+
     base.detail = true;
     base.mode = SurfaceMode::Transparent;
     assert(build_level_pass_graph(base, graph, error));
@@ -85,6 +129,17 @@ int main()
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque}, common, error));
     assert(common.passes[0].target == LevelPassTarget::GBuffer);
     assert(common.passes[0].fragment == "vk\\object_opaque.ps");
+    assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
+        false, false, true}, common, error));
+    assert(common.passes[0].fragment == "vk\\object_environment_opaque.ps");
+    assert(common.passes[0].target == LevelPassTarget::GBuffer);
+    assert(common.passes[0].textures & EnvironmentRole);
+    assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
+        false, true, true, false, 2}, common, error));
+    assert(common.passes[0].fragment == "vk\\skinned_environment_opaque.ps");
+    assert(!build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
+        true, true, true, false, 2}, common, error));
+    assert(error.find("HUD model environment cube") != std::string::npos);
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
         false, false, false, false, 0, 1, 0, true}, common, error));
     assert(common.passes[0].fragment == "vk\\object_detail_opaque.ps");

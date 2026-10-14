@@ -118,7 +118,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     }
     if (!textures.material(def_->texture, pass, material_, error,
             (definition.class_name == "S_SET   " || definition.class_name == "PARTICLE") &&
-            !(definition.screen_flags & 1u)))
+            definition.pass.clamp))
     {
         release_gpu();
         return false;

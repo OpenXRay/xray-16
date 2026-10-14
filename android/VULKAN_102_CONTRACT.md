@@ -34,6 +34,9 @@ The parser retains raw values and scopes for every property. The Vulkan
 consumer rejects nonzero tessellation and Object LOD, unsupported scene flag
 combinations, and unknown class properties with the exact class, version,
 shader and property path. Synthetic records test these rejection boundaries.
+`MaterialDefinition::pass` also preserves the resolved depth test/write,
+strict sorting, fog, lighting and clamp choices, including the class defaults;
+the original property bytes remain available for diagnostics.
 
 ## Material slots and passes
 
@@ -42,18 +45,19 @@ shader and property path. Synthetic records test these rejection boundaries.
 | `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal uses the THM DDS pair and surface descriptor slots. |
 | `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
 | `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. The four serialized `R2-*` slots are read for v3 `BmmD` as well as `BmmDold`; four `$null` slots leave the single-detail path available, whereas a partial set is rejected. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
-| `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; model forward only when blender selects blending. Opaque `MODELEbB` is rejected at material resolution, even with a valid cube slot, because its G-buffer reflection variant is absent. Named environment matrix rejected. |
+| `LmEbB`, `MODELEbB` | Base + environment cube; `LmEbB` also lightmap. | Reflection shader; blended models use forward, opaque models write the G-buffer through dedicated static/skinned variants. Named environment matrix rejected. |
 | `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |
 | `PARTICLE` | Base, clamp/wrap sampler by property. | Modes 0–5: set, alpha, add, multiply, multiply-2x, alpha-add. Mode 0 uses original fixed alpha reference 200. |
-| `S_SET` | Base, clamp/wrap sampler by property. | UI modes 0–9. World depth attachment requires compatible Z-test/write and flags; unsupported combinations report the precise property/mode. |
+| `S_SET` | Base, clamp/wrap sampler by property. | UI modes 0–9. World `SET` uses an unlit depth-writing forward draw; other world forward variants include source alpha, ADD, MUL, MUL_2X, ALPHA-ADD, wallmark MUL_2X and the 2R/4R variants. World geometry requires Z-test and compatible Z-write, lighting and fog; unsupported combinations report the precise property/mode. The original alpha reference is pushed for the applicable forward variants. |
 
 The descriptor cache includes all texture names and the sampler choice. Active
 sets retain their image views until idle retirement; both wrap and clamp
 descriptors are rebound after texture reload. An absent optional `.thm` keeps
 scale 1 and no implicit detail. A present malformed detail chunk fails with
 its VFS path. An explicit detail name is not replaced by the base texture.
-Base, lightmap, mask and detail slots require 2D DDS; the environment slot
-requires a cube for `LmEbB`/`MODELEbB` and 2D for `LaEmB`. Errors name the
+Base, lightmap, mask and detail slots require 2D DDS, including when bump and
+normal maps create a surface descriptor; the environment slot requires a cube
+for `LmEbB`/`MODELEbB` and 2D for `LaEmB`. Errors name the
 role, slot number and offending resource.
 
 `LevelPassGraph` selects the level shader pair, texture-role mask, attachment,

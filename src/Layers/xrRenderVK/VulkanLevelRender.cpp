@@ -1078,23 +1078,23 @@ void VulkanLevelRender::End()
     const bool clear_target = frame_clear_target_ || loading;
     frame_clear_target_ = false;
     const auto cpu_begin = std::chrono::steady_clock::now();
-    static std::string last_render_error;
-    static uint32_t repeated_render_errors = 0;
     if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target))
     {
         const auto elapsed = std::chrono::duration<double, std::milli>(
             std::chrono::steady_clock::now() - cpu_begin).count();
-        repeated_render_errors = error == last_render_error ? repeated_render_errors + 1 : 1;
-        last_render_error = error;
-        if (repeated_render_errors <= 4 || (repeated_render_errors & (repeated_render_errors - 1)) == 0)
+        repeated_render_errors_ = error == last_render_error_ ? repeated_render_errors_ + 1 : 1;
+        last_render_error_ = error;
+        if (repeated_render_errors_ <= 4 || (repeated_render_errors_ & (repeated_render_errors_ - 1)) == 0)
             Msg("! Vulkan frame recording/submission failed occurrence=%u frame=%u precache=%u world=%d cpu=%.2fms: %s",
-                repeated_render_errors, Device.dwFrame, Device.dwPrecacheFrame,
+                repeated_render_errors_, Device.dwFrame, Device.dwPrecacheFrame,
                 render_world ? 1 : 0, elapsed, error.c_str());
         return;
     }
-    if (repeated_render_errors)
-        Msg("[renderer-vulkan] frame recording recovered after %u failures", repeated_render_errors);
-    repeated_render_errors = 0;
+    if (repeated_render_errors_)
+        Msg("[renderer-vulkan] frame recording recovered after %u failures reason=%s",
+            repeated_render_errors_, last_render_error_.c_str());
+    repeated_render_errors_ = 0;
+    last_render_error_.clear();
     const auto now = std::chrono::steady_clock::now();
     const double cpu_ms = std::chrono::duration<double, std::milli>(now - cpu_begin).count();
     if (Device.dwPrecacheFrame && (Device.dwPrecacheFrame == Device.dwPrecacheTotal ||
@@ -1164,8 +1164,18 @@ void VulkanLevelRender::bind_level_device(VkDevice device, VkQueue queue, VkComm
     wait_idle_ = wait_idle;
 }
 
+void VulkanLevelRender::flush_render_failures()
+{
+    if (repeated_render_errors_)
+        Msg("! [renderer-vulkan] frame recording generation ended failures=%u reason=%s",
+            repeated_render_errors_, last_render_error_.c_str());
+    repeated_render_errors_ = 0;
+    last_render_error_.clear();
+}
+
 void VulkanLevelRender::level_Load(IReader* reader)
 {
+    flush_render_failures();
     Msg("[renderer-vulkan] level.load begin reader=%d device=%d queue=%d pool=%d textures=%d pass=%d idle=%d resources=%d frame=%d",
         reader != nullptr, device_ != VK_NULL_HANDLE, queue_ != VK_NULL_HANDLE, pool_ != VK_NULL_HANDLE,
         textures_ != nullptr, pass_ != nullptr, wait_idle_ != nullptr,
@@ -1185,12 +1195,12 @@ void VulkanLevelRender::level_Load(IReader* reader)
     models_Clear(true);
     model_bases_.clear();
     model_gpu_cache_.clear();
-    Msg("[renderer-vulkan] level.load reading geometry");
+    Msg("[renderer-vulkan] level.load file=$level$/level reading geometry");
     std::string error;
     if (!level_.load(*reader, device_, queue_, pool_, memory_, upload_, *textures_, *pass_, error))
     {
-        Msg("! [renderer-vulkan] level.load failed: %s", error.c_str());
-        xrDebug::Fatal(DEBUG_INFO, "Vulkan level load failed: %s", error.c_str());
+        Msg("! [renderer-vulkan] level.load file=$level$/level failed: %s", error.c_str());
+        xrDebug::Fatal(DEBUG_INFO, "Vulkan level load file=$level$/level failed: %s", error.c_str());
     }
     Msg("[renderer-vulkan] level.load ready visuals=%zu models=%zu textures=%zu",
         level_.visual_count(), level_.model_count(), textures_->resident_count());
@@ -1198,6 +1208,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
 
 void VulkanLevelRender::level_Unload()
 {
+    flush_render_failures();
     if (device_ && (level_.visual_count() || !models_.empty()))
         Msg("[renderer-vulkan] level.unload begin visuals=%zu models=%zu", level_.visual_count(), models_.size());
     R_ASSERT2(!frame_phase_.active(), "Vulkan level unload requires an idle frame");

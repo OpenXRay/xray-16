@@ -264,7 +264,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         mesh.wallmark_multiply = blend_mode == 6;
         mesh.glow_alpha_add = blend_mode == 5;
-        mesh.fog = (material_flags & 16u) != 0;
+        mesh.fog = definition.class_name == "S_SET   " && definition.pass.fog;
         mesh.laemb = definition.class_name == "LaEmB   ";
         mesh.environment = definition.class_name == "LmEbB   " || mesh.laemb;
         mesh.environment_constant = definition.has_environment_constant;
@@ -279,7 +279,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const uint16_t roles = (metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
             (!metadata.external_normal_texture.empty() || metadata.normal ? NormalRole : 0u);
         if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
-                mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles},
+                mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles,
+                definition.class_name == "S_SET   " ? blend_mode : -1},
                 mesh.pass_graph, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader='" +
@@ -348,7 +349,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 names[10] = names[9] + "#";
                 surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
             }
-            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error);
+            surface_ready = textures.surface_material(names, surface, pass, mesh.material, error,
+                mesh.environment && !mesh.laemb);
         }
         const bool material_ready = surface_roles ? surface_ready :
                 mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :
@@ -357,7 +359,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 mesh.environment ? textures.environment_material(diffuse, lightmap,
                     definition.environment_texture, !mesh.laemb, pass, mesh.material, error) :
                 lightmap.empty() ? textures.material(material.textures, pass, mesh.material, error,
-                    definition.class_name == "S_SET   " && !(material_flags & 1u)) :
+                    definition.class_name == "S_SET   " && definition.pass.clamp) :
                 textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error);
         if (!material_ready)
         {
@@ -984,7 +986,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             mesh.index_count, mvp, mesh.material, 0, Device.fTimeGlobal, mesh.glass ? -.35f : .72f) :
             transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
             mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr,
-                &failure, 0.f, nullptr, mesh.terrain_scale) :
+                &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale) :
             pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                 mesh.index_count, mvp, mesh.material, mesh.mode, 0,
                 named ? vertex : nullptr, named ? fragment : nullptr,
@@ -1044,7 +1046,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                 pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
-                    &failure, 0.f, nullptr, mesh.terrain_scale) :
+                    &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale) :
                 pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, mesh.mode, window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,

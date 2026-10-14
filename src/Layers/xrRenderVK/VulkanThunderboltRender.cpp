@@ -17,6 +17,18 @@ VulkanThunderboltRender::~VulkanThunderboltRender()
     R_ASSERT2(device_.wait_idle(), "Vulkan lightning buffers require idle GPU frames on destruction");
 }
 
+void VulkanThunderboltRender::Copy(IThunderboltRender& source)
+{
+    if (&source == this) return;
+    const auto& other = static_cast<VulkanThunderboltRender&>(source);
+    R_ASSERT2(&other.device_ == &device_, "thunderbolt renderer belongs to another Vulkan device");
+    // Geometry and its descriptor come from the current CEffect_Thunderbolt
+    // each Render call. Never copy another instance's in-flight buffers.
+    vertices_.clear();
+    indices_.clear();
+    material_ = VK_NULL_HANDLE;
+}
+
 namespace
 {
 struct Cursor

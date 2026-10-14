@@ -25,6 +25,15 @@ struct BlenderProperty
     uint32_t type{};
     std::vector<uint8_t> data;
 };
+struct MaterialPassState
+{
+    bool depth_test{true};
+    bool depth_write{true};
+    bool strict_sorting{};
+    bool lighting{true};
+    bool fog{true};
+    bool clamp{true};
+};
 struct MaterialDefinition
 {
     enum class Role { Standard, Water };
@@ -36,6 +45,7 @@ struct MaterialDefinition
     std::string unsupported_reason;
     int alpha_ref{-1}, blending{-1};
     uint32_t screen_flags{};
+    MaterialPassState pass;
     Role role{Role::Standard};
     TerrainMaterialTextures terrain;
     std::string detail_texture;

@@ -26,10 +26,10 @@ class VulkanLensFlareRender final : public ILensFlareRender
 {
 public:
     explicit VulkanLensFlareRender(VulkanGameDevice& device) : device_(device) {}
-    void Copy(ILensFlareRender&) override {}
+    void Copy(ILensFlareRender& source) override;
     void Render(CLensFlare& owner, BOOL sun, BOOL flares, BOOL gradient) override;
-    void OnDeviceCreate() override {}
-    void OnDeviceDestroy() override {}
+    void OnDeviceCreate() override;
+    void OnDeviceDestroy() override;
 private:
     void draw(const Fvector& center, const Fvector& axis_x, const Fvector& axis_y,
         float radius, float opacity, const Fcolor& color, VkDescriptorSet texture);
