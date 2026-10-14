@@ -1,6 +1,7 @@
 #include "src/Layers/xrRenderVK/DeferredPass.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
 #include "src/Layers/xrRenderVK/GameShaderResources.h"
+#include "src/Layers/xrRenderVK/LevelPassGraph.h"
 
 #include <cassert>
 #include <cstddef>
@@ -245,6 +246,21 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(attachments[1].colorWriteMask == 0);
         assert(attachments[2].colorWriteMask == 0);
     }
+    else if (info->pStages[1].module == handle<VkShaderModule>(201))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(10));
+        assert(info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable);
+        assert(info->pColorBlendState->attachmentCount == 3 &&
+            !info->pColorBlendState->pAttachments[0].blendEnable);
+    }
+    else if (info->pStages[1].module == handle<VkShaderModule>(202))
+    {
+        assert(info->renderPass == handle<VkRenderPass>(10));
+        assert(info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable);
+        assert(!info->pColorBlendState->pAttachments[0].blendEnable);
+    }
     else if (pipeline_count < 2)
     {
         assert(info->renderPass == handle<VkRenderPass>(10));
@@ -390,8 +406,11 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
         134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144,
         145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155,
         156, 157, 158, 159, 160, 161, 162, 163, 164, 165,
-        166, 167, 168, 169, 170, 171};
+        166, 167, 168, 169, 170, 171, 118, 172};
     assert(draw_count < std::size(expected_pipelines));
+    if (bound_pipeline != handle<VkPipeline>(expected_pipelines[draw_count]))
+        std::fprintf(stderr, "draw=%u expected pipeline=%zu actual=%zu\n", draw_count,
+            size_t(expected_pipelines[draw_count]), size_t(uintptr_t(bound_pipeline)));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
 }
@@ -916,6 +935,32 @@ int main()
             6, expected_mvp, detail, 0, "vk\\level_opaque.vs", fragment.c_str(), .25f));
         assert(world_alpha_push == (mode == 1 || mode == 5));
     }
+    LevelPassGraph two_pass;
+    assert(build_level_pass_graph({SurfaceMode::Opaque, true, false, false,
+        true, true}, two_pass, error) && two_pass.count == 2);
+    assert(two_pass.passes[1].previous_color_pass == 0 &&
+        two_pass.passes[1].target == LevelPassTarget::GBuffer &&
+        two_pass.passes[1].textures == BaseRole);
+    assert(deferred.create_game_pipeline(two_pass.passes[0].vertex,
+        two_pass.passes[0].fragment, handle<VkShaderModule>(200),
+        handle<VkShaderModule>(201), SurfaceMode::Opaque, false, error));
+    const auto prior_draws = draw_count;
+    for (uint8_t step = 0; step < two_pass.count; ++step)
+        assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
+            handle<VkBuffer>(21), 6, expected_mvp, detail, SurfaceMode::Opaque, 0,
+            two_pass.passes[step].vertex.c_str(), two_pass.passes[step].fragment.c_str(),
+            0.f, nullptr, 1.f, step == 0 ? expected_environment_camera : nullptr));
+    assert(draw_count == prior_draws + 2 && bound_pipeline == handle<VkPipeline>(118));
+    assert(deferred.create_game_pipeline("vk\\level_opaque.vs", "vk\\particle_world_deferred.ps",
+        handle<VkShaderModule>(106), handle<VkShaderModule>(202),
+        SurfaceMode::AlphaTest, false, error));
+    assert(!deferred.record_transparent(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, 0, "vk\\level_opaque.vs", "vk\\particle_world_deferred.ps"));
+    expected_world_alpha_ref = 200.f / 255.f;
+    assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+        6, expected_mvp, detail, SurfaceMode::AlphaTest, 0,
+        "vk\\level_opaque.vs", "vk\\particle_world_deferred.ps", 200.f / 255.f));
+    assert(draw_count == prior_draws + 3);
     deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);
     deferred.release_forward_sets();

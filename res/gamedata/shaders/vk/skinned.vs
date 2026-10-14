@@ -6,7 +6,6 @@
 [[vk::push_constant]] cbuffer Camera {
     float4x4 mvp;
     float alpha_threshold;
-    float3 padding;
     float4 normal_rows[3];
 };
 [[vk::binding(0, 1)]] StructuredBuffer<float4x4> pose : register(t0, space1);

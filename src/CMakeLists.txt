@@ -113,6 +113,18 @@ if (XRAY_BUILD_VULKAN_TESTS)
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-UNDEBUG>
     )
     add_test(NAME vulkan_deferred_pass COMMAND vulkan_deferred_pass_test)
+    # Executes shipped fragment SPIR-V and reads back distinguishable RGBA
+    # channels from a headless Vulkan device (Mesa Lavapipe is sufficient).
+    find_package(Vulkan QUIET)
+    if (Vulkan_FOUND AND NOT ANDROID)
+        add_executable(vulkan_surface_channels_test
+            "${XRAY_SOURCE_DIR}/tests/vulkan_surface_channels.cpp")
+        target_include_directories(vulkan_surface_channels_test PRIVATE
+            "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
+        target_link_libraries(vulkan_surface_channels_test PRIVATE Vulkan::Vulkan)
+        add_test(NAME vulkan_surface_channels COMMAND vulkan_surface_channels_test
+            "${XRAY_SOURCE_DIR}/res/gamedata/shaders/vk")
+    endif()
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if (Python3_Interpreter_FOUND)
         add_test(NAME vulkan_detail_spirv COMMAND "${Python3_EXECUTABLE}"

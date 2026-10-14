@@ -258,6 +258,10 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 {
     GBuffer output;
     output.albedo = diffuse.Sample(diffuse_sampler, fragment.uv);
+#if defined(VK_PARTICLE_DEFERRED)
+    output.albedo *= fragment.baked;
+    clip(output.albedo.a - terrain_alpha_threshold);
+#endif
     // R=gloss, G=material category/3, B=emission, A=height.
     // Flat materials explicitly write zero instead of inheriting stale data.
     output.surface = float4(0.0, 0.0, 0.0, 0.0);

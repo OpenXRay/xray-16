@@ -109,10 +109,11 @@ public:
         bool screen_pipeline = false, bool level_pipeline = false,
         bool water_pipeline = false, uint32_t* material_flags = nullptr,
         TerrainMaterialTextures* terrain = nullptr,
-        MaterialDefinition* definition = nullptr) const
+        MaterialDefinition* definition = nullptr, bool model_pipeline = false) const
     {
         if (materials_.size()) return materials_.resolve(shader, mode, error, alpha_ref, blend_mode,
-            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain, definition);
+            particle_pipeline, screen_pipeline, level_pipeline, water_pipeline, material_flags, terrain,
+            definition, model_pipeline);
         mode = SurfaceMode::Unresolved;
         error = "shaders.xr material library is not loaded for shader='" + shader +
             "' texture='" + texture + "'";

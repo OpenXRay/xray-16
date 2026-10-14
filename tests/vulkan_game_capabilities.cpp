@@ -26,12 +26,23 @@ int main()
 {
     VkPhysicalDeviceProperties properties{};
     properties.limits.maxPushConstantsSize = 128;
-    properties.limits.maxColorAttachments = 2;
+    properties.limits.maxColorAttachments = 3;
     properties.limits.maxImageDimension2D = 4096;
-    properties.limits.maxPerStageDescriptorSamplers = 8;
-    properties.limits.maxPerStageDescriptorSampledImages = 8;
+    properties.limits.maxPerStageDescriptorSamplers = 20;
+    properties.limits.maxPerStageDescriptorSampledImages = 20;
     std::string error;
     assert(supports_game_formats(VK_NULL_HANDLE, formats, properties, error) && error.empty());
+    properties.limits.maxPerStageDescriptorSampledImages = 19;
+    assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error) &&
+        error.find("20 fragment sampled images") != std::string::npos);
+    properties.limits.maxPerStageDescriptorSampledImages = 20;
+    properties.limits.maxPerStageDescriptorSamplers = 19;
+    assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error));
+    properties.limits.maxPerStageDescriptorSamplers = 20;
+    properties.limits.maxColorAttachments = 2;
+    assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error) &&
+        error.find("three color attachments") != std::string::npos);
+    properties.limits.maxColorAttachments = 3;
     sampled_depth = false;
     assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error) && !error.empty());
     sampled_depth = true;

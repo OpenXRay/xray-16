@@ -34,7 +34,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         // Resolve its world flags before choosing a model shader; otherwise a
         // valid ADD/MUL token silently becomes ordinary alpha blending.
         if (!textures.surface_mode(mesh.geometry.shader, texture, mesh.geometry.mode, error,
-                &mesh.alpha_ref, &mesh.screen_blend, false, false, true, false, nullptr, nullptr, &definition))
+                &mesh.alpha_ref, &mesh.screen_blend, false, false, true, false, nullptr, nullptr, &definition, true))
         {
             error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;
             return false;

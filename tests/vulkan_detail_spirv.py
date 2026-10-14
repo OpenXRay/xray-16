@@ -2,6 +2,7 @@
 
 import struct
 import sys
+import json
 from pathlib import Path
 
 
@@ -67,6 +68,30 @@ def main(root):
         assert ((2 if name.startswith("skinned_") else 1, 0) in slots.values()) == name.endswith("blended"), (name, slots)
     slots = reflect(shaders / "level_vegetation_detail_blended.ps.spv")
     assert (1, 0) in slots.values() and "lightmap" not in slots
+
+    # The shipped opaque vertex variants share Camera push constants with
+    # the fragment material. An unused float3 once moved normal_rows to 96,
+    # making the block 144 bytes against a 128-byte pipeline layout.
+    manifest = json.loads((shaders / "opaque-variants.json").read_text())
+    for variant in manifest["variants"]:
+        if variant["source"] not in ("opaque.vs", "skinned.vs"):
+            continue
+        path = root / variant["output"]
+        data = path.read_bytes()
+        words = struct.unpack(f"<{len(data) // 4}I", data)
+        names, offsets = {}, {}
+        cursor = 5
+        while cursor < len(words):
+            count, opcode = words[cursor] >> 16, words[cursor] & 0xFFFF
+            args = words[cursor + 1:cursor + count]
+            if opcode == 5:
+                names[args[0]] = text(args[1:])
+            elif opcode == 72 and args[2] == 35:
+                offsets[args[0], args[1]] = args[3]
+            cursor += count
+        camera = [offset for (identifier, member), offset in offsets.items()
+                  if names.get(identifier) == "Camera"]
+        assert camera == [0, 64, 80], (path, camera)
 
 
 if __name__ == "__main__":

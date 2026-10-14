@@ -16,6 +16,13 @@ namespace PAPI { struct Particle; }
 
 namespace xray::render::vulkan
 {
+inline bool particle_records_in_phase(bool hud, bool screen_set, int blend_mode,
+    GeometryPhase phase)
+{
+    const bool deferred_set = !hud && !screen_set && blend_mode == 0;
+    return (phase == GeometryPhase::OpaqueAndAlphaTest) == deferred_set;
+}
+
 class VulkanParticleEffect final : public IRenderVisual, public IParticleCustom
 {
 public:
@@ -26,7 +33,8 @@ public:
         const BufferResourceDispatch& dispatch, GameTextureFactory& textures, DeferredPass& pass,
         std::string& error);
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16],
-        const Fvector& right, const Fvector& up, bool hud, std::string& error);
+        const Fvector& right, const Fvector& up, bool hud, std::string& error,
+        GeometryPhase phase = GeometryPhase::Transparent);
     void release_gpu(); // The owner waits for all submitted frames first.
     void set_events(std::function<void(bool, PAPI::Particle&)> events);
     u32 getType() const override { return 8; }
@@ -91,7 +99,8 @@ public:
     const auto& effects() const { return effects_; }
     size_t triggered_count() const { return triggered_.size(); }
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16],
-        const Fvector& right, const Fvector& up, bool hud, std::string& error);
+        const Fvector& right, const Fvector& up, bool hud, std::string& error,
+        GeometryPhase phase = GeometryPhase::Transparent);
     u32 getType() const override { return 9; }
     vis_data& getVisData() override { return visibility_; }
     IRenderVisual* getSubModel(u8 index) override

@@ -1,10 +1,13 @@
 #include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/ShaderMaterialLibrary.h"
+#include "src/Layers/xrRenderVK/LevelPassGraph.h"
 
 #include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <string>
+#include <cstdio>
 
 using namespace xray::render::vulkan;
 using Bytes = std::vector<uint8_t>;
@@ -66,8 +69,180 @@ static Bytes record(const char* cls, const char* name, bool blend, uint32_t alph
     return result;
 }
 
+// Exhaust the five independently serialized S_SET flags for each mode and
+// consumer, including the contexts that must reject the same definition.
+static void screen_context_matrix()
+{
+    Bytes records, file;
+    constexpr const char* fields[]{"Texture clamp", "Z-test", "Z-write", "Lighting", "Fog"};
+    for (unsigned blend = 0; blend != 10; ++blend)
+        for (unsigned flags = 0; flags != 32; ++flags)
+        {
+            const std::string name = "matrix\\set_" + std::to_string(blend) + "_" + std::to_string(flags);
+            Bytes item = record("S_SET   ", name.c_str(), false, 73);
+            write32(item, 7);
+            item.insert(item.end(), {'B','l','e','n','d','i','n','g',0});
+            write32(item, blend); write32(item, 0);
+            for (unsigned bit = 0; bit != 5; ++bit)
+                property(item, 6, fields[bit], (flags >> bit) & 1u);
+            chunk(records, blend * 32 + flags, item);
+        }
+    chunk(file, 2, records);
+    IReader reader(file.data(), file.size());
+    ShaderMaterialLibrary materials;
+    std::string error;
+    assert(materials.load(reader, error) && materials.size() == 320);
+    for (unsigned blend = 0; blend != 10; ++blend)
+        for (unsigned flags = 0; flags != 32; ++flags)
+        {
+            const std::string name = "matrix\\set_" + std::to_string(blend) + "_" + std::to_string(flags);
+            const auto* definition = materials.find(name);
+            assert(definition && definition->blending == int(blend));
+            assert(definition->pass.clamp == bool(flags & 1) &&
+                definition->pass.depth_test == bool(flags & 2) &&
+                definition->pass.depth_write == bool(flags & 4) &&
+                definition->pass.lighting == bool(flags & 8) &&
+                definition->pass.fog == bool(flags & 16));
+            for (unsigned context = 0; context != 4; ++context)
+            {
+                // UI, particle, level/decal, OGF. Particle and OGF also use HUD.
+                const bool ui = context == 0, particle = context == 1;
+                const bool world = context >= 2;
+                const bool expected = ui ? (flags & ~1u) == 0 :
+                    particle ? blend <= 5 && (flags & ~(1u | 2u | 4u)) == 0 &&
+                        (flags & 2u) && bool(flags & 4u) == (blend == 0) :
+                    (flags & 2u) && (flags & ~(1u | 2u | (blend == 0 ? 4u : 0u) |
+                        (blend == 1 && context == 2 ? 16u : 0u))) == 0 &&
+                        (blend != 0 || (flags & 4u)) &&
+                        (context != 3 || !(flags & 16u));
+                SurfaceMode mode{};
+                int alpha = -1, selected = -1;
+                uint32_t extracted_flags = 0;
+                MaterialDefinition extracted;
+                const bool resolved = materials.resolve(name, mode, error, &alpha, &selected,
+                    particle, ui, world, false, &extracted_flags, nullptr, &extracted, context == 3);
+                if (resolved != expected)
+                {
+                    std::fprintf(stderr, "S_SET mode=%u flags=%u context=%u: expected=%d got=%d %s\n",
+                        blend, flags, context, expected, resolved, error.c_str());
+                    assert(false);
+                }
+                if (!resolved)
+                {
+                    assert(error.find("property=") != std::string::npos ||
+                        error.find("blending=") != std::string::npos);
+                    continue;
+                }
+                assert(extracted_flags == definition->screen_flags && selected == int(blend) &&
+                    alpha == (blend == 7 ? 0 : 73) &&
+                    extracted.pass.clamp == definition->pass.clamp);
+                if (ui)
+                {
+                    RenderPassGraph graph;
+                    assert(build_render_pass_graph({RenderConsumer::Ui, mode,
+                        false, false, false, false, 0, int(blend)}, graph, error));
+                    assert(graph.count == 1 && graph.passes[0].target == LevelPassTarget::Ui &&
+                        !graph.passes[0].depth_test && !graph.passes[0].depth_write);
+                }
+                else if (particle)
+                {
+                    for (bool hud : {false, true})
+                    {
+                        RenderPassGraph graph;
+                        RenderPassSelection selection{RenderConsumer::Particle, mode};
+                        selection.hud = hud;
+                        selection.blend_mode = int(blend);
+                        selection.particle_screen_set = true;
+                        assert(build_render_pass_graph(selection, graph, error));
+                        assert(graph.count == 1 && graph.passes[0].depth_test &&
+                            graph.passes[0].depth_write == (blend == 0) &&
+                            graph.passes[0].target == (hud ? LevelPassTarget::Hud : LevelPassTarget::Forward));
+                    }
+                }
+                else if (context == 2)
+                {
+                    LevelPassGraph graph;
+                    LevelPassSelection selection;
+                    selection.mode = mode;
+                    selection.screen_blend = int(blend);
+                    selection.wallmark_multiply = blend == 6;
+                    selection.glow_alpha_add = blend == 5;
+                    selection.fog = bool(flags & 16);
+                    assert(build_level_pass_graph(selection, graph, error));
+                    assert(graph.count == 1 && graph.passes[0].depth_test &&
+                        graph.passes[0].depth_write == (blend == 0) &&
+                        graph.passes[0].target == LevelPassTarget::Forward);
+                }
+                else
+                {
+                    for (bool hud : {false, true})
+                    {
+                        RenderPassGraph graph;
+                        RenderPassSelection selection{RenderConsumer::Model, mode};
+                        selection.hud = hud;
+                        selection.screen_blend = int(blend);
+                        assert(build_render_pass_graph(selection, graph, error));
+                        assert(graph.count == 1 && graph.passes[0].depth_test &&
+                            graph.passes[0].depth_write == (blend == 0) &&
+                            graph.passes[0].target == (hud ? LevelPassTarget::Hud : LevelPassTarget::Forward));
+                    }
+                }
+            }
+        }
+}
+
+static void particle_context_matrix()
+{
+    Bytes records, file;
+    for (unsigned blend = 0; blend < 6; ++blend)
+        for (unsigned clamp = 0; clamp < 2; ++clamp)
+        {
+            const std::string name = "matrix\\particle_" + std::to_string(blend) + "_" +
+                std::to_string(clamp);
+            Bytes item = record("PARTICLE", name.c_str(), false, 91);
+            write32(item, 7);
+            item.insert(item.end(), {'B','l','e','n','d','i','n','g',0});
+            write32(item, blend); write32(item, 0);
+            property(item, 6, "Texture clamp", clamp);
+            chunk(records, blend * 2 + clamp, item);
+        }
+    chunk(file, 2, records);
+    IReader reader(file.data(), file.size());
+    ShaderMaterialLibrary materials;
+    std::string error;
+    assert(materials.load(reader, error) && materials.size() == 12);
+    for (unsigned blend = 0; blend < 6; ++blend)
+        for (unsigned clamp = 0; clamp < 2; ++clamp)
+        {
+            const std::string name = "matrix\\particle_" + std::to_string(blend) + "_" +
+                std::to_string(clamp);
+            SurfaceMode mode{};
+            int alpha = -1, selected = -1;
+            MaterialDefinition definition;
+            assert(materials.resolve(name, mode, error, &alpha, &selected,
+                true, false, false, false, nullptr, nullptr, &definition));
+            assert(selected == int(blend) && alpha == (blend == 0 ? 200 : 91) &&
+                definition.pass.clamp == bool(clamp));
+            for (bool hud : {false, true})
+            {
+                RenderPassGraph graph;
+                RenderPassSelection selection{RenderConsumer::Particle,
+                    blend == 0 && !hud ? SurfaceMode::AlphaTest : SurfaceMode::Transparent};
+                selection.blend_mode = int(blend);
+                selection.hud = hud;
+                assert(build_render_pass_graph(selection, graph, error));
+                assert(graph.count == 1 && graph.passes[0].depth_test &&
+                    graph.passes[0].depth_write == (hud || blend == 0) &&
+                    graph.passes[0].target == (hud ? LevelPassTarget::Hud :
+                        blend == 0 ? LevelPassTarget::GBuffer : LevelPassTarget::Forward));
+            }
+        }
+}
+
 int main()
 {
+    screen_context_matrix();
+    particle_context_matrix();
     Bytes list;
     chunk(list, 0, record("LM_AREF ", "def_shaders\\leaf", false));
     chunk(list, 1, record("LM_AREF ", "def_shaders\\glass", true));

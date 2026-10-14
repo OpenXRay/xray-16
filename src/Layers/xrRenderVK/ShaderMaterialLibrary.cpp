@@ -478,7 +478,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     std::string& error, int* alpha_ref, int* blend_mode,
     bool particle_pipeline, bool screen_pipeline, bool level_pipeline,
     bool water_pipeline, uint32_t* material_flags, TerrainMaterialTextures* terrain,
-    MaterialDefinition* definition) const
+    MaterialDefinition* definition, bool model_pipeline) const
 {
     const auto it = entries_.find(lower(shader));
     if (it == entries_.end())
@@ -504,7 +504,7 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // UI has no depth attachment, but wrap addressing is a valid sampler state.
     const uint32_t supported_flags = screen_pipeline ? 1u :
         1u | (scene_depth_test ? 2u : 0u) |
-        (level_pipeline && material.blending == 1 ? 16u : 0u) |
+        (level_pipeline && !model_pipeline && material.blending == 1 ? 16u : 0u) |
         ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u) |
         (world_set || (particle_screen_set && material.blending == 0) ? 4u : 0u);
     const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;

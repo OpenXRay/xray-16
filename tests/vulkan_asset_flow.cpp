@@ -289,6 +289,42 @@ int main()
     assert(sampler_address.at(sampled_by.at(surface_clamp)) == VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
     textures.release_terrain_material(surface_wrap, pass);
     textures.release_terrain_material(surface_clamp, pass);
+    // All twenty surface roles retain their own DDS across a reload. The key
+    // must also distinguish a changed slot and per-material surface factors.
+    std::array<std::string, 20> distinct_names{};
+    for (size_t role = 0; role < distinct_names.size(); ++role)
+    {
+        distinct_names[role] = "surface_role_" + std::to_string(role);
+        save(directory / (distinct_names[role] + ".dds"), Bytes(dds.begin(), dds.end()));
+    }
+    FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+    const size_t before_surface = textures.resident_count();
+    VkDescriptorSet roles_a{}, roles_again{}, changed_parameter{}, changed_slot{};
+    assert(textures.surface_material(distinct_names, surface_parameters, pass, roles_a, error));
+    assert(textures.surface_material(distinct_names, surface_parameters, pass, roles_again, error));
+    assert(roles_a && roles_a == roles_again &&
+        textures.resident_count() == before_surface + distinct_names.size());
+    surface_parameters.emissive = .3f;
+    assert(textures.surface_material(distinct_names, surface_parameters, pass,
+        changed_parameter, error) && changed_parameter != roles_a);
+    surface_parameters.emissive = 0;
+    auto swapped_names = distinct_names;
+    std::swap(swapped_names[11], swapped_names[12]);
+    assert(textures.surface_material(swapped_names, surface_parameters, pass,
+        changed_slot, error) && changed_slot != roles_a && changed_slot != changed_parameter);
+    assert(textures.reload_assets(error) &&
+        textures.resident_count() == before_surface + distinct_names.size());
+    VkDescriptorSet after_reload{};
+    assert(textures.surface_material(distinct_names, surface_parameters, pass,
+        after_reload, error) && after_reload == roles_a);
+    textures.release_terrain_material(roles_again, pass);
+    textures.release_terrain_material(after_reload, pass);
+    textures.release_terrain_material(changed_parameter, pass);
+    textures.release_terrain_material(changed_slot, pass);
+    assert(textures.resident_count() == before_surface + distinct_names.size());
+    textures.release_terrain_material(roles_a, pass);
+    textures.retire_unused();
+    assert(textures.resident_count() == before_surface);
     // The mock uses an actual serialized blender definition. Runtime loading
     // must never infer alpha/depth behavior from a texture or shader name.
     {

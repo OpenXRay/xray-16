@@ -107,10 +107,13 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     for (bool hud : {false, true})
     {
         RenderPassGraph graph;
-        if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
+        const bool deferred_set = !hud && !screen_set_ && blend_mode_ == 0;
+        if (!build_render_pass_graph({RenderConsumer::Particle,
+                deferred_set ? SurfaceMode::AlphaTest : SurfaceMode::Transparent,
                 hud, false, false, false, 0, blend_mode_, 0, false, -1, screen_set_}, graph, error) ||
             !pass.request_game_pipeline(graph.passes[0].vertex, graph.passes[0].fragment,
-                hud ? SurfaceMode::Opaque : SurfaceMode::Transparent, hud, false, error))
+                hud ? SurfaceMode::Opaque : deferred_set ? SurfaceMode::AlphaTest :
+                    SurfaceMode::Transparent, hud, false, error))
         {
             error = "particle '" + def_->name + "' pass=" + (hud ? "HUD" : "world") + ": " + error;
             release_gpu();
@@ -229,9 +232,12 @@ void VulkanParticleEffect::OnFrame(u32 dt)
 }
 
 bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const DeferredPass& pass,
-    const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error)
+    const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error,
+    GeometryPhase phase)
 {
     if (!material_ || !device_) return true;
+    const bool deferred_set = !hud && !screen_set_ && blend_mode_ == 0;
+    if (!particle_records_in_phase(hud, screen_set_, blend_mode_, phase)) return true;
     PAPI::Particle* particles = nullptr;
     u32 count = 0;
     PAPI::ParticleManager()->GetParticles(effect_, particles, count);
@@ -296,12 +302,16 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
     RenderPassGraph graph;
-    if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
+    if (!build_render_pass_graph({RenderConsumer::Particle,
+            deferred_set ? SurfaceMode::AlphaTest : SurfaceMode::Transparent,
             hud, false, false, false, 0, blend_mode_, 0, false, -1, screen_set_}, graph, error)) return false;
     const auto& node = graph.passes[0];
     const char* vertex = node.vertex.c_str();
     const char* fragment = node.fragment.c_str();
-    return hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
+    return deferred_set ? pass.record_geometry(frame, buffers.vertices.handle(), buffers.indices.handle(),
+            count * 6, mvp, material_, SurfaceMode::AlphaTest, 0, vertex, fragment,
+            float(alpha_ref_) / 255.f) :
+        hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_, 0, vertex, fragment, float(alpha_ref_) / 255.f) :
         pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f);
@@ -449,12 +459,13 @@ void VulkanParticleGroup::SetHudMode(BOOL value)
 }
 
 bool VulkanParticleGroup::record(const FrameRecordingContext& frame, const DeferredPass& pass,
-    const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error)
+    const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error,
+    GeometryPhase phase)
 {
     for (auto& effect : effects_)
-        if (!effect->record(frame, pass, mvp, right, up, hud, error)) return false;
+        if (!effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
     for (auto& child : triggered_)
-        if (!child.effect->record(frame, pass, mvp, right, up, hud, error)) return false;
+        if (!child.effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
     return true;
 }
 

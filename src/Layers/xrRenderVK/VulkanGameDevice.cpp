@@ -692,6 +692,20 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
             return;
         }
     }
+    // R2's PARTICLE SET is a cutout G-buffer draw. Particle groups can mix
+    // this mode with forward effects; each child filters itself by phase.
+    for (auto& particle : owner.particle_draws_)
+    {
+        if (particle.hud) continue;
+        float mvp[16];
+        std::copy(particle.mvp.begin(), particle.mvp.end(), mvp);
+        const bool ok = particle.visual->getType() == 8 ?
+            static_cast<VulkanParticleEffect*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                particle.right, particle.up, false, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest) :
+            static_cast<VulkanParticleGroup*>(particle.visual)->record(frame, owner.deferred_, mvp,
+                particle.right, particle.up, false, owner.model_error_, GeometryPhase::OpaqueAndAlphaTest);
+        if (!ok) { owner.models_recorded_ = false; return; }
+    }
 }
 
 void VulkanGameDevice::begin_frame()

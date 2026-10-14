@@ -65,7 +65,7 @@ public:
         bool particle_pipeline = false, bool screen_pipeline = false,
         bool level_pipeline = false, bool water_pipeline = false,
         uint32_t* material_flags = nullptr, TerrainMaterialTextures* terrain = nullptr,
-        MaterialDefinition* definition = nullptr) const;
+        MaterialDefinition* definition = nullptr, bool model_pipeline = false) const;
     const MaterialDefinition* find(const std::string& shader) const;
     bool contains(const std::string& shader) const;
     size_t size() const { return entries_.size(); }

@@ -7,6 +7,18 @@ using namespace xray::render::vulkan;
 
 int main()
 {
+    // A mixed group visits both record callbacks; every child must choose
+    // exactly one world phase, including R2 PARTICLE SET versus S_SET SET.
+    for (bool screen_set : {false, true})
+        for (int mode = 0; mode < 6; ++mode)
+            for (bool hud : {false, true})
+            {
+                const bool deferred = particle_records_in_phase(hud, screen_set, mode,
+                    GeometryPhase::OpaqueAndAlphaTest);
+                const bool forward = particle_records_in_phase(hud, screen_set, mode,
+                    GeometryPhase::Transparent);
+                assert(deferred != forward && deferred == (!hud && !screen_set && mode == 0));
+            }
     Core.Initialize("vulkan_particle_visual_test", nullptr, false);
     auto catalog = std::make_shared<ParticleCatalog>();
     auto& def = catalog->effects.emplace_back();

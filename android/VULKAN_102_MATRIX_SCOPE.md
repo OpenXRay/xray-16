@@ -84,9 +84,10 @@ lighting/fog and retain detail UV scale. `S_SET` particle variants 0–5 are
 separate from `PARTICLE`: the former use serialized alpha reference in BLEND
 and ALPHA-ADD, while `PARTICLE` SET uses fixed AREF 200. Explicit unsupported
 reasons cover particle `Z-test=0`, mismatched `Z-write`, lighting/fog, and
-unimplemented OGF fog/water variants. PDF 3 still needs distinguishable-channel
-texture tests proving sampled results and complete lifetime coverage; PDF 4
-still needs the per-class element inventory and pass-binding/transition tests;
-PDF 5 still needs an exhaustive accepted context/flag matrix and tests. These
-are original PDF requirements, not new N-tasks. The original archive and
-device gate above remains open until the whole 102 implementation is ready.
+unimplemented OGF fog/water variants. PDF 3–5 now have numerical Vulkan
+readback with distinct channels, all 20 surface roles through reload, an
+original-element inventory, two ordered LaEmB draws and a complete accepted
+context/flag matrix. See [the measured contract](VULKAN_102_3_5_ACCEPTANCE.md).
+The separately discovered R2 deferred particle SET queue is N4 and is
+implemented on host. The original archive and device gate above remains open
+until the whole 102 implementation is ready.

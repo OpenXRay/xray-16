@@ -46,6 +46,32 @@ struct LevelPassGraph
     uint8_t count{};
 };
 
+// A previous-color edge is a fixed-function attachment blend within one
+// render pass, not a sampled image. Separate target passes need an explicit
+// image transition and are deliberately rejected by this graph.
+inline bool validate_level_pass_graph(const LevelPassGraph& graph, std::string& error)
+{
+    if (!graph.count || graph.count > graph.passes.size())
+    { error = "level pass graph: invalid pass count"; return false; }
+    for (uint8_t i = 0; i < graph.count; ++i)
+    {
+        const auto& pass = graph.passes[i];
+        const std::string prefix = "level pass graph: pass " + std::to_string(i) + " ";
+        if (pass.vertex.empty() || pass.fragment.empty() || !(pass.textures & BaseRole))
+        { error = prefix + "missing shader or base texture role"; return false; }
+        if (i == 0 && pass.previous_color_pass != -1)
+        { error = prefix + "cannot read a previous color"; return false; }
+        if (i && pass.previous_color_pass != i - 1)
+        { error = prefix + "missing ordered previous-color dependency"; return false; }
+        if (i && (pass.target != graph.passes[i - 1].target ||
+            pass.target != LevelPassTarget::GBuffer || pass.depth_write ||
+            pass.blend != LevelPassBlend::Multiply2x))
+        { error = prefix + "previous-color blend needs one G-buffer attachment with depth read"; return false; }
+    }
+    error.clear();
+    return true;
+}
+
 // A single executable description is shared by level, model, particle, HUD,
 // and screen consumers. The recorder selects the target; pipeline names and
 // texture roles are resolved here, before command recording begins.
@@ -125,7 +151,10 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     node.textures = BaseRole | input.surface_roles;
     if (input.consumer == RenderConsumer::Particle &&
         (input.blend_mode == 2 || input.blend_mode == 5)) node.textures |= EmissiveRole;
+    const bool deferred_particle_set = input.consumer == RenderConsumer::Particle &&
+        !input.hud && !input.particle_screen_set && input.blend_mode == 0;
     node.target = input.consumer == RenderConsumer::Ui ? LevelPassTarget::Ui :
+        deferred_particle_set ? LevelPassTarget::GBuffer :
         input.hud ? LevelPassTarget::Hud :
         input.mode == SurfaceMode::Transparent || input.consumer == RenderConsumer::Particle ?
             LevelPassTarget::Forward : LevelPassTarget::GBuffer;
@@ -150,7 +179,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.blend_mode == 5 ? "alpha_add" : input.blend_mode == 4 ? "multiply_2x" :
             input.blend_mode == 3 ? "multiply" : input.blend_mode == 2 ? "additive" : "blended";
         node.vertex = "vk\\level_opaque.vs";
-        node.fragment = input.particle_screen_set && input.hud ?
+        node.fragment = deferred_particle_set ? "vk\\particle_world_deferred.ps" :
+            input.particle_screen_set && input.hud ?
             std::string("vk\\hud_particle_screen_") + mode + ".ps" :
             input.particle_screen_set && input.blend_mode == 0 ? "vk\\world_set_set.ps" :
             input.particle_screen_set && input.blend_mode == 1 ? "vk\\world_set_blended.ps" :
@@ -286,8 +316,7 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
         second.previous_color_pass = 0;
         graph.count = 2;
     }
-    error.clear();
-    return true;
+    return validate_level_pass_graph(graph, error);
 }
 
 inline bool build_render_pass_graph(const LevelPassSelection& input,

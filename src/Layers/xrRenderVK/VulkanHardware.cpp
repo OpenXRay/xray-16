@@ -54,12 +54,16 @@ bool supports_game_formats(VkPhysicalDevice device, PFN_vkGetPhysicalDeviceForma
     const VkPhysicalDeviceProperties& properties, std::string& error)
 {
     if (!get || properties.limits.maxPushConstantsSize < 128 ||
-        properties.limits.maxColorAttachments < 2 ||
+        properties.limits.maxColorAttachments < 3 ||
         properties.limits.maxImageDimension2D < 1024 ||
-        properties.limits.maxPerStageDescriptorSamplers < 8 ||
-        properties.limits.maxPerStageDescriptorSampledImages < 8)
+        // The material set declares bindings 0..19 for fragment sampling.
+        // Pipeline layout creation counts the declared stage bindings, even
+        // when a particular variant only samples the first few roles.
+        properties.limits.maxPerStageDescriptorSamplers < 20 ||
+        properties.limits.maxPerStageDescriptorSampledImages < 20)
     {
-        error = "Vulkan gameplay limits or format query are insufficient";
+        error = "Vulkan gameplay needs 128 push-constant bytes, three color attachments, "
+            "1024px textures and 20 fragment sampled images/samplers";
         return false;
     }
     const auto supports = [&](VkFormat format, VkFormatFeatureFlags required)

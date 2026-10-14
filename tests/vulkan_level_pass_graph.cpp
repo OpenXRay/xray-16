@@ -117,6 +117,22 @@ int main()
     assert(graph.passes[1].blend == LevelPassBlend::Multiply2x);
     assert(graph.passes[1].previous_color_pass == 0);
     assert(graph.passes[1].depth_test && !graph.passes[1].depth_write);
+    LevelPassGraph invalid = graph;
+    invalid.passes[1].previous_color_pass = -1;
+    assert(!validate_level_pass_graph(invalid, error) &&
+        error.find("pass 1 missing ordered previous-color") != std::string::npos);
+    invalid = graph;
+    invalid.passes[1].target = LevelPassTarget::Forward;
+    assert(!validate_level_pass_graph(invalid, error) &&
+        error.find("pass 1 previous-color blend") != std::string::npos);
+    invalid = graph;
+    invalid.passes[1].depth_write = true;
+    assert(!validate_level_pass_graph(invalid, error) &&
+        error.find("pass 1 previous-color blend") != std::string::npos);
+    invalid = graph;
+    invalid.passes[1].textures = 0;
+    assert(!validate_level_pass_graph(invalid, error) &&
+        error.find("pass 1 missing shader or base") != std::string::npos);
     base.mode = SurfaceMode::Transparent;
     assert(!build_level_pass_graph(base, graph, error));
     assert(graph.count == 0 && error.find("incompatible") != std::string::npos);
@@ -232,6 +248,10 @@ int main()
             assert(build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
                 hud, false, false, false, 0, blend}, common, error));
             assert(common.passes[0].fragment.find(hud ? "particle_hud_" : "particle_world_") != std::string::npos);
+            assert(common.passes[0].target == (!hud && blend == 0 ?
+                LevelPassTarget::GBuffer : hud ? LevelPassTarget::Hud : LevelPassTarget::Forward));
+            if (!hud && blend == 0)
+                assert(common.passes[0].fragment == "vk\\particle_world_deferred.ps");
             assert(common.passes[0].blend == (blend == 0 ? LevelPassBlend::Replace :
                 blend == 2 ? LevelPassBlend::Additive : blend == 3 ? LevelPassBlend::Multiply :
                 blend == 4 ? LevelPassBlend::Multiply2x :
