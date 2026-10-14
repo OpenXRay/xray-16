@@ -300,6 +300,14 @@ int main()
     for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
         texture_property(modern_terrain, channel, channel);
     chunk(list, 81, modern_terrain);
+    Bytes named_terrain = record("BmmDold ", "levels\\zaton_asfalt_fixture", false);
+    named_terrain[172] = 3;
+    write32(named_terrain, 0);
+    named_terrain.insert(named_terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    texture_property(named_terrain, "Name", "detail\\serialized_but_unused");
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(named_terrain, channel, "detail\\asfalt_channel");
+    chunk(list, 110, named_terrain);
     Bytes null_terrain = record("BmmD    ", "mod\\single_with_null_channels", false);
     null_terrain[172] = 3;
     write32(null_terrain, 0);
@@ -440,7 +448,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 49);
+    assert(library.load(reader, error) && library.size() == 50);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -557,6 +565,16 @@ int main()
     assert(terrain_textures.enabled && terrain_textures.detail[0] == "r2-r" &&
         terrain_textures.detail[1] == "r2-g" && terrain_textures.detail[2] == "r2-b" &&
         terrain_textures.detail[3] == "r2-a");
+    MaterialDefinition named_terrain_definition;
+    assert(library.resolve("levels\\zaton_asfalt_fixture", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, &terrain_textures, &named_terrain_definition));
+    assert(terrain_textures.enabled && named_terrain_definition.terrain.enabled &&
+        named_terrain_definition.detail_texture == "detail\\serialized_but_unused");
+    LevelPassGraph named_terrain_graph;
+    assert(build_render_pass_graph(LevelPassSelection{mode, true, true, false},
+        named_terrain_graph, error) && named_terrain_graph.count == 1 &&
+        named_terrain_graph.passes[0].fragment == "vk\\level_terrain.ps" &&
+        (named_terrain_graph.passes[0].textures & DetailRole) == 0);
     MaterialDefinition null_channel_definition;
     assert(library.resolve("mod\\single_with_null_channels", mode, error, nullptr, nullptr,
         false, false, true, false, nullptr, &terrain_textures, &null_channel_definition));

@@ -329,8 +329,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 }
             }
         }
-        // Older BmmD records carry one detail texture in the Detail map
-        // scope. Keep its exact slot separate from the four-channel terrain.
+        // BmmD Save() serializes Name even for the v3 four-channel terrain
+        // path. The original impl shader uses R2-R/G/B/A for that path and
+        // ignores Name as a diffuse detail sampler. Preserve the slot for
+        // inspection; only the one-channel variant consumes it.
         if (cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ")
         {
             if (!terrain.enabled)
@@ -352,12 +354,7 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 if (!detail.empty() && lower(detail) != "$null")
                 {
                     definition.detail_texture = lower(detail);
-                    if (terrain.enabled)
-                    {
-                        definition.pipeline_supported = false;
-                        definition.unsupported_reason = "Detail map / Name alongside R2-R/G/B/A";
-                    }
-                    else if (supported)
+                    if (!terrain.enabled && supported)
                     {
                         definition.pipeline_supported = true;
                         definition.unsupported_reason.clear();

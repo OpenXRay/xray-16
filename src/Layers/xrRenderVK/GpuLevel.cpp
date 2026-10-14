@@ -284,7 +284,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.constant_waveforms = definition.constant_waveforms;
         mesh.lightmapped = !lightmap.empty();
         mesh.terrain = terrain.enabled;
-        mesh.single_detail = !detail_texture.empty();
+        // The four-channel impl pass ignores the serialized Detail map/Name;
+        // slot 2 belongs to its mask, slots 3–6 to R2-R/G/B/A.
+        mesh.single_detail = !detail_texture.empty() && !mesh.terrain;
         mesh.water = mode == SurfaceMode::Transparent &&
             definition.role == MaterialDefinition::Role::Water;
         mesh.glass = false;
