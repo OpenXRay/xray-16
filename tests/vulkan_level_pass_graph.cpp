@@ -156,8 +156,24 @@ int main()
     assert(build_level_pass_graph(base, graph, error));
     assert(std::string(graph.passes[0].vertex_for_visual(false, 7)) == "vk\\tree_opaque.vs");
     assert(std::string(graph.passes[0].vertex_for_visual(true, 7)) == "vk\\progressive_opaque.vs");
+    base.object_lod = true;
+    base.mode = SurfaceMode::AlphaTest;
+    assert(build_level_pass_graph(base, graph, error));
+    assert(graph.passes[0].vertex == "vk\\level_tree_s.vs" &&
+        graph.passes[0].fragment == "vk\\level_cutout.ps" &&
+        std::string(graph.passes[0].vertex_for_visual(false, 7)) == "vk\\level_tree_s.vs" &&
+        std::string(graph.passes[0].vertex_for_visual(true, 7)) == "vk\\level_tree_s.vs");
 
     RenderPassGraph common;
+    RenderPassSelection object_lod{RenderConsumer::Model, SurfaceMode::AlphaTest};
+    object_lod.double_sided = object_lod.object_lod = true;
+    assert(build_render_pass_graph(object_lod, common, error));
+    assert(common.passes[0].vertex == "vk\\object_tree_s.vs" &&
+        common.passes[0].fragment == "vk\\object_cutout.ps");
+    object_lod.animated = true;
+    object_lod.skin_weights = 2;
+    assert(!build_render_pass_graph(object_lod, common, error) &&
+        error.find("static two-sided") != std::string::npos);
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque}, common, error));
     assert(common.passes[0].target == LevelPassTarget::GBuffer);
     assert(common.passes[0].fragment == "vk\\object_opaque.ps");

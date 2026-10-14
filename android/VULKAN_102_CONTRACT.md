@@ -4,7 +4,7 @@ This records the game-path subset of PDF tasks 1–11. `shaders.xr` is read thro
 the engine VFS. Every property keeps its serialized type, scope and bytes in
 `MaterialDefinition`; acceptance depends on its semantics and the consumer's
 context. An unfamiliar property, unsupported render priority, non-default
-base/detail matrix, tessellation selection or tree_s selection fails with the
+base/detail matrix or tessellation selection fails with the
 blender ID, class, version and shader name. A parsed definition alone is not
 proof that a level, model, particle or UI pipeline can render it.
 
@@ -40,9 +40,9 @@ matrix or priority whose execution is not supported in a given context. This clo
 original PDF task 1's description and propagation contract on host: a
 serialized property never becomes an implicit default pipeline merely because
 its class/version is known. Implementing named animated matrices, a different
-render priority, tessellation and tree_s requires separate N1–N3 tasks in
+render priority, tessellation and tree_s have separate N1–N3 tasks in
 `VULKAN_FINISH_LINE.md`, if their inputs are confirmed in the claimed support
-matrix. The Vulkan consumer rejects nonzero tessellation and Object LOD, unsupported scene flag
+matrix. The Vulkan consumer rejects nonzero tessellation, unsupported scene flag
 combinations, and unknown class properties with the exact class, version,
 shader and property path. Synthetic records test these rejection boundaries.
 `MaterialDefinition::pass` also preserves the resolved depth test/write,
@@ -54,7 +54,7 @@ the original property bytes remain available for diagnostics.
 | Blender family | Game path and texture roles | Game pass and limitations |
 | --- | --- | --- |
 | `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal uses the THM DDS pair and surface descriptor slots. |
-| `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. | G-buffer or forward by blender state; nonzero `Object LOD` and `Tessellation` rejected. |
+| `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. `D_TREE / Object LOD` selects the static `tree_s` vertex path. | G-buffer or forward by blender state; nonzero `Tessellation` rejected. |
 | `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. The four serialized `R2-*` slots are read for v3 `BmmD` as well as `BmmDold`; four `$null` slots leave the single-detail path available, whereas a partial set is rejected. v3 may serialize `Detail map / Name` and `Transform` together with four channels; the HQ `impl` shader reads the channels and ignores the single-detail name/matrix. The single-detail variant still rejects an unimplemented named matrix. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
 | `LmEbB`, `MODELEbB` | `LmEbB` uses base, lightmap and environment cube. Blended `MODELEbB` uses base and environment cube; opaque `MODELEbB` retains the serialized environment fields but the original R2 `uber_deffer("model", "base")` does not sample them. | Blended models use forward reflection; opaque models use the ordinary static/skinned model G-buffer with bump and surface channels. A named environment matrix is rejected only when its forward/reflection pass consumes it. |
 | `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |

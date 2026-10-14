@@ -45,7 +45,8 @@ class GameShaderVariantsTest(unittest.TestCase):
             *{f"vk/skinned_{n}.vs.spv" for n in range(1, 5)},
             "vk/hud_skinned_1.vs.spv", "vk/hud_skinned_2.vs.spv",
             "vk/hud_skinned_3.vs.spv", "vk/hud_skinned_4.vs.spv", "vk/tree_opaque.vs.spv",
-            "vk/progressive_opaque.vs.spv",
+            "vk/progressive_opaque.vs.spv", "vk/level_tree_s.vs.spv",
+            "vk/object_tree_s.vs.spv",
         }
         self.assertTrue(expected <= outputs.keys())
         for name, variant in outputs.items():
@@ -63,11 +64,14 @@ class GameShaderVariantsTest(unittest.TestCase):
                 if name.endswith(".ps.spv"):
                     self.assertIn(0, output_locations)
                     self.assertIn(0, bindings.values())
-                    if ("blended" in name or "particle_" in name or "world_set_" in name or
+                    if name == "vk/particle_world_deferred.ps.spv":
+                        self.assertEqual(output_locations, {0, 1, 2})
+                    elif ("blended" in name or "particle_" in name or "world_set_" in name or
                             "model_set_" in name or
                             "alpha_add" in name or
                             "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
-                            name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv")):
+                            name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv",
+                                     "vk/level_priority_opaque.ps.spv")):
                         # The forward pass has one color attachment.
                         self.assertEqual(output_locations, {0})
                     else:
@@ -77,6 +81,15 @@ class GameShaderVariantsTest(unittest.TestCase):
                     self.assertIn(0, bindings.values())
                     self.assertIn(1, {value for (identifier, kind), value in decorations.items()
                                       if kind == 34})  # descriptor set for pose
+                if name in ("vk/level_tree_s.vs.spv", "vk/object_tree_s.vs.spv"):
+                    self.assertTrue({0, 1, 4} <= output_locations)
+                    inputs = {args[1] for op, args in code if op == 59 and args[2] == 1}
+                    input_locations = {decorations[(identifier, 30)] for identifier in inputs
+                                       if (identifier, 30) in decorations}
+                    self.assertTrue({0, 1, 2} <= input_locations)
+                    if name.startswith("vk/level_"):
+                        self.assertTrue({2, 3} <= output_locations)
+                        self.assertTrue({5, 6} <= input_locations)
 
     def test_cutout_discards_but_blended_does_not(self):
         for variant in ("level_cutout", "object_cutout"):

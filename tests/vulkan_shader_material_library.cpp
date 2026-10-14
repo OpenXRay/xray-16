@@ -270,6 +270,9 @@ int main()
     chunk(list, 0, record("LM_AREF ", "def_shaders\\leaf", false));
     chunk(list, 1, record("LM_AREF ", "def_shaders\\glass", true));
     chunk(list, 2, record("D_TREE  ", "trees\\leaf", false));
+    Bytes static_tree = record("D_TREE  ", "trees\\object_lod", false);
+    property(static_tree, 6, "Object LOD", 1);
+    chunk(list, 84, static_tree);
     chunk(list, 3, record("D_TREE  ", "trees\\blended", true));
     chunk(list, 4, record("D_STILL ", "detail\\solid", false));
     Bytes modded = record("CUSTOM  ", "mod\\unrecognized", false);
@@ -472,7 +475,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 50);
+    assert(library.load(reader, error) && library.size() == 51);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -502,6 +505,12 @@ int main()
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("trees\\leaf", mode, error) && mode == SurfaceMode::AlphaTest);
+    MaterialDefinition object_lod_definition;
+    assert(library.resolve("trees\\object_lod", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &object_lod_definition));
+    assert(object_lod_definition.object_lod && mode == SurfaceMode::AlphaTest &&
+        object_lod_definition.pipeline_supported);
+    assert(!library.find("trees\\leaf")->object_lod);
     assert(library.resolve("trees\\blended", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("models\\fur", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("models\\glass", mode, error) && mode == SurfaceMode::Transparent);

@@ -254,6 +254,10 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             if (property.scope == "General" && property.name == "Priority" &&
                 property.type == 4 && property.data.size() == 12)
                 definition.priority = static_cast<uint8_t>(std::min(le32(property.data.data()), 255u));
+        for (const BlenderProperty& property : definition.properties)
+            if (cls == "D_TREE  " && property.scope == "Base Texture" &&
+                property.name == "Object LOD" && property.type == 6 && property.data.size() == 4)
+                definition.object_lod = le32(property.data.data()) != 0;
         const bool strict_sorting = std::any_of(definition.properties.begin(), definition.properties.end(),
             [](const BlenderProperty& property)
             { return property.name == "Strict sorting" && property.type == 6 &&
@@ -449,9 +453,6 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             if (name == "Tessellation" && (property.type == 7 || property.type == 8) &&
                 property.data.size() >= 4 && le32(property.data.data()) != 0)
                 reject("tessellation variant is not implemented");
-            if (name == "Object LOD" && property.type == 6 && property.data.size() == 4 &&
-                le32(property.data.data()) != 0)
-                reject("tree_s shader variant is not implemented");
             // The four-channel BmmD impl pass does not bind oT2_xform: it
             // samples R2-R/G/B/A with its terrain UV. The serialized detail
             // matrix remains relevant to the one-channel detail variant.

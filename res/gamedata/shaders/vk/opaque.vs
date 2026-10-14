@@ -31,6 +31,12 @@ struct Fragment
 Fragment main(Vertex vertex)
 {
     Fragment fragment;
+    // VK_TREE_STATIC is the D_TREE Object LOD (tree_s) route. Unlike an
+    // animated tree, the decoded geometry is already in world space; leave
+    // the position, normal and UV untouched for every sliding window.
+#if defined(VK_TREE_STATIC) && !defined(LEVEL_GEOMETRY) && !defined(OBJECT_GEOMETRY)
+#error VK_TREE_STATIC requires decoded level or object geometry
+#endif
     fragment.position = mul(mvp, float4(vertex.position, 1.0));
     // X-Ray's projection is Y-up; a positive-height Vulkan viewport is Y-down.
     fragment.position.y = -fragment.position.y;

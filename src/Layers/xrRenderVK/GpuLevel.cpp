@@ -297,7 +297,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.pass_graph = secondary_opaque_level_graph(roles);
         else if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
                 mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles,
-                definition.class_name == "S_SET   " ? blend_mode : -1},
+                definition.class_name == "S_SET   " ? blend_mode : -1, definition.object_lod},
                 mesh.pass_graph, error))
         {
             error = "level / material id=" + std::to_string(model.material) + " shader='" +

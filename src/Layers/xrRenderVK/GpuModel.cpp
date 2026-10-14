@@ -91,7 +91,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 (metadata.normal || !metadata.external_normal_texture.empty() ? NormalRole : 0u)) : 0u;
         if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, false,
                 animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights, 1, roles,
-                mesh.detail, mesh.screen_blend},
+                mesh.detail, mesh.screen_blend, false, definition.object_lod},
                 mesh.pass_graph, error))
         {
             error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;

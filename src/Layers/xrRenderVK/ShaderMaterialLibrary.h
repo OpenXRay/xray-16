@@ -54,6 +54,7 @@ struct MaterialDefinition
     bool has_environment_constant{};
     std::vector<BlenderProperty> properties;
     uint8_t priority{1};
+    bool object_lod{}; // D_TREE's static tree_s vertex path.
 };
 // Reads the blender class and saved properties from the engine's shaders.xr.
 // This is deliberately independent of the GLES resource manager.

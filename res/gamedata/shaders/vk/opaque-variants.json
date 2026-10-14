@@ -113,6 +113,8 @@
     { "source": "skinned.vs", "stage": "vs", "output": "vk/hud_skinned_3.vs.spv", "define": ["SKIN_WEIGHTS=3", "VK_HUD=1"] },
     { "source": "skinned.vs", "stage": "vs", "output": "vk/hud_skinned_4.vs.spv", "define": ["SKIN_WEIGHTS=4", "VK_HUD=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/tree_opaque.vs.spv", "define": ["VK_TREE=1", "LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/level_tree_s.vs.spv", "define": ["VK_TREE_STATIC=1", "LEVEL_GEOMETRY=1"] },
+    { "source": "opaque.vs", "stage": "vs", "output": "vk/object_tree_s.vs.spv", "define": ["VK_TREE_STATIC=1", "OBJECT_GEOMETRY=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/progressive_opaque.vs.spv", "define": ["VK_PROGRESSIVE=1", "LEVEL_GEOMETRY=1"] }
   ]
 }

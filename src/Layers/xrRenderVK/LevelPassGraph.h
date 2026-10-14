@@ -106,6 +106,7 @@ struct RenderPassSelection
     bool detail{};
     int screen_blend{-1}; // Serialized S_SET mode when used by an OGF model.
     bool particle_screen_set{};
+    bool object_lod{};
 };
 
 inline bool build_render_pass_graph(const RenderPassSelection& input,
@@ -128,6 +129,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     if (input.consumer == RenderConsumer::Model && input.animated &&
         (input.skin_weights < 1 || input.skin_weights > 4))
         return reject("animated model skin weights (expected 1..4)");
+    if (input.object_lod && (input.consumer != RenderConsumer::Model || input.animated || !input.double_sided))
+        return reject("D_TREE Object LOD requires static two-sided model geometry");
     if (input.consumer == RenderConsumer::Model && input.detail && input.environment)
         return reject("model diffuse detail with environment cube");
     if (input.consumer == RenderConsumer::Model && input.environment &&
@@ -233,6 +236,7 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             node.textures |= DetailRole;
         }
         if (input.environment) node.textures |= EnvironmentRole;
+        if (input.object_lod) node.vertex = "vk\\object_tree_s.vs";
     }
     graph.count = 1;
     error.clear();
@@ -246,6 +250,7 @@ struct LevelPassSelection
     bool wallmark_multiply{}, glow_alpha_add{}, fog{};
     uint16_t surface_roles{};
     int screen_blend{-1};
+    bool object_lod{};
 };
 
 inline bool build_level_pass_graph(const LevelPassSelection& input,
@@ -306,6 +311,7 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     first.vertex = std::string("vk\\") + family + ".vs";
     if ((input.screen_blend >= 0 && input.screen_blend <= 4) || input.screen_blend >= 7)
         first.vertex = "vk\\level_opaque.vs";
+    if (input.object_lod) first.vertex = "vk\\level_tree_s.vs";
     first.fragment = input.screen_blend == 0 ? "vk\\world_set_set.ps" :
         input.wallmark_multiply ? "vk\\wallmark_multiply_2x.ps" :
         input.glow_alpha_add ? "vk\\glow_alpha_add.ps" : input.fog ? "vk\\level_fog.ps" :
