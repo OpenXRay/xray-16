@@ -2,6 +2,7 @@
 #include "src/Layers/xrRenderVK/ShaderMaterialLibrary.h"
 #include "src/Layers/xrRenderVK/LevelPassGraph.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -21,6 +22,15 @@ static void property(Bytes& bytes, uint32_t id, const char* name, uint32_t value
 static void texture_property(Bytes& bytes, const char* name, const char* value)
 {
     write32(bytes, 3);
+    bytes.insert(bytes.end(), name, name + std::strlen(name) + 1);
+    const size_t offset = bytes.size();
+    bytes.resize(offset + 64);
+    assert(std::strlen(value) < 64);
+    std::memcpy(bytes.data() + offset, value, std::strlen(value));
+}
+static void matrix_property(Bytes& bytes, const char* name, const char* value)
+{
+    write32(bytes, 1);
     bytes.insert(bytes.end(), name, name + std::strlen(name) + 1);
     const size_t offset = bytes.size();
     bytes.resize(offset + 64);
@@ -305,6 +315,7 @@ int main()
     write32(named_terrain, 0);
     named_terrain.insert(named_terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
     texture_property(named_terrain, "Name", "detail\\serialized_but_unused");
+    matrix_property(named_terrain, "Transform", "terrain_scroll_unused");
     for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
         texture_property(named_terrain, channel, "detail\\asfalt_channel");
     chunk(list, 110, named_terrain);
@@ -570,6 +581,11 @@ int main()
         false, false, true, false, nullptr, &terrain_textures, &named_terrain_definition));
     assert(terrain_textures.enabled && named_terrain_definition.terrain.enabled &&
         named_terrain_definition.detail_texture == "detail\\serialized_but_unused");
+    const auto transform = std::find_if(named_terrain_definition.properties.begin(),
+        named_terrain_definition.properties.end(), [](const BlenderProperty& property)
+        { return property.scope == "Detail map" && property.name == "Transform"; });
+    assert(transform != named_terrain_definition.properties.end() && transform->type == 1 &&
+        std::strcmp(reinterpret_cast<const char*>(transform->data.data()), "terrain_scroll_unused") == 0);
     LevelPassGraph named_terrain_graph;
     assert(build_render_pass_graph(LevelPassSelection{mode, true, true, false},
         named_terrain_graph, error) && named_terrain_graph.count == 1 &&
@@ -845,6 +861,15 @@ int main()
     for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
         texture_property(old_terrain, channel, "mod\\sand");
     rejected_semantics(old_terrain, 79, "mod\\old_terrain", "R2-R");
+    Bytes one_channel_matrix = record("BmmDold ", "mod\\one_channel_matrix", false);
+    one_channel_matrix[172] = 3;
+    write32(one_channel_matrix, 0);
+    one_channel_matrix.insert(one_channel_matrix.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    texture_property(one_channel_matrix, "Name", "detail\\actual_single_detail");
+    matrix_property(one_channel_matrix, "Transform", "animated_single_detail");
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(one_channel_matrix, channel, "$null");
+    rejected_semantics(one_channel_matrix, 111, "mod\\one_channel_matrix", "named texture matrix");
     Bytes base_matrix = record("LM      ", "mod\\double_sided", false);
     write32(base_matrix, 1);
     base_matrix.insert(base_matrix.end(), {'T','r','a','n','s','f','o','r','m',0});

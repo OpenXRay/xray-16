@@ -452,7 +452,11 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             if (name == "Object LOD" && property.type == 6 && property.data.size() == 4 &&
                 le32(property.data.data()) != 0)
                 reject("tree_s shader variant is not implemented");
-            if (name == "Transform" && (scope == "Base Texture" || scope == "Detail map") &&
+            // The four-channel BmmD impl pass does not bind oT2_xform: it
+            // samples R2-R/G/B/A with its terrain UV. The serialized detail
+            // matrix remains relevant to the one-channel detail variant.
+            if (name == "Transform" && (scope == "Base Texture" ||
+                    (scope == "Detail map" && !terrain.enabled)) &&
                 property.type == 1 && property.data[0] &&
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$null") != 0)
                 reject("named texture matrix is not implemented");
