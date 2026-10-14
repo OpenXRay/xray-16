@@ -73,10 +73,10 @@ input is access to legitimately owned game installations or a bounded,
 reproducible set of unmodified archives for each profile, and device output
 for visual/frame-time acceptance. Do not publish original assets in the PR.
 
-## Host implementation checkpoint: PDF 2–6
+## Host checkpoint and remaining work: PDF 2–6
 
-The declared material subset has host evidence for detail names and scale,
-texture roles and descriptor lifetime, graph pass states, `S_SET`/`PARTICLE`
+The implemented subset has host evidence for detail names and scale,
+some texture roles and descriptor lifetime, graph pass states, `S_SET`/`PARTICLE`
 mode routing, and transparent vegetation. Vegetation prototypes now resolve
 their own `.thm` diffuse detail, normal and bump names into the same surface
 contract as static geometry; transparent draws use level geometry with forward
@@ -84,5 +84,9 @@ lighting/fog and retain detail UV scale. `S_SET` particle variants 0–5 are
 separate from `PARTICLE`: the former use serialized alpha reference in BLEND
 and ALPHA-ADD, while `PARTICLE` SET uses fixed AREF 200. Explicit unsupported
 reasons cover particle `Z-test=0`, mismatched `Z-write`, lighting/fog, and
-unimplemented OGF fog/water variants. The original archive and device gate
-above remains open until the whole 102 implementation is ready.
+unimplemented OGF fog/water variants. PDF 3 still needs distinguishable-channel
+texture tests proving sampled results and complete lifetime coverage; PDF 4
+still needs the per-class element inventory and pass-binding/transition tests;
+PDF 5 still needs an exhaustive accepted context/flag matrix and tests. These
+are original PDF requirements, not new N-tasks. The original archive and
+device gate above remains open until the whole 102 implementation is ready.
