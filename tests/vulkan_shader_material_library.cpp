@@ -37,6 +37,22 @@ static void matrix_property(Bytes& bytes, const char* name, const char* value)
     assert(std::strlen(value) < 64);
     std::memcpy(bytes.data() + offset, value, std::strlen(value));
 }
+static void tessellation_property(Bytes& bytes, uint32_t selected)
+{
+    write32(bytes, 7);
+    const char* name = "Tessellation";
+    bytes.insert(bytes.end(), name, name + std::strlen(name) + 1);
+    write32(bytes, selected);
+    write32(bytes, 4);
+    constexpr const char* labels[]{"NO_TESS", "TESS_PN", "TESS_HM", "TESS_PN+HM"};
+    for (uint32_t i = 0; i < 4; ++i)
+    {
+        write32(bytes, i);
+        const auto start = bytes.size();
+        bytes.resize(start + 64);
+        std::memcpy(bytes.data() + start, labels[i], std::strlen(labels[i]));
+    }
+}
 static void replace_saved_string_property(Bytes& bytes, uint32_t type,
     const char* name, const char* value)
 {
@@ -370,6 +386,14 @@ int main()
     property(wallmark_mult, 6, "Z-test", 1);
     chunk(list, 51, wallmark_mult);
     chunk(list, 52, record("MODEL   ", "models\\fur", true, 32));
+    for (uint32_t selected = 0; selected <= 4; ++selected)
+    {
+        Bytes tessellated = record("MODEL   ",
+            ("models\\tess_" + std::to_string(selected)).c_str(), false);
+        tessellated[172] = 2;
+        tessellation_property(tessellated, selected);
+        chunk(list, 120 + selected, tessellated);
+    }
     chunk(list, 53, record("MODEL   ", "models\\glass", true, 4));
     Bytes reflection = record("LmEbB   ", "mod\\arbitrary_reflection", false);
     write32(reflection, 0);
@@ -475,7 +499,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 51);
+    assert(library.load(reader, error) && library.size() == 56);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -513,6 +537,18 @@ int main()
     assert(!library.find("trees\\leaf")->object_lod);
     assert(library.resolve("trees\\blended", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("models\\fur", mode, error) && mode == SurfaceMode::AlphaTest);
+    for (uint32_t selected = 0; selected < 4; ++selected)
+    {
+        MaterialDefinition tessellated;
+        const std::string name = "models\\tess_" + std::to_string(selected);
+        assert(library.resolve(name, mode, error, nullptr, nullptr, false,
+            false, true, false, nullptr, nullptr, &tessellated, true));
+        assert(tessellated.pipeline_supported && tessellated.tessellation == selected &&
+            mode == SurfaceMode::Opaque);
+    }
+    assert(!library.resolve("models\\tess_4", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, nullptr, true) &&
+        error.find("invalid Tessellation token") != std::string::npos);
     assert(library.resolve("models\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
     assert(library.resolve("mod\\plain_vertex", mode, error) && mode == SurfaceMode::Opaque);

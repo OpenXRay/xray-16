@@ -45,6 +45,9 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
+        if (definition.tessellation)
+            Msg("[renderer-vulkan] OGF shader='%s' texture='%s' Tessellation=%u: using CBlender_Model R2 non-tessellated path",
+                mesh.geometry.shader.c_str(), texture.c_str(), definition.tessellation);
         if (definition.class_name == "S_SET   " && definition.role == MaterialDefinition::Role::Water)
         {
             error = "OGF shader='" + mesh.geometry.shader +

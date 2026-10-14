@@ -258,6 +258,11 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             if (cls == "D_TREE  " && property.scope == "Base Texture" &&
                 property.name == "Object LOD" && property.type == 6 && property.data.size() == 4)
                 definition.object_lod = le32(property.data.data()) != 0;
+        for (const BlenderProperty& property : definition.properties)
+            if (property.scope == "Base Texture" && property.name == "Tessellation" &&
+                (property.type == 7 || property.type == 8) && property.data.size() >= 8 &&
+                le32(property.data.data()) <= 3)
+                definition.tessellation = static_cast<uint8_t>(le32(property.data.data()));
         const bool strict_sorting = std::any_of(definition.properties.begin(), definition.properties.end(),
             [](const BlenderProperty& property)
             { return property.name == "Strict sorting" && property.type == 6 &&
@@ -450,9 +455,23 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                  le32(property.data.data()) < le32(property.data.data() + 4) ||
                  le32(property.data.data()) > le32(property.data.data() + 8)))
                 reject("invalid render priority (expected 0..3 within saved bounds)");
-            if (name == "Tessellation" && (property.type == 7 || property.type == 8) &&
-                property.data.size() >= 4 && le32(property.data.data()) != 0)
-                reject("tessellation variant is not implemented");
+            if (name == "Tessellation" && (property.type == 7 || property.type == 8))
+            {
+                const uint32_t selected = le32(property.data.data());
+                const uint32_t count = le32(property.data.data() + 4);
+                const size_t first = property.type == 7 ? 8 : 12;
+                const size_t stride = property.type == 7 ? 68 : 8;
+                bool listed = count == 0;
+                for (uint32_t item = 0; item < count; ++item)
+                    listed |= le32(property.data.data() + first + size_t(item) * stride) == selected;
+                if (selected > 3 || !listed)
+                    reject("invalid Tessellation token (expected NO_TESS/PN/HM/PN+HM)");
+                else if (selected != 0 && cls != "MODEL   ")
+                    reject("level tessellation variant is not implemented");
+                // CBlender_Model's R2 path never sets C.TessMethod (only R4
+                // does). Vulkan uses that R2 non-tessellated shader path;
+                // keep the selected token for a future R4-equivalent pass.
+            }
             // The four-channel BmmD impl pass does not bind oT2_xform: it
             // samples R2-R/G/B/A with its terrain UV. The serialized detail
             // matrix remains relevant to the one-channel detail variant.
@@ -469,14 +488,15 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$base0") != 0)
                 reject("base texture selector is not implemented");
         }
-        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s priority=%u alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' passes=%u properties=%zu supported=%d reason='%s'",
+        Msg("[renderer-vulkan] material.definition file=shaders.xr id=%u name='%s' class='%s' version=%u mode=%s priority=%u alpha-ref=%d blending=%d flags=0x%x role=%s terrain=%d detail='%s' environment='%s' transform='%s' constant='%s' tessellation=%u passes=%u properties=%zu supported=%d reason='%s'",
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
             definition.priority, alpha_ref, blending, definition.screen_flags,
             definition.role == MaterialDefinition::Role::Water ? "water" : "standard",
             terrain.enabled ? 1 : 0, definition.detail_texture.c_str(),
             definition.environment_texture.c_str(), definition.environment_transform.c_str(),
-            definition.environment_constant.c_str(), cls == "LaEmB   " ? 2u : 1u,
+            definition.environment_constant.c_str(), definition.tessellation,
+            cls == "LaEmB   " ? 2u : 1u,
             definition.properties.size(), definition.pipeline_supported ? 1 : 0,
             definition.unsupported_reason.c_str());
     }
