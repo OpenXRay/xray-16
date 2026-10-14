@@ -177,6 +177,12 @@ int main()
     single_detail.insert(single_detail.end(), detail_scope, detail_scope + sizeof(detail_scope));
     texture_property(single_detail, "Name", "mod\\unusual_detail");
     chunk(list, 55, single_detail);
+    chunk(list, 66, record("V       ", "mod\\plain_vertex", false));
+    Bytes lightmapped_detail = record("LmBmmD  ", "mod\\lightmapped_detail", false);
+    write32(lightmapped_detail, 0);
+    lightmapped_detail.insert(lightmapped_detail.end(), detail_scope, detail_scope + sizeof(detail_scope));
+    texture_property(lightmapped_detail, "Name", "mod\\another_detail");
+    chunk(list, 67, lightmapped_detail);
     Bytes environment_constant = record("LaEmB   ", "mod\\glowing_wall", false);
     environment_constant[172] = 0;
     write32(environment_constant, 0);
@@ -248,7 +254,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 41);
+    assert(library.load(reader, error) && library.size() == 43);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -272,6 +278,12 @@ int main()
     assert(library.resolve("models\\fur", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("models\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("detail\\solid", mode, error) && mode == SurfaceMode::Opaque);
+    assert(library.resolve("mod\\plain_vertex", mode, error) && mode == SurfaceMode::Opaque);
+    MaterialDefinition lightmapped_detail_definition;
+    assert(library.resolve("mod\\lightmapped_detail", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, nullptr, &lightmapped_detail_definition) &&
+        mode == SurfaceMode::Opaque &&
+        lightmapped_detail_definition.detail_texture == "mod\\another_detail");
     int vertex_alpha_ref = -1;
     assert(library.resolve("mod\\vertex_cutout_detail", mode, error, &vertex_alpha_ref) &&
         mode == SurfaceMode::AlphaTest && vertex_alpha_ref == 72);
@@ -626,6 +638,20 @@ int main()
     base_matrix.resize(matrix_value + 64);
     std::memcpy(base_matrix.data() + matrix_value, "spin", 5);
     rejected_semantics(base_matrix, 71, "mod\\double_sided", "named texture matrix");
+    {
+        Bytes records, file;
+        chunk(records, 71, base_matrix);
+        chunk(file, 2, records);
+        IReader reader(file.data(), file.size());
+        ShaderMaterialLibrary parsed_library;
+        assert(parsed_library.load(reader, error));
+        const auto* parsed_matrix = parsed_library.find("mod\\double_sided");
+        assert(parsed_matrix && !parsed_matrix->pipeline_supported &&
+            parsed_matrix->properties.back().scope == "Base Texture" &&
+            parsed_matrix->properties.back().type == 1 &&
+            std::strcmp(reinterpret_cast<const char*>(parsed_matrix->properties.back().data.data()),
+                "spin") == 0);
+    }
     Bytes priority = record("LM      ", "mod\\priority", false);
     write32(priority, 0);
     priority.insert(priority.end(), {'G','e','n','e','r','a','l',0});
@@ -633,6 +659,20 @@ int main()
     priority.insert(priority.end(), {'P','r','i','o','r','i','t','y',0});
     write32(priority, 3); write32(priority, 0); write32(priority, 3);
     rejected_semantics(priority, 72, "mod\\priority", "render priority");
+    {
+        Bytes records, file;
+        chunk(records, 72, priority);
+        chunk(file, 2, records);
+        IReader reader(file.data(), file.size());
+        ShaderMaterialLibrary parsed_library;
+        assert(parsed_library.load(reader, error));
+        const auto* parsed_priority = parsed_library.find("mod\\priority");
+        assert(parsed_priority && !parsed_priority->pipeline_supported &&
+            parsed_priority->properties.back().scope == "General" &&
+            parsed_priority->properties.back().type == 4 &&
+            parsed_priority->properties.back().data.size() == 12 &&
+            parsed_priority->properties.back().data[0] == 3);
+    }
     Bytes renamed = record("LM_AREF ", "mod\\ordinary_surface", false);
     Bytes deceptive = record("LM_AREF ", "water\\double_sided_alpha_add", false);
     Bytes rename_records, rename_file;

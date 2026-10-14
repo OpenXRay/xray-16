@@ -30,8 +30,14 @@ version is rejected if inserted into an older record, even if its value is 0.
 | `PARTICLE` | 0 | `Blending` token 0, `Texture clamp` true, `Alpha ref` 32 |
 | `S_SET` | 0–4 | `Blending` token 0, `Texture clamp` true (omitted by v2 `Load`), `Alpha ref` 32; `Z-test`, `Z-write`, `Lighting`, `Fog` false |
 
-The parser retains raw values and scopes for every property. The Vulkan
-consumer rejects nonzero tessellation and Object LOD, unsupported scene flag
+The parser retains raw values and scopes for every property, including a
+matrix or priority whose execution is not supported yet. This closes the
+original PDF task 1's description and propagation contract on host: a
+serialized property never becomes an implicit default pipeline merely because
+its class/version is known. Implementing named animated matrices, a different
+render priority, tessellation and tree_s requires separate N1–N3 tasks in
+`VULKAN_FINISH_LINE.md`, if their inputs are confirmed in the claimed support
+matrix. The Vulkan consumer rejects nonzero tessellation and Object LOD, unsupported scene flag
 combinations, and unknown class properties with the exact class, version,
 shader and property path. Synthetic records test these rejection boundaries.
 `MaterialDefinition::pass` also preserves the resolved depth test/write,
