@@ -350,7 +350,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
             }
             surface_ready = textures.surface_material(names, surface, pass, mesh.material, error,
-                mesh.environment && !mesh.laemb);
+                mesh.environment && !mesh.laemb,
+                definition.class_name == "S_SET   " && definition.pass.clamp);
         }
         const bool material_ready = surface_roles ? surface_ready :
                 mesh.terrain ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error) :

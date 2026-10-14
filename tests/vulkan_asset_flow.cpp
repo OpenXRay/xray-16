@@ -273,6 +273,22 @@ int main()
     textures.release_ui(ui_clamp, ui_pass);
     textures.release_ui(ui_wrap, ui_pass);
     textures.release_ui(ui_wrap, ui_pass);
+    std::array<std::string, 20> surface_names;
+    surface_names.fill("fixture");
+    SurfaceParameters surface_parameters{};
+    VkDescriptorSet surface_wrap{}, surface_clamp{};
+    assert(textures.surface_material(surface_names, surface_parameters, pass,
+        surface_wrap, error) &&
+        textures.surface_material(surface_names, surface_parameters, pass,
+            surface_clamp, error, false, true));
+    assert(surface_wrap && surface_clamp && surface_wrap != surface_clamp);
+    assert(sampler_address.at(sampled_by.at(surface_wrap)) == VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    assert(sampler_address.at(sampled_by.at(surface_clamp)) == VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
+    assert(textures.reload_assets(error));
+    assert(sampler_address.at(sampled_by.at(surface_wrap)) == VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    assert(sampler_address.at(sampled_by.at(surface_clamp)) == VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
+    textures.release_terrain_material(surface_wrap, pass);
+    textures.release_terrain_material(surface_clamp, pass);
     // The mock uses an actual serialized blender definition. Runtime loading
     // must never infer alpha/depth behavior from a texture or shader name.
     {

@@ -21,7 +21,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     const char* label, bool shadow = false, bool additive = false,
     bool alpha_additive = false, bool multiply = false, bool multiply_2x = false,
     bool particle_set = false, bool water_depth_write = false, bool wallmark = false,
-    bool legacy_multiply = false, bool replace_no_depth = false)
+    bool legacy_multiply = false, bool replace_no_depth = false,
+    bool hud_set_no_depth_write = false)
 {
     VkPipelineShaderStageCreateInfo stages[2]{};
     stages[0].sType = stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -71,7 +72,8 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
     // against one another without occluding the HUD with world geometry.
     depth.depthTestEnable = (gbuffer || hud || transparent || shadow) &&
         (!additive && !alpha_additive || transparent || hud) ? VK_TRUE : VK_FALSE;
-    depth.depthWriteEnable = !legacy_multiply && ((gbuffer && !transparent) || hud || shadow || particle_set ||
+    depth.depthWriteEnable = !legacy_multiply && ((gbuffer && !transparent) ||
+        (hud && !hud_set_no_depth_write) || shadow || particle_set ||
         water_depth_write) ? VK_TRUE : VK_FALSE;
     // Decal polygons lie on top of the level surface. Strict LESS rejects
     // coplanar pixels and makes papers/wallmarks blink as the view moves.
@@ -666,7 +668,8 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
     const bool particle_alpha_add = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_alpha_add.ps") != std::string::npos;
     const bool glow_alpha_add = fragment_name == "vk\\glow_alpha_add.ps" ||
-        fragment_name == "vk\\model_set_alpha_add.ps";
+        fragment_name == "vk\\model_set_alpha_add.ps" ||
+        fragment_name == "vk\\hud_model_set_alpha_add.ps";
     const bool particle_multiply = (fragment_name.find("particle_") != std::string::npos ||
         fragment_name.find("world_set_") != std::string::npos ||
         fragment_name.find("model_set_") != std::string::npos) &&
@@ -676,13 +679,18 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name.find("model_set_") != std::string::npos) &&
         fragment_name.find("_multiply_2x.ps") != std::string::npos;
     const bool wallmark_multiply_2x = fragment_name == "vk\\wallmark_multiply_2x.ps" ||
-        fragment_name == "vk\\model_set_wallmark_multiply_2x.ps";
+        fragment_name == "vk\\model_set_wallmark_multiply_2x.ps" ||
+        fragment_name == "vk\\hud_model_set_wallmark_multiply_2x.ps";
     const bool particle_set = fragment_name.find("particle_") != std::string::npos &&
         fragment_name.find("_set.ps") != std::string::npos;
     const bool world_set_depth_write = fragment_name == "vk\\world_set_set.ps" ||
-        fragment_name == "vk\\model_set_set.ps";
+        fragment_name == "vk\\model_set_set.ps" ||
+        fragment_name == "vk\\hud_model_set_set.ps";
     const bool world_set_replace = fragment_name == "vk\\world_set_set_2r.ps" ||
-        fragment_name == "vk\\model_set_set_2r.ps";
+        fragment_name == "vk\\model_set_set_2r.ps" ||
+        fragment_name == "vk\\hud_model_set_set_2r.ps";
+    const bool hud_set_no_depth_write = hud &&
+        fragment_name.find("vk\\hud_model_set_") == 0 && !world_set_depth_write;
     const bool legacy_multiply = fragment_name == "vk\\level_laemb_multiply.ps";
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
@@ -690,7 +698,8 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
             "game shader pair", false, particle_additive, particle_alpha_add || glow_alpha_add,
             particle_multiply, particle_multiply_2x || wallmark_multiply_2x,
             particle_set || world_set_depth_write,
-            false, wallmark_multiply_2x, legacy_multiply, world_set_replace))
+            false, wallmark_multiply_2x, legacy_multiply, world_set_replace,
+            hud_set_no_depth_write))
     {
         error += ": " + vertex_name + " / " + fragment_name;
         return false;
@@ -1201,6 +1210,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
             std::strstr(fragment_name, "world_set_blend_4r.ps") ||
             std::strstr(fragment_name, "model_set_blend_4r.ps") ||
             std::strstr(fragment_name, "model_set_alpha_add.ps") ||
+            std::strstr(fragment_name, "level_fog.ps") ||
             std::strstr(fragment_name, "glow_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -1245,8 +1255,13 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
     if (normal_rows)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
-    if (fragment_name && std::strstr(fragment_name, "particle_") &&
-        std::strstr(fragment_name, "_set.ps"))
+    if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
+            std::strstr(fragment_name, "_set.ps")) ||
+            std::strstr(fragment_name, "model_set_blended.ps") ||
+            std::strstr(fragment_name, "model_set_set_2r.ps") ||
+            std::strstr(fragment_name, "model_set_blend_2r.ps") ||
+            std::strstr(fragment_name, "model_set_blend_4r.ps") ||
+            std::strstr(fragment_name, "model_set_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);

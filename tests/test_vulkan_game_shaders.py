@@ -143,7 +143,7 @@ class GameShaderVariantsTest(unittest.TestCase):
 
     def test_model_set_has_no_level_only_fragment_inputs(self):
         for variant in json.loads(MANIFEST.read_text())["variants"]:
-            if not variant["output"].startswith("vk/model_set_"):
+            if not variant["output"].startswith(("vk/model_set_", "vk/hud_model_set_")):
                 continue
             with self.subTest(name=variant["output"]):
                 code = list(instructions(SHADERS / variant["output"]))

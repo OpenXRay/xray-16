@@ -92,13 +92,12 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     if (input.consumer == RenderConsumer::Model && input.screen_blend >= 0)
     {
         if (input.screen_blend > 9) return reject("OGF S_SET Blending (expected 0..9)");
-        if (input.hud) return reject("HUD OGF S_SET world blend/depth pipeline");
         if (input.mode != SurfaceMode::Transparent)
             return reject("OGF S_SET requires world forward pass");
         if (input.detail || input.environment)
             return reject("OGF S_SET with detail or environment texture roles");
         auto& world = graph.passes[0];
-        world.target = LevelPassTarget::Forward;
+        world.target = input.hud ? LevelPassTarget::Hud : LevelPassTarget::Forward;
         world.depth_test = true;
         world.depth_write = input.screen_blend == 0;
         world.blend = input.screen_blend == 0 || input.screen_blend == 7 ? LevelPassBlend::Replace :
@@ -107,12 +106,14 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.screen_blend == 4 || input.screen_blend == 6 ? LevelPassBlend::Multiply2x :
             input.screen_blend == 5 ? LevelPassBlend::AlphaAdd : LevelPassBlend::Alpha;
         world.textures = BaseRole | (input.screen_blend == 5 ? EmissiveRole : 0);
-        world.vertex = input.animated ? "vk\\skinned_" + std::to_string(input.skin_weights) + ".vs" :
+        world.vertex = input.animated ? std::string(input.hud ? "vk\\hud_skinned_" : "vk\\skinned_") +
+            std::to_string(input.skin_weights) + ".vs" :
             std::string("vk\\object_blended.vs");
         const char* fragments[]{"set", "blended", "additive", "multiply",
             "multiply_2x", "alpha_add", "wallmark_multiply_2x", "set_2r",
             "blend_2r", "blend_4r"};
-        world.fragment = std::string("vk\\model_set_") + fragments[input.screen_blend] + ".ps";
+        world.fragment = std::string(input.hud ? "vk\\hud_model_set_" : "vk\\model_set_") +
+            fragments[input.screen_blend] + ".ps";
         graph.count = 1;
         error.clear();
         return true;

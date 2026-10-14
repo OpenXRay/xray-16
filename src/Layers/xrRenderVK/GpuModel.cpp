@@ -105,6 +105,21 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
             return false;
         }
+        if (mesh.screen_blend >= 0)
+        {
+            RenderPassGraph hud_graph;
+            if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
+                    animated, false, false, mesh.geometry.skin_weights, 1, 0, false,
+                    mesh.screen_blend}, hud_graph, error))
+                return false;
+            const auto& hud_node = hud_graph.passes[0];
+            if (!pass.request_game_pipeline(hud_node.vertex, hud_node.fragment,
+                    SurfaceMode::Opaque, true, animated, error))
+            {
+                error = "OGF HUD shader pair: " + error;
+                return false;
+            }
+        }
         mesh.detail_scale = metadata.scale;
         bool surface_ready = false;
         if (mesh.surface)
@@ -133,7 +148,8 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 surface.detail_normal = metadata.diffuse ? 2.f : 1.f;
             }
             surface_ready = textures.surface_material(names, surface, pass, mesh.material, error,
-                mesh.environment);
+                mesh.environment,
+                definition.class_name == "S_SET   " && definition.pass.clamp);
         }
         if (!(mesh.surface ? surface_ready : mesh.environment ? textures.environment_material(texture, {},
                 definition.environment_texture, true, pass, mesh.material, error) :
@@ -363,7 +379,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     window.index_count, mvp, mesh.material, window.offset,
                     hud_graph.passes[0].vertex.empty() ? nullptr : hud_graph.passes[0].vertex.c_str(),
                     hud_graph.passes[0].fragment.empty() ? nullptr : hud_graph.passes[0].fragment.c_str(),
-                    0.f, normal_rows))
+                    float(mesh.alpha_ref) / 255.f, normal_rows))
             {
                 if (error.empty()) error = "Vulkan HUD model geometry recording failed";
                 return false;

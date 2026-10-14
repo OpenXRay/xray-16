@@ -428,13 +428,15 @@ void GameTextureFactory::release_terrain_material(VkDescriptorSet set, DeferredP
 
 bool GameTextureFactory::surface_material(const std::array<std::string, 20>& names,
     const SurfaceParameters& parameters, DeferredPass& pass,
-    VkDescriptorSet& result, std::string& error, bool cube_environment)
+    VkDescriptorSet& result, std::string& error, bool cube_environment, bool clamp)
 {
     result = VK_NULL_HANDLE;
     TerrainMaterial item;
     item.count = names.size();
+    item.clamp = clamp;
     std::string key = "surface";
     key.push_back('\0');
+    key.push_back(clamp ? '\1' : '\0');
     for (size_t i = 0; i < names.size(); ++i)
     {
         const std::string name = trim_texture_name(names[i].empty() ? names[0] : names[i]);
@@ -460,8 +462,9 @@ bool GameTextureFactory::surface_material(const std::array<std::string, 20>& nam
         std::array<VkImageView, 13> extra{};
         for (size_t i = 0; i < first.size(); ++i) first[i] = item.assets[i]->texture.view;
         for (size_t i = 0; i < extra.size(); ++i) extra[i] = item.assets[i + 7]->texture.view;
-        if (!pass.terrain_material(first, sampler_, item.set, error)) return false;
-        pass.update_surface_textures(item.set, extra, sampler_);
+        const VkSampler material_sampler = clamp ? ui_sampler_ : sampler_;
+        if (!pass.terrain_material(first, material_sampler, item.set, error)) return false;
+        pass.update_surface_textures(item.set, extra, material_sampler);
         pass.set_surface_parameters(item.set, parameters);
         item.pass = &pass;
         for (size_t i = 0; i < item.count; ++i)
@@ -924,12 +927,13 @@ bool GameTextureFactory::reload_assets(std::string& error,
     {
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
-        item.pass->update_terrain_material(item.set, views, sampler_);
+        const VkSampler material_sampler = item.clamp ? ui_sampler_ : sampler_;
+        item.pass->update_terrain_material(item.set, views, material_sampler);
         if (item.count == 20)
         {
             std::array<VkImageView, 13> extra{};
             for (size_t i = 0; i < extra.size(); ++i) extra[i] = item.assets[i + 7]->texture.view;
-            item.pass->update_surface_textures(item.set, extra, sampler_);
+            item.pass->update_surface_textures(item.set, extra, material_sampler);
         }
         else
         {

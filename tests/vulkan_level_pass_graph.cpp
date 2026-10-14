@@ -158,8 +158,15 @@ int main()
         assert(build_render_pass_graph(model_set, common, error));
         assert(common.passes[0].vertex == "vk\\skinned_2.vs");
         model_set.hud = true;
-        assert(!build_render_pass_graph(model_set, common, error));
-        assert(error.find("HUD OGF S_SET") != std::string::npos);
+        assert(build_render_pass_graph(model_set, common, error));
+        assert(common.passes[0].target == LevelPassTarget::Hud &&
+            common.passes[0].depth_test && common.passes[0].depth_write == (blend == 0) &&
+            common.passes[0].vertex == "vk\\hud_skinned_2.vs" &&
+            common.passes[0].fragment == std::string("vk\\hud_model_set_") +
+                world_model_fragments[blend] + ".ps");
+        model_set.animated = false;
+        assert(build_render_pass_graph(model_set, common, error));
+        assert(common.passes[0].vertex == "vk\\object_blended.vs");
     }
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
         false, false, false, false, 0, 1, 0, true}, common, error));
