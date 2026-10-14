@@ -121,7 +121,8 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
         const char* vertex_name, const char* fragment_name,
-        float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr) const;
+        float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr,
+        float detail_scale = 1.f) const;
     void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     void update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
         VkImageView lightmap, VkSampler sampler);

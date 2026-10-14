@@ -53,6 +53,11 @@ VkResult VKAPI_CALL create_pipeline(VkDevice, VkPipelineCache, uint32_t,
         assert(attachment.srcColorBlendFactor == source &&
             attachment.dstColorBlendFactor == destination &&
             attachment.colorBlendOp == VK_BLEND_OP_ADD);
+        assert(attachment.srcAlphaBlendFactor ==
+            (source == VK_BLEND_FACTOR_DST_COLOR ? VK_BLEND_FACTOR_DST_ALPHA : source));
+        assert(attachment.dstAlphaBlendFactor ==
+            (destination == VK_BLEND_FACTOR_SRC_COLOR ? VK_BLEND_FACTOR_SRC_ALPHA : destination));
+        assert(attachment.alphaBlendOp == VK_BLEND_OP_ADD);
     }
     if (info->pDepthStencilState)
         assert(info->pDepthStencilState->depthTestEnable == (ui ? VK_FALSE : VK_TRUE));

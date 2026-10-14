@@ -60,7 +60,17 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         // Tree surfaces are two-sided by blender contract. A user-controlled
         // shader name must never select a different raster/shader variant.
         mesh.tree_surface = definition.class_name == "D_TREE  ";
-        const bool surface_roles = metadata.normal || metadata.bump_mode >= 2 ||
+        // CBlender_Tree's high quality element samples s_detail. MODEL does
+        // not, even when the same base DDS carries detail metadata.
+        mesh.detail = mesh.tree_surface && metadata.diffuse && !metadata.texture.empty() &&
+            metadata.texture != "$null";
+        if (mesh.detail && mesh.environment)
+        {
+            error = "OGF shader='" + mesh.geometry.shader +
+                "': diffuse detail with environment cube has no Vulkan pipeline";
+            return false;
+        }
+        const bool surface_roles = mesh.detail || metadata.normal || metadata.bump_mode >= 2 ||
             !metadata.external_normal_texture.empty() || metadata.material != 1 ||
             metadata.material_weight != 0.f;
         mesh.surface = surface_roles;
@@ -68,7 +78,8 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             ((metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
                 (metadata.normal || !metadata.external_normal_texture.empty() ? NormalRole : 0u)) : 0u;
         if (!build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, false,
-                animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights, 1, roles},
+                animated, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights, 1, roles,
+                mesh.detail},
                 mesh.pass_graph, error)) return false;
         const auto& node = mesh.pass_graph.passes[0];
         const std::string& vertex = node.vertex;
@@ -85,6 +96,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             std::array<std::string, 20> names;
             names.fill(texture);
             if (mesh.environment) names[2] = definition.environment_texture;
+            if (mesh.detail) names[2] = metadata.texture;
             if (metadata.bump_mode >= 2)
             { names[7] = metadata.bump_texture; names[8] = metadata.bump_texture + "#"; }
             if (!metadata.external_normal_texture.empty()) names[15] = metadata.external_normal_texture;
@@ -295,7 +307,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, descriptor,
                     hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
-                    vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f, normal_rows))
+                    vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f,
+                    normal_rows, mesh.detail_scale))
             {
                 error = "Vulkan skeletal shader pair or render pass is unavailable: " +
                     vertex_name + " / " + fragment_name;
@@ -348,7 +361,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         if (!(transparent ? pass.record_transparent(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp,
                                 mesh.material, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                nullptr, 0.f, normal_rows) :
+                                nullptr, 0.f, normal_rows, mesh.detail_scale) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
                                 float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale)))

@@ -6,6 +6,7 @@
 #include "SceneShaders.h"
 #include "ShaderModule.h"
 #include "PostProcessShaders.h"
+#include "TransparentDrawOrder.h"
 #include "xrEngine/x_ray.h"
 
 #include <algorithm>
@@ -492,15 +493,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         !owner.forward_buffers_[frame.image_index].write(0, &owner.forward_lighting_,
             sizeof(owner.forward_lighting_), owner.model_error_))
     { owner.models_recorded_ = false; return; }
-    struct DrawRef
-    {
-        float distance{};
-        bool model{};
-        size_t index{};
-        bool particle{};
-        bool detail{};
-    };
-    std::vector<DrawRef> draws;
+    std::vector<TransparentDrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
         if (!owner.level_draws_[i].hud) draws.push_back({owner.level_draws_[i].sort_distance, false, i});
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
@@ -521,11 +514,8 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         for (size_t i = 0; i < detail_distances.size(); ++i)
             draws.push_back({detail_distances[i], false, i, false, true});
     }
-    std::stable_sort(draws.begin(), draws.end(), [](const DrawRef& left, const DrawRef& right)
-    {
-        return left.distance > right.distance;
-    });
-    for (const DrawRef& draw : draws)
+    sort_transparent_draws(draws);
+    for (const TransparentDrawRef& draw : draws)
     {
         float mvp[16];
         if (draw.detail)

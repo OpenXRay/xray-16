@@ -63,11 +63,13 @@ class GameShaderVariantsTest(unittest.TestCase):
                 if name.endswith(".ps.spv"):
                     self.assertIn(0, output_locations)
                     self.assertIn(0, bindings.values())
-                    if "blended" in name or "particle_" in name or "alpha_add" in name:
-                        # The present pass has one color attachment, unlike the G-buffer.
+                    if ("blended" in name or "particle_" in name or "alpha_add" in name or
+                            "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
+                            name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv")):
+                        # The forward pass has one color attachment.
                         self.assertEqual(output_locations, {0})
                     else:
-                        self.assertEqual(output_locations, {0, 1})
+                        self.assertEqual(output_locations, {0, 1, 2})
                 if "skinned" in name and name.endswith(".vs.spv"):
                     self.assertTrue({0, 1, 2, 3, 4} <= locations)
                     self.assertIn(0, bindings.values())

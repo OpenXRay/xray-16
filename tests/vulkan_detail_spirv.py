@@ -40,7 +40,7 @@ def reflect(path):
     slots = {name: (sets.get(identifier), bindings.get(identifier))
              for identifier, name in names.items() if identifier in bindings}
     scales = [offset for (identifier, member), offset in offsets.items()
-              if names.get(identifier) == "TerrainParams" and member == 2]
+              if names.get(identifier) == "MaterialParams" and member == 2]
     assert scales == [68], (path, scales)
     assert slots.get("diffuse") == (0, 0), (path, slots)
     assert slots.get("single_detail") == (0, 2), (path, slots)
@@ -58,6 +58,13 @@ def main(root):
         slots = reflect(shaders / f"{name}.ps.spv")
         assert (slots.get("lightmap") == (0, 1)) == has_lightmap, (name, slots)
         assert ((1, 0) in slots.values()) == forward, (name, slots)
+    for name in ("object_detail_opaque", "object_detail_cutout", "object_detail_blended",
+                 "skinned_detail_opaque", "skinned_detail_cutout", "skinned_detail_blended",
+                 "object_detail_double_sided_opaque", "object_detail_double_sided_cutout",
+                 "object_detail_double_sided_blended"):
+        slots = reflect(shaders / f"{name}.ps.spv")
+        assert "lightmap" not in slots, (name, slots)
+        assert ((2 if name.startswith("skinned_") else 1, 0) in slots.values()) == name.endswith("blended"), (name, slots)
 
 
 if __name__ == "__main__":

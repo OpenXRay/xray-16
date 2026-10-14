@@ -727,7 +727,7 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
     const char* vertex_name, const char* fragment_name, float alpha_ref,
-    const float* normal_rows) const
+    const float* normal_rows, float detail_scale) const
 {
     const auto* pair = game_pipeline(vertex_name, fragment_name);
     if (!pair || !pair->skinned || pair->mode != mode || pair->hud != hud ||
@@ -749,9 +749,8 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
     push_surface(frame, skinned_layout_, material_set);
-    const float unit_scale = 1.f;
     vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
-        68, sizeof(unit_scale), &unit_scale);
+        68, sizeof(detail_scale), &detail_scale);
     if (mode == SurfaceMode::AlphaTest)
         vk_.cmd_push_constants(frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
@@ -1161,8 +1160,8 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         std::strstr(fragment_name, "_set.ps"))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    if (fragment_name && (std::strstr(fragment_name, "level_detail_blended.ps") ||
-            std::strstr(fragment_name, "level_detail_unlit_blended.ps")))
+    if (fragment_name && (std::strstr(fragment_name, "detail_blended.ps") ||
+            std::strstr(fragment_name, "detail_unlit_blended.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(detail_scale), &detail_scale);
     if (vertex_name || fragment_name)

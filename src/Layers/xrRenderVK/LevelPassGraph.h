@@ -60,26 +60,32 @@ struct RenderPassSelection
     uint8_t skin_weights{};
     int blend_mode{1};
     uint16_t surface_roles{};
+    bool detail{};
 };
 
 inline bool build_render_pass_graph(const RenderPassSelection& input,
     RenderPassGraph& graph, std::string& error)
 {
     graph = {};
-    if (input.mode == SurfaceMode::Unresolved ||
-        (input.consumer == RenderConsumer::Ui && (input.blend_mode < 0 || input.blend_mode > 9)) ||
-        (input.consumer == RenderConsumer::Particle &&
-            (input.blend_mode < 0 || input.blend_mode > 5)) ||
-        (input.surface_roles & BumpAuxRole && !(input.surface_roles & BumpRole)) ||
-        (input.surface_roles & GlossRole && !(input.surface_roles & (BumpRole | NormalRole))) ||
-        (input.consumer == RenderConsumer::Model && input.animated &&
-            (input.skin_weights < 1 || input.skin_weights > 4)) ||
-        (input.consumer == RenderConsumer::Model && input.environment &&
-            input.mode != SurfaceMode::Transparent))
-    {
-        error = "render pass graph: incompatible surface mode or geometry layout";
-        return false;
-    }
+    const auto reject = [&](const char* reason)
+    { error = std::string("render pass graph: incompatible ") + reason; return false; };
+    if (input.mode == SurfaceMode::Unresolved) return reject("unresolved material mode");
+    if (input.consumer == RenderConsumer::Ui && (input.blend_mode < 0 || input.blend_mode > 9))
+        return reject("S_SET Blending (expected 0..9)");
+    if (input.consumer == RenderConsumer::Particle && (input.blend_mode < 0 || input.blend_mode > 5))
+        return reject("PARTICLE Blending (expected 0..5)");
+    if (input.surface_roles & BumpAuxRole && !(input.surface_roles & BumpRole))
+        return reject("BumpAux texture without Bump");
+    if (input.surface_roles & GlossRole && !(input.surface_roles & (BumpRole | NormalRole)))
+        return reject("Gloss texture without Bump or Normal");
+    if (input.consumer == RenderConsumer::Model && input.animated &&
+        (input.skin_weights < 1 || input.skin_weights > 4))
+        return reject("animated model skin weights (expected 1..4)");
+    if (input.consumer == RenderConsumer::Model && input.environment &&
+        input.mode != SurfaceMode::Transparent)
+        return reject("opaque model environment pass");
+    if (input.consumer == RenderConsumer::Model && input.detail && input.environment)
+        return reject("model diffuse detail with environment cube");
     auto& node = graph.passes[0];
     node.textures = BaseRole | input.surface_roles;
     if (input.consumer == RenderConsumer::Particle &&
@@ -89,7 +95,10 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
         input.mode == SurfaceMode::Transparent || input.consumer == RenderConsumer::Particle ?
             LevelPassTarget::Forward : LevelPassTarget::GBuffer;
     node.depth_test = node.target != LevelPassTarget::Ui;
-    node.depth_write = node.target == LevelPassTarget::GBuffer || node.target == LevelPassTarget::Hud;
+    // PARTICLE SET is depth tested and writes depth even in the forward
+    // attachment, per CBlender_Particle::Compile (AREF 200).
+    node.depth_write = node.target == LevelPassTarget::GBuffer || node.target == LevelPassTarget::Hud ||
+        (input.consumer == RenderConsumer::Particle && input.blend_mode == 0);
     const bool replace = (input.consumer == RenderConsumer::Ui &&
             (input.blend_mode == 0 || input.blend_mode == 7)) ||
         (input.consumer == RenderConsumer::Particle && input.blend_mode == 0) ||
@@ -127,6 +136,14 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.animated && input.environment ? "vk\\skinned_environment.ps" :
             input.animated && input.mode == SurfaceMode::Transparent ? "vk\\skinned_blended.ps" :
                 std::string("vk\\") + family + ".ps";
+        if (input.detail && !input.hud && !input.environment)
+        {
+            const char* suffix = input.mode == SurfaceMode::Transparent ? "blended" :
+                input.mode == SurfaceMode::AlphaTest ? "cutout" : "opaque";
+            node.fragment = std::string("vk\\") + (input.animated ? "skinned_detail_" :
+                input.double_sided ? "object_detail_double_sided_" : "object_detail_") + suffix + ".ps";
+            node.textures |= DetailRole;
+        }
         if (input.environment) node.textures |= EnvironmentRole;
     }
     graph.count = 1;
@@ -146,17 +163,22 @@ inline bool build_level_pass_graph(const LevelPassSelection& input,
     LevelPassGraph& graph, std::string& error)
 {
     graph = {};
-    if (input.mode == SurfaceMode::Unresolved ||
-        (input.laemb && (input.mode != SurfaceMode::Opaque || !input.lightmapped || !input.environment)) ||
-        (input.terrain && (input.mode != SurfaceMode::Opaque || !input.lightmapped ||
-            input.detail || input.environment)) ||
-        (input.detail && input.environment) ||
-        ((input.wallmark_multiply || input.glow_alpha_add || input.fog) &&
-            (input.detail || input.terrain || input.environment)))
-    {
-        error = "level pass graph: incompatible mode or missing required texture roles";
-        return false;
-    }
+    const auto reject = [&](const char* reason)
+    { error = std::string("level pass graph: incompatible ") + reason; return false; };
+    if (input.mode == SurfaceMode::Unresolved) return reject("unresolved material mode");
+    if (input.laemb && (input.mode != SurfaceMode::Opaque || !input.lightmapped || !input.environment))
+        return reject("LaEmB requires opaque mode, lightmap and environment");
+    if (input.terrain && (input.mode != SurfaceMode::Opaque || !input.lightmapped ||
+        input.detail || input.environment))
+        return reject("terrain requires opaque mode and lightmap without single detail or environment");
+    if (input.detail && input.environment) return reject("detail and environment texture roles");
+    if ((input.wallmark_multiply || input.glow_alpha_add || input.fog) &&
+        (input.detail || input.terrain || input.environment))
+        return reject("world effect with detail, terrain or environment");
+    if (input.surface_roles & BumpAuxRole && !(input.surface_roles & BumpRole))
+        return reject("BumpAux texture without Bump");
+    if (input.surface_roles & GlossRole && !(input.surface_roles & (BumpRole | NormalRole)))
+        return reject("Gloss texture without Bump or Normal");
     auto& first = graph.passes[0];
     const bool transparent = input.mode == SurfaceMode::Transparent;
     first.target = transparent ? LevelPassTarget::Forward : LevelPassTarget::GBuffer;

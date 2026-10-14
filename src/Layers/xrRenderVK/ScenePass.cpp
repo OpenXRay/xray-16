@@ -78,8 +78,13 @@ bool make_pipeline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout l
     if (ui && ui_mode == 5)
         attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
     attachment.colorBlendOp = VK_BLEND_OP_ADD;
-    attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    // S_SET uses the same D3D source/destination factors for color and alpha.
+    // DST_COLOR/SRC_COLOR are the corresponding destination/source alpha
+    // factors when Vulkan blends the alpha component.
+    attachment.srcAlphaBlendFactor = attachment.srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR ?
+        VK_BLEND_FACTOR_DST_ALPHA : attachment.srcColorBlendFactor;
+    attachment.dstAlphaBlendFactor = attachment.dstColorBlendFactor == VK_BLEND_FACTOR_SRC_COLOR ?
+        VK_BLEND_FACTOR_SRC_ALPHA : attachment.dstColorBlendFactor;
     attachment.alphaBlendOp = VK_BLEND_OP_ADD;
     VkPipelineColorBlendStateCreateInfo blend{VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
     blend.attachmentCount = 1;

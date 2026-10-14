@@ -90,6 +90,7 @@ private:
         bool fast_variant = false;
         bool environment{};
         bool surface{};
+        bool detail{};
         float detail_scale{1.f};
         bool tree_surface{};
         RenderPassGraph pass_graph;
