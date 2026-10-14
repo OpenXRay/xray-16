@@ -38,7 +38,16 @@ void VulkanImGuiRender::OnDeviceResetBegin()
     }
     atlas_.clear();
 }
-void VulkanImGuiRender::OnDeviceResetEnd() {}
+void VulkanImGuiRender::OnDeviceResetEnd()
+{
+    if (!context_) return;
+    ImGui::SetCurrentContext(context_);
+    // The atlas was invalidated in ResetBegin. ImGui requests its new pixels
+    // in the next Render; restore the renderer contract for that request.
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendRendererName = "xrRenderVK";
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset | ImGuiBackendFlags_RendererHasTextures;
+}
 
 void VulkanImGuiRender::OnDeviceDestroy()
 {

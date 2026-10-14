@@ -37,7 +37,7 @@ semantics is still an open implementation item.
 | World static level | `S_SET` 0–9 with each meaningful Z-test, Z-write, lighting, fog and clamp combination; `LM`, `V`, `LM_AREF`, `V_AREF`, BmmD, environment | Reject flags requiring a missing attachment; exact depth/write, sorting, fog/lighting and texture roles; no fallback to alpha blending | Depth-tested unlit world `S_SET` variants 0–9 have distinct blend routes (SET writes depth); depthless and incompatible fog/lighting combinations remain rejected |
 | Standalone OGF and animated model | `MODEL`, `D_TREE`, `MODELEbB` and applicable `S_SET`; opaque, cutout, transparent; 1–4 skin weights | Correct pass per shader class and context, bone/UV/normal transfer, cull, blend/depth, LOD and resource lifetime | Static/skinned OGF `S_SET` 0–9 uses model forward fragments with no level-only baked/lightmap input; separate HUD variants are tested for 0–9. Opaque `MODELEbB` follows the original base-only deferred path; its blended path samples the cube. OGF water and fog variants remain rejected; full archive and context coverage remains |
 | World sprite particle and group | `PARTICLE` 0–5, `S_SET` where referenced; clamp on/off; fixed SET alpha reference and serialized alpha | Exact per-token blend, depth read/no write, fog/lighting where specified, lifetime across reload and frames in flight | Mode host checks exist; real particle effects and image acceptance remain |
-| HUD sprite and model | Same particle modes in HUD, model shaders with HUD projection and depth | Separate HUD pass/attachment and projection; ordering against world and UI; alpha and descriptor state | Full material-context Cartesian coverage absent |
+| HUD sprite and model | Same particle modes in HUD, model shaders with HUD projection and depth | Separate HUD pass/attachment and projection; ordering against world and UI; alpha and descriptor state | Accepted mode/context matrix checked on host; original archive images remain |
 | Decal, wallmark and tracer | `S_SET` world modes and flags used by each source; opaque versus multiply-2x and alpha-add | Depth-tested attachment, no unintended depth write, exact source/destination factors, stable order on surfaces | Some special passes exist; the complete token/flag inventory is not exercised |
 
 For each row, fixtures must cover every **accepted** mode and each rejected
@@ -66,6 +66,8 @@ blender ID and replaced `.thm`/DDS, not with edits to original game assets.
 | Vulkan host/device | Descriptor images and sampler, SPIR-V bindings, pipeline blend/depth, attachment transitions and validation output | Incorrect role/channel, missing barrier or shader/pipeline mismatch |
 | Scene acceptance | Same camera and settings for image capture, visual overlap/lighting/fog and frame-time; level transition and reload | Material absent or visually wrong, validation error, crash, unstable frame time |
 
+The [declared format matrix and 8–11 evidence](VULKAN_102_8_11_ACCEPTANCE.md)
+tie each supported v14/OGF v4 decoder to a fixture and explicit rejection.
 The repository contains synthetic decoder and shader fixtures, but **no
 licensed SoC/CS/CoP game archives or device captures**. This gate cannot be
 marked passed from a host mock or an APK build. The minimal user-provided
@@ -91,3 +93,5 @@ context/flag matrix. See [the measured contract](VULKAN_102_3_5_ACCEPTANCE.md).
 The separately discovered R2 deferred particle SET queue is N4 and is
 implemented on host. The original archive and device gate above remains open
 until the whole 102 implementation is ready.
+The 8–11 host work extends this checkpoint to format/profile combinations,
+interface lifetime, error context and parser/Vulkan/device evidence boundaries.

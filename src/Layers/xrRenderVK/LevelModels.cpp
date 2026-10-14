@@ -52,7 +52,10 @@ bool load_game_level_models(LevelGameProfile profile, LevelBytes header, LevelBy
     if (!validate_level_header(profile, header, error))
         return false;
     if (load_level_models(shaders, vertex_buffers, index_buffers, visuals, result, error, fast_vertex_buffers, fast_index_buffers, tree_windows))
+    {
+        result.profile = profile;
         return true;
+    }
     const char *file = error.find("vertex") != std::string::npos || error.find("index") != std::string::npos ? "level.geom" : "level";
     if (error.find("geomX") != std::string::npos)
         file = "level.geomX";
@@ -124,11 +127,12 @@ struct VertexBuffer
     bool lightmap_uv{};
 };
 
-bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
+bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::string& error)
 {
     Cursor c{bytes};
     uint32_t count;
-    if (!c.u32(count) || count > 65536) return false;
+    if (!c.u32(count)) { error = "truncated vertex-buffer table"; return false; }
+    if (count > 65536) { error = "unsupported vertex-buffer count=" + std::to_string(count); return false; }
     buffers.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
@@ -141,7 +145,7 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
         {
             LevelBytes element;
             if (!c.take(8, element))
-                return false;
+            { error = "truncated vertex declaration buffer=" + std::to_string(i); return false; }
             const uint16_t stream = uint16_t(element.data[0]) | (uint16_t(element.data[1]) << 8);
             if (stream == 0xff)
             {
@@ -149,45 +153,72 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
                 break;
             }
             if (stream != 0 || element.data[5] != 0)
-                return false;
+            { error = "unsupported vertex stream or method buffer=" + std::to_string(i); return false; }
             const size_t offset = size_t(element.data[2]) | (size_t(element.data[3]) << 8);
             const uint8_t type = element.data[4], usage = element.data[6], index = element.data[7];
             // Decode the common static declarations; reject unknown sizes to
             // avoid calculating a wrong stride for subsequent vertices.
             const size_t type_sizes[]{4, 8, 12, 16, 4, 4, 4, 8, 4, 4, 4, 8, 8, 4, 4, 4, 8};
-            if (type >= sizeof(type_sizes) / sizeof(*type_sizes)) return false;
+            if (type >= sizeof(type_sizes) / sizeof(*type_sizes))
+            { error = "unsupported vertex declaration type=" + std::to_string(type) + " buffer=" + std::to_string(i); return false; }
             const size_t end = offset + type_sizes[type];
-            if (end > 4096 || end < offset) return false;
+            if (end > 4096 || end < offset)
+            { error = "invalid vertex stride buffer=" + std::to_string(i); return false; }
+            const auto duplicate = [&](const char* semantic)
+            {
+                error = "duplicate vertex semantic=" + std::string(semantic) + " buffer=" + std::to_string(i);
+                return false;
+            };
             if (end > stride) stride = end;
-            if (usage == 0 && index == 0 && type == 2) position = static_cast<int>(offset);
+            if (usage == 0 && index == 0 && type == 2)
+            {
+                if (position >= 0) return duplicate("POSITION0");
+                position = static_cast<int>(offset);
+            }
             if (usage == 3 && index == 0 && (type == 2 || type == 4))
             {
+                if (normal >= 0) return duplicate("NORMAL0");
                 normal = static_cast<int>(offset);
                 normal_type = type;
             }
             if (usage == 5 && index == 0 && (type == 1 || type == 6 || type == 7))
             {
+                if (uv >= 0) return duplicate("TEXCOORD0");
                 uv = static_cast<int>(offset);
                 uv_type = type;
             }
             if (usage == 5 && index == 1 && (type == 1 || type == 6 || type == 7))
             {
+                if (uv1 >= 0) return duplicate("TEXCOORD1");
                 uv1 = static_cast<int>(offset);
                 uv1_type = type;
             }
             if (usage == 10 && index == 0 && type == 4)
+            {
+                if (color >= 0) return duplicate("COLOR0");
                 color = static_cast<int>(offset);
+            }
             if (usage == 6 && index == 0 && type == 4)
+            {
+                if (tangent >= 0) return duplicate("TANGENT0");
                 tangent = static_cast<int>(offset);
+            }
             if (usage == 7 && index == 0 && type == 4)
+            {
+                if (binormal >= 0) return duplicate("BINORMAL0");
                 binormal = static_cast<int>(offset);
+            }
         }
         uint32_t vertex_count;
-        if (!ended || position < 0 || normal < 0 || uv < 0 || !stride || !c.u32(vertex_count) || vertex_count > max_vertices)
-            return false;
+        if (!ended || position < 0 || normal < 0 || uv < 0 || !stride)
+        { error = "unsupported vertex semantics buffer=" + std::to_string(i) + " (POSITION0/NORMAL0/TEXCOORD0 required)"; return false; }
+        if (!c.u32(vertex_count))
+        { error = "truncated vertex count buffer=" + std::to_string(i); return false; }
+        if (vertex_count > max_vertices)
+        { error = "unsupported vertex count=" + std::to_string(vertex_count) + " buffer=" + std::to_string(i); return false; }
         LevelBytes data;
         if (!c.take(stride * vertex_count, data))
-            return false;
+        { error = "truncated vertex payload buffer=" + std::to_string(i); return false; }
         VertexBuffer buffer;
         buffer.lightmap_uv = uv1 >= 0;
         buffer.vertices.reserve(vertex_count);
@@ -236,42 +267,48 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers)
             }
             for (float coordinate : vertex.position)
                 if (!std::isfinite(coordinate))
-                    return false;
+                    { error = "non-finite vertex position buffer=" + std::to_string(i) + " vertex=" + std::to_string(v); return false; }
             for (float coordinate : vertex.normal)
                 if (!std::isfinite(coordinate))
-                    return false;
+                    { error = "non-finite vertex normal buffer=" + std::to_string(i) + " vertex=" + std::to_string(v); return false; }
             for (float coordinate : vertex.uv)
                 if (!std::isfinite(coordinate))
-                    return false;
+                    { error = "non-finite vertex UV buffer=" + std::to_string(i) + " vertex=" + std::to_string(v); return false; }
             for (float coordinate : vertex.lightmap_uv)
                 if (!std::isfinite(coordinate))
-                    return false;
+                    { error = "non-finite lightmap UV buffer=" + std::to_string(i) + " vertex=" + std::to_string(v); return false; }
             buffer.vertices.push_back(vertex);
         }
         buffers.push_back(std::move(buffer));
     }
-    return c.done();
+    if (!c.done()) { error = "trailing vertex-buffer bytes"; return false; }
+    return true;
 }
 
-bool read_indices(LevelBytes bytes, std::vector<std::vector<uint16_t>>& buffers)
+bool read_indices(LevelBytes bytes, std::vector<std::vector<uint16_t>>& buffers, std::string& error)
 {
     Cursor c{bytes};
     uint32_t count;
-    if (!c.u32(count) || count > 65536) return false;
+    if (!c.u32(count)) { error = "truncated index-buffer table"; return false; }
+    if (count > 65536) { error = "unsupported index-buffer count=" + std::to_string(count); return false; }
     buffers.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
         uint32_t index_count;
-        if (!c.u32(index_count) || index_count > max_indices) return false;
+        if (!c.u32(index_count)) { error = "truncated index count buffer=" + std::to_string(i); return false; }
+        if (index_count > max_indices)
+        { error = "unsupported index count=" + std::to_string(index_count) + " buffer=" + std::to_string(i); return false; }
         LevelBytes data;
-        if (!c.take(size_t(index_count) * 2, data)) return false;
+        if (!c.take(size_t(index_count) * 2, data))
+        { error = "truncated index payload buffer=" + std::to_string(i); return false; }
         std::vector<uint16_t> indices;
         indices.reserve(index_count);
         for (uint32_t n = 0; n < index_count; ++n)
             indices.push_back(uint16_t(data.data[n * 2]) | (uint16_t(data.data[n * 2 + 1]) << 8));
         buffers.push_back(std::move(indices));
     }
-    return c.done();
+    if (!c.done()) { error = "trailing index-buffer bytes"; return false; }
+    return true;
 }
 
 bool read_materials(LevelBytes bytes, std::vector<LevelMaterial>& materials)
@@ -509,8 +546,26 @@ bool read_visuals(LevelBytes bytes, const std::vector<VertexBuffer> &vertices, c
     for (size_t i = 0; i < records.size(); ++i)
         if (!decode_visual(records[i], vertices, indices, material_count, loaded.models, loaded.visuals, i, 0, fast_vertices, fast_indices, tree_windows))
         {
-            error = "level OGF visual id=" + std::to_string(i) +
-                " (unsupported type, layout, material ID or invalid geometry)";
+            LevelBytes header;
+            error = "level OGF visual id=" + std::to_string(i);
+            if (chunk(records[i], ogf_header, header) && header.size >= 4)
+            {
+                const unsigned type = header.data[1];
+                const unsigned material = unsigned(header.data[2]) | unsigned(header.data[3]) << 8;
+                error += " type=" + std::to_string(type) + " material_id=" + std::to_string(material);
+                if (material < loaded.materials.size())
+                    error += " shader='" + loaded.materials[material].shader +
+                        "' textures='" + loaded.materials[material].textures + "'";
+                if (type != 0 && type != 1 && type != 2 && type != 6 &&
+                    type != 7 && type != 11)
+                    error += " unsupported OGF type";
+                else if (material >= material_count && type != 1)
+                    error += " invalid material ID";
+                else
+                    error += " invalid geometry, sliding windows or child references";
+            }
+            else
+                error += " invalid or truncated header";
             return false;
         }
     std::vector<uint8_t> state(loaded.visuals.size()), referenced(loaded.visuals.size());
@@ -554,27 +609,29 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
     error.clear();
     if (!read_materials(shaders, loaded.materials))
         error = "invalid level shader table";
-    else if (!read_vertices(vertex_buffers, vertices))
-        error = "unsupported or invalid level vertex buffers";
-    else if (!read_indices(index_buffers, indices))
-        error = "invalid level index buffers";
+    else if (!read_vertices(vertex_buffers, vertices, error))
+        error = "level vertex buffers: " + error;
+    else if (!read_indices(index_buffers, indices, error))
+        error = "level index buffers: " + error;
     else
     {
         const bool valid_fast_vertices = !has_fast ||
-            (fast_vertex_buffers.data && read_vertices(fast_vertex_buffers, fast_vertices));
+            (fast_vertex_buffers.data && read_vertices(fast_vertex_buffers, fast_vertices, error));
+        const std::string fast_vertex_error = error;
         const bool valid_fast_indices = !has_fast ||
-            (fast_index_buffers.data && read_indices(fast_index_buffers, fast_indices));
+            (fast_index_buffers.data && read_indices(fast_index_buffers, fast_indices, error));
+        const std::string fast_index_error = error;
         if (has_fast && (!valid_fast_vertices || !valid_fast_indices))
         {
             if (skipped_fast_geometry) *skipped_fast_geometry = true;
             if (fast_fallback_reason)
                 *fast_fallback_reason = !fast_vertex_buffers.data ? "missing vertex chunk" :
                     !fast_index_buffers.data ? "missing index chunk" :
-                    !valid_fast_vertices ? "unsupported or invalid vertex declaration" :
-                    "invalid index buffer";
+                    !valid_fast_vertices ? fast_vertex_error : fast_index_error;
             has_fast = false;
             fast_vertices.clear();
             fast_indices.clear();
+            error.clear();
         }
         if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded,
             has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr, tree_windows, error))
@@ -603,13 +660,16 @@ bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, c
     std::vector<std::vector<uint16_t>> indices;
     std::vector<LevelModel> models;
     std::vector<LevelVisual> nodes(1);
-    if (!read_vertices(vertex_buffers, vertices) ||
-        !read_indices(index_buffers, indices) ||
+    if (!read_vertices(vertex_buffers, vertices, error) ||
+        !read_indices(index_buffers, indices, error) ||
         !decode_visual({ visual.source.data(), visual.source.size() }, vertices, indices,
             size_t(visual.shader_id) + 1, models, nodes, 0, 0, nullptr, nullptr, tree_windows) ||
         models.size() != 1)
     {
-        error = "standalone OGF GCONTAINER cannot be resolved against level.geom";
+        if (error.empty()) error = "invalid visual geometry or material index";
+        error = "standalone OGF GCONTAINER type=" + std::to_string(visual.type) +
+            " shader_id=" + std::to_string(visual.shader_id) +
+            " cannot be resolved against level.geom: " + error;
         return false;
     }
     result = std::move(models.front());

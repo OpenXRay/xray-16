@@ -122,6 +122,53 @@ int main()
         assert(!load_game_level_models(profile, input(level_header), {}, input(profile_vb), input(ib), input(visuals), result, error));
         assert(error.find("shader") != std::string::npos);
       }
+      for (uint8_t quality = 0; quality <= 2; ++quality)
+      {
+          const Bytes accepted_header{14, 0, quality, 0};
+          assert(load_game_level_models(profile, input(accepted_header), input(shaders),
+              input(vb), input(ib), input(visuals), result, error));
+          assert(result.profile == profile);
+          assert(result.models[0].material == 0 && result.models[0].indices[2] == 2);
+      }
+      for (const Bytes& rejected_header : {Bytes{13, 0, 1, 0}, Bytes{15, 0, 1, 0}, Bytes{14, 0, 3, 0}})
+      {
+          assert(!load_game_level_models(profile, input(rejected_header), input(shaders),
+              input(vb), input(ib), input(visuals), result, error));
+          assert(error.find(level_profile_name(profile)) != std::string::npos &&
+              error.find("unsupported version=") != std::string::npos);
+      }
+    }
+    // A repeated TEXCOORD0 would silently replace the first UV declaration;
+    // a sparse/invalid material ID must identify its visual and shader table.
+    Bytes duplicate_uv;
+    u32(duplicate_uv, 1);
+    decl(duplicate_uv, 0, 2, 0); decl(duplicate_uv, 12, 2, 3);
+    decl(duplicate_uv, 24, 1, 5); decl(duplicate_uv, 24, 1, 5);
+    duplicate_uv.insert(duplicate_uv.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
+    u32(duplicate_uv, 3);
+    duplicate_uv.insert(duplicate_uv.end(), vb.end() - 3 * 32, vb.end());
+    assert(!load_level_models(input(shaders), input(duplicate_uv), input(ib), input(visuals), result, error));
+    assert(error.find("duplicate vertex semantic=TEXCOORD0 buffer=0") != std::string::npos);
+    Bytes invalid_material_visual = visual, invalid_material_visuals;
+    invalid_material_visual[8 + 2] = 7; // OGF header material ID, no matching shader table entry.
+    part(invalid_material_visuals, 0, invalid_material_visual);
+    assert(!load_game_level_models(LevelGameProfile::CoP, input(Bytes{14, 0, 1, 0}),
+        input(shaders), input(vb), input(ib), input(invalid_material_visuals), result, error));
+    assert(error.find("visual id=0 type=0 material_id=7") != std::string::npos &&
+        error.find("invalid material ID") != std::string::npos);
+    Bytes sparse_shaders;
+    u32(sparse_shaders, 8);
+    sparse_shaders.insert(sparse_shaders.end(), 7, 0);
+    const char sparse_name[] = "mod\\arbitrary_shader/mod\\arbitrary_texture";
+    sparse_shaders.insert(sparse_shaders.end(), sparse_name, sparse_name + sizeof(sparse_name));
+    for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
+    {
+        assert(load_game_level_models(profile, input(Bytes{14, 0, 2, 0}),
+            input(sparse_shaders), input(vb), input(ib), input(invalid_material_visuals), result, error));
+        assert(result.models[0].material == 7 && result.materials.size() == 8);
+        assert(result.materials[7].shader == "mod\\arbitrary_shader" &&
+            result.materials[7].textures == "mod\\arbitrary_texture" &&
+            result.materials[7].mode == SurfaceMode::Unresolved);
     }
     assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     assert(error.empty() && result.materials.size() == 1 && result.models.size() == 1);
@@ -273,6 +320,13 @@ int main()
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals), result, error, input(vb), input(progressive_ib)));
     assert(result.models[0].fast && result.models[0].fast->windows.size() == 2);
     assert(select_slide_window(result.models[0].fast->windows, 0.f, 6).offset == 3);
+    for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
+    {
+        assert(load_game_level_models(profile, input(level_header), input(shaders), input(vb),
+            input(progressive_ib), input(fast_visuals), result, error, input(vb), input(progressive_ib)));
+        assert(result.profile == profile && result.models[0].fast &&
+            result.models[0].windows.size() == 2 && result.models[0].fast->windows.size() == 2);
+    }
     Bytes incompatible_fast_vb = vb;
     incompatible_fast_vb[0] = 0xff; // The normal geometry remains usable.
     bool skipped_fast_geometry = false;
@@ -281,13 +335,13 @@ int main()
         result, error, input(incompatible_fast_vb), input(progressive_ib), {},
         &skipped_fast_geometry, &fallback_reason));
     assert(skipped_fast_geometry && result.models.size() == 1 && !result.models[0].fast && result.models[0].indices.size() == 6);
-    assert(fallback_reason == "unsupported or invalid vertex declaration");
+    assert(fallback_reason == "truncated vertex declaration buffer=1");
     Bytes invalid_fast_ib = progressive_ib;
     invalid_fast_ib.pop_back();
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
         result, error, input(vb), input(invalid_fast_ib), {}, &skipped_fast_geometry,
         &fallback_reason));
-    assert(skipped_fast_geometry && fallback_reason == "invalid index buffer" &&
+    assert(skipped_fast_geometry && fallback_reason == "truncated index payload buffer=0" &&
         !result.models[0].fast);
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
         result, error, input(vb), {}, {}, &skipped_fast_geometry, &fallback_reason));
@@ -383,6 +437,12 @@ int main()
     assert(load_level_models(input(shaders), input(vb), input(ib), input(lod_visuals), result, error));
     assert(result.visuals.size() == 2 && result.models.size() == 9 &&
         result.visuals[0].children[0] == 1 && result.visuals[0].lod_facets[7] == 7);
+    for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
+    {
+        assert(load_game_level_models(profile, input(level_header), input(shaders), input(vb),
+            input(ib), input(lod_visuals), result, error));
+        assert(result.profile == profile && result.visuals[0].lod_facets[7] == 7);
+    }
     assert(select_lod_facet(result.visuals[0].lod_normals, {0, 0, -1}) == 0);
     auto directional = result.visuals[0].lod_normals;
     directional[3] = {1.f, 0.f, 0.f};
@@ -419,6 +479,12 @@ int main()
     assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals),
         result, error, {}, {}, input(tree_table)));
     assert(result.models[0].windows.size() == 1 && result.models[0].indices.size() == 3);
+    for (auto profile : {LevelGameProfile::SoC, LevelGameProfile::CS, LevelGameProfile::CoP})
+    {
+        assert(load_game_level_models(profile, input(level_header), input(shaders), input(vb),
+            input(ib), input(tree_visuals), result, error, {}, {}, input(tree_table)));
+        assert(result.profile == profile && result.models[0].windows.size() == 1);
+    }
     tree_table.pop_back();
     assert(!load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals),
         result, error, {}, {}, input(tree_table)));

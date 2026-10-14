@@ -213,6 +213,7 @@ void VulkanLevelRender::OnAssetsChanged()
     }
     models_Clear(false);
     particle_catalog_.reset();
+    flush_resource_failures();
 }
 void VulkanLevelRender::Screenshot(ScreenshotMode mode, pcstr name)
 {
@@ -360,7 +361,14 @@ void VulkanLevelRender::SetPostProcessParams(const SPPInfo& ppi)
 void VulkanLevelRender::setGamma(float value) { gamma_ = std::clamp(value, .01f, 4.f); }
 void VulkanLevelRender::setBrightness(float value) { brightness_ = std::clamp(value, 0.f, 4.f); }
 void VulkanLevelRender::setContrast(float value) { contrast_ = std::clamp(value, 0.f, 4.f); }
-void VulkanLevelRender::updateGamma() {}
+void VulkanLevelRender::updateGamma()
+{
+    // Console and post-precache calls apply the requested grade immediately;
+    // End copies these constants into the submitted frame as well.
+    postprocess_.grade[0] = gamma_;
+    postprocess_.grade[1] = brightness_;
+    postprocess_.grade[2] = contrast_;
+}
 namespace
 {
 bool wallmark_geometry(const Fvector (&triangle)[3], const Fvector& point,
@@ -1173,9 +1181,20 @@ void VulkanLevelRender::flush_render_failures()
     last_render_error_.clear();
 }
 
+void VulkanLevelRender::flush_resource_failures()
+{
+    resource_failures_.report_repeats([](const std::string& context, uint64_t count)
+    {
+        Msg("! [renderer-vulkan] repeated resource failure %s occurrences=%llu",
+            context.c_str(), static_cast<unsigned long long>(count));
+    });
+    resource_failures_.clear();
+}
+
 void VulkanLevelRender::level_Load(IReader* reader)
 {
     flush_render_failures();
+    flush_resource_failures();
     Msg("[renderer-vulkan] level.load begin reader=%d device=%d queue=%d pool=%d textures=%d pass=%d idle=%d resources=%d frame=%d",
         reader != nullptr, device_ != VK_NULL_HANDLE, queue_ != VK_NULL_HANDLE, pool_ != VK_NULL_HANDLE,
         textures_ != nullptr, pass_ != nullptr, wait_idle_ != nullptr,
@@ -1209,6 +1228,7 @@ void VulkanLevelRender::level_Load(IReader* reader)
 void VulkanLevelRender::level_Unload()
 {
     flush_render_failures();
+    flush_resource_failures();
     if (device_ && (level_.visual_count() || !models_.empty()))
         Msg("[renderer-vulkan] level.unload begin visuals=%zu models=%zu", level_.visual_count(), models_.size());
     R_ASSERT2(!frame_phase_.active(), "Vulkan level unload requires an idle frame");
@@ -1284,7 +1304,10 @@ IRenderVisual* VulkanLevelRender::model_Create(pcstr name, IReader* data)
         model = std::make_unique<VulkanModelVisual>(*base);
     if (!model)
     {
-        Msg("! [renderer-vulkan] OGF model '%s': %s", name ? name : "<reader>", error.c_str());
+        const std::string context = "file=" + std::string(name ? name : "<reader>.ogf") +
+            " stage=model_Create reason=" + error;
+        if (resource_failures_.record(context))
+            Msg("! [renderer-vulkan] %s", context.c_str());
         return nullptr;
     }
     IRenderVisual* visual = model.get();
@@ -1304,8 +1327,11 @@ IRenderVisual* VulkanLevelRender::model_CreateParticles(pcstr name)
     {
         // Gameplay calls IParticleCustom immediately after creation. A mod's
         // unsupported particle definition must not turn into a null visual.
-        Msg("! [renderer-vulkan] particle '%s' unavailable: %s; using inert visual",
-            name, reason);
+        const std::string context = "file=$game_data$/particles.xr particle='" +
+            std::string(name) + "' stage=model_CreateParticles reason=" + reason +
+            "; using inert visual";
+        if (resource_failures_.record(context))
+            Msg("! [renderer-vulkan] %s", context.c_str());
         auto catalog = std::make_shared<ParticleCatalog>();
         auto& definition = catalog->groups.emplace_back();
         definition.name = name;
@@ -1348,7 +1374,6 @@ IRenderVisual* VulkanLevelRender::model_CreateParticles(pcstr name)
         auto visual = std::make_unique<VulkanParticleEffect>(particle_catalog_, *def);
         if (!visual->initialize(device_, memory_, upload_.buffer, *textures_, *pass_, error))
         {
-            Msg("! [renderer-vulkan] particle effect '%s': %s", name, error.c_str());
             return unavailable_particle(error.c_str());
         }
         IRenderVisual* result = visual.get();
@@ -1360,14 +1385,12 @@ IRenderVisual* VulkanLevelRender::model_CreateParticles(pcstr name)
         auto visual = std::make_unique<VulkanParticleGroup>(particle_catalog_, *def);
         if (!visual->initialize(device_, memory_, upload_.buffer, *textures_, *pass_, error))
         {
-            Msg("! [renderer-vulkan] particle group '%s': %s", name, error.c_str());
             return unavailable_particle(error.c_str());
         }
         IRenderVisual* result = visual.get();
         particle_groups_.emplace(result, std::move(visual));
         return result;
     }
-    Msg("! [renderer-vulkan] particle effect or group not found: %s", name);
     return unavailable_particle("effect or group not found");
 }
 

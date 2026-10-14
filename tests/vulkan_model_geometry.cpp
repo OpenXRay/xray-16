@@ -193,6 +193,11 @@ int main()
     std::string error;
     assert(decode_model_geometry(plain, geometry, error));
     assert(geometry.vertices[2].position[0] == 2 && geometry.indices.size() == 3);
+    auto unknown_encoding = plain;
+    unknown_encoding.source[8] = 0x13; // Valid chunk framing, unsupported vertex format.
+    assert(!decode_model_geometry(unknown_encoding, geometry, error));
+    assert(error.find("unsupported OGF mesh vertex encoding=275 type=0") != std::string::npos);
+    assert(geometry.vertices[2].position[0] == 2); // The previous geometry is retained.
     VisualRecord progressive = plain;
     progressive.type = 2;
     progressive.source.clear();

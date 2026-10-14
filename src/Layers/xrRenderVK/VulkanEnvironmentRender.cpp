@@ -38,8 +38,15 @@ VulkanEnvironmentRender::Library::particles_group_end() const
 void VulkanEnvironmentRender::Library::particles_group_next(
     particles_systems::PS::CPGDef const* const*& iterator) const
 {
-    if (iterator && iterator >= particles_group_begin() && iterator < particles_group_end())
-        ++iterator;
+    // An iterator retained across a catalog reload is no longer part of this
+    // array. Relational pointer comparisons against it are undefined; accept
+    // only an address that is an element of the current catalog.
+    for (size_t index = 0; index < pointers_.size(); ++index)
+        if (iterator == pointers_.data() + index)
+        {
+            iterator = pointers_.data() + index + 1;
+            return;
+        }
 }
 
 shared_str const& VulkanEnvironmentRender::Library::particles_group_id(

@@ -514,6 +514,7 @@ bool load_engine_level_models(IReader &level, LevelModelData &result, std::strin
                               fast_ib_bytes.empty() ? LevelBytes{} : LevelBytes{fast_ib_bytes.data(), fast_ib_bytes.size()},
                               {swi_bytes.data(), swi_bytes.size()}, &skipped_fast_geometry,
                               &fast_fallback_reason);
+            if (error.empty()) result.profile = profile;
             if (skipped_fast_geometry)
                 Msg("! [renderer-vulkan] profile=%s resource=$level$/level.geomX fallback=level.geom reason='%s'",
                     level_profile_name(profile), fast_fallback_reason.c_str());

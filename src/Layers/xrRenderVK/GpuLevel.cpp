@@ -93,13 +93,15 @@ void GpuLevel::report_visual_record_failure(size_t visual, int32_t mesh, Geometr
     bool water, uint32_t indices, float lod, const char* reason) const
 {
     const std::string cause = reason ? reason : "unknown";
-    const std::string key = std::to_string(visual) + "/" + std::to_string(mesh) + "/" +
-        std::to_string(static_cast<int>(phase)) + "/" + cause;
-    if (++draw_failures_[key] != 1) return;
     const Mesh* resource = mesh >= 0 && size_t(mesh) < meshes_.size() ? &meshes_[mesh] : nullptr;
     const std::string material_id = resource ? std::to_string(resource->material_id) : "unknown";
-    Msg("! [renderer-vulkan] file=level.geom visual=%zu material=%s shader='%s' mesh=%d phase=%d water=%d indices=%u lod=%.3f reason=%s (repeats summarized on unload)",
-        visual, material_id.c_str(), resource ? resource->shader.c_str() : "unknown",
+    const std::string key = "profile=" + std::string(level_profile_name(profile_)) +
+        " visual=" + std::to_string(visual) + " material=" + material_id +
+        " shader='" + (resource ? resource->shader : "unknown") + "' mesh=" + std::to_string(mesh) +
+        " phase=" + std::to_string(static_cast<int>(phase)) + " reason=" + cause;
+    if (!draw_failures_.record(key)) return;
+    Msg("! [renderer-vulkan] profile=%s file=$level$/level.geom visual=%zu material=%s shader='%s' mesh=%d phase=%d water=%d indices=%u lod=%.3f reason=%s (repeats summarized on unload)",
+        level_profile_name(profile_), visual, material_id.c_str(), resource ? resource->shader.c_str() : "unknown",
         mesh, static_cast<int>(phase), water ? 1 : 0, indices, lod, cause.c_str());
 }
 
@@ -152,6 +154,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             visibility_error.c_str());
     GpuLevel prepared;
     prepared.device_ = device;
+    prepared.profile_ = models.profile;
     prepared.memory_ = memory;
     prepared.pool_ = pool;
     prepared.upload_ = upload;
@@ -383,6 +386,16 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         return true;
     };
     size_t released_cpu_bytes = 0;
+    const auto describe_upload_failure = [&](const LevelModel& model, size_t mesh_id, const char* geometry)
+    {
+        std::string context = "profile=" + std::string(level_profile_name(models.profile)) +
+            " file=$level$/level.geom mesh=" + std::to_string(mesh_id) +
+            " geometry=" + geometry + " material_id=" + std::to_string(model.material);
+        if (model.material < models.materials.size())
+            context += " shader='" + models.materials[model.material].shader +
+                "' textures='" + models.materials[model.material].textures + "'";
+        error = context + " / GPU preparation: " + error;
+    };
     for (LevelModel& model : models.models)
     {
         if (uploaded_models % 64 == 0)
@@ -393,12 +406,18 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         prepared.meshes_.emplace_back();
         Mesh& mesh = prepared.meshes_.back();
         if (!upload_mesh(model, mesh))
+        {
+            describe_upload_failure(model, uploaded_models, "regular");
             return false;
+        }
         if (model.fast)
         {
             mesh.fast = std::make_unique<Mesh>();
             if (!upload_mesh(*model.fast, *mesh.fast))
+            {
+                describe_upload_failure(*model.fast, uploaded_models, "fast level.geomX");
                 return false;
+            }
             released_cpu_bytes += model.fast->vertices.capacity() * sizeof(LevelVertex) +
                 model.fast->indices.capacity() * sizeof(uint32_t);
             model.fast.reset();
@@ -512,6 +531,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     // the same queue as the first draw and preserve staging until retired.
     destroy();
     device_ = prepared.device_;
+    profile_ = prepared.profile_;
     memory_ = prepared.memory_;
     pool_ = prepared.pool_;
     upload_ = prepared.upload_;
@@ -1209,10 +1229,11 @@ void GpuLevel::all_level_roots(std::vector<uint32_t>& roots) const
 
 void GpuLevel::destroy()
 {
-    for (const auto& [key, count] : draw_failures_)
-        if (count > 1)
-            Msg("! [renderer-vulkan] file=level.geom repeated draw failure key='%s' occurrences=%llu",
-                key.c_str(), static_cast<unsigned long long>(count));
+    draw_failures_.report_repeats([](const std::string& key, uint64_t count)
+    {
+        Msg("! [renderer-vulkan] file=$level$/level.geom repeated draw failure %s occurrences=%llu",
+            key.c_str(), static_cast<unsigned long long>(count));
+    });
     draw_failures_.clear();
     ++revision_;
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
@@ -1252,6 +1273,7 @@ void GpuLevel::destroy()
     portals_.clear();
     pending_.clear();
     device_ = VK_NULL_HANDLE;
+    profile_ = LevelGameProfile::Unknown;
     pool_ = VK_NULL_HANDLE;
     upload_ = {};
     textures_ = nullptr;

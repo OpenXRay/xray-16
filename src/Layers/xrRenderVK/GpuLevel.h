@@ -5,6 +5,7 @@
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
 #include "LevelPassGraph.h"
+#include "ResourceIssueCounter.h"
 #include "xrCore/_matrix.h"
 #include <array>
 #include <memory>
@@ -108,6 +109,7 @@ private:
         uint32_t index_count{};
     };
     VkDevice device_{};
+    LevelGameProfile profile_{LevelGameProfile::Unknown};
     VkPhysicalDeviceMemoryProperties memory_{};
     VkCommandPool pool_{};
     BufferUploadDispatch upload_{};
@@ -139,6 +141,6 @@ private:
     std::unordered_map<const IRenderVisual*, uint32_t> visual_indices_;
     uint64_t revision_{};
     bool has_water_{};
-    mutable std::unordered_map<std::string, uint64_t> draw_failures_;
+    mutable ResourceIssueCounter draw_failures_;
 };
 }

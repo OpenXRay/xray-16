@@ -116,7 +116,8 @@ bool mesh(const VisualRecord& source, ModelGeometry& out, std::string& error)
     const bool plain = source.type == 0 || source.type == 2;
     if (plain ? format != 0x112u : !links)
     {
-        error = "unsupported OGF mesh vertex encoding";
+        error = "unsupported OGF mesh vertex encoding=" + std::to_string(format) +
+            " type=" + std::to_string(source.type);
         return false;
     }
     out.skin_weights = static_cast<uint8_t>(links);

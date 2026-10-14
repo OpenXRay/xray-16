@@ -31,7 +31,8 @@ enum class LevelGameProfile : uint8_t
 {
     SoC,
     CS,
-    CoP
+    CoP,
+    Unknown
 };
 const char *level_profile_name(LevelGameProfile profile);
 bool validate_level_header(LevelGameProfile profile, LevelBytes header, std::string &error);
@@ -91,6 +92,7 @@ struct LevelSector
 
 struct LevelModelData
 {
+    LevelGameProfile profile{LevelGameProfile::Unknown};
     std::vector<LevelMaterial> materials;
     std::vector<LevelModel> models;
     std::vector<LevelVisual> visuals;

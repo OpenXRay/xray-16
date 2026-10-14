@@ -10,6 +10,7 @@
 #include "VulkanSurfaceLifecycle.h"
 #include "VulkanFrameMetrics.h"
 #include "ScreenCopyPass.h"
+#include "ResourceIssueCounter.h"
 #include "xrEngine/Render.h"
 
 #include <chrono>
@@ -135,6 +136,7 @@ protected:
 
 private:
   void flush_render_failures();
+  void flush_resource_failures();
   std::unique_ptr<VulkanModelVisual> create_model_tree(const VisualRecord &record, const std::string &inherited_texture, const std::string &cache_name,
                                                        std::string &error, bool skeletal_child = false);
   std::unique_ptr<VulkanModelVisual> load_model_base(pcstr name, IReader *data, const std::string &cache_name, std::string &error, bool skeletal_child = false);
@@ -145,6 +147,7 @@ private:
   GpuLevel level_;
   std::string last_render_error_;
   uint32_t repeated_render_errors_{};
+  ResourceIssueCounter resource_failures_;
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanModelVisual>> models_;
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleEffect>> particle_effects_;
   std::unordered_map<IRenderVisual *, std::unique_ptr<VulkanParticleGroup>> particle_groups_;
