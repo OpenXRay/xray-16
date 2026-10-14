@@ -142,13 +142,15 @@ int main()
     Core.Initialize("vulkan_asset_flow_test", nullptr, false);
     const auto directory = std::filesystem::temp_directory_path() / "openxray_vulkan_asset_flow";
     std::filesystem::create_directories(directory);
+    const auto base_textures = directory / "base_textures";
+    std::filesystem::create_directories(base_textures);
     gli::texture image(gli::TARGET_2D, gli::FORMAT_RGBA8_UNORM_PACK8, {4, 4, 1}, 1, 1, 1);
     std::memset(image.data(), 255, image.size());
     std::vector<char> dds;
     assert(gli::save_dds(image, dds));
     save(directory / "fixture.dds", Bytes(dds.begin(), dds.end()));
     FS.append_path("$level$", directory.string().c_str(), nullptr, false);
-    FS.append_path("$game_textures$", directory.string().c_str(), nullptr, false);
+    FS.append_path("$game_textures$", base_textures.string().c_str(), nullptr, false);
     FS.append_path("$game_meshes$", directory.string().c_str(), nullptr, false);
     using namespace vk_mock;
     const auto device = handle<VkDevice>(1);
@@ -172,6 +174,38 @@ int main()
                                          handle<VkShaderModule>(6), SurfaceMode::Opaque, true, error, true));
     }
     GameTextureFactory textures;
+    {
+        const auto thm = [](const char* detail, float scale, bool malformed = false)
+        {
+            Bytes data, parameters(malformed ? 7 : 8, 0), extension;
+            if (!malformed) parameters[6] = 0x80; // diffuse detail
+            extension.insert(extension.end(), detail, detail + std::strlen(detail) + 1);
+            putfloat(extension, scale);
+            chunk(data, 0x0812, parameters);
+            chunk(data, 0x0815, extension);
+            return data;
+        };
+        // A loose $level$ replacement takes priority over a game texture
+        // metadata file with the same arbitrary name. Removing it restores
+        // the lower-priority result; a malformed override must fail visibly.
+        save(base_textures / "arb_42.thm", thm("base_detail", 1.25f));
+        save(directory / "arb_42.thm", thm("mod_detail", 3.5f));
+        FS.rescan_path(FS.get_path("$game_textures$")->m_Path, false);
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+        GameTextureFactory::DetailMetadata detail;
+        std::string metadata_error;
+        assert(textures.texture_detail_metadata("arb_42", detail, metadata_error) &&
+            detail.diffuse && detail.texture == "mod_detail" && detail.scale == 3.5f);
+        save(directory / "arb_42.thm", thm("mod_detail", 3.5f, true));
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+        assert(!textures.texture_detail_metadata("arb_42", detail, metadata_error) &&
+            metadata_error.find("arb_42.thm") != std::string::npos &&
+            metadata_error.find("TEXTUREPARAM") != std::string::npos);
+        std::filesystem::remove(directory / "arb_42.thm");
+        FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+        assert(textures.texture_detail_metadata("arb_42", detail, metadata_error) &&
+            detail.diffuse && detail.texture == "base_detail" && detail.scale == 1.25f);
+    }
     {
         Bytes params(8, 0), extension{'m','o','d','\\','d','e','t','a','i','l',0};
         params[6] = 0x80; // flDiffuseDetail (bit 23)
