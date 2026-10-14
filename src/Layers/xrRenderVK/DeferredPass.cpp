@@ -690,7 +690,9 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name == "vk\\model_set_set_2r.ps" ||
         fragment_name == "vk\\hud_model_set_set_2r.ps";
     const bool hud_set_no_depth_write = hud &&
-        fragment_name.find("vk\\hud_model_set_") == 0 && !world_set_depth_write;
+        ((fragment_name.find("vk\\hud_model_set_") == 0 && !world_set_depth_write) ||
+         (fragment_name.find("vk\\hud_particle_screen_") == 0 &&
+          fragment_name != "vk\\hud_particle_screen_set.ps"));
     const bool legacy_multiply = fragment_name == "vk\\level_laemb_multiply.ps";
     if (!make_pipeline(device_, transparent || hud ? light_pass_ : geometry_pass_,
             skinned ? skinned_layout_ : geometry_layout_, vertex, fragment, true,
@@ -1196,11 +1198,11 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
     push_surface(frame, geometry_layout_, material_set);
-    const float unit_detail_scale = 1.f;
     vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
-        68, sizeof(unit_detail_scale), &unit_detail_scale);
+        68, sizeof(detail_scale), &detail_scale);
     if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
-            std::strstr(fragment_name, "_set.ps")) ||
+            std::strstr(fragment_name, "_set.ps") &&
+            !std::strstr(fragment_name, "particle_screen_set.ps")) ||
             std::strstr(fragment_name, "world_set_blended.ps") ||
             std::strstr(fragment_name, "model_set_blended.ps") ||
             std::strstr(fragment_name, "world_set_set_2r.ps") ||
@@ -1214,10 +1216,6 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
             std::strstr(fragment_name, "glow_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    if (fragment_name && (std::strstr(fragment_name, "detail_blended.ps") ||
-            std::strstr(fragment_name, "detail_unlit_blended.ps")))
-        vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
-            sizeof(mvp) + sizeof(alpha_ref), sizeof(detail_scale), &detail_scale);
     if (vertex_name || fragment_name)
     {
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -1256,12 +1254,17 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
             80, sizeof(float) * 12, normal_rows);
     if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
-            std::strstr(fragment_name, "_set.ps")) ||
+            std::strstr(fragment_name, "_set.ps") &&
+            !std::strstr(fragment_name, "particle_screen_set.ps")) ||
             std::strstr(fragment_name, "model_set_blended.ps") ||
             std::strstr(fragment_name, "model_set_set_2r.ps") ||
             std::strstr(fragment_name, "model_set_blend_2r.ps") ||
             std::strstr(fragment_name, "model_set_blend_4r.ps") ||
-            std::strstr(fragment_name, "model_set_alpha_add.ps")))
+            std::strstr(fragment_name, "model_set_alpha_add.ps") ||
+            std::strstr(fragment_name, "world_set_blended.ps") ||
+            std::strstr(fragment_name, "glow_alpha_add.ps") ||
+            std::strstr(fragment_name, "hud_particle_screen_blended.ps") ||
+            std::strstr(fragment_name, "hud_particle_screen_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);

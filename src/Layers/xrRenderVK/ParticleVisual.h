@@ -70,6 +70,7 @@ private:
     std::string material_name_;
     int blend_mode_{-1};
     int alpha_ref_{128};
+    bool screen_set_{};
     std::function<void(bool, PAPI::Particle&)> events_;
     struct Buffers
     {

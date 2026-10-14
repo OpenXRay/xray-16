@@ -181,6 +181,23 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         if (mode == 5) assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
             color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
     }
+    else if (uintptr_t(info->pStages[1].module) >= 148 &&
+        uintptr_t(info->pStages[1].module) <= 153)
+    {
+        const unsigned mode = unsigned(uintptr_t(info->pStages[1].module) - 148);
+        const auto& color = info->pColorBlendState->pAttachments[0];
+        assert(info->renderPass == handle<VkRenderPass>(11) &&
+            info->pDepthStencilState->depthTestEnable &&
+            info->pDepthStencilState->depthWriteEnable == (mode == 0));
+        assert(color.blendEnable == (mode != 0));
+        if (mode == 2) assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_ONE &&
+            color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
+        if (mode == 3 || mode == 4)
+            assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_DST_COLOR &&
+                color.dstColorBlendFactor == (mode == 3 ? VK_BLEND_FACTOR_ZERO : VK_BLEND_FACTOR_SRC_COLOR));
+        if (mode == 5) assert(color.srcColorBlendFactor == VK_BLEND_FACTOR_SRC_ALPHA &&
+            color.dstColorBlendFactor == VK_BLEND_FACTOR_ONE);
+    }
     else if (info->pStages[1].module == handle<VkShaderModule>(127))
     {
         assert(info->renderPass == handle<VkRenderPass>(11) &&
@@ -372,7 +389,8 @@ void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
         134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144,
         145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155,
-        156, 157, 158, 159, 160, 161, 162, 163, 164, 165};
+        156, 157, 158, 159, 160, 161, 162, 163, 164, 165,
+        166, 167, 168, 169, 170, 171};
     assert(draw_count < std::size(expected_pipelines));
     assert(bound_pipeline == handle<VkPipeline>(expected_pipelines[draw_count]));
     ++draw_count;
@@ -883,6 +901,20 @@ int main()
             6, expected_mvp, detail, pose, SurfaceMode::Opaque, true, 0,
             "vk\\hud_skinned_2.vs", fragment.c_str(), expected_world_alpha_ref));
         assert(world_alpha_push == (mode == 1 || mode == 5 || mode == 7 || mode == 8 || mode == 9));
+    }
+    const char* screen_particle_fragments[]{"set", "blended", "additive",
+        "multiply", "multiply_2x", "alpha_add"};
+    for (unsigned mode = 0; mode < 6; ++mode)
+    {
+        const std::string fragment = std::string("vk\\hud_particle_screen_") +
+            screen_particle_fragments[mode] + ".ps";
+        assert(deferred.create_game_pipeline("vk\\level_opaque.vs", fragment,
+            handle<VkShaderModule>(106), handle<VkShaderModule>(148 + mode),
+            SurfaceMode::Opaque, true, error));
+        world_alpha_push = false;
+        assert(deferred.record_hud(hud_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
+            6, expected_mvp, detail, 0, "vk\\level_opaque.vs", fragment.c_str(), .25f));
+        assert(world_alpha_push == (mode == 1 || mode == 5));
     }
     deferred.release_pose_descriptor(pose);
     deferred.release_gbuffer(detail);

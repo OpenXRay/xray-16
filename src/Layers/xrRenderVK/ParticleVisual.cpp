@@ -103,11 +103,12 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
         release_gpu();
         return false;
     }
+    screen_set_ = definition.class_name == "S_SET   ";
     for (bool hud : {false, true})
     {
         RenderPassGraph graph;
         if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
-                hud, false, false, false, 0, blend_mode_}, graph, error) ||
+                hud, false, false, false, 0, blend_mode_, 0, false, -1, screen_set_}, graph, error) ||
             !pass.request_game_pipeline(graph.passes[0].vertex, graph.passes[0].fragment,
                 hud ? SurfaceMode::Opaque : SurfaceMode::Transparent, hud, false, error))
         {
@@ -296,7 +297,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
     RenderPassGraph graph;
     if (!build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
-            hud, false, false, false, 0, blend_mode_}, graph, error)) return false;
+            hud, false, false, false, 0, blend_mode_, 0, false, -1, screen_set_}, graph, error)) return false;
     const auto& node = graph.passes[0];
     const char* vertex = node.vertex.c_str();
     const char* fragment = node.fragment.c_str();

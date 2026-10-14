@@ -239,6 +239,17 @@ int main()
     property(world_set, 6, "Z-test", 1);
     property(world_set, 6, "Z-write", 1);
     chunk(list, 85, world_set);
+    for (uint32_t blend = 0; blend <= 5; ++blend)
+    {
+        const std::string name = "mod\\particle_screen_" + std::to_string(blend);
+        Bytes screen = record("S_SET   ", name.c_str(), false, 53);
+        write32(screen, 7);
+        screen.insert(screen.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
+        write32(screen, blend); write32(screen, 0);
+        property(screen, 6, "Z-test", 1);
+        property(screen, 6, "Z-write", blend == 0 ? 1 : 0);
+        chunk(list, 95 + blend, screen);
+    }
     Bytes file;
     Bytes constants;
     constants.insert(constants.end(), {'p', 'u', 'l', 's', 'e', 0});
@@ -254,7 +265,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 43);
+    assert(library.load(reader, error) && library.size() == 49);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -271,6 +282,16 @@ int main()
     assert(reflective_state && reflective_state->pass.depth_test && reflective_state->pass.depth_write);
     assert(!library.contains("hud\\font")); // Built-in UI shaders are not serialized blenders.
     SurfaceMode mode{};
+    int screen_alpha_ref = -1;
+    for (int blend = 0; blend <= 5; ++blend)
+    {
+        const std::string name = "mod\\particle_screen_" + std::to_string(blend);
+        int selected = -1;
+        assert(library.resolve(name, mode, error, &screen_alpha_ref,
+            &selected, true) && screen_alpha_ref == 53 && selected == blend);
+    }
+    assert(!library.resolve("hud\\alpha", mode, error, nullptr, nullptr, true) &&
+        error.find("Z-test") != std::string::npos);
     assert(library.resolve("DEF_SHADERS/LEAF", mode, error) && mode == SurfaceMode::AlphaTest);
     assert(library.resolve("def_shaders\\glass", mode, error) && mode == SurfaceMode::Transparent);
     assert(library.resolve("trees\\leaf", mode, error) && mode == SurfaceMode::AlphaTest);
@@ -346,8 +367,8 @@ int main()
             false, false, true) && mode == SurfaceMode::Transparent && selected == blend);
     }
     int screen_particle_blend = -1;
-    assert(library.resolve("effects\\additive", mode, error, nullptr,
-        &screen_particle_blend, true) && mode == SurfaceMode::Transparent && screen_particle_blend == 2);
+    assert(!library.resolve("effects\\additive", mode, error, nullptr,
+        &screen_particle_blend, true) && error.find("Z-test") != std::string::npos);
     assert(library.resolve("effects\\sprite_set", mode, error, &alpha_ref) &&
         mode == SurfaceMode::AlphaTest && alpha_ref == 200);
     int blend_mode = -1;
@@ -402,8 +423,8 @@ int main()
         mode == SurfaceMode::Transparent && blend_mode == 3);
     assert(!library.resolve("effects\\screen_multiply_2x", mode, error) &&
         error.find("blending=4") != std::string::npos);
-    assert(library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
-        mode == SurfaceMode::Transparent && blend_mode == 4);
+    assert(!library.resolve("effects\\screen_multiply_2x", mode, error, nullptr, &blend_mode, true) &&
+        error.find("Z-test") != std::string::npos);
     assert(library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode) &&
         mode == SurfaceMode::Transparent && blend_mode == 6);
     assert(!library.resolve("effects\\wallmarkmult", mode, error, nullptr, &blend_mode, true) &&

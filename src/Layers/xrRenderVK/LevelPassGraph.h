@@ -62,6 +62,7 @@ struct RenderPassSelection
     uint16_t surface_roles{};
     bool detail{};
     int screen_blend{-1}; // Serialized S_SET mode when used by an OGF model.
+    bool particle_screen_set{};
 };
 
 inline bool build_render_pass_graph(const RenderPassSelection& input,
@@ -75,6 +76,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
         return reject("S_SET Blending (expected 0..9)");
     if (input.consumer == RenderConsumer::Particle && (input.blend_mode < 0 || input.blend_mode > 5))
         return reject("PARTICLE Blending (expected 0..5)");
+    if (input.particle_screen_set && input.consumer != RenderConsumer::Particle)
+        return reject("S_SET particle requires particle consumer");
     if (input.surface_roles & BumpAuxRole && !(input.surface_roles & BumpRole))
         return reject("BumpAux texture without Bump");
     if (input.surface_roles & GlossRole && !(input.surface_roles & (BumpRole | NormalRole)))
@@ -131,6 +134,7 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
     // attachment, per CBlender_Particle::Compile (AREF 200).
     node.depth_write = node.target == LevelPassTarget::GBuffer || node.target == LevelPassTarget::Hud ||
         (input.consumer == RenderConsumer::Particle && input.blend_mode == 0);
+    if (input.particle_screen_set) node.depth_write = input.blend_mode == 0;
     const bool replace = (input.consumer == RenderConsumer::Ui &&
             (input.blend_mode == 0 || input.blend_mode == 7)) ||
         (input.consumer == RenderConsumer::Particle && input.blend_mode == 0) ||
@@ -146,7 +150,12 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
             input.blend_mode == 5 ? "alpha_add" : input.blend_mode == 4 ? "multiply_2x" :
             input.blend_mode == 3 ? "multiply" : input.blend_mode == 2 ? "additive" : "blended";
         node.vertex = "vk\\level_opaque.vs";
-        node.fragment = std::string("vk\\particle_") + (input.hud ? "hud_" : "world_") + mode + ".ps";
+        node.fragment = input.particle_screen_set && input.hud ?
+            std::string("vk\\hud_particle_screen_") + mode + ".ps" :
+            input.particle_screen_set && input.blend_mode == 0 ? "vk\\world_set_set.ps" :
+            input.particle_screen_set && input.blend_mode == 1 ? "vk\\world_set_blended.ps" :
+            input.particle_screen_set && input.blend_mode == 5 ? "vk\\glow_alpha_add.ps" :
+            std::string("vk\\particle_") + (input.hud ? "hud_" : "world_") + mode + ".ps";
     }
     else if (input.consumer == RenderConsumer::Ui)
     {
@@ -285,5 +294,26 @@ inline bool build_render_pass_graph(const LevelPassSelection& input,
     RenderPassGraph& graph, std::string& error)
 {
     return build_level_pass_graph(input, graph, error);
+}
+
+// Detail prototypes use LevelVertex without a baked lightmap. Their forward
+// variant must retain world lighting/fog and the optional diffuse detail slot.
+inline bool build_vegetation_pass_graph(SurfaceMode mode, bool detail,
+    uint16_t surface_roles,
+    LevelPassGraph& graph, std::string& error)
+{
+    LevelPassSelection selection;
+    selection.mode = mode;
+    selection.detail = detail;
+    selection.surface_roles = surface_roles;
+    if (!build_level_pass_graph(selection, graph, error))
+        return false;
+    if (mode == SurfaceMode::Transparent)
+    {
+        graph.passes[0].vertex = "vk\\level_detail_blended.vs";
+        graph.passes[0].fragment = detail ? "vk\\level_vegetation_detail_blended.ps" :
+            "vk\\level_vegetation_blended.ps";
+    }
+    return true;
 }
 }

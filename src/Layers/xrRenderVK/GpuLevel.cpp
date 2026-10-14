@@ -438,14 +438,65 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             error = "level.details / " + prototype.shader + ": " + error;
             return false;
         }
-        const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
-        const bool transparent = mesh.mode == SurfaceMode::Transparent;
-        if (!pass.request_game_pipeline(transparent ? "vk\\object_blended.vs" :
-                cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
-                transparent ? "vk\\object_blended.ps" :
-                cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
+        GameTextureFactory::DetailMetadata metadata;
+        if (!textures.texture_detail_metadata(prototype.texture, metadata, error))
+        {
+            error = "level.details / " + prototype.texture + ": " + error;
+            return false;
+        }
+        mesh.single_detail = metadata.diffuse;
+        mesh.terrain_scale = metadata.scale;
+        const bool surface_roles = metadata.bump_mode >= 2 || metadata.normal ||
+            !metadata.external_normal_texture.empty() || metadata.material != 1 ||
+            metadata.material_weight != 0.f;
+        mesh.surface = surface_roles;
+        const uint16_t roles = (metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
+            (metadata.normal || !metadata.external_normal_texture.empty() ? NormalRole : 0u);
+        if (!build_vegetation_pass_graph(mesh.mode, mesh.single_detail,
+                roles, mesh.pass_graph, error))
+        {
+            error = "level.details / " + prototype.shader + ": " + error;
+            return false;
+        }
+        const auto& node = mesh.pass_graph.passes[0];
+        bool material_ready = false;
+        if (surface_roles)
+        {
+            std::array<std::string, 20> names;
+            names.fill(prototype.texture);
+            if (mesh.single_detail)
+                for (size_t slot = 2; slot <= 6; ++slot) names[slot] = metadata.texture;
+            if (metadata.bump_mode >= 2)
+            { names[7] = metadata.bump_texture; names[8] = metadata.bump_texture + "#"; }
+            if (!metadata.external_normal_texture.empty()) names[15] = metadata.external_normal_texture;
+            SurfaceParameters surface;
+            surface.bump_mode = metadata.bump_mode >= 2 ? float(metadata.bump_mode) : 0.f;
+            surface.external_normal = !metadata.external_normal_texture.empty() ? 1.f : 0.f;
+            surface.material = float(metadata.material);
+            surface.material_weight = metadata.material_weight;
+            surface.bump_height = metadata.bump_height;
+            if (metadata.normal)
+            {
+                GameTextureFactory::DetailMetadata detail;
+                if (!textures.texture_detail_metadata(metadata.texture, detail, error))
+                {
+                    error = "level.details / " + metadata.texture + ": " + error;
+                    return false;
+                }
+                names[9] = detail.bump_mode >= 2 ? detail.bump_texture : metadata.texture + "_bump";
+                names[10] = names[9] + "#";
+                surface.detail_normal = mesh.single_detail ? 2.f : 1.f;
+            }
+            material_ready = textures.surface_material(names, surface, pass, mesh.material, error);
+        }
+        else if (mesh.single_detail)
+            material_ready = textures.detail_material(prototype.texture, prototype.texture,
+                metadata.texture, pass, mesh.material, error);
+        else
+            material_ready = textures.material(prototype.texture, pass, mesh.material, error);
+        if (!pass.request_game_pipeline(node.vertex, node.fragment,
                 mesh.mode, false, false, error) ||
-            !textures.material(prototype.texture, pass, mesh.material, error) ||
+            !material_ready ||
             !upload_geometry(prototype.vertices.data(), prototype.vertices.size() * sizeof(LevelVertex),
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices) ||
             !upload_geometry(prototype.indices.data(), prototype.indices.size() * sizeof(uint32_t),
@@ -729,12 +780,11 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
             if (!buffer.index_count) continue;
             const Mesh& mesh = detail_meshes_[model];
             if (mesh.mode == SurfaceMode::Transparent) continue;
-            const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
+            const auto& node = mesh.pass_graph.passes[0];
             if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                     buffer.index_count, mvp, mesh.material, mesh.mode, 0,
-                    cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
-                    cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
-                    float(mesh.alpha_ref) / 255.f)) return false;
+                    node.vertex.c_str(), node.fragment.c_str(),
+                    float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale)) return false;
         }
         return true;
     }
@@ -798,13 +848,11 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
         }
         buffer.index_count = static_cast<uint32_t>(batch.indices.size());
         const Mesh& mesh = detail_meshes_[model];
-        const bool cutout = mesh.mode == SurfaceMode::AlphaTest;
+        const auto& node = mesh.pass_graph.passes[0];
         if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                 static_cast<uint32_t>(batch.indices.size()), mvp, mesh.material,
-                mesh.mode, 0,
-                cutout ? "vk\\level_cutout.vs" : "vk\\level_opaque.vs",
-                cutout ? "vk\\level_cutout.ps" : "vk\\level_opaque.ps",
-                float(mesh.alpha_ref) / 255.f)) return false;
+                mesh.mode, 0, node.vertex.c_str(), node.fragment.c_str(),
+                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale)) return false;
     }
     detail_signatures_[frame.frame_index] = signature;
     return true;
@@ -900,11 +948,14 @@ bool GpuLevel::record_transparent_detail(size_t draw_index, const FrameRecording
         transparent_detail_batches_[frame.frame_index].empty()) return false;
     const auto& draw = transparent_detail_draws_[frame.frame_index][draw_index];
     const auto& batch = transparent_detail_batches_[frame.frame_index][0];
+    const Mesh& mesh = detail_meshes_[draw.model];
+    const auto& node = mesh.pass_graph.passes[0];
     {
         const char* failure = nullptr;
         if (!pass.record_transparent(frame, batch.vertices.handle(), batch.indices.handle(),
-                draw.count, mvp, detail_meshes_[draw.model].material, draw.first,
-                "vk\\object_blended.vs", "vk\\object_blended.ps", &failure))
+                draw.count, mvp, mesh.material, draw.first,
+                node.vertex.c_str(), node.fragment.c_str(), &failure,
+                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale))
         {
             Msg("! [renderer-vulkan] transparent detail shader='%s' texture='%s': %s",
                 details_.prototypes[draw.model].shader.c_str(),
@@ -1182,7 +1233,8 @@ void GpuLevel::destroy()
         }
     if (textures_ && pass_)
         for (const Mesh& mesh : detail_meshes_)
-            textures_->release_material(mesh.material, *pass_);
+            if (mesh.surface || mesh.single_detail) textures_->release_terrain_material(mesh.material, *pass_);
+            else textures_->release_material(mesh.material, *pass_);
     meshes_.clear();
     has_water_ = false;
     detail_meshes_.clear();

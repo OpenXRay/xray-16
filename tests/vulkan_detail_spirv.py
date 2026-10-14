@@ -65,6 +65,8 @@ def main(root):
         slots = reflect(shaders / f"{name}.ps.spv")
         assert "lightmap" not in slots, (name, slots)
         assert ((2 if name.startswith("skinned_") else 1, 0) in slots.values()) == name.endswith("blended"), (name, slots)
+    slots = reflect(shaders / "level_vegetation_detail_blended.ps.spv")
+    assert (1, 0) in slots.values() and "lightmap" not in slots
 
 
 if __name__ == "__main__":

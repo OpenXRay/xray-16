@@ -88,6 +88,22 @@ int main()
     assert(graph.passes[0].fragment == "vk\\level_detail_unlit_cutout.ps");
     assert(graph.passes[0].depth_write);
 
+    for (bool detail : {false, true})
+    {
+        assert(build_vegetation_pass_graph(SurfaceMode::Transparent, detail, 0, graph, error));
+        assert(graph.count == 1 && graph.passes[0].target == LevelPassTarget::Forward);
+        assert(graph.passes[0].depth_test && !graph.passes[0].depth_write);
+        assert(graph.passes[0].blend == LevelPassBlend::Alpha);
+        assert(graph.passes[0].vertex == "vk\\level_detail_blended.vs");
+        assert(graph.passes[0].fragment == (detail ?
+            "vk\\level_vegetation_detail_blended.ps" : "vk\\level_vegetation_blended.ps"));
+        assert(graph.passes[0].textures == (BaseRole | (detail ? DetailRole : 0)));
+        assert(build_vegetation_pass_graph(SurfaceMode::AlphaTest, detail, 0, graph, error));
+        assert(graph.passes[0].depth_test && graph.passes[0].depth_write);
+        assert(graph.passes[0].fragment == (detail ?
+            "vk\\level_detail_unlit_cutout.ps" : "vk\\level_cutout.ps"));
+    }
+
     base = {};
     base.mode = SurfaceMode::Opaque;
     base.lightmapped = true;
@@ -221,6 +237,17 @@ int main()
                 blend == 4 ? LevelPassBlend::Multiply2x :
                 blend == 5 ? LevelPassBlend::AlphaAdd : LevelPassBlend::Alpha));
             assert(common.passes[0].depth_write == (hud || blend == 0));
+            assert(build_render_pass_graph({RenderConsumer::Particle, SurfaceMode::Transparent,
+                hud, false, false, false, 0, blend, 0, false, -1, true}, common, error));
+            assert(common.passes[0].depth_test && common.passes[0].depth_write == (blend == 0));
+            assert(common.passes[0].fragment == (hud ?
+                std::string("vk\\hud_particle_screen_") +
+                    (blend == 0 ? "set" : blend == 1 ? "blended" : blend == 2 ? "additive" :
+                        blend == 3 ? "multiply" : blend == 4 ? "multiply_2x" : "alpha_add") + ".ps" :
+                blend == 0 ? "vk\\world_set_set.ps" : blend == 1 ? "vk\\world_set_blended.ps" :
+                blend == 5 ? "vk\\glow_alpha_add.ps" :
+                    std::string("vk\\particle_world_") +
+                        (blend == 2 ? "additive" : blend == 3 ? "multiply" : "multiply_2x") + ".ps"));
         }
     for (int blend = 0; blend <= 9; ++blend)
     {

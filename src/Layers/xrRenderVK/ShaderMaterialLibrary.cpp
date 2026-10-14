@@ -498,14 +498,15 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     // honor rather than treating every S_SET as an overlay.
     const bool world_set = level_pipeline && material.class_name == "S_SET   " &&
         material.blending == 0 && material.role != MaterialDefinition::Role::Water;
+    const bool particle_screen_set = particle_pipeline && material.class_name == "S_SET   ";
     const bool scene_depth_test = !screen_pipeline &&
-        (material.mode == SurfaceMode::Transparent || world_set);
+        (material.mode == SurfaceMode::Transparent || world_set || particle_screen_set);
     // UI has no depth attachment, but wrap addressing is a valid sampler state.
     const uint32_t supported_flags = screen_pipeline ? 1u :
         1u | (scene_depth_test ? 2u : 0u) |
         (level_pipeline && material.blending == 1 ? 16u : 0u) |
         ((water_pipeline || (level_pipeline && material.role == MaterialDefinition::Role::Water)) ? 12u : 0u) |
-        (world_set ? 4u : 0u);
+        (world_set || (particle_screen_set && material.blending == 0) ? 4u : 0u);
     const uint32_t unsupported_flags = material.screen_flags & ~supported_flags;
     if (material.class_name == "S_SET   " && unsupported_flags)
     {
@@ -518,6 +519,17 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         !(material.screen_flags & 2u))
     {
         error = "unsupported world property='Z-test=0' in " + context;
+        return false;
+    }
+    if (particle_screen_set && !(material.screen_flags & 2u))
+    {
+        error = "unsupported particle property='Z-test=0' in " + context;
+        return false;
+    }
+    if (particle_screen_set && ((material.screen_flags & 4u) != 0) != (material.blending == 0))
+    {
+        error = "unsupported particle property='Z-write' for S_SET Blending=" +
+            std::to_string(material.blending) + " in " + context;
         return false;
     }
     if (material.class_name == "S_SET   " && level_pipeline &&
