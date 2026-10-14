@@ -18,7 +18,8 @@ SDL2, OpenAL Soft, libjpeg-turbo, Ogg, Vorbis and LZO were configured with
 CMake against the NDK toolchain. Vorbis was pointed at the installed Ogg
 headers and static library. Theora was configured through Autotools with
 `--host=aarch64-linux-android --disable-shared --enable-static --disable-examples`
-and the cross compiler `aarch64-linux-android26-clang`. OpenAL Soft 1.24.3's
+and the cross compiler `aarch64-linux-android26-clang`, with `CFLAGS=-fPIC -O2`
+so its static archives can link into `libmain.so`. OpenAL Soft 1.24.3's
 bundled fmt headers need `-include cstdlib` with NDK r30. Host tools for the
 APK build are JDK 17 and `glslc` in addition to those archived in the kit.
 
