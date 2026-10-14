@@ -92,7 +92,7 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         if (type == 0) scope = property;
         properties.push_back({scope, property, type,
             std::vector<uint8_t>(bytes + start, bytes + start + length)});
-        if (cls_name == "BmmDold " || cls_name == "LmBmmD  ")
+        if (cls_name == "BmmDold " || cls_name == "BmmD    " || cls_name == "LmBmmD  ")
         {
             constexpr const char* channels[]{"R2-R", "R2-G", "R2-B", "R2-A"};
             for (size_t channel = 0; channel < 4; ++channel)
@@ -151,10 +151,10 @@ bool parse_record(const uint8_t* bytes, size_t size, std::string& name,
         cls == "MODEL   " ? 2 :
         cls == "PARTICLE" || cls == "D_STILL " || cls == "LaEmB   " ? 0 : 1;
     supported &= version <= max_version;
-    if (cls == "BmmDold " || cls == "LmBmmD  ")
+    if (cls == "BmmDold " || cls == "BmmD    " || cls == "LmBmmD  ")
     {
         const bool any = std::any_of(terrain.detail.begin(), terrain.detail.end(),
-            [](const std::string& texture) { return !texture.empty(); });
+            [](const std::string& texture) { return !texture.empty() && texture != "$null"; });
         const bool all = std::all_of(terrain.detail.begin(), terrain.detail.end(),
             [](const std::string& texture) { return !texture.empty() && texture != "$null"; });
         if (any && !all)

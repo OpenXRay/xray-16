@@ -118,6 +118,21 @@ int main()
         std::memcpy(terrain.data() + start, "detail\\modded", 13);
     }
     chunk(list, 51, terrain);
+    Bytes modern_terrain = record("BmmD    ", "mod\\unusual_four_channel", false);
+    modern_terrain[172] = 3;
+    write32(modern_terrain, 0);
+    modern_terrain.insert(modern_terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(modern_terrain, channel, channel);
+    chunk(list, 81, modern_terrain);
+    Bytes null_terrain = record("BmmD    ", "mod\\single_with_null_channels", false);
+    null_terrain[172] = 3;
+    write32(null_terrain, 0);
+    null_terrain.insert(null_terrain.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    texture_property(null_terrain, "Name", "mod\\one_detail");
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(null_terrain, channel, "$null");
+    chunk(list, 82, null_terrain);
     Bytes particle_add = record("PARTICLE", "effects\\flash_add", false, 32);
     write32(particle_add, 7);
     particle_add.insert(particle_add.end(), blend_name, blend_name + std::strlen(blend_name) + 1);
@@ -212,7 +227,7 @@ int main()
     IReader reader(file.data(), file.size());
     ShaderMaterialLibrary library;
     std::string error;
-    assert(library.load(reader, error) && library.size() == 31);
+    assert(library.load(reader, error) && library.size() == 33);
     const MaterialDefinition* parsed = library.find("MOD/arbitrary_reflection");
     assert(parsed && parsed->properties.size() >= 2);
     const BlenderProperty& second_name = parsed->properties.back();
@@ -287,6 +302,15 @@ int main()
         false, false, true, false, nullptr, &terrain_textures));
     assert(terrain_textures.enabled && terrain_textures.detail[0] == "detail\\modded" &&
         terrain_textures.detail[3] == "detail\\modded");
+    assert(library.resolve("mod\\unusual_four_channel", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, &terrain_textures));
+    assert(terrain_textures.enabled && terrain_textures.detail[0] == "r2-r" &&
+        terrain_textures.detail[1] == "r2-g" && terrain_textures.detail[2] == "r2-b" &&
+        terrain_textures.detail[3] == "r2-a");
+    MaterialDefinition null_channel_definition;
+    assert(library.resolve("mod\\single_with_null_channels", mode, error, nullptr, nullptr,
+        false, false, true, false, nullptr, &terrain_textures, &null_channel_definition));
+    assert(!terrain_textures.enabled && null_channel_definition.detail_texture == "mod\\one_detail");
     Bytes missing_terrain = record("BmmDold ", "levels\\incomplete", false);
     missing_terrain[172] = 3;
     write32(missing_terrain, 3);
@@ -300,6 +324,19 @@ int main()
     ShaderMaterialLibrary incomplete_library;
     assert(!incomplete_library.load(missing_terrain_reader, error) &&
         error.find("id=62") != std::string::npos &&
+        error.find("R2-R/G/B/A") != std::string::npos);
+    Bytes incomplete_modern = record("BmmD    ", "mod\\incomplete_modern", false);
+    incomplete_modern[172] = 3;
+    write32(incomplete_modern, 0);
+    incomplete_modern.insert(incomplete_modern.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    texture_property(incomplete_modern, "R2-R", "mod\\red");
+    texture_property(incomplete_modern, "R2-G", "$null");
+    Bytes incomplete_modern_list, incomplete_modern_file;
+    chunk(incomplete_modern_list, 83, incomplete_modern);
+    chunk(incomplete_modern_file, 2, incomplete_modern_list);
+    IReader incomplete_modern_reader(incomplete_modern_file.data(), incomplete_modern_file.size());
+    assert(!incomplete_library.load(incomplete_modern_reader, error) &&
+        error.find("id=83") != std::string::npos &&
         error.find("R2-R/G/B/A") != std::string::npos);
     assert(library.resolve("effects\\flash_add", mode, error, nullptr, &blend_mode) &&
         mode == SurfaceMode::Transparent && blend_mode == 2);
