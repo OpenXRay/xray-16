@@ -328,6 +328,15 @@ int main()
     sort_transparent_draws(overlap);
     assert(overlap[0].index == 1 && overlap[1].index == 2 &&
         overlap[2].index == 3 && overlap[3].index == 0);
+    std::vector<TransparentDrawRef> priority_overlap = {
+        {100.f, false, 0, true, false, 3},
+        {1.f, false, 1, true, false, 2},
+        {5.f, false, 2, true, false, 2},
+        {2.f, false, 3, true, false, 1},
+    };
+    sort_transparent_draws(priority_overlap);
+    assert(priority_overlap[0].index == 3 && priority_overlap[1].index == 2 &&
+        priority_overlap[2].index == 1 && priority_overlap[3].index == 0);
     // Alpha compositing a solid red model behind half-transparent blue
     // particle and green grass yields all three channels at this pixel.
     float pixel[3]{};

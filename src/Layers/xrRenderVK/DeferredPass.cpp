@@ -1079,7 +1079,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name,
     float alpha_ref, const float* normal_rows, float terrain_scale,
-    const float* environment_camera, const float* environment_factor) const
+    const float* environment_camera, const float* environment_factor, int32_t vertex_base) const
 {
     if (mode == SurfaceMode::Transparent) return false;
     VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
@@ -1126,14 +1126,14 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
             vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
                 80, sizeof(float) * 4, environment_factor);
     }
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
 
 bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
-    bool alpha_test, uint32_t first_index, float alpha_ref) const
+    bool alpha_test, uint32_t first_index, float alpha_ref, int32_t vertex_base) const
 {
     const VkPipeline pipeline = alpha_test ? shadow_cutout_ : shadow_opaque_;
     if (!pipeline || !frame.command_buffer ||
@@ -1151,7 +1151,7 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
     if (alpha_test)
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
@@ -1159,7 +1159,8 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
 bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name,
-    const char** failure, float alpha_ref, const float* normal_rows, float detail_scale) const
+    const char** failure, float alpha_ref, const float* normal_rows, float detail_scale,
+    int32_t vertex_base) const
 {
     const auto reject = [failure](const char* reason)
     {
@@ -1223,7 +1224,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             geometry_layout_, 1, 1, &forward_sets_[frame.image_index], 0, nullptr);
     }
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
@@ -1231,7 +1232,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name, float alpha_ref,
-    const float* normal_rows) const
+    const float* normal_rows, int32_t vertex_base) const
 {
     VkPipeline pipeline = hud_;
     if (vertex_name || fragment_name)
@@ -1269,7 +1270,7 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
             std::strstr(fragment_name, "hud_particle_screen_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }
@@ -1315,7 +1316,8 @@ bool DeferredPass::record_local_light(const FrameRecordingContext& frame,
 
 bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16],
-    VkDescriptorSet material, uint32_t first_index, float time, float opacity) const
+    VkDescriptorSet material, uint32_t first_index, float time, float opacity,
+    int32_t vertex_base) const
 {
     if (!water_pipeline_ || !lighting_compatible(frame) || !frame.command_buffer ||
         frame.image_index >= water_sets_.size() || !water_sets_[frame.image_index] ||
@@ -1334,7 +1336,7 @@ bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer ver
     const float params[]{time, 1.f / frame.extent.width, 1.f / frame.extent.height, opacity};
     vk_.cmd_push_constants(frame.command_buffer, water_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
         sizeof(mvp), sizeof(params), params);
-    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
 }

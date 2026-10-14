@@ -525,7 +525,9 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
         !(level_pipeline && !model_pipeline && material.priority >= 2 &&
           material.priority <= 3 &&
           (material.mode == SurfaceMode::Transparent ||
-           material.class_name == "V       " && material.mode == SurfaceMode::Opaque)))
+           material.class_name == "V       " && material.mode == SurfaceMode::Opaque)) &&
+        !(particle_pipeline && material.class_name == "PARTICLE" &&
+          material.priority >= 2 && material.priority <= 3))
     {
         error = "unsupported General / Priority=" + std::to_string(material.priority) +
             " in " + context + " for this render consumer";

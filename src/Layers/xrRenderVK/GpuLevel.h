@@ -44,8 +44,8 @@ public:
     {
         const auto mesh_bytes = [](const Mesh& mesh)
         {
-            uint64_t bytes = mesh.vertices.size() + mesh.indices.size();
-            if (mesh.fast) bytes += mesh.fast->vertices.size() + mesh.fast->indices.size();
+            uint64_t bytes = mesh.vertex_bytes + mesh.index_bytes;
+            if (mesh.fast) bytes += mesh.fast->vertex_bytes + mesh.fast->index_bytes;
             return bytes;
         };
         uint64_t bytes = 0;
@@ -81,6 +81,11 @@ private:
     struct Mesh
     {
         BufferResource vertices, indices;
+        VkBuffer packed_vertices{}, packed_indices{};
+        uint32_t first_vertex{}, first_index{};
+        uint64_t vertex_bytes{}, index_bytes{};
+        VkBuffer vertex_buffer() const { return packed_vertices ? packed_vertices : vertices.handle(); }
+        VkBuffer index_buffer() const { return packed_indices ? packed_indices : indices.handle(); }
         uint32_t index_count{};
         std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
@@ -119,6 +124,8 @@ private:
     GameTextureFactory* textures_{};
     DeferredPass* pass_{};
     std::vector<PendingBufferUpload> pending_;
+    struct GeometryBatch { BufferResource vertices, indices; };
+    std::vector<GeometryBatch> geometry_batches_;
     std::vector<Mesh> meshes_;
     struct DetailPlacement
     {

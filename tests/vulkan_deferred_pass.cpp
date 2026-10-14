@@ -23,6 +23,7 @@ template <typename T> T handle(uintptr_t value)
 uint32_t pipeline_count{}, draw_count{}, descriptor_updates{}, descriptor_frees{};
 uint32_t pipeline_destroys{};
 uint32_t expected_first_index{};
+int32_t expected_vertex_base{};
 bool weather_bind{}, weather_push{};
 bool cutout_alpha_push{}, cutout_scale_push{}, forward_detail_scale_push{};
 SurfaceParameters expected_surface{};
@@ -397,10 +398,11 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(std::memcmp(data, expected_mvp, sizeof(expected_mvp)) == 0);
 }
 void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
-    uint32_t first_index, int32_t, uint32_t)
+    uint32_t first_index, int32_t vertex_base, uint32_t)
 {
     assert(count == 6 && instances == 1);
     assert(first_index == expected_first_index);
+    assert(vertex_base == expected_vertex_base);
     constexpr uintptr_t expected_pipelines[]{100, 106, 108, 101, 102, 107, 103, 119,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
         134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144,
@@ -653,8 +655,12 @@ int main()
     FrameRecordingContext geometry_frame{handle<VkCommandBuffer>(17),
         handle<VkRenderPass>(10), handle<VkFramebuffer>(18), {640, 480}, 0, 0};
     for (unsigned i = 0; i < 16; ++i) expected_mvp[i] = static_cast<float>(i + 1);
+    expected_vertex_base = 7;
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20),
-        handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Opaque));
+        handle<VkBuffer>(21), 6, expected_mvp, material, SurfaceMode::Opaque,
+        0, nullptr, nullptr, 128.f / 255.f, nullptr, 1.f, nullptr, nullptr,
+        expected_vertex_base));
+    expected_vertex_base = 0;
     assert(bound_pipeline == handle<VkPipeline>(100));
     assert(surface_push);
     assert(deferred.record_geometry(geometry_frame, handle<VkBuffer>(20), handle<VkBuffer>(21),

@@ -995,6 +995,31 @@ int main()
     }
     priority[priority.size() - 12] = 4;
     rejected_semantics(priority, 72, "mod\\priority", "invalid render priority");
+    Bytes particle_priority = record("PARTICLE", "mod\\priority_particle", false, 114);
+    write32(particle_priority, 7);
+    particle_priority.insert(particle_priority.end(), {'B','l','e','n','d','i','n','g',0});
+    write32(particle_priority, 1); write32(particle_priority, 0);
+    write32(particle_priority, 0);
+    particle_priority.insert(particle_priority.end(), {'G','e','n','e','r','a','l',0});
+    write32(particle_priority, 4);
+    particle_priority.insert(particle_priority.end(), {'P','r','i','o','r','i','t','y',0});
+    write32(particle_priority, 3); write32(particle_priority, 0); write32(particle_priority, 3);
+    {
+        Bytes records, file;
+        chunk(records, 114, particle_priority);
+        chunk(file, 2, records);
+        IReader reader(file.data(), file.size());
+        ShaderMaterialLibrary parsed_library;
+        assert(parsed_library.load(reader, error));
+        SurfaceMode selected{};
+        MaterialDefinition resolved;
+        assert(parsed_library.resolve("mod\\priority_particle", selected, error,
+            nullptr, nullptr, true, false, false, false,
+            nullptr, nullptr, &resolved) && resolved.priority == 3);
+        assert(!parsed_library.resolve("mod\\priority_particle", selected, error,
+            nullptr, nullptr, false, false, false, false,
+            nullptr, nullptr, &resolved, true));
+    }
     Bytes renamed = record("LM_AREF ", "mod\\ordinary_surface", false);
     Bytes deceptive = record("LM_AREF ", "water\\double_sided_alpha_add", false);
     Bytes rename_records, rename_file;

@@ -1,6 +1,7 @@
 #include "src/Layers/xrRenderVK/LevelModels.h"
 #include "src/Layers/xrRenderVK/VisualCatalog.h"
 #include "src/Layers/xrRenderVK/SpecialVisuals.h"
+#include "src/Layers/xrRenderVK/PackedLevelGeometry.h"
 
 #include <cassert>
 #include <cstring>
@@ -42,6 +43,28 @@ static void part(Bytes& data, uint32_t id, const Bytes& value)
 
 int main()
 {
+    PackedLevelGeometry packed;
+    LevelModel first, second;
+    first.vertices.resize(3);
+    first.vertices[1].uv[0] = .375f;
+    first.vertices[1].normal[2] = 1.f;
+    first.indices = {0, 1, 2};
+    second.vertices.resize(4);
+    second.indices = {0, 2, 3, 0, 1, 2};
+    uint32_t vertex_base = 0, index_base = 0;
+    std::string packing_error;
+    assert(packed.append(first, vertex_base, index_base, packing_error));
+    assert(vertex_base == 0 && index_base == 0);
+    assert(!packed.would_flush(second));
+    assert(packed.append(second, vertex_base, index_base, packing_error));
+    assert(vertex_base == 3 && index_base == 3 &&
+        packed.indices[index_base + 2] == 3 &&
+        packed.vertices[1].uv[0] == .375f && packed.vertices[1].normal[2] == 1.f);
+    // Slide windows add their local first index to index_base, whereas
+    // vertex_base stays at the beginning of the mesh.
+    assert(packed.indices[index_base + 3] == 0);
+    packed.reset();
+    assert(packed.vertices.empty() && packed.indices.empty());
 
     Bytes shaders{1, 0, 0, 0};
     const char material[] = "def_shaders\\default/concrete";

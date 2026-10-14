@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "GpuLevel.h"
+#include "PackedLevelGeometry.h"
 #include "LevelVisibility.h"
 #include "VulkanVisual.h"
 #include "SpecialVisuals.h"
@@ -21,6 +22,7 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <unordered_set>
 #if defined(XR_PLATFORM_ANDROID)
 #include <unistd.h>
 #endif
@@ -187,6 +189,32 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         return upload_buffer(device, queue, pool, memory, upload, data, bytes, usage,
             destination, prepared.pending_, error, true);
     };
+    PackedLevelGeometry packing;
+    std::vector<Mesh*> awaiting_batch;
+    std::unordered_map<uint32_t, const Mesh*> material_cache;
+    const auto flush_geometry = [&]() -> bool
+    {
+        if (awaiting_batch.empty()) return true;
+        GeometryBatch batch;
+        if (!upload_geometry(packing.vertices.data(),
+                packing.vertices.size() * sizeof(LevelVertex),
+                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, batch.vertices) ||
+            !upload_geometry(packing.indices.data(),
+                packing.indices.size() * sizeof(uint32_t),
+                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, batch.indices))
+            return false;
+        const VkBuffer vertices = batch.vertices.handle();
+        const VkBuffer indices = batch.indices.handle();
+        prepared.geometry_batches_.push_back(std::move(batch));
+        for (Mesh* mesh : awaiting_batch)
+        {
+            mesh->packed_vertices = vertices;
+            mesh->packed_indices = indices;
+        }
+        awaiting_batch.clear();
+        packing.reset();
+        return true;
+    };
     const auto upload_mesh = [&](const LevelModel& model, Mesh& mesh) -> bool
     {
         if (prepared.pending_.size() >= 128 &&
@@ -204,6 +232,44 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const auto& material = models.materials[model.material];
         mesh.material_id = model.material;
         mesh.shader = material.shader;
+        if (const auto cached = material_cache.find(model.material);
+            cached != material_cache.end())
+        {
+            const Mesh& source = *cached->second;
+            if (source.lightmapped && !model.lightmap_uv)
+            {
+                error = "level lightmap material has no TEXCOORD1: " + material.textures;
+                return false;
+            }
+            mesh.material = source.material;
+            mesh.mode = source.mode;
+            mesh.secondary_opaque = source.secondary_opaque;
+            mesh.alpha_ref = source.alpha_ref;
+            mesh.wallmark_multiply = source.wallmark_multiply;
+            mesh.glow_alpha_add = source.glow_alpha_add;
+            mesh.fog = source.fog;
+            mesh.lightmapped = source.lightmapped;
+            mesh.terrain = source.terrain;
+            mesh.surface = source.surface;
+            mesh.single_detail = source.single_detail;
+            mesh.environment = source.environment;
+            mesh.laemb = source.laemb;
+            mesh.environment_constant = source.environment_constant;
+            mesh.pass_graph = source.pass_graph;
+            mesh.constant_waveforms = source.constant_waveforms;
+            mesh.terrain_scale = source.terrain_scale;
+            mesh.water = source.water;
+            mesh.glass = source.glass;
+            prepared.has_water_ |= mesh.water;
+            if (packing.would_flush(model) && !flush_geometry()) return false;
+            if (!packing.append(model, mesh.first_vertex, mesh.first_index, error)) return false;
+            awaiting_batch.push_back(&mesh);
+            mesh.vertex_bytes = model.vertices.size() * sizeof(LevelVertex);
+            mesh.index_bytes = model.indices.size() * sizeof(uint32_t);
+            mesh.index_count = static_cast<uint32_t>(model.indices.size());
+            mesh.windows = model.windows;
+            return true;
+        }
         SurfaceMode mode;
         int blend_mode = -1;
         uint32_t material_flags = 0;
@@ -385,18 +451,20 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 material.shader + "' textures='" + material.textures + "': " + error;
             return false;
         }
-        if (!upload_geometry(model.vertices.data(), model.vertices.size() * sizeof(LevelVertex),
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, mesh.vertices) ||
-            !upload_geometry(model.indices.data(), model.indices.size() * sizeof(uint32_t),
-                VK_BUFFER_USAGE_INDEX_BUFFER_BIT, mesh.indices))
+        if (packing.would_flush(model) && !flush_geometry())
         {
             error = "level material id=" + std::to_string(model.material) +
-                " geometry upload: " + error;
+                " geometry batch upload: " + error;
             return false;
         }
+        if (!packing.append(model, mesh.first_vertex, mesh.first_index, error)) return false;
+        awaiting_batch.push_back(&mesh);
+        mesh.vertex_bytes = model.vertices.size() * sizeof(LevelVertex);
+        mesh.index_bytes = model.indices.size() * sizeof(uint32_t);
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
         mesh.windows = model.windows;
         mesh.mode = mode;
+        material_cache.emplace(model.material, &mesh);
         return true;
     };
     size_t released_cpu_bytes = 0;
@@ -436,9 +504,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 model.fast->indices.capacity() * sizeof(uint32_t);
             model.fast.reset();
         }
-        // Both the direct host-visible upload and the staging path have copied
-        // the source before returning. Release each decoded mesh now instead
-        // of keeping the complete CPU copy next to 41k GPU buffers.
+        // The CPU batch now owns a copy. Release each decoded mesh while the
+        // batch is assembled, before allocating its two Vulkan buffers.
         released_cpu_bytes += model.vertices.capacity() * sizeof(LevelVertex) +
             model.indices.capacity() * sizeof(uint32_t);
         std::vector<LevelVertex>().swap(model.vertices);
@@ -446,6 +513,14 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         std::vector<SlideWindow>().swap(model.windows);
         ++uploaded_models;
     }
+    if (!flush_geometry())
+    {
+        error = "level geometry final batch upload: " + error;
+        return false;
+    }
+    Msg("[renderer-vulkan] level.geometry batches=%zu vk-buffers=%zu materials=%zu (regular/fast meshes=%zu)",
+        prepared.geometry_batches_.size(), prepared.geometry_batches_.size() * 2,
+        material_cache.size(), uploaded_models);
     Msg("[renderer-vulkan] level.geometry uploaded=%zu elapsed-ms=%lld pending=%zu cpu-released=%zu",
         uploaded_models, static_cast<long long>(std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - upload_start).count()), prepared.pending_.size(), released_cpu_bytes);
@@ -539,6 +614,8 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         mesh.index_count = static_cast<uint32_t>(prototype.indices.size());
+        mesh.vertex_bytes = prototype.vertices.size() * sizeof(LevelVertex);
+        mesh.index_bytes = prototype.indices.size() * sizeof(uint32_t);
     }
     // The old level may still have been submitted. Its owner must wait for
     // those frames before replacing the level. Uploads within prepared use
@@ -552,6 +629,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     textures_ = prepared.textures_;
     pass_ = prepared.pass_;
     pending_ = std::move(prepared.pending_);
+    geometry_batches_ = std::move(prepared.geometry_batches_);
     meshes_ = std::move(prepared.meshes_);
     has_water_ = prepared.has_water_;
     details_ = std::move(prepared.details_);
@@ -660,9 +738,9 @@ bool GpuLevel::record_sun_shadow(const FrameRecordingContext& frame, const Defer
             if (size_t(visual.mesh) >= meshes_.size()) return false;
             const Mesh& mesh = meshes_[visual.mesh];
             if (mesh.mode != SurfaceMode::Transparent && mesh.index_count &&
-                !pass.record_sun_shadow(frame, mesh.vertices.handle(), mesh.indices.handle(),
+                !pass.record_sun_shadow(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                     mesh.index_count, sun_mvp, mesh.material, mesh.mode == SurfaceMode::AlphaTest,
-                    0, float(mesh.alpha_ref) / 255.f))
+                    mesh.first_index, float(mesh.alpha_ref) / 255.f, mesh.first_vertex))
                 return false;
         }
         for (uint32_t child : visual.children)
@@ -1078,20 +1156,22 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                 WaveForm waveform = mesh.constant_waveforms[channel];
                 factor[channel] = waveform.Calculate(Device.fTimeGlobal);
             }
-        const bool recorded = mesh.water && transparent ? pass.record_water(frame, mesh.vertices.handle(), mesh.indices.handle(),
-            mesh.index_count, mvp, mesh.material, 0, Device.fTimeGlobal, mesh.glass ? -.35f : .72f) :
-            transparent ? pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
-            mesh.index_count, mvp, mesh.material, 0, named ? vertex : nullptr, named ? fragment : nullptr,
-                &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale) :
-            pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, mvp, mesh.material, mesh.mode, 0,
+        const bool recorded = mesh.water && transparent ? pass.record_water(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+            mesh.index_count, mvp, mesh.material, mesh.first_index, Device.fTimeGlobal,
+            mesh.glass ? -.35f : .72f, mesh.first_vertex) :
+            transparent ? pass.record_transparent(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+            mesh.index_count, mvp, mesh.material, mesh.first_index, named ? vertex : nullptr, named ? fragment : nullptr,
+                &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex) :
+            pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                mesh.index_count, mvp, mesh.material, mesh.mode, mesh.first_index,
                 named ? vertex : nullptr, named ? fragment : nullptr,
                 float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
-                mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr);
+                mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex);
         const bool completed = recorded && (mesh.pass_graph.count < 2 ||
-            pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                mesh.index_count, mvp, mesh.material, mesh.mode, 0,
-                mesh.pass_graph.passes[1].vertex.c_str(), mesh.pass_graph.passes[1].fragment.c_str()));
+            pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                mesh.index_count, mvp, mesh.material, mesh.mode, mesh.first_index,
+                mesh.pass_graph.passes[1].vertex.c_str(), mesh.pass_graph.passes[1].fragment.c_str(),
+                128.f / 255.f, nullptr, 1.f, nullptr, nullptr, mesh.first_vertex));
         if (!completed) report_visual_record_failure(index, mesh_index, phase,
             mesh.water, mesh.index_count, lod, failure);
         return completed;
@@ -1137,25 +1217,26 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             }
 #endif
             if (!(transparent ?
-                mesh.water ? pass.record_water(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, window.offset, Device.fTimeGlobal,
-                    mesh.glass ? -.35f : .72f) :
-                pass.record_transparent(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, window.offset,
+                mesh.water ? pass.record_water(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                    window.index_count, mvp, mesh.material, mesh.first_index + window.offset, Device.fTimeGlobal,
+                    mesh.glass ? -.35f : .72f, mesh.first_vertex) :
+                pass.record_transparent(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                    window.index_count, mvp, mesh.material, mesh.first_index + window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
-                    &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale) :
-                pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, mesh.mode, window.offset,
+                    &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex) :
+                pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                    window.index_count, mvp, mesh.material, mesh.mode, mesh.first_index + window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
                     float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
-                    mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr)))
+                    mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex)))
             {
                 report_visual_record_failure(index, visual.mesh, phase, mesh.water, window.index_count, lod, failure);
                 return false;
             }
-            if (mesh.pass_graph.count > 1 && !pass.record_geometry(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                    window.index_count, mvp, mesh.material, mesh.mode, window.offset,
-                    mesh.pass_graph.passes[1].vertex.c_str(), mesh.pass_graph.passes[1].fragment.c_str()))
+            if (mesh.pass_graph.count > 1 && !pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                    window.index_count, mvp, mesh.material, mesh.mode, mesh.first_index + window.offset,
+                    mesh.pass_graph.passes[1].vertex.c_str(), mesh.pass_graph.passes[1].fragment.c_str(),
+                    128.f / 255.f, nullptr, 1.f, nullptr, nullptr, mesh.first_vertex))
             {
                 report_visual_record_failure(index, visual.mesh, phase, false, window.index_count, lod,
                     "material pass 1 multiply failed");
@@ -1191,8 +1272,9 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
         const int32_t mesh_index = visual.lod_facets[facet];
         if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size()) return false;
         const Mesh& mesh = meshes_[mesh_index];
-        return pass.record_hud(frame, mesh.vertices.handle(), mesh.indices.handle(),
-            mesh.index_count, mvp, mesh.material);
+        return pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+            mesh.index_count, mvp, mesh.material, mesh.first_index, nullptr, nullptr,
+            0.f, nullptr, mesh.first_vertex);
     }
     if (visual.mesh >= 0)
     {
@@ -1200,8 +1282,9 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
         const Mesh& base = meshes_[visual.mesh];
         const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
-        if (!pass.record_hud(frame, mesh.vertices.handle(), mesh.indices.handle(),
-                window.index_count, mvp, mesh.material, window.offset)) return false;
+        if (!pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(),
+                window.index_count, mvp, mesh.material, mesh.first_index + window.offset,
+                nullptr, nullptr, 0.f, nullptr, mesh.first_vertex)) return false;
     }
     for (uint32_t child : visual.children)
         if (!record_hud_visual(child, frame, pass, mvp, lod)) return false;
@@ -1264,24 +1347,22 @@ void GpuLevel::destroy()
     if (device_) wait_for_buffer_uploads(device_, pool_, upload_, pending_);
     visual_indices_.clear();
     visual_objects_.clear();
+    std::unordered_set<uint32_t> released_level_materials;
     if (textures_ && pass_)
         for (const Mesh& mesh : meshes_)
         {
+            if (!released_level_materials.insert(mesh.material_id).second) continue;
+            if (!mesh.material) continue;
             if (mesh.surface || mesh.terrain || mesh.single_detail || mesh.environment) textures_->release_terrain_material(mesh.material, *pass_);
             else if (mesh.lightmapped) textures_->release_lightmapped_material(mesh.material, *pass_);
             else textures_->release_material(mesh.material, *pass_);
-            if (mesh.fast)
-            {
-                if (mesh.fast->surface || mesh.fast->terrain || mesh.fast->single_detail || mesh.fast->environment) textures_->release_terrain_material(mesh.fast->material, *pass_);
-                else if (mesh.fast->lightmapped) textures_->release_lightmapped_material(mesh.fast->material, *pass_);
-                else textures_->release_material(mesh.fast->material, *pass_);
-            }
         }
     if (textures_ && pass_)
         for (const Mesh& mesh : detail_meshes_)
             if (mesh.surface || mesh.single_detail) textures_->release_terrain_material(mesh.material, *pass_);
             else textures_->release_material(mesh.material, *pass_);
     meshes_.clear();
+    geometry_batches_.clear();
     has_water_ = false;
     detail_meshes_.clear();
     details_ = {};

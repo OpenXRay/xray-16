@@ -516,7 +516,20 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
         if (!owner.model_draws_[i].hud) draws.push_back({owner.model_draws_[i].sort_distance, true, i});
     for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
-        if (!owner.particle_draws_[i].hud) draws.push_back({owner.particle_draws_[i].sort_distance, false, i, true});
+    {
+        const auto& particle = owner.particle_draws_[i];
+        if (particle.hud) continue;
+        if (particle.visual->getType() == 8)
+            draws.push_back({particle.sort_distance, false, i, true, false,
+                static_cast<VulkanParticleEffect*>(particle.visual)->priority()});
+        else
+        {
+            const auto* group = static_cast<VulkanParticleGroup*>(particle.visual);
+            for (uint8_t priority = 1; priority <= 3; ++priority)
+                if (group->has_priority(priority))
+                    draws.push_back({particle.sort_distance, false, i, true, false, priority});
+        }
+    }
     if (owner.current_level_)
     {
         float mvp[16];
@@ -554,7 +567,8 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
                 static_cast<VulkanParticleEffect*>(particle.visual)->record(frame, owner.deferred_, mvp,
                     particle.right, particle.up, false, owner.model_error_) :
                 static_cast<VulkanParticleGroup*>(particle.visual)->record(frame, owner.deferred_, mvp,
-                    particle.right, particle.up, false, owner.model_error_);
+                    particle.right, particle.up, false, owner.model_error_,
+                    GeometryPhase::Transparent, draw.priority);
             if (!ok) { owner.models_recorded_ = false; return; }
         }
         else if (draw.model)

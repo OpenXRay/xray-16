@@ -103,6 +103,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
         release_gpu();
         return false;
     }
+    priority_ = definition.priority;
     screen_set_ = definition.class_name == "S_SET   ";
     for (bool hud : {false, true})
     {
@@ -460,13 +461,24 @@ void VulkanParticleGroup::SetHudMode(BOOL value)
 
 bool VulkanParticleGroup::record(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error,
-    GeometryPhase phase)
+    GeometryPhase phase, int priority_filter)
 {
     for (auto& effect : effects_)
-        if (!effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
+        if ((priority_filter < 0 || effect->priority() == priority_filter) &&
+            !effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
     for (auto& child : triggered_)
-        if (!child.effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
+        if ((priority_filter < 0 || child.effect->priority() == priority_filter) &&
+            !child.effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
     return true;
+}
+
+bool VulkanParticleGroup::has_priority(uint8_t priority) const
+{
+    for (const auto& effect : effects_)
+        if (effect->priority() == priority) return true;
+    for (const auto& child : triggered_)
+        if (child.effect->priority() == priority) return true;
+    return false;
 }
 
 void VulkanParticleGroup::on_particle(size_t index, bool birth, PAPI::Particle& particle)

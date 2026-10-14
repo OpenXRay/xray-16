@@ -36,6 +36,7 @@ public:
         const Fvector& right, const Fvector& up, bool hud, std::string& error,
         GeometryPhase phase = GeometryPhase::Transparent);
     void release_gpu(); // The owner waits for all submitted frames first.
+    uint8_t priority() const { return priority_; }
     void set_events(std::function<void(bool, PAPI::Particle&)> events);
     u32 getType() const override { return 8; }
     vis_data& getVisData() override { return visibility_; }
@@ -79,6 +80,7 @@ private:
     int blend_mode_{-1};
     int alpha_ref_{128};
     bool screen_set_{};
+    uint8_t priority_{1};
     std::function<void(bool, PAPI::Particle&)> events_;
     struct Buffers
     {
@@ -97,10 +99,11 @@ public:
         const BufferResourceDispatch& dispatch, GameTextureFactory& textures, DeferredPass& pass,
         std::string& error);
     const auto& effects() const { return effects_; }
+    bool has_priority(uint8_t priority) const;
     size_t triggered_count() const { return triggered_.size(); }
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16],
         const Fvector& right, const Fvector& up, bool hud, std::string& error,
-        GeometryPhase phase = GeometryPhase::Transparent);
+        GeometryPhase phase = GeometryPhase::Transparent, int priority_filter = -1);
     u32 getType() const override { return 9; }
     vis_data& getVisData() override { return visibility_; }
     IRenderVisual* getSubModel(u8 index) override
