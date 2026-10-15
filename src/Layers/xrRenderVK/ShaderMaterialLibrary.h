@@ -34,6 +34,19 @@ struct MaterialPassState
     bool fog{true};
     bool clamp{true};
 };
+// Serialized shaders.xr matrix: mode, TCM flags, then five WaveForms.
+struct TextureMatrix
+{
+    uint32_t mode{}, tcm{};
+    std::array<WaveForm, 5> waves{};
+    // Two UV rows and a third direction row, for cube reflection.
+    std::array<std::array<float, 4>, 3> evaluate(float time, const float* view) const;
+};
+struct TextureMatrixSet
+{
+    std::array<TextureMatrix, 3> values{}; // Base, Detail, Environment
+    std::array<bool, 3> enabled{};
+};
 struct MaterialDefinition
 {
     enum class Role { Standard, Water };
@@ -50,6 +63,7 @@ struct MaterialDefinition
     TerrainMaterialTextures terrain;
     std::string detail_texture;
     std::string environment_texture, environment_transform, environment_constant;
+    TextureMatrixSet matrices;
     std::array<WaveForm, 4> constant_waveforms{};
     bool has_environment_constant{};
     std::vector<BlenderProperty> properties;

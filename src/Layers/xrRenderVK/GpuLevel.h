@@ -111,6 +111,11 @@ private:
         bool environment_constant{};
         LevelPassGraph pass_graph;
         std::array<WaveForm, 4> constant_waveforms{};
+        TextureMatrixSet matrices;
+        uint8_t tessellation{};
+        std::string bump_texture;
+        uint32_t bump_mode{1};
+        float bump_height{.05f};
         float terrain_scale{1.f};
         bool water{};
         bool glass{};

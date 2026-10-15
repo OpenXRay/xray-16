@@ -11,6 +11,7 @@
 
 namespace xray::render::vulkan
 {
+struct TextureMatrixSet;
 struct DeferredLight
 {
     float direction_ambient[4];
@@ -122,7 +123,8 @@ public:
         VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
         const char* vertex_name, const char* fragment_name,
         float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr,
-        float detail_scale = 1.f, const float* environment_camera = nullptr) const;
+        float detail_scale = 1.f, const float* environment_camera = nullptr,
+        const TextureMatrixSet* matrices = nullptr) const;
     void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     void update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
         VkImageView lightmap, VkSampler sampler);
@@ -160,7 +162,8 @@ public:
         const char* vertex_name = nullptr, const char* fragment_name = nullptr,
         float alpha_ref = 128.f / 255.f, const float* normal_rows = nullptr,
         float terrain_scale = 1.f, const float* environment_camera = nullptr,
-        const float* environment_factor = nullptr, int32_t vertex_base = 0) const;
+        const float* environment_factor = nullptr, int32_t vertex_base = 0,
+        const TextureMatrixSet* matrices = nullptr) const;
     bool record_sun_shadow(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
         bool alpha_test, uint32_t first_index = 0,
@@ -169,13 +172,15 @@ public:
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0, const char* vertex_name = nullptr,
         const char* fragment_name = nullptr, float alpha_ref = 0.f,
-        const float* normal_rows = nullptr, int32_t vertex_base = 0) const;
+        const float* normal_rows = nullptr, int32_t vertex_base = 0,
+        const TextureMatrixSet* matrices = nullptr) const;
     bool record_transparent(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
         uint32_t first_index = 0, const char* vertex_name = nullptr,
         const char* fragment_name = nullptr, const char** failure = nullptr,
         float alpha_ref = 0.f, const float* normal_rows = nullptr,
-        float detail_scale = 1.f, int32_t vertex_base = 0) const;
+        float detail_scale = 1.f, int32_t vertex_base = 0,
+        const TextureMatrixSet* matrices = nullptr) const;
     bool record_lighting(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         const DeferredLight& light, VkDescriptorSet weather_set = VK_NULL_HANDLE,
         const WeatherLighting* weather = nullptr) const;
@@ -191,6 +196,8 @@ public:
     uint32_t triangles() const { return triangles_; }
 
 private:
+    void push_texture_matrices(const FrameRecordingContext& frame, VkPipelineLayout layout,
+        const TextureMatrixSet* matrices) const;
     struct GamePipeline { VkPipeline handle{}; SurfaceMode mode{}; bool hud{}, skinned{}; };
     const GamePipeline* game_pipeline(const char* vertex_name, const char* fragment_name) const;
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,

@@ -104,6 +104,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
         return false;
     }
     priority_ = definition.priority;
+    matrices_ = definition.matrices;
     screen_set_ = definition.class_name == "S_SET   ";
     for (bool hud : {false, true})
     {
@@ -311,11 +312,13 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     const char* fragment = node.fragment.c_str();
     return deferred_set ? pass.record_geometry(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_, SurfaceMode::AlphaTest, 0, vertex, fragment,
-            float(alpha_ref_) / 255.f) :
+            float(alpha_ref_) / 255.f, nullptr, 1.f, nullptr, nullptr, 0, &matrices_) :
         hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment, float(alpha_ref_) / 255.f) :
+            count * 6, mvp, material_, 0, vertex, fragment, float(alpha_ref_) / 255.f,
+            nullptr, 0, &matrices_) :
         pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f);
+            count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f,
+            nullptr, 1.f, 0, &matrices_);
 }
 
 VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog,

@@ -53,7 +53,7 @@ int64_t score_device(const VkPhysicalDeviceProperties& properties, uint64_t loca
 bool supports_game_formats(VkPhysicalDevice device, PFN_vkGetPhysicalDeviceFormatProperties get,
     const VkPhysicalDeviceProperties& properties, std::string& error)
 {
-    if (!get || properties.limits.maxPushConstantsSize < 128 ||
+    if (!get || properties.limits.maxPushConstantsSize < 240 ||
         properties.limits.maxColorAttachments < 3 ||
         properties.limits.maxImageDimension2D < 1024 ||
         // The material set declares bindings 0..19 for fragment sampling.
@@ -62,7 +62,7 @@ bool supports_game_formats(VkPhysicalDevice device, PFN_vkGetPhysicalDeviceForma
         properties.limits.maxPerStageDescriptorSamplers < 20 ||
         properties.limits.maxPerStageDescriptorSampledImages < 20)
     {
-        error = "Vulkan gameplay needs 128 push-constant bytes, three color attachments, "
+        error = "Vulkan gameplay needs 240 push-constant bytes, three color attachments, "
             "1024px textures and 20 fragment sampled images/samplers";
         return false;
     }

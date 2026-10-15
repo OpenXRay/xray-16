@@ -63,6 +63,8 @@ target_sources(xrRenderVK PRIVATE
     LevelVisibility.h
     ModelGeometry.cpp
     ModelGeometry.h
+    ModelTessellation.cpp
+    ModelTessellation.h
     SkeletonBones.cpp
     SkeletonBones.h
     SkeletonMotions.cpp

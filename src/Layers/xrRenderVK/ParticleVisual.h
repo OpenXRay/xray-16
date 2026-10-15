@@ -81,6 +81,7 @@ private:
     int alpha_ref_{128};
     bool screen_set_{};
     uint8_t priority_{1};
+    TextureMatrixSet matrices_;
     std::function<void(bool, PAPI::Particle&)> events_;
     struct Buffers
     {

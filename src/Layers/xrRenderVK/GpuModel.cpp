@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "GpuModel.h"
+#include "ModelTessellation.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 
@@ -45,9 +46,7 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
-        if (definition.tessellation)
-            Msg("[renderer-vulkan] OGF shader='%s' texture='%s' Tessellation=%u: using CBlender_Model R2 non-tessellated path",
-                mesh.geometry.shader.c_str(), texture.c_str(), definition.tessellation);
+        mesh.matrices = definition.matrices;
         if (definition.class_name == "S_SET   " && definition.role == MaterialDefinition::Role::Water)
         {
             error = "OGF shader='" + mesh.geometry.shader +
@@ -66,6 +65,30 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
         {
             error = "OGF texture='" + texture + "': " + error;
             return false;
+        }
+        if (definition.tessellation)
+        {
+            const HeightField* height = nullptr;
+            if (definition.tessellation & 2)
+            {
+                if (metadata.bump_mode < 2 || metadata.bump_texture.empty())
+                {
+                    error = "OGF HM tessellation requires a bump auxiliary texture: " + texture;
+                    return false;
+                }
+                if (!textures.height_field(metadata.bump_texture + "#", height, error)) return false;
+            }
+            const size_t triangles = mesh.geometry.indices.size() / 3;
+            if (!tessellate_model(mesh.geometry, definition.tessellation,
+                    height, metadata.bump_height, error))
+            {
+                error = "OGF PN/HM tessellation shader='" + mesh.geometry.shader +
+                    "' texture='" + texture + "': " + error;
+                return false;
+            }
+            Msg("[renderer-vulkan] OGF PN/HM tessellation shader='%s' mode=%u triangles=%zu/%zu",
+                mesh.geometry.shader.c_str(), definition.tessellation,
+                triangles, mesh.geometry.indices.size() / 3);
         }
         const bool animated = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         // R2's opaque MODELEbB calls uber_deffer("model", "base") and never
@@ -351,7 +374,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     window.index_count, mvp, mesh.material, descriptor,
                     hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
                     vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f,
-                    normal_rows, mesh.detail_scale, mesh.environment ? camera : nullptr))
+                    normal_rows, mesh.detail_scale, mesh.environment ? camera : nullptr,
+                    &mesh.matrices))
             {
                 error = "Vulkan skeletal shader pair or render pass is unavailable: " +
                     vertex_name + " / " + fragment_name;
@@ -382,7 +406,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
                     window.index_count, mvp, mesh.material, window.offset,
                     hud_graph.passes[0].vertex.empty() ? nullptr : hud_graph.passes[0].vertex.c_str(),
                     hud_graph.passes[0].fragment.empty() ? nullptr : hud_graph.passes[0].fragment.c_str(),
-                    float(mesh.alpha_ref) / 255.f, normal_rows))
+                    float(mesh.alpha_ref) / 255.f, normal_rows, 0, &mesh.matrices))
             {
                 if (error.empty()) error = "Vulkan HUD model geometry recording failed";
                 return false;
@@ -409,11 +433,12 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         if (!(transparent ? pass.record_transparent(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp,
                                 mesh.material, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
-                                nullptr, float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale) :
+                                nullptr, float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale,
+                                0, &mesh.matrices) :
                             pass.record_geometry(frame, vertex_buffer->handle(), mesh.indices.handle(), window.index_count, mvp, mesh.material,
                                 mesh.geometry.mode, window.offset, named ? vertex : nullptr, named ? fragment : nullptr,
                                 float(mesh.alpha_ref) / 255.f, normal_rows, mesh.detail_scale,
-                                mesh.environment ? camera : nullptr)))
+                                mesh.environment ? camera : nullptr, nullptr, 0, &mesh.matrices)))
         {
             error = "Vulkan model geometry recording failed";
             return false;

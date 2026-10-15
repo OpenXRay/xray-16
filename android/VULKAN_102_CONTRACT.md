@@ -4,7 +4,7 @@ This records the game-path subset of PDF tasks 1–11. `shaders.xr` is read thro
 the engine VFS. Every property keeps its serialized type, scope and bytes in
 `MaterialDefinition`; acceptance depends on its semantics and the consumer's
 context. An unfamiliar property, unsupported render priority, non-default
-base/detail matrix or a level tessellation selection fails with the
+base/detail matrix reference or a tessellation selection with missing data fails with the
 blender ID, class, version and shader name. A parsed definition alone is not
 proof that a level, model, particle or UI pipeline can render it.
 
@@ -14,9 +14,9 @@ All known classes retain `General/Priority` (default 1), `General/Strict sorting
 (default false), and `Base Texture/Name` and `Transform` (default `$base0`
 and `$null`). Priority 2/3 on an opaque level `V` material uses a secondary
 forward replacement pass; transparent level materials retain their forward
-path. Other non-default priorities and named base matrices are rejected by
-the current game pipeline when the original programmable blender consumes
-them. Programmable `S_SET` binds `C.L_textures[0]` and ignores its serialized
+path. Other non-default priorities are rejected where the render consumer cannot
+honor them. Named Base/Detail/Environment matrices are loaded from chunk 1
+of `shaders.xr` and evaluated for every draw. Programmable `S_SET` binds `C.L_textures[0]` and ignores its serialized
 `Base Texture/Name` and `Transform`; Vulkan preserves both fields and binds
 the texture supplied by the level, model, particle or UI consumer. The following are the additional properties read by
 the original class `Save`/`Load` methods. A property introduced by a newer
@@ -24,9 +24,9 @@ version is rejected if inserted into an older record, even if its value is 0.
 
 | Class | Accepted versions | Additional serialized properties and defaults |
 | --- | --- | --- |
-| `LM`, `V` | 0–1 | `Tessellation` since v1, token 0 (no tessellation) |
+| `LM`, `V` | 0–1 | `Tessellation` since v1, token 0–3 (none, PN, HM, PN+HM) |
 | `LM_AREF`, `V_AREF` | 0–1 | `Alpha ref` 32; `Alpha-blend` false since v1 |
-| `MODEL` | 0–2 | `Use alpha-channel` false and `Alpha ref` 32 since v1; `Tessellation` token 0–3 since v2. Nonzero is retained and validated; Vulkan follows the non-tessellated R2 CBlender_Model route. GPU PN/HM tessellation is pending in N3. |
+| `MODEL` | 0–2 | `Use alpha-channel` false and `Alpha ref` 32 since v1; `Tessellation` token 0–3 since v2. Nonzero subdivides the model on CPU, with PN curvature and/or auxiliary DDS height. |
 | `D_TREE` | 0–1 | `Alpha-blend` false; `Object LOD` false since v1 |
 | `D_STILL` | 0 | `Alpha-blend` false |
 | `BmmDold`, `BmmD`, `LmBmmD` | up to 3, 3, 1 respectively | `Detail map/Name` and `Transform` (`$null`); terrain `R2-R/G/B/A` slots in v3 |
@@ -39,10 +39,9 @@ The parser retains raw values and scopes for every property, including a
 matrix or priority whose execution is not supported in a given context. This closes the
 original PDF task 1's description and propagation contract on host: a
 serialized property never becomes an implicit default pipeline merely because
-its class/version is known. Implementing named animated matrices, a different
-render priority, tessellation and tree_s have separate N1–N3 tasks in
-`VULKAN_FINISH_LINE.md`, if their inputs are confirmed in the claimed support
-matrix. The Vulkan level consumer rejects nonzero tessellation, unsupported scene flag
+its class/version is known. Named animated matrices, render priority, PN/HM
+tessellation and tree_s retain separate N1–N3 acceptance criteria in
+`VULKAN_FINISH_LINE.md`. The Vulkan level consumer rejects invalid tessellation data, unsupported scene flag
 combinations, and unknown class properties with the exact class, version,
 shader and property path. Synthetic records test these rejection boundaries.
 `MaterialDefinition::pass` also preserves the resolved depth test/write,
@@ -54,10 +53,10 @@ the original property bytes remain available for diagnostics.
 | Blender family | Game path and texture roles | Game pass and limitations |
 | --- | --- | --- |
 | `LM`, `V`, `LM_AREF`, `V_AREF` | Base; LM also lightmap. Diffuse `.thm` detail and scale are used by opaque LM/V, cutout LM_AREF/V_AREF, and transparent variants with detail. | G-buffer opaque/cutout or depth-tested forward alpha for transparent detail. Bump-detail/normal uses the THM DDS pair and surface descriptor slots. |
-| `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. `D_TREE / Object LOD` selects the static `tree_s` vertex path. | G-buffer or forward by blender state; MODEL Tessellation 1–3 uses the original non-tessellated R2 route, and GPU tessellation is pending. |
-| `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. The four serialized `R2-*` slots are read for v3 `BmmD` as well as `BmmDold`; four `$null` slots leave the single-detail path available, whereas a partial set is rejected. v3 may serialize `Detail map / Name` and `Transform` together with four channels; the HQ `impl` shader reads the channels and ignores the single-detail name/matrix. The single-detail variant still rejects an unimplemented named matrix. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
-| `LmEbB`, `MODELEbB` | `LmEbB` uses base, lightmap and environment cube. Blended `MODELEbB` uses base and environment cube; opaque `MODELEbB` retains the serialized environment fields but the original R2 `uber_deffer("model", "base")` does not sample them. | Blended models use forward reflection; opaque models use the ordinary static/skinned model G-buffer with bump and surface channels. A named environment matrix is rejected only when its forward/reflection pass consumes it. |
-| `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix rejected. |
+| `D_TREE`, `D_STILL`, `MODEL` | Base, cutout threshold; standalone tree models select the two-sided variant by class. `D_TREE / Object LOD` selects the static `tree_s` vertex path. | G-buffer or forward by blender state; MODEL Tessellation 1–3 subdivides triangles with PN curvature and/or bump auxiliary height. Hardware tessellation stages are not used. |
+| `BmmDold`, `BmmD`, `LmBmmD` | Base, lightmap, explicit detail **or** terrain mask + R/G/B/A textures; `.thm` scale. The four serialized `R2-*` slots are read for v3 `BmmD` as well as `BmmDold`; four `$null` slots leave the single-detail path available, whereas a partial set is rejected. v3 may serialize `Detail map / Name` and `Transform` together with four channels; the HQ `impl` shader reads the channels and ignores the single-detail name/matrix. The single-detail variant applies its named detail matrix. | One G-buffer draw with detail binding 2 or four terrain bindings 3–6. R/G/B/A bump and bump# pairs contribute tangent normals, gloss and height. |
+| `LmEbB`, `MODELEbB` | `LmEbB` uses base, lightmap and environment cube. Blended `MODELEbB` uses base and environment cube; opaque `MODELEbB` retains the serialized environment fields but the original R2 `uber_deffer("model", "base")` does not sample them. | Blended models use forward reflection; opaque models use the ordinary static/skinned model G-buffer with bump and surface channels. A named environment matrix is applied when its forward/reflection pass consumes it. |
+| `LaEmB` | Base, lightmap, 2D environment, optional waveform constant. | Ordered G-buffer base, then multiply-2x with depth read/no write. Named matrix transforms the environment coordinates. |
 | `PARTICLE` | Base, clamp/wrap sampler by property. | Modes 0–5: set, alpha, add, multiply, multiply-2x, alpha-add. Mode 0 uses original fixed alpha reference 200. |
 | `S_SET` | Base, clamp/wrap sampler by property, including UI still images, sequences and OGM frames. | UI modes 0–9. World level and OGF models use explicit forward variants for `SET` (depth writing), source alpha, ADD, MUL, MUL_2X, ALPHA-ADD, wallmark MUL_2X and 2R/4R. Static and skinned OGF use separate `OBJECT_GEOMETRY` fragments, without level-only baked/lightmap inputs; HUD OGF has its own shader/pipeline pair and depth/blend states for modes 0–9. World geometry requires Z-test and compatible Z-write. World BLEND with Fog uses unlit fog color, while combinations whose flags cannot be honored report their property. OGF water and fog contexts remain rejected. Alpha reference is pushed for the applicable variants; SET 2R uses the original fixed reference 0. |
 

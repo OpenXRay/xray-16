@@ -63,7 +63,7 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     if (range.stageFlags & VK_SHADER_STAGE_VERTEX_BIT)
     {
         assert(range.stageFlags == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
-        assert(range.size == sizeof(float) * 32);
+        assert(range.size == sizeof(float) * 60);
         *output = info->setLayoutCount == 3 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
@@ -346,6 +346,14 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
     assert(layout == geometry_layout || layout == skinned_layout);
     if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
     {
+        if (offset == 128)
+        {
+            assert(size == sizeof(float) * 28);
+            const float* rows = static_cast<const float*>(data);
+            assert(rows[0] == 1.f && rows[5] == 1.f && rows[8] == 1.f &&
+                rows[13] == 1.f && rows[16] == 1.f && rows[21] == 1.f && rows[26] == 1.f);
+            return;
+        }
         if (offset == 96)
         {
             assert(size == sizeof(SurfaceParameters) &&

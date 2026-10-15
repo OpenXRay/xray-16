@@ -80,8 +80,8 @@ static void fill(Memory& memory, const Image& image, const std::array<float, 4>&
 }
 struct Vertex { float position[3], normal[3], uv[2], lightmap_uv[2], baked[4]; };
 struct Push { float mvp[16]; float threshold{}, scale{}; float padding[2]{};
-    float modes[4]{}, factors[4]{}, extra[4]{}; };
-static_assert(sizeof(Push) == 128);
+    float modes[4]{}, factors[4]{}, extra[4]{}, matrices[28]{}; };
+static_assert(sizeof(Push) == 240);
 static void near(float actual, float expected, const char* label)
 {
     if (std::abs(actual - expected) > .015f)
@@ -375,6 +375,7 @@ int main(int argc, char** argv)
             vkDestroyPipeline(device, pipeline, nullptr); return result;
         };
         Push push{}; for (int i = 0; i < 16; ++i) push.mvp[i] = (i % 5 == 0 ? 1.f : 0.f);
+        for (int index : {0, 5, 8, 13, 16, 21, 26}) push.matrices[index] = 1.f;
         push.scale = 1; push.modes[3] = 1; push.factors[1] = 1;
         auto flat_result = execute(flat, push);
         near(flat_result[0][0], pixels[0][0], "base.R");

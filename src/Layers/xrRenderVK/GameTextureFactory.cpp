@@ -509,6 +509,46 @@ float GameTextureFactory::terrain_detail_scale(const std::string& diffuse) const
     return scale;
 }
 
+bool GameTextureFactory::height_field(const std::string& bump_aux,
+    const HeightField*& result, std::string& error)
+{
+    result = nullptr;
+    string_path path;
+    if (!FS.exist(path, "$level$", bump_aux.c_str(), ".dds") &&
+        !FS.exist(path, "$game_textures$", bump_aux.c_str(), ".dds"))
+    { error = "HM auxiliary DDS not found: " + bump_aux; return false; }
+    const auto cached = height_fields_.find(path);
+    if (cached != height_fields_.end())
+    { result = &cached->second; error.clear(); return true; }
+    IReader* reader = FS.r_open(path);
+    if (!reader) { error = "HM auxiliary DDS cannot be opened: " + bump_aux; return false; }
+    DdsTexture decoded;
+    const bool valid = decode_dds(reader->pointer(), reader->length(), false, decoded, error);
+    FS.r_close(reader);
+    if (!valid) { error = "HM auxiliary DDS '" + bump_aux + "': " + error; return false; }
+    if (decoded.cube || decoded.extent.width > 4096 || decoded.extent.height > 4096 ||
+        decoded.copies.empty() ||
+        (decoded.format != VK_FORMAT_R8G8B8A8_UNORM &&
+         decoded.format != VK_FORMAT_R8G8B8A8_SRGB &&
+         decoded.format != VK_FORMAT_B8G8R8A8_UNORM &&
+         decoded.format != VK_FORMAT_B8G8R8A8_SRGB))
+    { error = "HM auxiliary DDS requires a 2D RGBA height channel"; return false; }
+    const size_t pixels = size_t(decoded.extent.width) * decoded.extent.height;
+    const size_t offset = size_t(decoded.copies.front().bufferOffset);
+    if (pixels > (decoded.pixels.size() - std::min(decoded.pixels.size(), offset)) / 4)
+    { error = "HM auxiliary DDS base mip is truncated"; return false; }
+    HeightField field;
+    field.width = decoded.extent.width; field.height = decoded.extent.height;
+    field.values.resize(pixels);
+    const size_t blue = decoded.format == VK_FORMAT_B8G8R8A8_UNORM ||
+        decoded.format == VK_FORMAT_B8G8R8A8_SRGB ? 0 : 2;
+    for (size_t i = 0; i < pixels; ++i)
+        field.values[i] = decoded.pixels[offset + i * 4 + blue];
+    result = &height_fields_.emplace(path, std::move(field)).first->second;
+    error.clear();
+    return true;
+}
+
 bool GameTextureFactory::texture_detail_metadata(const std::string& diffuse,
     DetailMetadata& detail, std::string& error) const
 {
@@ -811,6 +851,7 @@ void GameTextureFactory::destroy()
     assets_.clear();
     lightmapped_.clear();
     terrain_.clear();
+    height_fields_.clear();
     transient_id_ = 0;
     pending_.clear();
     states_ = {};

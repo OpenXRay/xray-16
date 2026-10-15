@@ -93,6 +93,7 @@ private:
         bool surface{};
         bool detail{};
         float detail_scale{1.f};
+        TextureMatrixSet matrices;
         bool tree_surface{};
         RenderPassGraph pass_graph;
     };

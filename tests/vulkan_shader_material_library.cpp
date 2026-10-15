@@ -108,6 +108,66 @@ static Bytes record(const char* cls, const char* name, bool blend, uint32_t alph
     return result;
 }
 
+static void animated_texture_matrices()
+{
+    Bytes table, records, file;
+    const auto add_matrix = [&](const char* name, uint32_t mode, uint32_t flags)
+    {
+        table.insert(table.end(), name, name + std::strlen(name) + 1);
+        write32(table, mode); write32(table, flags);
+        for (size_t i = 0; i < 5; ++i)
+        {
+            WaveForm wave;
+            wave.arg[0] = i == 0 ? 2.f : i == 1 ? 3.f : i == 3 ? .25f : 0.f;
+            const auto* begin = reinterpret_cast<const uint8_t*>(&wave);
+            table.insert(table.end(), begin, begin + sizeof(wave));
+        }
+    };
+    add_matrix("mod\\moving", 1, 5); // scale + scroll
+    add_matrix("mod\\reflection", 2, 0);
+    auto base = record("LM      ", "mod\\moving_base", false);
+    matrix_property(base, "Transform", "mod\\moving");
+    chunk(records, 1, base);
+    auto detail = record("BmmDold ", "mod\\moving_detail", false);
+    detail[172] = 3;
+    write32(detail, 0);
+    detail.insert(detail.end(), {'D','e','t','a','i','l',' ','m','a','p',0});
+    texture_property(detail, "Name", "mod\\sand");
+    matrix_property(detail, "Transform", "mod\\moving");
+    for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
+        texture_property(detail, channel, "$null");
+    chunk(records, 2, detail);
+    auto environment = record("MODELEbB", "mod\\moving_environment", true);
+    texture_property(environment, "Name", "mod\\sky");
+    matrix_property(environment, "Transform", "mod\\reflection");
+    chunk(records, 3, environment);
+    chunk(file, 1, table); chunk(file, 2, records);
+    IReader reader(file.data(), file.size());
+    ShaderMaterialLibrary library;
+    std::string error;
+    assert(library.load(reader, error));
+    for (const auto& [name, slot] : {std::pair<const char*, size_t>{"mod\\moving_base", 0},
+             {"mod\\moving_detail", 1}, {"mod\\moving_environment", 2}})
+    {
+        const auto* material = library.find(name);
+        assert(material && material->pipeline_supported && material->matrices.enabled[slot]);
+    }
+    const auto& moving = library.find("mod\\moving_base")->matrices.values[0];
+    const auto first = moving.evaluate(1.f, nullptr);
+    const auto second = moving.evaluate(2.f, nullptr);
+    assert(first[0][0] == 2.f && first[1][1] == 3.f &&
+        second[0][3] > first[0][3] && second[1][3] == first[1][3]);
+    const float view[16]{1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
+    const auto reflection = library.find("mod\\moving_environment")->matrices.values[2].evaluate(2.f, view);
+    assert(reflection[0][0] == .5f && reflection[0][3] == .5f &&
+        reflection[1][1] == -.5f && reflection[1][3] == .5f);
+    Bytes damaged;
+    table.pop_back();
+    chunk(damaged, 1, table); chunk(damaged, 2, records);
+    IReader bad(damaged.data(), damaged.size());
+    assert(!library.load(bad, error) && error.find("matrix table is truncated") != std::string::npos);
+}
+
 // Exhaust the five independently serialized S_SET flags for each mode and
 // consumer, including the contexts that must reject the same definition.
 static void screen_context_matrix()
@@ -280,6 +340,7 @@ static void particle_context_matrix()
 
 int main()
 {
+    animated_texture_matrices();
     screen_context_matrix();
     particle_context_matrix();
     Bytes list;
@@ -937,14 +998,14 @@ int main()
     matrix_property(one_channel_matrix, "Transform", "animated_single_detail");
     for (const char* channel : {"R2-R", "R2-G", "R2-B", "R2-A"})
         texture_property(one_channel_matrix, channel, "$null");
-    rejected_semantics(one_channel_matrix, 111, "mod\\one_channel_matrix", "named texture matrix");
+    rejected_semantics(one_channel_matrix, 111, "mod\\one_channel_matrix", "missing shaders.xr matrix");
     Bytes base_matrix = record("LM      ", "mod\\double_sided", false);
     write32(base_matrix, 1);
     base_matrix.insert(base_matrix.end(), {'T','r','a','n','s','f','o','r','m',0});
     const size_t matrix_value = base_matrix.size();
     base_matrix.resize(matrix_value + 64);
     std::memcpy(base_matrix.data() + matrix_value, "spin", 5);
-    rejected_semantics(base_matrix, 71, "mod\\double_sided", "named texture matrix");
+    rejected_semantics(base_matrix, 71, "mod\\double_sided", "missing shaders.xr matrix");
     Bytes base_selector = record("LM      ", "mod\\base_selector", false);
     replace_saved_string_property(base_selector, 3, "Name", "textures\\nondefault");
     rejected_semantics(base_selector, 112, "mod\\base_selector", "base texture selector");

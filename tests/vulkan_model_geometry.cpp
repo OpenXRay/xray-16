@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
+#include "src/Layers/xrRenderVK/ModelTessellation.h"
 #include "src/Layers/xrRenderVK/VulkanModelVisual.h"
 #include "src/Layers/xrRenderVK/VulkanVisual.h"
 
@@ -215,4 +216,36 @@ int main()
     assert(geometry.indices.size() == 6 && geometry.windows.size() == 2);
     assert(select_slide_window(geometry.windows, 1.f, geometry.indices.size()).index_count == 6);
     assert(select_slide_window(geometry.windows, 0.f, geometry.indices.size()).offset == 3);
+    ModelGeometry patch;
+    patch.vertices.resize(3);
+    patch.indices = {0,1,2,0,1,2};
+    patch.windows = {{0,6,3},{3,3,3}};
+    patch.vertices[0].position[0] = 0; patch.vertices[1].position[0] = 1;
+    patch.vertices[2].position[1] = 1;
+    patch.vertices[0].normal[0] = .6f;
+    for (auto& v : patch.vertices) v.normal[2] = .8f;
+    patch.vertices[1].uv[0] = 1; patch.vertices[2].uv[1] = 1;
+    patch.vertices[0].bones[0] = 3; patch.vertices[1].bones[0] = 4;
+    patch.vertices[2].bones[0] = 5;
+    HeightField heights{2,2,{255,255,255,255}};
+    ModelGeometry pn = patch, combined = patch;
+    assert(tessellate_model(pn, 1, nullptr, 1.f, error));
+    assert(tessellate_model(combined, 3, &heights, 1.f, error));
+    assert(pn.indices.size() == 24 && pn.vertices.size() == 12 &&
+        select_slide_window(pn.windows, 0.f, pn.indices.size()).offset == 12 &&
+        select_slide_window(pn.windows, 0.f, pn.indices.size()).index_count == 12);
+    assert(std::abs(pn.vertices[3].uv[0] - .5f) < 1e-5f);
+    assert(std::abs(pn.vertices[3].normal[2]) > .1f);
+    assert(std::abs(pn.vertices[3].weights[0] + pn.vertices[3].weights[1] - 1.f) < 1e-5f);
+    assert(std::abs(combined.vertices[0].position[2] - pn.vertices[0].position[2] - .4f) < 1e-5f);
+    LevelModel level_patch;
+    level_patch.vertices.resize(3);
+    level_patch.indices = {0,1,2};
+    for (auto& v : level_patch.vertices) v.normal[2] = 1;
+    level_patch.vertices[1].lightmap_uv[0] = 1;
+    level_patch.vertices[1].baked[0] = 0;
+    assert(tessellate_level(level_patch, 2, &heights, 1.f, error));
+    assert(level_patch.vertices.size() == 6 && level_patch.indices.size() == 12 &&
+        std::abs(level_patch.vertices[3].lightmap_uv[0] - .5f) < 1e-5f &&
+        std::abs(level_patch.vertices[3].baked[0] - .5f) < 1e-5f);
 }

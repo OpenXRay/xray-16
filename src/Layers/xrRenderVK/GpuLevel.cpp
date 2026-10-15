@@ -5,6 +5,7 @@
 #include "VulkanVisual.h"
 #include "SpecialVisuals.h"
 #include "SlidingWindows.h"
+#include "ModelTessellation.h"
 #include "xrEngine/device.h"
 #if defined(XR_PLATFORM_ANDROID)
 #include "xrEngine/x_ray.h"
@@ -215,7 +216,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         packing.reset();
         return true;
     };
-    const auto upload_mesh = [&](const LevelModel& model, Mesh& mesh) -> bool
+    const auto upload_mesh = [&](LevelModel& model, Mesh& mesh) -> bool
     {
         if (prepared.pending_.size() >= 128 &&
             !wait_for_buffer_uploads(device, pool, upload, prepared.pending_))
@@ -232,6 +233,18 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const auto& material = models.materials[model.material];
         mesh.material_id = model.material;
         mesh.shader = material.shader;
+        const auto tessellate = [&]() -> bool
+        {
+            if (!mesh.tessellation) return true;
+            const HeightField* height = nullptr;
+            if (mesh.tessellation & 2)
+            {
+                if (mesh.bump_mode < 2 || mesh.bump_texture.empty())
+                { error = "level HM tessellation requires a bump auxiliary texture"; return false; }
+                if (!textures.height_field(mesh.bump_texture + "#", height, error)) return false;
+            }
+            return tessellate_level(model, mesh.tessellation, height, mesh.bump_height, error);
+        };
         if (const auto cached = material_cache.find(model.material);
             cached != material_cache.end())
         {
@@ -258,10 +271,16 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.environment_constant = source.environment_constant;
             mesh.pass_graph = source.pass_graph;
             mesh.constant_waveforms = source.constant_waveforms;
+            mesh.matrices = source.matrices;
+            mesh.tessellation = source.tessellation;
+            mesh.bump_texture = source.bump_texture;
+            mesh.bump_mode = source.bump_mode;
+            mesh.bump_height = source.bump_height;
             mesh.terrain_scale = source.terrain_scale;
             mesh.water = source.water;
             mesh.glass = source.glass;
             prepared.has_water_ |= mesh.water;
+            if (!tessellate()) return false;
             if (packing.would_flush(model) && !flush_geometry()) return false;
             if (!packing.append(model, mesh.first_vertex, mesh.first_index, error)) return false;
             awaiting_batch.push_back(&mesh);
@@ -350,6 +369,11 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.environment = definition.class_name == "LmEbB   " || mesh.laemb;
         mesh.environment_constant = definition.has_environment_constant;
         mesh.constant_waveforms = definition.constant_waveforms;
+        mesh.matrices = definition.matrices;
+        mesh.tessellation = definition.tessellation;
+        mesh.bump_texture = metadata.bump_texture;
+        mesh.bump_mode = metadata.bump_mode;
+        mesh.bump_height = metadata.bump_height;
         mesh.lightmapped = !lightmap.empty();
         mesh.terrain = terrain.enabled;
         // The four-channel impl pass ignores the serialized Detail map/Name;
@@ -453,6 +477,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 material.shader + "' textures='" + material.textures + "': " + error;
             return false;
         }
+        if (!tessellate()) return false;
         if (packing.would_flush(model) && !flush_geometry())
         {
             error = "level material id=" + std::to_string(model.material) +
@@ -542,12 +567,15 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         }
         prepared.detail_meshes_.emplace_back();
         Mesh& mesh = prepared.detail_meshes_.back();
+        MaterialDefinition detail_definition;
         if (!textures.surface_mode(prototype.shader, prototype.texture, mesh.mode,
-                error, &mesh.alpha_ref))
+                error, &mesh.alpha_ref, nullptr, false, false, true, false,
+                nullptr, nullptr, &detail_definition))
         {
             error = "level.details / " + prototype.shader + ": " + error;
             return false;
         }
+        mesh.matrices = detail_definition.matrices;
         GameTextureFactory::DetailMetadata metadata;
         if (!textures.texture_detail_metadata(prototype.texture, metadata, error))
         {
@@ -916,7 +944,8 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
             if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                     buffer.index_count, mvp, mesh.material, mesh.mode, 0,
                     node.vertex.c_str(), node.fragment.c_str(),
-                    float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale)) return false;
+                    float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
+                    nullptr, nullptr, 0, &mesh.matrices)) return false;
         }
         return true;
     }
@@ -984,7 +1013,8 @@ bool GpuLevel::record_details(const FrameRecordingContext& frame, const Deferred
         if (!pass.record_geometry(frame, buffer.vertices.handle(), buffer.indices.handle(),
                 static_cast<uint32_t>(batch.indices.size()), mvp, mesh.material,
                 mesh.mode, 0, node.vertex.c_str(), node.fragment.c_str(),
-                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale)) return false;
+                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
+                nullptr, nullptr, 0, &mesh.matrices)) return false;
     }
     detail_signatures_[frame.frame_index] = signature;
     return true;
@@ -1087,7 +1117,8 @@ bool GpuLevel::record_transparent_detail(size_t draw_index, const FrameRecording
         if (!pass.record_transparent(frame, batch.vertices.handle(), batch.indices.handle(),
                 draw.count, mvp, mesh.material, draw.first,
                 node.vertex.c_str(), node.fragment.c_str(), &failure,
-                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale))
+                float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
+                0, &mesh.matrices))
         {
             Msg("! [renderer-vulkan] transparent detail shader='%s' texture='%s': %s",
                 details_.prototypes[draw.model].shader.c_str(),
@@ -1176,12 +1207,12 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
             mesh.glass ? -.35f : .72f, mesh.first_vertex) :
             transparent ? pass.record_transparent(frame, mesh.vertex_buffer(), mesh.index_buffer(),
             mesh.index_count, mvp, mesh.material, mesh.first_index, named ? vertex : nullptr, named ? fragment : nullptr,
-                &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex) :
+                &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex, &mesh.matrices) :
             pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                 mesh.index_count, mvp, mesh.material, mesh.mode, mesh.first_index,
                 named ? vertex : nullptr, named ? fragment : nullptr,
                 float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
-                mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex);
+                mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex, &mesh.matrices);
         const bool completed = recorded && (mesh.pass_graph.count < 2 ||
             pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                 mesh.index_count, mvp, mesh.material, mesh.mode, mesh.first_index,
@@ -1239,12 +1270,12 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
                 pass.record_transparent(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                     window.index_count, mvp, mesh.material, mesh.first_index + window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
-                    &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex) :
+                    &failure, float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale, mesh.first_vertex, &mesh.matrices) :
                 pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                     window.index_count, mvp, mesh.material, mesh.mode, mesh.first_index + window.offset,
                     named ? vertex : nullptr, named ? fragment : nullptr,
                     float(mesh.alpha_ref) / 255.f, nullptr, mesh.terrain_scale,
-                    mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex)))
+                    mesh.environment ? camera : nullptr, mesh.laemb ? factor : nullptr, mesh.first_vertex, &mesh.matrices)))
             {
                 report_visual_record_failure(index, visual.mesh, phase, mesh.water, window.index_count, lod, failure);
                 return false;
@@ -1291,7 +1322,7 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
         const Mesh& mesh = meshes_[mesh_index];
         return pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(),
             mesh.index_count, mvp, mesh.material, mesh.first_index, nullptr, nullptr,
-            0.f, nullptr, mesh.first_vertex);
+            0.f, nullptr, mesh.first_vertex, &mesh.matrices);
     }
     if (visual.mesh >= 0)
     {
@@ -1301,7 +1332,7 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
         if (!pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                 window.index_count, mvp, mesh.material, mesh.first_index + window.offset,
-                nullptr, nullptr, 0.f, nullptr, mesh.first_vertex)) return false;
+                nullptr, nullptr, 0.f, nullptr, mesh.first_vertex, &mesh.matrices)) return false;
     }
     for (uint32_t child : visual.children)
         if (!record_hud_visual(child, frame, pass, mvp, lod)) return false;

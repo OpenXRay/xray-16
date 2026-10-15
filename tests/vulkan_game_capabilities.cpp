@@ -25,7 +25,7 @@ void VKAPI_PTR formats(VkPhysicalDevice, VkFormat format, VkFormatProperties* ou
 int main()
 {
     VkPhysicalDeviceProperties properties{};
-    properties.limits.maxPushConstantsSize = 128;
+    properties.limits.maxPushConstantsSize = 256;
     properties.limits.maxColorAttachments = 3;
     properties.limits.maxImageDimension2D = 4096;
     properties.limits.maxPerStageDescriptorSamplers = 20;
@@ -49,6 +49,6 @@ int main()
     color_attachment = false;
     assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error));
     color_attachment = true;
-    properties.limits.maxPushConstantsSize = 64;
+    properties.limits.maxPushConstantsSize = 128;
     assert(!supports_game_formats(VK_NULL_HANDLE, formats, properties, error));
 }

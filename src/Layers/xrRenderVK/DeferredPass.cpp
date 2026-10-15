@@ -1,5 +1,8 @@
+#include "xrEngine/stdafx.h"
 #include "DeferredPass.h"
+#include "ShaderMaterialLibrary.h"
 #include "ModelGeometry.h"
+#include "xrEngine/device.h"
 #if defined(XR_PLATFORM_ANDROID)
 #include "xrEngine/x_ray.h"
 #endif
@@ -387,10 +390,9 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         VK_STEP("vkCreateDescriptorPool(deferred)", vk_.create_descriptor_pool(device, &pool, nullptr, &pool_));
     }
     {
-        // Cutout fragment shaders read a per-material alpha threshold after
-        // the camera matrix. Vulkan guarantees at least 128 push-constant bytes.
+        // Material UV transforms occupy bytes 128..239 in the fragment stage.
         const VkPushConstantRange camera{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0, sizeof(float) * 32};
+            0, sizeof(float) * 60};
         const VkPushConstantRange light{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(DeferredLight)};
         VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
         layout.pushConstantRangeCount = 1;
@@ -749,11 +751,34 @@ void DeferredPass::release_pose_descriptor(VkDescriptorSet& set)
     set = VK_NULL_HANDLE;
 }
 
+void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
+    VkPipelineLayout layout, const TextureMatrixSet* matrices) const
+{
+    // Seven float4 rows: base UV, detail UV, environment UV/direction.
+    float rows[28]{};
+    rows[0] = rows[5] = rows[8] = rows[13] = rows[16] = rows[21] = rows[26] = 1.f;
+    if (matrices)
+        for (size_t slot = 0; slot < 3; ++slot)
+        {
+            if (!matrices->enabled[slot]) continue;
+            const auto result = matrices->values[slot].evaluate(Device.fTimeGlobal,
+                reinterpret_cast<const float*>(&Device.mView));
+            const size_t first = slot == 0 ? 0 : slot == 1 ? 2 : 4;
+            for (size_t row = 0; row < (slot == 2 ? 3u : 2u); ++row)
+                std::copy(result[row].begin(), result[row].end(), rows + (first + row) * 4);
+            if (slot == 2 && matrices->values[slot].mode == 2)
+                rows[27] = 1.f; // sphere reflection uses the world normal
+        }
+    vk_.cmd_push_constants(frame.command_buffer, layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+        128, sizeof(rows), rows);
+}
+
 bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     VkDescriptorSet pose_set, SurfaceMode mode, bool hud, uint32_t first_index,
     const char* vertex_name, const char* fragment_name, float alpha_ref,
-    const float* normal_rows, float detail_scale, const float* environment_camera) const
+    const float* normal_rows, float detail_scale, const float* environment_camera,
+    const TextureMatrixSet* matrices) const
 {
     const auto* pair = game_pipeline(vertex_name, fragment_name);
     if (!pair || !pair->skinned || pair->mode != mode || pair->hud != hud ||
@@ -805,6 +830,7 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             skinned_layout_, 2, 1, &forward_sets_[frame.image_index], 0, nullptr);
     }
+    push_texture_matrices(frame, skinned_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -1079,7 +1105,8 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     SurfaceMode mode, uint32_t first_index, const char* vertex_name, const char* fragment_name,
     float alpha_ref, const float* normal_rows, float terrain_scale,
-    const float* environment_camera, const float* environment_factor, int32_t vertex_base) const
+    const float* environment_camera, const float* environment_factor, int32_t vertex_base,
+    const TextureMatrixSet* matrices) const
 {
     if (mode == SurfaceMode::Transparent) return false;
     VkPipeline pipeline = mode == SurfaceMode::AlphaTest ? alpha_test_ : geometry_;
@@ -1126,6 +1153,7 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
             vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
                 80, sizeof(float) * 4, environment_factor);
     }
+    push_texture_matrices(frame, geometry_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -1160,7 +1188,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name,
     const char** failure, float alpha_ref, const float* normal_rows, float detail_scale,
-    int32_t vertex_base) const
+    int32_t vertex_base, const TextureMatrixSet* matrices) const
 {
     const auto reject = [failure](const char* reason)
     {
@@ -1224,6 +1252,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             geometry_layout_, 1, 1, &forward_sets_[frame.image_index], 0, nullptr);
     }
+    push_texture_matrices(frame, geometry_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -1232,7 +1261,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
 bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material_set,
     uint32_t first_index, const char* vertex_name, const char* fragment_name, float alpha_ref,
-    const float* normal_rows, int32_t vertex_base) const
+    const float* normal_rows, int32_t vertex_base, const TextureMatrixSet* matrices) const
 {
     VkPipeline pipeline = hud_;
     if (vertex_name || fragment_name)
@@ -1270,6 +1299,7 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
             std::strstr(fragment_name, "hud_particle_screen_alpha_add.ps")))
         vk_.cmd_push_constants(frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
+    push_texture_matrices(frame, geometry_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;

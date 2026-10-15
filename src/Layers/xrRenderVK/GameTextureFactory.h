@@ -3,6 +3,7 @@
 #include "DeferredPass.h"
 #include "EngineTextureSource.h"
 #include "ShaderMaterialLibrary.h"
+#include "ModelTessellation.h"
 
 #include <unordered_map>
 #include <functional>
@@ -68,6 +69,8 @@ public:
     float terrain_detail_scale(const std::string& diffuse) const;
     bool texture_detail_metadata(const std::string& diffuse, DetailMetadata& detail,
         std::string& error) const;
+    bool height_field(const std::string& bump_aux, const HeightField*& result,
+        std::string& error);
     static bool decode_detail_metadata(const uint8_t* params, size_t params_size,
         const uint8_t* extension, size_t extension_size,
         DetailMetadata& detail, std::string& error)
@@ -122,6 +125,7 @@ public:
     void destroy();
 
 private:
+    std::unordered_map<std::string, HeightField> height_fields_;
     struct Asset
     {
         UploadedTexture texture;

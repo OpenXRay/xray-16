@@ -11,6 +11,32 @@
 
 namespace xray::render::vulkan
 {
+std::array<std::array<float, 4>, 3> TextureMatrix::evaluate(float time, const float* view) const
+{
+    std::array<std::array<float, 4>, 3> rows{{{{1, 0, 0, 0}}, {{0, 1, 0, 0}}, {{0, 0, 1, 0}}}};
+    if (mode == 1)
+    {
+        auto wave = waves;
+        const float angle = (tcm & 2) ? wave[2].Calculate(time) * time : 0.f;
+        const float su = (tcm & 1) ? wave[0].Calculate(time) : 1.f;
+        const float sv = (tcm & 1) ? wave[1].Calculate(time) : 1.f;
+        const float c = std::cos(angle), s = std::sin(angle);
+        rows[0][0] = su * c; rows[0][1] = -su * s;
+        rows[1][0] = sv * s; rows[1][1] = sv * c;
+        const float scroll_u = (tcm & 4) ? wave[3].Calculate(time) * time * su : 0.f;
+        const float scroll_v = (tcm & 4) ? wave[4].Calculate(time) * time * sv : 0.f;
+        rows[0][3] = .5f - .5f * (rows[0][0] + rows[0][1]) + scroll_u;
+        rows[1][3] = .5f - .5f * (rows[1][0] + rows[1][1]) + scroll_v;
+    }
+    else if (mode == 2 && view)
+    {
+        rows[0] = {{.5f * view[0], .5f * view[4], .5f * view[8], .5f}};
+        rows[1] = {{-.5f * view[1], -.5f * view[5], -.5f * view[9], .5f}};
+    }
+    // Reflection directions are already in world space in the Vulkan shaders.
+    // The legacy modeC_refl inverse-view therefore has no further effect.
+    return rows;
+}
 namespace
 {
 uint32_t le32(const uint8_t* p)
@@ -211,6 +237,34 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             { error = "shaders.xr duplicate constant='" + name + "'"; return false; }
         }
     }
+    std::unordered_map<std::string, TextureMatrix> matrices;
+    std::unique_ptr<IReader, void(*)(IReader*)> matrices_chunk(file.open_chunk(1),
+        [](IReader* p) { if (p) p->close(); });
+    if (matrices_chunk)
+    {
+        Cursor cursor{static_cast<const uint8_t*>(matrices_chunk->pointer()), matrices_chunk->length(), 0};
+        while (cursor.offset < cursor.size)
+        {
+            std::string name;
+            constexpr size_t matrix_bytes = 8 + 5 * sizeof(WaveForm);
+            if (!cursor.string(name) || name.empty() || cursor.size - cursor.offset < matrix_bytes)
+            { error = "shaders.xr matrix table is truncated"; return false; }
+            TextureMatrix matrix;
+            matrix.mode = le32(cursor.bytes + cursor.offset);
+            matrix.tcm = le32(cursor.bytes + cursor.offset + 4);
+            std::memcpy(matrix.waves.data(), cursor.bytes + cursor.offset + 8, 5 * sizeof(WaveForm));
+            cursor.offset += matrix_bytes;
+            if (matrix.mode > 4 || (matrix.tcm & ~7u))
+            { error = "shaders.xr matrix='" + name + "' has invalid mode/flags"; return false; }
+            for (const auto& wave : matrix.waves)
+                if (wave.F > WaveForm::fINVSAWTOOTH ||
+                    std::any_of(std::begin(wave.arg), std::end(wave.arg),
+                        [](float value) { return !std::isfinite(value); }))
+                { error = "shaders.xr matrix='" + name + "' has invalid waveform"; return false; }
+            if (!matrices.emplace(lower(name), matrix).second)
+            { error = "shaders.xr duplicate matrix='" + name + "'"; return false; }
+        }
+    }
     std::unique_ptr<IReader, void(*)(IReader*)> blenders(file.open_chunk(2), [](IReader* p) { if (p) p->close(); });
     if (!blenders) { error = "shaders.xr has no blender chunk"; return false; }
     // open_chunk_iterator trusts chunk lengths. Validate the entire table first
@@ -237,9 +291,15 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         if (!parse_record(static_cast<const uint8_t*>(record->pointer()), record->length(),
                 name, mode, supported, cls, version, alpha_ref, blending, screen_flags,
                 terrain, properties, error) || name.empty() ||
-            !entries_.emplace(name, MaterialDefinition{id, name, cls, version, mode, supported,
-                {}, alpha_ref, blending, screen_flags, {}, MaterialDefinition::Role::Standard,
-                terrain, {}, {}, {}, {}, {}, false, std::move(properties)}).second)
+            ![&]() {
+                MaterialDefinition entry;
+                entry.id = id; entry.shader = name; entry.class_name = cls;
+                entry.version = version; entry.mode = mode; entry.pipeline_supported = supported;
+                entry.alpha_ref = alpha_ref; entry.blending = blending;
+                entry.screen_flags = screen_flags; entry.terrain = terrain;
+                entry.properties = std::move(properties);
+                return entries_.emplace(name, std::move(entry)).second;
+            }())
         {
             if (error.empty()) error = "duplicate or empty shaders.xr blender name: " + name;
             error = "shaders.xr blender id=" + std::to_string(id) +
@@ -314,12 +374,6 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             {
                 definition.pipeline_supported = false;
                 definition.unsupported_reason = "Environment map / Name (required texture)";
-            }
-            if (definition.pipeline_supported && uses_environment &&
-                !definition.environment_transform.empty() && definition.environment_transform != "$null")
-            {
-                definition.pipeline_supported = false;
-                definition.unsupported_reason = "Environment map / Transform (animated matrix not implemented)";
             }
             if (definition.pipeline_supported && cls == "LaEmB   " &&
                 !definition.environment_constant.empty() && definition.environment_constant != "$null")
@@ -466,11 +520,8 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
                     listed |= le32(property.data.data() + first + size_t(item) * stride) == selected;
                 if (selected > 3 || !listed)
                     reject("invalid Tessellation token (expected NO_TESS/PN/HM/PN+HM)");
-                else if (selected != 0 && cls != "MODEL   ")
-                    reject("level tessellation variant is not implemented");
-                // CBlender_Model's R2 path never sets C.TessMethod (only R4
-                // does). Vulkan uses that R2 non-tessellated shader path;
-                // keep the selected token for a future R4-equivalent pass.
+                // The selected PN/HM mode is applied when level or OGF
+                // geometry is uploaded.
             }
             // The four-channel BmmD impl pass does not bind oT2_xform: it
             // samples R2-R/G/B/A with its terrain UV. The serialized detail
@@ -478,11 +529,25 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             // The programmable S_SET blender binds C.L_textures[0] and
             // ignores its saved Base Texture Name/Transform. Fixed-function
             // S_SET uses those fields, but Vulkan never runs that path.
-            if (name == "Transform" && ((scope == "Base Texture" && cls != "S_SET   ") ||
-                    (scope == "Detail map" && !terrain.enabled)) &&
-                property.type == 1 && property.data[0] &&
-                std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$null") != 0)
-                reject("named texture matrix is not implemented");
+            if (name == "Transform" && property.type == 1 && property.data[0])
+            {
+                const std::string matrix_name = lower(reinterpret_cast<const char*>(property.data.data()));
+                const bool consumed = (scope == "Base Texture" && cls != "S_SET   ") ||
+                    (scope == "Detail map" && !terrain.enabled) ||
+                    (scope == "Environment map" &&
+                        (cls != "MODELEbB" || mode == SurfaceMode::Transparent));
+                if (consumed && matrix_name != "$null")
+                {
+                    const auto found = matrices.find(matrix_name);
+                    if (found == matrices.end()) reject("missing shaders.xr matrix");
+                    else
+                    {
+                        const size_t slot = scope == "Base Texture" ? 0 : scope == "Detail map" ? 1 : 2;
+                        definition.matrices.values[slot] = found->second;
+                        definition.matrices.enabled[slot] = true;
+                    }
+                }
+            }
             if (name == "Name" && scope == "Base Texture" && cls != "S_SET   " &&
                 property.type == 3 && property.data[0] &&
                 std::strcmp(reinterpret_cast<const char*>(property.data.data()), "$base0") != 0)
