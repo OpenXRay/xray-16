@@ -141,6 +141,7 @@ jobs:
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
           brew install ccache cmake sdl2 lzo libogg libvorbis theora openal-soft jpeg-turbo
+          echo "OpenAL_ROOT=$(brew --prefix openal-soft)" >> "$GITHUB_ENV"
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
