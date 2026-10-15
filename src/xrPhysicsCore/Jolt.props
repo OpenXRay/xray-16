@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <XRayJoltBuild>$(SolutionDir)..\build\msbuild-jolt\$(Platform)</XRayJoltBuild>
+    <XRayJoltConfiguration>Release</XRayJoltConfiguration>
+    <XRayJoltConfiguration Condition="$(Configuration.Contains('Debug'))">Debug</XRayJoltConfiguration>
+    <XRayJoltSource Condition="'$(XRayJoltSource)'==''">$(XRayJoltBuild)\_deps\jolt-src</XRayJoltSource>
+    <XRayJoltSourceOption Condition="Exists('$(XRayJoltSource)\Jolt\Jolt.h')">-DFETCHCONTENT_SOURCE_DIR_JOLT=&quot;$(XRayJoltSource)&quot;</XRayJoltSourceOption>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(XRayJoltBuild)\JoltProject\xray-mesh-query\include;$(XRayJoltSource);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JPH_DISABLE_CUSTOM_ALLOCATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Precise</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(XRayJoltBuild)\lib\$(XRayJoltConfiguration)\Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="BuildNativeJoltDependency" BeforeTargets="ClCompile" Condition="'$(MSBuildProjectName)'=='xrPhysicsCore'">
+    <Exec Command="cmake -S &quot;$(xrExternals)Jolt-proj\windows&quot; -B &quot;$(XRayJoltBuild)&quot; -A $(Platform) $(XRayJoltSourceOption)" />
+    <Exec Command="cmake --build &quot;$(XRayJoltBuild)&quot; --config $(XRayJoltConfiguration) --target Jolt --parallel" />
+  </Target>
+</Project>

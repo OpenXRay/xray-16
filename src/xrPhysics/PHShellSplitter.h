@@ -1,15 +1,15 @@
 #pragma once
 
 #include "PHDefs.h"
-
 #include "PHFracture.h"
 #include "PHUpdateObject.h"
-class CPHShellSplitter;
 
+class CPHShellSplitter;
 class CPHShell;
-class CODEGeom;
-using id_geom = std::pair<u16, CODEGeom*>;
-using GEOM_MAP = xr_map<u16, CODEGeom*>;
+class CPhysicsGeom; // Изменено с CODEGeom
+
+using id_geom = std::pair<u16, CPhysicsGeom*>;
+using GEOM_MAP = xr_map<u16, CPhysicsGeom*>;
 
 class CPHShellSplitter
 {
@@ -35,24 +35,24 @@ private:
 using SPLITTER_STORAGE = xr_vector<CPHShellSplitter>;
 using SPLITTER_RI = xr_vector<CPHShellSplitter>::reverse_iterator;
 
-class CPHShellSplitterHolder : public CPHUpdateObject // call all Fractures and Breakable Joints Updates
+class CPHShellSplitterHolder : public CPHUpdateObject
 {
     friend class CPHShell;
     bool m_has_breaks;
     bool m_unbreakable;
-    CPHShell* m_pShell; // purpose: to extract elements and joints corresponded splitters
-    SPLITTER_STORAGE m_splitters; //
-    GEOM_MAP m_geom_root_map; // to find geom pointer by bone id
-    virtual void PhTune(dReal step); // call fractures PhTune for element splitters
-    // m_pShell->m_elements[m_splitters[i]->m_element]->m_pFracturesHolder->PhTune()
-    virtual void PhDataUpdate(dReal step); // call fractures PhDataUpdate for element splitters
-    // m_pShell->m_elements[m_splitters[i]->m_element]->m_pFracturesHolder->PhDataUpdate()
-    bool CheckSplitter(u16 aspl); //
-    shell_root SplitJoint(u16 aspl); // create new shell moving into it departed elements and joints
+    CPHShell* m_pShell;
+    SPLITTER_STORAGE m_splitters;
+    GEOM_MAP m_geom_root_map;
+
+    virtual void PhTune(float step); // Заменен dReal на float
+    virtual void PhDataUpdate(float step); // Заменен dReal на float
+
+    bool CheckSplitter(u16 aspl);
+    shell_root SplitJoint(u16 aspl);
     shell_root ElementSingleSplit(const element_fracture& split_elem, const CPHElement* source_element);
-    void SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_shels); //
+    void SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_shels);
     void PassEndSplitters(const CShellSplitInfo& spl_inf, CPHShell* dest, u16 jt_add_shift, u16 el_add_shift);
-    void InitNewShell(CPHShell* shell); // inits new active shell
+    void InitNewShell(CPHShell* shell);
 
 public:
     CPHShellSplitterHolder(CPHShell* shell);
