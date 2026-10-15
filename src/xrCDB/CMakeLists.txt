@@ -28,6 +28,8 @@ target_sources_grouped(
     Intersect.hpp
     stdafx.h
     StdAfx.cpp
+    ModelTree.cpp
+    ModelTree.h
     xrCDB.cpp
     xrCDB.h
     xrCDB_box.cpp
@@ -54,6 +56,7 @@ target_link_libraries(xrCDB
 target_compile_definitions(xrCDB
     PRIVATE
     XRCDB_EXPORTS
+    BAN_OPCODE_AUTOLINK
 )
 
 set_target_properties(xrCDB PROPERTIES
@@ -69,4 +72,10 @@ if (BUILD_SHARED_LIBS)
     install(TARGETS xrCDB LIBRARY
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
+endif()
+
+option(XRAY_BUILD_CDB_TESTS "Build OPCODE collision and cache regression checks" OFF)
+if (XRAY_BUILD_CDB_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
 endif()

@@ -5,6 +5,7 @@
 
 using namespace CDB;
 using namespace Opcode;
+using IceMaths::Point;
 
 //! This macro quickly finds the min & max values among 3 variables
 #define FINDMINMAX(x0, x1, x2, min, max)\
@@ -275,8 +276,8 @@ public:
             return;
 
         // 1st chield
-        if (node->HasLeaf())
-            _prim(node->GetPrimitive());
+        if (node->HasPosLeaf())
+            _prim(node->GetPosPrimitive());
         else
             _stab(node->GetPos());
 
@@ -288,8 +289,8 @@ public:
         }
 
         // 2nd chield
-        if (node->HasLeaf2())
-            _prim(node->GetPrimitive2());
+        if (node->HasNegLeaf())
+            _prim(node->GetNegPrimitive());
         else
             _stab(node->GetNeg());
     }

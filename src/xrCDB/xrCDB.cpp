@@ -6,10 +6,7 @@
 #include "xrCDB.h"
 #include "xrCore/Threading/Lock.hpp"
 
-namespace Opcode
-{
-#include "OPCODE/OPC_TreeBuilders.h"
-} // namespace Opcode
+
 
 using namespace CDB;
 using namespace Opcode;
@@ -60,7 +57,7 @@ void MODEL::build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc, vo
     }
     else
     {
-        Threading::SpawnThread("CDB-construction", [&, this]
+        Threading::SpawnThread("CDB-construction", [this, V, Vcnt, T, Tcnt, bc, bcp]
         {
             ScopeLock lock{ pcs };
             build_internal(V, Vcnt, T, Tcnt, bc, bcp);
@@ -102,43 +99,8 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
     // Release data pointers
     status = S_BUILD;
 
-    // Allocate temporary "OPCODE" tris + convert tris to 'pointer' form
-    u32* temp_tris = xr_alloc<u32>(tris_count * 3);
-    if (0 == temp_tris)
-    {
-        xr_free(verts);
-        xr_free(tris);
-        return;
-    }
-    u32* temp_ptr = temp_tris;
-    for (u32 i = 0; i < tris_count; i++)
-    {
-        *temp_ptr++ = tris[i].verts[0];
-        *temp_ptr++ = tris[i].verts[1];
-        *temp_ptr++ = tris[i].verts[2];
-    }
-
-    // Build a non quantized no-leaf tree
-    OPCODECREATE OPCC;
-    OPCC.NbTris = tris_count;
-    OPCC.NbVerts = verts_count;
-    OPCC.Tris = (unsigned*)temp_tris;
-    OPCC.Verts = (Point*)verts;
-    OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
-    OPCC.NoLeaf = true;
-    OPCC.Quantized = false;
-
-    tree = xr_new<OPCODE_Model>();
-    if (!tree->Build(OPCC))
-    {
-        xr_free(verts);
-        xr_free(tris);
-        xr_free(temp_tris);
-        return;
-    };
-
-    // Free temporary tris
-    xr_free(temp_tris);
+    tree = xr_new<ModelTree>();
+    R_ASSERT2(tree->Build(verts, verts_count, tris, tris_count), "Invalid collision geometry");
 }
 
 void MODEL::load_geom(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt)
@@ -174,7 +136,10 @@ bool MODEL::serialize(pcstr fileName, serialize_callback callback /*= nullptr*/)
 {
     ZoneScoped;
 
-    IWriter* wstream = FS.w_open(fileName);
+    syncronize();
+
+    const xr_string cacheName = xr_string(fileName) + ".opcode13";
+    IWriter* wstream = FS.w_open(cacheName.c_str());
     if (!wstream)
         return false;
 
@@ -209,9 +174,18 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
 {
     ZoneScoped;
 
+    const xr_string cacheName = xr_string(fileName) + ".opcode13";
+    fileName = cacheName.c_str();
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)
         return false;
+
+
+    if (rstream->elapsed() < static_cast<intptr_t>(sizeof(u32)))
+    {
+        FS.r_close(rstream);
+        return false;
+    }
 
     // 1. Check that model's source file didn't changed
     if (model_crc32 != rstream->r_u32())
@@ -228,20 +202,30 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
     }
 
     // 3. Check MODEL's integrity and load it
-    const u32 modelCrc = rstream->r_u32();
-
-    const auto integrityPointer = rstream->pointer();
-    verts_count = rstream->r_u32();
-    tris_count = rstream->r_u32();
-
-    const size_t vertsSize = static_cast<size_t>(verts_count) * sizeof(Fvector);
-    const size_t trisSize = static_cast<size_t>(tris_count) * sizeof(TRI);
-    const size_t treeSize = sizeof(verts_count) + sizeof(tris_count) + vertsSize + trisSize;
-    if (treeSize > rstream->elapsed())
+    if (rstream->elapsed() < static_cast<intptr_t>(3 * sizeof(u32)))
     {
         FS.r_close(rstream);
         return false;
     }
+    const u32 modelCrc = rstream->r_u32();
+
+    const auto integrityPointer = rstream->pointer();
+    const u32 vertexCount = rstream->r_u32();
+    const u32 triangleCount = rstream->r_u32();
+    const size_t remaining = rstream->elapsed();
+    if (vertexCount < 4 || triangleCount < 2 || vertexCount > remaining / sizeof(Fvector))
+    {
+        FS.r_close(rstream);
+        return false;
+    }
+    const size_t vertsSize = static_cast<size_t>(vertexCount) * sizeof(Fvector);
+    if (triangleCount > (remaining - vertsSize) / sizeof(TRI))
+    {
+        FS.r_close(rstream);
+        return false;
+    }
+    const size_t trisSize = static_cast<size_t>(triangleCount) * sizeof(TRI);
+    const size_t treeSize = sizeof(vertexCount) + sizeof(triangleCount) + vertsSize + trisSize;
 
     const u32 actualModelCrc = skipCrc32Check ? modelCrc : crc32(integrityPointer, treeSize);
     if (modelCrc != actualModelCrc)
@@ -254,9 +238,11 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
     xr_free(tris);
     xr_delete(tree);
 
+    verts_count = vertexCount;
+    tris_count = triangleCount;
     verts = xr_alloc<Fvector>(verts_count);
     tris = xr_alloc<TRI>(tris_count);
-    tree = xr_new<OPCODE_Model>();
+    tree = xr_new<ModelTree>();
 
     CopyMemory(verts, rstream->pointer(), vertsSize);
     rstream->advance(vertsSize);
@@ -264,8 +250,7 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
     CopyMemory(tris, rstream->pointer(), trisSize);
     rstream->advance(trisSize);
 
-    // 4. Load the OPCODE tree
-    const bool success = tree->Load(rstream);
+    const bool success = tree->Load(rstream, tris_count, true, skipCrc32Check);
     if (success)
         status = S_READY;
 
@@ -279,10 +264,11 @@ void MODEL::deserialize_tree(IReader* rstream)
 
     xr_delete(tree);
 
-    tree = xr_new<OPCODE_Model>();
+    tree = xr_new<ModelTree>();
 
     // Load the OPCODE tree
-    const bool success = tree->Load(rstream, true, false);
+    const bool restored = tree->Load(rstream, tris_count, false, true);
+    const bool success = restored || tree->Build(verts, verts_count, tris, tris_count);
     if (success)
         status = S_READY;
 }
@@ -296,7 +282,7 @@ size_t MODEL::memory()
     }
     size_t V = static_cast<size_t>(verts_count) * sizeof(Fvector);
     size_t T = static_cast<size_t>(tris_count) * sizeof(TRI);
-    return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
+    return V + T + sizeof(*this) + (tree ? tree->GetUsedBytes() + sizeof(*tree) : 0);
 }
 
 COLLIDER::~COLLIDER() { r_free(); }
