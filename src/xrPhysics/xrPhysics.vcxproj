@@ -22,7 +22,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_USRDLL;XRPHYSICS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(xrExternals)ode/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FloatingPointModel Condition="'$(Platform)'=='x64'">Precise</FloatingPointModel>
       <DisableSpecificWarnings Condition="'$(PlatformShortName)'=='x86'">4756;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -34,10 +34,8 @@
     <ClCompile Include="ActorCameraCollision.cpp" />
     <ClCompile Include="collisiondamagereceiver.cpp" />
     <ClCompile Include="console_vars.cpp" />
-    <ClCompile Include="dcylinder\dCylinder.cpp" />
     <ClCompile Include="debug_output.cpp" />
     <ClCompile Include="DisablingParams.cpp" />
-    <ClCompile Include="dRayMotions.cpp" />
     <ClCompile Include="ElevatorState.cpp" />
     <ClCompile Include="ExtendedGeom.cpp" />
     <ClCompile Include="Geometry.cpp" />
@@ -56,16 +54,13 @@
     <ClCompile Include="PHCommander.cpp" />
     <ClCompile Include="PHContactBodyEffector.cpp" />
     <ClCompile Include="PHDisabling.cpp" />
-    <ClCompile Include="PHDynamicData.cpp" />
     <ClCompile Include="PHElement.cpp" />
     <ClCompile Include="PHElementNetState.cpp" />
     <ClCompile Include="PHFracture.cpp" />
     <ClCompile Include="PHGeometryOwner.cpp" />
     <ClCompile Include="PHInterpolation.cpp" />
-    <ClCompile Include="PHIsland.cpp" />
     <ClCompile Include="PHJoint.cpp" />
     <ClCompile Include="PHJointDestroyInfo.cpp" />
-    <ClCompile Include="PHMoveStorage.cpp" />
     <ClCompile Include="PHObject.cpp" />
     <ClCompile Include="PHScriptCall.cpp" />
     <ClCompile Include="PHShell.cpp" />
@@ -89,29 +84,17 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dcTriListCollider.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dSortTriPrimitive.cpp" />
-    <ClCompile Include="tri-colliderknoopc\dTriBox.cpp" />
-    <ClCompile Include="tri-colliderknoopc\dTriCallideK.cpp" />
-    <ClCompile Include="tri-colliderknoopc\dTriCylinder.cpp" />
-    <ClCompile Include="tri-colliderknoopc\dTriList.cpp" />
-    <ClCompile Include="tri-colliderknoopc\dTriSphere.cpp" />
     <ClCompile Include="xrPhysics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="ActorCameraCollision.h" />
     <ClInclude Include="BlockAllocator.h" />
-    <ClInclude Include="CalculateTriangle.h" />
     <ClInclude Include="console_vars.h" />
     <ClInclude Include="CycleConstStorage.h" />
     <ClInclude Include="DamageSource.h" />
-    <ClInclude Include="dcylinder\dCylinder.h" />
     <ClInclude Include="debug_output.h" />
     <ClInclude Include="DisablingParams.h" />
-    <ClInclude Include="dRayMotions.h" />
     <ClInclude Include="ElevatorState.h" />
     <ClInclude Include="ExtendedGeom.h" />
     <ClInclude Include="Geometry.h" />
@@ -127,11 +110,8 @@
     <ClInclude Include="IPHWorld.h" />
     <ClInclude Include="IPhysicsShellHolder.h" />
     <ClInclude Include="MathUtils.h" />
-    <ClInclude Include="MathUtilsOde.h" />
     <ClInclude Include="matrix_utils.h" />
     <ClInclude Include="MovementBoxDynamicActivate.h" />
-    <ClInclude Include="ode_include.h" />
-    <ClInclude Include="ode_redefine.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="PHActivationShape.h" />
     <ClInclude Include="PHActorCharacter.h" />
@@ -152,11 +132,9 @@
     <ClInclude Include="PHGeometryOwner.h" />
     <ClInclude Include="PHImpact.h" />
     <ClInclude Include="PHInterpolation.h" />
-    <ClInclude Include="PHIsland.h" />
     <ClInclude Include="PHItemList.h" />
     <ClInclude Include="PHJoint.h" />
     <ClInclude Include="PHJointDestroyInfo.h" />
-    <ClInclude Include="PHMoveStorage.h" />
     <ClInclude Include="PHObject.h" />
     <ClInclude Include="PHReqComparer.h" />
     <ClInclude Include="PHScriptCall.h" />
@@ -178,22 +156,8 @@
     <ClInclude Include="PhysicsShell.h" />
     <ClInclude Include="PhysicsShellAnimator.h" />
     <ClInclude Include="PhysicsShellAnimatorBoneData.h" />
-    <ClInclude Include="ph_valid_ode.h" />
     <ClInclude Include="SpaceUtils.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="tri-colliderknoopc\dcTriangle.h" />
-    <ClInclude Include="tri-colliderknoopc\dcTriListCollider.h" />
-    <ClInclude Include="tri-colliderknoopc\dSortTriPrimitive.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriBox.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriCollideK.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriColliderCommon.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriColliderMath.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriCylinder.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriList.h" />
-    <ClInclude Include="tri-colliderknoopc\dTriSphere.h" />
-    <ClInclude Include="tri-colliderknoopc\dxTriList.h" />
-    <ClInclude Include="tri-colliderknoopc\TriPrimitiveCollideClassDef.h" />
-    <ClInclude Include="tri-colliderknoopc\__aabb_tri.h" />
     <ClInclude Include="xrPhysics.h" />
   </ItemGroup>
   <ItemGroup>
@@ -215,8 +179,8 @@
     <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)ODE.vcxproj">
-      <Project>{1bf75feb-87dd-486c-880b-227987d191c2}</Project>
+    <ProjectReference Include="..\xrPhysicsCore\xrPhysicsCore.vcxproj">
+      <Project>{F40D703E-EB12-4E8B-BF21-233F2FCF570E}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>

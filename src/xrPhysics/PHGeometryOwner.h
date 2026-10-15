@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Geometry.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
-using GEOM_STORAGE = xr_vector<CODEGeom*>;
+using GEOM_STORAGE = xr_vector<CPhysicsGeom*>;
 using GEOM_I = GEOM_STORAGE::iterator;
 using GEOM_CI = GEOM_STORAGE::const_iterator;
 
@@ -12,84 +13,80 @@ class IKinematics;
 class CPHGeometryOwner
 {
 protected:
-    GEOM_STORAGE m_geoms; // e
-    // bl
+    GEOM_STORAGE m_geoms;
     bool b_builded;
+    BodyHandle m_native_body_handle = INVALID_BODY_HANDLE;
+    u32 m_native_shape_revision = 0;
 
-private:
-    dSpaceID m_group; // e					//bl
 protected:
-    Fvector m_mass_center; // e ??				//bl
-    IPhysicsShellHolder* m_phys_ref_object; //->to shell ??		//bl
-    float m_volume; // e ??				//bl
-    u16 ul_material; // e ??				//bl
-    ContactCallbackFun* contact_callback; //->to shell ??		//bt
-    ObjectContactCallbackFun* object_contact_callback; //->to shell ??		//st
+    Fvector m_mass_center;
+    IPhysicsShellHolder* m_phys_ref_object;
+    float m_volume;
+    u16 ul_material;
+    ObjectContactCallbackFun* contact_callback;
+    ObjectContactCallbackFun* object_contact_callback;
+
 public:
-    ///
-    void add_Sphere(const Fsphere& V); // aux
-    void add_Box(const Fobb& V); // aux
-    void add_Cylinder(const Fcylinder& V); // aux
-    void add_Shape(const SBoneShape& shape); // aux
-    void add_Shape(const SBoneShape& shape, const Fmatrix& offset); // aux
-    CODEGeom* last_geom()
+    void add_Sphere(const Fsphere& V);
+    void RebuildNativeShape();
+    u32 NativeShapeRevision() const { return m_native_shape_revision; }
+    void add_Box(const Fobb& V);
+    void add_Cylinder(const Fcylinder& V);
+    void add_Shape(const SBoneShape& shape);
+    void add_Shape(const SBoneShape& shape, const Fmatrix& offset);
+    CPhysicsGeom* last_geom()
     {
         if (m_geoms.empty())
-            return NULL;
+            return nullptr;
         return m_geoms.back();
-    } // aux
+    }
     bool has_geoms() { return !m_geoms.empty(); }
-    void add_geom(CODEGeom* g);
-    void remove_geom(CODEGeom* g);
-
-protected:
-    void group_add(CODEGeom& g);
-    void group_remove(CODEGeom& g);
+    void add_geom(CPhysicsGeom* g);
+    void remove_geom(CPhysicsGeom* g);
 
 public:
-    void set_ContactCallback(ContactCallbackFun* callback); // aux (may not be)
-    void set_ObjectContactCallback(ObjectContactCallbackFun* callback); // called anywhere ph state influent
-    void add_ObjectContactCallback(ObjectContactCallbackFun* callback); // called anywhere ph state influent
-    void remove_ObjectContactCallback(ObjectContactCallbackFun* callback); // called anywhere ph state influent
+    void set_ContactCallback(ObjectContactCallbackFun* callback);
+    void set_ObjectContactCallback(ObjectContactCallbackFun* callback);
+    void add_ObjectContactCallback(ObjectContactCallbackFun* callback);
+    void remove_ObjectContactCallback(ObjectContactCallbackFun* callback);
+
     void set_CallbackData(void* cd);
     void* get_CallbackData();
     ObjectContactCallbackFun* get_ObjectContactCallback();
-    void set_PhysicsRefObject(IPhysicsShellHolder* ref_object); // aux
-    IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; } // aux
+    void set_PhysicsRefObject(IPhysicsShellHolder* ref_object);
+    IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; }
     void SetPhObjectInGeomData(CPHObject* O);
 #ifdef DEBUG
     void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
     void SetMaterial(u16 m);
-    void SetMaterial(LPCSTR m) { SetMaterial(GMLib.GetMaterialIdx(m)); } // aux
-    IC CODEGeom* Geom(u16 num)
+    void SetMaterial(LPCSTR m) { SetMaterial(GMLib.GetMaterialIdx(m)); }
+    IC u16 Material() const { return ul_material; }
+    IC CPhysicsGeom* Geom(u16 num)
     {
         R_ASSERT2(num < m_geoms.size(), "out of range");
         return m_geoms[num];
     }
-    IC const CODEGeom* Geom(u16 num) const
+    IC const CPhysicsGeom* Geom(u16 num) const
     {
         R_ASSERT2(num < m_geoms.size(), "out of range");
         return m_geoms[num];
     }
-    CODEGeom* GeomByBoneID(u16 bone_id);
-    u16 numberOfGeoms() const; // aux
-    dGeomID dSpacedGeometry();
+    CPhysicsGeom* GeomByBoneID(u16 bone_id);
+    u16 numberOfGeoms() const;
 
-protected:
-    IC dSpaceID group_space() { return m_group; }
 public:
-    Fvector get_mc_data(); // aux
-    Fvector get_mc_geoms(); // aux
+    Fvector get_mc_data();
+    Fvector get_mc_geoms();
     void get_mc_kinematics(IKinematics* K, Fvector& mc, float& mass);
-    void calc_volume_data(); // aux
-    const Fvector& local_mass_Center() { return m_mass_center; } // aux
+    void calc_volume_data();
+    const Fvector& local_mass_Center() { return m_mass_center; }
     float get_volume()
     {
         calc_volume_data();
         return m_volume;
-    }; // aux
-    void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const; // aux
+    };
+    void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const;
     void get_MaxAreaDir(Fvector& dir);
     float getRadius();
     void setStaticForm(const Fmatrix& form);
@@ -100,25 +97,21 @@ public:
 
 protected:
     void build();
-    void CreateGroupSpace();
-    void DestroyGroupSpace();
     void destroy();
-    void build_Geom(CODEGeom& V); // aux
+    void build_Geom(CPhysicsGeom& V);
     void build_Geom(u16 i);
-    void set_body(dBodyID body);
+    void set_body(CharacterVirtualHandle body);
 
     CPHGeometryOwner();
     virtual ~CPHGeometryOwner();
-
-private:
 };
 
 template <typename geometry_type>
 void t_get_extensions(
     const xr_vector<geometry_type*>& geoms, const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext)
 {
-    lo_ext = dInfinity;
-    hi_ext = -dInfinity;
+    lo_ext = FLT_MAX;
+    hi_ext = -FLT_MAX;
     auto i = geoms.begin(), e = geoms.end();
     for (; i != e; ++i)
     {

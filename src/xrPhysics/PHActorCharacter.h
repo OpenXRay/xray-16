@@ -9,21 +9,24 @@ struct SPHCharacterRestrictor
     SPHCharacterRestrictor(ERestrictionType Ttype)
     {
         m_type = Ttype;
-        m_character = NULL;
-        m_restrictor = NULL;
-        m_restrictor_transform = NULL;
+        m_character = nullptr;
+        m_restrictor = nullptr;
+        m_restrictor_transform = nullptr;
         m_restrictor_radius = 0.1f;
     }
     ~SPHCharacterRestrictor() { Destroy(); };
+
     CPHCharacter* m_character;
     ERestrictionType m_type;
 
-    dGeomID m_restrictor;
-    dGeomID m_restrictor_transform;
+    CPhysicsGeom* m_restrictor;
+    CPhysicsGeom* m_restrictor_transform;
     float m_restrictor_radius;
+    float m_restrictor_height = 0;
+
     void SetObjectContactCallback(ObjectContactCallbackFun* callback);
     void SetMaterial(u16 material);
-    void Create(CPHCharacter* ch, dVector3 sizes);
+    void Create(CPHCharacter* ch, Fvector sizes);
     void Destroy(void);
     void SetPhysicsRefObject(IPhysicsShellHolder* ref_object);
     void SetRadius(float r);
@@ -33,28 +36,28 @@ template <ERestrictionType Ttype>
 struct TPHCharacterRestrictor : public SPHCharacterRestrictor
 {
     TPHCharacterRestrictor() : SPHCharacterRestrictor(Ttype) {}
-    void Create(CPHCharacter* ch, dVector3 sizes)
+    void Create(CPHCharacter* ch, Fvector sizes)
     {
-        dGeomUserDataSetObjectContactCallback(m_restrictor, RestrictorCallBack);
+        // В оригинале здесь назначался коллбек на геометрию.
+        // Предполагается, что CPhysicsGeom имеет соответствующий метод.
+        if (m_restrictor)
+            m_restrictor->set_contact_cb(RestrictorCallBack);
     }
-    static void RestrictorCallBack(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+
+    static void RestrictorCallBack(
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2
+    )
     {
         do_colide = false;
-        dBodyID b1 = dGeomGetBody(c.geom.g1);
-        dBodyID b2 = dGeomGetBody(c.geom.g2);
-        if (!(b1 && b2))
-            return;
-        dxGeomUserData* ud1 = retrieveGeomUserData(c.geom.g1);
-        dxGeomUserData* ud2 = retrieveGeomUserData(c.geom.g2);
-        if (!(ud1 && ud2))
+        if (!my_geom || !oposite_geom)
             return;
 
-        CPHObject* o1 = NULL;
-        if (ud1)
-            o1 = ud1->ph_object;
-        CPHObject* o2 = NULL;
-        if (ud2)
-            o2 = ud2->ph_object;
+        CPHObject* o1 = my_geom->ph_object;
+        CPHObject* o2 = oposite_geom->ph_object;
+
         if (!(o1 && o2))
             return;
         if (o1->CastType() != CPHObject::tpCharacter || o2->CastType() != CPHObject::tpCharacter)
@@ -65,30 +68,27 @@ struct TPHCharacterRestrictor : public SPHCharacterRestrictor
 
         if (bo1)
         {
-            ch1->ChooseRestrictionType(Ttype, c.geom.depth, ch2);
+            ch1->ChooseRestrictionType(rtStalker, ch2);
             do_colide = ch2->TouchRestrictor(Ttype);
         }
         else
         {
-            ch2->ChooseRestrictionType(Ttype, c.geom.depth, ch1);
+            ch2->ChooseRestrictionType(rtStalker, ch1);
             do_colide = ch1->TouchRestrictor(Ttype);
         }
     }
 };
+
 using RESRICTORS_V = xr_vector<SPHCharacterRestrictor*>;
 using RESTRICTOR_I = RESRICTORS_V::iterator;
 
-// typedef SPHCharacterRestrictor*		RESRICTORS_V[2];
-// typedef SPHCharacterRestrictor**	RESTRICTOR_I;
 IC RESTRICTOR_I begin(RESRICTORS_V& v)
 {
-    // return v;
     return v.begin();
 }
 
 IC RESTRICTOR_I end(RESRICTORS_V& v)
 {
-    // return v+sizeof(RESRICTORS_V)/sizeof(SPHCharacterRestrictor*);
     return v.end();
 }
 
@@ -109,15 +109,17 @@ public:
     virtual CPHActorCharacter* CastActorCharacter() { return this; }
     virtual void SetObjectContactCallback(ObjectContactCallbackFun* callback);
     virtual void SetMaterial(u16 material);
-    virtual void Create(dVector3 sizes);
+    virtual void Create(Fvector sizes);
     virtual void Destroy(void);
     virtual void SetPhysicsRefObject(IPhysicsShellHolder* ref_object);
     virtual void SetAcceleration(Fvector accel);
     virtual void Disable();
     virtual void Jump(const Fvector& jump_velocity);
-    virtual void InitContact(dContact* c, bool& do_collide, u16 material_idx_1, u16 material_idx_2);
+    virtual void InitContact(bool& do_collide, bool bo1, float depth, CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom, u16 material_idx_1, u16 material_idx_2);
     virtual void SetRestrictorRadius(ERestrictionType rtype, float r);
-    virtual void ChooseRestrictionType(ERestrictionType my_type, float my_depth, CPHCharacter* ch);
+    virtual void ChooseRestrictionType(ERestrictionType my_type, CPHCharacter* ch);
+    CPhysicsGeom* NativeRestrictionGeometry(CPHCharacter* other);
+
     CPHActorCharacter(bool single_game);
     virtual ~CPHActorCharacter(void);
 
@@ -125,7 +127,7 @@ private:
     virtual void ValidateWalkOn();
     bool CanJump();
     virtual void update_last_material();
-    virtual void PhTune(dReal step);
+    virtual void PhTune(float step);
 
 private:
     void ClearRestrictors();

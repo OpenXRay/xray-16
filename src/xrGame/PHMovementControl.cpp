@@ -8,7 +8,6 @@
 #include "xrPhysics/IPHCapture.h"
 #include "xrPhysics/IPhysicsShellHolder.h"
 #include "xrPhysics/ElevatorState.h"
-#include "xrPhysics/CalculateTriangle.h"
 #include "xrPhysics/IColisiondamageInfo.h"
 #include "xrPhysics/phvalide.h"
 #include "xrPhysics/PhysicsShell.h"
@@ -121,11 +120,7 @@ void CPHMovementControl::ApplyImpulse(const Fvector& dir, const float P)
     VERIFY(m_character);
     if (fis_zero(P))
         return;
-    Fvector force;
-    force.set(dir);
-    force.mul(P / fixed_step);
 
-    AddControlVel(force);
     m_character->ApplyImpulse(dir, P);
 }
 void CPHMovementControl::SetVelocityLimit(float val)
@@ -570,7 +565,6 @@ void CPHMovementControl::PathNearestPoint(const xr_vector<DetailPathManager::STr
 
     if (m_path_distance == phInfinity) // after whall path
     {
-        R_ASSERT2(after_line, "Must be after line");
         vtemp.sub(new_position, path[i].position);
         m_path_distance = vtemp.magnitude();
         SetPathDir(dir);
@@ -665,7 +659,6 @@ void CPHMovementControl::PathNearestPointFindUp(const xr_vector<DetailPathManage
 
     if (m_path_distance == phInfinity && i == m_path_size - 1)
     {
-        R_ASSERT2(after_line, "Must be after line");
         vtemp.sub(new_position, path[i].position);
         m_path_distance = vtemp.magnitude();
         SetPathDir(dir);
@@ -752,7 +745,6 @@ void CPHMovementControl::PathNearestPointFindDown(const xr_vector<DetailPathMana
 
     if (m_path_distance == phInfinity && i == 1)
     {
-        R_ASSERT2(after_line, "Must be after line");
         vtemp.sub(new_position, path[i].position);
         m_path_distance = vtemp.magnitude();
         SetPathDir(dir);
@@ -1201,7 +1193,8 @@ void CPHMovementControl::SetMaterial(u16 material)
 }
 void CPHMovementControl::CreateCharacter()
 {
-    dVector3 size = {aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1};
+    Fvector size;
+    size.set(aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1);
     m_character->Create(size);
     m_character->SetMaterial(m_material);
     m_character->SetAirControlFactor(fAirControlParam);
@@ -1249,7 +1242,8 @@ void CPHMovementControl::ActivateBox(u32 id, BOOL Check /*false*/)
     aabb.set(boxes[id]);
     if (!m_character || !m_character->b_exist)
         return;
-    dVector3 size = {aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1};
+    Fvector size;
+    size.set(aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1);
     m_character->SetBox(size);
     // Fvector v;
     // m_character->GetVelocity(v);
@@ -1264,9 +1258,11 @@ void CPHMovementControl::InterpolateBox(u32 id, float k)
         return;
     if (!m_character || !m_character->b_exist)
         return;
-    dVector3 size = {aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1};
-    dVector3 to_size = {boxes[id].x2 - boxes[id].x1, boxes[id].y2 - boxes[id].y1, boxes[id].z2 - boxes[id].z1};
-    dVectorInterpolate(size, to_size, k);
+    Fvector size;
+    size.set(aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1);
+    Fvector to_size;
+    to_size.set(boxes[id].x2 - boxes[id].x1, boxes[id].y2 - boxes[id].y1, boxes[id].z2 - boxes[id].z1);
+    size.lerp(size, to_size, k);
     m_character->SetBox(size);
 }
 void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHitType hit_type)
@@ -1283,7 +1279,8 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
         case ALife::eHitTypeShock:; // stop
         case ALife::eHitTypeStrike:; // stop
         case ALife::eHitTypeWound:
-            SetVelocity(Fvector().set(0, 0, 0));
+            if (fis_zero(P))
+                SetVelocity(Fvector().set(0, 0, 0));
             break; // stop							;
         case ALife::eHitTypeLightBurn:; // not stop
         case ALife::eHitTypeRadiation:; // not stop
@@ -1299,8 +1296,14 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
         }
     }
     // hit
-    if (hit_type == ALife::eHitTypeExplosion || hit_type == ALife::eHitTypeWound)
+    if (hit_type == ALife::eHitTypeExplosion ||
+        hit_type == ALife::eHitTypeWound ||
+        hit_type == ALife::eHitTypeStrike ||
+        hit_type == ALife::eHitTypePhysicStrike ||
+        hit_type == ALife::eHitTypeShock)
+    {
         ApplyImpulse(dir, P);
+    }
 }
 
 void CPHMovementControl::SetFrictionFactor(float f) { m_character->FrictionFactor() = f; }
@@ -1341,7 +1344,8 @@ bool CPHMovementControl::BorderTraceCallback(collide::rq_result& result, LPVOID 
     if (mtl->Flags.test(SGameMtl::flInjurious))
     {
         Fvector tri_norm;
-        GetNormal(T, tri_norm, Level().ObjectSpace.GetStaticVerts());
+        Fvector* V_array = Level().ObjectSpace.GetStaticVerts();
+        tri_norm.mknormal(V_array[T->verts[0]], V_array[T->verts[1]], V_array[T->verts[2]]);
         if (p.m_dir.dotproduct(tri_norm) < 0.f)
             p.m_movement->in_dead_area_count++;
         else
@@ -1402,7 +1406,7 @@ void CPHMovementControl::UpdateObjectBox(CPHCharacter* ach)
     R *= poses_dir.dotproduct(plane_cam); //(poses_dir.x*plane_cam.x+poses_dir.y*plane_cam.z);
     Calculate(Fvector().set(0, 0, 0), Fvector().set(1, 0, 0), 0, 0, 0, 0);
     m_character->SetObjectRadius(R);
-    ach->ChooseRestrictionType(rtStalker, 1.f, m_character);
+    ach->ChooseRestrictionType(rtStalker, m_character);
     m_character->UpdateRestrictionType(ach);
 }
 

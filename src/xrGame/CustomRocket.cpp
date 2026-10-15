@@ -8,8 +8,6 @@
 #include "ParticlesObject.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrPhysics/CalculateTriangle.h"
-#include "xrPhysics/tri-colliderknoopc/dcTriangle.h"
 
 #include "Level.h"
 #include "xrMessages.h"
@@ -182,104 +180,49 @@ void CCustomRocket::create_physic_shell()
 
 #pragma warning(push)
 
-// XXX: maybe update ODE to a newer version
 // The warning happens on line 241: l_pMYU->last_pos[0] != -dInfinity
 #pragma warning(disable : 4756)
 
 void CCustomRocket::ObjectContactCallback(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
     do_colide = false;
+    if (!bo1) { std::swap(my_geom, oposite_geom); std::swap(material_1, material_2); }
 
-    dxGeomUserData* l_pUD1 = NULL;
-    dxGeomUserData* l_pUD2 = NULL;
-    l_pUD1 = PHRetrieveGeomUserData(c.geom.g1);
-    l_pUD2 = PHRetrieveGeomUserData(c.geom.g2);
+    if (!my_geom)
+        return;
 
-    SGameMtl* material = 0;
-    CCustomRocket* l_this = l_pUD1 ? smart_cast<CCustomRocket*>(l_pUD1->ph_ref_object) : NULL;
-    Fvector vUp;
+    // В Jolt my_geom указывает на геометрию нашего объекта
+    IPhysicsShellHolder* holder = my_geom->ph_ref_object;
+    CCustomRocket* l_this = smart_cast<CCustomRocket*>(holder);
+
     if (!l_this)
-    {
-        l_this = l_pUD2 ? smart_cast<CCustomRocket*>(l_pUD2->ph_ref_object) : NULL;
-        vUp.invert(*(Fvector*)&c.geom.normal);
-
-        // if(dGeomGetClass(c.geom.g1)==dTriListClass)
-        //	material=GMLib.GetMaterialByIdx((u16)c.surface.mode);
-        // else
-        //	material=GMLib.GetMaterialByIdx(l_pUD2->material);
-        material = material_1;
-    }
-    else
-    {
-        vUp.set(*(Fvector*)&c.geom.normal);
-
-        // if(dGeomGetClass(c.geom.g2)==dTriListClass)
-        //	material=GMLib.GetMaterialByIdx((u16)c.surface.mode);
-        // else
-        //	material=GMLib.GetMaterialByIdx(l_pUD1->material);
-        material = material_2;
-    }
-    VERIFY(material);
-    if (material->Flags.is(SGameMtl::flPassable))
         return;
 
-    if (!l_this || l_this->m_contact.contact)
+    // Проверяем простреливаемость материала
+    SGameMtl* material = material_2;
+    if (material && material->Flags.is(SGameMtl::flPassable))
         return;
 
-    CGameObject* l_pOwner = l_pUD1 ? smart_cast<CGameObject*>(l_pUD1->ph_ref_object) : NULL;
-    if (!l_pOwner || l_pOwner == (CGameObject*)l_this)
-        l_pOwner = l_pUD2 ? smart_cast<CGameObject*>(l_pUD2->ph_ref_object) : NULL;
+    if (l_this->m_contact.contact)
+        return;
+
+    // Ищем владельца того, с чем столкнулись
+    IPhysicsShellHolder* owner_holder = oposite_geom ? oposite_geom->ph_ref_object : nullptr;
+    CGameObject* l_pOwner = owner_holder ? smart_cast<CGameObject*>(owner_holder) : nullptr;
+
+    // Ракета не должна взрываться об того, кто ее выпустил
     if (!l_pOwner || l_pOwner != l_this->m_pOwner)
     {
         if (l_this->m_pOwner)
         {
-            Fvector l_pos;
-            l_pos.set(l_this->Position());
-            dxGeomUserData* l_pMYU = bo1 ? l_pUD1 : l_pUD2;
-            VERIFY(l_pMYU);
-            if (l_pMYU->last_pos[0] != -dInfinity)
-                l_pos = cast_fv(l_pMYU->last_pos);
-#ifdef DEBUG
-            bool corrected_pos = false;
-#endif
-            if (!l_pUD1 || !l_pUD2)
-            {
-                dGeomID g = NULL;
-                dxGeomUserData*& l_pUD = l_pUD1 ? l_pUD1 : l_pUD2;
-                if (l_pUD1)
-                    g = c.geom.g1;
-                else
-                    g = c.geom.g2;
-
-                if (l_pUD->pushing_neg)
-                {
-                    Fvector velocity;
-                    l_this->PHGetLinearVell(velocity);
-                    if (velocity.square_magnitude() > EPS)
-                    { //. desync?
-                        velocity.normalize();
-                        Triangle neg_tri;
-                        CalculateTriangle(l_pUD->neg_tri, g, neg_tri, Level().ObjectSpace.GetStaticVerts());
-                        float cosinus = velocity.dotproduct(*((Fvector*)neg_tri.norm));
-                        VERIFY(_valid(neg_tri.dist));
-                        float dist = neg_tri.dist / cosinus;
-                        velocity.mul(dist * 1.1f);
-                        l_pos.sub(velocity);
-#ifdef DEBUG
-                        corrected_pos = true;
-//.	DBG_OpenCashedDraw();
-//.	const Fvector*	 V_array	= Level().ObjectSpace.GetStaticVerts();
-//.	DBG_DrawTri(neg_tri.T, V_array, color_xrgb(255,255,0));
-//.	DBG_ClosedCashedDraw(50000);
-#endif
-                    }
-                }
-            }
-#ifdef DEBUG
-            if (ph_dbg_draw_mask.test(phDbgDrawExplosionPos))
-                DBG_DrawPoint(l_pos, 0.05f, color_xrgb(255, 255, (!corrected_pos) * 255));
-#endif
+            // Берем готовую позицию контакта из Jolt, больше никаких CalculateTriangle!
+            Fvector l_pos = contact_pos;
+            Fvector vUp = contact_normal;
+            if (!bo1) vUp.invert();
 
             l_this->Contact(l_pos, vUp);
 
@@ -292,9 +235,6 @@ void CCustomRocket::ObjectContactCallback(
             l_this->m_pPhysicsShell->set_ApplyByGravity(false);
             l_this->setEnabled(FALSE);
         }
-    }
-    else
-    {
     }
 }
 #pragma warning(pop)

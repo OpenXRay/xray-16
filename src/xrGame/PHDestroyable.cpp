@@ -105,6 +105,8 @@ void CPHDestroyable::InitServerObject(CSE_Abstract* D)
 void CPHDestroyable::PhysicallyRemoveSelf()
 {
     CPhysicsShellHolder* obj = PPhysicsShellHolder();
+    if (!obj)
+        return;
 
     CActor* A = smart_cast<CActor*>(obj);
     if (A)
@@ -113,9 +115,10 @@ void CPHDestroyable::PhysicallyRemoveSelf()
     }
     else
     {
-        // obj->PPhysicsShell()->PureStep();
-        obj->PPhysicsShell()->Disable();
-        obj->PPhysicsShell()->DisableCollision();
+        if (obj->PPhysicsShell())
+        {
+            obj->PPhysicsShell()->Deactivate();
+        }
     }
 
     obj->setVisible(FALSE);
@@ -128,7 +131,6 @@ void CPHDestroyable::PhysicallyRemovePart(CPHDestroyableNotificate* dn)
     CPhysicsShell* s = sh->PPhysicsShell();
     sh->setVisible(FALSE);
     sh->setEnabled(FALSE);
-    s->Disable();
     s->DisableCollision();
 }
 
@@ -288,22 +290,25 @@ void CPHDestroyable::NotificatePart(CPHDestroyableNotificate* dn)
     for (u16 i = 0; i < new_el_number; ++i)
     {
         CPhysicsElement* e = new_shell->get_ElementByStoreOrder(i);
+        Fvector mc;
+        mc.set(e->mass_Center());
         float random_hit = random_min * e->getMass();
-        if (m_fatal_hit.is_valide() && m_fatal_hit.bone() != BI_NONE)
+        if (m_fatal_hit.is_valide())
         {
-            Fvector pos;
-            Fmatrix m;
-            m.set(own_K->LL_GetTransform(m_fatal_hit.bone()));
-            m.mulA_43(PPhysicsShellHolder()->XFORM());
-            m.transform_tiny(pos, m_fatal_hit.bone_space_position());
+            Fvector pos = mc;
+            if (m_fatal_hit.bone() != BI_NONE && own_K->LL_BoneCount() > m_fatal_hit.bone())
+            {
+                Fmatrix m;
+                m.set(own_K->LL_GetTransform(m_fatal_hit.bone()));
+                m.mulA_43(PPhysicsShellHolder()->XFORM());
+                m.transform_tiny(pos, m_fatal_hit.bone_space_position());
+            }
             e->applyImpulseVsGF(pos, m_fatal_hit.direction(), m_fatal_hit.phys_impulse() * imp_transition_factor);
             random_hit += random_hit_imp * m_fatal_hit.phys_impulse();
         }
         Fvector rnd_dir;
         rnd_dir.random_dir();
         e->applyImpulse(rnd_dir, random_hit);
-        Fvector mc;
-        mc.set(e->mass_Center());
 
         // dVector3 res_lvell;
         // dBodyGetPointVel(own_body,mc.x,mc.y,mc.z,res_lvell);

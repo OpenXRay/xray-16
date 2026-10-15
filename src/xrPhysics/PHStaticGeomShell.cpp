@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "PHStaticGeomShell.h"
-#include "SpaceUtils.h"
 
 #include "IPhysicsShellHolder.h"
 #include "PHCharacter.h"
@@ -10,23 +9,55 @@
 #include "PHCollideValidator.h"
 #include "xrEngine/xr_object.h"
 #include "xrCore/Animation/Bone.hpp"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
 void CPHStaticGeomShell::get_spatial_params()
 {
-    Fvector AABB;
-    spatialParsFromDGeom(dSpacedGeometry(), spatial.sphere.P, AABB, spatial.sphere.R);
+    if (!m_geoms.empty() && m_geoms.front()->get_body() != INVALID_CHARACTER_VIRTUAL_HANDLE)
+    {
+        Fvector extents;
+        GetPhysicsCore()->GetBodyAABB(m_geoms.front()->get_body(), spatial.sphere.P, extents);
+
+        spatial.sphere.R = extents.magnitude();
+        AABB.set(extents);
+    }
+    else
+    {
+        spatial.sphere.P.set(0.f, 0.f, 0.f);
+        spatial.sphere.R = EPS_L;
+        AABB.set(EPS_L, EPS_L, EPS_L);
+    }
 }
 
-void CPHStaticGeomShell::PhDataUpdate(dReal step)
+void CPHStaticGeomShell::PhDataUpdate(float step)
 {
-    Island().Step(step);
-    Island().Unmerge();
+    // Jolt Physics handles islands and sleeping states internally. ODE manual unmerge removed.
     PhysicsRefObject()->enable_notificate();
     CPHUpdateObject::Deactivate();
 }
+
 void CPHStaticGeomShell::Activate(const Fmatrix& form)
 {
+    get_mc_data();
     build();
+    xr_vector<PhysicsShapeHandle> shapes;
+    xr_vector<Fmatrix> transforms;
+    for (auto* geometry : m_geoms) {
+        shapes.push_back(geometry->geometry());
+        Fmatrix local;
+        geometry->get_local_form(local);
+        local.c.sub(m_mass_center);
+        transforms.push_back(local);
+    }
+    const auto shape = GetPhysicsCore()->CreateCompoundShape(shapes.data(), transforms.data(), shapes.size());
+    R_ASSERT(shape);
+    m_native_body = GetPhysicsCore()->CreateStaticBody(shape, m_mass_center);
+    GetPhysicsCore()->DestroyCDBModel(shape);
+    R_ASSERT(m_native_body != INVALID_BODY_HANDLE);
+    GetPhysicsCore()->SetBodyObjectLayer(m_native_body, 5);
+    GetPhysicsCore()->SetBodyUserData(m_native_body, this);
+    set_body(m_native_body);
+    SetPhObjectInGeomData(this);
     setStaticForm(form);
     get_spatial_params();
     spatial_register();
@@ -36,11 +67,16 @@ void CPHStaticGeomShell::Deactivate()
 {
     spatial_unregister();
     CPHUpdateObject::Deactivate();
+    GetPhysicsCore()->DestroyBody(m_native_body);
+    m_native_body = INVALID_BODY_HANDLE;
+    set_body(INVALID_BODY_HANDLE);
     destroy();
 }
 
 CPHStaticGeomShell::CPHStaticGeomShell() { spatial.type |= STYPE_PHYSIC; }
+
 void cb(CBoneInstance* B) {}
+
 void P_BuildStaticGeomShell(CPHStaticGeomShell* pUnbrokenObject, IPhysicsShellHolder* obj,
     ObjectContactCallbackFun* object_contact_callback, const Fobb& b)
 {
@@ -48,10 +84,10 @@ void P_BuildStaticGeomShell(CPHStaticGeomShell* pUnbrokenObject, IPhysicsShellHo
     pUnbrokenObject->Activate(obj->ObjectXFORM());
 
     pUnbrokenObject->set_PhysicsRefObject(obj);
-    // m_pUnbrokenObject->SetPhObjectInGeomData(m_pUnbrokenObject);
     pUnbrokenObject->set_ObjectContactCallback(object_contact_callback);
     CPHCollideValidator::SetNonDynamicObject(*pUnbrokenObject);
 }
+
 CPHStaticGeomShell* P_BuildStaticGeomShell(
     IPhysicsShellHolder* obj, ObjectContactCallbackFun* object_contact_callback, const Fobb& b)
 {
@@ -63,25 +99,19 @@ CPHStaticGeomShell* P_BuildStaticGeomShell(
 IPHStaticGeomShell* P_BuildStaticGeomShell(IPhysicsShellHolder* obj, ObjectContactCallbackFun* object_contact_callback)
 {
     Fobb b;
-    // IRenderVisual* V=obj->ObjectVisual();
-    // R_ASSERT2(V,"need visual to build");
     IKinematics* K = obj->ObjectKinematics();
     R_ASSERT2(K, "need visual to build");
-    K->CalculateBones(TRUE); //. bForce - was TRUE
+    K->CalculateBones(TRUE);
 
-    // V->getVisData().box.getradius	(b.m_halfsize);
     K->GetBox().getradius(b.m_halfsize);
 
     b.xform_set(Fidentity);
     CPHStaticGeomShell* pUnbrokenObject = P_BuildStaticGeomShell(obj, object_contact_callback, b);
 
-    // IKinematics* K=smart_cast<IKinematics*>(V); VERIFY(K);
     K->CalculateBones(TRUE);
     for (u16 k = 0; k < K->LL_BoneCount(); k++)
     {
         K->LL_GetBoneInstance(k).set_callback(bctPhysics, cb, K->LL_GetBoneInstance(k).callback_param(), TRUE);
-        // K->LL_GetBoneInstance(k).Callback_overwrite = TRUE;
-        // K->LL_GetBoneInstance(k).Callback = cb;
     }
     return pUnbrokenObject;
 }
@@ -93,10 +123,9 @@ void DestroyStaticGeomShell(IPHStaticGeomShell*& UnbrokenObject)
     CPHStaticGeomShell* gs = static_cast<CPHStaticGeomShell*>(UnbrokenObject);
     gs->Deactivate();
     xr_delete(gs);
-    UnbrokenObject = 0;
+    UnbrokenObject = nullptr;
 }
 
-class IClimableObject;
 class CPHLeaderGeomShell : public CPHStaticGeomShell
 {
     IClimableObject* m_pClimable;
@@ -109,13 +138,14 @@ public:
 IPHStaticGeomShell* P_BuildLeaderGeomShell(IClimableObject* obj, ObjectContactCallbackFun* callback, const Fobb& b)
 {
     CPHLeaderGeomShell* pStaticShell = xr_new<CPHLeaderGeomShell>(obj);
-    P_BuildStaticGeomShell(smart_cast<CPHStaticGeomShell*>(pStaticShell), smart_cast<IPhysicsShellHolder*>(obj), 0, b);
+    P_BuildStaticGeomShell(smart_cast<CPHStaticGeomShell*>(pStaticShell), smart_cast<IPhysicsShellHolder*>(obj), nullptr, b);
     pStaticShell->SetMaterial(obj->Material());
     pStaticShell->set_ObjectContactCallback(callback);
     return pStaticShell;
 }
 
 CPHLeaderGeomShell::CPHLeaderGeomShell(IClimableObject* climable) { m_pClimable = climable; }
+
 void CPHLeaderGeomShell::near_callback(CPHObject* obj)
 {
     if (obj && obj->CastType() == CPHObject::tpCharacter)

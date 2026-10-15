@@ -1,11 +1,11 @@
 #pragma once
 
 class CPHMesh;
-class CODEGeom;
+class CPhysicsGeom;
 class CPHGeometryBits
 {
 public:
-    static void init_geom(CODEGeom& g);
+    static void init_geom(CPhysicsGeom& g);
     static void init_geom(CPHMesh& g);
-    static void set_ignore_static(CODEGeom& g);
+    static void set_ignore_static(CPhysicsGeom& g);
 };
