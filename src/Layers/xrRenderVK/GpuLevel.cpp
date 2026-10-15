@@ -247,16 +247,13 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             if (!tessellate_level(model, mesh.tessellation, height, mesh.bump_height, error))
                 return false;
 #if defined(XR_PLATFORM_ANDROID)
-            if (std::strstr(Core.Params, "-vk_export_shaders_xr"))
+            static bool reported[4]{};
+            if (mesh.tessellation < 4 && !reported[mesh.tessellation])
             {
-                static bool reported[4]{};
-                if (mesh.tessellation < 4 && !reported[mesh.tessellation])
-                {
-                    reported[mesh.tessellation] = true;
-                    Msg("[renderer-vulkan] N3.level-tess mode=%u shader='%s' material=%u triangles=%zu/%zu height=%d",
-                        mesh.tessellation, mesh.shader.c_str(), mesh.material_id,
-                        before, model.indices.size() / 3, height ? 1 : 0);
-                }
+                reported[mesh.tessellation] = true;
+                Msg("[renderer-vulkan] N3.level-tess mode=%u shader='%s' material=%u triangles=%zu/%zu height=%d",
+                    mesh.tessellation, mesh.shader.c_str(), mesh.material_id,
+                    before, model.indices.size() / 3, height ? 1 : 0);
             }
 #endif
             return true;

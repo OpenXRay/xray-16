@@ -359,8 +359,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         const SlideWindow window = select_slide_window(mesh.geometry.windows, lod,
             mesh.geometry.indices.size());
 #if defined(XR_PLATFORM_ANDROID)
-        if (std::strstr(Core.Params, "-vk_export_shaders_xr") &&
-            (mesh.matrices.enabled[0] || mesh.matrices.enabled[1] || mesh.matrices.enabled[2]) &&
+        if ((mesh.matrices.enabled[0] || mesh.matrices.enabled[1] || mesh.matrices.enabled[2]) &&
             mesh.priority >= 2)
         {
             static u32 reported_frame = UINT32_MAX;

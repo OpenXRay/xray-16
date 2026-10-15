@@ -1,7 +1,10 @@
-# Device diagnostic for N1–N4 (APK 0.9.145)
+# Device diagnostic for N1–N4 (APK 0.9.146)
 
-The Android launcher already enables `-vk_export_shaders_xr`. The following
-bounded messages report observations, not a visual acceptance verdict:
+APK 0.9.145 accidentally gated N1–N4 messages behind `-vk_export_shaders_xr`,
+which the launcher does not enable by default. Absence of these messages in a
+0.9.145 log proves nothing about the four paths. APK 0.9.146 emits the following
+bounded messages without an extra launch flag. They report observations, not
+a visual acceptance verdict:
 
 | Finding | Log key | What the log can establish |
 | --- | --- | --- |

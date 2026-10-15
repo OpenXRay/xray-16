@@ -320,7 +320,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f,
             nullptr, 1.f, 0, &matrices_);
 #if defined(XR_PLATFORM_ANDROID)
-    if (recorded && deferred_set && std::strstr(Core.Params, "-vk_export_shaders_xr"))
+    if (recorded && deferred_set)
     {
         static bool reported = false;
         if (!reported)

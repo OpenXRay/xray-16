@@ -770,8 +770,7 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
 #if defined(XR_PLATFORM_ANDROID)
             // Sample the same named matrix twice during a real game session.
             // Logging every draw would both flood the file and change frame time.
-            if (matrices->values[slot].mode != 0 &&
-                std::strstr(Core.Params, "-vk_export_shaders_xr"))
+            if (matrices->values[slot].mode != 0)
             {
                 struct Sample
                 {

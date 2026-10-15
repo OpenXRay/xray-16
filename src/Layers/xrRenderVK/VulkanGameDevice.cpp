@@ -568,7 +568,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
     }
     sort_transparent_draws(draws);
 #if defined(XR_PLATFORM_ANDROID)
-    if (std::strstr(Core.Params, "-vk_export_shaders_xr") && Device.dwFrame % 300 == 0)
+    if (Device.dwFrame % 300 == 0)
     {
         size_t counts[4][3]{}; // priority 1..3: level, model, particle
         bool ordered = true;
