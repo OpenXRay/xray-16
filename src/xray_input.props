@@ -12,6 +12,7 @@
         $(xrExternals)luabind;
         $(xrExternals)imgui;
         $(xrExternals)tracy\public;
+        $(xrExternals)GameNetworkingSockets\include;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>

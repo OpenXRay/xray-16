@@ -2,11 +2,7 @@
 
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
-#if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#else // XXX: multiplayer on Linux
-#include "xrNetServer/empty/NET_Client.h"
-#endif
 #include "xrEngine/StatGraph.h"
 #include "xrMessages.h"
 #include "alife_space.h"
@@ -57,7 +53,7 @@ namespace file_transfer
 class client_site;
 }
 
-class CLevel : public IGame_Level, public IPureClient
+class CLevel : public IGame_Level, public NET_CLIENT_CLASS
 {
 public:
     struct AIStatistics
@@ -183,7 +179,7 @@ public:
 private:
     void OnSecureMessage(NET_Packet& P);
     void OnSecureKeySync(NET_Packet& P);
-    void SecureSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
+    void SecureSend(NET_Packet& P, u32 dwFlags = 0x0008 /*xr_send_GUARANTEED*/, u32 dwTimeout = 0);
     secure_messaging::key_t m_secret_key;
     bool m_bNeed_CrPr = false;
     u32 m_dwNumSteps = 0;
@@ -334,7 +330,7 @@ public:
     void ClientSendProfileData();
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
-    void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0) override;
+    void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*xr_send_GUARANTEED*/, u32 dwTimeout = 0) override;
     void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
 

@@ -159,7 +159,7 @@ ASB_INL CRandom32& CALifeSimulatorBase::random() { return m_random; }
 ASB_INL void CALifeSimulatorBase::setup_command_line(shared_str* command_line)
 { m_server_command_line = command_line; }
 
-ASB_INL IPureServer& CALifeSimulatorBase::server() const
+ASB_INL xrServer& CALifeSimulatorBase::server() const
 {
     VERIFY(m_server);
     return *m_server;

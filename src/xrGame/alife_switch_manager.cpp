@@ -26,9 +26,9 @@ using namespace ALife;
 
 struct remove_non_savable_predicate
 {
-    IPureServer* m_server;
+    xrServer* m_server;
 
-    IC remove_non_savable_predicate(IPureServer* server)
+    IC remove_non_savable_predicate(xrServer* server)
     {
         VERIFY(server);
         m_server = server;

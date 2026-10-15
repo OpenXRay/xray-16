@@ -7,11 +7,7 @@
 #include "game_sv_base_console_vars.h"
 #include "game_sv_event_queue.h"
 #include "game_sv_item_respawner.h"
-#if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#else // XXX: multiplayer on Linux
-#include "xrNetServer/empty/NET_Server.h"
-#endif
 
 #define MAX_PLAYERS_COUNT 32
 
@@ -219,7 +215,7 @@ public:
     virtual u32 get_alive_count(u32 team);
     virtual xr_vector<u16>* get_children(ClientID id_who);
     void u_EventGen(NET_Packet& P, u16 type, u16 dest);
-    void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
+    void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*xr_send_GUARANTEED*/);
 
     // Events
     virtual BOOL OnPreCreate(CSE_Abstract* E) { return TRUE; };
