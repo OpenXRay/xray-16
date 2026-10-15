@@ -18,6 +18,10 @@
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
 
+#if defined(XR_PLATFORM_APPLE)
+#include "macos/GameDataResolver.h"
+#endif
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
 #include "Text_Console.h"
@@ -252,6 +256,10 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
         const size_t sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
+
+#if defined(XR_PLATFORM_APPLE)
+    ResolveMacOSGameDataPath(commandLine);
+#endif
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
