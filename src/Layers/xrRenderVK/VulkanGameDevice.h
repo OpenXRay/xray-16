@@ -43,7 +43,8 @@ public:
     void set_postprocess(const PostProcessConstants& params, std::string first, std::string second);
     bool render(const GpuLevel& level, const float (&mvp)[16],
         const DeferredLight& light, FrameStatus& status, std::string& error,
-        bool render_world = true, bool clear_target = false);
+        bool render_world = true, bool clear_target = false,
+        const DeferredEnvironment* environment = nullptr);
     bool recreate_swapchain(VkExtent2D extent, std::string& error, bool recreate_surface = false);
     bool prepare_for_reset(std::string& error);
     bool reload_game_shaders(std::string& error);

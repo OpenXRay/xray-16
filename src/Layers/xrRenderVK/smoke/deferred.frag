@@ -7,6 +7,8 @@ layout(set = 0, binding = 4, std140) uniform ShadowConstants {
     mat4 inverse_view_projection;
     mat4 sun_view_projection;
     vec4 options;
+    vec4 ambient_color;
+    vec4 hemi_color;
 } shadow;
 layout(set = 0, binding = 5) uniform sampler2D surface_buffer;
 layout(push_constant) uniform Light {
@@ -53,27 +55,32 @@ void main()
     vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
     float diffuse = max(dot(normal, normalize(-light.direction_ambient.xyz)), 0.0);
     bool static_lightmap = encoded_normal.a < 0.875;
-    float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 1.0;
+    float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
+        clamp(0.5 + 0.5 * normal.y, 0.0, 1.0);
+    float depth = texture(depth_buffer, texcoord).r;
+    float sun_scale = 0.0;
     vec3 sunlight = vec3(0.0);
     if (max(max(light.color.r, light.color.g), light.color.b) > 0.0001)
-        sunlight = diffuse * sun_visibility(texture(depth_buffer, texcoord).r) *
-            light.color.rgb * (static_lightmap ? albedo.a : 1.0);
-    vec3 lit = albedo.rgb * (light.direction_ambient.w + light.grade.w * hemisphere + sunlight);
-    if (surface.r > 0.0)
+    {
+        sun_scale = sun_visibility(depth) * (static_lightmap ? albedo.a : 1.0);
+        sunlight = diffuse * sun_scale * light.color.rgb;
+    }
+    vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + shadow.hemi_color.rgb * hemisphere + sunlight);
+    if (surface.r > 0.0 && sun_scale > 0.0)
     {
         vec4 world_clip = shadow.inverse_view_projection *
             vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0,
-                texture(depth_buffer, texcoord).r, 1.0);
+                depth, 1.0);
         vec4 near_clip = shadow.inverse_view_projection *
             vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, 0.0, 1.0);
         vec3 view_ray = normalize(near_clip.xyz / near_clip.w - world_clip.xyz / world_clip.w);
         vec3 half_dir = normalize(view_ray - normalize(light.direction_ambient.xyz));
         float specular = pow(max(dot(normal, half_dir), 0.0), mix(4.0, 64.0, surface.r));
         lit += specular * surface.r * mix(0.04, 0.2, surface.g) *
-            light.color.rgb * sun_visibility(texture(depth_buffer, texcoord).r);
+            light.color.rgb * sun_scale;
     }
+    lit += albedo.rgb * surface.b;
     lit = (lit - 0.5) * light.grade.z + 0.5;
     lit = pow(max(lit * light.grade.y, 0.0), vec3(1.0 / max(light.grade.x, 0.01)));
-    lit += albedo.rgb * surface.b;
     pixel_color = vec4(lit, albedo.a);
 }

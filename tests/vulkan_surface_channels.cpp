@@ -379,8 +379,15 @@ int main(int argc, char** argv)
         push.scale = 1; push.modes[3] = 1; push.factors[1] = 1;
         auto flat_result = execute(flat, push);
         near(flat_result[0][0], pixels[0][0], "base.R");
+        near(flat_result[0][1], pixels[0][1], "static albedo does not multiply packed vertex light twice");
         near(flat_result[0][3], pixels[1][1], "lightmap sun channel G");
         near(flat_result[1][3], pixels[1][3] * .75f, "lightmap hemi channel A");
+        push.modes[3] = 2.f;
+        push.factors[0] = .5f;
+        auto material = execute(flat, push);
+        near(material[2][1], 2.5f / 3.f, "material class and weight in surface G");
+        push.modes[3] = 1.f;
+        push.factors[0] = 0.f;
         push.modes[0] = 2;
         auto bump = execute(flat, push);
         near(bump[2][0], pixels[7][0] * pixels[7][0], "bump gloss red");
@@ -456,7 +463,7 @@ int main(int argc, char** argv)
         push.threshold = .9f;
         particle = execute(deferred_particle, push);
         near(particle[0][0], 0.f, "deferred particle cutout at higher alpha reference");
-        std::cout << "surface channel readback: base/lightmap/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
+        std::cout << "surface channel readback: base/lightmap sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
         for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle})
             vkDestroyShaderModule(device, module_handle, nullptr);

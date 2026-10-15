@@ -1,4 +1,5 @@
 #include "src/Layers/xrRenderVK/DeferredPass.h"
+#include "src/Layers/xrRenderVK/SunShadowTargets.h"
 #include "src/Layers/xrRenderVK/ModelGeometry.h"
 #include "src/Layers/xrRenderVK/GameShaderResources.h"
 #include "src/Layers/xrRenderVK/LevelPassGraph.h"
@@ -481,6 +482,12 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
             writes[0].pBufferInfo->range == sizeof(ForwardLightUniform));
         return;
     }
+    if (count == 2 && writes[0].dstBinding == 3)
+    {
+        assert(writes[1].dstBinding == 4 &&
+            writes[1].pBufferInfo->range == sizeof(SunShadowUniform));
+        return;
+    }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
         ((writes[0].dstBinding == 0 || writes[0].dstBinding >= 7) &&
@@ -709,6 +716,7 @@ int main()
     VkDescriptorSet gbuffer{}, weather_set{};
     assert(deferred.gbuffer(albedo, handle<VkImageView>(52), handle<VkImageView>(53),
         handle<VkImageView>(54), sampler, gbuffer, error));
+    deferred.bind_sun_shadow(gbuffer, handle<VkImageView>(55), sampler, handle<VkBuffer>(25));
     assert(deferred.weather_set(handle<VkImageView>(60), handle<VkImageView>(61),
         handle<VkImageView>(62), handle<VkImageView>(63), sampler, weather_set, error));
     WeatherLighting weather{};

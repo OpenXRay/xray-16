@@ -1086,7 +1086,8 @@ void VulkanLevelRender::End()
     const bool clear_target = frame_clear_target_ || loading;
     frame_clear_target_ = false;
     const auto cpu_begin = std::chrono::steady_clock::now();
-    if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target))
+    if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target,
+            &environment))
     {
         const auto elapsed = std::chrono::duration<double, std::milli>(
             std::chrono::steady_clock::now() - cpu_begin).count();

@@ -13,6 +13,8 @@ struct alignas(16) ForwardLightUniform
     float viewport[4]{};
     float fog_color_start[4]{};
     float fog_end_camera[4]{};
+    float ambient_color[4]{};
+    float hemi_color[4]{};
     struct alignas(16) Local
     {
         float position_range[4]{};
@@ -20,5 +22,5 @@ struct alignas(16) ForwardLightUniform
         float color_type[4]{};
     } local[ForwardLightCapacity]{};
 };
-static_assert(sizeof(ForwardLightUniform) == 64 + 80 + 48 * ForwardLightCapacity);
+static_assert(sizeof(ForwardLightUniform) == 64 + 112 + 48 * ForwardLightCapacity);
 }

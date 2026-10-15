@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "DeferredPass.h"
+#include "SunShadowTargets.h"
 #include "ShaderMaterialLibrary.h"
 #include "ModelGeometry.h"
 #include "xrEngine/device.h"
@@ -966,7 +967,7 @@ void DeferredPass::bind_sun_shadow(VkDescriptorSet set, VkImageView view, VkSamp
 {
     if (!set || !view || !sampler || !uniform) return;
     const VkDescriptorImageInfo image{sampler, view, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL};
-    const VkDescriptorBufferInfo buffer{uniform, 0, sizeof(float) * 36};
+    const VkDescriptorBufferInfo buffer{uniform, 0, sizeof(SunShadowUniform)};
     VkWriteDescriptorSet writes[2]{};
     for (auto& write : writes)
     {

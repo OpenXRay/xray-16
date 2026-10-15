@@ -7,7 +7,10 @@ layout(set = 0, binding = 4, std140) uniform ShadowConstants {
     mat4 inverse_view_projection;
     mat4 sun_view_projection;
     vec4 options;
+    vec4 ambient_color;
+    vec4 hemi_color;
 } shadow;
+layout(set = 0, binding = 5) uniform sampler2D surface_buffer;
 layout(set = 1, binding = 0) uniform samplerCube sky_a;
 layout(set = 1, binding = 1) uniform samplerCube sky_b;
 layout(set = 1, binding = 2) uniform sampler2D clouds_a;
@@ -59,18 +62,37 @@ void main()
         float depth = texture(depth_buffer, texcoord).r;
         vec4 albedo = texture(albedo_buffer, texcoord);
         vec4 encoded_normal = texture(normal_buffer, texcoord);
+        vec4 surface = texture(surface_buffer, texcoord);
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
         bool static_lightmap = encoded_normal.a < 0.875;
-        float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) : 1.0;
-        float indirect = weather.direction_ambient.w + weather.grade.w * hemisphere;
+        float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
+            clamp(0.5 + 0.5 * normal.y, 0.0, 1.0);
+        float sun_scale = 0.0;
         vec3 sunlight = vec3(0.0);
         // Most rainy frames have no sun. Avoid nine depth fetches per pixel
         // when the result would be multiplied by black anyway.
         if (max(max(weather.light_color.r, weather.light_color.g), weather.light_color.b) > 0.0001)
-            sunlight = diffuse * sun_visibility(depth) * weather.light_color.rgb *
-                (static_lightmap ? albedo.a : 1.0);
-        vec3 lit = albedo.rgb * (indirect + sunlight);
+        {
+            sun_scale = sun_visibility(depth) * (static_lightmap ? albedo.a : 1.0);
+            sunlight = diffuse * sun_scale * weather.light_color.rgb;
+        }
+        vec3 lit = albedo.rgb * (shadow.ambient_color.rgb +
+            shadow.hemi_color.rgb * hemisphere + sunlight);
+        if (surface.r > 0.0 && sun_scale > 0.0)
+        {
+            vec4 world_clip = shadow.inverse_view_projection *
+                vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, depth, 1.0);
+            vec4 near_clip = shadow.inverse_view_projection *
+                vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, 0.0, 1.0);
+            vec3 view_ray = normalize(near_clip.xyz / near_clip.w - world_clip.xyz / world_clip.w);
+            vec3 half_dir = normalize(view_ray - normalize(weather.direction_ambient.xyz));
+            float specular = pow(max(dot(normal, half_dir), 0.0),
+                mix(4.0, 64.0, surface.r));
+            lit += specular * surface.r * mix(0.04, 0.2, surface.g) *
+                weather.light_color.rgb * sun_scale;
+        }
+        lit += albedo.rgb * surface.b;
         vec2 fog_rg = unpackHalf2x16(floatBitsToUint(weather.ray_base.w));
         vec2 fog_b_near = unpackHalf2x16(floatBitsToUint(weather.ray_dx.w));
         vec2 fog_far_projection = unpackHalf2x16(floatBitsToUint(weather.ray_dy.w));

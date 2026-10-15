@@ -10,7 +10,10 @@ struct alignas(16) SunShadowUniform
     float inverse_view_projection[16]{};
     float sun_view_projection[16]{};
     float options[4]{0.0015f, 0.f, 0.f, 0.f};
+    float ambient_color[4]{};
+    float hemi_color[4]{};
 };
+static_assert(sizeof(SunShadowUniform) == 176);
 
 // Each acquired swapchain image owns a depth map and its uniform buffer;
 // neither is overwritten while that image may still be in flight.

@@ -134,6 +134,8 @@ cbuffer ForwardLighting
     float4 viewport;
     float4 fog_color_start;
     float4 fog_end_camera;
+    float4 ambient_color;
+    float4 hemi_color;
     LocalLight local_lights[16];
 };
 #endif
@@ -220,7 +222,17 @@ float4 main(Fragment fragment) : SV_Target0
         }
         normal = surface_normal(normal, fragment.world_position, base_uv, tangent_normal);
     }
-    float3 illumination = sun_direction_ambient.w + sun_color_count.rgb *
+    float hemisphere = saturate(0.5 + 0.5 * normal.y);
+    float sun_occlusion = 1.0;
+#if defined(VK_LIGHTMAP)
+    // s_hemi stores hemisphere occlusion in A and static sun visibility in G.
+    // Its RGB is not an additional diffuse light term.
+    float4 baked_light = lightmap.Sample(diffuse_sampler, fragment.lightmap_uv);
+    hemisphere = baked_light.a;
+    sun_occlusion = baked_light.g;
+#endif
+    float3 illumination = ambient_color.rgb + hemi_color.rgb * hemisphere +
+        sun_color_count.rgb * sun_occlusion *
         max(dot(normal, normalize(-sun_direction_ambient.xyz)), 0.0);
     float2 uv = fragment.position.xy * viewport.xy;
     float4 world_clip = mul(inverse_view_projection,
@@ -245,12 +257,6 @@ float4 main(Fragment fragment) : SV_Target0
 #if defined(VK_ENV_CUBE)
     float3 reflection = reflect(normalize(world - fog_end_camera.yzw), normal);
     texel.rgb = lerp(environment_cube.Sample(diffuse_sampler, float3(dot(float4(reflection, 0.0), environment_matrix_u), dot(float4(reflection, 0.0), environment_matrix_v), dot(float4(reflection, 0.0), environment_matrix_z))).rgb, texel.rgb, texel.a);
-#if defined(VK_LIGHTMAP)
-    illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
-#endif
-#endif
-#if defined(VK_LIGHTMAP) && defined(VK_DETAIL)
-    illumination += lightmap.Sample(diffuse_sampler, fragment.lightmap_uv).rgb * 2.0;
 #endif
     float3 lit = texel.rgb * illumination;
     if (gloss > 0.0)
@@ -259,7 +265,7 @@ float4 main(Fragment fragment) : SV_Target0
         float3 half_ray = normalize(view_ray - normalize(sun_direction_ambient.xyz));
         lit += pow(max(dot(normal, half_ray), 0.0), lerp(4.0, 64.0, gloss)) *
             gloss * lerp(0.04, 0.2, saturate((surface_modes.w + surface_factors.x) / 3.0)) *
-            sun_color_count.rgb;
+            sun_color_count.rgb * sun_occlusion;
     }
     lit += texel.rgb * saturate(surface_factors.z);
 #if defined(VK_FOG)

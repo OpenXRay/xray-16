@@ -113,12 +113,13 @@ class GameShaderVariantsTest(unittest.TestCase):
 
     def test_forward_transparent_layouts(self):
         for name, expected_set in (("object_blended", 1), ("skinned_blended", 2),
-                ("object_priority_opaque", 1), ("skinned_priority_opaque", 2)):
+                ("object_priority_opaque", 1), ("skinned_priority_opaque", 2),
+                ("level_detail_blended", 1), ("level_environment_blended", 1)):
             code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
             sets = {args[2] for op, args in code if op == 71 and len(args) >= 3 and args[1] == 34}
             self.assertIn(expected_set, sets)
             offsets = {args[3] for op, args in code if op == 72 and len(args) >= 4 and args[2] == 35}
-            self.assertTrue({0, 64, 80, 96, 112} <= offsets)
+            self.assertTrue({0, 64, 80, 96, 112, 128, 144, 160, 176} <= offsets)
         hud = list(instructions(SHADERS / "vk/hud_blended.ps.spv"))
         self.assertFalse(any(op == 71 and len(args) >= 3 and args[1] == 34 and args[2] != 0
                              for op, args in hud))

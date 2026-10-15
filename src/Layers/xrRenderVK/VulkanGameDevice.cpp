@@ -888,7 +888,7 @@ void VulkanGameDevice::discard_scene_draws()
 
 bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     const DeferredLight& light, FrameStatus& status, std::string& error,
-    bool render_world, bool clear_target)
+    bool render_world, bool clear_target, const DeferredEnvironment* environment)
 {
     ui_recorded_ = true;
     models_recorded_ = true;
@@ -927,6 +927,14 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         }
     }
     SunShadowUniform sun_uniform{};
+    for (int channel = 0; channel < 3; ++channel)
+    {
+        const auto valid = [](float value) { return std::isfinite(value) ? std::max(value, 0.f) : 0.f; };
+        sun_uniform.ambient_color[channel] = environment ?
+            valid(environment->ambient_color[channel]) : light.direction_ambient[3];
+        sun_uniform.hemi_color[channel] = environment ?
+            valid(environment->hemi_color[channel]) : light.grade[3];
+    }
     WaterSceneUniform water_uniform{};
     {
         Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
@@ -1061,7 +1069,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         }
     }
     std::copy_n(light.direction_ambient, 4, forward_lighting_.sun_direction_ambient);
-    forward_lighting_.sun_direction_ambient[3] += light.grade[3];
+    std::copy_n(sun_uniform.ambient_color, 4, forward_lighting_.ambient_color);
+    std::copy_n(sun_uniform.hemi_color, 4, forward_lighting_.hemi_color);
     std::copy_n(light.color, 3, forward_lighting_.sun_color_count);
     const uint32_t forward_count = std::min<size_t>(local_uniforms_.size(), ForwardLightCapacity);
     forward_lighting_.sun_color_count[3] = static_cast<float>(forward_count);
@@ -1098,6 +1107,11 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             Device.dwFrame, level_draws_.size(), linked, model_draws_.size(), animated,
             particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE,
             light_snapshots_.size(), local_uniforms_.size());
+        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) static-lightmap=green-sun/alpha-hemi models=%zu local=%zu",
+            Device.dwFrame, weather_set_ != VK_NULL_HANDLE ? "weather" : "plain",
+            sun_uniform.ambient_color[0], sun_uniform.ambient_color[1], sun_uniform.ambient_color[2],
+            sun_uniform.hemi_color[0], sun_uniform.hemi_color[1], sun_uniform.hemi_color[2],
+            light.color[0], light.color[1], light.color[2], model_draws_.size(), local_uniforms_.size());
     }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
