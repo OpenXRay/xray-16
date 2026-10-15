@@ -433,6 +433,11 @@ target_precompile_headers(xrPhysics
     StdAfx.h
 )
 
+if (XRAY_BUILD_CDB_TESTS)
+    # Keep the fixture's access to internal physics types inside the physics DLL.
+    target_sources(xrPhysics PRIVATE "${XRAY_SOURCE_DIR}/src/xrCDB/tests/PhysicsContacts.cpp")
+endif()
+
 if (BUILD_SHARED_LIBS)
     install(TARGETS xrPhysics LIBRARY
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"
