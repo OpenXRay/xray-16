@@ -801,27 +801,37 @@ shared_str CInifile::r_string_wb(pcstr S, pcstr L) const
     return shared_str(_original);
 }
 
-u8 CInifile::r_u8(pcstr S, pcstr L) const
+pcstr CInifile::r_value(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
+    if (!C)
+    {
+        xrDebug::Fatal(DEBUG_INFO, "Empty value of %s in [%s]", L, S);
+    }
+    return C;
+}
+
+u8 CInifile::r_u8(pcstr S, pcstr L) const
+{
+    pcstr C = r_value(S, L);
     return u8(atoi(C));
 }
 
 u16 CInifile::r_u16(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return u16(atoi(C));
 }
 
 u32 CInifile::r_u32(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return u32(atoi(C));
 }
 
 u64 CInifile::r_u64(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
 #ifndef _EDITOR
     return _strtoui64(C, nullptr, 10);
 #else
@@ -831,37 +841,37 @@ u64 CInifile::r_u64(pcstr S, pcstr L) const
 
 s64 CInifile::r_s64(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return _atoi64(C);
 }
 
 s8 CInifile::r_s8(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return s8(atoi(C));
 }
 
 s16 CInifile::r_s16(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return s16(atoi(C));
 }
 
 s32 CInifile::r_s32(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return s32(atoi(C));
 }
 
 float CInifile::r_float(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return float(atof(C));
 }
 
 Fcolor CInifile::r_fcolor(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Fcolor V = {0, 0, 0, 0};
     sscanf(C, "%f,%f,%f,%f", &V.r, &V.g, &V.b, &V.a);
     return V;
@@ -869,7 +879,7 @@ Fcolor CInifile::r_fcolor(pcstr S, pcstr L) const
 
 u32 CInifile::r_color(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     u32 r = 0, g = 0, b = 0, a = 255;
     sscanf(C, "%u,%u,%u,%u", &r, &g, &b, &a);
     return color_rgba(r, g, b, a);
@@ -877,7 +887,7 @@ u32 CInifile::r_color(pcstr S, pcstr L) const
 
 Ivector2 CInifile::r_ivector2(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Ivector2 V = {0, 0};
     sscanf(C, "%d,%d", &V.x, &V.y);
     return V;
@@ -885,7 +895,7 @@ Ivector2 CInifile::r_ivector2(pcstr S, pcstr L) const
 
 Ivector3 CInifile::r_ivector3(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Ivector V = {0, 0, 0};
     sscanf(C, "%d,%d,%d", &V.x, &V.y, &V.z);
     return V;
@@ -893,7 +903,7 @@ Ivector3 CInifile::r_ivector3(pcstr S, pcstr L) const
 
 Ivector4 CInifile::r_ivector4(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Ivector4 V = {0, 0, 0, 0};
     sscanf(C, "%d,%d,%d,%d", &V.x, &V.y, &V.z, &V.w);
     return V;
@@ -901,7 +911,7 @@ Ivector4 CInifile::r_ivector4(pcstr S, pcstr L) const
 
 Fvector2 CInifile::r_fvector2(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Fvector2 V = {0.f, 0.f};
     sscanf(C, "%f,%f", &V.x, &V.y);
     return V;
@@ -909,7 +919,7 @@ Fvector2 CInifile::r_fvector2(pcstr S, pcstr L) const
 
 Fvector3 CInifile::r_fvector3(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Fvector3 V = {0.f, 0.f, 0.f};
     sscanf(C, "%f,%f,%f", &V.x, &V.y, &V.z);
     return V;
@@ -917,7 +927,7 @@ Fvector3 CInifile::r_fvector3(pcstr S, pcstr L) const
 
 Fvector4 CInifile::r_fvector4(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     Fvector4 V = {0.f, 0.f, 0.f, 0.f};
     sscanf(C, "%f,%f,%f,%f", &V.x, &V.y, &V.z, &V.w);
     return V;
@@ -925,7 +935,7 @@ Fvector4 CInifile::r_fvector4(pcstr S, pcstr L) const
 
 bool CInifile::r_bool(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     VERIFY2(C && xr_strlen(C) <= 5, make_string("\"%s\" is not a valid bool value, section[%s], line[%s]", C, S, L));
     char B[8];
     xr_strcpy(B, 7, C);
@@ -936,13 +946,13 @@ bool CInifile::r_bool(pcstr S, pcstr L) const
 
 CLASS_ID CInifile::r_clsid(pcstr S, pcstr L) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     return TEXT2CLSID(C);
 }
 
 int CInifile::r_token(pcstr S, pcstr L, const xr_token* token_list) const
 {
-    pcstr C = r_string(S, L);
+    pcstr C = r_value(S, L);
     for (int i = 0; token_list[i].name; i++)
         if (!xr_stricmp(C, token_list[i].name))
             return token_list[i].id;
