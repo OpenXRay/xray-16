@@ -202,8 +202,14 @@ void CActor::UpdateAvailableDialogs(CPhraseDialogManager* partner)
     m_AvailableDialogs.clear();
     m_CheckedDialogs.clear();
 
-    if (m_known_info_registry->registry().objects_ptr())
-    {
+    // CS and SoC gamedata only reach their goodbye dialogs through the dialogs
+    // of known info portions, so this scan is what surfaces them. CoP/CoC
+    // gamedata already lists them per character, and running both merges the
+    // generic and the character specific dialog into two topics that render the
+    // same text. See issue #2075.
+    const static bool dialog_from_info_portions = pSettingsOpenXRay->read_if_exists<bool>(
+        "compatibility", "dialogs_from_info_portions", ClearSkyMode || ShadowOfChernobylMode);
+    if (dialog_from_info_portions && m_known_info_registry->registry().objects_ptr()) {
         auto& infoPortionRegistry = *m_known_info_registry->registry().objects_ptr();
         for (const INFO_DATA& info_data : infoPortionRegistry)
         {
