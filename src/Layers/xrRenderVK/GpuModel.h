@@ -42,11 +42,14 @@ public:
     // the same layout as Fmatrix and include inverse bind transforms.
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
         GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f,
-        const IKinematics* instance = nullptr, const float* normal_rows = nullptr);
+        const IKinematics* instance = nullptr, const float* normal_rows = nullptr,
+        int priority_filter = -1);
     bool record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16], IKinematics& skeleton, std::string& error,
         GeometryPhase phase = GeometryPhase::OpaqueAndAlphaTest, float lod = 1.f,
-        const float* normal_rows = nullptr);
+        const float* normal_rows = nullptr, int priority_filter = -1);
+    bool has_secondary_priority() const;
+    bool has_transparent_priority(uint8_t priority) const;
     void destroy(); // Caller waits for all submitted frames first.
     uint64_t geometry_bytes() const
     {
@@ -94,6 +97,8 @@ private:
         bool detail{};
         float detail_scale{1.f};
         TextureMatrixSet matrices;
+        uint8_t priority{1};
+        bool secondary_opaque{};
         bool tree_surface{};
         RenderPassGraph pass_graph;
     };

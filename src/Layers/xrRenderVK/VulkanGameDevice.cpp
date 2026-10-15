@@ -510,6 +510,20 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
                 return;
             }
         }
+    for (auto& model : owner.model_draws_)
+    {
+        if (model.hud || !model.model->has_secondary_priority()) continue;
+        float mvp[16];
+        std::copy(model.mvp.begin(), model.mvp.end(), mvp);
+        const bool ok = model.skeleton ?
+            model.model->record_animated(frame, owner.deferred_, mvp,
+                *model.skeleton, owner.model_error_, GeometryPhase::SecondaryOpaque,
+                model.lod, model.normal_rows.data()) :
+            model.model->record(frame, owner.deferred_, mvp, nullptr, 0,
+                owner.model_error_, GeometryPhase::SecondaryOpaque, model.lod,
+                nullptr, model.normal_rows.data());
+        if (!ok) { owner.models_recorded_ = false; return; }
+    }
     std::vector<TransparentDrawRef> draws;
     for (size_t i = 0; i < owner.level_draws_.size(); ++i)
         if (!owner.level_draws_[i].hud && owner.current_level_)
@@ -518,7 +532,11 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
                     draws.push_back({owner.level_draws_[i].sort_distance, false, i,
                         false, false, priority});
     for (size_t i = 0; i < owner.model_draws_.size(); ++i)
-        if (!owner.model_draws_[i].hud) draws.push_back({owner.model_draws_[i].sort_distance, true, i});
+        if (!owner.model_draws_[i].hud)
+            for (uint8_t priority = 1; priority <= 3; ++priority)
+                if (owner.model_draws_[i].model->has_transparent_priority(priority))
+                    draws.push_back({owner.model_draws_[i].sort_distance, true, i,
+                        false, false, priority});
     for (size_t i = 0; i < owner.particle_draws_.size(); ++i)
     {
         const auto& particle = owner.particle_draws_[i];
@@ -582,10 +600,10 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             if (model.skeleton ?
                     !model.model->record_animated(frame, owner.deferred_, mvp,
                         *model.skeleton, owner.model_error_, GeometryPhase::Transparent, model.lod,
-                        model.normal_rows.data()) :
+                    model.normal_rows.data(), draw.priority) :
                     !model.model->record(frame, owner.deferred_, mvp,
                         nullptr, 0, owner.model_error_, GeometryPhase::Transparent, model.lod,
-                        nullptr, model.normal_rows.data()))
+                    nullptr, model.normal_rows.data(), draw.priority))
             {
                 owner.models_recorded_ = false;
                 return;

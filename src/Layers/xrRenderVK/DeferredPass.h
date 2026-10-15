@@ -47,6 +47,7 @@ struct SurfaceParameters
 enum class GeometryPhase
 {
     OpaqueAndAlphaTest,
+    SecondaryOpaque,
     Transparent,
     Hud
 };

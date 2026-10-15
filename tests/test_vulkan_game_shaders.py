@@ -41,6 +41,7 @@ class GameShaderVariantsTest(unittest.TestCase):
             "vk/object_opaque.vs.spv", "vk/object_opaque.ps.spv",
             "vk/level_cutout.ps.spv", "vk/object_cutout.ps.spv",
             "vk/object_blended.ps.spv", "vk/skinned_blended.ps.spv",
+            "vk/object_priority_opaque.ps.spv", "vk/skinned_priority_opaque.ps.spv",
             "vk/hud_blended.ps.spv", "vk/object_double_sided.ps.spv",
             *{f"vk/skinned_{n}.vs.spv" for n in range(1, 5)},
             "vk/hud_skinned_1.vs.spv", "vk/hud_skinned_2.vs.spv",
@@ -71,7 +72,9 @@ class GameShaderVariantsTest(unittest.TestCase):
                             "alpha_add" in name or
                             "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
                             name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv",
-                                     "vk/level_priority_opaque.ps.spv")):
+                                     "vk/level_priority_opaque.ps.spv",
+                                     "vk/object_priority_opaque.ps.spv",
+                                     "vk/skinned_priority_opaque.ps.spv")):
                         # The forward pass has one color attachment.
                         self.assertEqual(output_locations, {0})
                     else:
@@ -109,7 +112,8 @@ class GameShaderVariantsTest(unittest.TestCase):
             self.assertIn(64, offsets)
 
     def test_forward_transparent_layouts(self):
-        for name, expected_set in (("object_blended", 1), ("skinned_blended", 2)):
+        for name, expected_set in (("object_blended", 1), ("skinned_blended", 2),
+                ("object_priority_opaque", 1), ("skinned_priority_opaque", 2)):
             code = list(instructions(SHADERS / f"vk/{name}.ps.spv"))
             sets = {args[2] for op, args in code if op == 71 and len(args) >= 3 and args[1] == 34}
             self.assertIn(expected_set, sets)

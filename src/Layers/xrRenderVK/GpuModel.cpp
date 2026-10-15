@@ -46,6 +46,9 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
                 definition.class_name + "' requires level lightmap geometry";
             return false;
         }
+        mesh.priority = definition.priority;
+        mesh.secondary_opaque = mesh.priority >= 2 &&
+            mesh.geometry.mode == SurfaceMode::Opaque;
         mesh.matrices = definition.matrices;
         if (definition.class_name == "S_SET   " && definition.role == MaterialDefinition::Role::Water)
         {
@@ -123,10 +126,23 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
             error = "OGF shader='" + mesh.geometry.shader + "' texture='" + texture + "': " + error;
             return false;
         }
+        if (mesh.secondary_opaque)
+        {
+            // R2 submits priority 2/3 opaque objects after the lighting
+            // combine. They replace forward color and write scene depth.
+            auto& node = mesh.pass_graph.passes[0];
+            node.target = LevelPassTarget::Forward;
+            node.blend = LevelPassBlend::Replace;
+            node.depth_test = node.depth_write = true;
+            node.fragment = animated ? "vk\\skinned_priority_opaque.ps" :
+                "vk\\object_priority_opaque.ps";
+        }
         const auto& node = mesh.pass_graph.passes[0];
         const std::string& vertex = node.vertex;
         const std::string& fragment = node.fragment;
-        if (!pass.request_game_pipeline(vertex, fragment, mesh.geometry.mode, false, animated, error))
+        if (!pass.request_game_pipeline(vertex, fragment,
+                mesh.secondary_opaque ? SurfaceMode::Transparent : mesh.geometry.mode,
+                false, animated, error))
         {
             error = "OGF type=" + std::to_string(mesh.geometry.type) + " shader pair: " + error;
             return false;
@@ -293,7 +309,8 @@ bool GpuModel::load_geometry(ModelGeometry&& decoded, VkDevice device, VkQueue q
 }
 
 bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16], const float* pose, size_t bones, std::string& error,
-    GeometryPhase phase, float lod, const IKinematics* instance, const float* normal_rows)
+    GeometryPhase phase, float lod, const IKinematics* instance, const float* normal_rows,
+    int priority_filter)
 {
     if (!device_ || frame.frame_index >= FrameContext::FramesInFlight)
     {
@@ -310,6 +327,13 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         // The alternative OGF geometry is the low-detail path. Its own SWI
         // is selected below; the normal mesh remains available for near LOD.
         auto& mesh = base.fast_index != SIZE_MAX && lod < 0.33f ? meshes_[base.fast_index] : base;
+        if (phase != GeometryPhase::Hud &&
+            !(phase == GeometryPhase::SecondaryOpaque ? mesh.secondary_opaque :
+              phase == GeometryPhase::Transparent ?
+                  mesh.geometry.mode == SurfaceMode::Transparent &&
+                      (priority_filter < 0 || mesh.priority == priority_filter) :
+                  mesh.geometry.mode != SurfaceMode::Transparent && !mesh.secondary_opaque))
+            continue;
         const bool skinned = mesh.geometry.type == 4 || mesh.geometry.type == 5;
         const bool gpu_skinning = skinned && mesh.gpu_skinning;
         std::array<BufferResource, FrameContext::FramesInFlight>* buffers = &mesh.vertices;
@@ -334,9 +358,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         if (gpu_skinning)
         {
             const bool hud = phase == GeometryPhase::Hud;
-            const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent;
-            if (!hud && (phase == GeometryPhase::Transparent) != transparent)
-                continue;
+            const SurfaceMode draw_mode = mesh.secondary_opaque ?
+                SurfaceMode::Transparent : mesh.geometry.mode;
             if (!pose || !bones || bones > 256 || mesh.max_bone_index >= bones)
             {
                 error = "Vulkan GPU skinning references a bone outside its pose";
@@ -372,7 +395,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             const char* fragment_name = node.fragment.c_str();
             if (!pass.record_skinned(frame, mesh.skinned_vertices.handle(), mesh.indices.handle(),
                     window.index_count, mvp, mesh.material, descriptor,
-                    hud ? SurfaceMode::Opaque : mesh.geometry.mode, hud, window.offset,
+                    hud ? SurfaceMode::Opaque : draw_mode, hud, window.offset,
                     vertex_name.c_str(), fragment_name, float(mesh.alpha_ref) / 255.f,
                     normal_rows, mesh.detail_scale, mesh.environment ? camera : nullptr,
                     &mesh.matrices))
@@ -413,14 +436,14 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             }
             continue;
         }
-        const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent;
-        if ((phase == GeometryPhase::Transparent) != transparent)
-            continue;
+        const bool transparent = mesh.geometry.mode == SurfaceMode::Transparent ||
+            mesh.secondary_opaque;
         const char* vertex = mesh.pass_graph.passes[0].vertex.c_str();
         const char* fragment = mesh.pass_graph.passes[0].fragment.c_str();
         // Both the immutable static buffer and CPU-skinned frame buffers use
         // LevelVertex; pose-buffer variants use a separate GPU layout.
-        const bool named = pass.require_game_pipeline(vertex, fragment, mesh.geometry.mode, false, false, error);
+        const bool named = pass.require_game_pipeline(vertex, fragment,
+            transparent ? SurfaceMode::Transparent : mesh.geometry.mode, false, false, error);
         if (!named) return false;
         BufferResource* vertex_buffer = &mesh.vertices[0];
         if (skinned)
@@ -450,7 +473,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
 
 bool GpuModel::record_animated(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16], IKinematics& skeleton, std::string& error,
-    GeometryPhase phase, float lod, const float* normal_rows)
+    GeometryPhase phase, float lod, const float* normal_rows, int priority_filter)
 {
     static_assert(sizeof(Fmatrix) == 16 * sizeof(float));
     skeleton.CalculateBones();
@@ -465,7 +488,21 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
         std::memcpy(pose.data() + bone * 16,
             &skeleton.LL_GetBoneInstance(static_cast<u16>(bone)).mRenderTransform,
             16 * sizeof(float));
-    return record(frame, pass, mvp, pose.data(), count, error, phase, lod, &skeleton, normal_rows);
+    return record(frame, pass, mvp, pose.data(), count, error, phase, lod,
+        &skeleton, normal_rows, priority_filter);
+}
+
+bool GpuModel::has_secondary_priority() const
+{
+    return std::any_of(meshes_.begin(), meshes_.end(), [](const Mesh& mesh)
+    { return !mesh.fast_variant && mesh.secondary_opaque; });
+}
+
+bool GpuModel::has_transparent_priority(uint8_t priority) const
+{
+    return std::any_of(meshes_.begin(), meshes_.end(), [priority](const Mesh& mesh)
+    { return !mesh.fast_variant && mesh.geometry.mode == SurfaceMode::Transparent &&
+        mesh.priority == priority; });
 }
 
 void GpuModel::release_instance(const IKinematics* skeleton)

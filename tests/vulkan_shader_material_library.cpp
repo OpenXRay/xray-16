@@ -1049,10 +1049,9 @@ int main()
             nullptr, nullptr, false, false, true, false,
             nullptr, nullptr, &resolved));
         assert(selected == SurfaceMode::Opaque && resolved.priority == 3);
-        assert(!parsed_library.resolve("mod\\priority", selected, error,
+        assert(parsed_library.resolve("mod\\priority", selected, error,
             nullptr, nullptr, false, false, false, false,
-            nullptr, nullptr, &resolved, true) &&
-            error.find("Priority=3") != std::string::npos);
+            nullptr, nullptr, &resolved, true) && resolved.priority == 3);
     }
     priority[priority.size() - 12] = 4;
     rejected_semantics(priority, 72, "mod\\priority", "invalid render priority");
@@ -1080,6 +1079,51 @@ int main()
         assert(!parsed_library.resolve("mod\\priority_particle", selected, error,
             nullptr, nullptr, false, false, false, false,
             nullptr, nullptr, &resolved, true));
+    }
+    // The device log contains a transparent MODELEbB OGF at priority 2 and
+    // a particle S_SET at priority 3. Both must resolve for their consumers.
+    const auto set_priority = [](Bytes& record_bytes, uint32_t value)
+    {
+        write32(record_bytes, 0);
+        record_bytes.insert(record_bytes.end(), {'G','e','n','e','r','a','l',0});
+        write32(record_bytes, 4);
+        record_bytes.insert(record_bytes.end(), {'P','r','i','o','r','i','t','y',0});
+        write32(record_bytes, value); write32(record_bytes, 0); write32(record_bytes, 3);
+    };
+    Bytes priority_window = record("MODELEbB", "models\\window", true);
+    set_priority(priority_window, 2);
+    Bytes priority_solid = record("MODELEbB", "models\\solid_priority", false);
+    set_priority(priority_solid, 2);
+    Bytes priority_distortion = record("S_SET   ", "particles\\xdistort", false);
+    write32(priority_distortion, 7);
+    priority_distortion.insert(priority_distortion.end(), {'B','l','e','n','d','i','n','g',0});
+    write32(priority_distortion, 1); write32(priority_distortion, 0);
+    property(priority_distortion, 6, "Z-test", 1);
+    property(priority_distortion, 6, "Z-write", 0);
+    set_priority(priority_distortion, 3);
+    {
+        Bytes records, file;
+        chunk(records, 183, priority_window);
+        chunk(records, 184, priority_solid);
+        chunk(records, 198, priority_distortion);
+        chunk(file, 2, records);
+        IReader reader(file.data(), file.size());
+        ShaderMaterialLibrary parsed_library;
+        assert(parsed_library.load(reader, error));
+        SurfaceMode selected{};
+        MaterialDefinition resolved;
+        assert(parsed_library.resolve("models\\window", selected, error,
+            nullptr, nullptr, false, false, true, false,
+            nullptr, nullptr, &resolved, true) &&
+            selected == SurfaceMode::Transparent && resolved.priority == 2);
+        assert(parsed_library.resolve("models\\solid_priority", selected, error,
+            nullptr, nullptr, false, false, true, false,
+            nullptr, nullptr, &resolved, true) &&
+            selected == SurfaceMode::Opaque && resolved.priority == 2);
+        assert(parsed_library.resolve("particles\\xdistort", selected, error,
+            nullptr, nullptr, true, false, false, false,
+            nullptr, nullptr, &resolved) &&
+            selected == SurfaceMode::Transparent && resolved.priority == 3);
     }
     Bytes renamed = record("LM_AREF ", "mod\\ordinary_surface", false);
     Bytes deceptive = record("LM_AREF ", "water\\double_sided_alpha_add", false);
