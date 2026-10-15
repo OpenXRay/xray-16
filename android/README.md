@@ -257,9 +257,10 @@ Runtime data uses the normal desktop paths:
 The launcher can request the separate Vulkan gameplay module. `Auto` selects it
 only when the Vulkan probe and required game shaders pass, then selects GLES
 otherwise. Explicit Vulkan requests fail if those requirements are missing.
-Android hardware and representative gameplay have not yet been validated. See
-[VULKAN_RENDERER_PLAN.md](VULKAN_RENDERER_PLAN.md) for the implemented Vulkan
-pieces and remaining work.
+The material and level format implementation has passed host checks and a
+representative CoP device walkthrough. Visual defects and performance work
+remain open; [PR #6](https://github.com/r0shn1ch/xray-16/pull/6) tracks the
+current plan and results.
 
 The launcher can run GLES and Vulkan smoke tests without game data. The Vulkan
 test draws depth-tested indexed, lit geometry and a textured UI overlay, reads back one pixel
@@ -303,5 +304,5 @@ want automatic increments can enable the optional hook with
 dependency prefix, SDL source tree and Gradle cache. It does not create or
 download any of them.
 
-Launcher behavior is described in [apk/README.md](apk/README.md). Port-specific
-resource and platform boundaries are recorded in [PORT_AUDIT.md](PORT_AUDIT.md).
+Launcher behavior is described in [apk/README.md](apk/README.md). ARM64 build
+dependencies are listed in [ARM64_DEPS.md](ARM64_DEPS.md).
