@@ -3,7 +3,8 @@
 #include "xrPhysics/IClimableObject.h"
 class IPHStaticGeomShell;
 class CPHCharacter;
-struct dContact;
+class CPhysicsGeom;
+class CPHObject;
 struct SGameMtl;
 
 class CClimableObject : public CPhysicsShellHolder,
@@ -73,7 +74,10 @@ public:
     void UpperPoint(Fvector& P) const;
     void DefineClimbState(CPHCharacter* actor) const;
     static void ObjectContactCallback(
-        bool& /**do_colide**/, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2);
 
 public:
     virtual bool register_schedule() const { return false; }

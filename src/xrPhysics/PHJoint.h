@@ -1,39 +1,42 @@
 #pragma once
 
 #include "PhysicsShell.h"
-
-#include <ode/common.h>
+#include "xrPhysicsCore/IPhysicsCore.h"
+#include "PHJointDestroyInfo.h"
+#include <cmath>
 
 class CPHShell;
 class CPHJointDestroyInfo;
+class CPHElement;
+struct SPhysicsJointFeedback;
 
 class CPHJoint : public CPhysicsJoint
 {
-    ///////////////////////////////////////////////////////
     u16 m_bone_id;
     CPHElement* pFirst_element;
     CPHElement* pSecond_element;
-    CODEGeom* pFirstGeom;
-    /////////////////////////////////////////////////////////
+    CPhysicsGeom* pFirstGeom;
+
     CPHShell* pShell;
-    dJointID m_joint;
-    dJointID m_joint1;
+    JointHandle m_joint; // Теперь используется только один единый сустав!
     CPhysicsJoint** m_back_ref;
     CPHJointDestroyInfo* m_destroy_info;
-    float m_erp; // joint erp
-    float m_cfm; // joint cfm
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SPhysicsJointFeedback m_fracture_feedback;
+    float m_erp;
+    float m_cfm;
+
     struct SPHAxis
     {
-        float high; // high limit
-        float low; // law limit
-        float zero; // zero angle position
-        float erp; // limit erp
-        float cfm; // limit cfm
-        eVs vs; // coordinate system
-        float force; // max force
-        float velocity; // velocity to achieve
-        Fvector direction; // axis direction
+        float high;
+        float low;
+        float zero;
+        float erp;
+        float cfm;
+        eVs vs;
+        float force;
+        float velocity;
+        Fvector direction;
+
         IC void set_limits(float h, float l)
         {
             high = h;
@@ -49,11 +52,11 @@ class CPHJoint : public CPhysicsJoint
         void set_sd_factors(float sf, float df, enumType jt);
         SPHAxis();
     };
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     xr_vector<SPHAxis> axes;
     Fvector anchor;
     eVs vs_anchor;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     void CreateBall();
     void CreateHinge();
     void CreateHinge2();
@@ -63,10 +66,9 @@ class CPHJoint : public CPhysicsJoint
     void SetForceActive(const int axis_num);
     void SetVelocityActive(const int axis_num);
     void SetLimitsActive(int axis_num);
-    void CalcAxis(
-        int ax_num, Fvector& axis, float& lo, float& hi, const Fmatrix& first_matrix, const Fmatrix& second_matrix);
-    void CalcAxis(int ax_num, Fvector& axis, float& lo, float& hi, const Fmatrix& first_matrix,
-        const Fmatrix& second_matrix, const Fmatrix& rotate);
+    void CalcAxis(int ax_num, Fvector& axis, float& lo, float& hi, const Fmatrix& first_matrix, const Fmatrix& second_matrix);
+    void CalcAxis(int ax_num, Fvector& axis, float& lo, float& hi, const Fmatrix& first_matrix, const Fmatrix& second_matrix, const Fmatrix& rotate);
+
     virtual u16 GetAxesNumber();
     virtual void SetAxisSDfactors(float spring_factor, float damping_factor, int axis_num);
     virtual void SetJointSDfactors(float spring_factor, float damping_factor);
@@ -85,7 +87,7 @@ class CPHJoint : public CPhysicsJoint
     {
         SetAnchorVsSecondElement(position.x, position.y, position.z);
     }
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     virtual void SetAxisDir(const Fvector& orientation, const int axis_num)
     {
         SetAxisDir(orientation.x, orientation.y, orientation.z, axis_num);
@@ -99,17 +101,17 @@ class CPHJoint : public CPhysicsJoint
         SetAxisDirVsSecondElement(orientation.x, orientation.y, orientation.z, axis_num);
     }
     virtual void SetAxisDirDynamic(const Fvector& orientation, const int axis_num);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     virtual void SetLimits(const float low, const float high, const int axis_num);
     virtual void SetLimitsVsFirstElement(const float low, const float high, const int axis_num);
     virtual void SetLimitsVsSecondElement(const float low, const float high, const int axis_num);
     virtual void SetHiLimitDynamic(int axis_num, float limit);
     virtual void SetLoLimitDynamic(int axis_num, float limit);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     virtual void SetAnchor(const float x, const float y, const float z);
     virtual void SetAnchorVsFirstElement(const float x, const float y, const float z);
     virtual void SetAnchorVsSecondElement(const float x, const float y, const float z);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     virtual void SetAxisDir(const float x, const float y, const float z, const int axis_num);
     virtual void SetAxisDirVsFirstElement(const float x, const float y, const float z, const int axis_num);
     virtual void SetAxisDirVsSecondElement(const float x, const float y, const float z, const int axis_num);
@@ -121,6 +123,7 @@ public:
     virtual void SetBoneID(u16 bone_id) { m_bone_id = bone_id; }
     IC CPHElement* PFirstElement() { return pFirst_element; }
     IC CPHElement* PSecondElement() { return pSecond_element; }
+
     virtual void Activate();
     virtual void Create();
     virtual void RunSimulation();
@@ -130,14 +133,15 @@ public:
     virtual void SetVelocity(const float velocity = 0.f, const int axis_num = -1);
     virtual void SetBreakable(float force, float torque);
     virtual bool isBreakable() { return !!m_destroy_info; }
-    virtual dJointID GetDJoint() { return m_joint; }
-    virtual dJointID GetDJoint1() { return m_joint1; }
+
+    virtual JointHandle GetJointHandle() { return m_joint; }
+
     virtual void GetLimits(float& lo_limit, float& hi_limit, int axis_num);
     virtual void GetAxisDir(int num, Fvector& axis, eVs& vs);
     virtual void GetAxisDirDynamic(int num, Fvector& axis);
     virtual void GetAnchorDynamic(Fvector& anchor);
-    virtual bool IsWheelJoint();
     virtual bool IsHingeJoint();
+    virtual bool IsWheelJoint();
     virtual void GetAxisSDfactors(float& spring_factor, float& damping_factor, int axis_num);
     virtual void GetJointSDfactors(float& spring_factor, float& damping_factor);
     virtual void GetMaxForceAndVelocity(float& force, float& velocity, int axis_num);
@@ -145,8 +149,18 @@ public:
     virtual float GetAxisAngleRate(int axis_num);
     virtual void Deactivate();
     void ReattachFirstElement(CPHElement* new_element);
-    CODEGeom*& RootGeom() { return pFirstGeom; }
+
+    CPhysicsGeom*& RootGeom() { return pFirstGeom; }
+    const SPhysicsJointFeedback& FractureFeedback() const {
+        return m_destroy_info ? *m_destroy_info->JointFeedback() : m_fracture_feedback;
+    }
+    void EnableFractureFeedback() {
+        if (m_joint != INVALID_JOINT_HANDLE)
+            GetPhysicsCore()->SetJointFeedback(m_joint,
+                m_destroy_info ? m_destroy_info->JointFeedback() : &m_fracture_feedback);
+    }
     virtual CPHJointDestroyInfo* JointDestroyInfo() { return m_destroy_info; }
+
     CPHJoint(CPhysicsJoint::enumType type, CPhysicsElement* first, CPhysicsElement* second);
     virtual ~CPHJoint();
     void SetShell(CPHShell* p);
@@ -154,7 +168,6 @@ public:
     void ClearDestroyInfo();
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 IC void own_axis(const Fmatrix& m, Fvector& axis)
 {
     if (m._11 == 1.f)
@@ -183,7 +196,6 @@ IC void own_axis(const Fmatrix& m, Fvector& axis)
     axis.y = _sqrt(1.f / (k_zy * k_zy + k_xy * k_xy + 1.f));
     axis.x = axis.y * k_xy;
     axis.z = axis.y * k_zy;
-    return;
 }
 
 IC void own_axis_angle(const Fmatrix& m, Fvector& axis, float& angle)
@@ -284,6 +296,4 @@ IC void axis_angleA(const Fmatrix& m, const Fvector& axis, float& angle)
     angle = acosf(cosinus);
     if (sinus < 0.f)
         angle = -angle;
-    // if(angle>M_PI) angle=angle-2.f*M_PI;
-    // if(angle<-M_PI) angle=angle+2.f*M_PI;
 }

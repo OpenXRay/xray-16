@@ -1,0 +1,22 @@
+-- Create the common starting save outside the timed benchmark phases.
+function main()
+    local finish = time_global() + 20000
+    while time_global() < finish do coroutine.yield() end
+    if not db.actor or not db.actor:alive() then
+        log1("CLEAR_SKY_PREPARE FAIL actor missing/dead")
+        get_console():execute("quit")
+        return
+    end
+    local alive = 0
+    for _, entry in pairs(db.storage or {}) do
+        if entry.object and IsStalker(entry.object) and entry.object:alive() then alive = alive + 1 end
+    end
+    local p = db.actor:position()
+    log1(string.format("CLEAR_SKY_PREPARE actor=%.3f,%.3f,%.3f nearby_stalkers=%d", p.x, p.y, p.z, alive))
+    log1("CLEAR_SKY_PREPARE spawn_section=" .. tostring(system_ini():section_exist("sim_default_stalker_0")))
+    get_console():execute("save clear-sky-benchmark-start")
+    finish = time_global() + 2000
+    while time_global() < finish do coroutine.yield() end
+    log1("CLEAR_SKY_PREPARE DONE")
+    get_console():execute("quit")
+end

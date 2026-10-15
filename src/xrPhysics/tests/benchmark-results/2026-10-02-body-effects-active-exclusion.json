@@ -1,0 +1,17 @@
+{
+    "runtime":  "OptimizedNative4",
+    "collision":  "Jolt",
+    "dynamics":  "JoltNative",
+    "workers":  4,
+    "repetition":  1,
+    "exit_code":  -1073741819,
+    "save_reload_validated":  true,
+    "maximum_observed_working_set_bytes":  1485066240,
+    "physics_sha256":  "8E6671F53B5194D413F7914A8CA1D3D2BCF2EE80B449890AC399B45EE43169A6",
+    "collision_sha256":  "47317C5BB21E1C319F7BC5BC612E714CEA8121C6F44D8B94CF8A1BEAF51EA339",
+    "game_sha256":  "D0864B84B784EF4E200F925F68984CC8AEC2A1880D4B66CC81891A5E70A417EE",
+    "core_sha256":  "81D6C85061EA2542240A517CBC42E1B53C61BFB2ED7B0DF385FEE03B2ACAB828",
+    "shader_compiler_sha256":  "A05F99734F7C4822FEFC12B367AF21FD0976ED6608752FB1E1E80B6ECE7ECBBB",
+    "game_mode":  "cop",
+    "saved_at_utc":  "2026-10-02T07:17:36.1111642Z"
+}

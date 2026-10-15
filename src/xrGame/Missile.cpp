@@ -730,21 +730,35 @@ void CMissile::render_item_ui()
 }
 
 void CMissile::ExitContactCallback(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    dxGeomUserData *gd1 = NULL, *gd2 = NULL;
-    if (bo1)
+    IPhysicsShellHolder* my_holder = my_geom ? my_geom->ph_ref_object : nullptr;
+    IPhysicsShellHolder* oposite_holder = oposite_geom ? oposite_geom->ph_ref_object : nullptr;
+
+    if (!my_holder || !oposite_holder)
+        return;
+
+    CMissile* missile = smart_cast<CMissile*>(my_holder);
+    IPhysicsShellHolder* other_holder = oposite_holder;
+
+    if (!missile)
     {
-        gd1 = PHRetrieveGeomUserData(c.geom.g1);
-        gd2 = PHRetrieveGeomUserData(c.geom.g2);
+        missile = smart_cast<CMissile*>(oposite_holder);
+        other_holder = my_holder;
     }
-    else
+
+    if (missile && missile->PPhysicsShell())
     {
-        gd2 = PHRetrieveGeomUserData(c.geom.g1);
-        gd1 = PHRetrieveGeomUserData(c.geom.g2);
+        CPhysicsShellHolder* owner_root = (CPhysicsShellHolder*)missile->PPhysicsShell()->get_CallbackData();
+
+        if (owner_root && other_holder == owner_root)
+        {
+            do_colide = false;
+        }
     }
-    if (gd1 && gd2 && (CPhysicsShellHolder*)gd1->callback_data == gd2->ph_ref_object)
-        do_colide = false;
 }
 
 bool CMissile::GetBriefInfo(II_BriefInfo& info)

@@ -29,6 +29,7 @@ void character_shell_control::Load(LPCSTR section)
     // gray_wolf<
     skeleton_skin_friction_start = pSettings->r_float(section, "ph_skeleton_skin_friction_start");
     skeleton_skin_friction_end = pSettings->r_float(section, "ph_skeleton_skin_friction_end");
+    m_curr_skin_friction_in_death = skeleton_skin_friction_start;
     character_have_wounded_state = pSettings->r_bool(section, "ph_character_have_wounded_state");
     skeleton_skin_ddelay_after_wound = pSettings->r_float(section, "ph_skeleton_skin_ddelay_after_wound");
     skeleton_skin_remain_time_after_wound = skeleton_skin_ddelay_after_wound;
@@ -56,26 +57,20 @@ void character_shell_control::set_fatal_impulse(SHit& H) const
         H.impulse *= (H.type() == ALife::eHitTypeExplosion ? 1.f : skel_fatal_impulse_factor);
     }
 }
-void OnCharacterContactInDeath(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+static void SetNativeSkinFriction(CPhysicsShell* shell, float friction)
 {
-    dSurfaceParameters& surface = c.surface;
-    character_shell_control* l_character_physic_support = 0;
-    if (bo1)
-    {
-        l_character_physic_support = (character_shell_control*)PHRetrieveGeomUserData(c.geom.g1)->callback_data;
+    // A uniform response policy is read by Jolt's native listener. It does not
+    // require discovering every contact again to invoke a game callback.
+    for (u16 index = 0; index < shell->get_ElementsNumber(); ++index) {
+        auto* element = shell->get_ElementByStoreOrder(index);
+        for (u16 geometry = 0; geometry < element->numberOfGeoms(); ++geometry)
+            element->geometry(geometry)->native_contact_friction = friction;
     }
-    else
-    {
-        l_character_physic_support = (character_shell_control*)PHRetrieveGeomUserData(c.geom.g2)->callback_data;
-    }
-
-    surface.mu = l_character_physic_support->curr_skin_friction_in_death();
 }
 void character_shell_control::set_start_shell_params(CPhysicsShell* sh) const
 {
     sh->SetAirResistance(skel_airr_lin_factor, skel_airr_ang_factor);
-    sh->add_ObjectContactCallback(OnCharacterContactInDeath);
+    SetNativeSkinFriction(sh, m_curr_skin_friction_in_death);
     sh->set_CallbackData((void*)this);
 }
 
@@ -182,4 +177,5 @@ void character_shell_control::UpdateFrictionAndJointResistanse(CPhysicsShell* sh
 
     m_curr_skin_friction_in_death =
         skeleton_skin_friction_end + (remain / ddelay) * (skeleton_skin_friction_start - skeleton_skin_friction_end);
+    SetNativeSkinFriction(sh, m_curr_skin_friction_in_death);
 };

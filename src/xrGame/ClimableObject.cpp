@@ -300,40 +300,40 @@ bool CClimableObject::BeforeLadder(CPHCharacter* actor, float tolerance /*=0.f*/
 
 bool CClimableObject::UsedAI_Locations() { return FALSE; }
 void CClimableObject::ObjectContactCallback(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    dxGeomUserData* usr_data_1 = PHRetrieveGeomUserData(c.geom.g1);
-    dxGeomUserData* usr_data_2 = PHRetrieveGeomUserData(c.geom.g2);
-    dxGeomUserData* usr_data_ch = NULL;
-    dxGeomUserData* usr_data_lad = NULL;
-    CClimableObject* this_object = NULL;
-    CPHCharacter* ch = nullptr;
-    //float norm_sign = 0.f;
-    if (bo1)
-    {
-        usr_data_ch = usr_data_2;
-        usr_data_lad = usr_data_1;
-        //norm_sign = -1.f;
-    }
-    else
-    {
-        //norm_sign = 1.f;
-        usr_data_ch = usr_data_1;
-        usr_data_lad = usr_data_2;
-    }
-
-    if (usr_data_ch && usr_data_ch->ph_object && usr_data_ch->ph_object->CastType() == CPHObject::tpCharacter)
-        ch = static_cast<CPHCharacter*>(usr_data_ch->ph_object);
-    else
+    if (!my_geom || !oposite_geom)
     {
         do_colide = false;
         return;
     }
+
+    // my_geom всегда указывает на геометрию лестницы, так как коллбек висит на ней
+    if (!bo1) std::swap(my_geom, oposite_geom);
+    CClimableObject* this_object = smart_cast<CClimableObject*>(my_geom->ph_ref_object);
+
+    // oposite_geom указывает на того, кто касается лестницы
+    CPHObject* ph_obj = oposite_geom->ph_object;
+    CPHCharacter* ch = nullptr;
+
+    if (ph_obj && ph_obj->CastType() == CPHObject::tpCharacter)
+    {
+        ch = static_cast<CPHCharacter*>(ph_obj);
+    }
+    else
+    {
+        // Если это не персонаж, отключаем коллизию с лестницей (чтобы пули, болты и предметы пролетали сквозь неё)
+        do_colide = false;
+        return;
+    }
+
     VERIFY(ch);
-    VERIFY(usr_data_lad);
-    this_object = static_cast<CClimableObject*>(usr_data_lad->ph_ref_object);
     VERIFY(this_object);
-    // XXX: negative tolerance?
+
+    // Проверяем, находится ли персонаж перед лестницей
     if (!this_object->BeforeLadder(ch, -0.1f))
         do_colide = false;
 }

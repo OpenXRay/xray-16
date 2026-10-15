@@ -10,7 +10,7 @@
 #include "entity_alive.h"
 
 struct SGameMtl;
-struct dContact;
+class CPhysicsGeom;
 
 using ALIVE_LIST = xr_vector<CEntityAlive*>;
 
@@ -42,8 +42,11 @@ protected:
     virtual void UpdateCLChild();
 
     static void ObjectContactCallback(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
-    //столкновение мочалки с сущностью
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2);
+
     void BastCollision(CEntityAlive* pEntityAlive);
 
     //параметры артефакта
