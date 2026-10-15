@@ -3,6 +3,9 @@
 #include "ModelTessellation.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
+#if defined(XR_PLATFORM_ANDROID)
+#include "xrEngine/x_ray.h"
+#endif
 
 #include <algorithm>
 #include <cstring>
@@ -355,6 +358,21 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
         }
         const SlideWindow window = select_slide_window(mesh.geometry.windows, lod,
             mesh.geometry.indices.size());
+#if defined(XR_PLATFORM_ANDROID)
+        if (std::strstr(Core.Params, "-vk_export_shaders_xr") &&
+            (mesh.matrices.enabled[0] || mesh.matrices.enabled[1] || mesh.matrices.enabled[2]) &&
+            mesh.priority >= 2)
+        {
+            static u32 reported_frame = UINT32_MAX;
+            if (reported_frame != Device.dwFrame && Device.dwFrame % 300 == 0)
+            {
+                reported_frame = Device.dwFrame;
+                Msg("[renderer-vulkan] N1.model-draw shader='%s' priority=%u phase=%d lod=%.3f matrix-slots=%d/%d/%d",
+                    mesh.geometry.shader.c_str(), mesh.priority, static_cast<int>(phase), lod,
+                    mesh.matrices.enabled[0], mesh.matrices.enabled[1], mesh.matrices.enabled[2]);
+            }
+        }
+#endif
         if (gpu_skinning)
         {
             const bool hud = phase == GeometryPhase::Hud;

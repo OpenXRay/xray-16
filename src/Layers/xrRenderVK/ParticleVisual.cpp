@@ -310,7 +310,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     const auto& node = graph.passes[0];
     const char* vertex = node.vertex.c_str();
     const char* fragment = node.fragment.c_str();
-    return deferred_set ? pass.record_geometry(frame, buffers.vertices.handle(), buffers.indices.handle(),
+    const bool recorded = deferred_set ? pass.record_geometry(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_, SurfaceMode::AlphaTest, 0, vertex, fragment,
             float(alpha_ref_) / 255.f, nullptr, 1.f, nullptr, nullptr, 0, &matrices_) :
         hud ? pass.record_hud(frame, buffers.vertices.handle(), buffers.indices.handle(),
@@ -319,6 +319,19 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         pass.record_transparent(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_, 0, vertex, fragment, nullptr, float(alpha_ref_) / 255.f,
             nullptr, 1.f, 0, &matrices_);
+#if defined(XR_PLATFORM_ANDROID)
+    if (recorded && deferred_set && std::strstr(Core.Params, "-vk_export_shaders_xr"))
+    {
+        static bool reported = false;
+        if (!reported)
+        {
+            reported = true;
+            Msg("[renderer-vulkan] N4.particle-set draw='%s' frame=%u phase=gbuffer count=%u alpha-ref=%d tint-argb=0x%08x priority=%u",
+                def_->name.c_str(), Device.dwFrame, count, alpha_ref_, particles[0].color, priority_);
+        }
+    }
+#endif
+    return recorded;
 }
 
 VulkanParticleGroup::VulkanParticleGroup(std::shared_ptr<const ParticleCatalog> catalog,

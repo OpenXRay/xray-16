@@ -567,6 +567,25 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             draws.push_back({detail_distances[i], false, i, false, true});
     }
     sort_transparent_draws(draws);
+#if defined(XR_PLATFORM_ANDROID)
+    if (std::strstr(Core.Params, "-vk_export_shaders_xr") && Device.dwFrame % 300 == 0)
+    {
+        size_t counts[4][3]{}; // priority 1..3: level, model, particle
+        bool ordered = true;
+        for (size_t i = 0; i < draws.size(); ++i)
+        {
+            const auto& draw = draws[i];
+            if (draw.priority >= 1 && draw.priority <= 3)
+                ++counts[draw.priority][draw.particle ? 2 : draw.model ? 1 : 0];
+            if (i && (draws[i - 1].priority > draw.priority ||
+                (draws[i - 1].priority == draw.priority &&
+                    draws[i - 1].distance < draw.distance))) ordered = false;
+        }
+        Msg("[renderer-vulkan] N2.priority frame=%u sorted=%d refs=%zu p1=%zu/%zu/%zu p2=%zu/%zu/%zu p3=%zu/%zu/%zu (level/model/particle)",
+            Device.dwFrame, ordered ? 1 : 0, draws.size(), counts[1][0], counts[1][1], counts[1][2],
+            counts[2][0], counts[2][1], counts[2][2], counts[3][0], counts[3][1], counts[3][2]);
+    }
+#endif
     for (const TransparentDrawRef& draw : draws)
     {
         float mvp[16];

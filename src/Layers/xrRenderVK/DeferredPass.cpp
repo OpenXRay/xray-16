@@ -767,6 +767,42 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
             if (!matrices->enabled[slot]) continue;
             const auto result = matrices->values[slot].evaluate(Device.fTimeGlobal,
                 reinterpret_cast<const float*>(&Device.mView));
+#if defined(XR_PLATFORM_ANDROID)
+            // Sample the same named matrix twice during a real game session.
+            // Logging every draw would both flood the file and change frame time.
+            if (matrices->values[slot].mode != 0 &&
+                std::strstr(Core.Params, "-vk_export_shaders_xr"))
+            {
+                struct Sample
+                {
+                    const TextureMatrix* matrix{};
+                    float time{}, first[4]{};
+                    bool completed{};
+                };
+                static Sample samples[3];
+                auto& sample = samples[slot];
+                if (!sample.matrix)
+                {
+                    sample.matrix = &matrices->values[slot];
+                    sample.time = Device.fTimeGlobal;
+                    for (size_t i = 0; i < 4; ++i) sample.first[i] = result[0][i];
+                    Msg("[renderer-vulkan] N1.matrix first slot=%zu mode=%u tcm=%u frame=%u time=%.3f row0=(%.5f,%.5f,%.5f,%.5f)",
+                        slot, sample.matrix->mode, sample.matrix->tcm, Device.dwFrame,
+                        sample.time, result[0][0], result[0][1], result[0][2], result[0][3]);
+                }
+                else if (!sample.completed && sample.matrix == &matrices->values[slot] &&
+                    Device.fTimeGlobal - sample.time >= 3.f)
+                {
+                    float delta = 0.f;
+                    for (size_t i = 0; i < 4; ++i)
+                        delta = std::max(delta, std::fabs(result[0][i] - sample.first[i]));
+                    Msg("[renderer-vulkan] N1.matrix second slot=%zu mode=%u frame=%u time=%.3f row0=(%.5f,%.5f,%.5f,%.5f) max-delta=%.5f",
+                        slot, sample.matrix->mode, Device.dwFrame, Device.fTimeGlobal,
+                        result[0][0], result[0][1], result[0][2], result[0][3], delta);
+                    sample.completed = true;
+                }
+            }
+#endif
             const size_t first = slot == 0 ? 0 : slot == 1 ? 2 : 4;
             for (size_t row = 0; row < (slot == 2 ? 3u : 2u); ++row)
                 std::copy(result[row].begin(), result[row].end(), rows + (first + row) * 4);
