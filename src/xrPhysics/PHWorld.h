@@ -13,6 +13,9 @@
 // refs
 struct SGameMtlPair;
 class CPHCommander;
+#ifdef XRAY_USE_JOLT_PHYSICS
+class JoltDynamicsWorld;
+#endif
 class CPHCondition;
 class CPHAction;
 struct SPHNetState;
@@ -44,6 +47,10 @@ class CPHWorld final : public IPHWorld,
 #endif
 {
 private:
+#ifdef XRAY_USE_JOLT_PHYSICS
+    JoltDynamicsWorld* m_dynamics = nullptr;
+    JoltDynamicsWorld* m_isolated_dynamics = nullptr;
+#endif
     PHWorldStatistics stats;
     double m_start_time;
     u32 m_delay;
@@ -112,6 +119,9 @@ public:
     void FrameStep(dReal step = 0.025f);
     void Step();
     void StepTouch();
+#ifdef XRAY_USE_JOLT_PHYSICS
+    void StepIsland(CPHIsland& island, float step);
+#endif
     void CutVelocity(float l_limit, float a_limit);
     void GetState(V_PH_WORLD_STATE& state);
     void Freeze();

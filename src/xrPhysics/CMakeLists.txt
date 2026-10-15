@@ -1,5 +1,11 @@
 add_library(xrPhysics)
 
+if (XRAY_USE_JOLT_PHYSICS)
+    target_sources(xrPhysics PRIVATE JoltDynamicsWorld.cpp JoltDynamicsWorld.h)
+    target_link_libraries(xrPhysics PRIVATE Jolt)
+    target_compile_definitions(xrPhysics PRIVATE XRAY_USE_JOLT_PHYSICS)
+endif()
+
 target_sources_grouped(
     TARGET xrPhysics
     NAME "Kernel"
@@ -432,6 +438,16 @@ target_precompile_headers(xrPhysics
     PRIVATE
     StdAfx.h
 )
+
+if (XRAY_BUILD_CDB_TESTS)
+    # Keep the fixture's access to internal physics types inside the physics DLL.
+    target_sources(xrPhysics PRIVATE "${XRAY_SOURCE_DIR}/src/xrCDB/tests/PhysicsContacts.cpp")
+endif()
+
+if (XRAY_BUILD_PHYSICS_TESTS)
+    target_sources(xrPhysics PRIVATE tests/BackendFixture.cpp)
+    add_subdirectory(tests)
+endif()
 
 if (BUILD_SHARED_LIBS)
     install(TARGETS xrPhysics LIBRARY
