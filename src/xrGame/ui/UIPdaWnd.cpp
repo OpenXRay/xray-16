@@ -494,7 +494,8 @@ bool CUIPdaWnd::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
     bool open = CUIDialogWnd::FillDebugTree(debugState);
-    open |= m_hint_wnd->FillDebugTree(debugState);
+    if (m_hint_wnd)
+        open |= m_hint_wnd->FillDebugTree(debugState);
     return open;
 #else
     UNUSED(debugState);
