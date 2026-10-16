@@ -6,6 +6,7 @@
 #include "xrEngine/device.h"
 #include "FogParameters.h"
 
+#include <cmath>
 #include <cstring>
 
 // The Vulkan backend has no legacy particle renderer. The game-facing
@@ -231,10 +232,17 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
     lighting_.clouds_color[1] = current.clouds_color.y;
     lighting_.clouds_color[2] = current.clouds_color.z;
     lighting_.clouds_color[3] = current.clouds_color.w;
+    // The legacy cloud vertex shader scrolls two planar XZ projections over
+    // the hemisphere. Pack rotation and elapsed seconds into the unused
+    // weather grade component; the push constant is already 128 bytes.
+    const float cloud_time = std::fmod(std::max(0.f, Device.fTimeGlobal), 256.f);
+    const float cloud_rotation = std::fmod(current.clouds_rotation, PI_MUL_2) +
+        (current.clouds_rotation < 0.f ? PI_MUL_2 : 0.f);
+    lighting_.light.grade[3] = pack_fog_pair(cloud_time, cloud_rotation);
     if (Device.dwFrame % 300 == 0)
-        Msg("[renderer-vulkan] weather.frame frame=%u sky=(%.3f,%.3f,%.3f) cloud-alpha=%.3f ambient=%.3f sky-a=%d sky-b=%d",
+        Msg("[renderer-vulkan] weather.frame frame=%u sky=(%.3f,%.3f,%.3f) cloud-alpha=%.3f cloud-planar=1 cloud-angle=%.3f ambient=%.3f sky-a=%d sky-b=%d",
             Device.dwFrame, lighting_.sky_color[0], lighting_.sky_color[1],
-            lighting_.sky_color[2], current.clouds_color.w,
+            lighting_.sky_color[2], current.clouds_color.w, cloud_rotation,
             lighting_.light.direction_ambient[3], sky_a_ != VK_NULL_HANDLE,
             sky_b_ != VK_NULL_HANDLE);
     device_.queue_weather(weather_set_, lighting_, fog_color, current.fog_near, current.fog_far);

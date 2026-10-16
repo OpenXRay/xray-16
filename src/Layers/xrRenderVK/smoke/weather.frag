@@ -151,10 +151,22 @@ void main()
     float blend = clamp(weather.light_color.a, 0.0, 1.0);
     vec3 sky = mix(texture(sky_a, direction).rgb, texture(sky_b, direction).rgb, blend) *
         weather.sky_color.rgb;
-    vec2 cloud_uv = vec2(atan(direction.z, direction.x) / 6.2831853 + 0.5,
-        acos(clamp(direction.y, -1.0, 1.0)) / 3.1415927);
-    vec4 cloud = mix(texture(clouds_a, cloud_uv), texture(clouds_b, cloud_uv), blend);
-    float alpha = cloud.a * weather.clouds_color.a * smoothstep(-0.05, 0.25, direction.y);
+    // CoP projects both cloud layers from the XZ plane of a flattened
+    // hemisphere. Longitude/latitude coordinates introduce a polar pinwheel
+    // and a vertical wrap seam, especially in fully overcast weather.
+    vec2 cloud_params = unpackHalf2x16(floatBitsToUint(weather.grade.w));
+    float rotation = cloud_params.y;
+    vec3 dome = normalize(vec3(direction.x, direction.y * 25.0, direction.z));
+    vec2 planar = mat2(cos(rotation), -sin(rotation),
+        sin(rotation), cos(rotation)) * dome.xz;
+    float clock = cloud_params.x * 0.1;
+    vec2 uv0 = planar * 0.7 + vec2(0.70710678, 0.70710678) * clock * 0.1;
+    vec2 uv1 = planar * 2.8 + vec2(0.92387953, 0.38268343) * clock * 0.05;
+    vec4 cloud_a = texture(clouds_a, uv0) + texture(clouds_a, uv1);
+    vec4 cloud_b = texture(clouds_b, uv0) + texture(clouds_b, uv1);
+    vec4 cloud = mix(cloud_a, cloud_b, blend);
+    float alpha = clamp(cloud.a * weather.clouds_color.a *
+        pow(max(dome.y, 0.0), 25.0), 0.0, 1.0);
     vec3 lit = mix(sky, cloud.rgb * weather.clouds_color.rgb, alpha);
     lit = (lit - 0.5) * weather.grade.z + 0.5;
     lit = pow(max(lit * weather.grade.y, 0.0), vec3(1.0 / max(weather.grade.x, 0.01)));
