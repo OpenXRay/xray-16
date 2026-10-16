@@ -223,6 +223,9 @@ public final class XRayActivity extends SDLActivity {
             args.add(OptionCatalog.value(OptionCatalog.GRAPHICS_PRESETS, graphicsPreset, 0));
             if (showFps)
                 args.add("-android-show-fps");
+            if (rendererMode == LauncherActivity.RENDERER_VULKAN &&
+                    getIntent().getBooleanExtra(LauncherActivity.EXTRA_LIGHT_DIAGNOSTIC, false))
+                args.add("-vk-light-diagnostic");
         }
 
         // The smoke test validates Vulkan explicitly. In gameplay the layer

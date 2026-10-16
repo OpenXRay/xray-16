@@ -927,6 +927,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         }
     }
     SunShadowUniform sun_uniform{};
+    sun_uniform.options[1] = render_world && Core.Params &&
+        strstr(Core.Params, "-vk-light-diagnostic") ? 1.f : 0.f;
     for (int channel = 0; channel < 3; ++channel)
     {
         const auto valid = [](float value) { return std::isfinite(value) ? std::max(value, 0.f) : 0.f; };
@@ -935,6 +937,9 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         sun_uniform.hemi_color[channel] = environment ?
             valid(environment->hemi_color[channel]) : light.grade[3];
     }
+    if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
+        Msg("[renderer-vulkan] lighting.diagnostic frame=%u panes=top-left:base top-right:dynamic-sun bottom-left:R-baked-sun,G-hemi,B-model bottom-right:unlit-albedo shadow-size=%u bias=%.4f overlay=forward-only",
+            Device.dwFrame, SunShadowTargets::Size, sun_uniform.options[0]);
     WaterSceneUniform water_uniform{};
     {
         Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
