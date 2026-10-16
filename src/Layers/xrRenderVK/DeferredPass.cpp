@@ -766,9 +766,6 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
     // Seven float4 rows: base UV, detail UV, environment UV/direction.
     float rows[28]{};
     rows[0] = rows[5] = rows[8] = rows[13] = rows[16] = rows[21] = rows[26] = 1.f;
-    // The first float4 is unused by material UV matrices. The vertex stage
-    // reads its xyz as the three negative hemi-cube faces for model draws.
-    std::copy_n(model_hemi_negative_, 3, rows);
     if (matrices)
         for (size_t slot = 0; slot < 3; ++slot)
         {
@@ -816,6 +813,12 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
             if (slot == 2 && matrices->values[slot].mode == 2)
                 rows[27] = 1.f; // sphere reflection uses the world normal
         }
+    // UV matrix rows use x, y and w (the coordinate's z is always zero).
+    // Preserve the transform, including its translation in w, and carry
+    // model hemi faces in the unused z components of base U/V and detail U.
+    rows[2] = model_hemi_negative_[0];
+    rows[6] = model_hemi_negative_[1];
+    rows[10] = model_hemi_negative_[2];
     vk_.cmd_push_constants(frame.command_buffer, layout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         128, sizeof(rows), rows);

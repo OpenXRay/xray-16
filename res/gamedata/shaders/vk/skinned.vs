@@ -7,7 +7,9 @@
     float4x4 mvp;
     float alpha_threshold;
     float4 normal_rows[3];
-    float4 hemi_negative;
+    float4 base_matrix_u;
+    float4 base_matrix_v;
+    float4 detail_matrix_u;
 };
 [[vk::binding(0, 1)]] StructuredBuffer<float4x4> pose : register(t0, space1);
 
@@ -57,7 +59,7 @@ Fragment main(Vertex vertex)
     {
         float3 world_normal = fragment.normal;
         float3 positive = float3(normal_rows[0].w, normal_rows[1].w, normal_rows[2].w);
-        float3 negative = hemi_negative.xyz;
+        float3 negative = float3(base_matrix_u.z, base_matrix_v.z, detail_matrix_u.z);
         fragment.hemi = saturate(dot(lerp(positive, negative,
             float3(world_normal.x < 0.0, world_normal.y < 0.0, world_normal.z < 0.0)),
             abs(world_normal)));
