@@ -173,8 +173,6 @@ public:
     virtual void OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy);
     virtual void OnItemDropUpdate();
 
-    void MoveArtefactBelt(const CArtefact* artefact, bool on_belt);
-
     virtual void OnPlayHeadShotParticle(NET_Packet P);
 
     virtual void Die(IGameObject* who);
@@ -202,6 +200,7 @@ public:
 public:
     //свойства артефактов
     virtual void UpdateArtefactsOnBeltAndOutfit();
+    void UpdateArtefactPanel();
     float HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type);
     float GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type) const;
 
@@ -211,7 +210,6 @@ protected:
     ref_sound m_BloodSnd;
     ref_sound m_DangerSnd;
 
-    xr_vector<const CArtefact*> m_ArtefactsOnBelt;
 protected:
     // Death
     float m_hit_slowmo;
