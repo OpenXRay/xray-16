@@ -157,7 +157,10 @@ void VulkanEnvironmentRender::lerp(CEnvDescriptorMixer& current,
     const auto* first = static_cast<const VulkanEnvDescriptorRender*>(a);
     const auto* second = static_cast<const VulkanEnvDescriptorRender*>(b);
     if (weather_set_ && (!first || !second || sky_a_ != first->sky() ||
-        sky_b_ != second->sky() || clouds_a_ != first->clouds() ||
+        sky_b_ != second->sky() ||
+        environment_a_ != first->sky_environment() ||
+        environment_b_ != second->sky_environment() ||
+        clouds_a_ != first->clouds() ||
         clouds_b_ != second->clouds()))
     {
         R_ASSERT2(device_.wait_idle(), "weather texture change requires idle GPU frames");
@@ -165,6 +168,8 @@ void VulkanEnvironmentRender::lerp(CEnvDescriptorMixer& current,
     }
     if (sky_a_ != (first ? first->sky() : VK_NULL_HANDLE) ||
         sky_b_ != (second ? second->sky() : VK_NULL_HANDLE) ||
+        environment_a_ != (first ? first->sky_environment() : VK_NULL_HANDLE) ||
+        environment_b_ != (second ? second->sky_environment() : VK_NULL_HANDLE) ||
         clouds_a_ != (first ? first->clouds() : VK_NULL_HANDLE) ||
         clouds_b_ != (second ? second->clouds() : VK_NULL_HANDLE))
         weather_error_reported_ = false;
@@ -182,7 +187,11 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
     if (!weather_set_)
     {
         std::string error;
+        // Some weather packs omit the separate environment cube. The sky
+        // cube has the same Vulkan image type and remains a valid fallback.
         if (!device_.deferred().weather_set(sky_a_, sky_b_, clouds_a_, clouds_b_,
+                environment_a_ ? environment_a_ : sky_a_,
+                environment_b_ ? environment_b_ : sky_b_,
                 device_.textures().sampler(), weather_set_, error))
         {
             // Some weather presets omit textures. Retain the ordinary deferred
@@ -194,6 +203,9 @@ void VulkanEnvironmentRender::RenderSky(CEnvironment& env)
             weather_error_reported_ = true;
             return;
         }
+        Msg("[renderer-vulkan] lighting.environment cube-a=%d cube-b=%d sky-fallback-a=%d sky-fallback-b=%d",
+            environment_a_ != VK_NULL_HANDLE, environment_b_ != VK_NULL_HANDLE,
+            environment_a_ == VK_NULL_HANDLE, environment_b_ == VK_NULL_HANDLE);
     }
     Fmatrix inverse;
     // The full view-projection contains perspective; Fmatrix::invert only

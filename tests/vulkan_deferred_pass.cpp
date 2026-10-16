@@ -470,7 +470,7 @@ VkResult VKAPI_PTR free_sets(VkDevice, VkDescriptorPool, uint32_t, const VkDescr
 void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet* writes,
     uint32_t, const VkCopyDescriptorSet*)
 {
-    assert(count == 1 || count == 2 || count == 4 || count == 7 || count == 13);
+    assert(count == 1 || count == 2 || count == 4 || count == 6 || count == 7 || count == 13);
     if (writes[0].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER)
     {
         assert(count == 1 && writes[0].pBufferInfo->buffer == handle<VkBuffer>(23));
@@ -490,11 +490,12 @@ void VKAPI_PTR update_sets(VkDevice, uint32_t count, const VkWriteDescriptorSet*
     }
     assert(writes[0].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
     assert(writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL ||
-        ((writes[0].dstBinding == 0 || writes[0].dstBinding >= 7) &&
+        ((writes[0].dstBinding == 0 || writes[0].dstBinding >= 7 ||
+            (count == 6 && writes[0].pImageInfo->imageView == handle<VkImageView>(60))) &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_GENERAL) ||
         ((writes[0].dstBinding == 0 || writes[0].dstBinding == 3) &&
             writes[0].pImageInfo->imageLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL));
-    if (count == 4)
+    if (count == 6 && writes[0].pImageInfo->imageView == handle<VkImageView>(60))
     {
         for (uint32_t i = 0; i < count; ++i)
             assert(writes[i].dstBinding == i && writes[i].pImageInfo->imageView == handle<VkImageView>(60 + i));
@@ -718,7 +719,8 @@ int main()
         handle<VkImageView>(54), sampler, gbuffer, error));
     deferred.bind_sun_shadow(gbuffer, handle<VkImageView>(55), sampler, handle<VkBuffer>(25));
     assert(deferred.weather_set(handle<VkImageView>(60), handle<VkImageView>(61),
-        handle<VkImageView>(62), handle<VkImageView>(63), sampler, weather_set, error));
+        handle<VkImageView>(62), handle<VkImageView>(63), handle<VkImageView>(64),
+        handle<VkImageView>(65), sampler, weather_set, error));
     WeatherLighting weather{};
     assert(deferred.record_lighting(hud_frame, gbuffer, environment_light, weather_set, &weather));
     assert(bound_pipeline == handle<VkPipeline>(105) && weather_bind && weather_push);

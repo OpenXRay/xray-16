@@ -224,7 +224,7 @@ public final class XRayActivity extends SDLActivity {
             if (showFps)
                 args.add("-android-show-fps");
             int debugMode = getIntent().getIntExtra(LauncherActivity.EXTRA_LIGHT_DEBUG_MODE, 0);
-            if (rendererMode == LauncherActivity.RENDERER_VULKAN && debugMode >= 1 && debugMode <= 5)
+            if (rendererMode == LauncherActivity.RENDERER_VULKAN && debugMode >= 1 && debugMode <= 9)
                 args.add("-vk-light-debug=" + debugMode);
         }
 

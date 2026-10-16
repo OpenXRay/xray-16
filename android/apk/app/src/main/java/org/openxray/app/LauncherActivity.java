@@ -99,7 +99,9 @@ public final class LauncherActivity extends Activity {
     private static final String PREF_LIGHT_DEBUG_MODE = "light_debug_mode";
     private static final String[] LIGHT_DEBUG_MODES = {"Выключено", "Четыре экрана",
             "Один экран: освещение", "Один экран: солнечная тень",
-            "Один экран: запечённый свет", "Один экран: текстура без света"};
+            "Один экран: запечённый свет", "Один экран: текстура без света",
+            "Сравнение света: 4 экрана", "Один экран: прежний свет",
+            "Один экран: свет неба без затенения", "Один экран: солнце без тени"};
     private static final String PREF_ANDROID_CRASH_REPORTS = "android_crash_reports";
 
     public static final int RENDERER_AUTO = 0;
@@ -455,6 +457,8 @@ public final class LauncherActivity extends Activity {
         addSectionTitle(content, "Отладка Vulkan");
         content.addView(bodyText("Сравните четыре вида одного кадра или разверните любой из них "
                 + "на весь экран. R — запечённое солнце, G — полусфера, B — модель без карты света. "
+                + "В сравнении света: слева сверху новая модель, справа сверху небо без затенения; "
+                + "слева снизу солнце без тени, справа снизу оба изменения. "
                 + "Режим применяется после перезапуска игры."), matchWrap());
         lightDebugMode = new Spinner(this);
         ArrayAdapter<String> lightDebugAdapter = new ArrayAdapter<>(this,

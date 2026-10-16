@@ -324,6 +324,10 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     const VkDescriptorSetLayoutBinding gbuffer_bindings[]{bindings[0], bindings[1], bindings[2], bindings[3],
         {4, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
         {5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+    const VkDescriptorSetLayoutBinding weather_bindings[]{
+        bindings[0], bindings[1], bindings[2], bindings[3],
+        {4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
     const VkDescriptorSetLayoutBinding pose_binding{
         0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr};
     const VkDescriptorSetLayoutBinding forward_binding{
@@ -365,8 +369,8 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     descriptor.pBindings = gbuffer_bindings;
     descriptor.bindingCount = 6;
     VK_STEP("vkCreateDescriptorSetLayout(gbuffer)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &gbuffer_layout_));
-    descriptor.pBindings = bindings;
-    descriptor.bindingCount = 4;
+    descriptor.pBindings = weather_bindings;
+    descriptor.bindingCount = 6;
     VK_STEP("vkCreateDescriptorSetLayout(weather)", vk_.create_descriptor_set_layout(device, &descriptor, nullptr, &weather_set_layout_));
     descriptor.pBindings = local_bindings;
     descriptor.bindingCount = 2;
@@ -1098,13 +1102,15 @@ void DeferredPass::release_forward_sets()
 }
 
 bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
-    VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
+    VkImageView clouds_a, VkImageView clouds_b,
+    VkImageView environment_a, VkImageView environment_b, VkSampler sampler,
     VkDescriptorSet& set, std::string& error)
 {
     set = VK_NULL_HANDLE;
-    if (!pool_ || !sampler || !sky_a || !sky_b || !clouds_a || !clouds_b)
+    if (!pool_ || !sampler || !sky_a || !sky_b || !clouds_a || !clouds_b ||
+        !environment_a || !environment_b)
     {
-        error = "weather requires both sky cubemaps and cloud textures";
+        error = "weather requires sky, environment and cloud textures";
         return false;
     }
     VkDescriptorSetAllocateInfo info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
@@ -1116,10 +1122,10 @@ bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
         error = "weather descriptor pool is exhausted";
         return false;
     }
-    const VkImageView views[]{sky_a, sky_b, clouds_a, clouds_b};
-    VkDescriptorImageInfo images[4]{};
-    VkWriteDescriptorSet writes[4]{};
-    for (uint32_t i = 0; i < 4; ++i)
+    const VkImageView views[]{sky_a, sky_b, clouds_a, clouds_b, environment_a, environment_b};
+    VkDescriptorImageInfo images[6]{};
+    VkWriteDescriptorSet writes[6]{};
+    for (uint32_t i = 0; i < 6; ++i)
     {
         images[i] = {sampler, views[i], VK_IMAGE_LAYOUT_GENERAL};
         writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1129,7 +1135,7 @@ bool DeferredPass::weather_set(VkImageView sky_a, VkImageView sky_b,
         writes[i].descriptorCount = 1;
         writes[i].pImageInfo = &images[i];
     }
-    vk_.update_descriptor_sets(device_, 4, writes, 0, nullptr);
+    vk_.update_descriptor_sets(device_, 6, writes, 0, nullptr);
     return true;
 }
 

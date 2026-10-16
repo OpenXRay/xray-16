@@ -60,6 +60,14 @@ class LightingContractTest(unittest.TestCase):
                 self.assertTrue(any(decorated.get((key, 33)) == 5 and value == 0
                                     for (key, kind), value in decorated.items() if kind == 34))
 
+    def test_weather_binds_two_environment_cubemaps(self):
+        code = list(embedded_shader("WeatherShaders.h", "Fragment"))
+        decorated = {(args[0], args[1]): args[2] for op, args in code
+                     if op == 71 and len(args) >= 3}
+        set_one = {binding for (identifier, kind), binding in decorated.items()
+                   if kind == 33 and decorated.get((identifier, 34)) == 1}
+        self.assertTrue({0, 1, 2, 3, 4, 5} <= set_one)
+
     def test_forward_rgb_ambient_hemi_and_local_light_offsets(self):
         for shader in ("object_blended", "skinned_blended", "level_detail_blended"):
             with self.subTest(shader=shader):

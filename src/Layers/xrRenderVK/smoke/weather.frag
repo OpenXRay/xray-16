@@ -15,6 +15,8 @@ layout(set = 1, binding = 0) uniform samplerCube sky_a;
 layout(set = 1, binding = 1) uniform samplerCube sky_b;
 layout(set = 1, binding = 2) uniform sampler2D clouds_a;
 layout(set = 1, binding = 3) uniform sampler2D clouds_b;
+layout(set = 1, binding = 4) uniform samplerCube environment_a;
+layout(set = 1, binding = 5) uniform samplerCube environment_b;
 layout(push_constant) uniform Weather {
     vec4 ray_base;
     vec4 ray_dx;
@@ -55,15 +57,46 @@ float sun_visibility(float depth, vec2 screen_uv)
         mix(visibility[2], visibility[3], weight.x), weight.y);
 }
 
+// R2's hmodel samples the weather environment in the world-normal direction,
+// then squares the tinted sample for diffuse indirect light. Its material
+// table uses h^0.75, h^0.9 and h for diffuse slices 0, 1 and 2/3.
+// Reproduce those slices analytically instead of baking a generic hemi tint.
+float material_diffuse(float hemi, float material)
+{
+    float h = clamp(hemi, 0.0, 1.0);
+    float category = clamp(material * 3.0, 0.0, 3.0);
+    float oren = pow(h, 0.75);
+    float blinn = pow(h, 0.90);
+    return category < 1.0 ? mix(oren, blinn, category) :
+        category < 2.0 ? mix(blinn, h, category - 1.0) : h;
+}
+
+vec3 environment_indirect(vec3 normal, float hemi, float material)
+{
+    float blend = clamp(weather.light_color.a, 0.0, 1.0);
+    vec3 environment = mix(texture(environment_a, normal).rgb,
+        texture(environment_b, normal).rgb, blend);
+    // CoP's env_color is 2*hemi_color and the R2 combine pass doubles it.
+    vec3 tinted = environment * shadow.hemi_color.rgb * 4.0;
+    return tinted * tinted * material_diffuse(hemi, material);
+}
+
 void main()
 {
     // The four-pane view repeats one G-buffer; modes 2..5 fill the screen
     // with the corresponding panel at its native resolution.
     bool diagnostic = shadow.options.y > 0.5;
-    bool four_panes = diagnostic && shadow.options.y < 1.5;
+    bool comparison = diagnostic && shadow.options.y > 5.5;
+    bool four_panes = diagnostic && (shadow.options.y < 1.5 ||
+        (comparison && shadow.options.y < 6.5));
     vec2 pane = four_panes ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
     int panel = four_panes ? int(pane.x) + 2 * int(pane.y) :
-        diagnostic ? clamp(int(shadow.options.y) - 2, 0, 3) : 0;
+        diagnostic && !comparison ? clamp(int(shadow.options.y) - 2, 0, 3) : 0;
+    // Comparison panels: normal, full hemisphere, full sun visibility,
+    // both overrides. Mode 7 is the previous flat-hemi renderer; 8/9
+    // isolate the hemisphere/sun overrides at full resolution.
+    int comparison_mode = comparison ? (four_panes ? panel :
+        int(shadow.options.y) == 7 ? 4 : int(shadow.options.y) - 7) : 0;
     vec2 screen_uv = four_panes ? fract(texcoord * 2.0) : texcoord;
     if (texture(depth_buffer, screen_uv).r < 0.99999)
     {
@@ -80,13 +113,13 @@ void main()
         vec3 sunlight = vec3(0.0);
         // Most rainy frames have no sun. Avoid nine depth fetches per pixel
         // when the result would be multiplied by black anyway.
-        if (diagnostic && panel == 1)
+        if (diagnostic && !comparison && panel == 1)
         {
             float visibility = sun_visibility(depth, screen_uv);
             pixel_color = vec4(vec3(visibility), 1.0);
             return;
         }
-        if (diagnostic && panel == 2)
+        if (diagnostic && !comparison && panel == 2)
         {
             // R: baked static-sun channel (unused by dynamic sun), G: hemisphere,
             // B: blue denotes an object without a static lightmap.
@@ -94,18 +127,22 @@ void main()
                 hemisphere, static_lightmap ? 0.0 : 1.0, 1.0);
             return;
         }
-        if (diagnostic && panel == 3)
+        if (diagnostic && !comparison && panel == 3)
         {
             pixel_color = vec4(albedo.rgb, 1.0);
             return;
         }
         if (max(max(weather.light_color.r, weather.light_color.g), weather.light_color.b) > 0.0001)
         {
-            sun_scale = sun_visibility(depth, screen_uv);
+            sun_scale = (comparison_mode == 2 || comparison_mode == 3) ? 1.0 :
+                sun_visibility(depth, screen_uv);
             sunlight = diffuse * sun_scale * weather.light_color.rgb;
         }
-        vec3 lit = albedo.rgb * (shadow.ambient_color.rgb +
-            shadow.hemi_color.rgb * hemisphere + sunlight);
+        float tested_hemi = (comparison_mode == 1 || comparison_mode == 3) ? 1.0 : hemisphere;
+        vec3 indirect = comparison_mode == 4 ?
+            shadow.hemi_color.rgb * tested_hemi :
+            environment_indirect(normal, tested_hemi, surface.g);
+        vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + indirect + sunlight);
         if (surface.r > 0.0 && sun_scale > 0.0)
         {
             vec4 world_clip = shadow.inverse_view_projection *
@@ -139,7 +176,7 @@ void main()
         return;
     }
 
-    if (diagnostic && panel != 0)
+    if (diagnostic && !comparison && panel != 0)
     {
         pixel_color = vec4(0.04, 0.08, 0.18, 1.0);
         return;

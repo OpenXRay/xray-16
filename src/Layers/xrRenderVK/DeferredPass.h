@@ -142,7 +142,8 @@ public:
         VkImageView depth, VkSampler sampler, VkSampler depth_sampler, VkBuffer scene_uniform, std::string& error);
     void release_water_sets();
     bool weather_set(VkImageView sky_a, VkImageView sky_b,
-        VkImageView clouds_a, VkImageView clouds_b, VkSampler sampler,
+        VkImageView clouds_a, VkImageView clouds_b,
+        VkImageView environment_a, VkImageView environment_b, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
     bool forward_set(uint32_t image, VkBuffer buffer, std::string& error);

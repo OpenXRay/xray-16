@@ -948,7 +948,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         if (mode)
         {
             const char value = mode[16]; // one ASCII digit after the '='
-            if (value >= '1' && value <= '5' && (mode[17] == '\0' || mode[17] == ' '))
+            if (value >= '1' && value <= '9' && (mode[17] == '\0' || mode[17] == ' '))
                 sun_uniform.options[1] = float(value - '0');
         }
         else if (strstr(Core.Params, "-vk-light-diagnostic"))
@@ -963,7 +963,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             valid(environment->hemi_color[channel]) : light.grade[3];
     }
     if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
-        Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=base,sun,baked,albedo shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
+        Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=1:base,sun,baked,albedo;6:env,hemi-one,sun-one,both;7:old-flat shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
             Device.dwFrame, unsigned(sun_uniform.options[1]), SunShadowTargets::Size, sun_uniform.options[0]);
     WaterSceneUniform water_uniform{};
     {
