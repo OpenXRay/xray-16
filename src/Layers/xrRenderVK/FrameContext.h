@@ -43,6 +43,7 @@ struct FrameDispatch
     PFN_vkCmdClearAttachments cmd_clear_attachments{};
     PFN_vkCmdCopyImageToBuffer cmd_copy_image_to_buffer{};
     PFN_vkCmdCopyImage cmd_copy_image{};
+    PFN_vkCmdBlitImage cmd_blit_image{};
     PFN_vkCmdPipelineBarrier cmd_pipeline_barrier{};
     PFN_vkEndCommandBuffer end_command_buffer{};
     PFN_vkCreateSemaphore create_semaphore{};
@@ -152,6 +153,7 @@ private:
     void destroy_swapchain_resources();
 
     VkDevice m_device = VK_NULL_HANDLE;
+    VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
     VkQueue m_queue = VK_NULL_HANDLE;
     uint32_t m_queue_family = UINT32_MAX;
     FrameDispatch m_vk{};
@@ -181,6 +183,7 @@ private:
     std::vector<VkFramebuffer> m_framebuffers;
     VkRenderPass m_composite_pass = VK_NULL_HANDLE;
     std::vector<VkImage> m_post_images;
+    uint32_t m_post_mip_levels{1};
     std::vector<VkDeviceMemory> m_post_memories;
     std::vector<VkImageView> m_post_views;
     std::vector<VkFramebuffer> m_composite_framebuffers;

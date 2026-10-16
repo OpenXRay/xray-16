@@ -19,20 +19,26 @@ function all_modes(render_id)
 	return true
 end
 
+-- Vulkan has its own console options. Do not show desktop-only switches with
+-- empty token lists or sliders whose values cannot affect this renderer.
+function desktop_modes(render_id)
+	return render_id~=7
+end
+
 function mode_1(render_id)
 	return render_id==0
 end
 
 function mode_ge_2a(render_id)
-	return render_id>=1
+	return render_id>=1 and render_id~=7
 end
 
 function mode_ge_2(render_id)
-	return render_id>=2
+	return render_id>=2 and render_id~=7
 end
 
 function mode_ge_25(render_id)
-	return render_id>=3
+	return render_id>=3 and render_id~=7
 end
 
 function mode_less_3(render_id)
@@ -44,7 +50,7 @@ function mode_3(render_id)
 end
 
 function mode_ge_3(render_id)
-	return render_id>=4
+	return render_id>=4 and render_id~=7
 end
 
 function mode_4(render_id)
@@ -52,7 +58,7 @@ function mode_4(render_id)
 end
 
 function mode_ge_4(render_id)
-	return render_id>=5
+	return render_id>=5 and render_id~=7
 end
 
 function opt_video_adv:InitControls(x, y, xml, handler)
@@ -74,18 +80,18 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st	= xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_geometry_lod", _st)
 	xml:InitTrackBar("video_adv:track_geometry_lod", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st	= xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_texture_lod",	_st)
 	ctl = xml:InitTrackBar("video_adv:track_texture_lod", _st)
 	handler.texture_lod_track = ctl
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_aniso", _st)
 	xml:InitTrackBar("video_adv:track_aniso", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_ssample", _st)
@@ -106,7 +112,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_detail_density", _st)
 	xml:InitTrackBar("video_adv:track_detail_density", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_detail_radius", _st)
@@ -116,7 +122,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_sun", _st)
 	ctl = xml:InitCheck("video_adv:check_r2_sun", _st)
-	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+	table.insert(handler.m_preconditions, {func=function(id) return id>=2 end, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_light_distance", _st)
@@ -126,12 +132,12 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_particles_distance", _st)
 	ctl = xml:InitTrackBar("video_adv:track_particles_distance", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_smap_size", _st)
 	ctl = xml:InitComboBox("video_adv:list_r2_smap_size", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_npc_torch", _st)
@@ -246,7 +252,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_vsync", _st)
 	xml:InitCheck("video_adv:check_vsync", _st)
-	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	table.insert(handler.m_preconditions, {func=desktop_modes, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_always_active", _st)

@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanLevelRender.h"
+#include "VulkanSettings.h"
 #include "VulkanGameDevice.h"
 #include "VulkanModelVisual.h"
 #include "SpecialVisuals.h"
@@ -912,19 +913,8 @@ void VulkanLevelRender::Calculate()
     if (!level_.visible_sector_roots(camera_sector, view_projection_matrix,
             camera_position, visible_roots))
         level_.all_level_roots(visible_roots);
-    float detail_distance = Core.Params && std::strstr(Core.Params, "-android-mobile-preset Minimum") ? 0.f :
-        Core.Params && std::strstr(Core.Params, "-android-mobile-preset Low") ? 20.f :
-        Core.Params && std::strstr(Core.Params, "-android-mobile-preset High") ? 60.f :
-        Core.Params && std::strstr(Core.Params, "-android-mobile-preset Extreme") ? 80.f : 40.f;
-    if (Core.Params)
-        if (const char* option = std::strstr(Core.Params, "-vk-detail-distance "))
-        {
-            float requested = detail_distance;
-            if (std::sscanf(option + sizeof("-vk-detail-distance ") - 1, "%f", &requested) == 1 &&
-                std::isfinite(requested)) detail_distance = std::clamp(requested, 0.f, 80.f);
-        }
     level_.prepare_details(camera_position,
-        psDeviceFlags.test(rsDrawDetails) ? detail_distance : 0.f);
+        psDeviceFlags.test(rsDrawDetails) ? float(detail_radius) : 0.f);
 
     float view_projection[16];
     static_assert(sizeof(Fmatrix) == sizeof(view_projection));
@@ -1088,6 +1078,8 @@ void VulkanLevelRender::End()
 
     const DeferredEnvironment environment = current_environment();
     DeferredLight light = make_environment_deferred_light(environment);
+    for (unsigned i = 0; i < 3; ++i)
+        light.color[i] *= sun_enabled ? sun_scale : 0.f;
     postprocess_.grade[0] = gamma_;
     postprocess_.grade[1] = brightness_;
     postprocess_.grade[2] = contrast_;

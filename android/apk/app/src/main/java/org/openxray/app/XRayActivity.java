@@ -224,6 +224,14 @@ public final class XRayActivity extends SDLActivity {
             if (rendererMode == LauncherActivity.RENDERER_VULKAN) {
                 if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_SUN_SHADOWS, true))
                     args.add("-vk-no-sun-shadows");
+                if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_TONEMAP, true))
+                    args.add("-vk-no-tonemap");
+                args.add("-vk-ambient-scale");
+                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_AMBIENT_SCALE, 1.f)));
+                args.add("-vk-hemi-scale");
+                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_HEMI_SCALE, 1.f)));
+                args.add("-vk-sun-scale");
+                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_SUN_SCALE, 1.f)));
                 int detailDistance = getIntent().getIntExtra(LauncherActivity.EXTRA_DETAIL_DISTANCE, -1);
                 int anisotropy = getIntent().getIntExtra(LauncherActivity.EXTRA_ANISOTROPY, -1);
                 if (detailDistance >= 0) {

@@ -79,6 +79,10 @@ public final class LauncherActivity extends Activity {
     public static final String EXTRA_DETAIL_DISTANCE = "org.openxray.extra.DETAIL_DISTANCE";
     public static final String EXTRA_ANISOTROPY = "org.openxray.extra.ANISOTROPY";
     public static final String EXTRA_SUN_SHADOWS = "org.openxray.extra.SUN_SHADOWS";
+    public static final String EXTRA_TONEMAP = "org.openxray.extra.TONEMAP";
+    public static final String EXTRA_AMBIENT_SCALE = "org.openxray.extra.AMBIENT_SCALE";
+    public static final String EXTRA_HEMI_SCALE = "org.openxray.extra.HEMI_SCALE";
+    public static final String EXTRA_SUN_SCALE = "org.openxray.extra.SUN_SCALE";
 
     private static final String PREFS = "openxray_launcher";
     private static final String PREF_GAME_PATH = "game_path";
@@ -100,6 +104,11 @@ public final class LauncherActivity extends Activity {
     private static final String PREF_DETAIL_DISTANCE = "detail_distance";
     private static final String PREF_ANISOTROPY = "anisotropy";
     private static final String PREF_SUN_SHADOWS = "sun_shadows";
+    private static final String PREF_TONEMAP = "tonemap";
+    private static final String PREF_AMBIENT_SCALE = "ambient_scale";
+    private static final String PREF_HEMI_SCALE = "hemi_scale";
+    private static final String PREF_SUN_SCALE = "sun_scale";
+    private static final float[] LIGHT_SCALES = {0.5f, 0.75f, 1.f, 1.25f, 1.5f};
     private static final int[] DETAIL_DISTANCE_VALUES = {-1, 0, 20, 40, 60, 80};
     private static final int[] ANISOTROPY_VALUES = {-1, 2, 4, 8, 16};
     private static final String PREF_ANDROID_CRASH_REPORTS = "android_crash_reports";
@@ -135,6 +144,10 @@ public final class LauncherActivity extends Activity {
     private Spinner detailDistance;
     private Spinner anisotropy;
     private CheckBox sunShadows;
+    private CheckBox toneMap;
+    private Spinner ambientScale;
+    private Spinner hemiScale;
+    private Spinner sunScale;
     private CheckBox gamepadEnabled;
     private CheckBox splashEnabled;
     private CheckBox keepScreenOn;
@@ -444,9 +457,18 @@ public final class LauncherActivity extends Activity {
                 "Анизотропия: 8×", "Анизотропия: 16×"});
         sunShadows = makeCheckBox("Солнечные динамические тени",
                 "В дождливую погоду солнце может иметь нулевую яркость.");
+        toneMap = makeCheckBox("Автоматическая экспозиция Vulkan",
+                "Оценивает яркость кадра перед выводом.");
         content.addView(sunShadows, matchWrap());
+        content.addView(toneMap, matchWrap());
         content.addView(detailDistance, matchWrap());
         content.addView(anisotropy, matchWrap());
+        ambientScale = lightScaleSpinner("Фоновый свет");
+        hemiScale = lightScaleSpinner("Свет неба");
+        sunScale = lightScaleSpinner("Солнечный свет");
+        content.addView(ambientScale, matchWrap());
+        content.addView(hemiScale, matchWrap());
+        content.addView(sunScale, matchWrap());
 
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[2]);
         content.addView(bodyText("Снижение разрешения ускоряет рендеринг, но уменьшает чёткость."), matchWrap());
@@ -734,8 +756,17 @@ public final class LauncherActivity extends Activity {
         detailDistance.setSelection(Math.max(0, Math.min(5, preferences.getInt(PREF_DETAIL_DISTANCE, 0))));
         anisotropy.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_ANISOTROPY, 0))));
         sunShadows.setChecked(preferences.getBoolean(PREF_SUN_SHADOWS, true));
+        toneMap.setChecked(preferences.getBoolean(PREF_TONEMAP, true));
+        ambientScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_AMBIENT_SCALE, 2))));
+        hemiScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_HEMI_SCALE, 2))));
+        sunScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_SUN_SCALE, 2))));
         androidCrashReports.setChecked(preferences.getBoolean(PREF_ANDROID_CRASH_REPORTS, true));
         showPage(preferences.getInt(PREF_ACTIVE_PAGE, PAGE_GAME));
+    }
+
+    private Spinner lightScaleSpinner(String name) {
+        return settingsSpinner(new String[]{name + ": 50%", name + ": 75%",
+                name + ": 100%", name + ": 125%", name + ": 150%"});
     }
 
     private void savePreferences() {
@@ -759,6 +790,10 @@ public final class LauncherActivity extends Activity {
                 .putInt(PREF_DETAIL_DISTANCE, detailDistance.getSelectedItemPosition())
                 .putInt(PREF_ANISOTROPY, anisotropy.getSelectedItemPosition())
                 .putBoolean(PREF_SUN_SHADOWS, sunShadows.isChecked())
+                .putBoolean(PREF_TONEMAP, toneMap.isChecked())
+                .putInt(PREF_AMBIENT_SCALE, ambientScale.getSelectedItemPosition())
+                .putInt(PREF_HEMI_SCALE, hemiScale.getSelectedItemPosition())
+                .putInt(PREF_SUN_SCALE, sunScale.getSelectedItemPosition())
                 .putBoolean(PREF_ANDROID_CRASH_REPORTS, androidCrashReports.isChecked())
                 .putInt(PREF_ACTIVE_PAGE, activePage)
                 .apply();
@@ -1100,6 +1135,10 @@ public final class LauncherActivity extends Activity {
         intent.putExtra(EXTRA_DETAIL_DISTANCE, DETAIL_DISTANCE_VALUES[detailDistance.getSelectedItemPosition()]);
         intent.putExtra(EXTRA_ANISOTROPY, ANISOTROPY_VALUES[anisotropy.getSelectedItemPosition()]);
         intent.putExtra(EXTRA_SUN_SHADOWS, sunShadows.isChecked());
+        intent.putExtra(EXTRA_TONEMAP, toneMap.isChecked());
+        intent.putExtra(EXTRA_AMBIENT_SCALE, LIGHT_SCALES[ambientScale.getSelectedItemPosition()]);
+        intent.putExtra(EXTRA_HEMI_SCALE, LIGHT_SCALES[hemiScale.getSelectedItemPosition()]);
+        intent.putExtra(EXTRA_SUN_SCALE, LIGHT_SCALES[sunScale.getSelectedItemPosition()]);
         if (!vulkanSmoke) {
             intent.putExtra(EXTRA_GAME_PATH, gamePath.getText().toString().trim());
             intent.putExtra(EXTRA_GAME_VARIANT, activeGameVariant);

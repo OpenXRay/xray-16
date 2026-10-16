@@ -6,13 +6,85 @@
 #include "VulkanRenderFactory.h"
 #include "VulkanDrawUtils.h"
 #include "VulkanDebugRender.h"
+#include "VulkanSettings.h"
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
 #include <SDL.h>
 #include <cstring>
+#include <algorithm>
+#include <cstdio>
+#include <cmath>
 
 namespace xray::render::vulkan
 {
 namespace
 {
+const xr_token quality_tokens[]{{"Minimum", 0}, {"Low", 1}, {"Default", 2},
+    {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+
+class VulkanPreset final : public CCC_Token
+{
+public:
+    VulkanPreset() : CCC_Token("_preset", &quality_preset, quality_tokens) {}
+    void Execute(pcstr args) override
+    {
+        CCC_Token::Execute(args);
+        // The preset changes the same detail range that the launcher selects.
+        static constexpr int distances[]{0, 20, 40, 60, 80};
+        detail_radius = distances[quality_preset];
+    }
+};
+
+void register_vulkan_options()
+{
+    static VulkanPreset preset;
+    static CCC_Integer details("r__detail_radius", &detail_radius, 0, 80);
+    static CCC_Float ambient("r2_sun_lumscale_amb", &ambient_scale, 0.f, 3.f);
+    static CCC_Float hemisphere("r2_sun_lumscale_hemi", &hemisphere_scale, 0.f, 3.f);
+    static CCC_Float sun("r2_sun_lumscale", &sun_scale, 0.f, 3.f);
+    static CCC_Integer sun_switch("r2_sun", &sun_enabled, 0, 1);
+    static CCC_Integer tone_switch("r2_tonemap", &tonemap_enabled, 0, 1);
+    static CCC_Float tone_gray("r2_tonemap_middlegray", &tonemap_middlegray, 0.f, 2.f);
+    static CCC_Float tone_amount("r2_tonemap_amount", &tonemap_amount, 0.f, 1.f);
+    if (Core.Params)
+    {
+        tonemap_enabled = std::strstr(Core.Params, "-vk-no-tonemap") ? 0 : 1;
+        if (std::strstr(Core.Params, "-android-mobile-preset Minimum")) quality_preset = 0;
+        else if (std::strstr(Core.Params, "-android-mobile-preset Low")) quality_preset = 1;
+        else if (std::strstr(Core.Params, "-android-mobile-preset High")) quality_preset = 3;
+        else if (std::strstr(Core.Params, "-android-mobile-preset Extreme")) quality_preset = 4;
+        static constexpr int distances[]{0, 20, 40, 60, 80};
+        detail_radius = distances[quality_preset];
+        const auto read_scale = [](const char* key, float& target)
+        {
+            if (const char* option = std::strstr(Core.Params, key))
+            {
+                float requested = target;
+                if (std::sscanf(option + std::strlen(key), "%f", &requested) == 1 &&
+                    std::isfinite(requested)) target = std::clamp(requested, 0.f, 3.f);
+            }
+        };
+        read_scale("-vk-ambient-scale ", ambient_scale);
+        read_scale("-vk-hemi-scale ", hemisphere_scale);
+        read_scale("-vk-sun-scale ", sun_scale);
+        if (const char* option = std::strstr(Core.Params, "-vk-detail-distance "))
+        {
+            int requested = detail_radius;
+            if (std::sscanf(option + sizeof("-vk-detail-distance ") - 1, "%d", &requested) == 1)
+                detail_radius = std::clamp(requested, 0, 80);
+        }
+    }
+    Console->AddCommand(&preset);
+    Console->AddCommand(&details);
+    Console->AddCommand(&ambient);
+    Console->AddCommand(&hemisphere);
+    Console->AddCommand(&sun);
+    Console->AddCommand(&sun_switch);
+    Console->AddCommand(&tone_switch);
+    Console->AddCommand(&tone_gray);
+    Console->AddCommand(&tone_amount);
+}
+
 class VulkanRendererModule final : public RendererModule
 {
     xr_vector<std::pair<pcstr, int>> modes;
@@ -101,6 +173,7 @@ public:
         R_ASSERT2(!GEnv.Render || GEnv.Render == &renderer,
             "Another renderer is still bound to GEnv");
         GEnv.Render = &renderer;
+        register_vulkan_options();
         Msg("[renderer-vulkan] module.selected mode=%s", mode);
         GEnv.RenderFactory = &factory;
         GEnv.UIRender = &device.ui();

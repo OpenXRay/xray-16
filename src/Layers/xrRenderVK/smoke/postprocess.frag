@@ -33,6 +33,20 @@ void main()
     // The legacy duality values are normalized screen offsets.
     vec2 dual = settings.effect.yz * 0.5;
     vec3 image = 0.5 * (sample_source(texcoord + dual) + sample_source(texcoord - dual));
+    if (settings.grade.w > 0.0 && textureQueryLevels(sampler2D(frame_image, frame_sampler)) > 1)
+    {
+        // The source image's last mip is the measured scene-wide average.
+        // Restrict the gain so a bright sky or dark interior cannot turn a
+        // single frame into clipped white or amplify dark UI excessively.
+        int last_mip = textureQueryLevels(sampler2D(frame_image, frame_sampler)) - 1;
+        vec3 average = texelFetch(sampler2D(frame_image, frame_sampler), ivec2(0), last_mip).rgb;
+        float luminance = dot(average, vec3(0.2126, 0.7152, 0.0722));
+        float exposure = clamp(settings.color_map.z / max(luminance, 0.1), 0.65, 2.0);
+        vec3 exposed = max(image * exposure, 0.0);
+        const float white_squared = 1.7 * 1.7;
+        vec3 mapped = exposed * (1.0 + exposed / white_squared) / (1.0 + exposed);
+        image = mix(image, mapped, clamp(settings.grade.w, 0.0, 1.0));
+    }
     if (settings.effect.x > 0.0)
     {
         vec2 radius = pixel * settings.effect.x * 0.5;

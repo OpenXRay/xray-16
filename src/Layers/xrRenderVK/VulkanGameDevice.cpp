@@ -8,6 +8,7 @@
 #include "PostProcessShaders.h"
 #include "TransparentDrawOrder.h"
 #include "VulkanGameLightingMath.h"
+#include "VulkanSettings.h"
 #include "xrEngine/x_ray.h"
 
 #include <algorithm>
@@ -355,6 +356,8 @@ void VulkanGameDevice::set_postprocess(const PostProcessConstants& params,
     std::string first, std::string second)
 {
     postprocess_params_ = params;
+    postprocess_params_.grade[3] = tonemap_enabled ? tonemap_amount : 0.f;
+    postprocess_params_.color_map[2] = tonemap_middlegray;
     color_map_names_[0] = std::move(first);
     color_map_names_[1] = std::move(second);
 }
@@ -983,10 +986,11 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         // Match the R2 combine constants, including the floor before the
         // default ambient scale. The raw weather ambient is half of
         // the value passed to hmodel on the desktop renderer.
-        sun_uniform.ambient_color[channel] = std::max(ambient * 2.f, .001f);
+        sun_uniform.ambient_color[channel] = std::max(ambient * 2.f * ambient_scale, .001f);
         sun_uniform.hemi_color[channel] =
             environment ? valid(environment->hemi_color[channel]) :
                 valid(light.grade[3]);
+        sun_uniform.hemi_color[channel] *= hemisphere_scale;
     }
     if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
         Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=1:base,sun,baked,albedo;6:env,hemi-one,sun-one,both;7:old-flat shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
