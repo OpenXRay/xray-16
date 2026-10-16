@@ -100,10 +100,19 @@ float3 surface_normal(float3 geometric, float3 position, float2 uv, float3 tange
     // static, skinned and terrain vertices without requiring mesh tangents.
     float3 dpdx = ddx(position), dpdy = ddy(position);
     float2 dudx = ddx(uv), dudy = ddy(uv);
-    float3 tangent = dpdx * dudy.y - dpdy * dudx.y;
-    tangent = normalize(tangent - geometric * dot(geometric, tangent));
-    float handedness = dot(cross(dpdx, dpdy), geometric) *
-        (dudx.x * dudy.y - dudx.y * dudy.x) < 0.0 ? -1.0 : 1.0;
+    float determinant = dudx.x * dudy.y - dudx.y * dudy.x;
+    if (abs(determinant) < 1e-8) return geometric;
+    // The adjugate below carries the UV determinant. Without its sign the
+    // tangent flips on half the UV orientations (notably Y-down viewports),
+    // inverting the normal map's X/Y lighting on skinned models and props.
+    float orientation = determinant < 0.0 ? -1.0 : 1.0;
+    float3 tangent = (dpdx * dudy.y - dpdy * dudx.y) * orientation;
+    tangent -= geometric * dot(geometric, tangent);
+    float tangent_length = dot(tangent, tangent);
+    if (tangent_length < 1e-12) return geometric;
+    tangent *= rsqrt(tangent_length);
+    float3 bitangent = (dpdy * dudx.x - dpdx * dudy.x) * orientation;
+    float handedness = dot(cross(geometric, tangent), bitangent) < 0.0 ? -1.0 : 1.0;
     return normalize(tangent * tangent_normal.x +
         cross(geometric, tangent) * handedness * tangent_normal.y +
         geometric * tangent_normal.z);
