@@ -89,7 +89,7 @@ void main()
     vec3 sunlight = vec3(0.0);
     if (max(max(light.color.r, light.color.g), light.color.b) > 0.0001)
     {
-        sun_scale = sun_visibility(depth, screen_uv) * (static_lightmap ? albedo.a : 1.0);
+        sun_scale = sun_visibility(depth, screen_uv);
         sunlight = diffuse * sun_scale * light.color.rgb;
     }
     vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + shadow.hemi_color.rgb * hemisphere + sunlight);

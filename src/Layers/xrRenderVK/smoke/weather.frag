@@ -88,7 +88,7 @@ void main()
         }
         if (diagnostic && panel == 2)
         {
-            // R: baked sun (models use full visibility), G: hemisphere,
+            // R: baked static-sun channel (unused by dynamic sun), G: hemisphere,
             // B: blue denotes an object without a static lightmap.
             pixel_color = vec4(static_lightmap ? albedo.a : 1.0,
                 hemisphere, static_lightmap ? 0.0 : 1.0, 1.0);
@@ -101,7 +101,7 @@ void main()
         }
         if (max(max(weather.light_color.r, weather.light_color.g), weather.light_color.b) > 0.0001)
         {
-            sun_scale = sun_visibility(depth, screen_uv) * (static_lightmap ? albedo.a : 1.0);
+            sun_scale = sun_visibility(depth, screen_uv);
             sunlight = diffuse * sun_scale * weather.light_color.rgb;
         }
         vec3 lit = albedo.rgb * (shadow.ambient_color.rgb +

@@ -94,7 +94,13 @@ void DeferredFrame::capture(VkCommandBuffer command, VkImage image,
 void DeferredFrame::overlay(const FrameRecordingContext& frame, void* user_data)
 {
     auto& context = *static_cast<DeferredFrame*>(user_data);
-    if (context.render_world_)
+    const float debug_mode = context.shadow_uniform_.options[1];
+    // Only the full-screen base view shows forward particles and the HUD.
+    // Their screen-space coordinates do not map into the repeated G-buffer
+    // panels and would contaminate the shadow, lightmap and albedo views.
+    const bool isolated_gbuffer = debug_mode > 0.5f &&
+        (debug_mode < 1.5f || debug_mode > 2.5f);
+    if (context.render_world_ && !isolated_gbuffer)
     {
         if (context.transparent_) context.transparent_(frame, context.transparent_data_);
         else if (!context.level_visuals_)
@@ -107,7 +113,7 @@ void DeferredFrame::overlay(const FrameRecordingContext& frame, void* user_data)
     }
     // The HUD uses its own depth hierarchy and is never hidden by world geometry.
     context.frame_->clear_depth(frame.command_buffer);
-    if (context.hud_) context.hud_(frame, context.hud_data_);
+    if (context.hud_ && !isolated_gbuffer) context.hud_(frame, context.hud_data_);
     if (context.ui_) context.ui_(frame, context.ui_data_);
 }
 

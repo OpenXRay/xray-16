@@ -961,7 +961,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             valid(environment->hemi_color[channel]) : light.grade[3];
     }
     if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
-        Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=base,sun,baked,albedo shadow-size=%u bias=%.4f overlay=forward-only",
+        Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=base,sun,baked,albedo shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
             Device.dwFrame, unsigned(sun_uniform.options[1]), SunShadowTargets::Size, sun_uniform.options[0]);
     WaterSceneUniform water_uniform{};
     {
@@ -1136,7 +1136,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             Device.dwFrame, level_draws_.size(), linked, model_draws_.size(), animated,
             particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE,
             light_snapshots_.size(), local_uniforms_.size());
-        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) static-lightmap=green-sun/alpha-hemi models=%zu local=%zu",
+        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) static-lightmap=green-diagnostic-only/alpha-hemi dynamic-sun=shadow-only models=%zu local=%zu",
             Device.dwFrame, weather_set_ != VK_NULL_HANDLE ? "weather" : "plain",
             sun_uniform.ambient_color[0], sun_uniform.ambient_color[1], sun_uniform.ambient_color[2],
             sun_uniform.hemi_color[0], sun_uniform.hemi_color[1], sun_uniform.hemi_color[2],
