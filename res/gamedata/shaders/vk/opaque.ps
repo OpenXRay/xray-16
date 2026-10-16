@@ -85,6 +85,7 @@ struct Fragment
     [[vk::location(3)]] float4 baked : COLOR0;
 #endif
     [[vk::location(4)]] float3 world_position : TEXCOORD4;
+    [[vk::location(5)]] float hemi : TEXCOORD5;
 };
 
 
@@ -147,6 +148,39 @@ cbuffer ForwardLighting
     float4 hemi_color;
     LocalLight local_lights[16];
 };
+#if defined(VK_SKINNED)
+[[vk::binding(4, 3)]] TextureCube<float4> weather_environment_a : register(t20);
+[[vk::binding(5, 3)]] TextureCube<float4> weather_environment_b : register(t21);
+#else
+[[vk::binding(4, 2)]] TextureCube<float4> weather_environment_a : register(t20);
+[[vk::binding(5, 2)]] TextureCube<float4> weather_environment_b : register(t21);
+#endif
+
+float environment_diffuse_factor(float hemi, float material)
+{
+    float h = saturate(hemi);
+    float category = saturate(material) * 3.0;
+    if (category < 1.0) return lerp(pow(h, 0.75), pow(h, 0.90), category);
+    if (category < 2.0) return lerp(pow(h, 0.90), h, category - 1.0);
+    return h;
+}
+
+float environment_specular_factor(float hemi, float reflection, float material)
+{
+    float h = saturate(hemi);
+    float ls = saturate(reflection) * pow(h, 1.0 / 32.0);
+    float oren = 0.5 * pow(ls, 16.0);
+    float blinn = pow(ls, 24.0);
+    float phong = pow(min(ls * 1.01, 1.0), 128.0);
+    float metal = max(max(abs(1.0 - abs(0.05 * sin(33.0 * h) + h - ls)),
+        abs(1.0 - abs(0.05 * cos(33.0 * h * ls) + h - ls))),
+        abs(1.0 - abs(h - ls)));
+    metal = pow(saturate(metal), 24.0) * pow(h, 1.0 / 7.0);
+    float category = saturate(material) * 3.0;
+    if (category < 1.0) return lerp(oren, blinn, category);
+    if (category < 2.0) return lerp(blinn, phong, category - 1.0);
+    return lerp(phong, metal, category - 2.0);
+}
 #endif
 float4 main(Fragment fragment) : SV_Target0
 {
@@ -231,7 +265,7 @@ float4 main(Fragment fragment) : SV_Target0
         }
         normal = surface_normal(normal, fragment.world_position, base_uv, tangent_normal);
     }
-    float hemisphere = saturate(0.5 + 0.5 * normal.y);
+    float hemisphere = saturate(fragment.hemi);
 #if defined(VK_LIGHTMAP)
     // CoP's regular dynamic-sun renderer uses the lightmap alpha for hemi.
     // The green channel is only used with USE_R2_STATIC_SUN, which this
@@ -242,6 +276,32 @@ float4 main(Fragment fragment) : SV_Target0
     float3 illumination = ambient_color.rgb + hemi_color.rgb * hemisphere +
         sun_color_count.rgb *
         max(dot(normal, normalize(-sun_direction_ambient.xyz)), 0.0);
+    float3 environment_specular = 0.0;
+    if (hemi_color.w > 0.5)
+    {
+        float3 env_normal = normalize(normal);
+        float blend = saturate(viewport.z);
+        float3 diffuse_env = lerp(
+            weather_environment_a.Sample(diffuse_sampler, env_normal).rgb,
+            weather_environment_b.Sample(diffuse_sampler, env_normal).rgb, blend);
+        float3 tinted = diffuse_env * hemi_color.rgb * 4.0;
+        float material = saturate((surface_modes.w + surface_factors.x) / 3.0);
+        illumination += tinted * tinted * environment_diffuse_factor(hemisphere, material) -
+            hemi_color.rgb * hemisphere;
+        if (gloss > 0.0)
+        {
+            float3 incident = normalize(fragment.world_position - fog_end_camera.yzw);
+            float3 reflection = reflect(incident, env_normal);
+            float angle = 0.5 + 0.5 * dot(reflection, incident);
+            reflection.y = reflection.y * 2.0 - 1.0;
+            float3 spec_env = lerp(
+                weather_environment_a.Sample(diffuse_sampler, reflection).rgb,
+                weather_environment_b.Sample(diffuse_sampler, reflection).rgb, blend);
+            tinted = spec_env * hemi_color.rgb * 4.0;
+            environment_specular = tinted * tinted *
+                environment_specular_factor(hemisphere, angle, material) * gloss;
+        }
+    }
     float2 uv = fragment.position.xy * viewport.xy;
     float4 world_clip = mul(inverse_view_projection,
         float4(uv.x * 2.0 - 1.0, 1.0 - uv.y * 2.0, fragment.position.z, 1.0));
@@ -266,7 +326,7 @@ float4 main(Fragment fragment) : SV_Target0
     float3 reflection = reflect(normalize(world - fog_end_camera.yzw), normal);
     texel.rgb = lerp(environment_cube.Sample(diffuse_sampler, float3(dot(float4(reflection, 0.0), environment_matrix_u), dot(float4(reflection, 0.0), environment_matrix_v), dot(float4(reflection, 0.0), environment_matrix_z))).rgb, texel.rgb, texel.a);
 #endif
-    float3 lit = texel.rgb * illumination;
+    float3 lit = texel.rgb * illumination + environment_specular;
     if (gloss > 0.0)
     {
         float3 view_ray = normalize(fog_end_camera.yzw - world);
@@ -431,7 +491,9 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
     output.albedo.a = indirect.g;
     output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, indirect.a * 0.75);
 #else
-    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5, 1.0);
+    // Encode unlightmapped hemi above the static-lightmap alpha range.
+    output.normal = float4(normalize(fragment.normal) * 0.5 + 0.5,
+        0.875 + 0.125 * saturate(fragment.hemi));
 #endif
     return output;
 }

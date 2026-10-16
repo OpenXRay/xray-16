@@ -52,7 +52,7 @@ public:
 
     void queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16], bool hud = false,
         float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f,
-        const Fmatrix* world = nullptr);
+        const Fmatrix* world = nullptr, const float* hemi_faces = nullptr);
     void queue_level_visual(uint32_t index, const float (&mvp)[16],
         bool hud = false, float sort_distance = 0.f, const void* instance = nullptr, float lod = 1.f);
     void queue_particle(IRenderVisual* visual, const float (&mvp)[16],
@@ -137,6 +137,7 @@ private:
         IKinematics* skeleton{};
         std::array<float, 16> mvp{};
         std::array<float, 12> normal_rows{};
+        std::array<float, 3> hemi_negative{};
         float sort_distance{};
         float lod{1.f};
         bool hud{};

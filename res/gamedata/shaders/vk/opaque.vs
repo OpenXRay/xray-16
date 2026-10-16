@@ -3,6 +3,7 @@
     float4x4 mvp;
     float alpha_threshold;
     float4 normal_rows[3];
+    float4 hemi_negative;
 };
 
 struct Vertex
@@ -22,6 +23,7 @@ struct Fragment
     [[vk::location(0)]] float3 normal : TEXCOORD0;
     [[vk::location(1)]] float2 uv : TEXCOORD1;
     [[vk::location(4)]] float3 world_position : TEXCOORD4;
+    [[vk::location(5)]] float hemi : TEXCOORD5;
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(2)]] float2 lightmap_uv : TEXCOORD2;
     [[vk::location(3)]] float4 baked : COLOR0;
@@ -45,6 +47,18 @@ Fragment main(Vertex vertex)
 #else
     fragment.normal = normalize(float3(dot(normal_rows[0].xyz, vertex.normal),
         dot(normal_rows[1].xyz, vertex.normal), dot(normal_rows[2].xyz, vertex.normal)));
+#endif
+    fragment.hemi = saturate(0.5 + 0.5 * normalize(fragment.normal).y);
+#if !defined(LEVEL_GEOMETRY)
+    if (normal_rows[0].w >= 0.0)
+    {
+        float3 world_normal = normalize(fragment.normal);
+        float3 positive = float3(normal_rows[0].w, normal_rows[1].w, normal_rows[2].w);
+        float3 negative = hemi_negative.xyz;
+        fragment.hemi = saturate(dot(lerp(positive, negative,
+            float3(world_normal.x < 0.0, world_normal.y < 0.0, world_normal.z < 0.0)),
+            abs(world_normal)));
+    }
 #endif
     fragment.uv = vertex.uv;
     fragment.world_position = vertex.position;

@@ -66,9 +66,9 @@ void main()
     vec4 surface = texture(surface_buffer, screen_uv);
     vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
     float diffuse = max(dot(normal, normalize(-light.direction_ambient.xyz)), 0.0);
-    bool static_lightmap = encoded_normal.a < 0.875;
+    bool static_lightmap = encoded_normal.a < 0.8;
     float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
-        clamp(0.5 + 0.5 * normal.y, 0.0, 1.0);
+        clamp((encoded_normal.a - 0.875) * 8.0, 0.0, 1.0);
     if (diagnostic && panel == 1)
     {
         pixel_color = vec4(vec3(sun_visibility(depth, screen_uv)), 1.0);

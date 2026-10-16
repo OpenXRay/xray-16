@@ -401,13 +401,13 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
         const VkPushConstantRange light{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(DeferredLight)};
         VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
         layout.pushConstantRangeCount = 1;
-        const VkDescriptorSetLayout forward_sets[]{material_layout_, forward_layout_};
-        layout.setLayoutCount = 2;
+        const VkDescriptorSetLayout forward_sets[]{material_layout_, forward_layout_, weather_set_layout_};
+        layout.setLayoutCount = 3;
         layout.pSetLayouts = forward_sets;
         layout.pPushConstantRanges = &camera;
         VK_STEP("vkCreatePipelineLayout(geometry)", vk_.create_pipeline_layout(device, &layout, nullptr, &geometry_layout_));
-        const VkDescriptorSetLayout skinned_sets[]{material_layout_, pose_layout_, forward_layout_};
-        layout.setLayoutCount = 3;
+        const VkDescriptorSetLayout skinned_sets[]{material_layout_, pose_layout_, forward_layout_, weather_set_layout_};
+        layout.setLayoutCount = 4;
         layout.pSetLayouts = skinned_sets;
         VK_STEP("vkCreatePipelineLayout(skinned)", vk_.create_pipeline_layout(device, &layout, nullptr, &skinned_layout_));
         layout.setLayoutCount = 1;
@@ -766,6 +766,9 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
     // Seven float4 rows: base UV, detail UV, environment UV/direction.
     float rows[28]{};
     rows[0] = rows[5] = rows[8] = rows[13] = rows[16] = rows[21] = rows[26] = 1.f;
+    // The first float4 is unused by material UV matrices. The vertex stage
+    // reads its xyz as the three negative hemi-cube faces for model draws.
+    std::copy_n(model_hemi_negative_, 3, rows);
     if (matrices)
         for (size_t slot = 0; slot < 3; ++slot)
         {
@@ -813,7 +816,8 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
             if (slot == 2 && matrices->values[slot].mode == 2)
                 rows[27] = 1.f; // sphere reflection uses the world normal
         }
-    vk_.cmd_push_constants(frame.command_buffer, layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+    vk_.cmd_push_constants(frame.command_buffer, layout,
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         128, sizeof(rows), rows);
 }
 
@@ -873,6 +877,9 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
         if (frame.image_index >= forward_sets_.size() || !forward_sets_[frame.image_index]) return false;
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             skinned_layout_, 2, 1, &forward_sets_[frame.image_index], 0, nullptr);
+        if (forward_weather_)
+            vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                skinned_layout_, 3, 1, &forward_weather_, 0, nullptr);
     }
     push_texture_matrices(frame, skinned_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, 0, 0);
@@ -1297,6 +1304,9 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
     {
         vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
             geometry_layout_, 1, 1, &forward_sets_[frame.image_index], 0, nullptr);
+        if (forward_weather_)
+            vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                geometry_layout_, 2, 1, &forward_weather_, 0, nullptr);
     }
     push_texture_matrices(frame, geometry_layout_, matrices);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);

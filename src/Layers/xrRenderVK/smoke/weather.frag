@@ -81,6 +81,26 @@ vec3 environment_indirect(vec3 normal, float hemi, float material)
     return tinted * tinted * material_diffuse(hemi, material);
 }
 
+// The second channel of R2's 3D material table controls the reflected
+// environment. Reproduce its four material slices without another texture
+// allocation or a new descriptor on the mobile combine path.
+float material_specular(float hemi, float reflection, float material)
+{
+    float h = clamp(hemi, 0.0, 1.0);
+    float ls = clamp(reflection, 0.0, 1.0) * pow(h, 1.0 / 32.0);
+    float oren = 0.5 * pow(ls, 16.0);
+    float blinn = pow(ls, 24.0);
+    float phong = pow(min(ls * 1.01, 1.0), 128.0);
+    float metal = max(max(abs(1.0 - abs(0.05 * sin(33.0 * h) + h - ls)),
+        abs(1.0 - abs(0.05 * cos(33.0 * h * ls) + h - ls))),
+        abs(1.0 - abs(h - ls)));
+    metal = pow(clamp(metal, 0.0, 1.0), 24.0) * pow(h, 1.0 / 7.0);
+    float category = clamp(material * 3.0, 0.0, 3.0);
+    return category < 1.0 ? mix(oren, blinn, category) :
+        category < 2.0 ? mix(blinn, phong, category - 1.0) :
+        mix(phong, metal, category - 2.0);
+}
+
 void main()
 {
     // The four-pane view repeats one G-buffer; modes 2..5 fill the screen
@@ -106,9 +126,9 @@ void main()
         vec4 surface = texture(surface_buffer, screen_uv);
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
-        bool static_lightmap = encoded_normal.a < 0.875;
+        bool static_lightmap = encoded_normal.a < 0.8;
         float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
-            clamp(0.5 + 0.5 * normal.y, 0.0, 1.0);
+            clamp((encoded_normal.a - 0.875) * 8.0, 0.0, 1.0);
         float sun_scale = 0.0;
         vec3 sunlight = vec3(0.0);
         // Most rainy frames have no sun. Avoid nine depth fetches per pixel
@@ -143,6 +163,23 @@ void main()
             shadow.hemi_color.rgb * tested_hemi :
             environment_indirect(normal, tested_hemi, surface.g);
         vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + indirect + sunlight);
+        if (surface.r > 0.0 && comparison_mode != 4)
+        {
+            vec4 world_clip = shadow.inverse_view_projection *
+                vec4(screen_uv.x * 2.0 - 1.0, 1.0 - screen_uv.y * 2.0, depth, 1.0);
+            vec3 world_position = world_clip.xyz / world_clip.w;
+            vec4 camera_clip = shadow.inverse_view_projection * vec4(0.0, 0.0, 0.0, 1.0);
+            vec3 incident = normalize(world_position - camera_clip.xyz / camera_clip.w);
+            vec3 reflection = reflect(incident, normal);
+            float angle = 0.5 + 0.5 * dot(reflection, incident);
+            reflection.y = reflection.y * 2.0 - 1.0;
+            float blend = clamp(weather.light_color.a, 0.0, 1.0);
+            vec3 environment = mix(texture(environment_a, reflection).rgb,
+                texture(environment_b, reflection).rgb, blend);
+            vec3 tinted = environment * shadow.hemi_color.rgb * 4.0;
+            lit += tinted * tinted * material_specular(tested_hemi, angle, surface.g) *
+                surface.r;
+        }
         if (surface.r > 0.0 && sun_scale > 0.0)
         {
             vec4 world_clip = shadow.inverse_view_projection *

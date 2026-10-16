@@ -392,7 +392,8 @@ void VulkanGameDevice::record_postprocess(const FrameRecordingContext& frame, vo
 }
 
 void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const float (&mvp)[16],
-    bool hud, float sort_distance, const void* instance, float lod, const Fmatrix* world)
+    bool hud, float sort_distance, const void* instance, float lod, const Fmatrix* world,
+    const float* hemi_faces)
 {
     ModelDraw draw;
     draw.model = &model;
@@ -400,9 +401,18 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const
     draw.skeleton = skeleton;
     std::copy_n(mvp, 16, draw.mvp.data());
     const Fmatrix& rotation = world ? *world : Fidentity;
-    draw.normal_rows = {rotation.i.x, rotation.j.x, rotation.k.x, 0.f,
+    draw.normal_rows = {rotation.i.x, rotation.j.x, rotation.k.x, -1.f,
         rotation.i.y, rotation.j.y, rotation.k.y, 0.f,
         rotation.i.z, rotation.j.z, rotation.k.z, 0.f};
+    if (hemi_faces && std::all_of(hemi_faces, hemi_faces + 6,
+            [](float value) { return std::isfinite(value); }))
+    {
+        draw.normal_rows[3] = std::clamp(hemi_faces[0], 0.f, 1.f);
+        draw.normal_rows[7] = std::clamp(hemi_faces[1], 0.f, 1.f);
+        draw.normal_rows[11] = std::clamp(hemi_faces[2], 0.f, 1.f);
+        for (unsigned face = 0; face < 3; ++face)
+            draw.hemi_negative[face] = std::clamp(hemi_faces[face + 3], 0.f, 1.f);
+    }
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
     draw.lod = lod;
     draw.hud = hud;
@@ -514,6 +524,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
     {
         if (model.hud || !model.model->has_secondary_priority()) continue;
         float mvp[16];
+        owner.deferred_.set_model_hemi_negative(model.hemi_negative.data());
         std::copy(model.mvp.begin(), model.mvp.end(), mvp);
         const bool ok = model.skeleton ?
             model.model->record_animated(frame, owner.deferred_, mvp,
@@ -615,6 +626,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         else if (draw.model)
         {
             ModelDraw& model = owner.model_draws_[draw.index];
+            owner.deferred_.set_model_hemi_negative(model.hemi_negative.data());
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             if (model.skeleton ?
                     !model.model->record_animated(frame, owner.deferred_, mvp,
@@ -726,6 +738,7 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
         else if (draw.model)
         {
             ModelDraw& model = owner.model_draws_[draw.index];
+            owner.deferred_.set_model_hemi_negative(model.hemi_negative.data());
             std::copy(model.mvp.begin(), model.mvp.end(), mvp);
             const bool recorded = model.skeleton ?
                 model.model->record_animated(frame, owner.deferred_, mvp,
@@ -762,6 +775,7 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
     for (auto& draw : owner.model_draws_)
     {
         if (draw.hud) continue;
+        owner.deferred_.set_model_hemi_negative(draw.hemi_negative.data());
         float mvp[16];
         std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
         if (draw.skeleton ?
@@ -957,10 +971,15 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     for (int channel = 0; channel < 3; ++channel)
     {
         const auto valid = [](float value) { return std::isfinite(value) ? std::max(value, 0.f) : 0.f; };
-        sun_uniform.ambient_color[channel] = environment ?
-            valid(environment->ambient_color[channel]) : light.direction_ambient[3];
-        sun_uniform.hemi_color[channel] = environment ?
-            valid(environment->hemi_color[channel]) : light.grade[3];
+        const float ambient = environment ? valid(environment->ambient_color[channel]) :
+            valid(light.direction_ambient[3]);
+        // Match the R2 combine constants, including the floor before the
+        // default ambient scale. The raw weather ambient is half of
+        // the value passed to hmodel on the desktop renderer.
+        sun_uniform.ambient_color[channel] = std::max(ambient * 2.f, .001f);
+        sun_uniform.hemi_color[channel] =
+            environment ? valid(environment->hemi_color[channel]) :
+                valid(light.grade[3]);
     }
     if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
         Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=1:base,sun,baked,albedo;6:env,hemi-one,sun-one,both;7:old-flat shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
@@ -1108,6 +1127,8 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     const VkExtent2D forward_extent = window_.frame().extent();
     forward_lighting_.viewport[0] = forward_extent.width ? 1.f / forward_extent.width : 0.f;
     forward_lighting_.viewport[1] = forward_extent.height ? 1.f / forward_extent.height : 0.f;
+    forward_lighting_.viewport[2] = std::clamp(weather_lighting_.light.color[3], 0.f, 1.f);
+    forward_lighting_.hemi_color[3] = render_world && weather_set_ ? 1.f : 0.f;
     for (uint32_t i = 0; i < forward_count; ++i)
     {
         std::copy_n(local_uniforms_[i].position_range, 4, forward_lighting_.local[i].position_range);
@@ -1138,12 +1159,15 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             Device.dwFrame, level_draws_.size(), linked, model_draws_.size(), animated,
             particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE,
             light_snapshots_.size(), local_uniforms_.size());
-        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) static-lightmap=green-diagnostic-only/alpha-hemi dynamic-sun=shadow-only models=%zu local=%zu",
+        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) ambient-r2=2x env-spec=material forward-env=%u static-lightmap=green-diagnostic-only/alpha-hemi dynamic-sun=shadow-only models=%zu local=%zu",
             Device.dwFrame, weather_set_ != VK_NULL_HANDLE ? "weather" : "plain",
             sun_uniform.ambient_color[0], sun_uniform.ambient_color[1], sun_uniform.ambient_color[2],
             sun_uniform.hemi_color[0], sun_uniform.hemi_color[1], sun_uniform.hemi_color[2],
-            light.color[0], light.color[1], light.color[2], model_draws_.size(), local_uniforms_.size());
+            light.color[0], light.color[1], light.color[2],
+            forward_lighting_.hemi_color[3] > .5f ? 1u : 0u,
+            model_draws_.size(), local_uniforms_.size());
     }
+    deferred_.set_forward_weather(render_world ? weather_set_ : VK_NULL_HANDLE);
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,

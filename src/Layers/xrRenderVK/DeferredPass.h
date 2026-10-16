@@ -147,6 +147,11 @@ public:
         VkDescriptorSet& set, std::string& error);
     void release_gbuffer(VkDescriptorSet& set);
     bool forward_set(uint32_t image, VkBuffer buffer, std::string& error);
+    void set_forward_weather(VkDescriptorSet set) { forward_weather_ = set; }
+    void set_model_hemi_negative(const float* faces)
+    {
+        for (unsigned i = 0; i < 3; ++i) model_hemi_negative_[i] = faces ? faces[i] : 0.f;
+    }
     void release_forward_sets();
     void rebind_compatible_render_passes(VkRenderPass geometry_pass, VkRenderPass light_pass,
         VkRenderPass shadow_pass = VK_NULL_HANDLE, VkRenderPass local_shadow_pass = VK_NULL_HANDLE,
@@ -219,6 +224,8 @@ private:
     VkDescriptorSetLayout material_layout_{}, pose_layout_{}, gbuffer_layout_{}, weather_set_layout_{}, local_set_layout_{}, water_set_layout_{}, forward_layout_{};
     std::vector<VkDescriptorSet> water_sets_;
     std::vector<VkDescriptorSet> forward_sets_;
+    VkDescriptorSet forward_weather_{};
+    float model_hemi_negative_[3]{};
     VkDescriptorPool pool_{};
     ScenePassDispatch vk_{};
     GamePipelineRequest game_pipeline_request_;

@@ -1755,6 +1755,8 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
     const float lod = lod_for_distance(radius, sort_distance);
     if (model)
     {
+        const float* hemi_faces = root && root->renderable_ROS() ?
+            root->renderable_ROS()->get_luminocity_hemi_cube() : nullptr;
         std::function<void(const VulkanModelVisual&, IKinematics*)> submit =
             [&](const VulkanModelVisual& node, IKinematics* skeleton)
         {
@@ -1775,12 +1777,12 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
                     {center.x - camera_position.x, center.y - camera_position.y,
                         center.z - camera_position.z});
                 game_device_->queue_model(node.lod_gpu(facet), skeleton,
-                    transform, hud, sort_distance, model_owner, lod, &world);
+                    transform, hud, sort_distance, model_owner, lod, &world, hemi_faces);
                 return;
             }
             if (node.has_gpu())
                 game_device_->queue_model(node.gpu(), skeleton,
-                    transform, hud, sort_distance, model_owner, lod, &world);
+                    transform, hud, sort_distance, model_owner, lod, &world, hemi_faces);
             for (const auto& child : node.children()) submit(*child, skeleton);
             if (!node.linked().empty())
             {

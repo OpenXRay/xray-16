@@ -120,9 +120,27 @@ class GameShaderVariantsTest(unittest.TestCase):
             self.assertIn(expected_set, sets)
             offsets = {args[3] for op, args in code if op == 72 and len(args) >= 4 and args[2] == 35}
             self.assertTrue({0, 64, 80, 96, 112, 128, 144, 160, 176} <= offsets)
+            decorations = {(args[0], args[1]): args[2] for op, args in code
+                           if op == 71 and len(args) >= 3}
+            weather_bindings = {binding for (identifier, kind), binding in decorations.items()
+                                if kind == 33 and decorations.get((identifier, 34)) == expected_set + 1}
+            self.assertTrue({4, 5} <= weather_bindings)
         hud = list(instructions(SHADERS / "vk/hud_blended.ps.spv"))
         self.assertFalse(any(op == 71 and len(args) >= 3 and args[1] == 34 and args[2] != 0
                              for op, args in hud))
+
+    def test_model_hemi_cube_survives_vertex_to_fragment_contract(self):
+        for vertex_name, fragment_name in (("object_blended.vs.spv", "object_blended.ps.spv"),
+                                           ("skinned_4.vs.spv", "skinned_blended.ps.spv")):
+            vertex = list(instructions(SHADERS / "vk" / vertex_name))
+            fragment = list(instructions(SHADERS / "vk" / fragment_name))
+            for code in (vertex, fragment):
+                locations = {args[2] for op, args in code
+                             if op == 71 and len(args) >= 3 and args[1] == 30}
+                self.assertIn(5, locations)
+            offsets = {args[3] for op, args in vertex
+                       if op == 72 and len(args) >= 4 and args[2] == 35}
+            self.assertIn(128, offsets)
 
     def test_opaque_model_environment_uses_cube_and_surface_attachment(self):
         for name in ("object_environment_opaque", "skinned_environment_opaque"):
