@@ -31,8 +31,12 @@ struct VulkanObjectLighting
 {
     float luminocity{};
     float hemi_luminocity{};
+    // ROS order: +X, -X, +Y, -Y, +Z, -Z.
     std::array<float, 6> hemi_cube{};
 };
+
+// Vertex shaders consume the positive faces as xyz, followed by negative xyz.
+constexpr std::array<unsigned, 6> VulkanShaderHemiFaceOrder{0, 2, 4, 1, 3, 5};
 
 enum VulkanObjectLightingMode : uint32_t
 {

@@ -32,6 +32,12 @@ int main()
     assert(unlit.luminocity < lit.luminocity);
     assert(unlit.hemi_cube[4] == unlit.hemi_cube[5]);
 
+    // A light on +Z must reach the shader's positive Z face, not negative X.
+    assert(lit.hemi_cube[VulkanShaderHemiFaceOrder[2]] >
+        lit.hemi_cube[VulkanShaderHemiFaceOrder[5]]);
+    assert(lit.hemi_cube[VulkanShaderHemiFaceOrder[3]] ==
+        lit.hemi_cube[VulkanShaderHemiFaceOrder[4]]);
+
     point.active = true;
     point.type = VulkanLightType::Spot;
     point.direction = {0.f, 0.f, -1.f};

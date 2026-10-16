@@ -7,6 +7,7 @@
 #include "ShaderModule.h"
 #include "PostProcessShaders.h"
 #include "TransparentDrawOrder.h"
+#include "VulkanGameLightingMath.h"
 #include "xrEngine/x_ray.h"
 
 #include <algorithm>
@@ -407,11 +408,12 @@ void VulkanGameDevice::queue_model(GpuModel& model, IKinematics* skeleton, const
     if (hemi_faces && std::all_of(hemi_faces, hemi_faces + 6,
             [](float value) { return std::isfinite(value); }))
     {
-        draw.normal_rows[3] = std::clamp(hemi_faces[0], 0.f, 1.f);
-        draw.normal_rows[7] = std::clamp(hemi_faces[1], 0.f, 1.f);
-        draw.normal_rows[11] = std::clamp(hemi_faces[2], 0.f, 1.f);
+        draw.normal_rows[3] = std::clamp(hemi_faces[VulkanShaderHemiFaceOrder[0]], 0.f, 1.f);
+        draw.normal_rows[7] = std::clamp(hemi_faces[VulkanShaderHemiFaceOrder[1]], 0.f, 1.f);
+        draw.normal_rows[11] = std::clamp(hemi_faces[VulkanShaderHemiFaceOrder[2]], 0.f, 1.f);
         for (unsigned face = 0; face < 3; ++face)
-            draw.hemi_negative[face] = std::clamp(hemi_faces[face + 3], 0.f, 1.f);
+            draw.hemi_negative[face] =
+                std::clamp(hemi_faces[VulkanShaderHemiFaceOrder[face + 3]], 0.f, 1.f);
     }
     draw.sort_distance = std::isfinite(sort_distance) ? std::max(sort_distance, 0.f) : 0.f;
     draw.lod = lod;
