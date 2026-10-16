@@ -235,7 +235,12 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
                                  scene_dispatch, error, true) ||
             !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory, physical.features.textureCompressionBC,
                 physical.features, physical.properties,
-                strstr(Core.Params, "-android-mobile-preset Minimum") ? 2.f :
+                strstr(Core.Params, "-vk-anisotropy ") ? [&]() {
+                    unsigned value = 4;
+                    sscanf(strstr(Core.Params, "-vk-anisotropy ") +
+                        sizeof("-vk-anisotropy ") - 1, "%u", &value);
+                    return float(std::clamp(value, 1u, 16u));
+                }() : strstr(Core.Params, "-android-mobile-preset Minimum") ? 2.f :
                 strstr(Core.Params, "-android-mobile-preset Low") ? 4.f :
                 strstr(Core.Params, "-android-mobile-preset Extreme") ||
                 strstr(Core.Params, "-android-mobile-preset High") ? 16.f : 8.f,
@@ -1019,7 +1024,6 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     }
     local_uniforms_.clear();
     local_scissors_.clear();
-    size_t local_candidates = 0;
     if (render_world)
     {
         Fmatrix camera, inverse;
@@ -1045,7 +1049,6 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         };
         std::stable_sort(nearby.begin(), nearby.end(), [&](const auto* a, const auto* b)
         { return distance(a) < distance(b); });
-        local_candidates = nearby.size();
         const VkExtent2D extent = window_.frame().extent();
         for (const VulkanLightSnapshot* snapshot : nearby)
         {
@@ -1071,20 +1074,23 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             local.color_type[3] = spot ? 1.f : 0.f;
             const float cone = std::clamp(light_snapshot.cone, .15f, 3.f);
             local.direction_cone[3] = std::cos(cone * .5f);
+            // The launcher bounds the extra scene traversals. A point light
+            // uses six faces, while a spot uses one; neither silently loses
+            // its shadow merely because it is the other local light type.
+            uint32_t shadow_budget = LocalShadowSlots;
 #if defined(XR_PLATFORM_ANDROID)
-            // A point light replays the level six times. On mobile, only one
-            // prominent shadowed local light is affordable; other lights
-            // still illuminate their projected area without a shadow map.
-            const uint32_t shadow_budget = 1;
-#else
-            const uint32_t shadow_budget = LocalShadowSlots;
+            shadow_budget = Core.Params && strstr(Core.Params, "-android-mobile-preset Minimum") ? 0 : 1;
+            if (Core.Params)
+                if (const char* option = strstr(Core.Params, "-vk-shadow-lights "))
+                {
+                    unsigned requested = 1;
+                    if (sscanf(option + sizeof("-vk-shadow-lights ") - 1, "%u", &requested) == 1)
+                        shadow_budget = std::min(requested, LocalShadowSlots);
+                }
 #endif
             const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
             const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            // A point light would redraw the level six times per frame on the
-            // phone. Keep a single-face spot shadow; point lights still add
-            // their illumination without that prohibitive mobile cost.
-            const bool cast = spot && light_snapshot.shadow && shadow_slot < shadow_budget &&
+            const bool cast = light_snapshot.shadow && shadow_slot < shadow_budget &&
                 pixels * 20 >= screen_pixels;
             local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
             local.shadow_params[1] = .002f;
@@ -1136,38 +1142,6 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         std::copy_n(local_uniforms_[i].position_range, 4, forward_lighting_.local[i].position_range);
         std::copy_n(local_uniforms_[i].direction_cone, 4, forward_lighting_.local[i].direction_cone);
         std::copy_n(local_uniforms_[i].color_type, 4, forward_lighting_.local[i].color_type);
-    }
-    if (render_world && Device.dwFrame % 300 == 0)
-    {
-        float total_energy = 0.f, strongest = 0.f;
-        uint32_t spots = 0, shadowed = 0;
-        for (const auto& selected : local_uniforms_)
-        {
-            const float energy = .2126f * selected.color_type[0] +
-                .7152f * selected.color_type[1] + .0722f * selected.color_type[2];
-            total_energy += energy;
-            strongest = std::max(strongest, energy);
-            spots += selected.color_type[3] >= .5f;
-            shadowed += selected.shadow_params[2] >= .5f;
-        }
-        Msg("[renderer-vulkan] light.selection frame=%u candidates=%zu visible=%zu spots=%u shadowed=%u energy=%.3f strongest=%.3f ambient=%.3f hemi=%.3f",
-            Device.dwFrame, local_candidates, local_uniforms_.size(), spots, shadowed,
-            total_energy, strongest, light.direction_ambient[3], light.grade[3]);
-        const auto animated = std::count_if(model_draws_.begin(), model_draws_.end(),
-            [](const ModelDraw& draw) { return draw.skeleton != nullptr; });
-        const auto linked = std::count_if(level_draws_.begin(), level_draws_.end(),
-            [](const LevelDraw& draw) { return draw.instance != nullptr; });
-        Msg("[renderer-vulkan] scene.submit frame=%u level=%zu linked=%zu models=%zu animated=%zu particles=%zu rain=%zu weather=%d lights=%zu local-lights=%zu",
-            Device.dwFrame, level_draws_.size(), linked, model_draws_.size(), animated,
-            particle_draws_.size(), rain_draws_.size(), weather_set_ != VK_NULL_HANDLE,
-            light_snapshots_.size(), local_uniforms_.size());
-        Msg("[renderer-vulkan] lighting.12-15 frame=%u combine=%s surface=rgba8 ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) ambient-r2=2x env-spec=material forward-env=%u static-lightmap=green-diagnostic-only/alpha-hemi dynamic-sun=shadow-only models=%zu local=%zu",
-            Device.dwFrame, weather_set_ != VK_NULL_HANDLE ? "weather" : "plain",
-            sun_uniform.ambient_color[0], sun_uniform.ambient_color[1], sun_uniform.ambient_color[2],
-            sun_uniform.hemi_color[0], sun_uniform.hemi_color[1], sun_uniform.hemi_color[2],
-            light.color[0], light.color[1], light.color[2],
-            forward_lighting_.hemi_color[3] > .5f ? 1u : 0u,
-            model_draws_.size(), local_uniforms_.size());
     }
     deferred_.set_forward_weather(render_world ? weather_set_ : VK_NULL_HANDLE);
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,

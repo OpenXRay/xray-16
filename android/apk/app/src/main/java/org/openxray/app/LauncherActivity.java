@@ -76,7 +76,10 @@ public final class LauncherActivity extends Activity {
     public static final String EXTRA_RENDER_WIDTH = "org.openxray.extra.RENDER_WIDTH";
     public static final String EXTRA_RENDER_HEIGHT = "org.openxray.extra.RENDER_HEIGHT";
     public static final String EXTRA_SHOW_FPS = "org.openxray.extra.SHOW_FPS";
-    public static final String EXTRA_LIGHT_DEBUG_MODE = "org.openxray.extra.LIGHT_DEBUG_MODE";
+    public static final String EXTRA_SHADOW_LIGHTS = "org.openxray.extra.SHADOW_LIGHTS";
+    public static final String EXTRA_DETAIL_DISTANCE = "org.openxray.extra.DETAIL_DISTANCE";
+    public static final String EXTRA_ANISOTROPY = "org.openxray.extra.ANISOTROPY";
+    public static final String EXTRA_SUN_SHADOWS = "org.openxray.extra.SUN_SHADOWS";
 
     private static final String PREFS = "openxray_launcher";
     private static final String PREF_GAME_PATH = "game_path";
@@ -95,13 +98,13 @@ public final class LauncherActivity extends Activity {
     private static final String PREF_GRAPHICS_PRESET = "graphics_preset";
     private static final String PREF_RENDER_RESOLUTION = "render_resolution";
     private static final String PREF_SHOW_FPS = "show_fps";
-    private static final String PREF_LIGHT_DIAGNOSTIC = "light_diagnostic"; // migration from the four-pane build
-    private static final String PREF_LIGHT_DEBUG_MODE = "light_debug_mode";
-    private static final String[] LIGHT_DEBUG_MODES = {"Выключено", "Четыре экрана",
-            "Один экран: освещение", "Один экран: солнечная тень",
-            "Один экран: запечённый свет", "Один экран: текстура без света",
-            "Сравнение света: 4 экрана", "Один экран: прежний свет",
-            "Один экран: свет неба без затенения", "Один экран: солнце без тени"};
+    private static final String PREF_SHADOW_LIGHTS = "shadow_lights";
+    private static final String PREF_DETAIL_DISTANCE = "detail_distance";
+    private static final String PREF_ANISOTROPY = "anisotropy";
+    private static final String PREF_SUN_SHADOWS = "sun_shadows";
+    private static final int[] SHADOW_LIGHT_VALUES = {-1, 0, 1, 2, 4};
+    private static final int[] DETAIL_DISTANCE_VALUES = {-1, 0, 20, 40, 60, 80};
+    private static final int[] ANISOTROPY_VALUES = {-1, 2, 4, 8, 16};
     private static final String PREF_ANDROID_CRASH_REPORTS = "android_crash_reports";
 
     public static final int RENDERER_AUTO = 0;
@@ -132,13 +135,16 @@ public final class LauncherActivity extends Activity {
     private Spinner rendererMode;
     private Spinner graphicsPreset;
     private Spinner renderResolution;
+    private Spinner shadowLights;
+    private Spinner detailDistance;
+    private Spinner anisotropy;
+    private CheckBox sunShadows;
     private CheckBox gamepadEnabled;
     private CheckBox splashEnabled;
     private CheckBox keepScreenOn;
     private CheckBox immersiveMode;
     private CheckBox touchControlsEnabled;
     private CheckBox showFps;
-    private Spinner lightDebugMode;
     private CheckBox androidCrashReports;
     private TextView accessStatus;
     private TextView gameInspection;
@@ -404,6 +410,15 @@ public final class LauncherActivity extends Activity {
         return scrollPage(content);
     }
 
+    private Spinner settingsSpinner(String[] labels) {
+        Spinner spinner = new Spinner(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, labels);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        return spinner;
+    }
+
     private View buildSettingsPage() {
         LinearLayout content = pageContent();
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[0]);
@@ -425,6 +440,23 @@ public final class LauncherActivity extends Activity {
         graphicsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         graphicsPreset.setAdapter(graphicsAdapter);
         content.addView(graphicsPreset, matchWrap());
+
+        addSectionTitle(content, "Настройки Vulkan");
+        content.addView(bodyText("Тени точечных ламп используют шесть проходов на источник. "
+                + "Изменения применяются после перезапуска игры."), matchWrap());
+        shadowLights = settingsSpinner(new String[]{"Локальные тени: по пресету", "Локальные тени: выключены",
+                "Локальные тени: 1 источник", "Локальные тени: 2 источника",
+                "Локальные тени: 4 источника"});
+        detailDistance = settingsSpinner(new String[]{"Трава: по пресету", "Трава: выключена", "Трава: 20 м",
+                "Трава: 40 м", "Трава: 60 м", "Трава: 80 м"});
+        anisotropy = settingsSpinner(new String[]{"Анизотропия: по пресету", "Анизотропия: 2×", "Анизотропия: 4×",
+                "Анизотропия: 8×", "Анизотропия: 16×"});
+        sunShadows = makeCheckBox("Солнечные динамические тени",
+                "В дождливую погоду солнце может иметь нулевую яркость.");
+        content.addView(sunShadows, matchWrap());
+        content.addView(shadowLights, matchWrap());
+        content.addView(detailDistance, matchWrap());
+        content.addView(anisotropy, matchWrap());
 
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[2]);
         content.addView(bodyText("Снижение разрешения ускоряет рендеринг, но уменьшает чёткость."), matchWrap());
@@ -453,19 +485,6 @@ public final class LauncherActivity extends Activity {
         content.addView(keepScreenOn, matchWrap());
         content.addView(immersiveMode, matchWrap());
         content.addView(showFps, matchWrap());
-
-        addSectionTitle(content, "Отладка Vulkan");
-        content.addView(bodyText("Сравните четыре вида одного кадра или разверните любой из них "
-                + "на весь экран. R — запечённое солнце, G — полусфера, B — модель без карты света. "
-                + "В сравнении света: слева сверху новая модель, справа сверху небо без затенения; "
-                + "слева снизу солнце без тени, справа снизу оба изменения. "
-                + "Режим применяется после перезапуска игры."), matchWrap());
-        lightDebugMode = new Spinner(this);
-        ArrayAdapter<String> lightDebugAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, LIGHT_DEBUG_MODES);
-        lightDebugAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        lightDebugMode.setAdapter(lightDebugAdapter);
-        content.addView(lightDebugMode, matchWrap());
 
         addSectionTitle(content, "Диагностика");
         androidCrashReports = makeCheckBox("Сохранять отчёты Android о завершении движка",
@@ -722,9 +741,10 @@ public final class LauncherActivity extends Activity {
                 preferences.getInt(PREF_GRAPHICS_PRESET, GRAPHICS_AUTO)));
         selectStoredResolution(preferences.getString(PREF_RENDER_RESOLUTION, "auto"));
         showFps.setChecked(preferences.getBoolean(PREF_SHOW_FPS, true));
-        int previousDebugMode = preferences.getBoolean(PREF_LIGHT_DIAGNOSTIC, false) ? 1 : 0;
-        int debugMode = preferences.getInt(PREF_LIGHT_DEBUG_MODE, previousDebugMode);
-        lightDebugMode.setSelection(Math.max(0, Math.min(debugMode, LIGHT_DEBUG_MODES.length - 1)));
+        shadowLights.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_SHADOW_LIGHTS, 0))));
+        detailDistance.setSelection(Math.max(0, Math.min(5, preferences.getInt(PREF_DETAIL_DISTANCE, 0))));
+        anisotropy.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_ANISOTROPY, 0))));
+        sunShadows.setChecked(preferences.getBoolean(PREF_SUN_SHADOWS, true));
         androidCrashReports.setChecked(preferences.getBoolean(PREF_ANDROID_CRASH_REPORTS, true));
         showPage(preferences.getInt(PREF_ACTIVE_PAGE, PAGE_GAME));
     }
@@ -747,7 +767,10 @@ public final class LauncherActivity extends Activity {
                 .putInt(PREF_GRAPHICS_PRESET, graphicsPreset.getSelectedItemPosition())
                 .putString(PREF_RENDER_RESOLUTION, selectedRenderResolution().id)
                 .putBoolean(PREF_SHOW_FPS, showFps.isChecked())
-                .putInt(PREF_LIGHT_DEBUG_MODE, lightDebugMode.getSelectedItemPosition())
+                .putInt(PREF_SHADOW_LIGHTS, shadowLights.getSelectedItemPosition())
+                .putInt(PREF_DETAIL_DISTANCE, detailDistance.getSelectedItemPosition())
+                .putInt(PREF_ANISOTROPY, anisotropy.getSelectedItemPosition())
+                .putBoolean(PREF_SUN_SHADOWS, sunShadows.isChecked())
                 .putBoolean(PREF_ANDROID_CRASH_REPORTS, androidCrashReports.isChecked())
                 .putInt(PREF_ACTIVE_PAGE, activePage)
                 .apply();
@@ -1086,7 +1109,10 @@ public final class LauncherActivity extends Activity {
         intent.putExtra(EXTRA_RENDER_WIDTH, resolution.width);
         intent.putExtra(EXTRA_RENDER_HEIGHT, resolution.height);
         intent.putExtra(EXTRA_SHOW_FPS, showFps.isChecked());
-        intent.putExtra(EXTRA_LIGHT_DEBUG_MODE, lightDebugMode.getSelectedItemPosition());
+        intent.putExtra(EXTRA_SHADOW_LIGHTS, SHADOW_LIGHT_VALUES[shadowLights.getSelectedItemPosition()]);
+        intent.putExtra(EXTRA_DETAIL_DISTANCE, DETAIL_DISTANCE_VALUES[detailDistance.getSelectedItemPosition()]);
+        intent.putExtra(EXTRA_ANISOTROPY, ANISOTROPY_VALUES[anisotropy.getSelectedItemPosition()]);
+        intent.putExtra(EXTRA_SUN_SHADOWS, sunShadows.isChecked());
         if (!vulkanSmoke) {
             intent.putExtra(EXTRA_GAME_PATH, gamePath.getText().toString().trim());
             intent.putExtra(EXTRA_GAME_VARIANT, activeGameVariant);

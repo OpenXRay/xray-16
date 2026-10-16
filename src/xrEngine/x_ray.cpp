@@ -1049,7 +1049,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array
             // executing the GLES/desktop script here only produces misleading
             // unknown-command warnings without changing Vulkan quality.
             if (strstr(Core.Params, "-renderer-vulkan"))
-                Msg("[android] Vulkan quality preset: %s (world anisotropy; render resolution selected separately)", preset);
+                Msg("[android] Vulkan quality preset: %s (anisotropy, local shadows, grass distance; resolution selected separately)", preset);
             else
             {
                 string128 command{};

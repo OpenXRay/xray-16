@@ -68,7 +68,7 @@ public:
     bool visible_sector_roots(size_t camera_sector, const Fmatrix& view_projection,
         const Fvector& camera_position, std::vector<uint32_t>& roots) const;
     void all_level_roots(std::vector<uint32_t>& roots) const;
-    void prepare_details(const Fvector& camera_position);
+    void prepare_details(const Fvector& camera_position, float max_distance = 40.f);
     bool record_details(const FrameRecordingContext& frame, const DeferredPass& pass,
         const float (&mvp)[16]) const;
     bool prepare_transparent_details(const FrameRecordingContext& frame,

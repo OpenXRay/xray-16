@@ -817,12 +817,13 @@ uint32_t detail_random(uint32_t value)
 }
 }
 
-void GpuLevel::prepare_details(const Fvector& camera)
+void GpuLevel::prepare_details(const Fvector& camera, float max_distance)
 {
     visible_details_.clear();
     if (details_.cells.empty() || !g_pGameLevel || !std::isfinite(camera.x) ||
         !std::isfinite(camera.y) || !std::isfinite(camera.z)) return;
-    constexpr float max_distance = 40.f;
+    max_distance = std::clamp(max_distance, 0.f, 80.f);
+    if (max_distance < 1.f) return;
     const int cx = static_cast<int>(std::floor(camera.x / 2.f)) + details_.offset_x;
     const int cz = static_cast<int>(std::floor(camera.z / 2.f)) + details_.offset_z;
     const int radius = static_cast<int>(max_distance / 2.f) + 1;

@@ -221,11 +221,27 @@ public final class XRayActivity extends SDLActivity {
             args.add(Integer.toString(Math.max(320, renderHeight)));
             args.add("-android-mobile-preset");
             args.add(OptionCatalog.value(OptionCatalog.GRAPHICS_PRESETS, graphicsPreset, 0));
+            if (rendererMode == LauncherActivity.RENDERER_VULKAN) {
+                if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_SUN_SHADOWS, true))
+                    args.add("-vk-no-sun-shadows");
+                int shadowLights = getIntent().getIntExtra(LauncherActivity.EXTRA_SHADOW_LIGHTS, -1);
+                int detailDistance = getIntent().getIntExtra(LauncherActivity.EXTRA_DETAIL_DISTANCE, -1);
+                int anisotropy = getIntent().getIntExtra(LauncherActivity.EXTRA_ANISOTROPY, -1);
+                if (shadowLights >= 0) {
+                    args.add("-vk-shadow-lights");
+                    args.add(Integer.toString(shadowLights));
+                }
+                if (detailDistance >= 0) {
+                    args.add("-vk-detail-distance");
+                    args.add(Integer.toString(detailDistance));
+                }
+                if (anisotropy >= 0) {
+                    args.add("-vk-anisotropy");
+                    args.add(Integer.toString(anisotropy));
+                }
+            }
             if (showFps)
                 args.add("-android-show-fps");
-            int debugMode = getIntent().getIntExtra(LauncherActivity.EXTRA_LIGHT_DEBUG_MODE, 0);
-            if (rendererMode == LauncherActivity.RENDERER_VULKAN && debugMode >= 1 && debugMode <= 9)
-                args.add("-vk-light-debug=" + debugMode);
         }
 
         // The smoke test validates Vulkan explicitly. In gameplay the layer
