@@ -57,12 +57,14 @@ float sun_visibility(float depth, vec2 screen_uv)
 
 void main()
 {
-    // Diagnostic panes repeat the same camera view. Each screenshot therefore
-    // compares exactly the same pixels, without asking the player to move.
+    // The four-pane view repeats one G-buffer; modes 2..5 fill the screen
+    // with the corresponding panel at its native resolution.
     bool diagnostic = shadow.options.y > 0.5;
-    vec2 pane = diagnostic ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
-    int panel = int(pane.x) + 2 * int(pane.y);
-    vec2 screen_uv = diagnostic ? fract(texcoord * 2.0) : texcoord;
+    bool four_panes = diagnostic && shadow.options.y < 1.5;
+    vec2 pane = four_panes ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
+    int panel = four_panes ? int(pane.x) + 2 * int(pane.y) :
+        diagnostic ? clamp(int(shadow.options.y) - 2, 0, 3) : 0;
+    vec2 screen_uv = four_panes ? fract(texcoord * 2.0) : texcoord;
     if (texture(depth_buffer, screen_uv).r < 0.99999)
     {
         float depth = texture(depth_buffer, screen_uv).r;

@@ -74,10 +74,10 @@ void DeferredFrame::lighting(const FrameRecordingContext& frame, void* user_data
     context.recorded_ &= context.pass_->record_lighting(frame,
         context.targets_->lighting_set(frame.image_index), context.light_,
         context.weather_set_, context.weather_set_ ? &context.weather_ : nullptr);
-    // The diagnostic repeats the G-buffer into four panes. Local lights use
-    // full-screen coordinates and would otherwise contaminate those panes.
+    // The base panel receives local lights in both full-screen and four-pane
+    // views; the other three panels display G-buffer channels only.
     if (context.render_world_ && context.local_lighting_ &&
-        context.shadow_uniform_.options[1] < .5f)
+        context.shadow_uniform_.options[1] < 2.5f)
         context.local_lighting_(frame, context.local_data_);
     if (!context.water_) overlay(frame, user_data);
 }

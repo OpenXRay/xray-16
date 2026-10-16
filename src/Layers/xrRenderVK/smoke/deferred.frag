@@ -50,9 +50,11 @@ float sun_visibility(float depth, vec2 screen_uv)
 void main()
 {
     bool diagnostic = shadow.options.y > 0.5;
-    vec2 pane = diagnostic ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
-    int panel = int(pane.x) + 2 * int(pane.y);
-    vec2 screen_uv = diagnostic ? fract(texcoord * 2.0) : texcoord;
+    bool four_panes = diagnostic && shadow.options.y < 1.5;
+    vec2 pane = four_panes ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
+    int panel = four_panes ? int(pane.x) + 2 * int(pane.y) :
+        diagnostic ? clamp(int(shadow.options.y) - 2, 0, 3) : 0;
+    vec2 screen_uv = four_panes ? fract(texcoord * 2.0) : texcoord;
     float depth = texture(depth_buffer, screen_uv).r;
     if (diagnostic && depth >= 0.99999 && panel != 0)
     {

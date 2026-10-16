@@ -11,6 +11,7 @@ layout(set = 1, binding = 1, std140) uniform LocalLight {
     vec4 direction_cone;
     vec4 color_type;
     vec4 shadow_params;
+    vec4 debug_mode;
 } light;
 layout(location = 0) in vec2 texcoord;
 layout(location = 0) out vec4 pixel_color;
@@ -43,28 +44,34 @@ float visibility(vec3 world, vec3 delta)
 
 void main()
 {
-    float depth = texture(depth_buffer, texcoord).r;
+    // Match the base panel's G-buffer lookup. Local lights previously vanished
+    // from all four-panel screenshots, making lamps and interiors look broken.
+    vec2 screen_uv = light.debug_mode.x > 0.5 && light.debug_mode.x < 1.5 ?
+        texcoord * 2.0 : texcoord;
+    if (any(greaterThanEqual(screen_uv, vec2(1.0))))
+    { pixel_color = vec4(0.0); return; }
+    float depth = texture(depth_buffer, screen_uv).r;
     if (depth >= 0.99999) { pixel_color = vec4(0.0); return; }
     vec4 world_clip = light.inverse_view_projection *
-        vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, depth, 1.0);
+        vec4(screen_uv.x * 2.0 - 1.0, 1.0 - screen_uv.y * 2.0, depth, 1.0);
     vec3 world = world_clip.xyz / max(abs(world_clip.w), 1e-6) * sign(world_clip.w);
     vec3 delta = world - light.position_range.xyz;
     float distance = length(delta);
     float range = max(light.position_range.w, 0.01);
     if (distance >= range || distance <= 1e-5) { pixel_color = vec4(0.0); return; }
-    vec3 normal = normalize(texture(normal_buffer, texcoord).rgb * 2.0 - 1.0);
-    vec4 surface = texture(surface_buffer, texcoord);
+    vec3 normal = normalize(texture(normal_buffer, screen_uv).rgb * 2.0 - 1.0);
+    vec4 surface = texture(surface_buffer, screen_uv);
     float diffuse = max(dot(normal, -delta / distance), 0.0);
     float normalized_distance = distance / range;
     float attenuation = max(1.0 - normalized_distance * normalized_distance, 0.0);
     if (light.color_type.w >= 0.5)
         attenuation *= smoothstep(light.direction_cone.w, min(1.0, light.direction_cone.w + 0.05),
             dot(normalize(delta), normalize(light.direction_cone.xyz)));
-    vec3 color = texture(albedo_buffer, texcoord).rgb * light.color_type.rgb * diffuse;
+    vec3 color = texture(albedo_buffer, screen_uv).rgb * light.color_type.rgb * diffuse;
     if (surface.r > 0.0)
     {
         vec4 near_clip = light.inverse_view_projection *
-            vec4(texcoord.x * 2.0 - 1.0, 1.0 - texcoord.y * 2.0, 0.0, 1.0);
+            vec4(screen_uv.x * 2.0 - 1.0, 1.0 - screen_uv.y * 2.0, 0.0, 1.0);
         vec3 view_ray = normalize(near_clip.xyz / near_clip.w - world);
         float specular = pow(max(dot(normal, normalize(view_ray - delta / distance)), 0.0),
             mix(4.0, 64.0, surface.r));

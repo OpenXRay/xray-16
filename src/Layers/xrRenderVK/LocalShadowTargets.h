@@ -22,6 +22,7 @@ struct alignas(16) LocalLightUniform
     float direction_cone[4]{};
     float color_type[4]{};
     float shadow_params[4]{}; // base array layer, bias, enabled, unused
+    float debug_mode[4]{}; // 1: remap the four-pane base view into the upper-left quadrant
 };
 static_assert(sizeof(LocalLightUniform) % 16 == 0);
 
