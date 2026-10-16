@@ -1074,23 +1074,14 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             local.color_type[3] = spot ? 1.f : 0.f;
             const float cone = std::clamp(light_snapshot.cone, .15f, 3.f);
             local.direction_cone[3] = std::cos(cone * .5f);
-            // The launcher bounds the extra scene traversals. A point light
-            // uses six faces, while a spot uses one; neither silently loses
-            // its shadow merely because it is the other local light type.
-            uint32_t shadow_budget = LocalShadowSlots;
 #if defined(XR_PLATFORM_ANDROID)
-            shadow_budget = Core.Params && strstr(Core.Params, "-android-mobile-preset Minimum") ? 0 : 1;
-            if (Core.Params)
-                if (const char* option = strstr(Core.Params, "-vk-shadow-lights "))
-                {
-                    unsigned requested = 1;
-                    if (sscanf(option + sizeof("-vk-shadow-lights ") - 1, "%u", &requested) == 1)
-                        shadow_budget = std::min(requested, LocalShadowSlots);
-                }
+            const uint32_t shadow_budget = 1;
+#else
+            const uint32_t shadow_budget = LocalShadowSlots;
 #endif
             const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
             const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            const bool cast = light_snapshot.shadow && shadow_slot < shadow_budget &&
+            const bool cast = spot && light_snapshot.shadow && shadow_slot < shadow_budget &&
                 pixels * 20 >= screen_pixels;
             local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
             local.shadow_params[1] = .002f;

@@ -224,13 +224,8 @@ public final class XRayActivity extends SDLActivity {
             if (rendererMode == LauncherActivity.RENDERER_VULKAN) {
                 if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_SUN_SHADOWS, true))
                     args.add("-vk-no-sun-shadows");
-                int shadowLights = getIntent().getIntExtra(LauncherActivity.EXTRA_SHADOW_LIGHTS, -1);
                 int detailDistance = getIntent().getIntExtra(LauncherActivity.EXTRA_DETAIL_DISTANCE, -1);
                 int anisotropy = getIntent().getIntExtra(LauncherActivity.EXTRA_ANISOTROPY, -1);
-                if (shadowLights >= 0) {
-                    args.add("-vk-shadow-lights");
-                    args.add(Integer.toString(shadowLights));
-                }
                 if (detailDistance >= 0) {
                     args.add("-vk-detail-distance");
                     args.add(Integer.toString(detailDistance));
