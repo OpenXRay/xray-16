@@ -228,12 +228,13 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::st
             const uint8_t* source = data.data + stride * v;
             std::memcpy(vertex.position, source + position, sizeof(vertex.position));
             if (normal_type == 2)
-                std::memcpy(vertex.normal, source + normal, sizeof(vertex.normal));
+                std::memcpy(vertex.normal, source + normal, sizeof(float) * 3);
             else
             {
                 const uint32_t packed = uint32_t(source[normal]) | (uint32_t(source[normal + 1]) << 8) | (uint32_t(source[normal + 2]) << 16);
                 for (int axis = 0; axis < 3; ++axis)
                     vertex.normal[axis] = float((packed >> ((2 - axis) * 8)) & 255) * (2.f / 255.f) - 1.f;
+                vertex.normal[3] = float(source[normal + 3]) * (1.f / 255.f);
             }
             if (uv_type == 1)
                 std::memcpy(vertex.uv, source + uv, sizeof(vertex.uv));

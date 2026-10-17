@@ -4,6 +4,7 @@
 #include "src/Layers/xrRenderVK/PackedLevelGeometry.h"
 
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <limits>
 #include <vector>
@@ -121,7 +122,7 @@ int main()
                 f32(profile_vb, float(v));
                 f32(profile_vb, 0);
                 f32(profile_vb, 0);
-                u32(profile_vb, 0x008080ff);
+                u32(profile_vb, 0x7f8080ff);
                 u32(profile_vb, 0x7f000000);
                 u32(profile_vb, 0x3f000000);
                 u16(profile_vb, 1024);
@@ -134,7 +135,9 @@ int main()
         {
             assert(result.models[0].vertices[0].uv[0] > 1.f);
             assert(result.models[0].vertices[0].uv[1] < -0.999f);
+            assert(std::abs(result.models[0].vertices[0].normal[3] - 127.f / 255.f) < 1e-6f);
         }
+        else assert(result.models[0].vertices[0].normal[3] < 0.f);
         auto truncated = profile_vb;
         truncated.pop_back();
         assert(!load_game_level_models(profile, input(level_header), input(shaders), input(truncated), input(ib), input(visuals), result, error));
