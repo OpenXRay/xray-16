@@ -354,7 +354,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         if (mesh.secondary_opaque) mode = SurfaceMode::Transparent;
-        if (mode == SurfaceMode::Transparent && detail_texture.empty() &&
+        if (mode == SurfaceMode::Transparent && !mesh.secondary_opaque && detail_texture.empty() &&
             definition.class_name != "LmEbB   ") lightmap.clear();
         if ((terrain.enabled || !definition.detail_texture.empty() ||
                 definition.class_name == "LmEbB   " || definition.class_name == "LaEmB   ") && lightmap.empty())
@@ -399,7 +399,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         const uint16_t roles = (metadata.bump_mode >= 2 ? BumpRole | BumpAuxRole | GlossRole : 0u) |
             (!metadata.external_normal_texture.empty() || metadata.normal ? NormalRole : 0u);
         if (mesh.secondary_opaque)
-            mesh.pass_graph = secondary_opaque_level_graph(roles);
+            mesh.pass_graph = secondary_opaque_level_graph(roles, mesh.lightmapped);
         else if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
                 mesh.environment, mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles,
                 definition.class_name == "S_SET   " ? blend_mode : -1, definition.object_lod},

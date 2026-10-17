@@ -3,6 +3,7 @@
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_opaque.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_opaque.ps.spv", "define": ["LEVEL_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/level_priority_opaque.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/level_priority_lightmap.ps.spv", "define": ["LEVEL_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_LIGHTMAP=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_priority_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_priority_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_TRANSPARENT=1", "VK_SKINNED=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/level_lightmap.vs.spv", "define": ["LEVEL_GEOMETRY=1"] },

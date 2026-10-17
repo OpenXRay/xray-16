@@ -319,6 +319,10 @@ int main()
         secondary.passes[0].blend == LevelPassBlend::Replace &&
         secondary.passes[0].depth_test && secondary.passes[0].depth_write &&
         (secondary.passes[0].textures & (NormalRole | GlossRole)) == (NormalRole | GlossRole));
+    const auto secondary_lightmap = secondary_opaque_level_graph(NormalRole, true);
+    assert(validate_level_pass_graph(secondary_lightmap, error));
+    assert(secondary_lightmap.passes[0].fragment == "vk\\level_priority_lightmap.ps" &&
+        (secondary_lightmap.passes[0].textures & LightmapRole));
     std::vector<TransparentDrawRef> overlap = {
         {4.f, false, 0, false, true},
         {16.f, false, 1, false, false},

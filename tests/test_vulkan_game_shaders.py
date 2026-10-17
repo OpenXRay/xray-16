@@ -73,6 +73,7 @@ class GameShaderVariantsTest(unittest.TestCase):
                             "environment.ps" in name and name.startswith(("vk/object_", "vk/skinned_")) or
                             name in ("vk/wallmark_multiply_2x.ps.spv", "vk/level_fog.ps.spv",
                                      "vk/level_priority_opaque.ps.spv",
+                                     "vk/level_priority_lightmap.ps.spv",
                                      "vk/object_priority_opaque.ps.spv",
                                      "vk/skinned_priority_opaque.ps.spv")):
                         # The forward pass has one color attachment.

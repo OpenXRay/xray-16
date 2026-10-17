@@ -49,16 +49,16 @@ struct LevelPassGraph
 // Secondary opaque V surfaces are drawn after combine (R2 priority 2/3),
 // with color replacement and depth writes. Ordinary opaque shaders write
 // G-buffer attachments and cannot be bound in this pass.
-inline LevelPassGraph secondary_opaque_level_graph(uint16_t surface_roles)
+inline LevelPassGraph secondary_opaque_level_graph(uint16_t surface_roles, bool lightmapped = false)
 {
     LevelPassGraph graph;
     auto& node = graph.passes[0];
     node.vertex = "vk\\level_opaque.vs";
-    node.fragment = "vk\\level_priority_opaque.ps";
+    node.fragment = lightmapped ? "vk\\level_priority_lightmap.ps" : "vk\\level_priority_opaque.ps";
     node.target = LevelPassTarget::Forward;
     node.blend = LevelPassBlend::Replace;
     node.depth_test = node.depth_write = true;
-    node.textures = BaseRole | surface_roles;
+    node.textures = BaseRole | surface_roles | (lightmapped ? LightmapRole : 0);
     graph.count = 1;
     return graph;
 }

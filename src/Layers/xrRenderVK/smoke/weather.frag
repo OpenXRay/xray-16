@@ -74,8 +74,8 @@ float material_diffuse(float hemi, float material)
 vec3 environment_indirect(vec3 normal, float hemi, float material)
 {
     float blend = clamp(weather.light_color.a, 0.0, 1.0);
-    vec3 environment = mix(textureLod(environment_a, normal, 0.0).rgb,
-        textureLod(environment_b, normal, 0.0).rgb, blend);
+    vec3 environment = mix(texture(environment_a, normal).rgb,
+        texture(environment_b, normal).rgb, blend);
     // CoP's env_color is 2*hemi_color and the R2 combine pass doubles it.
     vec3 tinted = environment * shadow.hemi_color.rgb * 4.0;
     return tinted * tinted * material_diffuse(hemi, material);
@@ -174,8 +174,8 @@ void main()
             float angle = 0.5 + 0.5 * dot(reflection, incident);
             reflection.y = reflection.y * 2.0 - 1.0;
             float blend = clamp(weather.light_color.a, 0.0, 1.0);
-            vec3 environment = mix(textureLod(environment_a, reflection, 0.0).rgb,
-                textureLod(environment_b, reflection, 0.0).rgb, blend);
+            vec3 environment = mix(texture(environment_a, reflection).rgb,
+                texture(environment_b, reflection).rgb, blend);
             vec3 tinted = environment * shadow.hemi_color.rgb * 4.0;
             lit += tinted * tinted * material_specular(tested_hemi, angle, surface.g) *
                 surface.r;

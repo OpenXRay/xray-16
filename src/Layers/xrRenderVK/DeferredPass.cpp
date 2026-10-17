@@ -692,12 +692,14 @@ bool DeferredPass::create_game_pipeline(const std::string& vertex_name, const st
         fragment_name.find("_set.ps") != std::string::npos;
     const bool world_set_depth_write = fragment_name == "vk\\world_set_set.ps" ||
         fragment_name == "vk\\level_priority_opaque.ps" ||
+        fragment_name == "vk\\level_priority_lightmap.ps" ||
         fragment_name == "vk\\object_priority_opaque.ps" ||
         fragment_name == "vk\\skinned_priority_opaque.ps" ||
         fragment_name == "vk\\model_set_set.ps" ||
         fragment_name == "vk\\hud_model_set_set.ps";
     const bool world_set_replace = fragment_name == "vk\\world_set_set_2r.ps" ||
         fragment_name == "vk\\level_priority_opaque.ps" ||
+        fragment_name == "vk\\level_priority_lightmap.ps" ||
         fragment_name == "vk\\object_priority_opaque.ps" ||
         fragment_name == "vk\\skinned_priority_opaque.ps" ||
         fragment_name == "vk\\model_set_set_2r.ps" ||
