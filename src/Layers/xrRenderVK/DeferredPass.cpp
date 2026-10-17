@@ -40,7 +40,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         static_cast<uint32_t>(skinned ? sizeof(ModelVertex) : sizeof(LevelVertex)), VK_VERTEX_INPUT_RATE_VERTEX};
     const VkVertexInputAttributeDescription attributes[]{
         {0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},
-        {1, 0, skinned ? VK_FORMAT_R32G32B32_SFLOAT : VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(LevelVertex, normal)},
+        {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(LevelVertex, normal)},
         {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, uv)},
         {3, 0, VK_FORMAT_R16G16B16A16_UINT, offsetof(ModelVertex, bones)},
         {4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(ModelVertex, weights)},

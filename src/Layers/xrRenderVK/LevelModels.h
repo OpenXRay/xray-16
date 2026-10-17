@@ -47,9 +47,7 @@ struct LevelMaterial
 struct LevelVertex
 {
     float position[3]{};
-    // Packed NORMAL0.w is the level's baked hemisphere visibility. A negative
-    // value means the vertex was generated without this channel.
-    float normal[4]{0.f, 0.f, 0.f, -1.f};
+    float normal[3]{};
     float uv[2]{};
     float lightmap_uv[2]{};
     float baked[4]{1.f, 1.f, 1.f, 1.f};

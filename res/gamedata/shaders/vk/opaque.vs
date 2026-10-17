@@ -13,11 +13,7 @@
 struct Vertex
 {
     [[vk::location(0)]] float3 position : POSITION;
-#if defined(LEVEL_GEOMETRY)
-    [[vk::location(1)]] float4 normal : NORMAL;
-#else
     [[vk::location(1)]] float3 normal : NORMAL;
-#endif
     [[vk::location(2)]] float2 uv : TEXCOORD0;
 #if defined(LEVEL_GEOMETRY)
     [[vk::location(5)]] float2 lightmap_uv : TEXCOORD1;
@@ -51,16 +47,12 @@ Fragment main(Vertex vertex)
     // X-Ray's projection is Y-up; a positive-height Vulkan viewport is Y-down.
     fragment.position.y = -fragment.position.y;
 #if defined(LEVEL_GEOMETRY)
-    fragment.normal = vertex.normal.xyz;
+    fragment.normal = vertex.normal;
 #else
     fragment.normal = normalize(float3(dot(normal_rows[0].xyz, vertex.normal),
         dot(normal_rows[1].xyz, vertex.normal), dot(normal_rows[2].xyz, vertex.normal)));
 #endif
     fragment.hemi = saturate(0.5 + 0.5 * normalize(fragment.normal).y);
-#if defined(LEVEL_GEOMETRY)
-    if (vertex.normal.w >= 0.0)
-        fragment.hemi = saturate(vertex.normal.w);
-#endif
 #if !defined(LEVEL_GEOMETRY)
     if (normal_rows[0].w >= 0.0)
     {

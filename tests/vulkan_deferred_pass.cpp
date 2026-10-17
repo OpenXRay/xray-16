@@ -270,7 +270,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         const auto* attributes = info->pVertexInputState->pVertexAttributeDescriptions;
         assert(attributes[0].format == VK_FORMAT_R32G32B32_SFLOAT &&
             attributes[0].offset == offsetof(LevelVertex, position));
-        assert(attributes[1].format == VK_FORMAT_R32G32B32A32_SFLOAT &&
+        assert(attributes[1].format == VK_FORMAT_R32G32B32_SFLOAT &&
             attributes[1].offset == offsetof(LevelVertex, normal));
         assert(attributes[2].format == VK_FORMAT_R32G32_SFLOAT &&
             attributes[2].offset == offsetof(LevelVertex, uv));
