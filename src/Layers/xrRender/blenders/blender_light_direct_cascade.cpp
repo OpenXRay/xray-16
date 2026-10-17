@@ -34,12 +34,23 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
         C.r_Sampler("s_lmap", r2_sunmask);
         if (b_HW_smap)
         {
+#if defined(USE_OGL)
+            // FIX (macOS/Apple GL): the GLSL shader declares s_smap as sampler2DShadow.
+            // OpenGL requires the sampler object bound to that unit to have
+            // GL_TEXTURE_COMPARE_MODE = GL_COMPARE_REF_TO_TEXTURE, otherwise the result
+            // of textureProj() on a shadow sampler is undefined. Apple's Metal-backed GL
+            // silently returns raw depth (~0.9-1.0) in this case, which manifests as
+            // "no dynamic shadows, slight gamma change". DX11 uses a comparison sampler
+            // (smp_smap) for the same pass, so GL must use a comparison sampler too.
+            C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+#else
             if (b_HW_PCF)
                 C.r_Sampler_clf("s_smap", r2_RT_smap_depth);
             else
             {
                 C.r_Sampler_rtf("s_smap", r2_RT_smap_depth);
             }
+#endif
         }
         else
             C.r_Sampler_rtf("s_smap", r2_RT_smap_surf);
