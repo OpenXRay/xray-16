@@ -35,7 +35,13 @@ public:
         convert_path_separators(conv_fn);
         if (exclusive)
         {
-            const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
+#ifdef XR_PLATFORM_WINDOWS
+            const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR, _S_IREAD | _S_IWRITE);
+#else
+            // On POSIX _sopen maps to open(), whose 3rd argument is the file mode.
+            // The Windows share flag must not be passed, otherwise it becomes the mode (0).
+            const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, _S_IREAD | _S_IWRITE);
+#endif
 #ifndef MASTER_GOLD
             if (handle == -1)
             {
