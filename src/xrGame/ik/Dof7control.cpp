@@ -657,12 +657,12 @@ static void get_aim_circle_equation(const float g[3], const float a[3], const fl
     // Compute the angles of the triangle s,h,g
     //
     float L4 = _sqrt(DOT(g, g));
-    float beta = M_PI - alpha;
+    float beta = float(M_PI) - alpha;
 
     float delta = asin(_sin(beta) * L3 / L4);
     if (delta < 0)
         delta = -delta;
-    float gamma = M_PI - delta - beta;
+    float gamma = float(M_PI) - delta - beta;
 
     float c_gamma = _cos(gamma);
     float n[3];

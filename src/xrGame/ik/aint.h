@@ -75,12 +75,12 @@ inline float angle_distance(float a1, float a2)
 
     if (a1 > a2)
     {
-        t1 = 2 * M_PI - a1 + a2;
+        t1 = 2.f * float(M_PI) - a1 + a2;
         t2 = a1 - a2;
     }
     else
     {
-        t1 = 2 * M_PI - a2 + a1;
+        t1 = 2.f * float(M_PI) - a2 + a1;
         t2 = a2 - a1;
     }
     if (t2 < t1)

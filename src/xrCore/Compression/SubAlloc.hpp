@@ -88,7 +88,7 @@ inline void SplitBlock(void* pv, u32 OldIndx, u32 NewIndx)
 
 u32 _STDCALL GetUsedMemory()
 {
-    u32 RetVal = SubAllocatorSize - (HiUnit - LoUnit) - (UnitsStart - pText);
+    u32 RetVal = SubAllocatorSize - static_cast<u32>(HiUnit - LoUnit) - static_cast<u32>(UnitsStart - pText);
 
     for (size_t i = 0; i < N_INDEXES; i++)
         RetVal -= UNIT_SIZE * Indx2Units[i] * BList[i].Stamp;

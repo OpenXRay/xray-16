@@ -483,7 +483,7 @@ void CLocatorAPI::archive::open()
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
     stat(path.c_str(), &file_info);
-    modif = file_info.st_mtime;
+    modif = static_cast<u32>(file_info.st_mtime);
 #elif defined(XR_PLATFORM_POSIX)
     // Open the file
     if (hSrcFile)

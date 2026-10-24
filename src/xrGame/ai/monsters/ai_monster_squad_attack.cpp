@@ -308,7 +308,7 @@ Fvector CMonsterSquad::calc_monster_target_dir(CBaseMonster* monster, const CEnt
     home2enemy.getHP(heading, pitch);
 
     // 2pi * index/num - encircle
-    heading += M_PI * 2.f * squad_index / squad_size;
+    heading += float(M_PI) * 2.f * squad_index / squad_size;
     heading = angle_normalize(heading);
 
     Fvector dir;

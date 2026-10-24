@@ -581,7 +581,7 @@ void ComplexJtLimit::Solve2(float v, float tan_v, int& n1, float psi_1[2], int& 
     for (int i = 0; i < n; i++)
     {
         float t = theta(1, temp[i]);
-        float t2 = angle_normalize(t + M_PI);
+        float t2 = angle_normalize(t + float(M_PI));
 
         if (angleequal(t, v, 1e-4f))
             psi_1[n1++] = temp[i];

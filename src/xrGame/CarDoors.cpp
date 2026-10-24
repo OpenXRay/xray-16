@@ -710,9 +710,9 @@ void CCar::SDoor::Break()
         float lo, hi;
         joint->GetLimits(lo, hi, 0);
         if (pos_open > 0.f)
-            joint->SetLimits(lo + M_PI / 4.f, hi, 0);
+            joint->SetLimits(lo + float(M_PI) / 4.f, hi, 0);
         else
-            joint->SetLimits(lo, hi - M_PI / 4.f, 0);
+            joint->SetLimits(lo, hi - float(M_PI) / 4.f, 0);
     }
     // ApplyOpenTorque();
     state = broken;

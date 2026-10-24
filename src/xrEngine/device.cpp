@@ -296,7 +296,7 @@ void CRenderDevice::ProcessFrame()
         updateDelta = 1000 / ps_fps_limit_in_menu;
 
     if (frameTime < updateDelta)
-        Sleep(updateDelta - frameTime);
+        Sleep(static_cast<DWORD>(updateDelta - frameTime));
 
     if (!b_is_Active)
         Sleep(1);
@@ -436,7 +436,7 @@ void CRenderDevice::FrameMove()
 
     dwFrame++;
     Core.dwFrame = dwFrame;
-    dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
+    dwTimeContinual = static_cast<u32>(TimerMM.GetElapsed_ms() - app_inactive_time);
 
     fTimeDeltaReal = Timer.GetElapsed_sec();
     if (!_valid(fTimeDeltaReal))
@@ -467,7 +467,7 @@ void CRenderDevice::FrameMove()
         }
         fTimeGlobal = TimerGlobal.GetElapsed_sec();
         const u32 _old_global = dwTimeGlobal;
-        dwTimeGlobal = TimerGlobal.GetElapsed_ms();
+        dwTimeGlobal = static_cast<u32>(TimerGlobal.GetElapsed_ms());
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
     ImGui::GetIO().DeltaTime = fTimeDeltaReal;
@@ -577,11 +577,11 @@ void CRenderDevice::OnWindowActivate(SDL_Window* window, bool activated)
         {
             TaskScheduler->Pause(false);
             seqAppActivate.Process();
-            app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
+            app_inactive_time += static_cast<u32>(TimerMM.GetElapsed_ms() - app_inactive_time_start);
         }
         else
         {
-            app_inactive_time_start = TimerMM.GetElapsed_ms();
+            app_inactive_time_start = static_cast<u32>(TimerMM.GetElapsed_ms());
             seqAppDeactivate.Process();
             TaskScheduler->Pause(true);
         }

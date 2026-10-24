@@ -223,7 +223,7 @@ void xrCompressor::CompressOne(LPCSTR path)
                     R_ASSERT(LZO_E_OK ==
                         lzo1x_999_compress((u8*)src->pointer(), c_size_real, c_data, &lzo_size_temp, c_heap));
                 }
-                c_size_compressed = lzo_size_temp;
+                c_size_compressed = static_cast<u32>(lzo_size_temp);
 
                 t_compress.End();
 

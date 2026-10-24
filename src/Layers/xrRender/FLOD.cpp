@@ -69,8 +69,8 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
     float r = vis.sphere.R;
     std::sort(&S.x, &S.x + 3);
     float a = S.y;
-    float Sf = 4.f * (0.5f * (r * r * asin(a / r) + a * _sqrt(r * r - a * a)));
-    float Ss = M_PI * r * r;
+    float Sf = 4.f * (0.5f * (r * r * float(asin(a / r)) + a * _sqrt(r * r - a * a)));
+    float Ss = float(M_PI) * r * r;
     lod_factor = Sf / Ss;
 }
 void FLOD::Copy(dxRender_Visual* pFrom)

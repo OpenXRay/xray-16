@@ -139,7 +139,7 @@ inline float put_angle_in_range(float low, float high, float v)
     else
         d1 = _min(_abs(v - low), _abs(v - high));
 
-    v2 = v - 2 * M_PI;
+    v2 = v - 2.f * float(M_PI);
 
     if (low <= v2 && v2 <= high)
         return v2;

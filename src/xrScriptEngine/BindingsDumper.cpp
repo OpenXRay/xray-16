@@ -114,7 +114,7 @@ void BindingsDumper::PrintFunction(SignatureFormatter formatter, const void* fco
         R_ASSERT(getter);
         int signatureLen = getter->format_signature(ls, "#");
         const char* signature = lua_tostring(ls, -1);
-        int typeLen = std::strchr(signature, '#') - signature - 1;
+        int typeLen = static_cast<int>(std::strchr(signature, '#') - signature - 1);
         PrintIndented("");
         Print(signature, typeLen);
         Printf(" %s { get;", propName);

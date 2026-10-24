@@ -533,7 +533,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             if (savedFileCrc == fileCrc)
             {
                 u32 savedBytecodeCrc = file->r_u32();
-                u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
+                u32 bytecodeCrc = crc32(file->pointer(), static_cast<u32>(file->elapsed()));
                 if (bytecodeCrc == savedBytecodeCrc)
                 {
 #ifdef DEBUG
@@ -576,7 +576,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             file->w_u32(dx9compatibility);
             file->w_u32(fileCrc);
 
-            u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
+            u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), static_cast<u32>(pShaderBuf->GetBufferSize()));
             file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
 
             file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());

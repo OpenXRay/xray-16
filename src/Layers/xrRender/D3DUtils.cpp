@@ -220,7 +220,7 @@ void CDrawUtilities::OnDeviceCreate()
 
     for (int i = 0; i < LINE_DIVISION; i++)
     {
-        float angle = M_PI * 2.f * (i / (float)LINE_DIVISION);
+        float angle = float(M_PI) * 2.f * (i / (float)LINE_DIVISION);
         float _sa = _sin(angle), _ca = _cos(angle);
         circledef1[i].x = _ca;
         circledef1[i].y = _sa;

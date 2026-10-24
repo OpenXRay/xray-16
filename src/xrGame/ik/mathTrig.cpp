@@ -155,9 +155,9 @@ int myasin(float x, float solns[2])
         return 1;
 
     if (solns[0] > 0)
-        solns[1] = M_PI - solns[0];
+        solns[1] = float(M_PI) - solns[0];
     else
-        solns[1] = -M_PI - solns[0];
+        solns[1] = -float(M_PI) - solns[0];
 
     return 2;
 }

@@ -185,8 +185,8 @@ public:
 
     // Mode control
     IC CTimer_paused* GetTimerGlobal() { return &TimerGlobal; }
-    u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
-    u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
+    u32 TimerAsync() { return static_cast<u32>(TimerGlobal.GetElapsed_ms()); }
+    u32 TimerAsync_MMT() { return static_cast<u32>(TimerMM.GetElapsed_ms() + Timer_MM_Delta); }
 
 public:
     // Creation & Destroying

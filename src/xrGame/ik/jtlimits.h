@@ -58,7 +58,7 @@ inline float asin2(float x)
         //	printf("Domain error in asin2 %lf\n", x);
         x = (x > 0) ? 1.0f : -1.0f;
     }
-    return angle_normalize(M_PI - asin(x));
+    return angle_normalize(float(M_PI - asin(x)));
 }
 
 //  0 to Pi   (quadrants I,II)

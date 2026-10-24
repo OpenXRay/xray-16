@@ -11,7 +11,7 @@ disk_file_reader::disk_file_reader(shared_str const& file_name) { m_reader = FS.
 disk_file_reader::~disk_file_reader() { FS.r_close(m_reader); }
 bool disk_file_reader::make_data_packet(NET_Packet& packet, u32 chunk_size)
 {
-    u32 size_to_write = (static_cast<u32>(m_reader->elapsed()) >= chunk_size) ? chunk_size : m_reader->elapsed();
+    u32 size_to_write = (static_cast<u32>(m_reader->elapsed()) >= chunk_size) ? chunk_size : static_cast<u32>(m_reader->elapsed());
 
     void* pointer = xr_alloca(size_to_write);
 
@@ -35,7 +35,7 @@ memory_reader::memory_reader(u8* data_ptr, u32 data_size)
 memory_reader::~memory_reader() { xr_delete(m_reader); }
 bool memory_reader::make_data_packet(NET_Packet& packet, u32 chunk_size)
 {
-    u32 size_to_write = (static_cast<u32>(m_reader->elapsed()) >= chunk_size) ? chunk_size : m_reader->elapsed();
+    u32 size_to_write = (static_cast<u32>(m_reader->elapsed()) >= chunk_size) ? chunk_size : static_cast<u32>(m_reader->elapsed());
 
     void* pointer = xr_alloca(size_to_write);
 

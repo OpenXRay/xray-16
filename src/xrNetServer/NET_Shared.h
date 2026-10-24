@@ -43,7 +43,7 @@ enum
     NETFLAG_LOG_CL_PACKETS = 1 << 3,
 };
 
-IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
+IC u32 TimeGlobal(CTimer* timer) { return static_cast<u32>(timer->GetElapsed_ms()); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
 
 #if defined(XR_PLATFORM_WINDOWS)

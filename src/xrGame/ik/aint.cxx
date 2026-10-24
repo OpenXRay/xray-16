@@ -53,7 +53,7 @@ float AngleInt::Mid() const
     if (High() > Low())
         mid = ((High() + Low()) / 2.0f);
     else
-        mid = angle_normalize(M_PI + (High() + Low()) / 2.0f);
+        mid = angle_normalize(float(M_PI) + (High() + Low()) / 2.0f);
 
     return mid;
 }
@@ -213,7 +213,7 @@ int AngleInt::merge(const AngleInt& a, AngleInt& b, float eps) const
 //
 // Returns the size of the range
 //
-float AngleInt::Range() const { return (low < high) ? (high - low) : high + (2 * M_PI - low); }
+float AngleInt::Range() const { return (low < high) ? (high - low) : high + (2.f * float(M_PI) - low); }
 void AngleIntList::add(float l, float h)
 {
     AngleIntListNode* t = xr_new<AngleIntListNode>(l, h, (AngleIntListNode*)0);
