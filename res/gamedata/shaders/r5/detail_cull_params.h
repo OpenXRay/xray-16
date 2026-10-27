@@ -21,7 +21,9 @@ cbuffer DetailCullParams : register(b5)
     uint g_visible_decal_capacity;
     uint g_grass_mode;
     uint g_visible_billboard_capacity;
-    uint3 g_prepared_capacity;
+    uint g_prepared_capacity0;
+    uint g_prepared_capacity1;
+    uint g_prepared_capacity2;
     uint g_ray_mode;
     float g_ray_radius;
     float g_ray_cell_radius;

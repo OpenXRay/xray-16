@@ -5,7 +5,9 @@
 cbuffer DetailWorkParams
 {
     uint g_EntryCapacity;
-    uint3 g_BladeCapacity;
+    uint g_BladeCapacity0;
+    uint g_BladeCapacity1;
+    uint g_BladeCapacity2;
     uint g_MeshCapacity;
     uint g_DecalCapacity;
     uint2 g_WorkPadding;
@@ -40,7 +42,7 @@ void main_slots()
 void main()
 {
     uint counts[5] = { g_ArgsLod0.Load(4), g_ArgsLod1.Load(4), g_ArgsLod2.Load(4), g_ArgsMesh.Load(4), g_ArgsDecal.Load(4) };
-    uint capacities[5] = { g_BladeCapacity.x, g_BladeCapacity.y, g_BladeCapacity.z, g_MeshCapacity, g_DecalCapacity };
+    uint capacities[5] = { g_BladeCapacity0, g_BladeCapacity1, g_BladeCapacity2, g_MeshCapacity, g_DecalCapacity };
     uint blades[5] = { 7u, 18u, 42u, 1u, 1u };
     uint triangles[5] = { 17u, 7u, 3u, 128u, 128u };
     uint packets = 0;

@@ -22,7 +22,9 @@ cbuffer GrassRTCB {
     uint outputVertexOffset;
     uint indicesPerBlade;
     uint outputIndexOffset;
-    uint3 pad;
+    uint pad0;
+    uint pad1;
+    uint pad2;
     float4 interaction_window;
     float grass_interaction_displacement;
     float grass_interaction_max_angle;

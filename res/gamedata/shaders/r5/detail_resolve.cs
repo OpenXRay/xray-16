@@ -40,7 +40,9 @@ cbuffer DetailResolveParams
     uint g_VeinIndex;
     uint4 g_Segments;
     uint g_InteractionDebug;
-    uint3 g_PreparedCapacity;
+    uint g_PreparedCapacity0;
+    uint g_PreparedCapacity1;
+    uint g_PreparedCapacity2;
 };
 
 Texture3D g_Perlin4D;
@@ -221,7 +223,7 @@ void main(uint3 dtid : SV_DispatchThreadID)
     BladeInstance b;
     BladeBend w;
     float2 inter = SampleGrassInteraction(g_Interaction, smp_rtlinear, raw.pos.xz, interaction_window);
-    if (slot < g_PreparedCapacity[lod])
+    if (slot < ((lod == 0u) ? g_PreparedCapacity0 : ((lod == 1u) ? g_PreparedCapacity1 : g_PreparedCapacity2)))
     {
         PreparedBlade p = (lod == 0u) ? g_PreparedLod0[slot] : ((lod == 1u) ? g_PreparedLod1[slot] : g_PreparedLod2[slot]);
         b = BladeFromPrepared(p, raw);

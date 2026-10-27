@@ -131,7 +131,7 @@ void AppendBladeLOD(DetailInstance inst, uint2 address, inout uint2 membership)
             return;
         g_visible_lod0[idx] = address;
         AppendMembership(membership, 0u, address);
-        if (idx < g_prepared_capacity.x)
+        if (idx < g_prepared_capacity0)
             g_prepared_lod0[idx] = PrepareBlade(inst);
     }
     else if (dist_sqr < g_lod_distance_mid_sqr)
@@ -140,7 +140,7 @@ void AppendBladeLOD(DetailInstance inst, uint2 address, inout uint2 membership)
             return;
         g_visible_lod1[idx] = address;
         AppendMembership(membership, 1u, address);
-        if (idx < g_prepared_capacity.y)
+        if (idx < g_prepared_capacity1)
             g_prepared_lod1[idx] = PrepareBlade(inst);
     }
     else
@@ -149,7 +149,7 @@ void AppendBladeLOD(DetailInstance inst, uint2 address, inout uint2 membership)
             return;
         g_visible_lod2[idx] = address;
         AppendMembership(membership, 2u, address);
-        if (idx < g_prepared_capacity.z)
+        if (idx < g_prepared_capacity2)
             g_prepared_lod2[idx] = PrepareBlade(inst);
     }
 }
