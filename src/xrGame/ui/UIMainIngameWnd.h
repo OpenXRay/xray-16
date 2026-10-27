@@ -25,6 +25,8 @@ public:
     virtual void Draw();
     virtual void Update();
 
+    void DrawContextualElements();
+
     pcstr GetDebugType() override { return "CUIMainIngameWnd"; }
 
 protected:
