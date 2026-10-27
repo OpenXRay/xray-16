@@ -411,6 +411,11 @@ bool EnsurePipelines(fg::RenderDevice* device, LocalShadowState& state)
     return true;
 }
 
+// BuildLocalShadowArgs and BinCasterBatch each write one volatile constant buffer version per caster batch. The number
+// of batches grows with the number of candidate lights (it is much higher with ray tracing on), and a version is only
+// reused once the command list that wrote it has completed, so the ring must cover a full frame (or more) of batches.
+static constexpr u32 LOCAL_SHADOW_BATCH_CB_VERSIONS = 16384;
+
 void BuildLocalShadowArgs(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShadowState& state, u32 mode)
 {
     auto* cmdList = ctx->GetCommandList();
@@ -421,7 +426,7 @@ void BuildLocalShadowArgs(fg::RenderContext* ctx, fg::RenderDevice* device, Loca
     LocalShadowArgsParams ap = {};
     std::copy_n(state.pairCapacity, kLocalStreamCount, ap.caps);
     ap.caps[6] = mode;
-    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "ArgsParams", sizeof(ap), device, 1024);
+    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "ArgsParams", sizeof(ap), device, LOCAL_SHADOW_BATCH_CB_VERSIONS);
     cmdList->writeBuffer(cb, &ap, sizeof(ap));
     cmdList->setBufferState(state.stats, nvrhi::ResourceStates::NonPixelShaderResource);
     cmdList->setBufferState(state.args, nvrhi::ResourceStates::UnorderedAccess);
@@ -461,7 +466,7 @@ void BinCasterBatch(fg::RenderContext* ctx, fg::RenderDevice* device, LocalShado
     const u32 zeros[3] = {};
     cmd->setBufferState(state.stats, nvrhi::ResourceStates::CopyDest);
     cmd->writeBuffer(state.stats, zeros, sizeof(zeros), u64(dp.statsBase + 4u) * sizeof(u32));
-    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "DynBinParams", sizeof(dp), device, 1024);
+    auto cb = cache.GetOrCreateVolatileCB("LocalShadow", "DynBinParams", sizeof(dp), device, LOCAL_SHADOW_BATCH_CB_VERSIONS);
     cmd->writeBuffer(cb, &dp, sizeof(dp));
     auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("local_shadow_bin_dyn", ".cs");
     R_ASSERT(reflection);
