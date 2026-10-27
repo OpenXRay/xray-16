@@ -291,6 +291,10 @@ static constexpr u32 RT_SOURCE_STATIC = 0;
 static constexpr u32 RT_SOURCE_TERRAIN = 1;
 static constexpr u32 RT_SOURCE_TRANSPARENT = 2;
 static constexpr u32 RT_SOURCE_COUNT = 3;
+// Every dirty skinned visual writes its constants to one volatile constant buffer. On Vulkan a version is only
+// reused once the command list that wrote it has completed, so the ring must cover the number of skinning jobs per
+// frame times the frames in flight. A scene with a few dozen NPCs overran the default of 16 versions.
+static constexpr u32 RT_SKIN_CB_VERSIONS = 4096;
 static constexpr u32 RT_TABLE_EMISSIVE = 1u << 0;
 static constexpr u32 RT_TABLE_TRANSFORMS = 1u << 1;
 static constexpr u32 RT_TABLE_OFFSETS = 1u << 2;
@@ -1218,7 +1222,7 @@ bool RTAccelStructManager::InitSkinningPipeline()
     desc.byteSize = sizeof(RTSkinningCB);
     desc.isConstantBuffer = true;
     desc.isVolatile = true;
-    desc.maxVersions = RenderDevice::BufferDesc::VOLATILE_CB_MAX_VERSIONS;
+    desc.maxVersions = RT_SKIN_CB_VERSIONS;
     s_skinCB = m_device->CreateBuffer(desc);
     s_skinLayout = cache.GetOrCreateBindingLayoutFromReflection(*shader.reflection, device);
     if (!s_skinLayout || !s_skinCB.IsValid() || !m_device->GetNativeBuffer(s_skinCB))
@@ -2617,6 +2621,16 @@ void RTAccelStructManager::RecordInputs(const RTBuildPassData& data,
         const auto* reflection = GEnv.Render->GetShaderLoader()->GetCachedReflection("rt_skin_vertices", ".cs");
         R_ASSERT(reflection);
         auto* bones = buffer(data.bones);
+        if (scene.counts.skinned > RT_SKIN_CB_VERSIONS / 4)
+        {
+            static bool warned = false;
+            if (!warned)
+            {
+                warned = true;
+                Msg("! [RT] %u skinning jobs in one frame is close to the %u constant buffer versions available",
+                    scene.counts.skinned, RT_SKIN_CB_VERSIONS);
+            }
+        }
         for (u32 list = 0; list < 2; ++list)
         {
             const xr_vector<RTSkinJob>& jobs = list == 0 ? scene.skinJobs : scene.hudSkinJobs;
