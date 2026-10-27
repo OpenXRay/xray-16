@@ -21,6 +21,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/utils.h>
 #include <tuple>
+#include <set>
 
 
 namespace xray::render::fg
@@ -2747,11 +2748,13 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
     for (const auto handle : data.buffers)
         R_ASSERT(graph.GetPhysicalBuffer(handle));
     u32 index = 0;
-    auto build = [&](RTGeometryBuild& item)
+    auto build = [&](RTGeometryBuild& item, bool forceSkip = false)
     {
         if (!item.handle)
             return;
         auto* destination = graph.GetPhysicalAccelerationStructure(data.structures[index++]);
+        if (forceSkip)
+            return;
         nvrhi::rt::AccelStructDesc desc = item.desc;
         if (item.update)
             desc.buildFlags = desc.buildFlags | nvrhi::rt::AccelStructBuildFlags::PerformUpdate;
@@ -2774,10 +2777,17 @@ void RTAccelStructManager::RecordBLAS(const RTBuildPassData& data,
     }
     if (scene.counts.skinned)
     {
+        // Jobs that map to the same geometry identity share one build slot (and so one BLAS). Record that build once:
+        // building the same acceleration structure repeatedly in one command list with no barrier between the builds
+        // makes them overlap on the GPU. The duplicates still advance the structure index in build().
+        std::set<const RTGeometryBuild*> builtSlots;
         for (auto& job : scene.skinJobs)
         {
             if (job.dirty && job.build)
-                build(*job.build);
+            {
+                const bool firstUse = builtSlots.insert(job.build.get()).second;
+                build(*job.build, !firstUse);
+            }
             job.dirty = false;
         }
         if (scene.HudSkinDirty())
