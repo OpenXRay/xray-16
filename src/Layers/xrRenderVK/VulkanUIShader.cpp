@@ -7,6 +7,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include <unordered_set>
 
 namespace xray::render::vulkan
 {
@@ -141,11 +142,11 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
         Msg("! [renderer-vulkan] UI texture '%s': %s", texture_.c_str(), error.c_str());
         use_transparent_fallback();
     }
-    if (texture_.find("highlight") != std::string::npos ||
-        texture_.find("loading_progress") != std::string::npos)
-        Msg("[renderer-vulkan] ui.asset shader='%s' texture='%s' extent=%ux%u valid=%d",
+    static std::unordered_set<std::string> reported;
+    if (reported.emplace(shader_ + " / " + texture_).second)
+        Msg("[renderer-vulkan] ui.asset shader='%s' texture='%s' extent=%ux%u valid=%d blend=%d alpha-ref=%d clamp=%d",
             shader_.c_str(), texture_.c_str(), extent_.width, extent_.height,
-            descriptor_ != VK_NULL_HANDLE ? 1 : 0);
+            descriptor_ != VK_NULL_HANDLE ? 1 : 0, blend_mode_, alpha_ref_, clamp_ ? 1 : 0);
 }
 
 void VulkanUIShader::use_transparent_fallback()

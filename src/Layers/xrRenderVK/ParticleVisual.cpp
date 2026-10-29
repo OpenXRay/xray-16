@@ -106,8 +106,14 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     priority_ = definition.priority;
     matrices_ = definition.matrices;
     screen_set_ = definition.class_name == "S_SET   ";
+    // This game's Lua special pass overrides its serialized S_SET additive
+    // state (gl/particles_xdistort.s). Keep its offset map out of color ADD.
+    distortion_ = def_->shader == "particles\\xdistort";
+    if (distortion_)
+        Msg("[renderer-vulkan] particle.distortion definition='%s' route=scene-refraction", def_->name.c_str());
     for (bool hud : {false, true})
     {
+        if (distortion_) break;
         RenderPassGraph graph;
         const bool deferred_set = !hud && !screen_set_ && blend_mode_ == 0;
         if (!build_render_pass_graph({RenderConsumer::Particle,
@@ -303,6 +309,9 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
         !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
+    if (distortion_)
+        return pass.record_distortion(frame, buffers.vertices.handle(), buffers.indices.handle(),
+            count * 6, mvp, material_);
     RenderPassGraph graph;
     if (!build_render_pass_graph({RenderConsumer::Particle,
             deferred_set ? SurfaceMode::AlphaTest : SurfaceMode::Transparent,
@@ -486,6 +495,13 @@ bool VulkanParticleGroup::record(const FrameRecordingContext& frame, const Defer
         if ((priority_filter < 0 || child.effect->priority() == priority_filter) &&
             !child.effect->record(frame, pass, mvp, right, up, hud, error, phase)) return false;
     return true;
+}
+
+bool VulkanParticleGroup::has_distortion() const
+{
+    for (const auto& effect : effects_) if (effect->distortion()) return true;
+    for (const auto& child : triggered_) if (child.effect->distortion()) return true;
+    return false;
 }
 
 bool VulkanParticleGroup::has_priority(uint8_t priority) const

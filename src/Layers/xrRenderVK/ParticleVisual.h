@@ -37,6 +37,7 @@ public:
         GeometryPhase phase = GeometryPhase::Transparent);
     void release_gpu(); // The owner waits for all submitted frames first.
     uint8_t priority() const { return priority_; }
+    bool distortion() const { return distortion_; }
     void set_events(std::function<void(bool, PAPI::Particle&)> events);
     u32 getType() const override { return 8; }
     vis_data& getVisData() override { return visibility_; }
@@ -79,7 +80,7 @@ private:
     std::string material_name_;
     int blend_mode_{-1};
     int alpha_ref_{128};
-    bool screen_set_{};
+    bool screen_set_{}, distortion_{};
     uint8_t priority_{1};
     TextureMatrixSet matrices_;
     std::function<void(bool, PAPI::Particle&)> events_;
@@ -101,6 +102,7 @@ public:
         std::string& error);
     const auto& effects() const { return effects_; }
     bool has_priority(uint8_t priority) const;
+    bool has_distortion() const;
     size_t triggered_count() const { return triggered_.size(); }
     bool record(const FrameRecordingContext& frame, const DeferredPass& pass, const float (&mvp)[16],
         const Fvector& right, const Fvector& up, bool hud, std::string& error,

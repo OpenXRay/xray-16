@@ -242,6 +242,11 @@ float4 main(Fragment fragment) : SV_Target0
         max(fog_end_camera.x - fog_color_start.w, 0.01));
     color.rgb = lerp(color.rgb, fog_color_start.rgb, fog);
 #endif
+#if defined(VK_PARTICLE) && !defined(VK_PARTICLE_SCREEN)
+    // Match gl/particle.ps: additive blending must not emit retained RGB
+    // from fully transparent atlas texels.
+    clip(color.a - (0.01 / 255.0));
+#endif
 #if defined(VK_PARTICLE_SET)
     clip(color.a - terrain_alpha_threshold);
 #endif

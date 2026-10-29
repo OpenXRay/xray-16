@@ -6,6 +6,7 @@
 #include "ShadowShaders.h"
 #include "LocalLightShaders.h"
 #include "WaterShaders.h"
+#include "DistortionShaders.h"
 #include "VulkanGameShaders.h"
 
 namespace xray::render::vulkan
@@ -63,6 +64,12 @@ bool DeferredShaderFactory::create(VkDevice device, const ShaderModuleDispatch &
                          shadow_pass, shadow_vertex.handle(), shadow_opaque.handle(), shadow_cutout.handle(),
                          local_shadow_pass, local_light.handle(), water.handle()))
         return false;
+    ShaderModule distortion_vertex, distortion_fragment;
+    if (!distortion_vertex.initialize(device, shader_dispatch, distortion_shaders::Vertex,
+            sizeof(distortion_shaders::Vertex), error) ||
+        !distortion_fragment.initialize(device, shader_dispatch, distortion_shaders::Fragment,
+            sizeof(distortion_shaders::Fragment), error) ||
+        !pass.initialize_distortion(distortion_vertex.handle(), distortion_fragment.handle(), error)) return false;
     return reload_game_pipelines(device, shader_dispatch, pass, resources, error);
 }
 

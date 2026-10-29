@@ -1,6 +1,7 @@
 // Offscreen execution of the shipped fragment SPIR-V with 20 distinguishable
 // sampled slots. Run with a software Vulkan ICD when no physical GPU exists.
 #include <vulkan/vulkan.h>
+#include "../src/Layers/xrRenderVK/DistortionShaders.h"
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -41,12 +42,12 @@ struct Memory
 };
 struct Image { VkImage image{}; VkImageView view{}; VkDeviceMemory memory{}; };
 static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-    VkMemoryPropertyFlags flags, uint32_t layers = 1)
+    VkMemoryPropertyFlags flags, uint32_t layers = 1, uint32_t width = 1)
 {
     Image result;
     VkImageCreateInfo info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     info.imageType = VK_IMAGE_TYPE_2D; info.format = format;
-    info.extent = {1, 1, 1}; info.mipLevels = 1; info.arrayLayers = layers;
+    info.extent = {width, 1, 1}; info.mipLevels = 1; info.arrayLayers = layers;
     if (layers == 6) info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     info.samples = VK_SAMPLE_COUNT_1_BIT; info.tiling = tiling; info.usage = usage;
     info.initialLayout = tiling == VK_IMAGE_TILING_LINEAR ?
@@ -66,7 +67,7 @@ static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImag
     return result;
 }
 static void fill(Memory& memory, const Image& image, const std::array<float, 4>& rgba,
-    uint32_t layers = 1)
+    uint32_t layers = 1, uint32_t width = 1)
 {
     void* mapped{}; check(vkMapMemory(memory.device, image.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
     for (uint32_t face = 0; face < layers; ++face)
@@ -74,7 +75,8 @@ static void fill(Memory& memory, const Image& image, const std::array<float, 4>&
         VkImageSubresource subresource{VK_IMAGE_ASPECT_COLOR_BIT, 0, face};
         VkSubresourceLayout layout{};
         vkGetImageSubresourceLayout(memory.device, image.image, &subresource, &layout);
-        std::memcpy(static_cast<uint8_t*>(mapped) + layout.offset, rgba.data(), sizeof(float) * 4);
+        for (uint32_t x = 0; x < width; ++x)
+            std::memcpy(static_cast<uint8_t*>(mapped) + layout.offset + x * sizeof(float) * 4, rgba.data(), sizeof(float) * 4);
     }
     vkUnmapMemory(memory.device, image.memory);
 }
@@ -119,9 +121,9 @@ int main(int argc, char** argv)
             !(support.optimalTilingFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT))
             throw std::runtime_error("float sampled/attachment images unsupported");
         std::array<Image, 20> input;
-        for (auto& slot : input)
-            slot = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        for (size_t i = 0; i < input.size(); ++i)
+            input[i] = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, i == 3 ? 128 : 1);
         std::array<Image, 3> output;
         for (auto& target : output)
             target = image(memory, format, VK_IMAGE_TILING_OPTIMAL,
@@ -142,7 +144,7 @@ int main(int argc, char** argv)
         pixels[6] = {.8f, .7f, .5f, .5f};
         pixels[7] = {.3f, .4f, .5f, .6f};
         pixels[8] = {.1f, .2f, .7f, .4f};
-        for (size_t i = 0; i < input.size(); ++i) fill(memory, input[i], pixels[i]);
+        for (size_t i = 0; i < input.size(); ++i) fill(memory, input[i], pixels[i], 1, i == 3 ? 128 : 1);
         const Image cube = image(memory, format, VK_IMAGE_TILING_LINEAR,
             VK_IMAGE_USAGE_SAMPLED_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 6);
@@ -159,13 +161,14 @@ int main(int argc, char** argv)
         layout_info.bindingCount = bindings.size(); layout_info.pBindings = bindings.data();
         VkDescriptorSetLayout descriptor_layout{};
         check(vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &descriptor_layout));
-        VkDescriptorPoolSize pool_size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 20};
+        VkDescriptorPoolSize pool_size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 40};
         VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-        pool_info.maxSets = 1; pool_info.poolSizeCount = 1; pool_info.pPoolSizes = &pool_size;
+        pool_info.maxSets = 2; pool_info.poolSizeCount = 1; pool_info.pPoolSizes = &pool_size;
         VkDescriptorPool pool{}; check(vkCreateDescriptorPool(device, &pool_info, nullptr, &pool));
         VkDescriptorSetAllocateInfo alloc{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
         alloc.descriptorPool = pool; alloc.descriptorSetCount = 1; alloc.pSetLayouts = &descriptor_layout;
         VkDescriptorSet set{}; check(vkAllocateDescriptorSets(device, &alloc, &set));
+        VkDescriptorSet scene_set{}; check(vkAllocateDescriptorSets(device, &alloc, &scene_set));
         std::array<VkDescriptorImageInfo, 20> images{};
         std::array<VkWriteDescriptorSet, 20> writes{};
         for (uint32_t i = 0; i < 20; ++i)
@@ -177,9 +180,19 @@ int main(int argc, char** argv)
             writes[i].pImageInfo = &images[i];
         }
         vkUpdateDescriptorSets(device, writes.size(), writes.data(), 0, nullptr);
+        auto scene_images = images;
+        auto scene_writes = writes;
+        for (uint32_t i = 0; i < 20; ++i)
+        {
+            scene_images[i].imageView = input[i == 0 ? 3 : i == 2 ? 19 : i].view;
+            scene_writes[i].dstSet = scene_set;
+            scene_writes[i].pImageInfo = &scene_images[i];
+        }
+        vkUpdateDescriptorSets(device, scene_writes.size(), scene_writes.data(), 0, nullptr);
         VkPushConstantRange range{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(Push)};
         VkPipelineLayoutCreateInfo pipeline_layout_info{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
-        pipeline_layout_info.setLayoutCount = 1; pipeline_layout_info.pSetLayouts = &descriptor_layout;
+        const VkDescriptorSetLayout test_layouts[]{descriptor_layout, descriptor_layout};
+        pipeline_layout_info.setLayoutCount = 2; pipeline_layout_info.pSetLayouts = test_layouts;
         pipeline_layout_info.pushConstantRangeCount = 1; pipeline_layout_info.pPushConstantRanges = &range;
         VkPipelineLayout pipeline_layout{};
         check(vkCreatePipelineLayout(device, &pipeline_layout_info, nullptr, &pipeline_layout));
@@ -300,12 +313,22 @@ int main(int argc, char** argv)
         const auto laemb = module("level_laemb_base.ps.spv");
         const auto reflection = module("level_environment.ps.spv");
         const auto deferred_particle = module("particle_world_deferred.ps.spv");
+        const auto additive_particle = module("particle_world_additive.ps.spv");
+        const auto additive_world_set = module("world_set_additive.ps.spv");
+        auto embedded = [&](const uint32_t* code, size_t bytes) {
+            VkShaderModuleCreateInfo info{VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
+            info.codeSize = bytes; info.pCode = code;
+            VkShaderModule result{}; check(vkCreateShaderModule(device, &info, nullptr, &result)); return result;
+        };
+        using namespace xray::render::vulkan;
+        const auto distort_vs = embedded(distortion_shaders::Vertex, sizeof(distortion_shaders::Vertex));
+        const auto distort_ps = embedded(distortion_shaders::Fragment, sizeof(distortion_shaders::Fragment));
         bool inputs_initialized = false;
         bool cube_initialized = false;
-        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false) {
+        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE) {
             VkPipelineShaderStageCreateInfo stages[2]{};
             for (auto& stage : stages) stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-            stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = vs; stages[0].pName = "main";
+            stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = custom_vertex ? custom_vertex : vs; stages[0].pName = "main";
             stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT; stages[1].module = fragment; stages[1].pName = "main";
             pipeline_info.stageCount = 2; pipeline_info.pStages = stages;
             VkPipeline pipeline{}; check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
@@ -327,13 +350,12 @@ int main(int argc, char** argv)
                     VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
                 cube_initialized = true;
             }
-            if (!inputs_initialized)
             {
                 std::array<VkImageMemoryBarrier, 20> barriers{};
                 for (size_t i = 0; i < barriers.size(); ++i)
                 {
                     barriers[i] = {VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
-                    barriers[i].oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+                    barriers[i].oldLayout = inputs_initialized ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_PREINITIALIZED;
                     barriers[i].newLayout = VK_IMAGE_LAYOUT_GENERAL;
                     barriers[i].image = input[i].image;
                     barriers[i].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -352,7 +374,8 @@ int main(int argc, char** argv)
             rp.clearValueCount = 3; rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &set, 0, nullptr);
+            const VkDescriptorSet draw_sets[]{set, scene_set};
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 2, draw_sets, 0, nullptr);
             VkDeviceSize offset{}; vkCmdBindVertexBuffers(cmd, 0, 1, &vertices, &offset);
             vkCmdPushConstants(cmd, pipeline_layout, range.stageFlags, 0, sizeof(push), &push);
             vkCmdDraw(cmd, 3, 1, 0, 0); vkCmdEndRenderPass(cmd);
@@ -484,9 +507,48 @@ int main(int argc, char** argv)
         push.threshold = .9f;
         particle = execute(deferred_particle, push);
         near(particle[0][0], 0.f, "deferred particle cutout at higher alpha reference");
+        // Transparent texels may retain bright RGB in particle atlases.
+        // The desktop particle shader discards zero alpha before additive blending.
+        fill(memory, input[0], {1.f, .5f, 1.f, 0.f});
+        auto transparent_add = execute(additive_particle, push);
+        near(transparent_add[0][0], 0.f, "zero-alpha additive particle RGB must be discarded");
+        auto transparent_world_set = execute(additive_world_set, push);
+        near(transparent_world_set[0][0], .5f, "S_SET additive preserves its alpha-independent RGB semantics");
+        fill(memory, input[0], pixels[0]);
+        // The same RG distortion field must output sampled scene color,
+        // irrespective of its retained RGB, instead of emitting yellow quads.
+        fill(memory, input[0], {.8f, .7f, .1f, 1.f});
+        Push distort = push;
+        distort.threshold = 0; distort.scale = 1; distort.padding[0] = 1;
+        auto refracted = execute(distort_ps, distort, false, distort_vs);
+        for (unsigned channel = 0; channel < 3; ++channel)
+            near(refracted[0][channel], pixels[3][channel], "distortion reads scene color, not vector RGB");
+        near(refracted[0][3], .495f, "distortion weight uses atlas alpha and particle RGB");
+        // A horizontal scene gradient makes the displacement itself visible
+        // in readback, including its direction and the neutral 127/255 field.
+        void* gradient{};
+        check(vkMapMemory(device, input[3].memory, 0, VK_WHOLE_SIZE, 0, &gradient));
+        VkImageSubresource gradient_subresource{VK_IMAGE_ASPECT_COLOR_BIT, 0, 0};
+        VkSubresourceLayout gradient_layout{};
+        vkGetImageSubresourceLayout(device, input[3].image, &gradient_subresource, &gradient_layout);
+        for (unsigned x = 0; x < 128; ++x)
+        {
+            const float rgba[]{float(x) / 127.f, .3f, .4f, 1.f};
+            std::memcpy(static_cast<uint8_t*>(gradient) + gradient_layout.offset + x * sizeof(rgba), rgba, sizeof(rgba));
+        }
+        vkUnmapMemory(device, input[3].memory);
+        fill(memory, input[0], {127.f/255.f, 127.f/255.f, .1f, 1.f});
+        auto neutral = execute(distort_ps, distort, false, distort_vs);
+        near(neutral[0][0], 64.f/127.f, "neutral distortion leaves the sampled scene coordinate unchanged");
+        fill(memory, input[0], {1.f, 127.f/255.f, .1f, 1.f});
+        auto shifted = execute(distort_ps, distort, false, distort_vs);
+        near(shifted[0][0], 67.f/127.f, "distortion offsets the scene sample to the right");
+        fill(memory, input[0], {.8f, .7f, .1f, 0.f});
+        auto no_distortion = execute(distort_ps, distort, false, distort_vs);
+        near(no_distortion[0][0], 0.f, "zero-weight distortion is discarded");
         std::cout << "surface channel readback: base/lightmap sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
-        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle})
+        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle, additive_world_set, distort_vs, distort_ps})
             vkDestroyShaderModule(device, module_handle, nullptr);
         vkDestroyCommandPool(device, commands, nullptr);
         vkDestroyBuffer(device, readback, nullptr); vkFreeMemory(device, readback_memory, nullptr);

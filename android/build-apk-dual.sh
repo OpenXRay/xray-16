@@ -69,6 +69,7 @@ for generator in \
     embed_vulkan_scene_shaders.py \
     embed_vulkan_weather_shader.py \
     embed_vulkan_water_shader.py \
+    embed_vulkan_distortion_shaders.py \
     embed_vulkan_local_light_shader.py; do
     python3 "$repo_dir/tools/$generator" --glslc "$glslc_bin"
 done
@@ -154,6 +155,10 @@ python3 "$repo_dir/tools/compile_vulkan_shader.py" --compiler glslc --dxc "$glsl
     --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
     --output-dir "$repo_dir/res/gamedata/shaders"
 cp -R "$repo_dir/res/gamedata/." "$asset_root/gamedata/"
+# Compiler scratch files and an accidentally nested output directory are not
+# engine assets, including after an interrupted local shader build.
+find "$asset_root/gamedata/shaders/vk" -maxdepth 1 -type f -name 'tmp????????.spv' -delete
+remove_path "$asset_root/gamedata/shaders/vk/vk"
 python3 "$repo_dir/tools/check_vulkan_shader_assets.py" \
     --shader-root "$asset_root/gamedata/shaders" \
     --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json"

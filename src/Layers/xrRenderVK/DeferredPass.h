@@ -193,6 +193,9 @@ public:
         const WeatherLighting* weather = nullptr) const;
     bool record_local_light(const FrameRecordingContext& frame, VkDescriptorSet gbuffer_set,
         VkDescriptorSet local_set, const VkRect2D& scissor) const;
+    bool initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, std::string& error);
+    bool record_distortion(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
+        uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material) const;
     bool record_water(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
         uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
         uint32_t first_index, float time, float opacity = .72f,
@@ -215,7 +218,7 @@ private:
     VkRenderPass geometry_pass_{}, light_pass_{}, shadow_pass_{}, local_shadow_pass_{}, overlay_pass_{};
     bool lighting_compatible(const FrameRecordingContext& frame) const
     { return frame.render_pass == light_pass_ || (overlay_pass_ && frame.render_pass == overlay_pass_); }
-    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{};
+    VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{}, shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{}, distortion_pipeline_{};
     std::unordered_map<std::string, GamePipeline> game_pipelines_;
     std::unordered_map<VkDescriptorSet, SurfaceParameters> surface_parameters_;
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;

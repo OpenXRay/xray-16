@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <cstring>
 #if defined(XR_PLATFORM_ANDROID)
 #include <SDL_syswm.h>
@@ -23,6 +24,23 @@ namespace xray::render::vulkan
 {
 namespace
 {
+// Attribute CPU recording time to actual render passes in the normal device
+// log. Aggregate CPU p95 also includes acquisition/fence waits.
+struct PassCpuSample
+{
+    const char* name;
+    const DeferredPass& pass;
+    uint32_t draws;
+    std::chrono::steady_clock::time_point begin{std::chrono::steady_clock::now()};
+    ~PassCpuSample()
+    {
+        if (Device.dwFrame % 300 == 0)
+            Msg("[renderer-vulkan] pass.cpu frame=%u pass=%s ms=%.3f draws=%u", Device.dwFrame, name,
+                std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now()-begin).count(),
+                pass.draw_calls()-draws);
+    }
+};
+
 template <typename T> T proc(VkDevice device, PFN_vkGetDeviceProcAddr get, const char* name)
 {
     return reinterpret_cast<T>(get(device, name));
@@ -483,6 +501,7 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
 void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
+    PassCpuSample timing{"opaque-level", owner.deferred_, owner.deferred_.draw_calls()};
     for (const auto& draw : owner.level_draws_)
     {
         if (draw.hud) continue;
@@ -509,6 +528,7 @@ void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, 
 void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
+    PassCpuSample timing{"transparent", owner.deferred_, owner.deferred_.draw_calls()};
     if (frame.image_index >= owner.forward_buffers_.size() ||
         !owner.forward_buffers_[frame.image_index].write(0, &owner.forward_lighting_,
             sizeof(owner.forward_lighting_), owner.model_error_))
@@ -682,6 +702,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
 void VulkanGameDevice::record_local_lights(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
+    PassCpuSample timing{"local-lights", owner.deferred_, owner.deferred_.draw_calls()};
     if (frame.image_index >= owner.local_sets_.size())
     { owner.local_lights_recorded_ = false; return; }
     for (uint32_t i = 0; i < owner.local_uniforms_.size(); ++i)
@@ -782,6 +803,7 @@ void VulkanGameDevice::record_hud(const FrameRecordingContext& frame, void* user
 void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
+    PassCpuSample timing{"opaque-models", owner.deferred_, owner.deferred_.draw_calls()};
     for (auto& draw : owner.model_draws_)
     {
         if (draw.hud) continue;
@@ -995,6 +1017,11 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
     if (sun_uniform.options[1] > .5f && (Device.dwFrame < 3 || Device.dwFrame % 300 == 0))
         Msg("[renderer-vulkan] lighting.diagnostic frame=%u mode=%u panels=1:base,sun,baked,albedo;6:env,hemi-one,sun-one,both;7:old-flat shadow-size=%u bias=%.4f forward=single-base-only quad=opaque-only",
             Device.dwFrame, unsigned(sun_uniform.options[1]), SunShadowTargets::Size, sun_uniform.options[0]);
+    if (render_world && Device.dwFrame % 300 == 0)
+        Msg("[renderer-vulkan] lighting.rgb frame=%u ambient=(%.4f,%.4f,%.4f) hemi=(%.4f,%.4f,%.4f) sun=(%.4f,%.4f,%.4f) combine=%s diagnostic=%.0f",
+            Device.dwFrame, sun_uniform.ambient_color[0], sun_uniform.ambient_color[1], sun_uniform.ambient_color[2],
+            sun_uniform.hemi_color[0], sun_uniform.hemi_color[1], sun_uniform.hemi_color[2],
+            light.color[0], light.color[1], light.color[2], weather_set_ ? "weather" : "plain", sun_uniform.options[1]);
     WaterSceneUniform water_uniform{};
     {
         Fmatrix camera, inverse, sun_view, sun_projection, sun_vp;
@@ -1139,6 +1166,12 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         std::copy_n(local_uniforms_[i].color_type, 4, forward_lighting_.local[i].color_type);
     }
     deferred_.set_forward_weather(render_world ? weather_set_ : VK_NULL_HANDLE);
+    bool particle_refraction = false;
+    for (const auto& particle : particle_draws_)
+        if (particle.visual->getType() == 8 ?
+            static_cast<VulkanParticleEffect*>(particle.visual)->distortion() :
+            static_cast<VulkanParticleGroup*>(particle.visual)->has_distortion())
+        { particle_refraction = true; break; }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,
@@ -1147,7 +1180,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this,
             record_postprocess, this, &sun_shadows_, &sun_uniform,
             &local_shadows_, &local_uniforms_, record_local_lights, this,
-            render_world && level.has_water() ? &water_targets_ : nullptr, &water_uniform))
+            render_world && (level.has_water() || particle_refraction) ? &water_targets_ : nullptr, &water_uniform))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;

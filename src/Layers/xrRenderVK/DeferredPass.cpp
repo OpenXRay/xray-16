@@ -1405,6 +1405,39 @@ bool DeferredPass::record_local_light(const FrameRecordingContext& frame,
     return true;
 }
 
+bool DeferredPass::initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, std::string& error)
+{
+    if (!device_ || !water_layout_ || !vertex || !fragment)
+    { error = "distortion requires initialized scene descriptors and shader stages"; return false; }
+    return make_pipeline(device_, light_pass_, water_layout_, vertex, fragment,
+        true, false, true, false, false, vk_, distortion_pipeline_, error, "particle distortion");
+}
+
+bool DeferredPass::record_distortion(const FrameRecordingContext& frame, VkBuffer vertices,
+    VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material) const
+{
+    if (!distortion_pipeline_ || !lighting_compatible(frame) || !frame.command_buffer ||
+        frame.image_index >= water_sets_.size() || !water_sets_[frame.image_index] ||
+        !vertices || !indices || !index_count || !material ||
+        !frame.extent.width || !frame.extent.height) return false;
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, distortion_pipeline_);
+    viewport_scissor(frame, vk_);
+    const VkDeviceSize offset = 0;
+    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
+    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
+    const VkDescriptorSet sets[]{material, water_sets_[frame.image_index]};
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        water_layout_, 0, 2, sets, 0, nullptr);
+    vk_.cmd_push_constants(frame.command_buffer, water_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+        0, sizeof(mvp), mvp);
+    const float params[]{0.f, 1.f / frame.extent.width, 1.f / frame.extent.height, 0.f};
+    vk_.cmd_push_constants(frame.command_buffer, water_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        sizeof(mvp), sizeof(params), params);
+    vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
+    ++draw_calls_; triangles_ += index_count / 3;
+    return true;
+}
+
 bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer vertices,
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16],
     VkDescriptorSet material, uint32_t first_index, float time, float opacity,
@@ -1452,6 +1485,7 @@ void DeferredPass::destroy()
         if (shadow_cutout_) vk_.destroy_pipeline(device_, shadow_cutout_, nullptr);
         if (local_light_pipeline_) vk_.destroy_pipeline(device_, local_light_pipeline_, nullptr);
         if (water_pipeline_) vk_.destroy_pipeline(device_, water_pipeline_, nullptr);
+        if (distortion_pipeline_) vk_.destroy_pipeline(device_, distortion_pipeline_, nullptr);
     }
     game_pipelines_.clear();
     surface_parameters_.clear();
@@ -1482,6 +1516,7 @@ void DeferredPass::destroy()
     shadow_opaque_ = shadow_cutout_ = VK_NULL_HANDLE;
     local_light_pipeline_ = VK_NULL_HANDLE;
     water_pipeline_ = VK_NULL_HANDLE;
+    distortion_pipeline_ = VK_NULL_HANDLE;
     geometry_layout_ = skinned_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
     local_light_layout_ = VK_NULL_HANDLE;
     water_layout_ = VK_NULL_HANDLE;
