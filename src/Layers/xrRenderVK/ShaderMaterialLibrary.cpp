@@ -591,7 +591,8 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
           material.priority <= 3 &&
           (material.mode == SurfaceMode::Transparent ||
            material.class_name == "V       " && material.mode == SurfaceMode::Opaque)) &&
-        !(model_pipeline && material.priority >= 2 && material.priority <= 3 &&
+        !(model_pipeline && material.class_name != "PARTICLE" &&
+          material.priority >= 2 && material.priority <= 3 &&
           (material.mode == SurfaceMode::Opaque || material.mode == SurfaceMode::Transparent)) &&
         !(particle_pipeline && material.priority >= 2 && material.priority <= 3 &&
           (material.class_name == "PARTICLE" || material.class_name == "S_SET   ")))

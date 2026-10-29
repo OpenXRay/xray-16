@@ -50,6 +50,9 @@ if (XRAY_BUILD_VULKAN_TESTS)
     xray_add_vulkan_state_test(vulkan_device_resource_state_test tests/vulkan_device_resource_state.cpp)
     xray_add_vulkan_state_test(vulkan_frame_phase_test tests/vulkan_frame_phase.cpp)
     xray_add_vulkan_state_test(vulkan_camera_state_test tests/vulkan_camera_state.cpp)
+    xray_add_vulkan_state_test(vulkan_game_lighting_test tests/vulkan_game_lighting.cpp)
+    target_sources(vulkan_game_lighting_test PRIVATE
+        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/VulkanGameLightingMath.cpp")
     xray_add_vulkan_state_test(vulkan_slide_windows_test tests/vulkan_slide_windows.cpp)
     xray_add_vulkan_state_test(vulkan_skeleton_bones_test tests/vulkan_skeleton_bones.cpp)
     xray_add_vulkan_state_test(vulkan_skeleton_motions_test tests/vulkan_skeleton_motions.cpp)
@@ -99,14 +102,14 @@ if (XRAY_BUILD_VULKAN_TESTS)
 
     add_executable(vulkan_deferred_pass_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_deferred_pass.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/GameShaderResources.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/ShaderModule.cpp"
     )
     target_include_directories(vulkan_deferred_pass_test PRIVATE
         "${XRAY_SOURCE_DIR}"
+        "${XRAY_SOURCE_DIR}/src"
         "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include"
     )
+    target_link_libraries(vulkan_deferred_pass_test PRIVATE
+        xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     target_compile_definitions(vulkan_deferred_pass_test PRIVATE DEBUG)
     target_compile_options(vulkan_deferred_pass_test PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/UNDEBUG>
@@ -233,8 +236,9 @@ if (XRAY_BUILD_VULKAN_TESTS)
 
     add_executable(vulkan_gbuffer_targets_test
         "${XRAY_SOURCE_DIR}/tests/vulkan_gbuffer_targets.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/GBufferTargets.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp")
+    )
+    target_link_libraries(vulkan_gbuffer_targets_test PRIVATE
+        xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     target_include_directories(vulkan_gbuffer_targets_test PRIVATE
         "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
     target_compile_options(vulkan_gbuffer_targets_test PRIVATE
@@ -243,8 +247,9 @@ if (XRAY_BUILD_VULKAN_TESTS)
     add_test(NAME vulkan_gbuffer_targets COMMAND vulkan_gbuffer_targets_test)
 
     add_executable(vulkan_water_local_pipeline_test
-        "${XRAY_SOURCE_DIR}/tests/vulkan_water_local_pipeline.cpp"
-        "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/DeferredPass.cpp")
+        "${XRAY_SOURCE_DIR}/tests/vulkan_water_local_pipeline.cpp")
+    target_link_libraries(vulkan_water_local_pipeline_test PRIVATE
+        xrRenderVK xrEngine xrAPI xrScriptEngine xrCDB xrCore xrMaterialSystem)
     target_include_directories(vulkan_water_local_pipeline_test PRIVATE
         "${XRAY_SOURCE_DIR}" "${XRAY_SOURCE_DIR}/Externals/Vulkan-Headers/include")
     target_compile_options(vulkan_water_local_pipeline_test PRIVATE

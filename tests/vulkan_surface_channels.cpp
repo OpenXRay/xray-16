@@ -84,7 +84,7 @@ struct Push { float mvp[16]; float threshold{}, scale{}; float padding[2]{};
 static_assert(sizeof(Push) == 240);
 static void near(float actual, float expected, const char* label)
 {
-    if (std::abs(actual - expected) > .015f)
+    if (!std::isfinite(actual) || std::abs(actual - expected) > .015f)
         throw std::runtime_error(std::string(label) + " expected " + std::to_string(expected) +
             ", got " + std::to_string(actual));
 }
@@ -235,6 +235,12 @@ int main(int argc, char** argv)
           vertex.lightmap_uv[0] = vertex.lightmap_uv[1] = .5f;
           vertex.baked[0] = .5f; vertex.baked[1] = .25f;
           vertex.baked[2] = .75f; vertex.baked[3] = 1.f; }
+        // Normal mapping reconstructs a tangent frame from screen-space UV
+        // derivatives. Constant UVs exercise the degenerate fallback instead
+        // of the normal maps this fixture is intended to verify.
+        triangle[0].uv[0] = 0; triangle[0].uv[1] = 0;
+        triangle[1].uv[0] = 2; triangle[1].uv[1] = 0;
+        triangle[2].uv[0] = 0; triangle[2].uv[1] = 2;
         void* mapped{}; check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
         std::memcpy(mapped, triangle.data(), sizeof(triangle)); vkUnmapMemory(device, vertex_memory);
         buffer_info.size = 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
@@ -396,6 +402,21 @@ int main(int argc, char** argv)
         auto normal = execute(flat, push);
         if (std::abs(normal[1][0] - bump[1][0]) < .02f)
             throw std::runtime_error("external normal slot 15 did not change output normal");
+        // Distance/resolution change the magnitude of UV derivatives, but
+        // must not change the tangent-space lighting for the same surface.
+        for (auto& vertex : triangle)
+            for (float& uv : vertex.uv) uv *= 0.00001f;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        auto distant_normal = execute(flat, push);
+        for (unsigned channel = 0; channel < 3; ++channel)
+            near(distant_normal[1][channel], normal[1][channel], "normal mapping at small UV derivatives");
+        for (auto& vertex : triangle)
+            for (float& uv : vertex.uv) uv *= 100000.f;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
         push.modes[2] = 0; push.modes[1] = 0;
         push.factors[2] = .18f;
         auto emissive = execute(flat, push);

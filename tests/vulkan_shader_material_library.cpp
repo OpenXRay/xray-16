@@ -1091,6 +1091,9 @@ int main()
         write32(record_bytes, value); write32(record_bytes, 0); write32(record_bytes, 3);
     };
     Bytes priority_window = record("MODELEbB", "models\\window", true);
+    // Transparent MODELEbB requires its environment texture, independently
+    // of the render priority being checked here.
+    texture_property(priority_window, "Name", "mod\\cube");
     set_priority(priority_window, 2);
     Bytes priority_solid = record("MODELEbB", "models\\solid_priority", false);
     set_priority(priority_solid, 2);
@@ -1112,10 +1115,11 @@ int main()
         assert(parsed_library.load(reader, error));
         SurfaceMode selected{};
         MaterialDefinition resolved;
-        assert(parsed_library.resolve("models\\window", selected, error,
+        const bool window_resolved = parsed_library.resolve("models\\window", selected, error,
             nullptr, nullptr, false, false, true, false,
-            nullptr, nullptr, &resolved, true) &&
-            selected == SurfaceMode::Transparent && resolved.priority == 2);
+            nullptr, nullptr, &resolved, true);
+        if (!window_resolved) std::fprintf(stderr, "%s\n", error.c_str());
+        assert(window_resolved && selected == SurfaceMode::Transparent && resolved.priority == 2);
         assert(parsed_library.resolve("models\\solid_priority", selected, error,
             nullptr, nullptr, false, false, true, false,
             nullptr, nullptr, &resolved, true) &&

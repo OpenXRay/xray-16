@@ -42,7 +42,13 @@ class VulkanAlphaTestShaderTest(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("alpha_shader_generator", SCRIPT)
         generator = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(generator)
-        self.assertEqual(OUTPUT.read_text(), generator.generate())
+        # SPIR-V word 2 records the compiler version, not shader behavior.
+        # Distribution builds of glslc can differ only in this generator ID.
+        def code(text):
+            words = [int(word, 16) for word in re.findall(r"0x([0-9a-fA-F]+)u", text)]
+            words[2] = 0
+            return words
+        self.assertEqual(code(OUTPUT.read_text()), code(generator.generate()))
 
         source = OUTPUT.read_text()
         match = re.search(r"GBufferAlphaTestFragment\[\] = \{(.*?)\};", source, re.S)

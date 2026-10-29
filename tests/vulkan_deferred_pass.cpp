@@ -44,7 +44,7 @@ float expected_mvp[16]{};
 VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkPipelineLayout* output)
 {
-    assert(info->setLayoutCount >= 1 && info->setLayoutCount <= 3);
+    assert(info->setLayoutCount >= 1 && info->setLayoutCount <= 4);
     if (!info->pushConstantRangeCount)
     {
         assert(info->setLayoutCount == 2);
@@ -65,7 +65,7 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     {
         assert(range.stageFlags == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
         assert(range.size == sizeof(float) * 60);
-        *output = info->setLayoutCount == 3 ?
+        *output = info->setLayoutCount == 4 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
     }
@@ -345,16 +345,17 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         return;
     }
     assert(layout == geometry_layout || layout == skinned_layout);
+    if (offset == 128)
+    {
+        assert(stage == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
+        assert(size == sizeof(float) * 28);
+        const float* rows = static_cast<const float*>(data);
+        assert(rows[0] == 1.f && rows[5] == 1.f && rows[8] == 1.f &&
+            rows[13] == 1.f && rows[16] == 1.f && rows[21] == 1.f && rows[26] == 1.f);
+        return;
+    }
     if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
     {
-        if (offset == 128)
-        {
-            assert(size == sizeof(float) * 28);
-            const float* rows = static_cast<const float*>(data);
-            assert(rows[0] == 1.f && rows[5] == 1.f && rows[8] == 1.f &&
-                rows[13] == 1.f && rows[16] == 1.f && rows[21] == 1.f && rows[26] == 1.f);
-            return;
-        }
         if (offset == 96)
         {
             assert(size == sizeof(SurfaceParameters) &&

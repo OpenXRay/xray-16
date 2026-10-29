@@ -9,6 +9,7 @@
 #include "src/Layers/xrRenderVK/VulkanImGuiRender.h"
 #include "src/Layers/xrRenderVK/ResourceIssueCounter.h"
 #include "Include/xrRender/RenderFactory.h"
+#include "xrEngine/XR_IOConsole.h"
 
 #include <cassert>
 
@@ -20,6 +21,9 @@ RendererModule* GetRendererModule();
 int main()
 {
     Core.Initialize("vulkan_renderer_module_test", nullptr, false);
+    // SetupEnv registers renderer commands in the engine-owned console.
+    CConsole console;
+    Console = &console;
     {
         xray::render::vulkan::ResourceIssueCounter issues;
         const std::string source = "file=$level$/level.geom visual=2 material=7 shader='mod\\plain' reason=missing TEXCOORD1";
@@ -105,4 +109,5 @@ int main()
         module->ClearEnv();
         assert(!GEnv.Render && !GEnv.RenderFactory && !GEnv.DU && !GEnv.UIRender && !GEnv.DRender);
     }
+    Console = nullptr;
 }

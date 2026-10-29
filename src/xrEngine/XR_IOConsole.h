@@ -71,7 +71,7 @@ protected:
     bool m_disable_tips;
 
 private:
-    EVENT eConsole;
+    EVENT eConsole{};
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;

@@ -101,6 +101,17 @@ float3 surface_normal(float3 geometric, float3 position, float2 uv, float3 tange
     // static, skinned and terrain vertices without requiring mesh tangents.
     float3 dpdx = ddx(position), dpdy = ddy(position);
     float2 dudx = ddx(uv), dudy = ddy(uv);
+    // Derivative magnitudes depend on distance, texture scale and render
+    // resolution. Test degeneracy after rescaling both derivative pairs;
+    // an absolute determinant threshold drops normal maps on distant faces.
+    float uv_scale = max(max(abs(dudx.x), abs(dudx.y)), max(abs(dudy.x), abs(dudy.y)));
+    float position_scale = max(max(max(abs(dpdx.x), abs(dpdx.y)), abs(dpdx.z)),
+        max(max(abs(dpdy.x), abs(dpdy.y)), abs(dpdy.z)));
+    if (uv_scale < 1e-20 || position_scale < 1e-20) return geometric;
+    dudx /= uv_scale;
+    dudy /= uv_scale;
+    dpdx /= position_scale;
+    dpdy /= position_scale;
     float determinant = dudx.x * dudy.y - dudx.y * dudy.x;
     if (abs(determinant) < 1e-8) return geometric;
     // The adjugate below carries the UV determinant. Without its sign the

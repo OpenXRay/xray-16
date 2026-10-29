@@ -69,9 +69,8 @@ def main(root):
     slots = reflect(shaders / "level_vegetation_detail_blended.ps.spv")
     assert (1, 0) in slots.values() and "lightmap" not in slots
 
-    # The shipped opaque vertex variants share Camera push constants with
-    # the fragment material. An unused float3 once moved normal_rows to 96,
-    # making the block 144 bytes against a 128-byte pipeline layout.
+    # Camera shares the 240-byte material push range. Normal rows start at
+    # 80; material UV rows occupy the shared offsets 128, 144 and 160.
     manifest = json.loads((shaders / "opaque-variants.json").read_text())
     for variant in manifest["variants"]:
         if variant["source"] not in ("opaque.vs", "skinned.vs"):
@@ -91,7 +90,7 @@ def main(root):
             cursor += count
         camera = [offset for (identifier, member), offset in offsets.items()
                   if names.get(identifier) == "Camera"]
-        assert camera == [0, 64, 80], (path, camera)
+        assert camera == [0, 64, 80, 128, 144, 160], (path, camera)
 
 
 if __name__ == "__main__":
